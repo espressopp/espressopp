@@ -1,0 +1,39 @@
+There are three possibilities to run the same MPI demo:
+
+1. python example.py
+        - running the example through python, which loads
+          the python library mpi_test.py, which in turn
+          loads the C++-library cpp/mpi_test.so
+
+2. cpp/mpi_test_embedded example.py
+        - running the example through embedded python. Here
+          the binary contains the code of mpi_test.so, and
+          hands control over to python. In this example, the
+          initialization of MPI is done _before_ the
+          initialization of Python; if a slave is started,
+	  Python is not started at all, in fact.
+
+3. cpp/mpi_test
+
+The cool thing is: you can mix the three programs!
+With lam, you need an application schema, for example the provided
+test.appschema. For OpenMPI, it seems you can just specify
+multiple programs on the command line separated by ":". The
+example starts processes of all three kinds which are happily
+communicating.
+
+The program simulates the old slaveMainloop principle of Espresso,
+which will be replaced by DRMI. What happens, is that rank 0 sends
+commands to the other nodes. Here, the nodes just report the
+received command code and exit in case it is 42; this is issued
+automatically by the Python module on exit, the C++-master issues
+it manually.
+
+In any case, for changing the series of issued codes it is
+completely sufficient to change the master; most notably, this means
+that changing example.py is sufficient if the master is running
+Python, and no recompilation is necessary.
+
+The strange embedded invocation seems to be necessary on some
+platforms according to both pyMPI and mpi4py. As it seems, some MPI
+implementations need direct access to argc and argv.
