@@ -1,5 +1,0 @@
-virtual_iterators.C:
-  Tests the performance of virtual iterators by repeatedly adding up
-  a list of 3D vectors.
-  Test 1, 2, 3: Variants of using a virtual iterator.
-  Test 4: Non-virtual iterator.

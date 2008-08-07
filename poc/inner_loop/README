@@ -1,6 +1,0 @@
-inner_loop.C: 
-  Tests two variants of the inner loop using Verlet lists:
-  Variant 1: A first loop loops over all particles, a second over its
-  Verlet list.
-  Variant 2: A loop goes over pairs created from the above Verlet
-  lists.
