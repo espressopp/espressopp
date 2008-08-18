@@ -33,7 +33,9 @@ configure --with_boost=/home/brandes/boost
 
 3. Make
 
-make
+make        ! genrates (executables + ) libraries
+
+make check    ! generate and run test cases
 
 4. Installation in own directory
 
