@@ -8,7 +8,7 @@
 #                                                                 #
 ################################################################### 
 
-AC_INIT(src/cpp/kernel/BasicProperty.cpp)
+AC_INIT(src/cpp/espresso/kernel/BasicProperty.cpp)
 AM_INIT_AUTOMAKE(EspressoPP,0.1)
 AM_CONFIG_HEADER(config.h)
 
@@ -44,6 +44,8 @@ AM_PATH_PYTHON([2.2])
 
 AX_PYTHON
 AX_BOOST_BASE(1.35)
+CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS -I$PYTHON_INCLUDE_DIR"
+
 
 ################################################################### 
 #                                                                 #
@@ -81,6 +83,8 @@ DX_INIT_DOXYGEN(Espresso, doxygen.cfg, doc)
 
 AC_OUTPUT(Makefile 
           src/Makefile 
-          src/cpp/Makefile 
-          src/cpp/kernel/Makefile 
-          src/cpp/kernel/test/Makefile)
+          src/cpp/Makefile
+          src/cpp/espresso/Makefile 
+          src/cpp/espresso/kernel/Makefile 
+          src/cpp/espresso/kernel/test/Makefile
+	  )
