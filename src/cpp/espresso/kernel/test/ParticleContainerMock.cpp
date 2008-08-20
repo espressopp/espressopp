@@ -3,6 +3,7 @@
 #define DEFAULT_BLOCK_SIZE 256
 
 #include <iostream>
+#include <cstring>
 
 /** \file ParticleContainer.cpp    i
 

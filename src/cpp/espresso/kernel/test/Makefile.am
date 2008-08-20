@@ -18,4 +18,4 @@ ParticleContainerTest_CPPFLAGS = $(BOOST_CPPFLAGS)
 ParticleContainerTest_LDFLAGS  = $(BOOST_LDFLAGS) $(BOOST_UNIT_TEST_FRAMEWORK_LIB)
 ParticleContainerTest_LDADD    = ../BasicProperty.o ../ParticleContainer.o
 
-INCLUDES = -I$(top_srcdir)/src/cpp/kernel
+INCLUDES = -I../
