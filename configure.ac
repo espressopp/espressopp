@@ -8,9 +8,19 @@
 #                                                                 #
 ################################################################### 
 
-AC_INIT(src/cpp/espresso/kernel/BasicProperty.cpp)
-AM_INIT_AUTOMAKE(EspressoPP,0.1)
-AM_CONFIG_HEADER(config.h)
+AC_INIT(espressopp, 0.1)
+AM_INIT_AUTOMAKE()
+
+################################################################### 
+#                                                                 #
+#  - autoconfig generates the following file with                 #
+#    a lot of variables of HAVE_feature                           #
+#                                                                 #
+#  - this might be included where necessary                       #
+#                                                                 #
+################################################################### 
+
+AC_CONFIG_HEADERS(src/cpp/acconfig.h)
 
 ################################################################### 
 #                                                                 #
@@ -98,10 +108,15 @@ DX_INIT_DOXYGEN(Espresso, doxygen.cfg, doc)
 #                                                                 #
 ################################################################### 
 
-AC_OUTPUT(Makefile 
-          src/Makefile 
-          src/cpp/Makefile
-          src/cpp/espresso/Makefile 
-          src/cpp/espresso/kernel/Makefile 
-          src/cpp/espresso/kernel/test/Makefile
-	  )
+AC_CONFIG_FILES([Makefile 
+                 src/Makefile 
+                 src/cpp/Makefile
+                 src/cpp/espresso/Makefile 
+                 src/cpp/espresso/kernel/Makefile 
+                 src/cpp/espresso/kernel/test/Makefile
+	         ])
+
+# now make sure that all config files are generated
+
+AC_OUTPUT
+
