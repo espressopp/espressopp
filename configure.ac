@@ -38,14 +38,31 @@ AM_PATH_PYTHON([2.2])
 
 ################################################################### 
 #                                                                 #
-#  BOOST + PYTHON                                                 #
+#  AX_PYTHON sets the following variables                         #
+#                                                                 #
+#     PYTHON_BIN         : name of the python executable          #
+#     PYTHON_INCLUDE_DIR : directory holding the header files     #
+#     PYTHON_LIB         : name of the Python library.            #
+#                                                                 #
+#    Attention: use -I$(PYTHON_INCLUDE_DIR) in Makefile's         #
 #                                                                 #
 ################################################################### 
 
 AX_PYTHON
-AX_BOOST_BASE(1.35)
-CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS -I$PYTHON_INCLUDE_DIR"
 
+################################################################### 
+#                                                                 #
+#  AX_BOOST_BASE sets the following variables                     #
+#                                                                 #
+#     BOOST_CPPFLAGS :  flags used for compilation                #
+#     BOOST_LDFLAGS  :  flags used for linking boost              #
+#                                                                 #
+#     Note: BOOST_LDFLAGS contains the link path but not          #
+#           the libraries itself (that will follow)               #
+#                                                                 #
+################################################################### 
+
+AX_BOOST_BASE(1.35)
 
 ################################################################### 
 #                                                                 #
