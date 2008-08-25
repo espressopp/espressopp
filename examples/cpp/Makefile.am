@@ -15,3 +15,5 @@ INCLUDES = -I$(top_srcdir)/src/cpp/espresso/kernel
 LDADD = $(top_srcdir)/src/cpp/espresso/kernel/libesppkernel.la
 
 LIBS = $(LOG4ESPP_LIBS)
+
+EXTRA_DIST=log4cxx.properties
