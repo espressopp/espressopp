@@ -1,3 +1,4 @@
+#include "log4espp.hpp"
 #include "ParticleContainer.hpp"
 
 #define DEFAULT_BLOCK_SIZE 256
@@ -5,7 +6,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
-
 
 /** \file ParticleContainer.cpp    i
 
@@ -15,6 +15,8 @@ Implementation of class ParticleContainer for storing particle data.
 <a href="mailto:brandes@scai.fraunhofer.de">Thomas Brandes</a>
 
 */
+
+LOG4ESPP_LOGGER(ParticleContainer::myLogger,"kernel.ParticleContainer");
 
 /** This is the constructor of a ParticleContainer.
  *
@@ -41,18 +43,18 @@ ParticleContainer::ParticleContainer(int numberBlocks, int blockDefaultSize) {
 
    keyData = (int *) malloc (maxParticles * sizeof(int));
 
-#ifdef DEBUG
-   printf("ParticeContainer for %d blocks (size of block = %d) created.\n",
-           numberBlocks, blockDefaultSize);
-   printf ("size of blockOffset = %d\n", blockOffset.size());
-   printf ("size of blockSize   = %d\n", blockSize.size());
+   LOG4ESPP_INFO(myLogger,"ParticeContainer for " << numberBlocks <<
+                          " blocks (size of block = " << blockDefaultSize << ") created");
+
+   LOG4ESPP_DEBUG(myLogger,"size of blockOffset = " << blockOffset.size());
+   LOG4ESPP_DEBUG(myLogger,"size of blockSize   = " << blockSize.size());
 
    for (int i=0; i < numberBlocks; i++) {
 
-       printf ("block %d: offset = %d, total size = %d, act size = %d\n", 
-                i, blockOffset[i], blockOffset[i+1] - blockOffset[i], blockSize[i]);
+       LOG4ESPP_DEBUG(myLogger,"block " << i << ": offset = " << blockOffset[i] <<
+                               ", total size = " << blockOffset[i+1] - blockOffset[i] <<
+                               ", act size = " << blockSize[i]);
    }
-#endif
 
 }
 
@@ -77,10 +79,8 @@ void ParticleContainer::addProperty (BasicProperty *newProperty) {
 
   propertyData.push_back (data);
 
-#ifdef DEBUG
-  cout << "addProperty: " << size << " bytes allocated for property " <<
-        newProperty->getName() << "\n";
-#endif
+  LOG4ESPP_DEBUG(myLogger, "addProperty: " << size << " bytes allocated for property " <<
+                           newProperty->getName() << "\n");
 
 }
 
@@ -107,11 +107,9 @@ void ParticleContainer::removeProperty (BasicProperty *p) {
 
 ParticleRef ParticleContainer::addParticle (int blockIndex, int key) {
 
-#ifdef DEBUG
-   printf ("add particle for block %d\n", blockIndex);
-   printf ("block offset = %d\n", blockOffset[blockIndex]);
-   printf ("block size   = %d\n", blockSize[blockIndex]);
-#endif
+   LOG4ESPP_DEBUG(myLogger,"add particle for block " << blockIndex);
+   LOG4ESPP_DEBUG(myLogger,"block offset = " << blockOffset[blockIndex]);
+   LOG4ESPP_DEBUG(myLogger,"block size   = " << blockSize[blockIndex]);
  
    // we make here the proof of a legal blockIndex
 
@@ -120,7 +118,8 @@ ParticleRef ParticleContainer::addParticle (int blockIndex, int key) {
 
    if (blockOffset[blockIndex] + bsize >= blockOffset[blockIndex+1]) {
 
-      printf("addParticle, memory for block %d exhausted, max = %d\n", blockIndex, bsize-1);
+      LOG4ESPP_FATAL(myLogger,"addParticle, memory for block " << blockIndex <<
+                              " exhausted, max = " << bsize-1);
       exit(-1);
 
    }
@@ -177,10 +176,8 @@ void* ParticleContainer::getParticleDataPtr(ParticleRef pRef, BasicProperty *pro
 
 void ParticleContainer::setParticleData (ParticleRef pRef, BasicProperty *prop, void *data) {
 
-#ifdef DEBUG
-  cout << "setPartcileData for particle " << pRef.index << ", max = " << maxParticles << "\n";
-  cout << "prop = " << prop->getName() << " at pos = " << prop->getPosition() << "\n";
-#endif
+  LOG4ESPP_DEBUG(myLogger, "setPartcileData for particle " << pRef.index);
+  LOG4ESPP_DEBUG(myLogger, "prop = " << prop->getName() << " at pos = " << prop->getPosition() << "\n");
 
   char* ptr = (char *) getParticleDataPtr(pRef, prop);
 
@@ -190,8 +187,8 @@ void ParticleContainer::setParticleData (ParticleRef pRef, BasicProperty *prop, 
 void ParticleContainer::getParticleData(ParticleRef pRef, BasicProperty *prop, void *data) {
 
 #ifdef DEBUG
-  cout << "getPartcileData for particle " << pRef << ", max = " << maxParticles << "\n";
-  cout << "prop = " << prop->getName() << " at pos = " << prop->getPosition() << "\n";
+  LOG4ESPP_DEBUG("getPartcileData for particle " << pRef << ", max = " << maxParticles);
+  LOG4ESPP_DEBUG("prop = " << prop->getName() << " at pos = " << prop->getPosition());
 #endif
 
   char* ptr = (char *) getParticleDataPtr(pRef, prop);
@@ -201,7 +198,7 @@ void ParticleContainer::getParticleData(ParticleRef pRef, BasicProperty *prop, v
 
 void ParticleContainer:: moveParticle(ParticleRef p, int blockIndex) {
 
-   cout << "moveParticle not available yet\n";
+   LOG4ESPP_FATAL(myLogger,"moveParticle not available yet");
 
 }
 

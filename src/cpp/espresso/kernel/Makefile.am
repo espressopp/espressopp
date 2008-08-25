@@ -5,6 +5,8 @@ SUBDIRS = test
 # AM_CPPFLAGS = -fprofile-arcs -ftest-coverage
 # AM_LDFLAGS  = -fprofile-arcs -ftest-coverage
 
+AM_CPPFLAGS = $(LOG4ESPP_CPPFLAGS)
+
 lib_LTLIBRARIES = libesppkernel.la
 
 # we compile everything with mpicxx so this is not necesssary, but just in case
@@ -14,6 +16,7 @@ lib_LTLIBRARIES = libesppkernel.la
 
 libesppkernel_la_SOURCES = BasicProperty.cpp BasicProperty.hpp \
                            ParticleContainer.cpp ParticleContainer.hpp 
+
 
 #  for clean: remove all the files generate by gcov code coverage
 #

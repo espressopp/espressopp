@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "BasicProperty.hpp"
+#include "log4espp.hpp"
 
 /** \file ParticleContainer.hpp    Class for storing particle data.
 
@@ -102,6 +103,8 @@ private:
     int *keyData;              // pointer to the memory used for the key values
 
     int allocatedSize; 
+
+    static LOG4ESPP_DEF_LOGGER(myLogger);
 
 public:
  

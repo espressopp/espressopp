@@ -7,40 +7,41 @@
 
 using namespace std;
 
+// Define a static logger for this class
+
+LOG4ESPP_LOGGER(BasicProperty::logger, "kernel.BasicProperty");
+
 template<class X, class A> inline void Assert(A assertion) {
    if (!assertion) throw X();
 }
 
-BasicProperty::BasicProperty (int tsize, int nelems, const string& name) {
+BasicProperty::BasicProperty (int _typeSize, int _elemSize, const string& _propName) {
 
-    typeSize = tsize;
-    elemSize = nelems;
-    propName = name;
+    typeSize = _typeSize;
+    elemSize = _elemSize;
+    propName = _propName;
 
     position  = -1;
     container = 0;
+
+    LOG4ESPP_INFO(logger,"property " << propName << " defined, size = " << typeSize * elemSize);
 }
 
 void BasicProperty::registerContainer(class ParticleContainer *pContainer, int pos) {
 
     Assert<std::bad_exception>(container == 0);
 
-    // assert(container==0); 
-
     container = pContainer;
     position  = pos;
 
-#ifdef DEBUG
-    cout << "property " << propName << " registered for container " << pContainer << " at pos " << pos << "\n";
-#endif
+    LOG4ESPP_INFO(logger, "property " << propName << " registered for container " 
+                           << pContainer << " at pos " << pos);
 
 }
 
 bool BasicProperty::isRegistered(class ParticleContainer *pContainer) {
 
-#ifdef DEBUG
-    cout << "property " << propName << " of container " << container << " check " << pContainer << "\n";
-#endif
+    LOG4ESPP_DEBUG(logger,"property " << propName << " of container " << container << " check " << pContainer);
 
     return (pContainer == container);
 }
@@ -73,9 +74,9 @@ void BasicProperty::deregister() {
 
 void BasicProperty::printInfo() {
 
-    cout << "BasicProperty (Name=" << propName << 
-           ", typeSize=" << typeSize << ", size=" << (typeSize * elemSize) 
-           << ", pos=" << position << ")\n"; 
+    LOG4ESPP_INFO(logger, "BasicProperty (Name=" << propName << 
+                          ", typeSize=" << typeSize << ", size=" << (typeSize * elemSize) 
+                          << ", pos=" << position); 
 
 }
 

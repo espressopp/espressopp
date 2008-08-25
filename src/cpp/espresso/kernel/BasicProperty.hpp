@@ -15,8 +15,11 @@ a position that corresponds to the position in the list.
 
 #include <string>
 #include <iostream>
+#include "log4espp.hpp"
 
 class ParticleRef {
+
+private:
 
 public:
 
@@ -37,6 +40,8 @@ protected:
     int    elemSize;  /* number of elements       */
 
     std::string propName;  /* name of the property     */
+
+    static LOG4ESPP_DEF_LOGGER(logger);
 
 private:
 

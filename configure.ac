@@ -20,7 +20,7 @@ AM_INIT_AUTOMAKE()
 #                                                                 #
 ################################################################### 
 
-AC_CONFIG_HEADERS(src/cpp/acconfig.h)
+AC_CONFIG_HEADERS(src/hpp/acconfig.hpp)
 
 ################################################################### 
 #                                                                 #
@@ -80,11 +80,28 @@ AX_BOOST_BASE(1.35)
 #                                                                 #
 #    - test for Unit_Test_Framework library                       #
 #    - sets HAVE_BOOST_UNIT_TEST_FRAMEWORK                        #
-#    - calls AC_SUBST(BOOST_UNIT_TEST_FRAMEWORK_LIB)              #
+#    - sets BOOST_UNIT_TEST_FRAMEWORK_LIB to the needed lib       #
 #                                                                 #
 ################################################################### 
 
 AX_BOOST_UNIT_TEST_FRAMEWORK
+
+################################################################### 
+#                                                                 #
+#  LOG4CXX                                                        #
+#                                                                 #
+#    - if found we take it for LOG4ESPP                           #
+#                                                                 #
+################################################################### 
+
+AX_LOG4CXX()
+
+if test "$HAVE_LOG4CXX" == "1"; then
+   echo "LOG4CXX is used for LOG4ESSP (logging for Espresso)"
+   AC_SUBST(LOG4ESPP_CPPFLAGS,${LOG4CXX_CPPFLAGS})
+   AC_SUBST(LOG4ESPP_LDFLAGS,${LOG4CXX_LDFLAGS})
+   AC_SUBST(LOG4ESPP_LIBS,"-llog4cxx")
+fi
 
 ################################################################### 
 #                                                                 #
@@ -114,6 +131,8 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/espresso/Makefile 
                  src/cpp/espresso/kernel/Makefile 
                  src/cpp/espresso/kernel/test/Makefile
+                 examples/Makefile 
+                 examples/cpp/Makefile
 	         ])
 
 # now make sure that all config files are generated
