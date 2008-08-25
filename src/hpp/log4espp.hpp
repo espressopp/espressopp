@@ -22,12 +22,11 @@
 #include "log4cpp/NDC.hh"
 #include <log4cpp/SimpleConfigurator.hh>
 
-static log4cpp::SyslogAppender* syslogAppender;
-
 #define LOG4ESPP_CONFIGURE() log4cpp::SimpleConfigurator::configure("log4cpp.init")
  
 #define LOG4ESPP_ROOTLOGGER(aLogger) log4cpp::Category& aLogger = log4cpp::Category::getRoot()
 
+#define LOG4ESPP_DEF_LOGGER(aLogger) log4cpp::Category& aLogger;
 #define LOG4ESPP_LOGGER(aLogger,name) log4cpp::Category& aLogger = log4cpp::Category::getInstance(std::string(name))
 
 #if defined(LOG4ESSP_LEVEL_FATAL)
@@ -37,11 +36,16 @@ static log4cpp::SyslogAppender* syslogAppender;
 #define LOG4ESPP_ERROR(logger,msg)
 #define LOG4ESPP_FATAL(logger,msg)
 #else
-#define LOG4ESPP_DEBUG(logger,msg) logger.debug(msg)
-#define LOG4ESPP_INFO(logger,msg)  logger.info(msg)
-#define LOG4ESPP_WARN(logger,msg)  logger.warn(msg)
-#define LOG4ESPP_ERROR(logger,msg) logger.error(msg)
-#define LOG4ESPP_FATAL(logger,msg) logger.fatal(msg)
+#define LOG4ESPP_DEBUG(logger,msg) { if (logger.isPriorityEnabled(log4cpp::Priority::DEBUG)) \
+                 { ostringstream omsg; omsg << msg; logger.debug(omsg.str()); }}
+#define LOG4ESPP_INFO(logger,msg) { if (logger.isPriorityEnabled(log4cpp::Priority::INFO)) \
+                 { ostringstream omsg; omsg << msg; logger.info(omsg.str()); }}
+#define LOG4ESPP_WARN(logger,msg) { if (logger.isPriorityEnabled(log4cpp::Priority::WARN)) \
+                 { ostringstream omsg; omsg << msg; logger.info(omsg.str()); }}
+#define LOG4ESPP_ERROR(logger,msg) { if (logger.isPriorityEnabled(log4cpp::Priority::ERROR)) \
+                 { ostringstream omsg; omsg << msg; logger.info(omsg.str()); }}
+#define LOG4ESPP_FATAL(logger,msg) { if (logger.isPriorityEnabled(log4cpp::Priority::FATAL)) \
+                 { ostringstream omsg; omsg << msg; logger.info(omsg.str()); }}
 #endif
 
 #define LOG4ESPP_PUSH(string) log4cpp::NDC::push(string)

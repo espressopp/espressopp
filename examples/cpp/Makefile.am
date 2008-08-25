@@ -16,4 +16,4 @@ LDADD = $(top_srcdir)/src/cpp/espresso/kernel/libesppkernel.la
 
 LIBS = $(LOG4ESPP_LIBS)
 
-EXTRA_DIST=log4cxx.properties
+EXTRA_DIST=log4cxx.properties log4cpp.init

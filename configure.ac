@@ -86,6 +86,23 @@ AX_BOOST_BASE(1.35)
 
 AX_BOOST_UNIT_TEST_FRAMEWORK
 
+###################################################################
+#                                                                 #
+#  LOG4CPP                                                        #
+#                                                                 #
+#    - if found we take it for LOG4ESPP                           #
+#                                                                 #
+###################################################################
+
+AX_LOG4CPP()
+
+if test "$HAVE_LOG4CPP" == "1"; then
+   echo "LOG4CPP is used for LOG4ESSP (logging for Espresso)"
+   AC_SUBST(LOG4ESPP_CPPFLAGS,${LOG4CPP_CPPFLAGS})
+   AC_SUBST(LOG4ESPP_LDFLAGS,${LOG4CPP_LDFLAGS})
+   AC_SUBST(LOG4ESPP_LIBS,"-llog4cpp")
+fi
+
 ################################################################### 
 #                                                                 #
 #  LOG4CXX                                                        #
