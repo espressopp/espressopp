@@ -10,4 +10,4 @@ _hello_la_SOURCES = \
 	hello/python_bindings.cpp \
 	hello/HelloController.cpp hello/HelloController.hpp
 _hello_la_LDFLAGS = -module
-_hello_la_CPPFLAGS = -I$(PYTHON_INCLUDE_DIR)
+_hello_la_CPPFLAGS = -I$(PYTHON_INCLUDE_DIR) $(BOOST_CPPFLAGS)

@@ -60,6 +60,10 @@ AM_PATH_PYTHON([2.2])
 
 AX_PYTHON
 
+if test -z "$PYTHON_INCLUDE_DIR" ; then
+   AC_MSG_ERROR([ATTENTION: could not find python inlcude dir (probably no python-devel])
+fi
+
 ################################################################### 
 #                                                                 #
 #  AX_BOOST_BASE sets the following variables                     #
