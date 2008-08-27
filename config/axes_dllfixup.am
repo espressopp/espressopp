@@ -1,0 +1,28 @@
+# an automake extension to be able to load libtool dll's
+# in the build tree. For each libtool-built library, it adds a
+# link to the dll in the built tree
+# this creates two new phony targets:
+#    dllfixup and dllclean
+# which create links to the libtool generated dlls in the build tree
+# and remove them again. Typically, you want to include them into
+# the all-local and clean-local targets
+
+.PHONY: dllfixup dllclean
+
+# retrieve the objdir, where libtool stores its libraries
+OBJDIR=`$(LIBTOOL) --config | $(EGREP) "^objdir=" | sed -e 's,^objdir=,,'`
+
+dllfixup: $(lib_LTLIBRARIES)
+	@echo "updating links for dll's in the build tree"
+	@for library in $(lib_LTLIBRARIES); do \
+		dll=`echo $$library | sed -e 's,[.]la$$,.so,'`; \
+		if test ! -e $$dll; then \
+			$(LN_S) $(OBJDIR)/$$dll $$dll; \
+		fi \
+	done
+
+dllclean:
+	@for library in $(lib_LTLIBRARIES); do \
+		dll=`echo $$library | sed -e 's,[.]la$$,.so,'`; \
+		if test -h $$dll; then rm -f $$dll; fi \
+	done

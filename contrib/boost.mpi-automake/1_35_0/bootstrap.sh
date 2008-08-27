@@ -16,8 +16,15 @@ done
 cp -r $BOOSTPATH/libs/mpi/src .
 
 # and generate the autoconf/automake files
-libtoolize --automake
-autoheader
-aclocal
-automake --foreign --add-missing
-autoconf
+
+rm -f config.cache acconfig.h
+
+aclocal -I ../../../config		&& \
+autoheader				&& \
+automake --copy --foreign --add-missing	&& \
+autoconf				&& \
+exit 0
+
+exit 1
+
+

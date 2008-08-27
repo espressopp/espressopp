@@ -1,0 +1,31 @@
+Espresso++ uses autoconf, automake  and libtool to automate compiling.
+The necessary steps to generate the configure file are collected in
+autogen.sh, which runs the autotools in the right order. The configure.ac
+checks where to find the compiler and required libraries, and creates
+appropriate Makefiles.
+
+To deal with recursive directories, m4_include is used: for each subdirectory,
+include a file subconfigure.ac, which in turn does the same for each of
+its subdirectories. However, note that these subconfigures are included, i.e.,
+they are executed in the same directory as configure resides and need paths
+relative to the directory where configure.ac resides.
+
+Such a subconfigure is mostly used to specify the output Makefile using
+AC_CONFIG_FILES. It could also be used to check for features needed only in
+this subdirectory, however, if a second subdirectory would need the same, the
+check would be performed twice. So, use this mainly to specify output variables.
+
+The automake Makefiles are recursive by default, however, being able to run from
+the build directory requires some care:
+
+- The toplevel build directory needs to be decorated with a link to the python code.
+  You can do that in all-local, and clean up the link in clean-local.
+
+- a shared library that should be loaded from python needs to be built by
+  the lib_LTLIBRARIES target. To be able to run from the build directory, include
+  axes_dllfixup.am, which defines two new targets: dllfixup and dllclean, which
+  create links for each shared library to their libtool incarnations. Again, add these
+  targets to all-local (dllfixup) and clean-local (dllclean)
+
+- a convenience library that should not be installed needs to be built by the
+  noinst_LTLIBRARIES target.
