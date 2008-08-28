@@ -40,6 +40,11 @@ $(VERSIONLIB): libboost_mpi.la
 install-versionlib: versionlib
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(VERSIONLIB) "$(DESTDIR)$(libdir)";
 
+uninstall-versionlib: versionlib
+	$(LIBTOOL) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$(VERSIONLIB)"
+
+clean-versionlib:
+	rm -f $(VERSIONLIB)
 
 .PHONY: versionlib install-versionlib uninstall-versionlib clean-versionlib
 
