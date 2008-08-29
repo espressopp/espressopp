@@ -1,17 +1,22 @@
 #
 # SYNOPSIS
 #
-#   AXES_IMPORT_PREFIXES
+#   AXES_IMPORT_EXTRA_PREFIXES
 #
 # DESCRIPTION
 #
-#   A macro to set CPPFLAGS and LDFLAGS from a prefix. E.g., if you
-#   configure libxx with --prefix=/home/axel/software, then EXTRA_PREFIXES
-#   will add includes for /home/axel/software/lib and .../include, enabling
-#   use of libxx. Note that lib can also be lib32, lib64 or shlib, depending
-#   what is available on your system.
+#   This macro is a convenience macro that helps the user to add
+#   nonstandard locations of libraries and programs, so that autoconf
+#   can find them.
+#   Instead of having to specify the CPPFLAGS and LDFLAGS of such
+#   libraries/programs, this macro will read directory names from the
+#   environment variable EXTRA_PREFIXES. CPPFLAGS will be
+#   extended by -I<extra prefix>/include (if the directory exists), 
+#   LDFLAGS by -L<extra prefix>/lib, -L<extra prefix>/lib32, 
+#   -L<extra prefix>/lib64 or -L<extra prefix>/shlib, if any of them
+#   exists.
 #
-#   This macro sets:
+#   This macro modifies:
 #
 #     CPPFLAGS
 #     LDFLAGS
@@ -19,7 +24,7 @@
 #
 # LAST MODIFICATION
 #
-#   2008-08-27
+#   2008-08-29
 #
 # COPYLEFT
 #
@@ -51,33 +56,33 @@
 #   distribute a modified version of the Autoconf Macro, you may extend this
 #   special exception to the GPL to apply to your modified version as well.
 
-AC_DEFUN([AXES_IMPORT_PREFIXES],[
+AC_DEFUN([AXES_IMPORT_EXTRA_PREFIXES],[
 
-AC_ARG_VAR(EXTRA_PREFIXES, [list of locations where software is installed. All paths,
+AC_ARG_VAR(EXTRA_PREFIXES, [list of directories where software is installed;  All paths,
 extended by /include, are added to the include paths in CPPFLAGS, and to LDFLAGS
 extended by /lib, /lib32, /lib64 or /shlib, if existent])
 
-for axes_import_dir in $EXTRA_PREFIXES; do
+for axes_extra_dir in $EXTRA_PREFIXES; do
     dnl look for possible includes
-    for axes_import_prefix in $EXTRA_PREFIXES; do
-        axes_import_path="$axes_import_prefix/include"
-        if test -d "$axes_import_path"; then
+    for axes_extra_prefix in $EXTRA_PREFIXES; do
+        axes_extra_path="$axes_extra_prefix/include"
+        if test -d "$axes_extra_path"; then
             dnl make sure we import each path only once
             case " $CPPFLAGS " in
-                *" -I$axes_import_path "*) ;;
-                *) CPPFLAGS="$CPPFLAGS -I$axes_import_path" ;; 
+                *" -I$axes_extra_path "*) ;;
+                *) CPPFLAGS="$CPPFLAGS -I$axes_extra_path" ;; 
             esac
         fi
     done
     dnl and for possible libpaths
-    for axes_import_prefix in $EXTRA_PREFIXES; do
-        for axes_import_tail in lib lib64 lib32 shlib; do
-            axes_import_path="$axes_import_prefix/$axes_import_tail"
-            if test -d "$axes_import_path"; then
-                dnl make sure we import each path only once
+    for axes_extra_prefix in $EXTRA_PREFIXES; do
+        for axes_extra_tail in lib lib64 lib32 shlib; do
+            axes_extra_path="$axes_extra_prefix/$axes_extra_tail"
+            if test -d "$axes_extra_path"; then
+                dnl make sure we extra each path only once
                 case " $LDFLAGS " in
-                    *" -L$axes_import_path "*) ;;
-                    *) LDFLAGS="$LDFLAGS -L$axes_import_path" ;; 
+                    *" -L$axes_extra_path "*) ;;
+                    *) LDFLAGS="$LDFLAGS -L$axes_extra_path" ;; 
                 esac
             fi
         done

@@ -22,17 +22,12 @@
 #   And sets the ac cache variable:
 #
 #     axes_cv_boost
-#       which can be used to check whether boost is available
-#
-#   And sets the shell variable:
-#     axes_boost_lib_suffix
-#       which is "no" if boost was not found, the guessed include path,
-#       or "yes" if no additional path is necessary.
+#       which can be used to check whether the boost headers are available
 #
 #   Note:
 #
 #   This macro needs to be called _before_ any test for a specific Boost library.
-#   The libraries depend on axes_boost_lib_suffix.
+#   The libraries do not test independently for the existence of the header files.
 #
 # LAST MODIFICATION
 #
@@ -53,10 +48,9 @@
 AC_DEFUN([AXES_BOOST_BASE],
 [
 AC_ARG_WITH([boost],
-    AS_HELP_STRING([--with-boost@<:@=FLAVOR@:>@],
-    [use boost (default is yes) - you can specify the flavor of boost libraries
-    to use, that is the name extension, e.g. 'gcc-mt-1_35'; otherwise, the
-    flavor is guessed when testing for the first library]),
+    AS_HELP_STRING([--with-boost@<:@=INCLUDEDIR@:>@],
+    [use boost (default is yes) - you can specify the directory where the
+    boost headers are located, otherwise configure will search for them]),
     [
     if test "$withval" = "no"; then
         want_boost="no"
@@ -64,7 +58,7 @@ AC_ARG_WITH([boost],
         want_boost="yes"
     else
         want_boost="yes"
-        axes_boost_lib_suffix="-$withval"
+        axes_boost_user_inc_path="$withval"
     fi
     ],
     [ want_boost="yes" ])
@@ -89,33 +83,52 @@ if test "x$want_boost" = "xyes"; then
         [
         dnl compile the list of paths that we will search for includes,
 
-        dnl this will try it without include path, which should be the first option
-        axes_boost_possible_incpaths="yes"
+        if test "x$axes_boost_user_inc_path" != "x"; then
+            dnl only try user given include path, if set
+            axes_boost_try_incpaths=$axes_boost_user_inc_path
+        else
+            dnl this will try it without include path, which should be the first option
+            axes_boost_try_incpaths="yes"
 
-        dnl default system include paths and versioned ones
-        for axes_boost_path_tmp in /usr /usr/local /opt /opt/local ; do
-            dnl without version
-            if test -d "$axes_boost_path_tmp/include"; then
-                axes_boost_possible_incpaths="$axes_boost_possible_incpaths $axes_boost_path_tmp/include"
-            fi
-            dnl with version
-            for axes_boost_path_tmp_tmp in "$axes_boost_path_tmp/include/boost-"*; do
-                if test -d "$axes_boost_path_tmp_tmp"; then
-                    axes_boost_possible_incpaths="$axes_boost_possible_incpaths $axes_boost_path_tmp_tmp"
+            dnl then the BOOST_ROOT environment, if set
+            if test "x$BOOST_ROOT" != "x"; then
+                if test -d "$BOOST_ROOT"; then
+                    for axes_boost_path_tmp in "$BOOST_ROOT"/include "$BOOST_ROOT"/include/boost-*; do
+                        if test -d "$axes_boost_path_tmp"; then
+                            axes_boost_try_incpaths="$axes_boost_try_incpaths $axes_boost_path_tmp"
+                        fi
+                    done
                 fi
+            fi
+
+            dnl which paths we try as basis for the include paths of the boost-headers
+            axes_boost_try_roots=
+
+            dnl check include paths from CPPFLAGS
+            for axes_boost_path_tmp in $CPPFLAGS; do
+                dnl translate -I flags into paths
+                case "$axes_boost_path_tmp" in
+                -I*) axes_boost_abs_path=`cd ${axes_boost_path_tmp#-I} && pwd`
+                     axes_boost_try_roots="$axes_boost_try_roots $axes_boost_abs_path" ;;
+                esac
             done
-        done
-    
-        dnl and finally, BOOST_ROOT
-        if test "x$BOOST_ROOT" != "x"; then
-            if test -d "$BOOST_ROOT"; then
-                for axes_boost_path_tmp in "$BOOST_ROOT"/include "$BOOST_ROOT"/include-*; do
-                    if test -d "$axes_boost_path_tmp"; then
-                        axes_boost_possible_incpaths="$axes_boost_possible_incpaths $axes_boost_path_tmp"
+            axes_boost_try_roots="$axes_boost_try_roots /usr/include /usr/local/include"
+
+            dnl check include directories and maybe boost-<version> subdirs
+            for axes_boost_path_tmp in $axes_boost_try_roots; do
+                dnl without version
+                if test -d "$axes_boost_path_tmp"; then
+                    axes_boost_try_incpaths="$axes_boost_try_incpaths $axes_boost_path_tmp"
+                fi
+                dnl with version
+                for axes_boost_path_tmp_tmp in "$axes_boost_path_tmp/boost-"*; do
+                    if test -d "$axes_boost_path_tmp_tmp"; then
+                        axes_boost_try_incpaths="$axes_boost_try_incpaths $axes_boost_path_tmp_tmp"
                     fi
                 done
-            fi
+            done
         fi
+        echo "looking for includes in >$axes_boost_try_incpaths<" >&AS_MESSAGE_LOG_FD
 
         dnl compile-test the candidates
 
@@ -124,11 +137,11 @@ if test "x$want_boost" = "xyes"; then
 
         dnl test include paths for a suitable boost
         succeeded=no
-        for axes_boost_path_tmp in $axes_boost_possible_incpaths; do
+        for axes_boost_path_tmp in $axes_boost_try_incpaths; do
             dnl yes means we get try without an include path
             CPPFLAGS="$axes_boost_cppflags_saved"
             if test $axes_boost_path_tmp != "yes"; then
-                CPPFLAGS="$CPPFLAGS -I$axes_boost_path_tmp"
+                CPPFLAGS="-I$axes_boost_path_tmp $CPPFLAGS"
             fi
 
             AC_LANG_PUSH([C++])

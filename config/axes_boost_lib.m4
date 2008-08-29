@@ -69,6 +69,20 @@ AS_HELP_STRING([--with-boost-$1@<:@=special-lib@:>@],
     [want_boost="yes"; axes_boost_user_lib=""]
 )
 
+AC_ARG_WITH([boost-flavor],
+    AS_HELP_STRING([--with-boost-flavor=FLAVOR],
+    [specify the flavor of boost libraries to use, that is the name extension,
+     e.g. 'gcc-mt-1_35'; otherwise, the flavor is guessed when testing for the first library]),
+    [
+    if test "$withval" = "no"; then
+        axes_boost_user_lib_suffix=".none."
+    elif test "$withval" = ""; then
+        axes_boost_user_lib_suffix=".none."
+    else
+        axes_boost_user_lib_suffix="-$withval"
+    fi
+    ], [])
+
 dnl make proper variables from the cache ones
 AS_VAR_PUSHDEF([cv_boost_lib], [axes_cv_boost_lib_$1])
 
@@ -86,75 +100,89 @@ if test "x$axes_cv_boost" != "xno"; then
         if test "x$axes_cv_boost_lib_path" != "x"; then
             dnl the path was already found, we just use that again
             dnl - auto guessing should really not mix boost-installations.
-            axes_boost_possible_lib_paths=$axes_cv_boost_lib_path
+            axes_boost_try_lib_paths=$axes_cv_boost_lib_path
         else
             dnl first try without a path
-            axes_boost_possible_libpaths="yes"
+            axes_boost_try_libpaths="yes"
 
             if test "x$axes_cv_boost" = "xyes"; then
-                dnl ok, no include flag was guessed, so we need to guess the lib
-                axes_boost_possible_roots="/usr /usr/local /opt /opt/local"
+                dnl the headers are in one of the user-specified includes,
+                dnl so check, whether we can get from the user-specified
+                dnl lib paths or the compiler default paths
+
+                dnl check lib paths from LDFLAGS
+                for axes_boost_path_tmp in $LDFLAGS; do
+                    dnl translate -L flags into paths
+                    case "$p" in
+                    -L*) axes_boost_abs_path=`cd ${axes_boost_path_tmp#-L} && pwd`
+                         axes_boost_try_libpaths="$axes_boost_try_libpaths $axes_boost_abs_path" ;;
+                    esac
+                done
+
+                dnl append compiler paths
+                axes_boost_try_libpaths="$axes_boost_try_libpaths /usr/lib /usr/local/lib"
             else
                 dnl otherwise, we have some path, so only use paths derived from
                 dnl that
-                axes_boost_possible_roots="\
+                axes_boost_try_roots="\
                     `echo $axes_cv_boost | sed 's,/include$,,'` \
                     `echo $axes_cv_boost | sed 's,/include/boost-[[^/]]*$,,'` \
                     $axes_cv_boost/stage"
+                dnl but here, we need to guess the library subdirectory
+                for axes_boost_root_tmp in $axes_boost_try_roots; do
+                    for axes_boost_pathsuffix in lib lib64 lib32 shlib; do
+                        axes_boost_path_tmp="$axes_boost_root_tmp/$axes_boost_pathsuffix"
+                        if test -d "$axes_boost_path_tmp"; then
+                            axes_boost_try_libpaths="$axes_boost_try_libpaths\
+                                $axes_boost_path_tmp"
+                        fi
+                    done
+               done
             fi
-            
-            dnl and then try /lib, /lib64 etc
-            for axes_boost_root_tmp in $axes_boost_possible_roots; do
-                for axes_boost_pathsuffix in lib lib64 lib32 shlib; do
-                    axes_boost_path_tmp="$axes_boost_root_tmp/$axes_boost_pathsuffix"
-                    if test -d "$axes_boost_path_tmp"; then
-                        axes_boost_possible_libpaths="$axes_boost_possible_libpaths\
-                            $axes_boost_path_tmp"
-                    fi
-                done
-            done
         fi
-	echo "looking for lib in >$axes_boost_possible_libpaths<" >&AS_MESSAGE_LOG_FD
+        echo "looking for lib in >$axes_boost_try_libpaths<" >&AS_MESSAGE_LOG_FD
 
         dnl step 1: try to guess possible suffixes, if not specified
 
         if test "x$axes_boost_user_lib" != "x"; then
             dnl enforce use of user-specified library name
-            axes_boost_possible_suffixes=".user."
-    	elif test "x$axes_boost_lib_suffix" != "x"; then
-            dnl user defined suffix,
-            dnl use only that, no guessing
-            axes_boost_user_lib="boost_$1$axes_boost_lib_suffix"
-            axes_boost_possible_suffixes=".user."
+            axes_boost_try_suffixes=".user."
+    	elif test "x$axes_boost_user_lib_suffix" != "x"; then
+            dnl user defined suffix -> use only that, no guessing
+            if test $axes_boost_user_lib_suffix != ".none."; then
+                axes_boost_user_lib="boost_$1$axes_boost_user_lib_suffix"
+            else
+                axes_boost_user_lib="boost_$1"
+            fi
+            axes_boost_try_suffixes=".user."
     	elif test "x$axes_cv_boost_lib_suffix" != "x"; then
-            dnl already automatically determined suffix,
-            dnl use only that, no guessing
-            axes_boost_user_lib="boost_$1$axes_cv_boost_lib_suffix"
-            axes_boost_possible_suffixes=".user."
+            dnl already automatically determined suffix -> use only that, no guessing
+            if test $axes_cv_boost_lib_suffix != ".none."; then
+                axes_boost_user_lib="boost_$1$axes_cv_boost_lib_suffix"
+            else
+                axes_boost_user_lib="boost_$1"
+            fi
+            axes_boost_try_suffixes=".user."
         else
-            axes_boost_possible_suffixes=""
-            for axes_boost_path_tmp in $axes_boost_possible_libpaths; do
+            axes_boost_try_suffixes=""
+            for axes_boost_path_tmp in $axes_boost_try_libpaths; do
                 for axes_boost_lib_tmp in $axes_boost_path_tmp/*boost_$1*; do
                     if test ! -f $axes_boost_lib_tmp; then continue; fi
-                    axes_boost_suffix=`echo $axes_boost_lib_tmp | sed 's,^.*boost_$1,,' | sed 's,[[.]].*$,,'`
+                    axes_boost_suffix_tmp=`echo $axes_boost_lib_tmp | \
+                        sed 's,^.*boost_$1,,' | sed 's,[[.]].*$,,'`
                     dnl it is possible that boost is not versioned at all, protect the empty suffix
-                    if test "x$axes_boost_suffix" = "x"; then
-                        axes_boost_suffix=".none."
+                    if test "x$axes_boost_suffix_tmp" = "x"; then
+                        axes_boost_suffix_tmp=".none."
                     fi
                     dnl check that this suffix was not yet specified
-                    succeeded=no
-                    for axes_boost_suffix_tmp in $axes_boost_possible_suffixes; do
-                        if test "$axes_boost_suffix_tmp" = "$axes_boost_suffix"; then
-                            succeeded=yes
-                        fi
-                    done
-                    if test $succeeded = no; then
-                        axes_boost_possible_suffixes="$axes_boost_possible_suffixes $axes_boost_suffix"
-                    fi
+                    case " $axes_boost_try_suffixes " in
+                        *" $axes_boost_suffix_tmp "*) ;;
+                        *) axes_boost_try_suffixes="$axes_boost_try_suffixes $axes_boost_suffix_tmp" ;;
+                    esac
                 done
             done
         fi
-	echo "trying prefixes >$axes_boost_possible_suffixes<" >&AS_MESSAGE_LOG_FD
+        echo "trying suffixes >$axes_boost_try_suffixes<" >&AS_MESSAGE_LOG_FD
 
         dnl step 2: compile+link-test the candidate directories and suffixes
 
@@ -164,16 +192,16 @@ if test "x$axes_cv_boost" != "xno"; then
         axes_boost_libs_saved="$LIBS"
 
         dnl the CPPFLAGS for boost we know already
-        CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
+        CPPFLAGS="$BOOST_CPPFLAGS $CPPFLAGS"
 
         succeeded=no
-        for axes_boost_path_tmp in $axes_boost_possible_libpaths; do
+        for axes_boost_path_tmp in $axes_boost_try_libpaths; do
             dnl yes actually just means we get along without an include path
             LDFLAGS="$axes_boost_ldflags_saved"
             if test $axes_boost_path_tmp != "yes"; then
-                LDFLAGS="$LDFLAGS -L$axes_boost_path_tmp"
+                LDFLAGS="-L$axes_boost_path_tmp $LDFLAGS"
             fi
-            for axes_boost_suffix_tmp in $axes_boost_possible_suffixes; do
+            for axes_boost_suffix_tmp in $axes_boost_try_suffixes; do
                 dnl .user. means to stick to user-defined name or
                 dnl the suffix from previous library tests
                 if test $axes_boost_suffix_tmp = ".user."; then
@@ -181,9 +209,9 @@ if test "x$axes_cv_boost" != "xno"; then
                 else
                     dnl .none. tries without suffix
                     if test $axes_boost_suffix_tmp != ".none."; then
-                        axes_boost_lib=boost_$1$axes_boost_suffix_tmp
+                        axes_boost_lib="boost_$1$axes_boost_suffix_tmp"
                     else
-                        axes_boost_lib=boost_$1
+                        axes_boost_lib="boost_$1"
                     fi
                 fi
                 LIBS="$axes_boost_libs_saved -l$axes_boost_lib"
@@ -233,10 +261,24 @@ if test "x$axes_cv_boost" != "xno"; then
         dnl same for suffix
     if test "x$axes_cv_boost_lib_suffix" = "x"; then
         AC_MSG_CHECKING([suffix of boost libraries])
-        AC_CACHE_VAL(axes_cv_boost_lib_suffix,
-            [ axes_cv_boost_lib_suffix=$axes_boost_suffix_tmp ])
-        if test "x$axes_cv_boost_lib_suffix" = "x"; then
+        AC_CACHE_VAL(axes_cv_boost_lib_suffix, [
+            dnl if user specified the lib or suffix, use that
+            if test "x$axes_boost_suffix_tmp" = "x.user."; then
+                axes_cv_boost_lib_suffix=`echo $axes_boost_user_lib | sed -e 's,^boost_$1,,'`
+            else
+                axes_cv_boost_lib_suffix=$axes_boost_suffix_tmp
+            fi
+        ])
+        if test "x$axes_cv_boost_lib_suffix" = "x.none."; then
             AC_MSG_RESULT([unversioned layout])
+            AC_MSG_WARN([
+******************************************************************************
+    Your boost libraries are not versioned. This means that we cannot check if
+    the library matches the header files. If you encounter problems with the
+    boost libraries, please check manually that your header file version
+    matches your library version.
+******************************************************************************
+            ])
         else
             AC_MSG_RESULT($axes_cv_boost_lib_suffix)
         fi

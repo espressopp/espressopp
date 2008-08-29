@@ -10,19 +10,21 @@
 .PHONY: dllfixup dllclean
 
 # retrieve the objdir, where libtool stores its libraries
-OBJDIR=`$(LIBTOOL) --config | $(EGREP) "^objdir=" | sed -e 's,^objdir=,,'`
 
 dllfixup: $(lib_LTLIBRARIES)
 	@echo "updating links for dll's in the build tree"
-	@for library in $(lib_LTLIBRARIES); do \
-		dll=`echo $$library | sed -e 's,[.]la$$,.so,'`; \
+	@eval `$(LIBTOOL) --config | $(EGREP) "^objdir="`; \
+	eval `$(LIBTOOL) --config | $(EGREP) "^shrext_cmds="`; \
+	for library in $(lib_LTLIBRARIES); do \
+		dll=`echo $$library | sed -e "s,[.]la$$,$$shrext_cmds,"`; \
 		if test ! -e $$dll; then \
-			$(LN_S) $(OBJDIR)/$$dll $$dll; \
+			$(LN_S) $$objdir/$$dll $$dll; \
 		fi \
 	done
 
 dllclean:
-	@for library in $(lib_LTLIBRARIES); do \
-		dll=`echo $$library | sed -e 's,[.]la$$,.so,'`; \
+	@eval `$(LIBTOOL) --config | $(EGREP) "^shrext_cmds="`; \
+	for library in $(lib_LTLIBRARIES); do \
+		dll=`echo $$library | sed -e "s,[.]la$$,$$shrext_cmds,"`; \
 		if test -h $$dll; then rm -f $$dll; fi \
 	done
