@@ -11,6 +11,7 @@
 AC_INIT(espressopp, 0.1)
 AM_INIT_AUTOMAKE()
 
+
 ################################################################### 
 #                                                                 #
 #  - autoconfig generates the following file with                 #
@@ -28,9 +29,8 @@ AC_CONFIG_HEADERS(src/hpp/acconfig.hpp)
 #                                                                 #
 ################################################################### 
 
+AC_PROG_CXX
 AC_LANG([C++])
-ACX_MPI
-CXX="$MPICXX"
 
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
@@ -44,7 +44,7 @@ AC_PROG_LIBTOOL
 #                                                                 #
 ################################################################### 
 
-AM_PATH_PYTHON([2.2])
+# AM_PATH_PYTHON([2.2])
 
 ################################################################### 
 #                                                                 #
@@ -58,12 +58,6 @@ AM_PATH_PYTHON([2.2])
 #                                                                 #
 ################################################################### 
 
-AX_PYTHON
-
-if test -z "$PYTHON_INCLUDE_DIR" ; then
-   AC_MSG_ERROR([ATTENTION: could not find python inlcude dir (probably no python-devel])
-fi
-
 ################################################################### 
 #                                                                 #
 #  AX_BOOST_BASE sets the following variables                     #
@@ -76,7 +70,7 @@ fi
 #                                                                 #
 ################################################################### 
 
-AX_BOOST_BASE(1.35)
+AXES_BOOST_BASE(1.35)
 
 ################################################################### 
 #                                                                 #
@@ -88,7 +82,8 @@ AX_BOOST_BASE(1.35)
 #                                                                 #
 ################################################################### 
 
-AX_BOOST_UNIT_TEST_FRAMEWORK
+AXES_BOOST_PYTHON
+AXES_BOOST_UNIT_TEST_FRAMEWORK
 
 ###################################################################
 #                                                                 #
