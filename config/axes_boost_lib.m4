@@ -100,7 +100,7 @@ if test "x$axes_cv_boost" != "xno"; then
         if test "x$axes_cv_boost_lib_path" != "x"; then
             dnl the path was already found, we just use that again
             dnl - auto guessing should really not mix boost-installations.
-            axes_boost_try_lib_paths=$axes_cv_boost_lib_path
+            axes_boost_try_libpaths=$axes_cv_boost_lib_path
         else
             dnl first try without a path
             axes_boost_try_libpaths="yes"
@@ -248,41 +248,42 @@ if test "x$axes_cv_boost" != "xno"; then
         dnl user request
         dnl if the cache values are not cached, cv_boost_lib is not
         dnl cached, and therefore the _tmp-paths set
-    if test "x$axes_cv_boost_lib_path" = "x"; then
-        AC_MSG_CHECKING([location of boost libraries])
-        AC_CACHE_VAL(axes_cv_boost_lib_path,
-            [ axes_cv_boost_lib_path=$axes_boost_path_tmp ])
-        if test "x$axes_cv_boost_lib_path" = "xyes"; then
-            AC_MSG_RESULT(standard library paths)
-        else
-            AC_MSG_RESULT($axes_cv_boost_lib_path)
-        fi
-    fi
-        dnl same for suffix
-    if test "x$axes_cv_boost_lib_suffix" = "x"; then
-        AC_MSG_CHECKING([suffix of boost libraries])
-        AC_CACHE_VAL(axes_cv_boost_lib_suffix, [
-            dnl if user specified the lib or suffix, use that
-            if test "x$axes_boost_suffix_tmp" = "x.user."; then
-                axes_cv_boost_lib_suffix=`echo $axes_boost_user_lib | sed -e 's,^boost_$1,,'`
+        if test "x$axes_cv_boost_lib_path" = "x"; then
+            AC_MSG_CHECKING([location of boost libraries])
+            AC_CACHE_VAL(axes_cv_boost_lib_path,
+                [ axes_cv_boost_lib_path=$axes_boost_path_tmp ])
+            if test "x$axes_cv_boost_lib_path" = "xyes"; then
+                AC_MSG_RESULT(standard library paths)
             else
-                axes_cv_boost_lib_suffix=$axes_boost_suffix_tmp
+                AC_MSG_RESULT($axes_cv_boost_lib_path)
             fi
-        ])
-        if test "x$axes_cv_boost_lib_suffix" = "x.none."; then
-            AC_MSG_RESULT([unversioned layout])
-            AC_MSG_WARN([
+        fi
+        dnl same for suffix
+        if test "x$axes_cv_boost_lib_suffix" = "x"; then
+            AC_MSG_CHECKING([suffix of boost libraries])
+            AC_CACHE_VAL(axes_cv_boost_lib_suffix, [
+                dnl if user specified the lib or suffix, use that
+                if test "x$axes_boost_suffix_tmp" = "x.user."; then
+                    axes_cv_boost_lib_suffix=`echo $axes_boost_user_lib | sed -e 's,^boost_$1,,'`
+                else
+                    axes_cv_boost_lib_suffix=$axes_boost_suffix_tmp
+                fi
+            ])
+            if test "x$axes_cv_boost_lib_suffix" = "x.none."; then
+                AC_MSG_RESULT([unversioned layout])
+                AC_MSG_WARN([
 ******************************************************************************
     Your boost libraries are not versioned. This means that we cannot check if
     the library matches the header files. If you encounter problems with the
     boost libraries, please check manually that your header file version
     matches your library version.
 ******************************************************************************
-            ])
-        else
-            AC_MSG_RESULT($axes_cv_boost_lib_suffix)
-        fi
+                ])
+            else
+                AC_MSG_RESULT($axes_cv_boost_lib_suffix)
+            fi
 	fi
+
         dnl set macro with library name
         BOOST_$2_LIBS="-l$cv_boost_lib"
         AC_SUBST(BOOST_$2_LIBS)
