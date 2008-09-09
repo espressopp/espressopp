@@ -37,6 +37,19 @@ AC_PROG_LIBTOOL
 
 ################################################################### 
 #                                                                 #
+#  AXES_IMPORT_EXTRA_PREFIXES                                     #
+#                                                                 #
+#    - set EXTRA_PREFIXES="<dir-1> <dir-2> ... <dir-n>"           #
+#    - macro adds -I<dir-k>/include to CPPFLAGS                   #
+#      and -L<dir-k>/lib(64) to LDFLAGS                           #
+#    - very useful that other macros work fine                    #
+#                                                                 #
+################################################################### 
+
+AXES_IMPORT_EXTRA_PREFIXES
+
+################################################################### 
+#                                                                 #
 #  PYTHON                                                         #
 #                                                                 #
 #    - automake provides support for Python compilation           #
