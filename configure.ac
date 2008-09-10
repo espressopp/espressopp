@@ -1,135 +1,95 @@
 ################################################################### 
 #                                                                 #
-#  configure.ac                                                   #
+#  configure.ac for ESPResSo++                                    #
 #                                                                 #
-#  Input file for autoconf + automake                             #
-#                                                                 #
-#  - use script autogen.sh for the initial configuration          #
+#  - use ./autogen.sh to generate the configure script            #
 #                                                                 #
 ################################################################### 
 
-AC_INIT(espressopp, 0.1)
-AM_INIT_AUTOMAKE()
+AC_INIT([espressopp], [0.1])
+# basic autoconf configuration
+AC_CONFIG_MACRO_DIR(config)
+AC_CONFIG_AUX_DIR(build-aux)
+AC_CONFIG_SRCDIR([src/cpp/hello.hpp])
 
+# we use automake
+AM_INIT_AUTOMAKE
 
-################################################################### 
-#                                                                 #
-#  - autoconfig generates the following file with                 #
-#    a lot of variables of HAVE_feature                           #
-#                                                                 #
-#  - this might be included where necessary                       #
-#                                                                 #
-################################################################### 
+# import paths from the EXTRA_PREFIXES precious variable
+AXES_IMPORT_EXTRA_PREFIXES
 
-AC_CONFIG_HEADERS(src/hpp/acconfig.hpp)
-
-################################################################### 
-#                                                                 #
-#  MPI compiler driver for C++                                    #
-#                                                                 #
-################################################################### 
+# we use C++ as main code language
+# and libtool for building the shared libraries
 
 AC_PROG_CXX
 AC_LANG([C++])
 
-AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 
 ################################################################### 
 #                                                                 #
-#  AXES_IMPORT_EXTRA_PREFIXES                                     #
-#                                                                 #
-#    - set EXTRA_PREFIXES="<dir-1> <dir-2> ... <dir-n>"           #
-#    - macro adds -I<dir-k>/include to CPPFLAGS                   #
-#      and -L<dir-k>/lib(64) to LDFLAGS                           #
-#    - very useful that other macros work fine                    #
+#  check for various boost libraries. All are required, and       #
+#  we bail out if one or more are not found.                      #
 #                                                                 #
 ################################################################### 
 
-AXES_IMPORT_EXTRA_PREFIXES
+AXES_BOOST_BASE([1.35])
 
-################################################################### 
-#                                                                 #
-#  PYTHON                                                         #
-#                                                                 #
-#    - automake provides support for Python compilation           #
-#    - ACTION-IF-NOT-FOUND defaults to abort                      #
-#                                                                 #
-################################################################### 
-
-# AM_PATH_PYTHON([2.2])
-
-################################################################### 
-#                                                                 #
-#  AX_PYTHON sets the following variables                         #
-#                                                                 #
-#     PYTHON_BIN         : name of the python executable          #
-#     PYTHON_INCLUDE_DIR : directory holding the header files     #
-#     PYTHON_LIB         : name of the Python library.            #
-#                                                                 #
-#    Attention: use -I$(PYTHON_INCLUDE_DIR) in Makefile's         #
-#                                                                 #
-################################################################### 
-
-################################################################### 
-#                                                                 #
-#  AX_BOOST_BASE sets the following variables                     #
-#                                                                 #
-#     BOOST_CPPFLAGS :  flags used for compilation                #
-#     BOOST_LDFLAGS  :  flags used for linking boost              #
-#                                                                 #
-#     Note: BOOST_LDFLAGS contains the link path but not          #
-#           the libraries itself (that will follow)               #
-#                                                                 #
-################################################################### 
-
-AXES_BOOST_BASE(1.35)
-
-################################################################### 
-#                                                                 #
-#  BOOST UNIT TEST FRAMEWORK (AX_BOOST_UNIT_TEST_FRAMEWORK)       #
-#                                                                 #
-#    - test for Unit_Test_Framework library                       #
-#    - sets HAVE_BOOST_UNIT_TEST_FRAMEWORK                        #
-#    - sets BOOST_UNIT_TEST_FRAMEWORK_LIB to the needed lib       #
-#                                                                 #
-################################################################### 
-
-AXES_BOOST_PYTHON
-AXES_BOOST_UNIT_TEST_FRAMEWORK
-
-###################################################################
-#                                                                 #
-#  LOG4CPP                                                        #
-#                                                                 #
-#    - if found we take it for LOG4ESPP                           #
-#                                                                 #
-###################################################################
-
-AX_LOG4CPP()
-
-if test "$HAVE_LOG4CPP" == "1"; then
-   echo "LOG4CPP is used for LOG4ESSP (logging for Espresso)"
-   AC_SUBST(LOG4ESPP_CPPFLAGS,${LOG4CPP_CPPFLAGS})
-   AC_SUBST(LOG4ESPP_LDFLAGS,${LOG4CPP_LDFLAGS})
-   AC_SUBST(LOG4ESPP_LIBS,"-llog4cpp")
+if test "x$axes_cv_boost" = "xno"; then
+    AC_MSG_ERROR([could not find the boost headers])
 fi
 
-################################################################### 
-#                                                                 #
-#  LOG4CXX                                                        #
-#                                                                 #
-#    - if found we take it for LOG4ESPP                           #
-#                                                                 #
-################################################################### 
+AXES_BOOST_SERIALIZATION
+if test "x$axes_cv_boost_lib_serialization" = "xno"; then
+    AC_MSG_ERROR([could not find the boost serialization library])
+fi
 
-AX_LOG4CXX()
+AXES_MPI
+if test "x$axes_cv_mpi" = "xno"; then
+   AC_MSG_ERROR([could not compile an MPI program])
+fi
 
-if test "$HAVE_LOG4CXX" == "1"; then
-   echo "LOG4CXX is used for LOG4ESSP (logging for Espresso)"
-   AC_SUBST(LOG4ESPP_CPPFLAGS,${LOG4CXX_CPPFLAGS})
-   AC_SUBST(LOG4ESPP_LDFLAGS,${LOG4CXX_LDFLAGS})
-   AC_SUBST(LOG4ESPP_LIBS,"-llog4cxx")
+AXES_BOOST_MPI
+if test "x$axes_cv_boost_lib_mpi" = "xno"; then
+    AC_MSG_ERROR([could not find the boost mpi library])
+fi
+
+AXES_PYTHON
+if test "x$axes_cv_python_lib" = "xno" -o \
+	"x$axes_cv_python_include" = "xno"; then
+   AC_MSG_ERROR([could not find python])
+fi
+
+AXES_BOOST_PYTHON
+if test "x$axes_cv_boost_lib_python" = "xno"; then
+    AC_MSG_ERROR([could not find the boost python library])
+fi
+
+AXES_BOOST_UNIT_TEST_FRAMEWORK
+if test "x$axes_cv_boost_lib_unit_test_framework" = "xno"; then
+    AC_MSG_ERROR([could not find the boost unit test framework])
+fi
+
+###################################################################
+#                                                                 #
+#  check for log4cpp, or log4cxx if log4cpp is not found          #
+#                                                                 #
+###################################################################
+
+AXES_LOG4CXX
+AXES_LOG4CPP
+
+if test "x$axes_cv_log4cxx" != "xno"; then
+   axes_log4espp="LOG4CXX"
+   AC_SUBST(LOG4ESPP_LIBS,"-l$axes_cv_log4cxx")
+   AC_DEFINE(LOG4ESPP_USE_LOG4CXX,1, [define to use log4cxx for logging])
+elif test "x$axes_cv_log4cpp" != "xno"; then
+   axes_log4espp="LOG4CPP"
+   AC_SUBST(LOG4ESPP_LIBS,"-l$axes_cv_log4cpp")
+   AC_DEFINE(LOG4ESPP_USE_LOG4CPP,1, [define to use log4cpp for logging])
+else
+   axes_log4espp="generic logger"
+   AC_SUBST(LOG4ESPP_LIBS,"")
 fi
 
 ################################################################### 
@@ -150,9 +110,13 @@ DX_INIT_DOXYGEN(Espresso, doxygen.cfg, doc)
 
 ################################################################### 
 #                                                                 #
-#  Generation of Makefile in all subdirectories                   #
+#  Generation of output                                           #
+#  Makefiles in all subdirectories                                #
+#  src/cpp/acconfig.hpp                                           #
 #                                                                 #
 ################################################################### 
+
+AC_CONFIG_HEADERS([src/cpp/acconfig.hpp])
 
 AC_CONFIG_FILES([Makefile 
                  src/Makefile 
@@ -168,3 +132,35 @@ AC_CONFIG_FILES([Makefile
 
 AC_OUTPUT
 
+cat << EOF
+
+
+************************
+* INSTALLATION SUMMARY
+
+EOF
+
+echo "* BOOST:"
+if test "x$axes_cv_boost" != "xyes"; then
+    echo "  - headers located at $axes_cv_boost"
+else
+    echo "  - headers located in the default includes"
+fi
+echo "  - flavor ${axes_cv_boost_lib_suffix#-}"
+echo
+
+echo "* LOG4ESSP (logging for Espresso): uses $axes_log4espp"
+echo
+
+if DX_TEST_FEATURE([doc]); then
+echo "* Documentation: uses doxygen"
+echo
+else
+echo "* Documentation: not built"
+echo
+fi
+
+cat << EOF
+*
+************************
+EOF

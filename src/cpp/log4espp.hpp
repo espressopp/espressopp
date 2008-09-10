@@ -1,7 +1,7 @@
 
 #include "acconfig.hpp"
 
-#if defined(HAVE_LOG4CPP)
+#if defined(HAVE_LOG4CPP) and defined(LOG4ESPP_USE_LOG4CPP)
 
 #include <stdio.h>
 #include "log4cpp/Portability.hh"
@@ -51,7 +51,7 @@
 #define LOG4ESPP_PUSH(string) log4cpp::NDC::push(string)
 #define LOG4ESPP_POP() log4cpp::NDC::pop()
 
-#elif defined(HAVE_LOG4CXX)
+#elif defined(HAVE_LOG4CXX) and defined(LOG4ESPP_USE_LOG4CXX)
 
 #include <log4cxx/logstring.h>
 #include <stdlib.h>

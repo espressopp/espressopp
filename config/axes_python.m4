@@ -7,7 +7,7 @@
 #
 #   This macro checks for the Python headers and libraries.
 #
-#   It recurses through several python versions (from 2.1 to 2.6 in this
+#   It recurses through several python versions (from 2.3 to 2.6 in this
 #   version), looking for the library name. If it finds it, it looks to find
 #   the header files for this version.
 #
@@ -93,7 +93,7 @@ if test "x$want_python" != "xno"; then
     [
         dnl which names to probe for the library
         if test "x$axes_python_version" = "x"; then
-            axes_python_possible_libs="python2.5 python2.4 python2.3 python2.2 python2.1 python"
+            axes_python_possible_libs="python2.5 python2.4 python2.3 python"
         else
             axes_python_possible_libs="$axes_python_version"
         fi

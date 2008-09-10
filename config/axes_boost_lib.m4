@@ -75,9 +75,9 @@ AC_ARG_WITH([boost-flavor],
      e.g. 'gcc-mt-1_35'; otherwise, the flavor is guessed when testing for the first library]),
     [
     if test "$withval" = "no"; then
-        axes_boost_user_lib_suffix=".none."
+        axes_boost_user_lib_suffix="none"
     elif test "$withval" = ""; then
-        axes_boost_user_lib_suffix=".none."
+        axes_boost_user_lib_suffix="none"
     else
         axes_boost_user_lib_suffix="-$withval"
     fi
@@ -86,7 +86,7 @@ AC_ARG_WITH([boost-flavor],
 dnl make proper variables from the cache ones
 AS_VAR_PUSHDEF([cv_boost_lib], [axes_cv_boost_lib_$1])
 
-if test "x$axes_cv_boost" != "xno"; then
+if test "x$axes_cv_boost" != "xno" -a "x$want_boost" != "xno" ; then
     AC_CACHE_CHECK(whether the boost $1 library is available,
                    cv_boost_lib,
         [
@@ -149,7 +149,7 @@ if test "x$axes_cv_boost" != "xno"; then
             axes_boost_try_suffixes=".user."
     	elif test "x$axes_boost_user_lib_suffix" != "x"; then
             dnl user defined suffix -> use only that, no guessing
-            if test $axes_boost_user_lib_suffix != ".none."; then
+            if test $axes_boost_user_lib_suffix != "none"; then
                 axes_boost_user_lib="boost_$1$axes_boost_user_lib_suffix"
             else
                 axes_boost_user_lib="boost_$1"
@@ -157,7 +157,7 @@ if test "x$axes_cv_boost" != "xno"; then
             axes_boost_try_suffixes=".user."
     	elif test "x$axes_cv_boost_lib_suffix" != "x"; then
             dnl already automatically determined suffix -> use only that, no guessing
-            if test $axes_cv_boost_lib_suffix != ".none."; then
+            if test $axes_cv_boost_lib_suffix != "none"; then
                 axes_boost_user_lib="boost_$1$axes_cv_boost_lib_suffix"
             else
                 axes_boost_user_lib="boost_$1"
@@ -172,7 +172,7 @@ if test "x$axes_cv_boost" != "xno"; then
                         sed 's,^.*boost_$1,,' | sed 's,[[.]].*$,,'`
                     dnl it is possible that boost is not versioned at all, protect the empty suffix
                     if test "x$axes_boost_suffix_tmp" = "x"; then
-                        axes_boost_suffix_tmp=".none."
+                        axes_boost_suffix_tmp="none"
                     fi
                     dnl check that this suffix was not yet specified
                     case " $axes_boost_try_suffixes " in
@@ -207,8 +207,8 @@ if test "x$axes_cv_boost" != "xno"; then
                 if test $axes_boost_suffix_tmp = ".user."; then
                     axes_boost_lib=$axes_boost_user_lib
                 else
-                    dnl .none. tries without suffix
-                    if test $axes_boost_suffix_tmp != ".none."; then
+                    dnl none tries without suffix
+                    if test $axes_boost_suffix_tmp != "none"; then
                         axes_boost_lib="boost_$1$axes_boost_suffix_tmp"
                     else
                         axes_boost_lib="boost_$1"
@@ -269,7 +269,7 @@ if test "x$axes_cv_boost" != "xno"; then
                     axes_cv_boost_lib_suffix=$axes_boost_suffix_tmp
                 fi
             ])
-            if test "x$axes_cv_boost_lib_suffix" = "x.none."; then
+            if test "x$axes_cv_boost_lib_suffix" = "xnone"; then
                 AC_MSG_RESULT([unversioned layout])
                 AC_MSG_WARN([
 ******************************************************************************

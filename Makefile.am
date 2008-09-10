@@ -1,7 +1,7 @@
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS = -I config
 
 SUBDIRS = src examples
 
-include $(top_srcdir)/aminclude.am
+include $(top_srcdir)/config/ac_doxygen.am
 
 EXTRA_DIST = autogen.sh 
