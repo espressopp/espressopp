@@ -1,3 +1,5 @@
+#ifndef LOG4ESPP_H
+#define LOG4ESPP_H
 
 #include "acconfig.hpp"
 
@@ -110,9 +112,14 @@ using namespace log4cxx::helpers;
 
 #include <iostream>
 
+namespace Log4ESPP {
+  class EmptyClass {};
+}
+
 #define LOG4ESPP_CONFIGURE()
 #define LOG4ESPP_ROOTLOGGER(aLogger) 
-#define LOG4ESPP_LOGGER(aLogger,name) 
+#define LOG4ESPP_LOGGER(aLogger,name) Log4ESPP::EmptyClass aLogger
+#define LOG4ESPP_DEF_LOGGER(aLogger) Log4ESPP::EmptyClass aLogger
 
 #define LOG4ESPP_DEBUG(logger,msg) std::cout << "DEBUG: " << msg << "\n"
 #define LOG4ESPP_INFO(logger,msg)  std::cout << "INFO: " << msg << "\n"
@@ -120,4 +127,5 @@ using namespace log4cxx::helpers;
 #define LOG4ESPP_ERROR(logger,msg) std::cout << "ERROR: " << msg << "\n"
 #define LOG4ESPP_FATAL(logger,msg) std::cout << "FATAL: " << msg << "\n"
 
+#endif
 #endif
