@@ -8,7 +8,7 @@
 
 AC_INIT([espressopp], [0.1])
 # basic autoconf configuration
-AC_CONFIG_MACRO_DIR(config)
+AC_CONFIG_MACRO_DIR(build-aux/macros)
 AC_CONFIG_AUX_DIR(build-aux)
 AC_CONFIG_SRCDIR([src/cpp/hello.hpp])
 
@@ -50,8 +50,14 @@ if test "x$axes_cv_mpi" = "xno"; then
 fi
 
 AXES_BOOST_MPI
-if test "x$axes_cv_boost_lib_mpi" = "xno"; then
-    AC_MSG_ERROR([could not find the boost mpi library])
+if test "x$axes_cv_boost_mpi" = "xno"; then
+  if test "x$axes_cv_boost_mpi_links" = "xno"; then
+      AC_MSG_ERROR([could not link against the boost MPI library.
+Are you sure you are using the same MPI compiler/library that was used to
+compile the boost mpi library?])
+  else
+      AC_MSG_ERROR([could not find the boost MPI library])
+  fi
 fi
 
 AXES_PYTHON

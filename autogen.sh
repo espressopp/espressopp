@@ -2,16 +2,11 @@
 
 rm -f config.cache acconfig.h
 
-# make directory for autoconf-specific helper scripts
-if test ! -d build-aux; then
-	mkdir build-aux
-fi
-
 if [ -n "`which libtoolize`" ]; then
     libtoolize --copy
 fi
 
-aclocal -I config			&& \
+aclocal -I build-aux/macros		&& \
 autoheader				&& \
 automake --copy --foreign --add-missing	&& \
 autoconf				&& \
