@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I build-aux/macros
 
-SUBDIRS = src examples
+SUBDIRS = src test
 
 include $(top_srcdir)/build-aux/macros/ac_doxygen.am
 

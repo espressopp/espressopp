@@ -1,0 +1,12 @@
+This directory contains an example program that uses the Espresso++ 
+kernel without a controller and a Python script.
+
+It mainly demonstrates here the use of the Espresso++ loger.
+
+container.cpp:
+
+   - creates a particle container and stores particle in it
+
+log4cxx.properties:
+
+   - Configuration file for logger if log4cxx is used
