@@ -1,21 +1,6 @@
 EspressoPP
 ----------
 
-This is a first version of Espresso++ (Hello Word) that has already the specified directory structure.
-Furthermore, it contains the input file for autoconf + automake.
-
-It is a 'deep' project, meaning that it has source code organised into sub-projects. 
-
-Directory Structure:
-=====================
-
-src
-   cpp
-      kernel        - C++ code for the kernel of Espresso++
-         test       - Unit test code
-
-Note: Each directory contains the input file Makefile.am for automake
-
 INSTALL
 =======
 
@@ -26,10 +11,23 @@ Installation in four steps:
 autogen.sh        - makes the right calls of autoconf + automake
                   - Main input file is configure.ac
 
+Please note: this is not mandatory for the users.
+
 2. Configure the system
 
-configure --with_boost=/home/brandes/boost
-          --prefix=$HOME/EspressoPP
+- the environment variable EXTRA_PREFIXES should be used to specify
+  the directory of the boost installation and of the log4cxx 
+  (alternatively log4cpp or nothing at all)
+
+export EXTRA_PREFIXES="<boost_dir> <log4cxx_dir>"
+
+- CXX should be set to a compile script that can deal with MPI
+
+export CXX=mpicxx
+
+See alsO:
+
+configure --help
 
 3. Make
 
