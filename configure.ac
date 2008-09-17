@@ -130,8 +130,12 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/espresso/Makefile 
                  src/cpp/espresso/kernel/Makefile 
                  src/cpp/espresso/kernel/test/Makefile
-                 examples/Makefile 
-                 examples/cpp/Makefile
+                 test/Makefile 
+                 test/external/Makefile 
+                 test/external/mpi/Makefile 
+                 test/external/boost.mpi/Makefile 
+                 test/modules/Makefile 
+                 test/modules/kernel/Makefile 
 	         ])
 
 # now make sure that all config files are generated
