@@ -82,21 +82,7 @@ fi
 #                                                                 #
 ###################################################################
 
-AXES_LOG4CXX
-AXES_LOG4CPP
-
-if test "x$axes_cv_log4cxx" != "xno"; then
-   axes_log4espp="LOG4CXX"
-   AC_SUBST(LOG4ESPP_LIBS,"-l$axes_cv_log4cxx")
-   AC_DEFINE(LOG4ESPP_USE_LOG4CXX,1, [define to use log4cxx for logging])
-elif test "x$axes_cv_log4cpp" != "xno"; then
-   axes_log4espp="LOG4CPP"
-   AC_SUBST(LOG4ESPP_LIBS,"-l$axes_cv_log4cpp")
-   AC_DEFINE(LOG4ESPP_USE_LOG4CPP,1, [define to use log4cpp for logging])
-else
-   axes_log4espp="generic logger"
-   AC_SUBST(LOG4ESPP_LIBS,"")
-fi
+AXES_LOG4ESPP
 
 ################################################################### 
 #                                                                 #
@@ -133,7 +119,10 @@ AC_CONFIG_FILES([Makefile
                  test/Makefile 
                  test/external/Makefile 
                  test/external/mpi/Makefile 
+                 test/external/logging/Makefile 
                  test/external/boost.mpi/Makefile 
+                 test/external/boost.python/Makefile 
+                 test/external/boost.python/hello/Makefile 
                  test/modules/Makefile 
                  test/modules/kernel/Makefile 
 	         ])
