@@ -15,6 +15,7 @@
 
 #include <string>
 #include <iostream>
+#include <stdlib.h>
 
 #include "BasicProperty.hpp"
 #include "ParticleContainer.hpp"
