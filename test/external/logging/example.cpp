@@ -13,6 +13,17 @@
 
 #include <iostream>
 
+// by the following define we make sure that logging with level << ERROR will
+// be removed already at compile time; it has to be set before 
+// we include the log4espp.hpp file 
+
+#define LOG4ESPP_LEVEL_ERROR
+
+// the next define makes sure that we overwrite a define that might have been
+// set before or via -DLOG4ESPP_LEVEL_ERROR
+
+#define LOG4ESPP_LEVEL_DEBUG
+
 #include "log4espp.hpp"
 
 #define N 100
@@ -22,6 +33,8 @@
 *  MAIN program                                                           *
 *                                                                         *
 **************************************************************************/
+
+LOG4ESPP_DEFINITION();  // in one unit put definitions of logging
 
 int main (int argc, char **argv) {
 
@@ -60,7 +73,7 @@ int main (int argc, char **argv) {
 
      } else {
    
-        LOG4ESPP_DEBUG(rootLogger, i << " is not a prime number");
+        LOG4ESPP_DEBUG(rootLogger, i << " is not a prime number, can be divided by " << k);
 
      }
 
@@ -68,6 +81,12 @@ int main (int argc, char **argv) {
 
   std::cout << "There are " << primeCounter << " primes up to " << N << "\n";
 
-  LOG4ESPP_INFO(rootLogger, "main program terminates");
+  if (LOG4ESPP_INFO_SET(rootLogger)) {
+
+     int sum = 0;
+     for (int k = 0; k < N; k++) sum += k;
+
+     LOG4ESPP_INFO(rootLogger, "main program terminates with sum = " << sum);
+  }
 
 }
