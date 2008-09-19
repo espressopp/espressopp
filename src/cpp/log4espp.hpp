@@ -3,6 +3,9 @@
 
 #include "acconfig.hpp"
 
+//////////////////////////////////////////////////
+// log4cpp
+//////////////////////////////////////////////////
 #if defined(HAVE_LOG4CPP) and defined(LOG4ESPP_USE_LOG4CPP)
 
 #include <stdio.h>
@@ -28,7 +31,8 @@
  
 #define LOG4ESPP_ROOTLOGGER(aLogger) log4cpp::Category& aLogger = log4cpp::Category::getRoot()
 
-#define LOG4ESPP_DEF_LOGGER(aLogger) log4cpp::Category& aLogger;
+#define LOG4ESPP_DECL_LOGGER(aLogger) extern log4cpp::Category& aLogger
+#define LOG4ESPP_DEF_LOGGER(aLogger) log4cpp::Category& aLogger
 #define LOG4ESPP_LOGGER(aLogger,name) log4cpp::Category& aLogger = log4cpp::Category::getInstance(std::string(name))
 
 #if defined(LOG4ESPP_LEVEL_FATAL)
@@ -53,6 +57,9 @@
 #define LOG4ESPP_PUSH(string) log4cpp::NDC::push(string)
 #define LOG4ESPP_POP() log4cpp::NDC::pop()
 
+//////////////////////////////////////////////////
+// log4cxx
+//////////////////////////////////////////////////
 #elif defined(HAVE_LOG4CXX) and defined(LOG4ESPP_USE_LOG4CXX)
 
 #include <log4cxx/logstring.h>
@@ -71,6 +78,7 @@ using namespace log4cxx::helpers;
 #define LOG4ESPP_CONFIGURE() DefaultConfigurator::configure(LogManager::getLoggerRepository())
 #define LOG4ESPP_ROOTLOGGER(aLogger) log4cxx::LoggerPtr aLogger = Logger::getRootLogger()
 #define LOG4ESPP_LOGGER(aLogger,name) log4cxx::LoggerPtr aLogger = log4cxx::Logger::getLogger(name)
+#define LOG4ESPP_DECL_LOGGER(aLogger) extern log4cxx::LoggerPtr aLogger
 #define LOG4ESPP_DEF_LOGGER(aLogger) log4cxx::LoggerPtr aLogger
 
 #if defined(LOG4ESPP_LEVEL_FATAL)
@@ -108,7 +116,10 @@ using namespace log4cxx::helpers;
 #define LOG4ESPP_PUSH(string) NDC::push(string)
 #define LOG4ESPP_POP()        NDC::pop()
 
-#else 
+//////////////////////////////////////////////////
+// fallback: generic logger
+//////////////////////////////////////////////////
+#elif defined(LOG4ESPP_USE_GENERIC)
 
 #include <iostream>
 #include <ctype.h>
@@ -136,6 +147,7 @@ class LogClass {
 #define LOG4ESPP_ROOTLOGGER(aLogger) 
 #define LOG4ESPP_LOGGER(aLogger,name) 
 #define LOG4ESPP_DECL_LOGGER(aLogger)
+#define LOG4ESPP_DEF_LOGGER(aLogger)
 
 #define LOG4ESPP_DEBUG_SET(aLogger) (LogClass::logLevel <= 0)
 #define LOG4ESPP_INFO_SET(aLogger) (LogClass::logLevel <= 1)
@@ -215,7 +227,20 @@ class LogClass {
 			       std::cout << "FATAL: " << msg << std::endl; }
 #endif
 
-#endif
+//////////////////////////////////////////////////
+// No logger
+//////////////////////////////////////////////////
+#else
+#define LOG4ESPP_DEBUG(logger,msg) 
+#define LOG4ESPP_INFO(logger,msg) 
+#define LOG4ESPP_WARN(logger,msg) 
+#define LOG4ESPP_ERROR(logger,msg)
+#define LOG4ESPP_FATAL(logger,msg)
+#define LOG4ESPP_ROOTLOGGER(aLogger) 
+#define LOG4ESPP_LOGGER(aLogger,name) 
+#define LOG4ESPP_DECL_LOGGER(aLogger)
+#define LOG4ESPP_DEF_LOGGER(aLogger)
+#define LOG4ESPP_CONFIGURE() 
 
 #endif
-
+#endif

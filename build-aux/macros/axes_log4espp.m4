@@ -8,11 +8,11 @@
 #
 #   And sets the ac variables:
 #
-#     axes_log4cxx
+#     axes_log4espp
 #
 # LAST MODIFICATION
 #
-#   2008-09-17
+#   2008-09-19
 #
 # COPYLEFT
 #
@@ -30,7 +30,7 @@ AC_REQUIRE([AXES_LOG4CPP])
 AC_ARG_WITH([log4espp],
    AS_HELP_STRING([--with-log4espp=LOGGER], 
 [use the specified logger library (default: auto). 
-Possible values are "log4cxx", "log4cpp", "generic" and "auto".])
+Possible values are "log4cxx", "log4cpp", "generic", "no" and "auto".])
   ,[log4espp_wanted=$withval], [log4espp_wanted="auto"])
 
 AC_MSG_CHECKING([which logger library to use])
@@ -44,7 +44,9 @@ if test "x$log4espp_wanted" = "xauto" || test "x$log4espp_wanted" = "xyes"; then
       else
          axes_log4espp="generic"
       fi
-elif test "x$log4espp_wanted" = "xgeneric" || test "x$log4espp_wanted" = "xno"; then
+elif test "x$log4espp_wanted" = "xno"; then
+     axes_log4espp="no"
+elif test "x$log4espp_wanted" = "xgeneric"; then
       axes_log4espp="generic"
 elif test "x$log4espp_wanted" = "xlog4cpp"; then
       if test "x$axes_cv_log4cpp" != "xno"; then
@@ -72,6 +74,9 @@ if test "x$axes_log4espp" = "xlog4cxx"; then
 elif test "x$axes_log4espp" = "xlog4cpp"; then
      LOG4ESPP_LIBS="-l$axes_cv_log4cpp"
      AC_DEFINE(LOG4ESPP_USE_LOG4CPP,1,[define if log4cpp shall be used by log4espp])
+elif test "x$axes_log4espp" = "xgeneric"; then
+     LOG4ESPP_LIBS=""
+     AC_DEFINE(LOG4ESPP_USE_GENERIC,1,[define if the generic logger shall be used by log4espp])
 else
      LOG4ESPP_LIBS=""
 fi
