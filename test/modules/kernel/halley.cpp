@@ -247,6 +247,8 @@ void timeIntegration (REAL startTime, REAL deltaTime,
   }
 }
       
+LOG4ESPP_DEFINITION();  // in one unit put definitions of logging
+
 int main (int argc, char **argv) {
 
   LOG4ESPP_CONFIGURE();       // read runtime configuration for logging

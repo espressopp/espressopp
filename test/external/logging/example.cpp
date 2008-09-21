@@ -12,6 +12,7 @@
 **************************************************************************/
 
 #include <iostream>
+#include <stdlib.h>
 
 // by the following define we make sure that logging with level << ERROR will
 // be removed already at compile time; it has to be set before 
@@ -81,12 +82,40 @@ int main (int argc, char **argv) {
 
   std::cout << "There are " << primeCounter << " primes up to " << N << "\n";
 
-  if (LOG4ESPP_INFO_SET(rootLogger)) {
+#ifdef LOG4ESPP_INFO_ENABLED
+  if (LOG4ESPP_INFO_ON(rootLogger)) {
 
      int sum = 0;
      for (int k = 0; k < N; k++) sum += k;
 
      LOG4ESPP_INFO(rootLogger, "main program terminates with sum = " << sum);
   }
+#endif
 
+
+  if (LOG4ESPP_TRACE_ON(rootLogger)) {
+    std::cout << "log4espp: trace enabled" << std::endl;
+  }
+  if (LOG4ESPP_DEBUG_ON(rootLogger)) {
+    std::cout << "log4espp: debug enabled" << std::endl;
+  }
+  if (LOG4ESPP_INFO_ON(rootLogger)) {
+    std::cout << "log4espp: info enabled" << std::endl;
+  }
+  if (LOG4ESPP_WARN_ON(rootLogger)) {
+    std::cout << "log4espp: warn enabled" << std::endl;
+  }
+  if (LOG4ESPP_ERROR_ON(rootLogger)) {
+    std::cout << "log4espp: error enabled" << std::endl;
+  }
+  if (LOG4ESPP_FATAL_ON(rootLogger)) {
+    std::cout << "log4espp: fatal enabled" << std::endl;
+  }
+
+  LOG4ESPP_DEBUG(rootLogger, "log4espp: debug enabled");
+  LOG4ESPP_TRACE(rootLogger, "log4espp: trace enabled");
+  LOG4ESPP_INFO(rootLogger, "log4espp: info enabled");
+  LOG4ESPP_WARN(rootLogger, "log4espp: warn enabled");
+  LOG4ESPP_ERROR(rootLogger, "log4espp: error enabled");
+  LOG4ESPP_FATAL(rootLogger, "log4espp: fatal enabled");
 }

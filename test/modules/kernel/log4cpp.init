@@ -1,7 +1,7 @@
 # a simple test config
 #
 appender root pattern console %d : %m %n
-priority root DEBUG
+priority root INFO
 priority kernel.BasicProperty INFO
 priority kernel.ParticleContainer INFO
 #appender kernel.ParticleContainer basic file integrator.log
