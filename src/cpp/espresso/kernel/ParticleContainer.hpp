@@ -104,7 +104,7 @@ private:
 
     int allocatedSize; 
 
-    static LOG4ESPP_DEF_LOGGER(myLogger);
+    static LOG4ESPP_DECL_LOGGER(myLogger);
 
 public:
  

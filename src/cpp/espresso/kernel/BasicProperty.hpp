@@ -41,7 +41,7 @@ protected:
 
     std::string propName;  /* name of the property     */
 
-    static LOG4ESPP_DEF_LOGGER(logger);
+    static LOG4ESPP_DECL_LOGGER(logger);
 
 private:
 
