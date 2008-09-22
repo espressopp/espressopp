@@ -46,18 +46,14 @@ fi
 
 AXES_MPI
 if test "x$axes_cv_mpi" = "xno"; then
-   AC_MSG_ERROR([could not compile an MPI program])
+    AC_MSG_ERROR([could not compile an MPI program])
 fi
 
 AXES_BOOST_MPI
-if test "x$axes_cv_boost_mpi" = "xno"; then
-  if test "x$axes_cv_boost_mpi_links" = "xno"; then
-      AC_MSG_ERROR([could not link against the boost MPI library.
-Are you sure you are using the same MPI compiler/library that was used to
-compile the boost mpi library?])
-  else
-      AC_MSG_ERROR([could not find the boost MPI library])
-  fi
+if test "x$axes_cv_boost_lib_mpi" = "xno"; then
+    AC_MSG_ERROR([could not find the boost mpi library.
+Note that this can also mean that the compiler $CXX you are using
+to compile ESPResSo++ is not the same you used to build boost.mpi.])
 fi
 
 AXES_PYTHON
