@@ -367,13 +367,13 @@ using namespace log4cxx::helpers;
 #define LOG4ESPP_PUSH(string) NDC::push(string)
 #define LOG4ESPP_POP()        NDC::pop()
 
-#else 
-
 /************************************************************************
 *                                                                       *
-*  Default Logger (if neither log4cxx nor log4cpp are available)        *
+*   LOG4ESPP   <======   Generic logger (no additional lib required)    *
 *                                                                       *
 ************************************************************************/
+
+#elif defined(LOG4ESPP_USE_GENERIC)
 
 #include <iostream>
 #include <ctype.h>
@@ -389,6 +389,10 @@ class LogClass {
   *******************************************************/
 
 #define LOG4ESPP_DEFINITION() int LogClass::logLevel = 3; 
+
+  /*******************************************************
+  *   LOG4ESPP_CONFIGURE                                 *
+  *******************************************************/
 
 #define LOG4ESPP_CONFIGURE() { char *logLevel; \
    char *logItems [] = { "OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" }; \
@@ -406,8 +410,14 @@ class LogClass {
                 << ", environment variable LOG4ESPP has not been set" << std::endl; \
    } }
 
-#define LOG4ESPP_ROOTLOGGER(aLogger) 
-#define LOG4ESPP_LOGGER(aLogger,name) 
+  /*******************************************************
+  *   LOG4ESPP_DECL_LOGGER(logger)                       *
+  *   LOG4ESPP_ROOTLOGGER(logger)                        *
+  *   LOG4ESPP_LOGGER(logger,name)                       *
+  *******************************************************/
+
+#define LOG4ESPP_ROOTLOGGER(aLogger) LogClass aLogger;
+#define LOG4ESPP_LOGGER(aLogger,name) LogClass aLogger;
 #define LOG4ESPP_DECL_LOGGER(aLogger) LogClass aLogger;
 
   /*******************************************************
@@ -487,8 +497,44 @@ class LogClass {
 #define LOG4ESPP_FATAL(logger,msg)
 #endif
 
+/************************************************************************
+*                                                                       *
+*   LOG4ESPP   <======   NO LOGGER  ()                                  *
+*                                                                       *
+************************************************************************/
+
+#else
+
+class LogClass {
+};
+
+#define LOG4ESPP_DEFINITION() 
+#define LOG4ESPP_CONFIGURE()
+
+  /*******************************************************
+  *   LOG4ESPP_DECL_LOGGER(logger)                       *
+  *   LOG4ESPP_ROOTLOGGER(logger)                        *
+  *   LOG4ESPP_LOGGER(logger,name)                       *
+  *******************************************************/
+
+#define LOG4ESPP_ROOTLOGGER(aLogger) LogClass aLogger;
+#define LOG4ESPP_LOGGER(aLogger,name) LogClass aLogger;
+#define LOG4ESPP_DECL_LOGGER(aLogger) LogClass aLogger;
+
+#define LOG4ESPP_TRACE_ON(logger) (0)
+#define LOG4ESPP_DEBUG_ON(logger) (0)
+#define LOG4ESPP_INFO_ON(logger)  (0)
+#define LOG4ESPP_WARN_ON(logger)  (0)
+#define LOG4ESPP_ERROR_ON(logger) (0)
+#define LOG4ESPP_FATAL_ON(logger) (0)
+
+#define LOG4ESPP_TRACE(logger,msg)
+#define LOG4ESPP_DEBUG(logger,msg)
+#define LOG4ESPP_INFO(logger,msg)
+#define LOG4ESPP_WARN(logger,msg)
+#define LOG4ESPP_ERROR(logger,msg)
+#define LOG4ESPP_FATAL(logger,msg)
 
 #endif
 
 #endif
-
