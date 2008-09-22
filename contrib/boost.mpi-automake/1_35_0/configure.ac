@@ -1,5 +1,5 @@
 AC_INIT(boost_mpi, 1_35_0)
-AC_CONFIG_MACRO_DIR(../../../config)
+AC_CONFIG_MACRO_DIR(../../../build-aux/macros)
 AC_CONFIG_AUX_DIR(build-aux)
 
 AM_INIT_AUTOMAKE(1.9)

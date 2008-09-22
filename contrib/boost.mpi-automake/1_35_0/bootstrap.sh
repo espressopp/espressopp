@@ -1,5 +1,14 @@
 #!/bin/sh
 
+if test "$1" = "-wipe"; then
+    # instead of setting up, clean the boost imports from the directory
+    rm -f LICENSE_1_0.txt
+    rm -rf boost
+    find src ! \( -name ".svn" -prune \) -a ! -name "Makefile.am" -a ! -type d -a -exec rm {} \;
+
+    exit 1
+fi
+
 BOOSTPATH=$1
 
 if test ! -f "LICENSE_1_0.txt" -a \( "x$BOOSTPATH" = "x" -o ! -f "$BOOSTPATH/LICENSE_1_0.txt" \) ; then
@@ -30,7 +39,7 @@ if [ -n "`which libtoolize`" ]; then
     libtoolize --copy
 fi
 
-aclocal -I ../../../config		&& \
+aclocal -I ../../../build-aux/macros	&& \
 autoheader				&& \
 automake --copy --foreign --add-missing	&& \
 autoconf				&& \
