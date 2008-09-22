@@ -172,7 +172,7 @@ if test "x$want_boost" = "xyes"; then
         fi
     ])
 
-    if test "x$axes_cv_boost" != "no"; then
+    if test "x$axes_cv_boost" != "xno"; then
         if test "x$axes_cv_boost" != "xyes"; then
             BOOST_CPPFLAGS="-I$axes_cv_boost"
         fi
