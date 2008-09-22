@@ -388,22 +388,22 @@ class LogClass {
   *   LOG4ESPP_DEFINITION                                *
   *******************************************************/
 
-#define LOG4ESPP_DEFINITION() int LogClass::logLevel = 2; 
+#define LOG4ESPP_DEFINITION() int LogClass::logLevel = 3; 
 
 #define LOG4ESPP_CONFIGURE() { char *logLevel; \
-   printf ("configure logger\n"); \
+   char *logItems [] = { "OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" }; \
    logLevel = getenv("LOG4ESPP"); \
    if (logLevel != NULL) { \
-      printf ("logLevel = %s\n", logLevel); \
-      if (strncasecmp(logLevel,"TRACE",3)==0) LogClass::logLevel = 6; \
-      if (strncasecmp(logLevel,"DEBUG",3)==0) LogClass::logLevel = 5; \
-      if (strncasecmp(logLevel,"INFO",3)==0) LogClass::logLevel = 4; \
-      if (strncasecmp(logLevel,"WARN",3)==0) LogClass::logLevel = 3; \
-      if (strncasecmp(logLevel,"ERROR",3)==0) LogClass::logLevel = 2; \
-      if (strncasecmp(logLevel,"FATAL",3)==0) LogClass::logLevel = 1; \
-      if (strncasecmp(logLevel,"OFF",3)==0) LogClass::logLevel = 0; \
+      int nItems = sizeof(logItems) / sizeof(char *); \
+      for (int i = 0; i < nItems; i++) \
+        if (strncasecmp(logLevel,logItems[i],3)==0) LogClass::logLevel = i; \
+      std::cout << "LOG4ESPP: default logger, take logLevel = " \
+                << logItems[LogClass::logLevel]  \
+                << ", val of environment variable = " << logLevel << std::endl; \
     } else { \
-      printf ("no logging level specified (use e.g. LOG4ESPP=DEBUG), take default WARN\n"); \
+      std::cout << "LOG4ESPP: default logger, take logLevel = " \
+                << logItems[LogClass::logLevel]  \
+                << ", environment variable LOG4ESPP has not been set" << std::endl; \
    } }
 
 #define LOG4ESPP_ROOTLOGGER(aLogger) 
