@@ -21,12 +21,24 @@
 
 /************************************************************************
 *                                                                       *
-*  FLAGS for disable/enable LOGGING at compile time                     *
+*  Compile time guards for LOGGING                                      *
 *                                                                       *
 *    make sure that the desired logging levels are enabled              *
 *                                                                       *
 *    LOG4ESPP_DEBUG_ENABLED  :  LOG4ESPP_DEBUG is done                  *
 *    LOG4ESPP_INFO_ENABLED   :  LOG4ESPP_INFO is done                   *
+*                                                                       *
+*  The compile time guards itself can be set by these macros:           *
+*                                                                       *
+*    LOG4ESPP_LEVEL_TRACE  - compile all                                *
+*    LOG4ESPP_LEVEL_DEBUG  - compile debug and higher                   *
+*    LOG4ESPP_LEVEL_INFO   - compile info and higher                    *
+*    LOG4ESPP_LEVEL_WARN   - compile warn and higher                    *
+*    LOG4ESPP_LEVEL_ERROR  - compile error and higher                   *
+*    LOG4ESPP_LEVEL_FATAL  - compile fatal only                         *
+*                                                                       *
+*  Please note: These guards are only for compile time, so logging      *
+*               can still be switched off at runtime.                   *
 *                                                                       *
 ************************************************************************/
 

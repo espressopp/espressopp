@@ -8,7 +8,7 @@ bin_PROGRAMS = container halley
 
 INCLUDES = -I$(top_srcdir)/src/cpp/espresso/kernel 
 
-LDADD = $(top_srcdir)/src/cpp/espresso/kernel/libesppkernel.la
+LDADD = $(top_builddir)/src/cpp/espresso/kernel/libesppkernel.la
 
 LIBS = $(LOG4ESPP_LIBS)
 

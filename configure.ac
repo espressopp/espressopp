@@ -102,6 +102,14 @@ DX_INIT_DOXYGEN(Espresso, doxygen.cfg, doc)
 
 ################################################################### 
 #                                                                 #
+#                                                                 #
+#                                                                 #
+################################################################### 
+
+CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/src/cpp"
+
+################################################################### 
+#                                                                 #
 #  Generation of output                                           #
 #  Makefiles in all subdirectories                                #
 #  src/cpp/acconfig.hpp                                           #
