@@ -10,14 +10,13 @@ check_PROGRAMS = BasicPropertyTest ParticleContainerTest
 
 TESTS = $(check_PROGRAMS)
 
+AM_CPPFLAGS = $(BOOST_CPPFLAGS) $(LOG4ESPP_CPPFLAGS)
+AM_LDFLAGS  = $(BOOST_LDFLAGS) $(LOG4ESPP_LDFLAGS)
+
 BasicPropertyTest_SOURCES = BasicPropertyTest.cpp ParticleContainerMock.cpp
-BasicPropertyTest_CPPFLAGS = $(BOOST_CPPFLAGS) $(LOG4ESPP_CPPFLAGS)
-BasicPropertyTest_LDFLAGS = $(BOOST_LDFLAGS) $(LOG4ESPP_LDFLAGS)
 BasicPropertyTest_LDADD = ../BasicProperty.o
 
 ParticleContainerTest_SOURCES  = ParticleContainerTest.cpp 
-ParticleContainerTest_CPPFLAGS = $(BOOST_CPPFLAGS) $(LOG4ESPP_CPPFLAGS)
-ParticleContainerTest_LDFLAGS  = $(BOOST_LDFLAGS) $(LOG4ESPP_LDFLAGS)
 ParticleContainerTest_LDADD    = ../BasicProperty.o ../ParticleContainer.o
 
-INCLUDES = -I../
+INCLUDES = -I$(srcdir)/..

@@ -11,6 +11,8 @@ using boost::unit_test_framework::test_suite;
 #include <ParticleContainer.hpp>
 #include <BasicProperty.hpp>
 
+LOG4ESPP_DEFINITION();
+
 BOOST_AUTO_TEST_CASE( ParticleContainerTest ) {
 
     int bigBlocks = 10;

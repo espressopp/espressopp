@@ -11,15 +11,17 @@ using boost::unit_test_framework::test_case;
 
 // the class to be tested
 
-#include "../BasicProperty.hpp"
+#include "BasicProperty.hpp"
 
 // needed interface to create mock object of ParticleContainer
 
-#include "../ParticleContainer.hpp"
+#include "ParticleContainer.hpp"
 
 #include <iostream>
 
 using namespace std;
+
+LOG4ESPP_DEFINITION();
 
 class BasicPropertyTest {
 
