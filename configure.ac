@@ -6,7 +6,7 @@
 #                                                                 #
 ################################################################### 
 
-AC_INIT([espressopp], [0.1])
+AC_INIT([ESPResSo++], [0.1], [espressopp-user@www.espresso-pp.de], [espressopp])
 # basic autoconf configuration
 AC_CONFIG_MACRO_DIR(build-aux/macros)
 AC_CONFIG_AUX_DIR(build-aux)
@@ -117,6 +117,8 @@ AC_CONFIG_HEADERS([src/cpp/acconfig.hpp])
 AC_CONFIG_FILES([Makefile 
                  src/Makefile 
                  src/cpp/Makefile
+		 src/cpp/pmi/Makefile
+		 src/cpp/pmi/mpitransmit/Makefile
                  src/cpp/espresso/Makefile 
                  src/cpp/espresso/kernel/Makefile 
                  src/cpp/espresso/kernel/test/Makefile
@@ -139,31 +141,27 @@ cat << EOF
 
 
 ************************
-* INSTALLATION SUMMARY
+INSTALLATION SUMMARY
 
 EOF
 
-echo "* BOOST:"
+echo " * BOOST:"
 if test "x$axes_cv_boost" != "xyes"; then
-    echo "  - headers located at $axes_cv_boost"
+    echo "   - headers found in $axes_cv_boost"
 else
-    echo "  - headers located in the default includes"
+    echo "   - headers found in the default includes"
 fi
-echo "  - flavor ${axes_cv_boost_lib_suffix#-}"
-echo
+echo "   - flavor ${axes_cv_boost_lib_suffix#-}"
 
-echo "* LOG4ESSP (logging for Espresso): uses $axes_log4espp"
-echo
+echo " * LOG4ESSP (logging for ESPResSo++): uses $axes_log4espp"
 
 if DX_TEST_FEATURE([doc]); then
-echo "* Documentation: uses doxygen"
-echo
+echo " * Doxygen: doxygen was found"
 else
-echo "* Documentation: not built"
-echo
+echo " * Doxygen: doxygen was not found"
 fi
 
 cat << EOF
-*
+
 ************************
 EOF

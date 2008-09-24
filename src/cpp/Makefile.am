@@ -1,4 +1,4 @@
-SUBDIRS = espresso
+SUBDIRS = pmi espresso
 
 lib_LTLIBRARIES = _hello.la
 
@@ -13,6 +13,6 @@ _hello_la_SOURCES = \
 	hello/HelloWorld.cpp 
 
 # set the flags where to find PMI and BOOST
-_hello_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/contrib/pmi
-#_hello_la_LIBADD = $(top_builddir)/contrib/pmi/pmi/libpmi.la
+_hello_la_CPPFLAGS = $(BOOST_CPPFLAGS) 
+_hello_la_LIBADD = pmi/libpmi.la
 _hello_la_LDFLAGS = -module
