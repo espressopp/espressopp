@@ -1,8 +1,7 @@
 #include "boost/python.hpp"
 #include "hello.hpp"
 
-using namespace hello;
-BOOST_PYTHON_MODULE(hello)
+BOOST_PYTHON_MODULE(_hello)
 {
-  HelloController::registerPython();
+  hello::PHelloWorld::registerPython();
 }

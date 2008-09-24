@@ -2,13 +2,17 @@ SUBDIRS = espresso
 
 lib_LTLIBRARIES = _hello.la
 
-AM_CPPFLAGS = $(BOOST_CPPFLAGS)
-
 # TODO: results in a warning. Requires libltdl!
 
-_hello_la_SOURCES = \
+noinst_HEADERS = \
 	hello.hpp \
-	hello/python_bindings.cpp \
-	hello/HelloController.cpp hello/HelloController.hpp
+	hello/HelloWorld.hpp
 
+_hello_la_SOURCES = \
+	hello/python_bindings.cpp \
+	hello/HelloWorld.cpp 
+
+# set the flags where to find PMI and BOOST
+_hello_la_CPPFLAGS = $(BOOST_CPPFLAGS) -I$(top_srcdir)/contrib/pmi
+#_hello_la_LIBADD = $(top_builddir)/contrib/pmi/pmi/libpmi.la
 _hello_la_LDFLAGS = -module
