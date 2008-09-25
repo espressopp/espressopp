@@ -21,10 +21,34 @@ AXES_IMPORT_EXTRA_PREFIXES
 # we use C++ as main code language
 # and libtool for building the shared libraries
 
+cat <<EOF
+**********************************************************************
+*         Checking for compiler and dynamic library support          *
+**********************************************************************
+EOF
+
 AC_PROG_CXX
 AC_LANG([C++])
 
 AC_PROG_LIBTOOL
+
+
+cat <<EOF
+**********************************************************************
+*       Checking for required external libraries and tools           *
+**********************************************************************
+EOF
+AXES_MPI
+if test "x$axes_cv_mpi" = "xno"; then
+    AC_MSG_ERROR([could not compile an MPI program])
+fi
+
+
+AXES_PYTHON
+if test "x$axes_cv_python_lib" = "xno" || \
+   test "x$axes_cv_python_include" = "xno"; then
+   AC_MSG_ERROR([could not find python])
+fi
 
 ################################################################### 
 #                                                                 #
@@ -44,22 +68,11 @@ if test "x$axes_cv_boost_lib_serialization" = "xno"; then
     AC_MSG_ERROR([could not find the boost serialization library])
 fi
 
-AXES_MPI
-if test "x$axes_cv_mpi" = "xno"; then
-    AC_MSG_ERROR([could not compile an MPI program])
-fi
-
 AXES_BOOST_MPI
 if test "x$axes_cv_boost_lib_mpi" = "xno"; then
     AC_MSG_ERROR([could not find the boost mpi library.
 Note that this can also mean that the compiler $CXX you are using
 to compile ESPResSo++ is not the same you used to build boost.mpi.])
-fi
-
-AXES_PYTHON
-if test "x$axes_cv_python_lib" = "xno" -o \
-	"x$axes_cv_python_include" = "xno"; then
-   AC_MSG_ERROR([could not find python])
 fi
 
 AXES_BOOST_PYTHON
@@ -71,6 +84,13 @@ AXES_BOOST_UNIT_TEST_FRAMEWORK
 if test "x$axes_cv_boost_lib_unit_test_framework" = "xno"; then
     AC_MSG_ERROR([could not find the boost unit test framework])
 fi
+
+
+cat <<EOF
+**********************************************************************
+*         Checking for optional external libraries and tools         *
+**********************************************************************
+EOF
 
 ###################################################################
 #                                                                 #
@@ -96,11 +116,11 @@ DX_PDF_FEATURE(OFF)
 DX_PS_FEATURE(OFF)
 DX_INIT_DOXYGEN(Espresso, doxygen.cfg, doc)
 
-################################################################### 
-#                                                                 #
-#                                                                 #
-#                                                                 #
-################################################################### 
+cat <<EOF
+**********************************************************************
+*                        Writing output files                        *
+**********************************************************************
+EOF
 
 CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/src/cpp"
 
@@ -140,12 +160,15 @@ AC_OUTPUT
 cat << EOF
 
 
-************************
-INSTALLATION SUMMARY
-
+**********************************************************************
+*                         Configuration summary                      *
+**********************************************************************
+ * C++-compiler: $CXX
+ * Python:
+    - headers found in $axes_cv_python_include
+    - headers found in $axes_cv_python_lib
+ * Boost:
 EOF
-
-echo " * BOOST:"
 if test "x$axes_cv_boost" != "xyes"; then
     echo "   - headers found in $axes_cv_boost"
 else
@@ -160,8 +183,3 @@ echo " * Doxygen: doxygen was found"
 else
 echo " * Doxygen: doxygen was not found"
 fi
-
-cat << EOF
-
-************************
-EOF

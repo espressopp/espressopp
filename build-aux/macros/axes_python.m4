@@ -24,7 +24,7 @@
 #     axes_cv_python_lib
 #     axes_cv_python_include
 #       which can be used to check whether python is available. In this
-#       case, both are set to "no"
+#       case, both are set to "no".
 #
 # LAST MODIFICATION
 #
@@ -143,8 +143,8 @@ if test "x$want_python" != "xno"; then
     LIBS="$axes_python_saved_libs"
 
     dnl results
-    if test "x$axes_cv_python_include" != "x" -a \
-        "x$axes_cv_python_lib" != "x"; then
+    if test "x$axes_cv_python_include" != "x" && \
+       test "x$axes_cv_python_lib" != "x"; then
         PYTHON_CPPFLAGS="-I$axes_cv_python_include"
         AC_SUBST(PYTHON_CPPFLAGS)
         PYTHON_LIBS="-l$axes_cv_python_lib"
