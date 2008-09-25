@@ -8,6 +8,10 @@
 #include "pmi/worker_func.hpp"
 #endif
 
+// #ifdef HAVE_TYPEINFO
+// #include <typeinfo>
+#include <iostream>
+
 using namespace std;
 using namespace pmi;
 
@@ -49,8 +53,11 @@ namespace pmi {
 
     static IdType &associate() {
       if (ID == NOT_ASSOCIATED) {
-	if (NAME == NOT_REGISTERED)
+	if (NAME == NOT_REGISTERED) {
+	  // TODO: #ifdef HAVE_TYPEINFO
+	  // cerr << typeid(T).name() << endl;
 	  PMI_USER_ERROR("Controller tried to associate a class that was not registered!");
+	}
 
 	ID = generateClassId();
 	
@@ -70,8 +77,6 @@ namespace pmi {
   // Initialize ID
   template < class T >
   IdType ParallelClass<T>::ID = NOT_ASSOCIATED;
-  template < class T>
-  string ParallelClass<T>::NAME = NOT_REGISTERED;
 #endif
 }
 

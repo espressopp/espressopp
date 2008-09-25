@@ -16,7 +16,7 @@
 using namespace pmi;
 
 // macro to define proxy methods
-#define PMI_PROXY_METHOD(method)					\
+#define PMI_PARALLEL_PROXY_METHOD(method)					\
   void method() {							\
     ParallelObject<SubjectClass>::invoke<&SubjectClass::method>();	\
   }
@@ -59,13 +59,17 @@ namespace pmi {
       transmit::create(classId, ID);
 
       // create the local instance
-      objectPtr = new T();
+      objectPtr = new SubjectClass();
 
 #ifndef PMI_OPTIMIZE
       transmit::gatherStatus();
 #endif
     }
-      
+     
+    SubjectClass &getLocalInstance() {
+      return *objectPtr;
+    }
+ 
     template < void (T::*method)() >
     void invoke() {
       if (isWorker())

@@ -70,9 +70,6 @@ namespace pmi {
   // Initialize ID
   template < class T, void (T::*method)() >
   IdType ParallelMethod<T, method>::ID = NOT_ASSOCIATED;
-
-  template < class T, void (T::*method)() >
-  string ParallelMethod<T, method>::NAME = NOT_REGISTERED;
 }
 #endif
 
