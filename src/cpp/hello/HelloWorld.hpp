@@ -1,19 +1,21 @@
 #ifndef _HELLO_HELLOWORLD_HPP
 #define _HELLO_HELLOWORLD_HPP
 #include "pmi/pmi.hpp"
+#include <string>
+#include <vector>
 
 namespace hello {
-  class HelloWorld {
+  class WHelloWorld {
   public:
-    void print();
+    void printMessage();
   };
 
   // Expose the parallel proxy
-  class PHelloWorld 
-    : pmi::ParallelObject<HelloWorld> {
+  class CHelloWorld {
+    pmi::ParallelObject<WHelloWorld> wHello;
   public:
-    PMI_PROXY_METHOD(print);
-    
+    std::string printMessage();
+
     // expose the python registration
     static void registerPython();
   };
