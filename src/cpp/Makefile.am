@@ -12,13 +12,7 @@ AM_LDFLAGS = $(BOOST_LDFLAGS)
 
 lib_LTLIBRARIES = _espresso.la
 
-noinst_HEADERS = \
-	hello.hpp \
-	hello/HelloWorld.hpp
-
-_espresso_la_SOURCES = \
-	hello/python_bindings.cpp \
-	hello/HelloWorld.cpp 
+include "hello/SubMakefile.am"
 
 _espresso_la_LDFLAGS = -module -no-undefined 
 _espresso_la_LIBADD = pmi/libpmi.la $(BOOST_MPI_LIBS) $(BOOST_PYTHON_LIBS) $(LOG4ESPP_LIBS)
