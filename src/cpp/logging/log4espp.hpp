@@ -407,10 +407,10 @@ class LogClass {
   *******************************************************/
 
 #define LOG4ESPP_CONFIGURE() { char *logLevel; \
-   char *logItems [] = { "OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" }; \
+   const char *logItems [] = { "OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" }; \
    logLevel = getenv("LOG4ESPP"); \
    if (logLevel != NULL) { \
-      int nItems = sizeof(logItems) / sizeof(char *); \
+      int nItems = sizeof(logItems) / sizeof(const char *); \
       for (int i = 0; i < nItems; i++) \
         if (strncasecmp(logLevel,logItems[i],3)==0) LogClass::logLevel = i; \
       std::cout << "LOG4ESPP: default logger, take logLevel = " \

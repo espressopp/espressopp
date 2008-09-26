@@ -13,3 +13,5 @@ if cppname == "cpp":
 
 # include the path containing the installed python packages
 sys.path.append("@pkgpythondir@")
+
+import _espresso

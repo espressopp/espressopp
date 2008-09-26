@@ -1,7 +1,0 @@
-_espresso_la_SOURCES += \
-	hello/python_bindings.cpp \
-	hello/HelloWorld.cpp
-
-noinst_HEADERS += \
-	hello.hpp \
-	hello/HelloWorld.hpp

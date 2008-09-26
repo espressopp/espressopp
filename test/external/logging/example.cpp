@@ -25,7 +25,7 @@
 
 #define LOG4ESPP_LEVEL_DEBUG
 
-#include "log4espp.hpp"
+#include "logging/log4espp.hpp"
 
 #define N 100
 

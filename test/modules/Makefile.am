@@ -1,2 +1,3 @@
-SUBDIRS = kernel
-
+if HAVE_UNITTEST
+SUBDIRS = 
+endif

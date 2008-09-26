@@ -81,10 +81,7 @@ if test "x$axes_cv_boost_lib_python" = "xno"; then
 fi
 
 AXES_BOOST_UNIT_TEST_FRAMEWORK
-if test "x$axes_cv_boost_lib_unit_test_framework" = "xno"; then
-    AC_MSG_ERROR([could not find the boost unit test framework])
-fi
-
+AM_CONDITIONAL([HAVE_UNITTEST], [test "x$axes_cv_boost_lib_unit_test_framework" = "xno"])
 
 cat <<EOF
 **********************************************************************
@@ -139,9 +136,9 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/Makefile
 		 src/cpp/pmi/Makefile
 		 src/cpp/pmi/mpitransmit/Makefile
-                 src/cpp/espresso/Makefile 
-                 src/cpp/espresso/kernel/Makefile 
-                 src/cpp/espresso/kernel/test/Makefile
+                 src/cpp/mpi/Makefile
+                 src/cpp/hello/Makefile
+                 src/cpp/logging/Makefile
                  test/Makefile 
                  test/external/Makefile 
                  test/external/mpi/Makefile 
@@ -149,8 +146,6 @@ AC_CONFIG_FILES([Makefile
                  test/external/boost.mpi/Makefile 
                  test/external/boost.python/Makefile 
                  test/external/boost.python/hello/Makefile 
-                 test/modules/Makefile 
-                 test/modules/kernel/Makefile 
 	         ])
 
 # now make sure that all config files are generated
@@ -177,6 +172,10 @@ fi
 echo "   - flavor ${axes_cv_boost_lib_suffix#-}"
 
 echo " * LOG4ESSP (logging for ESPResSo++): uses $axes_log4espp"
+
+if test "x$axes_cv_boost_lib_unit_test_framework" = "xno"; then
+echo " * using the boost unit test framework for unit testing"
+fi
 
 if DX_TEST_FEATURE([doc]); then
 echo " * Doxygen: doxygen was found"
