@@ -1,2 +1,5 @@
-SUBDIRS = external modules
+SUBDIRS = external
+if HAVE_UNITTEST
+SUBDIRS += modules
+endif
 

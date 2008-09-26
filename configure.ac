@@ -81,7 +81,7 @@ if test "x$axes_cv_boost_lib_python" = "xno"; then
 fi
 
 AXES_BOOST_UNIT_TEST_FRAMEWORK
-AM_CONDITIONAL([HAVE_UNITTEST], [test "x$axes_cv_boost_lib_unit_test_framework" = "xno"])
+AM_CONDITIONAL([HAVE_UNITTEST], [test "x$axes_cv_boost_lib_unit_test_framework" = "xyes"])
 
 cat <<EOF
 **********************************************************************
@@ -173,7 +173,7 @@ echo "   - flavor ${axes_cv_boost_lib_suffix#-}"
 
 echo " * LOG4ESSP (logging for ESPResSo++): uses $axes_log4espp"
 
-if test "x$axes_cv_boost_lib_unit_test_framework" = "xno"; then
+if test "x$axes_cv_boost_lib_unit_test_framework" = "xyes"; then
 echo " * using the boost unit test framework for unit testing"
 fi
 
