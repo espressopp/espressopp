@@ -1,5 +1,2 @@
-SUBDIRS = external
-if HAVE_UNITTEST
-SUBDIRS += modules
-endif
+SUBDIRS = external modules
 

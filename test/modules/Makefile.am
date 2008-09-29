@@ -1,3 +1,1 @@
-if HAVE_UNITTEST
 SUBDIRS = 
-endif
