@@ -1,10 +1,6 @@
 #! /bin/sh -x
 
-rm -f config.cache acconfig.h
-
-if [ -n "`which libtoolize`" ]; then
-    libtoolize --copy
-fi
+rm -f config.cache src/cpp/acconfig.hpp
 
 aclocal -I build-aux/macros		&& \
 autoheader				&& \
