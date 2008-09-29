@@ -18,7 +18,7 @@ pkginclude_HEADERS = \
 noinst_HEADERS = \
 	worker_internal.hpp 
 
-lib_LTLIBRARIES = libpmi.la 
+noinst_LTLIBRARIES = libpmi.la 
 libpmi_la_SOURCES = \
 	types.cpp \
 	basic_func.cpp \
