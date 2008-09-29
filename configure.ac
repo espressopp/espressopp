@@ -134,12 +134,13 @@ AC_CONFIG_HEADERS([src/cpp/acconfig.hpp])
 AC_CONFIG_FILES([Makefile 
                  src/Makefile 
                  src/cpp/Makefile
-		 src/cpp/pmi/Makefile
-		 src/cpp/pmi/mpitransmit/Makefile
+                 src/cpp/pmi/Makefile
+                 src/cpp/pmi/mpitransmit/Makefile
                  src/cpp/mpi/Makefile
                  src/cpp/hello/Makefile
                  src/cpp/logging/Makefile
-                 test/Makefile 
+                 test/Makefile
+                 test/modules/Makefile
                  test/external/Makefile 
                  test/external/mpi/Makefile 
                  test/external/logging/Makefile 
