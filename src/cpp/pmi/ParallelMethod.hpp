@@ -48,10 +48,6 @@ namespace pmi {
     
     static IdType &associate() {
       if (ID == NOT_ASSOCIATED) {
-	if (NAME == NOT_REGISTERED) {
-	  LOG4ESPP_FATAL(logger, "Controller tried to associate a method that was not registered!");
-	  throw UserError("Controller tried to associate a method that was not registered!");
-	}
 	ID = generateMethodId();
 	
 	LOG4ESPP_INFO(logger, "Controller associates method \"" << NAME << \
@@ -70,6 +66,10 @@ namespace pmi {
   // Initialize ID
   template < class T, void (T::*method)() >
   IdType ParallelMethod<T, method>::ID = NOT_ASSOCIATED;
+
+  // NAME is not initialized: it has to be initialized when the method
+  // is registered. Use PMI_REGISTER_METHOD for that purpose.
+
 }
 #endif
 
