@@ -3,7 +3,7 @@ AM_LDFLAGS = $(BOOST_LDFLAGS)
 
 noinst_LTLIBRARIES=libhello.la
 libhello_la_SOURCES = \
-	python_bindings.cpp \
+	bindings.cpp \
 	HelloWorld.cpp
 
 noinst_HEADERS = \
