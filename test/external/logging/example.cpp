@@ -35,8 +35,6 @@
 *                                                                         *
 **************************************************************************/
 
-LOG4ESPP_DEFINITION();  // in one unit put definitions of logging
-
 int main (int argc, char **argv) {
 
   int primeCounter = 0;
