@@ -1,4 +1,4 @@
-#include "log4espp.hpp"
+#include "logging.hpp"
 #include "ParticleContainer.hpp"
 
 #define DEFAULT_BLOCK_SIZE 256

@@ -15,7 +15,7 @@ a position that corresponds to the position in the list.
 
 #include <string>
 #include <iostream>
-#include "log4espp.hpp"
+#include "logging.hpp"
 
 class ParticleRef {
 

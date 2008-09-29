@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "BasicProperty.hpp"
-#include "log4espp.hpp"
+#include "logging.hpp"
 
 /** \file ParticleContainer.hpp    Class for storing particle data.
 
