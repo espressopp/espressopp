@@ -81,7 +81,7 @@ if test "x$axes_cv_boost_lib_python" = "xno"; then
 fi
 
 AXES_BOOST_UNIT_TEST_FRAMEWORK
-AM_CONDITIONAL([HAVE_UNITTEST], [test "x$axes_cv_boost_lib_unit_test_framework" = "xyes"])
+AM_CONDITIONAL([HAVE_UNITTEST], [test "x$axes_cv_boost_lib_unit_test_framework" != "xno"])
 
 cat <<EOF
 **********************************************************************
