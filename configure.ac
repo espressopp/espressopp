@@ -75,6 +75,9 @@ Note that this can also mean that the compiler $CXX you are using
 to compile ESPResSo++ is not the same you used to build boost.mpi.])
 fi
 
+AC_PATH_PROG([MPIEXEC], [mpiexec], [no])
+AC_SUBST(MPIEXEC)
+
 AXES_BOOST_PYTHON
 if test "x$axes_cv_boost_lib_python" = "xno"; then
     AC_MSG_ERROR([could not find the boost python library])
@@ -139,6 +142,7 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/mpi/Makefile
                  src/cpp/hello/Makefile
                  src/cpp/logging/Makefile
+                 src/espp_mpiexec.sh
                  test/Makefile
                  test/modules/Makefile
                  test/external/Makefile 
@@ -147,11 +151,14 @@ AC_CONFIG_FILES([Makefile
                  test/external/boost.mpi/Makefile 
                  test/external/boost.python/Makefile 
                  test/external/boost.python/hello/Makefile 
-	         ])
+	         ],
+                 [chmod +x src/espp_mpiexec.sh])
 
 # now make sure that all config files are generated
 
 AC_OUTPUT
+
+chmod +x src/espp_mpiexec.sh
 
 cat << EOF
 
