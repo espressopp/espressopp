@@ -1,0 +1,33 @@
+#!/bin/bash
+
+allStatus=0
+
+MPIRUN=$1
+
+$MPIRUN -n 1 mpiTest
+status=$?
+
+echo "Status test 1 = $status"
+if test $status -ne 0 ; then
+   allStatus=$status
+fi
+
+$MPIRUN -n 4 mpiTest
+status=$?
+
+echo "Status test 2 = $status"
+if test $status -ne 0 ; then
+   allStatus=$status
+fi
+
+$MPIRUN -n 3 mpiTest
+status=$?
+
+echo "Status test 2 = $status"
+if test $status -ne 0 ; then
+   allStatus=$status
+fi
+
+echo "allStatus = $allStatus"
+
+exit $allStatus
