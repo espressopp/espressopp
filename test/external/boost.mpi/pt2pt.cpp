@@ -13,6 +13,13 @@ int main(int argc, char* argv[])
   int TAG_0 = 0;
   int TAG_1 = 1;
 
+  if (world.size() == 1) {
+    std::string test("Hello world");
+    broadcast(world, test, 0);
+    std::cout << test << "!" << std::endl;
+    return 0;
+  }
+
   if (world.rank() == 0) {
 
     int myPartnerRank = 1;
