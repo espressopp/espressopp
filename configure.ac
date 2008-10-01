@@ -181,7 +181,7 @@ echo "   - flavor ${axes_cv_boost_lib_suffix#-}"
 
 echo " * LOG4ESSP (logging for ESPResSo++): uses $axes_log4espp"
 
-if test "x$axes_cv_boost_lib_unit_test_framework" = "xyes"; then
+if test "x$axes_cv_boost_lib_unit_test_framework" != "xno"; then
 echo " * using the boost unit test framework for unit testing"
 fi
 
