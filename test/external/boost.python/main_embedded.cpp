@@ -16,13 +16,6 @@ extern "C" {
   void init_espresso();
 }
 
-// call functions that should be called before python starts.
-// of course only works in embedded mode
-void callBeforePythonHooks(int &argc, char **&argv)
-{
-  hello::initBeforePython(argc, argv);
-}
-
 // list of module(s) that this binary provides
 // simply provides the name and the name of the init-routine
 // the python routines that use _inittab do not import it
@@ -36,8 +29,6 @@ static struct _inittab libs[] = {
 // the program entry point that will call python
 int main(int argc, char **argv)
 {
-  callBeforePythonHooks(argc, argv);
-
   // register the modules that are compiled into this binary
   if (PyImport_ExtendInittab(libs) == -1) {
     cerr << "could not append mpi_test module to the list of loadable modules"
