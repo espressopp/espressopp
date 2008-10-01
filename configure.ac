@@ -18,15 +18,14 @@ AM_INIT_AUTOMAKE
 # import paths from the EXTRA_PREFIXES precious variable
 AXES_IMPORT_EXTRA_PREFIXES
 
-# we use C++ as main code language
-# and libtool for building the shared libraries
-
 cat <<EOF
 **********************************************************************
 *         Checking for compiler and dynamic library support          *
 **********************************************************************
 EOF
 
+# we use C++ as main code language
+# and libtool for building the shared libraries
 AC_PROG_CXX
 AC_LANG([C++])
 
@@ -142,6 +141,7 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/mpi/Makefile
                  src/cpp/hello/Makefile
                  src/cpp/logging/Makefile
+                 src/python/Makefile
                  src/espp_mpiexec.sh
                  test/Makefile
                  test/modules/Makefile
@@ -150,7 +150,6 @@ AC_CONFIG_FILES([Makefile
                  test/external/logging/Makefile 
                  test/external/boost.mpi/Makefile 
                  test/external/boost.python/Makefile 
-                 test/external/boost.python/hello/Makefile 
 	         ],
                  [chmod +x src/espp_mpiexec.sh])
 

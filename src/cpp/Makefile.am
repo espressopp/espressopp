@@ -1,5 +1,7 @@
 SUBDIRS = logging mpi pmi hello
 
+CLEANFILES=__init__.py*
+
 # make the dll's in this directory available even in the
 # build tree
 include $(top_srcdir)/build-aux/macros/axes_dllfixup.am

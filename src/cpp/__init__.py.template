@@ -22,9 +22,9 @@ __path__.append("@pkgpythondir@")
 if srcdir == "src":
     # add the build tree
     if root == "":
-	__path__.append("src/python/"+package)
+	__path__.append("src/python")
     else:
-	__path__.append(root+"/src/python/"+package)
+	__path__.append(root+"/src/python")
 
 print __path__
 import _espresso

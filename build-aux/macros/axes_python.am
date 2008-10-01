@@ -1,0 +1,17 @@
+# an automake extension for handling python files.
+# Since we want to be able to cross-compile, we cannot use the standard
+# automake python macros.
+# For running from the build tree, we need to copy the python files from
+# the source to the build tree.
+# This creates two new phony targets:
+#    python-all and python-clean
+# - which copy rsp. remove the python files specified in the python_scripts
+#   variable from the source to the build directory
+# - the clean-target also removes all compiled python files
+
+.PHONY: python-all python-clean
+
+python-all:
+	for f in $(python_scripts); do if test ! -e $$f; then cp $(srcdir)/$$f $$f; fi ; done
+python-clean:
+	for f in $(python_scripts); do rm -f $$f $${f}c ; done
