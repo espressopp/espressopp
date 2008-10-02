@@ -61,5 +61,7 @@ if test "x$want_log4cxx" = "xyes"; then
     if test "x$axes_cv_log4cxx" != "xno"; then
 	AC_DEFINE([HAVE_LOG4CXX],[1],[whether log4cxx is available])
     fi
+else
+	axes_cv_log4cxx=no
 fi
 ])
