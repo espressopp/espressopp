@@ -140,7 +140,6 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/hello/Makefile
                  src/cpp/logging/Makefile
                  src/python/Makefile
-                 src/espp_mpiexec.sh
                  test/Makefile
                  test/modules/Makefile
                  test/external/Makefile 
@@ -148,8 +147,10 @@ AC_CONFIG_FILES([Makefile
                  test/external/logging/Makefile 
                  test/external/boost.mpi/Makefile 
                  test/external/boost.python/Makefile 
-	         ],
-                 [chmod +x src/espp_mpiexec.sh])
+	         ])
+
+AC_CONFIG_FILES([ src/espp_mpiexec.sh ],
+                [ chmod +x src/espp_mpiexec.sh ])
 
 # now make sure that all config files are generated
 
