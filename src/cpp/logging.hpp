@@ -6,5 +6,6 @@
 
 namespace logging {
   void initLogging();
+  void finalizeLogging();
 }
 #endif

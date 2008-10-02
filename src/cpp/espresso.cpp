@@ -1,48 +1,74 @@
 /*
  this file contains the main routine when embedding python
 */
-#include <boost/python.hpp>
+#include "acconfig.hpp"
 #include <iostream>
+#ifdef HAVE_BOOST_PYTHON
+#include <boost/python.hpp>
+#endif
 
-#include "mpi.hpp"
+#include "espresso.hpp"
 
 using namespace boost;
 using namespace std;
 
-/** prototype for the function that python calls when loading a dll.
-    This function is actually defined by the BOOST_PYTHON_MODULE
-    macro in _espresso.cpp, which contains the main python bindings. */
-extern "C" {
-  void init_espresso();
+#ifdef HAVE_BOOST_PYTHON
+
+/** minimalistic Espresso module initialization,
+    for use with the static initialization */
+BOOST_PYTHON_MODULE(_espresso)
+{
+  initPythonEspresso();
 }
 
 /** name of the Espresso module that is loaded */
-static char espresso_module_name[] = "_espresso";
+static char espressoModuleName[] = "_espresso";
 
 /** list of module(s) that this binary provides.
     Povides the name (from @ref module_names) and the
-    init-routine of the module (typically init_modulename,
-    where modulename was specified to BOOST_PYTHON_MODULE) */
+    init-routine of the module (here, the initialization
+    of the python part of Espresso) */
 static struct _inittab libs[] = {
-  {espresso_module_name, init_espresso},
+  {espressoModuleName, init_espresso},
   {0, 0}
 };
 
-/** just adds the espresso library to python's static library
-    search path and starts python */
+#endif
+
+/** on the controller, just adds the espresso library to python's
+    static library search path and starts python.
+    on the slaves, just starts PMI
+*/
 int main(int argc, char **argv)
 {
-  // early initialization of MPI, in case some implementations
-  // need argc/argv
+  int exitstate = 0;
+  logging::initLogging();
   mpi::initMPI(argc, argv);
 
-  // register the modules that are compiled into this binary
-  if (PyImport_ExtendInittab(libs) == -1) {
-    cerr << "could not add the Espresso modules to python's list of loaded modules."
-	 << endl;
-    exit(-1);
+  if (!pmi::mainLoop()) {
+#ifdef HAVE_BOOST_PYTHON
+    // the controller:
+    // register the modules that are compiled into this binary
+    if (PyImport_ExtendInittab(libs) == -1) {
+      cerr << "could not add the Espresso modules to python's list of loaded modules."
+	   << endl;
+      exit(-1);
+    }
+    // fire up python
+    exitstate = Py_Main(argc, argv);
+#else
+    exitstate = -1;
+#endif
+    // after finishing, terminate workers
+    pmi::endWorkers();
+  } else {
+    // the worker:
+    // here, Espresso is already done, exit
+    exitstate = 0;
   }
 
-  // and fire up python
-  return Py_Main(argc, argv);
+  mpi::finalizeMPI();
+  logging::finalizeLogging();
+
+  return exitstate;
 }

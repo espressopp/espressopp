@@ -27,7 +27,7 @@ noinst_headers= \
 	pmi.hpp \
 	hello.hpp
 
-libespresso_common_la_SOURCES= _espresso.cpp
+libespresso_common_la_SOURCES= espresso_bindings.cpp
 libespresso_common_la_LIBADD = \
 	hello/libhello.la \
 	pmi/libpmi.la \
@@ -38,7 +38,7 @@ libespresso_common_la_LIBADD = \
 # rules for the shared library wrapper
 _espresso_la_LDFLAGS = -module -no-undefined 
 _espresso_la_LIBADD = libespresso_common.la
-_espresso_la_SOURCES =
+_espresso_la_SOURCES = _espresso.cpp
 
 # rules for the program wrapper
 espresso_SOURCES = espresso.cpp

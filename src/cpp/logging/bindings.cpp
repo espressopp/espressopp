@@ -6,4 +6,8 @@ namespace logging {
   {
     LOG4ESPP_CONFIGURE();
   }
+
+  void finalizeLogging()
+  {
+  }
 }
