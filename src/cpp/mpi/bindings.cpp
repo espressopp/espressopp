@@ -8,7 +8,13 @@ namespace mpi {
 
   void initMPI() {
     if (theEnvironment == 0) {
-      theEnvironment = new boost::mpi::environment;
+      theEnvironment = new boost::mpi::environment();
+    }
+  }
+
+  void initMPI(int &argc, char **&argv) {
+    if (theEnvironment == 0) {
+      theEnvironment = new boost::mpi::environment(argc, argv);
     }
   }
 
