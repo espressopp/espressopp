@@ -42,6 +42,8 @@ if test "x$axes_cv_mpi" = "xno"; then
     AC_MSG_ERROR([could not compile an MPI program])
 fi
 
+AC_PATH_PROG([MPIEXEC], [mpiexec], [no])
+AC_SUBST(MPIEXEC)
 
 AXES_PYTHON
 if test "x$axes_cv_python_lib" = "xno" || \
@@ -73,9 +75,6 @@ if test "x$axes_cv_boost_lib_mpi" = "xno"; then
 Note that this can also mean that the compiler $CXX you are using
 to compile ESPResSo++ is not the same you used to build boost.mpi.])
 fi
-
-AC_PATH_PROG([MPIEXEC], [mpiexec], [no])
-AC_SUBST(MPIEXEC)
 
 AXES_BOOST_PYTHON
 if test "x$axes_cv_boost_lib_python" = "xno"; then
@@ -137,7 +136,6 @@ AC_CONFIG_FILES([Makefile
                  src/Makefile 
                  src/cpp/Makefile
                  src/cpp/pmi/Makefile
-                 src/cpp/pmi/mpitransmit/Makefile
                  src/cpp/mpi/Makefile
                  src/cpp/hello/Makefile
                  src/cpp/logging/Makefile
@@ -156,8 +154,6 @@ AC_CONFIG_FILES([Makefile
 # now make sure that all config files are generated
 
 AC_OUTPUT
-
-chmod +x src/espp_mpiexec.sh
 
 cat << EOF
 

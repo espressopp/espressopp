@@ -1,5 +1,3 @@
-SUBDIRS = mpitransmit
-
 pkginclude_HEADERS = \
 	log4espp.hpp \
 	types.hpp \
@@ -28,8 +26,7 @@ libpmi_la_SOURCES = \
 	ParallelObject.cpp \
 	controller_func.cpp \
 	worker_func.cpp \
-	worker_internal.cpp
-libpmi_la_LIBADD = \
-	mpitransmit/libpmimpi.la
+	worker_internal.cpp \
+	mpitransmit/transmit.cpp
 
 
