@@ -17,8 +17,6 @@
 #ifndef LOG4ESPP_H
 #define LOG4ESPP_H
 
-#include "acconfig.hpp"
-
 /************************************************************************
 *                                                                       *
 *  Compile time guards for LOGGING                                      *
