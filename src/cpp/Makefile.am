@@ -1,6 +1,6 @@
 SUBDIRS = logging mpi pmi hello
 
-CLEANFILES=__init__.py*
+CLEANFILES=__init__.py __init__.pyc
 
 # make the dll's in this directory available even in the
 # build tree
