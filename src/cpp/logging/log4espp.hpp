@@ -282,6 +282,8 @@ using namespace log4cxx::helpers;
       printf ("LOG4ESPP: LOG4CXX basic configuration\n"); \
       /* DefaultConfigurator::configure(LogManager::getLoggerRepository()); */ \
       BasicConfigurator::configure(); \
+      LoggerPtr rootLogger = Logger::getRootLogger(); \
+      rootLogger->setLevel(log4cxx::Level::getWarn()); \
      } \
    }
 
