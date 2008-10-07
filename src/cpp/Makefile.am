@@ -1,5 +1,7 @@
 SUBDIRS = logging mpi pmi hello
 
+EXTRA_DIST = __init__.py.template
+
 CLEANFILES=__init__.py __init__.pyc
 
 # make the dll's in this directory available even in the
@@ -21,11 +23,11 @@ lib_LTLIBRARIES = _espresso.la
 bin_PROGRAMS = espresso
 
 # rules for the common Espresso library
-noinst_headers= \
+noinst_HEADERS= \
 	logging.hpp \
 	mpi.hpp \
-	pmi.hpp \
-	hello.hpp
+	hello.hpp \
+	espresso.hpp
 
 libespresso_common_la_SOURCES= espresso_bindings.cpp
 libespresso_common_la_LIBADD = \
