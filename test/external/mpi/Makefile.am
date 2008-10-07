@@ -4,7 +4,7 @@
 #  MPI test programs verify that MPI works correctly
 #
 
-bin_PROGRAMS = cpi comm
+noinst_PROGRAMS = cpi comm
 
 check_PROGRAMS = mpiTest
 

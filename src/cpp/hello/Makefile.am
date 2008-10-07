@@ -6,5 +6,6 @@ libhello_la_SOURCES = \
 	bindings.cpp \
 	HelloWorld.cpp
 
-noinst_HEADERS = \
+subpkgincludedir=$(pkgincludedir)/hello
+nobase_subpkginclude_HEADERS = \
 	HelloWorld.hpp

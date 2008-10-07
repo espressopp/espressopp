@@ -7,10 +7,10 @@ python_scripts=main.py hello.py
 EXTRA_DIST = $(python_scripts)
 
 # build a (normally shared) library that will be installed
-lib_LTLIBRARIES = _espresso.la
+check_LTLIBRARIES = _espresso.la
 
 # and a regular binary with embedded python
-bin_PROGRAMS = espresso
+check_PROGRAMS = espresso
 
 hello_sources = HelloWorld.cpp HelloWorld.hpp
 

@@ -1,4 +1,5 @@
-pkginclude_HEADERS = \
+subpkgincludedir=$(pkgincludedir)/pmi
+nobase_subpkginclude_HEADERS = \
 	log4espp.hpp \
 	types.hpp \
 	transmit.hpp \

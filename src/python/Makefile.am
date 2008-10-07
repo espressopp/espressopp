@@ -1,4 +1,4 @@
-EXTRA_DIST = $(python_scripts)
+dist_pkgdata_SCRIPTS=$(python_scripts)
 
 python_scripts=
 
