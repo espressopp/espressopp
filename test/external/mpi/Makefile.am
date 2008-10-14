@@ -17,5 +17,5 @@ comm_SOURCES = comm.cpp
 mpiTest_SOURCES = mpiTest.cpp
 
 check-local:
-	$(top_builddir)/src/espp_mpiexec.sh -n 2 mpiTest
-	$(top_builddir)/src/espp_mpiexec.sh -n 4 mpiTest
+	$(top_builddir)/bin/espp_mpiexec.sh -n 2 mpiTest
+	$(top_builddir)/bin/espp_mpiexec.sh -n 4 mpiTest

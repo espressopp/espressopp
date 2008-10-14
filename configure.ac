@@ -42,9 +42,6 @@ if test "x$axes_cv_mpi" = "xno"; then
     AC_MSG_ERROR([could not compile an MPI program])
 fi
 
-AC_PATH_PROG([MPIEXEC], [mpiexec], [no])
-AC_SUBST(MPIEXEC)
-
 AXES_PYTHON
 if test "x$axes_cv_python_lib" = "xno" || \
    test "x$axes_cv_python_include" = "xno"; then
@@ -81,14 +78,49 @@ if test "x$axes_cv_boost_lib_python" = "xno"; then
     AC_MSG_ERROR([could not find the boost python library])
 fi
 
-AXES_BOOST_UNIT_TEST_FRAMEWORK
-AM_CONDITIONAL([HAVE_UNITTEST], [test "x$axes_cv_boost_lib_unit_test_framework" != "xno"])
-
 cat <<EOF
 **********************************************************************
 *         Checking for optional external libraries and tools         *
 **********************************************************************
 EOF
+
+###################################################################
+#                                                                 #
+#  mpiexec/mympiexec.sh                                           #
+#                                                                 #
+###################################################################
+
+AC_PATH_PROG([MPIEXEC], [mpiexec], [no])
+AC_SUBST(MPIEXEC)
+
+AC_ARG_WITH([mympiexec],
+    AS_HELP_STRING([--with-mympiexec@<:@=script@:>@],
+    [specify the program or script that should be used to run the parallel build tests.
+The program should understand the basic syntax of the MPI-2 mpiexec command.
+Defaults to <builddir>/mympiexec.sh]),
+    [
+    if test "$withval" = "no"; then
+        MYMPIEXEC=""
+    else
+        MYMPIEXEC="$withval"
+
+        if test "${MYMPIEXEC#/}" = "$MYMPIEXEC"; then
+            dnl not an absolute path, make absolute
+            MYMPIEXEC="`pwd`/$MYMPIEXEC"
+        fi
+    fi
+    ],
+    [ MYMPIEXEC="$ac_abs_top_builddir/mympiexec.sh" ])
+AC_SUBST(MYMPIEXEC)
+
+###################################################################
+#                                                                 #
+#  optional boost packages                                        #
+#                                                                 #
+###################################################################
+
+AXES_BOOST_UNIT_TEST_FRAMEWORK
+AM_CONDITIONAL([HAVE_UNITTEST], [test "x$axes_cv_boost_lib_unit_test_framework" != "xno"])
 
 ###################################################################
 #                                                                 #
@@ -149,8 +181,8 @@ AC_CONFIG_FILES([Makefile
                  test/external/boost.python/Makefile 
 	         ])
 
-AC_CONFIG_FILES([ src/espp_mpiexec.sh ],
-                [ chmod +x src/espp_mpiexec.sh ])
+AC_CONFIG_FILES([ bin/espp_mpiexec.sh ],
+                [ chmod +x bin/espp_mpiexec.sh ])
 
 # now make sure that all config files are generated
 
@@ -176,6 +208,21 @@ fi
 echo "   - flavor ${axes_cv_boost_lib_suffix#-}"
 
 echo " * LOG4ESSP (logging for ESPResSo++): uses $axes_log4espp"
+
+if test "$MYMPIEXEC" = ""; then
+echo " * mpiexec disabled by user, no parallel tests will be run"
+else
+    if test -x "$MYMPIEXEC"; then
+echo " * mpiexec: using mympiexec = $MYMPIEXEC"
+    else
+echo " * mpiexec: using mympiexec = $MYMPIEXEC (not present or not executable at the moment)"
+    fi
+    if test "$MPIEXEC" != "no"; then
+echo "            fallback is $MPIEXEC, if mympiexec is not present"
+    else
+echo "            no fallback, will not run parallel test if mympiexec is not present"
+    fi
+fi
 
 if test "x$axes_cv_boost_lib_unit_test_framework" != "xno"; then
 echo " * using the boost unit test framework for unit testing"
