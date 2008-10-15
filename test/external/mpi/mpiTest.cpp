@@ -4,6 +4,7 @@
 
 #include <mpi.h>
 #include <iostream>
+#include <cstdlib>
 
 using namespace std;
 using namespace MPI;
@@ -46,6 +47,8 @@ bool testMPISum() {
 	 << size << ", got " << sum << ")" << endl;
     return false;
   }
+
+  return true;
 }
 
 int main(int argc, char **argv) {
