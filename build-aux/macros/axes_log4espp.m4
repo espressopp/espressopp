@@ -28,7 +28,7 @@ AC_REQUIRE([AXES_LOG4CXX])
 AC_REQUIRE([AXES_LOG4CPP])
 
 AC_ARG_WITH([log4espp],
-   AS_HELP_STRING([--with-log4espp=LOGGER], 
+   AS_HELP_STRING([--with-log4espp=LOGLIB], 
 [use the specified logger library (default: auto). 
 Possible values are "log4cxx", "log4cpp", "generic", "no" and "auto".])
   ,[log4espp_wanted=$withval], [log4espp_wanted="auto"])
