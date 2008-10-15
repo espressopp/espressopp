@@ -93,24 +93,26 @@ EOF
 AC_PATH_PROG([MPIEXEC], [mpiexec], [no])
 AC_SUBST(MPIEXEC)
 
+AC_MSG_CHECKING([for mympiexec])
 AC_ARG_WITH([mympiexec],
     AS_HELP_STRING([--with-mympiexec@<:@=script@:>@],
     [specify the program or script that should be used to run the parallel build tests.
-The program should understand the basic syntax of the MPI-2 mpiexec command.
-Defaults to <builddir>/mympiexec.sh]),
+Defaults to BUILDDIR/mympiexec.sh]),
     [
     if test "$withval" = "no"; then
         MYMPIEXEC=""
     else
         MYMPIEXEC="$withval"
 
-        if test "${MYMPIEXEC#/}" = "$MYMPIEXEC"; then
+	dir=`AS_DIRNAME([$MYMPIEXEC])`
+	if test "x$dir" = "x."; then
             dnl not an absolute path, make absolute
             MYMPIEXEC="`pwd`/$MYMPIEXEC"
         fi
     fi
     ],
-    [ MYMPIEXEC="$ac_abs_top_builddir/mympiexec.sh" ])
+    [ MYMPIEXEC="`pwd`/mympiexec.sh" ])
+AC_MSG_RESULT($MYMPIEXEC)
 AC_SUBST(MYMPIEXEC)
 
 ###################################################################
