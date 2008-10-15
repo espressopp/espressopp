@@ -2,83 +2,61 @@
 
 // MpiTest
 
-// Attention: #include <boost/test/unit_test.hpp> does not include main program
+#include <mpi.h>
+#include <iostream>
 
-#include <boost/test/included/unit_test.hpp>
-#include "mpi.h"
+using namespace std;
+using namespace MPI;
 
-using boost::unit_test_framework::test_suite;
+bool testMPIBroadcasting() {
+  const int broadcastValue = 13;
+  int val = 0;
+  int rank = COMM_WORLD.Get_rank();
 
-// the class to be tested
+  if (rank == 0) {
+    val = broadcastValue;
+  }
 
-void test_init() {
+  COMM_WORLD.Bcast(&val, 1, MPI_INT, 0);
 
-   // make sure that we run on more than 1 processor
+  // verify that now all processors have the value
+  if (val != broadcastValue) {
+    cerr << "rank " << rank << ": broadcasting failed (expected to get "
+	 << broadcastValue << ", got " << val << ")" << endl;
+    return false;
+  }
 
-   int mpiSize = MPI::COMM_WORLD.Get_size();
-   BOOST_CHECK(mpiSize > 1);
-
+  return true;
 }
 
-#define BROADCAST_VAL 13
+bool testMPISum() {
+  int rank = COMM_WORLD.Get_rank();
+  // val is send buffer, sum is receive buffer 
+  int val = COMM_WORLD.Get_rank();
+  int sum  = 1711;  // must be overwritten
 
-void test_bcast() {
+  COMM_WORLD.Allreduce(&val, &sum, 1, MPI_INT, MPI_SUM);
 
-   int val = 0;
-   int rank = MPI::COMM_WORLD.Get_rank();
+  int size = COMM_WORLD.Get_size();
+  // expected output (sum of processor numbers)
+  size = size * (size - 1) / 2;
 
-   if (rank == 0) {
-      val = BROADCAST_VAL;
-   }
-
-   MPI::COMM_WORLD.Bcast(&val, 1, MPI_INT, 0);
-
-   // verify that now all processors have the value
-
-   BOOST_CHECK_EQUAL (val, BROADCAST_VAL);
+  if (sum  != size) {
+    cerr << "rank " << rank << ": all2all sum failed (expected to get "
+	 << size << ", got " << sum << ")" << endl;
+    return false;
+  }
 }
 
+int main(int argc, char **argv) {
+  Init(argc, argv);
 
-void test_sum() {
+  if (!testMPIBroadcasting() ||
+      !testMPISum()) {
+    return EXIT_FAILURE;
+  }
 
-   int val  = MPI::COMM_WORLD.Get_rank() + 1;
+  Finalize();
 
-   int sum  = 1711;  // must be overwritten
-
-   // val is send buffer, sum is receive buffer 
-
-   MPI::COMM_WORLD.Allreduce(&val, &sum, 1, MPI_INT, MPI_SUM);
-
-   int size = MPI::COMM_WORLD.Get_size();
-
-   size = size * (size + 1) / 2;
-
-   BOOST_CHECK_EQUAL(sum, size);
+  return EXIT_SUCCESS;
 }
-
-class MPITestSuite : public test_suite
-{
-   public:
-
-   MPITestSuite() : test_suite("Simple MPI test suite") {
-
-      add (BOOST_TEST_CASE(&test_init));
-      add (BOOST_TEST_CASE(&test_bcast));
-      add (BOOST_TEST_CASE(&test_sum));
-
-   }
-
-};
-
-test_suite*
-init_unit_test_suite( int argc, char * argv[] ) {
-
-    MPI::Init(argc, argv);
-
-    test_suite* test= BOOST_TEST_SUITE( "MPI Test" );
-
-    test->add( new MPITestSuite());
-
-    return test;
-}
-
