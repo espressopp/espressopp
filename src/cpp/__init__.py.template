@@ -25,5 +25,3 @@ if srcdir == "src":
 	__path__.append("src/python")
     else:
 	__path__.append(root+"/src/python")
-
-import _espresso

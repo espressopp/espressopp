@@ -49,11 +49,15 @@ int main(int argc, char **argv)
 #ifdef HAVE_BOOST_PYTHON
     // the controller:
     // register the modules that are compiled into this binary
+    // has to be done before Py_Initialize
     if (PyImport_ExtendInittab(libs) == -1) {
       cerr << "could not add the Espresso modules to python's list of loaded modules."
 	   << endl;
       exit(-1);
     }
+
+    Py_Initialize();
+
     // fire up python
     exitstate = Py_Main(argc, argv);
 #else
