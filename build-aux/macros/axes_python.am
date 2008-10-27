@@ -14,4 +14,4 @@
 python-all:
 	for f in $(python_scripts); do if test ! -e $$f; then cp $(srcdir)/$$f $$f; fi ; done
 python-clean:
-	for f in $(python_scripts); do rm -f $$f $${f}c ; done
+	for f in $(python_scripts); do rm -f $${f}c ; done
