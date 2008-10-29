@@ -18,7 +18,7 @@ dllfixup: $(lib_LTLIBRARIES)
 	for library in $(lib_LTLIBRARIES); do \
 		dll=`echo $$library | sed -e "s,[.]la$$,$$shrext_cmds,"`; \
 		if test ! -e $$dll || test -h $$dll; then \
-			rm $$objdir/$$dll $$dll; $(LN_S) $$objdir/$$dll $$dll; \
+			rm $$dll; $(LN_S) $$objdir/$$dll $$dll; \
 		fi \
 	done
 
