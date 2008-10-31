@@ -1,0 +1,5 @@
+# test external libraries first
+external/mpi/mpiTest		external
+external/mpi/comm		external
+external/mpi/cpi		external
+

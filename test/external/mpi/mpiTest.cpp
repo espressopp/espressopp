@@ -59,7 +59,13 @@ int main(int argc, char **argv) {
     return EXIT_FAILURE;
   }
 
+  int rank = COMM_WORLD.Get_rank();
+
   Finalize();
+
+  if (rank == 0) {
+    cerr << "all tests passed" << endl;
+  }
 
   return EXIT_SUCCESS;
 }

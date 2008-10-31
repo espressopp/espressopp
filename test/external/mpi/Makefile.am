@@ -4,7 +4,7 @@
 #  MPI test programs verify that MPI works correctly
 #
 
-check_PROGRAMS = cpi comm mpiTest
+noinst_PROGRAMS = cpi comm mpiTest
 
 LIBS = $(MPI_LIBS)
 
@@ -12,6 +12,10 @@ cpi_SOURCES = cpi.cpp
 comm_SOURCES = comm.cpp
 mpiTest_SOURCES = mpiTest.cpp
 
-check-local:
-	$(top_builddir)/bin/espp_mpiexec.sh -n 2 mpiTest
-	$(top_builddir)/bin/espp_mpiexec.sh -n 4 mpiTest
+.PHONY: check-extended
+
+localtest= $(top_builddir)/bin/runtests.sh -tests $(top_srcdir)/test/tests.txt -fromdir $(srcdir) 
+check: $(ESPP_TESTS)
+	$(localtest)
+check-extended: $(ESPP_TESTS)
+	$(localtest) -notag extended
