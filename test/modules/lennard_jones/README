@@ -1,0 +1,10 @@
+Lennard-Jones potential
+11.11.2008
+JDH
+
+This test module demonstrates the use of the Lennard-Jones potential.
+The code loads N particle into a vector and then computes the
+total potential energy of the system.
+
+Currently, a manual build is required. This may be done with
+./manual_build

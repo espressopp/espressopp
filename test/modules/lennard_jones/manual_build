@@ -1,0 +1,6 @@
+g++ -c lj_test.cpp
+g++ -c Particle.cpp
+cd ../../../src/cpp/interactions/lennard_jones/
+g++ -c LennardJonesInteraction.cpp
+cd -
+g++ lj_test.o Particle.o ../../../src/cpp/interactions/lennard_jones/LennardJonesInteraction.o -o lj_test
