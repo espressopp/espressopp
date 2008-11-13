@@ -1,13 +1,14 @@
 #define RAND_MAX
-#define NUMBER_OF_PARTICLES 100
+#define NUMBER_OF_PARTICLES 22000
 
 #include <iostream>
 #include <vector>
 #include <string>
 #include <math.h>
+#include <stdlib.h>
 
 #include "Particle.hpp"
-#include "../../../src/cpp/interactions/lennard_jones/LennardJonesInteraction.hpp"
+#include "LennardJonesInteraction.hpp"
 
 int main() {
 
