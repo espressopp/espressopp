@@ -1,11 +1,13 @@
 #! /bin/sh 
 
-LJ_DIR=../../../src/cpp/interactions/lennard_jones
+LJ_DIR=../../../src/cpp/interactions/lennard_jones_inline
 
-OPT="-fomit-frame-pointer -funroll-loops -floop-optimize -ffast-math -O3 -malign-double -msse2 -mfpmath=sse -march=athlon64 -m64"
-g++ -c $OPT lj_test.cpp -I$LJ_DIR
-g++ -c $OPT Particle.cpp
+OPT="-O2"
+
+CPP=g++
+$CPP -c $OPT lj_test.cpp -I$LJ_DIR
+$CPP -c $OPT Particle.cpp
 cd ../../../src/cpp/interactions/lennard_jones/
-g++ -c $OPT LennardJonesInteraction.cpp
+$CPP -c $OPT LennardJonesInteraction.cpp
 cd -
-g++ lj_test.o Particle.o $LJ_DIR/LennardJonesInteraction.o -o lj_test
+$CPP lj_test.o Particle.o $LJ_DIR/LennardJonesInteraction.o -o lj_test

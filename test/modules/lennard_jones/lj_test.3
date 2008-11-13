@@ -13,21 +13,19 @@
 #include "FullPairIterator.hpp"
 
 template<class Interaction, class PairIterator>
-void compute (std::vector<Particle> *pc, Interaction lj, PairIterator* it)
+void compute (std::vector<Particle> *pc, Interaction lj, PairIterator it)
 
 {
   double rsq;
   double en;
 
-  PairIterator it1 = *it;
-
   en = 0.0;
 
   //loop over all pairs assuming non-periodic BCs
 
-  for (it1.reset(); !it1.done(); it1.next()) {
-     Particle* Pi = &(*pc)[it1.first()];
-     Particle* Pj = &(*pc)[it1.second()];
+  for (it.reset(); !it.done(); it.next()) {
+     Particle* Pi = &(*pc)[it.first()];
+     Particle* Pj = &(*pc)[it.second()];
      rsq   = pow(Pi->getx() - Pj->getx(), 2);
      rsq  += pow(Pi->gety() - Pj->gety(), 2);
      rsq  += pow(Pi->getz() - Pj->getz(), 2);
@@ -66,7 +64,7 @@ int main() {
 
   FullPairIterator it = FullPairIterator(pc.size());
 
-  compute<LennardJonesInteraction, FullPairIterator>(&pc, lj, &it);
+  compute<LennardJonesInteraction, FullPairIterator>(&pc, lj, it);
 
   return 0;
 }

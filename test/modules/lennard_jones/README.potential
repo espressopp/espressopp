@@ -1,0 +1,66 @@
+Virtual Iterator:
+=================
+
+NUMBER_OF_PARTICLES  33000
+
+lj_test.1
+
+  - FullPairIterator, LennardJonesInteraction
+  - compute loop is inlined in the main routine
+
+  time: 5.898 seconds
+
+  This test is only for comparison of data.
+
+lj_test.2
+
+  - FullPairIterator derived from PairIterator
+  - compute loop with PairIterator, Interaction as own subroutine
+
+  time: 14.845 seconds
+
+  This test shows that virtual iterators should not be taken.
+
+lj_test.4
+
+  ToDo: try it with a Blocked Pair / Cached Iterator (TB)
+
+  This test might be an alternative if compilation times are much
+  better.
+ 
+lj_test.3
+
+  - template<Interaction, PairIterator>
+  - instantiated with compute<LennardJonesInteraction, FullPairIterator>
+  Time: 5.43
+
+
+  This is the preferred solution.
+
+  - be careful: do not use pointer for Iterator otherwise slower
+  - even local copy of the FullPairIterator helps
+  Time: 6.56
+
+  - be careful: FullPairIterator should no more derived from PairIterator
+
+  Time: 6.56
+
+Open:
+
+- inlining of LennardJones interaction gives different results
+  possible reason: particles too close
+  workaround: generating particles on a mesh (JH)
+
+- more realistic: periodic boundary conditions (JH)
+
+ToDo:
+
+- compiling template<Interaction, PairIterator> for many 
+  different pairs (roughly 50 Interactinos, 15 PairIterators)
+  TB
+
+- Branching: moving the condition to the iterator or inner loop 
+  JH
+
+- Makefile for the different tests (Integrate in the build system), TB
+
