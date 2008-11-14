@@ -7,12 +7,13 @@ static void finalize();
 BOOST_PYTHON_MODULE(_espresso)
 {
   logging::initLogging();
-  mpi::initMPI();
 
   // register with python to call finalize
   // when exiting, to clean up
   Py_AtExit(&finalize);
 
+#ifdef HAVE_MPI
+  mpi::initMPI();
   if (!pmi::mainLoop()) {
     // the controller:
     // initialize python espresso glue
@@ -23,12 +24,17 @@ BOOST_PYTHON_MODULE(_espresso)
     // has disconnected, so we simply quit
     Py_Exit(0);
   }
+#else
+  initPythonEspresso();
+#endif
 }
 
 void finalize() {
+#ifdef HAVE_MPI
   if (pmi::isController()) {
     pmi::endWorkers();
   }
   mpi::finalizeMPI();
+#endif
   logging::finalizeLogging();
 }

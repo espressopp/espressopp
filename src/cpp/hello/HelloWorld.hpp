@@ -1,14 +1,19 @@
 #ifndef _HELLO_HELLOWORLD_HPP
 #define _HELLO_HELLOWORLD_HPP
 #include "acconfig.hpp"
+
+#ifdef HAVE_MPI
 #include "pmi/pmi.hpp"
+#endif
+
 #include <string>
 #include <vector>
+
 
 namespace hello {
   // Worker class
   class HelloWorld {
-    vector<std::string> allMessages;
+    std::vector<std::string> allMessages;
   public:
     std::string getMessages();
     void createMessage();

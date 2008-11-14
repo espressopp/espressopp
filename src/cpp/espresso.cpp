@@ -43,9 +43,12 @@ int main(int argc, char **argv)
 {
   int exitstate = 0;
   logging::initLogging();
+
+#ifdef HAVE_MPI
   mpi::initMPI(argc, argv);
 
   if (!pmi::mainLoop()) {
+#endif
 #ifdef HAVE_BOOST_PYTHON
     // the controller:
     // register the modules that are compiled into this binary
@@ -63,6 +66,7 @@ int main(int argc, char **argv)
 #else
     exitstate = -1;
 #endif
+#ifdef HAVE_MPI
     // after finishing, terminate workers
     pmi::endWorkers();
   } else {
@@ -72,6 +76,7 @@ int main(int argc, char **argv)
   }
 
   mpi::finalizeMPI();
+#endif
   logging::finalizeLogging();
 
   return exitstate;

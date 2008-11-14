@@ -1,7 +1,11 @@
 #include "HelloWorld.hpp"
 
 #include <sstream>
+
+#ifdef HAVE_MPI
 #include <boost/mpi.hpp>
+#endif
+
 #include <boost/python.hpp>
 
 using namespace std;
@@ -14,10 +18,10 @@ namespace hello {
   //////////////////////////////////////////////////
   void
   HelloWorld::createMessage() {
-    boost::mpi::communicator world;
-
-    // COMPUTE
     string msg = "Hello World!";
+
+#ifdef HAVE_MPI
+    boost::mpi::communicator world;
     ostringstream ost;
     ost << "MPI process #" << world.rank() << ": " << msg;
 
@@ -29,6 +33,9 @@ namespace hello {
     } else {
       boost::mpi::gather(world, ost.str(), 0);
     }
+#else
+    allMessages.push_back(msg);
+#endif
   }
 
   string
@@ -42,13 +49,16 @@ namespace hello {
     return result;
   }
 
+#ifdef HAVE_MPI
   //////////////////////////////////////////////////
   // REGISTRATION WITH PMI
   //////////////////////////////////////////////////
   // here, you need to register the SERIAL class
   PMI_REGISTER_CLASS(hello::HelloWorld, "hello::HelloWorld");
   PMI_REGISTER_METHOD(hello::HelloWorld, createMessage, "createMessage");
-  
+#endif 
+
+#ifdef HAVE_PYTHON  
   //////////////////////////////////////////////////
   // REGISTRATION WITH PYTHON
   //////////////////////////////////////////////////
@@ -57,10 +67,13 @@ namespace hello {
   PHelloWorld::registerPython() {
     using namespace boost::python;
     
+#ifdef HAVE_MPI
     new boost::mpi::environment;
+#endif
 
     class_<PHelloWorld>("hello_HelloWorld", init<>())
       .def("getMessages", &PHelloWorld::getMessages)
       .def("__str__", &PHelloWorld::getMessages);
   }
+#endif
 }

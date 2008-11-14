@@ -1,8 +1,13 @@
-SUBDIRS = logging mpi pmi hello
+SUBDIRS = logging hello
 
 EXTRA_DIST = __init__.py.template
+CLEANFILES = __init__.py __init__.pyc
 
-CLEANFILES=__init__.py __init__.pyc
+if HAVE_MPI
+  SUBDIRS += mpi pmi
+else
+  EXTRA_DIST += mpi pmi
+endif
 
 # make the dll's in this directory available even in the
 # build tree
@@ -26,19 +31,28 @@ pkglib_LTLIBRARIES = _espresso.la
 # and this one the program wrapper
 bin_PROGRAMS = espresso
 
-nobase_pkginclude_HEADERS= espresso.hpp \
+nobase_pkginclude_HEADERS = \
+	espresso.hpp \
 	logging.hpp \
-	mpi.hpp \
 	hello.hpp
+
+if HAVE_MPI
+nobase_pkginclude_HEADERS += mpi.hpp
+endif
 
 # rules for the common Espresso library
 libespresso_common_la_SOURCES= espresso_bindings.cpp
 libespresso_common_la_LIBADD = \
 	hello/libhello.la \
+	logging/liblogging.la \
+	$(BOOST_PYTHON_LIBS) $(LOG4ESPP_LIBS)
+
+if HAVE_MPI
+libespresso_common_la_LIBADD += \
 	pmi/libpmi.la \
 	mpi/libmpi.la \
-	logging/liblogging.la \
-	$(BOOST_MPI_LIBS) $(BOOST_PYTHON_LIBS) $(LOG4ESPP_LIBS)
+	$(BOOST_MPI_LIBS)
+endif
 
 # rules for the python module wrapper
 _espresso_la_SOURCES = _espresso.cpp

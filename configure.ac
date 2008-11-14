@@ -38,9 +38,7 @@ cat <<EOF
 **********************************************************************
 EOF
 AXES_MPI
-if test "x$axes_cv_mpi" = "xno"; then
-    AC_MSG_ERROR([could not compile an MPI program])
-fi
+AM_CONDITIONAL([HAVE_MPI], [test "x$axes_cv_mpi" != "xno"])
 
 AXES_PYTHON
 if test "x$axes_cv_python_lib" = "xno" || \
@@ -66,11 +64,13 @@ if test "x$axes_cv_boost_lib_serialization" = "xno"; then
     AC_MSG_ERROR([could not find the boost serialization library])
 fi
 
-AXES_BOOST_MPI
-if test "x$axes_cv_boost_lib_mpi" = "xno"; then
-    AC_MSG_ERROR([could not find the boost mpi library.
+if test "x$axes_cv_mpi" != "xno"; then
+   AXES_BOOST_MPI
+   if test "x$axes_cv_boost_lib_mpi" = "xno"; then
+      AC_MSG_ERROR([could not find the boost mpi library.
 Note that this can also mean that the compiler $CXX you are using
 to compile ESPResSo++ is not the same you used to build boost.mpi.])
+   fi
 fi
 
 AXES_BOOST_PYTHON
@@ -90,30 +90,33 @@ EOF
 #                                                                 #
 ###################################################################
 
-AC_PATH_PROG([MPIEXEC], [mpiexec], [no])
-AC_SUBST(MPIEXEC)
 
-AC_MSG_CHECKING([for mympiexec])
-AC_ARG_WITH([mympiexec],
-    AS_HELP_STRING([--with-mympiexec@<:@=script@:>@],
-    [specify the program or script that should be used to run the parallel build tests.
+if test "x$axes_cv_mpi" != "xno"; then
+  AC_PATH_PROG([MPIEXEC], [mpiexec], [no])
+  AC_SUBST(MPIEXEC)
+
+  AC_MSG_CHECKING([for mympiexec])
+  AC_ARG_WITH([mympiexec],
+     AS_HELP_STRING([--with-mympiexec@<:@=script@:>@],
+      [specify the program or script that should be used to run the parallel build tests.
 Defaults to BUILDDIR/mympiexec.sh]),
-    [
-    if test "$withval" = "no"; then
-        MYMPIEXEC=""
-    else
-        MYMPIEXEC="$withval"
+      [
+      if test "$withval" = "no"; then
+          MYMPIEXEC="" 
+      else
+          MYMPIEXEC="$withval"
 
-	dir=`AS_DIRNAME([$MYMPIEXEC])`
-	if test "x$dir" = "x."; then
+          dir=`AS_DIRNAME([$MYMPIEXEC])`
+          if test "x$dir" = "x."; then
             dnl not an absolute path, make absolute
             MYMPIEXEC="`pwd`/$MYMPIEXEC"
-        fi
-    fi
-    ],
-    [ MYMPIEXEC="`pwd`/mympiexec.sh" ])
-AC_MSG_RESULT($MYMPIEXEC)
-AC_SUBST(MYMPIEXEC)
+          fi
+      fi
+      ],
+      [ MYMPIEXEC="`pwd`/mympiexec.sh" ])
+  AC_MSG_RESULT($MYMPIEXEC)
+  AC_SUBST(MYMPIEXEC)
+fi
 
 ###################################################################
 #                                                                 #
@@ -201,39 +204,51 @@ cat << EOF
  * C++-compiler: $CXX
  * Python:
     - headers found in $axes_cv_python_include
-    - headers found in $axes_cv_python_lib
- * Boost:
+    - using library lib$axes_cv_python_lib
 EOF
+
+dnl MPI
+if test "x$axes_cv_mpi" != "xno"; then
+    if test "$MYMPIEXEC" = ""; then
+        echo " * mpiexec disabled by user, no parallel tests will be run"
+    else
+        if test -x "$MYMPIEXEC"; then
+            echo " * mpiexec: using mympiexec = $MYMPIEXEC"
+        else
+            echo " * mpiexec: using mympiexec = $MYMPIEXEC (not present or not executable at the moment)"
+        fi
+        if test "$MPIEXEC" != "no"; then
+            echo "            fallback is $MPIEXEC, if mympiexec is not present"
+        else
+            echo "            no fallback, will not run parallel test if mympiexec is not present"
+        fi
+    fi
+else
+    echo " * MPI is not used, will build serial program"
+fi
+
+dnl Boost
 if test "x$axes_cv_boost" != "xyes"; then
-    echo "   - headers found in $axes_cv_boost"
+    echo "   - using headers in $axes_cv_boost"
 else
-    echo "   - headers found in the default includes"
+    echo "   - using headers from default include path"
 fi
-echo "   - flavor ${axes_cv_boost_lib_suffix#-}"
+echo "   - using flavor ${axes_cv_boost_lib_suffix#-}"
 
-echo " * LOG4ESSP (logging for ESPResSo++): uses $axes_log4espp"
-
-if test "$MYMPIEXEC" = ""; then
-echo " * mpiexec disabled by user, no parallel tests will be run"
-else
-    if test -x "$MYMPIEXEC"; then
-echo " * mpiexec: using mympiexec = $MYMPIEXEC"
-    else
-echo " * mpiexec: using mympiexec = $MYMPIEXEC (not present or not executable at the moment)"
-    fi
-    if test "$MPIEXEC" != "no"; then
-echo "            fallback is $MPIEXEC, if mympiexec is not present"
-    else
-echo "            no fallback, will not run parallel test if mympiexec is not present"
-    fi
-fi
-
+dnl Unit test framework
 if test "x$axes_cv_boost_lib_unit_test_framework" != "xno"; then
-echo " * using the boost unit test framework for unit testing"
+echo "   - using the boost unit test framework"
 fi
 
+dnl Logging
+echo " * Logging: uses $axes_log4espp"
+
+
+dnl Doxygen
 if DX_TEST_FEATURE([doc]); then
 echo " * Doxygen: doxygen was found"
 else
 echo " * Doxygen: doxygen was not found"
 fi
+
+echo
