@@ -44,7 +44,7 @@ AC_REQUIRE([AXES_BOOST_BASE])
 AXES_BOOST_LIB(serialization, SERIALIZATION, AC_LANG_PROGRAM([[
         @%:@include <boost/archive/basic_archive.hpp>
 ]], [[
-        boost::archive::ARCHIVE_VERSION();
+        boost::archive::tracking_type t;
         return 0;
 ]]))
 ])
