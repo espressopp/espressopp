@@ -10,6 +10,7 @@
 #include "Particle.hpp"
 #include "LennardJonesInteraction.hpp"
 
+#define pow2(X) (X * X)
 int main() {
 
   //variables for storing random numbers
@@ -45,9 +46,9 @@ int main() {
     Particle* Pi = &pc[i];
     for(j = i + 1; j < pc.size(); j++) {
       Particle* Pj = &pc[j];
-      rsq   = pow(Pi->getx() - Pj->getx(), 2);
-      rsq  += pow(Pi->gety() - Pj->gety(), 2);
-      rsq  += pow(Pi->getz() - Pj->getz(), 2);
+      rsq   = pow2(Pi->getx() - Pj->getx());
+      rsq  += pow2(Pi->gety() - Pj->gety());
+      rsq  += pow2(Pi->getz() - Pj->getz());
       en += lj.computeLennardJonesEnergy(rsq);
     }
   }

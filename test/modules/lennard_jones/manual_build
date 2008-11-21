@@ -1,6 +1,6 @@
 #! /bin/sh 
 
-LJ_DIR=../../../src/cpp/interactions/lennard_jones_inline
+LJ_DIR=../../../src/cpp/interactions/lennard_jones
 
 OPT="-O2"
 

@@ -23,10 +23,7 @@ lj_test.2
 
 lj_test.4
 
-  ToDo: try it with a Blocked Pair / Cached Iterator (TB)
-
-  This test might be an alternative if compilation times are much
-  better.
+  - Impelementation with Cached Iterator (TB)
  
 lj_test.3
 
