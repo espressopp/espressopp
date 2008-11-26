@@ -7,6 +7,6 @@ private:
   double epsilon;
 public:
   LennardJonesInteraction() {};
-  LennardJonesInteraction(double rcut) {rc=rcut; rc2=pow(rcut,2);};
-  double computeLennardJonesEnergy(double dist2);
+  LennardJonesInteraction(double _rc) {rc=_rc; rcsq=pow(_rc,2);};
+  double computeLennardJonesEnergy(double _rsq);
 };
