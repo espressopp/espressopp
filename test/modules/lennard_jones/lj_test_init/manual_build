@@ -1,0 +1,16 @@
+#! /bin/sh
+
+LJ_DIR=../../../../src/cpp/interactions/lennard_jones
+PRT_IT_DIR=..
+
+OPT="-O2"
+
+CPP=g++
+$CPP -c $OPT lj_test.cpp -I$LJ_DIR -I$PRT_IT_DIR
+cd $PRT_IT_DIR
+$CPP -c $OPT Particle.cpp
+cd -
+cd $LJ_DIR
+$CPP -c $OPT LennardJonesInteraction.cpp
+cd -
+$CPP lj_test.o $PRT_IT_DIR/Particle.o $LJ_DIR/LennardJonesInteraction.o -o lj_test

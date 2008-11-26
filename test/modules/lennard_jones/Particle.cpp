@@ -3,10 +3,10 @@
 #include <string>
 #include "Particle.hpp"
 
-Particle::Particle(double xx, double yy, double zz) {
-  x = xx;
-  y = yy;
-  z = zz;
+Particle::Particle(double _x, double _y, double _z) {
+  x = _x;
+  y = _y;
+  z = _z;
 };
 
 std::string Particle::toString() {
