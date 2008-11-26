@@ -3,6 +3,10 @@ Virtual Iterator:
 
 NUMBER_OF_PARTICLES  33000
 
+lj_test.0
+
+  - direct loop nest (i, j), no iterator at all
+
 lj_test.1
 
   - FullPairIterator, LennardJonesInteraction

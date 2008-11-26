@@ -1,11 +1,10 @@
+#include "BlockIterator.hpp"
 
-typedef int particleRef;
-
-class FullPairIterator {
+class FullBlockIterator : public BlockIterator {
 
    public:
 
-   FullPairIterator(int _N) {
+   FullBlockIterator(int _N) {
 
     N =  _N;
     
@@ -21,26 +20,20 @@ class FullPairIterator {
 
    }
 
-   int first() {
+   void get (particleRef &_i, int &jk, int max, particleRef jlist[]) {
 
-    return i;
-   }
+    _i = i;
+    jk = 0;
 
-   int second() {
-
-    return j;
-   }
-
-   void get (particleRef& _i, particleRef& _j) {
-
-     _i = i;
-     _j = j;
+    for (int k = 0; k < max; k++) {
+       if (j >= N) break;
+       jlist[jk++] = j++;
+       if (jk >= max) break;
+    }
 
    }
 
    void next() {
-
-    j++;
 
     if (j < N) return;
 
@@ -56,6 +49,7 @@ class FullPairIterator {
 
    }
 
+   private:
 
    int N;  // number of particles
 

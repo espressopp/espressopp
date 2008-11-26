@@ -18,7 +18,7 @@ using namespace std;
 #define MAX 4096
 
 template<class Interaction>
-void compute (std::vector<Particle> *pc, Interaction lj, PairVIterator* it)
+double compute (std::vector<Particle> *pc, Interaction lj, PairVIterator* it)
 
 {
   double rsq;
@@ -29,13 +29,15 @@ void compute (std::vector<Particle> *pc, Interaction lj, PairVIterator* it)
   //loop over all pairs assuming non-periodic BCs
 
   for (it->reset(); !it->done(); it->next()) {
+
      int jlist[MAX];
      int i;
      int jk;
+
      it->get(i, jk, MAX, jlist);
 
-//     printf ("it->get, i = %d, jk = %d\n", i, jk);
      Particle* Pi = &(*pc)[i];
+
      for (int j1 = 0; j1 < jk; j1++) {
         // printf ("calc i = %d, j = %d\n", i, j[j1]);
         Particle* Pj = &(*pc)[jlist[j1]];
@@ -47,22 +49,27 @@ void compute (std::vector<Particle> *pc, Interaction lj, PairVIterator* it)
   }
 
   //write out the total LJ energy
-  std::cout << "en = " << en << std::endl;
+
+  return en;
 
 }
 
-void iterate(int size) {
+#define NITER 25
+
+void run(int size) {
 
   //variables for storing random numbers
+
   double rx;
   double ry;
   double rz;
 
-  //create a vector to store the particles
+  // create a vector to store the particles
 
   std::vector<Particle> pc(size);
 
-  //assign random positions to the particles on r[0, BOX_SIZE]
+  // assign random positions to the particles on r[0, BOX_SIZE]
+
   for(int i = 0; i < pc.size(); i++) {
     rx = BOX_SIZE * double(rand()) / RAND_MAX;
     ry = BOX_SIZE * double(rand()) / RAND_MAX;
@@ -71,15 +78,36 @@ void iterate(int size) {
   }
 
   //print a particle to standard output as a test
+
   std::cout << pc[1].toString() << std::endl;
 
   //create a LJ interaction and set its cutoff
+
   LennardJonesInteraction lj = LennardJonesInteraction();
   lj.setCutoff(2.5);
 
+  // build an iterator for all pairs (i, j) with i < j 
+
   PairVIterator* it = new FullPairVIterator(pc.size());
 
-  compute<LennardJonesInteraction>(&pc, lj, it);
+  double energy;
+  int    count = 0;
+
+  for (int iter = 0; iter < NITER; iter++) {
+
+     std::cout << "iter " << iter << " of " << NITER << std::endl;
+
+     energy = compute<LennardJonesInteraction>(&pc, lj, it);
+
+     count++;
+
+     // print energy every 5 iterations
+
+     if (count == 5) {
+        std::cout << "energy = " << energy << std::endl;
+        count = 0;
+     }
+  }
 
 }
 
@@ -90,7 +118,7 @@ int main() {
 
   // int sizes[] = { 10000, 10000, 33000};
 
-  int sizes[] = {  10000, 10000, 33000 };
+  int sizes[] = {  1000, 1000, 8000 };
   
   int n = sizeof(sizes) / sizeof(int);
 
@@ -98,11 +126,14 @@ int main() {
 
      int size = sizes[i];
 
+     cout << "LJ interaction for " << size << " particles" << endl;
+
      times(&start_t);
-     iterate (size);
+     run (size);
      times(&stop_t);
  
-     cout << "LJ interaction for " << size << " particles finished" << endl;
+     cout << "LJ interaction for " << size << " particles finished (" << 
+              NITER << " iterations)" << endl;
      cout << "user time = "
           << static_cast<double>(stop_t.tms_utime - start_t.tms_utime) / clocks_per_sec
           << "s\tsystem time = "

@@ -11,14 +11,14 @@
 
 #include "Particle.hpp"
 #include "LennardJonesInteraction.hpp"
-#include "FullListIterator.hpp"
+#include "FullDerListIterator.hpp"
 
 using namespace std;
 
 #define MAX 4096
 
 template<class Interaction>
-double compute (std::vector<Particle> *pc, Interaction lj, FullListIterator *it)
+double compute (std::vector<Particle> *pc, Interaction lj, ListIterator *it)
 
 {
   double rsq;
@@ -98,7 +98,7 @@ void run(int size) {
 
   // build an iterator for all pairs (i, j) with i < j 
 
-  FullListIterator it = FullListIterator(pc.size());
+  ListIterator it = FullListIterator(pc.size());
 
   double energy;
   int    count = 0;

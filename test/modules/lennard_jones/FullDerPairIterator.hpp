@@ -1,7 +1,6 @@
+#include "PairIterator.hpp"
 
-typedef int particleRef;
-
-class FullPairIterator {
+class FullPairIterator : public PairIterator {
 
    public:
 

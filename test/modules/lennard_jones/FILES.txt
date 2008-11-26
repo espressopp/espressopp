@@ -1,0 +1,26 @@
+Overview of the files:
+
+lj_test.pair
+
+  - using simple pair iterator
+
+  PairIterator.hpp - Abstract class for pair iterator
+  FullPairIterator.hpp - blocked pair iterator (not derived)
+  FullDerPairIterator.hpp - blocked pair iterator 
+
+lj_test.block
+
+  - using blocked pair iterator
+
+  BlockIterator.hpp - Abstract class for blocked iterator
+  FullBlockIterator.hpp - blocked pair iterator (not derived)
+  FullDerBlockIterator.hpp - blocked pair iterator 
+
+lj_test.list
+
+  - using iterator with adjacence lists
+
+  ListIterator.hpp - Abstract class for iterator with adjacence lists
+  FullListIterator.hpp - full pair list iterator (not derived)
+  FullDerListIterator.hpp - full pair list iterator (derived)
+

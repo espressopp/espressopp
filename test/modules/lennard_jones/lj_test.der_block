@@ -11,14 +11,14 @@
 
 #include "Particle.hpp"
 #include "LennardJonesInteraction.hpp"
-#include "FullListIterator.hpp"
+#include "FullDerBlockIterator.hpp"
 
 using namespace std;
 
-#define MAX 4096
+#define MAX 8
 
 template<class Interaction>
-double compute (std::vector<Particle> *pc, Interaction lj, FullListIterator *it)
+double compute (std::vector<Particle> *pc, Interaction lj, BlockIterator *it)
 
 {
   double rsq;
@@ -26,35 +26,28 @@ double compute (std::vector<Particle> *pc, Interaction lj, FullListIterator *it)
 
   en = 0.0;
 
-  int  inum = it->inum;
-  int* ilist = it->ilist;
+  for (it->reset(); !it->done(); it->next()) {
 
-  int*  numneigh   = it->numneigh;
-  int** firstneigh = it->firstneigh;
+     int jlist[MAX];
+     int i;
+     int jk;
 
-  for (int ii = 0; ii < inum; ii++) {
+     it->get(i, jk, MAX, jlist);
 
-    int i      = ilist[ii];
-    int *jlist = firstneigh[i];
-    int jnum   = numneigh[i];
+     Particle* Pi = &(*pc)[i];
 
-    Particle* Pi = &(*pc)[i];
+     double x = Pi->getx();
+     double y = Pi->gety();
+     double z = Pi->getz();
 
-    double x = Pi->getx();
-    double y = Pi->gety();
-    double z = Pi->getz();
+     for (int j1 = 0; j1 < jk; j1++) {
 
-    for (int jj = 0; jj < jnum; jj++) {
-
-      int j = jlist[jj];
-
-      Particle* Pj = &(*pc)[j];
-
-      rsq   = pow(x - Pj->getx(), 2);
-      rsq  += pow(y - Pj->gety(), 2);
-      rsq  += pow(z - Pj->getz(), 2);
-      en   += lj.computeLennardJonesEnergy(rsq);
-    }
+        Particle* Pj = &(*pc)[jlist[j1]];
+        rsq   = pow(x - Pj->getx(), 2);
+        rsq  += pow(y - Pj->gety(), 2);
+        rsq  += pow(z - Pj->getz(), 2);
+        en += lj.computeLennardJonesEnergy(rsq);
+     }
 
   }
 
@@ -98,7 +91,7 @@ void run(int size) {
 
   // build an iterator for all pairs (i, j) with i < j 
 
-  FullListIterator it = FullListIterator(pc.size());
+  BlockIterator* it = new FullBlockIterator(pc.size());
 
   double energy;
   int    count = 0;
@@ -107,7 +100,7 @@ void run(int size) {
 
      std::cout << "iter " << iter << " of " << NITER << std::endl;
 
-     energy = compute<LennardJonesInteraction>(&pc, lj, &it);
+     energy = compute<LennardJonesInteraction>(&pc, lj, it);
 
      count++;
 
