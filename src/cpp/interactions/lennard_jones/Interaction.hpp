@@ -1,12 +1,16 @@
 //base class
+
+#include "types.hpp"
+
 class Interaction {
 protected:
-  double rc;
-  double rcsq;
+  real rc;
+  real rc2;
 public:
-  Interaction() {};
-  Interaction(double _rc) {rc=_rc; rcsq=pow(_rc,2);};
-  double getCutoff() {return rc;};
-  double getCutoffSq() {return rcsq;};
-  void setCutoff(double _rc) {rc=_rc; rcsq=pow(_rc,2);};
+  Interaction() {}
+  Interaction(real rcut) {rc=rcut; rc2=pow(rcut,2);};
+  virtual ~Interaction() {}
+  virtual real computeEnergy(real dist2) const = 0;
+  real getCutoff() const {return rc;}
+  void setCutoff(real rcut) {rc=rcut; rc2=pow(rcut,2);}
 };
