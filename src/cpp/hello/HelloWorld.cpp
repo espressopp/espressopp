@@ -1,4 +1,5 @@
 #include "HelloWorld.hpp"
+#include "logging/log4espp.hpp"
 
 #include <sstream>
 
@@ -16,46 +17,45 @@ namespace hello {
   //////////////////////////////////////////////////
   // IMPLEMENTATION
   //////////////////////////////////////////////////
-  void
-  HelloWorld::createMessage() {
+  const string
+  HelloWorld::getMessage() {
     string msg = "Hello World!";
 
 #ifdef HAVE_MPI
     boost::mpi::communicator world;
     ostringstream ost;
+    vector<string> allMessages;
+
     ost << "MPI process #" << world.rank() << ": " << msg;
 
-    LOG4ESPP_INFO(logger, pmi::printWorkerId() << "Creating message.");
+    LOG4ESPP_INFO(logger, \
+		  pmi::printWorkerId() << "Creating message.");
 
-    // gather messages
-    if (pmi::isController()) {
-      boost::mpi::gather(world, ost.str(), allMessages, 0);
-    } else {
-      boost::mpi::gather(world, ost.str(), 0);
-    }
-#else
-    allMessages.push_back(msg);
+    // gather messages from the tasks
+    boost::mpi::gather(world, ost.str(), allMessages, 0);
+
+    msg = "";
+
+    if (pmi::isController())
+      // composite message
+      for (vector<string>::iterator it = allMessages.begin(); 
+	   it != allMessages.end(); it++) {
+	msg += *it;
+	msg += "\n";
+      }
 #endif
+
+    return msg;
   }
 
-  string
-  HelloWorld::getMessages() {
-    string result;
-    for (vector<string>::iterator it = allMessages.begin();
-	 it != allMessages.end(); it++) {
-      result += *it;
-      result += "\n";
-    }
-    return result;
-  }
 
 #ifdef HAVE_MPI
   //////////////////////////////////////////////////
   // REGISTRATION WITH PMI
   //////////////////////////////////////////////////
   // here, you need to register the SERIAL class
-  PMI_REGISTER_CLASS(hello::HelloWorld, "hello::HelloWorld");
-  PMI_REGISTER_METHOD(hello::HelloWorld, createMessage, "createMessage");
+  PMI_REGISTER_CLASS("hello::HelloWorld", hello::HelloWorld);
+  PMI_REGISTER_METHOD_SPMD("getMessage", hello::HelloWorld, getMessage, const string);
 #endif 
 
 #ifdef HAVE_PYTHON  
@@ -64,16 +64,12 @@ namespace hello {
   //////////////////////////////////////////////////
   // here, register the parallel class
   void 
-  PHelloWorld::registerPython() {
+  HelloWorld::registerPython() {
     using namespace boost::python;
     
-#ifdef HAVE_MPI
-    new boost::mpi::environment;
-#endif
-
     class_<PHelloWorld>("hello_HelloWorld", init<>())
-      .def("getMessages", &PHelloWorld::getMessages)
-      .def("__str__", &PHelloWorld::getMessages);
+      .def("getMessage", &PHelloWorld::getMessage)
+      .def("__str__", &PHelloWorld::getMessage);
   }
 #endif
 }

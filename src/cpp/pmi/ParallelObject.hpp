@@ -13,12 +13,16 @@
 #include "pmi/ParallelMethod.hpp"
 
 #ifdef CONTROLLER
-using namespace pmi;
 
 // macro to define proxy methods
-#define PMI_PARALLEL_PROXY_METHOD(method)					\
+#define PMI_PARALLEL_PROXY_METHOD(method, returnType)				\
+  returnType method() {							\
+    return pmi::ParallelObject<SubjectClass>::invoke<returnType, &SubjectClass::method>(); \
+  }
+
+#define PMI_PARALLEL_PROXY_METHOD_VOID(method)				\
   void method() {							\
-    ParallelObject<SubjectClass>::invoke<&SubjectClass::method>();	\
+    pmi::ParallelObject<SubjectClass>::invokeVoid<&SubjectClass::method>(); \
   }
 
 namespace pmi {
@@ -70,29 +74,75 @@ namespace pmi {
       return *objectPtr;
     }
  
-    template < void (T::*method)() >
-    void invoke() {
+    template < class returnType, returnType (T::*method)() >
+    returnType invoke() {
+      const string &methodName 
+	= ParallelMethod<T, returnType, method>::getName();
+
       if (isWorker())
 	PMI_USER_ERROR(printWorkerId()					\
 		       << "tries to invoke method \""			\
-		       << (ParallelMethod<T,method>::getName())		\
+		       << methodName \
 		       << "\" of parallel object id " << ID		\
 		       << " of class \"" << PClass::getName()		\
 		       << "\".");
 
       if (!isWorkersActive())
 	PMI_USER_ERROR("Controller tries to invoke method \""		\
-		       << (ParallelMethod<T,method>::getName())		\
+		       << methodName \
 		       << "\" of parallel object id " << ID		\
 		       << " of class \"" << PClass::getName()		\
 		       << "\", but the workers have been terminated.");
 
       IdType methodId =
-	ParallelMethod<T,method>::associate();
+	ParallelMethod<T, returnType, method>::associate();
 
       IdType classId = PClass::getId();
       LOG4ESPP_INFO(logger, "Controller invokes method \""		\
-		    << (ParallelMethod<T,method>::getName())		\
+		    << methodName \
+		    << "\" (method id " << methodId			\
+		    << ") of object id " << ID				\
+		    << " of class \"" << PClass::getName()		\
+		    << "\" (class id " << classId << ").");
+      // broadcast invoke command
+      transmit::invoke(classId, methodId, ID);
+
+      // invoke the method in the local objectPtr
+      returnType returnValue = (objectPtr->*method)();
+
+#ifndef PMI_OPTIMIZE
+      transmit::gatherStatus();
+#endif
+
+      return returnValue;
+    }
+
+    template < void (T::*method)() >
+    void invokeVoid() {
+      const string &methodName 
+	= ParallelMethod<T, void, method>::getName();
+
+      if (isWorker())
+	PMI_USER_ERROR(printWorkerId()					\
+		       << "tries to invoke method \""			\
+		       << methodName \
+		       << "\" of parallel object id " << ID		\
+		       << " of class \"" << PClass::getName()		\
+		       << "\".");
+
+      if (!isWorkersActive())
+	PMI_USER_ERROR("Controller tries to invoke method \""		\
+		       << methodName \
+		       << "\" of parallel object id " << ID		\
+		       << " of class \"" << PClass::getName()		\
+		       << "\", but the workers have been terminated.");
+
+      IdType methodId =
+	ParallelMethod<T, void, method>::associate();
+
+      IdType classId = PClass::getId();
+      LOG4ESPP_INFO(logger, "Controller invokes method \""		\
+		    << methodName \
 		    << "\" (method id " << methodId			\
 		    << ") of object id " << ID				\
 		    << " of class \"" << PClass::getName()		\

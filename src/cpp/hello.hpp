@@ -3,4 +3,8 @@
 
 #include "hello/HelloWorld.hpp"
 
+namespace hello {
+  void registerPython();
+}
+
 #endif

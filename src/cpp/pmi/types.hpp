@@ -2,7 +2,7 @@
 #define _PMI_TYPES_HPP
 
 #include "acconfig.hpp"
-#include "pmi/log4espp.hpp"
+#include "logging/log4espp.hpp"
 #include <limits>
 #include <string>
 #include <exception>

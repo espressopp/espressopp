@@ -32,7 +32,7 @@ namespace pmi {
     delete ptr;
   }
 
-  template <class T, void (T::*methodPtr)()>
+  template <class T, class returnType, returnType (T::*methodPtr)()>
   void
   methodCallerTemplate(void *voidPtr) {
     T* ptr = static_cast<T*>(voidPtr);

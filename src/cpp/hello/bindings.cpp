@@ -1,8 +1,7 @@
 #include "hello.hpp"
 
-namespace hello
-{
+namespace hello {
   void registerPython() {
-    PHelloWorld::registerPython();
+    HelloWorld::registerPython();
   }
 }

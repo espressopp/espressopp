@@ -1,6 +1,7 @@
 #ifndef _HELLO_HELLOWORLD_HPP
 #define _HELLO_HELLOWORLD_HPP
 #include "acconfig.hpp"
+#include "logging/log4espp.hpp"
 
 #ifdef HAVE_MPI
 #include "pmi/pmi.hpp"
@@ -11,28 +12,24 @@
 
 
 namespace hello {
-  // Worker class
   class HelloWorld {
-    std::vector<std::string> allMessages;
   public:
-    std::string getMessages();
-    void createMessage();
-  };
-
-  // Proxy class
-  class PHelloWorld : 
-    pmi::ParallelObject<hello::HelloWorld> {
-  public:
-    PMI_PARALLEL_PROXY_METHOD(createMessage);
-
-    std::string getMessages() {
-      createMessage();
-      return getLocalInstance().getMessages();
-    }
+    const std::string getMessage();
 
     // expose the python registration
     static void registerPython();
   };
+
+#ifdef HAVE_MPI
+  class PHelloWorld 
+    : public pmi::ParallelObject<HelloWorld> 
+  {
+  public:
+    PMI_PARALLEL_PROXY_METHOD(getMessage, const std::string);
+  };
+#else
+  typedef HelloWorld PHelloWorld;
+#endif
 }
 
 #endif

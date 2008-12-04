@@ -5,6 +5,7 @@
 #include <set>
 
 using namespace std;
+using namespace pmi;
 
 set<IdType> freeObjectIds;
 

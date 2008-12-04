@@ -11,10 +11,9 @@
 #include <iostream>
 
 using namespace std;
-using namespace pmi;
 
 // macro to register a class
-#define PMI_REGISTER_CLASS(aClass, name)					\
+#define PMI_REGISTER_CLASS(name, aClass)					\
   template <>								\
   string pmi::ParallelClass<aClass>::NAME =				\
     pmi::ParallelClass<aClass>::registerClass(name);
