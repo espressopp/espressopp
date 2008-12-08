@@ -1,7 +1,6 @@
 #ifndef _HELLO_HELLOWORLD_HPP
 #define _HELLO_HELLOWORLD_HPP
 #include "acconfig.hpp"
-#include "logging/log4espp.hpp"
 
 #ifdef HAVE_MPI
 #include "pmi/pmi.hpp"
