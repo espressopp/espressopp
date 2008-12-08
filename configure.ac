@@ -39,6 +39,12 @@ cat <<EOF
 EOF
 AXES_MPI
 AM_CONDITIONAL([HAVE_MPI], [test "x$axes_cv_mpi" != "xno"])
+# subst HAVE_MPI for test/runtest.sh.in
+if [test "x$axes_cv_mpi" != "xno"]; then
+   AC_SUBST(HAVE_MPI, "yes")
+else
+   AC_SUBST(HAVE_MPI, "no")
+fi
 
 AXES_PYTHON
 if test "x$axes_cv_python_lib" = "xno" || \
@@ -188,8 +194,8 @@ AC_CONFIG_FILES([Makefile
 
 AC_CONFIG_FILES([bin/espp_mpiexec.sh],
                 [chmod +x bin/espp_mpiexec.sh])
-AC_CONFIG_FILES([bin/runtests.sh],
-                [chmod +x bin/runtests.sh])
+AC_CONFIG_FILES([test/runtests.sh],
+                [chmod +x test/runtests.sh])
 
 # now make sure that all config files are generated
 

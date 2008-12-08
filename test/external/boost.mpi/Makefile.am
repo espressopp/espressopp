@@ -9,7 +9,7 @@ AM_LDFLAGS = $(BOOST_LDFLAGS)
 
 LIBS = $(BOOST_MPI_LIBS)
 
-noinst_PROGRAMS = pt2pt
+check_PROGRAMS = pt2pt
 
 pt2pt_SOURCES = pt2pt.cpp
 

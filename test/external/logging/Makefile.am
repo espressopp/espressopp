@@ -6,7 +6,7 @@
 
 LIBS = $(LOG4ESPP_LIBS)
 
-noinst_PROGRAMS = example
+check_PROGRAMS = example
 
 example_SOURCES = example.cpp
 
