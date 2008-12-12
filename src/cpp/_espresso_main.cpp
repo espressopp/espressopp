@@ -1,4 +1,4 @@
-#include "espresso.hpp"
+#include "espresso_common.hpp"
 #include <boost/python.hpp>
 
 /** called when python exits to clean up. */

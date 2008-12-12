@@ -1,6 +1,4 @@
-#include "espresso.hpp"
-
-#include "hello.hpp"
+#include "espresso_common.hpp"
 
 void initPythonEspresso()
 {

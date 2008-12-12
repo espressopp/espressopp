@@ -1,5 +1,5 @@
-#ifndef ESPRESSO_HPP
-#define ESPRESSO_HPP
+#ifndef _ESPRESSO_COMMON_HPP
+#define _ESPRESSO_COMMON_HPP
 
 #include "acconfig.hpp"
 

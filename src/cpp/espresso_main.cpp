@@ -7,7 +7,7 @@
 #include <boost/python.hpp>
 #endif
 
-#include "espresso.hpp"
+#include "espresso_common.hpp"
 
 using namespace boost;
 using namespace std;
