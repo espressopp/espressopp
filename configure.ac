@@ -13,7 +13,8 @@ AC_CONFIG_AUX_DIR(build-aux)
 AC_CONFIG_SRCDIR([src/cpp/hello.hpp])
 
 # we use automake
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([gnu subdir-objects dist-bzip2])
+AM_PROG_CC_C_O
 
 # import paths from the EXTRA_PREFIXES precious variable
 AXES_IMPORT_EXTRA_PREFIXES
