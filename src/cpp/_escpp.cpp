@@ -1,10 +1,14 @@
+/*
+ This file contains the main routine for the embedded python
+ interpreter version of ESPResSo. 
+*/
 #include "espresso_common.hpp"
 #include <boost/python.hpp>
 
 /** called when python exits to clean up. */
 static void finalize();
 
-BOOST_PYTHON_MODULE(_espresso)
+BOOST_PYTHON_MODULE(_escpp)
 {
   logging::initLogging();
 

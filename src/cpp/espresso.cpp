@@ -1,43 +1,33 @@
 /*
- this file contains the main routine when embedding python
+ This file contains the main routine for the embedded python
+ interpreter version of ESPResSo. 
 */
 #include "acconfig.hpp"
 #include <iostream>
+
 #ifdef HAVE_BOOST_PYTHON
 #include <boost/python.hpp>
 #endif
 
 #include "espresso_common.hpp"
 
-using namespace boost;
 using namespace std;
 
 #ifdef HAVE_BOOST_PYTHON
+using namespace boost;
 
-/** minimalistic Espresso module initialization,
+/** minimalistic ESPResSo module initialization,
     for use with the static initialization */
-BOOST_PYTHON_MODULE(_espresso)
+BOOST_PYTHON_MODULE(_escpp)
 {
   initPythonEspresso();
 }
 
-/** name of the Espresso module that is loaded */
-static char espressoModuleName[] = "_espresso";
-
-/** list of module(s) that this binary provides.
-    Povides the name (from @ref module_names) and the
-    init-routine of the module (here, the initialization
-    of the python part of Espresso) */
-static struct _inittab libs[] = {
-  {espressoModuleName, init_espresso},
-  {0, 0}
-};
-
 #endif
 
-/** on the controller, just adds the espresso library to python's
-    static library search path and starts python.
-    on the slaves, just starts PMI
+/** On the controller, just adds the espresso library to python's
+    builtin set of libraries and starts python.
+    On the slaves, just starts PMI.
 */
 int main(int argc, char **argv)
 {
@@ -50,11 +40,11 @@ int main(int argc, char **argv)
   if (!pmi::mainLoop()) {
 #endif
 #ifdef HAVE_BOOST_PYTHON
-    // the controller:
+    // The controller:
     // register the modules that are compiled into this binary
     // has to be done before Py_Initialize
-    if (PyImport_ExtendInittab(libs) == -1) {
-      cerr << "could not add the Espresso modules to python's list of loaded modules."
+    if (PyImport_AppendInittab("espresso._escpp", init_escpp) == -1) {      
+      cerr << "Could not add the ESPResSo module espresso._escpp to python's list of preloaded modules."
 	   << endl;
       exit(-1);
     }
@@ -70,8 +60,8 @@ int main(int argc, char **argv)
     // after finishing, terminate workers
     pmi::endWorkers();
   } else {
-    // the worker:
-    // here, Espresso is already done, exit
+    // The worker:
+    // here, ESPResSo is already done, exit
     exitstate = 0;
   }
 
