@@ -1,5 +1,5 @@
 ## THE SCRIPTS
-dist_pkglib_SCRIPTS=$(python_scripts)
+python_SCRIPTS=$(python_scripts)
 
 python_scripts=hello.py 
 
@@ -18,12 +18,12 @@ all-local: python-all
 
 # install __init__.install.py into pkglibdir, renaming it to __init__.py
 install-exec-local:
-	$(install_sh_SCRIPT) __init__.install.py $(DESTDIR)$(pkglibdir)/__init__.py
+	$(install_sh_SCRIPT) __init__.install.py $(DESTDIR)$(pythondir)/__init__.py
 
 # remove __init__.py and __init__.pyc from pkglib
 uninstall-local:
-	-rm $(pkglibdir)/__init__.py
-	-rm $(pkglibdir)/__init__.pyc
+	-rm $(DESTDIR)$(pythondir)/__init__.py
+	-rm $(DESTDIR)$(pythondir)/__init__.pyc
 
 
 

@@ -48,9 +48,9 @@ espresso_LDADD = ../cpp/libespresso_common.la
 # espresso_worker_CPPFLAGS = -DWORKER_ONLY
 # espresso_worker_LDADD = ../cpp/libespresso_common.la
 
-# Rules to build the python module escpp
-pkglib_LTLIBRARIES = _escpp.la
-_escpp_la_SOURCES = _escpp.cpp
-_escpp_la_LDFLAGS = -module -no-undefined 
-_escpp_la_LIBADD = libespresso_common.la
+# Rules to build the python module _espresso
+python_LTLIBRARIES = _espresso.la
+_espresso_la_SOURCES = _espresso.cpp
+_espresso_la_LDFLAGS = -module -no-undefined 
+_espresso_la_LIBADD = libespresso_common.la
 

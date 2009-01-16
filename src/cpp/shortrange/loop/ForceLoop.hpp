@@ -8,14 +8,22 @@ namespace espresso {
     //////////////////////////////////////////////////
     class Interaction {
     public:
-      real computeEnergy(Real3D &dist, ParticleRef p1, ParticleRef p2) const;
-      Real3D computeForce(Real3D &dist, ParticleRef p1, ParticleRef p2) const;
+      real computeEnergy(const Real3D &dist, 
+			 const ParticleRef p1, 
+			 const ParticleRef p2) const;
+      Real3D computeForce(const Real3D &dist,
+			  const ParticleRef p1, 
+			  const ParticleRef p2) const;
     };
 
     class LennardJonesInteraction : public Interaction {
     public:
-      real computeEnergy(Real3D &dist, ParticleRef p1, ParticleRef p2) const;
-      Real3D computeForce(Real3D &dist, ParticleRef p1, ParticleRef p2) const;
+      real computeEnergy(const Real3D &dist, 
+			 const ParticleRef p1, 
+			 const ParticleRef p2) const;
+      Real3D computeForce(const Real3D &dist, 
+			  const ParticleRef p1, 
+			  const ParticleRef p2) const;
     };
 
     //////////////////////////////////////////////////

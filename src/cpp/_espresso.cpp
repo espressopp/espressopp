@@ -8,7 +8,7 @@
 /** called when python exits to clean up. */
 static void finalize();
 
-BOOST_PYTHON_MODULE(_escpp)
+BOOST_PYTHON_MODULE(_espresso)
 {
   logging::initLogging();
 

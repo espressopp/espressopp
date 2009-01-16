@@ -142,6 +142,10 @@ AM_CONDITIONAL([HAVE_UNITTEST], [test "x$axes_cv_boost_lib_unit_test_framework" 
 
 AXES_LOG4ESPP
 
+pythondir=${libdir}/${PACKAGE_TARNAME}/espresso
+AC_SUBST(pythondir)
+
+
 ################################################################### 
 #                                                                 #
 #  DOXYGEN                                                        #
