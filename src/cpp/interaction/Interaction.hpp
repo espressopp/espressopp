@@ -2,15 +2,19 @@
 
 #include "types.hpp"
 
-class Interaction {
-protected:
-  real rc;
-  real rc2;
-public:
-  Interaction() {}
-  Interaction(real rcut) {rc=rcut; rc2=pow(rcut,2);};
-  virtual ~Interaction() {}
-  virtual real computeEnergy(real dist2) const = 0;
-  real getCutoff() const {return rc;}
-  void setCutoff(real rcut) {rc=rcut; rc2=pow(rcut,2);}
-};
+namespace espresso {
+  namespace interaction {
+    class Interaction {
+    public:
+      virtual ~Interaction() {}
+      virtual real computeEnergy(real distSqr, 
+				 const ParticleRef p1,
+				 const ParticleRef p2) const = 0;
+      virtual Real3D computeForce(real distSqr, 
+				  const ParticleRef p1,
+				  const ParticleRef p2) const = 0;
+      virtual real getCutoff() const = 0;
+      virtual real getCutoffSqr() const = 0;
+    };
+  }
+}

@@ -29,6 +29,7 @@ libespresso_common_la_SOURCES= espresso_common.cpp
 libespresso_common_la_LIBADD = \
 	hello/libhello.la \
 	logging/liblogging.la \
+	interaction/libinteraction.la \
 	$(BOOST_PYTHON_LIBS) $(LOG4ESPP_LIBS)
 
 if HAVE_MPI
