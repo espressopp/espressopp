@@ -191,6 +191,7 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/pairs/Makefile
                  src/cpp/bc/Makefile
                  src/cpp/particleset/Makefile
+                 src/cpp/particlestorage/Makefile
                  src/python/Makefile
                  test/Makefile
                  test/modules/Makefile

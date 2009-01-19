@@ -7,13 +7,13 @@
 
 namespace pairs {
 
-  class ParticlePairComputer {
+    class ParticlePairComputer {
 
-  public:
-    virtual void operator()(const Real3D dist, 
-			    const ParticleRef p1, 
-			    const ParticleRef p2) = 0;
-  };
+    public:
+	virtual void operator()(const Real3D dist, 
+				const espresso::particleset::ParticleSet::const_reference p1, 
+				const espresso::particleset::ParticleSet::const_reference p2) = 0;
+    };
 }
 
 #endif
