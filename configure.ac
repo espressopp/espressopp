@@ -155,11 +155,11 @@ AC_SUBST(pythondir)
 DX_HTML_FEATURE(ON)
 DX_CHM_FEATURE(OFF)
 DX_CHI_FEATURE(OFF)
-DX_MAN_FEATURE(OFF)
+DX_MAN_FEATURE(ON)
 DX_RTF_FEATURE(OFF)
 DX_XML_FEATURE(OFF)
-DX_PDF_FEATURE(OFF)
-DX_PS_FEATURE(OFF)
+DX_PDF_FEATURE(ON)
+DX_PS_FEATURE(ON)
 DX_INIT_DOXYGEN(Espresso, doxygen.cfg, doc)
 
 cat <<EOF
@@ -187,6 +187,10 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/mpi/Makefile
                  src/cpp/hello/Makefile
                  src/cpp/logging/Makefile
+                 src/cpp/interaction/Makefile
+                 src/cpp/pairs/Makefile
+                 src/cpp/bc/Makefile
+                 src/cpp/particleset/Makefile
                  src/python/Makefile
                  test/Makefile
                  test/modules/Makefile
