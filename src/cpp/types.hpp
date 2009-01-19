@@ -7,4 +7,6 @@
 
 typedef double real;  // double precision
 
+typedef struct { real x, y, z; }  Real3D;  // three real values
+
 #endif 

@@ -1,5 +1,5 @@
 # declare the subdirs
-SUBDIRS = logging hello
+SUBDIRS = logging hello interaction pairs bc particleset
 EXTRA_DIST =
 CLEANFILES =
 

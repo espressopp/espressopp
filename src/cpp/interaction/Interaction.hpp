@@ -1,6 +1,10 @@
+#ifndef _INTERACTION_INTERACTION
+#define _INTERACTION_INTERACTION
+
 //base class
 
 #include "types.hpp"
+#include "particleset/ParticleSet.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -18,3 +22,5 @@ namespace espresso {
     };
   }
 }
+
+#endif

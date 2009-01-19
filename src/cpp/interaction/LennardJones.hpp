@@ -18,8 +18,8 @@ namespace espresso {
 	real frac2;
 	real frac6;
 	
-	if(dist2 < rc2) {
-	  frac2 = 1.0 / dist2;
+	if (distSqr < cutoffSqr) {
+	  frac2 = 1.0 / distSqr;
 	  frac6 = frac2 * frac2 * frac2;
 	  return 4.0 * 1.0 * (frac6*frac6 - frac6);
 	} else {
@@ -27,17 +27,17 @@ namespace espresso {
 	}
       }
 
-      virtual Real3D computeForce (real dist2) const;
+      virtual Real3D computeForce (real distSqr) const;
 
       virtual real getCutoff() const { return cutoff; }
-      virtual real getCutoffSqr() const { return cutoff2; }
+      virtual real getCutoffSqr() const { return cutoffSqr; }
       virtual void setCutoff(real _cutoff) { 
 	cutoff = _cutoff; 
 	cutoffSqr = cutoff*cutoff;
       }
 
-      virtual setEpsilon(real _epsilon) { epsilon = _epsilon; }
-      virtual setSigma(real _sigma) { sigma = _sigma; }
+      virtual void setEpsilon(real _epsilon) { epsilon = _epsilon; }
+      virtual void setSigma(real _sigma) { sigma = _sigma; }
     };
   }
 }

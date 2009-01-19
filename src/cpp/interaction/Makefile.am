@@ -1,3 +1,5 @@
+subpkgincludedir=$(pkgincludedir)/interaction
+
 nobase_subpkginclude_HEADERS = \
 	Interaction.hpp \
 	LennardJones.hpp
