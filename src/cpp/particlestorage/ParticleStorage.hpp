@@ -182,6 +182,10 @@ namespace espresso {
 	    ConstArrayPropertyReference<real> getForceProperty() const { return ConstArrayPropertyReference<real>(force); }
 	    
 	    //@}
+
+	    /// loop
+	    virtual void foreach(class ParticleComputer &);
+	    virtual void foreach(const class ParticleComputer &) const;
 	};
     }
 }

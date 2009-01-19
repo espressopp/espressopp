@@ -1,7 +1,8 @@
 subpkgincludedir=$(pkgincludedir)/particlestorage
 
 nobase_subpkginclude_HEADERS = \
-	ParticleStorage.hpp 
+	ParticleStorage.hpp \
+	ParticleComputer.hpp
 
 noinst_LTLIBRARIES = libparticlestorage.la
 

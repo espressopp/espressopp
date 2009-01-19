@@ -1,4 +1,5 @@
 #include "ParticleStorage.hpp"
+#include "ParticleComputer.hpp"
 
 using namespace espresso::particlestorage;
 
@@ -26,4 +27,13 @@ static void intended_use() {
     // this does and should _not_ work, both violating const
     //const_ref[pref][2] = 0.3;
     //ref[const_pref][2] = 0.3;
+}
+
+
+void ParticleStorage::foreach(ParticleComputer &)
+{
+}
+
+void ParticleStorage::foreach(const ParticleComputer &) const
+{
 }
