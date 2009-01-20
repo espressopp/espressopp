@@ -1,6 +1,11 @@
 #ifndef _PARTICLESET_PARTICLESET_HPP
 #define _PARTICLESET_PARTICLESET_HPP
 
+#include "types.hpp"
+#include <vector>
+
+typedef int ParticleRef;
+
 #include "particlestorage/ParticleStorage.hpp"
 #include "particlestorage/ParticleComputer.hpp"
 
