@@ -4,7 +4,7 @@ namespace espresso {
   namespace pairs {
     class ParticlePairs {
     public:
-      virtual void foreach(ParticlePairComputer* comp) = 0;
+      virtual void foreach(ParticlePairComputer& comp) = 0;
     };
   }
 }

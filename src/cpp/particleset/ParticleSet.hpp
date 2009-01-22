@@ -41,7 +41,9 @@ namespace espresso {
 	     */
 	    virtual void foreach(ParticleComputer &computer) = 0;
 	    ///
-	    virtual void foreach(ParticleComputer &computer) const = 0;
+	    virtual void foreach(const ParticleComputer &computer) const = 0;
+
+            ParticleStorage* getStorage() { return theStorage; }
 
 	};
     }

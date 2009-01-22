@@ -2,7 +2,7 @@
 
 namespace espresso {
     namespace interaction {
-	class LennardJones: Interaction {
+	class LennardJones: public Interaction {
 	private:
 	    real sigma;
 	    real epsilon;
@@ -11,28 +11,49 @@ namespace espresso {
 	public:
 	    LennardJones() {}
 	    virtual ~LennardJones() {}
+
 	    virtual real computeEnergy (real distSqr,
 					const espresso::particleset::ParticleSet::const_reference p1,
 					const espresso::particleset::ParticleSet::const_reference p2) const {
 		real frac2;
 		real frac6;
 	
+                real energy = 0.0;
+
 		if (distSqr < cutoffSqr) {
-		    frac2 = 1.0 / distSqr;
+		    frac2 = sigma / distSqr;
 		    frac6 = frac2 * frac2 * frac2;
-		    return 4.0 * 1.0 * (frac6*frac6 - frac6);
-		} else {
-		    return 0.0;
-		}
+		    energy = 4.0 * epsilon * (frac6 * frac6 - frac6);
+		} 
+		    
+                return energy;
 	    }
 
-	    virtual Real3D computeForce (real distSqr) const;
+	    virtual Real3D computeForce (Real3D dist,
+					const espresso::particleset::ParticleSet::const_reference p1,
+					const espresso::particleset::ParticleSet::const_reference p2) const {
+                Real3D f = 0.0;
+		real   frac2;
+		real   frac6;
+	
+                real distSqr = dist.sqr();
+                
+		if (distSqr < cutoffSqr) {
+		    frac2 = sigma / distSqr;
+		    frac6 = frac2 * frac2 * frac2;
+		    real ffactor = 48.0 * epsilon * (frac6*frac6 - 0.5 * frac6) * frac2;
+                    printf ("computeForce, distSqr = %f, ffactor = %f\n", distSqr, ffactor);
+                    f = dist * ffactor;
+		} 
+
+                return f;
+	    }
 
 	    virtual real getCutoff() const { return cutoff; }
 	    virtual real getCutoffSqr() const { return cutoffSqr; }
 	    virtual void setCutoff(real _cutoff) { 
 		cutoff = _cutoff; 
-		cutoffSqr = cutoff*cutoff;
+                cutoffSqr = cutoff * cutoff;
 	    }
 
 	    virtual void setEpsilon(real _epsilon) { epsilon = _epsilon; }

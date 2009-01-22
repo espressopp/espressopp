@@ -8,7 +8,7 @@ namespace espresso {
     class BC {
     public:
       virtual ~BC() {}
-      virtual real getDist(const Real3D& pos1, const Real3D& pos2) const = 0;
+      virtual Real3D getDist(const Real3D& pos1, const Real3D& pos2) const = 0;
     };
   }
 }

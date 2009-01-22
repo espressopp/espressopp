@@ -17,6 +17,7 @@ namespace espresso {
 	   which shows how the class is intended to be used.
 	*/
 	class ParticleStorage {
+	public:
 	    /// just to have some particle data
 	    std::vector<size_t> id;
 	    /// just to have some particle data
@@ -24,7 +25,6 @@ namespace espresso {
 	    /// just to have some particle data
 	    std::vector<real>   force;
 
-	public:
 	    /** a reference to an element, which then can be used to read and
 		write properties of the element using @ref ParticleStorage::PropertyReference.
 	

@@ -30,10 +30,24 @@ static void intended_use() {
 }
 
 
-void ParticleStorage::foreach(ParticleComputer &)
+void ParticleStorage::foreach(ParticleComputer& compute)
 {
+   printf("ParticleStorage::foreach\n");
+
+   for (size_t p = 0; p < id.size(); p++) {
+
+       reference pref = getParticle(p);
+       compute(pref);
+   }
 }
 
-void ParticleStorage::foreach(const ParticleComputer &) const
+void ParticleStorage::foreach(const ParticleComputer& compute) const
 {
+   printf("const ParticleStorage::foreach\n");
+
+   for (size_t p = 0; p < id.size(); p++) {
+
+       const_reference pref = getParticle(p);
+       compute(pref);
+   }
 }

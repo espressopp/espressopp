@@ -31,6 +31,7 @@ namespace espresso {
 		}
 	    }
 	    ///
+
 	    virtual void foreach(const ParticleComputer &computer) const {
 		if (theStorage) {
 		    theStorage->foreach(computer);
