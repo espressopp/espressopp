@@ -1,9 +1,11 @@
 #include "ParallelMethod.hpp"
 
-namespace pmi {
-  IdType generateMethodId() {
+namespace pmi
+{
+  IdType generateMethodId ()
+  {
     static IdType nextMethodId = 0;
-    nextMethodId++;
-    return nextMethodId - 1;
+      nextMethodId++;
+      return nextMethodId - 1;
   }
 }

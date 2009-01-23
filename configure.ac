@@ -195,6 +195,7 @@ AC_CONFIG_FILES([Makefile
                  src/python/Makefile
                  test/Makefile
                  test/modules/Makefile
+                 test/modules/forceloop/Makefile
                  test/external/Makefile 
                  test/external/mpi/Makefile 
                  test/external/logging/Makefile 

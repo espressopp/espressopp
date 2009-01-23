@@ -6,6 +6,8 @@
 #include "particlestorage/ParticleStorage.hpp"
 #include "bc/BC.hpp"
 
+#include <cstdio>
+
 namespace espresso {
 
   namespace pairs {

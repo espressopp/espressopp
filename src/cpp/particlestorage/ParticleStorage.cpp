@@ -32,8 +32,6 @@ static void intended_use() {
 
 void ParticleStorage::foreach(ParticleComputer& compute)
 {
-   printf("ParticleStorage::foreach\n");
-
    for (size_t p = 0; p < id.size(); p++) {
 
        reference pref = getParticle(p);
@@ -43,8 +41,6 @@ void ParticleStorage::foreach(ParticleComputer& compute)
 
 void ParticleStorage::foreach(const ParticleComputer& compute) const
 {
-   printf("const ParticleStorage::foreach\n");
-
    for (size_t p = 0; p < id.size(); p++) {
 
        const_reference pref = getParticle(p);

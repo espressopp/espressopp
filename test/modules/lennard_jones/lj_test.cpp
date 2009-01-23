@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <math.h>
+#include <cmath>
 #include <stdlib.h>
 #include <sys/times.h>
 
@@ -17,12 +17,12 @@ using namespace std;
 
 #define MAX 4096
 
-template<class Interaction>
-double compute (std::vector<Particle> *pc, Interaction lj, FullListIterator *it)
+real compute (std::vector<Particle> *pc, const Interaction *lj, 
+              FullListIterator *it)
 
 {
-  double rsq;
-  double en;
+  real rsq;
+  real en;
 
   en = 0.0;
 
@@ -40,9 +40,9 @@ double compute (std::vector<Particle> *pc, Interaction lj, FullListIterator *it)
 
     Particle* Pi = &(*pc)[i];
 
-    double x = Pi->getx();
-    double y = Pi->gety();
-    double z = Pi->getz();
+    real x = Pi->getx();
+    real y = Pi->gety();
+    real z = Pi->getz();
 
     for (int jj = 0; jj < jnum; jj++) {
 
@@ -50,10 +50,14 @@ double compute (std::vector<Particle> *pc, Interaction lj, FullListIterator *it)
 
       Particle* Pj = &(*pc)[j];
 
-      rsq   = pow(x - Pj->getx(), 2);
-      rsq  += pow(y - Pj->gety(), 2);
-      rsq  += pow(z - Pj->getz(), 2);
-      en   += lj.computeLennardJonesEnergy(rsq);
+      real tmp;
+      tmp = x - Pj->getx();
+      rsq   = tmp * tmp;
+      tmp = y - Pj->gety();
+      rsq   = tmp * tmp;
+      tmp = z - Pj->getz();
+      rsq   = tmp * tmp;
+      en   += lj->computeEnergy(rsq);
     }
 
   }
@@ -70,9 +74,9 @@ void run(int size) {
 
   //variables for storing random numbers
 
-  double rx;
-  double ry;
-  double rz;
+  real rx;
+  real ry;
+  real rz;
 
   // create a vector to store the particles
 
@@ -81,9 +85,9 @@ void run(int size) {
   // assign random positions to the particles on r[0, BOX_SIZE]
 
   for(int i = 0; i < pc.size(); i++) {
-    rx = BOX_SIZE * double(rand()) / RAND_MAX;
-    ry = BOX_SIZE * double(rand()) / RAND_MAX;
-    rz = BOX_SIZE * double(rand()) / RAND_MAX;
+    rx = BOX_SIZE * real(rand()) / RAND_MAX;
+    ry = BOX_SIZE * real(rand()) / RAND_MAX;
+    rz = BOX_SIZE * real(rand()) / RAND_MAX;
     pc[i] = Particle(rx, ry, rz);
   }
 
@@ -100,14 +104,14 @@ void run(int size) {
 
   FullListIterator it = FullListIterator(pc.size());
 
-  double energy;
-  int    count = 0;
+  real energy;
+  int  count = 0;
 
   for (int iter = 0; iter < NITER; iter++) {
 
      std::cout << "iter " << iter << " of " << NITER << std::endl;
 
-     energy = compute<LennardJonesInteraction>(&pc, lj, &it);
+     energy = compute(&pc, &lj, &it);
 
      count++;
 
