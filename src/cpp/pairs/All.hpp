@@ -1,17 +1,16 @@
-#ifndef _PARTICLESET_PARTICLESET
-#define _PARTICLESET_PARTICLESET
+#ifndef _PAIRS_ALL_HPP
+#define _PAIRS_ALL_HPP
 
 #include "ParticlePairs.hpp"
 #include "particlestorage/ParticleStorage.hpp"
 #include "bc/BC.hpp"
 
+#warning "pairs/All.hpp currently includes cstdio, remove as fast as possible"
 #include <cstdio>
 
 namespace espresso {
 
   namespace pairs {
-
-     class ParticlePairComputer;
 
      class All : public ParticlePairs {
  
@@ -21,8 +20,6 @@ namespace espresso {
        typedef espresso::particlestorage::ParticleStorage::ArrayPropertyReference<real> RealArrayRef;
 
      private:
-
-#define TUPLESIZE 2
 
        espresso::particleset::ParticleSet& set;
        espresso::bc::BC& bc;
@@ -127,7 +124,7 @@ namespace espresso {
            set.foreach(traverser1);
        }
        
-       virtual void foreach(const ParticlePairComputer& pairComputer) {
+       virtual void foreach(ConstParticlePairComputer& pairComputer) const {
 
            printf ("ParticlePairComputer const");
        }
