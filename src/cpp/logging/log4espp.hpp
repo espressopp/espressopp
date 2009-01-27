@@ -122,7 +122,6 @@
 
 #if defined(HAVE_LOG4CPP) and defined(LOG4ESPP_USE_LOG4CPP)
 
-#include <stdio.h>
 #include "log4cpp/Portability.hh"
 #ifdef LOG4CPP_HAVE_UNISTD_H
 #include <unistd.h>
@@ -150,11 +149,9 @@
 #define LOG4ESPP_CONFIGURE() { char *logFile; \
    logFile = getenv("LOG4ESPP"); \
    if (logFile != NULL) {\
-      printf ("LOG4ESPP: LOG4CPP property configuration with file %s\n", logFile); \
       log4cpp::SimpleConfigurator::configure(logFile); \
      } \
      else { \
-      printf ("LOG4ESPP: LOG4CPP basic configuration\n"); \
       log4cpp::BasicConfigurator::configure(); \
      } \
    }
@@ -273,11 +270,9 @@ using namespace log4cxx::helpers;
 #define LOG4ESPP_CONFIGURE() { char *logFile; \
    logFile = getenv("LOG4ESPP"); \
    if (logFile != NULL) {\
-      printf ("LOG4ESPP: LOG4CXX property configuration with file %s\n", logFile); \
       PropertyConfigurator::configure(logFile); \
      } \
      else { \
-      printf ("LOG4ESPP: LOG4CXX basic configuration\n"); \
       /* DefaultConfigurator::configure(LogManager::getLoggerRepository()); */ \
       BasicConfigurator::configure(); \
       LoggerPtr rootLogger = Logger::getRootLogger(); \
