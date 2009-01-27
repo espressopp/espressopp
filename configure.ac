@@ -142,10 +142,6 @@ AM_CONDITIONAL([HAVE_UNITTEST], [test "x$axes_cv_boost_lib_unit_test_framework" 
 
 AXES_LOG4ESPP
 
-pythondir=${libdir}/${PACKAGE_TARNAME}/espresso
-AC_SUBST(pythondir)
-
-
 ################################################################### 
 #                                                                 #
 #  DOXYGEN                                                        #
@@ -168,7 +164,15 @@ cat <<EOF
 **********************************************************************
 EOF
 
-CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/src/cpp"
+
+################################################################### 
+#                                                                 #
+#  SET ADDITIONAL MAKEFILE VARIABLES                              #
+#                                                                 #
+################################################################### 
+pythondir=${libdir}/${PACKAGE_TARNAME}/espresso
+AC_SUBST(pythondir)
+CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/src/cpp $LOG4ESPP_CPPFLAGS"
 
 ################################################################### 
 #                                                                 #
