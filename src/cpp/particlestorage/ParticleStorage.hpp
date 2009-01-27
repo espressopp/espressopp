@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "types.hpp"
+#include "virtual_functional.hpp"
 
 namespace espresso {
     namespace particlestorage {
@@ -184,9 +185,12 @@ namespace espresso {
 	    //@}
 
 	    /// loop
-	    virtual void foreach(class ParticleComputer &);
-	    virtual void foreach(const class ParticleComputer &) const;
+	    virtual void foreach(VirtualUnaryFunction<void, reference> &);
+	    virtual void foreach(VirtualUnaryFunction<void, const_reference> &) const;
 	};
+
+	typedef VirtualUnaryFunction<void, ParticleStorage::reference> ParticleComputer;
+	typedef VirtualUnaryFunction<void, ParticleStorage::const_reference> ConstParticleComputer;
     }
 }
 

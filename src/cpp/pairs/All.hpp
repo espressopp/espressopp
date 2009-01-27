@@ -2,7 +2,6 @@
 #define _PARTICLESET_PARTICLESET
 
 #include "ParticlePairs.hpp"
-#include "particlestorage/ParticleComputer.hpp"
 #include "particlestorage/ParticleStorage.hpp"
 #include "bc/BC.hpp"
 

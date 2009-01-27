@@ -1,7 +1,6 @@
 #ifndef _PARTICLESTORAGE_PARTICLEWRITER_HPP
 #define _PARTICLESTORAGE_PARTICLEWRITER_HPP
 
-#include "particlestorage/ParticleComputer.hpp"
 #include "particlestorage/ParticleStorage.hpp"
 
 namespace espresso {

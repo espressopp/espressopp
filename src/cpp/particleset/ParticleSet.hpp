@@ -2,12 +2,7 @@
 #define _PARTICLESET_PARTICLESET_HPP
 
 #include "types.hpp"
-#include <vector>
-
-typedef int ParticleRef;
-
 #include "particlestorage/ParticleStorage.hpp"
-#include "particlestorage/ParticleComputer.hpp"
 
 namespace espresso {
     namespace particleset {
@@ -18,6 +13,7 @@ namespace espresso {
 	protected:
 	    typedef espresso::particlestorage::ParticleStorage ParticleStorage;
 	    typedef espresso::particlestorage::ParticleComputer ParticleComputer;
+	    typedef espresso::particlestorage::ConstParticleComputer ConstParticleComputer;
 
 	    /// the storage our particles are stored in
 	    ParticleStorage *theStorage;
@@ -41,7 +37,7 @@ namespace espresso {
 	     */
 	    virtual void foreach(ParticleComputer &computer) = 0;
 	    ///
-	    virtual void foreach(const ParticleComputer &computer) const = 0;
+	    virtual void foreach(ConstParticleComputer &computer) const = 0;
 
             ParticleStorage* getStorage() { return theStorage; }
 

@@ -1,5 +1,4 @@
 #include "ParticleStorage.hpp"
-#include "ParticleComputer.hpp"
 
 using namespace espresso::particlestorage;
 
@@ -29,7 +28,6 @@ static void intended_use() {
     //ref[const_pref][2] = 0.3;
 }
 
-
 void ParticleStorage::foreach(ParticleComputer& compute)
 {
    for (size_t p = 0; p < id.size(); p++) {
@@ -39,7 +37,7 @@ void ParticleStorage::foreach(ParticleComputer& compute)
    }
 }
 
-void ParticleStorage::foreach(const ParticleComputer& compute) const
+void ParticleStorage::foreach(ConstParticleComputer& compute) const
 {
    for (size_t p = 0; p < id.size(); p++) {
 
