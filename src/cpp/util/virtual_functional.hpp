@@ -3,7 +3,7 @@
 
 #include <functional>
 
-namespace espresso {
+namespace util {
     template <class Result, class Argument>
     class VirtualUnaryFunction
 	: public std::unary_function<Result, Argument> {
