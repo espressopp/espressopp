@@ -39,8 +39,10 @@ namespace espresso {
 				    const ParticleReference p2) = 0;
         };
 
-	typedef ParticlePairComputerBase<espresso::particlestorage::ParticleStorage::reference> ParticlePairComputer;
-	typedef ParticlePairComputerBase<espresso::particlestorage::ParticleStorage::const_reference> ConstParticlePairComputer;
+	typedef ParticlePairComputerBase<espresso::particlestorage::ParticleStorage::reference>
+                ParticlePairComputer;
+	typedef ParticlePairComputerBase<espresso::particlestorage::ParticleStorage::const_reference> 
+                ConstParticlePairComputer;
     }
 }
 

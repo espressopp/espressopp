@@ -7,8 +7,8 @@ namespace espresso {
 
    namespace pairs {
 
-     typedef espresso::particlestorage::ParticleStorage::ConstPropertyReference<size_t> ConstSizeRef;
-     typedef espresso::particlestorage::ParticleStorage::ConstArrayPropertyReference<real> ConstRealArrayRef;
+     typedef particlestorage::ParticleStorage::ConstPropertyReference<size_t> ConstSizeRef;
+     typedef particlestorage::ParticleStorage::ConstArrayPropertyReference<real> ConstRealArrayRef;
 
      /** This class is used to print all particle pairs.
 
@@ -21,14 +21,12 @@ namespace espresso {
         \sa espresso::pairs::ParticlePairComputer
      */
 
-     class PairWriteComputer: public ParticlePairComputer {
+     class PairWriteComputer: public ConstParticlePairComputer {
 
      public:
 
        ConstRealArrayRef pos;  //<! const property position
        ConstSizeRef id;        //<! const property id(entification)
-
-       // ToDo: take the const version
 
        /** Constructor of the pair writer class.
          
@@ -50,8 +48,8 @@ namespace espresso {
        */
 
        virtual void operator()(const Real3D dist,
-                               const espresso::particleset::ParticleSet::reference p1,
-                               const espresso::particleset::ParticleSet::reference p2)
+                               const espresso::particleset::ParticleSet::const_reference p1,
+                               const espresso::particleset::ParticleSet::const_reference p2)
 
        {
           printf("Pair: id = (%d,%d) , pos1 = (%f,%f,%f), pos2 = (%f,%f,%f), dist = (%f, %f, %f)\n",
