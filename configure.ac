@@ -148,15 +148,8 @@ AXES_LOG4ESPP
 #                                                                 #
 ################################################################### 
 
-DX_HTML_FEATURE(ON)
-DX_CHM_FEATURE(OFF)
-DX_CHI_FEATURE(OFF)
-DX_MAN_FEATURE(ON)
-DX_RTF_FEATURE(OFF)
-DX_XML_FEATURE(OFF)
-DX_PDF_FEATURE(ON)
-DX_PS_FEATURE(ON)
-DX_INIT_DOXYGEN(Espresso, doxygen.cfg, doc)
+AC_PATH_PROG(DOXYGEN,doxygen,no)
+AM_CONDITIONAL(HAVE_DOXYGEN,[test .$DOXYGEN != .no])
 
 cat <<EOF
 **********************************************************************
@@ -199,6 +192,8 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/particleset/Makefile
                  src/cpp/particlestorage/Makefile
                  src/python/Makefile
+		 doc/Makefile
+		 doc/dg/Makefile
                  test/Makefile
                  test/modules/Makefile
                  test/modules/forceloop/Makefile
@@ -268,7 +263,7 @@ echo " * Logging: uses $axes_log4espp"
 
 
 dnl Doxygen
-if DX_TEST_FEATURE([doc]); then
+if test .$DOXYGEN != .no; then
 echo " * Doxygen: doxygen was found"
 else
 echo " * Doxygen: doxygen was not found"
