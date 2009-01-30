@@ -1,47 +1,64 @@
+#include <boost/foreach.hpp>
+#include <algorithm>
+#include <stdexcept>
 #include "ParticleStorage.hpp"
 
 using namespace espresso::particlestorage;
 
-/** intended use example */
-static void intended_use() {
-    ParticleStorage storage;
+ParticleStorage::ParticleStorage(): uniqueID(0) {
+    particleIDProperty = particles.addProperty<size_t>();
+}
 
-    // get particle with global id 5
-    // particle sets will allow for more sophisticated selection of
-    // particles, e. g. all particles in a specified area or so
-    ParticleStorage::reference pref = storage.getParticle(5);
-    // same, but non-modifiable particle
-    ParticleStorage::const_reference const_pref = storage.getParticle(3);
+size_t ParticleStorage::addParticle() {
 
-    // get the position set of all particles
-    ParticleStorage::ArrayPropertyReference<real> ref = storage.getPosProperty();
-    // get the position set of all particles, again non-modifiable
-    ParticleStorage::ConstArrayPropertyReference<real> const_ref = storage.getPosProperty();
+    util::TupleVector::iterator it = particles.insert(particles.end());
+    particles.getProperty<size_t>(particleIDProperty)[*it] = ++uniqueID;
+    return uniqueID;
+}
 
-    // set position of particle 5
-    ref[pref][0] = 0.1*const_ref[const_pref][2];
-    ref[pref][1] = 0.2*const_ref[const_pref][1];
-    ref[pref][2] = 0.3*const_ref[const_pref][0];
+class PredicateMatchParticleID: public std::unary_function<ParticleStorage::const_reference, bool> {
+    ParticleStorage::PropertyTraits<size_t>::ConstReference id;
+    size_t searchID;
 
-    // this does and should _not_ work, both violating const
-    //const_ref[pref][2] = 0.3;
-    //ref[const_pref][2] = 0.3;
+public:
+    PredicateMatchParticleID(const ParticleStorage &store, size_t _searchID)
+	: id(store.getIDProperty()), searchID(_searchID) {}
+  
+    bool operator()(ParticleStorage::const_reference ref) { return id[ref] == searchID; }
+};
+
+void ParticleStorage::deleteParticle(size_t deleteID) {
+
+    util::TupleVector::iterator pos =
+	std::find_if(particles.begin(), particles.end(), PredicateMatchParticleID(*this, deleteID));
+
+    if (pos == particles.end()) {
+	throw std::out_of_range("ParticleStorage::deleteParticle");
+    }
+    particles.erase(pos);
+}
+
+ParticleStorage::reference ParticleStorage::getParticleByID(size_t id) {
+
+    util::TupleVector::iterator pos =
+	std::find_if(particles.begin(), particles.end(), PredicateMatchParticleID(*this, id));
+
+    if (pos == particles.end()) {
+	throw std::out_of_range("ParticleStorage::deleteParticle");
+    }
+    return *pos;
 }
 
 void ParticleStorage::foreach(ParticleComputer& compute)
 {
-   for (size_t p = 0; p < id.size(); p++) {
-
-       reference pref = getParticle(p);
-       compute(pref);
-   }
+    BOOST_FOREACH(reference particle, particles) {
+	compute(particle);
+    }
 }
 
 void ParticleStorage::foreach(ConstParticleComputer& compute) const
 {
-   for (size_t p = 0; p < id.size(); p++) {
-
-       const_reference pref = getParticle(p);
-       compute(pref);
-   }
+    BOOST_FOREACH(const_reference particle, particles) {
+	compute(particle);
+    }
 }

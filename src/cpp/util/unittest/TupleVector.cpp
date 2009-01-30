@@ -11,9 +11,11 @@ struct Fixture {
     TupleVector mv;
     const TupleVector &constMv;
 
+    size_t intProp, floatProp;
+
     Fixture(): constMv(mv) {
-	mv.addProperty<int>();
-	mv.addProperty<float>(3);
+	intProp = mv.addProperty<int>();
+	floatProp = mv.addProperty<float>(3);
 	mv.resize(42);
     }
 
@@ -74,14 +76,14 @@ BOOST_FIXTURE_TEST_CASE(dereference_scalar_test, Fixture)
 {
     ////// property references
     const TupleVector &constMv = mv;
-    TupleVector::PropertyReference<int> pRef = mv.getProperty<int>(0);
-    TupleVector::ConstPropertyReference<int> constPRef = constMv.getProperty<int>(0);
+    TupleVector::PropertyReference<int> pRef = mv.getProperty<int>(intProp);
+    TupleVector::ConstPropertyReference<int> constPRef = constMv.getProperty<int>(intProp);
 
     // convert non-const -> const
     { TupleVector::ConstPropertyReference<int> constPRef2 = pRef; }
 
     // this does not compile, tries const -> non-const conversion
-    //TupleVector::PropertyReference<int> pRef2 = constMv.getProperty<int>(0);    
+    //TupleVector::PropertyReference<int> pRef2 = constMv.getProperty<int>(intProp);    
 
     ////// element references
     TupleVector::reference ref = mv[0];
@@ -115,9 +117,9 @@ BOOST_FIXTURE_TEST_CASE(dereference_array_test, Fixture)
     ////// property references
     const TupleVector &constMv = mv;
     TupleVector::ArrayPropertyReference<float> pRef =
-	mv.getArrayProperty<float>(1);
+	mv.getArrayProperty<float>(floatProp);
     TupleVector::ConstArrayPropertyReference<float> constPRef =
-	constMv.getArrayProperty<float>(1);
+	constMv.getArrayProperty<float>(floatProp);
 
     // convert non-const -> const
     { TupleVector::ConstArrayPropertyReference<float> constPRef2 = pRef; }
@@ -165,7 +167,7 @@ BOOST_FIXTURE_TEST_CASE(dereference_array_test, Fixture)
 
 BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
 {
-    TupleVector::PropertyReference<int> intRef = mv.getProperty<int>(0);
+    TupleVector::PropertyReference<int> intRef = mv.getProperty<int>(intProp);
 
     // fill int property
     size_t i = 0;
@@ -252,9 +254,9 @@ BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
 /*
   Local Variables:
   compile-command: "g++ -Wall -static -g \
-  -I/home/axel/software/include/boost-1_36 \
-  -L/home/axel/software/lib TupleVector.cpp \
+  -I/home/user/software/include/boost-1_36 \
+  -L/home/user/software/lib TupleVector.cpp \
   ../TupleVector.cpp -o propvector \
-  -lboost_unit_test_framework-gcc42-mt-1_36 && ./propvector"
+  -lboost_unit_test_framework-gcc41-mt-1_36 && ./propvector"
   End:
 */

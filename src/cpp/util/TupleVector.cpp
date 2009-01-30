@@ -2,16 +2,12 @@
 
 #include <cstring>
 #include <boost/foreach.hpp>
+#include <algorithm>
 
 using namespace util;
 
-/// capacity is always a multiple of granularity
-static const int granularity = 8;
-
-/** capacity can shrink if difference between current size and capacity
-    is at least this
-*/
-static const int shrinkThreshold = 4*granularity;
+static const int defaultGranularity = 8;
+static const int defaultShrinkThreshold = 4*defaultGranularity;
 
 TupleVector::~TupleVector()
 {
@@ -21,8 +17,16 @@ TupleVector::~TupleVector()
     }
 }
 
+TupleVector::TupleVector(size_t newESize)
+    : eSize(0), maxESize(0), uniqueID(0),
+      granularity(defaultGranularity), shrinkThreshold(defaultShrinkThreshold)
+{
+    resize(newESize);
+}
+
 TupleVector::TupleVector(const TupleVector &vec, size_type newESize)
-    : eSize(0), maxESize(0)
+    : eSize(0), maxESize(0), uniqueID(0),
+      granularity(defaultGranularity), shrinkThreshold(defaultShrinkThreshold)
 {
     // set number of particles for allocation below
     resize(newESize);
@@ -36,15 +40,28 @@ TupleVector::TupleVector(const TupleVector &vec, size_type newESize)
 
 size_t TupleVector::addProperty(size_t _size, size_t _dimension)
 {
-    property.push_back(Property(_size, _dimension, malloc(maxESize)));
-    return property.size() - 1;
+    property.push_back(Property(++uniqueID, _size, _dimension, malloc(maxESize)));
+    return uniqueID;
 }
 
 void TupleVector::eraseProperty(size_t id)
 {
-    std::vector<Property>::iterator it = property.begin() + id;
+    std::vector<Property>::iterator it =
+	std::find_if(property.begin(), property.end(), PredicateMatchPropertyID(id));
+    if (it == property.end()) {
+	throw std::out_of_range("TupleVector::eraseProperty: property does not exist");
+    }
     free(it->data);
     property.erase(it);
+}
+
+const TupleVector::Property &TupleVector::getPropertyData(size_t id) const {
+    std::vector<Property>::const_iterator it =
+	std::find_if(property.begin(), property.end(), PredicateMatchPropertyID(id));
+    if (it == property.end()) {
+	throw std::out_of_range("TupleVector::eraseProperty: property does not exist");
+    }
+    return *it;
 }
 
 void TupleVector::reserve(size_t minCapacity)

@@ -21,6 +21,8 @@ namespace espresso {
        espresso::particleset::ParticleSet& set; 
        espresso::bc::BC& bc;
 
+       size_t coordinates;
+
        /** Destructor. */
 
        ~All();
@@ -29,10 +31,11 @@ namespace espresso {
 
          \param bc are the boundary conditions that are needed for distance calculation.
          \param set specifies the set of particles for which pairs will be considered.
+	 \param coordinates the identifier of the coordinates property to use
 
        */
 
-       All (espresso::bc::BC& bc, espresso::particleset::ParticleSet& set);
+       All (espresso::bc::BC& bc, espresso::particleset::ParticleSet& set, size_t coordinates);
 
        /** This routine will apply a function operator to all pairs.
 

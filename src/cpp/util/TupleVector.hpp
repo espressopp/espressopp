@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdexcept>
 #include <boost/iterator/iterator_facade.hpp>
+#include <functional>
 
 namespace util {
 
@@ -14,46 +15,7 @@ namespace util {
 	different (e.g., elements are uninitialized)
     */
     class TupleVector {
-
-	/** Handler for a property. This really just stores the data;
-	    (re)allocation and freeing needs to be done from outside */
-	struct Property {
-	    /// size of one element in characters
-	    size_t size;
-	    /// number of data type values in one element
-	    size_t dimension;
-	    /// memory segment storing the elements
-	    void *data;
-
-	    /** construct an empty property
-		@param _size byte size of an element
-		@param _dimension number of values in an element
-		(i.e. _size/_dimension = sizeof(datatype))
-		@param _data memory segment address
-	    */
-	    Property(size_t _size, size_t _dimension, void *_data)
-		: size(_size), dimension(_dimension), data(_data) {}
-	};
-
-	/// handlers for all properties
-	std::vector <Property> property;
-
-	/// size in elements of each of the stored properties
-	size_t eSize;
-
-	/// reserved size in elements of each of the stored properties
-	size_t maxESize;
-
     public:
-	/// @name standard vector members
-	//@{
-
-	///
-	typedef size_t size_type;
-
-	///
-	typedef ptrdiff_t difference_type;
-  
 	/** a reference to an element, which then can be used to read and
 	    write properties of the element using TupleVector::PropertyReference.
 	
@@ -64,15 +26,66 @@ namespace util {
 	class ReferenceBase {
 	protected:
 	    /// index of the reference particle
-	    size_type index;
+	    size_t index;
 
 	    /// constructor
-	    ReferenceBase(size_type _index): index(_index) {}
+	    ReferenceBase(size_t _index): index(_index) {}
 	public:
 	    /// convert to index
-	    operator size_type() const { return index; }
+	    operator size_t() const { return index; }
 	};
 
+	/** an iterator over elements. This is basically a reference to
+	    an element with a mutable index
+
+	    @tparam ReferenceType
+	*/
+	template<class ReferenceType, class CRTP>
+	class IteratorBase: public boost::iterator_facade<
+	    CRTP, 
+	    ReferenceType,
+	    boost::random_access_traversal_tag,
+	    ReferenceType,
+	    ptrdiff_t>
+	{
+	protected:
+	    /// index of particle that is referenced
+	    size_t index;
+
+	    /// regular constructor
+	    IteratorBase(size_t _index): index(_index) {}
+	public:
+	    /// reference type. Fixes up the iterator_facade for a reference only class
+	    typedef ReferenceType reference;
+
+	    /// default constructor, undefined iterator
+	    IteratorBase() {}
+
+	private:
+	    friend class boost::iterator_core_access;
+
+	    bool equal(const IteratorBase<ReferenceType, CRTP> &other) const {
+		return index == other.index;
+	    }
+
+	    void increment()       { index++; }
+	    void decrement()       { index--; }
+	    void advance(size_t n) { index += n; }
+	    reference dereference() const { return reference(index); }
+	    ptrdiff_t distance_to(const IteratorBase<ReferenceType, CRTP> &other) const{
+		return other.index - index;
+	    }
+	};
+
+	/// @name standard vector members
+	//@{
+
+	///
+	typedef size_t size_type;
+
+	///
+	typedef ptrdiff_t difference_type;
+  
 	/** see @ref TupleVector::ReferenceBase; this class marks the referenced
 	    element as non-const */
 	class reference: public ReferenceBase {
@@ -90,48 +103,6 @@ namespace util {
 	public:
 	    /// non-const->const conversion
 	    const_reference(const reference &_ref): ReferenceBase(_ref.index) {}
-	};
-
-	/** an iterator over elements. This is basically a reference to
-	    an element with a mutable index
-
-	    @tparam ReferenceType
-	*/
-	template<class ReferenceType, class CRTP>
-	class IteratorBase: public boost::iterator_facade<
-	    CRTP, 
-	    ReferenceType,
-	    boost::random_access_traversal_tag,
-	    ReferenceType,
-	    difference_type>
-	{
-	protected:
-	    /// index of particle that is referenced
-	    size_type index;
-
-	    /// regular constructor
-	    IteratorBase(size_type _index): index(_index) {}
-	public:
-	    /// reference type. Fixes up the iterator_facade for a reference only class
-	    typedef ReferenceType reference;
-
-	    /// default constructor, undefined iterator
-	    IteratorBase() {}
-
-	private:
-	    friend class boost::iterator_core_access;
-
-	    bool equal(const IteratorBase<ReferenceType, CRTP> &other) const {
-		return index == other.index;
-	    }
-
-	    void increment()          { index++; }
-	    void decrement()          { index--; }
-	    void advance(size_type n) { index += n; }
-	    reference dereference() const { return reference(index); }
-	    difference_type distance_to(const IteratorBase<ReferenceType, CRTP> &other) const{
-		return other.index - index;
-	    }
 	};
 
 	/// see @ref TupleVector::IteratorBase
@@ -158,12 +129,54 @@ namespace util {
 
 	//@}
 
+    private:
+	/** Handler for a property. This really just stores the data;
+	    (re)allocation and freeing needs to be done from outside */
+	struct Property {
+	    /// unique property identifier
+	    size_t id;
+	    /// size of one element in characters
+	    size_t size;
+	    /// number of data type values in one element
+	    size_t dimension;
+	    /// memory segment storing the elements
+	    void *data;
+
+	    /** construct an empty property
+		@param _size byte size of an element
+		@param _dimension number of values in an element
+		(i.e. _size/_dimension = sizeof(datatype))
+		@param _data memory segment address
+	    */
+	    Property(size_t _id, size_t _size, size_t _dimension, void *_data)
+		: id(_id), size(_size), dimension(_dimension), data(_data) {}
+	};
+
+	/// handlers for all properties
+	std::vector <Property> property;
+
+	/// size in elements of each of the stored properties
+	size_t eSize;
+
+	/// reserved size in elements of each of the stored properties
+	size_t maxESize;
+
+	size_t uniqueID;
+
+	/// capacity is always a multiple of granularity
+	int granularity;
+
+	/** capacity can shrink if difference between current size and capacity
+	    is at least this
+	*/
+	int shrinkThreshold;
+
+    public:
 	/** default constructor. Constructs an empty TupleVector, but possibly
 	    allocating already some particles. When properties are added, they
 	    will offer space for the specified number of particles.
 	*/
-	explicit TupleVector(size_type _n = 0)
-	    : eSize(0), maxESize(0) { resize(_n); };
+	explicit TupleVector(size_type _n = 0);
 
 	/** partial copy constructor. Creates a new TupleVector with the same
 	    properties as the previous one, but contains only n uninitialized
@@ -287,20 +300,22 @@ namespace util {
 	//@{
 
 	/** reference to a scalar property. In fact this is just an array
-	    that is dereferenced using a @ref TupleVector::reference
+	    that is dereferenced using a @ref TupleVector::reference.
+	    This reference is only guaranteed to be valid between any two
+	    resizings of the TupleVector.
 	*/
 	template<class T, class Property>
 	class PropertyReferenceBase {
 	protected:
-	    /// property that is referenced
-	    Property &property;
 	    /// data shortcut, already type-casted
 	    T *data;
 
 	    /// constructor
 	    PropertyReferenceBase(Property &_property)
-		: property(_property),
-		  data(static_cast<T *>(_property.data)) {};
+		: data(static_cast<T *>(_property.data)) {};
+	    /// constructor
+	    PropertyReferenceBase(T *_data)
+		: data(_data) {};
 
 	public:
 	    /// dereference
@@ -327,7 +342,7 @@ namespace util {
 	public:
 	    /// non-const->const conversion
 	    ConstPropertyReference(const PropertyReference<T> &_ref)
-		: PropertyReferenceBase<const T, const Property>(_ref.property) {}
+		: PropertyReferenceBase<const T, const Property>(_ref.data) {}
 	};
 
 	/** reference to an array property. In contrast to
@@ -338,8 +353,6 @@ namespace util {
 	template<class T, class Property>
 	class ArrayPropertyReferenceBase {
 	protected:
-	    /// reference to property
-	    Property &property;
 	    /// data short cut from property
 	    T *data;
 	    /// number of values per element, short cut from property
@@ -347,9 +360,11 @@ namespace util {
 
 	    /// constructor
 	    ArrayPropertyReferenceBase(Property &_property)
-		: property(_property),
-		  data(static_cast<T *>(_property.data)),
+		: data(static_cast<T *>(_property.data)),
 		  dimension(_property.dimension) {};
+	    /// constructor
+	    ArrayPropertyReferenceBase(T *_data, size_t _dimension)
+		: data(_data), dimension(_dimension) {};
 
 	public:
 	    /// dereference
@@ -385,7 +400,7 @@ namespace util {
 	public:
 	    /// non-const->const conversion
 	    ConstArrayPropertyReference(const ArrayPropertyReference<T> &_ref)
-		: ArrayPropertyReferenceBase<const T, const Property>(_ref.property) {}
+		: ArrayPropertyReferenceBase<const T, const Property>(_ref.data, _ref.dimension) {}
 	};
 
 	/** add a property
@@ -409,7 +424,7 @@ namespace util {
 	*/
 	template<class T>
 	PropertyReference<T> getProperty(size_t n) {
-	    return PropertyReference<T>(property[n]);
+	    return PropertyReference<T>(const_cast<Property &>(getPropertyData(n)));
 	}
 
 	/** get a constant non-array property
@@ -418,7 +433,7 @@ namespace util {
 	*/
 	template<class T>
 	ConstPropertyReference<T> getProperty(size_t n) const {
-	    return ConstPropertyReference<T>(property[n]);
+	    return ConstPropertyReference<T>(getPropertyData(n));
 	}
   
 	/** get an array property
@@ -427,7 +442,7 @@ namespace util {
 	*/
 	template<class T>
 	ArrayPropertyReference<T> getArrayProperty(size_t n) {
-	    return ArrayPropertyReference<T>(property[n]);
+	    return ArrayPropertyReference<T>(const_cast<Property &>(getPropertyData(n)));
 	}
 
 	/** get an array property
@@ -436,7 +451,7 @@ namespace util {
 	*/
 	template<class T>
 	ConstArrayPropertyReference<T> getArrayProperty(size_t n) const {
-	    return ConstArrayPropertyReference<T>(property[n]);
+	    return ConstArrayPropertyReference<T>(getPropertyData(n));
 	}
 
 	/// get number of properties
@@ -445,7 +460,6 @@ namespace util {
 	//@}
 
     private:
-
 	/// not accessible and not implemented
 	TupleVector(const TupleVector &);
 	/// not accessible and not implemented
@@ -469,6 +483,16 @@ namespace util {
 
 	/// actual function adding a property, with resolved type size
 	size_t addProperty(size_t size, size_t _dimension);
+	/// actual function searching for a property
+	const Property &getPropertyData(size_t n) const;
+
+	/// predicate for checking the ID of a property
+	struct PredicateMatchPropertyID
+	    : public std::unary_function<const Property &, bool>{
+	    size_t searchID;
+	    PredicateMatchPropertyID(size_t _searchID): searchID(_searchID) {}
+	    bool operator()(const Property &ref) { return ref.id == searchID; }
+	};
     };
 }
 #endif

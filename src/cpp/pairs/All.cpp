@@ -1,4 +1,3 @@
-
 #include "All.hpp"
 #include "util/virtual_functional.hpp"
 
@@ -10,21 +9,21 @@ using namespace espresso::particlestorage;
 
 // some abbreviations
 
-typedef ParticleStorage::PropertyReference<size_t> SizeRef;
+typedef ParticleStorage::PropertyTraits<size_t>::ConstReference SizeRef;
 
-typedef ParticleStorage::ArrayPropertyReference<real> RealArrayRef;
+typedef ParticleStorage::PropertyTraits<real>::ConstArrayReference RealArrayRef;
 
 
 // Helper class 1
 
 template<class Reference>
-class Traverser1 : public util::VirtualUnaryFunction<void, Reference>  {
+class Traverser1 : public util::VirtualUnaryFunction<Reference, void>  {
 
    typedef ParticlePairComputerBase<Reference> PairComputer;
 
    private:
 
-      class Traverser2 : public util::VirtualUnaryFunction<void, Reference> {
+    class Traverser2 : public util::VirtualUnaryFunction<Reference, void> {
    
       public:
 
@@ -39,11 +38,12 @@ class Traverser1 : public util::VirtualUnaryFunction<void, Reference>  {
 
       Traverser2(const All* all,
                  const Reference pref,
-                 PairComputer& _pairComputer) :
+                 PairComputer& _pairComputer
+	  ) :
 
         bc(all->bc), 
         id(all->set.getStorage()->getIDProperty()),
-        pos(all->set.getStorage()->getPosProperty()),
+        pos(all->set.getStorage()->getArrayProperty<real>(all->coordinates)),
         pref1(pref),
         pairComputer(_pairComputer)
 
@@ -96,10 +96,11 @@ All::~All() {}
 All::All(boundary_conditions, particle_set)
 -------------------------------------------------------------------------- */
 
-All::All(espresso::bc::BC& _bc, espresso::particleset::ParticleSet& _set):
+All::All(espresso::bc::BC& _bc, espresso::particleset::ParticleSet& _set, size_t _coordinates):
 
   set(_set),
-  bc(_bc)
+  bc(_bc),
+  coordinates(_coordinates)
 
 { }
 

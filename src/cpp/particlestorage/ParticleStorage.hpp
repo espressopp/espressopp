@@ -6,6 +6,7 @@
 
 #include "types.hpp"
 #include "util/virtual_functional.hpp"
+#include "util/TupleVector.hpp"
 
 namespace espresso {
     namespace particlestorage {
@@ -19,178 +20,125 @@ namespace espresso {
 	*/
 	class ParticleStorage {
 	public:
-	    /// just to have some particle data
-	    std::vector<size_t> id;
-	    /// just to have some particle data
-	    std::vector<real>   position;
-	    /// just to have some particle data
-	    std::vector<real>   force;
+	    typedef util::TupleVector::reference reference;
+	    typedef util::TupleVector::const_reference const_reference;
 
-	    /** a reference to an element, which then can be used to read and
-		write properties of the element using @ref ParticleStorage::PropertyReference.
-	
-		Actually, this is nothing but the index of the element. A
-		reference can only be obtained from element access to the
-		ParticleSet/Storage classes.
-	    */
-	    class ReferenceBase {
-	    protected:
-		/// index
-		size_t index;
-
-		/// constructor
-		ReferenceBase(size_t _index): index(_index) {}
-	    public:
-		/// convert to index
-		operator size_t() const { return index; }
+	    template<typename T>
+	    struct PropertyTraits {
+		typedef util::TupleVector::PropertyReference<T> Reference;
+		typedef util::TupleVector::ConstPropertyReference<T> ConstReference;
+		typedef util::TupleVector::ArrayPropertyReference<T> ArrayReference;
+		typedef util::TupleVector::ConstArrayPropertyReference<T> ConstArrayReference;
 	    };
 
-	    /** see @ref ParticleStorage::ReferenceBase; this class marks the referenced
-		element as non-const. Later, this will be fetched from the MultiVector,
-		and there not require several friends
-	    */
-	    class reference: public ReferenceBase {
-		friend class ParticleStorage;
-		friend class ParticleSet;
-		/// constructable only through @ref ParticleStorage/Set
-		reference(size_t _index): ReferenceBase(_index) {}
-	    };
+	private:
+	    util::TupleVector particles;
 
-	    /** see @ref MultiVector::ReferenceBase; this class marks the referenced
-		element as const */
-	    class const_reference: public ReferenceBase {
-		friend class ParticleStorage;
-		friend class ParticleSet;
-		/// constructable only through @ref MultiVector
-		const_reference(size_t _index): ReferenceBase(_index) {}
-	    public:
-		/// non-const->const conversion
-		const_reference(const reference &_ref): ReferenceBase(_ref.index) {}
-	    };
+	    /// unique ID counter for the particles
+	    size_t uniqueID;
+	    /// ID of the particle ID property
+	    size_t particleIDProperty;
+	public:
 
-	    /** reference to a scalar property. This is a base implementation, from
-		which the const and non-const versions inherit.
-	    */
-	    template<class T, class VectorClass>
-	    class PropertyReferenceBase {
-	    protected:
-		VectorClass &vec;
-		/// constructor
-		PropertyReferenceBase(VectorClass &_vec): vec(_vec) {}
-	    public:
-		/// dereference
-		T &operator[](reference n) { return vec[n]; }
-		/// dereference
-		const T &operator[](const_reference n) const { return vec[n]; }
-	    };
-
-	    /// see @ref ParticleStorage::PropertyReferenceBase
-	    template<class T>
-	    class PropertyReference: public PropertyReferenceBase< T, std::vector<T> > {
-		friend class ParticleStorage;
-		PropertyReference(std::vector<T> &_vec)
-		    : PropertyReferenceBase< T, std::vector<T> >(_vec) {}
-	    };
-	    
-	    /// see @ref ParticleStorage::PropertyReferenceBase; this is for a constant property
-	    template<class T>
-	    class ConstPropertyReference: public PropertyReferenceBase<const T, const std::vector<T> > {
-		friend class ParticleStorage;
-		ConstPropertyReference(const std::vector<T> &_vec)
-		    : PropertyReferenceBase< const T, const std::vector<T> >(_vec) {}
-	    public:
-		/// non-const->const conversion
-		ConstPropertyReference(const PropertyReference<T> &_ref)
-		    : PropertyReferenceBase<const T, const std::vector<T> >(_ref.vec) {}
-	    };
-
-	    /** reference to an array property. In contrast to
-		@ref ParticleStorage::PropertyReference, this returns a pointer, since
-		the element itself is in fact an array whose size
-		is only known at runtime.
-	    */
-	    template<class T, class VectorClass>
-	    class ArrayPropertyReferenceBase {
-	    protected:
-		VectorClass &vec;
-		/// constructor
-		ArrayPropertyReferenceBase(VectorClass &_vec): vec(_vec) {}
-
-	    public:
-		/// dereference
-		T *operator[](reference n) { return &vec[3*n]; }
-		/// dereference
-		const T *operator[](const_reference n) const { return &vec[3*n]; }
-	    };
-
-	    /** see @ref ParticleStorage::ArrayPropertyReferenceBase
-		@tparam T the data type of the property (or more precisely,
-		the datatype to interpret the property as)
-	    */
-	    template<class T>
-	    class ArrayPropertyReference: public ArrayPropertyReferenceBase< T, std::vector<T> > {
-		friend class ParticleStorage;
-
-		ArrayPropertyReference(std::vector<T> &_vec)
-		    : ArrayPropertyReferenceBase< T, std::vector<T> >(_vec) {};
-	    };
-
-	    /** see @ref ParticleStorage::ArrayPropertyReferenceBase;
-		this is for a constant property
-		@tparam T the data type of the property (or more precisely,
-		the datatype to interpret the property as)
-	    */
-	    template<class T>
-	    class ConstArrayPropertyReference
-		: public ArrayPropertyReferenceBase< const T, const std::vector<T> > {
-		friend class ParticleStorage;
-		
-		ConstArrayPropertyReference(const std::vector<T> &_vec)
-		    : ArrayPropertyReferenceBase< const T, const std::vector<T> >(_vec) {};
-	    public:
-		/// non-const->const conversion
-		ConstArrayPropertyReference(const ArrayPropertyReference<T> &_ref)
-		    : ArrayPropertyReferenceBase<const T, const std::vector<T> >(_ref.vec) {}
-	    };
+	    ParticleStorage();
 
 	    virtual ~ParticleStorage() {}
 
-	    /** get reference to a particle according to its position. Later, this will not be possible.
-		Particles may be obtained through their global id or through ParticleSet.
-	    */
-	    reference getParticle(size_t id) { return reference(id); }
-	    /** get reference to a particle according to its position. Later, this will not be possible.
-		Particles may be obtained through their global id or through ParticleSet.
-	    */
-	    const_reference getParticle(size_t id) const { return const_reference(id); }
-
-	    /// @name mockaccess to particle properties
+	    /// @name access to particles
 	    //@{
 
-	    /// this will be later replaced by a generic interface to obtain a property
-	    PropertyReference<size_t> getIDProperty() { return PropertyReference<size_t>(id); }
-	    /// this will be later replaced by a generic interface to obtain a property
-	    ConstPropertyReference<size_t> getIDProperty() const { return ConstPropertyReference<size_t>(id); }
-	    
-	    /// this will be later replaced by a generic interface to obtain a property
-	    ArrayPropertyReference<real> getPosProperty() { return ArrayPropertyReference<real>(position); }
-	    /// this will be later replaced by a generic interface to obtain a property
-	    ConstArrayPropertyReference<real> getPosProperty() const { return ConstArrayPropertyReference<real>(position); }
+	    /** add a particle
+		@return the ID of the added particle, basically just for deleting it again...
+	     */
+	    virtual size_t addParticle();
 
-	    /// this will be later replaced by a generic interface to obtain a property
-	    ArrayPropertyReference<real> getForceProperty() { return ArrayPropertyReference<real>(force); }
-	    /// this will be later replaced by a generic interface to obtain a property
-	    ConstArrayPropertyReference<real> getForceProperty() const { return ConstArrayPropertyReference<real>(force); }
-	    
+	    /** delete a particle
+		@param id the id of the particle to delete
+	    */
+	    virtual void deleteParticle(size_t id);
+
+	    /** get a reference to a particle using its ID. This is
+		potentially slow.
+		@param id the id of the particle to fetch
+	     */
+	    virtual reference getParticleByID(size_t id);
+
+	    /** get a particle to a particle using its ID. This is
+		potentially slow.
+		@param id the id of the particle to fetch
+	     */
+	    virtual const_reference getParticleByID(size_t id) const {
+		return const_reference(const_cast<ParticleStorage *>(this)->getParticleByID(id));
+	    }
+
+	    /// loop over all particles
+	    virtual void foreach(util::VirtualUnaryFunction<reference, void> &);
+	    /// loop over all particles
+	    virtual void foreach(util::VirtualUnaryFunction<const_reference, void> &) const;
+
 	    //@}
 
-	    /// loop
-	    virtual void foreach(util::VirtualUnaryFunction<void, reference> &);
-	    virtual void foreach(util::VirtualUnaryFunction<void, const_reference> &) const;
+	    /// @name access to particle properties
+	    //@{
+
+	    /// get a short lifetime reference to a property by its ID
+	    template<typename T>
+	    typename PropertyTraits<T>::Reference getProperty(size_t id) {
+		// no non-const reference to the ID
+		if (id == particleIDProperty) {
+		    throw std::out_of_range("id is not writable");
+		}
+		return particles.getProperty<T>(id);
+	    }
+	    /// get a short lifetime reference to a property by its ID
+	    template<typename T>
+	    typename PropertyTraits<T>::ConstReference getProperty(size_t id) const {
+		return particles.getProperty<T>(id);
+	    }
+	    /// get a short lifetime reference to a property by its ID
+	    template<typename T>
+	    typename PropertyTraits<T>::ArrayReference getArrayProperty(size_t id) {
+		// no non-const reference to the ID
+		if (id == particleIDProperty) {
+		    throw std::out_of_range("id is not writable");
+		}
+		return particles.getArrayProperty<T>(id);
+	    }
+	    /// get a short lifetime reference to a property by its ID
+	    template<typename T>
+	    typename PropertyTraits<T>::ConstArrayReference getArrayProperty(size_t id) const {
+		return particles.getArrayProperty<T>(id);
+	    }
+
+	    /// get a short lifetime reference to the property representing the particle ID
+	    const PropertyTraits<size_t>::ConstReference getIDProperty() const {
+		return particles.getProperty<size_t>(particleIDProperty);
+	    }
+
+	    /** add a property
+		@param dim dimensionality of the property (e.g. 3 for a 3D vector)
+		@return the ID of the property for use with getProperty or eraseProperty
+		@tparam T type of the property
+	    */
+	    template<typename T>
+	    size_t addProperty(size_t dim = 1) { return particles.addProperty<T>(dim); }
+
+	    /** delete a property
+		@param n ID of the property to delete as obtained from addProperty
+	    */
+	    void eraseProperty(size_t id) {
+		// no non-const reference to the ID
+		if (id == particleIDProperty) {
+		    throw std::out_of_range("id cannot be erased");
+		}
+		particles.eraseProperty(id);
+	    }
+
+	    //@}
 	};
 
-	typedef util::VirtualUnaryFunction<void, ParticleStorage::reference> ParticleComputer;
-	typedef util::VirtualUnaryFunction<void, ParticleStorage::const_reference> ConstParticleComputer;
+	typedef util::VirtualUnaryFunction<ParticleStorage::reference, void> ParticleComputer;
+	typedef util::VirtualUnaryFunction<ParticleStorage::const_reference, void> ConstParticleComputer;
     }
 }
 

@@ -14,7 +14,7 @@ namespace espresso {
 
      public:
 
-       typedef espresso::particlestorage::ParticleStorage::ArrayPropertyReference<real> RealArrayRef;
+       typedef espresso::particlestorage::ParticleStorage::PropertyTraits<real>::ArrayReference RealArrayRef;
 
      private: 
 

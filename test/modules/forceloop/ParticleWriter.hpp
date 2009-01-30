@@ -14,11 +14,11 @@ namespace espresso {
 
    private:
 
-    ParticleStorage::ConstArrayPropertyReference<real>
+     ParticleStorage::PropertyTraits<real>::ConstArrayReference
         f;    //<! reference to the force vector of all particles.
-    ParticleStorage::ConstArrayPropertyReference<real> 
+     ParticleStorage::PropertyTraits<real>::ConstArrayReference
         pos;  //<! reference to the position vector of all particles.
-    ParticleStorage::ConstPropertyReference<size_t>    
+     ParticleStorage::PropertyTraits<size_t>::ConstReference
         id;   //<! reference to the identification vector of all particles.
 
    public:
@@ -29,11 +29,11 @@ namespace espresso {
 
     */
 
-    ParticleWriter(const ParticleStorage* particleStorage) :
+    ParticleWriter(const ParticleStorage &particleStorage, size_t position, size_t force) :
 
-      f(particleStorage->getForceProperty()), 
-      pos(particleStorage->getPosProperty()),
-      id(particleStorage->getIDProperty())
+       f(particleStorage.getArrayProperty<real>(force)), 
+       pos(particleStorage.getArrayProperty<real>(position)),
+       id(particleStorage.getIDProperty())
 
     {
     }
