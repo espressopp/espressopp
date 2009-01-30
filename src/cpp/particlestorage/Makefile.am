@@ -1,6 +1,6 @@
 subpkgincludedir=$(pkgincludedir)/particlestorage
 
-nobase_subpkginclude_HEADERS = \
+subpkginclude_HEADERS = \
 	ParticleStorage.hpp
 
 noinst_LTLIBRARIES = libparticlestorage.la

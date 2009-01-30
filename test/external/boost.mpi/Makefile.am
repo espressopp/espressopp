@@ -3,10 +3,6 @@
 #
 #  Boost mpi test programs check correct Boost + MPI installation
 #
-
-AM_CPPFLAGS = $(BOOST_CPPFLAGS)
-AM_LDFLAGS = $(BOOST_LDFLAGS)
-
 LIBS = $(BOOST_MPI_LIBS)
 
 check_PROGRAMS = pt2pt

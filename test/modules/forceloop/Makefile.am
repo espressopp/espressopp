@@ -1,6 +1,3 @@
-AM_CPPFLAGS = $(BOOST_CPPFLAGS) $(LOG4ESPP_CPPFLAGS)
-AM_LDFLAGS  = $(BOOST_LDFLAGS)
-
 PARTICLESTORAGE_LIB=$(top_builddir)/src/cpp/particlestorage/libparticlestorage.la
 INTERACTION_LIB=$(top_builddir)/src/cpp/interaction/libinteraction.la
 PAIRS_LIB=$(top_builddir)/src/cpp/pairs/libpairs.la

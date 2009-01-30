@@ -1,5 +1,3 @@
-AM_CPPFLAGS=$(BOOST_CPPFLAGS)
-AM_LDFLAGS=$(BOOST_LDFLAGS)
 LIBS= $(BOOST_PYTHON_LIBS)
 
 python_scripts=main.py hello.py

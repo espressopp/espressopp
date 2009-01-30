@@ -1,6 +1,3 @@
-AM_CPPFLAGS = $(BOOST_CPPFLAGS)
-AM_LDFLAGS = $(BOOST_LDFLAGS)
-
 subpkgincludedir=$(pkgincludedir)/util
 
 nobase_subpkginclude_HEADERS = \

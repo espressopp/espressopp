@@ -1,8 +1,12 @@
 subpkgincludedir=$(pkgincludedir)/pairs
 
-nobase_subpkginclude_HEADERS = \
-       All.hpp PairEnergyComputer.hpp  ParticlePairComputer.hpp \
-       PairComputerList.hpp  PairForceComputer.hpp   ParticlePairs.hpp
+subpkginclude_HEADERS = \
+	All.hpp \
+	PairEnergyComputer.hpp \
+	ParticlePairComputer.hpp \
+	PairComputerList.hpp \
+	PairForceComputer.hpp \
+	ParticlePairs.hpp
 
 noinst_LTLIBRARIES = libpairs.la
 

@@ -9,10 +9,6 @@ else
   EXTRA_DIST += mpi pmi
 endif
 
-# declare the compile flags
-AM_CPPFLAGS = $(BOOST_CPPFLAGS) $(LOG4ESPP_CPPFLAGS)
-AM_LDFLAGS = $(BOOST_LDFLAGS)
-
 # declare the headers
 noinst_HEADERS = \
 	espresso_common.hpp \
