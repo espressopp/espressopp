@@ -42,8 +42,8 @@ endif
 # the program wrappers
 bin_PROGRAMS = espresso # espresso_worker
 
-espresso_SOURCES = ../cpp/espresso.cpp
-espresso_LDADD = ../cpp/libespresso_common.la
+espresso_SOURCES = espresso.cpp
+espresso_LDADD = libespresso_common.la
 
 # espresso_worker_SOURCES = ../cpp/espresso_main.cpp
 # espresso_worker_CPPFLAGS = -DWORKER_ONLY
