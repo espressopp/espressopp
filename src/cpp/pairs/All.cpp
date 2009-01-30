@@ -1,6 +1,6 @@
 
 #include "All.hpp"
-#include "virtual_functional.hpp"
+#include "util/virtual_functional.hpp"
 
 #include <cstdio>
 
@@ -18,13 +18,13 @@ typedef ParticleStorage::ArrayPropertyReference<real> RealArrayRef;
 // Helper class 1
 
 template<class Reference>
-class Traverser1 : public VirtualUnaryFunction<void, Reference>  {
+class Traverser1 : public util::VirtualUnaryFunction<void, Reference>  {
 
    typedef ParticlePairComputerBase<Reference> PairComputer;
 
    private:
 
-      class Traverser2 : public VirtualUnaryFunction<void, Reference> {
+      class Traverser2 : public util::VirtualUnaryFunction<void, Reference> {
    
       public:
 
