@@ -14,7 +14,10 @@ MOSTLYCLEANFILES=__init__.py __init__.pyc __init__.install.py
 all-local: python-all
 	sed -e "s,[@]cppdir[@],'$(abs_top_builddir)/src/cpp',g" \
 	$(srcdir)/__init__.build.py > __init__.py
-	cp $(srcdir)/__init__.install.py .
+	if test -e __init__.install.py && \
+	  test __init__.install.py -nt $(srcdir)/__init__.install.py; then \
+		cp $(srcdir)/__init__.install.py .; \
+	  fi
 
 # install __init__.install.py into pkglibdir, renaming it to __init__.py
 install-exec-local:
