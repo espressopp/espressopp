@@ -17,15 +17,18 @@ struct Fixture {
 	propertyPos = store.addProperty<float>(3);
 
 	for (size_t i = 0; i < 5; ++i) {
-	    size_t id = store.addParticle();
-	    generatedParticles.push_back(id);
-	    ParticleStorage::reference ref = store.getParticleByID(id);
+	    ParticleStorage::reference ref = store.addParticle();
+	    generatedParticles.push_back(store.getParticleID(ref));
 	}
     }
 
     ~Fixture() {
     }
 };
+
+void make_fixture() {
+    Fixture test;
+}
 
 //____________________________________________________________________________//
 
@@ -60,9 +63,9 @@ BOOST_FIXTURE_TEST_CASE(references_test, Fixture)
 /*
   Local Variables:
   compile-command: "g++ -Wall -static -g -I../.. \
-  -I/home/user/software/include/boost-1_36 \
-  -L/home/user/software/lib ParticleStorage.cpp \
+  -I/home/axel/software/include/boost-1_36 \
+  -L/home/axel/software/lib ParticleStorage.cpp \
   ../ParticleStorage.cpp ../../util/TupleVector.cpp -o partstore \
-  -lboost_unit_test_framework-gcc41-mt-1_36 && ./partstore"
+  -lboost_unit_test_framework-gcc42-mt-1_36 && ./partstore"
   End:
 */

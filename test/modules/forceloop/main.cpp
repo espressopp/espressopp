@@ -62,8 +62,7 @@ int main()
        real y = (j + r) / N * SIZE; 
        real z = (k + r) / N * SIZE;
 
-       ParticleStorage::reference ref =
-	   particleStorage.getParticleByID(particleStorage.addParticle());
+       ParticleStorage::reference ref = particleStorage.addParticle();
        ParticleStorage::PropertyTraits<real>::ArrayReference positionRef=
 	   particleStorage.getArrayProperty<real>(position);
        ParticleStorage::PropertyTraits<real>::ArrayReference forceRef=

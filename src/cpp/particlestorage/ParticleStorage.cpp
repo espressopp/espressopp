@@ -9,11 +9,11 @@ ParticleStorage::ParticleStorage(): uniqueID(0) {
     particleIDProperty = particles.addProperty<size_t>();
 }
 
-size_t ParticleStorage::addParticle() {
+ParticleStorage::reference ParticleStorage::addParticle() {
 
     util::TupleVector::iterator it = particles.insert(particles.end());
     particles.getProperty<size_t>(particleIDProperty)[*it] = ++uniqueID;
-    return uniqueID;
+    return *it;
 }
 
 class PredicateMatchParticleID: public std::unary_function<ParticleStorage::const_reference, bool> {
@@ -33,7 +33,7 @@ void ParticleStorage::deleteParticle(size_t deleteID) {
 	std::find_if(particles.begin(), particles.end(), PredicateMatchParticleID(*this, deleteID));
 
     if (pos == particles.end()) {
-	throw std::out_of_range("ParticleStorage::deleteParticle");
+	throw std::out_of_range("ParticleStorage::deleteParticle: particle does not exist");
     }
     particles.erase(pos);
 }
@@ -44,7 +44,7 @@ ParticleStorage::reference ParticleStorage::getParticleByID(size_t id) {
 	std::find_if(particles.begin(), particles.end(), PredicateMatchParticleID(*this, id));
 
     if (pos == particles.end()) {
-	throw std::out_of_range("ParticleStorage::deleteParticle");
+	throw std::out_of_range("ParticleStorage::getParticleByID: particle does not exist");
     }
     return *pos;
 }
