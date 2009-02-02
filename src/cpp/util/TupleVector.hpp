@@ -30,9 +30,6 @@ namespace util {
 
 	    /// constructor
 	    ReferenceBase(size_t _index): index(_index) {}
-	public:
-	    /// convert to index
-	    operator size_t() const { return index; }
 	};
 
 	/** an iterator over elements. This is basically a reference to
@@ -319,9 +316,9 @@ namespace util {
 
 	public:
 	    /// dereference
-	    T &operator[](reference n) { return data[n]; }
+	    T &operator[](reference n) { return data[n.index]; }
 	    /// dereference
-	    const T &operator[](const_reference n) const { return data[n]; }
+	    const T &operator[](const_reference n) const { return data[n.index]; }
 	};
 
 	/// see @ref TupleVector::PropertyReferenceBase
@@ -368,9 +365,9 @@ namespace util {
 
 	public:
 	    /// dereference
-	    T *operator[](reference n) { return data + n*dimension; }
+	    T *operator[](reference n) { return data + n.index*dimension; }
 	    /// dereference
-	    const T *operator[](const_reference n) const { return data + n*dimension; }
+	    const T *operator[](const_reference n) const { return data + n.index*dimension; }
 	};
 
 	/** see @ref TupleVector::ArrayPropertyReferenceBase

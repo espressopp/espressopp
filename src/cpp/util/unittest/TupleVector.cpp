@@ -254,9 +254,9 @@ BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
 /*
   Local Variables:
   compile-command: "g++ -Wall -static -g \
-  -I/home/user/software/include/boost-1_36 \
-  -L/home/user/software/lib TupleVector.cpp \
+  -I/home/axel/software/include/boost-1_36 \
+  -L/home/axel/software/lib TupleVector.cpp \
   ../TupleVector.cpp -o propvector \
-  -lboost_unit_test_framework-gcc41-mt-1_36 && ./propvector"
+  -lboost_unit_test_framework-gcc42-mt-1_36 && ./propvector"
   End:
 */
