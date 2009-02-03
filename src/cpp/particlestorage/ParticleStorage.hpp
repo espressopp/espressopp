@@ -48,14 +48,24 @@ namespace espresso {
 	    //@{
 
 	    /** add a particle
-		@return the ID of the added particle, basically just for deleting it again...
+		@return a temporary reference to the created particle. This reference only identifies
+		the particle as long as the ParticleStorage is not modified. For keeping a persistent
+		reference to the particle, use @ref getParticleID.
 	     */
-	    virtual size_t addParticle();
+	    virtual reference addParticle();
 
 	    /** delete a particle
 		@param id the id of the particle to delete
 	    */
 	    virtual void deleteParticle(size_t id);
+
+	    /** get the persistent ID of a particle
+		@param ref temporary reference to a particle
+		@return the persistent ID of the particle
+	     */
+	    size_t getParticleID(const_reference ref) const {
+		return getIDProperty()[ref];
+	    }
 
 	    /** get a reference to a particle using its ID. This is
 		potentially slow.

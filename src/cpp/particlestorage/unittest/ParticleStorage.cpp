@@ -26,12 +26,17 @@ struct Fixture {
     }
 };
 
-void make_fixture() {
-    Fixture test;
-}
-
 //____________________________________________________________________________//
 
+#ifdef __GNUC__
+__attribute__((noinline))
+#endif
+void put_particle(ParticleStorage::PropertyTraits<float>::ArrayReference ref,
+		  ParticleStorage::reference pref2) {
+    ref[pref2][0] = 0.4;
+    ref[pref2][1] = 0.5;
+    ref[pref2][2] = 0.6;
+}
 
 BOOST_FIXTURE_TEST_CASE(references_test, Fixture)
 {
@@ -41,9 +46,7 @@ BOOST_FIXTURE_TEST_CASE(references_test, Fixture)
     ParticleStorage::PropertyTraits<float>::ArrayReference
 	ref = store.getArrayProperty<float>(propertyPos);
 
-    ref[pref2][0] = 0.4;
-    ref[pref2][1] = 0.5;
-    ref[pref2][2] = 0.6;
+    put_particle(ref, pref2);
 
     BOOST_CHECK_CLOSE(ref[pref2][0], 0.4f, 1e-10f);
     BOOST_CHECK_CLOSE(ref[pref2][1], 0.5f, 1e-10f);
