@@ -1,31 +1,36 @@
-#include "timing.hpp"
+#include "Timer.hpp"
 
 #ifdef HAVE_SYS_RESOURCE_H
 
 #include <sys/resource.h>
 
 namespace util {
-    real userSecs() {
+    real UserTimer::getCurrentTime() const {
         struct rusage rus;
         getrusage(RUSAGE_SELF, &rus);
         return rus.ru_utime.tv_sec + 1.e-6*rus.ru_utime.tv_usec;
     }
 }
-
 #else
 
 namespace util {
     // we do not have getrusage
-    real userSecs() { return 0; }
+    real UserTimer::getCurrentTime() const { return 0; }
 }
 #endif
 
-#ifdef HAVE_SYS_TIME_H
+#ifdef HAVE_BOOST_MPI
+
+namespace util {
+    real WallTimer::getCurrentTime() const { return timer.elapsed(); }
+}
+
+#elif defined(HAVE_SYS_TIME_H)
 
 #include <sys/time.h>
 
 namespace util {
-    real wallSecs() {
+    real WallTimer::getCurrentTime() const {
         struct timeval tp;
         struct timezone tzp;
         gettimeofday (&tp, &tzp);
@@ -38,16 +43,14 @@ namespace util {
 #include <time.h>
 
 namespace util {
-    real wallSecs() {
-        return time(0);
-    }
+    real WallTimer::getCurrentTime() const { return time(0); }
 }
 
 #else
 
 namespace util {
     // we do not have gettimeofday
-    real wallSecs() { return 0; }
+    real WallTimer::getCurrentTime() const { return 0; }
 }
 
 #endif
