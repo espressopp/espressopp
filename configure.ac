@@ -32,6 +32,16 @@ AC_LANG([C++])
 
 AC_PROG_LIBTOOL
 
+cat <<EOF
+**********************************************************************
+*         Checking system header files                               *
+**********************************************************************
+EOF
+
+AC_CHECK_HEADERS(sys/time.h sys/resource.h)
+if test "$ac_cv_header_sys_time_h" != "yes"; then
+AC_CHECK_HEADER(time.h)
+fi
 
 cat <<EOF
 **********************************************************************
