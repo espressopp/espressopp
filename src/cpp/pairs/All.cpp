@@ -11,7 +11,7 @@ using namespace espresso::particlestorage;
 
 typedef ParticleStorage::PropertyTraits<size_t>::ConstReference SizeRef;
 
-typedef ParticleStorage::PropertyTraits<real>::ConstArrayReference RealArrayRef;
+typedef ParticleStorage::ArrayPropertyTraits<real,3>::ConstReference RealArrayRef;
 
 
 // Helper class 1
@@ -43,7 +43,7 @@ class Traverser1 : public util::VirtualUnaryFunction<Reference, void>  {
 
         bc(all->bc), 
         id(all->set.getStorage()->getIDProperty()),
-        pos(all->set.getStorage()->getArrayProperty<real>(all->coordinates)),
+        pos(all->set.getStorage()->getArrayProperty<real,3>(all->coordinates)),
         pref1(pref),
         pairComputer(_pairComputer)
 

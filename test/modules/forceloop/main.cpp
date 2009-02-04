@@ -63,10 +63,10 @@ int main()
        real z = (k + r) / N * SIZE;
 
        ParticleStorage::reference ref = particleStorage.addParticle();
-       ParticleStorage::PropertyTraits<real>::ArrayReference positionRef=
-	   particleStorage.getArrayProperty<real>(position);
-       ParticleStorage::PropertyTraits<real>::ArrayReference forceRef=
-	   particleStorage.getArrayProperty<real>(force);
+       ParticleStorage::ArrayPropertyTraits<real, 3>::Reference positionRef=
+	   particleStorage.getArrayProperty<real, 3>(position);
+       ParticleStorage::ArrayPropertyTraits<real, 3>::Reference forceRef=
+	   particleStorage.getArrayProperty<real, 3>(force);
 
        positionRef[ref][0] = x;
        positionRef[ref][1] = y;
@@ -116,7 +116,7 @@ int main()
   // force will be the vector of all forces in the particle storage
   // and force[ref] returns the force (as RealArrayRef) of particle reference ref
 
-  PairForceComputer::RealArrayRef forceRef = particleStorage.getArrayProperty<real>(force);
+  PairForceComputer::RealArrayRef forceRef = particleStorage.getArrayProperty<real, 3>(force);
 
   // Define a pair computer that computes the forces for particle pairs
   // ljint provides the routine computeForce for a particle pair

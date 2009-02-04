@@ -27,9 +27,19 @@ namespace espresso {
 	    struct PropertyTraits {
 		typedef util::TupleVector::PropertyReference<T> Reference;
 		typedef util::TupleVector::ConstPropertyReference<T> ConstReference;
-		typedef util::TupleVector::ArrayPropertyReference<T> ArrayReference;
-		typedef util::TupleVector::ConstArrayPropertyReference<T> ConstArrayReference;
-	    };
+            };
+             
+            template<typename T, size_t dimension>
+	    struct ArrayPropertyTraits {
+                typedef util::TupleVector::ArrayPropertyReference<T, dimension> Reference;
+                typedef util::TupleVector::ConstArrayPropertyReference<T, dimension> ConstReference;
+            };
+
+	    template<typename T>
+	    struct VarArrayPropertyTraits {
+		typedef util::TupleVector::VarArrayPropertyReference<T> Reference;
+		typedef util::TupleVector::ConstVarArrayPropertyReference<T> ConstReference;
+            };
 
 	private:
 	    util::TupleVector particles;
@@ -91,7 +101,9 @@ namespace espresso {
 	    /// @name access to particle properties
 	    //@{
 
-	    /// get a short lifetime reference to a property by its ID
+	    /** get a short lifetime reference to a property by its ID
+                @throw std::out_of_range if one tries to obtain a handle to the ID property
+            */
 	    template<typename T>
 	    typename PropertyTraits<T>::Reference getProperty(size_t id) {
 		// no non-const reference to the ID
@@ -105,18 +117,43 @@ namespace espresso {
 	    typename PropertyTraits<T>::ConstReference getProperty(size_t id) const {
 		return particles.getProperty<T>(id);
 	    }
-	    /// get a short lifetime reference to a property by its ID
-	    template<typename T>
-	    typename PropertyTraits<T>::ArrayReference getArrayProperty(size_t id) {
+
+	    /** get a short lifetime reference to a property by its ID
+                @throw std::out_of_range if one tries to obtain a handle to the ID property
+                @throw std::range_error if the given and array dimensions mismatch
+            */
+	    template<typename T, size_t dimension>
+	    typename ArrayPropertyTraits<T, dimension>::Reference getArrayProperty(size_t id) {
 		// no non-const reference to the ID
 		if (id == particleIDProperty) {
 		    throw std::out_of_range("id is not writable");
 		}
-		return particles.getArrayProperty<T>(id);
+		return particles.getArrayProperty<T, dimension>(id);
 	    }
-	    /// get a short lifetime reference to a property by its ID
+	    /** get a short lifetime reference to a property by its ID
+                @throw std::range_error if the given and array dimensions mismatch
+            */
+	    template<typename T, size_t dimension>
+	    typename ArrayPropertyTraits<T, dimension>::ConstReference getArrayProperty(size_t id) const {
+		return particles.getArrayProperty<T, dimension>(id);
+	    }
+
+	    /** get a short lifetime reference to a property by its ID
+                @throw std::out_of_range if one tries to obtain a handle to the ID property
+            */
 	    template<typename T>
-	    typename PropertyTraits<T>::ConstArrayReference getArrayProperty(size_t id) const {
+	    typename VarArrayPropertyTraits<T>::Reference getVarArrayProperty(size_t id) {
+		// no non-const reference to the ID
+		if (id == particleIDProperty) {
+		    throw std::out_of_range("id is not writable");
+		}
+		return particles.getVarArrayProperty<T>(id);
+	    }
+	    /** get a short lifetime reference to a property by its ID
+                @throw std::range_error if the given and array dimensions mismatch
+            */
+	    template<typename T>
+	    typename VarArrayPropertyTraits<T>::ConstReference getVarArrayProperty(size_t id) const {
 		return particles.getArrayProperty<T>(id);
 	    }
 

@@ -45,17 +45,17 @@ public:
     Real3D getForce(size_t i) {
         // HACK!
         Storage::reference ref = storage.getParticleByID(i + 1);
-        real *f = storage.getArrayProperty<real>(force)[ref];
+        real *f = storage.getArrayProperty<real,3>(force)[ref];
         return Real3D(f[0], f[1], f[2]);
     }
 };
 
 void TestEspresso::addParticle(const Real3D &pos) {
     Storage::reference ref = storage.addParticle();
-    Storage::PropertyTraits<real>::ArrayReference positionRef=
-        storage.getArrayProperty<real>(position);
-    Storage::PropertyTraits<real>::ArrayReference forceRef=
-        storage.getArrayProperty<real>(force);
+    Storage::ArrayPropertyTraits<real,3>::Reference positionRef=
+        storage.getArrayProperty<real,3>(position);
+    Storage::ArrayPropertyTraits<real,3>::Reference forceRef=
+        storage.getArrayProperty<real,3>(force);
 
     real *posR = positionRef[ref];
     posR[0] = pos.getX();
@@ -76,13 +76,13 @@ void TestEspresso::calculateForces() {
     ljint.setCutoff(2.5);
     ljint.setEpsilon(1.0);
     ljint.setSigma(1.0);
-    pairs::PairForceComputer forcecompute(storage.getArrayProperty<real>(force), ljint);
+    pairs::PairForceComputer forcecompute(storage.getArrayProperty<real,3>(force), ljint);
     allpairs.foreach(forcecompute);
 }
 
 class AverageComputer: public particlestorage::ParticleComputer {
 public:
-    typedef particlestorage::ParticleStorage::PropertyTraits<real>::ConstArrayReference Reference;
+    typedef particlestorage::ParticleStorage::ArrayPropertyTraits<real,3>::ConstReference Reference;
 
 private:
     Reference property;
@@ -93,15 +93,15 @@ public:
 
     virtual void operator()(particlestorage::ParticleStorage::reference ref) {
         const real *p = property[ref];
-        average += p[0]*p[1] + p[1]*p[1] + p[2]*p[2];
+        average += sqrt(p[0]*p[1] + p[1]*p[1] + p[2]*p[2]);
     }
 
-    real getAverage() { return sqrt(average); }
+    real getAverage() { return average; }
 };
 
 real TestEspresso::calculateAverage() {
     particleset::All allset(&storage);
-    AverageComputer avgcompute(storage.getArrayProperty<real>(force));
+    AverageComputer avgcompute(storage.getArrayProperty<real,3>(force));
     allset.foreach(avgcompute);
     return avgcompute.getAverage();
 }
@@ -181,9 +181,9 @@ real TestBasic::calculateAverage() {
     real average = 0;
     for (int i = 0; i < npart; ++i) {
         real *p = &(force[3*i]);
-        average += p[0]*p[1] + p[1]*p[1] + p[2]*p[2];
+        average += sqrt(p[0]*p[1] + p[1]*p[1] + p[2]*p[2]);
     }
-    return sqrt(average);
+    return average;
 }
 
 template<class Test>
@@ -228,7 +228,7 @@ int main()
     cout << "generate Basic: " << timer << endl;
 
     // calculate forces
-#if 0
+
     timer.reset();
     espresso.calculateForces();
     cout << "calc Espresso: " << timer << endl;
@@ -236,15 +236,19 @@ int main()
     timer.reset();
     basic.calculateForces();
     cout << "calc Basic: " << timer << endl;
-#endif
+
     // calculate average
 
     timer.reset();
-    real ave = espresso.calculateAverage();
+    real ave;
+    for (size_t cnt = 0; cnt < 10000; ++cnt)
+        ave = espresso.calculateAverage();
     cout << "average Espresso: " << timer << endl;
 
     timer.reset();
-    real avb = basic.calculateAverage();
+    real avb;
+    for (size_t cnt = 0; cnt < 10000; ++cnt)
+        avb = basic.calculateAverage();
     cout << "average Basic: " << timer << endl;
 
     // check consistency

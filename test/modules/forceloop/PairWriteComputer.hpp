@@ -8,7 +8,7 @@ namespace espresso {
    namespace pairs {
 
      typedef particlestorage::ParticleStorage::PropertyTraits<size_t>::ConstReference ConstSizeRef;
-     typedef particlestorage::ParticleStorage::PropertyTraits<real>::ConstArrayReference ConstRealArrayRef;
+     typedef particlestorage::ParticleStorage::ArrayPropertyTraits<real,3>::ConstReference ConstRealArrayRef;
 
      /** This class is used to print all particle pairs.
 
@@ -37,8 +37,8 @@ namespace espresso {
        PairWriteComputer(const espresso::particlestorage::ParticleStorage* particleStorage,
 	                 size_t position) :
 
-	  pos(particleStorage->getArrayProperty<real>(position)),
-          id(particleStorage->getIDProperty())
+         pos(particleStorage->getArrayProperty<real,3>(position)),
+         id(particleStorage->getIDProperty())
 
        {
        }

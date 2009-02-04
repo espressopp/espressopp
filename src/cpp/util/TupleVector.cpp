@@ -26,7 +26,7 @@ TupleVector::TupleVector(size_t newESize)
 
 TupleVector::TupleVector(const TupleVector &vec, size_type newESize)
     : eSize(0), maxESize(0), uniqueID(0),
-      granularity(defaultGranularity), shrinkThreshold(defaultShrinkThreshold)
+      granularity(vec.granularity), shrinkThreshold(vec.shrinkThreshold)
 {
     // set number of particles for allocation below
     resize(newESize);
@@ -85,8 +85,8 @@ void TupleVector::reserve(size_t minCapacity)
 	BOOST_FOREACH(Property &prop, property) {
 	    prop.data = realloc(prop.data, newCapacity*prop.size);
 	}
+        maxESize = newCapacity;
     }
-    maxESize = newCapacity;
 }
 
 void TupleVector::memmove(size_type dst, size_type src, size_type size)

@@ -16,6 +16,8 @@ struct Fixture {
     Fixture(): constMv(mv) {
 	intProp = mv.addProperty<int>();
 	floatProp = mv.addProperty<float>(3);
+        mv.setGranularity(8);
+        mv.setShrinkThreshold(32);
 	mv.resize(42);
     }
 
@@ -30,6 +32,8 @@ BOOST_FIXTURE_TEST_CASE(properties_resize_test, Fixture)
 {
     // check that empty vector is empty
     TupleVector mve;
+    mve.setGranularity(8);
+    mve.setShrinkThreshold(32);
     BOOST_CHECK(mve.size() == 0);
     BOOST_CHECK(mve.getNumProperties() == 0);
 
@@ -47,9 +51,9 @@ BOOST_FIXTURE_TEST_CASE(properties_resize_test, Fixture)
 
     // check resizing copy
     TupleVector mvc(mve, 42);
-    BOOST_CHECK(mvc.size() == 42);
-    BOOST_CHECK(mvc.capacity() == 48);
-    BOOST_CHECK(mvc.getNumProperties() == 1);
+    BOOST_CHECK_EQUAL(mvc.size(), size_t(42));
+    BOOST_CHECK_EQUAL(mvc.capacity(), size_t(48));
+    BOOST_CHECK_EQUAL(mvc.getNumProperties(), size_t(1));
 }
 
 BOOST_FIXTURE_TEST_CASE(particles_resize_test, Fixture)
@@ -116,16 +120,72 @@ BOOST_FIXTURE_TEST_CASE(dereference_array_test, Fixture)
 {
     ////// property references
     const TupleVector &constMv = mv;
-    TupleVector::ArrayPropertyReference<float> pRef =
-	mv.getArrayProperty<float>(floatProp);
-    TupleVector::ConstArrayPropertyReference<float> constPRef =
-	constMv.getArrayProperty<float>(floatProp);
+    TupleVector::ArrayPropertyReference<float, 3> pRef =
+	mv.getArrayProperty<float, 3>(floatProp);
+    TupleVector::ConstArrayPropertyReference<float, 3> constPRef =
+	constMv.getArrayProperty<float, 3>(floatProp);
+
+    BOOST_CHECK_THROW((constMv.getArrayProperty<float, 1>(floatProp)),
+                      std::range_error);
 
     // convert non-const -> const
-    { TupleVector::ConstArrayPropertyReference<float> constPRef2 = pRef; }
+    { TupleVector::ConstArrayPropertyReference<float, 3> constPRef2 = pRef; }
 
     // this does not compile, tries const -> non-const conversion
-    //TupleVector::ArrayPropertyReference<float> pRef2 = constMv.getArrayProperty<float>(0);
+    //TupleVector::ArrayPropertyReference<float, 3> pRef2 = constMv.getArrayProperty<float, 3>(floatProp);
+
+    ////// element references
+    TupleVector::reference ref = mv[0];
+    TupleVector::const_reference constRef = constMv[0];
+
+    // this does not compile, tries const -> non-const conversion
+    //TupleVector::reference ref2 = constMv[0];
+
+    BOOST_CHECK_THROW(TupleVector::reference ref2 = mv.at(42),
+		      std::out_of_range);
+
+    BOOST_CHECK_THROW(TupleVector::const_reference ref2 = constMv.at(43),
+		      std::out_of_range);
+
+    // to check that array elements do not overlap, create two adjacent elements
+    TupleVector::reference ref2 = mv[1];
+
+    pRef[ref][0] = 0.01;
+    pRef[ref][1] = 0.2;
+    pRef[ref][2] = 3.0;
+
+    pRef[ref2][0] = 0.04;
+    pRef[ref2][1] = 0.5;
+    pRef[ref2][2] = 6.0;
+
+    BOOST_CHECK_CLOSE(constPRef[constRef][0], 0.01f, 1e-10f);
+    BOOST_CHECK_CLOSE(          pRef[ref][1], 0.20f, 1e-10f);
+    BOOST_CHECK_CLOSE(     pRef[constRef][2], 3.00f, 1e-10f);
+
+    BOOST_CHECK_CLOSE(constPRef[ref2][0], 0.04f, 1e-10f);
+    BOOST_CHECK_CLOSE(constPRef[ref2][1], 0.50f, 1e-10f);
+    BOOST_CHECK_CLOSE(constPRef[ref2][2], 6.00f, 1e-10f);
+
+    // this does not compile, overriding const in various ways
+    //pRef[constRef][0] = 42;
+    //constPRef[ref][1] = 42;
+    //constPRef[constRef][2] = 42;
+}
+
+BOOST_FIXTURE_TEST_CASE(dereference_vararray_test, Fixture)
+{
+    ////// property references
+    const TupleVector &constMv = mv;
+    TupleVector::VarArrayPropertyReference<float> pRef =
+	mv.getVarArrayProperty<float>(floatProp);
+    TupleVector::ConstVarArrayPropertyReference<float> constPRef =
+	constMv.getVarArrayProperty<float>(floatProp);
+
+    // convert non-const -> const
+    { TupleVector::ConstVarArrayPropertyReference<float> constPRef2 = pRef; }
+
+    // this does not compile, tries const -> non-const conversion
+    //TupleVector::VarArrayPropertyReference<float> pRef2 = constMv.getVarArrayProperty<float>(floatProp);
 
     ////// element references
     TupleVector::reference ref = mv[0];
