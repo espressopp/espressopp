@@ -6,7 +6,7 @@
 
 using namespace util;
 
-static const int defaultGranularity = 8;
+static const int defaultGranularity = 1024/sizeof(int);
 static const int defaultShrinkThreshold = 4*defaultGranularity;
 
 TupleVector::~TupleVector()

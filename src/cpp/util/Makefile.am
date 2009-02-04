@@ -1,9 +1,11 @@
 subpkgincludedir=$(pkgincludedir)/util
 
 nobase_subpkginclude_HEADERS = \
-	TupleVector.hpp
+	TupleVector.hpp \
+	Timer.hpp
 
 noinst_LTLIBRARIES = libutil.la
 
 libutil_la_SOURCES = \
-	TupleVector.cpp
+	TupleVector.cpp \
+	Timer.cpp

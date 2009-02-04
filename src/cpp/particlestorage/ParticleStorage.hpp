@@ -145,6 +145,10 @@ namespace espresso {
 	    }
 
 	    //@}
+
+        private:
+            /// private and does not exist, do not try to use
+            ParticleStorage(const ParticleStorage &);
 	};
 
 	typedef util::VirtualUnaryFunction<ParticleStorage::reference, void> ParticleComputer;
