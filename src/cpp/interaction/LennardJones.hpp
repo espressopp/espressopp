@@ -51,9 +51,9 @@ namespace espresso {
                 return energy;
 	    }
 
-	    virtual Real3D computeForce (Real3D dist,
-					const const_reference p1,
-					const const_reference p2) const {
+	    virtual Real3D computeForce (const Real3D &dist,
+                                         const const_reference p1,
+                                         const const_reference p2) const {
                 Real3D f = 0.0;
 		real   frac2;
 		real   frac6;
@@ -64,8 +64,10 @@ namespace espresso {
 		    frac2 = sigma / distSqr;
 		    frac6 = frac2 * frac2 * frac2;
 		    real ffactor = 48.0 * epsilon * (frac6*frac6 - 0.5 * frac6) * frac2;
+
                     LOG4ESPP_DEBUG(theLogger, "computeForce, distSqr = " << distSqr <<
                                               ", ffactor = " << ffactor);
+
                     f = dist * ffactor;
 		} 
 

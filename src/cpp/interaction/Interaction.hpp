@@ -15,7 +15,7 @@ namespace espresso {
 	    virtual real computeEnergy(real distSqr, 
 				       const espresso::particleset::ParticleSet::const_reference p1,
 				       const espresso::particleset::ParticleSet::const_reference p2) const = 0;
- 	    virtual Real3D computeForce(Real3D dist, 
+ 	    virtual Real3D computeForce(const Real3D &dist, 
                                         const espresso::particleset::ParticleSet::const_reference p1,
 					const espresso::particleset::ParticleSet::const_reference p2) const = 0;
 	    virtual real getCutoff() const = 0;

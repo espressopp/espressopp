@@ -51,13 +51,14 @@ class Traverser1 : public util::VirtualUnaryFunction<Reference, void>  {
 
       virtual void operator()(const Reference pref2) {
    
-        Real3D pos1(pos[pref1][0], pos[pref1][1], pos[pref1][2]);
-        Real3D pos2(pos[pref2][0], pos[pref2][1], pos[pref2][2]);
-   
-        Real3D dist = bc.getDist(pos1, pos2);
-   
         if (id[pref1] < id[pref2]) {
-          pairComputer(dist, pref1, pref2);
+
+            Real3D pos1(pos[pref1][0], pos[pref1][1], pos[pref1][2]);
+            Real3D pos2(pos[pref2][0], pos[pref2][1], pos[pref2][2]);
+   
+            Real3D dist = bc.getDist(pos1, pos2);
+   
+            pairComputer(dist, pref1, pref2);
         }
       }
 

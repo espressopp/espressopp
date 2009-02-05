@@ -48,7 +48,7 @@ namespace espresso {
           \sa espresso::ParticlePairComputer::operator()
        */
 
-       virtual void operator()(const Real3D dist,
+       virtual void operator()(const Real3D &dist,
                                const espresso::particleset::ParticleSet::const_reference p1,
                                const espresso::particleset::ParticleSet::const_reference p2)
 

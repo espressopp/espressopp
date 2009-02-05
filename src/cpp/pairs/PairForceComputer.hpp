@@ -36,7 +36,7 @@ namespace espresso {
            pressure(0.0),
            interaction(_interaction) {}
     
-       virtual void operator()(const Real3D dist,
+       virtual void operator()(const Real3D &dist,
                                const espresso::particleset::ParticleSet::reference p1,
                                const espresso::particleset::ParticleSet::reference p2)
 

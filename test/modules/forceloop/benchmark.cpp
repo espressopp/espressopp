@@ -4,6 +4,8 @@
     ParticleStorage.
  */
 
+#define LOG4ESPP_LEVEL_WARN
+
 #include <iostream>
 #include <vector>
 
@@ -18,6 +20,13 @@
 
 using namespace std;
 using namespace espresso;
+
+#ifdef __GNUC__
+#define NOINLINE __attribute__((noinline))
+#else
+#define NOINLINE
+#endif
+
 
 /// number of particles in each dimension
 const int N = 20;
@@ -38,9 +47,9 @@ public:
 
     void addParticle(const Real3D &pos);
 
-    void calculateForces();
+    void calculateForces() NOINLINE;
 
-    real calculateAverage();
+    real calculateAverage() NOINLINE;
 
     Real3D getForce(size_t i) {
         // HACK!
@@ -50,7 +59,8 @@ public:
     }
 };
 
-void TestEspresso::addParticle(const Real3D &pos) {
+void TestEspresso::addParticle(const Real3D &pos)
+{
     Storage::reference ref = storage.addParticle();
     Storage::ArrayPropertyTraits<real,3>::Reference positionRef=
         storage.getArrayProperty<real,3>(position);
@@ -118,9 +128,9 @@ public:
 
     void addParticle(const Real3D &pos);
 
-    void calculateForces();
+    void calculateForces() NOINLINE;
 
-    real calculateAverage();
+    real calculateAverage() NOINLINE;
 
     Real3D getForce(size_t i) {
         return Real3D(

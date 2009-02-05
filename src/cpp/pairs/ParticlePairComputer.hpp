@@ -34,7 +34,7 @@ namespace espresso {
                 needed than only the distance.
 	    */
 
-	    virtual void operator()(const Real3D dist, 
+	    virtual void operator()(const Real3D &dist, 
 				    const ParticleReference p1, 
 				    const ParticleReference p2) = 0;
         };
