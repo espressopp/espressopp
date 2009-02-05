@@ -12,6 +12,9 @@
 #include "ParticleWriter.hpp"
 #include "PairWriteComputer.hpp"
 
+#include "integrator/md/velocity_verlet/Velocity_Verlet_A.hpp"
+#include "integrator/md/velocity_verlet/Velocity_Verlet_B.hpp"
+
 #include <cstdio>
 #include <vector>
 
@@ -22,6 +25,7 @@ using namespace espresso::pairs;
 using namespace espresso::particleset;
 using namespace espresso::particlestorage;
 using namespace espresso::interaction;
+using namespace espresso::integrator;
 
 /** N stands for number particles in each dimensions.
 */
@@ -48,6 +52,7 @@ int main()
 
   ParticleStorage particleStorage;
   size_t position = particleStorage.addProperty<real>(3);
+  size_t velocity = particleStorage.addProperty<real>(3);
   size_t force = particleStorage.addProperty<real>(3);
 
   // generate particles in the particle storage
@@ -65,12 +70,18 @@ int main()
        ParticleStorage::reference ref = particleStorage.addParticle();
        ParticleStorage::ArrayPropertyTraits<real, 3>::Reference positionRef=
 	   particleStorage.getArrayProperty<real, 3>(position);
+       ParticleStorage::ArrayPropertyTraits<real, 3>::Reference velocityRef=
+           particleStorage.getArrayProperty<real, 3>(velocity);
        ParticleStorage::ArrayPropertyTraits<real, 3>::Reference forceRef=
 	   particleStorage.getArrayProperty<real, 3>(force);
 
        positionRef[ref][0] = x;
        positionRef[ref][1] = y;
        positionRef[ref][2] = z;
+
+       velocityRef[ref][0] = x;
+       velocityRef[ref][1] = y;
+       velocityRef[ref][2] = z;
 
        forceRef[ref][0] = 0.0;
        forceRef[ref][1] = 0.0;
@@ -132,4 +143,29 @@ int main()
 
   particleStorage.foreach(pWriter);
 
+  // create references to do an integration step
+
+  ParticleStorage::ArrayPropertyTraits<real, 3>::Reference rRef=
+      particleStorage.getArrayProperty<real, 3>(position);
+  ParticleStorage::ArrayPropertyTraits<real, 3>::Reference vRef=
+      particleStorage.getArrayProperty<real, 3>(velocity);
+  ParticleStorage::ArrayPropertyTraits<real, 3>::Reference fRef=
+      particleStorage.getArrayProperty<real, 3>(force);
+
+  // create vvA to update positions and half update of velocities
+
+  Velocity_Verlet_A vvA(rRef, vRef, fRef);
+  vvA.set_time_step(0.1);
+  particleStorage.foreach(vvA);
+
+  // need to zero forces and then recompute
+
+  // create vvB to complete the velocity update
+
+  Velocity_Verlet_B vvB(vRef, fRef);
+  particleStorage.foreach(vvB);
+
+  // check to see that particles have new positions
+
+  particleStorage.foreach(pWriter);
 }
