@@ -4,6 +4,7 @@
 #include <vector>
 #include <stdexcept>
 #include <boost/iterator/iterator_facade.hpp>
+#include <boost/foreach.hpp>
 #include <functional>
 
 namespace util {
@@ -584,4 +585,12 @@ namespace util {
 	};
     };
 }
+
+/** Teach boost foreach that TupleVector is not copyable.
+    This function has to be at global scope.
+*/
+inline boost::mpl::true_ *
+boost_foreach_is_noncopyable(util::TupleVector *&, boost::foreach::tag)
+{ return 0; }
+
 #endif
