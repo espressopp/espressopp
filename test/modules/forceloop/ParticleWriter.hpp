@@ -14,9 +14,9 @@ namespace espresso {
 
    private:
 
-     ParticleStorage::ArrayPropertyTraits<real,3>::ConstReference
+     ParticleStorage::PropertyTraits<Real3D>::ConstReference
         f;    //<! reference to the force vector of all particles.
-     ParticleStorage::ArrayPropertyTraits<real,3>::ConstReference
+     ParticleStorage::PropertyTraits<Real3D>::ConstReference
         pos;  //<! reference to the position vector of all particles.
      ParticleStorage::PropertyTraits<size_t>::ConstReference
         id;   //<! reference to the identification vector of all particles.
@@ -31,8 +31,8 @@ namespace espresso {
 
     ParticleWriter(const ParticleStorage &particleStorage, size_t position, size_t force) :
 
-      f(particleStorage.getArrayProperty<real,3>(force)), 
-      pos(particleStorage.getArrayProperty<real,3>(position)),
+      f(particleStorage.getProperty<Real3D>(force)), 
+      pos(particleStorage.getProperty<Real3D>(position)),
       id(particleStorage.getIDProperty())
 
     {
@@ -48,8 +48,8 @@ namespace espresso {
 
       printf("Particle : id = %d, pos = (%f,%f,%f), f = (%f,%f,%f)\n",
  
-        id[pref], pos[pref][0], pos[pref][1], pos[pref][2], 
-                  f[pref][0],  f[pref][1], f[pref][2]);
+             id[pref], pos[pref].getX(), pos[pref].getY(), pos[pref].getZ(), 
+             f[pref].getX(),  f[pref].getY(),  f[pref].getZ());
     }
 
    };

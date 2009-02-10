@@ -14,7 +14,7 @@ namespace espresso {
 
      public:
 
-       typedef particlestorage::ParticleStorage::ArrayPropertyTraits<real, 3>::Reference RealArrayRef;
+       typedef particlestorage::ParticleStorage::PropertyTraits<Real3D>::Reference RealArrayRef;
 
      private: 
 
@@ -43,10 +43,8 @@ namespace espresso {
        {
          Real3D f = interaction.computeForce(dist, p1, p2);
 
-         // TODO: make real* look like Real3D
-
-         f.addTo(force[p1]);   // force[p1] += f
-         f.subFrom(force[p2]); // force[p2] -= f
+         force[p1] += f;
+         force[p2] -= f;
 
          if (computesPressure) pressure = pressure + f * dist;
        }

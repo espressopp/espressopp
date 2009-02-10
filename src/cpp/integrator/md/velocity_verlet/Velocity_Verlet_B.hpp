@@ -13,7 +13,7 @@ namespace espresso {
 
     class Velocity_Verlet_B: public md, public ParticleComputer {
     private:
-      typedef espresso::particlestorage::ParticleStorage::ArrayPropertyTraits<real, 3>::Reference RealArrayRef;
+      typedef espresso::particlestorage::ParticleStorage::PropertyTraits<Real3D>::Reference RealArrayRef;
       RealArrayRef vel;
       RealArrayRef force;
     public:
@@ -21,9 +21,7 @@ namespace espresso {
 
       //m=1
       virtual void operator()(ParticleStorage::reference pref) {
-        vel[pref][0] = vel[pref][0] + 0.5 * force[pref][0] * get_time_step();
-        vel[pref][1] = vel[pref][1] + 0.5 * force[pref][1] * get_time_step();
-        vel[pref][2] = vel[pref][2] + 0.5 * force[pref][2] * get_time_step();
+        vel[pref] = vel[pref] + 0.5 * force[pref] * get_time_step();
       }
    };
 

@@ -8,7 +8,7 @@ namespace espresso {
    namespace pairs {
 
      typedef particlestorage::ParticleStorage::PropertyTraits<size_t>::ConstReference ConstSizeRef;
-     typedef particlestorage::ParticleStorage::ArrayPropertyTraits<real,3>::ConstReference ConstRealArrayRef;
+     typedef particlestorage::ParticleStorage::PropertyTraits<Real3D>::ConstReference ConstRealArrayRef;
 
      /** This class is used to print all particle pairs.
 
@@ -37,7 +37,7 @@ namespace espresso {
        PairWriteComputer(const espresso::particlestorage::ParticleStorage* particleStorage,
 	                 size_t position) :
 
-         pos(particleStorage->getArrayProperty<real,3>(position)),
+         pos(particleStorage->getProperty<Real3D>(position)),
          id(particleStorage->getIDProperty())
 
        {
@@ -55,10 +55,10 @@ namespace espresso {
        {
           printf("Pair: id = (%d,%d) , pos1 = (%f,%f,%f), pos2 = (%f,%f,%f), dist = (%f, %f, %f)\n",
 
-               id[p1], id[p2], 
-               pos[p1][0], pos[p1][1], pos[p1][2],
-               pos[p2][0], pos[p2][1], pos[p2][2],
-               dist.getX(), dist.getY(), dist.getZ());
+                 id[p1], id[p2],
+                 pos[p1].getX(), pos[p1].getY(), pos[p1].getZ(),
+                 pos[p2].getX(), pos[p2].getY(), pos[p2].getZ(),
+                 dist.getX(), dist.getY(), dist.getZ());
        }
      };
   }

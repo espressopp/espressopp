@@ -41,8 +41,8 @@ public:
     size_t npart;
 
     TestEspresso(size_t nparticles): npart(nparticles) {
-        position = storage.addProperty<real>(3);
-        force = storage.addProperty<real>(3);
+        position = storage.addProperty<Real3D>();
+        force = storage.addProperty<Real3D>();
     }
 
     void addParticle(const Real3D &pos);
@@ -54,28 +54,18 @@ public:
     Real3D getForce(size_t i) {
         // HACK!
         Storage::reference ref = storage.getParticleByID(i + 1);
-        real *f = storage.getArrayProperty<real,3>(force)[ref];
-        return Real3D(f[0], f[1], f[2]);
+        return storage.getProperty<Real3D>(force)[ref];
     }
 };
 
 void TestEspresso::addParticle(const Real3D &pos)
 {
     Storage::reference ref = storage.addParticle();
-    Storage::ArrayPropertyTraits<real,3>::Reference positionRef=
-        storage.getArrayProperty<real,3>(position);
-    Storage::ArrayPropertyTraits<real,3>::Reference forceRef=
-        storage.getArrayProperty<real,3>(force);
+    Storage::PropertyTraits<Real3D>::Reference positionRef = storage.getProperty<Real3D>(position);
+    Storage::PropertyTraits<Real3D>::Reference forceRef    = storage.getProperty<Real3D>(force);
 
-    real *posR = positionRef[ref];
-    posR[0] = pos.getX();
-    posR[1] = pos.getY();
-    posR[2] = pos.getZ();
-
-    real *forceR = forceRef[ref];
-    forceR[0] = 0.0;
-    forceR[1] = 0.0;
-    forceR[2] = 0.0;
+    positionRef[ref] = pos;
+    forceRef[ref] = 0.0;
 }
 
 void TestEspresso::calculateForces() {
@@ -86,13 +76,13 @@ void TestEspresso::calculateForces() {
     ljint.setCutoff(2.5);
     ljint.setEpsilon(1.0);
     ljint.setSigma(1.0);
-    pairs::PairForceComputer forcecompute(storage.getArrayProperty<real,3>(force), ljint);
+    pairs::PairForceComputer forcecompute(storage.getProperty<Real3D>(force), ljint);
     allpairs.foreach(forcecompute);
 }
 
 class AverageComputer: public particlestorage::ParticleComputer {
 public:
-    typedef particlestorage::ParticleStorage::ArrayPropertyTraits<real,3>::ConstReference Reference;
+    typedef particlestorage::ParticleStorage::PropertyTraits<Real3D>::ConstReference Reference;
 
 private:
     Reference property;
@@ -102,8 +92,8 @@ public:
     AverageComputer(const Reference &_property): average(0), property(_property) {}
 
     virtual void operator()(particlestorage::ParticleStorage::reference ref) {
-        const real *p = property[ref];
-        average += sqrt(p[0]*p[1] + p[1]*p[1] + p[2]*p[2]);
+        const Real3D p = property[ref];
+        average += sqrt(p.sqr());
     }
 
     real getAverage() { return average; }
@@ -111,19 +101,19 @@ public:
 
 real TestEspresso::calculateAverage() {
     particleset::All allset(&storage);
-    AverageComputer avgcompute(storage.getArrayProperty<real,3>(force));
+    AverageComputer avgcompute(storage.getProperty<Real3D>(force));
     allset.foreach(avgcompute);
     return avgcompute.getAverage();
 }
 
 class TestBasic {
 public:
-    vector<real> position, force;
+    vector<Real3D> position, force;
     size_t npart;
 
     TestBasic(size_t nparticles): npart(nparticles) {
-        position.reserve(3*nparticles);
-        force.reserve(3*nparticles);
+        position.reserve(nparticles);
+        force.reserve(nparticles);
     }
 
     void addParticle(const Real3D &pos);
@@ -133,20 +123,12 @@ public:
     real calculateAverage() NOINLINE;
 
     Real3D getForce(size_t i) {
-        return Real3D(
-            force[3*i],
-            force[3*i + 1],
-            force[3*i + 2]);
+        return force[i];
     }
 };
 
 void TestBasic::addParticle(const Real3D &pos) {
-    position.push_back(pos.getX());
-    position.push_back(pos.getY());
-    position.push_back(pos.getZ());
-
-    force.push_back(0.0);
-    force.push_back(0.0);
+    position.push_back(pos);
     force.push_back(0.0);
 }
 
@@ -158,8 +140,8 @@ void TestBasic::calculateForces() {
     bc::PBC pbc(size);
     for (int i = 0; i < npart; ++i) {
         for (int j = i+1; j < npart; ++j) {
-            Real3D pos1(position[3*i], position[3*i + 1], position[3*i + 2]);
-            Real3D pos2(position[3*j], position[3*j + 1], position[3*j + 2]);
+            Real3D pos1 = position[i];
+            Real3D pos2 = position[j];
             Real3D dist = pbc.getDist(pos1, pos2);
 
             Real3D f(0.0, 0.0, 0.0);
@@ -175,14 +157,8 @@ void TestBasic::calculateForces() {
                     f = dist * ffactor;
                 } 
             }
-            
-            force[3*i] += f.getX();
-            force[3*i + 1] += f.getY();
-            force[3*i + 2] += f.getZ();
-
-            force[3*j] -= f.getX();
-            force[3*j + 1] -= f.getY();
-            force[3*j + 2] -= f.getZ();
+            force[i] += f;
+            force[j] -= f;
         }
     }
 }
@@ -190,8 +166,8 @@ void TestBasic::calculateForces() {
 real TestBasic::calculateAverage() {
     real average = 0;
     for (int i = 0; i < npart; ++i) {
-        real *p = &(force[3*i]);
-        average += sqrt(p[0]*p[1] + p[1]*p[1] + p[2]*p[2]);
+        Real3D p = force[i];
+        average += sqrt(p.sqr());
     }
     return average;
 }

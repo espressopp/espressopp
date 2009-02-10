@@ -309,7 +309,7 @@ namespace util {
 	    /// dereference
 	    const T &operator[](const_reference n) const { return data[n.index]; }
 	};
-
+#if 0
 	/** reference to an array property. In contrast to
 	    @ref TupleVector::PropertyReference, this returns a pointer, since
 	    the element itself is in fact an array of constant size.
@@ -335,6 +335,7 @@ namespace util {
 	    /// dereference
 	    const T *operator[](const_reference n) const { return data + n.index*dimension; }
 	};
+#endif
 
 	/** reference to an array property. In contrast to
 	    @ref TupleVector::PropertyReference, this returns a pointer, since
@@ -342,7 +343,7 @@ namespace util {
 	    is only known at runtime.
 	*/
 	template<class T, class Property>
-	class VarArrayPropertyReferenceBase {
+	class ArrayPropertyReferenceBase {
 	protected:
 	    /// data short cut from property
 	    T *data;
@@ -350,11 +351,11 @@ namespace util {
 	    int dimension;
 
 	    /// constructor
-	    VarArrayPropertyReferenceBase(Property &_property)
+	    ArrayPropertyReferenceBase(Property &_property)
 		: data(static_cast<T *>(_property.data)),
 		  dimension(_property.dimension) {};
 	    /// constructor
-	    VarArrayPropertyReferenceBase(T *_data, size_t _dimension)
+	    ArrayPropertyReferenceBase(T *_data, size_t _dimension)
 		: data(_data), dimension(_dimension) {};
 
 	public:
@@ -389,44 +390,14 @@ namespace util {
 	    @tparam T the data type of the property (or more precisely,
 	    the datatype to interpret the property as)
 	*/
-	template<class T, size_t dimension>
-	class ArrayPropertyReference: public ArrayPropertyReferenceBase<T, dimension, Property> {
-	    friend class TupleVector;
-
-	    ArrayPropertyReference(Property &_property)
-		: ArrayPropertyReferenceBase<T, dimension, Property>(_property) {};
-	};
-
-	/** see @ref TupleVector::ArrayPropertyReferenceBase;
-	    this is for a constant property
-	    @tparam T the data type of the property (or more precisely,
-	    the datatype to interpret the property as)
-	*/
-	template<class T, size_t dimension>
-	class ConstArrayPropertyReference
-	    : public ArrayPropertyReferenceBase<const T, dimension, const Property> {
-	    friend class TupleVector;
-
-	    ConstArrayPropertyReference(const Property &_property)
-		: ArrayPropertyReferenceBase<const T, dimension, const Property>(_property) {};
-	public:
-	    /// non-const->const conversion
-	    ConstArrayPropertyReference(const ArrayPropertyReference<T, dimension> &_ref)
-		: ArrayPropertyReferenceBase<const T, dimension, const Property>(_ref.data) {}
-	};
-
-	/** see @ref TupleVector::ArrayPropertyReferenceBase
-	    @tparam T the data type of the property (or more precisely,
-	    the datatype to interpret the property as)
-	*/
 	template<class T>
-	class VarArrayPropertyReference
-            : public VarArrayPropertyReferenceBase<T, Property>
+	class ArrayPropertyReference
+            : public ArrayPropertyReferenceBase<T, Property>
         {
 	    friend class TupleVector;
             
-	    VarArrayPropertyReference(Property &_property)
-		: VarArrayPropertyReferenceBase<T, Property>(_property) {};
+	    ArrayPropertyReference(Property &_property)
+		: ArrayPropertyReferenceBase<T, Property>(_property) {};
 	};
 
 	/** see @ref TupleVector::ArrayPropertyReferenceBase;
@@ -435,17 +406,17 @@ namespace util {
 	    the datatype to interpret the property as)
 	*/
 	template<class T>
-	class ConstVarArrayPropertyReference
-	    : public VarArrayPropertyReferenceBase<const T, const Property>
+	class ConstArrayPropertyReference
+	    : public ArrayPropertyReferenceBase<const T, const Property>
         {
 	    friend class TupleVector;
 
-	    ConstVarArrayPropertyReference(const Property &_property)
-		: VarArrayPropertyReferenceBase<const T, const Property>(_property) {};
+	    ConstArrayPropertyReference(const Property &_property)
+		: ArrayPropertyReferenceBase<const T, const Property>(_property) {};
 	public:
 	    /// non-const->const conversion
-	    ConstVarArrayPropertyReference(const VarArrayPropertyReference<T> &_ref)
-		: VarArrayPropertyReferenceBase<const T, const Property>(_ref.data, _ref.dimension) {}
+	    ConstArrayPropertyReference(const ArrayPropertyReference<T> &_ref)
+		: ArrayPropertyReferenceBase<const T, const Property>(_ref.data, _ref.dimension) {}
 	};
 
 	/** add a property
@@ -480,31 +451,14 @@ namespace util {
 	ConstPropertyReference<T> getProperty(size_t n) const {
 	    return ConstPropertyReference<T>(getPropertyData(n));
 	}
-  
-	/** get an array property
-	    @param n ID of the property
-	    @tparam T type of the property
-	*/
-	template<class T, size_t dimension>
-	ArrayPropertyReference<T, dimension> getArrayProperty(size_t n) {
-            const Property &prop = getPropertyData(n);
-            if (prop.dimension != dimension) {
-                throw std::range_error("getArrayProperty: property size mismatch");
-            }
-	    return ArrayPropertyReference<T, dimension>(const_cast<Property &>(prop));
-	}
 
 	/** get an array property
 	    @param n ID of the property
 	    @tparam T type of the property
 	*/
-	template<class T, size_t dimension>
-	ConstArrayPropertyReference<T, dimension> getArrayProperty(size_t n) const {
-            const Property &prop = getPropertyData(n);
-            if (prop.dimension != dimension) {
-                throw std::range_error("getArrayProperty: property size mismatch");
-            }
-	    return ConstArrayPropertyReference<T, dimension>(prop);
+	template<class T>
+	ArrayPropertyReference<T> getArrayProperty(size_t n) {
+	    return ArrayPropertyReference<T>(const_cast<Property &>(getPropertyData(n)));
 	}
 
 	/** get an array property
@@ -512,17 +466,8 @@ namespace util {
 	    @tparam T type of the property
 	*/
 	template<class T>
-	VarArrayPropertyReference<T> getVarArrayProperty(size_t n) {
-	    return VarArrayPropertyReference<T>(const_cast<Property &>(getPropertyData(n)));
-	}
-
-	/** get an array property
-	    @param n ID of the property
-	    @tparam T type of the property
-	*/
-	template<class T>
-	ConstVarArrayPropertyReference<T> getVarArrayProperty(size_t n) const {
-	    return ConstVarArrayPropertyReference<T>(getPropertyData(n));
+	ConstArrayPropertyReference<T> getArrayProperty(size_t n) const {
+	    return ConstArrayPropertyReference<T>(getPropertyData(n));
 	}
 
 	/// get number of properties

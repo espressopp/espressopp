@@ -51,9 +51,9 @@ int main()
   // Create a new particle storage
 
   ParticleStorage particleStorage;
-  size_t position = particleStorage.addProperty<real>(3);
-  size_t velocity = particleStorage.addProperty<real>(3);
-  size_t force = particleStorage.addProperty<real>(3);
+  size_t position = particleStorage.addProperty<Real3D>();
+  size_t velocity = particleStorage.addProperty<Real3D>();
+  size_t force = particleStorage.addProperty<Real3D>();
 
   // generate particles in the particle storage
 
@@ -68,24 +68,13 @@ int main()
        real z = (k + r) / N * SIZE;
 
        ParticleStorage::reference ref = particleStorage.addParticle();
-       ParticleStorage::ArrayPropertyTraits<real, 3>::Reference positionRef=
-	   particleStorage.getArrayProperty<real, 3>(position);
-       ParticleStorage::ArrayPropertyTraits<real, 3>::Reference velocityRef=
-           particleStorage.getArrayProperty<real, 3>(velocity);
-       ParticleStorage::ArrayPropertyTraits<real, 3>::Reference forceRef=
-	   particleStorage.getArrayProperty<real, 3>(force);
+       ParticleStorage::PropertyTraits<Real3D>::Reference positionRef = particleStorage.getProperty<Real3D>(position);
+       ParticleStorage::PropertyTraits<Real3D>::Reference velocityRef = particleStorage.getProperty<Real3D>(velocity);
+       ParticleStorage::PropertyTraits<Real3D>::Reference forceRef    = particleStorage.getProperty<Real3D>(force);
 
-       positionRef[ref][0] = x;
-       positionRef[ref][1] = y;
-       positionRef[ref][2] = z;
-
-       velocityRef[ref][0] = x;
-       velocityRef[ref][1] = y;
-       velocityRef[ref][2] = z;
-
-       forceRef[ref][0] = 0.0;
-       forceRef[ref][1] = 0.0;
-       forceRef[ref][2] = 0.0;
+       positionRef[ref] = Real3D(x, y, z);
+       velocityRef[ref] = Real3D(x, y, z);
+       forceRef[ref] = 0.0;
   }
 
   // For test only: ParticleWriter prints each particle
@@ -127,7 +116,7 @@ int main()
   // force will be the vector of all forces in the particle storage
   // and force[ref] returns the force (as RealArrayRef) of particle reference ref
 
-  PairForceComputer::RealArrayRef forceRef = particleStorage.getArrayProperty<real, 3>(force);
+  PairForceComputer::RealArrayRef forceRef = particleStorage.getProperty<Real3D>(force);
 
   // Define a pair computer that computes the forces for particle pairs
   // ljint provides the routine computeForce for a particle pair
@@ -145,12 +134,9 @@ int main()
 
   // create references to do an integration step
 
-  ParticleStorage::ArrayPropertyTraits<real, 3>::Reference rRef=
-      particleStorage.getArrayProperty<real, 3>(position);
-  ParticleStorage::ArrayPropertyTraits<real, 3>::Reference vRef=
-      particleStorage.getArrayProperty<real, 3>(velocity);
-  ParticleStorage::ArrayPropertyTraits<real, 3>::Reference fRef=
-      particleStorage.getArrayProperty<real, 3>(force);
+  ParticleStorage::PropertyTraits<Real3D>::Reference rRef = particleStorage.getProperty<Real3D>(position);
+  ParticleStorage::PropertyTraits<Real3D>::Reference vRef = particleStorage.getProperty<Real3D>(velocity);
+  ParticleStorage::PropertyTraits<Real3D>::Reference fRef = particleStorage.getProperty<Real3D>(force);
 
   // create vvA to update positions and half update of velocities
 
