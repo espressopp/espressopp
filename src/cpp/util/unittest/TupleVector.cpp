@@ -93,6 +93,9 @@ BOOST_FIXTURE_TEST_CASE(dereference_scalar_test, Fixture)
     TupleVector::reference ref = mv[0];
     TupleVector::const_reference constRef = constMv[0];
 
+    // this does not compile, reassigning a non-trivial reference
+    // ref = ref;
+
     // convert non-const -> const
     { TupleVector::const_reference constRef = mv[0]; }
 

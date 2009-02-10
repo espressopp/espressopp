@@ -73,6 +73,10 @@ namespace util {
 	    friend class TupleVector;
 	    /// index of the referenced particle
 	    size_t index;
+
+            /// not possible
+            void operator=(const const_reference &);
+
         protected:
 	    /// constructable only through @ref TupleVector
 	    const_reference(size_type _index): index(_index) {}
@@ -87,6 +91,8 @@ namespace util {
 	*/
 	class reference: public const_reference {
 	    friend class TupleVector;
+            /// not possible
+            void operator=(const reference &);
 	    /// constructable only through @ref TupleVector
 	    reference(size_type _index): const_reference(_index) {}
 	};
@@ -292,6 +298,9 @@ namespace util {
 	*/
 	template<class T, class Property>
 	class PropertyReferenceBase {
+            /// not possible
+            void operator=(const PropertyReferenceBase &);
+
 	protected:
 	    /// data shortcut, already type-casted
 	    T *data;
@@ -309,33 +318,6 @@ namespace util {
 	    /// dereference
 	    const T &operator[](const_reference n) const { return data[n.index]; }
 	};
-#if 0
-	/** reference to an array property. In contrast to
-	    @ref TupleVector::PropertyReference, this returns a pointer, since
-	    the element itself is in fact an array of constant size.
-
-            @tparam T class of the data type this reference
-            @tparam dimension number of values of type T per element
-	*/
-	template<class T, size_t dimension, class Property>
-	class ArrayPropertyReferenceBase {
-	protected:
-	    /// data short cut from property
-	    T *data;
-
-	    /// constructor
-	    ArrayPropertyReferenceBase(Property &_property)
-		: data(static_cast<T *>(_property.data)) {};
-	    /// constructor
-	    ArrayPropertyReferenceBase(T *_data): data(_data) {};
-
-	public:
-	    /// dereference
-	    T *operator[](reference n) const { return data + n.index*dimension; }
-	    /// dereference
-	    const T *operator[](const_reference n) const { return data + n.index*dimension; }
-	};
-#endif
 
 	/** reference to an array property. In contrast to
 	    @ref TupleVector::PropertyReference, this returns a pointer, since
@@ -344,6 +326,9 @@ namespace util {
 	*/
 	template<class T, class Property>
 	class ArrayPropertyReferenceBase {
+            /// not possible
+            void operator=(const ArrayPropertyReferenceBase &);
+
 	protected:
 	    /// data short cut from property
 	    T *data;
@@ -369,6 +354,10 @@ namespace util {
 	template<class T>
 	class PropertyReference: public PropertyReferenceBase<T, Property> {
 	    friend class TupleVector;
+
+            /// not possible
+            void operator=(const PropertyReference &);
+
 	    PropertyReference(Property &_property)
 		: PropertyReferenceBase<T, Property>(_property) {};
 	};
@@ -378,6 +367,10 @@ namespace util {
 	class ConstPropertyReference
 	    : public PropertyReferenceBase<const T, const Property> {
 	    friend class TupleVector;
+
+            /// not possible
+            void operator=(const ConstPropertyReference &);
+
 	    ConstPropertyReference(const Property &_property)
 		: PropertyReferenceBase<const T, const Property>(_property) {};
 	public:
@@ -396,6 +389,9 @@ namespace util {
         {
 	    friend class TupleVector;
             
+            /// not possible
+            void operator=(const ArrayPropertyReference &);
+
 	    ArrayPropertyReference(Property &_property)
 		: ArrayPropertyReferenceBase<T, Property>(_property) {};
 	};
@@ -410,6 +406,9 @@ namespace util {
 	    : public ArrayPropertyReferenceBase<const T, const Property>
         {
 	    friend class TupleVector;
+
+            /// not possible
+            void operator=(const ConstArrayPropertyReference &);
 
 	    ConstArrayPropertyReference(const Property &_property)
 		: ArrayPropertyReferenceBase<const T, const Property>(_property) {};
