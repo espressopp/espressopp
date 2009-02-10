@@ -17,22 +17,6 @@ namespace util {
     */
     class TupleVector {
     public:
-	/** a reference to an element, which then can be used to read and
-	    write properties of the element using TupleVector::PropertyReference.
-	
-	    Actually, this is nothing but the index of the element. A
-	    reference can only be obtained from element access to the
-	    TupleVector class or its iterators.
-	*/
-	class ReferenceBase {
-	protected:
-	    /// index of the reference particle
-	    size_t index;
-
-	    /// constructor
-	    ReferenceBase(size_t _index): index(_index) {}
-	};
-
 	/** an iterator over elements. This is basically a reference to
 	    an element with a mutable index
 
@@ -84,23 +68,27 @@ namespace util {
 	///
 	typedef ptrdiff_t difference_type;
   
-	/** see @ref TupleVector::ReferenceBase; this class marks the referenced
-	    element as non-const */
-	class reference: public ReferenceBase {
+	/// see @ref reference; this class marks the referenced element as const
+	class const_reference {
 	    friend class TupleVector;
+	    /// index of the referenced particle
+	    size_t index;
+        protected:
 	    /// constructable only through @ref TupleVector
-	    reference(size_type _index): ReferenceBase(_index) {}
+	    const_reference(size_type _index): index(_index) {}
 	};
 
-	/** see @ref TupleVector::ReferenceBase; this class marks the referenced
-	    element as const */
-	class const_reference: public ReferenceBase {
+	/** a reference to an element, which then can be used to read and
+	    write properties of the element using TupleVector::PropertyReference.
+	
+	    Actually, this is nothing but the index of the element. A
+	    reference can only be obtained from element access to the
+	    TupleVector class or its iterators.
+	*/
+	class reference: public const_reference {
 	    friend class TupleVector;
 	    /// constructable only through @ref TupleVector
-	    const_reference(size_type _index): ReferenceBase(_index) {}
-	public:
-	    /// non-const->const conversion
-	    const_reference(const reference &_ref): ReferenceBase(_ref.index) {}
+	    reference(size_type _index): const_reference(_index) {}
 	};
 
 	/// see @ref TupleVector::IteratorBase
@@ -317,7 +305,7 @@ namespace util {
 
 	public:
 	    /// dereference
-	    T &operator[](reference n) { return data[n.index]; }
+	    T &operator[](reference n) const { return data[n.index]; }
 	    /// dereference
 	    const T &operator[](const_reference n) const { return data[n.index]; }
 	};
@@ -343,7 +331,7 @@ namespace util {
 
 	public:
 	    /// dereference
-	    T *operator[](reference n) { return data + n.index*dimension; }
+	    T *operator[](reference n) const { return data + n.index*dimension; }
 	    /// dereference
 	    const T *operator[](const_reference n) const { return data + n.index*dimension; }
 	};
@@ -371,7 +359,7 @@ namespace util {
 
 	public:
 	    /// dereference
-	    T *operator[](reference n) { return data + n.index*dimension; }
+	    T *operator[](reference n) const { return data + n.index*dimension; }
 	    /// dereference
 	    const T *operator[](const_reference n) const { return data + n.index*dimension; }
 	};
