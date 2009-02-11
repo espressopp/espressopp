@@ -5,7 +5,7 @@ UTIL_LIB=$(top_builddir)/src/cpp/util/libutil.la
 
 LIBS= $(PARTICLESTORAGE_LIB) $(INTERACTION_LIB) $(PAIRS_LIB) $(UTIL_LIB) $(LOG4ESPP_LIBS)
 
-bin_PROGRAMS = forceloop benchmark
+check_PROGRAMS = forceloop benchmark
 
 forceloop_SOURCES = main.cpp
 
