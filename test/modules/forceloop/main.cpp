@@ -116,7 +116,7 @@ int main()
   // force will be the vector of all forces in the particle storage
   // and force[ref] returns the force (as RealArrayRef) of particle reference ref
 
-  PairForceComputer::RealArrayRef forceRef = particleStorage.getProperty<Real3D>(force);
+  ParticleStorage::PropertyTraits<Real3D>::Reference forceRef = particleStorage.getProperty<Real3D>(force);
 
   // Define a pair computer that computes the forces for particle pairs
   // ljint provides the routine computeForce for a particle pair
