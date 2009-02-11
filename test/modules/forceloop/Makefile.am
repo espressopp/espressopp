@@ -1,9 +1,9 @@
-PARTICLESTORAGE_LIB=$(top_builddir)/src/cpp/particlestorage/libparticlestorage.la
-INTERACTION_LIB=$(top_builddir)/src/cpp/interaction/libinteraction.la
-PAIRS_LIB=$(top_builddir)/src/cpp/pairs/libpairs.la
-UTIL_LIB=$(top_builddir)/src/cpp/util/libutil.la
-
-LIBS= $(PARTICLESTORAGE_LIB) $(INTERACTION_LIB) $(PAIRS_LIB) $(UTIL_LIB) $(LOG4ESPP_LIBS)
+LIBS= \
+	$(top_builddir)/src/cpp/particlestorage/libparticlestorage.la \
+	$(top_builddir)/src/cpp/interaction/libinteraction.la \
+	$(top_builddir)/src/cpp/pairs/libpairs.la \
+	$(top_builddir)/src/cpp/esutil/libesutil.la \
+	$(LOG4ESPP_LIBS)
 
 check_PROGRAMS = forceloop benchmark
 

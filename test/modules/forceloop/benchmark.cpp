@@ -16,7 +16,7 @@
 #include "pairs/All.hpp"
 #include "pairs/PairForceComputer.hpp"
 #include "interaction/LennardJones.hpp"
-#include "util/Timer.hpp"
+#include "esutil/Timer.hpp"
 
 using namespace std;
 using namespace espresso;
@@ -195,7 +195,7 @@ void generateParticles(Test &test) {
 /// this routine runs the tests as defined above
 int main()
 {
-    util::WallTimer timer;
+    esutil::WallTimer timer;
     TestEspresso espresso(N*N*N);
     cout << "setup Espresso: " << timer << endl;
 
