@@ -43,7 +43,7 @@ class Traverser1 : public esutil::VirtualUnaryFunction<Reference, void>  {
 
         bc(all->getBC()), 
         id(all->getSet().getStorage()->getIDProperty()),
-        pos(all->getSet().getStorage()->getProperty<Real3D>(all->coordinates)),
+        pos(all->getSet().getStorage()->template getProperty<Real3D>(all->coordinates)),
         pref1(pref),
         pairComputer(_pairComputer)
 

@@ -5,7 +5,7 @@
 
 #include "../TupleVector.hpp"
 
-using namespace util;
+using namespace esutil;
 
 struct Fixture {
     TupleVector mv;

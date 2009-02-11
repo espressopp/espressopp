@@ -17,6 +17,22 @@ namespace esutil {
     */
     class TupleVector {
     public:
+	// forward declarations of member classes
+	class reference;
+	class const_reference;
+
+	template<class ReferenceType, class CRTP> class IteratorBase;
+	class iterator;
+	class const_iterator;
+
+	template<class T, class Property> class PropertyReferenceBase;
+	template<class T> class PropertyReference;
+	template<class T> class ConstPropertyReference;
+
+	template<class T, class Property> class ArrayPropertyReferenceBase;
+	template<class T> class ArrayPropertyReference;
+	template<class T> class ConstArrayPropertyReference;
+
 	/** an iterator over elements. This is basically a reference to
 	    an element with a mutable index
 
@@ -30,12 +46,6 @@ namespace esutil {
 	    ReferenceType,
 	    ptrdiff_t>
 	{
-	protected:
-	    /// index of particle that is referenced
-	    size_t index;
-
-	    /// regular constructor
-	    IteratorBase(size_t _index): index(_index) {}
 	public:
 	    /// reference type. Fixes up the iterator_facade for a reference only class
 	    typedef ReferenceType reference;
@@ -43,7 +53,15 @@ namespace esutil {
 	    /// default constructor, undefined iterator
 	    IteratorBase() {}
 
+	protected:
+	    /// regular constructor
+	    IteratorBase(size_t _index): index(_index) {}
+
+ 	    /// index of particle that is referenced
+	    size_t index;
+
 	private:
+	    friend class TupleVector;
 	    friend class boost::iterator_core_access;
 
 	    bool equal(const IteratorBase<ReferenceType, CRTP> &other) const {
@@ -53,8 +71,8 @@ namespace esutil {
 	    void increment()       { index++; }
 	    void decrement()       { index--; }
 	    void advance(size_t n) { index += n; }
-	    reference dereference() const { return reference(index); }
-	    ptrdiff_t distance_to(const IteratorBase<ReferenceType, CRTP> &other) const{
+	    ReferenceType dereference() const { return ReferenceType(index); }
+	    ptrdiff_t distance_to(const IteratorBase<ReferenceType, CRTP> &other) const {
 		return other.index - index;
 	    }
 	};
@@ -70,16 +88,21 @@ namespace esutil {
   
 	/// see @ref reference; this class marks the referenced element as const
 	class const_reference {
+        protected:
+	    /// constructable only through @ref TupleVector
+	    const_reference(size_type _index): index(_index) {}
+
+	private:
 	    friend class TupleVector;
+	    template<class ReferenceType, class CRTP> friend class IteratorBase;
+	    template<class T, class Property> friend class PropertyReferenceBase;
+	    template<class T, class Property> friend class ArrayPropertyReferenceBase;
+
 	    /// index of the referenced particle
 	    size_t index;
 
             /// not possible
             void operator=(const const_reference &);
-
-        protected:
-	    /// constructable only through @ref TupleVector
-	    const_reference(size_type _index): index(_index) {}
 	};
 
 	/** a reference to an element, which then can be used to read and
@@ -91,6 +114,8 @@ namespace esutil {
 	*/
 	class reference: public const_reference {
 	    friend class TupleVector;
+	    template<class ReferenceType, class CRTP> friend class IteratorBase;
+
             /// not possible
             void operator=(const reference &);
 	    /// constructable only through @ref TupleVector
@@ -99,24 +124,30 @@ namespace esutil {
 
 	/// see @ref TupleVector::IteratorBase
 	class iterator: public IteratorBase<reference, iterator> {
-	    friend class TupleVector;
-	    /// constructable only through @ref TupleVector
-	    iterator(size_type _index): IteratorBase<reference, iterator>(_index) {}
 	public:
 	    /// default constructor, uninitialized iterator
 	    iterator() {}
+
+	private:
+	    friend class TupleVector;
+	    friend class const_iterator;
+
+	    /// constructable only through @ref TupleVector
+	    iterator(size_type _index): IteratorBase<reference, iterator>(_index) {}
 	};
+
 	/// see @ref TupleVector::IteratorBase
 	class const_iterator: public IteratorBase<const_reference, const_iterator> {
-	    friend class TupleVector;
-	    /// constructable only through @ref TupleVector
-	    const_iterator(size_type _index): IteratorBase<const_reference, const_iterator>(_index) {}
 	public:
 	    /// default constructor
 	    const_iterator() {}
+	private:
+	    friend class TupleVector;
+
+	    /// constructable only through @ref TupleVector
+	    const_iterator(size_type _index): IteratorBase<const_reference, const_iterator>(_index) {}
 	    /// non-const->const conversion
-	    const_iterator(const iterator &_it)
-		: IteratorBase<const_reference, const_iterator>(_it.index) {}
+	    const_iterator(const iterator _it): IteratorBase<const_reference, const_iterator>(_it.index) {}
 	};
 
 	//@}
@@ -143,25 +174,6 @@ namespace esutil {
 	    Property(size_t _id, size_t _size, size_t _dimension, void *_data)
 		: id(_id), size(_size), dimension(_dimension), data(_data) {}
 	};
-
-	/// handlers for all properties
-	std::vector <Property> property;
-
-	/// size in elements of each of the stored properties
-	size_t eSize;
-
-	/// reserved size in elements of each of the stored properties
-	size_t maxESize;
-
-	size_t uniqueID;
-
-	/// capacity is always a multiple of granularity
-	int granularity;
-
-	/** capacity can shrink if difference between current size and capacity
-	    is at least this
-	*/
-	int shrinkThreshold;
 
     public:
 	/** default constructor. Constructs an empty TupleVector, but possibly
@@ -354,6 +366,7 @@ namespace esutil {
 	template<class T>
 	class PropertyReference: public PropertyReferenceBase<T, Property> {
 	    friend class TupleVector;
+	    friend class ConstPropertyReference<T>;
 
             /// not possible
             void operator=(const PropertyReference &);
@@ -388,6 +401,7 @@ namespace esutil {
             : public ArrayPropertyReferenceBase<T, Property>
         {
 	    friend class TupleVector;
+	    friend class ConstArrayPropertyReference<T>;
             
             /// not possible
             void operator=(const ArrayPropertyReference &);
@@ -482,6 +496,25 @@ namespace esutil {
         void setShrinkThreshold(size_t _threshold) { shrinkThreshold = _threshold; }
 
     private:
+	/// handlers for all properties
+	std::vector <Property> property;
+
+	/// size in elements of each of the stored properties
+	size_t eSize;
+
+	/// reserved size in elements of each of the stored properties
+	size_t maxESize;
+
+	size_t uniqueID;
+
+	/// capacity is always a multiple of granularity
+	int granularity;
+
+	/** capacity can shrink if difference between current size and capacity
+	    is at least this
+	*/
+	int shrinkThreshold;
+
 	/// not accessible and not implemented
 	TupleVector(const TupleVector &);
 	/// not accessible and not implemented
