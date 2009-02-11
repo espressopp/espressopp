@@ -379,25 +379,27 @@ using namespace log4cxx::helpers;
   *   LogClass                                           *
   *******************************************************/
 
-class LogClass {
+namespace log4espp {
+  class LogClass {
 
 #define LEVEL_RELEVANT_CHARS 3
 
-   public: 
-
-   int logLevel;    // specifies the level of the logger
-
-   LogClass() {
-     char *envLevel;
-     envLevel = getenv("LOG4ESPP"); \
-     const char *logItems [] = { "OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" }; \
-     if (envLevel != NULL) { \
+  public: 
+    
+    int logLevel;    // specifies the level of the logger
+    
+    LogClass() {
+      char *envLevel;
+      envLevel = getenv("LOG4ESPP"); \
+      const char *logItems [] = { "OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" }; \
+      if (envLevel != NULL) { \
         int nItems = sizeof(logItems) / sizeof(const char *); \
         for (int i = 0; i < nItems; i++) \
           if (strncasecmp(envLevel,logItems[i],LEVEL_RELEVANT_CHARS)==0) logLevel = i; \
-     }
-   }
-};
+      }
+    }
+  };
+}
 
   /*******************************************************
   *   LOG4ESPP_CONFIGURE                                 *
@@ -411,9 +413,9 @@ class LogClass {
   *   LOG4ESPP_LOGGER(logger,name)                       *
   *******************************************************/
 
-#define LOG4ESPP_ROOTLOGGER(aLogger) LogClass aLogger = LogClass();
-#define LOG4ESPP_LOGGER(aLogger,name) LogClass aLogger = LogClass() ;
-#define LOG4ESPP_DECL_LOGGER(aLogger) LogClass aLogger;
+#define LOG4ESPP_ROOTLOGGER(aLogger) log4espp::LogClass aLogger = lo4espp::LogClass();
+#define LOG4ESPP_LOGGER(aLogger,name) log4espp::LogClass aLogger = log4espp::LogClass() ;
+#define LOG4ESPP_DECL_LOGGER(aLogger) log4espp::LogClass aLogger;
 
   /*******************************************************
   *   LOG4ESPP_XXXXX_ON                                  *
@@ -500,8 +502,10 @@ class LogClass {
 
 #else
 
-class LogClass {
-};
+namespace log4espp {
+  class LogClass {
+  };
+}
 
 #define LOG4ESPP_CONFIGURE()
 
@@ -511,9 +515,9 @@ class LogClass {
   *   LOG4ESPP_LOGGER(logger,name)                       *
   *******************************************************/
 
-#define LOG4ESPP_ROOTLOGGER(aLogger) LogClass aLogger;
-#define LOG4ESPP_LOGGER(aLogger,name) LogClass aLogger;
-#define LOG4ESPP_DECL_LOGGER(aLogger) LogClass aLogger;
+#define LOG4ESPP_ROOTLOGGER(aLogger) log4espp::LogClass aLogger;
+#define LOG4ESPP_LOGGER(aLogger,name) log4espp::LogClass aLogger;
+#define LOG4ESPP_DECL_LOGGER(aLogger) lo4espp::LogClass aLogger;
 
 #define LOG4ESPP_TRACE_ON(logger) (0)
 #define LOG4ESPP_DEBUG_ON(logger) (0)
