@@ -1,9 +1,9 @@
-#ifndef _VIRTUAL_FUNCTIONAL_HPP
-#define _VIRTUAL_FUNCTIONAL_HPP
+#ifndef _ESUTIL_VIRTUAL_FUNCTIONAL_HPP
+#define _ESUTIL_VIRTUAL_FUNCTIONAL_HPP
 
 #include <functional>
 
-namespace util {
+namespace esutil {
     template <class Argument, class Result>
     class VirtualUnaryFunction
 	: public std::unary_function<Argument, Result> {

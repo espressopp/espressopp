@@ -1,5 +1,5 @@
-#ifndef _TUPLEVECTOR_HPP
-#define _TUPLEVECTOR_HPP
+#ifndef _ESUTIL_TUPLEVECTOR_HPP
+#define _ESUTIL_TUPLEVECTOR_HPP
 
 #include <vector>
 #include <stdexcept>
@@ -7,7 +7,7 @@
 #include <boost/foreach.hpp>
 #include <functional>
 
-namespace util {
+namespace esutil {
 
     /** a vector of elements with dynamically configurable properties.
 	Each property is stored in a vector of its own, making loops
@@ -522,7 +522,7 @@ namespace util {
     This function has to be at global scope.
 */
 inline boost::mpl::true_ *
-boost_foreach_is_noncopyable(util::TupleVector *&, boost::foreach::tag)
+boost_foreach_is_noncopyable(esutil::TupleVector *&, boost::foreach::tag)
 { return 0; }
 
 #endif

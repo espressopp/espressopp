@@ -1,5 +1,5 @@
-#ifndef _UTIL_TIMER_HPP
-#define _UTIL_TIMER_HPP
+#ifndef _ESUTIL_TIMER_HPP
+#define _ESUTIL_TIMER_HPP
 
 #include "acconfig.hpp"
 
@@ -10,7 +10,7 @@
 
 #include "types.hpp"
 
-namespace util {
+namespace esutil {
     /** simple timer for obtaining typically microsecond precision
         timings.  The time is measured in seconds from the point of
         construction or whenever reset() is called. The precision

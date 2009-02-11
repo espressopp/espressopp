@@ -194,7 +194,7 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/pmi/Makefile
                  src/cpp/mpi/Makefile
                  src/cpp/hello/Makefile
-                 src/cpp/util/Makefile
+                 src/cpp/esutil/Makefile
                  src/cpp/logging/Makefile
                  src/cpp/interaction/Makefile
                  src/cpp/pairs/Makefile

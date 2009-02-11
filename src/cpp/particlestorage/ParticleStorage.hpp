@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "types.hpp"
-#include "util/virtual_functional.hpp"
-#include "util/TupleVector.hpp"
+#include "esutil/virtual_functional.hpp"
+#include "esutil/TupleVector.hpp"
 
 namespace espresso {
     namespace particlestorage {
@@ -20,23 +20,23 @@ namespace espresso {
 	*/
 	class ParticleStorage {
 	public:
-	    typedef util::TupleVector::reference reference;
-	    typedef util::TupleVector::const_reference const_reference;
+	    typedef esutil::TupleVector::reference reference;
+	    typedef esutil::TupleVector::const_reference const_reference;
 
 	    template<typename T>
 	    struct PropertyTraits {
-		typedef util::TupleVector::PropertyReference<T> Reference;
-		typedef util::TupleVector::ConstPropertyReference<T> ConstReference;
+		typedef esutil::TupleVector::PropertyReference<T> Reference;
+		typedef esutil::TupleVector::ConstPropertyReference<T> ConstReference;
             };
 
             template<typename T>
 	    struct ArrayPropertyTraits {
-                typedef util::TupleVector::ArrayPropertyReference<T> Reference;
-                typedef util::TupleVector::ConstArrayPropertyReference<T> ConstReference;
+                typedef esutil::TupleVector::ArrayPropertyReference<T> Reference;
+                typedef esutil::TupleVector::ConstArrayPropertyReference<T> ConstReference;
             };
 
 	private:
-	    util::TupleVector particles;
+	    esutil::TupleVector particles;
 
 	    /// unique ID counter for the particles
 	    size_t uniqueID;
@@ -86,9 +86,9 @@ namespace espresso {
 	    }
 
 	    /// loop over all particles
-	    virtual void foreach(util::VirtualUnaryFunction<reference, void> &);
+	    virtual void foreach(esutil::VirtualUnaryFunction<reference, void> &);
 	    /// loop over all particles
-	    virtual void foreach(util::VirtualUnaryFunction<const_reference, void> &) const;
+	    virtual void foreach(esutil::VirtualUnaryFunction<const_reference, void> &) const;
 
 	    //@}
 
@@ -162,8 +162,8 @@ namespace espresso {
             ParticleStorage(const ParticleStorage &);
 	};
 
-	typedef util::VirtualUnaryFunction<ParticleStorage::reference, void> ParticleComputer;
-	typedef util::VirtualUnaryFunction<ParticleStorage::const_reference, void> ConstParticleComputer;
+	typedef esutil::VirtualUnaryFunction<ParticleStorage::reference, void> ParticleComputer;
+	typedef esutil::VirtualUnaryFunction<ParticleStorage::const_reference, void> ConstParticleComputer;
     }
 }
 

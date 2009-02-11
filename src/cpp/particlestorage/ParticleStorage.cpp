@@ -11,7 +11,7 @@ ParticleStorage::ParticleStorage(): uniqueID(0) {
 
 ParticleStorage::reference ParticleStorage::addParticle() {
 
-    util::TupleVector::iterator it = particles.insert(particles.end());
+    esutil::TupleVector::iterator it = particles.insert(particles.end());
     particles.getProperty<size_t>(particleIDProperty)[*it] = ++uniqueID;
     return *it;
 }
@@ -29,7 +29,7 @@ public:
 
 void ParticleStorage::deleteParticle(size_t deleteID) {
 
-    util::TupleVector::iterator pos =
+    esutil::TupleVector::iterator pos =
 	std::find_if(particles.begin(), particles.end(), PredicateMatchParticleID(*this, deleteID));
 
     if (pos == particles.end()) {
@@ -40,7 +40,7 @@ void ParticleStorage::deleteParticle(size_t deleteID) {
 
 ParticleStorage::reference ParticleStorage::getParticleByID(size_t id) {
 
-    util::TupleVector::iterator pos =
+    esutil::TupleVector::iterator pos =
 	std::find_if(particles.begin(), particles.end(), PredicateMatchParticleID(*this, id));
 
     if (pos == particles.end()) {
