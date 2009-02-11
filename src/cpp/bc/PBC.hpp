@@ -8,6 +8,8 @@ namespace espresso {
 
   namespace bc {
 
+    /** Class for parallel boundary conditions in all three dimensions. */
+
     class PBC : public BC {
 
     private:
@@ -24,7 +26,16 @@ namespace espresso {
 
     public:
 
+      /** Constructor for parallel boundary conditions for a box where all
+          three dimensions have the same length.
+      */
+
       PBC(real _length) { length = _length; half_length = length * 0.5; }
+
+      /** Routine delivers the distance vector between two positions.
+
+          \sa bc::BC::getDist
+      */
 
       virtual Real3D getDist(const Real3D& pos1, const Real3D& pos2) const {
 
@@ -50,6 +61,8 @@ namespace espresso {
         return Real3D(xij, yij, zij);
 
       } 
+
+      /** Destructor for parallel boundary conditions */
 
       virtual ~PBC() {}
 

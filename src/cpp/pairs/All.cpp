@@ -41,9 +41,9 @@ class Traverser1 : public esutil::VirtualUnaryFunction<Reference, void>  {
                  PairComputer& _pairComputer
 	  ) :
 
-        bc(all->bc), 
-        id(all->set.getStorage()->getIDProperty()),
-        pos(all->set.getStorage()->getProperty<Real3D>(all->coordinates)),
+        bc(all->getBC()), 
+        id(all->getSet().getStorage()->getIDProperty()),
+        pos(all->getSet().getStorage()->getProperty<Real3D>(all->coordinates)),
         pref1(pref),
         pairComputer(_pairComputer)
 
@@ -83,7 +83,7 @@ class Traverser1 : public esutil::VirtualUnaryFunction<Reference, void>  {
 
          Traverser2 traverser2(all, pref, pairComputer);
 
-         all->set.foreach(traverser2);
+         all->getSet().foreach(traverser2);
       }
 };
 

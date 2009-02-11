@@ -39,8 +39,13 @@ namespace espresso {
 				    const ParticleReference p2) = 0;
         };
 
+        /** Abstract class that defines a function on pairs of particles */
+
 	typedef ParticlePairComputerBase<espresso::particlestorage::ParticleStorage::reference>
                 ParticlePairComputer;
+
+        /** Abstract class that defines a function on pairs of read-only particles */
+
 	typedef ParticlePairComputerBase<espresso::particlestorage::ParticleStorage::const_reference> 
                 ConstParticlePairComputer;
     }

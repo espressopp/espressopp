@@ -10,13 +10,15 @@ namespace espresso {
 
    namespace pairs {
 
+     /** Class that provides a functional for the force calculation. This class
+         implements the abstract class ParticlePairComputer.
+     */
+
      class PairForceComputer: public ParticlePairComputer {
 
-     public:
+     private: 
 
        typedef particlestorage::ParticleStorage::PropertyTraits<Real3D>::Reference RealArrayRef;
-
-     private: 
 
        typedef espresso::interaction::Interaction Interaction;
 
@@ -29,6 +31,12 @@ namespace espresso {
        bool computesPressure;
        
      public:
+
+      /** Constructor for force computations needs the force property and the interaction.
+
+         \item _force is the particle property that stands for the force
+         \itme _interaction provides the function that computes the force between two particles.
+      */
 
        PairForceComputer(RealArrayRef _force, const Interaction& _interaction) 
 

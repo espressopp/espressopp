@@ -16,10 +16,13 @@ namespace espresso {
 
      class All : public ParticlePairs {
  
-     public:
+     private:
 
        espresso::particleset::ParticleSet& set; 
+
        espresso::bc::BC& bc;
+
+     public:
 
        size_t coordinates;
 
@@ -37,6 +40,14 @@ namespace espresso {
 
        All (espresso::bc::BC& bc, espresso::particleset::ParticleSet& set, size_t coordinates);
 
+       /** Getter routine for the boundary conditions. */
+
+       espresso::bc::BC& getBC() const { return bc; }
+
+       /** Getter routine for the set of particles. */
+
+       espresso::particleset::ParticleSet& getSet() const { return set; }
+
        /** This routine will apply a function operator to all pairs.
 
          \param pairComputer is the object that provides the function to be applied to all pairs.
@@ -44,6 +55,12 @@ namespace espresso {
        */
 
        virtual void foreach(ParticlePairComputer& pairComputer);
+
+       /** This routine will apply a function operator for read-only particles to all pairs.
+
+         \param pairComputer is the object that provides the read-only function to be applied to all pairs.
+
+       */
 
        virtual void foreach(ConstParticlePairComputer& pairComputer) const;
 
