@@ -1,12 +1,11 @@
-#ifndef _MPIPO_WORKER_FUNC_HPP
-#define _MPIPO_WORKER_FUNC_HPP
+#ifndef _PMI_INTERNAL_FUNC_HPP
+#define _PMI_INTERNAL_FUNC_HPP
+/** @file Declares functions that should be used only internally by
+    PMI. */
 
 #include "pmi/types.hpp"
-
-#ifdef WORKER
 #include <map>
-
-using namespace std;
+#include <vector>
 
 namespace pmi {
   typedef void* (*ConstructorCallerType)();
@@ -14,9 +13,13 @@ namespace pmi {
   typedef void (*DestructorCallerType)(void*);
 
   // construct-on-first-use idioms
-  map<string, ConstructorCallerType> &constructorCallersByName();
-  map<string, MethodCallerType> &methodCallersByName();  
-  map<string, DestructorCallerType> &destructorCallersByName();
+  std::map<std::string, ConstructorCallerType> &constructorCallersByName();
+  std::map<std::string, MethodCallerType> &methodCallersByName();  
+  std::map<std::string, DestructorCallerType> &destructorCallersByName();
+
+  /** @internal
+      Stores the object pointers of each object id. */
+  extern std::vector<void*> objects;
 
   // templates for the different callers 
   template <class T>
@@ -32,15 +35,12 @@ namespace pmi {
     delete ptr;
   }
 
-  template <class T, class returnType, returnType (T::*methodPtr)()>
+  template <class T, void (T::*methodPtr)()>
   void
   methodCallerTemplate(void *voidPtr) {
     T* ptr = static_cast<T*>(voidPtr);
     (ptr->*methodPtr)();
   }
-
-  bool mainLoop();
 }
-#endif
 
 #endif

@@ -1,5 +1,4 @@
 #include "pmi/exceptions.hpp"
-#include "pmi/basic_func.hpp"
 
 #include <sstream>
 

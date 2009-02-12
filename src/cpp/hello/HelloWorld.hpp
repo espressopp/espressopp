@@ -9,26 +9,25 @@
 #include <string>
 #include <vector>
 
+namespace espresso {
+  namespace hello {
+    class HelloWorld {
+#ifdef HAVE_MPI
+      pmi::ParallelClass<HelloWorld> pclass;
+#endif
 
-namespace hello {
-  class HelloWorld {
-  public:
-    const std::string getMessage();
-
-    // expose the python registration
-    static void registerPython();
-  };
+    public:
+      const std::string getMessage();
 
 #ifdef HAVE_MPI
-  class PHelloWorld 
-    : public pmi::ParallelObject<HelloWorld> 
-  {
-  public:
-    PMI_PARALLEL_PROXY_METHOD(getMessage, const std::string);
-  };
-#else
-  typedef HelloWorld PHelloWorld;
+      void getMessageWorker();
 #endif
-}
 
+#ifdef HAVE_PYTHON
+      // expose the python registration
+      static void registerPython();
+#endif
+    };
+  }
+}
 #endif

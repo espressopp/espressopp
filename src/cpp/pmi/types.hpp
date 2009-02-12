@@ -7,17 +7,8 @@
 #include <string>
 #include <exception>
 
-#if !defined(CONTROLLER) && !defined(WORKER)
-#define CONTROLLER 1
-#define WORKER 1
-#endif
-
-
 namespace pmi {
   extern LOG4ESPP_DECL_LOGGER(logger);
-
-  // class required to call class initializers
-  class Nothing {};
 
   typedef unsigned int IdType;
   const static IdType NOT_ASSOCIATED = 

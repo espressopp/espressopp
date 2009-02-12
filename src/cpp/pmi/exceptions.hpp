@@ -8,14 +8,14 @@
 
 using namespace std;
 
-#define PMI_INTL_ERROR(output)			\
+#define PMI_THROW_INTL_ERROR(output)		\
   {						\
     ostringstream ost; ost << output;		\
     LOG4ESPP_FATAL(logger, ost.str());		\
     throw InternalError(ost.str());		\
   }
 
-#define PMI_USER_ERROR(output)			\
+#define PMI_THROW_USER_ERROR(output)		\
   {						\
     ostringstream ost; ost << output;		\
     LOG4ESPP_FATAL(logger, ost.str());		\
