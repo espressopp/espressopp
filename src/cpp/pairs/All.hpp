@@ -22,9 +22,9 @@ namespace espresso {
 
        espresso::bc::BC& bc;
 
-     public:
-
        size_t coordinates;
+
+     public:
 
        /** Destructor. */
 
@@ -47,6 +47,10 @@ namespace espresso {
        /** Getter routine for the set of particles. */
 
        espresso::particleset::ParticleSet& getSet() const { return set; }
+
+       /** Getter routine for the ID of the coordinate */
+
+       size_t getCoordinateProperty() const {return coordinates; }
 
        /** This routine will apply a function operator to all pairs.
 

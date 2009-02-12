@@ -62,3 +62,26 @@ void ParticleStorage::foreach(ConstParticleComputer& compute) const
 	compute(particle);
     }
 }
+
+size_t ParticleStorage::fillWithLattice(real size, size_t N, size_t positions) {
+    if (positions == 0) {
+        positions = addProperty<Real3D>();
+    }
+    for (size_t i = 0; i < N; i++) {
+        for (size_t j = 0; j < N; j++) { 
+            for (size_t k = 0; k < N; k++) {
+                Real3D pos = Real3D(
+                    i * size / N,
+                    j * size / N, 
+                    k * size / N);
+
+                reference ref = addParticle();
+                PropertyTraits<Real3D>::Reference
+                    coordRef = getProperty<Real3D>(positions);
+                coordRef[ref] = pos;
+            }
+        }
+    }
+    return positions;
+}
+

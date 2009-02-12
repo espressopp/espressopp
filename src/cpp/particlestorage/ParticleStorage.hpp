@@ -157,6 +157,20 @@ namespace espresso {
 
 	    //@}
 
+            /// @name convenience functions
+            //@{
+
+            /** fill the storage with a regular 3D lattice of particles
+                @param size the size of the box to fill
+                @param N the number of particle per side
+                @param positions where to write the particle positions. If omitted,
+                a new property is created
+                @return the ID of the position property
+             */
+            size_t fillWithLattice(real size, size_t N, size_t positions);
+
+            //@}
+
         private:
             /// private and does not exist, do not try to use
             ParticleStorage(const ParticleStorage &);

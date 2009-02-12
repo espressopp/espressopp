@@ -217,11 +217,13 @@ int main()
 
     timer.reset();
     espresso.calculateForces();
+    real espressoCalcTime = timer.getElapsedTime();
     cout << "calc Espresso: " << timer << endl;
 
     timer.reset();
     basic.calculateForces();
-    cout << "calc Basic: " << timer << endl;
+    cout << "calc Basic: " << timer << " ratio: "
+         << espressoCalcTime / timer.getElapsedTime() << endl;
 
     // calculate average
 
@@ -229,13 +231,15 @@ int main()
     real ave;
     for (size_t cnt = 0; cnt < 10000; ++cnt)
         ave = espresso.calculateAverage();
+    real espressoAvgTime = timer.getElapsedTime();
     cout << "average Espresso: " << timer << endl;
 
     timer.reset();
     real avb;
     for (size_t cnt = 0; cnt < 10000; ++cnt)
         avb = basic.calculateAverage();
-    cout << "average Basic: " << timer << endl;
+    cout << "average Basic: " << timer << " ratio: "
+	 << espressoAvgTime / timer.getElapsedTime() << endl;
 
     // check consistency
 
