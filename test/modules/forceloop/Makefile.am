@@ -2,6 +2,7 @@ LIBS= \
 	$(top_builddir)/src/cpp/particlestorage/libparticlestorage.la \
 	$(top_builddir)/src/cpp/interaction/libinteraction.la \
 	$(top_builddir)/src/cpp/pairs/libpairs.la \
+	$(top_builddir)/src/cpp/integrator/libintegrator.la \
 	$(top_builddir)/src/cpp/esutil/libesutil.la \
 	$(LOG4ESPP_LIBS)
 

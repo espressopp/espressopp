@@ -12,8 +12,7 @@
 #include "ParticleWriter.hpp"
 #include "PairWriteComputer.hpp"
 
-#include "integrator/md/velocity_verlet/Velocity_Verlet_A.hpp"
-#include "integrator/md/velocity_verlet/Velocity_Verlet_B.hpp"
+#include "integrator/VelocityVerlet.hpp"
 
 #include <cstdio>
 #include <vector>
@@ -30,8 +29,8 @@ using namespace espresso::integrator;
 /** N stands for number particles in each dimensions.
 */
 
-#define N 3
-#define SIZE 5.0
+#define N 10
+#define SIZE 15.0
 
 typedef espresso::pairs::All AllPairs;
 typedef espresso::particleset::All AllParticles;
@@ -91,19 +90,19 @@ int main()
 
   // define a set of all particles
 
-  AllParticles allset(&particleStorage);
+  AllParticles allSet(&particleStorage);
 
-  // define allpairs with (x, y) for all x, y in allset
+  // define allpairs with (x, y) for all x, y in allSet
 
-  AllPairs allpairs(pbc, allset, position);
+  AllPairs allpairs(pbc, allSet, position);
 
   // For test only: PairWriter prints each particle pair 
 
   PairWriteComputer pairWriter(&particleStorage, position);
 
-  // call pairWriter(ref1, ref2) for each particle ref pair of allset
+  // call pairWriter(ref1, ref2) for each particle ref pair of allSet
 
-  allpairs.foreach(pairWriter);
+  // allpairs.foreach(pairWriter);
 
   // define LennardJones interaction
 
@@ -124,7 +123,7 @@ int main()
 
   PairForceComputer forcecompute(forceRef, ljint);
 
-  // call forcecompute(ref1, ref2) for each particle ref pair of allset
+  // call forcecompute(ref1, ref2) for each particle ref pair of allSet
 
   allpairs.foreach(forcecompute);
 
@@ -132,26 +131,19 @@ int main()
 
   particleStorage.foreach(pWriter);
 
-  // create references to do an integration step
+  // create integrator and set properties
 
-  ParticleStorage::PropertyTraits<Real3D>::Reference rRef = particleStorage.getProperty<Real3D>(position);
-  ParticleStorage::PropertyTraits<Real3D>::Reference vRef = particleStorage.getProperty<Real3D>(velocity);
-  ParticleStorage::PropertyTraits<Real3D>::Reference fRef = particleStorage.getProperty<Real3D>(force);
+  VelocityVerlet integrator(&allSet, position, velocity, force);
+  integrator.setTimeStep(0.001);
+  integrator.addForce(&ljint, &allpairs);
+  integrator.addForce(&ljint, &allpairs);
 
-  // create vvA to update positions and half update of velocities
+  // integrate for a certain number of timesteps
 
-  Velocity_Verlet_A vvA(rRef, vRef, fRef);
-  vvA.set_time_step(0.1);
-  particleStorage.foreach(vvA);
-
-  // need to zero forces and then recompute
-
-  // create vvB to complete the velocity update
-
-  Velocity_Verlet_B vvB(vRef, fRef);
-  particleStorage.foreach(vvB);
+  integrator.run(100);
 
   // check to see that particles have new positions
 
   particleStorage.foreach(pWriter);
+
 }
