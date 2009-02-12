@@ -201,6 +201,7 @@ AC_CONFIG_FILES([Makefile
                  src/cpp/bc/Makefile
                  src/cpp/particleset/Makefile
                  src/cpp/particlestorage/Makefile
+                 src/cpp/integrator/Makefile
                  src/python/Makefile
 		 doc/Makefile
 		 doc/dg/Makefile
