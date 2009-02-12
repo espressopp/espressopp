@@ -3,8 +3,11 @@
 
 #include "hello/HelloWorld.hpp"
 
-namespace hello {
-  void registerPython();
+namespace espresso {
+  namespace hello {
+#ifdef HAVE_PYTHON
+    void registerPython();
+#endif
+  }
 }
-
 #endif

@@ -3,5 +3,5 @@
 void initPythonEspresso()
 {
   // the controller: register with python
-  hello::registerPython();
+  espresso::hello::registerPython();
 }
