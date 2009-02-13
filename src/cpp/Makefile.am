@@ -1,5 +1,5 @@
 # declare the subdirs
-SUBDIRS = esutil logging hello interaction pairs bc particleset particlestorage
+SUBDIRS = integrator esutil logging hello interaction pairs bc particleset particlestorage
 EXTRA_DIST =
 CLEANFILES =
 
