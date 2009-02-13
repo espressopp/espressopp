@@ -1,3 +1,4 @@
+import sys
 import espresso
 import espresso.bc
 import espresso.interaction
@@ -31,9 +32,9 @@ ljint=espresso.interaction.LennardJones(sigma=1, epsilon=1, cutoff=2.5)
 ljint.computeForces(setforce='force',pairs=allpairs)
 
 force=mySystem.getParticleProperty(name='force')
-print force[mySystem.particles[17]]
+sys.write(force[mySystem.particles[17]])
 
-print mySystem.particles[17].get(name='force')
+sys.write(mySystem.particles[17].get(name='force'))
 
 # system stores global default variables 
 #  * geometry

@@ -21,13 +21,11 @@ namespace espresso {
     //////////////////////////////////////////////////
     const string
     HelloWorld::getMessage() {
-#ifdef HAVE_MPI
-      if (pmi::isController())
-	pclass.invoke<&HelloWorld::getMessageWorker>();
-#endif
-
+      IF_MPI(pmiObject.invoke<&HelloWorld::getMessageWorker>());
+      
       string msg = "Hello World!";
 
+      // collect the messages of the processors
 #ifdef HAVE_MPI
       boost::mpi::communicator world;
       ostringstream ost;
@@ -36,20 +34,20 @@ namespace espresso {
       ost << "MPI process #" << world.rank() << ": " << msg;
 
       LOG4ESPP_INFO(logger, \
-		    pmi::printWorkerId() << "Creating message.");
+		    pmi::printWorkerId() << "Created message: " \
+		    << ost.str());
 
       // gather messages from the tasks
       boost::mpi::gather(world, ost.str(), allMessages, 0);
 
       msg = "";
 
-      if (pmi::isController())
-	// composite message
-	BOOST_FOREACH(const string s, allMessages)
-	  {	
-	    msg += s;
-	    msg += "\n";
-	  }
+      // compose message
+      BOOST_FOREACH(const string s, allMessages)
+	{	
+	  msg += s;
+	  msg += "\n";
+	}
 #endif
 
       return msg;
@@ -57,7 +55,22 @@ namespace espresso {
 
 
 #ifdef HAVE_MPI
-    void HelloWorld::getMessageWorker() { getMessage(); }
+    void HelloWorld::getMessageWorker() {
+      string msg = "Hello World!";
+
+      // send the messages to the controller
+      boost::mpi::communicator world;
+      ostringstream ost;
+
+      ost << "MPI process #" << world.rank() << ": " << msg;
+
+      LOG4ESPP_INFO(logger, \
+		    pmi::printWorkerId() << "Created message: " \
+		    << ost.str());
+
+      // gather messages from the tasks
+      boost::mpi::gather(world, ost.str(), 0);
+    }
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PMI

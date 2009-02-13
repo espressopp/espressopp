@@ -1,34 +1,34 @@
+import sys
 import espresso
 import espresso.bc
 import espresso.interaction
 import espresso.pairs
 
-# implied
-import espresso.system
-
 pbc=espresso.bc.PBC(length=10)
-particles=espresso.system.Particles()
+particles=espresso.decomposition.AtomicStorage()
+#particles=espresso.decomposition.CellStorage(bc=pbc)
 
 for pid in range(100):
     # default: pos=0 0 0
-    particles.addParticle(pos=mySystem.randomPos())
+    particles.addParticle(pos=pbc.randomPos())
 
-allpairs=espresso.pairs.AllPairs(bc=pbc, group=particles)
+allpairs=espresso.pairs.All(bc=pbc,set=particles)
 
 # default: shift=auto, offset=0.0
 ljint=espresso.interaction.LennardJones(sigma=1, epsilon=1, cutoff=2.5)
 
-# vvintegrator=espresso.integrator.VelocityVerletIntegrator(timestep=0.001)
-# vvintegrator.addForce(interaction=ljint, pairs=allpairs)
-# vvintegrator.addForce(interaction=feneint, pairs=bonds)
-
+# Just compute the forces
 allpairs.computeForces(setforce='force', interaction=ljint)
-
 force=particles.getParticleProperty(name='force')
+sys.write(force[particles[17]])
+sys.write(particles[17].get(name='force'))
 
-print force[particles[17]]
+# Now do 1000 simulation steps
+vvintegrator=espresso.integrator.VelocityVerlet(timestep=0.001, bc=pbc)
+vvintegrator.addForce(interaction=ljint, pairs=allpairs)
+vvintegrator.run(steps=1000)
 
-print particles[17].get(name='force')
+#vvintegrator.addForce(interaction=feneint, pairs=bonds)
 
 # system stores global default variables 
 #  * geometry

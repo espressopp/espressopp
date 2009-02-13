@@ -2,31 +2,22 @@
 #define _HELLO_HELLOWORLD_HPP
 #include "acconfig.hpp"
 
-#ifdef HAVE_MPI
-#include "pmi/pmi.hpp"
-#endif
+#include "pmi.hpp"
 
 #include <string>
-#include <vector>
 
 namespace espresso {
   namespace hello {
     class HelloWorld {
-#ifdef HAVE_MPI
-      pmi::ParallelClass<HelloWorld> pclass;
-#endif
+      IF_MPI(pmi::ParallelClass<HelloWorld> pmiObject;)
 
     public:
       const std::string getMessage();
 
-#ifdef HAVE_MPI
-      void getMessageWorker();
-#endif
+      IF_MPI(void getMessageWorker();)
 
-#ifdef HAVE_PYTHON
       // expose the python registration
-      static void registerPython();
-#endif
+      IF_PYTHON(static void registerPython();)
     };
   }
 }
