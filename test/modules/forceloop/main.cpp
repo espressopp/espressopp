@@ -67,9 +67,12 @@ int main()
        real z = (k + r) / N * SIZE;
 
        ParticleStorage::reference ref = particleStorage.addParticle();
-       ParticleStorage::PropertyTraits<Real3D>::Reference positionRef = particleStorage.getProperty<Real3D>(position);
-       ParticleStorage::PropertyTraits<Real3D>::Reference velocityRef = particleStorage.getProperty<Real3D>(velocity);
-       ParticleStorage::PropertyTraits<Real3D>::Reference forceRef    = particleStorage.getProperty<Real3D>(force);
+       ParticleStorage::PropertyTraits<Real3D>::Reference positionRef = 
+	 particleStorage.getProperty<Real3D>(position);
+       ParticleStorage::PropertyTraits<Real3D>::Reference velocityRef = 
+	 particleStorage.getProperty<Real3D>(velocity);
+       ParticleStorage::PropertyTraits<Real3D>::Reference forceRef    = 
+	 particleStorage.getProperty<Real3D>(force);
 
        positionRef[ref] = Real3D(x, y, z);
        velocityRef[ref] = Real3D(x, y, z);

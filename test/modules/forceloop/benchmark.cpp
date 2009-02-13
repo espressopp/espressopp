@@ -7,6 +7,7 @@
 #define LOG4ESPP_LEVEL_WARN
 
 #include <iostream>
+#include <iomanip>
 #include <vector>
 
 #include "types.hpp"
@@ -236,33 +237,33 @@ int main()
 {
     esutil::WallTimer timer;
     TestEspresso espresso(N*N*N);
-    cout << "setup Espresso: " << timer << endl;
+    cout << setw(30) << "setup Espresso: " << timer << endl;
 
     timer.reset();
     TestBasic basic(N*N*N);
-    cout << "setup Basic: " << timer << endl;
+    cout << setw(30) << "setup Basic: " << timer << endl;
 
     // generate particles in the particle storage
 
     timer.reset();
     generateParticles(espresso);
-    cout << "generate Espresso: " << timer << endl;
+    cout << setw(30) << "generate Espresso: " << timer << endl;
 
     timer.reset();
     generateParticles(basic);
-    cout << "generate Basic: " << timer << endl;
+    cout << setw(30) << "generate Basic: " << timer << endl;
 
     // calculate forces
 
     timer.reset();
     espresso.calculateForces(1.1, 1.2);
     real espressoCalcTime = timer.getElapsedTime();
-    cout << "calc Espresso: " << timer << endl;
+    cout << setw(30) << "calc Espresso: " << timer << endl;
 
     timer.reset();
     basic.calculateForces(1.1, 1.2);
-    cout << "calc Basic: " << timer << " ratio: "
-         << espressoCalcTime / timer.getElapsedTime() << endl;
+    cout << setw(30) << "calc Basic: " << timer << endl;
+    cout << setw(30) << "Ratio: " << (espressoCalcTime / timer.getElapsedTime()) << endl;
 
     // calculate minimum distance
 
@@ -283,14 +284,14 @@ int main()
     for (size_t cnt = 0; cnt < 10000; ++cnt)
         ave = espresso.calculateAverage();
     real espressoAvgTime = timer.getElapsedTime();
-    cout << "average Espresso: " << timer << endl;
+    cout << setw(30) << "average Espresso: " << timer << endl;
 
     timer.reset();
     real avb;
     for (size_t cnt = 0; cnt < 10000; ++cnt)
         avb = basic.calculateAverage();
-    cout << "average Basic: " << timer << " ratio: "
-	 << espressoAvgTime / timer.getElapsedTime() << endl;
+    cout << setw(30) << "average Basic: " << timer << endl;
+    cout << setw(30) << "Ratio: " << (espressoAvgTime / timer.getElapsedTime()) << endl;
 
     // check consistency
     cout << "min dists: " << mine << " " << minb << endl;
