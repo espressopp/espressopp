@@ -57,11 +57,29 @@ else
    AC_SUBST(HAVE_MPI, "no")
 fi
 
+AH_BOTTOM([
+#ifdef HAVE_MPI
+#define IF_MPI(code) code
+#else
+#define IF_MPI(code)
+#endif
+])
+
+
+
 AXES_PYTHON
 if test "x$axes_cv_python_lib" = "xno" || \
    test "x$axes_cv_python_include" = "xno"; then
    AC_MSG_ERROR([could not find python])
 fi
+
+AH_BOTTOM([
+#ifdef HAVE_PYTHON
+#define IF_PYTHON(code) code
+#else
+#define IF_PYTHON(code)
+#endif
+])
 
 ################################################################### 
 #                                                                 #
