@@ -36,7 +36,7 @@ namespace espresso {
     
     real LennardJones::computeEnergySqr (const real distSqr) const {
       if (distSqr < cutoffSqr) {
-	real frac2 = sigma / distSqr;
+	real frac2 = sigma*sigma / distSqr;
 	real frac6 = frac2 * frac2 * frac2;
 	real energy = 4.0 * epsilon * (frac6 * frac6 - frac6);
 	return energy;
@@ -44,8 +44,8 @@ namespace espresso {
     }
     
     Real3D LennardJones::computeForce (const Real3D &dist,
-				       const const_reference p1,
-				       const const_reference p2) const {
+					       const const_reference p1,
+					       const const_reference p2) const {
 	return computeForce(dist);
     }
 
