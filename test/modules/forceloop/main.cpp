@@ -4,6 +4,7 @@
 #include "types.hpp"
 #include "bc/PBC.hpp"
 #include "interaction/LennardJones.hpp"
+#include "interaction/FENE.hpp"
 #include "pairs/All.hpp"
 #include "pairs/PairForceComputer.hpp"
 #include "particleset/All.hpp"
@@ -115,6 +116,10 @@ int main()
   ljint.setEpsilon(1.0);
   ljint.setSigma(1.0);
 
+  // make a FENE interaction
+
+  FENE fene;
+
   // force will be the vector of all forces in the particle storage
   // and force[ref] returns the force (as RealArrayRef) of particle reference ref
 
@@ -137,8 +142,7 @@ int main()
   // create integrator and set properties
 
   VelocityVerlet integrator(&allSet, position, velocity, force);
-  integrator.setTimeStep(0.001);
-  integrator.addForce(&ljint, &allpairs);
+  integrator.setTimeStep(0.005);
   integrator.addForce(&ljint, &allpairs);
 
   // integrate for a certain number of timesteps
