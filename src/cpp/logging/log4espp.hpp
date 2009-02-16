@@ -413,8 +413,8 @@ namespace log4espp {
   *   LOG4ESPP_LOGGER(logger,name)                       *
   *******************************************************/
 
-#define LOG4ESPP_ROOTLOGGER(aLogger) log4espp::LogClass aLogger = lo4espp::LogClass();
-#define LOG4ESPP_LOGGER(aLogger,name) log4espp::LogClass aLogger = log4espp::LogClass() ;
+#define LOG4ESPP_ROOTLOGGER(aLogger) log4espp::LogClass aLogger = log4espp::LogClass();
+#define LOG4ESPP_LOGGER(aLogger,name) log4espp::LogClass aLogger = log4espp::LogClass();
 #define LOG4ESPP_DECL_LOGGER(aLogger) log4espp::LogClass aLogger;
 
   /*******************************************************
@@ -504,6 +504,8 @@ namespace log4espp {
 
 namespace log4espp {
   class LogClass {
+  public:
+      LogClass() {};
   };
 }
 

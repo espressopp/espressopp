@@ -46,7 +46,7 @@ namespace espresso {
 
     virtual void operator()(const ParticleStorage::const_reference pref) {
 
-      printf("Particle : id = %d, pos = (%f,%f,%f), f = (%f,%f,%f)\n",
+      printf("Particle : id = %ld, pos = (%f,%f,%f), f = (%f,%f,%f)\n",
  
              id[pref], pos[pref].getX(), pos[pref].getY(), pos[pref].getZ(), 
              f[pref].getX(),  f[pref].getY(),  f[pref].getZ());

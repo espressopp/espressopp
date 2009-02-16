@@ -35,8 +35,9 @@ namespace espresso {
       */
        PairForceComputer(RealArrayRef _force, const Interaction& _interaction) 
          : force(_force),
-           pressure(0.0),
-           interaction(_interaction) {}
+           interaction(_interaction),
+           pressure(0.0)
+           {}
        
        // TODO: why do I have to care what kind of reference to a particle I have?
        virtual void operator()(const Real3D &dist,

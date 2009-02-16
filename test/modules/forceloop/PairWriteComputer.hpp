@@ -53,7 +53,7 @@ namespace espresso {
                                const espresso::particleset::ParticleSet::const_reference p2)
 
        {
-          printf("Pair: id = (%d,%d) , pos1 = (%f,%f,%f), pos2 = (%f,%f,%f), dist = (%f, %f, %f)\n",
+          printf("Pair: id = (%ld,%ld) , pos1 = (%f,%f,%f), pos2 = (%f,%f,%f), dist = (%f, %f, %f)\n",
 
                  id[p1], id[p2],
                  pos[p1].getX(), pos[p1].getY(), pos[p1].getZ(),

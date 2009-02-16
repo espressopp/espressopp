@@ -115,7 +115,7 @@ public:
     Reference property;
     real average;
 
-    AverageComputer(const Reference &_property): average(0), property(_property) {}
+    AverageComputer(const Reference &_property): property(_property), average(0) {}
 
     virtual void operator()(particlestorage::ParticleStorage::const_reference ref) {
         const Real3D p = property[ref];
@@ -161,8 +161,8 @@ void TestBasic::addParticle(const Real3D &pos) {
 void TestBasic::calculateForces(real epsilon, real sigma) {
     real cutoffSqr = 2.5*2.5;
     bc::PBC pbc(size);
-    for (int i = 0; i < npart; ++i) {
-        for (int j = i+1; j < npart; ++j) {
+    for (size_t i = 0; i < npart; ++i) {
+        for (size_t j = i+1; j < npart; ++j) {
             Real3D pos1 = position[i];
             Real3D pos2 = position[j];
             Real3D dist = pbc.getDist(pos1, pos2);
@@ -190,8 +190,8 @@ real TestBasic::calculateMinDist() {
     real min = 1e10;
 
     bc::PBC pbc(size);
-    for (int i = 0; i < npart; ++i) {
-        for (int j = i+1; j < npart; ++j) {
+    for (size_t i = 0; i < npart; ++i) {
+        for (size_t j = i+1; j < npart; ++j) {
             Real3D pos1 = position[i];
             Real3D pos2 = position[j];
             real d = sqrt(pbc.getDist(pos1, pos2).sqr());
@@ -205,7 +205,7 @@ real TestBasic::calculateMinDist() {
 
 real TestBasic::calculateAverage() {
     real average = 0;
-    for (int i = 0; i < npart; ++i) {
+    for (size_t i = 0; i < npart; ++i) {
         Real3D p = force[i];
         average += sqrt(p.sqr());
     }
