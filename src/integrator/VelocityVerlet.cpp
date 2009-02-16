@@ -8,7 +8,7 @@ using namespace espresso::pairs;
 
 typedef ParticleStorage::PropertyTraits<Real3D>::Reference RealArrayRef;
 
-class StepA : public espresso::particlestorage::ParticleComputer  {
+class StepA : public espresso::particlestorage::ParticleComputer {
 
    private:
 
@@ -21,16 +21,19 @@ class StepA : public espresso::particlestorage::ParticleComputer  {
 
    public:
 
-      StepA(RealArrayRef _posRef, RealArrayRef _velRef,RealArrayRef _forceRef, real _timeStep):
+      StepA(RealArrayRef _posRef, RealArrayRef _velRef, RealArrayRef _forceRef, real _timeStep):
           pos(_posRef), vel(_velRef), force(_forceRef),
           timeStep(_timeStep), timeStepSqr(_timeStep * _timeStep) {}
 
+      //m=1
       virtual void operator()(espresso::particlestorage::ParticleStorage::reference pref) {
        pos[pref] = pos[pref] + vel[pref] * timeStep + 0.5 * force[pref] * timeStepSqr;
+       vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
        force[pref] = 0.0;
       }
 
 };
+
 
 class StepB : public espresso::particlestorage::ParticleComputer  {
 
@@ -44,13 +47,11 @@ class StepB : public espresso::particlestorage::ParticleComputer  {
   public:
 
      StepB(RealArrayRef _velRef,RealArrayRef _forceRef, real _timeStep):
-
          vel(_velRef), force(_forceRef), timeStep(_timeStep) {}
 
+     //m=1
      virtual void operator()(espresso::particlestorage::ParticleStorage::reference pref) {
-
         vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
-
      }
 
 };
