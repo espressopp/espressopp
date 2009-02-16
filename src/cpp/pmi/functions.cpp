@@ -6,6 +6,10 @@
 using namespace std;
 
 namespace pmi {
+  unsigned int getControllerMPIRank() {
+    return CONTROLLER_ID;
+  }
+
   WorkerIdType getWorkerId() {
     return pmi::transmit::getWorkerId();
   }

@@ -63,7 +63,7 @@ namespace pmi {
 		    << msg[2] << ", "				\
 		    << msg[3] << ")."				\
 		    );
-      MPI::COMM_WORLD.Bcast(msg, 4, MPI::UNSIGNED, 0);
+      MPI::COMM_WORLD.Bcast(msg, 4, MPI::UNSIGNED, getControllerMPIRank());
       LOG4ESPP_DEBUG(mpilogger, "Controller finished broadcast.");
     }
   
@@ -72,18 +72,18 @@ namespace pmi {
     broadcastName(const string &name, const unsigned int length) {
       // broadcast the string
       LOG4ESPP_INFO(mpilogger, "Controller broadcasts name \"" << name << "\".");
-      MPI::COMM_WORLD.Bcast(const_cast<char*>(name.c_str()), length, MPI::CHAR, 0);
+      MPI::COMM_WORLD.Bcast(const_cast<char*>(name.c_str()), length, MPI::CHAR, getControllerMPIRank());
       LOG4ESPP_DEBUG(mpilogger, "Controller finished broadcast.");
     }
   
     void
-    broadcastObjectId(const IdType objectId) {
+    broadcastPMIObjectId(const IdType objectId) {
       unsigned int oid = objectId;
     
       LOG4ESPP_INFO(mpilogger, "Controller broadcasts object (OID = "	\
 		    << oid << ")."					\
 		    );
-      MPI::COMM_WORLD.Bcast(&oid, 1, MPI::UNSIGNED, 0);
+      MPI::COMM_WORLD.Bcast(&oid, 1, MPI::UNSIGNED, getControllerMPIRank());
       LOG4ESPP_DEBUG(mpilogger, "Controller finished broadcast.");
     }
     
@@ -94,7 +94,7 @@ namespace pmi {
       unsigned short allStatus[size];
       LOG4ESPP_DEBUG(mpilogger, "Controller gathers status of workers.");
       MPI::COMM_WORLD.Gather(allStatus, 1, MPI::UNSIGNED_SHORT, 
-			     allStatus, 1, MPI::UNSIGNED_SHORT, 0);
+			     allStatus, 1, MPI::UNSIGNED_SHORT, getControllerMPIRank());
       LOG4ESPP_DEBUG(mpilogger, "Controller gathered status of workers.");
       for (int i = 1; i < MPI::COMM_WORLD.Get_size(); i++) {
 	if (allStatus[i] != STATUS_OK) {
@@ -173,7 +173,7 @@ namespace pmi {
       LOG4ESPP_DEBUG(mpilogger, "Worker " << getWorkerId()	\
 		     << " waits to receive a command.");
       
-      MPI::COMM_WORLD.Bcast(msg, 4, MPI::UNSIGNED, 0);
+      MPI::COMM_WORLD.Bcast(msg, 4, MPI::UNSIGNED, getControllerMPIRank());
       LOG4ESPP_INFO(mpilogger, "Worker " << getWorkerId()		\
 		    << " received command ("				\
 		    << msg[0] << ", "					\
@@ -190,7 +190,7 @@ namespace pmi {
       LOG4ESPP_DEBUG(mpilogger, printWorkerId()			\
 		     << "waits to receive a name of length "	\
 		     << length << ".");
-      MPI::COMM_WORLD.Bcast(&s, length, MPI::CHAR, 0);
+      MPI::COMM_WORLD.Bcast(&s, length, MPI::CHAR, getControllerMPIRank());
       string name = s;
       LOG4ESPP_INFO(mpilogger, printWorkerId()			\
 		    << "received name \"" << name << "\".");
@@ -198,13 +198,13 @@ namespace pmi {
     }
     
     IdType
-    receiveObjectId() {
+    receivePMIObjectId() {
       unsigned int oid;
       
       LOG4ESPP_DEBUG(mpilogger, "Worker " << getWorkerId()	\
 		     << " waits to receive an object id.");
       
-      MPI::COMM_WORLD.Bcast(&oid, 1, MPI::UNSIGNED, 0);
+      MPI::COMM_WORLD.Bcast(&oid, 1, MPI::UNSIGNED, getControllerMPIRank());
       LOG4ESPP_INFO(mpilogger, "Worker " << getWorkerId()		\
 		    << " received object id "				\
 		    << oid << "."					\
@@ -219,7 +219,7 @@ namespace pmi {
       LOG4ESPP_INFO(mpilogger, printWorkerId()	\
 		    << "reports status OK.");
       MPI::COMM_WORLD.Gather(&STATUS_OK, 1, MPI::UNSIGNED_SHORT, 
-			     0, 0, MPI::UNSIGNED_SHORT, 0);
+			     0, 0, MPI::UNSIGNED_SHORT, getControllerMPIRank());
     }
     
     void
@@ -227,10 +227,10 @@ namespace pmi {
       LOG4ESPP_INFO(mpilogger, printWorkerId()				\
 		    << "reports error status " << status << ".");
       MPI::COMM_WORLD.Gather(&status, 1, MPI::UNSIGNED_SHORT, 
-			     0, 0, MPI::UNSIGNED_SHORT, 0);
+			     0, 0, MPI::UNSIGNED_SHORT, getControllerMPIRank());
       LOG4ESPP_INFO(mpilogger, printWorkerId()			\
 		    << "sends error message \"" << what << "\".");
-      MPI::COMM_WORLD.Send(what.c_str(), what.length()+1, MPI::CHAR, 0, 99);
+      MPI::COMM_WORLD.Send(what.c_str(), what.length()+1, MPI::CHAR, getControllerMPIRank(), 99);
     }
 
     void reportInternalError(const string &what) {

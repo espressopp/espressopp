@@ -11,7 +11,7 @@ using namespace std;
   template <>								\
   string pmi::ParallelClass<aClass>::CNAME =				\
     pmi::_registerClass<aClass>(name);
-  
+
 #define PMI_CREATE_SPMD_METHOD(name, class, method, object)	\
   void name() {							\
     object.invoke<&class::method>();				\

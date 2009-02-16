@@ -20,7 +20,7 @@ namespace pmi {
     "NOT_REGISTERED";
 
   typedef unsigned int WorkerIdType;
-  const static int CONTROLLER_ID = 0;
+  const static WorkerIdType CONTROLLER_ID = 0;
 }
 
 #endif

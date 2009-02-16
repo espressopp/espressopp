@@ -8,6 +8,10 @@
 #include "pmi/internal_func.hpp"
 
 namespace pmi {
+  /** Returns the MPI rank of the controller. Use this in broadcast
+      and gather messages in MPI. */
+  unsigned int getControllerMPIRank();
+
   /** Returns the worker id of the executing process. */
   WorkerIdType getWorkerId();
 
@@ -40,35 +44,35 @@ namespace pmi {
   // Broadcast an object (call this only on the controller)
   template < class T >
   void 
-  broadcastObject(T& obj) {
+  broadcastPMIObject(T& obj) {
     if (isController()) {
-      pmi::transmit::broadcastObjectId(obj.getObjectId());
+      pmi::transmit::broadcastPMIObjectId(obj.getObjectId());
     } else
       PMI_THROW_USER_ERROR("Called broadcastObject on worker!");
   }
 
   template < class T >
-  T* getObjectPtr(const IdType oid) {
+  T* getPMIObjectPtr(const IdType oid) {
     return static_cast<T*>(objects[oid]);
   }
 
   template < class T >
-  T& receiveObject() {
+  T& receivePMIObject() {
     if (isController())
       PMI_THROW_USER_ERROR("Called receiveObject on controller!")
     else {
-      IdType oid = pmi::transmit::receiveObjectId();
-      return *getObjectPtr<T*>(oid);
+      IdType oid = pmi::transmit::receivePMIObjectId();
+      return *getPMIObjectPtr<T*>(oid);
     }
   }
 
   template < class T >
-  T* receiveObjectPtr() {
+  T* receivePMIObjectPtr() {
     if (isController())
       PMI_THROW_USER_ERROR("Called receiveObjectPtr on controller!")
     else {
-      IdType oid = pmi::transmit::receiveObjectId();
-      return getObjectPtr<T>(oid);
+      IdType oid = pmi::transmit::receivePMIObjectId();
+      return getPMIObjectPtr<T>(oid);
     }
   }
   
@@ -76,11 +80,11 @@ namespace pmi {
   // On the controller: broadcasts the object pointed to by ptr
   // On the worker: receive an object
   template < class T >
-  void broadcastObject(T*& ptr) {
+  void broadcastPMIObject(T*& ptr) {
     if (isWorker()) {
-      ptr = receiveObjectPtr<T*>();
+      ptr = receivePMIObjectPtr<T*>();
     } else {
-      broadcastObject<T>(*ptr);
+      broadcastPMIObject<T>(*ptr);
     }
   }
 

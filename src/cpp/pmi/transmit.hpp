@@ -24,7 +24,7 @@ namespace pmi {
 		const IdType objectId);
     void destroy(const IdType classId,
 		 const IdType objectId);
-    void broadcastObjectId(const IdType objectId);
+    void broadcastPMIObjectId(const IdType objectId);
 
 #ifndef PMI_OPTIMIZE
     // collect the results of the last operation from all workers
@@ -36,8 +36,7 @@ namespace pmi {
     void reportInternalError(const std::string &what);
 #endif
 
-    IdType receiveObjectId();
-
+    IdType receivePMIObjectId();
 
     // receive the next command from the controller and execute it
     // returns false if the stop worker command was received, true otherwise
