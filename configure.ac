@@ -10,7 +10,7 @@ AC_INIT([ESPResSo++], [0.1], [espressopp-user@www.espresso-pp.de], [espressopp])
 # basic autoconf configuration
 AC_CONFIG_MACRO_DIR(build-aux/macros)
 AC_CONFIG_AUX_DIR(build-aux)
-AC_CONFIG_SRCDIR([src/cpp/hello.hpp])
+AC_CONFIG_SRCDIR([src/espresso.cpp])
 
 # we use automake
 AM_INIT_AUTOMAKE([gnu subdir-objects dist-bzip2])
@@ -193,34 +193,32 @@ EOF
 ################################################################### 
 pythondir=${libdir}/${PACKAGE_TARNAME}/espresso
 AC_SUBST(pythondir)
-CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/src/cpp $LOG4ESPP_CPPFLAGS $BOOST_CPPFLAGS"
+CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/src $LOG4ESPP_CPPFLAGS $BOOST_CPPFLAGS"
 LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"
 
 ################################################################### 
 #                                                                 #
 #  Generation of output                                           #
 #  Makefiles in all subdirectories                                #
-#  src/cpp/acconfig.hpp                                           #
+#  src/acconfig.hpp                                           #
 #                                                                 #
 ################################################################### 
 
-AC_CONFIG_HEADERS([src/cpp/acconfig.hpp])
+AC_CONFIG_HEADERS([src/acconfig.hpp])
 
 AC_CONFIG_FILES([Makefile 
                  src/Makefile 
-                 src/cpp/Makefile
-                 src/cpp/pmi/Makefile
-                 src/cpp/mpi/Makefile
-                 src/cpp/hello/Makefile
-                 src/cpp/esutil/Makefile
-                 src/cpp/logging/Makefile
-                 src/cpp/interaction/Makefile
-                 src/cpp/pairs/Makefile
-                 src/cpp/bc/Makefile
-                 src/cpp/particleset/Makefile
-                 src/cpp/particlestorage/Makefile
-                 src/cpp/integrator/Makefile
-                 src/python/Makefile
+                 src/pmi/Makefile
+                 src/mpi/Makefile
+                 src/hello/Makefile
+                 src/esutil/Makefile
+                 src/logging/Makefile
+                 src/interaction/Makefile
+                 src/pairs/Makefile
+                 src/bc/Makefile
+                 src/particleset/Makefile
+                 src/particlestorage/Makefile
+                 src/integrator/Makefile
 		 doc/Makefile
 		 doc/dg/Makefile
                  test/Makefile

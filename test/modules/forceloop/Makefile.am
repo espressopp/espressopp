@@ -1,9 +1,9 @@
 LIBS= \
-	$(top_builddir)/src/cpp/particlestorage/libparticlestorage.la \
-	$(top_builddir)/src/cpp/interaction/libinteraction.la \
-	$(top_builddir)/src/cpp/pairs/libpairs.la \
-	$(top_builddir)/src/cpp/integrator/libintegrator.la \
-	$(top_builddir)/src/cpp/esutil/libesutil.la \
+	$(top_builddir)/src/particlestorage/libparticlestorage.la \
+	$(top_builddir)/src/interaction/libinteraction.la \
+	$(top_builddir)/src/pairs/libpairs.la \
+	$(top_builddir)/src/integrator/libintegrator.la \
+	$(top_builddir)/src/esutil/libesutil.la \
 	$(LOG4ESPP_LIBS)
 
 check_PROGRAMS = forceloop benchmark
