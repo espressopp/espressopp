@@ -254,6 +254,35 @@ BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
 	}
         i++;
     }
+
+    // and now, move some elements
+    mv.copy(mv[10], mv[9]);
+    BOOST_CHECK_EQUAL(size_t(44), mv.size());
+    mv.copy(mv.begin() + 3, mv.begin() + 7, mv.begin() + 11);
+    BOOST_CHECK_EQUAL(size_t(44), mv.size());
+
+    /* check the data is there, with constant array this time.
+       Now, we have:
+       mv[0:9]=0:9
+       mv[10] = mv[9] = 9
+       mv[11:14] = mv[3:6] = 3:6
+       mv[15:] = 13:
+     */
+
+    i = 0;
+    BOOST_FOREACH(TupleVector::const_reference ref,
+		  static_cast<const TupleVector &>(mv)) {
+	if (i < 10) {
+	    BOOST_CHECK_EQUAL(intRef[ref], int(i));
+	} else if (i == 10) {
+	    BOOST_CHECK_EQUAL(intRef[ref], 9);
+	} else if (i < 15) {
+	    BOOST_CHECK_EQUAL(intRef[ref], int(i - 8));
+	} else {
+	    BOOST_CHECK_EQUAL(intRef[ref], int(i - 2));
+	}
+        i++;
+    }
 }
 
 /*

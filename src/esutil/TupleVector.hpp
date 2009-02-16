@@ -16,31 +16,87 @@ namespace esutil {
 	different (e.g., elements are uninitialized)
     */
     class TupleVector {
+	// forward declarations of member classes, for making friends :-)
+    private:
+	class ReferenceBase;
+	template<class, class> class IteratorBase;
+	template<class, class> class PropertyReferenceBase;
+	template<class, class> class ArrayPropertyReferenceBase;
+
+        struct Property;
+
     public:
-	// forward declarations of member classes
 	class reference;
 	class const_reference;
 
-	template<class ReferenceType, class CRTP> class IteratorBase;
 	class iterator;
 	class const_iterator;
 
-	template<class T, class Property> class PropertyReferenceBase;
-	template<class T> class PropertyReference;
-	template<class T> class ConstPropertyReference;
+	template<class> class PropertyReference;
+	template<class> class ConstPropertyReference;
 
-	template<class T, class Property> class ArrayPropertyReferenceBase;
-	template<class T> class ArrayPropertyReference;
-	template<class T> class ConstArrayPropertyReference;
+	template<class> class ArrayPropertyReference;
+	template<class> class ConstArrayPropertyReference;
+
+    private:
+	/** Handler for a property. This really just stores the data;
+	    (re)allocation and freeing needs to be done from outside */
+	struct Property {
+	    /// unique property identifier
+	    size_t id;
+	    /// size of one element in characters
+	    size_t size;
+	    /// number of data type values in one element
+	    size_t dimension;
+	    /// memory segment storing the elements
+	    void *data;
+
+	    /** construct an empty property
+		@param _size byte size of an element
+		@param _dimension number of values in an element
+		(i.e. _size/_dimension = sizeof(datatype))
+		@param _data memory segment address
+	    */
+	    Property(size_t _id, size_t _size, size_t _dimension, void *_data)
+		: id(_id), size(_size), dimension(_dimension), data(_data) {}
+	};
+
+	/** a reference to a constant element, which then can be used to read
+	    properties of the element using
+	    @ref esutil::TupleVector::PropertyReference.
+	
+	    Actually, this is nothing but the index of the element. A
+	    reference can only be obtained from element access to the
+	    TupleVector class or its iterators.
+	*/
+	class ReferenceBase {
+        protected:
+	    /// constructable only through @ref esutil::TupleVector
+	    ReferenceBase(size_t _index): index(_index) {}
+
+	private:
+	    friend class TupleVector;
+	    template<class, class> friend class IteratorBase;
+	    template<class, class> friend class PropertyReferenceBase;
+	    template<class, class> friend class ArrayPropertyReferenceBase;
+
+	    /// index of the referenced particle
+	    size_t index;
+
+            /// not possible
+            void operator=(const const_reference &);
+	};
 
 	/** an iterator over elements. This is basically a reference to
 	    an element with a mutable index
 
-	    @tparam ReferenceType
+	    @tparam ReferenceType type we return as reference
+	    (reference or const_reference)
+	    @tparam CRTP curiously recurrent template pattern
 	*/
 	template<class ReferenceType, class CRTP>
 	class IteratorBase: public boost::iterator_facade<
-	    CRTP, 
+	    CRTP,
 	    ReferenceType,
 	    boost::random_access_traversal_tag,
 	    ReferenceType,
@@ -77,6 +133,66 @@ namespace esutil {
 	    }
 	};
 
+	/** reference to a scalar property. In fact this is just an array
+	    that is dereferenced using a @ref esutil::TupleVector::reference.
+	    This reference is only guaranteed to be valid between any two
+	    resizings of the TupleVector.
+	*/
+	template<class T, class Property>
+	class PropertyReferenceBase {
+            /// not possible
+            void operator=(const PropertyReferenceBase &);
+
+	protected:
+	    /// data shortcut, already type-casted
+	    T *data;
+
+	    /// constructor
+	    PropertyReferenceBase(Property &_property)
+		: data(static_cast<T *>(_property.data)) {};
+	    /// constructor
+	    PropertyReferenceBase(T *_data)
+		: data(_data) {};
+
+	public:
+	    /// dereference
+	    T &operator[](reference n) const { return data[n.index]; }
+	    /// dereference
+	    const T &operator[](const_reference n) const { return data[n.index]; }
+	};
+
+	/** reference to an array property. In contrast to
+	    @ref TupleVector::PropertyReference, this returns a pointer, since
+	    the element itself is in fact an array whose size
+	    is only known at runtime.
+	*/
+	template<class T, class Property>
+	class ArrayPropertyReferenceBase {
+            /// not possible
+            void operator=(const ArrayPropertyReferenceBase &);
+
+	protected:
+	    /// data short cut from property
+	    T *data;
+	    /// number of values per element, short cut from property
+	    int dimension;
+
+	    /// constructor
+	    ArrayPropertyReferenceBase(Property &_property)
+		: data(static_cast<T *>(_property.data)),
+		  dimension(_property.dimension) {};
+	    /// constructor
+	    ArrayPropertyReferenceBase(T *_data, size_t _dimension)
+		: data(_data), dimension(_dimension) {};
+
+	public:
+	    /// dereference
+	    T *operator[](reference n) const { return data + n.index*dimension; }
+	    /// dereference
+	    const T *operator[](const_reference n) const { return data + n.index*dimension; }
+	};
+
+    public:
 	/// @name standard vector members
 	//@{
 
@@ -86,25 +202,6 @@ namespace esutil {
 	///
 	typedef ptrdiff_t difference_type;
   
-	/// see @ref reference; this class marks the referenced element as const
-	class const_reference {
-        protected:
-	    /// constructable only through @ref TupleVector
-	    const_reference(size_type _index): index(_index) {}
-
-	private:
-	    friend class TupleVector;
-	    template<class ReferenceType, class CRTP> friend class IteratorBase;
-	    template<class T, class Property> friend class PropertyReferenceBase;
-	    template<class T, class Property> friend class ArrayPropertyReferenceBase;
-
-	    /// index of the referenced particle
-	    size_t index;
-
-            /// not possible
-            void operator=(const const_reference &);
-	};
-
 	/** a reference to an element, which then can be used to read and
 	    write properties of the element using TupleVector::PropertyReference.
 	
@@ -112,17 +209,46 @@ namespace esutil {
 	    reference can only be obtained from element access to the
 	    TupleVector class or its iterators.
 	*/
-	class reference: public const_reference {
+	class reference: public ReferenceBase  {
+        protected:
+	    /// constructable only through @ref esutil::TupleVector
+	    reference(size_type _index)
+                : ReferenceBase(_index) {}
+
+	private:
 	    friend class TupleVector;
-	    template<class ReferenceType, class CRTP> friend class IteratorBase;
+            friend class const_reference;
 
             /// not possible
             void operator=(const reference &);
-	    /// constructable only through @ref TupleVector
-	    reference(size_type _index): const_reference(_index) {}
 	};
 
-	/// see @ref TupleVector::IteratorBase
+	/** a reference to a constant element, which then can be used to read
+	    properties of the element using
+	    @ref esutil::TupleVector::PropertyReference.
+	
+	    Actually, this is nothing but the index of the element. A
+	    reference can only be obtained from element access to the
+	    TupleVector class or its iterators.
+	*/
+	class const_reference: public ReferenceBase  {
+        public:
+            /// non-const->const conversion
+	    const_reference(const reference &_ref): ReferenceBase(_ref.index) {}
+        protected:
+	    /// constructable only through @ref esutil::TupleVector
+	    const_reference(size_type _index): ReferenceBase(_index) {}
+
+	private:
+	    friend class TupleVector;
+
+            /// not possible
+            void operator=(const const_reference &);
+	};
+
+	/** a random iterator over elements. This is basically a reference to
+	    an element with a mutable index
+	*/
 	class iterator: public IteratorBase<reference, iterator> {
 	public:
 	    /// default constructor, uninitialized iterator
@@ -133,47 +259,141 @@ namespace esutil {
 	    friend class const_iterator;
 
 	    /// constructable only through @ref TupleVector
-	    iterator(size_type _index): IteratorBase<reference, iterator>(_index) {}
+	    iterator(size_type _index)
+                : IteratorBase<reference, iterator>(_index) {}
 	};
 
-	/// see @ref TupleVector::IteratorBase
+	/** a random iterator over constant elements. This is basically a
+	    reference to an element with a mutable index
+	*/
 	class const_iterator: public IteratorBase<const_reference, const_iterator> {
 	public:
 	    /// default constructor
 	    const_iterator() {}
+
+	    /// non-const->const conversion
+	    const_iterator(const iterator _it)
+                : IteratorBase<const_reference, const_iterator>(_it.index) {}
+
 	private:
 	    friend class TupleVector;
 
 	    /// constructable only through @ref TupleVector
-	    const_iterator(size_type _index): IteratorBase<const_reference, const_iterator>(_index) {}
-	    /// non-const->const conversion
-	    const_iterator(const iterator _it): IteratorBase<const_reference, const_iterator>(_it.index) {}
+	    const_iterator(size_type _index)
+                : IteratorBase<const_reference, const_iterator>(_index) {}
 	};
 
 	//@}
 
-    private:
-	/** Handler for a property. This really just stores the data;
-	    (re)allocation and freeing needs to be done from outside */
-	struct Property {
-	    /// unique property identifier
-	    size_t id;
-	    /// size of one element in characters
-	    size_t size;
-	    /// number of data type values in one element
-	    size_t dimension;
-	    /// memory segment storing the elements
-	    void *data;
+	/** @name property related members
 
-	    /** construct an empty property
-		@param _size byte size of an element
-		@param _dimension number of values in an element
-		(i.e. _size/_dimension = sizeof(datatype))
-		@param _data memory segment address
-	    */
-	    Property(size_t _id, size_t _size, size_t _dimension, void *_data)
-		: id(_id), size(_size), dimension(_dimension), data(_data) {}
+	    dealing with the properties dimension, extending the standard
+	    container interface. For efficiency, type checking is left to
+	    the class using TupleVector. For both adding and retrieving a
+	    property, the type is defined by a template parameter.
+	*/
+	//@{
+
+        /** reference to a scalar property. In fact this is just an array
+	    that is dereferenced using a @ref TupleVector::reference.
+	    This reference is only guaranteed to be valid between any two
+	    resizings of the TupleVector.
+            
+	    @tparam T the data type of the property (or more precisely,
+	    the datatype to interpret the property as)
+	*/
+	template<class T>
+	class PropertyReference: public PropertyReferenceBase<T, Property> {
+	    friend class TupleVector;
+	    friend class ConstPropertyReference<T>;
+
+            /// not possible
+            void operator=(const PropertyReference &);
+
+	    PropertyReference(Property &_property)
+		: PropertyReferenceBase<T, Property>(_property) {};
 	};
+
+        /** reference to a constant scalar property. In fact this is just
+            an array that is dereferenced using a @ref TupleVector::reference.
+	    This reference is only guaranteed to be valid between any two
+	    resizings of the TupleVector.
+            
+	    @tparam T the data type of the property (or more precisely,
+	    the datatype to interpret the property as)
+	*/
+	template<class T>
+	class ConstPropertyReference
+	    : public PropertyReferenceBase<const T, const Property> {
+	    friend class TupleVector;
+
+            /// not possible
+            void operator=(const ConstPropertyReference &);
+
+	    ConstPropertyReference(const Property &_property)
+		: PropertyReferenceBase<const T, const Property>(_property) {};
+	public:
+	    /// non-const->const conversion
+	    ConstPropertyReference(const PropertyReference<T> &_ref)
+		: PropertyReferenceBase<const T, const Property>(_ref.data) {}
+	};
+
+        /** reference to an vector-like property, which consists of
+            elements of a fixed number of replications of some data
+            type (ie, a classical C-array). In fact this is just an
+            array that is dereferenced using a
+            @ref TupleVector::reference. This reference is only guaranteed
+            to be valid between any two resizings of the TupleVector. Unlike
+            the @ref PropertyReference, this returns a pointer, in analogy
+            to a standard C-array.
+            
+	    @tparam T the data type of the property (or more precisely,
+	    the datatype to interpret the property as)
+	*/
+	template<class T>
+	class ArrayPropertyReference
+            : public ArrayPropertyReferenceBase<T, Property>
+        {
+	    friend class TupleVector;
+	    friend class ConstArrayPropertyReference<T>;
+            
+            /// not possible
+            void operator=(const ArrayPropertyReference &);
+
+	    ArrayPropertyReference(Property &_property)
+		: ArrayPropertyReferenceBase<T, Property>(_property) {};
+	};
+
+        /** reference to an constant vector-like property, which consists of
+            elements of a fixed number of replications of some data
+            type (ie, a classical C-array). In fact this is just an
+            array that is dereferenced using a
+            @ref TupleVector::reference. This reference is only guaranteed
+            to be valid between any two resizings of the TupleVector. Unlike
+            the @ref PropertyReference, this returns a pointer, in analogy
+            to a standard C-array.
+            
+	    @tparam T the data type of the property (or more precisely,
+	    the datatype to interpret the property as)
+	*/
+	template<class T>
+	class ConstArrayPropertyReference
+	    : public ArrayPropertyReferenceBase<const T, const Property>
+        {
+	    friend class TupleVector;
+
+            /// not possible
+            void operator=(const ConstArrayPropertyReference &);
+
+	    ConstArrayPropertyReference(const Property &_property)
+		: ArrayPropertyReferenceBase<const T, const Property>(_property) {};
+	public:
+	    /// non-const->const conversion
+	    ConstArrayPropertyReference(const ArrayPropertyReference<T> &_ref)
+		: ArrayPropertyReferenceBase<const T, const Property>(_ref.data, _ref.dimension) {}
+	};
+
+        //@}
 
     public:
 	/** default constructor. Constructs an empty TupleVector, but possibly
@@ -277,21 +497,32 @@ namespace esutil {
 	//@}
 
 	/** @name full element related members
+
 	    here are additional routines which allow to work
 	    with a whole element. These functions are in a
 	    way standard vector elements, however, for a standard
 	    vector, these functions are provided by the reference
-	    member only. Since in this class, the reference does
-	    not hold the full information, the functions need to be
-	    provided by the container.
+	    member only. Typically, an element can for example be copied
+            using a construct such as *a = *b. Since in this class,
+            the reference does not hold the full information,
+            these functions need to be provided by the container.
 	*/
 	//@{
 	/** copy all data of a particle
 	    @param dst where to write to
 	    @param src where to get the data from
 	*/
-	void assign(TupleVector::reference dst,
-		    TupleVector::const_reference src);
+	void copy(TupleVector::reference dst,
+                  TupleVector::const_reference src);
+	/** copy all data of a set of particles. This is typically faster
+            than looping over the set of particles.
+	    @param begin start of sequence to copy
+            @param end   end of sequence to copy
+	    @param dst   start of where to copy the data to
+	*/
+	void copy(TupleVector::const_iterator begin,
+                  TupleVector::const_iterator end,
+                  TupleVector::iterator dst);
 	//@}
 
 	/** @name property related members
@@ -302,135 +533,6 @@ namespace esutil {
 	    property, the type is defined by a template parameter.
 	*/
 	//@{
-
-	/** reference to a scalar property. In fact this is just an array
-	    that is dereferenced using a @ref TupleVector::reference.
-	    This reference is only guaranteed to be valid between any two
-	    resizings of the TupleVector.
-	*/
-	template<class T, class Property>
-	class PropertyReferenceBase {
-            /// not possible
-            void operator=(const PropertyReferenceBase &);
-
-	protected:
-	    /// data shortcut, already type-casted
-	    T *data;
-
-	    /// constructor
-	    PropertyReferenceBase(Property &_property)
-		: data(static_cast<T *>(_property.data)) {};
-	    /// constructor
-	    PropertyReferenceBase(T *_data)
-		: data(_data) {};
-
-	public:
-	    /// dereference
-	    T &operator[](reference n) const { return data[n.index]; }
-	    /// dereference
-	    const T &operator[](const_reference n) const { return data[n.index]; }
-	};
-
-	/** reference to an array property. In contrast to
-	    @ref TupleVector::PropertyReference, this returns a pointer, since
-	    the element itself is in fact an array whose size
-	    is only known at runtime.
-	*/
-	template<class T, class Property>
-	class ArrayPropertyReferenceBase {
-            /// not possible
-            void operator=(const ArrayPropertyReferenceBase &);
-
-	protected:
-	    /// data short cut from property
-	    T *data;
-	    /// number of values per element, short cut from property
-	    int dimension;
-
-	    /// constructor
-	    ArrayPropertyReferenceBase(Property &_property)
-		: data(static_cast<T *>(_property.data)),
-		  dimension(_property.dimension) {};
-	    /// constructor
-	    ArrayPropertyReferenceBase(T *_data, size_t _dimension)
-		: data(_data), dimension(_dimension) {};
-
-	public:
-	    /// dereference
-	    T *operator[](reference n) const { return data + n.index*dimension; }
-	    /// dereference
-	    const T *operator[](const_reference n) const { return data + n.index*dimension; }
-	};
-
-	/// see @ref TupleVector::PropertyReferenceBase
-	template<class T>
-	class PropertyReference: public PropertyReferenceBase<T, Property> {
-	    friend class TupleVector;
-	    friend class ConstPropertyReference<T>;
-
-            /// not possible
-            void operator=(const PropertyReference &);
-
-	    PropertyReference(Property &_property)
-		: PropertyReferenceBase<T, Property>(_property) {};
-	};
-
-	/// see @ref TupleVector::PropertyReferenceBase; this is for a constant property
-	template<class T>
-	class ConstPropertyReference
-	    : public PropertyReferenceBase<const T, const Property> {
-	    friend class TupleVector;
-
-            /// not possible
-            void operator=(const ConstPropertyReference &);
-
-	    ConstPropertyReference(const Property &_property)
-		: PropertyReferenceBase<const T, const Property>(_property) {};
-	public:
-	    /// non-const->const conversion
-	    ConstPropertyReference(const PropertyReference<T> &_ref)
-		: PropertyReferenceBase<const T, const Property>(_ref.data) {}
-	};
-
-	/** see @ref TupleVector::ArrayPropertyReferenceBase
-	    @tparam T the data type of the property (or more precisely,
-	    the datatype to interpret the property as)
-	*/
-	template<class T>
-	class ArrayPropertyReference
-            : public ArrayPropertyReferenceBase<T, Property>
-        {
-	    friend class TupleVector;
-	    friend class ConstArrayPropertyReference<T>;
-            
-            /// not possible
-            void operator=(const ArrayPropertyReference &);
-
-	    ArrayPropertyReference(Property &_property)
-		: ArrayPropertyReferenceBase<T, Property>(_property) {};
-	};
-
-	/** see @ref TupleVector::ArrayPropertyReferenceBase;
-	    this is for a constant property
-	    @tparam T the data type of the property (or more precisely,
-	    the datatype to interpret the property as)
-	*/
-	template<class T>
-	class ConstArrayPropertyReference
-	    : public ArrayPropertyReferenceBase<const T, const Property>
-        {
-	    friend class TupleVector;
-
-            /// not possible
-            void operator=(const ConstArrayPropertyReference &);
-
-	    ConstArrayPropertyReference(const Property &_property)
-		: ArrayPropertyReferenceBase<const T, const Property>(_property) {};
-	public:
-	    /// non-const->const conversion
-	    ConstArrayPropertyReference(const ArrayPropertyReference<T> &_ref)
-		: ArrayPropertyReferenceBase<const T, const Property>(_ref.data, _ref.dimension) {}
-	};
 
 	/** add a property
 	    @param dim dimensionality of the stored entries

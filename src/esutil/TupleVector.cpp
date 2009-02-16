@@ -129,7 +129,7 @@ TupleVector::iterator TupleVector::insert(TupleVector::iterator pos,
 					  TupleVector::const_reference e)
 {
     iterator it = insert(pos);
-    assign(*it, e);
+    copy(*it, e);
     return it;
 }
 
@@ -157,10 +157,17 @@ TupleVector::iterator TupleVector::erase(TupleVector::iterator start,
     return start;
 }
 
-void TupleVector::assign(TupleVector::reference dst,
-			 TupleVector::const_reference src)
+void TupleVector::copy(TupleVector::reference dst,
+                       TupleVector::const_reference src)
 {
     if (dst.index != src.index)
 	memmove(dst.index, src.index, 1);
+}
+
+void TupleVector::copy(TupleVector::const_iterator begin,
+                       TupleVector::const_iterator end,
+                       TupleVector::iterator dst)
+{
+    memcpy(dst.index, begin.index, end - begin);
 }
 
