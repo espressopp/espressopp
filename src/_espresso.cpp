@@ -2,8 +2,10 @@
  This file contains the main routine for the embedded python
  interpreter version of ESPResSo. 
 */
+#include "acconfig.hpp"
 #include "espresso_common.hpp"
-#include <boost/python.hpp>
+#include <python.hpp>
+#include <pmi.hpp>
 
 /** called when python exits to clean up. */
 static void finalize();
@@ -17,7 +19,7 @@ BOOST_PYTHON_MODULE(_espresso)
   Py_AtExit(&finalize);
 
 #ifdef HAVE_MPI
-  mpi::initMPI();
+  initMPI();
   if (!pmi::mainLoop()) {
     // the controller:
     // initialize python espresso glue
@@ -38,7 +40,7 @@ void finalize() {
   if (pmi::isController()) {
     pmi::endWorkers();
   }
-  mpi::finalizeMPI();
+  finalizeMPI();
 #endif
   logging::finalizeLogging();
 }

@@ -21,20 +21,20 @@ namespace pmi {
   class ParallelMethod {
   public:
     // store the name of the method
-    static string MNAME;
+    static std::string MNAME;
 
     // store the Id of the method
     static IdType MID;
 
     // register the method
     // this is typically called statically
-    static string registerMethod(const string &_name) {
-      string name = ParallelClass<T>::getName() + "::" +_name + "()";
+    static std::string registerMethod(const std::string &_name) {
+      std::string name = ParallelClass<T>::getName() + "::" +_name + "()";
       methodCallersByName()[name] = methodCallerTemplate<T, method>;
       return name;
     }
 
-    static const string &getName() { return MNAME; }
+    static const std::string &getName() { return MNAME; }
     //    static IdType &getId() { return MID; }
     
     static IdType &associate() {

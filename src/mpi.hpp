@@ -1,14 +1,7 @@
-#ifndef MPI_HPP
-#define MPI_HPP
+#ifndef _MPI_HPP
+#define _MPI_HPP
 
-namespace mpi {
-  /** initialize MPI environment with program arguments. */
-  void initMPI(int &argc, char **&argv);
-  /** initialize MPI environment with program arguments. */
-  void initMPI();
-
-  /** shut down MPI environment. */
-  void finalizeMPI();
-};
-
+#ifdef HAVE_MPI
+#include <boost/mpi.hpp>
+#endif
 #endif

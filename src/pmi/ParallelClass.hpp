@@ -4,12 +4,10 @@
 
 #include <iostream>
 
-using namespace std;
-
 // macro to register a class 
 #define PMI_REGISTER_CLASS(name, aClass)				\
   template <>								\
-  string pmi::ParallelClass<aClass>::CNAME =				\
+  std::string pmi::ParallelClass<aClass>::CNAME =			\
     pmi::_registerClass<aClass>(name);
 
 #define PMI_CREATE_SPMD_METHOD(name, class, method, object)	\
@@ -28,7 +26,7 @@ namespace pmi {
   IdType _generateObjectId();
   void _freeObjectId(const IdType id);
   template <typename T>
-  const string &_registerClass(const string &name) {
+  const std::string &_registerClass(const std::string &name) {
     // register constructorCaller with name
     constructorCallersByName()[name] = constructorCallerTemplate<T>;
     // register destructorCaller with name
@@ -47,7 +45,7 @@ namespace pmi {
 
   private:
     // store the name of the class
-    static string CNAME;
+    static std::string CNAME;
 
     // store the Id of the class
     static IdType CID;
@@ -57,7 +55,7 @@ namespace pmi {
 
   public:
     // returns the name of the class
-    static const string &getName() { return CNAME; }
+    static const std::string &getName() { return CNAME; }
     IdType getObjectId() const { return OID; }
 
     // The constructor of the class: create an instance of the parallel object
@@ -97,7 +95,7 @@ namespace pmi {
 
     template < void (SubjectClass::*method)() >
     void invoke() {
-      const string &MNAME 
+      const std::string &MNAME 
 	= ParallelMethod<SubjectClass, method>::getName();
       
       if (isWorker())

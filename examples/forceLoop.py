@@ -18,7 +18,7 @@ allpairs=espresso.pairs.All(bc=pbc,set=particles)
 ljint=espresso.interaction.LennardJones(sigma=1, epsilon=1, cutoff=2.5)
 
 # Just compute the forces
-allpairs.computeForces(setforce='force', interaction=ljint)
+allpairs.computeForces(set='force', interaction=ljint)
 force=particles.getParticleProperty(name='force')
 sys.write(force[particles[17]])
 sys.write(particles[17].get(name='force'))

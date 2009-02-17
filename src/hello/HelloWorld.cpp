@@ -1,13 +1,10 @@
 #include "HelloWorld.hpp"
-#include "logging/log4espp.hpp"
 
 #include <sstream>
 
-#ifdef HAVE_MPI
-#include <boost/mpi.hpp>
-#endif
-
-#include <boost/python.hpp>
+#include <logging.hpp>
+#include <mpi.hpp>
+#include <python.hpp>
 #include <boost/foreach.hpp>
 
 using namespace std;
@@ -71,6 +68,7 @@ namespace espresso {
       // gather messages from the tasks
       boost::mpi::gather(world, ost.str(), 0);
     }
+#endif 
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PMI
@@ -78,7 +76,6 @@ namespace espresso {
     // here, you need to register the SERIAL class
     PMI_REGISTER_CLASS("espresso::hello::HelloWorld", espresso::hello::HelloWorld);
     PMI_REGISTER_METHOD("getMessageWorker", espresso::hello::HelloWorld, getMessageWorker);
-#endif 
 
 #ifdef HAVE_PYTHON  
     //////////////////////////////////////////////////

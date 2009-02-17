@@ -1,6 +1,9 @@
 //method to compute the potential energy
 
 #include "LennardJones.hpp"
+#include <mpi.hpp>
+#include <python.hpp>
+#include <iostream>
 
 using namespace espresso::interaction;
 
@@ -13,9 +16,10 @@ LOG4ESPP_LOGGER(LennardJones::theLogger, "interaction.LennardJones");
 namespace espresso {
   namespace interaction {
     LennardJones::LennardJones() {
-      setEpsilon(1.0);
-      setSigma(1.0);
-      setCutoff(2.5);
+      epsilon = 1.0;
+      sigma = 1.0;
+      cutoff = 2.5;
+      cutoffSqr = 2.5*2.5;
     }
 
     LennardJones::~LennardJones() {}
@@ -73,14 +77,106 @@ namespace espresso {
     real LennardJones::getCutoff() const { return cutoff; }
     real LennardJones::getCutoffSqr() const { return cutoffSqr; }
     void LennardJones::setCutoff(real _cutoff) { 
+#ifdef HAVE_MPI
+      pmiObject.invoke<&LennardJones::setCutoffWorker>();
+      boost::mpi::communicator world;
+      boost::mpi::broadcast(world, _cutoff, pmi::getControllerMPIRank());
+#endif
+      setCutoffLocal(_cutoff);
+    }
+
+#ifdef HAVE_MPI
+    void LennardJones::setCutoffWorker() {
+      real _cutoff;
+      boost::mpi::communicator world;
+      boost::mpi::broadcast(world, _cutoff, pmi::getControllerMPIRank());
+      setCutoffLocal(_cutoff);
+    }
+#endif
+
+    void LennardJones::setCutoffLocal(real _cutoff) {
       cutoff = _cutoff; 
       cutoffSqr = cutoff * cutoff;
     }
     
-    void LennardJones::setEpsilon(real _epsilon) { epsilon = _epsilon; }
     real LennardJones::getEpsilon() const { return epsilon; }
-    void LennardJones::setSigma(real _sigma) { sigma = _sigma; }
+    void LennardJones::setEpsilon(real _epsilon) { 
+#ifdef HAVE_MPI
+      pmiObject.invoke<&LennardJones::setEpsilonWorker>();
+      boost::mpi::communicator world;
+      boost::mpi::broadcast(world, _epsilon, pmi::getControllerMPIRank());
+#endif
+      setEpsilonLocal(_epsilon);
+    }
+
+#ifdef HAVE_MPI
+    void LennardJones::setEpsilonWorker() {
+      real _epsilon;
+      boost::mpi::communicator world;
+      boost::mpi::broadcast(world, _epsilon, pmi::getControllerMPIRank());
+      setEpsilonLocal(_epsilon);
+    }
+#endif    
+
+    void LennardJones::setEpsilonLocal(real _epsilon) {
+      epsilon = _epsilon;
+    }
+
     real LennardJones::getSigma() const { return sigma; }
+    void LennardJones::setSigma(real _sigma) { 
+#ifdef HAVE_MPI
+      pmiObject.invoke<&LennardJones::setSigmaWorker>();
+      boost::mpi::communicator world;
+      boost::mpi::broadcast(world, _sigma, pmi::getControllerMPIRank());
+#endif
+      setSigmaLocal(_sigma);
+    }
+    
+#ifdef HAVE_MPI
+    void LennardJones::setSigmaWorker() {
+      real _sigma;
+      boost::mpi::communicator world;
+      boost::mpi::broadcast(world, _sigma, pmi::getControllerMPIRank());
+      setSigmaLocal(_sigma);
+    }
+#endif    
+
+    void LennardJones::setSigmaLocal(real _sigma) {
+      sigma = _sigma;
+    }
+
 
   }
+
+
+  //////////////////////////////////////////////////
+  // REGISTRATION WITH PMI
+  //////////////////////////////////////////////////
+  PMI_REGISTER_CLASS("espresso::interaction::LennardJones", espresso::interaction::LennardJones);
+  PMI_REGISTER_METHOD("setCutoffWorker", espresso::interaction::LennardJones, setCutoffWorker);
+  PMI_REGISTER_METHOD("setEpsilonWorker", espresso::interaction::LennardJones, setEpsilonWorker);
+  PMI_REGISTER_METHOD("setSigmaWorker", espresso::interaction::LennardJones, setSigmaWorker);
+
+#ifdef HAVE_PYTHON  
+  //////////////////////////////////////////////////
+  // REGISTRATION WITH PYTHON
+  //////////////////////////////////////////////////
+  void 
+  LennardJones::registerPython() {
+    using namespace boost::python;
+    
+    class_<LennardJones>("interaction_LennardJones", init<>())
+      .def("getCutoff", &LennardJones::getCutoff)
+      .def("setCutoff", &LennardJones::setCutoff)
+      .def("getEpsilon", &LennardJones::getEpsilon)
+      .def("setEpsilon", &LennardJones::setEpsilon)
+      .def("getSigma", &LennardJones::getSigma)
+      .def("setSigma", &LennardJones::setSigma);
+
+//       .def("computeEnergy", &LennardJones::computeEnergy)
+//       .def("computeForce", &LennardJones::computeForce)
+  }
+#endif
+
+
 }

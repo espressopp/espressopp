@@ -7,7 +7,7 @@
 # import the espresso C++ library _escpp.so from the cpp source
 # directory.
 
-# Import the shared library from the cpp dir.
+# Import the shared library from the src dir.
 import os
-pathname=os.path.join(@cppdir@, '.libs')
+pathname=os.path.join(@srcdir@, '.libs')
 __path__.append(pathname)

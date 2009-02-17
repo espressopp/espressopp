@@ -1,5 +1,5 @@
-#ifndef TYPES_HPP
-#define TYPES_HPP
+#ifndef _TYPES_HPP
+#define _TYPES_HPP
 
 // general type definition to choose between single and double precsion 
 

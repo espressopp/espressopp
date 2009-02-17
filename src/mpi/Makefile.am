@@ -1,7 +1,0 @@
-AM_CPPFLAGS = $(BOOST_CPPFLAGS) $(LOG4ESPP_CPPFLAGS)
-AM_LDFLAGS = $(BOOST_LDFLAGS)
-
-noinst_LTLIBRARIES=libmpi.la
-
-libmpi_la_SOURCES = \
-	bindings.cpp

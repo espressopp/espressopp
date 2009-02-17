@@ -1,7 +1,5 @@
 #ifndef _HELLO_HELLOWORLD_HPP
 #define _HELLO_HELLOWORLD_HPP
-#include "acconfig.hpp"
-
 #include "pmi.hpp"
 
 #include <string>

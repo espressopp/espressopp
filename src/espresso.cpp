@@ -3,13 +3,10 @@
  interpreter version of ESPResSo. 
 */
 #include "acconfig.hpp"
-#include <iostream>
-
-#ifdef HAVE_BOOST_PYTHON
-#include <boost/python.hpp>
-#endif
-
 #include "espresso_common.hpp"
+#include <iostream>
+#include <python.hpp>
+#include <pmi.hpp>
 
 using namespace std;
 
@@ -35,9 +32,9 @@ int main(int argc, char **argv)
   logging::initLogging();
 
 #ifdef HAVE_MPI
-  mpi::initMPI(argc, argv);
+  initMPI(argc, argv);
 
-  if (!pmi::mainLoop()) {
+  if (pmi::isController()) {
 #endif
 #ifdef HAVE_BOOST_PYTHON
     // The controller:
@@ -60,12 +57,13 @@ int main(int argc, char **argv)
     // after finishing, terminate workers
     pmi::endWorkers();
   } else {
+    pmi::mainLoop();
     // The worker:
     // here, ESPResSo is already done, exit
     exitstate = 0;
   }
 
-  mpi::finalizeMPI();
+  finalizeMPI();
 #endif
   logging::finalizeLogging();
 

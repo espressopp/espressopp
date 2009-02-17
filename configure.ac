@@ -209,7 +209,6 @@ AC_CONFIG_HEADERS([src/acconfig.hpp])
 AC_CONFIG_FILES([Makefile 
                  src/Makefile 
                  src/pmi/Makefile
-                 src/mpi/Makefile
                  src/hello/Makefile
                  src/esutil/Makefile
                  src/logging/Makefile

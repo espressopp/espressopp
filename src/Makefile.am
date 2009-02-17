@@ -4,35 +4,33 @@ EXTRA_DIST =
 CLEANFILES =
 
 if HAVE_MPI
-  SUBDIRS += mpi pmi
+  SUBDIRS += pmi
 else
-  EXTRA_DIST += mpi pmi
+  EXTRA_DIST += pmi
 endif
 
 
 # declare the headers
 noinst_HEADERS = \
 	espresso_common.hpp \
-	logging.hpp \
-	hello.hpp
+	logging.hpp
 
 if HAVE_MPI
-noinst_HEADERS += mpi.hpp
+noinst_HEADERS += mpi.hpp pmi.hpp 
 endif
 
 # the common part of all Espresso flavors
 noinst_LTLIBRARIES = libespresso_common.la
 libespresso_common_la_SOURCES= espresso_common.cpp
 libespresso_common_la_LIBADD = \
-	hello/libhello.la \
 	logging/liblogging.la \
+	hello/libhello.la \
 	interaction/libinteraction.la \
 	$(BOOST_PYTHON_LIBS) $(LOG4ESPP_LIBS)
 
 if HAVE_MPI
 libespresso_common_la_LIBADD += \
 	pmi/libpmi.la \
-	mpi/libmpi.la \
 	$(BOOST_MPI_LIBS)
 endif
 
@@ -66,7 +64,7 @@ MOSTLYCLEANFILES=__init__.py __init__.pyc __init__.install.py
 # rename __init__.build.py to __init__.py in the build dir
 # copy __init__.install.py into the build dir
 all-local: python-all
-	sed -e "s,[@]cppdir[@],'$(abs_top_builddir)/src/cpp',g" \
+	sed -e "s,[@]srcdir[@],'$(abs_top_builddir)/src',g" \
 	$(srcdir)/__init__.build.py > __init__.py
 
 # install __init__.install.py into pkglibdir, renaming it to __init__.py
