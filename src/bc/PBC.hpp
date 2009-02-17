@@ -2,6 +2,7 @@
 #define _BC_PBC
 
 #include <cmath>
+#include "types.hpp"
 #include "bc/BC.hpp"
 
 namespace espresso {
@@ -16,13 +17,6 @@ namespace espresso {
 
       real length;
       real half_length;
-
-      int sign(real _r) const {
-        if(_r > 0)
-          return 1;
-        else
-          return -1;
-      }
 
     public:
 
