@@ -27,14 +27,15 @@ class Traverser1 : public esutil::VirtualUnaryFunction<Reference, void>  {
    
       public:
 
-      espresso::bc::BC& bc;
+      const espresso::bc::BC& bc;
 
-      SizeRef id;
-      RealArrayRef pos;
+      const SizeRef id;
+      const RealArrayRef pos;
 
       const Reference pref1;
       const Real3D pos1;
-   
+      const size_t id1;
+
       PairComputer& pairComputer;
 
       Traverser2(const All* all,
@@ -47,16 +48,16 @@ class Traverser1 : public esutil::VirtualUnaryFunction<Reference, void>  {
         pos(all->getSet().getStorage()->template getProperty<Real3D>(all->getCoordinateProperty())),
         pref1(pref),
         pos1(pos[pref1]),
+        id1(id[pref1]),
         pairComputer(_pairComputer)
 
         {  } 
 
       virtual void operator()(const Reference pref2) {
    
-        if (id[pref1] < id[pref2]) {
-          Real3D pos2 = pos[pref2];
- 
-          Real3D dist = bc.getDist(pos1, pos2);
+        if (id1 < id[pref2]) {
+
+          Real3D dist = bc.getDist(pos1, pos[pref2]);
    
           pairComputer(dist, pref1, pref2);
         }
