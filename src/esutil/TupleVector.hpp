@@ -74,14 +74,13 @@ namespace esutil {
 	    /// constructable only through @ref esutil::TupleVector
 	    ReferenceBase(size_t _index): index(_index) {}
 
-	private:
-	    friend class TupleVector;
-	    template<class, class> friend class IteratorBase;
-	    template<class, class> friend class PropertyReferenceBase;
-	    template<class, class> friend class ArrayPropertyReferenceBase;
-
 	    /// index of the referenced particle
 	    size_t index;
+
+	private:
+	    friend class TupleVector;
+	    template<class, class> friend class PropertyReferenceBase;
+	    template<class, class> friend class ArrayPropertyReferenceBase;
 
             /// not possible
             void operator=(const const_reference &);
@@ -209,15 +208,15 @@ namespace esutil {
 	    reference can only be obtained from element access to the
 	    TupleVector class or its iterators.
 	*/
-	class reference: public ReferenceBase  {
+	class reference: public ReferenceBase {
         protected:
 	    /// constructable only through @ref esutil::TupleVector
-	    reference(size_type _index)
-                : ReferenceBase(_index) {}
+	    reference(size_type _index): ReferenceBase(_index) {}
 
 	private:
 	    friend class TupleVector;
             friend class const_reference;
+	    template<class, class> friend class IteratorBase;
 
             /// not possible
             void operator=(const reference &);
@@ -231,7 +230,7 @@ namespace esutil {
 	    reference can only be obtained from element access to the
 	    TupleVector class or its iterators.
 	*/
-	class const_reference: public ReferenceBase  {
+	class const_reference: public ReferenceBase {
         public:
             /// non-const->const conversion
 	    const_reference(const reference &_ref): ReferenceBase(_ref.index) {}
@@ -241,6 +240,7 @@ namespace esutil {
 
 	private:
 	    friend class TupleVector;
+	    template<class, class> friend class IteratorBase;
 
             /// not possible
             void operator=(const const_reference &);
