@@ -1,9 +1,6 @@
 // the main routine for embedding python
-#include <boost/python.hpp>
+#include <python.hpp>
 #include <iostream>
-
-// include the various module python bindings
-#include "hello.hpp"
 
 using namespace boost;
 using namespace std;
