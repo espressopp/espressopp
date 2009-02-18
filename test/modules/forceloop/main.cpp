@@ -2,6 +2,9 @@
 // Example C++ program doing the same as the force loop Python script
 
 #include "types.hpp"
+#include "logging.hpp"
+#include "pmi.hpp"
+#include "espresso_common.hpp"
 #include "bc/PBC.hpp"
 #include "interaction/LennardJones.hpp"
 #include "interaction/FENE.hpp"
@@ -28,10 +31,14 @@ using namespace espresso::interaction;
 using namespace espresso::integrator;
 
 /** N stands for number particles in each dimensions.
+
+    N   SIZE 
+  10    15.0
+
 */
 
-#define N 10
-#define SIZE 15.0
+#define N 3
+#define SIZE 4.0
 
 typedef espresso::pairs::All AllPairs;
 typedef espresso::particleset::All AllParticles;
@@ -45,7 +52,7 @@ typedef espresso::particleset::All AllParticles;
     - print out particle data
 */
 
-int main() 
+void forceloop() 
 
 {
   // Create a new particle storage
@@ -120,6 +127,10 @@ int main()
 
   FENE fene;
 
+  fene.setK(1.5); 
+  fene.setr0(1.0); 
+  fene.setrMax(2.5); 
+
   // force will be the vector of all forces in the particle storage
   // and force[ref] returns the force (as RealArrayRef) of particle reference ref
 
@@ -152,5 +163,48 @@ int main()
   // check to see that particles have new positions
 
   particleStorage.foreach(pWriter);
+
+}
+
+int main() 
+
+{
+
+  LOG4ESPP_CONFIGURE();
+
+  // Initialization of PMI and Python
+
+  // initPythonEspresso();
+
+#ifdef HAVE_MPI
+  initMPI();
+#endif
+
+  std::cout << "Worker " << pmi::getWorkerId() << std::endl ;
+
+  if (pmi::isController()) {
+
+      std::cout << "Controller starts forceloop" << std::endl;
+
+      forceloop();
+
+      std::cout << "Controller ends forceloop" << std::endl;
+
+      pmi::endWorkers();
+
+      std::cout << "Controller has stopped workers" << std::endl;
+
+  } else {
+
+      std::cout << "Worker " << pmi::getWorkerId() << " starts mainLoop" << std::endl ;
+
+      pmi::mainLoop();
+
+      std::cout << "Worker " << pmi::getWorkerId() << " ends mainLoop" << std::endl ;
+  }
+
+#ifdef HAVE_MPI
+  finalizeMPI();
+#endif
 
 }

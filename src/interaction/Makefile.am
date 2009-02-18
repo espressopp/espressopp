@@ -8,4 +8,5 @@ subpkginclude_HEADERS = \
 noinst_LTLIBRARIES = libinteraction.la
 libinteraction_la_SOURCES = \
 	bindings.cpp \
-	LennardJones.cpp 
+	LennardJones.cpp \
+        FENE.cpp

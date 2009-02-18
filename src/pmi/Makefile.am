@@ -12,6 +12,8 @@ subpkginclude_HEADERS = \
 noinst_HEADERS = \
         worker_internal.hpp
 
+# AM_CPPFLAGS = -DLOG4ESPP_LEVEL_OFF
+
 lib_LTLIBRARIES = libpmi.la
 libpmi_la_SOURCES = \
         types.cpp \
