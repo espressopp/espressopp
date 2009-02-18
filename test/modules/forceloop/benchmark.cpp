@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <vector>
 
+#include "espresso_common.hpp"
 #include "types.hpp"
 #include "bc/PBC.hpp"
 #include "particlestorage/ParticleStorage.hpp"
@@ -315,6 +316,7 @@ void generateParticles(Test &test) {
 /// this routine runs the tests as defined above
 int main()
 {
+    IF_MPI(initMPI());
     esutil::WallTimer timer;
     TestEspresso espresso(N*N*N);
     cout << setw(20) << "setup Espresso: " << timer << endl;
@@ -418,4 +420,5 @@ int main()
             cerr << "ERROR: " << f1.getZ() << " vs. " << f2.getZ() << endl;
         }
     }
+    IF_MPI(finalizeMPI());
 }

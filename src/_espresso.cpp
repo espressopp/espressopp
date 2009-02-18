@@ -17,7 +17,7 @@ BOOST_PYTHON_MODULE(_espresso)
 
   LOG4ESPP_ROOTLOGGER(logger);
 
-  LOG4ESSP_INFO(logger, "BOOST_PYTHON_MODULE _espresso");
+  LOG4ESPP_INFO(logger, "BOOST_PYTHON_MODULE _espresso");
 
   // register with python to call finalize
   // when exiting, to clean up
@@ -30,13 +30,13 @@ BOOST_PYTHON_MODULE(_espresso)
 
   if (pmi::isController()) {
   
-    LOG4ESSP_INFO(logger, "BOOST_PYTHON_MODULE _espresso controller");
+    LOG4ESPP_INFO(logger, "BOOST_PYTHON_MODULE _espresso controller");
     // the controller:
     // initialize python espresso glue
     initPythonEspresso();
   } else {
     // a worker:
-    LOG4ESSP_INFO(logger, "BOOST_PYTHON_MODULE _espresso worker");
+    LOG4ESPP_INFO(logger, "BOOST_PYTHON_MODULE _espresso worker");
 
     pmi::mainLoop();
     // has disconnected, so we simply quit
@@ -45,7 +45,7 @@ BOOST_PYTHON_MODULE(_espresso)
 
 #else
 
-  LOG4ESSP_INFO(logger, "BOOST_PYTHON_MODULE _espresso without MPI/PMI");
+  LOG4ESPP_INFO(logger, "BOOST_PYTHON_MODULE _espresso without MPI/PMI");
 
   initPythonEspresso();
 
