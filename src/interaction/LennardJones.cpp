@@ -157,13 +157,26 @@ namespace espresso {
   PMI_REGISTER_METHOD("setEpsilonWorker", espresso::interaction::LennardJones, setEpsilonWorker);
   PMI_REGISTER_METHOD("setSigmaWorker", espresso::interaction::LennardJones, setSigmaWorker);
 
+
 #ifdef HAVE_PYTHON  
   //////////////////////////////////////////////////
   // REGISTRATION WITH PYTHON
   //////////////////////////////////////////////////
+//   Real3D LennardJones::computeForceOverload(const Real3D& dist) const {
+//     return LennardJones::computeForce(dist);
+//   }
+
   void 
   LennardJones::registerPython() {
     using namespace boost::python;
+
+    // create thin wrappers around overloaded member functions
+    Real3D (LennardJones::*computeForceOverload)(const Real3D&) const =
+      &LennardJones::computeForce;
+    real (LennardJones::*computeEnergyOverload1)(const Real3D &) const =
+      &LennardJones::computeEnergy;
+    real (LennardJones::*computeEnergyOverload2)(const real) const =
+      &LennardJones::computeEnergy;
     
     class_<LennardJones>("interaction_LennardJones", init<>())
       .def("getCutoff", &LennardJones::getCutoff)
@@ -171,10 +184,10 @@ namespace espresso {
       .def("getEpsilon", &LennardJones::getEpsilon)
       .def("setEpsilon", &LennardJones::setEpsilon)
       .def("getSigma", &LennardJones::getSigma)
-      .def("setSigma", &LennardJones::setSigma);
-
-//       .def("computeEnergy", &LennardJones::computeEnergy)
-//       .def("computeForce", &LennardJones::computeForce)
+      .def("setSigma", &LennardJones::setSigma)
+      .def("computeForce", computeForceOverload)
+      .def("computeEnergy", computeEnergyOverload1)
+      .def("computeEnergy", computeEnergyOverload2);
   }
 #endif
 
