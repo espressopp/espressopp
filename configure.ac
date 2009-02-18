@@ -193,6 +193,7 @@ EOF
 ################################################################### 
 pythondir=${libdir}/${PACKAGE_TARNAME}/espresso
 AC_SUBST(pythondir)
+AC_SUBST([abs_top_builddir])
 CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/src -I\$(top_srcdir)/src/include $LOG4ESPP_CPPFLAGS $BOOST_CPPFLAGS"
 LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"
 
