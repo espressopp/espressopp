@@ -14,8 +14,8 @@
 *                                                                           *
 ****************************************************************************/
 
-#ifndef LOG4ESPP_H
-#define LOG4ESPP_H
+#ifndef _LOG4ESPP_HPP
+#define _LOG4ESPP_HPP
 
 /************************************************************************
 *                                                                       *
@@ -122,23 +122,23 @@
 
 #if defined(HAVE_LOG4CPP) and defined(LOG4ESPP_USE_LOG4CPP)
 
-#include "log4cpp/Portability.hh"
+#include <log4cpp/Portability.hh>
 #ifdef LOG4CPP_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 #include <iostream>
 #include <sstream>
-#include "log4cpp/Category.hh"
-#include "log4cpp/Appender.hh"
-#include "log4cpp/FileAppender.hh"
-#include "log4cpp/OstreamAppender.hh"
+#include <log4cpp/Category.hh>
+#include <log4cpp/Appender.hh>
+#include <log4cpp/FileAppender.hh>
+#include <log4cpp/OstreamAppender.hh>
 #ifdef LOG4CPP_HAVE_SYSLOG
-#include "log4cpp/SyslogAppender.hh"
+#include <log4cpp/SyslogAppender.hh>
 #endif
-#include "log4cpp/Layout.hh"
-#include "log4cpp/BasicLayout.hh"
-#include "log4cpp/Priority.hh"
-#include "log4cpp/NDC.hh"
+#include <log4cpp/Layout.hh>
+#include <log4cpp/BasicLayout.hh>
+#include <log4cpp/Priority.hh>
+#include <log4cpp/NDC.hh>
 #include <log4cpp/SimpleConfigurator.hh>
 #include <log4cpp/BasicConfigurator.hh>
 
@@ -519,7 +519,7 @@ namespace log4espp {
 
 #define LOG4ESPP_ROOTLOGGER(aLogger) log4espp::LogClass aLogger;
 #define LOG4ESPP_LOGGER(aLogger,name) log4espp::LogClass aLogger;
-#define LOG4ESPP_DECL_LOGGER(aLogger) lo4espp::LogClass aLogger;
+#define LOG4ESPP_DECL_LOGGER(aLogger) log4espp::LogClass aLogger;
 
 #define LOG4ESPP_TRACE_ON(logger) (0)
 #define LOG4ESPP_DEBUG_ON(logger) (0)

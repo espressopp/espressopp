@@ -29,7 +29,7 @@ BOOST_PYTHON_MODULE(_escpp)
 int main(int argc, char **argv)
 {
   int exitstate = 0;
-  logging::initLogging();
+  LOG4ESPP_CONFIGURE();
 
 #ifdef HAVE_MPI
   initMPI(argc, argv);
@@ -65,7 +65,6 @@ int main(int argc, char **argv)
 
   finalizeMPI();
 #endif
-  logging::finalizeLogging();
 
   return exitstate;
 }

@@ -193,7 +193,7 @@ EOF
 ################################################################### 
 pythondir=${libdir}/${PACKAGE_TARNAME}/espresso
 AC_SUBST(pythondir)
-CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/src $LOG4ESPP_CPPFLAGS $BOOST_CPPFLAGS"
+CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/src -I\$(top_srcdir)/src/include $LOG4ESPP_CPPFLAGS $BOOST_CPPFLAGS"
 LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"
 
 ################################################################### 
@@ -208,10 +208,10 @@ AC_CONFIG_HEADERS([src/acconfig.hpp])
 
 AC_CONFIG_FILES([Makefile 
                  src/Makefile 
+		 src/include/Makefile
                  src/pmi/Makefile
-                 src/hello/Makefile
                  src/esutil/Makefile
-                 src/logging/Makefile
+                 src/hello/Makefile
                  src/interaction/Makefile
                  src/pairs/Makefile
                  src/bc/Makefile

@@ -1,5 +1,5 @@
 # declare the subdirs
-SUBDIRS = integrator esutil logging hello interaction pairs bc particleset particlestorage
+SUBDIRS = include esutil
 EXTRA_DIST =
 CLEANFILES =
 
@@ -9,21 +9,19 @@ else
   EXTRA_DIST += pmi
 endif
 
+SUBDIRS += \
+	hello interaction integrator \
+	pairs bc particleset particlestorage
+
 
 # declare the headers
 noinst_HEADERS = \
-	espresso_common.hpp \
-	logging.hpp
-
-if HAVE_MPI
-noinst_HEADERS += mpi.hpp pmi.hpp 
-endif
+	espresso_common.hpp
 
 # the common part of all Espresso flavors
 noinst_LTLIBRARIES = libespresso_common.la
 libespresso_common_la_SOURCES= espresso_common.cpp
 libespresso_common_la_LIBADD = \
-	logging/liblogging.la \
 	hello/libhello.la \
 	interaction/libinteraction.la \
 	$(BOOST_PYTHON_LIBS) $(LOG4ESPP_LIBS)

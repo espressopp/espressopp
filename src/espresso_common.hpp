@@ -4,13 +4,17 @@
 #include "acconfig.hpp"
 #include <logging.hpp>
 
-/** initialize the Espresso extensions to Python. */
+/** Initialize the extensions to Python. */
 void initPythonEspresso();
 
-
 #ifdef HAVE_MPI
+/** Initialize MPI. */
 void initMPI();
+
+/** Initialize MPI. */
 void initMPI(int &argc, char **&argv);
+
+/** Finalize MPI. */ 
 void finalizeMPI();
 #endif
 

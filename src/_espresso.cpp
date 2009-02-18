@@ -12,26 +12,30 @@ static void finalize();
 
 BOOST_PYTHON_MODULE(_espresso)
 {
-  logging::initLogging();
+  LOG4ESPP_CONFIGURE();
 
   // register with python to call finalize
   // when exiting, to clean up
   Py_AtExit(&finalize);
 
 #ifdef HAVE_MPI
+
   initMPI();
-  if (!pmi::mainLoop()) {
+  if (pmi::isController()) {
     // the controller:
     // initialize python espresso glue
     initPythonEspresso();
   } else {
     // a worker:
-    // pmi::mainLoop only exits after the controller
+    pmi::mainLoop();
     // has disconnected, so we simply quit
     Py_Exit(0);
   }
+
 #else
+
   initPythonEspresso();
+
 #endif
 }
 
@@ -42,5 +46,4 @@ void finalize() {
   }
   finalizeMPI();
 #endif
-  logging::finalizeLogging();
 }
