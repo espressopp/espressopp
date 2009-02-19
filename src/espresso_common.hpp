@@ -2,7 +2,6 @@
 #define _ESPRESSO_COMMON_HPP
 
 #include "acconfig.hpp"
-#include <logging.hpp>
 
 /** Initialize the extensions to Python. */
 void initPythonEspresso();

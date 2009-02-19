@@ -7,6 +7,7 @@
 #include <iostream>
 #include <python.hpp>
 #include <pmi.hpp>
+#include <logging.hpp>
 
 using namespace std;
 

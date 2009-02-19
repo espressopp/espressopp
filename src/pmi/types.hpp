@@ -1,6 +1,7 @@
 #ifndef _PMI_TYPES_HPP
 #define _PMI_TYPES_HPP
 
+#include "acconfig.hpp"
 #include <log4espp.hpp>
 #include <limits>
 #include <string>

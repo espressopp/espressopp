@@ -70,7 +70,7 @@ namespace pmi {
 	  // associate class with ID
 	  CID = _generateClassId();
 	
-	  LOG4ESPP_INFO(logger, "Controller associates class \"" << CNAME << \
+	  LOG4ESPP_INFO(pmi::logger, "Controller associates class \"" << CNAME << \
 			"\" with class id " << CID << ".");
 	  transmit::associateClass(CNAME, CID);
 #ifndef PMI_OPTIMIZE

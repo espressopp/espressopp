@@ -9,14 +9,14 @@
 #define PMI_THROW_INTL_ERROR(output)		\
   {						\
     std::ostringstream ost; ost << output;	\
-    LOG4ESPP_FATAL(logger, ost.str());		\
+    LOG4ESPP_FATAL(pmi::logger, ost.str());	\
     throw InternalError(ost.str());		\
   }
 
 #define PMI_THROW_USER_ERROR(output)		\
   {						\
     std::ostringstream ost; ost << output;	\
-    LOG4ESPP_FATAL(logger, ost.str());		\
+    LOG4ESPP_FATAL(pmi::logger, ost.str());	\
     throw UserError(ost.str());			\
   }
 
