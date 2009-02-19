@@ -3,8 +3,8 @@
  interpreter version of ESPResSo. 
 */
 #include "acconfig.hpp"
-#include "log4espp.hpp"
 #include "espresso_common.hpp"
+#include <logging.hpp>
 #include <python.hpp>
 #include <pmi.hpp>
 
