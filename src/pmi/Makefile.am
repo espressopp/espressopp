@@ -14,7 +14,7 @@ noinst_HEADERS = \
 
 # AM_CPPFLAGS = -DLOG4ESPP_LEVEL_OFF
 
-lib_LTLIBRARIES = libpmi.la
+noinst_LTLIBRARIES = libpmi.la
 libpmi_la_SOURCES = \
         types.cpp \
         internal_func.cpp \
