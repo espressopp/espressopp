@@ -179,6 +179,7 @@ int main()
 #ifdef HAVE_MPI
   initMPI();
 #endif
+#ifdef HAVE_MPI
 
   std::cout << "Worker " << pmi::getWorkerId() << std::endl ;
 
@@ -202,6 +203,9 @@ int main()
 
       std::cout << "Worker " << pmi::getWorkerId() << " ends mainLoop" << std::endl ;
   }
+#else
+  forceloop();
+#endif
 
 #ifdef HAVE_MPI
   finalizeMPI();
