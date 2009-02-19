@@ -21,6 +21,10 @@ all-local:
 		echo "espresso exists and is not a link, please remove" 1>&2; \
 		exit -1; \
 	fi
+	if test ! -e examples || test -h examples; then \
+		rm -f examples; \
+		$(LN_S) $(srcdir)/examples examples; \
+	fi
 clean-local:
 	if test -h espresso; then \
 		rm -f espresso; \
