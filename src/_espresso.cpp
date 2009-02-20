@@ -12,7 +12,6 @@
 static void finalize();
 
 BOOST_PYTHON_MODULE(_espresso)
-
 {
   LOG4ESPP_CONFIGURE();
 
@@ -55,9 +54,8 @@ BOOST_PYTHON_MODULE(_espresso)
 
 void finalize() {
 #ifdef HAVE_MPI
-  if (pmi::isController()) {
+  if (pmi::isController())
     pmi::endWorkers();
-  }
   finalizeMPI();
 #endif
 }

@@ -16,7 +16,7 @@ using namespace boost;
 
 /** minimalistic ESPResSo module initialization,
     for use with the static initialization */
-BOOST_PYTHON_MODULE(_escpp)
+BOOST_PYTHON_MODULE(_espresso)
 {
   initPythonEspresso();
 }
@@ -37,12 +37,12 @@ int main(int argc, char **argv)
 
   if (pmi::isController()) {
 #endif
-#ifdef HAVE_BOOST_PYTHON
+#ifdef HAVE_PYTHON
     // The controller:
     // register the modules that are compiled into this binary
     // has to be done before Py_Initialize
-    if (PyImport_AppendInittab(const_cast<char *>("espresso._escpp"), init_escpp) == -1) {      
-      cerr << "Could not add the ESPResSo module espresso._escpp to python's list of preloaded modules."
+    if (PyImport_AppendInittab(const_cast<char *>("espresso._espresso"), init_espresso) == -1) {      
+      cerr << "Could not add the ESPResSo module espresso._espresso to python's list of preloaded modules."
 	   << endl;
       exit(-1);
     }
@@ -52,6 +52,7 @@ int main(int argc, char **argv)
     // fire up python
     exitstate = Py_Main(argc, argv);
 #else
+    cerr << "Tried to start pure worker code on the controller!" << endl;
     exitstate = -1;
 #endif
 #ifdef HAVE_MPI
