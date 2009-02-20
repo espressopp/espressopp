@@ -93,7 +93,7 @@ if test "x$want_python" != "xno"; then
     [
         dnl which names to probe for the library
         if test "x$axes_python_version" = "x"; then
-            axes_python_possible_libs="python2.5 python2.4 python2.3 python"
+            axes_python_possible_libs="python2.7 python2.6 python2.5 python2.4 python2.3 python"
         else
             axes_python_possible_libs="$axes_python_version"
         fi
@@ -121,9 +121,18 @@ if test "x$want_python" != "xno"; then
         AC_CACHE_CHECK(for matching Python.h,
             axes_cv_python_include,
         [
+            dnl check include paths from CPPFLAGS
+            for axes_python_path_tmp in $CPPFLAGS; do
+                dnl translate -I flags into paths
+                case "$axes_python_path_tmp" in
+                -I*) axes_python_abs_path=`cd ${axes_python_path_tmp#-I} && pwd`
+                     axes_python_try_roots="$axes_python_try_roots $axes_python_abs_path" ;;
+                esac
+            done
+            axes_python_try_roots="$axes_python_try_roots /usr/include /usr/local/include"
+
             dnl check possible locations
-            for axes_python_path_tmp in /usr/include /usr/local/include \
-                    /opt/include /opt/local/include; do
+            for axes_python_path_tmp in $axes_python_try_roots; do
                 CPPFLAGS="$axes_python_saved_cppflags -I$axes_python_path_tmp/$axes_cv_python_lib"
                 AC_LINK_IFELSE(AC_LANG_PROGRAM([[
                         #include <Python.h>
