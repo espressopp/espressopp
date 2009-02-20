@@ -66,7 +66,6 @@ AH_BOTTOM([
 ])
 
 
-
 AXES_PYTHON
 if test "x$axes_cv_python_lib" = "xno" || \
    test "x$axes_cv_python_include" = "xno"; then
@@ -194,7 +193,7 @@ EOF
 pythondir=${libdir}/${PACKAGE_TARNAME}/espresso
 AC_SUBST(pythondir)
 AC_SUBST([abs_top_builddir])
-CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/src -I\$(top_srcdir)/src/include $LOG4ESPP_CPPFLAGS $BOOST_CPPFLAGS"
+CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/src -I\$(top_srcdir)/src/include $BOOST_CPPFLAGS"
 LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"
 
 ################################################################### 
@@ -246,54 +245,78 @@ cat << EOF
 **********************************************************************
 *                         Configuration summary                      *
 **********************************************************************
+*****************
+** COMPILATION **
+*****************
  * C++-compiler: $CXX
  * Python:
-    - headers found in $axes_cv_python_include
-    - using library lib$axes_cv_python_lib
+   - Headers: $PYTHON_CPPFLAGS
+   - Libraries: $PYTHON_LIBS
+ * Boost:
 EOF
 
+if test "x$BOOST_CPPFLAGS" != "x"; then
+    echo "   - Headers: $BOOST_CPPFLAGS"
+else
+    echo "   - Headers: default include path"
+fi
+
+cat <<EOF
+   - Library suffix: ${axes_cv_boost_lib_suffix#-}
+   - Linker flags: $BOOST_LDFLAGS
+   - boost.Python libraries: $BOOST_PYTHON_LIBS
+EOF
+
+dnl Unit test framework
+if test "x$BOOST_UNIT_TEST_FRAMEWORK_LIBS" != "x"; then
+echo "   - boost.Test libraries: $BOOST_UNIT_TEST_FRAMEWORK_LIBS"
+else
+echo "   - boost.Test libraries: not available"
+fi
+
+cat <<EOF
+ * Log4ESPP: $axes_log4espp
+   - Libraries: $LOG4ESPP_LIBS
+ * Final compilation flags:
+   - Preprocessor flags (CPPFLAGS): $CPPFLAGS
+   - Compiler flags (CXXFLAGS): $CXXFLAGS
+   - Linker flags (LDFLAGS): $LDFLAGS
+
+EOF
+
+cat <<EOF
+*****************
+** OTHER TOOLS **
+*****************
+ * mpiexec:
+EOF
 dnl MPI
 if test "x$axes_cv_mpi" != "xno"; then
     if test "$MYMPIEXEC" = ""; then
-        echo " * mpiexec disabled by user, no parallel tests will be run"
+        echo "   - disabled by user, no parallel tests will be run"
     else
-        if test -x "$MYMPIEXEC"; then
-            echo " * mpiexec: using mympiexec = $MYMPIEXEC"
-        else
-            echo " * mpiexec: using mympiexec = $MYMPIEXEC (not present or not executable at the moment)"
+        echo "   - will try to use $MYMPIEXEC"
+        if ! test -x "$MYMPIEXEC"; then
+            echo "   - (which does not exist or is not executable at the moment)"
         fi
         if test "$MPIEXEC" != "no"; then
-            echo "            fallback is $MPIEXEC, if mympiexec is not present"
+            echo "   - fallback: $MPIEXEC"
         else
-            echo "            no fallback, will not run parallel test if mympiexec is not present"
+            echo "   - no fallback"
         fi
     fi
 else
-    echo " * MPI is not used, will build serial program"
+    echo "  - MPI is not used, will build serial program"
 fi
-
-dnl Boost
-if test "x$axes_cv_boost" != "xyes"; then
-    echo "   - using headers in $axes_cv_boost"
-else
-    echo "   - using headers from default include path"
-fi
-echo "   - using flavor ${axes_cv_boost_lib_suffix#-}"
-
-dnl Unit test framework
-if test "x$axes_cv_boost_lib_unit_test_framework" != "xno"; then
-echo "   - using the boost unit test framework"
-fi
-
-dnl Logging
-echo " * Logging: uses $axes_log4espp"
 
 
 dnl Doxygen
 if test .$DOXYGEN != .no; then
-echo " * Doxygen: doxygen was found"
+echo " * Doxygen: $DOXYGEN"
 else
 echo " * Doxygen: doxygen was not found"
 fi
 
+echo
+echo "READY TO BUILD $PACKAGE_STRING"
 echo
