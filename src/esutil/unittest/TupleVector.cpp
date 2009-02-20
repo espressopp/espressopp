@@ -76,6 +76,32 @@ BOOST_FIXTURE_TEST_CASE(particles_resize_test, Fixture)
     BOOST_CHECK(mv.capacity() == 16);
 }
 
+BOOST_FIXTURE_TEST_CASE(pointers_test, Fixture)
+{
+    TupleVector::PropertyReference<int> pRef = mv.getProperty<int>(intProp);
+
+    ////// element references
+    TupleVector::reference ref = mv[17];
+    TupleVector::const_reference constRef = constMv[17];
+    TupleVector::pointer ptr = &ref;
+    TupleVector::const_pointer constPtr = &constRef;
+    // check comparisons
+    BOOST_CHECK(ptr == constPtr);
+    BOOST_CHECK(!(ptr != constPtr));
+
+    // check changing the pointer
+    constPtr = &mv[3];
+    BOOST_CHECK(ptr != constPtr);
+
+    // this does not compile, tries const -> non-const conversion
+    //TupleVector::pointer ptr2 = &constRef;
+
+    // check that addresses seem to match
+    pRef[ref] = 42;
+    pRef[*ptr] = 45;    
+    BOOST_CHECK(pRef[ref] == 45);
+}
+
 BOOST_FIXTURE_TEST_CASE(dereference_scalar_test, Fixture)
 {
     ////// property references

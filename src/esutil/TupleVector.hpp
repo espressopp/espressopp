@@ -18,7 +18,7 @@ namespace esutil {
     class TupleVector {
 	// forward declarations of member classes, for making friends :-)
     private:
-	class ReferenceBase;
+	class PointerBase;
 	template<class, class> class IteratorBase;
 	template<class, class> class PropertyReferenceBase;
 	template<class, class> class ArrayPropertyReferenceBase;
@@ -28,6 +28,9 @@ namespace esutil {
     public:
 	class reference;
 	class const_reference;
+
+	class pointer;
+	class const_pointer;
 
 	class iterator;
 	class const_iterator;
@@ -69,15 +72,19 @@ namespace esutil {
 	    reference can only be obtained from element access to the
 	    TupleVector class or its iterators.
 	*/
-	class ReferenceBase {
+	class PointerBase {
         protected:
 	    /// constructable only through @ref esutil::TupleVector
-	    ReferenceBase(size_t _index): index(_index) {}
+	    PointerBase() {}
+
+	    /// constructable only through @ref esutil::TupleVector
+	    PointerBase(size_t _index): index(_index) {}
 
 	    /// index of the referenced particle
 	    size_t index;
 
 	private:
+            // classes that need to access the index
 	    friend class TupleVector;
 	    template<class, class> friend class PropertyReferenceBase;
 	    template<class, class> friend class ArrayPropertyReferenceBase;
@@ -206,17 +213,24 @@ namespace esutil {
 	
 	    Actually, this is nothing but the index of the element. A
 	    reference can only be obtained from element access to the
-	    TupleVector class or its iterators.
+	    TupleVector class or its iterators. And from the implementation point of
+            view, it doesn't differ from a pointer.
 	*/
-	class reference: public ReferenceBase {
-        protected:
-	    /// constructable only through @ref esutil::TupleVector
-	    reference(size_type _index): ReferenceBase(_index) {}
+	class reference: public PointerBase {
+        public:
+            /// get pointer to the referenced particle
+            pointer operator&() const { return pointer(index); }
 
 	private:
+	    /// constructable only through @ref esutil::TupleVector
+	    reference(size_type _index): PointerBase(_index) {}
+
+            // classes that can construct a reference
 	    friend class TupleVector;
-            friend class const_reference;
+            friend class pointer;
 	    template<class, class> friend class IteratorBase;
+            // for accessing the index
+            friend class const_reference;
 
             /// not possible
             void operator=(const reference &);
@@ -230,20 +244,86 @@ namespace esutil {
 	    reference can only be obtained from element access to the
 	    TupleVector class or its iterators.
 	*/
-	class const_reference: public ReferenceBase {
+	class const_reference: public PointerBase {
         public:
             /// non-const->const conversion
-	    const_reference(const reference &_ref): ReferenceBase(_ref.index) {}
-        protected:
-	    /// constructable only through @ref esutil::TupleVector
-	    const_reference(size_type _index): ReferenceBase(_index) {}
+	    const_reference(const reference &_ref): PointerBase(_ref.index) {}
+            /// get pointer to the referenced particle
+            const_pointer operator&() const { return const_pointer(index); }
 
 	private:
+            // classes that can construct a const_reference
 	    friend class TupleVector;
+            friend class const_pointer;
 	    template<class, class> friend class IteratorBase;
+
+	    /// constructable only through @ref esutil::TupleVector
+	    const_reference(size_type _index): PointerBase(_index) {}
 
             /// not possible
             void operator=(const const_reference &);
+	};
+
+	/** a pointer to an element, which is basically a reference
+            with exchangeable address. You cannot do anything useful
+            with it except for converting it to a reference an with
+            that e. g. access a property.
+	
+	    Actually, this is nothing but the index of the element. A
+	    pointer can only be obtained from a reference.
+	*/
+	class pointer: public PointerBase {
+        public:
+            /// create uninitialized pointer
+            pointer() {}
+            /// dereference
+            reference operator*() const { return reference(index); }
+            /// reset particle we point to
+            void operator=(const pointer &_p) { index = _p.index; }
+            /// compare pointers
+            bool operator==(const const_pointer &p) { return const_pointer(*this) == p; }
+            /// compare pointers
+            bool operator!=(const const_pointer &p) { return const_pointer(*this) != p; }
+
+	private:
+            // classes that can construct a pointer
+            friend class reference;
+            // for accessing the index
+            friend class const_pointer;
+
+	    /// constructable only through @ref esutil::TupleVector::reference
+	    pointer(size_type _index): PointerBase(_index) {}
+	};
+
+	/** a const pointer to an element, which is basically a
+            reference with exchangeable address. You cannot do
+            anything useful with it except for converting it to a
+            reference an with that e. g. access a property.
+	
+	    Actually, this is nothing but the index of the element. A
+	    pointer can only be obtained from a reference.
+	*/
+	class const_pointer: public PointerBase {
+        public:
+            /// non-const->const conversion
+	    const_pointer(const pointer &_ref): PointerBase(_ref.index) {}
+            /// create uninitialized pointer
+            const_pointer() {}
+            /// dereference
+            const_reference operator*() const { return const_reference(index); }
+            /// reset particle we point to
+            void operator=(const const_pointer &_p) { index = _p.index; }
+            /// compare pointers
+            bool operator==(const const_pointer &p) { return index == p.index; }
+            /// compare pointers
+            bool operator!=(const const_pointer &p) { return index != p.index; }
+
+	private:
+            // classes that can construct a pointer
+            friend class const_reference;
+
+	    /// constructable only through @ref esutil::TupleVector::const_reference
+	    const_pointer(size_type _index): PointerBase(_index) {}
 	};
 
 	/** a random iterator over elements. This is basically a reference to
@@ -255,7 +335,9 @@ namespace esutil {
 	    iterator() {}
 
 	private:
+            // class that can generate an iterator
 	    friend class TupleVector;
+            // for accessing the index
 	    friend class const_iterator;
 
 	    /// constructable only through @ref TupleVector
@@ -276,6 +358,7 @@ namespace esutil {
                 : IteratorBase<const_reference, const_iterator>(_it.index) {}
 
 	private:
+            // class that can generate an iterator
 	    friend class TupleVector;
 
 	    /// constructable only through @ref TupleVector

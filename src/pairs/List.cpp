@@ -18,8 +18,8 @@ List::List(espresso::bc::BC& _bc,
            ParticleStorage& _storage, 
            size_t _coordinates) :
 
-   bc(_bc),
    storage(_storage),
+   bc(_bc),
    coordinates(_coordinates) 
 
    {}
