@@ -1,15 +1,16 @@
-#ifndef _BC_PBC
-#define _BC_PBC
+#ifndef _BC_PBC_HPP
+#define _BC_PBC_HPP
 
 #include <cmath>
 #include "types.hpp"
 #include "bc/BC.hpp"
 
 namespace espresso {
-
   namespace bc {
 
-    /** Class for parallel boundary conditions in all three dimensions. */
+    /** Class for periodic boundary conditions in all three dimensions. */
+    //currently we assume a cube
+    //names like PBC will need to change to cubic or orthorhombic
 
     class PBC : public BC {
 
@@ -20,48 +21,18 @@ namespace espresso {
 
     public:
 
-      /** Constructor for parallel boundary conditions for a box where all
-          three dimensions have the same length.
-      */
+      /** Constructor for cubic box */
+      PBC();
+      PBC(real _length);
 
-      PBC(real _length) { length = _length; half_length = length * 0.5; }
+      /** Method to compute the minimum image distance */
+      virtual Real3D getDist(const Real3D& pos1, const Real3D& pos2) const;
 
-      /** Routine delivers the distance vector between two positions.
-
-          \sa bc::BC::getDist
-      */
-
-      virtual Real3D getDist(const Real3D& pos1, const Real3D& pos2) const {
-
-        real xij;
-        real yij;
-        real zij;
-        real xijabs;
-        real yijabs;
-        real zijabs;
-
-        xij = pos1.getX() - pos2.getX();
-        yij = pos1.getY() - pos2.getY();
-        zij = pos1.getZ() - pos2.getZ();
-    
-        xijabs = fabs(xij);
-        yijabs = fabs(yij);
-        zijabs = fabs(zij);
-    
-        if(xijabs > half_length) xij = (xijabs - length) * sign(xij);
-        if(yijabs > half_length) yij = (yijabs - length) * sign(yij);
-        if(zijabs > half_length) zij = (zijabs - length) * sign(zij);
-
-        return Real3D(xij, yij, zij);
-
-      } 
-
-      /** Destructor for parallel boundary conditions */
-
-      virtual ~PBC() {}
+      /** Destructor for periodic boundary conditions */
+      virtual ~PBC();
 
     };
+
   }
 }
-
 #endif

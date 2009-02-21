@@ -1,5 +1,5 @@
-#ifndef _BC_BC
-#define _BC_BC
+#ifndef _BC_BC_HPP
+#define _BC_BC_HPP
 
 #include "types.hpp"
 
