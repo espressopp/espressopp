@@ -1,6 +1,7 @@
 #include "List.hpp"
 #include <stdexcept>
 #include <types.hpp>
+#include <algorithm>
 
 using namespace espresso::pairs;
 using namespace espresso::particlestorage;
@@ -29,38 +30,23 @@ int List::size() {
 }
 
 bool List::findPair(size_t id1, size_t id2) {
-
    Tuple T (id1, id2);
-
    std::vector<Tuple>::iterator it = find (id_list.begin(), id_list.end(), T);
-
    return it != id_list.end();
-
 }
 
-void List::addPair(size_t id1, size_t id2) 
-
-{
+void List::addPair(size_t id1, size_t id2) {
    Tuple T (id1, id2);
-
    id_list.push_back(Tuple(id1, id2));
 }
 
-void List::deletePair(size_t id1, size_t id2) 
-
-{  
+void List::deletePair(size_t id1, size_t id2) {  
    Tuple T(id1, id2);
-
    std::vector<Tuple>::iterator it = find (id_list.begin(), id_list.end(), T);
-
    if (it == id_list.end()) {
-
       throw std::runtime_error("deletePair: tuple not found");
-
    }
-
    id_list.erase(it);
-
 }
 
 void List::foreach(ParticlePairComputer& pairComputer) {
