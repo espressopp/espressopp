@@ -1,4 +1,4 @@
-from espresso._espresso import hello_HelloWorld
+from _espresso import hello_HelloWorld
 _HelloWorld=hello_HelloWorld
 
 # map the class _HelloWorld to the class in the pseudo-namespace

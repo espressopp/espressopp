@@ -41,8 +41,8 @@ int main(int argc, char **argv)
     // The controller:
     // register the modules that are compiled into this binary
     // has to be done before Py_Initialize
-    if (PyImport_AppendInittab(const_cast<char *>("espresso._espresso"), init_espresso) == -1) {      
-      cerr << "Could not add the ESPResSo module espresso._espresso to python's list of preloaded modules."
+    if (PyImport_AppendInittab(const_cast<char *>("_espresso"), init_espresso) == -1) {
+      cerr << "Could not add the ESPResSo module _espresso to python's list of preloaded modules."
 	   << endl;
       exit(-1);
     }
