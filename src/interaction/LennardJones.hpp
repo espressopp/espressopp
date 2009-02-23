@@ -40,26 +40,20 @@ namespace espresso {
       /** Destructor. */
       virtual ~LennardJones();
 
-      // PMI and Python visible:
+      // Setter and getter
+      PMI_DECL_SETTER(setCutoff, real, _cutoff);
+      virtual real getCutoff() const;
+
+      PMI_DECL_SETTER(setEpsilon, real, _epsilon);
+      virtual real getEpsilon() const;
+
+      PMI_DECL_SETTER(setSigma, real, _sigma);
+      virtual real getSigma() const;
+
+      // PMI and Python visible
       virtual real computeEnergy(const Real3D &dist) const;  
       virtual real computeEnergy(const real dist) const;
       virtual Real3D computeForce(const Real3D &dist) const;
-
-      virtual void setCutoff(real _cutoff);
-      virtual real getCutoff() const;
-
-      virtual void setEpsilon(real _epsilon);
-      virtual real getEpsilon() const;
-
-      virtual void setSigma(real _sigma);
-      virtual real getSigma() const;
-
-#ifdef HAVE_MPI
-      // PMI Worker routines:
-      virtual void setCutoffWorker();
-      virtual void setEpsilonWorker();
-      virtual void setSigmaWorker();
-#endif
 
       // NOT visible on PMI/Python:
       virtual real computeEnergy(const Real3D &dist,
@@ -72,12 +66,6 @@ namespace espresso {
 				  const const_reference p2) const;
 
       virtual real getCutoffSqr() const;
-
-      // Local functions
-    private:
-      virtual void setCutoffLocal(real _cutoff);
-      virtual void setEpsilonLocal(real _epsilon);
-      virtual void setSigmaLocal(real _sigma);
 
     };
   }

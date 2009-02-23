@@ -48,7 +48,7 @@ _espresso_la_SOURCES = _espresso.cpp
 _espresso_la_LDFLAGS = -module -no-undefined 
 _espresso_la_LIBADD = libespresso_common.la
 
-python_scripts=hello.py 
+python_scripts=hello.py interaction.py
 
 ## THE SCRIPTS
 python_SCRIPTS=$(python_scripts)

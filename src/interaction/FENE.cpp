@@ -11,14 +11,37 @@ LOG4ESPP_LOGGER(FENE::theLogger, "interaction.FENE");
 
 /* ---------------------------------------------------------------------- */
 
-FENE::FENE() {}
+PMI_REGISTER_CLASS("espresso::interaction::FENE", espresso::interaction::FENE);
+
+FENE::FENE() {
+  K = 1.0;
+  r0 = 0.0;
+  rMax = 1.0;
+}
        
 FENE::~FENE() {}
+
+PMI_DEFINE_SETTER(espresso::interaction, FENE, setK, real, _K) {
+  K = _K;
+}
+real FENE::getK() const { return K; }
+
+PMI_DEFINE_SETTER(espresso::interaction, FENE, setR0, real, _r0) {
+  r0 = _r0;
+}
+real FENE::getR0() const { return r0; }
+
+PMI_DEFINE_SETTER(espresso::interaction, FENE, setRMax, real, _rMax) {
+  rMax = _rMax;
+}
+real FENE::getRMax() const { return rMax; }
+      
+real FENE::getCutoff() const { return -1; }
+real FENE::getCutoffSqr() const { return -1; }
 
 real FENE::computeEnergy (const Real3D &dist,
 			  const const_reference p1,
 			  const const_reference p2) const {
-	         	
    return computeEnergy(dist);
 }
 
@@ -51,102 +74,6 @@ Real3D FENE::computeForce (const Real3D &dist) const {
 
     return f;
 }
-      
-      
-void FENE::setK(real _K) {
-
-#ifdef HAVE_MPI
-      // invoke setK for the Workers
-      pmiObject.invoke<&FENE::setKWorker>();
-      // broadcast _K
-      boost::mpi::communicator world;
-      boost::mpi::broadcast(world, _K, pmi::getControllerMPIRank());
-#endif
-      // invoke setK in SPMD mode
-      setKLocal(_K);
-}
-
-#ifdef HAVE_MPI
-void FENE::setKWorker() {
-
-      real _K;
-      // broadcast _K
-      boost::mpi::communicator world;
-      boost::mpi::broadcast(world, _K, pmi::getControllerMPIRank());
-      // invoke setK in SPMD mode
-      setKLocal(_K);
-}
-#endif
-
-void FENE::setr0(real _r0) { 
-
-#ifdef HAVE_MPI
-      // invoke setr0 for the Workers
-      pmiObject.invoke<&FENE::setr0Worker>();
-      // broadcast _r0
-      boost::mpi::communicator world;
-      boost::mpi::broadcast(world, _r0, pmi::getControllerMPIRank());
-#endif
-      // invoke setr0 in SPMD mode
-      setr0Local(_r0);
-}
-
-#ifdef HAVE_MPI
-void FENE::setr0Worker() {
-
-      real _r0;
-      // broadcast _r0
-      boost::mpi::communicator world;
-      boost::mpi::broadcast(world, _r0, pmi::getControllerMPIRank());
-      // invoke setr0 in SPMD mode
-      setr0Local(_r0);
-}
-#endif
-
-void FENE::setrMax(real _rMax) { 
-
-#ifdef HAVE_MPI
-      // invoke setrMax for the Workers
-      pmiObject.invoke<&FENE::setrMaxWorker>();
-      // broadcast _rMax
-      boost::mpi::communicator world;
-      boost::mpi::broadcast(world, _rMax, pmi::getControllerMPIRank());
-#endif
-      // invoke setrMax in SPMD mode
-      setrMaxLocal(_rMax);
-}
-
-#ifdef HAVE_MPI
-void FENE::setrMaxWorker() {
-
-      real _rMax;
-      // broadcast _rMax
-      boost::mpi::communicator world;
-      boost::mpi::broadcast(world, _rMax, pmi::getControllerMPIRank());
-      // invoke setrMax in SPMD mode
-      setrMaxLocal(_rMax);
-}
-#endif
-
-void FENE::setKLocal(real _K) { 
-  LOG4ESPP_INFO(theLogger, "setK (local) : " << _K);
-  K = _K; 
-}
-
-void FENE::setr0Local(real _r0) { r0 = _r0; }
-void FENE::setrMaxLocal(real _rMax) { rMax = _rMax; }
-      
-real FENE::getCutoff() const { return -1; }
-real FENE::getCutoffSqr() const { return -1; }
-
-//////////////////////////////////////////////////
-// REGISTRATION WITH PMI
-//////////////////////////////////////////////////
-
-PMI_REGISTER_CLASS("espresso::interaction::FENE", espresso::interaction::FENE);
-PMI_REGISTER_METHOD("setKWorker", espresso::interaction::FENE, setKWorker);
-PMI_REGISTER_METHOD("setr0Worker", espresso::interaction::FENE, setr0Worker);
-PMI_REGISTER_METHOD("setrMaxWorker", espresso::interaction::FENE, setrMaxWorker);
 
 #ifdef HAVE_PYTHON
 
@@ -168,8 +95,11 @@ PMI_REGISTER_METHOD("setrMaxWorker", espresso::interaction::FENE, setrMaxWorker)
 
     class_<FENE>("interaction_FENE", init<>())
       .def("setK", &FENE::setK)
-      .def("setr0", &FENE::setr0)
-      .def("setrMax", &FENE::setrMax)
+      .def("getK", &FENE::getK)
+      .def("setR0", &FENE::setR0)
+      .def("getR0", &FENE::getR0)
+      .def("setRMax", &FENE::setRMax)
+      .def("getRMax", &FENE::getRMax)
       .def("computeForce", computeForceOverload)
       .def("computeEnergy", computeEnergyOverload1)
       .def("computeEnergy", computeEnergyOverload2);

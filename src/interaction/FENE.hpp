@@ -41,6 +41,21 @@ namespace espresso {
        
       virtual ~FENE();
 
+      PMI_DECL_SETTER(setK, real, _K);
+      real getK() const;
+
+      PMI_DECL_SETTER(setR0, real, _r0);
+      real getR0() const;
+
+      PMI_DECL_SETTER(setRMax, real, _rMax);
+      real getRMax() const;
+      
+      /* FENE should probably derived from a two-body interaction
+	 without a cutoff to avoid the following */
+      virtual real getCutoff() const;
+      virtual real getCutoffSqr() const;
+
+
       virtual real computeEnergy (const Real3D &dist,
 				  const const_reference p1,
 				  const const_reference p2) const ;
@@ -56,31 +71,6 @@ namespace espresso {
 				   const const_reference p2) const;
 
       virtual Real3D computeForce (const Real3D &dist) const;
-      
-      virtual void setK(real _K);
-      virtual void setr0(real _r0);
-      virtual void setrMax(real _rMax);
-
-#ifdef HAVE_MPI
-      // PMI Worker routines:
-      virtual void setKWorker();
-      virtual void setr0Worker();
-      virtual void setrMaxWorker();
-#endif
-      
-      /* FENE should probably derived from a two-body interaction
-	 without a cutoff to avoid the following */
-      virtual real getCutoff() const;
-      virtual real getCutoffSqr() const;
-      
-      // Local functions
-
-    private:
-
-      virtual void setKLocal(real _K);
-      virtual void setr0Local(real _r0);
-      virtual void setrMaxLocal(real _rMax);
-
     };
   }
 }

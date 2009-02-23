@@ -5,11 +5,12 @@
 #include <iostream>
 
 // macro to register a class 
-#define PMI_REGISTER_CLASS(name, aClass)				\
-  template <>								\
-  std::string pmi::ParallelClass<aClass>::CNAME =			\
+#define PMI_REGISTER_CLASS(name, aClass)			\
+  template <>							\
+  std::string pmi::ParallelClass<aClass>::CNAME =		\
     pmi::_registerClass<aClass>(name);
 
+// macro to create an spmd method
 #define PMI_CREATE_SPMD_METHOD(name, class, method, object)	\
   void name() {							\
     object.invoke<&class::method>();				\

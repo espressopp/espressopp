@@ -1,16 +1,16 @@
-import _espresso
+import espresso.interaction
 
-lj = _espresso.interaction_LennardJones()
+lj = espresso.interaction.LennardJones()
 
 print "lj(1.2) =", lj.computeEnergy(1.2)
 print "lj(1.3) =", lj.computeEnergy(1.3)
 
-fene = _espresso.interaction_FENE()
+# fene = _espresso.interaction_FENE()
 
-fene.setK(1.5)
-fene.setr0(1.0)
-fene.setrMax(1.0)
+# fene.setK(1.5)
+# fene.setR0(1.0)
+# fene.setRMax(1.0)
 
-print "fene(1.2) =", fene.computeEnergy(1.2)
-print "fene(1.3) =", fene.computeEnergy(1.3)
+# print "fene(1.2) =", fene.computeEnergy(1.2)
+# print "fene(1.3) =", fene.computeEnergy(1.3)
 
