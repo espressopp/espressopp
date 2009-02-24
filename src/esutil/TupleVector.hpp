@@ -18,7 +18,7 @@ namespace esutil {
     class TupleVector {
 	// forward declarations of member classes, for making friends :-)
     private:
-	class PointerBase;
+	class ReferenceBase;
 	template<class, class> class IteratorBase;
 	template<class, class> class PropertyReferenceBase;
 	template<class, class> class ArrayPropertyReferenceBase;
@@ -29,9 +29,6 @@ namespace esutil {
 	class reference;
 	class const_reference;
 
-	class pointer;
-	class const_pointer;
-
 	class iterator;
 	class const_iterator;
 
@@ -41,12 +38,14 @@ namespace esutil {
 	template<class> class ArrayPropertyReference;
 	template<class> class ConstArrayPropertyReference;
 
+        typedef size_t PropertyId;
+
     private:
 	/** Handler for a property. This really just stores the data;
 	    (re)allocation and freeing needs to be done from outside */
 	struct Property {
 	    /// unique property identifier
-	    size_t id;
+	    PropertyId id;
 	    /// size of one element in characters
 	    size_t size;
 	    /// number of data type values in one element
@@ -60,7 +59,7 @@ namespace esutil {
 		(i.e. _size/_dimension = sizeof(datatype))
 		@param _data memory segment address
 	    */
-	    Property(size_t _id, size_t _size, size_t _dimension, void *_data)
+	    Property(PropertyId _id, size_t _size, size_t _dimension, void *_data)
 		: id(_id), size(_size), dimension(_dimension), data(_data) {}
 	};
 
@@ -72,25 +71,24 @@ namespace esutil {
 	    reference can only be obtained from element access to the
 	    TupleVector class or its iterators.
 	*/
-	class PointerBase {
+	class ReferenceBase {
         protected:
-	    /// constructable only through @ref esutil::TupleVector
-	    PointerBase() {}
+	    /// constructable only through TupleVector
+	    ReferenceBase() {}
 
-	    /// constructable only through @ref esutil::TupleVector
-	    PointerBase(size_t _index): index(_index) {}
+	    /// constructable only through TupleVector
+	    ReferenceBase(size_t _index): index(_index) {}
 
 	    /// index of the referenced particle
 	    size_t index;
 
 	private:
             // classes that need to access the index
-	    friend class TupleVector;
 	    template<class, class> friend class PropertyReferenceBase;
 	    template<class, class> friend class ArrayPropertyReferenceBase;
 
             /// not possible
-            void operator=(const const_reference &);
+            void operator=(const ReferenceBase &_ref);
 	};
 
 	/** an iterator over elements. This is basically a reference to
@@ -108,6 +106,10 @@ namespace esutil {
 	    ReferenceType,
 	    ptrdiff_t>
 	{
+	    friend class boost::iterator_core_access;
+            // classes that need to access the index
+	    friend class TupleVector;
+
 	public:
 	    /// reference type. Fixes up the iterator_facade for a reference only class
 	    typedef ReferenceType reference;
@@ -123,10 +125,8 @@ namespace esutil {
 	    size_t index;
 
 	private:
-	    friend class TupleVector;
-	    friend class boost::iterator_core_access;
-
-	    bool equal(const IteratorBase<ReferenceType, CRTP> &other) const {
+            template<class OtherReferenceType, class OtherIteratorType>
+	    bool equal(const IteratorBase<OtherReferenceType, OtherIteratorType> &other) const {
 		return index == other.index;
 	    }
 
@@ -211,26 +211,26 @@ namespace esutil {
 	/** a reference to an element, which then can be used to read and
 	    write properties of the element using TupleVector::PropertyReference.
 	
-	    Actually, this is nothing but the index of the element. A
+	    Actually, this is nothing but a wrapper for an iterator. A
 	    reference can only be obtained from element access to the
-	    TupleVector class or its iterators. And from the implementation point of
-            view, it doesn't differ from a pointer.
+	    TupleVector class or its iterators. And from the
+	    implementation point of view, it doesn't differ from a
+	    pointer.
 	*/
-	class reference: public PointerBase {
-        public:
-            /// get pointer to the referenced particle
-            pointer operator&() const { return pointer(index); }
-
-	private:
-	    /// constructable only through @ref esutil::TupleVector
-	    reference(size_type _index): PointerBase(_index) {}
-
+	class reference: private ReferenceBase {
             // classes that can construct a reference
 	    friend class TupleVector;
-            friend class pointer;
 	    template<class, class> friend class IteratorBase;
-            // for accessing the index
+            // for const->nonconst conversion
             friend class const_reference;
+
+        public:
+            /// get pointer to the referenced particle
+            iterator operator&() const { return iterator(index); }
+
+	private:
+	    /// constructable only through TupleVector
+	    reference(size_type _index): ReferenceBase(_index) {}
 
             /// not possible
             void operator=(const reference &);
@@ -240,107 +240,45 @@ namespace esutil {
 	    properties of the element using
 	    @ref esutil::TupleVector::PropertyReference.
 	
-	    Actually, this is nothing but the index of the element. A
+	    Actually, this is nothing but a wrapper for an iterator. A
 	    reference can only be obtained from element access to the
 	    TupleVector class or its iterators.
 	*/
-	class const_reference: public PointerBase {
-        public:
-            /// non-const->const conversion
-	    const_reference(const reference &_ref): PointerBase(_ref.index) {}
-            /// get pointer to the referenced particle
-            const_pointer operator&() const { return const_pointer(index); }
-
-	private:
+	class const_reference: private ReferenceBase {
             // classes that can construct a const_reference
 	    friend class TupleVector;
-            friend class const_pointer;
 	    template<class, class> friend class IteratorBase;
 
+        public:
+            /// non-const->const conversion
+	    const_reference(const reference &_ref): ReferenceBase(_ref) {}
+            /// get pointer to the referenced particle
+            const_iterator operator&() const { return const_iterator(index); }
+
+	private:
+
 	    /// constructable only through @ref esutil::TupleVector
-	    const_reference(size_type _index): PointerBase(_index) {}
+	    const_reference(size_type _index): ReferenceBase(_index) {}
 
             /// not possible
             void operator=(const const_reference &);
-	};
-
-	/** a pointer to an element, which is basically a reference
-            with exchangeable address. You cannot do anything useful
-            with it except for converting it to a reference an with
-            that e. g. access a property.
-	
-	    Actually, this is nothing but the index of the element. A
-	    pointer can only be obtained from a reference.
-	*/
-	class pointer: public PointerBase {
-        public:
-            /// create uninitialized pointer
-            pointer() {}
-            /// dereference
-            reference operator*() const { return reference(index); }
-            /// reset particle we point to
-            void operator=(const pointer &_p) { index = _p.index; }
-            /// compare pointers
-            bool operator==(const const_pointer &p) { return const_pointer(*this) == p; }
-            /// compare pointers
-            bool operator!=(const const_pointer &p) { return const_pointer(*this) != p; }
-
-	private:
-            // classes that can construct a pointer
-            friend class reference;
-            // for accessing the index
-            friend class const_pointer;
-
-	    /// constructable only through @ref esutil::TupleVector::reference
-	    pointer(size_type _index): PointerBase(_index) {}
-	};
-
-	/** a const pointer to an element, which is basically a
-            reference with exchangeable address. You cannot do
-            anything useful with it except for converting it to a
-            reference an with that e. g. access a property.
-	
-	    Actually, this is nothing but the index of the element. A
-	    pointer can only be obtained from a reference.
-	*/
-	class const_pointer: public PointerBase {
-        public:
-            /// non-const->const conversion
-	    const_pointer(const pointer &_ref): PointerBase(_ref.index) {}
-            /// create uninitialized pointer
-            const_pointer() {}
-            /// dereference
-            const_reference operator*() const { return const_reference(index); }
-            /// reset particle we point to
-            void operator=(const const_pointer &_p) { index = _p.index; }
-            /// compare pointers
-            bool operator==(const const_pointer &p) { return index == p.index; }
-            /// compare pointers
-            bool operator!=(const const_pointer &p) { return index != p.index; }
-
-	private:
-            // classes that can construct a pointer
-            friend class const_reference;
-
-	    /// constructable only through @ref esutil::TupleVector::const_reference
-	    const_pointer(size_type _index): PointerBase(_index) {}
 	};
 
 	/** a random iterator over elements. This is basically a reference to
 	    an element with a mutable index
 	*/
 	class iterator: public IteratorBase<reference, iterator> {
+            // class that can generate an iterator
+	    friend class TupleVector;
+            // for const->nonconst conversion
+	    friend class const_iterator;
+
 	public:
 	    /// default constructor, uninitialized iterator
 	    iterator() {}
 
 	private:
-            // class that can generate an iterator
-	    friend class TupleVector;
-            // for accessing the index
-	    friend class const_iterator;
-
-	    /// constructable only through @ref TupleVector
+	    /// constructable only through TupleVector
 	    iterator(size_type _index)
                 : IteratorBase<reference, iterator>(_index) {}
 	};
@@ -349,6 +287,9 @@ namespace esutil {
 	    reference to an element with a mutable index
 	*/
 	class const_iterator: public IteratorBase<const_reference, const_iterator> {
+            // class that can generate an iterator
+	    friend class TupleVector;
+
 	public:
 	    /// default constructor
 	    const_iterator() {}
@@ -358,13 +299,13 @@ namespace esutil {
                 : IteratorBase<const_reference, const_iterator>(_it.index) {}
 
 	private:
-            // class that can generate an iterator
-	    friend class TupleVector;
-
-	    /// constructable only through @ref TupleVector
+	    /// constructable only through TupleVector
 	    const_iterator(size_type _index)
                 : IteratorBase<const_reference, const_iterator>(_index) {}
 	};
+
+        typedef iterator pointer;
+        typedef const_iterator const_pointer;
 
 	//@}
 
@@ -623,21 +564,21 @@ namespace esutil {
 	    @return ID of the property
 	*/
 	template<class T>
-	size_t addProperty(size_t dim = 1) {
+	PropertyId addProperty(size_t dim = 1) {
 	    return addProperty(sizeof(T)*dim, dim);
 	}
 
 	/** delete a property
 	    @param n ID of the property to delete as obtained from addProperty
 	*/
-	void eraseProperty(size_t n);
+	void eraseProperty(PropertyId n);
 
 	/** get a non-array property
 	    @param n ID of the property
 	    @tparam T type of the property
 	*/
 	template<class T>
-	PropertyReference<T> getProperty(size_t n) {
+	PropertyReference<T> getProperty(PropertyId n) {
 	    return PropertyReference<T>(const_cast<Property &>(getPropertyData(n)));
 	}
 
@@ -646,7 +587,7 @@ namespace esutil {
 	    @tparam T type of the property
 	*/
 	template<class T>
-	ConstPropertyReference<T> getProperty(size_t n) const {
+	ConstPropertyReference<T> getProperty(PropertyId n) const {
 	    return ConstPropertyReference<T>(getPropertyData(n));
 	}
 
@@ -655,7 +596,7 @@ namespace esutil {
 	    @tparam T type of the property
 	*/
 	template<class T>
-	ArrayPropertyReference<T> getArrayProperty(size_t n) {
+	ArrayPropertyReference<T> getArrayProperty(PropertyId n) {
 	    return ArrayPropertyReference<T>(const_cast<Property &>(getPropertyData(n)));
 	}
 
@@ -664,7 +605,7 @@ namespace esutil {
 	    @tparam T type of the property
 	*/
 	template<class T>
-	ConstArrayPropertyReference<T> getArrayProperty(size_t n) const {
+	ConstArrayPropertyReference<T> getArrayProperty(PropertyId n) const {
 	    return ConstArrayPropertyReference<T>(getPropertyData(n));
 	}
 
@@ -690,7 +631,7 @@ namespace esutil {
 	/// reserved size in elements of each of the stored properties
 	size_t maxESize;
 
-	size_t uniqueID;
+	PropertyId uniqueID;
 
 	/// capacity is always a multiple of granularity
 	int granularity;
@@ -722,15 +663,15 @@ namespace esutil {
 	void memcpy(size_type dst, size_type src, size_type size);
 
 	/// actual function adding a property, with resolved type size
-	size_t addProperty(size_t size, size_t _dimension);
+	PropertyId addProperty(size_t size, size_t _dimension);
 	/// actual function searching for a property
-	const Property &getPropertyData(size_t n) const;
+	const Property &getPropertyData(PropertyId n) const;
 
 	/// predicate for checking the ID of a property
 	struct PredicateMatchPropertyID
 	    : public std::unary_function<const Property &, bool>{
-	    size_t searchID;
-	    PredicateMatchPropertyID(size_t _searchID): searchID(_searchID) {}
+	    PropertyId searchID;
+	    PredicateMatchPropertyID(PropertyId _searchID): searchID(_searchID) {}
 	    bool operator()(const Property &ref) { return ref.id == searchID; }
 	};
     };

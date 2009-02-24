@@ -11,7 +11,7 @@ struct Fixture {
     TupleVector mv;
     const TupleVector &constMv;
 
-    size_t intProp, floatProp;
+    TupleVector::PropertyId intProp, floatProp;
 
     Fixture(): constMv(mv) {
 	intProp = mv.addProperty<int>();
@@ -42,7 +42,7 @@ BOOST_FIXTURE_TEST_CASE(properties_resize_test, Fixture)
     BOOST_REQUIRE(mve.getNumProperties() == 1);
 
     // add a second property
-    size_t prop = mve.addProperty<float>();
+    TupleVector::PropertyId prop = mve.addProperty<float>();
     BOOST_REQUIRE(mve.getNumProperties() == 2);
 
     // now, delete the property again
