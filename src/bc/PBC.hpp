@@ -17,7 +17,7 @@ namespace espresso {
     private:
 
       real length;
-      real half_length;
+      real lengthInverse;
 
     public:
 

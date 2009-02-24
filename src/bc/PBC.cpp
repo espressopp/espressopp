@@ -2,15 +2,17 @@
 
 using namespace espresso::bc;
 
+static inline real dround(real x) { return floor(x + 0.5); }
+
 namespace espresso {
   namespace bc {
 
     PBC::PBC() {}
 
-    PBC::PBC(real _length) {
-      length = _length; 
-      half_length = 0.5 * length;
-    }
+    PBC::PBC(real _length)
+      : length(_length),
+	lengthInverse(1.0 / _length) 
+    {}
     
     PBC::~PBC() {}
 
@@ -24,33 +26,14 @@ namespace espresso {
         real xij;
         real yij;
         real zij;
-        real xijtmp;
-        real yijtmp;
-        real zijtmp;
 
         xij = pos1.getX() - pos2.getX();
         yij = pos1.getY() - pos2.getY();
         zij = pos1.getZ() - pos2.getZ();
 
-        xijtmp = fabs(xij);
-        yijtmp = fabs(yij);
-        zijtmp = fabs(zij);
-
-        xijtmp = xijtmp - static_cast<int>(xijtmp / length) * length;
-        yijtmp = yijtmp - static_cast<int>(yijtmp / length) * length;
-        zijtmp = zijtmp - static_cast<int>(zijtmp / length) * length; 
-
-        if(xijtmp > half_length) {
-          xij = (xijtmp - length) * sign(xij);
-        } else xij = xijtmp * sign(xij);
-
-        if(yijtmp > half_length) {
-          yij = (yijtmp - length) * sign(yij);
-        } else yij = yijtmp * sign(yij);       
-
-        if(zijtmp > half_length) {
-          zij = (zijtmp - length) * sign(zij);
-        } else zij = zijtmp * sign(zij);
+	xij -= dround(xij*lengthInverse)*length;
+	yij -= dround(yij*lengthInverse)*length;
+	zij -= dround(zij*lengthInverse)*length;
 
         return Real3D(xij, yij, zij);
       }
