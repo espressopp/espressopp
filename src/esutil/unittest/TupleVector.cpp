@@ -143,6 +143,7 @@ BOOST_FIXTURE_TEST_CASE(dereference_scalar_test, Fixture)
     //pRef[constRef] = 42;
     //constPRef[ref] = 42;
     //constPRef[constRef] = 42;
+    //TupleVector::ReferenceIndexAccess::getIndex(constRef);
 }
 
 BOOST_FIXTURE_TEST_CASE(dereference_array_test, Fixture)

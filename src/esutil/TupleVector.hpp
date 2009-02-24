@@ -22,6 +22,7 @@ namespace esutil {
 	template<class, class> class IteratorBase;
 	template<class, class> class PropertyReferenceBase;
 	template<class, class> class ArrayPropertyReferenceBase;
+	class ReferenceIndexAccess;
 
         struct Property;
 
@@ -83,12 +84,16 @@ namespace esutil {
 	    size_t index;
 
 	private:
-            // classes that need to access the index
-	    template<class, class> friend class PropertyReferenceBase;
-	    template<class, class> friend class ArrayPropertyReferenceBase;
+            // class that grants access to the index
+	    friend class ReferenceIndexAccess;
 
             /// not possible
             void operator=(const ReferenceBase &_ref);
+	};
+
+	class ReferenceIndexAccess {
+	public:
+	    static size_t getIndex(const ReferenceBase &ref) { return ref.index; }
 	};
 
 	/** an iterator over elements. This is basically a reference to
@@ -106,6 +111,8 @@ namespace esutil {
 	    ReferenceType,
 	    ptrdiff_t>
 	{
+	    template <class,class> friend class IteratorBase;
+
 	    friend class boost::iterator_core_access;
             // classes that need to access the index
 	    friend class TupleVector;
@@ -145,7 +152,7 @@ namespace esutil {
 	    resizings of the TupleVector.
 	*/
 	template<class T, class Property>
-	class PropertyReferenceBase {
+	class PropertyReferenceBase: private ReferenceIndexAccess {
             /// not possible
             void operator=(const PropertyReferenceBase &);
 
@@ -162,9 +169,9 @@ namespace esutil {
 
 	public:
 	    /// dereference
-	    T &operator[](reference n) const { return data[n.index]; }
+	    T &operator[](reference n) const { return data[getIndex(n)]; }
 	    /// dereference
-	    const T &operator[](const_reference n) const { return data[n.index]; }
+	    const T &operator[](const_reference n) const { return data[getIndex(n)]; }
 	};
 
 	/** reference to an array property. In contrast to
@@ -173,7 +180,7 @@ namespace esutil {
 	    is only known at runtime.
 	*/
 	template<class T, class Property>
-	class ArrayPropertyReferenceBase {
+	class ArrayPropertyReferenceBase: private ReferenceIndexAccess {
             /// not possible
             void operator=(const ArrayPropertyReferenceBase &);
 
@@ -193,9 +200,9 @@ namespace esutil {
 
 	public:
 	    /// dereference
-	    T *operator[](reference n) const { return data + n.index*dimension; }
+	    T *operator[](reference n) const { return data + getIndex(n)*dimension; }
 	    /// dereference
-	    const T *operator[](const_reference n) const { return data + n.index*dimension; }
+	    const T *operator[](const_reference n) const { return data + getIndex(n)*dimension; }
 	};
 
     public:
@@ -217,7 +224,7 @@ namespace esutil {
 	    implementation point of view, it doesn't differ from a
 	    pointer.
 	*/
-	class reference: private ReferenceBase {
+	class reference: public ReferenceBase {
             // classes that can construct a reference
 	    friend class TupleVector;
 	    template<class, class> friend class IteratorBase;
@@ -244,7 +251,7 @@ namespace esutil {
 	    reference can only be obtained from element access to the
 	    TupleVector class or its iterators.
 	*/
-	class const_reference: private ReferenceBase {
+	class const_reference: public ReferenceBase {
             // classes that can construct a const_reference
 	    friend class TupleVector;
 	    template<class, class> friend class IteratorBase;
@@ -270,6 +277,7 @@ namespace esutil {
 	class iterator: public IteratorBase<reference, iterator> {
             // class that can generate an iterator
 	    friend class TupleVector;
+	    friend class TupleVector::reference;
             // for const->nonconst conversion
 	    friend class const_iterator;
 
@@ -289,6 +297,7 @@ namespace esutil {
 	class const_iterator: public IteratorBase<const_reference, const_iterator> {
             // class that can generate an iterator
 	    friend class TupleVector;
+	    friend class const_reference;
 
 	public:
 	    /// default constructor

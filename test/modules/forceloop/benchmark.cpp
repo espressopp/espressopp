@@ -314,21 +314,21 @@ void TestBasic::calculateForces(real epsilon, real sigma, real cutoff) {
             Real3D pos2 = position[j];
             Real3D dist = pbc.getDist(pos1, pos2);
 
-            Real3D f(0.0, 0.0, 0.0);
             {
                 real   frac2;
                 real   frac6;
                 real distSqr = dist.sqr();
                 
                 if (distSqr < cutoffSqr) {
+		    Real3D f(0.0, 0.0, 0.0);
                     frac2 = sigma / distSqr;
                     frac6 = frac2 * frac2 * frac2;
                     real ffactor = 48.0 * epsilon * (frac6*frac6 - 0.5 * frac6) * frac2;
                     f = dist * ffactor;
+		    force[i] += f;
+		    force[j] -= f;
                 } 
             }
-            force[i] += f;
-            force[j] -= f;
         }
     }
 }
