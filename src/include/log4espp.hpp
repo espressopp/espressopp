@@ -388,8 +388,8 @@ namespace log4espp {
     
     int logLevel;    // specifies the level of the logger
     
-    LogClass() {
-      char *envLevel;
+    LogClass(): logLevel(3) {
+      const char *envLevel;
       envLevel = getenv("LOG4ESPP"); \
       const char *logItems [] = { "OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" }; \
       if (envLevel != NULL) { \
