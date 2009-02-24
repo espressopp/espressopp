@@ -23,6 +23,9 @@ namespace espresso {
 	    typedef esutil::TupleVector::reference reference;
 	    typedef esutil::TupleVector::const_reference const_reference;
 
+	    typedef esutil::TupleVector::pointer pointer;
+	    typedef esutil::TupleVector::const_pointer const_pointer;
+
 	    template<typename T>
 	    struct PropertyTraits {
 		typedef esutil::TupleVector::PropertyReference<T> Reference;

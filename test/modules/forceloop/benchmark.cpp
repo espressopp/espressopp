@@ -90,45 +90,111 @@ void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {
     allpairs.foreach(forcecompute);
 }
 
-class MyLJComputer: public pairs::ParticlePairComputer {
+class MyPairComputer: public particlestorage::ParticleComputer {
 public:
-    typedef particlestorage::ParticleStorage::PropertyTraits<Real3D>::Reference ForceReference;
+    typedef particlestorage::ParticleStorage Storage;
 
-    ForceReference force;
+    virtual void bind(Storage::reference ref) {
+        ptr1 = &ref;
+    }
 
-    real sigma;
-    real epsilon;
-    real cutoffSqr;
+    virtual void operator()(Storage::reference ref2) = 0;
 
-    MyLJComputer(real _sigma, real _epsilon, real cutoff,
-                 ForceReference _force)
-        : force(_force), sigma(_sigma), epsilon(_epsilon), cutoffSqr(cutoff*cutoff) {}
+protected:
+    Storage::pointer ptr1;
+};
 
-    virtual void operator()(const Real3D &dist,
-			    particlestorage::ParticleStorage::reference ref1,
-			    particlestorage::ParticleStorage::reference ref2) {
+template <class InteractionType>
+class MyForceComputerFacade: public MyPairComputer {
+public:
+    typedef Storage::PropertyTraits<Real3D>::Reference Real3DReference;
+    typedef Storage::PropertyTraits<Real3D>::ConstReference ConstReal3DReference;
+
+    virtual void bind(Storage::reference ref) {
+        MyPairComputer::bind(ref);
+        pos1 = position[ref];
+        force1 = &force[ref];
+    }
+
+    virtual void operator()(Storage::reference ref2) {
+        if (ptr1 < &ref2) {
+            Real3D dist = bc.getDist(pos1, position[ref2]);
+            Real3D f    = upcast().computeForce(dist, *ptr1, ref2);
+            *force1      += f;
+            force[ref2] -= f;
+        }
+    }
+
+protected:
+    MyForceComputerFacade(bc::BC &_bc, ConstReal3DReference _position, Real3DReference _force)
+        : position(_position), force(_force), bc(_bc) {}
+
+private:
+    InteractionType &upcast() { return *static_cast<InteractionType *>(this); }
+
+    ConstReal3DReference position;
+    Real3DReference force;
+    bc::BC &bc;
+    Real3D pos1;
+    Real3D *force1;
+};
+
+class MyLJForceComputer: public MyForceComputerFacade<MyLJForceComputer> {
+public:
+
+    MyLJForceComputer(real _sigma, real _epsilon, real cutoff,
+                      bc::BC &bc,
+                      ConstReal3DReference position,
+                      Real3DReference force)
+        : MyForceComputerFacade<MyLJForceComputer>(bc, position, force),
+          sigma(_sigma), epsilon(_epsilon), cutoffSqr(cutoff*cutoff) {}
+    
+    Real3D computeForce(const Real3D &dist,
+                        const Storage::const_reference,
+                        const Storage::const_reference) {
         real distSqr = dist.sqr();
-
+        Real3D f(0.0, 0.0, 0.0);
+        
         if (distSqr < cutoffSqr) {
-            Real3D f(0.0, 0.0, 0.0);
             real frac2 = sigma / distSqr;
             real frac6 = frac2 * frac2 * frac2;
             real ffactor = 48.0 * epsilon * (frac6*frac6 - 0.5 * frac6) * frac2;
             f = dist * ffactor;
-            force[ref1] += f;
-            force[ref2] -= f;
         }
+        return f;
+    }
+
+private:
+    real sigma;
+    real epsilon;
+    real cutoffSqr;
+};
+
+class AllBinder: public particlestorage::ParticleComputer {
+    typedef particleset::ParticleSet Set;
+
+    Set            &set;
+    MyPairComputer &computer;
+public:
+
+    AllBinder(Set &_set, MyPairComputer &_computer):
+        set(_set), computer(_computer) {}
+
+    virtual void operator()(Set::reference ref) {
+        computer.bind(ref);
+        set.foreach(computer);
     }
 };
 
 void TestEspresso::calculateForces2(real epsilon, real sigma, real cutoff) {
+    Storage::PropertyTraits<Real3D>::ConstReference positionRef = storage.getProperty<Real3D>(position);
     Storage::PropertyTraits<Real3D>::Reference forceRef = storage.getProperty<Real3D>(force);
 
     bc::PBC pbc(size);
     particleset::All allset(&storage);
-    pairs::All allpairs(pbc, allset, position);
-    MyLJComputer ljc(sigma, epsilon, cutoff, forceRef);
-    allpairs.foreach(ljc);
+    MyLJForceComputer ljc(sigma, epsilon, cutoff, pbc, positionRef, forceRef);
+    AllBinder computeParticleForce(allset, ljc);
+    allset.foreach(computeParticleForce);
 }
 
 class EmptyPairComputer: public pairs::ConstParticlePairComputer {

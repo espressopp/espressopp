@@ -38,13 +38,13 @@ TupleVector::TupleVector(const TupleVector &vec, size_type newESize)
     }
 }
 
-size_t TupleVector::addProperty(size_t _size, size_t _dimension)
+TupleVector::PropertyId TupleVector::addProperty(size_t _size, size_t _dimension)
 {
     property.push_back(Property(++uniqueID, _size, _dimension, malloc(maxESize)));
     return uniqueID;
 }
 
-void TupleVector::eraseProperty(size_t id)
+void TupleVector::eraseProperty(TupleVector::PropertyId id)
 {
     std::vector<Property>::iterator it =
 	std::find_if(property.begin(), property.end(), PredicateMatchPropertyID(id));
@@ -55,7 +55,7 @@ void TupleVector::eraseProperty(size_t id)
     property.erase(it);
 }
 
-const TupleVector::Property &TupleVector::getPropertyData(size_t id) const {
+const TupleVector::Property &TupleVector::getPropertyData(PropertyId id) const {
     std::vector<Property>::const_iterator it =
 	std::find_if(property.begin(), property.end(), PredicateMatchPropertyID(id));
     if (it == property.end()) {
