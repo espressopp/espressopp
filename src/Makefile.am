@@ -33,10 +33,10 @@ libespresso_common_la_LIBADD += \
 endif
 
 # the program wrappers
-bin_PROGRAMS = espresso # espresso_worker
+bin_PROGRAMS = pypresso # espresso_worker
 
-espresso_SOURCES = espresso.cpp
-espresso_LDADD = libespresso_common.la
+pypresso_SOURCES = pypresso.cpp
+pypresso_LDADD = libespresso_common.la
 
 # espresso_worker_SOURCES = ../cpp/espresso_main.cpp
 # espresso_worker_CPPFLAGS = -DWORKER_ONLY
@@ -48,9 +48,12 @@ _espresso_la_SOURCES = _espresso.cpp
 _espresso_la_LDFLAGS = -module -no-undefined 
 _espresso_la_LIBADD = libespresso_common.la
 
+##############################
+## PYTHON
+##############################
+
 python_scripts=hello.py interaction.py
 
-## THE SCRIPTS
 python_SCRIPTS=$(python_scripts)
 
 # python script handling

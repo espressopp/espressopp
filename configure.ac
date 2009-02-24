@@ -10,7 +10,7 @@ AC_INIT([ESPResSo++], [0.1], [espressopp-user@www.espresso-pp.de], [espressopp])
 # basic autoconf configuration
 AC_CONFIG_MACRO_DIR(build-aux/macros)
 AC_CONFIG_AUX_DIR(build-aux)
-AC_CONFIG_SRCDIR([src/espresso.cpp])
+AC_CONFIG_SRCDIR([src/_espresso.cpp])
 
 # we use automake
 AM_INIT_AUTOMAKE([gnu subdir-objects dist-bzip2])

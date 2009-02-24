@@ -99,9 +99,6 @@ Real3D LennardJones::computeForce (const Real3D &dist) const {
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
 //////////////////////////////////////////////////
-//   Real3D LennardJones::computeForceOverload(const Real3D& dist) const {
-//     return LennardJones::computeForce(dist);
-//   }
 
 void 
 LennardJones::registerPython() {

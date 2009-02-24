@@ -73,7 +73,6 @@ namespace espresso {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PMI
     //////////////////////////////////////////////////
-    // here, you need to register the SERIAL class
     PMI_REGISTER_CLASS("espresso::hello::HelloWorld", espresso::hello::HelloWorld);
     PMI_REGISTER_METHOD("getMessageWorker", espresso::hello::HelloWorld, getMessageWorker);
 
@@ -81,7 +80,6 @@ namespace espresso {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
-    // here, register the parallel class
     void 
     HelloWorld::registerPython() {
       using namespace boost::python;

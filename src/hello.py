@@ -1,5 +1,4 @@
-from _espresso import hello_HelloWorld
-_HelloWorld=hello_HelloWorld
+from _espresso import hello_HelloWorld as _HelloWorld
 
 # map the class _HelloWorld to the class in the pseudo-namespace
 #_HelloWorld = __import__(_espresso.hello_HelloWorld)
@@ -9,4 +8,4 @@ class HelloWorld(_HelloWorld):
     'Python wrapper from C++ class HelloWorld'
     def getMessage(self) :
 	'Returns the messages.' 
-        return super(HelloWorld, self).getMessage(self)
+        return _HelloWorld.getMessage(self)
