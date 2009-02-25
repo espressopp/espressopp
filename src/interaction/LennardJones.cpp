@@ -14,32 +14,45 @@ LOG4ESPP_LOGGER(LennardJones::theLogger, "interaction.LennardJones");
 
 /* ---------------------------------------------------------------------- */
 
-PMI_REGISTER_CLASS(espresso::interaction::LennardJones);
+PMI_REGISTER_CLASS(LennardJones);
 
 LennardJones::LennardJones() {
-  epsilon = 1.0;
-  sigma = 1.0;
-  cutoff = 2.5;
-  cutoffSqr = 2.5*2.5;
+  setLocal(1.0, 1.0, 2.5);
 }
 
 LennardJones::~LennardJones() {}
 
-PMI_DEFINE_SETTER(espresso::interaction, LennardJones, setCutoff, real, _cutoff) {
-  cutoff = _cutoff; 
-  cutoffSqr = cutoff * cutoff;
+void LennardJones::set(real _epsilon, real _sigma, real _cutoff) {
+#ifndef HAVE_MPI
+  setLocal(_epsilon, _sigma, _cutoff);
+#else
+  real v[3] = { _epsilon, _sigma, _cutoff };
+  pmiObject.invoke<&LennardJones::setWorker>();
+  boost::mpi::communicator world;
+  boost::mpi::broadcast(world, v, 3, pmi::getControllerMPIRank());
+  setLocal(v[0], v[1], v[2]);
+  }
+
+void LennardJones::setWorker() {
+  real v[3];
+  boost::mpi::communicator world;
+  boost::mpi::broadcast(world, v, 3, pmi::getControllerMPIRank());
+  setLocal(v[0], v[1], v[2]);
 }
+
+PMI_REGISTER_METHOD(LennardJones, setWorker);
+#endif
+
+void LennardJones::setLocal(real _epsilon, real _sigma, real _cutoff) {
+  epsilon = _epsilon;
+  sigma = _sigma;
+  cutoff = _cutoff;
+  cutoffSqr = cutoff*cutoff;
+}
+
 real LennardJones::getCutoff() const { return cutoff; }
 real LennardJones::getCutoffSqr() const { return cutoffSqr; }
-    
-PMI_DEFINE_SETTER(espresso::interaction, LennardJones, setEpsilon, real, _epsilon) {
-  epsilon = _epsilon;
-}
 real LennardJones::getEpsilon() const { return epsilon; }
-
-PMI_DEFINE_SETTER(espresso::interaction, LennardJones, setSigma, real, _sigma) {
-  sigma = _sigma;
-}
 real LennardJones::getSigma() const { return sigma; }
 
 
@@ -93,8 +106,6 @@ Real3D LennardJones::computeForce (const Real3D &dist) const {
   return f;
 }
     
-
-
 #ifdef HAVE_PYTHON  
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -113,12 +124,10 @@ LennardJones::registerPython() {
     &LennardJones::computeEnergy;
     
   class_<LennardJones>("interaction_LennardJones", init<>())
+    .def("set", &LennardJones::set)
     .def("getCutoff", &LennardJones::getCutoff)
-    .def("setCutoff", &LennardJones::setCutoff)
     .def("getEpsilon", &LennardJones::getEpsilon)
-    .def("setEpsilon", &LennardJones::setEpsilon)
     .def("getSigma", &LennardJones::getSigma)
-    .def("setSigma", &LennardJones::setSigma)
     .def("computeForce", computeForceOverload)
     .def("computeEnergy", computeEnergyOverload1)
     .def("computeEnergy", computeEnergyOverload2);

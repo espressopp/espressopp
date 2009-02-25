@@ -41,14 +41,15 @@ namespace espresso {
       virtual ~LennardJones();
 
       // Setter and getter
-      PMI_DECL_SETTER(setCutoff, real, _cutoff);
-      virtual real getCutoff() const;
+      virtual void set(real _epsilon, real _sigma, real _cutoff);
+    private:
+      void setLocal(real, real, real);
+    public:
+      IF_MPI(void setWorker();)
 
-      PMI_DECL_SETTER(setEpsilon, real, _epsilon);
-      virtual real getEpsilon() const;
-
-      PMI_DECL_SETTER(setSigma, real, _sigma);
-      virtual real getSigma() const;
+      real getEpsilon() const;
+      real getSigma() const;
+      real getCutoff() const;
 
       // PMI and Python visible
       virtual real computeEnergy(const Real3D &dist) const;  

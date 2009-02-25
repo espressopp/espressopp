@@ -11,29 +11,41 @@ LOG4ESPP_LOGGER(FENE::theLogger, "interaction.FENE");
 
 /* ---------------------------------------------------------------------- */
 
-PMI_REGISTER_CLASS(espresso::interaction::FENE);
+PMI_REGISTER_CLASS(FENE);
 
-FENE::FENE() {
-  K = 1.0;
-  r0 = 0.0;
-  rMax = 1.0;
-}
+FENE::FENE() { setLocal(1.0, 0.0, 1.0); }
        
 FENE::~FENE() {}
 
-PMI_DEFINE_SETTER(espresso::interaction, FENE, setK, real, _K) {
+void FENE::set(real _K, real _r0, real _rMax) {
+#ifndef HAVE_MPI
+  setLocal(_K, _r0, _rMax);
+#else
+  real v[3] = { _K, _r0, _rMax };
+  pmiObject.invoke<&FENE::setWorker>();
+  boost::mpi::communicator world;
+  boost::mpi::broadcast(world, v, 3, pmi::getControllerMPIRank());
+  setLocal(v[0], v[1], v[2]);
+  }
+
+void FENE::setWorker() {
+  real v[3];
+  boost::mpi::communicator world;
+  boost::mpi::broadcast(world, v, 3, pmi::getControllerMPIRank());
+  setLocal(v[0], v[1], v[2]);
+}
+
+PMI_REGISTER_METHOD(FENE, setWorker);
+#endif
+
+void FENE::setLocal(real _K, real _r0, real _rMax) {
   K = _K;
-}
-real FENE::getK() const { return K; }
-
-PMI_DEFINE_SETTER(espresso::interaction, FENE, setR0, real, _r0) {
   r0 = _r0;
-}
-real FENE::getR0() const { return r0; }
-
-PMI_DEFINE_SETTER(espresso::interaction, FENE, setRMax, real, _rMax) {
   rMax = _rMax;
 }
+
+real FENE::getK() const { return K; }
+real FENE::getR0() const { return r0; }
 real FENE::getRMax() const { return rMax; }
       
 real FENE::getCutoff() const { return -1; }
@@ -94,11 +106,9 @@ Real3D FENE::computeForce (const Real3D &dist) const {
       &FENE::computeEnergy;
 
     class_<FENE>("interaction_FENE", init<>())
-      .def("setK", &FENE::setK)
+      .def("set", &FENE::set)
       .def("getK", &FENE::getK)
-      .def("setR0", &FENE::setR0)
       .def("getR0", &FENE::getR0)
-      .def("setRMax", &FENE::setRMax)
       .def("getRMax", &FENE::getRMax)
       .def("computeForce", computeForceOverload)
       .def("computeEnergy", computeEnergyOverload1)

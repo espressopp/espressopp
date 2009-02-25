@@ -32,8 +32,7 @@ namespace espresso {
       static LOG4ESPP_DECL_LOGGER(theLogger);
 
     public:
- 
-      IF_PYTHON(static void registerPython();)
+       IF_PYTHON(static void registerPython();)
 
       /** Default constructor. Member variables are accessed by setter and getter. */
 
@@ -41,13 +40,15 @@ namespace espresso {
        
       virtual ~FENE();
 
-      PMI_DECL_SETTER(setK, real, _K);
+      // Setter and getter
+      virtual void set(real _K, real _r0, real _rMax);
+    private:
+      void setLocal(real, real, real);
+    public:
+      IF_MPI(void setWorker();)
+
       real getK() const;
-
-      PMI_DECL_SETTER(setR0, real, _r0);
       real getR0() const;
-
-      PMI_DECL_SETTER(setRMax, real, _rMax);
       real getRMax() const;
       
       /* FENE should probably derived from a two-body interaction
