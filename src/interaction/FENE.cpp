@@ -11,7 +11,7 @@ LOG4ESPP_LOGGER(FENE::theLogger, "interaction.FENE");
 
 /* ---------------------------------------------------------------------- */
 
-PMI_REGISTER_CLASS("espresso::interaction::FENE", espresso::interaction::FENE);
+PMI_REGISTER_CLASS(espresso::interaction::FENE);
 
 FENE::FENE() {
   K = 1.0;

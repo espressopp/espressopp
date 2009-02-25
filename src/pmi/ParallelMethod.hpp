@@ -3,16 +3,11 @@
 #include "pmi/ParallelClass.hpp"
 
 // macro to register a method
-#define PMI_REGISTER_METHOD(name, aClass, aMethod)			\
+#define PMI_REGISTER_METHOD(aClass, aMethod)				\
   template <>								\
   std::string pmi::ParallelMethod<aClass, &aClass::aMethod>::MNAME =	\
-    pmi::ParallelMethod<aClass, &aClass::aMethod>::registerMethod(name);
-
-// #ifdef WORKER
-// #define PMI_REGISTER_METHOD(name, aClass, aMethodController, aMethodWorker, returnType) \
-//   PMI_REGISTER_METHOD_SPMD(name, aClass, aMethod, void)
-//   #else
-// #endif
+    pmi::ParallelMethod<aClass, &aClass::aMethod>			\
+    ::registerMethod(#aClass "::" #aMethod "()");
 
 namespace pmi { 
   IdType generateMethodId();
@@ -29,9 +24,8 @@ namespace pmi {
     // register the method
     // this is typically called statically
     static std::string registerMethod(const std::string &_name) {
-      std::string name = ParallelClass<T>::getName() + "::" +_name + "()";
-      methodCallersByName()[name] = methodCallerTemplate<T, method>;
-      return name;
+      methodCallersByName()[_name] = methodCallerTemplate<T, method>;
+      return _name;
     }
 
     static const std::string &getName() { return MNAME; }

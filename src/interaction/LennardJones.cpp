@@ -14,7 +14,7 @@ LOG4ESPP_LOGGER(LennardJones::theLogger, "interaction.LennardJones");
 
 /* ---------------------------------------------------------------------- */
 
-PMI_REGISTER_CLASS("espresso::interaction::LennardJones", espresso::interaction::LennardJones);
+PMI_REGISTER_CLASS(espresso::interaction::LennardJones);
 
 LennardJones::LennardJones() {
   epsilon = 1.0;

@@ -25,15 +25,15 @@
     boost::mpi::broadcast(world, arg, pmi::getControllerMPIRank());	\
     method##Local(arg);							\
   }									\
-  PMI_REGISTER_METHOD("_class::method##Worker", _namespace::_class, method##Worker); \
+  PMI_REGISTER_METHOD(_namespace::_class, method##Worker); \
 									\
   void _namespace::_class::method##Local(type arg)
 
 
 #else // HAVE_MPI
 
-#define PMI_REGISTER_CLASS(a,b)
-#define PMI_REGISTER_METHOD(a,b,c)
+#define PMI_REGISTER_CLASS(class)
+#define PMI_REGISTER_METHOD(class, method)
 
 #define PMI_DECL_SETTER(method, type, arg)	\
   virtual void method(type arg);

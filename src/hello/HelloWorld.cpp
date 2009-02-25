@@ -73,8 +73,8 @@ namespace espresso {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PMI
     //////////////////////////////////////////////////
-    PMI_REGISTER_CLASS("espresso::hello::HelloWorld", espresso::hello::HelloWorld);
-    PMI_REGISTER_METHOD("getMessageWorker", espresso::hello::HelloWorld, getMessageWorker);
+    PMI_REGISTER_CLASS(espresso::hello::HelloWorld);
+    PMI_REGISTER_METHOD(espresso::hello::HelloWorld, getMessageWorker);
 
 #ifdef HAVE_PYTHON  
     //////////////////////////////////////////////////
