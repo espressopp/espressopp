@@ -4,7 +4,7 @@
 #include <algorithm>
 
 using namespace espresso::pairs;
-using namespace espresso::particlestorage;
+using namespace espresso::particles;
 using namespace std;
 
 /* Destructor */
@@ -16,7 +16,7 @@ List::~List()
 /* Constructor for this class  */
 
 List::List(espresso::bc::BC& _bc, 
-           ParticleStorage& _storage, 
+           Storage& _storage, 
            size_t _coordinates) :
 
    storage(_storage),
@@ -49,23 +49,21 @@ void List::deletePair(size_t id1, size_t id2) {
    id_list.erase(it);
 }
 
-void List::foreach(ParticlePairComputer& pairComputer) {
+void List::foreach(Computer& pairComputer) {
 
-   vector<Tuple>::iterator it;
+  vector<Tuple>::iterator it;
 
-   ParticleStorage::PropertyTraits<Real3D>::Reference 
-       pos = storage.getProperty<Real3D>(coordinates);
+  Storage::PropertyTraits<Real3D>::Reference 
+    pos = storage.getProperty<Real3D>(coordinates);
 
-   for (it = id_list.begin(); it != id_list.end(); it++) {
+  for (it = id_list.begin(); it != id_list.end(); it++) {
+    Storage::reference pref1 = storage.getParticleByID(it->first);
+    Storage::reference pref2 = storage.getParticleByID(it->second);
 
-       ParticleStorage::reference pref1 = storage.getParticleByID(it->first);
-       ParticleStorage::reference pref2 = storage.getParticleByID(it->second);
-
-       Real3D dist = bc.getDist(pos[pref1], pos[pref2]);
-
-       pairComputer(dist, pref1, pref2);
-
-   }
+    Real3D dist = bc.getDist(pos[pref1], pos[pref2]);
+    
+    pairComputer(dist, pref1, pref2);
+  }
 }
 
 
@@ -73,21 +71,21 @@ void List::foreach(ParticlePairComputer& pairComputer) {
 List::foreach(ConstParticlePairComputer)
 -------------------------------------------------------------------------- */
 
-void List::foreach(ConstParticlePairComputer& pairComputer) const {
+void List::foreach(ConstComputer& pairComputer) const {
 
-   vector<Tuple>::const_iterator it;
+  vector<Tuple>::const_iterator it;
 
-   ParticleStorage::PropertyTraits<Real3D>::Reference 
-       pos = storage.getProperty<Real3D>(coordinates);
-
-   for (it = id_list.begin(); it != id_list.end(); it++) {
-
-       ParticleStorage::const_reference pref1 = storage.getParticleByID(it->first);
-       ParticleStorage::const_reference pref2 = storage.getParticleByID(it->second);
-
-       Real3D dist = bc.getDist(pos[pref1], pos[pref2]);
-
-       pairComputer(dist, pref1, pref2);
-   }
+  Storage::PropertyTraits<Real3D>::Reference 
+    pos = storage.getProperty<Real3D>(coordinates);
+  
+  for (it = id_list.begin(); it != id_list.end(); it++) {
+    
+    Storage::const_reference pref1 = storage.getParticleByID(it->first);
+    Storage::const_reference pref2 = storage.getParticleByID(it->second);
+    
+    Real3D dist = bc.getDist(pos[pref1], pos[pref2]);
+    
+    pairComputer(dist, pref1, pref2);
+  }
 }
 

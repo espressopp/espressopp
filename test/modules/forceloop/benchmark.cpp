@@ -12,11 +12,12 @@
 
 #include "espresso_common.hpp"
 #include "types.hpp"
-#include "bc/PBC.hpp"
-#include "particlestorage/ParticleStorage.hpp"
-#include "particleset/All.hpp"
+#include "particles/Storage.hpp"
+#include "particles/Computer.hpp"
+#include "particles/All.hpp"
 #include "pairs/All.hpp"
-#include "pairs/PairForceComputer.hpp"
+#include "pairs/ForceComputer.hpp"
+#include "bc/PBC.hpp"
 #include "interaction/LennardJones.hpp"
 #include "esutil/Timer.hpp"
 
@@ -37,7 +38,7 @@ const real size = 5.0;
 
 class TestEspresso {
 public:
-    typedef particlestorage::ParticleStorage Storage;
+    typedef particles::Storage Storage;
     Storage storage;
     size_t position, force;
     size_t npart;
@@ -80,17 +81,17 @@ void TestEspresso::addParticle(const Real3D &pos)
 
 void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {
     bc::PBC pbc(size);
-    particleset::All allset(&storage);
+    particles::All allset(&storage);
     pairs::All allpairs(pbc, allset, position);
     interaction::LennardJones ljint;
     ljint.set(epsilon, sigma, cutoff);
-    pairs::PairForceComputer forcecompute(storage.getProperty<Real3D>(force), ljint);
+    pairs::ForceComputer forcecompute(storage.getProperty<Real3D>(force), ljint);
     allpairs.foreach(forcecompute);
 }
 
-class MyPairComputer: public particlestorage::ParticleComputer {
+class MyPairComputer: public particles::Computer {
 public:
-    typedef particlestorage::ParticleStorage Storage;
+    typedef particles::Storage Storage;
 
     virtual void bind(Storage::reference ref) {
         ptr1 = &ref;
@@ -168,8 +169,8 @@ private:
     real cutoffSqr;
 };
 
-class AllBinder: public particlestorage::ParticleComputer {
-    typedef particleset::ParticleSet Set;
+class AllBinder: public particles::Computer {
+    typedef particles::Set Set;
 
     Set            &set;
     MyPairComputer &computer;
@@ -189,39 +190,39 @@ void TestEspresso::calculateForces2(real epsilon, real sigma, real cutoff) {
     Storage::PropertyTraits<Real3D>::Reference forceRef = storage.getProperty<Real3D>(force);
 
     bc::PBC pbc(size);
-    particleset::All allset(&storage);
+    particles::All allset(&storage);
     MyLJForceComputer ljc(sigma, epsilon, cutoff, pbc, positionRef, forceRef);
     AllBinder computeParticleForce(allset, ljc);
     allset.foreach(computeParticleForce);
 }
 
-class EmptyPairComputer: public pairs::ConstParticlePairComputer {
+class EmptyPairComputer: public pairs::ConstComputer {
 public:
     EmptyPairComputer() {}
 
     virtual void operator()(const Real3D &dist,
-			    particlestorage::ParticleStorage::const_reference ref1,
-			    particlestorage::ParticleStorage::const_reference ref2) {
+			    particles::Storage::const_reference ref1,
+			    particles::Storage::const_reference ref2) {
     }
 };
 
 void TestEspresso::runEmptyPairLoop() {
     bc::PBC pbc(size);
-    particleset::All allset(&storage);
+    particles::All allset(&storage);
     pairs::All allpairs(pbc, allset, position);
     EmptyPairComputer ljc;
     allpairs.foreach(ljc);
 }
 
-class MinDistComputer: public pairs::ConstParticlePairComputer {
+class MinDistComputer: public pairs::ConstComputer {
 public:
     real min;
 
     MinDistComputer(): min(1e10) {}
 
     virtual void operator()(const Real3D &dist,
-			    particlestorage::ParticleStorage::const_reference ref1,
-			    particlestorage::ParticleStorage::const_reference ref2) {
+			    particles::Storage::const_reference ref1,
+			    particles::Storage::const_reference ref2) {
 	real d = dist.sqr();
 	if (min > d) {
 	    min = d;
@@ -231,45 +232,45 @@ public:
 
 real TestEspresso::calculateMinDist() {
     bc::PBC pbc(size);
-    particleset::All allset(&storage);
+    particles::All allset(&storage);
     pairs::All allpairs(pbc, allset, position);
     MinDistComputer mincomp;
     allpairs.foreach(mincomp);
     return sqrt(mincomp.min);
 }
 
-class AverageComputer: public particlestorage::ConstParticleComputer {
+class AverageComputer: public particles::ConstComputer {
 public:
-    typedef particlestorage::ParticleStorage::PropertyTraits<Real3D>::ConstReference Reference;
+    typedef particles::Storage::PropertyTraits<Real3D>::ConstReference Reference;
 
     Reference property;
     real average;
 
     AverageComputer(const Reference &_property): property(_property), average(0) {}
 
-    virtual void operator()(particlestorage::ParticleStorage::const_reference ref) {
+    virtual void operator()(particles::Storage::const_reference ref) {
         const Real3D p = property[ref];
         average += sqrt(p.sqr());
     }
 };
 
 real TestEspresso::calculateAverage() {
-    particleset::All allset(&storage);
+    particles::All allset(&storage);
     AverageComputer avgcompute(storage.getProperty<Real3D>(force));
     allset.foreach(avgcompute);
     return avgcompute.average;
 }
 
-class EmptyComputer: public particlestorage::ConstParticleComputer {
+class EmptyComputer: public particles::ConstComputer {
 public:
     EmptyComputer() {}
 
-    virtual void operator()(particlestorage::ParticleStorage::const_reference ref) {
+    virtual void operator()(particles::Storage::const_reference ref) {
     }
 };
 
 void TestEspresso::runEmptyLoop() {
-    particleset::All allset(&storage);
+    particles::All allset(&storage);
     EmptyComputer avgcompute;
     allset.foreach(avgcompute);
 }

@@ -1,24 +1,28 @@
-#ifndef _PARTICLESTORAGE_PARTICLESTORAGE_HPP
-#define _PARTICLESTORAGE_PARTICLESTORAGE_HPP
+#ifndef _PARTICLES_STORAGE_HPP
+#define _PARTICLES_STORAGE_HPP
 
 // only included for the mock implementation. Remove for final
 #include <vector>
 
-#include "types.hpp"
-#include "esutil/virtual_functional.hpp"
-#include "esutil/TupleVector.hpp"
+#include <types.hpp>
+
+#include <esutil/TupleVector.hpp>
+
 
 namespace espresso {
-    namespace particlestorage {
+    namespace particles {
+      // forward declaration of Computer and ConstComputer
+      class Computer;
+      class ConstComputer;
 
 	/**
 	   MOCK implementation of particlestorage.
 	   Currently only provides a subset of the expected interface,
 	   and without guarantee :-). For the intended use, refer to
-	   @ref ParticleStorage.cpp, which contains a routine intended_use,
+	   @ref Storage.cpp, which contains a routine intended_use,
 	   which shows how the class is intended to be used.
 	*/
-	class ParticleStorage {
+	class Storage {
 	public:
 	    typedef esutil::TupleVector::reference reference;
 	    typedef esutil::TupleVector::const_reference const_reference;
@@ -47,16 +51,16 @@ namespace espresso {
 	    size_t particleIDProperty;
 	public:
 
-	    ParticleStorage();
+	    Storage();
 
-	    virtual ~ParticleStorage() {}
+	    virtual ~Storage() {}
 
 	    /// @name access to particles
 	    //@{
 
 	    /** add a particle
 		@return a temporary reference to the created particle. This reference only identifies
-		the particle as long as the ParticleStorage is not modified. For keeping a persistent
+		the particle as long as the Storage is not modified. For keeping a persistent
 		reference to the particle, use @ref getParticleID.
 	     */
 	    virtual reference addParticle();
@@ -85,13 +89,13 @@ namespace espresso {
 		@param id the id of the particle to fetch
 	     */
 	    virtual const_reference getParticleByID(size_t id) const {
-		return const_reference(const_cast<ParticleStorage *>(this)->getParticleByID(id));
+		return const_reference(const_cast<Storage *>(this)->getParticleByID(id));
 	    }
 
 	    /// loop over all particles
-	    virtual void foreach(esutil::VirtualUnaryFunction<reference, void> &);
+	    virtual void foreach(Computer &);
 	    /// loop over all particles
-	    virtual void foreach(esutil::VirtualUnaryFunction<const_reference, void> &) const;
+	    virtual void foreach(ConstComputer &) const;
 
 	    //@}
 
@@ -176,11 +180,9 @@ namespace espresso {
 
         private:
             /// private and does not exist, do not try to use
-            ParticleStorage(const ParticleStorage &);
+            Storage(const Storage &);
 	};
 
-	typedef esutil::VirtualUnaryFunction<ParticleStorage::reference, void> ParticleComputer;
-	typedef esutil::VirtualUnaryFunction<ParticleStorage::const_reference, void> ConstParticleComputer;
     }
 }
 

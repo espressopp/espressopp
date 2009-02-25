@@ -4,6 +4,7 @@
 #include <pmi.hpp>
 #include <logging.hpp>
 #include <interaction/Interaction.hpp>
+#include <particles/Set.hpp>
 
 namespace espresso {
   namespace interaction {
@@ -27,7 +28,7 @@ namespace espresso {
       real r0;
       real rMax;
 
-      typedef espresso::particleset::ParticleSet::const_reference const_reference;
+      typedef espresso::particles::Set::const_reference const_reference;
 
       static LOG4ESPP_DECL_LOGGER(theLogger);
 

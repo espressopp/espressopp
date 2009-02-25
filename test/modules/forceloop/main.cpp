@@ -1,17 +1,17 @@
 
 // Example C++ program doing the same as the force loop Python script
 
-#include "types.hpp"
-#include "logging.hpp"
-#include "pmi.hpp"
-#include "espresso_common.hpp"
-#include "bc/PBC.hpp"
-#include "interaction/LennardJones.hpp"
-#include "interaction/FENE.hpp"
-#include "pairs/All.hpp"
-#include "pairs/PairForceComputer.hpp"
-#include "particleset/All.hpp"
-#include "particlestorage/ParticleStorage.hpp"
+#include <types.hpp>
+#include <logging.hpp>
+#include <pmi.hpp>
+#include <espresso_common.hpp>
+#include <particles/Storage.hpp>
+#include <particles/All.hpp>
+#include <bc/PBC.hpp>
+#include <interaction/LennardJones.hpp>
+#include <interaction/FENE.hpp>
+#include <pairs/All.hpp>
+#include <pairs/ForceComputer.hpp>
 
 #include "ParticleWriter.hpp"
 #include "PairWriteComputer.hpp"
@@ -24,9 +24,8 @@
 using namespace std;
 using namespace espresso;
 using namespace espresso::bc;
+using namespace espresso::particles;
 using namespace espresso::pairs;
-using namespace espresso::particleset;
-using namespace espresso::particlestorage;
 using namespace espresso::interaction;
 using namespace espresso::integrator;
 
@@ -41,7 +40,7 @@ using namespace espresso::integrator;
 #define SIZE 4.0
 
 typedef espresso::pairs::All AllPairs;
-typedef espresso::particleset::All AllParticles;
+typedef espresso::particles::All AllParticles;
 
 /** Main routine of a test program:
 
@@ -52,12 +51,10 @@ typedef espresso::particleset::All AllParticles;
     - print out particle data
 */
 
-void forceloop() 
-
-{
+void forceloop() {
   // Create a new particle storage
 
-  ParticleStorage particleStorage;
+  Storage particleStorage;
   size_t position = particleStorage.addProperty<Real3D>();
   size_t velocity = particleStorage.addProperty<Real3D>();
   size_t force = particleStorage.addProperty<Real3D>();
@@ -74,12 +71,12 @@ void forceloop()
        real y = (j + r) / N * SIZE; 
        real z = (k + r) / N * SIZE;
 
-       ParticleStorage::reference ref = particleStorage.addParticle();
-       ParticleStorage::PropertyTraits<Real3D>::Reference positionRef = 
+       Storage::reference ref = particleStorage.addParticle();
+       Storage::PropertyTraits<Real3D>::Reference positionRef = 
 	 particleStorage.getProperty<Real3D>(position);
-       ParticleStorage::PropertyTraits<Real3D>::Reference velocityRef = 
+       Storage::PropertyTraits<Real3D>::Reference velocityRef = 
 	 particleStorage.getProperty<Real3D>(velocity);
-       ParticleStorage::PropertyTraits<Real3D>::Reference forceRef    = 
+       Storage::PropertyTraits<Real3D>::Reference forceRef    = 
 	 particleStorage.getProperty<Real3D>(force);
 
        positionRef[ref] = Real3D(x, y, z);
@@ -130,13 +127,13 @@ void forceloop()
   // force will be the vector of all forces in the particle storage
   // and force[ref] returns the force (as RealArrayRef) of particle reference ref
 
-  ParticleStorage::PropertyTraits<Real3D>::Reference forceRef = particleStorage.getProperty<Real3D>(force);
+  Storage::PropertyTraits<Real3D>::Reference forceRef = particleStorage.getProperty<Real3D>(force);
 
   // Define a pair computer that computes the forces for particle pairs
   // ljint provides the routine computeForce for a particle pair
   // force (pointer to all forces of particles) tells us where the computed forces are added
 
-  PairForceComputer forcecompute(forceRef, ljint);
+  ForceComputer forcecompute(forceRef, ljint);
 
   // call forcecompute(ref1, ref2) for each particle ref pair of allSet
 

@@ -212,11 +212,10 @@ AC_CONFIG_FILES([Makefile
                  src/pmi/Makefile
                  src/esutil/Makefile
                  src/hello/Makefile
-                 src/interaction/Makefile
+                 src/particles/Makefile
                  src/pairs/Makefile
+                 src/interaction/Makefile
                  src/bc/Makefile
-                 src/particleset/Makefile
-                 src/particlestorage/Makefile
                  src/integrator/Makefile
 		 doc/Makefile
 		 doc/dg/Makefile

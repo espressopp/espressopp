@@ -10,8 +10,7 @@ else
 endif
 
 SUBDIRS += \
-	hello interaction integrator \
-	pairs bc particleset particlestorage
+	hello particles pairs interaction bc integrator
 
 
 # declare the headers
@@ -22,8 +21,13 @@ noinst_HEADERS = \
 noinst_LTLIBRARIES = libespresso_common.la
 libespresso_common_la_SOURCES= espresso_common.cpp
 libespresso_common_la_LIBADD = \
+	esutil/libesutil.la \
 	hello/libhello.la \
+	particles/libparticles.la \
+	pairs/libpairs.la \
 	interaction/libinteraction.la \
+	bc/libbc.la \
+	integrator/libintegrator.la \
 	$(BOOST_PYTHON_LIBS) $(LOG4ESPP_LIBS)
 
 if HAVE_MPI

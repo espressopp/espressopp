@@ -5,9 +5,9 @@
 
 #include "MDIntegrator.hpp"
 
-#include "particleset/ParticleSet.hpp"
+#include "particles/Set.hpp"
 #include "interaction/Interaction.hpp"
-#include "pairs/ParticlePairs.hpp"
+#include "pairs/Set.hpp"
 
 namespace espresso {
   namespace integrator {
@@ -16,27 +16,26 @@ namespace espresso {
 
     private:
 
-      typedef espresso::particlestorage::ParticleStorage::PropertyTraits<Real3D>::Reference RealArrayRef;
+      typedef espresso::particles::Storage::PropertyTraits<Real3D>::Reference RealArrayRef;
 
-      espresso::particleset::ParticleSet* particles;
-      espresso::particlestorage::ParticleStorage* particlestorage;
+      espresso::particles::Set* particles;
+      espresso::particles::Storage* storage;
 
       size_t position;
       size_t velocity;
       size_t force;
 
       std::vector<espresso::interaction::Interaction*> interactions;
-      std::vector<espresso::pairs::ParticlePairs*> pairs;
+      std::vector<espresso::pairs::Set*> pairs;
 
     public:
 
-      VelocityVerlet(espresso::particleset::ParticleSet* _particles, 
+      VelocityVerlet(espresso::particles::Set* _particles, 
                      size_t _position, size_t _velocity, size_t _force);
-
+      
       void addForce(espresso::interaction::Interaction *interaction, 
-                    espresso::pairs::ParticlePairs *pair);
+                    espresso::pairs::Set *pairs);
   
-
       virtual void run(int timesteps); 
 
       virtual ~VelocityVerlet();

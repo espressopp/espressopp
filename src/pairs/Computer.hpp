@@ -1,17 +1,15 @@
-#ifndef _PAIRS_PARTICLEPAIRCOMPUTER_HPP
-#define _PAIRS_PARTICLEPAIRCOMPUTER_HPP
+#ifndef _PAIRS_COMPUTER_HPP
+#define _PAIRS_COMPUTER_HPP
 
 #include "types.hpp"
-
-#include "particleset/ParticleSet.hpp"
+#include "particles/Set.hpp"
 
 namespace espresso {
-  
   namespace pairs {
     /** Abstract class that defines the operator() applied to particle pairs
      */
     template<class ParticleReference>
-    class ParticlePairComputerBase {
+    class ComputerBase {
       
     public:
       /// @name extended function object interface
@@ -35,13 +33,13 @@ namespace espresso {
     };
 
     /** Abstract class that defines a function on pairs of particles */
-    class ParticlePairComputer: 
-      public ParticlePairComputerBase<espresso::particlestorage::ParticleStorage::reference> 
+    class Computer: 
+      public ComputerBase<espresso::particles::Storage::reference> 
     { };
     
     /** Abstract class that defines a function on pairs of read-only particles */
-    class ConstParticlePairComputer:
-      public ParticlePairComputerBase<espresso::particlestorage::ParticleStorage::const_reference> 
+    class ConstComputer:
+      public ComputerBase<espresso::particles::Storage::const_reference> 
     {};
   }
 }

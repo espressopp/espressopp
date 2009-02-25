@@ -1,69 +1,68 @@
 #include <boost/foreach.hpp>
 #include <algorithm>
 #include <stdexcept>
-#include "ParticleStorage.hpp"
+#include "Computer.hpp"
+#include "Storage.hpp"
 
-using namespace espresso::particlestorage;
+using namespace espresso::particles;
 
-ParticleStorage::ParticleStorage(): uniqueID(0) {
+Storage::Storage(): uniqueID(0) {
     particleIDProperty = particles.addProperty<size_t>();
 }
 
-ParticleStorage::reference ParticleStorage::addParticle() {
+Storage::reference Storage::addParticle() {
 
     esutil::TupleVector::iterator it = particles.insert(particles.end());
     particles.getProperty<size_t>(particleIDProperty)[*it] = ++uniqueID;
     return *it;
 }
 
-class PredicateMatchParticleID: public std::unary_function<ParticleStorage::const_reference, bool> {
-    ParticleStorage::PropertyTraits<size_t>::ConstReference id;
+class PredicateMatchParticleID: public std::unary_function<Storage::const_reference, bool> {
+    Storage::PropertyTraits<size_t>::ConstReference id;
     size_t searchID;
 
 public:
-    PredicateMatchParticleID(const ParticleStorage &store, size_t _searchID)
+    PredicateMatchParticleID(const Storage &store, size_t _searchID)
 	: id(store.getIDProperty()), searchID(_searchID) {}
   
-    bool operator()(ParticleStorage::const_reference ref) { return id[ref] == searchID; }
+    bool operator()(Storage::const_reference ref) { return id[ref] == searchID; }
 };
 
-void ParticleStorage::deleteParticle(size_t deleteID) {
+void Storage::deleteParticle(size_t deleteID) {
 
     esutil::TupleVector::iterator pos =
 	std::find_if(particles.begin(), particles.end(), PredicateMatchParticleID(*this, deleteID));
 
     if (pos == particles.end()) {
-	throw std::out_of_range("ParticleStorage::deleteParticle: particle does not exist");
+	throw std::out_of_range("Storage::deleteParticle: particle does not exist");
     }
     particles.erase(pos);
 }
 
-ParticleStorage::reference ParticleStorage::getParticleByID(size_t id) {
+Storage::reference Storage::getParticleByID(size_t id) {
 
     esutil::TupleVector::iterator pos =
 	std::find_if(particles.begin(), particles.end(), PredicateMatchParticleID(*this, id));
 
     if (pos == particles.end()) {
-	throw std::out_of_range("ParticleStorage::getParticleByID: particle does not exist");
+	throw std::out_of_range("Storage::getParticleByID: particle does not exist");
     }
     return *pos;
 }
 
-void ParticleStorage::foreach(ParticleComputer& compute)
-{
+void Storage::foreach(Computer& compute) {
     BOOST_FOREACH(reference particle, particles) {
 	compute(particle);
     }
 }
 
-void ParticleStorage::foreach(ConstParticleComputer& compute) const
-{
+void Storage::foreach(ConstComputer& compute) const {
     BOOST_FOREACH(const_reference particle, particles) {
 	compute(particle);
     }
 }
 
-size_t ParticleStorage::fillWithLattice(real size, size_t N, size_t positions) {
+size_t Storage::fillWithLattice(real size, size_t N, size_t positions) {
     if (positions == 0) {
         positions = addProperty<Real3D>();
     }

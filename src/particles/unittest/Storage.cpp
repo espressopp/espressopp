@@ -1,15 +1,15 @@
-#define BOOST_TEST_MODULE ParticleStorage
+#define BOOST_TEST_MODULE Storage
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/foreach.hpp>
 
-#include "../ParticleStorage.hpp"
+#include "../Storage.hpp"
 
-using namespace espresso::particlestorage;
+using namespace espresso::particle;
 
 struct Fixture {
-    ParticleStorage store;
-    const ParticleStorage &constStore;
+    Storage store;
+    const Storage &constStore;
     std::vector<size_t> generatedParticles;
     size_t propertyPos;
 
@@ -17,7 +17,7 @@ struct Fixture {
 	propertyPos = store.addProperty<float>(3);
 
 	for (size_t i = 0; i < 5; ++i) {
-	    ParticleStorage::reference ref = store.addParticle();
+	    Storage::reference ref = store.addParticle();
 	    generatedParticles.push_back(store.getParticleID(ref));
 	}
     }
@@ -31,8 +31,8 @@ struct Fixture {
 #ifdef __GNUC__
 __attribute__((noinline))
 #endif
-void put_particle(ParticleStorage::ArrayPropertyTraits<float, 3>::Reference ref,
-		  ParticleStorage::reference pref2) {
+void put_particle(Storage::ArrayPropertyTraits<float, 3>::Reference ref,
+		  Storage::reference pref2) {
     ref[pref2][0] = 0.4;
     ref[pref2][1] = 0.5;
     ref[pref2][2] = 0.6;
@@ -40,10 +40,10 @@ void put_particle(ParticleStorage::ArrayPropertyTraits<float, 3>::Reference ref,
 
 BOOST_FIXTURE_TEST_CASE(references_test, Fixture)
 {
-    ParticleStorage::reference pref1 = store.getParticleByID(generatedParticles[1]);
-    ParticleStorage::reference pref2 = store.getParticleByID(generatedParticles[2]);
-    ParticleStorage::const_reference const_pref2 = store.getParticleByID(generatedParticles[2]);
-    ParticleStorage::ArrayPropertyTraits<float, 3>::Reference
+    Storage::reference pref1 = store.getParticleByID(generatedParticles[1]);
+    Storage::reference pref2 = store.getParticleByID(generatedParticles[2]);
+    Storage::const_reference const_pref2 = store.getParticleByID(generatedParticles[2]);
+    Storage::ArrayPropertyTraits<float, 3>::Reference
 	ref = store.getArrayProperty<float, 3>(propertyPos);
 
     put_particle(ref, pref2);
@@ -67,8 +67,8 @@ BOOST_FIXTURE_TEST_CASE(references_test, Fixture)
   Local Variables:
   compile-command: "g++ -Wall -static -g -I../.. \
   -I/home/axel/software/include/boost-1_36 \
-  -L/home/axel/software/lib ParticleStorage.cpp \
-  ../ParticleStorage.cpp ../../util/TupleVector.cpp -o partstore \
+  -L/home/axel/software/lib Storage.cpp \
+  ../Storage.cpp ../../util/TupleVector.cpp -o partstore \
   -lboost_unit_test_framework-gcc42-mt-1_36 && ./partstore"
   End:
 */

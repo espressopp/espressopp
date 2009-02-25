@@ -1,14 +1,13 @@
 #include "types.hpp"
 
-#include "particlestorage/ParticleStorage.hpp"
-#include "pairs/ParticlePairComputer.hpp"
+#include "particles/Storage.hpp"
+#include "pairs/Computer.hpp"
 
 namespace espresso {
-
    namespace pairs {
 
-     typedef particlestorage::ParticleStorage::PropertyTraits<size_t>::ConstReference ConstSizeRef;
-     typedef particlestorage::ParticleStorage::PropertyTraits<Real3D>::ConstReference ConstRealArrayRef;
+     typedef particles::Storage::PropertyTraits<size_t>::ConstReference ConstSizeRef;
+     typedef particles::Storage::PropertyTraits<Real3D>::ConstReference ConstRealArrayRef;
 
      /** This class is used to print all particle pairs.
 
@@ -20,8 +19,7 @@ namespace espresso {
 
         \sa espresso::pairs::ParticlePairComputer
      */
-
-     class PairWriteComputer: public ConstParticlePairComputer {
+     class PairWriteComputer: public ConstComputer {
 
      public:
 
@@ -33,24 +31,19 @@ namespace espresso {
            \param particleStorage is needed to access the properties that will be printed
 
        */
-
-       PairWriteComputer(const espresso::particlestorage::ParticleStorage* particleStorage,
+       PairWriteComputer(const espresso::particles::Storage* particleStorage,
 	                 size_t position) :
-
          pos(particleStorage->getProperty<Real3D>(position)),
          id(particleStorage->getIDProperty())
-
-       {
-       }
+       {}
 
        /** Implementation of the pure routine that is applied to each particle pair.
 
           \sa espresso::ParticlePairComputer::operator()
        */
-
        virtual void operator()(const Real3D &dist,
-                               const espresso::particleset::ParticleSet::const_reference p1,
-                               const espresso::particleset::ParticleSet::const_reference p2)
+                               const espresso::particles::Set::const_reference p1,
+                               const espresso::particles::Set::const_reference p2)
 
        {
           printf("Pair: id = (%ld,%ld) , pos1 = (%f,%f,%f), pos2 = (%f,%f,%f), dist = (%f, %f, %f)\n",
