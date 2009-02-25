@@ -17,6 +17,7 @@ LOG4ESPP_LOGGER(LennardJones::theLogger, "interaction.LennardJones");
 PMI_REGISTER_CLASS(LennardJones);
 
 LennardJones::LennardJones() {
+  // set the defaults here
   setLocal(1.0, 1.0, 2.5);
 }
 

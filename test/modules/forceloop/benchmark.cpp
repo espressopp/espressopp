@@ -83,9 +83,7 @@ void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {
     particleset::All allset(&storage);
     pairs::All allpairs(pbc, allset, position);
     interaction::LennardJones ljint;
-    ljint.setCutoff(cutoff);
-    ljint.setEpsilon(epsilon);
-    ljint.setSigma(sigma);
+    ljint.set(epsilon, sigma, cutoff);
     pairs::PairForceComputer forcecompute(storage.getProperty<Real3D>(force), ljint);
     allpairs.foreach(forcecompute);
 }

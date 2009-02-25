@@ -119,17 +119,13 @@ void forceloop()
 
   LennardJones ljint;
 
-  ljint.setCutoff(2.5);
-  ljint.setEpsilon(1.0);
-  ljint.setSigma(1.0);
+  ljint.set(1.0, 1.0, 2.5);
 
   // make a FENE interaction
 
   FENE fene;
 
-  fene.setK(1.5); 
-  fene.setR0(1.0); 
-  fene.setRMax(2.5); 
+  fene.set(1.5, 1.0, 2.5);
 
   // force will be the vector of all forces in the particle storage
   // and force[ref] returns the force (as RealArrayRef) of particle reference ref
