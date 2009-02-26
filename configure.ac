@@ -190,11 +190,15 @@ EOF
 #  SET ADDITIONAL MAKEFILE VARIABLES                              #
 #                                                                 #
 ################################################################### 
+# required by build-aux/macros/axes_python.am
 pythondir=${libdir}/${PACKAGE_TARNAME}/espresso
 AC_SUBST(pythondir)
+# required by src/Makefile.am
 AC_SUBST([abs_top_builddir])
-CPPFLAGS="$CPPFLAGS -I\$(top_srcdir)/src -I\$(top_srcdir)/src/include $BOOST_CPPFLAGS"
-LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"
+AM_CPPFLAGS="-I\$(top_srcdir)/src -I\$(top_srcdir)/src/include $BOOST_CPPFLAGS"
+AM_LDFLAGS="$BOOST_LDFLAGS"
+AC_SUBST([AM_CPPFLAGS])
+AC_SUBST([AM_LDFLAGS])
 
 ################################################################### 
 #                                                                 #
@@ -211,6 +215,7 @@ AC_CONFIG_FILES([Makefile
 		 src/include/Makefile
                  src/pmi/Makefile
                  src/esutil/Makefile
+                 src/esutil/unittest/Makefile
                  src/hello/Makefile
                  src/particles/Makefile
                  src/pairs/Makefile
@@ -229,6 +234,8 @@ AC_CONFIG_FILES([Makefile
                  test/external/boost.python/Makefile 
                  ])
 
+AC_CONFIG_FILES([bin/utexec.sh],
+                [chmod +x bin/utexec.sh])
 AC_CONFIG_FILES([bin/espp_mpiexec.sh],
                 [chmod +x bin/espp_mpiexec.sh])
 AC_CONFIG_FILES([test/runtests.sh],

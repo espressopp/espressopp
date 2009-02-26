@@ -1,16 +1,12 @@
 # declare the subdirs
 SUBDIRS = include esutil
-EXTRA_DIST =
 CLEANFILES =
 
 if HAVE_MPI
   SUBDIRS += pmi
-else
-  EXTRA_DIST += pmi
 endif
 
-SUBDIRS += \
-	hello particles pairs interaction bc integrator
+SUBDIRS += hello particles pairs interaction bc integrator
 
 
 # declare the headers
@@ -56,7 +52,7 @@ _espresso_la_LIBADD = libespresso_common.la
 ## PYTHON
 ##############################
 
-python_scripts=hello.py interaction.py
+python_scripts=hello.py particles.py interaction.py
 
 python_SCRIPTS=$(python_scripts)
 

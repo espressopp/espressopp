@@ -1,0 +1,73 @@
+#! /bin/sh
+
+if test $1 = "--srcdir"; then
+    srcdir=$2
+    shift 2
+else
+    srcdir=`/bin/pwd`
+fi
+
+uts="$@"
+
+echo "Trying to compile and execute the following tests:"
+echo $uts
+echo "srcdir=$srcdir"
+
+# collect the list of unittests (get it from Makefile?)
+
+top_srcdir="@abs_top_srcdir@"
+top_builddir="@abs_top_builddir@"
+
+test -z "$LIBTOOL" && LIBTOOL="$SHELL $top_builddir/libtool"
+test -z "$CXX" && CXX="@CXX@"
+test -z "$CXXLD" && CXXLD=$CXX
+test -z "$CXXFLAGS" && CXXFLAGS="@CXXFLAGS@"
+BOOST_CPPFLAGS="@BOOST_CPPFLAGS@"
+BOOST_LDFLAGS="@BOOST_LDFLAGS@"
+BOOST_UNIT_TEST_FRAMEWORK_LIBS="@BOOST_UNIT_TEST_FRAMEWORK_LIBS@"
+
+CPPFLAGS="$CPPFLAGS -I$top_builddir/src -I$top_srcdir/src -I$top_srcdir/src/include $BOOST_CPPFLAGS"
+LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"
+LIBS="$top_builddir/src/libespresso_common.la $BOOST_UNIT_TEST_FRAMEWORK_LIBS"
+
+LTCALL="$LIBTOOL --tag=CXX $LIBTOOLFLAGS"
+
+# combine the compilation and linker commands
+LTCXXCOMPILE="$LTCALL --mode=compile $CXX $INCLUDES $CPPFLAGS $CXXFLAGS"
+LTCXXLINK="$LTCALL --mode=link $CXXLD $CXXFLAGS $LDFLAGS $LIBS" 
+LTRUN="$LTCALL --mode=execute"
+
+# loop over all unittests
+
+for ut in $uts; do
+    # check whether $ut contains .cpp and remove it
+    ut=${ut%.cpp}
+    if test -e $srcdir/$ut.cpp; then
+    # everything is fine
+	/bin/true ;
+    elif test -e $srcdir/Test$ut.cpp; then
+    # if not, try to prepend "Test"
+	ut=Test$ut
+    else
+    # if not, bail out
+	echo "ERROR: Could not find test $ut."
+	exit 1
+    fi
+
+    # compile and link the unittests
+    echo "COMPILING $ut..."
+    $LTCXXCOMPILE -c $srcdir/$ut.cpp || {
+	echo "ERROR: Compiling test $ut failed."
+	exit 1
+    }
+
+    echo "LINKING $ut..."
+    $LTCXXLINK $ut.lo -o $ut || {
+	echo "ERROR: Linking test $ut failed."
+	exit 1
+    }
+
+    # run the unittests
+    echo "EXECUTING $ut..."
+    $LTRUN ./$ut
+done

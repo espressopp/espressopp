@@ -1,11 +1,11 @@
-#define BOOST_TEST_DYN_LINK
+#include <acconfig.hpp>
 #define BOOST_TEST_MODULE timing
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 
 #include "../Timer.hpp"
 
-using namespace util;
+using namespace esutil;
 
 int doSomething()
 {

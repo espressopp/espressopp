@@ -1,3 +1,5 @@
+SUBDIRS=unittest
+
 subpkgincludedir=$(pkgincludedir)/esutil
 
 subpkginclude_HEADERS = \

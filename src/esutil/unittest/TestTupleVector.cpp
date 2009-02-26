@@ -1,4 +1,6 @@
+#include <acconfig.hpp>
 #define BOOST_TEST_MODULE PropertyVector
+
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/foreach.hpp>
