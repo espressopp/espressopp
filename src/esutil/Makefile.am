@@ -3,6 +3,7 @@ SUBDIRS=unittest
 subpkgincludedir=$(pkgincludedir)/esutil
 
 subpkginclude_HEADERS = \
+	Identifier.hpp \
 	TupleVector.hpp \
 	Timer.hpp \
 	virtual_functional.hpp
