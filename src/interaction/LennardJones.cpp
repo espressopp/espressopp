@@ -5,8 +5,6 @@
 #define LOG4ESPP_LEVEL_WARN
 
 #include "LennardJones.hpp"
-#include <mpi.hpp>
-#include <pmi.hpp>
 #include <python.hpp>
 #include <iostream>
 

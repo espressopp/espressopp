@@ -1,6 +1,5 @@
 #include "FENE.hpp"
 #include <cmath>
-#include <mpi.hpp>
 #include <python.hpp>
 
 using namespace espresso::interaction;

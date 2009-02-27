@@ -4,6 +4,7 @@
 #include "acconfig.hpp"
 
 #ifdef HAVE_MPI
+#include <boost/mpi.hpp>
 #include "pmi/pmi.hpp"
 
 #define PMI_DECL_SETTER(method, type, arg)	\
