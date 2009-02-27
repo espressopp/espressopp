@@ -56,7 +56,9 @@ class StepB : public espresso::particles::Computer  {
 };
 
 VelocityVerlet::VelocityVerlet(espresso::particles::Set* _particles, 
-			       size_t _position, size_t _velocity, size_t _force):
+			       Storage::PropertyId _position,
+                               Storage::PropertyId _velocity,
+                               Storage::PropertyId _force):
 
      particles(_particles),
      storage(_particles->getStorage()),

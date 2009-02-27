@@ -55,9 +55,9 @@ void forceloop() {
   // Create a new particle storage
 
   Storage particleStorage;
-  size_t position = particleStorage.addProperty<Real3D>();
-  size_t velocity = particleStorage.addProperty<Real3D>();
-  size_t force = particleStorage.addProperty<Real3D>();
+  Storage::PropertyId position = particleStorage.addProperty<Real3D>();
+  Storage::PropertyId velocity = particleStorage.addProperty<Real3D>();
+  Storage::PropertyId force = particleStorage.addProperty<Real3D>();
 
   // generate particles in the particle storage
 

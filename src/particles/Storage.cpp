@@ -62,8 +62,8 @@ void Storage::foreach(ConstComputer& compute) const {
     }
 }
 
-size_t Storage::fillWithLattice(real size, size_t N, size_t positions) {
-    if (positions == 0) {
+Storage::PropertyId Storage::fillWithLattice(real size, size_t N, PropertyId positions) {
+    if (positions == PropertyId()) {
         positions = addProperty<Real3D>();
     }
     for (size_t i = 0; i < N; i++) {

@@ -24,7 +24,7 @@ namespace espresso {
       /** Construct a writer for a particle storage.
 	  \param particleStorage is needed to get access the property vectors of all particles.
       */
-      ParticleWriter(const Storage &particleStorage, size_t position, size_t force) :
+      ParticleWriter(const Storage &particleStorage, Storage::PropertyId position, Storage::PropertyId force) :
 
 	f(particleStorage.getProperty<Real3D>(force)), 
 	pos(particleStorage.getProperty<Real3D>(position)),

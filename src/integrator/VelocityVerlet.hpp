@@ -16,14 +16,15 @@ namespace espresso {
 
     private:
 
-      typedef espresso::particles::Storage::PropertyTraits<Real3D>::Reference RealArrayRef;
+      typedef espresso::particles::Storage Storage;
+      typedef Storage::PropertyTraits<Real3D>::Reference RealArrayRef;
 
       espresso::particles::Set* particles;
-      espresso::particles::Storage* storage;
+      Storage* storage;
 
-      size_t position;
-      size_t velocity;
-      size_t force;
+      Storage::PropertyId position;
+      Storage::PropertyId velocity;
+      Storage::PropertyId force;
 
       std::vector<espresso::interaction::Interaction*> interactions;
       std::vector<espresso::pairs::Set*> pairs;
@@ -31,7 +32,9 @@ namespace espresso {
     public:
 
       VelocityVerlet(espresso::particles::Set* _particles, 
-                     size_t _position, size_t _velocity, size_t _force);
+                     Storage::PropertyId _position,
+                     Storage::PropertyId _velocity,
+                     Storage::PropertyId _force);
       
       void addForce(espresso::interaction::Interaction *interaction, 
                     espresso::pairs::Set *pairs);

@@ -40,8 +40,8 @@ TupleVector::TupleVector(const TupleVector &vec, size_type newESize)
 
 TupleVector::PropertyId TupleVector::addProperty(size_t _size, size_t _dimension)
 {
-    property.push_back(Property(++uniqueID, _size, _dimension, malloc(maxESize)));
-    return uniqueID;
+  property.push_back(Property(++uniqueID, _size, _dimension, malloc(maxESize)));
+  return uniqueID;
 }
 
 void TupleVector::eraseProperty(TupleVector::PropertyId id)

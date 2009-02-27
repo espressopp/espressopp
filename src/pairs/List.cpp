@@ -17,7 +17,7 @@ List::~List()
 
 List::List(espresso::bc::BC& _bc, 
            Storage& _storage, 
-           size_t _coordinates) :
+           Storage::PropertyId _coordinates) :
 
    storage(_storage),
    bc(_bc),
@@ -25,7 +25,7 @@ List::List(espresso::bc::BC& _bc,
 
    {}
 
-int List::size() {
+size_t List::size() {
    return id_list.size();
 }
 

@@ -89,7 +89,8 @@ All::~All() {}
   All::All(boundary_conditions, particle_set)
   -------------------------------------------------------------------------- */
 
-All::All(espresso::bc::BC& _bc, espresso::particles::Set& _set, size_t _coordinates):
+All::All(espresso::bc::BC& _bc, espresso::particles::Set& _set,
+         espresso::particles::Storage::PropertyId _coordinates):
   set(_set),
   bc(_bc),
   coordinates(_coordinates)

@@ -32,7 +32,7 @@ namespace espresso {
 
        */
        PairWriteComputer(const espresso::particles::Storage* particleStorage,
-	                 size_t position) :
+	                 espresso::particles::Storage::PropertyId position) :
          pos(particleStorage->getProperty<Real3D>(position)),
          id(particleStorage->getIDProperty())
        {}

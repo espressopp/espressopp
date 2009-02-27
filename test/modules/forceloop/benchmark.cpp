@@ -38,10 +38,10 @@ const real size = 5.0;
 
 class TestEspresso {
 public:
-    typedef particles::Storage Storage;
-    Storage storage;
-    size_t position, force;
-    size_t npart;
+  typedef particles::Storage Storage;
+  Storage storage;
+  Storage::PropertyId position, force;
+  size_t npart;
 
     TestEspresso(size_t nparticles): npart(nparticles) {
         position = storage.addProperty<Real3D>();

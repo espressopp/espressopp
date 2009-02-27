@@ -313,13 +313,3 @@ BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
         i++;
     }
 }
-
-/*
-  Local Variables:
-  compile-command: "g++ -Wall -static -g \
-  -I/home/axel/software/include/boost-1_36 \
-  -L/home/axel/software/lib TupleVector.cpp \
-  ../TupleVector.cpp -o propvector \
-  -lboost_unit_test_framework-gcc42-mt-1_36 && ./propvector"
-  End:
-*/

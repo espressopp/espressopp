@@ -17,7 +17,7 @@ namespace espresso {
     private:
       espresso::particles::Storage& storage; 
       espresso::bc::BC& bc;
-      size_t coordinates;
+      espresso::particles::Storage::PropertyId coordinates;
       typedef std::pair<size_t,size_t> Tuple;
       std::vector<Tuple> id_list;
 
@@ -34,9 +34,9 @@ namespace espresso {
       */
       List (espresso::bc::BC& bc, 
 	    espresso::particles::Storage& storage, 
-	    size_t coordinates);
+	    espresso::particles::Storage::PropertyId coordinates);
 
-      int size();
+      size_t size();
 
       /** Ask if a particle pair tuple (id1, id2) is in the pair list
 
@@ -74,7 +74,7 @@ namespace espresso {
 
       /** Getter routine for the ID of the coordinate */
 
-      size_t getCoordinateProperty() const {return coordinates; }
+      espresso::particles::Storage::PropertyId getCoordinateProperty() const {return coordinates; }
 
       /** This routine will apply a function operator to all pairs.
 
