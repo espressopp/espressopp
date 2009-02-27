@@ -17,18 +17,22 @@ Storage::reference Storage::addParticle() {
     return *it;
 }
 
+Storage::const_reference Storage::getParticleByID(ParticleId id) const {
+  return const_reference(const_cast<Storage *>(this)->getParticleByID(id));
+}
+
 class PredicateMatchParticleID: public std::unary_function<Storage::const_reference, bool> {
-    Storage::PropertyTraits<size_t>::ConstReference id;
-    size_t searchID;
+  Storage::PropertyTraits<Storage::ParticleId>::ConstReference id;
+  Storage::ParticleId searchID;
 
 public:
-    PredicateMatchParticleID(const Storage &store, size_t _searchID)
-	: id(store.getIDProperty()), searchID(_searchID) {}
+  PredicateMatchParticleID(const Storage &store, size_t _searchID)
+    : id(store.getIDProperty()), searchID(_searchID) {}
   
-    bool operator()(Storage::const_reference ref) { return id[ref] == searchID; }
+  bool operator()(Storage::const_reference ref) { return id[ref] == searchID; }
 };
 
-void Storage::deleteParticle(size_t deleteID) {
+void Storage::deleteParticle(ParticleId deleteID) {
 
     esutil::TupleVector::iterator pos =
 	std::find_if(particles.begin(), particles.end(), PredicateMatchParticleID(*this, deleteID));
@@ -39,7 +43,7 @@ void Storage::deleteParticle(size_t deleteID) {
     particles.erase(pos);
 }
 
-Storage::reference Storage::getParticleByID(size_t id) {
+Storage::reference Storage::getParticleByID(ParticleId id) {
 
     esutil::TupleVector::iterator pos =
 	std::find_if(particles.begin(), particles.end(), PredicateMatchParticleID(*this, id));
@@ -60,6 +64,14 @@ void Storage::foreach(ConstComputer& compute) const {
     BOOST_FOREACH(const_reference particle, particles) {
 	compute(particle);
     }
+}
+
+void Storage::eraseProperty(PropertyId id) {
+  // no non-const reference to the ID
+  if (id == particleIDProperty) {
+    throw std::out_of_range("id cannot be erased");
+  }
+  particles.eraseProperty(id);
 }
 
 Storage::PropertyId Storage::fillWithLattice(real size, size_t N, PropertyId positions) {

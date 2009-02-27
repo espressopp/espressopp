@@ -63,9 +63,9 @@ public:
     real calculateAverage() NOINLINE;
 
     Real3D getForce(size_t i) {
-        // HACK!
-        Storage::reference ref = storage.getParticleByID(i + 1);
-        return storage.getProperty<Real3D>(force)[ref];
+      // HACK!
+      Storage::reference ref = storage.getParticleByID(Storage::ParticleId(i + 1));
+      return storage.getProperty<Real3D>(force)[ref];
     }
 };
 

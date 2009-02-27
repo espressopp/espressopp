@@ -10,7 +10,7 @@ using namespace espresso::particles;
 
 // some abbreviations
 
-typedef Storage::PropertyTraits<size_t>::ConstReference SizeRef;
+typedef Storage::PropertyTraits<Storage::ParticleId>::ConstReference ParticleIdRef;
 typedef Storage::PropertyTraits<Real3D>::ConstReference RealArrayRef;
 
 
@@ -30,12 +30,12 @@ private:
   public:
     const espresso::bc::BC& bc;
     
-    const SizeRef id;
+    const ParticleIdRef id;
     const RealArrayRef pos;
 
     const Reference pref1;
     const Real3D pos1;
-    const size_t id1;
+    const Storage::ParticleId id1;
 
     PairComputer& pairComputer;
 

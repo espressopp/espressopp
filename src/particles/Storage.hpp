@@ -1,13 +1,9 @@
 #ifndef _PARTICLES_STORAGE_HPP
 #define _PARTICLES_STORAGE_HPP
 
-// only included for the mock implementation. Remove for final
-#include <vector>
-
-#include <types.hpp>
-
-#include <esutil/TupleVector.hpp>
-
+#include "types.hpp"
+#include "esutil/TupleVector.hpp"
+#include "esutil/Identifier.hpp"
 
 namespace espresso {
   namespace particles {
@@ -44,13 +40,22 @@ namespace espresso {
         typedef esutil::TupleVector::ConstArrayPropertyReference<T> ConstReference;
       };
 
-    private:
-      esutil::TupleVector particles;
+      /** permanent identifier for a particle. This is really just an
+          size_t, but with explicit conversion only, to make sure that
+          you are aware when you are about to access a particle */
+      class ParticleId {
+      public:
+        /// default constructor, generating an invalid id
+        ParticleId(): v(0) {}
+        /// constructor, by default generating an invalid id
+        explicit ParticleId(size_t _v): v(_v) {}
+        /// acts like a size_t otherwise
+        operator size_t() const { return v; }
 
-      /// unique ID counter for the particles
-      size_t uniqueID;
-      /// ID of the particle ID property
-      PropertyId particleIDProperty;
+      private:
+        size_t v;
+      };
+
     public:
 
       Storage();
@@ -70,13 +75,13 @@ namespace espresso {
       /** delete a particle
           @param id the id of the particle to delete
       */
-      virtual void deleteParticle(size_t id);
+      virtual void deleteParticle(ParticleId id);
 
       /** get the persistent ID of a particle
           @param ref temporary reference to a particle
           @return the persistent ID of the particle
       */
-      size_t getParticleID(const_reference ref) const {
+      ParticleId getParticleID(const_reference ref) const {
         return getIDProperty()[ref];
       }
 
@@ -84,15 +89,13 @@ namespace espresso {
           potentially slow.
           @param id the id of the particle to fetch
       */
-      virtual reference getParticleByID(size_t id);
+      virtual reference getParticleByID(ParticleId id);
 
       /** get a particle to a particle using its ID. This is
           potentially slow.
           @param id the id of the particle to fetch
       */
-      virtual const_reference getParticleByID(size_t id) const {
-        return const_reference(const_cast<Storage *>(this)->getParticleByID(id));
-      }
+      virtual const_reference getParticleByID(ParticleId id) const;
 
       /// loop over all particles
       virtual void foreach(Computer &);
@@ -141,8 +144,8 @@ namespace espresso {
       }
 
       /// get a short lifetime reference to the property representing the particle ID
-      const PropertyTraits<size_t>::ConstReference getIDProperty() const {
-        return particles.getProperty<size_t>(particleIDProperty);
+      const PropertyTraits<ParticleId>::ConstReference getIDProperty() const {
+        return particles.getProperty<ParticleId>(particleIDProperty);
       }
 
       /** add a property
@@ -156,13 +159,7 @@ namespace espresso {
       /** delete a property
           @param n ID of the property to delete as obtained from addProperty
       */
-      void eraseProperty(PropertyId id) {
-        // no non-const reference to the ID
-        if (id == particleIDProperty) {
-          throw std::out_of_range("id cannot be erased");
-        }
-        particles.eraseProperty(id);
-      }
+      void eraseProperty(PropertyId id);
 
       //@}
 
@@ -180,7 +177,16 @@ namespace espresso {
 
       //@}
 
+    protected:
+      /// here the particle data is stored
+      esutil::TupleVector particles;
+
     private:
+      /// unique ID counter for the particles
+      size_t uniqueID;
+      /// ID of the particle ID property
+      PropertyId particleIDProperty;
+
       /// private and does not exist, do not try to use
       Storage(const Storage &);
     };

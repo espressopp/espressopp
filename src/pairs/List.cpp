@@ -29,22 +29,22 @@ size_t List::size() {
    return id_list.size();
 }
 
-bool List::findPair(size_t id1, size_t id2) {
+bool List::findPair(Storage::ParticleId id1, Storage::ParticleId id2) {
    Tuple T (id1, id2);
    std::vector<Tuple>::iterator it = find (id_list.begin(), id_list.end(), T);
    return it != id_list.end();
 }
 
-void List::addPair(size_t id1, size_t id2) {
+void List::addPair(Storage::ParticleId id1, Storage::ParticleId id2) {
    Tuple T (id1, id2);
    id_list.push_back(Tuple(id1, id2));
 }
 
-void List::deletePair(size_t id1, size_t id2) {  
+void List::deletePair(Storage::ParticleId id1, Storage::ParticleId id2) {  
    Tuple T(id1, id2);
    std::vector<Tuple>::iterator it = find (id_list.begin(), id_list.end(), T);
    if (it == id_list.end()) {
-      throw std::runtime_error("deletePair: tuple not found");
+     throw std::runtime_error("deletePair: tuple not found");
    }
    id_list.erase(it);
 }

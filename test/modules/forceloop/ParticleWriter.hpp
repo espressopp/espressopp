@@ -16,7 +16,7 @@ namespace espresso {
       f;    //<! reference to the force vector of all particles.
       Storage::PropertyTraits<Real3D>::ConstReference
       pos;  //<! reference to the position vector of all particles.
-      Storage::PropertyTraits<size_t>::ConstReference
+      Storage::PropertyTraits<Storage::ParticleId>::ConstReference
       id;   //<! reference to the identification vector of all particles.
 
     public:
@@ -37,7 +37,7 @@ namespace espresso {
       */
       virtual void operator()(const Storage::const_reference pref) {
 	printf("Particle : id = %ld, pos = (%f,%f,%f), f = (%f,%f,%f)\n",
-	       id[pref], pos[pref].getX(), pos[pref].getY(), pos[pref].getZ(), 
+	       size_t(id[pref]), pos[pref].getX(), pos[pref].getY(), pos[pref].getZ(), 
 	       f[pref].getX(),  f[pref].getY(),  f[pref].getZ());
       }
     };
