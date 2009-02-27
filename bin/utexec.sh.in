@@ -1,4 +1,5 @@
 #! /bin/sh
+# Script that compiles, links and executes C++ unittests
 
 if test $1 = "--srcdir"; then
     srcdir=$2
@@ -40,6 +41,7 @@ LTRUN="$LTCALL --mode=execute"
 # loop over all unittests
 
 for ut in $uts; do
+    echo "**************************************************"
     # check whether $ut contains .cpp and remove it
     ut=${ut%.cpp}
     if test -e $srcdir/$ut.cpp; then
@@ -55,19 +57,25 @@ for ut in $uts; do
     fi
 
     # compile and link the unittests
-    echo "COMPILING $ut..."
+    echo "**********************"
+    echo "** COMPILING $ut..."
+    echo "**********************"
     $LTCXXCOMPILE -c $srcdir/$ut.cpp || {
 	echo "ERROR: Compiling test $ut failed."
 	exit 1
     }
 
-    echo "LINKING $ut..."
+    echo "**********************"
+    echo "** LINKING $ut..."
+    echo "**********************"
     $LTCXXLINK $ut.lo -o $ut || {
 	echo "ERROR: Linking test $ut failed."
 	exit 1
     }
 
     # run the unittests
-    echo "EXECUTING $ut..."
+    echo "**********************"
+    echo "** EXECUTING $ut..."
+    echo "**********************"
     $LTRUN ./$ut
 done
