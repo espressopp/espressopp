@@ -1,6 +1,6 @@
 #! /bin/sh -x
 
-rm -f config.cache src/cpp/acconfig.hpp
+rm -f config.cache src/acconfig.hpp
 
 aclocal -I build-aux/macros	&& \
 autoheader			&& \
