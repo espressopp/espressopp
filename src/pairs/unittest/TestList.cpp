@@ -2,25 +2,26 @@
 
 #include <boost/test/included/unit_test.hpp>
 
-#include "../List.hpp"
-#include "../../particlestorage/ParticleStorage.hpp"
-#include "../../bc/PBC.hpp"
+#include "pairs/List.hpp"
+#include "particles/Storage.hpp"
+#include "bc/PBC.hpp"
 
+using namespace espresso;
 using namespace espresso::pairs;
-using namespace espresso::particlestorage;
+using namespace espresso::particles;
 using namespace espresso::bc;
 
 struct Fixture {
 
-    ParticleStorage store;
+    Storage store;
 
-    size_t position;
+    Storage::PropertyId position;
 
     PBC pbc;
 
     List* pairList;
 
-    size_t first3, second3;  // saved values for one certain pair
+    Storage::ParticleId first3, second3;  // saved values for one certain pair
 
     Fixture() : pbc(2.5) {
 
@@ -28,12 +29,12 @@ struct Fixture {
 
         pairList = new List(pbc, store, position);
 
-        size_t first  = 0;
-        size_t second = 0;
+	Storage::ParticleId first = Storage::ParticleId(0);
+	Storage::ParticleId second = Storage::ParticleId(0);
  
         for (size_t i = 0; i < 5; ++i) {
 
-            ParticleStorage::reference ref = store.addParticle();
+            Storage::reference ref = store.addParticle();
             second = store.getParticleID(ref);
             if (i > 0) {
                pairList->addPair(first, second);
@@ -52,7 +53,7 @@ struct Fixture {
 
 /** Example class for traversing particle pairs */
 
-class PairAdder : public ConstParticlePairComputer {
+class PairAdder : public pairs::ConstComputer {
 
      public:
 
@@ -63,8 +64,8 @@ class PairAdder : public ConstParticlePairComputer {
        }
 
        virtual void operator()(const Real3D &dist,
-                               const espresso::particleset::ParticleSet::const_reference p1,
-                               const espresso::particleset::ParticleSet::const_reference p2)
+                               const particles::Set::const_reference p1,
+                               const particles::Set::const_reference p2)
 
        {
           counter++;

@@ -128,7 +128,7 @@ namespace espresso {
           @throw std::out_of_range if one tries to obtain a handle to the ID property
       */
       template<typename T>
-      typename ArrayPropertyTraits<T>::Reference getVarArrayProperty(size_t id) {
+      typename ArrayPropertyTraits<T>::Reference getVarArrayProperty(PropertyId id) {
         // no non-const reference to the ID
         if (id == particleIDProperty) {
           throw std::out_of_range("id is not writable");
@@ -139,7 +139,7 @@ namespace espresso {
           @throw std::range_error if the given and array dimensions mismatch
       */
       template<typename T>
-      typename ArrayPropertyTraits<T>::ConstReference getArrayProperty(size_t id) const {
+      typename ArrayPropertyTraits<T>::ConstReference getArrayProperty(PropertyId id) const {
         return particles.getArrayProperty<T>(id);
       }
 

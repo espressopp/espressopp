@@ -5,13 +5,13 @@
 
 #include "../Storage.hpp"
 
-using namespace espresso::particle;
+using namespace espresso::particles;
 
 struct Fixture {
     Storage store;
     const Storage &constStore;
-    std::vector<size_t> generatedParticles;
-    size_t propertyPos;
+  std::vector<Storage::ParticleId> generatedParticles;
+    Storage::PropertyId propertyPos;
 
     Fixture(): constStore(store) {
 	propertyPos = store.addProperty<float>(3);
@@ -31,7 +31,7 @@ struct Fixture {
 #ifdef __GNUC__
 __attribute__((noinline))
 #endif
-void put_particle(Storage::ArrayPropertyTraits<float, 3>::Reference ref,
+void put_particle(Storage::ArrayPropertyTraits<float>::Reference ref,
 		  Storage::reference pref2) {
     ref[pref2][0] = 0.4;
     ref[pref2][1] = 0.5;
@@ -43,8 +43,8 @@ BOOST_FIXTURE_TEST_CASE(references_test, Fixture)
     Storage::reference pref1 = store.getParticleByID(generatedParticles[1]);
     Storage::reference pref2 = store.getParticleByID(generatedParticles[2]);
     Storage::const_reference const_pref2 = store.getParticleByID(generatedParticles[2]);
-    Storage::ArrayPropertyTraits<float, 3>::Reference
-	ref = store.getArrayProperty<float, 3>(propertyPos);
+    Storage::ArrayPropertyTraits<float>::Reference
+      ref = store.getArrayProperty<float>(propertyPos);
 
     put_particle(ref, pref2);
 

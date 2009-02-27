@@ -218,9 +218,12 @@ AC_CONFIG_FILES([Makefile
                  src/esutil/unittest/Makefile
                  src/hello/Makefile
                  src/particles/Makefile
+                 src/particles/unittest/Makefile
                  src/pairs/Makefile
+                 src/pairs/unittest/Makefile
                  src/interaction/Makefile
                  src/bc/Makefile
+                 src/bc/unittest/Makefile
                  src/integrator/Makefile
 		 doc/Makefile
 		 doc/dg/Makefile

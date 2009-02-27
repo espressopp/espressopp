@@ -1,11 +1,11 @@
-#define BOOST_TEST_DYN_LINK
-#define BOOST_TEST_MODULE pairs_All
+#define BOOST_TEST_MODULE TestAll
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <map>
 
 #include "bc/PBC.hpp"
-#include "particleset/All.hpp"
+#include "particles/Storage.hpp"
+#include "particles/All.hpp"
 #include "../All.hpp"
 
 using namespace espresso;
@@ -17,9 +17,9 @@ struct Fixture {
     static const real size = 1.0;
 
     bc::PBC pbc;
-    particlestorage::ParticleStorage store;
-    size_t coord;
-    particleset::All set;
+    particles::Storage store;
+    particles::Storage::PropertyId coord;
+    particles::All set;
     pairs::All pairs;
 
     Fixture(): pbc(size),
@@ -38,8 +38,8 @@ struct Fixture {
 template<class ComputerClass>
 class PairTest: public ComputerClass {
 public:
-    particlestorage::ParticleStorage::PropertyTraits<size_t>::ConstReference id;
-    particlestorage::ParticleStorage::PropertyTraits<Real3D>::ConstReference pos;
+    particles::Storage::PropertyTraits<size_t>::ConstReference id;
+    particles::Storage::PropertyTraits<Real3D>::ConstReference pos;
 
     bc::BC &bc;
     
@@ -48,24 +48,24 @@ public:
     typedef std::pair< size_t, size_t > IDPair;
     std::map< IDPair, bool > occupied;
 
-    PairTest(bc::BC &_bc, const particlestorage::ParticleStorage &particleStorage,
-             size_t position)
+    PairTest(bc::BC &_bc, const particles::Storage &particleStorage,
+             particles::Storage::PropertyId position)
         : id(particleStorage.getIDProperty()),
           pos(particleStorage.template getProperty<Real3D>(position)),
           bc(_bc), pairs(0) {
     }
     
     virtual void operator()(const Real3D &dist,
-                            const particleset::ParticleSet::reference p1,
-                            const particleset::ParticleSet::reference p2) {
+                            const particles::Set::reference p1,
+                            const particles::Set::reference p2) {
         (*this)(dist,
-                particleset::ParticleSet::const_reference(p1),
-                particleset::ParticleSet::const_reference(p2));
+                particles::Set::const_reference(p1),
+                particles::Set::const_reference(p2));
     }
 
     virtual void operator()(const Real3D &dist,
-                            const particleset::ParticleSet::const_reference p1,
-                            const particleset::ParticleSet::const_reference p2) {
+                            const particles::Set::const_reference p1,
+                            const particles::Set::const_reference p2) {
         Real3D pos1 = pos[p1];
         Real3D pos2 = pos[p2];
         Real3D d = bc.getDist(pos1, pos2);
@@ -86,7 +86,7 @@ public:
 
 BOOST_FIXTURE_TEST_CASE(foreach_test, Fixture)
 {
-    PairTest<ParticlePairComputer> test(pbc, store, coord);
+    PairTest<Computer> test(pbc, store, coord);
     pairs.foreach(test);
     size_t np = N*N*N;
     BOOST_CHECK_EQUAL(test.pairs, (np*(np-1))/2);
@@ -94,18 +94,9 @@ BOOST_FIXTURE_TEST_CASE(foreach_test, Fixture)
 
 BOOST_FIXTURE_TEST_CASE(const_foreach_test, Fixture)
 {
-    PairTest<ConstParticlePairComputer> test(pbc, store, coord);
+    PairTest<ConstComputer> test(pbc, store, coord);
     pairs.foreach(test);
     size_t np = N*N*N;
     BOOST_CHECK_EQUAL(test.pairs, (np*(np-1))/2);
 }
 
-/*
-  Local Variables:
-  compile-command: "g++ -Wall -g -I../.. \
-  -I/home/axel/software/include/boost-1_36 \
-  -L/home/axel/software/lib All.cpp \
-  ../All.cpp ../../esutil/TupleVector.cpp ../../particlestorage/ParticleStorage.cpp -o all \
-  -lboost_unit_test_framework-gcc42-mt-1_36 && ./all"
-  End:
-*/
