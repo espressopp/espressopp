@@ -17,16 +17,17 @@ FENE::FENE() { setLocal(1.0, 0.0, 1.0); }
        
 FENE::~FENE() {}
 
-void FENE::set(real _K, real _r0, real _rMax) {
+void FENE::set(real _K, real _r0, real _rMax)
 #ifndef HAVE_MPI
-  setLocal(_K, _r0, _rMax);
+{ setLocal(_K, _r0, _rMax); }
 #else
+{
   real v[3] = { _K, _r0, _rMax };
   pmiObject.invoke<&FENE::setWorker>();
   boost::mpi::communicator world;
   boost::mpi::broadcast(world, v, 3, pmi::getControllerMPIRank());
   setLocal(v[0], v[1], v[2]);
-  }
+}
 
 void FENE::setWorker() {
   real v[3];

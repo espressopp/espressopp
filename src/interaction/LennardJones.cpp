@@ -23,16 +23,17 @@ LennardJones::LennardJones() {
 
 LennardJones::~LennardJones() {}
 
-void LennardJones::set(real _epsilon, real _sigma, real _cutoff) {
+void LennardJones::set(real _epsilon, real _sigma, real _cutoff)
 #ifndef HAVE_MPI
-  setLocal(_epsilon, _sigma, _cutoff);
+{ setLocal(_epsilon, _sigma, _cutoff); }
 #else
+{
   real v[3] = { _epsilon, _sigma, _cutoff };
   pmiObject.invoke<&LennardJones::setWorker>();
   boost::mpi::communicator world;
   boost::mpi::broadcast(world, v, 3, pmi::getControllerMPIRank());
   setLocal(v[0], v[1], v[2]);
-  }
+}
 
 void LennardJones::setWorker() {
   real v[3];
