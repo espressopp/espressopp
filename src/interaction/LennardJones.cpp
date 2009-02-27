@@ -1,5 +1,9 @@
 //method to compute the potential energy
 
+// this macro removes all LOG statements with level < WARN at source level
+
+#define LOG4ESPP_LEVEL_WARN
+
 #include "LennardJones.hpp"
 #include <mpi.hpp>
 #include <pmi.hpp>
@@ -101,7 +105,7 @@ Real3D LennardJones::computeForce (const Real3D &dist) const {
 	
     LOG4ESPP_DEBUG(theLogger, "computeForce, distSqr = " << distSqr <<
 		   ", ffactor = " << ffactor);
-	
+
     f = dist * ffactor;
   } 
       
