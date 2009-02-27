@@ -2,8 +2,9 @@
 #define _BC_PBC_HPP
 
 #include <cmath>
-#include "types.hpp"
-#include "bc/BC.hpp"
+#include <pmi.hpp>
+#include <logging.hpp>
+#include <bc/BC.hpp>
 
 namespace espresso {
   namespace bc {
@@ -16,23 +17,36 @@ namespace espresso {
 
     private:
 
+      IF_MPI(pmi::ParallelClass<PBC> pmiObject;)
+
       real length;
       real lengthInverse;
 
+      static LOG4ESPP_DECL_LOGGER(theLogger);
+
     public:
+
+      IF_PYTHON(static void registerPython();)
 
       /** Constructor for cubic box */
       PBC();
       PBC(real _length);
-
-      /** Method to compute the minimum image distance */
-      virtual Real3D getDist(const Real3D& pos1, const Real3D& pos2) const;
-
       /** Destructor for periodic boundary conditions */
       virtual ~PBC();
 
-    };
+      virtual void set(real _length);
 
+    private:
+      void setLocal(real);
+    public:
+      IF_MPI(void setWorker();)
+
+      //PMI and Python Visible
+      /** Method to compute the minimum image distance */
+      virtual Real3D getDist(const Real3D& pos1, const Real3D& pos2) const;
+
+    };
   }
 }
+
 #endif
