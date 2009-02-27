@@ -381,6 +381,7 @@ void generateParticles(Test &test) {
 /// this routine runs the tests as defined above
 int main()
 {
+    LOG4ESPP_CONFIGURE();
     IF_MPI(initMPI());
     esutil::WallTimer timer;
     TestEspresso espresso(N*N*N);
