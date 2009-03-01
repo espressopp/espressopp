@@ -37,8 +37,8 @@ namespace espresso {
       */
       virtual void operator()(const Storage::const_reference pref) {
 	printf("Particle : id = %ld, pos = (%f,%f,%f), f = (%f,%f,%f)\n",
-	       size_t(id[pref]), pos[pref].getX(), pos[pref].getY(), pos[pref].getZ(), 
-	       f[pref].getX(),  f[pref].getY(),  f[pref].getZ());
+	       size_t(id[pref]), pos[pref][0], pos[pref][1], pos[pref][2], 
+	       f[pref][0],  f[pref][1],  f[pref][2]);
       }
     };
   }

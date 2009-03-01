@@ -1,6 +1,8 @@
 #ifndef _TYPES_HPP
 #define _TYPES_HPP
 
+#include <cstddef>    // needed for size_t
+
 // general type definition to choose between single and double precsion 
 
 // typedef float real;  // single precision
@@ -12,53 +14,102 @@ real sign(real _r) {
     return  (_r > 0) ? 1 : -1;
 }
 
-/** Class for a vector of three real values */
+template<class T, int N>
+class SmallArray {
 
-class Real3D {
-   private:
-      real x, y, z;  //*< elements of the 3D vector 
+   protected:
+
+      T data[N];  //*< elements of the small array
 
    public:
-      Real3D(real _x, real _y, real _z) { x = _x; y = _y; z = _z; }
-      Real3D(real val = 0.0) { x = val; y = val; z = val; }
-      Real3D operator+ (const Real3D &b) const {
-         return Real3D(x + b.x, y + b.y, z + b.z);
+
+      // Default constructor
+
+      SmallArray<T,N>() {}
+
+      // Constructor
+
+      SmallArray<T,N>(T val) { for (size_t i = 0; i < N; i++) data[i] = val; }
+
+      // getter and setter
+
+      T& operator[] (int index) {
+        return data[index];
       }
- 
-      Real3D& operator+= (const Real3D &b) {
-         x += b.x;
-         y += b.y;
-         z += b.z;
+
+      const T& operator[] (int index) const {
+        return data[index];
+      }
+
+      // increment + decrement
+
+      SmallArray<T,N>& operator+= (const SmallArray<T,N>& b) {
+
+         for (size_t i = 0; i < N; i++) data[i] += b.data[i]; 
          return *this;
       }
  
-      Real3D& operator-= (const Real3D &b) {
-         x -= b.x;
-         y -= b.y;
-         z -= b.z;
+      SmallArray<T,N>& operator-= (const SmallArray<T,N>& b) {
+         for (size_t i = 0; i < N; i++) data[i] -= b.data[i]; 
          return *this;
       }
- 
-      Real3D operator- (const Real3D &b) const {
-         return Real3D(x - b.x, y - b.y, z - b.z);
-      }
- 
-      Real3D operator* (const Real3D &b) const {
-         return Real3D(x * b.x, y * b.y, z * b.z);
-      }
- 
-      Real3D operator* (real s) const {
-         return Real3D(x * s, y * s, z * s);
+
+      // binary + operator
+
+      SmallArray<T,N> operator+ (const SmallArray<T,N> &b) const {
+
+         SmallArray<T,N> result;
+         for (size_t i = 0; i < N; i++) result.data[i] = data[i] + b.data[i]; 
+         return result;
       }
 
-      real sqr() const { return x*x + y*y + z*z; }
+      SmallArray<T,N> operator- (const SmallArray<T,N> &b) const {
 
-      real getX() const { return x; }
+         SmallArray<T,N> result;
+         for (size_t i = 0; i < N; i++) result.data[i] = data[i] - b.data[i]; 
+         return result;
+      }
 
-      real getY() const { return y; }
+      SmallArray<T,N> operator* (const SmallArray<T,N> &b) const {
 
-      real getZ() const { return z; }
+         SmallArray<T,N> result;
+         for (size_t i = 0; i < N; i++) result.data[i] = data[i] * b.data[i]; 
+         return result;
+      }
+
+      SmallArray<T,N> operator* (const T s) const {
+         SmallArray<T,N> result;
+         for (size_t i = 0; i < N; i++) result.data[i] = data[i] * s; 
+         return result;
+      }
+
+      // dotproduct
+
+      T dot(const SmallArray<T,N>& y) const
+
+      { T val = 0;
+        for (size_t i = 0; i < N; i++) val += data[i]*y.data[i];
+        return val;
+      }
+
+      T sqr() const { return dot(*this); }
+
+      // these routine are only for N == 3 
+
+      SmallArray<T,N>(T x, T y, T z)
+
+      { data[0] = x; data[1] = y; data[2] = z; }
+
+      SmallArray<T,N> cross(const SmallArray<T,N>& y) const
+
+      {
+         return SmallArray<T,N>(data[1]*y.data[2] - data[2]*y.data[1],
+                                data[2]*y.data[0] - data[0]*y.data[2],
+                                data[0]*y.data[1] - data[1]*y.data[0]);
+      }
 };
+
+typedef SmallArray<real,3> Real3D;
 
 inline Real3D operator*(real s, const Real3D &v) { return v * s; }
 

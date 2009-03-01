@@ -21,7 +21,6 @@
 #include <cstdio>
 #include <vector>
 
-using namespace std;
 using namespace espresso;
 using namespace espresso::bc;
 using namespace espresso::particles;

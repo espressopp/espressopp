@@ -62,9 +62,9 @@ Real3D PBC::getDist(const Real3D& pos1, const Real3D& pos2) const {
   real yij;
   real zij;
 
-  xij = pos1.getX() - pos2.getX();
-  yij = pos1.getY() - pos2.getY();
-  zij = pos1.getZ() - pos2.getZ();
+  xij = pos1[0] - pos2[0];
+  yij = pos1[1] - pos2[1];
+  zij = pos1[2] - pos2[2];
 
   xij -= dround(xij*lengthInverse)*length;
   yij -= dround(yij*lengthInverse)*length;

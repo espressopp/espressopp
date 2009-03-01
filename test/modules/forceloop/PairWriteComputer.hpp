@@ -49,9 +49,9 @@ namespace espresso {
           printf("Pair: id = (%ld,%ld) , pos1 = (%f,%f,%f), pos2 = (%f,%f,%f), dist = (%f, %f, %f)\n",
 
                  size_t(id[p1]), size_t(id[p2]),
-                 pos[p1].getX(), pos[p1].getY(), pos[p1].getZ(),
-                 pos[p2].getX(), pos[p2].getY(), pos[p2].getZ(),
-                 dist.getX(), dist.getY(), dist.getZ());
+                 pos[p1][0], pos[p1][1], pos[p1][2],
+                 pos[p2][0], pos[p2][1], pos[p2][2],
+                 dist[0], dist[1], dist[2]);
        }
      };
   }

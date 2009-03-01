@@ -21,7 +21,7 @@
 #include "interaction/LennardJones.hpp"
 #include "esutil/Timer.hpp"
 
-using namespace std;
+// using namespace std;
 using namespace espresso;
 
 #ifdef __GNUC__
@@ -277,7 +277,7 @@ void TestEspresso::runEmptyLoop() {
 
 class TestBasic {
 public:
-    vector<Real3D> position, force;
+    std::vector<Real3D> position, force;
     size_t npart;
 
     TestBasic(size_t nparticles): npart(nparticles) {
@@ -385,67 +385,67 @@ int main()
     IF_MPI(initMPI());
     esutil::WallTimer timer;
     TestEspresso espresso(N*N*N);
-    cout << setw(20) << "setup Espresso: " << timer << endl;
+    std::cout << std::setw(20) << "setup Espresso: " << timer << std::endl;
 
     timer.reset();
     TestBasic basic(N*N*N);
-    cout << setw(20) << "setup Basic: " << timer << endl;
+    std::cout << std::setw(20) << "setup Basic: " << timer << std::endl;
 
     // generate particles in the particle storage
 
     timer.reset();
     generateParticles(espresso);
-    cout << setw(20) << "generate Espresso: " << timer << endl;
+    std::cout << std::setw(20) << "generate Espresso: " << timer << std::endl;
 
     timer.reset();
     generateParticles(basic);
-    cout << setw(20) << "generate Basic: " << timer << endl;
+    std::cout << std::setw(20) << "generate Basic: " << timer << std::endl;
 
-    cout << endl << "PARTICLE PAIR LOOPING TESTS" << endl;
+    std::cout << std::endl << "PARTICLE PAIR LOOPING TESTS" << std::endl;
 
     // check empty pair loop
 
     timer.reset();
     espresso.runEmptyPairLoop();
-    cout << setw(30) << "empty pair loop: " << timer << endl << endl;
+    std::cout << std::setw(30) << "empty pair loop: " << timer << std::endl << std::endl;
 
     // calculate forces
 
     timer.reset();
     basic.calculateForces(1.1, 1.2, 2.5);
     real basicCalcTime = timer.getElapsedTime();
-    cout << setw(30) << "calc basic: " << timer << endl;
+    std::cout << std::setw(30) << "calc basic: " << timer << std::endl;
 
     timer.reset();
     espresso.calculateForces(1.1, 1.2, 2.5);
-    cout << setw(30) << "calc Espresso: " << timer << endl;
-    cout << "RATIO: " << (timer.getElapsedTime() / basicCalcTime) << endl;
+    std::cout << std::setw(30) << "calc Espresso: " << timer << std::endl;
+    std::cout << "RATIO: " << (timer.getElapsedTime() / basicCalcTime) << std::endl;
 
     timer.reset();
     espresso.calculateForces2(1.1, 1.2, 2.5);
-    cout << setw(30) << "calc Espresso/LJ-Computer: " << timer << endl;
-    cout << "RATIO: " << (timer.getElapsedTime() / basicCalcTime) << endl;
+    std::cout << std::setw(30) << "calc Espresso/LJ-Computer: " << timer << std::endl;
+    std::cout << "RATIO: " << (timer.getElapsedTime() / basicCalcTime) << std::endl;
 
     // calculate minimum distance
 
     timer.reset();
     real mine = espresso.calculateMinDist();
     real espressoMinTime = timer.getElapsedTime();
-    cout << setw(30) << "min Espresso: " << timer << endl;
+    std::cout << std::setw(30) << "min Espresso: " << timer << std::endl;
 
     timer.reset();
     real minb = basic.calculateMinDist();
-    cout << setw(30) << "min Basic: " << timer << endl; 
-    cout << "RATIO: " << (espressoMinTime / timer.getElapsedTime()) << endl;
+    std::cout << std::setw(30) << "min Basic: " << timer << std::endl; 
+    std::cout << "RATIO: " << (espressoMinTime / timer.getElapsedTime()) << std::endl;
 
-    cout << endl << "PARTICLE LOOPING TESTS" << endl;
+    std::cout << std::endl << "PARTICLE LOOPING TESTS" << std::endl;
 
     // check empty loop
 
     timer.reset();
     for (size_t cnt = 0; cnt < 10000; ++cnt)
         espresso.runEmptyLoop();
-    cout << setw(30) << "empty loop: " << timer << endl << endl;
+    std::cout << std::setw(30) << "empty loop: " << timer << std::endl << std::endl;
 
     // calculate average
 
@@ -454,25 +454,25 @@ int main()
     for (size_t cnt = 0; cnt < 10000; ++cnt)
         ave = espresso.calculateAverage();
     real espressoAvgTime = timer.getElapsedTime();
-    cout << setw(30) << "average Espresso: " << timer << endl;
+    std::cout << std::setw(30) << "average Espresso: " << timer << std::endl;
 
     timer.reset();
     real avb;
     for (size_t cnt = 0; cnt < 10000; ++cnt)
         avb = basic.calculateAverage();
-    cout << setw(30) << "average Basic: " << timer << endl;
-    cout << "RATIO: " << (espressoAvgTime / timer.getElapsedTime()) << endl;
+    std::cout << std::setw(30) << "average Basic: " << timer << std::endl;
+    std::cout << "RATIO: " << (espressoAvgTime / timer.getElapsedTime()) << std::endl;
 
     // check consistency
-    cout << "min dists: " << mine << " " << minb << endl;
+    std::cout << "min dists: " << mine << " " << minb << std::endl;
     if (abs(mine-minb)/abs(mine) > 1e-5) {
-        cerr << "ERROR: minima are different: " << mine << " != " << minb << endl;        
+        std::cerr << "ERROR: minima are different: " << mine << " != " << minb << std::endl;        
     }
 
     // take into account that Espresso calculates forces twice to test two algorithms
-    cout << "average force: " << 0.5*ave << " " << avb << endl;
+    std::cout << "average force: " << 0.5*ave << " " << avb << std::endl;
     if (abs(0.5*ave-avb)/abs(ave) > 1e-5) {
-        cerr << "ERROR: averages are different: " << ave << " != " << avb << endl;        
+        std::cerr << "ERROR: averages are different: " << ave << " != " << avb << std::endl;        
     }
 
     for (size_t i = 0; i < N*N*N; ++i) {
@@ -480,10 +480,10 @@ int main()
         Real3D f2 = basic.getForce(i);
         real diff = sqrt((f1-f2).sqr());
         if (diff/abs(f1.sqr()) > 1e-5) {
-            cerr << "ERROR: difference " << diff << " too big for particle " << i << endl;
-            cerr << "ERROR: " << f1.getX() << " vs. " << f2.getX() << endl;
-            cerr << "ERROR: " << f1.getY() << " vs. " << f2.getY() << endl;
-            cerr << "ERROR: " << f1.getZ() << " vs. " << f2.getZ() << endl;
+            std::cerr << "ERROR: difference " << diff << " too big for particle " << i << std::endl;
+            std::cerr << "ERROR: " << f1[0] << " vs. " << f2[0] << std::endl;
+            std::cerr << "ERROR: " << f1[1] << " vs. " << f2[1] << std::endl;
+            std::cerr << "ERROR: " << f1[2] << " vs. " << f2[2] << std::endl;
         }
     }
     IF_MPI(finalizeMPI());
