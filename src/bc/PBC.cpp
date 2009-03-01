@@ -30,20 +30,17 @@ void PBC::set(real _length)
 {  setLocal(_length); }
 #else
 {
-  //real v = _length;
-  real v[3] = { 1.0, 2.0, 3.0 };
   pmiObject.invoke<&PBC::setWorker>();
   boost::mpi::communicator world;
-  boost::mpi::broadcast(world, v, 3, pmi::getControllerMPIRank());
-  setLocal(0.0);
+  boost::mpi::broadcast(world, _length, pmi::getControllerMPIRank());
+  setLocal(_length);
 }
 
 void PBC::setWorker() {
-  //real v;
-  real v[3];
+  real v;
   boost::mpi::communicator world;
-  boost::mpi::broadcast(world, v, 3, pmi::getControllerMPIRank());
-  setLocal(0.0);
+  boost::mpi::broadcast(world, v, pmi::getControllerMPIRank());
+  setLocal(v);
 }
 
 PMI_REGISTER_METHOD(PBC, setWorker);
