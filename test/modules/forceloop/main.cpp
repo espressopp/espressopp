@@ -132,11 +132,13 @@ void forceloop() {
   // ljint provides the routine computeForce for a particle pair
   // force (pointer to all forces of particles) tells us where the computed forces are added
 
-  ForceComputer forcecompute(forceRef, ljint);
+  ForceComputer *forcecompute = ljint.createForceComputer(ForceComputer(forceRef));
 
   // call forcecompute(ref1, ref2) for each particle ref pair of allSet
 
-  allpairs.foreach(forcecompute);
+  allpairs.foreach(*forcecompute);
+
+  delete forcecompute;
 
   // print out all particle data to see that it calculates some forces
 

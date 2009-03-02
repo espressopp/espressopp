@@ -1,5 +1,6 @@
-#include "VelocityVerlet.hpp"
+#include <boost/foreach.hpp>
 
+#include "VelocityVerlet.hpp"
 #include "particles/Computer.hpp"
 #include "pairs/ForceComputer.hpp"
 
@@ -70,10 +71,7 @@ VelocityVerlet::VelocityVerlet(espresso::particles::Set* _particles,
 
 void VelocityVerlet::addForce(espresso::interaction::Interaction *interaction, 
                               espresso::pairs::Set *pair) {
-  
-     interactions.push_back(interaction);
-     pairs.push_back(pair);
-
+  forceEvaluations.push_back(ForceEvaluation(interaction, pair));
 }
 
 void VelocityVerlet::run(int timesteps) {
@@ -92,13 +90,15 @@ void VelocityVerlet::run(int timesteps) {
 
        // Force Loop 
 
-       for (size_t k=0; k < interactions.size(); k++) {
+       // template for the force computer
+       espresso::pairs::ForceComputer
+         forceParameters(storage->getProperty<Real3D>(force));
 
-           espresso::pairs::ForceComputer 
-              forcecompute(storage->getProperty<Real3D>(force), *interactions[k]);
-
-           pairs[k]->foreach(forcecompute);
-
+       BOOST_FOREACH(ForceEvaluation fe, forceEvaluations) {
+         espresso::pairs::ForceComputer *forceCompute =
+           fe.interaction->createForceComputer(forceParameters);
+         fe.pairs->foreach(*forceCompute);
+         delete forceCompute;
        }
 
        // Step B

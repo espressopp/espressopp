@@ -8,6 +8,7 @@
 #include <python.hpp>
 #include <iostream>
 
+using namespace espresso;
 using namespace espresso::interaction;
 
 /* ---------------------------------------------------------------------- */
@@ -48,48 +49,41 @@ PMI_REGISTER_METHOD(LennardJones, setWorker);
 #endif
 
 void LennardJones::setLocal(real _epsilon, real _sigma, real _cutoff) {
-  epsilon = _epsilon;
-  sigma = _sigma;
   cutoff = _cutoff;
-  cutoffSqr = cutoff*cutoff;
+  computer.epsilon = _epsilon;
+  computer.sigma = _sigma;
+  computer.cutoffSqr = cutoff*cutoff;
 }
 
 real LennardJones::getCutoff() const { return cutoff; }
-real LennardJones::getCutoffSqr() const { return cutoffSqr; }
-real LennardJones::getEpsilon() const { return epsilon; }
-real LennardJones::getSigma() const { return sigma; }
-
-
-real LennardJones::computeEnergy (const Real3D &dist,
-				  const const_reference p1,
-				  const const_reference p2) const {
-  return computeEnergy(dist);
-}
+real LennardJones::getEpsilon() const { return computer.epsilon; }
+real LennardJones::getSigma() const { return computer.sigma; }
+real LennardJones::getCutoffSqr() const { return computer.cutoffSqr; }
 
 real LennardJones::computeEnergy (const Real3D &dist) const {
-  return computeEnergySqr(dist.sqr());
+  return computer.computeEnergySqr(dist.sqr());
 }
 
 real LennardJones::computeEnergy(const real dist) const {
-  return computeEnergySqr(dist*dist);
+  return computer.computeEnergySqr(dist*dist);
 }
-    
-real LennardJones::computeEnergySqr (const real distSqr) const {
+
+Real3D LennardJones::computeForce(const Real3D &dist) const {
+  return computer.computeForce(dist);
+}
+
+real LennardJones::BasicComputer::computeEnergySqr(const real distSqr) const {
   if (distSqr < cutoffSqr) {
     real frac2 = sigma*sigma / distSqr;
     real frac6 = frac2 * frac2 * frac2;
     real energy = 4.0 * epsilon * (frac6 * frac6 - frac6);
     return energy;
-  } else return 0.0;
+  } else {
+    return 0.0;
+  }
 }
     
-Real3D LennardJones::computeForce (const Real3D &dist,
-				   const const_reference p1,
-				   const const_reference p2) const {
-  return computeForce(dist);
-}
-
-Real3D LennardJones::computeForce (const Real3D &dist) const {
+Real3D LennardJones::BasicComputer::computeForce(const Real3D &dist) const {
   Real3D f = 0.0;
   real   frac2;
   real   frac6;
@@ -100,16 +94,24 @@ Real3D LennardJones::computeForce (const Real3D &dist) const {
     frac2 = sigma / distSqr;
     frac6 = frac2 * frac2 * frac2;
     real ffactor = 48.0 * epsilon * (frac6*frac6 - 0.5 * frac6) * frac2;
-	
-    LOG4ESPP_DEBUG(theLogger, "computeForce, distSqr = " << distSqr <<
+
+    LOG4ESPP_DEBUG(LennardJones::theLogger, "computeForce, distSqr = " << distSqr <<
 		   ", ffactor = " << ffactor);
 
     f = dist * ffactor;
-  } 
+  }
       
   return f;
 }
-    
+
+pairs::EnergyComputer*
+LennardJones::createEnergyComputer(const pairs::EnergyComputer &templ) const
+{ return new pairs::SquareDistEnergyComputerFacade<LennardJones::BasicComputer>(templ, computer); }
+
+pairs::ForceComputer*
+LennardJones::createForceComputer(const pairs::ForceComputer &templ) const
+{ return new pairs::VectorForceComputerFacade<LennardJones::BasicComputer>(templ, computer); }
+   
 #ifdef HAVE_PYTHON  
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON

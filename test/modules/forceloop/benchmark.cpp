@@ -30,11 +30,16 @@ using namespace espresso;
 #define NOINLINE
 #endif
 
-
 /// number of particles in each dimension
 const int N = 20;
 /// dimension of the cubic simulation box
 const real size = 5.0;
+
+static inline real dround(real x) { return floor(x + 0.5); }
+
+/***********************************************************************************
+ * Testing the Espresso way of calculating things
+ ***********************************************************************************/
 
 class TestEspresso {
 public:
@@ -51,8 +56,6 @@ public:
     void addParticle(const Real3D &pos);
 
     void calculateForces(real epsilon, real sigma, real cutoff) NOINLINE;
-
-    void calculateForces2(real epsilon, real sigma, real cutoff) NOINLINE;
 
     void runEmptyPairLoop() NOINLINE;
 
@@ -85,115 +88,10 @@ void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {
     pairs::All allpairs(pbc, allset, position);
     interaction::LennardJones ljint;
     ljint.set(epsilon, sigma, cutoff);
-    pairs::ForceComputer forcecompute(storage.getProperty<Real3D>(force), ljint);
-    allpairs.foreach(forcecompute);
-}
-
-class MyPairComputer: public particles::Computer {
-public:
-    typedef particles::Storage Storage;
-
-    virtual void bind(Storage::reference ref) {
-        ptr1 = &ref;
-    }
-
-    virtual void operator()(Storage::reference ref2) = 0;
-
-protected:
-    Storage::pointer ptr1;
-};
-
-template <class InteractionType>
-class MyForceComputerFacade: public MyPairComputer {
-public:
-    typedef Storage::PropertyTraits<Real3D>::Reference Real3DReference;
-    typedef Storage::PropertyTraits<Real3D>::ConstReference ConstReal3DReference;
-
-    virtual void bind(Storage::reference ref) {
-        MyPairComputer::bind(ref);
-        pos1 = position[ref];
-        force1 = &force[ref];
-    }
-
-    virtual void operator()(Storage::reference ref2) {
-        if (ptr1 < &ref2) {
-            Real3D dist = bc.getDist(pos1, position[ref2]);
-            Real3D f    = upcast().computeForce(dist, *ptr1, ref2);
-            *force1      += f;
-            force[ref2] -= f;
-        }
-    }
-
-protected:
-    MyForceComputerFacade(bc::BC &_bc, ConstReal3DReference _position, Real3DReference _force)
-        : position(_position), force(_force), bc(_bc) {}
-
-private:
-    InteractionType &upcast() { return *static_cast<InteractionType *>(this); }
-
-    ConstReal3DReference position;
-    Real3DReference force;
-    bc::BC &bc;
-    Real3D pos1;
-    Real3D *force1;
-};
-
-class MyLJForceComputer: public MyForceComputerFacade<MyLJForceComputer> {
-public:
-
-    MyLJForceComputer(real _sigma, real _epsilon, real cutoff,
-                      bc::BC &bc,
-                      ConstReal3DReference position,
-                      Real3DReference force)
-        : MyForceComputerFacade<MyLJForceComputer>(bc, position, force),
-          sigma(_sigma), epsilon(_epsilon), cutoffSqr(cutoff*cutoff) {}
-    
-    Real3D computeForce(const Real3D &dist,
-                        const Storage::const_reference,
-                        const Storage::const_reference) {
-        real distSqr = dist.sqr();
-        Real3D f(0.0, 0.0, 0.0);
-        
-        if (distSqr < cutoffSqr) {
-            real frac2 = sigma / distSqr;
-            real frac6 = frac2 * frac2 * frac2;
-            real ffactor = 48.0 * epsilon * (frac6*frac6 - 0.5 * frac6) * frac2;
-            f = dist * ffactor;
-        }
-        return f;
-    }
-
-private:
-    real sigma;
-    real epsilon;
-    real cutoffSqr;
-};
-
-class AllBinder: public particles::Computer {
-    typedef particles::Set Set;
-
-    Set            &set;
-    MyPairComputer &computer;
-public:
-
-    AllBinder(Set &_set, MyPairComputer &_computer):
-        set(_set), computer(_computer) {}
-
-    virtual void operator()(Set::reference ref) {
-        computer.bind(ref);
-        set.foreach(computer);
-    }
-};
-
-void TestEspresso::calculateForces2(real epsilon, real sigma, real cutoff) {
-    Storage::PropertyTraits<Real3D>::ConstReference positionRef = storage.getProperty<Real3D>(position);
-    Storage::PropertyTraits<Real3D>::Reference forceRef = storage.getProperty<Real3D>(force);
-
-    bc::PBC pbc(size);
-    particles::All allset(&storage);
-    MyLJForceComputer ljc(sigma, epsilon, cutoff, pbc, positionRef, forceRef);
-    AllBinder computeParticleForce(allset, ljc);
-    allset.foreach(computeParticleForce);
+    pairs::ForceComputer *forceCompute =
+        ljint.createForceComputer(pairs::ForceComputer(storage.getProperty<Real3D>(force)));
+    allpairs.foreach(*forceCompute);
+    delete forceCompute;
 }
 
 class EmptyPairComputer: public pairs::ConstComputer {
@@ -275,6 +173,10 @@ void TestEspresso::runEmptyLoop() {
     allset.foreach(avgcompute);
 }
 
+/***********************************************************************************
+ * Testing the hardcoded way
+ ***********************************************************************************/
+
 class TestBasic {
 public:
     std::vector<Real3D> position, force;
@@ -305,13 +207,17 @@ void TestBasic::addParticle(const Real3D &pos) {
 
 void TestBasic::calculateForces(real epsilon, real sigma, real cutoff) {
     real cutoffSqr = cutoff*cutoff;
-    bc::PBC pbc(size);
+    real sizeInverse = 1./size;
 
     for (size_t i = 0; i < npart; ++i) {
         for (size_t j = i+1; j < npart; ++j) {
             Real3D pos1 = position[i];
             Real3D pos2 = position[j];
-            Real3D dist = pbc.getDist(pos1, pos2);
+            Real3D dist = pos1 - pos2;
+
+            for(size_t c = 0; c < 3; ++c) {
+                dist[c] -= dround(dist[c]*sizeInverse)*size;
+            }
 
             {
                 real   frac2;
@@ -334,13 +240,19 @@ void TestBasic::calculateForces(real epsilon, real sigma, real cutoff) {
 
 real TestBasic::calculateMinDist() {
     real min = 1e10;
+    real sizeInverse = 1./size;
 
-    bc::PBC pbc(size);
     for (size_t i = 0; i < npart; ++i) {
         for (size_t j = i+1; j < npart; ++j) {
             Real3D pos1 = position[i];
             Real3D pos2 = position[j];
-            real d = pbc.getDist(pos1, pos2).sqr();
+
+            Real3D dist = pos1 - pos2;
+            for(size_t c = 0; c < 3; ++c) {
+                dist[c] -= dround(dist[c]*sizeInverse)*size;
+            }
+            real d = dist.sqr();
+
 	    if (min > d) {
 		min = d;
             }
@@ -357,6 +269,10 @@ real TestBasic::calculateAverage() {
     }
     return average;
 }
+
+/***********************************************************************************
+ * Testing environment
+ ***********************************************************************************/
 
 template<class Test>
 void generateParticles(Test &test) {
@@ -421,22 +337,17 @@ int main()
     std::cout << std::setw(30) << "calc Espresso: " << timer << std::endl;
     std::cout << "RATIO: " << (timer.getElapsedTime() / basicCalcTime) << std::endl;
 
-    timer.reset();
-    espresso.calculateForces2(1.1, 1.2, 2.5);
-    std::cout << std::setw(30) << "calc Espresso/LJ-Computer: " << timer << std::endl;
-    std::cout << "RATIO: " << (timer.getElapsedTime() / basicCalcTime) << std::endl;
-
     // calculate minimum distance
 
     timer.reset();
-    real mine = espresso.calculateMinDist();
-    real espressoMinTime = timer.getElapsedTime();
-    std::cout << std::setw(30) << "min Espresso: " << timer << std::endl;
+    real minb = basic.calculateMinDist();
+    real basicMinTime = timer.getElapsedTime();
+    std::cout << std::setw(30) << "min Basic: " << timer << std::endl; 
 
     timer.reset();
-    real minb = basic.calculateMinDist();
-    std::cout << std::setw(30) << "min Basic: " << timer << std::endl; 
-    std::cout << "RATIO: " << (espressoMinTime / timer.getElapsedTime()) << std::endl;
+    real mine = espresso.calculateMinDist();
+    std::cout << std::setw(30) << "min Espresso: " << timer << std::endl;
+    std::cout << "RATIO: " << (timer.getElapsedTime() / basicMinTime) << std::endl;
 
     std::cout << std::endl << "PARTICLE LOOPING TESTS" << std::endl;
 
@@ -465,13 +376,13 @@ int main()
 
     // check consistency
     std::cout << "min dists: " << mine << " " << minb << std::endl;
-    if (abs(mine-minb)/abs(mine) > 1e-5) {
+    if (std::abs(mine-minb)/std::abs(mine) > 1e-5) {
         std::cerr << "ERROR: minima are different: " << mine << " != " << minb << std::endl;        
     }
 
     // take into account that Espresso calculates forces twice to test two algorithms
-    std::cout << "average force: " << 0.5*ave << " " << avb << std::endl;
-    if (abs(0.5*ave-avb)/abs(ave) > 1e-5) {
+    std::cout << "average force: " << ave << " " << avb << std::endl;
+    if (std::abs(ave-avb)/std::abs(ave) > 1e-5) {
         std::cerr << "ERROR: averages are different: " << ave << " != " << avb << std::endl;        
     }
 
@@ -479,12 +390,13 @@ int main()
         Real3D f1 = espresso.getForce(i);
         Real3D f2 = basic.getForce(i);
         real diff = sqrt((f1-f2).sqr());
-        if (diff/abs(f1.sqr()) > 1e-5) {
+        if (diff/std::abs(f1.sqr()) > 1e-5) {
             std::cerr << "ERROR: difference " << diff << " too big for particle " << i << std::endl;
             std::cerr << "ERROR: " << f1[0] << " vs. " << f2[0] << std::endl;
             std::cerr << "ERROR: " << f1[1] << " vs. " << f2[1] << std::endl;
             std::cerr << "ERROR: " << f1[2] << " vs. " << f2[2] << std::endl;
         }
     }
+
     IF_MPI(finalizeMPI());
 }

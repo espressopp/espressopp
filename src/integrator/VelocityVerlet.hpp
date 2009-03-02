@@ -1,6 +1,6 @@
 #ifndef _VELOCITY_VERLET
 #define _VELOCITY_VERLET
-  
+
 #include "types.hpp"
 
 #include "MDIntegrator.hpp"
@@ -16,28 +16,35 @@ namespace espresso {
 
     private:
 
-      typedef espresso::particles::Storage Storage;
+      typedef particles::Storage Storage;
       typedef Storage::PropertyTraits<Real3D>::Reference RealArrayRef;
 
-      espresso::particles::Set* particles;
+      particles::Set* particles;
       Storage* storage;
 
       Storage::PropertyId position;
       Storage::PropertyId velocity;
       Storage::PropertyId force;
 
-      std::vector<espresso::interaction::Interaction*> interactions;
-      std::vector<espresso::pairs::Set*> pairs;
+      struct ForceEvaluation {
+        interaction::Interaction* interaction;
+        pairs::Set* pairs;
+        ForceEvaluation(interaction::Interaction* _interaction,
+                        pairs::Set* _pairs)
+          : interaction(_interaction), pairs(_pairs) {}
+      };
+
+      std::vector<ForceEvaluation> forceEvaluations;
 
     public:
 
-      VelocityVerlet(espresso::particles::Set* _particles, 
+      VelocityVerlet(particles::Set* _particles, 
                      Storage::PropertyId _position,
                      Storage::PropertyId _velocity,
                      Storage::PropertyId _force);
       
-      void addForce(espresso::interaction::Interaction *interaction, 
-                    espresso::pairs::Set *pairs);
+      void addForce(interaction::Interaction *interaction, 
+                    pairs::Set *pairs);
   
       virtual void run(int timesteps); 
 

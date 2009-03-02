@@ -5,10 +5,10 @@
 #include <logging.hpp>
 #include <interaction/Interaction.hpp>
 #include <particles/Set.hpp>
+#include <pairs/ForceComputer.hpp>
 
 namespace espresso {
   namespace interaction {
-
     /** This class provides routines to compute forces and energies
 	of the Lennard Jones potential.
 
@@ -17,19 +17,29 @@ namespace espresso {
 	\f]
 
     */
-
     class LennardJones: public Interaction {
+    public:
+      class BasicComputer {
+        friend class LennardJones;
+
+        real epsilon;
+        real sigma;
+        real cutoffSqr;
+
+      public:
+        Real3D computeForce(const Real3D &) const;
+        real   computeEnergySqr(const real) const;
+      };
+      friend class BasicComputer;
 
     private:
 
       IF_MPI(pmi::ParallelClass<LennardJones> pmiObject;)
 
-      real sigma;       
-      real epsilon;
+      BasicComputer computer;
       real cutoff;
-      real cutoffSqr;
 
-      typedef espresso::particles::Set::const_reference const_reference;
+      typedef particles::Set::const_reference const_reference;
 
       static LOG4ESPP_DECL_LOGGER(theLogger);
 
@@ -58,17 +68,10 @@ namespace espresso {
       virtual Real3D computeForce(const Real3D &dist) const;
 
       // NOT visible on PMI/Python:
-      virtual real computeEnergy(const Real3D &dist,
-				 const const_reference p1,
-				 const const_reference p2) const;
-      virtual real computeEnergySqr(const real distSqr) const;
-
-      virtual Real3D computeForce(const Real3D &dist,
-				  const const_reference p1,
-				  const const_reference p2) const;
+      virtual pairs::EnergyComputer *createEnergyComputer(const pairs::EnergyComputer &) const;
+      virtual pairs::ForceComputer  *createForceComputer (const pairs::ForceComputer &)  const;
 
       virtual real getCutoffSqr() const;
-
     };
   }
 }
