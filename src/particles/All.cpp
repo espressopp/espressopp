@@ -6,7 +6,8 @@ All::All(Storage *_store): Set(_store) {}
 
 All::~All() {}
 
-bool All::isMember(reference) const { return true; }
+bool All::isMember(ParticleReference) const { return true; }
+
 void All::foreach(Computer &computer) {
   if (theStorage) theStorage->foreach(computer);
 }

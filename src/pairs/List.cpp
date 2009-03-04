@@ -15,9 +15,9 @@ List::~List()
 
 /* Constructor for this class  */
 
-List::List(espresso::bc::BC& _bc, 
+List::List(bc::BC& _bc, 
            Storage& _storage, 
-           Storage::PropertyId _coordinates) :
+           PropertyId _coordinates) :
 
    storage(_storage),
    bc(_bc),
@@ -29,18 +29,18 @@ size_t List::size() {
    return id_list.size();
 }
 
-bool List::findPair(Storage::ParticleId id1, Storage::ParticleId id2) {
+bool List::findPair(ParticleId id1, ParticleId id2) {
    Tuple T (id1, id2);
    std::vector<Tuple>::iterator it = find (id_list.begin(), id_list.end(), T);
    return it != id_list.end();
 }
 
-void List::addPair(Storage::ParticleId id1, Storage::ParticleId id2) {
+void List::addPair(ParticleId id1, ParticleId id2) {
    Tuple T (id1, id2);
    id_list.push_back(Tuple(id1, id2));
 }
 
-void List::deletePair(Storage::ParticleId id1, Storage::ParticleId id2) {  
+void List::deletePair(ParticleId id1, ParticleId id2) {  
    Tuple T(id1, id2);
    std::vector<Tuple>::iterator it = find (id_list.begin(), id_list.end(), T);
    if (it == id_list.end()) {
@@ -53,12 +53,12 @@ void List::foreach(Computer& pairComputer) {
 
   vector<Tuple>::iterator it;
 
-  Storage::PropertyTraits<Real3D>::Reference 
-    pos = storage.getProperty<Real3D>(coordinates);
+  PropertyReference<Real3D> pos =
+    storage.getPropertyReference<Real3D>(coordinates);
 
   for (it = id_list.begin(); it != id_list.end(); it++) {
-    Storage::reference pref1 = storage.getParticleByID(it->first);
-    Storage::reference pref2 = storage.getParticleByID(it->second);
+    ParticleReference pref1 = storage.getParticleReference(it->first);
+    ParticleReference pref2 = storage.getParticleReference(it->second);
 
     Real3D dist = bc.getDist(pos[pref1], pos[pref2]);
     
@@ -75,13 +75,13 @@ void List::foreach(ConstComputer& pairComputer) const {
 
   vector<Tuple>::const_iterator it;
 
-  Storage::PropertyTraits<Real3D>::Reference 
-    pos = storage.getProperty<Real3D>(coordinates);
+  PropertyReference<Real3D> pos =
+    storage.getPropertyReference<Real3D>(coordinates);
   
   for (it = id_list.begin(); it != id_list.end(); it++) {
     
-    Storage::const_reference pref1 = storage.getParticleByID(it->first);
-    Storage::const_reference pref2 = storage.getParticleByID(it->second);
+    ConstParticleReference pref1 = storage.getParticleReference(it->first);
+    ConstParticleReference pref2 = storage.getParticleReference(it->second);
     
     Real3D dist = bc.getDist(pos[pref1], pos[pref2]);
     

@@ -15,16 +15,12 @@ namespace espresso {
     class VelocityVerlet: public MDIntegrator {
 
     private:
-
-      typedef particles::Storage Storage;
-      typedef Storage::PropertyTraits<Real3D>::Reference RealArrayRef;
-
       particles::Set* particles;
-      Storage* storage;
+      particles::Storage* storage;
 
-      Storage::PropertyId position;
-      Storage::PropertyId velocity;
-      Storage::PropertyId force;
+      particles::PropertyId position;
+      particles::PropertyId velocity;
+      particles::PropertyId force;
 
       struct ForceEvaluation {
         interaction::Interaction* interaction;
@@ -39,9 +35,9 @@ namespace espresso {
     public:
 
       VelocityVerlet(particles::Set* _particles, 
-                     Storage::PropertyId _position,
-                     Storage::PropertyId _velocity,
-                     Storage::PropertyId _force);
+                     particles::PropertyId _position,
+                     particles::PropertyId _velocity,
+                     particles::PropertyId _force);
       
       void addForce(interaction::Interaction *interaction, 
                     pairs::Set *pairs);

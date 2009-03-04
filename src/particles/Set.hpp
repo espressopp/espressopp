@@ -5,44 +5,38 @@
 #include "particles/Storage.hpp"
 
 namespace espresso {
-    namespace particles {
-	/** MOCK particle set. Provides a view onto a set of particles
-	    from a ParticleStorage
-	*/
-	class Set {
-	protected:
-	    typedef espresso::particles::Storage Storage;
-	    typedef espresso::particles::Computer Computer;
-	    typedef espresso::particles::ConstComputer ConstComputer;
+  namespace particles {
+    /** MOCK particle set. Provides a view onto a set of particles
+        from a ParticleStorage
+    */
+    class Set {
+    protected:
+      /// the storage our particles are stored in
+      Storage *theStorage;
 
-	    /// the storage our particles are stored in
-	    Storage *theStorage;
-	public:
-	    typedef Storage::reference reference;
-	    typedef Storage::const_reference const_reference;
-	    /** base constructor
+    public:
+      /** base constructor
+          
+          @param _store pointer to the Storage the
+          particles in this set come from
+      */
+      Set(Storage *_store = 0): theStorage(_store) {}
+      virtual ~Set() {}
 
-		@param _store pointer to the Storage the
-		particles in this set come from
-	     */
-	    Set(Storage *_store = 0): theStorage(_store) {}
-	    virtual ~Set() {}
+      /** for a particle of the Storage of this class,
+          check whether it belongs to this set
+      */
+      virtual bool isMember(ParticleReference pref) const = 0;
 
-	    /** for a particle of the Storage of this class,
-		check whether it belongs to this set
-	    */
-	    virtual bool isMember(reference pref) const = 0;
+      /** apply computer to all particles of this set
+       */
+      virtual void foreach(Computer &computer) = 0;
+      ///
+      virtual void foreach(ConstComputer &computer) const = 0;
 
-	    /** apply computer to all particles of this set
-	     */
-	    virtual void foreach(Computer &computer) = 0;
-	    ///
-	    virtual void foreach(ConstComputer &computer) const = 0;
-
-            Storage* getStorage() { return theStorage; }
-
-	};
-    }
+      Storage* getStorage() { return theStorage; }
+    };
+  }
 }
 
 #endif

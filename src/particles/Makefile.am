@@ -1,6 +1,8 @@
 subpkgincludedir=$(pkgincludedir)/particles
 
 subpkginclude_HEADERS = \
+	Particle.hpp \
+	Property.hpp \
 	Storage.hpp \
 	Set.hpp \
 	All.hpp

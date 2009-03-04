@@ -4,28 +4,28 @@
 #include "particles/Computer.hpp"
 #include "pairs/ForceComputer.hpp"
 
+using namespace espresso;
 using namespace espresso::integrator;
 using namespace espresso::particles;
-using namespace espresso::pairs;
 
-typedef Storage::PropertyTraits<Real3D>::Reference RealArrayRef;
-
-class StepA : public espresso::particles::Computer  {
+class StepA : public particles::Computer  {
    private:
-     RealArrayRef pos;
-     RealArrayRef vel;
-     RealArrayRef force;
+     PropertyReference<Real3D> pos;
+     PropertyReference<Real3D> vel;
+     PropertyReference<Real3D> force;
 
      real timeStep;
      real timeStepSqr;
 
    public:
-      StepA(RealArrayRef _posRef, RealArrayRef _velRef,RealArrayRef _forceRef, real _timeStep):
+      StepA(PropertyReference<Real3D> _posRef,
+            PropertyReference<Real3D> _velRef,
+            PropertyReference<Real3D> _forceRef, real _timeStep):
           pos(_posRef), vel(_velRef), force(_forceRef),
           timeStep(_timeStep), timeStepSqr(_timeStep * _timeStep) {}
 
       // m = 1
-      virtual void operator()(espresso::particles::Storage::reference pref) {
+      virtual void operator()(ParticleReference pref) {
        pos[pref] = pos[pref] + vel[pref] * timeStep + 0.5 * force[pref] * timeStepSqr;
        
        force[pref] = 0.0;
@@ -33,22 +33,23 @@ class StepA : public espresso::particles::Computer  {
 
 };
 
-class StepB : public espresso::particles::Computer  {
+class StepB : public particles::Computer  {
 
   private:
 
-    RealArrayRef vel;
-    RealArrayRef force;
+    PropertyReference<Real3D> vel;
+    PropertyReference<Real3D> force;
 
     real timeStep;
 
   public:
 
-     StepB(RealArrayRef _velRef,RealArrayRef _forceRef, real _timeStep):
+     StepB(PropertyReference<Real3D> _velRef,
+           PropertyReference<Real3D> _forceRef, real _timeStep):
 
          vel(_velRef), force(_forceRef), timeStep(_timeStep) {}
 
-     virtual void operator()(espresso::particles::Storage::reference pref) {
+     virtual void operator()(particles::ParticleReference pref) {
 
         vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
 
@@ -56,10 +57,10 @@ class StepB : public espresso::particles::Computer  {
 
 };
 
-VelocityVerlet::VelocityVerlet(espresso::particles::Set* _particles, 
-			       Storage::PropertyId _position,
-                               Storage::PropertyId _velocity,
-                               Storage::PropertyId _force):
+VelocityVerlet::VelocityVerlet(Set* _particles, 
+			       PropertyId _position,
+                               PropertyId _velocity,
+                               PropertyId _force):
 
      particles(_particles),
      storage(_particles->getStorage()),
@@ -69,8 +70,8 @@ VelocityVerlet::VelocityVerlet(espresso::particles::Set* _particles,
 
 {}
 
-void VelocityVerlet::addForce(espresso::interaction::Interaction *interaction, 
-                              espresso::pairs::Set *pair) {
+void VelocityVerlet::addForce(interaction::Interaction *interaction, 
+                              pairs::Set *pair) {
   forceEvaluations.push_back(ForceEvaluation(interaction, pair));
 }
 
@@ -80,9 +81,9 @@ void VelocityVerlet::run(int timesteps) {
 
        // Step A
 
-       StepA stepA(storage->getProperty<Real3D>(position),
-                   storage->getProperty<Real3D>(velocity),
-                   storage->getProperty<Real3D>(force),
+       StepA stepA(storage->getPropertyReference<Real3D>(position),
+                   storage->getPropertyReference<Real3D>(velocity),
+                   storage->getPropertyReference<Real3D>(force),
                    timeStep
                   );
 
@@ -91,11 +92,11 @@ void VelocityVerlet::run(int timesteps) {
        // Force Loop 
 
        // template for the force computer
-       espresso::pairs::ForceComputer
-         forceParameters(storage->getProperty<Real3D>(force));
+       pairs::ForceComputer
+         forceParameters(storage->getPropertyReference<Real3D>(force));
 
        BOOST_FOREACH(ForceEvaluation fe, forceEvaluations) {
-         espresso::pairs::ForceComputer *forceCompute =
+         pairs::ForceComputer *forceCompute =
            fe.interaction->createForceComputer(forceParameters);
          fe.pairs->foreach(*forceCompute);
          delete forceCompute;
@@ -103,8 +104,8 @@ void VelocityVerlet::run(int timesteps) {
 
        // Step B
 
-       StepB stepB(storage->getProperty<Real3D>(velocity),
-                   storage->getProperty<Real3D>(force),
+       StepB stepB(storage->getPropertyReference<Real3D>(velocity),
+                   storage->getPropertyReference<Real3D>(force),
                    timeStep
                   );
 

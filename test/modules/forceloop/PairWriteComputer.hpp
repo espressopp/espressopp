@@ -17,23 +17,18 @@ namespace espresso {
         \sa espresso::pairs::ParticlePairComputer
      */
      class PairWriteComputer: public ConstComputer {
-       typedef particles::Storage Storage;
-       typedef Storage::PropertyTraits<Storage::ParticleId>::ConstReference ConstParticleIdRef;
-       typedef Storage::PropertyTraits<Real3D>::ConstReference ConstRealArrayRef;
-
      public:
-
-       ConstRealArrayRef pos; //<! const property position
-       ConstParticleIdRef id; //<! const property id(entification)
+       particles::ConstPropertyReference<Real3D>                pos; //<! const property position
+       particles::ConstPropertyReference<particles::ParticleId> id; //<! const property id(entification)
 
        /** Constructor of the pair writer class.
          
            \param particleStorage is needed to access the properties that will be printed
 
        */
-       PairWriteComputer(const espresso::particles::Storage* particleStorage,
-	                 espresso::particles::Storage::PropertyId position) :
-         pos(particleStorage->getProperty<Real3D>(position)),
+       PairWriteComputer(const particles::Storage* particleStorage,
+	                 particles::PropertyId position) :
+         pos(particleStorage->getPropertyReference<Real3D>(position)),
          id(particleStorage->getIDProperty())
        {}
 
@@ -42,8 +37,8 @@ namespace espresso {
           \sa espresso::ParticlePairComputer::operator()
        */
        virtual void operator()(const Real3D &dist,
-                               const espresso::particles::Set::const_reference p1,
-                               const espresso::particles::Set::const_reference p2)
+                               const particles::ConstParticleReference p1,
+                               const particles::ConstParticleReference p2)
 
        {
           printf("Pair: id = (%ld,%ld) , pos1 = (%f,%f,%f), pos2 = (%f,%f,%f), dist = (%f, %f, %f)\n",

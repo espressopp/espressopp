@@ -39,8 +39,6 @@ namespace espresso {
       BasicComputer computer;
       real cutoff;
 
-      typedef particles::Set::const_reference const_reference;
-
       static LOG4ESPP_DECL_LOGGER(theLogger);
 
     public:

@@ -16,9 +16,9 @@ namespace espresso {
      class All : public Set {
  
      private:
-       espresso::particles::Set& set; 
-       espresso::bc::BC& bc;
-       espresso::particles::Storage::PropertyId coordinates;
+       particles::Set& set; 
+       bc::BC& bc;
+       particles::PropertyId coordinates;
 
      public:
        /** Destructor. */
@@ -31,17 +31,17 @@ namespace espresso {
 	 \param coordinates the identifier of the coordinates property to use
 
        */
-       All (espresso::bc::BC& bc, espresso::particles::Set& set,
-            espresso::particles::Storage::PropertyId coordinates);
+       All (bc::BC& bc, particles::Set& set,
+            particles::PropertyId coordinates);
 
        /** Getter routine for the boundary conditions. */
-       espresso::bc::BC& getBC() const { return bc; }
+       bc::BC& getBC() const { return bc; }
 
        /** Getter routine for the set of particles. */
-       espresso::particles::Set& getSet() const { return set; }
+       particles::Set& getSet() const { return set; }
 
        /** Getter routine for the ID of the coordinate */
-       espresso::particles::Storage::PropertyId getCoordinateProperty() const { return coordinates; }
+       particles::PropertyId getCoordinateProperty() const { return coordinates; }
 
        /** This routine will apply a function operator to all pairs.
          \param pairComputer is the object that provides the function to be applied to all pairs.

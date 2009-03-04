@@ -3,7 +3,8 @@
 
 #include "types.hpp"
 #include "esutil/TupleVector.hpp"
-#include "esutil/Identifier.hpp"
+#include "Particle.hpp"
+#include "Property.hpp"
 
 namespace espresso {
   namespace particles {
@@ -20,43 +21,6 @@ namespace espresso {
     */
     class Storage {
     public:
-      typedef esutil::TupleVector::PropertyId PropertyId;
-
-      typedef esutil::TupleVector::reference reference;
-      typedef esutil::TupleVector::const_reference const_reference;
-
-      typedef esutil::TupleVector::pointer pointer;
-      typedef esutil::TupleVector::const_pointer const_pointer;
-
-      template<typename T>
-      struct PropertyTraits {
-        typedef esutil::TupleVector::PropertyReference<T> Reference;
-        typedef esutil::TupleVector::ConstPropertyReference<T> ConstReference;
-      };
-
-      template<typename T>
-      struct ArrayPropertyTraits {
-        typedef esutil::TupleVector::ArrayPropertyReference<T> Reference;
-        typedef esutil::TupleVector::ConstArrayPropertyReference<T> ConstReference;
-      };
-
-      /** permanent identifier for a particle. This is really just an
-          size_t, but with explicit conversion only, to make sure that
-          you are aware when you are about to access a particle */
-      class ParticleId {
-      public:
-        /// default constructor, generating an invalid id
-        ParticleId(): v(0) {}
-        /// constructor, by default generating an invalid id
-        explicit ParticleId(size_t _v): v(_v) {}
-        /// acts like a size_t otherwise
-        operator size_t() const { return v; }
-
-      private:
-        size_t v;
-      };
-
-    public:
 
       Storage();
 
@@ -70,18 +34,18 @@ namespace espresso {
           the particle as long as the Storage is not modified. For keeping a persistent
           reference to the particle, use @ref getParticleID.
       */
-      virtual reference addParticle();
+      virtual ParticleReference addParticle();
 
       /** delete a particle
           @param id the id of the particle to delete
       */
       virtual void deleteParticle(ParticleId id);
 
-      /** get the persistent ID of a particle
+      /** get a persistent particle from a temporary reference
           @param ref temporary reference to a particle
-          @return the persistent ID of the particle
+          @return the particle
       */
-      ParticleId getParticleID(const_reference ref) const {
+      ParticleId getParticle(ConstParticleReference ref) const {
         return getIDProperty()[ref];
       }
 
@@ -89,13 +53,13 @@ namespace espresso {
           potentially slow.
           @param id the id of the particle to fetch
       */
-      virtual reference getParticleByID(ParticleId id);
+      virtual ParticleReference getParticleReference(ParticleId id);
 
       /** get a particle to a particle using its ID. This is
           potentially slow.
           @param id the id of the particle to fetch
       */
-      virtual const_reference getParticleByID(ParticleId id) const;
+      virtual ConstParticleReference getParticleReference(ParticleId id) const;
 
       /// loop over all particles
       virtual void foreach(Computer &);
@@ -111,7 +75,7 @@ namespace espresso {
           @throw std::out_of_range if one tries to obtain a handle to the ID property
       */
       template<typename T>
-      typename PropertyTraits<T>::Reference getProperty(PropertyId id) {
+      PropertyReference<T> getPropertyReference(PropertyId id) {
         // no non-const reference to the ID
         if (id == particleIDProperty) {
           throw std::out_of_range("id is not writable");
@@ -120,7 +84,7 @@ namespace espresso {
       }
       /// get a short lifetime reference to a property by its ID
       template<typename T>
-      typename PropertyTraits<T>::ConstReference getProperty(PropertyId id) const {
+      ConstPropertyReference<T> getPropertyReference(PropertyId id) const {
         return particles.getProperty<T>(id);
       }
 
@@ -128,7 +92,7 @@ namespace espresso {
           @throw std::out_of_range if one tries to obtain a handle to the ID property
       */
       template<typename T>
-      typename ArrayPropertyTraits<T>::Reference getVarArrayProperty(PropertyId id) {
+      ArrayPropertyReference<T> getArrayPropertyReference(PropertyId id) {
         // no non-const reference to the ID
         if (id == particleIDProperty) {
           throw std::out_of_range("id is not writable");
@@ -139,12 +103,12 @@ namespace espresso {
           @throw std::range_error if the given and array dimensions mismatch
       */
       template<typename T>
-      typename ArrayPropertyTraits<T>::ConstReference getArrayProperty(PropertyId id) const {
+      ConstArrayPropertyReference<T> getArrayPropertyReference(PropertyId id) const {
         return particles.getArrayProperty<T>(id);
       }
 
       /// get a short lifetime reference to the property representing the particle ID
-      const PropertyTraits<ParticleId>::ConstReference getIDProperty() const {
+      const ConstPropertyReference<ParticleId> getIDProperty() const {
         return particles.getProperty<ParticleId>(particleIDProperty);
       }
 

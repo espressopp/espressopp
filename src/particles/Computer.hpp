@@ -12,11 +12,11 @@ namespace espresso {
     {};
     
     class Computer : 
-      public ComputerBase<Storage::reference>
+      public ComputerBase<ParticleReference>
     {};
     
     class ConstComputer :
-      public ComputerBase<Storage::const_reference>
+      public ComputerBase<ConstParticleReference>
     {};
   }
 }

@@ -15,13 +15,12 @@ namespace espresso {
     class List : public Set {
  
     private:
-      typedef espresso::particles::Storage Storage;
 
-      Storage& storage; 
-      espresso::bc::BC& bc;
-      Storage::PropertyId coordinates;
-      typedef std::pair<Storage::ParticleId,
-                        Storage::ParticleId> Tuple;
+      particles::Storage& storage; 
+      bc::BC& bc;
+      particles::PropertyId coordinates;
+      typedef std::pair<particles::ParticleId,
+                        particles::ParticleId> Tuple;
       std::vector<Tuple> id_list;
 
     public:
@@ -35,9 +34,9 @@ namespace espresso {
 	  \param coordinates the identifier of the coordinates property to use
 
       */
-      List (espresso::bc::BC& bc, 
-	    espresso::particles::Storage& storage, 
-	    espresso::particles::Storage::PropertyId coordinates);
+      List (bc::BC& bc, 
+	    particles::Storage& storage, 
+	    particles::PropertyId coordinates);
 
       size_t size();
 
@@ -49,7 +48,7 @@ namespace espresso {
  
       */
 
-      bool findPair(Storage::ParticleId id1, Storage::ParticleId id2);
+      bool findPair(particles::ParticleId id1, particles::ParticleId id2);
 
       /** Adding a particle pair tuple (id1, id2) to the pair list
 
@@ -59,7 +58,7 @@ namespace espresso {
 	  Note: a tuple (id1, id2) can be added several times.
       */
 
-      void addPair(Storage::ParticleId id1, Storage::ParticleId id2);
+      void addPair(particles::ParticleId id1, particles::ParticleId id2);
 
       /** Deleting a particle pair tuple (id1, id2) from the pair list
 
@@ -69,15 +68,15 @@ namespace espresso {
 	  Particle (id1, i2) must be in the pair list otherwise exception.
       */
 
-      void deletePair(Storage::ParticleId id1, Storage::ParticleId id2);
+      void deletePair(particles::ParticleId id1, particles::ParticleId id2);
 
       /** Getter routine for the boundary conditions. */
 
-      espresso::bc::BC& getBC() const { return bc; }
+      bc::BC& getBC() const { return bc; }
 
       /** Getter routine for the ID of the coordinate */
 
-      espresso::particles::Storage::PropertyId getCoordinateProperty() const {return coordinates; }
+      particles::PropertyId getCoordinateProperty() const {return coordinates; }
 
       /** This routine will apply a function operator to all pairs.
 

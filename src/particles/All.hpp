@@ -21,7 +21,7 @@ namespace espresso {
       /** for a particle of the ParticleStorage of this class,
 	  check whether it belongs to this set
       */
-      virtual bool isMember(reference) const;
+      virtual bool isMember(ParticleReference) const;
 
       /** apply computer to all particles of this set
        */

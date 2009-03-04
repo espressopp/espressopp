@@ -29,31 +29,29 @@ namespace espresso {
         of the constructor.
     */
     class EnergyComputer: public pairs::Computer {
-      typedef particles::Storage::PropertyTraits<real>::Reference RealRef;
-
     public:
       /** Constructor for energy computations needs the energy property.
 
           @param _energy is the particle property that contains the energy
       */
-      EnergyComputer(RealRef _energy) 
+      EnergyComputer(particles::PropertyReference<real> _energy) 
         : energy(_energy), totalEnergy(0.0) {}
       virtual ~EnergyComputer() {};
 
       virtual void operator()(const Real3D &dist,
-                              const particles::Set::reference p1,
-                              const particles::Set::reference p2) {};
+                              const particles::ParticleReference p1,
+                              const particles::ParticleReference p2) {};
 
       real getAccumulatedEnergy() const { return totalEnergy; }
 
     protected:
-      RealRef energy;
+      particles::PropertyReference<real> energy;
       real totalEnergy;
       bool computesVirial;
 
       void addContribution(real e,
-                           const particles::Set::reference p1,
-                           const particles::Set::reference p2) {
+                           const particles::ParticleReference p1,
+                           const particles::ParticleReference p2) {
         energy[p1] += 0.5*e;
         energy[p2] += 0.5*e;
         totalEnergy += e;
@@ -82,8 +80,8 @@ namespace espresso {
       virtual ~SquareDistEnergyComputerFacade() {};
 
       virtual void operator()(const Real3D &dist,
-                              const particles::Set::reference p1,
-                              const particles::Set::reference p2) {
+                              const particles::ParticleReference p1,
+                              const particles::ParticleReference p2) {
         addContribution(computer.computeEnergySqr(dist.sqr()), p1, p2);
       }
 

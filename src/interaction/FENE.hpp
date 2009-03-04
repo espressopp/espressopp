@@ -39,8 +39,6 @@ namespace espresso {
 
       BasicComputer computer;
 
-      typedef espresso::particles::Set::const_reference const_reference;
-
       static LOG4ESPP_DECL_LOGGER(theLogger);
 
     public:

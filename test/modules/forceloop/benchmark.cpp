@@ -21,14 +21,14 @@
 #include "interaction/LennardJones.hpp"
 #include "esutil/Timer.hpp"
 
-// using namespace std;
-using namespace espresso;
-
 #ifdef __GNUC__
 #define NOINLINE __attribute__((noinline))
 #else
 #define NOINLINE
 #endif
+
+using namespace espresso;
+using namespace espresso::particles;
 
 /// number of particles in each dimension
 const int N = 20;
@@ -43,9 +43,8 @@ static inline real dround(real x) { return floor(x + 0.5); }
 
 class TestEspresso {
 public:
-  typedef particles::Storage Storage;
   Storage storage;
-  Storage::PropertyId position, force;
+  PropertyId position, force;
   size_t npart;
 
     TestEspresso(size_t nparticles): npart(nparticles) {
@@ -67,16 +66,16 @@ public:
 
     Real3D getForce(size_t i) {
       // HACK!
-      Storage::reference ref = storage.getParticleByID(Storage::ParticleId(i + 1));
-      return storage.getProperty<Real3D>(force)[ref];
+      ParticleReference ref = storage.getParticleReference(ParticleId(i + 1));
+      return storage.getPropertyReference<Real3D>(force)[ref];
     }
 };
 
 void TestEspresso::addParticle(const Real3D &pos)
 {
-    Storage::reference ref = storage.addParticle();
-    Storage::PropertyTraits<Real3D>::Reference positionRef = storage.getProperty<Real3D>(position);
-    Storage::PropertyTraits<Real3D>::Reference forceRef    = storage.getProperty<Real3D>(force);
+    ParticleReference ref = storage.addParticle();
+    PropertyReference<Real3D> positionRef = storage.getPropertyReference<Real3D>(position);
+    PropertyReference<Real3D> forceRef    = storage.getPropertyReference<Real3D>(force);
 
     positionRef[ref] = pos;
     forceRef[ref] = 0.0;
@@ -89,7 +88,7 @@ void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {
     interaction::LennardJones ljint;
     ljint.set(epsilon, sigma, cutoff);
     pairs::ForceComputer *forceCompute =
-        ljint.createForceComputer(pairs::ForceComputer(storage.getProperty<Real3D>(force)));
+        ljint.createForceComputer(pairs::ForceComputer(storage.getPropertyReference<Real3D>(force)));
     allpairs.foreach(*forceCompute);
     delete forceCompute;
 }
@@ -99,8 +98,8 @@ public:
     EmptyPairComputer() {}
 
     virtual void operator()(const Real3D &dist,
-			    particles::Storage::const_reference ref1,
-			    particles::Storage::const_reference ref2) {
+			    ConstParticleReference ref1,
+			    ConstParticleReference ref2) {
     }
 };
 
@@ -119,8 +118,8 @@ public:
     MinDistComputer(): min(1e10) {}
 
     virtual void operator()(const Real3D &dist,
-			    particles::Storage::const_reference ref1,
-			    particles::Storage::const_reference ref2) {
+			    ConstParticleReference ref1,
+			    ConstParticleReference ref2) {
 	real d = dist.sqr();
 	if (min > d) {
 	    min = d;
@@ -139,14 +138,14 @@ real TestEspresso::calculateMinDist() {
 
 class AverageComputer: public particles::ConstComputer {
 public:
-    typedef particles::Storage::PropertyTraits<Real3D>::ConstReference Reference;
 
-    Reference property;
+    ConstPropertyReference<Real3D> property;
     real average;
 
-    AverageComputer(const Reference &_property): property(_property), average(0) {}
+    AverageComputer(const ConstPropertyReference<Real3D> &_property)
+      : property(_property), average(0) {}
 
-    virtual void operator()(particles::Storage::const_reference ref) {
+    virtual void operator()(ConstParticleReference ref) {
         const Real3D p = property[ref];
         average += sqrt(p.sqr());
     }
@@ -154,7 +153,7 @@ public:
 
 real TestEspresso::calculateAverage() {
     particles::All allset(&storage);
-    AverageComputer avgcompute(storage.getProperty<Real3D>(force));
+    AverageComputer avgcompute(storage.getPropertyReference<Real3D>(force));
     allset.foreach(avgcompute);
     return avgcompute.average;
 }
@@ -163,7 +162,7 @@ class EmptyComputer: public particles::ConstComputer {
 public:
     EmptyComputer() {}
 
-    virtual void operator()(particles::Storage::const_reference ref) {
+    virtual void operator()(ConstParticleReference ref) {
     }
 };
 

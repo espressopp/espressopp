@@ -38,9 +38,6 @@ using namespace espresso::integrator;
 #define N 3
 #define SIZE 4.0
 
-typedef espresso::pairs::All AllPairs;
-typedef espresso::particles::All AllParticles;
-
 /** Main routine of a test program:
 
     - generate N * N * N particle in a box of size SIZE * SIZE * SIZE 
@@ -54,9 +51,9 @@ void forceloop() {
   // Create a new particle storage
 
   Storage particleStorage;
-  Storage::PropertyId position = particleStorage.addProperty<Real3D>();
-  Storage::PropertyId velocity = particleStorage.addProperty<Real3D>();
-  Storage::PropertyId force = particleStorage.addProperty<Real3D>();
+  PropertyId position = particleStorage.addProperty<Real3D>();
+  PropertyId velocity = particleStorage.addProperty<Real3D>();
+  PropertyId force = particleStorage.addProperty<Real3D>();
 
   // generate particles in the particle storage
 
@@ -70,13 +67,13 @@ void forceloop() {
        real y = (j + r) / N * SIZE; 
        real z = (k + r) / N * SIZE;
 
-       Storage::reference ref = particleStorage.addParticle();
-       Storage::PropertyTraits<Real3D>::Reference positionRef = 
-	 particleStorage.getProperty<Real3D>(position);
-       Storage::PropertyTraits<Real3D>::Reference velocityRef = 
-	 particleStorage.getProperty<Real3D>(velocity);
-       Storage::PropertyTraits<Real3D>::Reference forceRef    = 
-	 particleStorage.getProperty<Real3D>(force);
+       ParticleReference ref = particleStorage.addParticle();
+       PropertyReference<Real3D> positionRef = 
+	 particleStorage.getPropertyReference<Real3D>(position);
+       PropertyReference<Real3D> velocityRef = 
+	 particleStorage.getPropertyReference<Real3D>(velocity);
+       PropertyReference<Real3D> forceRef    = 
+	 particleStorage.getPropertyReference<Real3D>(force);
 
        positionRef[ref] = Real3D(x, y, z);
        velocityRef[ref] = Real3D(x, y, z);
@@ -97,11 +94,11 @@ void forceloop() {
 
   // define a set of all particles
 
-  AllParticles allSet(&particleStorage);
+  particles::All allSet(&particleStorage);
 
   // define allpairs with (x, y) for all x, y in allSet
 
-  AllPairs allpairs(pbc, allSet, position);
+  pairs::All allpairs(pbc, allSet, position);
 
   // For test only: PairWriter prints each particle pair 
 
@@ -126,7 +123,7 @@ void forceloop() {
   // force will be the vector of all forces in the particle storage
   // and force[ref] returns the force (as RealArrayRef) of particle reference ref
 
-  Storage::PropertyTraits<Real3D>::Reference forceRef = particleStorage.getProperty<Real3D>(force);
+  PropertyReference<Real3D> forceRef = particleStorage.getPropertyReference<Real3D>(force);
 
   // Define a pair computer that computes the forces for particle pairs
   // ljint provides the routine computeForce for a particle pair

@@ -34,12 +34,12 @@ namespace espresso {
 
     /** Abstract class that defines a function on pairs of particles */
     class Computer: 
-      public ComputerBase<espresso::particles::Storage::reference> 
-    { };
+      public ComputerBase<particles::ParticleReference> 
+    {};
     
     /** Abstract class that defines a function on pairs of read-only particles */
     class ConstComputer:
-      public ComputerBase<espresso::particles::Storage::const_reference> 
+      public ComputerBase<particles::ConstParticleReference> 
     {};
   }
 }
