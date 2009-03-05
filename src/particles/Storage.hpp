@@ -45,7 +45,7 @@ namespace espresso {
           @param ref temporary reference to a particle
           @return the particle
       */
-      ParticleId getParticle(ConstParticleReference ref) const {
+      ParticleId getParticleId(ConstParticleReference ref) const {
         return getIDProperty()[ref];
       }
 
