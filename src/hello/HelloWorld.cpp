@@ -18,59 +18,17 @@ namespace espresso {
     //////////////////////////////////////////////////
     const string
     HelloWorld::getMessage() {
-      pmiObject.invoke<&HelloWorld::getMessageWorker>();
-      
-      string msg = "Hello World!";
-
       // collect the messages of the processors
-      boost::mpi::communicator world;
       ostringstream ost;
-      vector<string> allMessages;
+      boost::mpi::communicator world;
+      ost << "MPI process #" << world.rank() << ": Hello World!";
 
-      ost << "MPI process #" << world.rank() << ": " << msg;
-
-      LOG4ESPP_INFO(logger, \
-		    pmi::printWorkerId() << "Created message: " \
+      LOG4ESPP_INFO(logger,			\
+		    "Created message: "		\
 		    << ost.str());
 
-      // gather messages from the tasks
-      boost::mpi::gather(world, ost.str(), allMessages, 0);
-
-      msg = "";
-
-      // compose message
-      BOOST_FOREACH(const string s, allMessages)
-	{	
-	  msg += s;
-	  msg += "\n";
-	}
-
-      return msg;
+      return ost.str();
     }
-
-
-    void HelloWorld::getMessageWorker() {
-      string msg = "Hello World!";
-
-      // send the messages to the controller
-      boost::mpi::communicator world;
-      ostringstream ost;
-
-      ost << "MPI process #" << world.rank() << ": " << msg;
-
-      LOG4ESPP_INFO(logger, \
-		    pmi::printWorkerId() << "Created message: " \
-		    << ost.str());
-
-      // gather messages from the tasks
-      boost::mpi::gather(world, ost.str(), 0);
-    }
-
-    //////////////////////////////////////////////////
-    // REGISTRATION WITH PMI
-    //////////////////////////////////////////////////
-    PMI_REGISTER_CLASS(espresso::hello::HelloWorld);
-    PMI_REGISTER_METHOD(espresso::hello::HelloWorld, getMessageWorker);
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON

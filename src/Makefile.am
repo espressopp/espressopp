@@ -2,7 +2,6 @@
 SUBDIRS = \
 	include \
 	esutil \
-	pmi \
 	hello \
 	particles \
 	pairs \
@@ -26,7 +25,6 @@ libespresso_common_la_LIBADD = \
 	interaction/libinteraction.la \
 	bc/libbc.la \
 	integrator/libintegrator.la \
-	pmi/libpmi.la \
 	$(BOOST_MPI_LIBS) \
 	$(BOOST_PYTHON_LIBS) \
 	$(LOG4ESPP_LIBS)
@@ -47,7 +45,7 @@ _espresso_la_LIBADD = libespresso_common.la
 ## PYTHON
 ##############################
 
-python_scripts=hello.py particles.py interaction.py
+python_scripts=pmi.py hello.py particles.py interaction.py
 
 python_SCRIPTS=$(python_scripts)
 

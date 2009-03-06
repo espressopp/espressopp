@@ -1,7 +1,6 @@
 #ifndef _INTERACTION_LENNARDJONES_HPP
 #define _INTERACTION_LENNARDJONES_HPP
 
-#include <pmi.hpp>
 #include <logging.hpp>
 #include <interaction/Interaction.hpp>
 #include <particles/Set.hpp>
@@ -33,16 +32,13 @@ namespace espresso {
       friend class BasicComputer;
 
     private:
-
-      IF_MPI(pmi::ParallelClass<LennardJones> pmiObject;)
-
       BasicComputer computer;
       real cutoff;
 
       static LOG4ESPP_DECL_LOGGER(theLogger);
 
     public:
-      IF_PYTHON(static void registerPython();)
+      static void registerPython();
 
       /** Default constructor. */
       LennardJones();
@@ -51,21 +47,15 @@ namespace espresso {
 
       // Setter and getter
       virtual void set(real _epsilon, real _sigma, real _cutoff);
-    private:
-      void setLocal(real, real, real);
-    public:
-      IF_MPI(void setWorker();)
 
       real getEpsilon() const;
       real getSigma() const;
       real getCutoff() const;
 
-      // PMI and Python visible
       virtual real computeEnergy(const Real3D &dist) const;  
       virtual real computeEnergy(const real dist) const;
       virtual Real3D computeForce(const Real3D &dist) const;
 
-      // NOT visible on PMI/Python:
       virtual pairs::EnergyComputer *createEnergyComputer(const pairs::EnergyComputer &) const;
       virtual pairs::ForceComputer  *createForceComputer (const pairs::ForceComputer &)  const;
 

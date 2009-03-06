@@ -7,7 +7,7 @@ def choose(val, altval) :
 
 # wrap LennardJones
 from _espresso import interaction_LennardJones as _LennardJones 
-class LennardJones(_LennardJones) :
+class LennardJones(_LennardJones, pmi.Proxy) :
     'The Lennard-Jones interaction.'
     super = _LennardJones
 

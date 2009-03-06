@@ -10,9 +10,9 @@
 #   Comparison with PMI in C++                                           #
 #                                                                        #
 #     + implementation rather clear and straightforward                  #
-#     + very easy to make worker classes available at controller site    #
-#     + easy to combine with an SPMD model                               #
-#     + easy implementation of help scripts on worker site               #
+#     + very simple to make worker classes available at controller site  #
+#     + simple to combine with an SPMD model                             #
+#     + simple implementation of help scripts on worker site             #
 #       (parallel analysis methods)                                      #
 #                                                                        #
 #     - relies on Boost.Python MPI bindings                              #
@@ -27,24 +27,23 @@
 #                                                                        #
 ##########################################################################
 
-## This routine adds the path to the Boost MPI library that is used
-#  for the implementation of PMI.
+# ## This routine adds the path to the Boost MPI library that is used
+# #  for the implementation of PMI.
+# def setPath() :
 
-def setPath() :
+#    import os
+#    import sys
 
-   import os
-   import sys
+#    boostMPI = os.environ.get('BOOST_HOME')
 
-   boostMPI = os.environ.get('BOOST_HOME')
+#    if boostMPI and os.path.isdir(boostMPI):
 
-   if boostMPI and os.path.isdir(boostMPI):
-
-      sys.path.append (boostMPI + '/lib')
+#       sys.path.append (boostMPI + '/lib')
 
 
-##########################################################################
+# ##########################################################################
 
-setPath()
+# setPath()
 
 import mpi
 
@@ -77,7 +76,7 @@ def pmiDoCommand (*args):
 
     # in the argument list we could replace objects derived
     # from the ProxyClass by an instance of this class
-    # to avoid the broadcast of member variables
+    # to avoid the broadcasting of member variables
 
     newArgs = list (args)
 
@@ -94,7 +93,7 @@ def pmiDoCommand (*args):
     return result
 
 ##########################################################################
-#  reduciton functions for MPI                                           #
+#  reduction functions for MPI                                           #
 ##########################################################################
 
 ## Example reduction function that can be used for pmiDoCommand
@@ -112,9 +111,9 @@ def add(x, y):
 #                                                                        #
 ##########################################################################
 
-## This routine is called by all works waiting for new commands.
+## This routine is called by all workers waiting for new commands.
 #  It is an infinite loop waiting for new commands to be executed by 
-#  the worker. An empy command will terminate the loop and this routine.
+#  the worker. An empty command will terminate the loop and this routine.
 
 def pmiWorkerLoop():
 
@@ -157,7 +156,7 @@ def pmiFinish():
 #                                                                        #
 #   execCommand (argList)                                                #
 #                                                                        #
-#     - this routine executes a command by a worker                      #
+#     - this routine executes a command on a worker                      #
 #     - it is sure that argList is a list and not a tuple                #
 #     - important: all proxy objects are replaced by the worker objects  #
 #     - argList = [methodName, redfn, proxyObj, arg1, ...., argn]        #
@@ -169,7 +168,7 @@ def pmiFinish():
 #  \param argList = (methodName, redfn, proxyObj, arg1, ..., argn)
 #
 
-def execCommand (argList) :
+def execCommand(argList) :
 
    if (len(argList) == 0):
        return
@@ -181,36 +180,30 @@ def execCommand (argList) :
    methodName  = argList[0]
 
    if isinstance (proxyObject, Proxy):
-
-      workerClass   = proxyObject.workerClass
-      proxyKey      = proxyObject.proxyKey
-      isConstructor = (methodName == "__init__")
-
+       # a proxy object is called
+       workerClass   = proxyObject.workerClass
+       proxyKey      = proxyObject.proxyKey
+       isConstructor = (methodName == "__init__")
+       
    elif isinstance (proxyObject, str):
-
-      # we just call a module function
-
-      workerClass   = __import__(proxyObject)
- 
-      # ToDo: make sure that it is really a module
-      proxyKey      = None
-      isConstructor = False
-
+       # import a module?
+       # we just call a module function
+       workerClass   = __import__(proxyObject)
+       
+       # ToDo: make sure that it is really a module
+       proxyKey      = None
+       isConstructor = False
+       
    else:
+      raise ArgumentError('execCommand, third arg not proxy object')
 
-      raise ArgumentError('execCommand, first arg not proxy object')
-
-#  now remap proxy Objects of class C to worker objects of class _C
+   #  now remap proxy Objects of class C to worker objects of class _C
 
    for i, arg in enumerate (argList):
-
       if isinstance (arg, Proxy) :
-
          if (i > 2) or (i == 2 and not isConstructor):
-
 #            replace controller object with my worker object
-
-             argList[i] = Proxy.myObjectMap [arg.proxyKey]
+             argList[i] = myObjectMap [arg.proxyKey]
 
 #  do the same remapping also for the key argument list
 #  for key, arg in keyArgs.iteritems():
@@ -226,7 +219,7 @@ def execCommand (argList) :
 
 #     the worker object can be identified by the proxyKey
 
-      Proxy.myObjectMap [proxyKey] = res     
+      myObjectMap [proxyKey] = res     
 
 #     And for a worker object we point back to the proxy
 
@@ -253,9 +246,9 @@ def execCommand (argList) :
 
 #     print 'proc ', mpi.rank, ' ready method, result = ', result
 
-      if (result != None) :
+      if (result is not None) :
 
-         if redFunction == None:
+         if redFunction is None:
 
             return result
 
@@ -278,7 +271,7 @@ def execCommand (argList) :
 #               print 'result will be registered with proxy key = ', redFunction.proxyKey
 #               print 'result is of class = ', result.__class__.__name__ 
 
-                Proxy.myObjectMap [redFunction.proxyKey] = result
+                myObjectMap [redFunction.proxyKey] = result
                 result.proxy = redFunction
 #               set the worker class of the proxy object
                 redFunction.workerClass = result.__class__
@@ -298,7 +291,7 @@ def execCommand (argList) :
 #                                                                        #
 ##########################################################################
 
-## Proxy is a simple class from which all controler classes will inherit.
+## Proxy is a simple class from which all controller classes will inherit.
 # 
 class Proxy:
 
@@ -321,7 +314,7 @@ class Proxy:
 
     def delete(self):
         pmiDoCommand("delete", None, self)
-        del Proxy.myObjectMap[self.proxyKey]
+        del myObjectMap[self.proxyKey]
         del(self)
 
 ##########################################################################
@@ -338,7 +331,7 @@ def PMIExecute(controllerRoutine, *args, **kargs):
 
    if (mpi.rank == 0) :
 
-#       Controler executes script
+#       Controller executes script
 
         controllerRoutine(*args, **kargs)
 
@@ -354,6 +347,9 @@ def PMIExecute(controllerRoutine, *args, **kargs):
 
 #  clean up the simulation by deleting the proxies
 
-   Proxy.myObjectMap = {}
+   myObjectMap = {}
 
    print "Process %d of %d is ready." % (mpi.rank, mpi.size)
+
+# init the myObjectMap map
+myObjectMap = {}
