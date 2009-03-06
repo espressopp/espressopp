@@ -1,13 +1,15 @@
 # declare the subdirs
-SUBDIRS = include esutil
+SUBDIRS = \
+	include \
+	esutil \
+	pmi \
+	hello \
+	particles \
+	pairs \
+	interaction \
+	bc \
+	integrator
 CLEANFILES =
-
-if HAVE_MPI
-  SUBDIRS += pmi
-endif
-
-SUBDIRS += hello particles pairs interaction bc integrator
-
 
 # declare the headers
 noinst_HEADERS = \
@@ -24,28 +26,21 @@ libespresso_common_la_LIBADD = \
 	interaction/libinteraction.la \
 	bc/libbc.la \
 	integrator/libintegrator.la \
-	$(BOOST_PYTHON_LIBS) $(LOG4ESPP_LIBS)
-
-if HAVE_MPI
-libespresso_common_la_LIBADD += \
 	pmi/libpmi.la \
-	$(BOOST_MPI_LIBS)
-endif
+	$(BOOST_MPI_LIBS) \
+	$(BOOST_PYTHON_LIBS) \
+	$(LOG4ESPP_LIBS)
 
-# the program wrappers
-bin_PROGRAMS = pypresso # espresso_worker
+# the embedded python interpreter with static espresso library
+bin_PROGRAMS = pypresso 
 
 pypresso_SOURCES = pypresso.cpp
 pypresso_LDADD = libespresso_common.la
 
-# espresso_worker_SOURCES = ../cpp/espresso_main.cpp
-# espresso_worker_CPPFLAGS = -DWORKER_ONLY
-# espresso_worker_LDADD = ../cpp/libespresso_common.la
-
 # Rules to build the python module _espresso
 python_LTLIBRARIES = _espresso.la
 _espresso_la_SOURCES = _espresso.cpp
-_espresso_la_LDFLAGS = -module -no-undefined 
+_espresso_la_LDFLAGS = -module -avoid-version -no-undefined 
 _espresso_la_LIBADD = libespresso_common.la
 
 ##############################

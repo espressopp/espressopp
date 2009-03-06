@@ -2,8 +2,6 @@
 #include "esutil/virtual_functional.hpp"
 #include "particles/Computer.hpp"
 
-#include <cstdio>
-
 using namespace espresso;
 using namespace espresso::pairs;
 using namespace espresso::particles;

@@ -7,15 +7,15 @@
 namespace espresso {
   namespace hello {
     class HelloWorld {
-      IF_MPI(pmi::ParallelClass<HelloWorld> pmiObject;)
+      pmi::ParallelClass<HelloWorld> pmiObject;
 
     public:
       const std::string getMessage();
 
-      IF_MPI(void getMessageWorker();)
+      void getMessageWorker();
 
       // expose the python registration
-      IF_PYTHON(static void registerPython();)
+      static void registerPython();
     };
   }
 }

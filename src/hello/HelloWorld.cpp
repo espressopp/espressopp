@@ -18,12 +18,11 @@ namespace espresso {
     //////////////////////////////////////////////////
     const string
     HelloWorld::getMessage() {
-      IF_MPI(pmiObject.invoke<&HelloWorld::getMessageWorker>());
+      pmiObject.invoke<&HelloWorld::getMessageWorker>();
       
       string msg = "Hello World!";
 
       // collect the messages of the processors
-#ifdef HAVE_MPI
       boost::mpi::communicator world;
       ostringstream ost;
       vector<string> allMessages;
@@ -45,13 +44,11 @@ namespace espresso {
 	  msg += s;
 	  msg += "\n";
 	}
-#endif
 
       return msg;
     }
 
 
-#ifdef HAVE_MPI
     void HelloWorld::getMessageWorker() {
       string msg = "Hello World!";
 
@@ -68,7 +65,6 @@ namespace espresso {
       // gather messages from the tasks
       boost::mpi::gather(world, ost.str(), 0);
     }
-#endif 
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PMI
@@ -76,7 +72,6 @@ namespace espresso {
     PMI_REGISTER_CLASS(espresso::hello::HelloWorld);
     PMI_REGISTER_METHOD(espresso::hello::HelloWorld, getMessageWorker);
 
-#ifdef HAVE_PYTHON  
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
@@ -88,6 +83,5 @@ namespace espresso {
 	.def("getMessage", &HelloWorld::getMessage)
 	.def("__str__", &HelloWorld::getMessage);
     }
-#endif
   }
 }

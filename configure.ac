@@ -49,22 +49,9 @@ cat <<EOF
 **********************************************************************
 EOF
 AXES_MPI
-AM_CONDITIONAL([HAVE_MPI], [test "x$axes_cv_mpi" != "xno"])
-# subst HAVE_MPI for test/runtest.sh.in
-if [test "x$axes_cv_mpi" != "xno"]; then
-   AC_SUBST(HAVE_MPI, "yes")
-else
-   AC_SUBST(HAVE_MPI, "no")
+if [test "x$axes_cv_mpi" = "xno"]; then
+   AC_MSG_ERROR([could not find mpi])   
 fi
-
-AH_BOTTOM([
-#ifdef HAVE_MPI
-#define IF_MPI(code) code
-#else
-#define IF_MPI(code)
-#endif
-])
-
 
 AXES_PYTHON
 if test "x$axes_cv_python_lib" = "xno" || \
@@ -72,12 +59,12 @@ if test "x$axes_cv_python_lib" = "xno" || \
    AC_MSG_ERROR([could not find python])
 fi
 
+# Only temporary, until all traces of HAVE_MPI and HAVE_PYTHON are gone
 AH_BOTTOM([
-#ifdef HAVE_PYTHON
+#define HAVE_MPI
+#define IF_MPI(code) code
+#define HAVE_PYTHON
 #define IF_PYTHON(code) code
-#else
-#define IF_PYTHON(code)
-#endif
 ])
 
 ################################################################### 
@@ -300,24 +287,19 @@ cat <<EOF
  * mpiexec:
 EOF
 dnl MPI
-if test "x$axes_cv_mpi" != "xno"; then
-    if test "$MYMPIEXEC" = ""; then
-        echo "   - disabled by user, no parallel tests will be run"
-    else
-        echo "   - will try to use $MYMPIEXEC"
-        if ! test -x "$MYMPIEXEC"; then
-            echo "   - (which does not exist or is not executable at the moment)"
-        fi
-        if test "$MPIEXEC" != "no"; then
-            echo "   - fallback: $MPIEXEC"
-        else
-            echo "   - no fallback"
-        fi
-    fi
+if test "$MYMPIEXEC" = ""; then
+    echo "   - disabled by user, no parallel tests will be run"
 else
-    echo "  - MPI is not used, will build serial program"
+    echo "   - will try to use $MYMPIEXEC"
+    if ! test -x "$MYMPIEXEC"; then
+        echo "   - (which does not exist or is not executable at the moment)"
+    fi
+    if test "$MPIEXEC" != "no"; then
+        echo "   - fallback: $MPIEXEC"
+    else
+        echo "   - no fallback"
+    fi
 fi
-
 
 dnl Doxygen
 if test .$DOXYGEN != .no; then
