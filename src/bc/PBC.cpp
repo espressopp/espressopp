@@ -2,6 +2,7 @@
 #define LOG4ESPP_LEVEL_WARN
 
 #include "PBC.hpp"
+#include <cmath>
 #include <python.hpp>
 #include <iostream>
 
@@ -15,38 +16,15 @@ LOG4ESPP_LOGGER(PBC::theLogger, "bc.PBC");
 
 static inline real dround(real x) { return floor(x + 0.5); }
 
-PMI_REGISTER_CLASS(PBC);
-
 PBC::PBC() {}
 
 PBC::PBC(real _length) {
-  setLocal(_length);
+  set(_length);
 }
 
 PBC::~PBC() {}
 
-void PBC::set(real _length)
-#ifndef HAVE_MPI
-{  setLocal(_length); }
-#else
-{
-  pmiObject.invoke<&PBC::setWorker>();
-  boost::mpi::communicator world;
-  boost::mpi::broadcast(world, _length, pmi::getControllerMPIRank());
-  setLocal(_length);
-}
-
-void PBC::setWorker() {
-  real v;
-  boost::mpi::communicator world;
-  boost::mpi::broadcast(world, v, pmi::getControllerMPIRank());
-  setLocal(v);
-}
-
-PMI_REGISTER_METHOD(PBC, setWorker);
-#endif
-
-void PBC::setLocal(real _length) {
+void PBC::set(real _length) {
   length = _length;
   lengthInverse = 1.0 / length;
 }
@@ -70,11 +48,9 @@ Real3D PBC::getDist(const Real3D& pos1, const Real3D& pos2) const {
   return Real3D(xij, yij, zij);
 }
 
-#ifdef HAVE_PYTHON
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
 //////////////////////////////////////////////////
-
 void
 PBC::registerPython() {
   using namespace boost::python;
@@ -83,4 +59,3 @@ PBC::registerPython() {
     .def("set", &PBC::set)
     .def("getDist", &PBC::getDist);
 }
-#endif

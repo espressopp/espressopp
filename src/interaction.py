@@ -1,3 +1,8 @@
+import pmi
+
+# transmit to pmi
+from _espresso import interaction_LennardJones as _LennardJones 
+
 def choose(val, altval) :
     if (val is None) :
         return altval
@@ -6,19 +11,27 @@ def choose(val, altval) :
 
 
 # wrap LennardJones
-from _espresso import interaction_LennardJones as _LennardJones 
-class LennardJones(_LennardJones, pmi.Proxy) :
+class LennardJones (object):
     'The Lennard-Jones interaction.'
-    super = _LennardJones
+
+    def __init__(self, epsilon = 1.0, sigma = 1.0, cutoff = 2.0) :
+        """Initialize the (parallel) Lennard Jones object. 
+
+        The parameters are identical to set."""
+        object.__init__(self)
+        # create the pmi object
+        self.worker = pmi.create(_LennardJones)
+        # set the defaults
+        set(epsilon, sigma, cutoff)
 
     # define setter
     def set(self, epsilon=None, sigma=None, cutoff=None) :
-        # call the C++ setter
-        self.super.set(self,
-            choose(epsilon, self.epsilon),
-            choose(sigma, self.sigma),
-            choose(cutoff, self.cutoff)
-            )
+        'Set the parameters of the interaction.'
+        pmi.invoke(self.worker.set,
+                   choose(epsilon, self.epsilon),
+                   choose(sigma, self.sigma),
+                   choose(cutoff, self.cutoff)
+                   )
 
     # define single property setters
     # avoid using these if possible
@@ -29,19 +42,21 @@ class LennardJones(_LennardJones, pmi.Proxy) :
     def setCutoff(self, _cutoff) : 
         set(cutoff=_cutoff)
 
-    # define properties
-    epsilon = property(super.getEpsilon, setEpsilon)
-    sigma = property(super.getSigma, setSigma)
-    cutoff = property(super.getCutoff, setCutoff)
+    def getEpsilon(self) :
+        return self.worker.getEpsilon()
+    def getSigma(self) :
+        return self.worker.getSigma()
+    def getCutoff(self) :
+        return self.worker.getCutoff()
 
-    # define constuctor
-    def __init__(self, epsilon=None, sigma=None, cutoff=None) :
-        self.super.__init__(self)
-        self.set(epsilon, sigma, cutoff)
+    # define properties
+    epsilon = property(getEpsilon, setEpsilon)
+    sigma = property(getSigma, setSigma)
+    cutoff = property(getCutoff, setCutoff)
 
     def computeEnergy(self, r) :
         'Compute and return the energy at the radius r.'
-        return self.super.computeEnergy(self, r)
+        return self.worker.computeEnergy(r)
 
 # wrap FENE
 from _espresso import interaction_FENE as _FENE

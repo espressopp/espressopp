@@ -6,7 +6,6 @@
 
 #include "LennardJones.hpp"
 #include <python.hpp>
-#include <iostream>
 
 using namespace espresso;
 using namespace espresso::interaction;

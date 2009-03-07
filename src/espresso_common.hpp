@@ -3,18 +3,15 @@
 
 #include "acconfig.hpp"
 
-/** Initialize the extensions to Python. */
-void initPythonEspresso();
+/* Register the python extensions. */
+void registerPython();
 
-#ifdef HAVE_MPI
-/** Initialize MPI. */
+/* Initialize MPI. */
 void initMPI();
 
-/** Initialize MPI. */
+/* Initialize MPI. */
 void initMPI(int &argc, char **&argv);
 
-/** Finalize MPI. */ 
+/* Finalize MPI. */ 
 void finalizeMPI();
-#endif
-
 #endif

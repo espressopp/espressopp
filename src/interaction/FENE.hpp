@@ -1,7 +1,6 @@
 #ifndef _INTERACTION_FENE_HPP
 #define _INTERACTION_FENE_HPP
 
-#include <pmi.hpp>
 #include <logging.hpp>
 #include <interaction/Interaction.hpp>
 #include "particles/Set.hpp"
@@ -10,7 +9,6 @@
 
 namespace espresso {
   namespace interaction {
-
     /** This class provides routines to computer forces and energies
 	based on the FENE potential.
 
@@ -34,15 +32,12 @@ namespace espresso {
       friend class BasicComputer;
 
     private:
-
-      IF_MPI(pmi::ParallelClass<FENE> pmiObject;)
-
       BasicComputer computer;
 
       static LOG4ESPP_DECL_LOGGER(theLogger);
 
     public:
-       IF_PYTHON(static void registerPython();)
+       static void registerPython();
 
       /** Default constructor. Member variables are accessed by setter and getter. */
 
@@ -52,22 +47,15 @@ namespace espresso {
 
       // Setter and getter
       virtual void set(real _K, real _r0, real _rMax);
-    private:
-      void setLocal(real, real, real);
-    public:
-      IF_MPI(void setWorker();)
 
       real getK() const;
       real getR0() const;
       real getRMax() const;
 
-      // PMI and Python visible
-
       virtual real computeEnergy (const Real3D &dist) const;
       virtual real computeEnergy (const real dist) const;
       virtual Real3D computeForce (const Real3D &dist) const;
 
-      // NOT visible on PMI/Python:
       virtual pairs::EnergyComputer *createEnergyComputer(const pairs::EnergyComputer &) const;
       virtual pairs::ForceComputer  *createForceComputer (const pairs::ForceComputer &)  const;
 

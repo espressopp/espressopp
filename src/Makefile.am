@@ -16,7 +16,8 @@ noinst_HEADERS = \
 
 # the common part of all Espresso flavors
 noinst_LTLIBRARIES = libespresso_common.la
-libespresso_common_la_SOURCES= espresso_common.cpp
+libespresso_common_la_SOURCES= \
+	espresso_common.cpp
 libespresso_common_la_LIBADD = \
 	esutil/libesutil.la \
 	hello/libhello.la \

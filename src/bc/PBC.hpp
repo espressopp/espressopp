@@ -2,7 +2,6 @@
 #define _BC_PBC_HPP
 
 #include <cmath>
-#include <pmi.hpp>
 #include <logging.hpp>
 #include <bc/BC.hpp>
 
@@ -16,9 +15,6 @@ namespace espresso {
     class PBC : public BC {
 
     private:
-
-      IF_MPI(pmi::ParallelClass<PBC> pmiObject;)
-
       real length;
       real lengthInverse;
 
@@ -26,7 +22,7 @@ namespace espresso {
 
     public:
 
-      IF_PYTHON(static void registerPython();)
+      static void registerPython();
 
       /** Constructor for cubic box */
       PBC();
@@ -36,15 +32,10 @@ namespace espresso {
 
       virtual void set(real _length);
 
-    private:
-      void setLocal(real);
-    public:
-      IF_MPI(void setWorker();)
-
       //PMI and Python Visible
       /** Method to compute the minimum image distance */
       virtual Real3D getDist(const Real3D& pos1, const Real3D& pos2) const;
-
+      
     };
   }
 }

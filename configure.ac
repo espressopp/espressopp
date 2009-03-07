@@ -59,11 +59,10 @@ if test "x$axes_cv_python_lib" = "xno" || \
    AC_MSG_ERROR([could not find python])
 fi
 
-# Only temporary, until all traces of HAVE_MPI and HAVE_PYTHON are gone
+# Define only temporary, until all traces of HAVE_MPI and HAVE_PYTHON
+# are gone 
 AH_BOTTOM([
-#define HAVE_MPI
 #define IF_MPI(code) code
-#define HAVE_PYTHON
 #define IF_PYTHON(code) code
 ])
 
