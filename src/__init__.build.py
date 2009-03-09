@@ -11,3 +11,6 @@
 import os, sys
 pathname=os.path.join(@srcdir@, '.libs')
 sys.path.append(pathname)
+
+import pmi
+pmi.workerLoop()

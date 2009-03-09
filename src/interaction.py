@@ -1,7 +1,7 @@
 import pmi
 
-# translate to pmi
-_espresso=pmi.importModule("_espresso")
+# pmi import _espresso
+pmi.exec_('from _espresso import interaction_LennardJones', globals())
 
 def choose(val, altval) :
     if (val is None) :
@@ -20,7 +20,7 @@ class LennardJones (object):
         The parameters are identical to set."""
         object.__init__(self)
         # create the pmi object
-        self.worker = pmi.create(_espresso.interaction_LennardJones)
+        self.worker = pmi.create(interaction_LennardJones)
         # set the defaults
         self.set(epsilon, sigma, cutoff)
 

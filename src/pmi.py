@@ -1,20 +1,49 @@
 # Fake PMI
 # This just shows what interface I expect that can be used
 
-def importModule(name) :
-    return __import__(name)
+import types
+
+def exec_(statement) :
+    """Even this might be possible! This should allow to define Python
+    classes and functions on all workers.
+    """
+    exec statement in globals()
+
+# import_ is an alias for exec_
+import_=exec_
 
 def create(theClass, *args) :
     """Create an object on all workers.
 
-    theClass is the class that should be used, *args are the arguments
-    to the constructor of the class.
+    theClass describes the class of that should be instantiated.
+    *args are the arguments to the constructor of the class.
+
+    Example:
+    # instantiate an object of the class with the passed name
+    pmi.create("HelloWorld")
+    # instantiate an object of the same class as the passed class
+    pmi.create(HelloWorld)
 
     Note, that you can use only those classes that are know to PMI
     when this function is called, i.e. classes in modules that have
-    been imported via pmi.importModule().
+    been imported via pmi.exec_() or pmi.import_().
     """
-    return theClass(*args)
+    if isinstance(theClass, types.StringTypes) :
+        # the class is passed as name
+        pass
+    elif type(theClass) == types.TypeType :
+        # a class object is passed
+        theClass = theClass.__module__ + '.' + theClass.__name__
+    elif type(theClass) == types.ClassType :
+        raise TypeError("pmi can't handle old-style classes. \
+Please create old style classes via their names.")
+    else :
+        raise TypeError("expects class as first argument")
+
+    # create the class creation string
+    s = "%s%s" % (theClass, args)
+    # broadcast it to all workers
+    return eval(s)
 
 def invoke(function, *args) :
     """Invoke a function on all workers.
@@ -34,12 +63,6 @@ def invoke(function, *args) :
     """
     return function(*args)
 
-def eval(code) :
-    """Even this might be possible! This should allow to define Python
-    classes and functions on all workers.
-    """
-    pass
-
 def delete(obj) :
     del(obj)
 
@@ -47,9 +70,7 @@ def finish() :
     'Ends PMI, i.e. stops all workers'
     pass
 
-def _workerLoop() :
+def workerLoop() :
     'Starts the main worker loop. Has to be called on the workers.'
     pass
 
-# Call the workerLoop
-_workerLoop()
