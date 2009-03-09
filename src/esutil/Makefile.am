@@ -3,6 +3,7 @@ SUBDIRS=unittest
 subpkgincludedir=$(pkgincludedir)/esutil
 
 subpkginclude_HEADERS = \
+	bindings.hpp \
 	Vector3D.hpp \
 	SmallVector.hpp \
 	DerivableSmallVector.hpp \
@@ -14,5 +15,6 @@ subpkginclude_HEADERS = \
 noinst_LTLIBRARIES = libesutil.la
 
 libesutil_la_SOURCES = \
+        bindings.cpp \
 	TupleVector.cpp \
-	Timer.cpp
+	Timer.cpp 

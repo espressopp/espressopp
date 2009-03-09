@@ -58,6 +58,10 @@ class LennardJones (object):
         'Compute and return the energy at the radius r.'
         return self.worker.computeEnergy(r)
 
+    def computeForce(self, r) :
+        'Compute and return the force at the radius r.'
+        return self.worker.computeForce(r)
+
 # wrap FENE
 from _espresso import interaction_FENE as _FENE
 class FENE(_FENE) :

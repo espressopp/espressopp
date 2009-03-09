@@ -1,6 +1,7 @@
 subpkgincludedir=$(pkgincludedir)/particles
 
 subpkginclude_HEADERS = \
+	bindings.hpp \
 	Particle.hpp \
 	Property.hpp \
 	Storage.hpp \
@@ -10,5 +11,6 @@ subpkginclude_HEADERS = \
 noinst_LTLIBRARIES = libparticles.la
 
 libparticles_la_SOURCES = \
+	bindings.cpp \
 	Storage.cpp \
 	All.cpp

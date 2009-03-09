@@ -141,6 +141,10 @@ namespace espresso {
 
       //@}
 
+      /** make this class available at Python. */
+
+      static void registerPython();
+
     protected:
       /// here the particle data is stored
       esutil::TupleVector particles;

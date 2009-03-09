@@ -1,6 +1,8 @@
 #ifndef _ESUTIL_DERIVABLESMALLVECTOR_HPP
 #define _ESUTIL_DERIVABLESMALLVECTOR_HPP
 
+#include <stdexcept>
+
 namespace esutil {
   /** a small vector of constant length, which can be used in derivate
       classes. The CRTP template parameter has to be the name of the
@@ -32,6 +34,20 @@ namespace esutil {
 
     T& operator[] (size_t index) {
       return data[index];
+    }
+
+    T getItem (size_t index) {
+      if (index >= N) {
+        throw std::out_of_range("SmallVector::getitem");
+      }
+      return data[index];
+    }
+
+    void setItem (size_t index, T val) {
+      if (index >= N) {
+        throw std::out_of_range("SmallVector::setitem");
+      }
+      data[index] = val;
     }
 
     const T& operator[] (size_t index) const {
@@ -68,12 +84,13 @@ namespace esutil {
       return result;
     }
 
-    // point product
+    // dot product
 
-    CRTP operator* (const DerivableSmallVector<T,N,CRTP>& b) const {
+    T operator* (const DerivableSmallVector<T,N,CRTP>& b) const {
 
-      CRTP result;
-      for (size_t i = 0; i < N; i++) result.data[i] = data[i] * b.data[i]; 
+      T result = 0;  // there is no default initialization of each T
+
+      for (size_t i = 0; i < N; i++) result += data[i] * b.data[i]; 
       return result;
     }
 
@@ -85,17 +102,13 @@ namespace esutil {
       return result;
     }
 
-    // dotproduct
-
-    T dot(const DerivableSmallVector<T,N,CRTP> &y) const
-
-    { T val = 0;
-      for (size_t i = 0; i < N; i++) val += data[i]*y.data[i];
-      return val;
+    T sqr() const { 
+      return (*this) * (*this);
     }
 
-    T sqr() const { return dot(*this); }
   };
+
+  // global definition to make sure that we can use scalar * vector in C++ and Python
 
   template<class T, size_t N, class CRTP>
   inline CRTP operator*(T s, const DerivableSmallVector<T,N,CRTP> &v) { return v * s; }
