@@ -33,26 +33,34 @@ namespace espresso {
 
       // getter and setter
 
-      T& operator[] (size_t index) {
+      T& operator[](size_t index) {
 	return data[index];
       }
 
-      T getItem (size_t index) {
+      const T& operator[](size_t index) const {
+	return data[index];
+      }
+
+      T& at(size_t index) {
 	if (index >= N) {
 	  throw std::out_of_range("SmallVector::getitem");
 	}
-	return data[index];
+	return (*this)[index];
       }
 
-      void setItem (size_t index, T val) {
+      const T& at(size_t index) const {
 	if (index >= N) {
-	  throw std::out_of_range("SmallVector::setitem");
+	  throw std::out_of_range("SmallVector::getitem");
 	}
-	data[index] = val;
+	return (*this)[index];
       }
 
-      const T& operator[] (size_t index) const {
-	return data[index];
+      T getItem(size_t index) const {
+	return at(index);
+      }
+
+      void setItem(size_t index, T val) {
+	at(index) = val;
       }
 
       // unary +/- operators

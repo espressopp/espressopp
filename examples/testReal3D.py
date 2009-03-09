@@ -10,14 +10,13 @@
 
 print 'This is a test of Real3D'
 
-from _espresso import Real3D
+from espresso.esutil import Real3D
 
 x = Real3D(1.2, 1.3, 1.4)
 
-print 'x = ', x
-print 'x = ', x.tuple()
+print('x = %s' % x)
 
-print 'x = ', x[0], x[1], x[2]
+print('x = (%f, %f, %f)' % x.tuple())
 
 try:
    print 'x[-1] = ', x[-1]

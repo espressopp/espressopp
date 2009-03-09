@@ -46,7 +46,7 @@ _espresso_la_LIBADD = libespresso_common.la
 ## PYTHON
 ##############################
 
-python_scripts=pmi.py hello.py particles.py interaction.py
+python_scripts=pmi.py esutil.py hello.py particles.py interaction.py
 
 python_SCRIPTS=$(python_scripts)
 

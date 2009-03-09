@@ -8,6 +8,7 @@
 #                              is an extension of expresso::particles::computer
 #
 
+import espresso
 from _espresso import particles_Storage
 from _espresso import particles_ParticleWriter
 

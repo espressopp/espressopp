@@ -1,4 +1,5 @@
 import pmi
+import espresso.esutil
 
 # pmi import _espresso
 pmi.exec_('from _espresso import interaction_LennardJones')
@@ -60,7 +61,10 @@ class LennardJones (object):
 
     def computeForce(self, r) :
         'Compute and return the force at the radius r.'
-        return self.worker.computeForce(r)
+        f = self.worker.computeForce(r)
+        # TODO: Is this the right way to do it???
+        f.__class__=espresso.esutil.Real3D
+        return f
 
 # wrap FENE
 from _espresso import interaction_FENE as _FENE
