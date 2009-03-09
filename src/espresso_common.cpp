@@ -10,7 +10,7 @@
 void registerPython() {
   espresso::hello::registerPython();
   espresso::interaction::registerPython();
-  esutil::registerPython();
+  espresso::esutil::registerPython();
   espresso::particles::registerPython();
 }
 

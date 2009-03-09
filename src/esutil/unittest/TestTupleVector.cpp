@@ -7,7 +7,7 @@
 
 #include "../TupleVector.hpp"
 
-using namespace esutil;
+using namespace espresso::esutil;
 
 struct Fixture {
     TupleVector mv;

@@ -25,34 +25,34 @@ namespace espresso {
     };
 
     /** reference to a partice */
-    class ParticleReference: public esutil::TupleVector::reference {
+    class ParticleReference: public espresso::esutil::TupleVector::reference {
     public:
       ParticleReference(const reference &_ref): reference(_ref) {}
     };
 
     /** reference to a constant partice */
-    class ConstParticleReference: public esutil::TupleVector::const_reference {
+    class ConstParticleReference: public espresso::esutil::TupleVector::const_reference {
     public:
-      ConstParticleReference(const esutil::TupleVector::const_reference &_ref)
-        : esutil::TupleVector::const_reference(_ref) {}
-      ConstParticleReference(const esutil::TupleVector::reference &_ref)
-        : esutil::TupleVector::const_reference(_ref) {}
+      ConstParticleReference(const espresso::esutil::TupleVector::const_reference &_ref)
+        : espresso::esutil::TupleVector::const_reference(_ref) {}
+      ConstParticleReference(const espresso::esutil::TupleVector::reference &_ref)
+        : espresso::esutil::TupleVector::const_reference(_ref) {}
     };
 
     /** pointer to a partice */
-    class ParticlePointer: public esutil::TupleVector::pointer {
+    class ParticlePointer: public espresso::esutil::TupleVector::pointer {
     public:
-      ParticlePointer(const esutil::TupleVector::pointer &_ptr)
-        : esutil::TupleVector::pointer(_ptr) {}
+      ParticlePointer(const espresso::esutil::TupleVector::pointer &_ptr)
+        : espresso::esutil::TupleVector::pointer(_ptr) {}
     };
 
     /** pointer to a constant partice */
-    class ConstParticlePointer: public esutil::TupleVector::const_pointer {
+    class ConstParticlePointer: public espresso::esutil::TupleVector::const_pointer {
     public:
-      ConstParticlePointer(const esutil::TupleVector::const_pointer &_ptr)
-        : esutil::TupleVector::const_pointer(_ptr) {}
-      ConstParticlePointer(const esutil::TupleVector::pointer &_ptr)
-        : esutil::TupleVector::const_pointer(_ptr) {}
+      ConstParticlePointer(const espresso::esutil::TupleVector::const_pointer &_ptr)
+        : espresso::esutil::TupleVector::const_pointer(_ptr) {}
+      ConstParticlePointer(const espresso::esutil::TupleVector::pointer &_ptr)
+        : espresso::esutil::TupleVector::const_pointer(_ptr) {}
     };
   }
 }

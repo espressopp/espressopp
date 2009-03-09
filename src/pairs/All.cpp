@@ -3,6 +3,7 @@
 #include "particles/Computer.hpp"
 
 using namespace espresso;
+using namespace espresso::esutil;
 using namespace espresso::pairs;
 using namespace espresso::particles;
 

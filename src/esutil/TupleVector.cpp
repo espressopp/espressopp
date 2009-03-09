@@ -4,7 +4,7 @@
 #include <boost/foreach.hpp>
 #include <algorithm>
 
-using namespace esutil;
+using namespace espresso::esutil;
 
 static const int defaultGranularity = 1024/sizeof(int);
 static const int defaultShrinkThreshold = 4*defaultGranularity;

@@ -5,7 +5,7 @@
 
 #include "../Timer.hpp"
 
-using namespace esutil;
+using namespace espresso::esutil;
 
 int doSomething()
 {

@@ -7,7 +7,8 @@
 
 namespace espresso {
   namespace bc {
-
+    typedef esutil::real real;
+    typedef esutil::Real3D Real3D;
     /** Class for periodic boundary conditions in all three dimensions. */
     //currently we assume a cube
     //names like PBC will need to change to cubic or orthorhombic

@@ -1,9 +1,12 @@
 #ifndef _MDINTEGRATOR_HPP
 #define _MDINTEGRATOR_HPP
 
+#include "types.hpp"
+
 namespace espresso {
 
   namespace integrator {
+    typedef esutil::real real;
 
     class MDIntegrator {
 

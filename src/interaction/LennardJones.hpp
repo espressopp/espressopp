@@ -8,6 +8,8 @@
 
 namespace espresso {
   namespace interaction {
+    typedef esutil::real real;
+    typedef esutil::Real3D Real3D;
     /** This class provides routines to compute forces and energies
 	of the Lennard Jones potential.
 

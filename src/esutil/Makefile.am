@@ -4,9 +4,11 @@ subpkgincludedir=$(pkgincludedir)/esutil
 
 subpkginclude_HEADERS = \
 	bindings.hpp \
-	Vector3D.hpp \
+	estypes.hpp \
 	SmallVector.hpp \
 	DerivableSmallVector.hpp \
+	Vector3D.hpp \
+	Real3D.hpp \
 	Identifier.hpp \
 	TupleVector.hpp \
 	Timer.hpp \

@@ -8,7 +8,7 @@ namespace espresso {
   namespace particles {
     template<class ParticleReference>
     class ComputerBase 
-      : public esutil::VirtualUnaryFunction<ParticleReference, void> 
+      : public espresso::esutil::VirtualUnaryFunction<ParticleReference, void> 
     {};
     
     class Computer : 

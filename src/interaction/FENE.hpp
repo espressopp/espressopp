@@ -9,6 +9,8 @@
 
 namespace espresso {
   namespace interaction {
+    typedef esutil::real real;
+    typedef esutil::Real3D Real3D;
     /** This class provides routines to computer forces and energies
 	based on the FENE potential.
 

@@ -34,22 +34,22 @@ namespace espresso {
 
           @param _energy is the particle property that contains the energy
       */
-      EnergyComputer(particles::PropertyReference<real> _energy) 
+      EnergyComputer(particles::PropertyReference<esutil::real> _energy) 
         : energy(_energy), totalEnergy(0.0) {}
       virtual ~EnergyComputer() {};
 
-      virtual void operator()(const Real3D &dist,
+      virtual void operator()(const esutil::Real3D &dist,
                               const particles::ParticleReference p1,
                               const particles::ParticleReference p2) {};
 
-      real getAccumulatedEnergy() const { return totalEnergy; }
+      esutil::real getAccumulatedEnergy() const { return totalEnergy; }
 
     protected:
-      particles::PropertyReference<real> energy;
-      real totalEnergy;
+      particles::PropertyReference<esutil::real> energy;
+      esutil::real totalEnergy;
       bool computesVirial;
 
-      void addContribution(real e,
+      void addContribution(esutil::real e,
                            const particles::ParticleReference p1,
                            const particles::ParticleReference p2) {
         energy[p1] += 0.5*e;
@@ -79,7 +79,7 @@ namespace espresso {
       {}
       virtual ~SquareDistEnergyComputerFacade() {};
 
-      virtual void operator()(const Real3D &dist,
+      virtual void operator()(const esutil::Real3D &dist,
                               const particles::ParticleReference p1,
                               const particles::ParticleReference p2) {
         addContribution(computer.computeEnergySqr(dist.sqr()), p1, p2);

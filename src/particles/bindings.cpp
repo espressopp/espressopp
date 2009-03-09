@@ -7,16 +7,13 @@
 #include <particles/Computer.hpp>
 
 using namespace boost::python;
+using namespace espresso::esutil;
 
 namespace espresso {
-
  namespace particles {
-
     /** Function object that prints data of a single particle. 
      */
-
     class ParticleWriter : public Computer {
-
     private:
       PropertyReference<Real3D>
       pos;  //<! reference to the position vector of all particles.
@@ -24,15 +21,12 @@ namespace espresso {
       id;   //<! reference to the identification vector of all particles.
 
     public:
-
       /** Construct a writer for a particle storage.
           \param particleStorage is needed to get access the property vectors of all particles.
       */
       ParticleWriter(Storage &particleStorage, PropertyId position) :
-
         pos(particleStorage.getPropertyReference<Real3D>(position)),
         id(particleStorage.getIDProperty())
-
       {}
 
       /** Function that is applied to a read-only particle.

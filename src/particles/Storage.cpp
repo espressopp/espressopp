@@ -1,12 +1,14 @@
+#include "Storage.hpp"
+
 #include <boost/foreach.hpp>
 #include <boost/python.hpp>
 #include <algorithm>
 #include <stdexcept>
 #include "Computer.hpp"
-#include "Storage.hpp"
 
 using namespace espresso;
 using namespace espresso::particles;
+using namespace espresso::esutil;
 
 Storage::Storage(): uniqueID(0) {
   particleIDProperty = particles.addProperty<size_t>();
