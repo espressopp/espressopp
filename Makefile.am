@@ -10,23 +10,22 @@ doc ug dg: FORCE
 	cd doc; $(MAKE) --print-directory $@
 FORCE:
 
-#################################################################
-# In the build tree's src, make a link from src to espresso,
-# so that importing "espresso" from the build dir works
-all-local:
-	if test ! -e espresso || test -h espresso; then \
-		rm -f espresso; \
-		$(LN_S) src espresso; \
-	else \
-		echo "espresso exists and is not a link, please remove" 1>&2; \
-		exit -1; \
-	fi
-	if test ! -e examples || test -h examples; then \
-		rm -f examples; \
-		$(LN_S) $(srcdir)/examples examples; \
-	fi
-clean-local:
+distclean-local:
+	-rm -f config.summary
+# remove the espresso and examples links created in configure
 	if test -h espresso; then \
 		rm -f espresso; \
 	fi
+	if test -h examples; then \
+		rm -f examples; \
+	fi
+
+install-exec-local:
+# install espresso setup scripts
+	$(install_sh_SCRIPT) espresso_setup.sh.install $(DESTDIR)$(pkglibdir)/espresso_setup.sh
+	$(install_sh_SCRIPT) espresso_setup.py.install $(DESTDIR)$(pkglibdir)/espresso_setup.py
+
+uninstall-local:
+	rm -f $(DESTDIR)$(pkglibdir)/espresso_setup.sh
+	rm -f $(DESTDIR)$(pkglibdir)/espresso_setup.py
 

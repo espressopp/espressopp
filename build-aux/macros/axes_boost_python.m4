@@ -25,10 +25,11 @@
 #
 # LAST MODIFICATION
 #
-#   2008-08-19
+#   2009-03-11
 #
 # COPYLEFT
 #
+#   Copyright (c) 2009 Olaf Lenz <lenzo@mpip-mainz.mpg.de>
 #   Copyright (c) 2008 Axel Arnold <axel.arnold@scai.fraunhofer.de>
 #
 #   based on AX_BOOST_SERIALIZATION, copylefted as follows:
@@ -43,7 +44,7 @@ AC_DEFUN([AXES_BOOST_PYTHON],
 [
 AC_REQUIRE([AXES_PYTHON])
 
-if test "x$axes_cv_python_lib" != "xno" -a "x$axes_cv_python_include" != "xno"; then
+if test "x$axes_cv_python_lib" != "xno" && test "x$axes_cv_python_include" != "xno"; then
 	dnl temporarily add python flags
 	axes_boost_python_saved_cppflags="$CPPFLAGS"
 	axes_boost_python_saved_libs="$LIBS"

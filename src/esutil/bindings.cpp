@@ -1,17 +1,16 @@
 #include "bindings.hpp"
-#include <boost/python.hpp>
 #include "Real3D.hpp"
+#include <boost/python.hpp>
 
 namespace espresso {
   namespace esutil {
     
-  using namespace boost::python;
+    using namespace boost::python;
     /** Register all C++ classes of namespace esutil 
 	
      * Real3D
      
      */
-    
     void registerPython() {
       // Export the C++ class Real3D to Python 
       class_<Real3D>("esutil_Real3D", init<real, real, real>())

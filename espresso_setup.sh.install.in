@@ -1,0 +1,24 @@
+# Shell-script that sets the required environment variables to run 
+# ESPResSo++.
+# Please source this script in the shell that you use to execute
+# espresso, by using
+#
+# . @pkglibdir@/espresso_setup.sh
+#
+# if the pythonpath was not set in the environment, use the one
+# specified by configure
+if test "x$PYTHONPATH" = "x"; then
+   PYTHONPATH=@PYTHONPATH@
+fi
+
+# Add the ES++ specific path
+ESPP_PYTHONPATH=@pkglibdir@
+if test "x$PYTHONPATH" = "x"; then
+    PYTHONPATH=$ESPP_PYTHONPATH
+else
+    PYTHONPATH=$PYTHONPATH:$ESPP_PYTHONPATH
+fi
+
+export PYTHONPATH
+echo "PYTHONPATH=$PYTHONPATH"
+

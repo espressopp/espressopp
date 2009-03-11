@@ -1,0 +1,6 @@
+# Python script that sets the correct path to the ESPResSo++ module,
+# if ES++ is installed.
+# Import this at the top of you simulation script
+
+# add @PYTHONPATH@ to path
+# add @pkglibdir@

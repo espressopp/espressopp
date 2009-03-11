@@ -1,0 +1,15 @@
+# Python script that sets the correct path to the ESPResSo++ module,
+# if ES++ is used in the build path.
+# Import this at the top of you simulation script
+
+import os, sys
+
+# Add the python path from configure
+if "@PYTHONPATH@" :
+    sys.path.append("@PYTHONPATH@")
+# Add the top-level build dir
+top_builddir="@abs_top_builddir@"
+sys.path.append(top_builddir)
+# Add the dir containing the es++ python module
+sys.path.append(os.path.join(top_builddir, "src", ".libs"))
+

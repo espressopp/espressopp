@@ -19,7 +19,7 @@ AM_PROG_CC_C_O
 # import paths from the EXTRA_PREFIXES precious variable
 AXES_IMPORT_EXTRA_PREFIXES
 
-cat <<EOF
+cat >& AS_MESSAGE_FD <<EOF
 **********************************************************************
 *         Checking for compiler and dynamic library support          *
 **********************************************************************
@@ -30,41 +30,32 @@ EOF
 AC_PROG_CXX
 AC_LANG([C++])
 
-AC_PROG_LIBTOOL
+LT_INIT([dlopen])
 
-cat <<EOF
+cat >& AS_MESSAGE_FD <<EOF
 **********************************************************************
 *         Checking system header files                               *
-**********************************************************************
+**********************************************************************])
 EOF
 
 AC_CHECK_HEADERS(sys/time.h sys/resource.h)
-if test "$ac_cv_header_sys_time_h" != "yes"; then
-AC_CHECK_HEADER(time.h)
-fi
+AS_IF([test "$ac_cv_header_sys_time_h" != "yes"], 
+        [AC_CHECK_HEADER(time.h)])
 
-cat <<EOF
+cat >& AS_MESSAGE_FD <<EOF
 **********************************************************************
 *       Checking for required external libraries and tools           *
 **********************************************************************
 EOF
-AXES_MPI
-if [test "x$axes_cv_mpi" = "xno"]; then
-   AC_MSG_ERROR([could not find mpi])   
-fi
 
 AXES_PYTHON
-if test "x$axes_cv_python_lib" = "xno" || \
-   test "x$axes_cv_python_include" = "xno"; then
-   AC_MSG_ERROR([could not find python])
-fi
+AS_IF([test "x$axes_cv_python_lib" = "xno" || 
+	    test "x$axes_cv_python_include" = "xno"], 
+         [AC_MSG_ERROR([could not find python])])
 
-# Define only temporary, until all traces of HAVE_MPI and HAVE_PYTHON
-# are gone 
-AH_BOTTOM([
-#define IF_MPI(code) code
-#define IF_PYTHON(code) code
-])
+AXES_MPI
+AS_IF([test "x$axes_cv_mpi" = "xno"],
+       [AC_MSG_ERROR([could not find mpi])])
 
 ################################################################### 
 #                                                                 #
@@ -75,30 +66,24 @@ AH_BOTTOM([
 
 AXES_BOOST_BASE([1.35])
 
-if test "x$axes_cv_boost" = "xno"; then
-    AC_MSG_ERROR([could not find the boost headers])
-fi
+AS_IF([test "x$axes_cv_boost" = "xno"],
+    [AC_MSG_ERROR([could not find the boost headers])])
 
 AXES_BOOST_SERIALIZATION
-if test "x$axes_cv_boost_lib_serialization" = "xno"; then
-    AC_MSG_ERROR([could not find the boost serialization library])
-fi
-
-if test "x$axes_cv_mpi" != "xno"; then
-   AXES_BOOST_MPI
-   if test "x$axes_cv_boost_lib_mpi" = "xno"; then
-      AC_MSG_ERROR([could not find the boost mpi library.
-Note that this can also mean that the compiler $CXX you are using
-to compile ESPResSo++ is not the same you used to build boost.mpi.])
-   fi
-fi
+AS_IF([test "x$axes_cv_boost_lib_serialization" = "xno"],
+    [AC_MSG_ERROR([could not find the boost serialization library])])
 
 AXES_BOOST_PYTHON
-if test "x$axes_cv_boost_lib_python" = "xno"; then
-    AC_MSG_ERROR([could not find the boost python library])
-fi
+AS_IF([test "x$axes_cv_boost_lib_python" = "xno"],
+    [AC_MSG_ERROR([could not find the boost python library])])
 
-cat <<EOF
+AXES_BOOST_MPI
+AS_IF([test "x$axes_cv_boost_lib_mpi" = "xno"],
+    [AC_MSG_ERROR([could not find the boost mpi library.
+Note that this can also mean that the compiler $CXX you are using
+to compile ESPResSo++ is not the same you used to build boost.mpi.])])
+
+cat >& AS_MESSAGE_FD <<EOF
 **********************************************************************
 *         Checking for optional external libraries and tools         *
 **********************************************************************
@@ -110,8 +95,7 @@ EOF
 #                                                                 #
 ###################################################################
 
-
-if test "x$axes_cv_mpi" != "xno"; then
+AS_IF([test "x$axes_cv_mpi" != "xno"],[
   AC_PATH_PROG([MPIEXEC], [mpiexec], [no])
   AC_SUBST(MPIEXEC)
 
@@ -120,23 +104,17 @@ if test "x$axes_cv_mpi" != "xno"; then
      AS_HELP_STRING([--with-mympiexec@<:@=script@:>@],
       [specify the program or script that should be used to run the parallel build tests.
 Defaults to BUILDDIR/mympiexec.sh]),
-      [
-      if test "$withval" = "no"; then
-          MYMPIEXEC="" 
-      else
-          MYMPIEXEC="$withval"
-
+      [AS_IF([test "$withval" = "no"],
+         [MYMPIEXEC=""],
+	 [MYMPIEXEC="$withval"
           dir=`AS_DIRNAME([$MYMPIEXEC])`
-          if test "x$dir" = "x."; then
-            dnl not an absolute path, make absolute
-            MYMPIEXEC="`pwd`/$MYMPIEXEC"
-          fi
-      fi
-      ],
+	  AS_IF([test "x$dir" = "x."],
+                  [MYMPIEXEC="`pwd`/$MYMPIEXEC"])
+         ])],
       [ MYMPIEXEC="`pwd`/mympiexec.sh" ])
   AC_MSG_RESULT($MYMPIEXEC)
   AC_SUBST(MYMPIEXEC)
-fi
+])
 
 ###################################################################
 #                                                                 #
@@ -162,9 +140,9 @@ AXES_LOG4ESPP
 ################################################################### 
 
 AC_PATH_PROG(DOXYGEN,doxygen,no)
-AM_CONDITIONAL(HAVE_DOXYGEN,[test .$DOXYGEN != .no])
+AM_CONDITIONAL(HAVE_DOXYGEN,[test "x$DOXYGEN" != "xno"])
 
-cat <<EOF
+cat >& AS_MESSAGE_FD <<EOF
 **********************************************************************
 *                        Writing output files                        *
 **********************************************************************
@@ -185,6 +163,9 @@ AM_CPPFLAGS="-I\$(top_srcdir)/src -I\$(top_srcdir)/src/include $BOOST_CPPFLAGS"
 AM_LDFLAGS="$BOOST_LDFLAGS"
 AC_SUBST([AM_CPPFLAGS])
 AC_SUBST([AM_LDFLAGS])
+
+# also substitute the pythonpath
+AC_SUBST([PYTHONPATH])
 
 ################################################################### 
 #                                                                 #
@@ -223,17 +204,45 @@ AC_CONFIG_FILES([Makefile
                  ])
 
 AC_CONFIG_FILES([bin/utexec.sh],
-                [chmod +x bin/utexec.sh])
+                [chmod ugo+x bin/utexec.sh])
 AC_CONFIG_FILES([bin/espp_mpiexec.sh],
-                [chmod +x bin/espp_mpiexec.sh])
+                [chmod ugo+x bin/espp_mpiexec.sh])
 AC_CONFIG_FILES([test/runtests.sh],
-                [chmod +x test/runtests.sh])
+                [chmod ugo+x test/runtests.sh])
+
+# espresso setup scripts
+AC_CONFIG_FILES([
+       espresso_setup.sh:espresso_setup.sh.build.in
+       espresso_setup.sh.install:espresso_setup.sh.install.in
+       espresso_setup.py:espresso_setup.py.build.in
+       espresso_setup.py.install:espresso_setup.py.install.in
+       ])
+
+# create a link to the src dir by the name of espresso
+AC_CONFIG_COMMANDS([espresso],
+	[AS_IF([test ! -e espresso],[$LN_S src espresso],
+               [test ! -h espresso], [
+	         AC_MSG_WARN(["espresso exists and is not a link, please remove"])
+		 exit 1
+               ])])
+# create a link to the examples dir
+AC_CONFIG_COMMANDS([examples],
+	[AS_IF([test ! -e examples && ! test -h examples], 
+                 [$LN_S $srcdir/examples examples])])
 
 # now make sure that all config files are generated
 
 AC_OUTPUT
 
-cat << EOF
+test "x$MPI_LIBS" != "x" || MPI_LIBS="(none required)"
+test "x$BOOST_CPPFLAGS" != "x" || BOOST_CPPFLAGS="(default include path)"
+test "x$BOOST_UNIT_TEST_FRAMEWORK_LIBS" != "x" || BOOST_UNIT_TEST_FRAMEWORK_LIBS="(not available)"
+test "x$DOXYGEN" != "xno" || DOXYGEN="(not available)"
+AS_IF([test "x$MYMPIEXEC" = "x"],
+        [MYMPIEXEC="disabled by user, no parallel tests will be run"],
+        [MYMPIEXEC="will try to use $MYMPIEXEC"])
+
+cat >config.summary << EOF
 
 
 **********************************************************************
@@ -246,29 +255,16 @@ cat << EOF
  * Python:
    - Headers: $PYTHON_CPPFLAGS
    - Libraries: $PYTHON_LIBS
+   - PYTHONPATH=$PYTHONPATH
+ * MPI:
+   - Libraries: $MPI_LIBS
  * Boost:
-EOF
-
-if test "x$BOOST_CPPFLAGS" != "x"; then
-    echo "   - Headers: $BOOST_CPPFLAGS"
-else
-    echo "   - Headers: default include path"
-fi
-
-cat <<EOF
+   - Headers: $BOOST_CPPFLAGS
    - Library suffix: ${axes_cv_boost_lib_suffix#-}
    - Linker flags: $BOOST_LDFLAGS
    - boost.Python libraries: $BOOST_PYTHON_LIBS
-EOF
-
-dnl Unit test framework
-if test "x$BOOST_UNIT_TEST_FRAMEWORK_LIBS" != "x"; then
-echo "   - boost.Test libraries: $BOOST_UNIT_TEST_FRAMEWORK_LIBS"
-else
-echo "   - boost.Test libraries: not available"
-fi
-
-cat <<EOF
+   - boost.MPI libraries: $BOOST_MPI_LIBS
+   - boost.Test libraries: $BOOST_UNIT_TEST_FRAMEWORK_LIBS
  * Log4ESPP: $axes_log4espp
    - Libraries: $LOG4ESPP_LIBS
  * Final compilation flags:
@@ -276,36 +272,20 @@ cat <<EOF
    - Compiler flags (CXXFLAGS): $CXXFLAGS
    - Linker flags (LDFLAGS): $LDFLAGS
 
-EOF
-
-cat <<EOF
 *****************
 ** OTHER TOOLS **
 *****************
  * mpiexec:
+    - $MYMPIEXEC
+    - fallback: $MPIEXEC
+ * Doxygen: $DOXYGEN
 EOF
-dnl MPI
-if test "$MYMPIEXEC" = ""; then
-    echo "   - disabled by user, no parallel tests will be run"
-else
-    echo "   - will try to use $MYMPIEXEC"
-    if ! test -x "$MYMPIEXEC"; then
-        echo "   - (which does not exist or is not executable at the moment)"
-    fi
-    if test "$MPIEXEC" != "no"; then
-        echo "   - fallback: $MPIEXEC"
-    else
-        echo "   - no fallback"
-    fi
-fi
 
-dnl Doxygen
-if test .$DOXYGEN != .no; then
-echo " * Doxygen: $DOXYGEN"
-else
-echo " * Doxygen: doxygen was not found"
-fi
+cat config.summary >&AS_MESSAGE_FD
+cat config.summary >&AS_MESSAGE_LOG_FD
 
-echo
-echo "READY TO BUILD $PACKAGE_STRING"
-echo
+cat >&AS_MESSAGE_FD <<EOF
+
+READY TO BUILD $PACKAGE_STRING
+
+EOF

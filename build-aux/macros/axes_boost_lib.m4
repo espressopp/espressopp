@@ -33,10 +33,11 @@
 #
 # LAST MODIFICATION
 #
-#   2008-08-15
+#   2009-03-11
 #
 # COPYLEFT
 #
+#   Copyright (c) 2009 Olaf Lenz <lenzo@mpip-mainz.mpg.de>
 #   Copyright (c) 2008 Axel Arnold <axel.arnold@scai.fraunhofer.de>
 #
 #   based on AX_BOOST_SERIALIZATION, copylefted as follows:
@@ -86,7 +87,7 @@ AC_ARG_WITH([boost-flavor],
 dnl make proper variables from the cache ones
 AS_VAR_PUSHDEF([cv_boost_lib], [axes_cv_boost_lib_$1])
 
-if test "x$axes_cv_boost" != "xno" -a "x$want_boost" != "xno" ; then
+if test "x$axes_cv_boost" != "xno" && test "x$want_boost" != "xno" ; then
     AC_CACHE_CHECK(whether the boost $1 library is available,
                    cv_boost_lib,
         [
@@ -291,7 +292,7 @@ if test "x$axes_cv_boost" != "xno" -a "x$want_boost" != "xno" ; then
     	AC_DEFINE(HAVE_BOOST_$2,1,[define if boost $1 library is available])
 
         dnl set the LDFLAGS to load the lib path if a non-standard path is needed
-        if test "x$BOOST_LDFLAGS" = "x" -a "x$axes_cv_boost_lib_path" != "xyes"; then        
+        if test "x$BOOST_LDFLAGS" = "x" && test "x$axes_cv_boost_lib_path" != "xyes"; then        
             BOOST_LDFLAGS="-L$axes_cv_boost_lib_path"
             AC_SUBST(BOOST_LDFLAGS)
         fi

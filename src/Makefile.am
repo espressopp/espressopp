@@ -30,45 +30,26 @@ libespresso_common_la_LIBADD = \
 	$(BOOST_PYTHON_LIBS) \
 	$(LOG4ESPP_LIBS)
 
-# the embedded python interpreter with static espresso library
-bin_PROGRAMS = pypresso 
-
-pypresso_SOURCES = pypresso.cpp
-pypresso_LDADD = libespresso_common.la
-
 # Rules to build the python module _espresso
 python_LTLIBRARIES = _espresso.la
 _espresso_la_SOURCES = _espresso.cpp
-_espresso_la_LDFLAGS = -module -avoid-version -no-undefined 
+_espresso_la_LDFLAGS = -module -avoid-version -no-undefined
 _espresso_la_LIBADD = libespresso_common.la
+
+# the embedded python interpreter with static espresso library
+bin_PROGRAMS = pypresso 
+pypresso_SOURCES = pypresso.cpp
+pypresso_LDADD = libespresso_common.la
 
 ##############################
 ## PYTHON
 ##############################
 
-python_scripts=pmi.py esutil.py hello.py particles.py interaction.py
+python_scripts=__init__.py pmi.py esutil.py hello.py particles.py interaction.py
 
 python_SCRIPTS=$(python_scripts)
 
 # python script handling
 include $(top_srcdir)/build-aux/macros/axes_python.am
-
-# clean the __init__.py-files from the build dir
-MOSTLYCLEANFILES=__init__.py __init__.pyc __init__.install.py
-
-# rename __init__.build.py to __init__.py in the build dir
-# copy __init__.install.py into the build dir
-all-local: python-all
-	sed -e "s,[@]srcdir[@],'$(abs_top_builddir)/src',g" \
-	$(srcdir)/__init__.build.py > __init__.py
-
-# install __init__.install.py into pkglibdir, renaming it to __init__.py
-install-exec-local:
-	$(install_sh_SCRIPT) $(srcdir)/__init__.install.py $(DESTDIR)$(pythondir)/__init__.py
-
-# remove __init__.py and __init__.pyc from pkglib
-uninstall-local:
-	-rm $(DESTDIR)$(pythondir)/__init__.py
-	-rm $(DESTDIR)$(pythondir)/__init__.pyc
 
 
