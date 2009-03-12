@@ -4,7 +4,6 @@
 */
 #include "acconfig.hpp"
 #include "espresso_common.hpp"
-#include "bindings.hpp"
 #include <iostream>
 #include <python.hpp>
 #include <logging.hpp>
