@@ -140,6 +140,7 @@ AXES_LOG4ESPP
 ################################################################### 
 
 AC_PATH_PROG(DOXYGEN,doxygen,no)
+AC_ARG_VAR(DOXYGEN, [Doxygen code documentation tool])
 AM_CONDITIONAL(HAVE_DOXYGEN,[test "x$DOXYGEN" != "xno"])
 
 cat >& AS_MESSAGE_FD <<EOF
@@ -164,8 +165,8 @@ AM_LDFLAGS="$BOOST_LDFLAGS"
 AC_SUBST([AM_CPPFLAGS])
 AC_SUBST([AM_LDFLAGS])
 
-# also substitute the pythonpath
-AC_SUBST([PYTHONPATH])
+# BOOST_MPI_PYTHON_DIR
+AC_ARG_VAR([BOOST_MPI_PYTHON_DIR], [directory where the boost.MPI python module is installed])
 
 ################################################################### 
 #                                                                 #
@@ -237,6 +238,7 @@ AC_OUTPUT
 test "x$MPI_LIBS" != "x" || MPI_LIBS="(none required)"
 test "x$BOOST_CPPFLAGS" != "x" || BOOST_CPPFLAGS="(default include path)"
 test "x$BOOST_UNIT_TEST_FRAMEWORK_LIBS" != "x" || BOOST_UNIT_TEST_FRAMEWORK_LIBS="(not available)"
+test "x$BOOST_MPI_PYTHON_DIR" != "x" || BOOST_MPI_PYTHON_DIR="(not set)"
 test "x$DOXYGEN" != "xno" || DOXYGEN="(not available)"
 AS_IF([test "x$MYMPIEXEC" = "x"],
         [MYMPIEXEC="disabled by user, no parallel tests will be run"],
@@ -255,7 +257,6 @@ cat >config.summary << EOF
  * Python:
    - Headers: $PYTHON_CPPFLAGS
    - Libraries: $PYTHON_LIBS
-   - PYTHONPATH=$PYTHONPATH
  * MPI:
    - Libraries: $MPI_LIBS
  * Boost:
@@ -264,6 +265,7 @@ cat >config.summary << EOF
    - Linker flags: $BOOST_LDFLAGS
    - boost.Python libraries: $BOOST_PYTHON_LIBS
    - boost.MPI libraries: $BOOST_MPI_LIBS
+   - boost.MPI Python module dir: $BOOST_MPI_PYTHON_DIR
    - boost.Test libraries: $BOOST_UNIT_TEST_FRAMEWORK_LIBS
  * Log4ESPP: $axes_log4espp
    - Libraries: $LOG4ESPP_LIBS

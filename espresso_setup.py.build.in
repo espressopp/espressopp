@@ -1,15 +1,19 @@
 # Python script that sets the correct path to the ESPResSo++ module,
 # if ES++ is used in the build path.
-# Import this at the top of you simulation script
+# 
+# To use it, put the follwoing line at the top of your script:
+#
+#   execfile("@abs_top_builddir@/espresso_setup.py")
+#
 
 import os, sys
 
 # Add the python path from configure
-if "@PYTHONPATH@" :
-    sys.path.append("@PYTHONPATH@")
+boost_mpi_python_dir="@BOOST_MPI_PYTHON_DIR@"
+if boost_mpi_python_dir: sys.path.insert(0, "boost_mpi_python_dir")
 # Add the top-level build dir
 top_builddir="@abs_top_builddir@"
-sys.path.append(top_builddir)
+sys.path.insert(0, top_builddir)
 # Add the dir containing the es++ python module
-sys.path.append(os.path.join(top_builddir, "src", ".libs"))
+sys.path.insert(0, os.path.join(top_builddir, "src", ".libs"))
 
