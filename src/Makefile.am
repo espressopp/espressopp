@@ -45,11 +45,20 @@ pypresso_LDADD = libespresso_common.la
 ## PYTHON
 ##############################
 
-python_scripts=__init__.py pmi.py esutil.py hello.py particles.py interaction.py
+python_scripts=\
+	__init__.py \
+	esmpi.py \
+	pmi.py \
+	esutil.py \
+	hello.py \
+	particles.py \
+	interaction.py
 
 python_SCRIPTS=$(python_scripts)
 
 # python script handling
 include $(top_srcdir)/build-aux/macros/axes_python.am
 
+clean-local: python-clean
+all-local: python-all
 

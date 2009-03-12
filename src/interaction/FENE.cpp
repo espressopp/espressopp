@@ -11,10 +11,7 @@ LOG4ESPP_LOGGER(FENE::theLogger, "interaction.FENE");
 
 /* ---------------------------------------------------------------------- */
 
-FENE::FENE() { 
-  // set the defaults here
-  set(1.0, 0.0, 1.0); 
-}
+FENE::FENE() {}
        
 FENE::~FENE() {}
 
@@ -27,8 +24,7 @@ void FENE::set(real _K, real _r0, real _rMax) {
 real FENE::getK() const { return computer.K; }
 real FENE::getR0() const { return computer.r0; }
 real FENE::getRMax() const { return computer.rMax; }
-
-real FENE::getCutoffSqr() const { return -1; }
+real FENE::getCutoffSqr() const { return -1.0; }
 
 real FENE::computeEnergy (const Real3D &dist) const {
   return computer.computeEnergySqr(dist.sqr());
@@ -76,7 +72,6 @@ FENE::createForceComputer(const pairs::ForceComputer &templ) const
 
 void
 FENE::registerPython() {
-  
   using namespace boost::python;
   
   Real3D (FENE::*computeForceOverload)(const Real3D&) const =

@@ -4,8 +4,6 @@
 //base class
 
 #include "types.hpp"
-#include "particles/Storage.hpp"
-#include "particles/Set.hpp"
 #include "pairs/ForceComputer.hpp"
 #include "pairs/EnergyComputer.hpp"
 

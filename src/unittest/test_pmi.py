@@ -1,36 +1,38 @@
 import unittest
-import espresso.pmi as pmi
+from espresso import pmi as pmi
 
 class ExecTest(unittest.TestCase) :
     def testImportModule(self) :
         pmi.exec_("import espresso")
         self.assertEqual(pmi.espresso.__name__, "espresso")
-        del(pmi.espresso)
+        pmi.exec_("del(espresso)")
 
     def testImportModuleAs(self) :
         pmi.exec_("import espresso as e")
         self.assertEqual(pmi.e.__name__, "espresso")
-        del(pmi.e)
+        pmi.exec_("del(e)")
 
     def testImportSubModule(self) :
         pmi.exec_("import espresso.pmi")
         self.assertEqual(pmi.espresso.pmi.__name__, "espresso.pmi")
-        del(pmi.espresso)
+        pmi.exec_("del(espresso)")
 
     def testImportSubModuleAs(self) :
         pmi.exec_("import espresso.pmi as p")
         self.assertEqual(pmi.p.__name__, "espresso.pmi")
-        del(pmi.p)
+        pmi.exec_("del(p)")
 
     def testImportNotToMain(self) :
+        'Tests that an import to PMI does NOT import to the main namespace.'
         pmi.exec_("import espresso")
         try :
             exec 'n=espresso.__name__'
+            self.fail("expected a NameError")
         except NameError :
             pass
         else :
             self.fail("expected a NameError")
-        del(pmi.espresso)
+        pmi.exec_("del(espresso)")
 
 
 class CreateTest(unittest.TestCase) :

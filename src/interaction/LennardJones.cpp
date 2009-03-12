@@ -16,10 +16,7 @@ LOG4ESPP_LOGGER(LennardJones::theLogger, "interaction.LennardJones");
 
 /* ---------------------------------------------------------------------- */
 
-LennardJones::LennardJones() {
-  // set the defaults here
-  set(1.0, 1.0, 2.5);
-}
+LennardJones::LennardJones() {}
 
 LennardJones::~LennardJones() {}
 

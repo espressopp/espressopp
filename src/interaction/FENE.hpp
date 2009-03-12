@@ -3,9 +3,6 @@
 
 #include <logging.hpp>
 #include <interaction/Interaction.hpp>
-#include "particles/Set.hpp"
-#include "pairs/EnergyComputer.hpp"
-#include "pairs/ForceComputer.hpp"
 
 namespace espresso {
   namespace interaction {
