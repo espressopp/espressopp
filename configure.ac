@@ -96,8 +96,11 @@ EOF
 ###################################################################
 
 AS_IF([test "x$axes_cv_mpi" != "xno"],[
-  AC_PATH_PROG([MPIEXEC], [mpiexec], [no])
-  AC_SUBST(MPIEXEC)
+  AC_MSG_CHECKING([for mpiexec])
+  AC_ARG_VAR([MPIEXEC], [MPI command mpiexec])
+  AS_IF([test "x$MPIEXEC" = "x"],
+    [AC_PATH_PROG([MPIEXEC], [mpiexec], [no])])
+  AC_MSG_RESULT($MPIEXEC)
 
   AC_MSG_CHECKING([for mympiexec])
   AC_ARG_WITH([mympiexec],
@@ -139,8 +142,8 @@ AXES_LOG4ESPP
 #                                                                 #
 ################################################################### 
 
-AC_PATH_PROG(DOXYGEN,doxygen,no)
-AC_ARG_VAR(DOXYGEN, [Doxygen code documentation tool])
+AC_ARG_VAR([DOXYGEN], [Doxygen code documentation tool])
+AC_PATH_PROG([DOXYGEN],[doxygen],[no])
 AM_CONDITIONAL(HAVE_DOXYGEN,[test "x$DOXYGEN" != "xno"])
 
 cat >& AS_MESSAGE_FD <<EOF
@@ -165,14 +168,9 @@ AM_LDFLAGS="$BOOST_LDFLAGS"
 AC_SUBST([AM_CPPFLAGS])
 AC_SUBST([AM_LDFLAGS])
 
-# BOOST_MPI_PYTHON_DIR
-AC_ARG_VAR([BOOST_MPI_PYTHON_DIR], [directory where the boost.MPI python module is installed])
-
 ################################################################### 
 #                                                                 #
 #  Generation of output                                           #
-#  Makefiles in all subdirectories                                #
-#  src/acconfig.hpp                                           #
 #                                                                 #
 ################################################################### 
 
@@ -219,30 +217,37 @@ AC_CONFIG_FILES([
        espresso_setup.py.install:espresso_setup.py.install.in
        ])
 
-# create a link to the src dir by the name of espresso
+# create a link to the src dir by the name of espresso, so 
 AC_CONFIG_COMMANDS([espresso],
 	[AS_IF([test ! -e espresso],[$LN_S src espresso],
                [test ! -h espresso], [
 	         AC_MSG_WARN(["espresso exists and is not a link, please remove"])
 		 exit 1
                ])])
-# create a link to the examples dir
-AC_CONFIG_COMMANDS([examples],
-	[AS_IF([test ! -e examples && ! test -h examples], 
-                 [$LN_S $srcdir/examples examples])])
 
 # now make sure that all config files are generated
 
 AC_OUTPUT
 
+################################################################### 
+#                                                                 #
+#  Summary                                                        #
+#                                                                 #
+################################################################### 
+
+test "x$EXTRA_PREFIXES" != "x" || EXTRA_PREFIXES="(none)"
 test "x$MPI_LIBS" != "x" || MPI_LIBS="(none required)"
+test "x$BOOST_ROOT" != "x" || BOOST_ROOT="(empty)"
 test "x$BOOST_CPPFLAGS" != "x" || BOOST_CPPFLAGS="(default include path)"
+test "x$BOOST_LDFLAGS" != "x" || BOOST_LDFLAGS="(none)"
 test "x$BOOST_UNIT_TEST_FRAMEWORK_LIBS" != "x" || BOOST_UNIT_TEST_FRAMEWORK_LIBS="(not available)"
 test "x$BOOST_MPI_PYTHON_DIR" != "x" || BOOST_MPI_PYTHON_DIR="(not set)"
 test "x$DOXYGEN" != "xno" || DOXYGEN="(not available)"
 AS_IF([test "x$MYMPIEXEC" = "x"],
         [MYMPIEXEC="disabled by user, no parallel tests will be run"],
         [MYMPIEXEC="will try to use $MYMPIEXEC"])
+test "x$AM_CPPFLAGS" != "x" || AM_CPPFLAGS="(empty)"
+test "x$AM_LDFLAGS" != "x" || AM_LDFLAGS="(empty)"
 
 cat >config.summary << EOF
 
@@ -253,26 +258,34 @@ cat >config.summary << EOF
 *****************
 ** COMPILATION **
 *****************
- * C++-compiler: $CXX
+ * C++-compiler: CXX=$CXX
+ * User provided compilation flags:
+   - EXTRA_PREFIXES=$EXTRA_PREFIXES
+   - CPPFLAGS=$CPPFLAGS
+   - CXXFLAGS=$CXXFLAGS
+   - LDFLAGS=$LDFLAGS
+ * Compilation flags determined by configure:
+   - AM_CPPFLAGS=$AM_CPPFLAGS
+   - AM_LDFLAGS=$AM_LDFLAGS
+
+*****************
+** LIBRARIES   **
+*****************
  * Python:
    - Headers: $PYTHON_CPPFLAGS
    - Libraries: $PYTHON_LIBS
  * MPI:
-   - Libraries: $MPI_LIBS
+   - Libraries: MPI_LIBS=$MPI_LIBS
  * Boost:
+   - BOOST_ROOT=$BOOST_ROOT
    - Headers: $BOOST_CPPFLAGS
    - Library suffix: ${axes_cv_boost_lib_suffix#-}
    - Linker flags: $BOOST_LDFLAGS
    - boost.Python libraries: $BOOST_PYTHON_LIBS
    - boost.MPI libraries: $BOOST_MPI_LIBS
-   - boost.MPI Python module dir: $BOOST_MPI_PYTHON_DIR
    - boost.Test libraries: $BOOST_UNIT_TEST_FRAMEWORK_LIBS
- * Log4ESPP: $axes_log4espp
+ * Log4ESPP: $LOG4ESPP_USE
    - Libraries: $LOG4ESPP_LIBS
- * Final compilation flags:
-   - Preprocessor flags (CPPFLAGS): $CPPFLAGS
-   - Compiler flags (CXXFLAGS): $CXXFLAGS
-   - Linker flags (LDFLAGS): $LDFLAGS
 
 *****************
 ** OTHER TOOLS **

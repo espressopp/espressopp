@@ -1,5 +1,7 @@
 # Shell-script that sets the required environment variables to run 
 # ESPResSo++.
+# @configure_input@
+#
 # Please source this script in the shell that you use to execute
 # espresso, by using
 #
@@ -8,7 +10,7 @@
 
 # if the pythonpath was not set in the environment, use the one
 # specified by configure
-BOOST_MPI_PYTHON_DIR=@BOOST_MPI_PYTHON_DIR@
+BOOST_MPI_PYTHON_DIR=@BOOST_ROOT@/lib
 if test "x$PYTHONPATH" = "x" && 
    test "x$BOOST_MPI_PYTHON_DIR" != "x"; then
    PYTHONPATH=$BOOST_MPI_PYTHON_DIR

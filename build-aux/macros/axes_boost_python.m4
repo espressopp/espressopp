@@ -23,6 +23,9 @@
 #     axes_cv_boost_lib_suffix
 #     axes_cv_boost_lib_path
 #
+#   Furthermore, it appends the contents of the variable
+#   PYTHON_CPPFLAGS to the variable BOOST_CPPFLAGS.
+#
 # LAST MODIFICATION
 #
 #   2009-03-11

@@ -5,11 +5,13 @@
 #
 # DESCRIPTION
 #
-#   Test for the headers of the Boost C++ library of a particular version (or newer).
+#   Test for the headers of the Boost C++ library of a particular
+#   version (or newer).
 #
-#   If no path to the installed boost library is given, the macro searches the
-#   headers under some default locations and evaluates the $BOOST_ROOT
-#   environment variable for a staged build of boost.
+#   If no path to the installed boost library is given, the macro
+#   searches the headers in all paths given in LDFLAGS, in some
+#   default locations and it evaluates the BOOST_ROOT environment
+#   variable for a staged build of boost.
 #
 #   This macro calls:
 #
@@ -26,24 +28,26 @@
 #
 #   Note:
 #
-#   This macro needs to be called _before_ any test for a specific Boost library.
-#   The libraries do not test independently for the existence of the header files.
+#   This macro needs to be called _before_ any test for a specific
+#   Boost library.  The libraries do not test independently for the
+#   existence of the header files.
 #
 # LAST MODIFICATION
 #
-#   2008-08-15
+#   2009-03-12
 #
 # COPYLEFT
 #
+#   Copyright (c) 2009 Olaf Lenz <lenzo@mpip-mainz.mpg.de>
 #   Copyright (c) 2008 Axel Arnold <Axel.Arnold@scai.fhg.de>
 #
 #   Parts of code are
 #
 #   Copyright (c) 2008 Thomas Porschberg <thomas@randspringer.de>
 #
-#   Copying and distribution of this file, with or without modification, are
-#   permitted in any medium without royalty provided the copyright notice
-#   and this notice are preserved.
+#   Copying and distribution of this file, with or without
+#   modification, are permitted in any medium without royalty provided
+#   the copyright notice and this notice are preserved.
 
 AC_DEFUN([AXES_BOOST_BASE],
 [
@@ -62,6 +66,9 @@ AC_ARG_WITH([boost],
     fi
     ],
     [ want_boost="yes" ])
+
+AC_ARG_VAR([BOOST_ROOT],
+  [directory where boost is installed])
 
 if test "x$want_boost" = "xyes"; then
     dnl determine required boost version
