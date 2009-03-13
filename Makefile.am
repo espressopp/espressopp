@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS = -I build-aux/macros
-SUBDIRS = contrib src test doc
+SUBDIRS = src test doc
 EXTRA_DIST = autogen.sh 
 
 #################################################################

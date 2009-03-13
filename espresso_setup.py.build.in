@@ -8,20 +8,17 @@
 #
 
 def __espresso_setup() :
-   import os, sys
+    import os, sys
 
-   top_builddir="@abs_top_builddir@"
-   boost_mpi_python_dir="@BOOST_MPI_PYTHON_DIR@"
-   
-   # Add the path of the mpi python module
-   if ! boost_mpi_python_dir:
-      boost_mpi_python_dir=os.path.join(
-         top_builddir, "contrib", "boost-am")
-   sys.path.insert(0, boost_mpi_python_dir)
-   # Add the top-level build dir
-   sys.path.insert(0, top_builddir)
-   # Add the dir containing the es++ python module
-   sys.path.insert(0, os.path.join(top_builddir, "src", ".libs"))
+    # Add the python path from configure
+    boost_root="@BOOST_ROOT@"
+    if boost_mpi_python_dir: 
+       sys.path.insert(0, os.path.join(boost_root, "lib"))
+    # Add the top-level build dir
+    top_builddir="@abs_top_builddir@"
+    sys.path.insert(0, top_builddir)
+    # Add the dir containing the es++ python module
+    sys.path.insert(0, os.path.join(top_builddir, "src", ".libs"))
 
 __espresso_setup()
 del(__espresso_setup)
