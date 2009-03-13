@@ -57,37 +57,6 @@ AXES_MPI
 AS_IF([test "x$axes_cv_mpi" = "xno"],
        [AC_MSG_ERROR([could not find mpi])])
 
-################################################################### 
-#                                                                 #
-#  check for various boost libraries. All are required, and       #
-#  we bail out if one or more are not found.                      #
-#                                                                 #
-################################################################### 
-
-AXES_BOOST_BASE([1.35])
-
-AS_IF([test "x$axes_cv_boost" = "xno"],
-    [AC_MSG_ERROR([could not find the boost headers])])
-
-AXES_BOOST_SERIALIZATION
-AS_IF([test "x$axes_cv_boost_lib_serialization" = "xno"],
-    [AC_MSG_ERROR([could not find the boost serialization library])])
-
-AXES_BOOST_PYTHON
-AS_IF([test "x$axes_cv_boost_lib_python" = "xno"],
-    [AC_MSG_ERROR([could not find the boost python library])])
-
-AXES_BOOST_MPI
-AS_IF([test "x$axes_cv_boost_lib_mpi" = "xno"],
-    [AC_MSG_ERROR([could not find the boost mpi library.
-Note that this can also mean that the compiler $CXX you are using
-to compile ESPResSo++ is not the same you used to build boost.mpi.])])
-
-cat >& AS_MESSAGE_FD <<EOF
-**********************************************************************
-*         Checking for optional external libraries and tools         *
-**********************************************************************
-EOF
 
 ###################################################################
 #                                                                 #
@@ -119,14 +88,69 @@ Defaults to BUILDDIR/mympiexec.sh]),
   AC_SUBST(MYMPIEXEC)
 ])
 
-###################################################################
-#                                                                 #
-#  optional boost packages                                        #
-#                                                                 #
-###################################################################
 
-AXES_BOOST_UNIT_TEST_FRAMEWORK
-AM_CONDITIONAL([HAVE_UNITTEST], [test "x$axes_cv_boost_lib_unit_test_framework" != "xno"])
+###################################################################
+#                                                                 #
+#  boost libs
+#                                                                 #
+###################################################################
+AC_ARG_WITH([boost-serialization-lib],
+    AS_HELP_STRING([--with-boost-serialization-lib=LIB], 
+    	           [specify which boost.serialization library to use])
+    ,, [withval="no"]
+)
+AS_IF([test "x$withval" = "xno" || test "x$withval" = "xyes"], 
+      [BOOST_SERIALIZATION_LIBS=-lboost_serialization],
+      [BOOST_SERIALIZATION_LIBS="-l$withval"
+       boost_serialization_ext="yes"])
+AC_SUBST(BOOST_SERIALIZATION_LIBS)
+AM_CONDITIONAL([BOOST_SERIALIZATION_EXT],[test "x$boost_serialization_ext" = "xyes"])
+
+AC_ARG_WITH([boost-python-lib],
+    AS_HELP_STRING([--with-boost-python-lib=LIB], 
+    	           [specify which boost.python library to use])
+    ,, [withval="no"]
+)
+AS_IF([test "x$withval" = "xno" || test "x$withval" = "xyes"], 
+      [BOOST_PYTHON_LIBS=-lboost_python],
+      [BOOST_PYTHON_LIBS="-l$withval"
+       boost_python_ext="yes"])
+AC_SUBST(BOOST_PYTHON_LIBS)
+AM_CONDITIONAL([BOOST_PYTHON_EXT],[test "x$boost_python_ext" = "xyes"])
+
+AC_ARG_WITH([boost-mpi-lib],
+    AS_HELP_STRING([--with-boost-mpi-lib=LIB], 
+    	           [specify which boost.mpi library to use])
+    ,, [withval="no"]
+)
+AS_IF([test "x$withval" = "xno" || test "x$withval" = "xyes"], 
+      [BOOST_MPI_LIBS=-lboost_mpi],
+      [BOOST_MPI_LIBS="-l$withval"
+       boost_mpi_ext=1])
+AC_SUBST(BOOST_MPI_LIBS)
+AM_CONDITIONAL([BOOST_MPI_EXT],[test "x$boost_mpi_ext" = "xyes"])
+
+AC_ARG_WITH([boost-unittest-lib],
+    AS_HELP_STRING([--with-boost-unittest-lib=LIB], 
+    	           [specify which boost.unittest library to use])
+    ,, [withval="no"]
+)
+AS_IF([test "x$withval" = "xno" || test "x$withval" = "xyes"], 
+      [BOOST_UNITTEST_LIBS=-lboost_unit_test_framework],
+      [BOOST_UNITTEST_LIBS="-l$withval"
+       boost_unittest_ext=1])
+AC_SUBST(BOOST_UNITTEST_LIBS)
+AM_CONDITIONAL([BOOST_UNITTEST_EXT],[test "x$boost_unittest_ext" = "xyes"])
+
+AC_ARG_WITH([boost-mpi-python-dir],
+    AS_HELP_STRING([--with-boost-mpi-python-dir=DIR], 
+    	           [specify where which boost.mpi python module can be found])
+    ,, [withval="no"]
+)
+AS_IF([test "x$withval" = "xno" || test "x$withval" = "xyes"], 
+      [BOOST_MPI_PYTHON_DIR=""],
+      [BOOST_MPI_PYTHON_DIR="$withval"])
+AC_SUBST(BOOST_MPI_PYTHON_DIR)
 
 ###################################################################
 #                                                                 #
@@ -163,10 +187,8 @@ pythondir=${libdir}/${PACKAGE_TARNAME}/espresso
 AC_SUBST(pythondir)
 # required by src/Makefile.am
 AC_SUBST([abs_top_builddir])
-AM_CPPFLAGS="-I\$(top_srcdir)/src -I\$(top_srcdir)/src/include $BOOST_CPPFLAGS"
-AM_LDFLAGS="$BOOST_LDFLAGS"
+AM_CPPFLAGS="-I\$(top_srcdir)/src -I\$(top_srcdir)/src/include -I\$(top_srcdir)/contrib/boost-am/"
 AC_SUBST([AM_CPPFLAGS])
-AC_SUBST([AM_LDFLAGS])
 
 ################################################################### 
 #                                                                 #
@@ -177,6 +199,8 @@ AC_SUBST([AM_LDFLAGS])
 AC_CONFIG_HEADERS([src/acconfig.hpp])
 
 AC_CONFIG_FILES([Makefile 
+                 contrib/Makefile
+                 contrib/boost-am/Makefile
                  src/Makefile 
 		 src/include/Makefile
                  src/esutil/Makefile
@@ -237,17 +261,16 @@ AC_OUTPUT
 
 test "x$EXTRA_PREFIXES" != "x" || EXTRA_PREFIXES="(none)"
 test "x$MPI_LIBS" != "x" || MPI_LIBS="(none required)"
-test "x$BOOST_ROOT" != "x" || BOOST_ROOT="(empty)"
-test "x$BOOST_CPPFLAGS" != "x" || BOOST_CPPFLAGS="(default include path)"
-test "x$BOOST_LDFLAGS" != "x" || BOOST_LDFLAGS="(none)"
-test "x$BOOST_UNIT_TEST_FRAMEWORK_LIBS" != "x" || BOOST_UNIT_TEST_FRAMEWORK_LIBS="(not available)"
-test "x$BOOST_MPI_PYTHON_DIR" != "x" || BOOST_MPI_PYTHON_DIR="(not set)"
+test "x$boost_serialization_ext" != "x" || BOOST_PYTHON_LIBS="(internal)"
+test "x$boost_python_ext" != "x" || BOOST_PYTHON_LIBS="(internal)"
+test "x$boost_mpi_ext" != "x" || BOOST_MPI_LIBS="(internal)"
+test "x$boost_unittest_ext" != "x" ||  BOOST_UNITTEST_LIBS="(internal)"
+test "x$BOOST_MPI_PYTHON_DIR" != "x" || BOOST_MPI_PYTHON_DIR="(internal)"
 test "x$DOXYGEN" != "xno" || DOXYGEN="(not available)"
 AS_IF([test "x$MYMPIEXEC" = "x"],
         [MYMPIEXEC="disabled by user, no parallel tests will be run"],
         [MYMPIEXEC="will try to use $MYMPIEXEC"])
 test "x$AM_CPPFLAGS" != "x" || AM_CPPFLAGS="(empty)"
-test "x$AM_LDFLAGS" != "x" || AM_LDFLAGS="(empty)"
 
 cat >config.summary << EOF
 
@@ -266,7 +289,6 @@ cat >config.summary << EOF
    - LDFLAGS=$LDFLAGS
  * Compilation flags determined by configure:
    - AM_CPPFLAGS=$AM_CPPFLAGS
-   - AM_LDFLAGS=$AM_LDFLAGS
 
 *****************
 ** LIBRARIES   **
@@ -277,13 +299,11 @@ cat >config.summary << EOF
  * MPI:
    - Libraries: MPI_LIBS=$MPI_LIBS
  * Boost:
-   - BOOST_ROOT=$BOOST_ROOT
-   - Headers: $BOOST_CPPFLAGS
-   - Library suffix: ${axes_cv_boost_lib_suffix#-}
-   - Linker flags: $BOOST_LDFLAGS
+   - boost.Serialization libraries: $BOOST_PYTHON_LIBS
    - boost.Python libraries: $BOOST_PYTHON_LIBS
    - boost.MPI libraries: $BOOST_MPI_LIBS
-   - boost.Test libraries: $BOOST_UNIT_TEST_FRAMEWORK_LIBS
+   - boost.Test libraries: $BOOST_UNITTEST_LIBS
+   - boost.MPI python dir: $BOOST_MPI_PYTHON_DIR
  * Log4ESPP: $LOG4ESPP_USE
    - Libraries: $LOG4ESPP_LIBS
 

@@ -8,16 +8,10 @@
 # . @abs_top_builddir@/espresso_setup.sh
 #
 
-# If the pythonpath is not set in the environment, use the boost mpi
-# python dir specified to configure
-BOOST_MPI_PYTHON_DIR=@BOOST_ROOT@/lib
-if test "x$PYTHONPATH" = "x" && 
-   test "x$BOOST_MPI_PYTHON_DIR" != "x"; then
-   PYTHONPATH=$BOOST_MPI_PYTHON_DIR
-fi
-
 # Add the ES++ specific path
-ESPP_PYTHONPATH=@abs_top_builddir@:@abs_top_builddir@/espresso/.libs
+ESPP_PYTHONPATH=@abs_top_builddir@:\
+@abs_top_builddir@/espresso/.libs:\
+@BOOST_MPI_PYTHON_DIR@
 if test "x$PYTHONPATH" = "x"; then
     PYTHONPATH=$ESPP_PYTHONPATH
 else
