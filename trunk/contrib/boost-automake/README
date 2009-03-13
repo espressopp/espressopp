@@ -1,0 +1,8 @@
+BOOTSTRAPPING
+=============
+
+just run bootstrap.sh in a freshly depacked boost directory.
+After that, there should be a ./configure, and the rest is as usual :-).
+
+Currently, this is tested for boost-1.36; with newer versions, check
+whether you might need to add some more files to the Makefiles.

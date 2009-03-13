@@ -1,0 +1,29 @@
+if HAVE_PYTHON_MPI
+
+noinst_LTLIBRARIES += libboost_mpi_python.la
+libboost_mpi_python_la_CPPFLAGS=$(PYTHON_CPPFLAGS) $(MPI_LIBS)
+libboost_mpi_python_la_LIBS=$(PYTHON_LIBS) libboost_mpi.la libboost_python.la
+libboost_mpi_python_la_LDFLAGS = -no-undefined
+libboost_mpi_python_la_SOURCES = \
+        libs/mpi/src/python/collectives.cpp \
+        libs/mpi/src/python/datatypes.cpp \
+        libs/mpi/src/python/documentation.cpp \
+        libs/mpi/src/python/module.cpp \
+        libs/mpi/src/python/py_communicator.cpp \
+        libs/mpi/src/python/py_environment.cpp \
+        libs/mpi/src/python/py_exception.cpp \
+        libs/mpi/src/python/py_nonblocking.cpp \
+        libs/mpi/src/python/py_request.cpp \
+        libs/mpi/src/python/py_timer.cpp \
+        libs/mpi/src/python/request_with_value.hpp \
+        libs/mpi/src/python/serialize.cpp \
+        libs/mpi/src/python/skeleton_and_content.cpp \
+        libs/mpi/src/python/status.cpp \
+        libs/mpi/src/python/utility.hpp
+
+python_LTLIBRARIES += mpi.la
+mpi_la_LIBADD=libboost_mpi_python.la libboost_mpi.la libboost_python.la libboost_serialization.la
+mpi_la_LDFLAGS= -module -no-undefined
+mpi_la_SOURCES=
+
+endif

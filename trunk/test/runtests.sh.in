@@ -1,0 +1,140 @@
+#!/bin/sh
+
+# parameter defaults
+#############################
+
+# numbers of processors to test, or nompi
+HAVE_MPI=@HAVE_MPI@
+
+# FIXME: without MPI, this should be "nompi"
+if test "$HAVE_MPI"; then
+    PROCESSORS="1,2,3,4,6,8"
+else
+    PROCESSORS="nompi"
+fi
+# maximal number to test
+# FIXME: this should come from configure
+MAXPROCS=8
+# tags/tests to look for
+TAGS="*"
+# ... and ignore
+if test x$HAVE_MPI = "xyes"; then
+    NOTAGS=
+else
+    NOTAGS=mpi
+fi
+# the file with the tests as a list
+TESTS=tests.cfg
+# only take tests from this directory, otherwise all
+FROMDIR=
+
+# parse arguments
+#############################
+
+while test "$#" -gt 0; do
+    arg="$1"; shift
+    case "$arg" in
+        -fromdir) FROMDIR="$1"; shift ;;
+        -nompi) PROCESSORS="nompi"; ;;
+        -n) PROCESSORS="$1"; MAXPROCS=""; shift ;;
+        -m) MAXPROCS="$1"; shift ;;
+        -tags) TAGS="$1"; shift ;;
+        -notags) NOTAGS="$1"; shift ;;
+        -tests) TESTS="$1"; shift ;;
+        *) echo "usage: $0 {-n <number of processors list>|-m <max number of processors>|-nompi} -[no]tags <taglist> -tests <test list>" 1>&2
+        exit 255
+    esac
+done
+
+if test ! -f "$TESTS"; then
+    echo "$TESTS is not a file, expected the list of tests" 1>&2
+    exit 255
+fi
+
+# reprocess arguments
+#############################
+
+MPIEXEC=@top_builddir@/bin/espp_mpiexec.sh
+
+# ,-lists to space-separated lists
+TAGS=`echo "$TAGS" |sed -e 's/,/ /g'`
+NOTAGS=`echo "$NOTAGS" |sed -e 's/,/ /g'`
+
+# here also throw out processor number above the maximum
+if test "$PROCESSORS" != "nompi"; then
+    tmp=
+    for p in `echo "$PROCESSORS" |sed -e 's/,/ /g'`; do
+	if test -n "$MAXPROCS"; then
+	    if test $p -gt "$MAXPROCS"; then
+		continue
+	    fi
+	fi
+	tmp="$tmp $p"
+    done
+    PROCESSORS="$tmp"
+fi
+
+# compile test list loop
+#############################
+# rationale: this loop fails when openmpi commands are used inside,
+# since the channels are messed up
+# TODO: Parse tag list correctly. The current way does not allow a
+#       tag to be a substring of another tag
+# TODO: Fix FROMDIR handling. It should not be required to explicitly
+#       add the runtests.sh-flags in each Makefile.am.
+TESTSET=`
+cat "$TESTS" | while read test flags; do
+    # filter out comments and empty lines
+    case "$test" in
+        \#*) continue ;;
+        "")  continue
+    esac
+
+    # check fromdir
+    if test -n "$FROMDIR"; then
+        if test "${test#$FROMDIR}" == "$test"; then
+		continue
+	fi
+    fi
+
+    # CHECK TAGS
+    # inclusion
+    if test "$TAGS" != "*"; then
+        dotest=n
+        for tag in $TAGS; do
+            case "$flags" in
+                *$tag*) dotest=y ;;
+            esac
+        done
+    else
+        dotest=y
+    fi
+    # exclusion
+    for tag in $NOTAGS; do
+        case "$flags" in
+            *$tag*) dotest=n ;;
+        esac
+    done
+
+    if test $dotest = y; then
+	echo "$test"
+    fi
+done`
+
+# main loop running tests
+#########################
+
+for test in $TESTSET; do	
+    # FIXME: report results
+    if test "$PROCESSORS" != "nompi"; then
+        for p in $PROCESSORS; do
+            echo "running test $test on $p processors"
+            $MPIEXEC -n $p $test || echo "failed"
+        done
+    else
+        echo "running test $test without MPI"
+        $test || echo "failed"
+    fi
+done
+
+# TODO: Generate summary
