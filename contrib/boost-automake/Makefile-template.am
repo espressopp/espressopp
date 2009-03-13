@@ -1,0 +1,3 @@
+noinst_LTLIBRARIES = libboost_.la
+libboost__la_LDFLAGS = -no-undefined
+libboost__la_SOURCES = \

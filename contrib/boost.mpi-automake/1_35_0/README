@@ -1,6 +1,0 @@
-To build your boost.mpi-standalone library, just run ./configure.
-
-If there is no directory boost here or ./configure is missing,
-you need to run the bootstrap.sh to extract the necessary
-files from boost. The script must be run in its directory, and
-takes the path to the boost sources as only parameter.
