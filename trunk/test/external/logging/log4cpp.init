@@ -1,9 +1,0 @@
-# a simple test config
-#
-appender root pattern console %d : %m %n
-priority root DEBUG
-priority kernel.BasicProperty INFO
-priority kernel.ParticleContainer INFO
-#appender kernel.ParticleContainer basic file integrator.log
-#appender sub1 basic syslog log4cpptest
-#appender kernel.BasicProperty pattern console The message %m at time %d%n
