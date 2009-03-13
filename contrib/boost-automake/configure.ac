@@ -2,7 +2,7 @@ AC_INIT(boost_mpi, 1_35_0)
 AC_CONFIG_MACRO_DIR(@macrodir@)
 AC_CONFIG_AUX_DIR(build-aux)
 
-AM_INIT_AUTOMAKE([gnu])
+AM_INIT_AUTOMAKE([gnu subdir-objects])
 AC_LANG([C++])
 
 AXES_IMPORT_EXTRA_PREFIXES
