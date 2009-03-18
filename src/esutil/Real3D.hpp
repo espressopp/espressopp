@@ -6,8 +6,11 @@
 
 namespace espresso {
   namespace esutil {
+
     /// make Real3D globally accessible for convenience
     typedef Vector3D<real> Real3D;
+
+    void registerPythonReal3D();
   }
 }
 

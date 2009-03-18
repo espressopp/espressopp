@@ -18,5 +18,6 @@ noinst_LTLIBRARIES = libesutil.la
 
 libesutil_la_SOURCES = \
         bindings.cpp \
+	Real3D.cpp \
 	TupleVector.cpp \
 	Timer.cpp 
