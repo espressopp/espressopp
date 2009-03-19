@@ -167,7 +167,9 @@ if test "x$axes_cv_boost" != "xno" && test "x$want_boost" != "xno" ; then
         else
             axes_boost_try_suffixes=""
             for axes_boost_path_tmp in $axes_boost_try_libpaths; do
+	    	echo "Looking for lib in $axes_boost_path_tmp..."
                 for axes_boost_lib_tmp in $axes_boost_path_tmp/*boost_$1*; do
+		    echo "Found $axes_boost_lib_tmp..."
                     if test ! -f $axes_boost_lib_tmp; then continue; fi
                     axes_boost_suffix_tmp=`echo $axes_boost_lib_tmp | \
                         sed 's,^.*boost_$1,,' | sed 's,[[.]].*$,,'`

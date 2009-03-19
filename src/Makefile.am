@@ -26,20 +26,35 @@ libespresso_common_la_LIBADD = \
 	interaction/libinteraction.la \
 	bc/libbc.la \
 	integrator/libintegrator.la \
+	$(PYTHON_LIBS) \
+	$(MPI_LIBS) \
+	$(BOOST_SERIALIZATION_LIBS) \
 	$(BOOST_MPI_LIBS) \
 	$(BOOST_PYTHON_LIBS) \
+	$(BOOST_MPI_PYTHON_LIBS) \
 	$(LOG4ESPP_LIBS)
 
-# Rules to build the python module _espresso
+# The python module _espresso
+# Build only if shared libs are built
+if ENABLE_SHARED
 python_LTLIBRARIES = _espresso.la
 _espresso_la_SOURCES = _espresso.cpp
-_espresso_la_LDFLAGS = -module -avoid-version -no-undefined
+_espresso_la_LDFLAGS = -shared -module -avoid-version -no-undefined
 _espresso_la_LIBADD = libespresso_common.la
+endif # ENABLE_SHARED
 
 # the embedded python interpreter with static espresso library
 bin_PROGRAMS = pypresso 
 pypresso_SOURCES = pypresso.cpp
-pypresso_LDADD = libespresso_common.la
+pypresso_LDADD = libespresso_common.la \
+	$(PYTHON_LIBS) \
+	$(MPI_LIBS) \
+	$(BOOST_SERIALIZATION_LIBS) \
+	$(BOOST_MPI_LIBS) \
+	$(BOOST_PYTHON_LIBS) \
+	$(BOOST_MPI_PYTHON_LIBS) \
+	$(LOG4ESPP_LIBS)
+
 
 ##############################
 ## PYTHON

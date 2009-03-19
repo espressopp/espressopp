@@ -1,3 +1,5 @@
+DIST_SUBDIRS=unittest
+
 subpkgincludedir=$(pkgincludedir)/pairs
 
 subpkginclude_HEADERS = \

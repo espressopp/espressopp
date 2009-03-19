@@ -1,0 +1,5 @@
+if EXTERNAL_BOOST
+else
+  MAYBE_BOOST = boost-am
+endif
+SUBDIRS=$(MAYBE_BOOST)

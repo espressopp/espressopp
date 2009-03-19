@@ -1,7 +1,10 @@
+DIST_SUBDIRS=unittest
+
 subpkgincludedir=$(pkgincludedir)/particles
 
 subpkginclude_HEADERS = \
 	bindings.hpp \
+	Computer.hpp \
 	Particle.hpp \
 	Property.hpp \
 	Storage.hpp \

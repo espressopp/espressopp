@@ -1,4 +1,4 @@
-SUBDIRS=unittest
+DIST_SUBDIRS=unittest
 
 subpkgincludedir=$(pkgincludedir)/esutil
 

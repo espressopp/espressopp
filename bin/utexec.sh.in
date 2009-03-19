@@ -20,16 +20,18 @@ top_srcdir="@abs_top_srcdir@"
 top_builddir="@abs_top_builddir@"
 
 test -z "$LIBTOOL" && LIBTOOL="$SHELL $top_builddir/libtool"
+test -z "$CPPFLAGS" && CPPFLAGS="@CPPFLAGS@"
+test -z "$LDFLAGS" && LDFLAGS="@LDFLAGS@"
 test -z "$CXX" && CXX="@CXX@"
 test -z "$CXXLD" && CXXLD=$CXX
 test -z "$CXXFLAGS" && CXXFLAGS="@CXXFLAGS@"
-BOOST_CPPFLAGS="@BOOST_CPPFLAGS@"
-BOOST_LDFLAGS="@BOOST_LDFLAGS@"
-BOOST_UNIT_TEST_FRAMEWORK_LIBS="@BOOST_UNIT_TEST_FRAMEWORK_LIBS@"
+UTEXEC_CPPFLAGS="@UTEXEC_CPPFLAGS@"
+UTEXEC_LDFLAGS="@UTEXEC_LDFLAGS@"
+BOOST_UNITTEST_LIBS="@BOOST_UNITTEST_LIBS@"
 
-CPPFLAGS="$CPPFLAGS -I$top_builddir/src -I$top_srcdir/src -I$top_srcdir/src/include $BOOST_CPPFLAGS"
-LDFLAGS="$LDFLAGS $BOOST_LDFLAGS"
-LIBS="$top_builddir/src/libespresso_common.la $BOOST_UNIT_TEST_FRAMEWORK_LIBS"
+CPPFLAGS="$CPPFLAGS -I$top_builddir/src -I$top_srcdir/src -I$top_srcdir/src/include $UTEXEC_CPPFLAGS"
+LDFLAGS="$LDFLAGS $UTEXEC_LDFLAGS"
+LIBS="$top_builddir/src/libespresso_common.la $BOOST_UNITTEST_LIBS"
 
 LTCALL="$LIBTOOL --tag=CXX $LIBTOOLFLAGS"
 
