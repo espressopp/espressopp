@@ -1,5 +1,5 @@
 import unittest
-from espresso.esutil import *
+from espresso.base import *
 
 class Real3DTest(unittest.TestCase) :
     def testCreateZero(self) :
@@ -49,9 +49,30 @@ class Real3DTest(unittest.TestCase) :
         self.assertEqual(list(v), [1.0, 2.0, 3.0])
         self.assertEqual(str(v), '(1.0, 2.0, 3.0)')
 
-    def testAddition(self) :
+    def testNumerics(self) :
         v = Real3D(1.0, 2.0, 3.0)
-        self.assertEqual((2.0, 4.0, 6.0), tuple(v + v))
+        r = v * 2.0
+        self.assertEqual(type(r), Real3D)
+        self.assertEqual(tuple(r), (2.0, 4.0, 6.0))
+#        self.assertEqual(r, Real3D(2.0, 4.0, 6.0))
+
+        r = 2.0 * v
+        self.assertEqual(type(r), Real3D)
+        self.assertEqual(tuple(r), (2.0, 4.0, 6.0))
+#        self.assertEqual(r, Real3D(2.0, 4.0, 6.0))
+
+        r = v*v
+        self.assertEqual(r, 14.0)
+
+        r = v.sqr()
+        self.assertEqual(r, 14.0)
+
+        r = v.cross(v)
+        self.assertEqual(tuple(r), (0.0, 0.0, 0.0))
+
+        v2 = Real3D(3.0, 2.0, 1.0)
+        r = v.cross(v2)
+        self.assertEqual(tuple(r), (-4.0, 8.0, -4.0))
 
 if __name__ == "__main__":
     unittest.main()

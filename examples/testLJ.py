@@ -3,7 +3,7 @@
 # ToDo JH: make a Python unit test of it
 
 from espresso.interaction import LennardJones
-from espresso.esutil import Real3D
+from espresso.base import Real3D
 
 # use constructor with default values
 

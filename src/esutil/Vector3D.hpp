@@ -25,7 +25,7 @@ namespace espresso {
 
       Vector3D cross(const Vector3D& y) const
       {
-	T* data = SmallVector<T, 3>::data;
+	const T* data = DerivableSmallVector< T, 3, Vector3D<T> >::data;
 	return Vector3D(data[1]*y.data[2] - data[2]*y.data[1],
 			data[2]*y.data[0] - data[0]*y.data[2],
 			data[0]*y.data[1] - data[1]*y.data[0]);

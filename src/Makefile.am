@@ -62,6 +62,7 @@ pypresso_LDADD = libespresso_common.la \
 
 python_scripts=\
 	__init__.py \
+	base.py \
 	esmpi.py \
 	pmi.py \
 	esutil.py \

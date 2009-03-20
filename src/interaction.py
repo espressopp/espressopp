@@ -1,12 +1,8 @@
 from espresso import pmi
 from espresso import esutil
+from esutil import choose
 
-def choose(val, altval) :
-    if (val is None) :
-        return altval
-    else :
-        return val
-
+__setdocs = 'Set the parameters of the interaction. Prefer using this to setting the properties directly.'
 
 # wrap LennardJones
 pmi.exec_('from _espresso import interaction_LennardJones')
@@ -19,49 +15,49 @@ class LennardJones (object):
         The parameters are identical to set."""
         object.__init__(self)
         # create the pmi object
-        self.__worker = pmi.create('interaction_LennardJones')
+        self.worker = pmi.create('interaction_LennardJones')
         # set the defaults
         self.set(epsilon, sigma, cutoff)
 
     # define setter
     def set(self, epsilon=None, sigma=None, cutoff=None) :
-        'Set the parameters of the interaction.'
-        pmi.invoke(self.__worker.set,
+        """set(integer, integer, integer) -- Set the "parameters" of the interaction.
+        """
+        pmi.invoke(self.worker.set,
                    choose(epsilon, self.epsilon),
                    choose(sigma, self.sigma),
                    choose(cutoff, self.cutoff)
                    )
 
+
     # define single property setters
     # avoid using these if possible
-    def setEpsilon(self, _epsilon) :
+    def __setEpsilon(self, _epsilon) :
         self.set(epsilon=_epsilon)
-    def setSigma(self, _sigma) : 
+    def __setSigma(self, _sigma) : 
         self.set(sigma=_sigma)
-    def setCutoff(self, _cutoff) : 
+    def __setCutoff(self, _cutoff) : 
         self.set(cutoff=_cutoff)
 
-    def getEpsilon(self) :
-        return self.__worker.getEpsilon()
-    def getSigma(self) :
-        return self.__worker.getSigma()
-    def getCutoff(self) :
-        return self.__worker.getCutoff()
+    def __getEpsilon(self) :
+        return self.worker.getEpsilon()
+    def __getSigma(self) :
+        return self.worker.getSigma()
+    def __getCutoff(self) :
+        return self.worker.getCutoff()
 
     # define properties
-    epsilon = property(getEpsilon, setEpsilon)
-    sigma = property(getSigma, setSigma)
-    cutoff = property(getCutoff, setCutoff)
+    epsilon = property(__getEpsilon, __setEpsilon)
+    sigma = property(__getSigma, __setSigma)
+    cutoff = property(__getCutoff, __setCutoff)
 
     def computeEnergy(self, r) :
         'Compute and return the energy at the radius r.'
-        return self.__worker.computeEnergy(r)
+        return self.worker.computeEnergy(r)
 
     def computeForce(self, r) :
         'Compute and return the force at the radius r.'
-        f = self.__worker.computeForce(r)
-        # TODO: Is this the right way to do it???
-        f.__class__=espresso.esutil.Real3D
+        f = self.worker.computeForce(r)
         return f
 
 # wrap FENE
@@ -74,13 +70,13 @@ class FENE(object) :
 
         The parameters are identical to set."""
         object.__init__(self)
-        self.__worker = pmi.create('interaction_FENE')
+        self.worker = pmi.create('interaction_FENE')
         self.set(K, r0, rMax)
 
     # define setter
     def set(self, K=None, r0=None, rMax=None) :
         'Set the parameters of the interaction.'
-        pmi.invoke(self.__worker.set,
+        pmi.invoke(self.worker.set,
                    choose(K, self.K),
                    choose(r0, self.r0),
                    choose(rMax, self.rMax)
@@ -96,11 +92,11 @@ class FENE(object) :
         self.set(rMax=_rMax)
 
     def __getK(self) :
-        return self.__worker.getK()
+        return self.worker.getK()
     def __getR0(self) :
-        return self.__worker.getR0()
+        return self.worker.getR0()
     def __getRMax(self) :
-        return self.__worker.getRMax()
+        return self.worker.getRMax()
 
     # define properties
     K = property(__getK, __setK)
@@ -109,11 +105,11 @@ class FENE(object) :
 
     def computeEnergy(self, r) :
         'Compute and return the energy at the radius r.'
-        return self.__worker.computeEnergy(r)
+        return self.worker.computeEnergy(r)
     
     def computeForce(self, r) :
         'Compute and return the force at the radius r.'
-        f = self.__worker.computeForce(r)
+        f = self.worker.computeForce(r)
         # TODO: Is this the right way to do it???
         f.__class__=espresso.esutil.Real3D
         return f

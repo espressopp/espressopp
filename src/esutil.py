@@ -1,4 +1,30 @@
+"""
+This module defines helper functions for python.
+
+It contains some **black magic**. Use this class as a meta class for an object,
+and the base class of the object will be extended by the functions
+of this class.
+
+Example:
+
+>>>class Test :
+>>>  def test(): return 'Test'
+
+>>>class TestExtender(Test) :
+>>>  __metaclass__ = ExtendBaseClass
+>>>  def test_extend(): return 'Test extension'
+
+>>>t = Test()
+>>>assert t.test() == 'Test'
+>>>assert t.test_extend() == 'Test extension'
+
+Stolen and modified from
+http://code.activestate.com/recipes/412717/ and
+http://www.boost.org/doc/libs/1_35_0/libs/python/doc/tutorial/doc/html/python/techniques.html#python.extending_wrapped_objects_in_python
+"""
+
 import sys
+
 def propget(func):
     'Decorator to easily define property getters.'
     locals = sys._getframe(1).f_locals
@@ -34,50 +60,18 @@ def propdel(func):
         prop = property(prop.fget, prop.fset, func, prop.__doc__)
     return prop
 
-from _espresso import esutil_Real3D 
-class Real3D (object) :
-    # TODO: make flexible: allow to be initialized from any sequence
-    def __init__(self, x=0.0, y=0.0, z=0.0) :
-        object.__init__(self)
-        self.__cc = esutil_Real3D(x, y, z)
+class ExtendBaseClass(type):
+    def __new__(self, name, bases, dict):
+        del dict['__metaclass__']
 
-    # wrap setitem and getitem
-    def __getitem__(self, i) :
-        return self.__cc[i]
-    def __setitem__(self, i, v) :
-        self.__cc[i] = v
+        theClass = bases[0]
+        # loop over all items in the class and replace it
+        for k,v in dict.iteritems():
+            setattr(theClass, k, v)
+        return theClass
 
-    # create setters and getters
-    @propget
-    def x(self) :
-        return self.__cc[0]
-
-    @propset
-    def x(self, v) :
-        self.__cc[0] = v
-
-    @propget
-    def y(self) :
-        return self.__cc[1]
-
-    @propset
-    def y(self, v) :
-        self.__cc[1] = v
-
-    @propget
-    def z(self) :
-        return self.__cc[2]
-
-    @propset
-    def z(self, v) :
-        self.__cc[2] = v
-
-    # string conversion
-    def __str__(self) :
-        return str(tuple(self))
-
-    def __add__(self, o) :
-        return self.__cc + o.__cc
-
-    def __mul__(self, o) :
-        return self.__cc * o.__cc
+def choose(val, altval) :
+    if (val is None) :
+        return altval
+    else :
+        return val

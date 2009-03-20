@@ -17,6 +17,7 @@ espresso::esutil::registerPythonReal3D() {
     .def(self - self)
     .def(self += self)
     .def(self -= self)
+    .def("cross", &Real3D::cross)
     .def("sqr", &Real3D::sqr)
     ;
   // ToDo: __eq__, __ne__ ?
