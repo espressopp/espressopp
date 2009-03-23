@@ -35,6 +35,8 @@ namespace espresso {
     public:
       static void registerPython();
 
+      VelocityVerlet(real _timeStep);
+
       VelocityVerlet(particles::Set* _particles, 
                      particles::PropertyId _position,
                      particles::PropertyId _velocity,

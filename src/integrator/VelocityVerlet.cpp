@@ -31,6 +31,7 @@ namespace espresso {
       // m = 1
       virtual void operator()(ParticleReference pref) {
 	pos[pref] = pos[pref] + vel[pref] * timeStep + 0.5 * force[pref] * timeStepSqr;
+        vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
        
 	force[pref] = 0.0;
       }
@@ -60,6 +61,9 @@ namespace espresso {
       }
 
     };
+
+    VelocityVerlet::VelocityVerlet(real _timeStep) {
+    setTimeStep(_timeStep);}
 
     VelocityVerlet::VelocityVerlet(Set* _particles, 
 				   PropertyId _position,
@@ -130,8 +134,10 @@ void
 VelocityVerlet::registerPython() {
   using namespace boost::python;
 
-  class_<VelocityVerlet>("integrator_VelocityVerlet", init<Set*, PropertyId, PropertyId, PropertyId>())
+  //class_<VelocityVerlet>("integrator_VelocityVerlet", init<Set*, PropertyId, PropertyId, PropertyId>())
+  class_<VelocityVerlet>("integrator_VelocityVerlet", init<real>())
     .def("run", &VelocityVerlet::run)
+    .def("setTimeStep", &VelocityVerlet::setTimeStep)
     ;
 }
 
