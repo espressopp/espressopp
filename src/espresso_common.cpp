@@ -6,12 +6,14 @@
 #include <interaction/bindings.hpp>
 #include <esutil/bindings.hpp>
 #include <particles/bindings.hpp>
+#include <integrator/bindings.hpp>
 
 void registerPython() {
   espresso::hello::registerPython();
   espresso::interaction::registerPython();
   espresso::esutil::registerPython();
   espresso::particles::registerPython();
+  espresso::integrator::registerPython();
 }
 
 /** the one and only instance of the MPI environment */

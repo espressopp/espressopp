@@ -1,6 +1,7 @@
 #include "VelocityVerlet.hpp"
 
 #include <boost/foreach.hpp>
+#include <python.hpp>
 #include "particles/Computer.hpp"
 #include "pairs/ForceComputer.hpp"
 
@@ -118,5 +119,20 @@ namespace espresso {
     }
 
     VelocityVerlet::~VelocityVerlet() {}
-  }
+//  }
+//}
+
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+
+void
+VelocityVerlet::registerPython() {
+  using namespace boost::python;
+
+  class_<VelocityVerlet>("integrator_VelocityVerlet", init<Set*, PropertyId, PropertyId, PropertyId>())
+    .def("run", &VelocityVerlet::run)
+    ;
 }
+
+}}

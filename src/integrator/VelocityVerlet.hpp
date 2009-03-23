@@ -33,6 +33,7 @@ namespace espresso {
       std::vector<ForceEvaluation> forceEvaluations;
 
     public:
+      static void registerPython();
 
       VelocityVerlet(particles::Set* _particles, 
                      particles::PropertyId _position,
