@@ -2,7 +2,7 @@
 #include "Real3D.hpp"
 
 namespace espresso {
-  namespace esutil {
+  namespace base {
     void registerPython() {
       registerPythonReal3D();
     }

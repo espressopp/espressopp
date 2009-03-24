@@ -74,5 +74,6 @@ class Real3DTest(unittest.TestCase) :
         r = v.cross(v2)
         self.assertEqual(tuple(r), (-4.0, 8.0, -4.0))
 
+
 if __name__ == "__main__":
     unittest.main()

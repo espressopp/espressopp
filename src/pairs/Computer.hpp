@@ -14,7 +14,7 @@ namespace espresso {
     public:
       /// @name extended function object interface
       //@{
-      typedef esutil::Real3D first_argument_type;
+      typedef base::Real3D first_argument_type;
       typedef ParticleReference second_argument_type;
       typedef ParticleReference  third_argument_type;
       typedef void                       result_type;
@@ -27,7 +27,7 @@ namespace espresso {
 	  Note: The references are necessary if more property data of the particles is
 	  needed than only the distance.
       */
-      virtual void operator()(const esutil::Real3D &dist, 
+      virtual void operator()(const base::Real3D &dist, 
 			      const ParticleReference p1, 
 			      const ParticleReference p2) = 0;
     };

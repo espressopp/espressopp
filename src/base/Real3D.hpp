@@ -1,14 +1,14 @@
-#ifndef _ESUTIL_REAL3D_HPP
-#define _ESUTIL_REAL3D_HPP
+#ifndef _BASE_REAL3D_HPP
+#define _BASE_REAL3D_HPP
 
 #include "estypes.hpp"
-#include "Vector3D.hpp"
+#include "esutil/Vector3D.hpp"
 
 namespace espresso {
-  namespace esutil {
+  namespace base {
 
     /// make Real3D globally accessible for convenience
-    typedef Vector3D<real> Real3D;
+    typedef esutil::Vector3D<real> Real3D;
 
     void registerPythonReal3D();
   }

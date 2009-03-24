@@ -6,7 +6,7 @@
 namespace espresso {
 
   namespace integrator {
-    typedef esutil::real real;
+    typedef base::real real;
 
     class MDIntegrator {
 

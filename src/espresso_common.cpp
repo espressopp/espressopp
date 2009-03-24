@@ -3,15 +3,15 @@
 #include <mpi.hpp>
 
 #include <hello/bindings.hpp>
-#include <interaction/bindings.hpp>
-#include <esutil/bindings.hpp>
+#include <base/bindings.hpp>
 #include <particles/bindings.hpp>
+#include <interaction/bindings.hpp>
 #include <integrator/bindings.hpp>
 
 void registerPython() {
   espresso::hello::registerPython();
+  espresso::base::registerPython();
   espresso::interaction::registerPython();
-  espresso::esutil::registerPython();
   espresso::particles::registerPython();
   espresso::integrator::registerPython();
 }

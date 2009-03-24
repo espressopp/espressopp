@@ -3,7 +3,7 @@
 #include <types.hpp>
 #include <algorithm>
 
-using namespace espresso::esutil;
+using namespace espresso::base;
 using namespace espresso::pairs;
 using namespace espresso::particles;
 using namespace std;

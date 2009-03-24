@@ -8,7 +8,7 @@
 
 namespace espresso {
   namespace particles {
-    typedef esutil::real real;
+    typedef base::real real;
 
     // forward declaration of Computer and ConstComputer
     class Computer;

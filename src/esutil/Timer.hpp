@@ -8,8 +8,6 @@
 #include <boost/mpi/timer.hpp>
 #endif
 
-#include "estypes.hpp"
-
 namespace espresso {
   namespace esutil {
     /** simple timer for obtaining typically microsecond precision
@@ -19,14 +17,14 @@ namespace espresso {
     */
     class Timer {
     protected:
-      real currentTime;
-      virtual real getCurrentTime() const = 0;
+      float currentTime;
+      virtual float getCurrentTime() const = 0;
     public:
       virtual ~Timer() {}
       /// reset the starting time
       void reset() { currentTime = getCurrentTime(); }
       /// get the time that elapsed since the last reset
-      real getElapsedTime() const { return getCurrentTime() - currentTime; }
+      float getElapsedTime() const { return getCurrentTime() - currentTime; }
     };
 
     /// when printing give the current elapsed time
@@ -37,7 +35,7 @@ namespace espresso {
 
     /// timer measuring the user time.
     class UserTimer: public Timer {
-      virtual real getCurrentTime() const;
+      virtual float getCurrentTime() const;
     public:
       UserTimer() { reset(); }
     };
@@ -48,14 +46,14 @@ namespace espresso {
     class WallTimer: public Timer {
       boost::mpi::timer timer;
 
-      virtual real getCurrentTime() const;
+      virtual float getCurrentTime() const;
     };
 
 #else
 
     /// timer measuring the wall time.
     class WallTimer: public Timer {
-      virtual real getCurrentTime() const;
+      virtual float getCurrentTime() const;
     public:
       WallTimer() { reset(); }
     };

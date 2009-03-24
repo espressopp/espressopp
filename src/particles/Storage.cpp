@@ -8,7 +8,7 @@
 
 using namespace espresso;
 using namespace espresso::particles;
-using namespace espresso::esutil;
+using namespace espresso::base;
 
 Storage::Storage(): uniqueID(0) {
   particleIDProperty = particles.addProperty<size_t>();

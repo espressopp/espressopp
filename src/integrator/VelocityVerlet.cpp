@@ -6,7 +6,7 @@
 #include "pairs/ForceComputer.hpp"
 
 using namespace espresso;
-using namespace espresso::esutil;
+using namespace espresso::base;
 using namespace espresso::integrator;
 using namespace espresso::particles;
 

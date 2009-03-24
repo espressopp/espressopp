@@ -30,22 +30,22 @@ namespace espresso {
           @param _force is the particle property that stands for the force
           @param _computesPressure whether the total virial is also computed
       */
-      ForceComputer(particles::PropertyReference<esutil::Real3D> _force,
+      ForceComputer(particles::PropertyReference<base::Real3D> _force,
                     bool _computesVirial = false) 
         : force(_force), virial(0.0) {}
       virtual ~ForceComputer() {};
 
-      virtual void operator()(const esutil::Real3D &dist,
+      virtual void operator()(const base::Real3D &dist,
                               const particles::ParticleReference p1,
                               const particles::ParticleReference p2) {};
        
     protected: 
-      particles::PropertyReference<esutil::Real3D> force;
-      esutil::Real3D virial;
+      particles::PropertyReference<base::Real3D> force;
+      base::Real3D virial;
       bool computesVirial;
 
-      void addContribution(const esutil::Real3D &f,
-                           const esutil::Real3D &dist,
+      void addContribution(const base::Real3D &f,
+                           const base::Real3D &dist,
                            const particles::ParticleReference p1,
                            const particles::ParticleReference p2) {
         force[p1] += f;
@@ -61,7 +61,7 @@ namespace espresso {
         potential, and should have the following form:
 
         class InterBasicComputer {
-        esutil::Real3D computeForce(const esutil::Real3D &dist);
+        base::Real3D computeForce(const base::Real3D &dist);
         };
     */
     template <class InterBasicComputer>
@@ -72,7 +72,7 @@ namespace espresso {
         : ForceComputer(_forceComputer), computer(_computer) {}
       virtual ~VectorForceComputerFacade() {};
        
-      virtual void operator()(const esutil::Real3D &dist,
+      virtual void operator()(const base::Real3D &dist,
                               const particles::ParticleReference p1,
                               const particles::ParticleReference p2) {
         addContribution(computer.computeForce(dist), dist, p1, p2);

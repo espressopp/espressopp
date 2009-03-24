@@ -1,12 +1,12 @@
-#ifndef _ESUTIL_ESTYPES_HPP
-#define _ESUTIL_ESTYPES_HPP
+#ifndef _BASE_ESTYPES_HPP
+#define _BASE_ESTYPES_HPP
 
 // general type definition to choose between single and double precsion 
 
 // typedef float real;  // single precision
 
 namespace espresso {
-  namespace esutil {
+  namespace base {
     typedef double real;  // double precision
     
     template<class real>

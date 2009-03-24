@@ -1,6 +1,6 @@
 """This module contains the basic ESPResSo objects.
 """
-from _espresso import esutil_Real3D as Real3D 
+from _espresso import base_Real3D as Real3D 
 import esutil
 
 # This injects additional methods into the Real3D class and pulls it
@@ -36,4 +36,8 @@ class __Real3D(Real3D) :
     # string conversion
     def __str__(self) :
         return str(tuple(self))
+
+    # enable pickling a Real3D
+    def __getinitargs__(self) :
+        return tuple(self)
 

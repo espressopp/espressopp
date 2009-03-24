@@ -2,6 +2,7 @@
 SUBDIRS = \
 	include \
 	esutil \
+	base \
 	hello \
 	particles \
 	pairs \
@@ -20,6 +21,7 @@ libespresso_common_la_SOURCES= \
 	espresso_common.cpp
 libespresso_common_la_LIBADD = \
 	esutil/libesutil.la \
+	base/libbase.la \
 	hello/libhello.la \
 	particles/libparticles.la \
 	pairs/libpairs.la \

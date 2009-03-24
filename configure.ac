@@ -281,6 +281,7 @@ AC_CONFIG_FILES([Makefile
 		 src/include/Makefile
                  src/esutil/Makefile
                  src/esutil/unittest/Makefile
+                 src/base/Makefile
                  src/hello/Makefile
                  src/particles/Makefile
                  src/particles/unittest/Makefile
