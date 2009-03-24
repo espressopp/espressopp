@@ -6,7 +6,6 @@
 #include "pairs/ForceComputer.hpp"
 
 using namespace espresso;
-using namespace espresso::base;
 using namespace espresso::integrator;
 using namespace espresso::particles;
 
@@ -54,7 +53,7 @@ namespace espresso {
 
 	vel(_velRef), force(_forceRef), timeStep(_timeStep) {}
 
-      virtual void operator()(particles::ParticleReference pref) {
+      virtual void operator()(ParticleReference pref) {
 
         vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
 

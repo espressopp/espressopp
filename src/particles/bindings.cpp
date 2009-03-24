@@ -7,7 +7,6 @@
 #include <particles/Computer.hpp>
 
 using namespace boost::python;
-using namespace espresso::base;
 
 namespace espresso {
  namespace particles {

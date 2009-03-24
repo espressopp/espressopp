@@ -6,8 +6,6 @@
 namespace espresso {
 
   namespace integrator {
-    typedef base::real real;
-
     class MDIntegrator {
 
     protected:

@@ -1,6 +1,6 @@
 import unittest
-import mpi
-from espresso.base import *
+import espresso.esmpi as mpi
+from espresso import *
 
 class Real3DTest(unittest.TestCase) :
     def testMPI(self) :

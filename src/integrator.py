@@ -2,8 +2,6 @@ from espresso import pmi
 from espresso import esutil
 from esutil import choose
 
-__setdocs = 'Set the parameters of the integrators.'
-
 # wrap VelocityVerlet
 pmi.exec_('from _espresso import integrator_VelocityVerlet')
 class VelocityVerlet (object):

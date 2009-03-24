@@ -6,6 +6,7 @@
 #include <python.hpp>
 #include <iostream>
 
+using namespace espresso;
 using namespace espresso::bc;
 
 /* ---------------------------------------------------------------------- */

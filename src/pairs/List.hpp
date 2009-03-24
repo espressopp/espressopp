@@ -19,8 +19,8 @@ namespace espresso {
       particles::Storage& storage; 
       bc::BC& bc;
       particles::PropertyId coordinates;
-      typedef std::pair<particles::ParticleId,
-                        particles::ParticleId> Tuple;
+      typedef std::pair<ParticleId,
+                        ParticleId> Tuple;
       std::vector<Tuple> id_list;
 
     public:
@@ -48,7 +48,7 @@ namespace espresso {
  
       */
 
-      bool findPair(particles::ParticleId id1, particles::ParticleId id2);
+      bool findPair(ParticleId id1, ParticleId id2);
 
       /** Adding a particle pair tuple (id1, id2) to the pair list
 
@@ -58,7 +58,7 @@ namespace espresso {
 	  Note: a tuple (id1, id2) can be added several times.
       */
 
-      void addPair(particles::ParticleId id1, particles::ParticleId id2);
+      void addPair(ParticleId id1, ParticleId id2);
 
       /** Deleting a particle pair tuple (id1, id2) from the pair list
 
@@ -68,7 +68,7 @@ namespace espresso {
 	  Particle (id1, i2) must be in the pair list otherwise exception.
       */
 
-      void deletePair(particles::ParticleId id1, particles::ParticleId id2);
+      void deletePair(ParticleId id1, ParticleId id2);
 
       /** Getter routine for the boundary conditions. */
 

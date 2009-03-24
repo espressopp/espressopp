@@ -2,9 +2,7 @@
 #define _ESPRESSO_COMMON_HPP
 
 #include "acconfig.hpp"
-
-/* Register the python extensions. */
-void registerPython();
+#include "bindings.hpp"
 
 /* Initialize MPI. */
 void initMPI();

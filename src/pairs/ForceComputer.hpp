@@ -30,24 +30,24 @@ namespace espresso {
           @param _force is the particle property that stands for the force
           @param _computesPressure whether the total virial is also computed
       */
-      ForceComputer(particles::PropertyReference<base::Real3D> _force,
+      ForceComputer(particles::PropertyReference<Real3D> _force,
                     bool _computesVirial = false) 
         : force(_force), virial(0.0) {}
       virtual ~ForceComputer() {};
 
-      virtual void operator()(const base::Real3D &dist,
-                              const particles::ParticleReference p1,
-                              const particles::ParticleReference p2) {};
+      virtual void operator()(const Real3D &dist,
+                              const ParticleReference p1,
+                              const ParticleReference p2) {};
        
     protected: 
-      particles::PropertyReference<base::Real3D> force;
-      base::Real3D virial;
+      particles::PropertyReference<Real3D> force;
+      Real3D virial;
       bool computesVirial;
 
-      void addContribution(const base::Real3D &f,
-                           const base::Real3D &dist,
-                           const particles::ParticleReference p1,
-                           const particles::ParticleReference p2) {
+      void addContribution(const Real3D &f,
+                           const Real3D &dist,
+                           const ParticleReference p1,
+                           const ParticleReference p2) {
         force[p1] += f;
         force[p2] -= f;
         if (computesVirial) virial = virial + f * dist;
@@ -61,7 +61,7 @@ namespace espresso {
         potential, and should have the following form:
 
         class InterBasicComputer {
-        base::Real3D computeForce(const base::Real3D &dist);
+        Real3D computeForce(const Real3D &dist);
         };
     */
     template <class InterBasicComputer>
@@ -72,9 +72,9 @@ namespace espresso {
         : ForceComputer(_forceComputer), computer(_computer) {}
       virtual ~VectorForceComputerFacade() {};
        
-      virtual void operator()(const base::Real3D &dist,
-                              const particles::ParticleReference p1,
-                              const particles::ParticleReference p2) {
+      virtual void operator()(const Real3D &dist,
+                              const ParticleReference p1,
+                              const ParticleReference p2) {
         addContribution(computer.computeForce(dist), dist, p1, p2);
       }
        

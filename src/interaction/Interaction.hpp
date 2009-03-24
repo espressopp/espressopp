@@ -14,7 +14,7 @@ namespace espresso {
       virtual ~Interaction() {}
       virtual pairs::EnergyComputer *createEnergyComputer(const pairs::EnergyComputer &) const = 0;
       virtual pairs::ForceComputer  *createForceComputer (const pairs::ForceComputer &)  const = 0;
-      virtual base::real getCutoffSqr() const = 0;
+      virtual real getCutoffSqr() const = 0;
     };
   }
 }

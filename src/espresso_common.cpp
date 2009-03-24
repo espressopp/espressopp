@@ -2,19 +2,6 @@
 
 #include <mpi.hpp>
 
-#include <hello/bindings.hpp>
-#include <base/bindings.hpp>
-#include <particles/bindings.hpp>
-#include <interaction/bindings.hpp>
-#include <integrator/bindings.hpp>
-
-void registerPython() {
-  espresso::hello::registerPython();
-  espresso::base::registerPython();
-  espresso::interaction::registerPython();
-  espresso::particles::registerPython();
-  espresso::integrator::registerPython();
-}
 
 /** the one and only instance of the MPI environment */
 static boost::mpi::environment *theEnvironment = 0;

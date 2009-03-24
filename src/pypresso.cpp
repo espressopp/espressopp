@@ -27,7 +27,7 @@ extern "C" {
     for use with the static initialization */
 BOOST_PYTHON_MODULE(_espresso)
 {
-  registerPython();
+  espresso::registerPython();
 }
 
 /** On the controller, just adds the espresso library to python's

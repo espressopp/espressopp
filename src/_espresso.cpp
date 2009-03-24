@@ -18,7 +18,7 @@ BOOST_PYTHON_MODULE(_espresso)
   initMPI();
 
   // register all classes with python 
-  registerPython();
+  espresso::registerPython();
 
   Py_AtExit(&finalize);
 }

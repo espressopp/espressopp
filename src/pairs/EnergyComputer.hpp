@@ -34,24 +34,24 @@ namespace espresso {
 
           @param _energy is the particle property that contains the energy
       */
-      EnergyComputer(particles::PropertyReference<base::real> _energy) 
+      EnergyComputer(particles::PropertyReference<real> _energy) 
         : energy(_energy), totalEnergy(0.0) {}
       virtual ~EnergyComputer() {};
 
-      virtual void operator()(const base::Real3D &dist,
-                              const particles::ParticleReference p1,
-                              const particles::ParticleReference p2) {};
+      virtual void operator()(const Real3D &dist,
+                              const ParticleReference p1,
+                              const ParticleReference p2) {};
 
-      base::real getAccumulatedEnergy() const { return totalEnergy; }
+      real getAccumulatedEnergy() const { return totalEnergy; }
 
     protected:
-      particles::PropertyReference<base::real> energy;
-      base::real totalEnergy;
+      particles::PropertyReference<real> energy;
+      real totalEnergy;
       bool computesVirial;
 
-      void addContribution(base::real e,
-                           const particles::ParticleReference p1,
-                           const particles::ParticleReference p2) {
+      void addContribution(real e,
+                           const ParticleReference p1,
+                           const ParticleReference p2) {
         energy[p1] += 0.5*e;
         energy[p2] += 0.5*e;
         totalEnergy += e;
@@ -79,9 +79,9 @@ namespace espresso {
       {}
       virtual ~SquareDistEnergyComputerFacade() {};
 
-      virtual void operator()(const base::Real3D &dist,
-                              const particles::ParticleReference p1,
-                              const particles::ParticleReference p2) {
+      virtual void operator()(const Real3D &dist,
+                              const ParticleReference p1,
+                              const ParticleReference p2) {
         addContribution(computer.computeEnergySqr(dist.sqr()), p1, p2);
       }
 

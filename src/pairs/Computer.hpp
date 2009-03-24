@@ -14,7 +14,7 @@ namespace espresso {
     public:
       /// @name extended function object interface
       //@{
-      typedef base::Real3D first_argument_type;
+      typedef Real3D first_argument_type;
       typedef ParticleReference second_argument_type;
       typedef ParticleReference  third_argument_type;
       typedef void                       result_type;
@@ -27,19 +27,19 @@ namespace espresso {
 	  Note: The references are necessary if more property data of the particles is
 	  needed than only the distance.
       */
-      virtual void operator()(const base::Real3D &dist, 
+      virtual void operator()(const Real3D &dist, 
 			      const ParticleReference p1, 
 			      const ParticleReference p2) = 0;
     };
 
     /** Abstract class that defines a function on pairs of particles */
     class Computer: 
-      public ComputerBase<particles::ParticleReference> 
+      public ComputerBase<ParticleReference> 
     {};
     
     /** Abstract class that defines a function on pairs of read-only particles */
     class ConstComputer:
-      public ComputerBase<particles::ConstParticleReference> 
+      public ComputerBase<ConstParticleReference> 
     {};
   }
 }

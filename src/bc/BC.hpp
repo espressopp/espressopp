@@ -18,9 +18,9 @@ namespace espresso {
           \param pos1, pos2 are the two positions 
           \returns the distance vector between pos1 and pos2
       */
-      virtual base::Real3D 
-      getDist(const base::Real3D& pos1, 
-	      const base::Real3D& pos2) const = 0;
+      virtual Real3D 
+      getDist(const Real3D& pos1, 
+	      const Real3D& pos2) const = 0;
     };
   }
 }

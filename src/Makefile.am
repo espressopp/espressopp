@@ -2,7 +2,6 @@
 SUBDIRS = \
 	include \
 	esutil \
-	base \
 	hello \
 	particles \
 	pairs \
@@ -13,15 +12,19 @@ CLEANFILES =
 
 # declare the headers
 noinst_HEADERS = \
+	estypes.hpp \
+	Real3D.hpp \
+	Particle.hpp \
 	espresso_common.hpp
 
 # the common part of all Espresso flavors
 noinst_LTLIBRARIES = libespresso_common.la
 libespresso_common_la_SOURCES= \
+	Real3D.cpp \
+	bindings.cpp \
 	espresso_common.cpp
 libespresso_common_la_LIBADD = \
 	esutil/libesutil.la \
-	base/libbase.la \
 	hello/libhello.la \
 	particles/libparticles.la \
 	pairs/libpairs.la \
@@ -64,13 +67,12 @@ pypresso_LDADD = libespresso_common.la \
 
 python_scripts=\
 	__init__.py \
-	base.py \
 	esmpi.py \
 	pmi.py \
 	esutil.py \
 	hello.py \
 	particles.py \
-	interaction.py 
+	interaction.py
 
 python_SCRIPTS=$(python_scripts)
 

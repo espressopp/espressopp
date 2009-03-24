@@ -1,11 +1,14 @@
 import types
+import logging
 from espresso import esmpi as mpi
+
+log = logging.getLogger('espresso.pmi')
 
 def exec_(statement) :
     """This allows to import modules and to define classes and
     functions on all workers.
     """
-    print("pmi: executing '%s'" % statement)
+    log.info("executing '%s'", statement)
     exec statement in globals()
 
 # import_ is an alias for exec_
@@ -41,7 +44,7 @@ Please create old style classes via their names.")
 
     # create the class creation string
     s = "%s%s" % (theClass, args)
-#    print("pmi: creating pmi object via '%s'" % s)
+    log.info("creating class '%s'", s)
     # broadcast it to all workers
     return eval(s)
 
@@ -61,7 +64,7 @@ def invoke(function, *args) :
     this function is called, i.e. functions in modules that have 
     been imported via pmi.importModule().
     """
-#    print("pmi: invoking %s" % function.__name__)
+    log.info("invoking %s", function.__name__)
     return function(*args)
 
 def delete(obj) :
