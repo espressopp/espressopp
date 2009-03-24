@@ -134,8 +134,8 @@ void
 VelocityVerlet::registerPython() {
   using namespace boost::python;
 
-  //class_<VelocityVerlet>("integrator_VelocityVerlet", init<Set*, PropertyId, PropertyId, PropertyId>())
   class_<VelocityVerlet>("integrator_VelocityVerlet", init<real>())
+    .def(init<Set*, PropertyId, PropertyId, PropertyId>())
     .def("run", &VelocityVerlet::run)
     .def("setTimeStep", &VelocityVerlet::setTimeStep)
     .def("getTimeStep", &VelocityVerlet::getTimeStep)

@@ -4,6 +4,7 @@
 
 from espresso.interaction import LennardJones
 from espresso.base import Real3D
+from espresso.integrator import VelocityVerlet
 
 # use constructor with default values
 
@@ -24,3 +25,5 @@ f = lj.computeForce(x)
 
 print('computeForce: x = %s, force = %s' % (x, f))
 
+vvIntegrator = VelocityVerlet(0.01)
+#vvIntegrator.setTimeStep(0.05)
