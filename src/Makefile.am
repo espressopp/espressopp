@@ -70,8 +70,7 @@ python_scripts=\
 	esutil.py \
 	hello.py \
 	particles.py \
-	interaction.py \
-        integrator.py
+	interaction.py 
 
 python_SCRIPTS=$(python_scripts)
 

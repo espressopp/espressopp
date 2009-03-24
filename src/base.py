@@ -37,7 +37,4 @@ class __Real3D(Real3D) :
     def __str__(self) :
         return str(tuple(self))
 
-    # enable pickling a Real3D
-    def __getinitargs__(self) :
-        return tuple(self)
 

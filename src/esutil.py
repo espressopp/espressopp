@@ -63,6 +63,7 @@ def propdel(func):
 class ExtendBaseClass(type):
     def __new__(self, name, bases, dict):
         del dict['__metaclass__']
+        del dict['__module__']
 
         theClass = bases[0]
         # loop over all items in the class and replace it

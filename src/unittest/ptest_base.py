@@ -12,7 +12,7 @@ class Real3DTest(unittest.TestCase) :
             self.assertEqual(tuple(v), (3.0, 2.0, 1.0))
         elif mpi.rank == 1 :
             v = mpi.world.recv(0)
-            mpi.world.send(0, Real3D(3.0, 2.0, 1.0))
+            mpi.world.send(0, value=Real3D(3.0, 2.0, 1.0))
             self.assertEqual(tuple(v), (1.0, 2.0, 3.0))
 
 if __name__ == "__main__":

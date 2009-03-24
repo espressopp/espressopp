@@ -115,6 +115,18 @@ namespace espresso {
 	return (*this) * (*this);
       }
 
+      bool operator== (const DerivableSmallVector<T,N,CRTP>& b) const {
+	for (size_t i = 0; i < N; i++)
+	  if (data[i] != b.data[i]) return false;
+	return true;
+      }
+
+      bool operator!= (const DerivableSmallVector<T,N,CRTP>& b) const {
+	for (size_t i = 0; i < N; i++)
+	  if (data[i] == b.data[i]) return false;
+	return true;
+      }
+
     };
 
     // global definition to make sure that we can use scalar * vector in C++ and Python

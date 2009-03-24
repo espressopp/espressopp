@@ -49,17 +49,23 @@ class Real3DTest(unittest.TestCase) :
         self.assertEqual(list(v), [1.0, 2.0, 3.0])
         self.assertEqual(str(v), '(1.0, 2.0, 3.0)')
 
+    def testComparison(self) :
+        'Tests the Real3D comparison operations.'
+        v = Real3D(1.0, 2.0, 3.0)
+        v2 = Real3D(1.0, 2.0, 3.0)
+        self.assert_(v == v2)
+        self.assert_(not (v != v2))
+
     def testNumerics(self) :
+        'Test various numeric operations of Real3D.'
         v = Real3D(1.0, 2.0, 3.0)
         r = v * 2.0
         self.assertEqual(type(r), Real3D)
-        self.assertEqual(tuple(r), (2.0, 4.0, 6.0))
-#        self.assertEqual(r, Real3D(2.0, 4.0, 6.0))
+        self.assertEqual(r, Real3D(2.0, 4.0, 6.0))
 
         r = 2.0 * v
         self.assertEqual(type(r), Real3D)
-        self.assertEqual(tuple(r), (2.0, 4.0, 6.0))
-#        self.assertEqual(r, Real3D(2.0, 4.0, 6.0))
+        self.assertEqual(r, Real3D(2.0, 4.0, 6.0))
 
         r = v*v
         self.assertEqual(r, 14.0)
@@ -68,11 +74,11 @@ class Real3DTest(unittest.TestCase) :
         self.assertEqual(r, 14.0)
 
         r = v.cross(v)
-        self.assertEqual(tuple(r), (0.0, 0.0, 0.0))
+        self.assertEqual(r, Real3D(0.0, 0.0, 0.0))
 
         v2 = Real3D(3.0, 2.0, 1.0)
         r = v.cross(v2)
-        self.assertEqual(tuple(r), (-4.0, 8.0, -4.0))
+        self.assertEqual(r, Real3D(-4.0, 8.0, -4.0))
 
 
 if __name__ == "__main__":
