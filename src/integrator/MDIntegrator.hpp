@@ -11,18 +11,19 @@ namespace espresso {
     class MDIntegrator {
 
     protected:
-
-       real timeStep;
-       real timeStepSqr;
+      
+      real timeStep;
+      real timeStepSqr;
 
     public:
-
-       virtual ~MDIntegrator() {}
-
-       virtual void setTimeStep(real _timeStep) { timeStep = _timeStep; timeStepSqr = timeStep * timeStep; }
-
-       virtual void run(int nsteps) = 0;
-
+      virtual ~MDIntegrator() {}
+      
+      virtual void setTimeStep(real _timeStep) { timeStep = _timeStep; timeStepSqr = timeStep * timeStep; }
+      
+      virtual real getTimeStep() const { return timeStep; }
+      
+      virtual void run(int nsteps) = 0;
+      
     };
 
   }

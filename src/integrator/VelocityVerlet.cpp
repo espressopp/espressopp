@@ -62,8 +62,8 @@ namespace espresso {
 
     };
 
-    VelocityVerlet::VelocityVerlet(real _timeStep) {
-    setTimeStep(_timeStep);}
+    VelocityVerlet::VelocityVerlet(real _timeStep) 
+    { setTimeStep(_timeStep);}
 
     VelocityVerlet::VelocityVerlet(Set* _particles, 
 				   PropertyId _position,
@@ -138,6 +138,7 @@ VelocityVerlet::registerPython() {
   class_<VelocityVerlet>("integrator_VelocityVerlet", init<real>())
     .def("run", &VelocityVerlet::run)
     .def("setTimeStep", &VelocityVerlet::setTimeStep)
+    .def("getTimeStep", &VelocityVerlet::getTimeStep)
     ;
 }
 
