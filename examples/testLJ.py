@@ -1,6 +1,4 @@
-### Test for Lennard Jones interaction
-#
-# ToDo JH: make a Python unit test of it
+# Test for Lennard Jones interaction
 
 from espresso.interaction import LennardJones
 from espresso.base import Real3D

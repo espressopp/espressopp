@@ -11,7 +11,7 @@ class LennardJonesTest(unittest.TestCase) :
         
     def testInitAll(self) :
         'LJ: Test that all parameters can be set in __init__.'
-        lj=LennardJones(epsilon=2.0, cutoff=3.0)
+        lj=LennardJones(epsilon=2.0, sigma=1.0, cutoff=3.0)
         self.assertEqual(lj.epsilon, 2.0)
         self.assertEqual(lj.sigma, 1.0)
         self.assertEqual(lj.cutoff, 3.0)
@@ -50,7 +50,7 @@ class LennardJonesTest(unittest.TestCase) :
         self.assertEqual(lj.cutoff, 2.0)
 
     def testEnergy(self) :
-        'LJ: Test that the energies are computed correct.'
+        'LJ: Test that the energies are computed correctly.'
         lj=LennardJones(epsilon=2.0, sigma=2.0, cutoff=4.0)
         # root
         self.assertAlmostEqual(lj.computeEnergy(2.0), 0.0)
@@ -82,8 +82,8 @@ class FENETest(unittest.TestCase) :
         
     def testSetAll(self) :
         'FENE: Test that all parameters can be set in set.'
-        fene=FENE(r0=2.0)
-        fene.set(K=2.0, rMax=2.0)
+        fene=FENE()
+        fene.set(K=2.0, r0=2.0, rMax=2.0)
         self.assertEqual(fene.K, 2.0)
         self.assertEqual(fene.r0, 2.0)
         self.assertEqual(fene.rMax, 2.0)
