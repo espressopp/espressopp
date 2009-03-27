@@ -1,11 +1,9 @@
-from espresso import pmi
 from espresso import esutil
 from esutil import choose
-
-__setdocs = 'Set the parameters of the interaction. Prefer using this to setting the properties directly.'
+from espresso import pmi
 
 # wrap LennardJones
-pmi.exec_('from _espresso import interaction_LennardJones')
+pmi.exec_('from _espresso import interaction_LennardJones as LennardJones')
 class LennardJones (object):
     'The Lennard-Jones interaction.'
 
@@ -15,7 +13,7 @@ class LennardJones (object):
         The parameters are identical to set."""
         object.__init__(self)
         # create the pmi object
-        self.worker = pmi.create('interaction_LennardJones')
+        self.worker = pmi.create('LennardJones')
         # set the defaults
         self.set(epsilon, sigma, cutoff)
 
@@ -23,12 +21,12 @@ class LennardJones (object):
     def set(self, epsilon=None, sigma=None, cutoff=None) :
         """set(integer, integer, integer) -- Set the "parameters" of the interaction.
         """
-        pmi.invoke(self.worker.set,
+        pmi.invoke('LennardJones.set',
+                   self.worker,
                    choose(epsilon, self.epsilon),
                    choose(sigma, self.sigma),
                    choose(cutoff, self.cutoff)
                    )
-
 
     # define single property setters
     # avoid using these if possible
@@ -61,7 +59,7 @@ class LennardJones (object):
         return f
 
 # wrap FENE
-pmi.exec_('from _espresso import interaction_FENE')
+pmi.exec_('from _espresso import interaction_FENE as FENE')
 class FENE(object) :
     'The FENE interaction.'
 
@@ -70,17 +68,19 @@ class FENE(object) :
 
         The parameters are identical to set."""
         object.__init__(self)
-        self.worker = pmi.create('interaction_FENE')
+        self.worker = pmi.create('FENE')
         self.set(K, r0, rMax)
 
     # define setter
     def set(self, K=None, r0=None, rMax=None) :
         'Set the parameters of the interaction.'
-        pmi.invoke(self.worker.set,
-                   choose(K, self.K),
-                   choose(r0, self.r0),
-                   choose(rMax, self.rMax)
-                   )
+        pmi.invoke(
+            'FENE.set',
+            self.worker,
+            choose(K, self.K),
+            choose(r0, self.r0),
+            choose(rMax, self.rMax)
+            )
 
     # define single property setters
     # avoid using these if possible

@@ -3,10 +3,6 @@ import logging
 import logging.config
 logging.config.fileConfig("espresso_log.conf")
 
-# Load pmi and start the worker loop
-import pmi
-pmi.workerLoop()
-
 # Define the basic classes
 from _espresso import Real3D
 import esutil
