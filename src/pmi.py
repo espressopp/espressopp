@@ -12,7 +12,7 @@ def exec_(statement) :
     """
     __check_controller(exec_)
     # broadcast the statement
-    __broadcast(_EXEC, statement)
+    _broadcast(_EXEC, statement)
     # locally execute the statement
     __exec_(statement)
 
@@ -64,23 +64,9 @@ Please create old style classes via their names.")
     # translate the arguments
     targs=map(__translate_arg, args)
     # broadcast creation to the workers
-    __broadcast(_CREATE, theClass, oid, *targs)
-    #
-    # Adding the delete method to the instance causes a non-collectable
-    # reference cycle, as the instancemethod holds a reference to the instance
-    #
-    #     # now add the delete method to the instance
-    #     if '__del__' in obj.__dict__:
-    #         obj.__origdel = obj.__del__
-    #     obj.__del__ = types.MethodType(__del_obj, obj)
-    #
-    # Workaround:
-    # Install the destructor as a class method
-    if '__pmi_del_installed' not in theClass.__dict__ :
-        if '__del__' in theClass.__dict__:
-            theClass.__pmi_savedel = theClass.__del__
-        theClass.__del__ = __del_obj
-        theClass.__pmi_del_installed = 1
+    _broadcast(_CREATE, theClass, oid, *targs)
+    # store the destroyer object in the instance
+    obj.__pmi_destroyer = __Destroyer(oid)
     return obj
 
 def __create(theClass, oid, *args) :
@@ -131,7 +117,7 @@ def invoke(arg0, *args) :
         raise ValueError("pmi.invoke expects function as first argument, but got %s" % arg0)
 
     targs=map(__translate_arg, args)
-    __broadcast(_INVOKE, function, *targs)
+    _broadcast(_INVOKE, function, *targs)
     log.info("Invoking: %s%s", function, tuple(args))
     function = eval(function)
     return function(*args)
@@ -145,26 +131,26 @@ def __invoke(function, *args) :
 ##################################################
 ## AUTOMATIC OBJECT DELETION
 ##################################################
-def __del_obj(self) :
-    """This function is the destructor for all classes that are used
-    in PMI."""
-    if IS_WORKER :
-        raise InternalError('__del_obj was called on worker!')
-    if '__pmi_savedel' in self.__dict__ :
-        self.__pmi_savedel()
-    # check whether this is a PMI instance, if not, return
-    oid = id(self)
-    if oid not in OIDS: return
-    log.info("Deleting: %s [%d]", self, oid)
-    __broadcast(_DELETE, __translate_arg(self))
-    # call the original destructor
-    OIDS.remove(oid)
+class __Destroyer(object) :
+    """Internal class that holds the oid of a PMI instance.
+    The PMI instance holds a reference to the __Destroyer object. When
+    the PMI instance dies, the Destroyer also dies and removes the oid
+    from OIDS."""
+    def __init__(self, oid) :
+        self.oid = oid
+    def __del__(self) :
+        if self.oid not in OIDS :
+            raise InternalError('OID %d is not in OIDS!' % self.oid)
+        log.info("Deleting OID: [%d]", self.oid)
+        _broadcast(_DELETE, self.oid)
+        OIDS.remove(self.oid)
 
-def __delete(obj) :
+def __delete(oid) :
     """Deletes the OBJECT_CACHE reference to a PMI object."""
-    log.info("Deleting: %s [%d]", __backtranslate_arg(obj), obj.oid)
+    obj=OBJECT_CACHE[oid]
+    log.info("Deleting: %s [%d]", obj, oid)
     # Delete the entry from the cache
-    del OBJECT_CACHE[obj.oid]
+    del OBJECT_CACHE[oid]
 
 ##################################################
 ## FINISH
@@ -176,7 +162,7 @@ def finish() :
     if isFinished : return
     isFinished = True
     log.info('Calling all workers to stop.')
-    __broadcast(_FINISH)
+    _broadcast(_FINISH)
 
 def __finish() :
     log.info('Finishing worker loop.')
@@ -188,7 +174,7 @@ def __finish() :
 def dump() :
     'Dump the object cache of PMI.'
     __check_controller(dump)
-    __broadcast(_DUMP)
+    _broadcast(_DUMP)
     log.info("OIDS=%s", str(OIDS))
 
 def __dump() :
@@ -244,6 +230,7 @@ class __OID(object) :
     def getinitargs(self) :
         return self.oid
 
+
 def __translate_arg(obj) :
     """Internal function that translates obj into an __OID
     object if it is a PMI object instance.
@@ -276,7 +263,7 @@ def __check_controller(func) :
     if IS_WORKER : 
         raise UserError("Can't call %s on worker!" % func.__name__)
 
-def __broadcast(*args) :
+def _broadcast(*args) :
     "Internal command used to broadcast a PMI command to all workers."
     if args[0] not in _ALLCMD :
         raise ValueError('Broadcast needs a command (one of %s) as first argument.' % args)

@@ -30,22 +30,20 @@ class Test1CreateAndDelete(unittest.TestCase) :
         pmi.exec_("import amodule")
     def tearDown(self) :
         pmi.exec_("del(amodule)")
-        gc.collect()
-        pmi.dump()
 
     def test0StringArgument(self) :
         self.assertEqual(len(pmi.OIDS), 0)
         a = pmi.create("amodule.A")
         self.assertEqual(a.__class__.__name__, "A")
         self.assertEqual(len(pmi.OIDS), 1)
-        del(a)
+        del a
 
     def test1ClassArgument(self) :
         self.assertEqual(len(pmi.OIDS), 0)
         import amodule
         a = pmi.create(amodule.A)
         self.assertEqual(a.__class__.__name__, "A")
-        del(a)
+        del a
 
     def test2OldClassArgument(self) :
         import amodule
@@ -65,6 +63,7 @@ class Test2Invoke(unittest.TestCase) :
 
     def tearDown(self) :
         pmi.exec_("del(amodule)")
+        del self.a
 
     def test0CallFunctionByString(self) :
         pmi.invoke('amodule.f')
