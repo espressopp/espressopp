@@ -11,36 +11,12 @@ float UserTimer::getCurrentTime() const {
   getrusage(RUSAGE_SELF, &rus);
   return rus.ru_utime.tv_sec + 1.e-6*rus.ru_utime.tv_usec;
 }
+
 #else
 
 // we do not have getrusage
 float UserTimer::getCurrentTime() const { return 0; }
-#endif
 
-#ifdef HAVE_BOOST_MPI
+#endif
 
 float WallTimer::getCurrentTime() const { return timer.elapsed(); }
-
-#elif defined(HAVE_SYS_TIME_H)
-
-#include <sys/time.h>
-
-float WallTimer::getCurrentTime() const {
-  struct timeval tp;
-  struct timezone tzp;
-  gettimeofday (&tp, &tzp);
-  return tp.tv_sec + 1.e-6*tp.tv_usec;
-}
-
-#elif defined(HAVE_TIME_H)
-
-#include <time.h>
-
-float WallTimer::getCurrentTime() const { return time(0); }
-
-#else
-
-// we do not have gettimeofday
-float WallTimer::getCurrentTime() const { return 0; }
-
-#endif

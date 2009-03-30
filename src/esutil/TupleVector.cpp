@@ -160,8 +160,8 @@ TupleVector::iterator TupleVector::erase(TupleVector::iterator start,
 void TupleVector::copy(TupleVector::reference dst,
                        TupleVector::const_reference src)
 {
-    if (dst.index != src.index)
-	memmove(dst.index, src.index, 1);
+  if (dst.index != src.index)
+    memcpy(dst.index, src.index, 1);
 }
 
 void TupleVector::copy(TupleVector::const_iterator begin,

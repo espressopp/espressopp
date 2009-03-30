@@ -4,9 +4,7 @@
 #include "acconfig.hpp"
 
 #include <ostream>
-#ifdef HAVE_BOOST_MPI
 #include <boost/mpi/timer.hpp>
-#endif
 
 namespace espresso {
   namespace esutil {
@@ -40,25 +38,12 @@ namespace espresso {
       UserTimer() { reset(); }
     };
 
-#ifdef HAVE_BOOST_MPI
- 
     /// timer measuring the wall time.
     class WallTimer: public Timer {
       boost::mpi::timer timer;
 
       virtual float getCurrentTime() const;
     };
-
-#else
-
-    /// timer measuring the wall time.
-    class WallTimer: public Timer {
-      virtual float getCurrentTime() const;
-    public:
-      WallTimer() { reset(); }
-    };
-
-#endif
   }
 }
 #endif
