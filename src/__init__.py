@@ -6,7 +6,7 @@ logConfigFile="espresso_log.conf"
 if os.path.exists(logConfigFile) :
     import logging.config
     logging.config.fileConfig(logConfigFile)
-    log = logging.getRootLogger()
+    log = logging.getLogger('root')
     log.info('Reading log config file %s', logConfigFile)
 else :
     logging.basicConfig()

@@ -56,7 +56,7 @@ class Test1CreateAndDelete(unittest.TestCase) :
         a = pmi.create("amodule.A", 1)
         self.assertEqual(a.arg, 1)
 
-class Test2Invoke(unittest.TestCase) :
+class Test2Call(unittest.TestCase) :
     def setUp(self) :
         pmi.exec_('import amodule')
         self.a = pmi.create('amodule.A')
@@ -66,34 +66,36 @@ class Test2Invoke(unittest.TestCase) :
         del self.a
 
     def test0CallFunctionByString(self) :
-        pmi.invoke('amodule.f')
+        pmi.call('amodule.f')
         self.assertEqual(pmi.amodule.f_arg, 42)
-        pmi.invoke('amodule.g', 52)
+        pmi.call('amodule.g', 52)
         self.assertEqual(pmi.amodule.g_arg, 52)
 
     def test1CallFunction(self) :
         import amodule
-        pmi.invoke(amodule.f)
+        pmi.call(amodule.f)
         self.assertEqual(pmi.amodule.f_arg, 42)
-        pmi.invoke(amodule.g, 52)
+        pmi.call(amodule.g, 52)
         self.assertEqual(pmi.amodule.g_arg, 52)
         del(amodule)
 
     def test2SimpleMethod(self):
-        pmi.invoke(self.a.f)
+        pmi.call(self.a.f)
         self.assertEqual(self.a.f_arg, 42)
 
     def test3SimpleMethodByString(self):
-        pmi.invoke('amodule.A.f', self.a)
+        pmi.call('amodule.A.f', self.a)
         self.assertEqual(self.a.f_arg, 42)
 
     def test4Method(self) :
-        pmi.invoke(self.a.g, 52)
+        pmi.call(self.a.g, 52)
         self.assertEqual(self.a.g_arg, 52)
 
     def test5MethodByString(self) :
-        pmi.invoke('amodule.A.g', self.a, 52)
+        pmi.call('amodule.A.g', self.a, 52)
         self.assertEqual(self.a.g_arg, 52)
+
+
 
 #     # with return list
 #     res = pmi.invoke(a.f, 52)

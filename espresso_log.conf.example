@@ -1,0 +1,51 @@
+[loggers]
+keys=root, controller, worker1
+
+[handlers]
+keys=consoleHandler, controllerHandler, worker1Handler
+
+[formatters]
+keys=simpleFormatter
+
+[logger_root]
+level=WARN
+#level=INFO
+handlers=controllerHandler
+
+[logger_controller]
+level=WARN
+#level=INFO
+#level=DEBUG
+handlers=controllerHandler
+qualname=espresso.pmi.controller
+propagate=0
+
+[logger_worker1]
+level=WARN
+#level=INFO
+#level=DEBUG
+handlers=worker1Handler
+qualname=espresso.pmi.worker1
+propagate=0
+
+[handler_controllerHandler]
+class=handlers.MemoryHandler
+level=NOTSET
+target=consoleHandler
+args=(1000, ERROR)
+
+[handler_worker1Handler]
+class=handlers.MemoryHandler
+level=NOTSET
+target=consoleHandler
+args=(1000, ERROR)
+
+[handler_consoleHandler]
+class=StreamHandler
+formatter=simpleFormatter
+level=DEBUG
+args=(sys.stdout,)
+
+[formatter_simpleFormatter]
+format=%(asctime)s - %(name)s - %(levelname)s - %(message)s
+datefmt=
