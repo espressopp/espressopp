@@ -14,16 +14,17 @@ def exec_(statement) :
     # broadcast the statement
     _broadcast(_EXEC, statement)
     # locally execute the statement
-    __exec_(statement)
+    __workerExec_(statement)
 
-def __exec_(statement) :
+def import_(statement) :
+    """import_() is an alias for exec_()."""
+    exec_(statement)
+
+def __workerExec_(statement) :
     'Internal function that executes the given statement locally.'
     # executing the statement locally
     log.info("Executing '%s'", statement)
     exec statement in globals()
-
-# import_ is an alias for exec_
-import_=exec_
 
 ##################################################
 ## CREATE
@@ -31,18 +32,23 @@ import_=exec_
 def create(theClass, *args) :
     """Create an object on all workers.
 
-    theClass describes the class of that should be instantiated.
+    theClass describes the (new-style) class of that should be
+    instantiated.
     *args are the arguments to the constructor of the class.
+    Only classes that are known to PMI can be used, that is classes
+    that have been imported to pmi via exec_() or import_().
 
     Example:
-    # instantiate an object of the class with the passed name
-    pmi.create("HelloWorld")
-    # instantiate an object of the same class as the passed class
-    pmi.create(HelloWorld)
-
-    Note, that you can use only those classes that are know to PMI
-    when this function is called, i.e. classes in modules that have
-    been imported via pmi.exec_() or pmi.import_().
+    # PMI import the module hello.
+    pmi.exec_('import hello')
+    # Instantiate an object of the class HelloWorld
+    # This also works if the class is not known in the calling module.
+    pmi.create("hello.HelloWorld")
+    # Alternative.
+    # Note that in this case the class has to be imported to the
+    # calling module.
+    import hello
+    pmi.create(hello.HelloWorld)
     """
     if isinstance(theClass, types.StringTypes) :
         theClass = eval(theClass)
@@ -69,7 +75,7 @@ Please create old style classes via their names.")
     obj.__pmi_destroyer = __Destroyer(oid)
     return obj
 
-def __create(theClass, oid, *args) :
+def __workerCreate(theClass, oid, *args) :
     # backtranslate the arguments
     btargs=map(__backtranslate_arg, args)
     # create the new object
@@ -89,44 +95,133 @@ def __create(theClass, oid, *args) :
 ##################################################
 ## INVOKE
 ##################################################
-def invoke(arg0, *args) :
-    """Invoke a function on all workers.
+def invoke(function, *args) :
+    """Invoke a function on all workers, gathering the return values into a list.
 
-    function is the function that is to be called, *args are the
-    arguments to the function. 
+    function denotes the function that is to be called, *args are the
+    arguments to the function.
+    invoke() returns the results of the different workers as a list.
+    Only functions that are known to PMI can be used, that is functions
+    that have been imported to pmi via exec_() or import_().
+
     Example:
-    lj = _LennardJones(epsilon=1.0, sigma=1.0, cutoff=2.0)
-    r = 1.2
-    print(pmi.invoke(lj.computeEnergy, r))
-    # equivalent:
-    print(pmi.invoke(_LennardJones.computeEnergy, lj, r))
-
-    Note, that you can use only functions that are know to PMI when
-    this function is called, i.e. functions in modules that have 
-    been imported via pmi.importModule().
+    pmi.exec_('import hello')
+    hw = pmi.create('hello.HelloWorld')
+    messages = pmi.invoke(hw.hello())
+    # alternative:
+    messages = pmi.invoke('hello.HelloWorld.hello', hw)
+    print('\\n'.join(messages))
     """
     __check_controller(invoke)
-    if isinstance(arg0, types.StringTypes) :
-        function = arg0
-    elif isinstance(arg0, types.FunctionType) :
-        function = '.'.join((arg0.__module__, arg0.__name__))
-    elif isinstance(arg0, types.MethodType) :
-        function = '.'.join((arg0.im_func.__module__, arg0.im_class.__name__, arg0.im_func.__name__))
-        args = (arg0.im_self,) + args
-    else :
-        raise ValueError("pmi.invoke expects function as first argument, but got %s" % arg0)
-
+    function, args = __translateInvokeArgs(function, args)
     targs=map(__translate_arg, args)
     _broadcast(_INVOKE, function, *targs)
     log.info("Invoking: %s%s", function, tuple(args))
     function = eval(function)
-    return function(*args)
+    value = function(*args)
+    return mpi.world.gather(value, root=CONTROLLER) 
 
-def __invoke(function, *args) :
+def __workerInvoke(function, *args) :
     btargs=map(__backtranslate_arg, args)
     log.info("Invoking: %s%s", function, tuple(btargs))
     function = eval(function)
-    function(*btargs)
+    value = function(*btargs)
+    return mpi.world.gather(value, root=CONTROLLER) 
+
+
+##################################################
+## CALL (INVOKE WITHOUT RESULT)
+##################################################
+def call(procedure, *args) :
+    """Call a procedure on all workers, ignoring any return values.
+
+    procedure denotes the procedure that is to be called, *args are the
+    arguments to the procedure.
+    If the procedure should return any results, they will be silently
+    ignored.
+    Only procedures that are known to PMI can be used, that is procedures
+    that have been imported to pmi via exec_() or import_().
+    
+    Example:
+    lj = _LennardJones(epsilon=1.0, sigma=1.0, cutoff=2.0)
+    r = 1.2
+    print(pmi.call(lj.computeEnergy, r))
+    # equivalent:
+    print(pmi.call(_LennardJones.computeEnergy, lj, r))
+
+    Note, that you can use only procedures that are know to PMI when
+    call() is called, i.e. procedures in modules that have 
+    been imported via exec_().
+    """
+    __check_controller(call)
+    procedure, args = __translateInvokeArgs(procedure, args)
+    targs=map(__translate_arg, args)
+    _broadcast(_CALL, procedure, *targs)
+    log.info("Calling: %s%s", procedure, tuple(args))
+    procedure = eval(procedure)
+    procedure(*args)
+
+def __workerCall(procedure, *args) :
+    btargs=map(__backtranslate_arg, args)
+    log.info("Calling: %s%s", procedure, tuple(btargs))
+    procedure = eval(procedure)
+    procedure(*btargs)
+
+def invokeNoResult(procedure, *args) :
+    """invokeNoResult() is an alias for call()."""
+    call(procedure, args)
+
+##################################################
+## REDUCE (INVOKE WITH REDUCED RESULT)
+##################################################
+def reduce(reduceOp, function, *args) :
+    """Invoke a function on all workers, reducing the return values to
+    a single value.
+
+    reduceOp is the (associative) operator that is used to process the
+    return values, function denotes the function that is to be called,
+    *args are the arguments to the function.
+    reduce() reduces the results of the different workers into a
+    single value via the operation reduceOp. reduceOp is assumed to be
+    associative.
+    Both reduceOp and function have to be known to PMI, that is they
+    must have been imported to pmi via exec_() or import_().
+
+    Example:
+    pmi.exec_('import hello')
+    pmi.exec_('joinstr=lambda a,b: "\\n".join(a,b)')
+    hw = pmi.create('hello.HelloWorld')
+    print(pmi.reduce('joinstr', hw.hello()))
+    # alternative:
+    print(
+      pmi.reduce(lambda a,b: '\\n'.join(a,b),
+                 'hello.HelloWorld.hello', hw)
+                 )
+    """
+    __check_controller(reduce)
+    # handle reduceOp argument
+    if isinstance(reduceOp, types.StringTypes) :
+        pass
+    elif isinstance(reduceOp, types.FunctionType) :
+        reduceOp = '.'.join((reduceOp.__module__, reduceOp.__name__))
+    else :
+        raise ValueError("pmi.reduce expects function as first argument, but got %s instead" % reduceOp)
+    function, args = __translateInvokeArgs(function, args)
+    targs=map(__translate_arg, args)
+    _broadcast(_REDUCE, reduceOp, function, *targs)
+    log.info("Reducing: %s%s", function, tuple(args))
+    function = eval(function)
+    reduceOp = eval(reduceOp)
+    value = function(*args)
+    return mpi.world.reduce(op=reduceOp, value=value, root=CONTROLLER) 
+
+def __workerReduce(reduceOp, function, *args) :
+    btargs=map(__backtranslate_arg, args)
+    log.info("Invoking: %s%s", function, tuple(btargs))
+    function = eval(function)
+    reduceOp = eval(reduceOp)
+    value = function(*args)
+    return mpi.world.reduce(op=reduceOp, value=value, root=CONTROLLER) 
 
 ##################################################
 ## AUTOMATIC OBJECT DELETION
@@ -145,7 +240,7 @@ class __Destroyer(object) :
         _broadcast(_DELETE, self.oid)
         OIDS.remove(self.oid)
 
-def __delete(oid) :
+def __workerDelete(oid) :
     """Deletes the OBJECT_CACHE reference to a PMI object."""
     obj=OBJECT_CACHE[oid]
     log.info("Deleting: %s [%d]", obj, oid)
@@ -164,7 +259,7 @@ def finish() :
     log.info('Calling all workers to stop.')
     _broadcast(_FINISH)
 
-def __finish() :
+def __workerFinish() :
     log.info('Finishing worker loop.')
     raise StopIteration()
 
@@ -177,7 +272,7 @@ def dump() :
     _broadcast(_DUMP)
     log.info("OIDS=%s", str(OIDS))
 
-def __dump() :
+def __workerDump() :
     log.info("OBJECT_CACHE=%s", str(OBJECT_CACHE))
 
 ##################################################
@@ -231,6 +326,13 @@ class __OID(object) :
         return self.oid
 
 
+def __check_controller(func) :
+    """Check whether we are on a controller, raises a UserError if we
+    are not.
+    """
+    if IS_WORKER : 
+        raise UserError("Can't call %s on worker!" % func.__name__)
+
 def __translate_arg(obj) :
     """Internal function that translates obj into an __OID
     object if it is a PMI object instance.
@@ -256,12 +358,17 @@ def __backtranslate_arg(obj) :
     else :
         return obj
 
-def __check_controller(func) :
-    """Check whether we are on a controller, raises a UserError if we
-    are not.
-    """
-    if IS_WORKER : 
-        raise UserError("Can't call %s on worker!" % func.__name__)
+def __translateInvokeArgs(arg0, args) :
+    if isinstance(arg0, types.StringTypes) :
+        function = arg0
+    elif isinstance(arg0, types.FunctionType) :
+        function = '.'.join((arg0.__module__, arg0.__name__))
+    elif isinstance(arg0, types.MethodType) :
+        function = '.'.join((arg0.im_func.__module__, arg0.im_class.__name__, arg0.im_func.__name__))
+        args = (arg0.im_self,) + args
+    else :
+        raise ValueError("pmi.__invoke expects function as first argument, but got %s" % arg0)
+    return (function, args)
 
 def _broadcast(*args) :
     "Internal command used to broadcast a PMI command to all workers."
@@ -272,7 +379,7 @@ def _broadcast(*args) :
 
 def __receive() :
     "Internal worker command that receives the broadcasts."
-    message = mpi.broadcast(mpi.world, root=CONTROLLER)
+    message = mpi.world.broadcast(root=CONTROLLER)
     log.debug("Received command: %s", message)
     cmd = message[0]
     if cmd not in _ALLCMD :
@@ -284,21 +391,26 @@ def __receive() :
     # now call the function
     cmd_func(*args)
 
+
 # Command IDs
 _EXEC = 'PMIEXEC'
 _CREATE = 'PMICREATE'
 _INVOKE = 'PMIINVOKE'
+_CALL = 'PMICALL'
+_REDUCE = 'PMIREDUCE'
 _DELETE = 'PMIDELETE'
 _FINISH = 'PMIFINISH'
 _DUMP = 'PMIDUMP'
 
 # dict that associates the command IDs with their worker commands
-_ALLCMD = { _EXEC : __exec_,
-            _CREATE : __create,
-            _INVOKE : __invoke,
-            _DELETE : __delete,
-            _FINISH : __finish,
-            _DUMP : __dump
+_ALLCMD = { _EXEC : __workerExec_,
+            _CREATE : __workerCreate,
+            _INVOKE : __workerInvoke,
+            _CALL : __workerCall,
+            _REDUCE : __workerReduce,
+            _DELETE : __workerDelete,
+            _FINISH : __workerFinish,
+            _DUMP : __workerDump
             }
 
 if IS_CONTROLLER: 
@@ -315,10 +427,10 @@ isFinished = False
 ##################################################
 if IS_CONTROLLER :
     WORKERSTR = 'Controller'
-    log = logging.getLogger('espresso.pmi.controller')
+    log = logging.getLogger('%s.controller' % __name__)
 else :
     WORKERSTR = 'Worker %d' % mpi.rank
-    log = logging.getLogger('espresso.pmi.worker%d' % mpi.rank)
+    log = logging.getLogger('%s.worker%d' % (__name__, mpi.rank))
 
 
 import sys, atexit

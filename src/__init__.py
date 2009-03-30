@@ -1,8 +1,18 @@
 # Set up logging
 import logging
-import logging.config
-logging.config.fileConfig("espresso_log.conf")
+import os
 
+logConfigFile="espresso_log.conf"
+if os.path.exists(logConfigFile) :
+    import logging.config
+    logging.config.fileConfig(logConfigFile)
+    log = logging.getRootLogger()
+    log.info('Reading log config file %s', logConfigFile)
+else :
+    logging.basicConfig()
+    log = logging.getLogger('root')
+    log.info('Did not find log config file %s, using basic configuration.', logConfigFile)
+                              
 # Define the basic classes
 from _espresso import Real3D
 import esutil

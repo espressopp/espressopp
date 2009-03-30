@@ -95,5 +95,12 @@ class Test2Invoke(unittest.TestCase) :
         pmi.invoke('amodule.A.g', self.a, 52)
         self.assertEqual(self.a.g_arg, 52)
 
+#     # with return list
+#     res = pmi.invoke(a.f, 52)
+#     # no return value
+#     pmi.call(a.f, 52)
+#     # with reduction
+#     res = pmi.reduce(lambda a,b: a+b, a.f, 52)
+
 if __name__ == "__main__":
     unittest.main()
