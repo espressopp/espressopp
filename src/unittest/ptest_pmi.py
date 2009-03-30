@@ -1,6 +1,7 @@
 import unittest
-import gc
 from espresso import pmi
+from espresso import esmpi
+
 
 class Test0Exec(unittest.TestCase) :
     def testImportModule(self) :
@@ -65,13 +66,13 @@ class Test2Call(unittest.TestCase) :
         pmi.exec_("del(amodule)")
         del self.a
 
-    def test0CallFunctionByString(self) :
+    def test0FunctionByString(self) :
         pmi.call('amodule.f')
         self.assertEqual(pmi.amodule.f_arg, 42)
         pmi.call('amodule.g', 52)
         self.assertEqual(pmi.amodule.g_arg, 52)
 
-    def test1CallFunction(self) :
+    def test1Function(self) :
         import amodule
         pmi.call(amodule.f)
         self.assertEqual(pmi.amodule.f_arg, 42)
@@ -95,14 +96,47 @@ class Test2Call(unittest.TestCase) :
         pmi.call('amodule.A.g', self.a, 52)
         self.assertEqual(self.a.g_arg, 52)
 
+class Test2Invoke(unittest.TestCase) :
+    def setUp(self) :
+        pmi.exec_('import amodule')
+        self.a = pmi.create('amodule.A')
 
+    def tearDown(self) :
+        pmi.exec_("del(amodule)")
+        del self.a
 
-#     # with return list
-#     res = pmi.invoke(a.f, 52)
-#     # no return value
-#     pmi.call(a.f, 52)
-#     # with reduction
-#     res = pmi.reduce(lambda a,b: a+b, a.f, 52)
+    def test0Function(self) :
+        res = pmi.invoke('amodule.f')
+        self.assertEqual(list(res), [42 for x in range(len(res))])
+        res = pmi.invoke('amodule.g', 52)
+        self.assertEqual(list(res), [52 for x in range(len(res))])
 
+    def test1Method(self) :
+        res = pmi.invoke(self.a.f)
+        self.assertEqual(list(res), [42 for x in range(len(res))])
+        res = pmi.invoke(self.a.g, 52)
+        self.assertEqual(list(res), [52 for x in range(len(res))])
+
+class Test3Reduce(unittest.TestCase) :
+    def setUp(self) :
+        pmi.exec_('import amodule')
+        self.a = pmi.create('amodule.A')
+
+    def tearDown(self) :
+        pmi.exec_("del(amodule)")
+        del self.a
+
+    def test0Function(self) :
+        res = pmi.reduce('amodule.add', 'amodule.f')
+        self.assertEqual(res, 42*esmpi.world.size)
+        res = pmi.reduce('amodule.add', 'amodule.g', 52)
+        self.assertEqual(res, 52*esmpi.world.size)
+
+    def test0Lambda(self) :
+        pmi.exec_('myadd = lambda a,b: a+b')
+        res = pmi.reduce('myadd', 'amodule.f')
+        self.assertEqual(res, 42*esmpi.world.size)
+        pmi.exec_('del myadd')
+        
 if __name__ == "__main__":
     unittest.main()

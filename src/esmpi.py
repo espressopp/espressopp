@@ -26,4 +26,4 @@ class ExtendMPI(Communicator) :
 
     def reduce(self, value, op, root) :
         """Calls __module__.reduce(self, value, op, root)."""
-        return reduce(self, *args)
+        return reduce(self, value, op, root)
