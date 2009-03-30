@@ -297,7 +297,7 @@ void generateParticles(Test &test) {
 int main()
 {
     LOG4ESPP_CONFIGURE();
-    IF_MPI(initMPI());
+
     esutil::WallTimer timer;
     TestEspresso espresso(N*N*N);
     std::cout << std::setw(20) << "setup Espresso: " << timer << std::endl;
@@ -396,6 +396,4 @@ int main()
             std::cerr << "ERROR: " << f1[2] << " vs. " << f2[2] << std::endl;
         }
     }
-
-    IF_MPI(finalizeMPI());
 }

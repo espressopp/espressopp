@@ -18,8 +18,8 @@ namespace espresso {
      */
      class PairWriteComputer: public ConstComputer {
      public:
-       particles::ConstPropertyReference<Real3D>                pos; //<! const property position
-       particles::ConstPropertyReference<particles::ParticleId> id; //<! const property id(entification)
+       particles::ConstPropertyReference<Real3D>     pos; //<! const property position
+       particles::ConstPropertyReference<ParticleId> id; //<! const property id(entification)
 
        /** Constructor of the pair writer class.
          
@@ -37,8 +37,8 @@ namespace espresso {
           \sa espresso::ParticlePairComputer::operator()
        */
        virtual void operator()(const Real3D &dist,
-                               const particles::ConstParticleReference p1,
-                               const particles::ConstParticleReference p2)
+                               const ConstParticleReference p1,
+                               const ConstParticleReference p2)
 
        {
           printf("Pair: id = (%ld,%ld) , pos1 = (%f,%f,%f), pos2 = (%f,%f,%f), dist = (%f, %f, %f)\n",

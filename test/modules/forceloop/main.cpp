@@ -3,7 +3,6 @@
 
 #include <types.hpp>
 #include <logging.hpp>
-#include <pmi.hpp>
 #include <espresso_common.hpp>
 #include <particles/Storage.hpp>
 #include <particles/All.hpp>
@@ -163,38 +162,6 @@ int main()
 
   LOG4ESPP_CONFIGURE();
 
-  // Initialization of PMI and Python
-
-  // initPythonEspresso();
-
-#ifdef HAVE_MPI
-  initMPI();
-
-  std::cout << "Worker " << pmi::getWorkerId() << std::endl ;
-
-  if (pmi::isController()) {
-
-      std::cout << "Controller starts forceloop" << std::endl;
-
-      forceloop();
-
-      std::cout << "Controller ends forceloop" << std::endl;
-
-      pmi::endWorkers();
-
-      std::cout << "Controller has stopped workers" << std::endl;
-
-  } else {
-
-      std::cout << "Worker " << pmi::getWorkerId() << " starts mainLoop" << std::endl ;
-
-      pmi::mainLoop();
-
-      std::cout << "Worker " << pmi::getWorkerId() << " ends mainLoop" << std::endl ;
-  }
-  finalizeMPI();
-#else
   forceloop();
-#endif
 
 }
