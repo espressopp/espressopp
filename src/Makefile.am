@@ -31,12 +31,9 @@ libespresso_common_la_LIBADD = \
 	interaction/libinteraction.la \
 	bc/libbc.la \
 	integrator/libintegrator.la \
+	$(ESPRESSO_BOOST_LIBS) \
 	$(PYTHON_LIBS) \
 	$(MPI_LIBS) \
-	$(BOOST_SERIALIZATION_LIBS) \
-	$(BOOST_MPI_LIBS) \
-	$(BOOST_PYTHON_LIBS) \
-	$(BOOST_MPI_PYTHON_LIBS) \
 	$(LOG4ESPP_LIBS)
 
 # The python module _espresso
@@ -52,14 +49,11 @@ endif # ENABLE_SHARED
 bin_PROGRAMS = pypresso 
 pypresso_SOURCES = pypresso.cpp
 pypresso_LDADD = libespresso_common.la \
+	$(ESPRESSO_BOOST_LIBS) \
+	$(BOOST_MPI_PYTHON_LIBS) \
 	$(PYTHON_LIBS) \
 	$(MPI_LIBS) \
-	$(BOOST_SERIALIZATION_LIBS) \
-	$(BOOST_MPI_LIBS) \
-	$(BOOST_PYTHON_LIBS) \
-	$(BOOST_MPI_PYTHON_LIBS) \
 	$(LOG4ESPP_LIBS)
-
 
 ##############################
 ## PYTHON

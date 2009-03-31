@@ -37,7 +37,7 @@ AM_CONDITIONAL(ENABLE_SHARED, [test "x$enable_shared" = "xyes"])
 cat >& AS_MESSAGE_FD <<EOF
 **********************************************************************
 *         Checking system header files                               *
-**********************************************************************])
+**********************************************************************
 EOF
 
 AC_CHECK_HEADERS(sys/time.h sys/resource.h)
@@ -67,11 +67,9 @@ AS_IF([test "x$axes_cv_mpi" = "xno"],
 ###################################################################
 
 AS_IF([test "x$axes_cv_mpi" != "xno"],[
-  AC_MSG_CHECKING([for mpiexec])
   AC_ARG_VAR([MPIEXEC], [MPI command mpiexec])
   AS_IF([test "x$MPIEXEC" = "x"],
     [AC_PATH_PROG([MPIEXEC], [mpiexec], [no])])
-  AC_MSG_RESULT($MPIEXEC)
 
   AC_MSG_CHECKING([for mympiexec])
   AC_ARG_WITH([mympiexec],
@@ -97,75 +95,42 @@ Defaults to BUILDDIR/mympiexec.sh]),
 #                                                                 #
 ###################################################################
 
-boost_internal_dir=`pwd`"/contrib/boost-am"
+AC_MSG_CHECKING([whether to use an external boost library])
+AC_ARG_WITH([external-boost],
+    AS_HELP_STRING([--with-external-boost=BOOST_MPI_PYTHON_MODULE],
+      [specify whether to use external boost libraries (instead of the
+       internal ones). If an external boost library is used, specify the
+       path of the boost.mpi python module.])
+    ,, [with_external_boost="no"])
+AS_IF([test "x$with_external_boost" = "xno"],
+    AC_MSG_RESULT([no]), AC_MSG_RESULT([yes]))
 
-# CHECK FOR THE BOOST SERIALIZATION LIB
-AC_ARG_WITH([boost-serialization-lib],
-    AS_HELP_STRING([--with-boost-serialization-lib=LIB], 
-    	           [specify which boost.serialization library to use])
-    ,, [withval="no"]
+AC_MSG_CHECKING([where to find the boost.mpi python module])
+AS_IF([test "x$with_external_boost" = "xno"],
+    [boost_internal_dir=`pwd`"/contrib/boost-am/"
+     ESPRESSO_BOOST_LIBS="$boost_internal_dir/libespresso_boost.la"
+     BOOST_UNITTEST_LIBS="$boost_internal_dir/libboost_unit_test_framework.la"
+     BOOST_MPI_PYTHON_DIR="$boost_internal_dir/.libs"
+     BOOST_MPI_PYTHON_LIBS="$boost_internal_dir/libboost_mpi_python.la"
+     AC_MSG_RESULT([(internal dir)])
+    ],
+  [test "x$with_external_boost" = "xyes"],
+    [AC_MSG_ERROR([boost.mpi python module was not specified in
+     --with-external-boost.])],
+  [test ! -e "$with_external_boost"], 
+    [AC_MSG_ERROR([file $with_external_boost does not exist! Please specify the complete path of the boost.mpi python module])],
+  dnl TODO: Check whether a boost program compiles as is
+  [ # else
+    BOOST_MPI_PYTHON_DIR=`AS_DIRNAME($with_external_boost)`
+    BOOST_MPI_PYTHON_LIBS="$with_external_boost"
+    AC_MSG_RESULT([$with_external_boost])
+  ]
 )
-AS_IF([test "x$withval" = "xyes"], [AC_MSG_ERROR([specify the name of the boost serialization library])])
-AS_IF([test "x$withval" = "xno"], 
-      [BOOST_SERIALIZATION_LIBS="$boost_internal_dir/libboost_serialization.la"],
-      [BOOST_SERIALIZATION_LIBS="-l$withval"; external_boost="yes"])
-AC_SUBST(BOOST_SERIALIZATION_LIBS)
 
-# CHECK FOR THE BOOST PYTHON LIB
-AC_ARG_WITH([boost-python-lib],
-    AS_HELP_STRING([--with-boost-python-lib=LIB], 
-    	           [specify which boost.python library to use])
-    ,, [withval="no"]
-)
-AS_IF([test "x$withval" = "xyes"], [AC_MSG_ERROR([specify the name of the boost python library])])
-AS_IF([test "x$withval" = "xno" && test "x$external_boost" != "xyes"],
-        [BOOST_PYTHON_LIBS="$boost_internal_dir/libboost_python.la"],
-      [test "x$withval" = "xno" && test "x$external_boost" = "xyes"],
-        [AC_MSG_ERROR([boost.python lib was not specified. Specify either all or none of the boost libraries.])],
-      [test "x$external_boost" != "xyes"],
-        [AC_MSG_ERROR([boost.python lib was specified, but none of the other boost libs. Specify either all or none of the boost libraries.])],
-        [BOOST_PYTHON_LIBS="-l$withval"])
-AC_SUBST(BOOST_PYTHON_LIBS)
-
-# CHECK FOR THE BOOST MPI LIB
-AC_ARG_WITH([boost-mpi-lib],
-    AS_HELP_STRING([--with-boost-mpi-lib=LIB], 
-    	           [specify which boost.mpi library to use])
-    ,, [withval="no"]
-)
-AS_IF([test "x$withval" = "xyes"], [AC_MSG_ERROR([specify the name of the boost mpi library])])
-AS_IF([test "x$withval" = "xno" && test "x$external_boost" != "xyes"],
-        [BOOST_MPI_LIBS="$boost_internal_dir/libboost_mpi.la"],
-      [test "x$withval" = "xno"],
-        [AC_MSG_ERROR([boost.mpi lib was not specified. Specify either all or none of the boost libraries.])],
-      [test "x$external_boost" != "xyes"],
-        [AC_MSG_ERROR([boost.mpi lib was specified, but none of the other boost libs. Specify either all or none of the boost libraries.])],
-        [BOOST_MPI_LIBS="-l$withval"])
-AC_SUBST(BOOST_MPI_LIBS)
-
-# CHECK FOR THE BOOST UNITTEST FRAMEWORK
-AC_ARG_WITH([boost-unittest-lib],
-    AS_HELP_STRING([--with-boost-unittest-lib=LIB], 
-    	           [specify which boost.unittest library to use])
-    ,, [withval="no"]
-)
-AS_IF([test "x$withval" = "xyes"], [AC_MSG_ERROR([specify the name of the boost unittest library])])
-AS_IF([test "x$withval" = "xno" && test "x$external_boost" != "xyes"],
-        [BOOST_UNITTEST_LIBS="$boost_internal_dir/libboost_unit_test_framework.la"],
-      [test "x$withval" = "xno"],
-        [AC_MSG_ERROR([boost.unittest lib was not specified. Specify either all or none of the boost libraries.])],
-      [test "x$external_boost" != "xyes"],
-        [AC_MSG_ERROR([boost.unittest lib was specified, but none of the other boost libs. Specify either all or none of the boost libraries.])],
-        [BOOST_UNITTEST_LIBS="-l$withval"])
-AC_SUBST(BOOST_UNITTEST_LIBS)
-
-
-AS_IF([test "x$external_boost" = "xyes"],[
-  libs_saved="$LIBS"
-  LIBS="$BOOST_UNITTEST_LIBS $LIBS"
-
+# Test using the unittest framework
+AS_IF([test "x$with_external_boost" != "xno"],[
   # test link a program using the dynamic linking
-  AC_MSG_CHECKING([whether a test can be dynamically linked])
+  AC_MSG_CHECKING([whether a boost unittest can be dynamically linked])
   AC_LANG_PUSH([C++])
   AC_LINK_IFELSE(AC_LANG_SOURCE([[
         @%:@define BOOST_TEST_DYN_LINK
@@ -185,35 +150,13 @@ AS_IF([test "x$external_boost" = "xyes"],[
     AC_DEFINE([BOOST_TEST_DYN_LINK], 1, 
     [whether to link the unit test framework library dynamically])
   fi
-
-  # restore previous flags
-  LIBS="$libs_saved"
 ])
 
-# CHECK FOR THE BOOST MPI PYTHON MODULE
-AC_ARG_WITH([boost-mpi-python-module],
-    AS_HELP_STRING([--with-boost-mpi-python-module=PATH], 
-    	           [specify the complete path where the boost.mpi python module can be found.])
-    ,, [withval="no"]
-)
-AS_IF([test "x$withval" = "xyes"], 
-  [AC_MSG_ERROR([specify the complete path of the boost.mpi python module])])
-AS_IF([test "x$withval" = "xno" && test "x$external_boost" != "xyes"],
-        [BOOST_MPI_PYTHON_LIBS="$boost_internal_dir/libboost_mpi_python.la"
-         BOOST_MPI_PYTHON_DIR=`pwd`"/contrib/boost-am/.libs"],
-      [test "x$withval" = "xno"],
-        [AC_MSG_ERROR([boost.mpi python module was not specified. Specify either all or none of the boost libraries.])],
-      [test ! -e "$withval"], 
-        [AC_MSG_ERROR([file $withval does not exist! please specify the complete path of the boost.mpi python module])],
-      [test "x$external_boost" != "xyes"],
-        [AC_MSG_ERROR([boost.mpi python module was specified, but none of the other boost libs. Specify either all or none of the boost libraries.])],
-        [BOOST_MPI_PYTHON_LIBS="$withval"
-         BOOST_MPI_PYTHON_DIR=`AS_DIRNAME($withval)`]
-)
+AM_CONDITIONAL([EXTERNAL_BOOST],[test "x$external_boost" = "xyes"])
+AC_SUBST(ESPRESSO_BOOST_LIBS)
+AC_SUBST(BOOST_UNITTEST_LIBS)
 AC_SUBST(BOOST_MPI_PYTHON_LIBS)
 AC_SUBST(BOOST_MPI_PYTHON_DIR)
-
-AM_CONDITIONAL([EXTERNAL_BOOST],[test "x$external_boost" = "xyes"])
 
 AS_IF([test "x$external_boost" != "xyes"], 
   [AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/contrib/boost-am/"])
@@ -313,6 +256,7 @@ AC_CONFIG_FILES([test/runtests.sh],
 AC_CONFIG_FILES([
        espresso_setup.sh:espresso_setup.sh.build.in
        espresso_setup.sh.install:espresso_setup.sh.install.in
+       espresso_setup.csh:espresso_setup.csh.build.in
        espresso_setup.py:espresso_setup.py.build.in
        espresso_setup.py.install:espresso_setup.py.install.in
        ])
@@ -375,17 +319,13 @@ EOF
 
 AS_IF([test "x$external_boost" = "xyes"], [
 cat >>config.summary << EOF
- * Boost:
-   - boost.Serialization libraries: $BOOST_SERIALIZATION_LIBS
-   - boost.Python libraries: $BOOST_PYTHON_LIBS
-   - boost.MPI libraries: $BOOST_MPI_LIBS
-   - boost.Test libraries: $BOOST_UNITTEST_LIBS
+ * Boost: external
    - boost.MPI python dir: $BOOST_MPI_PYTHON_DIR
 EOF
 ],
 [
 cat >>config.summary << EOF
- * Boost: (internal)
+ * Boost: internal
 EOF
 ])
 

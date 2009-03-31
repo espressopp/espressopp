@@ -7,7 +7,7 @@ EXTRA_DIST = autogen.sh
 #################################################################
 .PHONY: FORCE doc ug dg
 doc ug dg: FORCE
-	cd doc; $(MAKE) --print-directory $@
+	cd doc; $(MAKE) $(AM_MAKEFLAGS) --print-directory $@
 FORCE:
 
 distclean-local:

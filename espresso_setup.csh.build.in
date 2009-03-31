@@ -1,0 +1,18 @@
+# Shell-script that sets the required environment variables to run 
+# ESPResSo++ from the build path.
+# @configure_input@
+#
+# Please source this script in the shell that you use to execute
+# espresso, by using
+#
+# source @abs_top_builddir@/espresso_setup.csh
+#
+set abs_top_builddir="@abs_top_builddir@"
+set BOOST_MPI_PYTHON_DIR="@BOOST_MPI_PYTHON_DIR@"
+set ESPP_PYTHONPATH=${abs_top_builddir}:${abs_top_builddir}/espresso/.libs:${BOOST_MPI_PYTHON_DIR}
+
+if ($?PYTHONPATH) then
+    setenv PYTHONPATH ${ESPP_PYTHONPATH}:${PYTHONPATH}
+else
+    setenv PYTHONPATH ${ESPP_PYTHONPATH}
+endif
