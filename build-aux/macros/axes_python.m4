@@ -146,8 +146,7 @@ AS_IF([test "x$axes_cv_python_asis" = "xno"],
             ])
 
           # check for matching headers
-          AS_IF(
-            [test "x$axes_cv_python_lib" != "xno"],
+          if test "x$axes_cv_python_lib" != "xno"; then
             AC_CACHE_CHECK(
               [for matching python headers],
               axes_cv_python_include,
@@ -183,7 +182,7 @@ AS_IF([test "x$axes_cv_python_asis" = "xno"],
                       [break])
                 done
               ])
-          )
+          fi
 
           # restore flags
           CPPFLAGS="$axes_python_saved_cppflags"
