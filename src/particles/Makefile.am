@@ -5,6 +5,7 @@ subpkgincludedir=$(pkgincludedir)/particles
 subpkginclude_HEADERS = \
 	bindings.hpp \
 	Computer.hpp \
+	PythonComputer.hpp \
 	Property.hpp \
 	Storage.hpp \
 	Set.hpp \
@@ -13,6 +14,7 @@ subpkginclude_HEADERS = \
 noinst_LTLIBRARIES = libparticles.la
 
 libparticles_la_SOURCES = \
+	PythonComputer.cpp \
 	bindings.cpp \
 	Storage.cpp \
 	All.cpp
