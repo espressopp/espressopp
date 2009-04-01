@@ -65,41 +65,54 @@
 
 AC_DEFUN([AXES_MPI], [
 
-AC_CACHE_CHECK(whether MPI is available,
-                axes_cv_mpi,[
-    dnl save current flags
-    axes_mpi_libs_saved="$LIBS"
+AC_CACHE_CHECK([whether an MPI program can be linked as is],
+    axes_cv_mpi_asis,
+    AC_LINK_IFELSE(AC_LANG_PROGRAM([[
+        @%:@include <mpi.h>
+        ]], [[
+        MPI_Init((int *)0, (char ***)(0));
+        return 0;
+        ]]), 
+      [axes_cv_mpi_asis=yes], 
+      [axes_cv_mpi_asis=no]))
 
-    dnl check whether we need -lmpi or no
-    for lib in yes -lmpi; do
-        if test "$lib" != "yes"; then
-            LIBS="$axes_mpi_libs_save $lib"
-        fi
+# if not, check whether adding -lmpi can help
+AS_IF([test "x$axes_cv_mpi_asis" = "xno"],
+  AC_CACHE_CHECK([whether MPI requires -lmpi],
+      axes_cv_mpi_lib,
+    [
+      # save current flags
+      axes_mpi_libs_saved="$LIBS"
+
+      for axes_mpi_lib in -lmpi
+      do
+        LIBS="$axes_mpi_libs_save $axes_mpi_lib"
         AC_LINK_IFELSE(AC_LANG_PROGRAM([[
             @%:@include <mpi.h>
-        ]], [[
+            ]], [[
             MPI_Init((int *)0, (char ***)(0));
             return 0;
-        ]]), axes_cv_mpi=$lib, axes_cv_mpi=no)
-        if test $axes_cv_mpi != no; then break; fi
-    done
+            ]]), 
+          [axes_cv_mpi_lib=$axes_mpi_lib],
+          [axes_cv_mpi_lib="no"])
+        AS_IF([test "x$axes_cv_mpi_lib" != "xno"],
+          [break])
+      done
 
-    dnl restore flags
-    LIBS="$axes_mpi_libs_saved"
+      # restore flags
+      LIBS="$axes_mpi_libs_saved"
+    ]))
 
-    dnl fixup output if -lmpi is necessary
-    if test $axes_cv_mpi != no; then
-        if test $axes_cv_mpi != yes; then
-            axes_cv_mpi="requires $axes_cv_mpi"
-        fi
-    fi
+
+AS_IF(
+  [test "x$axes_cv_mpi_asis" = "xyes"],
+    [ AC_DEFINE(HAVE_MPI,1,[define if MPI is available])
+      axes_cv_mpi_lib=yes ],
+  [test "x$axes_cv_mpi_lib" != "xno"],
+    [ AC_DEFINE(HAVE_MPI,1) 
+      MPI_LIBS="$axes_cv_mpi_lib" ])
+
+AC_SUBST(MPI_LIBS)
+
 ])
 
-if test "x$axes_cv_mpi" != "xno"; then
-    AC_DEFINE(HAVE_MPI,1, [define if MPI is available])
-    if test "x$axes_cv_mpi" != "xyes"; then
-        MPI_LIBS=`echo $axes_cv_mpi | sed -e 's/^requires //'`
-    fi
-    AC_SUBST(MPI_LIBS)
-fi
-])

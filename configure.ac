@@ -14,7 +14,6 @@ AC_CONFIG_SRCDIR([src/_espresso.cpp])
 
 # we use automake
 AM_INIT_AUTOMAKE([gnu subdir-objects dist-bzip2])
-AM_PROG_CC_C_O
 
 # import paths from the EXTRA_PREFIXES precious variable
 AXES_IMPORT_EXTRA_PREFIXES
@@ -27,6 +26,7 @@ EOF
 
 # we use C++ as main code language
 # and libtool for building the shared libraries
+AM_PROG_CC_C_O
 AC_PROG_CXX
 AC_LANG([C++])
 
@@ -46,14 +46,14 @@ AS_IF([test "$ac_cv_header_sys_time_h" != "yes"],
 
 cat >& AS_MESSAGE_FD <<EOF
 **********************************************************************
-*       Checking for required external libraries and tools           *
+*       Checking for required libraries and tools                    *
 **********************************************************************
 EOF
 
 AXES_PYTHON
 AS_IF([test "x$axes_cv_python_lib" = "xno" || 
-	    test "x$axes_cv_python_include" = "xno"], 
-         [AC_MSG_ERROR([could not find python])])
+	  test "x$axes_cv_python_include" = "xno"], 
+         [AC_MSG_ERROR([Could not find python.])])
 
 AXES_MPI
 AS_IF([test "x$axes_cv_mpi" = "xno"],
@@ -280,6 +280,8 @@ AC_OUTPUT
 ################################################################### 
 
 test "x$EXTRA_PREFIXES" != "x" || EXTRA_PREFIXES="(none)"
+test "x$PYTHON_LIBS" != "x" || PYTHON_LIBS="(none required)"
+test "x$PYTHON_CPPFLAGS" != "x" || PYTHON_CPPFLAGS="(none required)"
 test "x$MPI_LIBS" != "x" || MPI_LIBS="(none required)"
 test "x$DOXYGEN" != "xno" || DOXYGEN="(not available)"
 AS_IF([test "x$MYMPIEXEC" = "x"],
