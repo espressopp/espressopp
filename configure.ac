@@ -26,8 +26,8 @@ EOF
 
 # we use C++ as main code language
 # and libtool for building the shared libraries
-AM_PROG_CC_C_O
 AC_PROG_CXX
+#AM_PROG_CC_C_O
 AC_LANG([C++])
 
 LT_INIT([dlopen])
@@ -88,6 +88,7 @@ Defaults to BUILDDIR/mympiexec.sh]),
   AC_SUBST(MYMPIEXEC)
 ])
 
+AC_CACHE_SAVE
 
 ###################################################################
 #                                                                 #
@@ -95,62 +96,104 @@ Defaults to BUILDDIR/mympiexec.sh]),
 #                                                                 #
 ###################################################################
 
-AC_MSG_CHECKING([whether to use an external boost library])
+
+AC_MSG_CHECKING([whether to use external boost libraries])
 AC_ARG_WITH([external-boost],
     AS_HELP_STRING([--with-external-boost=BOOST_MPI_PYTHON_MODULE],
       [specify whether to use external boost libraries (instead of the
        internal ones). If an external boost library is used, specify the
        path of the boost.mpi python module.])
     ,, [with_external_boost="no"])
+
 AS_IF([test "x$with_external_boost" = "xno"],
-    AC_MSG_RESULT([no]), AC_MSG_RESULT([yes]))
+    [ AC_MSG_RESULT([no])
+      # if we use the internal boost, set the configuration variables
+      boost_internal_dir=`pwd`"/contrib/boost-am/"
+      ESPRESSO_BOOST_LIBS="$boost_internal_dir/libespresso_boost.la"
+      BOOST_UNITTEST_LIBS="$boost_internal_dir/libboost_unit_test_framework.la"
+      BOOST_MPI_PYTHON_DIR="$boost_internal_dir/.libs"
+      BOOST_MPI_PYTHON_LIBS="$boost_internal_dir/libboost_mpi_python.la"
+      AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/contrib/boost-am/"],
+    [ AC_MSG_RESULT([yes])
 
-AC_MSG_CHECKING([where to find the boost.mpi python module])
-AS_IF([test "x$with_external_boost" = "xno"],
-    [boost_internal_dir=`pwd`"/contrib/boost-am/"
-     ESPRESSO_BOOST_LIBS="$boost_internal_dir/libespresso_boost.la"
-     BOOST_UNITTEST_LIBS="$boost_internal_dir/libboost_unit_test_framework.la"
-     BOOST_MPI_PYTHON_DIR="$boost_internal_dir/.libs"
-     BOOST_MPI_PYTHON_LIBS="$boost_internal_dir/libboost_mpi_python.la"
-     AC_MSG_RESULT([(internal dir)])
-    ],
-  [test "x$with_external_boost" = "xyes"],
-    [AC_MSG_ERROR([boost.mpi python module was not specified in
-     --with-external-boost.])],
-  [test ! -e "$with_external_boost"], 
-    [AC_MSG_ERROR([file $with_external_boost does not exist! Please specify the complete path of the boost.mpi python module])],
-  dnl TODO: Check whether a boost program compiles as is
-  [ # else
-    BOOST_MPI_PYTHON_DIR=`AS_DIRNAME($with_external_boost)`
-    BOOST_MPI_PYTHON_LIBS="$with_external_boost"
-    AC_MSG_RESULT([$with_external_boost])
-  ]
-)
+      # Test whether we can link a boost program
+      AC_CACHE_CHECK([whether a boost program can be linked],
+        axes_cv_external_boost_works,
+        [ AC_LANG_PUSH([C++])
+          AC_LINK_IFELSE(AC_LANG_PROGRAM([[
+                @%:@include <boost/archive/basic_archive.hpp>
+		@%:@include <boost/python.hpp>
+                @%:@include <boost/mpi.hpp>
+               using namespace boost::python;
+              ]],[[
+                // boost.serialization
+                boost::archive::tracking_type t;
+                // boost.python
+		boost::python::detail::init_module("test", 0);
+                // boost.mpi
+                int x;
+                boost::mpi::environment env;
+                boost::mpi::communicator world;
+                world.send(0, x);
+                world.recv(0,0,x);
 
-# Test using the unittest framework
-AS_IF([test "x$with_external_boost" != "xno"],[
-  # test link a program using the dynamic linking
-  AC_MSG_CHECKING([whether a boost unittest can be dynamically linked])
-  AC_LANG_PUSH([C++])
-  AC_LINK_IFELSE(AC_LANG_SOURCE([[
-        @%:@define BOOST_TEST_DYN_LINK
-        @%:@define BOOST_TEST_MODULE conftest
-        @%:@include <boost/test/unit_test.hpp>
-        BOOST_AUTO_TEST_CASE(conftestcase) {
-          BOOST_CHECK(true);
-        }
-  ]]), 
-  axes_boost_unit_test_framework_succeeded=yes,
-  axes_boost_unit_test_framework_succeeded=no)
-  AC_LANG_POP([C++])
-  AC_MSG_RESULT([$axes_boost_unit_test_framework_succeeded])
+                return 0;
+              ]]), 
+            [ axes_cv_external_boost_works=yes ],
+            [ axes_cv_external_boost_works=no ])
+          AC_LANG_POP([C++])])
+      AS_IF([test "x$axes_cv_external_boost_works" = "xno"],
+        [ AC_MSG_ERROR([Cannot compile a boost program using external boost!])])
 
-  # define BOOST_TEST_DYN_LINK if required
-  if test "x$axes_boost_unit_test_framework_succeeded" = "xyes"; then
-    AC_DEFINE([BOOST_TEST_DYN_LINK], 1, 
-    [whether to link the unit test framework library dynamically])
-  fi
-])
+      # Test where to find the boost.mi python module
+      AC_MSG_CHECKING([where to find the boost.mpi python module])
+      AS_IF([test "x$with_external_boost" = "xyes"],
+          [ AC_MSG_ERROR([boost.mpi python module was not specified in --with-external-boost.])],
+        [test ! -e "$with_external_boost"], 
+          [ AC_MSG_ERROR([file $with_external_boost does not exist! Please specify the complete path of the boost.mpi python module])],
+        [ # else
+          BOOST_MPI_PYTHON_DIR=`AS_DIRNAME($with_external_boost)`
+          BOOST_MPI_PYTHON_LIBS="$with_external_boost"
+          AC_MSG_RESULT([$with_external_boost])
+        ])
+
+      # Test using the unittest framework
+      AC_CACHE_CHECK([whether a boost unittest can be dynamically linked],
+        axes_cv_boost_unittest_dynamic,
+        [ AC_LANG_PUSH([C++])
+          # test link a program using dynamic linking
+          AC_LINK_IFELSE(AC_LANG_SOURCE([[
+                @%:@define BOOST_TEST_DYN_LINK
+                @%:@define BOOST_TEST_MODULE conftest
+                @%:@include <boost/test/unit_test.hpp>
+                BOOST_AUTO_TEST_CASE(conftestcase) {
+                  BOOST_CHECK(true);
+                }
+              ]]), 
+            [ axes_cv_boost_unittest_dynamic=yes ],
+            [ axes_cv_boost_unittest_dynamic=no ])
+          AC_LANG_POP([C++]) ])
+
+      AS_IF([test "x$axes_cv_boost_unittest_dynamic" = "xyes"],
+        [ AC_DEFINE([BOOST_TEST_DYN_LINK], 1, [whether to link the unit test framework library dynamically]) ],
+        [ AC_CACHE_CHECK([whether a boost unittest can be statically linked],
+            axes_cv_boost_unittest_static,
+            [ AC_LANG_PUSH([C++])
+              # test link a program using static linking
+              AC_LINK_IFELSE(AC_LANG_SOURCE([[
+                    @%:@define BOOST_TEST_MODULE conftest
+                    @%:@include <boost/test/unit_test.hpp>
+                    BOOST_AUTO_TEST_CASE(conftestcase) {
+                      BOOST_CHECK(true);
+                    }
+                  ]]), 
+                [ axes_cv_boost_unittest_static=yes ],
+                [ axes_cv_boost_unittest_static=no ])
+              AC_LANG_POP([C++]) ])
+
+          AS_IF([test "x$axes_cv_boost_unittest_static" != "xno"],
+            [ AC_MSG_ERROR([Boost unittest framework doesn't work!])])])
+]) # external boost
 
 AM_CONDITIONAL([EXTERNAL_BOOST],[test "x$external_boost" = "xyes"])
 AC_SUBST(ESPRESSO_BOOST_LIBS)
@@ -158,8 +201,8 @@ AC_SUBST(BOOST_UNITTEST_LIBS)
 AC_SUBST(BOOST_MPI_PYTHON_LIBS)
 AC_SUBST(BOOST_MPI_PYTHON_DIR)
 
-AS_IF([test "x$external_boost" != "xyes"], 
-  [AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/contrib/boost-am/"])
+AC_CACHE_SAVE
+
 
 ###################################################################
 #                                                                 #
