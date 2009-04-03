@@ -60,6 +60,12 @@ namespace log4espp {
 
    typedef boost::python::object object;
 
+   /** Initialization routine to be called with initialization */
+
+   static void initLogging();
+
+   static void registerPython();
+
    /** Constructor for a Logger that will use a corresponding Python instance
        for the configuration and for the output of the logging messages  
    */

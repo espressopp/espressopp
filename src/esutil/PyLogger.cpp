@@ -250,6 +250,10 @@ void PyLogger::setPythonLoggers(string& parentName)
    else
       fullName  = parentName + "." + name;
  
+#ifdef DEBUGGING
+   printf("setPytthonLoggers for %s\n", fullName.c_str());  
+#endif 
+
    object pyLogger = pyLogging.attr("getLogger") (fullName);
 
    // set the logger; will inherit the level 
@@ -270,6 +274,9 @@ static void pyInitialize() {
 
   if (!pyInit) {
 
+#ifdef DEBUGGING
+     printf("PyLogger:: pyInitialize\n");  
+#endif 
      // ToDo: make sure that Python itself has been initialized
      //       even it will probably never be called this way
 
@@ -277,6 +284,11 @@ static void pyInitialize() {
 
      pyLogging = import("logging");
 
+#ifdef DEBUGGING
+     printf("PyLogger:: import logging done\n");  
+#endif 
+
+     // ToDo: make sure that Python itself has been initialized
      pyNOTSET =  extract<int>(pyLogging.attr("NOTSET"));
      pyDEBUG  =  extract<int>(pyLogging.attr("DEBUG"));
      pyTRACE  =  extract<int>(pyLogging.attr("TRACE"));
@@ -284,6 +296,10 @@ static void pyInitialize() {
      pyWARN   =  extract<int>(pyLogging.attr("WARN"));
      pyERROR  =  extract<int>(pyLogging.attr("ERROR"));
      pyFATAL  =  extract<int>(pyLogging.attr("FATAL"));
+
+#ifdef DEBUGGING
+     printf("PyLogger:: got the logging levels\n");  
+#endif 
 
      pyInit = true;
   }
@@ -328,7 +344,7 @@ void loggerUpdate(object pythonLogger) {
            be availabe here.
 */
 
-void initLogging()
+void PyLogger::initLogging()
 
 {
 #ifdef DEBUGGING
@@ -355,8 +371,8 @@ void initLogging()
 
 /** This routine exports the bindings for python */
 
-void exportLogging() {
+void PyLogger::registerPython() {
 
-  def("setLogger", &initLogging);
+  def("setLogger", &PyLogger::initLogging);
   def("setLogger", &loggerUpdate);
 }
