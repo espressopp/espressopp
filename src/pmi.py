@@ -24,7 +24,6 @@ def __workerExec_(statement) :
     'Internal function that executes the given statement locally.'
     # executing the statement locally
     log.info("Executing '%s'", statement)
-    dir()
     exec statement in globals()
 
 ##################################################
@@ -293,6 +292,29 @@ def workerLoop() :
             __receive()
     except StopIteration :
         pass
+
+# Metaclass
+import functools
+
+def method_caller(method, self, *args) :
+    print('method_caller(%s, %s)' % (self, args))
+    getattr(self, method)(self, *args)
+
+def getargs(*args) :
+    print('arguments=%s' % args)
+
+class Proxy(type):
+    def __init__(self, name, bases, dict) :
+        # init the pmi object
+        self.local = create(dict['pmiclass'])
+        for method in dict['pmilocal'] :
+            newfunc = functools.partial(method_caller, method)
+            print(newfunc.func)
+            print(newfunc.args)
+#             setattr(self, method,
+#                     functools.partial(method_caller, method))
+                                     
+        return type.__init__(self, name, bases, dict)
 
 ##################################################
 ## CONSTANTS AND EXCEPTIONS

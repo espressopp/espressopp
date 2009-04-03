@@ -137,6 +137,20 @@ class Test3Reduce(unittest.TestCase) :
         res = pmi.reduce('myadd', 'amodule.f')
         self.assertEqual(res, 42*esmpi.world.size)
         pmi.exec_('del myadd')
+
+
+class Test4Proxy(unittest.TestCase) :
+    def test0Create(self):
+        pmi.exec_('import amodule')
+        class AProxy(object) :
+            __metaclass__ = pmi.Proxy
+            pmiclass = 'amodule.A'
+            pmilocal = [ 'f' ]
+        a = AProxy()
+        print(dir(a))
+        print(a.f.func)
+        print(a.f.args)
+        print(AProxy.f(a))
         
 if __name__ == "__main__":
     unittest.main()

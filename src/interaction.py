@@ -51,13 +51,15 @@ class __LennardJones(LennardJonesLocal) :
 
 if pmi.IS_CONTROLLER :
     # wrap LennardJones
-    pmi.exec_('from espresso import interaction')
 
     # class LennardJones(object) :
     #     __metaclass__ = PMIProxy
-    #     pmiclass = interaction_local.LennardJones
-    #     pmicalls = [ set ]
+    #     pmiclass = 'LennardJonesLocal'
+    #     pmicall = [ 'set' ]
+    #     pmiinvoke = []
+    #     pmilocal = [ pmi.ALL ]
     
+    pmi.exec_('from espresso.interaction import LennardJonesLocal')
     class LennardJones (object):
         'The Lennard-Jones interaction.'
         
@@ -74,19 +76,19 @@ if pmi.IS_CONTROLLER :
         def set(self, epsilon=None, sigma=None, cutoff=None) :
             """set(integer, integer, integer) -- Set the "parameters" of the interaction.
             """
-            pmi.call('LennardJones.set',
+            pmi.call('LennardJonesLocal.set',
                      self.local, epsilon, sigma, cutoff)
             
         # define single property setters
         # avoid using these if possible
         def _setEpsilon(self, _epsilon) :
-            pmi.call('LennardJones._setEpsilon',
+            pmi.call('LennardJonesLocal._setEpsilon',
                      self.local, _epsilon)
         def _setSigma(self, _sigma) : 
-            pmi.call('LennardJones._setSigma',
+            pmi.call('LennardJonesLocal._setSigma',
                      self.local, _sigma)
         def _setCutoff(self, _cutoff) : 
-            pmi.call('interaction_local.LennardJones._setCutoff',
+            pmi.call('LennardJonesLocal._setCutoff',
                      self.local, _cutoff)
                         
         def _getEpsilon(self) :
