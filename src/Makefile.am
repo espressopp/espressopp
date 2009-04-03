@@ -24,6 +24,7 @@ libespresso_common_la_SOURCES= \
 	espresso_common.cpp
 libespresso_common_la_LIBADD = \
 	esutil/libesutil.la \
+	esutil/libpylogger.la \
 	hello/libhello.la \
 	particles/libparticles.la \
 	pairs/libpairs.la \

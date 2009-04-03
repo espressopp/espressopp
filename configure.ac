@@ -27,7 +27,6 @@ EOF
 # we use C++ as main code language
 # and libtool for building the shared libraries
 AC_PROG_CXX
-#AM_PROG_CC_C_O
 AC_LANG([C++])
 
 LT_INIT([dlopen])

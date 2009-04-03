@@ -88,21 +88,19 @@ AC_CACHE_CHECK(
       [axes_cv_python_asis=no]))
 
 # if not, test the details
-AS_IF([test "x$axes_cv_python_asis" = "xno"],
-  [ 
+if test "x$axes_cv_python_asis" = "xno"; then
     AC_ARG_WITH([python],
         AS_HELP_STRING([--with-python@<:@=LIB@:>@],
           [use python (default is yes) - you can specify the library of python
           to use, by default the latest available is used]),
-        AS_IF(
-          [test "x$withval" = "xno"],
-            [want_python="no"],
-          [test "x$withval" = "xyes"]
-            [want_python="yes"]
-          [
-            want_python="yes"
-            axes_python_version="$withval"
-          ]),
+        [ if test "x$withval" = "xno"; then
+              want_python="no"
+          elif test "x$withval" = "xyes"; then
+              want_python="yes"
+          else
+              want_python="yes"
+              axes_python_version="$withval"
+          fi ],
         [ want_python="yes" ])
 
     AS_IF([test "x$want_python" != "xno"],
@@ -184,7 +182,7 @@ AS_IF([test "x$axes_cv_python_asis" = "xno"],
           CPPFLAGS="$axes_python_saved_cppflags"
           LIBS="$axes_python_saved_libs"
     ]) # want_python
-]) # python_asis
+fi # python_asis
 
 # results
 if test "x$axes_cv_python_asis" = "xyes"; then

@@ -4,14 +4,13 @@
 */
 #include "acconfig.hpp"
 #include "espresso_common.hpp"
-#include <logging.hpp>
-#include <python.hpp>
+#include "python.hpp"
+#include "esutil/PyLogger.hpp"
 
 static void finalize();
 
 BOOST_PYTHON_MODULE(_espresso)
 {
-
   initMPI();
 
   // register all classes with python 
