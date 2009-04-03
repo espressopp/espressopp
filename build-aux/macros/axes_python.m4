@@ -105,8 +105,7 @@ AS_IF([test "x$axes_cv_python_asis" = "xno"],
           ]),
         [ want_python="yes" ])
 
-    AS_IF(
-      [test "x$want_python" != "xno"],
+    AS_IF([test "x$want_python" != "xno"],
         [
           # save flags before tests
           axes_python_saved_cppflags="$CPPFLAGS"
@@ -176,8 +175,7 @@ AS_IF([test "x$axes_cv_python_asis" = "xno"],
             	      ]]),
                     [axes_cv_python_include="$axes_python_path_tmp/$axes_cv_python_lib"],
                     [axes_cv_python_include=no])
-                  AS_IF(
-                    [test "x$axes_cv_python_include" != "xno"],
+                  AS_IF([test "x$axes_cv_python_include" != "xno"],
                       [break])
                 done
               ])])
@@ -189,17 +187,18 @@ AS_IF([test "x$axes_cv_python_asis" = "xno"],
 ]) # python_asis
 
 # results
-AS_IF([test "x$axes_cv_python_asis" = "xyes"],
-        [ AC_DEFINE(HAVE_PYTHON,1,[define if python is available])
-          axes_cv_python_include=yes
-          axes_cv_python_lib=yes ],
-      [test "x$axes_cv_python_include" != "x" &&
-          test "x$axes_cv_python_lib" != "x"],
-        [ AC_DEFINE(HAVE_PYTHON,1)
-          PYTHON_CPPFLAGS="-I$axes_cv_python_include"
-          PYTHON_LIBS="-l$axes_cv_python_lib" ],
-      [ axes_cv_python_include=no
-        axes_cv_python_lib=no])
+if test "x$axes_cv_python_asis" = "xyes"; then
+  AC_DEFINE(HAVE_PYTHON,1,[define if python is available])
+  axes_cv_python_include=yes
+  axes_cv_python_lib=yes
+elif test "x$axes_cv_python_include" != "x" && test "x$axes_cv_python_lib" != "x"; then
+  AC_DEFINE(HAVE_PYTHON,1)
+  PYTHON_CPPFLAGS="-I$axes_cv_python_include"
+  PYTHON_LIBS="-l$axes_cv_python_lib"
+else
+  axes_cv_python_include=no
+  axes_cv_python_lib=no
+fi
 
 AC_SUBST(PYTHON_CPPFLAGS)
 AC_SUBST(PYTHON_LIBS)
