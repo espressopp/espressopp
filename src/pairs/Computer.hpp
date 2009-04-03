@@ -2,7 +2,9 @@
 #define _PAIRS_COMPUTER_HPP
 
 #include "types.hpp"
+#include "particles/ParticleHandle.hpp"
 #include "particles/Set.hpp"
+
 
 namespace espresso {
   namespace pairs {
@@ -34,12 +36,12 @@ namespace espresso {
 
     /** Abstract class that defines a function on pairs of particles */
     class Computer: 
-      public ComputerBase<ParticleReference> 
+      public ComputerBase<particles::ParticleReference> 
     {};
     
     /** Abstract class that defines a function on pairs of read-only particles */
     class ConstComputer:
-      public ComputerBase<ConstParticleReference> 
+      public ComputerBase<particles::ConstParticleReference> 
     {};
   }
 }

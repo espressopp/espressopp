@@ -6,6 +6,7 @@ subpkginclude_HEADERS = \
 	bindings.hpp \
 	Computer.hpp \
 	PythonComputer.hpp \
+	ParticleHandle.hpp \
 	Property.hpp \
 	Storage.hpp \
 	Set.hpp \

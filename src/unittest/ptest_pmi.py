@@ -19,18 +19,18 @@ class Test0Exec(unittest.TestCase) :
             self.fail("expected a NameError")
 
         # clean up
-        pmi.exec_("del(amodule)")
+        pmi.exec_("del amodule")
         
     def testImportModuleAs(self) :
         pmi.exec_("import amodule as e")
         self.assertEqual(pmi.e.__name__, "amodule")
-        pmi.exec_("del(e)")
+        pmi.exec_("del e")
 
 class Test1CreateAndDelete(unittest.TestCase) :
     def setUp(self) :
         pmi.exec_("import amodule")
     def tearDown(self) :
-        pmi.exec_("del(amodule)")
+        pmi.exec_("del amodule")
 
     def test0StringArgument(self) :
         self.assertEqual(len(pmi.OIDS), 0)
@@ -63,7 +63,7 @@ class Test2Call(unittest.TestCase) :
         self.a = pmi.create('amodule.A')
 
     def tearDown(self) :
-        pmi.exec_("del(amodule)")
+        pmi.exec_("del amodule")
         del self.a
 
     def test0FunctionByString(self) :
@@ -78,7 +78,7 @@ class Test2Call(unittest.TestCase) :
         self.assertEqual(pmi.amodule.f_arg, 42)
         pmi.call(amodule.g, 52)
         self.assertEqual(pmi.amodule.g_arg, 52)
-        del(amodule)
+        del amodule
 
     def test2SimpleMethod(self):
         pmi.call(self.a.f)
@@ -102,7 +102,7 @@ class Test2Invoke(unittest.TestCase) :
         self.a = pmi.create('amodule.A')
 
     def tearDown(self) :
-        pmi.exec_("del(amodule)")
+        pmi.exec_("del amodule")
         del self.a
 
     def test0Function(self) :
@@ -123,7 +123,7 @@ class Test3Reduce(unittest.TestCase) :
         self.a = pmi.create('amodule.A')
 
     def tearDown(self) :
-        pmi.exec_("del(amodule)")
+        pmi.exec_("del amodule")
         del self.a
 
     def test0Function(self) :

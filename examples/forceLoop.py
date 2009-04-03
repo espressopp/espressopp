@@ -1,4 +1,3 @@
-import sys
 import espresso
 import espresso.bc
 import espresso.interaction
@@ -19,9 +18,9 @@ ljint=espresso.interaction.LennardJones(sigma=1, epsilon=1, cutoff=2.5)
 
 # Just compute the forces
 allpairs.computeForces(set='force', interaction=ljint)
-force=particles.getParticleProperty(name='force')
-sys.write(force[particles[17]])
-sys.write(particles[17].get(name='force'))
+force=particles.getProperty(name='force')
+print(force[particles[17]])
+print(particles[17].get(name='force'))
 
 # Now do 1000 simulation steps
 vvintegrator=espresso.integrator.VelocityVerlet(timestep=0.001, bc=pbc)

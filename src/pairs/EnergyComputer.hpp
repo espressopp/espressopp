@@ -39,8 +39,8 @@ namespace espresso {
       virtual ~EnergyComputer() {};
 
       virtual void operator()(const Real3D &dist,
-                              const ParticleReference p1,
-                              const ParticleReference p2) {};
+                              const particles::ParticleReference p1,
+                              const particles::ParticleReference p2) {};
 
       real getAccumulatedEnergy() const { return totalEnergy; }
 
@@ -50,8 +50,8 @@ namespace espresso {
       bool computesVirial;
 
       void addContribution(real e,
-                           const ParticleReference p1,
-                           const ParticleReference p2) {
+                           const particles::ParticleReference p1,
+                           const particles::ParticleReference p2) {
         energy[p1] += 0.5*e;
         energy[p2] += 0.5*e;
         totalEnergy += e;
@@ -80,8 +80,8 @@ namespace espresso {
       virtual ~SquareDistEnergyComputerFacade() {};
 
       virtual void operator()(const Real3D &dist,
-                              const ParticleReference p1,
-                              const ParticleReference p2) {
+                              const particles::ParticleReference p1,
+                              const particles::ParticleReference p2) {
         addContribution(computer.computeEnergySqr(dist.sqr()), p1, p2);
       }
 

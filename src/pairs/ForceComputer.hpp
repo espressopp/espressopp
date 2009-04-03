@@ -14,7 +14,7 @@ namespace espresso {
         computer. For standard forms of potential, there are
         ForceCalculator facades automatically implementing a
         ForceComputer. The facades are:
-        <ul>
+        <ul>Storage
         <li> VectorForceComputerFacade
         </ul>
 
@@ -36,8 +36,8 @@ namespace espresso {
       virtual ~ForceComputer() {};
 
       virtual void operator()(const Real3D &dist,
-                              const ParticleReference p1,
-                              const ParticleReference p2) {};
+                              const particles::ParticleReference p1,
+                              const particles::ParticleReference p2) {};
        
     protected: 
       particles::PropertyReference<Real3D> force;
@@ -46,8 +46,8 @@ namespace espresso {
 
       void addContribution(const Real3D &f,
                            const Real3D &dist,
-                           const ParticleReference p1,
-                           const ParticleReference p2) {
+                           const particles::ParticleReference p1,
+                           const particles::ParticleReference p2) {
         force[p1] += f;
         force[p2] -= f;
         if (computesVirial) virial = virial + f * dist;
@@ -73,8 +73,8 @@ namespace espresso {
       virtual ~VectorForceComputerFacade() {};
        
       virtual void operator()(const Real3D &dist,
-                              const ParticleReference p1,
-                              const ParticleReference p2) {
+                              const particles::ParticleReference p1,
+                              const particles::ParticleReference p2) {
         addContribution(computer.computeForce(dist), dist, p1, p2);
       }
        

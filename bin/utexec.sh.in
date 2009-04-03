@@ -1,5 +1,5 @@
 #! /bin/sh
-# Script that compiles, links and executes C++ unittests
+# Script that compiles, links and executes C++ unittests using libtool
 
 if test $1 = "--srcdir"; then
     srcdir=$2

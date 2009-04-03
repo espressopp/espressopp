@@ -3,7 +3,7 @@
 
 #include "types.hpp"
 #include "esutil/TupleVector.hpp"
-#include "Particle.hpp"
+#include "ParticleHandle.hpp"
 #include "Property.hpp"
 
 namespace espresso {

@@ -14,7 +14,6 @@ CLEANFILES =
 noinst_HEADERS = \
 	estypes.hpp \
 	Real3D.hpp \
-	Particle.hpp \
 	espresso_common.hpp
 
 # the common part of all Espresso flavors
@@ -66,7 +65,8 @@ python_scripts=\
 	esutil.py \
 	hello.py \
 	particles.py \
-	interaction.py
+	interaction.py \
+	interaction_local.py
 
 python_SCRIPTS=$(python_scripts)
 

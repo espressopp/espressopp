@@ -24,9 +24,9 @@ class __Real3D(Real3D) :
     """
     __metaclass__ = esutil.ExtendBaseClass
 
-    originit = Real3D.__init__
+    __originit = Real3D.__init__
     def __init__(self, x=0.0, y=0.0, z=0.0) :
-        return self.originit(x, y, z)
+        return self.__originit(x, y, z)
 
     # create setters and getters
     @esutil.propget

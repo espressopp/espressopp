@@ -3,6 +3,5 @@
 
 #include "estypes.hpp"
 #include "Real3D.hpp"
-#include "Particle.hpp"
 
 #endif 
