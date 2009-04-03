@@ -13,6 +13,25 @@ else :
     log = logging.getLogger('root')
     log.info('Did not find log config file %s, using basic configuration.', logConfigFile)
                               
+import _espresso
+
+# This initialization routine will change existing and future loggers
+# to make a connection with their Python logger and change their class
+
+__save__logging__Logger__setLevel = logging.Logger.setLevel
+
+def __mySetLevel__(self, level):
+
+    __save__logging__Logger__setLevel(self, level)
+    _espresso.setLogger(self)
+
+logging.Logger.setLevel = __mySetLevel__
+logging.TRACE = (logging.NOTSET + logging.DEBUG) / 2
+logging.addLevelName('TRACE', logging.TRACE)
+
+_espresso.setLogger()
+
+
 # Define the basic classes
 from _espresso import Real3D
 import esutil
