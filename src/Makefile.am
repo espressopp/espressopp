@@ -32,8 +32,7 @@ libespresso_common_la_LIBADD = \
 	integrator/libintegrator.la \
 	$(ESPRESSO_BOOST_LIBS) \
 	$(PYTHON_LIBS) \
-	$(MPI_LIBS) \
-	$(LOG4ESPP_LIBS)
+	$(MPI_LIBS) 
 
 # The python module _espresso
 # Build only if shared libs are built
@@ -52,7 +51,7 @@ pypresso_LDADD = libespresso_common.la \
 	$(BOOST_MPI_PYTHON_LIBS) \
 	$(PYTHON_LIBS) \
 	$(MPI_LIBS) \
-	$(LOG4ESPP_LIBS)
+	esutil/libpylogger.la 
 
 ##############################
 ## PYTHON
