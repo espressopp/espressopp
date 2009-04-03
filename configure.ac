@@ -53,11 +53,11 @@ EOF
 AXES_PYTHON
 AS_IF([test "x$axes_cv_python_lib" = "xno" || 
 	  test "x$axes_cv_python_include" = "xno"], 
-         [AC_MSG_ERROR([Could not find python.])])
+         [AC_MSG_FAILURE([Could not find python.])])
 
 AXES_MPI
 AS_IF([test "x$axes_cv_mpi" = "xno"],
-       [AC_MSG_ERROR([could not find mpi])])
+       [AC_MSG_FAILURE([Could not find mpi.])])
 
 
 ###################################################################
@@ -113,7 +113,9 @@ AS_IF([test "x$with_external_boost" = "xno"],
       BOOST_UNITTEST_LIBS="$boost_internal_dir/libboost_unit_test_framework.la"
       BOOST_MPI_PYTHON_DIR="$boost_internal_dir/.libs"
       BOOST_MPI_PYTHON_LIBS="$boost_internal_dir/libboost_mpi_python.la"
-      AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/contrib/boost-am/"],
+      AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/contrib/boost-am/"
+      UTEXEC_CPPFLAGS="-I\$top_srcdir/contrib/boost-am" 
+      UTEXEC_LDFLAGS="-L\$top_builddir/contrib/boost-am"],
     [ AC_MSG_RESULT([yes])
 
       # Test whether we can link a boost program
@@ -143,14 +145,14 @@ AS_IF([test "x$with_external_boost" = "xno"],
             [ axes_cv_external_boost_works=no ])
           AC_LANG_POP([C++])])
       AS_IF([test "x$axes_cv_external_boost_works" = "xno"],
-        [ AC_MSG_ERROR([Cannot compile a boost program using external boost!])])
+        [ AC_MSG_FAILURE([Cannot compile a boost program using external boost!])])
 
-      # Test where to find the boost.mi python module
+      # Test where to find the boost.mpi python module
       AC_MSG_CHECKING([where to find the boost.mpi python module])
       AS_IF([test "x$with_external_boost" = "xyes"],
-          [ AC_MSG_ERROR([boost.mpi python module was not specified in --with-external-boost.])],
+          [ AC_MSG_ERROR([Boost.mpi python module was not specified in --with-external-boost.])],
         [test ! -e "$with_external_boost"], 
-          [ AC_MSG_ERROR([file $with_external_boost does not exist! Please specify the complete path of the boost.mpi python module])],
+          [ AC_MSG_ERROR([File $with_external_boost does not exist! Please specify the complete path of the boost.mpi python module.])],
         [ # else
           BOOST_MPI_PYTHON_DIR=`AS_DIRNAME($with_external_boost)`
           BOOST_MPI_PYTHON_LIBS="$with_external_boost"
@@ -192,7 +194,7 @@ AS_IF([test "x$with_external_boost" = "xno"],
               AC_LANG_POP([C++]) ])
 
           AS_IF([test "x$axes_cv_boost_unittest_static" != "xno"],
-            [ AC_MSG_ERROR([Boost unittest framework doesn't work!])])])
+            [ AC_MSG_FAILURE([Can't link against the boost unittest framework!])])])
 ]) # external boost
 
 AM_CONDITIONAL([EXTERNAL_BOOST],[test "x$external_boost" = "xyes"])
@@ -200,6 +202,8 @@ AC_SUBST(ESPRESSO_BOOST_LIBS)
 AC_SUBST(BOOST_UNITTEST_LIBS)
 AC_SUBST(BOOST_MPI_PYTHON_LIBS)
 AC_SUBST(BOOST_MPI_PYTHON_DIR)
+AC_SUBST(UTEXEC_CPPFLAGS)
+AC_SUBST(UTEXEC_LDFLAGS)
 
 AC_CACHE_SAVE
 
@@ -241,16 +245,9 @@ AC_SUBST(pythondir)
 AC_SUBST([abs_top_builddir])
 
 # determine CPPFLAGS 
-AM_CPPFLAGS="-I\$(top_srcdir)/src -I\$(top_srcdir)/src/include \$(PYTHON_CPPFLAGS)"
-AS_IF([test "x$external_boost" != "xyes"],
-   [
-     AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/contrib/boost-am/"
-     UTEXEC_CPPFLAGS="-I\$top_srcdir/contrib/boost-am" 
-     UTEXEC_LDFLAGS="-L\$top_builddir/contrib/boost-am"
-   ])
+AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/src -I\$(top_srcdir)/src/include"
+test "x$PYTHON_CPPFLAGS" != "xno" && AM_CPPFLAGS="$AM_CPPFLAGS \$(PYTHON_CPPFLAGS)" 
 AC_SUBST([AM_CPPFLAGS])
-AC_SUBST([UTEXEC_CPPFLAGS])
-AC_SUBST([UTEXEC_LDFLAGS])
 
 ################################################################### 
 #                                                                 #

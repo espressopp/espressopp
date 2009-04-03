@@ -155,12 +155,11 @@ AS_IF([test "x$axes_cv_python_asis" = "xno"],
                 for axes_python_path_tmp in $CPPFLAGS
                 do
                   dnl translate -I flags into paths
-                  AS_CASE(["$axes_python_path_tmp"],
-                    [-I*], 
-                      [axes_python_abs_path=`cd ${axes_python_path_tmp#-I} && pwd`
-                       axes_python_try_roots="$axes_python_try_roots $axes_python_abs_path"],
-                    []
-                  )
+                  case $axes_python_path_tmp in
+                    (-I*)
+                       axes_python_abs_path=`cd ${axes_python_path_tmp#-I} && pwd`
+                       axes_python_try_roots="$axes_python_try_roots $axes_python_abs_path";;
+                  esac
                 done
                
                 axes_python_try_roots="$axes_python_try_roots /usr/include /usr/local/include"
