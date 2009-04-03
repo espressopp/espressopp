@@ -11,9 +11,6 @@ static void finalize();
 
 BOOST_PYTHON_MODULE(_espresso)
 {
-  LOG4ESPP_CONFIGURE();
-  LOG4ESPP_ROOTLOGGER(logger);
-  LOG4ESPP_INFO(logger, "BOOST_PYTHON_MODULE _espresso");
 
   initMPI();
 

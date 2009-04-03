@@ -6,7 +6,6 @@
 #include "espresso_common.hpp"
 #include <iostream>
 #include <python.hpp>
-#include <logging.hpp>
 
 using namespace std;
 using namespace boost;
@@ -37,7 +36,6 @@ BOOST_PYTHON_MODULE(_espresso)
 int main(int argc, char **argv)
 {
   int exitstate = 0;
-  LOG4ESPP_CONFIGURE();
 
   initMPI(argc, argv);
 
