@@ -24,6 +24,7 @@ def __workerExec_(statement) :
     'Internal function that executes the given statement locally.'
     # executing the statement locally
     log.info("Executing '%s'", statement)
+    log.info(globals().keys())
     exec statement in globals()
 
 ##################################################
@@ -248,19 +249,27 @@ def __workerDelete(oid) :
     del OBJECT_CACHE[oid]
 
 ##################################################
-## FINISH
+## FINALIZE
 ##################################################
-def finish() :
-    'Ends PMI, i.e. stops all workers'
-    global isFinished
-    __check_controller(finish)
-    if isFinished : return
-    isFinished = True
-    log.info('Calling all workers to stop.')
-    _broadcast(_FINISH)
+def registerAtExit() :
+    """Registers the function finalize() via atexit.
 
-def __workerFinish() :
-    log.info('Finishing worker loop.')
+    This is called, when the workerLoop() is called on the
+    controller."""
+    import atexit
+    atexit.register(finalize)
+    
+def finalize() :
+    'Ends PMI, i.e. stops all workers'
+    global isFinalized
+    __check_controller(finalize)
+    if isFinalized : return
+    isFinalized = True
+    log.info('Calling all workers to stop.')
+    _broadcast(_FINALIZE)
+
+def __workerFinalize() :
+    log.info('Finalizeing worker loop.')
     raise StopIteration()
 
 ##################################################
@@ -283,7 +292,8 @@ def workerLoop() :
     log.info(' Entering the worker loop.')
     # On the controller, leave immediately
     if IS_CONTROLLER : 
-        log.info('Leaving the worker loop.')
+        registerAtExit()
+        log.info('Registering finalize and leaving the worker loop.')
         return None
     
     try :
@@ -422,7 +432,7 @@ _INVOKE = 'PMIINVOKE'
 _CALL = 'PMICALL'
 _REDUCE = 'PMIREDUCE'
 _DELETE = 'PMIDELETE'
-_FINISH = 'PMIFINISH'
+_FINALIZE = 'PMIFINALIZE'
 _DUMP = 'PMIDUMP'
 
 # dict that associates the command IDs with their worker commands
@@ -432,7 +442,7 @@ _ALLCMD = { _EXEC : __workerExec_,
             _CALL : __workerCall,
             _REDUCE : __workerReduce,
             _DELETE : __workerDelete,
-            _FINISH : __workerFinish,
+            _FINALIZE : __workerFinalize,
             _DUMP : __workerDump
             }
 
@@ -443,7 +453,7 @@ else :
     # dict that stores the objects corresponding to an oid
     OBJECT_CACHE = {}
 
-isFinished = False
+isFinalized = False
 
 ##################################################
 ## MODULE BODY
@@ -454,11 +464,3 @@ if IS_CONTROLLER :
 else :
     WORKERSTR = 'Worker %d' % mpi.rank
     log = logging.getLogger('%s.worker%d' % (__name__, mpi.rank))
-
-
-import sys, atexit
-if IS_WORKER: 
-    workerLoop()
-    sys.exit()
-else:
-    atexit.register(finish)

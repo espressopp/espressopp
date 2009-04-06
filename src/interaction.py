@@ -1,53 +1,45 @@
 from espresso import esutil
 from esutil import choose
 from espresso import pmi
-from _espresso import interaction_LennardJones as LennardJonesLocal
 
-class __LennardJones(LennardJonesLocal) :
-    'The Lennard-Jones interaction.'
-    __metaclass__ = esutil.ExtendBaseClass
+# Extend the C++ LennardJones class
+from _espresso import interaction_LennardJones as _LennardJones
 
-    __originit = LennardJonesLocal.__init__
+class LennardJonesLocal(_LennardJones) :
+    'The (local) Lennard-Jones interaction.'
+
     def __init__(self, epsilon=1.0, sigma=1.0, cutoff=2.0) :
-        """Initialize the (parallel) Lennard Jones object. 
+        """Initialize the local Lennard Jones object. 
 
-        The parameters are identical to set."""
-        self.__originit()
-        # set the defaults
+        The parameters are identical to set()."""
+        _LennardJones.__init__(self)
         self.set(epsilon, sigma, cutoff)
 
-    # define setter
-    __origset = LennardJonesLocal.set
     def set(self, epsilon=None, sigma=None, cutoff=None) :
-        """set(integer, integer, integer) -- Set the "parameters" of the interaction.
+        """set( (float)epsilon, (float)sigma, (float)cutoff ) -> None -- Set the "parameters" of the interaction.
         """
-        self.__origset(
-            choose(epsilon, self.epsilon),
-            choose(sigma, self.sigma),
-            choose(cutoff, self.cutoff)
-            )
-
-    # define single property setters
-    # avoid using these if possible
-    def _setEpsilon(self, _epsilon) :
-        self.set(epsilon=_epsilon)
-    def _setSigma(self, _sigma) : 
-        self.set(sigma=_sigma)
-    def _setCutoff(self, _cutoff) : 
-        self.set(cutoff=_cutoff)
-
-    def _getEpsilon(self) :
-        return self.getEpsilon()
-    def _getSigma(self) :
-        return self.getSigma()
-    def _getCutoff(self) :
-        return self.getCutoff()
+        return _LennardJones.set(self,
+                                 choose(epsilon, self.epsilon),
+                                 choose(sigma, self.sigma),
+                                 choose(cutoff, self.cutoff)
+                                 )
 
     # define properties
-    epsilon = property(_getEpsilon, _setEpsilon)
-    sigma = property(_getSigma, _setSigma)
-    cutoff = property(_getCutoff, _setCutoff)
+    @esutil.propset
+    def epsilon(self, _epsilon) : self.set(epsilon=_epsilon)
+    @esutil.propget
+    def epsilon(self) : return self.getEpsilon()
 
+    @esutil.propset
+    def sigma(self, _sigma) : self.set(sigma=_sigma)
+    @esutil.propget
+    def sigma(self) : return self.getSigma()
+
+    @esutil.propset
+    def cutoff(self, _cutoff) : self.set(cutoff=_cutoff)
+    @esutil.propget
+    def cutoff(self) : return self.getCutoff()
+        
 
 if pmi.IS_CONTROLLER :
     # wrap LennardJones
@@ -58,60 +50,99 @@ if pmi.IS_CONTROLLER :
     #     pmicall = [ 'set' ]
     #     pmiinvoke = []
     #     pmilocal = [ pmi.ALL ]
+
+    import functools
+    def pmi_create(cls) :
+        def wrap_wrap(f) :
+            @functools.wraps(f)
+            def wrapper(self, *args, **keywds):
+                self.local = pmi.create(cls, *args, **keywds)
+                self.pmi_class = cls
+                return f(self, *args, **keywds)
+            return wrapper
+        return wrap_wrap
+
+#     def pmi_call(f) :
+#         @functools.wraps(f)
+#         def wrapper(self, *args, **kwds) :
+#             pmi.call(f, self.local, *args, **kwds)
+#         return wrapper
     
     pmi.exec_('from espresso.interaction import LennardJonesLocal')
     class LennardJones (object):
         'The Lennard-Jones interaction.'
         
         def __init__(self, epsilon=1.0, sigma=1.0, cutoff=2.0) :
-            """Initialize the (parallel) Lennard Jones object. 
-            
-            The parameters are identical to set."""
-            # create the pmi object
-            self.local = pmi.create('LennardJonesLocal',
-                                    epsilon, sigma, cutoff)
+            self.local = pmi.create('LennardJonesLocal', epsilon, sigma, cutoff)
             return object.__init__(self)
         
-        # define setter
         def set(self, epsilon=None, sigma=None, cutoff=None) :
-            """set(integer, integer, integer) -- Set the "parameters" of the interaction.
-            """
             pmi.call('LennardJonesLocal.set',
                      self.local, epsilon, sigma, cutoff)
             
-        # define single property setters
-        # avoid using these if possible
-        def _setEpsilon(self, _epsilon) :
-            pmi.call('LennardJonesLocal._setEpsilon',
-                     self.local, _epsilon)
-        def _setSigma(self, _sigma) : 
-            pmi.call('LennardJonesLocal._setSigma',
-                     self.local, _sigma)
-        def _setCutoff(self, _cutoff) : 
-            pmi.call('LennardJonesLocal._setCutoff',
-                     self.local, _cutoff)
-                        
-        def _getEpsilon(self) :
-            return self.local.getEpsilon()
-        def _getSigma(self) :
-            return self.local.getSigma()
-        def _getCutoff(self) :
-            return self.local.getCutoff()
-                        
-        # define properties
-        epsilon = property(_getEpsilon, _setEpsilon)
-        sigma = property(_getSigma, _setSigma)
-        cutoff = property(_getCutoff, _setCutoff)
-                        
-        def computeEnergy(self, r) :
-            'Compute and return the energy at the radius r.'
-            return self.local.computeEnergy(r)
-                        
-        def computeForce(self, r) :
-            'Compute and return the force at the radius r.'
-            f = self.local.computeForce(r)
-            return f
+        @esutil.propset
+        def epsilon(self, _epsilon):
+            pmi.call('LennardJonesLocal.epsilon.fset', self.local, _epsilon)
+        @esutil.propget
+        def epsilon(self): return self.local.epsilon
 
+        @esutil.propset
+        def sigma(self, _sigma):
+            pmi.call('LennardJonesLocal.sigma.fset', self.local, _sigma)
+        @esutil.propget
+        def sigma(self): return self.local.sigma
+
+        @esutil.propset
+        def cutoff(self, _cutoff):
+            pmi.call('LennardJonesLocal.cutoff.fset', self.local, _cutoff)
+        @esutil.propget
+        def cutoff(self): return self.local.cutoff
+
+        def computeForce(self, r) :
+            return self.local.computeForce(r)
+
+        def computeEnergy(self, r) :
+            return self.local.computeEnergy(r)
+
+
+# from _espresso import interaction_FENE as _FENE
+# class __FENE(FENELocal) :
+#     'The FENE interaction.'
+#     __metaclass__ = esutil.ExtendBaseClass
+
+#     __originit = FENELocal.__init__
+#     def __init__(self, K=1.0, r0=0.0, rMax=1.0) :
+#         """Initialize the FENE potential.
+
+#         The parameters are identical to set()."""
+#         self.__originit()
+#         # set the defaults
+#         self.set(K, r0, rMax)
+
+#     # define setter
+#     __origset = FENELocal.set
+#     def set(self, K=None, r0=None, rMax=None) :
+#         """set((real)K, (real)r0, (real)rMax) -- Set the "parameters" of the interaction.
+#         """
+#         self.__origset(
+#             choose(epsilon, self.epsilon),
+#             choose(sigma, self.sigma),
+#             choose(cutoff, self.cutoff)
+#             )
+
+#     # define single property setters
+#     # avoid using these if possible
+#     def _setK(self, _K) :
+#         self.set(K=_K)
+#     def _setR0(self, _r0) : 
+#         self.set(r0=_r0)
+#     def _setRMax(self, _rMax) : 
+#         self.set(rMax=_rMax)
+
+#     # define properties
+#     K = property(getK, _setK)
+#     r0 = property(getR0, _setR0)
+#     rMax = property(getRMax, setRMax)
 
 
 # # wrap FENE

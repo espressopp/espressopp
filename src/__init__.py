@@ -41,3 +41,10 @@ class __Real3D(Real3D) :
     def __str__(self) :
         return str(tuple(self))
 
+import pmi, sys
+if pmi.IS_CONTROLLER :
+    pmi.registerAtExit()
+else :
+    pmi.workerLoop()
+    sys.exit() 
+    
