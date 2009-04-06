@@ -230,10 +230,7 @@ static int read_config (char *fname)
 *  Configuration of GenLogger done by reading configuration file    *
 ********************************************************************/
 
-/*
 void Logger::configure()  {
-
-   printf("GenLogger: configure\n");
 
    getRoot().setLevel(WARN);   // default setting
 
@@ -262,7 +259,6 @@ void Logger::configure()  {
 
    root->traverse();   // traverse all loggers and might be print it
 }
-*/
 
 /********************************************************************
 *  Helper routine for logging via Python                            *
