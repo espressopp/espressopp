@@ -24,7 +24,6 @@ libespresso_common_la_SOURCES= \
 	espresso_common.cpp
 libespresso_common_la_LIBADD = \
 	esutil/libesutil.la \
-	esutil/libpylogger.la \
 	hello/libhello.la \
 	particles/libparticles.la \
 	pairs/libpairs.la \
@@ -41,7 +40,7 @@ if ENABLE_SHARED
 python_LTLIBRARIES = _espresso.la
 _espresso_la_SOURCES = _espresso.cpp
 _espresso_la_LDFLAGS = -shared -module -avoid-version -no-undefined
-_espresso_la_LIBADD = libespresso_common.la
+_espresso_la_LIBADD = libespresso_common.la esutil/libpylogger.la 
 endif # ENABLE_SHARED
 
 # the embedded python interpreter with static espresso library

@@ -1,0 +1,12 @@
+# configure file for Espresso++ Generic Logger
+#
+#  set LOG4ESPP=config   - reads this config file
+#
+root=DEBUG
+
+Logger=TRACE
+bc=TRACE
+bc.PBC=DEBUG
+interaction=WARN
+interaction.FENE=INFO
+interaction.LennardJones=INFO

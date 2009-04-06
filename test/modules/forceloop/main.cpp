@@ -160,6 +160,8 @@ int main()
 
 {
 
+  printf("configure forceloop\n");
+
   LOG4ESPP_CONFIGURE();
 
   forceloop();

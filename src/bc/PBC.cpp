@@ -1,5 +1,5 @@
 // this macro removes all LOG statements with level < WARN at source level
-#define LOG4ESPP_LEVEL_WARN
+#define LOG4ESPP_LEVEL_INFO
 
 #include "PBC.hpp"
 #include <cmath>
@@ -20,14 +20,17 @@ static inline real dround(real x) { return floor(x + 0.5); }
 PBC::PBC() {}
 
 PBC::PBC(real _length) {
+  LOG4ESPP_INFO(theLogger, "constructor, length = " << length);
   set(_length);
 }
 
 PBC::~PBC() {}
 
 void PBC::set(real _length) {
+
   length = _length;
   lengthInverse = 1.0 / length;
+  LOG4ESPP_INFO(theLogger, "set length = " << length);
 }
 
 /** Routine delivers the distance vector between two positions.

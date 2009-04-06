@@ -1,7 +1,7 @@
 LIBS= \
         $(BOOST_PYTHON_LIBS) \
-        $(top_builddir)/src/libespresso_common.la
-	$(LOG4ESPP_LIBS)
+        $(top_builddir)/src/esutil/libgenlogger.la \
+        $(top_builddir)/src/libespresso_common.la 
 
 check_PROGRAMS = forceloop benchmark
 
