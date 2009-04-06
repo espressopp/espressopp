@@ -2,6 +2,7 @@
 #define _ESUTIL_DERIVABLESMALLVECTOR_HPP
 
 #include <stdexcept>
+#include <iostream>
 
 namespace espresso {
   namespace esutil {
@@ -130,9 +131,29 @@ namespace espresso {
     };
 
     // global definition to make sure that we can use scalar * vector in C++ and Python
-
     template<class T, size_t N, class CRTP>
     inline CRTP operator*(T s, const DerivableSmallVector<T,N,CRTP> &v) { return v * s; }
+
+    // I/O of a vector
+    template<class T, size_t N, class CRTP>
+    inline std::ostream &operator<<(std::ostream &os, const DerivableSmallVector<T,N,CRTP> &v) {
+      if (N) {
+        os << v[0] << " ";
+        for (size_t i = 1; i < N; ++i)
+          os << v[i] << " ";
+      }
+      return os;
+    }
+
+    template<class T, size_t N, class CRTP>
+    inline std::istream &operator>>(std::istream &is, const DerivableSmallVector<T,N,CRTP> &v) {
+      if (N) {
+        is >> v[0];
+        for (size_t i = 1; i < N; ++i)
+          is >> v[i];
+      }
+      return is;
+    }
   }
 }
 #endif
