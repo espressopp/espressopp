@@ -321,15 +321,6 @@ void loggerUpdate(object pythonLogger) {
 
   Logger& logger = Logger::getInstance(name);
 
-  // Verification: pythonLogger should not have been changed
-
-  int pyLevel = extract<int>(pythonLogger.attr("level"));
-
-#ifdef DEBUGGING
-  printf("update Python logger %s in C++ logger hierarchy, python level = %d\n", 
-          logger.getFullName().c_str(), pyLevel);
-#endif
-
   // Dynamic cast: is safe as all logger objects are PyLogger
 
   PyLogger *pyLogger = dynamic_cast<PyLogger*>(&logger);

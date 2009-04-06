@@ -326,7 +326,7 @@ namespace log4espp {
 
     Logger* instance = &getRoot();
 
-    for (int i = 0; i < tokens.size(); i++) {
+    for (size_t i = 0; i < tokens.size(); i++) {
 
         // find a son for the next token
 

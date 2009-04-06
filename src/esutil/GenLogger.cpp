@@ -13,7 +13,7 @@
 
 #include "GenLogger.hpp"
 
-#define DEBUGGING
+#undef DEBUGGING
 
 using namespace log4espp;
 using namespace std;
@@ -49,7 +49,7 @@ GenLogger::GenLogger(string _name, Logger* _parent) : Logger(_name, _parent)
 Logger& Logger::getRoot() {
 
 #ifdef DEBUGGING
-  printf("getRoot, rootLogger = %p\n");
+  printf("getRoot, rootLogger = %p\n", rootLogger);
 #endif
 
   if (rootLogger == NULL) {
@@ -169,7 +169,7 @@ static int eval_entry (char* line, int length, char *filename)
 
   if (string::npos == lastPos) lastPos = myLine.length();
  
-  for (int i = firstPos; i <= lastPos; i++) myLine[i] = toupper(myLine[i]);
+  for (string::size_type i = firstPos; i <= lastPos; i++) myLine[i] = toupper(myLine[i]);
 
   string value = myLine.substr(firstPos, lastPos - firstPos);
 
