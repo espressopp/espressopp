@@ -24,7 +24,6 @@ def __workerExec_(statement) :
     'Internal function that executes the given statement locally.'
     # executing the statement locally
     log.info("Executing '%s'", statement)
-    log.info(globals().keys())
     exec statement in globals()
 
 ##################################################
