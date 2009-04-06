@@ -16,11 +16,13 @@ namespace espresso {
      class All : public Set {
  
      private:
-       particles::Set& set; 
+       particles::Set& set;
        bc::BC& bc;
        particles::PropertyId coordinates;
 
      public:
+       static void registerPython();
+
        /** Destructor. */
        ~All();
 
@@ -31,8 +33,7 @@ namespace espresso {
 	 \param coordinates the identifier of the coordinates property to use
 
        */
-       All (bc::BC& bc, particles::Set& set,
-            particles::PropertyId coordinates);
+       All(bc::BC& _bc, particles::Set& _set, particles::PropertyId _coordinates);
 
        /** Getter routine for the boundary conditions. */
        bc::BC& getBC() const { return bc; }

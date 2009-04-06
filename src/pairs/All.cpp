@@ -1,8 +1,10 @@
 #include "All.hpp"
 #include "esutil/virtual_functional.hpp"
 #include "particles/Computer.hpp"
+#include <python.hpp>
 
 using namespace espresso;
+using namespace espresso::bc;
 using namespace espresso::pairs;
 using namespace espresso::particles;
 
@@ -22,7 +24,7 @@ private:
     : public ParticleComputer  {
     
   public:
-    const bc::BC& bc;
+    const BC& bc;
     
     const ConstPropertyReference<ParticleId> id;
     const ConstPropertyReference<Real3D> pos;
@@ -83,8 +85,7 @@ All::~All() {}
   All::All(boundary_conditions, particle_set)
   -------------------------------------------------------------------------- */
 
-All::All(bc::BC& _bc, particles::Set& _set,
-         particles::PropertyId _coordinates):
+All::All(bc::BC& _bc, particles::Set& _set, particles::PropertyId _coordinates):
   set(_set),
   bc(_bc),
   coordinates(_coordinates)
@@ -106,5 +107,19 @@ void All::foreach(pairs::ConstComputer& pairComputer) const {
   // printf ("ParticlePairComputer const\n");
   Traverser1<particles::ConstComputer> traverser1(this, pairComputer);;
   set.foreach(traverser1);
+}
+
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+
+void 
+All::registerPython() {
+  using namespace boost::python;
+  /*
+  class_<All>("pairs_All")
+    .def(init<BC&, Set&, PropertyId>())
+    ;
+  */
 }
 

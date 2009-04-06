@@ -3,6 +3,7 @@ DIST_SUBDIRS=unittest
 subpkgincludedir=$(pkgincludedir)/pairs
 
 subpkginclude_HEADERS = \
+        bindings.hpp \
 	Set.hpp \
 	All.hpp \
 	Computer.hpp \
@@ -13,6 +14,7 @@ subpkginclude_HEADERS = \
 noinst_LTLIBRARIES = libpairs.la
 
 libpairs_la_SOURCES = \
+        bindings.cpp \
 	All.cpp \
         List.cpp
 
