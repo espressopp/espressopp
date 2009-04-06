@@ -6,13 +6,13 @@
 
 namespace espresso {
   namespace interaction {
+
     /** This class provides routines to computer forces and energies
-	based on the FENE potential.
+        based on the FENE potential.
 
-	\f[ V(r) = -\frac{1}{2} \Delta r_\text{max}^2 K \log \left[ 1 - \left(
-	\frac{r-r_0}{\Delta r_\text{max}} \right)^2 \right]
+        \f[ V(r) = -\frac{1}{2} \Delta r_{max}^2 K \log \left[ 1 -
+        \left(\frac{r-r_0}{\Delta r_{max}} \right)^2 \right]
         \f]
-
     */
 
     class FENE: public Interaction {
