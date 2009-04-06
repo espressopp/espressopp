@@ -1,8 +1,8 @@
 //method to compute the potential energy
 
-// this macro removes all LOG statements with level < WARN at source level
+// this macro removes all LOG statements with level < DEBUG at source level
 
-#define LOG4ESPP_LEVEL_WARN
+#define LOG4ESPP_LEVEL_DEBUG
 
 #include "LennardJones.hpp"
 #include <python.hpp>
@@ -21,6 +21,10 @@ LennardJones::LennardJones() {}
 LennardJones::~LennardJones() {}
 
 void LennardJones::set(real _epsilon, real _sigma, real _cutoff) {
+
+  LOG4ESPP_DEBUG(theLogger, "set epsilon = " << _epsilon << 
+                            ", sigma = " << _sigma << ", cutoff = " << _cutoff);
+
   cutoff = _cutoff;
   computer.epsilon = _epsilon;
   computer.sigma = _sigma;
@@ -67,7 +71,7 @@ Real3D LennardJones::BasicComputer::computeForce(const Real3D &dist) const {
     frac6 = frac2 * frac2 * frac2;
     real ffactor = 48.0 * epsilon * (frac6*frac6 - 0.5 * frac6) * frac2;
 
-    LOG4ESPP_DEBUG(LennardJones::theLogger, "computeForce, distSqr = " << distSqr <<
+    LOG4ESPP_TRACE(LennardJones::theLogger, "computeForce, distSqr = " << distSqr <<
 		   ", ffactor = " << ffactor);
 
     f = dist * ffactor;
