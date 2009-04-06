@@ -14,8 +14,8 @@
 *                                                                           *
 ****************************************************************************/
 
-#ifndef _LOG4ESPP_HPP
-#define _LOG4ESPP_HPP
+#ifndef LOG4ESPP_H
+#define LOG4ESPP_H
 
 /************************************************************************
 *                                                                       *
@@ -45,6 +45,7 @@
 #define LOG4ESPP_TRACE_ENABLED
 #define LOG4ESPP_DEBUG_ENABLED
 #define LOG4ESPP_INFO_ENABLED
+
 #define LOG4ESPP_WARN_ENABLED
 #define LOG4ESPP_ERROR_ENABLED
 #define LOG4ESPP_FATAL_ENABLED
@@ -122,23 +123,24 @@
 
 #if defined(HAVE_LOG4CPP) and defined(LOG4ESPP_USE_LOG4CPP)
 
-#include <log4cpp/Portability.hh>
+#include <stdio.h>
+#include "log4cpp/Portability.hh"
 #ifdef LOG4CPP_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 #include <iostream>
 #include <sstream>
-#include <log4cpp/Category.hh>
-#include <log4cpp/Appender.hh>
-#include <log4cpp/FileAppender.hh>
-#include <log4cpp/OstreamAppender.hh>
+#include "log4cpp/Category.hh"
+#include "log4cpp/Appender.hh"
+#include "log4cpp/FileAppender.hh"
+#include "log4cpp/OstreamAppender.hh"
 #ifdef LOG4CPP_HAVE_SYSLOG
-#include <log4cpp/SyslogAppender.hh>
+#include "log4cpp/SyslogAppender.hh"
 #endif
-#include <log4cpp/Layout.hh>
-#include <log4cpp/BasicLayout.hh>
-#include <log4cpp/Priority.hh>
-#include <log4cpp/NDC.hh>
+#include "log4cpp/Layout.hh"
+#include "log4cpp/BasicLayout.hh"
+#include "log4cpp/Priority.hh"
+#include "log4cpp/NDC.hh"
 #include <log4cpp/SimpleConfigurator.hh>
 #include <log4cpp/BasicConfigurator.hh>
 
@@ -149,9 +151,11 @@
 #define LOG4ESPP_CONFIGURE() { char *logFile; \
    logFile = getenv("LOG4ESPP"); \
    if (logFile != NULL) {\
+      printf ("LOG4ESPP: LOG4CPP property configuration with file %s\n", logFile); \
       log4cpp::SimpleConfigurator::configure(logFile); \
      } \
      else { \
+      printf ("LOG4ESPP: LOG4CPP basic configuration\n"); \
       log4cpp::BasicConfigurator::configure(); \
      } \
    }
@@ -250,7 +254,7 @@
 #elif defined(HAVE_LOG4CXX) and defined(LOG4ESPP_USE_LOG4CXX)
 
 #include <log4cxx/logstring.h>
-#include <stdlib.h>
+// #include <stdlib.h>
 #include <log4cxx/logger.h>
 #include <log4cxx/defaultconfigurator.h>
 #include <log4cxx/basicconfigurator.h>
@@ -258,7 +262,7 @@
 #include <log4cxx/helpers/exception.h>
 #include <log4cxx/logmanager.h>
 #include <log4cxx/ndc.h>
-#include <locale.h>
+// #include <locale.h>
 
 using namespace log4cxx;
 using namespace log4cxx::helpers;
@@ -287,6 +291,7 @@ using namespace log4cxx::helpers;
 #define LOG4ESPP_ROOTLOGGER(aLogger) log4cxx::LoggerPtr aLogger = Logger::getRootLogger()
 #define LOG4ESPP_LOGGER(aLogger,name) log4cxx::LoggerPtr aLogger = log4cxx::Logger::getLogger(name)
 #define LOG4ESPP_DECL_LOGGER(aLogger) log4cxx::LoggerPtr aLogger
+#define LOG4ESPP_SET_LOGGER(aLogger,name) aLogger = log4cxx::Logger::getLogger(name)
 
   /*******************************************************
   *   LOG4ESPP_XXXXX_ON                                  *
@@ -359,140 +364,19 @@ using namespace log4cxx::helpers;
 #define LOG4ESPP_FATAL(logger,msg)
 #endif
 
+  /*******************************************************
+  *   LOG4ESPP_SET_XXXX                                  *
+  *******************************************************/
+
+#define LOG4ESPP_SET_TRACE(logger) logger->setLevel(log4cxx::Level::getTrace())
+#define LOG4ESPP_SET_DEBUG(logger) logger->setLevel(log4cxx::Level::getDebug())
+#define LOG4ESPP_SET_INFO(logger) logger->setLevel(log4cxx::Level::getInfo())
+#define LOG4ESPP_SET_WARN(logger) logger->setLevel(log4cxx::Level::getWarn())
+#define LOG4ESPP_SET_ERROR(logger) logger->setLevel(log4cxx::Level::getError())
+#define LOG4ESPP_SET_FATAL(logger) logger->setLevel(log4cxx::Level::getFatal())
+
 #define LOG4ESPP_PUSH(string) NDC::push(string)
 #define LOG4ESPP_POP()        NDC::pop()
-
-/************************************************************************
-*                                                                       *
-*   LOG4ESPP   <======   Generic logger (no additional lib required)    *
-*                                                                       *
-************************************************************************/
-
-#elif defined(LOG4ESPP_USE_GENERIC)
-
-#include <iostream>
-#include <ctype.h>
-#include <string.h>   /* strncasecmp */
-#include <stdlib.h>   /* getenv      */
-
-  /*******************************************************
-  *   LogClass                                           *
-  *******************************************************/
-
-namespace log4espp {
-  class LogClass {
-
-#define LEVEL_RELEVANT_CHARS 3
-
-  public: 
-    
-    int logLevel;    // specifies the level of the logger
-    
-    LogClass(): logLevel(3) {
-      const char *envLevel;
-      envLevel = getenv("LOG4ESPP"); \
-      const char *logItems [] = { "OFF", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE" }; \
-      if (envLevel != NULL) { \
-        int nItems = sizeof(logItems) / sizeof(const char *); \
-        for (int i = 0; i < nItems; i++) \
-          if (strncasecmp(envLevel,logItems[i],LEVEL_RELEVANT_CHARS)==0) logLevel = i; \
-      }
-    }
-  };
-}
-
-  /*******************************************************
-  *   LOG4ESPP_CONFIGURE                                 *
-  *******************************************************/
-
-#define LOG4ESPP_CONFIGURE() 
-
-  /*******************************************************
-  *   LOG4ESPP_DECL_LOGGER(logger)                       *
-  *   LOG4ESPP_ROOTLOGGER(logger)                        *
-  *   LOG4ESPP_LOGGER(logger,name)                       *
-  *******************************************************/
-
-#define LOG4ESPP_ROOTLOGGER(aLogger) log4espp::LogClass aLogger = log4espp::LogClass();
-#define LOG4ESPP_LOGGER(aLogger,name) log4espp::LogClass aLogger = log4espp::LogClass();
-#define LOG4ESPP_DECL_LOGGER(aLogger) log4espp::LogClass aLogger;
-
-  /*******************************************************
-  *   LOG4ESPP_XXXXX_ON                                  *
-  *******************************************************/
-
-#define LOG4ESPP_TRACE_ON(aLogger) (aLogger.logLevel >= 6)
-#define LOG4ESPP_DEBUG_ON(aLogger) (aLogger.logLevel >= 5)
-#define LOG4ESPP_INFO_ON(aLogger)  (aLogger.logLevel >= 4)
-#define LOG4ESPP_WARN_ON(aLogger)  (aLogger.logLevel >= 3)
-#define LOG4ESPP_ERROR_ON(aLogger) (aLogger.logLevel >= 2)
-#define LOG4ESPP_FATAL_ON(aLogger) (aLogger.logLevel >= 1)
-
-  /*******************************************************
-  *   LOG4ESPP_TRACE                                     *
-  *******************************************************/
-
-#ifdef LOG4ESPP_TRACE_ENABLED
-#define LOG4ESPP_TRACE(logger,msg) { if (logger.logLevel >= 6) \
-			       std::cout << "DEBUG: " << msg << std::endl; }
-#else
-#define LOG4ESPP_TRACE(logger,msg)
-#endif
-
-  /*******************************************************
-  *   LOG4ESPP_DEBUG                                     *
-  *******************************************************/
-
-#ifdef LOG4ESPP_DEBUG_ENABLED
-#define LOG4ESPP_DEBUG(logger,msg) { if (logger.logLevel >= 5) \
-			       std::cout << "DEBUG: " << msg << std::endl; }
-#else
-#define LOG4ESPP_DEBUG(logger,msg)
-#endif
-
-  /*******************************************************
-  *   LOG4ESPP_INFO                                      *
-  *******************************************************/
-
-#ifdef LOG4ESPP_INFO_ENABLED
-#define LOG4ESPP_INFO(logger,msg) { if (logger.logLevel >= 4) \
-			       std::cout << "INFO: " << msg << std::endl; }
-#else
-#define LOG4ESPP_INFO(logger,msg)
-#endif
-
-  /*******************************************************
-  *   LOG4ESPP_WARN                                      *
-  *******************************************************/
-
-#ifdef LOG4ESPP_WARN_ENABLED
-#define LOG4ESPP_WARN(logger,msg) { if (logger.logLevel >= 3) \
-			       std::cout << "WARN: " << msg << std::endl; }
-#else
-#define LOG4ESPP_WARN(logger,msg)
-#endif
-
-  /*******************************************************
-  *   LOG4ESPP_ERROR                                     *
-  *******************************************************/
-
-#ifdef LOG4ESPP_ERROR_ENABLED
-#define LOG4ESPP_ERROR(logger,msg) { if (logger.logLevel >= 2) \
-			       std::cout << "ERROR: " << msg << std::endl; }
-#else
-#define LOG4ESPP_ERROR(logger,msg)
-#endif
-
-  /*******************************************************
-  *   LOG4ESPP_FATAL                                     *
-  *******************************************************/
-
-#ifdef LOG4ESPP_FATAL_ENABLED
-#define LOG4ESPP_FATAL(logger,msg) { if (logger.logLevel >= 1) \
-			       std::cout << "FATAL: " << msg << std::endl; }
-#else
-#define LOG4ESPP_FATAL(logger,msg)
-#endif
 
 /************************************************************************
 *                                                                       *
@@ -500,14 +384,10 @@ namespace log4espp {
 *                                                                       *
 ************************************************************************/
 
-#else
+#elif defined(LOG4ESPP_NONE)
 
-namespace log4espp {
-  class LogClass {
-  public:
-      LogClass() {};
-  };
-}
+class LogClass {
+};
 
 #define LOG4ESPP_CONFIGURE()
 
@@ -517,9 +397,9 @@ namespace log4espp {
   *   LOG4ESPP_LOGGER(logger,name)                       *
   *******************************************************/
 
-#define LOG4ESPP_ROOTLOGGER(aLogger) log4espp::LogClass aLogger;
-#define LOG4ESPP_LOGGER(aLogger,name) log4espp::LogClass aLogger;
-#define LOG4ESPP_DECL_LOGGER(aLogger) log4espp::LogClass aLogger;
+#define LOG4ESPP_ROOTLOGGER(aLogger) LogClass aLogger;
+#define LOG4ESPP_LOGGER(aLogger,name) LogClass aLogger;
+#define LOG4ESPP_DECL_LOGGER(aLogger) LogClass aLogger;
 
 #define LOG4ESPP_TRACE_ON(logger) (0)
 #define LOG4ESPP_DEBUG_ON(logger) (0)
@@ -534,6 +414,123 @@ namespace log4espp {
 #define LOG4ESPP_WARN(logger,msg)
 #define LOG4ESPP_ERROR(logger,msg)
 #define LOG4ESPP_FATAL(logger,msg)
+
+/************************************************************************
+*                                                                       *
+*   LOG4ESPP   <======   Generic logger (additional lib required)       *
+*                                                                       *
+************************************************************************/
+
+#else
+
+#include <sstream>
+#include "esutil/Logger.hpp"
+
+  /*******************************************************
+  *   LOG4ESPP_CONFIGURE                                 *
+  *******************************************************/
+
+#define LOG4ESPP_CONFIGURE() { log4espp::Logger::configure(); }
+
+#define LOG4ESPP_ROOTLOGGER(aLogger) log4espp::Logger& aLogger = log4espp::Logger::getRoot()
+
+#define LOG4ESPP_DECL_LOGGER(aLogger) log4espp::Logger& aLogger;
+#define LOG4ESPP_LOGGER(aLogger,name) log4espp::Logger& aLogger = log4espp::Logger::getInstance(std::string(name))
+
+  /*******************************************************
+  *   LOG4ESPP_XXXXX_ON                                  *
+  *******************************************************/
+
+#define LOG4ESPP_TRACE_ON(logger) (logger.isTraceEnabled())
+#define LOG4ESPP_DEBUG_ON(logger) (logger.isDebugEnabled())
+#define LOG4ESPP_INFO_ON(logger) (logger.isInfoEnabled())
+#define LOG4ESPP_WARN_ON(logger) (logger.isWarnEnabled())
+#define LOG4ESPP_ERROR_ON(logger) (logger.isErrorEnabled())
+#define LOG4ESPP_FATAL_ON(logger) (logger.isFatalEnabled())
+
+  /*******************************************************
+  *   LOG4ESPP_TRACE                                     *
+  *******************************************************/
+
+#ifdef LOG4ESPP_TRACE_ENABLED
+#define LOG4ESPP_TRACE(logger,msg) { if (logger.isTraceEnabled()) \
+        { std::ostringstream omsg; omsg << msg; logger.trace(LOG4ESPP_LOCATION, omsg.str()); } }
+#else 
+#define LOG4ESPP_TRACE(logger,msg)
+#endif
+
+  /*******************************************************
+  *   LOG4ESPP_DEBUG                                     *
+  *******************************************************/
+
+#ifdef LOG4ESPP_DEBUG_ENABLED
+#define LOG4ESPP_DEBUG(logger,msg) { if (logger.isDebugEnabled()) \
+        { std::ostringstream omsg; omsg << msg; logger.debug(LOG4ESPP_LOCATION, omsg.str()); } }
+#else 
+#define LOG4ESPP_DEBUG(logger,msg)
+#endif
+
+  /*******************************************************
+  *   LOG4ESPP_INFO                                     *
+  *******************************************************/
+
+#ifdef LOG4ESPP_INFO_ENABLED
+#define LOG4ESPP_INFO(logger,msg) { if (logger.isInfoEnabled()) \
+        { std::ostringstream omsg; omsg << msg; logger.info(LOG4ESPP_LOCATION, omsg.str()); } }
+#else 
+#define LOG4ESPP_INFO(logger,msg)
+#endif
+
+  /*******************************************************
+  *   LOG4ESPP_WARN                                     *
+  *******************************************************/
+
+#ifdef LOG4ESPP_WARN_ENABLED
+#define LOG4ESPP_WARN(logger,msg) { if (logger.isWarnEnabled()) \
+        { std::ostringstream omsg; omsg << msg; logger.warn(LOG4ESPP_LOCATION, omsg.str()); } }
+#else 
+#define LOG4ESPP_WARN(logger,msg)
+#endif
+
+  /*******************************************************
+  *   LOG4ESPP_ERROR                                     *
+  *******************************************************/
+
+#ifdef LOG4ESPP_ERROR_ENABLED
+#define LOG4ESPP_ERROR(logger,msg) { if (logger.isErrorEnabled()) \
+        { std::ostringstream omsg; omsg << msg; logger.error(LOG4ESPP_LOCATION, omsg.str()); } }
+#else 
+#define LOG4ESPP_ERROR(logger,msg)
+#endif
+
+  /*******************************************************
+  *   LOG4ESPP_FATAL                                     *
+  *******************************************************/
+
+#ifdef LOG4ESPP_FATAL_ENABLED
+#define LOG4ESPP_FATAL(logger,msg) { if (logger.isFatalEnabled()) \
+        { std::ostringstream omsg; omsg << msg; logger.fatal(LOG4ESPP_LOCATION, omsg.str()); } }
+#else 
+#define LOG4ESPP_FATAL(logger,msg)
+#endif
+
+  /*******************************************************
+  *   LOG4ESPP_SET_XXXX                                  *
+  *******************************************************/
+
+#define LOG4ESPP_SET_TRACE(logger) { logger->setLevel(TRACE, true); }
+#define LOG4ESPP_SET_DEBUG(logger) { logger->setLevel(DEBUG, true); }
+#define LOG4ESPP_SET_INFO(logger) { logger->setLevel(INFO, true); }
+#define LOG4ESPP_SET_WARN(logger) { logger->setLevel(WARN, true); }
+#define LOG4ESPP_SET_ERROR(logger) { logger->setLevel(ERROR, true); }
+#define LOG4ESPP_SET_FATAL(logger) { logger->setLevel(FATAL, true); }
+
+  /*******************************************************
+  *   LOG4ESPP_PUSH / LOG4ESPP_POP                       *
+  *******************************************************/
+
+#define LOG4ESPP_PUSH(string) Logger::push(string)
+#define LOG4ESPP_POP()        Logger::pop()
 
 #endif
 
