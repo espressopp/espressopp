@@ -12,7 +12,7 @@ using namespace espresso::interaction;
 
 /* ---------------------------------------------------------------------- */
 
-LOG4ESPP_LOGGER(LennardJones::theLogger, "interaction.LennardJones");
+LOG4ESPP_LOGGER(LennardJones::theLogger, "_espresso.interaction.LennardJones");
 
 /* ---------------------------------------------------------------------- */
 
