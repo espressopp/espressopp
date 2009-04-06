@@ -268,7 +268,7 @@ def finalize() :
     _broadcast(_FINALIZE)
 
 def __workerFinalize() :
-    log.info('Finalizeing worker loop.')
+    log.info('Finalizing worker loop.')
     raise StopIteration()
 
 ##################################################
@@ -288,7 +288,7 @@ def __workerDump() :
 ##################################################
 def workerLoop() :
     'Starts the main worker loop. Has to be called on the workers.'
-    log.info(' Entering the worker loop.')
+    log.info('Entering the worker loop.')
     # On the controller, leave immediately
     if IS_CONTROLLER : 
         registerAtExit()
@@ -405,7 +405,7 @@ def __translateInvokeArgs(arg0, args) :
 def _broadcast(*args) :
     "Internal command used to broadcast a PMI command to all workers."
     if args[0] not in _ALLCMD :
-        raise ValueError('Broadcast needs a command (one of %s) as first argument.' % args)
+        raise ValueError('Broadcast needs a command (one of %s) as first argument. Got %s instead' % (_ALLCMD.keys(), args))
     log.debug("Broadcasting command: %s", args)
     mpi.broadcast(mpi.world, value=args, root=CONTROLLER)
 
