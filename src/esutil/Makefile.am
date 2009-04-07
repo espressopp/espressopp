@@ -6,8 +6,8 @@ subpkginclude_HEADERS = \
 	SmallVector.hpp \
 	DerivableSmallVector.hpp \
 	Vector3D.hpp \
-	Identifier.hpp \
 	TupleVector.hpp \
+	VectorTraits.hpp \
 	Timer.hpp \
 	virtual_functional.hpp \
         Logger.hpp

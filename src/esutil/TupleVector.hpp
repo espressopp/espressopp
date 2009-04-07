@@ -6,7 +6,7 @@
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/foreach.hpp>
 #include <functional>
-#include "Identifier.hpp"
+#include "VectorTraits.hpp"
 
 namespace espresso {
   namespace esutil {
@@ -41,16 +41,22 @@ namespace espresso {
       template<class> class ArrayPropertyReference;
       template<class> class ConstArrayPropertyReference;
 
-      class PropertyId: public Identifier {
+      class PropertyId {
       public:
 	/// invalid id, valid ones can only be obtained by TupleVector
 	PropertyId() {}
 
+        /// comparison
+        bool operator==(const PropertyId &o) const { return v == o.v; }
+        /// comparison
+        bool operator!=(const PropertyId &o) const { return v != o.v; }
       private:
 	friend class TupleVector;
 
+        size_t v;
+
 	/// constructable only by TupleVector
-	PropertyId(size_t _v): Identifier(_v) {}
+	PropertyId(size_t _v): v(_v) {}
 	/// TupleVector can get the stored number
 	operator size_t() const { return v; }
 	/// TupleVector can increment to obtain the next id
@@ -564,14 +570,17 @@ namespace espresso {
       void copy(TupleVector::reference dst,
 		TupleVector::const_reference src);
       /** copy all data of a set of particles. This is typically faster
-	  than looping over the set of particles.
+	  than looping over the set of particles, and a replacement for
+          the std::copy-algorithm, which does not work with TupleVectors
+          iterators.
+
 	  @param begin start of sequence to copy
 	  @param end   end of sequence to copy
 	  @param dst   start of where to copy the data to
       */
       void copy(TupleVector::const_iterator begin,
 		TupleVector::const_iterator end,
-		TupleVector::iterator dst);
+                TupleVector::iterator dst);
       //@}
 
       /** @name property related members
@@ -700,6 +709,25 @@ namespace espresso {
 	bool operator()(const Property &ref) { return ref.id == searchID; }
       };
     };
+
+    /// How BlockVector deals with copying data within a TupleVector
+    template<>
+    class VectorTraits<TupleVector> {
+      /// copy one element
+      void copy(TupleVector &v,
+                TupleVector::reference dst,
+		TupleVector::const_reference src) {
+        v.copy(dst,src);
+      }
+
+      /** copy a set of elements */
+      void copy(TupleVector &v,
+                TupleVector::const_iterator begin,
+		TupleVector::const_iterator end,
+                TupleVector::iterator dst) {
+        v.copy(begin, end, dst);
+      }
+    };
   }
 }
 
@@ -709,4 +737,5 @@ namespace espresso {
 inline boost::mpl::true_ *
 boost_foreach_is_noncopyable(espresso::esutil::TupleVector *&, boost::foreach::tag)
 { return 0; }
+
 #endif
