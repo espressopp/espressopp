@@ -15,7 +15,23 @@ class __Real3D(Real3D) :
     __metaclass__ = esutil.ExtendBaseClass
 
     __originit = Real3D.__init__
-    def __init__(self, x=0.0, y=0.0, z=0.0) :
+    def __init__(self, *args) :
+        if len(args) == 0 :
+            x = y = z = 0.0
+        elif len(args) == 1 :
+            arg0 = args[0]
+            # test whether the argument is iterable and has 3 elements
+            if getattr(arg0, '__iter__', False) and len(arg0) == 3:
+                x, y, z = arg0
+            elif isinstance(arg0, float) :
+                x = y = z = arg0
+            else :
+                raise TypeError("Cannot initialize Real3D from %s" % (args))
+        elif len(args) == 3 :
+            x, y, z = args
+        else :
+            raise TypeError("Cannot initialize Real3D from %s" % (args))
+        
         return self.__originit(x, y, z)
 
     # create setters and getters

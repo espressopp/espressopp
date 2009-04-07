@@ -14,6 +14,26 @@ class Test0Real3D(unittest.TestCase) :
         self.assertEqual(x[1], 2.0)
         self.assertEqual(x[2], 3.0)
 
+        x = Real3D([1.0, 2.0, 3.0])
+        self.assertEqual(x[0], 1.0)
+        self.assertEqual(x[1], 2.0)
+        self.assertEqual(x[2], 3.0)
+
+        x = Real3D((1.0, 2.0, 3.0))
+        self.assertEqual(x[0], 1.0)
+        self.assertEqual(x[1], 2.0)
+        self.assertEqual(x[2], 3.0)
+
+        x = Real3D(3.141)
+        self.assertEqual(x[0], 3.141)
+        self.assertEqual(x[1], 3.141)
+        self.assertEqual(x[2], 3.141)
+
+        self.assertRaises(TypeError, Real3D, 1.0, 2.0)
+        self.assertRaises(TypeError, Real3D, 1.0, 2.0, 3.0, 4.0)
+        self.assertRaises(TypeError, Real3D, (1.0, 2.0))
+        self.assertRaises(TypeError, Real3D, (1.0, 2.0, 3.0, 4.0))
+
     def test1OutOfRange(self) :
         'Test out-of-range Real3D element access.'
         v = Real3D()
