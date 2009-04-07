@@ -35,22 +35,22 @@ class __Real3D(Real3D) :
         return self.__originit(x, y, z)
 
     # create setters and getters
-    @esutil.propget
-    def x(self) : return self[0]
+    @property
+    def x(self): return self[0]
 
-    @esutil.propset
-    def x(self, v) : self[0] = v
+    @x.setter
+    def x(self, v): self[0] = v
 
-    @esutil.propget
+    @property
     def y(self) : return self[1]
 
-    @esutil.propset
+    @y.setter
     def y(self, v) : self[1] = v
 
-    @esutil.propget
+    @property
     def z(self) : return self[2]
 
-    @esutil.propset
+    @z.setter
     def z(self, v) : self[2] = v
 
     # string conversion

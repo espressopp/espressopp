@@ -25,41 +25,6 @@ http://www.boost.org/doc/libs/1_35_0/libs/python/doc/tutorial/doc/html/python/te
 
 import sys
 
-def propget(func):
-    'Decorator to easily define property getters.'
-    locals = sys._getframe(1).f_locals
-    name = func.__name__
-    prop = locals.get(name)
-    if not isinstance(prop, property):
-        prop = property(func, doc=func.__doc__)
-    else:
-        doc = prop.__doc__ or func.__doc__
-        prop = property(func, prop.fset, prop.fdel, doc)
-    return prop
-
-def propset(func):
-    'Decorator to easily define property setters.'
-    locals = sys._getframe(1).f_locals
-    name = func.__name__
-    prop = locals.get(name)
-    if not isinstance(prop, property):
-        prop = property(None, func, doc=func.__doc__)
-    else:
-        doc = prop.__doc__ or func.__doc__
-        prop = property(prop.fget, func, prop.fdel, doc)
-    return prop
-
-def propdel(func):
-    'Decorator to easily define property deletion.'
-    locals = sys._getframe(1).f_locals
-    name = func.__name__
-    prop = locals.get(name)
-    if not isinstance(prop, property):
-        prop = property(None, None, func, doc=func.__doc__)
-    else:
-        prop = property(prop.fget, prop.fset, func, prop.__doc__)
-    return prop
-
 class ExtendBaseClass(type):
     def __new__(self, name, bases, dict):
         del dict['__metaclass__']
@@ -76,3 +41,27 @@ def choose(val, altval) :
         return altval
     else :
         return val
+
+# Make the property setter decorator syntax of python 2.6+ available
+# for earlier versions
+try :
+    __setter = property.setter
+except AttributeError :
+    _property=property
+    class property(_property):
+        def __init__(self, fget, *args, **kwargs):
+            self.__doc__ = fget.__doc__
+            super(property, self).__init__(fget, *args, **kwargs)
+
+            def setter(self, fset):
+                cls_ns = sys._getframe(1).f_locals
+                for k, v in cls_ns.iteritems():
+                    if v == self:
+                        propname = k
+                        break
+                cls_ns[propname] = property(self.fget, fset,
+                                            self.fdel, self.__doc__)
+                return cls_ns[propname]
+
+    # Now override the property builtin
+    __builtins__['property'] = property

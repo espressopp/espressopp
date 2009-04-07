@@ -25,20 +25,20 @@ class LennardJonesLocal(_LennardJones) :
                                  )
 
     # define properties
-    @esutil.propset
-    def epsilon(self, _epsilon) : self.set(epsilon=_epsilon)
-    @esutil.propget
+    @property
     def epsilon(self) : return self.getEpsilon()
+    @epsilon.setter
+    def epsilon(self, _epsilon) : self.set(epsilon=_epsilon)
 
-    @esutil.propset
-    def sigma(self, _sigma) : self.set(sigma=_sigma)
-    @esutil.propget
+    @property
     def sigma(self) : return self.getSigma()
+    @sigma.getter
+    def sigma(self, _sigma) : self.set(sigma=_sigma)
 
-    @esutil.propset
-    def cutoff(self, _cutoff) : self.set(cutoff=_cutoff)
-    @esutil.propget
+    @property
     def cutoff(self) : return self.getCutoff()
+    @cutoff.getter
+    def cutoff(self, _cutoff) : self.set(cutoff=_cutoff)
         
 
 if pmi.IS_CONTROLLER :
@@ -80,23 +80,23 @@ if pmi.IS_CONTROLLER :
             pmi.call('LennardJonesLocal.set',
                      self.local, epsilon, sigma, cutoff)
             
-        @esutil.propset
+        @property
+        def epsilon(self): return self.local.epsilon
+        @epsilon.setter
         def epsilon(self, _epsilon):
             pmi.call('LennardJonesLocal.epsilon.fset', self.local, _epsilon)
-        @esutil.propget
-        def epsilon(self): return self.local.epsilon
 
-        @esutil.propset
+        @property
+        def sigma(self): return self.local.sigma
+        @sigma.setter
         def sigma(self, _sigma):
             pmi.call('LennardJonesLocal.sigma.fset', self.local, _sigma)
-        @esutil.propget
-        def sigma(self): return self.local.sigma
 
-        @esutil.propset
+        @property
+        def cutoff(self): return self.local.cutoff
+        @cutoff.setter
         def cutoff(self, _cutoff):
             pmi.call('LennardJonesLocal.cutoff.fset', self.local, _cutoff)
-        @esutil.propget
-        def cutoff(self): return self.local.cutoff
 
         def computeForce(self, r) :
             return self.local.computeForce(r)
