@@ -1,31 +1,34 @@
-"""
-This module defines helper functions for python.
+"""This module defines helper functions for python.
+Modify with care, it contains some **black magic**.
 
-It contains some **black magic**. Use this class as a meta class for an object,
-and the base class of the object will be extended by the functions
-of this class.
+ExtendBaseClass
+---------------
 
+Use this class as a meta class for an object, and the base class of
+the object will be extended by the functions of this class.
+    
 Example:
 
->>>class Test :
->>>  def test(): return 'Test'
-
->>>class TestExtender(Test) :
->>>  __metaclass__ = ExtendBaseClass
->>>  def test_extend(): return 'Test extension'
-
->>>t = Test()
->>>assert t.test() == 'Test'
->>>assert t.test_extend() == 'Test extension'
+>>> class Test :
+>>>   def test(): return 'Test'
+>>>
+>>> class TestExtender(Test) :
+>>>   __metaclass__ = ExtendBaseClass
+>>>   def test_extend(): return 'Test extension'
+>>>
+>>> t = Test()
+>>> t.test()
+>>> t.test_extend()
+'Test'
+'Test extension'
 
 Stolen and modified from
 http://code.activestate.com/recipes/412717/ and
 http://www.boost.org/doc/libs/1_35_0/libs/python/doc/tutorial/doc/html/python/techniques.html#python.extending_wrapped_objects_in_python
 """
-
 import sys
 
-class ExtendBaseClass(type):
+class ExtendBaseClass (type) :
     def __new__(self, name, bases, dict):
         del dict['__metaclass__']
         del dict['__module__']
@@ -47,7 +50,10 @@ def choose(val, altval) :
 try :
     __setter = property.setter
 except AttributeError :
+    # save the peoperty builtin
     _property=property
+    # now define out copy
+    # stolen from http://bruynooghe.blogspot.com/2008/04/xsetter-syntax-in-python-25.html 
     class property(_property):
         def __init__(self, fget, *args, **kwargs):
             self.__doc__ = fget.__doc__

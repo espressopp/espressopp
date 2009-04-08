@@ -32,12 +32,12 @@ class LennardJonesLocal(_LennardJones) :
 
     @property
     def sigma(self) : return self.getSigma()
-    @sigma.getter
+    @sigma.setter
     def sigma(self, _sigma) : self.set(sigma=_sigma)
 
     @property
     def cutoff(self) : return self.getCutoff()
-    @cutoff.getter
+    @cutoff.setter
     def cutoff(self, _cutoff) : self.set(cutoff=_cutoff)
         
 
