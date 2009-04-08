@@ -10,17 +10,15 @@
 using namespace std;
 using namespace boost;
 
-#ifndef BOOST_MPI_PYTHON_EXT
-/* the boost sources for obvious reasons do not contain init_mpi()
-   in any header file - after all, this is a function that should
-   be called when the module is loaded by Python. However, for
-   linking it in, we need it, so, declare it here. The signature
-   and name are known from the Python-API requirements.
+/* The boostmpi sources do not declare init_boostmpi() in any header
+   file, as it is a function that should usually be called when the
+   module is loaded by Python. However, for linking it in, we need it,
+   so, declare it here. The signature and name are known from the
+   Python-API requirements.
 */
 extern "C" {
-  void initmpi();
+  void init_boostmpi();
 }
-#endif
 
 /** minimalistic ESPResSo module initialization,
     for use with the static initialization */
@@ -47,9 +45,9 @@ int main(int argc, char **argv)
   }
 
 #ifndef BOOST_MPI_PYTHON_EXT
-  if (PyImport_AppendInittab(const_cast<char *>("mpi"), 
-			     initmpi) == -1) {
-    cerr << "Could not add the builtin module mpi to python's list of preloaded modules."
+  if (PyImport_AppendInittab(const_cast<char *>("_boostmpi"), 
+			     init_boostmpi) == -1) {
+    cerr << "Could not add the builtin module _boostmpi to python's list of preloaded modules."
 	 << endl;
     exit(-1);
   }

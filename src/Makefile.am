@@ -40,18 +40,21 @@ if ENABLE_SHARED
 python_LTLIBRARIES = _espresso.la
 _espresso_la_SOURCES = _espresso.cpp
 _espresso_la_LDFLAGS = -shared -module -avoid-version -no-undefined
-_espresso_la_LIBADD = libespresso_common.la esutil/libpylogger.la 
+_espresso_la_LIBADD = \
+	libespresso_common.la \
+	esutil/libpylogger.la
 endif # ENABLE_SHARED
 
-# the embedded python interpreter with static espresso library
+# the embedded python interpreter that makes _espresso and _boostmpi a builtin
 bin_PROGRAMS = pypresso 
 pypresso_SOURCES = pypresso.cpp
-pypresso_LDADD = libespresso_common.la \
+pypresso_LDADD = \
+	libespresso_common.la \
+	esutil/libpylogger.la \
+	../contrib/boostmpi/libboostmpi.la \
 	$(ESPRESSO_BOOST_LIBS) \
-	$(BOOST_MPI_PYTHON_LIBS) \
 	$(PYTHON_LIBS) \
-	$(MPI_LIBS) \
-	esutil/libpylogger.la 
+	$(MPI_LIBS)
 
 ##############################
 ## PYTHON
@@ -60,7 +63,7 @@ pypresso_LDADD = libespresso_common.la \
 python_scripts=\
 	__init__.py \
 	eslogging.py \
-	esmpi.py \
+	boostmpi.py \
 	pmi.py \
 	esutil.py \
 	hello.py \

@@ -98,24 +98,24 @@ AC_CACHE_SAVE
 
 AC_MSG_CHECKING([whether to use external boost libraries])
 AC_ARG_WITH([external-boost],
-    AS_HELP_STRING([--with-external-boost=BOOST_MPI_PYTHON_MODULE],
+    AS_HELP_STRING([--with-external-boost],
       [specify whether to use external boost libraries (instead of the
-       internal ones). If an external boost library is used, specify the
-       path of the boost.mpi python module.])
+       internal ones). If an external boost library is used, all boost
+       libraries have to be specified in LIBS, and CPPFLAGS and
+       LDFLAGS must be set accordingly.])
     ,, [with_external_boost="no"])
 
 AS_IF([test "x$with_external_boost" = "xno"],
     [ AC_MSG_RESULT([no])
       # if we use the internal boost, set the configuration variables
-      boost_internal_dir=`pwd`"/contrib/boost-am/"
+      boost_internal_dir=`pwd`"/contrib/boost/"
       ESPRESSO_BOOST_LIBS="$boost_internal_dir/libespresso_boost.la"
       BOOST_UNITTEST_LIBS="$boost_internal_dir/libboost_unit_test_framework.la"
-      BOOST_MPI_PYTHON_DIR="$boost_internal_dir/.libs"
-      BOOST_MPI_PYTHON_LIBS="$boost_internal_dir/libboost_mpi_python.la"
-      AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/contrib/boost-am/"
-      UTEXEC_CPPFLAGS="-I\$top_srcdir/contrib/boost-am" 
-      UTEXEC_LDFLAGS="-L\$top_builddir/contrib/boost-am"],
+      AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/contrib/boost"
+      UTEXEC_CPPFLAGS="-I\$top_srcdir/contrib/boost" 
+      UTEXEC_LDFLAGS="-L\$top_builddir/contrib/boost"],
     [ AC_MSG_RESULT([yes])
+      # if we use external boost, do some tests
 
       # Test whether we can link a boost program
       AC_CACHE_CHECK([whether a boost program can be linked],
@@ -145,18 +145,6 @@ AS_IF([test "x$with_external_boost" = "xno"],
           AC_LANG_POP([C++])])
       AS_IF([test "x$axes_cv_external_boost_works" = "xno"],
         [ AC_MSG_FAILURE([Cannot compile a boost program using external boost!])])
-
-      # Test where to find the boost.mpi python module
-      AC_MSG_CHECKING([where to find the boost.mpi python module])
-      AS_IF([test "x$with_external_boost" = "xyes"],
-          [ AC_MSG_ERROR([Boost.mpi python module was not specified in --with-external-boost.])],
-        [test ! -e "$with_external_boost"], 
-          [ AC_MSG_ERROR([File $with_external_boost does not exist! Please specify the complete path of the boost.mpi python module.])],
-        [ # else
-          BOOST_MPI_PYTHON_DIR=`AS_DIRNAME($with_external_boost)`
-          BOOST_MPI_PYTHON_LIBS="$with_external_boost"
-          AC_MSG_RESULT([$with_external_boost])
-        ])
 
       # Test using the unittest framework
       AC_CACHE_CHECK([whether a boost unittest can be dynamically linked],
@@ -196,11 +184,9 @@ AS_IF([test "x$with_external_boost" = "xno"],
             [ AC_MSG_FAILURE([Can't link against the boost unittest framework!])])])
 ]) # external boost
 
-AM_CONDITIONAL([EXTERNAL_BOOST],[test "x$external_boost" = "xyes"])
+AM_CONDITIONAL([EXTERNAL_BOOST],[test "x$with_external_boost" = "xyes"])
 AC_SUBST(ESPRESSO_BOOST_LIBS)
 AC_SUBST(BOOST_UNITTEST_LIBS)
-AC_SUBST(BOOST_MPI_PYTHON_LIBS)
-AC_SUBST(BOOST_MPI_PYTHON_DIR)
 AC_SUBST(UTEXEC_CPPFLAGS)
 AC_SUBST(UTEXEC_LDFLAGS)
 
@@ -235,7 +221,7 @@ AC_SUBST(pythondir)
 AC_SUBST([abs_top_builddir])
 
 # determine CPPFLAGS 
-AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/src -I\$(top_srcdir)/src/include"
+AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/src -I\$(top_srcdir)/src/include -I\$(top_srcdir)/contrib/boostmpi/include"
 test "x$PYTHON_CPPFLAGS" != "xno" && AM_CPPFLAGS="$AM_CPPFLAGS \$(PYTHON_CPPFLAGS)" 
 AC_SUBST([AM_CPPFLAGS])
 
@@ -249,7 +235,8 @@ AC_CONFIG_HEADERS([src/acconfig.hpp])
 
 AC_CONFIG_FILES([Makefile 
                  contrib/Makefile
-                 contrib/boost-am/Makefile
+                 contrib/boost/Makefile
+                 contrib/boostmpi/Makefile
                  src/Makefile 
 		 src/include/Makefile
                  src/esutil/Makefile
@@ -318,6 +305,11 @@ AS_IF([test "x$MYMPIEXEC" = "x"],
         [MYMPIEXEC="disabled by user, no parallel tests will be run"],
         [MYMPIEXEC="will try to use $MYMPIEXEC"])
 test "x$AM_CPPFLAGS" != "x" || AM_CPPFLAGS="(empty)"
+if [ test "x$with_external_boost" = "xyes" ]; then
+   external_boost="(external)"
+else
+   external_boost="(internal)"
+fi
 
 cat >config.summary << EOF
 
@@ -347,23 +339,7 @@ cat >config.summary << EOF
    - Libraries: $PYTHON_LIBS
  * MPI:
    - Libraries: $MPI_LIBS
-EOF
-
-AS_IF([test "x$external_boost" = "xyes"], [
-cat >>config.summary << EOF
- * Boost: external
-   - boost.MPI python dir: $BOOST_MPI_PYTHON_DIR
-EOF
-],
-[
-cat >>config.summary << EOF
- * Boost: internal
-EOF
-])
-
-cat >>config.summary << EOF
- * Log4ESPP: $LOG4ESPP_USE
-   - Libraries: $LOG4ESPP_LIBS
+ * Boost: $external_boost
 
 *****************
 ** OTHER TOOLS **

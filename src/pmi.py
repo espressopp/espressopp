@@ -1,6 +1,6 @@
 import logging
 import types, new
-from espresso import esmpi as mpi
+from espresso import boostmpi as mpi
 
 ##################################################
 ## EXEC

@@ -1,6 +1,6 @@
 import unittest
 from espresso import pmi
-from espresso import esmpi
+from espresso import boostmpi as mpi
 
 
 class Test0Exec(unittest.TestCase) :
@@ -128,14 +128,14 @@ class Test3Reduce(unittest.TestCase) :
 
     def test0Function(self) :
         res = pmi.reduce('amodule.add', 'amodule.f')
-        self.assertEqual(res, 42*esmpi.world.size)
+        self.assertEqual(res, 42*mpi.world.size)
         res = pmi.reduce('amodule.add', 'amodule.g', 52)
-        self.assertEqual(res, 52*esmpi.world.size)
+        self.assertEqual(res, 52*mpi.world.size)
 
     def test0Lambda(self) :
         pmi.exec_('myadd = lambda a,b: a+b')
         res = pmi.reduce('myadd', 'amodule.f')
-        self.assertEqual(res, 42*esmpi.world.size)
+        self.assertEqual(res, 42*mpi.world.size)
         pmi.exec_('del myadd')
 
 
