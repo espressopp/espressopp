@@ -4,6 +4,8 @@
 #include <boost/foreach.hpp>
 #include <algorithm>
 
+#include <iostream>
+
 using namespace espresso::esutil;
 
 static const int defaultGranularity = 1024/sizeof(int);
@@ -40,7 +42,7 @@ TupleVector::TupleVector(const TupleVector &vec, size_type newESize)
 
 TupleVector::PropertyId TupleVector::addProperty(size_t _size, size_t _dimension)
 {
-  property.push_back(Property(++uniqueID, _size, _dimension, malloc(maxESize)));
+  property.push_back(Property(++uniqueID, _size, _dimension, malloc(maxESize*_size)));
   return uniqueID;
 }
 

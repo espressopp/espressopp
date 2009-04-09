@@ -201,6 +201,7 @@ BOOST_FIXTURE_TEST_CASE(dereference_array_test, Fixture)
 
 BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
 {
+  {
     TupleVector::PropertyReference<int> intRef = mv.getProperty<int>(intProp);
 
     // fill int property
@@ -216,30 +217,33 @@ BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
 	BOOST_CHECK_EQUAL(intRef[ref], int(i++));
     }
     // this code above should not compile without const_
+  }
 
-    // insert two elements by insert()
-    TupleVector::iterator it = mv.begin() + 10;
-    // iterator it actually never changes, because it points to the
-    // inserted element
-    it = mv.insert(it);
-    BOOST_CHECK_EQUAL(size_t(43), mv.size());
-    it = mv.insert(it, mv[6]);
-    BOOST_CHECK_EQUAL(size_t(44), mv.size());
-    it = mv.insert(it, mv[3]);
-    BOOST_CHECK_EQUAL(size_t(45), mv.size());
-    mv.insert(it,3);
-    BOOST_CHECK_EQUAL(size_t(48), mv.size());
+  // insert two elements by insert()
+  TupleVector::iterator it = mv.begin() + 10;
+  // iterator it actually never changes, because it points to the
+  // inserted element
+  it = mv.insert(it);
+  BOOST_CHECK_EQUAL(size_t(43), mv.size());
+  it = mv.insert(it, mv[6]);
+  BOOST_CHECK_EQUAL(size_t(44), mv.size());
+  it = mv.insert(it, mv[3]);
+  BOOST_CHECK_EQUAL(size_t(45), mv.size());
+  mv.insert(it,3);
+  BOOST_CHECK_EQUAL(size_t(48), mv.size());
 
-    /* check the data is there, with constant array this time.
-       After above magic, we have:
-       mv[0:9]=0:9
-       mv[10:12] = x
-       mv[13] = mv[3] = 3
-       mv[14] = mv[6] = 6
-       mv[15] = x
-       mv[16:] = 10:
-     */
-    i = 0;
+  /* check the data is there, with constant array this time.
+     After above magic, we have:
+     mv[0:9]=0:9
+     mv[10:12] = x
+     mv[13] = mv[3] = 3
+     mv[14] = mv[6] = 6
+     mv[15] = x
+     mv[16:] = 10:
+  */
+  {
+    TupleVector::PropertyReference<int> intRef = mv.getProperty<int>(intProp);
+    size_t i = 0;
     BOOST_FOREACH(TupleVector::const_reference ref,
 		  static_cast<const TupleVector &>(mv)) {
 	if (i < 10) {
@@ -253,23 +257,26 @@ BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
 	}
         i++;
     }
+  }
 
-    // and now, delete some elements
-    it = mv.begin() + 10;
-    it = mv.erase(it, it + 3);
-    BOOST_CHECK_EQUAL(size_t(45), mv.size());
-    it = mv.erase(it + 2);
-    BOOST_CHECK_EQUAL(size_t(44), mv.size());
+  // and now, delete some elements
+  it = mv.begin() + 10;
+  it = mv.erase(it, it + 3);
+  BOOST_CHECK_EQUAL(size_t(45), mv.size());
+  it = mv.erase(it + 2);
+  BOOST_CHECK_EQUAL(size_t(44), mv.size());
 
-    /* check the data is there, with constant array this time.
-       Now, we have:
-       mv[0:9]=0:9
-       mv[10] = mv[3] = 3
-       mv[11] = mv[6] = 6
-       mv[12:] = 10:
-     */
+  /* check the data is there, with constant array this time.
+     Now, we have:
+     mv[0:9]=0:9
+     mv[10] = mv[3] = 3
+     mv[11] = mv[6] = 6
+     mv[12:] = 10:
+  */
+  {
+    TupleVector::PropertyReference<int> intRef = mv.getProperty<int>(intProp);
 
-    i = 0;
+    size_t i = 0;
     BOOST_FOREACH(TupleVector::const_reference ref,
 		  static_cast<const TupleVector &>(mv)) {
 	if (i < 10) {
@@ -283,33 +290,90 @@ BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
 	}
         i++;
     }
+  }
 
-    // and now, move some elements
-    mv.copy(mv[10], mv[9]);
-    BOOST_CHECK_EQUAL(size_t(44), mv.size());
-    mv.copy(mv.begin() + 3, mv.begin() + 7, mv.begin() + 11);
-    BOOST_CHECK_EQUAL(size_t(44), mv.size());
+  // and now, move some elements
+  mv.copy(mv[10], mv[9]);
+  BOOST_CHECK_EQUAL(size_t(44), mv.size());
+  mv.copy(mv.begin() + 3, mv.begin() + 7, mv.begin() + 11);
+  BOOST_CHECK_EQUAL(size_t(44), mv.size());
 
-    /* check the data is there, with constant array this time.
-       Now, we have:
-       mv[0:9]=0:9
-       mv[10] = mv[9] = 9
-       mv[11:14] = mv[3:6] = 3:6
-       mv[15:] = 13:
-     */
+  /* check the data is there, with constant array this time.
+     Now, we have:
+     mv[0:9]=0:9
+     mv[10] = mv[9] = 9
+     mv[11:14] = mv[3:6] = 3:6
+     mv[15:] = 13:
+  */
+  {
+    TupleVector::PropertyReference<int> intRef = mv.getProperty<int>(intProp);
 
-    i = 0;
+    size_t i = 0;
     BOOST_FOREACH(TupleVector::const_reference ref,
 		  static_cast<const TupleVector &>(mv)) {
-	if (i < 10) {
-	    BOOST_CHECK_EQUAL(intRef[ref], int(i));
-	} else if (i == 10) {
-	    BOOST_CHECK_EQUAL(intRef[ref], 9);
-	} else if (i < 15) {
-	    BOOST_CHECK_EQUAL(intRef[ref], int(i - 8));
-	} else {
-	    BOOST_CHECK_EQUAL(intRef[ref], int(i - 2));
-	}
-        i++;
+      if (i < 10) {
+	BOOST_CHECK_EQUAL(intRef[ref], int(i));
+      } else if (i == 10) {
+	BOOST_CHECK_EQUAL(intRef[ref], 9);
+      } else if (i < 15) {
+	BOOST_CHECK_EQUAL(intRef[ref], int(i - 8));
+      } else {
+	BOOST_CHECK_EQUAL(intRef[ref], int(i - 2));
+      }
+      i++;
     }
+  }
+}
+
+BOOST_FIXTURE_TEST_CASE(allocation_test, Fixture)
+{
+  mv.clear();
+
+  // stress-test by continous growing
+  // checks realloc code
+  for (size_t i = 0; i < 10000; ++i)
+    mv.insert(mv.end());
+
+  BOOST_CHECK_EQUAL(size_t(10000), mv.size());
+
+  // add property to new field
+  // checks malloc code
+  TupleVector::PropertyId newProp = mv.addProperty<float>(3);
+
+  // try wether writing to present and new fields raises memory problems
+  {
+    TupleVector::PropertyReference<int> intRef = mv.getProperty<int>(intProp);
+    TupleVector::ArrayPropertyReference<float> fltRef
+      = mv.getArrayProperty<float>(floatProp);
+    TupleVector::ArrayPropertyReference<float> fltNRef
+      = mv.getArrayProperty<float>(newProp);
+
+    
+    BOOST_FOREACH(TupleVector::reference ref, mv) {
+      intRef[ref] = 42;
+      fltRef[ref][0] =   4.2;
+      fltRef[ref][1] =  42.0;
+      fltRef[ref][2] = 420.0;
+      fltNRef[ref][0] =   1.2;
+      fltNRef[ref][1] =  12.0;
+      fltNRef[ref][2] = 120.0;
+    }
+
+    BOOST_FOREACH(TupleVector::reference ref, mv) {
+      BOOST_CHECK_EQUAL(intRef[ref], 42);
+      BOOST_CHECK_CLOSE(fltRef[ref][0],   4.2f, 1e-4f);
+      BOOST_CHECK_CLOSE(fltRef[ref][1],  42.0f, 1e-4f);
+      BOOST_CHECK_CLOSE(fltRef[ref][2], 420.0f, 1e-4f);
+      BOOST_CHECK_CLOSE(fltNRef[ref][0],   1.2f, 1e-4f);
+      BOOST_CHECK_CLOSE(fltNRef[ref][1],  12.0f, 1e-4f);
+      BOOST_CHECK_CLOSE(fltNRef[ref][2], 120.0f, 1e-4f);
+    }
+  }
+
+  mv.eraseProperty(newProp);
+
+  for (size_t i = 0; i < 10000; ++i)
+    mv.erase(mv.begin());
+
+  BOOST_CHECK_EQUAL(size_t(0), mv.size());
 }
