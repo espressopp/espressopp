@@ -10,28 +10,26 @@
 
 import espresso
 from _espresso import particles_Storage
-from _espresso import particles_ParticleWriter
+from _espresso import particles_PythonComputer
+from _espresso import Real3D
+from _espresso import Real3DProperty
+import random
 
-# ToDo: is it possible to make something like this
-# class MyWriter(particles_Computer)
-#    and overwrite () operator
+class ParticleWriter(particles_PythonComputer):
+    def __init__(self, _property, storage):
+        self.property = _property
+        particles_PythonComputer.__init__(self, storage)
+
+    def each(self, pid):
+        print("%d %s" % (pid, self.property[pid]))
 
 storage = particles_Storage()
 
-# Be careful: the default argument size_t dim = 1 does not export to Python
+pos = Real3DProperty(storage)
 
-pos = storage.addPropertyReal3D(1)
+for count in range(0,100):
+    pid = storage.addParticle()
+    pos[pid] = Real3D(random.random(), random.random(), random.random())
 
-# we use a routine of Storage to fill up with particles
-
-size = 3.3
-N    = 5
-
-storage.fillWithLattice(size, N, pos)
-
-# make a object of the test class that will print positions
-
-writer = particles_ParticleWriter(storage, pos)
-
-storage.foreach(writer)
+storage.foreach(ParticleWriter(pos, storage))
 
