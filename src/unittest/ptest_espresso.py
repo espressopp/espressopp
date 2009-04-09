@@ -1,5 +1,5 @@
 import unittest
-import espresso.esmpi as mpi
+from espresso import boostmpi as mpi
 from espresso import *
 
 class Real3DTest(unittest.TestCase) :
@@ -16,4 +16,6 @@ class Real3DTest(unittest.TestCase) :
             self.assertEqual(tuple(v), (1.0, 2.0, 3.0))
 
 if __name__ == "__main__":
+    if pmi.IS_CONTROLLER:
+        pmi.stopWorkerLoop()
     unittest.main()

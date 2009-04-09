@@ -60,7 +60,8 @@ class __Real3D(Real3D) :
 import pmi, sys
 if pmi.IS_CONTROLLER :
     pmi.registerAtExit()
+    # the script continues after this call
 else :
     pmi.workerLoop()
-    sys.exit() 
+    # the script will usually not reach this point on the workers
     
