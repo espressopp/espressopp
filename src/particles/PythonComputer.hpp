@@ -3,22 +3,19 @@
 
 #include <particles/Computer.hpp>
 #include <boost/python.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace espresso {
   namespace particles {
     /** Function object that prints data of a single particle. 
      */
-    class PythonComputer: public Computer {
-    private:
-      boost::python::object pyCompute;
+    class PythonComputer:
+      public Computer,
+      public boost::python::wrapper<PythonComputer> {
 
     public: // parts visible to Python
-
-      /** Construct a Computer and make a reference back to Python.  */
-      PythonComputer(): pyCompute(boost::python::object()) {}
-      
-      void setCallback(boost::python::object _pyCompute) { pyCompute = _pyCompute; }
-      const boost::python::object getCallback() const { return pyCompute; }
+      PythonComputer(boost::shared_ptr< particles::Storage > _storage)
+	: storage(_storage) {}
 
     public: // parts invisible to Python
 
@@ -26,6 +23,9 @@ namespace espresso {
       virtual void operator()(const ParticleHandle pref);
 
       static void registerPython();
+
+    private:
+      boost::shared_ptr< particles::Storage > storage;
     };
   }
 }

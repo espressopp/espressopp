@@ -5,13 +5,12 @@ using namespace boost::python;
 using namespace espresso::particles;
 
 void PythonComputer::operator()(const ParticleHandle pref) {
-  // TODO translate ParticleHandle to Particle
-  pyCompute.attr("each")();
+  ParticleId id = storage->getParticleId(pref);
+  get_override("each")(id);
 }
 
 void PythonComputer::registerPython() {
   class_<PythonComputer, bases<Computer> >
-    ("particles_PythonComputer", init<>())
-    .def("setCallback", &PythonComputer::setCallback)
-    .def("getCallback", &PythonComputer::getCallback);
+    ("particles_PythonComputer",
+     init< boost::shared_ptr< particles::Storage > >());
 }
