@@ -1,9 +1,10 @@
 #ifndef _PAIRS_ALL_HPP
 #define _PAIRS_ALL_HPP
 
+#include "boost/shared_ptr.hpp"
 #include "Set.hpp"
 #include "Computer.hpp"
-#include "particles/Storage.hpp"
+#include "Property.hpp"
 #include "bc/BC.hpp"
 
 namespace espresso {
@@ -18,7 +19,7 @@ namespace espresso {
      private:
        particles::Set& set;
        bc::BC& bc;
-       particles::PropertyId coordinates;
+       boost::shared_ptr< Property<Real3D> > coordinates;
 
      public:
        static void registerPython();
@@ -33,7 +34,7 @@ namespace espresso {
 	 \param coordinates the identifier of the coordinates property to use
 
        */
-       All(bc::BC& _bc, particles::Set& _set, particles::PropertyId _coordinates);
+       All(bc::BC& _bc, particles::Set& _set, boost::shared_ptr< Property<Real3D> > _coordinates);
 
        /** Getter routine for the boundary conditions. */
        bc::BC& getBC() const { return bc; }
@@ -41,8 +42,8 @@ namespace espresso {
        /** Getter routine for the set of particles. */
        particles::Set& getSet() const { return set; }
 
-       /** Getter routine for the ID of the coordinate */
-       particles::PropertyId getCoordinateProperty() const { return coordinates; }
+       /** Getter routine for the coordinate property */
+       boost::shared_ptr< const Property<Real3D> > getCoordinateProperty() const { return coordinates; }
 
        /** This routine will apply a function operator to all pairs.
          \param pairComputer is the object that provides the function to be applied to all pairs.

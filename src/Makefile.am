@@ -14,13 +14,17 @@ CLEANFILES =
 noinst_HEADERS = \
 	estypes.hpp \
 	Real3D.hpp \
+	Property.hpp \
+	Particle.hpp \
 	espresso_common.hpp
 
 # the common part of all Espresso flavors
 noinst_LTLIBRARIES = libespresso_common.la
 libespresso_common_la_SOURCES= \
-	Real3D.cpp \
 	bindings.cpp \
+	Real3D.cpp \
+	Property.cpp \
+	Particle.cpp \
 	espresso_common.cpp
 libespresso_common_la_LIBADD = \
 	esutil/libesutil.la \

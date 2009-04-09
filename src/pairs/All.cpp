@@ -26,8 +26,8 @@ private:
   public:
     const BC& bc;
     
-    const ConstPropertyReference<ParticleId> id;
-    const ConstPropertyReference<Real3D> pos;
+    const ConstPropertyHandle<ParticleId> id;
+    const ConstPropertyHandle<Real3D> pos;
 
     const Reference pref1;
     const Real3D pos1;
@@ -40,8 +40,8 @@ private:
 	       PairComputer& _pairComputer
 	       ) :
       bc(all->getBC()), 
-      id(all->getSet().getStorage()->getIDProperty()),
-      pos(all->getSet().getStorage()->template getPropertyReference<Real3D>(all->getCoordinateProperty())),
+      id(all->getSet().getStorage()->getIdPropertyHandle()),
+      pos(*(all->getCoordinateProperty())),
       pref1(pref),
       pos1(pos[pref1]),
       id1(id[pref1]),
@@ -85,7 +85,7 @@ All::~All() {}
   All::All(boundary_conditions, particle_set)
   -------------------------------------------------------------------------- */
 
-All::All(bc::BC& _bc, particles::Set& _set, particles::PropertyId _coordinates):
+All::All(bc::BC& _bc, particles::Set& _set, boost::shared_ptr< Property<Real3D> > _coordinates):
   set(_set),
   bc(_bc),
   coordinates(_coordinates)

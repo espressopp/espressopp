@@ -8,6 +8,7 @@
 #include "particles/Set.hpp"
 #include "interaction/Interaction.hpp"
 #include "pairs/Set.hpp"
+#include "Property.hpp"
 
 namespace espresso {
   namespace integrator {
@@ -18,9 +19,9 @@ namespace espresso {
       particles::Set* particles;
       particles::Storage* storage;
 
-      particles::PropertyId position;
-      particles::PropertyId velocity;
-      particles::PropertyId force;
+      boost::shared_ptr< Property<Real3D> > position;
+      boost::shared_ptr< Property<Real3D> > velocity;
+      boost::shared_ptr< Property<Real3D> > force;
 
       struct ForceEvaluation {
         interaction::Interaction* interaction;
@@ -38,9 +39,9 @@ namespace espresso {
       VelocityVerlet(real _timeStep);
 
       VelocityVerlet(particles::Set* _particles, 
-                     particles::PropertyId _position,
-                     particles::PropertyId _velocity,
-                     particles::PropertyId _force);
+                     boost::shared_ptr< Property<Real3D> > _position,
+                     boost::shared_ptr< Property<Real3D> > _velocity,
+                     boost::shared_ptr< Property<Real3D> > _force);
       
       void addForce(interaction::Interaction *interaction, 
                     pairs::Set *pairs);

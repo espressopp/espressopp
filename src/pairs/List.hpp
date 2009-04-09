@@ -3,8 +3,8 @@
 
 #include "Set.hpp"
 #include "Computer.hpp"
-#include "particles/ParticleHandle.hpp"
-#include "particles/Storage.hpp"
+#include "Particle.hpp"
+#include "Property.hpp"
 #include "bc/BC.hpp"
 
 namespace espresso {
@@ -19,9 +19,9 @@ namespace espresso {
 
       particles::Storage& storage; 
       bc::BC& bc;
-      particles::PropertyId coordinates;
-      typedef std::pair<particles::ParticleId,
-                        particles::ParticleId> Tuple;
+      boost::shared_ptr< Property<Real3D> > coordinates;
+      typedef std::pair<ParticleId,
+                        ParticleId> Tuple;
       std::vector<Tuple> id_list;
 
     public:
@@ -37,9 +37,9 @@ namespace espresso {
       */
       List (bc::BC& bc, 
 	    particles::Storage& storage, 
-	    particles::PropertyId coordinates);
+	    boost::shared_ptr< Property<Real3D> > coordinates);
 
-      size_t size();
+      size_t size() const;
 
       /** Ask if a particle pair tuple (id1, id2) is in the pair list
 
@@ -49,7 +49,7 @@ namespace espresso {
  
       */
 
-      bool findPair(particles::ParticleId id1, particles::ParticleId id2);
+      bool findPair(ParticleId id1, ParticleId id2) const;
 
       /** Adding a particle pair tuple (id1, id2) to the pair list
 
@@ -59,7 +59,7 @@ namespace espresso {
 	  Note: a tuple (id1, id2) can be added several times.
       */
 
-      void addPair(particles::ParticleId id1, particles::ParticleId id2);
+      void addPair(ParticleId id1, ParticleId id2);
 
       /** Deleting a particle pair tuple (id1, id2) from the pair list
 
@@ -69,7 +69,7 @@ namespace espresso {
 	  Particle (id1, i2) must be in the pair list otherwise exception.
       */
 
-      void deletePair(particles::ParticleId id1, particles::ParticleId id2);
+      void deletePair(ParticleId id1, ParticleId id2);
 
       /** Getter routine for the boundary conditions. */
 
@@ -77,7 +77,7 @@ namespace espresso {
 
       /** Getter routine for the ID of the coordinate */
 
-      particles::PropertyId getCoordinateProperty() const {return coordinates; }
+      boost::shared_ptr< Property<Real3D> > getCoordinateProperty() const {return coordinates; }
 
       /** This routine will apply a function operator to all pairs.
 
@@ -85,7 +85,7 @@ namespace espresso {
 
       */
 
-      virtual void foreach(Computer& pairComputer);
+      virtual void foreach(Computer& pairComputer) const;
 
       /** This routine will apply a function operator for read-only particles to all pairs.
 
@@ -95,6 +95,9 @@ namespace espresso {
 
       virtual void foreach(ConstComputer& pairComputer) const;
 
+    private:
+      template<class Computer, class>
+      void foreach(Computer& pairComputer) const;
     };
   }
 }

@@ -26,7 +26,7 @@ namespace espresso {
       /** for a particle of the Storage of this class,
           check whether it belongs to this set
       */
-      virtual bool isMember(ParticleReference pref) const = 0;
+      virtual bool isMember(ParticleHandle pref) const = 0;
 
       /** apply computer to all particles of this set
        */

@@ -2,9 +2,7 @@
 #define _PAIRS_FORCECOMPUTER_HPP
 
 #include "types.hpp"
-
 #include "particles/Storage.hpp"
-
 #include "Computer.hpp"
 
 namespace espresso {
@@ -30,24 +28,24 @@ namespace espresso {
           @param _force is the particle property that stands for the force
           @param _computesPressure whether the total virial is also computed
       */
-      ForceComputer(particles::PropertyReference<Real3D> _force,
+      ForceComputer(particles::PropertyHandle<Real3D> _force,
                     bool _computesVirial = false) 
         : force(_force), virial(0.0) {}
       virtual ~ForceComputer() {};
 
       virtual void operator()(const Real3D &dist,
-                              const particles::ParticleReference p1,
-                              const particles::ParticleReference p2) {};
+                              const particles::ParticleHandle p1,
+                              const particles::ParticleHandle p2) {};
        
     protected: 
-      particles::PropertyReference<Real3D> force;
+      particles::PropertyHandle<Real3D> force;
       Real3D virial;
       bool computesVirial;
 
       void addContribution(const Real3D &f,
                            const Real3D &dist,
-                           const particles::ParticleReference p1,
-                           const particles::ParticleReference p2) {
+                           const particles::ParticleHandle p1,
+                           const particles::ParticleHandle p2) {
         force[p1] += f;
         force[p2] -= f;
         if (computesVirial) virial = virial + f * dist;
@@ -73,8 +71,8 @@ namespace espresso {
       virtual ~VectorForceComputerFacade() {};
        
       virtual void operator()(const Real3D &dist,
-                              const particles::ParticleReference p1,
-                              const particles::ParticleReference p2) {
+                              const particles::ParticleHandle p1,
+                              const particles::ParticleHandle p2) {
         addContribution(computer.computeForce(dist), dist, p1, p2);
       }
        

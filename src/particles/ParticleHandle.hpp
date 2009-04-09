@@ -6,52 +6,36 @@
 
 namespace espresso {
   namespace particles {
-    /** persistent identifier for a particle. This is really just an
-	size_t, but with explicit conversion only, to make sure that
-	you are aware when you are about to access a particle */
-    class ParticleId {
+    /** temporary handle for efficient access to a partice */
+    class ParticleHandle {
     public:
-      /// default constructor, generating an invalid id
-      ParticleId(): v(0) {}
-      /** constructor by giving particle number. Explicit, so that
-	  ParticleId and size_t cannot be mixed unwantedly. */
-      explicit ParticleId(size_t _v): v(_v) {}
-      /// acts like a size_t otherwise
-      operator size_t() const { return v; }
+      ParticleHandle() {}
+      ParticleHandle(const esutil::TupleVector::pointer &_ptr): ptr(_ptr) {}
+
+      // for most uses, we actually need the reference
+      operator esutil::TupleVector::reference() const { return *ptr; }
 
     private:
-      size_t v;
+      friend class ConstParticleHandle;
+      esutil::TupleVector::pointer ptr;
     };
 
-    /** reference to a partice */
-    class ParticleReference: public espresso::esutil::TupleVector::reference {
-    public:
-      ParticleReference(const reference &_ref): reference(_ref) {}
-    };
+    /** temporary handle for efficient access to a partice */
+    class ConstParticleHandle {
+      esutil::TupleVector::const_pointer ptr;
 
-    /** reference to a constant particle */
-    class ConstParticleReference: public espresso::esutil::TupleVector::const_reference {
     public:
-      ConstParticleReference(const espresso::esutil::TupleVector::const_reference &_ref)
-	: espresso::esutil::TupleVector::const_reference(_ref) {}
-      ConstParticleReference(const espresso::esutil::TupleVector::reference &_ref)
-	: espresso::esutil::TupleVector::const_reference(_ref) {}
-    };
-
-    /** pointer to a partice */
-    class ParticlePointer: public espresso::esutil::TupleVector::pointer {
-    public:
-      ParticlePointer(const espresso::esutil::TupleVector::pointer &_ptr)
-	: espresso::esutil::TupleVector::pointer(_ptr) {}
-    };
-
-    /** pointer to a constant partice */
-    class ConstParticlePointer: public espresso::esutil::TupleVector::const_pointer {
-    public:
-      ConstParticlePointer(const espresso::esutil::TupleVector::const_pointer &_ptr)
-	: espresso::esutil::TupleVector::const_pointer(_ptr) {}
-      ConstParticlePointer(const espresso::esutil::TupleVector::pointer &_ptr)
-	: espresso::esutil::TupleVector::const_pointer(_ptr) {}
+      ConstParticleHandle(const ConstParticleHandle &_handle)
+        : ptr(_handle.ptr) {}
+      ConstParticleHandle(const ParticleHandle &_handle)
+        : ptr(_handle.ptr) {}
+      ConstParticleHandle(const esutil::TupleVector::const_pointer &_ptr)
+        : ptr(_ptr) {}
+      ConstParticleHandle(const esutil::TupleVector::pointer &_ptr)
+        : ptr(_ptr) {}
+      
+      // for most uses, we actually need the reference
+      operator esutil::TupleVector::const_reference() const { return *ptr; }
     };
   }
 }

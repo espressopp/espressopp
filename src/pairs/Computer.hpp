@@ -10,15 +10,15 @@ namespace espresso {
   namespace pairs {
     /** Abstract class that defines the operator() applied to particle pairs
      */
-    template<class ParticleReference>
+    template<class ParticleHandle>
     class ComputerBase {
       
     public:
       /// @name extended function object interface
       //@{
       typedef Real3D first_argument_type;
-      typedef ParticleReference second_argument_type;
-      typedef ParticleReference  third_argument_type;
+      typedef ParticleHandle second_argument_type;
+      typedef ParticleHandle  third_argument_type;
       typedef void                       result_type;
       //@}
 
@@ -30,18 +30,18 @@ namespace espresso {
 	  needed than only the distance.
       */
       virtual void operator()(const Real3D &dist, 
-			      const ParticleReference p1, 
-			      const ParticleReference p2) = 0;
+			      const ParticleHandle p1, 
+			      const ParticleHandle p2) = 0;
     };
 
     /** Abstract class that defines a function on pairs of particles */
     class Computer: 
-      public ComputerBase<particles::ParticleReference> 
+      public ComputerBase<particles::ParticleHandle> 
     {};
     
     /** Abstract class that defines a function on pairs of read-only particles */
     class ConstComputer:
-      public ComputerBase<particles::ConstParticleReference> 
+      public ComputerBase<particles::ConstParticleHandle> 
     {};
   }
 }

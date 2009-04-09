@@ -4,8 +4,8 @@
 using namespace boost::python;
 using namespace espresso::particles;
 
-void PythonComputer::operator()(const ParticleReference pref) {
-  // TODO translate ParticleReference to Particle
+void PythonComputer::operator()(const ParticleHandle pref) {
+  // TODO translate ParticleHandle to Particle
   pyCompute.attr("each")();
 }
 

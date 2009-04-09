@@ -238,6 +238,7 @@ AC_CONFIG_FILES([Makefile
                  contrib/boost/Makefile
                  contrib/boostmpi/Makefile
                  src/Makefile 
+                 src/unittest/Makefile
 		 src/include/Makefile
                  src/esutil/Makefile
                  src/esutil/unittest/Makefile

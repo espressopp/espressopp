@@ -23,7 +23,7 @@ namespace espresso {
     public: // parts invisible to Python
 
       /** The operator() calling the Python objects function each */
-      virtual void operator()(const ParticleReference pref);
+      virtual void operator()(const ParticleHandle pref);
 
       static void registerPython();
     };

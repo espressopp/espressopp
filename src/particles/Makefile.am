@@ -7,7 +7,7 @@ subpkginclude_HEADERS = \
 	Computer.hpp \
 	PythonComputer.hpp \
 	ParticleHandle.hpp \
-	Property.hpp \
+	PropertyHandle.hpp \
 	Storage.hpp \
 	Set.hpp \
 	All.hpp

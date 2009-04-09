@@ -59,7 +59,7 @@ const TupleVector::Property &TupleVector::getPropertyData(PropertyId id) const {
     std::vector<Property>::const_iterator it =
 	std::find_if(property.begin(), property.end(), PredicateMatchPropertyID(id));
     if (it == property.end()) {
-	throw std::out_of_range("TupleVector::eraseProperty: property does not exist");
+	throw std::out_of_range("TupleVector::getPropertyData: property does not exist");
     }
     return *it;
 }

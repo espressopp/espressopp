@@ -13,22 +13,22 @@ namespace espresso {
   namespace integrator {
     class StepA : public particles::Computer  {
     private:
-      PropertyReference<Real3D> pos;
-      PropertyReference<Real3D> vel;
-      PropertyReference<Real3D> force;
+      PropertyHandle<Real3D> pos;
+      PropertyHandle<Real3D> vel;
+      PropertyHandle<Real3D> force;
 
       real timeStep;
       real timeStepSqr;
 
     public:
-      StepA(PropertyReference<Real3D> _posRef,
-            PropertyReference<Real3D> _velRef,
-            PropertyReference<Real3D> _forceRef, real _timeStep):
+      StepA(PropertyHandle<Real3D> _posRef,
+            PropertyHandle<Real3D> _velRef,
+            PropertyHandle<Real3D> _forceRef, real _timeStep):
 	pos(_posRef), vel(_velRef), force(_forceRef),
 	timeStep(_timeStep), timeStepSqr(_timeStep * _timeStep) {}
 
       // m = 1
-      virtual void operator()(ParticleReference pref) {
+      virtual void operator()(ParticleHandle pref) {
 	pos[pref] = pos[pref] + vel[pref] * timeStep + 0.5 * force[pref] * timeStepSqr;
         vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
        
@@ -41,19 +41,19 @@ namespace espresso {
 
     private:
 
-      PropertyReference<Real3D> vel;
-      PropertyReference<Real3D> force;
+      PropertyHandle<Real3D> vel;
+      PropertyHandle<Real3D> force;
 
       real timeStep;
 
     public:
 
-      StepB(PropertyReference<Real3D> _velRef,
-	    PropertyReference<Real3D> _forceRef, real _timeStep):
+      StepB(PropertyHandle<Real3D> _velRef,
+	    PropertyHandle<Real3D> _forceRef, real _timeStep):
 
 	vel(_velRef), force(_forceRef), timeStep(_timeStep) {}
 
-      virtual void operator()(ParticleReference pref) {
+      virtual void operator()(ParticleHandle pref) {
 
         vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
 
@@ -65,9 +65,9 @@ namespace espresso {
     { setTimeStep(_timeStep);}
 
     VelocityVerlet::VelocityVerlet(Set* _particles, 
-				   PropertyId _position,
-				   PropertyId _velocity,
-				   PropertyId _force):
+				   boost::shared_ptr< Property<Real3D> > _position,
+				   boost::shared_ptr< Property<Real3D> > _velocity,
+				   boost::shared_ptr< Property<Real3D> > _force):
 
       particles(_particles),
       storage(_particles->getStorage()),
@@ -88,11 +88,7 @@ namespace espresso {
 
 	// Step A
 
-	StepA stepA(storage->getPropertyReference<Real3D>(position),
-		    storage->getPropertyReference<Real3D>(velocity),
-		    storage->getPropertyReference<Real3D>(force),
-		    timeStep
-		    );
+	StepA stepA(*position, *velocity, *force, timeStep);
 
 	particles->foreach(stepA);
 
@@ -100,7 +96,7 @@ namespace espresso {
 
 	// template for the force computer
 	pairs::ForceComputer
-	  forceParameters(storage->getPropertyReference<Real3D>(force));
+	  forceParameters(*force);
 
 	BOOST_FOREACH(ForceEvaluation fe, forceEvaluations) {
 	  pairs::ForceComputer *forceCompute =
@@ -111,10 +107,7 @@ namespace espresso {
 
 	// Step B
 
-	StepB stepB(storage->getPropertyReference<Real3D>(velocity),
-		    storage->getPropertyReference<Real3D>(force),
-		    timeStep
-		    );
+	StepB stepB(*velocity, *force, timeStep);
 
 	particles->foreach(stepB);
 
@@ -134,7 +127,9 @@ VelocityVerlet::registerPython() {
   using namespace boost::python;
 
   class_<VelocityVerlet>("integrator_VelocityVerlet", init<real>())
-    .def(init<Set*, PropertyId, PropertyId, PropertyId>())
+    .def(init< Set*, boost::shared_ptr< Property<Real3D> >,
+         boost::shared_ptr< Property<Real3D> >,
+         boost::shared_ptr< Property<Real3D> > >())
     .def("run", &VelocityVerlet::run)
     .def("setTimeStep", &VelocityVerlet::setTimeStep)
     .def("getTimeStep", &VelocityVerlet::getTimeStep)

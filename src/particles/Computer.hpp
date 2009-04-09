@@ -6,17 +6,17 @@
 
 namespace espresso {
   namespace particles {
-    template<class ParticleReference>
+    template<class ParticleHandle>
     class ComputerBase 
-      : public espresso::esutil::VirtualUnaryFunction<ParticleReference, void> 
+      : public espresso::esutil::VirtualUnaryFunction<ParticleHandle, void> 
     {};
     
     class Computer : 
-      public ComputerBase<ParticleReference>
+      public ComputerBase<ParticleHandle>
     {};
     
     class ConstComputer :
-      public ComputerBase<ConstParticleReference>
+      public ComputerBase<ConstParticleHandle>
     {};
   }
 }

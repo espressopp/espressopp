@@ -1,5 +1,6 @@
 #include "bindings.hpp"
 #include "Real3D.hpp"
+#include "Property.hpp"
 #include <hello/bindings.hpp>
 #include <particles/bindings.hpp>
 #include <interaction/bindings.hpp>
@@ -9,6 +10,8 @@
 void espresso::registerPython() {
 
   espresso::registerPythonReal3D();
+  espresso::registerPythonParticle();
+  espresso::registerPythonProperties();
 
   espresso::hello::registerPython();
   espresso::interaction::registerPython();

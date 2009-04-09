@@ -225,6 +225,8 @@ namespace espresso {
 	T *operator[](reference n) const { return data + getIndex(n)*dimension; }
 	/// dereference
 	const T *operator[](const_reference n) const { return data + getIndex(n)*dimension; }
+
+        size_t getDimension() const { return dimension; }
       };
 
     public:
