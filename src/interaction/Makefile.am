@@ -10,3 +10,6 @@ libinteraction_la_SOURCES = \
 	bindings.cpp \
 	LennardJones.cpp \
         FENE.cpp
+
+include $(top_srcdir)/build-aux/macros/axes_python.am
+python_SCRIPTS = __init__.py

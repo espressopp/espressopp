@@ -12,15 +12,20 @@ subpkginclude_HEADERS = \
 	virtual_functional.hpp \
         Logger.hpp
 
-noinst_LTLIBRARIES = libesutil.la \
-                     libgenlogger.la \
-                     libpylogger.la
+noinst_LTLIBRARIES = \
+	libesutil.la \
+	libgenlogger.la \
+	libpylogger.la
 
 libesutil_la_SOURCES = \
 	TupleVector.cpp \
 	Timer.cpp 
 
 libgenlogger_la_SOURCES = GenLogger.cpp GenLogger.hpp
-
 libpylogger_la_SOURCES = PyLogger.cpp PyLogger.hpp
+
+# python script handling
+include $(top_srcdir)/build-aux/macros/axes_python.am
+
+python_SCRIPTS= __init__.py
 

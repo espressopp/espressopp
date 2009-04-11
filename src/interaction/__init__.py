@@ -1,5 +1,5 @@
 from espresso import esutil
-from esutil import choose
+from espresso.esutil import choose
 from espresso import pmi
 
 # Extend the C++ LennardJones class

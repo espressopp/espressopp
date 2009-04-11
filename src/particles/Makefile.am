@@ -19,3 +19,6 @@ libparticles_la_SOURCES = \
 	bindings.cpp \
 	Storage.cpp \
 	All.cpp
+
+include $(top_srcdir)/build-aux/macros/axes_python.am
+python_SCRIPTS = __init__.py

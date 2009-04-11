@@ -1,5 +1,5 @@
 subpkgincludedir=$(pkgincludedir)/hello
-nobase_subpkginclude_HEADERS = \
+subpkginclude_HEADERS = \
 	bindings.hpp \
 	HelloWorld.hpp
 
@@ -8,3 +8,5 @@ libhello_la_SOURCES = \
 	bindings.cpp \
 	HelloWorld.cpp
 
+include $(top_srcdir)/build-aux/macros/axes_python.am
+python_SCRIPTS = __init__.py

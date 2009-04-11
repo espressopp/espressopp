@@ -63,22 +63,11 @@ pypresso_LDADD = \
 ##############################
 ## PYTHON
 ##############################
-
-python_scripts=\
+python_SCRIPTS= \
 	__init__.py \
 	eslogging.py \
 	boostmpi.py \
-	pmi.py \
-	esutil.py \
-	hello.py \
-	particles.py \
-	interaction.py
-
-python_SCRIPTS=$(python_scripts)
+	pmi.py
 
 # python script handling
 include $(top_srcdir)/build-aux/macros/axes_python.am
-
-clean-local: python-clean
-all-local: python-all
-
