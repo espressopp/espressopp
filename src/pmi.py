@@ -212,12 +212,12 @@ def reduce(reduceOp, function, *args) :
 
     Example:
     pmi.exec_('import hello')
-    pmi.exec_('joinstr=lambda a,b: "\\n".join(a,b)')
+    pmi.exec_('joinstr=lambda a,b: \"\\n\".join(a,b)')
     hw = pmi.create('hello.HelloWorld')
     print(pmi.reduce('joinstr', hw.hello()))
     # alternative:
     print(
-      pmi.reduce(lambda a,b: '\\n'.join(a,b),
+      pmi.reduce('lambda a,b: \"\\n\".join(a,b)',
                  'hello.HelloWorld.hello', hw)
                  )
     """
@@ -245,8 +245,9 @@ def __workerReduce(reduceOp, function, *args) :
     btargs=map(__backtranslate, args)
     log.info("Invoking: %s%s", function, tuple(btargs))
     function = eval(function)
+    value = function(*btargs)
+    log.info("Reducing results via %s", reduceOp)
     reduceOp = eval(reduceOp)
-    value = function(*args)
     return mpi.world.reduce(op=reduceOp, value=value, root=CONTROLLER) 
 
 ##################################################
@@ -426,6 +427,8 @@ class __OID(object) :
         self.oid = oid
     def getinitargs(self) :
         return self.oid
+    def __str__(self) :
+        return '[%d]' % self.oid
 
 def __checkController(func) :
     """Checks whether we are on the controller, raises a UserError if we are not.

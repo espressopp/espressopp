@@ -1,11 +1,17 @@
-from _espresso import hello_HelloWorld as _HelloWorld
+from espresso import pmi
 
-# map the class _HelloWorld to the class in the pseudo-namespace
-#_HelloWorld = __import__(_espresso.hello_HelloWorld)
+from _espresso import hello_HelloWorld as HelloWorldLocal
 
-# create the wrapping python class around the C++ class
-class HelloWorld(_HelloWorld):
-    'Python wrapper from C++ class HelloWorld'
-    def getMessage(self) :
-	'Returns the messages.' 
-        return _HelloWorld.getMessage(self)
+if pmi.IS_CONTROLLER:
+    pmi.exec_('from espresso.hello import HelloWorldLocal')
+    pmi.exec_('joinstr=lambda a,b: \"\\n\".join((a,b))')
+    class HelloWorld(object):
+        def __init__(self) :
+            self.local = pmi.create('HelloWorldLocal')
+            return object.__init__(self)
+            
+        def __str__(self) :
+            'Returns the messages.'
+            return pmi.reduce('joinstr',
+                              'HelloWorldLocal.getMessage',
+                              self.local)
