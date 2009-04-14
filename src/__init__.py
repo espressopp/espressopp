@@ -21,7 +21,7 @@ class __Real3D(Real3D) :
         elif len(args) == 1 :
             arg0 = args[0]
             # test whether the argument is iterable and has 3 elements
-            if getattr(arg0, '__iter__', False) and len(arg0) == 3:
+            if hasattr(arg0, '__iter__') and len(arg0) == 3:
                 x, y, z = arg0
             elif isinstance(arg0, float) :
                 x = y = z = arg0
@@ -57,7 +57,7 @@ class __Real3D(Real3D) :
     def __str__(self) :
         return str(tuple(self))
 
-import pmi, sys
+import pmi
 if pmi.IS_CONTROLLER :
     pmi.registerAtExit()
     # the script continues after this call

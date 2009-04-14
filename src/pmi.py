@@ -15,17 +15,19 @@ from espresso import boostmpi as mpi
 ##################################################
 ## EXEC
 ##################################################
-def exec_(statement) :
+def exec_(statement=None) :
     """Controller command that executes arbitrary python code on all workers.
     
     This allows to import modules and to define classes and functions
     on all workers.
     Example:
 
-    >>> pmi.exec_("import mymodule")
-    >>> myclass = pmi.create("mymodule.MyClass")
+    >>> pmi.exec_('import hello')
+    >>> hw = pmi.create('hello.HelloWorld')
     """
     if __checkController(exec_) :
+        if statement is None :
+            raise UserError('pmi.exec_ expects exactly 1 argument on controller!')
         # broadcast the statement
         _broadcast(_EXEC, statement)
         # locally execute the statement
@@ -45,33 +47,43 @@ def import_(statement) :
 ##################################################
 ## CREATE
 ##################################################
-def create(theClass, *args) :
+def create(theClass=None, *args) :
     """Controller command that creates an object on all workers.
 
-    "theClass" describes the (new-style) class of that should be
+    "theClass" describes the (new-style) class that should be
     instantiated.
     *args are the arguments to the constructor of the class.
     Only classes that are known to PMI can be used, that is, classes
     that have been imported to pmi via exec_() or import_().
 
     Example:
-    # PMI import the module hello.
     >>> pmi.exec_('import hello')
-    >>> pmi.create("hello.HelloWorld")
+    >>> hw = pmi.create("hello.HelloWorld")
+    >>> print(hw)
+    MPI process #0: Hello World!
+    MPI process #1: Hello World!
+    ...
 
     # Alternative.
     # Note that in this case the class has to be imported to the
-    # calling module.
+    # calling module AND via PMI.
     >>> import hello
-    >>> pmi.create(hello.HelloWorld)
+    >>> pmi.exec_('import hello')
+    >>> hw = pmi.create(hello.HelloWorld)
+    >>> print(hw)
+    MPI process #0: Hello World!
+    MPI process #1: Hello World!
+    ...
     """
     if __checkController(create) :
-        if isinstance(theClass, types.StringTypes) :
+        if theClass is None :
+          raise UserError("pmi.create expects at least 1 argument on controller")
+        elif isinstance(theClass, types.StringTypes) :
             theClass = eval(theClass)
         elif type(theClass) == types.TypeType :
             pass
         elif type(theClass) == types.ClassType :
-            raise TypeError("""PMI can't create old-style classes.
+            raise TypeError("""PMI cannot create old-style classes.
             Please create old style classes via their names.
             """)
         else :
@@ -114,7 +126,7 @@ def __workerCreate(theClass, oid, *args) :
 ##################################################
 ## INVOKE
 ##################################################
-def invoke(function, *args) :
+def invoke(function=None, *args) :
     """Invoke a function on all workers, gathering the return values into a list.
 
     function denotes the function that is to be called, *args are the
@@ -129,7 +141,6 @@ def invoke(function, *args) :
     messages = pmi.invoke(hw.hello())
     # alternative:
     messages = pmi.invoke('hello.HelloWorld.hello', hw)
-    print('\\n'.join(messages))
     """
     if __checkController(invoke) :
         function, args = __translateInvokeArgs(function, args)
@@ -153,7 +164,7 @@ def __workerInvoke(function, *args) :
 ##################################################
 ## CALL (INVOKE WITHOUT RESULT)
 ##################################################
-def call(procedure, *args) :
+def call(procedure=None, *args) :
     """Call a procedure on all workers, ignoring any return values.
 
     procedure denotes the procedure that is to be called, *args are the
@@ -164,12 +175,12 @@ def call(procedure, *args) :
     that have been imported to pmi via exec_() or import_().
     
     Example:
-    lj = _LennardJones(epsilon=1.0, sigma=1.0, cutoff=2.0)
-    r = 1.2
-    print(pmi.call(lj.computeEnergy, r))
+    >>> pmi.exec_('import hello')
+    >>> hw = pmi.create('hello.HelloWorld')
+    >>> pmi.call(hw.hello)
     # equivalent:
-    print(pmi.call(_LennardJones.computeEnergy, lj, r))
-
+    >>> pmi.call('hello.HelloWorld', hw)
+    
     Note, that you can use only procedures that are know to PMI when
     call() is called, i.e. procedures in modules that have 
     been imported via exec_().
@@ -197,7 +208,7 @@ def invokeNoResult(procedure, *args) :
 ##################################################
 ## REDUCE (INVOKE WITH REDUCED RESULT)
 ##################################################
-def reduce(reduceOp, function, *args) :
+def reduce(reduceOp=None, function=None, *args) :
     """Invoke a function on all workers, reducing the return values to
     a single value.
 
@@ -211,18 +222,20 @@ def reduce(reduceOp, function, *args) :
     must have been imported to pmi via exec_() or import_().
 
     Example:
-    pmi.exec_('import hello')
-    pmi.exec_('joinstr=lambda a,b: \"\\n\".join(a,b)')
-    hw = pmi.create('hello.HelloWorld')
-    print(pmi.reduce('joinstr', hw.hello()))
-    # alternative:
-    print(
-      pmi.reduce('lambda a,b: \"\\n\".join(a,b)',
-                 'hello.HelloWorld.hello', hw)
-                 )
+    >>> pmi.exec_('import hello')
+    >>> pmi.exec_('joinstr=lambda a,b: \"\\n\".join(a,b)')
+    >>> hw = pmi.create('hello.HelloWorld')
+    >>> print(pmi.reduce('joinstr', hw.hello()))
+    # equivalent:
+    >>> print(
+    ...   pmi.reduce('lambda a,b: \"\\n\".join(a,b)',
+    ...             'hello.HelloWorld.hello', hw)
+    ...             )
     """
     if __checkController(reduce) :
         # handle reduceOp argument
+        if reduceOp is None :
+            raise UserError("pmi.reduce expects reduceOp argument on controller")
         if isinstance(reduceOp, types.StringTypes) :
             pass
         elif isinstance(reduceOp, types.FunctionType) :
@@ -280,7 +293,8 @@ def __workerDelete(*args) :
 ## DUMP
 ##################################################
 def dump() :
-    'Dump the object cache of PMI.'
+    """Controller function that dumps the object cache of PMI. For
+    debugging purposes."""
     if __checkController(dump) :
         _broadcast(_DUMP)
         log.info("OIDS=%s", str(OIDS))
@@ -291,7 +305,7 @@ def __workerDump() :
     log.info("OBJECT_CACHE=%s", str(OBJECT_CACHE))
 
 ##################################################
-## WORKER LOOP
+## WORKER LOOP CONTROL
 ##################################################
 def registerAtExit() :
     """Controller command that registers the function
@@ -326,6 +340,7 @@ def __workerStop(exit) :
         log.info('Stopping worker loop.')
         raise StopIteration()
 
+
 def receive(expected=None) :
     """Worker command that receives and handles the next PMI command.
 
@@ -336,10 +351,15 @@ def receive(expected=None) :
     log.debug('Waiting for next PMI command.')
     message = mpi.world.broadcast(root=CONTROLLER)
     log.debug("Received command: %s", message)
-    cmd = message[0]
-    args = message[1:]
+    if not hasattr(message, '__getitem__'):
+        raise UserError("Received an MPI message that is not a PMI command: '%s'" % message)
+    try :
+        cmd = message[0]
+        args = message[1:]
+    except KeyError:
+        raise UserError("Received an MPI message that contains an associative map: '%s'" % message)
     if cmd not in _ALLCMD :
-        raise InternalError("Received an MPI message that is not a PMI command: '%s'" % cmd)
+        raise UserError("Received a message that does not start with a PMI command: '%s'" % cmd)
     elif cmd == _DELETE :
         # if delete is sent, delete the objects
         __workerDelete(*args)
@@ -357,7 +377,7 @@ def receive(expected=None) :
         return cmd_func(*args)
 
 def workerLoop() :
-    """WorkerCommand that starts the main worker loop.
+    """Worker command that starts the main worker loop.
 
     This function starts a loop that expects to receive PMI commands
     until stopWorkerLoop() or finalizeWorkers() is called on the
@@ -406,12 +426,17 @@ IS_CONTROLLER = mpi.rank == CONTROLLER
 IS_WORKER = not IS_CONTROLLER
 
 class InternalError(Exception) :
+    """Raised when PMI has encountered an internal error.
+
+    Hopefully, this exceptions is never raised."""
     def __str__(self) :
         return '%s: %s' % (WORKERSTR, str(self.args))
     def __repr__(self) :
         return str(self.args)
 
 class UserError(Exception) :
+    """Raised when PMI has encountered a user error.
+    """
     def __str__(self) :
         return '%s: %s' % (WORKERSTR, str(self.args))
     def __repr__(self) :
@@ -472,6 +497,11 @@ def __backtranslate(obj) :
         return obj
 
 def __translateInvokeArgs(arg0, args) :
+    """Internal controller function that normalizes the function
+    argument to invoke(), call() or reduce().
+    """
+    if arg0 is None :
+        raise UserError("pmi.__invoke expects function argument on controller")
     if isinstance(arg0, types.StringTypes) :
         function = arg0
     elif isinstance(arg0, types.FunctionType) :
@@ -484,9 +514,17 @@ def __translateInvokeArgs(arg0, args) :
     return (function, args)
 
 def _broadcast(*args) :
+    """Internal controller function that actually broadcasts the PMI
+    message.
+
+    The function first checks whether the command is a valid PMI
+    command, then it checks whether any objects have to be deleted
+    before the command is broadcast, and finally it broadcasts the
+    command itself.
+    """
     cmd = args[0]
     if cmd not in _ALLCMD :
-        raise ValueError('Broadcast needs a command (one of %s) as first argument. Got %s instead' % (_ALLCMD, args))
+        raise InternalError('_broadcast needs a command (one of %s) as first argument. Got %s instead' % (_ALLCMD, args))
     if len(DELETED_OIDS) > 0 :
         log.debug("Got %d objects in DELETED_OIDS.", len(DELETED_OIDS))
         deleteCmd = (_DELETE,) + tuple(DELETED_OIDS)
@@ -530,6 +568,7 @@ else :
 
 # whether or not SPMD mode is used
 SPMD = False
+ID = mpi.rank
 
 ##################################################
 ## MODULE BODY
@@ -539,4 +578,5 @@ if IS_CONTROLLER :
     log = logging.getLogger('%s.controller' % __name__)
 else :
     WORKERSTR = 'Worker %d' % mpi.rank
-    log = logging.getLogger('%s.worker%d' % (__name__, mpi.rank))
+    log = logging.getLogger('%s.worker%d' % (__name__, ID))
+

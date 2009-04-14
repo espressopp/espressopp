@@ -6,7 +6,7 @@ class Test0Exec(unittest.TestCase) :
     def test0ImportModule(self) :
         pmi.exec_("import amodule")
         # check that it's loaded
-        self.assert_('amodule' in pmi.__dict__)
+        self.assert_(hasattr(pmi, 'amodule'))
         # check that the main namespace is not polluted
         try :
             exec 'n=amodule.__name__'
@@ -18,12 +18,12 @@ class Test0Exec(unittest.TestCase) :
         # clean up
         pmi.exec_("del amodule")
         # check that it's gone
-        self.assert_('amodule' not in pmi.__dict__)
+        self.assert_(not hasattr(pmi, 'amodule'))
         
     def test1ImportModuleAs(self) :
         pmi.exec_("import amodule as e")
         # check that it's loaded
-        self.assert_('e' in pmi.__dict__)
+        self.assert_(hasattr(pmi, 'e'))
         self.assertEqual(pmi.e.__name__, "amodule")
         # clean up
         pmi.exec_("del e")
@@ -124,7 +124,12 @@ class Test2Call(unittest.TestCase) :
         pmi.call('amodule.A.g', self.a, 52)
         self.assertEqual(self.a.g_arg, 52)
 
-class Test2Invoke(unittest.TestCase) :
+    def test6BadArgument(self) :
+        if pmi.IS_CONTROLLER:
+            self.assertRaises(ValueError, pmi.call, 1)
+        self.assertRaises(AttributeError, pmi.call, 'amodule.doesntexist')
+
+class Test3Invoke(unittest.TestCase) :
     def setUp(self) :
         pmi.exec_('import amodule')
         self.a = pmi.create('amodule.A')
@@ -153,7 +158,12 @@ class Test2Invoke(unittest.TestCase) :
             pmi.receive()
             pmi.receive()
 
-class Test3Reduce(unittest.TestCase) :
+    def test6BadArgument(self) :
+        if pmi.IS_CONTROLLER:
+            self.assertRaises(ValueError, pmi.invoke, 1)
+        self.assertRaises(AttributeError, pmi.invoke, 'amodule.doesntexist')
+
+class Test4Reduce(unittest.TestCase) :
     def setUp(self) :
         pmi.exec_('import amodule')
         self.a = pmi.create('amodule.A')
@@ -172,8 +182,7 @@ class Test3Reduce(unittest.TestCase) :
             pmi.receive()
             pmi.receive()
             
-
-    def test0Lambda(self) :
+    def test1Lambda(self) :
         pmi.exec_('myadd = lambda a,b: a+b')
 
         if pmi.IS_CONTROLLER :
@@ -184,6 +193,37 @@ class Test3Reduce(unittest.TestCase) :
 
         pmi.exec_('del myadd')
 
+    def test2BadArgument(self) :
+        if pmi.IS_CONTROLLER:
+            self.assertRaises(ValueError, pmi.reduce, 1)
+        self.assertRaises(AttributeError, pmi.reduce, '', 'amodule.doesntexist')
+
+class Test5CommunicationFailure(unittest.TestCase) :
+    def test0CommandMismatch(self):
+        if pmi.IS_CONTROLLER :
+            pmi.exec_('import amodule')
+        else :
+            self.assertRaises(pmi.UserError, pmi.call, None)
+
+    def test1MPIandPMI(self) :
+        if pmi.IS_CONTROLLER :
+            mpi.world.broadcast(value=1, root=pmi.CONTROLLER)
+            mpi.world.broadcast(value=(1,2), root=pmi.CONTROLLER)
+            mpi.world.broadcast(value={'bla':'blub'}, root=pmi.CONTROLLER)
+        else :
+            self.assertRaises(pmi.UserError, pmi.exec_)
+            self.assertRaises(pmi.UserError, pmi.exec_)
+            self.assertRaises(pmi.UserError, pmi.exec_)
+
+class Test6WorkerCommandsOnController(unittest.TestCase) :
+    def test0Receive(self) :
+        if pmi.IS_CONTROLLER:
+            self.assertRaises(pmi.UserError, pmi.receive)
+            self.assertRaises(pmi.UserError, pmi.exec_)
+            self.assertRaises(pmi.UserError, pmi.create)
+            self.assertRaises(pmi.UserError, pmi.invoke)
+            self.assertRaises(pmi.UserError, pmi.call)
+            self.assertRaises(pmi.UserError, pmi.reduce)
 
 # class Test4Proxy(unittest.TestCase) :
 #     def test0Create(self):
@@ -197,11 +237,14 @@ class Test3Reduce(unittest.TestCase) :
 #         print(a.f.func)
 #         print(a.f.args)
 #         print(AProxy.f(a))
-        
-if __name__ == "__main__":
-    if pmi.IS_CONTROLLER:
-        # the controller first stops the workerLoop
-        pmi.stopWorkerLoop()
-    pmi.SPMD = True
-    # now execute the unit tests
-    unittest.main()
+
+if pmi.IS_CONTROLLER:
+    # the controller first stops the workerLoop
+    pmi.stopWorkerLoop()
+       
+
+pmi.SPMD = True
+
+unittest.main()
+
+
