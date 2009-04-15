@@ -10,6 +10,9 @@ if sys.platform == 'linux2':
 else:
     from _boostmpi import *
 
+import _boostmpi
+from _boostmpi import __doc__, __author__, __copyright__, __license__
+
 import esutil
 
 # extend the MPI Communicator class by the collective operations
@@ -17,13 +20,22 @@ class ExtendMPI(Communicator) :
     __metaclass__ = esutil.ExtendBaseClass
 
     def broadcast(self, value=None, root=0) :
-        """Calls __module__.broadcast(self, value, root)."""
+        """Calls broadcast(self, value, root).
+        """
         return broadcast(self, value, root)
 
     def gather(self, value=None, root=0) :
-        """Calls __module__.gather(self, value, root)."""
+        """Calls gather(self, value, root).
+        """
         return gather(self, value, root)
 
     def reduce(self, value, op, root) :
-        """Calls __module__.reduce(self, value, op, root)."""
+        """Calls reduce(self, value, op, root).
+        """
         return reduce(self, value, op, root)
+
+__author__ = __author__ + ', Olaf Lenz <lenzo@mpip-mainz.mpg.de>'
+__copyright__ = __copyright__ + ', 2009 Olaf Lenz'
+
+# export all symbols from _boostmpi
+__all__ = [n for n in dir(_boostmpi) if not n.startswith("_")]

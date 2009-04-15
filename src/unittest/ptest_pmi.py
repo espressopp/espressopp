@@ -97,8 +97,8 @@ class Test2Call(unittest.TestCase) :
             pmi.call('amodule.g', 52)
             self.assertEqual(pmi.amodule.g_arg, 52)
         else :
-            pmi.receive()
-            pmi.receive()
+            pmi.call()
+            pmi.call()
 
     def test1Function(self) :
         import amodule
@@ -145,8 +145,8 @@ class Test3Invoke(unittest.TestCase) :
             res = pmi.invoke('amodule.g', 52)
             self.assertEqual(list(res), [52 for x in range(len(res))])
         else :
-            pmi.receive()
-            pmi.receive()
+            pmi.invoke()
+            pmi.invoke()
 
     def test1Method(self) :
         if pmi.IS_CONTROLLER :
@@ -155,8 +155,8 @@ class Test3Invoke(unittest.TestCase) :
             res = pmi.invoke(self.a.g, 52)
             self.assertEqual(list(res), [52 for x in range(len(res))])
         else :
-            pmi.receive()
-            pmi.receive()
+            pmi.invoke()
+            pmi.invoke()
 
     def test6BadArgument(self) :
         if pmi.IS_CONTROLLER:
@@ -179,8 +179,8 @@ class Test4Reduce(unittest.TestCase) :
             res = pmi.reduce('amodule.add', 'amodule.g', 52)
             self.assertEqual(res, 52*mpi.world.size)
         else :
-            pmi.receive()
-            pmi.receive()
+            pmi.reduce()
+            pmi.reduce()
             
     def test1Lambda(self) :
         pmi.exec_('myadd = lambda a,b: a+b')
@@ -189,7 +189,7 @@ class Test4Reduce(unittest.TestCase) :
             res = pmi.reduce('myadd', 'amodule.f')
             self.assertEqual(res, 42*mpi.world.size)
         else :
-            pmi.receive()
+            pmi.reduce()
 
         pmi.exec_('del myadd')
 
@@ -239,12 +239,10 @@ class Test6WorkerCommandsOnController(unittest.TestCase) :
 #         print(AProxy.f(a))
 
 if pmi.IS_CONTROLLER:
-    # the controller first stops the workerLoop
+    # stop the workerLoop that is automatically started by
+    # ../__init__.py
     pmi.stopWorkerLoop()
        
-
-pmi.SPMD = True
-
 unittest.main()
 
 

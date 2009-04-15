@@ -1,12 +1,111 @@
-"""
-* general usage
-* worker/controller commands
-* SPMD mode
-  * use commands SPMD-like
-* PMI mode:
-  * use workerLoop() on workers
-  * use receive() commands on workers
-  * use registerAtExit() on controller
+"""The module pmi provides functions for Parallel Method Invocation
+(PMI).
+
+PMI is intended to be used in data-parallel environments, where
+several threads run in parallel and can communicate via MPI.
+
+In PMI mode, a single thread of control (a python script that runs on
+the \"controller\", i.e. the MPI root task) can invoke arbitrary
+functions on all other threads (the \"workers\") in parallel via
+call(), invoke() and reduce(). When the function on the workers
+return, the control is returned to the controller.
+
+This model is equivalent to the \"Fork-Join execution model\" used
+e.g. in OpenMP.
+
+PMI also allows to create parallel instances of object classes via
+create(), i.e. instances that have a corresponding object instance on
+all workers. call(), invoke() and reduce() can be used to call
+arbitrary methods of these instances.
+
+To allow importing of python modules and to execute arbitrary code on
+all workers, exec_() can be used.
+
+Main program
+------------
+
+On the workers, the main program of a PMI script usually consists of a
+single call to the function startWorkerLoop(). On the workers, this
+will start an infinite loop on the workers that waits to receive the
+next PMI call, while it will immediately return on the controller. On
+the workers, the loop ends only, when one of the commands
+finalizeWorkers() or stopWorkerLoop() is issued on the controller. A
+typical PMI main program looks like this:
+
+EXAMPLE PMI PROGRAM:
+
+>>> # compute 2*factorial(42) in parallel
+>>> import pmi
+>>>
+>>> # start the worker loop
+>>> # on the controller, this function returns immediately
+>>> pmi.startWorkerLoop()
+>>>
+>>> # Do the parallel computation
+>>> pmi.exec_('import math')
+>>> pmi.reduce('lambda a,b: a+b', 'math.factorial', 42)
+>>>
+>>> # exit all workers
+>>> pmi.finalizeWorkers()
+
+Instead of using pmi.finalizeWorkers() at the end of the script, you
+can call registerAtExit() anywhere else, which will cause
+finalizeWorkers() to be called when the python interpreter exits.
+
+Alternatively, it is possible to use PMI in an SPMD-like fashion,
+where each call to a PMI command on the controller must be accompanied
+by a corresponding call on the worker. This can be either a simple
+call to receive() that accepts any PMI command, or a call to the
+identical PMI command. In that case, the arguments of the call to the
+PMI command on the workers are ignored. In this way, it is possible to
+write SPMD scripts that profit from the PMI communication patterns.
+
+EXAMPLE SPMD PROGRAM:
+
+>>> # compute 2*factorial(42) in parallel
+>>> import pmi
+>>>
+>>> pmi.exec_('import math')
+>>> pmi.reduce('lambda a,b: a+b', 'math.factorial', 42)
+
+To start the worker loop, the command startWorkerLoop() can be issued
+on the workers. To stop the worker loop, stopWorkerLoop() can be
+issued on the controller, which will end the worker loop without
+exiting the workers. 
+
+Controller commands
+-------------------
+
+These commands can be called in the controller script. When any of
+these commands is issued on a worker during the worker loop, a
+UserError is raised.
+
+* call(), invoke(), reduce() to call functions and methods in parallel
+* create() to create parallel object instances
+* exec_() to execute arbitrary python code in parallel
+* finalizeWorkers() to stop and exit all workers
+* registerAtExit() to make sure that finalizeWorkers() is called when
+  python exits on the controller
+* stopWorkerLoop() to interrupt the worker loop an all workers and to
+  return control to the single workers
+
+Worker commands
+---------------
+
+These commands can be called on a worker.
+
+* startWorkerLoop() to start the worker loop
+* receive() to receive a single PMI command
+
+Useful constants
+----------------
+
+The pmi module defines the following useful constants:
+* IS_CONTROLLER is True when used on the controller, False otherwise
+* IS_WORKER = not IS_CONTROLLER
+* ID is the numerical Id of the thread ( = mpi.world.rank)
+* CONTROLLER is the numerical Id of the controller thread (the MPI root)
+* WORKERSTR is a string describing the thread ('Worker #' or 'Controller')
 """
 import logging
 import types
@@ -93,7 +192,7 @@ def create(theClass=None, *args) :
         obj = theClass(*args)
         oid = id(obj)
         if oid in OIDS :
-            raise InternalError("Object with oid %d is already in OIDS!" % oid)
+            raise _InternalError("Object with oid %d is already in OIDS!" % oid)
         OIDS.add(oid)
         log.info('Created: %s%s [oid=%d]', theClass.__name__, tuple(args), oid)
         # translate the arguments
@@ -113,7 +212,7 @@ def __workerCreate(theClass, oid, *args) :
     obj = theClass(*btargs)
     # store the new object
     if oid in OBJECT_CACHE :
-        raise InternalError("Object with oid %d is already in OBJECT_CACHE!" % oid)
+        raise _InternalError("Object with oid %d is already in OBJECT_CACHE!" % oid)
     OBJECT_CACHE[oid] = obj
     log.info('Created: %s%s [oid=%d]', theClass.__name__, tuple(args), oid)
     return obj
@@ -136,11 +235,11 @@ def invoke(function=None, *args) :
     that have been imported to pmi via exec_() or import_().
 
     Example:
-    pmi.exec_('import hello')
-    hw = pmi.create('hello.HelloWorld')
-    messages = pmi.invoke(hw.hello())
-    # alternative:
-    messages = pmi.invoke('hello.HelloWorld.hello', hw)
+    >>> pmi.exec_('import hello')
+    >>> hw = pmi.create('hello.HelloWorld')
+    >>> messages = pmi.invoke(hw.hello())
+    >>> # alternative:
+    >>> messages = pmi.invoke('hello.HelloWorld.hello', hw)
     """
     if __checkController(invoke) :
         function, args = __translateInvokeArgs(function, args)
@@ -178,7 +277,7 @@ def call(procedure=None, *args) :
     >>> pmi.exec_('import hello')
     >>> hw = pmi.create('hello.HelloWorld')
     >>> pmi.call(hw.hello)
-    # equivalent:
+    >>> # equivalent:
     >>> pmi.call('hello.HelloWorld', hw)
     
     Note, that you can use only procedures that are know to PMI when
@@ -226,7 +325,7 @@ def reduce(reduceOp=None, function=None, *args) :
     >>> pmi.exec_('joinstr=lambda a,b: \"\\n\".join(a,b)')
     >>> hw = pmi.create('hello.HelloWorld')
     >>> print(pmi.reduce('joinstr', hw.hello()))
-    # equivalent:
+    >>> # equivalent:
     >>> print(
     ...   pmi.reduce('lambda a,b: \"\\n\".join(a,b)',
     ...             'hello.HelloWorld.hello', hw)
@@ -275,7 +374,7 @@ class __Destroyer(object) :
         self.oid = oid
     def __del__(self) :
         if self.oid not in OIDS :
-            raise InternalError('OID %d is not in OIDS!' % self.oid)
+            raise _InternalError('OID %d is not in OIDS!' % self.oid)
         log.info("Adding OID to DELETED_OIDS: [%d]", self.oid)
         DELETED_OIDS.add(self.oid)
         OIDS.remove(self.oid)
@@ -318,34 +417,34 @@ def registerAtExit() :
 def finalizeWorkers():
     """Controller command that stops and exits all workers.
     """
-    stopWorkerLoop(exit=True)
+    stopWorkerLoop(doExit=True)
 
-def stopWorkerLoop(exit=False) :
+def stopWorkerLoop(doExit=False) :
     """Controller command that stops all workers.
 
-    If "exit" is set, the workers exit afterwards.
+    If \"exit\" is set, the workers exit afterwards.
     """
     if __checkController(stopWorkerLoop) :
         log.info('Calling all workers to stop.')
-        _broadcast(_STOP, exit)
+        _broadcast(_STOP, doExit)
     else :
         receive(_STOP)
 
-def __workerStop(exit) :
+def __workerStop(doExit) :
     import sys
-    if exit :
+    if doExit :
         log.info('Stopping worker loop and exiting worker thread.')
         sys.exit()
     else :
         log.info('Stopping worker loop.')
         raise StopIteration()
 
-
 def receive(expected=None) :
     """Worker command that receives and handles the next PMI command.
 
     This function waits to receive and handle a single PMI command. If
-    the received command is not one of "expected", raise a UserError.
+    expected is not None and the received command does not equal
+    \"expected\", raise a UserError.
     """
     __checkWorker(receive)
     log.debug('Waiting for next PMI command.')
@@ -376,45 +475,49 @@ def receive(expected=None) :
     else :
         return cmd_func(*args)
 
-def workerLoop() :
+def startWorkerLoop() :
     """Worker command that starts the main worker loop.
 
     This function starts a loop that expects to receive PMI commands
     until stopWorkerLoop() or finalizeWorkers() is called on the
     controller.
     """
-    log.info('Entering the worker loop.')
     # On the controller, leave immediately
-    if IS_CONTROLLER : return None
+    if IS_CONTROLLER :
+        log.info('Entering and leaving the worker loop')
+        return None
+
+    log.info('Entering the worker loop.')
+    inWorkerLoop = True
 
     try :
         while 1 :
             receive()
     except StopIteration :
-        pass
+        inWorkerLoop = False
 
 # Metaclass
-import functools
+# import functools
 
-def method_caller(method, self, *args) :
-    print('method_caller(%s, %s)' % (self, args))
-    getattr(self, method)(self, *args)
+# def method_caller(method, self, *args) :
+#     print('method_caller(%s, %s)' % (self, args))
+#     getattr(self, method)(self, *args)
 
-def getargs(*args) :
-    print('arguments=%s' % args)
+# def getargs(*args) :
+#     print('arguments=%s' % args)
 
-class Proxy(type):
-    def __init__(self, name, bases, dict) :
-        # init the pmi object
-        self.local = create(dict['pmiclass'])
-        for method in dict['pmilocal'] :
-            newfunc = functools.partial(method_caller, method)
-            print(newfunc.func)
-            print(newfunc.args)
-#             setattr(self, method,
-#                     functools.partial(method_caller, method))
+# class Proxy(type):
+#     def __init__(self, name, bases, dict) :
+#         # init the pmi object
+#         self.local = create(dict['pmiclass'])
+#         for method in dict['pmilocal'] :
+#             newfunc = functools.partial(method_caller, method)
+#             print(newfunc.func)
+#             print(newfunc.args)
+# #             setattr(self, method,
+# #                     functools.partial(method_caller, method))
                                      
-        return type.__init__(self, name, bases, dict)
+#         return type.__init__(self, name, bases, dict)
 
 ##################################################
 ## CONSTANTS AND EXCEPTIONS
@@ -425,7 +528,7 @@ CONTROLLER = 0
 IS_CONTROLLER = mpi.rank == CONTROLLER
 IS_WORKER = not IS_CONTROLLER
 
-class InternalError(Exception) :
+class _InternalError(Exception) :
     """Raised when PMI has encountered an internal error.
 
     Hopefully, this exceptions is never raised."""
@@ -458,18 +561,19 @@ class __OID(object) :
 def __checkController(func) :
     """Checks whether we are on the controller, raises a UserError if we are not.
     """
-    if IS_WORKER :
-        if SPMD :
+    if IS_CONTROLLER:
+        return True
+    else:
+        if not inWorkerLoop:
             return False
-        else :
-            raise UserError("Can't call %s on worker when not in SPMD mode!" % func.__name__)
-    return True
+        else:
+            raise UserError("Cannot call %s on worker while in worker loop!" % func.__name__)
 
 def __checkWorker(func) :
     """Checks whether we are on a worker, raises a UserError if we are not.
     """
     if IS_CONTROLLER : 
-        raise UserError("Can't call %s on controller!" % func.__name__)
+        raise UserError("Cannot call %s on the controller!" % func.__name__)
 
 def __translate(obj) :
     """Internal function that translates obj into an __OID
@@ -491,7 +595,7 @@ def __backtranslate(obj) :
     """
     if (type(obj) == __OID) :
         if obj.oid not in OBJECT_CACHE :
-            raise InternalError("OID %d was not in OBJECT_CACHE!" % obj.oid)
+            raise _InternalError("OID %d was not in OBJECT_CACHE!" % obj.oid)
         return OBJECT_CACHE[obj.oid]
     else :
         return obj
@@ -524,7 +628,7 @@ def _broadcast(*args) :
     """
     cmd = args[0]
     if cmd not in _ALLCMD :
-        raise InternalError('_broadcast needs a command (one of %s) as first argument. Got %s instead' % (_ALLCMD, args))
+        raise _InternalError('_broadcast needs a command (one of %s) as first argument. Got %s instead' % (_ALLCMD, args))
     if len(DELETED_OIDS) > 0 :
         log.debug("Got %d objects in DELETED_OIDS.", len(DELETED_OIDS))
         deleteCmd = (_DELETE,) + tuple(DELETED_OIDS)
@@ -566,8 +670,7 @@ else :
     # dict that stores the objects corresponding to an oid
     OBJECT_CACHE = {}
 
-# whether or not SPMD mode is used
-SPMD = False
+inWorkerLoop = False
 ID = mpi.rank
 
 ##################################################
