@@ -96,6 +96,9 @@ These commands can be called on a worker.
 
 * startWorkerLoop() to start the worker loop
 * receive() to receive a single PMI command
+* call(), invoke(), reduce(), create() and exec_() to receive a single
+  corresponding PMI command. Note that these commands will ignore any
+  arguments when called on a worker.
 
 Useful constants
 ----------------
@@ -413,6 +416,8 @@ def registerAtExit() :
     if __checkController(registerAtExit) :
         import atexit
         atexit.register(finalizeWorkers)
+    else:
+        raise UserError('Cannot call registerAtExit on worker!')
 
 def finalizeWorkers():
     """Controller command that stops and exits all workers.
@@ -428,7 +433,7 @@ def stopWorkerLoop(doExit=False) :
         log.info('Calling all workers to stop.')
         _broadcast(_STOP, doExit)
     else :
-        receive(_STOP)
+        raise UserError('Cannot call stopWorkerLoop on worker!')
 
 def __workerStop(doExit) :
     import sys

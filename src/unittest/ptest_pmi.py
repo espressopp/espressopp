@@ -215,8 +215,8 @@ class Test5CommunicationFailure(unittest.TestCase) :
             self.assertRaises(pmi.UserError, pmi.exec_)
             self.assertRaises(pmi.UserError, pmi.exec_)
 
-class Test6WorkerCommandsOnController(unittest.TestCase) :
-    def test0Receive(self) :
+class Test6WrongCommands(unittest.TestCase) :
+    def test0ReceiveOnController(self) :
         if pmi.IS_CONTROLLER:
             self.assertRaises(pmi.UserError, pmi.receive)
             self.assertRaises(pmi.UserError, pmi.exec_)
@@ -224,6 +224,12 @@ class Test6WorkerCommandsOnController(unittest.TestCase) :
             self.assertRaises(pmi.UserError, pmi.invoke)
             self.assertRaises(pmi.UserError, pmi.call)
             self.assertRaises(pmi.UserError, pmi.reduce)
+
+    def test1BadOnWorker(self):
+        if pmi.IS_WORKER:
+            self.assertRaises(pmi.UserError, pmi.finalizeWorkers)
+            self.assertRaises(pmi.UserError, pmi.stopWorkerLoop)
+            self.assertRaises(pmi.UserError, pmi.registerAtExit)
 
 # class Test4Proxy(unittest.TestCase) :
 #     def test0Create(self):
