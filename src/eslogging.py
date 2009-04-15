@@ -23,7 +23,9 @@ def __my_setLevel(self, level):
     __orig_setLevel(self, level)
     setLogger(self)
 
+import math
+
 logging.Logger.setLevel = __my_setLevel
-logging.TRACE = (logging.NOTSET + logging.DEBUG) / 2
+logging.TRACE = int((logging.NOTSET + logging.DEBUG)/2.0)
 logging.addLevelName('TRACE', logging.TRACE)
 setLogger()
