@@ -36,23 +36,22 @@ class Test1CreateAndDelete(unittest.TestCase) :
         pmi.exec_("del amodule")
 
     def test0StringArgument(self) :
-        if pmi.IS_CONTROLLER :
-            self.assertEqual(len(pmi.OIDS), 0)
-        else :
+        if pmi.IS_WORKER:
             self.assertEqual(len(pmi.OBJECT_CACHE), 0)
 
         a = pmi.create("amodule.A")
         self.assertEqual(a.__class__.__name__, "A")
         if pmi.IS_CONTROLLER :
-            self.assertEqual(len(pmi.OIDS), 1)
-        else :
+            self.assert_(hasattr(a, '__pmioid'))
+        else:
             self.assertEqual(len(pmi.OBJECT_CACHE), 1)
+
+        pmi.dump()
 
         del a
         if pmi.IS_CONTROLLER :
             # check that the oid is already deleted and registered as such
             self.assertEqual(len(pmi.DELETED_OIDS), 1)
-            self.assertEqual(len(pmi.OIDS), 0)
             
         pmi.exec_("pass")
         if pmi.IS_CONTROLLER :

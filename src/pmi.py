@@ -191,39 +191,24 @@ def create(theClass=None, *args, **kwds) :
         else :
             raise ValueError("pmi.create expects class as first argument, but got {0}".format(theClass))
 
-        # FIXME: Create the object only AFTER the broadcast
-        # create the new object
-        obj = theClass(*args, **kwds)
-        oid = id(obj)
-        if oid in OIDS :
-            raise _InternalError("Object with oid {0:x} is already in OIDS!".format(oid))
-        OIDS.add(oid)
-        log.info('Created: {0} [oid={1:x}]'.format(__formatCall(theClass.__name__, args, kwds), oid))
+        # generate a new oid
+        oid = __OID()
+
         # translate the arguments
         targs, tkwds = __translateArgs(args, kwds)
         # broadcast creation to the workers
         _broadcast(_CREATE, theClass, oid, *targs, **tkwds)
-        # store the destroyer object in the instance
-        obj.__pmidel = __Destroyer(oid)
+
+        log.info('Creating: {0} [{1}]'.format(__formatCall(theClass.__name__, args, kwds), oid))
+        # create the instance
+        obj = theClass(*args, **kwds)
+        # store the oid in the instance
+        obj.__pmioid = oid
+        obj.__pmidestroyer = __Destroyer(oid)
+
         return obj
     else :
         return receive(_CREATE)
-
-
-#         # generate a new oid
-#         oid = __OID()
-
-#         # translate the arguments
-#         targs, tkwds = __translateArgs(args, kwds)
-#         # broadcast creation to the workers
-#         _broadcast(_CREATE, theClass, oid, targs, tkwds)
-
-#         log.info('Creating: {0} [oid={1}]'.format(__formatCall(theClass.__name__, *args, **kwds), oid))
-#         # create the instance
-#         obj = theClass(*args, **kwds)
-#         # and store the oid in the instance
-#         obj.__PMIDEL = __Destroyer(oid)
-
 
 def __workerCreate(theClass, oid, *targs, **tkwds) :
     # backtranslate the arguments
@@ -232,9 +217,9 @@ def __workerCreate(theClass, oid, *targs, **tkwds) :
     obj = theClass(*args, **kwds)
     # store the new object
     if oid in OBJECT_CACHE :
-        raise _InternalError("Object with oid %d is already in OBJECT_CACHE!" % oid)
+        raise _InternalError("Object [{0}] is already in OBJECT_CACHE!".format(oid))
     OBJECT_CACHE[oid] = obj
-    log.info('Created: {0} [oid={1:x}]'\
+    log.info('Created: {0} [{1}]'\
                  .format(__formatCall(theClass.__name__, args, kwds), 
                          oid))
     return obj
@@ -385,19 +370,6 @@ def __workerReduce(reduceOp, function, *targs, **tkwds) :
 ##################################################
 ## AUTOMATIC OBJECT DELETION
 ##################################################
-class __Destroyer(object) :
-    """Internal class that holds the oid of a PMI instance.
-    The PMI instance holds a reference to the __Destroyer object. When
-    the PMI instance dies, the Destroyer also dies and removes the oid
-    from OIDS."""
-    def __init__(self, oid) :
-        self.oid = oid
-    def __del__(self) :
-        if self.oid not in OIDS :
-            raise _InternalError('OID {0:x} is not in OIDS!'.format(self.oid))
-        log.info("Adding OID to DELETED_OIDS: [{0:x}]".format(self.oid))
-        DELETED_OIDS.append(self.oid)
-        OIDS.remove(self.oid)
 
 def __delete() :
     """Internal controller command that deletes PMI objects on the
@@ -411,10 +383,10 @@ def __delete() :
 
 def __workerDelete(*args) :
     """Deletes the OBJECT_CACHE reference to a PMI object."""
-    log.info("Deleting oids: {0}".format(['{0:x}'.format(oid) for oid in args]))
+    log.info("Deleting oids: {0}".format(args))
     for oid in args :
         obj=OBJECT_CACHE[oid]
-        log.debug("  {0} [{1:x}]".format(obj, oid))
+        log.debug("  {0} [{1}]".format(obj, oid))
         # Delete the entry from the cache
         del OBJECT_CACHE[oid]
 
@@ -426,12 +398,12 @@ def dump() :
     debugging purposes."""
     if __checkController(dump) :
         _broadcast(_DUMP)
-        log.info("OIDS=%s", str(OIDS))
     else :
         receive(_DUMP)
 
 def __workerDump() :
-    log.info("OBJECT_CACHE=%s", str(OBJECT_CACHE))
+    import pprint
+    log.info("OBJECT_CACHE=%s", pprint.pformat(OBJECT_CACHE))
 
 ##################################################
 ## WORKER LOOP CONTROL
@@ -561,7 +533,6 @@ def __broadcastCmd(cmd, *args, **kwds) :
     cmd = __CMD(cmd, args, kwds)
     log.debug("Broadcasting command: %s", cmd)
     mpi.broadcast(mpi.world, value=cmd, root=CONTROLLER)
- 
 
 def receive(expected=None) :
     """Worker command that receives and handles the next PMI command.
@@ -585,7 +556,7 @@ def receive(expected=None) :
         return receive(expected)
     elif expected is not None and cmd != expected :
         # otherwise test whether the command is expected
-        raise UserError("Received PMI command %s but expected %s" % (_CMD[cmd][0], _CMD[expected][0]))
+        raise UserError("Received PMI command {0} but expected {1}".format(_CMD[cmd][0], _CMD[expected][0]))
     # determine which function to call
     cmd_func = _CMD[cmd][1]
     log.debug("Calling function %s", __formatCall(cmd_func.__name__, args, kwds))
@@ -596,14 +567,34 @@ def receive(expected=None) :
 ## INTERNAL FUNTIONS
 ##################################################
 class __OID(object) :
-    """Internal class that represents a PMI object instance."""
-    def __init__(self, oid) :
-        self.oid = oid
+    """Internal class that represents a PMI object id.
+    
+    An instance of this class can be pickled, so that it can be sent
+    via MPI, and it is hashable, so that it can be used as a hash key
+    (for OBJECT_CACHE).
+    """
+    def __init__(self) :
+        self.id = id(self)
         return object.__init__(self)
-    def getinitargs(self) :
-        return self.oid
-    def __str__(self) :
-        return '[{0:x}]'.format(self.oid)
+    def __str__(self):
+        return 'oid=0x{0:x}'.format(self.id)
+    def __hash__(self):
+        return self.id
+    def __eq__(self, obj):
+        return self.id == obj.id
+    def __getstate__(self):
+        return self.id
+    def __setstate__(self, id):
+        self.id = id
+
+if IS_CONTROLLER:
+    class __Destroyer(object):
+        def __init__(self, oid):
+            self.oid = oid
+            return object.__init__(self)
+        def __del__(self):
+            log.info("Adding OID to DELETED_OIDS: [{0}]".format(self.oid))
+            DELETED_OIDS.append(self.oid)
 
 class __CMD(object) :
     """Internal class that can be sent via MPI and represents a PMI command.
@@ -611,15 +602,22 @@ class __CMD(object) :
     def __init__(self, cmd, args=None, kwds=None) :
         if not _checkCommand(cmd):
             raise _InternalError('Created __CMD object with invalid PMI command %s', cmd)
-        # translate to numerical id
         self.cmd = cmd
         self.args = args
         self.kwds = kwds
         return object.__init__(self)
-    def getinitargs(self) :
-        return self.cmd, self.args, self.kwds
     def __str__(self):
-        return str((_CMD[self.cmd][0], self.args, self.kwds))
+        sargs = [_CMD[self.cmd][0]]
+        if hasattr(self, 'args'):
+            sargs.append(str(map(str, self.args)))
+        if hasattr(self, 'kwds'):
+            sargs.append(str(self.kwds))
+        return 'PMICMD({0})'.format(', '.join(sargs))
+    def __getstate__(self):
+        state = (self.cmd, self.args, self.kwds)
+        return state
+    def __setstate__(self, state):
+        self.cmd, self.args, self.kwds = state
 
 def _checkCommand(cmd):
     return 0 <= cmd < _MAXCMD
@@ -664,12 +662,11 @@ def __translateArgs(args, kwds):
         
         If the object is not a PMI object, returns obj untouched.
         """
-        oid = id(obj)
-        if oid in OIDS :
-            return __OID(oid)
-        else :
+        if hasattr(obj, '__pmioid'):
+            return obj.__pmioid
+        else:
             return obj
-
+    
     return __mapArgs(__translateOID, args, kwds)
 
 def __backtranslateArgs(args, kwds):
@@ -683,11 +680,11 @@ def __backtranslateArgs(args, kwds):
         
         If the object is not an __OID object, returns the object untouched.
         """
-        if (type(obj) == __OID) :
-            if obj.oid not in OBJECT_CACHE :
-                raise _InternalError("OID %d was not in OBJECT_CACHE!" % obj.oid)
-            else :
-                return OBJECT_CACHE[obj.oid]
+        if type(obj) is __OID:
+            if obj in OBJECT_CACHE.keys():
+                return OBJECT_CACHE[obj]
+            else:
+                raise _InternalError("Object [{0}] is not in OBJECT_CACHE".format(obj))
         else :
             return obj
 
@@ -736,8 +733,6 @@ for i in range(len(_CMD)) :
 del i
 
 if IS_CONTROLLER: 
-    # set that stores which oids have been PMI created
-    OIDS = set()
     # set that stores which oids have been deleted
     DELETED_OIDS = []
 else :
