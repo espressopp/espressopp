@@ -78,8 +78,19 @@ class Test1CreateAndDelete(unittest.TestCase) :
             self.assertRaises(ValueError, pmi.create, 1);
 
     def test4PassArguments(self) :
-        a = pmi.create("amodule.A", 1)
-        self.assertEqual(a.arg, 1)
+        a = pmi.create("amodule.A", 42)
+        self.assertEqual(a.arg, 42)
+
+    def test5KeywordArguments(self) :
+        kwds = {'arg1' : 'arg1', 'arg2' : 'arg2'}
+        a = pmi.create(theClass="amodule.A", **kwds)
+        self.assertEqual(a.kwds, kwds)
+
+    def test5MixedArguments(self) :
+        kwds = {'arg1' : 'arg1', 'arg2' : 'arg2'}
+        a = pmi.create("amodule.A", 42, **kwds)
+        self.assertEqual(a.arg, 42)
+        self.assertEqual(a.kwds, kwds)
 
 class Test2Call(unittest.TestCase) :
     def setUp(self) :
@@ -129,6 +140,17 @@ class Test2Call(unittest.TestCase) :
             self.assertRaises(ValueError, pmi.call, 1)
         self.assertRaises(AttributeError, pmi.call, 'amodule.doesntexist')
 
+    def test7KeywordArguments(self) :
+        kwds = {'arg1' : 'arg1', 'arg2' : 'arg2'}
+        pmi.call('amodule.A.g', self.a, **kwds)
+        self.assertEqual(self.a.g_kwds, kwds)
+
+    def test8MixedArguments(self) :
+        kwds = {'arg1' : 'arg1', 'arg2' : 'arg2'}
+        pmi.call('amodule.A.g', self.a, 42, **kwds)
+        self.assertEqual(self.a.g_kwds, kwds)
+        self.assertEqual(self.a.g_arg, 42)
+
 class Test3Invoke(unittest.TestCase) :
     def setUp(self) :
         pmi.exec_('import amodule')
@@ -158,10 +180,21 @@ class Test3Invoke(unittest.TestCase) :
             pmi.invoke()
             pmi.invoke()
 
-    def test6BadArgument(self) :
+    def test2BadArgument(self) :
         if pmi.IS_CONTROLLER:
             self.assertRaises(ValueError, pmi.invoke, 1)
         self.assertRaises(AttributeError, pmi.invoke, 'amodule.doesntexist')
+
+    def test3KeywordArguments(self) :
+        kwds = {'arg1' : 'arg1', 'arg2' : 'arg2'}
+        pmi.invoke('amodule.A.g', self.a, **kwds)
+        self.assertEqual(self.a.g_kwds, kwds)
+
+    def test4MixedArguments(self) :
+        kwds = {'arg1' : 'arg1', 'arg2' : 'arg2'}
+        pmi.invoke('amodule.A.g', self.a, 42, **kwds)
+        self.assertEqual(self.a.g_kwds, kwds)
+        self.assertEqual(self.a.g_arg, 42)
 
 class Test4Reduce(unittest.TestCase) :
     def setUp(self) :
@@ -185,11 +218,9 @@ class Test4Reduce(unittest.TestCase) :
     def test1Lambda(self) :
         pmi.exec_('myadd = lambda a,b: a+b')
 
+        res = pmi.reduce('myadd', 'amodule.f')
         if pmi.IS_CONTROLLER :
-            res = pmi.reduce('myadd', 'amodule.f')
             self.assertEqual(res, 42*mpi.world.size)
-        else :
-            pmi.reduce()
 
         pmi.exec_('del myadd')
 
@@ -197,6 +228,18 @@ class Test4Reduce(unittest.TestCase) :
         if pmi.IS_CONTROLLER:
             self.assertRaises(ValueError, pmi.reduce, 1)
         self.assertRaises(AttributeError, pmi.reduce, '', 'amodule.doesntexist')
+
+    def test3MixedArguments(self) :
+        pmi.exec_('myadd = lambda a,b: a+b')
+
+        kwds = {'arg1' : 'arg1', 'arg2' : 'arg2'}
+        res = pmi.reduce('myadd', 'amodule.A.g', self.a, 42, **kwds)
+        if pmi.IS_CONTROLLER:
+            self.assertEqual(res, 42*mpi.world.size)
+        self.assertEqual(self.a.g_kwds, kwds)
+        self.assertEqual(self.a.g_arg, 42)
+
+        pmi.exec_('del myadd')
 
 class Test5CommunicationFailure(unittest.TestCase) :
     def test0CommandMismatch(self):

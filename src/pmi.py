@@ -139,7 +139,7 @@ def exec_(statement=None) :
 
 def __workerExec_(statement) :
     # executing the statement locally
-    log.info("Executing '%s'", statement)
+    log.info("Executing '{0}'".format(statement))
     exec statement in globals()
 
 def import_(statement) :
@@ -149,7 +149,7 @@ def import_(statement) :
 ##################################################
 ## CREATE
 ##################################################
-def create(theClass=None, *args) :
+def create(theClass=None, *args, **kwds) :
     """Controller command that creates an object on all workers.
 
     "theClass" describes the (new-style) class that should be
@@ -189,35 +189,54 @@ def create(theClass=None, *args) :
             Please create old style classes via their names.
             """)
         else :
-            raise ValueError("pmi.create expects class as first argument, but got %s" % theClass)
+            raise ValueError("pmi.create expects class as first argument, but got {0}".format(theClass))
 
+        # FIXME: Create the object only AFTER the broadcast
         # create the new object
-        obj = theClass(*args)
+        obj = theClass(*args, **kwds)
         oid = id(obj)
         if oid in OIDS :
-            raise _InternalError("Object with oid %d is already in OIDS!" % oid)
+            raise _InternalError("Object with oid {0:x} is already in OIDS!".format(oid))
         OIDS.add(oid)
-        log.info('Created: %s%s [oid=%d]', theClass.__name__, tuple(args), oid)
+        log.info('Created: {0} [oid={1:x}]'.format(__formatCall(theClass.__name__, args, kwds), oid))
         # translate the arguments
-        targs=map(__translate, args)
+        targs, tkwds = __translateArgs(args, kwds)
         # broadcast creation to the workers
-        _broadcast(_CREATE, theClass, oid, *targs)
+        _broadcast(_CREATE, theClass, oid, *targs, **tkwds)
         # store the destroyer object in the instance
-        obj.__pmi_destroyer = __Destroyer(oid)
+        obj.__pmidel = __Destroyer(oid)
         return obj
     else :
         return receive(_CREATE)
 
-def __workerCreate(theClass, oid, *args) :
+
+#         # generate a new oid
+#         oid = __OID()
+
+#         # translate the arguments
+#         targs, tkwds = __translateArgs(args, kwds)
+#         # broadcast creation to the workers
+#         _broadcast(_CREATE, theClass, oid, targs, tkwds)
+
+#         log.info('Creating: {0} [oid={1}]'.format(__formatCall(theClass.__name__, *args, **kwds), oid))
+#         # create the instance
+#         obj = theClass(*args, **kwds)
+#         # and store the oid in the instance
+#         obj.__PMIDEL = __Destroyer(oid)
+
+
+def __workerCreate(theClass, oid, *targs, **tkwds) :
     # backtranslate the arguments
-    btargs=map(__backtranslate, args)
+    args, kwds = __backtranslateArgs(targs, tkwds)
     # create the new object
-    obj = theClass(*btargs)
+    obj = theClass(*args, **kwds)
     # store the new object
     if oid in OBJECT_CACHE :
         raise _InternalError("Object with oid %d is already in OBJECT_CACHE!" % oid)
     OBJECT_CACHE[oid] = obj
-    log.info('Created: %s%s [oid=%d]', theClass.__name__, tuple(args), oid)
+    log.info('Created: {0} [oid={1:x}]'\
+                 .format(__formatCall(theClass.__name__, args, kwds), 
+                         oid))
     return obj
 
 ##################################################
@@ -228,7 +247,7 @@ def __workerCreate(theClass, oid, *args) :
 ##################################################
 ## INVOKE
 ##################################################
-def invoke(function=None, *args) :
+def invoke(function=None, *args, **kwds) :
     """Invoke a function on all workers, gathering the return values into a list.
 
     function denotes the function that is to be called, *args are the
@@ -246,27 +265,26 @@ def invoke(function=None, *args) :
     """
     if __checkController(invoke) :
         function, args = __translateInvokeArgs(function, args)
-        targs=map(__translate, args)
-        _broadcast(_INVOKE, function, *targs)
-        log.info("Invoking: %s%s", function, tuple(args))
+        targs, tkwds = __translateArgs(args, kwds)
+        _broadcast(_INVOKE, function, *targs, **tkwds)
+        log.info("Invoking: %s", __formatCall(function, args, kwds))
         function = eval(function)
-        value = function(*args)
+        value = function(*args, **kwds)
         return mpi.world.gather(value, root=CONTROLLER)
     else :
         return receive(_INVOKE)
 
-def __workerInvoke(function, *args) :
-    btargs=map(__backtranslate, args)
-    log.info("Invoking: %s%s", function, tuple(btargs))
+def __workerInvoke(function, *targs, **tkwds) :
+    args, kwds = __backtranslateArgs(targs, tkwds)
+    log.info("Invoking: %s", __formatCall(function, args, kwds))
     function = eval(function)
-    value = function(*btargs)
+    value = function(*args, **kwds)
     return mpi.world.gather(value, root=CONTROLLER) 
-
 
 ##################################################
 ## CALL (INVOKE WITHOUT RESULT)
 ##################################################
-def call(procedure=None, *args) :
+def call(procedure=None, *args, **kwds) :
     """Call a procedure on all workers, ignoring any return values.
 
     procedure denotes the procedure that is to be called, *args are the
@@ -289,28 +307,28 @@ def call(procedure=None, *args) :
     """
     if __checkController(call) :
         procedure, args = __translateInvokeArgs(procedure, args)
-        targs=map(__translate, args)
-        _broadcast(_CALL, procedure, *targs)
-        log.info("Calling: %s%s", procedure, tuple(args))
+        targs, tkwds = __translateArgs(args, kwds)
+        _broadcast(_CALL, procedure, *targs, **tkwds)
+        log.info("Calling: %s", __formatCall(procedure, args, kwds))
         procedure = eval(procedure)
-        procedure(*args)
+        procedure(*args, **kwds)
     else :
         receive(_CALL)
 
-def __workerCall(procedure, *args) :
-    btargs=map(__backtranslate, args)
-    log.info("Calling: %s%s", procedure, tuple(btargs))
+def __workerCall(procedure, *targs, **tkwds) :
+    args, kwds = __backtranslateArgs(targs, tkwds)
+    log.info("Calling: %s", __formatCall(procedure, args, kwds))
     procedure = eval(procedure)
-    procedure(*btargs)
+    procedure(*args, **kwds)
 
-def invokeNoResult(procedure, *args) :
+def invokeNoResult(procedure, *args, **kwds) :
     """invokeNoResult() is an alias for call()."""
-    call(procedure, args)
+    call(procedure, *args, **kwds)
 
 ##################################################
 ## REDUCE (INVOKE WITH REDUCED RESULT)
 ##################################################
-def reduce(reduceOp=None, function=None, *args) :
+def reduce(reduceOp=None, function=None, *args, **kwds) :
     """Invoke a function on all workers, reducing the return values to
     a single value.
 
@@ -345,22 +363,21 @@ def reduce(reduceOp=None, function=None, *args) :
         else :
             raise ValueError("pmi.reduce expects function as first argument, but got %s instead" % reduceOp)
         function, args = __translateInvokeArgs(function, args)
-        targs=map(__translate, args)
-        _broadcast(_REDUCE, reduceOp, function, *targs)
-        log.info("Reducing: %s%s", function, tuple(args))
+        targs, tkwds = __translateArgs(args, kwds)
+        _broadcast(_REDUCE, reduceOp, function, *targs, **tkwds)
+        log.info("Reducing: %s", __formatCall(function, args, kwds))
         function = eval(function)
         reduceOp = eval(reduceOp)
-        value = function(*args)
-        return mpi.world.reduce(op=reduceOp, value=value,
-                                root=CONTROLLER)
+        value = function(*args, **kwds)
+        return mpi.world.reduce(op=reduceOp, value=value, root=CONTROLLER)
     else :
         return receive(_REDUCE)
 
-def __workerReduce(reduceOp, function, *args) :
-    btargs=map(__backtranslate, args)
-    log.info("Invoking: %s%s", function, tuple(btargs))
+def __workerReduce(reduceOp, function, *targs, **tkwds) :
+    args, kwds = __backtranslateArgs(targs, tkwds)
+    log.info("Invoking: %s", __formatCall(function, args, kwds))
     function = eval(function)
-    value = function(*btargs)
+    value = function(*args, **kwds)
     log.info("Reducing results via %s", reduceOp)
     reduceOp = eval(reduceOp)
     return mpi.world.reduce(op=reduceOp, value=value, root=CONTROLLER) 
@@ -377,17 +394,27 @@ class __Destroyer(object) :
         self.oid = oid
     def __del__(self) :
         if self.oid not in OIDS :
-            raise _InternalError('OID %d is not in OIDS!' % self.oid)
-        log.info("Adding OID to DELETED_OIDS: [%d]", self.oid)
-        DELETED_OIDS.add(self.oid)
+            raise _InternalError('OID {0:x} is not in OIDS!'.format(self.oid))
+        log.info("Adding OID to DELETED_OIDS: [{0:x}]".format(self.oid))
+        DELETED_OIDS.append(self.oid)
         OIDS.remove(self.oid)
+
+def __delete() :
+    """Internal controller command that deletes PMI objects on the
+    workers that have already been deleted on the controller.
+    """
+    global DELETED_OIDS
+    if len(DELETED_OIDS) > 0 :
+        log.debug("Got {0} objects in DELETED_OIDS.".format(len(DELETED_OIDS)))
+        __broadcastCmd(_DELETE, *DELETED_OIDS)
+        DELETED_OIDS = []
 
 def __workerDelete(*args) :
     """Deletes the OBJECT_CACHE reference to a PMI object."""
-    log.info("Deleting objects: %s", args)
+    log.info("Deleting oids: {0}".format(['{0:x}'.format(oid) for oid in args]))
     for oid in args :
         obj=OBJECT_CACHE[oid]
-        log.debug("  %s [%d]", obj, oid)
+        log.debug("  {0} [{1:x}]".format(obj, oid))
         # Delete the entry from the cache
         del OBJECT_CACHE[oid]
 
@@ -443,42 +470,6 @@ def __workerStop(doExit) :
     else :
         log.info('Stopping worker loop.')
         raise StopIteration()
-
-def receive(expected=None) :
-    """Worker command that receives and handles the next PMI command.
-
-    This function waits to receive and handle a single PMI command. If
-    expected is not None and the received command does not equal
-    \"expected\", raise a UserError.
-    """
-    __checkWorker(receive)
-    log.debug('Waiting for next PMI command.')
-    message = mpi.world.broadcast(root=CONTROLLER)
-    log.debug("Received command: %s", message)
-    if not hasattr(message, '__getitem__'):
-        raise UserError("Received an MPI message that is not a PMI command: '%s'" % message)
-    try :
-        cmd = message[0]
-        args = message[1:]
-    except KeyError:
-        raise UserError("Received an MPI message that contains an associative map: '%s'" % message)
-    if cmd not in _ALLCMD :
-        raise UserError("Received a message that does not start with a PMI command: '%s'" % cmd)
-    elif cmd == _DELETE :
-        # if delete is sent, delete the objects
-        __workerDelete(*args)
-        return receive(expected)
-    elif expected is not None and cmd != expected :
-        # otherwise test whether the command is expected
-        raise UserError("Received PMI command %s but expected %s" % (cmd, expected))
-    # determine which function to call
-    cmd_func = _CMDS[cmd]
-    log.debug("Calling function %s%s", cmd_func.__name__, args)
-    # if the command is a delete, call receive once more
-    if cmd == _DELETE :
-        cmd_func(*args)
-    else :
-        return cmd_func(*args)
 
 def startWorkerLoop() :
     """Worker command that starts the main worker loop.
@@ -551,17 +542,87 @@ class UserError(Exception) :
         return str(self.args)
 
 ##################################################
+## BROADCAST AND RECEIVE
+##################################################
+def _broadcast(cmd, *args, **kwds) :
+    """Internal controller command that actually broadcasts a PMI command.
+
+    The function first checks whether cmd is a valid PMI command, then
+    it checks whether any objects have to be deleted before the
+    command is broadcast, and finally it broadcasts the command
+    itself.
+    """
+    __delete()
+    __broadcastCmd(cmd, *args, **kwds)
+
+def __broadcastCmd(cmd, *args, **kwds) :
+    if not _checkCommand(cmd) :
+        raise _InternalError('_broadcast needs a PMI command as first argument. Got {0} instead!'.format(cmd))
+    cmd = __CMD(cmd, args, kwds)
+    log.debug("Broadcasting command: %s", cmd)
+    mpi.broadcast(mpi.world, value=cmd, root=CONTROLLER)
+ 
+
+def receive(expected=None) :
+    """Worker command that receives and handles the next PMI command.
+
+    This function waits to receive and handle a single PMI command. If
+    expected is not None and the received command does not equal
+    \"expected\", raise a UserError.
+    """
+    __checkWorker(receive)
+    log.debug('Waiting for next PMI command.')
+    message = mpi.world.broadcast(root=CONTROLLER)
+    log.debug("Received message: %s", message)
+    if type(message) != __CMD:
+        raise UserError("Received an MPI message that is not a PMI command: '{0}'".format(message))
+    cmd = message.cmd
+    args = message.args
+    kwds = message.kwds
+    if cmd == _DELETE :
+        # if delete is sent, delete the objects
+        __workerDelete(*args)
+        return receive(expected)
+    elif expected is not None and cmd != expected :
+        # otherwise test whether the command is expected
+        raise UserError("Received PMI command %s but expected %s" % (_CMD[cmd][0], _CMD[expected][0]))
+    # determine which function to call
+    cmd_func = _CMD[cmd][1]
+    log.debug("Calling function %s", __formatCall(cmd_func.__name__, args, kwds))
+    # if the command is a delete, call receive once more
+    return cmd_func(*args, **kwds)
+
+##################################################
 ## INTERNAL FUNTIONS
 ##################################################
 class __OID(object) :
-    """Internal class that can be sent via MPI and represents a PMI
-    object instance."""
+    """Internal class that represents a PMI object instance."""
     def __init__(self, oid) :
         self.oid = oid
+        return object.__init__(self)
     def getinitargs(self) :
         return self.oid
     def __str__(self) :
-        return '[%d]' % self.oid
+        return '[{0:x}]'.format(self.oid)
+
+class __CMD(object) :
+    """Internal class that can be sent via MPI and represents a PMI command.
+    """
+    def __init__(self, cmd, args=None, kwds=None) :
+        if not _checkCommand(cmd):
+            raise _InternalError('Created __CMD object with invalid PMI command %s', cmd)
+        # translate to numerical id
+        self.cmd = cmd
+        self.args = args
+        self.kwds = kwds
+        return object.__init__(self)
+    def getinitargs(self) :
+        return self.cmd, self.args, self.kwds
+    def __str__(self):
+        return str((_CMD[self.cmd][0], self.args, self.kwds))
+
+def _checkCommand(cmd):
+    return 0 <= cmd < _MAXCMD
 
 def __checkController(func) :
     """Checks whether we are on the controller, raises a UserError if we are not.
@@ -580,30 +641,57 @@ def __checkWorker(func) :
     if IS_CONTROLLER : 
         raise UserError("Cannot call %s on the controller!" % func.__name__)
 
-def __translate(obj) :
-    """Internal function that translates obj into an __OID
-    object if it is a PMI object instance.
 
-    If the object is not a PMI object, returns obj untouched.
+def __mapArgs(func, args, kwds):
+    """Internal function that maps a function to the list args and to
+    the values of the dict kwds. Used by __translateArsg and
+    __backtranslateArgs.
     """
-    oid = id(obj)
-    if oid in OIDS :
-        return __OID(oid)
-    else :
-        return obj
-
-def __backtranslate(obj) :
-    """Internal worker function that backtranslates an __OID object
-    into the corresponding PMI worker instance.
-
-    If the object is not an __OID object, returns the object untouched.
+    targs = map(func, args)
+    tkwds = {}
+    for k, v in kwds.iteritems():
+        tkwds[k] = func(v)
+    return targs, tkwds
+    
+def __translateArgs(args, kwds):
+    """Internal function that translates all PMI object instances that
+    occur in args or kwds into __OID objects that can be sent to the
+    workers.
     """
-    if (type(obj) == __OID) :
-        if obj.oid not in OBJECT_CACHE :
-            raise _InternalError("OID %d was not in OBJECT_CACHE!" % obj.oid)
-        return OBJECT_CACHE[obj.oid]
-    else :
-        return obj
+    def __translateOID(obj) :
+        """Internal function that translates obj into an __OID
+        object if it is a PMI object instance.
+        
+        If the object is not a PMI object, returns obj untouched.
+        """
+        oid = id(obj)
+        if oid in OIDS :
+            return __OID(oid)
+        else :
+            return obj
+
+    return __mapArgs(__translateOID, args, kwds)
+
+def __backtranslateArgs(args, kwds):
+    """Internal function that backtranslates all __OID object
+    instances that occur in args or kwds into the cached PMI objects
+    on the worker.
+    """
+    def __backtranslateOID(obj) :
+        """Internal worker function that backtranslates an __OID object
+        into the corresponding PMI worker instance.
+        
+        If the object is not an __OID object, returns the object untouched.
+        """
+        if (type(obj) == __OID) :
+            if obj.oid not in OBJECT_CACHE :
+                raise _InternalError("OID %d was not in OBJECT_CACHE!" % obj.oid)
+            else :
+                return OBJECT_CACHE[obj.oid]
+        else :
+            return obj
+
+    return __mapArgs(__backtranslateOID, args, kwds)
 
 def __translateInvokeArgs(arg0, args) :
     """Internal controller function that normalizes the function
@@ -622,55 +710,36 @@ def __translateInvokeArgs(arg0, args) :
         raise ValueError("pmi.__invoke expects function as first argument, but got %s" % arg0)
     return (function, args)
 
-def _broadcast(*args) :
-    """Internal controller function that actually broadcasts the PMI
-    message.
+def __formatCall(function, args, kwds) :
+    def formatArgs(args, kwds) :
+        arglist = [repr(arg) for arg in args]
+        for k, v in kwds.iteritems():
+            arglist.append('{0}={1}'.format(k, repr(v)))
+        return ', '.join(arglist)
 
-    The function first checks whether the command is a valid PMI
-    command, then it checks whether any objects have to be deleted
-    before the command is broadcast, and finally it broadcasts the
-    command itself.
-    """
-    cmd = args[0]
-    if cmd not in _ALLCMD :
-        raise _InternalError('_broadcast needs a command (one of %s) as first argument. Got %s instead' % (_ALLCMD, args))
-    if len(DELETED_OIDS) > 0 :
-        log.debug("Got %d objects in DELETED_OIDS.", len(DELETED_OIDS))
-        deleteCmd = (_DELETE,) + tuple(DELETED_OIDS)
-        log.debug("Broadcasting command: %s", deleteCmd)
-        mpi.world.broadcast(value=deleteCmd, root=CONTROLLER)
-        DELETED_OIDS.clear()
-    log.debug("Broadcasting command: %s", args)
-    mpi.broadcast(mpi.world, value=args, root=CONTROLLER)
+    return '{0}({1})'.format(function, formatArgs(args, kwds))
 
-# Command IDs
-_ANY = 'PMIANY'
-_EXEC = 'PMIEXEC'
-_CREATE = 'PMICREATE'
-_INVOKE = 'PMIINVOKE'
-_CALL = 'PMICALL'
-_REDUCE = 'PMIREDUCE'
-_DELETE = 'PMIDELETE'
-_STOP = 'PMISTOP'
-_DUMP = 'PMIDUMP'
+# map of command names and associated worker functions
+_CMD = [ ('EXEC', __workerExec_),
+          ('CREATE', __workerCreate),
+          ('INVOKE', __workerInvoke),
+          ('CALL', __workerCall),
+          ('REDUCE', __workerReduce),
+          ('DELETE', __workerDelete),
+          ('STOP', __workerStop),
+          ('DUMP', __workerDump) ]
+_MAXCMD = len(_CMD)
 
-# dict that associates the command IDs with their worker commands
-_CMDS = { _EXEC : __workerExec_,
-            _CREATE : __workerCreate,
-            _INVOKE : __workerInvoke,
-            _CALL : __workerCall,
-            _REDUCE : __workerReduce,
-            _DELETE : __workerDelete,
-            _STOP : __workerStop,
-            _DUMP : __workerDump
-            }
-_ALLCMD = _CMDS.keys()
+# define the numerical constants to be used
+for i in range(len(_CMD)) :
+    exec '_{0}={1}'.format(_CMD[i][0],i) in globals()
+del i
 
 if IS_CONTROLLER: 
     # set that stores which oids have been PMI created
     OIDS = set()
     # set that stores which oids have been deleted
-    DELETED_OIDS = set()
+    DELETED_OIDS = []
 else :
     # dict that stores the objects corresponding to an oid
     OBJECT_CACHE = {}
