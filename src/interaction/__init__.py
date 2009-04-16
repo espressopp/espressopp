@@ -8,9 +8,6 @@ from _espresso import interaction_LennardJones as _LennardJones
 class LennardJonesLocal(_LennardJones) :
     'The (local) Lennard-Jones interaction.'
 
-    def __init__(self, *args) :
-        
-
     def __init__(self, epsilon=1.0, sigma=1.0, cutoff=2.0) :
         """Initialize the local Lennard Jones object. 
 
