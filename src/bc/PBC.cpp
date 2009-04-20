@@ -52,6 +52,19 @@ Real3D PBC::getDist(const Real3D& pos1, const Real3D& pos2) const {
   return Real3D(xij, yij, zij);
 }
 
+Real3D PBC::randomPos(void) {
+
+  // a constant prefactor
+  real c = length / RAND_MAX;
+
+  real x = c * rand();
+  real y = c * rand();
+  real z = c * rand();
+
+  return Real3D(x, y, z);
+
+}
+
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
 //////////////////////////////////////////////////
@@ -61,5 +74,7 @@ PBC::registerPython() {
 
   class_<PBC>("bc_PBC", init<>())
     .def("set", &PBC::set)
-    .def("getDist", &PBC::getDist);
+    .def("getDist", &PBC::getDist)
+    .def("randomPos", &PBC::randomPos)
+    ;
 }

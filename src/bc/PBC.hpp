@@ -34,6 +34,10 @@ namespace espresso {
       //PMI and Python Visible
       /** Method to compute the minimum image distance */
       virtual Real3D getDist(const Real3D& pos1, const Real3D& pos2) const;
+
+      /** Method to get a random position within the central simulation box. The
+          positions are assigned with each coordinate on [0, length] */
+      virtual Real3D randomPos(void);
       
     };
   }
