@@ -51,16 +51,16 @@ if pmi.IS_CONTROLLER :
     #     pmiinvoke = []
     #     pmilocal = [ pmi.ALL ]
 
-    import functools
-    def pmi_create(cls) :
-        def wrap_wrap(f) :
-            @functools.wraps(f)
-            def wrapper(self, *args, **keywds):
-                self.local = pmi.create(cls, *args, **keywds)
-                self.pmi_class = cls
-                return f(self, *args, **keywds)
-            return wrapper
-        return wrap_wrap
+#     import functools
+#     def pmi_create(cls) :
+#         def wrap_wrap(f) :
+#             @functools.wraps(f)
+#             def wrapper(self, *args, **keywds):
+#                 self.local = pmi.create(cls, *args, **keywds)
+#                 self.pmi_class = cls
+#                 return f(self, *args, **keywds)
+#             return wrapper
+#         return wrap_wrap
 
 #     def pmi_call(f) :
 #         @functools.wraps(f)
@@ -77,8 +77,7 @@ if pmi.IS_CONTROLLER :
             return object.__init__(self)
         
         def set(self, epsilon=None, sigma=None, cutoff=None) :
-            pmi.call('LennardJonesLocal.set',
-                     self.local, epsilon, sigma, cutoff)
+            pmi.call('LennardJonesLocal.set', self.local, epsilon, sigma, cutoff)
             
         @property
         def epsilon(self): return self.local.epsilon

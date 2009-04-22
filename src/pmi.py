@@ -139,7 +139,7 @@ def exec_(statement=None) :
 
 def __workerExec_(statement) :
     # executing the statement locally
-    log.info("Executing '{0}'".format(statement))
+    log.info("Executing '%s'", statement)
     exec statement in globals()
 
 def import_(statement) :
@@ -189,7 +189,7 @@ def create(theClass=None, *args, **kwds) :
             Please create old style classes via their names.
             """)
         else :
-            raise ValueError("pmi.create expects class as first argument, but got {0}".format(theClass))
+            raise ValueError("pmi.create expects class as first argument, but got %s" % theClass)
 
         # generate a new oid
         oid = __OID()
@@ -199,7 +199,7 @@ def create(theClass=None, *args, **kwds) :
         # broadcast creation to the workers
         _broadcast(_CREATE, theClass, oid, *targs, **tkwds)
 
-        log.info('Creating: {0} [{1}]'.format(__formatCall(theClass.__name__, args, kwds), oid))
+        log.info('Creating: %s [%s]' % (__formatCall(theClass.__name__, args, kwds), oid))
         # create the instance
         obj = theClass(*args, **kwds)
         # store the oid in the instance
@@ -217,11 +217,10 @@ def __workerCreate(theClass, oid, *targs, **tkwds) :
     obj = theClass(*args, **kwds)
     # store the new object
     if oid in OBJECT_CACHE :
-        raise _InternalError("Object [{0}] is already in OBJECT_CACHE!".format(oid))
+        raise _InternalError("Object [%s] is already in OBJECT_CACHE!" % oid)
     OBJECT_CACHE[oid] = obj
-    log.info('Created: {0} [{1}]'\
-                 .format(__formatCall(theClass.__name__, args, kwds), 
-                         oid))
+    log.info('Created: %s [%s]'
+             % (__formatCall(theClass.__name__, args, kwds), oid))
     return obj
 
 ##################################################
@@ -377,16 +376,16 @@ def __delete() :
     """
     global DELETED_OIDS
     if len(DELETED_OIDS) > 0 :
-        log.debug("Got {0} objects in DELETED_OIDS.".format(len(DELETED_OIDS)))
+        log.debug("Got %d objects in DELETED_OIDS.", len(DELETED_OIDS))
         __broadcastCmd(_DELETE, *DELETED_OIDS)
         DELETED_OIDS = []
 
 def __workerDelete(*args) :
     """Deletes the OBJECT_CACHE reference to a PMI object."""
-    log.info("Deleting oids: {0}".format(args))
+    log.info("Deleting oids: %s", args)
     for oid in args :
         obj=OBJECT_CACHE[oid]
-        log.debug("  {0} [{1}]".format(obj, oid))
+        log.debug("  %s [%s]" % (obj, oid))
         # Delete the entry from the cache
         del OBJECT_CACHE[oid]
 
@@ -529,7 +528,7 @@ def _broadcast(cmd, *args, **kwds) :
 
 def __broadcastCmd(cmd, *args, **kwds) :
     if not _checkCommand(cmd) :
-        raise _InternalError('_broadcast needs a PMI command as first argument. Got {0} instead!'.format(cmd))
+        raise _InternalError('_broadcast needs a PMI command as first argument. Got %s instead!' % cmd)
     cmd = __CMD(cmd, args, kwds)
     log.debug("Broadcasting command: %s", cmd)
     mpi.broadcast(mpi.world, value=cmd, root=CONTROLLER)
@@ -546,7 +545,7 @@ def receive(expected=None) :
     message = mpi.world.broadcast(root=CONTROLLER)
     log.debug("Received message: %s", message)
     if type(message) != __CMD:
-        raise UserError("Received an MPI message that is not a PMI command: '{0}'".format(message))
+        raise UserError("Received an MPI message that is not a PMI command: '%s'" % str(message))
     cmd = message.cmd
     args = message.args
     kwds = message.kwds
@@ -556,7 +555,7 @@ def receive(expected=None) :
         return receive(expected)
     elif expected is not None and cmd != expected :
         # otherwise test whether the command is expected
-        raise UserError("Received PMI command {0} but expected {1}".format(_CMD[cmd][0], _CMD[expected][0]))
+        raise UserError("Received PMI command %s but expected %s" % (_CMD[cmd][0], _CMD[expected][0]))
     # determine which function to call
     cmd_func = _CMD[cmd][1]
     log.debug("Calling function %s", __formatCall(cmd_func.__name__, args, kwds))
@@ -577,7 +576,7 @@ class __OID(object) :
         self.id = id(self)
         return object.__init__(self)
     def __str__(self):
-        return 'oid=0x{0:x}'.format(self.id)
+        return 'oid=0x%x' %self.id
     def __hash__(self):
         return self.id
     def __eq__(self, obj):
@@ -593,7 +592,7 @@ if IS_CONTROLLER:
             self.oid = oid
             return object.__init__(self)
         def __del__(self):
-            log.info("Adding OID to DELETED_OIDS: [{0}]".format(self.oid))
+            log.info("Adding OID to DELETED_OIDS: [%s]" % self.oid)
             DELETED_OIDS.append(self.oid)
 
 class __CMD(object) :
@@ -612,7 +611,7 @@ class __CMD(object) :
             sargs.append(str(map(str, self.args)))
         if hasattr(self, 'kwds'):
             sargs.append(str(self.kwds))
-        return 'PMICMD({0})'.format(', '.join(sargs))
+        return 'PMICMD(%s)' % (', '.join(sargs))
     def __getstate__(self):
         state = (self.cmd, self.args, self.kwds)
         return state
@@ -684,7 +683,7 @@ def __backtranslateArgs(args, kwds):
             if obj in OBJECT_CACHE.keys():
                 return OBJECT_CACHE[obj]
             else:
-                raise _InternalError("Object [{0}] is not in OBJECT_CACHE".format(obj))
+                raise _InternalError("Object [%s] is not in OBJECT_CACHE" % obj)
         else :
             return obj
 
@@ -711,10 +710,10 @@ def __formatCall(function, args, kwds) :
     def formatArgs(args, kwds) :
         arglist = [repr(arg) for arg in args]
         for k, v in kwds.iteritems():
-            arglist.append('{0}={1}'.format(k, repr(v)))
+            arglist.append('%s=%r' % (k, repr(v)))
         return ', '.join(arglist)
 
-    return '{0}({1})'.format(function, formatArgs(args, kwds))
+    return '%s(%s)' % (function, formatArgs(args, kwds))
 
 # map of command names and associated worker functions
 _CMD = [ ('EXEC', __workerExec_),
@@ -729,7 +728,7 @@ _MAXCMD = len(_CMD)
 
 # define the numerical constants to be used
 for i in range(len(_CMD)) :
-    exec '_{0}={1}'.format(_CMD[i][0],i) in globals()
+    exec '_%s=%s' % (_CMD[i][0],i) in globals()
 del i
 
 if IS_CONTROLLER: 
