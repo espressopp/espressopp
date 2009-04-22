@@ -15,26 +15,64 @@ import espresso
 #   * at the end of the intergration (to add/remove details in one or
 #     the other model)
 
-
 # Integration:
 # * computes forces
 # * updates positions
 # * communicate positions
 
-pbc=espresso.bc.PBC(length=10)
+pbc = espresso.bc.PBC(length=10)
 
-atomic=espresso.decomposition.AtomicStorage()
-# define the rest of the atomic region: forces, etc.
-atomicIntegrator = espresso.integrator.VelocityVerlet(timestep=0.001, pb=pbc)
+# SET UP THE COARSE-GRAINED REGION
+cgParticles = espresso.decomposition.CellStorage(bc=pbc, grid=(2,2,2), skin=0.1)
+cgIntegrator = espresso.integrator.VelocityVerlet(timestep=0.005, pb=pbc)
+cgLJInt = espresso.interaction.LennardJones(sigma=1.0, epsilon=1.0, cutoff=2.0)
+cgVerletLists = espresso.pairs.VerletLists(radius=cgLJInt.cutoff, skin=0.3)
+cgIntegrator.addInteraction(pairs=cgVerletLists, interaction=cgLJInt)
 
-coarse = espresso.decomposition.AtomicStorage()
-# define the rest of the cg region: forces etc.
-coarseIntegrator = espresso.integrator.VelocityVerlet(timestep=0.005, pb=pbc)
+# SET UP THE ATOMIC SYSTEM
+atomicParticles = espresso.decomposition.CellStorage(bc=pbc, grid=(2,2,2), skin=0.1)
+atomicIntegrator = espresso.integrator.VelocityVerlet(timestep=0.001, bc=pbc)
+atomicBonds = espresso.pairs.List()
+atomicFENEInt = espresso.interaction.FENE(r0=0.5, K=1.0, rMax=0.1)
+atomicIntegrator.addInteraction(pairs=atomicBonds, interaction=atomicFENEInt)
 
-adInt = adress.Integrator(
-    lowresIntegrator=coarseIntegrator,
+# Python class that creates the atomic resolution particles for a
+# given coarse-grained particle
+class MyCreator(object):
+    def __init__(self, atomicParticles, atomicBonds):
+        # store references to required objects
+        self.cgParticles=cgParticles
+        self.atomicBonds=atomicBonds
+        # init an RNG
+        import random
+        self.rnd = random.Random()
+        # set up a library of example hires particles
+        self.createLib()
+
+    def create(self, cgParticle):
+        # get the position of the particle
+        pos=cgParticle[pos]
+        # draw a random example from the library
+        pos1, pos2 = self.rnd.sample(self.library)
+        # add the new atomic particles 
+        p1=self.atomicParticles.addParticle(pos+pos1)
+        p2=self.atomicParticles.addParticle(pos+pos2)
+        # create the bond between them
+        self.atomicBonds.add(p1, p2)
+        # and return the particles that were created
+        return p1, p2
+
+# create an instance of the creator
+myCreator = MyCreator(atomicParticles, atomicBonds)
+
+# DEFINE THE ADRESS INTEGRATOR
+adInt = espresso.adress.Integrator(
+    lowresIntegrator=cgIntegrator,
+    lowresParticles=cgParticles,
     hiresIntegrator=atomicIntegrator,
-    weighting=adress.SlabWeighting(normal='x',
+    hiresParticles=atomicParticles,
+    weighting=espresso.adress.SlabWeighting(
+        normal='x',
         position=(5.0, 5.0, 5.0),
         size=2.0,
         hybridSize=1.0,
@@ -42,8 +80,15 @@ adInt = adress.Integrator(
         createTriggerSize=0.1,
         destroySkinSize=0.5,
         destroyTriggerSize=0.1),
-    coupling=adress.StandardCoupling(),
-    hiresCreator=myHiresCreator)
+    coupling=espresso.adress.StandardCoupling(),
+    hiresCreator=myCreator)
+
+# CREATE THE INITIAL PARTICLES
+# .
+# .
+
+# SIMULATE
+adInt.integrate(steps=1000)
 
 #
 # C++ weighting interface:
@@ -82,5 +127,3 @@ adInt = adress.Integrator(
 
 #
 # adress.Integrator: each step, it will be checked whether a particle has moved further into the skin
-
-adInt.integrate(steps=1000)

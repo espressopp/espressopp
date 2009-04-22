@@ -1,66 +1,43 @@
-import espresso
+import espresso,
+import espresso.bc
+import espresso.decomposition
+import espresso.thermostat
+import espresso.integrator
+import espresso.interaction
+import espresso.pairs
 
-# - setup simulation system
-#    - set system geometry
-#    - set integrator
-#    - set particles
-#    - set interactions
-#      - set bonded interactions
-#      - set nonbonded interactions
-#    - set decomposition type
-# - setup topology
-# - integrate
-# - analysis
+# set up the boundary conditions
+pbc = espresso.bc.PBC(length=10)
+# set up the decomposition scheme
+particles = espresso.decomposition.CellStorage(bc=pbc, grid=(2, 2, 2), skin=0.1)
+# set up the thermostat
+lvThermostat = espresso.thermostat.Langevin(temperatur=1.0, gamma=0.5)
+# set up the integrator
+vvintegrator = espresso.integrator.VelocityVerlet(
+    timestep=0.001, thermostat=lvThermostat)
 
-#####
-system = espresso.system.System()
-# default: type=float, dim=1
-velocity = system.addParticleProperty(name="velocity", dim=3)
-
-## SET GEOMETRY
-system.geometry = espresso.bc.PBC(length = 10)
-
-## SET INTEGRATOR
-lvthermostat = espresso.LangevinThermostat(temperature=1.0, gamma=0.5)
-# default: useAsVelocity="velocity", useAsForce="force"
-vvintegrator = espresso.VelocityVerletIntegrator(timestep=0.001)
-# default: thermostat=none
-vvintegrator.thermostat = lvthermostat
-system.integrator = vvintegrator
-
-## SET DECOMPOSITION
-# default: grid, skin
-domdec = espresso.DomainDecomposition(grid = 2 2 2, skin = 0.1)
-system.decomposition = domdec
-
-## SET CHAINS
-# default: dim=2
-chains = espresso.ParticleTuple(dim=2)
+# create the particles and the chains
+feneint = espresso.interaction.FENE(K=1.0, r0=1.0, rMax=0.2)
+bonds = espresso.pairs.List()
 for chainid in range(100):
-    # default: pos=random
-    lastParticle = system.addParticle()
+    prevParticle = particles.addParticle()
     for beadid in range(63):
-        newpos = lastParticle.pos + randomWalk(step=1.0)
-        particle = system.addParticle(pos=newpos)
-        chains.addTuple(particle, lastParticle)
-        lastParticle = particle
+        newpos = lastParticle.pos + espresso.esutil.randomWalk(step=1.0)
+        particle = particles.addParticle(pos=newpos)
+        bonds.add(particle, prevParticle)
+        prevParticle = particle
+vvintegrator.addInteraction(pairs=bonds, interaction=feneint)
 
-## SET INTERACTIONS
-# default: FENE parameters
-system.addInteraction(tuples=chains, interaction=espresso.FENEInteraction(...))
+# create the LJ interaction
+ljint = espresso.interaction.LennardJones(sigma=1.0, epsilon=1.0, cutoff=2.0)
+verletlists = espresso.pairs.VerletList(radius=ljint.cutoff, skin=0.3)
+vvintegrator.addInteraction(pairs=verletlists, interaction=ljint)
 
-# default: particles=all, exclusions=none
-verletlists = espresso.VerletListsTuples(skin=0.3)
-# default: shift=auto, offset=0.0
-ljint = espresso.LJPairInteraction(sigma=1.0, epsilon=1.0, cutoff=1.0)
-system.addInteraction(tuples=verletlists, tupleInteraction=ljint)
-
-## INTEGRATE
+# integration
 for sweeps in range(100):
-    system.integrate(steps=100)
-    # - write system to disc
-    # - VMD coupling
-    # - analysis
+    vvintegrator.integrate(steps=100)
 
-# example for selecting a partilcle group:
-pg = system.selectParticles("within 5 of 3.0 3.0 3.0")
+# analysis
+.
+.
+.
