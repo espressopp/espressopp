@@ -6,19 +6,7 @@
 #
 #   execfile("@abs_top_builddir@/espresso_setup.py")
 #
+import sys
+sys.path.insert(0, '@abs_top_builddir@")
 
-def __espresso_setup() :
-   import os, sys
-
-   # Add the top-level build dir
-   top_builddir="@abs_top_builddir@"
-   sys.path.insert(0, top_builddir)
-   # Add the path of the boostmpi python module
-   boost_mpi_python_dir=os.path.join(top_builddir, "contrib", "boostmpi", ".libs")
-   sys.path.insert(0, boost_mpi_python_dir)
-   # Add the dir containing the es++ python module
-   sys.path.insert(0, os.path.join(top_builddir, "src", ".libs"))
-
-__espresso_setup()
-del(__espresso_setup)
 

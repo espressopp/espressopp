@@ -1,0 +1,18 @@
+# Python module that sets the correct path to the ESPResSo++ binary
+# modules, if ES++ is used in the build path.
+# @configure_input@
+
+def __setupPath() :
+   import os, sys
+
+   # Get the top-level build dir
+   top_builddir="@abs_top_builddir@"
+   # Add the path of the boostmpi python module
+   boost_mpi_python_dir=os.path.join(top_builddir, "contrib", "boostmpi", ".libs")
+   sys.path.insert(0, boost_mpi_python_dir)
+   # Add the dir containing the python module _espresso
+   sys.path.insert(0, os.path.join(top_builddir, "src", ".libs"))
+
+__setupPath()
+del(__setupPath)
+

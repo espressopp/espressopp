@@ -8,10 +8,9 @@
 # source @abs_top_builddir@/espresso_setup.csh
 #
 set abs_top_builddir="@abs_top_builddir@"
-set ESPP_PYTHONPATH=${abs_top_builddir}:${abs_top_builddir}/espresso/.libs::${abs_top_builddir}/contrib/boostmpi/.libs
 
 if ($?PYTHONPATH) then
-    setenv PYTHONPATH ${ESPP_PYTHONPATH}:${PYTHONPATH}
+    setenv PYTHONPATH ${abs_top_builddir}:${PYTHONPATH}
 else
-    setenv PYTHONPATH ${ESPP_PYTHONPATH}
+    setenv PYTHONPATH ${abs_top_builddir}
 endif

@@ -64,6 +64,7 @@ pypresso_LDADD = \
 ## PYTHON
 ##############################
 python_SCRIPTS= \
+	__setup.py \
 	__init__.py \
 	eslogging.py \
 	boostmpi.py \
@@ -71,3 +72,11 @@ python_SCRIPTS= \
 
 # python script handling
 include $(top_srcdir)/build-aux/macros/axes_python.am
+
+install-exec-local:
+# install espresso setup scripts
+	$(install_sh_SCRIPT) __setupPath.py.install $(DESTDIR)$(pkglibdir)/__setupPath.py
+
+uninstall-local:
+	rm -f $(DESTDIR)$(pkglibdir)/__setupPath.py
+

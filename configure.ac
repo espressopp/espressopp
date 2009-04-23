@@ -272,11 +272,13 @@ AC_CONFIG_FILES([test/runtests.sh],
 
 # espresso setup scripts
 AC_CONFIG_FILES([
-       espresso_setup.sh:espresso_setup.sh.build.in
-       espresso_setup.sh.install:espresso_setup.sh.install.in
-       espresso_setup.csh:espresso_setup.csh.build.in
-       espresso_setup.py:espresso_setup.py.build.in
-       espresso_setup.py.install:espresso_setup.py.install.in
+	src/__setupPath.py:src/__setupPath.py.build.in
+	src/__setupPath.py.install:src/__setupPath.py.install.in
+       	espresso_setup.sh:espresso_setup.sh.build.in
+       	espresso_setup.sh.install:espresso_setup.sh.install.in
+       	espresso_setup.csh:espresso_setup.csh.build.in
+       	espresso_setup.py:espresso_setup.py.build.in
+       	espresso_setup.py.install:espresso_setup.py.install.in
        ])
 
 # create a link to the src dir by the name of espresso, so 

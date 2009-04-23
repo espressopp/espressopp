@@ -1,9 +1,6 @@
-# eslogging has to imported once
-# it will modify the standard logging module, so that it can easily
-# cooperate with C++ logging
-import eslogging
+# set up espresso paths and logging
+from espresso import __setup
 
-# Define the basic classes
 from _espresso import Real3D
 import esutil
 

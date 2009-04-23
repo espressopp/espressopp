@@ -11,13 +11,10 @@
 abs_top_builddir="@abs_top_builddir@"
 
 # Add the ES++ specific path
-ESPP_PYTHONPATH=$abs_top_builddir:\
-$abs_top_builddir/espresso/.libs:\
-$abs_top_builddir/contrib/boostmpi/.libs
 if test "x$PYTHONPATH" = "x"; then
-    PYTHONPATH=$ESPP_PYTHONPATH
+    PYTHONPATH=$abs_top_builddir
 else
-    PYTHONPATH=$PYTHONPATH:$ESPP_PYTHONPATH
+    PYTHONPATH=$PYTHONPATH:$abs_top_builddir
 fi
 
 export PYTHONPATH
