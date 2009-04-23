@@ -64,9 +64,8 @@ pypresso_LDADD = \
 ## PYTHON
 ##############################
 python_SCRIPTS= \
-	__setup.py \
 	__init__.py \
-	eslogging.py \
+	__setup.py \
 	boostmpi.py \
 	pmi.py
 
