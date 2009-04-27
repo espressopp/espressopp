@@ -29,16 +29,13 @@ class Test0Exec(unittest.TestCase) :
         pmi.exec_("del e")
 
 class Test1CreateAndDelete(unittest.TestCase) :
-    def setUp(self) :
-        pmi.exec_("import amodule")
-
-    def tearDown(self) :
-        pmi.exec_("del amodule")
-
     def test0StringArgument(self) :
+        """Test whether an instance of a class that is not know in the
+        main module can be created.
+        """
+        pmi.exec_("import amodule")
         if pmi.IS_WORKER:
             self.assertEqual(len(pmi.OBJECT_CACHE), 0)
-
         a = pmi.create("amodule.A")
         self.assertEqual(a.__class__.__name__, "A")
         if pmi.IS_CONTROLLER :
@@ -52,7 +49,8 @@ class Test1CreateAndDelete(unittest.TestCase) :
         if pmi.IS_CONTROLLER :
             # check that the oid is already deleted and registered as such
             self.assertEqual(len(pmi.DELETED_OIDS), 1)
-            
+
+        # cause actual deletion of the object
         pmi.exec_("pass")
         if pmi.IS_CONTROLLER :
             # check that the list is empty now
@@ -60,12 +58,13 @@ class Test1CreateAndDelete(unittest.TestCase) :
         else :
             # check that the object is gone on the workers
             self.assertEqual(len(pmi.OBJECT_CACHE), 0)
+
+        pmi.exec_("del amodule")
             
     def test1ClassArgument(self) :
         import amodule
         a = pmi.create(amodule.A)
         self.assertEqual(a.__class__.__name__, "A")
-        del a
 
     def test2OldClassArgument(self) :
         import amodule
@@ -77,30 +76,29 @@ class Test1CreateAndDelete(unittest.TestCase) :
             self.assertRaises(ValueError, pmi.create, 1);
 
     def test4PassArguments(self) :
+        pmi.exec_("import amodule")
         a = pmi.create("amodule.A", 42)
         self.assertEqual(a.arg, 42)
+        pmi.exec_("del amodule")
 
     def test5KeywordArguments(self) :
+        pmi.exec_("import amodule")
         kwds = {'arg1' : 'arg1', 'arg2' : 'arg2'}
         a = pmi.create(theClass="amodule.A", **kwds)
         self.assertEqual(a.kwds, kwds)
+        pmi.exec_("del amodule")
 
     def test5MixedArguments(self) :
+        pmi.exec_("import amodule")
         kwds = {'arg1' : 'arg1', 'arg2' : 'arg2'}
         a = pmi.create("amodule.A", 42, **kwds)
         self.assertEqual(a.arg, 42)
         self.assertEqual(a.kwds, kwds)
-
-class Test2Call(unittest.TestCase) :
-    def setUp(self) :
-        pmi.exec_('import amodule')
-        self.a = pmi.create('amodule.A')
-
-    def tearDown(self) :
-        del self.a
         pmi.exec_("del amodule")
 
+class Test2Call(unittest.TestCase) :
     def test0FunctionByString(self) :
+        pmi.exec_('import amodule')
         if pmi.IS_CONTROLLER :
             pmi.call('amodule.f')
             self.assertEqual(pmi.amodule.f_arg, 42)
@@ -109,57 +107,85 @@ class Test2Call(unittest.TestCase) :
         else :
             pmi.call()
             pmi.call()
+        pmi.exec_('del amodule')
 
     def test1Function(self) :
+        # builtin function
+        pmi.call(len, (1,2,3))
+
+        # user defined function
+        pmi.exec_('import amodule')
         import amodule
         pmi.call(amodule.f)
-        self.assertEqual(pmi.amodule.f_arg, 42)
+        self.assertEqual(amodule.f_arg, 42)
         pmi.call(amodule.g, 52)
-        self.assertEqual(pmi.amodule.g_arg, 52)
-        del amodule
+        self.assertEqual(amodule.g_arg, 52)
+        pmi.exec_('del amodule')
 
     def test2SimpleMethod(self):
-        pmi.call(self.a.f)
-        self.assertEqual(self.a.f_arg, 42)
+        pmi.exec_('import amodule')
+        import amodule
+        a = pmi.create(amodule.A)
+        pmi.call(a.f)
+        self.assert_(hasattr(a, 'f_arg'))
+        self.assertEqual(a.f_arg, 42)
+        a.f_arg=0
+        pmi.call(amodule.A.f, a)
+        self.assertEqual(a.f_arg, 42)
+        pmi.exec_('del amodule')
 
     def test3SimpleMethodByString(self):
-        pmi.call('amodule.A.f', self.a)
-        self.assertEqual(self.a.f_arg, 42)
+        pmi.exec_('import amodule')
+        a = pmi.create('amodule.A')
+        pmi.call('amodule.A.f', a)
+        self.assert_(hasattr(a, 'f_arg'))
+        self.assertEqual(a.f_arg, 42)
+        pmi.exec_('del amodule')
 
     def test4Method(self) :
-        pmi.call(self.a.g, 52)
-        self.assertEqual(self.a.g_arg, 52)
+        import amodule
+        a = pmi.create(amodule.A)
+        pmi.call(a.g, 52)
+        self.assert_(hasattr(a, 'g_arg'))
+        self.assertEqual(a.g_arg, 52)
+        pmi.call(amodule.A.g, a, 62)
+        self.assertEqual(a.g_arg, 62)
 
     def test5MethodByString(self) :
-        pmi.call('amodule.A.g', self.a, 52)
-        self.assertEqual(self.a.g_arg, 52)
+        pmi.exec_('import amodule')
+        a = pmi.create('amodule.A')
+        pmi.call('amodule.A.g', a, 52)
+        self.assertEqual(a.g_arg, 52)
+        pmi.exec_('del amodule')
 
     def test6BadArgument(self) :
         if pmi.IS_CONTROLLER:
             self.assertRaises(ValueError, pmi.call, 1)
-        self.assertRaises(AttributeError, pmi.call, 'amodule.doesntexist')
+            self.assertRaises(ValueError, pmi.call, lambda x: x)
+        self.assertRaises(NameError, pmi.call, 'amodule.doesntexist')
+
+        pmi.exec_('import amodule')
+        self.assertRaises(AttributeError, pmi.call,'amodule.doesntexist')
+        pmi.exec_('del amodule')
 
     def test7KeywordArguments(self) :
+        import amodule
+        a = pmi.create(amodule.A)
         kwds = {'arg1' : 'arg1', 'arg2' : 'arg2'}
-        pmi.call('amodule.A.g', self.a, **kwds)
-        self.assertEqual(self.a.g_kwds, kwds)
+        pmi.call(a.g, **kwds)
+        self.assertEqual(a.g_kwds, kwds)
 
     def test8MixedArguments(self) :
+        import amodule
+        a = pmi.create(amodule.A)
         kwds = {'arg1' : 'arg1', 'arg2' : 'arg2'}
-        pmi.call('amodule.A.g', self.a, 42, **kwds)
-        self.assertEqual(self.a.g_kwds, kwds)
-        self.assertEqual(self.a.g_arg, 42)
+        pmi.call(a.g, 42, **kwds)
+        self.assertEqual(a.g_kwds, kwds)
+        self.assertEqual(a.g_arg, 42)
 
 class Test3Invoke(unittest.TestCase) :
-    def setUp(self) :
-        pmi.exec_('import amodule')
-        self.a = pmi.create('amodule.A')
-
-    def tearDown(self) :
-        del self.a
-        pmi.exec_("del amodule")
-
     def test0Function(self) :
+        pmi.exec_('import amodule')
         if pmi.IS_CONTROLLER :
             res = pmi.invoke('amodule.f')
             self.assertEqual(list(res), [42 for x in range(len(res))])
@@ -168,32 +194,19 @@ class Test3Invoke(unittest.TestCase) :
         else :
             pmi.invoke()
             pmi.invoke()
+        pmi.exec_("del amodule")
 
     def test1Method(self) :
+        import amodule
+        a = pmi.create(amodule.A)
         if pmi.IS_CONTROLLER :
-            res = pmi.invoke(self.a.f)
+            res = pmi.invoke(a.f)
             self.assertEqual(list(res), [42 for x in range(len(res))])
-            res = pmi.invoke(self.a.g, 52)
+            res = pmi.invoke(a.g, 52)
             self.assertEqual(list(res), [52 for x in range(len(res))])
         else :
             pmi.invoke()
             pmi.invoke()
-
-    def test2BadArgument(self) :
-        if pmi.IS_CONTROLLER:
-            self.assertRaises(ValueError, pmi.invoke, 1)
-        self.assertRaises(AttributeError, pmi.invoke, 'amodule.doesntexist')
-
-    def test3KeywordArguments(self) :
-        kwds = {'arg1' : 'arg1', 'arg2' : 'arg2'}
-        pmi.invoke('amodule.A.g', self.a, **kwds)
-        self.assertEqual(self.a.g_kwds, kwds)
-
-    def test4MixedArguments(self) :
-        kwds = {'arg1' : 'arg1', 'arg2' : 'arg2'}
-        pmi.invoke('amodule.A.g', self.a, 42, **kwds)
-        self.assertEqual(self.a.g_kwds, kwds)
-        self.assertEqual(self.a.g_arg, 42)
 
 class Test4Reduce(unittest.TestCase) :
     def setUp(self) :
@@ -220,23 +233,6 @@ class Test4Reduce(unittest.TestCase) :
         res = pmi.reduce('myadd', 'amodule.f')
         if pmi.IS_CONTROLLER :
             self.assertEqual(res, 42*mpi.world.size)
-
-        pmi.exec_('del myadd')
-
-    def test2BadArgument(self) :
-        if pmi.IS_CONTROLLER:
-            self.assertRaises(ValueError, pmi.reduce, 1)
-        self.assertRaises(AttributeError, pmi.reduce, '', 'amodule.doesntexist')
-
-    def test3MixedArguments(self) :
-        pmi.exec_('myadd = lambda a,b: a+b')
-
-        kwds = {'arg1' : 'arg1', 'arg2' : 'arg2'}
-        res = pmi.reduce('myadd', 'amodule.A.g', self.a, 42, **kwds)
-        if pmi.IS_CONTROLLER:
-            self.assertEqual(res, 42*mpi.world.size)
-        self.assertEqual(self.a.g_kwds, kwds)
-        self.assertEqual(self.a.g_arg, 42)
 
         pmi.exec_('del myadd')
 
@@ -285,6 +281,8 @@ class Test6WrongCommands(unittest.TestCase) :
 #         print(a.f.func)
 #         print(a.f.args)
 #         print(AProxy.f(a))
+
+unittest.defaultTestLoader.sortTestMethodsUsing=None
 
 if pmi.IS_CONTROLLER:
     # stop the workerLoop that is automatically started by

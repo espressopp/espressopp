@@ -40,7 +40,6 @@ class LennardJonesLocal(_LennardJones) :
     @cutoff.setter
     def cutoff(self, _cutoff) : self.set(cutoff=_cutoff)
         
-
 if pmi.IS_CONTROLLER :
     # wrap LennardJones
 
@@ -77,7 +76,7 @@ if pmi.IS_CONTROLLER :
             return object.__init__(self)
         
         def set(self, epsilon=None, sigma=None, cutoff=None) :
-            pmi.call('LennardJonesLocal.set', self.local, epsilon, sigma, cutoff)
+            pmi.call(self.local.set, epsilon, sigma, cutoff)
             
         @property
         def epsilon(self): return self.local.epsilon

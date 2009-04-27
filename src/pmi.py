@@ -110,8 +110,7 @@ The pmi module defines the following useful constants:
 * CONTROLLER is the numerical Id of the controller thread (the MPI root)
 * WORKERSTR is a string describing the thread ('Worker #' or 'Controller')
 """
-import logging
-import types
+import logging, types, sys, __builtin__
 from espresso import boostmpi as mpi
 
 ##################################################
@@ -152,7 +151,7 @@ def import_(statement) :
 def create(theClass=None, *args, **kwds) :
     """Controller command that creates an object on all workers.
 
-    "theClass" describes the (new-style) class that should be
+    theClass describes the (new-style) class that should be
     instantiated.
     *args are the arguments to the constructor of the class.
     Only classes that are known to PMI can be used, that is, classes
@@ -160,7 +159,7 @@ def create(theClass=None, *args, **kwds) :
 
     Example:
     >>> pmi.exec_('import hello')
-    >>> hw = pmi.create("hello.HelloWorld")
+    >>> hw = pmi.create('hello.HelloWorld')
     >>> print(hw)
     MPI process #0: Hello World!
     MPI process #1: Hello World!
@@ -182,9 +181,9 @@ def create(theClass=None, *args, **kwds) :
           raise UserError("pmi.create expects at least 1 argument on controller")
         elif isinstance(theClass, types.StringTypes) :
             theClass = eval(theClass)
-        elif type(theClass) == types.TypeType :
+        elif isinstance(theClass, types.TypeType) :
             pass
-        elif type(theClass) == types.ClassType :
+        elif isinstance(theClass, types.ClassType) :
             raise TypeError("""PMI cannot create old-style classes.
             Please create old style classes via their names.
             """)
@@ -199,7 +198,7 @@ def create(theClass=None, *args, **kwds) :
         # broadcast creation to the workers
         _broadcast(_CREATE, theClass, oid, *targs, **tkwds)
 
-        log.info('Creating: %s [%s]' % (__formatCall(theClass.__name__, args, kwds), oid))
+        log.info('Creating: %s [%s]', __formatCall(theClass.__name__, args, kwds), oid)
         # create the instance
         obj = theClass(*args, **kwds)
         # store the oid in the instance
@@ -248,21 +247,19 @@ def invoke(function=None, *args, **kwds) :
     >>> messages = pmi.invoke('hello.HelloWorld.hello', hw)
     """
     if __checkController(invoke) :
-        function, args = __translateInvokeArgs(function, args)
+        container, function, args = __translateInvokeArgs(function, args)
         targs, tkwds = __translateArgs(args, kwds)
-        _broadcast(_INVOKE, function, *targs, **tkwds)
+        _broadcast(_INVOKE, container, function, *targs, **tkwds)
         log.info("Invoking: %s", __formatCall(function, args, kwds))
-        function = eval(function)
-        value = function(*args, **kwds)
+        value = __invoke(container, function, args, kwds)
         return mpi.world.gather(value, root=CONTROLLER)
     else :
         return receive(_INVOKE)
 
-def __workerInvoke(function, *targs, **tkwds) :
+def __workerInvoke(container, function, *targs, **tkwds) :
     args, kwds = __backtranslateArgs(targs, tkwds)
     log.info("Invoking: %s", __formatCall(function, args, kwds))
-    function = eval(function)
-    value = function(*args, **kwds)
+    value = __invoke(container, function, args, kwds)
     return mpi.world.gather(value, root=CONTROLLER) 
 
 ##################################################
@@ -290,20 +287,18 @@ def call(procedure=None, *args, **kwds) :
     been imported via exec_().
     """
     if __checkController(call) :
-        procedure, args = __translateInvokeArgs(procedure, args)
+        container, procedure, args = __translateInvokeArgs(procedure, args)
         targs, tkwds = __translateArgs(args, kwds)
-        _broadcast(_CALL, procedure, *targs, **tkwds)
+        _broadcast(_CALL, container, procedure, *targs, **tkwds)
         log.info("Calling: %s", __formatCall(procedure, args, kwds))
-        procedure = eval(procedure)
-        procedure(*args, **kwds)
+        __invoke(container, procedure, args, kwds)
     else :
         receive(_CALL)
 
-def __workerCall(procedure, *targs, **tkwds) :
+def __workerCall(container, procedure, *targs, **tkwds) :
     args, kwds = __backtranslateArgs(targs, tkwds)
     log.info("Calling: %s", __formatCall(procedure, args, kwds))
-    procedure = eval(procedure)
-    procedure(*args, **kwds)
+    __invoke(container, procedure, args, kwds)
 
 def invokeNoResult(procedure, *args, **kwds) :
     """invokeNoResult() is an alias for call()."""
@@ -346,22 +341,21 @@ def reduce(reduceOp=None, function=None, *args, **kwds) :
             reduceOp = '.'.join((reduceOp.__module__, reduceOp.__name__))
         else :
             raise ValueError("pmi.reduce expects function as first argument, but got %s instead" % reduceOp)
-        function, args = __translateInvokeArgs(function, args)
+        container, function, args = __translateInvokeArgs(function, args)
         targs, tkwds = __translateArgs(args, kwds)
-        _broadcast(_REDUCE, reduceOp, function, *targs, **tkwds)
+        _broadcast(_REDUCE, reduceOp, container, function, *targs, **tkwds)
         log.info("Reducing: %s", __formatCall(function, args, kwds))
-        function = eval(function)
+        value = __invoke(container, function, args, kwds)
+        log.info("Reducing results via %s", reduceOp)
         reduceOp = eval(reduceOp)
-        value = function(*args, **kwds)
         return mpi.world.reduce(op=reduceOp, value=value, root=CONTROLLER)
     else :
         return receive(_REDUCE)
 
-def __workerReduce(reduceOp, function, *targs, **tkwds) :
+def __workerReduce(reduceOp, container, function, *targs, **tkwds) :
     args, kwds = __backtranslateArgs(targs, tkwds)
-    log.info("Invoking: %s", __formatCall(function, args, kwds))
-    function = eval(function)
-    value = function(*args, **kwds)
+    log.info("Reducing: %s", __formatCall(function, args, kwds))
+    value = __invoke(container, function, args, kwds)
     log.info("Reducing results via %s", reduceOp)
     reduceOp = eval(reduceOp)
     return mpi.world.reduce(op=reduceOp, value=value, root=CONTROLLER) 
@@ -541,7 +535,10 @@ def receive(expected=None) :
     \"expected\", raise a UserError.
     """
     __checkWorker(receive)
-    log.debug('Waiting for next PMI command.')
+    if expected is None:
+        log.debug('Waiting for next PMI command.')
+    else:
+        log.debug('Waiting for PMI command %s.', _CMD[expected][0])
     message = mpi.world.broadcast(root=CONTROLLER)
     log.debug("Received message: %s", message)
     if type(message) != __CMD:
@@ -576,7 +573,7 @@ class __OID(object) :
         self.id = id(self)
         return object.__init__(self)
     def __str__(self):
-        return 'oid=0x%x' %self.id
+        return 'oid=0x%x' % self.id
     def __hash__(self):
         return self.id
     def __eq__(self, obj):
@@ -592,7 +589,7 @@ if IS_CONTROLLER:
             self.oid = oid
             return object.__init__(self)
         def __del__(self):
-            log.info("Adding OID to DELETED_OIDS: [%s]" % self.oid)
+            log.info("Adding OID to DELETED_OIDS: [%s]", self.oid)
             DELETED_OIDS.append(self.oid)
 
 class __CMD(object) :
@@ -600,11 +597,10 @@ class __CMD(object) :
     """
     def __init__(self, cmd, args=None, kwds=None) :
         if not _checkCommand(cmd):
-            raise _InternalError('Created __CMD object with invalid PMI command %s', cmd)
+            raise _InternalError('Created __CMD object with invalid PMI command %s' % cmd)
         self.cmd = cmd
         self.args = args
         self.kwds = kwds
-        return object.__init__(self)
     def __str__(self):
         sargs = [_CMD[self.cmd][0]]
         if hasattr(self, 'args'):
@@ -695,16 +691,61 @@ def __translateInvokeArgs(arg0, args) :
     """
     if arg0 is None :
         raise UserError("pmi.__invoke expects function argument on controller")
-    if isinstance(arg0, types.StringTypes) :
+    if isinstance(arg0, types.StringTypes):
         function = arg0
-    elif isinstance(arg0, types.FunctionType) :
-        function = '.'.join((arg0.__module__, arg0.__name__))
-    elif isinstance(arg0, types.MethodType) :
-        function = '.'.join((arg0.im_func.__module__, arg0.im_class.__name__, arg0.im_func.__name__))
-        args = (arg0.im_self,) + args
+        container = None
+    elif isinstance(arg0, (types.FunctionType, types.BuiltinFunctionType)):
+        if arg0.__name__ == '<lambda>':
+            raise ValueError("pmi.__invoke can't handle lambda functions")
+        container = arg0.__module__
+        function = arg0.__name__
+    elif isinstance(arg0, (types.MethodType, types.BuiltinMethodType)):
+        container = arg0.im_class
+        function = arg0.__name__
+        # test whether the method is bound or not
+        if arg0.im_self is not None:
+            args = (arg0.im_self,) + args
     else :
         raise ValueError("pmi.__invoke expects function as first argument, but got %s" % arg0)
-    return (function, args)
+    return container, function, args
+
+def __invoke(container, function, args, kwds):
+    """Internal command that calls function from module, loading the
+    module if required.
+    """
+    if container is None:
+        func = eval(function)
+        log.debug("Invoking function: %s", __formatCall(function, args, kwds))
+        return func(*args, **kwds)
+    elif isinstance(container, types.TypeType):
+        func = getattr(container, function)
+        log.debug("Invoking method: %s",
+                  __formatCall('%s.%s' % (container.__name__, function), args, kwds))
+        return func(*args, **kwds)
+    elif isinstance(container, types.StringTypes):
+        module = container
+        if module in sys.modules:
+            mod = sys.modules[module]
+            if function not in mod.__dict__:
+                raise ValueError("%s: pmi.__invoke: module %s does not contain function %s"
+                                 % (WORKERSTR, module, function))
+            func = getattr(mod, function)
+        elif module in sys.builtin_module_names:
+            mod = __import__(module)
+            if function not in mod.__dict__:
+                raise ValueError("%s: pmi.__invoke: module %s does not contain function %s"
+                                 % (WORKERSTR, module, function))
+            func = getattr(mod, function)
+        else:
+            __import__(module)
+            mod = sys.modules[module]
+            if function not in mod.__dict__:
+                raise ValueError("%s: pmi.__invoke: module %s does not contain function %s"
+                                 % (WORKERSTR, module, function))
+            func = getattr(mod, function)
+        log.debug("Invoking function: %s",
+                  __formatCall('%s.%s' % (module, function), args, kwds))
+        return func(*args, **kwds)
 
 def __formatCall(function, args, kwds) :
     def formatArgs(args, kwds) :
