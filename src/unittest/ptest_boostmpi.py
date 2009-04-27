@@ -8,7 +8,8 @@ class Test0CommunicatorExtensions(unittest.TestCase) :
             val = 52
             mpi.world.broadcast(val, 0)
             res = mpi.world.gather(val, 0)
-            self.assert_(all(map(lambda x: x == 52, res)))
+            for v in res:
+                self.assert_(v == 52)
         else :
             val = mpi.world.broadcast(0)
             self.assertEqual(val, 52)
