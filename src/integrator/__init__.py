@@ -1,6 +1,6 @@
-from espresso import pmi
 from espresso import esutil
-from esutil import choose
+from espresso.esutil import choose
+from espresso import pmi
 
 # wrap VelocityVerlet
 pmi.exec_('from _espresso import integrator_VelocityVerlet')
@@ -14,4 +14,6 @@ class VelocityVerlet (object):
         self.worker = pmi.create('integrator_VelocityVerlet', timeStep)
         # set the defaults
         #self.set(epsilon, sigma, cutoff)
+
+    
 
