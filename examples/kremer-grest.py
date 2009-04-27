@@ -6,15 +6,15 @@ import espresso.integrator
 import espresso.interaction
 import espresso.pairs
 
+system = {}
 # set up the boundary conditions
-pbc = espresso.bc.PBC(length=10)
+system['bc'] = espresso.bc.PBC(length=10)
 # set up the decomposition scheme
-particles = espresso.decomposition.CellStorage(bc=pbc, grid=(2, 2, 2), skin=0.1)
+system['particles'] = espresso.decomposition.CellStorage(grid=(2, 2, 2), skin=0.1, **system)
 # set up the thermostat
-lvThermostat = espresso.thermostat.Langevin(temperatur=1.0, gamma=0.5)
+system['thermostat'] = espresso.thermostat.Langevin(temperatur=1.0, gamma=0.5, **system)
 # set up the integrator
-vvintegrator = espresso.integrator.VelocityVerlet(
-    timestep=0.001, thermostat=lvThermostat)
+system['integrator'] = espresso.integrator.VelocityVerlet(timestep=0.001, **system)
 
 # create the particles and the chains
 feneint = espresso.interaction.FENE(K=1.0, r0=1.0, rMax=0.2)
@@ -26,16 +26,16 @@ for chainid in range(100):
         particle = particles.addParticle(pos=newpos)
         bonds.add(particle, prevParticle)
         prevParticle = particle
-vvintegrator.addInteraction(pairs=bonds, interaction=feneint)
+system['integrator'].addInteraction(pairs=bonds, interaction=feneint)
 
 # create the LJ interaction
 ljint = espresso.interaction.LennardJones(sigma=1.0, epsilon=1.0, cutoff=2.0)
-verletlists = espresso.pairs.VerletList(radius=ljint.cutoff, skin=0.3)
-vvintegrator.addInteraction(pairs=verletlists, interaction=ljint)
+verletlists = espresso.pairs.VerletList(radius=ljint.cutoff, skin=0.3, **system)
+system['integrator'].addInteraction(pairs=verletlists, interaction=ljint)
 
 # integration
 for sweeps in range(100):
-    vvintegrator.integrate(steps=100)
+    system['integrator'].integrate(steps=100)
 
 # analysis
 .
