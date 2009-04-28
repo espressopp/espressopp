@@ -11,5 +11,6 @@ noinst_LTLIBRARIES = libbc.la
 
 libbc_la_SOURCES = \
         bindings.cpp\
+	BC.cpp \
 	PBC.cpp
 

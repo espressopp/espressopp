@@ -16,18 +16,19 @@ namespace espresso {
     class VelocityVerlet: public MDIntegrator {
 
     private:
-      particles::Set* particles;
-      particles::Storage* storage;
+
+      boost::shared_ptr<particles::Set> particles;
+      // boost::shared_ptr<Stoarge> storage;
 
       boost::shared_ptr< Property<Real3D> > position;
       boost::shared_ptr< Property<Real3D> > velocity;
       boost::shared_ptr< Property<Real3D> > force;
 
       struct ForceEvaluation {
-        interaction::Interaction* interaction;
-        pairs::Set* pairs;
-        ForceEvaluation(interaction::Interaction* _interaction,
-                        pairs::Set* _pairs)
+        boost::shared_ptr<interaction::Interaction> interaction;
+        boost::shared_ptr<pairs::Set> pairs;
+        ForceEvaluation(boost::shared_ptr<interaction::Interaction> _interaction,
+                        boost::shared_ptr<pairs::Set> _pairs)
           : interaction(_interaction), pairs(_pairs) {}
       };
 
@@ -38,13 +39,13 @@ namespace espresso {
 
       VelocityVerlet(real _timeStep);
 
-      VelocityVerlet(particles::Set* _particles, 
+      VelocityVerlet(boost::shared_ptr<particles::Set> _particles, 
                      boost::shared_ptr< Property<Real3D> > _position,
                      boost::shared_ptr< Property<Real3D> > _velocity,
                      boost::shared_ptr< Property<Real3D> > _force);
       
-      void addForce(interaction::Interaction *interaction, 
-                    pairs::Set *pairs);
+      void addForce(boost::shared_ptr<interaction::Interaction> interaction, 
+                    boost::shared_ptr<pairs::Set> pairs);
   
       virtual void run(int timesteps); 
 

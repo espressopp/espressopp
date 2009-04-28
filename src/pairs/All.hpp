@@ -17,8 +17,8 @@ namespace espresso {
      class All : public Set {
  
      private:
-       particles::Set& set;
-       bc::BC& bc;
+       boost::shared_ptr<particles::Set> set;
+       boost::shared_ptr<bc::BC> bc;
        boost::shared_ptr< Property<Real3D> > coordinates;
 
      public:
@@ -34,13 +34,15 @@ namespace espresso {
 	 \param coordinates the identifier of the coordinates property to use
 
        */
-       All(bc::BC& _bc, particles::Set& _set, boost::shared_ptr< Property<Real3D> > _coordinates);
+       All(boost::shared_ptr<bc::BC> _bc, 
+           boost::shared_ptr<particles::Set> _set, 
+           boost::shared_ptr< Property<Real3D> > _coordinates);
 
        /** Getter routine for the boundary conditions. */
-       bc::BC& getBC() const { return bc; }
+       boost::shared_ptr<bc::BC> getBC() const { return bc; }
 
        /** Getter routine for the set of particles. */
-       particles::Set& getSet() const { return set; }
+       boost::shared_ptr<particles::Set> getSet() const { return set; }
 
        /** Getter routine for the coordinate property */
        boost::shared_ptr< const Property<Real3D> > getCoordinateProperty() const { return coordinates; }

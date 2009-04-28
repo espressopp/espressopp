@@ -8,9 +8,8 @@
 using namespace espresso;
 using namespace espresso::integrator;
 using namespace espresso::particles;
+using namespace boost;
 
-namespace espresso {
-  namespace integrator {
     class StepA : public particles::Computer  {
     private:
       PropertyHandle<Real3D> pos;
@@ -64,21 +63,21 @@ namespace espresso {
     VelocityVerlet::VelocityVerlet(real _timeStep) 
     { setTimeStep(_timeStep);}
 
-    VelocityVerlet::VelocityVerlet(Set* _particles, 
+    VelocityVerlet::VelocityVerlet(boost::shared_ptr<Set> _particles, 
 				   boost::shared_ptr< Property<Real3D> > _position,
 				   boost::shared_ptr< Property<Real3D> > _velocity,
 				   boost::shared_ptr< Property<Real3D> > _force):
 
       particles(_particles),
-      storage(_particles->getStorage()),
       position(_position),
       velocity(_velocity),
       force(_force)
 
     {}
 
-    void VelocityVerlet::addForce(interaction::Interaction *interaction, 
-				  pairs::Set *pair) {
+    void VelocityVerlet::addForce(shared_ptr<interaction::Interaction> interaction,
+                                  shared_ptr<pairs::Set> pair)
+    {
       forceEvaluations.push_back(ForceEvaluation(interaction, pair));
     }
 
@@ -124,16 +123,16 @@ namespace espresso {
 
 void
 VelocityVerlet::registerPython() {
+  using namespace boost;
   using namespace boost::python;
 
   class_<VelocityVerlet>("integrator_VelocityVerlet", init<real>())
-    .def(init< Set*, boost::shared_ptr< Property<Real3D> >,
-         boost::shared_ptr< Property<Real3D> >,
-         boost::shared_ptr< Property<Real3D> > >())
+    .def(init<shared_ptr<Set>, shared_ptr< Property<Real3D> >,
+                               shared_ptr< Property<Real3D> >,
+                               shared_ptr< Property<Real3D> > >())
     .def("run", &VelocityVerlet::run)
     .def("setTimeStep", &VelocityVerlet::setTimeStep)
     .def("getTimeStep", &VelocityVerlet::getTimeStep)
     ;
 }
 
-}}

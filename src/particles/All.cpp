@@ -2,7 +2,7 @@
 
 using namespace espresso::particles;
 
-All::All(Storage *_store): Set(_store) {}
+All::All(boost::shared_ptr<Storage> _store) : Set(_store) {}
 
 All::~All() {}
 

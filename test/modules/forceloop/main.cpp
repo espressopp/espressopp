@@ -3,6 +3,9 @@
 
 #include <types.hpp>
 #include <logging.hpp>
+
+#include <boost/shared_ptr.hpp>
+
 #include <espresso_common.hpp>
 #include <particles/Storage.hpp>
 #include <particles/All.hpp>
@@ -13,7 +16,8 @@
 #include <pairs/ForceComputer.hpp>
 
 #include "ParticleWriter.hpp"
-#include "PairWriteComputer.hpp"
+
+// #include "PairWriteComputer.hpp"
 
 #include "integrator/VelocityVerlet.hpp"
 
@@ -47,12 +51,18 @@ using namespace espresso::integrator;
 */
 
 void forceloop() {
+
   // Create a new particle storage
 
-  Storage particleStorage;
-  PropertyId position = particleStorage.addProperty<Real3D>();
-  PropertyId velocity = particleStorage.addProperty<Real3D>();
-  PropertyId force = particleStorage.addProperty<Real3D>();
+  boost::shared_ptr<Storage> particleStorage = 
+         boost::shared_ptr<Storage>(new Storage());
+
+  boost::shared_ptr<Property<Real3D> > position = 
+         boost::shared_ptr<Property<Real3D> >(new Property<Real3D>(particleStorage));
+  boost::shared_ptr<Property<Real3D> > velocity = 
+         boost::shared_ptr<Property<Real3D> >(new Property<Real3D>(particleStorage));
+  boost::shared_ptr<Property<Real3D> > force    = 
+         boost::shared_ptr<Property<Real3D> >(new Property<Real3D>(particleStorage));
 
   // generate particles in the particle storage
 
@@ -66,42 +76,52 @@ void forceloop() {
        real y = (j + r) / N * SIZE; 
        real z = (k + r) / N * SIZE;
 
-       ParticleReference ref = particleStorage.addParticle();
-       PropertyReference<Real3D> positionRef = 
-	 particleStorage.getPropertyReference<Real3D>(position);
+       ParticleId id = particleStorage->addParticle();
+/*
+       PropertyHandle<Real3D> positionHandle = 
+	 particleStorage->getPropertyHandle<Real3D>(position);
        PropertyReference<Real3D> velocityRef = 
 	 particleStorage.getPropertyReference<Real3D>(velocity);
        PropertyReference<Real3D> forceRef    = 
 	 particleStorage.getPropertyReference<Real3D>(force);
+*/
 
-       positionRef[ref] = Real3D(x, y, z);
-       velocityRef[ref] = Real3D(x, y, z);
-       forceRef[ref] = 0.0;
+       (*position.get())[id] = Real3D(x, y, z);
+       (*velocity.get())[id] = Real3D(x, y, z);
+       (*force.get())[id] = 0.0;
+
+/*
+       positionRef[id] = Real3D(x, y, z);
+       velocityRef[id] = Real3D(x, y, z);
+       forceRef[id] = 0.0;
+*/
   }
 
   // For test only: ParticleWriter prints each particle
 
-  ParticleWriter pWriter(particleStorage, position, force);
+  ParticleWriter pWriter(*particleStorage.get(), *position.get(), *force.get());
 
-  // call pWriter(ref) for each particle reference ref of particle storage
+  // call pWriter(id) for each particle reference ref of particle storage
 
-  particleStorage.foreach(pWriter);
+  particleStorage->foreach(pWriter);
 
   // define periodic boundary conditions
 
-  PBC pbc(SIZE);
+  boost::shared_ptr<PBC> pbc = boost::shared_ptr<PBC>(new PBC(SIZE));
 
   // define a set of all particles
 
-  particles::All allSet(&particleStorage);
+  boost::shared_ptr<particles::All> allSet  = 
+         boost::shared_ptr<particles::All>(new particles::All(particleStorage));
 
   // define allpairs with (x, y) for all x, y in allSet
 
-  pairs::All allpairs(pbc, allSet, position);
+  boost::shared_ptr<pairs::All> allpairs =
+         boost::shared_ptr<pairs::All>(new pairs::All(pbc, allSet, position));
 
   // For test only: PairWriter prints each particle pair 
 
-  PairWriteComputer pairWriter(&particleStorage, position);
+  // PairWriteComputer pairWriter(&particleStorage, position);
 
   // call pairWriter(ref1, ref2) for each particle ref pair of allSet
 
@@ -109,9 +129,9 @@ void forceloop() {
 
   // define LennardJones interaction
 
-  LennardJones ljint;
+  boost::shared_ptr<LennardJones> ljint = boost::shared_ptr<LennardJones>(new LennardJones());
 
-  ljint.set(1.0, 1.0, 2.5);
+  ljint->set(1.0, 1.0, 2.5);
 
   // make a FENE interaction
 
@@ -122,37 +142,39 @@ void forceloop() {
   // force will be the vector of all forces in the particle storage
   // and force[ref] returns the force (as RealArrayRef) of particle reference ref
 
-  PropertyReference<Real3D> forceRef = particleStorage.getPropertyReference<Real3D>(force);
+  PropertyHandle<Real3D> forceRef = *force.get();
 
   // Define a pair computer that computes the forces for particle pairs
   // ljint provides the routine computeForce for a particle pair
   // force (pointer to all forces of particles) tells us where the computed forces are added
 
-  ForceComputer *forcecompute = ljint.createForceComputer(ForceComputer(forceRef));
+  ForceComputer *forcecompute = ljint->createForceComputer(ForceComputer(forceRef));
 
   // call forcecompute(ref1, ref2) for each particle ref pair of allSet
 
-  allpairs.foreach(*forcecompute);
+  allpairs->foreach(*forcecompute);
 
   delete forcecompute;
 
   // print out all particle data to see that it calculates some forces
 
-  particleStorage.foreach(pWriter);
+  particleStorage->foreach(pWriter);
 
   // create integrator and set properties
 
-  VelocityVerlet integrator(&allSet, position, velocity, force);
-  integrator.setTimeStep(0.005);
-  integrator.addForce(&ljint, &allpairs);
+  boost::shared_ptr<VelocityVerlet> integrator =
+        boost::shared_ptr<VelocityVerlet>(new VelocityVerlet(allSet, position, velocity, force));
+
+  integrator->setTimeStep(0.005);
+  integrator->addForce(ljint, allpairs);
 
   // integrate for a certain number of timesteps
 
-  integrator.run(100);
+  integrator->run(100);
 
   // check to see that particles have new positions
 
-  particleStorage.foreach(pWriter);
+  particleStorage->foreach(pWriter);
 
 }
 

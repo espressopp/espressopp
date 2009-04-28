@@ -1,6 +1,8 @@
 #ifndef _PARTICLES_ALL_HPP
 #define _PARTICLES_ALL_HPP
 
+#include <boost/shared_ptr.hpp>
+
 #include "particles/Set.hpp"
 
 namespace espresso {
@@ -15,7 +17,9 @@ namespace espresso {
 	  @param _store pointer to the ParticleStorage the
 	  particles in this set come from
       */
-      All(Storage *_store = 0);
+
+      All(boost::shared_ptr<Storage> _store = boost::shared_ptr<Storage>());
+
       virtual ~All();
 
       /** for a particle of the ParticleStorage of this class,

@@ -8,6 +8,8 @@ using namespace espresso::bc;
 using namespace espresso::pairs;
 using namespace espresso::particles;
 
+using namespace boost;
+
 // some abbreviations
 
 // Helper class 1
@@ -39,8 +41,8 @@ private:
 	       const Reference pref,
 	       PairComputer& _pairComputer
 	       ) :
-      bc(all->getBC()), 
-      id(all->getSet().getStorage()->getIdPropertyHandle()),
+      bc(*(all->getBC().get())), 
+      id(all->getSet()->getStorage()->getIdPropertyHandle()),
       pos(*(all->getCoordinateProperty())),
       pref1(pref),
       pos1(pos[pref1]),
@@ -71,7 +73,7 @@ public:
   virtual void operator()(const Reference pref) {
     // printf ("Traverser1: will call traverser2\n");
     Traverser2 traverser2(all, pref, pairComputer);
-    all->getSet().foreach(traverser2);
+    all->getSet()->foreach(traverser2);
   }
 };
 
@@ -85,7 +87,9 @@ All::~All() {}
   All::All(boundary_conditions, particle_set)
   -------------------------------------------------------------------------- */
 
-All::All(bc::BC& _bc, particles::Set& _set, boost::shared_ptr< Property<Real3D> > _coordinates):
+All::All(shared_ptr<bc::BC> _bc,
+         shared_ptr<particles::Set> _set,
+         shared_ptr< Property<Real3D> > _coordinates) :
   set(_set),
   bc(_bc),
   coordinates(_coordinates)
@@ -97,7 +101,7 @@ All::All(bc::BC& _bc, particles::Set& _set, boost::shared_ptr< Property<Real3D> 
 void All::foreach(pairs::Computer& pairComputer) {
   // printf ("ParticlePairComputer non-const\n");
   Traverser1<particles::Computer> traverser1(this, pairComputer);;
-  set.foreach(traverser1);
+  set->foreach(traverser1);
 }
        
 /*--------------------------------------------------------------------------
@@ -106,7 +110,7 @@ void All::foreach(pairs::Computer& pairComputer) {
 void All::foreach(pairs::ConstComputer& pairComputer) const {
   // printf ("ParticlePairComputer const\n");
   Traverser1<particles::ConstComputer> traverser1(this, pairComputer);;
-  set.foreach(traverser1);
+  set->foreach(traverser1);
 }
 
 //////////////////////////////////////////////////
@@ -115,11 +119,14 @@ void All::foreach(pairs::ConstComputer& pairComputer) const {
 
 void 
 All::registerPython() {
+  using namespace boost;
   using namespace boost::python;
-  /*
-  class_<All>("pairs_All")
-    .def(init<BC&, Set&, PropertyId>())
-    ;
-  */
-}
 
+  class_<All, shared_ptr<All> >
+    ("pairs_All", init<shared_ptr<bc::BC>, shared_ptr<particles::Set>, 
+                  shared_ptr<espresso::Property<Real3D> > >())
+  .def("getBC", &All::getBC)
+  .def("getSet", &All::getSet)
+  .def("getCoordinateProperty", &All::getCoordinateProperty)
+  ;
+}

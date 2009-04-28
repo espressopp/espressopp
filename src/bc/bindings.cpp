@@ -3,12 +3,10 @@
 #include "BC.hpp"
 #include "PBC.hpp"
 
-#ifdef HAVE_PYTHON
-namespace espresso {
-  namespace bc {
-    void registerPython() {
-      PBC::registerPython();
-    }
-  }
+using namespace espresso::bc;
+
+void 
+espresso::bc::registerPython() {
+   BC::registerPython();
+   PBC::registerPython();
 }
-#endif
