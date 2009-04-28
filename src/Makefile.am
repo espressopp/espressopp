@@ -4,6 +4,7 @@ SUBDIRS = \
 	esutil \
 	hello \
 	particles \
+	decomposition \
 	pairs \
 	interaction \
 	bc \
