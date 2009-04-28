@@ -245,6 +245,7 @@ AC_CONFIG_FILES([Makefile
                  src/hello/Makefile
                  src/particles/Makefile
                  src/particles/unittest/Makefile
+                 src/decomposition/Makefile
                  src/pairs/Makefile
                  src/pairs/unittest/Makefile
                  src/interaction/Makefile

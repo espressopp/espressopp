@@ -8,6 +8,7 @@ SUBDIRS = \
 	interaction \
 	bc \
 	integrator
+
 CLEANFILES =
 
 # declare the headers
@@ -67,7 +68,8 @@ python_SCRIPTS= \
 	__init__.py \
 	__setup.py \
 	boostmpi.py \
-	pmi.py
+	pmi.py \
+	Property.py
 
 # python script handling
 include $(top_srcdir)/build-aux/macros/axes_python.am

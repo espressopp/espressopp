@@ -1,8 +1,8 @@
 # set up espresso paths and logging
 from espresso import __setup
-
 from _espresso import Real3D
 import esutil
+from Property import *
 
 # This injects additional methods into the Real3D class and pulls it
 # into this module 
