@@ -33,6 +33,9 @@ void PBC::set(real _length) {
   LOG4ESPP_INFO(theLogger, "set length = " << length);
 }
 
+real PBC::getLength(void) const { return length; }
+  
+
 /** Routine delivers the distance vector between two positions.
     \sa bc::BC::getDist */
 Real3D PBC::getDist(const Real3D& pos1, const Real3D& pos2) const {
@@ -73,8 +76,8 @@ PBC::registerPython() {
   using namespace boost::python;
 
   class_<PBC, boost::shared_ptr<PBC>, bases<BC> >("bc_PBC", init<>())
-//    class_<PBC, boost::shared_ptr<PBC> >("bc_PBC", init<>())
     .def("set", &PBC::set)
+    .def("getLength", &PBC::getLength)
     .def("randomPos", &PBC::randomPos)
     ;
 }

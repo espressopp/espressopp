@@ -29,7 +29,11 @@ namespace espresso {
       /** Destructor for periodic boundary conditions */
       virtual ~PBC();
 
+      /** Method to set the length of the side of the cubic simulation cell */
       virtual void set(real _length);
+      
+      /** Method that returns the length of the side of the cubic simulation cell */
+      virtual real getLength(void) const;
 
       //PMI and Python Visible
       /** Method to compute the minimum image distance */
