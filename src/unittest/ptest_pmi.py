@@ -96,13 +96,22 @@ class Test1CreateAndDelete(unittest.TestCase) :
         self.assertEqual(a.kwds, kwds)
         pmi.exec_("del amodule")
 
+    def test6ControllerArguments(self):
+        pmi.exec_("import amodule")
+        a = pmi.create("amodule.A", arg = 42, __pmictr_arg = 52)
+        if pmi.IS_CONTROLLER:
+            self.assertEqual(a.arg, 52)
+        else:
+            self.assertEqual(a.arg, 42)
+        pmi.exec_('del amodule')
+            
 class Test2Call(unittest.TestCase) :
     def test0FunctionByString(self) :
         pmi.exec_('import amodule')
         if pmi.IS_CONTROLLER :
-            pmi.call('amodule.f')
+            self.assertEqual(pmi.call('amodule.f'), 42)
             self.assertEqual(pmi.amodule.f_arg, 42)
-            pmi.call('amodule.g', 52)
+            self.assertEqual(pmi.call('amodule.g', 52), 52)
             self.assertEqual(pmi.amodule.g_arg, 52)
         else :
             pmi.call()
@@ -116,9 +125,15 @@ class Test2Call(unittest.TestCase) :
         # user defined function
         pmi.exec_('import amodule')
         import amodule
-        pmi.call(amodule.f)
+        if pmi.IS_CONTROLLER:
+            self.assertEqual(pmi.call(amodule.f), 42)
+        else:
+            pmi.call()
         self.assertEqual(amodule.f_arg, 42)
-        pmi.call(amodule.g, 52)
+        if pmi.IS_CONTROLLER:
+            self.assertEqual(pmi.call(amodule.g, 52), 52)
+        else:
+            pmi.call()
         self.assertEqual(amodule.g_arg, 52)
         pmi.exec_('del amodule')
 
@@ -182,6 +197,17 @@ class Test2Call(unittest.TestCase) :
         pmi.call(a.g, 42, **kwds)
         self.assertEqual(a.g_kwds, kwds)
         self.assertEqual(a.g_arg, 42)
+
+    def test9ControllerArguments(self):
+        pmi.exec_("import amodule")
+        a = pmi.create("amodule.A")
+        if pmi.IS_CONTROLLER:
+            self.assertEqual(pmi.call(a.g, arg=42, __pmictr_arg=52), 52)
+            self.assertEqual(a.g_arg, 52)
+        else:
+            pmi.call()
+            self.assertEqual(a.g_arg, 42)
+        pmi.exec_('del amodule')
 
 class Test3Invoke(unittest.TestCase) :
     def test0Function(self) :

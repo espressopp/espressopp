@@ -102,12 +102,20 @@ if pmi.IS_CONTROLLER :
         def computeEnergy(self, r) :
             return self.local.computeEnergy(r)
 
+#         __metaclass__ = pmi.Proxy
+#         pmiproxydefs = {
+#             'pmisubjectclass': 'LennardJonesLocal',
+#             'pmicall': [ 'set' ],
+#             'pmipropset': [ 'epsilon', 'sigma', 'cutoff' ],
+#             'localpropget': [ 'epsilon', 'sigma', 'cutoff' ],
+#             'localcall': [ 'computeForce', 'computeEnergy' ]
+#             }
+
+
 
 # from _espresso import interaction_FENE as _FENE
 # class __FENE(FENELocal) :
 #     'The FENE interaction.'
-#     __metaclass__ = esutil.ExtendBaseClass
-
 #     __originit = FENELocal.__init__
 #     def __init__(self, K=1.0, r0=0.0, rMax=1.0) :
 #         """Initialize the FENE potential.
