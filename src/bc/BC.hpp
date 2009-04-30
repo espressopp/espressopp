@@ -24,7 +24,7 @@ namespace espresso {
 
     public:
 
-      //static void registerPython();
+      static void registerPython();
 
     };
   }

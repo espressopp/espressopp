@@ -72,8 +72,8 @@ void
 PBC::registerPython() {
   using namespace boost::python;
 
-//  class_<PBC, boost::shared_ptr<PBC>, bases<BC> >("bc_PBC", init<>())
-    class_<PBC, boost::shared_ptr<PBC> >("bc_PBC", init<>())
+  class_<PBC, boost::shared_ptr<PBC>, bases<BC> >("bc_PBC", init<>())
+//    class_<PBC, boost::shared_ptr<PBC> >("bc_PBC", init<>())
     .def("set", &PBC::set)
     .def("randomPos", &PBC::randomPos)
     ;
