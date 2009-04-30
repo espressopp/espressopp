@@ -32,7 +32,7 @@ class _PropertyLocal(object) :
             node = -1
 
         # find out a) who has the particle and b) if not too many have it
-        node = mpi.all_reduce(mpi.world, node, _reduceNodeInfo)
+        node = mpi.world.all_reduce(node, _reduceNodeInfo)
         if pmi.IS_CONTROLLER :
             if node == -1 :
                 raise KeyError("particle %d does not exist" % particle)

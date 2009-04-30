@@ -34,6 +34,16 @@ class ExtendMPI(Communicator) :
         """
         return reduce(self, value, op, root)
 
+    def all_gather(self, value) :
+        """Calls all_gather(self, value).
+        """
+        return all_gather(self, value)
+
+    def all_reduce(self, value, op) :
+        """Calls all_reduce(self, value, op).
+        """
+        return all_reduce(self, value, op)
+
 __author__ = __author__ + ', Olaf Lenz <lenzo@mpip-mainz.mpg.de>'
 __copyright__ = __copyright__ + ', 2009 Olaf Lenz'
 
