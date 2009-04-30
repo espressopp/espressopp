@@ -49,23 +49,24 @@ class _PropertyLocal(object) :
 
 ####
 
-class _Property(object) :
-    def __init__(self, decomposer, name) :
-        if name in decomposer.properties :
-            raise NameError('property "%s" already exists' % name)
+if pmi.IS_CONTROLLER:
+    class _Property(object) :
+        def __init__(self, decomposer, name) :
+            if name in decomposer.properties :
+                raise NameError('property "%s" already exists' % name)
+            
+            self.name = name
+            self.decomposer = decomposer
+            decomposer.properties[name] = self
 
-        self.name = name
-        self.decomposer = decomposer
-        decomposer.properties[name] = self
+            pmi.exec_('import espresso.Property')
 
-        pmi.exec_('import espresso.Property')
-
-    def __getitem__(self, particle) :
-        pmi.call(self.local.getItem, particle)
-        # fetch and clear return value
-        value = self.local.value
-        del(self.local.value)
-        return value
+        def __getitem__(self, particle) :
+            pmi.call(self.local.getItem, particle)
+            # fetch and clear return value
+            value = self.local.value
+            del(self.local.value)
+            return value
 
 ####
 
@@ -79,10 +80,11 @@ class RealPropertyLocal(_RealProperty, _PropertyLocal) :
         _RealProperty.__init__(self, decomposerlocal.storage)
 ####
 
-class RealProperty(_Property) :
-    def __init__(self, decomposer, name) :
-        _Property.__init__(self, decomposer, name)
-        self.local = pmi.create('espresso.Property.RealPropertyLocal', decomposer.local)
+if pmi.IS_CONTROLLER:
+    class RealProperty(_Property) :
+        def __init__(self, decomposer, name) :
+            _Property.__init__(self, decomposer, name)
+            self.local = pmi.create('espresso.Property.RealPropertyLocal', decomposer.local)
 ####
 
 ######## IntegerProperty

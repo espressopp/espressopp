@@ -1,8 +1,10 @@
 import unittest
 from espresso import boostmpi as mpi
 from espresso import pmi
-from espresso import RealProperty
 from _espresso import particles_Storage as _Storage
+
+if pmi.IS_CONTROLLER:
+    from espresso import RealProperty
 
 class MockDecomposerLocal(object) :
     def __init__(self) :
