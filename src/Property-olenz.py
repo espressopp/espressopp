@@ -25,7 +25,7 @@ class _PropertyLocal(object) :
     def getItem(self, particle) :
         # see whether we can read the value, i.e. the particle is here
         try:
-            return _RealProperty.__getitem__(self, particle)
+            return self[particle]
         except IndexError:
             return None
 

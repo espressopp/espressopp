@@ -26,7 +26,7 @@ class _PropertyLocal(object) :
     def getItem(self, particle) :
         # see whether we can read the value, i.e. the particle is here
         try:
-            value = _RealProperty.__getitem__(self, particle)
+            value = self[particle]
             node = mpi.rank
         except IndexError:
             node = -1
