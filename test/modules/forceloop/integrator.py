@@ -13,7 +13,6 @@
 #     - writing UnitTest in Python
 
 import espresso
-import math
 
 from _espresso import particles_Storage as Storage
 from _espresso import Real3DProperty
@@ -26,14 +25,8 @@ from _espresso import pairs_List as List
 from _espresso import interaction_LennardJones as LennardJones
 from _espresso import interaction_FENE as FENE
 from _espresso import integrator_VelocityVerlet as VelocityVerlet
- 
+
 ##  Simple class to write position of particles
-
-##  Global Parameters of the simulation
-
-SIZE    = 16.0  # size of the simulation box
-NCHAINS = 5     # number of polymers
-NBEADS  = 5     # number of particles in one polymer
 
 class ParticleWriter(particles_PythonComputer):
 
@@ -46,63 +39,37 @@ class ParticleWriter(particles_PythonComputer):
 
 import random
 
-def randomWalk(step):
-
-    rsq = 2.0
-    while rsq > 1.0:
-       dx = 2.0*random.random() - 1.0
-       dy = 2.0*random.random() - 1.0
-       dz = 2.0*random.random() - 1.0
-       rsq = dx*dx + dy*dy + dz*dz
-
-    r  = math.sqrt(rsq)
-
-    return Real3D(step*dx, step*dy, step*dz)
-
 particleStorage = Storage()
 position = Real3DProperty(particleStorage)
 velocity = Real3DProperty(particleStorage)
 force    = Real3DProperty(particleStorage)
 
-pbc = PBC()
-pbc.set(SIZE)
+N = 3
+SIZE = 4.0
 
-# Bond List for bonded interactions
+for i in range(N):
+   for j in range(N):
+      for k in range(N):
+     
+       r = 0.4 + 0.2 * random.random()
+       x = (i + r) / N * SIZE;
+       y = (j + r) / N * SIZE; 
+       z = (k + r) / N * SIZE;
 
-bondList = List(pbc, particleStorage, position)
+       id = particleStorage.addParticle()
+       print 'id = ', id
 
-for chainid in range(NCHAINS):
-    pid1 = particleStorage.addParticle()
-    x = random.random() * SIZE
-    y = random.random() * SIZE
-    z = random.random() * SIZE
-    pos1 = Real3D(random.random() * SIZE, random.random() * SIZE, random.random() * SIZE)
-    position[pid1] = pos1
-    velocity[pid1] = Real3D(0.0)
-    force[pid1]    = Real3D(0.0)
-
-    for beadid in range(NBEADS):
-
-        # create a new position by random walk
-        pos2 = pos1 + randomWalk(step=1.0)
-
-        pid2 = particleStorage.addParticle()
-
-        position[pid2] = pos2
-        velocity[pid2] = Real3D(0.0)
-        force[pid2]    = Real3D(0.0)
-
-        bondList.addPair(pid1, pid2)
-
-        # save pos2 and pid2 for the next step of this loop
-
-        pos1 = pos2
-        pid1 = pid2
+       position[id] = Real3D(x, y, z);
+       velocity[id] = Real3D(x, y, z);
+       force[id] = Real3D(0.0)
 
 #  Write all the particles of the storage
 
 #  We could print the particles already here
 #  particleStorage.foreach(ParticleWriter(position, particleStorage))
+
+pbc = PBC()
+pbc.set(SIZE)
 
 allSet = particles_All(particleStorage)
 allSet.foreach(ParticleWriter(position, particleStorage))
@@ -110,6 +77,16 @@ allSet.foreach(ParticleWriter(position, particleStorage))
 # Pair List for nonbonded interactions
 
 allPairs = All2(pbc, allSet, position)
+
+# Bond List for bonded interactions
+
+bondList = List(pbc, particleStorage, position)
+
+bondList.addPair(1,2)
+bondList.addPair(2,3)
+
+bondList.addPair(4,5)
+bondList.addPair(5,6)
 
 ljint = LennardJones()
 ljint.set(1.0, 1.0, 2.5)
