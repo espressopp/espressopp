@@ -6,6 +6,7 @@
 namespace espresso {
   namespace interaction {
     void registerPython() {
+      Interaction::registerPython();
       LennardJones::registerPython();
       FENE::registerPython();
     }

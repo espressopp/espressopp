@@ -21,7 +21,9 @@ from _espresso import bc_PBC as PBC
 from _espresso import particles_PythonComputer 
 from _espresso import particles_All
 from _espresso import pairs_All as All2
+from _espresso import pairs_List as List
 from _espresso import interaction_LennardJones as LennardJones
+from _espresso import interaction_FENE as FENE
 from _espresso import integrator_VelocityVerlet as VelocityVerlet
 
 ##  Simple class to write position of particles
@@ -55,6 +57,7 @@ for i in range(N):
        z = (k + r) / N * SIZE;
 
        id = particleStorage.addParticle()
+       print 'id = ', id
 
        position[id] = Real3D(x, y, z);
        velocity[id] = Real3D(x, y, z);
@@ -71,21 +74,36 @@ pbc.set(SIZE)
 allSet = particles_All(particleStorage)
 allSet.foreach(ParticleWriter(position, particleStorage))
 
-allpairs = All2(pbc, allSet, position)
+# Pair List for nonbonded interactions
 
-ljint = LennardJones();
+allPairs = All2(pbc, allSet, position)
 
+# Bond List for bonded interactions
+
+bondList = List(pbc, particleStorage, position)
+
+bondList.addPair(1,2)
+bondList.addPair(2,3)
+
+bondList.addPair(4,5)
+bondList.addPair(5,6)
+
+ljint = LennardJones()
 ljint.set(1.0, 1.0, 2.5)
 
-# not yet
-# forcecompute = ljint->createForceComputer(ForceComputer(forceRef))
+fene = FENE()
+fene.set(1.0, 0.5, 0.1)
+# fene = FENE(r0 = 0.5, K=1.0, rMax = 0.1)
 
-# allpairs.foreach(forcecompute)
+# allPairs.foreach(forcecompute)
 
 integrator = VelocityVerlet(allSet, position, velocity, force)
 
 integrator.setTimeStep(0.005)
-integrator.addForce(ljint, allpairs)
+
+integrator.addForce(ljint, allPairs)
+integrator.addForce(fene, bondList)
+
 integrator.run(100)
 
 allSet.foreach(ParticleWriter(force, particleStorage))

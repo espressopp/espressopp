@@ -6,6 +6,7 @@
 #include <particles/Storage.hpp>
 #include <particles/Computer.hpp>
 #include <particles/PythonComputer.hpp>
+#include <particles/All.hpp>
 
 using namespace boost::python;
 
@@ -17,4 +18,8 @@ void espresso::particles::registerPython() {
   PythonComputer::registerPython();
 
   Storage::registerPython();
+
+  Set::registerPython();
+
+  All::registerPython();
 }

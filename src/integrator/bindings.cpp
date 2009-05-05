@@ -5,6 +5,7 @@
 namespace espresso {
   namespace integrator {
     void registerPython() {
+      MDIntegrator::registerPython();
       VelocityVerlet::registerPython();
     }
   }

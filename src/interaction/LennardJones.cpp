@@ -104,7 +104,8 @@ LennardJones::registerPython() {
   real (LennardJones::*computeEnergyOverload2)(const real) const =
     &LennardJones::computeEnergy;
     
-  class_<LennardJones>("interaction_LennardJones", init<>())
+  class_<LennardJones, boost::shared_ptr<LennardJones>, bases<Interaction> >
+     ("interaction_LennardJones", init<>())
     .def("set", &LennardJones::set)
     .def("getCutoff", &LennardJones::getCutoff)
     .def("getEpsilon", &LennardJones::getEpsilon)

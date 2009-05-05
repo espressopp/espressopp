@@ -31,6 +31,9 @@ namespace espresso {
        */
       virtual void foreach(Computer &computer);
       virtual void foreach(ConstComputer &computer) const;
+
+      /// make this class available at Python
+      static void registerPython();
     };
   }
 }

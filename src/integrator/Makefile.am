@@ -9,6 +9,7 @@ noinst_LTLIBRARIES = libintegrator.la
 
 libintegrator_la_SOURCES = \
         bindings.cpp\
+	MDIntegrator.cpp \
 	VelocityVerlet.cpp
 
 include $(top_srcdir)/build-aux/macros/axes_python.am

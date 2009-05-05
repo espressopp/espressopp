@@ -1,4 +1,5 @@
 #include "All.hpp"
+#include <boost/python.hpp>
 
 using namespace espresso::particles;
 
@@ -16,3 +17,17 @@ void All::foreach(ConstComputer &computer) const {
   if (theStorage) theStorage->foreach(computer);
 }
 
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+
+void All::registerPython() {
+
+  using namespace boost::python;
+
+  // Please note that foreach of All will be available via foreach of Set
+
+  class_<All, boost::shared_ptr<All>, bases<Set> >("particles_All", 
+      init<boost::shared_ptr<Storage> >())
+  ;
+}

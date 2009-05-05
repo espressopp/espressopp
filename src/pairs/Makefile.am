@@ -15,6 +15,7 @@ noinst_LTLIBRARIES = libpairs.la
 
 libpairs_la_SOURCES = \
         bindings.cpp \
+	Set.cpp \
 	All.cpp \
         List.cpp
 

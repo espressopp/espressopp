@@ -17,8 +17,8 @@ namespace espresso {
  
     private:
 
-      particles::Storage& storage; 
-      bc::BC& bc;
+      boost::shared_ptr<particles::Storage> storage; 
+      boost::shared_ptr<bc::BC> bc;
       boost::shared_ptr< Property<Real3D> > coordinates;
       typedef std::pair<ParticleId,
                         ParticleId> Tuple;
@@ -35,8 +35,8 @@ namespace espresso {
 	  \param coordinates the identifier of the coordinates property to use
 
       */
-      List (bc::BC& bc, 
-	    particles::Storage& storage, 
+      List (boost::shared_ptr<bc::BC> bc, 
+            boost::shared_ptr<particles::Storage> storage,
 	    boost::shared_ptr< Property<Real3D> > coordinates);
 
       size_t size() const;
@@ -73,7 +73,7 @@ namespace espresso {
 
       /** Getter routine for the boundary conditions. */
 
-      bc::BC& getBC() const { return bc; }
+      boost::shared_ptr<bc::BC> getBC() const { return bc; }
 
       /** Getter routine for the ID of the coordinate */
 
@@ -85,7 +85,7 @@ namespace espresso {
 
       */
 
-      virtual void foreach(Computer& pairComputer) const;
+      virtual void foreach(Computer& pairComputer);
 
       /** This routine will apply a function operator for read-only particles to all pairs.
 
@@ -98,7 +98,13 @@ namespace espresso {
     private:
       template<class Computer, class>
       void foreach(Computer& pairComputer) const;
+
+    public:
+
+      static void registerPython();
+
     };
+
   }
 }
 

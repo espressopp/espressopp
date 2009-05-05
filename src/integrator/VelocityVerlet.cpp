@@ -126,13 +126,13 @@ VelocityVerlet::registerPython() {
   using namespace boost;
   using namespace boost::python;
 
-  class_<VelocityVerlet>("integrator_VelocityVerlet", init<real>())
+  class_<VelocityVerlet, boost::shared_ptr<VelocityVerlet>, bases<MDIntegrator> >
+    ("integrator_VelocityVerlet", init<real>())
     .def(init<shared_ptr<Set>, shared_ptr< Property<Real3D> >,
                                shared_ptr< Property<Real3D> >,
                                shared_ptr< Property<Real3D> > >())
     .def("run", &VelocityVerlet::run)
-    .def("setTimeStep", &VelocityVerlet::setTimeStep)
-    .def("getTimeStep", &VelocityVerlet::getTimeStep)
+    .def("addForce", &VelocityVerlet::addForce)
     ;
 }
 

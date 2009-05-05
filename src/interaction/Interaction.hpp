@@ -15,6 +15,9 @@ namespace espresso {
       virtual pairs::EnergyComputer *createEnergyComputer(const pairs::EnergyComputer &) const = 0;
       virtual pairs::ForceComputer  *createForceComputer (const pairs::ForceComputer &)  const = 0;
       virtual real getCutoffSqr() const = 0;
+    public:
+      /** Abstract class needs also registration in Python */
+      static void registerPython();
     };
   }
 }

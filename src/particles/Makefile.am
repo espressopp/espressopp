@@ -18,6 +18,7 @@ libparticles_la_SOURCES = \
 	PythonComputer.cpp \
 	bindings.cpp \
 	Storage.cpp \
+	Set.cpp \
 	All.cpp
 
 include $(top_srcdir)/build-aux/macros/axes_python.am

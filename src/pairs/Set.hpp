@@ -4,11 +4,20 @@
 #include "Computer.hpp"
 
 namespace espresso {
+
   namespace pairs {
+
     class Set {
+
     public:
+
       virtual void foreach(Computer& comp) = 0;
+
       virtual void foreach(ConstComputer& comp) const = 0;
+
+      /** Abstract class needs also registration in Python */
+
+      static void registerPython();
     };
   }
 }

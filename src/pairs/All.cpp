@@ -122,7 +122,7 @@ All::registerPython() {
   using namespace boost;
   using namespace boost::python;
 
-  class_<All, shared_ptr<All> >
+  class_<All, shared_ptr<All>, bases<Set> >
     ("pairs_All", init<shared_ptr<bc::BC>, shared_ptr<particles::Set>, 
                   shared_ptr<espresso::Property<Real3D> > >())
   .def("getBC", &All::getBC)

@@ -38,6 +38,13 @@ namespace espresso {
       virtual void foreach(ConstComputer &computer) const = 0;
 
       boost::shared_ptr<Storage> getStorage() { return theStorage; }
+
+    public:
+
+      /** Abstract class needs also registration in Python */
+
+      static void registerPython();
+
     };
   }
 }

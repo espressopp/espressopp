@@ -6,6 +6,7 @@
 namespace espresso {
 
   namespace integrator {
+
     class MDIntegrator {
 
     protected:
@@ -14,6 +15,7 @@ namespace espresso {
       real timeStepSqr;
 
     public:
+
       virtual ~MDIntegrator() {}
       
       virtual void setTimeStep(real _timeStep) { timeStep = _timeStep; timeStepSqr = timeStep * timeStep; }
@@ -22,6 +24,9 @@ namespace espresso {
       
       virtual void run(int nsteps) = 0;
       
+      /** Abstract class needs also registration in Python */
+
+      static void registerPython();
     };
 
   }
