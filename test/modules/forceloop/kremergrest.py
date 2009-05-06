@@ -57,7 +57,7 @@ def randomWalk(step):
 
     r  = math.sqrt(rsq)
 
-    return Real3D(step*dx, step*dy, step*dz)
+    return Real3D(step / r * dx, step / r * dy, step / r * dz)
 
 particleStorage = Storage()
 position = Real3DProperty(particleStorage)
@@ -73,9 +73,6 @@ bondList = List(pbc, particleStorage, position)
 
 for chainid in range(NCHAINS):
     pid1 = particleStorage.addParticle()
-    x = random.random() * SIZE
-    y = random.random() * SIZE
-    z = random.random() * SIZE
     pos1 = Real3D(random.random() * SIZE, random.random() * SIZE, random.random() * SIZE)
     position[pid1] = pos1
     velocity[pid1] = Real3D(0.0)
