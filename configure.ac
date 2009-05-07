@@ -252,6 +252,7 @@ AC_CONFIG_FILES([Makefile
                  src/bc/Makefile
                  src/bc/unittest/Makefile
                  src/integrator/Makefile
+                 src/thermostat/Makefile
 		 doc/Makefile
 		 doc/dg/Makefile
                  test/Makefile

@@ -8,7 +8,8 @@ SUBDIRS = \
 	pairs \
 	interaction \
 	bc \
-	integrator
+	integrator \
+        thermostat
 
 CLEANFILES =
 
@@ -36,6 +37,7 @@ libespresso_common_la_LIBADD = \
 	interaction/libinteraction.la \
 	bc/libbc.la \
 	integrator/libintegrator.la \
+        thermostat/libthermostat.la \
 	$(ESPRESSO_BOOST_LIBS) \
 	$(PYTHON_LIBS) \
 	$(MPI_LIBS) 
