@@ -2,6 +2,7 @@
 #define _PAIRS_SET_HPP
 
 #include "Computer.hpp"
+#include "particles/Storage.hpp"
 
 namespace espresso {
 
@@ -10,6 +11,8 @@ namespace espresso {
     class Set {
 
     public:
+
+      virtual boost::shared_ptr<particles::Storage> getStorage()const = 0;
 
       virtual void foreach(Computer& comp) = 0;
 

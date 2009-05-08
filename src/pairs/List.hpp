@@ -79,6 +79,10 @@ namespace espresso {
 
       boost::shared_ptr< Property<Real3D> > getCoordinateProperty() const {return coordinates; }
 
+      /** Getter routine for the storage */
+
+      boost::shared_ptr<particles::Storage> getStorage() const { return storage; }
+
       /** This routine will apply a function operator to all pairs.
 
 	  \param pairComputer is the object that provides the function to be applied to all pairs.
