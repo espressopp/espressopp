@@ -1,5 +1,4 @@
 #include "VelocityVerlet.hpp"
-
 #include <boost/foreach.hpp>
 #include <python.hpp>
 #include "particles/Computer.hpp"
@@ -11,7 +10,9 @@ using namespace espresso::particles;
 using namespace boost;
 
     class StepA : public particles::Computer  {
+
     private:
+
       PropertyHandle<Real3D> pos;
       PropertyHandle<Real3D> vel;
       PropertyHandle<Real3D> force;
@@ -20,6 +21,7 @@ using namespace boost;
       real timeStepSqr;
 
     public:
+
       StepA(PropertyHandle<Real3D> _posRef,
             PropertyHandle<Real3D> _velRef,
             PropertyHandle<Real3D> _forceRef, real _timeStep):
@@ -114,8 +116,6 @@ using namespace boost;
     }
 
     VelocityVerlet::~VelocityVerlet() {}
-//  }
-//}
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -135,4 +135,3 @@ VelocityVerlet::registerPython() {
     .def("addForce", &VelocityVerlet::addForce)
     ;
 }
-

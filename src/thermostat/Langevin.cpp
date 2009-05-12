@@ -16,6 +16,14 @@ void Langevin::setGamma(real _gamma) { gamma = _gamma; }
 
 real Langevin::getGamma() const { return gamma; }
 
+void Langevin::thermalizeA() {
+  std::cout << "dogA" << std::endl;
+}
+
+void Langevin::thermalizeB() {
+  std::cout << "dogB" << std::endl;
+}
+
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
 //////////////////////////////////////////////////

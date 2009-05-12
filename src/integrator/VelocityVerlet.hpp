@@ -2,9 +2,7 @@
 #define _VELOCITY_VERLET
 
 #include "types.hpp"
-
 #include "MDIntegrator.hpp"
-
 #include "particles/Set.hpp"
 #include "interaction/Interaction.hpp"
 #include "pairs/Set.hpp"
@@ -35,6 +33,7 @@ namespace espresso {
       std::vector<ForceEvaluation> forceEvaluations;
 
     public:
+
       static void registerPython();
 
       VelocityVerlet(real _timeStep);

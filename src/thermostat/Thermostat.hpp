@@ -12,7 +12,6 @@ namespace espresso {
     protected:
       
       boost::shared_ptr<particles::Set> particles;
-      //Integrator i;
       real temperature;
 
     public:
@@ -22,6 +21,10 @@ namespace espresso {
       virtual void setTemperature(real _temperature) { temperature = _temperature; }
       
       virtual real getTemperature() const { return temperature; }
+
+      virtual void thermalizeA() = 0;
+
+      virtual void thermalizeB() = 0;
       
       /** Abstract class needs also registration in Python */
       static void registerPython();

@@ -30,6 +30,10 @@ namespace espresso {
       /** Method to set gamma. */
       void setGamma(real _gamma);
 
+      virtual void thermalizeA();
+
+      virtual void thermalizeB();
+
       virtual ~Langevin();
 
     };

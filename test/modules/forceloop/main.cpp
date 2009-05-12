@@ -14,6 +14,7 @@
 #include <interaction/FENE.hpp>
 #include <pairs/All.hpp>
 #include <pairs/ForceComputer.hpp>
+#include <thermostat/Langevin.hpp>
 
 #include "ParticleWriter.hpp"
 
@@ -175,6 +176,16 @@ void forceloop() {
   // check to see that particles have new positions
 
   particleStorage->foreach(pWriter);
+
+  // make a shared pointer to a Lanevin thermostat with T=298.15 and gamma=0.5
+  boost::shared_ptr<thermostat::Langevin> lv =
+    boost::shared_ptr<thermostat::Langevin>(new thermostat::Langevin(298.15, 0.5));
+  // write out the gamma value
+  std::cout << lv->getGamma() << "\t" << lv->getTemperature() << std::endl;
+  // set the thermostat for the integrator
+  integrator->setThermostat(lv);
+  // get the integrator and call its thermalizeA method virtually
+  integrator->getThermostat()->thermalizeA();
 
 }
 
