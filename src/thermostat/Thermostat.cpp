@@ -12,11 +12,7 @@ Thermostat::registerPython() {
 
   using namespace boost::python;
 
-  // also register the abstract class MDIntegrator to make virtual functions available
-  // be careful: boost::noncopyable must be used for abstract classes with pure routines
-  // no_init must be used as the abstract class MDIntegrator has no constructor
-
-  class_<Thermostat, boost::shared_ptr<Thermostat>, boost::noncopyable >("thermostat_Set", no_init)
+  class_<Thermostat, boost::shared_ptr<Thermostat>, boost::noncopyable>("thermostat_Thermostat", no_init)
   .def("setTemperature", &Thermostat::setTemperature)
   .def("getTemperature", &Thermostat::getTemperature)
   ;

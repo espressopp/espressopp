@@ -88,10 +88,11 @@ using namespace boost;
       for (int i=0; i < timesteps; i++) {
 
 	// Step A
-
 	StepA stepA(*position, *velocity, *force, timeStep);
-
 	particles->foreach(stepA);
+
+        // call thermalizeA for the chosen thermostat
+        this->getThermostat()->thermalizeA();
 
 	// Force Loop 
 
@@ -107,10 +108,11 @@ using namespace boost;
 	}
 
 	// Step B
-
 	StepB stepB(*velocity, *force, timeStep);
-
 	particles->foreach(stepB);
+
+         // call thermalizeB for the chosen thermostat
+        this->getThermostat()->thermalizeB();
 
       }
     }

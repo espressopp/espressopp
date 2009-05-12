@@ -45,6 +45,8 @@ namespace espresso {
       
       void addForce(boost::shared_ptr<interaction::Interaction> interaction, 
                     boost::shared_ptr<pairs::Set> pairs);
+
+      boost::shared_ptr<particles::Set> getSet() { return particles; }
   
       virtual void run(int timesteps); 
 

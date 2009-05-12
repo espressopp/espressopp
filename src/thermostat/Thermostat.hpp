@@ -16,7 +16,10 @@ namespace espresso {
 
     public:
 
-      virtual ~Thermostat() {}
+      Thermostat(boost::shared_ptr<particles::Set> _particles, real _temperature):
+        particles(_particles), temperature(_temperature) { }
+
+      virtual ~Thermostat() { }
       
       virtual void setTemperature(real _temperature) { temperature = _temperature; }
       

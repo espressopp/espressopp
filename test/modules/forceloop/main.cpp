@@ -169,17 +169,10 @@ void forceloop() {
   integrator->setTimeStep(0.005);
   integrator->addForce(ljint, allpairs);
 
-  // integrate for a certain number of timesteps
-
-  integrator->run(100);
-
-  // check to see that particles have new positions
-
-  particleStorage->foreach(pWriter);
-
   // make a shared pointer to a Lanevin thermostat with T=298.15 and gamma=0.5
   boost::shared_ptr<thermostat::Langevin> lv =
-    boost::shared_ptr<thermostat::Langevin>(new thermostat::Langevin(298.15, 0.5));
+    boost::shared_ptr<thermostat::Langevin>
+      (new thermostat::Langevin(allSet, 1.0, 0.5, position, velocity, force));
   // write out the gamma value
   std::cout << lv->getGamma() << "\t" << lv->getTemperature() << std::endl;
   // set the thermostat for the integrator
@@ -187,6 +180,12 @@ void forceloop() {
   // get the integrator and call its thermalizeA method virtually
   integrator->getThermostat()->thermalizeA();
 
+  // integrate for a certain number of timesteps
+  integrator->run(100);
+
+  // check to see that particles have new positions
+
+  particleStorage->foreach(pWriter);
 }
 
 int main() 

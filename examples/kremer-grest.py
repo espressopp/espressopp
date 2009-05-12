@@ -1,4 +1,4 @@
-import espresso,
+import espresso
 import espresso.bc
 import espresso.decomposition
 import espresso.thermostat
@@ -12,7 +12,7 @@ system['bc'] = espresso.bc.PBC(length=10)
 # set up the decomposition scheme
 system['particles'] = espresso.decomposition.CellStorage(grid=(2, 2, 2), skin=0.1, **system)
 # set up the thermostat
-system['thermostat'] = espresso.thermostat.Langevin(temperatur=1.0, gamma=0.5, **system)
+system['thermostat'] = espresso.thermostat.Langevin(temperature=1.0, gamma=0.5, **system)
 # set up the integrator
 system['integrator'] = espresso.integrator.VelocityVerlet(timestep=0.001, **system)
 
