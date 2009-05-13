@@ -21,9 +21,9 @@
 #
 #     HAVE_MPI
 #
-#   And sets the cache value:
+#   And sets the value:
 #
-#     axes_cv_mpi
+#     axes_mpi
 #
 # LAST MODIFICATION
 #
@@ -77,7 +77,7 @@ AC_CACHE_CHECK([whether an MPI program can be linked as is],
       [axes_cv_mpi_asis=no]))
 
 # if not, check whether adding -lmpi can help
-AS_IF([test "x$axes_cv_mpi_asis" = "xno"],
+if test "x$axes_cv_mpi_asis" = "xno"; then
   AC_CACHE_CHECK([whether MPI requires -lmpi],
       axes_cv_mpi_lib,
     [
@@ -95,24 +95,26 @@ AS_IF([test "x$axes_cv_mpi_asis" = "xno"],
             ]]), 
           [axes_cv_mpi_lib=$axes_mpi_lib],
           [axes_cv_mpi_lib="no"])
-        AS_IF([test "x$axes_cv_mpi_lib" != "xno"],
-          [break])
+        if test "x$axes_cv_mpi_lib" != "xno"; then
+          break
+	fi
       done
 
       # restore flags
       LIBS="$axes_mpi_libs_saved"
-    ]))
+    ])
+fi
 
-
-AS_IF(
-  [test "x$axes_cv_mpi_asis" = "xyes"],
-    [ AC_DEFINE(HAVE_MPI,1,[define if MPI is available])
-      axes_cv_mpi_lib=yes ],
-  [test "x$axes_cv_mpi_lib" != "xno"],
-    [ AC_DEFINE(HAVE_MPI,1) 
-      MPI_LIBS="$axes_cv_mpi_lib" ])
-
-AC_SUBST(MPI_LIBS)
-
+axes_mpi=no
+if test "x$axes_cv_mpi_asis" = "xyes"; then
+    AC_DEFINE(HAVE_MPI,1,[define if MPI is available])
+    axes_cv_mpi_lib=yes
+    axes_mpi=yes
+elif test "x$axes_cv_mpi_lib" != "xno"; then
+    AC_DEFINE(HAVE_MPI,1) 
+    MPI_LIBS="$axes_cv_mpi_lib"
+    AC_SUBST(MPI_LIBS)
+    axes_mpi=yes
+fi
 ])
 

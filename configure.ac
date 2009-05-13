@@ -50,13 +50,15 @@ cat >& AS_MESSAGE_FD <<EOF
 EOF
 
 AXES_PYTHON
-AS_IF([test "x$axes_cv_python_lib" = "xno" || 
-	  test "x$axes_cv_python_include" = "xno"], 
-         [AC_MSG_FAILURE([Could not find python.])])
+if test "x$axes_cv_python_lib" = "xno" || 
+	  test "x$axes_cv_python_include" = "xno"; then	
+	  AC_MSG_FAILURE([Could not find python.])
+fi
 
 AXES_MPI
-AS_IF([test "x$axes_cv_mpi" = "xno"],
-       [AC_MSG_FAILURE([Could not find mpi.])])
+if test "x$axes_mpi" = "xno"; then
+       AC_MSG_FAILURE([Could not find mpi.])
+fi
 
 
 ###################################################################
