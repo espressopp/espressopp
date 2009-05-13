@@ -26,8 +26,12 @@ namespace espresso {
 	  \param dist: distance vector between the two particles
 	  \param p1, p2: references to the two particles
 
-	  Note: The references are necessary if more property data of the particles is
-	  needed than only the distance.
+	  The pair computer gets the distance vector between the
+	  particles, as it is hard to get otherwise and furthermore
+	  some pair generators compute it anyway.
+
+	  Note: The references are necessary if more property data of
+	  the particles is needed than only the distance.
       */
       virtual void operator()(const Real3D &dist, 
 			      const ParticleHandle p1, 
