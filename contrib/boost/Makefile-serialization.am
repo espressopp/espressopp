@@ -13,8 +13,8 @@ libespresso_boost_la_SOURCES += \
 	libs/serialization/src/binary_iarchive.cpp \
 	libs/serialization/src/binary_oarchive.cpp \
 	libs/serialization/src/extended_type_info.cpp \
-	libs/serialization/src/extended_type_info_no_rtti.cpp \
 	libs/serialization/src/extended_type_info_typeid.cpp \
+	libs/serialization/src/extended_type_info_no_rtti.cpp \
 	libs/serialization/src/polymorphic_iarchive.cpp \
 	libs/serialization/src/polymorphic_oarchive.cpp \
 	libs/serialization/src/stl_port.cpp \
