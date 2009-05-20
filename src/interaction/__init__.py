@@ -16,7 +16,7 @@ class LennardJonesLocal(_LennardJones) :
         self.set(epsilon, sigma, cutoff)
 
     def set(self, epsilon=None, sigma=None, cutoff=None) :
-        """set( (float)epsilon, (float)sigma, (float)cutoff ) -> None -- Set the "parameters" of the interaction.
+        """set( (float)epsilon, (float)sigma, (float)cutoff ) -> None -- Set the \"parameters\" of the interaction.
         """
         return _LennardJones.set(self,
                                  choose(epsilon, self.epsilon),
@@ -42,30 +42,6 @@ class LennardJonesLocal(_LennardJones) :
         
 if pmi.IS_CONTROLLER :
     # wrap LennardJones
-
-    # class LennardJones(object) :
-    #     __metaclass__ = PMIProxy
-    #     pmiclass = 'LennardJonesLocal'
-    #     pmicall = [ 'set' ]
-    #     pmiinvoke = []
-    #     pmilocal = [ pmi.ALL ]
-
-#     import functools
-#     def pmi_create(cls) :
-#         def wrap_wrap(f) :
-#             @functools.wraps(f)
-#             def wrapper(self, *args, **keywds):
-#                 self.local = pmi.create(cls, *args, **keywds)
-#                 self.pmi_class = cls
-#                 return f(self, *args, **keywds)
-#             return wrapper
-#         return wrap_wrap
-
-#     def pmi_call(f) :
-#         @functools.wraps(f)
-#         def wrapper(self, *args, **kwds) :
-#             pmi.call(f, self.local, *args, **kwds)
-#         return wrapper
     
     pmi.exec_('from espresso.interaction import LennardJonesLocal')
     class LennardJones (object):
