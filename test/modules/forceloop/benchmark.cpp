@@ -43,13 +43,15 @@ static inline real dround(real x) { return floor(x + 0.5); }
 
 class TestEspresso {
 public:
-  Storage storage;
-  PropertyId position, force;
+  boost::shared_ptr<Storage> storage;
+  boost::shared_ptr<Property<Real3D> > position, force;
   size_t npart;
 
-    TestEspresso(size_t nparticles): npart(nparticles) {
-        position = storage.addProperty<Real3D>();
-        force = storage.addProperty<Real3D>();
+    TestEspresso(size_t nparticles):
+      storage(new Storage()),
+      position(new Property<Real3D>(storage)),
+      force(new Property<Real3D>(storage)),
+      npart(nparticles) {
     }
 
     void addParticle(const Real3D &pos);
@@ -66,31 +68,27 @@ public:
 
     Real3D getForce(size_t i) {
       // HACK!
-      ParticleReference ref = storage.getParticleReference(ParticleId(i + 1));
-      return storage.getPropertyReference<Real3D>(force)[ref];
+      return (*force)[ParticleId(i + 1)];
     }
 };
 
 void TestEspresso::addParticle(const Real3D &pos)
 {
-    ParticleReference ref = storage.addParticle();
-    PropertyReference<Real3D> positionRef = storage.getPropertyReference<Real3D>(position);
-    PropertyReference<Real3D> forceRef    = storage.getPropertyReference<Real3D>(force);
-
-    positionRef[ref] = pos;
-    forceRef[ref] = 0.0;
+    ParticleId id = storage->addParticle();
+    (*position)[id] = pos;
+    (*force)[id] = 0.0;
 }
 
 void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {
-    bc::PBC pbc(size);
-    particles::All allset(&storage);
-    pairs::All allpairs(pbc, allset, position);
-    interaction::LennardJones ljint;
-    ljint.set(epsilon, sigma, cutoff);
-    pairs::ForceComputer *forceCompute =
-        ljint.createForceComputer(pairs::ForceComputer(storage.getPropertyReference<Real3D>(force)));
-    allpairs.foreach(*forceCompute);
-    delete forceCompute;
+  boost::shared_ptr<bc::PBC> pbc(new bc::PBC(size));
+  boost::shared_ptr<particles::All> allset(new particles::All(storage));
+  pairs::All allpairs(pbc, allset, position);
+  interaction::LennardJones ljint;
+  ljint.set(epsilon, sigma, cutoff);
+  pairs::ForceComputer *forceCompute =
+    ljint.createForceComputer(pairs::ForceComputer(*force));
+  allpairs.foreach(*forceCompute);
+  delete forceCompute;
 }
 
 class EmptyPairComputer: public pairs::ConstComputer {
@@ -98,17 +96,17 @@ public:
     EmptyPairComputer() {}
 
     virtual void operator()(const Real3D &dist,
-			    ConstParticleReference ref1,
-			    ConstParticleReference ref2) {
+			    ConstParticleHandle ref1,
+			    ConstParticleHandle ref2) {
     }
 };
 
 void TestEspresso::runEmptyPairLoop() {
-    bc::PBC pbc(size);
-    particles::All allset(&storage);
-    pairs::All allpairs(pbc, allset, position);
-    EmptyPairComputer ljc;
-    allpairs.foreach(ljc);
+  boost::shared_ptr<bc::PBC> pbc(new bc::PBC(size));
+  boost::shared_ptr<particles::All> allset(new particles::All(storage));
+  pairs::All allpairs(pbc, allset, position);
+  EmptyPairComputer ljc;
+  allpairs.foreach(ljc);
 }
 
 class MinDistComputer: public pairs::ConstComputer {
@@ -118,8 +116,8 @@ public:
     MinDistComputer(): min(1e10) {}
 
     virtual void operator()(const Real3D &dist,
-			    ConstParticleReference ref1,
-			    ConstParticleReference ref2) {
+			    ConstParticleHandle ref1,
+			    ConstParticleHandle ref2) {
 	real d = dist.sqr();
 	if (min > d) {
 	    min = d;
@@ -128,32 +126,32 @@ public:
 };
 
 real TestEspresso::calculateMinDist() {
-    bc::PBC pbc(size);
-    particles::All allset(&storage);
-    pairs::All allpairs(pbc, allset, position);
-    MinDistComputer mincomp;
-    allpairs.foreach(mincomp);
-    return sqrt(mincomp.min);
+  boost::shared_ptr<bc::PBC> pbc(new bc::PBC(size));
+  boost::shared_ptr<particles::All> allset(new particles::All(storage));
+  pairs::All allpairs(pbc, allset, position);
+  MinDistComputer mincomp;
+  allpairs.foreach(mincomp);
+  return sqrt(mincomp.min);
 }
 
 class AverageComputer: public particles::ConstComputer {
 public:
 
-    ConstPropertyReference<Real3D> property;
-    real average;
+  ConstPropertyHandle<Real3D> property;
+  real average;
 
-    AverageComputer(const ConstPropertyReference<Real3D> &_property)
-      : property(_property), average(0) {}
+  AverageComputer(const ConstPropertyHandle<Real3D> &_property)
+    : property(_property), average(0) {}
 
-    virtual void operator()(ConstParticleReference ref) {
-        const Real3D p = property[ref];
-        average += sqrt(p.sqr());
-    }
+  virtual void operator()(ConstParticleHandle ref) {
+    const Real3D p = property[ref];
+    average += sqrt(p.sqr());
+  }
 };
 
 real TestEspresso::calculateAverage() {
-    particles::All allset(&storage);
-    AverageComputer avgcompute(storage.getPropertyReference<Real3D>(force));
+    particles::All allset(storage);
+    AverageComputer avgcompute(*force);
     allset.foreach(avgcompute);
     return avgcompute.average;
 }
@@ -162,14 +160,14 @@ class EmptyComputer: public particles::ConstComputer {
 public:
     EmptyComputer() {}
 
-    virtual void operator()(ConstParticleReference ref) {
+    virtual void operator()(ConstParticleHandle ref) {
     }
 };
 
 void TestEspresso::runEmptyLoop() {
-    particles::All allset(&storage);
-    EmptyComputer avgcompute;
-    allset.foreach(avgcompute);
+  particles::All allset(storage);
+  EmptyComputer avgcompute;
+  allset.foreach(avgcompute);
 }
 
 /***********************************************************************************
