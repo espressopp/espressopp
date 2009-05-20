@@ -37,7 +37,7 @@ namespace espresso {
       ///
       virtual void foreach(ConstComputer &computer) const = 0;
 
-      boost::shared_ptr<Storage> getStorage() { return theStorage; }
+      boost::shared_ptr<Storage> getStorage() const { return theStorage; }
 
     public:
 
