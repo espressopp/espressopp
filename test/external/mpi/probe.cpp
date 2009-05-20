@@ -28,6 +28,7 @@ int main(int argc, char* argv[])
       
       for (int i = 0; i < NUM_TESTS; i++)
 	MPI::COMM_WORLD.Send(&data, N, MPI_DOUBLE, 1, 0);
+
     } else if (rank == 1) {
       double* data = 0;
       MPI::Status status;
@@ -40,7 +41,7 @@ int main(int argc, char* argv[])
 	MPI::COMM_WORLD.Recv(data, count, MPI_DOUBLE, 0, 0);
       }
     }
-    cout << timer << endl;
+    cout << "Probe: Rank " << rank << ": " << timer << endl;
   }
 
   if (MPI::COMM_WORLD.Get_size() > 1) {
@@ -54,6 +55,7 @@ int main(int argc, char* argv[])
       
       for (int i = 0; i < NUM_TESTS; i++)
 	MPI::COMM_WORLD.Send(&data, N, MPI_DOUBLE, 1, 0);
+
     } else if (rank == 1) {
       double data[20];
       MPI::Status status;
@@ -62,7 +64,11 @@ int main(int argc, char* argv[])
 	MPI::COMM_WORLD.Recv(data, N, MPI_DOUBLE, 0, 0);
       }
     }
-    cout << timer << endl;
+
+    cout << "No Probe: Rank " << rank << ": " << timer << endl;
+  } else {
+    cout << "Please start at least two MPI tasks!" << endl;
+    return 1;
   }
 
   MPI::Finalize();
