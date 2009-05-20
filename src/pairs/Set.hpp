@@ -12,6 +12,8 @@ namespace espresso {
 
     public:
 
+      virtual ~Set() {}
+
       virtual boost::shared_ptr<particles::Storage> getStorage()const = 0;
 
       virtual void foreach(Computer& comp) = 0;

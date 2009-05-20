@@ -18,14 +18,14 @@ namespace espresso {
  
      private:
        boost::shared_ptr<particles::Set> set;
-       boost::shared_ptr<bc::BC> bc;
-       boost::shared_ptr< Property<Real3D> > coordinates;
+       boost::shared_ptr<const bc::BC> bc;
+       boost::shared_ptr<const Property<Real3D> > coordinates;
 
      public:
        static void registerPython();
 
        /** Destructor. */
-       ~All();
+       virtual ~All();
 
        /** Constructor for this class 
 
@@ -34,21 +34,21 @@ namespace espresso {
 	 \param coordinates the identifier of the coordinates property to use
 
        */
-       All(boost::shared_ptr<bc::BC> _bc, 
+       All(boost::shared_ptr<const bc::BC> _bc, 
            boost::shared_ptr<particles::Set> _set, 
-           boost::shared_ptr< Property<Real3D> > _coordinates);
+           boost::shared_ptr<const Property<Real3D> > _coordinates);
 
        /** Getter routine for the boundary conditions. */
-       boost::shared_ptr<bc::BC> getBC() const { return bc; }
+       boost::shared_ptr<const bc::BC> getBC() const { return bc; }
 
        /** Getter routine for the set of particles. */
        boost::shared_ptr<particles::Set> getSet() const { return set; }
 
        /** Getter routine for the coordinate property */
-       boost::shared_ptr< const Property<Real3D> > getCoordinateProperty() const { return coordinates; }
+       boost::shared_ptr<const Property<Real3D> > getCoordinateProperty() const { return coordinates; }
 
        /** Getter routine for the storage */
-       boost::shared_ptr< particles::Storage > getStorage() const { return set->getStorage(); }
+       boost::shared_ptr<particles::Storage> getStorage() const { return set->getStorage(); }
 
        /** This routine will apply a function operator to all pairs.
          \param pairComputer is the object that provides the function to be applied to all pairs.

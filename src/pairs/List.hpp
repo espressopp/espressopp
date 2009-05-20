@@ -18,8 +18,8 @@ namespace espresso {
     private:
 
       boost::shared_ptr<particles::Storage> storage; 
-      boost::shared_ptr<bc::BC> bc;
-      boost::shared_ptr< Property<Real3D> > coordinates;
+      boost::shared_ptr<const bc::BC> bc;
+      boost::shared_ptr<const Property<Real3D> > coordinates;
       typedef std::pair<ParticleId,
                         ParticleId> Tuple;
       std::vector<Tuple> id_list;
@@ -35,9 +35,9 @@ namespace espresso {
 	  \param coordinates the identifier of the coordinates property to use
 
       */
-      List (boost::shared_ptr<bc::BC> bc, 
+      List (boost::shared_ptr<const bc::BC> bc, 
             boost::shared_ptr<particles::Storage> storage,
-	    boost::shared_ptr< Property<Real3D> > coordinates);
+	    boost::shared_ptr<const Property<Real3D> > coordinates);
 
       size_t size() const;
 
@@ -73,11 +73,11 @@ namespace espresso {
 
       /** Getter routine for the boundary conditions. */
 
-      boost::shared_ptr<bc::BC> getBC() const { return bc; }
+      boost::shared_ptr<const bc::BC> getBC() const { return bc; }
 
       /** Getter routine for the ID of the coordinate */
 
-      boost::shared_ptr< Property<Real3D> > getCoordinateProperty() const {return coordinates; }
+      boost::shared_ptr<const Property<Real3D> > getCoordinateProperty() const {return coordinates; }
 
       /** Getter routine for the storage */
 

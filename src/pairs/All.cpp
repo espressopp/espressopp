@@ -87,9 +87,9 @@ All::~All() {}
   All::All(boundary_conditions, particle_set)
   -------------------------------------------------------------------------- */
 
-All::All(shared_ptr<bc::BC> _bc,
+All::All(shared_ptr<const bc::BC> _bc,
          shared_ptr<particles::Set> _set,
-         shared_ptr< Property<Real3D> > _coordinates) :
+         shared_ptr<const Property<Real3D> > _coordinates) :
   set(_set),
   bc(_bc),
   coordinates(_coordinates)
@@ -124,7 +124,7 @@ All::registerPython() {
 
   class_<All, shared_ptr<All>, bases<Set> >
     ("pairs_All", init<shared_ptr<bc::BC>, shared_ptr<particles::Set>, 
-                  shared_ptr<espresso::Property<Real3D> > >())
+                  shared_ptr< Property<Real3D> > >())
   .def("getBC", &All::getBC)
   .def("getSet", &All::getSet)
   .def("getCoordinateProperty", &All::getCoordinateProperty)

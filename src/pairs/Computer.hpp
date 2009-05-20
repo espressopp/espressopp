@@ -22,6 +22,8 @@ namespace espresso {
       typedef void                       result_type;
       //@}
 
+      virtual ~ComputerBase() {}
+
       /** Interface of the routine that is applied to particle pairs
 	  \param dist: distance vector between the two particles
 	  \param p1, p2: references to the two particles

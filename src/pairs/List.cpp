@@ -16,9 +16,9 @@ List::~List()
 
 /* Constructor for this class  */
 
-List::List(boost::shared_ptr<bc::BC> _bc, 
+List::List(boost::shared_ptr<const bc::BC> _bc, 
            boost::shared_ptr<Storage> _storage, 
-           boost::shared_ptr< Property<Real3D> > _coordinates) :
+           boost::shared_ptr<const Property<Real3D> > _coordinates) :
 
    storage(_storage),
    bc(_bc),
