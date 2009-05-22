@@ -1,6 +1,7 @@
 #include "bindings.hpp"
 #include "Real3D.hpp"
 #include "Property.hpp"
+#include "esutil/Collectives.hpp"
 #include <hello/bindings.hpp>
 #include <bc/bindings.hpp>
 #include <particles/bindings.hpp>
@@ -15,7 +16,7 @@ void espresso::registerPython() {
   espresso::registerPythonReal3D();
   espresso::registerPythonParticle();
   espresso::registerPythonProperties();
-
+  espresso::esutil::Collectives::registerPython();
   espresso::hello::registerPython();
   espresso::bc::registerPython();
   espresso::pairs::registerPython();

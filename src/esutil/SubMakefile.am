@@ -1,6 +1,7 @@
 DIST_SUBDIRS += esutil/unittest
 
 nobase_pkginclude_HEADERS += \
+	esutil/Collectives.hpp \
 	esutil/SmallVector.hpp \
 	esutil/DerivableSmallVector.hpp \
 	esutil/Vector3D.hpp \
@@ -12,10 +13,12 @@ nobase_pkginclude_HEADERS += \
 
 libespresso_common_la_SOURCES += \
 	esutil/TupleVector.cpp \
+	esutil/Collectives.cpp \
 	esutil/Timer.cpp 
 
 python_SCRIPTS += \
-	esutil/__init__.py
+	esutil/__init__.py \
+	esutil/collectives.py
 
 noinst_LTLIBRARIES += \
 	libgenlogger.la \
