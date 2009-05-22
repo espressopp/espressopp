@@ -49,45 +49,62 @@ cat >& AS_MESSAGE_FD <<EOF
 **********************************************************************
 EOF
 
+###################################################################
+#
+# PYTHON
+#
+###################################################################
+
+# Python libs
 AXES_PYTHON
 if test "x$axes_cv_python_lib" = "xno" || 
 	  test "x$axes_cv_python_include" = "xno"; then	
 	  AC_MSG_FAILURE([Could not find python.])
 fi
 
+# python executable
+AC_PATH_PROG([PYTHON], [python], [no])
+
+###################################################################
+#
+# MPI
+#
+###################################################################
+
+# MPI lib
 AXES_MPI
 if test "x$axes_mpi" = "xno"; then
        AC_MSG_FAILURE([Could not find mpi.])
 fi
 
-
-###################################################################
-#                                                                 #
-#  mpiexec/mympiexec.sh                                           #
-#                                                                 #
-###################################################################
-
-AS_IF([test "x$axes_cv_mpi" != "xno"],[
+# mpiexec executable
+if test "x$axes_cv_mpi" != "xno"; then
   AC_ARG_VAR([MPIEXEC], [MPI command mpiexec])
-  AS_IF([test "x$MPIEXEC" = "x"],
-    [AC_PATH_PROG([MPIEXEC], [mpiexec], [no])])
+  if test "x$MPIEXEC" = "x"; then
+    AC_PATH_PROG([MPIEXEC], [mpiexec], [no])
+  fi
 
   AC_MSG_CHECKING([for mympiexec])
   AC_ARG_WITH([mympiexec],
      AS_HELP_STRING([--with-mympiexec@<:@=script@:>@],
       [specify the program or script that should be used to run the parallel build tests.
 Defaults to BUILDDIR/mympiexec.sh]),
-      [AS_IF([test "$withval" = "no"],
-         [MYMPIEXEC=""],
-	 [MYMPIEXEC="$withval"
-          dir=`AS_DIRNAME([$MYMPIEXEC])`
-	  AS_IF([test "x$dir" = "x."],
-                  [MYMPIEXEC="`pwd`/$MYMPIEXEC"])
-         ])],
+      [if test "$withval" = "no"; then
+         MYMPIEXEC=""
+       else
+	 MYMPIEXEC="$withval"
+         dir=`AS_DIRNAME([$MYMPIEXEC])`
+	 if test "x$dir" = "x."; then
+           MYMPIEXEC="`pwd`/$MYMPIEXEC"
+         fi
+      fi],
       [ MYMPIEXEC="`pwd`/mympiexec.sh" ])
   AC_MSG_RESULT($MYMPIEXEC)
   AC_SUBST(MYMPIEXEC)
-])
+fi
+
+ESPRESSO_MPIEXEC="`pwd`/bin/espp_mpiexec.sh"
+AC_SUBST(ESPRESSO_MPIEXEC)
 
 AC_CACHE_SAVE
 
@@ -110,12 +127,12 @@ AC_ARG_WITH([external-boost],
 AS_IF([test "x$with_external_boost" = "xno"],
     [ AC_MSG_RESULT([no])
       # if we use the internal boost, set the configuration variables
-      boost_internal_dir=`pwd`"/contrib/boost/"
+      boost_internal_dir=`pwd`"/contrib/boost"
       ESPRESSO_BOOST_LIBS="$boost_internal_dir/libespresso_boost.la"
       BOOST_UNITTEST_LIBS="$boost_internal_dir/libboost_unit_test_framework.la"
       AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/contrib/boost"
-      UTEXEC_CPPFLAGS="-I\$top_srcdir/contrib/boost" 
-      UTEXEC_LDFLAGS="-L\$top_builddir/contrib/boost"],
+      UTEXEC_CPPFLAGS="-I$srcdir/contrib/boost" 
+      UTEXEC_LDFLAGS="-L$boost_internal_dir"],
     [ AC_MSG_RESULT([yes])
       # if we use external boost, do some tests
 
@@ -240,35 +257,20 @@ AC_CONFIG_FILES([Makefile
                  contrib/boost/Makefile
                  contrib/boostmpi/Makefile
                  src/Makefile 
-                 src/unittest/Makefile
-		 src/include/Makefile
-                 src/esutil/Makefile
-                 src/esutil/unittest/Makefile
-                 src/hello/Makefile
-                 src/particles/Makefile
-                 src/particles/unittest/Makefile
-                 src/decomposition/Makefile
-                 src/pairs/Makefile
-                 src/pairs/unittest/Makefile
-                 src/interaction/Makefile
-                 src/bc/Makefile
-                 src/bc/unittest/Makefile
-                 src/integrator/Makefile
-                 src/thermostat/Makefile
 		 doc/Makefile
 		 doc/dg/Makefile
                  test/Makefile
                  test/modules/Makefile
+                 test/modules/logging/Makefile 
                  test/modules/forceloop/Makefile
                  test/external/Makefile 
                  test/external/mpi/Makefile 
-                 test/external/logging/Makefile 
                  test/external/boost.mpi/Makefile 
                  test/external/boost.python/Makefile 
                  ])
 
-AC_CONFIG_FILES([bin/utexec.sh],
-                [chmod ugo+x bin/utexec.sh])
+AC_CONFIG_FILES([bin/utexec],
+                [chmod ugo+x bin/utexec])
 AC_CONFIG_FILES([bin/espp_mpiexec.sh],
                 [chmod ugo+x bin/espp_mpiexec.sh])
 AC_CONFIG_FILES([test/runtests.sh],

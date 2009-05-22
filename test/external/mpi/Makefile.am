@@ -13,5 +13,5 @@ cpi_SOURCES = cpi.cpp
 comm_SOURCES = comm.cpp
 mpiTest_SOURCES = mpiTest.cpp
 probe_SOURCES = probe.cpp
-probe_LDADD = $(LDADD) $(top_builddir)/src/esutil/libesutil.la
+probe_LDADD = $(LDADD) $(top_builddir)/src/esutil/Timer.lo
 barrier_SOURCES = barrier.cpp

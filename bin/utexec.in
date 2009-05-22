@@ -1,0 +1,348 @@
+#! @PYTHON@
+# -*- mode: python -*-
+# 
+# Script that collects, compiles, links and executes unit tests
+import sys, getopt, os, glob
+
+def Usage():
+    print("""USAGE:
+  utexec -h
+  utexec [-nvpPc] [-s=SRCDIR] [-b=BUILDDIR] [UNITTESTS...]
+
+DESCRIPTION:
+  utexec finds and executes C++, Python and parallel Python unittests
+  for ESPResSo++. 
+
+OPTIONS:
+  -p, -P and -c specify which type of unittests are to be run. If none
+  of these options is specified, all unittests will be run.
+
+  -h  Output this help page.
+
+  -n|--dry-run
+      Only print the commands that will be executed, don't actually
+      run them.
+
+  -v|--verbose
+      Be more verbose.
+
+  -s=SRCDIR|--srcdir=SRCDIR
+      Specify the source dir where the unittest are to be found.
+
+  -b=BUILDDIR|--buildir=BUILDDIR
+      Specify the build dir where the unittest are to be built and
+      executed.
+
+  -p|--python
+      Specify that the python unittests are to be run.
+
+  -P|--parallel
+      Specify that the parallel python unittests are to be run.
+
+  -c|--cpp
+      Specify that the C++ unittests are to be compiled, linked and
+      run.
+      
+""")
+
+def die(msg):
+    print('ERROR: ' + msg)
+    if savecwd: chdir(savewd)
+    sys.exit(1)
+
+utdir = 'unittest/'
+
+##################################################
+# CONSTANTS
+top_srcdir="@abs_top_srcdir@"
+if not top_srcdir.endswith('/'): top_srcdir += '/'
+top_builddir="@abs_top_builddir@"
+if not top_builddir.endswith('/'): top_builddir += '/'
+
+PYRUN = "@PYTHON@"
+ESPRESSO_MPIEXEC = "@ESPRESSO_MPIEXEC@"
+HAVE_MPI = "@HAVE_MPI@"
+NUM_PROCS = [1, 2]
+
+# variables for C++ Unittest compilation
+CPPFLAGS = os.getenv('CPPFLAGS', '@CPPFLAGS@')
+LDFLAGS = os.getenv('LDFLAGS', '@LDFLAGS@')
+CXX = os.getenv('CXX', '@CXX@')
+CXXLD = os.getenv('CXXLD', CXX)
+CXXFLAGS = os.getenv('CXXFLAGS', '@CXXFLAGS@')
+UTEXEC_CPPFLAGS = '@UTEXEC_CPPFLAGS@'
+UTEXEC_LDFLAGS = '@UTEXEC_LDFLAGS@'
+BOOST_UNITTEST_LIBS = '@BOOST_UNITTEST_LIBS@'
+LIBTOOL = os.getenv('LIBTOOL', top_builddir + 'libtool')
+LIBTOOLFLAGS = os.getenv('LIBTOOLFLAGS', '')
+INCLUDES = os.getenv('INCLUDES', '')
+CPPFLAGS = ''.join(
+    [CPPFLAGS,
+     ' -I', top_builddir, 'src',
+     ' -I', top_srcdir, 'src',
+     ' -I', top_srcdir, 'src/include',
+     ' ', UTEXEC_CPPFLAGS])
+LDFLAGS += ' ' + UTEXEC_LDFLAGS
+LIBS = top_builddir + 'src/libespresso_common.la ' + BOOST_UNITTEST_LIBS
+LTCALL = LIBTOOL + ' --tag=CXX ' + LIBTOOLFLAGS
+
+##################################################
+# PARSE COMMAND LINE ARGS
+try:
+    optlist, tests = getopt.getopt(
+        sys.argv[1:], 'nvhs=b=pcP',
+        ['dry-run', 'verbose', 'help', 'srcdir=', 'builddir=',
+         'cpp', 'python', 'parallel'])
+except getopt.GetoptError, e:
+    print("Option error: " + str(e))
+    Usage()
+    sys.exit(1)
+
+builddir = None
+srcdir = None
+verbose = False
+dryrun = False
+do_python = do_cpp = do_parallel = False
+for k, v in optlist:
+    if k == '-h' or k == '--help':
+        Usage()
+        sys.exit(0)
+    elif k == '-v' or k == '--verbose':
+        verbose = True
+    elif k == '-s' or k == '--srcdir':
+        srcdir = v
+    elif k == '-b' or k == '--builddir':
+        builddir = v
+    elif k == '-n' or k == '--dry-run':
+        dryrun = True
+    elif k == '-p' or k == '--python':
+        do_python = True
+    elif k == '-P' or k == '--parallel':
+        do_parallel = True
+    elif k == '-c' or k == '--cpp':
+        do_cpp = True
+
+if not do_python and not do_cpp and not do_parallel:
+    do_python = do_cpp = do_parallel = True
+
+##################################################
+# DETERMINE BUILDDIR
+savecwd = os.getcwd()
+
+if builddir is None: builddir = savecwd
+
+# add trailing slash to builddir
+if not builddir.endswith('/'):
+    builddir = builddir + '/'
+# add trailing utdir to builddir
+if not builddir.endswith(utdir):
+    builddir += utdir
+        
+# check whether builddir is writeable, readable and executable
+if os.access(builddir, os.R_OK | os.X_OK):
+    os.chdir(builddir)
+    if verbose: print("BUILDDIR = " + builddir)
+else:
+    # create builddir
+    os.makedirs(builddir)
+    os.chdir(builddir)
+    if verbose:
+        print("Created builddir:")
+        print("BUILDDIR = " + builddir)
+
+##################################################
+# DETERMINE SRCDIR
+if srcdir is None:
+    # replace top_builddir with top_srcdir, if possible
+    srcdir = builddir.replace(top_builddir, top_srcdir)
+
+# add trailing slash to srcdir
+if not srcdir.endswith('/'):
+    srcdir = srcdir + '/'
+# add trailing utdir to srcdir
+if not srcdir.endswith(utdir):
+    srcdir += utdir
+
+# check whether srcdir is readable and executable
+if not os.access(srcdir, os.R_OK | os.X_OK):
+    die("Cannot access source dir " + srcdir)
+if verbose:
+    print("SRCDIR = " + srcdir)
+
+##################################################
+# DETERMINE WHICH TESTS TO RUN
+os.chdir(srcdir)
+
+class NoTest(Exception):
+    pass
+
+cpp_tests = []
+py_tests = []
+py_ptests = []
+
+if len(tests):
+    # split into different types of unittests
+    for test in tests:
+        if test.endswith('.py'):
+            if test.startswith('test_'):
+                py_tests.append(test)
+                continue
+            elif test.startswith('ptest_'):
+                py_ptests.append(test)
+                continue
+            elif os.access('test_' + test, os.R_OK):
+                py_tests.append('test_' + test)
+                continue
+            elif os.access('ptest_' + test, os.R_OK):
+                py_ptests.append('ptest_' + test)
+                continue
+        elif test.endswith('.cpp'):
+            if test.startswith('Test'):
+                cpp_tests.append(test)
+                continue
+            elif os.access('Test' + test, os.R_OK):
+                cpp_tests.append('Test' + test)
+                continue
+        elif test.startswith('Test'):
+            if os.access(test + '.cpp', os.R_OK):
+                cpp_tests.append(test + '.cpp')
+                continue
+        elif test.startswith('test_'):
+            if os.access(test + '.py', os.R_OK):
+                py_tests.append(test + '.py')
+                continue
+        elif test.startswith('ptest_'):
+            if os.access(test + '.py', os.R_OK):
+                py_ptests.append(test + '.py')
+                continue
+        else:
+            if os.access('Test' + test + '.cpp', os.R_OK):
+                cpp_tests.append('Test' + test + '.cpp')
+                continue
+            elif os.access('test_' + test + '.py', os.R_OK):
+                py_tests.append('test_' + test + '.py')
+                continue
+            elif os.access('ptest_' + test + '.py', os.R_OK):
+                py_ptests.append('ptest_' + test + '.py')
+                continue
+        die("Cannot identify test " + test)
+else:
+    # collect a list of unittests
+    if do_cpp:
+        cpp_tests = glob.glob('Test*.cpp')
+    if do_python:
+        py_tests = glob.glob('test_*.py')
+    if do_parallel:
+        py_ptests = glob.glob('ptest_*.py')
+
+os.chdir(builddir)
+
+if (do_cpp and not cpp_tests) and \
+       (do_python and not py_tests) and \
+       (do_parallel and not py_ptests):
+    print("No unittests found.")
+    sys.exit(0)
+
+if not HAVE_MPI:
+    py_tests.extend(py_ptests)
+
+if do_cpp:
+    print("Will do the following C++ unittests:")
+    print(cpp_tests)
+if do_python:
+    print("Will do the following Python unitests:")
+    print(py_tests)
+if HAVE_MPI and do_parallel:
+    print("Will do the following parallel Python tests:")
+    print(py_ptests)
+
+if do_cpp:
+    print("\n**************************************************")
+    print('**** RUNNING C++ UNITTESTS')
+    ##################################################
+    # COMBINE THE COMPILATION AND LINKER COMMANDS
+    LTCXXCOMPILE = ''.join(
+        [LTCALL,
+         ' --mode=compile ', CXX,
+         ' ', INCLUDES,
+         ' ', CPPFLAGS,
+         ' ', CXXFLAGS])
+    LTCXXLINK = ''.join(
+        [LTCALL,
+         ' --mode=link ', CXXLD,
+         ' ', CXXFLAGS,
+         ' ', LDFLAGS,
+         ' ', LIBS])
+    LTRUN = LTCALL + ' --mode=execute'
+    if verbose:
+        LTRUN += ' -v'
+        
+        print("LTCXXCOMPILE = " + LTCXXCOMPILE)
+        print("LTCXXLINK = " + LTCXXLINK)
+        print("LTRUN = " + LTRUN)
+        
+    ##############################################
+    # COMPILE, LINK AND EXECUTE C++ UNITTESTS
+    for test in cpp_tests:
+        print("**************************************************")
+        print("** " + test)
+
+        # strip ".cpp" from the end
+        test = test[:-4]
+
+        print('** COMPILING ' + test)
+        cmd = LTCXXCOMPILE + ' -c ' + srcdir + test + '.cpp'
+        print(cmd)
+        if not dryrun:
+            if os.system(cmd):
+                print('ERROR: Compiling test %s failed.' % test)
+                sys.exit(1)
+                
+        print('\n** LINKING ' + test)
+        cmd = LTCXXLINK + ' ' + test + '.lo -o ./' + test
+        print(cmd)
+        if not dryrun:
+            if os.system(cmd):
+                print('ERROR: Linking test %s failed.' % test)
+                sys.exit(1)
+
+        print('\n** EXECUTING ' + test)
+        cmd = LTRUN + ' ./' + test
+        print(cmd)
+        if not dryrun:
+            os.system(cmd)
+            print('')
+
+##############################################
+# EXECUTE THE PYTHON UNITTESTS
+if do_python:
+    print("\n**************************************************")
+    print('**** RUNNING PYTHON UNITTESTS')
+    for test in py_tests:
+        print("**************************************************")
+        print("** " + test)
+        cmd = PYRUN + ' ' + srcdir + test
+        if verbose: cmd += ' -v'
+        print(cmd)
+        if not dryrun:
+            os.system(cmd)
+            print('')
+
+##############################################
+# EXECUTE THE PARALLEL UNITTESTS
+if HAVE_MPI and do_parallel:
+    for NP in NUM_PROCS:
+        print("\n**************************************************")
+        print('**** RUNNING PARALLEL PYTHON UNITTESTS (%d CPUs)' % NP)
+        PARALLELPYTHON = ESPRESSO_MPIEXEC + ' -n ' + str(NP) + ' ' + PYRUN
+
+        for test in py_ptests:
+            print("**************************************************")
+            print("** " + test + ' (%d CPUs)' % NP)
+            cmd = PARALLELPYTHON + ' ' + srcdir + test
+            if verbose: cmd += ' -v'
+            print(cmd)
+            if not dryrun:
+                os.system(cmd)
+                print('')
+

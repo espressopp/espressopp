@@ -1,0 +1,12 @@
+DIST_SUBDIRS += bc/unittest
+
+nobase_pkginclude_HEADERS += \
+        bc/bindings.hpp \
+        bc/BC.hpp \
+	bc/PBC.hpp
+
+libespresso_common_la_SOURCES += \
+        bc/bindings.cpp \
+        bc/BC.cpp \
+	bc/PBC.cpp
+

@@ -1,2 +1,2 @@
-SUBDIRS = logging boost.python mpi boost.mpi 
+SUBDIRS = boost.python mpi boost.mpi 
 

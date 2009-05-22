@@ -1,15 +1,19 @@
-# declare the subdirs
-SUBDIRS = \
-	include \
-	esutil \
-	hello \
-	particles \
-	decomposition \
-	pairs \
-	interaction \
-	bc \
-	integrator \
-        thermostat
+nobase_pkginclude_HEADERS =
+python_SCRIPTS =
+noinst_LTLIBRARIES =
+libespresso_common_la_SOURCES =
+DIST_SUBDIRS = 
+
+include include/SubMakefile.am
+include esutil/SubMakefile.am
+include hello/SubMakefile.am
+include particles/SubMakefile.am
+include decomposition/SubMakefile.am
+include pairs/SubMakefile.am
+include interaction/SubMakefile.am
+include bc/SubMakefile.am
+include integrator/SubMakefile.am
+include thermostat/SubMakefile.am
 
 CLEANFILES =
 
@@ -22,22 +26,15 @@ noinst_HEADERS = \
 	espresso_common.hpp
 
 # the common part of all Espresso flavors
-noinst_LTLIBRARIES = libespresso_common.la
-libespresso_common_la_SOURCES= \
+noinst_LTLIBRARIES += libespresso_common.la
+libespresso_common_la_SOURCES += \
 	bindings.cpp \
 	Real3D.cpp \
 	Property.cpp \
 	Particle.cpp \
 	espresso_common.cpp
+
 libespresso_common_la_LIBADD = \
-	esutil/libesutil.la \
-	hello/libhello.la \
-	particles/libparticles.la \
-	pairs/libpairs.la \
-	interaction/libinteraction.la \
-	bc/libbc.la \
-	integrator/libintegrator.la \
-        thermostat/libthermostat.la \
 	$(ESPRESSO_BOOST_LIBS) \
 	$(PYTHON_LIBS) \
 	$(MPI_LIBS) 
@@ -50,7 +47,7 @@ _espresso_la_SOURCES = _espresso.cpp
 _espresso_la_LDFLAGS = -shared -module -avoid-version -no-undefined
 _espresso_la_LIBADD = \
 	libespresso_common.la \
-	esutil/libpylogger.la
+	libpylogger.la
 endif # ENABLE_SHARED
 
 # the embedded python interpreter that makes _espresso and _boostmpi a builtin
@@ -58,7 +55,7 @@ bin_PROGRAMS = pypresso
 pypresso_SOURCES = pypresso.cpp
 pypresso_LDADD = \
 	libespresso_common.la \
-	esutil/libpylogger.la \
+	libpylogger.la \
 	../contrib/boostmpi/libboostmpi.la \
 	$(ESPRESSO_BOOST_LIBS) \
 	$(PYTHON_LIBS) \
@@ -67,7 +64,7 @@ pypresso_LDADD = \
 ##############################
 ## PYTHON
 ##############################
-python_SCRIPTS= \
+python_SCRIPTS += \
 	__init__.py \
 	__setup.py \
 	boostmpi.py \

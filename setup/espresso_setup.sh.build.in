@@ -10,13 +10,21 @@
 
 abs_top_builddir="@abs_top_builddir@"
 
-# Add the ES++ specific path
+# Add the ES++ specific python path
 if test "x$PYTHONPATH" = "x"; then
     PYTHONPATH=$abs_top_builddir
 else
     PYTHONPATH=$PYTHONPATH:$abs_top_builddir
 fi
-
 export PYTHONPATH
 echo "PYTHONPATH=$PYTHONPATH"
 
+# Add the ES++ specific path
+ESPP_PATH=$abs_top_builddir/bin:$abs_top_builddir/src
+if test "x$PATH" = "x"; then
+    PATH=$ESPP_PATH
+else
+    PATH=$PATH:$ESPP_PATH
+fi
+export PATH
+echo "PATH=$PATH"

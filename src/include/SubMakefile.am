@@ -1,0 +1,6 @@
+nobase_pkginclude_HEADERS += \
+	include/log4espp.hpp \
+	include/logging.hpp \
+	include/mpi.hpp \
+	include/python.hpp \
+	include/types.hpp

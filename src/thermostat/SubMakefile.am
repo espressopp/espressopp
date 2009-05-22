@@ -1,0 +1,9 @@
+nobase_pkginclude_HEADERS += \
+        thermostat/bindings.hpp \
+        thermostat/Thermostat.hpp \
+	thermostat/Langevin.hpp 
+
+libespresso_common_la_SOURCES += \
+        thermostat/bindings.cpp \
+        thermostat/Thermostat.cpp \
+	thermostat/Langevin.cpp

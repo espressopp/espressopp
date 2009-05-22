@@ -25,7 +25,7 @@ MPIEXEC=@MPIEXEC@
 # the first parameter
 if test "$1" != "-n"; then
     echo "$0: usage: $0 -n <processors> <program> <params>..." 1>&2
-    exit -1
+    exit 1
 fi
 
 # check whether we are requested to run without MPI
@@ -39,7 +39,7 @@ if test "$processors" = "nompi"; then
     # check the program is actually one
     if test ! -x "$1"; then
         echo "$0: program $1 not executable." 1>&2
-        exit -1
+        exit 1
     fi
 
     exec "$@"

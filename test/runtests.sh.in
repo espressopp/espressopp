@@ -54,7 +54,7 @@ fi
 # reprocess arguments
 #############################
 
-MPIEXEC=@top_builddir@/bin/espp_mpiexec.sh
+MPIEXEC="@ESPRESSO_MPIEXEC@"
 
 # ,-lists to space-separated lists
 TAGS=`echo "$TAGS" |sed -e 's/,/ /g'`

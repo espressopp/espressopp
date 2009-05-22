@@ -1,0 +1,31 @@
+DIST_SUBDIRS += esutil/unittest
+
+nobase_pkginclude_HEADERS += \
+	esutil/SmallVector.hpp \
+	esutil/DerivableSmallVector.hpp \
+	esutil/Vector3D.hpp \
+	esutil/TupleVector.hpp \
+	esutil/VectorTraits.hpp \
+	esutil/Timer.hpp \
+	esutil/virtual_functional.hpp \
+        esutil/Logger.hpp
+
+libespresso_common_la_SOURCES += \
+	esutil/TupleVector.cpp \
+	esutil/Timer.cpp 
+
+python_SCRIPTS += \
+	esutil/__init__.py
+
+noinst_LTLIBRARIES += \
+	libgenlogger.la \
+	libpylogger.la
+
+libgenlogger_la_SOURCES = \
+	esutil/GenLogger.cpp \
+	esutil/GenLogger.hpp
+libpylogger_la_SOURCES = \
+	esutil/PyLogger.cpp \
+	esutil/PyLogger.hpp
+
+

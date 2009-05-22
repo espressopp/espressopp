@@ -1,0 +1,21 @@
+DIST_SUBDIRS += particles/unittest
+
+nobase_pkginclude_HEADERS += \
+	particles/bindings.hpp \
+	particles/Computer.hpp \
+	particles/PythonComputer.hpp \
+	particles/ParticleHandle.hpp \
+	particles/PropertyHandle.hpp \
+	particles/Storage.hpp \
+	particles/Set.hpp \
+	particles/All.hpp
+
+libespresso_common_la_SOURCES += \
+	particles/PythonComputer.cpp \
+	particles/bindings.cpp \
+	particles/Storage.cpp \
+	particles/Set.cpp \
+	particles/All.cpp
+
+python_SCRIPTS += \
+	particles/__init__.py

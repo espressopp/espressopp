@@ -4,7 +4,7 @@
 #  MPI test programs verify that MPI works correctly
 #
 
-LIBS = $(top_builddir)/src/esutil/libgenlogger.la 
+LIBS = $(top_builddir)/src/libgenlogger.la 
 
 check_PROGRAMS = example
 

@@ -1,1 +1,1 @@
-SUBDIRS = forceloop
+SUBDIRS = logging forceloop
