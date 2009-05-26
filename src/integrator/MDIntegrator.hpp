@@ -13,7 +13,8 @@ namespace espresso {
       
       real timeStep;
       real timeStepSqr;
-      boost::shared_ptr<thermostat::Thermostat> pThermostat;
+
+      // boost::shared_ptr<thermostat::Thermostat> pThermostat;
 
     public:
 
@@ -25,9 +26,9 @@ namespace espresso {
       
       virtual void run(int nsteps) = 0;
 
-      virtual void setThermostat(boost::shared_ptr<thermostat::Thermostat> _pThermostat) { pThermostat = _pThermostat; }
+      // virtual void setThermostat(boost::shared_ptr<thermostat::Thermostat> _pThermostat) { pThermostat = _pThermostat; }
 
-      virtual boost::shared_ptr<thermostat::Thermostat> getThermostat() { return pThermostat; }
+      // virtual boost::shared_ptr<thermostat::Thermostat> getThermostat() { return pThermostat; }
       
       /** Abstract class needs also registration in Python */
       static void registerPython();

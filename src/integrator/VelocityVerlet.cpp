@@ -91,8 +91,9 @@ using namespace boost;
 	StepA stepA(*position, *velocity, *force, timeStep);
 	particles->foreach(stepA);
 
-        // call thermalizeA for the chosen thermostat
-        this->getThermostat()->thermalizeA();
+        // call connected routines, e.g. thermalizeA for a chosen thermostat
+
+        postStepA();
 
 	// Force Loop 
 
@@ -111,8 +112,9 @@ using namespace boost;
 	StepB stepB(*velocity, *force, timeStep);
 	particles->foreach(stepB);
 
-         // call thermalizeB for the chosen thermostat
-        this->getThermostat()->thermalizeB();
+        // call connected routines, e.g. thermalizeB for a chosen thermostat
+
+        postStepB(i);
 
       }
     }
@@ -128,7 +130,7 @@ VelocityVerlet::registerPython() {
   using namespace boost;
   using namespace boost::python;
 
-  class_<VelocityVerlet, boost::shared_ptr<VelocityVerlet>, bases<MDIntegrator> >
+  class_<VelocityVerlet, boost::shared_ptr<VelocityVerlet>, boost::noncopyable, bases<MDIntegrator> >
     ("integrator_VelocityVerlet", init<real>())
     .def(init<shared_ptr<Set>, shared_ptr< Property<Real3D> >,
                                shared_ptr< Property<Real3D> >,

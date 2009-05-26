@@ -1,6 +1,8 @@
 #ifndef _VELOCITY_VERLET
 #define _VELOCITY_VERLET
 
+#include <boost/signals2.hpp>
+
 #include "types.hpp"
 #include "MDIntegrator.hpp"
 #include "particles/Set.hpp"
@@ -48,6 +50,18 @@ namespace espresso {
 
       boost::shared_ptr<particles::Set> getSet() { return particles; }
   
+      /** All routines that should be called after stepA in one integration 
+          step must connect to this signal.
+      */
+
+      boost::signals2::signal0<void> postStepA;
+
+      /** All routines that should be called after stepB in one integration 
+          step must connect to this signal.
+      */
+
+      boost::signals2::signal1<void, int> postStepB;
+
       virtual void run(int timesteps); 
 
       virtual ~VelocityVerlet();

@@ -1,13 +1,24 @@
 #include <python.hpp>
 #include "Langevin.hpp"
 #include "Property.hpp"
+#include "error.hpp"
 #include "particles/Computer.hpp"
+#include "integrator/VelocityVerlet.hpp"
+
+#include <boost/bind.hpp>
 
 using namespace espresso;
 using namespace espresso::particles;
 using namespace espresso::thermostat;
 
-/** subclass of Langevin to handle thermostatting. */
+/* -- define the Logger for the class  ------------------------------------------- */
+
+LOG4ESPP_LOGGER(Langevin::theLogger, "Langevin");
+
+/***********************************************************************************
+*  subclass of Langevin to handle thermostatting after StepA                       *
+***********************************************************************************/
+
 class StepThermalA: public particles::Computer {
 
 private:
@@ -35,6 +46,7 @@ public:
   }
   
   // m = 1
+
   virtual void operator()(ParticleHandle pref) {
     pos[pref] = pos[pref] - vel[pref] * timeStep - 0.5 * force[pref] * timeStepSqr
               + c3 * (vel[pref] + 0.5 * force[pref] * timeStep) + c2 * drand48();
@@ -44,7 +56,10 @@ public:
 };
 
 
-/** subclass of Langevin to handle thermostatting. */
+/***********************************************************************************
+*  subclass of Langevin to handle thermostatting after StepB                       *
+***********************************************************************************/
+
 class StepThermalB: public particles::Computer {
 
 private:
@@ -78,6 +93,9 @@ public:
 
 };
 
+/***********************************************************************************
+*  class Langevin                                                                  *
+***********************************************************************************/
 
 Langevin::Langevin(boost::shared_ptr<particles::Set> _particles,
                    real _temperature,
@@ -85,29 +103,102 @@ Langevin::Langevin(boost::shared_ptr<particles::Set> _particles,
                    boost::shared_ptr<Property<Real3D> > _position,
                    boost::shared_ptr<Property<Real3D> > _velocity,
                    boost::shared_ptr<Property<Real3D> > _force):
-                     Thermostat(_particles, _temperature),
-                     gamma(_gamma),
-                     position(_position),
-                     velocity(_velocity),
-                     force(_force) { }
 
-Langevin::~Langevin() {}
+             Thermostat(_particles, _temperature),
+             position(_position),
+             velocity(_velocity),
+             force(_force),
+             linearCongruential(15154),
+             normalDist(0.,1.),
+             gauss(linearCongruential, normalDist)
 
-void Langevin::setGamma(real _gamma) { gamma = _gamma; }
+{
+  LOG4ESPP_INFO(theLogger, "Langevin, temperature = " << temperature << ", gamma = " << gamma);
+
+  setGamma(_gamma);   // also checks for a correct argument
+}
+
+/**********************************************************************************/
+
+void Langevin::setGamma(real _gamma) 
+{ 
+  if (_gamma < 0.0) {
+     ARGERROR(theLogger, "gamma = " << _gamma << " illegal, must not be negative");
+  }
+  gamma = _gamma; 
+}
+
+/**********************************************************************************/
 
 real Langevin::getGamma() const { return gamma; }
 
+/**********************************************************************************/
+
 void Langevin::thermalizeA() {
+
+  LOG4ESPP_DEBUG(theLogger, "");
 
   StepThermalA stepThermalA(*position, *velocity, *force, 0.01);
   particles->foreach(stepThermalA);
 
 }
 
-void Langevin::thermalizeB() {
+/**********************************************************************************/
+
+void Langevin::thermalizeB(int itimestep) {
+
+  LOG4ESPP_DEBUG(theLogger, "itimestep = " << itimestep);
 
   StepThermalB stepThermalB(*position, *velocity, *force, 0.01);
   particles->foreach(stepThermalB);
+
+}
+
+/**********************************************************************************/
+
+void Langevin::connect(boost::shared_ptr<integrator::VelocityVerlet> _integrator)
+
+{ // check that there is no existing connection
+
+  if (integrator) {
+     LOG4ESPP_WARN(theLogger, "Thermostat is already connected, disconnecting from last one");
+     disconnect();
+  }
+
+  LOG4ESPP_INFO(theLogger, "connect to VelocityVerlet integrator");
+
+  integrator = _integrator;
+
+  stepA = integrator->postStepA.connect(boost::bind(&Langevin::thermalizeA, this));
+  stepB = integrator->postStepB.connect(boost::bind(&Langevin::thermalizeB, this, _1));
+}
+
+/**********************************************************************************/
+
+void Langevin::disconnect() 
+{
+  if (!integrator) {
+     LOG4ESPP_WARN(theLogger, "Thermostat is not connected");
+     return;
+  }
+
+  LOG4ESPP_INFO(theLogger, "disconnect from integrator");
+
+  stepA.disconnect();
+  stepB.disconnect();
+
+  // replace integrator with empty pointer
+
+  integrator = boost::shared_ptr<integrator::VelocityVerlet>();
+}
+
+/**********************************************************************************/
+
+Langevin::~Langevin() {
+
+  LOG4ESPP_INFO(theLogger, "~Langevin");
+
+  if (integrator) disconnect();
 
 }
 
@@ -128,5 +219,7 @@ Langevin::registerPython() {
                                    boost::shared_ptr<Property<Real3D> > >())
       .def("setGamma", &Langevin::setGamma)
       .def("getGamma", &Langevin::getGamma)    
+      .def("connect", &Langevin::connect)    
+      .def("disconnect", &Langevin::disconnect)    
       ;
 }
