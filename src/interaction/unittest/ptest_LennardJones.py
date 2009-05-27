@@ -1,5 +1,5 @@
 import unittest
-from espresso.interaction import *
+from espresso.interaction.LennardJones import *
 
 class Test0LennardJones(unittest.TestCase) :
     def test0Defaults(self) :

@@ -110,7 +110,7 @@ The pmi module defines the following useful constants:
 * CONTROLLER is the numerical Id of the controller thread (the MPI root)
 * WORKERSTR is a string describing the thread ('Worker #' or 'Controller')
 """
-import logging, types, sys, __builtin__
+import logging, types, sys, functools, __builtin__
 from espresso import boostmpi as mpi
 
 ##################################################
@@ -148,10 +148,10 @@ def import_(statement) :
 ##################################################
 ## CREATE
 ##################################################
-def create(theClass=None, *args, **kwds) :
+def create(cls=None, *args, **kwds) :
     """Controller command that creates an object on all workers.
 
-    theClass describes the (new-style) class that should be
+    cls describes the (new-style) class that should be
     instantiated.
     *args are the arguments to the constructor of the class.
     Only classes that are known to PMI can be used, that is, classes
@@ -177,18 +177,7 @@ def create(theClass=None, *args, **kwds) :
     ...
     """
     if __checkController(create) :
-        if theClass is None :
-          raise UserError("pmi.create expects at least 1 argument on controller")
-        elif isinstance(theClass, types.StringTypes) :
-            theClass = eval(theClass)
-        elif isinstance(theClass, types.TypeType) :
-            pass
-        elif isinstance(theClass, types.ClassType) :
-            raise TypeError("""PMI cannot create old-style classes.
-            Please create old style classes via their names.
-            """)
-        else :
-            raise ValueError("pmi.create expects class as first argument, but got %s" % theClass)
+        cls = _translateClass(cls)
 
         # generate a new oid
         oid = __OID()
@@ -196,13 +185,13 @@ def create(theClass=None, *args, **kwds) :
         # translate the arguments
         ckwds, targs, tkwds = __translateArgs(args, kwds)
         # broadcast creation to the workers
-        _broadcast(_CREATE, theClass, oid, *targs, **tkwds)
+        _broadcast(_CREATE, cls, oid, *targs, **tkwds)
 
         log.info('Creating: %s [%s]', 
-                 __formatCall(theClass.__name__, args, ckwds), oid)
+                 __formatCall(cls.__name__, args, ckwds), oid)
 
         # create the instance
-        obj = theClass(*args, **ckwds)
+        obj = cls(*args, **ckwds)
         # store the oid in the instance
         obj.__pmioid = oid
         obj.__pmidestroyer = __Destroyer(oid)
@@ -211,13 +200,13 @@ def create(theClass=None, *args, **kwds) :
     else :
         return receive(_CREATE)
 
-def __workerCreate(theClass, oid, *targs, **tkwds) :
+def __workerCreate(cls, oid, *targs, **tkwds) :
     # backtranslate the arguments
     args, kwds = __backtranslateArgs(targs, tkwds)
     log.info('Creating: %s [%s]'
-             % (__formatCall(theClass.__name__, args, kwds), oid))
+             % (__formatCall(cls.__name__, args, kwds), oid))
     # create the new object
-    obj = theClass(*args, **kwds)
+    obj = cls(*args, **kwds)
     # store the new object
     if oid in OBJECT_CACHE :
         raise _InternalError("Object [%s] is already in OBJECT_CACHE!" % oid)
@@ -471,57 +460,77 @@ def startWorkerLoop() :
 ##################################################
 ## PROXY METACLASS
 ##################################################
-# class Proxy(type):
-#     def __init__(cls, name, bases, dict):
-#         if 'pmiproxydefs' not in dict:
-#             raise(UserError('PMI proxy class %s has to define pmiproxydefs.' % name))
-#         log.info('Making %s a proxy class.' % name)
-#         defs = dict['pmiproxydefs']
 
-#         if 'pmisubjectclass' in defs:
-#             # new init method that creates the pmi subject
-#             def __subjectinit(self, *args, **kwds):
-#                 subjectclass = defs['pmisubjectclass']
-#                 log.info('%s is creating pmisubject of type %s',
-#                          name, subjectclass)
-#                 self.pmisubject = create(subjectclass, *args, **kwds)
-#                 if hasattr(cls, '__initBeforePMI'):
-#                     cls.__initBeforePMI(self, *args, **kwds)
+class Proxy(type):
+    class Initializer(object):
+        """Creates the PMI subject of a class.
+        """
+        def __init__(self, cls, oldinit):
+            self.cls = cls
+            self.oldinit = oldinit
+            self.__doc__ = oldinit.__doc__
+        def __call__(self, method_self, *args, **kwds):
+            # create the pmi subject
+            log.info('PMI.Proxy class %s is creating pmi subject of type %s',
+                     self.cls, self.cls.pmisubjectclass)
+            method_self.pmisubject = create(self.cls.pmisubjectclass, *args, **kwds)
+            if self.oldinit is not None:
+                self.oldinit(method_self)
+#                self.oldinit(method_self, *args, **kwds)
 
-#             # store the original init of the class
-#             if '__init__' in dict:
-#                 setattr(cls, __initBeforePMI,
-#                         getattr(cls, '__init__'))
-#             # override __init__ with __subjectinit
-#             setattr(cls, '__init__', __subjectinit)
+    class LocalCaller(object):
+        def __init__(self, cls, methodName):
+            self.method = getattr(cls.pmisubjectclass, methodName)
+        def __call__(self, method_self, *args, **kwds):
+            return self.method(method_self.pmisubject,
+                               *args, **kwds)
 
-#         if 'pmicall' in defs:
-#             for method in defs['pmicall']:
-#                 # create the proxied calls
-#                 def pmicall(method, self, *args, **kwds):
-#                     log.debug('proxy pmi call of method %s', method)
-#                     meth = getattr(self.pmisubject, method)
-#                     call(meth, *args, **kwds)
-#                 # store the new method
-#                 setattr(cls, method, partial(pmicall, method))
+    class PMICaller(object):
+        def __init__(self, cls, methodName):
+            self.method = getattr(cls.pmisubjectclass, methodName)
+        def __call__(self, method_self, *args, **kwds):
+            return call(self.method, method_self.pmisubject,
+                        *args, **kwds)
 
-#         if 'localcall' in defs:
-#             for method in defs['localcall']:
-#                 # create the proxied calls
-#                 def localcall(self, *args, **kwds):
-#                     log.debug('proxy local call of method %s', method)
-#                     meth = getattr(self.pmisubject, method)
-#                     meth(*args, **kwds)
-#                 # store the new method
-#                 setattr(cls, method, localcall)
+    class PMIInvoker(object):
+        def __init__(self, cls, methodName):
+            self.method = getattr(cls.pmisubjectclass, methodName)
+        def __call__(self, method_self, *args, **kwds):
+            return invoke(self.method, method_self.pmisubject,
+                          *args, **kwds)
 
-#         if 'pmipropset' in defs:
-#             for prop in defs['pmipropset']:
-#                 if not hasattr(cls, prop):
-#                     pmicall(
-        
-        
-#        super(Proxy, cls).__init__(name, bases, dict)
+    def __addMethod(cls, methodName, methodObject):
+#         if hasattr(cls.pmisubjectclass, methodName):
+#             localMethod = getattr(cls.pmisubjectclass, methodName)
+#             functools.update_wrapper(methodObject, localMethod)
+        setattr(cls, methodName, types.MethodType(methodObject, None, cls))
+    
+    def __init__(cls, name, bases, dict):
+        if 'pmiproxydefs' not in dict:
+            raise(UserError('PMI proxy class %s has to define pmiproxydefs.' % name))
+        log.info('Making %s a proxy class.' % name)
+        defs = dict['pmiproxydefs']
+
+        if 'subjectclass' in defs:
+            cls.pmisubjectclass = _translateClass(defs['subjectclass'])
+            if hasattr(cls, '__init__'):
+                oldinit = getattr(cls, '__init__')
+            else:
+                oldinit = None
+            cls.__addMethod('__init__', Proxy.Initializer(cls, oldinit))
+                        
+        if 'localcall' in defs:
+            for methodName in defs['localcall']:
+                cls.__addMethod(methodName, Proxy.LocalCaller(cls, methodName))
+
+        if 'pmicall' in defs:
+            for methodName in defs['pmicall']:
+                cls.__addMethod(methodName, Proxy.PMICaller(cls, methodName))
+
+        if 'pmiinvoke' in defs:
+            for methodName in defs['pmiinvoke']:
+                cls.__addMethod(methodName, Proxy.PMIInvoker(cls, methodName))
+
 
 ##################################################
 ## CONSTANTS AND EXCEPTIONS
@@ -676,6 +685,22 @@ def __checkWorker(func) :
     """
     if IS_CONTROLLER : 
         raise UserError("Cannot call %s on the controller!" % func.__name__)
+
+def _translateClass(cls):
+    """Returns the class object of the class decscribed by cls.
+    """
+    if cls is None :
+        raise UserError("pmi.create expects at least 1 argument on controller")
+    elif isinstance(cls, types.StringTypes) :
+        return eval(cls)
+    elif isinstance(cls, types.TypeType) :
+        return cls
+    elif isinstance(cls, types.ClassType) :
+        raise TypeError("""PMI cannot use old-style classes.
+        Please create old style classes via their names.
+        """)
+    else :
+        raise ValueError("__translateClass expects class as argument, but got %s" % cls)
 
 
 def __mapArgs(func, args, kwds):

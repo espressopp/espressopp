@@ -17,16 +17,51 @@ def add(a, b) :
     return a + b
 
 class A(object) :
+    created = False
+    initarg = None
+    initkwds = None
+    f_called = False
+    g_arg = None
+    g_kwds = None
+    
     def __init__(self, arg=None, **kwds) :
-        object.__init__(self)
-        self.arg = arg
-        self.kwds = kwds
+        A.created = True
+        A.initarg = arg
+        A.initkwds = kwds
+        A.f_called = False
+        A.g_arg = None
+        A.g_kwds = None
 
     def f(self) :
-        self.f_arg = 42
+        A.f_called = True
         return 42
 
     def g(self, arg=None, **kwds) :
-        self.g_arg = arg
-        self.g_kwds = kwds
+        A.g_arg = arg
+        A.g_kwds = kwds
         return arg
+
+    def __del__(self):
+        A.created = False
+        A.initarg = None
+        A.initkwds = None
+        A.f_called = False
+        A.g_arg = None
+        A.g_kwds = None
+
+
+class Local(object):
+    called = None
+    def __init__(self):
+        Local.called = 'init'
+    def f(self):
+        Local.called = 'f'
+        return 'f'
+    def g(self):
+        Local.called = 'g'
+        return 'g'
+    def h(self):
+        Local.called = 'h'
+        return 'h'
+    def __del__(self):
+        Local.called = None
