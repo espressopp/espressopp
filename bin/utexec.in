@@ -42,7 +42,10 @@ OPTIONS:
   -c|--cpp
       Specify that the C++ unittests are to be compiled, linked and
       run.
-      
+
+  -t=NUMTASKS|--num-tasks=NUMTASKS
+      Specify how many tasks to use when parallel python unittests are
+      run (defaults to 2). 
 """)
 
 def die(msg):
@@ -62,7 +65,6 @@ if not top_builddir.endswith('/'): top_builddir += '/'
 PYRUN = "@PYTHON@"
 ESPRESSO_MPIEXEC = "@ESPRESSO_MPIEXEC@"
 HAVE_MPI = "@HAVE_MPI@"
-NUM_PROCS = [1, 2]
 
 # variables for C++ Unittest compilation
 CPPFLAGS = os.getenv('CPPFLAGS', '@CPPFLAGS@')
@@ -90,9 +92,9 @@ LTCALL = LIBTOOL + ' --tag=CXX ' + LIBTOOLFLAGS
 # PARSE COMMAND LINE ARGS
 try:
     optlist, tests = getopt.getopt(
-        sys.argv[1:], 'nvhs=b=pcP',
+        sys.argv[1:], 'nvhs:b:pcPt:',
         ['dry-run', 'verbose', 'help', 'srcdir=', 'builddir=',
-         'cpp', 'python', 'parallel'])
+         'cpp', 'python', 'parallel', 'num-tasks='])
 except getopt.GetoptError, e:
     print("Option error: " + str(e))
     Usage()
@@ -103,6 +105,7 @@ srcdir = None
 verbose = False
 dryrun = False
 do_python = do_cpp = do_parallel = False
+num_tasks = 2
 for k, v in optlist:
     if k == '-h' or k == '--help':
         Usage()
@@ -121,6 +124,8 @@ for k, v in optlist:
         do_parallel = True
     elif k == '-c' or k == '--cpp':
         do_cpp = True
+    elif k == '-t' or k == '--num-tasks':
+        num_tasks = int(v)
 
 if not do_python and not do_cpp and not do_parallel:
     do_python = do_cpp = do_parallel = True
@@ -256,9 +261,9 @@ if HAVE_MPI and do_parallel:
     print("Will do the following parallel Python tests:")
     print(py_ptests)
 
-if do_cpp:
+if do_cpp and cpp_tests:
     print("\n**************************************************")
-    print('**** RUNNING C++ UNITTESTS')
+    print('**** COMPILING AND LINKING C++ UNITTESTS')
     ##################################################
     # COMBINE THE COMPILATION AND LINKER COMMANDS
     LTCXXCOMPILE = ''.join(
@@ -282,7 +287,7 @@ if do_cpp:
         print("LTRUN = " + LTRUN)
         
     ##############################################
-    # COMPILE, LINK AND EXECUTE C++ UNITTESTS
+    # COMPILE AND LINK C++ UNITTESTS
     for test in cpp_tests:
         print("**************************************************")
         print("** " + test)
@@ -305,8 +310,14 @@ if do_cpp:
             if os.system(cmd):
                 print('ERROR: Linking test %s failed.' % test)
                 sys.exit(1)
-
-        print('\n** EXECUTING ' + test)
+                
+    ##############################################
+    # EXECUTE C++ UNITTESTS
+    print("\n**************************************************")
+    print('**** EXECUTING C++ UNITTESTS')
+    for test in cpp_tests:
+        print("**************************************************")
+        print("** " + test)
         cmd = LTRUN + ' ./' + test
         print(cmd)
         if not dryrun:
@@ -314,8 +325,8 @@ if do_cpp:
             print('')
 
 ##############################################
-# EXECUTE THE PYTHON UNITTESTS
-if do_python:
+# EXECUTE PYTHON UNITTESTS
+if do_python and py_tests:
     print("\n**************************************************")
     print('**** RUNNING PYTHON UNITTESTS')
     for test in py_tests:
@@ -329,20 +340,20 @@ if do_python:
             print('')
 
 ##############################################
-# EXECUTE THE PARALLEL UNITTESTS
-if HAVE_MPI and do_parallel:
-    for NP in NUM_PROCS:
-        print("\n**************************************************")
-        print('**** RUNNING PARALLEL PYTHON UNITTESTS (%d CPUs)' % NP)
-        PARALLELPYTHON = ESPRESSO_MPIEXEC + ' -n ' + str(NP) + ' ' + PYRUN
-
-        for test in py_ptests:
-            print("**************************************************")
-            print("** " + test + ' (%d CPUs)' % NP)
-            cmd = PARALLELPYTHON + ' ' + srcdir + test
-            if verbose: cmd += ' -v'
-            print(cmd)
-            if not dryrun:
-                os.system(cmd)
-                print('')
+# EXECUTE PARALLEL PYTHON UNITTESTS
+if HAVE_MPI and do_parallel and py_ptests:
+    if verbose:
+        print('Executing ptests using %s MPI tasks' % num_tasks)
+    print("\n**************************************************")
+    print('**** RUNNING PARALLEL PYTHON UNITTESTS (%d CPUs)' % num_tasks)
+    PARALLELPYTHON = ESPRESSO_MPIEXEC + ' -n ' + str(num_tasks) + ' ' + PYRUN
+    for test in py_ptests:
+        print("**************************************************")
+        print("** " + test)
+        cmd = PARALLELPYTHON + ' ' + srcdir + test
+        if verbose: cmd += ' -v'
+        print(cmd)
+        if not dryrun:
+            os.system(cmd)
+            print('')
 
