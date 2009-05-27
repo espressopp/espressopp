@@ -314,11 +314,12 @@ if do_cpp and cpp_tests:
     ##############################################
     # EXECUTE C++ UNITTESTS
     print("\n**************************************************")
-    print('**** EXECUTING C++ UNITTESTS')
+    print('**** RUNNING C++ UNITTESTS')
     for test in cpp_tests:
         print("**************************************************")
         print("** " + test)
-        cmd = LTRUN + ' ./' + test
+        # strip ".cpp" from the end
+        cmd = LTRUN + ' ./' + test[:-4]
         print(cmd)
         if not dryrun:
             os.system(cmd)
