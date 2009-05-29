@@ -1,5 +1,3 @@
-DIST_SUBDIRS += esutil/unittest
-
 nobase_pkginclude_HEADERS += \
 	esutil/Collectives.hpp \
 	esutil/SmallVector.hpp \

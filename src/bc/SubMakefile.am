@@ -1,5 +1,3 @@
-DIST_SUBDIRS += bc/unittest
-
 nobase_pkginclude_HEADERS += \
         bc/bindings.hpp \
         bc/BC.hpp \

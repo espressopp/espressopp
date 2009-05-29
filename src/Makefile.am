@@ -3,6 +3,7 @@ python_SCRIPTS =
 noinst_LTLIBRARIES =
 libespresso_common_la_SOURCES =
 DIST_SUBDIRS = 
+EXTRA_DIST =
 
 include include/SubMakefile.am
 include esutil/SubMakefile.am
