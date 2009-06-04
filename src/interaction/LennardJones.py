@@ -38,7 +38,6 @@ class LennardJonesLocal(_LennardJones) :
     @cutoff.setter
     def cutoff(self, _cutoff) : self.set(cutoff=_cutoff)
 
-
 if pmi.IS_CONTROLLER :
     # wrap LennardJones
     
@@ -50,23 +49,6 @@ if pmi.IS_CONTROLLER :
         pmiproxydefs = {
             'subjectclass': 'LennardJonesLocal',
             'localcall' : [ 'computeForce', 'computeEnergy' ],
-            'pmicall' : [ 'set' ]
+            'pmicall' : [ 'set' ],
+            'pmiproperty' : [ 'epsilon', 'sigma', 'cutoff' ]
             }
-
-        @property
-        def epsilon(self): return self.pmisubject.epsilon
-        @epsilon.setter
-        def epsilon(self, _epsilon):
-            pmi.call('LennardJonesLocal.epsilon.fset', self.pmisubject, _epsilon)
-
-        @property
-        def sigma(self): return self.pmisubject.sigma
-        @sigma.setter
-        def sigma(self, _sigma):
-            pmi.call('LennardJonesLocal.sigma.fset', self.pmisubject, _sigma)
-
-        @property
-        def cutoff(self): return self.pmisubject.cutoff
-        @cutoff.setter
-        def cutoff(self, _cutoff):
-            pmi.call('LennardJonesLocal.cutoff.fset', self.pmisubject, _cutoff)

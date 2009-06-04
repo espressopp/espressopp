@@ -467,14 +467,14 @@ class Proxy(type):
         """
         def __init__(self, cls, oldinit):
             self.cls = cls
-            self.oldinit = oldinit
-            self.__doc__ = oldinit.__doc__
+            if oldinit is not None:
+                self.oldinit = oldinit
         def __call__(self, method_self, *args, **kwds):
             # create the pmi subject
             log.info('PMI.Proxy class %s is creating pmi subject of type %s',
                      self.cls, self.cls.pmisubjectclass)
             method_self.pmisubject = create(self.cls.pmisubjectclass, *args, **kwds)
-            if self.oldinit is not None:
+            if hasattr(self, 'oldinit'):
                 self.oldinit(method_self)
 #                self.oldinit(method_self, *args, **kwds)
 
@@ -482,29 +482,38 @@ class Proxy(type):
         def __init__(self, cls, methodName):
             self.method = getattr(cls.pmisubjectclass, methodName)
         def __call__(self, method_self, *args, **kwds):
-            return self.method(method_self.pmisubject,
-                               *args, **kwds)
+            return self.method(method_self.pmisubject, *args, **kwds)
 
     class PMICaller(object):
         def __init__(self, cls, methodName):
             self.method = getattr(cls.pmisubjectclass, methodName)
         def __call__(self, method_self, *args, **kwds):
-            return call(self.method, method_self.pmisubject,
-                        *args, **kwds)
+            return call(self.method, method_self.pmisubject, *args, **kwds)
 
     class PMIInvoker(object):
         def __init__(self, cls, methodName):
             self.method = getattr(cls.pmisubjectclass, methodName)
         def __call__(self, method_self, *args, **kwds):
-            return invoke(self.method, method_self.pmisubject,
-                          *args, **kwds)
+            return invoke(self.method, method_self.pmisubject, *args, **kwds)
 
-    def __addMethod(cls, methodName, methodObject):
-#         if hasattr(cls.pmisubjectclass, methodName):
-#             localMethod = getattr(cls.pmisubjectclass, methodName)
-#             functools.update_wrapper(methodObject, localMethod)
-        setattr(cls, methodName, types.MethodType(methodObject, None, cls))
-    
+    class PropertyLocalGetter(object):
+        def __init__(self, cls, propName):
+            property = getattr(cls.pmisubjectclass, propName)
+            self.getter = getattr(property, 'fget')
+        def __call__(self, method_self):
+            return self.getter(method_self.pmisubject)
+
+    class PropertyPMISetter(object):
+        def __init__(self, cls, propName):
+            property = getattr(cls.pmisubjectclass, propName)
+            self.setter = '.'.join((cls.pmisubjectclass.__name__, propName, 'fset'))
+        def __call__(self, method_self, val):
+            return call(self.setter, method_self.pmisubject, val)
+
+    def __addMethod(cls, methodName, caller):
+        newMethod = types.MethodType(caller, None, cls)
+        setattr(cls, methodName, newMethod)
+
     def __init__(cls, name, bases, dict):
         if 'pmiproxydefs' not in dict:
             raise(UserError('PMI proxy class %s has to define pmiproxydefs.' % name))
@@ -513,24 +522,34 @@ class Proxy(type):
 
         if 'subjectclass' in defs:
             cls.pmisubjectclass = _translateClass(defs['subjectclass'])
-            if hasattr(cls, '__init__'):
+            if hasattr(cls, '__init__'): 
                 oldinit = getattr(cls, '__init__')
-            else:
+            else: 
                 oldinit = None
-            cls.__addMethod('__init__', Proxy.Initializer(cls, oldinit))
+            cls.__addMethod('__init__', 
+                            Proxy.Initializer(cls, oldinit))
                         
         if 'localcall' in defs:
             for methodName in defs['localcall']:
-                cls.__addMethod(methodName, Proxy.LocalCaller(cls, methodName))
+                cls.__addMethod(methodName, 
+                                Proxy.LocalCaller(cls, methodName))
 
         if 'pmicall' in defs:
             for methodName in defs['pmicall']:
-                cls.__addMethod(methodName, Proxy.PMICaller(cls, methodName))
+                cls.__addMethod(methodName, 
+                                Proxy.PMICaller(cls, methodName))
 
         if 'pmiinvoke' in defs:
             for methodName in defs['pmiinvoke']:
-                cls.__addMethod(methodName, Proxy.PMIInvoker(cls, methodName))
+                cls.__addMethod(methodName, 
+                                Proxy.PMIInvoker(cls, methodName))
 
+        if 'pmiproperty' in defs:
+            for propname in defs['pmiproperty']:
+                newprop = property(
+                    Proxy.PropertyLocalGetter(cls, propname),
+                    Proxy.PropertyPMISetter(cls, propname))
+                setattr(cls, propname, newprop)
 
 ##################################################
 ## CONSTANTS AND EXCEPTIONS

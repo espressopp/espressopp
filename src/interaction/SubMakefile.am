@@ -12,4 +12,5 @@ libespresso_common_la_SOURCES += \
 
 python_SCRIPTS += \
 	interaction/__init__.py \
-	interaction/LennardJones.py
+	interaction/LennardJones.py \
+	interaction/FENE.py
