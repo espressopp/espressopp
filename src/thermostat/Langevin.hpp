@@ -15,6 +15,14 @@ using namespace boost::random;
 namespace espresso {
   namespace thermostat {
 
+    /** A Langevin thermostat models the embedding of particles into a
+       viscouls liquid of constant temperature using kicks and drag.
+
+       The Langevin thermostat is connected to a Velocity-Verlet 
+       integrator (\sa espresso::integrator::VelocityVerlet).
+
+    */
+
     class Langevin: public Thermostat {
 
     private:
@@ -26,7 +34,13 @@ namespace espresso {
       boost::shared_ptr<Property<Real3D> > position;
       boost::shared_ptr<Property<Real3D> > velocity;
       boost::shared_ptr<Property<Real3D> > force;
-      boost::shared_ptr<integrator::VelocityVerlet> integrator;
+
+      // Boolean variables that is true for an existing connection to
+      // an integrator. At any time only one connection is allowed.
+
+      bool connected;
+
+      // Connections to the integrator after step A and step B 
 
       boost::signals2::connection stepA;
       boost::signals2::connection stepB;
@@ -34,7 +48,9 @@ namespace espresso {
       // random number generator for normal distribution
 
       boost::minstd_rand0 linearCongruential;
+
       boost::normal_distribution<double> normalDist;
+
       variate_generator<boost::minstd_rand0&, 
                         boost::normal_distribution<double> > gauss;
 
@@ -53,10 +69,18 @@ namespace espresso {
 
       /** The thermostat will be connected to a VelocityVerlet integrator so that it
           can be called by this integrator. 
+
+          \param thisSharedPtr must be the shared pointer to this object
+          \param integrator is the Velocity-Verlet integrator to which this thermostat will be connected.
+
+          This thermostat will not keep a reference to the integrator but to its connections.
+
       */
 
-      void connect(boost::shared_ptr<integrator::VelocityVerlet> integrator);
+      void connect(boost::shared_ptr<Langevin> thisSharedPtr,
+                   boost::shared_ptr<integrator::VelocityVerlet> integrator);
 
+      /** Disconnect this thermostat object from its integrator. */
       void disconnect();
 
       /** Method to get gamma. */

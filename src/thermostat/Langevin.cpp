@@ -116,6 +116,8 @@ Langevin::Langevin(boost::shared_ptr<particles::Set> _particles,
   LOG4ESPP_INFO(theLogger, "Langevin, temperature = " << temperature << ", gamma = " << gamma);
 
   setGamma(_gamma);   // also checks for a correct argument
+
+  connected = false;
 }
 
 /**********************************************************************************/
@@ -156,28 +158,35 @@ void Langevin::thermalizeB(int itimestep) {
 
 /**********************************************************************************/
 
-void Langevin::connect(boost::shared_ptr<integrator::VelocityVerlet> _integrator)
+void Langevin::connect(boost::shared_ptr<thermostat::Langevin> langevin,
+                       boost::shared_ptr<integrator::VelocityVerlet> integrator)
 
 { // check that there is no existing connection
 
-  if (integrator) {
+  if (langevin.get() != this) {
+     ARGERROR(theLogger, "shared pointer does not belong to this object");
+  }
+
+  if (connected) {
      LOG4ESPP_WARN(theLogger, "Thermostat is already connected, disconnecting from last one");
      disconnect();
   }
 
   LOG4ESPP_INFO(theLogger, "connect to VelocityVerlet integrator");
 
-  integrator = _integrator;
+  // We give a shared pointer to the boost bind so this object cannot be deleted as long
 
-  stepA = integrator->postStepA.connect(boost::bind(&Langevin::thermalizeA, this));
-  stepB = integrator->postStepB.connect(boost::bind(&Langevin::thermalizeB, this, _1));
+  stepA = integrator->postStepA.connect(boost::bind(&Langevin::thermalizeA, langevin));
+
+  stepB = integrator->postStepB.connect(boost::bind(&Langevin::thermalizeB, langevin, _1));
+
 }
 
 /**********************************************************************************/
 
 void Langevin::disconnect() 
 {
-  if (!integrator) {
+  if (!connected) {
      LOG4ESPP_WARN(theLogger, "Thermostat is not connected");
      return;
   }
@@ -187,9 +196,7 @@ void Langevin::disconnect()
   stepA.disconnect();
   stepB.disconnect();
 
-  // replace integrator with empty pointer
-
-  integrator = boost::shared_ptr<integrator::VelocityVerlet>();
+  connected = false;
 }
 
 /**********************************************************************************/
@@ -198,7 +205,8 @@ Langevin::~Langevin() {
 
   LOG4ESPP_INFO(theLogger, "~Langevin");
 
-  if (integrator) disconnect();
+  // disconnect is not necesssary as this routine is called after the 
+  // deletion of the object to which this object is connected.
 
 }
 

@@ -54,13 +54,21 @@ namespace espresso {
           step must connect to this signal.
       */
 
-      boost::signals2::signal0<void> postStepA;
+      typedef boost::signals2::signal0<void> signalStepA;
+
+      // boost::signals2::signal0<void> postStepA;
+
+      signalStepA postStepA;
 
       /** All routines that should be called after stepB in one integration 
           step must connect to this signal.
       */
 
-      boost::signals2::signal1<void, int> postStepB;
+      typedef boost::signals2::signal1<void, int> signalStepB;
+
+      // boost::signals2::signal1<void, int> postStepB;
+
+      signalStepB postStepB;
 
       virtual void run(int timesteps); 
 

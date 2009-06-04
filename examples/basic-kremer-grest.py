@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#
 #  Python example script that does the same as forceloop but with
 #  epxorted routines from the C++ classes
 #
@@ -233,6 +235,9 @@ integrator = VelocityVerlet(allSet, position, velocity, force)
 
 integrator.setTimeStep(0.005)
 
+# Pair(ljint, allPairs).connect(integrator)
+# Pair(fene, bondList).connect(integrator)
+
 integrator.addForce(ljint, allPairs)
 integrator.addForce(fene, bondList)
 
@@ -240,16 +245,9 @@ integrator.addForce(fene, bondList)
 
 thermostat = Langevin(allSet, 1.0, 0.5, position, velocity, force)
 
-system = {}
-
-system['thermostat'] = thermostat
-
-# thermostat.disconnect()
-# thermostat.connect(integrator)
+thermostat.connect(thermostat, integrator)
 
 thermostat = 5.0
-
-print 'thermostat reset'
 
 writePSF(particleStorage, NCHAINS*NBEADS, 
          bondList, NCHAINS*(NBEADS-1), "dump.psf")
