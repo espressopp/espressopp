@@ -100,8 +100,17 @@ These commands can be called on a worker.
   corresponding PMI command. Note that these commands will ignore any
   arguments when called on a worker.
 
-Useful constants
-----------------
+PMI Proxy metaclass
+-------------------
+
+The Proxy metaclass can be used to easily generate front-end classes
+to distributed PMI classes.
+.
+.
+.
+
+Useful constants and variables
+------------------------------
 
 The pmi module defines the following useful constants:
 * IS_CONTROLLER is True when used on the controller, False otherwise
@@ -109,6 +118,10 @@ The pmi module defines the following useful constants:
 * ID is the numerical Id of the thread ( = mpi.world.rank)
 * CONTROLLER is the numerical Id of the controller thread (the MPI root)
 * WORKERSTR is a string describing the thread ('Worker #' or 'Controller')
+
+and the following variables:
+* inWorkerLoop is True, if PMI currently executes the worker loop on
+  the workers.
 """
 import logging, types, sys, functools, __builtin__
 from espresso import boostmpi as mpi
@@ -505,8 +518,13 @@ class Proxy(type):
 
     class PropertyPMISetter(object):
         def __init__(self, cls, propName):
-            property = getattr(cls.pmisubjectclass, propName)
-            self.setter = '.'.join((cls.pmisubjectclass.__name__, propName, 'fset'))
+            self.setter = '.'.join(
+                (
+                    cls.pmisubjectclass.__module__,
+                    cls.pmisubjectclass.__name__, 
+                    propName, 
+                    'fset')
+                )
         def __call__(self, method_self, val):
             return call(self.setter, method_self.pmisubject, val)
 
@@ -802,7 +820,7 @@ def __translateInvokeArgs(arg0, args) :
         function = arg0.__name__
     elif isinstance(arg0, (types.MethodType, types.BuiltinMethodType)):
         container = arg0.im_class
-        function = arg0.__name__
+        function = arg0.im_func.__name__
         # test whether the method is bound or not
         if arg0.im_self is not None:
             args = (arg0.im_self,) + args

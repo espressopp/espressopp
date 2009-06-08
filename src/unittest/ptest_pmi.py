@@ -231,7 +231,8 @@ if pmi.IS_CONTROLLER:
             'subjectclass' : 'amodule.Local',
             'localcall': [ 'f' ],
             'pmicall': [ 'g' ],
-            'pmiinvoke': [ 'h' ]
+            'pmiinvoke': [ 'h' ],
+            'pmiproperty': [ 'x' ]
             }
 
 class Test6ProxyCreateandDelete(unittest.TestCase) :
@@ -291,6 +292,23 @@ class Test7Proxy(unittest.TestCase) :
             pmi.invoke()
 
         self.assertEqual(amodule.Local.called, 'h')
+
+    def test3Property(self):
+        self.assertEqual(amodule.Local.called, 'init')
+
+        if pmi.IS_CONTROLLER:
+            self.a.x = 2
+            self.assertEqual(self.a.pmisubject._x, 2)
+        else:
+            pmi.call()
+
+        self.assertEqual(amodule.Local.called, 'x.set')
+
+        if pmi.IS_CONTROLLER:
+            res = self.a.x
+            self.assertEqual(amodule.Local.called, 'x.get')
+            self.assertEqual(res, 2)
+        
        
 unittest.main()
 

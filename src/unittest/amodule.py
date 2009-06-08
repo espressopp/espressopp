@@ -63,5 +63,13 @@ class Local(object):
     def h(self):
         Local.called = 'h'
         return 'h'
+    @property
+    def x(self):
+        Local.called = 'x.get'
+        return self._x
+    @x.setter
+    def x(self, val):
+        Local.called = 'x.set'
+        self._x = val
     def __del__(self):
         Local.called = None
