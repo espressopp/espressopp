@@ -35,7 +35,6 @@ public:
 };
 
 void Storage::deleteParticle(ParticleId deleteID) {
-
   esutil::TupleVector::iterator pos =
     std::find_if(particles.begin(), particles.end(), PredicateMatchParticleID(*this, deleteID));
 
@@ -46,12 +45,11 @@ void Storage::deleteParticle(ParticleId deleteID) {
 }
 
 ParticleHandle Storage::getParticleHandle(ParticleId id) {
-
   esutil::TupleVector::iterator pos =
     std::find_if(particles.begin(), particles.end(), PredicateMatchParticleID(*this, id));
 
   if (pos == particles.end()) {
-    throw std::out_of_range("Storage::getParticleByID: particle does not exist");
+    throw std::out_of_range("Storage::getParticleHandle: particle does not exist");
   }
   return pos;
 }

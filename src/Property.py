@@ -1,51 +1,38 @@
 from espresso import pmi
 from espresso import boostmpi as mpi
 
-def _reduceNodeInfo(x, y) :
-    """
-    Reduce operation for single node information. Input data should be
-    -1 on nodes that do not have the information, and the node number
-    on the node that has it. The operation then returns -1 if all
-    nodes did not have the information, the node number if exactly one
-    did, or mpi.size if more than one node claimed to have the
-    information.
-    """
-    # not on any of first nodes, second ones decide
-    if x == -1 :
-        return y
-    elif y == -1 :
-        return x
-    else:
-        # oops, both claim something...
-        return mpi.size
-
 class _PropertyLocal(object) :
+    """
+    common python code of properties. In fact, this provides the local
+    Property interface, while the xxxPropertyLocal only glues this
+    to the typified C++ Property.
+    """
     def __init__(self, decomposerlocal) :
         self.decomposerlocal = decomposerlocal
 
-    def getItem(self, particle) :
-        # see whether we can read the value, i.e. the particle is here
-        try:
-            value = self[particle]
-            node = mpi.rank
-        except IndexError:
-            node = -1
+    def getItem(self, node, particle) :
+        
+        if node == mpi.rank :
+            try :
+                value = self[particle]
+            except IndexError :
+                raise RuntimeWarning("decomposer put the particle %d here on node %d, but cannot find its properties" % (particle, mpi.rank))
 
-        # find out a) who has the particle and b) if not too many have it
-        node = mpi.world.all_reduce(node, _reduceNodeInfo)
-        if pmi.IS_CONTROLLER :
-            if node == -1 :
-                raise KeyError("particle %d does not exist" % particle)
-            elif node == mpi.size :
-                raise RuntimeWarning("particle %d found multiply" % particle)
-
-            if node == mpi.rank :
-                self.value = value
+            if pmi.IS_CONTROLLER :
+                return value
             else :
-                self.value = mpi.world.recv(node, 0)
-        else :
-            if node == mpi.rank :
                 mpi.world.send(pmi.CONTROLLER, 0, value)
+        else :
+            if pmi.IS_CONTROLLER :
+                return mpi.world.recv(node, 0)
+
+    def setItem(self, node, particle, value) :
+        
+        if node == mpi.rank :
+            try :
+                self[particle] = value
+            except IndexError :
+                raise RuntimeWarning("decomposer claims particle %d is here on node %d, but set its properties" % (particle, mpi.rank))
 
 ####
 
@@ -62,11 +49,12 @@ if pmi.IS_CONTROLLER:
             pmi.exec_('import espresso.Property')
 
         def __getitem__(self, particle) :
-            pmi.call(self.local.getItem, particle)
-            # fetch and clear return value
-            value = self.local.value
-            del(self.local.value)
-            return value
+            node = self.decomposer.nodeOfParticle(particle)
+            return pmi.call(self.local.getItem, node, particle)
+
+        def __setitem__(self, particle, value) :
+            node = self.decomposer.nodeOfParticle(particle)
+            pmi.call(self.local.setItem, node, particle, value)
 
 ####
 
@@ -91,7 +79,32 @@ if pmi.IS_CONTROLLER:
 
 from _espresso import IntegerProperty as _IntegerProperty
 
+class IntegerPropertyLocal(_IntegerProperty, _PropertyLocal) :
+    def __init__(self, decomposerlocal) :
+        _PropertyLocal.__init__(self, decomposerlocal)
+        _IntegerProperty.__init__(self, decomposerlocal.storage)
+####
+
+if pmi.IS_CONTROLLER:
+    class IntegerProperty(_Property) :
+        def __init__(self, decomposer, name) :
+            _Property.__init__(self, decomposer, name)
+            self.local = pmi.create('espresso.Property.IntegerPropertyLocal', decomposer.local)
+####
+
 ######## Real3DProperty
 
 from _espresso import Real3DProperty as _Real3DProperty
 
+class Real3DPropertyLocal(_Real3DProperty, _PropertyLocal) :
+    def __init__(self, decomposerlocal) :
+        _PropertyLocal.__init__(self, decomposerlocal)
+        _Real3DProperty.__init__(self, decomposerlocal.storage)
+####
+
+if pmi.IS_CONTROLLER:
+    class Real3DProperty(_Property) :
+        def __init__(self, decomposer, name) :
+            _Property.__init__(self, decomposer, name)
+            self.local = pmi.create('espresso.Property.Real3DPropertyLocal', decomposer.local)
+####
