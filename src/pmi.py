@@ -123,7 +123,7 @@ and the following variables:
 * inWorkerLoop is True, if PMI currently executes the worker loop on
   the workers.
 """
-import logging, types, sys, functools, __builtin__
+import logging, types, sys, __builtin__
 from espresso import boostmpi as mpi
 
 ##################################################
