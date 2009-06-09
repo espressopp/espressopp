@@ -9,6 +9,7 @@
 #include <interaction/bindings.hpp>
 #include <integrator/bindings.hpp>
 #include <thermostat/bindings.hpp>
+#include <force/bindings.hpp>
 #include <esutil/PyLogger.hpp>
 
 void espresso::registerPython() {
@@ -24,6 +25,7 @@ void espresso::registerPython() {
   espresso::particles::registerPython();
   espresso::integrator::registerPython();
   espresso::thermostat::registerPython();
+  espresso::force::registerPython();
 
   log4espp::PyLogger::registerPython();
 }

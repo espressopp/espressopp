@@ -5,10 +5,6 @@
 
 #include "types.hpp"
 #include "MDIntegrator.hpp"
-#include "particles/Set.hpp"
-#include "interaction/Interaction.hpp"
-#include "pairs/Set.hpp"
-#include "Property.hpp"
 
 namespace espresso {
   namespace integrator {
@@ -17,12 +13,7 @@ namespace espresso {
 
     private:
 
-      boost::shared_ptr<particles::Set> particles;
-      // boost::shared_ptr<Stoarge> storage;
-
-      boost::shared_ptr< Property<Real3D> > position;
-      boost::shared_ptr< Property<Real3D> > velocity;
-      boost::shared_ptr< Property<Real3D> > force;
+      /* on change:
 
       struct ForceEvaluation {
         boost::shared_ptr<interaction::Interaction> interaction;
@@ -34,43 +25,28 @@ namespace espresso {
 
       std::vector<ForceEvaluation> forceEvaluations;
 
+      */
+
+    protected:
+
+      void runSingleStep();
+
     public:
+
+      VelocityVerlet(boost::shared_ptr<particles::Set> particles,
+                   boost::shared_ptr< Property<Real3D> > position,
+                   boost::shared_ptr< Property<Real3D> > velocity,
+                   boost::shared_ptr< Property<Real3D> > force);
 
       static void registerPython();
 
-      VelocityVerlet(real _timeStep);
+      /** The following signals are specific for VelocityVerlet */
 
-      VelocityVerlet(boost::shared_ptr<particles::Set> _particles, 
-                     boost::shared_ptr< Property<Real3D> > _position,
-                     boost::shared_ptr< Property<Real3D> > _velocity,
-                     boost::shared_ptr< Property<Real3D> > _force);
-      
-      void addForce(boost::shared_ptr<interaction::Interaction> interaction, 
-                    boost::shared_ptr<pairs::Set> pairs);
+      typedef boost::signals2::signal1<void, const VelocityVerlet&> VelocityVerletSignal;
 
-      boost::shared_ptr<particles::Set> getSet() { return particles; }
-  
-      /** All routines that should be called after stepA in one integration 
-          step must connect to this signal.
-      */
+      VelocityVerletSignal updateVelocity1;
 
-      typedef boost::signals2::signal0<void> signalStepA;
-
-      // boost::signals2::signal0<void> postStepA;
-
-      signalStepA postStepA;
-
-      /** All routines that should be called after stepB in one integration 
-          step must connect to this signal.
-      */
-
-      typedef boost::signals2::signal1<void, int> signalStepB;
-
-      // boost::signals2::signal1<void, int> postStepB;
-
-      signalStepB postStepB;
-
-      virtual void run(int timesteps); 
+      VelocityVerletSignal updateVelocity2;
 
       virtual ~VelocityVerlet();
 

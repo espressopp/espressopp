@@ -97,27 +97,17 @@ public:
 *  class Langevin                                                                  *
 ***********************************************************************************/
 
-Langevin::Langevin(boost::shared_ptr<particles::Set> _particles,
-                   real _temperature,
-                   real _gamma,
-                   boost::shared_ptr<Property<Real3D> > _position,
-                   boost::shared_ptr<Property<Real3D> > _velocity,
-                   boost::shared_ptr<Property<Real3D> > _force):
+Langevin::Langevin(real _temperature, real _gamma):
 
-             Thermostat(_particles, _temperature),
-             position(_position),
-             velocity(_velocity),
-             force(_force),
+             Thermostat(_temperature),
              linearCongruential(15154),
              normalDist(0.,1.),
              gauss(linearCongruential, normalDist)
 
 {
+  setGamma(_gamma);         // also checks for a correct argument
+
   LOG4ESPP_INFO(theLogger, "Langevin, temperature = " << temperature << ", gamma = " << gamma);
-
-  setGamma(_gamma);   // also checks for a correct argument
-
-  connected = false;
 }
 
 /**********************************************************************************/
@@ -136,24 +126,45 @@ real Langevin::getGamma() const { return gamma; }
 
 /**********************************************************************************/
 
-void Langevin::thermalizeA() {
+void Langevin::thermalizeA(const integrator::VelocityVerlet& integrator) {
 
-  LOG4ESPP_DEBUG(theLogger, "");
+  LOG4ESPP_DEBUG(theLogger, "Langevin thermalizeA at integration step = " 
+                             << integrator.getIntegrationStep());
 
-  StepThermalA stepThermalA(*position, *velocity, *force, 0.01);
-  particles->foreach(stepThermalA);
+  PropertyHandle<Real3D> pos   = *integrator.getPosition();
+  PropertyHandle<Real3D> vel   = *integrator.getVelocity();
+  PropertyHandle<Real3D> force = *integrator.getForce();
+
+  StepThermalA stepThermalA(pos, vel, force, 0.01);
+
+  // apply stepThermalA to my particle set only if available
+
+  if (particles) {
+     particles->foreach(stepThermalA);
+  } else {
+     integrator.getParticles()->foreach(stepThermalA);
+  }
 
 }
 
 /**********************************************************************************/
 
-void Langevin::thermalizeB(int itimestep) {
+void Langevin::thermalizeB(const integrator::VelocityVerlet& integrator) {
 
-  LOG4ESPP_DEBUG(theLogger, "itimestep = " << itimestep);
+  LOG4ESPP_DEBUG(theLogger, "Langevin thermalizeB at integration step = " 
+                             << integrator.getIntegrationStep());
 
-  StepThermalB stepThermalB(*position, *velocity, *force, 0.01);
-  particles->foreach(stepThermalB);
+  PropertyHandle<Real3D> pos   = *integrator.getPosition();
+  PropertyHandle<Real3D> vel   = *integrator.getVelocity();
+  PropertyHandle<Real3D> force = *integrator.getForce();
 
+  StepThermalB stepThermalB(pos, vel, force, 0.01);
+
+  if (particles) {
+     particles->foreach(stepThermalB);
+  } else {
+     integrator.getParticles()->foreach(stepThermalB);
+  }
 }
 
 /**********************************************************************************/
@@ -167,7 +178,11 @@ void Langevin::connect(boost::shared_ptr<thermostat::Langevin> langevin,
      ARGERROR(theLogger, "shared pointer does not belong to this object");
   }
 
-  if (connected) {
+  if (!integrator) {
+     ARGERROR(theLogger, "Langevin: connect to NULL integrator");
+  }
+
+  if (stepA.connected()) {
      LOG4ESPP_WARN(theLogger, "Thermostat is already connected, disconnecting from last one");
      disconnect();
   }
@@ -176,9 +191,9 @@ void Langevin::connect(boost::shared_ptr<thermostat::Langevin> langevin,
 
   // We give a shared pointer to the boost bind so this object cannot be deleted as long
 
-  stepA = integrator->postStepA.connect(boost::bind(&Langevin::thermalizeA, langevin));
+  stepA = integrator->updateVelocity1.connect(boost::bind(&Langevin::thermalizeA, langevin, _1));
 
-  stepB = integrator->postStepB.connect(boost::bind(&Langevin::thermalizeB, langevin, _1));
+  stepB = integrator->updateVelocity2.connect(boost::bind(&Langevin::thermalizeB, langevin, _1));
 
 }
 
@@ -186,17 +201,15 @@ void Langevin::connect(boost::shared_ptr<thermostat::Langevin> langevin,
 
 void Langevin::disconnect() 
 {
-  if (!connected) {
-     LOG4ESPP_WARN(theLogger, "Thermostat is not connected");
+  if (!stepA.connected()) {
+     LOG4ESPP_WARN(theLogger, "Langevin termostat is not connected");
      return;
   }
 
-  LOG4ESPP_INFO(theLogger, "disconnect from integrator");
+  LOG4ESPP_INFO(theLogger, "Langevin disconnects from integrator");
 
   stepA.disconnect();
   stepB.disconnect();
-
-  connected = false;
 }
 
 /**********************************************************************************/
@@ -204,10 +217,6 @@ void Langevin::disconnect()
 Langevin::~Langevin() {
 
   LOG4ESPP_INFO(theLogger, "~Langevin");
-
-  // disconnect is not necesssary as this routine is called after the 
-  // deletion of the object to which this object is connected.
-
 }
 
 //////////////////////////////////////////////////
@@ -219,12 +228,7 @@ Langevin::registerPython() {
   using namespace boost::python;
 
     class_<Langevin, boost::shared_ptr<Langevin>, bases<Thermostat> >
-      ("thermostat_Langevin", init<boost::shared_ptr<particles::Set>,
-                                   real,
-                                   real,
-                                   boost::shared_ptr<Property<Real3D> >,
-                                   boost::shared_ptr<Property<Real3D> >,
-                                   boost::shared_ptr<Property<Real3D> > >())
+      ("thermostat_Langevin", init<real, real>())
       .def("setGamma", &Langevin::setGamma)
       .def("getGamma", &Langevin::getGamma)    
       .def("connect", &Langevin::connect)    

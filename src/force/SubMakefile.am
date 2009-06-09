@@ -1,0 +1,11 @@
+nobase_pkginclude_HEADERS += \
+	force/bindings.hpp \
+	force/ForceComputer.hpp
+
+libespresso_common_la_SOURCES += \
+	force/bindings.cpp \
+        force/ForceComputer.cpp
+
+python_SCRIPTS += \
+	force/__init__.py \
+	force/ForceComputer.py

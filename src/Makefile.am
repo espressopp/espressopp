@@ -14,6 +14,7 @@ include pairs/SubMakefile.am
 include interaction/SubMakefile.am
 include bc/SubMakefile.am
 include integrator/SubMakefile.am
+include force/SubMakefile.am
 include thermostat/SubMakefile.am
 
 CLEANFILES =

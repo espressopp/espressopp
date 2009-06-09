@@ -9,34 +9,33 @@ using namespace espresso::integrator;
 using namespace espresso::particles;
 using namespace boost;
 
-    class StepA : public particles::Computer  {
+class StepA : public particles::Computer  {
 
-    private:
+ private:
 
-      PropertyHandle<Real3D> pos;
-      PropertyHandle<Real3D> vel;
-      PropertyHandle<Real3D> force;
+   PropertyHandle<Real3D> pos;
+   PropertyHandle<Real3D> vel;
+   PropertyHandle<Real3D> force;
 
-      real timeStep;
-      real timeStepSqr;
+   real timeStep;
+   real timeStepSqr;
 
-    public:
+ public:
 
-      StepA(PropertyHandle<Real3D> _posRef,
-            PropertyHandle<Real3D> _velRef,
-            PropertyHandle<Real3D> _forceRef, real _timeStep):
-	pos(_posRef), vel(_velRef), force(_forceRef),
-	timeStep(_timeStep), timeStepSqr(_timeStep * _timeStep) {}
+   StepA(PropertyHandle<Real3D> _posRef,
+         PropertyHandle<Real3D> _velRef,
+         PropertyHandle<Real3D> _forceRef, real _timeStep):
 
-      // m = 1
-      virtual void operator()(ParticleHandle pref) {
-	pos[pref] = pos[pref] + vel[pref] * timeStep + 0.5 * force[pref] * timeStepSqr;
-        vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
-       
-	force[pref] = 0.0;
-      }
+     pos(_posRef), vel(_velRef), force(_forceRef),
+     timeStep(_timeStep), timeStepSqr(_timeStep * _timeStep) {}
 
-    };
+   virtual void operator()(ParticleHandle pref) 
+   {
+     pos[pref] = pos[pref] + vel[pref] * timeStep + 0.5 * force[pref] * timeStepSqr;
+     vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
+     force[pref] = 0.0;
+   }
+};
 
     class StepB : public particles::Computer  {
 
@@ -62,64 +61,56 @@ using namespace boost;
 
     };
 
-    VelocityVerlet::VelocityVerlet(real _timeStep) 
-    { setTimeStep(_timeStep);}
+VelocityVerlet::VelocityVerlet(boost::shared_ptr<Set> _particles, 
+                               boost::shared_ptr< Property<Real3D> > _position,
+                               boost::shared_ptr< Property<Real3D> > _velocity,
+                               boost::shared_ptr< Property<Real3D> > _force):
 
-    VelocityVerlet::VelocityVerlet(boost::shared_ptr<Set> _particles, 
-				   boost::shared_ptr< Property<Real3D> > _position,
-				   boost::shared_ptr< Property<Real3D> > _velocity,
-				   boost::shared_ptr< Property<Real3D> > _force):
+   MDIntegrator(_particles, _position, _velocity, _force)
 
-      particles(_particles),
-      position(_position),
-      velocity(_velocity),
-      force(_force)
+{
+}
 
-    {}
+void VelocityVerlet::runSingleStep() 
+{
+  // Step A
 
-    void VelocityVerlet::addForce(shared_ptr<interaction::Interaction> interaction,
-                                  shared_ptr<pairs::Set> pair)
-    {
-      forceEvaluations.push_back(ForceEvaluation(interaction, pair));
-    }
+  StepA stepA(*position, *velocity, *force, timeStep);
 
-    void VelocityVerlet::run(int timesteps) {
+  particles->foreach(stepA);
 
-      for (int i=0; i < timesteps; i++) {
+  // call connected routines, e.g. thermalizeA for a chosen thermostat
 
-	// Step A
-	StepA stepA(*position, *velocity, *force, timeStep);
-	particles->foreach(stepA);
+  updateVelocity1(*this);
 
-        // call connected routines, e.g. thermalizeA for a chosen thermostat
+  // ToDo: set forces to ZERO after calling updateVelocity1
 
-        postStepA();
+  // calculate forces:
 
-	// Force Loop 
+  updateForces(*this);
 
-	// template for the force computer
-	pairs::ForceComputer
-	  forceParameters(*force);
+  /* no more needed:
 
-	BOOST_FOREACH(ForceEvaluation fe, forceEvaluations) {
-	  pairs::ForceComputer *forceCompute =
-	    fe.interaction->createForceComputer(forceParameters);
-	  fe.pairs->foreach(*forceCompute);
-	  delete forceCompute;
-	}
-
-	// Step B
-	StepB stepB(*velocity, *force, timeStep);
-	particles->foreach(stepB);
-
-        // call connected routines, e.g. thermalizeB for a chosen thermostat
-
-        postStepB(i);
-
+     BOOST_FOREACH(ForceEvaluation fe, forceEvaluations) {
+      pairs::ForceComputer *forceCompute =
+          fe.interaction->createForceComputer(forceParameters);
+          fe.pairs->foreach(*forceCompute);
+          delete forceCompute;
       }
-    }
 
-    VelocityVerlet::~VelocityVerlet() {}
+  */
+
+  // Step B
+
+  StepB stepB(*velocity, *force, timeStep);
+  particles->foreach(stepB);
+
+  // call connected routines, e.g. thermalizeB for a chosen thermostat
+
+  updateVelocity2(*this);
+}
+
+VelocityVerlet::~VelocityVerlet() {}
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -131,11 +122,8 @@ VelocityVerlet::registerPython() {
   using namespace boost::python;
 
   class_<VelocityVerlet, boost::shared_ptr<VelocityVerlet>, boost::noncopyable, bases<MDIntegrator> >
-    ("integrator_VelocityVerlet", init<real>())
-    .def(init<shared_ptr<Set>, shared_ptr< Property<Real3D> >,
-                               shared_ptr< Property<Real3D> >,
-                               shared_ptr< Property<Real3D> > >())
-    .def("run", &VelocityVerlet::run)
-    .def("addForce", &VelocityVerlet::addForce)
+    ("integrator_VelocityVerlet", init<shared_ptr<Set>, shared_ptr< Property<Real3D> >,
+                                                        shared_ptr< Property<Real3D> >,
+                                                        shared_ptr< Property<Real3D> > >())
     ;
 }

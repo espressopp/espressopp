@@ -19,6 +19,8 @@ import math
 import logging
 
 logging.getLogger("Langevin").setLevel(logging.INFO)
+logging.getLogger("ForceComputer").setLevel(logging.INFO)
+logging.getLogger("Integrator").setLevel(logging.INFO)
 
 from _espresso import particles_Storage as Storage
 from _espresso import Real3DProperty
@@ -33,6 +35,7 @@ from _espresso import interaction_LennardJones as LennardJones
 from _espresso import interaction_FENE as FENE
 from _espresso import integrator_VelocityVerlet as VelocityVerlet
 from _espresso import thermostat_Langevin as Langevin
+from _espresso import force_ForceComputer as ForceComputer
  
 ##  Simple class to write position of particles
 
@@ -238,16 +241,16 @@ integrator.setTimeStep(0.005)
 # Pair(ljint, allPairs).connect(integrator)
 # Pair(fene, bondList).connect(integrator)
 
-integrator.addForce(ljint, allPairs)
-integrator.addForce(fene, bondList)
+f1 = ForceComputer(ljint, allPairs)
+f2 = ForceComputer(fene, bondList)
+f1.connect(f1, integrator);
+f2.connect(f2, integrator);
 
 #  Adding a thermostat
 
-thermostat = Langevin(allSet, 1.0, 0.5, position, velocity, force)
+thermostat = Langevin(1.0, 0.5)
 
 thermostat.connect(thermostat, integrator)
-
-thermostat = 5.0
 
 writePSF(particleStorage, NCHAINS*NBEADS, 
          bondList, NCHAINS*(NBEADS-1), "dump.psf")
@@ -260,6 +263,7 @@ allSet.foreach(xyz)
 
 N = 100
 for k in range(N):
+   # print 'pre-equilibration', k, 'of', N
    sigma = (1.0 * (k+1)) / N
    ljint.set(1.0, sigma, 2.5)
    integrator.run(20)

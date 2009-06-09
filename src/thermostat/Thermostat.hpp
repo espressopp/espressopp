@@ -28,7 +28,7 @@ namespace espresso {
 
       /** A constructor of a thermostat needs at least a particle set and a temperature. */
 
-      Thermostat(boost::shared_ptr<particles::Set> _particles, real _temperature): particles(_particles)
+      Thermostat(real _temperature)
 
       { setTemperature(_temperature); }
 
@@ -39,11 +39,15 @@ namespace espresso {
           \param temperature is the new target temperature (must not be negative)
       */
 
-      virtual void setTemperature(real temperature);
+      virtual void setTemperature(real _temperature);
 
       /** Getter routine for the temperature */
       
       virtual real getTemperature() const { return temperature; }
+
+      virtual void setParticles(boost::shared_ptr<particles::Set> _particles) { particles = _particles; }
+
+      virtual boost::shared_ptr<particles::Set> getParticles() { return particles; }
 
       /** Abstract class needs also registration in Python */
 

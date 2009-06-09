@@ -31,16 +31,8 @@ namespace espresso {
 
       real gamma;
 
-      boost::shared_ptr<Property<Real3D> > position;
-      boost::shared_ptr<Property<Real3D> > velocity;
-      boost::shared_ptr<Property<Real3D> > force;
-
-      // Boolean variables that is true for an existing connection to
-      // an integrator. At any time only one connection is allowed.
-
-      bool connected;
-
       // Connections to the integrator after step A and step B 
+      // Note: only one connection is allowed
 
       boost::signals2::connection stepA;
       boost::signals2::connection stepB;
@@ -54,18 +46,19 @@ namespace espresso {
       variate_generator<boost::minstd_rand0&, 
                         boost::normal_distribution<double> > gauss;
 
+      /** Method of the thermostat to modify r and v before force computation. */
+      virtual void thermalizeA(const integrator::VelocityVerlet&);
+
+      /** Method of the thermostat to modify r and v after force computation. */
+      virtual void thermalizeB(const integrator::VelocityVerlet&);
+
     public:
 
       /** Method to register the Python bindings. */
       static void registerPython();
 
       /** Constructor with the particle set, temperature, and friction coefficient. */
-      Langevin(boost::shared_ptr<particles::Set> _particles,
-               real _temperature,
-               real _gamma,
-	       boost::shared_ptr<Property<Real3D> > _position,
-               boost::shared_ptr<Property<Real3D> > _velocity,
-               boost::shared_ptr<Property<Real3D> > _force);
+      Langevin(real temperature, real gamma);
 
       /** The thermostat will be connected to a VelocityVerlet integrator so that it
           can be called by this integrator. 
@@ -83,20 +76,13 @@ namespace espresso {
       /** Disconnect this thermostat object from its integrator. */
       void disconnect();
 
-      /** Method to get gamma. */
+      /** Getter for gamma. */
       real getGamma() const;
 
-      /** Method to set gamma. */
-      void setGamma(real _gamma);
-
-      /** Method of the thermostat to modify r and v before force computation. */
-      virtual void thermalizeA();
-
-      /** Method of the thermostat to modify r and v before force computation. */
-      virtual void thermalizeB(int itimestep);
+      /** Setter for gamma. */
+      void setGamma(real gamma);
 
       virtual ~Langevin();
-
     };
 
   }
