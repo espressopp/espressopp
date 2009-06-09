@@ -16,5 +16,5 @@ def locateItem(here):
     res = _espresso.esutil_Collectives_locateItem(here, pmi.CONTROLLER)
     if pmi.IS_CONTROLLER:
         if res == ResultNone:
-            raise KeyError
+            raise IndexError("collectives.locateItem could not find anything")
         return res
