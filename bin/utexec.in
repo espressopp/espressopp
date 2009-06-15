@@ -2,7 +2,7 @@
 # -*- mode: python -*-
 # 
 # Script that collects, compiles, links and executes unit tests
-import sys, getopt, os, glob
+import sys, getopt, os, glob, os.path
 
 def Usage():
     print("""USAGE:
@@ -140,21 +140,42 @@ if not clean and not do_python and not do_cpp and not do_parallel:
     do_python = do_cpp = do_parallel = True
 
 ##################################################
-# DETERMINE BUILDDIR
+# DETERMINE DIRS
 savecwd = os.getcwd()
 
-if builddir is None: builddir = savecwd
+# normalize dirs given in options
+if srcdir is not None:
+    srcdir = os.path.abspath(srcdir)
+if builddir is not None:    
+    builddir = os.path.abspath(builddir)
 
+# determine the dirs not given in options
+if srcdir is not None and builddir is None:
+    builddir = srcdir.replace(top_srcdir, top_builddir)
+elif builddir is not None and srcdir is None:
+    srcdir = builddir.replace(top_builddir, top_srcdir)
+elif builddir is None and srcdir is None:
+    if savecwd.find(top_builddir):
+        builddir = savecwd
+        srcdir = builddir.replace(top_builddir, top_srcdir)
+    elif savecws.find(top_srcdir):
+        srcdir = savecwd
+        builddir = srcdir.replace(top_srcdir, top_builddir)
+    else:
+        die('Cannot identify source dir nor build dir')
+    
+##################################################
+# DETERMINE BUILDDIR
 # add trailing slash to builddir
 if not builddir.endswith('/'):
     builddir = builddir + '/'
 # add trailing utdir to builddir
 if not builddir.endswith(utdir):
     builddir += utdir
-        
+
 # check whether builddir is writeable, readable and executable
 if os.access(builddir, os.F_OK):
-    if not os.access(builddir, os.R_OK | os.X_OK):
+    if not os.access(builddir, os.W_OK | os.X_OK | os.R_OK):
         die("Cannot access build dir " + builddir)
     create_builddir = False
 else:
@@ -163,10 +184,6 @@ if verbose: print("BUILDDIR = " + builddir)
 
 ##################################################
 # DETERMINE SRCDIR
-if srcdir is None:
-    # replace top_builddir with top_srcdir, if possible
-    srcdir = builddir.replace(top_builddir, top_srcdir)
-
 # add trailing slash to srcdir
 if not srcdir.endswith('/'):
     srcdir = srcdir + '/'
