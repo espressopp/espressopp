@@ -158,7 +158,7 @@ elif builddir is None and srcdir is None:
     if savecwd.find(top_builddir):
         builddir = savecwd
         srcdir = builddir.replace(top_builddir, top_srcdir)
-    elif savecws.find(top_srcdir):
+    elif savecwd.find(top_srcdir):
         srcdir = savecwd
         builddir = srcdir.replace(top_srcdir, top_builddir)
     else:
