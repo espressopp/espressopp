@@ -22,17 +22,40 @@ class Test0PBC(unittest.TestCase):
         self.assertEqual(pbc.length, 2.0)
         
     def test2GetDist(self):
-        pbc = PBC()
+        pbc = PBC(10.0)
 
-        v1 = Real3D(0.1, 0.1, 0.1)
-        v2 = Real3D(0.2, 0.2, 0.2)
-        res = pbc.getDist(v1, v2)
-        self.assertEqual(res, Real3D(0.1, 0.1, 0.1))
+        for v1, v2, expected in [
+            # distance in central image
+            ((1.0, 1.0, 1.0), (2.0, 2.0, 2.0), (-1.0, -1.0, -1.0)),
+            # reverse distance in central image
+            ((2.0, 2.0, 2.0), (1.0, 1.0, 1.0), (1.0, 1.0, 1.0)),
+            # periodic distance
+            ((1.0, 1.0, 1.0), (9.0, 9.0, 9.0), (2.0, 2.0, 2.0)),
+            # reverse periodic distance
+            ((9.0, 9.0, 9.0), (1.0, 1.0, 1.0), (-2.0, -2.0, -2.0)),
+            # distance over various images
+            ((-51.0, -51.0, -51.0), (1.0, 1.0, 1.0), (-2.0, -2.0, -2.0)),
+            # different distances in different directions
+            ((1.0, 12.0, 23.0), (-11.0, -22.0, -33.0), (2.0, 4.0, -4.0)),
+            ]:
+            res = pbc.getDist(Real3D(v1), Real3D(v2))
+            self.assertEqual(res, Real3D(expected))
 
-        res = pbc.getDist(v2, v1)
-        self.assertEqual(res, Real3D(-0.1, -0.1, -0.1))
+    def test3RandomPos(self):
+        pbc = PBC(10.0)
+        sum = Real3D(0.0)
 
-        
+        for i in range(10000):
+            v = pbc.randomPos()
+            self.assert_(v[0] > 0.0 and v[0] <= 10.0)
+            self.assert_(v[1] > 0.0 and v[1] <= 10.0)
+            self.assert_(v[2] > 0.0 and v[2] <= 10.0)
+            sum += v
+
+        sum *= 1.0/10000.0
+        self.assertAlmostEqual(sum[0], 5.0, 1)
+        self.assertAlmostEqual(sum[1], 5.0, 1)
+        self.assertAlmostEqual(sum[2], 5.0, 1)
 
 if __name__ == "__main__":
     unittest.main()
