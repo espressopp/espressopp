@@ -6,7 +6,7 @@
 
 namespace espresso {
   namespace particles {
-    /** temporary handle for efficient access to a partice */
+    /** temporary handle for efficient read/write access to a particle */
     class ParticleHandle {
     public:
       ParticleHandle() {}
@@ -14,13 +14,17 @@ namespace espresso {
 
       // for most uses, we actually need the reference
       operator esutil::TupleVector::reference() const { return *ptr; }
+      operator esutil::TupleVector::iterator() const { return ptr; }
+
+      /// check if valid handle
+      operator bool() const { return ptr != esutil::TupleVector::pointer(); }
 
     private:
       friend class ConstParticleHandle;
       esutil::TupleVector::pointer ptr;
     };
 
-    /** temporary handle for efficient access to a partice */
+    /** temporary handle for efficient read access to a particle */
     class ConstParticleHandle {
       esutil::TupleVector::const_pointer ptr;
 
@@ -36,6 +40,10 @@ namespace espresso {
       
       // for most uses, we actually need the reference
       operator esutil::TupleVector::const_reference() const { return *ptr; }
+      operator esutil::TupleVector::const_iterator() const { return ptr; }
+
+      /// check if valid handle
+      operator bool() const { return ptr != esutil::TupleVector::const_pointer(); }
     };
   }
 }

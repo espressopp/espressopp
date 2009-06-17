@@ -69,6 +69,26 @@ namespace espresso {
       return (*this)[handle];
     }
 
+    /// checked access
+    T at(ParticleId id) const {
+      particles::ConstParticleHandle handle =
+        storage->getParticleHandle(id);
+      if (handle == particles::ConstParticleHandle()) {
+	throw std::out_of_range("Property::at");
+      }
+      return (*this)[handle];
+    }
+
+    /// checked access
+    T &at(ParticleId id) {
+      particles::ParticleHandle handle =
+        storage->getParticleHandle(id);
+      if (handle == particles::ParticleHandle()) {
+	throw std::out_of_range("Property::at");
+      }
+      return (*this)[handle];
+    }
+
   private:
     boost::shared_ptr<particles::Storage> storage;
     esutil::TupleVector::PropertyId id;
@@ -142,6 +162,26 @@ namespace espresso {
     T *operator[](ParticleId part) {
       particles::ParticleHandle handle =
         storage->getParticleHandle(part);
+      return (*this)[handle];
+    }
+
+    /// checked access
+    const T *at(ParticleId part) const {
+      particles::ConstParticleHandle handle =
+        storage->getParticleHandle(part);
+      if (handle == particles::ConstParticleHandle()) {
+	throw std::out_of_range("ArrayProperty::at");
+      }
+      return (*this)[handle];
+    }
+
+    /// checked access
+    T *at(ParticleId part) {
+      particles::ParticleHandle handle =
+        storage->getParticleHandle(part);
+      if (handle == particles::ParticleHandle()) {
+	throw std::out_of_range("ArrayProperty::at");
+      }
       return (*this)[handle];
     }
 

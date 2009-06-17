@@ -9,20 +9,7 @@
 using namespace espresso;
 using namespace espresso::particles;
 
-Storage::Storage(): uniqueID(0) {
-  particleIdProperty = particles.addProperty<size_t>();
-}
-
-ParticleId Storage::addParticle() {
-  esutil::TupleVector::iterator it = particles.insert(particles.end());
-  particles.getProperty<size_t>(particleIdProperty)[*it] = ++uniqueID;
-  return ParticleId(uniqueID);
-}
-
-ConstParticleHandle Storage::getParticleHandle(ParticleId id) const {
-  return ConstParticleHandle(const_cast<Storage *>(this)->getParticleHandle(id));
-}
-
+/// simple predicate class for "efficient" searching for a particle
 class PredicateMatchParticleID: public std::unary_function<ConstParticleHandle, bool> {
   ConstPropertyHandle<ParticleId> id;
   ParticleId searchID;
@@ -34,9 +21,17 @@ public:
   bool operator()(esutil::TupleVector::reference ref) { return id[ref] == searchID; }
 };
 
+Storage::Storage() {
+  particleIdProperty = particles.addProperty<size_t>();
+}
+
+void Storage::addParticle(ParticleId id) {
+  esutil::TupleVector::iterator it = particles.insert(particles.end());
+  particles.getProperty<size_t>(particleIdProperty)[*it] = id;
+}
+
 void Storage::deleteParticle(ParticleId deleteID) {
-  esutil::TupleVector::iterator pos =
-    std::find_if(particles.begin(), particles.end(), PredicateMatchParticleID(*this, deleteID));
+  esutil::TupleVector::iterator pos = getParticleHandle(deleteID);
 
   if (pos == particles.end()) {
     throw std::out_of_range("Storage::deleteParticle: particle does not exist");
@@ -48,10 +43,7 @@ ParticleHandle Storage::getParticleHandle(ParticleId id) {
   esutil::TupleVector::iterator pos =
     std::find_if(particles.begin(), particles.end(), PredicateMatchParticleID(*this, id));
 
-  if (pos == particles.end()) {
-    throw std::out_of_range("Storage::getParticleHandle: particle does not exist");
-  }
-  return pos;
+  return (pos != particles.end()) ? ParticleHandle(pos) : ParticleHandle();
 }
 
 void Storage::foreach(Computer& compute) {
@@ -67,10 +59,6 @@ void Storage::foreach(ConstComputer& compute) const {
 }
 
 void Storage::deleteProperty(PropertyId id) {
-  // no non-const reference to the ID
-  if (id == particleIdProperty) {
-    throw std::out_of_range("id cannot be erased");
-  }
   particles.eraseProperty(id);
 }
 

@@ -32,17 +32,21 @@ namespace espresso {
       /// @name access to particles
       //@{
 
-      /** add a particle.
-          @return the id of the created particle.
+      /** add a particle with a given id. Note that this is a basic
+	  and slow implementation, but derived classes can and should
+	  implement this more efficiently.
+          @param id the id of the particle to create.
+	  @throw std::out_of_range if the particle already exists
       */
-      virtual ParticleId addParticle();
+      virtual void addParticle(ParticleId id);
 
       /** delete a particle
           @param id the id of the particle to delete
+	  @throw std::out_of_range if the particle does not exist
       */
       virtual void deleteParticle(ParticleId id);
 
-      /** get a persistent particle from a temporary reference
+      /** get a persistent particle id from a temporary reference
           @param ref temporary reference to a particle
           @return the particle
       */
@@ -51,16 +55,21 @@ namespace espresso {
       }
 
       /** get a reference to a particle using its ID. This is
-          potentially slow.
+          a slow implementation, but derived classes can and should
+	  implement this more efficiently.
           @param id the id of the particle to fetch
+	  @return a handle to the particle, or ParticleHandle() if
+	  the particle does not exist
       */
       virtual ParticleHandle getParticleHandle(ParticleId id);
 
-      /** get a particle to a particle using its ID. This is
-          potentially slow.
-          @param id the id of the particle to fetch
+      /** get a const reference to a particle using its ID. This
+	  makes use of the non-const version of getParticleHandle; see
+	  there for further details.
       */
-      virtual ConstParticleHandle getParticleHandle(ParticleId id) const;
+      ConstParticleHandle getParticleHandle(ParticleId id) const {
+	return ConstParticleHandle(const_cast<Storage *>(this)->getParticleHandle(id));
+      }
 
       /// loop over all particles
       virtual void foreach(Computer &);
@@ -104,15 +113,9 @@ namespace espresso {
       */
       void deleteProperty(PropertyId id);
 
-      /** get a short lifetime reference to a property by its ID
-          @throw std::out_of_range if one tries to obtain a handle to the ID property
-      */
+      /// get a short lifetime reference to a property by its ID
       template<typename T>
       PropertyHandle<T> getPropertyHandle(PropertyId id) {
-        // no non-const reference to the ID
-        if (id == particleIdProperty) {
-          throw std::out_of_range("id is not writable");
-        }
         return particles.getProperty<T>(id);
       }
       /// get a short lifetime reference to a property by its ID
@@ -121,20 +124,12 @@ namespace espresso {
         return particles.getProperty<T>(id);
       }
 
-      /** get a short lifetime reference to a property by its ID
-          @throw std::out_of_range if one tries to obtain a handle to the ID property
-      */
+      /// get a short lifetime reference to a property by its ID
       template<typename T>
       ArrayPropertyHandle<T> getArrayPropertyHandle(PropertyId id) {
-        // no non-const reference to the ID
-        if (id == particleIdProperty) {
-          throw std::out_of_range("id is not writable");
-        }
         return particles.getArrayProperty<T>(id);
       }
-      /** get a short lifetime reference to a property by its ID
-          @throw std::range_error if the given and array dimensions mismatch
-      */
+      /// get a short lifetime reference to a property by its ID
       template<typename T>
       ConstArrayPropertyHandle<T> getConstArrayPropertyHandle(PropertyId id) const {
         return particles.getArrayProperty<T>(id);
@@ -142,8 +137,6 @@ namespace espresso {
 
       //@}
 
-      /// unique ID counter for the particles
-      size_t uniqueID;
       /// ID of the particle ID property
       PropertyId particleIdProperty;
 
