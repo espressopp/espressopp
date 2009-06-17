@@ -143,8 +143,8 @@ namespace espresso {
 	/// reference type. Fixes up the iterator_facade for a reference only class
 	typedef ReferenceType reference;
 
-	/// default constructor, undefined iterator
-	IteratorBase() {}
+	/// default constructor, sort of null pointer - illegal, but defined iterator
+	IteratorBase(): index(-1) {}
 
       protected:
 	/// regular constructor
