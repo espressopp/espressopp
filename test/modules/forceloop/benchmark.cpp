@@ -66,17 +66,18 @@ public:
 
     real calculateAverage() NOINLINE;
 
-    Real3D getForce(size_t i) {
-      // HACK!
-      return (*force)[ParticleId(i + 1)];
-    }
+  Real3D getForce(size_t i) {
+    return (*force).at(ParticleId(i));
+  }
 };
 
 void TestEspresso::addParticle(const Real3D &pos)
 {
-    ParticleId id = storage->addParticle();
-    (*position)[id] = pos;
-    (*force)[id] = 0.0;
+  static size_t cnt = 0;
+  ParticleId id = ParticleId(cnt++);
+  storage->addParticle(id);
+  (*position)[id] = pos;
+  (*force)[id] = 0.0;
 }
 
 void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {

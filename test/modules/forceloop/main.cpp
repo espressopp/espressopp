@@ -67,6 +67,7 @@ void forceloop() {
 
   // generate particles in the particle storage
 
+  size_t cnt = 0;
   for (int i = 0; i < N; i++) 
   for (int j = 0; j < N; j++) 
   for (int k = 0; k < N; k++) {
@@ -77,25 +78,12 @@ void forceloop() {
        real y = (j + r) / N * SIZE; 
        real z = (k + r) / N * SIZE;
 
-       ParticleId id = particleStorage->addParticle();
-/*
-       PropertyHandle<Real3D> positionHandle = 
-	 particleStorage->getPropertyHandle<Real3D>(position);
-       PropertyReference<Real3D> velocityRef = 
-	 particleStorage.getPropertyReference<Real3D>(velocity);
-       PropertyReference<Real3D> forceRef    = 
-	 particleStorage.getPropertyReference<Real3D>(force);
-*/
+       ParticleId id = ParticleId(cnt++);
+       particleStorage->addParticle(id);
 
        (*position.get())[id] = Real3D(x, y, z);
        (*velocity.get())[id] = Real3D(x, y, z);
        (*force.get())[id] = 0.0;
-
-/*
-       positionRef[id] = Real3D(x, y, z);
-       velocityRef[id] = Real3D(x, y, z);
-       forceRef[id] = 0.0;
-*/
   }
 
   // For test only: ParticleWriter prints each particle
@@ -172,7 +160,7 @@ void forceloop() {
   // make a shared pointer to a Lanevin thermostat with T=298.15 and gamma=0.5
   boost::shared_ptr<thermostat::Langevin> lv =
     boost::shared_ptr<thermostat::Langevin>
-      (new thermostat::Langevin(allSet, 1.0, 0.5, position, velocity, force));
+      (new thermostat::Langevin(allSet, 1.0, 0.5));
   // write out the gamma value
   std::cout << lv->getGamma() << "\t" << lv->getTemperature() << std::endl;
   // set the thermostat for the integrator
