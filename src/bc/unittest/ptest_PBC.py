@@ -38,6 +38,18 @@ class Test0PBC(unittest.TestCase):
             res = pbc.fold(Real3D(v))
             self.assertEqual(res, Real3D(expected))
 
+    def testFoldThis(self):
+        pbc = PBC(10.0)
+
+        for v, expected in [
+            ((1.0, 1.0, 1.0), (1.0, 1.0, 1.0)),
+            ((-1.0, -1.0, -1.0), (9.0, 9.0, 9.0)),
+            ((32.0, 54.0, 66.0), (2.0, 4.0, 6.0))
+            ]:
+            v = Real3D(v)
+            pbc.foldThis(v)
+            self.assertEqual(v, Real3D(expected))
+
     def testGetDist(self):
         pbc = PBC(10.0)
 
