@@ -41,13 +41,13 @@ class FENELocal(_FENE) :
 
 # wrap FENE
 if pmi.IS_CONTROLLER:
-    pmi.exec_('from espresso.interaction.FENE import FENELocal')
+    pmi.exec_('import espresso.interaction.FENE')
 
     class FENE(object) :
         'The FENE interaction.'
         __metaclass__ = pmi.Proxy
         pmiproxydefs = {
-            'subjectclass': 'FENELocal',
+            'subjectclass': 'espresso.interaction.FENELocal',
             'localcall' : [ 'computeForce', 'computeEnergy' ],
             'pmicall' : [ 'set' ],
             'pmiproperty' : ['K', 'r0', 'rMax' ]

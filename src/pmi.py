@@ -480,13 +480,13 @@ class Proxy(type):
         """
         def __init__(self, cls, oldinit):
             self.cls = cls
-            self.cls._normalizeClass()
             if oldinit is not None:
                 self.oldinit = oldinit
         def __call__(self, method_self, *args, **kwds):
             # create the pmi subject
             log.info('PMI.Proxy class %s is creating pmi subject of type %s',
                      self.cls, self.cls.pmisubjectclassdef)
+            self.cls._normalizeClass()
             method_self.pmisubject = create(self.cls.pmisubjectclass, *args, **kwds)
             if hasattr(self, 'oldinit'):
                 self.oldinit(method_self)
@@ -494,43 +494,51 @@ class Proxy(type):
 
     class LocalCaller(object):
         def __init__(self, cls, methodName):
-            cls._normalizeClass()
-            self.method = getattr(cls.pmisubjectclass, methodName)
+            self.cls = cls
+            self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
-            return self.method(method_self.pmisubject, *args, **kwds)
+            self.cls._normalizeClass()
+            method = getattr(self.cls.pmisubjectclass, self.methodName)
+            return method(method_self.pmisubject, *args, **kwds)
 
     class PMICaller(object):
         def __init__(self, cls, methodName):
-            cls._normalizeClass()
-            self.method = getattr(cls.pmisubjectclass, methodName)
+            self.cls = cls
+            self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
-            return call(self.method, method_self.pmisubject, *args, **kwds)
+            self.cls._normalizeClass()
+            method = getattr(self.cls.pmisubjectclass, self.methodName)
+            return call(method, method_self.pmisubject, *args, **kwds)
 
     class PMIInvoker(object):
         def __init__(self, cls, methodName):
-            cls._normalizeClass()
-            self.method = getattr(cls.pmisubjectclass, methodName)
+            self.cls = cls
+            self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
-            return invoke(self.method, method_self.pmisubject, *args, **kwds)
+            self.cls._normalizeClass()
+            method = getattr(self.cls.pmisubjectclass, self.methodName)
+            return invoke(method, method_self.pmisubject, *args, **kwds)
 
     class PropertyLocalGetter(object):
         def __init__(self, cls, propName):
-            cls._normalizeClass()
-            property = getattr(cls.pmisubjectclass, propName)
-            self.getter = getattr(property, 'fget')
+            self.cls = cls
+            self.propName = propName
         def __call__(self, method_self):
+            self.cls._normalizeClass()
+            property = getattr(self.cls.pmisubjectclass, self.propName)
+            self.getter = getattr(property, 'fget')
             return self.getter(method_self.pmisubject)
 
     class PropertyPMISetter(object):
         def __init__(self, cls, propName):
-            self.setter = '.'.join(
-                (
-                    cls.pmisubjectclassdef,
-                    propName, 
-                    'fset')
-                )
+            self.cls = cls
+            self.propName = propName
         def __call__(self, method_self, val):
-            return call(self.setter, method_self.pmisubject, val)
+            setter = '.'.join(
+                (self.cls.pmisubjectclassdef,
+                 self.propName, 
+                 'fset'))
+            return call(setter, method_self.pmisubject, val)
 
     def _normalizeClass(cls):
         if not hasattr(cls, 'pmisubjectclass'):

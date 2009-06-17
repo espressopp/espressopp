@@ -39,13 +39,13 @@ class LennardJonesLocal(_LennardJones) :
     def cutoff(self, _cutoff) : self.set(cutoff=_cutoff)
 
 if pmi.IS_CONTROLLER:
-    pmi.exec_('from espresso.interaction.LennardJones import LennardJonesLocal')
+    pmi.exec_('import espresso.interaction.LennardJones')
     
     class LennardJones (object):
         'The Lennard-Jones interaction.'
         __metaclass__ = pmi.Proxy
         pmiproxydefs = {
-            'subjectclass': 'LennardJonesLocal',
+            'subjectclass': 'espresso.interaction.LennardJonesLocal',
             'localcall' : [ 'computeForce', 'computeEnergy' ],
             'pmicall' : [ 'set' ],
             'pmiproperty' : [ 'epsilon', 'sigma', 'cutoff' ]
