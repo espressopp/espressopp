@@ -14,7 +14,7 @@ class TestCollectives(unittest.TestCase):
         
     def testLocateNoOne(self):
         if pmi.IS_CONTROLLER:        
-            self.assertRaises(KeyError, collectives.locateItem, False)
+            self.assertRaises(IndexError, collectives.locateItem, False)
         else:
             collectives.locateItem(False)
 
