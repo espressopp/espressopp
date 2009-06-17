@@ -30,8 +30,6 @@ private:
   real timeStep;
   real timeStepSqr;
   real c1;
-  real c2;
-  real c3;
 
 public:
 
@@ -41,16 +39,11 @@ public:
                pos(_posRef), vel(_velRef), force(_forceRef),
                timeStep(_timeStep), timeStepSqr(_timeStep * _timeStep) {
                  c1 = exp(-2.0 * timeStep);
-                 c2 = sqrt(2.0 * 2.0 * 1.0);
-                 c3 = (1.0 - exp(-2.0 * timeStep)) / 2.0;
   }
   
   // m = 1
-
   virtual void operator()(ParticleHandle pref) {
-    pos[pref] = pos[pref] - vel[pref] * timeStep - 0.5 * force[pref] * timeStepSqr
-              + c3 * (vel[pref] + 0.5 * force[pref] * timeStep) + c2 * drand48();
-    vel[pref] = vel[pref] * c1 + c2 * drand48();
+    vel[pref] = vel[pref] * c1 * drand48();
   }
 
 };
@@ -64,6 +57,7 @@ class StepThermalB: public particles::Computer {
 
 private:
 
+  // don't need all three handles or dt and dt*dt
   PropertyHandle<Real3D> pos;
   PropertyHandle<Real3D> vel;
   PropertyHandle<Real3D> force;
@@ -71,24 +65,22 @@ private:
   real timeStep;
   real timeStepSqr;
   real c1;
-  real c2;
-  real c3;
 
 public:
 
   StepThermalB(PropertyHandle<Real3D> _posRef,
                PropertyHandle<Real3D> _velRef,
-               PropertyHandle<Real3D> _forceRef, real _timeStep):
+               PropertyHandle<Real3D> _forceRef,
+               real _timeStep, real _gamma, real _temperature):
                pos(_posRef), vel(_velRef), force(_forceRef),
                timeStep(_timeStep), timeStepSqr(_timeStep * _timeStep) {
-                 c1 = exp(-2.0 * timeStep);
-                 c2 = sqrt(2.0 * 2.0 * 1.0);
-                 c3 = (1.0 - exp(-2.0 * timeStep)) / 2.0;
+                 c1 = sqrt(24.0 * _gamma * _temperature / timeStep);
   }
   
   // m = 1
   virtual void operator()(ParticleHandle pref) {
-    vel[pref] = vel[pref];
+    vel[pref] = vel[pref] * (1.0 - 0.5 * 1.0 * timeStep);
+      //+ 0.5 * (force[pref] + c1 * (drand48() - 0.5))
   }
 
 };
@@ -158,7 +150,9 @@ void Langevin::thermalizeB(const integrator::VelocityVerlet& integrator) {
   PropertyHandle<Real3D> vel   = *integrator.getVelocity();
   PropertyHandle<Real3D> force = *integrator.getForce();
 
-  StepThermalB stepThermalB(pos, vel, force, 0.01);
+  real temperature = this->getTemperature();
+
+  StepThermalB stepThermalB(pos, vel, force, 0.01, gamma, temperature);
 
   if (particles) {
      particles->foreach(stepThermalB);
@@ -202,7 +196,7 @@ void Langevin::connect(boost::shared_ptr<thermostat::Langevin> langevin,
 void Langevin::disconnect() 
 {
   if (!stepA.connected()) {
-     LOG4ESPP_WARN(theLogger, "Langevin termostat is not connected");
+     LOG4ESPP_WARN(theLogger, "Langevin thermostat is not connected");
      return;
   }
 
