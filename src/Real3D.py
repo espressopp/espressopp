@@ -50,3 +50,6 @@ class __Real3D(Real3D) :
     # string conversion
     def __str__(self) :
         return str(tuple(self))
+
+    def __repr__(self) :
+        return 'Real3D' + str(tuple(self))

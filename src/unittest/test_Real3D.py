@@ -71,13 +71,15 @@ class Test0Real3D(unittest.TestCase) :
         self.assertEqual(tuple(v), (1.0, 2.0, 3.0))
         self.assertEqual(list(v), [1.0, 2.0, 3.0])
         self.assertEqual(str(v), '(1.0, 2.0, 3.0)')
+        self.assertEqual(repr(v), 'Real3D(1.0, 2.0, 3.0)')
 
     def test5Comparison(self) :
         'Test Real3D comparison operations.'
         v = Real3D(1.0, 2.0, 3.0)
         v2 = Real3D(1.0, 2.0, 3.0)
-        self.assert_(v == v2)
-        self.assert_(not (v != v2))
+        self.assertEqual(v, v2)
+        self.assertFalse(v != v2)
+        self.assert_(v is not v2)
 
     def test6Numerics(self) :
         'Test various numeric operations of Real3D.'
