@@ -3,25 +3,42 @@ from espresso.bc import *
 from espresso import Real3D
 
 class Test0PBC(unittest.TestCase):
-    def test0Create(self):
+    def testCreate(self):
         pbc = PBC()
-        self.assertEqual(pbc.length, 1.0)
+        self.assertEqual(pbc.length, Real3D(1.0))
 
         pbc = PBC(3.0)
-        self.assertEqual(pbc.length, 3.0)
+        self.assertEqual(pbc.length, Real3D(3.0))
 
         pbc = PBC(length=5.0)
-        self.assertEqual(pbc.length, 5.0)
+        self.assertEqual(pbc.length, Real3D(5.0))
 
-    def test1Set(self):
+        pbc = PBC(Real3D(1.0, 2.0, 3.0))
+        self.assertEqual(pbc.length, Real3D(1.0, 2.0, 3.0))
+
+        pbc = PBC((1.0, 2.0, 3.0))
+        self.assertEqual(pbc.length, Real3D(1.0, 2.0, 3.0))
+
+    def testSet(self):
         pbc = PBC()
         pbc.set(3.0)
-        self.assertEqual(pbc.length, 3.0)
+        self.assertEqual(pbc.length, Real3D(3.0))
 
         pbc.set(length=2.0)
-        self.assertEqual(pbc.length, 2.0)
+        self.assertEqual(pbc.length, Real3D(2.0))
         
-    def test2GetDist(self):
+    def testFold(self):
+        pbc = PBC(10.0)
+
+        for v, expected in [
+            ((1.0, 1.0, 1.0), (1.0, 1.0, 1.0)),
+            ((-1.0, -1.0, -1.0), (9.0, 9.0, 9.0)),
+            ((32.0, 54.0, 66.0), (2.0, 4.0, 6.0))
+            ]:
+            res = pbc.fold(Real3D(v))
+            self.assertEqual(res, Real3D(expected))
+
+    def testGetDist(self):
         pbc = PBC(10.0)
 
         for v1, v2, expected in [
@@ -41,7 +58,7 @@ class Test0PBC(unittest.TestCase):
             res = pbc.getDist(Real3D(v1), Real3D(v2))
             self.assertEqual(res, Real3D(expected))
 
-    def test3RandomPos(self):
+    def testRandomPos(self):
         pbc = PBC(10.0)
         sum = Real3D(0.0)
 

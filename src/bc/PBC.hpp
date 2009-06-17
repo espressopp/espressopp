@@ -8,14 +8,12 @@
 namespace espresso {
   namespace bc {
     /** Class for periodic boundary conditions in all three dimensions. */
-    //currently we assume a cube
-    //names like PBC will need to change to cubic or orthorhombic
 
     class PBC : public BC {
 
     private:
-      real length;
-      real lengthInverse;
+      Real3D length;
+      Real3D lengthInverse;
 
       static LOG4ESPP_DECL_LOGGER(theLogger);
 
@@ -25,21 +23,28 @@ namespace espresso {
 
       /** Constructor for cubic box */
       PBC();
-      PBC(real _length);
+      PBC(Real3D _length);
       /** Destructor for periodic boundary conditions */
       virtual ~PBC();
 
       /** Method to set the length of the side of the cubic simulation cell */
-      virtual void set(real _length);
+      virtual void set(Real3D length);
       
       /** Method that returns the length of the side of the cubic simulation cell */
-      virtual real getLength(void) const;
+      virtual Real3D getLength(void) const;
 
-      //PMI and Python Visible
-      /** Method to compute the minimum image distance */
+      // PMI and Python Visible
+      /** Fold the position \p pos into the central image. */
+      virtual void foldThis(Real3D& pos) const;
+
+      /** Fold the position \pos into the central image. 
+       \return the folded position */
+      virtual Real3D fold(const Real3D& pos) const;
+
+      /** Compute the minimum image distance (pos2 - pos1) */
       virtual Real3D getDist(const Real3D& pos1, const Real3D& pos2) const;
 
-      /** Method to get a random position within the central simulation box. The
+      /** Get a random position within the central simulation box. The
           positions are assigned with each coordinate on [0, length] */
       virtual Real3D randomPos(void);
       

@@ -15,58 +15,60 @@ LOG4ESPP_LOGGER(PBC::theLogger, "bc.PBC");
 
 /* ---------------------------------------------------------------------- */
 
-static inline real dround(real x) { return floor(x + 0.5); }
-
 PBC::PBC() {}
 
-PBC::PBC(real _length) {
-  LOG4ESPP_INFO(theLogger, "constructor, length = " << length);
+PBC::PBC(Real3D _length) {
+  LOG4ESPP_DEBUG(theLogger, "constructor, length = " << length);
   set(_length);
 }
 
 PBC::~PBC() {}
 
-void PBC::set(real _length) {
-
+void PBC::set(Real3D _length) {
   length = _length;
-  lengthInverse = 1.0 / length;
+  lengthInverse[0] = 1.0 / length[0];
+  lengthInverse[1] = 1.0 / length[1];
+  lengthInverse[2] = 1.0 / length[2];
   LOG4ESPP_INFO(theLogger, "set length = " << length);
 }
 
-real PBC::getLength(void) const { return length; }
+Real3D PBC::getLength(void) const { return length; }
   
+void PBC::foldThis(Real3D &pos) const {
+  pos[0] -= floor(pos[0] * lengthInverse[0]) * length[0];
+  pos[1] -= floor(pos[1] * lengthInverse[1]) * length[1];
+  pos[2] -= floor(pos[2] * lengthInverse[2]) * length[2];
+}
 
-/** Routine delivers the distance vector between two positions.
-    \sa bc::BC::getDist */
+Real3D PBC::fold(const Real3D& pos) const {
+  Real3D res(pos);
+  foldThis(res);
+  return res;
+}
+
 Real3D PBC::getDist(const Real3D& pos1, const Real3D& pos2) const {
 
-  real xij;
-  real yij;
-  real zij;
+  // res = pos2 - pos1
+  Real3D res(pos1);
+  res -= pos2;
 
-  xij = pos1[0] - pos2[0];
-  yij = pos1[1] - pos2[1];
-  zij = pos1[2] - pos2[2];
+  // compute distance
+  res[0] = remainder(res[0], length[0]);
+  res[1] = remainder(res[1], length[1]);
+  res[2] = remainder(res[2], length[2]);
 
-  xij -= dround(xij*lengthInverse)*length;
-  yij -= dround(yij*lengthInverse)*length;
-  zij -= dround(zij*lengthInverse)*length;
-
-  return Real3D(xij, yij, zij);
+  return res;
 }
 
 Real3D PBC::randomPos(void) {
-
-  // a constant prefactor
-  real c = length / RAND_MAX;
-
-  real x = c * rand();
-  real y = c * rand();
-  real z = c * rand();
-
-  return Real3D(x, y, z);
-
+  // TODO: RNG!
+  Real3D res(length);
+  res[0] *= drand48();
+  res[1] *= drand48();
+  res[2] *= drand48();
+  return res;
 }
+
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -79,5 +81,8 @@ PBC::registerPython() {
     .def("set", &PBC::set)
     .def("getLength", &PBC::getLength)
     .def("randomPos", &PBC::randomPos)
+    .def("getDist", &PBC::getDist)
+    .def("fold", &PBC::fold)
+    .def("foldThis", &PBC::foldThis)
     ;
 }

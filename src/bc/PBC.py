@@ -1,5 +1,5 @@
 from espresso.esutil import choose
-from espresso import pmi
+from espresso import pmi, Real3D
 
 from _espresso import bc_PBC as _PBC
 
@@ -11,8 +11,9 @@ class PBCLocal(_PBC) :
         self.set(length)
 
     def set(self, length=None) :
-        """set( (float)length ) -> None -- Set the "parameters" of the boundary condition.
+        """set( length ) -> None -- Set the "parameters" of the boundary condition.
         """
+        if type(length) is not Real3D: length = Real3D(length)
         return _PBC.set(self, choose(length, self.length))
 
     # define properties
@@ -28,6 +29,6 @@ if pmi.IS_CONTROLLER:
         pmiproxydefs = {
             'subjectclass' : 'espresso.bc.PBCLocal',
             'pmicall' : [ 'set' ],
-            'localcall' : [ 'getDist', 'randomPos' ],
+            'localcall' : [ 'fold', 'foldThis', 'getDist', 'randomPos' ],
             'pmiproperty' : [ 'length' ]
             }
