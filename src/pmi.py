@@ -254,20 +254,20 @@ def invoke(function=None, *args, **kwds) :
     >>> messages = pmi.invoke('hello.HelloWorld.hello', hw)
     """
     if __checkController(invoke) :
-        container, function, args = __translateInvokeArgs(function, args)
+        function = __translateInvokeArg(function)
         ckwds, targs, tkwds = __translateArgs(args, kwds)
-        _broadcast(_INVOKE, container, function, *targs, **tkwds)
+        _broadcast(_INVOKE, function, *targs, **tkwds)
 
         log.info("Invoking: %s", __formatCall(function, args, ckwds))
-        value = __invoke(container, function, args, ckwds)
+        value = __invoke(function, args, ckwds)
         return mpi.world.gather(value, root=CONTROLLER)
     else :
         return receive(_INVOKE)
 
-def __workerInvoke(container, function, *targs, **tkwds) :
+def __workerInvoke(function, *targs, **tkwds) :
     args, kwds = __backtranslateArgs(targs, tkwds)
     log.info("Invoking: %s", __formatCall(function, args, kwds))
-    value = __invoke(container, function, args, kwds)
+    value = __invoke(function, args, kwds)
     return mpi.world.gather(value, root=CONTROLLER) 
 
 ##################################################
@@ -298,18 +298,18 @@ def call(function=None, *args, **kwds) :
     been imported via exec_().
     """
     if __checkController(call) :
-        container, function, args = __translateInvokeArgs(function, args)
+        function = __translateInvokeArg(function)
         ckwds, targs, tkwds = __translateArgs(args, kwds)
-        _broadcast(_CALL, container, function, *targs, **tkwds)
+        _broadcast(_CALL, function, *targs, **tkwds)
         log.info("Calling: %s", __formatCall(function, args, ckwds))
-        return __invoke(container, function, args, ckwds)
+        return __invoke(function, args, ckwds)
     else :
         receive(_CALL)
 
-def __workerCall(container, function, *targs, **tkwds) :
+def __workerCall(function, *targs, **tkwds) :
     args, kwds = __backtranslateArgs(targs, tkwds)
     log.info("Calling: %s", __formatCall(function, args, kwds))
-    __invoke(container, function, args, kwds)
+    __invoke(function, args, kwds)
 
 def invokeNoResult(function, *args, **kwds) :
     """invokeNoResult() is an alias for call()."""
@@ -355,21 +355,21 @@ def reduce(reduceOp=None, function=None, *args, **kwds) :
             reduceOp = '.'.join((reduceOp.__module__, reduceOp.__name__))
         else :
             raise ValueError("pmi.reduce expects function as first argument, but got %s instead" % reduceOp)
-        container, function, args = __translateInvokeArgs(function, args)
+        function = __translateInvokeArg(function)
         ckwds, targs, tkwds = __translateArgs(args, kwds)
-        _broadcast(_REDUCE, reduceOp, container, function, *targs, **tkwds)
+        _broadcast(_REDUCE, reduceOp, function, *targs, **tkwds)
         log.info("Reducing: %s", __formatCall(function, args, ckwds))
-        value = __invoke(container, function, args, ckwds)
+        value = __invoke(function, args, ckwds)
         log.info("Reducing results via %s", reduceOp)
         reduceOp = eval(reduceOp)
         return mpi.world.reduce(op=reduceOp, value=value, root=CONTROLLER)
     else :
         return receive(_REDUCE)
 
-def __workerReduce(reduceOp, container, function, *targs, **tkwds) :
+def __workerReduce(reduceOp, function, *targs, **tkwds) :
     args, kwds = __backtranslateArgs(targs, tkwds)
     log.info("Reducing: %s", __formatCall(function, args, kwds))
-    value = __invoke(container, function, args, kwds)
+    value = __invoke(function, args, kwds)
     log.info("Reducing results via %s", reduceOp)
     reduceOp = eval(reduceOp)
     return mpi.world.reduce(op=reduceOp, value=value, root=CONTROLLER) 
@@ -480,12 +480,13 @@ class Proxy(type):
         """
         def __init__(self, cls, oldinit):
             self.cls = cls
+            self.cls._normalizeClass()
             if oldinit is not None:
                 self.oldinit = oldinit
         def __call__(self, method_self, *args, **kwds):
             # create the pmi subject
             log.info('PMI.Proxy class %s is creating pmi subject of type %s',
-                     self.cls, self.cls.pmisubjectclass)
+                     self.cls, self.cls.pmisubjectclassdef)
             method_self.pmisubject = create(self.cls.pmisubjectclass, *args, **kwds)
             if hasattr(self, 'oldinit'):
                 self.oldinit(method_self)
@@ -493,24 +494,28 @@ class Proxy(type):
 
     class LocalCaller(object):
         def __init__(self, cls, methodName):
+            cls._normalizeClass()
             self.method = getattr(cls.pmisubjectclass, methodName)
         def __call__(self, method_self, *args, **kwds):
             return self.method(method_self.pmisubject, *args, **kwds)
 
     class PMICaller(object):
         def __init__(self, cls, methodName):
+            cls._normalizeClass()
             self.method = getattr(cls.pmisubjectclass, methodName)
         def __call__(self, method_self, *args, **kwds):
             return call(self.method, method_self.pmisubject, *args, **kwds)
 
     class PMIInvoker(object):
         def __init__(self, cls, methodName):
+            cls._normalizeClass()
             self.method = getattr(cls.pmisubjectclass, methodName)
         def __call__(self, method_self, *args, **kwds):
             return invoke(self.method, method_self.pmisubject, *args, **kwds)
 
     class PropertyLocalGetter(object):
         def __init__(self, cls, propName):
+            cls._normalizeClass()
             property = getattr(cls.pmisubjectclass, propName)
             self.getter = getattr(property, 'fget')
         def __call__(self, method_self):
@@ -520,13 +525,16 @@ class Proxy(type):
         def __init__(self, cls, propName):
             self.setter = '.'.join(
                 (
-                    cls.pmisubjectclass.__module__,
-                    cls.pmisubjectclass.__name__, 
+                    cls.pmisubjectclassdef,
                     propName, 
                     'fset')
                 )
         def __call__(self, method_self, val):
             return call(self.setter, method_self.pmisubject, val)
+
+    def _normalizeClass(cls):
+        if not hasattr(cls, 'pmisubjectclass'):
+            cls.pmisubjectclass = _translateClass(cls.pmisubjectclassdef)
 
     def __addMethod(cls, methodName, caller):
         newMethod = types.MethodType(caller, None, cls)
@@ -539,7 +547,7 @@ class Proxy(type):
         defs = dict['pmiproxydefs']
 
         if 'subjectclass' in defs:
-            cls.pmisubjectclass = _translateClass(defs['subjectclass'])
+            cls.pmisubjectclassdef = defs['subjectclass']
             if hasattr(cls, '__init__'): 
                 oldinit = getattr(cls, '__init__')
             else: 
@@ -638,6 +646,7 @@ def receive(expected=None) :
     if cmd == _DELETE :
         # if delete is sent, delete the objects
         __workerDelete(*args)
+        # recursively call receive once more
         return receive(expected)
     elif expected is not None and cmd != expected :
         # otherwise test whether the command is expected
@@ -645,7 +654,6 @@ def receive(expected=None) :
     # determine which function to call
     cmd_func = _CMD[cmd][1]
     log.debug("Calling function %s", __formatCall(cmd_func.__name__, args, kwds))
-    # if the command is a delete, call receive once more
     return cmd_func(*args, **kwds)
 
 ##################################################
@@ -751,21 +759,22 @@ def __mapArgs(func, args, kwds):
         tkwds[k] = func(v)
     return targs, tkwds
     
+def _translateOID(obj) :
+    """Internal function that translates obj into an __OID
+    object if it is a PMI object instance.
+        
+    If the object is not a PMI object, returns obj untouched.
+    """
+    if hasattr(obj, '__pmioid'):
+        return obj.__pmioid
+    else:
+        return obj
+
 def __translateArgs(args, kwds):
     """Internal function that translates all PMI object instances that
     occur in args or kwds into __OID objects that can be sent to the
     workers.
     """
-    def __translateOID(obj) :
-        """Internal function that translates obj into an __OID
-        object if it is a PMI object instance.
-        
-        If the object is not a PMI object, returns obj untouched.
-        """
-        if hasattr(obj, '__pmioid'):
-            return obj.__pmioid
-        else:
-            return obj
     
     workerKwds={}
     controllerKwds={}
@@ -779,32 +788,55 @@ def __translateArgs(args, kwds):
             if k not in controllerKwds:
                 controllerKwds[k] = v
 
-    targs, tWorkerKwds = __mapArgs(__translateOID, args, workerKwds)
+    targs, tWorkerKwds = __mapArgs(_translateOID, args, workerKwds)
 
     return controllerKwds, targs, tWorkerKwds
+
+def _backtranslateOID(obj) :
+    """Internal worker function that backtranslates an __OID object
+    into the corresponding PMI worker instance.
+    
+    If the object is not an __OID object, returns the object untouched.
+    """
+    if type(obj) is __OID:
+        if obj in OBJECT_CACHE.keys():
+            return OBJECT_CACHE[obj]
+        else:
+            raise _InternalError("Object [%s] is not in OBJECT_CACHE" % obj)
+    else :
+        return obj
 
 def __backtranslateArgs(targs, tkwds):
     """Internal function that backtranslates all __OID object
     instances that occur in args or kwds into the cached PMI objects
     on the worker.
     """
-    def __backtranslateOID(obj) :
-        """Internal worker function that backtranslates an __OID object
-        into the corresponding PMI worker instance.
-        
-        If the object is not an __OID object, returns the object untouched.
-        """
-        if type(obj) is __OID:
-            if obj in OBJECT_CACHE.keys():
-                return OBJECT_CACHE[obj]
-            else:
-                raise _InternalError("Object [%s] is not in OBJECT_CACHE" % obj)
-        else :
-            return obj
+    return __mapArgs(_backtranslateOID, targs, tkwds)
 
-    return __mapArgs(__backtranslateOID, targs, tkwds)
+# Wrapper that allows to pickle a method
+class __Method(object) :
+    def __init__(self, funcname, im_self, cls) :
+        self.__name__ = funcname
+        self.im_self = im_self
+        self.im_class = cls
+        self.__determineMethod()
+    def __getstate__(self):
+        return (self.__name__, _translateOID(self.im_self), self.im_class)
+    def __setstate__(self, state):
+        self.__name__, self.im_self, self.im_class = state
+        self.im_self = _backtranslateOID(self.im_self)
+        self.__determineMethod()
+    def __determineMethod(self):
+        for cls in self.im_class.mro():
+            if hasattr(cls, self.__name__):
+                function = getattr(cls, self.__name__)
+                self.method = function.__get__(self.im_self, cls)
+                break
+    def __call__(self, *args, **kwds):
+        return self.method(*args, **kwds)
 
-def __translateInvokeArgs(arg0, args) :
+# translate arguments to invoke
+def __translateInvokeArg(arg0) :
     """Internal controller function that normalizes the function
     argument to invoke(), call() or reduce().
     """
@@ -812,59 +844,22 @@ def __translateInvokeArgs(arg0, args) :
         raise UserError("pmi.__invoke expects function argument on controller")
     if isinstance(arg0, types.StringTypes):
         function = arg0
-        container = None
     elif isinstance(arg0, (types.FunctionType, types.BuiltinFunctionType)):
         if arg0.__name__ == '<lambda>':
             raise ValueError("pmi.__invoke can't handle lambda functions")
-        container = arg0.__module__
-        function = arg0.__name__
+        function = arg0
     elif isinstance(arg0, (types.MethodType, types.BuiltinMethodType)):
-        container = arg0.im_class
-        function = arg0.im_func.__name__
-        # test whether the method is bound or not
-        if arg0.im_self is not None:
-            args = (arg0.im_self,) + args
+        function = __Method(arg0.im_func.__name__, arg0.im_self, arg0.im_class)
     else :
         raise ValueError("pmi.__invoke expects function as first argument, but got %s" % arg0)
-    return container, function, args
+    return function
 
-def __invoke(container, function, args, kwds):
-    """Internal command that calls function from module, loading the
-    module if required.
-    """
-    if container is None:
-        func = eval(function)
-        log.debug("Invoking function: %s", __formatCall(function, args, kwds))
-        return func(*args, **kwds)
-    elif isinstance(container, types.TypeType):
-        func = getattr(container, function)
-        log.debug("Invoking method: %s",
-                  __formatCall('%s.%s' % (container.__name__, function), args, kwds))
-        return func(*args, **kwds)
-    elif isinstance(container, types.StringTypes):
-        module = container
-        if module in sys.modules:
-            mod = sys.modules[module]
-            if function not in mod.__dict__:
-                raise ValueError("%s: pmi.__invoke: module %s does not contain function %s"
-                                 % (WORKERSTR, module, function))
-            func = getattr(mod, function)
-        elif module in sys.builtin_module_names:
-            mod = __import__(module)
-            if function not in mod.__dict__:
-                raise ValueError("%s: pmi.__invoke: module %s does not contain function %s"
-                                 % (WORKERSTR, module, function))
-            func = getattr(mod, function)
-        else:
-            __import__(module)
-            mod = sys.modules[module]
-            if function not in mod.__dict__:
-                raise ValueError("%s: pmi.__invoke: module %s does not contain function %s"
-                                 % (WORKERSTR, module, function))
-            func = getattr(mod, function)
-        log.debug("Invoking function: %s",
-                  __formatCall('%s.%s' % (module, function), args, kwds))
-        return func(*args, **kwds)
+def __invoke(function, args, kwds):
+    if isinstance(function, types.StringTypes):
+        function = eval(function)
+    log.debug("Invoking function: %s",
+              __formatCall(function.__name__, args, kwds))
+    return function(*args, **kwds)
 
 def __formatCall(function, args, kwds) :
     def formatArgs(args, kwds) :

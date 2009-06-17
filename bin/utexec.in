@@ -7,9 +7,9 @@ import sys, getopt, os, glob, os.path
 def Usage():
     print("""USAGE:
   utexec -h
-  utexec -C
-  utexec -1 UNITTEST [SUBTEST...]
-  utexec [-nvpP] [-t=NUMTASKS] [-s=SUBDIR] [UNITTEST...]
+  utexec [-t=NUMTASKS] [-s=SUBDIR] [-nv] -C
+  utexec [-t=NUMTASKS] [-s=SUBDIR] [-nv] -1 UNITTEST [SUBTEST...]
+  utexec [-t=NUMTASKS] [-s=SUBDIR] [-nv] [-cpP] [UNITTEST...]
 
 DESCRIPTION:
   utexec finds and executes C++, Python and parallel Python unittests
@@ -48,7 +48,8 @@ OPTIONS:
 
   -s=SUBDIR|--subdir=SUBDIR
       Specify the subdirectory where the unittests reside, relative to
-      the ESPResSo++ source directory (""" + top_srcdir + """
+      the ESPResSo++ source directory 
+        """ + top_srcdir + """
 
   -t=NUMTASKS|--num-tasks=NUMTASKS
       Specify how many tasks to use when parallel python unittests are

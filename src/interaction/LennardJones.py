@@ -1,5 +1,5 @@
-from espresso.esutil import choose
 from espresso import pmi
+from espresso.esutil import choose
 
 from _espresso import interaction_LennardJones as _LennardJones
 
@@ -38,13 +38,11 @@ class LennardJonesLocal(_LennardJones) :
     @cutoff.setter
     def cutoff(self, _cutoff) : self.set(cutoff=_cutoff)
 
-if pmi.IS_CONTROLLER :
-    # wrap LennardJones
-    
+if pmi.IS_CONTROLLER:
     pmi.exec_('from espresso.interaction.LennardJones import LennardJonesLocal')
+    
     class LennardJones (object):
         'The Lennard-Jones interaction.'
-
         __metaclass__ = pmi.Proxy
         pmiproxydefs = {
             'subjectclass': 'LennardJonesLocal',
