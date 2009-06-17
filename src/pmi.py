@@ -123,7 +123,7 @@ and the following variables:
 * inWorkerLoop is True, if PMI currently executes the worker loop on
   the workers.
 """
-import logging, types, sys, __builtin__
+import logging, types, sys
 from espresso import boostmpi as mpi
 
 ##################################################
@@ -441,7 +441,6 @@ def stopWorkerLoop(doExit=False) :
         raise UserError('Cannot call stopWorkerLoop on worker!')
 
 def __workerStop(doExit) :
-    import sys
     if doExit :
         log.info('Stopping worker loop and exiting worker thread.')
         sys.exit()
@@ -903,6 +902,7 @@ else :
 
 inWorkerLoop = False
 ID = mpi.rank
+#Globals = {}
 
 ##################################################
 ## MODULE BODY

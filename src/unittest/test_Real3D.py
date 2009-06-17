@@ -114,8 +114,5 @@ class Test0Real3D(unittest.TestCase) :
         self.assert_(v is not v2)
         self.assertEqual(v, v2)
 
-class TestParticle(unittest.TestCase) :
-    pass
-
 if __name__ == "__main__":
     unittest.main()

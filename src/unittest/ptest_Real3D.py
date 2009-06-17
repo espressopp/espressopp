@@ -2,7 +2,7 @@ import unittest
 from espresso import boostmpi as mpi
 from espresso import *
 
-class Real3DTest(unittest.TestCase) :
+class TestReal3D(unittest.TestCase) :
     def testMPI(self) :
         'Test sending and receiving a Real3D via MPI.'
         if mpi.rank == 0 :

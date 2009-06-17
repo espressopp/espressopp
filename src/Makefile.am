@@ -5,6 +5,7 @@ libespresso_common_la_SOURCES =
 DIST_SUBDIRS = 
 EXTRA_DIST =
 
+include SubMakefile.am
 include include/SubMakefile.am
 include esutil/SubMakefile.am
 include hello/SubMakefile.am
@@ -21,19 +22,11 @@ CLEANFILES =
 
 # declare the headers
 noinst_HEADERS = \
-	estypes.hpp \
-	Real3D.hpp \
-	Property.hpp \
-	Particle.hpp \
 	espresso_common.hpp
 
 # the common part of all Espresso flavors
 noinst_LTLIBRARIES += libespresso_common.la
 libespresso_common_la_SOURCES += \
-	bindings.cpp \
-	Real3D.cpp \
-	Property.cpp \
-	Particle.cpp \
 	espresso_common.cpp
 
 libespresso_common_la_LIBADD = \
@@ -66,12 +59,6 @@ pypresso_LDADD = \
 ##############################
 ## PYTHON
 ##############################
-python_SCRIPTS += \
-	__init__.py \
-	__setup.py \
-	boostmpi.py \
-	pmi.py \
-	Property.py
 
 # python script handling
 include $(top_srcdir)/build-aux/macros/axes_python.am

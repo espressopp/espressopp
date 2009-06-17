@@ -8,3 +8,6 @@ libespresso_common_la_SOURCES += \
         bc/BC.cpp \
 	bc/PBC.cpp
 
+python_SCRIPTS += \
+	bc/__init__.py \
+	bc/PBC.py
