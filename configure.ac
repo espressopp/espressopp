@@ -130,9 +130,7 @@ AS_IF([test "x$with_external_boost" = "xno"],
       boost_internal_dir=`pwd`"/contrib/boost"
       ESPRESSO_BOOST_LIBS="$boost_internal_dir/libespresso_boost.la"
       BOOST_UNITTEST_LIBS="$boost_internal_dir/libboost_unit_test_framework.la"
-      AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/contrib/boost"
-      UTEXEC_CPPFLAGS="-I$srcdir/contrib/boost" 
-      UTEXEC_LDFLAGS="-L$boost_internal_dir"],
+      AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/contrib/boost" ],
     [ AC_MSG_RESULT([yes])
       # if we use external boost, do some tests
 
@@ -203,11 +201,11 @@ AS_IF([test "x$with_external_boost" = "xno"],
             [ AC_MSG_FAILURE([Can't link against the boost unittest framework!])])])
 ]) # external boost
 
+EXTERNAL_BOOST=$with_external_boost
+AC_SUBST(EXTERNAL_BOOST)
 AM_CONDITIONAL([EXTERNAL_BOOST],[test "x$with_external_boost" = "xyes"])
 AC_SUBST(ESPRESSO_BOOST_LIBS)
 AC_SUBST(BOOST_UNITTEST_LIBS)
-AC_SUBST(UTEXEC_CPPFLAGS)
-AC_SUBST(UTEXEC_LDFLAGS)
 AC_SUBST(RM)
 
 AC_CACHE_SAVE

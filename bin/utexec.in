@@ -9,7 +9,7 @@ def Usage():
   utexec -h
   utexec -C
   utexec -1 UNITTEST [SUBTEST...]
-  utexec [-nvpP] [-t=NUMTASKS] [-s=SRCDIR] [-b=BUILDDIR] [UNITTEST...]
+  utexec [-nvpP] [-t=NUMTASKS] [-s=SUBDIR] [UNITTEST...]
 
 DESCRIPTION:
   utexec finds and executes C++, Python and parallel Python unittests
@@ -46,12 +46,9 @@ OPTIONS:
   -v|--verbose
       Be more verbose.
 
-  -s=SRCDIR|--srcdir=SRCDIR
-      Specify the source dir where the unittest are to be found.
-
-  -b=BUILDDIR|--buildir=BUILDDIR
-      Specify the build dir where the unittest are to be built and
-      executed.
+  -s=SUBDIR|--subdir=SUBDIR
+      Specify the subdirectory where the unittests reside, relative to
+      the ESPResSo++ source directory (""" + top_srcdir + """
 
   -t=NUMTASKS|--num-tasks=NUMTASKS
       Specify how many tasks to use when parallel python unittests are
@@ -63,14 +60,12 @@ def die(msg):
     if savecwd: os.chdir(savecwd)
     sys.exit(1)
 
-utdir = 'unittest/'
+utdir = 'unittest'
 
 ##################################################
 # CONSTANTS
 top_srcdir="@abs_top_srcdir@"
-if not top_srcdir.endswith('/'): top_srcdir += '/'
 top_builddir="@abs_top_builddir@"
-if not top_builddir.endswith('/'): top_builddir += '/'
 
 PYRUN = "@PYTHON@"
 ESPRESSO_MPIEXEC = "@ESPRESSO_MPIEXEC@"
@@ -83,36 +78,35 @@ CXX = os.getenv('CXX', '@CXX@')
 CXXLD = os.getenv('CXXLD', CXX)
 CXXFLAGS = os.getenv('CXXFLAGS', '@CXXFLAGS@')
 RM = os.getenv('RM', '@RM@')
-UTEXEC_CPPFLAGS = '@UTEXEC_CPPFLAGS@'
-UTEXEC_LDFLAGS = '@UTEXEC_LDFLAGS@'
+EXTERNAL_BOOST = ('@EXTERNAL_BOOST@' == 'yes')
 BOOST_UNITTEST_LIBS = '@BOOST_UNITTEST_LIBS@'
-LIBTOOL = os.getenv('LIBTOOL', top_builddir + 'libtool')
+LIBTOOL = os.getenv('LIBTOOL', os.path.join(top_builddir, 'libtool'))
 LIBTOOLFLAGS = os.getenv('LIBTOOLFLAGS', '')
 INCLUDES = os.getenv('INCLUDES', '')
-CPPFLAGS = ''.join(
-    [CPPFLAGS,
-     ' -I', top_builddir, 'src',
-     ' -I', top_srcdir, 'src',
-     ' -I', top_srcdir, 'src/include',
-     ' ', UTEXEC_CPPFLAGS])
-LDFLAGS += ' ' + UTEXEC_LDFLAGS
-LIBS = top_builddir + 'src/libespresso_common.la ' + BOOST_UNITTEST_LIBS
+CPPFLAGS += ' -I' + os.path.join(top_builddir, 'src')
+CPPFLAGS += ' -I' + os.path.join(top_srcdir, 'src')
+CPPFLAGS += ' -I' + os.path.join(top_srcdir, 'src' , 'include')
+if not EXTERNAL_BOOST:
+    CPPFLAGS += ' -I' + os.path.join(top_srcdir, 'contrib' , 'boost')
+    LDFLAGS += ' -I' + os.path.join(top_builddir, 'contrib', 'boost')
+LIBS = os.path.join(top_builddir, 'src' , 'libespresso_common.la') 
+LIBS += ' ' + BOOST_UNITTEST_LIBS
 LTCALL = LIBTOOL + ' --tag=CXX ' + LIBTOOLFLAGS
 
 ##################################################
 # PARSE COMMAND LINE ARGS
 try:
     optlist, tests = getopt.getopt(
-        sys.argv[1:], 'nvhs:b:pcPt:C1',
-        ['dry-run', 'verbose', 'help', 'srcdir=', 'builddir=',
-         'cpp', 'python', 'parallel', 'num-tasks=', 'clean', 'single-test'])
+        sys.argv[1:], 'nvhs:pcPt:C1',
+        ['dry-run', 'verbose', 'help', 'subdir=',
+         'cpp', 'python', 'parallel', 
+         'num-tasks=', 'clean', 'single-test'])
 except getopt.GetoptError, e:
     print("Option error: " + str(e))
     Usage()
     sys.exit(1)
 
-builddir = None
-srcdir = None
+subdir = None
 verbose = False
 dryrun = False
 clean = False
@@ -125,10 +119,8 @@ for k, v in optlist:
         sys.exit(0)
     elif k == '-v' or k == '--verbose':
         verbose = True
-    elif k == '-s' or k == '--srcdir':
-        srcdir = v
-    elif k == '-b' or k == '--builddir':
-        builddir = v
+    elif k == '-s' or k == '--subdir':
+        subdir = v
     elif k == '-n' or k == '--dry-run':
         dryrun = True
     elif k == '-p' or k == '--python':
@@ -151,59 +143,54 @@ if not clean and not do_python and not do_cpp and not do_parallel:
 # DETERMINE DIRS
 savecwd = os.getcwd()
 
-# normalize dirs given in options
-if srcdir is not None:
-    srcdir = os.path.abspath(srcdir)
-if builddir is not None:    
-    builddir = os.path.abspath(builddir)
-
-# determine the dirs not given in options
-if srcdir is not None and builddir is None:
-    builddir = srcdir.replace(top_srcdir, top_builddir)
-elif builddir is not None and srcdir is None:
-    srcdir = builddir.replace(top_builddir, top_srcdir)
-elif builddir is None and srcdir is None:
-    if savecwd.find(top_builddir):
-        builddir = savecwd
-        srcdir = builddir.replace(top_builddir, top_srcdir)
-    elif savecwd.find(top_srcdir):
-        srcdir = savecwd
-        builddir = srcdir.replace(top_srcdir, top_builddir)
+if subdir is not None:
+    # subdir is specified
+    if subdir.startswith('src'):
+        srcdir = os.path.join(top_srcdir, subdir)
+        builddir = os.path.join(top_builddir, subdir)
     else:
-        die('Cannot identify source dir nor build dir')
+        srcdir = os.path.join(top_srcdir, 'src', subdir)
+        builddir = os.path.join(top_builddir, 'src', subdir)
+elif savecwd == top_builddir or savecwd == top_srcdir:
+    builddir = os.path.join(top_builddir, 'src')
+    srcdir = os.path.join(top_srcdir, 'src')
+elif savecwd.startswith(top_builddir):
+    builddir = savecwd
+    srcdir = builddir.replace(top_builddir, top_srcdir)
+elif savecwd.startswith(top_srcdir):
+    srcdir = savecwd
+    builddir = srcdir.replace(top_srcdir, top_builddir)
+else:
+    die("""Cannot identify subdir, please change to a directory below the 
+build directory
+  """ + top_builddir + """
+or the source directory 
+  """ + top_srcdir)
     
 ##################################################
-# DETERMINE BUILDDIR
-# add trailing slash to builddir
-if not builddir.endswith('/'):
-    builddir = builddir + '/'
-# add trailing utdir to builddir
-if not builddir.endswith(utdir):
-    builddir += utdir
-
-# check whether builddir is writeable, readable and executable
-if os.access(builddir, os.F_OK):
-    if not os.access(builddir, os.W_OK | os.X_OK | os.R_OK):
-        die("Cannot access build dir " + builddir)
-    create_builddir = False
-else:
-    create_builddir = True
-if verbose: print("BUILDDIR = " + builddir)
-
-##################################################
 # DETERMINE SRCDIR
-# add trailing slash to srcdir
-if not srcdir.endswith('/'):
-    srcdir = srcdir + '/'
 # add trailing utdir to srcdir
-if not srcdir.endswith(utdir):
-    srcdir += utdir
+if not srcdir.endswith(utdir):  srcdir = os.path.join(srcdir, utdir)
+if verbose: print("SRCDIR=" + srcdir)
 
 # check whether srcdir is readable and executable
 if not os.access(srcdir, os.R_OK | os.X_OK):
-    die("Cannot access source dir " + srcdir)
-if verbose:
-    print("SRCDIR = " + srcdir)
+    die("Cannot read and execute source dir \n  " + srcdir)
+
+##################################################
+# DETERMINE BUILDDIR
+# add trailing utdir to builddir
+if not builddir.endswith(utdir): builddir = os.path.join(builddir, utdir)
+if verbose: print("BUILDDIR=" + builddir)
+
+# check whether builddir is writeable, readable and executable
+if os.path.isdir(builddir):
+    if not os.access(builddir, os.W_OK | os.X_OK | os.R_OK):
+        die("Cannot read, write and execute build dir " + builddir)
+    create_builddir = False
+else:
+    create_builddir = True
+
 
 ##################################################
 # DETERMINE WHICH TESTS TO RUN
@@ -369,7 +356,7 @@ if do_cpp and cpp_tests:
         test = test[:-4]
 
         print('** COMPILING ' + test)
-        cmd = LTCXXCOMPILE + ' -c ' + srcdir + test + '.cpp'
+        cmd = LTCXXCOMPILE + ' -c ' + os.path.join(srcdir, test + '.cpp')
         print(cmd)
         if not dryrun:
             if os.system(cmd):
@@ -377,7 +364,7 @@ if do_cpp and cpp_tests:
                 sys.exit(1)
                 
         print('\n** LINKING ' + test)
-        cmd = LTCXXLINK + ' ' + test + '.lo -o ./' + test
+        cmd = LTCXXLINK + ' ' + test + '.lo -o ' + test
         print(cmd)
         if not dryrun:
             if os.system(cmd):
@@ -392,7 +379,7 @@ if do_cpp and cpp_tests:
         print("**************************************************")
         print("** " + test)
         # strip ".cpp" from the end
-        cmd = LTRUN + ' ./' + test[:-4]
+        cmd = LTRUN + ' ' + test[:-4]
         if verbose:
             cmd += ' --log_level=test_suite'
         if single_test and subtests:
@@ -410,7 +397,7 @@ if do_python and py_tests:
     for test in py_tests:
         print("**************************************************")
         print("** " + test)
-        cmd = PYRUN + ' ' + srcdir + test
+        cmd = PYRUN + ' ' + os.path.join(srcdir, test)
         if verbose: cmd += ' -v'
         if single_test:
             cmd += ' ' + ' '.join(subtests)
@@ -430,7 +417,7 @@ if HAVE_MPI and do_parallel and py_ptests:
     for test in py_ptests:
         print("**************************************************")
         print("** " + test)
-        cmd = PARALLELPYTHON + ' ' + srcdir + test
+        cmd = PARALLELPYTHON + ' ' + os.path.join(srcdir, test)
         if verbose: cmd += ' -v'
         if single_test:
             cmd += ' ' + ' '.join(subtests)
