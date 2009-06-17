@@ -155,6 +155,7 @@ void forceloop() {
         boost::shared_ptr<VelocityVerlet>(new VelocityVerlet(allSet, position, velocity, force));
 
   integrator->setTimeStep(0.005);
+  /*
   integrator->addForce(ljint, allpairs);
 
   // make a shared pointer to a Lanevin thermostat with T=298.15 and gamma=0.5
@@ -172,7 +173,7 @@ void forceloop() {
   integrator->run(100);
 
   // check to see that particles have new positions
-
+  */
   particleStorage->foreach(pWriter);
 }
 

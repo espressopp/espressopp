@@ -9,7 +9,7 @@ using namespace espresso::integrator;
 using namespace espresso::particles;
 using namespace boost;
 
-class StepA : public particles::Computer  {
+class StepA: public particles::Computer {
 
  private:
 
@@ -29,50 +29,56 @@ class StepA : public particles::Computer  {
      pos(_posRef), vel(_velRef), force(_forceRef),
      timeStep(_timeStep), timeStepSqr(_timeStep * _timeStep) {}
 
-   virtual void operator()(ParticleHandle pref) 
-   {
+   virtual void operator()(ParticleHandle pref) {
      pos[pref] = pos[pref] + vel[pref] * timeStep + 0.5 * force[pref] * timeStepSqr;
      vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
-     force[pref] = 0.0;
    }
 };
 
-    class StepB : public particles::Computer  {
+class StepB: public particles::Computer {
 
-    private:
+  private:
 
-      PropertyHandle<Real3D> vel;
-      PropertyHandle<Real3D> force;
+    PropertyHandle<Real3D> vel;
+    PropertyHandle<Real3D> force;
 
-      real timeStep;
+    real timeStep;
 
-    public:
+  public:
 
-      StepB(PropertyHandle<Real3D> _velRef,
-	    PropertyHandle<Real3D> _forceRef, real _timeStep):
+    StepB(PropertyHandle<Real3D> _velRef,
+	  PropertyHandle<Real3D> _forceRef, real _timeStep):
 
-	vel(_velRef), force(_forceRef), timeStep(_timeStep) {}
+      vel(_velRef), force(_forceRef), timeStep(_timeStep) {}
 
-      virtual void operator()(ParticleHandle pref) {
-
+    virtual void operator()(ParticleHandle pref) {
         vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
+    }
+};
 
-      }
+class StepZeroForces: public particles::Computer {
 
-    };
+  private:
+
+    PropertyHandle<Real3D> force;
+
+  public:
+
+    StepZeroForces(PropertyHandle<Real3D> _forceRef): force(_forceRef) {}
+
+    virtual void operator()(ParticleHandle pref) {
+      force[pref] = 0.0;
+    }
+};
 
 VelocityVerlet::VelocityVerlet(boost::shared_ptr<Set> _particles, 
                                boost::shared_ptr< Property<Real3D> > _position,
                                boost::shared_ptr< Property<Real3D> > _velocity,
                                boost::shared_ptr< Property<Real3D> > _force):
 
-   MDIntegrator(_particles, _position, _velocity, _force)
+   MDIntegrator(_particles, _position, _velocity, _force) {}
 
-{
-}
-
-void VelocityVerlet::runSingleStep() 
-{
+void VelocityVerlet::runSingleStep() {
   // Step A
 
   StepA stepA(*position, *velocity, *force, timeStep);
@@ -83,7 +89,9 @@ void VelocityVerlet::runSingleStep()
 
   updateVelocity1(*this);
 
-  // ToDo: set forces to ZERO after calling updateVelocity1
+  // set forces to ZERO after calling updateVelocity1
+  StepZeroForces stepZeroForces(*force);
+  particles->foreach(stepZeroForces);
 
   // calculate forces:
 
