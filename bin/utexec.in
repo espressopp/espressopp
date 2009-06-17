@@ -233,16 +233,19 @@ def identify_test(test):
     elif test.startswith('ptest_') and os.access(test + '.py', os.R_OK):
         py_ptests.append(test + '.py')
         return
-    elif os.access('Test' + test + '.cpp', os.R_OK):
-        cpp_tests.append('Test' + test + '.cpp')
-        return
-    elif os.access('test_' + test + '.py', os.R_OK):
-        py_tests.append('test_' + test + '.py')
-        return
-    elif os.access('ptest_' + test + '.py', os.R_OK):
-        py_ptests.append('ptest_' + test + '.py')
-        return
-    die("Cannot identify test " + test)
+    else:
+        found_one = False
+        if os.access('Test' + test + '.cpp', os.R_OK):
+            cpp_tests.append('Test' + test + '.cpp')
+            found_one = True
+        if os.access('test_' + test + '.py', os.R_OK):
+            py_tests.append('test_' + test + '.py')
+            found_one = True
+        if os.access('ptest_' + test + '.py', os.R_OK):
+            py_ptests.append('ptest_' + test + '.py')
+            found_one = True
+        if not found_one:
+            die("Cannot identify test " + test)
 
 if single_test:
     if len(tests):
