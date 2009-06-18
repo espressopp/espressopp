@@ -33,10 +33,10 @@ namespace espresso {
     }
 
     T getItem(ParticleId part) const {
-      return (*this)[part];
+      return (*this).at(part);
     }
     void setItem(ParticleId part, const T &v) {
-      (*this)[part] = v;
+      (*this).at(part) = v;
     }
 
   public: // invisible in Python
@@ -112,19 +112,17 @@ namespace espresso {
 
   public: // visible in Python
     std::vector<T> getItem(ParticleId part) const {
-      particles::ConstParticleHandle handle = storage->getParticleHandle(part);
       ConstRefType ref = *this;
       const T
-        *start = ref[handle],
+        *start = (*this).at(part),
         *end   = start + ref.getDimension();
       return std::vector<T>(start, end);
     }
     void setItem(ParticleId part, const std::vector<T> &v) {
-      particles::ParticleHandle handle = storage->getParticleHandle(part);
       RefType ref = *this;
       if (v.size() != ref.getDimension())
         throw std::range_error("ArrayProperty::setItem: incorrect dimension");
-      std::copy(v.begin(), v.end(), (*this)[part]);
+      std::copy(v.begin(), v.end(), (*this).at(part));
     }
 
   public: // invisible in Python
