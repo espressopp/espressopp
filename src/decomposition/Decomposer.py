@@ -9,8 +9,11 @@ __all__ = [ "DecomposerLocal" ]
 
 class DecomposerLocal(object):
     'The local basic particle storage'
-    def __init__(self) :
-        self.storage = _Storage()
+    def __init__(self, storage = None) :
+        if storage == None :
+            storage = _Storage()
+
+        self.storage = storage
 
 if pmi.IS_CONTROLLER :
 
@@ -40,11 +43,11 @@ if pmi.IS_CONTROLLER :
             as local instance and should be handed over by the derived class.
             """
             if local == None :
-                self.local = pmi.create('DecomposerLocal')
-            else :
-                if not issubclass(DecomposerLocal, local) :
-                    raise TypeError("local object was given, but not derived from DecomposerLocal")
-                self.local = local
+                local = pmi.create('DecomposerLocal')
+            elif not issubclass(type(local), DecomposerLocal) :
+                raise TypeError("local object was given, but not derived from DecomposerLocal (type is %s)" % str(type(local)))
+
+            self.local = local
             self.properties = {}
         
         def createProperty(self, type, dimension = 1) :
@@ -84,6 +87,7 @@ if pmi.IS_CONTROLLER :
             This has to be implemented by any derived class to implement a real particle storage.
             This method should add a particle with identity <id> or a not yet assigned
             identity, if id is None.
+            Returns the particle id of the created particle.
             If the particle already exists, an IndexError is raised.
             """
             raise RuntimeError("Decomposer.addParticle has be implemented by derived classes")
@@ -102,6 +106,13 @@ if pmi.IS_CONTROLLER :
             For a given particle identity, this method should return the node this particle is
             located on, or raise an IndexError if it does not exist.
             """
-            raise RuntimeError("Decomposer.nodeofParticle has be implemented by derived classes")
+            raise RuntimeError("Decomposer.getNodeofParticle has be implemented by derived classes")
+
+        def getTotalNumberOfParticles(self) :
+            """
+            This has to be implemented by any derived class to implement a real particle storage.
+            Returns the total number of particles; can be an expensive operation.
+            """
+            raise RuntimeError("Decomposer.getTotalNumberOfParticle has be implemented by derived classes")
 
 ####
