@@ -29,6 +29,7 @@ namespace espresso {
       esutil::TupleVector::const_pointer ptr;
 
     public:
+      ConstParticleHandle() {}
       ConstParticleHandle(const ConstParticleHandle &_handle)
         : ptr(_handle.ptr) {}
       ConstParticleHandle(const ParticleHandle &_handle)

@@ -14,16 +14,7 @@ class MockDecomposerLocal(object) :
     def __init__(self) :
         self.storage = _Storage()
         # create local particle, one per node
-        # work around till storage takes particle id
-        for p in range(mpi.rank):
-            dummy = self.storage.addParticle()
-            self.storage.deleteParticle(dummy)
-
-        self.pid = self.storage.addParticle()
-
-        pids = mpi.world.gather(root=pmi.CONTROLLER, value=self.pid)
-        if pmi.IS_CONTROLLER :
-            self.pids = pids
+        self.storage.addParticle(mpi.rank)
 
 ####
         
@@ -31,44 +22,32 @@ class MockDecomposer(object) :
     def __init__(self) :
         pmi.exec_('import ptest_Property')
         self.local = pmi.create('ptest_Property.MockDecomposerLocal')
-        self.pids = self.local.pids
-        # determine illegal particle id
-        max = 0
-        for r in self.pids :
-            if r > max : max = r
-        self.special = max + 1
+        # not existing particle for failure tests
+        self.special = mpi.size + 1
 
-        self.properties = {}
-
-    def nodeOfParticle(self, particle) :
+    def getNodeOfParticle(self, particle) :
         # magic for failure test - claim that a particle is here
         # that isn't
-        if particle == self.special:
+        if particle >= 0 and particle < mpi.size :
+            return particle
+        elif particle == self.special :
             return mpi.rank
-        
-        for k,r in enumerate(self.pids) :
-            if r == particle:
-                return k
-        raise IndexError("particle %d does not exist" % particle)
+        else :
+            raise IndexError("particle %d does not exist" % particle)
 
 ####
         
 class TestRealProperty(unittest.TestCase) :
     def setUp(self) :
         self.decomp = MockDecomposer()
-        self.prop = RealProperty(self.decomp, 'Test')
-
-    def testNoConstructTwice(self) :
-        self.assertRaises(NameError, RealProperty, self.decomp, 'Test')
+        self.prop = RealProperty(self.decomp)
 
     def testConstructAndRegister(self) :
-        prop = RealProperty(self.decomp, 'Test2')        
-        self.assertEqual(prop.name, 'Test2')
+        prop = RealProperty(self.decomp)        
         self.assertEqual(prop.decomposer, self.decomp)
-        self.assertEqual(self.decomp.properties['Test2'], prop)
 
     def testReadWrite(self) :
-        for part in self.decomp.pids :
+        for part in range(0,mpi.size) :
             self.prop[part] = part*3.1415
             self.assertEqual(self.prop[part], part*3.1415)
 
@@ -78,9 +57,10 @@ class TestRealProperty(unittest.TestCase) :
     def testWriteFail(self) :
         self.assertRaises(IndexError, self.prop.__setitem__, -1, 42.42)
 
-    def testDecomposerNodeOfParticleFailure(self) :
+    def testDecomposerNodeOfParticleFailureRead(self) :
         self.assertRaises(RuntimeWarning, self.prop.__getitem__, self.decomp.special)
-    def testDecomposerNodeOfParticleFailure(self) :
+
+    def testDecomposerNodeOfParticleFailureWrite(self) :
         self.assertRaises(RuntimeWarning, self.prop.__setitem__, self.decomp.special, 42)
 
 ####
@@ -91,10 +71,10 @@ class TestRealProperty(unittest.TestCase) :
 class TestIntegerProperty(unittest.TestCase) :
     def setUp(self) :
         self.decomp = MockDecomposer()
-        self.prop = IntegerProperty(self.decomp, 'Test')
+        self.prop = IntegerProperty(self.decomp)
 
     def testReadWrite(self) :
-        for part in self.decomp.pids :
+        for part in range(0,mpi.size) :
             self.prop[part] = part*42
             self.assertEqual(self.prop[part], part*42)
 
@@ -103,10 +83,10 @@ class TestIntegerProperty(unittest.TestCase) :
 class TestReal3DProperty(unittest.TestCase) :
     def setUp(self) :
         self.decomp = MockDecomposer()
-        self.prop = Real3DProperty(self.decomp, 'Test')
+        self.prop = Real3DProperty(self.decomp)
 
     def testReadWrite(self) :
-        for part in self.decomp.pids :
+        for part in range(0,mpi.size) :
             self.prop[part] = Real3D(part,4,2)
             self.assertEqual(self.prop[part], Real3D(part,4,2))
 

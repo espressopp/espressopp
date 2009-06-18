@@ -38,22 +38,22 @@ class _PropertyLocal(object) :
 
 if pmi.IS_CONTROLLER:
     class _Property(object) :
-        def __init__(self, decomposer, name) :
-            if name in decomposer.properties :
-                raise NameError('property "%s" already exists' % name)
-            
-            self.name = name
+        """
+        generic functionality of classes representing a particle property. This class mainly acts
+        similar to a tuple, in that one can access the property of a given particle by using element
+        access. In other words, p[k] corresponds to the property p of particle k, both write- and readable.
+        """
+        def __init__(self, decomposer) :
             self.decomposer = decomposer
-            decomposer.properties[name] = self
 
             pmi.exec_('import espresso.Property')
 
         def __getitem__(self, particle) :
-            node = self.decomposer.nodeOfParticle(particle)
+            node = self.decomposer.getNodeOfParticle(particle)
             return pmi.call(self.local.getItem, node, particle)
 
         def __setitem__(self, particle, value) :
-            node = self.decomposer.nodeOfParticle(particle)
+            node = self.decomposer.getNodeOfParticle(particle)
             pmi.call(self.local.setItem, node, particle, value)
 
 ####
@@ -70,8 +70,11 @@ class RealPropertyLocal(_RealProperty, _PropertyLocal) :
 
 if pmi.IS_CONTROLLER:
     class RealProperty(_Property) :
-        def __init__(self, decomposer, name) :
-            _Property.__init__(self, decomposer, name)
+        """
+        represents a real valued particle property.
+        """
+        def __init__(self, decomposer) :
+            _Property.__init__(self, decomposer)
             self.local = pmi.create('espresso.Property.RealPropertyLocal', decomposer.local)
 ####
 
@@ -87,8 +90,11 @@ class IntegerPropertyLocal(_IntegerProperty, _PropertyLocal) :
 
 if pmi.IS_CONTROLLER:
     class IntegerProperty(_Property) :
-        def __init__(self, decomposer, name) :
-            _Property.__init__(self, decomposer, name)
+        """
+        represents an integer valued particle property.
+        """
+        def __init__(self, decomposer) :
+            _Property.__init__(self, decomposer)
             self.local = pmi.create('espresso.Property.IntegerPropertyLocal', decomposer.local)
 ####
 
@@ -104,7 +110,10 @@ class Real3DPropertyLocal(_Real3DProperty, _PropertyLocal) :
 
 if pmi.IS_CONTROLLER:
     class Real3DProperty(_Property) :
-        def __init__(self, decomposer, name) :
-            _Property.__init__(self, decomposer, name)
+        """
+        represents a Real3D valued particle property.
+        """
+        def __init__(self, decomposer) :
+            _Property.__init__(self, decomposer)
             self.local = pmi.create('espresso.Property.Real3DPropertyLocal', decomposer.local)
 ####
