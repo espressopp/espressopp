@@ -8,55 +8,66 @@ namespace espresso {
     /** temporary handle for efficient access to a the data in a property */
     template<typename T>
     class PropertyHandle
-      : public esutil::TupleVector::PropertyReference<T> {
+      : public esutil::TupleVector::PropertyPointer<T> {
       friend class Storage;
 
-      /// constructor
-      PropertyHandle(const esutil::TupleVector::PropertyReference<T> &_ref)
-        : esutil::TupleVector::PropertyReference<T>(_ref) {}
+    public:
+      PropertyHandle(): esutil::TupleVector::PropertyPointer<T>() {}
+      
+    private:
+      PropertyHandle(const esutil::TupleVector::PropertyPointer<T> &_ref)
+        : esutil::TupleVector::PropertyPointer<T>(_ref) {}
     };
 
     /** temporary handle for efficient access to a the data in a property */
     template<typename T>
     class ConstPropertyHandle
-      : public esutil::TupleVector::ConstPropertyReference<T> {
+      : public esutil::TupleVector::ConstPropertyPointer<T> {
       friend class Storage;
 
-      /// constructor
-      ConstPropertyHandle(const esutil::TupleVector::ConstPropertyReference<T> &_ref)
-        : esutil::TupleVector::ConstPropertyReference<T>(_ref) {}
-
     public:
+      ConstPropertyHandle(): esutil::TupleVector::ConstPropertyPointer<T>() {}
+
       /// const->nonconst constructor
-      ConstPropertyHandle(const esutil::TupleVector::PropertyReference<T> &_ref)
-        : esutil::TupleVector::ConstPropertyReference<T>(_ref) {}
+      ConstPropertyHandle(const esutil::TupleVector::PropertyPointer<T> &_ref)
+        : esutil::TupleVector::ConstPropertyPointer<T>(_ref) {}
+
+    private:
+      ConstPropertyHandle(const esutil::TupleVector::ConstPropertyPointer<T> &_ref)
+        : esutil::TupleVector::ConstPropertyPointer<T>(_ref) {}
     };
 
     /** temporary handle for efficient access to a the data in an array property */
     template<typename T>
     class ArrayPropertyHandle
-      : public esutil::TupleVector::ArrayPropertyReference<T> {
+      : public esutil::TupleVector::ArrayPropertyPointer<T> {
       friend class Storage;
 
-      /// constructor
-      ArrayPropertyHandle(const esutil::TupleVector::ArrayPropertyReference<T> &_ref)
-        : esutil::TupleVector::ArrayPropertyReference<T>(_ref) {}
+    public:
+      ArrayPropertyHandle(): esutil::TupleVector::ArrayPropertyPointer<T>() {}
+      
+    private:
+      ArrayPropertyHandle(const esutil::TupleVector::ArrayPropertyPointer<T> &_ref)
+        : esutil::TupleVector::ArrayPropertyPointer<T>(_ref) {}
     };
 
     /** temporary handle for efficient access to a the data in an array property */
     template<typename T>
     class ConstArrayPropertyHandle
-      : public esutil::TupleVector::ConstArrayPropertyReference<T> {
+      : public esutil::TupleVector::ConstArrayPropertyPointer<T> {
       friend class Storage;
 
-      /// constructor
-      ConstArrayPropertyHandle(const esutil::TupleVector::ConstArrayPropertyReference<T> &_ref)
-        : esutil::TupleVector::ConstArrayPropertyReference<T>(_ref) {}
-
     public:
+      ConstArrayPropertyHandle()
+        : esutil::TupleVector::ConstArrayPropertyPointer<T>() {}
+ 
       /// const->nonconst constructor
-      ConstArrayPropertyHandle(const esutil::TupleVector::ArrayPropertyReference<T> &_ref)
-        : esutil::TupleVector::ConstArrayPropertyReference<T>(_ref) {}
+      ConstArrayPropertyHandle(const esutil::TupleVector::ArrayPropertyPointer<T> &_ref)
+        : esutil::TupleVector::ConstArrayPropertyPointer<T>(_ref) {}
+
+    private:
+      ConstArrayPropertyHandle(const esutil::TupleVector::ConstArrayPropertyPointer<T> &_ref)
+        : esutil::TupleVector::ConstArrayPropertyPointer<T>(_ref) {}
     };
   }
 }

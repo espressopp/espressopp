@@ -80,7 +80,7 @@ BOOST_FIXTURE_TEST_CASE(particles_resize_test, Fixture)
 
 BOOST_FIXTURE_TEST_CASE(pointers_test, Fixture)
 {
-    TupleVector::PropertyReference<int> pRef = mv.getProperty<int>(intProp);
+    TupleVector::PropertyPointer<int> pRef = mv.getProperty<int>(intProp);
 
     ////// element references
     TupleVector::reference ref = mv[17];
@@ -108,14 +108,14 @@ BOOST_FIXTURE_TEST_CASE(dereference_scalar_test, Fixture)
 {
     ////// property references
     const TupleVector &constMv = mv;
-    TupleVector::PropertyReference<int> pRef = mv.getProperty<int>(intProp);
-    TupleVector::ConstPropertyReference<int> constPRef = constMv.getProperty<int>(intProp);
+    TupleVector::PropertyPointer<int> pRef = mv.getProperty<int>(intProp);
+    TupleVector::ConstPropertyPointer<int> constPRef = constMv.getProperty<int>(intProp);
 
     // convert non-const -> const
-    { TupleVector::ConstPropertyReference<int> constPRef2 = pRef; }
+    { TupleVector::ConstPropertyPointer<int> constPRef2 = pRef; }
 
     // this does not compile, tries const -> non-const conversion
-    //TupleVector::PropertyReference<int> pRef2 = constMv.getProperty<int>(intProp);    
+    //TupleVector::PropertyPointer<int> pRef2 = constMv.getProperty<int>(intProp);    
 
     ////// element references
     TupleVector::reference ref = mv[0];
@@ -152,14 +152,14 @@ BOOST_FIXTURE_TEST_CASE(dereference_array_test, Fixture)
 {
     ////// property references
     const TupleVector &constMv = mv;
-    TupleVector::ArrayPropertyReference<float>           pRef = mv.getArrayProperty<float>(floatProp);
-    TupleVector::ConstArrayPropertyReference<float> constPRef = constMv.getArrayProperty<float>(floatProp);
+    TupleVector::ArrayPropertyPointer<float>           pRef = mv.getArrayProperty<float>(floatProp);
+    TupleVector::ConstArrayPropertyPointer<float> constPRef = constMv.getArrayProperty<float>(floatProp);
 
     // convert non-const -> const
-    { TupleVector::ConstArrayPropertyReference<float> constPRef2 = pRef; }
+    { TupleVector::ConstArrayPropertyPointer<float> constPRef2 = pRef; }
 
     // this does not compile, tries const -> non-const conversion
-    //TupleVector::ArrayPropertyReference<float, 3> pRef2 = constMv.getArrayProperty<float, 3>(floatProp);
+    //TupleVector::ArrayPropertyPointer<float, 3> pRef2 = constMv.getArrayProperty<float, 3>(floatProp);
 
     ////// element references
     TupleVector::reference ref = mv[0];
@@ -202,7 +202,7 @@ BOOST_FIXTURE_TEST_CASE(dereference_array_test, Fixture)
 BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
 {
   {
-    TupleVector::PropertyReference<int> intRef = mv.getProperty<int>(intProp);
+    TupleVector::PropertyPointer<int> intRef = mv.getProperty<int>(intProp);
 
     // fill int property
     size_t i = 0;
@@ -242,7 +242,7 @@ BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
      mv[16:] = 10:
   */
   {
-    TupleVector::PropertyReference<int> intRef = mv.getProperty<int>(intProp);
+    TupleVector::PropertyPointer<int> intRef = mv.getProperty<int>(intProp);
     size_t i = 0;
     BOOST_FOREACH(TupleVector::const_reference ref,
 		  static_cast<const TupleVector &>(mv)) {
@@ -274,7 +274,7 @@ BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
      mv[12:] = 10:
   */
   {
-    TupleVector::PropertyReference<int> intRef = mv.getProperty<int>(intProp);
+    TupleVector::PropertyPointer<int> intRef = mv.getProperty<int>(intProp);
 
     size_t i = 0;
     BOOST_FOREACH(TupleVector::const_reference ref,
@@ -306,7 +306,7 @@ BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
      mv[15:] = 13:
   */
   {
-    TupleVector::PropertyReference<int> intRef = mv.getProperty<int>(intProp);
+    TupleVector::PropertyPointer<int> intRef = mv.getProperty<int>(intProp);
 
     size_t i = 0;
     BOOST_FOREACH(TupleVector::const_reference ref,
@@ -342,10 +342,10 @@ BOOST_FIXTURE_TEST_CASE(allocation_test, Fixture)
 
   // try wether writing to present and new fields raises memory problems
   {
-    TupleVector::PropertyReference<int> intRef = mv.getProperty<int>(intProp);
-    TupleVector::ArrayPropertyReference<float> fltRef
+    TupleVector::PropertyPointer<int> intRef = mv.getProperty<int>(intProp);
+    TupleVector::ArrayPropertyPointer<float> fltRef
       = mv.getArrayProperty<float>(floatProp);
-    TupleVector::ArrayPropertyReference<float> fltNRef
+    TupleVector::ArrayPropertyPointer<float> fltNRef
       = mv.getArrayProperty<float>(newProp);
 
     

@@ -22,8 +22,8 @@ namespace espresso {
     private:
       class ReferenceBase;
       template<class, class> class IteratorBase;
-      template<class, class> class PropertyReferenceBase;
-      template<class, class> class ArrayPropertyReferenceBase;
+      template<class, class> class PropertyPointerBase;
+      template<class, class> class ArrayPropertyPointerBase;
       class ReferenceIndexAccess;
 
       struct Property;
@@ -35,11 +35,11 @@ namespace espresso {
       class iterator;
       class const_iterator;
 
-      template<class> class PropertyReference;
-      template<class> class ConstPropertyReference;
+      template<class> class PropertyPointer;
+      template<class> class ConstPropertyPointer;
 
-      template<class> class ArrayPropertyReference;
-      template<class> class ConstArrayPropertyReference;
+      template<class> class ArrayPropertyPointer;
+      template<class> class ConstArrayPropertyPointer;
 
       class PropertyId {
       public:
@@ -88,7 +88,7 @@ namespace espresso {
 
       /** a reference to a constant element, which then can be used to read
 	  properties of the element using
-	  @ref esutil::TupleVector::PropertyReference.
+	  @ref esutil::TupleVector::PropertyPointer.
 	
 	  Actually, this is nothing but the index of the element. A
 	  reference can only be obtained from element access to the
@@ -174,37 +174,43 @@ namespace espresso {
 	  resizings of the TupleVector.
       */
       template<class T, class Property>
-      class PropertyReferenceBase: private ReferenceIndexAccess {
-	/// not possible
-	void operator=(const PropertyReferenceBase &);
-
-      protected:
-	/// data shortcut, already type-casted
-	T *data;
-
-	/// constructor
-	PropertyReferenceBase(Property &_property)
-	  : data(static_cast<T *>(_property.data)) {};
-	/// constructor
-	PropertyReferenceBase(T *_data)
-	  : data(_data) {};
-
+      class PropertyPointerBase: private ReferenceIndexAccess {
       public:
 	/// dereference
 	T &operator[](reference n) const { return data[getIndex(n)]; }
 	/// dereference
 	const T &operator[](const_reference n) const { return data[getIndex(n)]; }
+
+	/// check for validity
+	operator bool() const { return data; }
+
+      protected:
+	/// data shortcut, already type-casted
+	T *data;
+
+	PropertyPointerBase(Property &_property)
+	  : data(static_cast<T *>(_property.data)) {};
+	PropertyPointerBase(T *_data)
+	  : data(_data) {};
       };
 
       /** reference to an array property. In contrast to
-	  @ref TupleVector::PropertyReference, this returns a pointer, since
+	  @ref TupleVector::PropertyPointer, this returns a pointer, since
 	  the element itself is in fact an array whose size
 	  is only known at runtime.
       */
       template<class T, class Property>
-      class ArrayPropertyReferenceBase: private ReferenceIndexAccess {
-	/// not possible
-	void operator=(const ArrayPropertyReferenceBase &);
+      class ArrayPropertyPointerBase: private ReferenceIndexAccess {
+      public:
+	/// dereference
+	T *operator[](reference n) const { return data + getIndex(n)*dimension; }
+	/// dereference
+	const T *operator[](const_reference n) const { return data + getIndex(n)*dimension; }
+
+	/// check for validity
+	operator bool() const { return data; }
+
+        size_t getDimension() const { return dimension; }
 
       protected:
 	/// data short cut from property
@@ -213,20 +219,12 @@ namespace espresso {
 	int dimension;
 
 	/// constructor
-	ArrayPropertyReferenceBase(Property &_property)
+	ArrayPropertyPointerBase(Property &_property)
 	  : data(static_cast<T *>(_property.data)),
 	    dimension(_property.dimension) {};
 	/// constructor
-	ArrayPropertyReferenceBase(T *_data, size_t _dimension)
+	ArrayPropertyPointerBase(T *_data, size_t _dimension)
 	  : data(_data), dimension(_dimension) {};
-
-      public:
-	/// dereference
-	T *operator[](reference n) const { return data + getIndex(n)*dimension; }
-	/// dereference
-	const T *operator[](const_reference n) const { return data + getIndex(n)*dimension; }
-
-        size_t getDimension() const { return dimension; }
       };
 
     public:
@@ -240,7 +238,7 @@ namespace espresso {
       typedef ptrdiff_t difference_type;
   
       /** a reference to an element, which then can be used to read and
-	  write properties of the element using TupleVector::PropertyReference.
+	  write properties of the element using TupleVector::PropertyPointer.
 	
 	  Actually, this is nothing but a wrapper for an iterator. A
 	  reference can only be obtained from element access to the
@@ -269,7 +267,7 @@ namespace espresso {
 
       /** a reference to a constant element, which then can be used to read
 	  properties of the element using
-	  @ref esutil::TupleVector::PropertyReference.
+	  @ref esutil::TupleVector::PropertyPointer.
 	
 	  Actually, this is nothing but a wrapper for an iterator. A
 	  reference can only be obtained from element access to the
@@ -360,15 +358,16 @@ namespace espresso {
 	  the datatype to interpret the property as)
       */
       template<class T>
-      class PropertyReference: public PropertyReferenceBase<T, Property> {
+      class PropertyPointer: public PropertyPointerBase<T, Property> {
 	friend class TupleVector;
-	friend class ConstPropertyReference<T>;
+	friend class ConstPropertyPointer<T>;
 
-	/// not possible
-	void operator=(const PropertyReference &);
+      public:
+	PropertyPointer(): PropertyPointerBase<T, Property>(0) {};
 
-	PropertyReference(Property &_property)
-	  : PropertyReferenceBase<T, Property>(_property) {};
+      private:
+	PropertyPointer(Property &_property)
+	  : PropertyPointerBase<T, Property>(_property) {};
       };
 
       /** reference to a constant scalar property. In fact this is just
@@ -380,19 +379,20 @@ namespace espresso {
 	  the datatype to interpret the property as)
       */
       template<class T>
-      class ConstPropertyReference
-	: public PropertyReferenceBase<const T, const Property> {
+      class ConstPropertyPointer
+	: public PropertyPointerBase<const T, const Property> {
 	friend class TupleVector;
 
-	/// not possible
-	void operator=(const ConstPropertyReference &);
-
-	ConstPropertyReference(const Property &_property)
-	  : PropertyReferenceBase<const T, const Property>(_property) {};
       public:
+	ConstPropertyPointer(): PropertyPointerBase<const T, const Property>(0) {};
+
 	/// non-const->const conversion
-	ConstPropertyReference(const PropertyReference<T> &_ref)
-	  : PropertyReferenceBase<const T, const Property>(_ref.data) {}
+	ConstPropertyPointer(const PropertyPointer<T> &_ref)
+	  : PropertyPointerBase<const T, const Property>(_ref.data) {}
+
+      private:
+	ConstPropertyPointer(const Property &_property)
+	  : PropertyPointerBase<const T, const Property>(_property) {};
       };
 
       /** reference to an vector-like property, which consists of
@@ -401,24 +401,26 @@ namespace espresso {
 	  array that is dereferenced using a
 	  @ref TupleVector::reference. This reference is only guaranteed
 	  to be valid between any two resizings of the TupleVector. Unlike
-	  the @ref PropertyReference, this returns a pointer, in analogy
+	  the @ref PropertyPointer, this returns a pointer, in analogy
 	  to a standard C-array.
             
 	  @tparam T the data type of the property (or more precisely,
 	  the datatype to interpret the property as)
       */
       template<class T>
-      class ArrayPropertyReference
-	: public ArrayPropertyReferenceBase<T, Property>
+      class ArrayPropertyPointer
+	: public ArrayPropertyPointerBase<T, Property>
       {
 	friend class TupleVector;
-	friend class ConstArrayPropertyReference<T>;
+	friend class ConstArrayPropertyPointer<T>;
             
-	/// not possible
-	void operator=(const ArrayPropertyReference &);
+      public:
+	ArrayPropertyPointer()
+	  : ArrayPropertyPointerBase<T, Property>(0, 0) {};
 
-	ArrayPropertyReference(Property &_property)
-	  : ArrayPropertyReferenceBase<T, Property>(_property) {};
+      private:
+	ArrayPropertyPointer(Property &_property)
+	  : ArrayPropertyPointerBase<T, Property>(_property) {};
       };
 
       /** reference to an constant vector-like property, which consists of
@@ -427,27 +429,29 @@ namespace espresso {
 	  array that is dereferenced using a
 	  @ref TupleVector::reference. This reference is only guaranteed
 	  to be valid between any two resizings of the TupleVector. Unlike
-	  the @ref PropertyReference, this returns a pointer, in analogy
+	  the @ref PropertyPointer, this returns a pointer, in analogy
 	  to a standard C-array.
             
 	  @tparam T the data type of the property (or more precisely,
 	  the datatype to interpret the property as)
       */
       template<class T>
-      class ConstArrayPropertyReference
-	: public ArrayPropertyReferenceBase<const T, const Property>
+      class ConstArrayPropertyPointer
+	: public ArrayPropertyPointerBase<const T, const Property>
       {
 	friend class TupleVector;
 
-	/// not possible
-	void operator=(const ConstArrayPropertyReference &);
-
-	ConstArrayPropertyReference(const Property &_property)
-	  : ArrayPropertyReferenceBase<const T, const Property>(_property) {};
       public:
+	ConstArrayPropertyPointer()
+	  : ArrayPropertyPointerBase<const T, const Property>(0, 0) {};
+
 	/// non-const->const conversion
-	ConstArrayPropertyReference(const ArrayPropertyReference<T> &_ref)
-	  : ArrayPropertyReferenceBase<const T, const Property>(_ref.data, _ref.dimension) {}
+	ConstArrayPropertyPointer(const ArrayPropertyPointer<T> &_ref)
+	  : ArrayPropertyPointerBase<const T, const Property>(_ref.data, _ref.dimension) {}
+
+      private:
+	ConstArrayPropertyPointer(const Property &_property)
+	  : ArrayPropertyPointerBase<const T, const Property>(_property) {};
       };
 
       //@}
@@ -614,8 +618,8 @@ namespace espresso {
 	  @tparam T type of the property
       */
       template<class T>
-      PropertyReference<T> getProperty(PropertyId n) {
-	return PropertyReference<T>(const_cast<Property &>(getPropertyData(n)));
+      PropertyPointer<T> getProperty(PropertyId n) {
+	return PropertyPointer<T>(const_cast<Property &>(getPropertyData(n)));
       }
 
       /** get a constant non-array property
@@ -623,8 +627,8 @@ namespace espresso {
 	  @tparam T type of the property
       */
       template<class T>
-      ConstPropertyReference<T> getProperty(PropertyId n) const {
-	return ConstPropertyReference<T>(getPropertyData(n));
+      ConstPropertyPointer<T> getProperty(PropertyId n) const {
+	return ConstPropertyPointer<T>(getPropertyData(n));
       }
 
       /** get an array property
@@ -632,8 +636,8 @@ namespace espresso {
 	  @tparam T type of the property
       */
       template<class T>
-      ArrayPropertyReference<T> getArrayProperty(PropertyId n) {
-	return ArrayPropertyReference<T>(const_cast<Property &>(getPropertyData(n)));
+      ArrayPropertyPointer<T> getArrayProperty(PropertyId n) {
+	return ArrayPropertyPointer<T>(const_cast<Property &>(getPropertyData(n)));
       }
 
       /** get an array property
@@ -641,8 +645,8 @@ namespace espresso {
 	  @tparam T type of the property
       */
       template<class T>
-      ConstArrayPropertyReference<T> getArrayProperty(PropertyId n) const {
-	return ConstArrayPropertyReference<T>(getPropertyData(n));
+      ConstArrayPropertyPointer<T> getArrayProperty(PropertyId n) const {
+	return ConstArrayPropertyPointer<T>(getPropertyData(n));
       }
 
       /// get number of properties
