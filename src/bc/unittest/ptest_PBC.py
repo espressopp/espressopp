@@ -70,21 +70,21 @@ class Test0PBC(unittest.TestCase):
             res = pbc.getDist(Real3D(v1), Real3D(v2))
             self.assertEqual(res, Real3D(expected))
 
-    def testRandomPos(self):
+    def testGetRandomPos(self):
         pbc = PBC(10.0)
         sum = Real3D(0.0)
 
-        for i in range(10000):
-            v = pbc.randomPos()
+        for i in range(500):
+            v = pbc.getRandomPos()
             self.assert_(v[0] > 0.0 and v[0] <= 10.0)
             self.assert_(v[1] > 0.0 and v[1] <= 10.0)
             self.assert_(v[2] > 0.0 and v[2] <= 10.0)
             sum += v
 
-        sum *= 1.0/10000.0
-        self.assertAlmostEqual(sum[0], 5.0, 1)
-        self.assertAlmostEqual(sum[1], 5.0, 1)
-        self.assertAlmostEqual(sum[2], 5.0, 1)
+        sum *= 1.0/500.0
+        self.assertAlmostEqual(sum[0], 5.0, places=0)
+        self.assertAlmostEqual(sum[1], 5.0, places=0)
+        self.assertAlmostEqual(sum[2], 5.0, places=0)
 
 if __name__ == "__main__":
     unittest.main()

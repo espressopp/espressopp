@@ -1,10 +1,17 @@
-
 #include <boost/python.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "BC.hpp"
 
+using namespace espresso;
 using namespace espresso::bc;
+
+Real3D 
+BC::fold(const Real3D &pos) const {
+  Real3D res(pos);
+  foldThis(res);
+  return res;
+}
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -18,6 +25,8 @@ BC::registerPython() {
   // no_init must be used as the abstract class BC has no constructor
 
   class_<BC, boost::shared_ptr<BC>, boost::noncopyable >("bc_BC", no_init)
+    .def("foldThis", &BC::foldThis)
+    .def("fold", &BC::fold)
     .def("getDist", &BC::getDist)
     ;
 }

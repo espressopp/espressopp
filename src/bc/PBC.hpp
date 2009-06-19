@@ -37,16 +37,12 @@ namespace espresso {
       /** Fold the position \p pos into the central image. */
       virtual void foldThis(Real3D& pos) const;
 
-      /** Fold the position \pos into the central image. 
-       \return the folded position */
-      virtual Real3D fold(const Real3D& pos) const;
-
       /** Compute the minimum image distance (pos2 - pos1) */
       virtual Real3D getDist(const Real3D& pos1, const Real3D& pos2) const;
 
       /** Get a random position within the central simulation box. The
           positions are assigned with each coordinate on [0, length] */
-      virtual Real3D randomPos(void);
+      virtual Real3D getRandomPos(void);
       
     };
   }

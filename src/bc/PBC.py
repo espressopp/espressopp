@@ -29,6 +29,6 @@ if pmi.IS_CONTROLLER:
         pmiproxydefs = {
             'subjectclass' : 'espresso.bc.PBCLocal',
             'pmicall' : [ 'set' ],
-            'localcall' : [ 'fold', 'foldThis', 'getDist', 'randomPos' ],
+            'localcall' : [ 'fold', 'foldThis', 'getDist', 'getRandomPos' ],
             'pmiproperty' : [ 'length' ]
             }
