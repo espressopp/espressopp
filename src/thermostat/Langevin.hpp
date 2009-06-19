@@ -1,6 +1,7 @@
-#ifndef _LANGEVIN
-#define _LANGEVIN
+#ifndef _THERMOSTAT_LANGEVIN_HPP
+#define _THERMOSTAT_LANGEVIN_HPP
 
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/signals2.hpp>
 #include <boost/random.hpp>
 
@@ -8,9 +9,6 @@
 #include "types.hpp"
 #include "Thermostat.hpp"
 #include "integrator/VelocityVerlet.hpp"
-
-using namespace boost;
-using namespace boost::random;
 
 namespace espresso {
   namespace thermostat {
@@ -23,7 +21,9 @@ namespace espresso {
 
     */
 
-    class Langevin: public Thermostat {
+    class Langevin: 
+      public Thermostat, 
+      public boost::enable_shared_from_this< Langevin > {
 
     private:
   
@@ -43,8 +43,8 @@ namespace espresso {
 
       boost::normal_distribution<double> normalDist;
 
-      variate_generator<boost::minstd_rand0&, 
-                        boost::normal_distribution<double> > gauss;
+      boost::variate_generator<boost::minstd_rand0&, 
+			       boost::normal_distribution<double> > gauss;
 
       /** Method of the thermostat to modify r and v before force computation. */
       virtual void thermalizeA(const integrator::VelocityVerlet&);
@@ -70,8 +70,7 @@ namespace espresso {
 
       */
 
-      void connect(boost::shared_ptr<Langevin> thisSharedPtr,
-                   boost::shared_ptr<integrator::VelocityVerlet> integrator);
+      void connect(integrator::PVelocityVerlet integrator);
 
       /** Disconnect this thermostat object from its integrator. */
       void disconnect();
@@ -85,6 +84,7 @@ namespace espresso {
       virtual ~Langevin();
     };
 
+    typedef boost::shared_ptr< Langevin > PLangevin;
   }
 }
 

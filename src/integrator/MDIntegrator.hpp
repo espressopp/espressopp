@@ -1,8 +1,7 @@
-#ifndef _MDINTEGRATOR_HPP
-#define _MDINTEGRATOR_HPP
+#ifndef _INTEGRATOR_MDINTEGRATOR_HPP
+#define _INTEGRATOR_MDINTEGRATOR_HPP
 
 #include <boost/signals2.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "types.hpp"
 #include "logging.hpp"
@@ -13,20 +12,20 @@ namespace espresso {
   namespace integrator {
 
     class MDIntegrator {
-
+      
     private:
-
+      
       int nTimeStep;   //!< iteration counter in time loop
 
     protected:
       
       real timeStep;   //!< delta time for integration
 
-      boost::shared_ptr<particles::Set> particles;    //!< particle set to integrate
+      particles::PSet particles;    //!< particle set to integrate
 
-      boost::shared_ptr< Property<Real3D> > position; //!< position property
-      boost::shared_ptr< Property<Real3D> > velocity; //!< velocity property
-      boost::shared_ptr< Property<Real3D> > force;    //!< force property
+      PReal3DProperty position; //!< position property
+      PReal3DProperty velocity; //!< velocity property
+      PReal3DProperty force;    //!< force property
 
       /** A pure routine for a single iteration step makes this class abstract. */
 
@@ -45,16 +44,16 @@ namespace espresso {
 
       IntegrateSignal updateForces;
 
-      MDIntegrator(boost::shared_ptr<particles::Set> particles,
-                   boost::shared_ptr< Property<Real3D> > position,
-                   boost::shared_ptr< Property<Real3D> > velocity,
-                   boost::shared_ptr< Property<Real3D> > force);
+      MDIntegrator(particles::PSet particles,
+                   PReal3DProperty position,
+                   PReal3DProperty velocity,
+                   PReal3DProperty force);
 
-      boost::shared_ptr<particles::Set> getParticles() const { return particles; }
+      particles::PSet getParticles() const { return particles; }
 
-      boost::shared_ptr< Property<Real3D> > getPosition() const { return position; }
-      boost::shared_ptr< Property<Real3D> > getVelocity() const { return velocity; }
-      boost::shared_ptr< Property<Real3D> > getForce()    const { return force; }
+      PReal3DProperty getPosition() const { return position; }
+      PReal3DProperty getVelocity() const { return velocity; }
+      PReal3DProperty getForce()    const { return force; }
 
       virtual ~MDIntegrator() {}
       
@@ -70,6 +69,8 @@ namespace espresso {
 
       static void registerPython();
     };
+
+    typedef boost::shared_ptr< MDIntegrator > PMDIntegrator;
   }
 }
 

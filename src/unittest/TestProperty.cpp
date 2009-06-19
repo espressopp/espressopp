@@ -3,7 +3,6 @@
 #include <boost/test/unit_test.hpp>
 #include <stdexcept>
 
-#include "boost/shared_ptr.hpp"
 #include "../particles/ParticleHandle.hpp"
 #include "../Particle.hpp"
 #include "../Property.hpp"
@@ -13,7 +12,7 @@ using namespace espresso;
 using namespace espresso::particles;
 
 struct Fixture {
-  boost::shared_ptr<Storage> storage;
+  PStorage storage;
   ParticleId theParticle;
 
   Fixture(): storage(new Storage) {

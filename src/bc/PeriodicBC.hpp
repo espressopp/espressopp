@@ -1,15 +1,16 @@
-#ifndef _BC_PBC_HPP
-#define _BC_PBC_HPP
+#ifndef _BC_PERIODICBC_HPP
+#define _BC_PERIODICBC_HPP
 
-#include <cmath>
+#include <boost/shared_ptr.hpp>
 #include <logging.hpp>
-#include <bc/BC.hpp>
+
+#include "BC.hpp"
 
 namespace espresso {
   namespace bc {
     /** Class for periodic boundary conditions in all three dimensions. */
 
-    class PBC : public BC {
+    class PeriodicBC : public BC {
 
     private:
       Real3D length;
@@ -22,10 +23,10 @@ namespace espresso {
       static void registerPython();
 
       /** Constructor for cubic box */
-      PBC();
-      PBC(Real3D _length);
+      PeriodicBC();
+      PeriodicBC(Real3D _length);
       /** Destructor for periodic boundary conditions */
-      virtual ~PBC();
+      virtual ~PeriodicBC();
 
       /** Method to set the length of the side of the cubic simulation cell */
       virtual void set(Real3D length);
@@ -45,6 +46,8 @@ namespace espresso {
       virtual Real3D getRandomPos(void);
       
     };
+
+    typedef boost::shared_ptr< PeriodicBC > PPeriodicBC;
   }
 }
 

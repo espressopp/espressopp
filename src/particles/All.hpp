@@ -18,7 +18,7 @@ namespace espresso {
 	  particles in this set come from
       */
 
-      All(boost::shared_ptr<Storage> _store = boost::shared_ptr<Storage>());
+      All(PStorage _store = PStorage());
 
       virtual ~All();
 
@@ -35,6 +35,8 @@ namespace espresso {
       /// make this class available at Python
       static void registerPython();
     };
+
+    typedef boost::shared_ptr< All > PAll;
   }
 }
 

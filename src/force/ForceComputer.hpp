@@ -1,6 +1,7 @@
-#ifndef _FORCE_COMPUTER
-#define _FORCE_COMPUTER
+#ifndef _FORCE_FORCECOMPUTER_HPP
+#define _FORCE_FORCECOMPUTER_HPP
 
+#include <boost/enable_shared_from_this.hpp>
 #include <boost/signals2.hpp>
 
 #include "types.hpp"
@@ -18,12 +19,14 @@ namespace espresso {
 
     */
 
-    class ForceComputer {
+    class ForceComputer 
+      : public boost::enable_shared_from_this< ForceComputer >
+    {
 
     private:
 
-      boost::shared_ptr<interaction::Interaction> interaction;
-      boost::shared_ptr<pairs::Set> pairs;
+      interaction::PInteraction interaction;
+      pairs::PSet pairs;
 
       // variable that holds the connection to the integrator
       // At this time the ForceComputer can only connect to one integrator.
@@ -40,13 +43,12 @@ namespace espresso {
 
       /** Constructor of ForceComputer just takes the interaction and the pair set */
 
-      ForceComputer(boost::shared_ptr<interaction::Interaction> interaction,
-                    boost::shared_ptr<pairs::Set> pairs);
+      ForceComputer(interaction::PInteraction interaction,
+                    pairs::PSet pairs);
 
       /** This method connects this ForceComputer via its shared pointer to the integrator. */
 
-      void connect(boost::shared_ptr<ForceComputer> thisComputer, 
-                   boost::shared_ptr<integrator::MDIntegrator> integrator);
+      void connect(integrator::PMDIntegrator integrator);
 
       /** This method disconnects the ForceComputer from the integrator. This is also done
           automatically when the integrator is deleted.
@@ -60,6 +62,7 @@ namespace espresso {
 
    };
 
+    typedef boost::shared_ptr< ForceComputer > PForceComputer;
   }
 }
 

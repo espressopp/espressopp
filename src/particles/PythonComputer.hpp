@@ -3,7 +3,6 @@
 
 #include <particles/Computer.hpp>
 #include <boost/python.hpp>
-#include <boost/shared_ptr.hpp>
 
 namespace espresso {
   namespace particles {
@@ -14,7 +13,7 @@ namespace espresso {
       public boost::python::wrapper<PythonComputer> {
 
     public: // parts visible to Python
-      PythonComputer(boost::shared_ptr< particles::Storage > _storage)
+      PythonComputer(PStorage _storage)
 	: storage(_storage) {}
 
     public: // parts invisible to Python
@@ -25,7 +24,7 @@ namespace espresso {
       static void registerPython();
 
     private:
-      boost::shared_ptr< particles::Storage > storage;
+      PStorage storage;
     };
   }
 }

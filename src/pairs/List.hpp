@@ -16,10 +16,9 @@ namespace espresso {
     class List : public Set {
  
     private:
-
-      boost::shared_ptr<particles::Storage> storage; 
-      boost::shared_ptr<const bc::BC> bc;
-      boost::shared_ptr<const Property<Real3D> > coordinates;
+      particles::PStorage storage; 
+      bc::PBC bc;
+      PReal3DProperty coordinates;
       typedef std::pair<ParticleId,
                         ParticleId> Tuple;
       std::vector<Tuple> id_list;
@@ -35,9 +34,9 @@ namespace espresso {
 	  \param coordinates the identifier of the coordinates property to use
 
       */
-      List (boost::shared_ptr<const bc::BC> bc, 
-            boost::shared_ptr<particles::Storage> storage,
-	    boost::shared_ptr<const Property<Real3D> > coordinates);
+      List (bc::PBC bc, 
+            particles::PStorage storage,
+	    PReal3DProperty coordinates);
 
       size_t size() const;
 
@@ -71,18 +70,6 @@ namespace espresso {
 
       void deletePair(ParticleId id1, ParticleId id2);
 
-      /** Getter routine for the boundary conditions. */
-
-      boost::shared_ptr<const bc::BC> getBC() const { return bc; }
-
-      /** Getter routine for the ID of the coordinate */
-
-      boost::shared_ptr<const Property<Real3D> > getCoordinateProperty() const {return coordinates; }
-
-      /** Getter routine for the storage */
-
-      boost::shared_ptr<particles::Storage> getStorage() const { return storage; }
-
       /** This routine will apply a function operator to all pairs.
 
 	  \param pairComputer is the object that provides the function to be applied to all pairs.
@@ -108,6 +95,8 @@ namespace espresso {
       static void registerPython();
 
     };
+
+    typedef boost::shared_ptr< List > PList;
 
   }
 }

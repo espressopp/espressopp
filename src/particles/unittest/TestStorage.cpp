@@ -3,7 +3,6 @@
 #define BOOST_TEST_MODULE Storage
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
 
 #include "../Storage.hpp"
@@ -13,8 +12,8 @@ using namespace espresso;
 using namespace espresso::particles;
 
 struct Fixture {
-  boost::shared_ptr<Storage> store;
-  Property<Real3D> propertyPos;
+  PStorage store;
+  Real3DProperty propertyPos;
 
   Fixture(): store(new Storage), propertyPos(store) {
     for (size_t i = 0; i < 5; ++i) {

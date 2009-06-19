@@ -1,13 +1,13 @@
 #include "bindings.hpp"
 
 #include "BC.hpp"
-#include "PBC.hpp"
+#include "PeriodicBC.hpp"
 
 namespace espresso {
   namespace bc {
     void registerPython() {
       BC::registerPython();
-      PBC::registerPython();
+      PeriodicBC::registerPython();
     }
   }
 }

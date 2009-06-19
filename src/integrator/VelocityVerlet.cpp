@@ -71,10 +71,10 @@ class StepZeroForces: public particles::Computer {
     }
 };
 
-VelocityVerlet::VelocityVerlet(boost::shared_ptr<Set> _particles, 
-                               boost::shared_ptr< Property<Real3D> > _position,
-                               boost::shared_ptr< Property<Real3D> > _velocity,
-                               boost::shared_ptr< Property<Real3D> > _force):
+VelocityVerlet::VelocityVerlet(PSet _particles, 
+                               PReal3DProperty _position,
+                               PReal3DProperty _velocity,
+                               PReal3DProperty _force):
 
    MDIntegrator(_particles, _position, _velocity, _force) {}
 
@@ -129,9 +129,7 @@ VelocityVerlet::registerPython() {
   using namespace boost;
   using namespace boost::python;
 
-  class_<VelocityVerlet, boost::shared_ptr<VelocityVerlet>, boost::noncopyable, bases<MDIntegrator> >
-    ("integrator_VelocityVerlet", init<shared_ptr<Set>, shared_ptr< Property<Real3D> >,
-                                                        shared_ptr< Property<Real3D> >,
-                                                        shared_ptr< Property<Real3D> > >())
+  class_<VelocityVerlet, boost::noncopyable, bases<MDIntegrator> >
+    ("integrator_VelocityVerlet", init<PSet, PReal3DProperty, PReal3DProperty, PReal3DProperty>())
     ;
 }

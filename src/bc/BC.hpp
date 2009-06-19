@@ -1,6 +1,7 @@
 #ifndef _BC_BC_HPP
 #define _BC_BC_HPP
 
+#include <boost/shared_ptr.hpp>
 #include "types.hpp"
 
 namespace espresso {
@@ -44,6 +45,8 @@ namespace espresso {
       static void registerPython();
 
     };
+
+    typedef boost::shared_ptr< BC > PBC;
   }
 }
 

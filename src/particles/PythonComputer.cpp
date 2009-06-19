@@ -12,5 +12,5 @@ void PythonComputer::operator()(const ParticleHandle pref) {
 void PythonComputer::registerPython() {
   class_<PythonComputer, bases<Computer> >
     ("particles_PythonComputer",
-     init< boost::shared_ptr< particles::Storage > >());
+     init< particles::PStorage >());
 }

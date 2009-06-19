@@ -1,1 +1,1 @@
-from espresso.bc.PBC import *
+from espresso.bc.PeriodicBC import *

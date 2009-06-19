@@ -59,6 +59,8 @@ namespace espresso {
 
       virtual real getCutoffSqr() const;
     };
+
+    typedef boost::shared_ptr< LennardJones > PLennardJones;
   }
 }
 

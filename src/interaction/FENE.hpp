@@ -60,6 +60,8 @@ namespace espresso {
 	 without a cutoff to avoid the following */
       virtual real getCutoffSqr() const;
     };
+
+    typedef boost::shared_ptr< FENE > PFENE;
   }
 }
 

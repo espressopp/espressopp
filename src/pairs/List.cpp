@@ -16,9 +16,9 @@ List::~List()
 
 /* Constructor for this class  */
 
-List::List(boost::shared_ptr<const bc::BC> _bc, 
-           boost::shared_ptr<Storage> _storage, 
-           boost::shared_ptr<const Property<Real3D> > _coordinates) :
+List::List(bc::PBC _bc, 
+           PStorage _storage, 
+           PReal3DProperty _coordinates) :
 
    storage(_storage),
    bc(_bc),
@@ -85,9 +85,9 @@ List::registerPython() {
   using namespace boost;
   using namespace boost::python;
 
-  class_<List, boost::shared_ptr<List>, bases<Set> >
-    ("pairs_List", init<shared_ptr<bc::BC>, shared_ptr<particles::Storage>,
-                  shared_ptr<espresso::Property<Real3D> > >())
+  class_<List, bases<Set> >
+    ("pairs_List", 
+     init< bc::PBC, particles::PStorage, PReal3DProperty >())
   .def("addPair", &List::addPair)
   ;
 }

@@ -1,6 +1,7 @@
 #ifndef _PARTICLES_STORAGE_HPP
 #define _PARTICLES_STORAGE_HPP
 
+#include <boost/shared_ptr.hpp>
 #include "types.hpp"
 #include "esutil/TupleVector.hpp"
 #include "Particle.hpp"
@@ -143,6 +144,8 @@ namespace espresso {
       /// private and does not exist, do not try to use
       Storage(const Storage &);
     };
+
+    typedef boost::shared_ptr< Storage > PStorage;
 
   }
 }

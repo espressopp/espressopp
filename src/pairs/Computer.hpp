@@ -24,6 +24,9 @@ namespace espresso {
 
       virtual ~ComputerBase() {}
 
+//       virtual void bind(PStorage storage) = 0;
+//       virtual void unbind() = 0;
+
       /** Interface of the routine that is applied to particle pairs
 	  \param dist: distance vector between the two particles
 	  \param p1, p2: references to the two particles

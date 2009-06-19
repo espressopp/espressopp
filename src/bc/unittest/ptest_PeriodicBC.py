@@ -2,25 +2,25 @@ import unittest
 from espresso.bc import *
 from espresso import Real3D
 
-class Test0PBC(unittest.TestCase):
+class Test0PeriodicBC(unittest.TestCase):
     def testCreate(self):
-        pbc = PBC()
+        pbc = PeriodicBC()
         self.assertEqual(pbc.length, Real3D(1.0))
 
-        pbc = PBC(3.0)
+        pbc = PeriodicBC(3.0)
         self.assertEqual(pbc.length, Real3D(3.0))
 
-        pbc = PBC(length=5.0)
+        pbc = PeriodicBC(length=5.0)
         self.assertEqual(pbc.length, Real3D(5.0))
 
-        pbc = PBC(Real3D(1.0, 2.0, 3.0))
+        pbc = PeriodicBC(Real3D(1.0, 2.0, 3.0))
         self.assertEqual(pbc.length, Real3D(1.0, 2.0, 3.0))
 
-        pbc = PBC((1.0, 2.0, 3.0))
+        pbc = PeriodicBC((1.0, 2.0, 3.0))
         self.assertEqual(pbc.length, Real3D(1.0, 2.0, 3.0))
 
     def testSet(self):
-        pbc = PBC()
+        pbc = PeriodicBC()
         pbc.set(3.0)
         self.assertEqual(pbc.length, Real3D(3.0))
 
@@ -28,7 +28,7 @@ class Test0PBC(unittest.TestCase):
         self.assertEqual(pbc.length, Real3D(2.0))
         
     def testFold(self):
-        pbc = PBC(10.0)
+        pbc = PeriodicBC(10.0)
 
         for v, expected in [
             ((1.0, 1.0, 1.0), (1.0, 1.0, 1.0)),
@@ -39,7 +39,7 @@ class Test0PBC(unittest.TestCase):
             self.assertEqual(res, Real3D(expected))
 
     def testFoldThis(self):
-        pbc = PBC(10.0)
+        pbc = PeriodicBC(10.0)
 
         for v, expected in [
             ((1.0, 1.0, 1.0), (1.0, 1.0, 1.0)),
@@ -51,7 +51,7 @@ class Test0PBC(unittest.TestCase):
             self.assertEqual(v, Real3D(expected))
 
     def testGetDist(self):
-        pbc = PBC(10.0)
+        pbc = PeriodicBC(10.0)
 
         for v1, v2, expected in [
             # distance in central image
@@ -71,7 +71,7 @@ class Test0PBC(unittest.TestCase):
             self.assertEqual(res, Real3D(expected))
 
     def testGetRandomPos(self):
-        pbc = PBC(10.0)
+        pbc = PeriodicBC(10.0)
         sum = Real3D(0.0)
 
         for i in range(500):

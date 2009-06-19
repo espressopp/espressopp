@@ -1,7 +1,6 @@
 #include "error.hpp"
 
 #include <boost/python.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "integrator/MDIntegrator.hpp"
 
@@ -13,10 +12,10 @@ LOG4ESPP_LOGGER(MDIntegrator::theLogger, "Integrator");
 
 /*********************************************************************************/
 
-MDIntegrator::MDIntegrator(boost::shared_ptr<particles::Set> _particles,
-                           boost::shared_ptr< Property<Real3D> > _position,
-                           boost::shared_ptr< Property<Real3D> > _velocity,
-                           boost::shared_ptr< Property<Real3D> > _force) :
+MDIntegrator::MDIntegrator(particles::PSet _particles,
+                           PReal3DProperty _position,
+                           PReal3DProperty _velocity,
+                           PReal3DProperty _force) :
 
     particles(_particles),
     position(_position),
@@ -71,7 +70,7 @@ MDIntegrator::registerPython() {
   // be careful: boost::noncopyable must be used for abstract classes with pure routines
   // no_init must be used as the abstract class MDIntegrator has no constructor
 
-  class_<MDIntegrator, boost::shared_ptr<MDIntegrator>, boost::noncopyable >("integrator_Set", no_init)
+  class_<MDIntegrator, boost::noncopyable >("integrator_MDIntegrator", no_init)
   .def("setTimeStep", &MDIntegrator::setTimeStep)
   .def("getTimeStep", &MDIntegrator::getTimeStep)
   .def("run", &MDIntegrator::run)

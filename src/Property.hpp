@@ -10,10 +10,10 @@
 namespace espresso {
   /** Scalar particle property. This does several things:
       <ul>
-      <li> lifetime management of the property. deletion
+      <li> Lifetime management of the property. Deletion
       of the Property object removes the property from
       its storage.
-      <li> slow, but direct access to the particle properties
+      <li> Slow, but direct access to the particle properties
       without the need for handles.
       </ul>
 
@@ -24,7 +24,7 @@ namespace espresso {
     typedef particles::PropertyHandle<T> RefType;
     typedef particles::ConstPropertyHandle<T> ConstRefType;
   public: // visible in Python
-    Property(boost::shared_ptr<particles::Storage> _storage)
+    Property(particles::PStorage _storage)
       : storage(_storage) {
       id = storage->template addProperty<T>();
     }
@@ -90,9 +90,17 @@ namespace espresso {
     }
 
   private:
-    boost::shared_ptr<particles::Storage> storage;
+    particles::PStorage storage;
     esutil::TupleVector::PropertyId id;
   };
+
+  typedef Property<real> RealProperty;
+  typedef Property<Real3D> Real3DProperty;
+  typedef Property<int> IntegerProperty;
+
+  typedef boost::shared_ptr< RealProperty > PRealProperty;
+  typedef boost::shared_ptr< Real3DProperty > PReal3DProperty;
+  typedef boost::shared_ptr< IntegerProperty > PIntegerProperty;
 
   /** Array particle property. This does several things:
       <ul>
@@ -126,7 +134,7 @@ namespace espresso {
     }
 
   public: // invisible in Python
-    ArrayProperty(boost::shared_ptr<particles::Storage> _storage,
+    ArrayProperty(particles::PStorage _storage,
                   size_t dimension)
       : storage(_storage) {
       id = _storage->template addProperty<T>(dimension);
@@ -184,9 +192,15 @@ namespace espresso {
     }
 
   private:
-    boost::shared_ptr<particles::Storage> storage;
+    particles::PStorage storage;
     esutil::TupleVector::PropertyId id;
   };
+
+  typedef ArrayProperty<int> IntegerArrayProperty;
+  typedef ArrayProperty<real> RealArrayProperty;
+
+  typedef boost::shared_ptr< RealArrayProperty > PRealArrayProperty;
+  typedef boost::shared_ptr< IntegerArrayProperty > PIntegerArrayProperty;
 
   void registerPythonProperties();
 }

@@ -33,10 +33,10 @@ namespace espresso {
 
     public:
 
-      VelocityVerlet(boost::shared_ptr<particles::Set> particles,
-                   boost::shared_ptr< Property<Real3D> > position,
-                   boost::shared_ptr< Property<Real3D> > velocity,
-                   boost::shared_ptr< Property<Real3D> > force);
+      VelocityVerlet(particles::PSet particles,
+		     PReal3DProperty position,
+		     PReal3DProperty velocity,
+		     PReal3DProperty force);
 
       static void registerPython();
 
@@ -51,6 +51,8 @@ namespace espresso {
       virtual ~VelocityVerlet();
 
    };
+
+    typedef boost::shared_ptr< VelocityVerlet > PVelocityVerlet;
 
   }
 }

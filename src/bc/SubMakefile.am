@@ -1,13 +1,13 @@
 nobase_pkginclude_HEADERS += \
         bc/bindings.hpp \
         bc/BC.hpp \
-	bc/PBC.hpp
+	bc/PeriodicBC.hpp
 
 libespresso_common_la_SOURCES += \
         bc/bindings.cpp \
         bc/BC.cpp \
-	bc/PBC.cpp
+	bc/PeriodicBC.cpp
 
 python_SCRIPTS += \
 	bc/__init__.py \
-	bc/PBC.py
+	bc/PeriodicBC.py

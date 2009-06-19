@@ -43,7 +43,7 @@ private:
 	       ) :
       bc(*(all->getBC().get())), 
       id(all->getSet()->getStorage()->getIdPropertyHandle()),
-      pos(*(all->getCoordinateProperty())),
+      pos(PropertyHandle<Real3D>(*(all->getCoordinateProperty()))),
       pref1(pref),
       pos1(pos[pref1]),
       id1(id[pref1]),
@@ -87,9 +87,9 @@ All::~All() {}
   All::All(boundary_conditions, particle_set)
   -------------------------------------------------------------------------- */
 
-All::All(shared_ptr<const bc::BC> _bc,
-         shared_ptr<particles::Set> _set,
-         shared_ptr<const Property<Real3D> > _coordinates) :
+All::All(bc::PBC _bc,
+         particles::PSet _set,
+         PReal3DProperty _coordinates) :
   set(_set),
   bc(_bc),
   coordinates(_coordinates)
@@ -122,11 +122,8 @@ All::registerPython() {
   using namespace boost;
   using namespace boost::python;
 
-  class_<All, shared_ptr<All>, bases<Set> >
-    ("pairs_All", init<shared_ptr<bc::BC>, shared_ptr<particles::Set>, 
-                  shared_ptr< Property<Real3D> > >())
-  .def("getBC", &All::getBC)
-  .def("getSet", &All::getSet)
-  .def("getCoordinateProperty", &All::getCoordinateProperty)
-  ;
+  class_<All, bases<Set> >
+    ("pairs_All", 
+     init< bc::PBC, particles::PSet, PReal3DProperty >())
+    ;
 }

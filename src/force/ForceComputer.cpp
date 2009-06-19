@@ -1,9 +1,10 @@
-#include "ForceComputer.hpp"
+#include <python.hpp>
+#include <boost/bind.hpp>
+
+#include "force/ForceComputer.hpp"
 #include "Property.hpp"
 #include "error.hpp"
 
-#include <boost/bind.hpp>
-#include <boost/python.hpp>
 
 using namespace espresso;
 using namespace espresso::force;
@@ -15,8 +16,9 @@ LOG4ESPP_LOGGER(ForceComputer::theLogger, "ForceComputer");
 
 /***************************************************************************************/
 
-ForceComputer::ForceComputer(boost::shared_ptr<interaction::Interaction> _interaction,
-                             boost::shared_ptr<pairs::Set> _pairs)
+ForceComputer::
+ForceComputer(interaction::PInteraction _interaction,
+	      pairs::PSet _pairs)
 {
   LOG4ESPP_INFO(theLogger, "constructor of ForceComputer");
 
@@ -33,14 +35,13 @@ ForceComputer::ForceComputer(boost::shared_ptr<interaction::Interaction> _intera
 
 /***************************************************************************************/
 
-void ForceComputer::updateForces(const integrator::MDIntegrator& integrator)
-{
+void ForceComputer::
+updateForces(const integrator::MDIntegrator& integrator) {
   LOG4ESPP_DEBUG(theLogger, "updateForces at integrator step " << integrator.getIntegrationStep());
 
   PropertyHandle<Real3D> force = *integrator.getForce();
 
   pairs::ForceComputer* forceCompute = 
-
     interaction->createForceComputer(force);
 
   pairs->foreach(*forceCompute);
@@ -50,9 +51,8 @@ void ForceComputer::updateForces(const integrator::MDIntegrator& integrator)
 
 /***************************************************************************************/
 
-void ForceComputer::connect(boost::shared_ptr<ForceComputer> computer,
-                            boost::shared_ptr<integrator::MDIntegrator> integrator)
-{
+void ForceComputer::
+connect(integrator::PMDIntegrator integrator) {
   // at this time we support only a single connection
 
   LOG4ESPP_INFO(theLogger, "ForceComputer connects to Integrator");
@@ -61,15 +61,14 @@ void ForceComputer::connect(boost::shared_ptr<ForceComputer> computer,
      ARGERROR(theLogger, "ForceComputer is already connected");
   }
 
-  if (computer.get() != this) {
-     ARGERROR(theLogger, "connect: first argument is not this ForceComputer");
-  }
-
   if (!integrator) {
      ARGERROR(theLogger, "connect: Integrator is NULL");
   }
 
-  forceCalc = integrator->updateForces.connect(boost::bind(&ForceComputer::updateForces, computer, _1));
+  forceCalc = 
+    integrator->
+    updateForces.connect(boost::bind(&ForceComputer::updateForces, 
+				     shared_from_this(), _1));
 }
 
 /***************************************************************************************/
@@ -98,8 +97,9 @@ ForceComputer::registerPython() {
   using namespace boost;
   using namespace boost::python;
 
-  class_<ForceComputer, boost::shared_ptr<ForceComputer>, boost::noncopyable >
-    ("force_ForceComputer", init<shared_ptr<interaction::Interaction>, shared_ptr<pairs::Set> >())
+  class_<ForceComputer, boost::noncopyable >
+    ("force_ForceComputer", 
+     init< interaction::PInteraction, pairs::PSet >())
     .def("connect", &ForceComputer::connect)
     .def("disconnect", &ForceComputer::disconnect)
     ;

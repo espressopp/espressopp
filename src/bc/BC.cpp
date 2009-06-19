@@ -1,5 +1,4 @@
 #include <boost/python.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include "BC.hpp"
 
@@ -24,7 +23,7 @@ BC::registerPython() {
   // be careful: boost::noncopyable must be used for abstract classes with pure routines
   // no_init must be used as the abstract class BC has no constructor
 
-  class_<BC, boost::shared_ptr<BC>, boost::noncopyable >("bc_BC", no_init)
+  class_<BC, boost::noncopyable >("bc_BC", no_init)
     .def("foldThis", &BC::foldThis)
     .def("fold", &BC::fold)
     .def("getDist", &BC::getDist)

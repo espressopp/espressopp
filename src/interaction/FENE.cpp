@@ -81,7 +81,7 @@ FENE::registerPython() {
   real (FENE::*computeEnergyOverload2)(const real) const =
     &FENE::computeEnergy;
   
-  class_<FENE, boost::shared_ptr<FENE>, bases<Interaction> >("interaction_FENE", init<>())
+  class_<FENE, bases<Interaction> >("interaction_FENE", init<>())
     .def("set", &FENE::set)
     .def("getK", &FENE::getK)
     .def("getR0", &FENE::getR0)

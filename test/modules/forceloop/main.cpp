@@ -1,15 +1,12 @@
-
 // Example C++ program doing the same as the force loop Python script
 
 #include <types.hpp>
 #include <logging.hpp>
 
-#include <boost/shared_ptr.hpp>
-
 #include <espresso_common.hpp>
 #include <particles/Storage.hpp>
 #include <particles/All.hpp>
-#include <bc/PBC.hpp>
+#include <bc/PeriodicBC.hpp>
 #include <interaction/LennardJones.hpp>
 #include <interaction/FENE.hpp>
 #include <pairs/All.hpp>
@@ -55,18 +52,18 @@ void forceloop() {
 
   // Create a new particle storage
 
-  boost::shared_ptr<Storage> particleStorage = 
-         boost::shared_ptr<Storage>(new Storage());
+  PStorage particleStorage = 
+    PStorage(new Storage());
 
-  boost::shared_ptr<Property<Real3D> > position = 
-         boost::shared_ptr<Property<Real3D> >(new Property<Real3D>(particleStorage));
-  boost::shared_ptr<Property<Real3D> > velocity = 
-         boost::shared_ptr<Property<Real3D> >(new Property<Real3D>(particleStorage));
-  boost::shared_ptr<Property<Real3D> > force    = 
-         boost::shared_ptr<Property<Real3D> >(new Property<Real3D>(particleStorage));
+  PReal3DProperty position = 
+    PReal3DProperty(new Real3DProperty(particleStorage));
+  PReal3DProperty velocity = 
+    PReal3DProperty(new Real3DProperty(particleStorage));
+  PReal3DProperty force = 
+    PReal3DProperty(new Real3DProperty(particleStorage));
 
   // generate particles in the particle storage
-
+  
   size_t cnt = 0;
   for (int i = 0; i < N; i++) 
   for (int j = 0; j < N; j++) 
@@ -96,32 +93,32 @@ void forceloop() {
 
   // define periodic boundary conditions
 
-  boost::shared_ptr<PBC> pbc = boost::shared_ptr<PBC>(new PBC(SIZE));
+  PPeriodicBC pbc = PPeriodicBC(new PeriodicBC(SIZE));
 
   // define a set of all particles
 
-  boost::shared_ptr<particles::All> allSet  = 
-         boost::shared_ptr<particles::All>(new particles::All(particleStorage));
+  particles::PAll allSet  = 
+    particles::PAll(new particles::All(particleStorage));
 
   // define allpairs with (x, y) for all x, y in allSet
 
-  boost::shared_ptr<pairs::All> allpairs =
-         boost::shared_ptr<pairs::All>(new pairs::All(pbc, allSet, position));
-
+  pairs::PAll allpairs =
+    pairs::PAll(new pairs::All(pbc, allSet, position));
+  
   // For test only: PairWriter prints each particle pair 
-
+  
   // PairWriteComputer pairWriter(&particleStorage, position);
-
+  
   // call pairWriter(ref1, ref2) for each particle ref pair of allSet
 
   // allpairs.foreach(pairWriter);
 
   // define LennardJones interaction
 
-  boost::shared_ptr<LennardJones> ljint = boost::shared_ptr<LennardJones>(new LennardJones());
-
+  PLennardJones ljint = PLennardJones(new LennardJones());
+  
   ljint->set(1.0, 1.0, 2.5);
-
+  
   // make a FENE interaction
 
   FENE fene;
@@ -151,9 +148,9 @@ void forceloop() {
 
   // create integrator and set properties
 
-  boost::shared_ptr<VelocityVerlet> integrator =
-        boost::shared_ptr<VelocityVerlet>(new VelocityVerlet(allSet, position, velocity, force));
-
+  PVelocityVerlet integrator =
+    PVelocityVerlet(new VelocityVerlet(allSet, position, velocity, force));
+  
   integrator->setTimeStep(0.005);
   /*
   integrator->addForce(ljint, allpairs);

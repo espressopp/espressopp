@@ -1,7 +1,6 @@
 #ifndef _PAIRS_ALL_HPP
 #define _PAIRS_ALL_HPP
 
-#include "boost/shared_ptr.hpp"
 #include "Set.hpp"
 #include "Computer.hpp"
 #include "Property.hpp"
@@ -17,9 +16,9 @@ namespace espresso {
      class All : public Set {
  
      private:
-       boost::shared_ptr<particles::Set> set;
-       boost::shared_ptr<const bc::BC> bc;
-       boost::shared_ptr<const Property<Real3D> > coordinates;
+       particles::PSet set;
+       bc::PBC bc;
+       PReal3DProperty coordinates;
 
      public:
        static void registerPython();
@@ -34,21 +33,21 @@ namespace espresso {
 	 \param coordinates the identifier of the coordinates property to use
 
        */
-       All(boost::shared_ptr<const bc::BC> _bc, 
-           boost::shared_ptr<particles::Set> _set, 
-           boost::shared_ptr<const Property<Real3D> > _coordinates);
+       All(bc::PBC _bc, 
+           particles::PSet _set, 
+           PReal3DProperty _coordinates);
 
        /** Getter routine for the boundary conditions. */
-       boost::shared_ptr<const bc::BC> getBC() const { return bc; }
+       bc::PBC getBC() const { return bc; }
 
        /** Getter routine for the set of particles. */
-       boost::shared_ptr<particles::Set> getSet() const { return set; }
+       particles::PSet getSet() const { return set; }
 
        /** Getter routine for the coordinate property */
-       boost::shared_ptr<const Property<Real3D> > getCoordinateProperty() const { return coordinates; }
+       PReal3DProperty getCoordinateProperty() const { return coordinates; }
 
        /** Getter routine for the storage */
-       boost::shared_ptr<particles::Storage> getStorage() const { return set->getStorage(); }
+       particles::PStorage getStorage() const { return set->getStorage(); }
 
        /** This routine will apply a function operator to all pairs.
          \param pairComputer is the object that provides the function to be applied to all pairs.
@@ -61,6 +60,8 @@ namespace espresso {
        virtual void foreach(ConstComputer& pairComputer) const;
 
      };
+
+    typedef boost::shared_ptr< All > PAll;
   }
 }
 

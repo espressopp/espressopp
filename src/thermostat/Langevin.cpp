@@ -1,11 +1,12 @@
 #include <python.hpp>
-#include "Langevin.hpp"
+#include <boost/bind.hpp>
+
+#include "thermostat/Langevin.hpp"
 #include "Property.hpp"
 #include "error.hpp"
 #include "particles/Computer.hpp"
 #include "integrator/VelocityVerlet.hpp"
 
-#include <boost/bind.hpp>
 
 using namespace espresso;
 using namespace espresso::particles;
@@ -163,14 +164,8 @@ void Langevin::thermalizeB(const integrator::VelocityVerlet& integrator) {
 
 /**********************************************************************************/
 
-void Langevin::connect(boost::shared_ptr<thermostat::Langevin> langevin,
-                       boost::shared_ptr<integrator::VelocityVerlet> integrator)
-
-{ // check that there is no existing connection
-
-  if (langevin.get() != this) {
-     ARGERROR(theLogger, "shared pointer does not belong to this object");
-  }
+void Langevin::connect(integrator::PVelocityVerlet integrator) {
+  // check that there is no existing connection
 
   if (!integrator) {
      ARGERROR(theLogger, "Langevin: connect to NULL integrator");
@@ -185,9 +180,8 @@ void Langevin::connect(boost::shared_ptr<thermostat::Langevin> langevin,
 
   // We give a shared pointer to the boost bind so this object cannot be deleted as long
 
-  stepA = integrator->updateVelocity1.connect(boost::bind(&Langevin::thermalizeA, langevin, _1));
-
-  stepB = integrator->updateVelocity2.connect(boost::bind(&Langevin::thermalizeB, langevin, _1));
+  stepA = integrator->updateVelocity1.connect(boost::bind(&Langevin::thermalizeA, shared_from_this(), _1));
+  stepB = integrator->updateVelocity2.connect(boost::bind(&Langevin::thermalizeB, shared_from_this(), _1));
 
 }
 
@@ -221,7 +215,7 @@ void
 Langevin::registerPython() {
   using namespace boost::python;
 
-    class_<Langevin, boost::shared_ptr<Langevin>, bases<Thermostat> >
+    class_<Langevin, bases<Thermostat> >
       ("thermostat_Langevin", init<real, real>())
       .def("setGamma", &Langevin::setGamma)
       .def("getGamma", &Langevin::getGamma)    
