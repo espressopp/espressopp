@@ -385,7 +385,7 @@ if do_cpp and cpp_tests:
         print("**************************************************")
         print("** " + test)
         # strip ".cpp" from the end
-        cmd = LTRUN + ' ' + test[:-4]
+        cmd = LTRUN + ' ./' + test[:-4]
         if verbose:
             cmd += ' --log_level=test_suite'
         if single_test and subtests:
