@@ -28,7 +28,7 @@ namespace espresso {
 
       Storage();
 
-      virtual ~Storage() {}
+      virtual ~Storage();
 
       /// @name access to particles
       //@{

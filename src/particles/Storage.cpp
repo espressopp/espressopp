@@ -25,6 +25,10 @@ Storage::Storage() {
   particleIdProperty = particles.addProperty<size_t>();
 }
 
+#include <iostream>
+Storage::~Storage() {
+}
+
 void Storage::addParticle(ParticleId id) {
   esutil::TupleVector::iterator it = particles.insert(particles.end());
   particles.getProperty<size_t>(particleIdProperty)[*it] = id;
@@ -47,15 +51,19 @@ ParticleHandle Storage::getParticleHandle(ParticleId id) {
 }
 
 void Storage::foreach(Computer& compute) {
+  compute.bind(this);
   BOOST_FOREACH(esutil::TupleVector::reference particle, particles) {
     compute(ParticleHandle(&particle));
   }
+  compute.unbind(this);
 }
 
 void Storage::foreach(ConstComputer& compute) const {
+  compute.bind(this);
   BOOST_FOREACH(esutil::TupleVector::const_reference particle, particles) {
     compute(ConstParticleHandle(&particle));
   }
+  compute.unbind(this);
 }
 
 void Storage::deleteProperty(PropertyId id) {
