@@ -1,6 +1,7 @@
 from espresso import esutil
 from espresso.esutil import choose
 from espresso import pmi
+from espresso import boostmpi as mpi
 from espresso.decomposition.Decomposer import *
 
 __all__ = [ "SingleNodeLocal" ]
@@ -15,10 +16,12 @@ class SingleNodeLocal(DecomposerLocal):
         self.masternode = masternode
     
     def addParticle(self, id):
-        self.storage.addParticle(id)
+        if mpi.rank == self.masternode :
+            self.storage.addParticle(id)
 
     def deleteParticle(self, id):
-        self.storage.deleteParticle(id)
+        if mpi.rank == self.masternode :
+            self.storage.deleteParticle(id)
 ####
 
 if pmi.IS_CONTROLLER :

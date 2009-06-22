@@ -1,25 +1,20 @@
 #######################################################
 #
-#   Test program for testing Boost-Python interface to 
-#   the C++ class espresso::particles::Storage|Computer
-
-#   particles_Storage        : espresso::particles::storage
-#   particles_ParticleWriter : new added class in bindings for test here
-#                              is an extension of expresso::particles::computer
+# Testing the decomposer
 #
 
-import espresso
-from _espresso import particles_Storage
-from _espresso import particles_PythonComputer
-from _espresso import Real3D
-from _espresso import Real3DProperty
-from _espresso import IntegerProperty
-import random
+from espresso import boostmpi as mpi
+from espresso import pmi
+from espresso.particles import PythonComputerLocal
+if pmi.IS_CONTROLLER :
+    from espresso import Real3D, Real3DProperty
+    from espresso.decomposition import SingleNode
+    import random
 
-# tag particles in a small sphere around (0,0,0)
-class ParticleTester(particles_PythonComputer):
-    def __init__(self, _position, _tag, storage):
-        particles_PythonComputer.__init__(self, storage)
+# tag particles in a small sphere around (0,0,0) as demonstration
+class ParticleTesterLocal(PythonComputerLocal):
+    def __init__(self, _position, _tag):
+        PythonComputerLocal.__init__(self)
         self.position = _position
         self.tag = _tag
 
@@ -30,30 +25,49 @@ class ParticleTester(particles_PythonComputer):
         else:
             self.tag[pid] = 0
 
-class ParticleWriter(particles_PythonComputer):
-    def __init__(self, _property, _tag, storage):
-        particles_PythonComputer.__init__(self, storage)
+# write out tagged particles
+class ParticleWriterLocal(PythonComputerLocal):
+    def __init__(self, _property, _tag):
+        PythonComputerLocal.__init__(self)
         self.property = _property
         self.tag = _tag
-
+        self.total = 0
+        self.sphere = 0
+        
     def each(self, pid):
+        self.total += 1
         if self.tag[pid]:
-            print("%d %s" % (pid, self.property[pid]))
+            print("%d %d %s" % (mpi.rank, pid, self.property[pid]))
+            self.sphere +=1
 
-storage = particles_Storage()
+    def collect(self) :
+        return mpi.world.reduce((self.sphere, self.total), lambda x,y : (x[0]+y[0], x[1]+y[1]), pmi.CONTROLLER)
 
-pos = Real3DProperty(storage)
+# main routine. Since we use this also as a module, we need to check that we are really the
+# main program and not the module initialization
+if __name__ == "__main__" :
 
-for count in range(0,100):
-    pid = storage.addParticle()
-    pos[pid] = Real3D(random.random(), random.random(), random.random())
+    # TBD: for scripts like this, how can one avoid hardcoding the script name?
+    # __name__ is "__main__" in case this is the main routine, and __file__ the
+    # fill path, which also doesn't help
+    pmi.exec_("from testParticles import ParticleTesterLocal, ParticleWriterLocal")
 
-# add property a posteriori
-tag = IntegerProperty(storage)
+    decomposer = SingleNode(mpi.size-1)
+    pos = decomposer.createProperty("Real3D")
 
-#tag particles
-storage.foreach(ParticleTester(pos, tag, storage))
+    for count in range(0,100):
+        decomposer.addParticle(count)
+        pos[count] = Real3D(random.random(), random.random(), random.random())
 
-# and print tagged ones
-storage.foreach(ParticleWriter(pos, tag, storage))
+    # add property a posteriori
+    tag = decomposer.createProperty("Integer")
 
+    #tag particles
+    # TBD: To create a PMI object referring to other PMI objects, we need to access
+    # the PMI local object. Will there be a general rule for that? Like it is always
+    # called "local"?
+    decomposer.foreach(pmi.create("ParticleTesterLocal", pos.local, tag.local))
+
+    # and print tagged ones
+    count = decomposer.foreach(pmi.create("ParticleWriterLocal", pos.local, tag.local))
+    print("printed %d out of %d particles" % count)

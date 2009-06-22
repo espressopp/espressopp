@@ -15,6 +15,12 @@ class DecomposerLocal(object):
 
         self.storage = storage
 
+    def foreach(self, computer) :
+        self.storage.foreach(computer)
+
+        if hasattr(computer, "collect") :
+            return computer.collect()
+
 if pmi.IS_CONTROLLER :
 
     __all__.append("Decomposer")
@@ -72,17 +78,45 @@ if pmi.IS_CONTROLLER :
             if dimension == 1 :
                 klassname = 'Property.%sProperty' % type
                 try:
-                    eval(klassname)(self)
+                    property = eval(klassname)(self)
                 except AttributeError :
                     raise TypeError('type "%s" cannot be used as particle property (class %s missing)' % (type, klassname));
             else :
                 klassname = 'Property.%sArrayProperty' % type
                 try:
-                    eval(klassname)(self, dimension)
+                    property = eval(klassname)(self, dimension)
                 except AttributeError :
                     raise TypeError('type "%s" cannot be used as particle array property (class %s missing)' % (type, klassname));
+	    return property
 
-        def addParticle(self, id = None):
+        def foreach(self, computer) :
+            """
+            call the method "each" of the computer object for each
+            particle on each node. Therefore, computer should be a
+            PMI-object, and has to be derived from
+            espresso.particles.PythonComputerLocal.
+
+            If the computer object has a method "collect", this method
+            will be called on all nodes after looping over all
+            particles; typically, this method can be used to collect
+            the results of the computation. The return value of foreach is
+            the return value of "collect" on the master node.
+            
+            Example:
+
+            >>> class MyPythonComputer(espresso.particles.PythonComputerLocal) :
+            >>>    def __init__(self) :
+            >>>        self.count = 0
+            >>>    def each(self, id) :
+            >>>        self.count += 1
+            >>>    def collect(self) :
+            >>>        return mpi.reduce(self.count, x,y : return x+y, pmi.CONTROLLER)
+            >>>
+            >>> decomposer.foreach(pmi.create("MyPythonComputer"))
+            """
+            return pmi.call(self.local.foreach, computer)
+            
+        def addParticle(self, id = None) :
             """
             This has to be implemented by any derived class to implement a real particle storage.
             This method should add a particle with identity <id> or a not yet assigned

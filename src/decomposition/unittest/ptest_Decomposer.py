@@ -3,7 +3,7 @@ from espresso import pmi
 from espresso.decomposition import DecomposerLocal
 
 if pmi.IS_CONTROLLER :
-    from espresso import RealProperty
+    from espresso import RealProperty, IntegerProperty
     from espresso.decomposition import Decomposer
 
 class DerivedLocal(DecomposerLocal) :
@@ -23,6 +23,7 @@ class Test(unittest.TestCase) :
 
     def testCreateProperty(self) :
         prop2 = self.decomp.createProperty("Integer")
+	self.assertEqual(type(prop2), IntegerProperty)
         self.assertRaises(TypeError, self.decomp.createProperty, "None")
 
 if __name__ == "__main__":
