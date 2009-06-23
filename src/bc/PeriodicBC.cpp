@@ -45,15 +45,13 @@ PeriodicBC::foldThis(Real3D &pos) const {
 
 Real3D 
 PeriodicBC::getDist(const Real3D& pos1, const Real3D& pos2) const {
-
   // res = pos2 - pos1
   Real3D res(pos1);
   res -= pos2;
 
-  // compute distance
-  res[0] = remainder(res[0], length[0]);
-  res[1] = remainder(res[1], length[1]);
-  res[2] = remainder(res[2], length[2]);
+  res[0] -= round(res[0] * lengthInverse[0]) * length[0];
+  res[1] -= round(res[1] * lengthInverse[1]) * length[1];
+  res[2] -= round(res[2] * lengthInverse[2]) * length[2];
 
   return res;
 }
