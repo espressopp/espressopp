@@ -29,7 +29,7 @@ if pmi.IS_CONTROLLER :
 
     class Decomposer(object) :
         """
-        The basic particle storage.This class is responsible for
+        The basic particle storage. This class is responsible for
         distributing particles across processors as well as locally on
         the processors in memory.
 
@@ -124,7 +124,7 @@ if pmi.IS_CONTROLLER :
             Returns the particle id of the created particle.
             If the particle already exists, an IndexError is raised.
             """
-            raise RuntimeError("Decomposer.addParticle has be implemented by derived classes")
+            raise RuntimeError("Decomposer.addParticle has to be implemented by derived classes")
 
         def deleteParticle(self, id) :
             """
@@ -132,7 +132,7 @@ if pmi.IS_CONTROLLER :
             This method should delete the particle with identity <id>
             If the particle does not exist, an IndexError is raised.
             """
-            raise RuntimeError("Decomposer.deleteParticle has be implemented by derived classes")
+            raise RuntimeError("Decomposer.deleteParticle has to be implemented by derived classes")
 
         def getNodeOfParticle(self, id) :
             """
@@ -140,13 +140,13 @@ if pmi.IS_CONTROLLER :
             For a given particle identity, this method should return the node this particle is
             located on, or raise an IndexError if it does not exist.
             """
-            raise RuntimeError("Decomposer.getNodeofParticle has be implemented by derived classes")
+            raise RuntimeError("Decomposer.getNodeofParticle has to be implemented by derived classes")
 
         def getTotalNumberOfParticles(self) :
             """
             This has to be implemented by any derived class to implement a real particle storage.
             Returns the total number of particles; can be an expensive operation.
             """
-            raise RuntimeError("Decomposer.getTotalNumberOfParticle has be implemented by derived classes")
+            raise RuntimeError("Decomposer.getTotalNumberOfParticle has to be implemented by derived classes")
 
 ####
