@@ -9,6 +9,7 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
+#include <cmath>
 
 #include "espresso_common.hpp"
 #include "types.hpp"
@@ -17,7 +18,7 @@
 #include "particles/All.hpp"
 #include "pairs/All.hpp"
 #include "pairs/ForceComputer.hpp"
-#include "bc/PBC.hpp"
+#include "bc/PeriodicBC.hpp"
 #include "interaction/LennardJones.hpp"
 #include "esutil/Timer.hpp"
 
@@ -81,8 +82,8 @@ void TestEspresso::addParticle(const Real3D &pos)
 }
 
 void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {
-  boost::shared_ptr<bc::PBC> pbc(new bc::PBC(size));
-  boost::shared_ptr<particles::All> allset(new particles::All(storage));
+  bc::PPeriodicBC pbc(new bc::PeriodicBC(size));
+  particles::PAll allset(new particles::All(storage));
   pairs::All allpairs(pbc, allset, position);
   interaction::LennardJones ljint;
   ljint.set(epsilon, sigma, cutoff);
@@ -103,8 +104,8 @@ public:
 };
 
 void TestEspresso::runEmptyPairLoop() {
-  boost::shared_ptr<bc::PBC> pbc(new bc::PBC(size));
-  boost::shared_ptr<particles::All> allset(new particles::All(storage));
+  bc::PPeriodicBC pbc(new bc::PeriodicBC(size));
+  particles::PAll allset(new particles::All(storage));
   pairs::All allpairs(pbc, allset, position);
   EmptyPairComputer ljc;
   allpairs.foreach(ljc);
@@ -127,8 +128,8 @@ public:
 };
 
 real TestEspresso::calculateMinDist() {
-  boost::shared_ptr<bc::PBC> pbc(new bc::PBC(size));
-  boost::shared_ptr<particles::All> allset(new particles::All(storage));
+  bc::PPeriodicBC pbc(new bc::PeriodicBC(size));
+  particles::PAll allset(new particles::All(storage));
   pairs::All allpairs(pbc, allset, position);
   MinDistComputer mincomp;
   allpairs.foreach(mincomp);
