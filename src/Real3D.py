@@ -17,7 +17,7 @@ class __Real3D(Real3D) :
             # test whether the argument is iterable and has 3 elements
             if hasattr(arg0, '__iter__') and len(arg0) == 3:
                 x, y, z = arg0
-            elif isinstance(arg0, float) :
+            elif isinstance(arg0, float) or isinstance(arg0, int):
                 x = y = z = arg0
             else :
                 raise TypeError("Cannot initialize Real3D from %s" % (args))

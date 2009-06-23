@@ -29,6 +29,11 @@ class Test0Real3D(unittest.TestCase) :
         self.assertEqual(x[1], 3.141)
         self.assertEqual(x[2], 3.141)
 
+        x = Real3D(10)
+        self.assertEqual(x[0], 10.0)
+        self.assertEqual(x[1], 10.0)
+        self.assertEqual(x[2], 10.0)
+
         self.assertRaises(TypeError, Real3D, 1.0, 2.0)
         self.assertRaises(TypeError, Real3D, 1.0, 2.0, 3.0, 4.0)
         self.assertRaises(TypeError, Real3D, (1.0, 2.0))
