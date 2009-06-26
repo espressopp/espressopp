@@ -20,14 +20,17 @@ computeEnergy(const real dist) const {
   return this->computeEnergySqr(dist * dist);
 }
 
-struct PythonCentralInteraction
-  : CentralInteraction, wrapper< CentralInteraction > 
+
+// thin wrapper for the C++ ABC
+class PythonCentralInteraction
+  : public CentralInteraction, 
+    public wrapper< CentralInteraction > 
 {
+public:
   real computeEnergySqr(const real distSqr) {
     return this->get_override("computeEnergySqr")(distSqr);
   }
 };
-
 
 void
 CentralInteraction::registerPython() {

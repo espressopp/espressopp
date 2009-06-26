@@ -11,11 +11,15 @@ using namespace boost::python;
 //////////////////////////////////////////////////
 struct PythonInteraction : Interaction, wrapper<Interaction> 
 {
-  real computeEnergy(const Real3D &dist) {
+  real getCutoffSqr() const {
+    return this->get_override("getCutoffSqr")();
+  }
+
+  real computeEnergy(const Real3D &dist) const {
     return this->get_override("computeEnergy")(dist);
   }
 
-  Real3D computeForce(const Real3D &dist) {
+  Real3D computeForce(const Real3D &dist) const {
     return this->get_override("computeForce")(dist);
   }
 };
@@ -28,6 +32,7 @@ Interaction::registerPython() {
 
   class_< PythonInteraction, boost::noncopyable >
     ("interaction_Interaction", no_init)
+    .def("getCutoffSqr", pure_virtual(&Interaction::getCutoffSqr))
     .def("computeEnergy", pure_virtual(&Interaction::computeEnergy))
     .def("computeForce", pure_virtual(&Interaction::computeForce))
     ;

@@ -4,6 +4,7 @@ noinst_LTLIBRARIES =
 libespresso_common_la_SOURCES =
 DIST_SUBDIRS = 
 EXTRA_DIST =
+python_LTLIBRARIES =
 
 include SubMakefile.am
 include include/SubMakefile.am
@@ -17,6 +18,8 @@ include bc/SubMakefile.am
 include integrator/SubMakefile.am
 include force/SubMakefile.am
 include thermostat/SubMakefile.am
+
+include sandbox/SubMakefile.am
 
 CLEANFILES =
 
@@ -37,7 +40,7 @@ libespresso_common_la_LIBADD = \
 # The python module _espresso
 # Build only if shared libs are built
 if ENABLE_SHARED
-python_LTLIBRARIES = _espresso.la
+python_LTLIBRARIES += _espresso.la
 _espresso_la_SOURCES = _espresso.cpp
 _espresso_la_LDFLAGS = -shared -module -avoid-version -no-undefined
 _espresso_la_LIBADD = \

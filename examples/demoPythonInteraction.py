@@ -2,7 +2,7 @@ from espresso.interaction import CentralInteractionLocalBase
 
 class MyInteraction(CentralInteractionLocalBase):
     def __init__(self):
-        pass
+        CentralInteractionLocalBase.__init__(self)
     def computeEnergySqr(self, distSqr):
         return distSqr
 

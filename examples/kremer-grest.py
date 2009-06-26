@@ -1,18 +1,27 @@
-import espresso
-import espresso.bc
-import espresso.decomposition
-import espresso.thermostat
-import espresso.integrator
-import espresso.interaction
-import espresso.pairs
+from espresso import *
+from espresso import bc, decomposition, integrator, particles
 
-system = {}
+# import espresso.thermostat
+# import espresso.interaction
+# import espresso.pairs
+
 # set up the boundary conditions
-system['bc'] = espresso.bc.PBC(length=10)
+pbc = bc.PeriodicBC(length=10)
 # set up the decomposition scheme
-system['particles'] = espresso.decomposition.CellStorage(grid=(2, 2, 2), skin=0.1, **system)
+decomposer = decomposition.SingleNode()
+#particles = espresso.decomposition.CellStorage(grid=(2, 2, 2), skin=0.1, **system)
+
+positionProperty = decomposer.createProperty('Real3D')
+velocityProperty = decomposer.createProperty('Real3D')
+forceProperty = decomposer.createProperty('Real3D')
+allParticles = particles.All(decomposer)
+
 # set up the integrator
-system['integrator'] = espresso.integrator.VelocityVerlet(timestep=0.001, **system)
+integrator = integrator.VelocityVerlet(set=allParticles,
+                                       positionProperty=positionProperty, 
+                                       velocityProperty=velocityProperty,
+                                       forceProperty=forceProperty,
+                                       timestep=0.001)
 # set up the thermostat
 system['thermostat'] = espresso.thermostat.Langevin(temperature=1.0, gamma=0.5, **system)
 
@@ -38,6 +47,3 @@ for sweeps in range(100):
     system['integrator'].integrate(steps=100)
 
 # analysis
-.
-.
-.
