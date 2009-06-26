@@ -51,19 +51,19 @@ ParticleHandle Storage::getParticleHandle(ParticleId id) {
 }
 
 void Storage::foreach(Computer& compute) {
-  compute.bind(this);
+  compute.prepare(this);
   BOOST_FOREACH(esutil::TupleVector::reference particle, particles) {
     compute(ParticleHandle(&particle));
   }
-  compute.unbind(this);
+  compute.finalize();
 }
 
 void Storage::foreach(ConstComputer& compute) const {
-  compute.bind(this);
+  compute.prepare(this);
   BOOST_FOREACH(esutil::TupleVector::const_reference particle, particles) {
     compute(ConstParticleHandle(&particle));
   }
-  compute.unbind(this);
+  compute.finalize();
 }
 
 void Storage::deleteProperty(PropertyId id) {

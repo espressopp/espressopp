@@ -17,4 +17,4 @@ libespresso_common_la_SOURCES += \
 
 python_SCRIPTS += \
 	particles/__init__.py \
-	particles/PythonComputer.py
+	particles/ComputerLocalBase.py

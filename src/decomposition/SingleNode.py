@@ -53,7 +53,7 @@ if pmi.IS_CONTROLLER :
             pmi.call(self.local.addParticle, id)
             # update max_seen_id and list of particle_ids
             self.max_seen_id = id
-            self.particle_ids.append(id)
+            self.particle_ids.add(id)
             return id
 
         def deleteParticle(self, id) :

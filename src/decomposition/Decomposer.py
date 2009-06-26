@@ -16,10 +16,13 @@ class DecomposerLocal(object):
         self.storage = storage
 
     def foreach(self, computer) :
+        if hasattr(computer, "prepare") :
+            computer.prepare(self)
+
         self.storage.foreach(computer)
 
-        if hasattr(computer, "collect") :
-            return computer.collect()
+        if hasattr(computer, "finalize") :
+            return computer.finalize()
 
 if pmi.IS_CONTROLLER :
 
@@ -91,23 +94,28 @@ if pmi.IS_CONTROLLER :
 
         def foreach(self, computer) :
             """
-            call the method "each" of the computer object for each
-            particle on each node. Therefore, computer should be a
-            PMI-object, and has to be derived from
-            espresso.particles.PythonComputerLocal.
+            apply the computer to each particle on each node
+            (i.e. call "__apply__" with the particle identity as
+            parameter). Therefore, computer has to be a PMI-created
+            object, and has to be derived from
+            espresso.particles.ComputerLocalBase.
 
-            If the computer object has a method "collect", this method
+            If the computer object has a method "prepare", this method will be
+            called with the DecomposerLocal as parameter on each node first,
+            before any call to "__apply__".
+
+            If the computer object has a method "finalize", this method
             will be called on all nodes after looping over all
             particles; typically, this method can be used to collect
             the results of the computation. The return value of foreach is
-            the return value of "collect" on the master node.
+            the return value of "finalize" on the master node.
             
             Example:
 
-            >>> class MyPythonComputer(espresso.particles.PythonComputerLocal) :
+            >>> class MyPythonComputer(espresso.particles.ComputerLocalBase) :
             >>>    def __init__(self) :
             >>>        self.count = 0
-            >>>    def each(self, id) :
+            >>>    def __apply__(self, id) :
             >>>        self.count += 1
             >>>    def collect(self) :
             >>>        return mpi.reduce(self.count, x,y : return x+y, pmi.CONTROLLER)

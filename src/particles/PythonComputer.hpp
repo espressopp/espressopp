@@ -18,7 +18,7 @@ namespace espresso {
       /** The operator() calling the Python objects function each */
       virtual void operator()(const ParticleHandle pref);
 
-      virtual void bind(const Storage *);
+      virtual void prepare(const Storage *);
 
       static void registerPython();
 

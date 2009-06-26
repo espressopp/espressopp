@@ -4,12 +4,12 @@
 using namespace boost::python;
 using namespace espresso::particles;
 
-void PythonComputer::bind(const Storage *storage) {
+void PythonComputer::prepare(const Storage *storage) {
   particleId = storage-> getIdPropertyHandle();
 }
 
 void PythonComputer::operator()(const ParticleHandle pref) {
-  get_override("each")(particleId[pref]);
+  get_override("__apply__")(particleId[pref]);
 }
 
 void PythonComputer::registerPython() {

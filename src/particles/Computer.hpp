@@ -14,11 +14,11 @@ namespace espresso {
       /** function that is called right before using the Computer on a
 	  specific Storage.  The storage will not be modified until
 	  unbind() is called. */
-      virtual void bind(const Storage *) {}
+      virtual void prepare(const Storage *) {}
       /** this function is called after completing operations,
 	  i.e. when the storage can potentially change again.
       */
-      virtual void unbind(const Storage *) {}
+      virtual void finalize() {}
     };
     
     class Computer : 
