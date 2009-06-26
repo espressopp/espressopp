@@ -43,7 +43,7 @@ if pmi.IS_CONTROLLER :
         
         def __init__(self, local = None) :
             """
-            initialize the basic decomper. This class cannot be used directly, since most
+            initialize the basic decomposer. This class cannot be used directly, since most
             functionality is not implemented and has to be provided by derived classes. This
             function takes one argument called local, which specifies the object to be used
             as local instance and should be handed over by the derived class.

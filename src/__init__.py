@@ -2,8 +2,8 @@
 from espresso import __setup
 from espresso.Property import *
 from espresso.Real3D import *
-
 from espresso import pmi
+
 if pmi.IS_CONTROLLER :
     # make sure that the workers exit when the script ends
     pmi.registerAtExit()
@@ -11,4 +11,6 @@ if pmi.IS_CONTROLLER :
 else :
     pmi.startWorkerLoop()
     # the script will usually not reach this point on the workers
+
+
     

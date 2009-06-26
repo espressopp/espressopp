@@ -29,6 +29,7 @@ namespace espresso {
       .def(self != self)
       .def("cross", &Real3D::cross)
       .def("sqr", &Real3D::sqr)
+      .def("__abs__", &Real3D::abs)
       .def_pickle(real3D_pickle_suite())
       ;
   }

@@ -29,9 +29,9 @@ namespace espresso {
 
       /** A pure routine for a single iteration step makes this class abstract. */
 
-      virtual void runSingleStep() = 0;
-
       static LOG4ESPP_DECL_LOGGER(theLogger);
+
+      virtual void step() = 0;
 
     public:
 
@@ -62,7 +62,8 @@ namespace espresso {
       real getTimeStep() const { return timeStep; }
 
       int getIntegrationStep() const { return nTimeStep; }
-      
+
+      /** Do \p nsteps steps. */
       void run(int nsteps);
 
       /** Abstract class needs also registration in Python */

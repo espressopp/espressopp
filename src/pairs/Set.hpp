@@ -10,8 +10,9 @@ namespace espresso {
   namespace pairs {
 
     class Set {
-
     public:
+      typedef boost::shared_ptr< Set > SelfPtr;
+
 
       virtual ~Set() {}
 

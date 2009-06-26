@@ -36,19 +36,19 @@ if pmi.IS_CONTROLLER :
         """
         
         def __init__(self, node = pmi.CONTROLLER, local = None) :
-            if local == None:
+            if local is None:
                 local = pmi.create('SingleNodeLocal', node)
             Decomposer.__init__(self, local = local)
             self.masternode = node
             # list of all particles. Since they are all on one node, we can as well
             # keep a table of all of them here
-            self.particle_ids = []
+            self.particle_ids = set()
             self.max_seen_id = -1
 
         def addParticle(self, id = None) :
             if id in self.particle_ids :
                 raise IndexError("particle %s already exists" % str(id))
-            if id == None :
+            if id is None:
                 id = self.max_seen_id + 1
             pmi.call(self.local.addParticle, id)
             # update max_seen_id and list of particle_ids
@@ -57,13 +57,13 @@ if pmi.IS_CONTROLLER :
             return id
 
         def deleteParticle(self, id) :
-            if not id in self.particle_ids :
+            if id not in self.particle_ids :
                 raise IndexError("particle %s does not exist" % str(id))
             self.particle_ids.remove(id)
             pmi.call(self.local.deleteParticle, id)
         
         def getNodeOfParticle(self, id) :
-            if not id in self.particle_ids :
+            if id not in self.particle_ids :
                 raise IndexError("particle %s does not exist" % str(id))
             return self.masternode
 

@@ -11,6 +11,25 @@ namespace espresso {
 
     class VelocityVerlet: public MDIntegrator {
 
+    public:
+
+      VelocityVerlet(particles::PSet particles,
+		     PReal3DProperty position,
+		     PReal3DProperty velocity,
+		     PReal3DProperty force);
+
+      /** The following signals are specific for VelocityVerlet */
+
+      typedef boost::signals2::signal1<void, const VelocityVerlet&> VelocityVerletSignal;
+
+      VelocityVerletSignal updateVelocity1;
+
+      VelocityVerletSignal updateVelocity2;
+
+      virtual ~VelocityVerlet();
+
+      static void registerPython();
+
     private:
 
       /* on change:
@@ -28,28 +47,7 @@ namespace espresso {
       */
 
     protected:
-
-      void runSingleStep();
-
-    public:
-
-      VelocityVerlet(particles::PSet particles,
-		     PReal3DProperty position,
-		     PReal3DProperty velocity,
-		     PReal3DProperty force);
-
-      static void registerPython();
-
-      /** The following signals are specific for VelocityVerlet */
-
-      typedef boost::signals2::signal1<void, const VelocityVerlet&> VelocityVerletSignal;
-
-      VelocityVerletSignal updateVelocity1;
-
-      VelocityVerletSignal updateVelocity2;
-
-      virtual ~VelocityVerlet();
-
+      virtual void step();
    };
 
     typedef boost::shared_ptr< VelocityVerlet > PVelocityVerlet;

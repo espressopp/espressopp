@@ -13,7 +13,7 @@ else:
 import _boostmpi
 from _boostmpi import __doc__, __author__, __copyright__, __license__
 
-import esutil
+from espresso import esutil
 
 # extend the MPI Communicator class by the collective operations
 class ExtendMPI(Communicator) :

@@ -2,7 +2,7 @@
 #define _INTERACTION_FENE_HPP
 
 #include <logging.hpp>
-#include <interaction/Interaction.hpp>
+#include <interaction/CentralInteraction.hpp>
 
 namespace espresso {
   namespace interaction {
@@ -15,7 +15,7 @@ namespace espresso {
         \f]
     */
 
-    class FENE: public Interaction {
+    class FENE: public CentralInteraction {
     public:
       struct BasicComputer {
         real K;       
@@ -49,8 +49,7 @@ namespace espresso {
       real getR0() const;
       real getRMax() const;
 
-      virtual real computeEnergy (const Real3D &dist) const;
-      virtual real computeEnergy (const real dist) const;
+      virtual real computeEnergySqr (const real distSqr) const;
       virtual Real3D computeForce (const Real3D &dist) const;
 
       virtual pairs::EnergyComputer *createEnergyComputer(const pairs::EnergyComputer &) const;

@@ -116,6 +116,10 @@ namespace espresso {
 	return (*this) * (*this);
       }
 
+      T abs() const {
+	return sqrt(this->sqr());
+      }
+
       bool operator== (const DerivableSmallVector<T,N,CRTP>& b) const {
 	for (size_t i = 0; i < N; i++)
 	  if (data[i] != b.data[i]) return false;

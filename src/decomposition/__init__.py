@@ -1,2 +1,2 @@
-from Decomposer import *
-from SingleNode import *
+from espresso.decomposition.Decomposer import *
+from espresso.decomposition.SingleNode import *

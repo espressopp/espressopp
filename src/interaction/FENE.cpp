@@ -26,12 +26,8 @@ real FENE::getR0() const { return computer.r0; }
 real FENE::getRMax() const { return computer.rMax; }
 real FENE::getCutoffSqr() const { return -1.0; }
 
-real FENE::computeEnergy (const Real3D &dist) const {
-  return computer.computeEnergySqr(dist.sqr());
-}
-      
-real FENE::computeEnergy (const real dist) const {
-  return computer.computeEnergySqr(dist*dist);
+real FENE::computeEnergySqr (const real distSqr) const {
+  return computer.computeEnergySqr(distSqr);
 }
 
 Real3D FENE::computeForce (const Real3D &dist) const {
@@ -74,21 +70,12 @@ void
 FENE::registerPython() {
   using namespace boost::python;
   
-  Real3D (FENE::*computeForceOverload)(const Real3D&) const =
-    &FENE::computeForce;
-  real (FENE::*computeEnergyOverload1)(const Real3D &) const =
-    &FENE::computeEnergy;
-  real (FENE::*computeEnergyOverload2)(const real) const =
-    &FENE::computeEnergy;
-  
-  class_<FENE, bases<Interaction> >("interaction_FENE", init<>())
+  class_< FENE, bases< CentralInteraction > >("interaction_FENE")
     .def("set", &FENE::set)
     .def("getK", &FENE::getK)
     .def("getR0", &FENE::getR0)
     .def("getRMax", &FENE::getRMax)
-    .def("computeForce", computeForceOverload)
-    .def("computeEnergy", computeEnergyOverload1)
-    .def("computeEnergy", computeEnergyOverload2);
+    ;
 }
 
 

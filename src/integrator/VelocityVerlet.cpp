@@ -78,7 +78,7 @@ VelocityVerlet::VelocityVerlet(PSet _particles,
 
    MDIntegrator(_particles, _position, _velocity, _force) {}
 
-void VelocityVerlet::runSingleStep() {
+void VelocityVerlet::step() {
   // Step A
 
   StepA stepA(*position, *velocity, *force, timeStep);
@@ -131,5 +131,6 @@ VelocityVerlet::registerPython() {
 
   class_<VelocityVerlet, boost::noncopyable, bases<MDIntegrator> >
     ("integrator_VelocityVerlet", init<PSet, PReal3DProperty, PReal3DProperty, PReal3DProperty>())
+    .def("step", &VelocityVerlet::step)
     ;
 }

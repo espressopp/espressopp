@@ -50,7 +50,7 @@ void MDIntegrator::run(int nsteps)
 
      // runSingleStep is the routine provided by the derived class
 
-     runSingleStep(); 
+     step(); 
 
      endStep(*this);
   }
@@ -71,9 +71,9 @@ MDIntegrator::registerPython() {
   // no_init must be used as the abstract class MDIntegrator has no constructor
 
   class_<MDIntegrator, boost::noncopyable >("integrator_MDIntegrator", no_init)
-  .def("setTimeStep", &MDIntegrator::setTimeStep)
-  .def("getTimeStep", &MDIntegrator::getTimeStep)
-  .def("run", &MDIntegrator::run)
+    .def("setTimeStep", &MDIntegrator::setTimeStep)
+    .def("getTimeStep", &MDIntegrator::getTimeStep)
+    .def("run", &MDIntegrator::run)
   ;
 }
 

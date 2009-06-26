@@ -1,12 +1,14 @@
 nobase_pkginclude_HEADERS += \
 	interaction/bindings.hpp \
 	interaction/Interaction.hpp \
+	interaction/CentralInteraction.hpp \
 	interaction/LennardJones.hpp \
 	interaction/FENE.hpp
 
 libespresso_common_la_SOURCES += \
 	interaction/bindings.cpp \
 	interaction/Interaction.cpp \
+	interaction/CentralInteraction.cpp \
 	interaction/LennardJones.cpp \
         interaction/FENE.cpp
 

@@ -36,12 +36,8 @@ real LennardJones::getEpsilon() const { return computer.epsilon; }
 real LennardJones::getSigma() const { return computer.sigma; }
 real LennardJones::getCutoffSqr() const { return computer.cutoffSqr; }
 
-real LennardJones::computeEnergy (const Real3D &dist) const {
-  return computer.computeEnergySqr(dist.sqr());
-}
-
-real LennardJones::computeEnergy(const real dist) const {
-  return computer.computeEnergySqr(dist*dist);
+real LennardJones::computeEnergySqr(const real distSqr) const {
+  return computer.computeEnergySqr(distSqr);
 }
 
 Real3D LennardJones::computeForce(const Real3D &dist) const {
@@ -96,21 +92,11 @@ void
 LennardJones::registerPython() {
   using namespace boost::python;
 
-  // create thin wrappers around overloaded member functions
-  Real3D (LennardJones::*computeForceOverload)(const Real3D&) const =
-    &LennardJones::computeForce;
-  real (LennardJones::*computeEnergyOverload1)(const Real3D &) const =
-    &LennardJones::computeEnergy;
-  real (LennardJones::*computeEnergyOverload2)(const real) const =
-    &LennardJones::computeEnergy;
-    
-  class_<LennardJones, bases<Interaction> >
-     ("interaction_LennardJones", init<>())
+  class_< LennardJones, bases< CentralInteraction > >
+     ("interaction_LennardJones")
     .def("set", &LennardJones::set)
     .def("getCutoff", &LennardJones::getCutoff)
     .def("getEpsilon", &LennardJones::getEpsilon)
     .def("getSigma", &LennardJones::getSigma)
-    .def("computeForce", computeForceOverload)
-    .def("computeEnergy", computeEnergyOverload1)
-    .def("computeEnergy", computeEnergyOverload2);
+    ;
 }

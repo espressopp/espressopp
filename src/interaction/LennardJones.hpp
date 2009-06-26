@@ -2,7 +2,7 @@
 #define _INTERACTION_LENNARDJONES_HPP
 
 #include <logging.hpp>
-#include <interaction/Interaction.hpp>
+#include <interaction/CentralInteraction.hpp>
 
 namespace espresso {
   namespace interaction {
@@ -14,7 +14,7 @@ namespace espresso {
 	\f]
 
     */
-    class LennardJones: public Interaction {
+    class LennardJones: public CentralInteraction {
     public:
       class BasicComputer {
         friend class LennardJones;
@@ -50,8 +50,7 @@ namespace espresso {
       real getSigma() const;
       real getCutoff() const;
 
-      virtual real computeEnergy(const Real3D &dist) const;  
-      virtual real computeEnergy(const real dist) const;
+      virtual real computeEnergySqr(const real distSqr) const;
       virtual Real3D computeForce(const Real3D &dist) const;
 
       virtual pairs::EnergyComputer *createEnergyComputer(const pairs::EnergyComputer &) const;
