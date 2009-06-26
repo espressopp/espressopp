@@ -13,6 +13,6 @@ void PythonComputer::operator()(const ParticleHandle pref) {
 }
 
 void PythonComputer::registerPython() {
-  class_<PythonComputer, bases<Computer> >
+  class_<PythonComputer, boost::noncopyable >
     ("particles_PythonComputer", init<>());
 }

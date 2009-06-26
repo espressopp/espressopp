@@ -13,13 +13,8 @@ using namespace boost::python;
 using namespace espresso::particles;
  
 void espresso::particles::registerPython() {
-  class_<Computer, boost::noncopyable>("particles_Computer", no_init);
-
   PythonComputer::registerPython();
-
   Storage::registerPython();
-
   Set::registerPython();
-
   All::registerPython();
 }

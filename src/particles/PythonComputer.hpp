@@ -11,7 +11,7 @@ namespace espresso {
      */
     class PythonComputer:
       public Computer,
-      public boost::python::wrapper<PythonComputer> {
+      public boost::python::wrapper<Computer> {
 
     public: // parts invisible to Python
 

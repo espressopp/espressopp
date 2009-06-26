@@ -1,13 +1,13 @@
 from espresso import pmi
 from _espresso import particles_PythonComputer as _PythonComputer
 
-__all__ = [ "ComputerLocalBase"]
+__all__ = [ "PythonComputerLocal"]
 
-class ComputerLocalBase(_PythonComputer) :
+class PythonComputerLocal(_PythonComputer) :
     """
     a per-particle-computer using Python code. You mainly need to
     provide a function "__apply__", so that a
-    ComputerLocalBase-object can be applied to a particle
+    PythonComputerLocal-object can be applied to a particle
     (identity). "__apply__" is mandatory to override. If any of two
     other functions is provided, namely "prepare" and/or "finalize",
     they are called right before calling "__apply__" and right after,

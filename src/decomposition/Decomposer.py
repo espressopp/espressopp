@@ -98,7 +98,7 @@ if pmi.IS_CONTROLLER :
             (i.e. call "__apply__" with the particle identity as
             parameter). Therefore, computer has to be a PMI-created
             object, and has to be derived from
-            espresso.particles.ComputerLocalBase.
+            espresso.particles.PythonComputer.
 
             If the computer object has a method "prepare", this method will be
             called with the DecomposerLocal as parameter on each node first,
@@ -112,7 +112,7 @@ if pmi.IS_CONTROLLER :
             
             Example:
 
-            >>> class MyPythonComputer(espresso.particles.ComputerLocalBase) :
+            >>> class MyPythonComputer(espresso.particles.PythonComputer) :
             >>>    def __init__(self) :
             >>>        self.count = 0
             >>>    def __apply__(self, id) :

@@ -36,7 +36,7 @@ class FENELocal(_FENE) :
 
     @property
     def rMax(self): return self.getRMax()
-    @K.setter
+    @rMax.setter
     def rMax(self, _rMax): self.set(rMax=_rMax)
 
 # wrap FENE
