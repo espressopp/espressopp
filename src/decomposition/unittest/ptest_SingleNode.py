@@ -3,16 +3,16 @@ from espresso import boostmpi as mpi
 from espresso import pmi
 from espresso.decomposition import SingleNode
 
-from espresso.particles import PythonComputerLocal
+from espresso.particles import ComputerLocalBase
 
 # simple particle counter
-class LocalCount(PythonComputerLocal) :
+class LocalCount(ComputerLocalBase) :
     def __init__(self) :
-        PythonComputerLocal.__init__(self)
+        ComputerLocalBase.__init__(self)
         self.count = 0
-    def each(self, id) :
+    def __apply__(self, id) :
         self.count += 1
-    def collect(self) :
+    def finalize(self) :
         return self.count
     
 def getParticleCount(decomplocal) :
@@ -40,6 +40,15 @@ if __name__ == "__main__" :
                 else :
                     self.assertEqual(count, 0)
 
+        def testAddParticleInvalid(self) :
+            self.assertRaises(TypeError, self.decomp.addParticle, "Olaf")
+            self.assertRaises(TypeError, self.decomp.addParticle, -42)
+
+        def testAddParticleReverse(self) :
+            self.decomp.addParticle(3)
+            self.decomp.addParticle(2)
+            self.assertEqual(self.decomp.max_seen_id, 3)
+            
         def testDeleteParticle(self) :
             self.assertRaises(IndexError, self.decomp.deleteParticle, 0)
             id = self.decomp.addParticle()

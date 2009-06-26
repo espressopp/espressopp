@@ -50,9 +50,12 @@ if pmi.IS_CONTROLLER :
                 raise IndexError("particle %s already exists" % str(id))
             if id is None:
                 id = self.max_seen_id + 1
+            elif type(id) is not type(1) or id < 0 :
+                raise TypeError("particle identity should be a nonnegative integer")
             pmi.call(self.local.addParticle, id)
             # update max_seen_id and list of particle_ids
-            self.max_seen_id = id
+            if id > self.max_seen_id :
+                self.max_seen_id = id
             self.particle_ids.add(id)
             return id
 
