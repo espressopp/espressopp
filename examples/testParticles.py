@@ -5,16 +5,16 @@
 
 from espresso import boostmpi as mpi
 from espresso import pmi
-from espresso.particles import ComputerLocalBase
+from espresso.particles import PythonComputerLocal
 if pmi.IS_CONTROLLER :
     from espresso import Real3D, Real3DProperty
     from espresso.decomposition import SingleNode
     import random
 
 # tag particles in a small sphere around (0,0,0) as demonstration
-class ParticleTesterLocal(ComputerLocalBase):
+class ParticleTesterLocal(PythonComputerLocal):
     def __init__(self, _position, _tag):
-        ComputerLocalBase.__init__(self)
+        PythonComputerLocal.__init__(self)
         self.position = _position
         self.tag = _tag
 
@@ -26,9 +26,9 @@ class ParticleTesterLocal(ComputerLocalBase):
             self.tag[pid] = 0
 
 # write out tagged particles
-class ParticleWriterLocal(ComputerLocalBase):
+class ParticleWriterLocal(PythonComputerLocal):
     def __init__(self, _property, _tag):
-        ComputerLocalBase.__init__(self)
+        PythonComputerLocal.__init__(self)
         self.property = _property
         self.tag = _tag
 
