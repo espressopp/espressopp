@@ -1,0 +1,13 @@
+def __setupPath() :
+   import os, sys
+
+   # Get the top-level build dir
+   top_builddir="@abs_top_builddir@"
+   # Add the path of the boostmpi python module
+   boost_mpi_python_dir=os.path.join(top_builddir, "contrib", "boostmpi", ".libs")
+   sys.path.insert(0, boost_mpi_python_dir)
+   # Add the dir containing the python module _espresso
+   sys.path.insert(0, os.path.join(top_builddir, "poc", ".libs"))
+
+__setupPath()
+del(__setupPath)

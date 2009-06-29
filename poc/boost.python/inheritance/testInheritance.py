@@ -1,5 +1,5 @@
-import espresso 
-import sandbox
+import poc
+import _inheritance
 
 class MyA(sandbox.A):
     def f(self):

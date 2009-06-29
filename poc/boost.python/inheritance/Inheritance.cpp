@@ -51,7 +51,7 @@ void caller(A &a) {
   a.g();
 }
 
-BOOST_PYTHON_MODULE(sandbox)
+BOOST_PYTHON_MODULE(_inheritance)
 {
   class_< PyA, boost::noncopyable >("A")
     .def("f", pure_virtual(&A::f))
