@@ -1,0 +1,11 @@
+pairlists.C: 
+  Benchmarks a loop over a pair list vs. a direct Verlet list.
+
+virtual_function.C:
+  Benchmarks a loop that uses a virtual function vs. a loop with a
+  normal (inlined) function.
+
+iterators.C: 
+  Benchmarks various variants of the iterators (virtual, non-virtual,
+  block).
+

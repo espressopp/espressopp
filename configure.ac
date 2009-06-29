@@ -256,6 +256,7 @@ AC_CONFIG_FILES([Makefile
                  contrib/boost/Makefile
                  contrib/boostmpi/Makefile
                  src/Makefile 
+		 poc/Makefile
 		 doc/Makefile
 		 doc/dg/Makefile
                  test/Makefile

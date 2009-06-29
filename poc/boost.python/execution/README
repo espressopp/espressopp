@@ -1,0 +1,46 @@
+This POC uses a standard autotools configure-mechanism. For an introduction
+to the autotools, see for example
+
+http://sources.redhat.com/autobook/autobook/autobook_toc.html
+
+INITIAL STEP
+============
+
+"./autogen.sh" must be called at first to generate the configure script.
+This requires the autotools (autoconf/automake/libtool).
+
+
+CONFIGURE
+=========
+
+Examples:
+
+a) Own boost installation
+
+./configure --with-boost-flavor=gcc41-mt-1_36 \
+	--with-boost=$HOME/boost/include/boost-1_36 \
+	LDFLAGS=-L$HOME/boost/lib
+
+or
+
+./configure EXTRA_PREFIXES=$HOME/boost
+
+For more options see the output of "./configure --help".
+
+RUN
+====
+
+  python example.py <random parameters>
+
+or
+
+  mpi/espresso_embedded example.py <random parameters>
+
+Problems
+========
+
+- currently, installing does not work
+
+- in case you have several versions of boost installed, it is recommended to specify the
+  boost include directory and boost flavor manually to make sure the correct version is
+  used
