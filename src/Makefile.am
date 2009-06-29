@@ -19,8 +19,6 @@ include integrator/SubMakefile.am
 include force/SubMakefile.am
 include thermostat/SubMakefile.am
 
-include sandbox/SubMakefile.am
-
 CLEANFILES =
 
 # declare the headers
