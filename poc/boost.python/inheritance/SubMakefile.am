@@ -5,3 +5,4 @@ _inheritance_la_SOURCES = boost.python/inheritance/Inheritance.cpp
 _inheritance_la_LDFLAGS = -shared -module -avoid-version -no-undefined -rpath /nowhere
 _inheritance_la_LIBADD = $(ESPRESSO_BOOST_LIBS) $(PYTHON_LIBS)
 endif
+

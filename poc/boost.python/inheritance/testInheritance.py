@@ -1,15 +1,15 @@
 import poc
 import _inheritance
 
-class MyA(sandbox.A):
+class MyA(_inheritance.A):
     def f(self):
         print("I'm PyA.f()")
 
-class MyBsimple(sandbox.Bsimple):
+class MyBsimple(_inheritance.Bsimple):
     def f(self):
         print("I'm PyBsimple.f()")
 
-class MyB(sandbox.B):
+class MyB(_inheritance.B):
     def f(self):
         print("I'm PyB.f()")
 
@@ -22,4 +22,4 @@ bsimple.g()
 b=MyB()
 b.g()
 
-sandbox.caller(b)
+_inheritance.caller(b)
