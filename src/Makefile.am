@@ -31,9 +31,9 @@ libespresso_common_la_SOURCES += \
 	espresso_common.cpp
 
 libespresso_common_la_LIBADD = \
-	$(ESPRESSO_BOOST_LIBS) \
-	$(PYTHON_LIBS) \
-	$(MPI_LIBS) 
+	$(ESPRESSO_BOOST_LIBS) 
+# 	$(PYTHON_LIBS) \
+# 	$(MPI_LIBS) 
 
 # The python module _espresso
 # Build only if shared libs are built

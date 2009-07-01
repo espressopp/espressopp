@@ -9,9 +9,8 @@ noinst_HEADERS = \
 # required for static linkage into pypresso
 noinst_LTLIBRARIES = libboostmpi.la
 libboostmpi_la_LDFLAGS = -no-undefined
-libboostmpi_la_LIBADD = \
-	$(ESPRESSO_BOOST_LIBS) \
-	$(MPI_LIBS) $(PYTHON_LIBS) 
+libboostmpi_la_LIBADD = $(ESPRESSO_BOOST_LIBS)
+# 	$(MPI_LIBS) $(PYTHON_LIBS) 
 
 libboostmpi_la_SOURCES = \
 	src/collectives.cpp \
@@ -35,10 +34,6 @@ python_LTLIBRARIES = _boostmpi.la
 _boostmpi_la_LDFLAGS = -shared -module -no-undefined -avoid-version
 _boostmpi_la_LIBTOOLFLAGS = --tag=CXX
 _boostmpi_la_SOURCES =
-_boostmpi_la_LIBADD = \
-	libboostmpi.la
-_boostmpi_la_LIBS = \
-	$(ESPRESSO_BOOST_LIBS) \
-	$(MPI_LIBS) $(PYTHON_LIBS) 
+_boostmpi_la_LIBADD = libboostmpi.la $(ESPRESSO_BOOST_LIBS)
 endif
 
