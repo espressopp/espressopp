@@ -16,14 +16,6 @@ public:
 
 };
 
-// wrapper for class A
-struct PyA : A,  wrapper< A > {
-  void f() {
-    this->get_override("f")();
-  }
-};
-
-
 // dervied class
 class B : public A {
 public:
@@ -31,6 +23,15 @@ public:
     cout << "I'm B::f()!" << endl;
   }
 };
+
+
+// wrapper for class A
+struct PyA : A,  wrapper< A > {
+  void f() {
+    this->get_override("f")();
+  }
+};
+
 
 // wrapper for class B
 struct PyB : B, wrapper< B > {

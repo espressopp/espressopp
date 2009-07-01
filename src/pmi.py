@@ -123,13 +123,13 @@ and the following variables:
 * inWorkerLoop is True, if PMI currently executes the worker loop on
   the workers.
 """
-import logging, types, sys
+import logging, types, sys, inspect
 from espresso import boostmpi as mpi
 
 ##################################################
 ## EXEC
 ##################################################
-def exec_(statement=None) :
+def exec_(arg=None) :
     """Controller command that executes arbitrary python code on all workers.
     
     This allows to import modules and to define classes and functions
@@ -140,8 +140,15 @@ def exec_(statement=None) :
     >>> hw = pmi.create('hello.HelloWorld')
     """
     if __checkController(exec_) :
-        if statement is None :
+        if arg is None :
             raise UserError('pmi.exec_ expects exactly 1 argument on controller!')
+        if type(arg) is str:
+            statement = arg
+        else:
+            statement = inspect.getsource(arg)
+            if isinstance(arg, types.FunctionType):
+                statement += "\n" + arg.__name__ + "()"
+            
         # broadcast the statement
         _broadcast(_EXEC, statement)
         # locally execute the statement

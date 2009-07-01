@@ -13,8 +13,8 @@ class MyB(_inheritance.B):
     def f(self):
         print("I'm PyB.f()")
 
-a = MyA()
-a.g()
+# a = MyA()
+# a.g()
 
 bsimple=MyBsimple()
 bsimple.g()
@@ -22,4 +22,4 @@ bsimple.g()
 b=MyB()
 b.g()
 
-_inheritance.caller(b)
+# _inheritance.caller(b)

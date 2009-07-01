@@ -25,7 +25,7 @@ class PythonComputerLocal(_PythonComputer) :
     """
     def __init__(self):
         _PythonComputer.__init__(self)
-
+        
     def __apply__(self, id):
         """
         override this function to implement a per-particle computer. This routine will be
