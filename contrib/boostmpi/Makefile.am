@@ -8,7 +8,6 @@ noinst_HEADERS = \
 # Create a convenience library version of the python module, 
 # required for static linkage into pypresso
 noinst_LTLIBRARIES = libboostmpi.la
-libboostmpi_la_LIBTOOLFLAGS = --tag=CXX
 libboostmpi_la_LDFLAGS = -no-undefined
 libboostmpi_la_LIBADD = \
 	$(ESPRESSO_BOOST_LIBS) \
@@ -34,6 +33,7 @@ libboostmpi_la_SOURCES = \
 if ENABLE_SHARED
 python_LTLIBRARIES = _boostmpi.la
 _boostmpi_la_LDFLAGS = -shared -module -no-undefined -avoid-version
+_boostmpi_la_LIBTOOLFLAGS = --tag=CXX
 _boostmpi_la_SOURCES =
 _boostmpi_la_LIBADD = \
 	libboostmpi.la
