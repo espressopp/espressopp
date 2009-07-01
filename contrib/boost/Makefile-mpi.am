@@ -1,4 +1,4 @@
-libespresso_boost_la_LIBS += $(MPI_LIBS)
+libespresso_boost_la_LIBADD += $(MPI_LIBS)
 libespresso_boost_la_SOURCES += \
 	libs/mpi/src/broadcast.cpp \
 	libs/mpi/src/communicator.cpp \

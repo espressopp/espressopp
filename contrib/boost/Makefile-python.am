@@ -1,4 +1,4 @@
-libespresso_boost_la_LIBS += $(PYTHON_LIBS)
+libespresso_boost_la_LIBADD += $(PYTHON_LIBS)
 libespresso_boost_la_SOURCES += \
 	libs/python/src/numeric.cpp \
 	libs/python/src/list.cpp \

@@ -5,7 +5,7 @@ python_LTLIBRARIES=
 pkglib_LTLIBRARIES = libespresso_boost.la
 libespresso_boost_la_LDFLAGS = -no-undefined
 libespresso_boost_la_SOURCES =
-libespresso_boost_la_LIBS =
+libespresso_boost_la_LIBADD =
 
 # These makefiles add sources and libs to libespresso_boost.la
 include Makefile-headers.am
