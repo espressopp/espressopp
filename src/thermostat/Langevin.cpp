@@ -124,9 +124,9 @@ void Langevin::thermalizeA(const integrator::VelocityVerlet& integrator) {
   LOG4ESPP_DEBUG(theLogger, "Langevin thermalizeA at integration step = " 
                              << integrator.getIntegrationStep());
 
-  PropertyHandle<Real3D> pos   = *integrator.getPosition();
-  PropertyHandle<Real3D> vel   = *integrator.getVelocity();
-  PropertyHandle<Real3D> force = *integrator.getForce();
+  PropertyHandle<Real3D> pos   = *integrator.getPosProperty();
+  PropertyHandle<Real3D> vel   = *integrator.getVelProperty();
+  PropertyHandle<Real3D> force = *integrator.getForceProperty();
 
   StepThermalA stepThermalA(pos, vel, force, 0.01);
 
@@ -147,9 +147,9 @@ void Langevin::thermalizeB(const integrator::VelocityVerlet& integrator) {
   LOG4ESPP_DEBUG(theLogger, "Langevin thermalizeB at integration step = " 
                              << integrator.getIntegrationStep());
 
-  PropertyHandle<Real3D> pos   = *integrator.getPosition();
-  PropertyHandle<Real3D> vel   = *integrator.getVelocity();
-  PropertyHandle<Real3D> force = *integrator.getForce();
+  PropertyHandle<Real3D> pos   = *integrator.getPosProperty();
+  PropertyHandle<Real3D> vel   = *integrator.getVelProperty();
+  PropertyHandle<Real3D> force = *integrator.getForceProperty();
 
   real temperature = this->getTemperature();
 
@@ -164,7 +164,7 @@ void Langevin::thermalizeB(const integrator::VelocityVerlet& integrator) {
 
 /**********************************************************************************/
 
-void Langevin::connect(integrator::PVelocityVerlet integrator) {
+void Langevin::connect(integrator::VelocityVerlet::SelfPtr integrator) {
   // check that there is no existing connection
 
   if (!integrator) {

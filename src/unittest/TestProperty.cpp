@@ -12,7 +12,7 @@ using namespace espresso;
 using namespace espresso::particles;
 
 struct Fixture {
-  PStorage storage;
+  Storage::SelfPtr storage;
   ParticleId theParticle;
 
   Fixture(): storage(new Storage) {

@@ -1,7 +1,7 @@
 import unittest
 from espresso import Real3D
 import espresso.unittest
-from espresso.interaction import *
+from espresso.potential import *
 
 class Test0LennardJones(espresso.unittest.TestCase) :
     def test0Defaults(self):

@@ -12,10 +12,10 @@ LOG4ESPP_LOGGER(MDIntegrator::theLogger, "Integrator");
 
 /*********************************************************************************/
 
-MDIntegrator::MDIntegrator(particles::PSet _particles,
-                           PReal3DProperty _position,
-                           PReal3DProperty _velocity,
-                           PReal3DProperty _force) :
+MDIntegrator::MDIntegrator(particles::Set::SelfPtr _particles,
+                           Real3DProperty::SelfPtr _position,
+                           Real3DProperty::SelfPtr _velocity,
+                           Real3DProperty::SelfPtr _force) :
 
     particles(_particles),
     position(_position),
@@ -70,7 +70,7 @@ MDIntegrator::registerPython() {
   // be careful: boost::noncopyable must be used for abstract classes with pure routines
   // no_init must be used as the abstract class MDIntegrator has no constructor
 
-  class_<MDIntegrator, boost::noncopyable >("integrator_MDIntegrator", no_init)
+  class_< MDIntegrator, boost::noncopyable >("integrator_MDIntegrator", no_init)
     .def("setTimeStep", &MDIntegrator::setTimeStep)
     .def("getTimeStep", &MDIntegrator::getTimeStep)
     .def("run", &MDIntegrator::run)

@@ -87,9 +87,9 @@ All::~All() {}
   All::All(boundary_conditions, particle_set)
   -------------------------------------------------------------------------- */
 
-All::All(bc::PBC _bc,
-         particles::PSet _set,
-         PReal3DProperty _coordinates) :
+All::All(bc::BC::SelfPtr _bc,
+         particles::Set::SelfPtr _set,
+         Real3DProperty::SelfPtr _coordinates) :
   set(_set),
   bc(_bc),
   coordinates(_coordinates)
@@ -122,8 +122,8 @@ All::registerPython() {
   using namespace boost;
   using namespace boost::python;
 
-  class_<All, bases<Set> >
+  class_< All, bases< Set > >
     ("pairs_All", 
-     init< bc::PBC, particles::PSet, PReal3DProperty >())
+     init< bc::BC::SelfPtr, particles::Set::SelfPtr, Real3DProperty::SelfPtr >())
     ;
 }

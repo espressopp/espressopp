@@ -3,11 +3,11 @@
 #include <python.hpp>
 
 using namespace espresso;
-using namespace espresso::interaction;
+using namespace espresso::potential;
 
 /* ---------------------------------------------------------------------- */
 
-LOG4ESPP_LOGGER(FENE::theLogger, "interaction.FENE");
+LOG4ESPP_LOGGER(FENE::theLogger, "potential.FENE");
 
 /* ---------------------------------------------------------------------- */
 
@@ -70,7 +70,7 @@ void
 FENE::registerPython() {
   using namespace boost::python;
   
-  class_< FENE, bases< CentralInteraction > >("interaction_FENE")
+  class_< FENE, bases< CentralPotential > >("potential_FENE")
     .def("set", &FENE::set)
     .def("getK", &FENE::getK)
     .def("getR0", &FENE::getR0)

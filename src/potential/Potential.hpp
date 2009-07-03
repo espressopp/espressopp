@@ -1,5 +1,5 @@
-#ifndef _INTERACTION_INTERACTION_HPP
-#define _INTERACTION_INTERACTION_HPP
+#ifndef _POTENTIAL_POTENTIAL_HPP
+#define _POTENTIAL_POTENTIAL_HPP
 
 //base class
 
@@ -9,10 +9,12 @@
 #include "pairs/EnergyComputer.hpp"
 
 namespace espresso {
-  namespace interaction {
-    class Interaction {
+  namespace potential {
+    class Potential {
     public:
-      virtual ~Interaction() {}
+      typedef boost::shared_ptr< Potential > SelfPtr;
+
+      virtual ~Potential() {}
       virtual pairs::EnergyComputer *createEnergyComputer(const pairs::EnergyComputer &) const = 0;
       virtual pairs::ForceComputer  *createForceComputer (const pairs::ForceComputer &)  const = 0;
       virtual real getCutoffSqr() const = 0;
@@ -23,7 +25,6 @@ namespace espresso {
       static void registerPython();
     };
 
-    typedef boost::shared_ptr< Interaction > PInteraction;
   }
 }
 

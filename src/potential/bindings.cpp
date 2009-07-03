@@ -1,15 +1,15 @@
 #include "bindings.hpp"
 
-#include "Interaction.hpp"
-#include "CentralInteraction.hpp"
+#include "Potential.hpp"
+#include "CentralPotential.hpp"
 #include "LennardJones.hpp"
 #include "FENE.hpp"
 
 namespace espresso {
-  namespace interaction {
+  namespace potential {
     void registerPython() {
-      Interaction::registerPython();
-      CentralInteraction::registerPython();
+      Potential::registerPython();
+      CentralPotential::registerPython();
       LennardJones::registerPython();
       FENE::registerPython();
     }

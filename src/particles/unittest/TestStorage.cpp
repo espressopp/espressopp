@@ -12,7 +12,7 @@ using namespace espresso;
 using namespace espresso::particles;
 
 struct Fixture {
-  PStorage store;
+  Storage::SelfPtr store;
   Real3DProperty propertyPos;
 
   Fixture(): store(new Storage), propertyPos(store) {

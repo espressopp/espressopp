@@ -4,7 +4,7 @@
 
 #include "pairs/List.hpp"
 #include "particles/Storage.hpp"
-#include "bc/PBC.hpp"
+#include "bc/PeriodicBC.hpp"
 
 using namespace espresso;
 using namespace espresso::pairs;
@@ -17,7 +17,7 @@ struct Fixture {
 
     Storage::PropertyId position;
 
-    PBC pbc;
+    PeriodicBC pbc;
 
     List* pairList;
 

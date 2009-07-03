@@ -298,7 +298,7 @@ class Test7Proxy(unittest.TestCase) :
 
         if pmi.IS_CONTROLLER:
             self.a.x = 2
-            self.assertEqual(self.a.pmisubject._x, 2)
+            self.assertEqual(self.a.pmiobject._x, 2)
         else:
             pmi.call()
 

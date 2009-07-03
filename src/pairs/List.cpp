@@ -16,9 +16,9 @@ List::~List()
 
 /* Constructor for this class  */
 
-List::List(bc::PBC _bc, 
-           PStorage _storage, 
-           PReal3DProperty _coordinates) :
+List::List(bc::BC::SelfPtr _bc, 
+           Storage::SelfPtr _storage, 
+           Real3DProperty::SelfPtr _coordinates) :
 
    storage(_storage),
    bc(_bc),
@@ -85,9 +85,9 @@ List::registerPython() {
   using namespace boost;
   using namespace boost::python;
 
-  class_<List, bases<Set> >
+  class_< List, bases< Set > >
     ("pairs_List", 
-     init< bc::PBC, particles::PStorage, PReal3DProperty >())
+     init< bc::BC::SelfPtr, particles::Storage::SelfPtr, Real3DProperty::SelfPtr >())
   .def("addPair", &List::addPair)
   ;
 }

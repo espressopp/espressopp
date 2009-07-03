@@ -13,10 +13,10 @@ namespace espresso {
      */
     class PythonComputer:
       public Computer,
-      public boost::python::wrapper<PythonComputer> {
+      public boost::python::wrapper< PythonComputer > {
 
     public: // parts visible to Python
-      PythonComputer(particles::PStorage _storage)
+      PythonComputer(particles::Storage::SelfPtr _storage)
 	: storage(_storage) {}
       
     public: // parts invisible to Python
@@ -28,7 +28,7 @@ namespace espresso {
       static void registerPython();
       
     private:
-      particles::PStorage storage;
+      particles::Storage::SelfPtr storage;
     };
   }
 }

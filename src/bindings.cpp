@@ -6,7 +6,7 @@
 #include <bc/bindings.hpp>
 #include <particles/bindings.hpp>
 #include <pairs/bindings.hpp>
-#include <interaction/bindings.hpp>
+#include <potential/bindings.hpp>
 #include <integrator/bindings.hpp>
 #include <thermostat/bindings.hpp>
 #include <force/bindings.hpp>
@@ -21,7 +21,7 @@ void espresso::registerPython() {
   espresso::hello::registerPython();
   espresso::bc::registerPython();
   espresso::pairs::registerPython();
-  espresso::interaction::registerPython();
+  espresso::potential::registerPython();
   espresso::particles::registerPython();
   espresso::integrator::registerPython();
   espresso::thermostat::registerPython();

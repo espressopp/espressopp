@@ -3,7 +3,7 @@
 
 using namespace espresso::particles;
 
-All::All(PStorage _store) : Set(_store) {}
+All::All(Storage::SelfPtr _store) : Set(_store) {}
 
 All::~All() {}
 
@@ -28,6 +28,6 @@ void All::registerPython() {
   // Please note that foreach of All will be available via foreach of Set
 
   class_<All, bases<Set> >("particles_All", 
-      init< PStorage >())
+      init< Storage::SelfPtr >())
   ;
 }

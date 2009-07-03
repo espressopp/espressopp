@@ -16,6 +16,6 @@ void PythonComputer::operator()(const Real3D &dist,
 }
 
 void PythonComputer::registerPython() {
-  class_<PythonComputer, bases<Computer> >
-    ("pairs_PythonComputer", init< PStorage >());
+  class_< PythonComputer, bases< Computer > >
+    ("pairs_PythonComputer", init< Storage::SelfPtr >());
 }

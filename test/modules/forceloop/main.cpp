@@ -7,8 +7,8 @@
 #include <particles/Storage.hpp>
 #include <particles/All.hpp>
 #include <bc/PeriodicBC.hpp>
-#include <interaction/LennardJones.hpp>
-#include <interaction/FENE.hpp>
+#include <potential/LennardJones.hpp>
+#include <potential/FENE.hpp>
 #include <pairs/All.hpp>
 #include <pairs/ForceComputer.hpp>
 #include <thermostat/Langevin.hpp>
@@ -26,7 +26,7 @@ using namespace espresso;
 using namespace espresso::bc;
 using namespace espresso::particles;
 using namespace espresso::pairs;
-using namespace espresso::interaction;
+using namespace espresso::potential;
 using namespace espresso::integrator;
 
 /** N stands for number particles in each dimensions.
@@ -44,7 +44,7 @@ using namespace espresso::integrator;
     - generate N * N * N particle in a box of size SIZE * SIZE * SIZE 
     - print out particle data
     - define periodic boundary conditions
-    - define Lennard Jones interaction and apply it to all pairs
+    - define Lennard Jones potential and apply it to all pairs
     - print out particle data
 */
 
@@ -52,15 +52,15 @@ void forceloop() {
 
   // Create a new particle storage
 
-  PStorage particleStorage = 
-    PStorage(new Storage());
+  Storage::SelfPtr particleStorage = 
+    Storage::SelfPtr(new Storage());
 
-  PReal3DProperty position = 
-    PReal3DProperty(new Real3DProperty(particleStorage));
-  PReal3DProperty velocity = 
-    PReal3DProperty(new Real3DProperty(particleStorage));
-  PReal3DProperty force = 
-    PReal3DProperty(new Real3DProperty(particleStorage));
+  Real3DProperty::SelfPtr position = 
+    Real3DProperty::SelfPtr(new Real3DProperty(particleStorage));
+  Real3DProperty::SelfPtr velocity = 
+    Real3DProperty::SelfPtr(new Real3DProperty(particleStorage));
+  Real3DProperty::SelfPtr force = 
+    Real3DProperty::SelfPtr(new Real3DProperty(particleStorage));
 
   // generate particles in the particle storage
   
@@ -93,17 +93,18 @@ void forceloop() {
 
   // define periodic boundary conditions
 
-  PPeriodicBC pbc = PPeriodicBC(new PeriodicBC(SIZE));
+  PeriodicBC::SelfPtr pbc 
+    = PeriodicBC::SelfPtr(new PeriodicBC(SIZE));
 
   // define a set of all particles
 
-  particles::PAll allSet  = 
-    particles::PAll(new particles::All(particleStorage));
+  particles::All::SelfPtr allSet  = 
+    particles::All::SelfPtr(new particles::All(particleStorage));
 
   // define allpairs with (x, y) for all x, y in allSet
 
-  pairs::PAll allpairs =
-    pairs::PAll(new pairs::All(pbc, allSet, position));
+  pairs::All::SelfPtr allpairs =
+    pairs::All::SelfPtr(new pairs::All(pbc, allSet, position));
   
   // For test only: PairWriter prints each particle pair 
   
@@ -113,13 +114,13 @@ void forceloop() {
 
   // allpairs.foreach(pairWriter);
 
-  // define LennardJones interaction
+  // define LennardJones potential
 
-  PLennardJones ljint = PLennardJones(new LennardJones());
+  LennardJones::SelfPtr ljint = LennardJones::SelfPtr(new LennardJones());
   
   ljint->set(1.0, 1.0, 2.5);
   
-  // make a FENE interaction
+  // make a FENE potential
 
   FENE fene;
 
@@ -148,8 +149,8 @@ void forceloop() {
 
   // create integrator and set properties
 
-  PVelocityVerlet integrator =
-    PVelocityVerlet(new VelocityVerlet(allSet, position, velocity, force));
+  VelocityVerlet::SelfPtr integrator =
+    VelocityVerlet::SelfPtr(new VelocityVerlet(allSet, position, velocity, force));
   
   integrator->setTimeStep(0.005);
   /*

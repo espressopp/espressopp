@@ -8,11 +8,11 @@
 #include <python.hpp>
 
 using namespace espresso;
-using namespace espresso::interaction;
+using namespace espresso::potential;
 
 /* ---------------------------------------------------------------------- */
 
-LOG4ESPP_LOGGER(LennardJones::theLogger, "_espresso.interaction.LennardJones");
+LOG4ESPP_LOGGER(LennardJones::theLogger, "_espresso.potential.LennardJones");
 
 /* ---------------------------------------------------------------------- */
 
@@ -92,8 +92,8 @@ void
 LennardJones::registerPython() {
   using namespace boost::python;
 
-  class_< LennardJones, bases< CentralInteraction > >
-     ("interaction_LennardJones")
+  class_< LennardJones, bases< CentralPotential > >
+     ("potential_LennardJones")
     .def("set", &LennardJones::set)
     .def("getCutoff", &LennardJones::getCutoff)
     .def("getEpsilon", &LennardJones::getEpsilon)

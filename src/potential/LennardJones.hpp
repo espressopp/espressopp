@@ -1,11 +1,11 @@
-#ifndef _INTERACTION_LENNARDJONES_HPP
-#define _INTERACTION_LENNARDJONES_HPP
+#ifndef _POTENTIAL_LENNARDJONES_HPP
+#define _POTENTIAL_LENNARDJONES_HPP
 
 #include <logging.hpp>
-#include <interaction/CentralInteraction.hpp>
+#include <potential/CentralPotential.hpp>
 
 namespace espresso {
-  namespace interaction {
+  namespace potential {
     /** This class provides routines to compute forces and energies
 	of the Lennard Jones potential.
 
@@ -14,8 +14,10 @@ namespace espresso {
 	\f]
 
     */
-    class LennardJones: public CentralInteraction {
+    class LennardJones: public CentralPotential {
     public:
+      typedef boost::shared_ptr< LennardJones > SelfPtr;
+
       class BasicComputer {
         friend class LennardJones;
 
@@ -59,7 +61,6 @@ namespace espresso {
       virtual real getCutoffSqr() const;
     };
 
-    typedef boost::shared_ptr< LennardJones > PLennardJones;
   }
 }
 

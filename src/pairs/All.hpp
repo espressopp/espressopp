@@ -16,11 +16,13 @@ namespace espresso {
      class All : public Set {
  
      private:
-       particles::PSet set;
-       bc::PBC bc;
-       PReal3DProperty coordinates;
+       particles::Set::SelfPtr set;
+       bc::BC::SelfPtr bc;
+       Real3DProperty::SelfPtr coordinates;
 
      public:
+       typedef boost::shared_ptr< All > SelfPtr;
+
        static void registerPython();
 
        /** Destructor. */
@@ -33,21 +35,21 @@ namespace espresso {
 	 \param coordinates the identifier of the coordinates property to use
 
        */
-       All(bc::PBC _bc, 
-           particles::PSet _set, 
-           PReal3DProperty _coordinates);
+       All(bc::BC::SelfPtr _bc, 
+           particles::Set::SelfPtr _set, 
+           Real3DProperty::SelfPtr _coordinates);
 
        /** Getter routine for the boundary conditions. */
-       bc::PBC getBC() const { return bc; }
+       bc::BC::SelfPtr getBC() const { return bc; }
 
        /** Getter routine for the set of particles. */
-       particles::PSet getSet() const { return set; }
+       particles::Set::SelfPtr getSet() const { return set; }
 
        /** Getter routine for the coordinate property */
-       PReal3DProperty getCoordinateProperty() const { return coordinates; }
+       Real3DProperty::SelfPtr getCoordinateProperty() const { return coordinates; }
 
        /** Getter routine for the storage */
-       particles::PStorage getStorage() const { return set->getStorage(); }
+       particles::Storage::SelfPtr getStorage() const { return set->getStorage(); }
 
        /** This routine will apply a function operator to all pairs.
          \param pairComputer is the object that provides the function to be applied to all pairs.
@@ -61,7 +63,6 @@ namespace espresso {
 
      };
 
-    typedef boost::shared_ptr< All > PAll;
   }
 }
 

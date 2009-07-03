@@ -17,19 +17,19 @@ LOG4ESPP_LOGGER(ForceComputer::theLogger, "ForceComputer");
 /***************************************************************************************/
 
 ForceComputer::
-ForceComputer(interaction::PInteraction _interaction,
-	      pairs::PSet _pairs)
+ForceComputer(potential::Potential::SelfPtr _potential,
+	      pairs::Set::SelfPtr _pairs)
 {
   LOG4ESPP_INFO(theLogger, "constructor of ForceComputer");
 
-  if (!_interaction) {
-     ARGERROR(theLogger, "Interaction must not be NULL for ForceComputer");
+  if (!_potential) {
+     ARGERROR(theLogger, "Potential must not be NULL for ForceComputer");
   }
   if (!_pairs) {
      ARGERROR(theLogger, "Pairs must not be NULL for ForceComputer");
   }
 
-  interaction = _interaction;
+  potential = _potential;
   pairs = _pairs;
 }
 
@@ -39,10 +39,10 @@ void ForceComputer::
 updateForces(const integrator::MDIntegrator& integrator) {
   LOG4ESPP_DEBUG(theLogger, "updateForces at integrator step " << integrator.getIntegrationStep());
 
-  PropertyHandle<Real3D> force = *integrator.getForce();
+  PropertyHandle<Real3D> force = *integrator.getForceProperty();
 
   pairs::ForceComputer* forceCompute = 
-    interaction->createForceComputer(force);
+    potential->createForceComputer(force);
 
   pairs->foreach(*forceCompute);
 
@@ -52,7 +52,7 @@ updateForces(const integrator::MDIntegrator& integrator) {
 /***************************************************************************************/
 
 void ForceComputer::
-connect(integrator::PMDIntegrator integrator) {
+connect(integrator::MDIntegrator::SelfPtr integrator) {
   // at this time we support only a single connection
 
   LOG4ESPP_INFO(theLogger, "ForceComputer connects to Integrator");
@@ -97,9 +97,9 @@ ForceComputer::registerPython() {
   using namespace boost;
   using namespace boost::python;
 
-  class_<ForceComputer, boost::noncopyable >
+  class_< ForceComputer >
     ("force_ForceComputer", 
-     init< interaction::PInteraction, pairs::PSet >())
+     init< potential::Potential::SelfPtr, pairs::Set::SelfPtr >())
     .def("connect", &ForceComputer::connect)
     .def("disconnect", &ForceComputer::disconnect)
     ;

@@ -12,13 +12,15 @@ namespace espresso {
     */
     class All: public Set {
     public:
+      typedef boost::shared_ptr< All > SelfPtr;
+      
       /** constructor
 	    
 	  @param _store pointer to the ParticleStorage the
 	  particles in this set come from
       */
 
-      All(PStorage _store = PStorage());
+      All(Storage::SelfPtr _store = Storage::SelfPtr());
 
       virtual ~All();
 
@@ -36,7 +38,6 @@ namespace espresso {
       static void registerPython();
     };
 
-    typedef boost::shared_ptr< All > PAll;
   }
 }
 

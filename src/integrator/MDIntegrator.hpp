@@ -12,7 +12,9 @@ namespace espresso {
   namespace integrator {
 
     class MDIntegrator {
-      
+    public:
+      typedef boost::shared_ptr< MDIntegrator > SelfPtr;
+
     private:
       
       int nTimeStep;   //!< iteration counter in time loop
@@ -21,11 +23,11 @@ namespace espresso {
       
       real timeStep;   //!< delta time for integration
 
-      particles::PSet particles;    //!< particle set to integrate
+      particles::Set::SelfPtr particles;    //!< particle set to integrate
 
-      PReal3DProperty position; //!< position property
-      PReal3DProperty velocity; //!< velocity property
-      PReal3DProperty force;    //!< force property
+      Real3DProperty::SelfPtr position; //!< position property
+      Real3DProperty::SelfPtr velocity; //!< velocity property
+      Real3DProperty::SelfPtr force;    //!< force property
 
       /** A pure routine for a single iteration step makes this class abstract. */
 
@@ -44,16 +46,16 @@ namespace espresso {
 
       IntegrateSignal updateForces;
 
-      MDIntegrator(particles::PSet particles,
-                   PReal3DProperty position,
-                   PReal3DProperty velocity,
-                   PReal3DProperty force);
+      MDIntegrator(particles::Set::SelfPtr particles,
+                   Real3DProperty::SelfPtr posProperty,
+                   Real3DProperty::SelfPtr velProperty,
+                   Real3DProperty::SelfPtr forceProperty);
 
-      particles::PSet getParticles() const { return particles; }
+      particles::Set::SelfPtr getParticles() const { return particles; }
 
-      PReal3DProperty getPosition() const { return position; }
-      PReal3DProperty getVelocity() const { return velocity; }
-      PReal3DProperty getForce()    const { return force; }
+      Real3DProperty::SelfPtr getPosProperty() const { return position; }
+      Real3DProperty::SelfPtr getVelProperty() const { return velocity; }
+      Real3DProperty::SelfPtr getForceProperty() const { return force; }
 
       virtual ~MDIntegrator() {}
       
@@ -71,7 +73,6 @@ namespace espresso {
       static void registerPython();
     };
 
-    typedef boost::shared_ptr< MDIntegrator > PMDIntegrator;
   }
 }
 

@@ -24,7 +24,9 @@ namespace espresso {
     typedef particles::PropertyHandle<T> RefType;
     typedef particles::ConstPropertyHandle<T> ConstRefType;
   public: // visible in Python
-    Property(particles::PStorage _storage)
+    typedef boost::shared_ptr< Property< T > > SelfPtr;
+
+    Property(particles::Storage::SelfPtr _storage)
       : storage(_storage) {
       id = storage->template addProperty<T>();
     }
@@ -42,11 +44,11 @@ namespace espresso {
   public: // invisible in Python
 
     operator ConstRefType() const {
-      return storage->template getConstPropertyHandle<T>(id);
+      return storage->template getConstPropertyHandle< T >(id);
     }
 
     operator RefType() {
-      return storage->template getPropertyHandle<T>(id);
+      return storage->template getPropertyHandle< T >(id);
     }
 
     T operator[](particles::ConstParticleHandle handle) const {
@@ -90,7 +92,7 @@ namespace espresso {
     }
 
   private:
-    particles::PStorage storage;
+    particles::Storage::SelfPtr storage;
     esutil::TupleVector::PropertyId id;
   };
 
@@ -98,9 +100,6 @@ namespace espresso {
   typedef Property<Real3D> Real3DProperty;
   typedef Property<int> IntegerProperty;
 
-  typedef boost::shared_ptr< RealProperty > PRealProperty;
-  typedef boost::shared_ptr< Real3DProperty > PReal3DProperty;
-  typedef boost::shared_ptr< IntegerProperty > PIntegerProperty;
 
   /** Array particle property. This does several things:
       <ul>
@@ -119,6 +118,8 @@ namespace espresso {
     typedef particles::ConstArrayPropertyHandle<T> ConstRefType;
 
   public: // visible in Python
+    typedef boost::shared_ptr< ArrayProperty< T > > SelfPtr;
+
     std::vector<T> getItem(ParticleId part) const {
       ConstRefType ref = *this;
       const T
@@ -134,7 +135,7 @@ namespace espresso {
     }
 
   public: // invisible in Python
-    ArrayProperty(particles::PStorage _storage,
+    ArrayProperty(particles::Storage::SelfPtr _storage,
                   size_t dimension)
       : storage(_storage) {
       id = _storage->template addProperty<T>(dimension);
@@ -192,15 +193,12 @@ namespace espresso {
     }
 
   private:
-    particles::PStorage storage;
+    particles::Storage::SelfPtr storage;
     esutil::TupleVector::PropertyId id;
   };
 
   typedef ArrayProperty<int> IntegerArrayProperty;
   typedef ArrayProperty<real> RealArrayProperty;
-
-  typedef boost::shared_ptr< RealArrayProperty > PRealArrayProperty;
-  typedef boost::shared_ptr< IntegerArrayProperty > PIntegerArrayProperty;
 
   void registerPythonProperties();
 }

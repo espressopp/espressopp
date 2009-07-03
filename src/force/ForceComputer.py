@@ -4,7 +4,7 @@ from espresso import pmi
 from _espresso import force_ForceComputer as _ForceComputer
 
 class ForceComputerLocal(_ForceComputer) :
-    'The (local) ForceComputer interaction.'
+    'The (local) ForceComputer potential.'
     def __init__(self, K=1.0, r0=0.0, rMax=1.0) :
         """Initialize the ForceComputer potential.
 
@@ -15,7 +15,7 @@ class ForceComputerLocal(_ForceComputer) :
 
     # define setter
     def set(self, K=None, r0=None, rMax=None) :
-        """set((real)K, (real)r0, (real)rMax) -- Set the parameters of the interaction.
+        """set((real)K, (real)r0, (real)rMax) -- Set the parameters of the potential.
         """
         return _ForceComputer.set(self,
             choose(K, self.K),
@@ -41,9 +41,9 @@ class ForceComputerLocal(_ForceComputer) :
 
 # wrap ForceComputer
 if pmi.IS_CONTROLLER:
-    pmi.exec_('from espresso.interaction.ForceComputer import ForceComputerLocal')
+    pmi.exec_('from espresso.potential.ForceComputer import ForceComputerLocal')
     class ForceComputer(object) :
-        'The ForceComputer interaction.'
+        'The ForceComputer potential.'
 
         __metaclass__ = pmi.Proxy
         pmiproxydefs = {

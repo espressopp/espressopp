@@ -19,7 +19,7 @@
 #include "pairs/All.hpp"
 #include "pairs/ForceComputer.hpp"
 #include "bc/PeriodicBC.hpp"
-#include "interaction/LennardJones.hpp"
+#include "potential/LennardJones.hpp"
 #include "esutil/Timer.hpp"
 
 #ifdef __GNUC__
@@ -82,10 +82,10 @@ void TestEspresso::addParticle(const Real3D &pos)
 }
 
 void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {
-  bc::PPeriodicBC pbc(new bc::PeriodicBC(size));
-  particles::PAll allset(new particles::All(storage));
+  bc::PeriodicBC::SelfPtr pbc(new bc::PeriodicBC(size));
+  particles::All::SelfPtr allset(new particles::All(storage));
   pairs::All allpairs(pbc, allset, position);
-  interaction::LennardJones ljint;
+  potential::LennardJones ljint;
   ljint.set(epsilon, sigma, cutoff);
   pairs::ForceComputer *forceCompute =
     ljint.createForceComputer(pairs::ForceComputer(*force));
@@ -104,8 +104,8 @@ public:
 };
 
 void TestEspresso::runEmptyPairLoop() {
-  bc::PPeriodicBC pbc(new bc::PeriodicBC(size));
-  particles::PAll allset(new particles::All(storage));
+  bc::PeriodicBC::SelfPtr pbc(new bc::PeriodicBC(size));
+  particles::All::SelfPtr allset(new particles::All(storage));
   pairs::All allpairs(pbc, allset, position);
   EmptyPairComputer ljc;
   allpairs.foreach(ljc);
@@ -128,8 +128,8 @@ public:
 };
 
 real TestEspresso::calculateMinDist() {
-  bc::PPeriodicBC pbc(new bc::PeriodicBC(size));
-  particles::PAll allset(new particles::All(storage));
+  bc::PeriodicBC::SelfPtr pbc(new bc::PeriodicBC(size));
+  particles::All::SelfPtr allset(new particles::All(storage));
   pairs::All allpairs(pbc, allset, position);
   MinDistComputer mincomp;
   allpairs.foreach(mincomp);

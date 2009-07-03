@@ -71,10 +71,10 @@ class StepZeroForces: public particles::Computer {
     }
 };
 
-VelocityVerlet::VelocityVerlet(PSet _particles, 
-                               PReal3DProperty _position,
-                               PReal3DProperty _velocity,
-                               PReal3DProperty _force):
+VelocityVerlet::VelocityVerlet(Set::SelfPtr _particles, 
+                               Real3DProperty::SelfPtr _position,
+                               Real3DProperty::SelfPtr _velocity,
+                               Real3DProperty::SelfPtr _force):
 
    MDIntegrator(_particles, _position, _velocity, _force) {}
 
@@ -101,7 +101,7 @@ void VelocityVerlet::step() {
 
      BOOST_FOREACH(ForceEvaluation fe, forceEvaluations) {
       pairs::ForceComputer *forceCompute =
-          fe.interaction->createForceComputer(forceParameters);
+          fe.potential->createForceComputer(forceParameters);
           fe.pairs->foreach(*forceCompute);
           delete forceCompute;
       }
@@ -129,8 +129,10 @@ VelocityVerlet::registerPython() {
   using namespace boost;
   using namespace boost::python;
 
-  class_<VelocityVerlet, boost::noncopyable, bases<MDIntegrator> >
-    ("integrator_VelocityVerlet", init<PSet, PReal3DProperty, PReal3DProperty, PReal3DProperty>())
+  // TODO: Why noncopyable?
+  class_< VelocityVerlet, boost::noncopyable, bases< MDIntegrator > >
+    ("integrator_VelocityVerlet", 
+     init< Set::SelfPtr, Real3DProperty::SelfPtr, Real3DProperty::SelfPtr, Real3DProperty::SelfPtr >())
     .def("step", &VelocityVerlet::step)
     ;
 }

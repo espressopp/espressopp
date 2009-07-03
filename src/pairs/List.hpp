@@ -14,16 +14,19 @@ namespace espresso {
      */
 
     class List : public Set {
- 
+    public:
+      typedef boost::shared_ptr< List > SelfPtr;
+
     private:
-      particles::PStorage storage; 
-      bc::PBC bc;
-      PReal3DProperty coordinates;
-      typedef std::pair<ParticleId,
-                        ParticleId> Tuple;
-      std::vector<Tuple> id_list;
+      particles::Storage::SelfPtr storage; 
+      bc::BC::SelfPtr bc;
+      Real3DProperty::SelfPtr coordinates;
+      typedef std::pair< ParticleId,
+			 ParticleId > Tuple;
+      std::vector< Tuple > id_list;
 
     public:
+
       /** Destructor. */
       ~List();
 
@@ -34,9 +37,9 @@ namespace espresso {
 	  \param coordinates the identifier of the coordinates property to use
 
       */
-      List (bc::PBC bc, 
-            particles::PStorage storage,
-	    PReal3DProperty coordinates);
+      List (bc::BC::SelfPtr bc, 
+            particles::Storage::SelfPtr storage,
+	    Real3DProperty::SelfPtr coordinates);
 
       size_t size() const;
 
@@ -87,7 +90,7 @@ namespace espresso {
       virtual void foreach(ConstComputer& pairComputer) const;
 
     private:
-      template<class Computer, class>
+      template< class Computer, class >
       void foreach(Computer& pairComputer) const;
 
     public:
@@ -95,8 +98,6 @@ namespace espresso {
       static void registerPython();
 
     };
-
-    typedef boost::shared_ptr< List > PList;
 
   }
 }

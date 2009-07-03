@@ -10,6 +10,8 @@ namespace espresso {
     /** Abstract class for boundary condtions. */
     class BC {
     public:
+      typedef boost::shared_ptr< BC > SelfPtr;
+
       /** Virtual destructor for boundary conditions. */
       virtual ~BC() {}
 
@@ -45,8 +47,6 @@ namespace espresso {
       static void registerPython();
 
     };
-
-    typedef boost::shared_ptr< BC > PBC;
   }
 }
 

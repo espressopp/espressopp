@@ -1,11 +1,11 @@
-#ifndef _INTERACTION_FENE_HPP
-#define _INTERACTION_FENE_HPP
+#ifndef _POTENTIAL_FENE_HPP
+#define _POTENTIAL_FENE_HPP
 
 #include <logging.hpp>
-#include <interaction/CentralInteraction.hpp>
+#include <potential/CentralPotential.hpp>
 
 namespace espresso {
-  namespace interaction {
+  namespace potential {
 
     /** This class provides routines to computer forces and energies
         based on the FENE potential.
@@ -15,7 +15,7 @@ namespace espresso {
         \f]
     */
 
-    class FENE: public CentralInteraction {
+    class FENE: public CentralPotential {
     public:
       struct BasicComputer {
         real K;       
@@ -27,6 +27,8 @@ namespace espresso {
         real   computeEnergy(const real) const;
       };
       friend class BasicComputer;
+
+      typedef boost::shared_ptr< FENE > SelfPtr;
 
     private:
       BasicComputer computer;
@@ -55,12 +57,10 @@ namespace espresso {
       virtual pairs::EnergyComputer *createEnergyComputer(const pairs::EnergyComputer &) const;
       virtual pairs::ForceComputer  *createForceComputer (const pairs::ForceComputer &)  const;
 
-      /* FENE should probably derived from a two-body interaction
+      /* FENE should probably derived from a two-body potential
 	 without a cutoff to avoid the following */
       virtual real getCutoffSqr() const;
     };
-
-    typedef boost::shared_ptr< FENE > PFENE;
   }
 }
 

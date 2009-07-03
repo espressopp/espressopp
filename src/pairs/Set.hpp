@@ -13,7 +13,6 @@ namespace espresso {
     public:
       typedef boost::shared_ptr< Set > SelfPtr;
 
-
       virtual ~Set() {}
 
       virtual void foreach(Computer& comp) = 0;
@@ -22,8 +21,6 @@ namespace espresso {
 
       static void registerPython();
     };
-
-    typedef boost::shared_ptr< Set > PSet;
   }
 }
 

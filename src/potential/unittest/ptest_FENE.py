@@ -1,6 +1,6 @@
 import unittest
 import espresso.unittest
-from espresso.interaction.FENE import *
+from espresso.potential.FENE import *
 from espresso import Real3D
 
 class Test0LennardJones(espresso.unittest.TestCase) :

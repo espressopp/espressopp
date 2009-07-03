@@ -25,6 +25,9 @@ namespace espresso {
       public Thermostat, 
       public boost::enable_shared_from_this< Langevin > {
 
+    public:
+      typedef boost::shared_ptr< Langevin > SelfPtr;
+
     private:
   
       static LOG4ESPP_DECL_LOGGER(theLogger);
@@ -70,7 +73,7 @@ namespace espresso {
 
       */
 
-      void connect(integrator::PVelocityVerlet integrator);
+      void connect(integrator::VelocityVerlet::SelfPtr integrator);
 
       /** Disconnect this thermostat object from its integrator. */
       void disconnect();
@@ -83,8 +86,6 @@ namespace espresso {
 
       virtual ~Langevin();
     };
-
-    typedef boost::shared_ptr< Langevin > PLangevin;
   }
 }
 

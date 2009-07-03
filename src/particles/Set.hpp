@@ -14,15 +14,17 @@ namespace espresso {
     class Set {
     protected:
       /// the storage our particles are stored in
-      PStorage theStorage;
+      Storage::SelfPtr theStorage;
 
     public:
+      typedef boost::shared_ptr<Set> SelfPtr;
+
       /** base constructor
           
           @param _store pointer to the Storage the
           particles in this set come from
       */
-      Set(PStorage _store = PStorage()) : theStorage(_store) {}
+      Set(Storage::SelfPtr _store = Storage::SelfPtr()) : theStorage(_store) {}
 
       virtual ~Set() {}
 
@@ -37,7 +39,7 @@ namespace espresso {
       ///
       virtual void foreach(ConstComputer &computer) const = 0;
 
-      PStorage getStorage() const { return theStorage; }
+      Storage::SelfPtr getStorage() const { return theStorage; }
 
     public:
 
@@ -46,8 +48,6 @@ namespace espresso {
       static void registerPython();
 
     };
-
-    typedef boost::shared_ptr<Set> PSet;
   }
 }
 

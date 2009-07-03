@@ -491,9 +491,9 @@ class Proxy(type):
         def __call__(self, method_self, *args, **kwds):
             # create the pmi subject
             log.info('PMI.Proxy class %s is creating pmi subject of type %s',
-                     self.cls, self.cls.pmisubjectclassdef)
+                     self.cls, self.cls.pmiobjectclassdef)
             self.cls._normalizeClass()
-            method_self.pmisubject = create(self.cls.pmisubjectclass, *args, **kwds)
+            method_self.pmiobject = create(self.cls.pmiobjectclass, *args, **kwds)
             if hasattr(self, 'oldinit'):
                 self.oldinit(method_self)
 #                self.oldinit(method_self, *args, **kwds)
@@ -504,8 +504,8 @@ class Proxy(type):
             self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
             self.cls._normalizeClass()
-            method = getattr(self.cls.pmisubjectclass, self.methodName)
-            return method(method_self.pmisubject, *args, **kwds)
+            method = getattr(self.cls.pmiobjectclass, self.methodName)
+            return method(method_self.pmiobject, *args, **kwds)
 
     class PMICaller(object):
         def __init__(self, cls, methodName):
@@ -513,8 +513,8 @@ class Proxy(type):
             self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
             self.cls._normalizeClass()
-            method = getattr(self.cls.pmisubjectclass, self.methodName)
-            return call(method, method_self.pmisubject, *args, **kwds)
+            method = getattr(self.cls.pmiobjectclass, self.methodName)
+            return call(method, method_self.pmiobject, *args, **kwds)
 
     class PMIInvoker(object):
         def __init__(self, cls, methodName):
@@ -522,8 +522,8 @@ class Proxy(type):
             self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
             self.cls._normalizeClass()
-            method = getattr(self.cls.pmisubjectclass, self.methodName)
-            return invoke(method, method_self.pmisubject, *args, **kwds)
+            method = getattr(self.cls.pmiobjectclass, self.methodName)
+            return invoke(method, method_self.pmiobject, *args, **kwds)
 
     class PropertyLocalGetter(object):
         def __init__(self, cls, propName):
@@ -531,9 +531,9 @@ class Proxy(type):
             self.propName = propName
         def __call__(self, method_self):
             self.cls._normalizeClass()
-            property = getattr(self.cls.pmisubjectclass, self.propName)
+            property = getattr(self.cls.pmiobjectclass, self.propName)
             self.getter = getattr(property, 'fget')
-            return self.getter(method_self.pmisubject)
+            return self.getter(method_self.pmiobject)
 
     class PropertyPMISetter(object):
         def __init__(self, cls, propName):
@@ -541,14 +541,14 @@ class Proxy(type):
             self.propName = propName
         def __call__(self, method_self, val):
             setter = '.'.join(
-                (self.cls.pmisubjectclassdef,
+                (self.cls.pmiobjectclassdef,
                  self.propName, 
                  'fset'))
-            return call(setter, method_self.pmisubject, val)
+            return call(setter, method_self.pmiobject, val)
 
     def _normalizeClass(cls):
-        if not hasattr(cls, 'pmisubjectclass'):
-            cls.pmisubjectclass = _translateClass(cls.pmisubjectclassdef)
+        if not hasattr(cls, 'pmiobjectclass'):
+            cls.pmiobjectclass = _translateClass(cls.pmiobjectclassdef)
 
     def __addMethod(cls, methodName, caller):
         newMethod = types.MethodType(caller, None, cls)
@@ -561,7 +561,7 @@ class Proxy(type):
         defs = dict['pmiproxydefs']
 
         if 'subjectclass' in defs:
-            cls.pmisubjectclassdef = defs['subjectclass']
+            cls.pmiobjectclassdef = defs['subjectclass']
             if hasattr(cls, '__init__'): 
                 oldinit = getattr(cls, '__init__')
             else: 

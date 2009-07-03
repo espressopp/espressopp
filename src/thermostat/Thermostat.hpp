@@ -15,12 +15,14 @@ namespace espresso {
     */
 
     class Thermostat {
+    public:
+      typedef boost::shared_ptr< Thermostat > SelfPtr;
 
     protected:
       
       static LOG4ESPP_DECL_LOGGER(theLogger);
 
-      particles::PSet particles;  //!< Particles to which the thermostat is applied
+      particles::Set::SelfPtr particles;  //!< Particles to which the thermostat is applied
 
       real temperature;   //!< target temperature for the thermostat
 
@@ -45,9 +47,9 @@ namespace espresso {
       
       virtual real getTemperature() const { return temperature; }
 
-      virtual void setParticles(particles::PSet _particles) { particles = _particles; }
+      virtual void setParticles(particles::Set::SelfPtr _particles) { particles = _particles; }
 
-      virtual particles::PSet getParticles() { return particles; }
+      virtual particles::Set::SelfPtr getParticles() { return particles; }
 
       /** Abstract class needs also registration in Python */
 

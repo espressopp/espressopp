@@ -11,6 +11,8 @@ namespace espresso {
     /** Class for periodic boundary conditions in all three dimensions. */
 
     class PeriodicBC : public BC {
+    public:
+      typedef boost::shared_ptr< PeriodicBC > SelfPtr;
 
     private:
       Real3D length;
@@ -46,8 +48,6 @@ namespace espresso {
       virtual Real3D getRandomPos(void);
       
     };
-
-    typedef boost::shared_ptr< PeriodicBC > PPeriodicBC;
   }
 }
 

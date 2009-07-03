@@ -1,0 +1,20 @@
+nobase_pkginclude_HEADERS += \
+	potential/bindings.hpp \
+	potential/Potential.hpp \
+	potential/CentralPotential.hpp \
+	potential/LennardJones.hpp \
+	potential/FENE.hpp
+
+libespresso_common_la_SOURCES += \
+	potential/bindings.cpp \
+	potential/Potential.cpp \
+	potential/CentralPotential.cpp \
+	potential/LennardJones.cpp \
+        potential/FENE.cpp
+
+python_SCRIPTS += \
+	potential/__init__.py \
+	potential/Potential.py \
+	potential/CentralPotential.py \
+	potential/LennardJones.py \
+	potential/FENE.py

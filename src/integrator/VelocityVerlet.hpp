@@ -12,11 +12,12 @@ namespace espresso {
     class VelocityVerlet: public MDIntegrator {
 
     public:
+      typedef boost::shared_ptr< VelocityVerlet > SelfPtr;
 
-      VelocityVerlet(particles::PSet particles,
-		     PReal3DProperty position,
-		     PReal3DProperty velocity,
-		     PReal3DProperty force);
+      VelocityVerlet(particles::Set::SelfPtr particles,
+		     Real3DProperty::SelfPtr posProperty,
+		     Real3DProperty::SelfPtr velProperty,
+		     Real3DProperty::SelfPtr forceProperty);
 
       /** The following signals are specific for VelocityVerlet */
 
@@ -35,11 +36,11 @@ namespace espresso {
       /* on change:
 
       struct ForceEvaluation {
-        boost::shared_ptr<interaction::Interaction> interaction;
+        potential::Potential::SelfPtr potential;
         boost::shared_ptr<pairs::Set> pairs;
-        ForceEvaluation(boost::shared_ptr<interaction::Interaction> _interaction,
+        ForceEvaluation(potential::Potential::SelfPtr _potential,
                         boost::shared_ptr<pairs::Set> _pairs)
-          : interaction(_interaction), pairs(_pairs) {}
+          : potential(_potential), pairs(_pairs) {}
       };
 
       std::vector<ForceEvaluation> forceEvaluations;
@@ -49,8 +50,6 @@ namespace espresso {
     protected:
       virtual void step();
    };
-
-    typedef boost::shared_ptr< VelocityVerlet > PVelocityVerlet;
 
   }
 }

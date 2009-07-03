@@ -25,6 +25,7 @@ namespace espresso {
     */
     class Storage {
     public:
+      typedef boost::shared_ptr< Storage > SelfPtr;
 
       Storage();
 
@@ -145,7 +146,6 @@ namespace espresso {
       Storage(const Storage &);
     };
 
-    typedef boost::shared_ptr< Storage > PStorage;
 
   }
 }

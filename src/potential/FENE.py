@@ -1,10 +1,10 @@
 from espresso import pmi
 from espresso.esutil import choose
 
-from _espresso import interaction_FENE as _FENE
+from _espresso import potential_FENE as _FENE
 
 class FENELocal(_FENE) :
-    'The (local) FENE interaction.'
+    'The (local) FENE potential.'
     def __init__(self, K=1.0, r0=0.0, rMax=1.0) :
         """Initialize the FENE potential.
 
@@ -15,7 +15,7 @@ class FENELocal(_FENE) :
 
     # define setter
     def set(self, K=None, r0=None, rMax=None) :
-        """set((real)K, (real)r0, (real)rMax) -- Set the parameters of the interaction.
+        """set((real)K, (real)r0, (real)rMax) -- Set the parameters of the potential.
         """
         return _FENE.set(self,
             choose(K, self.K),
@@ -41,13 +41,13 @@ class FENELocal(_FENE) :
 
 # wrap FENE
 if pmi.IS_CONTROLLER:
-    pmi.exec_('import espresso.interaction.FENE')
+    pmi.exec_('import espresso.potential.FENE')
 
     class FENE(object) :
-        'The FENE interaction.'
+        'The FENE potential.'
         __metaclass__ = pmi.Proxy
         pmiproxydefs = {
-            'subjectclass': 'espresso.interaction.FENELocal',
+            'subjectclass': 'espresso.potential.FENELocal',
             'localcall' : [ 'computeForce', 'computeEnergy' ],
             'pmicall' : [ 'set' ],
             'pmiproperty' : ['K', 'r0', 'rMax' ]
