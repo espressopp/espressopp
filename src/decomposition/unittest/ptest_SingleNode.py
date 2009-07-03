@@ -1,13 +1,8 @@
-import unittest
-import inspect
 from espresso import boostmpi as mpi
 from espresso import pmi
-from espresso.decomposition import SingleNode
 
 if __name__ == 'espresso.pmi':
     from espresso.particles import PythonComputerLocal
-    from espresso import boostmpi as mpi
-    from espresso import pmi
 
     # simple particle counter
     class LocalCount(PythonComputerLocal) :
@@ -20,6 +15,10 @@ if __name__ == 'espresso.pmi':
             return mpi.world.gather(self.count, pmi.CONTROLLER)
 
 else:
+    import unittest
+    import inspect
+    from espresso.decomposition import SingleNode
+
     pmi.execfile_(__file__)
 
     class Common(object) :
