@@ -35,10 +35,10 @@ if pmi.IS_CONTROLLER :
         on a single, configurable node.
         """
         
-        def __init__(self, node = pmi.CONTROLLER, local = None) :
-            if local is None:
-                local = pmi.create('SingleNodeLocal', node)
-            Decomposer.__init__(self, local = local)
+        def __init__(self, node = pmi.CONTROLLER, pmiobject = None) :
+            if pmiobject is None:
+                pmiobject = pmi.create('SingleNodeLocal', node)
+            Decomposer.__init__(self, pmiobject = pmiobject)
             self.masternode = node
             # list of all particles. Since they are all on one node, we can as well
             # keep a table of all of them here
@@ -52,7 +52,7 @@ if pmi.IS_CONTROLLER :
                 id = self.max_seen_id + 1
             elif type(id) is not type(1) or id < 0 :
                 raise TypeError("particle identity should be a nonnegative integer")
-            pmi.call(self.local.addParticle, id)
+            pmi.call(self.pmiobject.addParticle, id)
             # update max_seen_id and list of particle_ids
             if id > self.max_seen_id :
                 self.max_seen_id = id
@@ -63,7 +63,7 @@ if pmi.IS_CONTROLLER :
             if id not in self.particle_ids :
                 raise IndexError("particle %s does not exist" % str(id))
             self.particle_ids.remove(id)
-            pmi.call(self.local.deleteParticle, id)
+            pmi.call(self.pmiobject.deleteParticle, id)
         
         def getNodeOfParticle(self, id) :
             if id not in self.particle_ids :

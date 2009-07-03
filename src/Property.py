@@ -50,11 +50,11 @@ if pmi.IS_CONTROLLER:
 
         def __getitem__(self, particle) :
             node = self.decomposer.getNodeOfParticle(particle)
-            return pmi.call(self.local.getItem, node, particle)
+            return pmi.call(self.pmiobject.getItem, node, particle)
 
         def __setitem__(self, particle, value) :
             node = self.decomposer.getNodeOfParticle(particle)
-            pmi.call(self.local.setItem, node, particle, value)
+            pmi.call(self.pmiobject.setItem, node, particle, value)
 
 ####
 
@@ -75,7 +75,7 @@ if pmi.IS_CONTROLLER:
         """
         def __init__(self, decomposer) :
             _Property.__init__(self, decomposer)
-            self.local = pmi.create('espresso.Property.RealPropertyLocal', decomposer.local)
+            self.pmiobject = pmi.create('espresso.Property.RealPropertyLocal', decomposer.pmiobject)
 ####
 
 ######## IntegerProperty
@@ -95,7 +95,7 @@ if pmi.IS_CONTROLLER:
         """
         def __init__(self, decomposer) :
             _Property.__init__(self, decomposer)
-            self.local = pmi.create('espresso.Property.IntegerPropertyLocal', decomposer.local)
+            self.pmiobject = pmi.create('espresso.Property.IntegerPropertyLocal', decomposer.pmiobject)
 ####
 
 ######## Real3DProperty
@@ -115,5 +115,5 @@ if pmi.IS_CONTROLLER:
         """
         def __init__(self, decomposer) :
             _Property.__init__(self, decomposer)
-            self.local = pmi.create('espresso.Property.Real3DPropertyLocal', decomposer.local)
+            self.pmiobject = pmi.create('espresso.Property.Real3DPropertyLocal', decomposer.pmiobject)
 ####

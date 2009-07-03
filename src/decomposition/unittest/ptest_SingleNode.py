@@ -12,7 +12,9 @@ if __name__ == 'espresso.pmi':
         def __apply__(self, id) :
             self.count += 1
         def finalize(self) :
-            return mpi.world.gather(self.count, pmi.CONTROLLER)
+            self.counts = mpi.world.gather(self.count, pmi.CONTROLLER)
+        def getCounts(self):
+            return self.counts
 
 else:
     import unittest
@@ -33,7 +35,9 @@ else:
             self.assert_(id2 > id1)
             self.assertRaises(IndexError, self.decomp.addParticle, id1)
             self.assertEqual(self.decomp.getTotalNumberOfParticles(), 2)
-            counts = self.decomp.foreach(pmi.create("LocalCount"))        
+            counter = pmi.create("LocalCount")
+            self.decomp.foreach(counter)
+            counts = counter.getCounts()
             for node, count in enumerate(counts) :
                 if node == self.node :
                     self.assertEqual(count, 2)

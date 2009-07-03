@@ -9,27 +9,24 @@ using namespace boost::python;
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
 //////////////////////////////////////////////////
-struct PythonPotential : Potential, wrapper<Potential> 
-{
-  real getCutoffSqr() const {
-    return this->get_override("getCutoffSqr")();
+class PythonPotential 
+  : public Potential, 
+    public wrapper<Potential> {
+  virtual real getCutoffSqr() const {
+    return get_override("getCutoffSqr")();
   }
 
-  real computeEnergy(const Real3D &dist) const {
-    return this->get_override("computeEnergy")(dist);
+  virtual real computeEnergy(const Real3D &dist) const {
+    return get_override("computeEnergy")(dist);
   }
 
-  Real3D computeForce(const Real3D &dist) const {
-    return this->get_override("computeForce")(dist);
+  virtual Real3D computeForce(const Real3D &dist) const {
+    return get_override("computeForce")(dist);
   }
 };
 
 void
 Potential::registerPython() {
-  // also register the abstract class Set to make virtual functions available
-  // be careful: boost::noncopyable must be used for abstract classes with pure routines
-  // no_init must be used as the abstract class Set has no constructor
-
   class_< PythonPotential, boost::noncopyable >
     ("potential_Potential", no_init)
     .def("getCutoffSqr", pure_virtual(&Potential::getCutoffSqr))

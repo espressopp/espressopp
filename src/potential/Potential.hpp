@@ -21,7 +21,6 @@ namespace espresso {
       virtual real computeEnergy(const Real3D &dist) const = 0;
       virtual Real3D computeForce(const Real3D &dist) const = 0;
     public:
-      /** Abstract class needs also registration in Python */
       static void registerPython();
     };
 

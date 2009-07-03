@@ -16,13 +16,7 @@ class DecomposerLocal(object):
         self.storage = storage
 
     def foreach(self, computer) :
-        if hasattr(computer, "prepare") :
-            computer.prepare(self)
-
         self.storage.foreach(computer)
-
-        if hasattr(computer, "finalize") :
-            return computer.finalize()
 
 if pmi.IS_CONTROLLER :
 
@@ -44,19 +38,19 @@ if pmi.IS_CONTROLLER :
         smaller boxes or cells.
         """
         
-        def __init__(self, local = None) :
+        def __init__(self, pmiobject = None) :
             """
             initialize the basic decomposer. This class cannot be used directly, since most
             functionality is not implemented and has to be provided by derived classes. This
             function takes one argument called local, which specifies the object to be used
             as local instance and should be handed over by the derived class.
             """
-            if local == None :
-                local = pmi.create('DecomposerLocal')
-            elif not issubclass(type(local), DecomposerLocal) :
-                raise TypeError("local object was given, but not derived from DecomposerLocal (type is %s)" % str(type(local)))
+            if pmiobject is None:
+                pmiobject = pmi.create('DecomposerLocal')
+            elif not isinstance(pmiobject, DecomposerLocal) :
+                raise TypeError("pmiobject object was given, but not derived from DecomposerLocal (type is %s)" % str(type(pmiobject)))
 
-            self.local = local
+            self.pmiobject = pmiobject
             self.properties = {}
         
         def createProperty(self, type, dimension = 1) :
@@ -122,7 +116,7 @@ if pmi.IS_CONTROLLER :
             >>>
             >>> decomposer.foreach(pmi.create("MyPythonComputer"))
             """
-            return pmi.call(self.local.foreach, computer)
+            return pmi.call(self.pmiobject.foreach, computer)
             
         def addParticle(self, id = None) :
             """

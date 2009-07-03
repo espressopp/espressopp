@@ -16,7 +16,7 @@ class Test(unittest.TestCase) :
 
     def testConstructWLocal(self) :
         pmi.exec_("import ptest_Decomposer")
-        self.decomp = Decomposer(local = pmi.create("ptest_Decomposer.DerivedLocal"))
+        self.decomp = Decomposer(pmiobject = pmi.create("ptest_Decomposer.DerivedLocal"))
 
     def testConstructFail(self) :
         self.assertRaises(TypeError, Decomposer, 5)

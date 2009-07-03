@@ -4,6 +4,8 @@
 #include <esutil/virtual_functional.hpp>
 #include "Storage.hpp"
 
+#include <iostream>
+
 namespace espresso {
   namespace particles {
     template<class ParticleHandle>
@@ -19,11 +21,15 @@ namespace espresso {
 	  i.e. when the storage can potentially change again.
       */
       virtual void finalize() {}
+
     };
     
     class Computer : 
       public ComputerBase<ParticleHandle>
-    {};
+    {
+    public:
+      static void registerPython();
+    };
     
     class ConstComputer :
       public ComputerBase<ConstParticleHandle>
