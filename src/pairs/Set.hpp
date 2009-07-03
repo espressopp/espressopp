@@ -20,6 +20,9 @@ namespace espresso {
       virtual void foreach(ConstComputer& comp) const = 0;
 
       static void registerPython();
+
+      virtual particles::Storage::SelfPtr getStorage() const = 0;
+
     };
   }
 }

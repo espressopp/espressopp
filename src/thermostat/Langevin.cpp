@@ -215,7 +215,7 @@ void
 Langevin::registerPython() {
   using namespace boost::python;
 
-    class_<Langevin, bases<Thermostat> >
+    class_<Langevin, Langevin::SelfPtr, bases<Thermostat> >
       ("thermostat_Langevin", init<real, real>())
       .def("setGamma", &Langevin::setGamma)
       .def("getGamma", &Langevin::getGamma)    

@@ -25,14 +25,14 @@ logging.getLogger("Integrator").setLevel(logging.INFO)
 from _espresso import particles_Storage as Storage
 from _espresso import Real3DProperty
 from _espresso import Real3D
-from _espresso import bc_PBC as PBC
+from _espresso import bc_PeriodicBC as PeriodicBC
 from _espresso import particles_PythonComputer 
 from _espresso import pairs_PythonComputer 
 from _espresso import particles_All
 from _espresso import pairs_All as All2
 from _espresso import pairs_List as List
-from _espresso import interaction_LennardJones as LennardJones
-from _espresso import interaction_FENE as FENE
+from _espresso import potential_LennardJones as LennardJones
+from _espresso import potential_FENE as FENE
 from _espresso import integrator_VelocityVerlet as VelocityVerlet
 from _espresso import thermostat_Langevin as Langevin
 from _espresso import force_ForceComputer as ForceComputer
@@ -47,11 +47,11 @@ NBEADS  = 5     # number of particles in one polymer
 
 class ParticleWriter(particles_PythonComputer):
 
-    def __init__(self, _property, storage):
-        particles_PythonComputer.__init__(self, storage)
+    def __init__(self, _property):
+        particles_PythonComputer.__init__(self)
         self.property = _property
 
-    def each(self, pid):
+    def __apply__(self, pid):
         print("%d %s" % (pid, self.property[pid]))
 
 ########################################################################
@@ -64,9 +64,9 @@ class XYZWriter(particles_PythonComputer):
 
     """This class writes a XYZ coordinate file for all particles"""
 
-    def __init__(self, storage, size, position, filename):
+    def __init__(self, size, position, filename):
 
-        particles_PythonComputer.__init__(self, storage)
+        particles_PythonComputer.__init__(self)
 
         self.outfile = open(filename, "w")
         self.position = position
@@ -76,7 +76,7 @@ class XYZWriter(particles_PythonComputer):
 
         self.outfile.write("%d\nAtoms\n" % (self.size,))
 
-    def each(self, pid):
+    def __apply__(self, pid):
 
         pos = self.position[pid]
         self.outfile.write("1 %f %f %f\n" % (pos[0], pos[1], pos[2]))
@@ -97,12 +97,12 @@ def writePSF(particleStorage, size, bondList, numbonds, filename):
    
    class ParticleWriter(particles_PythonComputer):
 
-      def __init__(self, storage, outfile):
+      def __init__(self, outfile):
 
-          particles_PythonComputer.__init__(self, storage)
+          particles_PythonComputer.__init__(self)
           self.outfile = outfile
 
-      def each(self, pid):
+      def __apply__(self, pid):
 
           self.outfile.write("%8d" % (pid,))
           self.outfile.write("      1")
@@ -145,7 +145,7 @@ def writePSF(particleStorage, size, bondList, numbonds, filename):
 
    #  Write the info about the particles
 
-   writeParticles = ParticleWriter(particleStorage, outfile)
+   writeParticles = ParticleWriter(outfile)
    particleStorage.foreach(writeParticles)
 
    # Write the header for the bonds
@@ -180,15 +180,20 @@ position = Real3DProperty(particleStorage)
 velocity = Real3DProperty(particleStorage)
 force    = Real3DProperty(particleStorage)
 
-pbc = PBC()
-pbc.set(SIZE)
+pbc = PeriodicBC()
+BoxSize = Real3D(SIZE, SIZE, SIZE)
+pbc.set(BoxSize)
 
 # Bond List for bonded interactions
 
 bondList = List(pbc, particleStorage, position)
 
+pid = 1
+
 for chainid in range(NCHAINS):
-    pid1 = particleStorage.addParticle()
+    pid1 = pid
+    pid = pid + 1
+    particleStorage.addParticle(pid1)
     pos1 = Real3D(random.random() * SIZE, random.random() * SIZE, random.random() * SIZE)
     position[pid1] = pos1
     velocity[pid1] = Real3D(0.0)
@@ -199,7 +204,10 @@ for chainid in range(NCHAINS):
         # create a new position by random walk
         pos2 = pos1 + randomWalk(step=1.0)
 
-        pid2 = particleStorage.addParticle()
+        pid2 = pid
+        pid = pid+1
+
+        particleStorage.addParticle(pid2)
 
         position[pid2] = pos2
         velocity[pid2] = Real3D(0.0)
@@ -218,7 +226,7 @@ for chainid in range(NCHAINS):
 #  particleStorage.foreach(ParticleWriter(position, particleStorage))
 
 allSet = particles_All(particleStorage)
-allSet.foreach(ParticleWriter(position, particleStorage))
+allSet.foreach(ParticleWriter(position))
 
 # Pair List for nonbonded interactions
 
@@ -236,6 +244,11 @@ fene.set(1.0, 0.5, 0.1)
 
 integrator = VelocityVerlet(allSet, position, velocity, force)
 
+if integrator.getPosProperty() == position:
+   print 'pos property is okay for integrator'
+else:
+   print 'pos property is DIFFERENT for integrator'
+
 integrator.setTimeStep(0.005)
 
 # Pair(ljint, allPairs).connect(integrator)
@@ -243,19 +256,19 @@ integrator.setTimeStep(0.005)
 
 f1 = ForceComputer(ljint, allPairs)
 f2 = ForceComputer(fene, bondList)
-f1.connect(f1, integrator);
-f2.connect(f2, integrator);
+f1.connect(integrator);
+f2.connect(integrator);
 
 #  Adding a thermostat
 
 thermostat = Langevin(1.0, 0.5)
 
-thermostat.connect(thermostat, integrator)
+thermostat.connect(integrator)
 
 writePSF(particleStorage, NCHAINS*NBEADS, 
          bondList, NCHAINS*(NBEADS-1), "dump.psf")
 
-xyz = XYZWriter(particleStorage, NCHAINS*NBEADS, position, "dump.xyz")
+xyz = XYZWriter(NCHAINS*NBEADS, position, "dump.xyz")
 xyz.start()
 allSet.foreach(xyz)
 

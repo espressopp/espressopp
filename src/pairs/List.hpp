@@ -89,6 +89,10 @@ namespace espresso {
 
       virtual void foreach(ConstComputer& pairComputer) const;
 
+      /** Getter routine for the storage */
+
+      particles::Storage::SelfPtr getStorage() const { return storage; }
+
     private:
       template< class Computer, class >
       void foreach(Computer& pairComputer) const;

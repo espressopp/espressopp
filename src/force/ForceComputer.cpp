@@ -97,7 +97,7 @@ ForceComputer::registerPython() {
   using namespace boost;
   using namespace boost::python;
 
-  class_< ForceComputer >
+  class_< ForceComputer, ForceComputer::SelfPtr >
     ("force_ForceComputer", 
      init< potential::Potential::SelfPtr, pairs::Set::SelfPtr >())
     .def("connect", &ForceComputer::connect)
