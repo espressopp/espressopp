@@ -309,6 +309,33 @@ class Test7Proxy(unittest.TestCase) :
             self.assertEqual(amodule.Local.called, 'x.get')
             self.assertEqual(res, 2)
         
+class Test8SendObject(unittest.TestCase):
+    def test0Basic(self):
+        local2 = pmi.create(amodule.Local2)
+        self.assertEqual(amodule.Local2.called, 'init')
+        local = pmi.create(amodule.Local)
+        self.assertEqual(amodule.Local.called, 'init')
+            
+        pmi.call(local2.f, local)
+        self.assertEqual(amodule.Local2.called, 'f')
+        self.assertEqual(amodule.Local.called, 'f')
+
+    def test1Proxy(self):
+        local2 = pmi.create(amodule.Local2)
+        self.assertEqual(amodule.Local2.called, 'init')
+
+        if pmi.IS_CONTROLLER:
+            proxy = Proxy()
+        else:
+            pmi.create()
+        self.assertEqual(amodule.Local.called, 'init')
+
+        if pmi.IS_CONTROLLER:
+            pmi.call(local2.f, proxy)
+        else:
+            pmi.call()
+        self.assertEqual(amodule.Local2.called, 'f')
+        self.assertEqual(amodule.Local.called, 'f')
        
 unittest.main()
 

@@ -4,18 +4,12 @@
 #
 
 from espresso import pmi
-from espresso import boostmpi as mpi
-from espresso import Real3D, Real3DProperty
-from espresso.decomposition import SingleNode
-import random
-import inspect
 
-def setupLocal():
+if __name__ == 'espresso.pmi':
     from espresso import pmi
     from espresso.particles import PythonComputerLocal
+    import sys
 
-    global ParticleTesterLocal, ParticleWriterLocal
-    
     # tag particles in a small sphere around (0,0,0) as demonstration
     class ParticleTesterLocal(PythonComputerLocal):
         def __init__(self, _position, _tag):
@@ -40,7 +34,7 @@ def setupLocal():
         def prepare(self, storage) :
             self.total = 0
             self.sphere = 0
-        
+
         def __apply__(self, pid) :
             self.total += 1
             if self.tag[pid]:
@@ -50,24 +44,31 @@ def setupLocal():
         def finalize(self) :
             return mpi.world.reduce((self.sphere, self.total), lambda x,y : (x[0]+y[0], x[1]+y[1]), pmi.CONTROLLER)
 
-pmi.exec_(setupLocal)
+else:
 
-decomposer = SingleNode(mpi.size-1)
-pos = decomposer.createProperty("Real3D")
+    pmi.execfile_(__file__)
 
-for count in range(0,100):
-    decomposer.addParticle(count)
-    pos[count] = Real3D(random.random(), random.random(), random.random())
+    from espresso import boostmpi as mpi
+    from espresso import Real3D, Real3DProperty
+    from espresso.decomposition import SingleNode
+    import random
 
-# add property a posteriori
-tag = decomposer.createProperty("Integer")
+    decomposer = SingleNode(mpi.size-1)
+    pos = decomposer.createProperty("Real3D")
 
-#tag particles
-# TBD: To create a PMI object referring to other PMI objects, we need to access
-# the PMI local object. Will there be a general rule for that? Like it is always
-# called "local"?
-decomposer.foreach(pmi.create("ParticleTesterLocal", pos.local, tag.local))
+    for count in range(0,100):
+        decomposer.addParticle(count)
+        pos[count] = Real3D(random.random(), random.random(), random.random())
 
-# and print tagged ones
-count = decomposer.foreach(pmi.create("ParticleWriterLocal", pos.local, tag.local))
-print("printed %d out of %d particles" % count)
+    # add property a posteriori
+    tag = decomposer.createProperty("Integer")
+
+    #tag particles
+    # TBD: To create a PMI object referring to other PMI objects, we need to access
+    # the PMI local object. Will there be a general rule for that? Like it is always
+    # called "local"?
+    decomposer.foreach(pmi.create("ParticleTesterLocal", pos.local, tag.local))
+
+    # and print tagged ones
+    count = decomposer.foreach(pmi.create("ParticleWriterLocal", pos.local, tag.local))
+    print("printed %d out of %d particles" % count)

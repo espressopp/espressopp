@@ -82,7 +82,9 @@ UserError is raised.
 
 * call(), invoke(), reduce() to call functions and methods in parallel
 * create() to create parallel object instances
-* exec_() to execute arbitrary python code in parallel
+* exec_() and import_() to execute arbitrary python code in parallel
+  and to import classes and functions into the global namespace of
+  pmi.
 * finalizeWorkers() to stop and exit all workers
 * registerAtExit() to make sure that finalizeWorkers() is called when
   python exits on the controller
@@ -129,41 +131,68 @@ from espresso import boostmpi as mpi
 ##################################################
 ## EXEC
 ##################################################
-def exec_(arg=None) :
+def exec_(*args) :
     """Controller command that executes arbitrary python code on all workers.
     
-    This allows to import modules and to define classes and functions
-    on all workers.
-    Example:
+    exec_() allows to execute arbitrary Python code on all workers.
+    It can be used to import modules, or to define classes and
+    functions on all workers.
 
+    if arg is a string, the string is the Python code to be
+    executed. If arg is any other object, exec_ will try to get its
+    source code via inspect.getsource() and execute it.
+    Note, that this means that if you apply exec_() to a function,
+    that the function will be defined on the workers, but it will not
+    execute the function itself. Note also, that function or class
+    definitions will affect the top-level pmi namespace and not be
+    part of the module they are defined in.
+
+    Example:
     >>> pmi.exec_('import hello')
     >>> hw = pmi.create('hello.HelloWorld')
+
+    Example2:
+    >>> class HelloWorld(object):
+    >>>   def hello():
+    >>>     print('Hello World!')
+    >>>
+    >>> pmi.exec_(HelloWorld)
+    >>> hw = pmi.create(HelloWorld)
     """
     if __checkController(exec_) :
-        if arg is None :
+        if len(args) == 0:
             raise UserError('pmi.exec_ expects exactly 1 argument on controller!')
-        if type(arg) is str:
-            statement = arg
-        else:
-            statement = inspect.getsource(arg)
-            if isinstance(arg, types.FunctionType):
-                statement += "\n" + arg.__name__ + "()"
             
         # broadcast the statement
-        _broadcast(_EXEC, statement)
+        _broadcast(_EXEC, *args)
         # locally execute the statement
-        return __workerExec_(statement)
+        return __workerExec_(*args)
     else :
         return receive(_EXEC)
 
-def __workerExec_(statement) :
+def __workerExec_(*statements) :
     # executing the statement locally
-    log.info("Executing '%s'", statement)
-    exec statement in globals()
+    for statement in statements:
+        log.info("Executing '%s'", statement)
+        exec statement in globals()
 
 def import_(statement) :
     """import_() is an alias for exec_()."""
     exec_(statement)
+
+##################################################
+## EXECFILE
+##################################################
+def execfile_(file):
+    if __checkController(execfile_):
+        _broadcast(_EXECFILE, file)
+        return __workerExecfile_(file)
+    else:
+        return receive(_EXECFILE)
+
+def __workerExecfile_(file):
+    log.info("Executing file '%s'", file)
+    execfile(file, globals())
 
 ##################################################
 ## CREATE
@@ -779,7 +808,11 @@ def _translateOID(obj) :
         
     If the object is not a PMI object, returns obj untouched.
     """
+    if hasattr(obj, 'pmiobject'):
+        # if it is a proxy, send its pmiobjects oid
+        return obj.pmiobject.__pmioid
     if hasattr(obj, '__pmioid'):
+        # if it is a pmi object, send the oid
         return obj.__pmioid
     else:
         return obj
@@ -860,17 +893,17 @@ def __translateInvokeArg(arg0) :
         function = arg0
     elif isinstance(arg0, (types.FunctionType, types.BuiltinFunctionType)):
         if arg0.__name__ == '<lambda>':
-            raise ValueError("pmi.__invoke can't handle lambda functions")
+            raise ValueError("pmi.__translateInvokeArgs cannot handle lambda functions")
         function = arg0
     elif isinstance(arg0, (types.MethodType, types.BuiltinMethodType)):
         function = __Method(arg0.im_func.__name__, arg0.im_self, arg0.im_class)
     else :
-        raise ValueError("pmi.__invoke expects function as first argument, but got %s" % arg0)
+        raise ValueError("pmi.__translateInvokeArgs expects function as first argument, but got %s" % arg0)
     return function
 
 def __invoke(function, args, kwds):
     if isinstance(function, types.StringTypes):
-        function = eval(function)
+        function = eval(function, globals())
     log.debug("Invoking function: %s",
               __formatCall(function.__name__, args, kwds))
     return function(*args, **kwds)
@@ -886,6 +919,7 @@ def __formatCall(function, args, kwds) :
 
 # map of command names and associated worker functions
 _CMD = [ ('EXEC', __workerExec_),
+         ('EXECFILE', __workerExecfile_),
           ('CREATE', __workerCreate),
           ('INVOKE', __workerInvoke),
           ('CALL', __workerCall),

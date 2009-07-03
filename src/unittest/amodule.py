@@ -63,6 +63,7 @@ class Local(object):
     def h(self):
         Local.called = 'h'
         return 'h'
+
     @property
     def x(self):
         Local.called = 'x.get'
@@ -73,3 +74,11 @@ class Local(object):
         self._x = val
     def __del__(self):
         Local.called = None
+
+class Local2(object):
+    called = None
+    def __init__(seld):
+        Local2.called = 'init'
+    def f(self, local):
+        Local2.called = 'f'
+        local.f()
