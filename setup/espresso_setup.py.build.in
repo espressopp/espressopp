@@ -7,6 +7,6 @@
 #   execfile("@abs_top_builddir@/espresso_setup.py")
 #
 import sys
-sys.path.insert(0, '@abs_top_builddir@")
+sys.path.insert(0, '@abs_top_builddir@')
 
 
