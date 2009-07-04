@@ -24,27 +24,18 @@ class StepThermalA: public particles::Computer {
 
 private:
 
-  PropertyHandle<Real3D> pos;
   PropertyHandle<Real3D> vel;
-  PropertyHandle<Real3D> force;
-
   real timeStep;
-  real timeStepSqr;
-  real c1;
+  real gamma;
 
 public:
 
-  StepThermalA(PropertyHandle<Real3D> _posRef,
-               PropertyHandle<Real3D> _velRef,
-               PropertyHandle<Real3D> _forceRef, real _timeStep):
-               pos(_posRef), vel(_velRef), force(_forceRef),
-               timeStep(_timeStep), timeStepSqr(_timeStep * _timeStep) {
-                 c1 = exp(-2.0 * timeStep);
-  }
+  StepThermalA(PropertyHandle<Real3D> _velRef, real _timeStep, real _gamma):
+               vel(_velRef), timeStep(_timeStep), gamma(_gamma) { }
   
   // m = 1
   virtual void operator()(ParticleHandle pref) {
-    vel[pref] = vel[pref] * c1 * drand48();
+    vel[pref] = vel[pref] - 0.5 * gamma * vel[pref] * timeStep;
   }
 
 };
@@ -58,30 +49,23 @@ class StepThermalB: public particles::Computer {
 
 private:
 
-  // don't need all three handles or dt and dt*dt
-  PropertyHandle<Real3D> pos;
   PropertyHandle<Real3D> vel;
-  PropertyHandle<Real3D> force;
-
   real timeStep;
-  real timeStepSqr;
-  real c1;
+  real gamma;
+  real temperature;
+  real c;
 
 public:
 
-  StepThermalB(PropertyHandle<Real3D> _posRef,
-               PropertyHandle<Real3D> _velRef,
-               PropertyHandle<Real3D> _forceRef,
-               real _timeStep, real _gamma, real _temperature):
-               pos(_posRef), vel(_velRef), force(_forceRef),
-               timeStep(_timeStep), timeStepSqr(_timeStep * _timeStep) {
-                 c1 = sqrt(24.0 * _gamma * _temperature / timeStep);
+  StepThermalB(PropertyHandle<Real3D> _velRef, real _timeStep, real _gamma, real _temperature):
+               vel(_velRef), timeStep(_timeStep), gamma(_gamma), temperature(_temperature) {
+               c = sqrt(24.0 * gamma * temperature / timeStep);
   }
   
   // m = 1
   virtual void operator()(ParticleHandle pref) {
-    vel[pref] = vel[pref] * (1.0 - 0.5 * 1.0 * timeStep);
-      //+ 0.5 * (force[pref] + c1 * (drand48() - 0.5))
+    Real3D rand3(drand48() - 0.5, drand48() - 0.5, drand48() - 0.5);
+    vel[pref] = vel[pref] + 0.5 * (c * rand3 - gamma * vel[pref]) * timeStep;
   }
 
 };
@@ -124,11 +108,10 @@ void Langevin::thermalizeA(const integrator::VelocityVerlet& integrator) {
   LOG4ESPP_DEBUG(theLogger, "Langevin thermalizeA at integration step = " 
                              << integrator.getIntegrationStep());
 
-  PropertyHandle<Real3D> pos   = *integrator.getPosProperty();
-  PropertyHandle<Real3D> vel   = *integrator.getVelProperty();
-  PropertyHandle<Real3D> force = *integrator.getForceProperty();
+  PropertyHandle<Real3D> vel = *integrator.getVelProperty();
+  real timeStep = integrator.getTimeStep();
 
-  StepThermalA stepThermalA(pos, vel, force, 0.01);
+  StepThermalA stepThermalA(vel, timeStep, gamma);
 
   // apply stepThermalA to my particle set only if available
 
@@ -147,13 +130,11 @@ void Langevin::thermalizeB(const integrator::VelocityVerlet& integrator) {
   LOG4ESPP_DEBUG(theLogger, "Langevin thermalizeB at integration step = " 
                              << integrator.getIntegrationStep());
 
-  PropertyHandle<Real3D> pos   = *integrator.getPosProperty();
-  PropertyHandle<Real3D> vel   = *integrator.getVelProperty();
-  PropertyHandle<Real3D> force = *integrator.getForceProperty();
-
+  PropertyHandle<Real3D> vel = *integrator.getVelProperty();
+  real timeStep = integrator.getTimeStep();
   real temperature = this->getTemperature();
 
-  StepThermalB stepThermalB(pos, vel, force, 0.01, gamma, temperature);
+  StepThermalB stepThermalB(vel, timeStep, gamma, temperature);
 
   if (particles) {
      particles->foreach(stepThermalB);

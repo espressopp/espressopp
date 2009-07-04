@@ -9,6 +9,7 @@
 #include "types.hpp"
 #include "Thermostat.hpp"
 #include "integrator/VelocityVerlet.hpp"
+#include "../Real3D.hpp"
 
 namespace espresso {
   namespace thermostat {

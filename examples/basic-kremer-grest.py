@@ -235,7 +235,7 @@ allPairs = All2(pbc, allSet, position)
 ljint = LennardJones()
 
 fene = FENE()
-fene.set(1.0, 0.5, 0.1)
+fene.set(0.0, 30.0, 1.5)
 # fene = FENE(r0 = 0.5, K=1.0, rMax = 0.1)
 
 # allPairs.foreach(forcecompute)
@@ -249,7 +249,7 @@ if integrator.getPosProperty() == position:
 else:
    print 'pos property is DIFFERENT for integrator'
 
-integrator.setTimeStep(0.005)
+integrator.setTimeStep(0.01)
 
 # Pair(ljint, allPairs).connect(integrator)
 # Pair(fene, bondList).connect(integrator)
