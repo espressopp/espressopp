@@ -4,6 +4,7 @@
 #
 
 from espresso import pmi
+from espresso import boostmpi as mpi
 
 if __name__ == 'espresso.pmi':
     from espresso import pmi
@@ -19,10 +20,7 @@ if __name__ == 'espresso.pmi':
 
         def __apply__(self, pid):
             pos = self.position[pid]
-            if pos*pos < 0.5:
-                self.tag[pid] = 1
-            else:
-                self.tag[pid] = 0
+            self.tag[pid] = pos*pos < 0.5
 
     # write out tagged particles
     class ParticleWriterLocal(PythonComputerLocal):
@@ -31,7 +29,7 @@ if __name__ == 'espresso.pmi':
             self.property = _property
             self.tag = _tag
 
-        def prepare(self, storage) :
+        def prepare(self):
             self.total = 0
             self.sphere = 0
 
@@ -41,14 +39,17 @@ if __name__ == 'espresso.pmi':
                 print("%d %d %s" % (mpi.rank, pid, self.property[pid]))
                 self.sphere +=1
 
-        def finalize(self) :
-            return mpi.world.reduce((self.sphere, self.total), lambda x,y : (x[0]+y[0], x[1]+y[1]), pmi.CONTROLLER)
+        def _getCount(self):
+            return self.sphere, self.total
+
+        def getCount(self):
+            return pmi.reduce("lambda x,y: (x[0]+y[0], x[1]+y[1])", 
+                              self._getCount)
 
 else:
 
     pmi.execfile_(__file__)
 
-    from espresso import boostmpi as mpi
     from espresso import Real3D, Real3DProperty
     from espresso.decomposition import SingleNode
     import random
@@ -64,11 +65,11 @@ else:
     tag = decomposer.createProperty("Integer")
 
     #tag particles
-    # TBD: To create a PMI object referring to other PMI objects, we need to access
-    # the PMI local object. Will there be a general rule for that? Like it is always
-    # called "local"?
-    decomposer.foreach(pmi.create("ParticleTesterLocal", pos.local, tag.local))
+    decomposer.foreach(pmi.create("ParticleTesterLocal", pos, tag))
 
     # and print tagged ones
-    count = decomposer.foreach(pmi.create("ParticleWriterLocal", pos.local, tag.local))
+    writer=pmi.create("ParticleWriterLocal", pos, tag)
+    decomposer.foreach(writer)
+    count=writer.getCount()
+    
     print("printed %d out of %d particles" % count)
