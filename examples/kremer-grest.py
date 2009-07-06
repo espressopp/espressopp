@@ -14,7 +14,7 @@ decomposer = decomposition.SingleNode()
 positionProperty = decomposer.createProperty('Real3D')
 velocityProperty = decomposer.createProperty('Real3D')
 forceProperty = decomposer.createProperty('Real3D')
-allParticles = particles.All(decomposer)
+allParticles = decomposer.getAll()
 
 # set up the integrator
 integrator = integrator.VelocityVerlet(set=allParticles,

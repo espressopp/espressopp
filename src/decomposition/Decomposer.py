@@ -1,6 +1,6 @@
 from espresso import esutil
 from espresso import pmi
-from espresso import Property
+from espresso import *
 import types
 
 from _espresso import particles_Storage as _Storage
@@ -15,8 +15,8 @@ class DecomposerLocal(object):
 
         self.storage = storage
 
-    def foreach(self, computer) :
-        self.storage.foreach(computer)
+    def getAll(self):
+        return self.storage.getAll()
 
 if pmi.IS_CONTROLLER :
 

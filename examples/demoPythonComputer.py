@@ -63,13 +63,14 @@ else:
 
     # add property a posteriori
     tag = decomposer.createProperty("Integer")
+    all = decomposer.getAll()
 
     #tag particles
-    decomposer.foreach(pmi.create("ParticleTesterLocal", pos, tag))
+    all.foreach(pmi.create("ParticleTesterLocal", pos, tag))
 
     # and print tagged ones
     writer=pmi.create("ParticleWriterLocal", pos, tag)
-    decomposer.foreach(writer)
+    all.foreach(writer)
     count=writer.getCount()
     
     print("printed %d out of %d particles" % count)

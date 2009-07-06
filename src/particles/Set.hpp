@@ -4,7 +4,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include "types.hpp"
-#include "particles/Storage.hpp"
+#include "Storage.hpp"
+#include "Computer.hpp"
 
 namespace espresso {
   namespace particles {
@@ -24,7 +25,8 @@ namespace espresso {
           @param _store pointer to the Storage the
           particles in this set come from
       */
-      Set(Storage::SelfPtr _store = Storage::SelfPtr()) : theStorage(_store) {}
+      Set(Storage::SelfPtr _store = Storage::SelfPtr()) 
+	: theStorage(_store) {}
 
       virtual ~Set() {}
 

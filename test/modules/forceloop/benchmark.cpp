@@ -83,7 +83,7 @@ void TestEspresso::addParticle(const Real3D &pos)
 
 void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {
   bc::PeriodicBC::SelfPtr pbc(new bc::PeriodicBC(size));
-  particles::All::SelfPtr allset(new particles::All(storage));
+  particles::All::SelfPtr allset = storage->getAll();
   pairs::All allpairs(pbc, allset, position);
   potential::LennardJones ljint;
   ljint.set(epsilon, sigma, cutoff);
@@ -105,7 +105,7 @@ public:
 
 void TestEspresso::runEmptyPairLoop() {
   bc::PeriodicBC::SelfPtr pbc(new bc::PeriodicBC(size));
-  particles::All::SelfPtr allset(new particles::All(storage));
+  particles::All::SelfPtr allset = storage->getAll();
   pairs::All allpairs(pbc, allset, position);
   EmptyPairComputer ljc;
   allpairs.foreach(ljc);
@@ -129,7 +129,7 @@ public:
 
 real TestEspresso::calculateMinDist() {
   bc::PeriodicBC::SelfPtr pbc(new bc::PeriodicBC(size));
-  particles::All::SelfPtr allset(new particles::All(storage));
+  particles::All::SelfPtr allset = storage->getAll();
   pairs::All allpairs(pbc, allset, position);
   MinDistComputer mincomp;
   allpairs.foreach(mincomp);
@@ -152,10 +152,10 @@ public:
 };
 
 real TestEspresso::calculateAverage() {
-    particles::All allset(storage);
-    AverageComputer avgcompute(*force);
-    allset.foreach(avgcompute);
-    return avgcompute.average;
+  particles::All::SelfPtr allset = storage->getAll();
+  AverageComputer avgcompute(*force);
+  allset->foreach(avgcompute);
+  return avgcompute.average;
 }
 
 class EmptyComputer: public particles::ConstComputer {
@@ -167,9 +167,9 @@ public:
 };
 
 void TestEspresso::runEmptyLoop() {
-  particles::All allset(storage);
+  particles::All::SelfPtr allset = storage->getAll();
   EmptyComputer avgcompute;
-  allset.foreach(avgcompute);
+  allset->foreach(avgcompute);
 }
 
 /***********************************************************************************

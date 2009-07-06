@@ -11,6 +11,7 @@ namespace espresso {
     public:
       ParticleHandle() {}
       ParticleHandle(const esutil::TupleVector::pointer &_ptr): ptr(_ptr) {}
+      ParticleHandle(const esutil::TupleVector::reference &_ref): ptr(&_ref) {}
 
       // for most uses, we actually need the reference
       operator esutil::TupleVector::reference() const { return *ptr; }
@@ -38,6 +39,10 @@ namespace espresso {
         : ptr(_ptr) {}
       ConstParticleHandle(const esutil::TupleVector::pointer &_ptr)
         : ptr(_ptr) {}
+      ConstParticleHandle(const esutil::TupleVector::const_reference &_ref)
+	: ptr(&_ref) {}
+      ConstParticleHandle(const esutil::TupleVector::reference &_ref)
+	: ptr(&_ref) {}
       
       // for most uses, we actually need the reference
       operator esutil::TupleVector::const_reference() const { return *ptr; }

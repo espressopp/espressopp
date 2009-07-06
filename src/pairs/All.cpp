@@ -6,7 +6,7 @@
 using namespace espresso;
 using namespace espresso::bc;
 using namespace espresso::pairs;
-using namespace espresso::particles;
+//using namespace espresso::particles;
 
 using namespace boost;
 
@@ -28,8 +28,8 @@ private:
   public:
     const BC& bc;
     
-    const ConstPropertyHandle<ParticleId> id;
-    const ConstPropertyHandle<Real3D> pos;
+    const particles::ConstPropertyHandle<ParticleId> id;
+    const particles::ConstPropertyHandle<Real3D> pos;
 
     const Reference pref1;
     const Real3D pos1;
@@ -43,7 +43,7 @@ private:
 	       ) :
       bc(*(all->getBC().get())), 
       id(all->getSet()->getStorage()->getIdPropertyHandle()),
-      pos(PropertyHandle<Real3D>(*(all->getCoordinateProperty()))),
+      pos(particles::PropertyHandle<Real3D>(*(all->getCoordinateProperty()))),
       pref1(pref),
       pos1(pos[pref1]),
       id1(id[pref1]),

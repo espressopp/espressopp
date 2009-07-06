@@ -54,6 +54,7 @@ void forceloop() {
 
   Storage::SelfPtr particleStorage = 
     Storage::SelfPtr(new Storage());
+  particles::All::SelfPtr allSet = particleStorage->getAll();
 
   Real3DProperty::SelfPtr position = 
     Real3DProperty::SelfPtr(new Real3DProperty(particleStorage));
@@ -89,17 +90,12 @@ void forceloop() {
 
   // call pWriter(id) for each particle reference ref of particle storage
 
-  particleStorage->foreach(pWriter);
+  allSet->foreach(pWriter);
 
   // define periodic boundary conditions
 
   PeriodicBC::SelfPtr pbc 
     = PeriodicBC::SelfPtr(new PeriodicBC(SIZE));
-
-  // define a set of all particles
-
-  particles::All::SelfPtr allSet  = 
-    particles::All::SelfPtr(new particles::All(particleStorage));
 
   // define allpairs with (x, y) for all x, y in allSet
 
@@ -172,7 +168,7 @@ void forceloop() {
 
   // check to see that particles have new positions
   */
-  particleStorage->foreach(pWriter);
+  allSet->foreach(pWriter);
 }
 
 int main() 

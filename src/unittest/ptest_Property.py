@@ -2,6 +2,7 @@ import unittest
 from espresso import boostmpi as mpi
 from espresso import pmi
 from espresso import Real3D
+from espresso import decomposition
 
 if pmi.IS_CONTROLLER:
     from espresso import RealProperty
@@ -10,7 +11,7 @@ if pmi.IS_CONTROLLER:
 
 from _espresso import particles_Storage as _Storage
 
-class MockDecomposerLocal(object) :
+class MockDecomposerLocal(decomposition.DecomposerLocal) :
     def __init__(self) :
         self.storage = _Storage()
         # create local particle, one per node
@@ -21,7 +22,7 @@ class MockDecomposerLocal(object) :
 class MockDecomposer(object) :
     def __init__(self) :
         pmi.exec_('import ptest_Property')
-        self.local = pmi.create('ptest_Property.MockDecomposerLocal')
+        self.pmiobject = pmi.create('ptest_Property.MockDecomposerLocal')
         # not existing particle for failure tests
         self.special = mpi.size + 1
 

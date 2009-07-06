@@ -19,7 +19,7 @@ Set::registerPython() {
   // be careful: boost::noncopyable must be used for abstract classes with pure routines
   // no_init must be used as the abstract class Set has no constructor
 
-  class_<Set, boost::noncopyable >("particles_Set", no_init)
+  class_< Set, boost::noncopyable >("particles_Set", no_init)
     .def("foreach", foreach_nonconst)
     ;
 }

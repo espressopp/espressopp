@@ -4,7 +4,7 @@
 #include <boost/python.hpp>
 #include <algorithm>
 #include <stdexcept>
-#include "Computer.hpp"
+#include "All.hpp"
 
 using namespace espresso;
 using namespace espresso::particles;
@@ -23,11 +23,10 @@ public:
 
 Storage::Storage() {
   particleIdProperty = particles.addProperty<size_t>();
+  allSet = All::SelfPtr();
 }
 
-#include <iostream>
-Storage::~Storage() {
-}
+Storage::~Storage() {}
 
 void Storage::addParticle(ParticleId id) {
   esutil::TupleVector::iterator it = particles.insert(particles.end());
@@ -50,24 +49,17 @@ ParticleHandle Storage::getParticleHandle(ParticleId id) {
   return (pos != particles.end()) ? ParticleHandle(pos) : ParticleHandle();
 }
 
-void Storage::foreach(Computer& compute) {
-  compute.prepare(this);
-  BOOST_FOREACH(esutil::TupleVector::reference particle, particles) {
-    compute(ParticleHandle(&particle));
-  }
-  compute.finalize();
-}
-
-void Storage::foreach(ConstComputer& compute) const {
-  compute.prepare(this);
-  BOOST_FOREACH(esutil::TupleVector::const_reference particle, particles) {
-    compute(ConstParticleHandle(&particle));
-  }
-  compute.finalize();
-}
-
 void Storage::deleteProperty(PropertyId id) {
   particles.eraseProperty(id);
+}
+
+AllSelfPtr Storage::getAll() {
+  // late binding is required here, as shared_from_this can not be
+  // used in the constructor, as it requires a shared_ptr to be
+  // available.
+  if (!allSet) 
+    allSet = All::SelfPtr(new All(shared_from_this()));
+  return allSet;
 }
 
 //////////////////////////////////////////////////
@@ -77,11 +69,10 @@ void Storage::deleteProperty(PropertyId id) {
 void Storage::registerPython() {
   using namespace boost::python;
 
-  void (Storage::*foreach_nonconst)(Computer& computer) = &Storage::foreach;
-
-  class_<Storage, boost::noncopyable>("particles_Storage", init<>())
+  class_< Storage, boost::noncopyable >("particles_Storage", 
+					init<>())
     .def("addParticle", &Storage::addParticle)
     .def("deleteParticle", &Storage::deleteParticle)
-    .def("foreach", foreach_nonconst);
+    ;
 }
 

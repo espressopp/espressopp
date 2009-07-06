@@ -12,7 +12,7 @@ class PythonComputer
   
 public: // parts invisible to Python
   
-  virtual void prepare(const Storage* storage) {
+  virtual void prepare(Storage::SelfPtr storage) {
     // get the particleId property
     particleId = storage->getIdPropertyHandle();
     

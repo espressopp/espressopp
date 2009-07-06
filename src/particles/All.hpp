@@ -7,10 +7,12 @@
 
 namespace espresso {
   namespace particles {
-    /** MOCK particle set. Provides a view onto all particles
-	from a ParticleStorage
+    /** Provides a view onto all particles of a Storage. The only way
+	to get an instance of All is to use Storage::getAll().
     */
     class All: public Set {
+      friend class Storage;
+
     public:
       typedef boost::shared_ptr< All > SelfPtr;
       
@@ -20,9 +22,6 @@ namespace espresso {
 	  particles in this set come from
       */
 
-      All(Storage::SelfPtr _store = Storage::SelfPtr());
-
-      virtual ~All();
 
       /** for a particle of the ParticleStorage of this class,
 	  check whether it belongs to this set
@@ -36,6 +35,12 @@ namespace espresso {
 
       /// make this class available at Python
       static void registerPython();
+
+      virtual ~All();
+    private:
+      /** Create an All set. Only Storage can create an All
+	  object. */
+      All(Storage::SelfPtr _store);
     };
 
   }

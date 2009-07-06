@@ -12,7 +12,7 @@ namespace espresso {
     class ParticleWriter : public ConstComputer {
 
     private:
-      ConstPropertyHandle<Real3D>
+      ConstPropertyHandle< Real3D >
       f;    //<! reference to the force vector of all particles.
       ConstPropertyHandle<Real3D>
       pos;  //<! reference to the position vector of all particles.

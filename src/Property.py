@@ -1,5 +1,6 @@
 from espresso import pmi
 from espresso import boostmpi as mpi
+from espresso import decomposition
 
 class _PropertyLocal(object) :
     """
@@ -7,14 +8,19 @@ class _PropertyLocal(object) :
     Property interface, while the xxxPropertyLocal only glues this
     to the typified C++ Property.
     """
-    def __init__(self, decomposerlocal) :
-        self.decomposerlocal = decomposerlocal
+    def __init__(self, cxxobject) :
+        self.cxxobject = cxxobject
 
-    def getItem(self, node, particle) :
-        
+    def __getitem__(self, item):
+        return cxxobject[item]
+
+    def __setitem__(self, item, val):
+        cxxobject[item] = val
+
+    def getItem(self, node, particle):
         if node == mpi.rank :
             try :
-                value = self[particle]
+                value = self.cxxobject[particle]
             except IndexError :
                 raise RuntimeWarning("decomposer put the particle %d here on node %d, but cannot find its properties" % (particle, mpi.rank))
 
@@ -27,10 +33,9 @@ class _PropertyLocal(object) :
                 return mpi.world.recv(node, 0)
 
     def setItem(self, node, particle, value) :
-        
         if node == mpi.rank :
             try :
-                self[particle] = value
+                self.cxxobject[particle] = value
             except IndexError :
                 raise RuntimeWarning("decomposer claims particle %d is here on node %d, but set its properties" % (particle, mpi.rank))
 
@@ -45,7 +50,6 @@ if pmi.IS_CONTROLLER:
         """
         def __init__(self, decomposer) :
             self.decomposer = decomposer
-
             pmi.exec_('import espresso.Property')
 
         def __getitem__(self, particle) :
@@ -62,10 +66,12 @@ if pmi.IS_CONTROLLER:
 
 from _espresso import RealProperty as _RealProperty
 
-class RealPropertyLocal(_RealProperty, _PropertyLocal) :
-    def __init__(self, decomposerlocal) :
-        _PropertyLocal.__init__(self, decomposerlocal)
-        _RealProperty.__init__(self, decomposerlocal.storage)
+class RealPropertyLocal(_PropertyLocal) :
+    def __init__(self, decomposerlocal):
+        if isinstance(decomposerlocal, decomposition.DecomposerLocal):
+            cxxobject = _RealProperty(decomposerlocal.storage)
+        else: raise TypeError('RealPropertyLocal requires a DecomposerLocal or _RealProperty')
+        _PropertyLocal.__init__(self, cxxobject)
 ####
 
 if pmi.IS_CONTROLLER:
@@ -82,10 +88,13 @@ if pmi.IS_CONTROLLER:
 
 from _espresso import IntegerProperty as _IntegerProperty
 
-class IntegerPropertyLocal(_IntegerProperty, _PropertyLocal) :
-    def __init__(self, decomposerlocal) :
-        _PropertyLocal.__init__(self, decomposerlocal)
-        _IntegerProperty.__init__(self, decomposerlocal.storage)
+class IntegerPropertyLocal(_PropertyLocal) :
+    def __init__(self, decomposerlocal):
+        if isinstance(decomposerlocal, decomposition.DecomposerLocal):
+            cxxobject = _IntegerProperty(decomposerlocal.storage)
+        else: raise TypeError('IntegerPropertyLocal requires a DecomposerLocal or _RealProperty')
+        _PropertyLocal.__init__(self, cxxobject)
+
 ####
 
 if pmi.IS_CONTROLLER:
@@ -102,10 +111,13 @@ if pmi.IS_CONTROLLER:
 
 from _espresso import Real3DProperty as _Real3DProperty
 
-class Real3DPropertyLocal(_Real3DProperty, _PropertyLocal) :
-    def __init__(self, decomposerlocal) :
-        _PropertyLocal.__init__(self, decomposerlocal)
-        _Real3DProperty.__init__(self, decomposerlocal.storage)
+class Real3DPropertyLocal(_PropertyLocal) :
+    def __init__(self, decomposerlocal):
+        if isinstance(decomposerlocal, decomposition.DecomposerLocal):
+            cxxobject = _Real3DProperty(decomposerlocal.storage)
+        else: raise TypeError('Real3DPropertyLocal requires a DecomposerLocal or _RealProperty')
+        _PropertyLocal.__init__(self, cxxobject)
+
 ####
 
 if pmi.IS_CONTROLLER:
