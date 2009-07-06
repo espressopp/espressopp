@@ -20,7 +20,7 @@ export PYTHONPATH
 echo "PYTHONPATH=$PYTHONPATH"
 
 # Add the ES++ specific path
-ESPP_PATH=$abs_top_builddir/bin:$abs_top_builddir/src
+ESPP_PATH=$abs_top_builddir/bin
 if test "x$PATH" = "x"; then
     PATH=$ESPP_PATH
 else

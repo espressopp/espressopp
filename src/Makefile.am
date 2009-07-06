@@ -57,6 +57,13 @@ pypresso_LDADD = \
 	$(PYTHON_LIBS) \
 	$(MPI_LIBS)
 
+# check whether a link to pypresso in the bin directory exists
+all-local:
+	if test -x $(top_builddir)/src/pypresso && \
+	    test ! -L $(top_builddir)/bin/pypresso; then \
+	  $(LN_S) $(top_builddir)/src/pypresso $(top_builddir)/bin/; \
+	fi
+
 ##############################
 ## PYTHON
 ##############################
