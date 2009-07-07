@@ -1,10 +1,10 @@
 #include "Storage.hpp"
+#include "python.hpp"
+#include "All.hpp"
 
 #include <boost/foreach.hpp>
-#include <boost/python.hpp>
 #include <algorithm>
 #include <stdexcept>
-#include "All.hpp"
 
 using namespace espresso;
 using namespace espresso::particles;
@@ -67,10 +67,9 @@ AllSelfPtr Storage::getAll() {
 //////////////////////////////////////////////////
 
 void Storage::registerPython() {
-  using namespace boost::python;
+  using namespace espresso::python;
 
-  class_< Storage, boost::noncopyable >("particles_Storage", 
-					init<>())
+  class_< Storage, boost::noncopyable >("particles_Storage")
     .def("addParticle", &Storage::addParticle)
     .def("deleteParticle", &Storage::deleteParticle)
     ;

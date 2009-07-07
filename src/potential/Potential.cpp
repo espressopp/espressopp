@@ -1,17 +1,16 @@
-#include <boost/python.hpp>
+#include "python.hpp"
 
-#include "potential/Potential.hpp"
+#include "Potential.hpp"
 
 using namespace espresso;
 using namespace espresso::potential;
-using namespace boost::python;
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
 //////////////////////////////////////////////////
 class PythonPotential 
   : public Potential, 
-    public wrapper<Potential> {
+    public espresso::python::wrapper<Potential> {
   virtual real getCutoffSqr() const {
     return get_override("getCutoffSqr")();
   }
@@ -27,6 +26,8 @@ class PythonPotential
 
 void
 Potential::registerPython() {
+  using namespace espresso::python;
+
   class_< PythonPotential, boost::noncopyable >
     ("potential_Potential", no_init)
     .def("getCutoffSqr", pure_virtual(&Potential::getCutoffSqr))

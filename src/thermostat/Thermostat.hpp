@@ -16,7 +16,7 @@ namespace espresso {
 
     class Thermostat {
     public:
-      typedef boost::shared_ptr< Thermostat > SelfPtr;
+      typedef shared_ptr< Thermostat > SelfPtr;
 
     protected:
       

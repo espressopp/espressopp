@@ -1,9 +1,7 @@
 #ifndef _PARTICLES_ALL_HPP
 #define _PARTICLES_ALL_HPP
 
-#include <boost/shared_ptr.hpp>
-
-#include "particles/Set.hpp"
+#include "Set.hpp"
 
 namespace espresso {
   namespace particles {
@@ -14,7 +12,7 @@ namespace espresso {
       friend class Storage;
 
     public:
-      typedef boost::shared_ptr< All > SelfPtr;
+      typedef shared_ptr< All > SelfPtr;
       
       /** constructor
 	    

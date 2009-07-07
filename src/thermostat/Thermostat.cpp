@@ -1,4 +1,4 @@
-#include <boost/python.hpp>
+#include "python.hpp"
 #include "thermostat/Thermostat.hpp"
 
 using namespace espresso::thermostat;
@@ -23,10 +23,10 @@ void Thermostat::setTemperature(real _temperature)
 
 void
 Thermostat::registerPython() {
+  using namespace espresso::python;
 
-  using namespace boost::python;
-
-  class_<Thermostat, boost::noncopyable>("thermostat_Thermostat", no_init)
+  class_< Thermostat, boost::noncopyable >
+    ("thermostat_Thermostat", no_init)
   .def("setTemperature", &Thermostat::setTemperature)
   .def("getTemperature", &Thermostat::getTemperature)
   ;

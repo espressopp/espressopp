@@ -1,8 +1,7 @@
 #include "pairs/PythonComputer.hpp"
 #include "Particle.hpp"
-#include <boost/python.hpp>
+#include "python.hpp"
 
-using namespace boost::python;
 using namespace espresso::pairs;
 using namespace espresso::particles;
 
@@ -16,7 +15,8 @@ void PythonComputer::operator()(const Real3D &dist,
 }
 
 void PythonComputer::registerPython() {
-  class_<PythonComputer, bases<Computer> >
-    ("pairs_PythonComputer",
-     init< pairs::Set::SelfPtr > ());
+  using namespace espresso::python;
+  
+  class_< PythonComputer, bases< Computer > >
+    ("pairs_PythonComputer", init< pairs::Set::SelfPtr > ());
 }

@@ -15,7 +15,7 @@ namespace espresso {
 
     class List : public Set {
     public:
-      typedef boost::shared_ptr< List > SelfPtr;
+      typedef shared_ptr< List > SelfPtr;
 
     private:
       particles::Storage::SelfPtr storage; 

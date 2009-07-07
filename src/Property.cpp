@@ -1,12 +1,11 @@
-#include <boost/python.hpp>
+#include "python.hpp"
 #include "Property.hpp"
 #include "Particle.hpp"
 
-using namespace espresso::particles;
-
 void espresso::registerPythonProperties()
 {
-  using namespace boost::python;
+  using namespace espresso::particles;
+  using namespace espresso::python;
 
   class_< Real3DProperty, Real3DProperty::SelfPtr >
     ("Real3DProperty", init< Storage::SelfPtr >())

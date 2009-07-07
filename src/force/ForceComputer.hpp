@@ -1,7 +1,6 @@
 #ifndef _FORCE_FORCECOMPUTER_HPP
 #define _FORCE_FORCECOMPUTER_HPP
 
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/signals2.hpp>
 
 #include "types.hpp"
@@ -20,10 +19,10 @@ namespace espresso {
     */
 
     class ForceComputer 
-      : public boost::enable_shared_from_this< ForceComputer >
+      : public enable_shared_from_this< ForceComputer >
     {
     public:
-      typedef boost::shared_ptr< ForceComputer > SelfPtr;
+      typedef shared_ptr< ForceComputer > SelfPtr;
 
     private:
 

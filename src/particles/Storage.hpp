@@ -1,8 +1,6 @@
 #ifndef _PARTICLES_STORAGE_HPP
 #define _PARTICLES_STORAGE_HPP
 
-#include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include "types.hpp"
 #include "esutil/TupleVector.hpp"
 #include "Particle.hpp"
@@ -17,20 +15,21 @@ namespace espresso {
   namespace particles {
     // forward declaration
     class All;
-    typedef boost::shared_ptr< All > AllSelfPtr;
+    typedef shared_ptr< All > AllSelfPtr;
     /**
        MOCK implementation of particlestorage.
        Currently only provides a subset of the expected interface,
        and without guarantee :-).
     */
     class Storage 
-      : public boost::enable_shared_from_this< Storage >
+      : public enable_shared_from_this< Storage >,
+	boost::noncopyable
     {
       // All should be able to loop over all particles
       friend class All;
 
     public:
-      typedef boost::shared_ptr< Storage > SelfPtr;
+      typedef shared_ptr< Storage > SelfPtr;
 
       Storage();
 
@@ -147,9 +146,6 @@ namespace espresso {
 
       /// ID of the particle ID property
       PropertyId particleIdProperty;
-
-      /// private and does not exist, do not try to use
-      Storage(const Storage &);
     };
 
 

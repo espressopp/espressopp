@@ -1,5 +1,5 @@
 #include "All.hpp"
-#include <boost/python.hpp>
+#include "python.hpp"
 
 using namespace espresso::particles;
 
@@ -34,7 +34,7 @@ void All::foreach(ConstComputer& computer) const {
 
 void All::registerPython() {
 
-  using namespace boost::python;
+  using namespace espresso::python;
 
   // Please note that foreach of All will be available via foreach of Set
 

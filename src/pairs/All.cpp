@@ -120,7 +120,7 @@ void All::foreach(pairs::ConstComputer& pairComputer) const {
 void 
 All::registerPython() {
   using namespace boost;
-  using namespace boost::python;
+  using namespace espresso::python;
 
   class_< All, bases< Set > >
     ("pairs_All", 

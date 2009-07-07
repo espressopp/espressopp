@@ -13,7 +13,7 @@ namespace espresso {
 
     class MDIntegrator {
     public:
-      typedef boost::shared_ptr< MDIntegrator > SelfPtr;
+      typedef shared_ptr< MDIntegrator > SelfPtr;
 
     private:
       

@@ -1,8 +1,6 @@
 #ifndef _PARTICLES_SET_HPP
 #define _PARTICLES_SET_HPP
 
-#include <boost/shared_ptr.hpp>
-
 #include "types.hpp"
 #include "Storage.hpp"
 #include "Computer.hpp"
@@ -18,7 +16,7 @@ namespace espresso {
       Storage::SelfPtr theStorage;
 
     public:
-      typedef boost::shared_ptr<Set> SelfPtr;
+      typedef shared_ptr<Set> SelfPtr;
 
       /** base constructor
           

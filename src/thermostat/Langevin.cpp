@@ -194,13 +194,13 @@ Langevin::~Langevin() {
 
 void
 Langevin::registerPython() {
-  using namespace boost::python;
+  using namespace espresso::python;
 
-    class_<Langevin, Langevin::SelfPtr, bases<Thermostat> >
-      ("thermostat_Langevin", init<real, real>())
-      .def("setGamma", &Langevin::setGamma)
-      .def("getGamma", &Langevin::getGamma)    
-      .def("connect", &Langevin::connect)    
-      .def("disconnect", &Langevin::disconnect)    
-      ;
+  class_< Langevin, bases<Thermostat> >
+    ("thermostat_Langevin", init<real, real>())
+    .def("setGamma", &Langevin::setGamma)
+    .def("getGamma", &Langevin::getGamma)    
+    .def("connect", &Langevin::connect)    
+    .def("disconnect", &Langevin::disconnect)    
+    ;
 }

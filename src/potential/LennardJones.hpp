@@ -16,7 +16,7 @@ namespace espresso {
     */
     class LennardJones: public CentralPotential {
     public:
-      typedef boost::shared_ptr< LennardJones > SelfPtr;
+      typedef shared_ptr< LennardJones > SelfPtr;
 
       class BasicComputer {
         friend class LennardJones;

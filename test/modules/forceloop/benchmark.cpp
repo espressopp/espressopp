@@ -30,6 +30,7 @@
 
 using namespace espresso;
 using namespace espresso::particles;
+using namespace boost;
 
 /// number of particles in each dimension
 const int N = 20;
@@ -44,16 +45,16 @@ static inline real dround(real x) { return floor(x + 0.5); }
 
 class TestEspresso {
 public:
-  boost::shared_ptr<Storage> storage;
-  boost::shared_ptr<Property<Real3D> > position, force;
+  Storage::SelfPtr storage;
+  Property< Real3D >::SelfPtr position, force;
   size_t npart;
-
-    TestEspresso(size_t nparticles):
-      storage(new Storage()),
-      position(new Property<Real3D>(storage)),
-      force(new Property<Real3D>(storage)),
-      npart(nparticles) {
-    }
+  
+  TestEspresso(size_t nparticles)
+    : npart(nparticles) {
+    storage = make_shared< Storage >();
+    position = make_shared< Property< Real3D > >(storage);
+    force = make_shared< Property< Real3D > >(storage);
+  }
 
     void addParticle(const Real3D &pos);
 
@@ -82,7 +83,8 @@ void TestEspresso::addParticle(const Real3D &pos)
 }
 
 void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {
-  bc::PeriodicBC::SelfPtr pbc(new bc::PeriodicBC(size));
+  bc::PeriodicBC::SelfPtr pbc 
+    = make_shared< bc::PeriodicBC >(size);
   particles::All::SelfPtr allset = storage->getAll();
   pairs::All allpairs(pbc, allset, position);
   potential::LennardJones ljint;
@@ -104,7 +106,8 @@ public:
 };
 
 void TestEspresso::runEmptyPairLoop() {
-  bc::PeriodicBC::SelfPtr pbc(new bc::PeriodicBC(size));
+  bc::PeriodicBC::SelfPtr pbc 
+    = make_shared< bc::PeriodicBC >(size);
   particles::All::SelfPtr allset = storage->getAll();
   pairs::All allpairs(pbc, allset, position);
   EmptyPairComputer ljc;
@@ -128,7 +131,8 @@ public:
 };
 
 real TestEspresso::calculateMinDist() {
-  bc::PeriodicBC::SelfPtr pbc(new bc::PeriodicBC(size));
+  bc::PeriodicBC::SelfPtr pbc
+    = make_shared< bc::PeriodicBC >(size);
   particles::All::SelfPtr allset = storage->getAll();
   pairs::All allpairs(pbc, allset, position);
   MinDistComputer mincomp;

@@ -21,7 +21,7 @@ namespace espresso {
        Real3DProperty::SelfPtr coordinates;
 
      public:
-       typedef boost::shared_ptr< All > SelfPtr;
+       typedef shared_ptr< All > SelfPtr;
 
        static void registerPython();
 

@@ -95,7 +95,7 @@ ForceComputer::~ForceComputer()
 void
 ForceComputer::registerPython() {
   using namespace boost;
-  using namespace boost::python;
+  using namespace espresso::python;
 
   class_< ForceComputer, ForceComputer::SelfPtr >
     ("force_ForceComputer", 

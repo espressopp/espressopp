@@ -1,4 +1,4 @@
-#include <boost/python.hpp>
+#include "python.hpp"
 
 #include "BC.hpp"
 
@@ -17,7 +17,7 @@ BC::fold(const Real3D &pos) const {
 //////////////////////////////////////////////////
 void
 BC::registerPython() {
-  using namespace boost::python;
+  using namespace espresso::python;
 
   // also register the abstract class BC to make virtual functions available
   // be careful: boost::noncopyable must be used for abstract classes with pure routines

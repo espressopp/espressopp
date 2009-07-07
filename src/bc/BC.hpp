@@ -1,7 +1,6 @@
 #ifndef _BC_BC_HPP
 #define _BC_BC_HPP
 
-#include <boost/shared_ptr.hpp>
 #include "types.hpp"
 
 namespace espresso {
@@ -10,7 +9,7 @@ namespace espresso {
     /** Abstract class for boundary condtions. */
     class BC {
     public:
-      typedef boost::shared_ptr< BC > SelfPtr;
+      typedef shared_ptr< BC > SelfPtr;
 
       /** Virtual destructor for boundary conditions. */
       virtual ~BC() {}

@@ -9,7 +9,7 @@
 */
 
 #include <esutil/Logger.hpp>
-#include <boost/python.hpp>
+#include "python.hpp"
 
 namespace log4espp {
 

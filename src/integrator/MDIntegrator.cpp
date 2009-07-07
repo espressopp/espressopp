@@ -1,6 +1,5 @@
 #include "error.hpp"
-
-#include <boost/python.hpp>
+#include "python.hpp"
 
 #include "integrator/MDIntegrator.hpp"
 
@@ -63,12 +62,7 @@ void MDIntegrator::run(int nsteps)
 //////////////////////////////////////////////////
 void
 MDIntegrator::registerPython() {
-
-  using namespace boost::python;
-
-  // also register the abstract class MDIntegrator to make virtual functions available
-  // be careful: boost::noncopyable must be used for abstract classes with pure routines
-  // no_init must be used as the abstract class MDIntegrator has no constructor
+  using namespace espresso::python;
 
   class_< MDIntegrator, boost::noncopyable >("integrator_MDIntegrator", no_init)
     .def("setTimeStep", &MDIntegrator::setTimeStep)

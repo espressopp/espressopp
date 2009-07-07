@@ -117,6 +117,7 @@ noinst_HEADERS = \
 	boost/smart_ptr/detail/atomic_count_sync.hpp \
 	boost/smart_ptr/detail/spinlock_pool.hpp \
 	boost/smart_ptr/shared_ptr.hpp \
+	boost/smart_ptr/make_shared.hpp \
 	boost/non_type.hpp \
 	boost/function_equal.hpp \
 	boost/tokenizer.hpp \
@@ -2501,5 +2502,6 @@ noinst_HEADERS = \
 	boost/config.hpp \
 	boost/assert.hpp \
 	boost/signals2.hpp \
+	boost/make_shared.hpp \
 	libs/serialization/src/basic_xml_grammar.ipp \
 	boost/python/detail/python22_fixed.h

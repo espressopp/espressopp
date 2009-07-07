@@ -1,11 +1,11 @@
 #include "HelloWorld.hpp"
 
 #include <sstream>
-
-#include <logging.hpp>
-#include <mpi.hpp>
-#include <python.hpp>
 #include <boost/foreach.hpp>
+
+#include "logging.hpp"
+#include "mpi.hpp"
+#include "python.hpp"
 
 using namespace std;
 
@@ -35,9 +35,9 @@ namespace espresso {
     //////////////////////////////////////////////////
     void 
     HelloWorld::registerPython() {
-      using namespace boost::python;
-    
-      class_<HelloWorld>("hello_HelloWorld", init<>())
+      using namespace espresso::python;
+
+      class_< HelloWorld >("hello_HelloWorld")
 	.def("getMessage", &HelloWorld::getMessage)
 	.def("__str__", &HelloWorld::getMessage);
     }

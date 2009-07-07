@@ -28,7 +28,7 @@ namespace espresso {
       };
       friend class BasicComputer;
 
-      typedef boost::shared_ptr< FENE > SelfPtr;
+      typedef shared_ptr< FENE > SelfPtr;
 
     private:
       BasicComputer computer;

@@ -1,8 +1,9 @@
 #include "List.hpp"
+#include "python.hpp"
+
 #include <stdexcept>
 #include <types.hpp>
 #include <algorithm>
-#include <boost/python.hpp>
 
 using namespace espresso::pairs;
 using namespace espresso::particles;
@@ -32,7 +33,7 @@ size_t List::size() const {
 
 bool List::findPair(ParticleId id1, ParticleId id2) const {
    Tuple T (id1, id2);
-   std::vector<Tuple>::const_iterator it = find (id_list.begin(), id_list.end(), T);
+   vector<Tuple>::const_iterator it = find (id_list.begin(), id_list.end(), T);
    return it != id_list.end();
 }
 
@@ -43,9 +44,9 @@ void List::addPair(ParticleId id1, ParticleId id2) {
 
 void List::deletePair(ParticleId id1, ParticleId id2) {  
    Tuple T(id1, id2);
-   std::vector<Tuple>::iterator it = find (id_list.begin(), id_list.end(), T);
+   vector<Tuple>::iterator it = find (id_list.begin(), id_list.end(), T);
    if (it == id_list.end()) {
-     throw std::runtime_error("deletePair: tuple not found");
+     throw runtime_error("deletePair: tuple not found");
    }
    id_list.erase(it);
 }
@@ -82,13 +83,12 @@ void List::foreach(ConstComputer& pairComputer) const {
 
 void
 List::registerPython() {
-  using namespace boost;
-  using namespace boost::python;
+  using namespace espresso::python;
 
   class_< List, bases< Set > >
     ("pairs_List", 
      init< bc::BC::SelfPtr, particles::Storage::SelfPtr, Real3DProperty::SelfPtr >())
-  .def("addPair", &List::addPair)
-  ;
+    .def("addPair", &List::addPair)
+    ;
 }
 

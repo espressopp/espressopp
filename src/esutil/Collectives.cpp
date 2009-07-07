@@ -1,8 +1,8 @@
 #include "Collectives.hpp"
-#include <boost/python.hpp>
+#include "python.hpp"
 
 using namespace boost::mpi;
-using namespace boost::python;
+using namespace espresso::python;
 using namespace espresso::esutil::Collectives;
 
 /**

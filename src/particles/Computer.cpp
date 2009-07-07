@@ -1,14 +1,14 @@
 #include "Computer.hpp"
-#include <particles/PropertyHandle.hpp>
-#include <boost/python.hpp>
+#include "particles/PropertyHandle.hpp"
+#include "python.hpp"
 
 using namespace espresso;
 using namespace espresso::particles;
-using namespace boost::python;
+using namespace espresso::python;
 
 class PythonComputer
   : public Computer,
-    public wrapper<Computer> {
+    public wrapper< Computer > {
   
 public: // parts invisible to Python
   
@@ -39,6 +39,7 @@ private:
 };
 
 void Computer::registerPython() {
+  using namespace espresso::python;
   class_< PythonComputer, boost::noncopyable >
     ("particles_PythonComputer", init<>())
     .def("prepare", &PythonComputer::prepare)

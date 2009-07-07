@@ -127,7 +127,7 @@ VelocityVerlet::~VelocityVerlet() {}
 void
 VelocityVerlet::registerPython() {
   using namespace boost;
-  using namespace boost::python;
+  using namespace espresso::python;
 
   // TODO: Why noncopyable?
   class_< VelocityVerlet, boost::noncopyable, bases< MDIntegrator > >

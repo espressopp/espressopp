@@ -1,13 +1,13 @@
 #ifndef _POTENTIAL_CENTRALPOTENTIAL_HPP
 #define _POTENTIAL_CENTRALPOTENTIAL_HPP
 
-#include "potential/Potential.hpp"
+#include "Potential.hpp"
 
 namespace espresso {
   namespace potential {
     class CentralPotential : public Potential {
     public:
-      typedef boost::shared_ptr< CentralPotential > SelfPtr;
+      typedef shared_ptr< CentralPotential > SelfPtr;
 
       virtual ~CentralPotential() {}
       virtual real computeEnergy(const Real3D &dist) const;

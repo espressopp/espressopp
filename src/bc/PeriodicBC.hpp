@@ -1,7 +1,6 @@
 #ifndef _BC_PERIODICBC_HPP
 #define _BC_PERIODICBC_HPP
 
-#include <boost/shared_ptr.hpp>
 #include <logging.hpp>
 
 #include "BC.hpp"
@@ -12,7 +11,7 @@ namespace espresso {
 
     class PeriodicBC : public BC {
     public:
-      typedef boost::shared_ptr< PeriodicBC > SelfPtr;
+      typedef shared_ptr< PeriodicBC > SelfPtr;
 
     private:
       Real3D length;

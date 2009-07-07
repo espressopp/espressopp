@@ -90,10 +90,10 @@ LennardJones::createForceComputer(const pairs::ForceComputer &templ) const
 
 void 
 LennardJones::registerPython() {
-  using namespace boost::python;
+  using namespace espresso::python;
 
   class_< LennardJones, bases< CentralPotential > >
-     ("potential_LennardJones")
+    ("potential_LennardJones")
     .def("set", &LennardJones::set)
     .def("getCutoff", &LennardJones::getCutoff)
     .def("getEpsilon", &LennardJones::getEpsilon)

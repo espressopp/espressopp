@@ -68,7 +68,7 @@ FENE::createForceComputer(const pairs::ForceComputer &templ) const
 
 void
 FENE::registerPython() {
-  using namespace boost::python;
+  using namespace espresso::python;
   
   class_< FENE, bases< CentralPotential > >("potential_FENE")
     .def("set", &FENE::set)

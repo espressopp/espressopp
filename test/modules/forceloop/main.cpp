@@ -19,6 +19,7 @@
 
 #include "integrator/VelocityVerlet.hpp"
 
+#include <boost/make_shared.hpp>
 #include <cstdio>
 #include <vector>
 
@@ -28,6 +29,7 @@ using namespace espresso::particles;
 using namespace espresso::pairs;
 using namespace espresso::potential;
 using namespace espresso::integrator;
+using namespace boost;
 
 /** N stands for number particles in each dimensions.
 
@@ -52,16 +54,12 @@ void forceloop() {
 
   // Create a new particle storage
 
-  Storage::SelfPtr particleStorage = 
-    Storage::SelfPtr(new Storage());
+  Storage::SelfPtr particleStorage = make_shared< Storage >();
   particles::All::SelfPtr allSet = particleStorage->getAll();
 
-  Real3DProperty::SelfPtr position = 
-    Real3DProperty::SelfPtr(new Real3DProperty(particleStorage));
-  Real3DProperty::SelfPtr velocity = 
-    Real3DProperty::SelfPtr(new Real3DProperty(particleStorage));
-  Real3DProperty::SelfPtr force = 
-    Real3DProperty::SelfPtr(new Real3DProperty(particleStorage));
+  Real3DProperty::SelfPtr position = make_shared< Real3DProperty >(particleStorage);
+  Real3DProperty::SelfPtr velocity = make_shared< Real3DProperty >(particleStorage);
+  Real3DProperty::SelfPtr force = make_shared< Real3DProperty >(particleStorage);
 
   // generate particles in the particle storage
   
@@ -94,13 +92,11 @@ void forceloop() {
 
   // define periodic boundary conditions
 
-  PeriodicBC::SelfPtr pbc 
-    = PeriodicBC::SelfPtr(new PeriodicBC(SIZE));
+  PeriodicBC::SelfPtr pbc = make_shared< PeriodicBC >(SIZE);
 
   // define allpairs with (x, y) for all x, y in allSet
 
-  pairs::All::SelfPtr allpairs =
-    pairs::All::SelfPtr(new pairs::All(pbc, allSet, position));
+  pairs::All::SelfPtr allpairs = make_shared< pairs::All >(pbc, allSet, position);
   
   // For test only: PairWriter prints each particle pair 
   
@@ -112,7 +108,7 @@ void forceloop() {
 
   // define LennardJones potential
 
-  LennardJones::SelfPtr ljint = LennardJones::SelfPtr(new LennardJones());
+  LennardJones::SelfPtr ljint = make_shared< LennardJones >();
   
   ljint->set(1.0, 1.0, 2.5);
   
@@ -145,8 +141,8 @@ void forceloop() {
 
   // create integrator and set properties
 
-  VelocityVerlet::SelfPtr integrator =
-    VelocityVerlet::SelfPtr(new VelocityVerlet(allSet, position, velocity, force));
+  VelocityVerlet::SelfPtr integrator = 
+    make_shared< VelocityVerlet >(allSet, position, velocity, force);
   
   integrator->setTimeStep(0.005);
   /*

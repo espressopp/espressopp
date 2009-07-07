@@ -12,7 +12,7 @@ namespace espresso {
     class VelocityVerlet: public MDIntegrator {
 
     public:
-      typedef boost::shared_ptr< VelocityVerlet > SelfPtr;
+      typedef shared_ptr< VelocityVerlet > SelfPtr;
 
       VelocityVerlet(particles::Set::SelfPtr particles,
 		     Real3DProperty::SelfPtr posProperty,
@@ -37,9 +37,9 @@ namespace espresso {
 
       struct ForceEvaluation {
         potential::Potential::SelfPtr potential;
-        boost::shared_ptr<pairs::Set> pairs;
+        pairs::Set::SelfPtr pairs;
         ForceEvaluation(potential::Potential::SelfPtr _potential,
-                        boost::shared_ptr<pairs::Set> _pairs)
+                        pairs::Set::SelfPtr _pairs)
           : potential(_potential), pairs(_pairs) {}
       };
 

@@ -3,7 +3,6 @@
 
 //base class
 
-#include <boost/shared_ptr.hpp>
 #include "types.hpp"
 #include "pairs/ForceComputer.hpp"
 #include "pairs/EnergyComputer.hpp"
@@ -12,7 +11,7 @@ namespace espresso {
   namespace potential {
     class Potential {
     public:
-      typedef boost::shared_ptr< Potential > SelfPtr;
+      typedef shared_ptr< Potential > SelfPtr;
 
       virtual ~Potential() {}
       virtual pairs::EnergyComputer *createEnergyComputer(const pairs::EnergyComputer &) const = 0;

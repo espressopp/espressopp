@@ -6,8 +6,8 @@
 #include <pairs/Set.hpp>
 #include <particles/ParticleHandle.hpp>
 #include <particles/Set.hpp>
-#include <boost/python.hpp>
-#include <boost/shared_ptr.hpp>
+
+#include "python.hpp"
 
 namespace espresso {
   namespace pairs {
@@ -17,10 +17,10 @@ namespace espresso {
 
       public Computer,
 
-      public boost::python::wrapper<PythonComputer> {
+      public espresso::python::wrapper< PythonComputer > {
 
     public: // parts visible to Python
-      PythonComputer(boost::shared_ptr<Set> _set)
+      PythonComputer(Set::SelfPtr _set)
 	: set(_set) {}
 
     public: // parts invisible to Python
@@ -32,7 +32,7 @@ namespace espresso {
       static void registerPython();
 
     private:
-      boost::shared_ptr<Set> set;
+      Set::SelfPtr set;
     };
   }
 }

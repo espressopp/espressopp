@@ -1,11 +1,11 @@
-#include <boost/python.hpp>
+#include "python.hpp"
 #include "Particle.hpp"
 
 using namespace espresso;
 
-using namespace boost::python;
+using namespace espresso::python;
 
-/// boost::python ResultConverter for ParticleId
+/// espresso::python ResultConverter for ParticleId
 struct ParticleIdToInteger {
   static PyObject* convert(const ParticleId &id) {
     return incref(object(size_t(id)).ptr());

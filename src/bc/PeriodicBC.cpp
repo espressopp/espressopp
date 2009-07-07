@@ -72,10 +72,10 @@ PeriodicBC::getRandomPos(void) {
 //////////////////////////////////////////////////
 void
 PeriodicBC::registerPython() {
-  using namespace boost::python;
+  using namespace espresso::python;
 
   //  class_<PeriodicBC, boost::shared_ptr<PeriodicBC>, bases<BC> >("bc_PeriodicBC", init<>())
-  class_<PeriodicBC, bases<BC> >("bc_PeriodicBC", init<>())
+  class_<PeriodicBC, bases< BC > >("bc_PeriodicBC", init<>())
     .def("set", &PeriodicBC::set)
     .def("getLength", &PeriodicBC::getLength)
     .def("getRandomPos", &PeriodicBC::getRandomPos)

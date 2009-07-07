@@ -1,17 +1,19 @@
 #include "Real3D.hpp"
-#include <boost/python.hpp>
+#include "python.hpp"
 
 namespace espresso { 
-  struct real3D_pickle_suite : boost::python::pickle_suite
+  struct real3D_pickle_suite 
+    : boost::python::pickle_suite
   {
     static
-    boost::python::tuple
+    espresso::python::tuple
     getinitargs(const Real3D& v)
-    { return boost::python::make_tuple(v[0], v[1], v[2]); }
+    { return espresso::python::make_tuple(v[0], v[1], v[2]); }
   };
     
   void 
   registerPythonReal3D() {
+    // here we do NOT use espresso::python
     using namespace boost::python;
       
     // Export the C++ class Real3D to Python 

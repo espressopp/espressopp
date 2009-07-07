@@ -1,9 +1,8 @@
-#include <boost/python.hpp>
+#include "python.hpp"
 #include "potential/CentralPotential.hpp"
 
 using namespace espresso;
 using namespace espresso::potential;
-using namespace boost::python;
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -24,7 +23,7 @@ computeEnergy(const real dist) const {
 // thin wrapper for the C++ ABC
 class PythonCentralPotential
   : public CentralPotential, 
-    public wrapper< CentralPotential > 
+    public python::wrapper< CentralPotential > 
 {
 public:
   real computeEnergySqr(const real distSqr) {
@@ -34,9 +33,7 @@ public:
 
 void
 CentralPotential::registerPython() {
-  // also register the abstract class Set to make virtual functions available
-  // be careful: boost::noncopyable must be used for abstract classes with pure routines
-  // no_init must be used as the abstract class Set has no constructor
+  using namespace espresso::python;
 
   // create thin wrappers around overloaded member functions
   real (CentralPotential::*computeEnergyOverload1)(const Real3D &) const =

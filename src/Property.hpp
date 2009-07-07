@@ -1,7 +1,6 @@
 #ifndef _PROPERTY_HPP
 #define _PROPERTY_HPP
 
-#include <boost/shared_ptr.hpp>
 #include <vector>
 #include <algorithm>
 #include "particles/Storage.hpp"
@@ -24,7 +23,7 @@ namespace espresso {
     typedef particles::PropertyHandle<T> RefType;
     typedef particles::ConstPropertyHandle<T> ConstRefType;
   public: // visible in Python
-    typedef boost::shared_ptr< Property< T > > SelfPtr;
+    typedef shared_ptr< Property< T > > SelfPtr;
 
     Property(particles::Storage::SelfPtr _storage)
       : storage(_storage) {
@@ -118,7 +117,7 @@ namespace espresso {
     typedef particles::ConstArrayPropertyHandle<T> ConstRefType;
 
   public: // visible in Python
-    typedef boost::shared_ptr< ArrayProperty< T > > SelfPtr;
+    typedef shared_ptr< ArrayProperty< T > > SelfPtr;
 
     std::vector<T> getItem(ParticleId part) const {
       ConstRefType ref = *this;

@@ -1,7 +1,7 @@
 #ifndef _PAIRS_SET_HPP
 #define _PAIRS_SET_HPP
 
-#include <boost/shared_ptr.hpp>
+#include "types.hpp"
 #include "Computer.hpp"
 #include "particles/Storage.hpp"
 
@@ -11,7 +11,7 @@ namespace espresso {
 
     class Set {
     public:
-      typedef boost::shared_ptr< Set > SelfPtr;
+      typedef shared_ptr< Set > SelfPtr;
 
       virtual ~Set() {}
 

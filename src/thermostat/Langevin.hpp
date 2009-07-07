@@ -1,7 +1,6 @@
 #ifndef _THERMOSTAT_LANGEVIN_HPP
 #define _THERMOSTAT_LANGEVIN_HPP
 
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/signals2.hpp>
 #include <boost/random.hpp>
 
@@ -24,10 +23,10 @@ namespace espresso {
 
     class Langevin: 
       public Thermostat, 
-      public boost::enable_shared_from_this< Langevin > {
+      public enable_shared_from_this< Langevin > {
 
     public:
-      typedef boost::shared_ptr< Langevin > SelfPtr;
+      typedef shared_ptr< Langevin > SelfPtr;
 
     private:
   

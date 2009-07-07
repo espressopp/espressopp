@@ -1,4 +1,4 @@
-#include <boost/python.hpp>
+#include "python.hpp"
 
 #include "particles/Set.hpp"
 #include "particles/Computer.hpp"
@@ -11,7 +11,7 @@ using namespace espresso::particles;
 void
 Set::registerPython() {
 
-  using namespace boost::python;
+  using namespace espresso::python;
 
   void (Set::*foreach_nonconst)(Computer& computer) = &Set::foreach;
 
