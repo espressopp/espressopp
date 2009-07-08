@@ -1,6 +1,6 @@
 from espresso import esutil
 from espresso import pmi
-from espresso import *
+from espresso import Property
 import types
 
 from _espresso import particles_Storage as _Storage
@@ -19,11 +19,9 @@ class DecomposerLocal(object):
         return self.storage.getAll()
 
 if pmi.IS_CONTROLLER :
-
     __all__.append("Decomposer")
 
     pmi.exec_('from espresso.decomposition.Decomposer import DecomposerLocal')
-
     class Decomposer(object) :
         """
         The basic particle storage. This class is responsible for

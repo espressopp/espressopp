@@ -1,4 +1,5 @@
 import unittest
+from unittest import *
 from espresso import Real3D
 
 class TestCase(unittest.TestCase):

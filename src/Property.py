@@ -1,6 +1,5 @@
 from espresso import pmi
 from espresso import boostmpi as mpi
-from espresso import decomposition
 
 class _PropertyLocal(object) :
     """
@@ -68,9 +67,9 @@ from _espresso import RealProperty as _RealProperty
 
 class RealPropertyLocal(_PropertyLocal) :
     def __init__(self, decomposerlocal):
-        if isinstance(decomposerlocal, decomposition.DecomposerLocal):
-            cxxobject = _RealProperty(decomposerlocal.storage)
-        else: raise TypeError('RealPropertyLocal requires a DecomposerLocal or _RealProperty')
+#        if isinstance(decomposerlocal, DecomposerLocal):
+        cxxobject = _RealProperty(decomposerlocal.storage)
+#        else: raise TypeError('RealPropertyLocal requires a DecomposerLocal or _RealProperty')
         _PropertyLocal.__init__(self, cxxobject)
 ####
 
@@ -90,9 +89,9 @@ from _espresso import IntegerProperty as _IntegerProperty
 
 class IntegerPropertyLocal(_PropertyLocal) :
     def __init__(self, decomposerlocal):
-        if isinstance(decomposerlocal, decomposition.DecomposerLocal):
-            cxxobject = _IntegerProperty(decomposerlocal.storage)
-        else: raise TypeError('IntegerPropertyLocal requires a DecomposerLocal or _RealProperty')
+#        if isinstance(decomposerlocal, decomposition.DecomposerLocal):
+        cxxobject = _IntegerProperty(decomposerlocal.storage)
+#        else: raise TypeError('IntegerPropertyLocal requires a DecomposerLocal or _RealProperty')
         _PropertyLocal.__init__(self, cxxobject)
 
 ####
@@ -113,9 +112,9 @@ from _espresso import Real3DProperty as _Real3DProperty
 
 class Real3DPropertyLocal(_PropertyLocal) :
     def __init__(self, decomposerlocal):
-        if isinstance(decomposerlocal, decomposition.DecomposerLocal):
-            cxxobject = _Real3DProperty(decomposerlocal.storage)
-        else: raise TypeError('Real3DPropertyLocal requires a DecomposerLocal or _RealProperty')
+#        if isinstance(decomposerlocal, decomposition.DecomposerLocal):
+        cxxobject = _Real3DProperty(decomposerlocal.storage)
+#        else: raise TypeError('Real3DPropertyLocal requires a DecomposerLocal or _RealProperty')
         _PropertyLocal.__init__(self, cxxobject)
 
 ####

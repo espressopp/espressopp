@@ -2,7 +2,7 @@
 from espresso import __setupPath
 
 # load boostmpi (must be loaded before _espresso)
-import boostmpi
+from espresso import boostmpi
 
 # set up logging
 import logging, os, math
