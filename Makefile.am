@@ -2,6 +2,15 @@ ACLOCAL_AMFLAGS = -I build-aux/macros
 SUBDIRS = contrib src test doc
 EXTRA_DIST = autogen.sh 
 
+noinst_SCRIPTS = \
+	bin/utexec \
+	bin/espp_mpiexec.sh \
+	espresso_setup.sh \
+	espresso_setup.sh.install \
+	espresso_setup.py \
+	espresso_setup.py.install \
+	espresso_setup.csh
+
 #################################################################
 # Documentation
 #################################################################
