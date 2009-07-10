@@ -9,6 +9,8 @@ class _PropertyLocal(object) :
     to the typified C++ Property.
     """
     __metaclass__ = abc.ABCMeta
+    def __init__(self, decomposer):
+        self.decomposer = decomposer
     def __getitem__(self, item):
         return self.cxxobject[item]
 
@@ -67,9 +69,8 @@ from _espresso import RealProperty as _RealProperty
 class RealPropertyLocal(_PropertyLocal) :
     def __init__(self, decomposer):
         if not hasattr(self, 'cxxobject'):
-            #        if isinstance(decomposerlocal, DecomposerLocal):
             self.cxxobject = _RealProperty(decomposer.cxxobject)
-            #        else: raise TypeError('RealPropertyLocal requires a DecomposerLocal or _RealProperty')
+        _PropertyLocal.__init__(self, decomposer)
 ####
 
 if pmi.IS_CONTROLLER:
@@ -89,9 +90,9 @@ from _espresso import IntegerProperty as _IntegerProperty
 class IntegerPropertyLocal(_PropertyLocal) :
     def __init__(self, decomposer):
         if not hasattr(self, 'cxxobject'):
-            #        if isinstance(decomposerlocal, decomposition.DecomposerLocal):
             self.cxxobject = _IntegerProperty(decomposer.cxxobject)
             #        else: raise TypeError('IntegerPropertyLocal requires a DecomposerLocal or _RealProperty')
+        _PropertyLocal.__init__(self, decomposer)
 
 ####
 
@@ -112,9 +113,8 @@ from _espresso import Real3DProperty as _Real3DProperty
 class Real3DPropertyLocal(_PropertyLocal) :
     def __init__(self, decomposer):
         if not hasattr(self, 'cxxobject'):
-            #        if isinstance(decomposerlocal, decomposition.DecomposerLocal):
             self.cxxobject = _Real3DProperty(decomposer.cxxobject)
-            #        else: raise TypeError('Real3DPropertyLocal requires a DecomposerLocal or _RealProperty')
+        _PropertyLocal.__init__(self, decomposer)
 
 ####
 

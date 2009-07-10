@@ -1,6 +1,6 @@
 import abc
 from espresso import pmi
-from _espresso import particles_PythonComputer
+from _espresso import particles_PythonComputer, particles_Storage
 
 # This is the abstract base class for a computer implemented in Python
 class PythonComputerLocal(particles_PythonComputer) :
@@ -23,8 +23,11 @@ class PythonComputerLocal(particles_PythonComputer) :
     that, call "finalize" once on each node. In the case of
     Decomposer.foreach, the return value of "finalize" is passed back.
     """
-    def __init__(self, storage):
-        particles_PythonComputer.__init__(self, storage)
+    def __init__(self, arg):
+        if isinstance(arg, particles_Storage):
+            particles_PythonComputer.__init__(self, arg)
+        else:
+            particles_PythonComputer.__init__(self, arg.cxxobject)
         
     def prepare(self): pass
 

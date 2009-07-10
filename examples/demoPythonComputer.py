@@ -14,7 +14,7 @@ if __name__ == 'espresso.pmi':
     # tag particles in a small sphere around (0,0,0) as demonstration
     class ParticleTesterLocal(PythonComputerLocal):
         def __init__(self, _position, _tag):
-            PythonComputerLocal.__init__(self)
+            PythonComputerLocal.__init__(self, _position.decomposer)
             self.position = _position
             self.tag = _tag
 
@@ -25,7 +25,7 @@ if __name__ == 'espresso.pmi':
     # write out tagged particles
     class ParticleWriterLocal(PythonComputerLocal):
         def __init__(self, _property, _tag):
-            PythonComputerLocal.__init__(self)
+            PythonComputerLocal.__init__(self, _property.decomposer)
             self.property = _property
             self.tag = _tag
 
@@ -63,14 +63,13 @@ else:
 
     # add property a posteriori
     tag = decomposer.createProperty("Integer")
-    all = decomposer.getAll()
 
     #tag particles
-    all.foreach(pmi.create("ParticleTesterLocal", pos, tag))
+    decomposer.foreach(pmi.create("ParticleTesterLocal", pos.pmiobject, tag.pmiobject))
 
     # and print tagged ones
-    writer=pmi.create("ParticleWriterLocal", pos, tag)
-    all.foreach(writer)
+    writer=pmi.create("ParticleWriterLocal", pos.pmiobject, tag.pmiobject)
+    decomposer.foreach(writer)
     count=writer.getCount()
     
     print("printed %d out of %d particles" % count)

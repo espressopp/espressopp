@@ -2,6 +2,9 @@ import abc
 from espresso.particles.Computer import *
 
 class SetLocal(object):
+    """Any derived object must define cxxobject, which must be a C++
+    Set object. 
+    """
     __metaclass__ = abc.ABCMeta
     def foreach(self, computer):
         """
@@ -25,9 +28,10 @@ class SetLocal(object):
             >>> decomposer.foreach(pmi.create(\"MyPythonComputer\"))
             """
         if isinstance(computer, PythonComputerLocal):
-            return self.cxxobject.foreach(computer)
+            cxxcomputer = computer
         else:
-            self.cxxobject.foreach(computer.cxxobject)
+            cxxcomputer = computer.cxxobject
+        self.cxxobject.foreach(cxxcomputer)
 
 # TODO: implement:
 #   * __contains__ from isMember
