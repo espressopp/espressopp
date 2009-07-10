@@ -6,6 +6,7 @@
 #include "Particle.hpp"
 #include "ParticleHandle.hpp"
 #include "PropertyHandle.hpp"
+#include "Set.hpp"
 
 namespace espresso {
   // forward declarations
@@ -14,8 +15,7 @@ namespace espresso {
 
   namespace particles {
     // forward declaration
-    class All;
-    typedef shared_ptr< All > AllSelfPtr;
+
     /**
        MOCK implementation of particlestorage.
        Currently only provides a subset of the expected interface,
@@ -23,11 +23,9 @@ namespace espresso {
     */
     class Storage 
       : public enable_shared_from_this< Storage >,
+	public Set,
 	boost::noncopyable
     {
-      // All should be able to loop over all particles
-      friend class All;
-
     public:
       typedef shared_ptr< Storage > SelfPtr;
 
@@ -74,20 +72,28 @@ namespace espresso {
 	  there for further details.
       */
       ConstParticleHandle getParticleHandle(ParticleId id) const {
-	return ConstParticleHandle(const_cast<Storage *>(this)->getParticleHandle(id));
+	return ConstParticleHandle(const_cast< Storage* >(this)->getParticleHandle(id));
       }
 
-      /** return a pointer to a set containing all particles */
-      AllSelfPtr getAll();
-
-      operator AllSelfPtr () { return getAll(); }
 
       //@}
 
       /// get a short lifetime reference to the property representing the particle ID
-      const ConstPropertyHandle<ParticleId> getIdPropertyHandle() const {
-        return particles.getProperty<ParticleId>(particleIdProperty);
+      const ConstPropertyHandle< ParticleId > getIdPropertyHandle() const {
+        return particles.getProperty< ParticleId >(particleIdProperty);
       }
+
+      // The Set interface
+      
+      /** for a particle of the ParticleStorage of this class,
+	  check whether it belongs to this set
+      */
+      virtual bool isMember(ParticleHandle) const;
+      
+      /** apply computer to all particles of this set
+       */
+      virtual void foreach(Computer &computer);
+      virtual void foreach(ConstComputer &computer) const;
 
       /// make this class available at Python
       static void registerPython();
@@ -95,14 +101,13 @@ namespace espresso {
     protected:
       /// here the particle data is stored
       esutil::TupleVector particles;
-      AllSelfPtr allSet;
 
     private:
       typedef esutil::TupleVector::PropertyId PropertyId;
 
       /// since Property/ArrayProperty are the ones that operates properties
-      template<typename> friend class espresso::Property;
-      template<typename> friend class espresso::ArrayProperty;
+      template< typename > friend class espresso::Property;
+      template< typename > friend class espresso::ArrayProperty;
 
       /// @name access to particle properties. Used by the Property classes
       //@{

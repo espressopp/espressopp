@@ -2,7 +2,6 @@
 #define _PARTICLES_SET_HPP
 
 #include "types.hpp"
-#include "Storage.hpp"
 #include "Computer.hpp"
 
 namespace espresso {
@@ -11,22 +10,8 @@ namespace espresso {
         from a ParticleStorage
     */
     class Set {
-    protected:
-      /// the storage our particles are stored in
-      Storage::SelfPtr theStorage;
-
     public:
-      typedef shared_ptr<Set> SelfPtr;
-
-      /** base constructor
-          
-          @param _store pointer to the Storage the
-          particles in this set come from
-      */
-      Set(Storage::SelfPtr _store = Storage::SelfPtr()) 
-	: theStorage(_store) {}
-
-      virtual ~Set() {}
+      typedef shared_ptr< Set > SelfPtr;
 
       /** for a particle of the Storage of this class,
           check whether it belongs to this set
@@ -36,10 +21,7 @@ namespace espresso {
       /** apply computer to all particles of this set
        */
       virtual void foreach(Computer &computer) = 0;
-      ///
       virtual void foreach(ConstComputer &computer) const = 0;
-
-      Storage::SelfPtr getStorage() const { return theStorage; }
 
     public:
 

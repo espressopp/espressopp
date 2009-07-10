@@ -26,7 +26,7 @@ distclean-local:
 		rm -f espresso; \
 	fi
 
-install-exec-local:
+install-exec-local: espresso_setup.sh.install espresso_setup.py.install
 # install espresso setup scripts
 	$(install_sh_SCRIPT) espresso_setup.sh.install $(DESTDIR)$(pkglibdir)/espresso_setup.sh
 	$(install_sh_SCRIPT) espresso_setup.py.install $(DESTDIR)$(pkglibdir)/espresso_setup.py

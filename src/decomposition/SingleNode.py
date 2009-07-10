@@ -1,5 +1,3 @@
-from espresso import esutil
-from espresso.esutil import choose
 from espresso import pmi
 from espresso import boostmpi as mpi
 from espresso.decomposition.Decomposer import *
@@ -8,20 +6,20 @@ __all__ = [ "SingleNodeLocal" ]
 
 class SingleNodeLocal(DecomposerLocal):
     """
-    The local particle storage that puts all particles on a dedicated node. So,
+    The local particle cxxobject that puts all particles on a dedicated node. So,
     this actually is nothing on most of the nodes.
     """
-    def __init__(self, masternode, storage = None) :
-        DecomposerLocal.__init__(self, storage)
+    def __init__(self, masternode) :
+        DecomposerLocal.__init__(self)
         self.masternode = masternode
     
     def addParticle(self, id):
         if mpi.rank == self.masternode :
-            self.storage.addParticle(id)
+            self.cxxobject.addParticle(id)
 
     def deleteParticle(self, id):
         if mpi.rank == self.masternode :
-            self.storage.deleteParticle(id)
+            self.cxxobject.deleteParticle(id)
 ####
 
 if pmi.IS_CONTROLLER :
@@ -34,42 +32,40 @@ if pmi.IS_CONTROLLER :
         The single node particle storage. Stores all particles
         on a single, configurable node.
         """
-        
         def __init__(self, node = pmi.CONTROLLER, pmiobject = None) :
-            if pmiobject is None:
-                pmiobject = pmi.create('SingleNodeLocal', node)
-            Decomposer.__init__(self, pmiobject = pmiobject)
+            self.pmiobject = pmi.create('SingleNodeLocal', node)
+            Decomposer.__init__(self)
             self.masternode = node
             # list of all particles. Since they are all on one node, we can as well
             # keep a table of all of them here
-            self.particle_ids = set()
-            self.max_seen_id = -1
+            self.particleIds = set()
+            self.maxSeenId = -1
 
         def addParticle(self, id = None) :
-            if id in self.particle_ids :
+            if id in self.particleIds :
                 raise IndexError("particle %s already exists" % str(id))
             if id is None:
-                id = self.max_seen_id + 1
+                id = self.maxSeenId + 1
             elif type(id) is not type(1) or id < 0 :
                 raise TypeError("particle identity should be a nonnegative integer")
             pmi.call(self.pmiobject.addParticle, id)
-            # update max_seen_id and list of particle_ids
-            if id > self.max_seen_id :
-                self.max_seen_id = id
-            self.particle_ids.add(id)
+            # update maxSeenId and list of particleIds
+            if id > self.maxSeenId :
+                self.maxSeenId = id
+            self.particleIds.add(id)
             return id
 
         def deleteParticle(self, id) :
-            if id not in self.particle_ids :
+            if id not in self.particleIds :
                 raise IndexError("particle %s does not exist" % str(id))
-            self.particle_ids.remove(id)
+            self.particleIds.remove(id)
             pmi.call(self.pmiobject.deleteParticle, id)
         
         def getNodeOfParticle(self, id) :
-            if id not in self.particle_ids :
+            if id not in self.particleIds :
                 raise IndexError("particle %s does not exist" % str(id))
             return self.masternode
 
         def getTotalNumberOfParticles(self) :
-            return len(self.particle_ids)
+            return len(self.particleIds)
 ####

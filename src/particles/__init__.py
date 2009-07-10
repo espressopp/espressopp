@@ -1,1 +1,2 @@
-from espresso.particles.PythonComputer import *
+from espresso.particles.Computer import *
+from espresso.particles.Set import *

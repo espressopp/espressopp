@@ -2,12 +2,12 @@ from espresso import boostmpi as mpi
 from espresso import pmi
 
 if __name__ == 'espresso.pmi':
-    from espresso.particles import PythonComputerLocal
+    import espresso.particles
 
     # simple particle counter
-    class LocalCount(PythonComputerLocal) :
-        def __init__(self) :
-            PythonComputerLocal.__init__(self)
+    class LocalCount(espresso.particles.PythonComputerLocal) :
+        def __init__(self, decomposer) :
+            espresso.particles.PythonComputerLocal.__init__(self, decomposer.cxxobject)
             self.count = 0
         def __apply__(self, id) :
             self.count += 1
@@ -35,7 +35,7 @@ else:
             self.assert_(id2 > id1)
             self.assertRaises(IndexError, self.decomp.addParticle, id1)
             self.assertEqual(self.decomp.getTotalNumberOfParticles(), 2)
-            counter = pmi.create("LocalCount")
+            counter = pmi.create("LocalCount", self.decomp.pmiobject)
             self.decomp.foreach(counter)
             counts = counter.getCounts()
             for node, count in enumerate(counts) :
@@ -57,7 +57,7 @@ else:
         def testAddParticleReverse(self) :
             self.decomp.addParticle(3)
             self.decomp.addParticle(2)
-            self.assertEqual(self.decomp.max_seen_id, 3)
+            self.assertEqual(self.decomp.maxSeenId, 3)
 
         def testDeleteParticle(self) :
             self.assertRaises(IndexError, self.decomp.deleteParticle, 0)

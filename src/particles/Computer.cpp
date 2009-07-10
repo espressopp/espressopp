@@ -1,4 +1,5 @@
 #include "Computer.hpp"
+#include "Storage.hpp"
 #include "particles/PropertyHandle.hpp"
 #include "python.hpp"
 
@@ -11,15 +12,16 @@ class PythonComputer
     public wrapper< Computer > {
   
 public: // parts invisible to Python
-  
-  virtual void prepare(Storage::SelfPtr storage) {
+  PythonComputer(Storage::SelfPtr _storage) : storage(_storage) {}
+
+  virtual void prepare() {
     // get the particleId property
     particleId = storage->getIdPropertyHandle();
     
     // call Python prepare
     if (override prepare = get_override("prepare"))
       prepare();
-    else Computer::prepare(storage);
+    else Computer::prepare();
   }
 
   /** The operator() calling the Python objects function each */
@@ -35,15 +37,17 @@ public: // parts invisible to Python
   }
 
 private:
-  ConstPropertyHandle<ParticleId> particleId;
+  Storage::SelfPtr storage;
+  ConstPropertyHandle< ParticleId > particleId;
 };
 
 void Computer::registerPython() {
   using namespace espresso::python;
   class_< PythonComputer, boost::noncopyable >
-    ("particles_PythonComputer", init<>())
+    ("particles_PythonComputer", init< Storage::SelfPtr >())
     .def("prepare", &PythonComputer::prepare)
     .def("finalize", &PythonComputer::finalize)
+    .def("__apply__", &PythonComputer::operator())
     ;
 
 }

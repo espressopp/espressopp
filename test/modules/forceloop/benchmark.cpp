@@ -15,7 +15,6 @@
 #include "types.hpp"
 #include "particles/Storage.hpp"
 #include "particles/Computer.hpp"
-#include "particles/All.hpp"
 #include "pairs/All.hpp"
 #include "pairs/ForceComputer.hpp"
 #include "bc/PeriodicBC.hpp"
@@ -83,10 +82,8 @@ void TestEspresso::addParticle(const Real3D &pos)
 }
 
 void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {
-  bc::PeriodicBC::SelfPtr pbc 
-    = make_shared< bc::PeriodicBC >(size);
-  particles::All::SelfPtr allset = storage->getAll();
-  pairs::All allpairs(pbc, allset, position);
+  bc::PeriodicBC::SelfPtr pbc = make_shared< bc::PeriodicBC >(size);
+  pairs::All allpairs(pbc, storage, position);
   potential::LennardJones ljint;
   ljint.set(epsilon, sigma, cutoff);
   pairs::ForceComputer *forceCompute =
@@ -106,19 +103,17 @@ public:
 };
 
 void TestEspresso::runEmptyPairLoop() {
-  bc::PeriodicBC::SelfPtr pbc 
-    = make_shared< bc::PeriodicBC >(size);
-  particles::All::SelfPtr allset = storage->getAll();
-  pairs::All allpairs(pbc, allset, position);
-  EmptyPairComputer ljc;
-  allpairs.foreach(ljc);
+  bc::PeriodicBC::SelfPtr pbc = make_shared< bc::PeriodicBC >(size);
+  pairs::All::SelfPtr allpairs = make_shared< pairs::All >(pbc, storage, position);
+  shared_ptr< EmptyPairComputer > ljc = make_shared< EmptyPairComputer >();
+  allpairs->foreach(ljc);
 }
 
 class MinDistComputer: public pairs::ConstComputer {
 public:
     real min;
 
-    MinDistComputer(): min(1e10) {}
+    MinDistComputer(): min(1.0e10) {}
 
     virtual void operator()(const Real3D &dist,
 			    ConstParticleHandle ref1,
@@ -131,12 +126,10 @@ public:
 };
 
 real TestEspresso::calculateMinDist() {
-  bc::PeriodicBC::SelfPtr pbc
-    = make_shared< bc::PeriodicBC >(size);
-  particles::All::SelfPtr allset = storage->getAll();
-  pairs::All allpairs(pbc, allset, position);
+  bc::PeriodicBC::SelfPtr pbc = make_shared< bc::PeriodicBC >(size);
+  pairs::All::SelfPtr allpairs = make_shared< pairs::All >(pbc, storage, position);
   MinDistComputer mincomp;
-  allpairs.foreach(mincomp);
+  allpairs->foreach(mincomp);
   return sqrt(mincomp.min);
 }
 
@@ -156,9 +149,8 @@ public:
 };
 
 real TestEspresso::calculateAverage() {
-  particles::All::SelfPtr allset = storage->getAll();
   AverageComputer avgcompute(*force);
-  allset->foreach(avgcompute);
+  storage->foreach(avgcompute);
   return avgcompute.average;
 }
 
@@ -171,9 +163,8 @@ public:
 };
 
 void TestEspresso::runEmptyLoop() {
-  particles::All::SelfPtr allset = storage->getAll();
   EmptyComputer avgcompute;
-  allset->foreach(avgcompute);
+  storage->foreach(avgcompute);
 }
 
 /***********************************************************************************

@@ -5,7 +5,6 @@
 
 #include <espresso_common.hpp>
 #include <particles/Storage.hpp>
-#include <particles/All.hpp>
 #include <bc/PeriodicBC.hpp>
 #include <potential/LennardJones.hpp>
 #include <potential/FENE.hpp>
@@ -55,7 +54,6 @@ void forceloop() {
   // Create a new particle storage
 
   Storage::SelfPtr particleStorage = make_shared< Storage >();
-  particles::All::SelfPtr allSet = particleStorage->getAll();
 
   Real3DProperty::SelfPtr position = make_shared< Real3DProperty >(particleStorage);
   Real3DProperty::SelfPtr velocity = make_shared< Real3DProperty >(particleStorage);
@@ -88,7 +86,7 @@ void forceloop() {
 
   // call pWriter(id) for each particle reference ref of particle storage
 
-  allSet->foreach(pWriter);
+  particleStorage->foreach(pWriter);
 
   // define periodic boundary conditions
 
@@ -96,7 +94,7 @@ void forceloop() {
 
   // define allpairs with (x, y) for all x, y in allSet
 
-  pairs::All::SelfPtr allpairs = make_shared< pairs::All >(pbc, allSet, position);
+  pairs::All::SelfPtr allpairs = make_shared< pairs::All >(pbc, particleStorage, position);
   
   // For test only: PairWriter prints each particle pair 
   
@@ -142,7 +140,7 @@ void forceloop() {
   // create integrator and set properties
 
   VelocityVerlet::SelfPtr integrator = 
-    make_shared< VelocityVerlet >(allSet, position, velocity, force);
+    make_shared< VelocityVerlet >(particleStorage, position, velocity, force);
   
   integrator->setTimeStep(0.005);
   /*
@@ -164,7 +162,7 @@ void forceloop() {
 
   // check to see that particles have new positions
   */
-  allSet->foreach(pWriter);
+  particleStorage->foreach(pWriter);
 }
 
 int main() 

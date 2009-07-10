@@ -6,14 +6,14 @@
 namespace espresso {
   namespace particles {
     /** temporary handle for efficient access to a the data in a property */
-    template<typename T>
+    template< typename T >
     class PropertyHandle
       : public esutil::TupleVector::PropertyPointer<T> {
       friend class Storage;
 
     public:
       PropertyHandle(): esutil::TupleVector::PropertyPointer<T>() {}
-      
+
     private:
       PropertyHandle(const esutil::TupleVector::PropertyPointer<T> &_ref)
         : esutil::TupleVector::PropertyPointer<T>(_ref) {}

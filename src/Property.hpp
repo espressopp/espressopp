@@ -18,10 +18,10 @@ namespace espresso {
 
       @tparam T type stored in the property
   */
-  template <typename T>
+  template < typename T >
   class Property {
-    typedef particles::PropertyHandle<T> RefType;
-    typedef particles::ConstPropertyHandle<T> ConstRefType;
+    typedef particles::PropertyHandle< T > RefType;
+    typedef particles::ConstPropertyHandle< T > ConstRefType;
   public: // visible in Python
     typedef shared_ptr< Property< T > > SelfPtr;
 

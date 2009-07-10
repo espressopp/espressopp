@@ -5,7 +5,7 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/foreach.hpp>
 
-#include "../Storage.hpp"
+#include "particles/Storage.hpp"
 #include "Property.hpp"
 
 using namespace espresso;
@@ -13,9 +13,11 @@ using namespace espresso::particles;
 
 struct Fixture {
   Storage::SelfPtr store;
-  Real3DProperty propertyPos;
+  Real3DProperty::SelfPtr propertyPos;
 
-  Fixture(): store(new Storage), propertyPos(store) {
+  Fixture() {
+    store = make_shared< Storage >();
+    propertyPos = make_shared< Real3DProperty >(store);
     for (size_t i = 0; i < 5; ++i) {
       store->addParticle(ParticleId(i));
     }
@@ -23,6 +25,7 @@ struct Fixture {
 
   ~Fixture() {}
 };
+
 
 //____________________________________________________________________________//
 
@@ -33,7 +36,7 @@ BOOST_FIXTURE_TEST_CASE(references_test, Fixture)
   ParticleHandle p2 = store->getParticleHandle(ParticleId(4));
   const Storage &cstore = *store;
   ConstParticleHandle const_p2 = cstore.getParticleHandle(ParticleId(4));
-  PropertyHandle<Real3D> pos = propertyPos;
+  PropertyHandle< Real3D > pos = *propertyPos;
 
   pos[p2][0] = 0.4;
   pos[p2][1] = 0.5;
@@ -54,3 +57,49 @@ BOOST_FIXTURE_TEST_CASE(references_test, Fixture)
   BOOST_CHECK_CLOSE(pos[p1][2], 0.18, 1e-10);
 }
 
+template < class Base >
+struct MockComputerBase : Base {
+  bool prepareCalled;
+  bool finalizeCalled;
+  int applyCalled;
+
+  MockComputerBase() {
+    prepareCalled = false;
+    finalizeCalled = false;
+    applyCalled = 0;
+  }
+
+  virtual void prepare() {
+    prepareCalled = true;
+  }
+
+  virtual void finalize() {
+    finalizeCalled = true;
+  }
+
+  virtual void operator()(typename Base::ParticleHandle handle) {
+    applyCalled++;
+  }
+};
+
+BOOST_FIXTURE_TEST_CASE(foreachTest, Fixture)
+{
+  MockComputerBase< Computer > computer;
+
+  store->foreach(computer);
+
+  BOOST_CHECK(computer.prepareCalled);
+  BOOST_CHECK_EQUAL(computer.applyCalled, 5);
+  BOOST_CHECK(computer.finalizeCalled);
+}
+
+BOOST_FIXTURE_TEST_CASE(foreachTestConst, Fixture)
+{
+  MockComputerBase< ConstComputer > computer;
+
+  store->foreach(computer);
+
+  BOOST_CHECK(computer.prepareCalled);
+  BOOST_CHECK_EQUAL(computer.applyCalled, 5);
+  BOOST_CHECK(computer.finalizeCalled);
+}

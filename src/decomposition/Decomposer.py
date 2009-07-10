@@ -1,28 +1,21 @@
 from espresso import esutil
 from espresso import pmi
 from espresso import Property
+from espresso.particles.Set import *
 import types
+import abc
 
 from _espresso import particles_Storage as _Storage
 
-__all__ = [ "DecomposerLocal" ]
-
-class DecomposerLocal(object):
+class DecomposerLocal(SetLocal):
     'The local basic particle storage'
-    def __init__(self, storage = None) :
-        if storage == None :
-            storage = _Storage()
-
-        self.storage = storage
-
-    def getAll(self):
-        return self.storage.getAll()
+    __metaclass__ = abc.ABCMeta
+    def __init__(self):
+        if not hasattr(self, 'storage'):
+            self.cxxobject = _Storage()
 
 if pmi.IS_CONTROLLER :
-    __all__.append("Decomposer")
-
-    pmi.exec_('from espresso.decomposition.Decomposer import DecomposerLocal')
-    class Decomposer(object) :
+    class Decomposer(Set):
         """
         The basic particle storage. This class is responsible for
         distributing particles across processors as well as locally on
@@ -35,20 +28,16 @@ if pmi.IS_CONTROLLER :
         memory on each processor is in general subdivided into several
         smaller boxes or cells.
         """
-        
-        def __init__(self, pmiobject = None) :
+        __metaclass__ = abc.ABCMeta
+        def __init__(self) :
             """
-            initialize the basic decomposer. This class cannot be used directly, since most
-            functionality is not implemented and has to be provided by derived classes. This
-            function takes one argument called local, which specifies the object to be used
-            as local instance and should be handed over by the derived class.
+            initialize the basic decomposer. This class cannot be used
+            directly, since most functionality is not implemented and
+            has to be provided by derived classes. This function takes
+            one argument called local, which specifies the object to
+            be used as local instance and should be handed over by the
+            derived class.
             """
-            if pmiobject is None:
-                pmiobject = pmi.create('DecomposerLocal')
-            elif not isinstance(pmiobject, DecomposerLocal) :
-                raise TypeError("pmiobject object was given, but not derived from DecomposerLocal (type is %s)" % str(type(pmiobject)))
-
-            self.pmiobject = pmiobject
             self.properties = {}
         
         def createProperty(self, type, dimension = 1) :
@@ -84,38 +73,7 @@ if pmi.IS_CONTROLLER :
                     raise TypeError('type "%s" cannot be used as particle array property (class %s missing)' % (type, klassname));
 	    return property
 
-        def foreach(self, computer) :
-            """
-            apply the computer to each particle on each node
-            (i.e. call "__apply__" with the particle identity as
-            parameter). Therefore, computer has to be a PMI-created
-            object, and has to be derived from
-            espresso.particles.PythonComputer.
-
-            If the computer object has a method "prepare", this method will be
-            called with the DecomposerLocal as parameter on each node first,
-            before any call to "__apply__".
-
-            If the computer object has a method "finalize", this method
-            will be called on all nodes after looping over all
-            particles; typically, this method can be used to collect
-            the results of the computation. The return value of foreach is
-            the return value of "finalize" on the master node.
-            
-            Example:
-
-            >>> class MyPythonComputer(espresso.particles.PythonComputer) :
-            >>>    def __init__(self) :
-            >>>        self.count = 0
-            >>>    def __apply__(self, id) :
-            >>>        self.count += 1
-            >>>    def collect(self) :
-            >>>        return mpi.reduce(self.count, x,y : return x+y, pmi.CONTROLLER)
-            >>>
-            >>> decomposer.foreach(pmi.create("MyPythonComputer"))
-            """
-            return pmi.call(self.pmiobject.foreach, computer)
-            
+        @abc.abstractmethod
         def addParticle(self, id = None) :
             """
             This has to be implemented by any derived class to implement a real particle storage.
@@ -124,29 +82,33 @@ if pmi.IS_CONTROLLER :
             Returns the particle id of the created particle.
             If the particle already exists, an IndexError is raised.
             """
-            raise RuntimeError("Decomposer.addParticle has to be implemented by derived classes")
+            pass
 
+        @abc.abstractmethod
         def deleteParticle(self, id) :
             """
             This has to be implemented by any derived class to implement a real particle storage.
             This method should delete the particle with identity <id>
             If the particle does not exist, an IndexError is raised.
             """
-            raise RuntimeError("Decomposer.deleteParticle has to be implemented by derived classes")
+            pass
 
+        @abc.abstractmethod
         def getNodeOfParticle(self, id) :
             """
             This has to be implemented by any derived class to implement a real particle storage.
             For a given particle identity, this method should return the node this particle is
             located on, or raise an IndexError if it does not exist.
             """
-            raise RuntimeError("Decomposer.getNodeofParticle has to be implemented by derived classes")
+            pass
 
+        @abc.abstractmethod
         def getTotalNumberOfParticles(self) :
             """
             This has to be implemented by any derived class to implement a real particle storage.
             Returns the total number of particles; can be an expensive operation.
             """
-            raise RuntimeError("Decomposer.getTotalNumberOfParticle has to be implemented by derived classes")
+            pass
 
 ####
+

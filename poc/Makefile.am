@@ -1,6 +1,8 @@
 python_SCRIPTS =
 noinst_LTLIBRARIES =
+noinst_PROGRAMS =
 
+include boost/SubMakefile.am
 include boost.python/inheritance/SubMakefile.am
 include boost.python/shared_ptr/SubMakefile.am
 #include boost.python/keywords/SubMakefile.am

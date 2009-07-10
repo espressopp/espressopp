@@ -23,7 +23,6 @@ public:
 
 Storage::Storage() {
   particleIdProperty = particles.addProperty<size_t>();
-  allSet = All::SelfPtr();
 }
 
 Storage::~Storage() {}
@@ -53,13 +52,25 @@ void Storage::deleteProperty(PropertyId id) {
   particles.eraseProperty(id);
 }
 
-AllSelfPtr Storage::getAll() {
-  // late binding is required here, as shared_from_this can not be
-  // used in the constructor, as it requires a shared_ptr to be
-  // available.
-  if (!allSet) 
-    allSet = All::SelfPtr(new All(shared_from_this()));
-  return allSet;
+// Implementation of the Set interface
+bool Storage::isMember(ParticleHandle) const { return true; }
+
+void Storage::foreach(Computer &computer) {
+  computer.prepare();
+  BOOST_FOREACH(esutil::TupleVector::reference particle, 
+		particles) {
+    computer(ParticleHandle(particle));
+  }
+  computer.finalize();
+}
+
+void Storage::foreach(ConstComputer& computer) const {
+  computer.prepare();
+  BOOST_FOREACH(esutil::TupleVector::const_reference particle, 
+		particles) {
+    computer(ConstParticleHandle(particle));
+  }
+  computer.finalize();
 }
 
 //////////////////////////////////////////////////
@@ -69,7 +80,7 @@ AllSelfPtr Storage::getAll() {
 void Storage::registerPython() {
   using namespace espresso::python;
 
-  class_< Storage, boost::noncopyable >("particles_Storage")
+  class_< Storage, boost::noncopyable, bases < Set > >("particles_Storage")
     .def("addParticle", &Storage::addParticle)
     .def("deleteParticle", &Storage::deleteParticle)
     ;
