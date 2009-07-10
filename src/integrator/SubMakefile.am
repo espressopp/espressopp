@@ -10,4 +10,5 @@ libespresso_common_la_SOURCES += \
 
 python_SCRIPTS += \
 	integrator/__init__.py \
+	integrator/MDIntegrator.py \
 	integrator/VelocityVerlet.py

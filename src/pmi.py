@@ -125,8 +125,9 @@ and the following variables:
 * inWorkerLoop is True, if PMI currently executes the worker loop on
   the workers.
 """
-import logging, types, sys, inspect
+import logging, types, sys, inspect, abc
 from espresso import boostmpi as mpi
+
 
 ##################################################
 ## EXEC
@@ -138,26 +139,12 @@ def exec_(*args) :
     It can be used to import modules, or to define classes and
     functions on all workers.
 
-    if arg is a string, the string is the Python code to be
-    executed. If arg is any other object, exec_ will try to get its
-    source code via inspect.getsource() and execute it.
-    Note, that this means that if you apply exec_() to a function,
-    that the function will be defined on the workers, but it will not
-    execute the function itself. Note also, that function or class
-    definitions will affect the top-level pmi namespace and not be
-    part of the module they are defined in.
+    Each element of args should be string that is executed on all
+    workers.
 
     Example:
     >>> pmi.exec_('import hello')
     >>> hw = pmi.create('hello.HelloWorld')
-
-    Example2:
-    >>> class HelloWorld(object):
-    >>>   def hello():
-    >>>     print('Hello World!')
-    >>>
-    >>> pmi.exec_(HelloWorld)
-    >>> hw = pmi.create(HelloWorld)
     """
     if __checkController(exec_) :
         if len(args) == 0:
@@ -508,8 +495,7 @@ def startWorkerLoop() :
 ##################################################
 ## PROXY METACLASS
 ##################################################
-
-class Proxy(type):
+class Proxy(abc.ABCMeta):
     class Initializer(object):
         """Creates the PMI subject of a class.
         """

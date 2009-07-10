@@ -1,38 +1,30 @@
-from espresso import esutil, pmi
+from espresso import pmi
 
-from _espresso import integrator_VelocityVerlet as _VelocityVerlet
+from espresso.integrator.MDIntegrator import *
+from _espresso import integrator_VelocityVerlet
 
-class VelocityVerletLocal(_VelocityVerlet):
-    def __init__(self, particles, 
-                 positionProperty, velocityProperty, forceProperty, 
-                 timeStep):
-        # TODO: defaults:
-        # - if "velocity", "position", "force" exist in global table, use them
-        # - if not, create them
-        _VelocityVerlet.__init__(self, particles, 
-                                 positionProperty, 
-                                 velocityProperty, 
-                                 forceProperty)
-        self.setTimeStep(timeStep)
+class VelocityVerletLocal(MDIntegratorLocal):
+    def __init__(self, set, 
+                 posProperty, velProperty, forceProperty,
+                 timestep):
+        if not hasattr(self, 'cxxobject'):
+            self.cxxobject = \
+                integrator_VelocityVerlet(set.cxxobject, 
+                                          posProperty.cxxobject,
+                                          velProperty.cxxobject, 
+                                          forceProperty.cxxobject)
 
-    def run(self, steps = 1):
-        return _VelocityVerlet.run(self, steps)
-
-    @property
-    def timeStep(self): return self.getTimeStep
-    @timeStep.setter
-    def timeStep(self, _timeStep): self.setTimeStep(_timeStep)
-
-    if pmi.IS_CONTROLLER:
-        pmi.exec_('import espresso.integrator.VelocityVerlet')
-
-        class VelocityVerlet (object):
-            'The Velocity-Verlet integrator.'
-            __metaclass__ = pmi.Proxy
-            pmiproxydefs = {
-                'subjectclass': 'espresso.integrator.VelocityVerletLocal',
-                'pmicall' : [ 'run' ],
-                'pmiproperty' : [ 'timeStep' ]
-                }
-
+if pmi.IS_CONTROLLER:
+    class VelocityVerlet(MDIntegrator):
+        'The Velocity-Verlet integrator.'
+        def __init__(self, set, 
+                     posProperty, velProperty, forceProperty, 
+                     timestep = 1):
+            if not hasattr(self, 'pmiobject'):
+                self.pmiobject = pmi.create("espresso.integrator.VelocityVerletLocal",
+                                            set.pmiobject,
+                                            posProperty.pmiobject,
+                                            velProperty.pmiobject,
+                                            forceProperty.pmiobject,
+                                            timestep)
     

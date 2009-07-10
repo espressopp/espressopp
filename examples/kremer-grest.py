@@ -11,19 +11,20 @@ pbc = bc.PeriodicBC(length=10)
 decomposer = decomposition.SingleNode()
 #particles = espresso.decomposition.CellStorage(grid=(2, 2, 2), skin=0.1, **system)
 
-positionProperty = decomposer.createProperty('Real3D')
-velocityProperty = decomposer.createProperty('Real3D')
-forceProperty = decomposer.createProperty('Real3D')
-allParticles = decomposer.getAll()
+pos = decomposer.createProperty('Real3D')
+vel = decomposer.createProperty('Real3D')
+force = decomposer.createProperty('Real3D')
 
 # set up the integrator
-integrator = integrator.VelocityVerlet(set=allParticles,
-                                       positionProperty=positionProperty, 
-                                       velocityProperty=velocityProperty,
-                                       forceProperty=forceProperty,
+
+print(decomposer)
+integrator = integrator.VelocityVerlet(set=decomposer,
+                                       posProperty=pos, 
+                                       velProperty=vel,
+                                       forceProperty=force,
                                        timestep=0.001)
 # set up the thermostat
-system['thermostat'] = espresso.thermostat.Langevin(temperature=1.0, gamma=0.5, **system)
+thermostat = thermostat.Langevin(temperature=1.0, gamma=0.5)
 
 # create the particles and the chains
 feneint = espresso.interaction.FENE(K=1.0, r0=1.0, rMax=0.2)
@@ -44,6 +45,6 @@ system['integrator'].addInteraction(pairs=verletlists, interaction=ljint)
 
 # integration
 for sweeps in range(100):
-    system['integrator'].integrate(steps=100)
+    integrator.integrate(steps=100)
 
 # analysis

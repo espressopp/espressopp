@@ -133,6 +133,5 @@ VelocityVerlet::registerPython() {
   class_< VelocityVerlet, boost::noncopyable, bases< MDIntegrator > >
     ("integrator_VelocityVerlet", 
      init< Set::SelfPtr, Real3DProperty::SelfPtr, Real3DProperty::SelfPtr, Real3DProperty::SelfPtr >())
-    .def("step", &VelocityVerlet::step)
     ;
 }

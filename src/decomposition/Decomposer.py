@@ -11,7 +11,7 @@ class DecomposerLocal(SetLocal):
     'The local basic particle storage'
     __metaclass__ = abc.ABCMeta
     def __init__(self):
-        if not hasattr(self, 'storage'):
+        if not hasattr(self, 'cxxobject'):
             self.cxxobject = _Storage()
 
 if pmi.IS_CONTROLLER :
@@ -29,17 +29,6 @@ if pmi.IS_CONTROLLER :
         smaller boxes or cells.
         """
         __metaclass__ = abc.ABCMeta
-        def __init__(self) :
-            """
-            initialize the basic decomposer. This class cannot be used
-            directly, since most functionality is not implemented and
-            has to be provided by derived classes. This function takes
-            one argument called local, which specifies the object to
-            be used as local instance and should be handed over by the
-            derived class.
-            """
-            self.properties = {}
-        
         def createProperty(self, type, dimension = 1) :
             """
             create a Property in this particle storage. For example, adding a scalar real Property:

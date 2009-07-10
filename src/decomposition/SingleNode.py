@@ -32,9 +32,8 @@ if pmi.IS_CONTROLLER :
         The single node particle storage. Stores all particles
         on a single, configurable node.
         """
-        def __init__(self, node = pmi.CONTROLLER, pmiobject = None) :
+        def __init__(self, node = pmi.CONTROLLER) :
             self.pmiobject = pmi.create('SingleNodeLocal', node)
-            Decomposer.__init__(self)
             self.masternode = node
             # list of all particles. Since they are all on one node, we can as well
             # keep a table of all of them here

@@ -64,13 +64,15 @@ void
 MDIntegrator::registerPython() {
   using namespace espresso::python;
 
-  class_< MDIntegrator, boost::noncopyable >("integrator_MDIntegrator", no_init)
+  class_< MDIntegrator, boost::noncopyable >
+    ("integrator_MDIntegrator", no_init)
     .def("setTimeStep", &MDIntegrator::setTimeStep)
     .def("getTimeStep", &MDIntegrator::getTimeStep)
     .def("getPosProperty", &MDIntegrator::getPosProperty)
     .def("getVelProperty", &MDIntegrator::getVelProperty)
     .def("getForceProperty", &MDIntegrator::getForceProperty)
     .def("run", &MDIntegrator::run)
+    .def("step", pure_virtual(&MDIntegrator::step))
   ;
 }
 
