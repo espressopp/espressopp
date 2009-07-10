@@ -11,13 +11,12 @@ pbc = bc.PeriodicBC(length=10)
 decomposer = decomposition.SingleNode()
 #particles = espresso.decomposition.CellStorage(grid=(2, 2, 2), skin=0.1, **system)
 
+# set up the properties
 pos = decomposer.createProperty('Real3D')
 vel = decomposer.createProperty('Real3D')
 force = decomposer.createProperty('Real3D')
 
 # set up the integrator
-
-print(decomposer)
 integrator = integrator.VelocityVerlet(set=decomposer,
                                        posProperty=pos, 
                                        velProperty=vel,
