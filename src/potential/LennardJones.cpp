@@ -63,9 +63,9 @@ Real3D LennardJones::BasicComputer::computeForce(const Real3D &dist) const {
   real distSqr = dist.sqr();
       
   if (distSqr < cutoffSqr) {
-    frac2 = sigma / distSqr;
+    frac2 = sigma*sigma / distSqr;
     frac6 = frac2 * frac2 * frac2;
-    real ffactor = 48.0 * epsilon * (frac6*frac6 - 0.5 * frac6) * frac2;
+    real ffactor = 48.0 * epsilon * (frac6*frac6 - 0.5 * frac6) / distSqr;
 
     LOG4ESPP_TRACE(LennardJones::theLogger, "computeForce, distSqr = " << distSqr <<
 		   ", ffactor = " << ffactor);
