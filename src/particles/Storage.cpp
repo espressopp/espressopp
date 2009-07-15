@@ -1,6 +1,5 @@
 #include "Storage.hpp"
 #include "python.hpp"
-#include "All.hpp"
 
 #include <boost/foreach.hpp>
 #include <algorithm>
