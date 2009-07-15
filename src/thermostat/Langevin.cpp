@@ -57,9 +57,22 @@ private:
 
 public:
 
-  StepThermalB(PropertyHandle<Real3D> _velRef, real _timeStep, real _gamma, real _temperature):
-               vel(_velRef), timeStep(_timeStep), gamma(_gamma), temperature(_temperature) {
-               c = sqrt(24.0 * gamma * temperature / timeStep);
+		StepThermalB(PropertyHandle<Real3D> _velRef, real _timeStep, real _gamma, real _temperature):
+				vel(_velRef), timeStep(_timeStep), gamma(_gamma), temperature(_temperature) {
+				/*
+				 * The c coefficient represents the strength of the noise in the Langevin thermostat.
+				 * The formula is usually given as c = sqrt(2*gamma*temp/timeStep) multiplied by
+				 * a *normally* distributed random number N(0,1). One can approximate this by using
+				 * a uniformly distributed random number with same first and second moment, i.e.
+				 * mean 0 and interval [-sqrt(3);sqrt(3)]. This can be reproduced with a distribution
+				 * between [-0.5;0.5] by using a prefactor of 2*sqrt(3) in front. This now gives
+				 * c = sqrt(24 * gamma * temp/ timeStep).
+				 * We finally multiply this by an additional factor of 2 in order to weight correctly
+				 * the noise term over the two steps of the Velocity Verlet integrator.
+				 * c = sqrt(96 * gamma * temp/ timeStep).
+				 */
+				
+				c = sqrt(96.0 * gamma * temperature / timeStep);
   }
   
   // m = 1
