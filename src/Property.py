@@ -1,6 +1,5 @@
 from espresso import pmi
 from espresso import boostmpi as mpi
-import abc
 
 class _PropertyLocal(object) :
     """
@@ -8,7 +7,7 @@ class _PropertyLocal(object) :
     Property interface, while the xxxPropertyLocal only glues this
     to the typified C++ Property.
     """
-    __metaclass__ = abc.ABCMeta
+    #    __metaclass__ = abc.ABCMeta
     def __init__(self, decomposer):
         self.decomposer = decomposer
     def __getitem__(self, item):

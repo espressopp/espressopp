@@ -125,7 +125,7 @@ and the following variables:
 * inWorkerLoop is True, if PMI currently executes the worker loop on
   the workers.
 """
-import logging, types, sys, inspect, abc
+import logging, types, sys, inspect
 from espresso import boostmpi as mpi
 
 
@@ -495,7 +495,7 @@ def startWorkerLoop() :
 ##################################################
 ## PROXY METACLASS
 ##################################################
-class Proxy(abc.ABCMeta):
+class Proxy(type):
     class Initializer(object):
         """Creates the PMI subject of a class.
         """

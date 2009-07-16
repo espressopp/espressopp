@@ -1,4 +1,3 @@
-import abc
 from espresso import pmi
 from _espresso import particles_PythonComputer, particles_Storage
 
@@ -43,8 +42,8 @@ class PythonComputerLocal(particles_PythonComputer) :
 # This is the abstract base class for the Python glue of local computers
 # it doesn't really contain anything
 class ComputerLocal(object):
-    __metaclass__ = abc.ABCMeta
+    pass
     
 if pmi.IS_CONTROLLER:
     class Computer(object):
-        __metaclass__ = abc.ABCMeta
+        pass

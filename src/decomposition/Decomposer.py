@@ -3,13 +3,11 @@ from espresso import pmi
 from espresso import Property
 from espresso.particles.Set import *
 import types
-import abc
 
 from _espresso import particles_Storage as _Storage
 
 class DecomposerLocal(SetLocal):
     'The local basic particle storage'
-    __metaclass__ = abc.ABCMeta
     def __init__(self):
         if not hasattr(self, 'cxxobject'):
             self.cxxobject = _Storage()
@@ -28,7 +26,6 @@ if pmi.IS_CONTROLLER :
         memory on each processor is in general subdivided into several
         smaller boxes or cells.
         """
-        __metaclass__ = abc.ABCMeta
         def createProperty(self, type, dimension = 1) :
             """
             create a Property in this particle storage. For example, adding a scalar real Property:
@@ -62,7 +59,7 @@ if pmi.IS_CONTROLLER :
                     raise TypeError('type "%s" cannot be used as particle array property (class %s missing)' % (type, klassname));
 	    return property
 
-        @abc.abstractmethod
+        #        @abc.abstractmethod
         def addParticle(self, id = None) :
             """
             This has to be implemented by any derived class to implement a real particle storage.
@@ -73,7 +70,7 @@ if pmi.IS_CONTROLLER :
             """
             pass
 
-        @abc.abstractmethod
+        #        @abc.abstractmethod
         def deleteParticle(self, id) :
             """
             This has to be implemented by any derived class to implement a real particle storage.
@@ -82,7 +79,7 @@ if pmi.IS_CONTROLLER :
             """
             pass
 
-        @abc.abstractmethod
+        #         @abc.abstractmethod
         def getNodeOfParticle(self, id) :
             """
             This has to be implemented by any derived class to implement a real particle storage.
@@ -91,7 +88,7 @@ if pmi.IS_CONTROLLER :
             """
             pass
 
-        @abc.abstractmethod
+        #         @abc.abstractmethod
         def getTotalNumberOfParticles(self) :
             """
             This has to be implemented by any derived class to implement a real particle storage.

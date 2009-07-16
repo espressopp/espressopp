@@ -1,11 +1,9 @@
-import abc
 from espresso.particles.Computer import *
 
 class SetLocal(object):
     """Any derived object must define cxxobject, which must be a C++
     Set object. 
     """
-    __metaclass__ = abc.ABCMeta
     def foreach(self, computer):
         """
         apply the computer to each particle in the set (i.e. call
@@ -39,7 +37,6 @@ class SetLocal(object):
 
 if pmi.IS_CONTROLLER:
     class Set(object):
-        __metaclass__ = abc.ABCMeta
         def foreach(self, computer):
             if isinstance(computer, PythonComputerLocal):
                 return pmi.call(self.pmiobject.foreach, computer)

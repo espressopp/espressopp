@@ -1,8 +1,7 @@
 from espresso import pmi
-import abc
 
 class MDIntegratorLocal(object):
-    __metaclass__ = abc.ABCMeta
+    #    __metaclass__ = abc.ABCMeta
     def step(self):
         return self.cxxobject.step()
     def run(self, steps = 1):
@@ -15,7 +14,7 @@ class MDIntegratorLocal(object):
 if pmi.IS_CONTROLLER:
     pmi.exec_('import espresso.integrator')
     class MDIntegrator(object):
-        __metaclass__ = abc.ABCMeta
+        # __metaclass__ = abc.ABCMeta
         def run(self, steps = 1):
             return pmi.call(self.pmiobject.run, steps)
 
