@@ -34,7 +34,7 @@ public:
                vel(_velRef), timeStep(_timeStep), gamma(_gamma) { }
   
   // m = 1
-  virtual void operator()(ParticleHandle pref) {
+  virtual void apply(ParticleHandle pref) {
     vel[pref] = vel[pref] - 0.5 * gamma * vel[pref] * timeStep;
   }
 
@@ -76,7 +76,7 @@ public:
   }
   
   // m = 1
-  virtual void operator()(ParticleHandle pref) {
+  virtual void apply(ParticleHandle pref) {
     Real3D rand3(drand48() - 0.5, drand48() - 0.5, drand48() - 0.5);
     vel[pref] = vel[pref] + 0.5 * (c * rand3 - gamma * vel[pref]) * timeStep;
   }

@@ -6,16 +6,42 @@
 #include "particles/Storage.hpp"
 
 namespace espresso {
-
   namespace pairs {
+    typedef boost::function< 
+      void (const Real3D, 
+	    const particles::ParticleHandle, 
+	    const particles::ParticleHandle) 
+      > ApplyFunction;
+  
+    typedef boost::function< 
+      void (const Real3D, 
+	    const particles::ConstParticleHandle, 
+	    const particles::ConstParticleHandle) 
+      > ConstApplyFunction;
+  
+    class ForeachBreak: public std::exception {};
 
     class Set {
     public:
       typedef shared_ptr< Set > SelfPtr;
+      
+      /** Apply computer to all pairs of this set. Call prepare() and
+	  finalize().
+       */
+      virtual void foreach(Computer& computer);
+      virtual void foreach(const Computer::SelfPtr computer);
+      virtual void foreach(ConstComputer& computer) const;
 
-      virtual void foreach(Computer& comp) = 0;
+      /** Apply a function to all pairs of this set.
 
-      virtual void foreach(ConstComputer& comp) const = 0;
+	  A derived Set should override these methods.
+
+	  They should be used when you want to loop over the same set
+	  several times without calling prepare and finalize of a
+	  Computer.
+      */
+      virtual void foreach(ApplyFunction function) = 0;
+      virtual void foreach(ConstApplyFunction function) const = 0;
 
       static void registerPython();
     };

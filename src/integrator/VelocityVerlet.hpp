@@ -15,9 +15,9 @@ namespace espresso {
       typedef shared_ptr< VelocityVerlet > SelfPtr;
 
       VelocityVerlet(particles::Set::SelfPtr particles,
-		     Real3DProperty::SelfPtr posProperty,
-		     Real3DProperty::SelfPtr velProperty,
-		     Real3DProperty::SelfPtr forceProperty);
+		     Property< Real3D >::SelfPtr posProperty,
+		     Property< Real3D >::SelfPtr velProperty,
+		     Property< Real3D >::SelfPtr forceProperty);
 
       /** The following signals are specific for VelocityVerlet */
 

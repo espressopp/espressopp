@@ -13,7 +13,6 @@ class VelocityVerletLocal(MDIntegratorLocal):
                                           forceProperty.cxxobject)
 
 if pmi.IS_CONTROLLER:
-#    pmi.exec_('import espresso.integrator
     class VelocityVerlet(MDIntegrator):
         'The Velocity-Verlet integrator.'
         def __init__(self, set, 

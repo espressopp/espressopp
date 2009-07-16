@@ -1,17 +1,18 @@
 nobase_pkginclude_HEADERS += \
-        pairs/bindings.hpp \
+	pairs/bindings.hpp \
 	pairs/Set.hpp \
+	pairs/All.hpp \
 	pairs/Computer.hpp \
 	pairs/EnergyComputer.hpp \
 	pairs/ForceComputer.hpp \
 	pairs/ComputerList.hpp
 
-#	pairs/All.hpp
+
 
 libespresso_common_la_SOURCES += \
-        pairs/bindings.cpp \
+	pairs/bindings.cpp \
 	pairs/Set.cpp \
-        pairs/List.cpp
+	pairs/Computer.cpp \
+	pairs/All.cpp 
 
-#        pairs/PythonComputer.cpp
-#	pairs/All.cpp
+#        pairs/List.cpp

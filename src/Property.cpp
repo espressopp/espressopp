@@ -7,29 +7,29 @@ void espresso::registerPythonProperties()
   using namespace espresso::particles;
   using namespace espresso::python;
 
-  class_< Real3DProperty, Real3DProperty::SelfPtr >
+  class_< Property< Real3D > >
     ("Real3DProperty", init< Storage::SelfPtr >())
-    .def("__getitem__", &Real3DProperty::getItem)
-    .def("__setitem__", &Real3DProperty::setItem);
+    .def("__getitem__", &Property< Real3D >::getItem)
+    .def("__setitem__", &Property< Real3D >::setItem);
   
-  class_< IntegerProperty, IntegerProperty::SelfPtr >
+  class_< Property< int > >
     ("IntegerProperty", init< Storage::SelfPtr >())
-    .def("__getitem__", &IntegerProperty::getItem)
-    .def("__setitem__", &IntegerProperty::setItem);
+    .def("__getitem__", &Property< int >::getItem)
+    .def("__setitem__", &Property< int >::setItem);
   
-  class_< RealProperty, RealProperty::SelfPtr >
+  class_< Property< real > >
     ("RealProperty", init< Storage::SelfPtr >())
-    .def("__getitem__", &RealProperty::getItem)
-    .def("__setitem__", &RealProperty::setItem);
+    .def("__getitem__", &Property< real >::getItem)
+    .def("__setitem__", &Property< real >::setItem);
   
-  class_< IntegerArrayProperty, IntegerArrayProperty::SelfPtr >
+  class_< ArrayProperty< int > >
     ("IntegerArrayProperty", init< Storage::SelfPtr, size_t >())
-    .def("__getitem__", &IntegerArrayProperty::getItem)
-    .def("__setitem__", &IntegerArrayProperty::setItem);
+    .def("__getitem__", &ArrayProperty< int >::getItem)
+    .def("__setitem__", &ArrayProperty< int >::setItem);
   
-  class_< RealArrayProperty, RealArrayProperty::SelfPtr >
+  class_< ArrayProperty< real > >
     ("RealArrayProperty", init< Storage::SelfPtr, size_t >())
-    .def("__getitem__", &RealArrayProperty::getItem)
-    .def("__setitem__", &RealArrayProperty::setItem);
+    .def("__getitem__", &ArrayProperty< real >::getItem)
+    .def("__setitem__", &ArrayProperty< real >::setItem);
 }
 

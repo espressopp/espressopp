@@ -9,7 +9,7 @@ class SetLocal(object):
     def foreach(self, computer):
         """
         apply the computer to each particle in the set (i.e. call
-        \"__apply__\" with the particle identity as
+        \"apply\" with the particle identity as
         parameter). 
         
         The return value of foreach is the return value of
@@ -20,7 +20,7 @@ class SetLocal(object):
             >>> class MyPythonComputer(espresso.particles.PythonComputer) :
             >>>    def __init__(self) :
             >>>        self.count = 0
-            >>>    def __apply__(self, id) :
+            >>>    def apply(self, id) :
             >>>        self.count += 1
             >>>    def collect(self) :
             >>>        return mpi.reduce(self.count, x,y : return x+y, pmi.CONTROLLER)

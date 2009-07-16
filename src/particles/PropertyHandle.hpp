@@ -69,6 +69,8 @@ namespace espresso {
       ConstArrayPropertyHandle(const esutil::TupleVector::ConstArrayPropertyPointer<T> &_ref)
         : esutil::TupleVector::ConstArrayPropertyPointer<T>(_ref) {}
     };
+
+    typedef ConstPropertyHandle< ParticleId > IdPropertyHandle;
   }
 }
 #endif

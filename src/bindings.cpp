@@ -25,7 +25,7 @@ void espresso::registerPython() {
   espresso::particles::registerPython();
   espresso::integrator::registerPython();
   espresso::thermostat::registerPython();
-  espresso::force::registerPython();
+  //  espresso::force::registerPython();
 
   log4espp::PyLogger::registerPython();
 }

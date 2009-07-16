@@ -25,16 +25,16 @@ namespace espresso {
 	: base(name, doc) {}
       
       // Construct with class name, no docstring, and an uncallable __init__ function
-      class_(char const* name, boost::python::no_init_t) 
+      class_(char const* name,  boost::python::no_init_t) 
 	: base(name, boost::python::no_init) {}
       
       // Construct with class name, docstring, and an uncallable __init__ function
-      class_(char const* name, char const* doc, boost::python::no_init_t)
-	: base(name, doc, boost::python::no_init) {}
+      class_(char const* name, char const* doc,  boost::python::no_init_t)
+	: base(name, doc, no_init) {}
       
       // Construct with class name and init<> function
       template <class DerivedT>
-      inline class_(char const* name, boost::python::init_base<DerivedT> const& i)
+      inline class_(char const* name, boost::python::init_base< DerivedT > const& i)
 	: base(name, i) {}
       
       // Construct with class name, docstring and init<> function

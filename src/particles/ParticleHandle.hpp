@@ -10,6 +10,7 @@ namespace espresso {
     class ParticleHandle {
     public:
       ParticleHandle() {}
+      ParticleHandle(const ParticleHandle &_handle) : ptr(_handle.ptr) {}
       ParticleHandle(const esutil::TupleVector::pointer &_ptr): ptr(_ptr) {}
       ParticleHandle(const esutil::TupleVector::reference &_ref): ptr(&_ref) {}
 
@@ -19,6 +20,10 @@ namespace espresso {
 
       /// check if valid handle
       operator bool() const { return ptr != esutil::TupleVector::pointer(); }
+
+      /// comparison
+      bool operator==(const ParticleHandle h) const { return ptr == h.ptr; }
+      bool operator!=(const ParticleHandle h) const { return ptr != h.ptr; }
 
     private:
       friend class ConstParticleHandle;
@@ -50,6 +55,10 @@ namespace espresso {
 
       /// check if valid handle
       operator bool() const { return ptr != esutil::TupleVector::const_pointer(); }
+
+      /// comparison
+      bool operator==(const ConstParticleHandle h) const { return ptr == h.ptr; }
+      bool operator!=(const ConstParticleHandle h) const { return ptr != h.ptr; }
     };
   }
 }

@@ -10,8 +10,8 @@ namespace espresso {
     void registerPython() {
       Potential::registerPython();
       CentralPotential::registerPython();
-      LennardJones::registerPython();
-      FENE::registerPython();
+//       LennardJones::registerPython();
+//       FENE::registerPython();
     }
   }
 }

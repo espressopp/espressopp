@@ -20,7 +20,7 @@ namespace espresso {
     private:
       particles::Storage::SelfPtr storage; 
       bc::BC::SelfPtr bc;
-      Real3DProperty::SelfPtr coordinates;
+      Property< Real3D >::SelfPtr coordinates;
       typedef std::pair< ParticleId,
 			 ParticleId > Tuple;
       std::vector< Tuple > id_list;
@@ -39,7 +39,7 @@ namespace espresso {
       */
       List (bc::BC::SelfPtr bc, 
             particles::Storage::SelfPtr storage,
-	    Real3DProperty::SelfPtr coordinates);
+	    Property< Real3D >::SelfPtr coordinates);
 
       size_t size() const;
 

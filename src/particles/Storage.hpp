@@ -14,17 +14,8 @@ namespace espresso {
   template<typename> class ArrayProperty;
 
   namespace particles {
-    // forward declaration
-
-    /**
-       MOCK implementation of particlestorage.
-       Currently only provides a subset of the expected interface,
-       and without guarantee :-).
-    */
-    class Storage 
-      : public enable_shared_from_this< Storage >,
-	public Set,
-	boost::noncopyable
+    class Storage : public Set, 
+		    boost::noncopyable
     {
     public:
       typedef shared_ptr< Storage > SelfPtr;
@@ -42,7 +33,7 @@ namespace espresso {
           @param id the id of the particle to create.
 	  @throw std::out_of_range if the particle already exists
       */
-      virtual void addParticle(ParticleId id);
+      virtual ParticleHandle addParticle(ParticleId id);
 
       /** delete a particle
           @param id the id of the particle to delete
@@ -79,7 +70,7 @@ namespace espresso {
       //@}
 
       /// get a short lifetime reference to the property representing the particle ID
-      const ConstPropertyHandle< ParticleId > getIdPropertyHandle() const {
+      const IdPropertyHandle getIdPropertyHandle() const {
         return particles.getProperty< ParticleId >(particleIdProperty);
       }
 
@@ -89,16 +80,20 @@ namespace espresso {
 	  check whether it belongs to this set
       */
       virtual bool isMember(ParticleHandle) const;
-      
+
+
       /** apply computer to all particles of this set
        */
-      virtual void foreach(Computer &computer);
-      virtual void foreach(ConstComputer &computer) const;
+      virtual void foreach(const ApplyFunction function);
+      virtual void foreach(const ConstApplyFunction function) const;
+      // make the other variants of foreach available
+      using Set::foreach;
 
       /// make this class available at Python
       static void registerPython();
 
     protected:
+
       /// here the particle data is stored
       esutil::TupleVector particles;
 

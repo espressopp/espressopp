@@ -2,7 +2,6 @@
 #include "Particle.hpp"
 
 using namespace espresso;
-
 using namespace espresso::python;
 
 /// espresso::python ResultConverter for ParticleId

@@ -26,9 +26,10 @@ Storage::Storage() {
 
 Storage::~Storage() {}
 
-void Storage::addParticle(ParticleId id) {
+ParticleHandle Storage::addParticle(ParticleId id) {
   esutil::TupleVector::iterator it = particles.insert(particles.end());
   particles.getProperty<size_t>(particleIdProperty)[*it] = id;
+  return ParticleHandle(it);
 }
 
 void Storage::deleteParticle(ParticleId deleteID) {
@@ -54,22 +55,18 @@ void Storage::deleteProperty(PropertyId id) {
 // Implementation of the Set interface
 bool Storage::isMember(ParticleHandle) const { return true; }
 
-void Storage::foreach(Computer &computer) {
-  computer.prepare();
+void Storage::foreach(const ApplyFunction function) {
   BOOST_FOREACH(esutil::TupleVector::reference particle, 
 		particles) {
-    computer(ParticleHandle(particle));
+    function(ParticleHandle(particle));
   }
-  computer.finalize();
 }
 
-void Storage::foreach(ConstComputer& computer) const {
-  computer.prepare();
+void Storage::foreach(const ConstApplyFunction function) const {
   BOOST_FOREACH(esutil::TupleVector::const_reference particle, 
 		particles) {
-    computer(ConstParticleHandle(particle));
+    function(ConstParticleHandle(particle));
   }
-  computer.finalize();
 }
 
 //////////////////////////////////////////////////

@@ -1,7 +1,9 @@
 #include "All.hpp"
-#include "esutil/virtual_functional.hpp"
+
+#include <exception>
+
 #include "particles/Computer.hpp"
-#include <python.hpp>
+#include "python.hpp"
 
 using namespace espresso;
 using namespace espresso::bc;
@@ -10,108 +12,82 @@ using namespace espresso::pairs;
 
 using namespace boost;
 
-// some abbreviations
-
-// Helper class 1
-
-template <class ParticleComputer>
-class Traverser1 
-  : public ParticleComputer  {
-
-  typedef typename ParticleComputer::argument_type Reference;
-  typedef pairs::ComputerBase<Reference> PairComputer;
-  
-private:
-  class Traverser2 
-    : public ParticleComputer  {
-    
-  public:
-    const BC& bc;
-    
-    const particles::ConstPropertyHandle<ParticleId> id;
-    const particles::ConstPropertyHandle<Real3D> pos;
-
-    const Reference pref1;
-    const Real3D pos1;
-    const ParticleId id1;
-
-    PairComputer& pairComputer;
-
-    Traverser2(const All* all,
-	       const Reference pref,
-	       PairComputer& _pairComputer
-	       ) :
-      bc(*(all->getBC().get())), 
-      id(all->getSet()->getStorage()->getIdPropertyHandle()),
-      pos(particles::PropertyHandle<Real3D>(*(all->getCoordinateProperty()))),
-      pref1(pref),
-      pos1(pos[pref1]),
-      id1(id[pref1]),
-      pairComputer(_pairComputer)
-    {  } 
-
-    virtual void operator()(const Reference pref2) {
-   
-      if (id1 < id[pref2]) {
-	Real3D dist = bc.getDist(pos1, pos[pref2]);
-	pairComputer(dist, pref1, pref2);
-      }
-    }
-  };
-
-public:
-
-  PairComputer& pairComputer;
-
-  const All* all;
-
-  Traverser1(const All* _all, PairComputer& _pairComputer) :
-    pairComputer(_pairComputer),
-    all(_all)
-  {  }
-
-  virtual void operator()(const Reference pref) {
-    // printf ("Traverser1: will call traverser2\n");
-    Traverser2 traverser2(all, pref, pairComputer);
-    all->getSet()->foreach(traverser2);
-  }
-};
-
-/*--------------------------------------------------------------------------
-  All::~All()
-  -------------------------------------------------------------------------- */
-
-All::~All() {}
-
-/*--------------------------------------------------------------------------
-  All::All(boundary_conditions, particle_set)
-  -------------------------------------------------------------------------- */
-
 All::All(bc::BC::SelfPtr _bc,
          particles::Set::SelfPtr _set,
-         Real3DProperty::SelfPtr _coordinates) :
-  set(_set),
-  bc(_bc),
-  coordinates(_coordinates)
+         Property< Real3D >::SelfPtr _posProperty ) 
+  : set(_set), bc(_bc), posProperty(_posProperty)
 { }
 
-/*--------------------------------------------------------------------------
-  All::foreach(PairComputer)
-  -------------------------------------------------------------------------- */
-void All::foreach(pairs::Computer& pairComputer) {
-  // printf ("ParticlePairComputer non-const\n");
-  Traverser1<particles::Computer> traverser1(this, pairComputer);;
-  set->foreach(traverser1);
+namespace {
+  class SameId {};
+
+  template < class ApplyFunction, class ParticleHandle >
+  class Traverser {
+    typedef Traverser< ApplyFunction, ParticleHandle > Self;
+
+    // the function to be applied to the pair
+    const ApplyFunction &applyFunction;
+    // the boundary conditions required to compute the posititon
+    const bc::BC &bc;
+    // the set to loop over
+    particles::Set &set;
+
+    particles::PropertyHandle< Real3D > pos;
+    // the current particle in the first set
+    ParticleHandle p1;
+
+  public:
+    Traverser(const ApplyFunction &_applyFunction,
+	      const bc::BC::SelfPtr bcptr,
+	      const particles::Set::SelfPtr setptr,
+	      const Property< Real3D >::SelfPtr posProperty)
+      : applyFunction(_applyFunction), 
+	bc(*bcptr), 
+	set(*setptr), 
+	pos(*posProperty)
+    {}
+
+    void foreach() {
+      particles::ApplyFunction af = 
+	boost::bind(&Self::traverse1, this, _1);
+      set.foreach(af);
+    }
+
+  private:
+    void traverse1(const ParticleHandle _p1) {
+      p1 = _p1;
+      try {
+	set.foreach(boost::bind(&Self::traverse2, this, _1));
+      } catch (SameId) {}
+    }
+    
+    void traverse2(const ParticleHandle p2) {
+      // if a pair of a particle with itself turn up in the inner loop,
+      // interrupt the inner loop and continue with the next element from
+      // the outer loop
+      if (p1 == p2) throw SameId();
+      Real3D pos1 = pos[p1];
+      Real3D pos2 = pos[p2];
+      Real3D dist = bc.getDist(pos1, pos2);
+      applyFunction(dist, p1, p2);
+    }
+
+
+  };
+
 }
-       
-/*--------------------------------------------------------------------------
-  All::foreach(ConstPairComputer)
-  -------------------------------------------------------------------------- */
-void All::foreach(pairs::ConstComputer& pairComputer) const {
-  // printf ("ParticlePairComputer const\n");
-  Traverser1<particles::ConstComputer> traverser1(this, pairComputer);;
-  set->foreach(traverser1);
+
+void All::foreach(ApplyFunction applyFunction) {
+  Traverser< ApplyFunction, particles::ParticleHandle > 
+    traverser(applyFunction, bc, set, posProperty);
+  traverser.foreach();
 }
+
+void All::foreach(ConstApplyFunction applyFunction) const {
+  Traverser< ConstApplyFunction, particles::ConstParticleHandle > 
+    traverser(applyFunction, bc, set, posProperty);
+  traverser.foreach();
+}  
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -119,11 +95,11 @@ void All::foreach(pairs::ConstComputer& pairComputer) const {
 
 void 
 All::registerPython() {
-  using namespace boost;
   using namespace espresso::python;
-
   class_< All, bases< Set > >
     ("pairs_All", 
-     init< bc::BC::SelfPtr, particles::Set::SelfPtr, Real3DProperty::SelfPtr >())
+     init < bc::BC::SelfPtr, 
+     particles::Set::SelfPtr, 
+     Property< Real3D >::SelfPtr >())
     ;
 }

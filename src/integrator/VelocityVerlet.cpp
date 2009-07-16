@@ -29,7 +29,7 @@ class StepA: public particles::Computer {
      pos(_posRef), vel(_velRef), force(_forceRef),
      timeStep(_timeStep), timeStepSqr(_timeStep * _timeStep) {}
 
-   virtual void operator()(ParticleHandle pref) {
+   virtual void apply(ParticleHandle pref) {
      pos[pref] = pos[pref] + vel[pref] * timeStep + 0.5 * force[pref] * timeStepSqr;
      vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
    }
@@ -51,7 +51,7 @@ class StepB: public particles::Computer {
 
       vel(_velRef), force(_forceRef), timeStep(_timeStep) {}
 
-    virtual void operator()(ParticleHandle pref) {
+    virtual void apply(ParticleHandle pref) {
         vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
     }
 };
@@ -66,15 +66,15 @@ class StepZeroForces: public particles::Computer {
 
     StepZeroForces(PropertyHandle<Real3D> _forceRef): force(_forceRef) {}
 
-    virtual void operator()(ParticleHandle pref) {
+    virtual void apply(ParticleHandle pref) {
       force[pref] = 0.0;
     }
 };
 
 VelocityVerlet::VelocityVerlet(Set::SelfPtr _particles, 
-                               Real3DProperty::SelfPtr _position,
-                               Real3DProperty::SelfPtr _velocity,
-                               Real3DProperty::SelfPtr _force):
+                               Property< Real3D >::SelfPtr _position,
+                               Property< Real3D >::SelfPtr _velocity,
+                               Property< Real3D >::SelfPtr _force):
 
    MDIntegrator(_particles, _position, _velocity, _force) {}
 
@@ -132,6 +132,9 @@ VelocityVerlet::registerPython() {
   // TODO: Why noncopyable?
   class_< VelocityVerlet, boost::noncopyable, bases< MDIntegrator > >
     ("integrator_VelocityVerlet", 
-     init< Set::SelfPtr, Real3DProperty::SelfPtr, Real3DProperty::SelfPtr, Real3DProperty::SelfPtr >())
+     init< Set::SelfPtr, 
+     Property< Real3D >::SelfPtr, 
+     Property< Real3D >::SelfPtr, 
+     Property< Real3D >::SelfPtr >())
     ;
 }

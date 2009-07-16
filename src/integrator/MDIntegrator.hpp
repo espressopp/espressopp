@@ -25,9 +25,9 @@ namespace espresso {
 
       particles::Set::SelfPtr particles;    //!< particle set to integrate
 
-      Real3DProperty::SelfPtr position; //!< position property
-      Real3DProperty::SelfPtr velocity; //!< velocity property
-      Real3DProperty::SelfPtr force;    //!< force property
+      Property< Real3D >::SelfPtr position; //!< position property
+      Property< Real3D >::SelfPtr velocity; //!< velocity property
+      Property< Real3D >::SelfPtr force;    //!< force property
 
       /** A pure routine for a single iteration step makes this class abstract. */
 
@@ -47,15 +47,15 @@ namespace espresso {
       IntegrateSignal updateForces;
 
       MDIntegrator(particles::Set::SelfPtr particles,
-                   Real3DProperty::SelfPtr posProperty,
-                   Real3DProperty::SelfPtr velProperty,
-                   Real3DProperty::SelfPtr forceProperty);
+                   Property< Real3D >::SelfPtr posProperty,
+                   Property< Real3D >::SelfPtr velProperty,
+                   Property< Real3D >::SelfPtr forceProperty);
 
       particles::Set::SelfPtr getParticles() const { return particles; }
 
-      Real3DProperty::SelfPtr getPosProperty() const { return position; }
-      Real3DProperty::SelfPtr getVelProperty() const { return velocity; }
-      Real3DProperty::SelfPtr getForceProperty() const { return force; }
+      Property< Real3D >::SelfPtr getPosProperty() const { return position; }
+      Property< Real3D >::SelfPtr getVelProperty() const { return velocity; }
+      Property< Real3D >::SelfPtr getForceProperty() const { return force; }
 
       virtual ~MDIntegrator() {}
       

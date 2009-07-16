@@ -18,10 +18,14 @@ namespace espresso {
 
       @tparam T type stored in the property
   */
+
+  // TODO: Should be noncopyable!
+  //  class Property :  boost::noncopyable {
+
   template < typename T >
   class Property {
-    typedef particles::PropertyHandle< T > RefType;
-    typedef particles::ConstPropertyHandle< T > ConstRefType;
+    typedef particles::PropertyHandle< T > Handle;
+    typedef particles::ConstPropertyHandle< T > ConstHandle;
   public: // visible in Python
     typedef shared_ptr< Property< T > > SelfPtr;
 
@@ -41,21 +45,23 @@ namespace espresso {
     }
 
   public: // invisible in Python
-
-    operator ConstRefType() const {
+    ConstHandle getConstHandle() const {
       return storage->template getConstPropertyHandle< T >(id);
     }
 
-    operator RefType() {
+    Handle getHandle() {
       return storage->template getPropertyHandle< T >(id);
     }
 
-    T operator[](particles::ConstParticleHandle handle) const {
-      return ConstRefType(*this)[handle];
+    operator ConstHandle() const { return getConstHandle(); }
+    operator Handle() { return getHandle(); }
+
+    T operator[](particles::ConstParticleHandle particle) const {
+      return ConstHandle(*this)[particle];
     }
 
-    T &operator[](particles::ParticleHandle handle) {
-      return RefType(*this)[handle];
+    T &operator[](particles::ParticleHandle particle) {
+      return Handle(*this)[particle];
     }
 
     T operator[](ParticleId id) const {
@@ -90,14 +96,16 @@ namespace espresso {
       return (*this)[handle];
     }
 
+    particles::Storage::SelfPtr getStorage() { return storage; }
+
+    particles::IdPropertyHandle getIdHandle() { 
+      return storage->getIdPropertyHandle(); 
+    }
+
   private:
     particles::Storage::SelfPtr storage;
     esutil::TupleVector::PropertyId id;
   };
-
-  typedef Property<real> RealProperty;
-  typedef Property<Real3D> Real3DProperty;
-  typedef Property<int> IntegerProperty;
 
 
   /** Array particle property. This does several things:
@@ -111,23 +119,23 @@ namespace espresso {
 
       @tparam T type stored in the property
   */
-  template <typename T>
-  class ArrayProperty {
-    typedef particles::ArrayPropertyHandle<T> RefType;
-    typedef particles::ConstArrayPropertyHandle<T> ConstRefType;
+  template < typename T >
+  class ArrayProperty  {
+    typedef particles::ArrayPropertyHandle<T> Handle;
+    typedef particles::ConstArrayPropertyHandle<T> ConstHandle;
 
   public: // visible in Python
     typedef shared_ptr< ArrayProperty< T > > SelfPtr;
 
     std::vector<T> getItem(ParticleId part) const {
-      ConstRefType ref = *this;
+      ConstHandle ref = *this;
       const T
         *start = (*this).at(part),
         *end   = start + ref.getDimension();
       return std::vector<T>(start, end);
     }
     void setItem(ParticleId part, const std::vector<T> &v) {
-      RefType ref = *this;
+      Handle ref = *this;
       if (v.size() != ref.getDimension())
         throw std::range_error("ArrayProperty::setItem: incorrect dimension");
       std::copy(v.begin(), v.end(), (*this).at(part));
@@ -143,20 +151,20 @@ namespace espresso {
       storage->deleteProperty(id);
     }
 
-    operator ConstRefType() const {
+    operator ConstHandle() const {
       return storage->template getConstArrayPropertyHandle<T>(id);
     }
 
-    operator RefType() {
+    operator Handle() {
       return storage->template getArrayPropertyHandle<T>(id);
     }
 
     const T *operator[](particles::ConstParticleHandle handle) const {
-      return ConstRefType(*this)[handle];
+      return ConstHandle(*this)[handle];
     }
 
     T *operator[](particles::ParticleHandle handle) {
-      return RefType(*this)[handle];
+      return Handle(*this)[handle];
     }
 
     const T *operator[](ParticleId part) const {
@@ -191,13 +199,16 @@ namespace espresso {
       return (*this)[handle];
     }
 
+    particles::Storage::SelfPtr getStorage() { return storage; }
+
+    particles::IdPropertyHandle getIdPropertyHandle() { 
+      return storage->getIdPropertyHandle(); 
+    }
+
   private:
     particles::Storage::SelfPtr storage;
     esutil::TupleVector::PropertyId id;
   };
-
-  typedef ArrayProperty<int> IntegerArrayProperty;
-  typedef ArrayProperty<real> RealArrayProperty;
 
   void registerPythonProperties();
 }

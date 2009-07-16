@@ -1,6 +1,8 @@
 #ifndef _PARTICLE_HPP
 #define _PARTICLE_HPP
 
+#include "types.hpp"
+
 namespace espresso {
   /** persistent identifier for a particle. This is really just an
       size_t, but with explicit conversion only, to make sure that

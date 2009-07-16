@@ -3,16 +3,14 @@
 
 #include "types.hpp"
 #include "particles/ParticleHandle.hpp"
-#include "particles/Set.hpp"
-
+#include "boost/function.hpp"
 
 namespace espresso {
   namespace pairs {
     /** Abstract class that defines the operator() applied to particle pairs
      */
-    template<class ParticleHandle>
+    template< class ParticleHandle >
     class ComputerBase {
-      
     public:
       /// @name extended function object interface
       //@{
@@ -22,10 +20,8 @@ namespace espresso {
       typedef void                       result_type;
       //@}
 
-      virtual ~ComputerBase() {}
-
-//       virtual void bind(PStorage storage) = 0;
-//       virtual void unbind() = 0;
+      virtual void prepare() {}
+      virtual void finalize() {}
 
       /** Interface of the routine that is applied to particle pairs
 	  \param dist: distance vector between the two particles
@@ -38,20 +34,27 @@ namespace espresso {
 	  Note: The references are necessary if more property data of
 	  the particles is needed than only the distance.
       */
-      virtual void operator()(const Real3D &dist, 
-			      const ParticleHandle p1, 
-			      const ParticleHandle p2) = 0;
+      virtual void apply(const Real3D dist, 
+			 const ParticleHandle p1, 
+			 const ParticleHandle p2) = 0;
     };
 
     /** Abstract class that defines a function on pairs of particles */
     class Computer: 
-      public ComputerBase<particles::ParticleHandle> 
-    {};
+      public ComputerBase< particles::ParticleHandle > 
+    {
+    public:
+      typedef shared_ptr< Computer > SelfPtr;
+      static void registerPython();
+    };
     
     /** Abstract class that defines a function on pairs of read-only particles */
     class ConstComputer:
-      public ComputerBase<particles::ConstParticleHandle> 
-    {};
+      public ComputerBase< particles::ConstParticleHandle > 
+    {
+    public:
+      typedef shared_ptr< ConstComputer > SelfPtr;
+    };
   }
 }
 
