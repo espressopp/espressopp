@@ -18,7 +18,7 @@ if __name__ == 'espresso.pmi':
             self.position = _position
             self.tag = _tag
 
-        def __apply__(self, pid):
+        def apply(self, pid):
             pos = self.position[pid]
             self.tag[pid] = pos*pos < 0.5
 
@@ -33,7 +33,7 @@ if __name__ == 'espresso.pmi':
             self.total = 0
             self.sphere = 0
 
-        def __apply__(self, pid) :
+        def apply(self, pid) :
             self.total += 1
             if self.tag[pid]:
                 print("%d %d %s" % (mpi.rank, pid, self.property[pid]))

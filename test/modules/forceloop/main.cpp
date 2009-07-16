@@ -55,34 +55,33 @@ void forceloop() {
 
   Storage::SelfPtr particleStorage = make_shared< Storage >();
 
-  Real3DProperty::SelfPtr position = make_shared< Real3DProperty >(particleStorage);
-  Real3DProperty::SelfPtr velocity = make_shared< Real3DProperty >(particleStorage);
-  Real3DProperty::SelfPtr force = make_shared< Real3DProperty >(particleStorage);
-
+  Property< Real3D >::SelfPtr position = make_shared< Property< Real3D > >(particleStorage);
+  Property< Real3D >::SelfPtr velocity = make_shared< Property< Real3D > >(particleStorage);
+  Property< Real3D >::SelfPtr force = make_shared< Property< Real3D > >(particleStorage);
+  
   // generate particles in the particle storage
   
   size_t cnt = 0;
   for (int i = 0; i < N; i++) 
-  for (int j = 0; j < N; j++) 
-  for (int k = 0; k < N; k++) {
-      
-       real r;
-       r = 0.4 + 0.2 * rand() / RAND_MAX;
-       real x = (i + r) / N * SIZE;
-       real y = (j + r) / N * SIZE; 
-       real z = (k + r) / N * SIZE;
-
-       ParticleId id = ParticleId(cnt++);
-       particleStorage->addParticle(id);
-
-       (*position.get())[id] = Real3D(x, y, z);
-       (*velocity.get())[id] = Real3D(x, y, z);
-       (*force.get())[id] = 0.0;
-  }
-
+    for (int j = 0; j < N; j++) 
+      for (int k = 0; k < N; k++) {
+	
+	real r;
+	r = 0.4 + 0.2 * rand() / RAND_MAX;
+	real x = (i + r) / N * SIZE;
+	real y = (j + r) / N * SIZE; 
+	real z = (k + r) / N * SIZE;
+	
+	ParticleId id = ParticleId(cnt++);
+	particleStorage->addParticle(id);
+	
+	(*position)[id] = Real3D(x, y, z);
+	(*velocity)[id] = Real3D(x, y, z);
+	(*force)[id] = 0.0;
+      }
+  
   // For test only: ParticleWriter prints each particle
-
-  ParticleWriter pWriter(*particleStorage.get(), *position.get(), *force.get());
+  ParticleWriter pWriter(position, force);
 
   // call pWriter(id) for each particle reference ref of particle storage
 
@@ -106,20 +105,20 @@ void forceloop() {
 
   // define LennardJones potential
 
-  LennardJones::SelfPtr ljint = make_shared< LennardJones >();
+  // LennardJones::SelfPtr ljint = make_shared< LennardJones >();
   
-  ljint->set(1.0, 1.0, 2.5);
+  // ljint->set(1.0, 1.0, 2.5);
   
   // make a FENE potential
 
-  FENE fene;
+  //  FENE fene;
 
-  fene.set(1.5, 1.0, 2.5);
+  //  fene.set(1.5, 1.0, 2.5);
 
   // force will be the vector of all forces in the particle storage
   // and force[ref] returns the force (as RealArrayRef) of particle reference ref
 
-  PropertyHandle<Real3D> forceRef = *force.get();
+  PropertyHandle< Real3D > forceRef = *force;
 
   // Define a pair computer that computes the forces for particle pairs
   // ljint provides the routine computeForce for a particle pair
