@@ -96,6 +96,7 @@ if not EXTERNAL_BOOST:
     CPPFLAGS += ' -I' + os.path.join(top_srcdir, 'contrib' , 'boost')
     LDFLAGS += ' -I' + os.path.join(top_builddir, 'contrib', 'boost')
 LIBS = os.path.join(top_builddir, 'src' , 'libespresso_common.la') 
+LIBS += ' ' + os.path.join(top_builddir, 'src' , 'libgenlogger.la') 
 LIBS += ' ' + BOOST_UNITTEST_LIBS
 LTCALL = LIBTOOL + ' --tag=CXX ' + LIBTOOLFLAGS
 
