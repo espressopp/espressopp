@@ -23,12 +23,10 @@ class PythonComputerLocal(particles_PythonComputer) :
     Decomposer.foreach, the return value of "finalize" is passed back.
     """
     def __init__(self, arg):
-        if isinstance(arg, particles_Storage):
-            particles_PythonComputer.__init__(self, arg)
-        else:
-            particles_PythonComputer.__init__(self, arg.cxxobject)
+        particles_PythonComputer.__init__(self)
         
-    def prepare(self): pass
+    def prepare(self, storage):
+        pass
 
     def apply(self, id): 
         """

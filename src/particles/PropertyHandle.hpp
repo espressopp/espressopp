@@ -70,7 +70,6 @@ namespace espresso {
         : esutil::TupleVector::ConstArrayPropertyPointer<T>(_ref) {}
     };
 
-    typedef ConstPropertyHandle< ParticleId > IdPropertyHandle;
   }
 }
 #endif

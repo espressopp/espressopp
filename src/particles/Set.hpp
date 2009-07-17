@@ -1,8 +1,8 @@
 #ifndef _PARTICLES_SET_HPP
 #define _PARTICLES_SET_HPP
-#include <exception>
 #include "types.hpp"
-#include "Computer.hpp"
+#include "particles/Computer.hpp"
+#include "Particle.hpp"
 
 namespace espresso {
   namespace particles {
@@ -11,6 +11,9 @@ namespace espresso {
 
     class ForeachBreak: public std::exception {};
 
+    // forward declaration
+    class Storage;
+
     class Set {
     public:
       typedef shared_ptr< Set > SelfPtr;
@@ -18,7 +21,8 @@ namespace espresso {
       /** for a particle of the Storage of this class,
           check whether it belongs to this set
       */
-      virtual bool isMember(ConstParticleHandle pref) const;
+      virtual bool isMember(const ConstParticleHandle pref) const;
+      virtual bool isMember(ParticleId pid);
 
       /** Apply computer to all particles of this set. Call prepare and finalize.
 
@@ -37,7 +41,9 @@ namespace espresso {
       virtual void foreach(const ApplyFunction function) = 0;
       virtual void foreach(const ConstApplyFunction function) const = 0;
 
-      /** Abstract class needs also registration in Python */
+      virtual shared_ptr< Storage > getStorage() = 0;
+      virtual const shared_ptr< Storage > getStorage() const;
+
       static void registerPython();
     };
   }

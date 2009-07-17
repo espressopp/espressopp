@@ -2,11 +2,19 @@
 #include "Property.hpp"
 #include "Particle.hpp"
 
-void espresso::registerPythonProperties()
-{
-  using namespace espresso::particles;
-  using namespace espresso::python;
+using namespace espresso;
+using namespace espresso::particles;
 
+PropertyBase::
+PropertyBase(const Storage::SelfPtr _storage)
+  : storage(_storage) {}
+
+Storage::SelfPtr
+const PropertyBase::getStorage() const { return storage; }
+
+void espresso::registerPythonProperty()
+{
+  using namespace espresso::python;
   class_< Property< Real3D > >
     ("Real3DProperty", init< Storage::SelfPtr >())
     .def("__getitem__", &Property< Real3D >::getItem)

@@ -2,30 +2,53 @@
 #include "python.hpp"
 
 #include "integrator/MDIntegrator.hpp"
+#include "particles/Storage.hpp"
 
+using namespace espresso;
 using namespace espresso::integrator;
 
 /* -- define the Logger for the class  ------------------------------------------- */
 
 LOG4ESPP_LOGGER(MDIntegrator::theLogger, "Integrator");
 
-/*********************************************************************************/
-
-MDIntegrator::MDIntegrator(particles::Set::SelfPtr _particles,
-                           Property< Real3D >::SelfPtr _position,
-                           Property< Real3D >::SelfPtr _velocity,
-                           Property< Real3D >::SelfPtr _force) :
-
-    particles(_particles),
-    position(_position),
-    velocity(_velocity),
-    force(_force)
+MDIntegrator::MDIntegrator(particles::Set::SelfPtr _set,
+                           Property< Real3D >::SelfPtr _posProperty,
+                           Property< Real3D >::SelfPtr _velProperty,
+                           Property< Real3D >::SelfPtr _forceProperty) :
+  set(_set),
+  posProperty(_posProperty),
+  velProperty(_velProperty),
+  forceProperty(_forceProperty)
 {
+  particles::Storage::SelfPtr storage = set->getStorage();
+  storage->checkProperty(posProperty);
+  storage->checkProperty(velProperty);
+  storage->checkProperty(forceProperty);
   LOG4ESPP_INFO(theLogger, "Constructor of MDIntegrator");
   timeStep = 0.0;
 }
 
-/*********************************************************************************/
+particles::Set::SelfPtr 
+MDIntegrator::getSet() const { return set; }
+
+Property< Real3D >::SelfPtr 
+MDIntegrator::getPosProperty() const { return posProperty; }
+
+Property< Real3D >::SelfPtr 
+MDIntegrator::getVelProperty() const { return velProperty; }
+
+Property< Real3D >::SelfPtr 
+MDIntegrator::getForceProperty() const { return forceProperty; }
+
+void 
+MDIntegrator::setTimeStep(real _timeStep) { timeStep = _timeStep; }
+
+real 
+MDIntegrator::getTimeStep() const { return timeStep; }
+
+int 
+MDIntegrator::getIntegrationStep() const { return nTimeStep; }
+
 
 void MDIntegrator::run(int nsteps)
 {
@@ -42,13 +65,10 @@ void MDIntegrator::run(int nsteps)
   startIntegration(*this);
 
   for (nTimeStep = 0; nTimeStep < nsteps; nTimeStep++) {
-
      LOG4ESPP_DEBUG(theLogger, "Integrator runs step " << nTimeStep << " of " << nsteps);
-
      startStep(*this);
 
      // runSingleStep is the routine provided by the derived class
-
      step(); 
 
      endStep(*this);

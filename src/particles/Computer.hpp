@@ -1,7 +1,6 @@
 #ifndef _PARTICLES_COMPUTER_HPP
 #define _PARTICLES_COMPUTER_HPP
 
-//#include "esutil/virtual_functional.hpp"
 #include <iostream>
 
 #include "ParticleHandle.hpp"
@@ -10,6 +9,8 @@
 
 namespace espresso {
   namespace particles {
+    class Storage;
+
     template< class Handle >
     class ComputerBase {
     public:
@@ -17,8 +18,11 @@ namespace espresso {
 
       /** function that is called right before using the Computer on a
 	  specific Storage.  The storage will not be modified until
-	  finalize() is called. */
-      virtual void prepare() {}
+	  finalize() is called. 
+	  The Storage should be used to check whether the Properties
+	  that are used in the Computer use the same Storage as the
+	  particles in the Set. */
+      virtual void prepare(const shared_ptr< Storage > storage) {}
 
       /** \return whether to interrupt the loop or not. */
       virtual void apply(const Handle p) = 0;

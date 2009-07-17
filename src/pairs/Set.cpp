@@ -6,9 +6,13 @@
 
 using namespace espresso::pairs;
 
+Set::Set(particles::Storage::SelfPtr _storage1,
+	 particles::Storage::SelfPtr _storage2)
+  : storage1(_storage1), storage2(_storage2) {}
+
 void 
 Set::foreach(Computer &computer) {
-  computer.prepare();
+  computer.prepare(storage1, storage2);
   try {
     foreach(boost::bind(&Computer::apply, &computer, _1, _2, _3));
   } catch (ForeachBreak) {
@@ -20,7 +24,7 @@ Set::foreach(Computer &computer) {
 
 void
 Set::foreach(ConstComputer &computer) const {
-  computer.prepare();
+  computer.prepare(storage1, storage2);
   try {
     foreach(boost::bind(&ConstComputer::apply, &computer, _1, _2, _3));
   } catch (ForeachBreak) {

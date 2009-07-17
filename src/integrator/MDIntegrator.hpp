@@ -23,11 +23,11 @@ namespace espresso {
       
       real timeStep;   //!< delta time for integration
 
-      particles::Set::SelfPtr particles;    //!< particle set to integrate
+      particles::Set::SelfPtr set;    //!< particle set to integrate
 
-      Property< Real3D >::SelfPtr position; //!< position property
-      Property< Real3D >::SelfPtr velocity; //!< velocity property
-      Property< Real3D >::SelfPtr force;    //!< force property
+      Property< Real3D >::SelfPtr posProperty; //!< position property
+      Property< Real3D >::SelfPtr velProperty; //!< velocity property
+      Property< Real3D >::SelfPtr forceProperty; //!< force property
 
       /** A pure routine for a single iteration step makes this class abstract. */
 
@@ -46,24 +46,20 @@ namespace espresso {
 
       IntegrateSignal updateForces;
 
-      MDIntegrator(particles::Set::SelfPtr particles,
-                   Property< Real3D >::SelfPtr posProperty,
-                   Property< Real3D >::SelfPtr velProperty,
-                   Property< Real3D >::SelfPtr forceProperty);
+      MDIntegrator(particles::Set::SelfPtr set,
+                   Property< Real3D >::SelfPtr _posProperty,
+                   Property< Real3D >::SelfPtr _velProperty,
+                   Property< Real3D >::SelfPtr _forceProperty);
 
-      particles::Set::SelfPtr getParticles() const { return particles; }
+      particles::Set::SelfPtr getSet() const;
+      Property< Real3D >::SelfPtr getPosProperty() const;
+      Property< Real3D >::SelfPtr getVelProperty() const;
+      Property< Real3D >::SelfPtr getForceProperty() const;
 
-      Property< Real3D >::SelfPtr getPosProperty() const { return position; }
-      Property< Real3D >::SelfPtr getVelProperty() const { return velocity; }
-      Property< Real3D >::SelfPtr getForceProperty() const { return force; }
+      void setTimeStep(real _timeStep);
+      real getTimeStep() const;
 
-      virtual ~MDIntegrator() {}
-      
-      void setTimeStep(real _timeStep) { timeStep = _timeStep; }
-      
-      real getTimeStep() const { return timeStep; }
-
-      int getIntegrationStep() const { return nTimeStep; }
+      int getIntegrationStep() const;
 
       /** Do \p nsteps steps. */
       void run(int nsteps);

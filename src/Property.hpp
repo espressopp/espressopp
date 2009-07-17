@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <algorithm>
+#include "particles/PropertyHandle.hpp"
+#include "particles/ParticleHandle.hpp"
 #include "particles/Storage.hpp"
 #include "Particle.hpp"
 
@@ -19,20 +21,33 @@ namespace espresso {
       @tparam T type stored in the property
   */
 
+  class PropertyBase {
+  public:
+    typedef shared_ptr< PropertyBase > SelfPtr;
+
+    PropertyBase(const shared_ptr< particles::Storage > _storage);
+
+    virtual const shared_ptr< particles::Storage > 
+    getStorage() const;
+
+  protected:
+    // what storage does the property belong to
+    const shared_ptr< particles::Storage > storage;
+  };
+
   // TODO: Should be noncopyable!
   //  class Property :  boost::noncopyable {
-
   template < typename T >
-  class Property {
+  class Property : public PropertyBase {
     typedef particles::PropertyHandle< T > Handle;
     typedef particles::ConstPropertyHandle< T > ConstHandle;
   public: // visible in Python
     typedef shared_ptr< Property< T > > SelfPtr;
 
-    Property(particles::Storage::SelfPtr _storage)
-      : storage(_storage) {
-      id = storage->template addProperty<T>();
-    }
+    Property(shared_ptr< particles::Storage > _storage)
+      : PropertyBase(_storage), id(storage->template addProperty<T>())
+    {}
+
     ~Property() {
       storage->deleteProperty(id);
     }
@@ -45,16 +60,13 @@ namespace espresso {
     }
 
   public: // invisible in Python
-    ConstHandle getConstHandle() const {
+    operator ConstHandle() const { 
       return storage->template getConstPropertyHandle< T >(id);
     }
 
-    Handle getHandle() {
+    operator Handle() { 
       return storage->template getPropertyHandle< T >(id);
     }
-
-    operator ConstHandle() const { return getConstHandle(); }
-    operator Handle() { return getHandle(); }
 
     T operator[](particles::ConstParticleHandle particle) const {
       return ConstHandle(*this)[particle];
@@ -96,14 +108,7 @@ namespace espresso {
       return (*this)[handle];
     }
 
-    particles::Storage::SelfPtr getStorage() { return storage; }
-
-    particles::IdPropertyHandle getIdHandle() { 
-      return storage->getIdPropertyHandle(); 
-    }
-
   private:
-    particles::Storage::SelfPtr storage;
     esutil::TupleVector::PropertyId id;
   };
 
@@ -120,7 +125,7 @@ namespace espresso {
       @tparam T type stored in the property
   */
   template < typename T >
-  class ArrayProperty  {
+  class ArrayProperty : public PropertyBase {
     typedef particles::ArrayPropertyHandle<T> Handle;
     typedef particles::ConstArrayPropertyHandle<T> ConstHandle;
 
@@ -144,9 +149,9 @@ namespace espresso {
   public: // invisible in Python
     ArrayProperty(particles::Storage::SelfPtr _storage,
                   size_t dimension)
-      : storage(_storage) {
-      id = _storage->template addProperty<T>(dimension);
-    }
+      : PropertyBase(_storage), id(_storage->template addProperty<T>(dimension))
+    {}
+
     ~ArrayProperty() {
       storage->deleteProperty(id);
     }
@@ -199,18 +204,12 @@ namespace espresso {
       return (*this)[handle];
     }
 
-    particles::Storage::SelfPtr getStorage() { return storage; }
-
-    particles::IdPropertyHandle getIdPropertyHandle() { 
-      return storage->getIdPropertyHandle(); 
-    }
-
   private:
-    particles::Storage::SelfPtr storage;
     esutil::TupleVector::PropertyId id;
   };
 
-  void registerPythonProperties();
+  void registerPythonProperty();
+
 }
 
 #endif

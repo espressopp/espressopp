@@ -29,5 +29,7 @@ Thermostat::registerPython() {
     ("thermostat_Thermostat", no_init)
   .def("setTemperature", &Thermostat::setTemperature)
   .def("getTemperature", &Thermostat::getTemperature)
+  .def("setSet", &Thermostat::setSet)
+  .def("getSet", &Thermostat::getSet)
   ;
 }

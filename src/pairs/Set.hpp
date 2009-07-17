@@ -25,6 +25,9 @@ namespace espresso {
     public:
       typedef shared_ptr< Set > SelfPtr;
       
+      Set(particles::Storage::SelfPtr _storage1,
+	  particles::Storage::SelfPtr _storage2);
+
       /** Apply computer to all pairs of this set. Call prepare() and
 	  finalize().
        */
@@ -44,6 +47,10 @@ namespace espresso {
       virtual void foreach(ConstApplyFunction function) const = 0;
 
       static void registerPython();
+
+    protected:
+      particles::Storage::SelfPtr storage1;
+      particles::Storage::SelfPtr storage2;
     };
   }
 }

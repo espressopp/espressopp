@@ -12,6 +12,9 @@ class DecomposerLocal(SetLocal):
         if not hasattr(self, 'cxxobject'):
             self.cxxobject = _Storage()
 
+    def checkProperty(self, property):
+        self.cxxobject.checkProperty(property.cxxobject)
+
 if pmi.IS_CONTROLLER :
     class Decomposer(Set):
         """

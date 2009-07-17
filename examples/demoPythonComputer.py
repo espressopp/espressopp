@@ -18,6 +18,11 @@ if __name__ == 'espresso.pmi':
             self.position = _position
             self.tag = _tag
 
+        def prepare(self, storage):
+            pass
+            #             storage.checkProperty(self.position.cxxobject)
+            #             storage.checkProperty(self.tag.cxxobject)
+
         def apply(self, pid):
             pos = self.position[pid]
             self.tag[pid] = pos*pos < 0.5
@@ -29,7 +34,9 @@ if __name__ == 'espresso.pmi':
             self.property = _property
             self.tag = _tag
 
-        def prepare(self):
+        def prepare(self, storage):
+            #             storage.checkProperty(self.property)
+            #             storage.checkProperty(self.tag)
             self.total = 0
             self.sphere = 0
 

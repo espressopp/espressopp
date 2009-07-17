@@ -1,6 +1,7 @@
 #include "VelocityVerlet.hpp"
 #include <boost/foreach.hpp>
 #include <python.hpp>
+#include "particles/Storage.hpp"
 #include "particles/Computer.hpp"
 #include "pairs/ForceComputer.hpp"
 
@@ -9,112 +10,86 @@ using namespace espresso::integrator;
 using namespace espresso::particles;
 using namespace boost;
 
-class StepA: public particles::Computer {
+namespace {
+  // fire once computer that should not be reused
+  struct StepA : public Computer {
+    const PropertyHandle< Real3D > pos;
+    const PropertyHandle< Real3D > vel;
+    const PropertyHandle< Real3D > force;
 
- private:
+    const real timeStep;
+    const real timeStepSqr;
 
-   PropertyHandle<Real3D> pos;
-   PropertyHandle<Real3D> vel;
-   PropertyHandle<Real3D> force;
-
-   real timeStep;
-   real timeStepSqr;
-
- public:
-
-   StepA(PropertyHandle<Real3D> _posRef,
-         PropertyHandle<Real3D> _velRef,
-         PropertyHandle<Real3D> _forceRef, real _timeStep):
-
-     pos(_posRef), vel(_velRef), force(_forceRef),
-     timeStep(_timeStep), timeStepSqr(_timeStep * _timeStep) {}
-
-   virtual void apply(ParticleHandle pref) {
-     pos[pref] = pos[pref] + vel[pref] * timeStep + 0.5 * force[pref] * timeStepSqr;
-     vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
-   }
-};
-
-class StepB: public particles::Computer {
-
-  private:
-
-    PropertyHandle<Real3D> vel;
-    PropertyHandle<Real3D> force;
-
-    real timeStep;
-
-  public:
-
-    StepB(PropertyHandle<Real3D> _velRef,
-	  PropertyHandle<Real3D> _forceRef, real _timeStep):
-
-      vel(_velRef), force(_forceRef), timeStep(_timeStep) {}
-
-    virtual void apply(ParticleHandle pref) {
-        vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
+    StepA(Property< Real3D >::SelfPtr posProperty,
+	  Property< Real3D >::SelfPtr velProperty,
+	  Property< Real3D >::SelfPtr forceProperty, 
+	    real _timeStep)
+      : pos(*posProperty), vel(*velProperty), force(*forceProperty),
+	timeStep(_timeStep), timeStepSqr(_timeStep * _timeStep) 
+    {}
+  
+    virtual void apply(const ParticleHandle pref) {
+      pos[pref] = pos[pref] + vel[pref] * timeStep + 0.5 * force[pref] * timeStepSqr;
+      vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
     }
-};
+  };
 
-class StepZeroForces: public particles::Computer {
+  struct StepB : public Computer {
+    const PropertyHandle< Real3D > vel;
+    const PropertyHandle< Real3D > force;
 
-  private:
+    const real timeStep;
 
-    PropertyHandle<Real3D> force;
+    StepB(Property< Real3D >::SelfPtr velProperty,
+	  Property< Real3D >::SelfPtr forceProperty, 
+	  real _timeStep)
+      : vel(*velProperty), force(*forceProperty), timeStep(_timeStep)
+    {}
+    
+    void apply(const ParticleHandle pref) { 
+      vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep; 
+    }
+  };
 
-  public:
+  struct StepZeroForces: public Computer {
+    const PropertyHandle< Real3D > force;
 
-    StepZeroForces(PropertyHandle<Real3D> _forceRef): force(_forceRef) {}
-
-    virtual void apply(ParticleHandle pref) {
+    StepZeroForces(Property< Real3D >::SelfPtr forceProperty)
+      : force(*forceProperty) {}
+    
+    virtual void apply(const ParticleHandle pref) {
       force[pref] = 0.0;
     }
-};
+  };
+}
 
-VelocityVerlet::VelocityVerlet(Set::SelfPtr _particles, 
-                               Property< Real3D >::SelfPtr _position,
-                               Property< Real3D >::SelfPtr _velocity,
-                               Property< Real3D >::SelfPtr _force):
-
-   MDIntegrator(_particles, _position, _velocity, _force) {}
+VelocityVerlet::VelocityVerlet(Set::SelfPtr set, 
+                               Property< Real3D >::SelfPtr posProperty,
+                               Property< Real3D >::SelfPtr velProperty,
+                               Property< Real3D >::SelfPtr forceProperty)
+  : MDIntegrator(set, posProperty, velProperty, forceProperty) {}
 
 void VelocityVerlet::step() {
+  StepA stepA(posProperty, velProperty, forceProperty, timeStep);
+
   // Step A
-
-  StepA stepA(*position, *velocity, *force, timeStep);
-
-  particles->foreach(stepA);
+  set->foreach(stepA);
 
   // call connected routines, e.g. thermalizeA for a chosen thermostat
-
   updateVelocity1(*this);
 
   // set forces to ZERO after calling updateVelocity1
-  StepZeroForces stepZeroForces(*force);
-  particles->foreach(stepZeroForces);
+  StepZeroForces stepZeroForces(forceProperty);
+  set->foreach(stepZeroForces);
 
   // calculate forces:
-
   updateForces(*this);
 
-  /* no more needed:
-
-     BOOST_FOREACH(ForceEvaluation fe, forceEvaluations) {
-      pairs::ForceComputer *forceCompute =
-          fe.potential->createForceComputer(forceParameters);
-          fe.pairs->foreach(*forceCompute);
-          delete forceCompute;
-      }
-
-  */
-
   // Step B
-
-  StepB stepB(*velocity, *force, timeStep);
-  particles->foreach(stepB);
+  StepB stepB(velProperty, forceProperty, timeStep);
+  set->foreach(stepB);
 
   // call connected routines, e.g. thermalizeB for a chosen thermostat
-
   updateVelocity2(*this);
 }
 

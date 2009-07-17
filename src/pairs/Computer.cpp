@@ -21,28 +21,22 @@ namespace espresso {
 	public wrapper< Computer > {
   
     public: 
-      PythonComputer(Storage::SelfPtr _storage1, 
-		     Storage::SelfPtr _storage2)
-	: storage1(_storage1), storage2(_storage2) {}
-
-      PythonComputer(Storage::SelfPtr _storage)
-	: storage1(_storage), storage2(_storage) {}
-  
-      virtual void prepare() {
+      virtual void prepare(Storage::SelfPtr storage1,
+			   Storage::SelfPtr storage2) {
 	// get the particleId properties
-	idProperty1 = storage1->getIdPropertyHandle();
-	idProperty2 = storage2->getIdPropertyHandle();
+	id1 = storage1->getIdPropertyHandle();
+	id2 = storage2->getIdPropertyHandle();
 
 	// call Python prepare
 	if (override prepare = get_override("prepare"))
-	  prepare();
-	else Computer::prepare();
+	  prepare(storage1, storage2);
+	else Computer::prepare(storage1, storage2);
       }
 
       virtual void apply(const Real3D dist,
 			 const ParticleHandle p1,
 			 const ParticleHandle p2) {
-	get_override("apply")(dist, idProperty1[p1], idProperty2[p2]);
+	get_override("apply")(dist, id1[p1], id2[p2]);
       }
 
       virtual void finalize() {
@@ -53,10 +47,8 @@ namespace espresso {
       }
 
     private:
-      Storage::SelfPtr storage1;
-      Storage::SelfPtr storage2;
-      ConstPropertyHandle< ParticleId > idProperty1;
-      ConstPropertyHandle< ParticleId > idProperty2;
+      ConstPropertyHandle< ParticleId > id1;
+      ConstPropertyHandle< ParticleId > id2;
     };
   }
 }
@@ -64,8 +56,7 @@ namespace espresso {
 void Computer::registerPython() {
   espresso::python::class_
     < espresso::pairs::PythonComputer, boost::noncopyable >
-    ("pairs_PythonComputer", 
-     init< Storage::SelfPtr, optional< Storage::SelfPtr > >())
+    ("pairs_PythonComputer")
     .def("prepare", &PythonComputer::prepare)
     .def("finalize", &PythonComputer::finalize)
     .def("apply", &PythonComputer::apply)

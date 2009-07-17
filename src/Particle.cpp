@@ -4,12 +4,14 @@
 using namespace espresso;
 using namespace espresso::python;
 
-/// espresso::python ResultConverter for ParticleId
-struct ParticleIdToInteger {
-  static PyObject* convert(const ParticleId &id) {
-    return incref(object(size_t(id)).ptr());
-  }
-};
+namespace {
+  /// espresso::python ResultConverter for ParticleId
+  struct ParticleIdToInteger {
+    static PyObject* convert(const ParticleId &id) {
+      return incref(object(size_t(id)).ptr());
+    }
+  };
+}
 
 void espresso::registerPythonParticle()
 {

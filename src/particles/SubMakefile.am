@@ -4,13 +4,15 @@ nobase_pkginclude_HEADERS += \
 	particles/PropertyHandle.hpp \
 	particles/Storage.hpp \
 	particles/Computer.hpp \
-	particles/Set.hpp
+	particles/Set.hpp \
+	particles/Subset.hpp
 
 libespresso_common_la_SOURCES += \
 	particles/bindings.cpp \
 	particles/Storage.cpp \
 	particles/Computer.cpp \
-	particles/Set.cpp
+	particles/Set.cpp \
+	particles/Subset.cpp
 
 python_SCRIPTS += \
 	particles/__init__.py \

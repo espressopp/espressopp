@@ -16,7 +16,7 @@ void espresso::registerPython() {
 
   espresso::registerPythonReal3D();
   espresso::registerPythonParticle();
-  espresso::registerPythonProperties();
+  espresso::registerPythonProperty();
   espresso::esutil::Collectives::registerPython();
   espresso::hello::registerPython();
   espresso::bc::registerPython();

@@ -84,7 +84,7 @@ struct MockComputerBase : Base {
     applyCalled = 0;
   }
 
-  virtual void prepare() {
+  virtual void prepare(const Storage::SelfPtr storage) {
     prepareCalled = true;
   }
 
@@ -108,7 +108,9 @@ BOOST_FIXTURE_TEST_CASE(foreachTest, Fixture)
   BOOST_CHECK(computer.finalizeCalled);
 }
 
-// TODO: OL: Why does this not compile??? I'm lost!
+// TODO: OL: This doesn't compile. It can be considered a Boost bug, I
+//   would say, reported in:
+//   https://svn.boost.org/trac/boost/ticket/3270
 // BOOST_FIXTURE_TEST_CASE(foreachTestConst, Fixture)
 // {
 //   MockComputerBase< ConstComputer > computer;

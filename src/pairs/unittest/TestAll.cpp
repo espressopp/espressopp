@@ -32,13 +32,11 @@ struct Fixture {
   void createLattice() {
     // create a lattice of NxNxN particles
     size_t pid = 0;
-    particles::PropertyHandle< Real3D > pos;
-
     double step = size/(N-1);
     for (size_t i = 0; i < N; i++)
       for (size_t j = 0; j < N; j++)
 	for (size_t k = 0; k < N; k++) {
-	  particles::ParticleHandle p 
+	  particles::ParticleHandle p
 	    = store->addParticle(ParticleId(pid));
 	  (*posProperty)[p] = Real3D(i*step, j*step, k*step);
 	  pid++;

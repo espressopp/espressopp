@@ -4,9 +4,11 @@
 #include <boost/foreach.hpp>
 #include <algorithm>
 #include <stdexcept>
+#include "Property.hpp"
 
 using namespace espresso;
 using namespace espresso::particles;
+using namespace espresso::python;
 
 /// simple predicate class for "efficient" searching for a particle
 class PredicateMatchParticleID: public std::unary_function<ConstParticleHandle, bool> {
@@ -32,6 +34,10 @@ ParticleHandle Storage::addParticle(ParticleId id) {
   return ParticleHandle(it);
 }
 
+void Storage::_addParticle(ParticleId id) {
+  addParticle(id);
+}
+
 void Storage::deleteParticle(ParticleId deleteID) {
   esutil::TupleVector::iterator pos = getParticleHandle(deleteID);
 
@@ -54,6 +60,7 @@ void Storage::deleteProperty(PropertyId id) {
 
 // Implementation of the Set interface
 bool Storage::isMember(ParticleHandle) const { return true; }
+bool Storage::isMember(ParticleId) const { return true; }
 
 void Storage::foreach(const ApplyFunction function) {
   BOOST_FOREACH(esutil::TupleVector::reference particle, 
@@ -69,6 +76,16 @@ void Storage::foreach(const ConstApplyFunction function) const {
   }
 }
 
+Storage::SelfPtr 
+Storage::getStorage() { return shared_from_this(); }
+
+void 
+Storage::checkProperty(PropertyBase::SelfPtr prop) {
+  if (prop->getStorage().get() != this)
+    throw StorageMismatch();
+}
+
+
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
 //////////////////////////////////////////////////
@@ -76,9 +93,11 @@ void Storage::foreach(const ConstApplyFunction function) const {
 void Storage::registerPython() {
   using namespace espresso::python;
 
-  class_< Storage, boost::noncopyable, bases < Set > >("particles_Storage")
-    .def("addParticle", &Storage::addParticle)
+  class_< Storage, boost::noncopyable, bases < Set > >
+    ("particles_Storage")
+    .def("addParticle", &Storage::_addParticle)
     .def("deleteParticle", &Storage::deleteParticle)
+    .def("checkProperty", &Storage::checkProperty)
     ;
 }
 

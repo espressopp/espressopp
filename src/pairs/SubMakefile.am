@@ -7,8 +7,6 @@ nobase_pkginclude_HEADERS += \
 	pairs/ForceComputer.hpp \
 	pairs/ComputerList.hpp
 
-
-
 libespresso_common_la_SOURCES += \
 	pairs/bindings.cpp \
 	pairs/Set.cpp \
@@ -16,3 +14,10 @@ libespresso_common_la_SOURCES += \
 	pairs/All.cpp 
 
 #        pairs/List.cpp
+
+
+python_SCRIPTS += \
+	pairs/__init__.py \
+	pairs/Computer.py \
+	pairs/Set.py \
+	pairs/All.py

@@ -1,20 +1,30 @@
 #ifndef _PARTICLES_STORAGE_HPP
 #define _PARTICLES_STORAGE_HPP
 
+#include <exception>
+
 #include "types.hpp"
 #include "esutil/TupleVector.hpp"
 #include "Particle.hpp"
-#include "ParticleHandle.hpp"
-#include "PropertyHandle.hpp"
-#include "Set.hpp"
+#include "particles/ParticleHandle.hpp"
+#include "particles/PropertyHandle.hpp"
+#include "particles/Set.hpp"
 
 namespace espresso {
   // forward declarations
+  class PropertyBase;
   template<typename> class Property;
   template<typename> class ArrayProperty;
 
   namespace particles {
+    typedef ConstPropertyHandle< ParticleId > IdPropertyHandle;
+
+    // forward declaration
+    class StorageMismatch : public std::exception 
+    {};
+
     class Storage : public Set, 
+		    public enable_shared_from_this< Storage >,
 		    boost::noncopyable
     {
     public:
@@ -34,6 +44,7 @@ namespace espresso {
 	  @throw std::out_of_range if the particle already exists
       */
       virtual ParticleHandle addParticle(ParticleId id);
+      void _addParticle(ParticleId id);
 
       /** delete a particle
           @param id the id of the particle to delete
@@ -80,6 +91,7 @@ namespace espresso {
 	  check whether it belongs to this set
       */
       virtual bool isMember(ParticleHandle) const;
+      virtual bool isMember(ParticleId) const;
 
 
       /** apply computer to all particles of this set
@@ -88,6 +100,10 @@ namespace espresso {
       virtual void foreach(const ConstApplyFunction function) const;
       // make the other variants of foreach available
       using Set::foreach;
+
+      virtual SelfPtr getStorage();
+
+      void checkProperty(const shared_ptr< PropertyBase > prop);
 
       /// make this class available at Python
       static void registerPython();
@@ -112,7 +128,7 @@ namespace espresso {
           @return the ID of the property for use with getProperty or eraseProperty
           @tparam T type of the property
       */
-      template<typename T>
+      template< typename T >
       PropertyId addProperty(size_t dim = 1) { return particles.addProperty<T>(dim); }
 
       /** delete a property

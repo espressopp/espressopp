@@ -15,26 +15,14 @@ namespace espresso {
 	public wrapper< Computer > {
       
     public: 
-      PythonComputer(Storage::SelfPtr _storage) 
-	: storage(_storage) {}
-      
-      PythonComputer(Property< Real3D >::SelfPtr prop) 
-      { storage = prop->getStorage(); }
-      
-      PythonComputer(Property< real >::SelfPtr prop) 
-      { storage = prop->getStorage(); }
-
-      PythonComputer(Property< int >::SelfPtr prop) 
-      { storage = prop->getStorage(); }
-
-      virtual void prepare() {
+      virtual void prepare(Storage::SelfPtr storage) {
 	// get the particleId property
 	particleId = storage->getIdPropertyHandle();
     
 	// call Python prepare
 	if (override prepare = get_override("prepare"))
-	  prepare();
-	else Computer::prepare();
+	  prepare(storage);
+	else Computer::prepare(storage);
       }
 
       /** The operator() calling the Python objects function each */
@@ -50,7 +38,6 @@ namespace espresso {
       }
 
     private:
-      Storage::SelfPtr storage;
       ConstPropertyHandle< ParticleId > particleId;
     };
   }
@@ -59,10 +46,7 @@ namespace espresso {
 void Computer::registerPython() {
   espresso::python::class_
     < espresso::particles::PythonComputer, boost::noncopyable >
-    ("particles_PythonComputer", init< Storage::SelfPtr >())
-    .def(init< Property< Real3D >::SelfPtr >())
-    .def(init< Property< real >::SelfPtr >())
-    .def(init< Property< int >::SelfPtr >())
+    ("particles_PythonComputer")
     .def("prepare", &PythonComputer::prepare)
     .def("finalize", &PythonComputer::finalize)
     .def("apply", &PythonComputer::apply)
