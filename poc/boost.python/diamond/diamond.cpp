@@ -16,7 +16,8 @@ public:
   }
 
   virtual void doIt() {
-    cout << "C++ A" << endl;
+    cout << "C++ A doIt start" << endl;
+    cout << "C++ A doIt end" << endl;
   }
 
   virtual ~A() {
@@ -33,8 +34,9 @@ public:
   }
 
   virtual void doIt() {
+    cout << "C++ B doIt start" << endl;
     this->A::doIt();
-    cout << "C++ B" << endl;
+    cout << "C++ B doIt end" << endl;
   }
 };
 
