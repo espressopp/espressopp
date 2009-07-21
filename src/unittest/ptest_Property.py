@@ -98,6 +98,13 @@ else:
                 self.prop[part] = Real3D(part,4,2)
                 self.assertEqual(self.prop[part], Real3D(part,4,2))
 
+        def testConversion(self):
+            self.prop[0] = 1.0
+            self.assertEqual(self.prop[0], Real3D(1.0, 1.0, 1.0))
+
+            self.prop[0] = 1.0, 2.0, 3.0
+            self.assertEqual(self.prop[0], Real3D(1.0, 2.0, 3.0))
+
     ####
 
     unittest.main()

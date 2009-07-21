@@ -1,3 +1,4 @@
+from espresso.Real3D import *
 from espresso import pmi
 from espresso import boostmpi as mpi
 
@@ -31,7 +32,10 @@ class _PropertyLocal(object) :
             if pmi.IS_CONTROLLER :
                 return mpi.world.recv(node, 0)
 
-    def setItem(self, node, particle, value) :
+    def setItem(self, node, particle, value):
+        # if we did not already get the right type, try to convert it
+        if type(value) is not self.propertytype:
+            value = self.propertytype(value)
         if node == mpi.rank :
             try :
                 self.cxxobject[particle] = value
@@ -47,15 +51,15 @@ if pmi.IS_CONTROLLER:
         similar to a tuple, in that one can access the property of a given particle by using element
         access. In other words, p[k] corresponds to the property p of particle k, both write- and readable.
         """
-        def __init__(self, decomposer) :
+        def __init__(self, decomposer):
             self.decomposer = decomposer
             pmi.exec_('import espresso.Property')
 
-        def __getitem__(self, particle) :
+        def __getitem__(self, particle):
             node = self.decomposer.getNodeOfParticle(particle)
             return pmi.call(self.pmiobject.getItem, node, particle)
 
-        def __setitem__(self, particle, value) :
+        def __setitem__(self, particle, value):
             node = self.decomposer.getNodeOfParticle(particle)
             pmi.call(self.pmiobject.setItem, node, particle, value)
 
@@ -65,15 +69,16 @@ if pmi.IS_CONTROLLER:
 
 from _espresso import RealProperty as _RealProperty
 
-class RealPropertyLocal(_PropertyLocal) :
+class RealPropertyLocal(_PropertyLocal):
     def __init__(self, decomposer):
         if not hasattr(self, 'cxxobject'):
             self.cxxobject = _RealProperty(decomposer.cxxobject)
+        self.propertytype = float
         _PropertyLocal.__init__(self, decomposer)
 ####
 
 if pmi.IS_CONTROLLER:
-    class RealProperty(_Property) :
+    class RealProperty(_Property):
         """
         represents a real valued particle property.
         """
@@ -86,11 +91,12 @@ if pmi.IS_CONTROLLER:
 
 from _espresso import IntegerProperty as _IntegerProperty
 
-class IntegerPropertyLocal(_PropertyLocal) :
+class IntegerPropertyLocal(_PropertyLocal):
     def __init__(self, decomposer):
         if not hasattr(self, 'cxxobject'):
             self.cxxobject = _IntegerProperty(decomposer.cxxobject)
             #        else: raise TypeError('IntegerPropertyLocal requires a DecomposerLocal or _RealProperty')
+        self.propertytype = int
         _PropertyLocal.__init__(self, decomposer)
 
 ####
@@ -113,6 +119,7 @@ class Real3DPropertyLocal(_PropertyLocal) :
     def __init__(self, decomposer):
         if not hasattr(self, 'cxxobject'):
             self.cxxobject = _Real3DProperty(decomposer.cxxobject)
+        self.propertytype = Real3D
         _PropertyLocal.__init__(self, decomposer)
 
 ####
