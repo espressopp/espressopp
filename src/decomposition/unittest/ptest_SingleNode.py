@@ -6,10 +6,10 @@ if __name__ == 'espresso.pmi':
 
     # simple particle counter
     class LocalCount(espresso.particles.PythonComputerLocal) :
-        def __init__(self, decomposer) :
-            espresso.particles.PythonComputerLocal.__init__(self, decomposer.cxxobject)
+        def __init__(self) :
+            espresso.particles.PythonComputerLocal.__init__(self)
             self.count = 0
-        def __apply__(self, id) :
+        def apply(self, id):
             self.count += 1
         def finalize(self) :
             self.counts = mpi.world.gather(self.count, pmi.CONTROLLER)
@@ -35,7 +35,7 @@ else:
             self.assert_(id2 > id1)
             self.assertRaises(IndexError, self.decomp.addParticle, id1)
             self.assertEqual(self.decomp.getTotalNumberOfParticles(), 2)
-            counter = pmi.create("LocalCount", self.decomp.pmiobject)
+            counter = pmi.create("LocalCount")
             self.decomp.foreach(counter)
             counts = counter.getCounts()
             for node, count in enumerate(counts) :

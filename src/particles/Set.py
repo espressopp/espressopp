@@ -1,6 +1,9 @@
-from espresso.particles.Computer import *
+from espresso import pmi
+import espresso.particles.Computer
 
-class SetLocal(object):
+from _espresso import particles_Set
+
+class SetLocal(particles_Set):
     """Any derived object must define cxxobject, which must be a C++
     Set object. 
     """
@@ -25,24 +28,21 @@ class SetLocal(object):
             >>>
             >>> decomposer.foreach(pmi.create(\"MyPythonComputer\"))
             """
-        if isinstance(computer, PythonComputerLocal):
-            cxxcomputer = computer
-        else:
-            cxxcomputer = computer.cxxobject
-        self.cxxobject.foreach(cxxcomputer)
-
-    def __contains__(self, particle):
-        return self.cxxobject.isMember(particle)
+        particles_Set.foreach(self, computer)
 
     def __locateParticleLocal(self, particle):
         # to be used by Set.contains
         # don't call locally
         collectives.locateItem(particle in self)
 
+    def __contains__(self, particle):
+        return particles_Set.__contains__(self, particle)
+
 # TODO: implement:
 #   * __iter__ (via foreach?)
 
 if pmi.IS_CONTROLLER:
+    from espresso.particles.Computer import PythonComputerLocal
     class Set(object):
         def foreach(self, computer):
             if isinstance(computer, PythonComputerLocal):

@@ -9,7 +9,6 @@ using namespace espresso::python;
 
 using espresso::particles::Storage;
 using espresso::particles::ParticleHandle;
-using espresso::particles::ConstPropertyHandle;
 
 // We need to put the wrapper class into the namespace, even though it
 // is used only in this file. Otherwise, we get a strange boost runtim
@@ -47,8 +46,8 @@ namespace espresso {
       }
 
     private:
-      ConstPropertyHandle< ParticleId > id1;
-      ConstPropertyHandle< ParticleId > id2;
+      particles::PropertyHandle< ParticleId > id1;
+      particles::PropertyHandle< ParticleId > id2;
     };
   }
 }

@@ -2,25 +2,17 @@ from espresso.Real3D import *
 from espresso import pmi
 from espresso import boostmpi as mpi
 
-class _PropertyLocal(object) :
+class _PropertyLocal(object):
     """
     common python code of properties. In fact, this provides the local
     Property interface, while the xxxPropertyLocal only glues this
     to the typified C++ Property.
     """
     #    __metaclass__ = abc.ABCMeta
-    def __init__(self, decomposer):
-        self.decomposer = decomposer
-    def __getitem__(self, item):
-        return self.cxxobject[item]
-
-    def __setitem__(self, item, val):
-        self.cxxobject[item] = val
-
     def getItem(self, node, particle):
         if node == mpi.rank :
             try :
-                value = self.cxxobject[particle]
+                value = self[particle]
             except IndexError :
                 raise RuntimeWarning("decomposer put the particle %d here on node %d, but cannot find its properties" % (particle, mpi.rank))
 
@@ -38,7 +30,7 @@ class _PropertyLocal(object) :
             value = self.propertytype(value)
         if node == mpi.rank :
             try :
-                self.cxxobject[particle] = value
+                self[particle] = value
             except IndexError :
                 raise RuntimeWarning("decomposer claims particle %d is here on node %d, but set its properties" % (particle, mpi.rank))
 
@@ -69,12 +61,12 @@ if pmi.IS_CONTROLLER:
 
 from _espresso import RealProperty as _RealProperty
 
-class RealPropertyLocal(_PropertyLocal):
+class RealPropertyLocal(_PropertyLocal, _RealProperty):
     def __init__(self, decomposer):
-        if not hasattr(self, 'cxxobject'):
-            self.cxxobject = _RealProperty(decomposer.cxxobject)
+        if not hasattr(self, 'cxxinit'):
+            _RealProperty.__init__(self, decomposer)
+            self.cxxinit = True
         self.propertytype = float
-        _PropertyLocal.__init__(self, decomposer)
 ####
 
 if pmi.IS_CONTROLLER:
@@ -91,13 +83,12 @@ if pmi.IS_CONTROLLER:
 
 from _espresso import IntegerProperty as _IntegerProperty
 
-class IntegerPropertyLocal(_PropertyLocal):
+class IntegerPropertyLocal(_PropertyLocal, _IntegerProperty):
     def __init__(self, decomposer):
-        if not hasattr(self, 'cxxobject'):
-            self.cxxobject = _IntegerProperty(decomposer.cxxobject)
-            #        else: raise TypeError('IntegerPropertyLocal requires a DecomposerLocal or _RealProperty')
+        if not hasattr(self, 'cxxinit'):
+            _IntegerProperty.__init__(self, decomposer)
+            self.cxxinit = True
         self.propertytype = int
-        _PropertyLocal.__init__(self, decomposer)
 
 ####
 
@@ -115,12 +106,12 @@ if pmi.IS_CONTROLLER:
 
 from _espresso import Real3DProperty as _Real3DProperty
 
-class Real3DPropertyLocal(_PropertyLocal) :
+class Real3DPropertyLocal(_PropertyLocal, _Real3DProperty):
     def __init__(self, decomposer):
-        if not hasattr(self, 'cxxobject'):
-            self.cxxobject = _Real3DProperty(decomposer.cxxobject)
+        if not hasattr(self, 'cxxinit'):
+            _Real3DProperty.__init__(self, decomposer)
+            self.cxxinit = True
         self.propertytype = Real3D
-        _PropertyLocal.__init__(self, decomposer)
 
 ####
 

@@ -11,8 +11,8 @@ using namespace espresso::particles;
 using namespace espresso::python;
 
 /// simple predicate class for "efficient" searching for a particle
-class PredicateMatchParticleID: public std::unary_function<ConstParticleHandle, bool> {
-  ConstPropertyHandle<ParticleId> id;
+class PredicateMatchParticleID: public std::unary_function< ParticleHandle, bool > {
+  PropertyHandle<ParticleId> id;
   ParticleId searchID;
 
 public:

@@ -5,7 +5,7 @@
 #include "pairs/Computer.hpp"
 
 using namespace espresso::pairs;
-
+#include <iostream>
 Set::Set(particles::Storage::SelfPtr _storage1,
 	 particles::Storage::SelfPtr _storage2)
   : storage1(_storage1), storage2(_storage2) {}

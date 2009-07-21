@@ -1,8 +1,8 @@
 from espresso import pmi
-from _espresso import particles_PythonComputer, particles_Storage
+from _espresso import particles_PythonComputer
 
 # This is the abstract base class for a computer implemented in Python
-class PythonComputerLocal(particles_PythonComputer) :
+class PythonComputerLocal(particles_PythonComputer):
     """
     a per-particle-computer using Python code. You mainly need to
     provide a function "apply", so that a
@@ -22,7 +22,7 @@ class PythonComputerLocal(particles_PythonComputer) :
     that, call "finalize" once on each node. In the case of
     Decomposer.foreach, the return value of "finalize" is passed back.
     """
-    def __init__(self, arg):
+    def __init__(self):
         particles_PythonComputer.__init__(self)
         
     def prepare(self, storage):
@@ -37,11 +37,6 @@ class PythonComputerLocal(particles_PythonComputer) :
 
     def finalize(self): pass
 
-# This is the abstract base class for the Python glue of local computers
-# it doesn't really contain anything
-class ComputerLocal(object):
-    pass
-    
 if pmi.IS_CONTROLLER:
     class Computer(object):
         pass

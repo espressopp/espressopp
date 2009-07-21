@@ -9,17 +9,17 @@ class SingleNodeLocal(DecomposerLocal):
     The local particle cxxobject that puts all particles on a dedicated node. So,
     this actually is nothing on most of the nodes.
     """
-    def __init__(self, masternode) :
+    def __init__(self, masternode):
         DecomposerLocal.__init__(self)
         self.masternode = masternode
     
     def addParticle(self, id):
         if mpi.rank == self.masternode :
-            self.cxxobject.addParticle(id)
+            DecomposerLocal.addParticle(self, id)
 
     def deleteParticle(self, id):
         if mpi.rank == self.masternode :
-            self.cxxobject.deleteParticle(id)
+            DecomposerLocal.deleteParticle(self, id)
 ####
 
 if pmi.IS_CONTROLLER :

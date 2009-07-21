@@ -1,14 +1,12 @@
-from espresso.pairs.Computer import *
+from espresso import pmi
 
-class SetLocal(object):
+from _espresso import pairs_Set
+class SetLocal(pairs_Set):
     def foreach(self, computer):
-        if isinstance(computer, PythonComputerLocal):
-            cxxcomputer = computer
-        else:
-            cxxcomputer = computer.cxxobject
-        self.cxxobject.foreach(cxxcomputer)
+        pairs_Set.foreach(self, computer)
 
 if pmi.IS_CONTROLLER:
+    from espresso.pairs.Computer import PythonComputerLocal
     class Set(object):
         def foreach(self, computer):
             if isinstance(computer, PythonComputerLocal):

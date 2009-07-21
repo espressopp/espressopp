@@ -16,8 +16,7 @@ All::All(bc::BC::SelfPtr _bc,
          particles::Set::SelfPtr _set,
          Property< Real3D >::SelfPtr _posProperty ) 
   : Set(_set->getStorage(), _set->getStorage()),
-    set(_set), bc(_bc), posProperty(_posProperty)
-{ }
+    set(_set), bc(_bc), posProperty(_posProperty) {}
 
 namespace {
   class SameId {};

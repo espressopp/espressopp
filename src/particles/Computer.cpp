@@ -38,7 +38,7 @@ namespace espresso {
       }
 
     private:
-      ConstPropertyHandle< ParticleId > particleId;
+      PropertyHandle< ParticleId > particleId;
     };
   }
 }

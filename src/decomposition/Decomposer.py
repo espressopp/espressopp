@@ -4,16 +4,19 @@ from espresso import Property
 from espresso.particles.Set import *
 import types
 
-from _espresso import particles_Storage as _Storage
-
-class DecomposerLocal(SetLocal):
+from _espresso import particles_Storage
+class DecomposerLocal(SetLocal, particles_Storage):
     'The local basic particle storage'
     def __init__(self):
-        if not hasattr(self, 'cxxobject'):
-            self.cxxobject = _Storage()
+        if not hasattr(self, 'cxxinit'):
+            particles_Storage.__init__(self)
+            self.cxxinit = True
 
     def checkProperty(self, property):
-        self.cxxobject.checkProperty(property.cxxobject)
+        particles_Storage.checkProperty(self, property)
+
+    def foreach(self, computer):
+        particles_Storage.foreach(self, computer)
 
 if pmi.IS_CONTROLLER :
     class Decomposer(Set):

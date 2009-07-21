@@ -1,12 +1,12 @@
 from espresso import decomposition
-from _espresso import particles_Storage as _Storage
+from _espresso import particles_Storage
 
 if __name__ == 'espresso.pmi':
     class MockDecomposerLocal(decomposition.DecomposerLocal) :
-        def __init__(self) :
-            self.cxxobject = _Storage()
+        def __init__(self):
+            decomposition.DecomposerLocal.__init__(self)
             # create local particle, one per node
-            self.cxxobject.addParticle(mpi.rank)
+            self.addParticle(mpi.rank)
 
 else:
 

@@ -7,20 +7,17 @@ from espresso import pmi
 from espresso import boostmpi as mpi
 
 if __name__ == 'espresso.pmi':
-    from espresso import pmi
     from espresso.particles import PythonComputerLocal
-    import sys
-
     # tag particles in a small sphere around (0,0,0) as demonstration
     class ParticleTesterLocal(PythonComputerLocal):
         def __init__(self, _position, _tag):
-            PythonComputerLocal.__init__(self, _position.decomposer)
+            PythonComputerLocal.__init__(self)
             self.position = _position
             self.tag = _tag
 
         def prepare(self, storage):
-            storage.checkProperty(self.position.cxxobject)
-            storage.checkProperty(self.tag.cxxobject)
+            storage.checkProperty(self.position)
+            storage.checkProperty(self.tag)
 
         def apply(self, pid):
             pos = self.position[pid]
@@ -29,13 +26,13 @@ if __name__ == 'espresso.pmi':
     # write out tagged particles
     class ParticleWriterLocal(PythonComputerLocal):
         def __init__(self, _property, _tag):
-            PythonComputerLocal.__init__(self, _property.decomposer)
+            PythonComputerLocal.__init__(self)
             self.property = _property
             self.tag = _tag
 
         def prepare(self, storage):
-            storage.checkProperty(self.property.cxxobject)
-            storage.checkProperty(self.tag.cxxobject)
+            storage.checkProperty(self.property)
+            storage.checkProperty(self.tag)
             self.total = 0
             self.sphere = 0
 
@@ -56,19 +53,19 @@ else:
 
     pmi.execfile_(__file__)
 
-    from espresso import Real3D, Real3DProperty
+    from espresso import Real3D, Real3DProperty, IntegerProperty
     from espresso.decomposition import SingleNode
     import random
 
     decomposer = SingleNode(mpi.size-1)
-    pos = decomposer.createProperty("Real3D")
+    pos = Real3DProperty(decomposer)
 
     for count in range(0,100):
         decomposer.addParticle(count)
         pos[count] = Real3D(random.random(), random.random(), random.random())
 
     # add property a posteriori
-    tag = decomposer.createProperty("Integer")
+    tag = IntegerProperty(decomposer)
 
     #tag particles
     decomposer.foreach(pmi.create("ParticleTesterLocal", pos.pmiobject, tag.pmiobject))
