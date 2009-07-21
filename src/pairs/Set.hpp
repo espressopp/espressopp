@@ -13,12 +13,6 @@ namespace espresso {
 	    const particles::ParticleHandle) 
       > ApplyFunction;
   
-    typedef boost::function< 
-      void (const Real3D, 
-	    const particles::ConstParticleHandle, 
-	    const particles::ConstParticleHandle) 
-      > ConstApplyFunction;
-  
     class ForeachBreak: public std::exception {};
 
     class Set {
@@ -32,8 +26,7 @@ namespace espresso {
 	  finalize().
        */
       virtual void foreach(Computer& computer);
-      virtual void foreach(const Computer::SelfPtr computer);
-      virtual void foreach(ConstComputer& computer) const;
+      virtual void foreach(Computer::SelfPtr computer);
 
       /** Apply a function to all pairs of this set.
 
@@ -44,7 +37,6 @@ namespace espresso {
 	  Computer.
       */
       virtual void foreach(ApplyFunction function) = 0;
-      virtual void foreach(ConstApplyFunction function) const = 0;
 
       static void registerPython();
 

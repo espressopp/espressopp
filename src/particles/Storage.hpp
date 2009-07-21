@@ -17,7 +17,7 @@ namespace espresso {
   template<typename> class ArrayProperty;
 
   namespace particles {
-    typedef ConstPropertyHandle< ParticleId > IdPropertyHandle;
+    typedef PropertyHandle< ParticleId > IdPropertyHandle;
 
     // forward declaration
     class StorageMismatch : public std::exception 
@@ -56,7 +56,7 @@ namespace espresso {
           @param ref temporary reference to a particle
           @return the particle
       */
-      ParticleId getParticleId(ConstParticleHandle ref) const {
+      ParticleId getParticleId(ParticleHandle ref) {
         return getIdPropertyHandle()[ref];
       }
 
@@ -69,19 +69,11 @@ namespace espresso {
       */
       virtual ParticleHandle getParticleHandle(ParticleId id);
 
-      /** get a const reference to a particle using its ID. This
-	  makes use of the non-const version of getParticleHandle; see
-	  there for further details.
-      */
-      ConstParticleHandle getParticleHandle(ParticleId id) const {
-	return ConstParticleHandle(const_cast< Storage* >(this)->getParticleHandle(id));
-      }
-
 
       //@}
 
       /// get a short lifetime reference to the property representing the particle ID
-      const IdPropertyHandle getIdPropertyHandle() const {
+      IdPropertyHandle getIdPropertyHandle() {
         return particles.getProperty< ParticleId >(particleIdProperty);
       }
 
@@ -90,20 +82,19 @@ namespace espresso {
       /** for a particle of the ParticleStorage of this class,
 	  check whether it belongs to this set
       */
-      virtual bool isMember(ParticleHandle) const;
-      virtual bool isMember(ParticleId) const;
+      virtual bool contains(ParticleHandle);
+      virtual bool contains(ParticleId);
 
 
       /** apply computer to all particles of this set
        */
-      virtual void foreach(const ApplyFunction function);
-      virtual void foreach(const ConstApplyFunction function) const;
+      virtual void foreach(ApplyFunction function);
       // make the other variants of foreach available
       using Set::foreach;
 
       virtual SelfPtr getStorage();
 
-      void checkProperty(const shared_ptr< PropertyBase > prop);
+      void checkProperty(shared_ptr< PropertyBase > prop);
 
       /// make this class available at Python
       static void registerPython();
@@ -141,20 +132,10 @@ namespace espresso {
       PropertyHandle<T> getPropertyHandle(PropertyId id) {
         return particles.getProperty<T>(id);
       }
-      /// get a short lifetime reference to a property by its ID
-      template<typename T>
-      ConstPropertyHandle<T> getConstPropertyHandle(PropertyId id) const {
-        return particles.getProperty<T>(id);
-      }
 
       /// get a short lifetime reference to a property by its ID
       template<typename T>
       ArrayPropertyHandle<T> getArrayPropertyHandle(PropertyId id) {
-        return particles.getArrayProperty<T>(id);
-      }
-      /// get a short lifetime reference to a property by its ID
-      template<typename T>
-      ConstArrayPropertyHandle<T> getConstArrayPropertyHandle(PropertyId id) const {
         return particles.getArrayProperty<T>(id);
       }
 

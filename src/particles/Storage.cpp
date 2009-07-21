@@ -16,7 +16,7 @@ class PredicateMatchParticleID: public std::unary_function<ConstParticleHandle, 
   ParticleId searchID;
 
 public:
-  PredicateMatchParticleID(const Storage &store, size_t _searchID)
+  PredicateMatchParticleID(Storage &store, size_t _searchID)
     : id(store.getIdPropertyHandle()), searchID(_searchID) {}
   
   bool operator()(esutil::TupleVector::reference ref) { return id[ref] == searchID; }
@@ -59,20 +59,13 @@ void Storage::deleteProperty(PropertyId id) {
 }
 
 // Implementation of the Set interface
-bool Storage::isMember(ParticleHandle) const { return true; }
-bool Storage::isMember(ParticleId) const { return true; }
+bool Storage::contains(ParticleHandle) { return true; }
+bool Storage::contains(ParticleId) { return true; }
 
-void Storage::foreach(const ApplyFunction function) {
+void Storage::foreach(ApplyFunction function) {
   BOOST_FOREACH(esutil::TupleVector::reference particle, 
 		particles) {
     function(ParticleHandle(particle));
-  }
-}
-
-void Storage::foreach(const ConstApplyFunction function) const {
-  BOOST_FOREACH(esutil::TupleVector::const_reference particle, 
-		particles) {
-    function(ConstParticleHandle(particle));
   }
 }
 

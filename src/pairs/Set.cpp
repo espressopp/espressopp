@@ -23,19 +23,7 @@ Set::foreach(Computer &computer) {
 }
 
 void
-Set::foreach(ConstComputer &computer) const {
-  computer.prepare(storage1, storage2);
-  try {
-    foreach(boost::bind(&ConstComputer::apply, &computer, _1, _2, _3));
-  } catch (ForeachBreak) {
-    computer.finalize();
-    throw;
-  }
-  computer.finalize();
-}
-
-void
-Set::foreach(const Computer::SelfPtr computer) {
+Set::foreach(Computer::SelfPtr computer) {
   foreach(*computer);
 }
 
@@ -46,7 +34,7 @@ void
 Set::registerPython() {
   using namespace espresso::python;
 
-  void (Set::*py_foreach)(const Computer::SelfPtr computer) 
+  void (Set::*py_foreach)(Computer::SelfPtr computer) 
     = &Set::foreach;
 
   // also register the abstract class Set to make virtual functions available

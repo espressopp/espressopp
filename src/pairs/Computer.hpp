@@ -8,16 +8,16 @@
 
 namespace espresso {
   namespace pairs {
-    /** Abstract class that defines the operator() applied to particle pairs
-     */
-    template< class ParticleHandle >
-    class ComputerBase {
+    /** Abstract class that defines a function on pairs of particles */
+    class Computer {
     public:
+      typedef shared_ptr< Computer > SelfPtr;
+      
       /// @name extended function object interface
       //@{
       typedef Real3D first_argument_type;
-      typedef ParticleHandle second_argument_type;
-      typedef ParticleHandle  third_argument_type;
+      typedef particles::ParticleHandle second_argument_type;
+      typedef particles::ParticleHandle  third_argument_type;
       typedef void                       result_type;
       //@}
 
@@ -36,27 +36,12 @@ namespace espresso {
 	  the particles is needed than only the distance.
       */
       virtual void apply(const Real3D dist, 
-			 const ParticleHandle p1, 
-			 const ParticleHandle p2) = 0;
+			 const particles::ParticleHandle p1, 
+			 const particles::ParticleHandle p2) = 0;
 
       virtual void finalize() {}
-    };
 
-    /** Abstract class that defines a function on pairs of particles */
-    class Computer: 
-      public ComputerBase< particles::ParticleHandle > 
-    {
-    public:
-      typedef shared_ptr< Computer > SelfPtr;
       static void registerPython();
-    };
-    
-    /** Abstract class that defines a function on pairs of read-only particles */
-    class ConstComputer:
-      public ComputerBase< particles::ConstParticleHandle > 
-    {
-    public:
-      typedef shared_ptr< ConstComputer > SelfPtr;
     };
   }
 }

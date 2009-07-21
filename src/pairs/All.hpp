@@ -33,12 +33,7 @@ namespace espresso {
       /** This routine will apply a function operator to all pairs.
 	  \param pairComputer is the object that provides the function to be applied to all pairs.
       */
-      virtual void foreach(ApplyFunction _applyFunction);
-
-      /** This routine will apply a function operator for read-only particles to all pairs.
-	  \param pairComputer is the object that provides the read-only function to be applied to all pairs.
-      */
-      virtual void foreach(ConstApplyFunction _applyFunction) const;
+      virtual void foreach(ApplyFunction applyFunction);
 
     private:
       particles::Set::SelfPtr set;

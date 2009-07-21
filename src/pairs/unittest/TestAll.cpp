@@ -42,14 +42,11 @@ struct Fixture {
 	  pid++;
 	}
   }
-
-
 };
 
 //____________________________________________________________________________//
 
-template< class ComputerClass >
-class PairTest: public ComputerClass {
+class MockPairComputer: public Computer {
 public:
   typedef std::pair< size_t, size_t > IDPair;
 
@@ -61,9 +58,9 @@ public:
   bool finalizeCalled;
 
   particles::IdPropertyHandle id;
-  particles::ConstPropertyHandle< Real3D > pos;
+  particles::PropertyHandle< Real3D > pos;
 
-  PairTest(bc::BC::SelfPtr _bc,
+  MockPairComputer(bc::BC::SelfPtr _bc,
 	   Property< Real3D >::SelfPtr _posProperty)
     : bc(_bc), posProperty(_posProperty), occupied()
   {
@@ -71,10 +68,12 @@ public:
     finalizeCalled = false;
   }
 
-  virtual void prepare() {
+  virtual void prepare(particles::Storage::SelfPtr storage1, 
+		       particles::Storage::SelfPtr storage2) {
     prepareCalled = true;
-    id = posProperty->getIdHandle();
-    pos = posProperty->getHandle();
+    id = storage1->getIdPropertyHandle();
+    storage1->checkProperty(posProperty);
+    pos = *posProperty;
   }
 
   virtual void finalize() {
@@ -84,14 +83,6 @@ public:
   virtual void apply(const Real3D dist,
 		     const particles::ParticleHandle p1,
 		     const particles::ParticleHandle p2) {
-    apply(dist,
-	  particles::ConstParticleHandle(p1),
-	  particles::ConstParticleHandle(p2));
-  }
-  
-  virtual void apply(const Real3D dist,
-		     const particles::ConstParticleHandle p1,
-		     const particles::ConstParticleHandle p2) {
     Real3D pos1 = pos[p1];
     Real3D pos2 = pos[p2];
     Real3D d = bc->getDist(pos1, pos2);
@@ -103,7 +94,6 @@ public:
     IDPair pair(id1, id2);
     BOOST_CHECK_MESSAGE(occupied.find(pair) == occupied.end(),
 			"pair doublette: " << id1 << " " << id2);
-
     
     occupied.insert(pair);
   }
@@ -112,21 +102,11 @@ public:
 
 BOOST_FIXTURE_TEST_CASE(foreachTest, Fixture)
 {
-    PairTest< Computer > test(pbc, posProperty);
-    pairs->foreach(test);
+    MockPairComputer computer(pbc, posProperty);
+    pairs->foreach(computer);
     size_t np = N*N*N;
-    BOOST_CHECK_EQUAL(test.occupied.size(), (np*(np-1))/2);
-    BOOST_CHECK(test.prepareCalled);
-    BOOST_CHECK(test.finalizeCalled);
+    BOOST_CHECK_EQUAL(computer.occupied.size(), (np*(np-1))/2);
+    BOOST_CHECK(computer.prepareCalled);
+    BOOST_CHECK(computer.finalizeCalled);
 }
-
-// BOOST_FIXTURE_TEST_CASE(constForeachTest, Fixture)
-// {
-//     PairTest< ConstComputer > test(pbc, posProperty);
-//     pairs->foreach(test);
-//     size_t np = N*N*N;
-//     BOOST_CHECK_EQUAL(test.occupied.size(), (np*(np-1))/2);
-//     BOOST_CHECK(test.prepareCalled);
-//     BOOST_CHECK(test.finalizeCalled);
-// }
 

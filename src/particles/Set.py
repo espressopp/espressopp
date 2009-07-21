@@ -31,8 +31,15 @@ class SetLocal(object):
             cxxcomputer = computer.cxxobject
         self.cxxobject.foreach(cxxcomputer)
 
+    def __contains__(self, particle):
+        return self.cxxobject.isMember(particle)
+
+    def __locateParticleLocal(self, particle):
+        # to be used by Set.contains
+        # don't call locally
+        collectives.locateItem(particle in self)
+
 # TODO: implement:
-#   * __contains__ from isMember
 #   * __iter__ (via foreach?)
 
 if pmi.IS_CONTROLLER:
@@ -42,3 +49,14 @@ if pmi.IS_CONTROLLER:
                 return pmi.call(self.pmiobject.foreach, computer)
             else:
                 return pmi.call(self.pmiobject.foreach, computer.pmiobject)
+
+        def locateParticle(self, particle):
+            return pmi.call(self.pmiobject.__locateParticleLocal, particle)
+
+        def __contains__(self, particle):
+            try:
+                self.locateParticle(particle)
+            except KeyError:
+                return false
+            return true
+            

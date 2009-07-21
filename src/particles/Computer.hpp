@@ -11,10 +11,9 @@ namespace espresso {
   namespace particles {
     class Storage;
 
-    template< class Handle >
-    class ComputerBase {
+    class Computer {
     public:
-      typedef Handle ParticleHandle;
+      typedef shared_ptr< Computer > SelfPtr;
 
       /** function that is called right before using the Computer on a
 	  specific Storage.  The storage will not be modified until
@@ -25,28 +24,14 @@ namespace espresso {
       virtual void prepare(const shared_ptr< Storage > storage) {}
 
       /** \return whether to interrupt the loop or not. */
-      virtual void apply(const Handle p) = 0;
+      virtual void apply(const ParticleHandle p) = 0;
 
       /** this function is called after completing operations,
 	  i.e. when the storage can potentially change again.
       */
       virtual void finalize() {}
-
-    };
-    
-    class Computer : 
-      public ComputerBase< ParticleHandle >
-    {
-    public:
-      typedef shared_ptr< Computer > SelfPtr;
+      
       static void registerPython();
-    };
-    
-    class ConstComputer :
-      public ComputerBase< ConstParticleHandle >
-    {
-    public:
-      typedef shared_ptr< ConstComputer > SelfPtr;
     };
   }
 }

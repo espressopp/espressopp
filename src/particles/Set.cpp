@@ -12,14 +12,14 @@ using namespace espresso::particles;
 
 namespace {
   class Found {};
-  void findMember(const ConstParticleHandle p1, 
-		  const ConstParticleHandle p2) {
-    if (p1 == p2) throw new Found();
+  void findMember(const ParticleHandle p1, 
+		  const ParticleHandle p2) {
+    if (p1 == p2) throw Found();
   }
 }
 
 bool
-Set::isMember(const ConstParticleHandle p) const {
+Set::contains(ParticleHandle p) {
   try {
     foreach(boost::bind(findMember, p, _1));
   } catch (Found) {
@@ -28,9 +28,9 @@ Set::isMember(const ConstParticleHandle p) const {
   return false;
 }
 
-bool
-Set::isMember(ParticleId pid) {
-  return isMember(getStorage()->getParticleHandle(pid));
+bool                                                                           
+Set::contains(ParticleId pid) {
+  return contains(getStorage()->getParticleHandle(pid));
 }
 
 void
@@ -45,26 +45,11 @@ Set::foreach(Computer &computer) {
   computer.finalize();
 }
   
-void
-Set::foreach(ConstComputer &computer) const {
-  computer.prepare(getStorage());
-  try {
-    foreach(boost::bind(&ConstComputer::apply, &computer, _1));
-  } catch (ForeachBreak &exc) {
-    computer.finalize();
-    throw;
-    }
-  computer.finalize();
-}
 
 void
-Set::foreach(const Computer::SelfPtr computer) 
+Set::foreach(const Computer::SelfPtr computer)
 { foreach(*computer); }
 
-const Storage::SelfPtr
-Set::getStorage() const { 
-  return const_pointer_cast< Storage, const Storage >(getStorage()); 
-}
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -73,15 +58,15 @@ void
 Set::registerPython() {
   using namespace espresso::python;
   
-  void (Set::*pyForeach)(const Computer::SelfPtr computer) 
+  void (Set::*pyForeach)(Computer::SelfPtr computer) 
     = &Set::foreach;
 
-  bool (Set::*pyIsMember)(ParticleId pid)
-    = &Set::isMember;
+  bool (Set::*pyContains)(ParticleId pid)
+    = &Set::contains;
 
   class_< Set, boost::noncopyable >
     ("particles_Set", no_init)
     .def("foreach", pyForeach)
-    .def("isMember", pyIsMember)
+    .def("__contains__", pyContains)
     ;
 }
