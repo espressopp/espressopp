@@ -9,6 +9,25 @@
 #include "Particle.hpp"
 
 namespace espresso {
+  /** Exception thrown when a property and a storage don't match. */
+  class StorageMismatch : public std::exception 
+  {};
+
+  class PropertyBase {
+  public:
+    typedef shared_ptr< PropertyBase > SelfPtr;
+
+    PropertyBase(const particles::Storage::SelfPtr _storage);
+
+    const particles::Storage::SelfPtr getStorage() const;
+
+    void checkFitsTo(const particles::Set::SelfPtr set) const;
+
+  protected:
+    // what storage does the property belong to
+    const shared_ptr< particles::Storage > storage;
+  };
+
   /** Scalar particle property. This does several things:
       <ul>
       <li> Lifetime management of the property. Deletion
@@ -20,30 +39,16 @@ namespace espresso {
 
       @tparam T type stored in the property
   */
-
-  class PropertyBase {
-  public:
-    typedef shared_ptr< PropertyBase > SelfPtr;
-
-    PropertyBase(const shared_ptr< particles::Storage > _storage);
-
-    virtual const shared_ptr< particles::Storage > 
-    getStorage() const;
-
-  protected:
-    // what storage does the property belong to
-    const shared_ptr< particles::Storage > storage;
-  };
-
   // TODO: Should be noncopyable!
   //  class Property :  boost::noncopyable {
   template < typename T >
   class Property : public PropertyBase {
     typedef particles::PropertyHandle< T > Handle;
+
   public: // visible in Python
     typedef shared_ptr< Property< T > > SelfPtr;
 
-    Property(shared_ptr< particles::Storage > _storage)
+    Property(particles::Storage::SelfPtr _storage)
       : PropertyBase(_storage), 
 	id(storage->template addProperty<T>())
     {}
@@ -61,12 +66,21 @@ namespace espresso {
     }
 
   public: // invisible in Python
-    operator Handle() { 
+    Handle getHandle(particles::Set::SelfPtr set) {
+      checkFitsTo(set);
+      return getHandle();
+    }
+
+    Handle getHandle() {
+      return Handle(*this);
+    }
+
+    operator Handle() {
       return storage->template getPropertyHandle< T >(id);
     }
 
     T &operator[](particles::ParticleHandle particle) {
-      return Handle(*this)[particle];
+      return getHandle()[particle];
     }
 
     T &operator[](ParticleId id) {
@@ -86,6 +100,7 @@ namespace espresso {
     }
 
   private:
+
     esutil::TupleVector::PropertyId id;
   };
 
@@ -109,7 +124,7 @@ namespace espresso {
     typedef shared_ptr< ArrayProperty< T > > SelfPtr;
 
     std::vector<T> getItem(ParticleId part) {
-      Handle ref = *this;
+      Handle ref = getHandle();
       const T
         *start = (*this).at(part),
         *end   = start + ref.getDimension();
@@ -117,7 +132,7 @@ namespace espresso {
     }
 
     void setItem(ParticleId part, const std::vector<T> &v) {
-      Handle ref = *this;
+      Handle ref = getHandle();
       if (v.size() != ref.getDimension())
         throw std::range_error("ArrayProperty::setItem: incorrect dimension");
       std::copy(v.begin(), v.end(), (*this).at(part));
@@ -134,12 +149,13 @@ namespace espresso {
       storage->deleteProperty(id);
     }
 
-    operator Handle() {
-      return storage->template getArrayPropertyHandle<T>(id);
+    Handle getHandle(particles::Storage::SelfPtr _storage) {
+      checkFitsTo(_storage);
+      return getHandle();
     }
 
     T *operator[](particles::ParticleHandle handle) {
-      return Handle(*this)[handle];
+      return getHandle()[handle];
     }
 
     T *operator[](ParticleId part) {
@@ -159,6 +175,10 @@ namespace espresso {
     }
 
   private:
+    Handle getHandle() {
+      return storage->template getArrayPropertyHandle<T>(id);
+    }
+
     esutil::TupleVector::PropertyId id;
   };
 

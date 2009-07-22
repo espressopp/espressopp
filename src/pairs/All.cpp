@@ -41,7 +41,7 @@ namespace {
       : applyFunction(_applyFunction), 
 	bc(*bcptr), 
 	set(*setptr), 
-	pos(*posProperty)
+	pos(posProperty->getHandle(setptr))
     {}
 
     void foreach() {

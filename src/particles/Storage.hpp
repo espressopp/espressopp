@@ -19,10 +19,6 @@ namespace espresso {
   namespace particles {
     typedef PropertyHandle< ParticleId > IdPropertyHandle;
 
-    // forward declaration
-    class StorageMismatch : public std::exception 
-    {};
-
     class Storage : public Set, 
 		    public enable_shared_from_this< Storage >,
 		    boost::noncopyable
@@ -85,7 +81,6 @@ namespace espresso {
       virtual bool contains(ParticleHandle);
       virtual bool contains(ParticleId);
 
-
       /** apply computer to all particles of this set
        */
       virtual void foreach(ApplyFunction function);
@@ -93,8 +88,6 @@ namespace espresso {
       using Set::foreach;
 
       virtual SelfPtr getStorage();
-
-      void checkProperty(shared_ptr< PropertyBase > prop);
 
       /// make this class available at Python
       static void registerPython();
@@ -128,15 +121,15 @@ namespace espresso {
       void deleteProperty(PropertyId id);
 
       /// get a short lifetime reference to a property by its ID
-      template<typename T>
-      PropertyHandle<T> getPropertyHandle(PropertyId id) {
-        return particles.getProperty<T>(id);
+      template< typename T >
+      PropertyHandle< T > getPropertyHandle(PropertyId id) {
+        return particles.getProperty< T >(id);
       }
 
       /// get a short lifetime reference to a property by its ID
-      template<typename T>
-      ArrayPropertyHandle<T> getArrayPropertyHandle(PropertyId id) {
-        return particles.getArrayProperty<T>(id);
+      template< typename T >
+      ArrayPropertyHandle< T > getArrayPropertyHandle(PropertyId id) {
+        return particles.getArrayProperty< T >(id);
       }
 
       //@}

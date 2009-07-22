@@ -20,10 +20,9 @@ MDIntegrator::MDIntegrator(particles::Set::SelfPtr _set,
   velProperty(_velProperty),
   forceProperty(_forceProperty)
 {
-  particles::Storage::SelfPtr storage = set->getStorage();
-  storage->checkProperty(posProperty);
-  storage->checkProperty(velProperty);
-  storage->checkProperty(forceProperty);
+  posProperty->checkFitsTo(set);
+  velProperty->checkFitsTo(set);
+  forceProperty->checkFitsTo(set);
   LOG4ESPP_INFO(theLogger, "Constructor of MDIntegrator");
   timeStep = 0.0;
 }

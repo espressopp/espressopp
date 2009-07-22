@@ -72,13 +72,6 @@ void Storage::foreach(ApplyFunction function) {
 Storage::SelfPtr 
 Storage::getStorage() { return shared_from_this(); }
 
-void 
-Storage::checkProperty(PropertyBase::SelfPtr prop) {
-  if (prop->getStorage().get() != this)
-    throw StorageMismatch();
-}
-
-
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
 //////////////////////////////////////////////////
@@ -90,7 +83,6 @@ void Storage::registerPython() {
     ("particles_Storage")
     .def("addParticle", &Storage::_addParticle)
     .def("deleteParticle", &Storage::deleteParticle)
-    .def("checkProperty", &Storage::checkProperty)
     ;
 }
 

@@ -16,8 +16,8 @@ if __name__ == 'espresso.pmi':
             self.tag = _tag
 
         def prepare(self, storage):
-            storage.checkProperty(self.position)
-            storage.checkProperty(self.tag)
+            self.position.checkFitsTo(storage)
+            self.tag.checkFitsTo(storage)
 
         def apply(self, pid):
             pos = self.position[pid]
@@ -31,8 +31,8 @@ if __name__ == 'espresso.pmi':
             self.tag = _tag
 
         def prepare(self, storage):
-            storage.checkProperty(self.property)
-            storage.checkProperty(self.tag)
+            self.property.checkFitsTo(storage)
+            self.tag.checkFitsTo(storage)
             self.total = 0
             self.sphere = 0
 

@@ -55,6 +55,9 @@ if pmi.IS_CONTROLLER:
             node = self.decomposer.getNodeOfParticle(particle)
             pmi.call(self.pmiobject.setItem, node, particle, value)
 
+        def checkFitsTo(self, set):
+            self.pmiobject.checkFitsTo(set.pmiobject)
+
 ####
 
 ######## RealProperty

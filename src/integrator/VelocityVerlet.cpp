@@ -23,7 +23,7 @@ namespace {
     StepA(Property< Real3D >::SelfPtr posProperty,
 	  Property< Real3D >::SelfPtr velProperty,
 	  Property< Real3D >::SelfPtr forceProperty, 
-	    real _timeStep)
+	  real _timeStep)
       : pos(*posProperty), vel(*velProperty), force(*forceProperty),
 	timeStep(_timeStep), timeStepSqr(_timeStep * _timeStep) 
     {}

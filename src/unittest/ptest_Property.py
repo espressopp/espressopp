@@ -1,5 +1,4 @@
 from espresso import decomposition
-from _espresso import particles_Storage
 
 if __name__ == 'espresso.pmi':
     class MockDecomposerLocal(decomposition.DecomposerLocal) :
@@ -41,7 +40,7 @@ else:
 
         def addParticle(self, id = None): pass
         def deleteParticle(self, id): pass
-        def getTotalNumberOfParticles(self) :pass
+        def getTotalNumberOfParticles(self): pass
 
     ####
 
@@ -70,6 +69,10 @@ else:
 
         def testDecomposerNodeOfParticleFailureWrite(self) :
             self.assertRaises(RuntimeWarning, self.prop.__setitem__, self.decomp.special, 42)
+
+        def testDoesntFit(self):
+            self.decomp2 = MockDecomposer()
+            self.assertRaises(RuntimeError, self.prop.checkFitsTo, self.decomp2)
 
     ####
 
