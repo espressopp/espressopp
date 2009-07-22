@@ -7,11 +7,6 @@
 
 namespace espresso {
   typedef double real;  // double precision
-    
-  template<class real>
-  real sign(real _r) {
-    return  (_r > 0) ? 1 : -1;
-  }
 }
 
 #endif

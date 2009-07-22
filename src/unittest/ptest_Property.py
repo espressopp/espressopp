@@ -71,6 +71,7 @@ else:
             self.assertRaises(RuntimeWarning, self.prop.__setitem__, self.decomp.special, 42)
 
         def testDoesntFit(self):
+            self.prop.checkFitsTo(self.decomp)
             self.decomp2 = MockDecomposer()
             self.assertRaises(RuntimeError, self.prop.checkFitsTo, self.decomp2)
 

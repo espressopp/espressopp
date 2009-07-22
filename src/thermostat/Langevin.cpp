@@ -28,9 +28,11 @@ private:
   real gamma;
 
 public:
-  StepThermalA(Property< Real3D >::SelfPtr velProperty, 
+  StepThermalA(Set::SelfPtr set,
+	       Property< Real3D >::SelfPtr velProperty, 
 	       real _timeStep, real _gamma)
-    : vel(*velProperty), timeStep(_timeStep), gamma(_gamma) { }
+    : vel(velProperty->getHandle(set)), 
+      timeStep(_timeStep), gamma(_gamma) { }
   // m = 1
   virtual void apply(const ParticleHandle pref) {
     vel[pref] = vel[pref] - 0.5 * gamma * vel[pref] * timeStep;
@@ -45,7 +47,6 @@ public:
 class StepThermalB: public particles::Computer {
   
 private:
-  
   PropertyHandle< Real3D > vel;
   real timeStep;
   real gamma;
@@ -53,10 +54,11 @@ private:
   real c;
 
 public:
-
-  StepThermalB(Property< Real3D >::SelfPtr velProperty, 
+  StepThermalB(Set::SelfPtr set,
+	       Property< Real3D >::SelfPtr velProperty, 
 	       real _timeStep, real _gamma, real _temperature)
-    : vel(*velProperty), timeStep(_timeStep), gamma(_gamma), temperature(_temperature) {
+    : vel(velProperty->getHandle(set)), 
+      timeStep(_timeStep), gamma(_gamma), temperature(_temperature) {
     /*
      * The c coefficient represents the strength of the noise in the Langevin thermostat.
      * The formula is usually given as c = sqrt(2*gamma*temp/timeStep) multiplied by
@@ -121,19 +123,19 @@ void Langevin::thermalizeA(const integrator::VelocityVerlet& integrator) {
 
   real timeStep = integrator.getTimeStep();
 
-  StepThermalA stepThermalA(integrator.getVelProperty(), timeStep, gamma);
+  Set::SelfPtr localset = takeFirst(set, integrator.getSet());
+
+  StepThermalA stepThermalA(localset, integrator.getVelProperty(), 
+			    timeStep, gamma);
 
   // apply stepThermalA to my particle set only if available
-
-  if (set) {
-    set->foreach(stepThermalA);
-  } else {
-    integrator.getSet()->foreach(stepThermalA);
-  }
+  localset->foreach(stepThermalA);
 
 }
 
 /**********************************************************************************/
+
+
 
 void Langevin::thermalizeB(const integrator::VelocityVerlet& integrator) {
 
@@ -143,13 +145,12 @@ void Langevin::thermalizeB(const integrator::VelocityVerlet& integrator) {
   real timeStep = integrator.getTimeStep();
   real temperature = getTemperature();
 
-  StepThermalB stepThermalB(integrator.getVelProperty(), timeStep, gamma, temperature);
+  Set::SelfPtr localset = takeFirst(set, integrator.getSet());
 
-  if (set) {
-     set->foreach(stepThermalB);
-  } else {
-     integrator.getSet()->foreach(stepThermalB);
-  }
+  StepThermalB stepThermalB(localset, integrator.getVelProperty(), 
+			    timeStep, gamma, temperature);
+
+  localset->foreach(stepThermalB);
 }
 
 /**********************************************************************************/
@@ -206,7 +207,7 @@ Langevin::registerPython() {
   using namespace espresso::python;
 
   class_< Langevin, bases< Thermostat > >
-    ("thermostat_Langevin", init<real, real>())
+    ("thermostat_Langevin", init< real, real >())
     .def("setGamma", &Langevin::setGamma)
     .def("getGamma", &Langevin::getGamma)    
     .def("connect", &Langevin::connect)    

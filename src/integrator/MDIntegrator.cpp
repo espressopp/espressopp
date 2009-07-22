@@ -18,14 +18,9 @@ MDIntegrator::MDIntegrator(particles::Set::SelfPtr _set,
   set(_set),
   posProperty(_posProperty),
   velProperty(_velProperty),
-  forceProperty(_forceProperty)
-{
-  posProperty->checkFitsTo(set);
-  velProperty->checkFitsTo(set);
-  forceProperty->checkFitsTo(set);
-  LOG4ESPP_INFO(theLogger, "Constructor of MDIntegrator");
-  timeStep = 0.0;
-}
+  forceProperty(_forceProperty),
+  timeStep(0.0)
+{}
 
 particles::Set::SelfPtr 
 MDIntegrator::getSet() const { return set; }

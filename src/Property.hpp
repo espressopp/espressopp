@@ -71,14 +71,6 @@ namespace espresso {
       return getHandle();
     }
 
-    Handle getHandle() {
-      return Handle(*this);
-    }
-
-    operator Handle() {
-      return storage->template getPropertyHandle< T >(id);
-    }
-
     T &operator[](particles::ParticleHandle particle) {
       return getHandle()[particle];
     }
@@ -100,6 +92,9 @@ namespace espresso {
     }
 
   private:
+    Handle getHandle() {
+      return storage->template getPropertyHandle< T >(id);
+    }
 
     esutil::TupleVector::PropertyId id;
   };

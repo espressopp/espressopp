@@ -20,12 +20,16 @@ namespace {
     const real timeStep;
     const real timeStepSqr;
 
-    StepA(Property< Real3D >::SelfPtr posProperty,
+    StepA(Set::SelfPtr set,
+	  Property< Real3D >::SelfPtr posProperty,
 	  Property< Real3D >::SelfPtr velProperty,
 	  Property< Real3D >::SelfPtr forceProperty, 
 	  real _timeStep)
-      : pos(*posProperty), vel(*velProperty), force(*forceProperty),
-	timeStep(_timeStep), timeStepSqr(_timeStep * _timeStep) 
+      : pos(posProperty->getHandle(set)), 
+	vel(velProperty->getHandle(set)), 
+	force(forceProperty->getHandle(set)),
+	timeStep(_timeStep), 
+	timeStepSqr(_timeStep * _timeStep) 
     {}
   
     virtual void apply(const ParticleHandle pref) {
@@ -40,10 +44,13 @@ namespace {
 
     const real timeStep;
 
-    StepB(Property< Real3D >::SelfPtr velProperty,
+    StepB(Set::SelfPtr set,
+	  Property< Real3D >::SelfPtr velProperty,
 	  Property< Real3D >::SelfPtr forceProperty, 
 	  real _timeStep)
-      : vel(*velProperty), force(*forceProperty), timeStep(_timeStep)
+      : vel(velProperty->getHandle(set)), 
+	force(forceProperty->getHandle(set)),
+	timeStep(_timeStep)
     {}
     
     void apply(const ParticleHandle pref) { 
@@ -54,8 +61,9 @@ namespace {
   struct StepZeroForces: public Computer {
     const PropertyHandle< Real3D > force;
 
-    StepZeroForces(Property< Real3D >::SelfPtr forceProperty)
-      : force(*forceProperty) {}
+    StepZeroForces(Set::SelfPtr set,
+		   Property< Real3D >::SelfPtr forceProperty)
+      : force(forceProperty->getHandle(set)) {}
     
     virtual void apply(const ParticleHandle pref) {
       force[pref] = 0.0;
@@ -70,7 +78,7 @@ VelocityVerlet::VelocityVerlet(Set::SelfPtr set,
   : MDIntegrator(set, posProperty, velProperty, forceProperty) {}
 
 void VelocityVerlet::step() {
-  StepA stepA(posProperty, velProperty, forceProperty, timeStep);
+  StepA stepA(set, posProperty, velProperty, forceProperty, timeStep);
 
   // Step A
   set->foreach(stepA);
@@ -79,14 +87,14 @@ void VelocityVerlet::step() {
   updateVelocity1(*this);
 
   // set forces to ZERO after calling updateVelocity1
-  StepZeroForces stepZeroForces(forceProperty);
+  StepZeroForces stepZeroForces(set, forceProperty);
   set->foreach(stepZeroForces);
 
   // calculate forces:
   updateForces(*this);
 
   // Step B
-  StepB stepB(velProperty, forceProperty, timeStep);
+  StepB stepB(set, velProperty, forceProperty, timeStep);
   set->foreach(stepB);
 
   // call connected routines, e.g. thermalizeB for a chosen thermostat
