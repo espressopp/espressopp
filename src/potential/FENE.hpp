@@ -15,24 +15,17 @@ namespace espresso {
         \f]
     */
 
-    class FENE: public CentralPotential {
+    class FENE
+      : public CentralPotentialTemplate< FENE >
+    {
     public:
-      struct BasicComputer {
-        real K;       
-        real r0;
-        real rMax;
-
-        Real3D computeForce(const Real3D &) const;
-        real   computeEnergySqr(const real) const;
-        real   computeEnergy(const real) const;
-      };
-      friend class BasicComputer;
-
       typedef shared_ptr< FENE > SelfPtr;
 
     private:
-      BasicComputer computer;
-
+      real K;       
+      real r0;
+      real rMax;
+      
       static LOG4ESPP_DECL_LOGGER(theLogger);
 
     public:
@@ -40,22 +33,22 @@ namespace espresso {
 
       /** Default constructor. Member variables are accessed by setter and getter. */
 
-      FENE(); 
-       
-      virtual ~FENE();
+      FENE() {}
+      virtual ~FENE() {}
 
-      // Setter and getter
-      virtual void set(real _K, real _r0, real _rMax);
+      void setK(real _K) { K = _K; }
+      real getK() const { return K; }
 
-      real getK() const;
-      real getR0() const;
-      real getRMax() const;
+      void setR0(real _r0) { r0 = _r0; }
+      real getR0() const { return r0; }
 
+      void setRMax(real _rMax) { rMax = _rMax; }
+      real getRMax() const { return rMax; }
+
+      using CentralPotential::computeEnergy;
+      virtual real computeEnergy(const real r) const;
       virtual real computeEnergySqr (const real distSqr) const;
-      virtual Real3D computeForce (const Real3D &dist) const;
-
-      virtual pairs::EnergyComputer *createEnergyComputer(const pairs::EnergyComputer &) const;
-      virtual pairs::ForceComputer  *createForceComputer (const pairs::ForceComputer &)  const;
+      virtual Real3D computeForce (const Real3D dist) const;
 
       /* FENE should probably derived from a two-body potential
 	 without a cutoff to avoid the following */

@@ -9,7 +9,7 @@ using namespace espresso::potential;
 //////////////////////////////////////////////////
 real
 CentralPotential::
-computeEnergy(const Real3D &dist) const {
+computeEnergy(const Real3D dist) const {
   return this->computeEnergySqr(dist.sqr());
 }
 
@@ -20,7 +20,6 @@ computeEnergy(const real dist) const {
 }
 
 
-// thin wrapper for the C++ ABC
 class PythonCentralPotential
   : public CentralPotential, 
     public python::wrapper< CentralPotential > 
@@ -35,17 +34,17 @@ void
 CentralPotential::registerPython() {
   using namespace espresso::python;
 
-  // create thin wrappers around overloaded member functions
-  real (CentralPotential::*computeEnergyOverload1)(const Real3D &) const =
+  real (CentralPotential::*computeEnergy1)(const Real3D) const =
     &CentralPotential::computeEnergy;
-  real (CentralPotential::*computeEnergyOverload2)(const real) const =
+  real (CentralPotential::*computeEnergy2)(const real) const =
     &CentralPotential::computeEnergy;
 
   class_< PythonCentralPotential, bases< Potential >, boost::noncopyable >
-    ("potential_CentralPotential", no_init)
+    ("potential_PythonCentralPotential", no_init)
     .def("computeEnergySqr", pure_virtual(&CentralPotential::computeEnergySqr))
-    .def("computeEnergy", computeEnergyOverload1)
-    .def("computeEnergy", computeEnergyOverload2)
+    .def("computeEnergy", computeEnergy1)
+    .def("computeEnergy", computeEnergy2)
     ;
+
 }
 

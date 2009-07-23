@@ -24,6 +24,7 @@ class _PropertyLocal(object):
             if pmi.IS_CONTROLLER :
                 return mpi.world.recv(node, 0)
 
+    # TODO: implement auto conversion in __setitem__
     def setItem(self, node, particle, value):
         # if we did not already get the right type, try to convert it
         if type(value) is not self.propertytype:

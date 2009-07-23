@@ -72,8 +72,7 @@ public:
 		       particles::Storage::SelfPtr storage2) {
     prepareCalled = true;
     id = storage1->getIdPropertyHandle();
-    storage1->checkProperty(posProperty);
-    pos = *posProperty;
+    pos = posProperty->getHandle(storage1);;
   }
 
   virtual void finalize() {

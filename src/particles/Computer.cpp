@@ -47,9 +47,9 @@ void Computer::registerPython() {
   espresso::python::class_
     < espresso::particles::PythonComputer, boost::noncopyable >
     ("particles_PythonComputer")
-    .def("prepare", &PythonComputer::prepare)
-    .def("finalize", &PythonComputer::finalize)
-    .def("apply", &PythonComputer::apply)
+    .def("prepare", &Computer::prepare)
+    .def("finalize", &Computer::finalize)
+    .def("apply", pure_virtual(&Computer::apply))
     ;
 
 }

@@ -23,7 +23,9 @@ class PythonComputerLocal(particles_PythonComputer):
     Decomposer.foreach, the return value of "finalize" is passed back.
     """
     def __init__(self):
-        particles_PythonComputer.__init__(self)
+        if not hasattr(self, 'cxxinit'):
+            particles_PythonComputer.__init__(self)
+            self.cxxinit = True
         
     def prepare(self, storage):
         pass

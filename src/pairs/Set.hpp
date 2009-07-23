@@ -38,6 +38,8 @@ namespace espresso {
       */
       virtual void foreach(ApplyFunction function) = 0;
 
+      virtual int bump() { return 1; }
+
       static void registerPython();
 
     protected:

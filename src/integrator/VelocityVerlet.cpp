@@ -3,7 +3,6 @@
 #include <python.hpp>
 #include "particles/Storage.hpp"
 #include "particles/Computer.hpp"
-#include "pairs/ForceComputer.hpp"
 
 using namespace espresso;
 using namespace espresso::integrator;

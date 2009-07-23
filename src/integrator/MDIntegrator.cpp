@@ -14,12 +14,12 @@ LOG4ESPP_LOGGER(MDIntegrator::theLogger, "Integrator");
 MDIntegrator::MDIntegrator(particles::Set::SelfPtr _set,
                            Property< Real3D >::SelfPtr _posProperty,
                            Property< Real3D >::SelfPtr _velProperty,
-                           Property< Real3D >::SelfPtr _forceProperty) :
-  set(_set),
-  posProperty(_posProperty),
-  velProperty(_velProperty),
-  forceProperty(_forceProperty),
-  timeStep(0.0)
+                           Property< Real3D >::SelfPtr _forceProperty) 
+  : timeStep(0.0),
+    set(_set),
+    posProperty(_posProperty),
+    velProperty(_velProperty),
+    forceProperty(_forceProperty)
 {}
 
 particles::Set::SelfPtr 

@@ -37,7 +37,7 @@ BOOST_FIXTURE_TEST_CASE(referencesTest, Fixture)
 {
   ParticleHandle p1 = store->getParticleHandle(ParticleId(2));
   ParticleHandle p2 = store->getParticleHandle(ParticleId(4));
-  PropertyHandle< Real3D > pos = *propertyPos;
+  PropertyHandle< Real3D > pos = propertyPos->getHandle(store);
 
   pos[p2][0] = 0.4;
   pos[p2][1] = 0.5;

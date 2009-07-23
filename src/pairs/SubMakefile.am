@@ -3,8 +3,6 @@ nobase_pkginclude_HEADERS += \
 	pairs/Set.hpp \
 	pairs/All.hpp \
 	pairs/Computer.hpp \
-	pairs/EnergyComputer.hpp \
-	pairs/ForceComputer.hpp \
 	pairs/ComputerList.hpp
 
 libespresso_common_la_SOURCES += \

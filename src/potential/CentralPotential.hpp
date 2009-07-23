@@ -10,7 +10,7 @@ namespace espresso {
       typedef shared_ptr< CentralPotential > SelfPtr;
 
       virtual ~CentralPotential() {}
-      virtual real computeEnergy(const Real3D &dist) const;
+      virtual real computeEnergy(const Real3D dist) const;
       virtual real computeEnergy(const real dist) const;
 
       /** When deriving a CentralPotential, it is enough to override
@@ -19,6 +19,12 @@ namespace espresso {
 
       static void registerPython();
     };
+
+    template < class ConcretePotential >
+    class CentralPotentialTemplate 
+      : public PotentialTemplate< ConcretePotential, CentralPotential > 
+    {};
+
   }
 }
 

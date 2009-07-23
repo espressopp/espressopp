@@ -2,8 +2,9 @@ from espresso import pmi
 
 from _espresso import pairs_Set
 class SetLocal(pairs_Set):
-    def foreach(self, computer):
-        pairs_Set.foreach(self, computer)
+    pass
+#     def foreach(self, computer):
+#         pairs_Set.foreach(self, computer)
 
 if pmi.IS_CONTROLLER:
     from espresso.pairs.Computer import PythonComputerLocal

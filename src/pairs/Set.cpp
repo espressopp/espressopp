@@ -27,6 +27,8 @@ Set::foreach(Computer::SelfPtr computer) {
   foreach(*computer);
 }
 
+
+
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
 //////////////////////////////////////////////////
@@ -34,7 +36,7 @@ void
 Set::registerPython() {
   using namespace espresso::python;
 
-  void (Set::*py_foreach)(Computer::SelfPtr computer) 
+  void (Set::*foreach1)(Computer::SelfPtr computer) 
     = &Set::foreach;
 
   // also register the abstract class Set to make virtual functions available
@@ -42,8 +44,10 @@ Set::registerPython() {
   // no_init must be used as the abstract class Set has no constructor
 
   class_< Set, boost::noncopyable >("pairs_Set", no_init)
-    .def("foreach", py_foreach);
-  ;
+    .def("foreach", foreach1)
+    .def("bump", &Set::bump)
+    ;
+
 }
 
 

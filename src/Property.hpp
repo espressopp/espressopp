@@ -44,10 +44,10 @@ namespace espresso {
   template < typename T >
   class Property : public PropertyBase {
     typedef particles::PropertyHandle< T > Handle;
-
-  public: // visible in Python
+  public:
     typedef shared_ptr< Property< T > > SelfPtr;
 
+    // visible in Python
     Property(particles::Storage::SelfPtr _storage)
       : PropertyBase(_storage), 
 	id(storage->template addProperty<T>())

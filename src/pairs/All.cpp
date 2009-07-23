@@ -86,8 +86,10 @@ All::registerPython() {
   using namespace espresso::python;
   class_< All, bases< Set > >
     ("pairs_All", 
-     init < bc::BC::SelfPtr, 
+     init< 
+     bc::BC::SelfPtr, 
      particles::Set::SelfPtr, 
-     Property< Real3D >::SelfPtr >())
+     Property< Real3D >::SelfPtr 
+     >())
     ;
 }

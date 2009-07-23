@@ -1,56 +1,28 @@
 from espresso import pmi
-from espresso.esutil import choose
 
-from _espresso import potential_FENE as _FENE
+from espresso.potential.CentralPotential import *
+from _espresso import potential_FENE
 
-class FENELocal(_FENE) :
+class FENELocal(CentralPotentialLocal, potential_FENE) :
     'The (local) FENE potential.'
     def __init__(self, K=1.0, r0=0.0, rMax=1.0) :
-        """Initialize the FENE potential.
-
-        The parameters are identical to set()."""
-        _FENE.__init__(self)
-        # set the defaults
-        self.set(K, r0, rMax)
-
-    # define setter
-    def set(self, K=None, r0=None, rMax=None) :
-        """set((real)K, (real)r0, (real)rMax) -- Set the parameters of the potential.
-        """
-        return _FENE.set(self,
-            choose(K, self.K),
-            choose(r0, self.r0),
-            choose(rMax, self.rMax)
-            )
-
-    # define properties
-    @property
-    def K(self): return self.getK()
-    @K.setter
-    def K(self, _K): self.set(K=_K)
-
-    @property
-    def r0(self): return self.getR0()
-    @r0.setter
-    def r0(self, _r0): self.set(r0=_r0)
-
-    @property
-    def rMax(self): return self.getRMax()
-    @rMax.setter
-    def rMax(self, _rMax): self.set(rMax=_rMax)
+        """Initialize the FENE potential."""
+        if not hasattr(self, 'cxxinit'):
+            potential_FENE.__init__(self)
+            self.cxxinit = True
+        self.K = K
+        self.r0 = r0
+        self.rMax = rMax
 
 # wrap FENE
 if pmi.IS_CONTROLLER:
-    pmi.exec_('import espresso.potential.FENE')
-
+    pmi.exec_('import espresso.potential')
     class FENE(object) :
         'The FENE potential.'
         __metaclass__ = pmi.Proxy
-        pmiproxydefs = {
-            'subjectclass': 'espresso.potential.FENELocal',
-            'localcall' : [ 'computeForce', 'computeEnergy' ],
-            'pmicall' : [ 'set' ],
-            'pmiproperty' : ['K', 'r0', 'rMax' ]
-            }
+        pmiproxydefs = CentralPotential.pmiproxydefs
+        pmiproxydefs['subjectclass'] = 'espresso.potential.FENELocal'
+        pmiproxydefs['pmiproperty'] = [ 'K', 'r0', 'rMax' ]
+
 
 

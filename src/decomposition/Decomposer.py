@@ -66,7 +66,7 @@ if pmi.IS_CONTROLLER :
 	    return property
 
         #        @abc.abstractmethod
-        def addParticle(self, id = None) :
+        def addParticle(self, id=None) :
             """
             This has to be implemented by any derived class to implement a real particle storage.
             This method should add a particle with identity <id> or a not yet assigned
