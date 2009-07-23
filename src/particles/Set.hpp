@@ -16,6 +16,8 @@ namespace espresso {
     class Set {
     public:
       typedef shared_ptr< Set > SelfPtr;
+ 
+      virtual ~Set() {}
 
       /** for a particle of the Storage of this class,
           check whether it belongs to this set

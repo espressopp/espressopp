@@ -30,6 +30,8 @@ namespace espresso {
 
       using Set::foreach;
 
+      virtual ~All() {}
+
       /** This routine will apply a function operator to all pairs.
 	  \param pairComputer is the object that provides the function to be applied to all pairs.
       */

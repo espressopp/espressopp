@@ -22,6 +22,8 @@ namespace espresso {
       Set(particles::Storage::SelfPtr _storage1,
 	  particles::Storage::SelfPtr _storage2);
 
+      virtual ~Set() {}
+
       /** Apply computer to all pairs of this set. Call prepare() and
 	  finalize().
        */

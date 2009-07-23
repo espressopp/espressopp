@@ -19,13 +19,15 @@ namespace espresso {
 
     PropertyBase(const particles::Storage::SelfPtr _storage);
 
-    const particles::Storage::SelfPtr getStorage() const;
-
     void checkFitsTo(const particles::Set::SelfPtr set) const;
 
+
   protected:
+    const particles::Storage::SelfPtr getStorage() const;
+
+  private:
     // what storage does the property belong to
-    const shared_ptr< particles::Storage > storage;
+    const particles::Storage::SelfPtr storage;
   };
 
   /** Scalar particle property. This does several things:
@@ -50,11 +52,11 @@ namespace espresso {
     // visible in Python
     Property(particles::Storage::SelfPtr _storage)
       : PropertyBase(_storage), 
-	id(storage->template addProperty<T>())
+	id(getStorage()->template addProperty<T>())
     {}
 
     ~Property() {
-      storage->deleteProperty(id);
+      getStorage()->deleteProperty(id);
     }
 
     T getItem(ParticleId part) {
@@ -71,29 +73,30 @@ namespace espresso {
       return getHandle();
     }
 
-    T &operator[](particles::ParticleHandle particle) {
+    T &at(particles::Set::SelfPtr set, particles::ParticleHandle particle) {
+      checkFitsTo(set);
       return getHandle()[particle];
     }
 
     T &operator[](ParticleId id) {
       particles::ParticleHandle handle =
-        storage->getParticleHandle(id);
-      return (*this)[handle];
+        getStorage()->getParticleHandle(id);
+      return (*this).at(getStorage(), handle);
     }
 
     /// checked access
     T &at(ParticleId id) {
       particles::ParticleHandle handle =
-        storage->getParticleHandle(id);
+        getStorage()->getParticleHandle(id);
       if (handle == particles::ParticleHandle()) {
 	throw std::out_of_range("Property::at");
       }
-      return (*this)[handle];
+      return (*this).at(getStorage(), handle);
     }
 
   private:
     Handle getHandle() {
-      return storage->template getPropertyHandle< T >(id);
+      return getStorage()->template getPropertyHandle< T >(id);
     }
 
     esutil::TupleVector::PropertyId id;
@@ -141,37 +144,38 @@ namespace espresso {
     {}
 
     ~ArrayProperty() {
-      storage->deleteProperty(id);
+      getStorage()->deleteProperty(id);
     }
 
-    Handle getHandle(particles::Storage::SelfPtr _storage) {
-      checkFitsTo(_storage);
+    Handle getHandle(particles::Set::SelfPtr set) {
+      checkFitsTo(set);
       return getHandle();
     }
 
-    T *operator[](particles::ParticleHandle handle) {
+    T *at(particles::Set::SelfPtr set, particles::ParticleHandle handle) {
+      checkFitsTo(set);
       return getHandle()[handle];
     }
 
     T *operator[](ParticleId part) {
       particles::ParticleHandle handle =
-        storage->getParticleHandle(part);
-      return (*this)[handle];
+        getStorage()->getParticleHandle(part);
+      return (*this).at(getStorage(), handle);
     }
 
     /// checked access
     T *at(ParticleId part) {
       particles::ParticleHandle handle =
-        storage->getParticleHandle(part);
+        getStorage()->getParticleHandle(part);
       if (handle == particles::ParticleHandle()) {
 	throw std::out_of_range("ArrayProperty::at");
       }
-      return (*this)[handle];
+      return (*this).at(getStorage(), handle);
     }
 
   private:
     Handle getHandle() {
-      return storage->template getArrayPropertyHandle<T>(id);
+      return getStorage()->template getArrayPropertyHandle<T>(id);
     }
 
     esutil::TupleVector::PropertyId id;

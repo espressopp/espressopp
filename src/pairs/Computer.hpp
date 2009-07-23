@@ -12,7 +12,9 @@ namespace espresso {
     class Computer {
     public:
       typedef shared_ptr< Computer > SelfPtr;
-      
+
+      virtual ~Computer() {}
+
       /// @name extended function object interface
       //@{
       typedef Real3D first_argument_type;

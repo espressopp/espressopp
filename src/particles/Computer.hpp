@@ -15,6 +15,8 @@ namespace espresso {
     public:
       typedef shared_ptr< Computer > SelfPtr;
 
+      virtual ~Computer() {}
+
       /** function that is called right before using the Computer on a
 	  specific Storage.  The storage will not be modified until
 	  finalize() is called. 

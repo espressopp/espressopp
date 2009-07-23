@@ -38,7 +38,7 @@ struct Fixture {
 	for (size_t k = 0; k < N; k++) {
 	  particles::ParticleHandle p
 	    = store->addParticle(ParticleId(pid));
-	  (*posProperty)[p] = Real3D(i*step, j*step, k*step);
+	  posProperty->at(store, p) = Real3D(i*step, j*step, k*step);
 	  pid++;
 	}
   }
@@ -72,7 +72,7 @@ public:
 		       particles::Storage::SelfPtr storage2) {
     prepareCalled = true;
     id = storage1->getIdPropertyHandle();
-    pos = posProperty->getHandle(storage1);;
+    pos = posProperty->getHandle(storage1);
   }
 
   virtual void finalize() {

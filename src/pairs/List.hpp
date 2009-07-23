@@ -81,14 +81,6 @@ namespace espresso {
 
       virtual void foreach(Computer& pairComputer);
 
-      /** This routine will apply a function operator for read-only particles to all pairs.
-
-	  \param pairComputer is the object that provides the read-only function to be applied to all pairs.
-
-      */
-
-      virtual void foreach(ConstComputer& pairComputer) const;
-
       /** Getter routine for the storage */
 
       particles::Storage::SelfPtr getStorage() const { return storage; }
