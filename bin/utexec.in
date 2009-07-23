@@ -309,7 +309,7 @@ for srcdir in dirs:
                 (do_python and py_tests) or \
                 (do_parallel and py_ptests)):
         print("No unittests to handle.")
-        break
+        continue
 
     if not HAVE_MPI:
         py_tests.extend(py_ptests)
