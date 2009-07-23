@@ -10,7 +10,6 @@
 using namespace espresso;
 using namespace espresso::pairs;
 
-#include <iostream>
 struct Fixture {
   static const size_t N = 3;
   static const real size = 1.0;
@@ -101,11 +100,11 @@ public:
 
 BOOST_FIXTURE_TEST_CASE(foreachTest, Fixture)
 {
-    MockPairComputer computer(pbc, posProperty);
-    pairs->foreach(computer);
-    size_t np = N*N*N;
-    BOOST_CHECK_EQUAL(computer.occupied.size(), (np*(np-1))/2);
-    BOOST_CHECK(computer.prepareCalled);
-    BOOST_CHECK(computer.finalizeCalled);
+  shared_ptr< MockPairComputer > computer = make_shared< MockPairComputer >(pbc, posProperty);
+  pairs->foreach(*computer);
+  size_t np = N*N*N;
+  BOOST_CHECK_EQUAL(computer->occupied.size(), (np*(np-1))/2);
+  BOOST_CHECK(computer->prepareCalled);
+  BOOST_CHECK(computer->finalizeCalled);
 }
 

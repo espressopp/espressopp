@@ -6,7 +6,7 @@ using namespace std;
 using namespace espresso;
 using namespace esutil;
 
-template<typename type>
+template< typename type >
 class Test {
   type *base;
   int size;
@@ -23,14 +23,14 @@ public:
 
 };
 
-template<typename type>
-type *Test<type>::get() const
+template< typename type >
+type *Test< type >::get() const
 {
   return base;
 }
 
-template<typename type>
-int Test<type>::getSize() const
+template< typename type >
+int Test< type >::getSize() const
 {
   return size;
 }
@@ -65,7 +65,7 @@ int main()
   //typedef double type;
   typedef int type;
   //typedef float type;
-  Test<type> test(new type[size], size);
+  Test< type > test(new type[size], size);
 
   WallTimer timer;
 

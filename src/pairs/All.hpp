@@ -35,7 +35,7 @@ namespace espresso {
       /** This routine will apply a function operator to all pairs.
 	  \param pairComputer is the object that provides the function to be applied to all pairs.
       */
-      virtual void foreach(ApplyFunction applyFunction);
+      void foreach(ApplyFunction applyFunction);
 
     private:
       particles::Set::SelfPtr set;

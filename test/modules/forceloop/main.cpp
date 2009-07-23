@@ -8,8 +8,8 @@
 #include <bc/PeriodicBC.hpp>
 #include <potential/LennardJones.hpp>
 #include <potential/FENE.hpp>
+#include <potential/ForceComputer.hpp>
 #include <pairs/All.hpp>
-#include <pairs/ForceComputer.hpp>
 #include <thermostat/Langevin.hpp>
 
 #include "ParticleWriter.hpp"
@@ -118,7 +118,7 @@ void forceloop() {
   // force will be the vector of all forces in the particle storage
   // and force[ref] returns the force (as RealArrayRef) of particle reference ref
 
-  PropertyHandle< Real3D > forceRef = *force;
+  PropertyHandle< Real3D > forceRef = force->getHandle(particleStorage);
 
   // Define a pair computer that computes the forces for particle pairs
   // ljint provides the routine computeForce for a particle pair

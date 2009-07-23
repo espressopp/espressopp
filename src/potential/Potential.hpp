@@ -44,6 +44,7 @@ namespace espresso {
 	public enable_shared_from_this< ConcretePotential >
     {
     public:
+      using Base::createForceComputer;
       virtual pairs::Computer::SelfPtr 
       createForceComputer(Property< Real3D >::SelfPtr _forceProperty1,
 			  Property< Real3D >::SelfPtr _forceProperty2) {
@@ -52,6 +53,7 @@ namespace espresso {
 	  ((*this).shared_from_this(), _forceProperty1, _forceProperty2);
       }
 
+      using Base::createEnergyComputer;
       virtual pairs::Computer::SelfPtr 
       createEnergyComputer(Property< real >::SelfPtr _energyProperty1,
 			   Property< real >::SelfPtr _energyProperty2) {

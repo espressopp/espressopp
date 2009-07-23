@@ -12,31 +12,28 @@ namespace espresso {
     class ParticleWriter : public Computer {
 
     private:
-      const Property<Real3D>::SelfPtr posProperty;
-      const Property<Real3D>::SelfPtr forceProperty;
+      Property< Real3D >::SelfPtr posProperty;
+      Property< Real3D >::SelfPtr forceProperty;
 
-//       ConstPropertyHandle< Real3D > f;    //<! reference to the force vector of all particles.
-//       ConstPropertyHandle< Real3D > pos;  //<! reference to the position vector of all particles.
-//       ConstPropertyHandle< ParticleId > id;   //<! reference to the identification vector of all particles.
-      ConstPropertyHandle< Real3D > f;    //<! reference to the force vector of all particles.
-      ConstPropertyHandle< Real3D > pos;  //<! reference to the position vector of all particles.
-      ConstPropertyHandle< ParticleId > id;   //<! reference to the identification vector of all particles.
+      PropertyHandle< Real3D > f;    //<! reference to the force vector of all particles.
+      PropertyHandle< Real3D > pos;  //<! reference to the position vector of all particles.
+      PropertyHandle< ParticleId > id;   //<! reference to the identification vector of all particles.
 
     public:
 
       /** Construct a writer for a particle storage.
 	  \param particleStorage is needed to get access the property vectors of all particles.
       */
-      ParticleWriter(const Property<Real3D>::SelfPtr _posProperty, 
-		     const Property<Real3D>::SelfPtr _forceProperty) :
+      ParticleWriter(Property<Real3D>::SelfPtr _posProperty, 
+		     Property<Real3D>::SelfPtr _forceProperty) :
 	posProperty(_posProperty),
 	forceProperty(_forceProperty)
       {}
 
-      virtual void prepare() {
-	pos = *posProperty;
-	f = *forceProperty;
-	id = posProperty->getIdHandle();
+      virtual void prepare(Storage::SelfPtr storage) {
+	pos = posProperty->getHandle(storage);
+	f = forceProperty->getHandle(storage);
+	id = storage->getIdPropertyHandle();
       }
 
       /** Function that is applied to a read-only particle.

@@ -16,7 +16,7 @@
 #include "particles/Storage.hpp"
 #include "particles/Computer.hpp"
 #include "pairs/All.hpp"
-#include "pairs/ForceComputer.hpp"
+#include "potential/ForceComputer.hpp"
 #include "bc/PeriodicBC.hpp"
 #include "potential/LennardJones.hpp"
 #include "esutil/Timer.hpp"
@@ -83,88 +83,92 @@ void TestEspresso::addParticle(const Real3D &pos)
 
 void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {
   bc::PeriodicBC::SelfPtr pbc = make_shared< bc::PeriodicBC >(size);
-  pairs::All allpairs(pbc, storage, position);
-  potential::LennardJones ljint;
-  ljint.set(epsilon, sigma, cutoff);
-  pairs::ForceComputer *forceCompute =
-    ljint.createForceComputer(pairs::ForceComputer(*force));
-  allpairs.foreach(*forceCompute);
-  delete forceCompute;
+  pairs::All::SelfPtr allpairs = make_shared< pairs::All >(pbc, storage, position);
+  potential::LennardJones::SelfPtr ljint = make_shared< potential::LennardJones >();
+  ljint->setEpsilon(epsilon);
+  ljint->setSigma(sigma);
+  ljint->setCutoff(cutoff);
+  pairs::Computer::SelfPtr forceCompute 
+    = ljint->createForceComputer(force);
+  allpairs->foreach(forceCompute);
 }
 
-class EmptyPairComputer: public pairs::ConstComputer {
+class EmptyPairComputer: public pairs::Computer {
 public:
-    EmptyPairComputer() {}
-
-    virtual void operator()(const Real3D &dist,
-			    ConstParticleHandle ref1,
-			    ConstParticleHandle ref2) {
-    }
+  typedef shared_ptr< EmptyPairComputer > SelfPtr;
+  EmptyPairComputer() {}
+  
+  virtual void apply(const Real3D dist,
+		     ParticleHandle ref1,
+		     ParticleHandle ref2) {}
 };
 
 void TestEspresso::runEmptyPairLoop() {
   bc::PeriodicBC::SelfPtr pbc = make_shared< bc::PeriodicBC >(size);
   pairs::All::SelfPtr allpairs = make_shared< pairs::All >(pbc, storage, position);
-  shared_ptr< EmptyPairComputer > ljc = make_shared< EmptyPairComputer >();
-  allpairs->foreach(ljc);
+  EmptyPairComputer::SelfPtr ljc = make_shared< EmptyPairComputer >();
+  allpairs->foreach(*ljc);
 }
 
-class MinDistComputer: public pairs::ConstComputer {
+class MinDistComputer: public pairs::Computer {
 public:
-    real min;
-
-    MinDistComputer(): min(1.0e10) {}
-
-    virtual void operator()(const Real3D &dist,
-			    ConstParticleHandle ref1,
-			    ConstParticleHandle ref2) {
-	real d = dist.sqr();
-	if (min > d) {
-	    min = d;
-	}
+  typedef shared_ptr< MinDistComputer > SelfPtr;
+  real min;
+  
+  MinDistComputer(): min(1.0e10) {}
+  
+  virtual void apply(const Real3D dist,
+		     ParticleHandle ref1,
+		     ParticleHandle ref2) {
+    real d = dist.sqr();
+    if (min > d) {
+      min = d;
     }
+  }
 };
 
 real TestEspresso::calculateMinDist() {
   bc::PeriodicBC::SelfPtr pbc = make_shared< bc::PeriodicBC >(size);
   pairs::All::SelfPtr allpairs = make_shared< pairs::All >(pbc, storage, position);
-  MinDistComputer mincomp;
-  allpairs->foreach(mincomp);
-  return sqrt(mincomp.min);
+  MinDistComputer::SelfPtr mincomp = make_shared< MinDistComputer >();
+  allpairs->foreach(*mincomp);
+  return sqrt(mincomp->min);
 }
 
-class AverageComputer: public particles::ConstComputer {
+class AverageComputer: public particles::Computer {
 public:
+  typedef shared_ptr< AverageComputer > SelfPtr;
 
-  ConstPropertyHandle<Real3D> property;
+  PropertyHandle< Real3D > property;
   real average;
 
-  AverageComputer(const ConstPropertyHandle<Real3D> &_property)
+  AverageComputer(const PropertyHandle< Real3D > &_property)
     : property(_property), average(0) {}
 
-  virtual void operator()(ConstParticleHandle ref) {
+  virtual void apply(ParticleHandle ref) {
     const Real3D p = property[ref];
     average += sqrt(p.sqr());
   }
 };
 
 real TestEspresso::calculateAverage() {
-  AverageComputer avgcompute(*force);
-  storage->foreach(avgcompute);
-  return avgcompute.average;
+  AverageComputer::SelfPtr avgcompute 
+    = make_shared< AverageComputer >(force->getHandle(storage));
+  storage->foreach(*avgcompute);
+  return avgcompute->average;
 }
 
-class EmptyComputer: public particles::ConstComputer {
+class EmptyComputer: public particles::Computer {
 public:
-    EmptyComputer() {}
-
-    virtual void operator()(ConstParticleHandle ref) {
-    }
+  EmptyComputer() {}
+  
+  virtual void apply(ParticleHandle ref) {
+  }
 };
 
 void TestEspresso::runEmptyLoop() {
-  EmptyComputer avgcompute;
-  storage->foreach(avgcompute);
+  EmptyComputer compute;
+  storage->foreach(compute);
 }
 
 /***********************************************************************************
