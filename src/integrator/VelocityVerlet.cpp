@@ -30,8 +30,10 @@ namespace {
 	timeStep(_timeStep), 
 	timeStepSqr(_timeStep * _timeStep) 
     {}
+
+    void prepare(Storage::SelfPtr set) {}
   
-    virtual void apply(const ParticleHandle pref) {
+    void apply(const ParticleHandle pref) {
       pos[pref] = pos[pref] + vel[pref] * timeStep + 0.5 * force[pref] * timeStepSqr;
       vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
     }
@@ -52,6 +54,8 @@ namespace {
 	timeStep(_timeStep)
     {}
     
+    void prepare(Storage::SelfPtr set) {}
+
     void apply(const ParticleHandle pref) { 
       vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep; 
     }
@@ -64,7 +68,8 @@ namespace {
 		   Property< Real3D >::SelfPtr forceProperty)
       : force(forceProperty->getHandle(set)) {}
     
-    virtual void apply(const ParticleHandle pref) {
+    void prepare(Storage::SelfPtr set) {}
+    void apply(const ParticleHandle pref) {
       force[pref] = 0.0;
     }
   };

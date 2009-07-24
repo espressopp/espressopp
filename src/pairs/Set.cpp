@@ -14,7 +14,7 @@ void
 Set::foreach(Computer &computer) {
   computer.prepare(storage1, storage2);
   try {
-    foreach(boost::bind(&Computer::apply, &computer, _1, _2, _3));
+    foreachApply(computer);
   } catch (ForeachBreak) {
     computer.finalize();
     throw;

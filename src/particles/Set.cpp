@@ -12,16 +12,25 @@ using namespace espresso::particles;
 
 namespace {
   class Found {};
-  void findMember(const ParticleHandle p1, 
-		  const ParticleHandle p2) {
-    if (p1 == p2) throw Found();
-  }
+  struct FindMember: public Computer {
+    ParticleHandle p1;
+
+    FindMember(ParticleHandle _p1) : p1(_p1) 
+    {}
+
+    void prepare(const Storage::SelfPtr storage) {}
+
+    void apply(const ParticleHandle p2) {
+      if (p1 == p2) throw Found();
+    }
+  };
 }
 
 bool
 Set::contains(ParticleHandle p) {
+  FindMember findMember(p);
   try {
-    foreach(boost::bind(findMember, p, _1));
+    foreach(findMember);
   } catch (Found) {
     return true;
   }
@@ -37,7 +46,7 @@ void
 Set::foreach(Computer &computer) {
   computer.prepare(getStorage());
   try {
-    foreach(boost::bind(&Computer::apply, &computer, _1));
+    foreachApply(computer);
   } catch (ForeachBreak) {
     computer.finalize();
     throw;
@@ -45,7 +54,6 @@ Set::foreach(Computer &computer) {
   computer.finalize();
 }
   
-
 void
 Set::foreach(const Computer::SelfPtr computer)
 { foreach(*computer); }

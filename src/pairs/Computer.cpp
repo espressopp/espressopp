@@ -21,7 +21,7 @@ namespace espresso {
   
     public: 
       void prepare(Storage::SelfPtr storage1,
-			   Storage::SelfPtr storage2) {
+		   Storage::SelfPtr storage2) {
 	// get the particleId properties
 	id1 = storage1->getIdPropertyHandle();
 	id2 = storage2->getIdPropertyHandle();
@@ -29,12 +29,6 @@ namespace espresso {
 	// call Python prepare
 	if (override prepare = get_override("prepare"))
 	  prepare(storage1, storage2);
-	else Computer::prepare(storage1, storage2);
-      }
-      
-      void default_prepare(Storage::SelfPtr storage1,
-			   Storage::SelfPtr storage2) {
-	this->Computer::prepare(storage1, storage2);
       }
       
       void apply(const Real3D dist,
@@ -50,10 +44,6 @@ namespace espresso {
 	else Computer::finalize();
       }
 
-      void default_finalize() {
-	this->Computer::finalize();
-      }
-
     private:
       particles::PropertyHandle< ParticleId > id1;
       particles::PropertyHandle< ParticleId > id2;
@@ -67,8 +57,8 @@ void Computer::registerPython() {
   espresso::python::class_
     < PythonComputer, boost::noncopyable >
     ("pairs_PythonComputer")
-    .def("prepare", &Computer::prepare, &PythonComputer::default_prepare)
-    .def("finalize", &Computer::finalize, &PythonComputer::default_finalize)
+    .def("prepare", pure_virtual(&Computer::prepare))
+    .def("finalize", &Computer::finalize)
     .def("apply", pure_virtual(&Computer::apply))
     ;
 }

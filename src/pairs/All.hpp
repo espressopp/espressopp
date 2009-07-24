@@ -32,10 +32,11 @@ namespace espresso {
 
       virtual ~All() {}
 
+    protected:
       /** This routine will apply a function operator to all pairs.
 	  \param pairComputer is the object that provides the function to be applied to all pairs.
       */
-      void foreach(ApplyFunction applyFunction);
+      virtual void foreachApply(Computer &computer);
 
     private:
       particles::Set::SelfPtr set;

@@ -81,18 +81,14 @@ namespace espresso {
       virtual bool contains(ParticleHandle);
       virtual bool contains(ParticleId);
 
-      /** apply computer to all particles of this set
-       */
-      virtual void foreach(ApplyFunction function);
-      // make the other variants of foreach available
-      using Set::foreach;
-
       virtual SelfPtr getStorage();
 
       /// make this class available at Python
       static void registerPython();
 
     protected:
+      void foreachApply(Computer &computer);
+
 
       /// here the particle data is stored
       esutil::TupleVector particles;

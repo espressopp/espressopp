@@ -113,7 +113,10 @@ class EmptyPairComputer: public pairs::Computer {
 public:
   typedef shared_ptr< EmptyPairComputer > SelfPtr;
   EmptyPairComputer() {}
-  
+
+  void prepare(Storage::SelfPtr storage1,
+	       Storage::SelfPtr storage2) {}
+
   virtual void apply(const Real3D dist,
 		     ParticleHandle ref1,
 		     ParticleHandle ref2) {}
@@ -133,6 +136,9 @@ public:
   
   MinDistComputer(): min(1.0e10) {}
   
+  void prepare(Storage::SelfPtr storage1,
+	       Storage::SelfPtr storage2) {}
+
   virtual void apply(const Real3D dist,
 		     ParticleHandle ref1,
 		     ParticleHandle ref2) {
@@ -161,7 +167,9 @@ public:
   AverageComputer(const PropertyHandle< Real3D > &_property)
     : property(_property), average(0) {}
 
-  virtual void apply(ParticleHandle ref) {
+  void prepare(Storage::SelfPtr storage) {}
+
+  void apply(ParticleHandle ref) {
     const Real3D p = property[ref];
     average += sqrt(p.sqr());
   }
@@ -177,9 +185,8 @@ real TestEspresso::calculateAverage() {
 class EmptyComputer: public particles::Computer {
 public:
   EmptyComputer() {}
-  
-  virtual void apply(ParticleHandle ref) {
-  }
+  void prepare(Storage::SelfPtr storage) {}
+  virtual void apply(ParticleHandle ref) {}
 };
 
 void TestEspresso::runEmptyLoop() {

@@ -6,8 +6,6 @@
 
 namespace espresso {
   namespace particles {
-    typedef boost::function< void (ParticleHandle) > ApplyFunction;
-
     class ForeachBreak: public std::exception {};
 
     // forward declaration
@@ -40,11 +38,14 @@ namespace espresso {
 
       They should be used when you want to loop over the same set
       several times without using a computer. */
-      virtual void foreach(const ApplyFunction function) = 0;
+//       virtual void foreach(const ApplyFunction function) = 0;
 
       virtual shared_ptr< Storage > getStorage() = 0;
 
       static void registerPython();
+
+    protected:
+      virtual void foreachApply(Computer &computer) = 0;
     };
   }
 }

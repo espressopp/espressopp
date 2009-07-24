@@ -24,7 +24,7 @@ namespace espresso {
       //@}
 
       virtual void prepare(particles::Storage::SelfPtr storage1, 
-			   particles::Storage::SelfPtr storage2) {}
+			   particles::Storage::SelfPtr storage2) = 0;
 
       /** Interface of the routine that is applied to particle pairs
 	  \param dist: distance vector between the two particles
