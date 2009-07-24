@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <stdexcept>
 #include <esutil/Timer.hpp>
 
 using namespace std;
@@ -17,15 +17,24 @@ public:
   int getSizeInline() const { return size; }
 
   type *getInline() const { return base; }
-  
+
   int getSize() const __attribute__((noinline));
   type *get() const __attribute__((noinline));
+  type *getWInlineException() const __attribute__((noinline));
 
 };
 
 template< typename type >
 type *Test< type >::get() const
 {
+  return base;
+}
+
+template< typename type >
+type *Test< type >::getWInlineException() const {
+  if (base == 0) {
+    throw std::runtime_error("base pointer was unexpectedly zero");
+  }
   return base;
 }
 
@@ -43,6 +52,17 @@ void runTestInline(Test<type> &test, int rounds)
   for (int r = 1; r <= rounds; ++r)
     for (int i = 0; i < test.getSizeInline(); ++i) {
       test.getInline()[i] = i + r;
+    }
+}
+
+template<typename type>
+void runTestWInlineException(Test<type> &t, int rounds) __attribute__((noinline));
+template<typename type>
+void runTestWInlineException(Test<type> &test, int rounds)
+{
+  for (int r = 1; r <= rounds; ++r)
+    for (int i = 0; i < test.getSize(); ++i) {
+      test.getWInlineException()[i] = i + r;
     }
 }
 
@@ -71,19 +91,15 @@ int main()
 
   timer.reset();
   runTestInline(test, rounds);
-  cout << "inline1 " << timer.getElapsedTime() << endl;
-
-  timer.reset();
-  runTestInline(test, rounds);
-  cout << "inline2 "  << timer.getElapsedTime() << endl;
+  cout << "inline " << timer.getElapsedTime() << endl;
 
   timer.reset();
   runTest(test, rounds);
-  cout << "call1 " << timer.getElapsedTime() << endl;
+  cout << "call " << timer.getElapsedTime() << endl;
 
   timer.reset();
-  runTest(test, rounds);
-  cout << "call2 " << timer.getElapsedTime() << endl;
+  runTestWInlineException(test, rounds);
+  cout << "call w/ inline exception " << timer.getElapsedTime() << endl;
 
   return 0;
 }
