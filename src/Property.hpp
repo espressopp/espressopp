@@ -23,7 +23,7 @@ namespace espresso {
 
 
   protected:
-    const particles::Storage::SelfPtr getStorage() const;
+    const particles::Storage::SelfPtr getStorage() const { return storage; }
 
   private:
     // what storage does the property belong to
@@ -79,19 +79,19 @@ namespace espresso {
     }
 
     T &operator[](ParticleId id) {
-      particles::ParticleHandle handle =
+      particles::ParticleHandle particle =
         getStorage()->getParticleHandle(id);
-      return (*this).at(getStorage(), handle);
+      return getHandle()[particle];
     }
 
     /// checked access
     T &at(ParticleId id) {
-      particles::ParticleHandle handle =
+      particles::ParticleHandle particle =
         getStorage()->getParticleHandle(id);
-      if (handle == particles::ParticleHandle()) {
+      if (particle == particles::ParticleHandle()) {
 	throw std::out_of_range("Property::at");
       }
-      return (*this).at(getStorage(), handle);
+      return getHandle()[particle];
     }
 
   private:
@@ -158,19 +158,19 @@ namespace espresso {
     }
 
     T *operator[](ParticleId part) {
-      particles::ParticleHandle handle =
+      particles::ParticleHandle particle =
         getStorage()->getParticleHandle(part);
-      return (*this).at(getStorage(), handle);
+      return getHandle()[particle];
     }
 
     /// checked access
     T *at(ParticleId part) {
-      particles::ParticleHandle handle =
+      particles::ParticleHandle particle =
         getStorage()->getParticleHandle(part);
-      if (handle == particles::ParticleHandle()) {
+      if (particle == particles::ParticleHandle()) {
 	throw std::out_of_range("ArrayProperty::at");
       }
-      return (*this).at(getStorage(), handle);
+      return getHandle()[particle];
     }
 
   private:

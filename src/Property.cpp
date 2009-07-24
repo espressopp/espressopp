@@ -9,9 +9,6 @@ PropertyBase::
 PropertyBase(const Storage::SelfPtr _storage)
   : storage(_storage) {}
 
-const Storage::SelfPtr
-PropertyBase::getStorage() const { return storage; }
-
 void
 PropertyBase::checkFitsTo(const Set::SelfPtr set) const {
   if (set->getStorage() != storage) throw StorageMismatch();
