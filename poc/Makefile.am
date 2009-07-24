@@ -15,4 +15,9 @@ inline_SOURCES = inline.cpp
 inline_LDADD = ../src/libespresso_common.la \
 	$(ESPRESSO_BOOST_LIBS) $(PYTHON_LIBS)
 
+noinst_PROGRAMS += boost_function
+boost_function_SOURCES =boost_function.cpp
+boost_function_LDADD = ../src/libespresso_common.la \
+	$(ESPRESSO_BOOST_LIBS) $(PYTHON_LIBS)
+
 python_SCRIPTS += __init__.py
