@@ -44,10 +44,17 @@ namespace espresso {
       void setCutoff(real _cutoff) { cutoff = _cutoff; cutoffSqr = cutoff*cutoff; }
       real getCutoff() const { return cutoff; }
 
+      virtual real getCutoffSqr() const { return cutoffSqr; }
+
       virtual real computeEnergySqr(const real distSqr) const;
       virtual Real3D computeForce(const Real3D dist) const;
 
-      virtual real getCutoffSqr() const { return cutoffSqr; }
+    protected:
+      friend class ForceComputer< LennardJones >;
+
+      real _computeEnergySqr(const real distSqr) const;
+      Real3D _computeForce(const Real3D dist) const;
+
     };
 
   }

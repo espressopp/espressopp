@@ -53,6 +53,13 @@ namespace espresso {
       /* FENE should probably derived from a two-body potential
 	 without a cutoff to avoid the following */
       virtual real getCutoffSqr() const;
+
+    protected:
+      friend class ForceComputer< FENE >;
+
+      real _computeEnergy(const real r) const;
+      real _computeEnergySqr (const real distSqr) const;
+      Real3D _computeForce (const Real3D dist) const;
     };
   }
 }

@@ -46,7 +46,7 @@ namespace espresso {
       virtual void apply(const Real3D dist, 
 			 const particles::ParticleHandle p1, 
 			 const particles::ParticleHandle p2) {
-	Real3D f = potential.computeForce(dist);
+	Real3D f = potential._computeForce(dist);
 	force1[p1] += f;
 	force2[p2] -= f;
         if (computesVirial) 

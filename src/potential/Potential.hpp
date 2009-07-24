@@ -34,7 +34,7 @@ namespace espresso {
       virtual real getCutoffSqr() const = 0;
       virtual real computeEnergy(const Real3D dist) const = 0;
       virtual Real3D computeForce(const Real3D dist) const = 0;
-    public:
+
       static void registerPython();
     };
 

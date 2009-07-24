@@ -12,15 +12,27 @@ LOG4ESPP_LOGGER(FENE::theLogger, "potential.FENE");
 /* ---------------------------------------------------------------------- */
 
 real FENE::computeEnergy(const real r) const {
+  return _computeEnergy(r);
+}
+
+real FENE::computeEnergySqr(const real distSqr) const {
+  return _computeEnergySqr(distSqr);
+}
+
+Real3D FENE::computeForce (const Real3D dist) const {
+  return _computeForce(dist);
+}
+
+real FENE::_computeEnergy(const real r) const {
   real energy = -0.5 * pow(rMax, 2) * K * log(1 - pow((r - r0) / rMax, 2));
   return energy;
 }
 
-real FENE::computeEnergySqr(const real distSqr) const {
+real FENE::_computeEnergySqr(const real distSqr) const {
   return computeEnergy(sqrt(distSqr));
 }
 
-Real3D FENE::computeForce (const Real3D dist) const {
+Real3D FENE::_computeForce (const Real3D dist) const {
   Real3D f = 0.0;
   real r = sqrt(dist.sqr());
 
