@@ -30,11 +30,22 @@
 using namespace espresso;
 using namespace espresso::particles;
 using namespace boost;
+using namespace std;
+
+/// We set up a system of N^3 particles on an NxNxN lattice in a cubic
+/// box of size. The particles are set in a cubic box with side length
+/// variance around the lattice grid points.
 
 /// number of particles in each dimension
 const int N = 20;
 /// dimension of the cubic simulation box
-const real size = 5.0;
+const real size = 21.0;
+/// how far the particles maximally deviate from the grid point
+const real variance = 0.1;
+
+const size_t repeatParticleLoop = 10000;
+
+size_t npart = 0;
 
 static inline real dround(real x) { return floor(x + 0.5); }
 
@@ -46,39 +57,44 @@ class TestEspresso {
 public:
   Storage::SelfPtr storage;
   Property< Real3D >::SelfPtr position, force;
-  size_t npart;
   
-  TestEspresso(size_t nparticles)
-    : npart(nparticles) {
+  TestEspresso() {
     storage = make_shared< Storage >();
     position = make_shared< Property< Real3D > >(storage);
     force = make_shared< Property< Real3D > >(storage);
   }
 
-    void addParticle(const Real3D &pos);
+  void addParticles(vector< Real3D > &positions);
 
-    void calculateForces(real epsilon, real sigma, real cutoff) NOINLINE;
-
-    void runEmptyPairLoop() NOINLINE;
-
-    real calculateMinDist() NOINLINE;
-
-    void runEmptyLoop() NOINLINE;
-
-    real calculateAverage() NOINLINE;
-
+  void calculateForces(real epsilon, real sigma, real cutoff) NOINLINE;
+  
+  void runEmptyPairLoop() NOINLINE;
+  
+  real calculateMinDist() NOINLINE;
+  
+  void runEmptyLoop() NOINLINE;
+  
+  real calculateAverage() NOINLINE;
+  
   Real3D getForce(size_t i) {
-    return (*force).at(ParticleId(i));
+    return force->at(ParticleId(i));
+  }
+
+  Real3D getPosition(size_t i) {
+    return position->at(ParticleId(i));
   }
 };
 
-void TestEspresso::addParticle(const Real3D &pos)
-{
-  static size_t cnt = 0;
-  ParticleId id = ParticleId(cnt++);
-  storage->addParticle(id);
-  (*position)[id] = pos;
-  (*force)[id] = 0.0;
+void TestEspresso::addParticles(vector< Real3D > &positions) {
+  size_t cnt = 0;
+  BOOST_FOREACH(Real3D pos, positions)
+    {
+      ParticleId id = ParticleId(cnt);
+      storage->addParticle(id);
+      (*position)[id] = pos;
+      (*force)[id] = 0.0;
+      cnt++;
+    }
 }
 
 void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {
@@ -106,8 +122,8 @@ public:
 void TestEspresso::runEmptyPairLoop() {
   bc::PeriodicBC::SelfPtr pbc = make_shared< bc::PeriodicBC >(size);
   pairs::All::SelfPtr allpairs = make_shared< pairs::All >(pbc, storage, position);
-  EmptyPairComputer::SelfPtr ljc = make_shared< EmptyPairComputer >();
-  allpairs->foreach(*ljc);
+  pairs::Computer::SelfPtr ljc = make_shared< EmptyPairComputer >();
+  allpairs->foreach(ljc);
 }
 
 class MinDistComputer: public pairs::Computer {
@@ -177,63 +193,68 @@ void TestEspresso::runEmptyLoop() {
 
 class TestBasic {
 public:
-    std::vector<Real3D> position, force;
-    size_t npart;
+  vector<Real3D> position, force;
+  
+  TestBasic() {}
 
-    TestBasic(size_t nparticles): npart(nparticles) {
-        position.reserve(nparticles);
-        force.reserve(nparticles);
-    }
-
-    void addParticle(const Real3D &pos);
-
-    void calculateForces(real epsilon, real sigma, real cutoff) NOINLINE;
-
-    real calculateMinDist() NOINLINE;
-
-    real calculateAverage() NOINLINE;
-
-    Real3D getForce(size_t i) {
-        return force[i];
-    }
+  void addParticles(vector< Real3D > &positions);
+  
+  void calculateForces(real epsilon, real sigma, real cutoff) NOINLINE;
+  
+  real calculateMinDist() NOINLINE;
+  
+  real calculateAverage() NOINLINE;
+  
+  Real3D getForce(size_t i) {
+    return force[i];
+  }
+  
+  Real3D getPosition(size_t i) {
+    return position[i];
+  }
 };
 
-void TestBasic::addParticle(const Real3D &pos) {
-    position.push_back(pos);
-    force.push_back(0.0);
+void TestBasic::addParticles(vector< Real3D > &positions) {
+  BOOST_FOREACH(Real3D pos, positions)
+    {
+      position.push_back(pos);
+      force.push_back(0.0);
+    }
 }
 
 void TestBasic::calculateForces(real epsilon, real sigma, real cutoff) {
-    real cutoffSqr = cutoff*cutoff;
-    real sizeInverse = 1./size;
+  real cutoffSqr = cutoff*cutoff;
+  real sizeInverse = 1./size;
 
-    for (size_t i = 0; i < npart; ++i) {
-        for (size_t j = i+1; j < npart; ++j) {
-            Real3D pos1 = position[i];
-            Real3D pos2 = position[j];
-            Real3D dist = pos1 - pos2;
+  for (size_t i = 0; i < npart; ++i) {
+    for (size_t j = i+1; j < npart; ++j) {
+      Real3D pos1 = position[i];
+      Real3D pos2 = position[j];
+      Real3D dist = pos1 - pos2;
 
-            for(size_t c = 0; c < 3; ++c) {
-                dist[c] -= dround(dist[c]*sizeInverse)*size;
-            }
+      for(size_t c = 0; c < 3; ++c) {
+	dist[c] -= dround(dist[c]*sizeInverse)*size;
+      }
 
-            {
-                real   frac2;
-                real   frac6;
-                real distSqr = dist.sqr();
+      {
+	real frac2;
+	real frac6;
+	real distSqrInv;
+	real distSqr = dist.sqr();
                 
-                if (distSqr < cutoffSqr) {
-		    Real3D f(0.0, 0.0, 0.0);
-                    frac2 = sigma / distSqr;
-                    frac6 = frac2 * frac2 * frac2;
-                    real ffactor = 48.0 * epsilon * (frac6*frac6 - 0.5 * frac6) * frac2;
-                    f = dist * ffactor;
-		    force[i] += f;
-		    force[j] -= f;
-                } 
-            }
-        }
+	if (distSqr < cutoffSqr) {
+	  Real3D f(0.0, 0.0, 0.0);
+	  distSqrInv = 1.0 / distSqr;
+	  frac2 = sigma*sigma * distSqrInv;
+	  frac6 = frac2 * frac2 * frac2;
+	  real ffactor = 48.0 * epsilon * (frac6*frac6 - 0.5*frac6) * distSqrInv;
+	  f = dist * ffactor;
+	  force[i] += f;
+	  force[j] -= f;
+	} 
+      }
     }
+  }
 }
 
 real TestBasic::calculateMinDist() {
@@ -272,127 +293,143 @@ real TestBasic::calculateAverage() {
  * Testing environment
  ***********************************************************************************/
 
-template<class Test>
-void generateParticles(Test &test) {
-    srand48(123);
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) { 
-            for (int k = 0; k < N; k++) {
-      
-                real r;
-                r = 0.4 + 0.2 * drand48();
-                Real3D pos = Real3D(
-                    (i + r) / N * size,
-                    (j + r) / N * size, 
-                    (k + r) / N * size);
-
-                test.addParticle(pos);
-            }
-        }
+void generateParticles(vector< Real3D >& positions) {
+  srand48(123);
+  real grid = size / (N+1);
+  for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) { 
+      for (int k = 0; k < N; k++) {
+	Real3D pos(i*grid + drand48()*variance,
+		   j*grid + drand48()*variance,
+		   k*grid + drand48()*variance);
+	positions.push_back(pos);
+      }
     }
+  }
+//   positions.push_back(Real3D(0.0, 0.0, 0.0));
+//   positions.push_back(Real3D(1.0, 0.0, 0.0));
 }
 
 /// this routine runs the tests as defined above
 int main()
 {
-    LOG4ESPP_CONFIGURE();
+  LOG4ESPP_CONFIGURE();
 
-    esutil::WallTimer timer;
-    TestEspresso espresso(N*N*N);
-    std::cout << std::setw(20) << "setup Espresso: " << timer << std::endl;
+  cout << "BENCHMARK" << endl;
+  cout << "Computing LJ forces in a cubic box (size=" << size << ") of " 
+       << N << "x" 
+       << N << "x" 
+       << N << " particles." << endl;
+  cout << endl;
 
-    timer.reset();
-    TestBasic basic(N*N*N);
-    std::cout << std::setw(20) << "setup Basic: " << timer << std::endl;
+  esutil::WallTimer timer;
+  TestEspresso espresso;
+  cout << setw(30) << "setup Espresso: " << timer << endl;
 
-    // generate particles in the particle storage
+  timer.reset();
+  TestBasic basic;
+  cout << setw(30) << "setup Basic: " << timer << endl;
 
-    timer.reset();
-    generateParticles(espresso);
-    std::cout << std::setw(20) << "generate Espresso: " << timer << std::endl;
+  // generate particles in the particle storage
 
-    timer.reset();
-    generateParticles(basic);
-    std::cout << std::setw(20) << "generate Basic: " << timer << std::endl;
+  vector< Real3D > positions;
+  generateParticles(positions);
+  npart = positions.size();
 
-    std::cout << std::endl << "PARTICLE PAIR LOOPING TESTS" << std::endl;
+  timer.reset();
+  espresso.addParticles(positions);
+  cout << setw(30) << "generate Espresso: " << timer << endl;
 
-    // check empty pair loop
+  timer.reset();
+  basic.addParticles(positions);
+  cout << setw(30) << "generate Basic: " << timer << endl;
 
-    timer.reset();
-    espresso.runEmptyPairLoop();
-    std::cout << std::setw(30) << "empty pair loop: " << timer << std::endl << std::endl;
+  ////////////////////////////////////////////////////////////////////////
+  cout << endl << "PARTICLE PAIR LOOPING TESTS" << endl;
+  ////////////////////////////////////////////////////////////////////////
 
-    // calculate forces
+  // EMPTY PAIR LOOP
+  timer.reset();
+  espresso.runEmptyPairLoop();
+  cout << setw(30) << "empty pair loop: " << timer << endl << endl;
 
-    timer.reset();
-    basic.calculateForces(1.1, 1.2, 2.5);
-    real basicCalcTime = timer.getElapsedTime();
-    std::cout << std::setw(30) << "calc basic: " << timer << std::endl;
+  // CALCULATE MINIMUM DISTANCE
+  timer.reset();
+  real minb = basic.calculateMinDist();
+  real basicMinTime = timer.getElapsedTime();
+  cout << setw(30) << "min Basic: " << timer << " (min=" << minb << ")" << endl; 
 
-    timer.reset();
-    espresso.calculateForces(1.1, 1.2, 2.5);
-    std::cout << std::setw(30) << "calc Espresso: " << timer << std::endl;
-    std::cout << "RATIO: " << (timer.getElapsedTime() / basicCalcTime) << std::endl;
+  timer.reset();
+  real mine = espresso.calculateMinDist();
+  real espressoMinTime = timer.getElapsedTime();
+  cout << setw(30) << "min Espresso: " << timer << " (min=" << mine << ")" << endl; 
 
-    // calculate minimum distance
+  cout << setw(30) << "RATIO: " << (espressoMinTime / basicMinTime) << endl;
 
-    timer.reset();
-    real minb = basic.calculateMinDist();
-    real basicMinTime = timer.getElapsedTime();
-    std::cout << std::setw(30) << "min Basic: " << timer << std::endl; 
+  // check consistency
+  if (abs(mine-minb)/abs(mine) > 1e-5)
+    cout << "ERROR: minima are different: " << mine << " != " << minb << endl;
+  cout << endl;
 
-    timer.reset();
-    real mine = espresso.calculateMinDist();
-    std::cout << std::setw(30) << "min Espresso: " << timer << std::endl;
-    std::cout << "RATIO: " << (timer.getElapsedTime() / basicMinTime) << std::endl;
+  // CALCULATE FORCES
+  timer.reset();
+  basic.calculateForces(1.1, 1.2, 2.5);
+  real basicCalcTime = timer.getElapsedTime();
+  cout << setw(30) << "calc basic: " << timer << endl;
 
-    std::cout << std::endl << "PARTICLE LOOPING TESTS" << std::endl;
+  timer.reset();
+  espresso.calculateForces(1.1, 1.2, 2.5);
+  real espressoCalcTime = timer.getElapsedTime();
+  cout << setw(30) << "calc Espresso: " << timer << endl;
 
-    // check empty loop
+  cout << setw(30) << "RATIO: " << (espressoCalcTime / basicCalcTime) << endl;
 
-    timer.reset();
-    for (size_t cnt = 0; cnt < 10000; ++cnt)
-        espresso.runEmptyLoop();
-    std::cout << std::setw(30) << "empty loop: " << timer << std::endl << std::endl;
-
-    // calculate average
-
-    timer.reset();
-    real ave;
-    for (size_t cnt = 0; cnt < 10000; ++cnt)
-        ave = espresso.calculateAverage();
-    real espressoAvgTime = timer.getElapsedTime();
-    std::cout << std::setw(30) << "average Espresso: " << timer << std::endl;
-
-    timer.reset();
-    real avb;
-    for (size_t cnt = 0; cnt < 10000; ++cnt)
-        avb = basic.calculateAverage();
-    std::cout << std::setw(30) << "average Basic: " << timer << std::endl;
-    std::cout << "RATIO: " << (espressoAvgTime / timer.getElapsedTime()) << std::endl;
-
-    // check consistency
-    std::cout << "min dists: " << mine << " " << minb << std::endl;
-    if (std::abs(mine-minb)/std::abs(mine) > 1e-5) {
-        std::cerr << "ERROR: minima are different: " << mine << " != " << minb << std::endl;        
+  // check consistency
+  for (size_t i = 0; i < npart; ++i) {
+    Real3D fe = espresso.getForce(i);
+    Real3D fb = basic.getForce(i);
+    real diff = sqrt((fe-fb).sqr());
+    if (diff/sqrt(fe.sqr()) > 1.0e-5) {
+      Real3D pe = espresso.getPosition(i);
+      Real3D pb = basic.getPosition(i);
+      cout << "ERROR: difference " << diff << " too big for particle " << i << endl;
+      cout << "     basic: f=(" << fb[0] << ", " << fb[1] << ", " << fb[2] << ")" << endl;
+      cout << "            p=(" << pb[0] << ", " << pb[1] << ", " << pb[2] << ")" << endl;
+      cout << "  espresso: f=(" << fe[0] << ", " << fe[1] << ", " << fe[2] << ")" << endl;
+      cout << "            p=(" << pe[0] << ", " << pe[1] << ", " << pe[2] << ")" << endl;
+      cout << endl;
     }
+  }
+  cout << endl;
 
-    // take into account that Espresso calculates forces twice to test two algorithms
-    std::cout << "average force: " << ave << " " << avb << std::endl;
-    if (std::abs(ave-avb)/std::abs(ave) > 1e-5) {
-        std::cerr << "ERROR: averages are different: " << ave << " != " << avb << std::endl;        
-    }
+  ////////////////////////////////////////////////////////////////////////
+  cout << endl << "PARTICLE LOOPING TESTS" << endl;
+  ////////////////////////////////////////////////////////////////////////
 
-    for (size_t i = 0; i < N*N*N; ++i) {
-        Real3D f1 = espresso.getForce(i);
-        Real3D f2 = basic.getForce(i);
-        real diff = sqrt((f1-f2).sqr());
-        if (diff/std::abs(f1.sqr()) > 1e-5) {
-            std::cerr << "ERROR: difference " << diff << " too big for particle " << i << std::endl;
-            std::cerr << "ERROR: " << f1[0] << " vs. " << f2[0] << std::endl;
-            std::cerr << "ERROR: " << f1[1] << " vs. " << f2[1] << std::endl;
-            std::cerr << "ERROR: " << f1[2] << " vs. " << f2[2] << std::endl;
-        }
-    }
+  // EMPTY LOOP
+  timer.reset();
+  for (size_t cnt = 0; cnt < repeatParticleLoop; ++cnt)
+    espresso.runEmptyLoop();
+  cout << setw(30) << "empty loop: " << timer << endl << endl;
+
+  // CALCULATE AVERAGE
+  timer.reset();
+  real avb;
+  for (size_t cnt = 0; cnt < repeatParticleLoop; ++cnt)
+    avb = basic.calculateAverage();
+  real basicAvgTime = timer.getElapsedTime();
+  cout << setw(30) << "average Basic: " << timer << " (avg=" << avb << ")" << endl;
+
+  timer.reset();
+  real ave;
+  for (size_t cnt = 0; cnt < repeatParticleLoop; ++cnt)
+    ave = espresso.calculateAverage();
+  real espressoAvgTime = timer.getElapsedTime();
+  cout << setw(30) << "average Espresso: " << timer << " (avg=" << ave << ")" << endl;
+
+  cout << setw(30) << "RATIO: " << (espressoAvgTime / basicAvgTime) << endl;
+
+  if (abs(ave-avb)/abs(ave) > 1e-5)
+    cout << "ERROR: averages are different: " << ave << " != " << avb << endl;
+  cout << endl;
 }

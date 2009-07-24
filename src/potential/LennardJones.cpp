@@ -30,15 +30,18 @@ real LennardJones::computeEnergySqr(const real distSqr) const {
     
 Real3D LennardJones::computeForce(const Real3D dist) const {
   Real3D f = 0.0;
-  real   frac2;
-  real   frac6;
-      
+  real frac2;
+  real frac6;
+  real distSqrInv;
+  real ffactor;
+    
   real distSqr = dist.sqr();
       
   if (distSqr < cutoffSqr) {
-    frac2 = sigma*sigma / distSqr;
+    distSqrInv = 1.0 / distSqr;
+    frac2 = sigma*sigma * distSqrInv;
     frac6 = frac2 * frac2 * frac2;
-    real ffactor = 48.0 * epsilon * (frac6*frac6 - 0.5 * frac6) / distSqr;
+    ffactor = 48.0 * epsilon * (frac6*frac6 - 0.5*frac6) * distSqrInv;
 
     LOG4ESPP_TRACE(LennardJones::theLogger, "computeForce, distSqr = " << distSqr <<
 		   ", ffactor = " << ffactor);
