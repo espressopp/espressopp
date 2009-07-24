@@ -77,7 +77,6 @@ namespace {
 
     particles::ParticleHandle p1;
     particles::PropertyHandle< Real3D > pos;
-    particles::PropertyHandle< ParticleId > id;
 
     Traverser2(pairs::Computer &_computer, 
 	       bc::BC &_bc, 
@@ -89,17 +88,14 @@ namespace {
 
     void prepare(particles::Storage::SelfPtr storage) {
       pos = posProperty.getHandle(storage);
-      //      id = posProperty->getIdPropertyHandle();
     }
 
     void apply(particles::ParticleHandle p2) {
-      //      if (id[p1] < id[p2]) {
-	if (p1 == p2) throw SameId();
-	Real3D pos1 = pos[p1];
-	Real3D pos2 = pos[p2];
-	Real3D dist = bc.getDist(pos1, pos2);
-	computer.apply(dist, p1, p2);
-	//      }
+      if (p1 == p2) throw SameId();
+      Real3D pos1 = pos[p1];
+      Real3D pos2 = pos[p2];
+      Real3D dist = bc.getDist(pos1, pos2);
+      computer.apply(dist, p1, p2);
     }
   };
 

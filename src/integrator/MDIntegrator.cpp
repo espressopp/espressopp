@@ -35,13 +35,13 @@ Property< Real3D >::SelfPtr
 MDIntegrator::getForceProperty() const { return forceProperty; }
 
 void 
-MDIntegrator::setTimeStep(real _timeStep) { timeStep = _timeStep; }
+MDIntegrator::setTimestep(real _timeStep) { timeStep = _timeStep; }
 
 real 
-MDIntegrator::getTimeStep() const { return timeStep; }
+MDIntegrator::getTimestep() const { return timeStep; }
 
 int 
-MDIntegrator::getIntegrationStep() const { return nTimeStep; }
+MDIntegrator::getIntegrationStep() const { return nTimestep; }
 
 
 void MDIntegrator::run(int nsteps)
@@ -58,8 +58,8 @@ void MDIntegrator::run(int nsteps)
 
   startIntegration(*this);
 
-  for (nTimeStep = 0; nTimeStep < nsteps; nTimeStep++) {
-     LOG4ESPP_DEBUG(theLogger, "Integrator runs step " << nTimeStep << " of " << nsteps);
+  for (nTimestep = 0; nTimestep < nsteps; nTimestep++) {
+     LOG4ESPP_DEBUG(theLogger, "Integrator runs step " << nTimestep << " of " << nsteps);
      startStep(*this);
 
      // runSingleStep is the routine provided by the derived class
@@ -80,8 +80,8 @@ MDIntegrator::registerPython() {
 
   class_< MDIntegrator, boost::noncopyable >
     ("integrator_MDIntegrator", no_init)
-    .def("setTimeStep", &MDIntegrator::setTimeStep)
-    .def("getTimeStep", &MDIntegrator::getTimeStep)
+    .add_property("timestep", &MDIntegrator::getTimestep, 
+		  &MDIntegrator::setTimestep)
     .def("getPosProperty", &MDIntegrator::getPosProperty)
     .def("getVelProperty", &MDIntegrator::getVelProperty)
     .def("getForceProperty", &MDIntegrator::getForceProperty)

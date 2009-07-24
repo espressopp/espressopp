@@ -1,32 +1,32 @@
 #include <python.hpp>
 #include <boost/bind.hpp>
 
-#include "force/ForceComputer.hpp"
+#include "potential/Interaction.hpp"
 #include "Property.hpp"
 #include "error.hpp"
 
 
 using namespace espresso;
-using namespace espresso::force;
+using namespace espresso::potential;
 using namespace espresso::particles;
 
 /***************************************************************************************/
 
-LOG4ESPP_LOGGER(ForceComputer::theLogger, "ForceComputer");
+LOG4ESPP_LOGGER(Interaction::theLogger, "potential.Interaction");
 
 /***************************************************************************************/
 
-ForceComputer::
-ForceComputer(potential::Potential::SelfPtr _potential,
-	      pairs::Set::SelfPtr _pairs)
+Interaction::
+Interaction(Potential::SelfPtr _potential,
+	    pairs::Set::SelfPtr _pairs)
 {
-  LOG4ESPP_INFO(theLogger, "constructor of ForceComputer");
+  LOG4ESPP_INFO(theLogger, "constructor of Interaction");
 
   if (!_potential) {
-     ARGERROR(theLogger, "Potential must not be NULL for ForceComputer");
+     ARGERROR(theLogger, "Potential must not be NULL for Interaction");
   }
   if (!_pairs) {
-     ARGERROR(theLogger, "Pairs must not be NULL for ForceComputer");
+     ARGERROR(theLogger, "Pairs must not be NULL for Interaction");
   }
 
   potential = _potential;
@@ -35,48 +35,42 @@ ForceComputer(potential::Potential::SelfPtr _potential,
 
 /***************************************************************************************/
 
-void ForceComputer::
+void Interaction::
 updateForces(const integrator::MDIntegrator& integrator) {
   LOG4ESPP_DEBUG(theLogger, "updateForces at integrator step " << integrator.getIntegrationStep());
 
-  PropertyHandle<Real3D> force = *integrator.getForceProperty();
+  pairs::Computer::SelfPtr computer = 
+    potential->createForceComputer(integrator.getForceProperty());
 
-  pairs::ForceComputer* forceCompute = 
-    potential->createForceComputer(force);
-
-  pairs->foreach(*forceCompute);
-
-  delete forceCompute;
+  pairs->foreach(computer);
 }
 
 /***************************************************************************************/
 
-void ForceComputer::
+void Interaction::
 connect(integrator::MDIntegrator::SelfPtr integrator) {
   // at this time we support only a single connection
 
-  LOG4ESPP_INFO(theLogger, "ForceComputer connects to Integrator");
+  LOG4ESPP_INFO(theLogger, "Interaction connects to Integrator");
 
-  if (forceCalc.connected()) {
-     ARGERROR(theLogger, "ForceComputer is already connected");
-  }
+  if (forceCalc.connected())
+     ARGERROR(theLogger, "Interaction is already connected");
 
-  if (!integrator) {
+  if (!integrator)
      ARGERROR(theLogger, "connect: Integrator is NULL");
-  }
-
+  
   forceCalc = 
     integrator->
-    updateForces.connect(boost::bind(&ForceComputer::updateForces, 
+    updateForces.connect(boost::bind(&Interaction::updateForces, 
 				     shared_from_this(), _1));
 }
 
 /***************************************************************************************/
 
-void ForceComputer::disconnect()
+void Interaction::disconnect()
 {
   if (!forceCalc.connected()) {
-     LOG4ESPP_WARN(theLogger, "ForceComputer not connected");
+     LOG4ESPP_WARN(theLogger, "Interaction not connected");
      return;
   }
 
@@ -85,22 +79,22 @@ void ForceComputer::disconnect()
 
 /***************************************************************************************/
 
-ForceComputer::~ForceComputer()
+Interaction::~Interaction()
 {
-  LOG4ESPP_INFO(theLogger, "destructor of ForceComputer");
+  LOG4ESPP_INFO(theLogger, "destructor of Interaction");
 }
 
 /***************************************************************************************/
 
 void
-ForceComputer::registerPython() {
+Interaction::registerPython() {
   using namespace boost;
   using namespace espresso::python;
 
-  class_< ForceComputer, ForceComputer::SelfPtr >
-    ("force_ForceComputer", 
-     init< potential::Potential::SelfPtr, pairs::Set::SelfPtr >())
-    .def("connect", &ForceComputer::connect)
-    .def("disconnect", &ForceComputer::disconnect)
+  class_< Interaction >
+    ("potential_Interaction", 
+     init< Potential::SelfPtr, pairs::Set::SelfPtr >())
+    .def("connect", &Interaction::connect)
+    .def("disconnect", &Interaction::disconnect)
     ;
 }

@@ -123,7 +123,7 @@ void Langevin::thermalizeA(const integrator::VelocityVerlet& integrator) {
   LOG4ESPP_DEBUG(theLogger, "Langevin thermalizeA at integration step = " 
                              << integrator.getIntegrationStep());
 
-  real timeStep = integrator.getTimeStep();
+  real timeStep = integrator.getTimestep();
 
   Set::SelfPtr localset = takeFirst(set, integrator.getSet());
 
@@ -144,7 +144,7 @@ void Langevin::thermalizeB(const integrator::VelocityVerlet& integrator) {
   LOG4ESPP_DEBUG(theLogger, "Langevin thermalizeB at integration step = " 
                              << integrator.getIntegrationStep());
 
-  real timeStep = integrator.getTimeStep();
+  real timeStep = integrator.getTimestep();
   real temperature = getTemperature();
 
   Set::SelfPtr localset = takeFirst(set, integrator.getSet());

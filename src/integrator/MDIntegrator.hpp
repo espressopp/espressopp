@@ -17,7 +17,7 @@ namespace espresso {
 
     private:
       
-      int nTimeStep;   //!< iteration counter in time loop
+      int nTimestep;   //!< iteration counter in time loop
 
     protected:
       
@@ -56,8 +56,8 @@ namespace espresso {
       Property< Real3D >::SelfPtr getVelProperty() const;
       Property< Real3D >::SelfPtr getForceProperty() const;
 
-      void setTimeStep(real _timeStep);
-      real getTimeStep() const;
+      void setTimestep(real _timeStep);
+      real getTimestep() const;
 
       int getIntegrationStep() const;
 

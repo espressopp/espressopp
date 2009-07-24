@@ -58,18 +58,6 @@ BOOST_FIXTURE_TEST_CASE(referencesTest, Fixture)
   BOOST_CHECK_CLOSE(pos[p1][2], 0.18, 1e-10);
 }
 
-
-bool applyFn(const ParticleHandle handle) {
-  applyFnCalled++;
-  return true;
-}
-
-BOOST_FIXTURE_TEST_CASE(foreachFunctionTest, Fixture)
-{
-  store->foreach(applyFn);
-  BOOST_CHECK_EQUAL(applyFnCalled, 5);
-}
-
 struct MockComputer : Computer {
   bool prepareCalled;
   bool finalizeCalled;

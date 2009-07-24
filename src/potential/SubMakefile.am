@@ -1,5 +1,6 @@
 nobase_pkginclude_HEADERS += \
 	potential/bindings.hpp \
+	potential/Interaction.hpp \
 	potential/Potential.hpp \
 	potential/CentralPotential.hpp \
 	potential/ForceComputer.hpp \
@@ -9,6 +10,7 @@ nobase_pkginclude_HEADERS += \
 
 libespresso_common_la_SOURCES += \
 	potential/bindings.cpp \
+	potential/Interaction.cpp \
 	potential/Potential.cpp \
 	potential/CentralPotential.cpp \
 	potential/LennardJones.cpp \
@@ -16,6 +18,7 @@ libespresso_common_la_SOURCES += \
 
 python_SCRIPTS += \
 	potential/__init__.py \
+	potential/Interaction.py \
 	potential/Potential.py \
 	potential/CentralPotential.py \
 	potential/LennardJones.py \
