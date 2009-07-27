@@ -37,15 +37,15 @@ namespace espresso {
       */
       
       virtual void setTemperature(real _temperature);
-
+      
       virtual real getTemperature() const { return temperature; }
-
+      
       virtual void setSet(particles::Set::SelfPtr _set) { set = _set; }
-
+      
       virtual particles::Set::SelfPtr getSet() { return set; }
-
+      
       /** Abstract class needs also registration in Python */
-
+      
       static void registerPython();
     };
 

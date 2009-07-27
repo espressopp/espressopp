@@ -21,7 +21,7 @@ namespace espresso {
 
     protected:
       
-      real timeStep;   //!< delta time for integration
+      real timestep;   //!< delta time for integration
 
       particles::Set::SelfPtr set;    //!< particle set to integrate
 
@@ -49,17 +49,18 @@ namespace espresso {
       MDIntegrator(particles::Set::SelfPtr set,
                    Property< Real3D >::SelfPtr _posProperty,
                    Property< Real3D >::SelfPtr _velProperty,
-                   Property< Real3D >::SelfPtr _forceProperty);
+                   Property< Real3D >::SelfPtr _forceProperty,
+		   real _timestep);
 
-      particles::Set::SelfPtr getSet() const;
-      Property< Real3D >::SelfPtr getPosProperty() const;
-      Property< Real3D >::SelfPtr getVelProperty() const;
-      Property< Real3D >::SelfPtr getForceProperty() const;
+      particles::Set::SelfPtr getSet() const { return set; }
+      Property< Real3D >::SelfPtr getPosProperty() const { return posProperty; }
+      Property< Real3D >::SelfPtr getVelProperty() const { return velProperty; }
+      Property< Real3D >::SelfPtr getForceProperty() const { return forceProperty; }
 
-      void setTimestep(real _timeStep);
-      real getTimestep() const;
+      void setTimestep(real _timestep) { timestep = _timestep; }
+      real getTimestep() const { return timestep; }
 
-      int getIntegrationStep() const;
+      int getIntegrationStep() const { return nTimestep; }
 
       /** Do \p nsteps steps. */
       void run(int nsteps);

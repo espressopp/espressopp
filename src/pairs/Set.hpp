@@ -24,8 +24,6 @@ namespace espresso {
       virtual void foreach(Computer& computer);
       virtual void foreach(Computer::SelfPtr computer);
 
-      virtual int bump() { return 1; }
-
       static void registerPython();
 
     protected:

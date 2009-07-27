@@ -17,7 +17,8 @@ namespace espresso {
       VelocityVerlet(particles::Set::SelfPtr set,
 		     Property< Real3D >::SelfPtr posProperty,
 		     Property< Real3D >::SelfPtr velProperty,
-		     Property< Real3D >::SelfPtr forceProperty);
+		     Property< Real3D >::SelfPtr forceProperty,
+		     real timestep);
 
       /** The following signals are specific for VelocityVerlet */
 

@@ -44,7 +44,6 @@ Set::registerPython() {
 
   class_< Set, boost::noncopyable >("pairs_Set", no_init)
     .def("foreach", foreach1)
-    .def("bump", &Set::bump)
     ;
 
 }

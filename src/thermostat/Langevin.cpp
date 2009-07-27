@@ -89,13 +89,11 @@ public:
 *  class Langevin                                                                  *
 ***********************************************************************************/
 
-Langevin::Langevin(real _temperature, real _gamma):
-
-             Thermostat(_temperature),
-             linearCongruential(15154),
-             normalDist(0.,1.),
-             gauss(linearCongruential, normalDist)
-
+Langevin::Langevin(real _temperature, real _gamma)
+  : Thermostat(_temperature),
+    linearCongruential(15154),
+    normalDist(0.,1.),
+    gauss(linearCongruential, normalDist)
 {
   setGamma(_gamma);         // also checks for a correct argument
 
@@ -210,8 +208,7 @@ Langevin::registerPython() {
 
   class_< Langevin, bases< Thermostat > >
     ("thermostat_Langevin", init< real, real >())
-    .def("setGamma", &Langevin::setGamma)
-    .def("getGamma", &Langevin::getGamma)    
+    .add_property("gamma", &Langevin::getGamma, &Langevin::setGamma)
     .def("connect", &Langevin::connect)    
     .def("disconnect", &Langevin::disconnect)    
     ;

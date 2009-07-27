@@ -28,9 +28,9 @@ if __name__ == 'espresso.pmi':
             
         def finalize(self):
             self.finalizeCalled = True
-            self.prepareCalled = mpi.world.gather(self.prepareCalled, pmi.CONTROLLER)
-            self.finalizeCalled = mpi.world.gather(self.finalizeCalled, pmi.CONTROLLER)
-            self.pairApplied = mpi.world.gather(self.pairApplied, pmi.CONTROLLER)
+            self.prepareCalledList = mpi.world.gather(self.prepareCalled, pmi.CONTROLLER)
+            self.finalizeCalledList = mpi.world.gather(self.finalizeCalled, pmi.CONTROLLER)
+            self.pairAppliedList = mpi.world.gather(self.pairApplied, pmi.CONTROLLER)
 
     class TestCaseLocal(unittest.TestCase):
         def __init__(self):
@@ -63,10 +63,10 @@ else:
         def testForeach(self):
             computer = pmi.create('MockComputerLocal', self.tc, self.pos, self.bc)
             self.all.foreach(computer)
-            for b in computer.prepareCalled: self.assert_(b)
-            for b in computer.finalizeCalled: self.assert_(b)
+            for b in computer.prepareCalledList: self.assert_(b)
+            for b in computer.finalizeCalledList: self.assert_(b)
             pairApplied = list()
-            for l in computer.pairApplied:
+            for l in computer.pairAppliedList:
                 pairApplied.extend(l)
             for id1 in range(4):
                 for id2 in range(id1+1, 4):

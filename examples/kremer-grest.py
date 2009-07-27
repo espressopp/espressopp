@@ -1,9 +1,5 @@
 from espresso import *
-from espresso import bc, decomposition, integrator, particles, potential, pairs
-
-# import espresso.thermostat
-# import espresso.interaction
-# import espresso.pairs
+from espresso import bc, decomposition, integrator, particles, potential, pairs, thermostat
 
 # set up the boundary conditions
 pbc = bc.PeriodicBC(length=10)
@@ -19,27 +15,35 @@ force = decomposer.createProperty('Real3D')
 # create the particles and the chains
 feneint = potential.FENE(K=1.0, r0=1.0, rMax=0.2)
 #bonds = pairs.List()
-for chainid in range(100):
-    prevPid = decomposer.addParticle()
-    for beadid in range(63):
-        newPid = decomposer.addParticle()
-        pos[newPid] = pos[prevPid]
-        #+ espresso.esutil.randomWalk(step=1.0)
-        #bonds.add(particle, prevParticle)
-        prevPid = newPid
+# for chainid in range(100):
+#     prevPid = decomposer.addParticle()
+#     for beadid in range(63):
+#         newPid = decomposer.addParticle()
+#         pos[newPid] = pos[prevPid]
+#         #+ espresso.esutil.randomWalk(step=1.0)
+#         #bonds.add(particle, prevParticle)
+#         prevPid = newPid
 
-# create the LJ interaction
-lj = potential.LennardJones(sigma=1.0, epsilon=1.0, cutoff=2.0)
-allpairs = pairs.All(set=decomposer, bc=pbc, posProperty=pos)
-ljint = potential.Interaction(potential=lj, pairs=allpairs)
+pid = decomposer.addParticle()
+pos[pid] = 0
+pid = decomposer.addParticle()
+pos[pid] = 0.5
 
 # set up the integrator
 integrator = integrator.VelocityVerlet(
     set=decomposer,
     posProperty=pos, velProperty=vel, forceProperty=force,
-    timestep=0.001)
+    timestep=0.01)
+
+# create the LJ interaction
+lj = potential.LennardJones(sigma=1.0, epsilon=1.0, cutoff=2.0)
+allpairs = pairs.All(set=decomposer, bc=pbc, posProperty=pos)
+ljint = potential.Interaction(potential=lj, pairs=allpairs)
+ljint.connect(integrator)
+
 # set up the thermostat
-thermostat = thermostat.Langevin(temperature=1.0, gamma=0.5)
+therm = thermostat.Langevin(temperature=1.0, gamma=0.5)
+therm.connect(integrator)
 
 # # create the particles and the chains
 # feneint = espresso.potential.FENE(K=1.0, r0=1.0, rMax=0.2)
@@ -56,7 +60,10 @@ thermostat = thermostat.Langevin(temperature=1.0, gamma=0.5)
 #verletlists = espresso.pairs.VerletList(radius=ljint.cutoff, skin=0.3, **system)
 
 # integration
-# for sweeps in range(100):
-#     integrator.integrate(steps=100)
+for sweeps in range(5):
+    print('step ' + str(sweeps))
+    print('  pos=' + str(pos[0]) + ' ' + str(pos[1]))
+    print('  force=' + str(force[0]) + ' ' + str(force[1]))
+    integrator.run(steps=100)
 
 # analysis

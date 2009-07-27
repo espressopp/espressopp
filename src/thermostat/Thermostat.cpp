@@ -27,9 +27,7 @@ Thermostat::registerPython() {
 
   class_< Thermostat, boost::noncopyable >
     ("thermostat_Thermostat", no_init)
-  .def("setTemperature", &Thermostat::setTemperature)
-  .def("getTemperature", &Thermostat::getTemperature)
-  .def("setSet", &Thermostat::setSet)
-  .def("getSet", &Thermostat::getSet)
-  ;
+    .add_property("temperature", &Thermostat::getTemperature,
+		  &Thermostat::setTemperature)
+    ;
 }

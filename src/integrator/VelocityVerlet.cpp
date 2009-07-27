@@ -16,26 +16,26 @@ namespace {
     const PropertyHandle< Real3D > vel;
     const PropertyHandle< Real3D > force;
 
-    const real timeStep;
-    const real timeStepSqr;
+    const real timestep;
+    const real timestepSqr;
 
     StepA(Set::SelfPtr set,
 	  Property< Real3D >::SelfPtr posProperty,
 	  Property< Real3D >::SelfPtr velProperty,
 	  Property< Real3D >::SelfPtr forceProperty, 
-	  real _timeStep)
+	  real _timestep)
       : pos(posProperty->getHandle(set)), 
 	vel(velProperty->getHandle(set)), 
 	force(forceProperty->getHandle(set)),
-	timeStep(_timeStep), 
-	timeStepSqr(_timeStep * _timeStep) 
+	timestep(_timestep), 
+	timestepSqr(_timestep * _timestep) 
     {}
 
     void prepare(Storage::SelfPtr set) {}
   
     void apply(const ParticleHandle pref) {
-      pos[pref] = pos[pref] + vel[pref] * timeStep + 0.5 * force[pref] * timeStepSqr;
-      vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep;
+      pos[pref] = pos[pref] + vel[pref] * timestep + 0.5 * force[pref] * timestepSqr;
+      vel[pref] = vel[pref] + 0.5 * force[pref] * timestep;
     }
   };
 
@@ -43,21 +43,21 @@ namespace {
     const PropertyHandle< Real3D > vel;
     const PropertyHandle< Real3D > force;
 
-    const real timeStep;
+    const real timestep;
 
     StepB(Set::SelfPtr set,
 	  Property< Real3D >::SelfPtr velProperty,
 	  Property< Real3D >::SelfPtr forceProperty, 
-	  real _timeStep)
+	  real _timestep)
       : vel(velProperty->getHandle(set)), 
 	force(forceProperty->getHandle(set)),
-	timeStep(_timeStep)
+	timestep(_timestep)
     {}
     
     void prepare(Storage::SelfPtr set) {}
 
     void apply(const ParticleHandle pref) { 
-      vel[pref] = vel[pref] + 0.5 * force[pref] * timeStep; 
+      vel[pref] = vel[pref] + 0.5 * force[pref] * timestep; 
     }
   };
 
@@ -78,11 +78,13 @@ namespace {
 VelocityVerlet::VelocityVerlet(Set::SelfPtr set, 
                                Property< Real3D >::SelfPtr posProperty,
                                Property< Real3D >::SelfPtr velProperty,
-                               Property< Real3D >::SelfPtr forceProperty)
-  : MDIntegrator(set, posProperty, velProperty, forceProperty) {}
+                               Property< Real3D >::SelfPtr forceProperty,
+			       real _timestep)
+  : MDIntegrator(set, posProperty, velProperty, forceProperty, _timestep) 
+{}
 
 void VelocityVerlet::step() {
-  StepA stepA(set, posProperty, velProperty, forceProperty, timeStep);
+  StepA stepA(set, posProperty, velProperty, forceProperty, timestep);
 
   // Step A
   set->foreach(stepA);
@@ -98,7 +100,7 @@ void VelocityVerlet::step() {
   updateForces(*this);
 
   // Step B
-  StepB stepB(set, velProperty, forceProperty, timeStep);
+  StepB stepB(set, velProperty, forceProperty, timestep);
   set->foreach(stepB);
 
   // call connected routines, e.g. thermalizeB for a chosen thermostat
@@ -119,9 +121,12 @@ VelocityVerlet::registerPython() {
   // TODO: Why noncopyable?
   class_< VelocityVerlet, boost::noncopyable, bases< MDIntegrator > >
     ("integrator_VelocityVerlet", 
-     init< Set::SelfPtr, 
+     init< 
+     Set::SelfPtr, 
      Property< Real3D >::SelfPtr, 
      Property< Real3D >::SelfPtr, 
-     Property< Real3D >::SelfPtr >())
+     Property< Real3D >::SelfPtr,
+     real
+     >())
     ;
 }

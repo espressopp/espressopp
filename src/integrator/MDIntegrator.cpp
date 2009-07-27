@@ -14,42 +14,20 @@ LOG4ESPP_LOGGER(MDIntegrator::theLogger, "Integrator");
 MDIntegrator::MDIntegrator(particles::Set::SelfPtr _set,
                            Property< Real3D >::SelfPtr _posProperty,
                            Property< Real3D >::SelfPtr _velProperty,
-                           Property< Real3D >::SelfPtr _forceProperty) 
-  : timeStep(0.0),
-    set(_set),
+                           Property< Real3D >::SelfPtr _forceProperty,
+			   real timestep) 
+  : set(_set),
     posProperty(_posProperty),
     velProperty(_velProperty),
     forceProperty(_forceProperty)
-{}
-
-particles::Set::SelfPtr 
-MDIntegrator::getSet() const { return set; }
-
-Property< Real3D >::SelfPtr 
-MDIntegrator::getPosProperty() const { return posProperty; }
-
-Property< Real3D >::SelfPtr 
-MDIntegrator::getVelProperty() const { return velProperty; }
-
-Property< Real3D >::SelfPtr 
-MDIntegrator::getForceProperty() const { return forceProperty; }
-
-void 
-MDIntegrator::setTimestep(real _timeStep) { timeStep = _timeStep; }
-
-real 
-MDIntegrator::getTimestep() const { return timeStep; }
-
-int 
-MDIntegrator::getIntegrationStep() const { return nTimestep; }
-
+{ setTimestep(timestep); }
 
 void MDIntegrator::run(int nsteps)
 {
   LOG4ESPP_INFO(theLogger, "MDIntegrator will run " << nsteps << " steps");
 
-  if (timeStep <= 0.0) {
-     ARGERROR(theLogger, "Illegal timeStep in MDIntegrator: " << timeStep <<
+  if (timestep <= 0.0) {
+     ARGERROR(theLogger, "Illegal timestep in MDIntegrator: " << timestep <<
                          ", value must be positive");
   }
   if (nsteps < 0) {

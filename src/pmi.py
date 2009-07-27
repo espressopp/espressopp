@@ -219,15 +219,15 @@ def create(cls=None, *args, **kwds) :
         oid = __OID()
 
         # translate the arguments
-        ckwds, targs, tkwds = __translateArgs(args, kwds)
+        cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
         # broadcast creation to the workers
         _broadcast(_CREATE, cls, oid, *targs, **tkwds)
 
         log.info('Creating: %s [%s]', 
-                 __formatCall(cls.__name__, args, ckwds), oid)
+                 __formatCall(cls.__name__, cargs, ckwds), oid)
 
         # create the instance
-        obj = cls(*args, **ckwds)
+        obj = cls(*cargs, **ckwds)
         # store the oid in the instance
         obj.__pmioid = oid
         obj.__pmidestroyer = __Destroyer(oid)
@@ -278,11 +278,11 @@ def invoke(function=None, *args, **kwds) :
     """
     if __checkController(invoke) :
         function = __translateInvokeArg(function)
-        ckwds, targs, tkwds = __translateArgs(args, kwds)
+        cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
         _broadcast(_INVOKE, function, *targs, **tkwds)
 
-        log.info("Invoking: %s", __formatCall(function, args, ckwds))
-        value = __invoke(function, args, ckwds)
+        log.info("Invoking: %s", __formatCall(function, cargs, ckwds))
+        value = __invoke(function, cargs, ckwds)
         return mpi.world.gather(value, root=CONTROLLER)
     else :
         return receive(_INVOKE)
@@ -322,10 +322,10 @@ def call(function=None, *args, **kwds) :
     """
     if __checkController(call) :
         function = __translateInvokeArg(function)
-        ckwds, targs, tkwds = __translateArgs(args, kwds)
+        cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
         _broadcast(_CALL, function, *targs, **tkwds)
-        log.info("Calling: %s", __formatCall(function, args, ckwds))
-        return __invoke(function, args, ckwds)
+        log.info("Calling: %s", __formatCall(function, cargs, ckwds))
+        return __invoke(function, cargs, ckwds)
     else :
         receive(_CALL)
 
@@ -379,9 +379,9 @@ def reduce(reduceOp=None, function=None, *args, **kwds) :
         else :
             raise ValueError("pmi.reduce expects function as first argument, but got %s instead" % reduceOp)
         function = __translateInvokeArg(function)
-        ckwds, targs, tkwds = __translateArgs(args, kwds)
+        cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
         _broadcast(_REDUCE, reduceOp, function, *targs, **tkwds)
-        log.info("Reducing: %s", __formatCall(function, args, ckwds))
+        log.info("Reducing: %s", __formatCall(function, cargs, ckwds))
         value = __invoke(function, args, ckwds)
         log.info("Reducing results via %s", reduceOp)
         reduceOp = eval(reduceOp)
@@ -575,8 +575,13 @@ class Proxy(type):
         log.info('Making %s a proxy class.' % name)
         defs = dict['pmiproxydefs']
 
+
+        if 'class' in defs:
+            cls.pmiobjectclassdef = defs['class']
+        # TODO: remove when cleaned up
         if 'subjectclass' in defs:
             cls.pmiobjectclassdef = defs['subjectclass']
+        if 'class' in defs or 'subjectclass' in defs:
             if hasattr(cls, '__init__'): 
                 oldinit = getattr(cls, '__init__')
             else: 
@@ -779,7 +784,7 @@ def _translateClass(cls):
 
 def __mapArgs(func, args, kwds):
     """Internal function that maps a function to the list args and to
-    the values of the dict kwds. Used by __translateArsg and
+    the values of the dict kwds. Used by __translateArgs and
     __backtranslateArgs.
     """
     targs = map(func, args)
@@ -794,9 +799,6 @@ def _translateOID(obj) :
         
     If the object is not a PMI object, returns obj untouched.
     """
-    if hasattr(obj, 'pmiobject'):
-        # if it is a proxy, send its pmiobjects oid
-        return obj.pmiobject.__pmioid
     if hasattr(obj, '__pmioid'):
         # if it is a pmi object, send the oid
         return obj.__pmioid
@@ -808,7 +810,13 @@ def __translateArgs(args, kwds):
     occur in args or kwds into __OID objects that can be sent to the
     workers.
     """
-    
+    controllerArgs = []
+    for arg in args:
+        if hasattr(arg, 'pmiobject'):
+            controllerArgs.append(arg.pmiobject)
+        else:
+            controllerArgs.append(arg)
+
     workerKwds={}
     controllerKwds={}
     for k in kwds.keys():
@@ -821,9 +829,9 @@ def __translateArgs(args, kwds):
             if k not in controllerKwds:
                 controllerKwds[k] = v
 
-    targs, tWorkerKwds = __mapArgs(_translateOID, args, workerKwds)
+    targs, tWorkerKwds = __mapArgs(_translateOID, controllerArgs, workerKwds)
 
-    return controllerKwds, targs, tWorkerKwds
+    return controllerArgs, controllerKwds, targs, tWorkerKwds
 
 def _backtranslateOID(obj) :
     """Internal worker function that backtranslates an __OID object

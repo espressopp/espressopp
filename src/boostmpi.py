@@ -13,11 +13,20 @@ else:
 import _boostmpi
 from _boostmpi import __doc__, __author__, __copyright__, __license__
 
-from espresso import esutil
+class _ExtendBaseClass (type) :
+    def __new__(self, name, bases, dict):
+        del dict['__metaclass__']
+        del dict['__module__']
+
+        theClass = bases[0]
+        # loop over all items in the class and replace it
+        for k,v in dict.iteritems():
+            setattr(theClass, k, v)
+        return theClass
 
 # extend the MPI Communicator class by the collective operations
 class ExtendMPI(Communicator) :
-    __metaclass__ = esutil.ExtendBaseClass
+    __metaclass__ = _ExtendBaseClass
 
     def broadcast(self, value=None, root=0) :
         """Calls broadcast(self, value, root).

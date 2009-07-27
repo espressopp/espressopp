@@ -26,7 +26,6 @@ Stolen and modified from
 http://code.activestate.com/recipes/412717/ and
 http://www.boost.org/doc/libs/1_35_0/libs/python/doc/tutorial/doc/html/python/techniques.html#python.extending_wrapped_objects_in_python
 """
-
 class ExtendBaseClass (type) :
     def __new__(self, name, bases, dict):
         del dict['__metaclass__']
@@ -44,3 +43,12 @@ def choose(val, altval) :
     else :
         return val
 
+def cxxinit(obj, cls, *args, **kwds):
+    if not hasattr(obj, 'cxxinit'):
+        cls.__init__(obj, *args, **kwds)
+        obj.cxxinit = True
+
+from espresso import pmi
+def pmiinit(obj, cls, *args, **kwds):
+    if not hasattr(obj, 'pmiobject'):
+        obj.pmiobject = pmi.create(cls, *args, **kwds)
