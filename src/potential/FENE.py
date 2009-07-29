@@ -1,3 +1,4 @@
+from espresso.esutil import *
 from espresso import pmi
 
 from espresso.potential.CentralPotential import *
@@ -7,12 +8,7 @@ class FENELocal(CentralPotentialLocal, potential_FENE) :
     'The (local) FENE potential.'
     def __init__(self, K=1.0, r0=0.0, rMax=1.0) :
         """Initialize the FENE potential."""
-        if not hasattr(self, 'cxxinit'):
-            potential_FENE.__init__(self)
-            self.cxxinit = True
-        self.K = K
-        self.r0 = r0
-        self.rMax = rMax
+        cxxinit(self, potential_FENE, K, r0, rMax)
 
 # wrap FENE
 if pmi.IS_CONTROLLER:

@@ -100,10 +100,8 @@ void TestEspresso::addParticles(vector< Real3D > &positions) {
 void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {
   bc::PeriodicBC::SelfPtr pbc = make_shared< bc::PeriodicBC >(size);
   pairs::All::SelfPtr allpairs = make_shared< pairs::All >(pbc, storage, position);
-  potential::LennardJones::SelfPtr ljint = make_shared< potential::LennardJones >();
-  ljint->setEpsilon(epsilon);
-  ljint->setSigma(sigma);
-  ljint->setCutoff(cutoff);
+  potential::LennardJones::SelfPtr ljint 
+    = make_shared< potential::LennardJones >(epsilon, sigma, cutoff);
   pairs::Computer::SelfPtr forceCompute 
     = ljint->createForceComputer(force);
   allpairs->foreach(forceCompute);

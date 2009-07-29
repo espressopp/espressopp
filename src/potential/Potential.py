@@ -1,8 +1,16 @@
 from espresso import pmi
+from espresso import toReal3DFromVector
 
 from _espresso import potential_PythonPotential
-class PythonPotentialLocal(potential_PythonPotential):
-    pass
+class PythonPotentialLocal(object):
+    def computeForce(self, *args):
+        return \
+            self.cxxclass.computeForce(self,
+                toReal3DFromVector(*args))
+    def computeEnergy(self, *args):
+        return \
+            self.cxxclass.computeEnergy(self,
+                toReal3DFromVector(*args))
 
 PotentialLocal = PythonPotentialLocal
 

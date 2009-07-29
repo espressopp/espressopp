@@ -575,7 +575,6 @@ class Proxy(type):
         log.info('Making %s a proxy class.' % name)
         defs = dict['pmiproxydefs']
 
-
         if 'class' in defs:
             cls.pmiobjectclassdef = defs['class']
         # TODO: remove when cleaned up

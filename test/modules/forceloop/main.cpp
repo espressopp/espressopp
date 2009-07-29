@@ -139,9 +139,8 @@ void forceloop() {
   // create integrator and set properties
 
   VelocityVerlet::SelfPtr integrator = 
-    make_shared< VelocityVerlet >(particleStorage, position, velocity, force);
+    make_shared< VelocityVerlet >(particleStorage, position, velocity, force, 0.005);
   
-  integrator->setTimeStep(0.005);
   /*
   integrator->addForce(ljint, allpairs);
 

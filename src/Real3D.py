@@ -9,13 +9,17 @@ class __Real3D(Real3D) :
     __metaclass__ = esutil.ExtendBaseClass
 
     __originit = Real3D.__init__
-    def __init__(self, *args) :
-        if len(args) == 0 :
+    def __init__(self, *args):
+        if len(args) == 0:
             x = y = z = 0.0
-        elif len(args) == 1 :
+        elif len(args) == 1:
             arg0 = args[0]
+            if isinstance(arg0, Real3D):
+                x = arg0.x
+                y = arg0.y
+                z = arg0.z
             # test whether the argument is iterable and has 3 elements
-            if hasattr(arg0, '__iter__') and len(arg0) == 3:
+            elif hasattr(arg0, '__iter__') and len(arg0) == 3:
                 x, y, z = arg0
             elif isinstance(arg0, float) or isinstance(arg0, int):
                 x = y = z = arg0
@@ -53,3 +57,27 @@ class __Real3D(Real3D) :
 
     def __repr__(self) :
         return 'Real3D' + str(tuple(self))
+
+def toReal3DFromVector(*args):
+    """Try to convert the arguments to a Real3D.
+
+    This function will only convert to a Real3D if x, y and z are
+    specified."""
+    if len(args) == 1:
+        arg0 = args[0]
+        if isinstance(arg0, Real3D):
+            return arg0
+        elif hasattr(arg0, '__iter__') and len(arg0) == 3:
+            return Real3D(*args)
+    elif len(args) == 3:
+        return Real3D(*args)
+
+    raise TypeError("Specify x, y and z.")
+
+def toReal3D(*args):
+    """Try to convert the arguments to a Real3D, returns the rgument,
+    if it is already a Real3D."""
+    if len(args) == 1 and isinstance(args[0], Real3D):
+        return args[0]
+    else:
+        return Real3D(*args)

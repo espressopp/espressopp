@@ -33,7 +33,11 @@ namespace espresso {
 
       /** Default constructor. Member variables are accessed by setter and getter. */
 
-      FENE() {}
+      FENE(real _K, real _r0, real _rMax) {
+	setK(_K);
+	setR0(_r0);
+	setRMax(_rMax);
+      }
       virtual ~FENE() {}
 
       void setK(real _K) { K = _K; }

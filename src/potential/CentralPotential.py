@@ -1,9 +1,13 @@
 from espresso import pmi
 from espresso.potential.Potential import *
 
-from _espresso import potential_PythonCentralPotential
-class PythonCentralPotentialLocal(PotentialLocal, potential_PythonCentralPotential):
-    pass
+class PythonCentralPotentialLocal(PotentialLocal):
+    def computeEnergy(self, *args):
+        if len(args) == 1:
+            arg0 = args[0]
+            if type(arg0) is float or type(arg0) is int:
+                return self.cxxclass.computeEnergy(self, arg0)
+        return PotentialLocal.computeEnergy(self, *args)
 
 CentralPotentialLocal = PythonCentralPotentialLocal
 

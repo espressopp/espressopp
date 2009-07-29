@@ -44,9 +44,11 @@ def choose(val, altval) :
         return val
 
 def cxxinit(obj, cls, *args, **kwds):
-    if not hasattr(obj, 'cxxinit'):
+    if not issubclass(cls, object):
+        raise('cxxinit requires a class input argument.')
+    if not hasattr(obj, 'cxxclass'):
+        obj.cxxclass = cls
         cls.__init__(obj, *args, **kwds)
-        obj.cxxinit = True
 
 from espresso import pmi
 def pmiinit(obj, cls, *args, **kwds):

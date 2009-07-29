@@ -52,7 +52,8 @@ void
 FENE::registerPython() {
   using namespace espresso::python;
   
-  class_< FENE, bases< CentralPotential > >("potential_FENE")
+  class_< FENE, bases< CentralPotential > >
+    ("potential_FENE", init< real, real, real>())
     .add_property("K", &FENE::getK, &FENE::setK)
     .add_property("r0", &FENE::getR0, &FENE::setR0)
     .add_property("rMax", &FENE::getRMax, &FENE::setRMax)

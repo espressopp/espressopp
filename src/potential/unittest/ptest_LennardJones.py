@@ -26,15 +26,19 @@ class Test0LennardJones(espresso.unittest.TestCase) :
         lj=LennardJones(epsilon=2.0, sigma=2.0, cutoff=4.0)
         # root
         self.assertAlmostEqual(lj.computeEnergy(2.0), 0.0)
-        self.assertAlmostEqual(lj.computeEnergy(Real3D(2.0, 0.0, 0.0)), 0.0)
+        self.assertAlmostEqual(
+            lj.computeEnergy(2.0, 0.0, 0.0),
+            0.0)
         # minimum
-        self.assertAlmostEqual(lj.computeEnergy(2.0*2.0**(1.0/6.0)), -2.0)
-        self.assertAlmostEqual(lj.computeEnergy(Real3D(0.0, 2.0*2.0**(1.0/6.0), 0.0)), -2.0)
+        self.assertAlmostEqual(
+            lj.computeEnergy(2.0*2.0**(1.0/6.0)), -2.0)
+        self.assertAlmostEqual(lj.computeEnergy(0.0, 2.0*2.0**(1.0/6.0), 0.0), -2.0)
 
     def test4Force(self):
         lj=LennardJones()
-        dist=Real3D(2.0**(1.0/6.0), 0.0, 0.0)
-        self.assertAlmostEqual(lj.computeForce(dist), Real3D(0.0, 0.0, 0.0))
+        self.assertAlmostEqual(
+            lj.computeForce(2.0**(1.0/6.0), 0.0, 0.0),
+            Real3D(0.0, 0.0, 0.0))
 
     def test5Properties(self) :
         lj=LennardJones()
@@ -45,7 +49,6 @@ class Test0LennardJones(espresso.unittest.TestCase) :
         # would always work
         self.assertAlmostEqual(lj.computeEnergy(2.0), 0.0)
         self.assertAlmostEqual(lj.computeEnergy(2.0*2.0**(1.0/6.0)), -2.0)
-
 
 if __name__ == "__main__":
     unittest.main()

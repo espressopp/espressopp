@@ -49,10 +49,6 @@ else:
             self.decomp = MockDecomposer()
             self.prop = RealProperty(self.decomp)
 
-        def testConstructAndRegister(self) :
-            prop = RealProperty(self.decomp)        
-            self.assertEqual(prop.decomposer, self.decomp)
-
         def testReadWrite(self) :
             for part in range(0,mpi.size) :
                 self.prop[part] = part*3.1415

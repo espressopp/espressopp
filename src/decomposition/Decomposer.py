@@ -1,4 +1,4 @@
-from espresso import esutil
+from espresso.esutil import *
 from espresso import pmi
 from espresso import Property
 from espresso.particles.Set import *
@@ -8,9 +8,7 @@ from _espresso import particles_Storage
 class DecomposerLocal(SetLocal, particles_Storage):
     'The local basic particle storage'
     def __init__(self):
-        if not hasattr(self, 'cxxinit'):
-            particles_Storage.__init__(self)
-            self.cxxinit = True
+        cxxinit(self, particles_Storage)
 
     def checkProperty(self, property):
         particles_Storage.checkProperty(self, property)

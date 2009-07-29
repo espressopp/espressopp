@@ -70,7 +70,7 @@ LennardJones::registerPython() {
   using namespace espresso::python;
 
   class_< LennardJones, bases< CentralPotential > >
-    ("potential_LennardJones")
+    ("potential_LennardJones", init< real, real, real >())
     .add_property("cutoff", &LennardJones::getCutoff, &LennardJones::setCutoff)
     .add_property("sigma", &LennardJones::getSigma, &LennardJones::setSigma)
     .add_property("epsilon", &LennardJones::getEpsilon, &LennardJones::setEpsilon)

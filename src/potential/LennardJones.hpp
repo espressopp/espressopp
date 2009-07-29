@@ -31,7 +31,11 @@ namespace espresso {
     public:
       static void registerPython();
 
-      LennardJones() {}
+      LennardJones(real _epsilon, real _sigma, real _cutoff) {
+	setEpsilon(_epsilon);
+	setSigma(_sigma);
+	setCutoff(_cutoff);
+      }
       virtual ~LennardJones() {}
 
       // Setter and getter

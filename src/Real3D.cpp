@@ -16,7 +16,8 @@ namespace espresso {
   registerPythonReal3D() {
     // here we do NOT use espresso::python::class_
     // Export the C++ class Real3D to Python 
-    boost::python::class_<Real3D>("Real3D", init<real, real, real>())
+    boost::python::class_< Real3D >
+      ("Real3D", init<real, real, real>())
       .def("__getitem__", &Real3D::getItem)
       .def("__setitem__", &Real3D::setItem)
       .def(self * real())
