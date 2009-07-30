@@ -10,8 +10,8 @@ include SubMakefile.am
 include include/SubMakefile.am
 include esutil/SubMakefile.am
 include hello/SubMakefile.am
+include storage/SubMakefile.am
 include particles/SubMakefile.am
-include decomposition/SubMakefile.am
 include pairs/SubMakefile.am
 include potential/SubMakefile.am
 include bc/SubMakefile.am
@@ -29,7 +29,6 @@ noinst_HEADERS = \
 noinst_LTLIBRARIES += libespresso_common.la
 libespresso_common_la_SOURCES += \
 	espresso_common.cpp
-
 libespresso_common_la_LIBADD = \
 	$(ESPRESSO_BOOST_LIBS) 
 
@@ -51,7 +50,6 @@ pypresso_LDADD = \
 	libespresso_common.la \
 	libpylogger.la \
 	../contrib/boostmpi/libboostmpi.la \
-	$(ESPRESSO_BOOST_LIBS) \
 	$(PYTHON_LIBS) \
 	$(MPI_LIBS)
 

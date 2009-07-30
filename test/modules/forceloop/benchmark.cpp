@@ -13,7 +13,7 @@
 
 #include "espresso_common.hpp"
 #include "types.hpp"
-#include "particles/Storage.hpp"
+#include "storage/Storage.hpp"
 #include "particles/Computer.hpp"
 #include "pairs/All.hpp"
 #include "potential/ForceComputer.hpp"
@@ -29,6 +29,7 @@
 
 using namespace espresso;
 using namespace espresso::particles;
+using namespace espresso::storage;
 using namespace boost;
 using namespace std;
 

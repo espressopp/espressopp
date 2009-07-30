@@ -4,7 +4,7 @@
 #include <logging.hpp>
 
 #include <espresso_common.hpp>
-#include <particles/Storage.hpp>
+#include <storage/Storage.hpp>
 #include <bc/PeriodicBC.hpp>
 #include <potential/LennardJones.hpp>
 #include <potential/FENE.hpp>
@@ -24,6 +24,7 @@
 
 using namespace espresso;
 using namespace espresso::bc;
+using namespace espresso::storage;
 using namespace espresso::particles;
 using namespace espresso::pairs;
 using namespace espresso::potential;

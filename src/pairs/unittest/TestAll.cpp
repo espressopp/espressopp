@@ -4,10 +4,11 @@
 #include <set>
 
 #include "bc/PeriodicBC.hpp"
-#include "particles/Storage.hpp"
+#include "storage/Storage.hpp"
 #include "../All.hpp"
 
 using namespace espresso;
+using namespace espresso::storage;
 using namespace espresso::pairs;
 
 struct Fixture {
@@ -15,15 +16,15 @@ struct Fixture {
   static const real size = 1.0;
   
   bc::PeriodicBC::SelfPtr pbc;
-  particles::Storage::SelfPtr store;
+  Storage::SelfPtr store;
   Property< Real3D >::SelfPtr posProperty;
-  pairs::All::SelfPtr pairs;
+  All::SelfPtr pairs;
 
   Fixture() {
     pbc = make_shared< bc::PeriodicBC >(1.0);
-    store = make_shared< particles::Storage >();
+    store = make_shared< Storage >();
     posProperty = make_shared< Property< Real3D > >(store);
-    pairs = make_shared< pairs::All >(pbc, store, posProperty);
+    pairs = make_shared< All >(pbc, store, posProperty);
 
     createLattice();
   }
@@ -35,7 +36,7 @@ struct Fixture {
     for (size_t i = 0; i < N; i++)
       for (size_t j = 0; j < N; j++)
 	for (size_t k = 0; k < N; k++) {
-	  particles::ParticleHandle p
+	  ParticleHandle p
 	    = store->addParticle(ParticleId(pid));
 	  posProperty->at(store, p) = Real3D(i*step, j*step, k*step);
 	  pid++;
@@ -56,8 +57,8 @@ public:
   bool prepareCalled;
   bool finalizeCalled;
 
-  particles::IdPropertyHandle id;
-  particles::PropertyHandle< Real3D > pos;
+  IdPropertyHandle id;
+  PropertyHandle< Real3D > pos;
 
   MockPairComputer(bc::BC::SelfPtr _bc,
 	   Property< Real3D >::SelfPtr _posProperty)
@@ -67,8 +68,8 @@ public:
     finalizeCalled = false;
   }
 
-  virtual void prepare(particles::Storage::SelfPtr storage1, 
-		       particles::Storage::SelfPtr storage2) {
+  virtual void prepare(Storage::SelfPtr storage1, 
+		       Storage::SelfPtr storage2) {
     prepareCalled = true;
     id = storage1->getIdPropertyHandle();
     pos = posProperty->getHandle(storage1);
@@ -79,8 +80,8 @@ public:
   }
   
   virtual void apply(const Real3D dist,
-		     const particles::ParticleHandle p1,
-		     const particles::ParticleHandle p2) {
+		     const ParticleHandle p1,
+		     const ParticleHandle p2) {
     Real3D pos1 = pos[p1];
     Real3D pos2 = pos[p2];
     Real3D d = bc->getDist(pos1, pos2);

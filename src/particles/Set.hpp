@@ -5,11 +5,13 @@
 #include "Particle.hpp"
 
 namespace espresso {
+  // forward declaration
+  namespace storage {
+    class Storage;
+  }
+
   namespace particles {
     class ForeachBreak: public std::exception {};
-
-    // forward declaration
-    class Storage;
 
     class Set {
     public:
@@ -20,7 +22,7 @@ namespace espresso {
       /** for a particle of the Storage of this class,
           check whether it belongs to this set
       */
-      virtual bool contains(ParticleHandle pref);
+      virtual bool contains(storage::ParticleHandle pref);
       virtual bool contains(ParticleId pid);
 
       /** Apply computer to all particles of this set. Call prepare and finalize.
@@ -40,7 +42,7 @@ namespace espresso {
       several times without using a computer. */
 //       virtual void foreach(const ApplyFunction function) = 0;
 
-      virtual shared_ptr< Storage > getStorage() = 0;
+      virtual shared_ptr< storage::Storage > getStorage() = 0;
 
       static void registerPython();
 

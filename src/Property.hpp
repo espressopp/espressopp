@@ -3,9 +3,9 @@
 
 #include <vector>
 #include <algorithm>
-#include "particles/PropertyHandle.hpp"
-#include "particles/ParticleHandle.hpp"
-#include "particles/Storage.hpp"
+#include "storage/PropertyHandle.hpp"
+#include "storage/ParticleHandle.hpp"
+#include "storage/Storage.hpp"
 #include "Particle.hpp"
 
 namespace espresso {
@@ -17,17 +17,17 @@ namespace espresso {
   public:
     typedef shared_ptr< PropertyBase > SelfPtr;
 
-    PropertyBase(const particles::Storage::SelfPtr _storage);
+    PropertyBase(const storage::Storage::SelfPtr _storage);
 
     void checkFitsTo(const particles::Set::SelfPtr set) const;
 
 
   protected:
-    const particles::Storage::SelfPtr getStorage() const { return storage; }
+    const storage::Storage::SelfPtr getStorage() const { return storage; }
 
   private:
     // what storage does the property belong to
-    const particles::Storage::SelfPtr storage;
+    const storage::Storage::SelfPtr storage;
   };
 
   /** Scalar particle property. This does several things:
@@ -45,12 +45,12 @@ namespace espresso {
   //  class Property :  boost::noncopyable {
   template < typename T >
   class Property : public PropertyBase {
-    typedef particles::PropertyHandle< T > Handle;
+    typedef storage::PropertyHandle< T > Handle;
   public:
     typedef shared_ptr< Property< T > > SelfPtr;
 
     // visible in Python
-    Property(particles::Storage::SelfPtr _storage)
+    Property(storage::Storage::SelfPtr _storage)
       : PropertyBase(_storage), 
 	id(getStorage()->template addProperty<T>())
     {}
@@ -73,22 +73,22 @@ namespace espresso {
       return getHandle();
     }
 
-    T &at(particles::Set::SelfPtr set, particles::ParticleHandle particle) {
+    T &at(particles::Set::SelfPtr set, storage::ParticleHandle particle) {
       checkFitsTo(set);
       return getHandle()[particle];
     }
 
     T &operator[](ParticleId id) {
-      particles::ParticleHandle particle =
+      storage::ParticleHandle particle =
         getStorage()->getParticleHandle(id);
       return getHandle()[particle];
     }
 
     /// checked access
     T &at(ParticleId id) {
-      particles::ParticleHandle particle =
+      storage::ParticleHandle particle =
         getStorage()->getParticleHandle(id);
-      if (particle == particles::ParticleHandle()) {
+      if (particle == storage::ParticleHandle()) {
 	throw std::out_of_range("Property::at");
       }
       return getHandle()[particle];
@@ -116,7 +116,7 @@ namespace espresso {
   */
   template < typename T >
   class ArrayProperty : public PropertyBase {
-    typedef particles::ArrayPropertyHandle<T> Handle;
+    typedef storage::ArrayPropertyHandle<T> Handle;
 
   public: // visible in Python
     typedef shared_ptr< ArrayProperty< T > > SelfPtr;
@@ -137,7 +137,7 @@ namespace espresso {
     }
 
   public: // invisible in Python
-    ArrayProperty(particles::Storage::SelfPtr _storage,
+    ArrayProperty(storage::Storage::SelfPtr _storage,
                   size_t dimension)
       : PropertyBase(_storage), 
 	id(_storage->template addProperty<T>(dimension))
@@ -152,22 +152,22 @@ namespace espresso {
       return getHandle();
     }
 
-    T *at(particles::Set::SelfPtr set, particles::ParticleHandle handle) {
+    T *at(particles::Set::SelfPtr set, storage::ParticleHandle handle) {
       checkFitsTo(set);
       return getHandle()[handle];
     }
 
     T *operator[](ParticleId part) {
-      particles::ParticleHandle particle =
+      storage::ParticleHandle particle =
         getStorage()->getParticleHandle(part);
       return getHandle()[particle];
     }
 
     /// checked access
     T *at(ParticleId part) {
-      particles::ParticleHandle particle =
+      storage::ParticleHandle particle =
         getStorage()->getParticleHandle(part);
-      if (particle == particles::ParticleHandle()) {
+      if (particle == storage::ParticleHandle()) {
 	throw std::out_of_range("ArrayProperty::at");
       }
       return getHandle()[particle];

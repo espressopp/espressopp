@@ -5,11 +5,11 @@
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/foreach.hpp>
 
-#include "particles/Storage.hpp"
+#include "storage/Storage.hpp"
 #include "Property.hpp"
 
 using namespace espresso;
-using namespace espresso::particles;
+using namespace espresso::storage;
 
 int applyFnCalled;
 
@@ -58,7 +58,7 @@ BOOST_FIXTURE_TEST_CASE(referencesTest, Fixture)
   BOOST_CHECK_CLOSE(pos[p1][2], 0.18, 1e-10);
 }
 
-struct MockComputer : Computer {
+struct MockComputer : particles::Computer {
   bool prepareCalled;
   bool finalizeCalled;
   int applyCalled;

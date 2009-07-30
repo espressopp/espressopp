@@ -4,8 +4,8 @@
 #include "particles/Subset.hpp"
 #include "particles/Computer.hpp"
 
-
 using namespace espresso::particles;
+using namespace espresso::storage;
 
 Subset::Subset(const Set::SelfPtr superset)
   : storage(superset->getStorage()) {}

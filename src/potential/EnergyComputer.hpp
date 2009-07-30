@@ -3,7 +3,7 @@
 
 #include "types.hpp"
 #include "Property.hpp"
-#include "particles/Storage.hpp"
+#include "storage/Storage.hpp"
 #include "pairs/Computer.hpp"
 
 namespace espresso {
@@ -18,8 +18,8 @@ namespace espresso {
       Property< real >::SelfPtr energyProperty1;
       Property< real >::SelfPtr energyProperty2;
 
-      particles::PropertyHandle< real > energy1;
-      particles::PropertyHandle< real > energy2;
+      storage::PropertyHandle< real > energy1;
+      storage::PropertyHandle< real > energy2;
 
       real totalEnergy;
 
@@ -36,16 +36,16 @@ namespace espresso {
 
       virtual ~EnergyComputer() {};
 
-      virtual void prepare(particles::Storage::SelfPtr storage1, 
-			   particles::Storage::SelfPtr storage2) {
+      virtual void prepare(storage::Storage::SelfPtr storage1, 
+			   storage::Storage::SelfPtr storage2) {
 	energy1 = energyProperty1->getHandle(storage1);
 	energy2 = energyProperty2->getHandle(storage2);
 	totalEnergy = 0.0;
       }
 
       virtual void apply(const Real3D dist,
-			 const particles::ParticleHandle p1,
-			 const particles::ParticleHandle p2) {
+			 const storage::ParticleHandle p1,
+			 const storage::ParticleHandle p2) {
 	real e = potential.computeEnergy(dist);
 	energy1[p1] += 0.5*e;
 	energy2[p2] += 0.5*e;

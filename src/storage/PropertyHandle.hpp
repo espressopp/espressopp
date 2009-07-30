@@ -4,7 +4,7 @@
 #include "esutil/TupleVector.hpp"
 
 namespace espresso {
-  namespace particles {
+  namespace storage {
     /** temporary handle for efficient access to a the data in a property */
     template< typename T >
     class PropertyHandle

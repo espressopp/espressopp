@@ -2,7 +2,6 @@
 #include "python.hpp"
 
 #include "integrator/MDIntegrator.hpp"
-#include "particles/Storage.hpp"
 
 using namespace espresso;
 using namespace espresso::integrator;

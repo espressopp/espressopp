@@ -1,33 +1,33 @@
 from espresso import pmi
 from espresso import boostmpi as mpi
-from espresso.decomposition.Decomposer import *
+from espresso.storage.Storage import *
 
 __all__ = [ "SingleNodeLocal" ]
 
-class SingleNodeLocal(DecomposerLocal):
+class SingleNodeLocal(StorageLocal):
     """
     The local particle cxxobject that puts all particles on a dedicated node. So,
     this actually is nothing on most of the nodes.
     """
     def __init__(self, masternode):
-        DecomposerLocal.__init__(self)
+        StorageLocal.__init__(self)
         self.masternode = masternode
     
     def addParticle(self, id):
         if mpi.rank == self.masternode :
-            DecomposerLocal.addParticle(self, id)
+            StorageLocal.addParticle(self, id)
 
     def deleteParticle(self, id):
         if mpi.rank == self.masternode :
-            DecomposerLocal.deleteParticle(self, id)
+            StorageLocal.deleteParticle(self, id)
 ####
 
 if pmi.IS_CONTROLLER :
     __all__.append("SingleNode")
 
-    pmi.exec_('from espresso.decomposition.SingleNode import SingleNodeLocal')
+    pmi.exec_('from espresso.storage.SingleNode import SingleNodeLocal')
 
-    class SingleNode(Decomposer) :
+    class SingleNode(Storage) :
         """
         The single node particle storage. Stores all particles
         on a single, configurable node.

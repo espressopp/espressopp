@@ -1,12 +1,12 @@
 #include "VelocityVerlet.hpp"
 #include <boost/foreach.hpp>
 #include <python.hpp>
-#include "particles/Storage.hpp"
 #include "particles/Computer.hpp"
 
 using namespace espresso;
 using namespace espresso::integrator;
 using namespace espresso::particles;
+using namespace espresso::storage;
 using namespace boost;
 
 namespace {

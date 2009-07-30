@@ -1,9 +1,9 @@
-from espresso import decomposition
+from espresso import storage
 
 if __name__ == 'espresso.pmi':
-    class MockDecomposerLocal(decomposition.DecomposerLocal) :
+    class MockStorageLocal(storage.StorageLocal) :
         def __init__(self):
-            decomposition.DecomposerLocal.__init__(self)
+            storage.StorageLocal.__init__(self)
             # create local particle, one per node
             self.addParticle(mpi.rank)
 
@@ -13,6 +13,7 @@ else:
     from espresso import boostmpi as mpi
     from espresso import pmi
     from espresso import Real3D
+    from espresso.esutil import *
 
     if pmi.IS_CONTROLLER:
         from espresso import RealProperty
@@ -22,9 +23,9 @@ else:
     pmi.execfile_(__file__)
     ####
 
-    class MockDecomposer(decomposition.Decomposer) :
+    class MockStorage(storage.Storage) :
         def __init__(self) :
-            self.pmiobject = pmi.create('MockDecomposerLocal')
+            pmiinit(self, 'MockStorageLocal')
             # not existing particle for failure tests
             self.special = mpi.size + 1
 
@@ -46,8 +47,8 @@ else:
 
     class TestRealProperty(unittest.TestCase) :
         def setUp(self) :
-            self.decomp = MockDecomposer()
-            self.prop = RealProperty(self.decomp)
+            self.storage = MockStorage()
+            self.prop = RealProperty(self.storage)
 
         def testReadWrite(self) :
             for part in range(0,mpi.size) :
@@ -61,15 +62,15 @@ else:
             self.assertRaises(IndexError, self.prop.__setitem__, -1, 42.42)
 
         def testDecomposerNodeOfParticleFailureRead(self) :
-            self.assertRaises(RuntimeWarning, self.prop.__getitem__, self.decomp.special)
+            self.assertRaises(RuntimeWarning, self.prop.__getitem__, self.storage.special)
 
         def testDecomposerNodeOfParticleFailureWrite(self) :
-            self.assertRaises(RuntimeWarning, self.prop.__setitem__, self.decomp.special, 42)
+            self.assertRaises(RuntimeWarning, self.prop.__setitem__, self.storage.special, 42)
 
         def testDoesntFit(self):
-            self.prop.checkFitsTo(self.decomp)
-            self.decomp2 = MockDecomposer()
-            self.assertRaises(RuntimeError, self.prop.checkFitsTo, self.decomp2)
+            self.prop.checkFitsTo(self.storage)
+            self.storage2 = MockStorage()
+            self.assertRaises(RuntimeError, self.prop.checkFitsTo, self.storage2)
 
     ####
 
@@ -78,8 +79,8 @@ else:
 
     class TestIntegerProperty(unittest.TestCase) :
         def setUp(self) :
-            self.decomp = MockDecomposer()
-            self.prop = IntegerProperty(self.decomp)
+            self.storage = MockStorage()
+            self.prop = IntegerProperty(self.storage)
 
         def testReadWrite(self) :
             for part in range(0,mpi.size) :
@@ -90,8 +91,8 @@ else:
 
     class TestReal3DProperty(unittest.TestCase) :
         def setUp(self) :
-            self.decomp = MockDecomposer()
-            self.prop = Real3DProperty(self.decomp)
+            self.storage = MockStorage()
+            self.prop = Real3DProperty(self.storage)
 
         def testReadWrite(self) :
             for part in range(0,mpi.size) :

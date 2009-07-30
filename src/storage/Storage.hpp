@@ -1,13 +1,13 @@
-#ifndef _PARTICLES_STORAGE_HPP
-#define _PARTICLES_STORAGE_HPP
+#ifndef _STORAGE_STORAGE_HPP
+#define _STORAGE_STORAGE_HPP
 
 #include <exception>
 
 #include "types.hpp"
 #include "esutil/TupleVector.hpp"
 #include "Particle.hpp"
-#include "particles/ParticleHandle.hpp"
-#include "particles/PropertyHandle.hpp"
+#include "storage/ParticleHandle.hpp"
+#include "storage/PropertyHandle.hpp"
 #include "particles/Set.hpp"
 
 namespace espresso {
@@ -16,10 +16,10 @@ namespace espresso {
   template<typename> class Property;
   template<typename> class ArrayProperty;
 
-  namespace particles {
+  namespace storage {
     typedef PropertyHandle< ParticleId > IdPropertyHandle;
 
-    class Storage : public Set, 
+    class Storage : public particles::Set, 
 		    public enable_shared_from_this< Storage >,
 		    boost::noncopyable
     {
@@ -87,7 +87,7 @@ namespace espresso {
       static void registerPython();
 
     protected:
-      void foreachApply(Computer &computer);
+      void foreachApply(particles::Computer &computer);
 
 
       /// here the particle data is stored

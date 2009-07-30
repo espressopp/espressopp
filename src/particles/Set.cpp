@@ -1,16 +1,16 @@
 #include "particles/Set.hpp"
 #include "particles/Computer.hpp"
-#include "particles/ParticleHandle.hpp"
-#include "particles/Storage.hpp"
+#include "storage/ParticleHandle.hpp"
+#include "storage/Storage.hpp"
 
 #include <boost/bind.hpp>
 #include <python.hpp>
 
-// Implementation of a generic isMember
-
 using namespace espresso::particles;
+using namespace espresso::storage;
 
 namespace {
+
   class Found {};
   struct FindMember: public Computer {
     ParticleHandle p1;

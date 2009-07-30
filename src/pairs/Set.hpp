@@ -3,7 +3,7 @@
 
 #include "types.hpp"
 #include "Computer.hpp"
-#include "particles/Storage.hpp"
+#include "storage/Storage.hpp"
 
 namespace espresso {
   namespace pairs {
@@ -13,8 +13,8 @@ namespace espresso {
     public:
       typedef shared_ptr< Set > SelfPtr;
       
-      Set(particles::Storage::SelfPtr _storage1,
-	  particles::Storage::SelfPtr _storage2);
+      Set(storage::Storage::SelfPtr _storage1,
+	  storage::Storage::SelfPtr _storage2);
 
       virtual ~Set() {}
 
@@ -29,8 +29,8 @@ namespace espresso {
     protected:
       virtual void foreachApply(Computer &computer) = 0;
 
-      particles::Storage::SelfPtr storage1;
-      particles::Storage::SelfPtr storage2;
+      storage::Storage::SelfPtr storage1;
+      storage::Storage::SelfPtr storage2;
     };
   }
 }

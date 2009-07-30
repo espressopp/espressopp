@@ -1,23 +1,24 @@
 from espresso.esutil import *
 from espresso import pmi
 from espresso import Property
-from espresso.particles.Set import *
+from espresso.particles import SetLocal
 import types
 
-from _espresso import particles_Storage
-class DecomposerLocal(SetLocal, particles_Storage):
+from _espresso import storage_Storage
+class StorageLocal(SetLocal, storage_Storage):
     'The local basic particle storage'
     def __init__(self):
-        cxxinit(self, particles_Storage)
+        cxxinit(self, storage_Storage)
 
     def checkProperty(self, property):
-        particles_Storage.checkProperty(self, property)
+        self.cxxclass.checkProperty(self, property)
 
     def foreach(self, computer):
-        particles_Storage.foreach(self, computer)
+        self.cxxclass.foreach(self, computer)
 
 if pmi.IS_CONTROLLER :
-    class Decomposer(Set):
+    from espresso.particles import Set
+    class Storage(Set):
         """
         The basic particle storage. This class is responsible for
         distributing particles across processors as well as locally on

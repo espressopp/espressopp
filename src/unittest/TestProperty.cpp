@@ -3,13 +3,13 @@
 #include <boost/test/unit_test.hpp>
 #include <stdexcept>
 
-#include "../particles/ParticleHandle.hpp"
+#include "../storage/ParticleHandle.hpp"
 #include "../Particle.hpp"
 #include "../Property.hpp"
 #include "Real3D.hpp"
 
 using namespace espresso;
-using namespace espresso::particles;
+using namespace espresso::storage;
 
 struct Fixture {
   Storage::SelfPtr storage;

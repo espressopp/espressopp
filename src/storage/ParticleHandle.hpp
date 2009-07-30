@@ -5,7 +5,7 @@
 #include "esutil/TupleVector.hpp"
 
 namespace espresso {
-  namespace particles {
+  namespace storage {
     /** temporary handle for efficient read/write access to a particle */
     class ParticleHandle {
     public:

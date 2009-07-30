@@ -3,13 +3,15 @@
 
 #include <iostream>
 
-#include "ParticleHandle.hpp"
 #include "types.hpp"
+#include "storage/ParticleHandle.hpp"
 
 namespace espresso {
-  namespace particles {
+  namespace storage {
     class Storage;
+  }
 
+  namespace particles {
     class Computer {
     public:
       typedef shared_ptr< Computer > SelfPtr;
@@ -22,10 +24,10 @@ namespace espresso {
 	  The Storage should be used to check whether the Properties
 	  that are used in the Computer use the same Storage as the
 	  particles in the Set. */
-      virtual void prepare(const shared_ptr< Storage > storage) = 0;
+      virtual void prepare(const shared_ptr< storage::Storage > storage) = 0;
 
       /** \return whether to interrupt the loop or not. */
-      virtual void apply(const ParticleHandle p) = 0;
+      virtual void apply(const storage::ParticleHandle p) = 0;
 
       /** this function is called after completing operations,
 	  i.e. when the storage can potentially change again.

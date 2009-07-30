@@ -1,8 +1,0 @@
-# nobase_pkginclude_HEADERS += 
-
-# libespresso_common_la_SOURCES += 
-
-python_SCRIPTS += \
-	decomposition/__init__.py \
-	decomposition/Decomposer.py \
-	decomposition/SingleNode.py

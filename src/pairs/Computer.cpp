@@ -1,14 +1,12 @@
 #include "Particle.hpp"
 #include "python.hpp"
 #include "pairs/Computer.hpp"
-#include "particles/Storage.hpp"
+#include "storage/Storage.hpp"
 
 using namespace espresso;
 using namespace espresso::pairs;
 using namespace espresso::python;
-
-using espresso::particles::Storage;
-using espresso::particles::ParticleHandle;
+using namespace espresso::storage;
 
 // We need to put the wrapper class into the namespace, even though it
 // is used only in this file. Otherwise, we get a strange boost runtim
@@ -45,8 +43,8 @@ namespace espresso {
       }
 
     private:
-      particles::PropertyHandle< ParticleId > id1;
-      particles::PropertyHandle< ParticleId > id2;
+      PropertyHandle< ParticleId > id1;
+      PropertyHandle< ParticleId > id2;
     };
   }
 }

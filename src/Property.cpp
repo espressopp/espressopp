@@ -4,6 +4,7 @@
 
 using namespace espresso;
 using namespace espresso::particles;
+using namespace espresso::storage;
 
 PropertyBase::
 PropertyBase(const Storage::SelfPtr _storage)

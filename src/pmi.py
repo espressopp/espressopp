@@ -161,7 +161,7 @@ def __workerExec_(*statements) :
     # executing the statement locally
     for statement in statements:
         log.info("Executing '%s'", statement)
-        exec statement in globals()
+        exec(statement, globals())
 
 def import_(statement) :
     """import_() is an alias for exec_()."""

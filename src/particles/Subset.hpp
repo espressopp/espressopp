@@ -1,7 +1,7 @@
 #ifndef _PARTICLES_SUBSET_HPP
 #define _PARTICLES_SUBSET_HPP
 #include "particles/Set.hpp"
-#include "particles/Storage.hpp"
+#include "storage/Storage.hpp"
 
 namespace espresso {
   namespace particles {
@@ -11,11 +11,11 @@ namespace espresso {
       
       Subset(const Set::SelfPtr superset);
       
-      virtual Storage::SelfPtr getStorage();
+      virtual storage::Storage::SelfPtr getStorage();
 
       static void registerPython();
     private:
-      Storage::SelfPtr storage;
+      storage::Storage::SelfPtr storage;
     };
   }
 }

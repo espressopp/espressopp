@@ -7,7 +7,7 @@
 #include "Property.hpp"
 
 using namespace espresso;
-using namespace espresso::particles;
+using namespace espresso::storage;
 using namespace espresso::python;
 
 /// simple predicate class for "efficient" searching for a particle
@@ -62,7 +62,7 @@ void Storage::deleteProperty(PropertyId id) {
 bool Storage::contains(ParticleHandle) { return true; }
 bool Storage::contains(ParticleId) { return true; }
 
-void Storage::foreachApply(Computer &computer) {
+void Storage::foreachApply(particles::Computer &computer) {
   BOOST_FOREACH(esutil::TupleVector::reference particle, 
 		particles) 
     {
@@ -80,8 +80,8 @@ Storage::getStorage() { return shared_from_this(); }
 void Storage::registerPython() {
   using namespace espresso::python;
 
-  class_< Storage, boost::noncopyable, bases < Set > >
-    ("particles_Storage")
+  class_< Storage, boost::noncopyable, bases < particles::Set > >
+    ("storage_Storage")
     .def("addParticle", &Storage::_addParticle)
     .def("deleteParticle", &Storage::deleteParticle)
     ;

@@ -26,8 +26,8 @@ namespace {
     bc::BC &bc;
     Property< Real3D > &posProperty;
 
-    particles::ParticleHandle p1;
-    particles::PropertyHandle< Real3D > pos;
+    storage::ParticleHandle p1;
+    storage::PropertyHandle< Real3D > pos;
 
     Traverser2(pairs::Computer &_computer, 
 	       bc::BC &_bc, 
@@ -35,13 +35,13 @@ namespace {
       : computer(_computer), bc(_bc), posProperty(_posProperty)
     {}
 
-    void setP1(particles::ParticleHandle _p1) { p1 = _p1; }
+    void setP1(storage::ParticleHandle _p1) { p1 = _p1; }
 
-    void prepare(particles::Storage::SelfPtr storage) {
+    void prepare(storage::Storage::SelfPtr storage) {
       pos = posProperty.getHandle(storage);
     }
 
-    void apply(particles::ParticleHandle p2) {
+    void apply(storage::ParticleHandle p2) {
       if (p1 == p2) throw SameId();
       Real3D pos1 = pos[p1];
       Real3D pos2 = pos[p2];
@@ -58,9 +58,9 @@ namespace {
       : traverser2(_traverser2), set(_set)
     {}
 
-    void prepare(particles::Storage::SelfPtr set) {}
+    void prepare(storage::Storage::SelfPtr set) {}
 
-    void apply(particles::ParticleHandle p1) {
+    void apply(storage::ParticleHandle p1) {
       traverser2.setP1(p1);
       try {
 	set.foreach(traverser2);

@@ -19,24 +19,24 @@ if __name__ == 'espresso.pmi':
 else:
     import unittest
     import inspect
-    from espresso.decomposition import SingleNode
+    from espresso.storage import SingleNode
 
     pmi.execfile_(__file__)
 
     class Common(object) :
         def setUp(self) :
-            self.decomp = SingleNode(self.node)
-            self.prop = self.decomp.createProperty("Integer")
+            self.storage = SingleNode(self.node)
+            self.prop = self.storage.createProperty("Integer")
 
         def testAddParticle(self) :
-            id1 = self.decomp.addParticle(3)
-            id2 = self.decomp.addParticle()
+            id1 = self.storage.addParticle(3)
+            id2 = self.storage.addParticle()
             self.assertEqual(id1, 3)
             self.assert_(id2 > id1)
-            self.assertRaises(IndexError, self.decomp.addParticle, id1)
-            self.assertEqual(self.decomp.getTotalNumberOfParticles(), 2)
+            self.assertRaises(IndexError, self.storage.addParticle, id1)
+            self.assertEqual(self.storage.getTotalNumberOfParticles(), 2)
             counter = pmi.create("LocalCount")
-            self.decomp.foreach(counter)
+            self.storage.foreach(counter)
             counts = counter.getCounts()
             for node, count in enumerate(counts) :
                 if node == self.node :
@@ -45,29 +45,29 @@ else:
                     self.assertEqual(count, 0)
 
         def testDeleteParticle(self) :
-            self.assertRaises(IndexError, self.decomp.deleteParticle, 0)
-            id = self.decomp.addParticle()
-            self.decomp.deleteParticle(id)
-            self.assertEqual(self.decomp.getTotalNumberOfParticles(), 0)
+            self.assertRaises(IndexError, self.storage.deleteParticle, 0)
+            id = self.storage.addParticle()
+            self.storage.deleteParticle(id)
+            self.assertEqual(self.storage.getTotalNumberOfParticles(), 0)
 
         def testAddParticleInvalid(self) :
-            self.assertRaises(TypeError, self.decomp.addParticle, "Olaf")
-            self.assertRaises(TypeError, self.decomp.addParticle, -42)
+            self.assertRaises(TypeError, self.storage.addParticle, "Olaf")
+            self.assertRaises(TypeError, self.storage.addParticle, -42)
 
         def testAddParticleReverse(self) :
-            self.decomp.addParticle(3)
-            self.decomp.addParticle(2)
-            self.assertEqual(self.decomp.maxSeenId, 3)
+            self.storage.addParticle(3)
+            self.storage.addParticle(2)
+            self.assertEqual(self.storage.maxSeenId, 3)
 
         def testDeleteParticle(self) :
-            self.assertRaises(IndexError, self.decomp.deleteParticle, 0)
-            id = self.decomp.addParticle()
-            self.decomp.deleteParticle(id)
-            self.assertEqual(self.decomp.getTotalNumberOfParticles(), 0)
+            self.assertRaises(IndexError, self.storage.deleteParticle, 0)
+            id = self.storage.addParticle()
+            self.storage.deleteParticle(id)
+            self.assertEqual(self.storage.getTotalNumberOfParticles(), 0)
 
         def testNodeOfParticle(self) :
-            id = self.decomp.addParticle()
-            self.assertEqual(self.decomp.getNodeOfParticle(id), self.decomp.masternode)
+            id = self.storage.addParticle()
+            self.assertEqual(self.storage.getNodeOfParticle(id), self.storage.masternode)
 
     class TestLocal(unittest.TestCase, Common) :
         node = mpi.rank

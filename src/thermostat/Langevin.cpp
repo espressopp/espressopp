@@ -10,6 +10,7 @@
 
 using namespace espresso;
 using namespace espresso::particles;
+using namespace espresso::storage;
 using namespace espresso::thermostat;
 
 /* -- define the Logger for the class  ------------------------------------------- */

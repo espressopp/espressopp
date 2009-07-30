@@ -43,12 +43,12 @@ else:
 
     import espresso
     from espresso.pairs import All
-    import espresso.decomposition 
+    import espresso.storage
     import espresso.bc
 
     class TestAll(unittest.TestCase):
         def setUp(self):
-            self.dec = espresso.decomposition.SingleNode((pmi.CONTROLLER + 1) % mpi.size)
+            self.dec = espresso.storage.SingleNode((pmi.CONTROLLER + 1) % mpi.size)
             self.bc = espresso.bc.PeriodicBC()
             self.pos = espresso.Real3DProperty(self.dec)
 

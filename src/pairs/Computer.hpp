@@ -2,8 +2,8 @@
 #define _PAIRS_COMPUTER_HPP
 
 #include "types.hpp"
-#include "particles/ParticleHandle.hpp"
-#include "particles/Storage.hpp"
+#include "storage/ParticleHandle.hpp"
+#include "storage/Storage.hpp"
 #include "boost/function.hpp"
 
 namespace espresso {
@@ -18,13 +18,13 @@ namespace espresso {
       /// @name extended function object interface
       //@{
       typedef Real3D first_argument_type;
-      typedef particles::ParticleHandle second_argument_type;
-      typedef particles::ParticleHandle  third_argument_type;
+      typedef storage::ParticleHandle second_argument_type;
+      typedef storage::ParticleHandle  third_argument_type;
       typedef void                       result_type;
       //@}
 
-      virtual void prepare(particles::Storage::SelfPtr storage1, 
-			   particles::Storage::SelfPtr storage2) = 0;
+      virtual void prepare(storage::Storage::SelfPtr storage1, 
+			   storage::Storage::SelfPtr storage2) = 0;
 
       /** Interface of the routine that is applied to particle pairs
 	  \param dist: distance vector between the two particles
@@ -38,8 +38,8 @@ namespace espresso {
 	  the particles is needed than only the distance.
       */
       virtual void apply(const Real3D dist, 
-			 const particles::ParticleHandle p1, 
-			 const particles::ParticleHandle p2) = 0;
+			 const storage::ParticleHandle p1, 
+			 const storage::ParticleHandle p2) = 0;
 
       virtual void finalize() {}
 

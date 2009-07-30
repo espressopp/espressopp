@@ -5,9 +5,9 @@
 #include "pairs/Computer.hpp"
 
 using namespace espresso::pairs;
-#include <iostream>
-Set::Set(particles::Storage::SelfPtr _storage1,
-	 particles::Storage::SelfPtr _storage2)
+
+Set::Set(storage::Storage::SelfPtr _storage1,
+	 storage::Storage::SelfPtr _storage2)
   : storage1(_storage1), storage2(_storage2) {}
 
 void 
@@ -37,10 +37,6 @@ Set::registerPython() {
 
   void (Set::*foreach1)(Computer::SelfPtr computer) 
     = &Set::foreach;
-
-  // also register the abstract class Set to make virtual functions available
-  // be careful: boost::noncopyable must be used for abstract classes with pure routines
-  // no_init must be used as the abstract class Set has no constructor
 
   class_< Set, boost::noncopyable >("pairs_Set", no_init)
     .def("foreach", foreach1)

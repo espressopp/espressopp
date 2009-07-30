@@ -1,10 +1,11 @@
 #include "particles/Computer.hpp"
-#include "particles/Storage.hpp"
-#include "particles/PropertyHandle.hpp"
+#include "storage/Storage.hpp"
+#include "storage/PropertyHandle.hpp"
 #include "Property.hpp"
 #include "python.hpp"
 
 using namespace espresso;
+using namespace espresso::storage;
 using namespace espresso::particles;
 using namespace espresso::python;
 
