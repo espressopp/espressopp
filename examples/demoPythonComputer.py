@@ -54,7 +54,7 @@ else:
     pmi.execfile_(__file__)
 
     from espresso import Real3D, Real3DProperty, IntegerProperty
-    from espresso.decomposition import SingleNode
+    from espresso.storage import SingleNode
     import random
 
     decomposer = SingleNode(mpi.size-1)
