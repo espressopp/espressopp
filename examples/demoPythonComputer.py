@@ -57,22 +57,22 @@ else:
     from espresso.storage import SingleNode
     import random
 
-    decomposer = SingleNode(mpi.size-1)
-    pos = Real3DProperty(decomposer)
+    storage = SingleNode(mpi.size-1)
+    pos = Real3DProperty(storage)
 
     for count in range(0,100):
-        decomposer.addParticle(count)
+        storage.addParticle(count)
         pos[count] = Real3D(random.random(), random.random(), random.random())
 
     # add property a posteriori
-    tag = IntegerProperty(decomposer)
+    tag = IntegerProperty(storage)
 
     #tag particles
-    decomposer.foreach(pmi.create("ParticleTesterLocal", pos.pmiobject, tag.pmiobject))
+    storage.foreach(pmi.create("ParticleTesterLocal", pos.pmiobject, tag.pmiobject))
 
     # and print tagged ones
     writer=pmi.create("ParticleWriterLocal", pos.pmiobject, tag.pmiobject)
-    decomposer.foreach(writer)
+    storage.foreach(writer)
     count=writer.getCount()
     
     print("printed %d out of %d particles" % count)

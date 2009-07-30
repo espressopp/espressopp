@@ -38,10 +38,20 @@ Interaction(Potential::SelfPtr _potential,
 void Interaction::
 updateForces(const integrator::MDIntegrator& integrator) {
   LOG4ESPP_DEBUG(theLogger, "updateForces at integrator step " << integrator.getIntegrationStep());
+  addForces(integrator.getForceProperty());
+}
 
+void Interaction::
+addForces(const Property< Real3D >::SelfPtr forceProperty) {
   pairs::Computer::SelfPtr computer = 
-    potential->createForceComputer(integrator.getForceProperty());
+    potential->createForceComputer(forceProperty);
+  pairs->foreach(computer);
+}
 
+void Interaction::
+addEnergies(const Property< real >::SelfPtr energyProperty) {
+  pairs::Computer::SelfPtr computer = 
+    potential->createEnergyComputer(energyProperty);
   pairs->foreach(computer);
 }
 
@@ -96,5 +106,7 @@ Interaction::registerPython() {
      init< Potential::SelfPtr, pairs::Set::SelfPtr >())
     .def("connect", &Interaction::connect)
     .def("disconnect", &Interaction::disconnect)
+    .def("addForces", &Interaction::addForces)
+    .def("addEnergies", &Interaction::addEnergies)
     ;
 }

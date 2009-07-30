@@ -15,12 +15,7 @@ namespace espresso {
         \f]
     */
 
-    class FENE
-      : public CentralPotentialTemplate< FENE >
-    {
-    public:
-      typedef shared_ptr< FENE > SelfPtr;
-
+    class _FENE {
     private:
       real K;       
       real r0;
@@ -33,12 +28,11 @@ namespace espresso {
 
       /** Default constructor. Member variables are accessed by setter and getter. */
 
-      FENE(real _K, real _r0, real _rMax) {
+      _FENE(real _K, real _r0, real _rMax) {
 	setK(_K);
 	setR0(_r0);
 	setRMax(_rMax);
       }
-      virtual ~FENE() {}
 
       void setK(real _K) { K = _K; }
       real getK() const { return K; }
@@ -49,22 +43,12 @@ namespace espresso {
       void setRMax(real _rMax) { rMax = _rMax; }
       real getRMax() const { return rMax; }
 
-      using CentralPotential::computeEnergy;
-      virtual real computeEnergy(const real r) const;
-      virtual real computeEnergySqr (const real distSqr) const;
-      virtual Real3D computeForce (const Real3D dist) const;
-
-      /* FENE should probably derived from a two-body potential
-	 without a cutoff to avoid the following */
-      virtual real getCutoffSqr() const;
-
-    protected:
-      friend class ForceComputer< FENE >;
-
-      real _computeEnergy(const real r) const;
+      real _getCutoffSqr() const { return -1.0; }
       real _computeEnergySqr (const real distSqr) const;
       Real3D _computeForce (const Real3D dist) const;
     };
+
+    typedef CentralPotentialWrapper< _FENE > FENE;
   }
 }
 

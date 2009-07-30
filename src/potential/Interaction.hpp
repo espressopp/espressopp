@@ -29,6 +29,8 @@ namespace espresso {
       Interaction(potential::Potential::SelfPtr potential,
 		  pairs::Set::SelfPtr pairs);
 
+      virtual ~Interaction();
+
       /** This method connects this Interaction via its shared pointer to the integrator. */
       void connect(integrator::MDIntegrator::SelfPtr integrator);
 
@@ -38,9 +40,11 @@ namespace espresso {
 
       void disconnect();
 
-      static void registerPython();
+      virtual void addForces(const Property< Real3D >::SelfPtr forceProperty);
 
-      virtual ~Interaction();
+      virtual void addEnergies(const Property< real >::SelfPtr energyProperty);
+
+      static void registerPython();
 
     private:
       potential::Potential::SelfPtr potential;
@@ -55,8 +59,8 @@ namespace espresso {
 
       // This method will be connect to and called by the integrator
 
-      void updateForces(const integrator::MDIntegrator& integrator);
-
+      virtual void updateForces(const integrator::MDIntegrator& integrator);
+      
 
    };
   }

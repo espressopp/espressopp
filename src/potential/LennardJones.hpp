@@ -14,12 +14,7 @@ namespace espresso {
 	\f]
 
     */
-    class LennardJones 
-      : public CentralPotentialTemplate< LennardJones >
-    {
-    public:
-      typedef shared_ptr< LennardJones > SelfPtr;
-
+    class _LennardJones {
     private:
       real epsilon;
       real sigma;
@@ -31,12 +26,11 @@ namespace espresso {
     public:
       static void registerPython();
 
-      LennardJones(real _epsilon, real _sigma, real _cutoff) {
+      _LennardJones(real _epsilon, real _sigma, real _cutoff) {
 	setEpsilon(_epsilon);
 	setSigma(_sigma);
 	setCutoff(_cutoff);
       }
-      virtual ~LennardJones() {}
 
       // Setter and getter
       void setEpsilon(real _epsilon) { epsilon = _epsilon; }
@@ -48,18 +42,13 @@ namespace espresso {
       void setCutoff(real _cutoff) { cutoff = _cutoff; cutoffSqr = cutoff*cutoff; }
       real getCutoff() const { return cutoff; }
 
-      virtual real getCutoffSqr() const { return cutoffSqr; }
-
-      virtual real computeEnergySqr(const real distSqr) const;
-      virtual Real3D computeForce(const Real3D dist) const;
-
-    protected:
-      friend class ForceComputer< LennardJones >;
+      real _getCutoffSqr() const { return cutoffSqr; }
 
       real _computeEnergySqr(const real distSqr) const;
       Real3D _computeForce(const Real3D dist) const;
-
     };
+
+    typedef CentralPotentialWrapper< _LennardJones > LennardJones;
 
   }
 }

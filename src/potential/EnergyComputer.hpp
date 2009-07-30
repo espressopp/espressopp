@@ -46,7 +46,7 @@ namespace espresso {
       virtual void apply(const Real3D dist,
 			 const storage::ParticleHandle p1,
 			 const storage::ParticleHandle p2) {
-	real e = potential.computeEnergy(dist);
+	real e = potential._computeEnergy(dist);
 	energy1[p1] += 0.5*e;
 	energy2[p2] += 0.5*e;
       };

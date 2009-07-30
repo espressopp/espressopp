@@ -16,7 +16,7 @@ if pmi.IS_CONTROLLER:
         'The FENE potential.'
         __metaclass__ = pmi.Proxy
         pmiproxydefs = CentralPotential.pmiproxydefs
-        pmiproxydefs['subjectclass'] = 'espresso.potential.FENELocal'
+        pmiproxydefs['class'] = 'espresso.potential.FENELocal'
         pmiproxydefs['pmiproperty'] = [ 'K', 'r0', 'rMax' ]
 
 

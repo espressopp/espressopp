@@ -18,22 +18,27 @@ Potential::createEnergyComputer(Property< real >::SelfPtr _energyProperty) {
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
 //////////////////////////////////////////////////
-class PythonPotential 
-  : public Potential, 
-    public espresso::python::wrapper<Potential> {
-public:
-  virtual real getCutoffSqr() const {
-    return get_override("getCutoffSqr")();
-  }
+namespace espresso {
+  namespace potential {
+    class _PythonPotential 
+      : public espresso::python::wrapper< Potential > {
+    public:
+      real _getCutoffSqr() const {
+	return get_override("getCutoffSqr")();
+      }
+      
+      real _computeEnergy(const Real3D dist) const {
+	return get_override("computeEnergy")(dist);
+      }
+      
+      Real3D _computeForce(const Real3D dist) const {
+	return get_override("computeForce")(dist);
+      }
+    };
 
-  virtual real computeEnergy(const Real3D dist) const {
-    return get_override("computeEnergy")(dist);
+    typedef PotentialWrapper< _PythonPotential > PythonPotential;
   }
-
-  virtual Real3D computeForce(const Real3D dist) const {
-    return get_override("computeForce")(dist);
-  }
-};
+}
 
 void
 Potential::registerPython() {
@@ -53,8 +58,8 @@ Potential::registerPython() {
     (Property< real >::SelfPtr) 
      = &Potential::createEnergyComputer;
 
-  class_< PythonPotential, boost::noncopyable >
-    ("potential_PythonPotential", no_init)
+  class_< espresso::potential::PythonPotential, boost::noncopyable >
+    ("potential_PythonPotential")
     .def("getCutoffSqr", pure_virtual(&Potential::getCutoffSqr))
     .def("computeEnergy", pure_virtual(&Potential::computeEnergy))
     .def("computeForce", pure_virtual(&Potential::computeForce))

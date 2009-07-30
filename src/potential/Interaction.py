@@ -16,6 +16,12 @@ if pmi.IS_CONTROLLER:
         def connect(self, integrator):
             pmi.call(self.pmiobject.connect, integrator.pmiobject)
 
+        def addForces(self, forceProperty):
+            pmi.call(self.pmiobject.addForces, forceProperty)
+
+        def addEnergies(self, energyProperty):
+            pmi.call(self.pmiobject.addEnergies, energyProperty)
+
 #         __metaclass__ = pmi.Proxy
 #         pmiproxydefs = {
 #             'class': 'espresso.potential.InteractionLocal',
