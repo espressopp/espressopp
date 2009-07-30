@@ -1,5 +1,9 @@
 # set up espresso paths and logging
 from espresso import __setup
+
+from espresso.esutil import pmiimport
+pmiimport('espresso')
+
 from espresso.Property import *
 from espresso.Real3D import *
 from espresso import pmi

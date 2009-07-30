@@ -38,7 +38,6 @@ class _PropertyLocal(object):
         self.cxxclass.__setitem__(self, particle, value)
 
 if pmi.IS_CONTROLLER:
-    pmi.exec_('import espresso')
     class _Property(object) :
         """
         generic functionality of classes representing a particle property. This class mainly acts

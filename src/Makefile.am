@@ -9,14 +9,12 @@ python_LTLIBRARIES =
 include SubMakefile.am
 include include/SubMakefile.am
 include esutil/SubMakefile.am
-include hello/SubMakefile.am
 include storage/SubMakefile.am
 include particles/SubMakefile.am
 include pairs/SubMakefile.am
 include potential/SubMakefile.am
 include bc/SubMakefile.am
 include integrator/SubMakefile.am
-include force/SubMakefile.am
 include thermostat/SubMakefile.am
 
 CLEANFILES =

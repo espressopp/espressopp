@@ -1,9 +1,0 @@
-nobase_pkginclude_HEADERS += \
-	hello/bindings.hpp \
-	hello/HelloWorld.hpp
-
-libespresso_common_la_SOURCES += \
-	hello/bindings.cpp \
-	hello/HelloWorld.cpp
-
-python_SCRIPTS += hello/__init__.py

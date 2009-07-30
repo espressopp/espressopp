@@ -10,7 +10,6 @@ class AllLocal(SetLocal, pairs_All):
             self.cxxinit = True
 
 if pmi.IS_CONTROLLER:
-    pmi.exec_('import espresso.pairs')
     class All(Set):
         def __init__(self, bc, set, posProperty):
             if not hasattr(self, 'pmiobject'):

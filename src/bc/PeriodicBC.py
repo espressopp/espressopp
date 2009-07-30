@@ -23,7 +23,6 @@ class PeriodicBCLocal(_PeriodicBC) :
     def length(self, _length) : self.set(length=_length)
 
 if pmi.IS_CONTROLLER:
-    pmi.exec_('import espresso.bc.PeriodicBC')
     class PeriodicBC(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = {

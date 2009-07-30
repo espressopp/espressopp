@@ -11,7 +11,6 @@ class LennardJonesLocal(CentralPotentialLocal, potential_LennardJones):
         cxxinit(self, potential_LennardJones, epsilon, sigma, cutoff)
 
 if pmi.IS_CONTROLLER:
-    pmi.exec_('import espresso.potential')
     class LennardJones(CentralPotential):
         'The Lennard-Jones potential.'
         pmiproxydefs = CentralPotential.pmiproxydefs

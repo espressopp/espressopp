@@ -12,7 +12,6 @@ class FENELocal(CentralPotentialLocal, potential_FENE) :
 
 # wrap FENE
 if pmi.IS_CONTROLLER:
-    pmi.exec_('import espresso.potential')
     class FENE(object) :
         'The FENE potential.'
         __metaclass__ = pmi.Proxy

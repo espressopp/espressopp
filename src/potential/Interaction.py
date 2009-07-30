@@ -8,7 +8,6 @@ class InteractionLocal(potential_Interaction):
         cxxinit(self, potential_Interaction, potential, pairs)
 
 if pmi.IS_CONTROLLER:
-    pmi.exec_('import espresso.potential')
     class Interaction(object):
         def __init__(self, potential, pairs):
             pmiinit(self, 'espresso.potential.InteractionLocal',

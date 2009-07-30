@@ -8,7 +8,6 @@ class LangevinLocal(ThermostatLocal, thermostat_Langevin):
         cxxinit(self, thermostat_Langevin, temperature, gamma)
 
 if pmi.IS_CONTROLLER:
-    pmi.exec_('import espresso.thermostat')
     class Langevin(Thermostat):
 #         __metaclass__ = pmi.Proxy
 #         pmiproxydefs = Thermostat.pmiproxydefs
