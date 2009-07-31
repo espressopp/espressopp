@@ -153,6 +153,32 @@ else:
 
             pmi.exec_('del myadd')
 
+    class TestExec(unittest.TestCase) :
+        def testImportModule(self) :
+            pmi.exec_("import random")
+            # check that it's loaded into pmi
+            self.assert_(hasattr(pmi, 'random'))
+            # check that the main namespace is not polluted
+            try :
+                exec 'n=random.__name__'
+                self.fail("expected a NameError")
+            except NameError :
+                pass
+            else :
+                self.fail("expected a NameError")
+            # clean up
+            pmi.exec_("del(random)")
+            # check that it's gone
+            self.assertFalse(hasattr(pmi, 'random'))
+
+        def testImportModuleAs(self) :
+            pmi.exec_("import random as s")
+            # check that it's loaded
+            self.assert_(hasattr(pmi, 's'))
+            self.assertEqual(pmi.s.__name__, "random")
+            # clean up
+            pmi.exec_("del(s)")
+
 ## Mock Classes
 # This class is visible to all workers and the frontend
 class MockClass(object):
