@@ -453,7 +453,7 @@ for srcdir in dirs:
     # EXECUTE PARALLEL PYTHON UNITTESTS
     if HAVE_MPI and do_parallel and py_ptests:
         if verbose:
-            print('Executing ptests using %s MPI tasks' % num_tasks)
+            print('Executing ptests using %s MPI tasks.' % num_tasks)
         print("\n**************************************************")
         print('**** RUNNING PARALLEL PYTHON UNITTESTS (%d CPUs)' % num_tasks)
         PARALLELPYTHON = ESPRESSO_MPIEXEC + ' -n ' + str(num_tasks) + ' ' + PYRUN

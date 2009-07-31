@@ -85,6 +85,7 @@ UserError is raised.
 * exec_() and import_() to execute arbitrary python code in parallel
   and to import classes and functions into the global namespace of
   pmi.
+* sync() to make sure that all deleted PMI objects have been deleted.
 * finalizeWorkers() to stop and exit all workers
 * registerAtExit() to make sure that finalizeWorkers() is called when
   python exits on the controller
@@ -226,7 +227,7 @@ def create(cls=None, *args, **kwds) :
         log.info('Creating: %s [%s]', 
                  __formatCall(cls.__name__, cargs, ckwds), oid)
 
-        # create the instance
+        # create the controller instance
         obj = cls(*cargs, **ckwds)
         # store the oid in the instance
         obj.__pmioid = oid
@@ -241,7 +242,7 @@ def __workerCreate(cls, oid, *targs, **tkwds) :
     args, kwds = __backtranslateArgs(targs, tkwds)
     log.info('Creating: %s [%s]'
              % (__formatCall(cls.__name__, args, kwds), oid))
-    # create the new object
+    # create the worker instance
     obj = cls(*args, **kwds)
     # store the new object
     if oid in OBJECT_CACHE :
@@ -252,46 +253,7 @@ def __workerCreate(cls, oid, *targs, **tkwds) :
 ##################################################
 ## CLONE
 ##################################################
-# If a class is picklable, a living instance can be cloned
-
-##################################################
-## INVOKE
-##################################################
-def invoke(function=None, *args, **kwds) :
-    """Invoke a function on all workers, gathering the return values into a list.
-
-    function denotes the function that is to be called, *args and
-    **kwds are the arguments to the function. If **kwds contains keys
-    that start with with the prefix '__pmictr_', they are stripped of
-    the prefix and are passed only to the controller.
-
-    invoke() returns the results of the different workers as a list.
-    Only functions that are known to PMI can be used, that is functions
-    that have been imported to pmi via exec_() or import_().
-
-    Example:
-    >>> pmi.exec_('import hello')
-    >>> hw = pmi.create('hello.HelloWorld')
-    >>> messages = pmi.invoke(hw.hello())
-    >>> # alternative:
-    >>> messages = pmi.invoke('hello.HelloWorld.hello', hw)
-    """
-    if __checkController(invoke) :
-        function = __translateInvokeArg(function)
-        cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
-        _broadcast(_INVOKE, function, *targs, **tkwds)
-
-        log.info("Invoking: %s", __formatCall(function, cargs, ckwds))
-        value = __invoke(function, cargs, ckwds)
-        return mpi.world.gather(value, root=CONTROLLER)
-    else :
-        return receive(_INVOKE)
-
-def __workerInvoke(function, *targs, **tkwds) :
-    args, kwds = __backtranslateArgs(targs, tkwds)
-    log.info("Invoking: %s", __formatCall(function, args, kwds))
-    value = __invoke(function, args, kwds)
-    return mpi.world.gather(value, root=CONTROLLER) 
+# If the class is picklable, a living instance can be converted into a pmi object
 
 ##################################################
 ## CALL (INVOKE WITHOUT RESULT)
@@ -303,9 +265,8 @@ def call(function=None, *args, **kwds) :
     **kwds are the arguments to the function. If **kwds contains keys
     that start with with the prefix '__pmictr_', they are stripped of
     the prefix and are passed only to the controller.
-    If the function should return any results on the workers, they
-    will be silently ignored. Only the result on the controller will
-    be returned by call().
+    If the function should return any results, it will be locally
+    returned.
     Only functions that are known to PMI can be used, that is functions
     that have been imported to pmi via exec_() or import_().
     
@@ -321,22 +282,63 @@ def call(function=None, *args, **kwds) :
     been imported via exec_().
     """
     if __checkController(call) :
-        function = __translateInvokeArg(function)
+        cfunction, tfunction = __translateFunctionArg(function)
         cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
-        _broadcast(_CALL, function, *targs, **tkwds)
-        log.info("Calling: %s", __formatCall(function, cargs, ckwds))
-        return __invoke(function, cargs, ckwds)
+        _broadcast(_CALL, tfunction, *targs, **tkwds)
+        log.info("Calling: %s", __formatCall(cfunction, cargs, ckwds))
+        return cfunction(*cargs, **ckwds)
     else :
-        receive(_CALL)
+        return receive(_CALL)
 
 def __workerCall(function, *targs, **tkwds) :
+    function = __backtranslateFunctionArg(function)
     args, kwds = __backtranslateArgs(targs, tkwds)
     log.info("Calling: %s", __formatCall(function, args, kwds))
-    __invoke(function, args, kwds)
+    return function(*args, **kwds)
 
 def invokeNoResult(function, *args, **kwds) :
     """invokeNoResult() is an alias for call()."""
-    call(function, *args, **kwds)
+    return call(function, *args, **kwds)
+
+##################################################
+## INVOKE
+##################################################
+def invoke(function=None, *args, **kwds) :
+    """Invoke a function on all workers, gathering the return values into a list.
+
+    function denotes the function that is to be called, *args and
+    **kwds are the arguments to the function. If **kwds contains keys
+    that start with with the prefix '__pmictr_', they are stripped of
+    the prefix and are passed only to the controller.
+
+    On the controller, invoke() returns the results of the different
+    workers as a list. On the workers, invoke returns None.
+    Only functions that are known to PMI can be used, that is functions
+    that have been imported to pmi via exec_() or import_().
+
+    Example:
+    >>> pmi.exec_('import hello')
+    >>> hw = pmi.create('hello.HelloWorld')
+    >>> messages = pmi.invoke(hw.hello())
+    >>> # alternative:
+    >>> messages = pmi.invoke('hello.HelloWorld.hello', hw)
+    """
+    if __checkController(invoke) :
+        cfunction, tfunction = __translateFunctionArg(function)
+        cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
+        _broadcast(_INVOKE, tfunction, *targs, **tkwds)
+        log.info("Invoking: %s", __formatCall(cfunction, cargs, ckwds))
+        value = cfunction(*cargs, **ckwds)
+        return mpi.world.gather(value, root=CONTROLLER)
+    else :
+        return receive(_INVOKE)
+
+def __workerInvoke(function, *targs, **tkwds) :
+    function = __backtranslateFunctionArg(function)
+    args, kwds = __backtranslateArgs(targs, tkwds)
+    log.info("Invoking: %s", __formatCall(function, args, kwds))
+    value = function(*args, **kwds)
+    return mpi.world.gather(value, root=CONTROLLER) 
 
 ##################################################
 ## REDUCE (INVOKE WITH REDUCED RESULT)
@@ -372,52 +374,43 @@ def reduce(reduceOp=None, function=None, *args, **kwds) :
         # handle reduceOp argument
         if reduceOp is None :
             raise UserError("pmi.reduce expects reduceOp argument on controller")
-        if isinstance(reduceOp, types.StringTypes) :
-            pass
-        elif isinstance(reduceOp, types.FunctionType) :
-            reduceOp = '.'.join((reduceOp.__module__, reduceOp.__name__))
-        else :
-            raise ValueError("pmi.reduce expects function as first argument, but got %s instead" % reduceOp)
-        function = __translateInvokeArg(function)
+        creduceOp, treduceOp = __translateFunctionArg(reduceOp)
+        cfunction, tfunction = __translateFunctionArg(function)
         cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
-        _broadcast(_REDUCE, reduceOp, function, *targs, **tkwds)
-        log.info("Reducing: %s", __formatCall(function, cargs, ckwds))
-        value = __invoke(function, args, ckwds)
-        log.info("Reducing results via %s", reduceOp)
-        reduceOp = eval(reduceOp)
-        return mpi.world.reduce(op=reduceOp, value=value, root=CONTROLLER)
+        _broadcast(_REDUCE, treduceOp, tfunction, *targs, **tkwds)
+        log.info("Reducing: %s", __formatCall(cfunction, cargs, ckwds))
+        value = cfunction(*args, **ckwds)
+        log.info("Reducing results via %s", creduceOp)
+        return mpi.world.reduce(op=creduceOp, value=value, root=CONTROLLER)
     else :
         return receive(_REDUCE)
 
 def __workerReduce(reduceOp, function, *targs, **tkwds) :
+    reduceOp = __backtranslateFunctionArg(reduceOp)
+    function = __backtranslateFunctionArg(function)
     args, kwds = __backtranslateArgs(targs, tkwds)
     log.info("Reducing: %s", __formatCall(function, args, kwds))
-    value = __invoke(function, args, kwds)
+    value = function(*args, **kwds)
     log.info("Reducing results via %s", reduceOp)
-    reduceOp = eval(reduceOp)
     return mpi.world.reduce(op=reduceOp, value=value, root=CONTROLLER) 
 
 ##################################################
-## AUTOMATIC OBJECT DELETION
+## SYNC
 ##################################################
-def __delete() :
-    """Internal controller command that deletes PMI objects on the
+def sync():
+    """Controller command that deletes the PMI objects on the
     workers that have already been deleted on the controller.
     """
-    global DELETED_OIDS
-    if len(DELETED_OIDS) > 0 :
-        log.debug("Got %d objects in DELETED_OIDS.", len(DELETED_OIDS))
-        __broadcastCmd(_DELETE, *DELETED_OIDS)
-        DELETED_OIDS = []
+    if __checkController(sync):
+        _broadcast(_SYNC)
+    else:
+        receive(_SYNC)
 
-def __workerDelete(*args) :
-    """Deletes the OBJECT_CACHE reference to a PMI object."""
-    log.info("Deleting oids: %s", args)
-    for oid in args :
-        obj=OBJECT_CACHE[oid]
-        log.debug("  %s [%s]" % (obj, oid))
-        # Delete the entry from the cache
-        del OBJECT_CACHE[oid]
+def __workerSync():
+    """Worker sync is a nop, it only exists for the possible deletion
+    of objects.
+    """
+    pass
 
 ##################################################
 ## DUMP
@@ -433,6 +426,31 @@ def dump() :
 def __workerDump() :
     import pprint
     log.info("OBJECT_CACHE=%s", pprint.pformat(OBJECT_CACHE))
+
+##################################################
+## AUTOMATIC OBJECT DELETION
+##################################################
+def __delete():
+    """Internal implementation of sync(). If explicit is True, it will
+    send an empty sync signal to the workers, even if no objects need
+    to be deleted.
+    """
+    global DELETED_OIDS
+    if len(DELETED_OIDS) > 0:
+        log.debug("Got %d objects in DELETED_OIDS.", len(DELETED_OIDS))
+        __broadcastCmd(_DELETE, *DELETED_OIDS)
+        DELETED_OIDS = []
+
+def __workerDelete(*args) :
+    """Deletes the OBJECT_CACHE reference to a PMI object."""
+    if len(args) > 0:
+        log.info("Deleting oids: %s", args)
+        for oid in args :
+            obj=OBJECT_CACHE[oid]
+            log.debug("  %s [%s]" % (obj, oid))
+            # Delete the entry from the cache
+            del OBJECT_CACHE[oid]
+
 
 ##################################################
 ## WORKER LOOP CONTROL
@@ -510,8 +528,7 @@ class Proxy(type):
             self.cls._normalizeClass()
             method_self.pmiobject = create(self.cls.pmiobjectclass, *args, **kwds)
             if hasattr(self, 'oldinit'):
-                self.oldinit(method_self)
-#                self.oldinit(method_self, *args, **kwds)
+                self.oldinit(method_self, *args, **kwds)
 
     class LocalCaller(object):
         def __init__(self, cls, methodName):
@@ -676,8 +693,8 @@ def receive(expected=None) :
     cmd = message.cmd
     args = message.args
     kwds = message.kwds
-    if cmd == _DELETE :
-        # if delete is sent, delete the objects
+    if cmd == _DELETE:
+        # if _DELETE is sent, delete the objects
         __workerDelete(*args)
         # recursively call receive once more
         return receive(expected)
@@ -876,30 +893,32 @@ class __Method(object) :
         return self.method(*args, **kwds)
 
 # translate arguments to invoke
-def __translateInvokeArg(arg0) :
+def __translateFunctionArg(arg0):
     """Internal controller function that normalizes the function
     argument to invoke(), call() or reduce().
     """
     if arg0 is None :
-        raise UserError("pmi.__invoke expects function argument on controller")
+        raise UserError("pmi expects function argument on controller")
     if isinstance(arg0, types.StringTypes):
-        function = arg0
+        tfunction = arg0
+        function = eval(arg0, globals())
     elif isinstance(arg0, (types.FunctionType, types.BuiltinFunctionType)):
         if arg0.__name__ == '<lambda>':
-            raise ValueError("pmi.__translateInvokeArgs cannot handle lambda functions")
-        function = arg0
+            raise ValueError("pmi cannot handle lambda functions")
+        tfunction = arg0
+        function = tfunction
     elif isinstance(arg0, (types.MethodType, types.BuiltinMethodType)):
-        function = __Method(arg0.im_func.__name__, arg0.im_self, arg0.im_class)
+        tfunction = __Method(arg0.im_func.__name__, arg0.im_self, arg0.im_class)
+        function = tfunction
     else :
-        raise ValueError("pmi.__translateInvokeArgs expects function as first argument, but got %s" % arg0)
-    return function
+        raise ValueError("pmi expects function, but got %s" % arg0)
+    return function, tfunction
 
-def __invoke(function, args, kwds):
-    if isinstance(function, types.StringTypes):
-        function = eval(function, globals())
-    log.debug("Invoking function: %s",
-              __formatCall(function.__name__, args, kwds))
-    return function(*args, **kwds)
+def __backtranslateFunctionArg(arg0):
+    if isinstance(arg0, types.StringTypes):
+        return eval(arg0, globals())
+    else:
+        return arg0
 
 def __formatCall(function, args, kwds) :
     def formatArgs(args, kwds) :
@@ -911,15 +930,19 @@ def __formatCall(function, args, kwds) :
     return '%s(%s)' % (function, formatArgs(args, kwds))
 
 # map of command names and associated worker functions
-_CMD = [ ('EXEC', __workerExec_),
-         ('EXECFILE', __workerExecfile_),
-          ('CREATE', __workerCreate),
-          ('INVOKE', __workerInvoke),
-          ('CALL', __workerCall),
-          ('REDUCE', __workerReduce),
-          ('DELETE', __workerDelete),
-          ('STOP', __workerStop),
-          ('DUMP', __workerDump) ]
+_CMD = [ 
+    ('EXEC', __workerExec_),
+    ('EXECFILE', __workerExecfile_),
+    ('CREATE', __workerCreate),
+    ('INVOKE', __workerInvoke),
+    ('CALL', __workerCall),
+    ('REDUCE', __workerReduce),
+    ('DELETE', __workerDelete),
+    ('SYNC', __workerSync),
+    ('STOP', __workerStop),
+    ('DUMP', __workerDump) 
+    ]
+
 _MAXCMD = len(_CMD)
 
 # define the numerical constants to be used
