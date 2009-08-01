@@ -22,13 +22,13 @@ logging.getLogger("Langevin").setLevel(logging.INFO)
 logging.getLogger("ForceComputer").setLevel(logging.INFO)
 logging.getLogger("Integrator").setLevel(logging.INFO)
 
-from _espresso import particles_Storage as Storage
+from _espresso import storage_Storage as Storage
 from _espresso import Real3DProperty
 from _espresso import Real3D
 from _espresso import bc_PeriodicBC as PeriodicBC
 from _espresso import particles_PythonComputer 
 from _espresso import pairs_PythonComputer 
-from _espresso import particles_All
+#from _espresso import particles_All
 from _espresso import pairs_All as All2
 from _espresso import pairs_List as List
 from _espresso import potential_LennardJones as LennardJones

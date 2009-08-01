@@ -1,30 +1,26 @@
+#include "types.hpp"
 #include "List.hpp"
 #include "python.hpp"
 
 #include <stdexcept>
-#include <types.hpp>
 #include <algorithm>
 
 using namespace espresso::pairs;
-using namespace espresso::particles;
+using namespace espresso::storage;
 using namespace std;
 
 /* Destructor */
-
-List::~List() 
-
+List::~List()
 {}
 
-/* Constructor for this class  */
-
+/* Constructor */
 List::List(bc::BC::SelfPtr _bc, 
            Storage::SelfPtr _storage, 
-           Real3DProperty::SelfPtr _coordinates) :
+           Property< Real3D >::SelfPtr _posProperty) :
 
    storage(_storage),
    bc(_bc),
-   coordinates(_coordinates) 
-
+   posProperty(_posProperty)
    {}
 
 size_t List::size() const {
@@ -58,7 +54,7 @@ List::foreach(PairComputer)
 template<class Computer, class Handle>
 void List::foreach(Computer& pairComputer) const {
   vector<Tuple>::const_iterator it;
-  ConstPropertyHandle<Real3D> pos = *coordinates;
+  PropertyHandle<Real3D> pos = *posProperty;
 
   for (it = id_list.begin(); it != id_list.end(); it++) {
     Handle pref1 = storage->getParticleHandle(it->first);
@@ -73,9 +69,11 @@ void List::foreach(Computer& pairComputer) {
   foreach<Computer, ParticleHandle>(pairComputer);
 }
 
+/**
 void List::foreach(ConstComputer& pairComputer) const {
   foreach<ConstComputer, ConstParticleHandle>(pairComputer);
 }
+*/
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -87,8 +85,7 @@ List::registerPython() {
 
   class_< List, bases< Set > >
     ("pairs_List", 
-     init< bc::BC::SelfPtr, particles::Storage::SelfPtr, Real3DProperty::SelfPtr >())
+     init< bc::BC::SelfPtr, storage::Storage::SelfPtr, Property< Real3D >::SelfPtr >())
     .def("addPair", &List::addPair)
     ;
 }
-

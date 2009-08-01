@@ -1,9 +1,9 @@
 #include "python.hpp"
-
 #include "bindings.hpp"
+
+#include "Computer.hpp"
 #include "All.hpp"
 //#include "List.hpp"
-#include "Computer.hpp"
 
 namespace espresso {
   namespace pairs {
@@ -14,7 +14,8 @@ namespace espresso {
       Set::registerPython();
       Computer::registerPython();
       All::registerPython();
-//       List::registerPython();
+      //List::registerPython();
+
     }
 
   }

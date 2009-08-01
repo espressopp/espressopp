@@ -10,7 +10,6 @@ libespresso_common_la_SOURCES += \
 	pairs/Set.cpp \
 	pairs/Computer.cpp \
 	pairs/All.cpp 
-
 #        pairs/List.cpp
 
 
