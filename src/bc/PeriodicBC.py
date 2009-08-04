@@ -1,33 +1,28 @@
-from espresso.esutil import choose
-from espresso import pmi, Real3D
+from espresso.esutil import cxxinit
+from espresso import pmi
+from espresso import toReal3D
 
-from _espresso import bc_PeriodicBC as _PeriodicBC
+from _espresso import bc_PeriodicBC 
 
-class PeriodicBCLocal(_PeriodicBC) :
+class PeriodicBCLocal(bc_PeriodicBC) :
     'The (local) periodic boundary condition.'
+    def __init__(self, length=1.0):
+        length = toReal3D(length)
+        cxxinit(self, bc_PeriodicBC, length)
 
-    def __init__(self, length=1.0) :
-        _PeriodicBC.__init__(self)
-        self.set(length)
+    # override length property
+    def setLength(self, length):
+        bc_PeriodicBC.length.fset(self, toReal3D(length))
 
-    def set(self, length=None) :
-        """set( length ) -> None -- Set the "parameters" of the boundary condition.
-        """
-        if type(length) is not Real3D: length = Real3D(length)
-        return _PeriodicBC.set(self, choose(length, self.length))
+    length = property(bc_PeriodicBC.length.fget, setLength)
 
-    # define properties
-    @property
-    def length(self) : return self.getLength()
-    @length.setter
-    def length(self, _length) : self.set(length=_length)
+
 
 if pmi.IS_CONTROLLER:
     class PeriodicBC(object):
         __metaclass__ = pmi.Proxy
-        pmiproxydefs = {
-            'subjectclass' : 'espresso.bc.PeriodicBCLocal',
-            'pmicall' : [ 'set' ],
-            'localcall' : [ 'fold', 'foldThis', 'getDist', 'getRandomPos' ],
-            'pmiproperty' : [ 'length' ]
-            }
+        pmiproxydefs = dict(
+            cls =  'espresso.bc.PeriodicBCLocal',
+            localcall = [ 'fold', 'foldThis', 'getDist', 'getRandomPos' ],
+            pmiproperty = [ 'length' ]
+            )

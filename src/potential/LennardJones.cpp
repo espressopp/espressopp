@@ -55,7 +55,6 @@ Real3D _LennardJones::_computeForce(const Real3D dist) const {
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
 //////////////////////////////////////////////////
-
 void 
 _LennardJones::registerPython() {
   using namespace espresso::python;

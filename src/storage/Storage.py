@@ -1,7 +1,7 @@
 from espresso.esutil import *
 from espresso import pmi
 from espresso import Property
-from espresso.particles import SetLocal
+from espresso.particles.Set import *
 import types
 
 from _espresso import storage_Storage
@@ -13,11 +13,7 @@ class StorageLocal(SetLocal, storage_Storage):
     def checkProperty(self, property):
         self.cxxclass.checkProperty(self, property)
 
-    def foreach(self, computer):
-        self.cxxclass.foreach(self, computer)
-
 if pmi.IS_CONTROLLER :
-    from espresso.particles import Set
     class Storage(Set):
         """
         The basic particle storage. This class is responsible for
@@ -31,6 +27,8 @@ if pmi.IS_CONTROLLER :
         memory on each processor is in general subdivided into several
         smaller boxes or cells.
         """
+        pmiproxydefs = dict(cls = 'espresso.storage.StorageLocal')
+
         def createProperty(self, type, dimension = 1) :
             """
             create a Property in this particle storage. For example, adding a scalar real Property:

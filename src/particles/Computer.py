@@ -1,7 +1,8 @@
 from espresso import pmi
+from espresso.esutil import cxxinit
 from _espresso import particles_PythonComputer
 
-# This is the abstract base class for a computer implemented in Python
+# Python base class for Computers
 class PythonComputerLocal(particles_PythonComputer):
     """
     a per-particle-computer using Python code. You mainly need to
@@ -23,9 +24,7 @@ class PythonComputerLocal(particles_PythonComputer):
     Decomposer.foreach, the return value of "finalize" is passed back.
     """
     def __init__(self):
-        if not hasattr(self, 'cxxinit'):
-            particles_PythonComputer.__init__(self)
-            self.cxxinit = True
+        cxxinit(self, particles_PythonComputer)
         
     def prepare(self, storage):
         pass
@@ -39,6 +38,11 @@ class PythonComputerLocal(particles_PythonComputer):
 
     def finalize(self): pass
 
+# ABC for worker Computers
+class ComputerLocal(object):
+    pass
+
 if pmi.IS_CONTROLLER:
+    # ABC for controller Computers
     class Computer(object):
-        pass
+        __metaclass__ = pmi.Proxy

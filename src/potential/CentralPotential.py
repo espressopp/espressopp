@@ -30,12 +30,6 @@ class CentralPotentialLocal(PotentialLocal):
                 return self.cxxclass.computeEnergy(self, arg0)
         return PotentialLocal.computeEnergy(self, *args)
 
-CentralPotentialLocal = PythonCentralPotentialLocal
-
-# from _espresso import potential_PythonCentralPotential
-# class PythonCentralPotentialLocal(CentralPotentialLocal, potential_PythonCentralPotential):
-#     pass
-
 if pmi.IS_CONTROLLER:
     class CentralPotential(Potential):
-        pmiproxydefs = Potential.pmiproxydefs
+        pass

@@ -32,16 +32,9 @@ class PotentialLocal(object):
             self.cxxclass.computeEnergy(self,
                 toReal3DFromVector(*args))
 
-# # this class is the base of all potentials implemented in Python
-# from _espresso import potential_PythonPotential
-# class PythonPotentialLocal(PotentialLocal, potential_PythonPotential):
-#     pass
-
 if pmi.IS_CONTROLLER:
-    class Potential:
+    class Potential(object):
         __metaclass__ = pmi.Proxy
-        pmiproxydefs = {
-            'localcall' : [ 'computeForce', 'computeEnergy' ]
-            }
+        pmiproxydefs = dict(localcall = [ 'computeForce', 'computeEnergy' ])
 
         

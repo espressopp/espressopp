@@ -24,16 +24,15 @@ namespace espresso {
       static void registerPython();
 
       /** Constructor for cubic box */
-      PeriodicBC();
       PeriodicBC(Real3D _length);
       /** Destructor for periodic boundary conditions */
       virtual ~PeriodicBC();
 
       /** Method to set the length of the side of the cubic simulation cell */
-      virtual void set(Real3D length);
+      virtual void setLength(Real3D _length);
       
       /** Method that returns the length of the side of the cubic simulation cell */
-      virtual Real3D getLength(void) const;
+      virtual Real3D getLength() const;
 
       // PMI and Python Visible
       /** Fold the position \p pos into the central image. */

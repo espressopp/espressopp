@@ -21,10 +21,10 @@ class Test0PeriodicBC(unittest.TestCase):
 
     def testSet(self):
         pbc = PeriodicBC()
-        pbc.set(3.0)
+        pbc.length = 3.0
         self.assertEqual(pbc.length, Real3D(3.0))
 
-        pbc.set(length=2.0)
+        pbc.length = 2.0
         self.assertEqual(pbc.length, Real3D(2.0))
         
     def testFold(self):

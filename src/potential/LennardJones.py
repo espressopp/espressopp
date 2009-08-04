@@ -13,6 +13,5 @@ class LennardJonesLocal(CentralPotentialLocal, potential_LennardJones):
 if pmi.IS_CONTROLLER:
     class LennardJones(CentralPotential):
         'The Lennard-Jones potential.'
-        pmiproxydefs = CentralPotential.pmiproxydefs
-        pmiproxydefs['class'] = 'espresso.potential.LennardJonesLocal'
-        pmiproxydefs['pmiproperty'] = [ 'epsilon', 'sigma', 'cutoff' ]
+        pmiproxydefs = dict(cls = 'espresso.potential.LennardJonesLocal',
+                            pmiproperty = [ 'epsilon', 'sigma', 'cutoff' ])

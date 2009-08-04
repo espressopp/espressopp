@@ -15,17 +15,15 @@ LOG4ESPP_LOGGER(PeriodicBC::theLogger, "bc.PeriodicBC");
 
 /* ---------------------------------------------------------------------- */
 
-PeriodicBC::PeriodicBC() {}
-
 PeriodicBC::PeriodicBC(Real3D _length) {
   LOG4ESPP_DEBUG(theLogger, "constructor, length = " << length);
-  set(_length);
+  setLength(_length);
 }
 
 PeriodicBC::~PeriodicBC() {}
 
 void 
-PeriodicBC::set(Real3D _length) {
+PeriodicBC::setLength(Real3D _length) {
   length = _length;
   lengthInverse[0] = 1.0 / length[0];
   lengthInverse[1] = 1.0 / length[1];
@@ -75,9 +73,9 @@ PeriodicBC::registerPython() {
   using namespace espresso::python;
 
   //  class_<PeriodicBC, boost::shared_ptr<PeriodicBC>, bases<BC> >("bc_PeriodicBC", init<>())
-  class_<PeriodicBC, bases< BC > >("bc_PeriodicBC", init<>())
-    .def("set", &PeriodicBC::set)
-    .def("getLength", &PeriodicBC::getLength)
+  class_<PeriodicBC, bases< BC > >
+    ("bc_PeriodicBC", init< Real3D >())
+    .add_property("length", &PeriodicBC::getLength, &PeriodicBC::setLength)
     .def("getRandomPos", &PeriodicBC::getRandomPos)
     ;
 }

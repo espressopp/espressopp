@@ -318,6 +318,9 @@ class MockProxyLocal(object):
     delCalled = False
     def __init__(self, arg=None, *args, **kwds):
         self.x = 17
+        self.arg = arg
+        self.args = args
+        self.kwds = kwds
         MockProxyLocal.delCalled = False
     def __del__(self):
         if hasattr(MockProxyLocal, 'delCalled'):
@@ -339,21 +342,25 @@ class MockProxyLocal(object):
     x = property(getX, setX)
 
 if __name__ != 'espresso.pmi':
-    class MockProxy(object):
-        __metaclass__ = pmi.Proxy
-        pmiproxydefs = {
-            'class' : 'MockProxyLocal',
-            'localcall': [ 'f' ],
-            'pmicall': [ 'f2' ],
-            'pmiinvoke': [ 'f3' ],
-            'pmiproperty': [ 'x' ]
-            }
+
+    if pmi.IS_CONTROLLER:
+        class MockProxy(object):
+            __metaclass__ = pmi.Proxy
+            pmiproxydefs = dict(
+                cls = 'MockProxyLocal',
+                localcall = [ 'f' ],
+                pmicall = [ 'f2' ],
+                pmiinvoke = [ 'f3' ],
+                pmiproperty = [ 'x' ]
+                )
+
     class TestProxyCreateAndDelete(unittest.TestCase):
         def testCreateandDelete(self):
             if pmi.IS_CONTROLLER:
                 obj = MockProxy()
                 self.assert_(hasattr(obj, 'pmiobject'))
                 self.assert_(isinstance(obj.pmiobject, pmi.MockProxyLocal))
+                self.assert_(hasattr(obj, 'pmiinit'))
                 del(obj)
             else:
                 pmiobj = pmi.create()
@@ -382,12 +389,11 @@ if __name__ != 'espresso.pmi':
         def testLocalCall(self):
             if pmi.IS_CONTROLLER:
                 self.assertEqual(self.obj.f(), 42)
-            pmi.sync()
-
-            if pmi.IS_CONTROLLER:
+                pmi.sync()
                 self.assertEqual(self.pmiobj.called, 'f')
             else:
                 self.assertFalse(hasattr(self.pmiobj, 'called'))
+                pmi.sync()
 
         def testCall(self):
             if pmi.IS_CONTROLLER:
@@ -406,12 +412,11 @@ if __name__ != 'espresso.pmi':
             
         def testProperty(self):
             if pmi.IS_CONTROLLER:
-                self.obj.x = 2
-                self.assertEqual(self.obj.x, 2)
+                self.obj.x = 42
+                self.assertEqual(self.obj.x, 42)
             else:
                 pmi.call()
-
-            self.assertEqual(self.pmiobj.x, 2)
+            self.assertEqual(self.pmiobj.x, 42)
 
         def testProxyArgument(self):
             global mockFuncArg
@@ -421,20 +426,45 @@ if __name__ != 'espresso.pmi':
                 pmi.call()
             self.assertEqual(mockFuncArg, self.pmiobj)
 
-    class MockProxy2(object):
-        __metaclass__ = pmi.Proxy
-        pmiproxydefs = {
-            'class' : 'MockProxyLocal',
-            }
-
-        def f4(self):
-            self.pmiobject.called = "f4"
-            return 72
         
     class TestModifiedProxy(unittest.TestCase):
+        def testUserSuppliedInit(self):
+            if pmi.IS_CONTROLLER:
+                class MockProxy(object):
+                    __metaclass__ = pmi.Proxy
+                    pmiproxydefs = dict(cls='MockProxyLocal')
+
+                    def __init__(self, arg):
+                        self.arg = arg
+                        self.pmiinit(arg+10)
+
+                obj = MockProxy(42)
+                pmiobj = obj.pmiobject
+                self.assert_(hasattr(obj, 'arg'))
+                self.assertEqual(obj.arg, 42)
+                self.assert_(isinstance(pmiobj, pmi.MockProxyLocal))
+                self.assertEqual(pmiobj.arg, 52)
+                del(pmiobj)
+                del(obj)
+                pmi.sync()
+            else:
+                pmiobj = pmi.create()
+                self.assert_(isinstance(pmiobj, pmi.MockProxyLocal))
+                self.assertEqual(pmiobj.arg, 52)
+                del(pmiobj)
+                pmi.sync()
+
         def testUserSuppliedFunction(self):
             if pmi.IS_CONTROLLER:
-                obj = MockProxy2()
+                class MockProxy(object):
+                    __metaclass__ = pmi.Proxy
+                    pmiproxydefs = dict(cls='MockProxyLocal')
+
+                    def f4(self):
+                        self.pmiobject.called = "f4"
+                        return 72
+
+                obj = MockProxy()
                 pmiobj = obj.pmiobject
                 self.assertEqual(obj.f4(), 72)
                 pmi.sync()
@@ -447,31 +477,88 @@ if __name__ != 'espresso.pmi':
                 self.assertFalse(hasattr(pmiobj, 'called'))
                 pmi.sync()
 
-    class MockProxy3(object):
-        __metaclass__ = pmi.Proxy
-        pmiproxydefs = {
-            'class' : 'MockProxyLocal',
-            }
 
-        def __init__(self, arg):
-            self.arg = arg
-        
-    class TestModifiedProxy2(unittest.TestCase):
-        def testUserSuppliedInit(self):
+class MockProxyLocalBase(object):
+    def f(self, arg=None):
+        self.arg = arg
+        self.fCalled = True
+
+    def g(self, arg=None):
+        self.gArg = arg
+
+class MockProxyLocalDerived(MockProxyLocalBase):
+    def f(self, arg2=None, arg=42):
+        self.arg2 = arg2
+        self.fDerivedCalled = True
+        MockProxyLocalBase.f(self, arg)
+
+if __name__ != 'espresso.pmi':
+
+    if pmi.IS_CONTROLLER:
+        class MockProxyAbstractBase(object):
+            __metaclass__ = pmi.Proxy
+            pmiproxydefs = dict(pmicall=['f', 'g'])
+
+        class MockProxyDerived(MockProxyAbstractBase):
+            __metaclass__ = pmi.Proxy
+            pmiproxydefs = dict(cls='MockProxyLocalDerived')
+
+    class TestProxyHierarchy(unittest.TestCase):
+        def testCreate(self):
             if pmi.IS_CONTROLLER:
-                obj = MockProxy3(42)
+                obj = MockProxyDerived()
                 pmiobj = obj.pmiobject
-                self.assert_(hasattr(obj, 'arg'))
-                self.assertEqual(obj.arg, 42)
+                self.assert_(hasattr(obj, 'f'))
+                self.assert_(hasattr(obj, 'g'))
+                self.assert_(isinstance(pmiobj, pmi.MockProxyLocalDerived))
             else:
                 pmiobj = pmi.create()
+                self.assert_(isinstance(pmiobj, pmi.MockProxyLocalDerived))
 
-            self.assert_(isinstance(pmiobj, pmi.MockProxyLocal))
-            del(pmiobj)
-
+        def testCallInherited(self):
             if pmi.IS_CONTROLLER:
-                del(obj)
-            pmi.sync()
+                obj = MockProxyDerived()
+                pmiobj = obj.pmiobject
+                obj.g(42)
+            else:
+                pmiobj = pmi.create()
+                pmi.call()
 
+            self.assertEqual(pmiobj.gArg, 42)
+
+        def testCallOverridden(self):
+            if pmi.IS_CONTROLLER:
+                obj = MockProxyDerived()
+                pmiobj = obj.pmiobject
+                obj.f(52)
+            else:
+                pmiobj = pmi.create()
+                pmi.call()
+
+            self.assert_(hasattr(pmiobj, 'fDerivedCalled'))
+            self.assert_(hasattr(pmiobj, 'fCalled'))
+            self.assertEqual(pmiobj.arg, 42)
+            self.assertEqual(pmiobj.arg2, 52)
+
+        def testCallRedefined(self):
+            if pmi.IS_CONTROLLER:
+                class MockProxyDerived(MockProxyAbstractBase):
+                    __metaclass__ = pmi.Proxy
+                    pmiproxydefs = dict(cls='MockProxyLocalDerived', 
+                                        localcall=['f'])
+            
+                obj = MockProxyDerived()
+                pmiobj = obj.pmiobject
+                obj.f(52)
+                self.assert_(hasattr(pmiobj, 'fDerivedCalled'))
+                self.assert_(hasattr(pmiobj, 'fCalled'))
+                self.assertEqual(pmiobj.arg, 42)
+                self.assertEqual(pmiobj.arg2, 52)
+            else:
+                pmiobj = pmi.create()
+                self.assertFalse(hasattr(pmiobj, 'fDerivedCalled'))
+                self.assertFalse(hasattr(pmiobj, 'fCalled'))
+
+if __name__ != 'espresso.pmi':
     unittest.main()
 

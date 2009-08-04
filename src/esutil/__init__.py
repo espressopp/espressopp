@@ -46,8 +46,9 @@ def choose(val, altval) :
         return val
 
 def cxxinit(obj, cls, *args, **kwds):
-    if not issubclass(cls, object):
-        raise('cxxinit requires a class input argument.')
+#     # check whether the class is a boost.python class
+#     if not issubclass(cls, type):
+#         raise TypeError('cxxinit requires a class input argument.')
     if not hasattr(obj, 'cxxclass'):
         obj.cxxclass = cls
         cls.__init__(obj, *args, **kwds)

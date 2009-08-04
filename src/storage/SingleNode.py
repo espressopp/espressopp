@@ -32,15 +32,18 @@ if pmi.IS_CONTROLLER :
         The single node particle storage. Stores all particles
         on a single, configurable node.
         """
-        def __init__(self, node = pmi.CONTROLLER) :
-            self.pmiobject = pmi.create('SingleNodeLocal', node)
+        pmiproxydefs = dict(cls='espresso.storage.SingleNodeLocal')
+
+        def __init__(self, node=pmi.CONTROLLER) :
+            self.pmiinit(node)
+            Storage.pmiinit(self)
             self.masternode = node
             # list of all particles. Since they are all on one node, we can as well
             # keep a table of all of them here
             self.particleIds = set()
             self.maxSeenId = -1
 
-        def addParticle(self, id = None) :
+        def addParticle(self, id=None) :
             if id in self.particleIds :
                 raise IndexError("particle %s already exists" % str(id))
             if id is None:

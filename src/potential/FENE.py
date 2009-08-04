@@ -1,5 +1,5 @@
-from espresso.esutil import *
 from espresso import pmi
+from espresso.esutil import *
 
 from espresso.potential.CentralPotential import *
 from _espresso import potential_FENE
@@ -10,14 +10,11 @@ class FENELocal(CentralPotentialLocal, potential_FENE) :
         """Initialize the FENE potential."""
         cxxinit(self, potential_FENE, K, r0, rMax)
 
-# wrap FENE
 if pmi.IS_CONTROLLER:
-    class FENE(object) :
+    class FENE(CentralPotential) :
         'The FENE potential.'
-        __metaclass__ = pmi.Proxy
-        pmiproxydefs = CentralPotential.pmiproxydefs
-        pmiproxydefs['class'] = 'espresso.potential.FENELocal'
-        pmiproxydefs['pmiproperty'] = [ 'K', 'r0', 'rMax' ]
+        pmiproxydefs = dict(cls = 'espresso.potential.FENELocal',
+                            pmiproperty = [ 'K', 'r0', 'rMax' ])
 
 
 

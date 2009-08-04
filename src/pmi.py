@@ -239,7 +239,7 @@ def create(cls=None, *args, **kwds) :
 
 def __workerCreate(cls, oid, *targs, **tkwds) :
     # backtranslate the arguments
-    args, kwds = __backtranslateArgs(targs, tkwds)
+    args, kwds = __backtranslateOIDs(targs, tkwds)
     log.info('Creating: %s [%s]'
              % (__formatCall(cls.__name__, args, kwds), oid))
     # create the worker instance
@@ -292,13 +292,28 @@ def call(function=None, *args, **kwds) :
 
 def __workerCall(function, *targs, **tkwds) :
     function = __backtranslateFunctionArg(function)
-    args, kwds = __backtranslateArgs(targs, tkwds)
+    args, kwds = __backtranslateOIDs(targs, tkwds)
     log.info("Calling: %s", __formatCall(function, args, kwds))
     return function(*args, **kwds)
 
 def invokeNoResult(function, *args, **kwds) :
     """invokeNoResult() is an alias for call()."""
     return call(function, *args, **kwds)
+
+
+##################################################
+## LOCAL CALL
+##################################################
+# provided for convenience
+# you can just use: pmiobject.function(*args, **kwds)
+def localcall(function=None, *args, **kwds):
+    if __checkController(localcall):
+        cfunction, tfunction = __translateFunctionArg(function)
+        args, kwds = __transcendProxies(args, kwds)
+        log.info("Calling locally: %s", __formatCall(function, args, kwds))
+        return cfunction(*args, **kwds)
+    else:
+        raise UserError('Cannot call localcall on worker!')
 
 ##################################################
 ## INVOKE
@@ -335,7 +350,7 @@ def invoke(function=None, *args, **kwds) :
 
 def __workerInvoke(function, *targs, **tkwds) :
     function = __backtranslateFunctionArg(function)
-    args, kwds = __backtranslateArgs(targs, tkwds)
+    args, kwds = __backtranslateOIDs(targs, tkwds)
     log.info("Invoking: %s", __formatCall(function, args, kwds))
     value = function(*args, **kwds)
     return mpi.world.gather(value, root=CONTROLLER) 
@@ -388,7 +403,7 @@ def reduce(reduceOp=None, function=None, *args, **kwds) :
 def __workerReduce(reduceOp, function, *targs, **tkwds) :
     reduceOp = __backtranslateFunctionArg(reduceOp)
     function = __backtranslateFunctionArg(function)
-    args, kwds = __backtranslateArgs(targs, tkwds)
+    args, kwds = __backtranslateOIDs(targs, tkwds)
     log.info("Reducing: %s", __formatCall(function, args, kwds))
     value = function(*args, **kwds)
     log.info("Reducing results via %s", reduceOp)
@@ -515,117 +530,109 @@ def startWorkerLoop() :
 ##################################################
 class Proxy(type):
     class Initializer(object):
-        """Creates the PMI subject of a class.
+        """Creates the PMI object of a proxy class.
         """
-        def __init__(self, cls, oldinit):
-            self.cls = cls
-            if oldinit is not None:
-                self.oldinit = oldinit
+        def __init__(self, pmiobjectclassdef):
+            self.pmiobjectclassdef = pmiobjectclassdef
         def __call__(self, method_self, *args, **kwds):
-            # create the pmi subject
-            log.info('PMI.Proxy class %s is creating pmi subject of type %s',
-                     self.cls, self.cls.pmiobjectclassdef)
-            self.cls._normalizeClass()
-            method_self.pmiobject = create(self.cls.pmiobjectclass, *args, **kwds)
-            if hasattr(self, 'oldinit'):
-                self.oldinit(method_self, *args, **kwds)
+            # create the pmi object
+            log.info('PMI.Proxy of type %s is creating pmi object of type %s',
+                     method_self.__class__.__name__,
+                     self.pmiobjectclassdef)
+            if not hasattr(method_self, 'pmiobject'):
+                method_self.pmiobjectclassdef = self.pmiobjectclassdef
+                pmiobjectclass = _translateClass(self.pmiobjectclassdef)
+                method_self.pmiobject = create(pmiobjectclass, *args, **kwds)
 
     class LocalCaller(object):
-        def __init__(self, cls, methodName):
-            self.cls = cls
+        def __init__(self, methodName):
             self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
-            self.cls._normalizeClass()
-            method = getattr(self.cls.pmiobjectclass, self.methodName)
-            return method(method_self.pmiobject, *args, **kwds)
+            method = getattr(method_self.pmiobject, self.methodName)
+            return localcall(method, *args, **kwds)
 
     class PMICaller(object):
-        def __init__(self, cls, methodName):
-            self.cls = cls
+        def __init__(self, methodName):
             self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
-            self.cls._normalizeClass()
-            method = getattr(self.cls.pmiobjectclass, self.methodName)
-            return call(method, method_self.pmiobject, *args, **kwds)
+            method = getattr(method_self.pmiobject, self.methodName)
+            return call(method, *args, **kwds)
 
     class PMIInvoker(object):
-        def __init__(self, cls, methodName):
-            self.cls = cls
+        def __init__(self, methodName):
             self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
-            self.cls._normalizeClass()
-            method = getattr(self.cls.pmiobjectclass, self.methodName)
-            return invoke(method, method_self.pmiobject, *args, **kwds)
+            method = getattr(method_self.pmiobject, self.methodName)
+            return invoke(method, *args, **kwds)
 
     class PropertyLocalGetter(object):
-        def __init__(self, cls, propName):
-            self.cls = cls
+        def __init__(self, propName):
             self.propName = propName
         def __call__(self, method_self):
-            self.cls._normalizeClass()
-            property = getattr(self.cls.pmiobjectclass, self.propName)
-            self.getter = getattr(property, 'fget')
-            return self.getter(method_self.pmiobject)
+            property = getattr(method_self.pmiobject.__class__, self.propName)
+            getter = getattr(property, 'fget')
+            return getter(method_self.pmiobject)
 
     class PropertyPMISetter(object):
-        def __init__(self, cls, propName):
-            self.cls = cls
+        def __init__(self, propName):
             self.propName = propName
         def __call__(self, method_self, val):
+#             property = getattr(method_self.pmiobject.__class__, self.propName)
+#             setter = getattr(property, 'fset')
+#             return call(setter, method_self.pmiobject, val)
             setter = '.'.join(
-                (self.cls.pmiobjectclassdef,
+                (method_self.pmiobjectclassdef,
                  self.propName, 
                  'fset'))
-            return call(setter, method_self.pmiobject, val)
-
-    def _normalizeClass(cls):
-        if not hasattr(cls, 'pmiobjectclass'):
-            cls.pmiobjectclass = _translateClass(cls.pmiobjectclassdef)
+            return call(setter, method_self, val)
 
     def __addMethod(cls, methodName, caller):
         newMethod = types.MethodType(caller, None, cls)
         setattr(cls, methodName, newMethod)
 
     def __init__(cls, name, bases, dict):
-        if 'pmiproxydefs' not in dict:
-            raise(UserError('PMI proxy class %s has to define pmiproxydefs.' % name))
-        log.info('Making %s a proxy class.' % name)
-        defs = dict['pmiproxydefs']
+        if 'pmiproxydefs' in dict:
+            defs = dict['pmiproxydefs']
 
-        if 'class' in defs:
-            cls.pmiobjectclassdef = defs['class']
-        # TODO: remove when cleaned up
-        if 'subjectclass' in defs:
-            cls.pmiobjectclassdef = defs['subjectclass']
-        if 'class' in defs or 'subjectclass' in defs:
-            if hasattr(cls, '__init__'): 
-                oldinit = getattr(cls, '__init__')
-            else: 
-                oldinit = None
-            cls.__addMethod('__init__', 
-                            Proxy.Initializer(cls, oldinit))
-                        
-        if 'localcall' in defs:
-            for methodName in defs['localcall']:
-                cls.__addMethod(methodName, 
-                                Proxy.LocalCaller(cls, methodName))
+            # now generate the methods of the Proxy object
+            if 'cls' in defs:
+                pmiobjectclassdef = defs['cls']
+                log.info('Defining PMI proxy class %s for pmi object class %s.' 
+                         % (name, pmiobjectclassdef))
 
-        if 'pmicall' in defs:
-            for methodName in defs['pmicall']:
-                cls.__addMethod(methodName, 
-                                Proxy.PMICaller(cls, methodName))
+                # define cls.pmiinit
+                cls.__addMethod('pmiinit', Proxy.Initializer(pmiobjectclassdef))
+                if not isinstance(cls.__init__, types.MethodType):
+                    log.debug('  redirecting __init__ to pmiinit')
+                    cls.__init__ = cls.pmiinit
+            else:
+                log.info('Defining abstract PMI proxy class %s.' % name)
 
-        if 'pmiinvoke' in defs:
-            for methodName in defs['pmiinvoke']:
-                cls.__addMethod(methodName, 
-                                Proxy.PMIInvoker(cls, methodName))
+            if 'localcall' in defs:
+                for methodName in defs['localcall']:
+                    log.debug('  adding local call to %s' % methodName)
+                    cls.__addMethod(methodName, 
+                                    Proxy.LocalCaller(methodName))
 
-        if 'pmiproperty' in defs:
-            for propname in defs['pmiproperty']:
-                newprop = property(
-                    Proxy.PropertyLocalGetter(cls, propname),
-                    Proxy.PropertyPMISetter(cls, propname))
-                setattr(cls, propname, newprop)
+            if 'pmicall' in defs:
+                for methodName in defs['pmicall']:
+                    log.debug('  adding pmi call to %s' % methodName)
+                    cls.__addMethod(methodName, 
+                                    Proxy.PMICaller(methodName))
+
+            if 'pmiinvoke' in defs:
+                for methodName in defs['pmiinvoke']:
+                    log.debug('  adding pmi invoke of %s' % methodName)
+                    cls.__addMethod(methodName, 
+                                    Proxy.PMIInvoker(methodName))
+
+            if 'pmiproperty' in defs:
+                for propname in defs['pmiproperty']:
+                    log.debug('  adding pmi property %s' % propname)
+                    newprop = property(
+                        Proxy.PropertyLocalGetter(propname),
+                        Proxy.PropertyPMISetter(propname))
+                    setattr(cls, propname, newprop)
 
 ##################################################
 ## CONSTANTS AND EXCEPTIONS
@@ -801,7 +808,7 @@ def _translateClass(cls):
 def __mapArgs(func, args, kwds):
     """Internal function that maps a function to the list args and to
     the values of the dict kwds. Used by __translateArgs and
-    __backtranslateArgs.
+    __backtranslateOIDs.
     """
     targs = map(func, args)
     tkwds = {}
@@ -821,17 +828,24 @@ def _translateOID(obj) :
     else:
         return obj
 
-def __translateArgs(args, kwds):
+def _transcendProxy(obj):
+    if hasattr(obj, 'pmiobject'):
+        return obj.pmiobject
+    else:
+        return obj
+
+def __transcendProxies(args, kwds):
+    return __mapArgs(_transcendProxy, args, kwds)
+
+def __translateOIDs(args, kwds):
     """Internal function that translates all PMI object instances that
     occur in args or kwds into __OID objects that can be sent to the
     workers.
     """
-    controllerArgs = []
-    for arg in args:
-        if hasattr(arg, 'pmiobject'):
-            controllerArgs.append(arg.pmiobject)
-        else:
-            controllerArgs.append(arg)
+    return __mapArgs(_translateOID, args, kwds)
+
+def __translateArgs(args, kwds):
+    args, kwds = __transcendProxies(args, kwds)
 
     workerKwds={}
     controllerKwds={}
@@ -845,9 +859,10 @@ def __translateArgs(args, kwds):
             if k not in controllerKwds:
                 controllerKwds[k] = v
 
-    targs, tWorkerKwds = __mapArgs(_translateOID, controllerArgs, workerKwds)
+    targs, tWorkerKwds = __translateOIDs(args, workerKwds)
 
-    return controllerArgs, controllerKwds, targs, tWorkerKwds
+    return args, controllerKwds, targs, tWorkerKwds
+    
 
 def _backtranslateOID(obj) :
     """Internal worker function that backtranslates an __OID object
@@ -863,7 +878,7 @@ def _backtranslateOID(obj) :
     else :
         return obj
 
-def __backtranslateArgs(targs, tkwds):
+def __backtranslateOIDs(targs, tkwds):
     """Internal function that backtranslates all __OID object
     instances that occur in args or kwds into the cached PMI objects
     on the worker.
