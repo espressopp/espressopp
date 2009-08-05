@@ -1,6 +1,7 @@
 #include "All.hpp"
 
 #include <exception>
+#include <cmath>
 
 #include "particles/Computer.hpp"
 #include "python.hpp"
@@ -46,6 +47,14 @@ namespace {
       Real3D pos1 = pos[p1];
       Real3D pos2 = pos[p2];
       Real3D dist = bc.getDist(pos1, pos2);
+
+//       const Real3D length(21.0);
+//       const Real3D length_inv(1.0/length[0], 1.0/length[1], 1.0/length[2]);
+//       Real3D dist = pos1 - pos2;
+//       dist[0] -= round(dist[0] * length_inv[0]) * length[0];
+//       dist[1] -= round(dist[1] * length_inv[1]) * length[1];
+//       dist[2] -= round(dist[2] * length_inv[2]) * length[2];
+      
       computer.apply(dist, p1, p2);
     }
   };

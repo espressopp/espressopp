@@ -25,7 +25,7 @@ namespace espresso {
 
     public: // parts invisible to Python
 
-      virtual void operator()(const Real3D &dist,
+      virtual void operator()(const Real3D dist,
                               const particles::ParticleHandle p1,
                               const particles::ParticleHandle p2);
 

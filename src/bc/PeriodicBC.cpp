@@ -35,23 +35,22 @@ Real3D
 PeriodicBC::getLength(void) const { return length; }
   
 void 
-PeriodicBC::foldThis(Real3D &pos) const {
+PeriodicBC::foldThis(Real3D pos) const {
   pos[0] -= floor(pos[0] * lengthInverse[0]) * length[0];
   pos[1] -= floor(pos[1] * lengthInverse[1]) * length[1];
   pos[2] -= floor(pos[2] * lengthInverse[2]) * length[2];
 }
 
 Real3D 
-PeriodicBC::getDist(const Real3D& pos1, const Real3D& pos2) const {
-  // res = pos2 - pos1
-  Real3D res(pos1);
-  res -= pos2;
+PeriodicBC::getDist(const Real3D pos1, const Real3D pos2) const {
+  // res = pos1 - pos2
+  Real3D dist = pos1 - pos2;
 
-  res[0] -= round(res[0] * lengthInverse[0]) * length[0];
-  res[1] -= round(res[1] * lengthInverse[1]) * length[1];
-  res[2] -= round(res[2] * lengthInverse[2]) * length[2];
+  dist[0] -= round(dist[0] * lengthInverse[0]) * length[0];
+  dist[1] -= round(dist[1] * lengthInverse[1]) * length[1];
+  dist[2] -= round(dist[2] * lengthInverse[2]) * length[2];
 
-  return res;
+  return dist;
 }
 
 Real3D 

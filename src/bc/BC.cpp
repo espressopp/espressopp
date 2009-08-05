@@ -6,7 +6,7 @@ using namespace espresso;
 using namespace espresso::bc;
 
 Real3D 
-BC::fold(const Real3D &pos) const {
+BC::fold(const Real3D pos) const {
   Real3D res(pos);
   foldThis(res);
   return res;

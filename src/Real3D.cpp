@@ -8,7 +8,7 @@ namespace espresso {
   {
     static
     espresso::python::tuple
-    getinitargs(const Real3D& v)
+    getinitargs(const Real3D v)
     { return make_tuple(v[0], v[1], v[2]); }
   };
     
