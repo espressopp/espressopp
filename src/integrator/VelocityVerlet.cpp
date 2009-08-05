@@ -75,14 +75,6 @@ namespace {
   };
 }
 
-VelocityVerlet::VelocityVerlet(Set::SelfPtr set, 
-                               Property< Real3D >::SelfPtr posProperty,
-                               Property< Real3D >::SelfPtr velProperty,
-                               Property< Real3D >::SelfPtr forceProperty,
-			       real _timestep)
-  : MDIntegrator(set, posProperty, velProperty, forceProperty, _timestep) 
-{}
-
 void VelocityVerlet::step() {
   StepA stepA(set, posProperty, velProperty, forceProperty, timestep);
 
@@ -107,8 +99,6 @@ void VelocityVerlet::step() {
   updateVelocity2(*this);
 }
 
-VelocityVerlet::~VelocityVerlet() {}
-
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
 //////////////////////////////////////////////////
@@ -118,8 +108,9 @@ VelocityVerlet::registerPython() {
   using namespace boost;
   using namespace espresso::python;
 
-  // TODO: Why noncopyable?
-  class_< VelocityVerlet, boost::noncopyable, bases< MDIntegrator > >
+  // Velocity Verlet is noncopyable, as it provides signals that can
+  // not easily be copied
+  class_< VelocityVerlet, noncopyable, bases< MDIntegrator > >
     ("integrator_VelocityVerlet", 
      init< 
      Set::SelfPtr, 

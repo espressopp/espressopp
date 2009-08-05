@@ -18,17 +18,17 @@ namespace espresso {
 		     Property< Real3D >::SelfPtr posProperty,
 		     Property< Real3D >::SelfPtr velProperty,
 		     Property< Real3D >::SelfPtr forceProperty,
-		     real timestep);
+		     real _timestep)  
+	: MDIntegrator(set, posProperty, velProperty, forceProperty, _timestep) 
+      {}
 
       /** The following signals are specific for VelocityVerlet */
-
       typedef boost::signals2::signal1<void, const VelocityVerlet&> VelocityVerletSignal;
 
       VelocityVerletSignal updateVelocity1;
-
       VelocityVerletSignal updateVelocity2;
 
-      virtual ~VelocityVerlet();
+      virtual ~VelocityVerlet() {}
 
       static void registerPython();
 

@@ -17,10 +17,12 @@ namespace espresso {
   public:
     typedef shared_ptr< PropertyBase > SelfPtr;
 
-    PropertyBase(const storage::Storage::SelfPtr _storage);
+    PropertyBase(const storage::Storage::SelfPtr _storage)
+      : storage(_storage) {}
 
-    void checkFitsTo(const particles::Set::SelfPtr set) const;
-
+    void checkFitsTo(const particles::Set::SelfPtr set) const {
+      if (set->getStorage() != storage) throw StorageMismatch();
+    }
 
   protected:
     const storage::Storage::SelfPtr getStorage() const { return storage; }
@@ -41,10 +43,8 @@ namespace espresso {
 
       @tparam T type stored in the property
   */
-  // TODO: Should be noncopyable!
-  //  class Property :  boost::noncopyable {
   template < typename T >
-  class Property : public PropertyBase {
+  class Property : public PropertyBase, boost::noncopyable {
     typedef storage::PropertyHandle< T > Handle;
   public:
     typedef shared_ptr< Property< T > > SelfPtr;
@@ -60,11 +60,11 @@ namespace espresso {
     }
 
     T getItem(ParticleId part) {
-      return (*this).at(part);
+      return at(part);
     }
 
     void setItem(ParticleId part, const T &v) {
-      (*this).at(part) = v;
+      at(part) = v;
     }
 
   public: // invisible in Python
