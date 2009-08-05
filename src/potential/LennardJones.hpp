@@ -47,9 +47,6 @@ namespace espresso {
       real _computeEnergySqr(const real distSqr) const;
       Real3D _computeForce(const Real3D dist) const;
     };
-
-//     typedef CentralPotentialWrapper< _LennardJones > LennardJones;
-
   }
 }
 

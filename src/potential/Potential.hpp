@@ -13,8 +13,6 @@ namespace espresso {
     public:
       typedef shared_ptr< Potential > SelfPtr;
 
-      virtual ~Potential() {}
-
       // override these
       virtual pairs::Computer::SelfPtr 
       createEnergyComputer(Property< real >::SelfPtr _energyProperty1,
@@ -47,13 +45,14 @@ namespace espresso {
       typedef shared_ptr< Derived > SelfPtr;
 
       using Potential::createForceComputer;
+      using enable_shared_from_this< Derived >::shared_from_this;
 
       virtual pairs::Computer::SelfPtr 
       createForceComputer(Property< Real3D >::SelfPtr _forceProperty1,
 			  Property< Real3D >::SelfPtr _forceProperty2) {
 	return 
 	  make_shared< ForceComputer< Derived > >
-	  ((*this).shared_from_this(), _forceProperty1, _forceProperty2);
+	  (shared_from_this(), _forceProperty1, _forceProperty2);
       }
       
       using Potential::createEnergyComputer;
@@ -62,7 +61,7 @@ namespace espresso {
 			   Property< real >::SelfPtr _energyProperty2) {
 	return 
 	  make_shared< EnergyComputer< Derived > >
-	  ((*this).shared_from_this(), _energyProperty1, _energyProperty2);
+	  (shared_from_this(), _energyProperty1, _energyProperty2);
       }
       
       virtual real getCutoffSqr() const {
