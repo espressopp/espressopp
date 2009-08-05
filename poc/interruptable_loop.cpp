@@ -141,7 +141,7 @@ int main() {
   cout << "Tesing the interrupted loop (half square):" << endl;
 
   foreachTest< BoolHalfSquare, 100000, 100 >();
-  foreachTest< ExceptionHalfSquare, 10000, 100 >();
+  foreachTest< ExceptionHalfSquare, 100000, 100 >();
 
   foreachTest< BoolHalfSquare, 10, 10000 >();
   foreachTest< ExceptionHalfSquare, 10, 10000 >();

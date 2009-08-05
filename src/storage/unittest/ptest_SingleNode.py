@@ -16,17 +16,17 @@ if __name__ == 'espresso.pmi':
         def getCounts(self):
             return self.counts
 
-else:
+elif pmi.IS_CONTROLLER:
     import unittest
-    import inspect
     from espresso.storage import SingleNode
+    from espresso import IntegerProperty
 
     pmi.execfile_(__file__)
 
     class Common(object) :
         def setUp(self) :
             self.storage = SingleNode(self.node)
-            self.prop = self.storage.createProperty("Integer")
+            self.prop = IntegerProperty(self.storage)
 
         def testAddParticle(self) :
             id1 = self.storage.addParticle(3)
@@ -40,7 +40,7 @@ else:
             counts = counter.getCounts()
             for node, count in enumerate(counts) :
                 if node == self.node :
-                    self.assertEqual(count, 2)
+                    self.assertEqual(count, 1)
                 else :
                     self.assertEqual(count, 0)
 

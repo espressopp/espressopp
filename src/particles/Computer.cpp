@@ -26,8 +26,8 @@ namespace espresso {
       }
 
       /** The operator() calling the Python objects function each */
-      void apply(const ParticleHandle pref) {
-	get_override("apply")(particleId[pref]);
+      bool apply(const ParticleHandle pref) {
+	return get_override("apply")(particleId[pref]);
       }
   
       void finalize() {

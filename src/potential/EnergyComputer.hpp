@@ -43,12 +43,13 @@ namespace espresso {
 	totalEnergy = 0.0;
       }
 
-      virtual void apply(const Real3D dist,
+      virtual bool apply(const Real3D dist,
 			 const storage::ParticleHandle p1,
 			 const storage::ParticleHandle p2) {
 	real e = potential._computeEnergy(dist);
 	energy1[p1] += 0.5*e;
 	energy2[p2] += 0.5*e;
+	return true;
       };
 
       real getAccumulatedEnergy() const { return totalEnergy; }

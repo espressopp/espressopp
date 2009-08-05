@@ -29,12 +29,12 @@ namespace espresso {
 
 	  \return whether the loop finished normally or was interrupted.
        */
-      virtual void foreach(Computer &computer);
+      virtual bool foreach(Computer &computer);
       /** Required only for compilation. */
 //       virtual void foreach(ConstComputer &computer);
 
       /** For the python export. */
-      virtual void foreach(Computer::SelfPtr computer);
+      virtual bool foreach(Computer::SelfPtr computer);
 
       /** A derived Set should override these methods.
 
@@ -47,7 +47,7 @@ namespace espresso {
       static void registerPython();
 
     protected:
-      virtual void foreachApply(Computer &computer) = 0;
+      virtual bool foreachApply(Computer &computer) = 0;
     };
   }
 }

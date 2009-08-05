@@ -1,6 +1,5 @@
-import unittest
 from espresso.bc import *
-from espresso import Real3D
+from espresso import Real3D, unittest
 
 class Test0PeriodicBC(unittest.TestCase):
     def testCreate(self):
@@ -35,8 +34,8 @@ class Test0PeriodicBC(unittest.TestCase):
             ((-1.0, -1.0, -1.0), (9.0, 9.0, 9.0)),
             ((32.0, 54.0, 66.0), (2.0, 4.0, 6.0))
             ]:
-            res = pbc.fold(Real3D(v))
-            self.assertEqual(res, Real3D(expected))
+            res = pbc.fold(v)
+            self.assertAlmostEqualReal3D(res, expected)
 
     def testFoldThis(self):
         pbc = PeriodicBC(10.0)
@@ -48,7 +47,7 @@ class Test0PeriodicBC(unittest.TestCase):
             ]:
             v = Real3D(v)
             pbc.foldThis(v)
-            self.assertEqual(v, Real3D(expected))
+            self.assertAlmostEqualReal3D(v, expected)
 
     def testGetDist(self):
         pbc = PeriodicBC(10.0)
@@ -67,8 +66,8 @@ class Test0PeriodicBC(unittest.TestCase):
             # different distances in different directions
             ((1.0, 12.0, 23.0), (-11.0, -22.0, -33.0), (2.0, 4.0, -4.0)),
             ]:
-            res = pbc.getDist(Real3D(v1), Real3D(v2))
-            self.assertEqual(res, Real3D(expected))
+            res = pbc.getDist(v1, v2)
+            self.assertAlmostEqualReal3D(res, expected)
 
     def testGetRandomPos(self):
         pbc = PeriodicBC(10.0)

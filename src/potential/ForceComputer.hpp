@@ -43,7 +43,7 @@ namespace espresso {
 	virial = 0.0;
       }
 
-      virtual void apply(const Real3D dist, 
+      virtual bool apply(const Real3D dist, 
 			 const storage::ParticleHandle p1, 
 			 const storage::ParticleHandle p2) {
 	Real3D f = potential.computeForce(dist);
@@ -51,6 +51,7 @@ namespace espresso {
 	force2[p2] -= f;
         if (computesVirial) 
 	  virial = virial + f * dist;
+	return true;
       }
     };
   }

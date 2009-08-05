@@ -68,18 +68,18 @@ public:
     finalizeCalled = false;
   }
 
-  virtual void prepare(Storage::SelfPtr storage1, 
+  void prepare(Storage::SelfPtr storage1, 
 		       Storage::SelfPtr storage2) {
     prepareCalled = true;
     id = storage1->getIdPropertyHandle();
     pos = posProperty->getHandle(storage1);
   }
 
-  virtual void finalize() {
+  void finalize() {
     finalizeCalled = true;
   }
   
-  virtual void apply(const Real3D dist,
+  bool apply(const Real3D dist,
 		     const ParticleHandle p1,
 		     const ParticleHandle p2) {
     Real3D pos1 = pos[p1];
@@ -95,6 +95,7 @@ public:
 			"pair doublette: " << id1 << " " << id2);
     
     occupied.insert(pair);
+    return true;
   }
 };
 

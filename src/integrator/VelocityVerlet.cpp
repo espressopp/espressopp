@@ -33,9 +33,10 @@ namespace {
 
     void prepare(Storage::SelfPtr set) {}
   
-    void apply(const ParticleHandle pref) {
+    bool apply(const ParticleHandle pref) {
       pos[pref] = pos[pref] + vel[pref] * timestep + 0.5 * force[pref] * timestepSqr;
       vel[pref] = vel[pref] + 0.5 * force[pref] * timestep;
+      return true;
     }
   };
 
@@ -56,8 +57,9 @@ namespace {
     
     void prepare(Storage::SelfPtr set) {}
 
-    void apply(const ParticleHandle pref) { 
+    bool apply(const ParticleHandle pref) { 
       vel[pref] = vel[pref] + 0.5 * force[pref] * timestep; 
+      return true;
     }
   };
 
@@ -69,8 +71,9 @@ namespace {
       : force(forceProperty->getHandle(set)) {}
     
     void prepare(Storage::SelfPtr set) {}
-    void apply(const ParticleHandle pref) {
+    bool apply(const ParticleHandle pref) {
       force[pref] = 0.0;
+      return true;
     }
   };
 }

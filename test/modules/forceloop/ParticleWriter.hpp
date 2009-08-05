@@ -39,10 +39,11 @@ namespace espresso {
       /** Function that is applied to a read-only particle.
 	  \sa espresso::particlestorage::Particlecomputer::operator()
       */
-      virtual void apply(const storage::ParticleHandle pref) {
+      virtual bool apply(const storage::ParticleHandle pref) {
 	printf("Particle : id = %ld, pos = (%f,%f,%f), f = (%f,%f,%f)\n",
 	       size_t(id[pref]), pos[pref][0], pos[pref][1], pos[pref][2], 
 	       f[pref][0],  f[pref][1],  f[pref][2]);
+	return true;
       }
     };
   }

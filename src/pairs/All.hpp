@@ -28,15 +28,13 @@ namespace espresso {
 	  particles::Set::SelfPtr _set, 
 	  Property< Real3D >::SelfPtr _posProperty);
 
-      using Set::foreach;
-
       virtual ~All() {}
 
     protected:
       /** This routine will apply a function operator to all pairs.
 	  \param pairComputer is the object that provides the function to be applied to all pairs.
       */
-      virtual void foreachApply(Computer &computer);
+      bool foreachApply(Computer &computer);
 
     private:
       particles::Set::SelfPtr set;

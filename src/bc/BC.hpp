@@ -32,7 +32,7 @@ namespace espresso {
 	  \param pos is the position to be folded
       */
       virtual void
-      foldThis(Real3D pos) const = 0;
+      foldThis(Real3D &pos) const = 0;
 
       /** Returns the central image of the position \p pos .
 

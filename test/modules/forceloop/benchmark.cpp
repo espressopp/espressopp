@@ -116,9 +116,9 @@ public:
   void prepare(Storage::SelfPtr storage1,
 	       Storage::SelfPtr storage2) {}
 
-  virtual void apply(const Real3D dist,
+  virtual bool apply(const Real3D dist,
 		     ParticleHandle ref1,
-		     ParticleHandle ref2) {}
+		     ParticleHandle ref2) { return true; }
 };
 
 void TestEspresso::runEmptyPairLoop() {
@@ -138,13 +138,14 @@ public:
   void prepare(Storage::SelfPtr storage1,
 	       Storage::SelfPtr storage2) {}
 
-  virtual void apply(const Real3D dist,
-		     ParticleHandle ref1,
-		     ParticleHandle ref2) {
+  bool apply(const Real3D dist,
+	     ParticleHandle ref1,
+	     ParticleHandle ref2) {
     real d = dist.sqr();
     if (min > d) {
       min = d;
     }
+    return true;
   }
 };
 
@@ -168,9 +169,10 @@ public:
 
   void prepare(Storage::SelfPtr storage) {}
 
-  void apply(ParticleHandle ref) {
+  bool apply(ParticleHandle ref) {
     const Real3D p = property[ref];
     average += sqrt(p.sqr());
+    return true;
   }
 };
 
@@ -185,7 +187,7 @@ class EmptyComputer: public particles::Computer {
 public:
   EmptyComputer() {}
   void prepare(Storage::SelfPtr storage) {}
-  virtual void apply(ParticleHandle ref) {}
+  bool apply(ParticleHandle ref) { return true; }
 };
 
 void TestEspresso::runEmptyLoop() {

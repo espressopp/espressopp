@@ -22,6 +22,7 @@ if __name__ == 'espresso.pmi':
         def apply(self, pid):
             pos = self.position[pid]
             self.tag[pid] = pos*pos < 0.5
+            return True
 
     # write out tagged particles
     class ParticleWriterLocal(PythonComputerLocal):
@@ -41,6 +42,7 @@ if __name__ == 'espresso.pmi':
             if self.tag[pid]:
                 print("%d %d %s" % (mpi.rank, pid, self.property[pid]))
                 self.sphere +=1
+            return True
 
         def _getCount(self):
             return self.sphere, self.total

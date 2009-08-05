@@ -69,7 +69,7 @@ namespace espresso {
       /** This routine will apply a function operator to all pairs of the list.
 	  \param pairComputer is the object that provides the function to be applied.
       */
-      virtual void foreachApply(Computer &computer);
+      virtual bool foreachApply(Computer &computer);
 
     private:
 

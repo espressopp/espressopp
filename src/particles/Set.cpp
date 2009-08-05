@@ -11,7 +11,6 @@ using namespace espresso::storage;
 
 namespace {
 
-  class Found {};
   struct FindMember: public Computer {
     ParticleHandle p1;
 
@@ -20,8 +19,8 @@ namespace {
 
     void prepare(const Storage::SelfPtr storage) {}
 
-    void apply(const ParticleHandle p2) {
-      if (p1 == p2) throw Found();
+    bool apply(const ParticleHandle p2) {
+      return p1 != p2;
     }
   };
 }
@@ -29,12 +28,7 @@ namespace {
 bool
 Set::contains(ParticleHandle p) {
   FindMember findMember(p);
-  try {
-    foreach(findMember);
-  } catch (Found) {
-    return true;
-  }
-  return false;
+  return !foreach(findMember);
 }
 
 bool                                                                           
@@ -42,21 +36,17 @@ Set::contains(ParticleId pid) {
   return contains(getStorage()->getParticleHandle(pid));
 }
 
-void
+bool
 Set::foreach(Computer &computer) {
   computer.prepare(getStorage());
-  try {
-    foreachApply(computer);
-  } catch (ForeachBreak) {
-    computer.finalize();
-    throw;
-  } 
+  bool res = foreachApply(computer);
   computer.finalize();
+  return res;
 }
   
-void
+bool
 Set::foreach(const Computer::SelfPtr computer)
-{ foreach(*computer); }
+{ return foreach(*computer); }
 
 
 //////////////////////////////////////////////////
@@ -66,7 +56,7 @@ void
 Set::registerPython() {
   using namespace espresso::python;
   
-  void (Set::*pyForeach)(Computer::SelfPtr computer) 
+  bool (Set::*pyForeach)(Computer::SelfPtr computer) 
     = &Set::foreach;
 
   bool (Set::*pyContains)(ParticleId pid)

@@ -29,10 +29,10 @@ namespace espresso {
 	  prepare(storage1, storage2);
       }
       
-      void apply(const Real3D dist,
+      bool apply(const Real3D dist,
 		 const ParticleHandle p1,
 		 const ParticleHandle p2) {
-	get_override("apply")(dist, id1[p1], id2[p2]);
+	return get_override("apply")(dist, id1[p1], id2[p2]);
       }
       
       void finalize() {

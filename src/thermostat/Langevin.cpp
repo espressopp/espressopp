@@ -36,8 +36,9 @@ public:
       timeStep(_timeStep), gamma(_gamma) { }
   void prepare(Storage::SelfPtr set) {}
   // m = 1
-  virtual void apply(const ParticleHandle pref) {
+  virtual bool apply(const ParticleHandle pref) {
     vel[pref] = vel[pref] - 0.5 * gamma * vel[pref] * timeStep;
+    return true;
   }
 };
 
@@ -79,9 +80,10 @@ public:
   
   void prepare(Storage::SelfPtr set) {}
   // m = 1
-  virtual void apply(ParticleHandle pref) {
+  virtual bool apply(ParticleHandle pref) {
     Real3D rand3(drand48() - 0.5, drand48() - 0.5, drand48() - 0.5);
     vel[pref] = vel[pref] + 0.5 * (c * rand3 - gamma * vel[pref]) * timeStep;
+    return true;
   }
 
 };

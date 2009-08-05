@@ -26,8 +26,8 @@ namespace espresso {
 	  particles in the Set. */
       virtual void prepare(const shared_ptr< storage::Storage > storage) = 0;
 
-      /** \return whether to interrupt the loop or not. */
-      virtual void apply(const storage::ParticleHandle p) = 0;
+      /** \return whether to continue the loop or not. */
+      virtual bool apply(const storage::ParticleHandle p) = 0;
 
       /** this function is called after completing operations,
 	  i.e. when the storage can potentially change again.

@@ -62,12 +62,14 @@ void Storage::deleteProperty(PropertyId id) {
 bool Storage::contains(ParticleHandle) { return true; }
 bool Storage::contains(ParticleId) { return true; }
 
-void Storage::foreachApply(particles::Computer &computer) {
+bool Storage::foreachApply(particles::Computer &computer) {
   BOOST_FOREACH(esutil::TupleVector::reference particle, 
 		particles) 
     {
-      computer.apply(ParticleHandle(particle));
+      if (!computer.apply(ParticleHandle(particle))) 
+	return false;
     }
+  return true;
 }
 
 Storage::SelfPtr 

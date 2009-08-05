@@ -25,6 +25,7 @@ if __name__ == 'espresso.pmi':
                 pair = (id2, id1)
             self.tc.assertFalse(pair in self.pairApplied)
             self.pairApplied.append(pair)
+            return True
             
         def finalize(self):
             self.finalizeCalled = True

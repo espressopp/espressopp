@@ -23,6 +23,7 @@ namespace {
   class SameId {};
 
   struct Traverser2 : particles::Computer {
+    bool cont;
     pairs::Computer &computer;
     bc::BC &bc;
     Property< Real3D > &posProperty;
@@ -33,7 +34,8 @@ namespace {
     Traverser2(pairs::Computer &_computer, 
 	       bc::BC &_bc, 
 	       Property< Real3D > &_posProperty) 
-      : computer(_computer), bc(_bc), posProperty(_posProperty)
+      : cont(true), 
+	computer(_computer), bc(_bc), posProperty(_posProperty)
     {}
 
     void setP1(storage::ParticleHandle _p1) { p1 = _p1; }
@@ -42,8 +44,8 @@ namespace {
       pos = posProperty.getHandle(storage);
     }
 
-    void apply(storage::ParticleHandle p2) {
-      if (p1 == p2) throw SameId();
+    bool apply(storage::ParticleHandle p2) {
+      if (p1 == p2) return false;
       Real3D pos1 = pos[p1];
       Real3D pos2 = pos[p2];
       Real3D dist = bc.getDist(pos1, pos2);
@@ -55,7 +57,8 @@ namespace {
 //       dist[1] -= round(dist[1] * length_inv[1]) * length[1];
 //       dist[2] -= round(dist[2] * length_inv[2]) * length[2];
       
-      computer.apply(dist, p1, p2);
+      cont = computer.apply(dist, p1, p2);
+      return cont;
     }
   };
 
@@ -69,22 +72,23 @@ namespace {
 
     void prepare(storage::Storage::SelfPtr set) {}
 
-    void apply(storage::ParticleHandle p1) {
+    bool apply(storage::ParticleHandle p1) {
       traverser2.setP1(p1);
-      try {
-	set.foreach(traverser2);
-      } catch (SameId) {};
+      if (!set.foreach(traverser2) && !traverser2.cont) 
+	return false;
+      return true;
     }
   };
 
 }
 
-void All::foreachApply(Computer &computer) {
+bool All::foreachApply(Computer &computer) {
   computer.prepare(set->getStorage(), set->getStorage());
   Traverser2 traverser2(computer, *bc, *posProperty);
   Traverser1 traverser1(traverser2, *set);
-  set->foreach(traverser1);
+  bool res = set->foreach(traverser1);
   computer.finalize();
+  return res;
 }
 
 //////////////////////////////////////////////////

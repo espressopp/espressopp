@@ -21,13 +21,13 @@ namespace espresso {
       /** Apply computer to all pairs of this set. Call prepare() and
 	  finalize().
        */
-      virtual void foreach(Computer& computer);
-      virtual void foreach(Computer::SelfPtr computer);
+      virtual bool foreach(Computer& computer);
+      virtual bool foreach(Computer::SelfPtr computer);
 
       static void registerPython();
 
     protected:
-      virtual void foreachApply(Computer &computer) = 0;
+      virtual bool foreachApply(Computer &computer) = 0;
 
       storage::Storage::SelfPtr storage1;
       storage::Storage::SelfPtr storage2;

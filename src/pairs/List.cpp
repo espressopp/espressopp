@@ -59,7 +59,7 @@ void List::deletePair(ParticleId id1, ParticleId id2) {
    id_list.erase(it);
 }
 
-void List::foreachApply(Computer &computer) {
+bool List::foreachApply(Computer &computer) {
   /*computer.prepare(storage, storage);
   storage->foreach(computer);
   computer.finalize();*/

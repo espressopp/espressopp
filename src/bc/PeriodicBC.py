@@ -12,11 +12,15 @@ class PeriodicBCLocal(bc_PeriodicBC) :
 
     # override length property
     def setLength(self, length):
-        bc_PeriodicBC.length.fset(self, toReal3D(length))
+        self.cxxclass.length.fset(self, toReal3D(length))
 
     length = property(bc_PeriodicBC.length.fget, setLength)
 
+    def fold(self, v):
+        return self.cxxclass.fold(self, toReal3D(v))
 
+    def getDist(self, v1, v2):
+        return self.cxxclass.getDist(self, toReal3D(v1), toReal3D(v2))
 
 if pmi.IS_CONTROLLER:
     class PeriodicBC(object):

@@ -78,16 +78,16 @@ namespace espresso {
       /** for a particle of the ParticleStorage of this class,
 	  check whether it belongs to this set
       */
-      virtual bool contains(ParticleHandle);
-      virtual bool contains(ParticleId);
+      bool contains(ParticleHandle);
+      bool contains(ParticleId);
 
-      virtual SelfPtr getStorage();
+      SelfPtr getStorage();
 
       /// make this class available at Python
       static void registerPython();
 
     protected:
-      void foreachApply(particles::Computer &computer);
+      bool foreachApply(particles::Computer &computer);
 
 
       /// here the particle data is stored

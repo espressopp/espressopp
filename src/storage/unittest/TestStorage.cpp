@@ -69,17 +69,17 @@ struct MockComputer : particles::Computer {
     applyCalled = 0;
   }
 
-  virtual void prepare(Storage::SelfPtr storage) {
+  void prepare(Storage::SelfPtr storage) {
     prepareCalled = true;
   }
 
-  virtual void finalize() {
+  void finalize() {
     finalizeCalled = true;
   }
 
-  virtual void 
-  apply(ParticleHandle handle) {
+  bool apply(ParticleHandle handle) {
     applyCalled++;
+    return true;
   }
 };
 
