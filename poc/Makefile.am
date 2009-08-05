@@ -20,7 +20,11 @@ boost_function_SOURCES = boost_function.cpp
 boost_function_LDADD = ../src/libespresso_common.la \
 	$(ESPRESSO_BOOST_LIBS) $(PYTHON_LIBS)
 
-noinst_PROGRAMS += crtp
+noinst_PROGRAMS += interruptable_loop
+interruptable_loop_SOURCES = interruptable_loop.cpp
+interruptable_loop_LDADD = ../src/libespresso_common.la
+
+noinst_PROGRAMS += crtp 
 crtp_SOURCES = crtp.cpp
 
 python_SCRIPTS += __init__.py
