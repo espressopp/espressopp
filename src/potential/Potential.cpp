@@ -20,8 +20,9 @@ Potential::createEnergyComputer(Property< real >::SelfPtr _energyProperty) {
 //////////////////////////////////////////////////
 namespace espresso {
   namespace potential {
-    class _PythonPotential 
-      : public espresso::python::wrapper< Potential > {
+    class PythonPotential 
+      : public espresso::python::wrapper< Potential >,
+	public PotentialBase< PythonPotential > {
     public:
       real _getCutoffSqr() const {
 	return get_override("getCutoffSqr")();
@@ -35,8 +36,6 @@ namespace espresso {
 	return get_override("computeForce")(dist);
       }
     };
-
-    typedef PotentialWrapper< _PythonPotential > PythonPotential;
   }
 }
 

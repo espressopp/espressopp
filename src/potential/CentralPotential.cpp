@@ -21,8 +21,10 @@ computeEnergy(const real dist) const {
 
 namespace espresso {
   namespace potential {
-    class _PythonCentralPotential
-      : public python::wrapper< CentralPotential > {
+    class PythonCentralPotential
+      : public python::wrapper< CentralPotential >,
+	public CentralPotentialBase< PythonCentralPotential >
+    {
     public:
       real _getCutoffSqr() const {
 	return get_override("getCutoffSqr")();
@@ -36,9 +38,6 @@ namespace espresso {
 	return get_override("computeForce")(dist);
       }
     };
-
-    typedef CentralPotentialWrapper< _PythonCentralPotential > PythonCentralPotential;
-
   }
 }
 

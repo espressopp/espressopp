@@ -13,11 +13,11 @@ using namespace espresso::potential;
 
 /* ---------------------------------------------------------------------- */
 
-LOG4ESPP_LOGGER(_LennardJones::theLogger, "_espresso.potential._LennardJones");
+LOG4ESPP_LOGGER(LennardJones::theLogger, "_espresso.potential.LennardJones");
 
 /* ---------------------------------------------------------------------- */
 
-real _LennardJones::_computeEnergySqr(const real distSqr) const {
+real LennardJones::_computeEnergySqr(const real distSqr) const {
   if (distSqr < cutoffSqr) {
     real frac2 = sigma*sigma / distSqr;
     real frac6 = frac2 * frac2 * frac2;
@@ -28,7 +28,7 @@ real _LennardJones::_computeEnergySqr(const real distSqr) const {
   }
 }
     
-Real3D _LennardJones::_computeForce(const Real3D dist) const {
+Real3D LennardJones::_computeForce(const Real3D dist) const {
   Real3D f = 0.0;
   real frac2;
   real frac6;
@@ -56,7 +56,7 @@ Real3D _LennardJones::_computeForce(const Real3D dist) const {
 // REGISTRATION WITH PYTHON
 //////////////////////////////////////////////////
 void 
-_LennardJones::registerPython() {
+LennardJones::registerPython() {
   using namespace espresso::python;
 
   class_< LennardJones, bases< CentralPotential > >

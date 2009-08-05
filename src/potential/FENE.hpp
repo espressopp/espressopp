@@ -15,7 +15,7 @@ namespace espresso {
         \f]
     */
 
-    class _FENE {
+    class FENE : public CentralPotentialBase< FENE > {
     private:
       real K;       
       real r0;
@@ -28,7 +28,7 @@ namespace espresso {
 
       /** Default constructor. Member variables are accessed by setter and getter. */
 
-      _FENE(real _K, real _r0, real _rMax) {
+      FENE(real _K, real _r0, real _rMax) {
 	setK(_K);
 	setR0(_r0);
 	setRMax(_rMax);
@@ -47,8 +47,6 @@ namespace espresso {
       real _computeEnergySqr (const real distSqr) const;
       Real3D _computeForce (const Real3D dist) const;
     };
-
-    typedef CentralPotentialWrapper< _FENE > FENE;
   }
 }
 

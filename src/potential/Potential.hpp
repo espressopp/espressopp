@@ -38,71 +38,21 @@ namespace espresso {
       static void registerPython();
     };
 
-    template < class ConcretePotential, class Base = Potential >
-    class PotentialTemplate 
+    template < class Derived, class Base = Potential >
+    class PotentialBase
       : public Base,
-	public enable_shared_from_this< ConcretePotential >
+	public enable_shared_from_this< Derived >
     {
     public:
-      using Base::createForceComputer;
-      virtual pairs::Computer::SelfPtr 
-      createForceComputer(Property< Real3D >::SelfPtr _forceProperty1,
-			  Property< Real3D >::SelfPtr _forceProperty2) {
-	return 
-	  make_shared< ForceComputer< ConcretePotential > >
-	  ((*this).shared_from_this(), _forceProperty1, _forceProperty2);
-      }
-
-      using Base::createEnergyComputer;
-      virtual pairs::Computer::SelfPtr 
-      createEnergyComputer(Property< real >::SelfPtr _energyProperty1,
-			   Property< real >::SelfPtr _energyProperty2) {
-	return 
-	  make_shared< EnergyComputer< ConcretePotential > >
-	  ((*this).shared_from_this(), _energyProperty1, _energyProperty2);
-      }
-    };
-
-    template < class PotentialImplementation >
-    class PotentialWrapper
-      : public Potential,
-	public PotentialImplementation,
-	public enable_shared_from_this< PotentialWrapper< PotentialImplementation > >
-    {
-    public:
-      typedef PotentialWrapper< PotentialImplementation > Self;
-      typedef shared_ptr< Self > SelfPtr;
-
-      PotentialWrapper() {}
-
-      template < typename X0 >
-      PotentialWrapper(X0 x0) 
-	: PotentialImplementation(x0) {}
-
-      template < typename X0, typename X1 >
-      PotentialWrapper(X0 x0, X1 x1) 
-	: PotentialImplementation(x0, x1) {}
-
-      template < typename X0, typename X1, typename X2 >
-      PotentialWrapper(X0 x0, X1 x1, X2 x2) 
-	: PotentialImplementation(x0, x1, x2) {}
-
-      template < typename X0, typename X1, typename X2, typename X3 >
-      PotentialWrapper(X0 x0, X1 x1, X2 x2, X3 x3) 
-	: PotentialImplementation(x0, x1, x2, x3) {}
-
-      template < typename X0, typename X1, typename X2, typename X3, typename X4 >
-      PotentialWrapper(X0 x0, X1 x1, X2 x2, X3 x3, X4 x4) 
-	: PotentialImplementation(x0, x1, x2, x3, x4) {}
-
-      virtual ~PotentialWrapper() {}
+      typedef shared_ptr< Derived > SelfPtr;
 
       using Potential::createForceComputer;
+
       virtual pairs::Computer::SelfPtr 
       createForceComputer(Property< Real3D >::SelfPtr _forceProperty1,
 			  Property< Real3D >::SelfPtr _forceProperty2) {
 	return 
-	  make_shared< ForceComputer< Self > >
+	  make_shared< ForceComputer< Derived > >
 	  ((*this).shared_from_this(), _forceProperty1, _forceProperty2);
       }
       
@@ -111,21 +61,31 @@ namespace espresso {
       createEnergyComputer(Property< real >::SelfPtr _energyProperty1,
 			   Property< real >::SelfPtr _energyProperty2) {
 	return 
-	  make_shared< EnergyComputer< Self > >
+	  make_shared< EnergyComputer< Derived > >
 	  ((*this).shared_from_this(), _energyProperty1, _energyProperty2);
       }
       
       virtual real getCutoffSqr() const {
-	return PotentialImplementation::_getCutoffSqr();
+	return derived_this()->_getCutoffSqr();
       }
 
       virtual real computeEnergy(const Real3D dist) const {
-	return PotentialImplementation::_computeEnergy(dist);
+	return derived_this()->_computeEnergy(dist);
       }
 
       virtual Real3D computeForce(const Real3D dist) const {
-	return PotentialImplementation::_computeForce(dist);
+	return derived_this()->_computeForce(dist);
       }
+
+    protected:
+      Derived* derived_this() {
+	return static_cast< Derived* >(this);
+      }
+
+      const Derived* derived_this() const {
+	return static_cast< const Derived* >(this);
+      }
+
 
     };
 

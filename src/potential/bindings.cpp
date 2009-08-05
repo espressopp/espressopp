@@ -12,8 +12,8 @@ namespace espresso {
       Interaction::registerPython();
       Potential::registerPython();
       CentralPotential::registerPython();
-      _LennardJones::registerPython();
-      _FENE::registerPython();
+      LennardJones::registerPython();
+      FENE::registerPython();
     }
   }
 }

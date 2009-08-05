@@ -14,7 +14,7 @@ namespace espresso {
 	\f]
 
     */
-    class _LennardJones {
+    class LennardJones : public CentralPotentialBase< LennardJones > {
     private:
       real epsilon;
       real sigma;
@@ -26,7 +26,7 @@ namespace espresso {
     public:
       static void registerPython();
 
-      _LennardJones(real _epsilon, real _sigma, real _cutoff) {
+      LennardJones(real _epsilon, real _sigma, real _cutoff) {
 	setEpsilon(_epsilon);
 	setSigma(_sigma);
 	setCutoff(_cutoff);
@@ -48,7 +48,7 @@ namespace espresso {
       Real3D _computeForce(const Real3D dist) const;
     };
 
-    typedef CentralPotentialWrapper< _LennardJones > LennardJones;
+//     typedef CentralPotentialWrapper< _LennardJones > LennardJones;
 
   }
 }
