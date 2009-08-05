@@ -3,7 +3,7 @@
 
 #include "Computer.hpp"
 #include "All.hpp"
-//#include "List.hpp"
+#include "List.hpp"
 
 namespace espresso {
   namespace pairs {
@@ -14,7 +14,7 @@ namespace espresso {
       Set::registerPython();
       Computer::registerPython();
       All::registerPython();
-      //List::registerPython();
+      List::registerPython();
 
     }
 

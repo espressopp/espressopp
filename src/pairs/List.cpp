@@ -14,14 +14,26 @@ List::~List()
 {}
 
 /* Constructor */
+//TODO: is it right to take _storage1, _posProperty1
 List::List(bc::BC::SelfPtr _bc, 
-           Storage::SelfPtr _storage, 
-           Property< Real3D >::SelfPtr _posProperty) :
-
-   storage(_storage),
+           Storage::SelfPtr _storage1, 
+           Storage::SelfPtr _storage2, 
+           Property< Real3D >::SelfPtr _posProperty1,
+           Property< Real3D >::SelfPtr _posProperty2) 
+  : Set(_storage1, _storage2),
+   storage(_storage1),
    bc(_bc),
-   posProperty(_posProperty)
+   posProperty(_posProperty1)
    {}
+
+List::List(bc::BC::SelfPtr _bc,
+           Storage::SelfPtr _storage,
+           Property< Real3D >::SelfPtr _posProperty)
+  : Set(_storage, _storage),
+    storage(_storage),
+    bc(_bc),
+    posProperty(_posProperty)
+    {}
 
 size_t List::size() const {
    return id_list.size();
@@ -47,12 +59,13 @@ void List::deletePair(ParticleId id1, ParticleId id2) {
    id_list.erase(it);
 }
 
-/*--------------------------------------------------------------------------
-List::foreach(PairComputer)
--------------------------------------------------------------------------- */
-
-template<class Computer, class Handle>
-void List::foreach(Computer& pairComputer) const {
+void List::foreachApply(Computer &computer) {
+  /*computer.prepare(storage, storage);
+  storage->foreach(computer);
+  computer.finalize();*/
+}
+/*
+void List::foreach(Computer& pairComputer) {
   vector<Tuple>::const_iterator it;
   PropertyHandle<Real3D> pos = *posProperty;
 
@@ -64,16 +77,8 @@ void List::foreach(Computer& pairComputer) const {
     pairComputer(dist, pref1, pref2);
   }
 }
-
-void List::foreach(Computer& pairComputer) {
-  foreach<Computer, ParticleHandle>(pairComputer);
-}
-
-/**
-void List::foreach(ConstComputer& pairComputer) const {
-  foreach<ConstComputer, ConstParticleHandle>(pairComputer);
-}
 */
+
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON

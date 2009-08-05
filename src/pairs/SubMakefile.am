@@ -9,9 +9,8 @@ libespresso_common_la_SOURCES += \
 	pairs/bindings.cpp \
 	pairs/Set.cpp \
 	pairs/Computer.cpp \
-	pairs/All.cpp 
-#        pairs/List.cpp
-
+	pairs/All.cpp \
+        pairs/List.cpp
 
 python_SCRIPTS += \
 	pairs/__init__.py \

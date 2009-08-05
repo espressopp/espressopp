@@ -10,34 +10,32 @@
 namespace espresso {
   namespace pairs {
 
-    /** Class that applies a Computer to a list of pairs 
-     */
+    /** Class that applies a Computer to a list of pairs */
 
     class List : public Set {
     public:
       typedef shared_ptr< List > SelfPtr;
 
-    private:
-      storage::Storage::SelfPtr storage;
-      bc::BC::SelfPtr bc;
-      Property< Real3D >::SelfPtr posProperty;
-      typedef std::pair< ParticleId,
-			 ParticleId > Tuple;
-      std::vector< Tuple > id_list;
+      static void registerPython();
 
-    public:
+      /* 2-parameter constructor */
+      List(bc::BC::SelfPtr _bc, 
+           storage::Storage::SelfPtr _storage1, 
+           storage::Storage::SelfPtr _storage2, 
+           Property< Real3D >::SelfPtr _posProperty1,
+           Property< Real3D >::SelfPtr _posProperty2);
 
-      /** Destructor. */
-      ~List();
-
-      /** Constructor for this class 
+      /** Constructor
 	  \param bc are the boundary conditions that are needed for distance calculation.
 	  \param storage specifies the particle storage to which particles belong
-	  \param coordinates the identifier of the coordinates property to use
+	  \param posProperty the identifier of the posProperty property to use
       */
-      List(bc::BC::SelfPtr bc, 
-           storage::Storage::SelfPtr storage,
-	   Property< Real3D >::SelfPtr coordinates);
+      List(bc::BC::SelfPtr _bc, 
+           storage::Storage::SelfPtr _storage,
+	   Property< Real3D >::SelfPtr _posProperty);
+
+      /** Destructor. */
+      virtual ~List();     
 
       /** return size of list */
       size_t size() const;
@@ -63,21 +61,24 @@ namespace espresso {
       */
       void deletePair(ParticleId id1, ParticleId id2);
 
-      /** This routine will apply a function operator to all pairs.
-	  \param pairComputer is the object that provides the function to be applied to all pairs.
-      */
-      virtual void foreach(Computer& pairComputer);
-
       /** Getter routine for the storage */
       storage::Storage::SelfPtr getStorage() const { return storage; }
 
+    protected:
+
+      /** This routine will apply a function operator to all pairs of the list.
+	  \param pairComputer is the object that provides the function to be applied.
+      */
+      virtual void foreachApply(Computer &computer);
+
     private:
-      template< class Computer, class >
-      void foreach(Computer& pairComputer) const;
 
-    public:
+      storage::Storage::SelfPtr storage;
+      bc::BC::SelfPtr bc;
+      Property< Real3D >::SelfPtr posProperty;
 
-      static void registerPython();
+      typedef std::pair< ParticleId, ParticleId > Tuple;
+      std::vector< Tuple > id_list;
 
     };
 
