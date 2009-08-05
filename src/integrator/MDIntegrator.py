@@ -1,13 +1,15 @@
 from espresso import pmi
 
 class MDIntegratorLocal(object):
-    pass
+    def integrate(self, steps):
+        self.cxxclass.integrate(self, steps)
 
 if pmi.IS_CONTROLLER:
     class MDIntegrator(object):
-        pass
-#         __metaclass__ = pmi.Proxy
-#         pmiproxydefs = {
-#             'pmicall': ['run', 'step'],
-#             'pmiproperty': [ 'timestep' ]
-#             }    
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            pmiproperty = [ 'set', 
+                            'posProperty', 'velProperty', 'forceProperty', 
+                            'timestep' ],
+            pmicall = ['integrate']
+            )

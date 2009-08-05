@@ -16,11 +16,9 @@ namespace espresso {
       typedef shared_ptr< MDIntegrator > SelfPtr;
 
     private:
-      
       int nTimestep;   //!< iteration counter in time loop
 
     protected:
-      
       real timestep;   //!< delta time for integration
 
       particles::Set::SelfPtr set;    //!< particle set to integrate
@@ -46,15 +44,34 @@ namespace espresso {
 
       IntegrateSignal updateForces;
 
-      MDIntegrator(particles::Set::SelfPtr set,
+      MDIntegrator(particles::Set::SelfPtr _set,
                    Property< Real3D >::SelfPtr _posProperty,
                    Property< Real3D >::SelfPtr _velProperty,
                    Property< Real3D >::SelfPtr _forceProperty,
-		   real _timestep);
+		   real _timestep) {
+	setSet(_set);
+	setPosProperty(_posProperty);
+	setVelProperty(_velProperty);
+	setForceProperty(_forceProperty);
+	setTimestep(_timestep);
+      }
 
+      void setSet(particles::Set::SelfPtr _set) { set = _set; }
       particles::Set::SelfPtr getSet() const { return set; }
+
+      void setPosProperty(Property< Real3D >::SelfPtr _posProperty) { 
+	posProperty = _posProperty; 
+      }
       Property< Real3D >::SelfPtr getPosProperty() const { return posProperty; }
+
+      void setVelProperty(Property< Real3D >::SelfPtr _velProperty) { 
+	velProperty = _velProperty; 
+      }
       Property< Real3D >::SelfPtr getVelProperty() const { return velProperty; }
+
+      void setForceProperty(Property< Real3D >::SelfPtr _forceProperty) { 
+	forceProperty = _forceProperty; 
+      }
       Property< Real3D >::SelfPtr getForceProperty() const { return forceProperty; }
 
       void setTimestep(real _timestep) { timestep = _timestep; }
@@ -63,7 +80,7 @@ namespace espresso {
       int getIntegrationStep() const { return nTimestep; }
 
       /** Do \p nsteps steps. */
-      void run(int nsteps);
+      void integrate(int nsteps);
 
       /** Abstract class needs also registration in Python */
 

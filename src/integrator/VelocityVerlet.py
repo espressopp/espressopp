@@ -12,18 +12,4 @@ class VelocityVerletLocal(MDIntegratorLocal, integrator_VelocityVerlet):
 if pmi.IS_CONTROLLER:
     class VelocityVerlet(MDIntegrator):
         'The Velocity-Verlet integrator.'
-#        pmiproxydefs = MDIntegrator.pmiproxydefs
-#        pmiproxydefs['subjectclass'] = 'espresso.integrator.VelocityVerletLocal'
-        
-        def __init__(self, set, 
-                     posProperty, velProperty, forceProperty,
-                     timestep):
-            pmiinit(self, "espresso.integrator.VelocityVerletLocal",
-                    set.pmiobject,
-                    posProperty.pmiobject,
-                    velProperty.pmiobject,
-                    forceProperty.pmiobject, 
-                    timestep)    
-
-        def run(self, steps):
-            pmi.call(self.pmiobject.run, steps)
+        pmiproxydefs = dict(cls = 'espresso.integrator.VelocityVerletLocal')

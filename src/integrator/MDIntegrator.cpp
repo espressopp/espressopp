@@ -10,18 +10,7 @@ using namespace espresso::integrator;
 
 LOG4ESPP_LOGGER(MDIntegrator::theLogger, "Integrator");
 
-MDIntegrator::MDIntegrator(particles::Set::SelfPtr _set,
-                           Property< Real3D >::SelfPtr _posProperty,
-                           Property< Real3D >::SelfPtr _velProperty,
-                           Property< Real3D >::SelfPtr _forceProperty,
-			   real timestep) 
-  : set(_set),
-    posProperty(_posProperty),
-    velProperty(_velProperty),
-    forceProperty(_forceProperty)
-{ setTimestep(timestep); }
-
-void MDIntegrator::run(int nsteps)
+void MDIntegrator::integrate(int nsteps)
 {
   LOG4ESPP_INFO(theLogger, "MDIntegrator will run " << nsteps << " steps");
 
@@ -57,13 +46,12 @@ MDIntegrator::registerPython() {
 
   class_< MDIntegrator, boost::noncopyable >
     ("integrator_MDIntegrator", no_init)
-    .add_property("timestep", &MDIntegrator::getTimestep, 
-		  &MDIntegrator::setTimestep)
-    .def("getPosProperty", &MDIntegrator::getPosProperty)
-    .def("getVelProperty", &MDIntegrator::getVelProperty)
-    .def("getForceProperty", &MDIntegrator::getForceProperty)
-    .def("run", &MDIntegrator::run)
-    .def("step", pure_virtual(&MDIntegrator::step))
+    .add_property("set", &MDIntegrator::getSet, &MDIntegrator::setSet)
+    .add_property("posProperty", &MDIntegrator::getPosProperty, &MDIntegrator::setPosProperty)
+    .add_property("velProperty", &MDIntegrator::getVelProperty, &MDIntegrator::setVelProperty)
+    .add_property("forceProperty", &MDIntegrator::getForceProperty, &MDIntegrator::setForceProperty)
+    .add_property("timestep", &MDIntegrator::getTimestep, &MDIntegrator::setTimestep)
+    .def("integrate", &MDIntegrator::integrate)
   ;
 }
 
