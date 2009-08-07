@@ -51,6 +51,8 @@ namespace espresso {
 	  \param id1 is the identificaiton of particle 1
 	  \param id2 is the identificaiton of particle 2
 	  Note: a tuple (id1, id2) can be added several times.
+      TODO: should addPair check to see if id1/2 are in range of storage?
+      TODO: same for negative, id1=id2, etc.
       */
       void addPair(ParticleId id1, ParticleId id2);
 

@@ -14,7 +14,7 @@ List::~List()
 {}
 
 /* Constructor */
-//TODO: is it right to take _storage1, _posProperty1
+//TODO: right now only take _storage1, _posProperty1
 List::List(bc::BC::SelfPtr _bc, 
            Storage::SelfPtr _storage1, 
            Storage::SelfPtr _storage2, 
@@ -59,26 +59,23 @@ void List::deletePair(ParticleId id1, ParticleId id2) {
    id_list.erase(it);
 }
 
-bool List::foreachApply(Computer &computer) {
-  /*computer.prepare(storage, storage);
-  storage->foreach(computer);
-  computer.finalize();*/
-}
-/*
-void List::foreach(Computer& pairComputer) {
+bool List::foreachApply(Computer &pairComputer) {
+// computer.prepare(storage, storage);
+// computer.finalize();
+
+  bool cont;
   vector<Tuple>::const_iterator it;
-  PropertyHandle<Real3D> pos = *posProperty;
+  storage::PropertyHandle<Real3D> pos = posProperty->getHandle(storage);
 
   for (it = id_list.begin(); it != id_list.end(); it++) {
-    Handle pref1 = storage->getParticleHandle(it->first);
-    Handle pref2 = storage->getParticleHandle(it->second);
-    Real3D dist = bc->getDist(pos[pref1], pos[pref2]);
+    ParticleHandle p1 = storage->getParticleHandle(it->first);
+    ParticleHandle p2 = storage->getParticleHandle(it->second);
+    Real3D dist = bc->getDist(pos[p1], pos[p2]);
     
-    pairComputer(dist, pref1, pref2);
+    cont = pairComputer.apply(dist, p1, p2);
   }
+  return cont;
 }
-*/
-
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
@@ -89,8 +86,16 @@ List::registerPython() {
   using namespace espresso::python;
 
   class_< List, bases< Set > >
-    ("pairs_List", 
+    ("pairs_List", "Put pairs::List docstring here.", 
      init< bc::BC::SelfPtr, storage::Storage::SelfPtr, Property< Real3D >::SelfPtr >())
+    .def(init< bc::BC::SelfPtr,
+	 storage::Storage::SelfPtr,
+         storage::Storage::SelfPtr,
+         Property< Real3D >::SelfPtr,
+         Property< Real3D >::SelfPtr >()) 
     .def("addPair", &List::addPair)
+    .def("deletePair", &List::deletePair)
+    .def("size", &List::size)
+    .def("findPair", &List::findPair)
     ;
 }

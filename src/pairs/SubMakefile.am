@@ -16,4 +16,5 @@ python_SCRIPTS += \
 	pairs/__init__.py \
 	pairs/Computer.py \
 	pairs/Set.py \
-	pairs/All.py
+	pairs/All.py \
+        pairs/List.py
