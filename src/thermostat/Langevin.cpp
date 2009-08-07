@@ -79,6 +79,7 @@ public:
   }
   
   void prepare(Storage::SelfPtr set) {}
+
   // m = 1
   virtual bool apply(ParticleHandle pref) {
     Real3D rand3(drand48() - 0.5, drand48() - 0.5, drand48() - 0.5);
@@ -165,33 +166,23 @@ void Langevin::connect(integrator::VelocityVerlet::SelfPtr integrator) {
      ARGERROR(theLogger, "Langevin: connect to NULL integrator");
   }
 
-  if (stepA.connected()) {
-     LOG4ESPP_WARN(theLogger, "Thermostat is already connected, disconnecting from last one");
-     disconnect();
-  }
-
   LOG4ESPP_INFO(theLogger, "connect to VelocityVerlet integrator");
 
-  // We give a shared pointer to the boost bind so this object cannot be deleted as long
+  integrator->connections.add
+    (integrator->updateVelocity1, 
+     shared_from_this(), &Langevin::thermalizeA);
 
-  stepA = integrator->updateVelocity1.connect(boost::bind(&Langevin::thermalizeA, shared_from_this(), _1));
-  stepB = integrator->updateVelocity2.connect(boost::bind(&Langevin::thermalizeB, shared_from_this(), _1));
-
+  integrator->connections.add
+    (integrator->updateVelocity2, 
+     shared_from_this(), &Langevin::thermalizeB);
 }
 
 /**********************************************************************************/
 
-void Langevin::disconnect() 
+void Langevin::disconnect(integrator::VelocityVerlet::SelfPtr integrator) 
 {
-  if (!stepA.connected()) {
-     LOG4ESPP_WARN(theLogger, "Langevin thermostat is not connected");
-     return;
-  }
-
   LOG4ESPP_INFO(theLogger, "Langevin disconnects from integrator");
-
-  stepA.disconnect();
-  stepB.disconnect();
+  integrator->connections.remove(shared_from_this());
 }
 
 /**********************************************************************************/

@@ -7,7 +7,8 @@ nobase_pkginclude_HEADERS += \
 	esutil/VectorTraits.hpp \
 	esutil/Timer.hpp \
 	esutil/virtual_functional.hpp \
-        esutil/Logger.hpp
+        esutil/Logger.hpp \
+	esutil/MultiSignalConnections.hpp
 
 libespresso_common_la_SOURCES += \
 	esutil/TupleVector.cpp \

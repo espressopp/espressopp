@@ -38,7 +38,7 @@ namespace espresso {
           automatically when the integrator is deleted.
       */
 
-      void disconnect();
+      void disconnect(integrator::MDIntegrator::SelfPtr integrator);
 
       virtual void addForces(const Property< Real3D >::SelfPtr forceProperty);
 

@@ -6,9 +6,9 @@
 
 #include "logging.hpp"
 #include "types.hpp"
-#include "Thermostat.hpp"
+#include "thermostat/Thermostat.hpp"
 #include "integrator/VelocityVerlet.hpp"
-#include "../Real3D.hpp"
+#include "Real3D.hpp"
 
 namespace espresso {
   namespace thermostat {
@@ -23,7 +23,8 @@ namespace espresso {
 
     class Langevin: 
       public Thermostat, 
-      public enable_shared_from_this< Langevin > {
+      public enable_shared_from_this< Langevin >
+    {
 
     public:
       typedef shared_ptr< Langevin > SelfPtr;
@@ -33,12 +34,6 @@ namespace espresso {
       static LOG4ESPP_DECL_LOGGER(theLogger);
 
       real gamma;
-
-      // Connections to the integrator after step A and step B 
-      // Note: only one connection is allowed
-
-      boost::signals2::connection stepA;
-      boost::signals2::connection stepB;
 
       // random number generator for normal distribution
 
@@ -76,7 +71,7 @@ namespace espresso {
       void connect(integrator::VelocityVerlet::SelfPtr integrator);
 
       /** Disconnect this thermostat object from its integrator. */
-      void disconnect();
+      void disconnect(integrator::VelocityVerlet::SelfPtr integrator);
 
       /** Getter for gamma. */
       real getGamma() const;

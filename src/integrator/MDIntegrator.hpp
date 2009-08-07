@@ -7,6 +7,7 @@
 #include "logging.hpp"
 #include "Property.hpp"
 #include "particles/Set.hpp"
+#include "esutil/MultiSignalConnections.hpp"
 
 namespace espresso {
   namespace integrator {
@@ -36,6 +37,9 @@ namespace espresso {
     public:
 
       typedef boost::signals2::signal1<void, const MDIntegrator&> IntegrateSignal;
+
+      // the base class needs to define the connection manager
+      esutil::MultiSignalConnections connections;
 
       IntegrateSignal startIntegration;
       IntegrateSignal endIntegration;

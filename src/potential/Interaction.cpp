@@ -63,28 +63,19 @@ connect(integrator::MDIntegrator::SelfPtr integrator) {
 
   LOG4ESPP_INFO(theLogger, "Interaction connects to Integrator");
 
-  if (forceCalc.connected())
-     ARGERROR(theLogger, "Interaction is already connected");
-
   if (!integrator)
      ARGERROR(theLogger, "connect: Integrator is NULL");
   
-  forceCalc = 
-    integrator->
-    updateForces.connect(boost::bind(&Interaction::updateForces, 
-				     shared_from_this(), _1));
+  integrator->connections.add
+    (integrator->updateForces,
+     shared_from_this(), &Interaction::updateForces);
 }
 
 /***************************************************************************************/
 
-void Interaction::disconnect()
+void Interaction::disconnect(integrator::MDIntegrator::SelfPtr integrator)
 {
-  if (!forceCalc.connected()) {
-     LOG4ESPP_WARN(theLogger, "Interaction not connected");
-     return;
-  }
-
-  forceCalc.disconnect();
+  integrator->connections.remove(shared_from_this());
 }
 
 /***************************************************************************************/
