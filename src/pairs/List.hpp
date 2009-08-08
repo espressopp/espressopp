@@ -31,8 +31,8 @@ namespace espresso {
 	  \param posProperty the identifier of the posProperty property to use
       */
       List(bc::BC::SelfPtr _bc, 
-           storage::Storage::SelfPtr _storage,
-	   Property< Real3D >::SelfPtr _posProperty);
+           storage::Storage::SelfPtr _storage1,
+	   Property< Real3D >::SelfPtr _posProperty1);
 
       /** Destructor. */
       virtual ~List();     
@@ -52,7 +52,6 @@ namespace espresso {
 	  \param id2 is the identificaiton of particle 2
 	  Note: a tuple (id1, id2) can be added several times.
       TODO: should addPair check to see if id1/2 are in range of storage?
-      TODO: same for negative, id1=id2, etc.
       */
       void addPair(ParticleId id1, ParticleId id2);
 
@@ -64,24 +63,21 @@ namespace espresso {
       void deletePair(ParticleId id1, ParticleId id2);
 
       /** Getter routine for the storage */
-      storage::Storage::SelfPtr getStorage() const { return storage; }
+      //storage::Storage::SelfPtr getStorage() const { return storage; }
 
     protected:
-
       /** This routine will apply a function operator to all pairs of the list.
 	  \param pairComputer is the object that provides the function to be applied.
       */
       virtual bool foreachApply(Computer &computer);
 
     private:
-
-      storage::Storage::SelfPtr storage;
       bc::BC::SelfPtr bc;
-      Property< Real3D >::SelfPtr posProperty;
+      Property< Real3D >::SelfPtr posProperty1;
+      Property< Real3D >::SelfPtr posProperty2;
 
       typedef std::pair< ParticleId, ParticleId > Tuple;
       std::vector< Tuple > id_list;
-
     };
 
   }

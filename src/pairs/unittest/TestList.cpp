@@ -8,6 +8,7 @@
 
 using namespace espresso;
 using namespace espresso::pairs;
+using namespace espresso::storage;
 using namespace espresso::particles;
 using namespace espresso::bc;
 
@@ -53,7 +54,7 @@ struct Fixture {
 
 /** Example class for traversing particle pairs */
 
-class PairAdder : public pairs::ConstComputer {
+class PairAdder : public pairs::Computer {
 
      public:
 
@@ -72,9 +73,7 @@ class PairAdder : public pairs::ConstComputer {
        }
 };
 
-BOOST_FIXTURE_TEST_CASE(references_test, Fixture)
-
-{
+BOOST_FIXTURE_TEST_CASE(references_test, Fixture) {
     BOOST_CHECK_EQUAL(pairList->size(), 4);
     PairAdder adder;
     pairList->foreach(adder);
@@ -87,4 +86,3 @@ BOOST_FIXTURE_TEST_CASE(references_test, Fixture)
     pairList->foreach(adder);
     BOOST_CHECK_EQUAL(adder.counter, 3);
 }
-
