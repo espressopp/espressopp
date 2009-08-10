@@ -52,16 +52,18 @@ void List::addPair(ParticleId id1, ParticleId id2) {
    if(id1 < 0 || id2 < 0) {
       throw runtime_error("pairs::List::addPair: ParticleId less than zero.");
    }
+   //TODO: next test should be only if one storage is used
    if(id1 == id2) {
       throw runtime_error("pairs::List::addPair: Particles id's are equal.");
    }
-   //TODO: check if id1 or id2 is greater than number of particles in the system
+   //TODO: check if id1/2 d2 is greater than number of particles in storage1/2
+   //TODO: if two storages make sure id1 is from storage1 and id2 is from storage2
    id_list.push_back(Tuple(id1, id2));
 }
 
 void List::deletePair(ParticleId id1, ParticleId id2) {
    Tuple T(id1, id2);
-   vector<Tuple>::iterator it = find (id_list.begin(), id_list.end(), T);
+   vector<Tuple>::iterator it = find(id_list.begin(), id_list.end(), T);
    if (it == id_list.end()) {
      throw runtime_error("pairs::List::deletePair: Tuple not found.");
      //TODO: write id1 and id2 in error message

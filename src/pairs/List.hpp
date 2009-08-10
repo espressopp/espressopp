@@ -31,8 +31,8 @@ namespace espresso {
 	  \param posProperty the identifier of the posProperty property to use
       */
       List(bc::BC::SelfPtr _bc, 
-           storage::Storage::SelfPtr _storage1,
-	   Property< Real3D >::SelfPtr _posProperty1);
+           storage::Storage::SelfPtr _storage,
+	   Property< Real3D >::SelfPtr _posProperty);
 
       /** Destructor. */
       virtual ~List();     
@@ -62,8 +62,11 @@ namespace espresso {
       */
       void deletePair(ParticleId id1, ParticleId id2);
 
-      /** Getter routine for the storage */
-      //storage::Storage::SelfPtr getStorage() const { return storage; }
+      /** Getter routine for storage1 */
+      storage::Storage::SelfPtr getStorage1() const { return storage1; }
+
+      /** Getter routine for storage2 */
+      storage::Storage::SelfPtr getStorage2() const { return storage2; }
 
     protected:
       /** This routine will apply a function operator to all pairs of the list.
