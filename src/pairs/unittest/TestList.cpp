@@ -1,88 +1,116 @@
-#define BOOST_TEST_MODULE List
+#define BOOST_TEST_MODULE TestList
+#include <boost/test/unit_test.hpp>
 
-#include <boost/test/included/unit_test.hpp>
-
-#include "pairs/List.hpp"
-#include "particles/Storage.hpp"
 #include "bc/PeriodicBC.hpp"
+#include "storage/Storage.hpp"
+#include "../List.hpp"
 
 using namespace espresso;
-using namespace espresso::pairs;
 using namespace espresso::storage;
-using namespace espresso::particles;
-using namespace espresso::bc;
+using namespace espresso::pairs;
 
 struct Fixture {
+  static const size_t N = 3;
+  static const real size = 1.0;
+  int np;
 
-    Storage store;
+  bc::PeriodicBC::SelfPtr pbc;
+  Storage::SelfPtr store;
+  Property< Real3D >::SelfPtr posProperty;
+  List::SelfPtr bonds;
 
-    Storage::PropertyId position;
+  Fixture() {
+    np = N * N * N;
+    pbc = make_shared< bc::PeriodicBC >(1.0);
+    store = make_shared< Storage >();
+    posProperty = make_shared< Property< Real3D > >(store);
+    bonds = make_shared< List >(pbc, store, posProperty);
 
-    PeriodicBC pbc;
+    createLattice();
 
-    List* pairList;
+    // create pairs and add to the pairs::List bonds
+    // note: there are np - 1 bonds where np is the number of particles
+    for(int i = 0; i < np - 1; i++) {
+      ParticleId id1(i);
+      ParticleId id2(i+1);
+      bonds->addPair(id1, id2);
+    }
+  }
 
-    Storage::ParticleId first3, second3;  // saved values for one certain pair
-
-    Fixture() : pbc(2.5) {
-
-        position = store.addProperty<Real3D>();
-
-        pairList = new List(pbc, store, position);
-
-	Storage::ParticleId first = Storage::ParticleId(0);
-	Storage::ParticleId second = Storage::ParticleId(0);
- 
-        for (size_t i = 0; i < 5; ++i) {
-
-            Storage::reference ref = store.addParticle();
-            second = store.getParticleID(ref);
-            if (i > 0) {
-               pairList->addPair(first, second);
-            }
-            if (i == 3) {
-               first3 = first;
-               second3 = second;
-            }
-            first = second;
+  void createLattice() {
+    // create a lattice of NxNxN particles
+    size_t pid = 0;
+    double step = size/(N-1);
+    for (size_t i = 0; i < N; i++)
+      for (size_t j = 0; j < N; j++)
+        for (size_t k = 0; k < N; k++) {
+          ParticleHandle p = store->addParticle(ParticleId(pid));
+          posProperty->at(store, p) = Real3D(i*step, j*step, k*step);
+          pid++;
         }
-    }
-
-    ~Fixture() {
-    }
+  }
 };
 
-/** Example class for traversing particle pairs */
+// derive from pairs::Computer to test apply method
+struct PairAdder: public Computer {
+  size_t counter;
+  bool prepareCalled, finalizeCalled;
+ 
+  PairAdder(void) { 
+    counter = 0; 
+    prepareCalled = false;
+    finalizeCalled = false;
+  }
 
-class PairAdder : public pairs::Computer {
+  void prepare(Storage::SelfPtr store1, Storage::SelfPtr store2) {
+    prepareCalled = true;
+  }
+  
+  bool apply(const Real3D dist,
+             const ParticleHandle p1,
+             const ParticleHandle p2) {
+    counter++;
+    return true;
+  }
 
-     public:
-
-       int counter;   // counter for pairs
-
-       PairAdder() {
-         counter = 0;
-       }
-
-       virtual void operator()(const Real3D &dist,
-                               const particles::Set::const_reference p1,
-                               const particles::Set::const_reference p2)
-
-       {
-          counter++;
-       }
+  void finalize(void) {
+    finalizeCalled = true;
+  }
 };
 
-BOOST_FIXTURE_TEST_CASE(references_test, Fixture) {
-    BOOST_CHECK_EQUAL(pairList->size(), 4);
-    PairAdder adder;
-    pairList->foreach(adder);
-    BOOST_CHECK_EQUAL(adder.counter, 4);
-    BOOST_CHECK_EQUAL(pairList->findPair(first3, second3), true);
-    BOOST_CHECK_EQUAL(pairList->findPair(second3, first3), false);
-    pairList->deletePair(first3, second3);
-    BOOST_CHECK_EQUAL(pairList->findPair(first3, second3), false);
-    adder.counter = 0;  // must be reset
-    pairList->foreach(adder);
-    BOOST_CHECK_EQUAL(adder.counter, 3);
+BOOST_FIXTURE_TEST_CASE(initSizeTest, Fixture) {
+  size_t sz = np - 1;
+  BOOST_CHECK_EQUAL(bonds->size(), sz);
+}
+
+BOOST_FIXTURE_TEST_CASE(delTest, Fixture) {
+  size_t sz = np - 2;
+  ParticleId id1(0);
+  ParticleId id2(1);
+  bonds->deletePair(id1, id2);
+  BOOST_CHECK_EQUAL(bonds->size(), sz);
+}
+
+BOOST_FIXTURE_TEST_CASE(findTest, Fixture) {
+  size_t tmpid1 = np / 2;
+  size_t tmpid2 = tmpid1 + size_t(1);
+  ParticleId id1(tmpid1);
+  ParticleId id2(tmpid2);
+  BOOST_CHECK(bonds->findPair(id1, id2));
+
+  for(int i = 0; i < np; i++) {
+    ParticleId id1(i);
+    ParticleId id2(i);
+    BOOST_CHECK_MESSAGE(!bonds->findPair(id1, id2), 
+                        "particle bonded to itself: " << id1 << " " << id2);
+  }
+}
+
+BOOST_FIXTURE_TEST_CASE(counterTest, Fixture) {
+  PairAdder pa;
+  bonds->foreach(pa); 
+  size_t sz = np - 1;
+  BOOST_CHECK_EQUAL(pa.counter, sz);
+  BOOST_CHECK(pa.prepareCalled);
+  BOOST_CHECK(pa.finalizeCalled);
 }
