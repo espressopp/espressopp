@@ -31,7 +31,7 @@ class SetLocal(object):
     def __locateParticleLocal(self, particle):
         # to be used by Set.contains
         # don't call locally
-        collectives.locateItem(particle in self)
+        return collectives.locateItem(particle in self)
 
     def __contains__(self, particle):
         return self.cxxclass.__contains__(self, particle)
@@ -45,7 +45,7 @@ if pmi.IS_CONTROLLER:
         pmiproxydefs = dict(pmicall = ['foreach'])
 
         def locateParticle(self, particle):
-            return pmi.call(self.pmiobject.__locateParticleLocal, particle)
+            return pmi.call('espresso.particles.SetLocal.__locateParticleLocal', self, particle)
 
         def __contains__(self, particle):
             try:

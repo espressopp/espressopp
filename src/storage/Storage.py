@@ -27,7 +27,11 @@ if pmi.IS_CONTROLLER :
         memory on each processor is in general subdivided into several
         smaller boxes or cells.
         """
-        pmiproxydefs = dict(cls = 'espresso.storage.StorageLocal')
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(cls='espresso.storage.StorageLocal')
+
+        def __init__(self):
+            self.pmiinit()
 
         def createProperty(self, type, dimension = 1) :
             """

@@ -129,6 +129,16 @@ and the following variables:
 import logging, types, sys, inspect
 from espresso import boostmpi as mpi
 
+__all__ = [
+    'exec_', 'import_', 'execfile_',
+    'create', 'call', 'invoke', 'reduce', 'localcall',
+    'sync', 'receive',
+    'startWorkerLoop',
+    'finalizeWorkers', 'stopWorkerLoop', 'registerAtExit',
+    'Proxy',
+    'ID', 'CONTROLLER', 'IS_CONTROLLER', 'IS_WORKER', 'WORKERSTR',
+    'UserError'
+    ]
 
 ##################################################
 ## EXEC
@@ -214,6 +224,8 @@ def create(cls=None, *args, **kwds) :
     ...
     """
     if __checkController(create) :
+        if cls is None:
+            raise UserError('pmi.create expects at least 1 argument on controller!')
         cls = _translateClass(cls)
 
         # generate a new oid
@@ -258,7 +270,7 @@ def __workerCreate(cls, oid, *targs, **tkwds) :
 ##################################################
 ## CALL (INVOKE WITHOUT RESULT)
 ##################################################
-def call(function=None, *args, **kwds) :
+def call(*args, **kwds) :
     """Call a function on all workers, returning only the return value on the controller.
 
     function denotes the function that is to be called, *args and
@@ -282,7 +294,9 @@ def call(function=None, *args, **kwds) :
     been imported via exec_().
     """
     if __checkController(call) :
-        cfunction, tfunction = __translateFunctionArg(function)
+        if len(args) == 0:
+            raise UserError('pmi.call expects at least 1 argument on controller!')
+        cfunction, tfunction, args = __translateFunctionArgs(*args)
         cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
         _broadcast(_CALL, tfunction, *targs, **tkwds)
         log.info("Calling: %s", __formatCall(cfunction, cargs, ckwds))
@@ -296,21 +310,16 @@ def __workerCall(function, *targs, **tkwds) :
     log.info("Calling: %s", __formatCall(function, args, kwds))
     return function(*args, **kwds)
 
-def invokeNoResult(function, *args, **kwds) :
-    """invokeNoResult() is an alias for call()."""
-    return call(function, *args, **kwds)
-
-
 ##################################################
 ## LOCAL CALL
 ##################################################
 # provided for convenience
 # you can just use: pmiobject.function(*args, **kwds)
-def localcall(function=None, *args, **kwds):
+def localcall(*args, **kwds):
     if __checkController(localcall):
-        cfunction, tfunction = __translateFunctionArg(function)
+        cfunction, tfunction, args = __translateFunctionArgs(*args)
         args, kwds = __transcendProxies(args, kwds)
-        log.info("Calling locally: %s", __formatCall(function, args, kwds))
+        log.info("Calling locally: %s", __formatCall(cfunction, args, kwds))
         return cfunction(*args, **kwds)
     else:
         raise UserError('Cannot call localcall on worker!')
@@ -318,7 +327,7 @@ def localcall(function=None, *args, **kwds):
 ##################################################
 ## INVOKE
 ##################################################
-def invoke(function=None, *args, **kwds) :
+def invoke(*args, **kwds) :
     """Invoke a function on all workers, gathering the return values into a list.
 
     function denotes the function that is to be called, *args and
@@ -339,7 +348,9 @@ def invoke(function=None, *args, **kwds) :
     >>> messages = pmi.invoke('hello.HelloWorld.hello', hw)
     """
     if __checkController(invoke) :
-        cfunction, tfunction = __translateFunctionArg(function)
+        if len(args) == 0:
+            raise UserError('pmi.invoke expects at least 1 argument on controller!')
+        cfunction, tfunction, args = __translateFunctionArgs(*args)
         cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
         _broadcast(_INVOKE, tfunction, *targs, **tkwds)
         log.info("Invoking: %s", __formatCall(cfunction, cargs, ckwds))
@@ -358,7 +369,7 @@ def __workerInvoke(function, *targs, **tkwds) :
 ##################################################
 ## REDUCE (INVOKE WITH REDUCED RESULT)
 ##################################################
-def reduce(reduceOp=None, function=None, *args, **kwds) :
+def reduce(*args, **kwds) :
     """Invoke a function on all workers, reducing the return values to
     a single value.
 
@@ -386,11 +397,11 @@ def reduce(reduceOp=None, function=None, *args, **kwds) :
     ...             )
     """
     if __checkController(reduce) :
+        if len(args) <= 1:
+            raise UserError('pmi.reduce expects at least 2 argument on controller!')
         # handle reduceOp argument
-        if reduceOp is None :
-            raise UserError("pmi.reduce expects reduceOp argument on controller")
-        creduceOp, treduceOp = __translateFunctionArg(reduceOp)
-        cfunction, tfunction = __translateFunctionArg(function)
+        creduceOp, treduceOp, args = __translateFunctionArgs(*args)
+        cfunction, tfunction, args = __translateFunctionArgs(*args)
         cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
         _broadcast(_REDUCE, treduceOp, tfunction, *targs, **tkwds)
         log.info("Reducing: %s", __formatCall(cfunction, cargs, ckwds))
@@ -470,15 +481,26 @@ def __workerDelete(*args) :
 ##################################################
 ## WORKER LOOP CONTROL
 ##################################################
-def registerAtExit() :
-    """Controller command that registers the function
-    finalizeWorkers() via atexit. 
+def startWorkerLoop() :
+    """Worker command that starts the main worker loop.
+
+    This function starts a loop that expects to receive PMI commands
+    until stopWorkerLoop() or finalizeWorkers() is called on the
+    controller.
     """
-    if __checkController(registerAtExit) :
-        import atexit
-        atexit.register(finalizeWorkers)
-    else:
-        raise UserError('Cannot call registerAtExit on worker!')
+    # On the controller, leave immediately
+    if IS_CONTROLLER :
+        log.info('Entering and leaving the worker loop')
+        return None
+
+    log.info('Entering the worker loop.')
+    inWorkerLoop = True
+
+    try :
+        while 1 :
+            receive()
+    except StopIteration :
+        inWorkerLoop = False
 
 def finalizeWorkers():
     """Controller command that stops and exits all workers.
@@ -504,26 +526,16 @@ def __workerStop(doExit) :
         log.info('Stopping worker loop.')
         raise StopIteration()
 
-def startWorkerLoop() :
-    """Worker command that starts the main worker loop.
-
-    This function starts a loop that expects to receive PMI commands
-    until stopWorkerLoop() or finalizeWorkers() is called on the
-    controller.
+def registerAtExit() :
+    """Controller command that registers the function
+    finalizeWorkers() via atexit. 
     """
-    # On the controller, leave immediately
-    if IS_CONTROLLER :
-        log.info('Entering and leaving the worker loop')
-        return None
+    if __checkController(registerAtExit) :
+        import atexit
+        atexit.register(finalizeWorkers)
+    else:
+        raise UserError('Cannot call registerAtExit on worker!')
 
-    log.info('Entering the worker loop.')
-    inWorkerLoop = True
-
-    try :
-        while 1 :
-            receive()
-    except StopIteration :
-        inWorkerLoop = False
 
 ##################################################
 ## PROXY METACLASS
@@ -539,7 +551,7 @@ class Proxy(type):
             log.info('PMI.Proxy of type %s is creating pmi object of type %s',
                      method_self.__class__.__name__,
                      self.pmiobjectclassdef)
-            if not hasattr(method_self, 'pmiobject'):
+            if not _isProxy(method_self):
                 method_self.pmiobjectclassdef = self.pmiobjectclassdef
                 pmiobjectclass = _translateClass(self.pmiobjectclassdef)
                 method_self.pmiobject = create(pmiobjectclass, *args, **kwds)
@@ -768,6 +780,9 @@ class __CMD(object) :
     def __setstate__(self, state):
         self.cmd, self.args, self.kwds = state
 
+def _isProxy(obj):
+    return hasattr(obj, 'pmiobject')
+
 def _checkCommand(cmd):
     return 0 <= cmd < _MAXCMD
 
@@ -785,7 +800,7 @@ def __checkController(func) :
 def __checkWorker(func) :
     """Checks whether we are on a worker, raises a UserError if we are not.
     """
-    if IS_CONTROLLER : 
+    if IS_CONTROLLER:
         raise UserError("Cannot call %s on the controller!" % func.__name__)
 
 def _translateClass(cls):
@@ -829,7 +844,7 @@ def _translateOID(obj) :
         return obj
 
 def _transcendProxy(obj):
-    if hasattr(obj, 'pmiobject'):
+    if _isProxy(obj):
         return obj.pmiobject
     else:
         return obj
@@ -887,13 +902,18 @@ def __backtranslateOIDs(targs, tkwds):
 
 # Wrapper that allows to pickle a method
 class __Method(object) :
-    def __init__(self, funcname, im_self, cls) :
+    def __init__(self, funcname, im_self, im_class=None):
         self.__name__ = funcname
-        self.im_self = im_self
-        self.im_class = cls
+        self.im_self = _transcendProxy(im_self)
+        if im_class is None:
+            self.im_class = self.im_self.__class__
+        else:
+            self.im_class = im_class
         self.__determineMethod()
     def __getstate__(self):
-        return (self.__name__, _translateOID(self.im_self), self.im_class)
+        return (self.__name__,
+                _translateOID(self.im_self),
+                self.im_class)
     def __setstate__(self, state):
         self.__name__, self.im_self, self.im_class = state
         self.im_self = _backtranslateOID(self.im_self)
@@ -908,26 +928,39 @@ class __Method(object) :
         return self.method(*args, **kwds)
 
 # translate arguments to invoke
-def __translateFunctionArg(arg0):
+def __translateFunctionArgs(*args):
     """Internal controller function that normalizes the function
     argument to invoke(), call() or reduce().
     """
-    if arg0 is None :
-        raise UserError("pmi expects function argument on controller")
+    if not args:
+        raise TypeError("arguments missing")
+    arg0 = args[0]
+    if arg0 is None:
+        raise TypeError("pmi expects function argument on controller")
     if isinstance(arg0, types.StringTypes):
         tfunction = arg0
         function = eval(arg0, globals())
+        rargs = args[1:]
     elif isinstance(arg0, (types.FunctionType, types.BuiltinFunctionType)):
         if arg0.__name__ == '<lambda>':
             raise ValueError("pmi cannot handle lambda functions")
         tfunction = arg0
         function = tfunction
+        rargs = args[1:]
     elif isinstance(arg0, (types.MethodType, types.BuiltinMethodType)):
         tfunction = __Method(arg0.im_func.__name__, arg0.im_self, arg0.im_class)
         function = tfunction
-    else :
-        raise ValueError("pmi expects function, but got %s" % arg0)
-    return function, tfunction
+        rargs = args[1:]
+    else:
+        if len(args) <= 1:
+            raise TypeError("got an object as first argument, but nothing as second")
+        arg1 = args[1]
+        if isinstance(arg1, types.StringTypes):
+            tfunction = __Method(arg1, arg0)
+            function = tfunction
+            rargs = args[2:]
+        else: raise ValueError("bad arguments")
+    return function, tfunction, rargs
 
 def __backtranslateFunctionArg(arg0):
     if isinstance(arg0, types.StringTypes):

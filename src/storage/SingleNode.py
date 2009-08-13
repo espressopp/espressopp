@@ -32,11 +32,12 @@ if pmi.IS_CONTROLLER :
         The single node particle storage. Stores all particles
         on a single, configurable node.
         """
+        __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(cls='espresso.storage.SingleNodeLocal')
 
         def __init__(self, node=pmi.CONTROLLER) :
             self.pmiinit(node)
-            Storage.pmiinit(self)
+            Storage.__init__(self)
             self.masternode = node
             # list of all particles. Since they are all on one node, we can as well
             # keep a table of all of them here
@@ -50,7 +51,7 @@ if pmi.IS_CONTROLLER :
                 id = self.maxSeenId + 1
             elif type(id) is not type(1) or id < 0 :
                 raise TypeError("particle identity should be a nonnegative integer")
-            pmi.call(self.pmiobject.addParticle, id)
+            pmi.call(self, 'addParticle', id)
             # update maxSeenId and list of particleIds
             if id > self.maxSeenId :
                 self.maxSeenId = id
@@ -61,7 +62,7 @@ if pmi.IS_CONTROLLER :
             if id not in self.particleIds :
                 raise IndexError("particle %s does not exist" % str(id))
             self.particleIds.remove(id)
-            pmi.call(self.pmiobject.deleteParticle, id)
+            pmi.call(self, 'deleteParticle', id)
         
         def getNodeOfParticle(self, id) :
             if id not in self.particleIds :

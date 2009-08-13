@@ -1,5 +1,5 @@
 from espresso.Real3D import *
-from espresso.esutil import pmiinit, cxxinit
+from espresso.esutil import cxxinit
 from espresso import pmi
 from espresso import boostmpi as mpi
 
@@ -49,14 +49,14 @@ if pmi.IS_CONTROLLER:
 
         def __getitem__(self, particle):
             node = self.storage.getNodeOfParticle(particle)
-            return pmi.call(self.pmiobject.getItem, node, particle)
+            return pmi.call(self, 'getItem', node, particle)
 
         def __setitem__(self, particle, value):
             node = self.storage.getNodeOfParticle(particle)
-            pmi.call(self.pmiobject.setItem, node, particle, value)
+            pmi.call(self, 'setItem', node, particle, value)
 
         def checkFitsTo(self, set):
-            self.pmiobject.checkFitsTo(set.pmiobject)
+            pmi.localcall(self, 'checkFitsTo', set)
 
 ######## RealProperty
 
@@ -70,8 +70,10 @@ if pmi.IS_CONTROLLER:
     class RealProperty(Property):
         """Represents a real-valued particle property.
         """
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(cls='espresso.RealPropertyLocal')
         def __init__(self, storage):
-            pmiinit(self, 'espresso.RealPropertyLocal', storage)
+            self.pmiinit(storage)
             Property.__init__(self, storage)
 
 ######## IntegerProperty
@@ -87,8 +89,10 @@ if pmi.IS_CONTROLLER:
         """
         represents an integer valued particle property.
         """
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(cls='espresso.IntegerPropertyLocal')
         def __init__(self, storage):
-            pmiinit(self, 'espresso.IntegerPropertyLocal', storage)
+            self.pmiinit(storage)
             Property.__init__(self, storage)
 
 ######## Real3DProperty
@@ -104,6 +108,8 @@ if pmi.IS_CONTROLLER:
         """
         represents a Real3D valued particle property.
         """
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(cls='espresso.Real3DPropertyLocal')
         def __init__(self, storage):
-            pmiinit(self, 'espresso.Real3DPropertyLocal', storage)
+            self.pmiinit(storage)
             Property.__init__(self, storage)

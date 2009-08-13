@@ -53,9 +53,9 @@ def cxxinit(obj, cls, *args, **kwds):
         obj.cxxclass = cls
         cls.__init__(obj, *args, **kwds)
 
-def pmiinit(obj, cls, *args, **kwds):
-    if not hasattr(obj, 'pmiobject'):
-        obj.pmiobject = pmi.create(cls, *args, **kwds)
+# def pmiinit(obj, cls, *args, **kwds):
+#     if not hasattr(obj, 'pmiobject'):
+#         obj.pmiobject = pmi.create(cls, *args, **kwds)
 
 if pmi.IS_CONTROLLER:
     def pmiimport(module):

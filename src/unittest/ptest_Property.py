@@ -24,10 +24,13 @@ else:
     ####
 
     class MockStorage(storage.Storage) :
-        def __init__(self) :
-            pmiinit(self, 'MockStorageLocal')
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(cls='MockStorageLocal')
+
+        def __init__(self):
             # not existing particle for failure tests
             self.special = mpi.size + 1
+            self.pmiinit()
 
         def getNodeOfParticle(self, particle) :
             # magic for failure test - claim that a particle is here

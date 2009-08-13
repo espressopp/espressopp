@@ -58,7 +58,7 @@ else:
 
         def testBadArgument(self) :
             if pmi.IS_CONTROLLER:
-                self.assertRaises(ValueError, pmi.call, 1)
+                self.assertRaises(TypeError, pmi.call, 1)
                 self.assertRaises(ValueError, pmi.call, lambda x: x)
                 self.assertRaises(NameError, pmi.call, 'doesntexist')
 
@@ -126,7 +126,7 @@ else:
     class TestReduce(unittest.TestCase):
         def testBadArgument(self):
             if pmi.IS_CONTROLLER :
-                self.assertRaises(pmi.UserError, pmi.reduce, function=mockFunc)
+                self.assertRaises(pmi.UserError, pmi.reduce, mockFunc)
 
         def testFunction(self):
             res = pmi.reduce(add, mockFunc)
@@ -251,6 +251,7 @@ else:
                 self.assertRaises(pmi.UserError, pmi.create)
 
         def testCallMethod(self):
+            # call via instance
             obj = pmi.create(MockClass)
             self.assertEqual(pmi.call(obj.f), 42)
             self.assert_(obj.fCalled)
@@ -264,6 +265,11 @@ else:
             # call via string
             obj3 = pmi.create('MockClass2')
             self.assertEqual(pmi.call('MockClass2.f', obj3), 52)
+
+            # call via instance and method name
+            obj4 = pmi.create(MockClass)
+            self.assertEqual(pmi.call(obj4, 'f'), 42)
+            self.assert_(obj4.fCalled)
 
         def testPMIClassArgument(self):
             global mockFuncArg, mockFuncArgs
@@ -334,6 +340,9 @@ class MockProxyLocal(object):
     def f3(self):
         self.called = "f3"
         return 62
+    def f4(self):
+        self.called = "f4"
+        return 72
 
     def setX(self, v):
         self._x = v
@@ -353,6 +362,8 @@ if __name__ != 'espresso.pmi':
                 pmiinvoke = [ 'f3' ],
                 pmiproperty = [ 'x' ]
                 )
+            def f4(self):
+                return pmi.call(self, 'f4')
 
     class TestProxyCreateAndDelete(unittest.TestCase):
         def testCreateandDelete(self):
@@ -409,6 +420,13 @@ if __name__ != 'espresso.pmi':
             else:
                 self.assertEqual(pmi.invoke(), None)
             self.assertEqual(self.pmiobj.called, 'f3')
+
+        def testCallViaSelf(self):
+            if pmi.IS_CONTROLLER:
+                self.assertEqual(self.obj.f4(), 72)
+            else:
+                self.assertEqual(pmi.call(), 72)
+            self.assertEqual(self.pmiobj.called, 'f4')
             
         def testProperty(self):
             if pmi.IS_CONTROLLER:

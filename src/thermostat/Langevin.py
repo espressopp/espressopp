@@ -9,15 +9,8 @@ class LangevinLocal(ThermostatLocal, thermostat_Langevin):
 
 if pmi.IS_CONTROLLER:
     class Langevin(Thermostat):
-#         __metaclass__ = pmi.Proxy
-#         pmiproxydefs = Thermostat.pmiproxydefs
-# #        pmiproxydefs['class'] = 'espresso.thermostat.LangevinLocal'
-#         pmiproxydefs['pmicall'] = ['connect', 'disconnect']
-#         pmiproxydefs['pmiproperty'].extend(['gamma'])
-
-        def __init__(self, temperature, gamma):
-            pmiinit(self, 'espresso.thermostat.LangevinLocal',
-                    temperature, gamma)
-
-        def connect(self, integrator):
-            pmi.call(self.pmiobject.connect, integrator.pmiobject)
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = \
+            dict(cls='espresso.thermostat.LangevinLocal',
+                 pmicall = ['connect', 'disconnect'],
+                 pmiproperty = [ 'gamma' ])
