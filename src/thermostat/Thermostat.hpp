@@ -31,6 +31,8 @@ namespace espresso {
 	setTemperature(_temperature); 
       }
       
+      virtual ~Thermostat() {}
+
       /** Setter routine for the temperature
 	  
           \param temperature is the new target temperature (must not be negative)

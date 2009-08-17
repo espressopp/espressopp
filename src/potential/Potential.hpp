@@ -13,6 +13,8 @@ namespace espresso {
     public:
       typedef shared_ptr< Potential > SelfPtr;
 
+      virtual ~Potential() {}
+
       // override these
       virtual pairs::Computer::SelfPtr 
       createEnergyComputer(Property< real >::SelfPtr _energyProperty1,

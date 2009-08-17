@@ -60,6 +60,8 @@ namespace espresso {
 	setTimestep(_timestep);
       }
 
+      virtual ~MDIntegrator() {}
+
       void setSet(particles::Set::SelfPtr _set) { set = _set; }
       particles::Set::SelfPtr getSet() const { return set; }
 
