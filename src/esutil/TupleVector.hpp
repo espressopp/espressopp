@@ -277,6 +277,8 @@ namespace espresso {
 	// classes that can construct a const_reference
 	friend class TupleVector;
 	template<class, class> friend class IteratorBase;
+	// classes that need to access the index
+	friend class fat_reference;
 
       public:
 	/// non-const->const conversion
@@ -310,6 +312,7 @@ namespace espresso {
 	// classes that can construct a fat_reference
 	friend class TupleVector;
 	template<class, class> friend class IteratorBase;
+	friend class fat_iterator;
 
       public:
 	/// get pointer to the referenced particle
@@ -317,6 +320,7 @@ namespace espresso {
 
 	fat_reference &operator=(const fat_reference &ref) { return *this = const_reference(ref); }
 	fat_reference &operator=(const_reference);
+
       private:
 
 	/// constructable only through @ref esutil::TupleVector
@@ -353,6 +357,8 @@ namespace espresso {
 	// classes that can generate an iterator
 	friend class TupleVector;
 	friend class const_reference;
+	// classes that need access to the index
+	friend class fat_iterator;
 
 	typedef IteratorBase<const_reference, const_iterator> IteratorBaseClass;
       public:
@@ -376,9 +382,10 @@ namespace espresso {
       class fat_iterator: public IteratorBase<fat_reference, fat_iterator> {
 	// classes that can generate a fat_iterator
 	friend class TupleVector;
+	friend class fat_reference;
 	// for fat->thin conversion
 	friend class iterator;
-	friend class fat_reference;
+	friend class const_iterator;
 
 	friend class boost::iterator_core_access;
 
