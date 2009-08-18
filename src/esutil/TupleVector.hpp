@@ -3,10 +3,10 @@
 
 #include <vector>
 #include <stdexcept>
+#include <algorithm>
+#include <functional>
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/foreach.hpp>
-#include <functional>
-#include "VectorTraits.hpp"
 
 namespace espresso {
   namespace esutil {
@@ -31,9 +31,11 @@ namespace espresso {
     public:
       class reference;
       class const_reference;
+      class fat_reference;
 
       class iterator;
       class const_iterator;
+      class fat_iterator;
 
       template<class> class PropertyPointer;
       template<class> class ConstPropertyPointer;
@@ -95,6 +97,11 @@ namespace espresso {
 	  TupleVector class or its iterators.
       */
       class ReferenceBase {
+	// classes that need to access the index
+	// this are just the properties, which do the actual dereferencing
+	template<class, class> friend class PropertyPointerBase;
+	template<class, class> friend class ArrayPropertyPointerBase;
+
       protected:
 	/// constructable only through TupleVector
 	ReferenceBase() {}
@@ -106,16 +113,8 @@ namespace espresso {
 	size_t index;
 
       private:
-	// class that grants access to the index
-	friend class ReferenceIndexAccess;
-
 	/// not possible
 	void operator=(const ReferenceBase &_ref);
-      };
-
-      class ReferenceIndexAccess {
-      public:
-	static size_t getIndex(const ReferenceBase &ref) { return ref.index; }
       };
 
       /** an iterator over elements. This is basically a reference to
@@ -174,12 +173,12 @@ namespace espresso {
 	  resizings of the TupleVector.
       */
       template<class T, class Property>
-      class PropertyPointerBase: private ReferenceIndexAccess {
+      class PropertyPointerBase {
       public:
 	/// dereference
-	T &operator[](reference n) const { return data[getIndex(n)]; }
+	T &operator[](reference n) const { return data[ReferenceBase(n).index]; }
 	/// dereference
-	const T &operator[](const_reference n) const { return data[getIndex(n)]; }
+	const T &operator[](const_reference n) const { return data[ReferenceBase(n).index]; }
 
 	/// check for validity
 	operator bool() const { return data; }
@@ -200,12 +199,12 @@ namespace espresso {
 	  is only known at runtime.
       */
       template<class T, class Property>
-      class ArrayPropertyPointerBase: private ReferenceIndexAccess {
+      class ArrayPropertyPointerBase {
       public:
 	/// dereference
-	T *operator[](reference n) const { return data + getIndex(n)*dimension; }
+	T *operator[](reference n) const { return data + ReferenceBase(n).index*dimension; }
 	/// dereference
-	const T *operator[](const_reference n) const { return data + getIndex(n)*dimension; }
+	const T *operator[](const_reference n) const { return data + ReferenceBase(n).index*dimension; }
 
 	/// check for validity
 	operator bool() const { return data; }
@@ -240,8 +239,7 @@ namespace espresso {
       /** a reference to an element, which then can be used to read and
 	  write properties of the element using TupleVector::PropertyPointer.
 	
-	  Actually, this is nothing but a wrapper for an iterator. A
-	  reference can only be obtained from element access to the
+	  A reference can only be obtained from element access to the
 	  TupleVector class or its iterators. And from the
 	  implementation point of view, it doesn't differ from a
 	  pointer.
@@ -257,6 +255,9 @@ namespace espresso {
 	/// get pointer to the referenced particle
 	iterator operator&() const { return iterator(index); }
 
+	/// cast down fat_reference
+	reference(const fat_reference &_ref): ReferenceBase(_ref) {}
+
       private:
 	/// constructable only through TupleVector
 	reference(size_type _index): ReferenceBase(_index) {}
@@ -269,8 +270,7 @@ namespace espresso {
 	  properties of the element using
 	  @ref esutil::TupleVector::PropertyPointer.
 	
-	  Actually, this is nothing but a wrapper for an iterator. A
-	  reference can only be obtained from element access to the
+	  A reference can only be obtained from element access to the
 	  TupleVector class or its iterators.
       */
       class const_reference: public ReferenceBase {
@@ -281,6 +281,10 @@ namespace espresso {
       public:
 	/// non-const->const conversion
 	const_reference(const reference &_ref): ReferenceBase(_ref) {}
+
+	/// cast down fat_reference
+	const_reference(const fat_reference &_ref): ReferenceBase(_ref) {}
+
 	/// get pointer to the referenced particle
 	const_iterator operator&() const { return const_iterator(index); }
 
@@ -293,46 +297,104 @@ namespace espresso {
 	void operator=(const const_reference &);
       };
 
+      /** a reference to an element, which then can be used to copy an
+	  entire element, or casting down to a simple
+	  (const_)reference. Unlike the reference itself, the
+	  fat_reference knows about the underlying vector and
+	  therefore allows copying of whole elements.
+	
+	  A reference can only be obtained from element access to the
+	  TupleVector class or its iterators.
+      */
+      class fat_reference: public ReferenceBase {
+	// classes that can construct a fat_reference
+	friend class TupleVector;
+	template<class, class> friend class IteratorBase;
+
+      public:
+	/// get pointer to the referenced particle
+	fat_iterator operator&() const { return fat_iterator(vector, index); }
+
+	fat_reference &operator=(const fat_reference &ref) { return *this = const_reference(ref); }
+	fat_reference &operator=(const_reference);
+      private:
+
+	/// constructable only through @ref esutil::TupleVector
+	fat_reference(TupleVector *_vector, size_type _index)
+	  : ReferenceBase(_index), vector(_vector) {}
+
+	TupleVector *vector;
+      };
+
       /** a random iterator over elements. This is basically a reference to
 	  an element with a mutable index
       */
       class iterator: public IteratorBase<reference, iterator> {
-	// class that can generate an iterator
-	friend class TupleVector;
+	// classes that can generate an iterator
 	friend class TupleVector::reference;
-	// for const->nonconst conversion
+	// for non-const->const conversion
 	friend class const_iterator;
+
+	typedef IteratorBase<reference, iterator> IteratorBaseClass;
 
       public:
 	/// default constructor, uninitialized iterator
 	iterator() {}
-
+	/// cast-down fat_iterator
+	iterator(const fat_iterator &fat): IteratorBaseClass(fat.index) {}
       private:
-	/// constructable only through TupleVector
-	iterator(size_type _index)
-	  : IteratorBase<reference, iterator>(_index) {}
+	iterator(size_type _index): IteratorBaseClass(_index) {}
       };
 
       /** a random iterator over constant elements. This is basically a
 	  reference to an element with a mutable index
       */
       class const_iterator: public IteratorBase<const_reference, const_iterator> {
-	// class that can generate an iterator
+	// classes that can generate an iterator
 	friend class TupleVector;
 	friend class const_reference;
 
+	typedef IteratorBase<const_reference, const_iterator> IteratorBaseClass;
       public:
 	/// default constructor
 	const_iterator() {}
 
 	/// non-const->const conversion
-	const_iterator(const iterator _it)
-	  : IteratorBase<const_reference, const_iterator>(_it.index) {}
+	const_iterator(const iterator _it): IteratorBaseClass(_it.index) {}
+	/// non-const->const conversion
+	const_iterator(const fat_iterator &fat): IteratorBaseClass(fat.index) {}
 
       private:
+	const_iterator(size_type _index): IteratorBaseClass(_index) {}
+      };
+
+      /** a random iterator over elements with knowledge of the underlying TupleVector.
+	  Due to this, fat_iterators are much less efficient when used as function
+	  parameters, however, they provide most of the functionality of a normal iterator,
+	  e. g. copying sets of elements.
+      */
+      class fat_iterator: public IteratorBase<fat_reference, fat_iterator> {
+	// classes that can generate a fat_iterator
+	friend class TupleVector;
+	// for fat->thin conversion
+	friend class iterator;
+	friend class fat_reference;
+
+	friend class boost::iterator_core_access;
+
+	typedef IteratorBase<reference, fat_iterator> IteratorBaseClass;
+
+      public:
+	fat_iterator copy(TupleVector::const_iterator begin, TupleVector::const_iterator end);
+
+      private:
+	fat_reference dereference() const { return fat_reference(vector, index); }
+
 	/// constructable only through TupleVector
-	const_iterator(size_type _index)
-	  : IteratorBase<const_reference, const_iterator>(_index) {}
+	fat_iterator(TupleVector *_vector, size_type _index)
+	  : IteratorBaseClass(_index), vector(_vector) {}
+
+	TupleVector *vector;
       };
 
       typedef iterator pointer;
@@ -477,28 +539,28 @@ namespace espresso {
       //@{
 
       ///
-      iterator begin() { return iterator(0); }
+      fat_iterator begin() { return fat_iterator(this, 0); }
       ///
       const_iterator begin() const { return const_iterator(0); }
 
       ///
-      iterator end()   { return iterator(eSize); }
+      fat_iterator end()   { return fat_iterator(this, eSize); }
       ///
       const_iterator end() const { return const_iterator(eSize); };
 
       /// get reference to nth element
-      reference operator[](size_type n) { return reference(n); }
+      fat_reference operator[](size_type n) { return fat_reference(this, n); }
       /// get const reference to nth element
       const_reference operator[](size_type n) const {
 	return const_reference(n);
       }
 
       /// get checked reference to nth element
-      reference at(size_type n)  {
+      fat_reference at(size_type n)  {
 	if (n >= eSize) {
 	  throw std::out_of_range("TupleVector::at");
 	}
-	return reference(n);
+	return fat_reference(this, n);
       }
       /// get checked const reference to nth element
       const_reference at(size_type n) const {
@@ -510,9 +572,6 @@ namespace espresso {
 
       /// insert an uninitialized element at position pos
       iterator insert(iterator pos);
-      /// insert a copy of element e at position pos
-      iterator insert(iterator pos, reference e)
-      { return insert(pos, const_reference(e)); }
       /// insert a copy of element e at position pos
       iterator insert(iterator pos, const_reference e);
       /// insert n uninitialized elements at position pos
@@ -555,38 +614,6 @@ namespace espresso {
       */
       void reserve(size_type minCapacity);
 
-      //@}
-
-      /** @name full element related members
-
-	  here are additional routines which allow to work
-	  with a whole element. These functions are in a
-	  way standard vector elements, however, for a standard
-	  vector, these functions are provided by the reference
-	  member only. Typically, an element can for example be copied
-	  using a construct such as *a = *b. Since in this class,
-	  the reference does not hold the full information,
-	  these functions need to be provided by the container.
-      */
-      //@{
-      /** copy all data of a particle
-	  @param dst where to write to
-	  @param src where to get the data from
-      */
-      void copy(TupleVector::reference dst,
-		TupleVector::const_reference src);
-      /** copy all data of a set of particles. This is typically faster
-	  than looping over the set of particles, and a replacement for
-          the std::copy-algorithm, which does not work with TupleVectors
-          iterators.
-
-	  @param begin start of sequence to copy
-	  @param end   end of sequence to copy
-	  @param dst   start of where to copy the data to
-      */
-      void copy(TupleVector::const_iterator begin,
-		TupleVector::const_iterator end,
-                TupleVector::iterator dst);
       //@}
 
       /** @name property related members
@@ -715,27 +742,25 @@ namespace espresso {
 	bool operator()(const Property &ref) { return ref.id == searchID; }
       };
     };
-
-    /// How BlockVector deals with copying data within a TupleVector
-    template<>
-    class VectorTraits<TupleVector> {
-      /// copy one element
-      void copy(TupleVector &v,
-                TupleVector::reference dst,
-		TupleVector::const_reference src) {
-        v.copy(dst,src);
-      }
-
-      /** copy a set of elements */
-      void copy(TupleVector &v,
-                TupleVector::const_iterator begin,
-		TupleVector::const_iterator end,
-                TupleVector::iterator dst) {
-        v.copy(begin, end, dst);
-      }
-    };
   }
 }
+
+namespace std {
+  /** Specialization for the fat_iterator of the TupleVector. Copy a set of elements */
+  template<class In>
+  inline espresso::esutil::TupleVector::fat_iterator
+  copy(In begin, In end,
+       espresso::esutil::TupleVector::fat_iterator dst) {
+    return dst.copy(begin, end);
+  }
+  /** Specialization for the fat_iterator of the TupleVector. Copy a set of elements */
+  template<class In>
+  inline espresso::esutil::TupleVector::fat_iterator
+  copy_backward(In begin, In end,
+		espresso::esutil::TupleVector::fat_iterator dst) {
+    return dst.copy(begin, end);
+  }
+};
 
 /** Teach boost foreach that TupleVector is not copyable.
     This function has to be at global scope.
