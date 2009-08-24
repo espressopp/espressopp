@@ -8,6 +8,8 @@
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/foreach.hpp>
 
+#include "VectorTraits.hpp"
+
 namespace espresso {
   namespace esutil {
 
@@ -30,12 +32,12 @@ namespace espresso {
 
     public:
       class reference;
+      class thin_reference;
       class const_reference;
-      class fat_reference;
 
       class iterator;
+      class thin_iterator;
       class const_iterator;
-      class fat_iterator;
 
       template<class> class PropertyPointer;
       template<class> class ConstPropertyPointer;
@@ -178,6 +180,8 @@ namespace espresso {
 	/// dereference
 	T &operator[](reference n) const { return data[ReferenceBase(n).index]; }
 	/// dereference
+	T &operator[](thin_reference n) const { return data[ReferenceBase(n).index]; }
+	/// dereference
 	const T &operator[](const_reference n) const { return data[ReferenceBase(n).index]; }
 
 	/// check for validity
@@ -203,6 +207,8 @@ namespace espresso {
       public:
 	/// dereference
 	T *operator[](reference n) const { return data + ReferenceBase(n).index*dimension; }
+	/// dereference
+	T *operator[](thin_reference n) const { return data + ReferenceBase(n).index*dimension; }
 	/// dereference
 	const T *operator[](const_reference n) const { return data + ReferenceBase(n).index*dimension; }
 
@@ -236,15 +242,51 @@ namespace espresso {
       ///
       typedef ptrdiff_t difference_type;
   
-      /** a reference to an element, which then can be used to read and
-	  write properties of the element using TupleVector::PropertyPointer.
-	
+      /** a reference to an element, which then can be used to copy an
+	  entire element, or casting down to a simple const or thin
+	  reference. Unlike the thin reference, the reference knows
+	  about the underlying vector and therefore allows copying of
+	  whole elements. However, a reference is also less performant,
+          especially when used in loops and function calls. In the
+          latter case, often a thin reference is enough.
+
 	  A reference can only be obtained from element access to the
-	  TupleVector class or its iterators. And from the
-	  implementation point of view, it doesn't differ from a
-	  pointer.
+	  TupleVector class or its iterators.
       */
       class reference: public ReferenceBase {
+	// classes that can construct a fat_reference
+	friend class TupleVector;
+	template<class, class> friend class IteratorBase;
+	friend class iterator;
+
+      public:
+	/// "upcast" of a thin reference
+	reference(TupleVector *_vector, thin_reference _ref)
+	  : ReferenceBase(_ref.index), vector(_vector) {}
+
+	/// get pointer to the referenced particle
+	iterator operator&() const { return iterator(vector, index); }
+
+	reference &operator=(const reference &ref) { return *this = const_reference(ref); }
+	reference &operator=(const_reference);
+
+      private:
+	reference(TupleVector *_vector, size_type _index)
+	  : ReferenceBase(_index), vector(_vector) {}
+
+	TupleVector *vector;
+      };
+
+      /** a thin reference to an element, which then can be used to
+	  read and write properties of the element using
+	  TupleVector::PropertyPointer. This reference is thin in the
+          sense that it does not allow cross-property operations, for
+          example assigning the referenced element from another.
+	
+	  A thin reference can be obtained by simply casting down a
+          reference.
+      */
+      class thin_reference: public ReferenceBase {
 	// classes that can construct a reference
 	friend class TupleVector;
 	template<class, class> friend class IteratorBase;
@@ -253,112 +295,120 @@ namespace espresso {
 
       public:
 	/// get pointer to the referenced particle
-	iterator operator&() const { return iterator(index); }
+	thin_iterator operator&() const { return thin_iterator(index); }
 
 	/// cast down fat_reference
-	reference(const fat_reference &_ref): ReferenceBase(_ref) {}
+	thin_reference(const reference &_ref): ReferenceBase(_ref) {}
 
       private:
-	/// constructable only through TupleVector
-	reference(size_type _index): ReferenceBase(_index) {}
+	thin_reference(size_type _index): ReferenceBase(_index) {}
 
 	/// not possible
 	void operator=(const reference &);
       };
 
-      /** a reference to a constant element, which then can be used to read
-	  properties of the element using
-	  @ref esutil::TupleVector::PropertyPointer.
-	
-	  A reference can only be obtained from element access to the
-	  TupleVector class or its iterators.
+      /** a thin reference to a constant element, which then can be
+	  used to read properties of the element using @ref
+	  esutil::TupleVector::PropertyPointer. Since a
+	  const_reference cannot be assigned anything to, there is no
+	  need for a full const_reference; therefore, the
+	  const_reference is thin.
       */
       class const_reference: public ReferenceBase {
 	// classes that can construct a const_reference
 	friend class TupleVector;
 	template<class, class> friend class IteratorBase;
 	// classes that need to access the index
-	friend class fat_reference;
+	friend class reference;
 
       public:
 	/// non-const->const conversion
 	const_reference(const reference &_ref): ReferenceBase(_ref) {}
-
-	/// cast down fat_reference
-	const_reference(const fat_reference &_ref): ReferenceBase(_ref) {}
+	/// non-const->const conversion
+	const_reference(const thin_reference &_ref): ReferenceBase(_ref) {}
 
 	/// get pointer to the referenced particle
 	const_iterator operator&() const { return const_iterator(index); }
 
       private:
-
-	/// constructable only through @ref esutil::TupleVector
 	const_reference(size_type _index): ReferenceBase(_index) {}
 
 	/// not possible
 	void operator=(const const_reference &);
       };
 
-      /** a reference to an element, which then can be used to copy an
-	  entire element, or casting down to a simple
-	  (const_)reference. Unlike the reference itself, the
-	  fat_reference knows about the underlying vector and
-	  therefore allows copying of whole elements.
-	
-	  A reference can only be obtained from element access to the
-	  TupleVector class or its iterators.
-      */
-      class fat_reference: public ReferenceBase {
-	// classes that can construct a fat_reference
-	friend class TupleVector;
-	template<class, class> friend class IteratorBase;
-	friend class fat_iterator;
-
-      public:
-	/// get pointer to the referenced particle
-	fat_iterator operator&() const { return fat_iterator(vector, index); }
-
-	fat_reference &operator=(const fat_reference &ref) { return *this = const_reference(ref); }
-	fat_reference &operator=(const_reference);
-
-      private:
-
-	/// constructable only through @ref esutil::TupleVector
-	fat_reference(TupleVector *_vector, size_type _index)
-	  : ReferenceBase(_index), vector(_vector) {}
-
-	TupleVector *vector;
-      };
-
-      /** a random iterator over elements. This is basically a reference to
-	  an element with a mutable index
+      /** a random iterator over elements with knowledge of the
+	  underlying TupleVector.  Due to this, iterators are much
+	  less efficient when used as function parameters, however,
+	  they provide most of the functionality of a normal iterator,
+	  e. g. copying sets of elements. For better performance, look
+	  at the thin_iterator (and its limitations, see also
+	  thin_reference).
       */
       class iterator: public IteratorBase<reference, iterator> {
-	// classes that can generate an iterator
+	// classes that can generate a fat_iterator
+	friend class TupleVector;
 	friend class TupleVector::reference;
-	// for non-const->const conversion
+	// for fat->thin conversion
+	friend class thin_iterator;
 	friend class const_iterator;
+
+	friend class boost::iterator_core_access;
 
 	typedef IteratorBase<reference, iterator> IteratorBaseClass;
 
       public:
-	/// default constructor, uninitialized iterator
-	iterator() {}
-	/// cast-down fat_iterator
-	iterator(const fat_iterator &fat): IteratorBaseClass(fat.index) {}
+	/// "upcast" of a thin iterator
+	iterator(TupleVector *_vector, thin_iterator _it)
+	  : IteratorBaseClass(_it.index), vector(_vector) {}
+
+        /** used by the std::copy and std::copy_backward specialisations.
+            Copy the elements of the sequence begin - end to the places
+            indicated by iterator. */
+	iterator copy(TupleVector::const_iterator begin, TupleVector::const_iterator end);
+
       private:
-	iterator(size_type _index): IteratorBaseClass(_index) {}
+	iterator(TupleVector *_vector, size_type _index)
+	  : IteratorBaseClass(_index), vector(_vector) {}
+
+	reference dereference() const { return reference(vector, index); }
+
+	TupleVector *vector;
       };
 
-      /** a random iterator over constant elements. This is basically a
-	  reference to an element with a mutable index
+      /** a thin random iterator over elements. This is basically a
+	  reference to an element with a mutable index. Unlike the
+	  iterator, this thin iterator is faster, but referenced
+	  element cannot be assigned.
+      */
+      class thin_iterator: public IteratorBase<thin_reference, thin_iterator> {
+	// classes that can generate an thin_iterator
+	friend class TupleVector::thin_reference;
+	// for non-const->const conversion
+	friend class const_iterator;
+
+	typedef IteratorBase<thin_reference, thin_iterator> IteratorBaseClass;
+
+      public:
+	/// default constructor, uninitialized iterator
+	thin_iterator() {}
+	/// cast-down fat_iterator
+	thin_iterator(const iterator &fat): IteratorBaseClass(fat.index) {}
+
+      private:
+	thin_iterator(size_type _index): IteratorBaseClass(_index) {}
+      };
+
+      /** a random iterator over constant elements. This is basically
+	  a reference to an element with a mutable index. Like
+	  const_reference, there is also only a thin const_iterator.
       */
       class const_iterator: public IteratorBase<const_reference, const_iterator> {
 	// classes that can generate an iterator
 	friend class TupleVector;
 	friend class const_reference;
 	// classes that need access to the index
-	friend class fat_iterator;
+	friend class iterator;
 
 	typedef IteratorBase<const_reference, const_iterator> IteratorBaseClass;
       public:
@@ -366,45 +416,16 @@ namespace espresso {
 	const_iterator() {}
 
 	/// non-const->const conversion
-	const_iterator(const iterator _it): IteratorBaseClass(_it.index) {}
+	const_iterator(const thin_iterator _it): IteratorBaseClass(_it.index) {}
 	/// non-const->const conversion
-	const_iterator(const fat_iterator &fat): IteratorBaseClass(fat.index) {}
+	const_iterator(const iterator &fat): IteratorBaseClass(fat.index) {}
 
       private:
 	const_iterator(size_type _index): IteratorBaseClass(_index) {}
       };
 
-      /** a random iterator over elements with knowledge of the underlying TupleVector.
-	  Due to this, fat_iterators are much less efficient when used as function
-	  parameters, however, they provide most of the functionality of a normal iterator,
-	  e. g. copying sets of elements.
-      */
-      class fat_iterator: public IteratorBase<fat_reference, fat_iterator> {
-	// classes that can generate a fat_iterator
-	friend class TupleVector;
-	friend class fat_reference;
-	// for fat->thin conversion
-	friend class iterator;
-	friend class const_iterator;
-
-	friend class boost::iterator_core_access;
-
-	typedef IteratorBase<reference, fat_iterator> IteratorBaseClass;
-
-      public:
-	fat_iterator copy(TupleVector::const_iterator begin, TupleVector::const_iterator end);
-
-      private:
-	fat_reference dereference() const { return fat_reference(vector, index); }
-
-	/// constructable only through TupleVector
-	fat_iterator(TupleVector *_vector, size_type _index)
-	  : IteratorBaseClass(_index), vector(_vector) {}
-
-	TupleVector *vector;
-      };
-
       typedef iterator pointer;
+      typedef thin_iterator thin_pointer;
       typedef const_iterator const_pointer;
 
       //@}
@@ -546,28 +567,28 @@ namespace espresso {
       //@{
 
       ///
-      fat_iterator begin() { return fat_iterator(this, 0); }
+      iterator begin() { return iterator(this, 0); }
       ///
       const_iterator begin() const { return const_iterator(0); }
 
       ///
-      fat_iterator end()   { return fat_iterator(this, eSize); }
+      iterator end()   { return iterator(this, eSize); }
       ///
       const_iterator end() const { return const_iterator(eSize); };
 
       /// get reference to nth element
-      fat_reference operator[](size_type n) { return fat_reference(this, n); }
+      reference operator[](size_type n) { return reference(this, n); }
       /// get const reference to nth element
       const_reference operator[](size_type n) const {
 	return const_reference(n);
       }
 
       /// get checked reference to nth element
-      fat_reference at(size_type n)  {
+      reference at(size_type n)  {
 	if (n >= eSize) {
 	  throw std::out_of_range("TupleVector::at");
 	}
-	return fat_reference(this, n);
+	return reference(this, n);
       }
       /// get checked const reference to nth element
       const_reference at(size_type n) const {
@@ -578,16 +599,16 @@ namespace espresso {
       }
 
       /// insert an uninitialized element at position pos
-      iterator insert(iterator pos);
+      thin_iterator insert(thin_iterator pos);
       /// insert a copy of element e at position pos
-      iterator insert(iterator pos, const_reference e);
+      thin_iterator insert(thin_iterator pos, const_reference e);
       /// insert n uninitialized elements at position pos
-      void insert(iterator pos, size_type n);
+      void insert(thin_iterator pos, size_type n);
 
       /// delete element at position pos
-      iterator erase(iterator pos);
+      thin_iterator erase(thin_iterator pos);
       /// delete elements from sequence
-      iterator erase(iterator start, iterator end);
+      thin_iterator erase(thin_iterator start, thin_iterator end);
 
       /// remove all elements, but keep set of properties
       void clear() { resize(0); }
@@ -752,20 +773,57 @@ namespace espresso {
   }
 }
 
+/*****************************************************************
+ * some specializations for interoperability with TupleVector
+ *****************************************************************/
+
+namespace espresso {
+  namespace esutil {
+    template<>
+    class VectorTraits<TupleVector> {
+    public:
+      // best we can do
+      typedef TupleVector::const_reference value_type;
+      typedef TupleVector::size_type size_type;
+      typedef TupleVector::difference_type difference_type;
+        
+      typedef TupleVector::iterator iterator;
+      typedef TupleVector::thin_iterator thin_iterator;
+      typedef TupleVector::const_iterator const_iterator;
+
+      typedef TupleVector::reference reference;
+      typedef TupleVector::thin_reference thin_reference;
+      typedef TupleVector::const_reference const_reference;
+
+      typedef TupleVector::pointer pointer;
+      typedef TupleVector::thin_pointer thin_pointer;
+      typedef TupleVector::const_pointer const_pointer;
+
+      /** Make an thin iterator or reference thick. */
+      template<class ItOrRef, class ThinItOrRef>
+      static ItOrRef make_thick(TupleVector *v, ThinItOrRef ref) { return ItOrRef(v, ref); }
+      /** Make an thin iterator or reference thick. For const, that has to be a no-op. */
+      template<class ItOrRef, class ThinItOrRef>
+      static ItOrRef make_thick(const TupleVector *v, ThinItOrRef ref) { return ref; }
+    };
+  }
+}
+
 namespace std {
-  /** Specialization for the fat_iterator of the TupleVector. Copy a set of elements */
+  /** Specialization for the fat_iterator of the TupleVector. Copy a set of elements. */
   template<class In>
-  inline espresso::esutil::TupleVector::fat_iterator
+  inline espresso::esutil::TupleVector::iterator
   copy(In begin, In end,
-       espresso::esutil::TupleVector::fat_iterator dst) {
+       espresso::esutil::TupleVector::iterator dst) {
     return dst.copy(begin, end);
   }
-  /** Specialization for the fat_iterator of the TupleVector. Copy a set of elements */
+  /** Specialization for the fat_iterator of the TupleVector. Copy a set of elements.
+      Unlike the STL version, this requires random iterators. */
   template<class In>
-  inline espresso::esutil::TupleVector::fat_iterator
+  inline espresso::esutil::TupleVector::iterator
   copy_backward(In begin, In end,
-		espresso::esutil::TupleVector::fat_iterator dst) {
-    return dst.copy(begin, end);
+		espresso::esutil::TupleVector::iterator dst) {
+    return (dst - (end - begin)).copy(begin, end);
   }
 };
 

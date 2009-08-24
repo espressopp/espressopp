@@ -42,7 +42,8 @@ TupleVector::TupleVector(const TupleVector &vec, size_type newESize)
 
 TupleVector::PropertyId TupleVector::addProperty(size_t _size, size_t _dimension)
 {
-  property.push_back(Property(++uniqueID, _size, _dimension, malloc(maxESize*_size)));
+  void *mem = maxESize > 0 ? malloc(maxESize*_size) : 0;
+  property.push_back(Property(++uniqueID, _size, _dimension, mem));
   return uniqueID;
 }
 
@@ -85,7 +86,13 @@ void TupleVector::reserve(size_t minCapacity)
   // finally, reallocate if necessary
   if (newCapacity != maxESize) {
     BOOST_FOREACH(Property &prop, property) {
-      prop.data = realloc(prop.data, newCapacity*prop.size);
+      if (newCapacity > 0) {
+        prop.data = realloc(prop.data, newCapacity*prop.size);
+      }
+      else {
+        free(prop.data);
+        prop.data = 0;
+      }
     }
     maxESize = newCapacity;
   }
@@ -120,22 +127,22 @@ void TupleVector::memcpy(size_type dst, size_type src, size_type size)
   }
 }
 
-TupleVector::iterator TupleVector::insert(TupleVector::iterator pos)
+TupleVector::thin_iterator TupleVector::insert(TupleVector::thin_iterator pos)
 {
   resize(eSize + 1);
   memmove(pos.index + 1, pos.index, eSize - (pos.index + 1));
   return pos;
 }
 
-TupleVector::iterator TupleVector::insert(TupleVector::iterator pos,
-					  TupleVector::const_reference e)
+TupleVector::thin_iterator TupleVector::insert(TupleVector::thin_iterator pos,
+                                               TupleVector::const_reference e)
 {
-  iterator it = insert(pos);
+  thin_iterator it = insert(pos);
   memmove(it.index, e.index, 1);
   return it;
 }
 
-void TupleVector::insert(TupleVector::iterator pos, size_type n)
+void TupleVector::insert(TupleVector::thin_iterator pos, size_type n)
 {
   resize(eSize + n);
   if (n) {
@@ -143,24 +150,24 @@ void TupleVector::insert(TupleVector::iterator pos, size_type n)
   }
 }
 
-TupleVector::iterator TupleVector::erase(TupleVector::iterator pos)
+TupleVector::thin_iterator TupleVector::erase(TupleVector::thin_iterator pos)
 {
+  if (pos.index != eSize - 1)
+    memmove(pos.index, pos.index + 1, eSize - pos.index - 1);
   resize(eSize - 1);
-  if (pos.index != eSize)
-    memmove(pos.index, pos.index + 1, eSize - pos.index);
   return pos;
 }
 
-TupleVector::iterator TupleVector::erase(TupleVector::iterator start,
-					 TupleVector::iterator end)
+TupleVector::thin_iterator TupleVector::erase(TupleVector::thin_iterator start,
+                                              TupleVector::thin_iterator end)
 {
+  memmove(start.index, end.index, eSize - end.index);
   resize(eSize - (end - start));
-  memmove(start.index, end.index, eSize - start.index);
   return start;
 }
 
-TupleVector::fat_reference &
-TupleVector::fat_reference::operator=(TupleVector::const_reference src)
+TupleVector::reference &
+TupleVector::reference::operator=(TupleVector::const_reference src)
 {
   if (index != src.index)
     vector->memcpy(index, src.index, 1);
@@ -168,12 +175,12 @@ TupleVector::fat_reference::operator=(TupleVector::const_reference src)
   return *this;
 }
 
-TupleVector::fat_iterator
-TupleVector::fat_iterator::copy(TupleVector::const_iterator begin,
-				TupleVector::const_iterator end)
+TupleVector::iterator
+TupleVector::iterator::copy(TupleVector::const_iterator begin,
+                            TupleVector::const_iterator end)
 {
   size_type len = end - begin;
   vector->memmove(index, begin.index, len);
-  return TupleVector::fat_iterator(vector, index + len);
+  return TupleVector::iterator(vector, index + len);
 }
 

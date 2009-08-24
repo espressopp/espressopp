@@ -231,7 +231,7 @@ BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
   }
 
   // insert two elements by insert()
-  TupleVector::iterator it = mv.begin() + 10;
+  TupleVector::thin_iterator it = mv.begin() + 10;
   // iterator it actually never changes, because it points to the
   // inserted element
   it = mv.insert(it);
@@ -324,7 +324,8 @@ BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
   // and now, move some elements
   mv[10] = mv[9];
   BOOST_CHECK_EQUAL(size_t(44), mv.size());
-  std::copy(mv.begin() + 3, mv.begin() + 7, mv.begin() + 11);
+  std::copy(mv.begin() + 3, mv.begin() + 5, mv.begin() + 11);
+  std::copy_backward(mv.begin() + 5, mv.begin() + 7, mv.begin() + 15);
   BOOST_CHECK_EQUAL(size_t(44), mv.size());
 
   /* check the data is there, with constant array this time.
@@ -378,7 +379,7 @@ BOOST_FIXTURE_TEST_CASE(allocation_test, Fixture)
       = mv.getArrayProperty<float>(newProp);
 
     
-    BOOST_FOREACH(TupleVector::reference ref, mv) {
+    BOOST_FOREACH(TupleVector::thin_reference ref, mv) {
       intRef[ref] = 42;
       fltRef[ref][0] =   4.2;
       fltRef[ref][1] =  42.0;
@@ -387,7 +388,7 @@ BOOST_FIXTURE_TEST_CASE(allocation_test, Fixture)
       fltNRef[ref][2] = 120.0;
     }
 
-    BOOST_FOREACH(TupleVector::reference ref, mv) {
+    BOOST_FOREACH(TupleVector::thin_reference ref, mv) {
       BOOST_CHECK_EQUAL(intRef[ref], 42);
       BOOST_CHECK_CLOSE(fltRef[ref][0],   4.2f, 1e-4f);
       BOOST_CHECK_CLOSE(fltRef[ref][1],  42.0f, 1e-4f);
@@ -411,34 +412,48 @@ BOOST_FIXTURE_TEST_CASE(allocation_test, Fixture)
 
 const int qa_intValue = 42;
 
-TupleVector::reference qa_reference_(TupleVector &tv)
+TupleVector::thin_reference qa_reference_(TupleVector &tv)
 { return tv[qa_intValue]; }
 TupleVector::const_reference qa_const_reference_(TupleVector &tv)
 { return tv[qa_intValue]; }
 TupleVector::const_reference qa_const_reference_indirect_(TupleVector &tv)
-{ return TupleVector::reference(tv[qa_intValue]); }
-TupleVector::fat_reference qa_fat_reference_(TupleVector &tv)
+{ return TupleVector::thin_reference(tv[qa_intValue]); }
+TupleVector::reference qa_fat_reference_(TupleVector &tv)
 { return tv[qa_intValue]; }
 
-TupleVector::iterator qa_iterator_(TupleVector &tv)
+TupleVector::thin_iterator qa_iterator_(TupleVector &tv)
 { return tv.begin(); }
 TupleVector::const_iterator qa_const_iterator_(TupleVector &tv)
 { return tv.begin(); }
 TupleVector::const_iterator qa_const_iterator_indirect_(TupleVector &tv)
-{ return TupleVector::iterator(tv.begin()); }
-TupleVector::fat_iterator qa_fat_iterator_(TupleVector &tv)
+{ return TupleVector::thin_iterator(tv.begin()); }
+TupleVector::iterator qa_fat_iterator_(TupleVector &tv)
 { return tv.begin(); }
 
-/* test that using fat_iterators in a loop is also not desastrous.
-   Note that this loop really would crash if executed. */
-size_t qa_manual_loop_(TupleVector &tv)
+
+/* test that using fat iterators (as implicitely done by BOOST_FOREACH)
+   in a loop is also not desastrous. Note that this loop really would crash if executed. */
+
+size_t qa_manual_thin_loop_(TupleVector &tv, TupleVector::PropertyId id)
 {
-  TupleVector::fat_iterator it = tv.begin();
-  const TupleVector::fat_iterator end = tv.end();
+  TupleVector::PropertyPointer<int> intRef = tv.getProperty<int>(id);
+
+  TupleVector::thin_iterator it = tv.begin();
+  const TupleVector::thin_iterator end = tv.end();
   size_t cnt = 0;
   while (it != end) {
-    *it++ = *it;
-    cnt++;
+    if (intRef[*it++] > 42) cnt++;
+  }
+  return cnt;
+}
+
+size_t qa_manual_fat_loop_(TupleVector &tv, TupleVector::PropertyId id)
+{
+  TupleVector::PropertyPointer<int> intRef = tv.getProperty<int>(id);
+
+  size_t cnt = 0;
+  BOOST_FOREACH(TupleVector::thin_reference ref, tv) {
+    if (intRef[ref] > 42) cnt++;
   }
   return cnt;
 }

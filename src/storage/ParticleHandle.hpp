@@ -12,21 +12,23 @@ namespace espresso {
       ParticleHandle() {}
       ParticleHandle(const ParticleHandle &_handle) : ptr(_handle.ptr) {}
       ParticleHandle(const esutil::TupleVector::pointer &_ptr): ptr(_ptr) {}
+      ParticleHandle(const esutil::TupleVector::thin_pointer &_ptr): ptr(_ptr) {}
       ParticleHandle(const esutil::TupleVector::reference &_ref): ptr(&_ref) {}
+      ParticleHandle(const esutil::TupleVector::thin_reference &_ref): ptr(&_ref) {}
 
       // for most uses, we actually need the reference
-      operator esutil::TupleVector::reference() const { return *ptr; }
-      operator esutil::TupleVector::iterator() const { return ptr; }
+      operator esutil::TupleVector::thin_reference() const { return *ptr; }
+      operator esutil::TupleVector::thin_pointer() const { return ptr; }
 
       /// check if valid handle
-      operator bool() const { return ptr != esutil::TupleVector::pointer(); }
+      operator bool() const { return ptr != esutil::TupleVector::thin_pointer(); }
 
       /// comparison
       bool operator==(const ParticleHandle h) const { return ptr == h.ptr; }
       bool operator!=(const ParticleHandle h) const { return ptr != h.ptr; }
 
     private:
-      esutil::TupleVector::pointer ptr;
+      esutil::TupleVector::thin_pointer ptr;
     };
   }
 }

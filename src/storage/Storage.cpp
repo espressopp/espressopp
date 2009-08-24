@@ -19,7 +19,7 @@ public:
   PredicateMatchParticleID(Storage &store, size_t _searchID)
     : id(store.getIdPropertyHandle()), searchID(_searchID) {}
   
-  bool operator()(esutil::TupleVector::reference ref) { return id[ref] == searchID; }
+  bool operator()(ParticleHandle ref) { return id[ref] == searchID; }
 };
 
 Storage::Storage() {
@@ -29,9 +29,9 @@ Storage::Storage() {
 Storage::~Storage() {}
 
 ParticleHandle Storage::addParticle(ParticleId id) {
-  esutil::TupleVector::iterator it = particles.insert(particles.end());
-  particles.getProperty<size_t>(particleIdProperty)[*it] = id;
-  return ParticleHandle(it);
+  ParticleHandle it = particles.insert(particles.end());
+  particles.getProperty<size_t>(particleIdProperty)[it] = id;
+  return it;
 }
 
 void Storage::_addParticle(ParticleId id) {
@@ -39,7 +39,7 @@ void Storage::_addParticle(ParticleId id) {
 }
 
 void Storage::deleteParticle(ParticleId deleteID) {
-  esutil::TupleVector::iterator pos = getParticleHandle(deleteID);
+  ParticleHandle pos = getParticleHandle(deleteID);
 
   if (pos == particles.end()) {
     throw std::out_of_range("Storage::deleteParticle: particle does not exist");
@@ -48,7 +48,7 @@ void Storage::deleteParticle(ParticleId deleteID) {
 }
 
 ParticleHandle Storage::getParticleHandle(ParticleId id) {
-  esutil::TupleVector::iterator pos =
+  ParticleHandle pos =
     std::find_if(particles.begin(), particles.end(), PredicateMatchParticleID(*this, id));
 
   return (pos != particles.end()) ? ParticleHandle(pos) : ParticleHandle();
@@ -63,8 +63,7 @@ bool Storage::contains(ParticleHandle) { return true; }
 bool Storage::contains(ParticleId) { return true; }
 
 bool Storage::foreachApply(particles::Computer &computer) {
-  BOOST_FOREACH(esutil::TupleVector::reference particle, 
-		particles) 
+  BOOST_FOREACH(ParticleHandle particle, particles) 
     {
       if (!computer.apply(ParticleHandle(particle))) 
 	return false;
