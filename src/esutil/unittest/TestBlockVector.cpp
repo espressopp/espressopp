@@ -9,7 +9,7 @@ using namespace std;
 #include "../BlockVector.hpp"
 #include "../TupleVector.hpp"
 
-typedef espresso::esutil::BlockVector< vector<int> > BlockVector;
+typedef espresso::esutil::BlockVector< vector<int>, 16 > BlockVector;
 
 /* make this a template to allow block to be both a reference and not.
    Unfortunately, C++, does not allow non-const references to temporaries... */

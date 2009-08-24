@@ -263,6 +263,7 @@ AC_CONFIG_FILES([Makefile
                  test/modules/Makefile
                  test/modules/logging/Makefile 
                  test/modules/forceloop/Makefile
+                 test/modules/blockvector/Makefile
                  test/external/Makefile 
                  test/external/mpi/Makefile 
                  test/external/boost.mpi/Makefile 

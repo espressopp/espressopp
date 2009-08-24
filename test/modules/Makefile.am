@@ -1,1 +1,1 @@
-SUBDIRS = logging forceloop
+SUBDIRS = logging forceloop blockvector

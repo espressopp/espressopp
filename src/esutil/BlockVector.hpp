@@ -5,6 +5,7 @@
 #include <boost/utility/enable_if.hpp>
 #include <limits>
 #include <algorithm>
+#include <stdexcept>
 #include "VectorTraits.hpp"
 
 namespace espresso {
@@ -17,6 +18,7 @@ namespace espresso {
       class Block;
       class const_iterator;
       class iterator;
+      template<class, class, class, class> friend class BlockBase;
 
       /** structure containing the start and end of each block. */
       struct BlockBoundaries {
@@ -148,13 +150,13 @@ namespace espresso {
 
     public:
       /// constant block. Behaves mostly like a const VectorClass.
-      class ConstBlock: public BlockBase< const BlockVector<VectorClass>,
+      class ConstBlock: public BlockBase< const BlockVector,
 					  typename Traits::const_iterator,
 					  typename Traits::const_iterator,
 					  typename Traits::const_reference > {
       public:
 	typedef typename BlockVector::const_iterator BlockIterator;
-	typedef BlockBase< const BlockVector<VectorClass>,
+	typedef BlockBase< const BlockVector,
 			   typename Traits::const_iterator,
 			   typename Traits::const_iterator,
 			   typename Traits::const_reference > BlockBaseType;
@@ -168,7 +170,7 @@ namespace espresso {
       };
 
       /// a block. Behaves mostly like a VectorClass.
-      class Block: public BlockBase< BlockVector<VectorClass>,
+      class Block: public BlockBase< BlockVector,
                                      typename Traits::iterator,
                                      typename Traits::thin_iterator,
                                      typename Traits::reference > {
@@ -179,7 +181,7 @@ namespace espresso {
 	typedef typename Traits::iterator Iterator;
 	typedef typename Traits::thin_iterator ThinIterator;
 	typedef typename Traits::const_reference ConstReference;
-	typedef BlockBase< BlockVector<VectorClass>,
+	typedef BlockBase< BlockVector,
 			   typename Traits::iterator,
 			   typename Traits::thin_iterator,
 			   typename Traits::reference > BlockBaseType;
@@ -281,7 +283,12 @@ namespace espresso {
 	}
 
         void reserve(size_type newsize) {
-          BlockBaseType::vector.reserveForBlock(BlockBaseType::index, newsize);
+          /* check to reduce the number of function calls to the not
+             inlined vector.reserveForBlock. Most of the time, we do
+             not need to reserve here.*/
+          if (newsize > BlockBaseType::capacity()) {
+            BlockBaseType::vector.reserveForBlock(BlockBaseType::index, newsize);
+          }
         }
 
       private:
