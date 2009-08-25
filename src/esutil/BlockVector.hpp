@@ -10,7 +10,7 @@
 
 namespace espresso {
   namespace esutil {
-    template<class VectorClass, size_t initGapSize = 8, class Traits = VectorTraits<VectorClass> >
+    template<class VectorClass, class Traits = VectorTraits<VectorClass> >
     class BlockVector {
     public:
       /* forward declarations */
@@ -42,7 +42,7 @@ namespace espresso {
       */
       template<class BlockVectorType, class IteratorType, class ThinIteratorType, class ReferenceType>
       class BlockBase {
-	template<class, size_t, class> friend class BlockVector;
+	template<class, class> friend class BlockVector;
 
       public:
         typedef typename Traits::value_type value_type;
@@ -301,7 +301,7 @@ namespace espresso {
       /// a random iterator over blocks.
       class iterator: public IteratorBase<BlockVector, Block, iterator> {
 	// class that can generate an iterator
-	template<class, size_t, class> friend class BlockVector;
+	template<class, class> friend class BlockVector;
 	friend class BlockVector::Block;
 	// for const->nonconst conversion
 	friend class const_iterator;
@@ -324,7 +324,7 @@ namespace espresso {
       /// a random iterator over constant blocks.
       class const_iterator: public IteratorBase<const BlockVector, ConstBlock, const_iterator> {
 	// class that can generate an iterator
-	template<class, size_t, class> friend class BlockVector;
+	template<class, class> friend class BlockVector;
 	friend class ConstBlock;
       public:
 	typedef IteratorBase<const BlockVector, ConstBlock, const_iterator> IteratorBaseType;
@@ -353,14 +353,12 @@ namespace espresso {
       /// type of block index differences, can in theory differ from vectorClass::difference_type
       typedef ptrdiff_t difference_type;
 
-      static const int gapSize = initGapSize;
-
-
       /******************************************************************
        * Methods of BlockVector
        ******************************************************************/
 
-      BlockVector(size_t nBlocks = 0): boundaries(1) { resize(nBlocks); }
+      BlockVector(size_t nBlocks = 0): boundaries(1), gapSize(8)
+      { resize(nBlocks); }
 
       void resize(size_t newsize);
 
@@ -427,7 +425,10 @@ namespace espresso {
       size_type max_size() const { return boundaries.max_size(); }
 
       /// get total number of elements in all blocks
-      size_t getTotalElements() const;
+      size_t data_size() const;
+      /// get current capacity in elements of the vector below
+      size_t data_capacity() const { return data.capacity(); }
+      size_t target_gap_size() const { return gapSize; }
 
     private:
       /** block boundaries. The last entry is not really a block; it simply serves to speed up
@@ -435,6 +436,7 @@ namespace espresso {
       */
       std::vector<BlockBoundaries> boundaries;
       VectorClass data;
+      int gapSize;
 
       void reserveForBlock(size_t index, typename Traits::size_type newsize);
 
@@ -449,8 +451,8 @@ namespace espresso {
      * TEMPLATE IMPLEMENTATION
      ***********************************************************************/
 
-    template<class VectorClass, size_t initGapSize, class Traits>
-    size_t BlockVector<VectorClass, initGapSize, Traits>::getTotalElements() const {
+    template<class VectorClass, class Traits>
+    size_t BlockVector<VectorClass, Traits>::data_size() const {
       size_t s = 0;
       const_iterator stop = end();
       for (const_iterator it = begin(); it != stop; ++it) {
@@ -459,11 +461,15 @@ namespace espresso {
       return s;
     }
 
-    template<class VectorClass, size_t initGapSize, class Traits>
+    template<class VectorClass, class Traits>
     void
-    BlockVector<VectorClass, initGapSize, Traits>::resize
+    BlockVector<VectorClass, Traits>::resize
     (size_t newsize) {
       size_t oldSize = size();
+      /* Double the gap size, in the style of a std::vector.
+	 There, however, not the gapsize is doubled, but the capacity.
+      */
+      gapSize *= 2;
 
       boundaries.resize(newsize + 1);
 
@@ -472,27 +478,27 @@ namespace espresso {
 	   the gap size is the default.  If there were blocks before,
 	   leave the default gap to the last one, otherwise we start
 	   at 0 */
-	size_t blockLocation = oldSize > 0 ? boundaries[oldSize - 1].end + initGapSize : 0;
+	size_t blockLocation = oldSize > 0 ? boundaries[oldSize - 1].end + gapSize : 0;
         typename std::vector<BlockBoundaries>::const_iterator stop = boundaries.end();
 	for (typename std::vector<BlockBoundaries>::iterator it = boundaries.begin() + oldSize;
 	     it != stop; ++it) {
 	  it->start = it->end = blockLocation;
-	  blockLocation += initGapSize;
+	  blockLocation += gapSize;
 	}
-	resizeDataBuffer(blockLocation - initGapSize);
+	resizeDataBuffer(blockLocation - gapSize);
       }
       else {
 	// maybe free some memory
-	size_t newDataSize = (boundaries.begin() + newsize)->end + initGapSize;
+	size_t newDataSize = (boundaries.begin() + newsize)->end + gapSize;
 	if (data.size() > newDataSize) {
 	  resizeDataBuffer(newDataSize);
 	}
       }
     }
 
-    template<class VectorClass, size_t initGapSize, class Traits>
+    template<class VectorClass, class Traits>
     void
-    BlockVector<VectorClass, initGapSize, Traits>::reserveForBlock
+    BlockVector<VectorClass, Traits>::reserveForBlock
     (size_t index, typename Traits::size_type newsize) {
       if (newsize > (*this)[index].capacity()) {
 	/* now it gets messy, we need to shift away all the rest blocks.
@@ -504,7 +510,7 @@ namespace espresso {
 	  spaceNeeded += it->size();
 	}
 	// add space for gaps - all gaps are reset to the default gap size
-	spaceNeeded += (size() - index)*initGapSize;
+	spaceNeeded += (size() - index)*gapSize;
 
 	resizeDataBuffer(boundaries[index].start + spaceNeeded);
 
@@ -514,9 +520,9 @@ namespace espresso {
 	// location information
 	for (size_t b = size() - 1; b > index; --b) {
 	  Block block  = (*this)[b];
-	  std::copy_backward(block.begin(), block.end(), data.begin() + space - initGapSize);
+	  std::copy_backward(block.begin(), block.end(), data.begin() + space - gapSize);
 
-	  space -= initGapSize;
+	  space -= gapSize;
 	  boundaries[b].end = space;
 	  space -= block.size();
 	  boundaries[b].start = space;
@@ -524,9 +530,9 @@ namespace espresso {
       }
     }
 
-    template<class VectorClass, size_t initGapSize, class Traits>
+    template<class VectorClass, class Traits>
     typename Traits::thin_iterator
-    BlockVector<VectorClass, initGapSize, Traits>::Block::makeSpace
+    BlockVector<VectorClass, Traits>::Block::makeSpace
     (typename Traits::thin_iterator pos, size_type n) {
       // Iterator->index since STL iterators are not resize-safe
       size_type startId = pos - begin();

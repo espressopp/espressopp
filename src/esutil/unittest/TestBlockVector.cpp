@@ -9,7 +9,7 @@ using namespace std;
 #include "../BlockVector.hpp"
 #include "../TupleVector.hpp"
 
-typedef espresso::esutil::BlockVector< vector<int>, 16 > BlockVector;
+typedef espresso::esutil::BlockVector< vector<int> > BlockVector;
 
 /* make this a template to allow block to be both a reference and not.
    Unfortunately, C++, does not allow non-const references to temporaries... */
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(add_remove_block_test)
     }
     else {
       BOOST_CHECK_EQUAL(block.size(), size_t(0));
-      BOOST_CHECK_EQUAL(block.capacity(), size_t(BlockVector::gapSize));
+      BOOST_CHECK_EQUAL(block.capacity(), size_t(blockv.target_gap_size()));
     }
   }
 
@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(add_remove_block_test)
   // check that we can clean up the mess
   blockv.clear();
   BOOST_CHECK(blockv.empty());  
-  BOOST_CHECK_EQUAL(blockv.getTotalElements(), size_t(0));
+  BOOST_CHECK_EQUAL(blockv.data_size(), size_t(0));
 }
 
 BOOST_AUTO_TEST_CASE(insert_erase_block_test)
@@ -197,14 +197,13 @@ BOOST_AUTO_TEST_CASE(block_resize_test)
 
   /* check that the capacities match.
      All gaps after the resized blocks should be default size */
-  const int initGapSize = BlockVector::gapSize;
-  BOOST_CHECK_EQUAL(blockv[0].capacity(), size_t(initGapSize));
-  BOOST_CHECK_EQUAL(blockv[1].capacity(), size_t(initGapSize));
-  BOOST_CHECK_EQUAL(blockv[2].capacity(), size_t(1000 + initGapSize));
+  BOOST_CHECK_EQUAL(blockv[0].capacity(), size_t(blockv.target_gap_size()));
+  BOOST_CHECK_EQUAL(blockv[1].capacity(), size_t(blockv.target_gap_size()));
+  BOOST_CHECK_EQUAL(blockv[2].capacity(), size_t(1000 + blockv.target_gap_size()));
   // double check copy and original
-  BOOST_CHECK_EQUAL(block.capacity(), size_t(1000 + initGapSize));
-  BOOST_CHECK_EQUAL(blockv[3].capacity(), size_t(7 + initGapSize));
-  BOOST_CHECK_EQUAL(blockv[4].capacity(), size_t(4 + initGapSize));
+  BOOST_CHECK_EQUAL(block.capacity(), size_t(1000 + blockv.target_gap_size()));
+  BOOST_CHECK_EQUAL(blockv[3].capacity(), size_t(7 + blockv.target_gap_size()));
+  BOOST_CHECK_EQUAL(blockv[4].capacity(), size_t(4 + blockv.target_gap_size()));
 
   // now, check blocks again
   {
@@ -217,7 +216,7 @@ BOOST_AUTO_TEST_CASE(block_resize_test)
   check_block(blockv[3], 31, -1, 7);
   check_block(blockv[4], 29,  6, 4);
 
-  BOOST_CHECK_EQUAL(blockv.getTotalElements(), size_t(1016));
+  BOOST_CHECK_EQUAL(blockv.data_size(), size_t(1016));
 }
 
 BOOST_AUTO_TEST_CASE(block_copy_and_assign_test)
