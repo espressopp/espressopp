@@ -76,16 +76,6 @@ void bm_shuffle(BVClass &vec) {
   }
 }
 
-BVClass::Block bm_test_pushback(BVClass &vec) NOINLINE;
-BVClass::Block bm_test_pushback(BVClass &vec) {
-  return vec[2345];
-}
-
-VectorClass::iterator bm_test_pushback(std::vector<VectorClass> &vec) NOINLINE;
-VectorClass::iterator bm_test_pushback(std::vector<VectorClass> &vec) {
-  return vec[2345].begin();
-}
-
 int main()
 {
   vector<VectorClass> stdvec;

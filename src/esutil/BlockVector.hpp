@@ -40,7 +40,8 @@ namespace espresso {
           non-const functions.  ConstBlock adds just the possibilty to
           convert a Block into a ConstBlock.
       */
-      template<class BlockVectorType, class IteratorType, class ThinIteratorType, class ReferenceType>
+      template<class BlockVectorType, class BoundariesPtr,
+	       class IteratorType, class ThinIteratorType, class ReferenceType>
       class BlockBase {
 	template<class, class> friend class BlockVector;
 
@@ -62,41 +63,33 @@ namespace espresso {
         typedef typename Traits::const_pointer const_pointer;
 
       public:
-        IteratorType begin() const { return Traits::template make_thick<IteratorType, ThinIteratorType>(&vector.data, blockBegin); }
-        IteratorType end()   const { return Traits::template make_thick<IteratorType, ThinIteratorType>(&vector.data, blockEnd); }
+        IteratorType begin() const { return Traits::template make_thick<IteratorType, ThinIteratorType>(&vector.data, vector.data.begin() + boundaries->start); }
+        IteratorType end()   const { return Traits::template make_thick<IteratorType, ThinIteratorType>(&vector.data, vector.data.begin() + boundaries->end); }
 
         ReferenceType operator[](size_type n) const { return *(begin() + n); }
-        ReferenceType at(size_type n) const { return vector.data.at(vector.boundaries[index].start + n); }
+        ReferenceType at(size_type n) const { return vector.data.at(boundaries->start + n); }
 
         ReferenceType front() const { return *begin(); }
         ReferenceType back()  const { return *(end() - 1); }
 
-        size_type size()     const { return blockEnd - blockBegin; }
-        bool empty()         const { return blockEnd == blockBegin; }
+        size_type size()     const { return boundaries->end - boundaries->start; }
+        bool empty()         const { return size() == size_type(0); }
         size_type max_size() const { return vector.data.max_size(); }
         /// for a Block of a BlockVector, the capacity is the space to the next neighbor
-        size_type capacity() const { return vector[index + 1].blockBegin - blockBegin; }
+        size_type capacity() const { return (boundaries+1)->start - boundaries->start; }
 
       protected:
         /// instances can only be obtained through BlockVector.
         BlockBase(BlockVectorType &_vector, size_t _index)
-          : vector(_vector), index(_index) {
-	  updateIterators();
-	}
+          : vector(_vector), boundaries(vector.boundaries.begin() + _index) {}
+        /// instances can only be obtained through BlockVector.
+        BlockBase(BlockVectorType &_vector, BoundariesPtr _boundaries)
+          : vector(_vector), boundaries(_boundaries) {}
 
         /// reference to the underlying block vector
         BlockVectorType &vector;
-        /// index of this block in the BlockVector it belongs to
-        size_t index;
-        /** caches for the data block boundaries, which we need for
-            about everything you can do with such a blockvector.
-        */
-        ThinIteratorType blockBegin, blockEnd;
-
-	void updateIterators() {
-	  blockBegin = vector.data.begin() + vector.boundaries[index].start;
-	  blockEnd   = vector.data.begin() + vector.boundaries[index].end; 
-	}  
+        /// where the boundary information really is inside vector
+        BoundariesPtr boundaries;
       };
       
       /** iterator over all blocks. Basically just the index of the
@@ -151,37 +144,42 @@ namespace espresso {
     public:
       /// constant block. Behaves mostly like a const VectorClass.
       class ConstBlock: public BlockBase< const BlockVector,
+					  typename std::vector<BlockBoundaries>::const_iterator,
 					  typename Traits::const_iterator,
 					  typename Traits::const_iterator,
 					  typename Traits::const_reference > {
       public:
 	typedef typename BlockVector::const_iterator BlockIterator;
 	typedef BlockBase< const BlockVector,
+			   typename std::vector<BlockBoundaries>::const_iterator,
 			   typename Traits::const_iterator,
 			   typename Traits::const_iterator,
 			   typename Traits::const_reference > BlockBaseType;
-
-        ConstBlock(const BlockVector &_vector, size_t _index):
-          BlockBaseType(_vector, _index) {};
+      
+	ConstBlock(const BlockVector &_vector, size_t _index):
+	  BlockBaseType(_vector, _index) {};
 
         // const->non-const conversion
         ConstBlock(const Block &_block):
-          BlockBaseType(_block.vector, _block.index) {};
+          BlockBaseType(_block.vector, _block.boundaries) {};
       };
 
       /// a block. Behaves mostly like a VectorClass.
       class Block: public BlockBase< BlockVector,
+				     typename std::vector<BlockBoundaries>::iterator,
                                      typename Traits::iterator,
                                      typename Traits::thin_iterator,
                                      typename Traits::reference > {
         // for const->nonconst conversion
         friend class ConstBlock;
+
       public:
         typedef typename BlockVector::iterator BlockIterator;
 	typedef typename Traits::iterator Iterator;
 	typedef typename Traits::thin_iterator ThinIterator;
 	typedef typename Traits::const_reference ConstReference;
 	typedef BlockBase< BlockVector,
+			   typename std::vector<BlockBoundaries>::iterator,
 			   typename Traits::iterator,
 			   typename Traits::thin_iterator,
 			   typename Traits::reference > BlockBaseType;
@@ -277,9 +275,8 @@ namespace espresso {
             reserve(newsize);
           }
           // assign block its new size, now there is space
-          BlockBaseType::vector.boundaries[BlockBaseType::index].end =
-            BlockBaseType::vector.boundaries[BlockBaseType::index].start + newsize;
-	  BlockBaseType::updateIterators();
+	  BlockBaseType::boundaries->end =
+	    BlockBaseType::boundaries->start + newsize;
 	}
 
         void reserve(size_type newsize) {
@@ -287,7 +284,7 @@ namespace espresso {
              inlined vector.reserveForBlock. Most of the time, we do
              not need to reserve here.*/
           if (newsize > BlockBaseType::capacity()) {
-            BlockBaseType::vector.reserveForBlock(BlockBaseType::index, newsize);
+            BlockBaseType::vector.reserveForBlock(BlockBaseType::boundaries, newsize);
           }
         }
 
@@ -357,7 +354,7 @@ namespace espresso {
        * Methods of BlockVector
        ******************************************************************/
 
-      BlockVector(size_t nBlocks = 0): boundaries(1), gapSize(8)
+      BlockVector(size_t nBlocks = 0): boundaries(1), gapSize(2)
       { resize(nBlocks); }
 
       void resize(size_t newsize);
@@ -421,7 +418,7 @@ namespace espresso {
       void clear() { resize(0); }
 
       size_type size() const { return boundaries.size() - 1; }
-      bool empty() const { return boundaries.size() == 1; }
+      bool empty() const { return size() == size_type(0); }
       size_type max_size() const { return boundaries.max_size(); }
 
       /// get total number of elements in all blocks
@@ -438,12 +435,12 @@ namespace espresso {
       VectorClass data;
       int gapSize;
 
-      void reserveForBlock(size_t index, typename Traits::size_type newsize);
+      void reserveForBlock(typename std::vector<BlockBoundaries>::iterator block, typename Traits::size_type newsize);
 
       void resizeDataBuffer(size_type newsize) {
         data.resize(newsize);
-	BlockBoundaries &buffer = boundaries.back();
-	buffer.start = buffer.end = data.size();
+	BlockBoundaries &endbuffer = boundaries.back();
+	endbuffer.start = endbuffer.end = data.size();
       }
     };
 
@@ -466,10 +463,6 @@ namespace espresso {
     BlockVector<VectorClass, Traits>::resize
     (size_t newsize) {
       size_t oldSize = size();
-      /* Double the gap size, in the style of a std::vector.
-	 There, however, not the gapsize is doubled, but the capacity.
-      */
-      gapSize *= 2;
 
       boundaries.resize(newsize + 1);
 
@@ -499,7 +492,14 @@ namespace espresso {
     template<class VectorClass, class Traits>
     void
     BlockVector<VectorClass, Traits>::reserveForBlock
-    (size_t index, typename Traits::size_type newsize) {
+    (typename std::vector<BlockVector::BlockBoundaries>::iterator block,
+     typename Traits::size_type newsize) {
+      /* Double the gap size, in the style of a std::vector.
+	 There, however, not the gapsize is doubled, but the capacity.
+      */
+      gapSize *= 2;
+
+      size_t index = block - boundaries.begin();
       if (newsize > (*this)[index].capacity()) {
 	/* now it gets messy, we need to shift away all the rest blocks.
 	   At this occasion, we also create space in all the other blocks */
@@ -520,11 +520,12 @@ namespace espresso {
 	// location information
 	for (size_t b = size() - 1; b > index; --b) {
 	  Block block  = (*this)[b];
+	  size_t size = block.size();
 	  std::copy_backward(block.begin(), block.end(), data.begin() + space - gapSize);
 
 	  space -= gapSize;
 	  boundaries[b].end = space;
-	  space -= block.size();
+	  space -= size;
 	  boundaries[b].start = space;
 	}
       }

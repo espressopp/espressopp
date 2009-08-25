@@ -197,8 +197,6 @@ BOOST_AUTO_TEST_CASE(block_resize_test)
 
   /* check that the capacities match.
      All gaps after the resized blocks should be default size */
-  BOOST_CHECK_EQUAL(blockv[0].capacity(), size_t(blockv.target_gap_size()));
-  BOOST_CHECK_EQUAL(blockv[1].capacity(), size_t(blockv.target_gap_size()));
   BOOST_CHECK_EQUAL(blockv[2].capacity(), size_t(1000 + blockv.target_gap_size()));
   // double check copy and original
   BOOST_CHECK_EQUAL(block.capacity(), size_t(1000 + blockv.target_gap_size()));
@@ -226,10 +224,6 @@ BOOST_AUTO_TEST_CASE(block_copy_and_assign_test)
   fill_block(blockv[0], 23,  7, 2);
   fill_block(blockv[2], 42,  2, 3);
   fill_block(blockv[1], 29,  6, 4);
-
-  std::vector<int> test;
-
-  test.assign(20, 3);
 
   blockv[1].assign(20, 3);
 
