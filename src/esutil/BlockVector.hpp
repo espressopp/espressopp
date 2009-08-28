@@ -423,9 +423,12 @@ namespace espresso {
 
       /// get total number of elements in all blocks
       size_t data_size() const;
-      /// get current capacity in elements of the vector below
-      size_t data_capacity() const { return data.capacity(); }
       size_t target_gap_size() const { return gapSize; }
+
+      /** access to the raw data storage. Use this e.g. to add properties to
+	  a TupleVector.  */
+      VectorClass &raw() { return data; }
+      const VectorClass &raw() const { return data; }
 
     private:
       /** block boundaries. The last entry is not really a block; it simply serves to speed up

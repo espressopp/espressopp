@@ -215,6 +215,7 @@ BOOST_AUTO_TEST_CASE(block_resize_test)
   check_block(blockv[4], 29,  6, 4);
 
   BOOST_CHECK_EQUAL(blockv.data_size(), size_t(1016));
+  BOOST_CHECK_EQUAL(blockv.raw().size(), size_t(1116));
 }
 
 BOOST_AUTO_TEST_CASE(block_copy_and_assign_test)
