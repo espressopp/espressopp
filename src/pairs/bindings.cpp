@@ -4,6 +4,7 @@
 #include "Computer.hpp"
 #include "All.hpp"
 #include "List.hpp"
+#include "VerletList.hpp"
 
 namespace espresso {
   namespace pairs {
@@ -15,6 +16,7 @@ namespace espresso {
       Computer::registerPython();
       All::registerPython();
       List::registerPython();
+      VerletList::registerPython();
 
     }
 

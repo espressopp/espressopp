@@ -58,7 +58,9 @@ else:
                 self.dec.addParticle(i)
                 self.pos[i] = 0.2*i
             
+            # make a list of pairs
             self.bonds = espresso.pairs.List(self.bc, self.dec, self.pos)
+            self.bonds.addPair(0, 1)
             self.tc = pmi.create('TestCaseLocal')
 
         def testForeach(self):

@@ -2,6 +2,7 @@ nobase_pkginclude_HEADERS += \
 	pairs/bindings.hpp \
 	pairs/Set.hpp \
 	pairs/All.hpp \
+        pairs/List.hpp \
 	pairs/Computer.hpp \
 	pairs/ComputerList.hpp
 
@@ -10,11 +11,13 @@ libespresso_common_la_SOURCES += \
 	pairs/Set.cpp \
 	pairs/Computer.cpp \
 	pairs/All.cpp \
-        pairs/List.cpp
+        pairs/List.cpp \
+        pairs/VerletList.cpp
 
 python_SCRIPTS += \
 	pairs/__init__.py \
 	pairs/Computer.py \
 	pairs/Set.py \
 	pairs/All.py \
-        pairs/List.py
+        pairs/List.py \
+        pairs/VerletList.py
