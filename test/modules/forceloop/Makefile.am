@@ -1,4 +1,4 @@
-LIBS= \
+ESLIBS= \
         $(BOOST_PYTHON_LIBS) \
         $(top_builddir)/src/libespresso_common.la \
         $(top_builddir)/src/libgenlogger.la
@@ -6,7 +6,7 @@ LIBS= \
 check_PROGRAMS = forceloop benchmark
 
 forceloop_SOURCES = main.cpp
-forceloop_LDADD   = $(LIBS)
+forceloop_LDADD   = $(ESLIBS)
 
 benchmark_SOURCES = benchmark.cpp
-benchmark_LDADD   = $(LIBS)
+benchmark_LDADD   = $(ESLIBS)

@@ -1,4 +1,4 @@
-LIBS= \
+ESLIBS= \
         $(BOOST_PYTHON_LIBS) \
         $(top_builddir)/src/libespresso_common.la \
         $(top_builddir)/src/libgenlogger.la
@@ -6,4 +6,4 @@ LIBS= \
 check_PROGRAMS = blockvector
 
 blockvector_SOURCES = blockvector.cpp
-blockvector_LDADD   = $(LIBS)
+blockvector_LDADD   = $(ESLIBS)
