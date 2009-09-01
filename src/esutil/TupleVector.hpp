@@ -19,7 +19,7 @@ namespace espresso {
 	there is no value type, and some vector operations are slightly
 	different (e.g., elements are uninitialized)
     */
-    class TupleVector {
+    class TupleVector: public boost::noncopyable {
       // forward declarations of member classes, for making friends :-)
     private:
       class ReferenceBase;
@@ -48,7 +48,7 @@ namespace espresso {
       class PropertyId {
       public:
 	/// invalid id, valid ones can only be obtained by TupleVector
-	PropertyId() {}
+	PropertyId(): v(-1) {}
 
         /// comparison
         bool operator==(const PropertyId &o) const { return v == o.v; }
@@ -826,12 +826,5 @@ namespace std {
     return (dst - (end - begin)).copy(begin, end);
   }
 };
-
-/** Teach boost foreach that TupleVector is not copyable.
-    This function has to be at global scope.
-*/
-inline boost::mpl::true_ *
-boost_foreach_is_noncopyable(espresso::esutil::TupleVector *&, boost::foreach::tag)
-{ return 0; }
 
 #endif

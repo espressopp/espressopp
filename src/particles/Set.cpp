@@ -48,6 +48,10 @@ bool
 Set::foreach(const Computer::SelfPtr computer)
 { return foreach(*computer); }
 
+bool
+Set::enclForeachIn(Computer &computer, const RealBox &)
+{ return foreach(computer); }
+
 
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON

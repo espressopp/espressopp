@@ -1,6 +1,8 @@
 from espresso.esutil import *
 from espresso import pmi
 from espresso import Property
+from espresso import IDProperty
+from espresso import Real3DProperty
 from espresso.particles.Set import *
 import types
 
@@ -8,10 +10,14 @@ from _espresso import storage_Storage
 class StorageLocal(SetLocal, storage_Storage):
     'The local basic particle storage'
     def __init__(self):
-        cxxinit(self, storage_Storage)
+        pass
 
     def checkProperty(self, property):
         self.cxxclass.checkProperty(self, property)
+
+    def _setIdAndPos(self, idProperty, posProperty):
+        self.setIdProperty(idProperty)
+        self.setPositionProperty(posProperty)
 
 if pmi.IS_CONTROLLER :
     class Storage(Set):
@@ -33,38 +39,22 @@ if pmi.IS_CONTROLLER :
         def __init__(self):
             self.pmiinit()
 
-        def createProperty(self, type, dimension = 1) :
+            # add the ID and position properties
+            self.idProperty = IDProperty(self)
+            self.posProperty = Real3DProperty(self)
+            pmi.call(self, '_setIdAndPos', self.idProperty, self.posProperty)
+
+        def getPositionProperty():
             """
-            create a Property in this particle storage. For example, adding a scalar real Property:
-
-            >>> decomposer.createProperty("Real")
-
-            or a two-dimensional integer vector:
-            
-            >>> decomposer.createProperty(type = "Integer", dimension = 2)
-
-            The property will be of class <type>Property, e. g. RealProperty if type was "Real"; for
-            multidimensional properties, the class is <type>ArrayProperty.
-            If the specified type has not been implemented as a Property, a TypeError is raised.
-
-            Note that this function creates a normal Python-object representing the property; therefore,
-            the particles possess this property exactly as long as there is any other object that is able
-            to access this particle property.
+            obtain the position property.
             """
-            # construct Property name
-            if dimension == 1 :
-                klassname = 'Property.%sProperty' % type
-                try:
-                    property = eval(klassname)(self)
-                except AttributeError :
-                    raise TypeError('type "%s" cannot be used as particle property (class %s missing)' % (type, klassname));
-            else :
-                klassname = 'Property.%sArrayProperty' % type
-                try:
-                    property = eval(klassname)(self, dimension)
-                except AttributeError :
-                    raise TypeError('type "%s" cannot be used as particle array property (class %s missing)' % (type, klassname));
-	    return property
+            return self.posProperty
+
+        def getIdProperty():
+            """
+            obtain the id property.
+            """
+            return self.idProperty
 
         #        @abc.abstractmethod
         def addParticle(self, id=None) :

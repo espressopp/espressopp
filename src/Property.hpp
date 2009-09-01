@@ -45,6 +45,8 @@ namespace espresso {
   */
   template < typename T >
   class Property : public PropertyBase, boost::noncopyable {
+    friend class storage::Storage;
+
     typedef storage::PropertyHandle< T > Handle;
   public:
     typedef shared_ptr< Property< T > > SelfPtr;

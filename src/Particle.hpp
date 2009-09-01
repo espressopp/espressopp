@@ -10,7 +10,7 @@ namespace espresso {
   class ParticleId {
   public:
     /// default constructor, generating an invalid id
-    ParticleId(): v(0) {}
+    ParticleId(): v(-1) {}
     /** constructor by giving particle number. Explicit, so that
         ParticleId and size_t cannot be mixed unwantedly. */
     explicit ParticleId(size_t _v): v(_v) {}

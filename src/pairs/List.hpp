@@ -19,20 +19,17 @@ namespace espresso {
       static void registerPython();
 
       /* 2-parameter constructor */
-      List(bc::BC::SelfPtr _bc, 
-           storage::Storage::SelfPtr _storage1, 
-           storage::Storage::SelfPtr _storage2, 
-           Property< Real3D >::SelfPtr _posProperty1,
-           Property< Real3D >::SelfPtr _posProperty2);
+      List(bc::BC::SelfPtr bc,
+	   storage::Storage::SelfPtr _storage1,
+           storage::Storage::SelfPtr _storage2);
 
       /** Constructor
 	  \param bc are the boundary conditions that are needed for distance calculation.
 	  \param storage specifies the particle storage to which particles belong
 	  \param posProperty the identifier of the posProperty property to use
       */
-      List(bc::BC::SelfPtr _bc, 
-           storage::Storage::SelfPtr _storage,
-	   Property< Real3D >::SelfPtr _posProperty);
+      List(bc::BC::SelfPtr bc,
+	   storage::Storage::SelfPtr _storage);
 
       /** Destructor. */
       virtual ~List();     
@@ -63,21 +60,20 @@ namespace espresso {
       void deletePair(ParticleId id1, ParticleId id2);
 
       /** Getter routine for storage1 */
-      storage::Storage::SelfPtr getStorage1() const { return storage1; }
-
+      virtual storage::Storage::SelfPtr getLeftStorage();
       /** Getter routine for storage2 */
-      storage::Storage::SelfPtr getStorage2() const { return storage2; }
+      virtual storage::Storage::SelfPtr getRightStorage();
 
     protected:
       /** This routine will apply a function operator to all pairs of the list.
 	  \param pairComputer is the object that provides the function to be applied.
       */
-      virtual bool foreachApply(Computer &computer);
+      virtual bool foreachPairApply(Computer &computer);
 
     private:
       bc::BC::SelfPtr bc;
-      Property< Real3D >::SelfPtr posProperty1;
-      Property< Real3D >::SelfPtr posProperty2;
+      storage::Storage::SelfPtr storage1;
+      storage::Storage::SelfPtr storage2;
 
       typedef std::pair< ParticleId, ParticleId > Tuple;
       std::vector< Tuple > id_list;

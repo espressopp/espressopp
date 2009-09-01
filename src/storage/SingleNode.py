@@ -1,16 +1,17 @@
 from espresso import pmi
 from espresso import boostmpi as mpi
 from espresso.storage.Storage import *
+from _espresso import storage_SingleNode
 
 __all__ = [ "SingleNodeLocal" ]
 
-class SingleNodeLocal(StorageLocal):
+class SingleNodeLocal(StorageLocal, storage_SingleNode):
     """
     The local particle cxxobject that puts all particles on a dedicated node. So,
     this actually is nothing on most of the nodes.
     """
-    def __init__(self, masternode):
-        StorageLocal.__init__(self)
+    def __init__(self, bc, masternode):
+        cxxinit(self, storage_SingleNode, bc)
         self.masternode = masternode
     
     def addParticle(self, id):
@@ -35,15 +36,16 @@ if pmi.IS_CONTROLLER :
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(cls='espresso.storage.SingleNodeLocal')
 
-        def __init__(self, node=pmi.CONTROLLER) :
-            self.pmiinit(node)
+        def __init__(self, bc, node=pmi.CONTROLLER) :
+            self.pmiinit(bc, node)
             Storage.__init__(self)
             self.masternode = node
+
             # list of all particles. Since they are all on one node, we can as well
             # keep a table of all of them here
             self.particleIds = set()
             self.maxSeenId = -1
-
+            
         def addParticle(self, id=None) :
             if id in self.particleIds :
                 raise IndexError("particle %s already exists" % str(id))

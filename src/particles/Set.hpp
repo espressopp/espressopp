@@ -11,8 +11,6 @@ namespace espresso {
   }
 
   namespace particles {
-    class ForeachBreak: public std::exception {};
-
     class Set {
     public:
       typedef shared_ptr< Set > SelfPtr;
@@ -30,17 +28,14 @@ namespace espresso {
 	  \return whether the loop finished normally or was interrupted.
        */
       virtual bool foreach(Computer &computer);
-      /** Required only for compilation. */
-//       virtual void foreach(ConstComputer &computer);
 
       /** For the python export. */
       virtual bool foreach(Computer::SelfPtr computer);
 
-      /** A derived Set should override these methods.
-
-      They should be used when you want to loop over the same set
-      several times without using a computer. */
-//       virtual void foreach(const ApplyFunction function) = 0;
+      /** approximate looping over a box. A set should try to loop over as little
+	  as possible particles, but at least all in the given box. This is not
+	  and should not be exported to Python. */
+      virtual bool enclForeachIn(Computer &computer, const RealBox &box);
 
       virtual shared_ptr< storage::Storage > getStorage() = 0;
 

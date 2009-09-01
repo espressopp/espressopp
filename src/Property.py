@@ -76,6 +76,25 @@ if pmi.IS_CONTROLLER:
             self.pmiinit(storage)
             Property.__init__(self, storage)
 
+######## IDProperty
+
+from _espresso import IDProperty as _IDProperty
+class IDPropertyLocal(PropertyLocal, _IDProperty):
+    def __init__(self, storage):
+        cxxinit(self, _IDProperty, storage)
+        self.propertytype = int
+
+if pmi.IS_CONTROLLER:
+    class IDProperty(Property) :
+        """
+        represents an integer valued particle property.
+        """
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(cls='espresso.IDPropertyLocal')
+        def __init__(self, storage):
+            self.pmiinit(storage)
+            Property.__init__(self, storage)
+
 ######## IntegerProperty
 
 from _espresso import IntegerProperty as _IntegerProperty

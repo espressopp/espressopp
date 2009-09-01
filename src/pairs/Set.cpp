@@ -6,21 +6,22 @@
 
 using namespace espresso::pairs;
 
-Set::Set(storage::Storage::SelfPtr _storage1,
-	 storage::Storage::SelfPtr _storage2)
-  : storage1(_storage1), storage2(_storage2) {}
-
 bool 
-Set::foreach(Computer &computer) {
-  computer.prepare(storage1, storage2);
-  bool res = foreachApply(computer);
+Set::foreachPair(Computer &computer) {
+  computer.prepare(getLeftStorage(), getRightStorage());
+  bool res = foreachPairApply(computer);
   computer.finalize();
   return res;
 }
 
 bool
-Set::foreach(Computer::SelfPtr computer) {
-  return foreach(*computer);
+Set::foreachPair(Computer::SelfPtr computer) {
+  return foreachPair(*computer);
+}
+
+bool
+Set::enclForeachPairWithin(Computer &computer) {
+  return foreachPair(computer);
 }
 
 
@@ -32,7 +33,7 @@ Set::registerPython() {
   using namespace espresso::python;
 
   bool (Set::*pyForeach)(Computer::SelfPtr computer) 
-    = &Set::foreach;
+    = &Set::foreachPair;
 
   class_< Set, boost::noncopyable >("pairs_Set", no_init)
     .def("foreach", pyForeach)

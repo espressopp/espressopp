@@ -56,10 +56,11 @@ else:
     pmi.execfile_(__file__)
 
     from espresso import Real3D, Real3DProperty, IntegerProperty
+    from espresso import bc
     from espresso.storage import SingleNode
     import random
 
-    storage = SingleNode(mpi.size-1)
+    storage = SingleNode(bc.PeriodicBC(length=1), mpi.size-1)
     pos = Real3DProperty(storage)
 
     for count in range(0,100):

@@ -13,27 +13,22 @@ VerletList::~VerletList() {}
 
 /* Constructor */
 VerletList::VerletList(bc::BC::SelfPtr _bc,
-           Storage::SelfPtr _storage,
-	   Property< Real3D >::SelfPtr _posProperty,
-		       espresso::real _skin)
-  : Set(_storage, _storage),
-    bc(_bc),
-    posProperty1(_posProperty),
-    posProperty2(_posProperty),
+		       Storage::SelfPtr _storage,
+		       real _skin)
+  : bc(_bc),
+    storage1(_storage),
+    storage2(_storage),
     skin(_skin)
     {}
 
 /* Constructor */
 VerletList::VerletList(bc::BC::SelfPtr _bc, 
-           Storage::SelfPtr _storage1, 
-           Storage::SelfPtr _storage2, 
-           Property< Real3D >::SelfPtr _posProperty1,
-	   Property< Real3D >::SelfPtr _posProperty2,
-	   espresso::real _skin) 
-  : Set(_storage1, _storage2),
-    bc(_bc),
-    posProperty1(_posProperty1),
-    posProperty2(_posProperty2),
+		       Storage::SelfPtr _storage1, 
+		       Storage::SelfPtr _storage2, 
+		       real _skin) 
+  : bc(_bc),
+    storage1(_storage1),
+    storage2(_storage2),
     skin(_skin)
     {}
 
@@ -47,10 +42,10 @@ size_t VerletList::size() const {
    return id_list.size();
 }
 
-bool VerletList::foreachApply(Computer &computer) {
+bool VerletList::foreachPairApply(Computer &computer) {
    vector<Tuple>::const_iterator it;
-   storage::PropertyHandle<Real3D> pos1 = posProperty1->getHandle(storage1);
-   storage::PropertyHandle<Real3D> pos2 = posProperty2->getHandle(storage2);
+   storage::PropertyHandle<Real3D> pos1 = getLeftStorage()->getPositionPropertyHandle();
+   storage::PropertyHandle<Real3D> pos2 = getRightStorage()->getPositionPropertyHandle();
 
    for(it = id_list.begin(); it != id_list.end(); it++) {
      ParticleHandle p1 = storage1->getParticleHandle(it->first);
@@ -63,6 +58,12 @@ bool VerletList::foreachApply(Computer &computer) {
    return true;
 }
 
+Storage::SelfPtr VerletList::getLeftStorage()
+{ return storage1; }
+
+Storage::SelfPtr VerletList::getRightStorage()
+{ return storage2; }
+
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
 //////////////////////////////////////////////////
@@ -73,13 +74,13 @@ VerletList::registerPython() {
 
   class_< VerletList, bases< Set > >
     ("pairs_VerletList", "Put pairs::VerletList docstring here.", 
-     init< bc::BC::SelfPtr, storage::Storage::SelfPtr, Property< Real3D >::SelfPtr, espresso::real >())
-    .def(init< bc::BC::SelfPtr,
+     init< bc::BC::SelfPtr,
+     storage::Storage::SelfPtr,
+     espresso::real >())
+    .def(init<bc::BC::SelfPtr,
 	 storage::Storage::SelfPtr,
          storage::Storage::SelfPtr,
-         Property< Real3D >::SelfPtr,
-         Property< Real3D >::SelfPtr,
-         espresso::real >())
+	 real >())
     .def("size", &VerletList::size)
     ;
 }

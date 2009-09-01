@@ -19,27 +19,26 @@ namespace espresso {
 
       /** Constructor for this class 
 
-	  \param bc are the boundary conditions that are needed for distance calculation.
 	  \param set specifies the set of particles for which pairs will be considered.
-	  \param coordinates the identifier of the coordinates property to use
 
       */
-      All(bc::BC::SelfPtr _bc, 
-	  particles::Set::SelfPtr _set, 
-	  Property< Real3D >::SelfPtr _posProperty);
+      All(particles::Set::SelfPtr _set);
 
       virtual ~All() {}
+
+      /** Getter routine for storage1 */
+      virtual storage::Storage::SelfPtr getLeftStorage();
+      /** Getter routine for storage2 */
+      virtual storage::Storage::SelfPtr getRightStorage();
 
     protected:
       /** This routine will apply a function operator to all pairs.
 	  \param pairComputer is the object that provides the function to be applied to all pairs.
       */
-      bool foreachApply(Computer &computer);
+      virtual bool foreachPairApply(Computer &computer);
 
     private:
       particles::Set::SelfPtr set;
-      bc::BC::SelfPtr bc;
-      Property< Real3D >::SelfPtr posProperty;
     };
 
   }

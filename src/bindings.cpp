@@ -18,9 +18,9 @@ void espresso::registerPython() {
   espresso::registerPythonProperty();
   espresso::esutil::Collectives::registerPython();
   espresso::particles::registerPython();
-  espresso::storage::registerPython();
   espresso::bc::registerPython();
   espresso::pairs::registerPython();
+  espresso::storage::registerPython();
   espresso::potential::registerPython();
   espresso::integrator::registerPython();
   espresso::thermostat::registerPython();

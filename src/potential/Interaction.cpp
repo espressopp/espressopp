@@ -45,14 +45,14 @@ void Interaction::
 addForces(const Property< Real3D >::SelfPtr forceProperty) {
   pairs::Computer::SelfPtr computer = 
     potential->createForceComputer(forceProperty);
-  pairs->foreach(computer);
+  pairs->foreachPair(computer);
 }
 
 void Interaction::
 addEnergies(const Property< real >::SelfPtr energyProperty) {
   pairs::Computer::SelfPtr computer = 
     potential->createEnergyComputer(energyProperty);
-  pairs->foreach(computer);
+  pairs->foreachPair(computer);
 }
 
 /***************************************************************************************/

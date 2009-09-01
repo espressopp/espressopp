@@ -14,6 +14,12 @@ void espresso::registerPythonProperty()
     .def("checkFitsTo", &PropertyBase::checkFitsTo)
     ;
 
+  class_< Property< ParticleId >, boost::noncopyable, bases< PropertyBase > >
+    ("IDProperty", init< Storage::SelfPtr >())
+    .def("__getitem__", &Property< ParticleId >::getItem)
+    .def("__setitem__", &Property< ParticleId >::setItem)
+    ;
+
   class_< Property< Real3D >, boost::noncopyable, bases< PropertyBase > >
     ("Real3DProperty", init< Storage::SelfPtr >())
     .def("__getitem__", &Property< Real3D >::getItem)

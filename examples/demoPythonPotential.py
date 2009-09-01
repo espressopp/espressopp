@@ -17,15 +17,14 @@ if __name__ == 'espresso.pmi':
             return self.D * (abs(dist) - self.r0) * dist
 
 else:
-    from espresso.esutil import pmiinit
-
     class Harmonic(espresso.potential.Potential):
+        __metaclass__ = espresso.pmi.Proxy
         pmiproxydefs = espresso.potential.Potential.pmiproxydefs
         pmiproxydefs['pmiproperty'] = [ 'D', 'r0' ]
-        pmiproxydefs['class'] = 'HarmonicLocal'
+        pmiproxydefs['cls'] = 'HarmonicLocal'
 
         def __init__(self, D=1.0, r0=0.0):
-            pmiinit(self, 'HarmonicLocal', D, r0)
+            self.pmiinit('HarmonicLocal', D, r0)
 
     from espresso import pmi
     pmi.execfile_(__file__)
@@ -36,8 +35,8 @@ else:
     import espresso.bc
     import espresso.pairs
     import random
-
-    storage = espresso.storage.SingleNode(mpi.size-1)
+    
+    storage = espresso.storage.SingleNode(espresso.bc.PeriodicBC(), mpi.size-1)
     pos = Real3DProperty(storage)
     force = Real3DProperty(storage)
     energy = RealProperty(storage)

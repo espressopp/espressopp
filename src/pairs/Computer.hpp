@@ -2,12 +2,16 @@
 #define _PAIRS_COMPUTER_HPP
 
 #include "types.hpp"
-#include "storage/ParticleHandle.hpp"
-#include "storage/Storage.hpp"
 #include "boost/function.hpp"
 
 namespace espresso {
+  namespace storage {
+    class Storage;
+    class ParticleHandle;
+  }
+
   namespace pairs {
+
     /** Abstract class that defines a function on pairs of particles */
     class Computer {
     public:
@@ -23,8 +27,8 @@ namespace espresso {
       typedef void                       result_type;
       //@}
 
-      virtual void prepare(storage::Storage::SelfPtr storage1, 
-			   storage::Storage::SelfPtr storage2) = 0;
+      virtual void prepare(const shared_ptr< storage::Storage > storage1, 
+			   const shared_ptr< storage::Storage > storage2) = 0;
 
       /** Interface of the routine that is applied to particle pairs
 	  \param dist: distance vector between the two particles

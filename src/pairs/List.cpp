@@ -16,23 +16,18 @@ List::~List()
 /* Constructor */
 List::List(bc::BC::SelfPtr _bc, 
            Storage::SelfPtr _storage1, 
-           Storage::SelfPtr _storage2, 
-           Property< Real3D >::SelfPtr _posProperty1,
-           Property< Real3D >::SelfPtr _posProperty2) 
-  : Set(_storage1, _storage2),
-    bc(_bc),
-    posProperty1(_posProperty1),
-    posProperty2(_posProperty2)
+           Storage::SelfPtr _storage2) 
+  : bc(_bc),
+    storage1(_storage1),
+    storage2(_storage2)
     {}
 
 /* Constructor */
 List::List(bc::BC::SelfPtr _bc,
-           Storage::SelfPtr _storage,
-           Property< Real3D >::SelfPtr _posProperty)
-  : Set(_storage, _storage),
-    bc(_bc),
-    posProperty1(_posProperty),
-    posProperty2(_posProperty)
+           Storage::SelfPtr _storage)
+  : bc(_bc),
+    storage1(_storage),
+    storage2(_storage)
     {}
 
 size_t List::size() const {
@@ -71,10 +66,10 @@ void List::deletePair(ParticleId id1, ParticleId id2) {
    id_list.erase(it);
 }
 
-bool List::foreachApply(Computer &computer) {
+bool List::foreachPairApply(Computer &computer) {
    vector<Tuple>::const_iterator it;
-   storage::PropertyHandle<Real3D> pos1 = posProperty1->getHandle(storage1);
-   storage::PropertyHandle<Real3D> pos2 = posProperty2->getHandle(storage2);
+   storage::PropertyHandle<Real3D> pos1 = storage1->getPositionPropertyHandle();
+   storage::PropertyHandle<Real3D> pos2 = storage2->getPositionPropertyHandle();
 
    for(it = id_list.begin(); it != id_list.end(); it++) {
      ParticleHandle p1 = storage1->getParticleHandle(it->first);
@@ -87,6 +82,13 @@ bool List::foreachApply(Computer &computer) {
    return true;
 }
 
+Storage::SelfPtr List::getLeftStorage()
+{ return storage1; }
+
+Storage::SelfPtr List::getRightStorage()
+{ return storage2; }
+
+
 //////////////////////////////////////////////////
 // REGISTRATION WITH PYTHON
 //////////////////////////////////////////////////
@@ -97,12 +99,10 @@ List::registerPython() {
 
   class_< List, bases< Set > >
     ("pairs_List", "Put pairs::List docstring here.", 
-     init< bc::BC::SelfPtr, storage::Storage::SelfPtr, Property< Real3D >::SelfPtr >())
+     init< bc::BC::SelfPtr, storage::Storage::SelfPtr >())
     .def(init< bc::BC::SelfPtr,
 	 storage::Storage::SelfPtr,
-         storage::Storage::SelfPtr,
-         Property< Real3D >::SelfPtr,
-         Property< Real3D >::SelfPtr >()) 
+         storage::Storage::SelfPtr >()) 
     .def("addPair", &List::addPair)
     .def("deletePair", &List::deletePair)
     .def("size", &List::size)

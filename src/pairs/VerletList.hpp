@@ -49,18 +49,15 @@ namespace espresso {
       static void registerPython();
 
       /** Constructor */
-      VerletList(bc::BC::SelfPtr _bc,
-                 storage::Storage::SelfPtr _storage,
-	         Property< Real3D >::SelfPtr _posProperty, 
+      VerletList(bc::BC::SelfPtr _bc, 
+		 storage::Storage::SelfPtr _storage,
 		 real _skin);
 
       /* 2-parameter constructor */
       VerletList(bc::BC::SelfPtr _bc, 
-           storage::Storage::SelfPtr _storage1, 
-           storage::Storage::SelfPtr _storage2, 
-           Property< Real3D >::SelfPtr _posProperty1,
-	   Property< Real3D >::SelfPtr _posProperty2,
-	   real _skin);
+		 storage::Storage::SelfPtr _storage1, 
+		 storage::Storage::SelfPtr _storage2, 
+		 real _skin);
 
       /** Destructor */
       virtual ~VerletList();
@@ -77,19 +74,24 @@ namespace espresso {
       /** return size of list */
       size_t size() const;
 
+      /** Getter routine for storage1 */
+      virtual storage::Storage::SelfPtr getLeftStorage();
+      /** Getter routine for storage2 */
+      virtual storage::Storage::SelfPtr getRightStorage();
+
     protected:
       /** This routine will apply a function operator to all pairs of the Verlet list.
 	  \param computer is the object that provides the function to be applied.
       */
-      virtual bool foreachApply(Computer &computer);
+      virtual bool foreachPairApply(Computer &computer);
 
     private:
+      bc::BC::SelfPtr bc;
+      storage::Storage::SelfPtr storage1;
+      storage::Storage::SelfPtr storage2;
+
       real skin; // skin thickness
       real maxdisp; // sum of maximum displacements
-
-      bc::BC::SelfPtr bc;
-      Property< Real3D >::SelfPtr posProperty1;
-      Property< Real3D >::SelfPtr posProperty2;
 
       typedef std::pair< ParticleId, ParticleId > Tuple;
       std::vector< Tuple > id_list;
