@@ -4,7 +4,7 @@
 #include <logging.hpp>
 
 #include <espresso_common.hpp>
-#include <storage/Storage.hpp>
+#include <storage/SingleNode.hpp>
 #include <bc/PeriodicBC.hpp>
 #include <potential/LennardJones.hpp>
 #include <potential/FENE.hpp>
@@ -52,11 +52,17 @@ using namespace boost;
 
 void forceloop() {
 
+  // define periodic boundary conditions
+
+  PeriodicBC::SelfPtr pbc = make_shared< PeriodicBC >(SIZE);
+
   // Create a new particle storage
 
-  Storage::SelfPtr particleStorage = make_shared< Storage >();
+  Storage::SelfPtr particleStorage = make_shared< SingleNode >(pbc);
 
+  particleStorage->setIdProperty();
   Property< Real3D >::SelfPtr position = make_shared< Property< Real3D > >(particleStorage);
+  particleStorage->setPositionProperty(position);
   Property< Real3D >::SelfPtr velocity = make_shared< Property< Real3D > >(particleStorage);
   Property< Real3D >::SelfPtr force = make_shared< Property< Real3D > >(particleStorage);
   
@@ -88,13 +94,9 @@ void forceloop() {
 
   particleStorage->foreach(pWriter);
 
-  // define periodic boundary conditions
-
-  PeriodicBC::SelfPtr pbc = make_shared< PeriodicBC >(SIZE);
-
   // define allpairs with (x, y) for all x, y in allSet
 
-  pairs::All::SelfPtr allpairs = make_shared< pairs::All >(pbc, particleStorage, position);
+  pairs::All::SelfPtr allpairs = make_shared< pairs::All >(particleStorage);
   
   // For test only: PairWriter prints each particle pair 
   

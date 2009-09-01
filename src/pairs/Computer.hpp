@@ -41,7 +41,7 @@ namespace espresso {
 	  Note: The references are necessary if more property data of
 	  the particles is needed than only the distance.
       */
-      virtual bool apply(const Real3D dist, 
+      virtual bool apply(const Real3D &dist, 
 			 const storage::ParticleHandle p1, 
 			 const storage::ParticleHandle p2) = 0;
       

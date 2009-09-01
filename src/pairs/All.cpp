@@ -23,7 +23,7 @@ namespace {
 
     void prepare(Storage::SelfPtr s1, Storage::SelfPtr s2)
     { computer.prepare(s1, s2); }
-    bool apply(Real3D d,
+    bool apply(const Real3D &d,
 	       ParticleHandle p1,
 	       ParticleHandle p2) {
       if (set.contains(p1) && set.contains(p2)) {

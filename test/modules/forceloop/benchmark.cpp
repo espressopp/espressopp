@@ -13,7 +13,7 @@
 
 #include "espresso_common.hpp"
 #include "types.hpp"
-#include "storage/Storage.hpp"
+#include "storage/SingleNode.hpp"
 #include "particles/Computer.hpp"
 #include "pairs/All.hpp"
 #include "potential/ForceComputer.hpp"
@@ -56,12 +56,16 @@ static inline real dround(real x) { return floor(x + 0.5); }
 
 class TestEspresso {
 public:
+  bc::PeriodicBC::SelfPtr pbc;
   Storage::SelfPtr storage;
-  Property< Real3D >::SelfPtr position, force;
+  Property< Real3D >::SelfPtr force;
+  Property< Real3D >::SelfPtr position;
   
   TestEspresso() {
-    storage = make_shared< Storage >();
-    position = make_shared< Property< Real3D > >(storage);
+    pbc = make_shared< bc::PeriodicBC >(size);
+    storage = make_shared< SingleNode >(pbc);
+    storage->setIdProperty();
+    storage->setPositionProperty(position = make_shared< Property< Real3D > >(storage));
     force = make_shared< Property< Real3D > >(storage);
   }
 
@@ -82,7 +86,8 @@ public:
   }
 
   Real3D getPosition(size_t i) {
-    return position->at(ParticleId(i));
+    ParticleHandle h = storage->getParticleHandle(ParticleId(i));
+    return (storage->getPositionPropertyHandle())[h];
   }
 };
 
@@ -91,21 +96,20 @@ void TestEspresso::addParticles(vector< Real3D > &positions) {
   BOOST_FOREACH(Real3D pos, positions)
     {
       ParticleId id = ParticleId(cnt);
-      storage->addParticle(id);
-      (*position)[id] = pos;
+      ParticleHandle h = storage->addParticle(id);
+      storage->getPositionPropertyHandle()[h] = pos;
       (*force)[id] = 0.0;
       cnt++;
     }
 }
 
 void TestEspresso::calculateForces(real epsilon, real sigma, real cutoff) {
-  bc::PeriodicBC::SelfPtr pbc = make_shared< bc::PeriodicBC >(size);
-  pairs::All::SelfPtr allpairs = make_shared< pairs::All >(pbc, storage, position);
+  pairs::All::SelfPtr allpairs = make_shared< pairs::All >(storage);
   potential::LennardJones::SelfPtr ljint 
     = make_shared< potential::LennardJones >(epsilon, sigma, cutoff);
   pairs::Computer::SelfPtr forceCompute 
     = ljint->createForceComputer(force);
-  allpairs->foreach(forceCompute);
+  allpairs->foreachPair(forceCompute);
 }
 
 class EmptyPairComputer: public pairs::Computer {
@@ -116,16 +120,15 @@ public:
   void prepare(Storage::SelfPtr storage1,
 	       Storage::SelfPtr storage2) {}
 
-  virtual bool apply(const Real3D dist,
+  virtual bool apply(const Real3D &dist,
 		     ParticleHandle ref1,
 		     ParticleHandle ref2) { return true; }
 };
 
 void TestEspresso::runEmptyPairLoop() {
-  bc::PeriodicBC::SelfPtr pbc = make_shared< bc::PeriodicBC >(size);
-  pairs::All::SelfPtr allpairs = make_shared< pairs::All >(pbc, storage, position);
+  pairs::All::SelfPtr allpairs = make_shared< pairs::All >(storage);
   pairs::Computer::SelfPtr ljc = make_shared< EmptyPairComputer >();
-  allpairs->foreach(ljc);
+  allpairs->foreachPair(ljc);
 }
 
 class MinDistComputer: public pairs::Computer {
@@ -138,7 +141,7 @@ public:
   void prepare(Storage::SelfPtr storage1,
 	       Storage::SelfPtr storage2) {}
 
-  bool apply(const Real3D dist,
+  bool apply(const Real3D &dist,
 	     ParticleHandle ref1,
 	     ParticleHandle ref2) {
     real d = dist.sqr();
@@ -151,9 +154,9 @@ public:
 
 real TestEspresso::calculateMinDist() {
   bc::PeriodicBC::SelfPtr pbc = make_shared< bc::PeriodicBC >(size);
-  pairs::All::SelfPtr allpairs = make_shared< pairs::All >(pbc, storage, position);
+  pairs::All::SelfPtr allpairs = make_shared< pairs::All >(storage);
   MinDistComputer::SelfPtr mincomp = make_shared< MinDistComputer >();
-  allpairs->foreach(*mincomp);
+  allpairs->foreachPair(*mincomp);
   return sqrt(mincomp->min);
 }
 

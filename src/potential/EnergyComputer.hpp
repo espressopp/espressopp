@@ -43,7 +43,7 @@ namespace espresso {
 	totalEnergy = 0.0;
       }
 
-      virtual bool apply(const Real3D dist,
+      virtual bool apply(const Real3D &dist,
 			 const storage::ParticleHandle p1,
 			 const storage::ParticleHandle p2) {
 	real e = potential._computeEnergy(dist);
