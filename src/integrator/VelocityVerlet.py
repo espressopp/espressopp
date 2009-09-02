@@ -5,9 +5,9 @@ from espresso.integrator.MDIntegrator import *
 from _espresso import integrator_VelocityVerlet
 
 class VelocityVerletLocal(MDIntegratorLocal, integrator_VelocityVerlet):
-    def __init__(self, set, posProperty, velProperty, forceProperty, timestep=0.1):
+    def __init__(self, set, velProperty, forceProperty, timestep=0.1):
         cxxinit(self, integrator_VelocityVerlet, 
-                set, posProperty, velProperty, forceProperty, timestep)
+                set, velProperty, forceProperty, timestep)
 
 if pmi.IS_CONTROLLER:
     class VelocityVerlet(MDIntegrator):

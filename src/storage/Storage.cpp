@@ -14,12 +14,17 @@ Storage::Storage(bc::BC::SelfPtr _bc): bc(_bc) {}
 
 Storage::~Storage() {}
 
+void Storage::positionPropertyModified() {
+}
+
 void Storage::_addParticle(ParticleId id) {
   addParticle(id);
+  positionPropertyModified();
 }
 
 void Storage::deleteProperty(PropertyId id) {
   getTupleVector().eraseProperty(id);
+  handlesChanged();
 }
 
 Storage::SelfPtr

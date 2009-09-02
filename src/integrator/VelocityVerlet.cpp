@@ -20,11 +20,11 @@ namespace {
     const real timestepSqr;
 
     StepA(Set::SelfPtr set,
-	  Property< Real3D >::SelfPtr posProperty,
+	  PropertyHandle< Real3D > posProperty,
 	  Property< Real3D >::SelfPtr velProperty,
 	  Property< Real3D >::SelfPtr forceProperty, 
 	  real _timestep)
-      : pos(posProperty->getHandle(set)), 
+      : pos(posProperty), 
 	vel(velProperty->getHandle(set)), 
 	force(forceProperty->getHandle(set)),
 	timestep(_timestep), 
@@ -79,10 +79,12 @@ namespace {
 }
 
 void VelocityVerlet::step() {
-  StepA stepA(set, posProperty, velProperty, forceProperty, timestep);
+  StepA stepA(set, set->getStorage()->getPositionPropertyHandle(), velProperty, forceProperty, timestep);
 
   // Step A
   set->foreach(stepA);
+
+  set->getStorage()->positionPropertyModified();
 
   // call connected routines, e.g. thermalizeA for a chosen thermostat
   updateVelocity1(*this);
@@ -117,7 +119,6 @@ VelocityVerlet::registerPython() {
     ("integrator_VelocityVerlet", 
      init< 
      Set::SelfPtr, 
-     Property< Real3D >::SelfPtr, 
      Property< Real3D >::SelfPtr, 
      Property< Real3D >::SelfPtr,
      real

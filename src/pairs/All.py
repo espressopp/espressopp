@@ -5,8 +5,8 @@ from espresso.pairs.Set import *
 
 from _espresso import pairs_All
 class AllLocal(SetLocal, pairs_All):
-    def __init__(self, bc, set, posProperty):
-        cxxinit(self, pairs_All, bc, set, posProperty)
+    def __init__(self, set):
+        cxxinit(self, pairs_All, set)
 
 if pmi.IS_CONTROLLER:
     class All(Set):

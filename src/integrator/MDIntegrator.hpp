@@ -24,7 +24,6 @@ namespace espresso {
 
       particles::Set::SelfPtr set;    //!< particle set to integrate
 
-      Property< Real3D >::SelfPtr posProperty; //!< position property
       Property< Real3D >::SelfPtr velProperty; //!< velocity property
       Property< Real3D >::SelfPtr forceProperty; //!< force property
 
@@ -49,12 +48,10 @@ namespace espresso {
       IntegrateSignal updateForces;
 
       MDIntegrator(particles::Set::SelfPtr _set,
-                   Property< Real3D >::SelfPtr _posProperty,
                    Property< Real3D >::SelfPtr _velProperty,
                    Property< Real3D >::SelfPtr _forceProperty,
 		   real _timestep) {
 	setSet(_set);
-	setPosProperty(_posProperty);
 	setVelProperty(_velProperty);
 	setForceProperty(_forceProperty);
 	setTimestep(_timestep);
@@ -64,11 +61,6 @@ namespace espresso {
 
       void setSet(particles::Set::SelfPtr _set) { set = _set; }
       particles::Set::SelfPtr getSet() const { return set; }
-
-      void setPosProperty(Property< Real3D >::SelfPtr _posProperty) { 
-	posProperty = _posProperty; 
-      }
-      Property< Real3D >::SelfPtr getPosProperty() const { return posProperty; }
 
       void setVelProperty(Property< Real3D >::SelfPtr _velProperty) { 
 	velProperty = _velProperty; 

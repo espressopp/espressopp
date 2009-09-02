@@ -16,6 +16,7 @@ ParticleHandle SingleNode::addParticle(ParticleId id) {
   esutil::TupleVector &particles = getTupleVector();
   ParticleHandle it = particles.insert(particles.end());
   getIdPropertyHandle()[it] = id;
+  handlesChanged();
   return it;
 }
 
@@ -27,6 +28,7 @@ void SingleNode::deleteParticle(ParticleId deleteID) {
     throw std::out_of_range("Storage::deleteParticle: particle does not exist");
   }
   particles.erase(pos);
+  handlesChanged();
 }
 
 namespace {

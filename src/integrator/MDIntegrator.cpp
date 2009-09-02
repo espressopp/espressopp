@@ -47,7 +47,6 @@ MDIntegrator::registerPython() {
   class_< MDIntegrator, boost::noncopyable >
     ("integrator_MDIntegrator", no_init)
     .add_property("set", &MDIntegrator::getSet, &MDIntegrator::setSet)
-    .add_property("posProperty", &MDIntegrator::getPosProperty, &MDIntegrator::setPosProperty)
     .add_property("velProperty", &MDIntegrator::getVelProperty, &MDIntegrator::setVelProperty)
     .add_property("forceProperty", &MDIntegrator::getForceProperty, &MDIntegrator::setForceProperty)
     .add_property("timestep", &MDIntegrator::getTimestep, &MDIntegrator::setTimestep)

@@ -2,6 +2,7 @@
 #define _STORAGE_STORAGE_HPP
 
 #include <exception>
+#include <boost/signals2.hpp>
 
 #include "types.hpp"
 #include "esutil/TupleVector.hpp"
@@ -11,6 +12,7 @@
 #include "particles/Set.hpp"
 #include "pairs/Set.hpp"
 #include "bc/BC.hpp"
+#include "esutil/MultiSignalConnections.hpp"
 
 namespace espresso {
   // forward declarations
@@ -30,6 +32,7 @@ namespace espresso {
     {
     public:
       typedef shared_ptr< Storage > SelfPtr;
+      typedef boost::signals2::signal0<void> Signal;
 
       /** constructor, specifies the boundary conditions to apply.
 	  Derived Storage classes restrict the possible boundary
@@ -84,6 +87,20 @@ namespace espresso {
       //@}
 
       bc::BC::SelfPtr getBoundaryConditions() const { return bc; }
+
+      /** inform the storage that particle positions have
+	  changed. Call this e. g. after the integrator has moved all
+	  particles.
+       */
+      virtual void positionPropertyModified();
+      
+      /** signal that is rised if the storage was modified such that
+	  particle or property handles might be outdated.
+      */
+      Signal handlesChanged;
+
+      /// connection manager
+      esutil::MultiSignalConnections connections;
 
       /// @name the particles::Set interface
       //@{
@@ -154,7 +171,11 @@ namespace espresso {
           @tparam T type of the property
       */
       template< typename T >
-      PropertyId addProperty(size_t dim = 1) { return getTupleVector().addProperty<T>(dim); }
+      PropertyId addProperty(size_t dim = 1) {
+	PropertyId tmp =  getTupleVector().addProperty<T>(dim);
+	handlesChanged();
+	return tmp;
+      }
 
       /** delete a property
           @param n ID of the property to delete as obtained from addProperty

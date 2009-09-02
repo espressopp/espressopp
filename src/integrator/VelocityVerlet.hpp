@@ -15,11 +15,10 @@ namespace espresso {
       typedef shared_ptr< VelocityVerlet > SelfPtr;
 
       VelocityVerlet(particles::Set::SelfPtr set,
-		     Property< Real3D >::SelfPtr posProperty,
 		     Property< Real3D >::SelfPtr velProperty,
 		     Property< Real3D >::SelfPtr forceProperty,
 		     real _timestep)  
-	: MDIntegrator(set, posProperty, velProperty, forceProperty, _timestep) 
+	: MDIntegrator(set, velProperty, forceProperty, _timestep) 
       {}
 
       /** The following signals are specific for VelocityVerlet */

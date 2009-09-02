@@ -44,13 +44,13 @@ if pmi.IS_CONTROLLER :
             self.posProperty = Real3DProperty(self)
             pmi.call(self, '_setIdAndPos', self.idProperty, self.posProperty)
 
-        def getPositionProperty():
+        def getPositionProperty(self):
             """
             obtain the position property.
             """
             return self.posProperty
 
-        def getIdProperty():
+        def getIdProperty(self):
             """
             obtain the id property.
             """

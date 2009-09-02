@@ -9,7 +9,7 @@ if pmi.IS_CONTROLLER:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             pmiproperty = [ 'set', 
-                            'posProperty', 'velProperty', 'forceProperty', 
+                            'velProperty', 'forceProperty', 
                             'timestep' ],
             pmicall = ['integrate']
             )
