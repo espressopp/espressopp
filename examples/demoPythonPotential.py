@@ -24,7 +24,7 @@ else:
         pmiproxydefs['cls'] = 'HarmonicLocal'
 
         def __init__(self, D=1.0, r0=0.0):
-            self.pmiinit('HarmonicLocal', D, r0)
+            self.pmiinit(D, r0)
 
     from espresso import pmi
     pmi.execfile_(__file__)
@@ -37,7 +37,7 @@ else:
     import random
     
     storage = espresso.storage.SingleNode(espresso.bc.PeriodicBC(), mpi.size-1)
-    pos = Real3DProperty(storage)
+    pos = storage.getPositionProperty()
     force = Real3DProperty(storage)
     energy = RealProperty(storage)
     bc = espresso.bc.PeriodicBC(10.0)
@@ -50,7 +50,7 @@ else:
 
     potential = Harmonic()
 
-    allpairs = espresso.pairs.All(set=storage, posProperty=pos, bc=bc)
+    allpairs = espresso.pairs.All(set=storage)
     harmint = espresso.potential.Interaction(pairs=allpairs, potential=potential)
 
     harmint.addForces(force)

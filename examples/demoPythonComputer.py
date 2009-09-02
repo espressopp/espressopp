@@ -61,7 +61,7 @@ else:
     import random
 
     storage = SingleNode(bc.PeriodicBC(length=1), mpi.size-1)
-    pos = Real3DProperty(storage)
+    pos = storage.getPositionProperty()
 
     for count in range(0,100):
         storage.addParticle(count)

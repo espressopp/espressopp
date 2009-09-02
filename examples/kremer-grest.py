@@ -6,7 +6,7 @@ size = 10.0
 # set up the boundary conditions
 pbc = bc.PeriodicBC(length=size)
 # set up the decomposition scheme
-storage = storage.SingleNode(0)
+storage = storage.SingleNode(pbc, 0)
 #storage = espresso.storage.CellStorage(grid=(2, 2, 2), skin=0.1, **system)
 
 # set up the properties
@@ -16,7 +16,7 @@ force = Real3DProperty(storage)
 #force = storage.createProperty('Real3D')
 
 # create the particles and the chains
-bonds = pairs.List(bc=pbc, storage=storage, posProperty=pos)
+bonds = pairs.List(bc=pbc, storage=storage)
 
 # for chainid in range(100):
 #     prevPid = storage.addParticle()
@@ -43,12 +43,12 @@ bonds.addPair(0, 1)
 # set up the integrator
 integrator = integrator.VelocityVerlet(
     set=storage,
-    posProperty=pos, velProperty=vel, forceProperty=force,
+    velProperty=vel, forceProperty=force,
     timestep=0.01)
 
 # create the LJ interaction
 lj = potential.LennardJones(sigma=1.0, epsilon=1.0, cutoff=2.0)
-allpairs = pairs.All(set=storage, bc=pbc, posProperty=pos)
+allpairs = pairs.All(set=storage)
 ljint = potential.Interaction(potential=lj, pairs=allpairs)
 ljint.connect(integrator)
 
