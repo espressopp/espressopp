@@ -29,13 +29,12 @@ bonds = pairs.List(bc=pbc, storage=storage)
 #         prevPid = newPid
 
 for beadid in range(10):
-    newPid = storage.addParticle()
-    pos[newPid] = Real3D(random.random()*size, random.random()*size, random.random()*size)
+    storage.addParticle(beadid)
+    pos[beadid] = Real3D(random.random()*size, random.random()*size, random.random()*size)
     # + espresso.esutil.randomWalk(step=1.0)
-    vel[newPid] = 0.0
-    force[newPid] = 0.0
+    vel[beadid] = 0.0
+    force[beadid] = 0.0
 
-# create bond for first two particles
 pos[0] = (0.0, 0.0, 0.0)
 pos[1] = (1.0, 0.0, 0.0)
 bonds.addPair(0, 1)
