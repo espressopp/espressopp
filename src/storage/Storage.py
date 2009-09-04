@@ -39,6 +39,8 @@ if pmi.IS_CONTROLLER :
         def __init__(self):
             self.pmiinit()
 
+            self.maxSeenId = 0
+
             # add the ID and position properties
             self.idProperty = IDProperty(self)
             self.posProperty = Real3DProperty(self)
@@ -56,14 +58,30 @@ if pmi.IS_CONTROLLER :
             """
             return self.idProperty
 
-        #        @abc.abstractmethod
         def addParticle(self, id=None) :
             """
-            This has to be implemented by any derived class to implement a real particle storage.
-            This method should add a particle with identity <id> or a not yet assigned
+            This method adds a particle with identity <id> or a not yet assigned
             identity, if id is None.
             Returns the particle id of the created particle.
             If the particle already exists, an IndexError is raised.
+            """
+            if id is None:
+                id = self.maxSeenId + 1
+            elif type(id) is not type(1) or id < 0 :
+                raise TypeError("particle identity should be a nonnegative integer")
+            self._addParticle(id)
+            if id > self.maxSeenId :
+                self.maxSeenId = id
+            return id
+
+        #        @abc.abstractmethod
+        def _addParticle(self, id) :
+            """
+            This has to be implemented by any derived class to
+            implement a real particle storage.  This method should add
+            a particle with identity <id>, or raise an IndexError if
+            the particle already exists. It is assured by the Storage
+            that id is a nonnegative integer.
             """
             pass
 

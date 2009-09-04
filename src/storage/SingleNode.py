@@ -44,21 +44,12 @@ if pmi.IS_CONTROLLER :
             # list of all particles. Since they are all on one node, we can as well
             # keep a table of all of them here
             self.particleIds = set()
-            self.maxSeenId = -1
             
-        def addParticle(self, id=None) :
+        def _addParticle(self, id) :
             if id in self.particleIds :
                 raise IndexError("particle %s already exists" % str(id))
-            if id is None:
-                id = self.maxSeenId + 1
-            elif type(id) is not type(1) or id < 0 :
-                raise TypeError("particle identity should be a nonnegative integer")
             pmi.call(self, 'addParticle', id)
-            # update maxSeenId and list of particleIds
-            if id > self.maxSeenId :
-                self.maxSeenId = id
             self.particleIds.add(id)
-            return id
 
         def deleteParticle(self, id) :
             if id not in self.particleIds :

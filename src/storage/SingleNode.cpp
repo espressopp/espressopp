@@ -5,6 +5,7 @@ using namespace espresso;
 using namespace storage;
 
 SingleNode::SingleNode(bc::BC::SelfPtr _bc): Storage(_bc) {}
+SingleNode::~SingleNode() {}
 
 esutil::TupleVector &
 SingleNode::getTupleVector()
