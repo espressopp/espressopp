@@ -2,6 +2,11 @@ from espresso import *
 from espresso import storage, bc, integrator, particles, potential, pairs, thermostat
 import random
 
+import logging
+
+# logging.root.setLevel(logging.DEBUG)
+# logging.getLogger("espresso.pmi").setLevel(logging.WARN)
+
 size = 10.0
 # set up the boundary conditions
 pbc = bc.PeriodicBC(length=size)
@@ -10,7 +15,7 @@ storage = storage.SingleNode(pbc, 0)
 #storage = espresso.storage.CellStorage(grid=(2, 2, 2), skin=0.1, **system)
 
 # set up the properties
-pos = Real3DProperty(storage)
+pos = storage.getPositionProperty()
 vel = Real3DProperty(storage)
 force = Real3DProperty(storage)
 #force = storage.createProperty('Real3D')
@@ -84,6 +89,6 @@ for sweeps in range(5):
     print('  pos[1]=%8.3g %8.3g %8.3g' % tuple(pos[1]))
     print('  vel[1]=%8.3g %8.3g %8.3g' % tuple(vel[1]))
     print('  force[1]=%8.3g %8.3g %8.3g' % tuple(force[1]))
-    integrator.integrate(steps=1000)
+    integrator.integrate(steps=1)
 
 # analysis
