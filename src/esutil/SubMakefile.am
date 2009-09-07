@@ -8,6 +8,7 @@ nobase_pkginclude_HEADERS += \
 	esutil/Timer.hpp \
 	esutil/virtual_functional.hpp \
         esutil/Logger.hpp \
+	esutil/SignalBindingTraits.hpp \
 	esutil/MultiSignalConnections.hpp
 
 libespresso_common_la_SOURCES += \

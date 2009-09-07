@@ -7,6 +7,7 @@
 #include <boost/bind.hpp>
 #include <map>
 #include <utility>
+#include "SignalBindingTraits.hpp"
 
 namespace espresso {
   namespace esutil {
@@ -21,7 +22,7 @@ namespace espresso {
 	       boost::signals2::connect_position at 
 	       = boost::signals2::at_back) {
 	boost::signals2::connection connection 
-	  = signal.connect(at, boost::bind(method, obj, _1));
+	  = signal.connect(at, SignalBindingTraits<SignalType>::bind(method, obj));
 	insert(std::make_pair(static_cast< void* >(obj.get()), connection));
       }
 
