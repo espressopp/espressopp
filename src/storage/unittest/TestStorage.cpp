@@ -4,26 +4,83 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/test/floating_point_comparison.hpp>
 #include <boost/foreach.hpp>
+#include <boost/unordered_set.hpp>
 
+#include "bc/PeriodicBC.hpp"
 #include "storage/Storage.hpp"
 #include "Property.hpp"
 
 using namespace espresso;
 using namespace espresso::storage;
 
-int applyFnCalled;
+#include <iostream>
+struct MockStorage: public Storage
+{
+  esutil::TupleVector particles;
+  bool handleSignalledCalled;
+  bool positionPropertyModifiedCalled;
+  ParticleId addedParticle;
+  bool foreachApplyCalled;
+
+  MockStorage():
+    Storage(make_shared<bc::PeriodicBC>(1.0)),
+    particles(5),
+    handleSignalledCalled(false),
+    positionPropertyModifiedCalled(false),
+    addedParticle(0),
+    foreachApplyCalled(false)
+  {
+    setIdProperty();
+    setPositionProperty();
+
+    int c = 0;
+    BOOST_FOREACH(ParticleHandle h, particles) {
+      getIdPropertyHandle()[h] = ParticleId(c++);
+    }
+  }
+
+  void connectSelf() {
+    connections.add(handlesChanged,
+                    boost::dynamic_pointer_cast< MockStorage >( shared_from_this() ),
+                    &MockStorage::handleSignalled);
+  }
+  
+  void handleSignalled() {
+    handleSignalledCalled = true;
+  }
+
+  void positionPropertyModified() {
+    positionPropertyModifiedCalled = true;
+  }
+
+  virtual ParticleHandle addParticle(ParticleId id) {
+    addedParticle = id;
+    return particles.begin();
+  }
+
+  virtual bool foreachApply(particles::Computer &computer) {
+    foreachApplyCalled = true;
+
+    BOOST_FOREACH(ParticleHandle h, particles) {
+      computer.apply(h);
+    }
+    return true;
+  }
+
+  virtual esutil::TupleVector &getTupleVector() { return particles; }
+
+  // abstract functions that a storage has to provide
+  // nothing to test here, but we still need empty implementations
+  virtual void deleteParticle(ParticleId id) {}
+  virtual ParticleHandle getParticleHandle(ParticleId id) { return particles[id]; }
+};
 
 struct Fixture {
-  Storage::SelfPtr store;
-  Property< Real3D >::SelfPtr propertyPos;
+  boost::shared_ptr< MockStorage > store;
 
   Fixture() {
-    store = make_shared< Storage >();
-    propertyPos = make_shared< Property< Real3D > >(store);
-    for (size_t i = 0; i < 5; ++i) {
-      store->addParticle(ParticleId(i));
-    }
-    applyFnCalled = 0;
+    store = make_shared< MockStorage >();
+    store->connectSelf();
   }
 
   ~Fixture() {}
@@ -32,36 +89,26 @@ struct Fixture {
 
 //____________________________________________________________________________//
 
-
-BOOST_FIXTURE_TEST_CASE(referencesTest, Fixture)
+BOOST_FIXTURE_TEST_CASE(_addTest, Fixture)
 {
-  ParticleHandle p1 = store->getParticleHandle(ParticleId(2));
-  ParticleHandle p2 = store->getParticleHandle(ParticleId(4));
-  PropertyHandle< Real3D > pos = propertyPos->getHandle(store);
+  store->_addParticle(ParticleId(32));
+  BOOST_CHECK_EQUAL(size_t(store->addedParticle), size_t(32));
+  BOOST_CHECK(store->positionPropertyModifiedCalled);
+}
 
-  pos[p2][0] = 0.4;
-  pos[p2][1] = 0.5;
-  pos[p2][2] = 0.6;
-  
-  BOOST_CHECK_CLOSE(pos[p2][0], 0.4, 1e-10);
-  BOOST_CHECK_CLOSE(pos[p2][1], 0.5, 1e-10);
-  BOOST_CHECK_CLOSE(pos[p2][2], 0.6, 1e-10);
-  
-  // set position of particle 1 from particle 2's position
-  pos[p1][0] = 0.1*pos[p2][0];
-  pos[p1][1] = 0.2*pos[p2][1];
-  pos[p1][2] = 0.3*pos[p2][2];
-
-  // check result
-  BOOST_CHECK_CLOSE(pos[p1][0], 0.04, 1e-10);
-  BOOST_CHECK_CLOSE(pos[p1][1], 0.10, 1e-10);
-  BOOST_CHECK_CLOSE(pos[p1][2], 0.18, 1e-10);
+BOOST_FIXTURE_TEST_CASE(deleteProperty, Fixture)
+{ 
+  Property<int> * prop = new Property<int>(store);
+  BOOST_CHECK_EQUAL(size_t(store->getTupleVector().getNumProperties()), size_t(3));
+  delete prop;
+  BOOST_CHECK_EQUAL(size_t(store->getTupleVector().getNumProperties()), size_t(2));
 }
 
 struct MockComputer : particles::Computer {
   bool prepareCalled;
   bool finalizeCalled;
   int applyCalled;
+  boost::unordered_set<ParticleHandle> parts;
 
   MockComputer() {
     prepareCalled = false;
@@ -69,7 +116,7 @@ struct MockComputer : particles::Computer {
     applyCalled = 0;
   }
 
-  void prepare(Storage::SelfPtr storage) {
+  void prepare(Storage::SelfPtr) {
     prepareCalled = true;
   }
 
@@ -79,18 +126,65 @@ struct MockComputer : particles::Computer {
 
   bool apply(ParticleHandle handle) {
     applyCalled++;
+    parts.insert(handle);
     return true;
   }
 };
 
-BOOST_FIXTURE_TEST_CASE(foreachTest, Fixture)
+BOOST_FIXTURE_TEST_CASE(foreach, Fixture)
 {
   MockComputer computer;
 
   store->foreach(computer);
 
+  BOOST_CHECK(store->foreachApplyCalled);
   BOOST_CHECK(computer.prepareCalled);
   BOOST_CHECK_EQUAL(computer.applyCalled, 5);
+  BOOST_CHECK_EQUAL(computer.parts.size(), size_t(5));
+  BOOST_CHECK(computer.finalizeCalled);
+}
+
+struct MockPairComputer : pairs::Computer {
+  Storage::SelfPtr storage;
+  bool prepareCalled;
+  bool finalizeCalled;
+  int applyCalled;
+  boost::unordered_set< std::pair<ParticleHandle, ParticleHandle> > pairs;
+
+  MockPairComputer() {
+    prepareCalled = false;
+    finalizeCalled = false;
+    applyCalled = 0;
+  }
+
+  void prepare(Storage::SelfPtr store, Storage::SelfPtr) {
+    storage = store;
+    prepareCalled = true;
+  }
+
+  void finalize() {
+    finalizeCalled = true;
+  }
+
+  bool apply(const Real3D &,
+             ParticleHandle handle1,
+             ParticleHandle handle2
+             ) {
+    applyCalled++;
+    pairs.insert(std::make_pair(handle1, handle2));
+    return true;
+  }
+};
+BOOST_FIXTURE_TEST_CASE(foreachPairApply, Fixture)
+{
+  MockPairComputer computer;
+
+  store->foreachPair(computer);
+
+  BOOST_CHECK(store->foreachApplyCalled);
+  BOOST_CHECK(computer.prepareCalled);
+  BOOST_CHECK_EQUAL(computer.applyCalled, 20);
+  BOOST_CHECK_EQUAL(computer.pairs.size(), size_t(20));
   BOOST_CHECK(computer.finalizeCalled);
 }
 

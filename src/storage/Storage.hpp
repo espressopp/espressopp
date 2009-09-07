@@ -95,7 +95,7 @@ namespace espresso {
       virtual void positionPropertyModified();
       
       /** signal that is rised if the storage was modified such that
-	  particle or property handles might be outdated.
+	  particle handles might be outdated.
       */
       Signal handlesChanged;
 
@@ -173,7 +173,6 @@ namespace espresso {
       template< typename T >
       PropertyId addProperty(size_t dim = 1) {
 	PropertyId tmp =  getTupleVector().addProperty<T>(dim);
-	handlesChanged();
 	return tmp;
       }
 

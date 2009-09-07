@@ -24,7 +24,6 @@ void Storage::_addParticle(ParticleId id) {
 
 void Storage::deleteProperty(PropertyId id) {
   getTupleVector().eraseProperty(id);
-  handlesChanged();
 }
 
 Storage::SelfPtr
@@ -86,9 +85,8 @@ namespace {
 
     bool apply(ParticleHandle p1) {
       innerTraverser.setP1(p1);
-      if (!store.foreach(innerTraverser) && !innerTraverser.cont) 
-	return false;
-      return true;
+      store.foreach(innerTraverser);
+      return innerTraverser.cont;
     }
   };
 }
@@ -121,6 +119,7 @@ void Storage::setPositionProperty(boost::shared_ptr< Property< Real3D > >prop) {
   else {
     particlePosProperty = addProperty< Property< Real3D > >();
   }
+  positionPropertyModified();
 }
 
 IdPropertyHandle
