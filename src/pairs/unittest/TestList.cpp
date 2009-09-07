@@ -2,7 +2,7 @@
 #include <boost/test/unit_test.hpp>
 
 #include "bc/PeriodicBC.hpp"
-#include "storage/Storage.hpp"
+#include "storage/SingleNode.hpp"
 #include "../List.hpp"
 
 using namespace espresso;
@@ -16,15 +16,15 @@ struct Fixture {
 
   bc::PeriodicBC::SelfPtr pbc;
   Storage::SelfPtr store;
-  Property< Real3D >::SelfPtr posProperty;
   List::SelfPtr bonds;
 
   Fixture() {
     np = N * N * N;
     pbc = make_shared< bc::PeriodicBC >(1.0);
-    store = make_shared< Storage >();
-    posProperty = make_shared< Property< Real3D > >(store);
-    bonds = make_shared< List >(pbc, store, posProperty);
+    store = make_shared< SingleNode >( pbc );
+    bonds = make_shared< List >(pbc, store);
+    store->setIdProperty();
+    store->setPositionProperty();
 
     createLattice();
 
@@ -45,7 +45,7 @@ struct Fixture {
       for (size_t j = 0; j < N; j++)
         for (size_t k = 0; k < N; k++) {
           ParticleHandle p = store->addParticle(ParticleId(pid));
-          posProperty->at(store, p) = Real3D(i*step, j*step, k*step);
+          store->getPositionPropertyHandle()[p] = Real3D(i*step, j*step, k*step);
           pid++;
         }
   }
@@ -66,7 +66,7 @@ struct PairAdder: public Computer {
     prepareCalled = true;
   }
   
-  bool apply(const Real3D dist,
+  bool apply(const Real3D &dist,
              const ParticleHandle p1,
              const ParticleHandle p2) {
     counter++;
@@ -108,7 +108,7 @@ BOOST_FIXTURE_TEST_CASE(findTest, Fixture) {
 
 BOOST_FIXTURE_TEST_CASE(counterTest, Fixture) {
   PairAdder pa;
-  bonds->foreach(pa); 
+  bonds->foreachPair(pa); 
   size_t sz = np - 1;
   BOOST_CHECK_EQUAL(pa.counter, sz);
   BOOST_CHECK(pa.prepareCalled);

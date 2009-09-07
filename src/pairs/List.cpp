@@ -74,6 +74,9 @@ bool List::foreachPairApply(Computer &computer) {
    for(it = id_list.begin(); it != id_list.end(); it++) {
      ParticleHandle p1 = storage1->getParticleHandle(it->first);
      ParticleHandle p2 = storage2->getParticleHandle(it->second);
+     if (!p1 || !p2) {
+       throw runtime_error("List::foreachPairApply: pair in list does not exist in storages.");
+     }
      Real3D dist = bc->getDist(pos1[p1], pos2[p2]);
     
      if(!computer.apply(dist, p1, p2)) return false;

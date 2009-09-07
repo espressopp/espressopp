@@ -10,7 +10,7 @@ class Test0FENE(espresso.unittest.TestCase) :
         self.assertAlmostEqual(fene.computeEnergy(1.0), 0.0)
         self.assertAlmostEqual(fene.computeEnergy(1.0, 0.0, 0.0), 0.0)
 
-        self.assertAlmostEqual(fene.computeForce(1.0, 0.0, 0.0), Real3D(0.0, 0.0, 0.0))
+        self.assertAlmostEqual((fene.computeForce(1.0, 0.0, 0.0) - Real3D(0.0, 0.0, 0.0)).sqr(), 0.0)
 
 if __name__ == "__main__":
     unittest.main()

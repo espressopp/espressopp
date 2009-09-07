@@ -1,5 +1,5 @@
-#ifndef SINGLE_NODE_HPP
-#define SINGLE_NODE_HPP
+#ifndef _STORAGE_SINGLE_NODE_HPP
+#define _STORAGE_SINGLE_NODE_HPP
 
 #include "Storage.hpp"
 
@@ -9,7 +9,7 @@ namespace espresso {
     public:
       SingleNode(bc::BC::SelfPtr);
       virtual ~SingleNode();
-      virtual ParticleHandle getParticleHandle(ParticleId id) ;
+      virtual ParticleHandle getParticleHandle(ParticleId id);
       virtual ParticleHandle addParticle(ParticleId);
       virtual void deleteParticle(ParticleId);
 

@@ -10,14 +10,18 @@
 #include "storage/Storage.hpp"
 #include "Property.hpp"
 
+#include "particles/unittest/MockComputer.hpp"
+#include "pairs/unittest/MockPairComputer.hpp"
+#include "MockStorageSignalReceiver.hpp"
+
 using namespace espresso;
 using namespace espresso::storage;
 
 #include <iostream>
+
 struct MockStorage: public Storage
 {
   esutil::TupleVector particles;
-  bool handleSignalledCalled;
   bool positionPropertyModifiedCalled;
   ParticleId addedParticle;
   bool foreachApplyCalled;
@@ -25,7 +29,6 @@ struct MockStorage: public Storage
   MockStorage():
     Storage(make_shared<bc::PeriodicBC>(1.0)),
     particles(5),
-    handleSignalledCalled(false),
     positionPropertyModifiedCalled(false),
     addedParticle(0),
     foreachApplyCalled(false)
@@ -37,16 +40,6 @@ struct MockStorage: public Storage
     BOOST_FOREACH(ParticleHandle h, particles) {
       getIdPropertyHandle()[h] = ParticleId(c++);
     }
-  }
-
-  void connectSelf() {
-    connections.add(handlesChanged,
-                    boost::dynamic_pointer_cast< MockStorage >( shared_from_this() ),
-                    &MockStorage::handleSignalled);
-  }
-  
-  void handleSignalled() {
-    handleSignalledCalled = true;
   }
 
   void positionPropertyModified() {
@@ -77,10 +70,12 @@ struct MockStorage: public Storage
 
 struct Fixture {
   boost::shared_ptr< MockStorage > store;
+  boost::shared_ptr< MockStorageSignalReceiver > signalReceiver;
 
   Fixture() {
     store = make_shared< MockStorage >();
-    store->connectSelf();
+    signalReceiver = make_shared< MockStorageSignalReceiver >();
+    signalReceiver->connect( store );
   }
 
   ~Fixture() {}
@@ -94,6 +89,7 @@ BOOST_FIXTURE_TEST_CASE(_addTest, Fixture)
   store->_addParticle(ParticleId(32));
   BOOST_CHECK_EQUAL(size_t(store->addedParticle), size_t(32));
   BOOST_CHECK(store->positionPropertyModifiedCalled);
+  BOOST_CHECK_EQUAL(signalReceiver->handlesChangedCount, 0);
 }
 
 BOOST_FIXTURE_TEST_CASE(deleteProperty, Fixture)
@@ -102,34 +98,8 @@ BOOST_FIXTURE_TEST_CASE(deleteProperty, Fixture)
   BOOST_CHECK_EQUAL(size_t(store->getTupleVector().getNumProperties()), size_t(3));
   delete prop;
   BOOST_CHECK_EQUAL(size_t(store->getTupleVector().getNumProperties()), size_t(2));
+  BOOST_CHECK_EQUAL(signalReceiver->handlesChangedCount, 0);
 }
-
-struct MockComputer : particles::Computer {
-  bool prepareCalled;
-  bool finalizeCalled;
-  int applyCalled;
-  boost::unordered_set<ParticleHandle> parts;
-
-  MockComputer() {
-    prepareCalled = false;
-    finalizeCalled = false;
-    applyCalled = 0;
-  }
-
-  void prepare(Storage::SelfPtr) {
-    prepareCalled = true;
-  }
-
-  void finalize() {
-    finalizeCalled = true;
-  }
-
-  bool apply(ParticleHandle handle) {
-    applyCalled++;
-    parts.insert(handle);
-    return true;
-  }
-};
 
 BOOST_FIXTURE_TEST_CASE(foreach, Fixture)
 {
@@ -142,39 +112,9 @@ BOOST_FIXTURE_TEST_CASE(foreach, Fixture)
   BOOST_CHECK_EQUAL(computer.applyCalled, 5);
   BOOST_CHECK_EQUAL(computer.parts.size(), size_t(5));
   BOOST_CHECK(computer.finalizeCalled);
+  BOOST_CHECK_EQUAL(signalReceiver->handlesChangedCount, 0);
 }
 
-struct MockPairComputer : pairs::Computer {
-  Storage::SelfPtr storage;
-  bool prepareCalled;
-  bool finalizeCalled;
-  int applyCalled;
-  boost::unordered_set< std::pair<ParticleHandle, ParticleHandle> > pairs;
-
-  MockPairComputer() {
-    prepareCalled = false;
-    finalizeCalled = false;
-    applyCalled = 0;
-  }
-
-  void prepare(Storage::SelfPtr store, Storage::SelfPtr) {
-    storage = store;
-    prepareCalled = true;
-  }
-
-  void finalize() {
-    finalizeCalled = true;
-  }
-
-  bool apply(const Real3D &,
-             ParticleHandle handle1,
-             ParticleHandle handle2
-             ) {
-    applyCalled++;
-    pairs.insert(std::make_pair(handle1, handle2));
-    return true;
-  }
-};
 BOOST_FIXTURE_TEST_CASE(foreachPairApply, Fixture)
 {
   MockPairComputer computer;
@@ -186,5 +126,5 @@ BOOST_FIXTURE_TEST_CASE(foreachPairApply, Fixture)
   BOOST_CHECK_EQUAL(computer.applyCalled, 20);
   BOOST_CHECK_EQUAL(computer.pairs.size(), size_t(20));
   BOOST_CHECK(computer.finalizeCalled);
+  BOOST_CHECK_EQUAL(signalReceiver->handlesChangedCount, 0);
 }
-

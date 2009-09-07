@@ -49,16 +49,16 @@ else:
 
     class TestAll(unittest.TestCase):
         def setUp(self):
-            self.dec = espresso.storage.SingleNode((pmi.CONTROLLER + 1) % mpi.size)
             self.bc = espresso.bc.PeriodicBC()
-            self.pos = espresso.Real3DProperty(self.dec)
+            self.dec = espresso.storage.SingleNode(self.bc, (pmi.CONTROLLER + 1) % mpi.size)
+            self.pos = self.dec.getPositionProperty()
 
             # create particles
             for i in range(4):
                 self.dec.addParticle(i)
                 self.pos[i] = 0.2*i
             
-            self.all = espresso.pairs.All(self.bc, self.dec, self.pos)
+            self.all = espresso.pairs.All(self.dec)
             self.tc = pmi.create('TestCaseLocal')
 
         def testForeach(self):

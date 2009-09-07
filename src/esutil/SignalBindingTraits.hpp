@@ -11,18 +11,6 @@ namespace espresso {
     template < typename SignalType >
     struct SignalBindingTraits {};
 
-    template < typename Result >
-    struct SignalBindingTraits<
-      boost::signals2::signal0<Result>
-      > {
-      template< typename MethodPtr, typename ObjectPtr > static
-      typename
-      boost::signals2::signal0<Result>::slot_type
-      bind(MethodPtr method, ObjectPtr obj) {
-        return boost::bind(method, obj);
-      }
-    };
-
 #define SIGNALBINDINGTRAITS_REPEATER(z, i, what) , what##i
 #define SIGNALBINDINGTRAITS_REPEAT(cnt, what)                           \
     BOOST_PP_REPEAT_FROM_TO(1, BOOST_PP_INC(cnt), SIGNALBINDINGTRAITS_REPEATER, what)
@@ -44,7 +32,7 @@ namespace espresso {
       }                                                                 \
     };
 
-    BOOST_PP_REPEAT_FROM_TO(1, BOOST_SIGNALS2_MAX_ARGS, SIGNALBINDINGTRAITS, );
+    BOOST_PP_REPEAT(BOOST_SIGNALS2_MAX_ARGS, SIGNALBINDINGTRAITS, );
     
 #undef SIGNALBINDINGTRAITS_REPEATER
 #undef SIGNALBINDINGTRAITS_REPEAT

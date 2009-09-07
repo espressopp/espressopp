@@ -37,8 +37,8 @@ class Test0LennardJones(espresso.unittest.TestCase) :
     def test4Force(self):
         lj=LennardJones()
         self.assertAlmostEqual(
-            lj.computeForce(2.0**(1.0/6.0), 0.0, 0.0),
-            Real3D(0.0, 0.0, 0.0))
+            (lj.computeForce(2.0**(1.0/6.0), 0.0, 0.0) -
+            Real3D(0.0, 0.0, 0.0)).sqr(), 0)
 
     def test5Properties(self) :
         lj=LennardJones()

@@ -12,7 +12,7 @@ namespace espresso {
     class Box {
     public:
       /// Default constructor
-      Box() {}
+      Box(): left(0), right(0) {}
       /** Constructor from two diagonally located corners.
        */
       Box(const typename espresso::esutil::Vector3D<T> &corner1,

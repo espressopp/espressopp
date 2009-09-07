@@ -19,13 +19,15 @@ if __name__ == 'espresso.pmi':
 elif pmi.IS_CONTROLLER:
     import unittest
     from espresso.storage import SingleNode
+    from espresso.bc import PeriodicBC
     from espresso import IntegerProperty
 
     pmi.execfile_(__file__)
 
     class Common(object) :
         def setUp(self) :
-            self.storage = SingleNode(self.node)
+            self.bc = PeriodicBC(length=1)
+            self.storage = SingleNode(self.bc, self.node)
             self.prop = IntegerProperty(self.storage)
 
         def testAddParticle(self) :

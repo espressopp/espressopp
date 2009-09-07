@@ -15,6 +15,10 @@ SingleNode::getTupleVector()
 
 ParticleHandle SingleNode::addParticle(ParticleId id) {
   esutil::TupleVector &particles = getTupleVector();
+  if (getParticleHandle(id) != ParticleHandle()) {
+    throw std::out_of_range("SingleNode::addParticle: particle already exists");
+  }
+
   ParticleHandle it = particles.insert(particles.end());
   getIdPropertyHandle()[it] = id;
   handlesChanged();
@@ -25,7 +29,7 @@ void SingleNode::deleteParticle(ParticleId deleteID) {
   esutil::TupleVector &particles = getTupleVector();
 
   ParticleHandle pos = getParticleHandle(deleteID);
-  if (pos == particles.end()) {
+  if (pos == ParticleHandle()) {
     throw std::out_of_range("Storage::deleteParticle: particle does not exist");
   }
   particles.erase(pos);

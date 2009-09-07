@@ -49,9 +49,9 @@ else:
 
     class TestList(unittest.TestCase):
         def setUp(self):
-            self.dec = espresso.storage.SingleNode((pmi.CONTROLLER + 1) % mpi.size)
             self.bc = espresso.bc.PeriodicBC()
-            self.pos = espresso.Real3DProperty(self.dec)
+            self.dec = espresso.storage.SingleNode(self.bc, (pmi.CONTROLLER + 1) % mpi.size)
+            self.pos = self.dec.getPositionProperty()
 
             # create particles
             for i in range(4):
@@ -59,7 +59,7 @@ else:
                 self.pos[i] = 0.2*i
             
             # make a list of pairs
-            self.bonds = espresso.pairs.List(self.bc, self.dec, self.pos)
+            self.bonds = espresso.pairs.List(self.bc, self.dec)
             self.bonds.addPair(0, 1)
             self.tc = pmi.create('TestCaseLocal')
 
@@ -74,6 +74,6 @@ else:
             #for id1 in range(4):
             #    for id2 in range(id1+1, 4):
             #        pairApplied.remove((id1, id2))
-            self.assertEqual(0, len(pairApplied))
+            self.assertEqual(1, len(pairApplied))
 
     unittest.main()

@@ -108,7 +108,7 @@ void Storage::setIdProperty(boost::shared_ptr< Property< ParticleId > >prop) {
     particleIdProperty = prop->id;
   }
   else {
-    particleIdProperty = addProperty< Property< ParticleId > >();
+    particleIdProperty = addProperty< ParticleId >();
   }
 }
 
@@ -117,7 +117,7 @@ void Storage::setPositionProperty(boost::shared_ptr< Property< Real3D > >prop) {
     particlePosProperty = prop->id;
   }
   else {
-    particlePosProperty = addProperty< Property< Real3D > >();
+    particlePosProperty = addProperty< Real3D >();
   }
   positionPropertyModified();
 }

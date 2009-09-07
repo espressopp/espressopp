@@ -4,7 +4,7 @@
 #include <set>
 
 #include "bc/PeriodicBC.hpp"
-#include "storage/Storage.hpp"
+#include "storage/SingleNode.hpp"
 #include "../All.hpp"
 
 using namespace espresso;
@@ -17,14 +17,14 @@ struct Fixture {
   
   bc::PeriodicBC::SelfPtr pbc;
   Storage::SelfPtr store;
-  Property< Real3D >::SelfPtr posProperty;
   All::SelfPtr pairs;
 
   Fixture() {
     pbc = make_shared< bc::PeriodicBC >(1.0);
-    store = make_shared< Storage >();
-    posProperty = make_shared< Property< Real3D > >(store);
-    pairs = make_shared< All >(pbc, store, posProperty);
+    store = make_shared< SingleNode >(pbc);
+    store->setIdProperty();
+    store->setPositionProperty();
+    pairs = make_shared< All >(store);
 
     createLattice();
   }
@@ -38,7 +38,7 @@ struct Fixture {
 	for (size_t k = 0; k < N; k++) {
 	  ParticleHandle p
 	    = store->addParticle(ParticleId(pid));
-	  posProperty->at(store, p) = Real3D(i*step, j*step, k*step);
+	  store->getPositionPropertyHandle()[p] = Real3D(i*step, j*step, k*step);
 	  pid++;
 	}
   }
@@ -50,38 +50,36 @@ class MockPairComputer: public Computer {
 public:
   typedef std::pair< size_t, size_t > IDPair;
 
-  bc::BC::SelfPtr bc;
-  Property< Real3D >::SelfPtr posProperty;
   std::set< IDPair > occupied;
 
   bool prepareCalled;
   bool finalizeCalled;
 
+  bc::BC *bc;
   IdPropertyHandle id;
   PropertyHandle< Real3D > pos;
 
-  MockPairComputer(bc::BC::SelfPtr _bc,
-	   Property< Real3D >::SelfPtr _posProperty)
-    : bc(_bc), posProperty(_posProperty), occupied()
+  MockPairComputer(): occupied()
   {
     prepareCalled = false;
     finalizeCalled = false;
   }
 
   void prepare(Storage::SelfPtr storage1, 
-		       Storage::SelfPtr storage2) {
+               Storage::SelfPtr storage2) {
     prepareCalled = true;
+    bc = storage1->getBoundaryConditions().get();
     id = storage1->getIdPropertyHandle();
-    pos = posProperty->getHandle(storage1);
+    pos = storage1->getPositionPropertyHandle();
   }
 
   void finalize() {
     finalizeCalled = true;
   }
   
-  bool apply(const Real3D dist,
-		     const ParticleHandle p1,
-		     const ParticleHandle p2) {
+  bool apply(const Real3D &dist,
+             const ParticleHandle p1,
+             const ParticleHandle p2) {
     Real3D pos1 = pos[p1];
     Real3D pos2 = pos[p2];
     Real3D d = bc->getDist(pos1, pos2);
@@ -102,8 +100,8 @@ public:
 
 BOOST_FIXTURE_TEST_CASE(foreachTest, Fixture)
 {
-  shared_ptr< MockPairComputer > computer = make_shared< MockPairComputer >(pbc, posProperty);
-  pairs->foreach(*computer);
+  shared_ptr< MockPairComputer > computer = make_shared< MockPairComputer >();
+  pairs->foreachPair(*computer);
   size_t np = N*N*N;
   BOOST_CHECK_EQUAL(computer->occupied.size(), (np*(np-1))/2);
   BOOST_CHECK(computer->prepareCalled);
