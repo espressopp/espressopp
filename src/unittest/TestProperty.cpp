@@ -3,10 +3,12 @@
 #include <boost/test/unit_test.hpp>
 #include <stdexcept>
 
-#include "../storage/ParticleHandle.hpp"
-#include "../Particle.hpp"
-#include "../Property.hpp"
+#include "storage/ParticleHandle.hpp"
+#include "Particle.hpp"
+#include "Property.hpp"
 #include "Real3D.hpp"
+#include "bc/PeriodicBC.hpp"
+#include "storage/SingleNode.hpp"
 
 using namespace espresso;
 using namespace espresso::storage;
@@ -15,8 +17,9 @@ struct Fixture {
   Storage::SelfPtr storage;
   ParticleId theParticle;
 
-  Fixture(): storage(new Storage) {
+  Fixture(): storage(make_shared< SingleNode >(make_shared< bc::PeriodicBC >(1))) {
     // make a particle
+    storage->setIdProperty();
     theParticle = ParticleId(0);
     storage->addParticle(theParticle);
   }

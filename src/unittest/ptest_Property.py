@@ -1,9 +1,14 @@
+from espresso.esutil import *
+from espresso import pmi
 from espresso import storage
+from _espresso import storage_SingleNode
 
 if __name__ == 'espresso.pmi':
-    class MockStorageLocal(storage.StorageLocal) :
-        def __init__(self):
-            storage.StorageLocal.__init__(self)
+    class MockStorageLocal(storage.StorageLocal, storage_SingleNode) :
+        def __init__(self, bc):
+            cxxinit(self, storage_SingleNode, bc)
+
+        def fillUp(self):
             # create local particle, one per node
             self.addParticle(mpi.rank)
 
@@ -19,6 +24,7 @@ else:
         from espresso import RealProperty
         from espresso import IntegerProperty
         from espresso import Real3DProperty
+        from espresso import bc
 
     pmi.execfile_(__file__)
     ####
@@ -27,11 +33,13 @@ else:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(cls='MockStorageLocal')
 
-        def __init__(self):
+        def __init__(self, bc):
+            self.pmiinit(bc)
+            storage.Storage.__init__(self)
             # not existing particle for failure tests
             self.special = mpi.size + 1
-            self.pmiinit()
-
+            pmi.call(self, 'fillUp')
+            
         def getNodeOfParticle(self, particle) :
             # magic for failure test - claim that a particle is here
             # that isn't
@@ -50,7 +58,8 @@ else:
 
     class TestRealProperty(unittest.TestCase) :
         def setUp(self) :
-            self.storage = MockStorage()
+            self.bc = bc.PeriodicBC(length=1)
+            self.storage = MockStorage(self.bc)
             self.prop = RealProperty(self.storage)
 
         def testReadWrite(self) :
@@ -72,7 +81,8 @@ else:
 
         def testDoesntFit(self):
             self.prop.checkFitsTo(self.storage)
-            self.storage2 = MockStorage()
+            self.bc = bc.PeriodicBC(length=1)
+            self.storage2 = MockStorage(self.bc)
             self.assertRaises(RuntimeError, self.prop.checkFitsTo, self.storage2)
 
     ####
@@ -82,7 +92,8 @@ else:
 
     class TestIntegerProperty(unittest.TestCase) :
         def setUp(self) :
-            self.storage = MockStorage()
+            self.bc = bc.PeriodicBC(length=1)
+            self.storage = MockStorage(self.bc)
             self.prop = IntegerProperty(self.storage)
 
         def testReadWrite(self) :
@@ -94,7 +105,8 @@ else:
 
     class TestReal3DProperty(unittest.TestCase) :
         def setUp(self) :
-            self.storage = MockStorage()
+            self.bc = bc.PeriodicBC(length=1)
+            self.storage = MockStorage(self.bc)
             self.prop = Real3DProperty(self.storage)
 
         def testReadWrite(self) :

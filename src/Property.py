@@ -87,7 +87,7 @@ class IDPropertyLocal(PropertyLocal, _IDProperty):
 if pmi.IS_CONTROLLER:
     class IDProperty(Property) :
         """
-        represents an integer valued particle property.
+        represents the particle identity property.
         """
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(cls='espresso.IDPropertyLocal')
