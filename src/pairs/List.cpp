@@ -30,6 +30,16 @@ List::List(bc::BC::SelfPtr _bc,
     storage2(_storage)
     {}
 
+void List::cacheParticleHandles() {
+    ph_list.clear();
+    vector<Tuple>::const_iterator it;
+    for(it = id_list.begin(); it != id_list.end(); it++) {
+       ParticleHandle p1 = storage1->getParticleHandle(it->first);
+       ParticleHandle p2 = storage2->getParticleHandle(it->second);
+       ph_list.push_back(phTuple(p1, p2));
+    }
+}
+
 size_t List::size() const {
    return id_list.size();
 }
@@ -54,6 +64,7 @@ void List::addPair(ParticleId id1, ParticleId id2) {
    //TODO: check if id1/2 d2 is greater than number of particles in storage1/2
    //TODO: if two storages make sure id1 is from storage1 and id2 is from storage2
    id_list.push_back(Tuple(id1, id2));
+   cacheParticleHandles(); // rebuild list of particle handles
 }
 
 void List::deletePair(ParticleId id1, ParticleId id2) {
@@ -64,7 +75,28 @@ void List::deletePair(ParticleId id1, ParticleId id2) {
      //TODO: write id1 and id2 in error message
    }
    id_list.erase(it);
+   cacheParticleHandles(); // rebuild list of particle handles
 }
+
+bool List::foreachPairApply(Computer &computer) {
+   vector<phTuple>::const_iterator it;
+   storage::PropertyHandle<Real3D> pos1 = storage1->getPositionPropertyHandle();
+   storage::PropertyHandle<Real3D> pos2 = storage2->getPositionPropertyHandle();
+
+   for(it = ph_list.begin(); it != ph_list.end(); it++) {
+     ParticleHandle p1 = it->first;
+     ParticleHandle p2 = it->second;
+     if (!p1 || !p2) {
+       throw runtime_error("List::foreachPairApply: pair in list does not exist in storages.");
+     }
+     Real3D dist = bc->getDist(pos1[p1], pos2[p2]);
+    
+     if(!computer.apply(dist, p1, p2)) return false;
+   }
+   return true;
+}
+
+/** the following can be removed since it is based on id's instead of the quicker handles
 
 bool List::foreachPairApply(Computer &computer) {
    vector<Tuple>::const_iterator it;
@@ -81,9 +113,9 @@ bool List::foreachPairApply(Computer &computer) {
     
      if(!computer.apply(dist, p1, p2)) return false;
    }
-
    return true;
 }
+*/
 
 Storage::SelfPtr List::getLeftStorage()
 { return storage1; }

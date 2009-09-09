@@ -71,9 +71,6 @@ namespace espresso {
       /** setter routine for skin thickness */
       void setSkin(real _skin);
 
-      /** return size of list */
-      size_t size() const;
-
       /** Getter routine for storage1 */
       virtual storage::Storage::SelfPtr getLeftStorage();
       /** Getter routine for storage2 */

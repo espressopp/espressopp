@@ -31,6 +31,9 @@ namespace espresso {
       List(bc::BC::SelfPtr bc,
 	   storage::Storage::SelfPtr _storage);
 
+      /** Convert ParticelIds to ParticleHandles */
+      void cacheParticleHandles();
+
       /** Destructor. */
       virtual ~List();     
 
@@ -76,7 +79,9 @@ namespace espresso {
       storage::Storage::SelfPtr storage2;
 
       typedef std::pair< ParticleId, ParticleId > Tuple;
+      typedef std::pair< storage::ParticleHandle, storage::ParticleHandle > phTuple;
       std::vector< Tuple > id_list;
+      std::vector< phTuple > ph_list;
     };
 
   }

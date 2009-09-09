@@ -38,10 +38,6 @@ espresso::real VerletList::getSkin() { return skin; }
 
 void VerletList::setSkin(espresso::real _skin) { skin = _skin; }
 
-size_t VerletList::size() const {
-   return id_list.size();
-}
-
 bool VerletList::foreachPairApply(Computer &computer) {
    vector<Tuple>::const_iterator it;
    storage::PropertyHandle<Real3D> pos1 = getLeftStorage()->getPositionPropertyHandle();
@@ -54,7 +50,6 @@ bool VerletList::foreachPairApply(Computer &computer) {
     
      if(!computer.apply(dist, p1, p2)) return false;
    }
-
    return true;
 }
 
@@ -81,6 +76,5 @@ VerletList::registerPython() {
 	 storage::Storage::SelfPtr,
          storage::Storage::SelfPtr,
 	 real >())
-    .def("size", &VerletList::size)
     ;
 }
