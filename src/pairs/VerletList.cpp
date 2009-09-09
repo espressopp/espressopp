@@ -14,29 +14,29 @@ VerletList::~VerletList() {}
 /* Constructor */
 VerletList::VerletList(bc::BC::SelfPtr _bc,
 		       Storage::SelfPtr _storage,
+                       real _radius,
 		       real _skin)
   : bc(_bc),
     storage1(_storage),
     storage2(_storage),
+    radius(_radius),
     skin(_skin)
     {}
 
 /* Constructor */
 VerletList::VerletList(bc::BC::SelfPtr _bc, 
 		       Storage::SelfPtr _storage1, 
-		       Storage::SelfPtr _storage2, 
+		       Storage::SelfPtr _storage2,
+                       real _radius, 
 		       real _skin) 
   : bc(_bc),
     storage1(_storage1),
     storage2(_storage2),
+    radius(_radius),
     skin(_skin)
     {}
 
 void VerletList::update() {}
-
-espresso::real VerletList::getSkin() { return skin; }
-
-void VerletList::setSkin(espresso::real _skin) { skin = _skin; }
 
 bool VerletList::foreachPairApply(Computer &computer) {
    vector<Tuple>::const_iterator it;
@@ -71,10 +71,14 @@ VerletList::registerPython() {
     ("pairs_VerletList", "Put pairs::VerletList docstring here.", 
      init< bc::BC::SelfPtr,
      storage::Storage::SelfPtr,
+     espresso::real,
      espresso::real >())
     .def(init<bc::BC::SelfPtr,
 	 storage::Storage::SelfPtr,
          storage::Storage::SelfPtr,
+         espresso::real,
 	 real >())
+     .add_property("radius", &VerletList::getRadius, &LennardJones::setRadius)
+     .add_property("skin", &VerletList::getSkin, &LennardJones::setSkin)
     ;
 }

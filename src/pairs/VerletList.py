@@ -12,7 +12,7 @@ class VerletListLocal(SetLocal, pairs_VerletList):
         dctlen = len(kywds)
         sumlen = tuplen + dctlen
 
-        if sumlen == 3:
+        if sumlen == 4:
             if tuplen == 0:
                 bc=kywds['bc']; storage=kywds['storage']; posProperty=kywds['posProperty']
             elif tuplen == 1:
@@ -52,5 +52,5 @@ if pmi.IS_CONTROLLER:
         'PMI class of a list of pairs'
         pmiproxydefs = \
             dict(cls = 'espresso.pairs.VerletListLocal', 
-                 pmicall = [ 'deletePair', 'size', 'findPair' ])
+                 pmicall = [ 'setRadius', 'getRadius', 'setSkin', 'getSkin' ])
 

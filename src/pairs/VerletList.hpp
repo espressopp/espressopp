@@ -35,11 +35,6 @@ namespace espresso {
 
         A second signal is needed to update the particle handles using the id's
         when a particle is added/removed, etc.
-
-        TODO: should VerletList have size, findPair, addPair, deletePair? One can
-        imagine using deletePair to handle exclusions. If so, then don't want to
-        maintain the same code between two or more classes so may consider introducing
-        a new class that pairs::List and pairs::VerletList derive from.
     */
 
     class VerletList : public Set {
@@ -51,12 +46,14 @@ namespace espresso {
       /** Constructor */
       VerletList(bc::BC::SelfPtr _bc, 
 		 storage::Storage::SelfPtr _storage,
+                 real _radius,
 		 real _skin);
 
       /* 2-parameter constructor */
       VerletList(bc::BC::SelfPtr _bc, 
 		 storage::Storage::SelfPtr _storage1, 
-		 storage::Storage::SelfPtr _storage2, 
+		 storage::Storage::SelfPtr _storage2,
+                 real _radius, 
 		 real _skin);
 
       /** Destructor */
@@ -66,10 +63,14 @@ namespace espresso {
       void update();
 
       /** getter routine for skin thickness */
-      real getSkin();
-
+      espresso::real getSkin() { return skin; }
       /** setter routine for skin thickness */
-      void setSkin(real _skin);
+      void setSkin(espresso::real _skin) { skin = _skin; }
+
+      /** getter routine for Verlet list radius */
+      espresso::real getRadius() { return radius; }
+      /** setter routine for Verlet list radius */
+      void setRadius(espresso::real _radius) { radius = _radius; }
 
       /** Getter routine for storage1 */
       virtual storage::Storage::SelfPtr getLeftStorage();
@@ -88,10 +89,13 @@ namespace espresso {
       storage::Storage::SelfPtr storage2;
 
       real skin; // skin thickness
+      real radius; // radius of the Verlet list
       real maxdisp; // sum of maximum displacements
 
       typedef std::pair< ParticleId, ParticleId > Tuple;
+      typedef std::pair< storage::ParticleHandle, storage::ParticleHandle > phTuple;
       std::vector< Tuple > id_list;
+      std::vector< phTuple > ph_list;
     };
 
   }
