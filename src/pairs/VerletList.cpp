@@ -36,16 +36,21 @@ VerletList::VerletList(bc::BC::SelfPtr _bc,
     skin(_skin)
     {}
 
-void VerletList::update() {}
+void VerletList::update() {
+
+}
 
 bool VerletList::foreachPairApply(Computer &computer) {
-   vector<Tuple>::const_iterator it;
-   storage::PropertyHandle<Real3D> pos1 = getLeftStorage()->getPositionPropertyHandle();
-   storage::PropertyHandle<Real3D> pos2 = getRightStorage()->getPositionPropertyHandle();
+   vector<phTuple>::const_iterator it;
+   storage::PropertyHandle<Real3D> pos1 = storage1->getPositionPropertyHandle();
+   storage::PropertyHandle<Real3D> pos2 = storage2->getPositionPropertyHandle();
 
-   for(it = id_list.begin(); it != id_list.end(); it++) {
-     ParticleHandle p1 = storage1->getParticleHandle(it->first);
-     ParticleHandle p2 = storage2->getParticleHandle(it->second);
+   for(it = ph_list.begin(); it != ph_list.end(); it++) {
+     ParticleHandle p1 = it->first;
+     ParticleHandle p2 = it->second;
+     if (!p1 || !p2) {
+       throw runtime_error("VerletList::foreachPairApply: pair in Verlet list does not exist in storages.");
+     }
      Real3D dist = bc->getDist(pos1[p1], pos2[p2]);
     
      if(!computer.apply(dist, p1, p2)) return false;
@@ -78,7 +83,7 @@ VerletList::registerPython() {
          storage::Storage::SelfPtr,
          espresso::real,
 	 real >())
-     .add_property("radius", &VerletList::getRadius, &LennardJones::setRadius)
-     .add_property("skin", &VerletList::getSkin, &LennardJones::setSkin)
+     .add_property("radius", &VerletList::getRadius, &VerletList::setRadius)
+     .add_property("skin", &VerletList::getSkin, &VerletList::setSkin)
     ;
 }

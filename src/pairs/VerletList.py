@@ -14,43 +14,43 @@ class VerletListLocal(SetLocal, pairs_VerletList):
 
         if sumlen == 4:
             if tuplen == 0:
-                bc=kywds['bc']; storage=kywds['storage']; posProperty=kywds['posProperty']
+                bc=kywds['bc']; storage=kywds['storage']; radius=kywds['radius']; skin=kywds['skin']
             elif tuplen == 1:
-                bc=args[0]; storage=kywds['storage']; posProperty=kywds['posProperty']
+                bc=args[0]; storage=kywds['storage']; radius=kywds['radius']; skin=kywds['skin']
             elif tuplen == 2:
-                bc=args[0]; storage=args[1]; posProperty=kywds['posProperty']
+                bc=args[0]; storage=args[1]; radius=kywds['radius']; skin=kywds['skin']
+            elif tuplen == 3:
+                bc=args[0]; storage=args[1]; radius=args[2]; skin=kywds['skin']
             else:
-                bc=args[0]; storage=args[1]; posProperty=args[2]
-            cxxinit(self, pairs_VerletList, bc, storage, posProperty)
+                bc=args[0]; storage=args[1]; radius=args[2]; skin=args[3]
+            cxxinit(self, pairs_VerletList, bc, storage, radius, skin)
 
         elif sumlen == 5:
             if tuplen == 0:
                 bc=kywds['bc']; storage1=kywds['storage1']; storage2=kywds['storage2']
-                posProperty1=kywds['posProperty1']; posProperty2=kywds['posProperty2']
+                radius=kywds['radius']; skin=kywds['skin']
             elif tuplen == 1:
                 bc=args[0]; storage1=kywds['storage1']; storage2=kywds['storage2']
-                posProperty1=kywds['posProperty1']; posProperty2=kywds['posProperty2']
+                radius=kywds['radius']; skin=kywds['skin']
             elif tuplen == 2:
                 bc=args[0]; storage1=args[1]; storage2=kywds['storage2']
-                posProperty1=kywds['posProperty1']; posProperty2=kywds['posProperty2']
+                radius=kywds['radius']; skin=kywds['skin']
             elif tuplen == 3:
                 bc=args[0]; storage1=args[1]; storage2=args[2]
-                posProperty1=kywds['posProperty1']; posProperty2=kywds['posProperty2']
+                radius=kywds['radius']; skin=kywds['skin']
             elif tuplen == 4:
                 bc=args[0]; storage1=args[1]; storage2=args[2]
-                posProperty1=args[3]; posProperty2=kywds['posProperty2']
+                radius=args[3]; skin=kywds['skin']
             else:
                 bc=args[0]; storage1=args[1]; storage2=args[2]
-                posProperty1=args[3]; posProperty2=args[4]
-            cxxinit(self, pairs_VerletList, bc, storage1, storage2, posProperty1, posProperty2)
+                radius=args[3]; skin=args[4]
+            cxxinit(self, pairs_VerletList, bc, storage1, storage2, radius, skin)
         else:
-            raise ValueError('Number of arguments to constructor of pairs::List is invalid.')
-
+            raise ValueError('Number of arguments to constructor of pairs::VerletList is invalid.')
 
 if pmi.IS_CONTROLLER:
     class VerletList(Set):
         'PMI class of a list of pairs'
         pmiproxydefs = \
             dict(cls = 'espresso.pairs.VerletListLocal', 
-                 pmicall = [ 'setRadius', 'getRadius', 'setSkin', 'getSkin' ])
-
+                 pmiproperty = [ 'radius', 'skin' ])

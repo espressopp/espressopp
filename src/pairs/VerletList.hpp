@@ -15,7 +15,7 @@ namespace espresso {
 
     /** Python code:
         lj = potential.LennardJones(sigma=1.0, epsilon=1.0, cutoff=2.0)
-        vlist = pairs.VerletList(set=storage, bc=pbc, posProperty=pos, radius=lj.cutoff, skin=0.3)
+        vlist = pairs.VerletList(set=storage, bc=pbc, radius=lj.cutoff, skin=0.3)
         ljint = potential.Interaction(potential=lj, pairs=vlist)
         ljint.connect(integrator)
 
@@ -65,7 +65,7 @@ namespace espresso {
       /** getter routine for skin thickness */
       espresso::real getSkin() { return skin; }
       /** setter routine for skin thickness */
-      void setSkin(espresso::real _skin) { skin = _skin; }
+      void setSkin(real _skin) { skin = _skin; }
 
       /** getter routine for Verlet list radius */
       espresso::real getRadius() { return radius; }
@@ -92,7 +92,7 @@ namespace espresso {
       real radius; // radius of the Verlet list
       real maxdisp; // sum of maximum displacements
 
-      typedef std::pair< ParticleId, ParticleId > Tuple;
+      typedef std::pair< ParticleId, ParticleId > Tuple; // maybe this is not necessary
       typedef std::pair< storage::ParticleHandle, storage::ParticleHandle > phTuple;
       std::vector< Tuple > id_list;
       std::vector< phTuple > ph_list;
