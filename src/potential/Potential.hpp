@@ -16,7 +16,7 @@ namespace espresso {
       virtual ~Potential() {}
 
       // override these
-      virtual pairs::Computer::SelfPtr 
+      virtual EnergyComputerBase::SelfPtr 
       createEnergyComputer(Property< real >::SelfPtr _energyProperty1,
 			   Property< real >::SelfPtr _energyProperty2) = 0;
 
@@ -25,7 +25,7 @@ namespace espresso {
 			  Property< Real3D >::SelfPtr _forceProperty2) = 0;
 
       // convenience variants
-      virtual pairs::Computer::SelfPtr 
+      virtual EnergyComputerBase::SelfPtr 
       createEnergyComputer(Property< real >::SelfPtr _energyProperty);
 
       virtual pairs::Computer::SelfPtr 
@@ -58,7 +58,7 @@ namespace espresso {
       }
       
       using Potential::createEnergyComputer;
-      virtual pairs::Computer::SelfPtr 
+      virtual EnergyComputerBase::SelfPtr 
       createEnergyComputer(Property< real >::SelfPtr _energyProperty1,
 			   Property< real >::SelfPtr _energyProperty2) {
 	return 

@@ -55,6 +55,15 @@ addEnergies(const Property< real >::SelfPtr energyProperty) {
   pairs->foreachPair(computer);
 }
 
+real Interaction::
+totalEnergy() {
+  LOG4ESPP_INFO(theLogger, "total energy creates EnergyComputer with empty energy property");
+  potential::EnergyComputerBase::SelfPtr computer = 
+    potential->createEnergyComputer(Property< real >::SelfPtr());
+  pairs->foreachPair(computer);
+  return computer->getAccumulatedEnergy();
+}
+
 /***************************************************************************************/
 
 void Interaction::
@@ -99,5 +108,6 @@ Interaction::registerPython() {
     .def("disconnect", &Interaction::disconnect)
     .def("addForces", &Interaction::addForces)
     .def("addEnergies", &Interaction::addEnergies)
+    .def("totalEnergy", &Interaction::totalEnergy)
     ;
 }

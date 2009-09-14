@@ -10,7 +10,7 @@ Potential::createForceComputer(Property< Real3D >::SelfPtr _forceProperty) {
   return createForceComputer(_forceProperty, _forceProperty);
 }
 
-pairs::Computer::SelfPtr 
+potential::EnergyComputerBase::SelfPtr
 Potential::createEnergyComputer(Property< real >::SelfPtr _energyProperty) {
   return createEnergyComputer(_energyProperty, _energyProperty);
 }
@@ -50,10 +50,10 @@ Potential::registerPython() {
     (Property< Real3D >::SelfPtr) 
      = &Potential::createForceComputer;
 
-  pairs::Computer::SelfPtr (Potential::*createEnergyComputer1)
+  EnergyComputerBase::SelfPtr (Potential::*createEnergyComputer1)
     (Property< real >::SelfPtr, Property< real >::SelfPtr) 
      = &Potential::createEnergyComputer;
-  pairs::Computer::SelfPtr (Potential::*createEnergyComputer2)
+  EnergyComputerBase::SelfPtr (Potential::*createEnergyComputer2)
     (Property< real >::SelfPtr) 
      = &Potential::createEnergyComputer;
 

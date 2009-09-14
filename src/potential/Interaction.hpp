@@ -44,6 +44,8 @@ namespace espresso {
 
       virtual void addEnergies(const Property< real >::SelfPtr energyProperty);
 
+      virtual real totalEnergy();
+
       static void registerPython();
 
     private:

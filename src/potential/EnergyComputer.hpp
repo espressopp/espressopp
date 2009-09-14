@@ -8,8 +8,17 @@
 
 namespace espresso {
   namespace potential {
+
+    class EnergyComputerBase : public pairs::Computer {
+    public:
+      typedef shared_ptr< EnergyComputerBase > SelfPtr;
+      real getAccumulatedEnergy() const { return totalEnergy; }
+    protected:
+      real totalEnergy;
+    };
+
     template < class Potential >
-    class EnergyComputer: public pairs::Computer {
+    class EnergyComputer: public EnergyComputerBase {
       // keep a pointer so that the object isn't destroyed
       typename Potential::SelfPtr potentialptr;
       // keep a reference for fast access
@@ -20,8 +29,6 @@ namespace espresso {
 
       storage::PropertyHandle< real > energy1;
       storage::PropertyHandle< real > energy2;
-
-      real totalEnergy;
 
     public:
       /** Constructor for energy computations needs the energy property.
@@ -38,8 +45,8 @@ namespace espresso {
 
       virtual void prepare(storage::Storage::SelfPtr storage1, 
 			   storage::Storage::SelfPtr storage2) {
-	energy1 = energyProperty1->getHandle(storage1);
-	energy2 = energyProperty2->getHandle(storage2);
+        if (energy1) energy1 = energyProperty1->getHandle(storage1);
+	if (energy2) energy2 = energyProperty2->getHandle(storage2);
 	totalEnergy = 0.0;
       }
 
@@ -47,12 +54,12 @@ namespace espresso {
 			 const storage::ParticleHandle p1,
 			 const storage::ParticleHandle p2) {
 	real e = potential._computeEnergy(dist);
-	energy1[p1] += 0.5*e;
-	energy2[p2] += 0.5*e;
+	if (energy1) energy1[p1] += 0.5*e;
+	if (energy2) energy2[p2] += 0.5*e;
+        totalEnergy += e;
 	return true;
       };
 
-      real getAccumulatedEnergy() const { return totalEnergy; }
     };
   }
 }
