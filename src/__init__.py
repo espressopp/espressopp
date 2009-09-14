@@ -6,6 +6,7 @@ pmiimport('espresso')
 
 from espresso.Property import *
 from espresso.Real3D import *
+from espresso.RealTensor import *
 from espresso import pmi
 
 if pmi.IS_CONTROLLER :

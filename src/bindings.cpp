@@ -1,5 +1,6 @@
 #include "bindings.hpp"
 #include "Real3D.hpp"
+#include "RealTensor.hpp"
 #include "Property.hpp"
 #include <esutil/Collectives.hpp>
 #include <storage/bindings.hpp>
@@ -9,11 +10,13 @@
 #include <potential/bindings.hpp>
 #include <integrator/bindings.hpp>
 #include <thermostat/bindings.hpp>
+#include <analysis/bindings.hpp>
 #include <esutil/PyLogger.hpp>
 
 void espresso::registerPython() {
 
   espresso::registerPythonReal3D();
+  espresso::registerPythonRealTensor();
   espresso::registerPythonParticle();
   espresso::registerPythonProperty();
   espresso::esutil::Collectives::registerPython();
@@ -24,6 +27,7 @@ void espresso::registerPython() {
   espresso::potential::registerPython();
   espresso::integrator::registerPython();
   espresso::thermostat::registerPython();
+  espresso::analysis::registerPython();
 
   log4espp::PyLogger::registerPython();
 }

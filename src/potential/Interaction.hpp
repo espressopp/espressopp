@@ -42,6 +42,8 @@ namespace espresso {
 
       virtual void addForces(const Property< Real3D >::SelfPtr forceProperty);
 
+      virtual RealTensor totalVirial();
+
       virtual void addEnergies(const Property< real >::SelfPtr energyProperty);
 
       virtual real totalEnergy();
@@ -62,7 +64,6 @@ namespace espresso {
       // This method will be connect to and called by the integrator
 
       virtual void updateForces(const integrator::MDIntegrator& integrator);
-      
 
    };
   }

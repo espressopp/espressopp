@@ -1,3 +1,5 @@
+#define LOG4ESPP_LEVEL_TRACE
+
 #include "VelocityVerlet.hpp"
 #include <boost/foreach.hpp>
 #include <python.hpp>
@@ -34,6 +36,7 @@ namespace {
     void prepare(Storage::SelfPtr set) {}
   
     bool apply(const ParticleHandle pref) {
+      std::cout << "Particle " << pref << " in stepA, pos = " << pos[pref] << std::endl;
       pos[pref] = pos[pref] + vel[pref] * timestep + 0.5 * force[pref] * timestepSqr;
       vel[pref] = vel[pref] + 0.5 * force[pref] * timestep;
       return true;

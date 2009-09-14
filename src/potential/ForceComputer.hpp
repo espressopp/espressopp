@@ -8,8 +8,17 @@
 
 namespace espresso {
   namespace potential {
+
+    class ForceComputerBase : public pairs::Computer {
+    public:
+      typedef shared_ptr< ForceComputerBase > SelfPtr;
+      RealTensor getTotalVirial() const { return totalVirial; }
+    protected:
+      RealTensor totalVirial;
+    };
+
     template < class Potential >
-    class ForceComputer : public pairs::Computer {
+    class ForceComputer : public ForceComputerBase {
       // keep a pointer so that the object isn't destroyed
       typename Potential::SelfPtr potentialptr;
       // keep a reference for fast access
@@ -22,13 +31,12 @@ namespace espresso {
       storage::PropertyHandle< Real3D > force2;
 
       bool computesVirial;
-      Real3D virial;
             
     public:
       ForceComputer(typename Potential::SelfPtr _potential,
 		    Property< Real3D >::SelfPtr _forceProperty1,
 		    Property< Real3D >::SelfPtr _forceProperty2,
-		    bool _computesVirial = false) 
+		    bool _computesVirial) 
 	: potentialptr(_potential), potential(*_potential), 
 	  forceProperty1(_forceProperty1), forceProperty2(_forceProperty2),
 	  computesVirial(_computesVirial)
@@ -38,19 +46,19 @@ namespace espresso {
 
       virtual void prepare(storage::Storage::SelfPtr storage1, 
 			   storage::Storage::SelfPtr storage2) {
-	force1 = forceProperty1->getHandle(storage1);
-	force2 = forceProperty2->getHandle(storage2);
-	virial = 0.0;
+	if (forceProperty1) force1 = forceProperty1->getHandle(storage1);
+	if (forceProperty2) force2 = forceProperty2->getHandle(storage2);
+	totalVirial = RealTensor(0.0);
       }
 
       virtual bool apply(const Real3D &dist, 
 			 const storage::ParticleHandle p1, 
 			 const storage::ParticleHandle p2) {
 	Real3D f = potential.computeForce(dist);
-	force1[p1] += f;
-	force2[p2] -= f;
+	if (force1) force1[p1] += f;
+	if (force2) force2[p2] -= f;
         if (computesVirial) 
-	  virial = virial + f * dist;
+	  totalVirial += RealTensor(dist, f);
 	return true;
       }
     };

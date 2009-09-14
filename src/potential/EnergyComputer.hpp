@@ -12,7 +12,7 @@ namespace espresso {
     class EnergyComputerBase : public pairs::Computer {
     public:
       typedef shared_ptr< EnergyComputerBase > SelfPtr;
-      real getAccumulatedEnergy() const { return totalEnergy; }
+      real getTotalEnergy() const { return totalEnergy; }
     protected:
       real totalEnergy;
     };

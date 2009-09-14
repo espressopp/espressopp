@@ -16,6 +16,7 @@ include potential/SubMakefile.am
 include bc/SubMakefile.am
 include integrator/SubMakefile.am
 include thermostat/SubMakefile.am
+include analysis/SubMakefile.am
 
 CLEANFILES =
 

@@ -12,7 +12,7 @@ if pmi.IS_CONTROLLER:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = \
             dict(cls = 'espresso.potential.InteractionLocal',
-                 pmicall = [ 'connect', 'disconnect', 'addForces', 'addEnergies', 'totalEnergy' ]
+                 pmicall = [ 'connect', 'disconnect', 'addForces', 'addEnergies', 'totalEnergy', 'totalVirial' ]
                  )
         
 

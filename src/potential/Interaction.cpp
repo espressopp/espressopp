@@ -44,7 +44,7 @@ updateForces(const integrator::MDIntegrator& integrator) {
 void Interaction::
 addForces(const Property< Real3D >::SelfPtr forceProperty) {
   pairs::Computer::SelfPtr computer = 
-    potential->createForceComputer(forceProperty);
+    potential->createForceComputer(forceProperty, false);
   pairs->foreachPair(computer);
 }
 
@@ -55,13 +55,26 @@ addEnergies(const Property< real >::SelfPtr energyProperty) {
   pairs->foreachPair(computer);
 }
 
+/***************************************************************************************/
+
 real Interaction::
 totalEnergy() {
   LOG4ESPP_INFO(theLogger, "total energy creates EnergyComputer with empty energy property");
   potential::EnergyComputerBase::SelfPtr computer = 
     potential->createEnergyComputer(Property< real >::SelfPtr());
   pairs->foreachPair(computer);
-  return computer->getAccumulatedEnergy();
+  return computer->getTotalEnergy();
+}
+
+/***************************************************************************************/
+
+RealTensor Interaction::
+totalVirial() {
+  LOG4ESPP_INFO(theLogger, "total virial creates ForceComputer with empty force property");
+  potential::ForceComputerBase::SelfPtr computer = 
+    potential->createForceComputer(Property< Real3D >::SelfPtr(), true);
+  pairs->foreachPair(computer);
+  return computer->getTotalVirial();
 }
 
 /***************************************************************************************/
@@ -109,5 +122,6 @@ Interaction::registerPython() {
     .def("addForces", &Interaction::addForces)
     .def("addEnergies", &Interaction::addEnergies)
     .def("totalEnergy", &Interaction::totalEnergy)
+    .def("totalVirial", &Interaction::totalVirial)
     ;
 }

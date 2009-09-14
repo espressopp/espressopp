@@ -1,12 +1,14 @@
 nobase_pkginclude_HEADERS += \
 	estypes.hpp \
 	Real3D.hpp \
+	RealTensor.hpp \
 	Property.hpp \
 	Particle.hpp
 
 libespresso_common_la_SOURCES += \
 	bindings.cpp \
 	Real3D.cpp \
+	RealTensor.cpp \
 	Property.cpp \
 	Particle.cpp
 
@@ -17,4 +19,5 @@ python_SCRIPTS += \
 	boostmpi.py \
 	pmi.py \
 	Property.py \
-	Real3D.py
+	Real3D.py \
+	RealTensor.py

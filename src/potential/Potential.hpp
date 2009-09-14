@@ -20,16 +20,17 @@ namespace espresso {
       createEnergyComputer(Property< real >::SelfPtr _energyProperty1,
 			   Property< real >::SelfPtr _energyProperty2) = 0;
 
-      virtual pairs::Computer::SelfPtr 
+      virtual ForceComputerBase::SelfPtr 
       createForceComputer(Property< Real3D >::SelfPtr _forceProperty1,
-			  Property< Real3D >::SelfPtr _forceProperty2) = 0;
+			  Property< Real3D >::SelfPtr _forceProperty2,
+                          bool _computesVirial) = 0;
 
       // convenience variants
       virtual EnergyComputerBase::SelfPtr 
       createEnergyComputer(Property< real >::SelfPtr _energyProperty);
 
-      virtual pairs::Computer::SelfPtr 
-      createForceComputer(Property< Real3D >::SelfPtr _forceProperty);
+      virtual ForceComputerBase::SelfPtr 
+      createForceComputer(Property< Real3D >::SelfPtr _forceProperty, bool _computesVirial);
       
       virtual real getCutoffSqr() const = 0;
       virtual real computeEnergy(const Real3D dist) const = 0;
@@ -49,12 +50,14 @@ namespace espresso {
       using Potential::createForceComputer;
       using enable_shared_from_this< Derived >::shared_from_this;
 
-      virtual pairs::Computer::SelfPtr 
+      virtual ForceComputerBase::SelfPtr 
       createForceComputer(Property< Real3D >::SelfPtr _forceProperty1,
-			  Property< Real3D >::SelfPtr _forceProperty2) {
+			  Property< Real3D >::SelfPtr _forceProperty2,
+                          bool _computesVirial)
+      {
 	return 
 	  make_shared< ForceComputer< Derived > >
-	  (shared_from_this(), _forceProperty1, _forceProperty2);
+	  (shared_from_this(), _forceProperty1, _forceProperty2,  _computesVirial );
       }
       
       using Potential::createEnergyComputer;

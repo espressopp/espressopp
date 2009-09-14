@@ -5,9 +5,9 @@
 using namespace espresso;
 using namespace espresso::potential;
 
-pairs::Computer::SelfPtr 
-Potential::createForceComputer(Property< Real3D >::SelfPtr _forceProperty) {
-  return createForceComputer(_forceProperty, _forceProperty);
+potential::ForceComputerBase::SelfPtr 
+Potential::createForceComputer(Property< Real3D >::SelfPtr _forceProperty, bool _computesVirial) {
+  return createForceComputer(_forceProperty, _forceProperty, _computesVirial);
 }
 
 potential::EnergyComputerBase::SelfPtr
@@ -43,11 +43,11 @@ void
 Potential::registerPython() {
   using namespace espresso::python;
 
-  pairs::Computer::SelfPtr (Potential::*createForceComputer1)
-    (Property< Real3D >::SelfPtr, Property< Real3D >::SelfPtr) 
+  ForceComputerBase::SelfPtr (Potential::*createForceComputer1)
+    (Property< Real3D >::SelfPtr, Property< Real3D >::SelfPtr, bool) 
      = &Potential::createForceComputer;
-  pairs::Computer::SelfPtr (Potential::*createForceComputer2)
-    (Property< Real3D >::SelfPtr) 
+  ForceComputerBase::SelfPtr (Potential::*createForceComputer2)
+    (Property< Real3D >::SelfPtr, bool) 
      = &Potential::createForceComputer;
 
   EnergyComputerBase::SelfPtr (Potential::*createEnergyComputer1)
