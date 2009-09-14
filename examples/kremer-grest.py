@@ -1,5 +1,6 @@
 from espresso import *
 from espresso import storage, bc, integrator, particles, potential, pairs, thermostat
+from espresso import analysis
 import random
 
 import logging
@@ -33,7 +34,7 @@ bonds = pairs.List(bc=pbc, storage=storage)
 #         #bonds.add(particle, prevParticle)
 #         prevPid = newPid
 
-for beadid in range(10):
+for beadid in range(30):
     storage.addParticle(beadid)
     pos[beadid] = Real3D(random.random()*size, random.random()*size, random.random()*size)
     # + espresso.esutil.randomWalk(step=1.0)
@@ -79,7 +80,12 @@ therm.connect(integrator)
 
 #verletlists = espresso.pairs.VerletList(radius=ljint.cutoff, skin=0.3, **system)
 
+# ke = analysis.KineticEnergy(storage, vel)
+
+# calc the kinetic energy every 5 steps during integration
+
 # integration
+
 for sweeps in range(5):
     print('sweep ' + str(sweeps))
     print('  pos[0]=%8.3g %8.3g %8.3g' % tuple(pos[0]))
@@ -90,5 +96,11 @@ for sweeps in range(5):
     print('  vel[1]=%8.3g %8.3g %8.3g' % tuple(vel[1]))
     print('  force[1]=%8.3g %8.3g %8.3g' % tuple(force[1]))
     integrator.integrate(steps=1)
+
+#   print 'Kinetic energy = : ', ke.compute()
+    print 'Pair energy = : ', ljint.totalEnergy()
+    print 'Bond energy = : ', feneint.totalEnergy()
+    print 'Pair virial = : ', ljint.totalVirial()
+    print 'Bond virial = : ', feneint.totalVirial()
 
 # analysis
