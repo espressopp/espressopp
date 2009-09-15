@@ -1,6 +1,5 @@
 from espresso import *
 from espresso import storage, bc, integrator, particles, potential, pairs, thermostat
-from espresso import analysis
 import random
 
 import logging
