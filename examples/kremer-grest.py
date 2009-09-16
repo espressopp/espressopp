@@ -52,8 +52,14 @@ integrator = integrator.VelocityVerlet(
 
 # create the LJ interaction
 lj = potential.LennardJones(sigma=1.0, epsilon=1.0, cutoff=2.0)
-allpairs = pairs.All(set=storage)
-ljint = potential.Interaction(potential=lj, pairs=allpairs)
+if 0:
+  # all pairs
+  allpairs = pairs.All(set=storage)
+  ljint = potential.Interaction(potential=lj, pairs=allpairs)
+else:
+  # Verlet lists
+  vlist = pairs.VerletList(storage=storage, bc=pbc, radius=lj.cutoff, skin=0.3)
+  ljint = potential.Interaction(potential=lj, pairs=vlist)
 ljint.connect(integrator)
 
 # create FENE interaction
@@ -66,8 +72,6 @@ therm = thermostat.Langevin(temperature=1.0, gamma=0.5)
 therm.connect(integrator)
 
 # # create the particles and the chains
-# feneint = espresso.potential.FENE(K=1.0, r0=1.0, rMax=0.2)
-# bonds = espresso.pairs.List()
 # for chainid in range(100):
 #     prevParticle = particles.addParticle()
 #     for beadid in range(63):
@@ -75,9 +79,6 @@ therm.connect(integrator)
 #         particle = particles.addParticle(pos=newpos)
 #         bonds.add(particle, prevParticle)
 #         prevParticle = particle
-# system['integrator'].addInteraction(pairs=bonds, interaction=feneint)
-
-#verletlists = espresso.pairs.VerletList(radius=ljint.cutoff, skin=0.3, **system)
 
 # ke = analysis.KineticEnergy(storage, vel)
 

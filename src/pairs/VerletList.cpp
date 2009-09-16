@@ -1,9 +1,16 @@
 #include "VerletList.hpp"
 #include "python.hpp"
+#include "types.hpp"
+#include "estypes.hpp"
 
 #include <stdexcept>
 #include <algorithm>
 
+
+#include <iostream>
+
+
+using namespace espresso;
 using namespace espresso::pairs;
 using namespace espresso::storage;
 using namespace std;
@@ -36,14 +43,50 @@ VerletList::VerletList(bc::BC::SelfPtr _bc,
     skin(_skin)
     {}
 
-void VerletList::update() {
+namespace {
+  typedef std::pair< storage::ParticleHandle, storage::ParticleHandle > phTuple;
 
+  struct DistanceComputer: public pairs::Computer {
+    DistanceComputer(storage::Storage::SelfPtr _stor, bc::BC::SelfPtr _bc,
+                     espresso::real _radius, espresso::real _skin,
+                     std::vector< phTuple > &_ph_list):
+      stor(_stor), bc(_bc), radius(_radius), skin(_skin), ph_list(_ph_list) {}
+
+    void prepare(Storage::SelfPtr s1, Storage::SelfPtr s2) {
+      ph_list.clear();
+    }
+
+    bool apply(const Real3D &d, const ParticleHandle p1, const ParticleHandle p2) {
+      
+      std::cout << stor->getParticleId(p1) << "\t" << stor->getParticleId(p2) << std::endl;
+
+      storage::PropertyHandle<Real3D> pos1 = stor->getPositionPropertyHandle();
+      storage::PropertyHandle<Real3D> pos2 = stor->getPositionPropertyHandle();
+
+      Real3D dist = bc->getDist(pos1[p1], pos2[p2]);
+      if(dist.sqr() <= pow(radius + skin, 2))
+        ph_list.push_back(phTuple(p1, p2));
+      return true;
+    }
+    storage::Storage::SelfPtr stor;
+    bc::BC::SelfPtr bc;
+    espresso::real radius;
+    espresso::real skin;
+    std::vector< phTuple > ph_list;
+  };
+}
+
+void VerletList::update() {
+  DistanceComputer distanceComputer(storage1, bc, radius, skin, ph_list);
+  storage1->enclForeachPairWithin(distanceComputer);
 }
 
 bool VerletList::foreachPairApply(Computer &computer) {
    vector<phTuple>::const_iterator it;
    storage::PropertyHandle<Real3D> pos1 = storage1->getPositionPropertyHandle();
    storage::PropertyHandle<Real3D> pos2 = storage2->getPositionPropertyHandle();
+
+   std::cout << "VERLET LIST SIZE = " << ph_list.size() << std::endl;
 
    for(it = ph_list.begin(); it != ph_list.end(); it++) {
      ParticleHandle p1 = it->first;

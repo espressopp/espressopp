@@ -13,7 +13,7 @@ using namespace espresso::storage;
 
 using namespace boost;
 
-All::All(particles::Set::SelfPtr _set) 
+All::All(particles::Set::SelfPtr _set)
   : set(_set) {}
 
 namespace {

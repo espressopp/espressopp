@@ -15,7 +15,7 @@ namespace espresso {
 
     /** Python code:
         lj = potential.LennardJones(sigma=1.0, epsilon=1.0, cutoff=2.0)
-        vlist = pairs.VerletList(set=storage, bc=pbc, radius=lj.cutoff, skin=0.3)
+        vlist = pairs.VerletList(storage=storage, bc=pbc, radius=lj.cutoff, skin=0.3)
         ljint = potential.Interaction(potential=lj, pairs=vlist)
         ljint.connect(integrator)
 
@@ -63,14 +63,14 @@ namespace espresso {
       void update();
 
       /** getter routine for skin thickness */
-      espresso::real getSkin() { return skin; }
+      real getSkin() { return skin; }
       /** setter routine for skin thickness */
       void setSkin(real _skin) { skin = _skin; }
 
       /** getter routine for Verlet list radius */
-      espresso::real getRadius() { return radius; }
+      real getRadius() { return radius; }
       /** setter routine for Verlet list radius */
-      void setRadius(espresso::real _radius) { radius = _radius; }
+      void setRadius(real _radius) { radius = _radius; update();}
 
       /** Getter routine for storage1 */
       virtual storage::Storage::SelfPtr getLeftStorage();
