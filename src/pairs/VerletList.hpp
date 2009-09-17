@@ -11,30 +11,27 @@
 namespace espresso {
   namespace pairs {
 
-    /** Class that applies a Computer to a Verlet list of pairs */
+    /** VerletList applies a pairs::Computer to a list of particle pairs.
 
-    /** Python code:
-        lj = potential.LennardJones(sigma=1.0, epsilon=1.0, cutoff=2.0)
-        vlist = pairs.VerletList(storage=storage, bc=pbc, radius=lj.cutoff, skin=0.3)
-        ljint = potential.Interaction(potential=lj, pairs=vlist)
-        ljint.connect(integrator)
+        This class maintains a vector of tuples of particle handles which are all the
+        pairs within rc+skin of each other. This along with a potential is used to
+        create an Interaction object. When the updateForces signal is emitted the
+        Interaction object runs over all pairs applying a forceComputer.
 
-        pairs::VerletList maintains a vector of tuples of particle handles which are all the
-        pairs within rc+delta of each other. This along with a potential is used by a
-        forceComputer to compute the mutual forces between particles.
-
-        update() uses cells or N^2 is independent of whether using cells
-        or not since just call storage::foreachIn() and this will return the
-        particles in that box.
-
-        The user should have the option of rebuilding the list based on the maximum
+        The storage is responsible for deciding when to update the Verlet lists. The
+        user should have the option of rebuilding the list based on the maximum
         displacement of all the particles or by tracking all the individual displacements.
 
-        A signal is needed to determine when to rebuild the Verlet list when the
-        skin is violated
+        Remaining questions of JH (17.9.2009):
 
-        A second signal is needed to update the particle handles using the id's
-        when a particle is added/removed, etc.
+        1. Should BC be an explicit member or should it be obtained from the storage?
+           This question also holds for the DistanceComputer. If two stores will they
+           ever have different BC?
+        2. Are particle ids needed are any point? Right only handles are used.
+        3. What about storage2 in update?
+        4. How to make Verlet list based on particle property in addition to distance?
+           Another computer? Must this only be possible from the C++ level?
+        5. Should the forces be computed as the list is updated?
     */
 
     class VerletList : public Set {
@@ -70,7 +67,7 @@ namespace espresso {
       /** getter routine for Verlet list radius */
       real getRadius() { return radius; }
       /** setter routine for Verlet list radius */
-      void setRadius(real _radius) { radius = _radius; update();}
+      void setRadius(real _radius) { radius = _radius; }
 
       /** Getter routine for storage1 */
       virtual storage::Storage::SelfPtr getLeftStorage();
@@ -88,13 +85,13 @@ namespace espresso {
       storage::Storage::SelfPtr storage1;
       storage::Storage::SelfPtr storage2;
 
-      real skin; // skin thickness
+      real skin; // skin thickness (maybe this is not necessary)
       real radius; // radius of the Verlet list
-      real maxdisp; // sum of maximum displacements
+      real radiusPlusSkinSqr; // need to store the square of the radius plus skin
 
       typedef std::pair< ParticleId, ParticleId > Tuple; // maybe this is not necessary
       typedef std::pair< storage::ParticleHandle, storage::ParticleHandle > phTuple;
-      std::vector< Tuple > id_list;
+      std::vector< Tuple > id_list; // maybe this is not necessary
       std::vector< phTuple > ph_list;
     };
 
