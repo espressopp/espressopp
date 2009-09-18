@@ -53,7 +53,8 @@ namespace {
                      espresso::real _skin,
                      std::vector< phTuple > &_ph_list):
                      stor(_stor), bc(_bc), radius(_radius),
-                     skin(_skin), ph_list(_ph_list) {}
+                     skin(_skin), ph_list(_ph_list)
+                     {}
 
     void prepare(Storage::SelfPtr s1, Storage::SelfPtr s2) {
       ph_list.clear();
@@ -65,8 +66,8 @@ namespace {
       storage::PropertyHandle<Real3D> pos2 = stor->getPositionPropertyHandle();
 
       // replace with radiusPlusSkinSqr
-      Real3D dist = bc->getDist(pos1[p1], pos2[p2]);
-      if(dist.sqr() <= pow(radius + skin, 2)){
+      //Real3D d = bc->getDist(pos1[p1], pos2[p2]);
+      if(d.sqr() <= pow(radius + skin, 2)){
         ph_list.push_back(phTuple(p1, p2));
       }
       return true;

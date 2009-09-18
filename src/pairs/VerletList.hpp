@@ -11,7 +11,7 @@
 namespace espresso {
   namespace pairs {
 
-    /** VerletList applies a pairs::Computer to a list of particle pairs.
+    /** Class that applies a pairs::Computer to a Verlet list of particle pairs.
 
         This class maintains a vector of tuples of particle handles which are all the
         pairs within rc+skin of each other. This along with a potential is used to
@@ -32,6 +32,8 @@ namespace espresso {
         4. How to make Verlet list based on particle property in addition to distance?
            Another computer? Must this only be possible from the C++ level?
         5. Should the forces be computed as the list is updated?
+        6. Why is prepare and finalize called twice? foreachPairApply calls these 
+           methods in addition to foreachPair.
     */
 
     class VerletList : public Set {
@@ -56,7 +58,11 @@ namespace espresso {
       /** Destructor */
       virtual ~VerletList();
 
-      /** method to rebuild the list */
+      /** Method to rebuild the list. A DistanceComputer is created which is
+          passed to the foreach loop of the storage. Particle pairs that are
+          separated by less then rc+skin are stored in the Verlet list. This
+          method is called by the storage before the particles violate the
+          skin thickness. */
       void update();
 
       /** getter routine for skin thickness */
@@ -64,14 +70,14 @@ namespace espresso {
       /** setter routine for skin thickness */
       void setSkin(real _skin) { skin = _skin; }
 
-      /** getter routine for Verlet list radius */
+      /** Method to get the radius */
       real getRadius() { return radius; }
-      /** setter routine for Verlet list radius */
+      /** Method to set the radius */
       void setRadius(real _radius) { radius = _radius; }
 
-      /** Getter routine for storage1 */
+      /** Method to get storage1 */
       virtual storage::Storage::SelfPtr getLeftStorage();
-      /** Getter routine for storage2 */
+      /** Method to get storage2 */
       virtual storage::Storage::SelfPtr getRightStorage();
 
     protected:
