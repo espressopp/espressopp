@@ -21,6 +21,8 @@ namespace espresso {
   template<typename> class ArrayProperty;
 
   namespace storage {
+    class SkinHandler;
+
     typedef PropertyHandle< ParticleId > IdPropertyHandle;
     typedef PropertyHandle< Real3D > PosPropertyHandle;
     typedef esutil::TupleVector::PropertyId PropertyId;
@@ -93,6 +95,10 @@ namespace espresso {
 	  particles.
        */
       virtual void positionPropertyModified();
+
+      /**  return the skin handler of the storage, _if_ it uses one;
+       otherwise, a blank pointer is returned. */
+      virtual shared_ptr< SkinHandler > getSkinHandler();
       
       /** signal that is rised if the storage was modified such that
 	  particle handles might be outdated.

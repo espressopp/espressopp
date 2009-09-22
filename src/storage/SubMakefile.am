@@ -3,11 +3,13 @@ nobase_pkginclude_HEADERS += \
 	storage/ParticleHandle.hpp \
 	storage/PropertyHandle.hpp \
 	storage/Storage.hpp \
+	storage/SkinHandler.hpp \
 	storage/SingleNode.hpp
 
 libespresso_common_la_SOURCES += \
 	storage/bindings.cpp \
 	storage/Storage.cpp \
+	storage/SkinHandler.cpp \
 	storage/SingleNode.cpp
 
 python_SCRIPTS += \

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include "Property.hpp"
+#include "storage/SkinHandler.cpp"
 
 using namespace espresso;
 using namespace espresso::storage;
@@ -16,6 +17,8 @@ Storage::~Storage() {}
 
 void Storage::positionPropertyModified() {
 }
+
+shared_ptr< SkinHandler > Storage::getSkinHandler() { return shared_ptr< SkinHandler >(); }
 
 void Storage::_addParticle(ParticleId id) {
   addParticle(id);
