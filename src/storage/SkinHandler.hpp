@@ -1,7 +1,7 @@
 #ifndef STORAGE_SKIN_HANDLER_HPP
 #define STORAGE_SKIN_HANDLER_HPP
 
-#include "esutil/MultiSignalConnections.hpp"
+#include "boost/signals2.hpp"
 #include "Property.hpp"
 #include "storage/PropertyHandle.hpp"
 
@@ -9,9 +9,10 @@ namespace espresso {
   namespace particles {
     class Set;
   }
+
   namespace storage {
     /** abstract class checking a skin condition. */
-    class SkinHandler {
+    class SkinHandler: public boost::noncopyable {
       typedef boost::signals2::signal1<void, const SkinHandler &> Signal;
     public:
       virtual ~SkinHandler() {}
@@ -30,7 +31,6 @@ namespace espresso {
 
       virtual void setSkin(real) = 0;
       real getSkin() const { return skin; }
-      real getSkinSqr() const { return skinSqr; }
 
       /** Signal emitted if the skin was changed. Note that the skin
 	  criterion is checked anyways and if necessary, skinExceed
@@ -41,14 +41,12 @@ namespace espresso {
 	  than the skin.
       */
       Signal skinExceeded;
-      /// connection manager
-      esutil::MultiSignalConnections connections;
 
     protected:
       // function checking the skin criterion, and emitting skinExceeded if applicable
       void checkSkin(particles::Set &);
 
-      real skin, skinSqr;
+      real skin;
     };
 
     /// SkinHandler living outside a storage
@@ -58,9 +56,14 @@ namespace espresso {
 					   boost::shared_ptr< Property< Real3D > >());
       virtual PropertyHandle< Real3D > getLastPositionPropertyHandle();
       virtual void setSkin(real);
+
     private:
+      void checkSkin();
+
       shared_ptr< particles::Set > set;
       shared_ptr< Property< Real3D > > lastPositionProperty;
+
+      boost::signals2::scoped_connection storagePositionsChanged;
     };
   }
 }

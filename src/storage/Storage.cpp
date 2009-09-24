@@ -18,7 +18,7 @@ Storage::~Storage() {}
 void Storage::positionPropertyModified() {
 }
 
-shared_ptr< SkinHandler > Storage::getSkinHandler() { return shared_ptr< SkinHandler >(); }
+real Storage::getSkin() { return 0.0; }
 
 void Storage::_addParticle(ParticleId id) {
   addParticle(id);

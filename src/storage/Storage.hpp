@@ -21,8 +21,6 @@ namespace espresso {
   template<typename> class ArrayProperty;
 
   namespace storage {
-    class SkinHandler;
-
     typedef PropertyHandle< ParticleId > IdPropertyHandle;
     typedef PropertyHandle< Real3D > PosPropertyHandle;
     typedef esutil::TupleVector::PropertyId PropertyId;
@@ -96,13 +94,18 @@ namespace espresso {
        */
       virtual void positionPropertyModified();
 
-      /**  return the skin handler of the storage, _if_ it uses one;
-       otherwise, a blank pointer is returned. */
-      virtual shared_ptr< SkinHandler > getSkinHandler();
+      /** return the skin of the storage, _if_ it uses one; otherwise,
+	  0 is returned. If getSkin() returns a value greater than 0,
+	  the storage guarantees that the handlesChanged signal is
+	  emitted if a particle moved further that this value since
+	  the last handlesChanged signal. */
+      virtual real getSkin();
       
+      /** signal that is rised if positionPropertyModified was called,
+	  that is, particle coordinates may have changed. */
+      Signal positionsChanged;
       /** signal that is rised if the storage was modified such that
-	  particle handles might be outdated.
-      */
+	  particle handles might be outdated. */
       Signal handlesChanged;
 
       /// connection manager

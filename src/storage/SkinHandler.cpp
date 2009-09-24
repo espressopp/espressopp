@@ -44,7 +44,7 @@ void SkinHandler::checkSkin(particles::Set &set)
   checker.maxSqr = 0;
   set.foreach(checker);
 
-  if (checker.maxSqr > skinSqr) {
+  if (checker.maxSqr > skin*skin) {
     SkinReset reset;
     reset.prepare(store->getPositionPropertyHandle(), getLastPositionPropertyHandle());     
     skinExceeded(*this);
@@ -53,7 +53,10 @@ void SkinHandler::checkSkin(particles::Set &set)
 
 ExtraSkinHandler::ExtraSkinHandler(shared_ptr< particles::Set > _set)
   : set(_set)
-{}
+{
+  Storage::SelfPtr store = set->getStorage();
+  storagePositionsChanged = store->positionsChanged.connect(boost::bind(&ExtraSkinHandler::checkSkin, this));
+}
 
 void ExtraSkinHandler::setLastPositionProperty(boost::shared_ptr< Property< Real3D > > prop)
 {
@@ -71,7 +74,10 @@ PropertyHandle< Real3D > ExtraSkinHandler::getLastPositionPropertyHandle()
 void ExtraSkinHandler::setSkin(real _skin)
 {
   skin = _skin;
-  skinSqr = _skin*_skin;
   skinChanged(*this);
-  checkSkin(*set);
+  checkSkin();
 }
+
+void ExtraSkinHandler::checkSkin()
+{ SkinHandler::checkSkin(*set); }
+
