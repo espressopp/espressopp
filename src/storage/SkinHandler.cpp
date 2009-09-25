@@ -36,7 +36,7 @@ namespace {
   };
 }
 
-void SkinHandler::checkSkin(particles::Set &set)
+bool SkinHandler::checkSkin(particles::Set &set)
 {
   Storage *store = set.getStorage().get();
   SkinCheck checker;
@@ -47,12 +47,13 @@ void SkinHandler::checkSkin(particles::Set &set)
   if (checker.maxSqr > skin*skin) {
     SkinReset reset;
     reset.prepare(store->getPositionPropertyHandle(), getLastPositionPropertyHandle());     
-    skinExceeded(*this);
+    return true;
   }
+  return false;
 }
 
-ExtraSkinHandler::ExtraSkinHandler(shared_ptr< particles::Set > _set)
-  : set(_set)
+ExtraSkinHandler::ExtraSkinHandler(shared_ptr< particles::Set > _set, real _skin)
+  : SkinHandler(_skin), set(_set)
 {
   Storage::SelfPtr store = set->getStorage();
   storagePositionsChanged = store->positionsChanged.connect(boost::bind(&ExtraSkinHandler::checkSkin, this));
@@ -79,5 +80,9 @@ void ExtraSkinHandler::setSkin(real _skin)
 }
 
 void ExtraSkinHandler::checkSkin()
-{ SkinHandler::checkSkin(*set); }
+{
+  if (SkinHandler::checkSkin(*set)) { 
+    skinExceeded(*this);
+  }
+}
 
