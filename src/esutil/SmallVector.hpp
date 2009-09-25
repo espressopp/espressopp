@@ -1,5 +1,6 @@
 #ifndef _ESUTIL_SMALLVECTOR_HPP
 #define _ESUTIL_SMALLVECTOR_HPP
+#include <algorithm>
 #include "DerivableSmallVector.hpp"
 
 namespace espresso {
@@ -8,19 +9,15 @@ namespace espresso {
     class SmallVector: public DerivableSmallVector<T, N, SmallVector<T, N> > {
     public:
 
-      // Default constructor
-
       SmallVector<T,N>() {}
-
-      // Constructor
-
       SmallVector<T,N>(T val): DerivableSmallVector<T, N, SmallVector<T,N> >(val) {}
-
-      // cross-CRTP constructor
-
+      /// C-field copy constructor
+      SmallVector<T,N>(const T val[N])
+      : DerivableSmallVector<T, N, SmallVector<T,N> >(val) {}
+      /// cross-CRTP constructor
       template< class OtherCRTP >
       SmallVector<T,N>(const DerivableSmallVector<T, N, OtherCRTP> &other)
-      { for (size_t i = 0; i < N; i++) this->data[i] = other.data[i]; }
+      { std::copy(other.data, other.data + N, this->data); }
     };
 
     template<class T, int N>

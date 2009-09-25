@@ -3,6 +3,9 @@ nobase_pkginclude_HEADERS += \
 	esutil/SmallVector.hpp \
 	esutil/DerivableSmallVector.hpp \
 	esutil/Vector3D.hpp \
+        esutil/Box.hpp \
+        esutil/Grid.hpp \
+        esutil/Tensor.hpp \
 	esutil/TupleVector.hpp \
 	esutil/VectorTraits.hpp \
 	esutil/Timer.hpp \

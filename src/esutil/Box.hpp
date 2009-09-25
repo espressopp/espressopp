@@ -8,16 +8,15 @@ namespace espresso {
     /** Represents a box with sides parallel to the coordinates
 	axes by two corner points.
      */
-    template<class T>
+    template<class VectorClass>
     class Box {
     public:
       /// Default constructor
-      Box(): left(0), right(0) {}
+      Box(): left(0.0), right(0.0) {}
       /** Constructor from two diagonally located corners.
        */
-      Box(const typename espresso::esutil::Vector3D<T> &corner1,
-	  const typename espresso::esutil::Vector3D<T> &corner2) {
-	for (size_t i = 0; i < 3; ++i) {
+      Box(const VectorClass &corner1, const VectorClass &corner2) {
+	for (size_t i = 0; i < VectorClass::dimension; ++i) {
 	  if (corner1[i] < corner2[i]) {
 	    left[i]  = corner1[i];
 	    right[i] = corner2[i];
@@ -30,14 +29,14 @@ namespace espresso {
       }
 
       /// get lower coordinates
-      const typename espresso::esutil::Vector3D<T> &getLeft()  const { return left; }
+      const VectorClass &getLeft()  const { return left; }
       /// get upper coordinates
-      const typename espresso::esutil::Vector3D<T> &getRight() const { return right; }
+      const VectorClass &getRight() const { return right; }
 
-      espresso::esutil::Vector3D<T> getExtend() const { return right - left; }
+      VectorClass getExtend() const { return right - left; }
 
     protected:
-      espresso::esutil::Vector3D<T> left, right;
+      VectorClass left, right;
     };
   }
 }

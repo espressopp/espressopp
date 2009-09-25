@@ -35,7 +35,7 @@ namespace espresso {
       /** approximate looping over a box. A set should try to loop over as little
 	  as possible particles, but at least all in the given box. This is not
 	  and should not be exported to Python. */
-      virtual bool enclForeachIn(Computer &computer, const RealBox &box);
+      virtual bool enclForeachIn(Computer &computer, const Real3DBox &box);
 
       virtual shared_ptr< storage::Storage > getStorage() = 0;
 

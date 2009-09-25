@@ -12,6 +12,8 @@ namespace espresso {
       Vector3D() {}
       /// Constructor
       Vector3D(T val) { for (size_t i = 0; i < 3; i++) this->data[i] = val; }
+      /// C-field Constructor
+      Vector3D(const T *val) { for (size_t i = 0; i < 3; i++) this->data[i] = val[i]; }
       /// full constructor
       Vector3D(T x, T y, T z) {
 	this->data[0] = x;

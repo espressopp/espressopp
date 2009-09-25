@@ -49,7 +49,7 @@ Set::foreach(const Computer::SelfPtr computer)
 { return foreach(*computer); }
 
 bool
-Set::enclForeachIn(Computer &computer, const RealBox &)
+Set::enclForeachIn(Computer &computer, const Real3DBox &)
 { return foreach(computer); }
 
 

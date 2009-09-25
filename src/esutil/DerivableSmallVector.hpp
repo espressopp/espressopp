@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <algorithm>
 
 namespace espresso {
   namespace esutil {
@@ -16,21 +17,21 @@ namespace espresso {
     */
     template<class T, size_t N, class CRTP>
     class DerivableSmallVector {
-      CRTP&       upcast()       { return *static_cast<      CRTP*>(this); }
-      const CRTP& upcast() const { return *static_cast<const CRTP*>(this); }
-    protected:
-
-      T data[N];  //*< elements of the small array
-
     public:
+      // for generic programming, class of the elements
+      typedef T ValueType;
+      // for generic programming, reveals the true CRTP class of this object
+      typedef CRTP ThisType;
 
       // Default constructor
 
       DerivableSmallVector<T,N,CRTP>() {}
 
-      // Constructor
-
       DerivableSmallVector<T,N,CRTP>(T val) { for (size_t i = 0; i < N; i++) data[i] = val; }
+
+      /// C-field copy constructor
+      DerivableSmallVector<T,N,CRTP>(const T val[N])
+      { std::copy(val, val + N, this->data); }
 
       // getter and setter
 
@@ -112,6 +113,14 @@ namespace espresso {
 	return result;
       }
 
+      // pointwise product
+
+      CRTP multiplyPointwise (const DerivableSmallVector<T,N,CRTP>& b) const {
+	CRTP result;
+	for (size_t i = 0; i < N; i++) result[i] = data[i] * b.data[i]; 
+	return result;
+      }
+
       T sqr() const { 
 	return (*this) * (*this);
       }
@@ -132,6 +141,16 @@ namespace espresso {
 	return true;
       }
 
+      // size of the vector, for generic algorithms
+      static const size_t dimension = N;
+
+    protected:
+
+      T data[N];  //*< elements of the small array
+
+    private:
+      CRTP&       upcast()       { return *static_cast<      CRTP*>(this); }
+      const CRTP& upcast() const { return *static_cast<const CRTP*>(this); }
     };
 
     // global definition to make sure that we can use scalar * vector in C++ and Python
