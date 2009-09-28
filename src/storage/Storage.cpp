@@ -5,17 +5,25 @@
 #include <algorithm>
 #include <stdexcept>
 #include "Property.hpp"
-#include "storage/SkinHandler.cpp"
+#include "storage/SkinHandler.hpp"
 
 using namespace espresso;
 using namespace espresso::storage;
 using namespace espresso::python;
 
-Storage::Storage(bc::BC::SelfPtr _bc): bc(_bc) {}
+Storage::Storage(bc::BC::SelfPtr _bc): bc(_bc), positionsModified(false) {}
 
 Storage::~Storage() {}
 
+void Storage::prepare() {
+  if (positionsModified) {
+    positionPropertyModified();
+  }
+  positionsModified = false;
+}
+
 void Storage::positionPropertyModified() {
+  positionsChanged();  
 }
 
 real Storage::getSkin() { return 0.0; }

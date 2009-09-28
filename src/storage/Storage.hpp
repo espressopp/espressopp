@@ -88,6 +88,10 @@ namespace espresso {
 
       bc::BC::SelfPtr getBoundaryConditions() const { return bc; }
 
+      /** call this routine once before start of integration. This checks if the particle position
+          property has been changed, and if so, resorts the particles. */
+      virtual void prepare();
+
       /** inform the storage that particle positions have
 	  changed. Call this e. g. after the integrator has moved all
 	  particles.
@@ -208,6 +212,8 @@ namespace espresso {
       PropertyId particleIdProperty;
       /// ID of the particle ID property
       PropertyId particlePosProperty;
+
+      bool positionsModified;
     };
 
   }

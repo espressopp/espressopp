@@ -66,6 +66,9 @@ namespace espresso {
     }
 
     void setItem(ParticleId part, const T &v) {
+      if (id == getStorage()->particlePosProperty) {
+        getStorage()->positionsModified = true;
+      }
       at(part) = v;
     }
 
@@ -136,6 +139,9 @@ namespace espresso {
       if (v.size() != ref.getDimension())
         throw std::range_error("ArrayProperty::setItem: incorrect dimension");
       std::copy(v.begin(), v.end(), (*this).at(part));
+      if (id == getStorage()->particlePosProperty) {
+        getStorage()->positionsModified = true;
+      }
     }
 
   public: // invisible in Python
