@@ -155,8 +155,8 @@ namespace espresso {
 	size_t index;
 
       private:
-	template<class OtherReferenceType, class OtherIteratorType>
-	bool equal(const IteratorBase<OtherReferenceType, OtherIteratorType> &other) const {
+	template<class OtherReferenceType, class OtherCRTP>
+	bool equal(const IteratorBase<OtherReferenceType, OtherCRTP> &other) const {
 	  return index == other.index;
 	}
 
@@ -164,7 +164,8 @@ namespace espresso {
 	void decrement()       { index--; }
 	void advance(size_t n) { index += n; }
 	ReferenceType dereference() const { return ReferenceType(index); }
-	ptrdiff_t distance_to(const IteratorBase<ReferenceType, CRTP> &other) const {
+	template<class OtherReferenceType, class OtherCRTP>
+	ptrdiff_t distance_to(const IteratorBase<OtherReferenceType, OtherCRTP> &other) const {
 	  return other.index - index;
 	}
       };
@@ -304,7 +305,7 @@ namespace espresso {
 	thin_reference(size_type _index): ReferenceBase(_index) {}
 
 	/// not possible
-	void operator=(const reference &);
+	void operator=(const thin_reference &);
       };
 
       /** a thin reference to a constant element, which then can be

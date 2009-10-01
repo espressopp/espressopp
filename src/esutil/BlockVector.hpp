@@ -237,10 +237,16 @@ namespace espresso {
         }
         void pop_back() { resize(size() - 1); }
 
-        ThinIterator insert(ThinIterator pos, ConstReference v) { insert(pos, 1, v); }
+        ThinIterator insert(ThinIterator pos, ConstReference v) {
+          size_type index = pos - this->begin(); // resize safety
+          insert(pos, 1, v);
+          return this->begin() + index;
+        }
+
         void insert(ThinIterator pos, size_type n, ConstReference v) {
           pos = makeSpace(pos, n);
-          std::fill(pos, pos + n, v);
+          typename Traits::iterator fpos = Traits::template make_thick<Iterator, ThinIterator>(&(this->vector.data), pos);
+          std::fill(fpos, fpos + n, v);
         }
         /** insert a sequence. Note that the iterators need to be
 	    random iterators, in contrast to standard STL containers.
@@ -255,13 +261,13 @@ namespace espresso {
         void insert(ThinIterator pos, It begin,
                     typename boost::disable_if_c<std::numeric_limits<It>::is_integer, It>::type end) {
           pos = makeSpace(pos, (end - begin));
-          std::copy(begin, end, pos);
+          std::copy(begin, end, Traits::template make_thick<Iterator, ThinIterator>(&(this->vector.data), pos));
         }
 
         ThinIterator erase(ThinIterator pos) { return erase(pos, pos+1); }
         ThinIterator erase(ThinIterator begin, ThinIterator end) {
-          std::copy(end, this->end(), begin);
           size_type index = begin - this->begin(); // resize safety
+          std::copy(end, ThinIterator(this->end()), this->begin() + index);
           resize(size() - (end - begin));
           return this->begin() + index;
         }
@@ -543,7 +549,7 @@ namespace espresso {
       resize(size() + n);
       // pos after resizing
       pos = begin() + startId;
-      std::copy_backward(pos, end() - n, end());
+      std::copy_backward(pos, typename Traits::thin_iterator(end() - n), end());
       return pos;
     }
   }

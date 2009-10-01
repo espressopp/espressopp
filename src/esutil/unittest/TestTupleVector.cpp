@@ -6,15 +6,9 @@
 #include <boost/foreach.hpp>
 
 #include "../TupleVector.hpp"
+#include "../TupleVector.cpp"
 
 using namespace espresso::esutil;
-
-/*
-  compile like this:
-  libtool --mode=link g++  -Wall -O3 -I ../../../contrib/boost -I ../../../obj-cayley/src \
-  ../TupleVector.cpp TestTupleVector.cpp ../../../obj-cayley/contrib/boost/libboost_unit_test_framework.la -o test \
-  && ./test
-*/
 
 struct Fixture {
     TupleVector mv;
@@ -352,6 +346,20 @@ BOOST_FIXTURE_TEST_CASE(iterator_test, Fixture)
       }
       i++;
     }
+  }
+}
+
+BOOST_FIXTURE_TEST_CASE(iterator_interop_test, Fixture)
+{
+  {
+    TupleVector::thin_iterator it = mv.begin();
+    size_t diff = mv.end() - it;
+    BOOST_CHECK_EQUAL(diff, size_t(42));
+  }
+  {
+    TupleVector::thin_iterator it = mv.end();
+    size_t diff = it - mv.begin();
+    BOOST_CHECK_EQUAL(diff, size_t(42));
   }
 }
 

@@ -170,6 +170,8 @@ namespace espresso {
       /// boundary condition in charge
       bc::BC::SelfPtr bc;
 
+      bool positionsModified;
+
     private:
       /// since Property/ArrayProperty are the ones that operates properties
       template< typename > friend class espresso::Property;
@@ -212,8 +214,6 @@ namespace espresso {
       PropertyId particleIdProperty;
       /// ID of the particle ID property
       PropertyId particlePosProperty;
-
-      bool positionsModified;
     };
 
   }

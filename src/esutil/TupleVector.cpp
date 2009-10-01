@@ -4,8 +4,6 @@
 #include <boost/foreach.hpp>
 #include <algorithm>
 
-#include <iostream>
-
 using namespace espresso::esutil;
 
 static const int defaultGranularity = 1024/sizeof(int);

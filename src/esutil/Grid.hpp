@@ -22,6 +22,14 @@ namespace espresso {
         }
       }
 
+      Grid(const Box<VectorClass> &_domain)
+        : domain(_domain)
+      {
+        for(size_t i = 0; i < VectorClass::dimension; ++i) {
+          setNumCells(i, 1);
+        }
+      }
+
       /// set the domain that the grid is spanning up
       void setDomain(const Box<VectorClass> &_domain) {
         domain = _domain;
@@ -36,6 +44,7 @@ namespace espresso {
         cells[i] = s;
         cellsizes[i] = domain.getExtend()[i]/s;
         cellsizes_i[i] = s/domain.getExtend()[i];
+        updateMaxId();
       }
 
       /// get the domain that the grid is spanning up
@@ -62,6 +71,7 @@ namespace espresso {
         return result;
       }
 
+      /// turn a cell identifier into a linear index between 0 and getMaxLinearId()
       size_t linearize(const CellIdentifier &id) {
         size_t res = id[0];
         for (size_t d = 1; d < VectorClass::dimension; ++d) {
@@ -69,13 +79,25 @@ namespace espresso {
         }
         return res;
       }
+      
+      size_t getMaxLinearId() const { return maxID; }
 
       /// not a cell, returned by various algorithms in case of failure
       static const CellIdentifier notACell;
 
     protected:
+      void updateMaxId() {
+        maxID = 1;
+        for (size_t d = 0; d < VectorClass::dimension; ++d) {
+          maxID *= cells[d];
+        }
+      }
+
       Box<VectorClass> domain;
       size_t cells[VectorClass::dimension];
+
+      size_t maxID;
+
       typename VectorClass::ValueType cellsizes[VectorClass::dimension];
       typename VectorClass::ValueType cellsizes_i[VectorClass::dimension];
     };

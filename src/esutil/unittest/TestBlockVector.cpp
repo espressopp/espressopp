@@ -307,11 +307,16 @@ BOOST_AUTO_TEST_CASE(block_erase_test)
 BOOST_AUTO_TEST_CASE(tuplevector_interop_text)
 {
   typedef espresso::esutil::BlockVector< espresso::esutil::TupleVector > BlockVector;
+  typedef BlockVector::Block::thin_iterator thin_iterator;
 
   BlockVector blockv(3);
   blockv[0].resize(10);
   /* this only works if the correct specialization for TupleVector is found, i.e.
-     the make_thick mechanism is in use.
-   */
+     the make_thick mechanism is in use. There is nothing to assert here; it simply
+     won't compile if it goes wrong.
+  */
   blockv[1].assign(blockv[0].begin(), blockv[0].begin() + 3);
+  blockv[1].insert(blockv[1].begin(), thin_iterator(blockv[0].begin()), thin_iterator(blockv[0].end()));
+  blockv[1].insert(blockv[1].begin(), *blockv[0].begin());
+  blockv[1].erase(blockv[1].begin(), blockv[1].end());
 }
