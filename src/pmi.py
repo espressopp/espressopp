@@ -1,38 +1,41 @@
-"""The module pmi provides functions for Parallel Method Invocation
-(PMI).
+"""
+************************************
+**PMI** - Parallel Method Invocation
+************************************
+
+PMI allows users to write serial Python scripts that use functions and
+classes that are executed in parallel. 
 
 PMI is intended to be used in data-parallel environments, where
 several threads run in parallel and can communicate via MPI.
 
 In PMI mode, a single thread of control (a python script that runs on
-the \"controller\", i.e. the MPI root task) can invoke arbitrary
-functions on all other threads (the \"workers\") in parallel via
-call(), invoke() and reduce(). When the function on the workers
+the *controller*, i.e. the MPI root task) can invoke arbitrary
+functions on all other threads (the *workers*) in parallel via
+`call()`, `invoke()` and `reduce()`. When the function on the workers
 return, the control is returned to the controller.
 
 This model is equivalent to the \"Fork-Join execution model\" used
 e.g. in OpenMP.
 
 PMI also allows to create parallel instances of object classes via
-create(), i.e. instances that have a corresponding object instance on
-all workers. call(), invoke() and reduce() can be used to call
-arbitrary methods of these instances.
+`create()`, i.e. instances that have a corresponding object instance
+on all workers. `call()`, `invoke()` and `reduce()` can be used to
+call arbitrary methods of these instances.
 
 To allow importing of python modules and to execute arbitrary code on
-all workers, exec_() can be used.
+all workers, `exec_()` can be used.
 
 Main program
 ------------
 
 On the workers, the main program of a PMI script usually consists of a
-single call to the function startWorkerLoop(). On the workers, this
+single call to the function `startWorkerLoop()`. On the workers, this
 will start an infinite loop on the workers that waits to receive the
 next PMI call, while it will immediately return on the controller. On
 the workers, the loop ends only, when one of the commands
-finalizeWorkers() or stopWorkerLoop() is issued on the controller. A
-typical PMI main program looks like this:
-
-EXAMPLE PMI PROGRAM:
+`finalizeWorkers()` or `stopWorkerLoop()` is issued on the
+controller. A typical PMI main program looks like this:
 
 >>> # compute 2*factorial(42) in parallel
 >>> import pmi
@@ -48,19 +51,17 @@ EXAMPLE PMI PROGRAM:
 >>> # exit all workers
 >>> pmi.finalizeWorkers()
 
-Instead of using pmi.finalizeWorkers() at the end of the script, you
-can call registerAtExit() anywhere else, which will cause
-finalizeWorkers() to be called when the python interpreter exits.
+Instead of using `finalizeWorkers()` at the end of the script, you can
+call `registerAtExit()` anywhere else, which will cause
+`finalizeWorkers()` to be called when the python interpreter exits.
 
 Alternatively, it is possible to use PMI in an SPMD-like fashion,
 where each call to a PMI command on the controller must be accompanied
 by a corresponding call on the worker. This can be either a simple
-call to receive() that accepts any PMI command, or a call to the
+call to `receive()` that accepts any PMI command, or a call to the
 identical PMI command. In that case, the arguments of the call to the
 PMI command on the workers are ignored. In this way, it is possible to
 write SPMD scripts that profit from the PMI communication patterns.
-
-EXAMPLE SPMD PROGRAM:
 
 >>> # compute 2*factorial(42) in parallel
 >>> import pmi
@@ -68,28 +69,28 @@ EXAMPLE SPMD PROGRAM:
 >>> pmi.exec_('import math')
 >>> pmi.reduce('lambda a,b: a+b', 'math.factorial', 42)
 
-To start the worker loop, the command startWorkerLoop() can be issued
-on the workers. To stop the worker loop, stopWorkerLoop() can be
-issued on the controller, which will end the worker loop without
-exiting the workers. 
+To start the worker loop, the command `startWorkerLoop()` can be
+issued on the workers. To stop the worker loop, `stopWorkerLoop()` can
+be issued on the controller, which will end the worker loop without
+exiting the workers.
 
 Controller commands
 -------------------
 
 These commands can be called in the controller script. When any of
 these commands is issued on a worker during the worker loop, a
-UserError is raised.
+`UserError` is raised.
 
-* call(), invoke(), reduce() to call functions and methods in parallel
-* create() to create parallel object instances
-* exec_() and import_() to execute arbitrary python code in parallel
-  and to import classes and functions into the global namespace of
-  pmi.
-* sync() to make sure that all deleted PMI objects have been deleted.
-* finalizeWorkers() to stop and exit all workers
-* registerAtExit() to make sure that finalizeWorkers() is called when
+* `call()`, `invoke()`, `reduce()` to call functions and methods in parallel
+* `create()` to create parallel object instances
+* `exec_()` and `import_()` to execute arbitrary python code in
+  parallel and to import classes and functions into the global
+  namespace of pmi.
+* `sync()` to make sure that all deleted PMI objects have been deleted.
+* `finalizeWorkers()` to stop and exit all workers
+* `registerAtExit()` to make sure that finalizeWorkers() is called when
   python exits on the controller
-* stopWorkerLoop() to interrupt the worker loop an all workers and to
+* `stopWorkerLoop()` to interrupt the worker loop an all workers and to
   return control to the single workers
 
 Worker commands
@@ -97,16 +98,16 @@ Worker commands
 
 These commands can be called on a worker.
 
-* startWorkerLoop() to start the worker loop
-* receive() to receive a single PMI command
-* call(), invoke(), reduce(), create() and exec_() to receive a single
-  corresponding PMI command. Note that these commands will ignore any
-  arguments when called on a worker.
+* `startWorkerLoop()` to start the worker loop
+* `receive()` to receive a single PMI command
+* `call()`, `invoke()`, `reduce()`, `create()` and `exec_()` to
+  receive a single corresponding PMI command. Note that these commands
+  will ignore any arguments when called on a worker.
 
 PMI Proxy metaclass
 -------------------
 
-The Proxy metaclass can be used to easily generate front-end classes
+The `Proxy` metaclass can be used to easily generate front-end classes
 to distributed PMI classes.
 .
 .
@@ -116,15 +117,18 @@ Useful constants and variables
 ------------------------------
 
 The pmi module defines the following useful constants:
-* IS_CONTROLLER is True when used on the controller, False otherwise
-* IS_WORKER = not IS_CONTROLLER
-* ID is the numerical Id of the thread ( = mpi.world.rank)
-* CONTROLLER is the numerical Id of the controller thread (the MPI root)
-* WORKERSTR is a string describing the thread ('Worker #' or 'Controller')
+
+* `IS_CONTROLLER` is True when used on the controller, False otherwise
+* `IS_WORKER` = not IS_CONTROLLER
+* `ID` is the numerical Id of the thread ( = mpi.world.rank)
+* `CONTROLLER` is the numerical Id of the controller thread (the MPI root)
+* `WORKERSTR` is a string describing the thread ('Worker #' or 'Controller')
 
 and the following variables:
-* inWorkerLoop is True, if PMI currently executes the worker loop on
+
+* `inWorkerLoop` is True, if PMI currently executes the worker loop on
   the workers.
+
 """
 import logging, types, sys, inspect
 from espresso import boostmpi as mpi
@@ -145,7 +149,7 @@ __all__ = [
 ##################################################
 def exec_(*args) :
     """Controller command that executes arbitrary python code on all workers.
-    
+
     exec_() allows to execute arbitrary Python code on all workers.
     It can be used to import modules, or to define classes and
     functions on all workers.
@@ -154,6 +158,7 @@ def exec_(*args) :
     workers.
 
     Example:
+    
     >>> pmi.exec_('import hello')
     >>> hw = pmi.create('hello.HelloWorld')
     """
@@ -198,13 +203,13 @@ def __workerExecfile_(file):
 def create(cls=None, *args, **kwds) :
     """Controller command that creates an object on all workers.
 
-    cls describes the (new-style) class that should be
-    instantiated.
-    *args are the arguments to the constructor of the class.
-    Only classes that are known to PMI can be used, that is, classes
-    that have been imported to pmi via exec_() or import_().
+    cls describes the (new-style) class that should be instantiated.
+    args are the arguments to the constructor of the class.  Only
+    classes that are known to PMI can be used, that is, classes that
+    have been imported to pmi via `exec_()` or `import_()`.
 
     Example:
+    
     >>> pmi.exec_('import hello')
     >>> hw = pmi.create('hello.HelloWorld')
     >>> print(hw)
@@ -212,9 +217,10 @@ def create(cls=None, *args, **kwds) :
     MPI process #1: Hello World!
     ...
 
-    # Alternative.
-    # Note that in this case the class has to be imported to the
-    # calling module AND via PMI.
+    Alternative:
+    Note that in this case the class has to be imported to the
+    calling module *and* via PMI.
+    
     >>> import hello
     >>> pmi.exec_('import hello')
     >>> hw = pmi.create(hello.HelloWorld)
@@ -273,16 +279,17 @@ def __workerCreate(cls, oid, *targs, **tkwds) :
 def call(*args, **kwds) :
     """Call a function on all workers, returning only the return value on the controller.
 
-    function denotes the function that is to be called, *args and
-    **kwds are the arguments to the function. If **kwds contains keys
-    that start with with the prefix '__pmictr_', they are stripped of
-    the prefix and are passed only to the controller.
+    function denotes the function that is to be called, args and kwds
+    are the arguments to the function. If kwds contains keys that
+    start with with the prefix '__pmictr_', they are stripped of the
+    prefix and are passed only to the controller.
     If the function should return any results, it will be locally
     returned.
     Only functions that are known to PMI can be used, that is functions
-    that have been imported to pmi via exec_() or import_().
+    that have been imported to pmi via `exec_()` or `import_()`.
     
     Example:
+    
     >>> pmi.exec_('import hello')
     >>> hw = pmi.create('hello.HelloWorld')
     >>> pmi.call(hw.hello)
@@ -290,8 +297,8 @@ def call(*args, **kwds) :
     >>> pmi.call('hello.HelloWorld', hw)
     
     Note, that you can use only functions that are know to PMI when
-    call() is called, i.e. functions in modules that have 
-    been imported via exec_().
+    `call()` is called, i.e. functions in modules that have 
+    been imported via `exec_()`.
     """
     if __checkController(call) :
         if len(args) == 0:
@@ -330,17 +337,18 @@ def localcall(*args, **kwds):
 def invoke(*args, **kwds) :
     """Invoke a function on all workers, gathering the return values into a list.
 
-    function denotes the function that is to be called, *args and
-    **kwds are the arguments to the function. If **kwds contains keys
+    function denotes the function that is to be called, args and
+    kwds are the arguments to the function. If kwds contains keys
     that start with with the prefix '__pmictr_', they are stripped of
     the prefix and are passed only to the controller.
 
     On the controller, invoke() returns the results of the different
     workers as a list. On the workers, invoke returns None.
     Only functions that are known to PMI can be used, that is functions
-    that have been imported to pmi via exec_() or import_().
+    that have been imported to pmi via `exec_()` or `import_()`.
 
     Example:
+    
     >>> pmi.exec_('import hello')
     >>> hw = pmi.create('hello.HelloWorld')
     >>> messages = pmi.invoke(hw.hello())
@@ -375,7 +383,7 @@ def reduce(*args, **kwds) :
 
     reduceOp is the (associative) operator that is used to process the
     return values, function denotes the function that is to be called,
-    *args and **kwds are the arguments to the function. If **kwds
+    args and kwds are the arguments to the function. If kwds
     contains keys that start with with the prefix '__pmictr_', they
     are stripped of the prefix and are passed only to the controller.
 
@@ -383,9 +391,10 @@ def reduce(*args, **kwds) :
     single value via the operation reduceOp. reduceOp is assumed to be
     associative.
     Both reduceOp and function have to be known to PMI, that is they
-    must have been imported to pmi via exec_() or import_().
+    must have been imported to pmi via `exec_()` or `import_()`.
 
     Example:
+    
     >>> pmi.exec_('import hello')
     >>> pmi.exec_('joinstr=lambda a,b: \"\\n\".join(a,b)')
     >>> hw = pmi.create('hello.HelloWorld')
@@ -485,7 +494,7 @@ def startWorkerLoop() :
     """Worker command that starts the main worker loop.
 
     This function starts a loop that expects to receive PMI commands
-    until stopWorkerLoop() or finalizeWorkers() is called on the
+    until `stopWorkerLoop()` or `finalizeWorkers()` is called on the
     controller.
     """
     # On the controller, leave immediately
@@ -510,7 +519,7 @@ def finalizeWorkers():
 def stopWorkerLoop(doExit=False) :
     """Controller command that stops all workers.
 
-    If \"exit\" is set, the workers exit afterwards.
+    If doExit is set, the workers exit afterwards.
     """
     if __checkController(stopWorkerLoop) :
         log.info('Calling all workers to stop.')
@@ -528,7 +537,7 @@ def __workerStop(doExit) :
 
 def registerAtExit() :
     """Controller command that registers the function
-    finalizeWorkers() via atexit. 
+    `finalizeWorkers()` via atexit. 
     """
     if __checkController(registerAtExit) :
         import atexit
@@ -541,9 +550,8 @@ def registerAtExit() :
 ## PROXY METACLASS
 ##################################################
 class Proxy(type):
-    class Initializer(object):
-        """Creates the PMI object of a proxy class.
-        """
+    """A metaclass to be used to create frontend serial objects."""
+    class _Initializer(object):
         def __init__(self, pmiobjectclassdef):
             self.pmiobjectclassdef = pmiobjectclassdef
         def __call__(self, method_self, *args, **kwds):
@@ -556,28 +564,28 @@ class Proxy(type):
                 pmiobjectclass = _translateClass(self.pmiobjectclassdef)
                 method_self.pmiobject = create(pmiobjectclass, *args, **kwds)
 
-    class LocalCaller(object):
+    class _LocalCaller(object):
         def __init__(self, methodName):
             self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
             method = getattr(method_self.pmiobject, self.methodName)
             return localcall(method, *args, **kwds)
 
-    class PMICaller(object):
+    class _PMICaller(object):
         def __init__(self, methodName):
             self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
             method = getattr(method_self.pmiobject, self.methodName)
             return call(method, *args, **kwds)
 
-    class PMIInvoker(object):
+    class _PMIInvoker(object):
         def __init__(self, methodName):
             self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
             method = getattr(method_self.pmiobject, self.methodName)
             return invoke(method, *args, **kwds)
 
-    class PropertyLocalGetter(object):
+    class _PropertyLocalGetter(object):
         def __init__(self, propName):
             self.propName = propName
         def __call__(self, method_self):
@@ -585,7 +593,7 @@ class Proxy(type):
             getter = getattr(property, 'fget')
             return getter(method_self.pmiobject)
 
-    class PropertyPMISetter(object):
+    class _PropertyPMISetter(object):
         def __init__(self, propName):
             self.propName = propName
         def __call__(self, method_self, val):
@@ -613,7 +621,7 @@ class Proxy(type):
                          % (name, pmiobjectclassdef))
 
                 # define cls.pmiinit
-                cls.__addMethod('pmiinit', Proxy.Initializer(pmiobjectclassdef))
+                cls.__addMethod('pmiinit', Proxy._Initializer(pmiobjectclassdef))
                 if not isinstance(cls.__init__, types.MethodType):
                     log.debug('  redirecting __init__ to pmiinit')
                     cls.__init__ = cls.pmiinit
@@ -624,26 +632,26 @@ class Proxy(type):
                 for methodName in defs['localcall']:
                     log.debug('  adding local call to %s' % methodName)
                     cls.__addMethod(methodName, 
-                                    Proxy.LocalCaller(methodName))
+                                    Proxy._LocalCaller(methodName))
 
             if 'pmicall' in defs:
                 for methodName in defs['pmicall']:
                     log.debug('  adding pmi call to %s' % methodName)
                     cls.__addMethod(methodName, 
-                                    Proxy.PMICaller(methodName))
+                                    Proxy._PMICaller(methodName))
 
             if 'pmiinvoke' in defs:
                 for methodName in defs['pmiinvoke']:
                     log.debug('  adding pmi invoke of %s' % methodName)
                     cls.__addMethod(methodName, 
-                                    Proxy.PMIInvoker(methodName))
+                                    Proxy._PMIInvoker(methodName))
 
             if 'pmiproperty' in defs:
                 for propname in defs['pmiproperty']:
                     log.debug('  adding pmi property %s' % propname)
                     newprop = property(
-                        Proxy.PropertyLocalGetter(propname),
-                        Proxy.PropertyPMISetter(propname))
+                        Proxy._PropertyLocalGetter(propname),
+                        Proxy._PropertyPMISetter(propname))
                     setattr(cls, propname, newprop)
 
 ##################################################
@@ -698,7 +706,7 @@ def receive(expected=None) :
 
     This function waits to receive and handle a single PMI command. If
     expected is not None and the received command does not equal
-    \"expected\", raise a UserError.
+    expected, raise a `UserError`.
     """
     __checkWorker(receive)
     if expected is None:
