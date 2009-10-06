@@ -1,21 +1,9 @@
 nobase_pkginclude_HEADERS += \
 	esutil/Collectives.hpp \
-	esutil/SmallVector.hpp \
-	esutil/DerivableSmallVector.hpp \
-	esutil/Vector3D.hpp \
-        esutil/Box.hpp \
-        esutil/Grid.hpp \
-        esutil/Tensor.hpp \
-	esutil/TupleVector.hpp \
-	esutil/VectorTraits.hpp \
 	esutil/Timer.hpp \
-	esutil/virtual_functional.hpp \
-        esutil/Logger.hpp \
-	esutil/SignalBindingTraits.hpp \
-	esutil/MultiSignalConnections.hpp
+        esutil/Logger.hpp
 
 libespresso_common_la_SOURCES += \
-	esutil/TupleVector.cpp \
 	esutil/Collectives.cpp \
 	esutil/Timer.cpp 
 

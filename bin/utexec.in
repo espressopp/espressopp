@@ -122,28 +122,28 @@ do_python = do_cpp = do_parallel = False
 num_tasks = 2
 recursive = False
 for k, v in optlist:
-    if k == '-h' or k == '--help':
+    if k in ('-h', '--help'):
         Usage()
         sys.exit(0)
-    elif k == '-v' or k == '--verbose':
+    elif k in ('-v', '--verbose'):
         verbose = True
-    elif k == '-s' or k == '--subdir':
+    elif k in ('-s', '--subdir'):
         subdir = v
-    elif k == '-n' or k == '--dry-run':
+    elif k in ('-n', '--dry-run'):
         dryrun = True
-    elif k == '-p' or k == '--python':
+    elif k in ('-p', '--python'):
         do_python = True
-    elif k == '-P' or k == '--parallel':
+    elif k in ('-P', '--parallel'):
         do_parallel = True
-    elif k == '-c' or k == '--cpp':
+    elif k in ('-c', '--cpp'):
         do_cpp = True
-    elif k == '-t' or k == '--num-tasks':
+    elif k in ('-t', '--num-tasks'):
         num_tasks = int(v)
-    elif k == '-C' or k == '--clean':
+    elif k in ('-C', '--clean'):
         clean = True
-    elif k == '-1' or k == '--single-test':
+    elif k in ('-1', '--single-test'):
         single_test = True
-    elif k == '-r' or k == '--recursive':
+    elif k in ('-r', '--recursive'):
         recursive = True
 
 if not clean and not do_python and not do_cpp and not do_parallel:

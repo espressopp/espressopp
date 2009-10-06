@@ -2,4 +2,4 @@ if EXTERNAL_BOOST
 else
   MAYBE_BOOST = boost
 endif
-SUBDIRS=$(MAYBE_BOOST) boostmpi
+SUBDIRS=$(MAYBE_BOOST)

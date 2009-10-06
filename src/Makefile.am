@@ -9,13 +9,6 @@ python_LTLIBRARIES =
 include SubMakefile.am
 include include/SubMakefile.am
 include esutil/SubMakefile.am
-include storage/SubMakefile.am
-include particles/SubMakefile.am
-include pairs/SubMakefile.am
-include potential/SubMakefile.am
-include bc/SubMakefile.am
-include integrator/SubMakefile.am
-include thermostat/SubMakefile.am
 
 CLEANFILES =
 
@@ -47,7 +40,6 @@ pypresso_SOURCES = pypresso.cpp
 pypresso_LDADD = \
 	libespresso_common.la \
 	libpylogger.la \
-	../contrib/boostmpi/libboostmpi.la \
 	$(PYTHON_LIBS) \
 	$(MPI_LIBS)
 

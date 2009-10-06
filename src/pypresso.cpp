@@ -44,15 +44,15 @@ int main(int argc, char **argv)
     exit(-1);
   }
 
-#ifndef BOOST_MPI_PYTHON_EXT
-  if (PyImport_AppendInittab(const_cast<char *>("_boostmpi"), 
-			     init_boostmpi) == -1) {
-    cerr << "Could not add the builtin module _boostmpi to python's list of preloaded modules."
-	 << endl;
-    exit(-1);
-  }
+// #ifndef BOOST_MPI_PYTHON_EXT
+//   if (PyImport_AppendInittab(const_cast<char *>("_boostmpi"), 
+// 			     init_boostmpi) == -1) {
+//     cerr << "Could not add the builtin module _boostmpi to python's list of preloaded modules."
+// 	 << endl;
+//     exit(-1);
+//   }
 
-#endif
+// #endif
 
   Py_Initialize();
 

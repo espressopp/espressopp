@@ -254,7 +254,6 @@ AC_CONFIG_HEADERS([src/acconfig.hpp])
 AC_CONFIG_FILES([Makefile 
                  contrib/Makefile
                  contrib/boost/Makefile
-                 contrib/boostmpi/Makefile
                  src/Makefile 
 		 poc/Makefile
 		 doc/Makefile
@@ -262,8 +261,6 @@ AC_CONFIG_FILES([Makefile
                  test/Makefile
                  test/modules/Makefile
                  test/modules/logging/Makefile 
-                 test/modules/forceloop/Makefile
-                 test/modules/blockvector/Makefile
                  test/external/Makefile 
                  test/external/mpi/Makefile 
                  test/external/boost.mpi/Makefile 

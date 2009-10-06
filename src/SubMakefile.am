@@ -1,23 +1,10 @@
-nobase_pkginclude_HEADERS += \
-	estypes.hpp \
-	Real3D.hpp \
-	RealTensor.hpp \
-	Property.hpp \
-	Particle.hpp
+#nobase_pkginclude_HEADERS += 
 
 libespresso_common_la_SOURCES += \
-	bindings.cpp \
-	Real3D.cpp \
-	RealTensor.cpp \
-	Property.cpp \
-	Particle.cpp
+	bindings.cpp
 
 python_SCRIPTS += \
 	__init__.py \
 	unittest/__init__.py \
 	__setup.py \
-	boostmpi.py \
-	pmi.py \
-	Property.py \
-	Real3D.py \
-	RealTensor.py
+	pmi.py
