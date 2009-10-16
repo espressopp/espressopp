@@ -1,7 +1,7 @@
 #ifndef _ESUTIL_COLLECTIVES_HPP
 #define _ESUTIL_COLLECTIVES_HPP
 #include <stdexcept>
-#include <boost/mpi.hpp>
+#include "mpi.hpp"
 
 namespace espresso { namespace esutil { namespace Collectives {
   const int None = -1;

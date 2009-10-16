@@ -5,6 +5,7 @@
 #include <boost/make_shared.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <exception>
+#include "estypes.hpp"
 
 namespace espresso {
   using boost::shared_ptr;

@@ -1,8 +1,9 @@
 nobase_pkginclude_HEADERS += \
-	Storage.hpp 
+	RNG.hpp \
+	bindings.hpp
 
 libespresso_common_la_SOURCES += \
-	Storage.cpp \
+	RNG.cpp \
 	bindings.cpp
 
 python_SCRIPTS += \

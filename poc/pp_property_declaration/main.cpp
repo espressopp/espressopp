@@ -6,17 +6,13 @@
 
 struct Particle {
   struct Basic {
-
 #define PROPERTY(name, descriptor) descriptor::Type name;
 #include "PropertyDeclarations.hpp"
-
   } basic;
 
   struct Local {
-
 #define LOCALPROPERTY(name, descriptor) descriptor::Type name;
 #include "PropertyDeclarations.hpp"
-
   } local;
 };
 

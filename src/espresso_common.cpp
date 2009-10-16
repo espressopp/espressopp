@@ -2,9 +2,10 @@
 
 #include <mpi.hpp>
 
-
 /** the one and only instance of the MPI environment */
 static boost::mpi::environment *theEnvironment = 0;
+
+boost::mpi::communicator mpiWorld;
 
 /** Initialize MPI. */
 void initMPI(int &argc, char **&argv) {

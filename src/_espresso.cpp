@@ -5,7 +5,6 @@
 #include "acconfig.hpp"
 #include "espresso_common.hpp"
 #include "python.hpp"
-#include "esutil/PyLogger.hpp"
 
 static void finalize();
 
