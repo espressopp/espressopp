@@ -1,8 +1,14 @@
 nobase_pkginclude_HEADERS += \
+	GhostCellGrid.hpp \
+	NodeGrid.hpp \
+	Storage.hpp 
 	RNG.hpp \
 	bindings.hpp
 
 libespresso_common_la_SOURCES += \
+	GhostCellGrid.cpp \
+	NodeGrid.cpp \
+	Storage.cpp \
 	RNG.cpp \
 	bindings.cpp
 
