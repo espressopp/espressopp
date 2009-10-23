@@ -1,15 +1,12 @@
 /** \file GenLogger.cpp    Implementation of a genereric Logging facility
 
-<b>Responsible:</b>
-<a href="mailto:brandes@scai.fraunhofer.de">Thomas Brandes</a>
-
 */
-
 
 #include <iostream>
 
 #include <logging.hpp>
-#include <cstdlib>          // import getenv
+#include <cstdlib>
+#include <cstdio> 
 
 #include "GenLogger.hpp"
 
