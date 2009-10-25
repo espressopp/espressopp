@@ -34,8 +34,12 @@ public:
   void sendGhostData();
   void collectGhostForces();
 
-  const std::vector<Cell *> &getActiveCells()     const { return localCells; }
-  const std::vector<Cell *> &getAllPassiveCells() const { return ghostCells; }
+  const NodeGrid      &getNodeGrid() const { return nodeGrid; }
+  const GhostCellGrid &getGCGrid() const { return cellGrid; }
+
+  const std::vector<Cell> &getAllCells()      const { return cells; }
+  const std::vector<Cell *> &getActiveCells() const { return localCells; }
+  const std::vector<Cell *> &getGhostCells()  const { return ghostCells; }
 
 protected:
   // generic cells
