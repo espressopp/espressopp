@@ -23,8 +23,8 @@ struct ParticleMomentum {
 };
 
 struct ParticleLocal {
-  size_t    i[3];
-  size_t ghost;
+  integer i[3];
+  integer ghost;
 };
 
 struct Particle {
@@ -33,6 +33,11 @@ struct Particle {
   ParticleMomentum m;
   ParticleForce f;
   ParticleLocal l;
+
+  void init() {
+    m.v[0] = m.v[1] = m.v[2] = 0;
+    p.type = 0;
+  }
 };
 
 typedef std::vector<Particle> Cell;

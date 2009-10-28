@@ -1,10 +1,22 @@
 #define PARALLEL_TEST_MODULE DomainDecomposition
 #include "ut.hpp"
+#include <memory>
 
 #include "mpi.hpp"
+#include "logging.hpp"
 #include "../Storage.hpp"
+#include "../RNG.hpp"
 
 using namespace espresso;
+
+struct LoggingFixture {  
+  LoggingFixture() { 
+    LOG4ESPP_CONFIGURE();
+    log4espp::Logger::getRoot().setLevel(log4espp::Logger::TRACE);
+  }
+};
+
+BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
 BOOST_AUTO_TEST_CASE(constructDomainDecomposition) 
 {
@@ -86,7 +98,7 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
 }
 
 struct Fixture {
-  DomainDecomposition *domdec;
+  std::auto_ptr<DomainDecomposition> domdec;
   System system;
 
   Fixture() {
@@ -95,17 +107,22 @@ struct Fixture {
     system.boxL[2] = 3.0;
     integer nodeGrid[3] = { boost::mpi::communicator().size(), 1, 1 };
     integer cellGrid[3] = { 1, 2, 3 };
-    domdec = new DomainDecomposition(&system,
-				     boost::mpi::communicator(),
-				     nodeGrid,
-				     cellGrid,
-				     true);
-  }
-  ~Fixture() {
-    delete domdec;
+    domdec = std::auto_ptr<DomainDecomposition>
+      (new DomainDecomposition(&system,
+			       boost::mpi::communicator(),
+			       nodeGrid,
+			       cellGrid,
+			       true));
   }
 };
 
 BOOST_FIXTURE_TEST_CASE(addParticles, Fixture) 
 {
+  RNG rng;
+
+  for (int i = 0; i < 10; ++i) {
+    real pos[3] = { 5*rng(), 3*rng(), 9*rng() };
+    domdec->addParticle(i, pos);
+  }
+  BOOST_CHECK_EQUAL(domdec->getNActiveParticles(), integer(10));
 }

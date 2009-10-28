@@ -22,11 +22,28 @@ public:
 /** at present, this is just the domain decomposition. */
 class DomainDecomposition {
 public:
+  // generic Storage
+  ///////////////////////////////////////////////////
+
+  void addParticle(integer id, const real pos[3]);
+
+
+  integer getNActiveParticles() const;
+
+  const std::vector<Cell> &getAllCells()      const { return cells; }
+  const std::vector<Cell *> &getActiveCells() const { return localCells; }
+  const std::vector<Cell *> &getGhostCells()  const { return ghostCells; }
+
+  // domain decomposition
+  ///////////////////////////////////////////////////
+
   DomainDecomposition(System *,
 		      const boost::mpi::communicator &,
 		      integer nodeGrid[3],
 		      integer cellGrid[3],
 		      bool useVList);
+
+  virtual ~DomainDecomposition() {}
 
   void fetchParticles(DomainDecomposition *);
 
@@ -34,19 +51,26 @@ public:
   void sendGhostData();
   void collectGhostForces();
 
+  virtual Cell *mapPositionToCellClipping(const real pos[3]);
+  virtual Cell *mapPositionToCellChecked(const real pos[3]);
+
   const NodeGrid      &getNodeGrid() const { return nodeGrid; }
   const GhostCellGrid &getGCGrid() const { return cellGrid; }
 
-  const std::vector<Cell> &getAllCells()      const { return cells; }
-  const std::vector<Cell *> &getActiveCells() const { return localCells; }
-  const std::vector<Cell *> &getGhostCells()  const { return ghostCells; }
-
 protected:
-  // generic cells
+  // generic Storage
   ///////////////////////////////////////////////////
 
   // update the id->local particle map for the given cell
   void updateLocalParticles(Cell *);
+  // append a particle to a list, without updating localParticles
+  Particle *appendUnindexedParticle(Cell *, Particle *);
+  // append a particle to a list, updating localParticles
+  Particle *appendIndexedParticle(Cell *, Particle *);
+  // move a particle from one list to another, without updating localParticles
+  Particle *moveUnindexedParticle(Cell *dst, Cell *src, integer srcpos);
+  // move a particle from one list to another, updating localParticles
+  Particle *moveIndexedParticle(Cell *dst, Cell *src, integer srcpos);
 
   /// map particle id to Particle *
   boost::unordered_map<integer, Particle * > localParticles;
@@ -56,7 +80,6 @@ protected:
 private:
   // domain decomposition
   ///////////////////////////////////////////////////
-
 
   /** Structure containing information about local interactions
       with particles in a neighbor cell. */

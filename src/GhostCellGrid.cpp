@@ -49,8 +49,8 @@ integer GhostCellGrid::mapPositionToCellClipping(const real pos[3]) const
     if (cpos[i] < frame) {
       cpos[i] = frame;
     }
-    else if (cpos[i] >= getGridSize(i) - frame) {
-      cpos[i] = getGridSize(i) - frame - 1;
+    else if (cpos[i] >= getGhostGridSize(i) - frame) {
+      cpos[i] = getGhostGridSize(i) - frame - 1;
     }
   }
   return getLinearIndex(cpos);  
@@ -75,9 +75,9 @@ integer GhostCellGrid::mapPositionToCellChecked(const real pos[3]) const
 	return noCell;
       }
     }
-    else if (cpos[i] >= getGridSize(i) - frame) {
+    else if (cpos[i] >= getGhostGridSize(i) - frame) {
       if (pos[i] < myRight[i] + ROUND_ERROR_PREC) {
-	cpos[i] = getGridSize(i) - frame - 1;
+	cpos[i] = getGhostGridSize(i) - frame - 1;
       }
       else {
 	return noCell;
