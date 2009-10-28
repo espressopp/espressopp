@@ -125,4 +125,16 @@ BOOST_FIXTURE_TEST_CASE(addParticles, Fixture)
     domdec->addParticle(i, pos);
   }
   BOOST_CHECK_EQUAL(domdec->getNActiveParticles(), integer(10));
+
+  integer nodeGrid[3] = { boost::mpi::communicator().size(), 1, 1 };
+  integer cellGrid[3] = { 10, 5, 4 };
+
+  DomainDecomposition domdec2(&system,
+                              boost::mpi::communicator(),
+                              nodeGrid,
+                              cellGrid,
+                              true);
+  domdec2.fetchParticles(*domdec);
+
+  BOOST_CHECK_EQUAL(domdec2.getNActiveParticles(), integer(10));
 }

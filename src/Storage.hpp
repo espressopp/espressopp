@@ -19,6 +19,43 @@ public:
   NodeGridMismatch();
 };
 
+/**
+   Iterates all Particles in a list of cells. This is a Python-like,
+   self-contained iterator: isValid() tells whether there are more
+   particles to come.
+*/
+class ParticleIterator {
+public:
+  ParticleIterator(std::vector<Cell *> &lst)
+    : cCell(lst.begin()), endCell(lst.end()), part(0)
+  {
+    if (!isValid()) return;
+    end = (*cCell)->size();
+    if (part >= end) {
+      findNonemptyCell();
+    }
+  }
+  
+  ParticleIterator &operator++()
+  {
+    if (++part >= end) {
+      findNonemptyCell();
+    }
+    return *this;
+  }
+
+  bool isValid() const { return cCell != endCell; }
+
+  Particle &operator*() const { return (*(*cCell))[part]; }
+  Particle *operator->() const { return &((*(*cCell))[part]); }
+
+private:
+  void findNonemptyCell();
+
+  std::vector<Cell *>::iterator cCell, endCell;
+  integer part, end;
+};
+
 /** at present, this is just the domain decomposition. */
 class DomainDecomposition {
 public:
@@ -30,9 +67,9 @@ public:
 
   integer getNActiveParticles() const;
 
-  const std::vector<Cell> &getAllCells()      const { return cells; }
-  const std::vector<Cell *> &getActiveCells() const { return localCells; }
-  const std::vector<Cell *> &getGhostCells()  const { return ghostCells; }
+  std::vector<Cell> &getAllCells()      { return cells; }
+  std::vector<Cell *> &getActiveCells() { return localCells; }
+  std::vector<Cell *> &getGhostCells()  { return ghostCells; }
 
   // domain decomposition
   ///////////////////////////////////////////////////
@@ -45,7 +82,7 @@ public:
 
   virtual ~DomainDecomposition() {}
 
-  void fetchParticles(DomainDecomposition *);
+  void fetchParticles(DomainDecomposition &);
 
   void exchangeAndSortParticles();
   void sendGhostData();

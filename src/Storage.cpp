@@ -12,6 +12,15 @@ using namespace boost;
 NodeGridMismatch::NodeGridMismatch()
   : std::runtime_error("specified node grid does not match number of nodes in the communicator") {}
 
+void ParticleIterator::findNonemptyCell()
+{
+  part = 0;
+  while (++cCell != endCell) {
+    end = (*cCell)->size();
+    if (end > 0) break;
+  }      
+}
+
 void DomainDecomposition::createCellGrid(const integer _nodeGrid[3], const integer _cellGrid[3])
 {
   real myLeft[3];
@@ -147,33 +156,24 @@ DomainDecomposition::DomainDecomposition(System *_system,
 }
 
 
-void DomainDecomposition::fetchParticles(Storage *old)
+void DomainDecomposition::fetchParticles(Storage &old)
 {
-#if 0
-
   LOG4ESPP_INFO(logger, "number of received cells = "
-		<< (old ? old->getActiveCells().size() : 0));
+		<< old.getActiveCells().size());
 
-  /* copy particles */
-  for (c = 0; c < old->n; c++) {
-    part = old->cell[c]->part;
-    np   = old->cell[c]->n;
-    for (p = 0; p < np; p++) {
-      Cell *nc = dd_save_position_to_cell(part[p].r.p);
-      /* particle does not belong to this node. Just stow away
-	 somewhere for the moment */
-      if (nc == NULL)
-	nc = local_cells.cell[0];
-      append_unindexed_particle(nc, &part[p]);
-    }
+  for (ParticleIterator it(old.getActiveCells());
+       it.isValid(); ++it) {
+    Particle &part = *it;
+    Cell *nc = mapPositionToCellClipping(part.r.p);
+    appendUnindexedParticle(nc, &part);
   }
 
-  // update local particles
-  for(c=0; c<local_cells.n; c++) {
-    update_local_particles(local_cells.cell[c]);
+  // update localParticles
+  for(std::vector<Cell *>::iterator it = localCells.begin(),
+	end = localCells.end();
+      it != end; ++it) {
+    updateLocalParticles(*it);
   }
-
-#endif
 }
 
 void DomainDecomposition::exchangeAndSortParticles()
