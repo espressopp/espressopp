@@ -5,19 +5,10 @@
 #include <boost/unordered_map.hpp>
 #include "log4espp.hpp"
 
-#include "GhostCellGrid.hpp"
-#include "NodeGrid.hpp"
 #include "Particle.hpp"
 #include "System.hpp"
-#include <stdexcept>
 
 typedef std::vector< std::pair<int,int> > PairList;
-
-class NodeGridMismatch: public std::runtime_error
-{
-public:
-  NodeGridMismatch();
-};
 
 /**
    Iterates all Particles in a list of cells. This is a Python-like,
@@ -29,7 +20,10 @@ public:
   ParticleIterator(std::vector<Cell *> &lst)
     : cCell(lst.begin()), endCell(lst.end()), part(0)
   {
-    if (!isValid()) return;
+    if (!isValid()) {
+      end = 0;
+      return;
+    }
     end = (*cCell)->size();
     if (part >= end) {
       findNonemptyCell();
@@ -56,48 +50,27 @@ private:
   integer part, end;
 };
 
-/** at present, this is just the domain decomposition. */
-class DomainDecomposition {
+/** represents the particle storage of one system. */
+class Storage {
 public:
-  // generic Storage
-  ///////////////////////////////////////////////////
+  Storage(System *,
+          const boost::mpi::communicator &,
+          bool useVList);
+  virtual ~Storage();
 
   void addParticle(integer id, const real pos[3]);
 
-
   integer getNActiveParticles() const;
+  void fetchParticles(Storage &);
 
   std::vector<Cell> &getAllCells()      { return cells; }
   std::vector<Cell *> &getActiveCells() { return localCells; }
   std::vector<Cell *> &getGhostCells()  { return ghostCells; }
 
-  // domain decomposition
-  ///////////////////////////////////////////////////
-
-  DomainDecomposition(System *,
-		      const boost::mpi::communicator &,
-		      integer nodeGrid[3],
-		      integer cellGrid[3],
-		      bool useVList);
-
-  virtual ~DomainDecomposition() {}
-
-  void fetchParticles(DomainDecomposition &);
-
-  void exchangeAndSortParticles();
-  void sendGhostData();
-  void collectGhostForces();
-
-  virtual Cell *mapPositionToCellClipping(const real pos[3]);
-  virtual Cell *mapPositionToCellChecked(const real pos[3]);
-
-  const NodeGrid      &getNodeGrid() const { return nodeGrid; }
-  const GhostCellGrid &getGCGrid() const { return cellGrid; }
+  virtual Cell *mapPositionToCellClipping(const real pos[3]) = 0;
+  virtual Cell *mapPositionToCellChecked(const real pos[3]) = 0;
 
 protected:
-  // generic Storage
-  ///////////////////////////////////////////////////
-
   // update the id->local particle map for the given cell
   void updateLocalParticles(Cell *);
   // append a particle to a list, without updating localParticles
@@ -114,10 +87,6 @@ protected:
   boost::mpi::communicator comm;
   System *system;
   
-private:
-  // domain decomposition
-  ///////////////////////////////////////////////////
-
   /** Structure containing information about local interactions
       with particles in a neighbor cell. */
   struct IANeighbor {
@@ -147,19 +116,6 @@ private:
   */
   typedef std::vector<IANeighbor> IANeighborList;
 
-  /// init global Verlet list
-  void initCellInteractions();
-  /// set the grids and allocate space accordingly
-  void createCellGrid(const integer _nodeGrid[3], const integer _cellGrid[3]);
-  /// sort cells into local/ghost cell arrays
-  void markCells();
-
-  /// spatial domain decomposition of nodes
-  NodeGrid nodeGrid;
-
-  /// spatial domain decomposition on node in cells
-  GhostCellGrid cellGrid;
-
   /** flag for using Verlet List. */
   integer useVList;
 
@@ -176,7 +132,5 @@ private:
 
   static LOG4ESPP_DECL_LOGGER(logger);
 };
-
-typedef DomainDecomposition Storage;
 
 #endif

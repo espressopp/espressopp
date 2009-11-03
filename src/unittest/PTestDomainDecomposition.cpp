@@ -4,7 +4,7 @@
 
 #include "mpi.hpp"
 #include "logging.hpp"
-#include "../Storage.hpp"
+#include "../DomainDecomposition.hpp"
 #include "../RNG.hpp"
 
 using namespace espresso;

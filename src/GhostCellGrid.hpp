@@ -42,17 +42,31 @@ public:
   }
 
   /// get start of inner grid
-  integer getInnerCellsBegin(integer i)const { return frame; }
+  integer getInnerCellsBegin(int i)const { return frame; }
   /// get first element after inner elements
-  integer getInnerCellsEnd(integer i) const { return Grid::getGridSize(i) - frame; }
+  integer getInnerCellsEnd(int i) const { return Grid::getGridSize(i) - frame; }
+
   /// inner size without the ghost frame
-  integer getGridSize(integer i)      const { return Grid::getGridSize(i) - extraSize; }
+  integer getGridSize(int i)      const { return Grid::getGridSize(i) - extraSize; }
   /// full size including the ghost frame
-  integer getGhostGridSize(integer i) const { return Grid::getGridSize(i); }
-  /// full size including the ghost frame
-  const integer *getGhostGridSize() const { return Grid::getGridSize(); }
+  integer getGhostGridSize(int i) const { return Grid::getGridSize(i); }
+
+  /// start coordinates of the domain
+  real getMyLeft(int i) const { return myLeft[i]; }
+  /// start coordinates of the domain
+  const real *getMyLeft() const { return myLeft; }
+  /// end coordinates of the domain
+  real getMyRight(int i) const { return myRight[i]; }
+  /// end coordinates of the domain
+  const real *getMyRight() const { return myRight; }
+
+  /// size of a cell
+  real getCellSize(int i) const { return cellSize[i]; }
   /// size of a cell
   const real *getCellSize() const { return cellSize; }
+
+  /// inverse of the size of a cell
+  real getInverseCellSize(int i) const { return invCellSize[i]; }
   /// inverse of the size of a cell
   const real *getInverseCellSize() const { return invCellSize; }
 
