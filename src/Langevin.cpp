@@ -69,22 +69,29 @@ class Langevin {
       \param gamma Friction constant for the Langevin thermostat.
   */
 
-  Langevin(System* _system, double _gamma, double _temperature)
+  Langevin(double _gamma, double _temperature)
 
   {
-    system      = _system;
     temperature = _temperature;
     gamma       = _gamma;
   }
 
+  void connect(MDIntegrator &integrator) {
+    integrator.startIntegration.connect(init);
+    // APPLY?
+    // heatUp?
+    // coolDown?
+  }
+
   /** Prefactors have to be calculated only once before the first iteration */
 
-  void init()
+  void init(MDIntegrator &integrator)
 
-  { // calclate the prefactors
+  { // calculate the prefactors
 
-    pref1 = -gamma * system->timeStep;
-    pref2 = sqrt(24.0 * temperature * gamma / system->timeStep);
+    real timestep = integrator.getTimeStep();
+    pref1 = -gamma * timestep;
+    pref2 = sqrt(24.0 * temperature * gamma / timestep);
   }
 
   /** very nasty: if we recalculate force when leaving/reentering the integrator,
@@ -126,13 +133,13 @@ class Langevin {
 
   /** This routine will be called by the Verlet integrator */
 
-  void apply() 
+  void apply(System &system) 
 
   { /** loop over all local particles */
 
     printf("start apply\n");
 
-    CellPList& localCells = system->localCells;
+    CellPList& localCells = system.getStorage().getActiveCells();
 
     for (int c = 0; c < localCells.n; c++) {
       printf ("local cell %d\n", c);

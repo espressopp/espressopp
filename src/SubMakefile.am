@@ -1,17 +1,19 @@
 nobase_pkginclude_HEADERS += \
 	GhostCellGrid.hpp \
+	Integrator.hpp \
 	NodeGrid.hpp \
 	Storage.hpp \
 	DomainDecomposition.hpp \
-	RNG.hpp \
+	System.hpp \
+	Particle.hpp \
 	bindings.hpp
 
 libespresso_common_la_SOURCES += \
 	GhostCellGrid.cpp \
 	NodeGrid.cpp \
 	Storage.cpp \
+	System.cpp \
 	DomainDecomposition.cpp \
-	RNG.cpp \
 	bindings.cpp
 
 python_SCRIPTS += \

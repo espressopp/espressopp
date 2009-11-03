@@ -1,11 +1,11 @@
 #define PARALLEL_TEST_MODULE RNG
-#include "ut.hpp"
+#include "include/ut.hpp"
 
 #include "mpi.hpp"
 #include <vector>
 #include "../RNG.hpp"
 
-using namespace espresso;
+using namespace espresso::esutil;
 
 // Check that a random real is between 0 and 1
 BOOST_AUTO_TEST_CASE(real_in_interval) 
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(normalDist)
   RNG rng;
 
   const int N = 10000;
-  RNG::NormalVariate::SelfPtr nv = rng.createNormalVariate(2.0, 0.5);
+  NormalVariate::SelfPtr nv = rng.createNormalVariate(2.0, 0.5);
 
   real r;
   real sum = 0.0;
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(uniformOnSphere)
 BOOST_AUTO_TEST_CASE(uniformOnSphereVariate)
 {
   RNG rng;
-  RNG::UniformOnSphere::SelfPtr uv = 
+  UniformOnSphere::SelfPtr uv = 
     rng.createUniformOnSphere(2);
 
   const int N = 10000;

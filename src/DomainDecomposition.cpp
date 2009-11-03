@@ -6,6 +6,7 @@
 #include "DomainDecomposition.hpp"
 
 using namespace boost;
+using namespace espresso;
 
 LOG4ESPP_LOGGER(DomainDecomposition::logger, "DomainDecomposition");
 

@@ -6,6 +6,7 @@
 #include "Storage.hpp"
 
 using namespace boost;
+using namespace espresso;
 
 LOG4ESPP_LOGGER(Storage::logger, "Storage");
 

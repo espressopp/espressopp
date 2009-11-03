@@ -2,10 +2,6 @@
 #define PyLogger_HPP
 
 /** \file PyLogger.hpp    Python implementation for logging.
-
-<b>Responsible:</b>
-<a href="mailto:brandes@scai.fraunhofer.de">Thomas Brandes</a>
-
 */
 
 #include <esutil/Logger.hpp>

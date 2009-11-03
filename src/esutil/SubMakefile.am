@@ -1,11 +1,18 @@
 nobase_pkginclude_HEADERS += \
 	esutil/Collectives.hpp \
 	esutil/Timer.hpp \
-        esutil/Logger.hpp
+        esutil/Logger.hpp \
+	esutil/RNG.hpp \
+	esutil/NormalVariate.hpp \
+	esutil/UniformOnSphere.hpp \
+	esutil/estypes.hpp
 
 libespresso_common_la_SOURCES += \
 	esutil/Collectives.cpp \
-	esutil/Timer.cpp 
+	esutil/Timer.cpp \
+	esutil/RNG.cpp \
+	esutil/NormalVariate.cpp \
+	esutil/UniformOnSphere.cpp
 
 python_SCRIPTS += \
 	esutil/__init__.py \

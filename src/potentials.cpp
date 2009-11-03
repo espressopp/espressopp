@@ -2,155 +2,163 @@
 #include <cmath>
 #include <vector>
 
-typedef double real;
+#include "Particle.hpp"
 
-/* from Particle.hpp */
-struct ParticleProperties {
-  size_t identity;
-  size_t type;
-};
+namespace espresso {
+  typedef std::vector<Particle> Cell;
+  /* above from Particle.hpp */
 
-struct ParticlePosition {
-  real p[3];
-};
-
-struct ParticleForce {
-  real f[3];
-  ParticleForce operator* (real s) {
-    ParticleForce tmp = {f[0] * s, f[1] * s, f[2] * s};
-    return tmp;
-  }
-};
-
-struct ParticleMomentum {
-  real v[3];
-};
-
-struct ParticleLocal {
-  size_t i[3];
-  size_t ghost;
-};
-
-struct Particle {
-  ParticleProperties p;
-  ParticlePosition r;
-  ParticleMomentum m;
-  ParticleForce f;
-  ParticleLocal l;
-};
-
-typedef std::vector<Particle> Cell;
-/* above from Particle.hpp */
-
-struct Real3D {
-  real rij[3];
-  real sqr() {
-    return pow(rij[0], 2) + pow(rij[1], 2) + pow(rij[2], 2);
-  }
-  real operator [] (size_t i) { return rij[i]; }
-};
-
-/* CRTP */
-template<typename Derived>
-class InteractionBase {
-public:
-
-  /* the next method should be moved */
-  void setParameters(real ep, real sg, real rc) {
-    static_cast<Derived*>(this)->_setParameters(ep, sg, rc);
-  }
-
-  real computeEnergySqr(Particle p1, Particle p2, real distSqr) {
-    static_cast<Derived*>(this)->_computeEnergySqr(p1, p2, distSqr);
-  }
-
-  void computeForce(Particle& p1, Particle& p2, Real3D dist) {
-    static_cast<Derived*>(this)->_computeForce(p1, p2, dist);
-  }
-
-};
-
-/* pairwise potential which implements computeEnergy and computeForce */
-class LennardJones: public InteractionBase< LennardJones > {
-private:
-
-  /* nested class to store coefficients and cutoff */
-  class Parameters {
-  private:
-    real epsilon;
-    real sigma;
-    real cutoff;
-    real cutoffSqr;
-
-  public:
-    Parameters() {}
-    Parameters(real ep, real sg, real rc) {
-      setEpsilon(ep);
-      setSigma(sg);
-      setCutoff(rc);
+  struct Real3D {
+    real rij[3];
+    real sqr() {
+      return pow(rij[0], 2) + pow(rij[1], 2) + pow(rij[2], 2);
     }
-
-    void setEpsilon(real _epsilon) { epsilon = _epsilon; }
-    real getEpsilon() const { return epsilon; }
-
-    void setSigma(real _sigma) { sigma = _sigma; }
-    real getSigma() const { return sigma; }
-
-    void setCutoff(real _cutoff) { cutoff = _cutoff; cutoffSqr = cutoff * cutoff; }
-    real getCutoff() const { return cutoff; }
-
-    real _getCutoffSqr() const { return cutoffSqr; }
+    real operator [] (size_t i) { return rij[i]; }
   };
 
-  Parameters params;
+  /* CRTP */
+  template< typename Derived >
+  class InteractionBase {
 
   public:
-
-    LennardJones(real _epsilon, real _sigma, real _cutoff) {
-      params = Parameters(_epsilon, _sigma, _cutoff);
+    // full square over two cells
+    virtual real 
+    computeCellEnergies(BoundaryConditions &bc, 
+			Cell &cell1, Cell &cell2) {
+      real e = 0.0;
+      for (int i = 0, endi = cell1.size(); i < endi; i++)
+	for (int j = 0, endj = cell2.size(); j < endj; j++) {
+	  Particle &p1 = cell1[i];
+	  Particle &p2 = cell2[j];
+	  real dist[3];
+	  real distSqr;
+	  bc.getMinimumImageVector(dist, &distSqr, p1.r.p, p2.r.p);
+	  e += computeEnergy(p1, p2, dist, distSqr);
+	}
     }
 
-    void _setParameters(real ep, real sg, real rc) {
+    // half square over a single cell
+    virtual real 
+    computeCellEnergies(BoundaryConditions &bc, 
+			Cell &cell) {
+      real e = 0.0;
+      for (int i = 0; i < cell.size(); i++)
+	for (int j = 0; j < i; j++) {
+	  Particle &p1 = cell[i];
+	  Particle &p2 = cell[j];
+	  real dist[3];
+	  real distSqr;
+	  bc.getMinimumImageVector(dist, &distSqr, p1.r.p, p2.r.p);
+	  e += computeEnergy(p1, p2, dist, distSqr);
+	}
+    }
+
+    real computeEnergy(Particle& p1, Particle& p2, 
+		       const real dist[3], real distSqr) {
+      Parameters &params = getParameters(p1.type, p2.type);
+      if (distSqr < params.getCutoffSqr()) {
+	return static_cast< Derived* >(this)->computeEnergy(p1, p2, params, distSqr);
+      } else return 0.0;
+    }
+
+    void computeForce(Particle& p1, Particle& p2, 
+		      const real dist[3], real distSqr, 
+		      real force[3]) {
+      Parameters &params = getParameters(p1.type, p2.type);
+      if (distSqr < params.getCutoffSqr()) {
+	static_cast< Derived* >(this)->computeForce(p1, p2, params, dist, force);
+      } else { 
+	force[0] = force[1] = force[2] = 0.0; 
+      }
+    }
+
+  protected:
+    Derived::Parameters&
+    getParameters(int type1, int type2);
+
+    Derived::Parameters&
+    createParameters(int type1, int type2);
+  
+    class ParametersBase {
+      real cutoff;
+      real cutoffSqr;
+
+    public:
+      ParametersBase() { setCutoff(0.0); }
+      void setCutoff(real _cutoff) { cutoff = _cutoff; cutoffSqr = cutoff * cutoff; }
+      real getCutoff() const { return cutoff; }
+
+      real getCutoffSqr() const { return cutoffSqr; }
+    };
+  };
+
+  /* pairwise potential which implements computeEnergy and computeForce */
+  class LennardJones : public InteractionBase< LennardJones > {
+  public:
+    LennardJones() {}
+
+    void setParameters(int type1, int type2, real ep, real sg, real rc) {
+      Parameters& params = createParameters(type1, type2);
       params.setEpsilon(ep);
       params.setSigma(sg);
       params.setCutoff(rc);
     }
 
-    real _computeEnergySqr(Particle p1, Particle p2, real distSqr);
+  private:
+    friend class InteractionBase<>;
+    /* nested class to store coefficients and cutoff */
+    class Parameters : public ParametersBase {
+      real epsilon;
+      real sigma;
 
-    void _computeForce(Particle& p1, Particle& p2, Real3D dist) const;
-};
+    public:
+      void setEpsilon(real _epsilon) { epsilon = _epsilon; }
+      real getEpsilon() const { return epsilon; }
 
-real LennardJones::_computeEnergySqr(Particle p1, Particle p2, real distSqr) {
-  if (distSqr < params._getCutoffSqr()) {
+      void setSigma(real _sigma) { sigma = _sigma; }
+      real getSigma() const { return sigma; }
+    };
+
+    real computeEnergy(Particle &p1, Particle &p2, 
+		       Parameters &params, const real dist[3], 
+		       const real distSqr) const;
+
+    void computeForce(Particle& p1, Particle& p2, 
+		      Parameters &params, const real dist[3],
+		      const real distSqr,
+		      real force[3]) const;
+  };
+
+  real 
+  LennardJones::
+  computeEnergy(Particle &p1, Particle &p2, 
+		Parameters &params, const real dist[3], 
+		const real distSqr) const {
     real frac2 = params.getSigma() * params.getSigma() / distSqr;
     real frac6 = frac2 * frac2 * frac2;
     real energy = 4.0 * params.getEpsilon() * (frac6 * frac6 - frac6);
     return energy;
-  } else {
-    return 0.0;
   }
-}
 
-void LennardJones::_computeForce(Particle& p1, Particle& p2, Real3D dist) const {
-  real frac2;
-  real frac6;
-  real distSqrInv;
-  real ffactor;
-  real distSqr = dist.sqr();
+  void 
+  LennardJones::
+  computeForce(Particle& p1, Particle& p2, 
+	       Parameters &params, const real dist[3],
+	       const real distSqr, real force[3]) const {
+    real frac2;
+    real frac6;
+    real distSqrInv;
+    real ffactor;
 
-  if (distSqr < params._getCutoffSqr()) {
     distSqrInv = 1.0 / distSqr;
     frac2 = params.getSigma() * params.getSigma() * distSqrInv;
     frac6 = frac2 * frac2 * frac2;
     ffactor = 48.0 * params.getEpsilon() * (frac6 * frac6 - 0.5 * frac6) * distSqrInv;
 
-    ParticleForce f = {dist[0], dist[1], dist[2]};
-    p1.f = f * ffactor; //need += operator
-    p2.f = f * (-1.0 * ffactor);
+    for (int i = 0; i < 3; i++)
+      force[i] = dist[i] * ffactor;
   }
 }
-
 
 int main() {
 

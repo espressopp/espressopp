@@ -2,20 +2,8 @@
 
 #include "mpi.hpp"
 
-using namespace espresso;
+using namespace espresso::esutil;
 using namespace boost;
-
-RNG::NormalVariate::NormalVariate(shared_ptr< RNGType > _rng,
-				  const real mean, 
-				  const real sigma) 
-  : Super(*_rng, DistType(mean, sigma)), rng(_rng)
-{}
-
-RNG::UniformOnSphere::UniformOnSphere(shared_ptr< RNGType > _rng,
-				      int dim)
-  : Super(*_rng, DistType(dim)), rng(_rng)
-{}
-
 
 RNG::RNG(long _seed) 
   : boostRNG(make_shared< RNGType >()), 
@@ -24,15 +12,6 @@ RNG::RNG(long _seed)
 {
   seed(_seed);
 }
-
-// long
-// RNG::seedNondet() {
-//   // get a nondeterministic seed on the first proc, distribute it to
-//   // the other procs, and seed
-//   //   long ndSeed = nondet();
-//   //   seed(ndSeed);
-//   //   return ndSeed;
-// }
 
 void
 RNG::seed(long _seed) {
@@ -57,10 +36,10 @@ RNG::normal() {
   return normalVariate();
 }
 
-RNG::NormalVariate::SelfPtr 
+NormalVariate::SelfPtr 
 RNG::createNormalVariate(const real mean, const real sigma) {
   return
-    make_shared< RNG::NormalVariate >(boostRNG, mean, sigma);
+    make_shared< NormalVariate >(boostRNG, mean, sigma);
 }
 
 std::vector< real >
@@ -68,8 +47,8 @@ RNG::uniformOnSphere() {
   return uniformOnSphereVariate();
 }
 
-RNG::UniformOnSphere::SelfPtr
+UniformOnSphere::SelfPtr
 RNG::createUniformOnSphere(int dim) {
   return
-    make_shared< RNG::UniformOnSphere >(boostRNG, dim);
+    make_shared< UniformOnSphere >(boostRNG, dim);
 }
