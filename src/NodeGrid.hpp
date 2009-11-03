@@ -7,7 +7,7 @@
 
 #include <stdexcept>
 #include "esutil/Grid.hpp"
-#include "estypes.hpp"
+#include "types.hpp"
 
 class NodeGridIllegal: public std::runtime_error
 {

@@ -1,7 +1,7 @@
 #ifndef GRID_HPP
 #define GRID_HPP
 
-#include "estypes.hpp"
+#include "types.hpp"
 
 /** regular grid decomposition of a box, outside view. */
 class Grid {

@@ -1,7 +1,7 @@
 #ifndef SYSTEM_HPP
 #define SYSTEM_HPP
 
-#include "estypes.hpp"
+#include "types.hpp"
 
 struct System {
   real boxL[3];

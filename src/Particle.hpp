@@ -1,7 +1,7 @@
 #ifndef PARTICLE_HPP
 #define PARTICLE_HPP
 
-#include "estypes.hpp"
+#include "types.hpp"
 #include <vector>
 #include "types.hpp"
 
