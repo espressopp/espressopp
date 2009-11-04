@@ -1,10 +1,11 @@
 #ifndef _DOMAINDECOMPOSITION_HPP
 #define _DOMAINDECOMPOSITION_HPP
 #include "Storage.hpp"
-#include "GhostCellGrid.hpp"
+#include "CellGrid.hpp"
 #include "NodeGrid.hpp"
 
 namespace espresso {
+
   class NodeGridMismatch: public std::runtime_error
   {
   public:
@@ -15,8 +16,8 @@ namespace espresso {
   public:
     DomainDecomposition(System *,
 			const boost::mpi::communicator &,
-			integer nodeGrid[3],
-			integer cellGrid[3],
+			int nodeGrid[3],
+			int cellGrid[3],
 			bool useVList);
 
     virtual ~DomainDecomposition() {}
@@ -28,14 +29,14 @@ namespace espresso {
     virtual Cell *mapPositionToCellClipping(const real pos[3]);
     virtual Cell *mapPositionToCellChecked(const real pos[3]);
 
-    const NodeGrid      &getNodeGrid() const { return nodeGrid; }
-    const GhostCellGrid &getGCGrid() const { return cellGrid; }
+    const NodeGrid &getNodeGrid() const { return nodeGrid; }
+    const CellGrid &getCellGrid() const { return cellGrid; }
 
   protected:
     /// init global Verlet list
     void initCellInteractions();
     /// set the grids and allocate space accordingly
-    void createCellGrid(const integer _nodeGrid[3], const integer _cellGrid[3]);
+    void createCellGrid(const int _nodeGrid[3], const int _cellGrid[3]);
     /// sort cells into local/ghost cell arrays
     void markCells();
 
@@ -43,7 +44,7 @@ namespace espresso {
     NodeGrid nodeGrid;
 
     /// spatial domain decomposition on node in cells
-    GhostCellGrid cellGrid;
+    CellGrid cellGrid;
 
     /// expected capacity of send/recv buffers for neighbor communication
     size_t exchangeBufferSize;

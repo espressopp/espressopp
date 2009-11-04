@@ -9,6 +9,7 @@
 #include "System.hpp"
 
 namespace espresso {
+
   typedef std::vector< std::pair<int,int> > PairList;
 
   /**
@@ -48,7 +49,7 @@ namespace espresso {
     void findNonemptyCell();
 
     std::vector<Cell *>::iterator cCell, endCell;
-    integer part, end;
+    int part, end;
   };
 
   /** represents the particle storage of one system. */
@@ -59,14 +60,14 @@ namespace espresso {
 	    bool useVList);
     virtual ~Storage();
 
-    void addParticle(integer id, const real pos[3]);
+    void addParticle(longint id, const real pos[3]);
 
-    integer getNActiveParticles() const;
+    longint getNActiveParticles() const;
     void fetchParticles(Storage &);
 
-    std::vector<Cell> &getAllCells()      { return cells; }
-    std::vector<Cell *> &getActiveCells() { return localCells; }
-    std::vector<Cell *> &getGhostCells()  { return ghostCells; }
+    std::vector<Cell> &getAllCells()       { return cells; }
+    std::vector<Cell *> &getActiveCells()  { return activeCells; }
+    std::vector<Cell *> &getPassiveCells() { return passiveCells; }
 
     virtual Cell *mapPositionToCellClipping(const real pos[3]) = 0;
     virtual Cell *mapPositionToCellChecked(const real pos[3]) = 0;
@@ -79,12 +80,12 @@ namespace espresso {
     // append a particle to a list, updating localParticles
     Particle *appendIndexedParticle(Cell *, Particle *);
     // move a particle from one list to another, without updating localParticles
-    Particle *moveUnindexedParticle(Cell *dst, Cell *src, integer srcpos);
+    Particle *moveUnindexedParticle(Cell *dst, Cell *src, int srcpos);
     // move a particle from one list to another, updating localParticles
-    Particle *moveIndexedParticle(Cell *dst, Cell *src, integer srcpos);
+    Particle *moveIndexedParticle(Cell *dst, Cell *src, int srcpos);
 
-    /// map particle id to Particle *
-    boost::unordered_map<integer, Particle * > localParticles;
+    /// map particle id to Particle * for all particles on this node
+    boost::unordered_map<longint, Particle * > localParticles;
     boost::mpi::communicator comm;
     System *system;
   
@@ -117,19 +118,25 @@ namespace espresso {
     */
     typedef std::vector<IANeighbor> IANeighborList;
 
-    /** flag for using Verlet List. */
-    integer useVList;
-
     /** Array containing information about the interactions between the cells. */
     std::vector<IANeighborList> cellInter;
+
+    /** flag for using Verlet List. */
+    int useVList;
+
+    /** Verlet radius including skin */
+    real maxRange;
+
+    /** Verlet skin */
+    real skin;
 
     /** here the particles are actually stored */
     std::vector<Cell> cells;
 
     /** list of local (active) cells */
-    std::vector<Cell *> localCells;
+    std::vector<Cell *> activeCells;
     /** list of ghost cells */
-    std::vector<Cell *> ghostCells;
+    std::vector<Cell *> passiveCells;
 
     static LOG4ESPP_DECL_LOGGER(logger);
   };

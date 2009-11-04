@@ -7,9 +7,6 @@ typedef double real;
 // define this to "long long" if you need longer integers
 typedef int longint;
 
-// OBSOLETE
-typedef int integer;
-
 static const real ROUND_ERROR_PREC = 1.0e-14;
 
 // RNG config

@@ -15,8 +15,8 @@ NodeGridMismatch::NodeGridMismatch()
 
 DomainDecomposition::DomainDecomposition(System *_system,
 					 const mpi::communicator &_comm,
-					 integer _nodeGrid[3],
-					 integer _cellGrid[3],
+					 int _nodeGrid[3],
+					 int _cellGrid[3],
 					 bool _useVList)
   : Storage(_system, _comm, _useVList), exchangeBufferSize(0)
 {
@@ -32,7 +32,7 @@ DomainDecomposition::DomainDecomposition(System *_system,
   LOG4ESPP_INFO(logger, "done");
 }
 
-void DomainDecomposition::createCellGrid(const integer _nodeGrid[3], const integer _cellGrid[3])
+void DomainDecomposition::createCellGrid(const int _nodeGrid[3], const int _cellGrid[3])
 {
   real myLeft[3];
   real myRight[3];
@@ -43,55 +43,55 @@ void DomainDecomposition::createCellGrid(const integer _nodeGrid[3], const integ
     throw NodeGridMismatch();
   }
 
-  for(integer i = 0; i < 3; ++i) {
+  for(int i = 0; i < 3; ++i) {
     myLeft[i]  = nodeGrid.calculateMyLeft(i);
     myRight[i] = nodeGrid.calculateMyRight(i);
   }
 
-  cellGrid = GhostCellGrid(_cellGrid, myLeft, myRight, 1);
+  cellGrid = CellGrid(_cellGrid, myLeft, myRight, 1);
   
   LOG4ESPP_INFO(logger, "local_box "
 		<< myLeft[0] << "-" << myRight[0] << ", "
 		<< myLeft[1] << "-" << myRight[1] << ", "
 		<< myLeft[2] << "-" << myRight[2]);
 
-  integer nTotalCells = 1;
-  integer nLocalCells = 1;
-  for(integer i = 0; i < 3; ++i) {
-    nLocalCells          *= cellGrid.getGridSize(i);
-    nTotalCells          *= cellGrid.getGhostGridSize(i);
+  longint nTotalCells = 1;
+  longint nActiveCells = 1;
+  for(int i = 0; i < 3; ++i) {
+    nActiveCells         *= cellGrid.getGridSize(i);
+    nTotalCells          *= cellGrid.getFrameGridSize(i);
   }
 
   cells.resize(nTotalCells);
 
-  localCells.reserve(nLocalCells);
-  ghostCells.reserve(nTotalCells - nLocalCells);
+  activeCells.reserve(nActiveCells);
+  passiveCells.reserve(nTotalCells - nActiveCells);
 
   markCells();
 
   LOG4ESPP_INFO(logger, "total # cells=" << nTotalCells
-		<< ", # local cells=" << nLocalCells
-		<< ", ghostCellGrid=(" << cellGrid.getGhostGridSize(0) 
-		<< ", " << cellGrid.getGhostGridSize(1)
-		<< ", " << cellGrid.getGhostGridSize(2)
+		<< ", # active cells=" << nActiveCells
+		<< ", frame cell grid = (" << cellGrid.getFrameGridSize(0) 
+		<< ", " << cellGrid.getFrameGridSize(1)
+		<< ", " << cellGrid.getFrameGridSize(2)
 		<< ")");
 }
 
 void DomainDecomposition::markCells() {
-  localCells.resize(0);
-  ghostCells.resize(0);
+  activeCells.resize(0);
+  passiveCells.resize(0);
 
-  for(integer o = 0; o < cellGrid.getGhostGridSize(2); ++o) {
-    for(integer n = 0; n < cellGrid.getGhostGridSize(1); ++n) {
-      for(integer m = 0; m < cellGrid.getGhostGridSize(0); ++m) {
+  for(int o = 0; o < cellGrid.getFrameGridSize(2); ++o) {
+    for(int n = 0; n < cellGrid.getFrameGridSize(1); ++n) {
+      for(int m = 0; m < cellGrid.getFrameGridSize(0); ++m) {
 	Cell *cur = &cells[cellGrid.getLinearIndex(m, n, o)];
 	if(cellGrid.isInnerCell(m, n, o)) {
 	  LOG4ESPP_TRACE(logger, "cell " << (cur - &cells[0]) << " is inner cell (" << m << ", " << n << ", " << o << ")");
-	  localCells.push_back(cur);
+	  activeCells.push_back(cur);
 	}
 	else {
 	  LOG4ESPP_TRACE(logger, "cell " << (cur - &cells[0]) << " is ghost cell (" << m << ", " << n << ", " << o << ")");
-	  ghostCells.push_back(cur);
+	  passiveCells.push_back(cur);
 	}
       }
     }
@@ -100,23 +100,23 @@ void DomainDecomposition::markCells() {
 
 void DomainDecomposition::initCellInteractions() {
   // deallocate old structures
-  cellInter.resize(localCells.size());
+  cellInter.resize(activeCells.size());
 
-  integer cCnt = 0;
-  for(integer o = cellGrid.getInnerCellsBegin(2); o < cellGrid.getInnerCellsEnd(2); ++o) {
-    for(integer n = cellGrid.getInnerCellsBegin(1); n < cellGrid.getInnerCellsEnd(1); ++n) {
-      for(integer m = cellGrid.getInnerCellsBegin(0); m < cellGrid.getInnerCellsEnd(0); ++m) {
+  longint cCnt = 0;
+  for(int o = cellGrid.getInnerCellsBegin(2); o < cellGrid.getInnerCellsEnd(2); ++o) {
+    for(int n = cellGrid.getInnerCellsBegin(1); n < cellGrid.getInnerCellsEnd(1); ++n) {
+      for(int m = cellGrid.getInnerCellsBegin(0); m < cellGrid.getInnerCellsEnd(0); ++m) {
 	// there should be always 14 neighbors
 	cellInter[cCnt].resize(14);
 
-	integer nCnt = 0;
-	integer ind1 = cellGrid.getLinearIndex(m, n, o);
+	int nCnt = 0;
+	longint ind1 = cellGrid.getLinearIndex(m, n, o);
 
 	// loop all neighbor cells
-	for(integer p = o - 1; p <= o + 1; ++p) {
-	  for(integer q = n - 1; q <= n + 1; ++q) {
-	    for(integer r = m - 1; r <= m + 1; ++r) {   
-	      integer ind2 = cellGrid.getLinearIndex(r, q, p);
+	for(int p = o - 1; p <= o + 1; ++p) {
+	  for(int q = n - 1; q <= n + 1; ++q) {
+	    for(int r = m - 1; r <= m + 1; ++r) {   
+	      longint ind2 = cellGrid.getLinearIndex(r, q, p);
 	      if(ind2 >= ind1) {
 		cellInter[cCnt][nCnt].pList1 = &cells[ind1];
 		cellInter[cCnt][nCnt].pList2 = &cells[ind2];
@@ -138,8 +138,8 @@ Cell *DomainDecomposition::mapPositionToCellClipping(const real pos[3])
 
 Cell *DomainDecomposition::mapPositionToCellChecked(const real pos[3])
 {
-  integer c = cellGrid.mapPositionToCellChecked(pos);
-  if (c == GhostCellGrid::noCell) {
+  longint c = cellGrid.mapPositionToCellChecked(pos);
+  if (c == CellGrid::noCell) {
     return 0;
   }
   else{
@@ -164,8 +164,8 @@ void DomainDecomposition::exchangeAndSortParticles()
     for (int dir = 0; dir < 3; ++dir) { 
       if (nodeGrid.getGridSize(dir) > 1) {
 	// do not use an iterator here, since we have need to take out particles during the loop
-	for(std::vector<Cell*>::iterator it = localCells.begin(),
-	      end = localCells.end(); it != end; ++it) {
+	for(std::vector<Cell*>::iterator it = activeCells.begin(),
+	      end = activeCells.end(); it != end; ++it) {
 	  Cell *cell = *it;
 	  for (size_t p = 0; p < cell->size(); ++p) {
 	    Particle *part = &(*cell)[p];

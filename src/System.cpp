@@ -3,8 +3,8 @@
 using namespace espresso;
 
 void 
-System::foldCoordinate(real pos[3], integer imageBox[3], integer dir) {
-  integer tmp = (integer)floor(pos[dir]*getInvBoxL(dir));
+System::foldCoordinate(real pos[3], int imageBox[3], int dir) {
+  int tmp = static_cast<int>(floor(pos[dir]*getInvBoxL(dir)));
   
   imageBox[dir] += tmp;
   pos[dir] -= tmp*getBoxL(dir);    
@@ -24,13 +24,13 @@ System::foldCoordinate(real pos[3], integer imageBox[3], integer dir) {
 }
 
 void 
-System::foldPosition(real pos[3], integer imageBox[3]) {
+System::foldPosition(real pos[3], int imageBox[3]) {
   for(int i = 0; i < 3; ++i)
     foldCoordinate(pos, imageBox, i);
 }
 
 void 
-System::unfoldPosition(real pos[3], integer imageBox[3]) {
+System::unfoldPosition(real pos[3], int imageBox[3]) {
   for(int i = 0; i < 3; ++i) {
     pos[i] = pos[i] + imageBox[i]*getBoxL(i);    
     imageBox[i] = 0;

@@ -24,7 +24,7 @@ namespace espresso {
 	Both pos and image_box are I/O,
 	i. e. a previously folded position will be folded correctly.
     */
-    void foldCoordinate(real pos[3], integer imageBox[3], integer dir);
+    void foldCoordinate(real pos[3], int imageBox[3], int dir);
 
     /** fold particle coordinates to primary simulation box.
 	\param pos the position...
@@ -33,7 +33,7 @@ namespace espresso {
 	Both pos and image_box are I/O,
 	i. e. a previously folded position will be folded correctly.
     */
-    void foldPosition(real pos[3], integer imageBox[3]);
+    void foldPosition(real pos[3], int imageBox[3]);
 
     /** unfold coordinates to physical position.
 	\param pos the position...
@@ -42,7 +42,7 @@ namespace espresso {
 	Both pos and image_box are I/O, i.e. image_box will be (0,0,0)
 	afterwards.
     */
-    void unfoldPosition(real pos[3], integer imageBox[3]);
+    void unfoldPosition(real pos[3], int imageBox[3]);
 
   private:
   };

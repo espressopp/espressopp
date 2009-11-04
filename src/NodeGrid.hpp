@@ -9,74 +9,77 @@
 #include "esutil/Grid.hpp"
 #include "types.hpp"
 
-class NodeGridIllegal: public std::runtime_error
-{
-public:
-  NodeGridIllegal();
-};
+namespace espresso {
 
-/** Node grid point. This represents the node grid of the domain
-    decomposition, as well as the location of this processor in the
-    grid.
-*/
-class NodeGrid: public Grid
-{
-public:
-  NodeGrid() {}
-
-  /// order of node neighbors
-  enum Directions {
-    Left = 0, Right,
-    Bottom,   Top,
-    Front,    Back
+  class NodeGridIllegal: public std::runtime_error
+  {
+  public:
+    NodeGridIllegal();
   };
 
-  NodeGrid(const integer grid[3],
-	   const integer nodeId,
-	   const real _domainSize[3]);
+  /** Node grid point. This represents the node grid of the domain
+      decomposition, as well as the location of this processor in the
+      grid.
+  */
+  class NodeGrid: public esutil::Grid
+  {
+  public:
+    NodeGrid() {}
 
-  /// automatic setup of a node grid for nNodes processors
-  NodeGrid(const integer nNodes,
-	   const integer nodeId,
-	   const real _domainSize[3]);
+    /// order of node neighbors
+    enum Directions {
+      Left = 0, Right,
+      Bottom,   Top,
+      Front,    Back
+    };
 
-  /// map coordinate to a node. Positions outside are clipped back
-  integer mapPositionToNodeClipping(const real pos[3]) const;
+    NodeGrid(const int grid[3],
+	     const longint nodeId,
+	     const real _domainSize[3]);
 
-  /// get this node's coordinates
-  integer getNodePosition(integer i) const { return nodePos[i]; }
-  /// size of the local box
-  real getLocalBoxSize(integer i) const { return localBoxSize[i]; }
-  /// inverse of the size of a cell
-  real getInverseLocalBoxSize(integer i) const { return invLocalBoxSize[i]; }
+    /// automatic setup of a node grid for nNodes processors
+    NodeGrid(const longint nNodes,
+	     const longint nodeId,
+	     const real _domainSize[3]);
 
-  /// calculate start of local box
-  real    calculateMyLeft(integer i) const { return nodePos[i]*localBoxSize[i]; }
-  /// calculate end of local box
-  real    calculateMyRight(integer i) const { return (nodePos[i] + 1)*localBoxSize[i]; }
+    /// map coordinate to a node. Positions outside are clipped back
+    longint mapPositionToNodeClipping(const real pos[3]) const;
 
-  integer getNodeNeighbor(integer i) { return nodeNeighbors[i]; }
-  integer getBoundary(integer i)     { return boundaries[i]; }
+    /// get this node's coordinates
+    longint getNodePosition(int i) const { return nodePos[i]; }
+    /// size of the local box
+    real getLocalBoxSize(int i) const { return localBoxSize[i]; }
+    /// inverse of the size of a cell
+    real getInverseLocalBoxSize(int i) const { return invLocalBoxSize[i]; }
 
-  static const integer numNodeNeighbors = Back + 1;
+    /// calculate start of local box
+    real calculateMyLeft(int i) const { return nodePos[i]*localBoxSize[i]; }
+    /// calculate end of local box
+    real calculateMyRight(int i) const { return (nodePos[i] + 1)*localBoxSize[i]; }
 
-private:
-  void calcNodeNeighbors(integer node);
+    int getNodeNeighbor(int i) { return nodeNeighbors[i]; }
+    int getBoundary(int i)     { return boundaries[i]; }
 
-  /// position of this node in node grid
-  integer nodePos[3];
-  /// the six nearest neighbors of a node in the node grid
-  integer nodeNeighbors[6];
-  /// where to fold particles that leave local box in direction i
-  integer boundaries[6];
+    static const int numNodeNeighbors = Back + 1;
 
-  /// cell size
-  real localBoxSize[3];
-  /// inverse domain size
-  real invLocalBoxSize[3];
+  private:
+    void calcNodeNeighbors(longint node);
 
-  /// smallest diameter of the local box
-  real smallestLocalBoxDiameter;
-};
+    /// position of this node in node grid
+    int nodePos[3];
+    /// the six nearest neighbors of a node in the node grid
+    longint nodeNeighbors[6];
+    /// where to fold particles that leave local box in direction i
+    int boundaries[6];
+
+    /// cell size
+    real localBoxSize[3];
+    /// inverse domain size
+    real invLocalBoxSize[3];
+
+    /// smallest diameter of the local box
+    real smallestLocalBoxDiameter;
+  };
+}
 
 #endif

@@ -1,13 +1,15 @@
 #include "NodeGrid.hpp"
 
+using namespace espresso;
+
 NodeGridIllegal::NodeGridIllegal()
   : std::runtime_error("node grid dimensions have to be positive") {}
 
-integer NodeGrid::mapPositionToNodeClipping(const real pos[3]) const
+longint NodeGrid::mapPositionToNodeClipping(const real pos[3]) const
 {
-  integer cpos[3];
+  int cpos[3];
 
-  for (integer i = 0; i < 3; ++i) {
+  for (int i = 0; i < 3; ++i) {
     cpos[i] = static_cast<int>(pos[i]*invLocalBoxSize[i]);
     if (cpos[i] < 0) {
       cpos[i] = 0;
@@ -19,14 +21,14 @@ integer NodeGrid::mapPositionToNodeClipping(const real pos[3]) const
   return getLinearIndex(cpos);
 }
 
-void NodeGrid::calcNodeNeighbors(integer node)
+void NodeGrid::calcNodeNeighbors(longint node)
 {
   int nPos[3];
   
   getGridPosition(node,nodePos);
 
-  for(integer dir = 0; dir < 3; ++dir) {
-    for(integer j = 0; j < 3; ++j) {
+  for(int dir = 0; dir < 3; ++dir) {
+    for(int j = 0; j < 3; ++j) {
       nPos[j] = nodePos[j];
     }
 
@@ -61,8 +63,8 @@ void NodeGrid::calcNodeNeighbors(integer node)
   }
 }
 
-NodeGrid::NodeGrid(const integer grid[3],
-		   const integer nodeId,
+NodeGrid::NodeGrid(const int grid[3],
+		   const longint nodeId,
 		   const real    domainSize[3])
   : Grid(grid)
 {
@@ -70,7 +72,7 @@ NodeGrid::NodeGrid(const integer grid[3],
     throw NodeGridIllegal();
   }
 
-  for(integer i = 0; i < 3; ++i) {
+  for(int i = 0; i < 3; ++i) {
     localBoxSize[i] = domainSize[i]/static_cast<real>(getGridSize(i));
     invLocalBoxSize[i] = 1.0/localBoxSize[i];
   }

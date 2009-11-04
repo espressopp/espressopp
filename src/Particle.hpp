@@ -24,8 +24,8 @@ namespace espresso {
   };
 
   struct ParticleLocal {
-    integer i[3];
-    integer ghost;
+    int i[3];
+    int ghost;
   };
 
   struct Particle {
