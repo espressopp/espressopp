@@ -55,40 +55,6 @@ namespace espresso {
   /** represents the particle storage of one system. */
   class Storage {
   public:
-    Storage(System *,
-	    const boost::mpi::communicator &,
-	    bool useVList);
-    virtual ~Storage();
-
-    void addParticle(longint id, const real pos[3]);
-
-    longint getNActiveParticles() const;
-    void fetchParticles(Storage &);
-
-    std::vector<Cell> &getAllCells()       { return cells; }
-    std::vector<Cell *> &getActiveCells()  { return activeCells; }
-    std::vector<Cell *> &getPassiveCells() { return passiveCells; }
-
-    virtual Cell *mapPositionToCellClipping(const real pos[3]) = 0;
-    virtual Cell *mapPositionToCellChecked(const real pos[3]) = 0;
-
-  protected:
-    // update the id->local particle map for the given cell
-    void updateLocalParticles(Cell *);
-    // append a particle to a list, without updating localParticles
-    Particle *appendUnindexedParticle(Cell *, Particle *);
-    // append a particle to a list, updating localParticles
-    Particle *appendIndexedParticle(Cell *, Particle *);
-    // move a particle from one list to another, without updating localParticles
-    Particle *moveUnindexedParticle(Cell *dst, Cell *src, int srcpos);
-    // move a particle from one list to another, updating localParticles
-    Particle *moveIndexedParticle(Cell *dst, Cell *src, int srcpos);
-
-    /// map particle id to Particle * for all particles on this node
-    boost::unordered_map<longint, Particle * > localParticles;
-    boost::mpi::communicator comm;
-    System *system;
-  
     /** Structure containing information about local interactions
 	with particles in a neighbor cell. */
     struct IANeighbor {
@@ -118,6 +84,46 @@ namespace espresso {
     */
     typedef std::vector<IANeighbor> IANeighborList;
 
+    Storage(System *,
+	    const boost::mpi::communicator &,
+	    bool useVList);
+    virtual ~Storage();
+
+    void addParticle(longint id, const real pos[3]);
+
+    longint getNActiveParticles() const;
+    void fetchParticles(Storage &);
+
+    std::vector<Cell> &getAllCells()       { return cells; }
+    std::vector<Cell *> &getActiveCells()  { return activeCells; }
+    std::vector<Cell *> &getPassiveCells() { return passiveCells; }
+
+    /// get neighbor cells of cell
+    const IANeighborList &getCellNeighbors(Cell *cell) { return cellInter[cell - getFirstCell()]; }
+    
+    virtual Cell *mapPositionToCellClipping(const real pos[3]) = 0;
+    virtual Cell *mapPositionToCellChecked(const real pos[3]) = 0;
+
+  protected:
+
+    const Cell *getFirstCell() const { return &(cells[0]); }
+
+    // update the id->local particle map for the given cell
+    void updateLocalParticles(Cell *);
+    // append a particle to a list, without updating localParticles
+    Particle *appendUnindexedParticle(Cell *, Particle *);
+    // append a particle to a list, updating localParticles
+    Particle *appendIndexedParticle(Cell *, Particle *);
+    // move a particle from one list to another, without updating localParticles
+    Particle *moveUnindexedParticle(Cell *dst, Cell *src, int srcpos);
+    // move a particle from one list to another, updating localParticles
+    Particle *moveIndexedParticle(Cell *dst, Cell *src, int srcpos);
+
+    /// map particle id to Particle * for all particles on this node
+    boost::unordered_map<longint, Particle * > localParticles;
+    boost::mpi::communicator comm;
+    System *system;
+  
     /** Array containing information about the interactions between the cells. */
     std::vector<IANeighborList> cellInter;
 

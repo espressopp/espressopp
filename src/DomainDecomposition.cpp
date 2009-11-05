@@ -100,35 +100,39 @@ void DomainDecomposition::markCells() {
 
 void DomainDecomposition::initCellInteractions() {
   // deallocate old structures
-  cellInter.resize(activeCells.size());
+  cellInter.resize(cells.size());
 
-  longint cCnt = 0;
+  LOG4ESPP_INFO(logger, "setting up neighbors for " << cells.size() << " cells");
+
   for(int o = cellGrid.getInnerCellsBegin(2); o < cellGrid.getInnerCellsEnd(2); ++o) {
     for(int n = cellGrid.getInnerCellsBegin(1); n < cellGrid.getInnerCellsEnd(1); ++n) {
       for(int m = cellGrid.getInnerCellsBegin(0); m < cellGrid.getInnerCellsEnd(0); ++m) {
-	// there should be always 14 neighbors
-	cellInter[cCnt].resize(14);
-
-	int nCnt = 0;
 	longint ind1 = cellGrid.getLinearIndex(m, n, o);
 
+	LOG4ESPP_TRACE(logger, "setting up neighbors for cell " << ind1);
+
+	// there should be always 14 neighbors
+	cellInter[ind1].resize(14);
+
+	int nCnt = 0;
 	// loop all neighbor cells
 	for(int p = o - 1; p <= o + 1; ++p) {
 	  for(int q = n - 1; q <= n + 1; ++q) {
 	    for(int r = m - 1; r <= m + 1; ++r) {   
 	      longint ind2 = cellGrid.getLinearIndex(r, q, p);
 	      if(ind2 >= ind1) {
-		cellInter[cCnt][nCnt].pList1 = &cells[ind1];
-		cellInter[cCnt][nCnt].pList2 = &cells[ind2];
+		cellInter[ind1][nCnt].pList1 = &cells[ind1];
+		cellInter[ind1][nCnt].pList2 = &cells[ind2];
 		nCnt++;
 	      }
 	    }
 	  }
 	}
-	cCnt++;
       }
     }
   }
+
+  LOG4ESPP_INFO(logger, "done");
 }
 
 Cell *DomainDecomposition::mapPositionToCellClipping(const real pos[3])

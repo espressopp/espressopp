@@ -138,3 +138,23 @@ BOOST_FIXTURE_TEST_CASE(addParticles, Fixture)
 
   BOOST_CHECK_EQUAL(domdec2.getNActiveParticles(), int(10));
 }
+
+BOOST_FIXTURE_TEST_CASE(cellNeighbors, Fixture) 
+{
+  {
+    for(std::vector<Cell *>::const_iterator
+	  it  = domdec->getActiveCells().begin(),
+	  end = domdec->getActiveCells().end();
+	it != end; ++it) {
+      BOOST_CHECK_EQUAL(domdec->getCellNeighbors((*it)).size(), size_t(14));
+    }
+  }
+  {
+    for(std::vector<Cell *>::const_iterator
+	  it  = domdec->getPassiveCells().begin(),
+	  end = domdec->getPassiveCells().end();
+	it != end; ++it) {
+      BOOST_CHECK_EQUAL(domdec->getCellNeighbors((*it)).size(), size_t(0));
+    }
+  }  
+}

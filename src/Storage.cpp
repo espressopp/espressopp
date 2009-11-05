@@ -33,7 +33,7 @@ longint Storage::getNActiveParticles() const {
   for (std::vector<Cell *>::const_iterator it = activeCells.begin(),
 	 end = activeCells.end();
        it != end; ++it) {
-    LOG4ESPP_TRACE(logger, "cell " << ((*it) - &cells[0]) << " size " << (*it)->size());
+    LOG4ESPP_TRACE(logger, "cell " << ((*it) - getFirstCell()) << " size " << (*it)->size());
     cnt += (*it)->size();
   }
   return cnt;
@@ -63,7 +63,7 @@ void Storage::addParticle(longint id, const real p[3])
   appendIndexedParticle(cell, &n);
 
   LOG4ESPP_TRACE(logger, "got particle id="
-		 << id << " @ " << p[0] << " " << p[1] << " " << p[2] << " ; put it into cell " << cell - &cells[0]);
+		 << id << " @ " << p[0] << " " << p[1] << " " << p[2] << " ; put it into cell " << cell - getFirstCell());
   LOG4ESPP_TRACE(logger, "cell size is now " << cell->size());
 }
 
