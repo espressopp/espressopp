@@ -3,23 +3,16 @@
 #include <vector>
 
 #include "Particle.hpp"
+#include "PeriodicBC.hpp"
 
 namespace espresso {
   typedef std::vector<Particle> Cell;
-  /* above from Particle.hpp */
 
-  struct Real3D {
-    real rij[3];
-    real sqr() {
-      return pow(rij[0], 2) + pow(rij[1], 2) + pow(rij[2], 2);
-    }
-    real operator [] (size_t i) { return rij[i]; }
-  };
+  /** InteractionBase provides loop templates to compute
+      forces and energies of the various interactions. */
 
-  /* CRTP */
   template< typename Derived >
   class InteractionBase {
-
   public:
     // full square over two cells
     virtual real 
@@ -35,6 +28,7 @@ namespace espresso {
 	  bc.getMinimumImageVector(dist, &distSqr, p1.r.p, p2.r.p);
 	  e += computeEnergy(p1, p2, dist, distSqr);
 	}
+      return e;
     }
 
     // half square over a single cell
@@ -51,7 +45,53 @@ namespace espresso {
 	  bc.getMinimumImageVector(dist, &distSqr, p1.r.p, p2.r.p);
 	  e += computeEnergy(p1, p2, dist, distSqr);
 	}
+      return e;
     }
+
+    // full square over two cells
+    virtual void 
+    computeCellForces(BoundaryConditions &bc,
+                      Cell &cell1, Cell &cell2) {
+      for (int i = 0, endi = cell1.size(); i < endi; i++)
+        for (int j = 0, endj = cell2.size(); j < endj; j++) {
+          Particle &p1 = cell1[i];
+          Particle &p2 = cell2[j];
+          real dist[3];
+          real distSqr;
+          real force[3] = {0.0, 0.0, 0.0};
+          bc.getMinimumImageVector(dist, &distSqr, p1.r.p, p2.r.p);
+          computeForce(p1, p2, dist, distSqr, force);
+
+          for (int k = 0; k < 3; i++) {
+            p1.f.f[k] +=  force[k];
+            p2.f.f[k] += -force[k];
+          }
+        }
+    }
+   
+    // half square over a single cell
+    virtual void
+    computeCellForces(BoundaryConditions &bc,
+                      Cell &cell) {
+      for (int i = 0, endi = cell.size(); i < endi; i++)
+        for (int j = 0; j < i; j++) {
+          Particle &p1 = cell[i];
+          Particle &p2 = cell[j];
+          real dist[3];
+          real distSqr;
+          real force[3] = {0.0, 0.0, 0.0};
+          bc.getMinimumImageVector(dist, &distSqr, p1.r.p, p2.r.p);
+          computeForce(p1, p2, dist, distSqr, force);
+
+          for (int k = 0; k < 3; i++) {
+            p1.f.f[k] +=  force[k];
+            p2.f.f[k] += -force[k];
+          }
+        }
+    }
+
+    // need loops for Verlet lists
+    // and bonded interactions
 
     real computeEnergy(Particle& p1, Particle& p2, 
 		       const real dist[3], real distSqr) {
@@ -80,6 +120,7 @@ namespace espresso {
     createParameters(int type1, int type2);
   
     class ParametersBase {
+    private:
       real cutoff;
       real cutoffSqr;
 
@@ -87,12 +128,19 @@ namespace espresso {
       ParametersBase() { setCutoff(0.0); }
       void setCutoff(real _cutoff) { cutoff = _cutoff; cutoffSqr = cutoff * cutoff; }
       real getCutoff() const { return cutoff; }
-
       real getCutoffSqr() const { return cutoffSqr; }
     };
   };
 
-  /* pairwise potential which implements computeEnergy and computeForce */
+
+  /** This class provides routines to compute forces and energies
+      of the Lennard-Jones potential.
+
+      \f[ V(r) = 4 \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} -
+      \left( \frac{\sigma}{r} \right)^{6} \right]
+      \f]
+  */
+
   class LennardJones : public InteractionBase< LennardJones > {
   public:
     LennardJones() {}
@@ -106,7 +154,7 @@ namespace espresso {
 
   private:
     friend class InteractionBase<>;
-    /* nested class to store coefficients and cutoff */
+    /* nested class to store coefficients */
     class Parameters : public ParametersBase {
       real epsilon;
       real sigma;
@@ -182,7 +230,7 @@ int main() {
   Real3D dist = {p1.r.p[0] - p2.r.p[0], p1.r.p[1] - p2.r.p[1], p1.r.p[2] - p2.r.p[2]};
   real distSqr = dist.sqr();
 
-  /* compute energy and force */  
+  /* compute energy and force */
   InteractionBase<LennardJones> ib;
   ib.setParameters(1.0, 1.0, 2.0);
   std::cout << ib.computeEnergySqr(p1, p2, distSqr) << std::endl;
