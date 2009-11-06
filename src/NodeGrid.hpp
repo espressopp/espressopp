@@ -32,6 +32,10 @@ namespace espresso {
       Bottom,   Top,
       Front,    Back
     };
+    /// order coordinates
+    enum FoldDirections {
+      ToLeft = -1, ToRight = 1
+    };
 
     NodeGrid(const int grid[3],
 	     const longint nodeId,
@@ -43,7 +47,7 @@ namespace espresso {
 	     const real _domainSize[3]);
 
     /// map coordinate to a node. Positions outside are clipped back
-    longint mapPositionToNodeClipping(const real pos[3]) const;
+    longint mapPositionToNodeClipped(const real pos[3]) const;
 
     /// get this node's coordinates
     longint getNodePosition(int i) const { return nodePos[i]; }
@@ -57,8 +61,12 @@ namespace espresso {
     /// calculate end of local box
     real calculateMyRight(int i) const { return (nodePos[i] + 1)*localBoxSize[i]; }
 
-    int getNodeNeighbor(int i) { return nodeNeighbors[i]; }
-    int getBoundary(int i)     { return boundaries[i]; }
+    int getNodeNeighbor(int i) const { return nodeNeighbors[i]; }
+    /// where to fold particles that leave the box in direction i (ToRight, 0, ToLeft)
+    int getBoundary(int i) const { return boundaries[i]; }
+
+    /// get the coordinate of a direction  
+    static int convertDirToCoord(int dir) { return dir/2; }
 
     static const int numNodeNeighbors = Back + 1;
 

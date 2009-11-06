@@ -30,9 +30,12 @@ namespace espresso {
 	     int frame);
 
     /// map coordinate to a non-ghost cell. Positions outside the inner grid are clipped back
-    longint mapPositionToCellClipping(const real pos[3]) const;
+    longint mapPositionToCellClipped(const real pos[3]) const;
     /// map coordinate to a non-ghost cell. Returns noCell if the position is outside the inner grid
     longint mapPositionToCellChecked(const real pos[3]) const;
+    /** map coordinate to a non-ghost cell. Returns true if the returned cell is clipped, i.e. the
+	position is outside the inner grid */
+    bool mapPositionToCellCheckedAndClipped(longint &, const real pos[3]) const;
 
     /// get start of inner grid
     bool isInnerCell(int m, int n, int o) const {

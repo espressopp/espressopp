@@ -26,7 +26,7 @@ namespace espresso {
     void sendGhostData();
     void collectGhostForces();
 
-    virtual Cell *mapPositionToCellClipping(const real pos[3]);
+    virtual Cell *mapPositionToCellClipped(const real pos[3]);
     virtual Cell *mapPositionToCellChecked(const real pos[3]);
 
     const NodeGrid &getNodeGrid() const { return nodeGrid; }
@@ -36,9 +36,15 @@ namespace espresso {
     /// init global Verlet list
     void initCellInteractions();
     /// set the grids and allocate space accordingly
-    void createCellGrid(const int _nodeGrid[3], const int _cellGrid[3]);
+    void createCellGrid(const int nodeGrid[3], const int cellGrid[3]);
     /// sort cells into local/ghost cell arrays
     void markCells();
+    /** read particles from a temporary buffer into the local cell structure.
+	The direction determines in which direction to fold the particles position.
+	Returns true if one of the given particles did not belong to this processors
+	domain.
+     */
+    bool appendParticles(Cell &, int dir);
 
     /// spatial domain decomposition of nodes
     NodeGrid nodeGrid;

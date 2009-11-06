@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#define LOG4ESPP_LEVEL_TRACE
+#define LOG4ESPP_LEVEL_DEBUG
 #include "log4espp.hpp"
 
 #include "Storage.hpp"
@@ -9,6 +9,9 @@ using namespace boost;
 using namespace espresso;
 
 LOG4ESPP_LOGGER(Storage::logger, "Storage");
+
+
+const int STORAGE_COMM_TAG = 0xaa;
 
 void ParticleIterator::findNonemptyCell()
 {
@@ -39,8 +42,8 @@ longint Storage::getNActiveParticles() const {
   return cnt;
 }
 
-void Storage::updateLocalParticles(Cell *l) {
-  for (Cell::iterator it = l->begin(), end = l->end();
+void Storage::updateLocalParticles(Cell &l) {
+  for (Cell::iterator it = l.begin(), end = l.end();
        it != end; ++it) {
     localParticles[it->p.identity] = &(*it);
   }
@@ -58,65 +61,65 @@ void Storage::addParticle(longint id, const real p[3])
     n.l.i[i] = 0;
   }
   system->foldPosition(n.r.p, n.l.i);
-  cell = mapPositionToCellClipping(n.r.p);
+  cell = mapPositionToCellClipped(n.r.p);
 
-  appendIndexedParticle(cell, &n);
+  appendIndexedParticle(*cell, n);
 
   LOG4ESPP_TRACE(logger, "got particle id="
 		 << id << " @ " << p[0] << " " << p[1] << " " << p[2] << " ; put it into cell " << cell - getFirstCell());
   LOG4ESPP_TRACE(logger, "cell size is now " << cell->size());
 }
 
-Particle *Storage::appendUnindexedParticle(Cell *l, Particle *part)
+Particle *Storage::appendUnindexedParticle(Cell &l, Particle &part)
 {
-  l->push_back(*part);
-  return &l->back();
+  l.push_back(part);
+  return &l.back();
 }
 
-Particle *Storage::appendIndexedParticle(Cell *l, Particle *part)
+Particle *Storage::appendIndexedParticle(Cell &l, Particle &part)
 {
   // see whether the array was resized; STL hack
-  Particle *begin = &l->front();
+  Particle *begin = &l.front();
 
-  l->push_back(*part);
-  Particle *p = &l->back();
+  l.push_back(part);
+  Particle *p = &l.back();
 
-  if (begin != &l->front())
+  if (begin != &l.front())
     updateLocalParticles(l);
   else
     localParticles[p->p.identity] = p;
   return p;
 }
 
-Particle *Storage::moveUnindexedParticle(Cell *dl, Cell *sl, int i)
+Particle *Storage::moveUnindexedParticle(Cell &dl, Cell &sl, int i)
 {
-  dl->push_back((*sl)[i]);
-  int newSize = sl->size() - 1;
+  dl.push_back(sl[i]);
+  int newSize = sl.size() - 1;
   if (i != newSize) {
-    (*sl)[i] = sl->back();
+    sl[i] = sl.back();
   }
-  sl->resize(newSize);
-  return &dl->back();
+  sl.resize(newSize);
+  return &dl.back();
 }
 
-Particle *Storage::moveIndexedParticle(Cell *dl, Cell *sl, int i)
+Particle *Storage::moveIndexedParticle(Cell &dl, Cell &sl, int i)
 {
   // see whether the arrays were resized; STL hack
-  Particle *dbegin = &dl->front();
-  Particle *sbegin = &sl->front();
+  Particle *dbegin = &dl.front();
+  Particle *sbegin = &sl.front();
 
-  dl->push_back((*sl)[i]);
-  int newSize = sl->size() - 1;
+  dl.push_back(sl[i]);
+  int newSize = sl.size() - 1;
   if (i != newSize) {
-    (*sl)[i] = sl->back();
+    sl[i] = sl.back();
   }
-  sl->resize(newSize);
+  sl.resize(newSize);
 
-  Particle *dst = &dl->back();
-  Particle *src = &(*sl)[i];
+  Particle *dst = &dl.back();
+  Particle *src = &(sl[i]);
 
   // fix up destination list
-  if (dbegin !=  &dl->front()) {
+  if (dbegin !=  &dl.front()) {
     updateLocalParticles(dl);
   }
   else {
@@ -124,7 +127,7 @@ Particle *Storage::moveIndexedParticle(Cell *dl, Cell *sl, int i)
   }
   // fix up resorted source list; due to moving, the last particle
   // might have been moved to the position of the actually moved one
-  if (sbegin != &sl->front()) {
+  if (sbegin != &sl.front()) {
     updateLocalParticles(sl);
   }
   else if (i != newSize) {
@@ -142,8 +145,8 @@ void Storage::fetchParticles(Storage &old)
   for (ParticleIterator it(old.getActiveCells());
        it.isValid(); ++it) {
     Particle &part = *it;
-    Cell *nc = mapPositionToCellClipping(part.r.p);
-    appendUnindexedParticle(nc, &part);
+    Cell *nc = mapPositionToCellClipped(part.r.p);
+    appendUnindexedParticle(*nc, part);
   }
 
   // update localParticles
@@ -151,6 +154,36 @@ void Storage::fetchParticles(Storage &old)
 	it = activeCells.begin(),
 	end = activeCells.end();
       it != end; ++it) {
-    updateLocalParticles(*it);
+    updateLocalParticles(**it);
   }
+}
+
+void Storage::sendParticles(Cell &cell, longint node)
+{
+  LOG4ESPP_INFO(logger, "send " << cell.size() << " particles to " << node);
+
+  longint nPart = cell.size();
+  comm.send(node, STORAGE_COMM_TAG, nPart);
+  comm.send(node, STORAGE_COMM_TAG,
+	    static_cast<char *>(static_cast<void *>(&(cell[0]))), nPart*sizeof(Particle));
+  cell.clear();
+
+  LOG4ESPP_INFO(logger, "done");
+}
+
+void Storage::recvParticles(Cell &cell, longint node)
+{
+  LOG4ESPP_INFO(logger, "recv from " << node);
+
+  longint transfer;
+
+  comm.recv(node, STORAGE_COMM_TAG, transfer);
+
+  LOG4ESPP_INFO(logger, "will receive " << node << "particles");
+
+  longint curSize = cell.size();
+  cell.resize(curSize + transfer);
+
+  comm.recv(node, STORAGE_COMM_TAG, static_cast<char *>(static_cast<void *>(&(cell[curSize]))),
+	    transfer*sizeof(Particle));
 }

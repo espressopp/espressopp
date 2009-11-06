@@ -101,23 +101,41 @@ namespace espresso {
     /// get neighbor cells of cell
     const IANeighborList &getCellNeighbors(Cell *cell) { return cellInter[cell - getFirstCell()]; }
     
-    virtual Cell *mapPositionToCellClipping(const real pos[3]) = 0;
+    virtual Cell *mapPositionToCellClipped(const real pos[3]) = 0;
     virtual Cell *mapPositionToCellChecked(const real pos[3]) = 0;
 
   protected:
+    /** send particles of a cell to another node, and empty the cell
+	locally. The operation is blocking: the operation
+	will wait until the particles really have been received.
+
+	The particles are not removed from localParticles!
+    */
+    void sendParticles(Cell &, longint node);
+    /** receive particles from another node. The particles are added
+	to the given cell. The operation is blocking: the
+	operation will wait until the particles have been received.
+
+	The particles are not added to localParticles! Moreover, the
+	cell might be resized, invalidating all particles
+	localParticles entries. Therefore, if the receiving cell is
+	the final destination of the particles, call
+	updateLocalParticles after recvParticles.
+    */
+    void recvParticles(Cell &, longint node);
 
     const Cell *getFirstCell() const { return &(cells[0]); }
 
     // update the id->local particle map for the given cell
-    void updateLocalParticles(Cell *);
+    void updateLocalParticles(Cell &);
     // append a particle to a list, without updating localParticles
-    Particle *appendUnindexedParticle(Cell *, Particle *);
+    Particle *appendUnindexedParticle(Cell &, Particle &);
     // append a particle to a list, updating localParticles
-    Particle *appendIndexedParticle(Cell *, Particle *);
+    Particle *appendIndexedParticle(Cell &, Particle &);
     // move a particle from one list to another, without updating localParticles
-    Particle *moveUnindexedParticle(Cell *dst, Cell *src, int srcpos);
+    Particle *moveUnindexedParticle(Cell &dst, Cell &src, int srcpos);
     // move a particle from one list to another, updating localParticles
-    Particle *moveIndexedParticle(Cell *dst, Cell *src, int srcpos);
+    Particle *moveIndexedParticle(Cell &dst, Cell &src, int srcpos);
 
     /// map particle id to Particle * for all particles on this node
     boost::unordered_map<longint, Particle * > localParticles;

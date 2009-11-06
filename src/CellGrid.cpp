@@ -38,7 +38,7 @@ longint CellGrid::getNumberOfInnerCells() const
   return res;
 }
 
-longint CellGrid::mapPositionToCellClipping(const real pos[3]) const
+longint CellGrid::mapPositionToCellClipped(const real pos[3]) const
 {
   int cpos[3];
 
@@ -68,20 +68,50 @@ longint CellGrid::mapPositionToCellChecked(const real pos[3]) const
     
     /* particles outside our box. Still take them if
        VERY close or nonperiodic boundary */
-    if (cpos[i] < 1) {
-      if (lpos > -ROUND_ERROR_PREC) {
-	cpos[i] = 1;
+    if (cpos[i] < frame) {
+      if (lpos >= -ROUND_ERROR_PREC) {
+	cpos[i] = frame;
       }
       else {
 	return noCell;
       }
     }
     else if (cpos[i] >= getFrameGridSize(i) - frame) {
-      if (pos[i] < myRight[i] + ROUND_ERROR_PREC) {
+      if (pos[i] <= myRight[i] + ROUND_ERROR_PREC) {
 	cpos[i] = getFrameGridSize(i) - frame - 1;
       }
       else {
 	return noCell;
+      }
+    }
+  }
+  return getLinearIndex(cpos);  
+}
+
+bool CellGrid::mapPositionToCellCheckedAndClipped(longint &cell, const real pos[3]) const
+{
+  int cpos[3];
+  bool outside = false;
+
+  for(int i = 0; i < 3; ++i) {
+    real lpos = pos[i] - myLeft[i];
+
+    cpos[i] = static_cast<int>(lpos*invCellSize[i]) + frame;
+    
+    /* particles outside our box. Still take them if
+       VERY close or nonperiodic boundary */
+    if (cpos[i] < frame) {
+      cpos[i] = frame;
+
+      if (lpos < -ROUND_ERROR_PREC) {
+	outside = true;
+      }
+    }
+    else if (cpos[i] >= getFrameGridSize(i) - frame) {
+      cpos[i] = getFrameGridSize(i) - frame - 1;
+
+      if (pos[i] > myRight[i] + ROUND_ERROR_PREC) {
+	outside = true;
       }
     }
   }

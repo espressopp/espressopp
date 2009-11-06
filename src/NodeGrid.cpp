@@ -5,7 +5,7 @@ using namespace espresso;
 NodeGridIllegal::NodeGridIllegal()
   : std::runtime_error("node grid dimensions have to be positive") {}
 
-longint NodeGrid::mapPositionToNodeClipping(const real pos[3]) const
+longint NodeGrid::mapPositionToNodeClipped(const real pos[3]) const
 {
   int cpos[3];
 
@@ -48,14 +48,14 @@ void NodeGrid::calcNodeNeighbors(longint node)
 
     /* left boundary ? */
     if (nodePos[dir] == 0) {
-      boundaries[2*dir] = 1;
+      boundaries[2*dir] = ToRight;
     }
     else {
       boundaries[2*dir] = 0;
     }
     /* right boundary ? */
     if (nodePos[dir] == getGridSize(dir) - 1) {
-      boundaries[2*dir + 1] = -1;
+      boundaries[2*dir + 1] = ToLeft;
     }
     else {
       boundaries[2*dir + 1] = 0;
