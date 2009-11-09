@@ -41,7 +41,7 @@ namespace espresso {
       { return getLinearIndex(pos[0], pos[1], pos[2]); }
 
       /// convert a sequence index back to a grid position
-      void getGridPosition(longint index, int &p1, int &p2, int &p3) const
+      void mapIndexToPosition(int &p1, int &p2, int &p3, longint index) const
       {
 	p1 = index % size[0];
 	index /= size[0];
@@ -49,8 +49,8 @@ namespace espresso {
 	index /= size[1];
 	p3 = index;
       }
-      void getGridPosition(longint index, int pos[3]) const
-      { getGridPosition(index, pos[0], pos[1], pos[2]); }
+      void mapIndexToPosition(int pos[3], longint index) const
+      { mapIndexToPosition(pos[0], pos[1], pos[2], index); }
 
     private:
       /// number of grid points

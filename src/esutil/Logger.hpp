@@ -17,8 +17,10 @@
       #define __LOG4ESPP_FUNC__ __FUNCSIG__
 #endif
 #else
-#if defined(__GNUC__)
+#if defined(__GNUC__) and !defined(LOG4ESPP_SHORTNAMES)
       #define __LOG4ESPP_FUNC__ __PRETTY_FUNCTION__
+#else
+      #define __LOG4ESPP_FUNC__ __FUNCTION__
 #endif
 #endif
 

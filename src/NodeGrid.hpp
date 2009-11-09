@@ -6,8 +6,9 @@
 */
 
 #include <stdexcept>
-#include "esutil/Grid.hpp"
 #include "types.hpp"
+#include "logging.hpp"
+#include "esutil/Grid.hpp"
 
 namespace espresso {
 
@@ -57,9 +58,9 @@ namespace espresso {
     real getInverseLocalBoxSize(int i) const { return invLocalBoxSize[i]; }
 
     /// calculate start of local box
-    real calculateMyLeft(int i) const { return nodePos[i]*localBoxSize[i]; }
+    real getMyLeft(int i) const { return nodePos[i]*localBoxSize[i]; }
     /// calculate end of local box
-    real calculateMyRight(int i) const { return (nodePos[i] + 1)*localBoxSize[i]; }
+    real getMyRight(int i) const { return (nodePos[i] + 1)*localBoxSize[i]; }
 
     int getNodeNeighbor(int i) const { return nodeNeighbors[i]; }
     /// where to fold particles that leave the box in direction i (ToRight, 0, ToLeft)
@@ -87,6 +88,8 @@ namespace espresso {
 
     /// smallest diameter of the local box
     real smallestLocalBoxDiameter;
+
+    static LOG4ESPP_DECL_LOGGER(logger);
   };
 }
 

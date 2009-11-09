@@ -269,13 +269,13 @@ void GenLogger::log(const char* level, Location& loc, const string& msg)
 
 {  
 #ifdef  HAVE_UNISTD_H
-  printf("%s:%d: %s in \"%s\", PID %d: %s\n", 
+  fprintf(stderr, "%s:%d: %s in \"%s\", PID %d: %s\n", 
 	 loc.filename, loc.line, level, loc.funcname, getpid(), msg.c_str());
 #else
-  printf("%s:%d: %s in \"%s\": %s\n", 
+  fprintf(stderr, "%s:%d: %s in \"%s\": %s\n", 
 	 loc.filename, loc.line, level, loc.funcname, msg.c_str());
 #endif
-  fflush(stdout);
+  fflush(stderr);
 }
 
 /********************************************************************

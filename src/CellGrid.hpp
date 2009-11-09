@@ -98,6 +98,8 @@ namespace espresso {
 
     /// smallest diameter of the cell
     real smallestCellDiameter;
+
+    static LOG4ESPP_DECL_LOGGER(logger);
   };
 }
 

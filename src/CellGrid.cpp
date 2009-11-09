@@ -1,8 +1,14 @@
-#include "CellGrid.hpp"
 #include <cmath>
+
+#define LOG4ESPP_LEVEL_DEBUG
+#include "log4espp.hpp"
+
+#include "CellGrid.hpp"
 
 using namespace std;
 using namespace espresso;
+
+LOG4ESPP_LOGGER(CellGrid::logger, "DomainDecomposition.CellGrid");
 
 CellGridIllegal::CellGridIllegal()
   : std::runtime_error("cell grid dimensions have to be positive") {}
@@ -115,5 +121,17 @@ bool CellGrid::mapPositionToCellCheckedAndClipped(longint &cell, const real pos[
       }
     }
   }
-  return getLinearIndex(cpos);  
+
+  cell = getLinearIndex(cpos);
+
+  LOG4ESPP_TRACE(logger, "mapping position ("
+		 << pos[0] << ", "
+		 << pos[1] << ", "
+		 << pos[2] << ") to grid position ("
+		 << cpos[0] << ", "
+		 << cpos[1] << ", "
+		 << cpos[2] << ") <-> "
+		 << cell);
+
+  return outside;
 }

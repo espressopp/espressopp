@@ -1,6 +1,11 @@
+#define LOG4ESPP_LEVEL_INFO
+#include "log4espp.hpp"
+
 #include "NodeGrid.hpp"
 
 using namespace espresso;
+
+LOG4ESPP_LOGGER(NodeGrid::logger, "DomainDecomposition.NodeGrid");
 
 NodeGridIllegal::NodeGridIllegal()
   : std::runtime_error("node grid dimensions have to be positive") {}
@@ -25,41 +30,51 @@ void NodeGrid::calcNodeNeighbors(longint node)
 {
   int nPos[3];
   
-  getGridPosition(node,nodePos);
+  mapIndexToPosition(nodePos, node);
+
+  LOG4ESPP_DEBUG(logger, "my position: "
+		 << node << " -> "
+		 << nodePos[0] << " "
+		 << nodePos[1] << " "
+		 << nodePos[2]);
 
   for(int dir = 0; dir < 3; ++dir) {
     for(int j = 0; j < 3; ++j) {
       nPos[j] = nodePos[j];
     }
 
-    /* left neighbor in direction dir */
+    // left neighbor in direction dir
     nPos[dir] = nodePos[dir] - 1;
     if(nPos[dir] < 0) {
       nPos[dir] += getGridSize(dir);
     }
     nodeNeighbors[2*dir] = getLinearIndex(nPos);
+    LOG4ESPP_DEBUG(logger, "left neighbor in dir " << dir << ": "
+		   << getNodeNeighbor(2*dir) << " <-> "
+		   << nPos[0] << " "
+		   << nPos[1] << " "
+		   << nPos[2]);
 
-    /* right neighbor in direction dir */
+    // right neighbor in direction dir
     nPos[dir] = nodePos[dir] + 1;
     if(nPos[dir] >= getGridSize(dir)) {
       nPos[dir] -= getGridSize(dir);
     }
     nodeNeighbors[2*dir + 1] = getLinearIndex(nPos);
 
-    /* left boundary ? */
-    if (nodePos[dir] == 0) {
-      boundaries[2*dir] = ToRight;
-    }
-    else {
-      boundaries[2*dir] = 0;
-    }
-    /* right boundary ? */
-    if (nodePos[dir] == getGridSize(dir) - 1) {
-      boundaries[2*dir + 1] = ToLeft;
-    }
-    else {
-      boundaries[2*dir + 1] = 0;
-    }
+    LOG4ESPP_DEBUG(logger, "right neighbor in dir " << dir << ": "
+		   << getNodeNeighbor(2*dir+1) << " <-> "
+		   << nPos[0] << " "
+		   << nPos[1] << " "
+		   << nPos[2]);
+
+    // left or right boundary ?
+    boundaries[2*dir] = (nodePos[dir] == 0) ? ToRight : 0;
+    boundaries[2*dir + 1] = (nodePos[dir] == getGridSize(dir) - 1) ? ToLeft : 0;
+
+    LOG4ESPP_DEBUG(logger, "boundaries in dir " << dir << ": "
+		   << getBoundary(2*dir) << " "
+		   << getBoundary(2*dir + 1));
   }
 }
 
@@ -76,8 +91,7 @@ NodeGrid::NodeGrid(const int grid[3],
     localBoxSize[i] = domainSize[i]/static_cast<real>(getGridSize(i));
     invLocalBoxSize[i] = 1.0/localBoxSize[i];
   }
-
   smallestLocalBoxDiameter = std::min(std::min(localBoxSize[0], localBoxSize[1]), localBoxSize[2]);
 
-  getGridPosition(nodeId, nodePos);
+  calcNodeNeighbors(nodeId);
 }

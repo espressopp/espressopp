@@ -1,5 +1,6 @@
 #include <algorithm>
 
+#define LOG4ESPP_SHORTNAMES
 #define LOG4ESPP_LEVEL_DEBUG
 #include "log4espp.hpp"
 
@@ -29,7 +30,7 @@ DomainDecomposition::DomainDecomposition(System *_system,
 
   initCellInteractions();
 
-  LOG4ESPP_INFO(logger, "done");
+  LOG4ESPP_DEBUG(logger, "done");
 }
 
 void DomainDecomposition::createCellGrid(const int _nodeGrid[3], const int _cellGrid[3])
@@ -43,14 +44,28 @@ void DomainDecomposition::createCellGrid(const int _nodeGrid[3], const int _cell
     throw NodeGridMismatch();
   }
 
+  LOG4ESPP_INFO(logger, "my node grid position: "
+		<< nodeGrid.getNodePosition(0) << " "
+		<< nodeGrid.getNodePosition(1) << " "
+		<< nodeGrid.getNodePosition(2) << " -> "
+		<< comm.rank());
+
+  LOG4ESPP_DEBUG(logger, "my neighbors: "
+		 << nodeGrid.getNodeNeighbor(0) << "<->"
+		 << nodeGrid.getNodeNeighbor(1) << ", "
+		 << nodeGrid.getNodeNeighbor(2) << "<-> "
+		 << nodeGrid.getNodeNeighbor(3) << ", "
+		 << nodeGrid.getNodeNeighbor(4) << "<->"
+		 << nodeGrid.getNodeNeighbor(5));
+
   for(int i = 0; i < 3; ++i) {
-    myLeft[i]  = nodeGrid.calculateMyLeft(i);
-    myRight[i] = nodeGrid.calculateMyRight(i);
+    myLeft[i]  = nodeGrid.getMyLeft(i);
+    myRight[i] = nodeGrid.getMyRight(i);
   }
 
   cellGrid = CellGrid(_cellGrid, myLeft, myRight, 1);
   
-  LOG4ESPP_INFO(logger, "local_box "
+  LOG4ESPP_INFO(logger, "local box "
 		<< myLeft[0] << "-" << myRight[0] << ", "
 		<< myLeft[1] << "-" << myRight[1] << ", "
 		<< myLeft[2] << "-" << myRight[2]);
@@ -69,12 +84,12 @@ void DomainDecomposition::createCellGrid(const int _nodeGrid[3], const int _cell
 
   markCells();
 
-  LOG4ESPP_INFO(logger, "total # cells=" << nTotalCells
-		<< ", # active cells=" << nActiveCells
-		<< ", frame cell grid = (" << cellGrid.getFrameGridSize(0) 
-		<< ", " << cellGrid.getFrameGridSize(1)
-		<< ", " << cellGrid.getFrameGridSize(2)
-		<< ")");
+  LOG4ESPP_DEBUG(logger, "total # cells=" << nTotalCells
+		 << ", # active cells=" << nActiveCells
+		 << ", frame cell grid = (" << cellGrid.getFrameGridSize(0) 
+		 << ", " << cellGrid.getFrameGridSize(1)
+		 << ", " << cellGrid.getFrameGridSize(2)
+		 << ")");
 }
 
 void DomainDecomposition::markCells() {
@@ -102,7 +117,7 @@ void DomainDecomposition::initCellInteractions() {
   // deallocate old structures
   cellInter.resize(cells.size());
 
-  LOG4ESPP_INFO(logger, "setting up neighbors for " << cells.size() << " cells");
+  LOG4ESPP_DEBUG(logger, "setting up neighbors for " << cells.size() << " cells");
 
   for(int o = cellGrid.getInnerCellsBegin(2); o < cellGrid.getInnerCellsEnd(2); ++o) {
     for(int n = cellGrid.getInnerCellsBegin(1); n < cellGrid.getInnerCellsEnd(1); ++n) {
@@ -132,7 +147,7 @@ void DomainDecomposition::initCellInteractions() {
     }
   }
 
-  LOG4ESPP_INFO(logger, "done");
+  LOG4ESPP_DEBUG(logger, "done");
 }
 
 Cell *DomainDecomposition::mapPositionToCellClipped(const real pos[3])
@@ -155,24 +170,26 @@ bool DomainDecomposition::appendParticles(Cell &cell, int dir)
 {
   bool outlier = false;
 
-  LOG4ESPP_INFO(logger, "got " << cell.size() << " particles");
+  LOG4ESPP_DEBUG(logger, "got " << cell.size() << " particles");
 
   for(Cell::iterator it = cell.begin(),
 	end = cell.end(); it != end; ++it) {
 
-    if(nodeGrid.getBoundary(dir) != 0)
+    if(nodeGrid.getBoundary(dir) != 0) {
       system->foldCoordinate(it->r.p, it->l.i, nodeGrid.convertDirToCoord(dir));
-    
+      LOG4ESPP_TRACE(logger, "folded coordinate " << nodeGrid.convertDirToCoord(dir) << " of particle " << it->p.identity);
+    }
+
     longint cell;
     if (cellGrid.mapPositionToCellCheckedAndClipped(cell, it->r.p)) {
-      LOG4ESPP_INFO(logger, "particle " << it->p.identity
-		    << " @ " << it->r.p[0] << ", " << it->r.p[1] << ", "
-		    << it->r.p[2] << " is not inside node domain");
+      LOG4ESPP_TRACE(logger, "particle " << it->p.identity
+		     << " @ " << it->r.p[0] << ", " << it->r.p[1] << ", "
+		     << it->r.p[2] << " is not inside node domain");
       outlier = true;
     }
 
-    LOG4ESPP_INFO(logger, "append part " << it->p.identity << " to cell "
-		  << cell);
+    LOG4ESPP_TRACE(logger, "append part " << it->p.identity << " to cell "
+		   << cell);
 
     appendIndexedParticle(cells[cell], *it);
   }
@@ -181,7 +198,7 @@ bool DomainDecomposition::appendParticles(Cell &cell, int dir)
 
 void DomainDecomposition::exchangeAndSortParticles()
 {
-  LOG4ESPP_INFO(logger, "starting, expected comm buffer size " << exchangeBufferSize);
+  LOG4ESPP_DEBUG(logger, "starting, expected comm buffer size " << exchangeBufferSize);
 
   // allocate send/recv buffers. We use the size as we need maximally so far, to avoid reallocation
   std::vector<Particle> sendBufL; sendBufL.reserve(exchangeBufferSize);
@@ -193,35 +210,37 @@ void DomainDecomposition::exchangeAndSortParticles()
   do {
     int finished = 1;
 
-    for (int dir = 0; dir < 3; ++dir) { 
-      if (nodeGrid.getGridSize(dir) > 1) {
+    for (int coord = 0; coord < 3; ++coord) { 
+      LOG4ESPP_DEBUG(logger, "starting with direction " << coord);
+
+      if (nodeGrid.getGridSize(coord) > 1) {
 	for(std::vector<Cell*>::iterator it = activeCells.begin(),
 	      end = activeCells.end(); it != end; ++it) {
 	  Cell &cell = **it;
 	  // do not use an iterator here, since we have need to take out particles during the loop
 	  for (size_t p = 0; p < cell.size(); ++p) {
 	    Particle &part = cell[p];
-	    if (part.r.p[dir] - cellGrid.getMyLeft(dir) < -ROUND_ERROR_PREC) {
-	      LOG4ESPP_INFO(logger, "send particle left " << part.p.identity);
+	    if (part.r.p[coord] - cellGrid.getMyLeft(coord) < -ROUND_ERROR_PREC) {
+	      LOG4ESPP_TRACE(logger, "send particle left " << part.p.identity);
 	      moveIndexedParticle(sendBufL, cell, p);
 	      localParticles.erase(part.p.identity);
 	      // redo same particle since we took one out here, so it's a new one
 	      --p;
 	    }
-	    else if(part.r.p[dir] - cellGrid.getMyRight(dir) >= ROUND_ERROR_PREC) {
-	      LOG4ESPP_INFO(logger, "send particle right " << part.p.identity);
+	    else if(part.r.p[coord] - cellGrid.getMyRight(coord) >= ROUND_ERROR_PREC) {
+	      LOG4ESPP_TRACE(logger, "send particle right " << part.p.identity);
 	      moveIndexedParticle(sendBufR, cell, p);
 	      localParticles.erase(part.p.identity);
 	      --p;
 	    }
 	    // Sort particles in cells of this node during last direction
-	    else if (dir == 2) {
+	    else if (coord == 2) {
 	      Cell *sortCell = mapPositionToCellChecked(part.r.p);
 	      if (sortCell != &cell) {
 		if (sortCell == 0) {
-		  LOG4ESPP_INFO(logger, "take another loop: particle " << part.p.identity
-				<< " @ " << part.r.p[0] << ", " << part.r.p[1] << ", "
-				<< part.r.p[2] << " is not inside node domain after neighbor exchange");
+		  LOG4ESPP_TRACE(logger, "take another loop: particle " << part.p.identity
+				 << " @ " << part.r.p[0] << ", " << part.r.p[1] << ", "
+				 << part.r.p[2] << " is not inside node domain after neighbor exchange");
 		  // particle stays where it is, and will be sorted in the next round
 		  finished = 0;
 		}
@@ -235,22 +254,22 @@ void DomainDecomposition::exchangeAndSortParticles()
 	}
 
 	// Exchange particles, odd-even rule
-	if( nodeGrid.getNodePosition(dir) % 2 == 0) {
-	  sendParticles(sendBufL, nodeGrid.getNodeNeighbor(2*dir));
-	  recvParticles(recvBufR, nodeGrid.getNodeNeighbor(2*dir + 1));
-	  sendParticles(sendBufR, nodeGrid.getNodeNeighbor(2*dir + 1));
-	  recvParticles(recvBufL, nodeGrid.getNodeNeighbor(2*dir));
+	if( nodeGrid.getNodePosition(coord) % 2 == 0) {
+	  sendParticles(sendBufL, nodeGrid.getNodeNeighbor(2*coord));
+	  recvParticles(recvBufR, nodeGrid.getNodeNeighbor(2*coord + 1));
+	  sendParticles(sendBufR, nodeGrid.getNodeNeighbor(2*coord + 1));
+	  recvParticles(recvBufL, nodeGrid.getNodeNeighbor(2*coord));
 	}
 	else {
-	  recvParticles(recvBufR, nodeGrid.getNodeNeighbor(2*dir + 1));
-	  sendParticles(sendBufL, nodeGrid.getNodeNeighbor(2*dir));
-	  recvParticles(recvBufL, nodeGrid.getNodeNeighbor(2*dir));
-	  sendParticles(sendBufR, nodeGrid.getNodeNeighbor(2*dir + 1));
+	  recvParticles(recvBufR, nodeGrid.getNodeNeighbor(2*coord + 1));
+	  sendParticles(sendBufL, nodeGrid.getNodeNeighbor(2*coord));
+	  recvParticles(recvBufL, nodeGrid.getNodeNeighbor(2*coord));
+	  sendParticles(sendBufR, nodeGrid.getNodeNeighbor(2*coord + 1));
 	}
 
 	// sort received particles to cells
-	if (appendParticles(recvBufL, 2*dir    ) && dir == 2) finished = 0;
-	if (appendParticles(recvBufR, 2*dir + 1) && dir == 2) finished = 0; 
+	if (appendParticles(recvBufL, 2*coord    ) && coord == 2) finished = 0;
+	if (appendParticles(recvBufR, 2*coord + 1) && coord == 2) finished = 0; 
 
 	// reset send/recv buffers
 	sendBufL.resize(0);
@@ -267,16 +286,17 @@ void DomainDecomposition::exchangeAndSortParticles()
 	  // do not use an iterator here, since we have need to take out particles during the loop
 	  for (size_t p = 0; p < cell.size(); ++p) {
 	    Particle &part = cell[p];
-	    system->foldCoordinate(part.r.p, part.l.i, dir);
+	    system->foldCoordinate(part.r.p, part.l.i, coord);
+            LOG4ESPP_TRACE(logger, "folded coordinate " << coord << " of particle " << part.p.identity);
 
-	    if (dir == 2) {
+	    if (coord == 2) {
 	      Cell *sortCell = mapPositionToCellChecked(part.r.p);
 
 	      if (sortCell != &cell) {
 		if (sortCell == 0) {
-		  LOG4ESPP_INFO(logger, "take another loop: particle " << part.p.identity
-				<< " @ " << part.r.p[0] << ", " << part.r.p[1] << ", "
-				<< part.r.p[2] << " is not inside node domain after neighbor exchange");
+		  LOG4ESPP_TRACE(logger, "take another loop: particle " << part.p.identity
+				 << " @ " << part.r.p[0] << ", " << part.r.p[1] << ", "
+				 << part.r.p[2] << " is not inside node domain after neighbor exchange");
 		  // particle stays where it is, and will be sorted in the next round
 		  finished = 0;
 		}
@@ -289,6 +309,8 @@ void DomainDecomposition::exchangeAndSortParticles()
 	  }
 	}
       }
+
+      LOG4ESPP_DEBUG(logger, "done with direction " << coord);
     }
 
     // Communicate wether particle exchange is finished
@@ -302,9 +324,9 @@ void DomainDecomposition::exchangeAndSortParticles()
 						  std::max(recvBufL.capacity(),
 							   recvBufR.capacity()))));
 
-  LOG4ESPP_INFO(logger, "finished exchanging particles, new send/recv buffer size " << exchangeBufferSize);
+  LOG4ESPP_DEBUG(logger, "finished exchanging particles, new send/recv buffer size " << exchangeBufferSize);
 
-  LOG4ESPP_INFO(logger, "starting to exchange full ghost information");
+  LOG4ESPP_DEBUG(logger, "starting to exchange full ghost information");
 
 #if 0
   dd_prepare_comm(&cell_structure.ghost_cells_comm,         GHOSTTRANS_PARTNUM);
@@ -313,7 +335,7 @@ void DomainDecomposition::exchangeAndSortParticles()
   dd_prepare_comm(&cell_structure.exchange_ghosts_comm,  exchange_data);
 #endif
 
-  LOG4ESPP_INFO(logger, "done");
+  LOG4ESPP_DEBUG(logger, "done");
 }
 
 void DomainDecomposition::sendGhostData()

@@ -11,6 +11,13 @@ namespace espresso {
     real boxL[3];
     real invBoxL[3];
 
+    void setBoxL(const real _boxL[3]) {
+      for (int i = 0; i < 3; ++i) {
+        boxL[i]    = _boxL[i];
+        invBoxL[i] = 1.0/_boxL[i];
+      }
+    }
+
     const real *getBoxL()    const { return boxL; }
     const real *getInvBoxL() const { return invBoxL; }
     real getBoxL(int i)      const { return boxL[i]; }

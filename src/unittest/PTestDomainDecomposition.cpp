@@ -18,12 +18,30 @@ struct LoggingFixture {
 
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
+struct Fixture {
+  std::auto_ptr<DomainDecomposition> domdec;
+  System system;
+
+  Fixture() {
+    real boxL[3] = { 1.0, 2.0, 3.0 };
+    int nodeGrid[3] = { boost::mpi::communicator().size(), 1, 1 };
+    int cellGrid[3] = { 1, 2, 3 };
+    system.setBoxL(boxL);
+    domdec = std::auto_ptr<DomainDecomposition>
+      (new DomainDecomposition(&system,
+			       boost::mpi::communicator(),
+			       nodeGrid,
+			       cellGrid,
+			       true));
+  }
+};
+
 BOOST_AUTO_TEST_CASE(constructDomainDecomposition) 
 {
+  real boxL[3] = { 1.0, 2.0, 3.0 };
   System system;
-  system.boxL[0] = 1.0;
-  system.boxL[1] = 2.0;
-  system.boxL[2] = 3.0;
+
+  system.setBoxL(boxL);
 
   for(int i = 0; i < 3; ++i) {
     int nodeGrid[3] = { 1, 1, 1 };
@@ -78,7 +96,7 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
 	  end = domdec.getActiveCells().end();
 	it != end; ++it, ++cnt) {
       int m, n, o;
-      gcGrid.getGridPosition((*it) - firstCell, m, n, o);
+      gcGrid.mapIndexToPosition(m, n, o, (*it) - firstCell);
       BOOST_CHECK(gcGrid.isInnerCell(m, n, o));
     }
     BOOST_CHECK_EQUAL(cnt, int(6));
@@ -90,66 +108,11 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
 	  end = domdec.getPassiveCells().end();
 	it != end; ++it, ++cnt) {
       int m, n, o;
-      gcGrid.getGridPosition((*it) - firstCell, m, n, o);
+      gcGrid.mapIndexToPosition(m, n, o, (*it) - firstCell);
       BOOST_CHECK(!gcGrid.isInnerCell(m, n, o));
     }
     BOOST_CHECK_EQUAL(cnt, int(3*4*5 - 6));
   }
-}
-
-struct Fixture {
-  std::auto_ptr<DomainDecomposition> domdec;
-  System system;
-
-  Fixture() {
-    system.boxL[0] = 1.0;
-    system.boxL[1] = 2.0;
-    system.boxL[2] = 3.0;
-    int nodeGrid[3] = { boost::mpi::communicator().size(), 1, 1 };
-    int cellGrid[3] = { 1, 2, 3 };
-    domdec = std::auto_ptr<DomainDecomposition>
-      (new DomainDecomposition(&system,
-			       boost::mpi::communicator(),
-			       nodeGrid,
-			       cellGrid,
-			       true));
-  }
-};
-
-BOOST_FIXTURE_TEST_CASE(addAndSortParticles, Fixture) 
-{
-  esutil::RNG rng;
-  boost::mpi::communicator comm;
-
-  for (int i = 0; i < 10; ++i) {
-    real pos[3] = { 5*rng(), 3*rng(), 9*rng() };
-    domdec->addParticle(i, pos);
-  }
-  BOOST_CHECK_EQUAL(domdec->getNActiveParticles(), int(10));
-
-  int nodeGrid[3] = { comm.size(), 1, 1 };
-  int cellGrid[3] = { 10, 5, 4 };
-
-  DomainDecomposition domdec2(&system,
-                              comm,
-                              nodeGrid,
-                              cellGrid,
-                              true);
-  domdec2.fetchParticles(*domdec);
-
-  BOOST_CHECK_EQUAL(domdec2.getNActiveParticles(), int(10));
-
-  BOOST_MESSAGE("starting to exchange and sort");
-
-  domdec2.exchangeAndSortParticles();
-
-  BOOST_MESSAGE("still alive after exchange");
-
-  longint myCount = domdec2.getNActiveParticles();
-  longint total;
-  boost::mpi::all_reduce(comm, myCount, total, std::plus<int>());
-
-  BOOST_CHECK_EQUAL(total, comm.size()*int(10));
 }
 
 BOOST_FIXTURE_TEST_CASE(cellNeighbors, Fixture) 
@@ -170,4 +133,54 @@ BOOST_FIXTURE_TEST_CASE(cellNeighbors, Fixture)
       BOOST_CHECK_EQUAL(domdec->getCellNeighbors((*it)).size(), size_t(0));
     }
   }  
+}
+
+BOOST_FIXTURE_TEST_CASE(fetchParticles, Fixture) 
+{
+  int ppn = 100;
+  esutil::RNG rng;
+  boost::mpi::communicator comm;
+
+  for (int i = 0; i < ppn; ++i) {
+    real pos[3] = { 5*rng(), 3*rng(), 9*rng() };
+    domdec->addParticle(i, pos);
+  }
+  BOOST_CHECK_EQUAL(domdec->getNActiveParticles(), ppn);
+
+  int nodeGrid[3] = { comm.size(), 1, 1 };
+  int cellGrid[3] = { 10, 5, 4 };
+
+  DomainDecomposition domdec2(&system,
+                              comm,
+                              nodeGrid,
+                              cellGrid,
+                              true);
+  domdec2.fetchParticles(*domdec);
+
+  BOOST_CHECK_EQUAL(domdec2.getNActiveParticles(), ppn);
+}
+
+BOOST_FIXTURE_TEST_CASE(sortParticles, Fixture) 
+{
+  int initPPN = 10;
+  esutil::RNG rng;
+  boost::mpi::communicator comm;
+
+  for (int i = 0; i < initPPN; ++i) {
+    real pos[3] = { 5*rng(), 3*rng(), 9*rng() };
+    domdec->addParticle(i + 100*comm.rank(), pos);
+  }
+  BOOST_CHECK_EQUAL(domdec->getNActiveParticles(), initPPN);
+
+  BOOST_MESSAGE("starting to exchange and sort");
+
+  domdec->exchangeAndSortParticles();
+
+  BOOST_MESSAGE("still alive after exchange");
+
+  longint myCount = domdec->getNActiveParticles();
+  longint total;
+  boost::mpi::all_reduce(comm, myCount, total, std::plus<int>());
+
+  BOOST_CHECK_EQUAL(total, comm.size()*initPPN);
 }

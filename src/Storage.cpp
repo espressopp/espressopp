@@ -1,5 +1,6 @@
 #include <algorithm>
 
+#define LOG4ESPP_SHORTNAMES
 #define LOG4ESPP_LEVEL_DEBUG
 #include "log4espp.hpp"
 
@@ -36,8 +37,11 @@ longint Storage::getNActiveParticles() const {
   for (std::vector<Cell *>::const_iterator it = activeCells.begin(),
 	 end = activeCells.end();
        it != end; ++it) {
-    LOG4ESPP_TRACE(logger, "cell " << ((*it) - getFirstCell()) << " size " << (*it)->size());
-    cnt += (*it)->size();
+    longint size = (*it)->size();
+    if (size) {
+      LOG4ESPP_TRACE(logger, "cell " << ((*it) - getFirstCell()) << " size " << size);
+    }
+    cnt += size;
   }
   return cnt;
 }
@@ -139,8 +143,8 @@ Particle *Storage::moveIndexedParticle(Cell &dl, Cell &sl, int i)
 
 void Storage::fetchParticles(Storage &old)
 {
-  LOG4ESPP_INFO(logger, "number of received cells = "
-		<< old.getActiveCells().size());
+  LOG4ESPP_DEBUG(logger, "number of received cells = "
+		 << old.getActiveCells().size());
 
   for (ParticleIterator it(old.getActiveCells());
        it.isValid(); ++it) {
@@ -160,30 +164,34 @@ void Storage::fetchParticles(Storage &old)
 
 void Storage::sendParticles(Cell &cell, longint node)
 {
-  LOG4ESPP_INFO(logger, "send " << cell.size() << " particles to " << node);
+  LOG4ESPP_DEBUG(logger, "send " << cell.size() << " particles to " << node);
 
   longint nPart = cell.size();
   comm.send(node, STORAGE_COMM_TAG, nPart);
-  comm.send(node, STORAGE_COMM_TAG,
-	    static_cast<char *>(static_cast<void *>(&(cell[0]))), nPart*sizeof(Particle));
+  if (nPart > 0) {
+    comm.send(node, STORAGE_COMM_TAG,
+	      static_cast<char *>(static_cast<void *>(&(cell[0]))), nPart*sizeof(Particle));
+  }
   cell.clear();
 
-  LOG4ESPP_INFO(logger, "done");
+  LOG4ESPP_DEBUG(logger, "done");
 }
 
 void Storage::recvParticles(Cell &cell, longint node)
 {
-  LOG4ESPP_INFO(logger, "recv from " << node);
+  LOG4ESPP_DEBUG(logger, "recv from " << node);
 
-  longint transfer;
-
-  comm.recv(node, STORAGE_COMM_TAG, transfer);
-
-  LOG4ESPP_INFO(logger, "will receive " << node << "particles");
+  longint nPart;
+  comm.recv(node, STORAGE_COMM_TAG, nPart);
 
   longint curSize = cell.size();
-  cell.resize(curSize + transfer);
+  LOG4ESPP_DEBUG(logger, "will get " << nPart << " particles, have " << curSize);
 
-  comm.recv(node, STORAGE_COMM_TAG, static_cast<char *>(static_cast<void *>(&(cell[curSize]))),
-	    transfer*sizeof(Particle));
+  if (nPart > 0) {
+    cell.resize(curSize + nPart);
+
+    comm.recv(node, STORAGE_COMM_TAG, static_cast<char *>(static_cast<void *>(&(cell[curSize]))),
+	      nPart*sizeof(Particle));
+  }
+  LOG4ESPP_DEBUG(logger, "done");
 }
