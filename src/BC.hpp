@@ -35,14 +35,14 @@ namespace espresso {
 	  \param pos is the position to be folded
       */
       virtual void
-      foldThis(real &pos[3]) const = 0;
+      foldThis(real pos[3]) const = 0;
 
       /** Returns the central image of the position \p pos .
 
 	  \param pos is the position to be folded
 	  \return the folded position */
       virtual void
-      fold(const real &pos[3]) const;
+      fold(const real pos[3]) const;
 
     };
   }

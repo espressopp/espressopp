@@ -14,6 +14,11 @@ namespace espresso {
   template< typename Derived >
   class InteractionBase {
   public:
+    // TODO: 
+    // * Add full loops over all geometric neighbors (with/without BCs)
+    // * Add loops working over Verlet lists
+    // * Add loops working without BC
+
     // full square over two cells
     virtual real 
     computeCellEnergies(BoundaryConditions &bc, 

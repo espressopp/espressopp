@@ -9,9 +9,6 @@
 #include "System.hpp"
 
 namespace espresso {
-
-  typedef std::vector< std::pair<int,int> > PairList;
-
   /**
      Iterates all Particles in a list of cells. This is a Python-like,
      self-contained iterator: isValid() tells whether there are more
@@ -52,38 +49,38 @@ namespace espresso {
     int part, end;
   };
 
+
+  struct Cell;
+
+  typedef vector< Cell* > CellList;
+
+  /** A cell is a structure that manages a list of particles and a
+      list of other cells that are geometric neighbors. 
+
+      A word about the interacting neighbor cells:
+      
+      In a 3D lattice each cell has 27 neighbors (including
+      itself!). Since we deal with pair forces, it is sufficient to
+      calculate only half of the interactions (Newtons law: actio =
+      reactio). For each cell 13+1=14 neighbors. This has only to be
+      done for the inner cells. 
+      
+      Caution: This implementation needs double sided ghost
+      communication! For single sided ghost communication one would
+      need some ghost-ghost cell interaction as well, which we do not
+      need! 
+	
+      It follows: inner cells: #neighbors = 14
+      ghost cells:             #neighbors = 0
+  */
+  struct Cell {
+    ParticleList particles;
+    CellList neighborCells;
+  };
+
   /** represents the particle storage of one system. */
   class Storage {
   public:
-    /** Structure containing information about local interactions
-	with particles in a neighbor cell. */
-    struct IANeighbor {
-      /// Pointer to cells of neighboring cells
-      Cell *pList1, *pList2;
-      /// Verlet list for non bonded interactions of a cell with a neighbor cell
-      PairList vList;
-    };
-
-    /** List of neighbor cells and their interactions.
-
-	A word about the interacting neighbor cells:
-
-	In a 3D lattice each cell has 27 neighbors (including
-	itself!). Since we deal with pair forces, it is sufficient to
-	calculate only half of the interactions (Newtons law: actio =
-	reactio). For each cell 13+1=14 neighbors. This has only to be
-	done for the inner cells. 
-
-	Caution: This implementation needs double sided ghost
-	communication! For single sided ghost communication one would
-	need some ghost-ghost cell interaction as well, which we do not
-	need! 
-
-	It follows: inner cells: #neighbors = 14
-	ghost cells:             #neighbors = 0
-    */
-    typedef std::vector<IANeighbor> IANeighborList;
-
     Storage(System *,
 	    const boost::mpi::communicator &,
 	    bool useVList);
@@ -94,7 +91,7 @@ namespace espresso {
     longint getNActiveParticles() const;
     void fetchParticles(Storage &);
 
-    std::vector<Cell> &getAllCells()       { return cells; }
+    std::vector<Cell> &getLocalCells()       { return cells; }
     std::vector<Cell *> &getActiveCells()  { return activeCells; }
     std::vector<Cell *> &getPassiveCells() { return passiveCells; }
 
@@ -157,9 +154,9 @@ namespace espresso {
     /** here the particles are actually stored */
     std::vector<Cell> cells;
 
-    /** list of local (active) cells */
+    /** list of active (local) cells */
     std::vector<Cell *> activeCells;
-    /** list of ghost cells */
+    /** list of passive (ghost) cells */
     std::vector<Cell *> passiveCells;
 
     static LOG4ESPP_DECL_LOGGER(logger);
