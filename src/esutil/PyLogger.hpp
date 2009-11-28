@@ -4,8 +4,8 @@
 /** \file PyLogger.hpp    Python implementation for logging.
 */
 
-#include <esutil/Logger.hpp>
 #include "python.hpp"
+#include <esutil/Logger.hpp>
 
 namespace log4espp {
 

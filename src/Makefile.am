@@ -9,6 +9,7 @@ python_LTLIBRARIES =
 include SubMakefile.am
 include include/SubMakefile.am
 include esutil/SubMakefile.am
+include storage/SubMakefile.am
 
 CLEANFILES =
 

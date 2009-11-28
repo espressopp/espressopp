@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
 			     true);
 
   const CellGrid &gcGrid = domdec.getCellGrid();
-  const Cell *firstCell = &domdec.getAllCells()[0];
+  const Cell *firstCell = &domdec.getLocalCells()[0];
 
   {
     int cnt = 0;
@@ -122,7 +122,7 @@ BOOST_FIXTURE_TEST_CASE(cellNeighbors, Fixture)
 	  it  = domdec->getActiveCells().begin(),
 	  end = domdec->getActiveCells().end();
 	it != end; ++it) {
-      BOOST_CHECK_EQUAL(domdec->getCellNeighbors((*it)).size(), size_t(14));
+      BOOST_CHECK_EQUAL((*it)->neighborCells.size(), size_t(14));
     }
   }
   {
@@ -130,7 +130,7 @@ BOOST_FIXTURE_TEST_CASE(cellNeighbors, Fixture)
 	  it  = domdec->getPassiveCells().begin(),
 	  end = domdec->getPassiveCells().end();
 	it != end; ++it) {
-      BOOST_CHECK_EQUAL(domdec->getCellNeighbors((*it)).size(), size_t(0));
+      BOOST_CHECK_EQUAL((*it)->neighborCells.size(), size_t(0));
     }
   }  
 }

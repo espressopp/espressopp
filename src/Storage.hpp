@@ -5,79 +5,10 @@
 #include <boost/unordered_map.hpp>
 #include "log4espp.hpp"
 
-#include "Particle.hpp"
 #include "System.hpp"
+#include "Cell.hpp"
 
 namespace espresso {
-  /**
-     Iterates all Particles in a list of cells. This is a Python-like,
-     self-contained iterator: isValid() tells whether there are more
-     particles to come.
-  */
-  class ParticleIterator {
-  public:
-    ParticleIterator(std::vector<Cell *> &lst)
-      : cCell(lst.begin()), endCell(lst.end()), part(0)
-    {
-      if (!isValid()) {
-	end = 0;
-	return;
-      }
-      end = (*cCell)->size();
-      if (part >= end) {
-	findNonemptyCell();
-      }
-    }
-  
-    ParticleIterator &operator++()
-    {
-      if (++part >= end) {
-	findNonemptyCell();
-      }
-      return *this;
-    }
-
-    bool isValid() const { return cCell != endCell; }
-
-    Particle &operator*() const { return (*(*cCell))[part]; }
-    Particle *operator->() const { return &((*(*cCell))[part]); }
-
-  private:
-    void findNonemptyCell();
-
-    std::vector<Cell *>::iterator cCell, endCell;
-    int part, end;
-  };
-
-
-  struct Cell;
-
-  typedef vector< Cell* > CellList;
-
-  /** A cell is a structure that manages a list of particles and a
-      list of other cells that are geometric neighbors. 
-
-      A word about the interacting neighbor cells:
-      
-      In a 3D lattice each cell has 27 neighbors (including
-      itself!). Since we deal with pair forces, it is sufficient to
-      calculate only half of the interactions (Newtons law: actio =
-      reactio). For each cell 13+1=14 neighbors. This has only to be
-      done for the inner cells. 
-      
-      Caution: This implementation needs double sided ghost
-      communication! For single sided ghost communication one would
-      need some ghost-ghost cell interaction as well, which we do not
-      need! 
-	
-      It follows: inner cells: #neighbors = 14
-      ghost cells:             #neighbors = 0
-  */
-  struct Cell {
-    ParticleList particles;
-    CellList neighborCells;
-  };
-
   /** represents the particle storage of one system. */
   class Storage {
   public:
@@ -95,9 +26,6 @@ namespace espresso {
     std::vector<Cell *> &getActiveCells()  { return activeCells; }
     std::vector<Cell *> &getPassiveCells() { return passiveCells; }
 
-    /// get neighbor cells of cell
-    const IANeighborList &getCellNeighbors(Cell *cell) { return cellInter[cell - getFirstCell()]; }
-    
     virtual Cell *mapPositionToCellClipped(const real pos[3]) = 0;
     virtual Cell *mapPositionToCellChecked(const real pos[3]) = 0;
 
@@ -108,7 +36,7 @@ namespace espresso {
 
 	The particles are not removed from localParticles!
     */
-    void sendParticles(Cell &, longint node);
+    void sendParticles(ParticleList &, longint node);
     /** receive particles from another node. The particles are added
 	to the given cell. The operation is blocking: the
 	operation will wait until the particles have been received.
@@ -119,29 +47,26 @@ namespace espresso {
 	the final destination of the particles, call
 	updateLocalParticles after recvParticles.
     */
-    void recvParticles(Cell &, longint node);
+    void recvParticles(ParticleList &, longint node);
 
     const Cell *getFirstCell() const { return &(cells[0]); }
 
     // update the id->local particle map for the given cell
-    void updateLocalParticles(Cell &);
+    void updateLocalParticles(ParticleList &);
     // append a particle to a list, without updating localParticles
-    Particle *appendUnindexedParticle(Cell &, Particle &);
+    Particle *appendUnindexedParticle(ParticleList &, Particle &);
     // append a particle to a list, updating localParticles
-    Particle *appendIndexedParticle(Cell &, Particle &);
+    Particle *appendIndexedParticle(ParticleList &, Particle &);
     // move a particle from one list to another, without updating localParticles
-    Particle *moveUnindexedParticle(Cell &dst, Cell &src, int srcpos);
+    Particle *moveUnindexedParticle(ParticleList &dst, ParticleList &src, int srcpos);
     // move a particle from one list to another, updating localParticles
-    Particle *moveIndexedParticle(Cell &dst, Cell &src, int srcpos);
+    Particle *moveIndexedParticle(ParticleList &dst, ParticleList &src, int srcpos);
 
     /// map particle id to Particle * for all particles on this node
     boost::unordered_map<longint, Particle * > localParticles;
     boost::mpi::communicator comm;
     System *system;
   
-    /** Array containing information about the interactions between the cells. */
-    std::vector<IANeighborList> cellInter;
-
     /** flag for using Verlet List. */
     int useVList;
 

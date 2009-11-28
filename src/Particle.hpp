@@ -43,6 +43,6 @@ namespace espresso {
     }
   };
 
-  typedef std::vector<Particle> Cell;
+  typedef std::vector<Particle> ParticleList;
 }
 #endif

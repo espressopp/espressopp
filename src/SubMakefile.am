@@ -1,18 +1,15 @@
 nobase_pkginclude_HEADERS += \
-	CellGrid.hpp \
-	NodeGrid.hpp \
 	Storage.hpp \
-	DomainDecomposition.hpp \
 	System.hpp \
 	Particle.hpp \
+	Cell.hpp \
+	CellListIterator.hpp \
 	bindings.hpp
 
 libespresso_common_la_SOURCES += \
-	CellGrid.cpp \
-	NodeGrid.cpp \
 	Storage.cpp \
 	System.cpp \
-	DomainDecomposition.cpp \
+	CellListIterator.cpp \
 	bindings.cpp
 
 python_SCRIPTS += \

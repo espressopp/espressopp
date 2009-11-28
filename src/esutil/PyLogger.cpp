@@ -6,8 +6,8 @@
 */
 
 
-#include <iostream>
 #include "PyLogger.hpp"
+#include <iostream>
 
 /********************************************************************
 *  Implementation of trace/debug/info/warn/error/fatal              *

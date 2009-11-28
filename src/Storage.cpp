@@ -5,6 +5,7 @@
 #include "log4espp.hpp"
 
 #include "Storage.hpp"
+#include "CellListIterator.hpp"
 
 using namespace boost;
 using namespace espresso;
@@ -13,15 +14,6 @@ LOG4ESPP_LOGGER(Storage::logger, "Storage");
 
 
 const int STORAGE_COMM_TAG = 0xaa;
-
-void ParticleIterator::findNonemptyCell()
-{
-  part = 0;
-  while (++cCell != endCell) {
-    end = (*cCell)->size();
-    if (end > 0) break;
-  }      
-}
 
 Storage::Storage(System *_system,
                  const boost::mpi::communicator &_comm,
@@ -37,7 +29,7 @@ longint Storage::getNActiveParticles() const {
   for (std::vector<Cell *>::const_iterator it = activeCells.begin(),
 	 end = activeCells.end();
        it != end; ++it) {
-    longint size = (*it)->size();
+    longint size = (*it)->getNParticles();
     if (size) {
       LOG4ESPP_TRACE(logger, "cell " << ((*it) - getFirstCell()) << " size " << size);
     }
@@ -46,8 +38,10 @@ longint Storage::getNActiveParticles() const {
   return cnt;
 }
 
-void Storage::updateLocalParticles(Cell &l) {
-  for (Cell::iterator it = l.begin(), end = l.end();
+void Storage::updateLocalParticles(ParticleList &l) {
+  for (ParticleList::iterator
+	 it  = l.begin(),
+	 end = l.end();
        it != end; ++it) {
     localParticles[it->p.identity] = &(*it);
   }
@@ -67,20 +61,20 @@ void Storage::addParticle(longint id, const real p[3])
   system->foldPosition(n.r.p, n.l.i);
   cell = mapPositionToCellClipped(n.r.p);
 
-  appendIndexedParticle(*cell, n);
+  appendIndexedParticle(cell->particles, n);
 
   LOG4ESPP_TRACE(logger, "got particle id="
 		 << id << " @ " << p[0] << " " << p[1] << " " << p[2] << " ; put it into cell " << cell - getFirstCell());
   LOG4ESPP_TRACE(logger, "cell size is now " << cell->size());
 }
 
-Particle *Storage::appendUnindexedParticle(Cell &l, Particle &part)
+Particle *Storage::appendUnindexedParticle(ParticleList &l, Particle &part)
 {
   l.push_back(part);
   return &l.back();
 }
 
-Particle *Storage::appendIndexedParticle(Cell &l, Particle &part)
+Particle *Storage::appendIndexedParticle(ParticleList &l, Particle &part)
 {
   // see whether the array was resized; STL hack
   Particle *begin = &l.front();
@@ -95,7 +89,7 @@ Particle *Storage::appendIndexedParticle(Cell &l, Particle &part)
   return p;
 }
 
-Particle *Storage::moveUnindexedParticle(Cell &dl, Cell &sl, int i)
+Particle *Storage::moveUnindexedParticle(ParticleList &dl, ParticleList &sl, int i)
 {
   dl.push_back(sl[i]);
   int newSize = sl.size() - 1;
@@ -106,7 +100,7 @@ Particle *Storage::moveUnindexedParticle(Cell &dl, Cell &sl, int i)
   return &dl.back();
 }
 
-Particle *Storage::moveIndexedParticle(Cell &dl, Cell &sl, int i)
+Particle *Storage::moveIndexedParticle(ParticleList &dl, ParticleList &sl, int i)
 {
   // see whether the arrays were resized; STL hack
   Particle *dbegin = &dl.front();
@@ -146,11 +140,11 @@ void Storage::fetchParticles(Storage &old)
   LOG4ESPP_DEBUG(logger, "number of received cells = "
 		 << old.getActiveCells().size());
 
-  for (ParticleIterator it(old.getActiveCells());
+  for (CellListIterator it(old.getActiveCells());
        it.isValid(); ++it) {
     Particle &part = *it;
     Cell *nc = mapPositionToCellClipped(part.r.p);
-    appendUnindexedParticle(*nc, part);
+    appendUnindexedParticle(nc->particles, part);
   }
 
   // update localParticles
@@ -158,39 +152,39 @@ void Storage::fetchParticles(Storage &old)
 	it = activeCells.begin(),
 	end = activeCells.end();
       it != end; ++it) {
-    updateLocalParticles(**it);
+    updateLocalParticles((*it)->particles);
   }
 }
 
-void Storage::sendParticles(Cell &cell, longint node)
+void Storage::sendParticles(ParticleList &l, longint node)
 {
-  LOG4ESPP_DEBUG(logger, "send " << cell.size() << " particles to " << node);
+  LOG4ESPP_DEBUG(logger, "send " << l.size() << " particles to " << node);
 
-  longint nPart = cell.size();
+  longint nPart = l.size();
   comm.send(node, STORAGE_COMM_TAG, nPart);
   if (nPart > 0) {
     comm.send(node, STORAGE_COMM_TAG,
-	      static_cast<char *>(static_cast<void *>(&(cell[0]))), nPart*sizeof(Particle));
+	      static_cast<char *>(static_cast<void *>(&(l[0]))), nPart*sizeof(Particle));
   }
-  cell.clear();
+  l.clear();
 
   LOG4ESPP_DEBUG(logger, "done");
 }
 
-void Storage::recvParticles(Cell &cell, longint node)
+void Storage::recvParticles(ParticleList &l, longint node)
 {
   LOG4ESPP_DEBUG(logger, "recv from " << node);
 
   longint nPart;
   comm.recv(node, STORAGE_COMM_TAG, nPart);
 
-  longint curSize = cell.size();
+  longint curSize = l.size();
   LOG4ESPP_DEBUG(logger, "will get " << nPart << " particles, have " << curSize);
 
   if (nPart > 0) {
-    cell.resize(curSize + nPart);
+    l.resize(curSize + nPart);
 
-    comm.recv(node, STORAGE_COMM_TAG, static_cast<char *>(static_cast<void *>(&(cell[curSize]))),
+    comm.recv(node, STORAGE_COMM_TAG, static_cast<char *>(static_cast<void *>(&(l[curSize]))),
 	      nPart*sizeof(Particle));
   }
   LOG4ESPP_DEBUG(logger, "done");

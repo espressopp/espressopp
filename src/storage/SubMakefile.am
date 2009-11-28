@@ -1,0 +1,12 @@
+nobase_pkginclude_HEADERS += \
+	storage/DomainDecomposition.cpp \
+	storage/CellGrid.hpp \
+	storage/NodeGrid.hpp
+
+libespresso_common_la_SOURCES += \
+	storage/DomainDecomposition.cpp \
+	storage/CellGrid.cpp \
+	storage/NodeGrid.cpp
+
+python_SCRIPTS +=
+

@@ -114,31 +114,25 @@ void DomainDecomposition::markCells() {
 }
 
 void DomainDecomposition::initCellInteractions() {
-  // deallocate old structures
-  cellInter.resize(cells.size());
-
   LOG4ESPP_DEBUG(logger, "setting up neighbors for " << cells.size() << " cells");
 
   for(int o = cellGrid.getInnerCellsBegin(2); o < cellGrid.getInnerCellsEnd(2); ++o) {
     for(int n = cellGrid.getInnerCellsBegin(1); n < cellGrid.getInnerCellsEnd(1); ++n) {
       for(int m = cellGrid.getInnerCellsBegin(0); m < cellGrid.getInnerCellsEnd(0); ++m) {
-	longint ind1 = cellGrid.getLinearIndex(m, n, o);
+	Cell *cell = &cells[cellGrid.getLinearIndex(m, n, o)];
 
-	LOG4ESPP_TRACE(logger, "setting up neighbors for cell " << ind1);
-
+	LOG4ESPP_TRACE(logger, "setting up neighbors for cell " << cell - getFirstCell());
+	
 	// there should be always 14 neighbors
-	cellInter[ind1].resize(14);
+	cell->neighborCells.reserve(14);
 
-	int nCnt = 0;
 	// loop all neighbor cells
 	for(int p = o - 1; p <= o + 1; ++p) {
 	  for(int q = n - 1; q <= n + 1; ++q) {
-	    for(int r = m - 1; r <= m + 1; ++r) {   
-	      longint ind2 = cellGrid.getLinearIndex(r, q, p);
-	      if(ind2 >= ind1) {
-		cellInter[ind1][nCnt].pList1 = &cells[ind1];
-		cellInter[ind1][nCnt].pList2 = &cells[ind2];
-		nCnt++;
+	    for(int r = m - 1; r <= m + 1; ++r) {
+	      Cell *cell2 = &cells[cellGrid.getLinearIndex(r, q, p)];
+	      if(cell2 - cell >= 0) {
+		cell->neighborCells.push_back(cell2);
 	      }
 	    }
 	  }
@@ -166,14 +160,14 @@ Cell *DomainDecomposition::mapPositionToCellChecked(const real pos[3])
   }
 }
 
-bool DomainDecomposition::appendParticles(Cell &cell, int dir)
+bool DomainDecomposition::appendParticles(ParticleList &l, int dir)
 {
   bool outlier = false;
 
-  LOG4ESPP_DEBUG(logger, "got " << cell.size() << " particles");
+  LOG4ESPP_DEBUG(logger, "got " << l.size() << " particles");
 
-  for(Cell::iterator it = cell.begin(),
-	end = cell.end(); it != end; ++it) {
+  for(ParticleList::iterator it = l.begin(),
+	end = l.end(); it != end; ++it) {
 
     if(nodeGrid.getBoundary(dir) != 0) {
       system->foldCoordinate(it->r.p, it->l.i, nodeGrid.convertDirToCoord(dir));
@@ -191,7 +185,7 @@ bool DomainDecomposition::appendParticles(Cell &cell, int dir)
     LOG4ESPP_TRACE(logger, "append part " << it->p.identity << " to cell "
 		   << cell);
 
-    appendIndexedParticle(cells[cell], *it);
+    appendIndexedParticle(cells[cell].particles, *it);
   }
   return outlier;
 }
@@ -201,10 +195,10 @@ void DomainDecomposition::exchangeAndSortParticles()
   LOG4ESPP_DEBUG(logger, "starting, expected comm buffer size " << exchangeBufferSize);
 
   // allocate send/recv buffers. We use the size as we need maximally so far, to avoid reallocation
-  std::vector<Particle> sendBufL; sendBufL.reserve(exchangeBufferSize);
-  std::vector<Particle> sendBufR; sendBufR.reserve(exchangeBufferSize);
-  std::vector<Particle> recvBufL; recvBufL.reserve(exchangeBufferSize);
-  std::vector<Particle> recvBufR; recvBufR.reserve(exchangeBufferSize);
+  ParticleList sendBufL; sendBufL.reserve(exchangeBufferSize);
+  ParticleList sendBufR; sendBufR.reserve(exchangeBufferSize);
+  ParticleList recvBufL; recvBufL.reserve(exchangeBufferSize);
+  ParticleList recvBufR; recvBufR.reserve(exchangeBufferSize);
 
   int nNodesFinished;
   do {
@@ -218,18 +212,18 @@ void DomainDecomposition::exchangeAndSortParticles()
 	      end = activeCells.end(); it != end; ++it) {
 	  Cell &cell = **it;
 	  // do not use an iterator here, since we have need to take out particles during the loop
-	  for (size_t p = 0; p < cell.size(); ++p) {
-	    Particle &part = cell[p];
+	  for (size_t p = 0; p < cell.particles.size(); ++p) {
+	    Particle &part = cell.particles[p];
 	    if (part.r.p[coord] - cellGrid.getMyLeft(coord) < -ROUND_ERROR_PREC) {
 	      LOG4ESPP_TRACE(logger, "send particle left " << part.p.identity);
-	      moveIndexedParticle(sendBufL, cell, p);
+	      moveIndexedParticle(sendBufL, cell.particles, p);
 	      localParticles.erase(part.p.identity);
 	      // redo same particle since we took one out here, so it's a new one
 	      --p;
 	    }
 	    else if(part.r.p[coord] - cellGrid.getMyRight(coord) >= ROUND_ERROR_PREC) {
 	      LOG4ESPP_TRACE(logger, "send particle right " << part.p.identity);
-	      moveIndexedParticle(sendBufR, cell, p);
+	      moveIndexedParticle(sendBufR, cell.particles, p);
 	      localParticles.erase(part.p.identity);
 	      --p;
 	    }
@@ -245,7 +239,7 @@ void DomainDecomposition::exchangeAndSortParticles()
 		  finished = 0;
 		}
 		else {
-		  moveIndexedParticle(*sortCell, cell, p);
+		  moveIndexedParticle(sortCell->particles, cell.particles, p);
 		  --p;
 		}
 	      }
@@ -284,8 +278,8 @@ void DomainDecomposition::exchangeAndSortParticles()
 	      end = activeCells.end(); it != end; ++it) {
 	  Cell &cell = **it;
 	  // do not use an iterator here, since we have need to take out particles during the loop
-	  for (size_t p = 0; p < cell.size(); ++p) {
-	    Particle &part = cell[p];
+	  for (size_t p = 0; p < cell.particles.size(); ++p) {
+	    Particle &part = cell.particles[p];
 	    system->foldCoordinate(part.r.p, part.l.i, coord);
             LOG4ESPP_TRACE(logger, "folded coordinate " << coord << " of particle " << part.p.identity);
 
@@ -301,7 +295,7 @@ void DomainDecomposition::exchangeAndSortParticles()
 		  finished = 0;
 		}
 		else {
-		  moveIndexedParticle(*sortCell, cell, p);
+		  moveIndexedParticle(sortCell->particles, cell.particles, p);
 		  --p;
 		}
 	      }

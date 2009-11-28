@@ -44,7 +44,7 @@ namespace espresso {
 	Returns true if one of the given particles did not belong to this processors
 	domain.
      */
-    bool appendParticles(Cell &, int dir);
+    bool appendParticles(ParticleList &, int dir);
 
     /// spatial domain decomposition of nodes
     NodeGrid nodeGrid;
