@@ -12,8 +12,23 @@ using namespace espresso;
 
 LOG4ESPP_LOGGER(Storage::logger, "Storage");
 
-
 const int STORAGE_COMM_TAG = 0xaa;
+
+
+Storage::ExtraDataElements::ExtraDataElements(bool _properties,
+					      bool _momentum,
+					      bool _local) :
+  properties(_properties),
+  momentum(_momentum),
+  local(_local) {}
+
+const Storage::ExtraDataElements
+Storage::dataOfUpdateGhosts =
+  Storage::ExtraDataElements(false, false, false);
+
+const Storage::ExtraDataElements
+Storage::dataOfExchangeGhosts =
+  Storage::ExtraDataElements(true, false, false);
 
 Storage::Storage(System *_system,
                  const boost::mpi::communicator &_comm,
@@ -24,10 +39,10 @@ Storage::Storage(System *_system,
 
 Storage::~Storage() {}
 
-longint Storage::getNActiveParticles() const {
+longint Storage::getNRealParticles() const {
   longint cnt = 0;
-  for (std::vector<Cell *>::const_iterator it = activeCells.begin(),
-	 end = activeCells.end();
+  for (std::vector<Cell *>::const_iterator it = realCells.begin(),
+         end = realCells.end();
        it != end; ++it) {
     longint size = (*it)->getNParticles();
     if (size) {
@@ -138,9 +153,9 @@ Particle *Storage::moveIndexedParticle(ParticleList &dl, ParticleList &sl, int i
 void Storage::fetchParticles(Storage &old)
 {
   LOG4ESPP_DEBUG(logger, "number of received cells = "
-		 << old.getActiveCells().size());
+		 << old.getRealCells().size());
 
-  for (CellListIterator it(old.getActiveCells());
+  for (CellListIterator it(old.getRealCells());
        it.isValid(); ++it) {
     Particle &part = *it;
     Cell *nc = mapPositionToCellClipped(part.r.p);
@@ -149,8 +164,8 @@ void Storage::fetchParticles(Storage &old)
 
   // update localParticles
   for(std::vector<Cell *>::iterator
-	it = activeCells.begin(),
-	end = activeCells.end();
+	it = realCells.begin(),
+	end = realCells.end();
       it != end; ++it) {
     updateLocalParticles((*it)->particles);
   }
@@ -160,13 +175,16 @@ void Storage::sendParticles(ParticleList &l, longint node)
 {
   LOG4ESPP_DEBUG(logger, "send " << l.size() << " particles to " << node);
 
-  longint nPart = l.size();
-  comm.send(node, STORAGE_COMM_TAG, nPart);
-  if (nPart > 0) {
-    comm.send(node, STORAGE_COMM_TAG,
-	      static_cast<char *>(static_cast<void *>(&(l[0]))), nPart*sizeof(Particle));
-  }
+  // pack for transport
+  mpi::packed_oarchive data(comm);
+  int size = l.size();
+  data << size;
+  for (ParticleList::iterator it = l.begin(), end = l.end(); it != end; ++it)
+    data << *it;
   l.clear();
+
+  // ... and send
+  comm.send(node, STORAGE_COMM_TAG, data);
 
   LOG4ESPP_DEBUG(logger, "done");
 }
@@ -175,17 +193,48 @@ void Storage::recvParticles(ParticleList &l, longint node)
 {
   LOG4ESPP_DEBUG(logger, "recv from " << node);
 
-  longint nPart;
-  comm.recv(node, STORAGE_COMM_TAG, nPart);
+  // receive packed data
+  mpi::packed_iarchive data(comm);
+  comm.recv(node, STORAGE_COMM_TAG, data);
 
-  longint curSize = l.size();
-  LOG4ESPP_DEBUG(logger, "will get " << nPart << " particles, have " << curSize);
+  // ... and unpack
+  int size;
+  data >> size;
+  int curSize = l.size();
+  LOG4ESPP_DEBUG(logger, "got " << size << " particles, have " << curSize);
+  if (size > 0) {
+    l.resize(curSize + size);
 
-  if (nPart > 0) {
-    l.resize(curSize + nPart);
-
-    comm.recv(node, STORAGE_COMM_TAG, static_cast<char *>(static_cast<void *>(&(l[curSize]))),
-	      nPart*sizeof(Particle));
+    for (int i = 0; i < size; ++i) {
+      data >> l[curSize + i];
+    }
   }
+
   LOG4ESPP_DEBUG(logger, "done");
+}
+
+void Storage::invalidateGhosts()
+{
+  for(CellListIterator it(getGhostCells());
+      it.isValid(); ++it) {
+    /* remove only ghosts from the hash if the localParticles hash
+       actually points to the ghost.  If there are local ghost cells
+       to implement pbc, the real particle will be the one accessible
+       via localParticles.
+    */
+    if (localParticles[it->p.identity] == &(*it)) {
+      localParticles.erase(it->p.identity);
+    }
+  }
+}
+
+void Storage::resortParticles()
+{
+  invalidateGhosts();
+
+  resortRealParticles();
+
+  exchangeGhosts();
+
+  onResortParticles();
 }

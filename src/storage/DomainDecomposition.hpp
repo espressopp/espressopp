@@ -22,10 +22,6 @@ namespace espresso {
 
     virtual ~DomainDecomposition() {}
 
-    void exchangeAndSortParticles();
-    void sendGhostData();
-    void collectGhostForces();
-
     virtual Cell *mapPositionToCellClipped(const real pos[3]);
     virtual Cell *mapPositionToCellChecked(const real pos[3]);
 
@@ -33,6 +29,14 @@ namespace espresso {
     const CellGrid &getCellGrid() const { return cellGrid; }
 
   protected:
+    virtual void resortRealParticles();
+    virtual void exchangeGhosts();
+    virtual void updateGhosts();
+    virtual void collectGhostForces();
+
+    void doGhostCommunication(bool realToGhosts,
+			      const ExtraDataElements & = ExtraDataElements());
+
     /// init global Verlet list
     void initCellInteractions();
     /// set the grids and allocate space accordingly

@@ -92,8 +92,8 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
   {
     int cnt = 0;
     for(std::vector<Cell *>::const_iterator
-	  it  = domdec.getActiveCells().begin(),
-	  end = domdec.getActiveCells().end();
+	  it  = domdec.getRealCells().begin(),
+	  end = domdec.getRealCells().end();
 	it != end; ++it, ++cnt) {
       int m, n, o;
       gcGrid.mapIndexToPosition(m, n, o, (*it) - firstCell);
@@ -104,8 +104,8 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
   {
     int cnt = 0;
     for(std::vector<Cell *>::const_iterator
-	  it  = domdec.getPassiveCells().begin(),
-	  end = domdec.getPassiveCells().end();
+	  it  = domdec.getGhostCells().begin(),
+	  end = domdec.getGhostCells().end();
 	it != end; ++it, ++cnt) {
       int m, n, o;
       gcGrid.mapIndexToPosition(m, n, o, (*it) - firstCell);
@@ -119,16 +119,16 @@ BOOST_FIXTURE_TEST_CASE(cellNeighbors, Fixture)
 {
   {
     for(std::vector<Cell *>::const_iterator
-	  it  = domdec->getActiveCells().begin(),
-	  end = domdec->getActiveCells().end();
+	  it  = domdec->getRealCells().begin(),
+	  end = domdec->getRealCells().end();
 	it != end; ++it) {
       BOOST_CHECK_EQUAL((*it)->neighborCells.size(), size_t(14));
     }
   }
   {
     for(std::vector<Cell *>::const_iterator
-	  it  = domdec->getPassiveCells().begin(),
-	  end = domdec->getPassiveCells().end();
+	  it  = domdec->getGhostCells().begin(),
+	  end = domdec->getGhostCells().end();
 	it != end; ++it) {
       BOOST_CHECK_EQUAL((*it)->neighborCells.size(), size_t(0));
     }
@@ -145,7 +145,7 @@ BOOST_FIXTURE_TEST_CASE(fetchParticles, Fixture)
     real pos[3] = { 5*rng(), 3*rng(), 9*rng() };
     domdec->addParticle(i, pos);
   }
-  BOOST_CHECK_EQUAL(domdec->getNActiveParticles(), ppn);
+  BOOST_CHECK_EQUAL(domdec->getNRealParticles(), ppn);
 
   int nodeGrid[3] = { comm.size(), 1, 1 };
   int cellGrid[3] = { 10, 5, 4 };
@@ -157,7 +157,7 @@ BOOST_FIXTURE_TEST_CASE(fetchParticles, Fixture)
                               true);
   domdec2.fetchParticles(*domdec);
 
-  BOOST_CHECK_EQUAL(domdec2.getNActiveParticles(), ppn);
+  BOOST_CHECK_EQUAL(domdec2.getNRealParticles(), ppn);
 }
 
 BOOST_FIXTURE_TEST_CASE(sortParticles, Fixture) 
@@ -170,15 +170,15 @@ BOOST_FIXTURE_TEST_CASE(sortParticles, Fixture)
     real pos[3] = { 5*rng(), 3*rng(), 9*rng() };
     domdec->addParticle(i + 100*comm.rank(), pos);
   }
-  BOOST_CHECK_EQUAL(domdec->getNActiveParticles(), initPPN);
+  BOOST_CHECK_EQUAL(domdec->getNRealParticles(), initPPN);
 
   BOOST_MESSAGE("starting to exchange and sort");
 
-  domdec->exchangeAndSortParticles();
+  domdec->resortParticles();
 
   BOOST_MESSAGE("still alive after exchange");
 
-  longint myCount = domdec->getNActiveParticles();
+  longint myCount = domdec->getNRealParticles();
   longint total;
   boost::mpi::all_reduce(comm, myCount, total, std::plus<int>());
 
