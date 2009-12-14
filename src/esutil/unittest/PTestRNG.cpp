@@ -5,6 +5,7 @@
 #include <vector>
 #include "../RNG.hpp"
 
+using namespace espresso;
 using namespace espresso::esutil;
 
 // Check that a random real is between 0 and 1

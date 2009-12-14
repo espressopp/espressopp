@@ -6,6 +6,7 @@
 #include "logging.hpp"
 #include "esutil/RNG.hpp"
 #include "../DomainDecomposition.hpp"
+#include "System.hpp"
 
 using namespace espresso;
 
@@ -19,36 +20,36 @@ struct LoggingFixture {
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
 struct Fixture {
-  std::auto_ptr<DomainDecomposition> domdec;
-  System system;
+  DomainDecomposition::SelfPtr domdec;
+  System::SelfPtr system;
 
   Fixture() {
     real boxL[3] = { 1.0, 2.0, 3.0 };
-    int nodeGrid[3] = { boost::mpi::communicator().size(), 1, 1 };
+    int nodeGrid[3] = { mpiWorld.size(), 1, 1 };
     int cellGrid[3] = { 1, 2, 3 };
-    system.setBoxL(boxL);
-    domdec = std::auto_ptr<DomainDecomposition>
-      (new DomainDecomposition(&system,
-			       boost::mpi::communicator(),
-			       nodeGrid,
-			       cellGrid,
-			       true));
+    system = make_shared< System >();
+    system->setBoxL(boxL);
+    domdec = make_shared< DomainDecomposition >(system,
+    						mpiWorld,
+    						nodeGrid,
+    						cellGrid,
+    						true);
   }
 };
 
 BOOST_AUTO_TEST_CASE(constructDomainDecomposition) 
 {
   real boxL[3] = { 1.0, 2.0, 3.0 };
-  System system;
-
-  system.setBoxL(boxL);
+  System::SelfPtr system;
+  system = make_shared< System >();
+  system->setBoxL(boxL);
 
   for(int i = 0; i < 3; ++i) {
     int nodeGrid[3] = { 1, 1, 1 };
     int cellGrid[3] = { 1, 1, 1 };
     nodeGrid[i] = 0;
-    BOOST_CHECK_THROW(DomainDecomposition(&system,
-					  boost::mpi::communicator(),
+    BOOST_CHECK_THROW(DomainDecomposition(system,
+					  mpiWorld,
 					  nodeGrid,
 					  cellGrid,
 					  true),
@@ -56,11 +57,11 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
   }
 
   for(int i = 0; i < 3; ++i) {
-    int nodeGrid[3] = { boost::mpi::communicator().size(), 1, 1 };
+    int nodeGrid[3] = { mpiWorld.size(), 1, 1 };
     int cellGrid[3] = { 1, 1, 1 };
     cellGrid[i] = 0;
-    BOOST_CHECK_THROW(DomainDecomposition(&system,
-					  boost::mpi::communicator(),
+    BOOST_CHECK_THROW(DomainDecomposition(system,
+					  mpiWorld,
 					  nodeGrid,
 					  cellGrid,
 					  true),
@@ -68,20 +69,20 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
   }
 
   {
-    int nodeGrid[3] = { boost::mpi::communicator().size(), 2, 1 };
+    int nodeGrid[3] = { mpiWorld.size(), 2, 1 };
     int cellGrid[3] = { 1, 1, 1 };
-    BOOST_CHECK_THROW(DomainDecomposition(&system,
-					  boost::mpi::communicator(),
+    BOOST_CHECK_THROW(DomainDecomposition(system,
+					  mpiWorld,
 					  nodeGrid,
 					  cellGrid,
 					  true),
 		      NodeGridMismatch);
   }
 
-  int nodeGrid[3] = { boost::mpi::communicator().size(), 1, 1 };
+  int nodeGrid[3] = { mpiWorld.size(), 1, 1 };
   int cellGrid[3] = { 1, 2, 3 };
-  DomainDecomposition domdec(&system,
-			     boost::mpi::communicator(),
+  DomainDecomposition domdec(system,
+			     mpiWorld,
 			     nodeGrid,
 			     cellGrid,
 			     true);
@@ -150,7 +151,7 @@ BOOST_FIXTURE_TEST_CASE(fetchParticles, Fixture)
   int nodeGrid[3] = { comm.size(), 1, 1 };
   int cellGrid[3] = { 10, 5, 4 };
 
-  DomainDecomposition domdec2(&system,
+  DomainDecomposition domdec2(system,
                               comm,
                               nodeGrid,
                               cellGrid,

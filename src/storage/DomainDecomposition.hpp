@@ -16,8 +16,8 @@ namespace espresso {
   public:
     DomainDecomposition(shared_ptr< System >,
 			const boost::mpi::communicator &,
-			int nodeGrid[3],
-			int cellGrid[3],
+			const int nodeGrid[3],
+			const int cellGrid[3],
 			bool useVList);
 
     virtual ~DomainDecomposition() {}

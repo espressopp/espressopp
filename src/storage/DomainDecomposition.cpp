@@ -16,8 +16,8 @@ NodeGridMismatch::NodeGridMismatch()
 
 DomainDecomposition::DomainDecomposition(shared_ptr< System > _system,
 					 const mpi::communicator &_comm,
-					 int _nodeGrid[3],
-					 int _cellGrid[3],
+					 const int _nodeGrid[3],
+					 const int _cellGrid[3],
 					 bool _useVList)
   : Storage(_system, _comm, _useVList), exchangeBufferSize(0)
 {
