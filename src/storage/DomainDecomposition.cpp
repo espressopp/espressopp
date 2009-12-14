@@ -1,8 +1,8 @@
-#include <algorithm>
-
 #define LOG4ESPP_SHORTNAMES
 #define LOG4ESPP_LEVEL_DEBUG
+#include <algorithm>
 #include "log4espp.hpp"
+#include "System.hpp"
 
 #include "DomainDecomposition.hpp"
 
@@ -14,7 +14,7 @@ LOG4ESPP_LOGGER(DomainDecomposition::logger, "DomainDecomposition");
 NodeGridMismatch::NodeGridMismatch()
   : std::runtime_error("specified node grid does not match number of nodes in the communicator") {}
 
-DomainDecomposition::DomainDecomposition(System *_system,
+DomainDecomposition::DomainDecomposition(shared_ptr< System > _system,
 					 const mpi::communicator &_comm,
 					 int _nodeGrid[3],
 					 int _cellGrid[3],
@@ -38,7 +38,7 @@ void DomainDecomposition::createCellGrid(const int _nodeGrid[3], const int _cell
   real myLeft[3];
   real myRight[3];
 
-  nodeGrid = NodeGrid(_nodeGrid, comm.rank(), system->getBoxL());
+  nodeGrid = NodeGrid(_nodeGrid, comm.rank(), system.lock()->getBoxL());
   
   if (nodeGrid.getNumberOfCells() != comm.size()) {
     throw NodeGridMismatch();
@@ -170,7 +170,7 @@ bool DomainDecomposition::appendParticles(ParticleList &l, int dir)
 	end = l.end(); it != end; ++it) {
 
     if(nodeGrid.getBoundary(dir) != 0) {
-      system->foldCoordinate(it->r.p, it->l.i, nodeGrid.convertDirToCoord(dir));
+      system.lock()->foldCoordinate(it->r.p, it->l.i, nodeGrid.convertDirToCoord(dir));
       LOG4ESPP_TRACE(logger, "folded coordinate " << nodeGrid.convertDirToCoord(dir) << " of particle " << it->p.identity);
     }
 
@@ -280,7 +280,7 @@ void DomainDecomposition::resortRealParticles()
 	  // do not use an iterator here, since we have need to take out particles during the loop
 	  for (size_t p = 0; p < cell.particles.size(); ++p) {
 	    Particle &part = cell.particles[p];
-	    system->foldCoordinate(part.r.p, part.l.i, coord);
+	    system.lock()->foldCoordinate(part.r.p, part.l.i, coord);
             LOG4ESPP_TRACE(logger, "folded coordinate " << coord << " of particle " << part.p.identity);
 
 	    if (coord == 2) {

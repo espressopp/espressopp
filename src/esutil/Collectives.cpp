@@ -1,5 +1,5 @@
-#include "Collectives.hpp"
 #include "python.hpp"
+#include "Collectives.hpp"
 
 using namespace boost::mpi;
 using namespace espresso::python;

@@ -4,17 +4,20 @@
 #include <mpi.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
+#include "types.hpp"
 #include "log4espp.hpp"
 
-#include "System.hpp"
 #include "Cell.hpp"
 
 namespace espresso {
   /** represents the particle storage of one system. */
+  class System;
+
   class Storage {
   public:
-    
-    Storage(System *,
+    typedef shared_ptr< Storage > SelfPtr;
+
+    Storage(shared_ptr< System > _system,
 	    const boost::mpi::communicator &,
 	    bool useVList);
     virtual ~Storage();
@@ -136,8 +139,8 @@ namespace espresso {
 
     /// map particle id to Particle * for all particles on this node
     boost::unordered_map<longint, Particle * > localParticles;
-    boost::mpi::communicator comm;
-    System *system;
+    mpi::communicator comm;
+    weak_ptr< System > system;
   
     /** flag for using Verlet List. */
     int useVList;

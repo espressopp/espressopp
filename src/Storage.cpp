@@ -4,6 +4,7 @@
 #define LOG4ESPP_LEVEL_DEBUG
 #include "log4espp.hpp"
 
+#include "System.hpp"
 #include "Storage.hpp"
 #include "CellListIterator.hpp"
 
@@ -30,7 +31,7 @@ const Storage::ExtraDataElements
 Storage::dataOfExchangeGhosts =
   Storage::ExtraDataElements(true, false, false);
 
-Storage::Storage(System *_system,
+Storage::Storage(shared_ptr< System > _system,
                  const boost::mpi::communicator &_comm,
                  bool _useVList)
   : comm(_comm), system(_system), useVList(_useVList)
@@ -73,7 +74,7 @@ void Storage::addParticle(longint id, const real p[3])
     n.r.p[i] = p[i];
     n.l.i[i] = 0;
   }
-  system->foldPosition(n.r.p, n.l.i);
+  system.lock()->foldPosition(n.r.p, n.l.i);
   cell = mapPositionToCellClipped(n.r.p);
 
   appendIndexedParticle(cell->particles, n);

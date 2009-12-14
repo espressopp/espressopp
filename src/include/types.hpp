@@ -4,17 +4,35 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/mpi.hpp>
+#include <boost/random.hpp>
 #include <exception>
-
-#include "esutil/estypes.hpp"
 
 namespace espresso {
   using boost::shared_ptr;
+  using boost::weak_ptr;
   using boost::make_shared;
   using boost::enable_shared_from_this;
   using boost::const_pointer_cast;
   using boost::static_pointer_cast;
   using boost::dynamic_pointer_cast;
+  namespace mpi {
+    using namespace boost::mpi;
+  }
+
+  // define this to "float" if you want to have single precision
+  typedef double real;
+  
+  // define this to "long long" if you need longer integers
+  typedef int longint;
+  
+  static const real ROUND_ERROR_PREC = 1.0e-14;
+  
+  // RNG config
+  typedef boost::lagged_fibonacci607 RNGType;
+  // If you REALLY need speed!
+  //typedef boost::rand48 RNGType;
+
 
   class NoDefault: public std::exception {};
 

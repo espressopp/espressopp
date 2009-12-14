@@ -3,6 +3,7 @@
 #include "mpi.hpp"
 
 using namespace espresso::esutil;
+using namespace espresso;
 using namespace boost;
 
 RNG::RNG(long _seed) 

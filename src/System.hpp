@@ -2,11 +2,14 @@
 #define _SYSTEM_HPP
 
 #include "types.hpp"
+#include "Storage.hpp"
 
 namespace espresso {
   class System {
   public:
-    typedef boost::shared_ptr< System > SelfPtr;
+    typedef shared_ptr< System > SelfPtr;
+
+    Storage::SelfPtr storage;
 
     real boxL[3];
     real invBoxL[3];

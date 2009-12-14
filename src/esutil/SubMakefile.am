@@ -4,8 +4,7 @@ nobase_pkginclude_HEADERS += \
         esutil/Logger.hpp \
 	esutil/RNG.hpp \
 	esutil/NormalVariate.hpp \
-	esutil/UniformOnSphere.hpp \
-	esutil/estypes.hpp
+	esutil/UniformOnSphere.hpp
 
 libespresso_common_la_SOURCES += \
 	esutil/Collectives.cpp \
