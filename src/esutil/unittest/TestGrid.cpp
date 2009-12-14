@@ -18,6 +18,6 @@ BOOST_AUTO_TEST_CASE(testGrid) {
   for (int i = 0; i < 6; ++i) {
     int x, y, z;
     testGrid.mapIndexToPosition(x, y, z, i);
-    BOOST_CHECK_EQUAL(testGrid.getLinearIndex(x, y, z), i);
+    BOOST_CHECK_EQUAL(testGrid.mapPositionToIndex(x, y, z), i);
   }
 }

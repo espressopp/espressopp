@@ -29,6 +29,8 @@ namespace espresso {
 	     const real _myRight[3],
 	     int frame);
 
+    int getFrameWidth() const { return frame; }
+
     /// map coordinate to a non-ghost cell. Positions outside the inner grid are clipped back
     longint mapPositionToCellClipped(const real pos[3]) const;
     /// map coordinate to a non-ghost cell. Returns noCell if the position is outside the inner grid

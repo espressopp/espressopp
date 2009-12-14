@@ -23,7 +23,7 @@ longint NodeGrid::mapPositionToNodeClipped(const real pos[3]) const
       cpos[i] = getGridSize(i) - 1;
     }
   }
-  return getLinearIndex(cpos);
+  return mapPositionToIndex(cpos);
 }
 
 void NodeGrid::calcNodeNeighbors(longint node)
@@ -48,7 +48,7 @@ void NodeGrid::calcNodeNeighbors(longint node)
     if(nPos[dir] < 0) {
       nPos[dir] += getGridSize(dir);
     }
-    nodeNeighbors[2*dir] = getLinearIndex(nPos);
+    nodeNeighbors[2*dir] = mapPositionToIndex(nPos);
     LOG4ESPP_DEBUG(logger, "left neighbor in dir " << dir << ": "
 		   << getNodeNeighbor(2*dir) << " <-> "
 		   << nPos[0] << " "
@@ -60,7 +60,7 @@ void NodeGrid::calcNodeNeighbors(longint node)
     if(nPos[dir] >= getGridSize(dir)) {
       nPos[dir] -= getGridSize(dir);
     }
-    nodeNeighbors[2*dir + 1] = getLinearIndex(nPos);
+    nodeNeighbors[2*dir + 1] = mapPositionToIndex(nPos);
 
     LOG4ESPP_DEBUG(logger, "right neighbor in dir " << dir << ": "
 		   << getNodeNeighbor(2*dir+1) << " <-> "

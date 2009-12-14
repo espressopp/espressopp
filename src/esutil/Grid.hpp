@@ -35,10 +35,10 @@ namespace espresso {
       }
 
       /// convert a grid position to a unique sequence index
-      longint getLinearIndex(int p1, int p2, int p3) const
+      longint mapPositionToIndex(int p1, int p2, int p3) const
       { return p1 + size[0]*(p2 + size[1]*p3); }
-      longint getLinearIndex(const int pos[3]) const
-      { return getLinearIndex(pos[0], pos[1], pos[2]); }
+      longint mapPositionToIndex(const int pos[3]) const
+      { return mapPositionToIndex(pos[0], pos[1], pos[2]); }
 
       /// convert a sequence index back to a grid position
       void mapIndexToPosition(int &p1, int &p2, int &p3, longint index) const

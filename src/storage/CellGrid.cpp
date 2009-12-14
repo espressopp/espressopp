@@ -60,7 +60,7 @@ longint CellGrid::mapPositionToCellClipped(const real pos[3]) const
       cpos[i] = getFrameGridSize(i) - frame - 1;
     }
   }
-  return getLinearIndex(cpos);  
+  return mapPositionToIndex(cpos);  
 }
 
 longint CellGrid::mapPositionToCellChecked(const real pos[3]) const
@@ -91,7 +91,7 @@ longint CellGrid::mapPositionToCellChecked(const real pos[3]) const
       }
     }
   }
-  return getLinearIndex(cpos);  
+  return mapPositionToIndex(cpos);  
 }
 
 bool CellGrid::mapPositionToCellCheckedAndClipped(longint &cell, const real pos[3]) const
@@ -122,7 +122,7 @@ bool CellGrid::mapPositionToCellCheckedAndClipped(longint &cell, const real pos[
     }
   }
 
-  cell = getLinearIndex(cpos);
+  cell = mapPositionToIndex(cpos);
 
   LOG4ESPP_TRACE(logger, "mapping position ("
 		 << pos[0] << ", "
