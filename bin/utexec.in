@@ -158,7 +158,11 @@ if not clean and not do_python and not do_cpp \
 
 ##################################################
 # DETERMINE BASEDIRS
-savecwd = os.getcwd()
+savecwd = os.environ.get("PWD")
+if savecwd is None:
+    savecwd = Popen('pwd', stdout=PIPE).communicate()[0].strip()
+    if not savecwd:
+        savecwd = os.getcwd()
 
 if subdir is not None:
     # subdir is specified
