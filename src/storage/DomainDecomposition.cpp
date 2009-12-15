@@ -27,8 +27,8 @@ DomainDecomposition::DomainDecomposition(shared_ptr< System > _system,
 		<< _cellGrid[0] << "x" << _cellGrid[1] << "x" << _cellGrid[2]);
 
   createCellGrid(_nodeGrid, _cellGrid);
-
   initCellInteractions();
+  prepareGhostCommunication();
 
   LOG4ESPP_DEBUG(logger, "done");
 }
@@ -99,7 +99,7 @@ void DomainDecomposition::markCells() {
   for(int o = 0; o < cellGrid.getFrameGridSize(2); ++o) {
     for(int n = 0; n < cellGrid.getFrameGridSize(1); ++n) {
       for(int m = 0; m < cellGrid.getFrameGridSize(0); ++m) {
-	Cell *cur = &cells[cellGrid.getLinearIndex(m, n, o)];
+	Cell *cur = &cells[cellGrid.mapPositionToIndex(m, n, o)];
 	if(cellGrid.isInnerCell(m, n, o)) {
 	  LOG4ESPP_TRACE(logger, "cell " << (cur - &cells[0]) << " is inner cell (" << m << ", " << n << ", " << o << ")");
 	  realCells.push_back(cur);
@@ -119,7 +119,7 @@ void DomainDecomposition::initCellInteractions() {
   for(int o = cellGrid.getInnerCellsBegin(2); o < cellGrid.getInnerCellsEnd(2); ++o) {
     for(int n = cellGrid.getInnerCellsBegin(1); n < cellGrid.getInnerCellsEnd(1); ++n) {
       for(int m = cellGrid.getInnerCellsBegin(0); m < cellGrid.getInnerCellsEnd(0); ++m) {
-	Cell *cell = &cells[cellGrid.getLinearIndex(m, n, o)];
+	Cell *cell = &cells[cellGrid.mapPositionToIndex(m, n, o)];
 
 	LOG4ESPP_TRACE(logger, "setting up neighbors for cell " << cell - getFirstCell());
 	
@@ -130,7 +130,7 @@ void DomainDecomposition::initCellInteractions() {
 	for(int p = o - 1; p <= o + 1; ++p) {
 	  for(int q = n - 1; q <= n + 1; ++q) {
 	    for(int r = m - 1; r <= m + 1; ++r) {
-	      Cell *cell2 = &cells[cellGrid.getLinearIndex(r, q, p)];
+	      Cell *cell2 = &cells[cellGrid.mapPositionToIndex(r, q, p)];
 	      if(cell2 - cell >= 0) {
 		cell->neighborCells.push_back(cell2);
 	      }
@@ -326,71 +326,131 @@ void DomainDecomposition::resortRealParticles()
 }
 
 void DomainDecomposition::exchangeGhosts() {
-  doGhostCommunication(true, dataOfExchangeGhosts);
+  doGhostCommunication(true, true, dataOfExchangeGhosts);
 }
 
 void DomainDecomposition::updateGhosts() {
-  doGhostCommunication(true, dataOfUpdateGhosts);
+  doGhostCommunication(false, true, dataOfUpdateGhosts);
 }
 
 void DomainDecomposition::collectGhostForces() {
-  doGhostCommunication(false);
+  doGhostCommunication(false, false);
 }
 
-void DomainDecomposition::doGhostCommunication(bool realToGhosts,
+void DomainDecomposition::fillCells(std::vector<Cell *> &cv,
+				    const int leftBoundary[3],
+				    const int rightBoundary[3])
+{
+  longint total = 1;
+  for(int i = 0; i < 3; ++i) {
+    if(leftBoundary[i]  < 0 || leftBoundary[i]  >= cellGrid.getFrameGridSize(i) ||
+       rightBoundary[i] < 0 || rightBoundary[i] >= cellGrid.getFrameGridSize(i) ||
+       leftBoundary[i] >= rightBoundary[i]) {
+      throw std::runtime_error("DomainDecomposition::fillCells: wrong cell grid specified internally");
+    }
+    total *= (rightBoundary[i] - leftBoundary[i]);
+  }
+  cv.reserve(total);
+
+  for(int o = leftBoundary[0]; o <= rightBoundary[0]; ++o) {
+    for(int n = leftBoundary[1]; n <= rightBoundary[1]; ++n) {
+      for(int m = leftBoundary[2]; m <= rightBoundary[2]; ++m) {
+	int i = cellGrid.mapPositionToIndex(o, n, m);
+	LOG4ESPP_DEBUG(logger, "add cell " << i);
+	cv.push_back(&cells[i]);
+      }
+    }
+  }
+}
+
+void DomainDecomposition::prepareGhostCommunication()
+{
+  // direction loop: x, y, z
+  for(int dir = 0; dir < 3; ++dir) {
+    // boundaries of area to send
+    int leftBoundary[3], rightBoundary[3];
+    /* boundaries perpendicular directions are the same for left/right send.
+       We also send the ghost frame that we have already, so the data amount
+       increase with each cycles.
+
+       For a direction that was done already, i.e. is smaller than dir,
+       we take the full ghost frame, otherwise only the inner frame.
+    */
+    for (int offset = 1; offset <= 2; ++offset) {
+      int otherDir = (dir + offset) % 3;
+      if (otherDir < dir) {
+	leftBoundary[otherDir]  = 0;
+	rightBoundary[otherDir] = cellGrid.getFrameGridSize(otherDir);
+      }
+      else {
+	leftBoundary[otherDir]  = cellGrid.getInnerCellsBegin(otherDir);
+	rightBoundary[otherDir] = cellGrid.getInnerCellsEnd(otherDir);
+      }
+    }
+
+    //  lr loop: left right - loop
+    for(int lr = 0; lr < 2; ++lr) {
+      int curDir = 2*dir + lr;
+
+      /* participating real particles from this node */
+      if (lr == 0) {
+	leftBoundary[dir]  = cellGrid.getInnerCellsBegin(dir);
+	rightBoundary[dir] = cellGrid.getInnerCellsBegin(dir) + cellGrid.getFrameWidth();
+      }
+      else {
+	leftBoundary[dir]  = cellGrid.getInnerCellsEnd(dir) - cellGrid.getFrameWidth();
+	rightBoundary[dir] = cellGrid.getInnerCellsEnd(dir);
+      }
+      fillCells(commCells[curDir].reals, leftBoundary, rightBoundary);
+
+      /* participating ghosts from this node */
+      if (lr == 0) {
+	leftBoundary[dir]  = cellGrid.getInnerCellsEnd(dir);
+	rightBoundary[dir] = cellGrid.getFrameGridSize(dir);
+      }
+      else {
+	leftBoundary[dir]  = 0;
+	rightBoundary[dir] = cellGrid.getInnerCellsBegin(dir);
+      }      
+      fillCells(commCells[curDir].ghosts, leftBoundary, rightBoundary);
+    }
+  }
+}
+
+void DomainDecomposition::doGhostCommunication(bool sizesFirst,
+					       bool realToGhosts,
 					       const ExtraDataElements &extraElements)
 {
 #if 0
-  int dir,lr,i,cnt, num, n_comm_cells[3];
-  int lc[3],hc[3],done[3]={0,0,0};
-
-  /* calculate number of communications */
-  num = 0;
-  for(dir=0; dir<3; dir++) { 
-    for(lr=0; lr<2; lr++) {
-	{
-	  if(node_grid[dir] == 1 ) num++;
-	  else num += 2;
+  /* direction loop: x, y, z.
+     Here we could in principle build in a one sided ghost
+     communication, simply by taking the lr loop only over one
+     value. */
+  for(int dir = 0; dir < 3; ++dir) {
+    // lr loop: left right
+    for(int lr = 0; lr < 2; ++lr) {
+      if(nodeGrid.getGridSize(dir) == 1) {
+	int curDir = 2*dir + lr;
+	if (commCells[dir].ghosts.size() != commCells[dir].reals.size()) {
+	  throw std::runtime_error("DomainDecomposition::doGhostCommunication: corrupt send/recv cell structure");
 	}
-    }
-  }
 
-  /* prepare communicator */
-  CELL_TRACE(fprintf(stderr,"%d Create Communicator: prep_comm data_parts %d num %d\n",this_node,data_parts,num));
-  prepare_comm(comm, data_parts, num);
+	for (int i = 0; i < 
 
-  /* number of cells to communicate in a direction */
-  n_comm_cells[0] = dd.cell_grid[1]       * dd.cell_grid[2];
-  n_comm_cells[1] = dd.cell_grid[2]       * dd.ghost_cell_grid[0];
-  n_comm_cells[2] = dd.ghost_cell_grid[0] * dd.ghost_cell_grid[1];
-
-  cnt=0;
-  /* direction loop: x, y, z */
-  for(dir=0; dir<3; dir++) {
-    lc[(dir+1)%3] = 1-done[(dir+1)%3]; 
-    lc[(dir+2)%3] = 1-done[(dir+2)%3];
-    hc[(dir+1)%3] = dd.cell_grid[(dir+1)%3]+done[(dir+1)%3];
-    hc[(dir+2)%3] = dd.cell_grid[(dir+2)%3]+done[(dir+2)%3];
-    /* lr loop: left right */
-    /* here we could in principle build in a one sided ghost
-       communication, simply by taking the lr loop only over one
-       value */
-    for(lr=0; lr<2; lr++) {
-      if(node_grid[dir] == 1) {
-	/* just copy cells on a single node */
-	  {
-	    comm->comm[cnt].type          = GHOST_LOCL;
-	    comm->comm[cnt].node          = this_node;
-	    /* Buffer has to contain Send and Recv cells -> factor 2 */
-	    comm->comm[cnt].part_lists    = malloc(2*n_comm_cells[dir]*sizeof(ParticleList *));
-	    comm->comm[cnt].n_part_lists  = 2*n_comm_cells[dir];
-	    /* prepare folding of ghost positions */
-	    if((data_parts & GHOSTTRANS_POSSHFTD) && boundary[2*dir+lr] != 0) 
-	      comm->comm[cnt].shift[dir] = boundary[2*dir+lr]*box_l[dir];
-	    /* fill send comm cells */
-	    lc[(dir+0)%3] = hc[(dir+0)%3] = 1+lr*(dd.cell_grid[(dir+0)%3]-1);  
-	    dd_fill_comm_cell_lists(comm->comm[cnt].part_lists,lc,hc);
-	    CELL_TRACE(fprintf(stderr,"%d: prep_comm %d copy to          grid (%d,%d,%d)-(%d,%d,%d)\n",this_node,cnt,
+	/* sending along direction where we have only one node. So
+	   every node just copies cells within itself */
+	comm->comm[cnt].type          = GHOST_LOCL;
+	comm->comm[cnt].node          = this_node;
+	/* Buffer has to contain Send and Recv cells -> factor 2 */
+	comm->comm[cnt].part_lists    = malloc(2*n_comm_cells[dir]*sizeof(ParticleList *));
+	comm->comm[cnt].n_part_lists  = 2*n_comm_cells[dir];
+	/* prepare folding of ghost positions */
+	if((data_parts & GHOSTTRANS_POSSHFTD) && boundary[2*dir+lr] != 0) 
+	  comm->comm[cnt].shift[dir] = boundary[2*dir+lr]*box_l[dir];
+	/* fill send comm cells */
+	lc[(dir+0)%3] = hc[(dir+0)%3] = 1+lr*(dd.cell_grid[(dir+0)%3]-1);  
+	dd_fill_comm_cell_lists(comm->comm[cnt].part_lists,lc,hc);
+	CELL_TRACE(fprintf(stderr,"%d: prep_comm %d copy to          grid (%d,%d,%d)-(%d,%d,%d)\n",this_node,cnt,
 			       lc[0],lc[1],lc[2],hc[0],hc[1],hc[2]));
 	    /* fill recv comm cells */
 	    lc[(dir+0)%3] = hc[(dir+0)%3] = 0+(1-lr)*(dd.cell_grid[(dir+0)%3]+1);
@@ -403,6 +463,9 @@ void DomainDecomposition::doGhostCommunication(bool realToGhosts,
       else {
 	/* i: send/recv loop */
 	for(i=0; i<2; i++) {  
+                    /* PARTIAL_PERIODIC: #ifdef PARTIAL_PERIODIC */
+                    /* PARTIAL_PERIODIC: 	  if( PERIODIC(dir) || (boundary[2*dir+lr] == 0) )  */
+                    /* PARTIAL_PERIODIC: #endif */
 	    if((node_pos[dir]+i)%2==0) {
 	      comm->comm[cnt].type          = GHOST_SEND;
 	      comm->comm[cnt].node          = node_neighbors[2*dir+lr];
@@ -419,6 +482,9 @@ void DomainDecomposition::doGhostCommunication(bool realToGhosts,
 				 comm->comm[cnt].node,lc[0],lc[1],lc[2],hc[0],hc[1],hc[2]));
 	      cnt++;
 	    }
+                    /* PARTIAL_PERIODIC: #ifdef PARTIAL_PERIODIC */
+                    /* PARTIAL_PERIODIC: 	  if( PERIODIC(dir) || (boundary[2*dir+(1-lr)] == 0) )  */
+                    /* PARTIAL_PERIODIC: #endif */
 	    if((node_pos[dir]+(1-i))%2==0) {
 	      comm->comm[cnt].type          = GHOST_RECV;
 	      comm->comm[cnt].node          = node_neighbors[2*dir+(1-lr)];

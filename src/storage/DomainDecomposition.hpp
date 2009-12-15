@@ -34,8 +34,11 @@ namespace espresso {
     virtual void updateGhosts();
     virtual void collectGhostForces();
 
-    void doGhostCommunication(bool realToGhosts,
+    void doGhostCommunication(bool sizesFirst,
+			      bool realToGhosts,
 			      const ExtraDataElements & = ExtraDataElements());
+
+    void prepareGhostCommunication();
 
     /// init global Verlet list
     void initCellInteractions();
@@ -43,6 +46,10 @@ namespace espresso {
     void createCellGrid(const int nodeGrid[3], const int cellGrid[3]);
     /// sort cells into local/ghost cell arrays
     void markCells();
+    /// fill a list of cells with the cells from a certain region of the domain grid
+    void fillCells(std::vector<Cell *> &,
+		   const int leftBoundary[3],
+		   const int rightBoundary[3]);
     /** read particles from a temporary buffer into the local cell structure.
 	The direction determines in which direction to fold the particles position.
 	Returns true if one of the given particles did not belong to this processors
@@ -58,6 +65,18 @@ namespace espresso {
 
     /// expected capacity of send/recv buffers for neighbor communication
     size_t exchangeBufferSize;
+
+    /** which cells to send and receive during one communication step.
+	In case this is a communication with ourselves, the send-cells
+	are transferred to the recv-cells. */
+    struct CommCells {
+      std::vector<Cell *> reals;
+      std::vector<Cell *> ghosts;
+    };
+    /** which cells to send left, right, up, down, ...
+	For the order, see NodeGrid.
+    */
+    CommCells commCells[6];
 
     static LOG4ESPP_DECL_LOGGER(logger);
   };
