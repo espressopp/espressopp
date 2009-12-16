@@ -36,7 +36,7 @@ namespace espresso {
 
     void doGhostCommunication(bool sizesFirst,
 			      bool realToGhosts,
-			      const ExtraDataElements & = ExtraDataElements());
+			      const int dataElements = 0);
 
     void prepareGhostCommunication();
 

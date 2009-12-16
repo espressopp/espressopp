@@ -86,24 +86,36 @@ namespace espresso {
      */
     virtual void exchangeGhosts() = 0;
 
-    /** which extra data elements to in- or exclude from ghost communication
+    /** bitmask: which extra data elements to in- or exclude from
+	ghost sending
      */
-    struct ExtraDataElements {
-      ExtraDataElements(bool = false, bool = false, bool = false);
-
-      bool properties;
-      bool momentum;
-      bool local;
+    enum ExtraDataElements {
+      DATA_PROPERTIES=1,
+      DATA_MOMENTUM=2,
+      DATA_LOCAL=4
     };
 
     /** for the moment, these are constants, defining what to transfer
 	during ghost communications.
      */
-    static const ExtraDataElements dataOfUpdateGhosts;
-    static const ExtraDataElements dataOfExchangeGhosts;
+    static const int dataOfUpdateGhosts;
+    static const int dataOfExchangeGhosts;
 
     /// remove ghost particles from the localParticles index
     void invalidateGhosts();
+
+    /** copy specified data elements between a real cell and one of its ghosts
+
+	@param realToGhost specify the transfer direction from reals to ghosts
+	or backwards. In the first case, in any case (shifted) positions are sent, in the
+	reverse case, only the forces are collected
+	@param shift how to adjust the positions of the particles when sending
+    */
+    void copyRealsToGhosts(Cell &reals, Cell &ghosts,
+			   int extradata,
+			   const double shift[3]);
+
+    void addGhostForcesToReals(Cell &ghosts, Cell &reals);
 
     /** send particles of a cell to another node, and empty the cell
 	locally. The operation is blocking: the operation
@@ -128,6 +140,7 @@ namespace espresso {
 
     // update the id->local particle map for the given cell
     void updateLocalParticles(ParticleList &);
+
     // append a particle to a list, without updating localParticles
     Particle *appendUnindexedParticle(ParticleList &, Particle &);
     // append a particle to a list, updating localParticles

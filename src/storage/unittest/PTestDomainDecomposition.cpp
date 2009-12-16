@@ -119,14 +119,16 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
 BOOST_FIXTURE_TEST_CASE(cellNeighbors, Fixture) 
 {
   {
+    // minimal test: inner cells have 27 neighbors
     for(std::vector<Cell *>::const_iterator
 	  it  = domdec->getRealCells().begin(),
 	  end = domdec->getRealCells().end();
 	it != end; ++it) {
-      BOOST_CHECK_EQUAL((*it)->neighborCells.size(), size_t(14));
+      BOOST_CHECK_EQUAL((*it)->neighborCells.size(), size_t(27));
     }
   }
   {
+    // minimal test: ghost cells have no neighbors
     for(std::vector<Cell *>::const_iterator
 	  it  = domdec->getGhostCells().begin(),
 	  end = domdec->getGhostCells().end();

@@ -26,9 +26,11 @@ VerletList::VerletList(System::SelfPtr system, double cut)
  
     for (size_t n = 0; n < neighborCells.size(); n++) {
 
-      LOG4ESPP_DEBUG(theLogger, "loop cell pair " << c << " x " << n);
-
       Cell* neighborCell = neighborCells[n];
+
+      LOG4ESPP_DEBUG(theLogger, "loop cell pair " << c << " x " << n);
+      LOG4ESPP_DEBUG(theLogger, c << " has " << localCell->particles.size() << " particles");
+      LOG4ESPP_DEBUG(theLogger, n << " has " << neighborCell->particles.size() << " particles");
 
       // avoid double cells
 

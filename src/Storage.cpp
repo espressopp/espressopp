@@ -1,6 +1,5 @@
 #include <algorithm>
 
-#define LOG4ESPP_SHORTNAMES
 #define LOG4ESPP_LEVEL_DEBUG
 #include "log4espp.hpp"
 
@@ -15,21 +14,8 @@ LOG4ESPP_LOGGER(Storage::logger, "Storage");
 
 const int STORAGE_COMM_TAG = 0xaa;
 
-
-Storage::ExtraDataElements::ExtraDataElements(bool _properties,
-					      bool _momentum,
-					      bool _local) :
-  properties(_properties),
-  momentum(_momentum),
-  local(_local) {}
-
-const Storage::ExtraDataElements
-Storage::dataOfUpdateGhosts =
-  Storage::ExtraDataElements(false, false, false);
-
-const Storage::ExtraDataElements
-Storage::dataOfExchangeGhosts =
-  Storage::ExtraDataElements(true, false, false);
+const int Storage::dataOfUpdateGhosts = 0;
+const int Storage::dataOfExchangeGhosts = DATA_PROPERTIES;
 
 Storage::Storage(shared_ptr< System > _system,
                  const boost::mpi::communicator &_comm,
@@ -238,4 +224,46 @@ void Storage::resortParticles()
   exchangeGhosts();
 
   onResortParticles();
+}
+
+void Storage::copyRealsToGhosts(Cell &_reals, Cell &_ghosts,
+				int elements,
+				const double shift[3])
+{
+  ParticleList &reals  = _reals.particles;
+  ParticleList &ghosts = _ghosts.particles;
+
+  LOG4ESPP_DEBUG(logger, "copy data from reals in "
+		 << (&_reals - getFirstCell()) << " to ghosts in "
+		 << (&_ghosts - getFirstCell()));
+  LOG4ESPP_DEBUG(logger, "also copying "
+		 << ((elements & DATA_PROPERTIES) ? "properties " : "")
+		 << ((elements & DATA_MOMENTUM) ? "momentum " : "")
+		 << ((elements & DATA_LOCAL) ? "local " : ""));
+  LOG4ESPP_DEBUG(logger, "positions are shifted by "
+		 << shift[0] << "," << shift[1] << "," << shift[2]);
+
+  ghosts.resize(reals.size());
+
+  for(ParticleList::iterator src = reals.begin(), end = reals.end(), dst = ghosts.begin();
+      src != end; ++src, ++dst) {
+    src->r.copyShifted(dst->r, shift);
+    if (elements & DATA_PROPERTIES) {
+      dst->p = src->p;
+    }
+    if (elements & DATA_MOMENTUM) {
+      dst->m = src->m;
+    }
+    if (elements & DATA_LOCAL) {
+      dst->l = src->l;
+    }
+
+  }
+}
+
+void Storage::addGhostForcesToReals(Cell &ghosts, Cell &reals)
+{
+  LOG4ESPP_DEBUG(logger, "add forces from ghosts in "
+		 << (&ghosts - getFirstCell()) << " to reals in "
+		 << (&reals - getFirstCell()));
 }

@@ -1,12 +1,13 @@
 #define PARALLEL_TEST_MODULE DomainDecomposition
 #include "ut.hpp"
 #include <memory>
+#include <cstdio>
 
 #include "mpi.hpp"
 #include "logging.hpp"
 #include "esutil/RNG.hpp"
-#include "../DomainDecomposition.hpp"
-#include "../VerletList.hpp"
+#include "storage/DomainDecomposition.hpp"
+#include "VerletList.hpp"
 #include "System.hpp"
 
 using namespace espresso;

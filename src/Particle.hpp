@@ -25,6 +25,12 @@ namespace espresso {
   struct ParticlePosition {
     real p[3];
 
+    void copyShifted(ParticlePosition &dst, const real shift[3]) {
+      for (int i = 0; i < 3; ++i) {
+	dst.p[i] = p[i] + shift[i];
+      }
+    }
+
   private:
     friend class boost::serialization::access;
     template<class Archive>
