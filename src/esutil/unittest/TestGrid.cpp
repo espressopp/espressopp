@@ -1,6 +1,6 @@
-#include <acconfig.hpp>
 #define BOOST_TEST_MODULE Grid
-#include <boost/test/unit_test.hpp>
+
+#include "ut.hpp"
 #include <boost/test/floating_point_comparison.hpp>
 
 #include "../Grid.hpp"
