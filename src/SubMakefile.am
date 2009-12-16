@@ -4,14 +4,16 @@ nobase_pkginclude_HEADERS += \
 	Particle.hpp \
 	Cell.hpp \
 	CellListIterator.hpp \
-	bindings.hpp \
+	VerletList.hpp \
         BC.hpp
+	bindings.hpp
 
 libespresso_common_la_SOURCES += \
 	Storage.cpp \
 	System.cpp \
 	CellListIterator.cpp \
 	bindings.cpp \
+	VerletList.cpp \
         BC.cpp
 
 python_SCRIPTS += \
