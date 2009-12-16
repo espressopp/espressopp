@@ -343,8 +343,8 @@ void DomainDecomposition::fillCells(std::vector<Cell *> &cv,
 {
   longint total = 1;
   for(int i = 0; i < 3; ++i) {
-    if(leftBoundary[i]  < 0 || leftBoundary[i]  >= cellGrid.getFrameGridSize(i) ||
-       rightBoundary[i] < 0 || rightBoundary[i] >= cellGrid.getFrameGridSize(i) ||
+    if(leftBoundary[i]  < 0 || leftBoundary[i]  > cellGrid.getFrameGridSize(i) ||
+       rightBoundary[i] < 0 || rightBoundary[i] > cellGrid.getFrameGridSize(i) ||
        leftBoundary[i] >= rightBoundary[i]) {
       throw std::runtime_error("DomainDecomposition::fillCells: wrong cell grid specified internally");
     }

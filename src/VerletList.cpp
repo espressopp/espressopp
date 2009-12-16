@@ -49,13 +49,13 @@ VerletList::VerletList(System::SelfPtr system, double cut)
 
           // avoid double particle pairs in a cell 
 
-          nparticles = p1 - 1;
+          nparticles = p1;
 
         }
 
         for (size_t p2 = 0; p2 < nparticles; p2++) {
 
-          Particle* pt2  = &neighborCell->particles[p1];
+          Particle* pt2  = &neighborCell->particles[p2];
           double*   pos2 = pt2->r.p;
 
           double d[3];
@@ -70,7 +70,7 @@ VerletList::VerletList(System::SelfPtr system, double cut)
 
           myList.push_back(std::pair<Particle*, Particle*>(pt1, pt2));
         }
-      } 
+      }
     }
   }
 }
