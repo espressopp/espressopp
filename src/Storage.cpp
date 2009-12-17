@@ -28,10 +28,11 @@ Storage::~Storage() {}
 
 longint Storage::getNRealParticles() const {
   longint cnt = 0;
-  for (std::vector<Cell *>::const_iterator it = realCells.begin(),
+  for (CellList::const_iterator 
+	 it = realCells.begin(),
          end = realCells.end();
        it != end; ++it) {
-    longint size = (*it)->getNParticles();
+    longint size = (*it)->particles.size();
     if (size) {
       LOG4ESPP_TRACE(logger, "cell " << ((*it) - getFirstCell()) << " size " << size);
     }

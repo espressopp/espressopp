@@ -5,7 +5,7 @@
 #include <vector>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/list.hpp>
-#include "types.hpp"
+#include "esutil/ESPPIterator.hpp"
 
 namespace espresso {
   struct ParticleProperties {
@@ -114,7 +114,9 @@ namespace espresso {
       ar & p & r & m & f & l;
     }
   };
-  
-  typedef std::vector<Particle> ParticleList;
+
+  struct ParticleList : public std::vector< Particle > {
+    typedef esutil::ESPPIterator< std::vector< Particle > > Iterator;
+  };
 }
 #endif

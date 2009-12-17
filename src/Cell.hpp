@@ -23,11 +23,21 @@ namespace espresso {
       It follows: inner cells: #neighbors = 14
       ghost cells:             #neighbors = 0
   */
+  struct Cell;
+
+  struct CellList : public std::vector< Cell* > {
+    typedef esutil::ESPPIterator< std::vector< Cell* > > Iterator;
+  };
+
+  struct LocalCellList : public std::vector< Cell > {
+    typedef esutil::ESPPIterator< std::vector< Cell > > Iterator;
+  };
+
   struct Cell {
     ParticleList        particles;
-    std::vector<Cell *> neighborCells;
-
-    int getNParticles() const { return particles.size(); }
+    CellList		neighborCells;
   };
+  
+
 }
 #endif

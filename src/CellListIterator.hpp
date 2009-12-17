@@ -12,37 +12,33 @@ namespace espresso {
   */
   class CellListIterator {
   public:
-    CellListIterator(std::vector<Cell *> &lst)
-      : cCell(lst.begin()), endCell(lst.end()), part(0)
-    {
-      if (!isValid()) {
-	end = 0;
-	return;
-      }
-      end = (*cCell)->particles.size();
-      if (part >= end) {
-	findNonemptyCell();
-      }
+    CellListIterator() {
+    }
+
+    CellListIterator(CellList &cl) : cit(cl) {
+      if (cit.isDone()) return;
+      pit = ParticleList::Iterator((*cit)->particles);
+      findNonemptyCell();
     }
 
     CellListIterator &operator++()
     {
-      if (++part >= end) {
-	findNonemptyCell();
-      }
+      ++pit;
+      findNonemptyCell();
       return *this;
     }
 
-    bool isValid() const { return cCell != endCell; }
+    bool isValid() const { return cit.isValid(); }
+    bool isDone() const { return !isValid(); }
 
-    Particle &operator*() const { return (*cCell)->particles[part]; }
-    Particle *operator->() const { return &((*cCell)->particles[part]); }
+    Particle &operator*() const { return *pit; }
+    Particle *operator->() const { return &**this; }
 
   private:
     void findNonemptyCell();
 
-    std::vector<Cell *>::iterator cCell, endCell;
-    int part, end;
+    CellList::Iterator cit;
+    ParticleList::Iterator pit;
   };
 }
 #endif

@@ -1,0 +1,7 @@
+# nobase_pkginclude_HEADERS += \
+# 	interaction/InteractionTemplate.hpp \
+# 	interaction/LennardJones.hpp
+
+# libespresso_common_la_SOURCES += \
+# 	interaction/LennardJones.cpp
+

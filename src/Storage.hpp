@@ -31,9 +31,9 @@ namespace espresso {
      */
     void fetchParticles(Storage &);
 
-    std::vector<Cell>   &getLocalCells()   { return cells; }
-    std::vector<Cell *> &getRealCells()  { return realCells; }
-    std::vector<Cell *> &getGhostCells() { return ghostCells; }
+    LocalCellList &getLocalCells()   { return cells; }
+    CellList &getRealCells()  { return realCells; }
+    CellList &getGhostCells() { return ghostCells; }
 
     /** map a position to a valid cell on this node.  If the position
         is outside the domain of this node, return the cell inside the
@@ -165,12 +165,12 @@ namespace espresso {
     real skin;
 
     /** here the local particles are actually stored */
-    std::vector<Cell> cells;
+    LocalCellList cells;
 
     /** list of real cells */
-    std::vector<Cell *> realCells;
+    CellList realCells;
     /** list of ghost cells */
-    std::vector<Cell *> ghostCells;
+    CellList ghostCells;
 
     static LOG4ESPP_DECL_LOGGER(logger);
   };

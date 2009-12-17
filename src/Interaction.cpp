@@ -6,13 +6,13 @@
 #include "PeriodicBC.hpp"
 
 namespace espresso {
-  typedef std::vector<Particle> Cell;
+  typedef std::vector< Particle > Cell;
 
-  /** InteractionBase provides loop templates to compute
+  /** InteractionTemplate provides loop templates to compute
       forces and energies of the various interactions. */
 
   template< typename Derived >
-  class InteractionBase {
+  class InteractionTemplate {
   public:
     // TODO: 
     // * Add full loops over all geometric neighbors (with/without BCs)

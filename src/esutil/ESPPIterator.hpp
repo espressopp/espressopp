@@ -7,6 +7,10 @@ namespace espresso {
     class ESPPIterator {
       typedef typename STLContainer::value_type value_type;
     public:
+      ESPPIterator()
+	: stlIt(), stlEnd()
+      {}
+
       ESPPIterator(STLContainer container) 
 	: stlIt(container.begin()), stlEnd(container.end())
       {}
@@ -22,6 +26,9 @@ namespace espresso {
       
       value_type &operator*() const { return *stlIt; }
       value_type *operator->() const { return &*this; }
+
+      typename STLContainer::iterator 
+      getSTLIterator() { return stlIt; }
       
     private:
       typename STLContainer::iterator stlIt;
