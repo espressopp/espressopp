@@ -11,7 +11,7 @@ namespace espresso {
 	: stlIt(), stlEnd()
       {}
 
-      ESPPIterator(STLContainer container) 
+      ESPPIterator(STLContainer &container) 
 	: stlIt(container.begin()), stlEnd(container.end())
       {}
       
@@ -25,7 +25,7 @@ namespace espresso {
       bool isDone() const { return !isValid(); }
       
       value_type &operator*() const { return *stlIt; }
-      value_type *operator->() const { return &*this; }
+      value_type *operator->() const { return &**this; }
 
       typename STLContainer::iterator 
       getSTLIterator() { return stlIt; }

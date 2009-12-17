@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(Container) {
     v.push_back(i);
 
   ESPPIterator< std::vector< int > > esppit(v);
-  BOOST_CHECK_EQUAL(*esppit, 0);
+  BOOST_CHECK_EQUAL((*esppit), 0);
   for (int i = 1; i < N; i++) {
     ++esppit;
     BOOST_CHECK_EQUAL(*esppit, i);
@@ -93,9 +93,9 @@ BOOST_AUTO_TEST_CASE(CopyConstructor) {
   for (int i = 0; i < 10; ++i) v.push_back(i);
 
   ESPPIterator< std::vector< int > > esppit(v);
-  BOOST_CHECK_EQUAL(*esppit, 0);
+  BOOST_CHECK_EQUAL((*esppit), 0);
   ++esppit;
-  BOOST_CHECK_EQUAL(*esppit, 1);
+  BOOST_CHECK_EQUAL((*esppit), 1);
 
   // check that the copy points to the same value
   ESPPIterator< std::vector< int > > esppit2(esppit);
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(CopyConstructor) {
   BOOST_CHECK_EQUAL(*esppit2, 2);
 
   // check that you can fully use the copy
-  for (int i = 2; i < 10; ++i) {
+  for (int i = 3; i < 10; ++i) {
     ++esppit2;
     BOOST_CHECK(!esppit2.isDone());
     BOOST_CHECK_EQUAL(*esppit2, i);
