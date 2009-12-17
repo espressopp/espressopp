@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(FullCellList) {
   for (int i = 0; i < NCELL; ++i) {
     cells.push_back(cell);
     for (int j = 0; j < NP; ++j) {
-      p.p.identity = i*NP + j;
+      p.p.id = i*NP + j;
       cells.back().particles.push_back(p);
     }
   }
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(FullCellList) {
   for (int i = 0; i < NCELL*NP; ++i) {
     BOOST_CHECK(cit.isValid());
     BOOST_CHECK(!cit.isDone());
-    ++occ[cit->p.identity];
+    ++occ[cit->p.id];
     ++cit;
   }
 
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(CellListWithHole) {
     if (i == 0 || i == 3)
       cells.push_back(cell);
     for (int j = 0; j < NP; ++j) {
-      p.p.identity = i*NP + j;
+      p.p.id = i*NP + j;
       cells.back().particles.push_back(p);
     }
   }
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE(CellListWithHole) {
   for (int i = 0; i < NCELL*NP; ++i) {
     BOOST_REQUIRE_MESSAGE(cit.isValid(), "Failed in iteration " << i);
     BOOST_REQUIRE(!cit.isDone());
-    ++occ[cit->p.identity];
+    ++occ[cit->p.id];
     ++cit;
   }
 

@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(selfPairs) {
   cell.neighborCells.push_back(&cell);
   cl.push_back(&cell);
   for (int i = 0; i < NP; ++i) {
-    p.p.identity = i;
+    p.p.id = i;
     cell.particles.push_back(p);
   }
 
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(selfPairs) {
     ++it;
     BOOST_CHECK(it.isValid());
     BOOST_CHECK(!it.isDone());
-    BOOST_CHECK(it->first.p.identity != it->second.p.identity);
+    BOOST_CHECK(it->first.p.id != it->second.p.id);
   }
     
   BOOST_CHECK(!it.isValid());
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(fullLoop1D) {
   for (int i = 0; i < NCELL; ++i) {
     // create particles
     for (int j = 0; j < NP; ++j) {
-      p.p.identity = i*NP+j;
+      p.p.id = i*NP+j;
       cell[i].particles.push_back(p);
     }
     // set up neighborhood
@@ -129,8 +129,8 @@ BOOST_AUTO_TEST_CASE(fullLoop1D) {
     ++it;
     BOOST_CHECK(it.isValid());
     BOOST_CHECK(!it.isDone());
-    int id1 = it->first.p.identity;
-    int id2 = it->second.p.identity;
+    int id1 = it->first.p.id;
+    int id2 = it->second.p.id;
     BOOST_CHECK_NE(id1, id2);
     if (id1 > id2) { swap(id1, id2); }
     ++occupancy[id1*NP*NCELL + id2];

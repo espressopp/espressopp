@@ -46,7 +46,7 @@ void Storage::updateLocalParticles(ParticleList &l) {
 	 it  = l.begin(),
 	 end = l.end();
        it != end; ++it) {
-    localParticles[it->p.identity] = &(*it);
+    localParticles[it->p.id] = &(*it);
   }
 }
 
@@ -56,7 +56,7 @@ void Storage::addParticle(longint id, const real p[3])
 
   Particle n;
   n.init();
-  n.p.identity = id;
+  n.p.id = id;
   for (int i = 0; i < 3 ; ++i) {
     n.r.p[i] = p[i];
     n.l.i[i] = 0;
@@ -88,7 +88,7 @@ Particle *Storage::appendIndexedParticle(ParticleList &l, Particle &part)
   if (begin != &l.front())
     updateLocalParticles(l);
   else
-    localParticles[p->p.identity] = p;
+    localParticles[p->p.id] = p;
   return p;
 }
 
@@ -124,7 +124,7 @@ Particle *Storage::moveIndexedParticle(ParticleList &dl, ParticleList &sl, int i
     updateLocalParticles(dl);
   }
   else {
-    localParticles[dst->p.identity] = dst;
+    localParticles[dst->p.id] = dst;
   }
   // fix up resorted source list; due to moving, the last particle
   // might have been moved to the position of the actually moved one
@@ -132,7 +132,7 @@ Particle *Storage::moveIndexedParticle(ParticleList &dl, ParticleList &sl, int i
     updateLocalParticles(sl);
   }
   else if (i != newSize) {
-    localParticles[src->p.identity] = src;
+    localParticles[src->p.id] = src;
   }
 
   return dst;
@@ -210,8 +210,8 @@ void Storage::invalidateGhosts()
        to implement pbc, the real particle will be the one accessible
        via localParticles.
     */
-    if (localParticles[it->p.identity] == &(*it)) {
-      localParticles.erase(it->p.identity);
+    if (localParticles[it->p.id] == &(*it)) {
+      localParticles.erase(it->p.id);
     }
   }
 }

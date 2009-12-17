@@ -168,18 +168,18 @@ bool DomainDecomposition::appendParticles(ParticleList &l, int dir)
 
     if(nodeGrid.getBoundary(dir) != 0) {
       system.lock()->foldCoordinate(it->r.p, it->l.i, nodeGrid.convertDirToCoord(dir));
-      LOG4ESPP_TRACE(logger, "folded coordinate " << nodeGrid.convertDirToCoord(dir) << " of particle " << it->p.identity);
+      LOG4ESPP_TRACE(logger, "folded coordinate " << nodeGrid.convertDirToCoord(dir) << " of particle " << it->p.id);
     }
 
     longint cell;
     if (cellGrid.mapPositionToCellCheckedAndClipped(cell, it->r.p)) {
-      LOG4ESPP_TRACE(logger, "particle " << it->p.identity
+      LOG4ESPP_TRACE(logger, "particle " << it->p.id
 		     << " @ " << it->r.p[0] << ", " << it->r.p[1] << ", "
 		     << it->r.p[2] << " is not inside node domain");
       outlier = true;
     }
 
-    LOG4ESPP_TRACE(logger, "append part " << it->p.identity << " to cell "
+    LOG4ESPP_TRACE(logger, "append part " << it->p.id << " to cell "
 		   << cell);
 
     appendIndexedParticle(cells[cell].particles, *it);
@@ -212,16 +212,16 @@ void DomainDecomposition::resortRealParticles()
 	  for (size_t p = 0; p < cell.particles.size(); ++p) {
 	    Particle &part = cell.particles[p];
 	    if (part.r.p[coord] - cellGrid.getMyLeft(coord) < -ROUND_ERROR_PREC) {
-	      LOG4ESPP_TRACE(logger, "send particle left " << part.p.identity);
+	      LOG4ESPP_TRACE(logger, "send particle left " << part.p.id);
 	      moveIndexedParticle(sendBufL, cell.particles, p);
-	      localParticles.erase(part.p.identity);
+	      localParticles.erase(part.p.id);
 	      // redo same particle since we took one out here, so it's a new one
 	      --p;
 	    }
 	    else if(part.r.p[coord] - cellGrid.getMyRight(coord) >= ROUND_ERROR_PREC) {
-	      LOG4ESPP_TRACE(logger, "send particle right " << part.p.identity);
+	      LOG4ESPP_TRACE(logger, "send particle right " << part.p.id);
 	      moveIndexedParticle(sendBufR, cell.particles, p);
-	      localParticles.erase(part.p.identity);
+	      localParticles.erase(part.p.id);
 	      --p;
 	    }
 	    // Sort particles in cells of this node during last direction
@@ -229,7 +229,7 @@ void DomainDecomposition::resortRealParticles()
 	      Cell *sortCell = mapPositionToCellChecked(part.r.p);
 	      if (sortCell != &cell) {
 		if (sortCell == 0) {
-		  LOG4ESPP_TRACE(logger, "take another loop: particle " << part.p.identity
+		  LOG4ESPP_TRACE(logger, "take another loop: particle " << part.p.id
 				 << " @ " << part.r.p[0] << ", " << part.r.p[1] << ", "
 				 << part.r.p[2] << " is not inside node domain after neighbor exchange");
 		  // particle stays where it is, and will be sorted in the next round
@@ -278,14 +278,14 @@ void DomainDecomposition::resortRealParticles()
 	  for (size_t p = 0; p < cell.particles.size(); ++p) {
 	    Particle &part = cell.particles[p];
 	    system.lock()->foldCoordinate(part.r.p, part.l.i, coord);
-            LOG4ESPP_TRACE(logger, "folded coordinate " << coord << " of particle " << part.p.identity);
+            LOG4ESPP_TRACE(logger, "folded coordinate " << coord << " of particle " << part.p.id);
 
 	    if (coord == 2) {
 	      Cell *sortCell = mapPositionToCellChecked(part.r.p);
 
 	      if (sortCell != &cell) {
 		if (sortCell == 0) {
-		  LOG4ESPP_TRACE(logger, "take another loop: particle " << part.p.identity
+		  LOG4ESPP_TRACE(logger, "take another loop: particle " << part.p.id
 				 << " @ " << part.r.p[0] << ", " << part.r.p[1] << ", "
 				 << part.r.p[2] << " is not inside node domain after neighbor exchange");
 		  // particle stays where it is, and will be sorted in the next round

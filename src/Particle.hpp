@@ -9,7 +9,7 @@
 
 namespace espresso {
   struct ParticleProperties {
-    size_t identity;
+    size_t id;
     size_t type;
 
   private:
@@ -17,7 +17,7 @@ namespace espresso {
     template<class Archive>
     void serialize(Archive &ar, const unsigned int version)
     {
-      ar & identity;
+      ar & id;
       ar & type;
     }
   };
