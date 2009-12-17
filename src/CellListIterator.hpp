@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "Cell.hpp"
+#include <iostream>
 
 namespace espresso {
   /**
