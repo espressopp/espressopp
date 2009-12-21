@@ -1,4 +1,4 @@
-#define LOG4ESPP_LEVEL_TRACE
+#define LOG4ESPP_LEVEL_DEBUG
 #include <algorithm>
 #include "log4espp.hpp"
 #include "System.hpp"
@@ -370,7 +370,7 @@ void DomainDecomposition::fillCells(std::vector<Cell *> &cv,
 void DomainDecomposition::prepareGhostCommunication()
 {
   // direction loop: x, y, z
-  for(int dir = 0; dir < 3; ++dir) {
+  for(int coord = 0; coord < 3; ++coord) {
     // boundaries of area to send
     int leftBoundary[3], rightBoundary[3];
     /* boundaries perpendicular directions are the same for left/right send.
@@ -381,46 +381,46 @@ void DomainDecomposition::prepareGhostCommunication()
        we take the full ghost frame, otherwise only the inner frame.
     */
     for (int offset = 1; offset <= 2; ++offset) {
-      int otherDir = (dir + offset) % 3;
-      if (otherDir < dir) {
-	leftBoundary[otherDir]  = 0;
-	rightBoundary[otherDir] = cellGrid.getFrameGridSize(otherDir);
+      int otherCoord = (coord + offset) % 3;
+      if (otherCoord < coord) {
+	leftBoundary[otherCoord]  = 0;
+	rightBoundary[otherCoord] = cellGrid.getFrameGridSize(otherCoord);
       }
       else {
-	leftBoundary[otherDir]  = cellGrid.getInnerCellsBegin(otherDir);
-	rightBoundary[otherDir] = cellGrid.getInnerCellsEnd(otherDir);
+	leftBoundary[otherCoord]  = cellGrid.getInnerCellsBegin(otherCoord);
+	rightBoundary[otherCoord] = cellGrid.getInnerCellsEnd(otherCoord);
       }
     }
 
     //  lr loop: left right - loop
     for(int lr = 0; lr < 2; ++lr) {
-      int curDir = 2*dir + lr;
+      int dir = 2*coord + lr;
 
       /* participating real particles from this node */
-      LOG4ESPP_DEBUG(logger, "direction " << curDir << " reals");
+      LOG4ESPP_DEBUG(logger, "direction " << dir << " reals");
 
       if (lr == 0) {
-	leftBoundary[dir]  = cellGrid.getInnerCellsBegin(dir);
-	rightBoundary[dir] = cellGrid.getInnerCellsBegin(dir) + cellGrid.getFrameWidth();
+	leftBoundary[coord]  = cellGrid.getInnerCellsBegin(coord);
+	rightBoundary[coord] = cellGrid.getInnerCellsBegin(coord) + cellGrid.getFrameWidth();
       }
       else {
-	leftBoundary[dir]  = cellGrid.getInnerCellsEnd(dir) - cellGrid.getFrameWidth();
-	rightBoundary[dir] = cellGrid.getInnerCellsEnd(dir);
+	leftBoundary[coord]  = cellGrid.getInnerCellsEnd(coord) - cellGrid.getFrameWidth();
+	rightBoundary[coord] = cellGrid.getInnerCellsEnd(coord);
       }
-      fillCells(commCells[curDir].reals, leftBoundary, rightBoundary);
+      fillCells(commCells[dir].reals, leftBoundary, rightBoundary);
 
       /* participating ghosts from this node */
-      LOG4ESPP_DEBUG(logger, "direction " << curDir << " ghosts");
+      LOG4ESPP_DEBUG(logger, "direction " << dir << " ghosts");
 
       if (lr == 0) {
-	leftBoundary[dir]  = cellGrid.getInnerCellsEnd(dir);
-	rightBoundary[dir] = cellGrid.getFrameGridSize(dir);
+	leftBoundary[coord]  = cellGrid.getInnerCellsEnd(coord);
+	rightBoundary[coord] = cellGrid.getInnerCellsEnd(coord) + cellGrid.getFrameWidth();
       }
       else {
-	leftBoundary[dir]  = 0;
-	rightBoundary[dir] = cellGrid.getInnerCellsBegin(dir);
+	leftBoundary[coord]  = cellGrid.getInnerCellsBegin(coord) - cellGrid.getFrameWidth();
+	rightBoundary[coord] = cellGrid.getInnerCellsBegin(coord);
       }      
-      fillCells(commCells[curDir].ghosts, leftBoundary, rightBoundary);
+      fillCells(commCells[dir].ghosts, leftBoundary, rightBoundary);
     }
   }
 }
@@ -433,16 +433,16 @@ void DomainDecomposition::doGhostCommunication(bool sizesFirst,
      Here we could in principle build in a one sided ghost
      communication, simply by taking the lr loop only over one
      value. */
-  for(int dir = 0; dir < 3; ++dir) {
-    real curDirBoxL = system.lock()->getBoxL(dir);
+  for(int coord = 0; coord < 3; ++coord) {
+    real curCoordBoxL = system.lock()->getBoxL(coord);
 
     // lr loop: left right
     for (int lr = 0; lr < 2; ++lr) {
-      int curDir = 2*dir + lr;
+      int dir = 2*coord + lr;
 
-      LOG4ESPP_DEBUG(logger, "direction " << curDir);
-
-      if (nodeGrid.getGridSize(dir) == 1) {
+      LOG4ESPP_DEBUG(logger, "direction " << dir);
+      
+      if (nodeGrid.getGridSize(coord) == 1) {
 	LOG4ESPP_DEBUG(logger, "local communication");
 
 	// copy operation, we have to receive as many cells as we send
@@ -451,23 +451,20 @@ void DomainDecomposition::doGhostCommunication(bool sizesFirst,
 	}
 
 	real shift[3] = { 0, 0, 0 };
-	shift[dir] = nodeGrid.getBoundary(curDir)*curDirBoxL;
+	shift[coord] = nodeGrid.getBoundary(dir)*curCoordBoxL;
 	
 	for (int i = 0, end = commCells[dir].ghosts.size(); i < end; ++i) {
 	  if (realToGhosts) {
-	    copyRealsToGhosts(*commCells[curDir].reals[i],
-			      *commCells[curDir].ghosts[i],
+	    copyRealsToGhosts(*commCells[dir].reals[i],
+			      *commCells[dir].ghosts[i],
 			      extraElements, shift);
 	  } else {
-	    addGhostForcesToReals(*commCells[curDir].ghosts[i],
-				  *commCells[curDir].reals[i]);
+	    addGhostForcesToReals(*commCells[dir].ghosts[i],
+				  *commCells[dir].reals[i]);
 	  }
 	}
       }
       else {
-	throw std::runtime_error("DomainDecomposition::doGhostCommunication: mpi send/recv not implemented");
-
-
 #if 0
 	/* i: send/recv loop */
 	for(i=0; i<2; i++) {  

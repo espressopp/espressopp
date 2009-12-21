@@ -39,7 +39,13 @@ namespace espresso {
 	position is outside the inner grid */
     bool mapPositionToCellCheckedAndClipped(longint &, const real pos[3]) const;
 
-    /// get start of inner grid
+    /// check wether a position is in the inner domain
+    bool isInnerPosition(real pos[3]) {
+      return (pos[0] >= getMyLeft(0) && pos[0] < getMyRight(0) &&
+	      pos[1] >= getMyLeft(1) && pos[1] < getMyRight(1) &&
+	      pos[2] >= getMyLeft(2) && pos[2] < getMyRight(2));
+    }
+    /// check whether a cell is in the inner grid
     bool isInnerCell(int m, int n, int o) const {
       return
 	(m >= getInnerCellsBegin(0) && m < getInnerCellsEnd(0)) &&

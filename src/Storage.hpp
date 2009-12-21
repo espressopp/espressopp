@@ -16,13 +16,30 @@ namespace espresso {
   class Storage {
   public:
     typedef shared_ptr< Storage > SelfPtr;
+    typedef boost::unordered_map<longint, Particle * > IdParticleMap;
 
     Storage(shared_ptr< System > _system,
 	    const boost::mpi::communicator &,
 	    bool useVList);
     virtual ~Storage();
 
-    void addParticle(longint id, const real pos[3]);
+    /** add a particle with given id and position. Note that this is a
+	local operation, and therefore cannot check whether a particle
+	with the give id already exists.  This is left to the parallel
+	front end.
+    */
+    Particle *addParticle(longint id, const real pos[3]);
+    /** lookup whether data for a given particle is available on this node,
+	either as real or as ghost particle*/
+    Particle *lookupLocalParticle(longint id) {
+      IdParticleMap::iterator it = localParticles.find(id);
+      return (it != localParticles.end()) ? it->second : 0;
+    }
+    /** lookup whether data for a given particle is available on this node. */
+    Particle *lookupRealParticle(longint id) {
+      IdParticleMap::iterator it = localParticles.find(id);
+      return (it != localParticles.end() && !(it->second->l.ghost)) ? it->second : 0;
+    }
 
     /// get number of real particles on this node
     longint getNRealParticles() const;
@@ -34,6 +51,8 @@ namespace espresso {
     LocalCellList &getLocalCells()   { return cells; }
     CellList &getRealCells()  { return realCells; }
     CellList &getGhostCells() { return ghostCells; }
+
+    const Cell *getFirstCell() const { return &(cells[0]); }
 
     /** map a position to a valid cell on this node.  If the position
         is outside the domain of this node, return the cell inside the
@@ -135,8 +154,6 @@ namespace espresso {
 	updateLocalParticles after recvParticles.
     */
     void recvParticles(ParticleList &, longint node);
-
-    const Cell *getFirstCell() const { return &(cells[0]); }
 
     // update the id->local particle map for the given cell
     void updateLocalParticles(ParticleList &);

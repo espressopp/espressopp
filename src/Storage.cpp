@@ -50,7 +50,7 @@ void Storage::updateLocalParticles(ParticleList &l) {
   }
 }
 
-void Storage::addParticle(longint id, const real p[3])
+Particle *Storage::addParticle(longint id, const real p[3])
 {
   Cell *cell;
 
@@ -69,6 +69,8 @@ void Storage::addParticle(longint id, const real p[3])
   LOG4ESPP_TRACE(logger, "got particle id="
 		 << id << " @ " << p[0] << " " << p[1] << " " << p[2] << " ; put it into cell " << cell - getFirstCell());
   LOG4ESPP_TRACE(logger, "cell size is now " << cell->size());
+
+  return &cell->particles.back();
 }
 
 Particle *Storage::appendUnindexedParticle(ParticleList &l, Particle &part)
@@ -258,7 +260,7 @@ void Storage::copyRealsToGhosts(Cell &_reals, Cell &_ghosts,
     if (elements & DATA_LOCAL) {
       dst->l = src->l;
     }
-
+    dst->l.ghost = 1;
   }
 }
 
