@@ -1,7 +1,10 @@
-# nobase_pkginclude_HEADERS += \
-# 	interaction/InteractionTemplate.hpp \
-# 	interaction/LennardJones.hpp
+nobase_pkginclude_HEADERS += \
+	interaction/Interaction.hpp \
+	interaction/InteractionTemplate.hpp \
+ 	interaction/LennardJones.hpp
 
-# libespresso_common_la_SOURCES += \
-# 	interaction/LennardJones.cpp
+libespresso_common_la_SOURCES += \
+ 	interaction/Interaction.cpp
+
+python_SCRIPTS +=
 

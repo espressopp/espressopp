@@ -1,16 +1,18 @@
-#define PARALLEL_TEST_MODULE DomainDecomposition
+#define PARALLEL_TEST_MODULE LennardJones
 #include "ut.hpp"
 #include <memory>
-#include <cstdio>
 
 #include "mpi.hpp"
 #include "logging.hpp"
 #include "esutil/RNG.hpp"
 #include "storage/DomainDecomposition.hpp"
-#include "VerletList.hpp"
+#include "interaction/LennardJones.hpp"
 #include "System.hpp"
+#include "VerletList.hpp"
 
 using namespace espresso;
+using namespace interaction;
+using namespace esutil;
 
 struct LoggingFixture {  
   LoggingFixture() { 
@@ -32,10 +34,10 @@ struct Fixture {
     system = make_shared< System >();
     system->setBoxL(boxL);
     domdec = make_shared< DomainDecomposition >(system,
-    						mpiWorld,
-    						nodeGrid,
-    						cellGrid,
-    						true);
+                                                mpiWorld,
+                                                nodeGrid,
+                                                cellGrid,
+                                                true);
     int initPPN = 4;
     esutil::RNG rng;
     boost::mpi::communicator comm;
@@ -52,7 +54,7 @@ struct Fixture {
 
 BOOST_GLOBAL_FIXTURE(Fixture);
 
-BOOST_FIXTURE_TEST_CASE(buildVerletList, Fixture) 
+BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 {
   BOOST_MESSAGE("starting to build verlet lists");
 
@@ -68,5 +70,19 @@ BOOST_FIXTURE_TEST_CASE(buildVerletList, Fixture)
     printf("pair %d = %d %d\n", i, 1, 2);
   }
 
-  // BOOST_CHECK_EQUAL(total, comm.size()*initPPN);
+  LennardJones lj = LennardJones();
+
+  lj.setParameters(0, 0, 1.0, 1.0, 1.3);
+
+  // compute energy for the storage looping over all cells
+
+  real e1 = lj.computeStorageEnergy(system->storage);
+
+  printf("energy (cells) = %f\n", e1);
+
+  lj.addVerletListForces(vl);
+
+  real e2 = lj.computeVerletListEnergy(vl);
+
+  printf("energy (verlet) = %f\n", e2);
 }

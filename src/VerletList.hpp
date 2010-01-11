@@ -24,7 +24,7 @@ class VerletList {
 
   /** List of pairs are currently done by a vector. */
 
-  typedef std::vector<pairParticle> pairList;
+  typedef std::vector<pairParticle> PairList;
 
   /** Build a verlet list of all particle pairs in the storage
       whose distance is less than a given cutoff.
@@ -38,11 +38,11 @@ class VerletList {
 
   ~VerletList();
 
-  const pairList& getPairs() { return myList; }
+  const PairList& getPairs() { return myList; }
 
  private:
 
-  pairList myList;
+  PairList myList;
 
   double cutsq;
 

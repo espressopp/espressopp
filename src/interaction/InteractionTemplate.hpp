@@ -2,6 +2,10 @@
 #define _INTERACTION_INTERACTIONTEMPLATE_HPP
 
 #include "Interaction.hpp"
+#include "BC.hpp"
+#include "Storage.hpp"
+#include "VerletList.hpp"
+#include "esutil/Utils.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -11,113 +15,92 @@ namespace espresso {
     template< typename Derived >
     class InteractionTemplate : public Interaction {
     public:
-      //////////////////////
-      // STORAGE LOOP
-      //////////////////////
+
       // ENERGY COMPUTATION
       // full square over two particle lists
-      template < class ParticleList >
-      real 
-      computeCellEnergy(ParticleList &pl1, ParticleList &pl2) {
+
+      virtual real computeCellEnergy(ParticleList &pl1, ParticleList &pl2)
+      {
+        LOG4ESPP_INFO(theLogger, "compute energy for a cell pair");
+
+        Derived* interaction = static_cast<Derived*>(this);
 	real e = 0.0;
-	for (int i = 0, endi = pl1.size(); i < endi; i++)
+	for (int i = 0, endi = pl1.size(); i < endi; i++) {
+	  Particle &p1 = pl1[i];
+          int type1 = p1.p.type;
 	  for (int j = 0, endj = pl2.size(); j < endj; j++) {
-	    Particle &p1 = pl1[i];
 	    Particle &p2 = pl2[j];
 	    real dist[3];
-	    real distSqr = esutil.getDist(dist, p1.r.p, p2.r.p);
-	    e += computeEnergy(p1, p2, dist, distSqr);
+	    real distSqr = distance2vec(p1.r.p, p2.r.p, dist);
+            int type2 = p2.p.type;
+            if (distSqr < interaction->getCutoffSqr(type1, type2)) {
+	       e += interaction->computeEnergy(p1, p2, type1, type2, dist, distSqr);
+            }
 	  }
+        }
 	return e;
       }
 
-      // half square over a single particle list
-      template < class ParticleList >
-      real 
-      computeCellEnergy(ParticleList &pl) {
-	real e = 0.0;
-	for (int i = 0; i < pl.size(); i++)
-	  for (int j = 0; j < i; j++) {
-	    Particle &p1 = pl[i];
-	    Particle &p2 = pl[j];
-	    real dist[3];
-	    real distSqr = esutil.getDist(dist, p1.r.p, p2.r.p);
-	    e += computeEnergy(p1, p2, dist, distSqr);
-	  }
-	return e;
-      }
+      /** Reimplementation of pure routine for the derived class; the
+          methods getCutoffSqr and computeEnergy will be inlined for efficiency.
+      */
 
-      // full loop over a storage
-      virtual real 
-      computeEnergy(Storage::SelfPtr storage) {
-	real e = 0.0;
+      virtual real computeVerletListEnergy(shared_ptr<VerletList> vl) {
 
-	CellList &realCells = storage.getRealCells();
-	for (CellList::const_iterator 
-	       realCell = realCells.begin(),
-	       realCellEnd = realCells.end();
-	     realCell != realCellEnd;
-	     realCell++) {
-	  CellList &neighborCells = (*realCell)->neighborCells
+        LOG4ESPP_INFO(theLogger, "compute energy by the Verlet List");
 
-	for (int i = 0; i < realCells.size(); i++) {
-	  CellList &
-	  for (int j = 0;
-	}
+        Derived* interaction = static_cast<Derived*>(this);
+
+        const VerletList::PairList pairList = vl->getPairs();
+        int npairs = pairList.size();
+        real e = 0.0;
+        for (int i = 0; i < npairs; i++) {
+          Particle& p1 = *pairList[i].first;
+          Particle& p2 = *pairList[i].second;
+          int type1 = p1.p.type;
+          real dist[3];
+          real distSqr = distance2vec(p1.r.p, p2.r.p, dist);
+          int type2 = p2.p.type;
+          if (distSqr < interaction->getCutoffSqr(type1, type2)) {
+             e += interaction->computeEnergy(p1, p2, type1, type2, dist, distSqr);
+          }
+        }
+        return e;
       }
 
       // FORCE COMPUTATION
-      // full square over two cells
-      virtual void 
-      computeCellForces(BoundaryConditions &bc,
-			Cell &cell1, Cell &cell2) {
-	for (int i = 0, endi = cell1.size(); i < endi; i++)
-	  for (int j = 0, endj = cell2.size(); j < endj; j++) {
-	    Particle &p1 = cell1[i];
-	    Particle &p2 = cell2[j];
-	    real dist[3];
-	    real distSqr;
-	    real force[3] = {0.0, 0.0, 0.0};
-	    bc.getMinimumImageVector(dist, &distSqr, p1.r.p, p2.r.p);
-	    computeForce(p1, p2, dist, distSqr, force);
-
-	    for (int k = 0; k < 3; i++) {
-	      p1.f.f[k] +=  force[k];
-	      p2.f.f[k] += -force[k];
-	    }
-	  }
-      }
-   
-      // half square over a single cell
-      virtual void
-      computeCellForces(BoundaryConditions &bc,
-			Cell &cell) {
-	for (int i = 0, endi = cell.size(); i < endi; i++)
-	  for (int j = 0; j < i; j++) {
-	    Particle &p1 = cell[i];
-	    Particle &p2 = cell[j];
-	    real dist[3];
-	    real distSqr;
-	    real force[3] = {0.0, 0.0, 0.0};
-	    bc.getMinimumImageVector(dist, &distSqr, p1.r.p, p2.r.p);
-	    computeForce(p1, p2, dist, distSqr, force);
-
-	    for (int k = 0; k < 3; i++) {
-	      p1.f.f[k] +=  force[k];
-	      p2.f.f[k] += -force[k];
-	    }
-	  }
-      }
+      // full square over two particle lists
 
       virtual void addForcesStorage() {
-      
       }
 
-      virtual void addForcesVerletLists() {
+      virtual void addVerletListForces(shared_ptr<VerletList> vl) {
+
+       LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
+
+       Derived* interaction = static_cast<Derived*>(this);
+
+        const VerletList::PairList pairList = vl->getPairs();
+        int npairs = pairList.size();
+        real e = 0.0;
+        for (int i = 0; i < npairs; i++) {
+          Particle& p1 = *pairList[i].first;
+          Particle& p2 = *pairList[i].second;
+          int type1 = p1.p.type;
+          real dist[3];
+          real distSqr = distance2vec(p1.r.p, p2.r.p, dist);
+          int type2 = p2.p.type;
+          if (distSqr < interaction->getCutoffSqr(type1, type2)) {
+             real force[3];
+             interaction->computeForce(p1, p2, type1, type2, dist, distSqr, force);
+             for (int k = 0; k < 3; k++) {
+               p1.f.f[k] +=  force[k];
+               p2.f.f[k] += -force[k];
+             }
+          }
+        }
       }
 
-      virtual real computeEnergyVerletLists() {
-      }
     };
 
   }
