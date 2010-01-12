@@ -53,6 +53,8 @@ namespace espresso {
         real frac2 = params.getSigma() * params.getSigma() / distSqr;
         real frac6 = frac2 * frac2 * frac2;
         real energy = 4.0 * params.getEpsilon() * (frac6 * frac6 - frac6);
+        printf ("Particle %d - %d, dist = %6.3g, energy = %7.3g\n", 
+                 p1.p.id, p2.p.id, distSqr, energy);
         return energy;
       }
 

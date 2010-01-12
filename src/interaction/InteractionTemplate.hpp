@@ -41,6 +41,32 @@ namespace espresso {
 	return e;
       }
 
+      // half square over a list of a single cell
+
+      virtual real computeCellEnergy(ParticleList &pl)
+      {
+        LOG4ESPP_INFO(theLogger, "compute energy for a single cell");
+
+        Derived* interaction = static_cast<Derived*>(this);
+        real e = 0.0;
+        int size = pl.size();
+        for (int i = 0; i < size; i++) {
+          Particle &p1 = pl[i];
+          int type1 = p1.p.type;
+          for (int j = i+1; j < size; j++) {
+            Particle &p2 = pl[j];
+            real dist[3];
+            real distSqr = distance2vec(p1.r.p, p2.r.p, dist);
+            int type2 = p2.p.type;
+            if (distSqr < interaction->getCutoffSqr(type1, type2)) {
+               e += interaction->computeEnergy(p1, p2, type1, type2, dist, distSqr);
+            }
+          }
+        }
+        return e;
+      }
+
+
       /** Reimplementation of pure routine for the derived class; the
           methods getCutoffSqr and computeEnergy will be inlined for efficiency.
       */

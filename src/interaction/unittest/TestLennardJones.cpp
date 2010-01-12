@@ -28,9 +28,9 @@ struct Fixture {
   System::SelfPtr system;
 
   Fixture() {
-    real boxL[3] = { 2.0, 2.0, 3.0 };
-    int nodeGrid[3] = { mpiWorld.size(), 1, 1 };
-    int cellGrid[3] = { 2, 2, 3 };
+    real boxL[3] = { 3.0, 3.0, 3.0 };
+    int nodeGrid[3] = { 1, 1, 1 };
+    int cellGrid[3] = { 3, 3, 3 };
     system = make_shared< System >();
     system->setBoxL(boxL);
     domdec = make_shared< DomainDecomposition >(system,
@@ -38,7 +38,7 @@ struct Fixture {
                                                 nodeGrid,
                                                 cellGrid,
                                                 true);
-    int initPPN = 4;
+    int initPPN = 10;
     esutil::RNG rng;
     boost::mpi::communicator comm;
 
@@ -58,7 +58,7 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 {
   BOOST_MESSAGE("starting to build verlet lists");
 
-  double cut = 2.5;
+  double cut = 1.5;
 
   VerletList::SelfPtr vl = make_shared<VerletList>(system, cut);
 
@@ -67,7 +67,7 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
   printf("# of verlet list pairs = %d\n", pairs.size());
 
   for (size_t i = 0; i < pairs.size(); i++) {
-    printf("pair %d = %d %d\n", i, 1, 2);
+    printf("pair %d = %d %d\n", i, pairs[i].first->p.id, pairs[i].second->p.id);
   }
 
   LennardJones lj = LennardJones();

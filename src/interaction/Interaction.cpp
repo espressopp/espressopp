@@ -32,12 +32,19 @@ double Interaction::computeStorageEnergy(shared_ptr<Storage> storage)
 
       if (localCell - neighborCell < 0) continue;
 
-      ParticleList& list2 = neighborCell->particles;
-
       // call now the efficient reimplemented method for derived interactions
 
-      e += computeCellEnergy(list1, list2);
+      if (localCell == neighborCell) {
 
+         e += computeCellEnergy(list1);
+
+      } else {
+      
+         ParticleList& list2 = neighborCell->particles;
+         e += computeCellEnergy(list1, list2);
+      }
     }
   }
+
+  return e;
 }

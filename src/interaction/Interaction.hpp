@@ -27,6 +27,8 @@ namespace espresso {
 
       virtual real computeVerletListEnergy(shared_ptr<VerletList> vl) = 0;
 
+      virtual real computeCellEnergy(ParticleList &pl) = 0;
+
       virtual real computeCellEnergy(ParticleList &pl1, ParticleList &pl2) = 0;
 
     protected:
