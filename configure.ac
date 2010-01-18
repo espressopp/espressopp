@@ -57,8 +57,7 @@ EOF
 
 # Python libs
 AXES_PYTHON
-if test "x$axes_cv_python_lib" = "xno" || 
-	  test "x$axes_cv_python_include" = "xno"; then	
+if test "x$axes_cv_python_lib" = "xno" || test "x$axes_cv_python_include" = "xno"; then	
 	  AC_MSG_FAILURE([Could not find python.])
 fi
 
