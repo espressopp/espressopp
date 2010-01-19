@@ -4,8 +4,7 @@
 
 #include "mpi.hpp"
 #include "logging.hpp"
-#include "esutil/RNG.hpp"
-#include "../BC.hpp"
+#include "../OrthorhombicBC.hpp"
 
 using namespace espresso;
 
@@ -19,15 +18,22 @@ struct LoggingFixture {
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
 struct Fixture {
-  bc::BC::SelfPtr pbc;
+  bc::OrthorhombicBC::SelfPtr pbc;
 
   Fixture() {
     real L[3] = {10.0, 10.0, 10.0};
-    pbc = make_shared< bc::BC >(L);
+    pbc = make_shared< bc::OrthorhombicBC >(L);
   }
 };
 
 BOOST_FIXTURE_TEST_CASE(foldingTest, Fixture) {
-  BOOST_CHECK_EQUAL(1.0, 1.0);
-}
+  int dim = 2;
+  BOOST_CHECK_EQUAL(10.0, pbc->getBoxL(dim));
 
+  real pi[3] = {5.0, 5.0, 5.0};
+  real pj[3] = {11.0, 11.0, 11.0};
+  real rij[3];
+  real d = 0.0;
+  pbc->getMinimumImageVector(rij, d, pi, pj);
+  BOOST_CHECK_EQUAL(rij[0], 4.0);
+}
