@@ -1,0 +1,5 @@
+nobase_pkginclude_HEADERS += \
+	bc/OrthorhombicBC.hpp
+
+libespresso_common_la_SOURCES += \
+	bc/OrthorhombicBC.cpp
