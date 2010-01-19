@@ -10,6 +10,11 @@ include boost.python/diamond/SubMakefile.am
 
 include $(top_srcdir)/build-aux/macros/axes_python.am
 
+noinst_PROGRAMS += wrappingReal3D
+wrappingReal3D_SOURCES = wrappingReal3D.cpp
+wrappingReal3D_LDADD = ../src/libespresso_common.la \
+	$(ESPRESSO_BOOST_LIBS) $(PYTHON_LIBS)
+
 noinst_PROGRAMS += inline
 inline_SOURCES = inline.cpp
 inline_LDADD = ../src/libespresso_common.la \
