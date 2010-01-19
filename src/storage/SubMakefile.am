@@ -8,5 +8,5 @@ libespresso_common_la_SOURCES += \
 	storage/CellGrid.cpp \
 	storage/NodeGrid.cpp
 
-python_SCRIPTS +=
+#python_SCRIPTS +=
 

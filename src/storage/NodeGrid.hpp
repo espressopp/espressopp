@@ -1,5 +1,5 @@
-#ifndef NODE_GRID_HPP
-#define NODE_GRID_HPP
+#ifndef _NODE_GRID_HPP
+#define _NODE_GRID_HPP
 
 /*
   local ghost cell grid representation. Taken from grid.c.
@@ -33,22 +33,24 @@ namespace espresso {
       Bottom,   Top,
       Front,    Back
     };
+
     /// order coordinates
     enum FoldDirections {
       ToLeft = -1, ToRight = 1
     };
 
     NodeGrid(const int grid[3],
-	     const longint nodeId,
-	     const real _domainSize[3]);
+    	     const longint nodeId,
+    	     const real _domainSize[3]);
 
     /// automatic setup of a node grid for nNodes processors
     NodeGrid(const longint nNodes,
-	     const longint nodeId,
-	     const real _domainSize[3]);
+    	     const longint nodeId,
+    	     const real _domainSize[3]);
 
     /// map coordinate to a node. Positions outside are clipped back
-    longint mapPositionToNodeClipped(const real pos[3]) const;
+    longint 
+    mapPositionToNodeClipped(const real pos[3]) const;
 
     /// get this node's coordinates
     longint getNodePosition(int i) const { return nodePos[i]; }

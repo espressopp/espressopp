@@ -1,26 +1,34 @@
-#ifndef _BC_HPP
-#define _BC_HPP
+#ifndef _BC_ORTHORHOMBICBC_HPP
+#define _BC_ORTHORHOMBICBC_HPP
 
-#include "types.hpp"
+#include "BC.hpp"
 
 namespace espresso {
-    /** Abstract base class for boundary conditions. */
-    class BC {
+  namespace bc {
+    class OrthorhombicBC : public BC {
+    private:
+      real boxL[3];
+      real invBoxL[3];
+
     public:
-      typedef shared_ptr< BC > SelfPtr;
+      typedef shared_ptr< OrthorhombicBC > SelfPtr;
 
       /** Virtual destructor for boundary conditions. */
-      virtual ~BC() {};
+      virtual
+      ~OrthorhombicBC() {};
+
+      /** Constructor */
+      OrthorhombicBC(const real _boxL[3]);
 
       /** Method to set the length of the side of the cubic simulation cell */
       virtual void
-      setBoxL(const real _boxL[3]) = 0;
+      setBoxL(const real _boxL[3]);
 
       /** Getters for box dimensions */
-      virtual const real *getBoxL()    const = 0;
-      virtual const real *getInvBoxL() const = 0;
-      virtual real getBoxL(int i)      const = 0;
-      virtual real getInvBoxL(int i)   const = 0;
+      virtual const real *getBoxL()    const { return boxL; }
+      virtual const real *getInvBoxL() const { return invBoxL; }
+      virtual real getBoxL(int i)      const { return boxL[i]; }
+      virtual real getInvBoxL(int i)   const { return invBoxL[i]; }
 
       /** Computes the minimum image distance vector between two
           positions. This routine must be implemented by derived
@@ -35,7 +43,7 @@ namespace espresso {
       getMinimumImageVector(real dist[3],
                             real &distSqr,
                             const real pos1[3],
-                            const real pos2[3]) const = 0;
+                            const real pos2[3]) const;
 
       /** fold a coordinate to the primary simulation box.
 	  \param pos         the position...
@@ -45,7 +53,7 @@ namespace espresso {
 	  Both pos and image_box are I/O,
 	  i. e. a previously folded position will be folded correctly.
       */
-      virtual void foldCoordinate(real pos[3], int imageBox[3], int dir) = 0;
+      virtual void foldCoordinate(real pos[3], int imageBox[3], int dir);
 
       /** fold particle coordinates to the primary simulation box.
 	  \param pos the position...
@@ -54,7 +62,7 @@ namespace espresso {
 	  Both pos and image_box are I/O,
 	  i. e. a previously folded position will be folded correctly.
       */
-      virtual void foldPosition(real pos[3], int imageBox[3]) = 0;
+      virtual void foldPosition(real pos[3], int imageBox[3]);
 
       /** unfold coordinates to physical position.
 	  \param pos the position...
@@ -63,15 +71,16 @@ namespace espresso {
 	  Both pos and image_box are I/O, i.e. image_box will be (0,0,0)
 	  afterwards.
       */
-      virtual void unfoldPosition(real pos[3], int imageBox[3]) = 0;
+      virtual void unfoldPosition(real pos[3], int imageBox[3]);
 
       /** Get a random position within the central simulation box. The
           positions are assigned with each coordinate on [0, boxL]. */
       virtual void
-      getRandomPos(real res[3]) const = 0;
+      getRandomPos(real res[3]) const;
 
-      static void registerPython();
-    }; 
+
+    };
+  }
 }
 
 #endif

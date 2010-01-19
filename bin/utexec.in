@@ -50,7 +50,7 @@ OPTIONS:
   -v, --verbose
       Be more verbose.
 
-  -s=SUBDIR|--subdir=SUBDIR
+  -s SUBDIR|--subdir=SUBDIR
       Specify the subdirectory where the unittests reside, relative to
       the ESPResSo++ source directory 
         """ + top_srcdir + """
@@ -58,7 +58,7 @@ OPTIONS:
   -r, --recursive
       Recursively walk through all subdirectories to find unittests.
 
-  -t=NUMTASKS|--num-tasks=NUMTASKS
+  -t NUMTASKS|--num-tasks=NUMTASKS
       Specify how many tasks to use when parallel python unittests are
       run (defaults to 2). 
 """)

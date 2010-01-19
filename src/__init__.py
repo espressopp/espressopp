@@ -4,10 +4,10 @@ from espresso import __setup
 from espresso.esutil import pmiimport
 pmiimport('espresso')
 
-from espresso.Property import *
-from espresso.Real3D import *
-from espresso.RealTensor import *
-from espresso import pmi
+# from espresso.Property import *
+# from espresso.Real3D import *
+# from espresso.RealTensor import *
+# from espresso import pmi
 
 if pmi.IS_CONTROLLER :
     # make sure that the workers exit when the script ends
