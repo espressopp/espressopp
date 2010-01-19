@@ -22,11 +22,11 @@ VerletList::VerletList(System::SelfPtr system, double cut)
 
     // Loop cell neighbors
 
-    std::vector<Cell*>& neighborCells = localCell->neighborCells;
+    std::vector<NeighborCellInfo>& neighborCells = localCell->neighborCells;
  
     for (size_t n = 0; n < neighborCells.size(); n++) {
 
-      Cell* neighborCell = neighborCells[n];
+      Cell* neighborCell = neighborCells[n].cell;
 
       LOG4ESPP_DEBUG(theLogger, "loop cell pair " << c << " x " << n);
       LOG4ESPP_DEBUG(theLogger, c << " has " << localCell->particles.size() << " particles");
