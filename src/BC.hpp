@@ -71,6 +71,7 @@ namespace espresso {
       getRandomPos(real res[3]) const = 0;
 
       static void registerPython();
+
     }; 
 }
 
