@@ -30,10 +30,11 @@ BOOST_AUTO_TEST_CASE(ListOfEmptyCells) {
   LocalCellList cells;
 
   CellList cl;
-  for (int i = 0; i < NCELL; i++) {
+  for (int i = 0; i < NCELL; i++)
     cells.push_back(cell);
+
+  for (int i = 0; i < NCELL; i++)
     cl.push_back(&cells[i]);
-  }
 
   CellListIterator cit(cl);
   BOOST_CHECK(!cit.isValid());

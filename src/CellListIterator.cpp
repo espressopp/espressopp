@@ -4,6 +4,7 @@ using namespace boost;
 using namespace espresso;
 
 void CellListIterator::findNonemptyCell() {
+  
   while (pit.isDone()) {
     ++cit;
     if (cit.isDone()) break;

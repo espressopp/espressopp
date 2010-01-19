@@ -16,7 +16,7 @@ namespace espresso {
     CellListIterator() {
     }
 
-    CellListIterator(CellList &cl) : cit(cl) {
+    CellListIterator(CellList &cl) : cit(cl), pit() {
       if (cit.isDone()) return;
       pit = ParticleList::Iterator((*cit)->particles);
       findNonemptyCell();

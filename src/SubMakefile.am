@@ -6,16 +6,18 @@ nobase_pkginclude_HEADERS += \
 	CellListIterator.hpp \
 	CellListNeighborIterator.hpp \
         BC.hpp \
-	VerletList.hpp \
 	bindings.hpp
+
+#	VerletList.hpp
 
 libespresso_common_la_SOURCES += \
 	Storage.cpp \
 	System.cpp \
 	CellListIterator.cpp \
         BC.cpp \
-	VerletList.cpp \
 	bindings.cpp
+
+#	VerletList.cpp
 
 python_SCRIPTS += \
 	__init__.py \

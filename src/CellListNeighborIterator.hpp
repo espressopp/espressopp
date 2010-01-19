@@ -10,8 +10,9 @@ namespace espresso {
 
   class CellListNeighborIterator {
   public:
-    CellListNeighborIterator(CellList &cl) {
-    }
+    CellListNeighborIterator();
+    CellListNeighborIterator(CellListNeighborIterator &clni);
+    CellListNeighborIterator(CellList &cl);
 
     CellListNeighborIterator &operator++();
 

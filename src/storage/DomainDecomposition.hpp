@@ -1,5 +1,5 @@
-#ifndef _DOMAINDECOMPOSITION_HPP
-#define _DOMAINDECOMPOSITION_HPP
+#ifndef _STORAGE_DOMAINDECOMPOSITION_HPP
+#define _STORAGE_DOMAINDECOMPOSITION_HPP
 #include "Storage.hpp"
 #include "CellGrid.hpp"
 #include "NodeGrid.hpp"
