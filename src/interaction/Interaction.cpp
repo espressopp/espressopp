@@ -22,11 +22,11 @@ double Interaction::computeStorageEnergy(shared_ptr<Storage> storage)
 
     // Loop cell neighbors
 
-    std::vector<Cell*>& neighborCells = localCell->neighborCells;
+    std::vector<NeighborCellInfo>& neighborCells = localCell->neighborCells;
 
     for (size_t n = 0; n < neighborCells.size(); n++) {
 
-      Cell* neighborCell = neighborCells[n];
+      Cell* neighborCell = neighborCells[n].cell;
 
       // avoid double cells
 

@@ -31,7 +31,7 @@ namespace espresso {
 
       virtual real computeCellEnergy(ParticleList &pl1, ParticleList &pl2) = 0;
 
-    protected:
+    public:
 
       class ParametersBase {
       private:
@@ -53,4 +53,28 @@ namespace espresso {
     };
   }
 }
+
+#define INTERACTION_ROUTINES(Derived) \
+ \
+void Derived::addVerletListForces(shared_ptr<VerletList> vl) \
+{ \
+  addVerletListForcesImpl(vl); \
+} \
+ \
+real Derived::computeVerletListEnergy(shared_ptr<VerletList> vl) \
+{ \
+  return computeVerletListEnergyImpl(vl); \
+} \
+ \
+real Derived::computeCellEnergy(ParticleList &pl) \
+{ \
+  return computeCellEnergyImpl(pl); \
+} \
+ \
+real Derived::computeCellEnergy(ParticleList &pl1, ParticleList &pl2) \
+{ \
+  return computeCellEnergyImpl(pl1, pl2); \
+} 
+
+
 #endif

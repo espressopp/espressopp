@@ -12,18 +12,21 @@ namespace espresso {
     /** InteractionTemplate provides loop templates to compute
 	forces and energies of the various interactions. */
 
-    template< typename Derived >
+    template< typename _Parameters >
+
     class InteractionTemplate : public Interaction {
+
     public:
+
+      typedef _Parameters Parameters;
 
       // ENERGY COMPUTATION
       // full square over two particle lists
 
-      virtual real computeCellEnergy(ParticleList &pl1, ParticleList &pl2)
+      virtual real computeCellEnergyImpl(ParticleList &pl1, ParticleList &pl2)
       {
         LOG4ESPP_INFO(theLogger, "compute energy for a cell pair");
 
-        Derived* interaction = static_cast<Derived*>(this);
 	real e = 0.0;
 	for (int i = 0, endi = pl1.size(); i < endi; i++) {
 	  Particle &p1 = pl1[i];
@@ -33,8 +36,9 @@ namespace espresso {
 	    real dist[3];
 	    real distSqr = distance2vec(p1.r.p, p2.r.p, dist);
             int type2 = p2.p.type;
-            if (distSqr < interaction->getCutoffSqr(type1, type2)) {
-	       e += interaction->computeEnergy(p1, p2, type1, type2, dist, distSqr);
+            const Parameters& params = parameterArray[type1][type2];
+            if (distSqr < params.getCutoffSqr()) {
+	       e += params.computeEnergy(p1, p2, dist, distSqr);
             }
 	  }
         }
@@ -43,11 +47,10 @@ namespace espresso {
 
       // half square over a list of a single cell
 
-      virtual real computeCellEnergy(ParticleList &pl)
+      virtual real computeCellEnergyImpl(ParticleList &pl)
       {
         LOG4ESPP_INFO(theLogger, "compute energy for a single cell");
 
-        Derived* interaction = static_cast<Derived*>(this);
         real e = 0.0;
         int size = pl.size();
         for (int i = 0; i < size; i++) {
@@ -58,8 +61,9 @@ namespace espresso {
             real dist[3];
             real distSqr = distance2vec(p1.r.p, p2.r.p, dist);
             int type2 = p2.p.type;
-            if (distSqr < interaction->getCutoffSqr(type1, type2)) {
-               e += interaction->computeEnergy(p1, p2, type1, type2, dist, distSqr);
+            const Parameters& params = parameterArray[type1][type2];
+            if (distSqr < params.getCutoffSqr()) {
+               e += params.computeEnergy(p1, p2, dist, distSqr);
             }
           }
         }
@@ -71,11 +75,9 @@ namespace espresso {
           methods getCutoffSqr and computeEnergy will be inlined for efficiency.
       */
 
-      virtual real computeVerletListEnergy(shared_ptr<VerletList> vl) {
+      virtual real computeVerletListEnergyImpl(shared_ptr<VerletList> vl) {
 
         LOG4ESPP_INFO(theLogger, "compute energy by the Verlet List");
-
-        Derived* interaction = static_cast<Derived*>(this);
 
         const VerletList::PairList pairList = vl->getPairs();
         int npairs = pairList.size();
@@ -87,8 +89,9 @@ namespace espresso {
           real dist[3];
           real distSqr = distance2vec(p1.r.p, p2.r.p, dist);
           int type2 = p2.p.type;
-          if (distSqr < interaction->getCutoffSqr(type1, type2)) {
-             e += interaction->computeEnergy(p1, p2, type1, type2, dist, distSqr);
+          const Parameters& params = parameterArray[type1][type2];
+          if (distSqr < params.getCutoffSqr()) {
+             e += params.computeEnergy(p1, p2, dist, distSqr);
           }
         }
         return e;
@@ -100,13 +103,12 @@ namespace espresso {
       virtual void addForcesStorage() {
       }
 
-      virtual void addVerletListForces(shared_ptr<VerletList> vl) {
+      virtual void addVerletListForcesImpl(shared_ptr<VerletList> vl) {
 
-       LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
-
-       Derived* interaction = static_cast<Derived*>(this);
+        LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
 
         const VerletList::PairList pairList = vl->getPairs();
+
         int npairs = pairList.size();
         real e = 0.0;
         for (int i = 0; i < npairs; i++) {
@@ -116,9 +118,11 @@ namespace espresso {
           real dist[3];
           real distSqr = distance2vec(p1.r.p, p2.r.p, dist);
           int type2 = p2.p.type;
-          if (distSqr < interaction->getCutoffSqr(type1, type2)) {
+          const Parameters& params = parameterArray[type1][type2];
+
+          if (distSqr < params.getCutoffSqr()) {
              real force[3];
-             interaction->computeForce(p1, p2, type1, type2, dist, distSqr, force);
+             params.computeForce(p1, p2, dist, distSqr, force);
              for (int k = 0; k < 3; k++) {
                p1.f.f[k] +=  force[k];
                p2.f.f[k] += -force[k];
@@ -126,6 +130,10 @@ namespace espresso {
           }
         }
       }
+
+     protected:
+
+      Parameters parameterArray[1][1];
 
     };
 
