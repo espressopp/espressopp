@@ -6,51 +6,100 @@ using namespace std;
 using namespace espresso;
 using namespace esutil;
 
-template<int size>
-class Real {
-  Real(real _v[size]): v(_v) {}
-  operator real*() const { return v; }
-private:
-  real *v;
-};
+template< typename type >
+class Test {
+  type *base;
+  int size;
 
-class Wrap<typename in> {
 public:
-  real operator()(in a, in b) {
-    real res = 0;
-    for (int i = 0; i < 3; ++i) {
-      res += a[i]*b[i];  
-    }
-    return res;
-  }
+  Test(type *_base, int _size): base(_base), size(_size) {}
+
+  int getSizeInline() const { return size; }
+
+  type *getInline() const { return base; }
+
+  int getSize() const __attribute__((noinline));
+  type *get() const __attribute__((noinline));
+  type *getWInlineException() const __attribute__((noinline));
+
 };
 
-template<class WrapFunc>
-void runTestWrapped(int rounds, int size)
+template< typename type >
+type *Test< type >::get() const
 {
-  real data[(size+1)*3];
-  real res = 0;
-  for (int i = 0; i < rounds; ++i) {
-    for (int j = 0; j < size; ++j) {
-      res += WrapFunc(data + j, data + (3*j % size));
-    }
+  return base;
+}
+
+template< typename type >
+type *Test< type >::getWInlineException() const {
+  if (base == 0) {
+    throw std::runtime_error("base pointer was unexpectedly zero");
   }
-  return res;
+  return base;
+}
+
+template< typename type >
+int Test< type >::getSize() const
+{
+  return size;
+}
+
+template<typename type>
+void runTestInline(Test<type> &t, int rounds) __attribute__((noinline));
+template<typename type>
+void runTestInline(Test<type> &test, int rounds)
+{
+  for (int r = 1; r <= rounds; ++r)
+    for (int i = 0; i < test.getSizeInline(); ++i) {
+      test.getInline()[i] = i + r;
+    }
+}
+
+template<typename type>
+void runTestWInlineException(Test<type> &t, int rounds) __attribute__((noinline));
+template<typename type>
+void runTestWInlineException(Test<type> &test, int rounds)
+{
+  for (int r = 1; r <= rounds; ++r)
+    for (int i = 0; i < test.getSize(); ++i) {
+      test.getWInlineException()[i] = i + r;
+    }
+}
+
+template<typename type>
+void runTest(Test<type> &t, int rounds) __attribute__((noinline));
+template<typename type>
+void runTest(Test<type> &test, int rounds)
+{
+  for (int r = 1; r <= rounds; ++r)
+    for (int i = 0; i < test.getSize(); ++i) {
+      test.get()[i] = i + r;
+    }
 }
 
 int main()
 {
-  const int rounds = 1000;
   const int size = 1000000;
+  const int rounds = 100;
+
+  //typedef double type;
+  typedef int type;
+  //typedef float type;
+  Test< type > test(new type[size], size);
+
   WallTimer timer;
 
   timer.reset();
-  runTest<WrapFunc< Real<3> > >(rounds, size);
-  cout << "wrapped " << timer.getElapsedTime() << endl;
+  runTestInline(test, rounds);
+  cout << "inline " << timer.getElapsedTime() << endl;
 
   timer.reset();
-  runTest<WrapFunc< real *  > >(rounds, size);
-  cout << "generic " << timer.getElapsedTime() << endl;
+  runTest(test, rounds);
+  cout << "call " << timer.getElapsedTime() << endl;
+
+  timer.reset();
+  runTestWInlineException(test, rounds);
+  cout << "call w/ inline exception " << timer.getElapsedTime() << endl;
 
   return 0;
 }
