@@ -32,6 +32,10 @@ namespace espresso {
     struct NeighborCellInfo {
         NeighborCellInfo(Cell *_cell, bool _useForAllPairs)
         : cell(_cell), useForAllPairs(_useForAllPairs) {}
+
+        NeighborCellInfo(Cell &_cell, bool _useForAllPairs)
+        : cell(&_cell), useForAllPairs(_useForAllPairs) {}
+
         Cell* cell;
         // stores whether the cell is to be used in an all pair loop
         bool useForAllPairs;

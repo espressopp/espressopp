@@ -61,7 +61,8 @@ BOOST_AUTO_TEST_CASE(noParticles) {
   // create cells
   for (int i = 0; i < NCELL; ++i) {
     for (int j = 0; j < NNCELL; ++j)
-      cell[i].neighborCells.push_back(&neighbor[i]);
+      cell[i].neighborCells.push_back
+	(NeighborCellInfo(neighbor[i], false));
     cl.push_back(&cell[i]);
   }
 

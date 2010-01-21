@@ -1,21 +1,24 @@
 nobase_pkginclude_HEADERS += \
-	Storage.hpp \
-	System.hpp \
+	Real3D.hpp \
+	Real3DPtr.hpp \
 	Particle.hpp \
 	Cell.hpp \
+	Storage.hpp \
+        BC.hpp \
+	System.hpp \
 	CellListIterator.hpp \
 	CellListNeighborIterator.hpp \
-        BC.hpp \
+	VerletList.hpp \
 	bindings.hpp
 
-#	VerletList.hpp
 
 libespresso_common_la_SOURCES += \
+	Real3D.cpp \
 	Storage.cpp \
+        BC.cpp \
 	System.cpp \
 	CellListIterator.cpp \
-        BC.cpp \
- 	VerletList.cpp \
+	VerletList.cpp \
 	bindings.cpp
 
 python_SCRIPTS += \

@@ -4,25 +4,25 @@
 namespace espresso {
   namespace bc {
     /* Constructor */
-    OrthorhombicBC::OrthorhombicBC(const real _boxL[3]) {
-      setBoxL(_boxL);
-    }
+    OrthorhombicBC::OrthorhombicBC(const Real3DPtr _boxL) 
+    { setBoxL(_boxL); }
 
     /* Setter method for the box length */
-    void OrthorhombicBC::setBoxL(const real _boxL[3]) {
-      for(int i = 0; i < 3; i++) {
-	boxL[i]    = _boxL[i];
-	invBoxL[i] = 1.0/_boxL[i];
-      }
+    void OrthorhombicBC::setBoxL(const Real3DPtr _boxL) {
+      boxL = _boxL;
+      for (int i = 0; i < 3; i++)
+	invBoxL[i] = 1.0/boxL[i];
     }
 
     /* Returns minimum image vector between two particles */
-    void OrthorhombicBC::getMinimumImageVector(real dist[3],
-				   real &distSqr,
-				   const real pos1[3],
-				   const real pos2[3]) const {
-      for(int k = 0; k < 3; k++)
-	dist[k] = pos1[k] - pos2[k];
+    void 
+    OrthorhombicBC::
+    getMinimumImageVector(Real3DPtr dist,
+			  real &distSqr,
+			  const Real3DPtr pos1,
+			  const Real3DPtr pos2) const {
+      dist = pos1;
+      dist -= pos2;
 
       dist[0] -= round(dist[0] * invBoxL[0]) * boxL[0];
       dist[1] -= round(dist[1] * invBoxL[1]) * boxL[1];
@@ -30,7 +30,9 @@ namespace espresso {
     }
 
     /* Fold an individual coordinate in the specified direction */
-    void OrthorhombicBC::foldCoordinate(real pos[3], int imageBox[3], int dir) {
+    void 
+    OrthorhombicBC::
+    foldCoordinate(Real3DPtr pos, int imageBox[3], int dir) {
       int tmp = static_cast<int>(floor(pos[dir]*getInvBoxL(dir)));
 
       imageBox[dir] += tmp;
@@ -51,13 +53,17 @@ namespace espresso {
     }
 
     /* Fold coordinates */
-    void OrthorhombicBC::foldPosition(real pos[3], int imageBox[3]) {
+    void 
+    OrthorhombicBC::
+    foldPosition(Real3DPtr pos, int imageBox[3]) {
       for (int i = 0; i < 3; ++i)
 	foldCoordinate(pos, imageBox, i);
     }
 
     /* Unfold coordinates */
-    void OrthorhombicBC::unfoldPosition(real pos[3], int imageBox[3]) {
+    void 
+    OrthorhombicBC::
+    unfoldPosition(Real3DPtr pos, int imageBox[3]) {
       for (int i = 0; i < 3; ++i) {
 	pos[i] = pos[i] + imageBox[i]*getBoxL(i);
 	imageBox[i] = 0;
@@ -65,10 +71,12 @@ namespace espresso {
     }
 
     /* Get random position in the central image box */
-    void OrthorhombicBC::getRandomPos(real res[3]) const {
+    void 
+    OrthorhombicBC::
+    getRandomPos(Real3DPtr res) const {
       for(int k = 0; k < 3; k++)
 	res[k] = boxL[k];
-
+      
       // TODO: Use real RNG
       res[0] *= drand48();
       res[1] *= drand48();

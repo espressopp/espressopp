@@ -7,8 +7,8 @@ namespace espresso {
   namespace bc {
     class OrthorhombicBC : public BC {
     private:
-      real boxL[3];
-      real invBoxL[3];
+      Real3D boxL;
+      Real3D invBoxL;
 
     public:
       typedef shared_ptr< OrthorhombicBC > SelfPtr;
@@ -18,15 +18,15 @@ namespace espresso {
       ~OrthorhombicBC() {};
 
       /** Constructor */
-      OrthorhombicBC(const real _boxL[3]);
+      OrthorhombicBC(const Real3DPtr _boxL);
 
       /** Method to set the length of the side of the cubic simulation cell */
       virtual void
-      setBoxL(const real _boxL[3]);
+      setBoxL(const Real3DPtr _boxL);
 
       /** Getters for box dimensions */
-      virtual const real *getBoxL()    const { return boxL; }
-      virtual const real *getInvBoxL() const { return invBoxL; }
+      virtual Real3DPtr getBoxL() { return boxL; }
+      virtual Real3DPtr getInvBoxL() { return invBoxL; }
       virtual real getBoxL(int i)      const { return boxL[i]; }
       virtual real getInvBoxL(int i)   const { return invBoxL[i]; }
 
@@ -40,10 +40,10 @@ namespace espresso {
           \param pos1, pos2 are the particle positions 
       */
       virtual void
-      getMinimumImageVector(real dist[3],
+      getMinimumImageVector(Real3DPtr dist,
                             real &distSqr,
-                            const real pos1[3],
-                            const real pos2[3]) const;
+                            const Real3DPtr pos1,
+                            const Real3DPtr pos2) const;
 
       /** fold a coordinate to the primary simulation box.
 	  \param pos         the position...
@@ -53,7 +53,7 @@ namespace espresso {
 	  Both pos and image_box are I/O,
 	  i. e. a previously folded position will be folded correctly.
       */
-      virtual void foldCoordinate(real pos[3], int imageBox[3], int dir);
+      virtual void foldCoordinate(Real3DPtr pos, int imageBox[3], int dir);
 
       /** fold particle coordinates to the primary simulation box.
 	  \param pos the position...
@@ -62,7 +62,7 @@ namespace espresso {
 	  Both pos and image_box are I/O,
 	  i. e. a previously folded position will be folded correctly.
       */
-      virtual void foldPosition(real pos[3], int imageBox[3]);
+      virtual void foldPosition(Real3DPtr pos, int imageBox[3]);
 
       /** unfold coordinates to physical position.
 	  \param pos the position...
@@ -71,14 +71,12 @@ namespace espresso {
 	  Both pos and image_box are I/O, i.e. image_box will be (0,0,0)
 	  afterwards.
       */
-      virtual void unfoldPosition(real pos[3], int imageBox[3]);
+      virtual void unfoldPosition(Real3DPtr pos, int imageBox[3]);
 
       /** Get a random position within the central simulation box. The
           positions are assigned with each coordinate on [0, boxL]. */
       virtual void
-      getRandomPos(real res[3]) const;
-
-
+      getRandomPos(Real3DPtr res) const;
     };
   }
 }

@@ -2,6 +2,8 @@
 #define _BC_HPP
 
 #include "types.hpp"
+#include "Real3DPtr.hpp"
+#include "Real3D.hpp"
 
 namespace espresso {
     /** Abstract base class for boundary conditions. */
@@ -12,13 +14,13 @@ namespace espresso {
       /** Virtual destructor for boundary conditions. */
       virtual ~BC() {};
 
-      /** Method to set the length of the side of the cubic simulation cell */
+      /** Method to set the length of the side of the simulation box */
       virtual void
-      setBoxL(const real _boxL[3]) = 0;
-
+      setBoxL(Real3DPtr _boxL) = 0;
+      
       /** Getters for box dimensions */
-      virtual const real *getBoxL()    const = 0;
-      virtual const real *getInvBoxL() const = 0;
+      virtual const Real3DPtr getBoxL()    const = 0;
+      virtual const Real3DPtr getInvBoxL() const = 0;
       virtual real getBoxL(int i)      const = 0;
       virtual real getInvBoxL(int i)   const = 0;
 
@@ -32,10 +34,10 @@ namespace espresso {
           \param pos1, pos2 are the particle positions 
       */
       virtual void
-      getMinimumImageVector(real dist[3],
+      getMinimumImageVector(Real3DPtr dist,
                             real &distSqr,
-                            const real pos1[3],
-                            const real pos2[3]) const = 0;
+                            const Real3DPtr pos1,
+                            const Real3DPtr pos2) const = 0;
 
       /** fold a coordinate to the primary simulation box.
 	  \param pos         the position...
@@ -45,7 +47,7 @@ namespace espresso {
 	  Both pos and image_box are I/O,
 	  i. e. a previously folded position will be folded correctly.
       */
-      virtual void foldCoordinate(real pos[3], int imageBox[3], int dir) = 0;
+      virtual void foldCoordinate(Real3DPtr pos, int imageBox[3], int dir) = 0;
 
       /** fold particle coordinates to the primary simulation box.
 	  \param pos the position...
@@ -54,7 +56,7 @@ namespace espresso {
 	  Both pos and image_box are I/O,
 	  i. e. a previously folded position will be folded correctly.
       */
-      virtual void foldPosition(real pos[3], int imageBox[3]) = 0;
+      virtual void foldPosition(Real3DPtr pos, int imageBox[3]) = 0;
 
       /** unfold coordinates to physical position.
 	  \param pos the position...
@@ -63,13 +65,20 @@ namespace espresso {
 	  Both pos and image_box are I/O, i.e. image_box will be (0,0,0)
 	  afterwards.
       */
-      virtual void unfoldPosition(real pos[3], int imageBox[3]) = 0;
+      virtual void unfoldPosition(Real3DPtr pos, int imageBox[3]) = 0;
 
       /** Get a random position within the central simulation box. The
           positions are assigned with each coordinate on [0, boxL]. */
       virtual void
-      getRandomPos(real res[3]) const = 0;
+      getRandomPos(Real3DPtr res) const = 0;
 
+      virtual Real3D
+      getRandomPos() const {
+	Real3D res;
+	getRandomPos(res);
+	return res;
+      }
+      
       static void registerPython();
 
     }; 
