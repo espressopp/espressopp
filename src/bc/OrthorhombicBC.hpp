@@ -25,8 +25,8 @@ namespace espresso {
       setBoxL(const Real3DPtr _boxL);
 
       /** Getters for box dimensions */
-      virtual Real3DPtr getBoxL() { return boxL; }
-      virtual Real3DPtr getInvBoxL() { return invBoxL; }
+      virtual const Real3D &getBoxL() const { return boxL; }
+      virtual const Real3D &getInvBoxL() const { return invBoxL; }
       virtual real getBoxL(int i)      const { return boxL[i]; }
       virtual real getInvBoxL(int i)   const { return invBoxL[i]; }
 
@@ -77,6 +77,8 @@ namespace espresso {
           positions are assigned with each coordinate on [0, boxL]. */
       virtual void
       getRandomPos(Real3DPtr res) const;
+
+      static void registerPython();
     };
   }
 }

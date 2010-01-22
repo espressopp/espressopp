@@ -25,4 +25,5 @@ python_SCRIPTS += \
 	__init__.py \
 	unittest/__init__.py \
 	__setup.py \
-	pmi.py
+	pmi.py \
+	Real3D.py

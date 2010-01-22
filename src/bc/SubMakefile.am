@@ -1,5 +1,7 @@
 nobase_pkginclude_HEADERS += \
-	bc/OrthorhombicBC.hpp
+	bc/OrthorhombicBC.hpp \
+	bc/bindings.hpp
 
 libespresso_common_la_SOURCES += \
-	bc/OrthorhombicBC.cpp
+	bc/OrthorhombicBC.cpp \
+	bc/bindings.cpp

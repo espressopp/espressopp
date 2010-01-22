@@ -59,8 +59,6 @@ static int pyLocateItem(bool here, int controller) {
 }
 
 void espresso::esutil::Collectives::registerPython() {
-  
   def("esutil_Collectives_locateItem", pyLocateItem);
   scope().attr("esutil_Collectives_ResultNone") = None;
-
 }

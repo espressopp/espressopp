@@ -1,4 +1,5 @@
 #include "OrthorhombicBC.hpp"
+#include <python.hpp>
 #include <cmath>
 
 namespace espresso {
@@ -81,6 +82,14 @@ namespace espresso {
       res[0] *= drand48();
       res[1] *= drand48();
       res[2] *= drand48();
+    }
+
+    void 
+    OrthorhombicBC::
+    registerPython() {
+      using namespace espresso::python;
+      class_<OrthorhombicBC, bases< BC > >
+	("bc_OrthorhombicBC", init< Real3DPtr >());
     }
   }
 }
