@@ -3,6 +3,7 @@
 
 #include "types.hpp"
 #include "Real3D.hpp"
+#include <iostream>
 
 namespace espresso {
   class Real3DPtr {
@@ -31,25 +32,26 @@ namespace espresso {
     { return data[0]*data[0] + data[1]*data[1] + data[2]*data[2]; }
 
     real abs() const
-    { return sqrt(abs()); }
+    { return sqrt(this->sqr()); }
     
     Real3DPtr& 
     operator+=(const Real3DPtr &b) 
-    { for (int i = 0; i < 3; i++) data[i] += b.data[i]; }
+    { for (int i = 0; i < 3; i++) data[i] += b.data[i]; return *this; }
     
     Real3DPtr& 
     operator-=(const Real3DPtr &b)
-    { for (int i = 0; i < 3; i++) data[i] -= b.data[i]; }
+    { for (int i = 0; i < 3; i++) data[i] -= b.data[i]; return *this; }
     
     Real3DPtr& 
     operator*=(const real v)
-    { for (int i = 0; i < 3; i++) data[i] *= v; }
+    { for (int i = 0; i < 3; i++) data[i] *= v; return *this; }
     
     Real3DPtr& 
     operator/=(const real v) { 
       real v_1 = 1.0/v;
       for (int i = 0; i < 3; i++) 
 	data[i] *= v_1; 
+      return *this; 
     }
 
     bool operator==(const Real3DPtr &v) const { 
@@ -64,6 +66,10 @@ namespace espresso {
     }
     
   };
+
+  inline std::ostream &operator<<(std::ostream &out, const Real3DPtr &v) {
+    return out << v[0] << ' ' << v[1] << ' ' << v[2];
+  }
 }
 
 #endif

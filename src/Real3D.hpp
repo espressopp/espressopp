@@ -55,18 +55,19 @@ namespace espresso {
 
     // unary operators
     Real3D& operator+=(const Real3D &v)
-    { for (int i = 0; i < 3; i++) data[i] += v.data[i]; }
+    { for (int i = 0; i < 3; i++) data[i] += v.data[i]; return *this; }
 
     Real3D& operator-=(const Real3D &v)
-    { for (int i = 0; i < 3; i++) data[i] -= v.data[i]; }
+    { for (int i = 0; i < 3; i++) data[i] -= v.data[i]; return *this; }
 
     Real3D& operator*=(const real v)
-    { for (int i = 0; i < 3; i++) data[i] *= v; }
+    { for (int i = 0; i < 3; i++) data[i] *= v; return *this; }
 
     Real3D& operator/=(const real v) { 
       real v_1 = 1.0/v;
       for (int i = 0; i < 3; i++) 
 	data[i] *= v_1; 
+      return *this;
     }
 
     // bool operators
@@ -108,6 +109,10 @@ namespace espresso {
   };
 
   inline Real3D operator*(real s, const Real3D &v) { return v*s; }
+
+  inline std::ostream &operator<<(std::ostream &out, const Real3D &v) {
+    return out << v[0] << ' ' << v[1] << ' ' << v[2];
+  }
 }
 
 #endif
