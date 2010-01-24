@@ -1,0 +1,10 @@
+nobase_pkginclude_HEADERS += \
+	integrator/Integrator.hpp \
+	integrator/VelocityVerlet.hpp
+
+libespresso_common_la_SOURCES += \
+ 	integrator/Integrator.cpp \
+ 	integrator/VelocityVerlet.cpp
+
+#python_SCRIPTS +=
+

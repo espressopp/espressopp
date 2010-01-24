@@ -1,0 +1,11 @@
+
+Discussion points for next meeting:
+
+-  Integrator::selfPtr  vs. shared_ptr<class Integrator>
+
+    * arguments: avoids to include header files for Integrator.hpp
+
+- Integrator->System
+
+    * Reference back from Integrator to System
+

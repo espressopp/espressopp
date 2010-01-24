@@ -12,6 +12,7 @@ include esutil/SubMakefile.am
 include bc/SubMakefile.am
 include storage/SubMakefile.am
 include interaction/SubMakefile.am
+include integrator/SubMakefile.am
 
 CLEANFILES =
 
