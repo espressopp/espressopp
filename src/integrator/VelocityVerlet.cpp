@@ -24,15 +24,34 @@ void VelocityVerlet::run(int nsteps)
 {
   LOG4ESPP_INFO(theLogger, "run " << nsteps << " iterations");
   
+  // Before start make sure that particles are on the right processor
+
+  system.lock().get()->storage->resortParticles();
+
   for (int i = 0; i < nsteps; i++) {
 
     LOG4ESPP_DEBUG(theLogger, "step " << i << " of " << nsteps << " iterations");
 
     integrate1();
 
+    updateVelocity1(i);
+
+    if (rebuild()) {
+
+      system.lock().get()->storage->resortParticles();
+    }
+
+    system.lock().get()->storage->updateGhosts();
+
     calcForces();
 
+    postForces(i);  //  call signal 
+
+    system.lock().get()->storage->collectGhostForces();
+
     integrate2();
+ 
+    updateVelocity2(i);
   }
 }
 
@@ -128,3 +147,13 @@ void VelocityVerlet::calcForces()
   LOG4ESPP_INFO(theLogger, "energy  = " << e2);
 
 }
+
+/*****************************************************************************/
+
+bool VelocityVerlet::rebuild()
+{
+  // check for maximal movement
+
+  return true;
+}
+

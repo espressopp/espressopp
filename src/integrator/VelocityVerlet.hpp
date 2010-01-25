@@ -27,6 +27,10 @@ namespace espresso {
         void integrate2();
 
         void calcForces();
+
+        /** Predicate that returns true if verlet lists must be rebuild. */
+
+        bool rebuild();
     };
   }
 }

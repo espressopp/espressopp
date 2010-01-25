@@ -9,3 +9,10 @@ Discussion points for next meeting:
 
     * Reference back from Integrator to System
 
+- Force
+
+    * own class for Force Field
+
+- Verlet List
+
+    * who keeps a list of verlet lists
