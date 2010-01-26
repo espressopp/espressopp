@@ -24,9 +24,10 @@ namespace espresso {
       setBoxL(const Real3DRef _boxL);
 
       /** Getters for box dimensions */
-      virtual Real3D &getBoxL() { return boxL; }
-      virtual Real3D &getInvBoxL() { return invBoxL; }
+      virtual Real3D getBoxL() { return boxL; }
       virtual real getBoxL(int i)      const { return boxL[i]; }
+
+      virtual Real3D getInvBoxL() { return invBoxL; }
       virtual real getInvBoxL(int i)   const { return invBoxL[i]; }
 
       /** Computes the minimum image distance vector between two

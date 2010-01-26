@@ -81,7 +81,7 @@ namespace espresso {
   NodeGrid::
   NodeGrid(const int grid[3],
 	   const longint nodeId,
-	   const Real3DRef domainSize)
+	   const Real3D &domainSize)
     : Grid(grid)
   {
     if (grid[0] <= 0 || grid[1] <= 0 || grid[2] <= 0) {

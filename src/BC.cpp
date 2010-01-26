@@ -23,9 +23,12 @@ namespace espresso {
     // also register the abstract class BC to make virtual functions available
     // be careful: boost::noncopyable must be used for abstract classes with pure routines
     // no_init must be used as the abstract class BC has no constructor
+
+    Real3D (BC::*pygetBoxL)()=&BC::getBoxL;
     
     class_<BC, boost::noncopyable >("bc_BC", no_init)
       .def("setBoxL", &BC::setBoxL)
+      .def("getBoxL", pygetBoxL)
       ;
   }
 }
