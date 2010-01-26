@@ -31,7 +31,7 @@ namespace espresso {
 
         /** Setter routine for the timestep. */
 
-        void setTimeStep(double dt);
+        void setTimeStep(real dt);
 
         /** This method runs the integration for a certain number of steps. */
 
@@ -45,7 +45,7 @@ namespace espresso {
 
         /** Timestep used for integration. */
 
-        double dt;
+        real dt;
 
         /** Logger */
 

@@ -2,6 +2,7 @@
 
 #include "VerletList.hpp"
 #include "interaction/LennardJones.hpp"
+#include "Langevin.hpp"
 #include "System.hpp"
 
 using namespace espresso;
@@ -20,8 +21,30 @@ VelocityVerlet::~VelocityVerlet()
 
 /*****************************************************************************/
 
+void VelocityVerlet::setLangevin(shared_ptr<Langevin> _langevin)
+{
+  langevin = _langevin;
+}
+
+/*****************************************************************************/
+
 void VelocityVerlet::run(int nsteps)
 {
+
+  if (langevin) langevin->init(dt);
+
+  bool recalcForces = true;  // TODO: more intelligent
+
+  if (recalcForces) {
+
+     if (langevin) langevin->heatUp();
+
+     calcForces();
+
+     if (langevin) langevin->coolDown();
+
+  }
+
   LOG4ESPP_INFO(theLogger, "run " << nsteps << " iterations");
   
   // Before start make sure that particles are on the right processor
@@ -37,6 +60,9 @@ void VelocityVerlet::run(int nsteps)
     system.lock().get()->storage->updateGhosts();
     calcForces();
     system.lock().get()->storage->collectGhostForces();
+
+    if (langevin) langevin->thermalize();
+   
     integrate2();
   }
 }
@@ -49,7 +75,7 @@ void VelocityVerlet::integrate1()
 
   // loop over all particles of the local cells
 
-  double dt2 = dt * dt;
+  real dt2 = dt * dt;
   int count = 0;
 
   for (size_t c = 0; c < localCells.size(); c++) {
@@ -95,7 +121,7 @@ void VelocityVerlet::calcForces()
 {
   // build VerletList (currently each step, issue for optimization)
 
-  double cut = 1.5;
+  real cut = 1.5;
 
   shared_ptr< VerletList > vl = 
     make_shared<VerletList>(system.lock(), cut);

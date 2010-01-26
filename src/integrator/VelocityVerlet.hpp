@@ -16,9 +16,13 @@ namespace espresso {
 
         ~VelocityVerlet();
 
+        void setLangevin(shared_ptr<class Langevin> langevin);
+
         void run(int nsteps);
 
       private:
+
+        shared_ptr< class Langevin > langevin;
 
         void integrate1();
 

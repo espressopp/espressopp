@@ -1,10 +1,12 @@
 nobase_pkginclude_HEADERS += \
 	integrator/MDIntegrator.hpp \
-	integrator/VelocityVerlet.hpp
+	integrator/VelocityVerlet.hpp \
+	integrator/Langevin.hpp
 
 libespresso_common_la_SOURCES += \
  	integrator/MDIntegrator.cpp \
- 	integrator/VelocityVerlet.cpp
+ 	integrator/VelocityVerlet.cpp \
+ 	integrator/Langevin.cpp
 
 #python_SCRIPTS +=
 

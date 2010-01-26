@@ -18,7 +18,7 @@ MDIntegrator::~MDIntegrator()
   LOG4ESPP_INFO(theLogger, "free Integrator");
 }
 
-void MDIntegrator::setTimeStep(double _dt)
+void MDIntegrator::setTimeStep(real _dt)
 {
   dt = _dt;
 }
