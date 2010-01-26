@@ -20,7 +20,7 @@ struct LoggingFixture {
   LoggingFixture() { 
     LOG4ESPP_CONFIGURE();
     log4espp::Logger::getRoot().setLevel(log4espp::Logger::WARN);
-    log4espp::Logger::getInstance("Integrator").setLevel(log4espp::Logger::DEBUG);
+    log4espp::Logger::getInstance("MDIntegrator").setLevel(log4espp::Logger::DEBUG);
   }
 };
 
@@ -63,9 +63,8 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 
   double cut = 1.5;
 
-  VelocityVerlet* vv = new VelocityVerlet(system);
-
-  Integrator::SelfPtr integrator = shared_ptr<VelocityVerlet>(vv);
+  shared_ptr<MDIntegrator> integrator = 
+     make_shared<VelocityVerlet>(system);
 
   integrator->setTimeStep(0.005);
 

@@ -1,18 +1,16 @@
 #ifndef _INTEGRATOR_VELOCITY_VERLET_HPP
 #define _INTEGRATOR_VELOCITY_VERLET_HPP
 
-#include "Integrator.hpp"
+#include "MDIntegrator.hpp"
 
 namespace espresso {
   namespace integrator {
 
     /** Velocity Verlet Integrator */
 
-    class VelocityVerlet : public Integrator {
+    class VelocityVerlet : public MDIntegrator {
 
       public:
-
-        typedef shared_ptr< VelocityVerlet > SelfPtr;
 
         VelocityVerlet(shared_ptr<class espresso::System> system);
 

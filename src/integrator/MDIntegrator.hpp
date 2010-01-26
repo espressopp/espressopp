@@ -1,5 +1,5 @@
-#ifndef _INTEGRATOR_INTEGRATOR_HPP
-#define _INTEGRATOR_INTEGRATOR_HPP
+#ifndef _INTEGRATOR_MD_INTEGRATOR_HPP
+#define _INTEGRATOR_MD_INTEGRATOR_HPP
 
 #include "boost/signals2.hpp"
 
@@ -12,13 +12,11 @@ namespace espresso {
 
   namespace integrator {
 
-    /** Integrator base class. */
+    /** MOD Integrator base class. */
 
-    class Integrator {
+    class MDIntegrator {
 
       public:
-
-        typedef shared_ptr< Integrator > SelfPtr;
 
         /** Constructor for an integrator.
 
@@ -27,9 +25,9 @@ namespace espresso {
             Note: This class will keep a weak reference to the system.
         */
 
-        Integrator(shared_ptr<System>);
+        MDIntegrator(shared_ptr<System>);
 
-        ~Integrator();
+        ~MDIntegrator();
 
         /** Setter routine for the timestep. */
 
@@ -38,18 +36,6 @@ namespace espresso {
         /** This method runs the integration for a certain number of steps. */
 
         virtual void run(int nsteps) = 0;
-
-        /** Signal for routines to be called after first update of velocity */
-
-        boost::signals2::signal<void(int nstep)> updateVelocity1;
-
-        /** Signal for routines to be called after forces have been calculated. */
-
-        boost::signals2::signal<void(int nstep)> postForces;
-
-        /** Signal for routines to be called after second update of velocity */
-
-        boost::signals2::signal<void(int nstep)> updateVelocity2;
 
       protected:
 
