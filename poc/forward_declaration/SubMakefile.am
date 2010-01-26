@@ -1,0 +1,9 @@
+noinst_PROGRAMS += forward_declare
+
+noinst_HEADERS += \
+	forward_declaration/A.hpp \
+	forward_declaration/B.hpp
+
+forward_declare_SOURCES = \
+	forward_declaration/A.cpp \
+	forward_declaration/main.cpp
