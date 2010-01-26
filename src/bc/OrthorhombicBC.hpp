@@ -24,8 +24,8 @@ namespace espresso {
       setBoxL(const Real3DRef _boxL);
 
       /** Getters for box dimensions */
-      virtual const Real3D &getBoxL() const { return boxL; }
-      virtual const Real3D &getInvBoxL() const { return invBoxL; }
+      virtual Real3D &getBoxL() { return boxL; }
+      virtual Real3D &getInvBoxL() { return invBoxL; }
       virtual real getBoxL(int i)      const { return boxL[i]; }
       virtual real getInvBoxL(int i)   const { return invBoxL[i]; }
 

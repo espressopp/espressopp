@@ -1,6 +1,7 @@
 #define LOG4ESPP_LEVEL_INFO
 #include "log4espp.hpp"
 
+#include "Real3DRef.hpp"
 #include "NodeGrid.hpp"
 
 namespace espresso {
@@ -80,7 +81,7 @@ namespace espresso {
   NodeGrid::
   NodeGrid(const int grid[3],
 	   const longint nodeId,
-	   const real    domainSize[3])
+	   const Real3DRef domainSize)
     : Grid(grid)
   {
     if (grid[0] <= 0 || grid[1] <= 0 || grid[2] <= 0) {

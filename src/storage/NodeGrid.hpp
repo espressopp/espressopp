@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include "types.hpp"
 #include "logging.hpp"
+#include "Real3DRef.hpp"
 #include "esutil/Grid.hpp"
 
 namespace espresso {
@@ -41,12 +42,12 @@ namespace espresso {
 
     NodeGrid(const int grid[3],
     	     const longint nodeId,
-    	     const real _domainSize[3]);
+    	     const Real3DRef _domainSize);
 
     /// automatic setup of a node grid for nNodes processors
     NodeGrid(const longint nNodes,
     	     const longint nodeId,
-    	     const real _domainSize[3]);
+    	     const Real3DRef _domainSize);
 
     /// map coordinate to a node. Positions outside are clipped back
     longint 

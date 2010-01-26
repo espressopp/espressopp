@@ -4,7 +4,9 @@
 #include "log4espp.hpp"
 
 #include "System.hpp"
+#include "Real3DRef.hpp"
 #include "Storage.hpp"
+#include "BC.hpp"
 #include "CellListIterator.hpp"
 
 using namespace boost;
@@ -61,7 +63,7 @@ Particle *Storage::addParticle(longint id, const real p[3])
     n.r.p[i] = p[i];
     n.l.i[i] = 0;
   }
-  system.lock()->foldPosition(n.r.p, n.l.i);
+  system.lock()->bc->foldPosition(n.r.p, n.l.i);
   cell = mapPositionToCellClipped(n.r.p);
 
   appendIndexedParticle(cell->particles, n);

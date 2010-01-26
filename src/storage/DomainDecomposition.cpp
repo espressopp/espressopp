@@ -4,6 +4,7 @@
 #include "System.hpp"
 
 #include "DomainDecomposition.hpp"
+#include "BC.hpp"
 
 using namespace boost;
 
@@ -35,7 +36,7 @@ namespace espresso {
     real myLeft[3];
     real myRight[3];
 
-    nodeGrid = NodeGrid(_nodeGrid, comm.rank(), system.lock()->getBoxL());
+    nodeGrid = NodeGrid(_nodeGrid, comm.rank(), system.lock()->bc->getBoxL());
 
     if (nodeGrid.getNumberOfCells() != comm.size()) {
       throw NodeGridMismatch();
@@ -164,7 +165,7 @@ namespace espresso {
 	   end = l.end(); it != end; ++it) {
 
       if (nodeGrid.getBoundary(dir) != 0) {
-	system.lock()->foldCoordinate(it->r.p, it->l.i, nodeGrid.convertDirToCoord(dir));
+	system.lock()->bc->foldCoordinate(it->r.p, it->l.i, nodeGrid.convertDirToCoord(dir));
 	LOG4ESPP_TRACE(logger, "folded coordinate " << nodeGrid.convertDirToCoord(dir) << " of particle " << it->p.id);
       }
 
@@ -272,7 +273,7 @@ namespace espresso {
 	    // do not use an iterator here, since we have need to take out particles during the loop
 	    for (size_t p = 0; p < cell.particles.size(); ++p) {
 	      Particle &part = cell.particles[p];
-	      system.lock()->foldCoordinate(part.r.p, part.l.i, coord);
+	      system.lock()->bc->foldCoordinate(part.r.p, part.l.i, coord);
 	      LOG4ESPP_TRACE(logger, "folded coordinate " << coord << " of particle " << part.p.id);
 
 	      if (coord == 2) {
@@ -421,7 +422,7 @@ namespace espresso {
        communication, simply by taking the lr loop only over one
        value. */
     for (int coord = 0; coord < 3; ++coord) {
-      real curCoordBoxL = system.lock()->getBoxL(coord);
+      real curCoordBoxL = system.lock()->bc->getBoxL(coord);
 
       // lr loop: left right
       for (int lr = 0; lr < 2; ++lr) {
