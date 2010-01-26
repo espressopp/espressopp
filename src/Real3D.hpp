@@ -4,11 +4,10 @@
 #include "types.hpp"
 
 namespace espresso {
-  // forward declaration of Real3DPtr
   class Real3D {
     real data[3];
   public:
-    friend class Real3DPtr;
+    friend class Real3DRef;
 
     Real3D() 
     { for (int i = 0; i < 3; i++) data[i] = 0.0; }
@@ -22,7 +21,7 @@ namespace espresso {
       data[2] = z;
     }
 
-    Real3D(const class Real3DPtr &v);
+    Real3D(const class Real3DRef &v);
 
     real &operator[](int i) { return data[i]; }
     const real &operator[](int i) const { return data[i]; }

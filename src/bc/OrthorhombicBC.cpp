@@ -1,15 +1,16 @@
 #include "OrthorhombicBC.hpp"
 #include <python.hpp>
 #include <cmath>
+#include "Real3DRef.hpp"
 
 namespace espresso {
   namespace bc {
     /* Constructor */
-    OrthorhombicBC::OrthorhombicBC(const Real3DPtr _boxL) 
+    OrthorhombicBC::OrthorhombicBC(const Real3DRef _boxL) 
     { setBoxL(_boxL); }
 
     /* Setter method for the box length */
-    void OrthorhombicBC::setBoxL(const Real3DPtr _boxL) {
+    void OrthorhombicBC::setBoxL(const Real3DRef _boxL) {
       boxL = _boxL;
       for (int i = 0; i < 3; i++)
 	invBoxL[i] = 1.0/boxL[i];
@@ -18,10 +19,10 @@ namespace espresso {
     /* Returns minimum image vector between two particles */
     void 
     OrthorhombicBC::
-    getMinimumImageVector(Real3DPtr dist,
+    getMinimumImageVector(Real3DRef dist,
 			  real &distSqr,
-			  const Real3DPtr pos1,
-			  const Real3DPtr pos2) const {
+			  const Real3DRef pos1,
+			  const Real3DRef pos2) const {
       dist = pos1;
       dist -= pos2;
 
@@ -33,7 +34,7 @@ namespace espresso {
     /* Fold an individual coordinate in the specified direction */
     void 
     OrthorhombicBC::
-    foldCoordinate(Real3DPtr pos, int imageBox[3], int dir) {
+    foldCoordinate(Real3DRef pos, int imageBox[3], int dir) {
       int tmp = static_cast<int>(floor(pos[dir]*getInvBoxL(dir)));
 
       imageBox[dir] += tmp;
@@ -56,7 +57,7 @@ namespace espresso {
     /* Fold coordinates */
     void 
     OrthorhombicBC::
-    foldPosition(Real3DPtr pos, int imageBox[3]) {
+    foldPosition(Real3DRef pos, int imageBox[3]) {
       for (int i = 0; i < 3; ++i)
 	foldCoordinate(pos, imageBox, i);
     }
@@ -64,7 +65,7 @@ namespace espresso {
     /* Unfold coordinates */
     void 
     OrthorhombicBC::
-    unfoldPosition(Real3DPtr pos, int imageBox[3]) {
+    unfoldPosition(Real3DRef pos, int imageBox[3]) {
       for (int i = 0; i < 3; ++i) {
 	pos[i] = pos[i] + imageBox[i]*getBoxL(i);
 	imageBox[i] = 0;
@@ -74,7 +75,7 @@ namespace espresso {
     /* Get random position in the central image box */
     void 
     OrthorhombicBC::
-    getRandomPos(Real3DPtr res) const {
+    getRandomPos(Real3DRef res) const {
       for(int k = 0; k < 3; k++)
 	res[k] = boxL[k];
       
@@ -89,7 +90,7 @@ namespace espresso {
     registerPython() {
       using namespace espresso::python;
       class_<OrthorhombicBC, bases< BC > >
-	("bc_OrthorhombicBC", init< Real3DPtr >());
+	("bc_OrthorhombicBC", init< Real3DRef >());
     }
   }
 }

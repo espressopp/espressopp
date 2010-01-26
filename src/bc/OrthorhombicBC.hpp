@@ -2,6 +2,7 @@
 #define _BC_ORTHORHOMBICBC_HPP
 
 #include "BC.hpp"
+#include "Real3D.hpp"
 
 namespace espresso {
   namespace bc {
@@ -16,11 +17,11 @@ namespace espresso {
       ~OrthorhombicBC() {};
 
       /** Constructor */
-      OrthorhombicBC(const Real3DPtr _boxL);
+      OrthorhombicBC(const Real3DRef _boxL);
 
       /** Method to set the length of the side of the cubic simulation cell */
       virtual void
-      setBoxL(const Real3DPtr _boxL);
+      setBoxL(const Real3DRef _boxL);
 
       /** Getters for box dimensions */
       virtual const Real3D &getBoxL() const { return boxL; }
@@ -38,10 +39,10 @@ namespace espresso {
           \param pos1, pos2 are the particle positions 
       */
       virtual void
-      getMinimumImageVector(Real3DPtr dist,
+      getMinimumImageVector(Real3DRef dist,
                             real &distSqr,
-                            const Real3DPtr pos1,
-                            const Real3DPtr pos2) const;
+                            const Real3DRef pos1,
+                            const Real3DRef pos2) const;
 
       /** fold a coordinate to the primary simulation box.
 	  \param pos         the position...
@@ -51,7 +52,7 @@ namespace espresso {
 	  Both pos and image_box are I/O,
 	  i. e. a previously folded position will be folded correctly.
       */
-      virtual void foldCoordinate(Real3DPtr pos, int imageBox[3], int dir);
+      virtual void foldCoordinate(Real3DRef pos, int imageBox[3], int dir);
 
       /** fold particle coordinates to the primary simulation box.
 	  \param pos the position...
@@ -60,7 +61,7 @@ namespace espresso {
 	  Both pos and image_box are I/O,
 	  i. e. a previously folded position will be folded correctly.
       */
-      virtual void foldPosition(Real3DPtr pos, int imageBox[3]);
+      virtual void foldPosition(Real3DRef pos, int imageBox[3]);
 
       /** unfold coordinates to physical position.
 	  \param pos the position...
@@ -69,12 +70,12 @@ namespace espresso {
 	  Both pos and image_box are I/O, i.e. image_box will be (0,0,0)
 	  afterwards.
       */
-      virtual void unfoldPosition(Real3DPtr pos, int imageBox[3]);
+      virtual void unfoldPosition(Real3DRef pos, int imageBox[3]);
 
       /** Get a random position within the central simulation box. The
           positions are assigned with each coordinate on [0, boxL]. */
       virtual void
-      getRandomPos(Real3DPtr res) const;
+      getRandomPos(Real3DRef res) const;
 
       static void registerPython();
     };

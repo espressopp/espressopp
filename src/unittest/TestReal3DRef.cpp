@@ -1,7 +1,7 @@
-#define BOOST_TEST_MODULE Real3DPtr
+#define BOOST_TEST_MODULE Real3DRef
 
 #include "ut.hpp"
-#include "Real3DPtr.hpp"
+#include "Real3DRef.hpp"
 #include "Real3D.hpp"
 
 using namespace espresso;
@@ -12,19 +12,19 @@ BOOST_AUTO_TEST_CASE(FromCArray) {
   v[1] = 2.0;
   v[2] = 3.0;
 
-  Real3DPtr r(v);
+  Real3DRef r(v);
 
-  // check that the Real3DPtr reflects the given values
+  // check that the Real3DRef reflects the given values
   BOOST_CHECK_EQUAL(r[0], 1.0);
   BOOST_CHECK_EQUAL(r[1], 2.0);
   BOOST_CHECK_EQUAL(r[2], 3.0);
 
-  // check that the Real3DPtr can be written to
+  // check that the Real3DRef can be written to
   r[0]=42.0;
   r[1]=52.0;
   r[2]=62.0;
 
-  // check that wrinting to the Real3DPtr modifies the original array
+  // check that wrinting to the Real3DRef modifies the original array
   BOOST_CHECK_EQUAL(v[0], 42.0);
   BOOST_CHECK_EQUAL(v[1], 52.0);
   BOOST_CHECK_EQUAL(v[2], 62.0);
@@ -37,19 +37,19 @@ BOOST_AUTO_TEST_CASE(FromReal3D) {
   v[1] = 2.0;
   v[2] = 3.0;
 
-  Real3DPtr r(v);
+  Real3DRef r(v);
 
-  // check that the Real3DPtr reflects the given values
+  // check that the Real3DRef reflects the given values
   BOOST_CHECK_EQUAL(r[0], 1.0);
   BOOST_CHECK_EQUAL(r[1], 2.0);
   BOOST_CHECK_EQUAL(r[2], 3.0);
  
-  // check that the Real3DPtr can be written to
+  // check that the Real3DRef can be written to
   r[0]=42.0;
   r[1]=52.0;
   r[2]=62.0;
 
-  // check that wrinting to the Real3DPtr modifies the original
+  // check that wrinting to the Real3DRef modifies the original
   BOOST_CHECK_EQUAL(v[0], 42.0);
   BOOST_CHECK_EQUAL(v[1], 52.0);
   BOOST_CHECK_EQUAL(v[2], 62.0);
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(AssignmentIsNotInit) {
   Real3D v(1.0, 1.0, 1.0);
   Real3D v2(2.0, 2.0, 2.0);
 
-  Real3DPtr r(v);
+  Real3DRef r(v);
   BOOST_CHECK_EQUAL(r[0], 1.0);
   BOOST_CHECK_EQUAL(r[1], 1.0);
   BOOST_CHECK_EQUAL(r[2], 1.0);
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(AssignmentIsNotInit) {
 
 BOOST_AUTO_TEST_CASE(at) {
   Real3D a(1.0, 2.0, 3.0);
-  Real3DPtr r(a);
+  Real3DRef r(a);
 
   BOOST_CHECK_EQUAL(r.at(0), 1.0);
   BOOST_CHECK_EQUAL(r.at(1), 2.0);
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(at) {
 
 BOOST_AUTO_TEST_CASE(constElementAccess) {
   Real3D a(1.0, 2.0, 3.0);
-  const Real3DPtr r(a);
+  const Real3DRef r(a);
 
   BOOST_CHECK_EQUAL(r[0], 1.0);
   BOOST_CHECK_EQUAL(r[1], 2.0);
@@ -118,21 +118,21 @@ BOOST_AUTO_TEST_CASE(constElementAccess) {
 
 BOOST_AUTO_TEST_CASE(testSqr) {
   Real3D a(1.0, 2.0, 3.0);
-  Real3DPtr r(a);
+  Real3DRef r(a);
   BOOST_CHECK_CLOSE(r.sqr(), 14.0, 0.0001);
 }
   
 BOOST_AUTO_TEST_CASE(testAbs) {
   Real3D a(1.0, 2.0, 3.0);
-  Real3DPtr r(a);
+  Real3DRef r(a);
   BOOST_CHECK_CLOSE(r.abs(), sqrt(14.0), 0.0001);
 }
 
 BOOST_AUTO_TEST_CASE(unaryOps) {
   Real3D a(1.0, 2.0, 3.0);
   Real3D b(42.0, 52.0, 62.0);
-  Real3DPtr r(a);
-  Real3DPtr s(b);
+  Real3DRef r(a);
+  Real3DRef s(b);
 
   r += s;
   BOOST_CHECK_CLOSE(r[0], 43.0, 0.0001);
@@ -160,9 +160,9 @@ BOOST_AUTO_TEST_CASE(boolOps) {
   Real3D b(42.0, 52.0, 62.0);
   Real3D c(1.0, 2.0, 3.0);
 
-  Real3DPtr r(a);
-  Real3DPtr s(b);
-  Real3DPtr t(c);
+  Real3DRef r(a);
+  Real3DRef s(b);
+  Real3DRef t(c);
 
   BOOST_CHECK_EQUAL(r, r);
   BOOST_CHECK(!(r!=r));
