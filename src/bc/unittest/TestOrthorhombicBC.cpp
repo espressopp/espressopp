@@ -21,8 +21,9 @@ struct Fixture {
   shared_ptr< bc::OrthorhombicBC > pbc;
 
   Fixture() {
-    real L[3] = {10.0, 10.0, 10.0};
-    pbc = make_shared< bc::OrthorhombicBC >(L);
+    Real3D L(10.0, 10.0, 10.0);
+    //    pbc = make_shared< bc::OrthorhombicBC >(L);
+    pbc = shared_ptr< bc::OrthorhombicBC >(new bc::OrthorhombicBC(L));
   }
 };
 
@@ -30,9 +31,9 @@ BOOST_FIXTURE_TEST_CASE(foldingTest, Fixture) {
   int dim = 2;
   BOOST_CHECK_EQUAL(10.0, pbc->getBoxL(dim));
 
-  real pi[3] = {5.0, 5.0, 5.0};
-  real pj[3] = {11.0, 11.0, 11.0};
-  real rij[3];
+  Real3D pi(5.0, 5.0, 5.0);
+  Real3D pj(11.0, 11.0, 11.0);
+  Real3D rij;
   real d = 0.0;
   pbc->getMinimumImageVector(rij, d, pi, pj);
   BOOST_CHECK_EQUAL(rij[0], 4.0);

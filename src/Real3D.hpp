@@ -5,8 +5,6 @@
 
 namespace espresso {
   // forward declaration of Real3DPtr
-  class Real3DPtr;
-
   class Real3D {
     real data[3];
   public:
@@ -24,7 +22,7 @@ namespace espresso {
       data[2] = z;
     }
 
-    Real3D(const Real3DPtr &v);
+    Real3D(const class Real3DPtr &v);
 
     real &operator[](int i) { return data[i]; }
     const real &operator[](int i) const { return data[i]; }

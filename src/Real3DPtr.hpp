@@ -13,6 +13,13 @@ namespace espresso {
     Real3DPtr(Real3D &v) : data(v.data) {}
     Real3DPtr(real v[3]): data(v) {}
 
+    // assignment is not the same as initialization
+    Real3DPtr &operator=(const Real3DPtr &v) {
+      data[0] = v[0];
+      data[1] = v[1];
+      data[2] = v[2];
+    }
+
     real &operator[](const int i) { return data[i]; };
     const real &operator[](const int i) const { return data[i]; };
 

@@ -49,10 +49,37 @@ BOOST_AUTO_TEST_CASE(FromReal3D) {
   r[1]=52.0;
   r[2]=62.0;
 
-  // check that wrinting to the Real3DPtr modifies the original array
+  // check that wrinting to the Real3DPtr modifies the original
   BOOST_CHECK_EQUAL(v[0], 42.0);
   BOOST_CHECK_EQUAL(v[1], 52.0);
   BOOST_CHECK_EQUAL(v[2], 62.0);
+}
+
+BOOST_AUTO_TEST_CASE(AssignmentIsNotInit) {
+  Real3D v(1.0, 1.0, 1.0);
+  Real3D v2(2.0, 2.0, 2.0);
+
+  Real3DPtr r(v);
+  BOOST_CHECK_EQUAL(r[0], 1.0);
+  BOOST_CHECK_EQUAL(r[1], 1.0);
+  BOOST_CHECK_EQUAL(r[2], 1.0);
+  
+  r = v2;
+  BOOST_CHECK_EQUAL(r[0], 2.0);
+  BOOST_CHECK_EQUAL(r[1], 2.0);
+  BOOST_CHECK_EQUAL(r[2], 2.0);
+
+  r[0] = 3.0;
+  r[1] = 3.0;
+  r[2] = 3.0;
+
+  // Now, v should have changed, but v2 shouldn't!
+  BOOST_CHECK_EQUAL(v[0], 3.0);
+  BOOST_CHECK_EQUAL(v[1], 3.0);
+  BOOST_CHECK_EQUAL(v[2], 3.0);
+  BOOST_CHECK_EQUAL(v2[0], 2.0);
+  BOOST_CHECK_EQUAL(v2[1], 2.0);
+  BOOST_CHECK_EQUAL(v2[2], 2.0);
 }
 
 BOOST_AUTO_TEST_CASE(at) {
