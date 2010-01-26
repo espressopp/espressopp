@@ -1,5 +1,5 @@
 #include "Real3D.hpp"
-#include "Real3DRef.hpp"
+#include "types.hpp"
 #include <python.hpp>
 #include <boost/python/implicit.hpp>
 

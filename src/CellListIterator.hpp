@@ -13,8 +13,7 @@ namespace espresso {
   */
   class CellListIterator {
   public:
-    CellListIterator() {
-    }
+    CellListIterator() {}
 
     CellListIterator(CellList &cl) : cit(cl), pit() {
       if (cit.isDone()) return;
@@ -22,8 +21,7 @@ namespace espresso {
       findNonemptyCell();
     }
 
-    CellListIterator &operator++()
-    {
+    CellListIterator &operator++() {
       ++pit;
       findNonemptyCell();
       return *this;

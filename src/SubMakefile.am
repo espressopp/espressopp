@@ -8,10 +8,9 @@ nobase_pkginclude_HEADERS += \
 	System.hpp \
 	Interaction.hpp \
 	CellListIterator.hpp \
-	CellListNeighborIterator.hpp \
+	CellListAllPairsIterator.hpp \
 	VerletList.hpp \
 	bindings.hpp
-
 
 libespresso_common_la_SOURCES += \
 	Real3D.cpp \

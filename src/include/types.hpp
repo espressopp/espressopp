@@ -5,8 +5,10 @@
 #include <boost/make_shared.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/mpi.hpp>
-#include <boost/random.hpp>
 #include <exception>
+#include "esconfig.hpp"
+#include "Real3D.hpp"
+#include "Real3DRef.hpp"
 
 namespace espresso {
   using boost::shared_ptr;
@@ -19,20 +21,6 @@ namespace espresso {
   namespace mpi {
     using namespace boost::mpi;
   }
-
-  // define this to "float" if you want to have single precision
-  typedef double real;
-  
-  // define this to "long long" if you need longer integers
-  typedef int longint;
-  
-  static const real ROUND_ERROR_PREC = 1.0e-14;
-  
-  // RNG config
-  typedef boost::lagged_fibonacci607 RNGType;
-  // If you REALLY need speed!
-  //typedef boost::rand48 RNGType;
-
 
   class NoDefault: public std::exception {};
 

@@ -4,7 +4,6 @@
 
 #include "mpi.hpp"
 #include "logging.hpp"
-#include "Real3DRef.hpp"
 #include "../OrthorhombicBC.hpp"
 
 using namespace espresso;

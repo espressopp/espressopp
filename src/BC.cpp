@@ -1,8 +1,6 @@
 #include "BC.hpp"
 #include <python.hpp>
 #include <cmath>
-#include "Real3D.hpp"
-#include "Real3DRef.hpp"
 
 namespace espresso {
 

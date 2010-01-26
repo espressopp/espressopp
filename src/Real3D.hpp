@@ -1,7 +1,7 @@
 #ifndef _REAL3D_HPP
 #define _REAL3D_HPP
 
-#include "types.hpp"
+#include "esconfig.hpp"
 
 namespace espresso {
   class Real3D {

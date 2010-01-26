@@ -1,7 +1,7 @@
-#ifndef _REAL3DREF_HPP
-#define _REAL3DREF_HPP
+#ifndef _ESUTIL_REAL3DREF_HPP
+#define _ESUTIL_REAL3DREF_HPP
 
-#include "types.hpp"
+#include "esconfig.hpp"
 #include "Real3D.hpp"
 #include <iostream>
 
@@ -10,7 +10,7 @@ namespace espresso {
     real *data;
 
   public:
-    Real3DRef(Real3D &v) : data(v.data) {}
+    Real3DRef(class Real3D &v) : data(v.data) {};
     Real3DRef(real v[3]): data(v) {}
 
     // assignment is not the same as initialization

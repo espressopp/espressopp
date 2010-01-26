@@ -4,9 +4,9 @@ nobase_pkginclude_HEADERS += \
 	integrator/Langevin.hpp
 
 libespresso_common_la_SOURCES += \
- 	integrator/MDIntegrator.cpp \
- 	integrator/VelocityVerlet.cpp \
- 	integrator/Langevin.cpp
+	integrator/MDIntegrator.cpp \
+	integrator/VelocityVerlet.cpp \
+	integrator/Langevin.cpp
 
 #python_SCRIPTS +=
 

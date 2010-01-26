@@ -1,23 +1,23 @@
-#define BOOST_TEST_MODULE CellListNeighborIterator
+#define BOOST_TEST_MODULE CellListAllPairsIterator
 
 #include "ut.hpp"
 #include "Particle.hpp"
 #include "Cell.hpp"
-#include "CellListNeighborIterator.hpp"
+#include "CellListAllPairsIterator.hpp"
 #include <vector>
 
 using namespace espresso;
 using namespace std;
 
 BOOST_AUTO_TEST_CASE(defaultConstructor) {
-  CellListNeighborIterator it;
+  CellListAllPairsIterator it;
   BOOST_CHECK(!it.isValid());
   BOOST_CHECK(it.isDone());
 }
 
 BOOST_AUTO_TEST_CASE(emptyList) {
   CellList cl;
-  CellListNeighborIterator it(cl);
+  CellListAllPairsIterator it(cl);
   BOOST_CHECK(!it.isValid());
   BOOST_CHECK(it.isDone());
 }
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(noNeighbors) {
     cl.push_back(&cells[i]);
   }
 
-  CellListNeighborIterator it(cl);
+  CellListAllPairsIterator it(cl);
   BOOST_CHECK(!it.isValid());
   BOOST_CHECK(it.isDone());
 }
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(noParticles) {
     cl.push_back(&cell[i]);
   }
 
-  CellListNeighborIterator it(cl);
+  CellListAllPairsIterator it(cl);
   BOOST_CHECK(!it.isValid());
   BOOST_CHECK(it.isDone());
 }
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(selfPairs) {
     cell.particles.push_back(p);
   }
 
-  CellListNeighborIterator it(cl);
+  CellListAllPairsIterator it(cl);
   for (int i = 0; i < (NP*(NP-1))/2; i++) {
     ++it;
     BOOST_CHECK(it.isValid());
@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(fullLoop1D) {
     cl.push_back(&cell[i]);
   }
 
-  CellListNeighborIterator it(cl);
+  CellListAllPairsIterator it(cl);
   for (int i = 0; i < NCELL*(NP*(NCELL-1) + (NP*(NP-1))/2); ++i) {
     ++it;
     BOOST_CHECK(it.isValid());

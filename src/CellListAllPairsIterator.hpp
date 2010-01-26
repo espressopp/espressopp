@@ -1,5 +1,5 @@
-#ifndef _CELLLISTNEIGHBORITERATOR_HPP
-#define _CELLLISTNEIGHBORITERATOR_HPP
+#ifndef _CELLLISTALLPAIRSITERATOR_HPP
+#define _CELLLISTALLPAIRSITERATOR_HPP
 
 #include <utility>
 #include "Cell.hpp"
@@ -8,13 +8,13 @@
 namespace espresso {
   typedef std::pair< Particle&, Particle& > ParticlePair;
 
-  class CellListNeighborIterator {
+  class CellListAllPairsIterator {
   public:
-    CellListNeighborIterator();
-    CellListNeighborIterator(CellListNeighborIterator &clni);
-    CellListNeighborIterator(CellList &cl);
+    CellListAllPairsIterator();
+    CellListAllPairsIterator(CellListAllPairsIterator &clni);
+    CellListAllPairsIterator(CellList &cl);
 
-    CellListNeighborIterator &operator++();
+    CellListAllPairsIterator &operator++();
 
     bool isValid() const;
     bool isDone() const;
