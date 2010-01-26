@@ -34,7 +34,7 @@ namespace espresso {
 	  for (int j = 0, endj = pl2.size(); j < endj; j++) {
 	    Particle &p2 = pl2[j];
 	    real dist[3];
-	    real distSqr = distance2vec(p1.r.p, p2.r.p, dist);
+	    real distSqr = esutil::distance2vec(p1.r.p, p2.r.p, dist);
             int type2 = p2.p.type;
             const Parameters& params = parameterArray[type1][type2];
             if (distSqr < params.getCutoffSqr()) {
@@ -59,7 +59,7 @@ namespace espresso {
           for (int j = i+1; j < size; j++) {
             Particle &p2 = pl[j];
             real dist[3];
-            real distSqr = distance2vec(p1.r.p, p2.r.p, dist);
+            real distSqr = esutil::distance2vec(p1.r.p, p2.r.p, dist);
             int type2 = p2.p.type;
             const Parameters& params = parameterArray[type1][type2];
             if (distSqr < params.getCutoffSqr()) {
@@ -87,7 +87,7 @@ namespace espresso {
           Particle& p2 = *pairList[i].second;
           int type1 = p1.p.type;
           real dist[3];
-          real distSqr = distance2vec(p1.r.p, p2.r.p, dist);
+          real distSqr = esutil::distance2vec(p1.r.p, p2.r.p, dist);
           int type2 = p2.p.type;
           const Parameters& params = parameterArray[type1][type2];
           if (distSqr < params.getCutoffSqr()) {
@@ -116,7 +116,7 @@ namespace espresso {
           Particle& p2 = *pairList[i].second;
           int type1 = p1.p.type;
           real dist[3];
-          real distSqr = distance2vec(p1.r.p, p2.r.p, dist);
+          real distSqr = esutil::distance2vec(p1.r.p, p2.r.p, dist);
           int type2 = p2.p.type;
           const Parameters& params = parameterArray[type1][type2];
 

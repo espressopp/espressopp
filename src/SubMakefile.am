@@ -6,6 +6,7 @@ nobase_pkginclude_HEADERS += \
 	Storage.hpp \
         BC.hpp \
 	System.hpp \
+	Interaction.hpp \
 	CellListIterator.hpp \
 	CellListNeighborIterator.hpp \
 	VerletList.hpp \
@@ -17,6 +18,7 @@ libespresso_common_la_SOURCES += \
 	Storage.cpp \
         BC.cpp \
 	System.cpp \
+	Interaction.cpp \
 	CellListIterator.cpp \
 	VerletList.cpp \
 	bindings.cpp
