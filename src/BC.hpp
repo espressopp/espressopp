@@ -9,8 +9,6 @@ namespace espresso {
     /** Abstract base class for boundary conditions. */
     class BC {
     public:
-      typedef shared_ptr< BC > SelfPtr;
-
       /** Virtual destructor for boundary conditions. */
       virtual ~BC() {};
 

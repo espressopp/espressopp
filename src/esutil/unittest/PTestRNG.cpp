@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(normalDist)
   RNG rng;
 
   const int N = 10000;
-  NormalVariate::SelfPtr nv = rng.createNormalVariate(2.0, 0.5);
+  shared_ptr< NormalVariate > nv = rng.createNormalVariate(2.0, 0.5);
 
   real r;
   real sum = 0.0;
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(uniformOnSphere)
 BOOST_AUTO_TEST_CASE(uniformOnSphereVariate)
 {
   RNG rng;
-  UniformOnSphere::SelfPtr uv = 
+  shared_ptr< UniformOnSphere > uv = 
     rng.createUniformOnSphere(2);
 
   const int N = 10000;

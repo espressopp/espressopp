@@ -11,8 +11,6 @@ namespace espresso {
       Real3D invBoxL;
 
     public:
-      typedef shared_ptr< OrthorhombicBC > SelfPtr;
-
       /** Virtual destructor for boundary conditions. */
       virtual
       ~OrthorhombicBC() {};

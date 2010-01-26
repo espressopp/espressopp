@@ -11,14 +11,11 @@
 
 namespace espresso {
   /** represents the particle storage of one system. */
-  class System;
-
   class Storage {
   public:
-    typedef shared_ptr< Storage > SelfPtr;
-    typedef boost::unordered_map<longint, Particle * > IdParticleMap;
+    typedef boost::unordered_map< longint, Particle * > IdParticleMap;
 
-    Storage(shared_ptr< System > _system,
+    Storage(shared_ptr< class System > _system,
 	    const boost::mpi::communicator &,
 	    bool useVList);
     virtual ~Storage();
@@ -170,7 +167,7 @@ namespace espresso {
     /// map particle id to Particle * for all particles on this node
     boost::unordered_map<longint, Particle * > localParticles;
     mpi::communicator comm;
-    weak_ptr< System > system;
+    weak_ptr< class System > system;
   
     /** flag for using Verlet List. */
     int useVList;

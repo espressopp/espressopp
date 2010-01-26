@@ -18,8 +18,6 @@ namespace espresso {
       shared_ptr< RNGType > boostRNG;
 
     public:
-      typedef shared_ptr< RNG > SelfPtr;
-
       /** Init the RNG, use the given seed. */
       RNG(long _seed = 12345);
 
@@ -42,14 +40,14 @@ namespace espresso {
 
       /** returns a variate generator object that generates random
 	  variates with a normal distribution and the given parameters. */
-      NormalVariate::SelfPtr 
+      shared_ptr < NormalVariate > 
       createNormalVariate(const real mean = 0.0,
 			  const real sigma = 1.0);
 
       /** returns a random 3D vector that is uniformly distributed on a sphere. */
       std::vector< real > uniformOnSphere();
 
-      UniformOnSphere::SelfPtr
+      shared_ptr< UniformOnSphere >
       createUniformOnSphere(int dim = 3);
 
     private:

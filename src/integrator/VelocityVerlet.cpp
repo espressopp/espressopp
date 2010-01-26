@@ -1,5 +1,5 @@
-
 #include "VelocityVerlet.hpp"
+
 #include "VerletList.hpp"
 #include "interaction/LennardJones.hpp"
 #include "System.hpp"
@@ -8,7 +8,7 @@ using namespace espresso;
 using namespace integrator;
 using namespace interaction;
 
-VelocityVerlet::VelocityVerlet(shared_ptr<System> system) : Integrator(system)
+VelocityVerlet::VelocityVerlet(shared_ptr< System > system) : Integrator(system)
 {
   LOG4ESPP_INFO(theLogger, "construct VelocityVerlet");
 }
@@ -128,7 +128,8 @@ void VelocityVerlet::calcForces()
 
   double cut = 1.5;
 
-  VerletList::SelfPtr vl = make_shared<VerletList>(system.lock(), cut);
+  shared_ptr< VerletList > vl = 
+    make_shared<VerletList>(system.lock(), cut);
 
   VerletList::PairList pairs = vl->getPairs();
 

@@ -24,8 +24,8 @@ struct LoggingFixture {
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
 struct Fixture {
-  DomainDecomposition::SelfPtr domdec;
-  System::SelfPtr system;
+  shared_ptr< DomainDecomposition > domdec;
+  shared_ptr< System > system;
 
   Fixture() {
     real boxL[3] = { 3.0, 3.0, 3.0 };
@@ -60,7 +60,8 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 
   double cut = 1.5;
 
-  VerletList::SelfPtr vl = make_shared<VerletList>(system, cut);
+  shared_ptr< VerletList > vl = 
+    make_shared<VerletList>(system, cut);
 
   VerletList::PairList pairs = vl->getPairs();
 

@@ -15,16 +15,12 @@ namespace espresso {
 class VerletList {
 
  public:
-
-  typedef shared_ptr<VerletList> SelfPtr;
-
   /** A pair is a tuple of two references to the particles. */
-
-  typedef std::pair<class Particle*, class Particle*> pairParticle;
+  typedef std::pair< class Particle*, class Particle* > pairParticle;
 
   /** List of pairs are currently done by a vector. */
 
-  typedef std::vector<pairParticle> PairList;
+  typedef std::vector< pairParticle > PairList;
 
   /** Build a verlet list of all particle pairs in the storage
       whose distance is less than a given cutoff.
@@ -34,7 +30,7 @@ class VerletList {
 
   */
 
-  VerletList(shared_ptr<class System>, double cut);
+  VerletList(shared_ptr< class System >, double cut);
 
   ~VerletList();
 

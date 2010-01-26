@@ -20,8 +20,6 @@ namespace espresso {
       shared_ptr< RNGType > rng;
 
     public:
-      typedef espresso::shared_ptr< NormalVariate > SelfPtr;
-
       NormalVariate(shared_ptr< RNGType > _rng,
 		    const real mean = 0.0, 
 		    const real sigma = 1.0);

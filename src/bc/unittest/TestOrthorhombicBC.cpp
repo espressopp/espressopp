@@ -18,7 +18,7 @@ struct LoggingFixture {
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
 struct Fixture {
-  bc::OrthorhombicBC::SelfPtr pbc;
+  shared_ptr< bc::OrthorhombicBC > pbc;
 
   Fixture() {
     real L[3] = {10.0, 10.0, 10.0};

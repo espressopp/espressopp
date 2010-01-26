@@ -18,8 +18,6 @@ namespace espresso {
       shared_ptr< RNGType > rng;
       
     public:
-      typedef shared_ptr< UniformOnSphere > SelfPtr;
-      
       UniformOnSphere(shared_ptr< RNGType > _rng, int dim = 3);
       using Super::operator();
     };

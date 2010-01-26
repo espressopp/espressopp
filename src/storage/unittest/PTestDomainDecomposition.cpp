@@ -22,8 +22,8 @@ struct LoggingFixture {
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
 struct Fixture {
-  DomainDecomposition::SelfPtr domdec;
-  System::SelfPtr system;
+  shared_ptr< DomainDecomposition > domdec;
+  shared_ptr< System > system;
 
   Fixture() {
     real boxL[3] = { 1.0, 2.0, 3.0 };
@@ -63,7 +63,7 @@ struct Fixture {
 BOOST_AUTO_TEST_CASE(constructDomainDecomposition) 
 {
   real boxL[3] = { 1.0, 2.0, 3.0 };
-  System::SelfPtr system;
+  shared_ptr< System > system;
   system = make_shared< System >();
   system->setBoxL(boxL);
 

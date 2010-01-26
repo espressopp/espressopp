@@ -2,16 +2,12 @@
 #define _SYSTEM_HPP
 
 #include "types.hpp"
-#include "BC.hpp"
-#include "Storage.hpp"
 
 namespace espresso {
   class System {
   public:
-    typedef shared_ptr< System > SelfPtr;
-
-    Storage::SelfPtr storage;
-    espresso::BC::SelfPtr gen_bc;
+    shared_ptr< class Storage > storage;
+    shared_ptr< class BC > gen_bc;
 
     real boxL[3];
     real invBoxL[3];

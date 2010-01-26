@@ -1,18 +1,17 @@
-#include "Cell.hpp"
-
-#include "System.hpp"
 #include "VerletList.hpp"
+
+#include "Cell.hpp"
+#include "System.hpp"
+#include "Storage.hpp"
 
 using namespace espresso;
 
 LOG4ESPP_LOGGER(VerletList::theLogger, "VerletList");
 
-VerletList::VerletList(System::SelfPtr system, double cut)
-
-{
+VerletList::VerletList(shared_ptr< System > system, real cut) {
   cutsq = cut * cut;
 
-  std::vector<Cell>& localCells = system->storage->getLocalCells();
+  std::vector< Cell >& localCells = system->storage->getLocalCells();
  
   for (size_t c = 0; c < localCells.size(); c++) {
 
@@ -78,6 +77,5 @@ VerletList::VerletList(System::SelfPtr system, double cut)
 }
 
 VerletList::~VerletList()
-{
-}
+{}
 

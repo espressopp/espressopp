@@ -1,7 +1,7 @@
 #ifndef _INTERACTION_HPP
 #define _INTERACTION_HPP
 
-#include "Storage.hpp"
+#include "types.hpp"
 
 namespace espresso {
   /** Abstract base class for interactions. 
@@ -10,8 +10,8 @@ namespace espresso {
    */
   class Interaction {
   protected:
-    virtual void addForces(Storage::SelfPtr storage) = 0;
-    virtual real computeEnergy(Storage::SelfPtr storage) = 0;
+    virtual void addForces(shared_ptr< class Storage > storage) = 0;
+    virtual real computeEnergy(shared_ptr< class Storage > storage) = 0;
   };
 }
 

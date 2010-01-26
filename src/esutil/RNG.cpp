@@ -37,7 +37,7 @@ RNG::normal() {
   return normalVariate();
 }
 
-NormalVariate::SelfPtr 
+shared_ptr< NormalVariate >
 RNG::createNormalVariate(const real mean, const real sigma) {
   return
     make_shared< NormalVariate >(boostRNG, mean, sigma);
@@ -48,7 +48,7 @@ RNG::uniformOnSphere() {
   return uniformOnSphereVariate();
 }
 
-UniformOnSphere::SelfPtr
+shared_ptr< UniformOnSphere >
 RNG::createUniformOnSphere(int dim) {
   return
     make_shared< UniformOnSphere >(boostRNG, dim);
