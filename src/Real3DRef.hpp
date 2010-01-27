@@ -18,6 +18,7 @@ namespace espresso {
       data[0] = v[0];
       data[1] = v[1];
       data[2] = v[2];
+      return *this;
     }
 
     real &operator[](const int i) { return data[i]; };

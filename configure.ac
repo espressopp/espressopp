@@ -253,6 +253,7 @@ AC_CONFIG_HEADERS([src/acconfig.hpp])
 AC_CONFIG_FILES([Makefile 
                  contrib/Makefile
                  contrib/boost/Makefile
+                 contrib/mpi4py/Makefile
                  src/Makefile 
 		 poc/Makefile
 		 doc/Makefile

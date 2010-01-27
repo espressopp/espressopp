@@ -1,3 +1,19 @@
+# PMI - Parallel Method Invocation
+# Copyright (C) 2009 Olaf Lenz
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 """
 ************************************
 **PMI** - Parallel Method Invocation
@@ -23,8 +39,8 @@ PMI also allows to create parallel instances of object classes via
 on all workers. `call()`, `invoke()` and `reduce()` can be used to
 call arbitrary methods of these instances.
 
-To allow importing of python modules and to execute arbitrary code on
-all workers, `exec_()` can be used.
+to execute arbitrary code on all workers, `exec_()` can be used, and
+to import python modules to all workers, use 'import_()'.
 
 Main program
 ------------
@@ -45,7 +61,7 @@ controller. A typical PMI main program looks like this:
 >>> pmi.startWorkerLoop()
 >>>
 >>> # Do the parallel computation
->>> pmi.exec_('import math')
+>>> pmi.import_('math')
 >>> pmi.reduce('lambda a,b: a+b', 'math.factorial', 42)
 >>>
 >>> # exit all workers
@@ -116,23 +132,22 @@ to distributed PMI classes.
 Useful constants and variables
 ------------------------------
 
-The pmi module defines the following useful constants:
+The pmi module defines the following useful constants and variables:
 
-* `IS_CONTROLLER` is True when used on the controller, False otherwise
-* `IS_WORKER` = not IS_CONTROLLER
-* `ID` is the numerical Id of the thread ( = mpi.world.rank)
-* `CONTROLLER` is the numerical Id of the controller thread (the MPI root)
-* `WORKERSTR` is a string describing the thread ('Worker #' or 'Controller')
-
-and the following variables:
-
+* `isController` is True when used on the controller, False otherwise
+* `isWorker` = not isController
+* `ID` is the rank of the MPI task
+* `CONTROLLER` is the rank of the Controller (normally the MPI root)
+* `workerStr` is a string describing the thread ('Worker #' or 'Controller')
 * `inWorkerLoop` is True, if PMI currently executes the worker loop on
   the workers.
 
 """
-import logging, types, sys, inspect
-from espresso import boostmpi as mpi
+import logging, types, sys, inspect, os
 
+__author__ = 'Olaf Lenz'
+__email__ = 'olaf at lenz dot name'
+__version__ = '1.0'
 __all__ = [
     'exec_', 'import_', 'execfile_',
     'create', 'call', 'invoke', 'reduce', 'localcall',
@@ -140,9 +155,42 @@ __all__ = [
     'startWorkerLoop',
     'finalizeWorkers', 'stopWorkerLoop', 'registerAtExit',
     'Proxy',
-    'ID', 'CONTROLLER', 'IS_CONTROLLER', 'IS_WORKER', 'WORKERSTR',
+    'rank', 'size', 'CONTROLLER',
+    'isController', 'isWorker',
+    'workerStr', 'inWorkerLoop',
     'UserError'
     ]
+
+##################################################
+## IMPORT
+##################################################
+def import_(*args) :
+    """Controller command that imports python modules on all workers.
+
+    Each element of args should be a module name that is imported to
+    all workers.
+
+    Example:
+    
+    >>> pmi.import_('hello')
+    >>> hw = pmi.create('hello.HelloWorld')
+    """
+    global inWorkerLoop
+    if isController:
+        if len(args) == 0:
+            raise UserError('pmi.import_ expects exactly 1 argument on controller!')
+            
+        # broadcast the statement
+        _broadcast(_IMPORT, *args)
+        # locally execute the statement
+        return __workerImport_(*args)
+    elif not inWorkerLoop:
+        return receive(_IMPORT)
+
+def __workerImport_(*modules) :
+    log.info("Importing modules: %s", modules)
+    statement='import ' + ', '.join(modules)
+    exec(statement, globals())
 
 ##################################################
 ## EXEC
@@ -151,8 +199,9 @@ def exec_(*args) :
     """Controller command that executes arbitrary python code on all workers.
 
     exec_() allows to execute arbitrary Python code on all workers.
-    It can be used to import modules, or to define classes and
-    functions on all workers.
+    It can be used to define classes and functions on all workers.
+    Modules should not be imported via exec_(), instead import_()
+    should be used.
 
     Each element of args should be string that is executed on all
     workers.
@@ -164,7 +213,7 @@ def exec_(*args) :
     """
     if __checkController(exec_) :
         if len(args) == 0:
-            raise UserError('pmi.exec_ expects exactly 1 argument on controller!')
+            raise UserError('pmi.exec_ expects at least one argument(s) on controller!')
             
         # broadcast the statement
         _broadcast(_EXEC, *args)
@@ -179,9 +228,6 @@ def __workerExec_(*statements) :
         log.info("Executing '%s'", statement)
         exec(statement, globals())
 
-def import_(statement) :
-    """import_() is an alias for exec_()."""
-    exec_(statement)
 
 ##################################################
 ## EXECFILE
@@ -242,13 +288,12 @@ def create(cls=None, *args, **kwds) :
         # broadcast creation to the workers
         _broadcast(_CREATE, cls, oid, *targs, **tkwds)
 
-        log.info('Creating: %s [%s]', 
-                 __formatCall(cls.__name__, cargs, ckwds), oid)
+        obj = __workerCreate(cls, oid, *cargs, **ckwds)
 
-        # create the controller instance
-        obj = cls(*cargs, **ckwds)
-        # store the oid in the instance
+        # On the controller, store the oid in the instance
         obj.__pmioid = oid
+        # Create the destroyer so that the instances on the workers
+        # are destroyed
         obj.__pmidestroyer = __Destroyer(oid)
 
         return obj
@@ -262,10 +307,12 @@ def __workerCreate(cls, oid, *targs, **tkwds) :
              % (__formatCall(cls.__name__, args, kwds), oid))
     # create the worker instance
     obj = cls(*args, **kwds)
-    # store the new object
-    if oid in OBJECT_CACHE :
-        raise _InternalError("Object [%s] is already in OBJECT_CACHE!" % oid)
-    OBJECT_CACHE[oid] = obj
+
+    if isWorker:
+        # store the new object
+        if oid in OBJECT_CACHE :
+            raise InternalError("Object [%s] is already in OBJECT_CACHE!" % oid)
+        OBJECT_CACHE[oid] = obj
     return obj
 
 ##################################################
@@ -363,7 +410,7 @@ def invoke(*args, **kwds) :
         _broadcast(_INVOKE, tfunction, *targs, **tkwds)
         log.info("Invoking: %s", __formatCall(cfunction, cargs, ckwds))
         value = cfunction(*cargs, **ckwds)
-        return mpi.world.gather(value, root=CONTROLLER)
+        return _MPIGather(value)
     else :
         return receive(_INVOKE)
 
@@ -372,7 +419,7 @@ def __workerInvoke(function, *targs, **tkwds) :
     args, kwds = __backtranslateOIDs(targs, tkwds)
     log.info("Invoking: %s", __formatCall(function, args, kwds))
     value = function(*args, **kwds)
-    return mpi.world.gather(value, root=CONTROLLER) 
+    return _MPIGather(value)
 
 ##################################################
 ## REDUCE (INVOKE WITH REDUCED RESULT)
@@ -416,7 +463,7 @@ def reduce(*args, **kwds) :
         log.info("Reducing: %s", __formatCall(cfunction, cargs, ckwds))
         value = cfunction(*args, **ckwds)
         log.info("Reducing results via %s", creduceOp)
-        return mpi.world.reduce(op=creduceOp, value=value, root=CONTROLLER)
+        return _MPIReduce(op=creduceOp, value=value)
     else :
         return receive(_REDUCE)
 
@@ -427,7 +474,7 @@ def __workerReduce(reduceOp, function, *targs, **tkwds) :
     log.info("Reducing: %s", __formatCall(function, args, kwds))
     value = function(*args, **kwds)
     log.info("Reducing results via %s", reduceOp)
-    return mpi.world.reduce(op=reduceOp, value=value, root=CONTROLLER) 
+    return _MPIReduce(op=reduceOp, value=value)
 
 ##################################################
 ## SYNC
@@ -460,7 +507,7 @@ def dump() :
 
 def __workerDump() :
     import pprint
-    log.info("OBJECT_CACHE=%s", pprint.pformat(OBJECT_CACHE))
+    print("OBJECT_CACHE=%s", pprint.pformat(OBJECT_CACHE))
 
 ##################################################
 ## AUTOMATIC OBJECT DELETION
@@ -480,7 +527,7 @@ def __workerDelete(*args) :
     """Deletes the OBJECT_CACHE reference to a PMI object."""
     if len(args) > 0:
         log.info("Deleting oids: %s", args)
-        for oid in args :
+        for oid in args:
             obj=OBJECT_CACHE[oid]
             log.debug("  %s [%s]" % (obj, oid))
             # Delete the entry from the cache
@@ -497,8 +544,10 @@ def startWorkerLoop() :
     until `stopWorkerLoop()` or `finalizeWorkers()` is called on the
     controller.
     """
+    global inWorkerLoop
+
     # On the controller, leave immediately
-    if IS_CONTROLLER :
+    if isController :
         log.info('Entering and leaving the worker loop')
         return None
 
@@ -657,28 +706,27 @@ class Proxy(type):
 ##################################################
 ## CONSTANTS AND EXCEPTIONS
 ##################################################
-# MPI task that runs the controller
-CONTROLLER = 0
-# whether this is a worker or a controller
-IS_CONTROLLER = mpi.rank == CONTROLLER
-IS_WORKER = not IS_CONTROLLER
 
-class _InternalError(Exception) :
+class InternalError(Exception):
     """Raised when PMI has encountered an internal error.
 
     Hopefully, this exceptions is never raised."""
+    def __init__(self, msg):
+        self.msg = msg
     def __str__(self) :
-        return '%s: %s' % (WORKERSTR, str(self.args))
+        return workerStr + ': ' + self.msg
     def __repr__(self) :
-        return str(self.args)
+        return str(self)
 
-class UserError(Exception) :
+class UserError(Exception):
     """Raised when PMI has encountered a user error.
     """
+    def __init__(self, msg):
+        self.msg = msg
     def __str__(self) :
-        return '%s: %s' % (WORKERSTR, str(self.args))
+        return workerStr + ': ' + self.msg
     def __repr__(self) :
-        return str(self.args)
+        return str(self)
 
 ##################################################
 ## BROADCAST AND RECEIVE
@@ -692,14 +740,17 @@ def _broadcast(cmd, *args, **kwds) :
     itself.
     """
     __delete()
+    log.debug("Broadcasting command: %s", _CMD[cmd][0])
     __broadcastCmd(cmd, *args, **kwds)
 
 def __broadcastCmd(cmd, *args, **kwds) :
+    """This wraps a command with its argument into an internal __CMD
+    object, so that it can be safely sent via MPI. __CMD is
+    pciklable."""
     if not _checkCommand(cmd) :
-        raise _InternalError('_broadcast needs a PMI command as first argument. Got %s instead!' % cmd)
-    cmd = __CMD(cmd, args, kwds)
-    log.debug("Broadcasting command: %s", cmd)
-    mpi.broadcast(mpi.world, value=cmd, root=CONTROLLER)
+        raise InternalError('_broadcast needs a PMI command as first argument. Got %s instead!' % cmd)
+    cmdobj = __CMD(cmd, args, kwds)
+    _MPIBroadcast(cmdobj)
 
 def receive(expected=None) :
     """Worker command that receives and handles the next PMI command.
@@ -713,9 +764,9 @@ def receive(expected=None) :
         log.debug('Waiting for next PMI command.')
     else:
         log.debug('Waiting for PMI command %s.', _CMD[expected][0])
-    message = mpi.world.broadcast(root=CONTROLLER)
+    message = _MPIBroadcast()
     log.debug("Received message: %s", message)
-    if type(message) != __CMD:
+    if type(message) is not __CMD:
         raise UserError("Received an MPI message that is not a PMI command: '%s'" % str(message))
     cmd = message.cmd
     args = message.args
@@ -745,7 +796,6 @@ class __OID(object) :
     """
     def __init__(self) :
         self.id = id(self)
-        return object.__init__(self)
     def __str__(self):
         return 'oid=0x%x' % self.id
     def __hash__(self):
@@ -757,21 +807,21 @@ class __OID(object) :
     def __setstate__(self, id):
         self.id = id
 
-if IS_CONTROLLER:
-    class __Destroyer(object):
-        def __init__(self, oid):
-            self.oid = oid
-            return object.__init__(self)
-        def __del__(self):
-            log.info("Adding OID to DELETED_OIDS: [%s]", self.oid)
-            DELETED_OIDS.append(self.oid)
+class __Destroyer(object):
+    def __init__(self, oid):
+        self.oid = oid
+        return object.__init__(self)
+    def __del__(self):
+        log.info("Adding OID to DELETED_OIDS: [%s]", self.oid)
+        DELETED_OIDS.append(self.oid)
 
 class __CMD(object) :
-    """Internal class that can be sent via MPI and represents a PMI command.
+    """Internal, picklable class that represents a PMI
+    command. Intended to be sent via MPI.
     """
     def __init__(self, cmd, args=None, kwds=None) :
         if not _checkCommand(cmd):
-            raise _InternalError('Created __CMD object with invalid PMI command %s' % cmd)
+            raise InternalError('Created __CMD object with invalid PMI command %s' % cmd)
         self.cmd = cmd
         self.args = args
         self.kwds = kwds
@@ -795,9 +845,13 @@ def _checkCommand(cmd):
     return 0 <= cmd < _MAXCMD
 
 def __checkController(func) :
-    """Checks whether we are on the controller, raises a UserError if we are not.
+    """Checks whether we are on the controller, raises a UserError if
+    we are on a worker and in the worker loop.
+
+    Returns whether we are on the controller.
     """
-    if IS_CONTROLLER:
+    global inWorkerLoop
+    if isController:
         return True
     else:
         if not inWorkerLoop:
@@ -808,7 +862,7 @@ def __checkController(func) :
 def __checkWorker(func) :
     """Checks whether we are on a worker, raises a UserError if we are not.
     """
-    if IS_CONTROLLER:
+    if isController:
         raise UserError("Cannot call %s on the controller!" % func.__name__)
 
 def _translateClass(cls):
@@ -894,10 +948,14 @@ def _backtranslateOID(obj) :
     If the object is not an __OID object, returns the object untouched.
     """
     if type(obj) is __OID:
-        if obj in OBJECT_CACHE.keys():
+        if obj in OBJECT_CACHE:
             return OBJECT_CACHE[obj]
+        elif isController:
+            # TODO: Not nice! Is this just so that broadcast can
+            # return anything on the controller?
+            return None
         else:
-            raise _InternalError("Object [%s] is not in OBJECT_CACHE" % obj)
+            raise InternalError("Object [%s] is not in OBJECT_CACHE" % obj)
     else :
         return obj
 
@@ -988,6 +1046,7 @@ def __formatCall(function, args, kwds) :
 # map of command names and associated worker functions
 _CMD = [ 
     ('EXEC', __workerExec_),
+    ('IMPORT', __workerImport_),
     ('EXECFILE', __workerExecfile_),
     ('CREATE', __workerCreate),
     ('INVOKE', __workerInvoke),
@@ -1003,27 +1062,99 @@ _MAXCMD = len(_CMD)
 
 # define the numerical constants to be used
 for i in range(len(_CMD)) :
-    exec '_%s=%s' % (_CMD[i][0],i) in globals()
+    exec('_%s=%s' % (_CMD[i][0],i), globals())
 del i
 
-if IS_CONTROLLER: 
-    # set that stores which oids have been deleted
-    DELETED_OIDS = []
-else :
-    # dict that stores the objects corresponding to an oid
-    OBJECT_CACHE = {}
+# set that stores which oids have been deleted
+DELETED_OIDS = []
+# dict that stores the objects corresponding to an oid
+OBJECT_CACHE = {}
 
 inWorkerLoop = False
-ID = mpi.rank
-#Globals = {}
+
+##################################################
+## MPI SETUP
+##################################################
+import MPI
+
+def _MPIInit(comm=MPI.COMM_WORLD):
+    # The communicator used by PMI
+    global _MPIcomm, CONTROLLER, rank, size, \
+        isController, isWorker, workerStr, log
+    _MPIcomm = comm
+
+    CONTROLLER = 0
+    rank = _MPIcomm.rank
+    size = _MPIcomm.size
+
+    # whether this is a worker or a controller
+    isController = rank == CONTROLLER
+    isWorker = not isController
+
+    if isController :
+        workerStr = 'Controller'
+        log = logging.getLogger('%s.controller' % __name__)
+    else :
+        workerStr = 'Worker %d' % rank
+        log = logging.getLogger('%s.worker%d' % (__name__, rank))
+
+def _MPIGather(value):
+    global CONTROLLER, _MPIcomm
+    return _MPIcomm.gather(value, root=CONTROLLER)
+
+def _MPIBroadcast(value=None):
+    global CONTROLLER, _MPIcomm
+    return _MPIcomm.bcast(value, root=CONTROLLER)
+
+def _MPIReduce(op, value):
+    global CONTROLLER, _MPIcomm
+    return _MPIcomm.reduce(value, root=CONTROLLER, op=op)
+
+def _MPISpawnAndMerge(ntasks, command):
+    cmd = command[0]
+    if len(command) > 1:
+        args = command[1:]
+    else:
+        args = ()
+    intercomm = \
+        _MPIcomm.Spawn(cmd, args,
+                       maxprocs=ntasks, root=CONTROLLER)
+    newcomm = intercomm.Merge(False)
+    _MPIInit(newcomm)
+
+def _MPIMergeWithParent():
+    intercomm = _MPIComm.Get_parent()
+    if intercomm == MPI.COMM_NULL: return
+    newcomm = intercomm.Merge(True)
+    _MPIInit(newcomm)
+
+##################################################
+## SETUP
+##################################################
+def setup(ntasks=None,
+          taskcmd=(sys.argv[0], os.path.abspath('pmi.py'))):
+    if isController:
+        registerAtExit()
+        if ntasks is not None:
+            if size > 1:
+                # parallel tasks already running
+                if size != ntasks:
+                    raise UserError('setup() requested to start %d tasks, but %d tasks are already running.' % (ntasks, size))
+            else:
+                # start ntasks tasks
+                _MPISpawnAndMerge(ntasks-1, taskcmd)
+
+    else:
+        startWorkerLoop()
 
 ##################################################
 ## MODULE BODY
 ##################################################
-if IS_CONTROLLER :
-    WORKERSTR = 'Controller'
-    log = logging.getLogger('%s.controller' % __name__)
-else :
-    WORKERSTR = 'Worker %d' % mpi.rank
-    log = logging.getLogger('%s.worker%d' % (__name__, ID))
+# set up MPI
+_MPIInit()
+
+# if the module is executed as script, it was probably spawned
+if __name__ == 'main':
+    _MPIMergeWithParent()
+    startWorkerLoop()
 

@@ -25,8 +25,7 @@ namespace espresso {
     Real3D (BC::*pygetBoxL)()=&BC::getBoxL;
     
     class_<BC, boost::noncopyable >("bc_BC", no_init)
-      .def("setBoxL", &BC::setBoxL)
-      .def("getBoxL", pygetBoxL)
+      .add_property("boxL", pygetBoxL, &BC::setBoxL)
       ;
   }
 }

@@ -5,3 +5,7 @@ nobase_pkginclude_HEADERS += \
 libespresso_common_la_SOURCES += \
 	bc/OrthorhombicBC.cpp \
 	bc/bindings.cpp
+
+python_SCRIPTS += \
+	bc/OrthorhombicBC.py \
+	bc/__init__.py

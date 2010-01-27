@@ -14,7 +14,7 @@ def locateItem(here):
     i.e. had here=True.
     """
     res = _espresso.esutil_Collectives_locateItem(here, pmi.CONTROLLER)
-    if pmi.IS_CONTROLLER:
+    if pmi.isController:
         if res == ResultNone:
             raise IndexError("collectives.locateItem could not find anything")
         return res
