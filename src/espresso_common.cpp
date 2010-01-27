@@ -8,19 +8,19 @@ static boost::mpi::environment *theEnvironment = 0;
 boost::mpi::communicator mpiWorld;
 
 /** Initialize MPI. */
-void initMPI(int &argc, char **&argv) {
+void initMPIEnv(int &argc, char **&argv) {
   if (theEnvironment == 0) {
     theEnvironment = new boost::mpi::environment(argc, argv);
   }
 }
 
-void initMPI() {
+void initMPIEnv() {
   if (theEnvironment == 0) {
     theEnvironment = new boost::mpi::environment();
   }
 }
 
-void finalizeMPI() {
+void finalizeMPIEnv() {
   delete theEnvironment;
   theEnvironment = 0;
 }

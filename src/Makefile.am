@@ -43,6 +43,7 @@ bin_PROGRAMS = pypresso
 pypresso_SOURCES = pypresso.cpp
 pypresso_LDADD = \
 	libespresso_common.la \
+	../contrib/mpi4py/libmpi4py.la \
 	libpylogger.la \
 	$(PYTHON_LIBS) \
 	$(MPI_LIBS)

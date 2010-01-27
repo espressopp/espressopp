@@ -10,7 +10,7 @@ static void finalize();
 
 BOOST_PYTHON_MODULE(_espresso)
 {
-  initMPI();
+  initMPIEnv();
 
   // register all classes with python 
   espresso::registerPython();
@@ -19,5 +19,5 @@ BOOST_PYTHON_MODULE(_espresso)
 }
 
 void finalize() {
-  finalizeMPI();
+  finalizeMPIEnv();
 }

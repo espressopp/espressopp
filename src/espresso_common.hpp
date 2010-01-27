@@ -5,11 +5,11 @@
 #include "bindings.hpp"
 
 /* Initialize MPI. */
-void initMPI();
+void initMPIEnv();
 
 /* Initialize MPI. */
-void initMPI(int &argc, char **&argv);
+void initMPIEnv(int &argc, char **&argv);
 
 /* Finalize MPI. */ 
-void finalizeMPI();
+void finalizeMPIEnv();
 #endif
