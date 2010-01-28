@@ -19,16 +19,15 @@ noinst_HEADERS = \
 	compat/sgimpi.h \
 	compat/sicortex.h \
 	compat/lammpi.h \
-	mpi4py.MPI.c
+	MPI.c dynload.c mpi4py.MPI.c
 
 # Create a convenience library version of the python module,
 # required for static linkage into pypresso
-CC=$(CXX)
 noinst_LTLIBRARIES = libmpi4py.la
 libmpi4py_la_LDFLAGS = -no-undefined
 libmpi4py_la_LIBADD = $(ESPRESSO_BOOST_LIBS)
 
-libmpi4py_la_SOURCES = MPI.c dynload.c
+libmpi4py_la_SOURCES = MPI.cpp dynload.cpp
 
 # The python module boostmpi
 # Build only if shared libs are built
