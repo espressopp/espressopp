@@ -17,11 +17,11 @@ namespace espresso {
       ~OrthorhombicBC() {};
 
       /** Constructor */
-      OrthorhombicBC(const Real3DRef _boxL);
+      OrthorhombicBC(const ConstReal3DRef _boxL);
 
       /** Method to set the length of the side of the cubic simulation cell */
       virtual void
-      setBoxL(const Real3DRef _boxL);
+      setBoxL(const ConstReal3DRef _boxL);
 
       /** Getters for box dimensions */
       virtual Real3D getBoxL() { return boxL; }
@@ -42,8 +42,8 @@ namespace espresso {
       virtual void
       getMinimumImageVector(Real3DRef dist,
                             real &distSqr,
-                            const Real3DRef pos1,
-                            const Real3DRef pos2) const;
+                            const ConstReal3DRef pos1,
+                            const ConstReal3DRef pos2) const;
 
       /** fold a coordinate to the primary simulation box.
 	  \param pos         the position...

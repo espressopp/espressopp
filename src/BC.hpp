@@ -15,7 +15,7 @@ namespace espresso {
 
     /** Method to set the length of the side of the simulation box */
     virtual void
-    setBoxL(const Real3DRef _boxL) = 0;
+    setBoxL(const ConstReal3DRef _boxL) = 0;
       
     /** Getters for box dimensions */
     virtual Real3D getBoxL() = 0;
@@ -36,8 +36,8 @@ namespace espresso {
     virtual void
     getMinimumImageVector(Real3DRef dist,
 			  real &distSqr,
-			  const Real3DRef pos1,
-			  const Real3DRef pos2) const = 0;
+			  const ConstReal3DRef pos1,
+			  const ConstReal3DRef pos2) const = 0;
 
     /** fold a coordinate to the primary simulation box.
 	\param pos         the position...

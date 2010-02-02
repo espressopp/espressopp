@@ -22,8 +22,7 @@ struct Fixture {
 
   Fixture() {
     Real3D L(10.0, 10.0, 10.0);
-    //    pbc = make_shared< bc::OrthorhombicBC >(L);
-    pbc = shared_ptr< bc::OrthorhombicBC >(new bc::OrthorhombicBC(L));
+    pbc = make_shared< bc::OrthorhombicBC >(L);
   }
 };
 

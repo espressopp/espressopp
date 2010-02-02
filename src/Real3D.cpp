@@ -4,7 +4,7 @@
 #include <boost/python/implicit.hpp>
 
 namespace espresso {
-  Real3D::Real3D(const Real3DRef &v) {
+  Real3D::Real3D(const ConstReal3DRef &v) {
     for (int i = 0; i < 3; i++)
       data[i] = v[i];
   }

@@ -6,11 +6,11 @@
 namespace espresso {
   namespace bc {
     /* Constructor */
-    OrthorhombicBC::OrthorhombicBC(const Real3DRef _boxL) 
+    OrthorhombicBC::OrthorhombicBC(const ConstReal3DRef _boxL) 
     { setBoxL(_boxL); }
 
     /* Setter method for the box length */
-    void OrthorhombicBC::setBoxL(const Real3DRef _boxL) {
+    void OrthorhombicBC::setBoxL(const ConstReal3DRef _boxL) {
       boxL = _boxL;
       for (int i = 0; i < 3; i++)
 	invBoxL[i] = 1.0/boxL[i];
@@ -21,8 +21,8 @@ namespace espresso {
     OrthorhombicBC::
     getMinimumImageVector(Real3DRef dist,
 			  real &distSqr,
-			  const Real3DRef pos1,
-			  const Real3DRef pos2) const {
+			  const ConstReal3DRef pos1,
+			  const ConstReal3DRef pos2) const {
       dist = pos1;
       dist -= pos2;
 

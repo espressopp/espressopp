@@ -8,6 +8,7 @@ namespace espresso {
     real data[3];
   public:
     friend class Real3DRef;
+    friend class ConstReal3DRef;
 
     Real3D() 
     { for (int i = 0; i < 3; i++) data[i] = 0.0; }
@@ -21,7 +22,7 @@ namespace espresso {
       data[2] = z;
     }
 
-    Real3D(const class Real3DRef &v);
+    Real3D(const class ConstReal3DRef &v);
 
     real &operator[](int i) { return data[i]; }
     const real &operator[](int i) const { return data[i]; }

@@ -8,9 +8,12 @@
 #include "../DomainDecomposition.hpp"
 #include "System.hpp"
 #include "esutil/ESPPIterator.hpp"
+#include "bc/OrthorhombicBC.hpp"
+#include "Real3DRef.hpp"
 
 using namespace espresso;
 using namespace esutil;
+using namespace storage;
 
 struct LoggingFixture {  
   LoggingFixture() { 
@@ -26,7 +29,7 @@ struct Fixture {
   shared_ptr< System > system;
 
   Fixture() {
-    real boxL[3] = { 1.0, 2.0, 3.0 };
+    Real3D boxL(1.0, 2.0, 3.0);
     int nodeGrid[3];
     int nodes = mpiWorld.size();
     for (int i = 0; i < 3; ++i) {
@@ -42,7 +45,7 @@ struct Fixture {
     }
     int cellGrid[3] = { 1, 2, 3 };
     system = make_shared< System >();
-    system->setBoxL(boxL);
+    system->bc = make_shared< bc::OrthorhombicBC >(boxL);
     domdec = make_shared< DomainDecomposition >(system,
     						mpiWorld,
     						nodeGrid,
@@ -62,10 +65,10 @@ struct Fixture {
 
 BOOST_AUTO_TEST_CASE(constructDomainDecomposition) 
 {
-  real boxL[3] = { 1.0, 2.0, 3.0 };
+  Real3D boxL(1.0, 2.0, 3.0);
   shared_ptr< System > system;
   system = make_shared< System >();
-  system->setBoxL(boxL);
+  system-> bc = make_shared< bc::OrthorhombicBC >(boxL);
 
   for(int i = 0; i < 3; ++i) {
     int nodeGrid[3] = { 1, 1, 1 };
@@ -141,12 +144,12 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
 BOOST_FIXTURE_TEST_CASE(cellNeighbors, Fixture) 
 {
   {
-    // minimal test: inner cells have 27 neighbors
+    // minimal test: inner cells have 26 neighbors
     for(std::vector<Cell *>::const_iterator
 	  it  = domdec->getRealCells().begin(),
 	  end = domdec->getRealCells().end();
 	it != end; ++it) {
-      BOOST_CHECK_EQUAL((*it)->neighborCells.size(), size_t(27));
+      BOOST_CHECK_EQUAL((*it)->neighborCells.size(), size_t(26));
     }
   }
   {
