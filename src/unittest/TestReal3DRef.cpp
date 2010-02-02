@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(FromReal3D) {
   r[1]=52.0;
   r[2]=62.0;
 
-  // check that wrinting to the Real3DRef modifies the original
+  // check that writing to the Real3DRef modifies the original
   BOOST_CHECK_EQUAL(v[0], 42.0);
   BOOST_CHECK_EQUAL(v[1], 52.0);
   BOOST_CHECK_EQUAL(v[2], 62.0);
