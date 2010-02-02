@@ -10,7 +10,16 @@
 set abs_top_builddir="@abs_top_builddir@"
 
 if ($?PYTHONPATH) then
-    setenv PYTHONPATH ${abs_top_builddir}:${PYTHONPATH}
+    setenv PYTHONPATH ${PYTHONPATH}:${abs_top_builddir}
 else
     setenv PYTHONPATH ${abs_top_builddir}
 endif
+echo "PYTHONPATH=${PYTHONPATH}"
+
+set espp_path="${abs_top_builddir}/bin"
+if ($?PATH) then
+   setenv PATH ${espp_path}
+else
+   setenv PATH "${PATH}:${espp_path}"
+endif
+echo "PATH=${PATH}"
