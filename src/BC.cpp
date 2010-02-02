@@ -23,9 +23,11 @@ namespace espresso {
     // no_init must be used as the abstract class BC has no constructor
 
     Real3D (BC::*pygetBoxL)()=&BC::getBoxL;
+    Real3D (BC::*pygetRandomPos)() const = &BC::getRandomPos;
     
     class_<BC, boost::noncopyable >("bc_BC", no_init)
       .add_property("boxL", pygetBoxL, &BC::setBoxL)
+      .def("getRandomPos", pygetRandomPos)
       ;
   }
 }

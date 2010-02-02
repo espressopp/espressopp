@@ -22,6 +22,8 @@ namespace espresso {
 
     double skin;  //<! skin used for VerletList
 
+    static void registerPython();
+
   };
 }
 #endif
