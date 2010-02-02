@@ -5,6 +5,7 @@
 #include "mpi.hpp"
 #include "logging.hpp"
 #include "../OrthorhombicBC.hpp"
+#include "System.hpp"
 
 using namespace espresso;
 
@@ -18,22 +19,23 @@ struct LoggingFixture {
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
 struct Fixture {
-  shared_ptr< bc::OrthorhombicBC > pbc;
+  shared_ptr< System > system;
 
   Fixture() {
     Real3D L(10.0, 10.0, 10.0);
-    pbc = make_shared< bc::OrthorhombicBC >(L);
+    system = make_shared< System >();
+    system->bc = make_shared< bc::OrthorhombicBC >(system, L);
   }
 };
 
 BOOST_FIXTURE_TEST_CASE(foldingTest, Fixture) {
   int dim = 2;
-  BOOST_CHECK_EQUAL(10.0, pbc->getBoxL(dim));
+  BOOST_CHECK_EQUAL(10.0, system->bc->getBoxL(dim));
 
   Real3D pi(5.0, 5.0, 5.0);
   Real3D pj(11.0, 11.0, 11.0);
   Real3D rij;
   real d = 0.0;
-  pbc->getMinimumImageVector(rij, d, pi, pj);
+  system->bc->getMinimumImageVector(rij, d, pi, pj);
   BOOST_CHECK_EQUAL(rij[0], 4.0);
 }

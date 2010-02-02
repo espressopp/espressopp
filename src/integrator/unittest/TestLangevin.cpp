@@ -10,6 +10,7 @@
 #include "interaction/LennardJones.hpp"
 #include "integrator/VelocityVerlet.hpp"
 #include "integrator/Langevin.hpp"
+#include "bc/OrthorhombicBC.hpp"
 #include "System.hpp"
 #include "VerletList.hpp"
 
@@ -17,8 +18,9 @@ using namespace espresso;
 using namespace interaction;
 using namespace integrator;
 using namespace esutil;
+using namespace storage;
 
-struct LoggingFixture {  
+struct LoggingFixture {
   LoggingFixture() { 
     LOG4ESPP_CONFIGURE();
     log4espp::Logger::getRoot().setLevel(log4espp::Logger::WARN);
@@ -30,15 +32,15 @@ struct LoggingFixture {
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
 struct Fixture {
-  shared_ptr<DomainDecomposition> domdec;
-  shared_ptr<System> system;
+  shared_ptr< DomainDecomposition > domdec;
+  shared_ptr< System > system;
 
   Fixture() {
-    real boxL[3] = { 3.0, 3.0, 3.0 };
+    Real3D boxL(3.0, 3.0, 3.0);
     int nodeGrid[3] = { 1, 1, 1 };
     int cellGrid[3] = { 3, 3, 3 };
     system = make_shared< System >();
-    system->setBoxL(boxL);
+    system->bc = make_shared< bc::OrthorhombicBC >(system, boxL);
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,
                                                 nodeGrid,
@@ -86,7 +88,7 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
   }
   */
 
-  langevin = make_shared<Langevin>(system);
+  langevin = make_shared< Langevin >(system);
 
   langevin->setTemperature(1.0);
   langevin->setGamma(0.5);

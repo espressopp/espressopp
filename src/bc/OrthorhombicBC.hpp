@@ -5,12 +5,14 @@
 #include "BC.hpp"
 
 namespace espresso {
+  class System;
+
   namespace bc {
     class OrthorhombicBC : public BC {
     private:
       Real3D boxL;
       Real3D invBoxL;
-      weak_ptr< class System > system;
+      weak_ptr< System > system;
 
     public:
       /** Virtual destructor for boundary conditions. */

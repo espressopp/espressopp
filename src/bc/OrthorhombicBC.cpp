@@ -3,6 +3,7 @@
 #include <cmath>
 #include "Real3DRef.hpp"
 #include "esutil/RNG.hpp"
+#include "System.hpp"
 
 namespace espresso {
   namespace bc {
@@ -84,7 +85,7 @@ namespace espresso {
 	res[k] = boxL[k];
       
       // TODO: Use real RNG
-      esutil::RNG &rng = *(system->lock().rng);
+      esutil::RNG &rng = system.lock()->rng;
       res[0] *= rng();
       res[1] *= rng();
       res[2] *= rng();
@@ -95,7 +96,7 @@ namespace espresso {
     registerPython() {
       using namespace espresso::python;
       class_<OrthorhombicBC, bases< BC > >
-	("bc_OrthorhombicBC", init< Real3DRef >());
+	("bc_OrthorhombicBC", init< shared_ptr< System >, Real3DRef >());
     }
   }
 }

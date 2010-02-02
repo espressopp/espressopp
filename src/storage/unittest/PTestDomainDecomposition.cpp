@@ -45,7 +45,7 @@ struct Fixture {
     }
     int cellGrid[3] = { 1, 2, 3 };
     system = make_shared< System >();
-    system->bc = make_shared< bc::OrthorhombicBC >(boxL);
+    system->bc = make_shared< bc::OrthorhombicBC >(system, boxL);
     domdec = make_shared< DomainDecomposition >(system,
     						mpiWorld,
     						nodeGrid,
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
   Real3D boxL(1.0, 2.0, 3.0);
   shared_ptr< System > system;
   system = make_shared< System >();
-  system-> bc = make_shared< bc::OrthorhombicBC >(boxL);
+  system->bc = make_shared< bc::OrthorhombicBC >(system, boxL);
 
   for(int i = 0; i < 3; ++i) {
     int nodeGrid[3] = { 1, 1, 1 };

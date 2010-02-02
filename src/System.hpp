@@ -18,7 +18,7 @@ namespace espresso {
 
     InteractionList shortRangeInteractions;
 
-    espresso::esutil::RNG rng; //<! common random number generator
+    esutil::RNG rng; //<! common random number generator
 
     double skin;  //<! skin used for VerletList
 
