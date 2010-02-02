@@ -131,7 +131,21 @@ namespace espresso {
         }
       }
 
+      real getMaxCutoff() {
+
+        real cutoff = 0.0;
+
+        for (int i = 0; i < ntypes; i++) {
+          for (int j = 0; i < ntypes; i++) {
+             cutoff = std::max(cutoff, parameterArray[i][j].getCutoff());
+          }
+        }
+        return cutoff;cutoff;
+      }
+
      protected:
+
+      int ntypes;
 
       Parameters parameterArray[1][1];
 

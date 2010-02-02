@@ -22,9 +22,12 @@ struct LoggingFixture {
   LoggingFixture() { 
     LOG4ESPP_CONFIGURE();
     log4espp::Logger::getRoot().setLevel(log4espp::Logger::WARN);
+    log4espp::Logger::getInstance("VerletList").setLevel(log4espp::Logger::DEBUG);
     log4espp::Logger::getInstance("MDIntegrator").setLevel(log4espp::Logger::DEBUG);
   }
 };
+
+static real cutoff = 1.001;
 
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
@@ -33,42 +36,91 @@ struct Fixture {
   shared_ptr<System> system;
 
   Fixture() {
-    Real3D boxL(3.0, 3.0, 3.0);
+
+    int N = 3;  // number of particles in each dimension
+
+    real density = 1.0;
+
+    real SIZE = pow(N * N * N / density, 1.0/3.0) ;
+
+    printf("box SIZE = %f, density = %f\n", SIZE, density);
+
+    Real3D boxL(SIZE, SIZE, SIZE);
+
+    real skin   = 0.3;
+    int  ncells = SIZE / (2 * cutoff + skin) + 1;
+
+    printf("cellGrid = %d x %d x %d\n", ncells, ncells, ncells);
+
     Real3DRef boxLRef(boxL);
     int nodeGrid[3] = { 1, 1, 1 };
-    int cellGrid[3] = { 3, 3, 3 };
+    int cellGrid[3] = { ncells, ncells, ncells };
     system = make_shared< System >();
     system->bc = make_shared< OrthorhombicBC >(boxLRef);
-    system->skin = 0.3;
+    system->skin = skin;
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,
                                                 nodeGrid,
                                                 cellGrid,
                                                 true);
-    int initPPN = 10;
     esutil::RNG rng;
-    boost::mpi::communicator comm;
 
-    for (int i = 0; i < initPPN; ++i) {
-      real pos[3] = { 2*rng(), 2*rng(), 3*rng() };
-      domdec->addParticle(i, pos);
+    int id = 0;
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j++) {
+        for (int k = 0; k < N; k++) {
+
+          // real r = 0.4 + 0.2 * rng();
+          real r = 0.5;
+          double x = (i + r) / N * SIZE;
+          double y = (j + r) / N * SIZE; 
+          double z = (k + r) / N * SIZE;
+          real pos[3] = { x, y, z };
+      
+          printf("add particle at %f %f %f\n", x, y, z);
+
+          domdec->addParticle(id, pos);
+          id++;
+        }
+      }
     }
 
     system->storage = domdec;
 
+    printf("number of particles in storage = %lld\n", 
+            domdec->getNRealParticles());
   }
 };
 
-BOOST_GLOBAL_FIXTURE(Fixture);
+// BOOST_GLOBAL_FIXTURE(Fixture);
 
 BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 {
   BOOST_MESSAGE("starting to build verlet lists");
 
+  shared_ptr< VerletList > vl = make_shared< VerletList >(system, 0.0);
+
+  VerletList::PairList pairs = vl->getPairs();
+
+  printf("cutoff = 0.0: # of verlet list pairs = %d\n", pairs.size());
+
+  vl = make_shared< VerletList >(system, 1.001);
+
+  pairs = vl->getPairs();
+
+  printf("cutofff = 1.0: # of verlet list pairs = %d\n", pairs.size());
+
+  for (size_t i = 0; i < pairs.size(); i++) {
+    Particle *p1 = pairs[i].first;
+    Particle *p2 = pairs[i].second;
+    printf("pair %d = %lld %lld\n", i, p1->p.id, p2->p.id);
+  }
+
+  /*
   // define a potential
 
   shared_ptr<LennardJones> lj = make_shared<LennardJones>();
-  lj->setParameters(0, 0, 1.0, 1.0, 1.3);
+  lj->setParameters(0, 0, 1.0, 1.0, cutoff);
   system->shortRangeInteractions.push_back(lj);
 
   shared_ptr<MDIntegrator> integrator = 
@@ -77,4 +129,5 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
   integrator->setTimeStep(0.005);
 
   integrator->run(20);
+  */
 }

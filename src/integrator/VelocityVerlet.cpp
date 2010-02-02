@@ -136,11 +136,23 @@ void VelocityVerlet::calcForces()
 {
   // build VerletList (currently each step, issue for optimization)
 
-  real cut = 1.5;
-
   System& sys = *(system.lock().get());
 
-  shared_ptr< VerletList > vl = make_shared<VerletList>(system.lock(), cut);
+  InteractionList& interactions = sys.shortRangeInteractions;
+
+  real cutForce = 0.0;
+
+  for (int j = 0; j < interactions.size(); j++) {
+
+     double cut = interactions[j]->getMaxCutoff();
+
+     cutForce = std::max(cutForce, cut);
+  }
+
+  printf("maximal cut for all forces: %f\n", cutForce);
+
+  shared_ptr< VerletList > vl = make_shared<VerletList>(system.lock(), 
+                                      cutForce + sys.skin);
 
   VerletList::PairList pairs = vl->getPairs();
 

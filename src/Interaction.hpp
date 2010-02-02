@@ -30,6 +30,10 @@ namespace espresso {
 
       virtual real computeCellEnergy(ParticleList &pl1, ParticleList &pl2) = 0;
 
+      /** This method returns the maximal cutoff defined for one type pair. */
+
+      virtual real getMaxCutoff() = 0;
+
     public:
 
       class ParametersBase {

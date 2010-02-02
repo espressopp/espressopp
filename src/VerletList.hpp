@@ -38,12 +38,15 @@ class VerletList {
 
  private:
 
+  void checkPair(Particle* pt1, Particle* pt2);
+
   PairList myList;
 
   double cutsq;
 
   static LOG4ESPP_DECL_LOGGER(theLogger);
 
+  shared_ptr<class BC> bc;
 };
 
 }
