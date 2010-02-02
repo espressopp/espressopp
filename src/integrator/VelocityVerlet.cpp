@@ -1,7 +1,7 @@
 #include "VelocityVerlet.hpp"
 
 #include "VerletList.hpp"
-#include "interaction/LennardJones.hpp"
+#include "Interaction.hpp"
 #include "Langevin.hpp"
 #include "System.hpp"
 
@@ -31,6 +31,8 @@ void VelocityVerlet::setLangevin(shared_ptr<Langevin> _langevin)
 void VelocityVerlet::run(int nsteps)
 {
 
+  System* pSystem = system.lock().get();
+
   if (langevin) langevin->init(dt);
 
   bool recalcForces = true;  // TODO: more intelligent
@@ -49,17 +51,22 @@ void VelocityVerlet::run(int nsteps)
   
   // Before start make sure that particles are on the right processor
 
-  system.lock().get()->storage->resortParticles();
+  pSystem->storage->resortParticles();
+
+  double maxSqDist = 0.0;
+  double skinHalfSq = 0.25 * (pSystem->skin * pSystem->skin);
 
   for (int i = 0; i < nsteps; i++) {
     LOG4ESPP_DEBUG(theLogger, "step " << i << " of " << nsteps << " iterations");
-    integrate1();
-    if (rebuild()) {
-      system.lock().get()->storage->resortParticles();
+    maxSqDist += integrate1();
+    if (maxSqDist > skinHalfSq) {
+      LOG4ESPP_DEBUG(theLogger, "resort particles");
+      pSystem->storage->resortParticles();
+      maxSqDist = 0.0;
     }
-    system.lock().get()->storage->updateGhosts();
+    pSystem->storage->updateGhosts();
     calcForces();
-    system.lock().get()->storage->collectGhostForces();
+    pSystem->storage->collectGhostForces();
 
     if (langevin) langevin->thermalize();
    
@@ -69,7 +76,7 @@ void VelocityVerlet::run(int nsteps)
 
 /*****************************************************************************/
 
-void VelocityVerlet::integrate1()
+real VelocityVerlet::integrate1()
 {
   std::vector<Cell>& localCells = system.lock().get()->storage->getLocalCells();
 
@@ -78,21 +85,29 @@ void VelocityVerlet::integrate1()
   real dt2 = dt * dt;
   int count = 0;
 
+  real maxSqDist = 0.0; // maximal square distance a particle moves
+
   for (size_t c = 0; c < localCells.size(); c++) {
     Cell* localCell = &localCells[c];
     for (size_t index = 0; index < localCell->particles.size(); index++) {
       Particle* particle  = &localCell->particles[index];
+      real sqDist = 0.0;
       for (int j = 0; j < 3; j++) {
         /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
         particle->m.v[j] += 0.5 * dt * particle->f.f[j];
         /* Propagate positions (only NVT): p(t + dt)   = p(t) + dt * v(t+0.5*dt) */
-        particle->r.p[j] += 0.5 * dt2 * particle->m.v[j];
+        double deltaP = 0.5 * dt2 * particle->m.v[j];
+        particle->r.p[j] += deltaP;
+        sqDist += deltaP * deltaP;
         count++;
       }
+      maxSqDist = std::max(maxSqDist, sqDist);
     }
   }
 
-  LOG4ESPP_DEBUG(theLogger, "moved " << count << " particles in integrate1");
+  LOG4ESPP_DEBUG(theLogger, "moved " << count << " particles in integrate1" <<
+                            ", max sqr move = " << maxSqDist);
+  return maxSqDist;
 }
 
 /*****************************************************************************/
@@ -123,25 +138,26 @@ void VelocityVerlet::calcForces()
 
   real cut = 1.5;
 
-  shared_ptr< VerletList > vl = 
-    make_shared<VerletList>(system.lock(), cut);
+  System& sys = *(system.lock().get());
+
+  shared_ptr< VerletList > vl = make_shared<VerletList>(system.lock(), cut);
 
   VerletList::PairList pairs = vl->getPairs();
+
   LOG4ESPP_DEBUG(theLogger, "# of verlet list pairs =  " << pairs.size());
-  LennardJones lj = LennardJones();
-  lj.setParameters(0, 0, 1.0, 1.0, 1.3);
-  lj.addVerletListForces(vl);
 
-  // Just for control now: compute energy
-  real e2 = lj.computeVerletListEnergy(vl);
-  LOG4ESPP_INFO(theLogger, "energy  = " << e2);
-}
+  real energy = 0.0;
 
-/*****************************************************************************/
+  const InteractionList& srIL = sys.shortRangeInteractions;
 
-bool VelocityVerlet::rebuild()
-{
-  // check for maximal movement
-  return true;
+  for (size_t i = 0; i < srIL.size(); i++) {
+
+     srIL[i]->addVerletListForces(vl);
+     // energy += srIL[i]->computeVerletListEnergy(vl);
+  }
+
+  // Just for control now: compute + print energy
+
+  LOG4ESPP_INFO(theLogger, "energy  = " << energy);
 }
 

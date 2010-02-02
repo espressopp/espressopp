@@ -8,12 +8,14 @@
 #include "storage/DomainDecomposition.hpp"
 #include "interaction/LennardJones.hpp"
 #include "integrator/VelocityVerlet.hpp"
+#include "bc/OrthorhombicBC.hpp"
 #include "System.hpp"
 #include "VerletList.hpp"
 
 using namespace espresso;
 using namespace interaction;
 using namespace integrator;
+using namespace bc;
 using namespace esutil;
 
 struct LoggingFixture {  
@@ -27,15 +29,17 @@ struct LoggingFixture {
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
 struct Fixture {
-  DomainDecomposition::SelfPtr domdec;
-  System::SelfPtr system;
+  shared_ptr<DomainDecomposition> domdec;
+  shared_ptr<System> system;
 
   Fixture() {
-    real boxL[3] = { 3.0, 3.0, 3.0 };
+    Real3D boxL(3.0, 3.0, 3.0);
+    Real3DRef boxLRef(boxL);
     int nodeGrid[3] = { 1, 1, 1 };
     int cellGrid[3] = { 3, 3, 3 };
     system = make_shared< System >();
-    system->setBoxL(boxL);
+    system->bc = make_shared< OrthorhombicBC >(boxLRef);
+    system->skin = 0.3;
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,
                                                 nodeGrid,
@@ -61,7 +65,11 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 {
   BOOST_MESSAGE("starting to build verlet lists");
 
-  double cut = 1.5;
+  // define a potential
+
+  shared_ptr<LennardJones> lj = make_shared<LennardJones>();
+  lj->setParameters(0, 0, 1.0, 1.0, 1.3);
+  system->shortRangeInteractions.push_back(lj);
 
   shared_ptr<MDIntegrator> integrator = 
      make_shared<VelocityVerlet>(system);
@@ -69,5 +77,4 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
   integrator->setTimeStep(0.005);
 
   integrator->run(20);
-
 }

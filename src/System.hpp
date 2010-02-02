@@ -20,6 +20,8 @@ namespace espresso {
 
     espresso::esutil::RNG rng; //<! common random number generator
 
+    double skin;  //<! skin used for VerletList
+
   };
 }
 #endif

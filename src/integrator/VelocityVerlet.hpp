@@ -4,6 +4,7 @@
 #include "MDIntegrator.hpp"
 
 namespace espresso {
+
   namespace integrator {
 
     /** Velocity Verlet Integrator */
@@ -24,15 +25,17 @@ namespace espresso {
 
         shared_ptr< class Langevin > langevin;
 
-        void integrate1();
+        /** Method updates particle positions and velcocities.
+
+            \return Maximal square distance a particle has moved.
+        */
+
+        double integrate1();
 
         void integrate2();
 
         void calcForces();
 
-        /** Predicate that returns true if verlet lists must be rebuild. */
-
-        bool rebuild();
     };
   }
 }

@@ -27,6 +27,8 @@ namespace espresso {
 
         MDIntegrator(shared_ptr<System>);
 
+        /** Destructor. */
+
         ~MDIntegrator();
 
         /** Setter routine for the timestep. */
