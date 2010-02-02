@@ -16,10 +16,10 @@ else
 endif
 echo "PYTHONPATH=${PYTHONPATH}"
 
-set espp_path="${abs_top_builddir}/bin"
+set espp_path=${abs_top_builddir}/bin
 if ($?PATH) then
-   setenv PATH ${espp_path}
+   setenv PATH ${PATH}:${espp_path}
 else
-   setenv PATH "${PATH}:${espp_path}"
+   setenv PATH ${espp_path}
 endif
 echo "PATH=${PATH}"
