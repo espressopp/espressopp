@@ -9,6 +9,8 @@
 #include "esconfig.hpp"
 #include "Real3D.hpp"
 #include "Real3DRef.hpp"
+#include "Int3D.hpp"
+#include "Int3DRef.hpp"
 
 namespace espresso {
   using boost::shared_ptr;
