@@ -16,10 +16,10 @@
 
 struct MPIFixture {  
   MPIFixture() { 
-    initMPI(); 
+    initMPIEnv(); 
   }
   ~MPIFixture() { 
-    finalizeMPI(); 
+    finalizeMPIEnv(); 
   }
 };
 
