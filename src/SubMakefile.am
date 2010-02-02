@@ -1,6 +1,8 @@
 nobase_pkginclude_HEADERS += \
 	Real3D.hpp \
 	Real3DRef.hpp \
+	Int3D.hpp \
+	Int3DRef.hpp \
 	Particle.hpp \
 	Cell.hpp \
 	Storage.hpp \
@@ -14,6 +16,7 @@ nobase_pkginclude_HEADERS += \
 
 libespresso_common_la_SOURCES += \
 	Real3D.cpp \
+	Int3D.cpp \
 	Storage.cpp \
         BC.cpp \
 	System.cpp \
@@ -26,4 +29,6 @@ python_SCRIPTS += \
 	__init__.py \
 	unittest/__init__.py \
 	__setup.py \
+	Real3D.py \
+	Int3D.py \
 	pmi.py 

@@ -4,6 +4,7 @@
 #include <esutil/bindings.hpp>
 #include <bc/bindings.hpp>
 #include <Real3D.hpp>
+#include <Int3D.hpp>
 #include <BC.hpp>
 #include <esutil/PyLogger.hpp>
 
@@ -12,6 +13,7 @@
 void espresso::registerPython() {
 
   espresso::Real3D::registerPython();
+  espresso::Int3D::registerPython();
   espresso::BC::registerPython();
 
   espresso::esutil::registerPython();
