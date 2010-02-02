@@ -12,8 +12,13 @@ BOOST_AUTO_TEST_CASE(FromCArray) {
   v[1] = 2.0;
   v[2] = 3.0;
 
-  Real3DRef r(v);
+  ConstReal3DRef cr(v);
+  // check that the Real3DRef reflects the given values
+  BOOST_CHECK_EQUAL(cr[0], 1.0);
+  BOOST_CHECK_EQUAL(cr[1], 2.0);
+  BOOST_CHECK_EQUAL(cr[2], 3.0);
 
+  Real3DRef r(v);
   // check that the Real3DRef reflects the given values
   BOOST_CHECK_EQUAL(r[0], 1.0);
   BOOST_CHECK_EQUAL(r[1], 2.0);
@@ -28,6 +33,7 @@ BOOST_AUTO_TEST_CASE(FromCArray) {
   BOOST_CHECK_EQUAL(v[0], 42.0);
   BOOST_CHECK_EQUAL(v[1], 52.0);
   BOOST_CHECK_EQUAL(v[2], 62.0);
+
 }
 
 BOOST_AUTO_TEST_CASE(FromReal3D) {
@@ -37,13 +43,19 @@ BOOST_AUTO_TEST_CASE(FromReal3D) {
   v[1] = 2.0;
   v[2] = 3.0;
 
-  Real3DRef r(v);
+  ConstReal3DRef cr(v);
+  // check that the Real3DRef reflects the given values
+  BOOST_CHECK_EQUAL(cr[0], 1.0);
+  BOOST_CHECK_EQUAL(cr[1], 2.0);
+  BOOST_CHECK_EQUAL(cr[2], 3.0);
 
+  Real3DRef r(v);
   // check that the Real3DRef reflects the given values
   BOOST_CHECK_EQUAL(r[0], 1.0);
   BOOST_CHECK_EQUAL(r[1], 2.0);
   BOOST_CHECK_EQUAL(r[2], 3.0);
  
+
   // check that the Real3DRef can be written to
   r[0]=42.0;
   r[1]=52.0;
@@ -53,6 +65,7 @@ BOOST_AUTO_TEST_CASE(FromReal3D) {
   BOOST_CHECK_EQUAL(v[0], 42.0);
   BOOST_CHECK_EQUAL(v[1], 52.0);
   BOOST_CHECK_EQUAL(v[2], 62.0);
+
 }
 
 BOOST_AUTO_TEST_CASE(AssignmentIsNotInit) {
@@ -84,8 +97,15 @@ BOOST_AUTO_TEST_CASE(AssignmentIsNotInit) {
 
 BOOST_AUTO_TEST_CASE(at) {
   Real3D a(1.0, 2.0, 3.0);
-  Real3DRef r(a);
 
+  ConstReal3DRef cr(a);
+  BOOST_CHECK_EQUAL(cr.at(0), 1.0);
+  BOOST_CHECK_EQUAL(cr.at(1), 2.0);
+  BOOST_CHECK_EQUAL(cr.at(2), 3.0);
+  BOOST_CHECK_THROW(cr.at(-1), std::out_of_range);
+  BOOST_CHECK_THROW(cr.at(3), std::out_of_range);
+
+  Real3DRef r(a);
   BOOST_CHECK_EQUAL(r.at(0), 1.0);
   BOOST_CHECK_EQUAL(r.at(1), 2.0);
   BOOST_CHECK_EQUAL(r.at(2), 3.0);
@@ -120,12 +140,18 @@ BOOST_AUTO_TEST_CASE(testSqr) {
   Real3D a(1.0, 2.0, 3.0);
   Real3DRef r(a);
   BOOST_CHECK_CLOSE(r.sqr(), 14.0, 0.0001);
+
+  ConstReal3DRef cr(a);
+  BOOST_CHECK_CLOSE(cr.sqr(), 14.0, 0.0001);
 }
   
 BOOST_AUTO_TEST_CASE(testAbs) {
   Real3D a(1.0, 2.0, 3.0);
   Real3DRef r(a);
   BOOST_CHECK_CLOSE(r.abs(), sqrt(14.0), 0.0001);
+
+  ConstReal3DRef cr(a);
+  BOOST_CHECK_CLOSE(cr.abs(), sqrt(14.0), 0.0001);
 }
 
 BOOST_AUTO_TEST_CASE(unaryOps) {
@@ -153,6 +179,17 @@ BOOST_AUTO_TEST_CASE(unaryOps) {
   BOOST_CHECK_CLOSE(r[0], 1.0, 0.0001);
   BOOST_CHECK_CLOSE(r[1], 2.0, 0.0001);
   BOOST_CHECK_CLOSE(r[2], 3.0, 0.0001);
+
+  ConstReal3DRef cs(b);
+  r += cs;
+  BOOST_CHECK_CLOSE(r[0], 43.0, 0.0001);
+  BOOST_CHECK_CLOSE(r[1], 54.0, 0.0001);
+  BOOST_CHECK_CLOSE(r[2], 65.0, 0.0001);
+
+  r -= cs;
+  BOOST_CHECK_CLOSE(r[0], 1.0, 0.0001);
+  BOOST_CHECK_CLOSE(r[1], 2.0, 0.0001);
+  BOOST_CHECK_CLOSE(r[2], 3.0, 0.0001);
 }
 
 BOOST_AUTO_TEST_CASE(boolOps) {
@@ -172,4 +209,22 @@ BOOST_AUTO_TEST_CASE(boolOps) {
 
   BOOST_CHECK_EQUAL(r, t);
   BOOST_CHECK(!(r!=t));
+
+  ConstReal3DRef cr(a);
+  ConstReal3DRef cs(b);
+  ConstReal3DRef ct(c);
+  
+  BOOST_CHECK_EQUAL(cr, cr);
+  BOOST_CHECK(!(cr!=cr));
+
+  BOOST_CHECK_NE(cr, cs);
+  BOOST_CHECK(!(cr==cs));
+
+  BOOST_CHECK_EQUAL(cr, ct);
+  BOOST_CHECK(!(cr!=ct));
+
+  // cross comparison
+  BOOST_CHECK_EQUAL(cr, r);
+  BOOST_CHECK(!(cr!=r));
 }
+

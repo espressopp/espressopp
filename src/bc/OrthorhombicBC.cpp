@@ -2,11 +2,15 @@
 #include <python.hpp>
 #include <cmath>
 #include "Real3DRef.hpp"
+#include "esutil/RNG.hpp"
 
 namespace espresso {
   namespace bc {
     /* Constructor */
-    OrthorhombicBC::OrthorhombicBC(const ConstReal3DRef _boxL) 
+    OrthorhombicBC::
+    OrthorhombicBC(shared_ptr< System > _system, 
+		   const ConstReal3DRef _boxL) 
+      : system(_system)
     { setBoxL(_boxL); }
 
     /* Setter method for the box length */
@@ -80,9 +84,10 @@ namespace espresso {
 	res[k] = boxL[k];
       
       // TODO: Use real RNG
-      res[0] *= drand48();
-      res[1] *= drand48();
-      res[2] *= drand48();
+      esutil::RNG &rng = *(system->lock().rng);
+      res[0] *= rng();
+      res[1] *= rng();
+      res[2] *= rng();
     }
 
     void 

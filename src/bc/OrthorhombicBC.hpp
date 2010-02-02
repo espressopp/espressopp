@@ -10,14 +10,16 @@ namespace espresso {
     private:
       Real3D boxL;
       Real3D invBoxL;
+      weak_ptr< class System > system;
 
     public:
       /** Virtual destructor for boundary conditions. */
       virtual
-      ~OrthorhombicBC() {};
+      ~OrthorhombicBC() {}
 
       /** Constructor */
-      OrthorhombicBC(const ConstReal3DRef _boxL);
+      OrthorhombicBC(shared_ptr< System > _system, 
+		     const ConstReal3DRef _boxL);
 
       /** Method to set the length of the side of the cubic simulation cell */
       virtual void
