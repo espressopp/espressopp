@@ -158,11 +158,13 @@ if not clean and not do_python and not do_cpp \
 
 ##################################################
 # DETERMINE BASEDIRS
-savecwd = os.environ.get("PWD")
+savecwd = None #os.environ.get("PWD")
 if savecwd is None:
-    savecwd = Popen('pwd', stdout=PIPE).communicate()[0].strip()
+    import subprocess
+    savecwd = subprocess.Popen('pwd', stdout=subprocess.PIPE).communicate()[0].strip()
     if not savecwd:
         savecwd = os.getcwd()
+if verbose: print("CWD=" + savecwd)
 
 if subdir is not None:
     # subdir is specified
@@ -177,8 +179,11 @@ elif savecwd.startswith(top_builddir):
 elif savecwd.startswith(top_srcdir):
     basedir = savecwd
 else:
-    die("""Cannot identify subdir, please change to a directory below the 
-build directory
+    if top_builddir == top_srcdir:
+        die("""Cannot identify subdir, please change to a directory below the directory
+  """ + top_builddir)
+    else:
+        die("""Cannot identify subdir, please change to a directory below the build directory
   """ + top_builddir + """
 or the source directory 
   """ + top_srcdir)
