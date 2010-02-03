@@ -83,12 +83,12 @@ VerletList::VerletList(shared_ptr< System > system, real cut)
 
 void VerletList::checkPair(Particle* pt1, Particle* pt2)
 {
-  double* pos1 = pt1->r.p;
-  double* pos2 = pt2->r.p;
+  real* pos1 = pt1->r.p;
+  real* pos2 = pt2->r.p;
 
-  double d[3];
+  real d[3];
 
-  double distsq;
+  real distsq;
 
 #define WORKAROUND
 

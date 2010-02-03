@@ -66,7 +66,7 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 {
   BOOST_MESSAGE("starting to build verlet lists");
 
-  double cut = 1.5;
+  real cut = 1.5;
 
   shared_ptr<VelocityVerlet> integrator = 
      make_shared<VelocityVerlet>(system);

@@ -53,8 +53,8 @@ void VelocityVerlet::run(int nsteps)
 
   pSystem->storage->resortParticles();
 
-  double maxSqDist = 0.0;
-  double skinHalfSq = 0.25 * (pSystem->skin * pSystem->skin);
+  real maxSqDist = 0.0;
+  real skinHalfSq = 0.25 * (pSystem->skin * pSystem->skin);
 
   for (int i = 0; i < nsteps; i++) {
     LOG4ESPP_DEBUG(theLogger, "step " << i << " of " << nsteps << " iterations");
@@ -96,7 +96,7 @@ real VelocityVerlet::integrate1()
         /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
         particle->m.v[j] += 0.5 * dt * particle->f.f[j];
         /* Propagate positions (only NVT): p(t + dt)   = p(t) + dt * v(t+0.5*dt) */
-        double deltaP = 0.5 * dt2 * particle->m.v[j];
+        real deltaP = 0.5 * dt2 * particle->m.v[j];
         particle->r.p[j] += deltaP;
         sqDist += deltaP * deltaP;
         count++;
@@ -144,7 +144,7 @@ void VelocityVerlet::calcForces()
 
   for (int j = 0; j < interactions.size(); j++) {
 
-     double cut = interactions[j]->getMaxCutoff();
+     real cut = interactions[j]->getMaxCutoff();
 
      cutForce = std::max(cutForce, cut);
   }

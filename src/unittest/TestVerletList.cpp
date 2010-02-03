@@ -68,9 +68,9 @@ struct Fixture {
 
           // real r = 0.4 + 0.2 * rng();
           real r = 0.5;
-          double x = (i + r) / N * SIZE;
-          double y = (j + r) / N * SIZE; 
-          double z = (k + r) / N * SIZE;
+          real x = (i + r) / N * SIZE;
+          real y = (j + r) / N * SIZE; 
+          real z = (k + r) / N * SIZE;
           real pos[3] = { x, y, z };
       
           printf("add particle at %f %f %f\n", x, y, z);
