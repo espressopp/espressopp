@@ -13,6 +13,7 @@
 #include "VerletList.hpp"
 
 using namespace espresso;
+using namespace storage;
 using namespace interaction;
 using namespace integrator;
 using namespace bc;
@@ -22,12 +23,12 @@ struct LoggingFixture {
   LoggingFixture() { 
     LOG4ESPP_CONFIGURE();
     log4espp::Logger::getRoot().setLevel(log4espp::Logger::WARN);
-    log4espp::Logger::getInstance("VerletList").setLevel(log4espp::Logger::DEBUG);
+    log4espp::Logger::getInstance("VerletList").setLevel(log4espp::Logger::WARN);
     log4espp::Logger::getInstance("MDIntegrator").setLevel(log4espp::Logger::DEBUG);
   }
 };
 
-static real cutoff = 1.001;
+static real cutoff = 1.15;
 
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
@@ -52,11 +53,11 @@ struct Fixture {
 
     printf("cellGrid = %d x %d x %d\n", ncells, ncells, ncells);
 
-    Real3DRef boxLRef(boxL);
+    ConstReal3DRef boxLRef(boxL);
     int nodeGrid[3] = { 1, 1, 1 };
     int cellGrid[3] = { ncells, ncells, ncells };
     system = make_shared< System >();
-    system->bc = make_shared< OrthorhombicBC >(boxLRef);
+    system->bc = make_shared< OrthorhombicBC >(system, boxLRef);
     system->skin = skin;
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,
@@ -70,8 +71,8 @@ struct Fixture {
       for (int j = 0; j < N; j++) {
         for (int k = 0; k < N; k++) {
 
-          // real r = 0.4 + 0.2 * rng();
-          real r = 0.5;
+          real r = 0.4 + 0.2 * rng();
+          // real r = 0.5;
           double x = (i + r) / N * SIZE;
           double y = (j + r) / N * SIZE; 
           double z = (k + r) / N * SIZE;
@@ -98,15 +99,9 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 {
   BOOST_MESSAGE("starting to build verlet lists");
 
-  shared_ptr< VerletList > vl = make_shared< VerletList >(system, 0.0);
+  shared_ptr< VerletList> vl = make_shared< VerletList >(system, cutoff);
 
   VerletList::PairList pairs = vl->getPairs();
-
-  printf("cutoff = 0.0: # of verlet list pairs = %d\n", pairs.size());
-
-  vl = make_shared< VerletList >(system, 1.001);
-
-  pairs = vl->getPairs();
 
   printf("cutofff = 1.0: # of verlet list pairs = %d\n", pairs.size());
 
@@ -116,7 +111,6 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
     printf("pair %d = %lld %lld\n", i, p1->p.id, p2->p.id);
   }
 
-  /*
   // define a potential
 
   shared_ptr<LennardJones> lj = make_shared<LennardJones>();
@@ -128,6 +122,5 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 
   integrator->setTimeStep(0.005);
 
-  integrator->run(20);
-  */
+  integrator->run(100);
 }
