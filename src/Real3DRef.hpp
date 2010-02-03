@@ -1,9 +1,9 @@
-#ifndef _ESUTIL_REAL3DREF_HPP
-#define _ESUTIL_REAL3DREF_HPP
+#ifndef _REAL3DREF_HPP
+#define _REAL3DREF_HPP
 
-#include "esconfig.hpp"
-#include "Real3D.hpp"
+#include "types.hpp"
 #include <iostream>
+#include "Real3D.hpp"
 
 namespace espresso {
   class ConstReal3DRef {
@@ -12,9 +12,9 @@ namespace espresso {
   public:
     friend class Real3DRef;
 
-    ConstReal3DRef(const class Real3DRef v); 
-    ConstReal3DRef(const class Real3D &v) : data(v.data) {};
+    ConstReal3DRef(const Real3DRef v);
     ConstReal3DRef(const real v[3]): data(v) {}
+    explicit ConstReal3DRef(const Real3D& v) : data(v.data) {}
 
     const real &operator[](const int i) const { return data[i]; };
 
@@ -48,8 +48,8 @@ namespace espresso {
   public:
     friend class ConstReal3DRef;
 
-    Real3DRef(class Real3D &v) : data(v.data) {};
     Real3DRef(real v[3]): data(v) {}
+    explicit Real3DRef(Real3D& v) : data(v.data) {}
 
     // assignment is not the same as initialization
     Real3DRef &operator=(const ConstReal3DRef &v) {
@@ -121,7 +121,7 @@ namespace espresso {
   };
 
   inline ConstReal3DRef::
-  ConstReal3DRef(const class Real3DRef v) 
+  ConstReal3DRef(const Real3DRef v) 
   : data(v.data) {};
 
   inline std::ostream &operator<<(std::ostream &out, const Real3DRef &v) {

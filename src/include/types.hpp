@@ -7,10 +7,6 @@
 #include <boost/mpi.hpp>
 #include <exception>
 #include "esconfig.hpp"
-#include "Real3D.hpp"
-#include "Real3DRef.hpp"
-#include "Int3D.hpp"
-#include "Int3DRef.hpp"
 
 namespace espresso {
   using boost::shared_ptr;
@@ -23,6 +19,24 @@ namespace espresso {
   namespace mpi {
     using namespace boost::mpi;
   }
+
+  /* Forward declarations and typedefs. */
+  class Particle;
+  class Cell;
+  class CellList;
+  class NeighborCellList;
+  class LocalCellList;
+
+  /** A pair is a tuple of two references to the particles. */
+  typedef std::pair< class Particle*, class Particle* > ParticlePair;
+
+  class Real3D;
+  class Real3DRef;
+  class ConstReal3DRef;
+
+  class Int3D;
+  class Int3DRef;
+  class ConstInt3DRef;
 
   class NoDefault: public std::exception {};
 
@@ -45,6 +59,7 @@ namespace espresso {
   real sign(real _r) {
     return  (_r > 0) ? 1.0 : -1.0;
   }
+
 }
 
 #endif 

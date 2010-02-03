@@ -6,6 +6,8 @@
 #include "logging.hpp"
 #include "../OrthorhombicBC.hpp"
 #include "System.hpp"
+#include "Real3D.hpp"
+#include "Real3DRef.hpp"
 
 using namespace espresso;
 
@@ -35,7 +37,6 @@ BOOST_FIXTURE_TEST_CASE(foldingTest, Fixture) {
   Real3D pi(5.0, 5.0, 5.0);
   Real3D pj(11.0, 11.0, 11.0);
   Real3D rij;
-  real d = 0.0;
-  system->bc->getMinimumImageVector(rij, d, pi, pj);
+  system->bc->getMinimumImageVector(rij, pi, pj);
   BOOST_CHECK_EQUAL(rij[0], 4.0);
 }

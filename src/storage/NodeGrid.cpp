@@ -1,7 +1,7 @@
 #define LOG4ESPP_LEVEL_INFO
 #include "log4espp.hpp"
 
-#include "Real3DRef.hpp"
+#include "Real3D.hpp"
 #include "NodeGrid.hpp"
 
 namespace espresso {

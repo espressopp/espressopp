@@ -1,12 +1,25 @@
 #include "Real3D.hpp"
-#include "types.hpp"
+#include "Real3DRef.hpp"
 #include <python.hpp>
 #include <boost/python/implicit.hpp>
 
 namespace espresso {
+  Real3D::Real3D(const Real3DRef &v) {
+    for (int i = 0; i < 3; i++)
+      data[i] = v[i];
+  }
+
   Real3D::Real3D(const ConstReal3DRef &v) {
     for (int i = 0; i < 3; i++)
       data[i] = v[i];
+  }
+
+  Real3D::operator Real3DRef() {
+    return Real3DRef(data);
+  }
+
+  Real3D::operator ConstReal3DRef() const {
+    return ConstReal3DRef(data);
   }
 
   struct real3D_pickle_suite : boost::python::pickle_suite {
@@ -45,6 +58,8 @@ namespace espresso {
 
     boost::python::implicitly_convertible<Real3D, Real3DRef>();
     boost::python::implicitly_convertible<Real3DRef, Real3D>();
+    boost::python::implicitly_convertible<const Real3D, ConstReal3DRef>();
+    boost::python::implicitly_convertible<ConstReal3DRef, Real3D>();
 
   }
 }

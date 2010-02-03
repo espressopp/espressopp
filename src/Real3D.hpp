@@ -1,14 +1,14 @@
 #ifndef _REAL3D_HPP
 #define _REAL3D_HPP
 
-#include "esconfig.hpp"
+#include "types.hpp"
 
 namespace espresso {
   class Real3D {
     real data[3];
   public:
-    friend class Real3DRef;
     friend class ConstReal3DRef;
+    friend class Real3DRef;
 
     Real3D() 
     { for (int i = 0; i < 3; i++) data[i] = 0.0; }
@@ -22,7 +22,11 @@ namespace espresso {
       data[2] = z;
     }
 
-    Real3D(const class ConstReal3DRef &v);
+    Real3D(const Real3DRef &v);
+    Real3D(const ConstReal3DRef &v);
+
+    operator Real3DRef();
+    operator ConstReal3DRef() const;
 
     real &operator[](int i) { return data[i]; }
     const real &operator[](int i) const { return data[i]; }

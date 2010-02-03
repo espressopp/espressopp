@@ -1,5 +1,8 @@
 #include "VerletList.hpp"
 
+#include "Real3D.hpp"
+#include "Real3DRef.hpp"
+#include "Particle.hpp"
 #include "Cell.hpp"
 #include "System.hpp"
 #include "Storage.hpp"
@@ -34,11 +37,11 @@ VerletList::VerletList(shared_ptr< System > system, real cut)
 
     for (size_t p1 = 0; p1 < nparticles; p1++) {
 
-      Particle* pt1  = &localCell->particles[p1];
+      Particle& pt1  = localCell->particles[p1];
 
       for (size_t p2 = p1 + 1; p2 < nparticles; p2++) {
 
-        checkPair(pt1, &localCell->particles[p2]);
+        checkPair(pt1, localCell->particles[p2]);
       }
     }
 
@@ -68,11 +71,11 @@ VerletList::VerletList(shared_ptr< System > system, real cut)
  
       for (size_t p1 = 0; p1 < nparticles; p1++) {
 
-        Particle* pt1  = &localCell->particles[p1];
+        Particle& pt1  = localCell->particles[p1];
 
         for (size_t p2 = 0; p2 < nPNeighbor; p2++) {
 
-          checkPair(pt1, &neighborCell->particles[p2]);
+          checkPair(pt1, neighborCell->particles[p2]);
         }
       }
     }
@@ -81,10 +84,10 @@ VerletList::VerletList(shared_ptr< System > system, real cut)
 
 /*-------------------------------------------------------------*/
 
-void VerletList::checkPair(Particle* pt1, Particle* pt2)
+void VerletList::checkPair(Particle& pt1, Particle& pt2)
 {
-  Real3DRef pos1 = pt1->r.p;
-  Real3DRef pos2 = pt2->r.p;
+  Real3DRef pos1 = pt1.r.p;
+  Real3DRef pos2 = pt2.r.p;
 
   Real3D d;
   real distsq;
@@ -101,14 +104,14 @@ void VerletList::checkPair(Particle* pt1, Particle* pt2)
 #endif
   distsq = d.sqr();
 
-  LOG4ESPP_DEBUG(theLogger, "p1: " << pt1->p.id << " - p2: "
-             << pt2->p.id << " -> distsq = " << distsq);
+  LOG4ESPP_DEBUG(theLogger, "p1: " << pt1.p.id << " - p2: "
+             << pt2.p.id << " -> distsq = " << distsq);
 
-  if (pt1->p.id >= pt2->p.id) return;
+  if (pt1.p.id >= pt2.p.id) return;
 
   if (distsq > cutsq) return;
 
-  myList.push_back(std::pair<Particle*, Particle*>(pt1, pt2));
+  myList.push_back(ParticlePair(&pt1, &pt2));
 }
 
 /*-------------------------------------------------------------*/

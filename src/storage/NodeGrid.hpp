@@ -1,5 +1,5 @@
-#ifndef _NODE_GRID_HPP
-#define _NODE_GRID_HPP
+#ifndef _STORAGE_NODEGRID_HPP
+#define _STORAGE_NODEGRID_HPP
 
 /*
   local ghost cell grid representation. Taken from grid.c.
@@ -8,7 +8,6 @@
 #include <stdexcept>
 #include "types.hpp"
 #include "logging.hpp"
-#include "Real3DRef.hpp"
 #include "esutil/Grid.hpp"
 
 namespace espresso {

@@ -42,8 +42,8 @@ namespace espresso {
   public:
     friend class ConstInt3DRef;
 
-    Int3DRef(class Int3D &v) : data(v.data) {};
     Int3DRef(int v[3]): data(v) {}
+    explicit Int3DRef(class Int3D &v) : data(v.data) {};
 
     // assignment is not the same as initialization
     Int3DRef &operator=(const ConstInt3DRef &v) {
@@ -104,9 +104,6 @@ namespace espresso {
     return out << v[0] << ' ' << v[1] << ' ' << v[2];
   }
 
-  inline std::ostream &operator<<(std::ostream &out, const ConstInt3DRef &v) {
-    return out << v[0] << ' ' << v[1] << ' ' << v[2];
-  }
 }
 
 #endif

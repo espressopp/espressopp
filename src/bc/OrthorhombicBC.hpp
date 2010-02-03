@@ -3,6 +3,7 @@
 
 #include "types.hpp"
 #include "BC.hpp"
+#include "Real3D.hpp"
 
 namespace espresso {
   class System;

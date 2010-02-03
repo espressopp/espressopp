@@ -7,8 +7,6 @@
 #include "esutil/ESPPIterator.hpp"
 
 namespace espresso {
-  typedef std::pair< Particle&, Particle& > ParticlePair;
-
   class CellListAllPairsIterator {
   public:
     CellListAllPairsIterator();

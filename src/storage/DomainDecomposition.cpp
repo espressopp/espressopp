@@ -5,6 +5,8 @@
 
 #include "DomainDecomposition.hpp"
 #include "BC.hpp"
+#include "Real3D.hpp"
+#include "Real3DRef.hpp"
 
 using namespace boost;
 

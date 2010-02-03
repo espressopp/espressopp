@@ -12,42 +12,40 @@ namespace espresso {
 
 */
 
-class VerletList {
+  class Particle;
 
- public:
-  /** A pair is a tuple of two references to the particles. */
-  typedef std::pair< class Particle*, class Particle* > pairParticle;
+  class VerletList {
 
-  /** List of pairs are currently done by a vector. */
+  public:
+    /** List of pairs are currently done by a vector. */
+    typedef std::vector< ParticlePair > PairList;
 
-  typedef std::vector< pairParticle > PairList;
+    /** Build a verlet list of all particle pairs in the storage
+	whose distance is less than a given cutoff.
 
-  /** Build a verlet list of all particle pairs in the storage
-      whose distance is less than a given cutoff.
+	\param system is the system for which the verlet list is built
+	\param cut is the cutoff value for the 
 
-      \param system is the system for which the verlet list is built
-      \param cut is the cutoff value for the 
+    */
 
-  */
+    VerletList(shared_ptr< class System >, double cut);
 
-  VerletList(shared_ptr< class System >, double cut);
+    ~VerletList();
 
-  ~VerletList();
+    const PairList& getPairs() { return myList; }
 
-  const PairList& getPairs() { return myList; }
+  private:
 
- private:
+    void checkPair(Particle &pt1, Particle &pt2);
 
-  void checkPair(Particle* pt1, Particle* pt2);
+    PairList myList;
 
-  PairList myList;
+    double cutsq;
 
-  double cutsq;
+    static LOG4ESPP_DECL_LOGGER(theLogger);
 
-  static LOG4ESPP_DECL_LOGGER(theLogger);
-
-  shared_ptr<class BC> bc;
-};
+    shared_ptr<class BC> bc;
+  };
 
 }
 

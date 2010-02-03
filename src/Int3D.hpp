@@ -1,16 +1,14 @@
 #ifndef _INT3D_HPP
 #define _INT3D_HPP
 
-#include "esconfig.hpp"
-#include "Int3D.hpp"
-#include <iostream>
+#include "types.hpp"
 
 namespace espresso {
   class Int3D {
     int data[3];
   public:
-    friend class Int3DRef;
     friend class ConstInt3DRef;
+    friend class Int3DRef;
 
     Int3D() 
     { for (int i = 0; i < 3; i++) data[i] = 0.0; }
@@ -24,7 +22,11 @@ namespace espresso {
       data[2] = z;
     }
 
-    Int3D(const class Int3DRef &v);
+    Int3D(const Int3DRef &v);
+    Int3D(const ConstInt3DRef &v);
+
+    operator Int3DRef();
+    operator ConstInt3DRef() const;
 
     int &operator[](int i) { return data[i]; }
     const int &operator[](int i) const { return data[i]; }

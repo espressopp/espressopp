@@ -1,14 +1,16 @@
 #define PARALLEL_TEST_MODULE LennardJones
 #include "ut.hpp"
-#include <memory>
 
+#include <memory>
 #include "mpi.hpp"
 #include "logging.hpp"
+#include "VerletList.hpp"
 #include "esutil/RNG.hpp"
 #include "storage/DomainDecomposition.hpp"
 #include "bc/OrthorhombicBC.hpp"
 #include "System.hpp"
-#include "VerletList.hpp"
+#include "Real3D.hpp"
+#include "Real3DRef.hpp"
 
 using namespace espresso;
 using namespace storage;
@@ -48,11 +50,10 @@ struct Fixture {
 
     printf("cellGrid = %d x %d x %d\n", ncells, ncells, ncells);
 
-    ConstReal3DRef boxLRef(boxL);
     int nodeGrid[3] = { 1, 1, 1 };
     int cellGrid[3] = { ncells, ncells, ncells };
     system = make_shared< System >();
-    system->bc = make_shared< OrthorhombicBC >(system, boxLRef);
+    system->bc = make_shared< OrthorhombicBC >(system, boxL);
     system->skin = skin;
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,

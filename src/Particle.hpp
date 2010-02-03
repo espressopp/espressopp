@@ -118,5 +118,6 @@ namespace espresso {
   struct ParticleList : public std::vector< Particle > {
     typedef esutil::ESPPIterator< std::vector< Particle > > Iterator;
   };
+
 }
 #endif

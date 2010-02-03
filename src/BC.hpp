@@ -4,9 +4,6 @@
 #include "types.hpp"
 
 namespace espresso {
-  class Real3D;
-  class Real3DRef;
-
     /** Abstract base class for boundary conditions. */
   class BC {
   public:
