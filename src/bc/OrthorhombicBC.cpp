@@ -25,7 +25,6 @@ namespace espresso {
     void 
     OrthorhombicBC::
     getMinimumImageVector(Real3DRef dist,
-			  real &distSqr,
 			  const ConstReal3DRef pos1,
 			  const ConstReal3DRef pos2) const {
       dist = pos1;
@@ -34,8 +33,6 @@ namespace espresso {
       dist[0] -= round(dist[0] * invBoxL[0]) * boxL[0];
       dist[1] -= round(dist[1] * invBoxL[1]) * boxL[1];
       dist[2] -= round(dist[2] * invBoxL[2]) * boxL[2];
-
-      distSqr = dist[0]*dist[0] + dist[1]*dist[1] + dist[2]*dist[2];
     }
 
     /* Fold an individual coordinate in the specified direction */

@@ -3,6 +3,7 @@
 
 #include <utility>
 #include "Cell.hpp"
+#include "CellListIterator.hpp"
 #include "esutil/ESPPIterator.hpp"
 
 namespace espresso {
@@ -11,16 +12,22 @@ namespace espresso {
   class CellListAllPairsIterator {
   public:
     CellListAllPairsIterator();
-    CellListAllPairsIterator(CellListAllPairsIterator &clni);
-    CellListAllPairsIterator(CellList &cl);
+
+    CellListAllPairsIterator(CellList &cl); 
+    //      : clit(cl), nclit(clit.getCurrentCell()->neighborCells) {}
 
     CellListAllPairsIterator &operator++();
 
-    bool isValid() const;
-    bool isDone() const;
+    bool isValid() const { return clit.isValid(); }
+    bool isDone() const { return !isValid(); }
 
-    ParticlePair &operator*() const;
-    ParticlePair *operator->() const { return &(**this); }
+    const ParticlePair &operator*() const { return current; }
+    const ParticlePair *operator->() const { return &(**this); }
+
+  private:
+    ParticlePair current;
+    CellListIterator clit;
+    CellListIterator nclit;
    };
 
 }

@@ -39,13 +39,10 @@ namespace espresso {
           classes (once the code stabilizes).
 
           \param dist is the distance vector (pos2 - pos1)
-          \param distSqr is the square of the magnitude
-                 of the separation vector
           \param pos1, pos2 are the particle positions 
       */
       virtual void
       getMinimumImageVector(Real3DRef dist,
-                            real &distSqr,
                             const ConstReal3DRef pos1,
                             const ConstReal3DRef pos2) const;
 

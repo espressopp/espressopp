@@ -83,31 +83,23 @@ VerletList::VerletList(shared_ptr< System > system, real cut)
 
 void VerletList::checkPair(Particle* pt1, Particle* pt2)
 {
-  real* pos1 = pt1->r.p;
-  real* pos2 = pt2->r.p;
+  Real3DRef pos1 = pt1->r.p;
+  Real3DRef pos2 = pt2->r.p;
 
-  real d[3];
-
+  Real3D d;
   real distsq;
 
+#warning WORKAROUND FOR MINIMUM IMAGE COMPUTATION
 #define WORKAROUND
 
 #ifdef WORKAROUND
-
   // This gives the right distance, but is much slower
-
-  bc->getMinimumImageVector(d, distsq, pos1, pos2);
-
+  bc->getMinimumImageVector(d, pos1, pos2);
 #else
-
   // This should also work, but doesn't yet
-  //
-  d[0] = pos1[0] - pos2[0];
-  d[1] = pos1[1] - pos2[1];
-  d[2] = pos1[2] - pos2[2];
-
-  distsq = d[0]*d[0] + d[1]*d[1] + d[2]*d[2];
+  d = pos1 - pos2;
 #endif
+  distsq = d.sqr();
 
   LOG4ESPP_DEBUG(theLogger, "p1: " << pt1->p.id << " - p2: "
              << pt2->p.id << " -> distsq = " << distsq);

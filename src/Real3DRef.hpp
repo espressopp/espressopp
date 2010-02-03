@@ -127,10 +127,6 @@ namespace espresso {
   inline std::ostream &operator<<(std::ostream &out, const Real3DRef &v) {
     return out << v[0] << ' ' << v[1] << ' ' << v[2];
   }
-
-  inline std::ostream &operator<<(std::ostream &out, ConstReal3DRef &v) {
-    return out << v[0] << ' ' << v[1] << ' ' << v[2];
-  }
 }
 
 #endif

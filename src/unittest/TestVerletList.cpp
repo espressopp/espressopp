@@ -83,8 +83,8 @@ struct Fixture {
 
     system->storage = domdec;
 
-    printf("number of particles in storage = %lld\n", 
-            domdec->getNRealParticles());
+    printf("number of particles in storage = %ulld\n", 
+	   domdec->getNRealParticles());
   }
 };
 

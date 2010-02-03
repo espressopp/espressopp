@@ -33,6 +33,8 @@ namespace espresso {
     Particle &operator*() const { return *pit; }
     Particle *operator->() const { return &**this; }
 
+    Cell *getCurrentCell() { return *cit; }
+
   private:
     void findNonemptyCell();
 
