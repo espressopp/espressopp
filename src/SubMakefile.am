@@ -1,7 +1,6 @@
 nobase_pkginclude_HEADERS += \
 	Real3D.hpp \
 	Int3D.hpp \
-	Int3DRef.hpp \
 	Particle.hpp \
 	Cell.hpp \
 	Storage.hpp \

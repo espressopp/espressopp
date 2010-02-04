@@ -1,27 +1,8 @@
 #include "Int3D.hpp"
-#include "Int3DRef.hpp"
 #include <python.hpp>
 #include <boost/python/implicit.hpp>
 
 namespace espresso {
-  Int3D::Int3D(const Int3DRef &v) {
-    for (int i = 0; i < 3; i++)
-      data[i] = v[i];
-  }
-
-  Int3D::Int3D(const ConstInt3DRef &v) {
-    for (int i = 0; i < 3; i++)
-      data[i] = v[i];
-  }
-
-  Int3D::operator Int3DRef() {
-    return Int3DRef(data);
-  }
-  
-  Int3D::operator ConstInt3DRef() const {
-    return ConstInt3DRef(data);
-  }
-  
   struct int3D_pickle_suite : boost::python::pickle_suite {
     static
     python::tuple

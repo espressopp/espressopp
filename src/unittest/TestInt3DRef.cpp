@@ -1,7 +1,6 @@
 #define BOOST_TEST_MODULE Int3DRef
 
 #include "ut.hpp"
-#include "Int3DRef.hpp"
 #include "Int3D.hpp"
 
 using namespace espresso;

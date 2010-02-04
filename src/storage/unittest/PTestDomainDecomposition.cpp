@@ -9,7 +9,7 @@
 #include "System.hpp"
 #include "esutil/ESPPIterator.hpp"
 #include "bc/OrthorhombicBC.hpp"
-#include "Real3DRef.hpp"
+#include "Real3D.hpp"
 
 using namespace espresso;
 using namespace esutil;

@@ -10,7 +10,6 @@
 #include "bc/OrthorhombicBC.hpp"
 #include "System.hpp"
 #include "Real3D.hpp"
-#include "Real3DRef.hpp"
 
 using namespace espresso;
 using namespace storage;
