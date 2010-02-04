@@ -12,6 +12,8 @@ using namespace interaction;
 VelocityVerlet::VelocityVerlet(shared_ptr< System > system) : MDIntegrator(system)
 {
   LOG4ESPP_INFO(theLogger, "construct VelocityVerlet");
+
+  resortFlag = true;
 }
 
 VelocityVerlet::~VelocityVerlet()
@@ -35,6 +37,19 @@ void VelocityVerlet::run(int nsteps)
 
   if (langevin) langevin->init(dt);
 
+  setUp();
+
+  // Before start make sure that particles are on the right processor
+
+  real maxSqDist;
+
+  if (resortFlag) {
+     LOG4ESPP_INFO(theLogger, "resort particles + rebuild VL");
+     pSystem->storage->resortParticles();
+     vl = make_shared<VerletList>(system.lock(), maxCut + pSystem->skin);
+     maxSqDist = 0.0;
+  }
+
   bool recalcForces = true;  // TODO: more intelligent
 
   if (recalcForces) {
@@ -49,21 +64,26 @@ void VelocityVerlet::run(int nsteps)
 
   LOG4ESPP_INFO(theLogger, "run " << nsteps << " iterations");
   
-  // Before start make sure that particles are on the right processor
-
-  pSystem->storage->resortParticles();
-
-  real maxSqDist = 0.0;
   real skinHalfSq = 0.25 * (pSystem->skin * pSystem->skin);
 
   for (int i = 0; i < nsteps; i++) {
+
     LOG4ESPP_DEBUG(theLogger, "step " << i << " of " << nsteps << " iterations");
+
     maxSqDist += integrate1();
-    if (maxSqDist > skinHalfSq) {
-      LOG4ESPP_DEBUG(theLogger, "resort particles");
+
+    LOG4ESPP_INFO(theLogger, "maxSqDist = " << maxSqDist);
+
+    if (maxSqDist > skinHalfSq) resortFlag = true;
+
+    if (resortFlag) {
+      LOG4ESPP_INFO(theLogger, "resort particles + rebuild VL");
       pSystem->storage->resortParticles();
-      maxSqDist = 0.0;
+      vl = make_shared<VerletList>(system.lock(), maxCut + pSystem->skin);
+      maxSqDist  = 0.0;
+      resortFlag = false;
     }
+
     pSystem->storage->updateGhosts();
     calcForces();
     pSystem->storage->collectGhostForces();
@@ -78,17 +98,16 @@ void VelocityVerlet::run(int nsteps)
 
 real VelocityVerlet::integrate1()
 {
-  std::vector<Cell>& localCells = system.lock().get()->storage->getLocalCells();
+  std::vector<Cell*>& realCells = system.lock().get()->storage->getRealCells();
 
   // loop over all particles of the local cells
 
-  real dt2 = dt * dt;
   int count = 0;
 
   real maxSqDist = 0.0; // maximal square distance a particle moves
 
-  for (size_t c = 0; c < localCells.size(); c++) {
-    Cell* localCell = &localCells[c];
+  for (size_t c = 0; c < realCells.size(); c++) {
+    Cell* localCell = realCells[c];
     for (size_t index = 0; index < localCell->particles.size(); index++) {
       Particle* particle  = &localCell->particles[index];
       real sqDist = 0.0;
@@ -96,7 +115,7 @@ real VelocityVerlet::integrate1()
         /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
         particle->m.v[j] += 0.5 * dt * particle->f.f[j];
         /* Propagate positions (only NVT): p(t + dt)   = p(t) + dt * v(t+0.5*dt) */
-        real deltaP = 0.5 * dt2 * particle->m.v[j];
+        real deltaP = dt * particle->m.v[j];
         particle->r.p[j] += deltaP;
         sqDist += deltaP * deltaP;
         count++;
@@ -114,14 +133,14 @@ real VelocityVerlet::integrate1()
 
 void VelocityVerlet::integrate2()
 {
-  std::vector<Cell>& localCells = system.lock().get()->storage->getLocalCells();
+  std::vector<Cell*>& realCells = system.lock().get()->storage->getRealCells();
 
   // loop over all particles of the local cells
 
-  for (size_t c = 0; c < localCells.size(); c++) {
-    Cell* localCell = &localCells[c];
-    for (size_t index = 0; index < localCell->particles.size(); index++) {
-      Particle* particle  = &localCell->particles[index];
+  for (size_t c = 0; c < realCells.size(); c++) {
+    Cell* realCell = realCells[c];
+    for (size_t index = 0; index < realCell->particles.size(); index++) {
+      Particle* particle  = &realCell->particles[index];
       for (int j = 0; j < 3; j++) {
         /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
         particle->m.v[j] += 0.5 * dt * particle->f.f[j];
@@ -132,44 +151,64 @@ void VelocityVerlet::integrate2()
 
 /*****************************************************************************/
 
+void VelocityVerlet::setUp()
+{
+  System* pSystem = system.lock().get();
+
+  const InteractionList& srIL = pSystem->shortRangeInteractions;
+
+  maxCut = 0.0;
+
+  for (int j = 0; j < srIL.size(); j++) {
+
+     real cut = srIL[j]->getMaxCutoff();
+
+     maxCut = std::max(maxCut, cut);
+  }
+
+  LOG4ESPP_INFO(theLogger, "maximal cutoff = " << maxCut);
+}
+
+/*****************************************************************************/
+
 void VelocityVerlet::calcForces()
 {
-  // build VerletList (currently each step, issue for optimization)
+  initForces();
 
   System& sys = *(system.lock().get());
 
-  InteractionList& interactions = sys.shortRangeInteractions;
-
-  real cutForce = 0.0;
-
-  for (int j = 0; j < interactions.size(); j++) {
-
-     real cut = interactions[j]->getMaxCutoff();
-
-     cutForce = std::max(cutForce, cut);
-  }
-
-  printf("maximal cut for all forces: %f\n", cutForce);
-
-  shared_ptr< VerletList > vl = make_shared<VerletList>(system.lock(), 
-                                      cutForce + sys.skin);
-
-  VerletList::PairList pairs = vl->getPairs();
-
-  LOG4ESPP_DEBUG(theLogger, "# of verlet list pairs =  " << pairs.size());
+  const InteractionList& srIL = sys.shortRangeInteractions;
 
   real energy = 0.0;
-
-  const InteractionList& srIL = sys.shortRangeInteractions;
 
   for (size_t i = 0; i < srIL.size(); i++) {
 
      srIL[i]->addVerletListForces(vl);
-     // energy += srIL[i]->computeVerletListEnergy(vl);
+
+     energy += srIL[i]->computeVerletListEnergy(vl);
   }
 
   // Just for control now: compute + print energy
 
   LOG4ESPP_INFO(theLogger, "energy  = " << energy);
+}
+
+/*****************************************************************************/
+
+void VelocityVerlet::initForces()
+{
+  // forces are initialized for real + ghost particles
+
+  std::vector<Cell>& localCells = system.lock().get()->storage->getLocalCells();
+
+  for (size_t c = 0; c < localCells.size(); c++) {
+    Cell* localCell = &localCells[c];
+    for (size_t index = 0; index < localCell->particles.size(); index++) {
+      Particle* particle  = &localCell->particles[index];
+      for (int j = 0; j < 3; j++) {
+        particle->f.f[j] = 0.0;
+      }
+    }
+  }
 }
 

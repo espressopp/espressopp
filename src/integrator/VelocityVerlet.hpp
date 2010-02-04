@@ -5,6 +5,8 @@
 
 namespace espresso {
 
+  class VerletList;
+
   namespace integrator {
 
     /** Velocity Verlet Integrator */
@@ -23,19 +25,28 @@ namespace espresso {
 
       private:
 
-        shared_ptr< class Langevin > langevin;
+        bool resortFlag;  //!< true implies need for resort of particles
+
+        shared_ptr< class VerletList > vl;
+
+        double maxCut;
+
+        shared_ptr< class Langevin > langevin;  //!< Langevin thermostat if available
 
         /** Method updates particle positions and velcocities.
 
-            \return Maximal square distance a particle has moved.
+            \return maximal square distance a particle has moved.
         */
 
         double integrate1();
 
         void integrate2();
 
+        void initForces();
+
         void calcForces();
 
+        void setUp();   //<! set up for a new run
     };
   }
 }
