@@ -1,7 +1,6 @@
 #define BOOST_TEST_MODULE Real3DRef
 
 #include "ut.hpp"
-#include "Real3DRef.hpp"
 #include "Real3D.hpp"
 
 using namespace espresso;

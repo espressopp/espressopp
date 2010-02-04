@@ -3,7 +3,6 @@
 #include "VerletList.hpp"
 
 #include "Real3D.hpp"
-#include "Real3DRef.hpp"
 #include "Particle.hpp"
 #include "Cell.hpp"
 #include "System.hpp"

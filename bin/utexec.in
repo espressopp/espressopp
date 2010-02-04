@@ -158,7 +158,8 @@ if not clean and not do_python and not do_cpp \
 
 ##################################################
 # DETERMINE BASEDIRS
-savecwd = None #os.environ.get("PWD")
+
+savecwd = os.environ.get("PWD")
 if savecwd is None:
     import subprocess
     savecwd = subprocess.Popen('pwd', stdout=subprocess.PIPE).communicate()[0].strip()
