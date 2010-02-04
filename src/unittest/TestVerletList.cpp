@@ -21,7 +21,9 @@ struct LoggingFixture {
   LoggingFixture() { 
     LOG4ESPP_CONFIGURE();
     log4espp::Logger::getRoot().setLevel(log4espp::Logger::WARN);
-    log4espp::Logger::getInstance("VerletList").setLevel(log4espp::Logger::DEBUG);
+    log4espp::Logger::getInstance("VerletList").setLevel(log4espp::Logger::TRACE);
+    log4espp::Logger::getInstance("DomainDecomposition").setLevel(log4espp::Logger::TRACE);
+    log4espp::Logger::getInstance("Storage").setLevel(log4espp::Logger::TRACE);
   }
 };
 
@@ -86,6 +88,8 @@ struct Fixture {
 
     printf("number of particles in storage = %ulld\n", 
 	   domdec->getNRealParticles());
+
+    domdec->resortParticles();
   }
 };
 

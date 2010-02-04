@@ -1,3 +1,5 @@
+#define LOG4ESPP_LEVEL_DEBUG
+
 #include "VerletList.hpp"
 
 #include "Real3D.hpp"
@@ -32,8 +34,11 @@ VerletList::VerletList(shared_ptr< System > system, real cut)
 
     size_t nparticles = localCell->particles.size();
 
-    LOG4ESPP_INFO(theLogger, "find pairs of real cell " << c <<
-                             " with " << nparticles << " particles");
+    LOG4ESPP_DEBUG(theLogger, "find pairs of real cell " << c
+		   << " with local index " << localCell - system->storage->getFirstCell()
+		   << " with " << nparticles << " particles");
+
+    int c = myList.size();
 
     for (size_t p1 = 0; p1 < nparticles; p1++) {
 
@@ -43,14 +48,18 @@ VerletList::VerletList(shared_ptr< System > system, real cut)
 
         checkPair(pt1, localCell->particles[p2]);
       }
+      
     }
+
+    LOG4ESPP_INFO(theLogger, "self size " << myList.size() - c);
 
     // Loop cell neighbors
 
     std::vector<NeighborCellInfo>& neighborCells = localCell->neighborCells;
  
-    LOG4ESPP_INFO(theLogger, "find pairs of real cell " << c << 
-                " with " << neighborCells.size() << " neighbored cells");
+    LOG4ESPP_DEBUG(theLogger, "find pairs of real cell " << c
+		   << " with local index " << localCell - system->storage->getFirstCell()
+		   << " with " << neighborCells.size() << " neighbored cells");
 
     for (size_t n = 0; n < neighborCells.size(); n++) {
 
@@ -58,16 +67,15 @@ VerletList::VerletList(shared_ptr< System > system, real cut)
 
       int nPNeighbor = neighborCell->particles.size();
 
-      if (nPNeighbor == 0) continue;
+      LOG4ESPP_DEBUG(theLogger, "Neighbor " << n
+		     << " with local index " << neighborCell - system->storage->getFirstCell()
+		     << " has " << neighborCell->particles.size() << " particles");
 
-      LOG4ESPP_DEBUG(theLogger, "Neighbor " << n << " has " <<
-          neighborCell->particles.size() << " particles");
-
-      // avoid double cells
-
-      // if (localCell - neighborCell < 0) continue;
+      if (!neighborCells[n].useForAllPairs || nPNeighbor == 0) continue;
 
       // now build all parir of localCell / neighborCell
+
+      int c = myList.size();
  
       for (size_t p1 = 0; p1 < nparticles; p1++) {
 
@@ -78,6 +86,8 @@ VerletList::VerletList(shared_ptr< System > system, real cut)
           checkPair(pt1, neighborCell->particles[p2]);
         }
       }
+
+      LOG4ESPP_DEBUG(theLogger, "cross size " << myList.size() - c);
     }
   }
 }
@@ -92,22 +102,12 @@ void VerletList::checkPair(Particle& pt1, Particle& pt2)
   Real3D d;
   real distsq;
 
-#warning WORKAROUND FOR MINIMUM IMAGE COMPUTATION
-#define WORKAROUND
-
-#ifdef WORKAROUND
-  // This gives the right distance, but is much slower
-  bc->getMinimumImageVector(d, pos1, pos2);
-#else
-  // This should also work, but doesn't yet
-  d = pos1 - pos2;
-#endif
+  d = pos1; d -= pos2;
   distsq = d.sqr();
 
-  LOG4ESPP_DEBUG(theLogger, "p1: " << pt1.p.id << " - p2: "
-             << pt2.p.id << " -> distsq = " << distsq);
-
-  if (pt1.p.id >= pt2.p.id) return;
+  LOG4ESPP_TRACE(theLogger, "p1: " << pt1.p.id << " @ " << pos1
+		 << " - p2: " << pt2.p.id << " @ " << pos2
+		 << " -> distsq = " << distsq);
 
   if (distsq > cutsq) return;
 
