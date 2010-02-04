@@ -119,11 +119,12 @@ namespace espresso {
       for (int o = cellGrid.getInnerCellsBegin(2); o < cellGrid.getInnerCellsEnd(2); ++o) {
 	for (int n = cellGrid.getInnerCellsBegin(1); n < cellGrid.getInnerCellsEnd(1); ++n) {
 	  for (int m = cellGrid.getInnerCellsBegin(0); m < cellGrid.getInnerCellsEnd(0); ++m) {
-	    longint cell_idx = cellGrid.mapPositionToIndex(m, n, o);
-	    Cell *cell = &cells[cell_idx];
+	    longint cellIdx = cellGrid.mapPositionToIndex(m, n, o);
+	    Cell *cell = &cells[cellIdx];
 
-	    LOG4ESPP_TRACE(logger, "setting up neighbors for cell " << cell - getFirstCell());
-
+	    LOG4ESPP_TRACE(logger, "setting up neighbors for cell " << cell - getFirstCell()
+			   << " @ " << m << " " << n << " " << o);
+	    
 	    // there should be always 26 neighbors
 	    cell->neighborCells.reserve(26);
 
@@ -132,9 +133,12 @@ namespace espresso {
 	      for (int q = n - 1; q <= n + 1; ++q) {
 		for (int r = m - 1; r <= m + 1; ++r) {
 		  if (p != o || q != n || r != m) {
-		    longint cell2_idx = cellGrid.mapPositionToIndex(r, q, p);
-		    Cell *cell2 = &cells[cell2_idx];
-		    cell->neighborCells.push_back(NeighborCellInfo(cell2, (cell2_idx<cell_idx)));
+		    longint cell2Idx = cellGrid.mapPositionToIndex(r, q, p);
+		    Cell *cell2 = &cells[cell2Idx];
+		    cell->neighborCells.push_back(NeighborCellInfo(cell2, (cell2Idx<cellIdx)));
+
+		    LOG4ESPP_TRACE(logger, "neighbor cell " << cell2 - getFirstCell()
+				   << " @ " << r << " " << q << " " << p << ((cell2Idx<cellIdx) ? " is" : " is not") << " taken" );
 		  }
 		}
 	      }

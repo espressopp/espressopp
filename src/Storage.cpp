@@ -70,7 +70,9 @@ Particle *Storage::addParticle(longint id, const real p[3])
 
   LOG4ESPP_TRACE(logger, "got particle id="
 		 << id << " @ " << p[0] << " " << p[1] << " " << p[2] << " ; put it into cell " << cell - getFirstCell());
-  LOG4ESPP_TRACE(logger, "cell size is now " << cell->size());
+  LOG4ESPP_TRACE(logger, "folded it to "
+		 << n.r.p[0] << " " << n.r.p[1] << " " << n.r.p[2] );
+  LOG4ESPP_TRACE(logger, "cell size is now " << cell->particles.size());
 
   return &cell->particles.back();
 }
