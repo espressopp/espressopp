@@ -57,7 +57,9 @@ void VelocityVerlet::run(int nsteps)
 
      if (langevin) langevin->heatUp();
 
+     pSystem->storage->updateGhosts();
      calcForces();
+     pSystem->storage->collectGhostForces();
 
      if (langevin) langevin->coolDown();
 

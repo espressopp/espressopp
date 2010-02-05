@@ -25,6 +25,7 @@ struct LoggingFixture {
     LOG4ESPP_CONFIGURE();
     log4espp::Logger::getRoot().setLevel(log4espp::Logger::WARN);
     log4espp::Logger::getInstance("VerletList").setLevel(log4espp::Logger::WARN);
+    log4espp::Logger::getInstance("Storage").setLevel(log4espp::Logger::DEBUG);
     log4espp::Logger::getInstance("MDIntegrator").setLevel(log4espp::Logger::DEBUG);
   }
 };
@@ -45,7 +46,7 @@ struct Fixture {
 
     // real SIZE = pow(N * N * N / density, 1.0/3.0) ;
   
-    SIZE = 3.0
+    real SIZE = 3.0;
 
     printf("box SIZE = %f, density = %f\n", SIZE, density);
 

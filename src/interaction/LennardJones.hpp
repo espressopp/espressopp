@@ -35,7 +35,9 @@ namespace espresso {
 
       void enableShift() {
         real ratio = sigma / getCutoff();
-        shift = 4.0 * epsilon * (pow(ratio, 12.0) - pow(ratio, 6.0));
+        real rat2 = ratio * ratio;
+        real rat6 = rat2 * rat2 * rat2;
+        shift = 4.0 * epsilon * rat6 * (rat6 - 1.0);
       }
 
       void preset() {
@@ -70,6 +72,8 @@ namespace espresso {
         real frac2   = 1.0 / distSqr;
         real frac6   = frac2 * frac2 * frac2;
         real ffactor = frac6 * (ff1 * frac6 - ff2) * frac2;
+
+        // printf ("force of distsq %f  = %f, ff1 = %f, ff2 = %f\n", distSqr, ffactor, ff1, ff2);
 
         for (int i = 0; i < 3; i++) {
           force[i] = dist[i] * ffactor;
