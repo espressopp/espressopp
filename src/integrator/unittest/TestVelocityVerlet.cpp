@@ -11,7 +11,7 @@
 #include "bc/OrthorhombicBC.hpp"
 #include "System.hpp"
 #include "VerletList.hpp"
-#include "Real3DRef.hpp"
+#include "Real3D.hpp"
 
 using namespace espresso;
 using namespace storage;
@@ -29,7 +29,7 @@ struct LoggingFixture {
   }
 };
 
-static real cutoff = 1.15;
+static real cutoff = 1.4;
 
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
@@ -43,14 +43,16 @@ struct Fixture {
 
     real density = 1.0;
 
-    real SIZE = pow(N * N * N / density, 1.0/3.0) ;
+    // real SIZE = pow(N * N * N / density, 1.0/3.0) ;
+  
+    SIZE = 3.0
 
     printf("box SIZE = %f, density = %f\n", SIZE, density);
 
     Real3D boxL(SIZE, SIZE, SIZE);
 
     real skin   = 0.3;
-    int  ncells = SIZE / (2 * cutoff + skin) + 1;
+    int  ncells = round(SIZE / (2 * cutoff + skin) + 1);
 
     printf("cellGrid = %d x %d x %d\n", ncells, ncells, ncells);
 
@@ -72,8 +74,8 @@ struct Fixture {
       for (int j = 0; j < N; j++) {
         for (int k = 0; k < N; k++) {
 
-          real r = 0.4 + 0.2 * rng();
-          // real r = 0.5;
+          int m = (i + 2*j + 3*k) % 11;
+          real r = 0.45 + m * 0.01;
           real x = (i + r) / N * SIZE;
           real y = (j + r) / N * SIZE; 
           real z = (k + r) / N * SIZE;
@@ -116,6 +118,7 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 
   shared_ptr<LennardJones> lj = make_shared<LennardJones>();
   lj->setParameters(0, 0, 1.0, 1.0, cutoff);
+  // lj->enableShift(0, 0);
   system->shortRangeInteractions.push_back(lj);
 
   shared_ptr<MDIntegrator> integrator = 
@@ -123,5 +126,5 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 
   integrator->setTimeStep(0.005);
 
-  integrator->run(100);
+  integrator->run(1);
 }

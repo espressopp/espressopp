@@ -48,6 +48,7 @@ void VelocityVerlet::run(int nsteps)
      pSystem->storage->resortParticles();
      vl = make_shared<VerletList>(system.lock(), maxCut + pSystem->skin);
      maxSqDist = 0.0;
+     resortFlag = false;
   }
 
   bool recalcForces = true;  // TODO: more intelligent
@@ -68,7 +69,7 @@ void VelocityVerlet::run(int nsteps)
 
   for (int i = 0; i < nsteps; i++) {
 
-    LOG4ESPP_DEBUG(theLogger, "step " << i << " of " << nsteps << " iterations");
+    LOG4ESPP_INFO(theLogger, "step " << i << " of " << nsteps << " iterations");
 
     maxSqDist += integrate1();
 
@@ -109,17 +110,23 @@ real VelocityVerlet::integrate1()
   for (size_t c = 0; c < realCells.size(); c++) {
     Cell* localCell = realCells[c];
     for (size_t index = 0; index < localCell->particles.size(); index++) {
-      Particle* particle  = &localCell->particles[index];
+      Particle& pt  = localCell->particles[index];
       real sqDist = 0.0;
+
+      printf("Particle %d, pos = %f %f %f, vel = %f %f %f, f = %f %f %f\n", 
+              pt.p.id, pt.r.p[0], pt.r.p[1], pt.r.p[2], 
+              pt.m.v[0], pt.m.v[1], pt.m.v[2],
+              pt.f.f[0], pt.f.f[1], pt.f.f[2]);
+
       for (int j = 0; j < 3; j++) {
         /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
-        particle->m.v[j] += 0.5 * dt * particle->f.f[j];
+        pt.m.v[j] += 0.5 * dt * pt.f.f[j];
         /* Propagate positions (only NVT): p(t + dt)   = p(t) + dt * v(t+0.5*dt) */
-        real deltaP = dt * particle->m.v[j];
-        particle->r.p[j] += deltaP;
+        real deltaP = dt * pt.m.v[j];
+        pt.r.p[j] += deltaP;
         sqDist += deltaP * deltaP;
-        count++;
       }
+      count++;
       maxSqDist = std::max(maxSqDist, sqDist);
     }
   }
@@ -140,10 +147,14 @@ void VelocityVerlet::integrate2()
   for (size_t c = 0; c < realCells.size(); c++) {
     Cell* realCell = realCells[c];
     for (size_t index = 0; index < realCell->particles.size(); index++) {
-      Particle* particle  = &realCell->particles[index];
+      Particle& pt  = realCell->particles[index];
+      printf("Particle %d, pos = %f %f %f, vel = %f %f %f, f = %f %f %f\n", 
+              pt.p.id, pt.r.p[0], pt.r.p[1], pt.r.p[2], 
+              pt.m.v[0], pt.m.v[1], pt.m.v[2],
+              pt.f.f[0], pt.f.f[1], pt.f.f[2]);
       for (int j = 0; j < 3; j++) {
         /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
-        particle->m.v[j] += 0.5 * dt * particle->f.f[j];
+        pt.m.v[j] += 0.5 * dt * pt.f.f[j];
       }
     }
   }
@@ -182,6 +193,8 @@ void VelocityVerlet::calcForces()
   real energy = 0.0;
 
   for (size_t i = 0; i < srIL.size(); i++) {
+
+     LOG4ESPP_INFO(theLogger, "compute forces for srIL " << i << " of " << srIL.size());
 
      srIL[i]->addVerletListForces(vl);
 

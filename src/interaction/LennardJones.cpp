@@ -7,18 +7,34 @@
 using namespace espresso;
 using namespace espresso::interaction;
 
+/************************************************************************************/
+
 LennardJones::LennardJones()
 {
   ntypes = 0;
 }
 
+/************************************************************************************/
+
 LennardJones::~LennardJones()
 {
 }
 
+/************************************************************************************/
+
 INTERACTION_ROUTINES(LennardJones)
 
-void LennardJones::setParameters(int type1, int type2, real ep, real sg, real rc) 
+/************************************************************************************/
+
+void LennardJones::enableShift(int type1, int type2)
+{
+  Parameters& params = parameterArray[type1][type2];
+  params.enableShift();
+}
+
+/************************************************************************************/
+
+void LennardJones::setParameters(int type1, int type2, real epsilon, real sigma, real rc) 
 {
   assert(type1 >= 0);
   assert(type2 >= 0);
@@ -45,8 +61,9 @@ void LennardJones::setParameters(int type1, int type2, real ep, real sg, real rc
   }
 
   Parameters& params = parameterArray[type1][type2];
-  params.setEpsilon(ep);
-  params.setSigma(sg);
+  params.setEpsilon(epsilon);
+  params.setSigma(sigma);
   params.setCutoff(rc);
+  params.preset();
 }
 

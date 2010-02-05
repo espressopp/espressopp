@@ -120,7 +120,7 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 
   BOOST_CHECK_EQUAL(pairs.size(), N * N * N * 3);
 
-  // there are N * N * N * 18 / 2 pairs in cutoff 
+  // there are N * N * N * 18 / 2 pairs in cutoff  sqrt(2.0)
 
   vl = make_shared< VerletList >(system, pow(2.001, 0.5));
 

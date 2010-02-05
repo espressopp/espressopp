@@ -18,6 +18,9 @@ namespace espresso {
 
       real epsilon;
       real sigma;
+      real shift;
+      real ff1, ff2;
+      real ef1, ef2;
 
       public:
 
@@ -27,17 +30,34 @@ namespace espresso {
       void setSigma(real _sigma) { sigma = _sigma; }
       real getSigma() const { return sigma; }
 
+      void setShift(real _shift) { shift = _shift; }
+      real getShift() const { return shift; }
+
+      void enableShift() {
+        real ratio = sigma / getCutoff();
+        shift = 4.0 * epsilon * (pow(ratio, 12.0) - pow(ratio, 6.0));
+      }
+
+      void preset() {
+        real sig2 = sigma * sigma;
+        real sig6 = sig2 * sig2 * sig2;
+        ff1 = 48.0 * epsilon * sig6 * sig6;
+        ff2 = 24.0 * epsilon * sig6;
+        ef1 =  4.0 * epsilon * sig6 * sig6;
+        ef2 =  4.0 * epsilon * sig6;
+      }
+
       /** Inline method for reimplementation of methods to compute energies */
 
       real computeEnergy(Particle &p1, Particle &p2,
                          const real dist[3],
                          const real distSqr) const 
       {
-        real frac2 = sigma * sigma / distSqr;
-        real frac6 = frac2 * frac2 * frac2;
-        real energy = 4.0 * epsilon * (frac6 * frac6 - frac6);
-        printf ("Particle %d - %d, dist = %6.3g, energy = %7.3g\n", 
-                 p1.p.id, p2.p.id, distSqr, energy);
+        real frac2  = 1.0 / distSqr;
+        real frac6  = frac2 * frac2 * frac2;
+        real energy = frac6 * (ef1 * frac6 - ef2) - shift;
+        // printf ("Particle %d - %d, dist = %6.3g, energy = %7.3g\n", 
+        //         p1.p.id, p2.p.id, distSqr, energy);
         return energy;
       }
 
@@ -47,16 +67,14 @@ namespace espresso {
                         const real dist[3],
                         const real distSqr, real force[3]) const 
       {
-        real distSqrInv = 1.0 / distSqr;
-
-        real frac2   = sigma * sigma * distSqrInv;
+        real frac2   = 1.0 / distSqr;
         real frac6   = frac2 * frac2 * frac2;
-        real ffactor = 48.0 * epsilon * (frac6 * frac6 - 0.5 * frac6) * distSqrInv;
-    
-        for (int i = 0; i < 3; i++)
-          force[i] = dist[i] * ffactor;
-      }
+        real ffactor = frac6 * (ff1 * frac6 - ff2) * frac2;
 
+        for (int i = 0; i < 3; i++) {
+          force[i] = dist[i] * ffactor;
+        }
+      }
     };
 
     class LennardJones : public InteractionTemplate< LennardJonesParameters > {
@@ -77,6 +95,7 @@ namespace espresso {
     
       void setParameters(int type1, int type2, real ep, real sg, real rc);
 
+      void enableShift(int type1, int type2);
     };
   }
 }

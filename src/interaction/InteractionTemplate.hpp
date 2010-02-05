@@ -70,7 +70,6 @@ namespace espresso {
         return e;
       }
 
-
       /** Reimplementation of pure routine for the derived class; the
           methods getCutoffSqr and computeEnergy will be inlined for efficiency.
       */
@@ -124,8 +123,16 @@ namespace espresso {
              real force[3];
              params.computeForce(p1, p2, dist, distSqr, force);
              for (int k = 0; k < 3; k++) {
-               p1.f.f[k] +=  force[k];
-               p2.f.f[k] += -force[k];
+               p1.f.f[k] += force[k];
+               p2.f.f[k] -= force[k];
+             }
+             printf("dist(%d,%d), dist = %f -> %f %f %f\n", p1.p.id, p2.p.id, distSqr, dist[0], dist[1], dist[2]);
+             printf("force(%d,%d), dist = %f -> %f %f %f\n", p1.p.id, p2.p.id, distSqr, force[0], force[1], force[2]);
+             if (p1.p.id == 0) {
+                printf("sum add force Particle 0 = %f %f %f\n", p1.f.f[0], p1.f.f[1], p1.f.f[0]);
+             }
+             if (p2.p.id == 0) {
+                printf("sum sub force Particle 0 = %f %f %f\n", p2.f.f[0], p2.f.f[1], p2.f.f[0]);
              }
           }
         }
