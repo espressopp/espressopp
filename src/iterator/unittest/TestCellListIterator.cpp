@@ -3,11 +3,12 @@
 #include "ut.hpp"
 #include "Particle.hpp"
 #include "Cell.hpp"
-#include "CellListIterator.hpp"
+#include "../CellListIterator.hpp"
 #include <vector>
 #include <iostream>
 
 using namespace espresso;
+using namespace iterator;
 using namespace std;
 
 BOOST_AUTO_TEST_CASE(DefaultConstructor) {

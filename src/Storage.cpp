@@ -6,11 +6,12 @@
 #include "System.hpp"
 #include "Storage.hpp"
 #include "BC.hpp"
-#include "CellListIterator.hpp"
+#include "iterator/CellListIterator.hpp"
 #include "Real3D.hpp"
 
 using namespace boost;
 using namespace espresso;
+using namespace espresso::iterator;
 
 LOG4ESPP_LOGGER(Storage::logger, "Storage");
 

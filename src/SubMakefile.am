@@ -7,8 +7,6 @@ nobase_pkginclude_HEADERS += \
         BC.hpp \
 	System.hpp \
 	Interaction.hpp \
-	CellListIterator.hpp \
-	CellListAllPairsIterator.hpp \
 	VerletList.hpp \
 	bindings.hpp
 
@@ -19,8 +17,6 @@ libespresso_common_la_SOURCES += \
         BC.cpp \
 	System.cpp \
 	Interaction.cpp \
-	CellListIterator.cpp \
-	CellListAllPairsIterator.cpp \
 	VerletList.cpp \
 	bindings.cpp
 
