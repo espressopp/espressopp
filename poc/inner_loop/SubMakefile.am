@@ -1,0 +1,23 @@
+noinst_PROGRAMS += \
+	inner_loop/pairlists \
+	inner_loop/iterators \
+	inner_loop/virtual_function \
+	inner_loop/puetzloop
+
+noinst_HEADERS += \
+	inner_loop/iterators_block.H \
+	inner_loop/iterators_fobject.H \
+	inner_loop/iterators_nonvirtual.H \
+	inner_loop/iterators_virtual.H
+
+inner_loop_pairlists_SOURCES = \
+	inner_loop/pairlists.C
+
+inner_loop_iterators_SOURCES = \
+	inner_loop/iterators.C
+
+inner_loop_virtual_function_SOURCES = \
+	inner_loop/virtual_function.C
+
+inner_loop_puetzloop_SOURCES = \
+	inner_loop/puetzloop.C

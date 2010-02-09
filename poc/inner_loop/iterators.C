@@ -1,6 +1,7 @@
 // This benchmarks different versions of a loop via an iterator,
 // where the iterator methods are virtual or non-virtual
 
+#include <stdlib.h>
 #include <vector>
 #include <iostream>
 #include <sys/times.h>
@@ -402,11 +403,10 @@ void benchmark_block() {
 // MAIN PROGRAM
 //////////////////////////////////////////////////
 int main() {
-
   cout << "Creating random vector with " << N << " elements..." << endl;
 	
   for (size_t i=0; i < N; i++)
-    v.push_back(TestType(drand48(),drand48(),drand48()));
+    v.push_back(TestType(drand48(), drand48(), drand48()));
 
   int i;
   TestType sum;

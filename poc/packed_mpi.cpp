@@ -40,7 +40,7 @@ void son()
 
 int main()
 {
-  initMPI();
+  initMPIEnv();
 
   if (mpiWorld.rank() == 0) {
     parent();
@@ -49,6 +49,6 @@ int main()
     son();
   }
   
-  finalizeMPI();
+  finalizeMPIEnv();
   return 0;	
 }

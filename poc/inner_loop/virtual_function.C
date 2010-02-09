@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sys/times.h>
 #include <cmath>
+#include <cstdlib>
 
 using namespace std;
 

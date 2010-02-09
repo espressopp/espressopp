@@ -2,6 +2,7 @@
 #include <sys/times.h>
 #include <vector>
 #include <utility>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -40,7 +41,7 @@ int main() {
   for (i = 0; i< N; i++) {
     p1 = &v[i];
     for (j = 0; j < N_PARTNERS; j++) {
-      r = static_cast<int>(drand48() * N);
+      r = static_cast<int>(drand48()*N);
       p2 = &v[r];
       // fill the verlet list
       vl[i].push_back(p2);
