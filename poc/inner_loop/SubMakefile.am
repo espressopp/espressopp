@@ -2,7 +2,8 @@ noinst_PROGRAMS += \
 	inner_loop/pairlists \
 	inner_loop/iterators \
 	inner_loop/virtual_function \
-	inner_loop/puetzloop
+	inner_loop/puetzloop \
+	inner_loop/espresso_loop
 
 noinst_HEADERS += \
 	inner_loop/iterators_block.H \
@@ -21,3 +22,8 @@ inner_loop_virtual_function_SOURCES = \
 
 inner_loop_puetzloop_SOURCES = \
 	inner_loop/puetzloop.C
+
+inner_loop_espresso_loop_SOURCES = \
+	inner_loop/espresso_loop.cpp
+inner_loop_espresso_loop_LDADD = \
+	../src/libespresso_common.la  $(ESPRESSO_BOOST_LIBS)
