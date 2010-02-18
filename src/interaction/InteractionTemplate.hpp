@@ -99,7 +99,29 @@ namespace espresso {
       // FORCE COMPUTATION
       // full square over two particle lists
 
-      virtual void addForcesStorage() {
+      virtual void addForcesStorage(ParticleList &pl1, ParticleList &pl2) {
+
+        LOG4ESPP_INFO(theLogger, "add forces for a cell pair");
+
+        for (int i = 0, endi = pl1.size(); i < endi; i++) {
+          Particle &p1 = pl1[i];
+          int type1 = p1.p.type;
+          for (int j = 0, endj = pl2.size(); j < endj; j++) {
+            Particle &p2 = pl2[j];
+            real dist[3];
+            real distSqr = esutil::distance2vec(p1.r.p, p2.r.p, dist);
+            int type2 = p2.p.type;
+            const Parameters& params = parameterArray[type1][type2];
+            if (distSqr < params.getCutoffSqr()) {
+               real force[3];
+	       params.computeForce(p1, p2, dist, distSqr, force);
+	       for (int k = 0; k < 3; k++) {
+		 p1.f.f[k] += force[k];
+		 p2.f.f[k] -= force[k];
+	       }
+            }
+          }
+        }
       }
 
       virtual void addVerletListForcesImpl(shared_ptr<VerletList> vl) {

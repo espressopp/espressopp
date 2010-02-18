@@ -33,7 +33,7 @@ namespace espresso {
 
         shared_ptr< class Langevin > langevin;  //!< Langevin thermostat if available
 
-        /** Method updates particle positions and velcocities.
+        /** Method updates particle positions and velocities.
 
             \return maximal square distance a particle has moved.
         */
