@@ -279,9 +279,22 @@ void Storage::copyRealsToGhosts(Cell &_reals, Cell &_ghosts,
   }
 }
 
-void Storage::addGhostForcesToReals(Cell &ghosts, Cell &reals)
+void Storage::addGhostForcesToReals(Cell &_ghosts, Cell &_reals)
 {
-  LOG4ESPP_DEBUG(logger, "add forces from ghosts in "
-		 << (&ghosts - getFirstCell()) << " to reals in "
-		 << (&reals - getFirstCell()));
+  LOG4ESPP_DEBUG(logger, "add forces from ghosts in cell "
+		 << (&_ghosts - getFirstCell()) << " to reals in cell "
+		 << (&_reals - getFirstCell()));
+
+  ParticleList &reals  = _reals.particles;
+  ParticleList &ghosts = _ghosts.particles;
+
+  for(ParticleList::iterator dst = reals.begin(), end = reals.end(), src = ghosts.begin();
+      dst != end; ++dst, ++src) {
+
+    LOG4ESPP_TRACE(logger, "for particle " << dst->p.id << ": adding force "
+		   << src->f.f[0] << " " << src->f.f[1] << " "<< src->f.f[2] << " to "
+		   << dst->f.f[0] << " " << dst->f.f[1] << " "<< dst->f.f[2]);
+
+    dst->f += src->f;
+  }
 }

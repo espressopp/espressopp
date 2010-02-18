@@ -50,8 +50,7 @@ struct Fixture {
     domdec = make_shared< DomainDecomposition >(system,
     						mpiWorld,
     						nodeGrid,
-    						cellGrid,
-    						true);
+    						cellGrid);
   }
 
   /// fill with initPPN particles per node
@@ -227,7 +226,7 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
 	  pos[i] = (0.5 + ipos[i])*cGrid.getCellSize(i);
 	}
 	
-	Particle *p = domdec->addParticle(c, pos);
+	Particle *p = domdec->addParticle(c++, pos);
 
 	p->p.type = 10000*ipos[0] + 100*ipos[1] + ipos[2];
 	BOOST_TEST_MESSAGE("generated particle with type " << p->p.type);
@@ -319,15 +318,15 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
       // see which how many ghosts should be there
       int ghostCnt = 0;
       for (int nx = -1; nx <= +1; ++nx) {
-	if (nx == -1 && ipos[0] != 0) continue;
+	if (nx == -1 && ipos[0] != cGrid.getInnerCellsBegin(0)) continue;
 	if (nx == +1 && ipos[0] != cGrid.getInnerCellsEnd(0) - 1) continue;
 
 	for (int ny = -1; ny <= +1; ++ny) {
-	  if (ny == -1 && ipos[1] != 0) continue;
+	  if (ny == -1 && ipos[1] != cGrid.getInnerCellsBegin(1)) continue;
 	  if (ny == +1 && ipos[1] != cGrid.getInnerCellsEnd(1) - 1) continue;
 	  
 	  for (int nz = -1; nz <= +1; ++nz) {
-	    if (nz == -1 && ipos[2] != 0) continue;
+	    if (nz == -1 && ipos[2] != cGrid.getInnerCellsBegin(2)) continue;
 	    if (nz == +1 && ipos[2] != cGrid.getInnerCellsEnd(2) - 1) continue;
 
 	    ghostCnt++;
@@ -353,7 +352,9 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
       if (dst > 1e-10) {
 	BOOST_TEST_MESSAGE("error at cell: " << ipos[0] << " " <<  ipos[1] << " " << ipos[2]
 			   << " on node " << nGrid.getNodePosition(0) << " "
-			   << nGrid.getNodePosition(1) << " " << nGrid.getNodePosition(2));
+			   << nGrid.getNodePosition(1) << " " << nGrid.getNodePosition(2)
+			   << " expect force " << force[0] << " " << force[1] << " " << force[2]
+			   << " got force " << pl[0].f.f[0] << " " << pl[0].f.f[1] << " " << pl[0].f.f[2]);
       }
     }
   }

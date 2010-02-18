@@ -437,7 +437,7 @@ namespace espresso {
 	 value. */
       for (int _coord = 0; _coord < 3; ++_coord) {
 	// inverted processing order for ghost force communication
-	int coord = realToGhosts ? _coord : 3 - _coord;
+	int coord = realToGhosts ? _coord : (2 - _coord);
 	real curCoordBoxL = system.lock()->bc->getBoxL(coord);
 
 	// lr loop: left right
