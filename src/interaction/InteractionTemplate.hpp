@@ -126,6 +126,7 @@ namespace espresso {
                p1.f.f[k] += force[k];
                p2.f.f[k] -= force[k];
              }
+#if 0
              printf("dist(%d,%d), dist = %f -> %f %f %f\n", p1.p.id, p2.p.id, distSqr, dist[0], dist[1], dist[2]);
              printf("force(%d,%d), dist = %f -> %f %f %f\n", p1.p.id, p2.p.id, distSqr, force[0], force[1], force[2]);
              if (p1.p.id == 0) {
@@ -134,6 +135,7 @@ namespace espresso {
              if (p2.p.id == 0) {
                 printf("sum sub force Particle 0 = %f %f %f\n", p2.f.f[0], p2.f.f[1], p2.f.f[0]);
              }
+#endif
           }
         }
       }

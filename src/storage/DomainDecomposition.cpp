@@ -77,7 +77,7 @@ namespace espresso {
 	nLocalCells *= cellGrid.getFrameGridSize(i);
       }
 
-      cells.resize(nLocalCells);
+      resizeCells(nLocalCells);
 
       realCells.reserve(nRealCells);
       ghostCells.reserve(nLocalCells - nRealCells);

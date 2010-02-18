@@ -7,13 +7,14 @@
 #include "esutil/RNG.hpp"
 #include "../DomainDecomposition.hpp"
 #include "System.hpp"
-#include "esutil/ESPPIterator.hpp"
+#include "iterator/CellListIterator.hpp"
 #include "bc/OrthorhombicBC.hpp"
 #include "Real3D.hpp"
 
 using namespace espresso;
-using namespace esutil;
-using namespace storage;
+using namespace espresso::esutil;
+using namespace espresso::storage;
+using namespace espresso::iterator;
 
 struct LoggingFixture {  
   LoggingFixture() { 
@@ -241,13 +242,13 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
   domdec->resortParticles();
 
   /* now check that each cell has one particle, and at the proper position */  
-  for(ESPPIterator<LocalCellList> it(domdec->getLocalCells()); it.isValid(); ++it) {
+  for(ESPPIterator<CellList> it(domdec->getLocalCells()); it.isValid(); ++it) {
     bool failed = true;
-    ParticleList &pl = it->particles;
+    ParticleList &pl = (*it)->particles;
     int cnt = pl.size();
     // map back cell to coordinates
     int ipos[3];
-    cGrid.mapIndexToPosition(ipos, &(*it) - domdec->getFirstCell());
+    cGrid.mapIndexToPosition(ipos, *it - domdec->getFirstCell());
 
     BOOST_CHECK_EQUAL(cnt, 1);
 

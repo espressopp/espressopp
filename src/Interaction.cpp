@@ -10,14 +10,14 @@ LOG4ESPP_LOGGER(Interaction::theLogger, "Interaction");
 
 double Interaction::computeStorageEnergy(shared_ptr<Storage> storage)
 {
-  std::vector<Cell>& localCells = storage->getLocalCells();
+  CellList &localCells = storage->getLocalCells();
 
   double e = 0.0;
 
   for (size_t c = 0; c < localCells.size(); c++) {
 
-    Cell* localCell = &localCells[c];
-
+    Cell* localCell = localCells[c];
+    
     ParticleList& list1 = localCell->particles;
 
     // Loop cell neighbors

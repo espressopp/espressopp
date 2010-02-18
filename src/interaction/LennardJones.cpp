@@ -46,12 +46,12 @@ void LennardJones::setParameters(int type1, int type2, real epsilon, real sigma,
     int maxtypes = std::max(type1+1, type2+1);
 
     if (maxtypes > ntypes + 1) {
-       printf("WARNING: number of types increased from %d to %d\n",
-                        ntypes, maxtypes);
+       //printf("WARNING: number of types increased from %d to %d\n",
+       //                 ntypes, maxtypes);
     }
 
     if (maxtypes > 1) {
-       printf("ERROR: currently not supported\n");
+       //printf("ERROR: currently not supported\n");
        exit(-1);
     }
  

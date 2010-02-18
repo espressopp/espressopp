@@ -50,10 +50,10 @@ void Langevin::thermalize()
 {
   LOG4ESPP_INFO(theLogger, "thermalize")
 
-  std::vector< Cell >& localCells = system.lock()->storage->getLocalCells();
+  CellList &localCells = system.lock()->storage->getLocalCells();
 
   for (size_t c = 0; c < localCells.size(); c++) {
-    Cell* localCell = &localCells[c];
+    Cell* localCell = localCells[c];
     for (size_t index = 0; index < localCell->particles.size(); index++) {
       Particle* particle  = &localCell->particles[index];
       frictionThermo(particle);

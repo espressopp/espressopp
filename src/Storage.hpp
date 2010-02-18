@@ -45,7 +45,7 @@ namespace espresso {
      */
     void fetchParticles(Storage &);
 
-    LocalCellList &getLocalCells()   { return cells; }
+    CellList &getLocalCells() { return localCells; }
     CellList &getRealCells()  { return realCells; }
     CellList &getGhostCells() { return ghostCells; }
 
@@ -155,6 +155,9 @@ namespace espresso {
     // update the id->local particle map for the given cell
     void updateLocalParticles(ParticleList &);
 
+    // reserve space for nCells cells
+    void resizeCells(longint nCells);
+
     // append a particle to a list, without updating localParticles
     Particle *appendUnindexedParticle(ParticleList &, Particle &);
     // append a particle to a list, updating localParticles
@@ -185,6 +188,8 @@ namespace espresso {
     CellList realCells;
     /** list of ghost cells */
     CellList ghostCells;
+    /** all cells on this CPU. Just an index of the cells */
+    CellList localCells;
 
     static LOG4ESPP_DECL_LOGGER(logger);
   };

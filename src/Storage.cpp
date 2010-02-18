@@ -53,6 +53,17 @@ void Storage::updateLocalParticles(ParticleList &l) {
   }
 }
 
+void Storage::resizeCells(longint nCells) {
+  cells.resize(nCells);
+  localCells.reserve(nCells);
+  for (LocalCellList::iterator
+	 it = cells.begin(),
+	 end = cells.end(); it != end; ++it) {
+    localCells.push_back(&(*it));
+  }
+}
+
+
 Particle *Storage::addParticle(longint id, const real p[3])
 {
   Cell *cell;

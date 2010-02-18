@@ -114,11 +114,12 @@ real VelocityVerlet::integrate1()
     for (size_t index = 0; index < localCell->particles.size(); index++) {
       Particle& pt  = localCell->particles[index];
       real sqDist = 0.0;
-
+#if 0
       printf("Particle %d, pos = %f %f %f, vel = %f %f %f, f = %f %f %f\n", 
               pt.p.id, pt.r.p[0], pt.r.p[1], pt.r.p[2], 
               pt.m.v[0], pt.m.v[1], pt.m.v[2],
               pt.f.f[0], pt.f.f[1], pt.f.f[2]);
+#endif
 
       for (int j = 0; j < 3; j++) {
         /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
@@ -150,10 +151,12 @@ void VelocityVerlet::integrate2()
     Cell* realCell = realCells[c];
     for (size_t index = 0; index < realCell->particles.size(); index++) {
       Particle& pt  = realCell->particles[index];
+#if 0
       printf("Particle %d, pos = %f %f %f, vel = %f %f %f, f = %f %f %f\n", 
               pt.p.id, pt.r.p[0], pt.r.p[1], pt.r.p[2], 
               pt.m.v[0], pt.m.v[1], pt.m.v[2],
               pt.f.f[0], pt.f.f[1], pt.f.f[2]);
+#endif
       for (int j = 0; j < 3; j++) {
         /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
         pt.m.v[j] += 0.5 * dt * pt.f.f[j];
@@ -214,10 +217,10 @@ void VelocityVerlet::initForces()
 {
   // forces are initialized for real + ghost particles
 
-  std::vector<Cell>& localCells = system.lock().get()->storage->getLocalCells();
+  CellList &localCells = system.lock().get()->storage->getLocalCells();
 
   for (size_t c = 0; c < localCells.size(); c++) {
-    Cell* localCell = &localCells[c];
+    Cell* localCell = localCells[c];
     for (size_t index = 0; index < localCell->particles.size(); index++) {
       Particle* particle  = &localCell->particles[index];
       for (int j = 0; j < 3; j++) {
