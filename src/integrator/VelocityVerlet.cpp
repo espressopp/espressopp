@@ -1,6 +1,7 @@
 #include "VelocityVerlet.hpp"
 
 #include "VerletList.hpp"
+#include "iterator/CellListIterator.hpp"
 #include "Interaction.hpp"
 #include "Langevin.hpp"
 #include "System.hpp"
@@ -8,6 +9,7 @@
 using namespace espresso;
 using namespace integrator;
 using namespace interaction;
+using namespace iterator;
 
 VelocityVerlet::VelocityVerlet(shared_ptr< System > system) : MDIntegrator(system)
 {
@@ -101,7 +103,7 @@ void VelocityVerlet::run(int nsteps)
 
 real VelocityVerlet::integrate1()
 {
-  std::vector<Cell*>& realCells = system.lock().get()->storage->getRealCells();
+  CellList realCells = system.lock().get()->storage->getRealCells();
 
   // loop over all particles of the local cells
 
@@ -109,29 +111,25 @@ real VelocityVerlet::integrate1()
 
   real maxSqDist = 0.0; // maximal square distance a particle moves
 
-  for (size_t c = 0; c < realCells.size(); c++) {
-    Cell* localCell = realCells[c];
-    for (size_t index = 0; index < localCell->particles.size(); index++) {
-      Particle& pt  = localCell->particles[index];
+  for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+
       real sqDist = 0.0;
-#if 0
+
       printf("Particle %d, pos = %f %f %f, vel = %f %f %f, f = %f %f %f\n", 
-              pt.p.id, pt.r.p[0], pt.r.p[1], pt.r.p[2], 
-              pt.m.v[0], pt.m.v[1], pt.m.v[2],
-              pt.f.f[0], pt.f.f[1], pt.f.f[2]);
-#endif
+              cit->p.id, cit->r.p[0], cit->r.p[1], cit->r.p[2], 
+              cit->m.v[0], cit->m.v[1], cit->m.v[2],
+              cit->f.f[0], cit->f.f[1], cit->f.f[2]);
 
       for (int j = 0; j < 3; j++) {
         /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
-        pt.m.v[j] += 0.5 * dt * pt.f.f[j];
+        cit->m.v[j] += 0.5 * dt * cit->f.f[j];
         /* Propagate positions (only NVT): p(t + dt)   = p(t) + dt * v(t+0.5*dt) */
-        real deltaP = dt * pt.m.v[j];
-        pt.r.p[j] += deltaP;
+        real deltaP = dt * cit->m.v[j];
+        cit->r.p[j] += deltaP;
         sqDist += deltaP * deltaP;
       }
       count++;
       maxSqDist = std::max(maxSqDist, sqDist);
-    }
   }
 
   LOG4ESPP_DEBUG(theLogger, "moved " << count << " particles in integrate1" <<
@@ -143,24 +141,19 @@ real VelocityVerlet::integrate1()
 
 void VelocityVerlet::integrate2()
 {
-  std::vector<Cell*>& realCells = system.lock().get()->storage->getRealCells();
+  CellList realCells = system.lock().get()->storage->getRealCells();
 
   // loop over all particles of the local cells
 
-  for (size_t c = 0; c < realCells.size(); c++) {
-    Cell* realCell = realCells[c];
-    for (size_t index = 0; index < realCell->particles.size(); index++) {
-      Particle& pt  = realCell->particles[index];
-#if 0
-      printf("Particle %d, pos = %f %f %f, vel = %f %f %f, f = %f %f %f\n", 
-              pt.p.id, pt.r.p[0], pt.r.p[1], pt.r.p[2], 
-              pt.m.v[0], pt.m.v[1], pt.m.v[2],
-              pt.f.f[0], pt.f.f[1], pt.f.f[2]);
-#endif
-      for (int j = 0; j < 3; j++) {
-        /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
-        pt.m.v[j] += 0.5 * dt * pt.f.f[j];
-      }
+  for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+
+    printf("Particle %d, pos = %f %f %f, vel = %f %f %f, f = %f %f %f\n", 
+            cit->p.id, cit->r.p[0], cit->r.p[1], cit->r.p[2], 
+            cit->m.v[0], cit->m.v[1], cit->m.v[2],
+            cit->f.f[0], cit->f.f[1], cit->f.f[2]);
+    for (int j = 0; j < 3; j++) {
+      /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
+      cit->m.v[j] += 0.5 * dt * cit->f.f[j];
     }
   }
 }
@@ -217,15 +210,21 @@ void VelocityVerlet::initForces()
 {
   // forces are initialized for real + ghost particles
 
-  CellList &localCells = system.lock().get()->storage->getLocalCells();
+  // ToDo: make one loop when getLocalCells() works
 
-  for (size_t c = 0; c < localCells.size(); c++) {
-    Cell* localCell = localCells[c];
-    for (size_t index = 0; index < localCell->particles.size(); index++) {
-      Particle* particle  = &localCell->particles[index];
-      for (int j = 0; j < 3; j++) {
-        particle->f.f[j] = 0.0;
-      }
+  CellList realCells = system.lock().get()->storage->getRealCells();
+
+  for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+    for (int j = 0; j < 3; j++) {
+      cit->f.f[j] = 0.0;
+    }
+  }
+
+  CellList ghostCells = system.lock().get()->storage->getGhostCells();
+
+  for(CellListIterator cit(ghostCells); !cit.isDone(); ++cit) {
+    for (int j = 0; j < 3; j++) {
+      cit->f.f[j] = 0.0;
     }
   }
 }
