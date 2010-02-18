@@ -21,9 +21,8 @@ const int Storage::dataOfUpdateGhosts = 0;
 const int Storage::dataOfExchangeGhosts = DATA_PROPERTIES;
 
 Storage::Storage(shared_ptr< System > _system,
-                 const boost::mpi::communicator &_comm,
-                 bool _useVList)
-  : comm(_comm), system(_system), useVList(_useVList)
+                 const boost::mpi::communicator &_comm)
+  : comm(_comm), system(_system)
 {
 }
 

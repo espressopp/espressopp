@@ -1,5 +1,6 @@
 #define LOG4ESPP_LEVEL_DEBUG
 #include <algorithm>
+#include <cmath>
 #include "log4espp.hpp"
 #include "System.hpp"
 
@@ -20,9 +21,8 @@ namespace espresso {
     DomainDecomposition::DomainDecomposition(shared_ptr< System > _system,
 					     const mpi::communicator &_comm,
 					     const int _nodeGrid[3],
-					     const int _cellGrid[3],
-					     bool _useVList)
-      : Storage(_system, _comm, _useVList), exchangeBufferSize(0) {
+					     const int _cellGrid[3])
+      : Storage(_system, _comm), exchangeBufferSize(0) {
       //  LOG4ESPP_INFO(logger, "node grid = "
       //		<< _nodeGrid[0] << "x" << _nodeGrid[1] << "x" << _nodeGrid[2]
       //		<< " cell grid = "
@@ -234,11 +234,15 @@ namespace espresso {
 		  Cell *sortCell = mapPositionToCellChecked(part.r.p);
 		  if (sortCell != &cell) {
 		    if (sortCell == 0) {
-		      LOG4ESPP_TRACE(logger, "take another loop: particle " << part.p.id
+		      LOG4ESPP_DEBUG(logger, "take another loop: particle " << part.p.id
 				     << " @ " << part.r.p[0] << ", " << part.r.p[1] << ", "
 				     << part.r.p[2] << " is not inside node domain after neighbor exchange");
-		      // particle stays where it is, and will be sorted in the next round
-		      finished = 0;
+		      if (isnan(part.r.p[0]) || isnan(part.r.p[1]) || isnan(part.r.p[2])) {
+			LOG4ESPP_ERROR(logger, "particle " << part.p.id << " has moved to outer space (one or more coordinates are nan)");
+		      } else {
+			// particle stays where it is, and will be sorted in the next round
+			finished = 0;
+		      }
 		    } else {
 		      moveIndexedParticle(sortCell->particles, cell.particles, p);
 		      --p;
@@ -287,11 +291,15 @@ namespace espresso {
 
 		  if (sortCell != &cell) {
 		    if (sortCell == 0) {
-		      LOG4ESPP_TRACE(logger, "take another loop: particle " << part.p.id
+		      LOG4ESPP_DEBUG(logger, "take another loop: particle " << part.p.id
 				     << " @ " << part.r.p[0] << ", " << part.r.p[1] << ", "
 				     << part.r.p[2] << " is not inside node domain after neighbor exchange");
-		      // particle stays where it is, and will be sorted in the next round
-		      finished = 0;
+		      if (isnan(part.r.p[0]) || isnan(part.r.p[1]) || isnan(part.r.p[2])) {
+			LOG4ESPP_ERROR(logger, "particle " << part.p.id << " has moved to outer space (one or more coordinates are nan)");
+		      } else {
+			// particle stays where it is, and will be sorted in the next round
+			finished = 0;
+		      }
 		    } else {
 		      moveIndexedParticle(sortCell->particles, cell.particles, p);
 		      --p;
@@ -427,7 +435,9 @@ namespace espresso {
 	 Here we could in principle build in a one sided ghost
 	 communication, simply by taking the lr loop only over one
 	 value. */
-      for (int coord = 0; coord < 3; ++coord) {
+      for (int _coord = 0; _coord < 3; ++_coord) {
+	// inverted processing order for ghost force communication
+	int coord = realToGhosts ? _coord : 3 - _coord;
 	real curCoordBoxL = system.lock()->bc->getBoxL(coord);
 
 	// lr loop: left right

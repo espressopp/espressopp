@@ -78,8 +78,7 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
     BOOST_CHECK_THROW(DomainDecomposition(system,
 					  mpiWorld,
 					  nodeGrid,
-					  cellGrid,
-					  true),
+					  cellGrid),
 		      NodeGridIllegal);
   }
 
@@ -90,8 +89,7 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
     BOOST_CHECK_THROW(DomainDecomposition(system,
 					  mpiWorld,
 					  nodeGrid,
-					  cellGrid,
-					  true),
+					  cellGrid),
 		      CellGridIllegal);
   }
 
@@ -101,8 +99,7 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
     BOOST_CHECK_THROW(DomainDecomposition(system,
 					  mpiWorld,
 					  nodeGrid,
-					  cellGrid,
-					  true),
+					  cellGrid),
 		      NodeGridMismatch);
   }
 
@@ -111,8 +108,7 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
   DomainDecomposition domdec(system,
 			     mpiWorld,
 			     nodeGrid,
-			     cellGrid,
-			     true);
+			     cellGrid);
 
   const CellGrid &cGrid = domdec.getCellGrid();
 
@@ -142,7 +138,7 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
   }
 }
 
-BOOST_FIXTURE_TEST_CASE(cellNeighbors, Fixture) 
+BOOST_FIXTURE_TEST_CASE(cellNeighbors, Fixture)
 {
   {
     // minimal test: inner cells have 26 neighbors
@@ -181,8 +177,7 @@ BOOST_FIXTURE_TEST_CASE(fetchParticles, Fixture)
   DomainDecomposition domdec2(system,
                               mpiWorld,
                               nodeGrid,
-                              cellGrid,
-                              true);
+                              cellGrid);
   domdec2.fetchParticles(*domdec);
 
   BOOST_CHECK_EQUAL(domdec2.getNRealParticles(), ppn);
@@ -233,13 +228,18 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
 	}
 	
 	Particle *p = domdec->addParticle(c, pos);
+
 	p->p.type = 10000*ipos[0] + 100*ipos[1] + ipos[2];
 	BOOST_TEST_MESSAGE("generated particle with type " << p->p.type);
       }
     }
   }
 
+  BOOST_TEST_MESSAGE("resort particles");
+
   domdec->resortParticles();
+
+  BOOST_TEST_MESSAGE("done with resort particles");
 
   /* now check that each cell has one particle, and at the proper position */  
   for(ESPPIterator<CellList> it(domdec->getLocalCells()); it.isValid(); ++it) {
@@ -271,6 +271,11 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
 	  ip -= totalCells[i];
 	}
 	origcpos[i] = ip;
+
+	/* for the force test, set force according to original's
+	   absolute position that means that the forces on any ghost
+	   should always be the same as for its real particle. */
+	pl[0].f.f[i] = origcpos[i];
       }
       size_t type = 10000*origcpos[0] + 100*origcpos[1] + origcpos[2];
       BOOST_CHECK_EQUAL(pl[0].p.type, type);
@@ -297,4 +302,61 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
 			 << nGrid.getNodePosition(1) << " " << nGrid.getNodePosition(2));
     }
   }
+
+  BOOST_TEST_MESSAGE("collect ghost forces");
+
+  domdec->collectGhostForces();
+
+  /* now check that the forces on the particles are correct */  
+  for(ESPPIterator<CellList> it(domdec->getRealCells()); it.isValid(); ++it) {
+    ParticleList &pl = (*it)->particles;
+    int cnt = pl.size();
+    // map back cell to coordinates
+    int ipos[3];
+    cGrid.mapIndexToPosition(ipos, *it - domdec->getFirstCell());
+
+    if (cnt == 1) {
+      // see which how many ghosts should be there
+      int ghostCnt = 0;
+      for (int nx = -1; nx <= +1; ++nx) {
+	if (nx == -1 && ipos[0] != 0) continue;
+	if (nx == +1 && ipos[0] != cGrid.getInnerCellsEnd(0) - 1) continue;
+
+	for (int ny = -1; ny <= +1; ++ny) {
+	  if (ny == -1 && ipos[1] != 0) continue;
+	  if (ny == +1 && ipos[1] != cGrid.getInnerCellsEnd(1) - 1) continue;
+	  
+	  for (int nz = -1; nz <= +1; ++nz) {
+	    if (nz == -1 && ipos[2] != 0) continue;
+	    if (nz == +1 && ipos[2] != cGrid.getInnerCellsEnd(2) - 1) continue;
+
+	    ghostCnt++;
+	  }
+	}
+      }
+      BOOST_TEST_MESSAGE("expect " << ghostCnt << " ghosts for particle at "
+			 << ipos[0] << " " <<  ipos[1] << " " << ipos[2]);
+      
+      // calculate expected force from absolute cell location
+      real force[3];
+      for (int i = 0; i < 3; ++i) {
+	real ap = ipos[i] - cGrid.getFrameWidth() + nGrid.getNodePosition(i)*nGrid.getGridSize(i);
+	force[i] = ap*ghostCnt;
+      }
+      
+      real dst = 0;
+      for (int i = 0; i < 3; ++i) {
+	real dd = force[i] - pl[0].f.f[i];
+	dst += dd*dd;
+      }
+      BOOST_CHECK_SMALL(dst, 1e-10);
+      if (dst > 1e-10) {
+	BOOST_TEST_MESSAGE("error at cell: " << ipos[0] << " " <<  ipos[1] << " " << ipos[2]
+			   << " on node " << nGrid.getNodePosition(0) << " "
+			   << nGrid.getNodePosition(1) << " " << nGrid.getNodePosition(2));
+      }
+    }
+  }
+
+  BOOST_TEST_MESSAGE("done with collect ghost forces");
 }

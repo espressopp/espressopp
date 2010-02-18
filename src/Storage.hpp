@@ -16,8 +16,7 @@ namespace espresso {
     typedef boost::unordered_map< longint, Particle * > IdParticleMap;
 
     Storage(shared_ptr< class System > _system,
-	    const boost::mpi::communicator &,
-	    bool useVList);
+	    const boost::mpi::communicator &);
     virtual ~Storage();
 
     /** add a particle with given id and position. Note that this is a
@@ -172,15 +171,6 @@ namespace espresso {
     mpi::communicator comm;
     weak_ptr< class System > system;
   
-    /** flag for using Verlet List. */
-    int useVList;
-
-    /** Verlet radius including skin */
-    real maxRange;
-
-    /** Verlet skin */
-    real skin;
-
     /** here the local particles are actually stored */
     LocalCellList cells;
 

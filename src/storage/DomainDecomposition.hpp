@@ -17,8 +17,7 @@ namespace espresso {
       DomainDecomposition(shared_ptr< System >,
 			  const boost::mpi::communicator &,
 			  const int nodeGrid[3],
-			  const int cellGrid[3],
-			  bool useVList);
+			  const int cellGrid[3]);
 
       virtual ~DomainDecomposition() {}
 
@@ -28,11 +27,13 @@ namespace espresso {
       const NodeGrid &getNodeGrid() const { return nodeGrid; }
       const CellGrid &getCellGrid() const { return cellGrid; }
 
+    public:
+      virtual void updateGhosts();
+      virtual void collectGhostForces();
+
     protected:
       virtual void resortRealParticles();
       virtual void exchangeGhosts();
-      virtual void updateGhosts();
-      virtual void collectGhostForces();
 
       void doGhostCommunication(bool sizesFirst,
 				bool realToGhosts,
