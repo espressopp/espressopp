@@ -24,9 +24,9 @@ struct LoggingFixture {
   LoggingFixture() { 
     LOG4ESPP_CONFIGURE();
     log4espp::Logger::getRoot().setLevel(log4espp::Logger::WARN);
-    log4espp::Logger::getInstance("VerletList").setLevel(log4espp::Logger::WARN);
-    log4espp::Logger::getInstance("Storage").setLevel(log4espp::Logger::DEBUG);
-    log4espp::Logger::getInstance("MDIntegrator").setLevel(log4espp::Logger::DEBUG);
+    // log4espp::Logger::getInstance("VerletList").setLevel(log4espp::Logger::WARN);
+    // log4espp::Logger::getInstance("Storage").setLevel(log4espp::Logger::DEBUG);
+    // log4espp::Logger::getInstance("MDIntegrator").setLevel(log4espp::Logger::DEBUG);
   }
 };
 
@@ -66,8 +66,7 @@ struct Fixture {
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,
                                                 nodeGrid,
-                                                cellGrid,
-                                                true);
+                                                cellGrid);
     esutil::RNG rng;
 
     int id = 0;
@@ -101,31 +100,26 @@ struct Fixture {
 
 BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 {
-  BOOST_MESSAGE("starting to build verlet lists");
-
-  shared_ptr< VerletList> vl = make_shared< VerletList >(system, cutoff);
-
-  VerletList::PairList pairs = vl->getPairs();
-
-  printf("cutofff = 1.0: # of verlet list pairs = %d\n", pairs.size());
-
-  for (size_t i = 0; i < pairs.size(); i++) {
-    Particle *p1 = pairs[i].first;
-    Particle *p2 = pairs[i].second;
-    printf("pair %d = %lld %lld\n", i, p1->p.id, p2->p.id);
-  }
+  BOOST_MESSAGE("define LJ potential");
 
   // define a potential
 
   shared_ptr<LennardJones> lj = make_shared<LennardJones>();
   lj->setParameters(0, 0, 1.0, 1.0, cutoff);
-  // lj->enableShift(0, 0);
+
+  lj->enableShift(0, 0);
   system->shortRangeInteractions.push_back(lj);
+
+  BOOST_MESSAGE("define Velocity Verlet integrator");
 
   shared_ptr<MDIntegrator> integrator = 
      make_shared<VelocityVerlet>(system);
 
   integrator->setTimeStep(0.005);
 
-  integrator->run(1);
+  BOOST_MESSAGE("run 1000 iterations with timestep 0.005");
+
+  integrator->run(1000);
+
+  BOOST_MESSAGE("ready");
 }

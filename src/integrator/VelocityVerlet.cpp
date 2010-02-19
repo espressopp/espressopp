@@ -18,6 +18,8 @@ VelocityVerlet::VelocityVerlet(shared_ptr< System > system) : MDIntegrator(syste
   resortFlag = true;
 }
 
+/*****************************************************************************/
+
 VelocityVerlet::~VelocityVerlet()
 {
   LOG4ESPP_INFO(theLogger, "free VelocityVerlet");
@@ -27,6 +29,7 @@ VelocityVerlet::~VelocityVerlet()
 
 void VelocityVerlet::setLangevin(shared_ptr<Langevin> _langevin)
 {
+  LOG4ESPP_INFO(theLogger, "set Langevin thermostat");
   langevin = _langevin;
 }
 
@@ -34,7 +37,6 @@ void VelocityVerlet::setLangevin(shared_ptr<Langevin> _langevin)
 
 void VelocityVerlet::run(int nsteps)
 {
-
   System* pSystem = system.lock().get();
 
   if (langevin) langevin->init(dt);
@@ -43,19 +45,22 @@ void VelocityVerlet::run(int nsteps)
 
   // Before start make sure that particles are on the right processor
 
-  real maxSqDist;
+  real maxDist;
 
   if (resortFlag) {
-     LOG4ESPP_INFO(theLogger, "resort particles + rebuild VL");
+     LOG4ESPP_INFO(theLogger, "resort particles");
      pSystem->storage->resortParticles();
+     LOG4ESPP_INFO(theLogger, "particles rosort, build VL");
      vl = make_shared<VerletList>(system.lock(), maxCut + pSystem->skin);
-     maxSqDist = 0.0;
+     maxDist = 0.0;
      resortFlag = false;
   }
 
   bool recalcForces = true;  // TODO: more intelligent
 
   if (recalcForces) {
+
+     LOG4ESPP_INFO(theLogger, "recalc Forces");
 
      if (langevin) langevin->heatUp();
 
@@ -69,23 +74,23 @@ void VelocityVerlet::run(int nsteps)
 
   LOG4ESPP_INFO(theLogger, "run " << nsteps << " iterations");
   
-  real skinHalfSq = 0.25 * (pSystem->skin * pSystem->skin);
+  real skinHalf = 0.5 * pSystem->skin;
 
   for (int i = 0; i < nsteps; i++) {
 
     LOG4ESPP_INFO(theLogger, "step " << i << " of " << nsteps << " iterations");
 
-    maxSqDist += integrate1();
+    maxDist += integrate1();
 
-    LOG4ESPP_INFO(theLogger, "maxSqDist = " << maxSqDist);
+    LOG4ESPP_INFO(theLogger, "maxDist = " << maxDist);
 
-    if (maxSqDist > skinHalfSq) resortFlag = true;
+    if (maxDist > skinHalf) resortFlag = true;
 
     if (resortFlag) {
       LOG4ESPP_INFO(theLogger, "resort particles + rebuild VL");
       pSystem->storage->resortParticles();
       vl = make_shared<VerletList>(system.lock(), maxCut + pSystem->skin);
-      maxSqDist  = 0.0;
+      maxDist  = 0.0;
       resortFlag = false;
     }
 
@@ -113,28 +118,34 @@ real VelocityVerlet::integrate1()
 
   for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
-      real sqDist = 0.0;
+    real sqDist = 0.0;
 
-      printf("Particle %d, pos = %f %f %f, vel = %f %f %f, f = %f %f %f\n", 
-              cit->p.id, cit->r.p[0], cit->r.p[1], cit->r.p[2], 
-              cit->m.v[0], cit->m.v[1], cit->m.v[2],
-              cit->f.f[0], cit->f.f[1], cit->f.f[2]);
+    /*
+    printf("Particle %d, pos = %f %f %f, vel = %f %f %f, f = %f %f %f\n", 
+            cit->p.id, cit->r.p[0], cit->r.p[1], cit->r.p[2], 
+            cit->m.v[0], cit->m.v[1], cit->m.v[2],
+            cit->f.f[0], cit->f.f[1], cit->f.f[2]);
+    */
 
-      for (int j = 0; j < 3; j++) {
-        /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
-        cit->m.v[j] += 0.5 * dt * cit->f.f[j];
-        /* Propagate positions (only NVT): p(t + dt)   = p(t) + dt * v(t+0.5*dt) */
-        real deltaP = dt * cit->m.v[j];
-        cit->r.p[j] += deltaP;
-        sqDist += deltaP * deltaP;
-      }
-      count++;
-      maxSqDist = std::max(maxSqDist, sqDist);
+    for (int j = 0; j < 3; j++) {
+      /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
+      cit->m.v[j] += 0.5 * dt * cit->f.f[j];
+      /* Propagate positions (only NVT): p(t + dt)   = p(t) + dt * v(t+0.5*dt) */
+      real deltaP = dt * cit->m.v[j];
+      cit->r.p[j] += deltaP;
+      sqDist += deltaP * deltaP;
+    }
+    count++;
+    maxSqDist = std::max(maxSqDist, sqDist);
+ 
   }
 
-  LOG4ESPP_DEBUG(theLogger, "moved " << count << " particles in integrate1" <<
+  // ToDo: here or outside: mpi->sum 
+
+  LOG4ESPP_INFO(theLogger, "moved " << count << " particles in integrate1" <<
                             ", max sqr move = " << maxSqDist);
-  return maxSqDist;
+
+  return sqrt(maxSqDist);
 }
 
 /*****************************************************************************/
@@ -147,10 +158,13 @@ void VelocityVerlet::integrate2()
 
   for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
+    /*
     printf("Particle %d, pos = %f %f %f, vel = %f %f %f, f = %f %f %f\n", 
             cit->p.id, cit->r.p[0], cit->r.p[1], cit->r.p[2], 
             cit->m.v[0], cit->m.v[1], cit->m.v[2],
             cit->f.f[0], cit->f.f[1], cit->f.f[2]);
+    */
+
     for (int j = 0; j < 3; j++) {
       /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
       cit->m.v[j] += 0.5 * dt * cit->f.f[j];
@@ -196,12 +210,12 @@ void VelocityVerlet::calcForces()
 
      srIL[i]->addVerletListForces(vl);
 
-     energy += srIL[i]->computeVerletListEnergy(vl);
+     // energy += srIL[i]->computeVerletListEnergy(vl);
   }
 
   // Just for control now: compute + print energy
 
-  LOG4ESPP_INFO(theLogger, "energy  = " << energy);
+  // LOG4ESPP_INFO(theLogger, "energy  = " << energy);
 }
 
 /*****************************************************************************/
@@ -213,6 +227,8 @@ void VelocityVerlet::initForces()
   // ToDo: make one loop when getLocalCells() works
 
   CellList realCells = system.lock().get()->storage->getRealCells();
+
+  LOG4ESPP_INFO(theLogger, "init forces for real + ghost particles");
 
   for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
     for (int j = 0; j < 3; j++) {

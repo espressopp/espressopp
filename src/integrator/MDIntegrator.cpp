@@ -11,6 +11,9 @@ MDIntegrator::MDIntegrator(shared_ptr<System> _system)
 {
   system = _system;
   LOG4ESPP_INFO(theLogger, "construct Integrator");
+  if (!_system->storage) {
+    LOG4ESPP_ERROR(theLogger, "system has no storage");
+  }
 }
 
 MDIntegrator::~MDIntegrator()
