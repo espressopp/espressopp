@@ -5,7 +5,6 @@
 #include "log4espp.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "iterator/NeighborCellListIterator.hpp"
-#include <cassert>
 
 namespace espresso {
   namespace iterator {
@@ -43,7 +42,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     // INLINE IMPLEMENTATION
     LOG4ESPP_LOGGER(CellListAllPairsIterator::theLogger, 
-			   "CellListAllPairsIterator");
+		    "CellListAllPairsIterator");
 
     inline 
     CellListAllPairsIterator::
