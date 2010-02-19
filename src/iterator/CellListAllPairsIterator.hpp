@@ -2,8 +2,10 @@
 #define _ITERATOR_CELLLISTALLPAIRSITERATOR_HPP
 
 #include "Cell.hpp"
+#include "log4espp.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "iterator/NeighborCellListIterator.hpp"
+#include <cassert>
 
 namespace espresso {
   namespace iterator {
@@ -21,13 +23,28 @@ namespace espresso {
       const ParticlePair *operator->() const;
       
     private:
+      static LOG4ESPP_DECL_LOGGER(theLogger);
+
       ParticlePair current;
-      CellListIterator clit;
-      NeighborCellListIterator nclit;
+
+      bool inSelfLoop;
+
+      // current cell
+      CellList::Iterator cit;
+      // current particle
+      ParticleList::Iterator pit;
+
+      // current neighbor cell
+      NeighborCellList::Iterator ncit;
+      // current neighbor particle
+      ParticleList::Iterator npit;
     };
 
     //////////////////////////////////////////////////
     // INLINE IMPLEMENTATION
+    LOG4ESPP_LOGGER(CellListAllPairsIterator::theLogger, 
+			   "CellListAllPairsIterator");
+
     inline 
     CellListAllPairsIterator::
     CellListAllPairsIterator() 
@@ -35,38 +52,76 @@ namespace espresso {
 
     inline 
     CellListAllPairsIterator::
-    CellListAllPairsIterator(CellList &cl)
-      : clit(cl), nclit() {
-      if (clit.isDone()) return;
-      nclit = NeighborCellListIterator
-	(clit.getCurrentCell().neighborCells(), true);
-      while (nclit.isDone()) {
-	++clit;
-	if (clit.isDone()) return;
+    CellListAllPairsIterator(CellList &cl) {
+      cit = CellList::Iterator(cl);
+      if (cit.isDone()) return;
+      inSelfLoop = true;
+      pit = ParticleList::Iterator((*cit)->particles);
+      while (pit.isDone()) {
+	++cit;
+	if (cit.isDone()) return;
+	pit = ParticleList::Iterator((*cit)->particles);
       }
-      current.first = &*clit;
-      current.seconds = &*nclit;
-    }
       
+      npit = pit; 
+      this->operator++();
+    }
+
     inline CellListAllPairsIterator &
     CellListAllPairsIterator::
     operator++() {
-      ++nclit;
-      while (nclit.isDone()) {
-	++clit;
-	if (clit.isDone()) return *this;
-	nclit = NeighborCellListIterator
-	  (clit.getCurrentCell().neighborCells(), true);
+      ++npit;
+      while (npit.isDone()) {
+	++pit;
+	while (pit.isDone()) {
+	  if (inSelfLoop) {
+	    LOG4ESPP_TRACE(theLogger, "pit.isDone(), inSelfLoop, starting neighbor loop");
+	    inSelfLoop = false;
+	    ncit = NeighborCellList::Iterator((*cit)->neighborCells);
+	  } else {
+	    LOG4ESPP_TRACE(theLogger, "pit.isDone(), !inSelfLoop, continuing neighbor loop");
+	    ++ncit;
+	  }
+
+	  while (ncit.isValid() && ncit->useForAllPairs)
+	    ++ncit;
+
+	  if (ncit.isDone()) {
+	    LOG4ESPP_TRACE(theLogger, "ncit.isDone(), go to next cell");
+	    ++cit;
+	    if (cit.isDone()) {
+	      LOG4ESPP_TRACE(theLogger, "cit.isDone(), LOOP FINISHED");
+	      return *this;
+	    }
+	    inSelfLoop = true;
+	  }
+	  //assert(inSelfLoop || ncit.isValid());
+	  pit = ParticleList::Iterator((*cit)->particles);
+	}
+	//assert(pit.isValid());
+
+	if (inSelfLoop) {
+	  npit = pit;
+	  ++npit;
+	} else {
+	  npit = ParticleList::Iterator(ncit->cell->particles);
+	}
       }
-      current.first = &*clit;
-      current.seconds = &*nclit;
+
+      current.first = &*pit;
+      current.second = &*npit;
+
+      LOG4ESPP_TRACE(theLogger, 
+		     "current pair: (" << current.first->p.id <<
+		     ", " << current.second->p.id << ")"
+		     );
       return *this;
     }
-      
+
     inline bool 
     CellListAllPairsIterator::
     isValid() const 
-    { return clit.isValid(); }
+    { return cit.isValid(); }
 
     inline bool 
     CellListAllPairsIterator::
@@ -83,41 +138,33 @@ namespace espresso {
     operator->() const 
     { return &(**this); }
 
-// void loop(CellList &cl) {
-//   // loop over the cell list
-//   for (esutil::ESPPIterator< CellList > cit(cl);
-//        !cit.isDone(); ++cit) {
-//     // loop over the particles in the current cell
-//     for (esutil::ESPPIterator< ParticleList > pit((*cit)->particles);
-// 	 !pit.isDone(); ++pit) {
-//       // loop over the neighbor cells
-//       for (esutil::ESPPIterator< CellList > ncit((*cit)->neighborCells);
-// 	   !ncit.isDone(); ++cit) {
-// 	// compare cell ids
-// 	if ((*ncit)->id < (*cit)->id) {
-// 	  // do full loop over all particle pairs
-// 	  for (esutil::ESPPIterator< ParticleList > npit((*ncit)->particles);
-// 	       !npit.isDone(); ++npit) {
-// 	    // use *pit, *npit
-// 	  }
-// 	} else if ((*ncit)->id == (*cit)->id) {
-// 	  // this and neighbor cell are identical
-// 	  // do half loop over all particles
-// 	  esutil::ESPPIterator< ParticleList > npit(pit);
-// 	  if (!npit.isDone()) {
-// 	    ++npit;
-// 	    for (; !npit.isDone(); ++npit) {
-	      
-// 	    }
-// 	  }
-// 	}
-//       }
-//     }
-//   }
-// }
-
   }
 }
 
+    // foreach(CellList &cl) {
+    //   // loop over all cells
+    //   for (cit = CellList::Iterator(cl); cit.isValid(); ++cit) {
+    // 	// loop over pairs of particles where both particles are in
+    // 	// the local cell
+    // 	for (pit = ParticleList::Iterator(*cit); pit.isValid(); ++pit) {
+    // 	  // loop over particles in the cell itself
+    // 	  npit = pit; 
+    // 	  ++npit;
+    // 	  for (; npit.isValid(); ++npit)
+    // 	    yield(*pit, *npit);
+    // 	}
+
+    // 	// now loop over pairs of particles in the cell that involve
+    // 	// neighbor cells
+    // 	for (ncit = NeighborCellList::Iterator(cit->neighborCells);
+    // 	     ncit.isValid(); ++ncit) {
+    // 	  if (ncit->useForAllPairs)
+    // 	    for (pit = ParticleList::Iterator(*cit); pit.isValid(); ++pit)
+    // 	      for (npit = ParticleList::Iterator(ncit->cell->particles); 
+    // 		   npit.isValid(); ++npit)
+    // 		yield(*pit, *npit);
+    // 	}
+    //   }
+    // }
 
 #endif
