@@ -2,6 +2,7 @@ nobase_pkginclude_HEADERS += \
 	esutil/Collectives.hpp \
 	esutil/Timer.hpp \
         esutil/Logger.hpp \
+        esutil/Error.hpp \
 	esutil/RNG.hpp \
 	esutil/NormalVariate.hpp \
 	esutil/UniformOnSphere.hpp \
@@ -12,6 +13,7 @@ libespresso_common_la_SOURCES += \
 	esutil/Collectives.cpp \
 	esutil/Timer.cpp \
 	esutil/RNG.cpp \
+	esutil/Error.cpp \
 	esutil/NormalVariate.cpp \
 	esutil/UniformOnSphere.cpp \
 	esutil/bindings.cpp
