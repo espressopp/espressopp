@@ -7,12 +7,14 @@
 #include "esutil/RNG.hpp"
 #include "storage/DomainDecomposition.hpp"
 #include "interaction/LennardJones.hpp"
+#include "bc/OrthorhombicBC.hpp"
 #include "System.hpp"
 #include "VerletList.hpp"
 
 using namespace espresso;
 using namespace interaction;
 using namespace esutil;
+using namespace storage;
 
 struct LoggingFixture {  
   LoggingFixture() { 
@@ -32,12 +34,11 @@ struct Fixture {
     int nodeGrid[3] = { 1, 1, 1 };
     int cellGrid[3] = { 3, 3, 3 };
     system = make_shared< System >();
-    system->setBoxL(boxL);
+    system->bc = make_shared< bc::OrthorhombicBC >(system, boxL);
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,
                                                 nodeGrid,
-                                                cellGrid,
-                                                true);
+                                                cellGrid);
     int initPPN = 10;
     esutil::RNG rng;
     boost::mpi::communicator comm;
