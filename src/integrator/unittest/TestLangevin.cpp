@@ -44,8 +44,7 @@ struct Fixture {
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,
                                                 nodeGrid,
-                                                cellGrid,
-                                                true);
+                                                cellGrid);
     int initPPN = 10;
     esutil::RNG rng;
     boost::mpi::communicator comm;
