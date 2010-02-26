@@ -120,12 +120,13 @@ real VelocityVerlet::integrate1()
 
     real sqDist = 0.0;
 
-    /*
-    printf("Particle %d, pos = %f %f %f, vel = %f %f %f, f = %f %f %f\n", 
-            cit->p.id, cit->r.p[0], cit->r.p[1], cit->r.p[2], 
-            cit->m.v[0], cit->m.v[1], cit->m.v[2],
-            cit->f.f[0], cit->f.f[1], cit->f.f[2]);
-    */
+    LOG4ESPP_DEBUG(theLogger, "Particle " << cit->p.id << 
+             ", pos = " << cit->r.p[0] << " " 
+                        << cit->r.p[1] << " " <<  cit->r.p[2] <<
+             ", v = " << cit->m.v[0] << " " 
+                      << cit->m.v[1] << " " <<  cit->m.v[2] <<
+             ", f = " << cit->f.f[0] << " " 
+                      << cit->f.f[1] << " " <<  cit->f.f[2]);
 
     for (int j = 0; j < 3; j++) {
       /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
@@ -140,7 +141,7 @@ real VelocityVerlet::integrate1()
  
   }
 
-  // ToDo: here or outside: mpi->sum 
+  // ToDo: here or outside: mpi::all_reduce(maxval)
 
   LOG4ESPP_INFO(theLogger, "moved " << count << " particles in integrate1" <<
                             ", max sqr move = " << maxSqDist);
@@ -158,14 +159,8 @@ void VelocityVerlet::integrate2()
 
   for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
-    /*
-    printf("Particle %d, pos = %f %f %f, vel = %f %f %f, f = %f %f %f\n", 
-            cit->p.id, cit->r.p[0], cit->r.p[1], cit->r.p[2], 
-            cit->m.v[0], cit->m.v[1], cit->m.v[2],
-            cit->f.f[0], cit->f.f[1], cit->f.f[2]);
-    */
-
     for (int j = 0; j < 3; j++) {
+
       /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
       cit->m.v[j] += 0.5 * dt * cit->f.f[j];
     }
@@ -226,19 +221,11 @@ void VelocityVerlet::initForces()
 
   // ToDo: make one loop when getLocalCells() works
 
-  CellList realCells = system.lock().get()->storage->getRealCells();
+  CellList localCells = system.lock().get()->storage->getLocalCells();
 
   LOG4ESPP_INFO(theLogger, "init forces for real + ghost particles");
 
-  for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-    for (int j = 0; j < 3; j++) {
-      cit->f.f[j] = 0.0;
-    }
-  }
-
-  CellList ghostCells = system.lock().get()->storage->getGhostCells();
-
-  for(CellListIterator cit(ghostCells); !cit.isDone(); ++cit) {
+  for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
     for (int j = 0; j < 3; j++) {
       cit->f.f[j] = 0.0;
     }
