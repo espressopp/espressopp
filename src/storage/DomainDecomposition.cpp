@@ -12,6 +12,9 @@ using namespace boost;
 
 namespace espresso { 
   namespace storage {
+
+    const int DD_COMM_TAG = 0xab;
+
     LOG4ESPP_LOGGER(DomainDecomposition::logger, "DomainDecomposition");
 
     NodeGridMismatch::NodeGridMismatch()
@@ -23,10 +26,10 @@ namespace espresso {
 					     const int _nodeGrid[3],
 					     const int _cellGrid[3])
       : Storage(_system, _comm), exchangeBufferSize(0) {
-      //  LOG4ESPP_INFO(logger, "node grid = "
-      //		<< _nodeGrid[0] << "x" << _nodeGrid[1] << "x" << _nodeGrid[2]
-      //		<< " cell grid = "
-      //		<< _cellGrid[0] << "x" << _cellGrid[1] << "x" << _cellGrid[2]);
+      LOG4ESPP_INFO(logger, "node grid = "
+		    << _nodeGrid[0] << "x" << _nodeGrid[1] << "x" << _nodeGrid[2]
+		    << " cell grid = "
+		    << _cellGrid[0] << "x" << _cellGrid[1] << "x" << _cellGrid[2]);
 
       createCellGrid(_nodeGrid, _cellGrid);
       initCellInteractions();
@@ -53,7 +56,7 @@ namespace espresso {
       LOG4ESPP_DEBUG(logger, "my neighbors: "
 		     << nodeGrid.getNodeNeighbor(0) << "<->"
 		     << nodeGrid.getNodeNeighbor(1) << ", "
-		     << nodeGrid.getNodeNeighbor(2) << "<-> "
+		     << nodeGrid.getNodeNeighbor(2) << "<->"
 		     << nodeGrid.getNodeNeighbor(3) << ", "
 		     << nodeGrid.getNodeNeighbor(4) << "<->"
 		     << nodeGrid.getNodeNeighbor(5));
@@ -381,7 +384,7 @@ namespace espresso {
 	int leftBoundary[3], rightBoundary[3];
 	/* boundaries perpendicular directions are the same for left/right send.
 	   We also send the ghost frame that we have already, so the data amount
-	   increase with each cycles.
+	   increase with each cycle.
 
 	   For a direction that was done already, i.e. is smaller than dir,
 	   we take the full ghost frame, otherwise only the inner frame.
@@ -430,19 +433,30 @@ namespace espresso {
 
     void DomainDecomposition::doGhostCommunication(bool sizesFirst,
 						   bool realToGhosts,
-						   int extraElements) {
+						   int extradata) {
+      LOG4ESPP_DEBUG(logger, "do ghost communication " << (sizesFirst ? "with sizes " : "") << (realToGhosts ? "reals to ghosts " : "ghosts to reals ") << extradata);
+      
       /* direction loop: x, y, z.
 	 Here we could in principle build in a one sided ghost
 	 communication, simply by taking the lr loop only over one
 	 value. */
       for (int _coord = 0; _coord < 3; ++_coord) {
-	// inverted processing order for ghost force communication
+	/* inverted processing order for ghost force communication,
+	   since the corner ghosts have to be collected via several
+	   nodes. We now add back the corner ghost forces first again
+	   to ghost forces, which only eventually go back to the real
+	   particle.
+	*/
 	int coord = realToGhosts ? _coord : (2 - _coord);
 	real curCoordBoxL = system.lock()->bc->getBoxL(coord);
 
 	// lr loop: left right
 	for (int lr = 0; lr < 2; ++lr) {
-	  int dir = 2 * coord + lr;
+	  int dir         = 2 * coord + lr;
+	  int oppositeDir = 2 * coord + (1 - lr);
+
+	  real shift[3] = {0, 0, 0};
+	  shift[coord] = nodeGrid.getBoundary(dir) * curCoordBoxL;
 
 	  LOG4ESPP_DEBUG(logger, "direction " << dir);
 
@@ -454,61 +468,90 @@ namespace espresso {
 	      throw std::runtime_error("DomainDecomposition::doGhostCommunication: send/recv cell structure mismatch during local copy");
 	    }
 
-	    real shift[3] = {0, 0, 0};
-	    shift[coord] = nodeGrid.getBoundary(dir) * curCoordBoxL;
-
 	    for (int i = 0, end = commCells[dir].ghosts.size(); i < end; ++i) {
 	      if (realToGhosts) {
-		copyRealsToGhosts(*commCells[dir].reals[i],
-				  *commCells[dir].ghosts[i],
-				  extraElements, shift);
+		copyRealsToGhosts(*commCells[dir].reals[i], *commCells[dir].ghosts[i], extradata, shift);
 	      } else {
-		addGhostForcesToReals(*commCells[dir].ghosts[i],
-				      *commCells[dir].reals[i]);
+		addGhostForcesToReals(*commCells[dir].ghosts[i], *commCells[dir].reals[i]);
 	      }
 	    }
 	  } else {
-	    //                    /* i: send/recv loop */
-	    //                    for (i = 0; i < 2; i++) {
-	    //                        /* PARTIAL_PERIODIC: #ifdef PARTIAL_PERIODIC */
-	    //                        /* PARTIAL_PERIODIC: 	  if( PERIODIC(dir) || (boundary[2*dir+lr] == 0) )  */
-	    //                        /* PARTIAL_PERIODIC: #endif */
-	    //                        if ((node_pos[dir] + i) % 2 == 0) {
-	    //                            comm->comm[cnt].type = GHOST_SEND;
-	    //                            comm->comm[cnt].node = node_neighbors[2 * dir + lr];
-	    //                            comm->comm[cnt].part_lists = malloc(n_comm_cells[dir] * sizeof (ParticleList *));
-	    //                            comm->comm[cnt].n_part_lists = n_comm_cells[dir];
-	    //                            /* prepare folding of ghost positions */
-	    //                            if ((data_parts & GHOSTTRANS_POSSHFTD) && boundary[2 * dir + lr] != 0)
-	    //                                comm->comm[cnt].shift[dir] = boundary[2 * dir + lr] * box_l[dir];
-	    //
-	    //                            lc[(dir + 0) % 3] = hc[(dir + 0) % 3] = 1 + lr * (dd.cell_grid[(dir + 0) % 3] - 1);
-	    //                            dd_fill_comm_cell_lists(comm->comm[cnt].part_lists, lc, hc);
-	    //
-	    //                            CELL_TRACE(fprintf(stderr, "%d: prep_comm %d send to   node %d grid (%d,%d,%d)-(%d,%d,%d)\n", this_node, cnt,
-	    //                                    comm->comm[cnt].node, lc[0], lc[1], lc[2], hc[0], hc[1], hc[2]));
-	    //                            cnt++;
-	    //                        }
-	    //                        /* PARTIAL_PERIODIC: #ifdef PARTIAL_PERIODIC */
-	    //                        /* PARTIAL_PERIODIC: 	  if( PERIODIC(dir) || (boundary[2*dir+(1-lr)] == 0) )  */
-	    //                        /* PARTIAL_PERIODIC: #endif */
-	    //                        if ((node_pos[dir]+(1 - i)) % 2 == 0) {
-	    //                            comm->comm[cnt].type = GHOST_RECV;
-	    //                            comm->comm[cnt].node = node_neighbors[2 * dir + (1 - lr)];
-	    //                            comm->comm[cnt].part_lists = malloc(n_comm_cells[dir] * sizeof (ParticleList *));
-	    //                            comm->comm[cnt].n_part_lists = n_comm_cells[dir];
-	    //
-	    //                            lc[(dir + 0) % 3] = hc[(dir + 0) % 3] = 0 + (1 - lr)*(dd.cell_grid[(dir + 0) % 3] + 1);
-	    //                            dd_fill_comm_cell_lists(comm->comm[cnt].part_lists, lc, hc);
-	    //
-	    //                            CELL_TRACE(fprintf(stderr, "%d: prep_comm %d recv from node %d grid (%d,%d,%d)-(%d,%d,%d)\n", this_node, cnt,
-	    //                                    comm->comm[cnt].node, lc[0], lc[1], lc[2], hc[0], hc[1], hc[2]));
-	    //                            cnt++;
-	    //                        }
-	    //                    }
+	    // exchange size information, if necessary
+	    if (sizesFirst) {
+	      LOG4ESPP_DEBUG(logger, "exchanging ghost cell sizes");
+
+	      // prepare buffers
+	      std::vector<longint> sendSizes, recvSizes;
+	      sendSizes.reserve(commCells[dir].reals.size());
+	      for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
+		sendSizes.push_back(commCells[dir].reals[i]->particles.size());
+	      }
+	      recvSizes.resize(commCells[dir].ghosts.size());
+
+	      // exchange sizes, odd-even rule
+	      if (nodeGrid.getNodePosition(coord) % 2 == 0) {
+		LOG4ESPP_DEBUG(logger, "sending to node " << nodeGrid.getNodeNeighbor(dir)
+			       << ", then receiving from node " << nodeGrid.getNodeNeighbor(oppositeDir));
+		comm.send(nodeGrid.getNodeNeighbor(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
+		comm.recv(nodeGrid.getNodeNeighbor(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
+	      }
+	      else {
+		LOG4ESPP_DEBUG(logger, "receiving from node " << nodeGrid.getNodeNeighbor(oppositeDir)
+			       << ", then sending to node " << nodeGrid.getNodeNeighbor(dir));
+		comm.recv(nodeGrid.getNodeNeighbor(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
+		comm.send(nodeGrid.getNodeNeighbor(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
+	      }
+
+	      // resize according to received information
+	      for (int i = 0, end = commCells[dir].ghosts.size(); i < end; ++i) {
+		commCells[dir].ghosts[i]->particles.resize(recvSizes[i]);
+	      }
+	      LOG4ESPP_DEBUG(logger, "exchanging ghost cell sizes done");
+	    }
+
+	    // prepare send and receive buffers
+	    longint oarRecver, iarSender;
+	    boost::mpi::packed_oarchive oar(comm);
+	    boost::mpi::packed_iarchive iar(comm);
+	    if (realToGhosts) {
+	      oarRecver = nodeGrid.getNodeNeighbor(dir);
+	      iarSender = nodeGrid.getNodeNeighbor(oppositeDir);
+	      for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
+		packPositionsEtc(oar, *commCells[dir].reals[i], extradata, shift);
+	      }
+	    }
+	    else {
+	      oarRecver = nodeGrid.getNodeNeighbor(oppositeDir);
+	      iarSender = nodeGrid.getNodeNeighbor(dir);
+	      for (int i = 0, end = commCells[dir].ghosts.size(); i < end; ++i) {
+		packForces(oar, *commCells[dir].ghosts[i]);
+	      }
+	    }
+
+	    // exchange particles, odd-even rule
+	    if (nodeGrid.getNodePosition(coord) % 2 == 0) {
+	      comm.send(oarRecver, DD_COMM_TAG, oar);
+	      comm.recv(iarSender, DD_COMM_TAG, iar);
+	    } else {
+	      comm.recv(iarSender, DD_COMM_TAG, iar);
+	      comm.send(oarRecver, DD_COMM_TAG, oar);
+	    }
+
+	    // unpack received data
+	    if (realToGhosts) {
+	      for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
+		unpackPositionsEtc(*commCells[dir].ghosts[i], iar, extradata);
+	      }
+	    }
+	    else {
+	      for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
+		unpackAndAddForces(*commCells[dir].reals[i], iar);
+	      }
+	    }
 	  }
 	}
       }
+      LOG4ESPP_DEBUG(logger, "ghost communication finished");
     }
   }
 }

@@ -222,7 +222,7 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
 	// center particle in cell's global position
 	real pos[3];
 	for (int i = 0; i < 3; ++i) {
-	  ipos[i] += nGrid.getNodePosition(i)*nGrid.getGridSize(i);
+	  ipos[i] += nGrid.getNodePosition(i)*cGrid.getGridSize(i);
 	  pos[i] = (0.5 + ipos[i])*cGrid.getCellSize(i);
 	}
 	
@@ -260,7 +260,7 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
       for (int i = 0; i < 3; ++i) {
 	/* absolute cell location. Since coordinates should get folded, also the ghost
 	   particles should have their positions in the center of their cell */
-	int ip =  ipos[i] - cGrid.getFrameWidth() + nGrid.getNodePosition(i)*nGrid.getGridSize(i);
+	int ip =  ipos[i] - cGrid.getFrameWidth() + nGrid.getNodePosition(i)*cGrid.getGridSize(i);
 	pos[i] = (0.5 + ip)*cGrid.getCellSize(i);
 
 	// now backfold for type encoding
@@ -339,7 +339,7 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
       // calculate expected force from absolute cell location
       real force[3];
       for (int i = 0; i < 3; ++i) {
-	real ap = ipos[i] - cGrid.getFrameWidth() + nGrid.getNodePosition(i)*nGrid.getGridSize(i);
+	real ap = ipos[i] - cGrid.getFrameWidth() + nGrid.getNodePosition(i)*cGrid.getGridSize(i);
 	force[i] = ap*ghostCnt;
       }
       

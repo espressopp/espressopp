@@ -119,17 +119,29 @@ namespace espresso {
     /// remove ghost particles from the localParticles index
     void invalidateGhosts();
 
+    /** pack real particle data for sending. At least positions, maybe
+	shifted, and possibly additional data according to extradata.
+
+	@param shift how to adjust the positions of the particles when sending
+    */
+    void packPositionsEtc(boost::mpi::packed_oarchive &ar,
+			  Cell &reals, int extradata, const double shift[3]);
+    /** unpack received data for ghosts. */
+    void unpackPositionsEtc(Cell &ghosts, boost::mpi::packed_iarchive &ar, int extradata);
     /** copy specified data elements between a real cell and one of its ghosts
 
-	@param realToGhost specify the transfer direction from reals to ghosts
-	or backwards. In the first case, in any case (shifted) positions are sent, in the
-	reverse case, only the forces are collected
 	@param shift how to adjust the positions of the particles when sending
     */
     void copyRealsToGhosts(Cell &reals, Cell &ghosts,
 			   int extradata,
 			   const double shift[3]);
 
+    /** pack ghost forces for sending. */
+    void packForces(boost::mpi::packed_oarchive &ar, Cell &ghosts);
+    /** unpack received ghost forces. This one ADDS, and is most likely, what you need. */
+    void unpackAndAddForces(Cell &reals, boost::mpi::packed_iarchive &ar);
+    /** unpack received ghost forces. This one OVERWRITES, and is probably what you don't need. */
+    void unpackForces(Cell &reals, boost::mpi::packed_iarchive &ar);
     void addGhostForcesToReals(Cell &ghosts, Cell &reals);
 
     /** send particles of a cell to another node, and empty the cell
