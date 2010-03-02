@@ -2,11 +2,11 @@
 #define _SYSTEM_HPP
 
 #include "types.hpp"
-#include "esutil/RNG.hpp"
 
 namespace espresso {
 
   namespace interaction { class Interaction; }
+  namespace esutil { class RNG; }
 
   typedef std::vector< shared_ptr<interaction::Interaction> > InteractionList;
 
@@ -15,10 +15,9 @@ namespace espresso {
   public:
     shared_ptr< class Storage > storage;
     shared_ptr< class BC > bc;
+    shared_ptr< esutil::RNG > rng;
 
     InteractionList shortRangeInteractions;
-
-    esutil::RNG rng; //<! common random number generator
 
     double skin;  //<! skin used for VerletList
 

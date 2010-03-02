@@ -4,15 +4,30 @@
 #include "Real3D.hpp"
 #include "esutil/RNG.hpp"
 #include "System.hpp"
+#include "stdio.h"
 
 namespace espresso {
   namespace bc {
     /* Constructor */
     OrthorhombicBC::
     OrthorhombicBC(shared_ptr< System > _system, 
-		   const ConstReal3DRef _boxL) 
-      : system(_system)
-    { setBoxL(_boxL); }
+		   const ConstReal3DRef _boxL)
+    { setBoxL(_boxL); 
+      system = _system;
+      if (!system.use_count()) {
+        printf("ERROR in OrthorhomicBC::Orthorhombic : no system !\n");
+      } else {
+        printf("OrthorhombicBC::OrthorhombicBC() : system.use_count()=%i\n",system.use_count());
+        try {
+          esutil::RNG &rng = *(system.lock()->rng);
+          printf("OrthorhombicBC::OrthorhombicBC() : system.lock()->rng()=%f\n",rng());
+        }
+        catch (boost::bad_weak_ptr) {
+          printf("WARNING in OrthorhombicBC::Orthorhombic() : system has no RNG !\n");
+        }
+      }
+    }
+  
 
     /* Setter method for the box length */
     void OrthorhombicBC::setBoxL(const ConstReal3DRef _boxL) {
@@ -83,11 +98,19 @@ namespace espresso {
       for(int k = 0; k < 3; k++)
 	res[k] = boxL[k];
       
-      // TODO: Use real RNG
-      esutil::RNG &rng = system.lock()->rng;
-      res[0] *= rng();
-      res[1] *= rng();
-      res[2] *= rng();
+      if (!system.use_count()) {
+        printf("ERROR in OrthorhomicBC::getRandomPos() : BC lost system !\n");
+      } else {
+        try {
+          esutil::RNG &rng = *(system.lock()->rng);
+          res[0] *= rng();
+          res[1] *= rng();
+          res[2] *= rng();
+        }
+        catch (boost::bad_weak_ptr) {
+          printf("ERROR in OrthorhombicBC::getRandomPos() : system lost RNG !\n");
+        }
+      }
     }
 
     void 
@@ -95,7 +118,8 @@ namespace espresso {
     registerPython() {
       using namespace espresso::python;
       class_<OrthorhombicBC, bases< BC > >
-	("bc_OrthorhombicBC", init< shared_ptr< System >, Real3DRef >());
+	("bc_OrthorhombicBC", init< shared_ptr< System >, Real3DRef >())
+      ;
     }
   }
 }

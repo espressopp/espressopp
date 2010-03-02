@@ -1,6 +1,7 @@
 #include "RNG.hpp"
-
+#include "python.hpp"
 #include "mpi.hpp"
+#include "types.hpp"
 
 using namespace espresso::esutil;
 using namespace espresso;
@@ -52,4 +53,19 @@ shared_ptr< UniformOnSphere >
 RNG::createUniformOnSphere(int dim) {
   return
     make_shared< UniformOnSphere >(boostRNG, dim);
+}
+
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+void
+RNG::registerPython() {
+  using namespace espresso::python;
+
+   real (RNG::*pyoperator)()=&RNG::operator();
+
+   class_< RNG >("RNG")
+    .def("__call__",pyoperator)
+    .add_property("normal",&RNG::normal)
+    ;
 }

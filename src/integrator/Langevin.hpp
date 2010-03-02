@@ -51,8 +51,6 @@ namespace espresso {
 
         void frictionThermo(class Particle*);
 
-        espresso::esutil::RNG &rng;  
-
         real gamma;        //!< friction coefficient
 
         real temperature;  //!< desired user temperature

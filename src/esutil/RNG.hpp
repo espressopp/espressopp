@@ -50,6 +50,8 @@ namespace espresso {
       shared_ptr< UniformOnSphere >
       createUniformOnSphere(int dim = 3);
 
+      static void registerPython();
+
     private:
       // the standard normal variate (mean 0, sigma 1)
       NormalVariate normalVariate;

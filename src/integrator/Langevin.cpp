@@ -10,10 +10,7 @@ using namespace espresso::integrator;
 
 LOG4ESPP_LOGGER(Langevin::theLogger, "Langevin");
 
-Langevin::Langevin(shared_ptr<System> _system) :
-
-  rng(_system->rng)
-
+Langevin::Langevin(shared_ptr<System> _system)
 {
   system = _system;
   gamma  = 0.0;
@@ -68,6 +65,7 @@ void Langevin::frictionThermo(Particle *p)
   double massf = 1.0;
 
   for (int j = 0 ; j < 3 ; j++) {
+    esutil::RNG &rng = *(system.lock()->rng);
     p->f.f[j] += pref1*p->m.v[j] + pref2*(rng()-0.5)*massf;
   }
 

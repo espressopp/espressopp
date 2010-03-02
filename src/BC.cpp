@@ -2,6 +2,7 @@
 #include <python.hpp>
 #include <cmath>
 #include "Real3D.hpp"
+#include <iostream>
 
 namespace espresso {
 
