@@ -15,12 +15,17 @@ namespace espresso {
     { setBoxL(_boxL); 
       system = _system;
       if (!system.use_count()) {
-        printf("ERROR in OrthorhomicBC::Orthorhombic : no system !\n");
+        printf("ERROR in OrthorhomicBC::Orthorhombic : no system (you should never see this line) !\n");
       } else {
         printf("OrthorhombicBC::OrthorhombicBC() : system.use_count()=%i\n",system.use_count());
         try {
-          esutil::RNG &rng = *(system.lock()->rng);
-          printf("OrthorhombicBC::OrthorhombicBC() : system.lock()->rng()=%f\n",rng());
+          if (system.lock()->rng) {
+            esutil::RNG &rng = *(system.lock()->rng);
+            printf("OrthorhombicBC::OrthorhombicBC() : system.lock()->rng()=%f\n",rng());
+          }
+          else {
+            printf("Please define RNG in System first !\n");
+          }
         }
         catch (boost::bad_weak_ptr) {
           printf("WARNING in OrthorhombicBC::Orthorhombic() : system has no RNG !\n");
@@ -112,6 +117,23 @@ namespace espresso {
         }
       }
     }
+    
+    std::string
+    OrthorhombicBC::
+    printSystem() {
+      if (system.use_count()) {
+        try {
+          return system.lock()->name;
+        } 
+        catch (boost::bad_weak_ptr) {
+          return "EXCEPTION boost::bad_weak_ptr in OrthorhombicBC::printSystem() !\n";
+        }
+      }
+      else {
+        return "no_system_defined";
+      }
+    }
+
 
     void 
     OrthorhombicBC::
@@ -121,7 +143,7 @@ namespace espresso {
 	("bc_OrthorhombicBC", init< shared_ptr< System >, Real3DRef >())
         .def("setSystem",&OrthorhombicBC::setSystem)
         .def("getSystem",&OrthorhombicBC::getSystem)
-        .def("printSystemUseCount",&OrthorhombicBC::printSystemUseCount)
+        .def("printSystem",&OrthorhombicBC::printSystem)
       ;
     }
   }

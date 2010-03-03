@@ -13,6 +13,10 @@ namespace espresso {
   class System {
 
   public:
+    System() : name("DEFAULT") {};
+    System(std::string _name) : name(_name) {};
+
+    std::string name;
     shared_ptr< class Storage > storage;
     shared_ptr< class BC > bc;
     shared_ptr< esutil::RNG > rng;

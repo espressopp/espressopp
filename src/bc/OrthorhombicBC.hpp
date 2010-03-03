@@ -31,7 +31,7 @@ namespace espresso {
       /** Setter, Getter and Printer for system weak_ptr (implemented only for debugging)*/
       virtual void setSystem(shared_ptr< System > _system) { system=weak_ptr< System >(_system); }
       virtual shared_ptr< System > getSystem() { return system.lock(); }
-      virtual void printSystemUseCount() { printf("system.use_count()=%i\n",system.use_count()); }
+      virtual std::string printSystem();
 
       /** Getters for box dimensions */
       virtual Real3D getBoxL() { return boxL; }
