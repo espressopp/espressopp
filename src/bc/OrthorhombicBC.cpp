@@ -119,6 +119,9 @@ namespace espresso {
       using namespace espresso::python;
       class_<OrthorhombicBC, bases< BC > >
 	("bc_OrthorhombicBC", init< shared_ptr< System >, Real3DRef >())
+        .def("setSystem",&OrthorhombicBC::setSystem)
+        .def("getSystem",&OrthorhombicBC::getSystem)
+        .def("printSystemUseCount",&OrthorhombicBC::printSystemUseCount)
       ;
     }
   }
