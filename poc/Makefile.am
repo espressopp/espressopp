@@ -6,6 +6,7 @@ noinst_HEADERS =
 include boost/SubMakefile.am
 include boost.python/inheritance/SubMakefile.am
 include boost.python/shared_ptr/SubMakefile.am
+include boost.python/weak_ptr/SubMakefile.am
 #include boost.python/keywords/SubMakefile.am
 include boost.python/diamond/SubMakefile.am
 include boost.python/real3D/SubMakefile.am
