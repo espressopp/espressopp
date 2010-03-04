@@ -137,7 +137,7 @@ static int eval_entry (char* line, int length, char *filename)
   string::size_type firstPos = myLine.find_first_not_of(" ", 0);
 
 #ifdef DEBUGGING
-  printf("pos of first releveant char = %d\n", firstPos);
+  printf("pos of first relevant char = %d\n", firstPos);
 #endif
 
   if (string::npos == firstPos) return 0;
@@ -183,9 +183,8 @@ static int eval_entry (char* line, int length, char *filename)
 *  help routine: read_config for reading a logger configuration     *
 ********************************************************************/
 
-static int read_config (char *fname)
-
-{ FILE *config_file;
+static int read_config (char *fname) { 
+  FILE *config_file;
 
   char buffer [180];
   int  buf_len;
@@ -195,11 +194,10 @@ static int read_config (char *fname)
 
   config_file = fopen (fname, "r");
 
-  if (config_file == NULL)
-
-    { LOG4ESPP_ERROR(myLogger, "config: could not open config file " << fname);
-      return 0;
-    }
+  if (config_file == NULL) { 
+    LOG4ESPP_ERROR(myLogger, "config: could not open config file " << fname);
+    return 0;
+  }
 
   buf_len    = 0;
   eof        = EOF;

@@ -40,6 +40,7 @@ struct Fixture {
     int nodeGrid[3] = { 1, 1, 1 };
     int cellGrid[3] = { 3, 3, 3 };
     system = make_shared< System >();
+    system->rng = make_shared< RNG >();
     system->bc = make_shared< bc::OrthorhombicBC >(system, boxL);
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,
