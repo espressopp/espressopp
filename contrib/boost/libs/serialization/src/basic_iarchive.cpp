@@ -23,15 +23,15 @@ namespace std{
 } // namespace std
 #endif
 
-#include <boost/limits.hpp>
+#include <boost/integer_traits.hpp>
 #include <boost/serialization/state_saver.hpp>
 #include <boost/serialization/throw_exception.hpp>
 #include <boost/serialization/tracking.hpp>
 
-#include <boost/archive/archive_exception.hpp>
-
 #define BOOST_ARCHIVE_SOURCE
 #define BOOST_SERIALIZATION_SOURCE
+
+#include <boost/archive/archive_exception.hpp>
 
 #include <boost/archive/detail/decl.hpp>
 #include <boost/archive/basic_archive.hpp>
@@ -92,18 +92,18 @@ class basic_iarchive_impl {
     // used by load object to look up class id given basic_serializer
     struct cobject_type
     {
-        const basic_iserializer * bis;
-        const class_id_type class_id;
+        const basic_iserializer * m_bis;
+        const class_id_type m_class_id;
         cobject_type(
-            class_id_type class_id_,
-            const basic_iserializer & bis_
+            std::size_t class_id,
+            const basic_iserializer & bis
         ) : 
-            bis(& bis_),
-            class_id(class_id_)
+            m_bis(& bis),
+            m_class_id(class_id)
         {}
         cobject_type(const cobject_type & rhs) : 
-            bis(rhs.bis),
-            class_id(rhs.class_id)
+            m_bis(rhs.m_bis),
+            m_class_id(rhs.m_class_id)
         {}
         // the following cannot be defined because of the const
         // member.  This will generate a link error if an attempt
@@ -111,7 +111,7 @@ class basic_iarchive_impl {
         cobject_type & operator=(const cobject_type & rhs);
         bool operator<(const cobject_type &rhs) const
         {
-            return *bis < *(rhs.bis);
+            return *m_bis < *(rhs.m_bis);
         }
     };
     typedef std::set<cobject_type> cobject_info_set_type;
@@ -172,7 +172,7 @@ class basic_iarchive_impl {
         pending_version(0)
     {}
     ~basic_iarchive_impl(){}
-    void set_library_version(unsigned int archive_library_version){
+    void set_library_version(version_type archive_library_version){
         m_archive_library_version = archive_library_version;
     }
     bool
@@ -216,6 +216,7 @@ class basic_iarchive_impl {
         const basic_pointer_iserializer * (*finder)(
             const boost::serialization::extended_type_info & type
         )
+
     );
 };
 
@@ -290,7 +291,14 @@ inline class_id_type
 basic_iarchive_impl::register_type(
     const basic_iserializer & bis
 ){
-    class_id_type id(static_cast<int>(cobject_info_set.size()));
+    assert(
+        cobject_info_set.size() 
+        <= 
+        boost::integer_traits<class_id_type>::const_max
+    );
+    class_id_type id(static_cast<class_id_type>(
+        cobject_info_set.size()
+    ));
     cobject_type co(id, bis);
     std::pair<cobject_info_set_type::const_iterator, bool>
         result = cobject_info_set.insert(co);
@@ -299,7 +307,7 @@ basic_iarchive_impl::register_type(
         cobject_id_vector.push_back(cobject_id(bis));
         assert(cobject_info_set.size() == cobject_id_vector.size());
     }
-    id = result.first->class_id;
+    id = result.first->m_class_id;
     // borland complains without this minor hack
     const int tid = id;
     cobject_id & coid = cobject_id_vector[tid];
@@ -400,6 +408,7 @@ basic_iarchive_impl::load_pointer(
     const basic_pointer_iserializer * (*finder)(
         const boost::serialization::extended_type_info & type_
     )
+
 ){
     class_id_type cid;
     load(ar, cid);
@@ -409,6 +418,11 @@ basic_iarchive_impl::load_pointer(
         return bpis_ptr;
     }
 
+    assert(
+        cobject_info_set.size() 
+        <= 
+        boost::integer_traits<class_id_type>::const_max
+    );
     // if its a new class type - i.e. never been registered
     if(class_id_type(cobject_info_set.size()) <= cid){
         // if its either abstract
@@ -513,7 +527,7 @@ basic_iarchive::~basic_iarchive()
 }
 
 BOOST_ARCHIVE_DECL(void)
-basic_iarchive::set_library_version(unsigned int archive_library_version){
+basic_iarchive::set_library_version(version_type archive_library_version){
     pimpl->set_library_version(archive_library_version);
 }
 
@@ -541,6 +555,7 @@ basic_iarchive::load_pointer(
     const basic_pointer_iserializer * (*finder)(
         const boost::serialization::extended_type_info & type_
     )
+
 ){
     return pimpl->load_pointer(*this, t, bpis_ptr, finder);
 }

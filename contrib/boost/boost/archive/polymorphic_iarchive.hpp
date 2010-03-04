@@ -18,15 +18,15 @@
 
 #include <cstddef> // std::size_t
 #include <climits> // ULONG_MAX 
-#include <boost/config.hpp>
+#include <string>
 
+#include <boost/config.hpp>
 #if defined(BOOST_NO_STDC_NAMESPACE)
 namespace std{
     using ::size_t;
 } // namespace std
 #endif
 
-#include <string>
 #include <boost/cstdint.hpp>
 
 #include <boost/serialization/pfto.hpp>
@@ -141,7 +141,7 @@ protected:
     virtual ~polymorphic_iarchive_impl(){};
 public:
     // utility function implemented by all legal archives
-    virtual void set_library_version(unsigned int archive_library_version) = 0;
+    virtual void set_library_version(version_type archive_library_version) = 0;
     virtual unsigned int get_library_version() const = 0;
     virtual unsigned int get_flags() const = 0;
     virtual void delete_created_pointers() = 0;
@@ -169,6 +169,8 @@ public:
 } // namespace archive
 } // namespace boost
 
+#include <boost/archive/detail/abi_suffix.hpp> // pops abi_suffix.hpp pragmas
+
 // note special treatment of shared_ptr. This type needs a special
 // structure associated with every archive.  We created a "mix-in"
 // class to provide this functionality.  Since shared_ptr holds a
@@ -191,7 +193,5 @@ public:
 
 // required by export
 BOOST_SERIALIZATION_REGISTER_ARCHIVE(boost::archive::polymorphic_iarchive)
-
-#include <boost/archive/detail/abi_suffix.hpp> // pops abi_suffix.hpp pragmas
 
 #endif // BOOST_ARCHIVE_POLYMORPHIC_IARCHIVE_HPP

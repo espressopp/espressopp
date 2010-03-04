@@ -7,7 +7,7 @@
  *
  * See http://www.boost.org for most recent version including documentation.
  *
- * $Id: additive_combine.hpp 52492 2009-04-19 14:55:57Z steven_watanabe $
+ * $Id: additive_combine.hpp 58649 2010-01-02 21:23:17Z steven_watanabe $
  *
  * Revision history
  *  2001-02-18  moved to individual header files
@@ -54,6 +54,8 @@ public:
   additive_combine(typename MLCG1::result_type seed1, 
                    typename MLCG2::result_type seed2)
     : _mlcg1(seed1), _mlcg2(seed2) { }
+  additive_combine(result_type aseed)
+    : _mlcg1(aseed), _mlcg2(aseed) { }
   template<class It> additive_combine(It& first, It last)
     : _mlcg1(first, last), _mlcg2(first, last) { }
 
@@ -61,6 +63,12 @@ public:
   {
     _mlcg1.seed();
     _mlcg2.seed();
+  }
+
+  void seed(result_type aseed)
+  {
+    _mlcg1.seed(aseed);
+    _mlcg2.seed(aseed);
   }
 
   void seed(typename MLCG1::result_type seed1,

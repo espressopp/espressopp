@@ -16,10 +16,19 @@
 #include <algorithm>
 #include <boost/config.hpp> // BOOST_DEDUCED_TYPENAME
 
+#ifdef BOOST_MSVC
+#  pragma warning(push)
+#  pragma warning(disable : 4511 4512)
+#endif
+
 // spirit stuff
 #include <boost/spirit/core/composite/operators.hpp>
 #include <boost/spirit/core/composite/actions.hpp>
 #include <boost/spirit/core/primitives/numerics.hpp>
+
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
 
 // for head_iterator test
 //#include <boost/bind.hpp> 
@@ -42,6 +51,11 @@ namespace archive {
 // template code for basic_xml_grammar of both wchar_t and char types
 
 namespace xml { // anonymous
+
+#ifdef BOOST_MSVC
+#  pragma warning(push)
+#  pragma warning(disable : 4511 4512)
+#endif
 
 template<class T>
 struct assign_impl {
@@ -67,6 +81,9 @@ struct assign_impl<std::string> {
             ++b;
         }
     }
+    assign_impl<std::string> & operator=(
+        assign_impl<std::string> & rhs
+    );
     assign_impl(std::string & t_)
         : t(t_)
     {}
@@ -150,6 +167,10 @@ struct append_lit {
     {}
 };
 
+#ifdef BOOST_MSVC
+#pragma warning(pop)
+#endif
+
 } // namespace anonymous
 
 template<class CharType>
@@ -171,10 +192,12 @@ bool basic_xml_grammar<CharType>::my_parse(
     
     CharType val;
     do{
-        val = is.get();
-        arg += val;
+        BOOST_DEDUCED_TYPENAME basic_xml_grammar<CharType>::IStream::int_type
+            result = is.get();
         if(is.fail())
             return false;
+        val = static_cast<CharType>(result);
+        arg += val;
     }
     while(val != delimiter);
     
@@ -192,32 +215,17 @@ template<class CharType>
 bool basic_xml_grammar<CharType>::parse_start_tag(
     BOOST_DEDUCED_TYPENAME basic_xml_grammar<CharType>::IStream & is
 ){
-    if(is.fail()){
-        boost::serialization::throw_exception(
-            archive_exception(archive_exception::stream_error)
-        );
-    }
     rv.class_name.resize(0);
     return my_parse(is, STag);
 }
 
 template<class CharType>
 bool basic_xml_grammar<CharType>::parse_end_tag(IStream & is) const {
-    if(is.fail()){
-        boost::serialization::throw_exception(
-            archive_exception(archive_exception::stream_error)
-        );
-    }
     return my_parse(is, ETag);
 }
 
 template<class CharType>
 bool basic_xml_grammar<CharType>::parse_string(IStream & is, StringType & s){
-    if(is.fail()){
-        boost::serialization::throw_exception(
-            archive_exception(archive_exception::stream_error)
-        );
-    }
     rv.contents.resize(0);
     bool result = my_parse(is, content, '<');
     // note: unget caused a problem with dinkumware.  replace with
@@ -451,7 +459,7 @@ template<class CharType>
 void basic_xml_grammar<CharType>::windup(IStream & is){
     if(is.fail())
         return;
-    // uh-oh - don't exception from code called by a destructor !
+    // uh-oh - don't throw exception from code called by a destructor !
     // so just ignore any failure.
     my_parse(is, ETag);
 }

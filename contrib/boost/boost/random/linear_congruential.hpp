@@ -7,7 +7,7 @@
  *
  * See http://www.boost.org for most recent version including documentation.
  *
- * $Id: linear_congruential.hpp 52492 2009-04-19 14:55:57Z steven_watanabe $
+ * $Id: linear_congruential.hpp 58649 2010-01-02 21:23:17Z steven_watanabe $
  *
  * Revision history
  *  2001-02-18  moved to individual header files
@@ -25,6 +25,8 @@
 #include <boost/random/detail/config.hpp>
 #include <boost/random/detail/const_mod.hpp>
 #include <boost/detail/workaround.hpp>
+
+#include <boost/random/detail/disable_warnings.hpp>
 
 namespace boost {
 namespace random {
@@ -52,12 +54,8 @@ public:
   // BOOST_STATIC_ASSERT(m == 0 || c < m);
 
   explicit linear_congruential(IntType x0 = 1)
-    : _modulus(modulus), _x(_modulus ? (x0 % _modulus) : x0)
   { 
-    assert(c || x0); /* if c == 0 and x(0) == 0 then x(n) = 0 for all n */
-    // overflow check
-    // disabled because it gives spurious "divide by zero" gcc warnings
-    // assert(m == 0 || (a*(m-1)+c) % m == (c < a ? c-a+m : c-a)); 
+    seed(x0);
 
     // MSVC fails BOOST_STATIC_ASSERT with std::numeric_limits at class scope
 #ifndef BOOST_NO_LIMITS_COMPILE_TIME_CONSTANTS
@@ -67,7 +65,6 @@ public:
 
   template<class It>
   linear_congruential(It& first, It last)
-    : _modulus(modulus)
   {
       seed(first, last);
   }
@@ -75,8 +72,22 @@ public:
   // compiler-generated copy constructor and assignment operator are fine
   void seed(IntType x0 = 1)
   {
-    assert(c || x0);
-    _x = (_modulus ? (x0 % _modulus) : x0);
+    // wrap _x if it doesn't fit in the destination
+    if(modulus == 0) {
+      _x = x0;
+    } else {
+      _x = x0 % modulus;
+    }
+    // handle negative seeds
+    if(_x <= 0 && _x != 0) {
+      _x += modulus;
+    }
+    // adjust to the correct range
+    if(increment == 0 && _x == 0) {
+      _x = 1;
+    }
+    assert(_x >= (min)());
+    assert(_x <= (max)());
   }
 
   template<class It>
@@ -84,8 +95,7 @@ public:
   {
     if(first == last)
       throw std::invalid_argument("linear_congruential::seed");
-    IntType value = *first++;
-    _x = (_modulus ? (value % _modulus) : value);
+    seed(*first++);
   }
 
   result_type min BOOST_PREVENT_MACRO_SUBSTITUTION () const { return c == 0 ? 1 : 0; }
@@ -135,8 +145,7 @@ public:
 private:
 #endif
 #endif
-    
-  IntType _modulus;   // work-around for gcc "divide by zero" warning in ctor
+
   IntType _x;
 };
 
@@ -212,12 +221,12 @@ public:
   int32_t min BOOST_PREVENT_MACRO_SUBSTITUTION () const { return 0; }
   int32_t max BOOST_PREVENT_MACRO_SUBSTITUTION () const { return std::numeric_limits<int32_t>::max BOOST_PREVENT_MACRO_SUBSTITUTION (); }
   
-  explicit rand48(int32_t x0 = 1) : lcf(cnv(x0)) { }
-  explicit rand48(uint64_t x0) : lcf(x0) { }
+  rand48() : lcf(cnv(static_cast<int32_t>(1))) {}
+  template<class T> explicit rand48(T x0) : lcf(cnv(x0)) { }
   template<class It> rand48(It& first, It last) : lcf(first, last) { }
   // compiler-generated copy ctor and assignment operator are fine
-  void seed(int32_t x0 = 1) { lcf.seed(cnv(x0)); }
-  void seed(uint64_t x0) { lcf.seed(x0); }
+  void seed() { seed(static_cast<int32_t>(1)); }
+  template<class T> void seed(T x0) { lcf.seed(cnv(x0)); }
   template<class It> void seed(It& first, It last) { lcf.seed(first,last); }
 
   int32_t operator()() { return static_cast<int32_t>(lcf() >> 17); }
@@ -253,11 +262,23 @@ private:
   random::linear_congruential<uint64_t,
     uint64_t(0xDEECE66DUL) | (uint64_t(0x5) << 32), // xxxxULL is not portable
     0xB, uint64_t(1)<<48, /* unknown */ 0> lcf;
-  static uint64_t cnv(int32_t x) 
-  { return (static_cast<uint64_t>(x) << 16) | 0x330e;  }
+  template<class T>
+  static uint64_t cnv(T x) 
+  {
+    if(sizeof(T) < sizeof(uint64_t)) {
+      return (static_cast<uint64_t>(x) << 16) | 0x330e;
+    } else {
+      return(static_cast<uint64_t>(x));
+    }
+  }
+  static uint64_t cnv(float x) { return(static_cast<uint64_t>(x)); }
+  static uint64_t cnv(double x) { return(static_cast<uint64_t>(x)); }
+  static uint64_t cnv(long double x) { return(static_cast<uint64_t>(x)); }
 };
 #endif /* !BOOST_NO_INT64_T && !BOOST_NO_INTEGRAL_INT64_T */
 
 } // namespace boost
+
+#include <boost/random/detail/enable_warnings.hpp>
 
 #endif // BOOST_RANDOM_LINEAR_CONGRUENTIAL_HPP

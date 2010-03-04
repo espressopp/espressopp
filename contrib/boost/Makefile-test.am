@@ -26,5 +26,3 @@ libboost_unit_test_framework_la_SOURCES = \
 # not used in UTF_SOURCES
 #	libs/test/src/cpp_main.cpp \
 #	libs/test/src/test_main.cpp
-
-

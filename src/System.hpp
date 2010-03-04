@@ -8,13 +8,13 @@ namespace espresso {
   namespace interaction { class Interaction; }
   namespace esutil { class RNG; }
 
-  typedef std::vector< shared_ptr<interaction::Interaction> > InteractionList;
+  typedef std::vector< shared_ptr< interaction::Interaction > > InteractionList;
 
   class System {
 
   public:
     System() : name("DEFAULT") {};
-    System(std::string _name) : name(_name) {};
+    System(std::string &_name) : name(_name) {};
 
     std::string name;
     shared_ptr< class Storage > storage;

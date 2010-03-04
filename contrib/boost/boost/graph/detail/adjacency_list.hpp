@@ -15,7 +15,7 @@
 #include <boost/config.hpp>
 #include <boost/detail/workaround.hpp>
 #include <boost/operators.hpp>
-#include <boost/property_map.hpp>
+#include <boost/property_map/property_map.hpp>
 #include <boost/pending/integer_range.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <memory>
@@ -387,7 +387,7 @@ namespace boost {
           ++first;
         incidence_iterator i = first;
         if (first != last)
-          for (; i != last; ++i)
+          for (++i; i != last; ++i)
             if (!pred(*i)) {
               *first.base() = *i.base();
               ++first;
@@ -786,14 +786,14 @@ namespace boost {
         typedef typename EdgeList::value_type StoredEdge;
         typename EdgeList::iterator i = el.begin(), end = el.end();
         for (; i != end; ++i) {
-          if((*i).get_target() == v) {
+          if ((*i).get_target() == v) {
             // NOTE: Wihtout this skip, this loop will double-delete properties
             // of loop edges. This solution is based on the observation that
             // the incidence edges of a vertex with a loop are adjacent in the
             // out edge list. This *may* actually hold for multisets also.
-            bool skip = (next(i) != end && i->get_iter() == next(i)->get_iter());
+            bool skip = (boost::next(i) != end && i->get_iter() == boost::next(i)->get_iter());
             g.m_edges.erase((*i).get_iter());
-            if(skip) ++i;
+            if (skip) ++i;
           }
         }
         detail::erase_from_incidence_list(el, v, cat);
@@ -1183,13 +1183,11 @@ namespace boost {
                                 multisetS*)
       { return edge_range(source(e, g), target(e, g), g); }
 
-#if !defined BOOST_NO_HASH
       std::pair<out_edge_iterator, out_edge_iterator>
       get_parallel_edge_sublist(typename Config::edge_descriptor e,
                                 const graph_type& g,
                                 hash_setS*)
       { return edge_range(source(e, g), target(e, g), g); }
-#endif
 
       // Placement of these overloaded remove_edge() functions
       // inside the class avoids a VC++ bug.
@@ -2297,7 +2295,7 @@ namespace boost {
         // VertexList and vertex_iterator
         typedef typename container_gen<VertexListS,
           vertex_ptr>::type SeqVertexList;
-        typedef boost::integer_range<std::size_t> RandVertexList;
+        typedef boost::integer_range<vertex_descriptor> RandVertexList;
         typedef typename mpl::if_<is_rand_access,
           RandVertexList, SeqVertexList>::type VertexList;
 
@@ -2785,8 +2783,8 @@ namespace boost {
 
 } // namespace boost
 
-#if !defined(BOOST_NO_HASH) && !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
-namespace BOOST_STD_EXTENSION_NAMESPACE {
+#if !defined(BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION)
+namespace boost {
 
   #if BOOST_WORKAROUND( _STLPORT_VERSION, >= 0x500 )
   // STLport 5 already defines a hash<void*> specialization.
