@@ -1,8 +1,8 @@
 # set the path
 from espresso import __setupPath
 
-# load boostmpi (must be loaded before _espresso)
-#from espresso import boostmpi
+# load mpi4py (must be loaded before _espresso)
+import MPI
 
 # set up logging
 import logging, os, math
