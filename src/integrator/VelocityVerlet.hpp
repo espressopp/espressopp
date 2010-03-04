@@ -46,6 +46,10 @@ namespace espresso {
 
         void calcForces();
 
+        void printPositions(bool withGhost);
+
+        void printForces(bool withGhost);
+
         void setUp();   //<! set up for a new run
     };
   }

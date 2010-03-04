@@ -5,6 +5,7 @@
 #include "Interaction.hpp"
 #include "Langevin.hpp"
 #include "System.hpp"
+#include "mpi.hpp"
 
 using namespace espresso;
 using namespace integrator;
@@ -64,12 +65,33 @@ void VelocityVerlet::run(int nsteps)
 
      if (langevin) langevin->heatUp();
 
+     if (LOG4ESPP_DEBUG_ON(theLogger)) {
+        printPositions(false);
+     }
+
      pSystem->storage->updateGhosts();
+
+     if (LOG4ESPP_DEBUG_ON(theLogger)) {
+        printPositions(true);
+     }
+
+     initForces();
+
      calcForces();
+
+     if (LOG4ESPP_DEBUG_ON(theLogger)) {
+        printForces(true);    // check forces in real + ghost particles
+     }
+
+     pSystem->storage->collectGhostForces();
+
+     if (LOG4ESPP_DEBUG_ON(theLogger)) {
+        printForces(false);   // forces are reduced to real particles
+     }
+
      pSystem->storage->collectGhostForces();
 
      if (langevin) langevin->coolDown();
-
   }
 
   LOG4ESPP_INFO(theLogger, "run " << nsteps << " iterations");
@@ -78,7 +100,7 @@ void VelocityVerlet::run(int nsteps)
 
   for (int i = 0; i < nsteps; i++) {
 
-    LOG4ESPP_INFO(theLogger, "step " << i << " of " << nsteps << " iterations");
+    LOG4ESPP_INFO(theLogger, "Next step " << i << " of " << nsteps << " starts");
 
     maxDist += integrate1();
 
@@ -87,7 +109,7 @@ void VelocityVerlet::run(int nsteps)
     if (maxDist > skinHalf) resortFlag = true;
 
     if (resortFlag) {
-      LOG4ESPP_INFO(theLogger, "resort particles + rebuild VL");
+      LOG4ESPP_INFO(theLogger, "step " << i << ": resort particles + rebuild VL");
       pSystem->storage->resortParticles();
       vl = make_shared<VerletList>(system.lock(), maxCut + pSystem->skin);
       maxDist  = 0.0;
@@ -95,13 +117,17 @@ void VelocityVerlet::run(int nsteps)
     }
 
     pSystem->storage->updateGhosts();
+
     calcForces();
+
     pSystem->storage->collectGhostForces();
 
     if (langevin) langevin->thermalize();
    
     integrate2();
   }
+
+  LOG4ESPP_INFO(theLogger, "proc " << mpiWorld.rank() << ": finished run");
 }
 
 /*****************************************************************************/
@@ -136,17 +162,23 @@ real VelocityVerlet::integrate1()
       cit->r.p[j] += deltaP;
       sqDist += deltaP * deltaP;
     }
+
     count++;
+
     maxSqDist = std::max(maxSqDist, sqDist);
- 
   }
 
   // ToDo: here or outside: mpi::all_reduce(maxval)
 
-  LOG4ESPP_INFO(theLogger, "moved " << count << " particles in integrate1" <<
-                            ", max sqr move = " << maxSqDist);
+  real maxAllSqDist;
 
-  return sqrt(maxSqDist);
+  mpi::all_reduce(mpiWorld, maxSqDist, maxAllSqDist, boost::mpi::maximum<double>());
+
+  LOG4ESPP_INFO(theLogger, "moved " << count << " particles in integrate1" <<
+                            ", max move local = " << sqrt(maxSqDist) <<
+                            ", global = " << sqrt(maxAllSqDist));
+
+  return sqrt(maxAllSqDist);
 }
 
 /*****************************************************************************/
@@ -191,6 +223,8 @@ void VelocityVerlet::setUp()
 
 void VelocityVerlet::calcForces()
 {
+  LOG4ESPP_INFO(theLogger, "calculate forces");
+
   initForces();
 
   System& sys = *(system.lock().get());
@@ -204,8 +238,6 @@ void VelocityVerlet::calcForces()
      LOG4ESPP_INFO(theLogger, "compute forces for srIL " << i << " of " << srIL.size());
 
      srIL[i]->addVerletListForces(vl);
-
-     // energy += srIL[i]->computeVerletListEnergy(vl);
   }
 
   // Just for control now: compute + print energy
@@ -232,3 +264,52 @@ void VelocityVerlet::initForces()
   }
 }
 
+/*****************************************************************************/
+
+void VelocityVerlet::printForces(bool withGhosts)
+{
+  // print forces of real + ghost particles
+
+  CellList cells;
+
+  if (withGhosts) {
+    cells = system.lock().get()->storage->getLocalCells();
+    LOG4ESPP_DEBUG(theLogger, "Proc " << mpiWorld.rank() << ": local forces");
+  } else {
+    cells = system.lock().get()->storage->getRealCells();
+    LOG4ESPP_DEBUG(theLogger, "Proc " << mpiWorld.rank() << ": real forces");
+  }
+  
+  for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
+
+    LOG4ESPP_DEBUG(theLogger, "Proc " << mpiWorld.rank()
+                   << ": Particle " << cit->p.id 
+                   << ", force = " << cit->f.f[0] << " "
+                   << cit->f.f[1] << " " <<  cit->f.f[2]);
+  }
+}
+
+/*****************************************************************************/
+
+void VelocityVerlet::printPositions(bool withGhosts)
+{
+  // print positions of real + ghost particles
+
+  CellList cells;
+
+  if (withGhosts) {
+    cells = system.lock().get()->storage->getLocalCells();
+    LOG4ESPP_DEBUG(theLogger, "Proc " << mpiWorld.rank() << ": local positions");
+  } else {
+     cells = system.lock().get()->storage->getRealCells();
+    LOG4ESPP_DEBUG(theLogger, "Proc " << mpiWorld.rank() << ": real positions");
+  }
+  
+  for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
+
+    LOG4ESPP_DEBUG(theLogger, "Proc " << mpiWorld.rank()
+                   << ": Particle " << cit->p.id
+                   << ", position = " << cit->r.p[0] << " "
+                   << cit->r.p[1] << " " <<  cit->r.p[2]);
+  }
+}
