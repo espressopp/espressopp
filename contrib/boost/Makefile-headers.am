@@ -238,7 +238,6 @@ noinst_HEADERS = \
 	boost/smart_ptr/intrusive_ptr.hpp \
 	boost/smart_ptr/shared_array.hpp \
 	boost/smart_ptr/weak_ptr.hpp \
-	boost/smart_ptr/make_shared.hpp \
 	boost/smart_ptr/bad_weak_ptr.hpp \
 	boost/smart_ptr/scoped_ptr.hpp \
 	boost/smart_ptr/detail/spinlock.hpp \
@@ -832,7 +831,6 @@ noinst_HEADERS = \
 	boost/pending/detail/property.hpp \
 	boost/pending/property.hpp \
 	boost/pending/queue.hpp \
-	boost/make_shared.hpp \
 	boost/token_iterator.hpp \
 	boost/version.hpp \
 	boost/is_placeholder.hpp \
@@ -3147,5 +3145,4 @@ noinst_HEADERS = \
 	boost/config.hpp \
 	boost/assert.hpp \
 	boost/signals2.hpp \
-	libs/serialization/src/basic_xml_grammar.ipp \
-	boost/python/detail/python22_fixed.h
+	libs/serialization/src/basic_xml_grammar.ipp
