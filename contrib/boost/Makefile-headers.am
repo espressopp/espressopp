@@ -232,6 +232,7 @@ noinst_HEADERS = \
 	boost/tuple/detail/tuple_basic_no_partial_spec.hpp \
 	boost/operators.hpp \
 	boost/signals.hpp \
+	boost/smart_ptr/enable_shared_from_this2.hpp \
 	boost/smart_ptr/scoped_array.hpp \
 	boost/smart_ptr/enable_shared_from_this.hpp \
 	boost/smart_ptr/intrusive_ptr.hpp \
@@ -244,6 +245,7 @@ noinst_HEADERS = \
 	boost/smart_ptr/detail/yield_k.hpp \
 	boost/smart_ptr/detail/sp_counted_base_acc_ia64.hpp \
 	boost/smart_ptr/detail/sp_counted_base_gcc_x86.hpp \
+	boost/smart_ptr/detail/sp_counted_base_cw_x86.hpp \
 	boost/smart_ptr/detail/lwm_win32_cs.hpp \
 	boost/smart_ptr/detail/shared_ptr_nmt.hpp \
 	boost/smart_ptr/detail/sp_counted_base_pt.hpp \
@@ -259,6 +261,7 @@ noinst_HEADERS = \
 	boost/smart_ptr/detail/sp_counted_base_w32.hpp \
 	boost/smart_ptr/detail/sp_convertible.hpp \
 	boost/smart_ptr/detail/atomic_count_pthreads.hpp \
+	boost/smart_ptr/detail/atomic_count_solaris.hpp \
 	boost/smart_ptr/detail/lwm_nop.hpp \
 	boost/smart_ptr/detail/sp_counted_base_spin.hpp \
 	boost/smart_ptr/detail/shared_count.hpp \
@@ -273,6 +276,7 @@ noinst_HEADERS = \
 	boost/smart_ptr/detail/spinlock_sync.hpp \
 	boost/smart_ptr/detail/sp_counted_impl.hpp \
 	boost/smart_ptr/detail/sp_counted_base_cw_ppc.hpp \
+	boost/smart_ptr/detail/sp_counted_base_solaris.hpp \
 	boost/smart_ptr/detail/quick_allocator.hpp \
 	boost/smart_ptr/detail/lwm_pthreads.hpp \
 	boost/smart_ptr/detail/atomic_count_gcc_x86.hpp \
@@ -1356,6 +1360,7 @@ noinst_HEADERS = \
 	boost/last_value.hpp \
 	boost/math_fwd.hpp \
 	boost/random.hpp \
+	boost/pointer_cast.hpp \
 	boost/range/value_type.hpp \
 	boost/range/as_literal.hpp \
 	boost/range/rend.hpp \
@@ -1638,6 +1643,7 @@ noinst_HEADERS = \
 	boost/python/call.hpp \
 	boost/python/arg_from_python.hpp \
 	boost/get_pointer.hpp \
+	boost/pointer_to_other.hpp \
 	boost/test/logged_expectations.hpp \
 	boost/test/unit_test_log_formatter.hpp \
 	boost/test/test_case_template.hpp \
@@ -2776,6 +2782,7 @@ noinst_HEADERS = \
 	boost/parameter/aux_/arg_list.hpp \
 	boost/parameter/aux_/cast.hpp \
 	boost/parameter/aux_/parenthesized_type.hpp \
+	boost/parameter/aux_/overloads.hpp \
 	boost/parameter/aux_/maybe.hpp \
 	boost/parameter/aux_/tagged_argument.hpp \
 	boost/parameter/aux_/set.hpp \
@@ -3075,6 +3082,7 @@ noinst_HEADERS = \
 	boost/detail/atomic_count.hpp \
 	boost/detail/endian.hpp \
 	boost/detail/indirect_traits.hpp \
+	boost/detail/lightweight_thread.hpp \
 	boost/detail/ob_call_traits.hpp \
 	boost/detail/container_fwd.hpp \
 	boost/detail/lcast_precision.hpp \
