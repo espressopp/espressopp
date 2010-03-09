@@ -1,69 +1,26 @@
-
 #include "LennardJones.hpp"
 
-#include "types.hpp"
-#include <cassert>
-
-using namespace espresso;
-using namespace espresso::interaction;
-
-/************************************************************************************/
-
-LennardJones::LennardJones()
-{
-  ntypes = 0;
-}
-
-/************************************************************************************/
-
-LennardJones::~LennardJones()
-{
-}
-
-/************************************************************************************/
-
-INTERACTION_ROUTINES(LennardJones)
-
-/************************************************************************************/
-
-void LennardJones::enableShift(int type1, int type2)
-{
-  Parameters& params = parameterArray[type1][type2];
-  params.enableShift();
-}
-
-/************************************************************************************/
-
-void LennardJones::setParameters(int type1, int type2, real epsilon, real sigma, real rc) 
-{
-  assert(type1 >= 0);
-  assert(type2 >= 0);
-
-  if ((type1 >= ntypes) || (type2 >= ntypes)) {
-
-    // reallocate the type array
-
-    int maxtypes = std::max(type1+1, type2+1);
-
-    if (maxtypes > ntypes + 1) {
-       //printf("WARNING: number of types increased from %d to %d\n",
-       //                 ntypes, maxtypes);
+namespace espresso {
+  namespace interaction {
+    void LennardJonesFunction::preset() {
+      real sig2 = sigma * sigma;
+      real sig6 = sig2 * sig2 * sig2;
+      ff1 = 48.0 * epsilon * sig6 * sig6;
+      ff2 = 24.0 * epsilon * sig6;
+      ef1 =  4.0 * epsilon * sig6 * sig6;
+      ef2 =  4.0 * epsilon * sig6;
     }
 
-    if (maxtypes > 1) {
-       //printf("ERROR: currently not supported\n");
-       exit(-1);
+    void LennardJonesFunction::setAutoShift() {
+      real ratio = sigma / getCutoff();
+      real rat2 = ratio * ratio;
+      real rat6 = rat2 * rat2 * rat2;
+      shift = 4.0 * epsilon * rat6 * (rat6 - 1.0);
     }
- 
-    // ToDo: reallocation
 
-    ntypes = maxtypes;
+    void VerletListLennardJones::setAutoShift(int type1, int type2)
+    {
+      getFunction(type1, type2).setAutoShift();
+    }
   }
-
-  Parameters& params = parameterArray[type1][type2];
-  params.setEpsilon(epsilon);
-  params.setSigma(sigma);
-  params.setCutoff(rc);
-  params.preset();
 }
-

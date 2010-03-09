@@ -42,17 +42,17 @@ namespace espresso {
     bool useForAllPairs;
   };
 
-  struct CellList : public std::vector< Cell* > {
-    typedef esutil::ESPPIterator< std::vector< Cell* > > Iterator;
-  };
+  struct CellList 
+    : public esutil::ESPPContainer < std::vector< Cell* > > 
+  {};
 
-  struct NeighborCellList : public std::vector< NeighborCellInfo > {
-    typedef esutil::ESPPIterator< std::vector< NeighborCellInfo > > Iterator;
-  };
+  struct NeighborCellList 
+    : public esutil::ESPPContainer< std::vector< NeighborCellInfo > > 
+  {};
 
-  struct LocalCellList : public std::vector< Cell > {
-    typedef esutil::ESPPIterator< std::vector< Cell > > Iterator;
-  };
+  struct LocalCellList 
+    : public esutil::ESPPContainer< std::vector< Cell > > 
+  {};
 
   struct Cell {
     ParticleList particles;

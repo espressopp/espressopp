@@ -1,5 +1,5 @@
 from espresso import *
-from espresso import storage, bc, integrator, esutil
+from espresso import storage, bc, integrator, esutil, interaction
 import random
 
 # constants
@@ -13,3 +13,13 @@ system.rng = esutil.RNG()
 system.bc = bc.OrthorhombicBC(system)
 system.storage = storage.DomainDecomposition(system)
 
+vl = VerletList(system, cutoff=1.0, skin=0.4)
+ljint = interaction.VerletListLennardJones(vl)
+ljfunc = interaction.LennardJonesFunction(
+    epsilon=1.0, sigma=1.0, cutoff=2.0)
+ljint.setParameters(type1=0, type2=1, ljfunc)
+
+integrator = integrator.VelocityVerlet(system, timestep=0.001)
+integrator.addInteraction(ljint)
+
+integrator.run(steps=1000)

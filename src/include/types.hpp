@@ -21,15 +21,6 @@ namespace espresso {
   }
 
   /* Forward declarations and typedefs. */
-  class Particle;
-  class Cell;
-  class CellList;
-  class NeighborCellList;
-  class LocalCellList;
-
-  /** A pair is a tuple of two references to the particles. */
-  typedef std::pair< class Particle*, class Particle* > ParticlePair;
-
   class Real3D;
   class Real3DRef;
   class ConstReal3DRef;
@@ -37,6 +28,26 @@ namespace espresso {
   class Int3D;
   class Int3DRef;
   class ConstInt3DRef;
+
+  class Particle;
+  class ParticleList;
+  class ParticlePair;
+  class PairList;
+
+  class Cell;
+  class CellList;
+  class NeighborCellList;
+  class LocalCellList;
+
+  class Storage;
+  class BC;
+
+  class System;
+
+  namespace interaction {
+    class Interaction;
+    class InteractionList;
+  }
 
   class NoDefault: public std::exception {};
 

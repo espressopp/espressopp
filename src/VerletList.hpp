@@ -3,6 +3,7 @@
 
 #include "log4espp.hpp"
 #include "types.hpp"
+#include "Particle.hpp"
 
 namespace espresso {
 
@@ -12,14 +13,9 @@ namespace espresso {
 
 */
 
-  class Particle;
-
   class VerletList {
 
   public:
-    /** List of pairs are currently done by a vector. */
-    typedef std::vector< ParticlePair > PairList;
-
     /** Build a verlet list of all particle pairs in the storage
 	whose distance is less than a given cutoff.
 
@@ -28,7 +24,7 @@ namespace espresso {
 
     */
 
-    VerletList(shared_ptr< class System >, double cut);
+    VerletList(shared_ptr< System >, real cut);
 
     ~VerletList();
 
@@ -40,11 +36,11 @@ namespace espresso {
 
     PairList myList;
 
-    double cutsq;
+    real cutsq;
 
     static LOG4ESPP_DECL_LOGGER(theLogger);
 
-    shared_ptr<class BC> bc;
+    shared_ptr< BC> bc;
   };
 
 }

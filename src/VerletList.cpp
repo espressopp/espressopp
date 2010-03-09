@@ -51,7 +51,7 @@ void VerletList::checkPair(Particle& pt1, Particle& pt2)
 
   if (distsq > cutsq) return;
 
-  myList.push_back(ParticlePair(&pt1, &pt2));
+  myList.add(pt1, pt2);
 }
 
 /*-------------------------------------------------------------*/

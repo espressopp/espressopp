@@ -1,12 +1,9 @@
 #ifndef _INTERACTION_HPP
 #define _INTERACTION_HPP
 
-#include "Particle.hpp"
-#include "BC.hpp"
-#include "logging.hpp"
 #include "types.hpp"
-#include "Storage.hpp"
-#include "VerletList.hpp"
+#include "logging.hpp"
+#include "esutil/ESPPIterator.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -16,68 +13,43 @@ namespace espresso {
     class Interaction {
 
     public:
+      virtual void addForces() = 0;
+      virtual real computeEnergy() = 0;
 
-      // full loop over a storage; this class provides its own implementation
-      // but will call the abstract routine for two Cells.
+      // move into separate classes:
+      // virtual void addStorageForces(shared_ptr< Storage > storage) = 0;
+      // virtual real computeStorageEnergy(shared_ptr< Storage > storage) = 0;
 
-      virtual real computeStorageEnergy(shared_ptr<Storage> storage);
-
-      virtual void addVerletListForces(shared_ptr<VerletList> vl) = 0;
-
-      virtual real computeVerletListEnergy(shared_ptr<VerletList> vl) = 0;
-
-      virtual real computeCellEnergy(ParticleList &pl) = 0;
-
-      virtual real computeCellEnergy(ParticleList &pl1, ParticleList &pl2) = 0;
+      // virtual void addVerletListForces(shared_ptr< VerletList > vl) = 0;
+      // virtual real computeVerletListEnergy(shared_ptr< VerletList > vl) = 0;
 
       /** This method returns the maximal cutoff defined for one type pair. */
-
       virtual real getMaxCutoff() = 0;
 
-    public:
-
-      class ParametersBase {
-      private:
-        real cutoff;
-        real cutoffSqr;
-
-      public:
-        ParametersBase() { setCutoff(0.0); }
-        void setCutoff(real _cutoff) { cutoff = _cutoff; cutoffSqr = cutoff * cutoff; }
-        real getCutoff() const { return cutoff; }
-        real getCutoffSqr() const { return cutoffSqr; }
-      };
-    
     protected:
-
       /** Logger */
-
       static LOG4ESPP_DECL_LOGGER(theLogger);
     };
+
+    struct InteractionList
+      : public std::vector< shared_ptr< Interaction > > {
+      typedef esutil::ESPPIterator< std::vector< Interaction > > Iterator;
+    };
+
+    /** Interaction function base class. */
+    class InteractionFunction {
+    private:
+      real cutoff;
+      real cutoffSqr;
+      
+    public:
+      InteractionFunction() { setCutoff(0.0); }
+      void setCutoff(real _cutoff) { cutoff = _cutoff; cutoffSqr = cutoff * cutoff; }
+      real getCutoff() const { return cutoff; }
+      real getCutoffSqr() const { return cutoffSqr; }
+    };
+
   }
 }
-
-#define INTERACTION_ROUTINES(Derived) \
- \
-void Derived::addVerletListForces(shared_ptr<VerletList> vl) \
-{ \
-  addVerletListForcesImpl(vl); \
-} \
- \
-real Derived::computeVerletListEnergy(shared_ptr<VerletList> vl) \
-{ \
-  return computeVerletListEnergyImpl(vl); \
-} \
- \
-real Derived::computeCellEnergy(ParticleList &pl) \
-{ \
-  return computeCellEnergyImpl(pl); \
-} \
- \
-real Derived::computeCellEnergy(ParticleList &pl1, ParticleList &pl2) \
-{ \
-  return computeCellEnergyImpl(pl1, pl2); \
-} 
-
 
 #endif

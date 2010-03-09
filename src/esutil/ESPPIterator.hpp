@@ -34,6 +34,14 @@ namespace espresso {
       typename STLContainer::iterator stlIt;
       typename STLContainer::iterator stlEnd;
     };
+
+    template < class STLContainer >
+    class ESPPContainer : public STLContainer {
+    protected:
+      typedef STLContainer Super;
+    public:
+      typedef ESPPIterator< STLContainer > Iterator;
+    };
   }
 }
 

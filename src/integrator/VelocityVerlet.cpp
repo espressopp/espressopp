@@ -5,6 +5,7 @@
 #include "Interaction.hpp"
 #include "Langevin.hpp"
 #include "System.hpp"
+#include "Storage.hpp"
 #include "mpi.hpp"
 
 using namespace espresso;
@@ -28,7 +29,7 @@ VelocityVerlet::~VelocityVerlet()
 
 /*****************************************************************************/
 
-void VelocityVerlet::setLangevin(shared_ptr<Langevin> _langevin)
+void VelocityVerlet::setLangevin(shared_ptr< Langevin > _langevin)
 {
   LOG4ESPP_INFO(theLogger, "set Langevin thermostat");
   langevin = _langevin;
@@ -38,7 +39,7 @@ void VelocityVerlet::setLangevin(shared_ptr<Langevin> _langevin)
 
 void VelocityVerlet::run(int nsteps)
 {
-  System* pSystem = system.lock().get();
+  Storage &storage = *(system.lock()->storage);
 
   if (langevin) langevin->init(dt);
 
@@ -50,9 +51,8 @@ void VelocityVerlet::run(int nsteps)
 
   if (resortFlag) {
      LOG4ESPP_INFO(theLogger, "resort particles");
-     pSystem->storage->resortParticles();
-     LOG4ESPP_INFO(theLogger, "particles rosort, build VL");
-     vl = make_shared<VerletList>(system.lock(), maxCut + pSystem->skin);
+     storage.resortParticles();
+     LOG4ESPP_INFO(theLogger, "particles resort");
      maxDist = 0.0;
      resortFlag = false;
   }
@@ -69,7 +69,7 @@ void VelocityVerlet::run(int nsteps)
         printPositions(false);
      }
 
-     pSystem->storage->updateGhosts();
+     storage.updateGhosts();
 
      if (LOG4ESPP_DEBUG_ON(theLogger)) {
         printPositions(true);
@@ -83,20 +83,20 @@ void VelocityVerlet::run(int nsteps)
         printForces(true);    // check forces in real + ghost particles
      }
 
-     pSystem->storage->collectGhostForces();
+     storage.collectGhostForces();
 
      if (LOG4ESPP_DEBUG_ON(theLogger)) {
         printForces(false);   // forces are reduced to real particles
      }
 
-     pSystem->storage->collectGhostForces();
+     storage.collectGhostForces();
 
      if (langevin) langevin->coolDown();
   }
 
   LOG4ESPP_INFO(theLogger, "run " << nsteps << " iterations");
   
-  real skinHalf = 0.5 * pSystem->skin;
+  real skinHalf = 0.5 * system.lock()->skin;
 
   for (int i = 0; i < nsteps; i++) {
 
@@ -109,18 +109,17 @@ void VelocityVerlet::run(int nsteps)
     if (maxDist > skinHalf) resortFlag = true;
 
     if (resortFlag) {
-      LOG4ESPP_INFO(theLogger, "step " << i << ": resort particles + rebuild VL");
-      pSystem->storage->resortParticles();
-      vl = make_shared<VerletList>(system.lock(), maxCut + pSystem->skin);
+      LOG4ESPP_INFO(theLogger, "step " << i << ": resort particles");
+      storage.resortParticles();
       maxDist  = 0.0;
       resortFlag = false;
     }
 
-    pSystem->storage->updateGhosts();
+    storage.updateGhosts();
 
     calcForces();
 
-    pSystem->storage->collectGhostForces();
+    storage.collectGhostForces();
 
     if (langevin) langevin->thermalize();
    
@@ -237,7 +236,7 @@ void VelocityVerlet::calcForces()
 
      LOG4ESPP_INFO(theLogger, "compute forces for srIL " << i << " of " << srIL.size());
 
-     srIL[i]->addVerletListForces(vl);
+     srIL[i]->addForces();
   }
 
   // Just for control now: compute + print energy

@@ -1,5 +1,5 @@
 nobase_pkginclude_HEADERS += \
-	interaction/InteractionTemplate.hpp \
+	interaction/VerletListInteractionTemplate.hpp \
 	interaction/LennardJones.hpp
 
 libespresso_common_la_SOURCES += \

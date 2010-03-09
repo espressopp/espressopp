@@ -44,10 +44,7 @@ namespace espresso {
   }
 
   void Storage::updateLocalParticles(ParticleList &l) {
-    for (ParticleList::iterator
-	   it  = l.begin(),
-	   end = l.end();
-	 it != end; ++it) {
+    for (ParticleList::Iterator it(l); it.isValid(); ++it) {
       localParticles[it->p.id] = &(*it);
     }
   }
@@ -168,10 +165,7 @@ namespace espresso {
     }
 
     // update localParticles
-    for(std::vector<Cell *>::iterator
-	  it = realCells.begin(),
-	  end = realCells.end();
-	it != end; ++it) {
+    for(CellList::Iterator it(realCells); it.isValid(); ++it) {
       updateLocalParticles((*it)->particles);
     }
   }
@@ -184,7 +178,7 @@ namespace espresso {
     mpi::packed_oarchive data(comm);
     int size = l.size();
     data << size;
-    for (ParticleList::iterator it = l.begin(), end = l.end(); it != end; ++it)
+    for (ParticleList::Iterator it(l); it.isValid(); ++it)
       data << *it;
     l.clear();
 

@@ -117,8 +117,31 @@ namespace espresso {
     }
   };
 
-  struct ParticleList : public std::vector< Particle > {
-    typedef esutil::ESPPIterator< std::vector< Particle > > Iterator;
+  struct ParticleList 
+    : public esutil::ESPPContainer < std::vector< Particle > > 
+  {};
+
+  class ParticlePair 
+    : public std::pair< class Particle*, class Particle* > 
+  {
+  private:
+    typedef std::pair< class Particle*, class Particle* > Super;
+  public:
+    ParticlePair() : Super() {}
+    ParticlePair(Particle* p1, Particle* p2) 
+      : Super(p1, p2) {}
+    ParticlePair(Particle &p1, Particle& p2)
+      : Super(&p1, &p2) {}
+  };
+
+  struct PairList
+    : public esutil::ESPPContainer< std::vector< ParticlePair > >
+  {
+    void add(Particle *p1, Particle *p2) 
+    { this->push_back(ParticlePair(p1, p2)); }
+
+    void add(Particle &p1, Particle &p2) 
+    { this->add(&p1, &p2); }
   };
 
 }

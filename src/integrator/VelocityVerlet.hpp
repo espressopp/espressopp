@@ -27,8 +27,6 @@ namespace espresso {
 
         bool resortFlag;  //!< true implies need for resort of particles
 
-        shared_ptr< class VerletList > vl;
-
         double maxCut;
 
         shared_ptr< class Langevin > langevin;  //!< Langevin thermostat if available
