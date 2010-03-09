@@ -117,8 +117,6 @@ struct Fixture {
   }
 };
 
-// BOOST_GLOBAL_FIXTURE(Fixture);
-
 BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 {
   BOOST_MESSAGE("define LJ potential");
@@ -144,12 +142,6 @@ BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 
   BOOST_MESSAGE("ready");
 }
-
-
-
-
-
-
 
 
 // sets up a storage with particles in a lattice

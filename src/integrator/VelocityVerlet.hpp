@@ -1,11 +1,10 @@
 #ifndef _INTEGRATOR_VELOCITY_VERLET_HPP
 #define _INTEGRATOR_VELOCITY_VERLET_HPP
 
+#include "types.hpp"
 #include "MDIntegrator.hpp"
 
 namespace espresso {
-
-  class VerletList;
 
   namespace integrator {
 

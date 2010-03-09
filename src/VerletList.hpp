@@ -40,7 +40,7 @@ namespace espresso {
 
     static LOG4ESPP_DECL_LOGGER(theLogger);
 
-    shared_ptr< BC> bc;
+    shared_ptr< bc::BC > bc;
   };
 
 }

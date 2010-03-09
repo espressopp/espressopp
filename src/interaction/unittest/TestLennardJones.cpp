@@ -57,34 +57,34 @@ BOOST_GLOBAL_FIXTURE(Fixture);
 
 BOOST_FIXTURE_TEST_CASE(calcEnergy, Fixture)
 {
-  BOOST_MESSAGE("starting to build verlet lists");
+  // BOOST_MESSAGE("starting to build verlet lists");
 
-  double cut = 1.5;
+  // double cut = 1.5;
 
-  shared_ptr< VerletList > vl = 
-    make_shared<VerletList>(system, cut);
+  // shared_ptr< VerletList > vl = 
+  //   make_shared< VerletList >(system, cut);
 
-  VerletList::PairList pairs = vl->getPairs();
+  // PairList pairs = vl->getPairs();
 
-  printf("# of verlet list pairs = %d\n", pairs.size());
+  // printf("# of verlet list pairs = %d\n", pairs.size());
 
-  for (size_t i = 0; i < pairs.size(); i++) {
-    printf("pair %d = %d %d\n", i, pairs[i].first->p.id, pairs[i].second->p.id);
-  }
+  // for (size_t i = 0; i < pairs.size(); i++) {
+  //   printf("pair %d = %d %d\n", i, pairs[i].first->p.id, pairs[i].second->p.id);
+  // }
 
-  LennardJones lj = LennardJones();
+  // LennardJones lj = LennardJones();
 
-  lj.setParameters(0, 0, 1.0, 1.0, 1.3);
+  // lj.setParameters(0, 0, 1.0, 1.0, 1.3);
 
-  // compute energy for the storage looping over all cells
+  // // compute energy for the storage looping over all cells
 
-  real e1 = lj.computeStorageEnergy(system->storage);
+  // real e1 = lj.computeStorageEnergy(system->storage);
 
-  printf("energy (cells) = %f\n", e1);
+  // printf("energy (cells) = %f\n", e1);
 
-  lj.addVerletListForces(vl);
+  // lj.addVerletListForces(vl);
 
-  real e2 = lj.computeVerletListEnergy(vl);
+  // real e2 = lj.computeVerletListEnergy(vl);
 
-  printf("energy (verlet) = %f\n", e2);
+  // printf("energy (verlet) = %f\n", e2);
 }

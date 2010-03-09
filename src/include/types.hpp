@@ -21,6 +21,10 @@ namespace espresso {
   }
 
   /* Forward declarations and typedefs. */
+  namespace esutil {
+    class RNG;
+  }
+
   class Real3D;
   class Real3DRef;
   class ConstReal3DRef;
@@ -39,10 +43,17 @@ namespace espresso {
   class NeighborCellList;
   class LocalCellList;
 
-  class Storage;
-  class BC;
+  class VerletList;
 
   class System;
+
+  namespace storage {
+    class Storage;
+  }
+
+  namespace bc {
+    class BC;
+  }
 
   namespace interaction {
     class Interaction;
@@ -50,27 +61,6 @@ namespace espresso {
   }
 
   class NoDefault: public std::exception {};
-
-  template < typename T >
-  T takeFirst(T t1, T t2) {
-    if (t1) return t1;
-    if (t2) return t2;
-    throw NoDefault();
-  }
-
-  template < typename T >
-  T takeFirst(T t1, T t2, T t3) {
-    if (t1) return t1;
-    if (t2) return t2;
-    if (t3) return t3;
-    throw NoDefault();
-  }
-
-  template< class real >
-  real sign(real _r) {
-    return  (_r > 0) ? 1.0 : -1.0;
-  }
-
 }
 
 #endif 

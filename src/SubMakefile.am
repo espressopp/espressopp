@@ -3,21 +3,15 @@ nobase_pkginclude_HEADERS += \
 	Int3D.hpp \
 	Particle.hpp \
 	Cell.hpp \
-	Storage.hpp \
-        BC.hpp \
 	System.hpp \
-	Interaction.hpp \
 	VerletList.hpp \
 	bindings.hpp
 
 libespresso_common_la_SOURCES += \
 	Real3D.cpp \
 	Int3D.cpp \
-	Storage.cpp \
-        BC.cpp \
 	System.cpp \
 	VerletList.cpp \
-	Interaction.cpp \
 	bindings.cpp
 
 python_SCRIPTS += \

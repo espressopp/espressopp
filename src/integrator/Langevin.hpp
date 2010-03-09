@@ -1,12 +1,10 @@
-#ifndef _INTEGRATOR_LANGEVIN_VERLET_HPP
-#define _INTEGRATOR_LANGEVIN_VERLET_HPP
+#ifndef _INTEGRATOR_LANGEVIN_HPP
+#define _INTEGRATOR_LANGEVIN_HPP
 
+#include "types.hpp"
 #include "logging.hpp"
 
 namespace espresso {
-
-  namespace esutil { class RNG; }
-
   namespace integrator {
 
     /** Langevin */
@@ -15,7 +13,7 @@ namespace espresso {
 
       public:
 
-        Langevin(shared_ptr<class espresso::System> system);
+        Langevin(shared_ptr< System > system);
 
         void setGamma(real gamma);
 

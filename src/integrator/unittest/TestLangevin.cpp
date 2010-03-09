@@ -1,4 +1,4 @@
-#define PARALLEL_TEST_MODULE LennardJones
+#define BOOST_TEST_MODULE LennardJones
 #include "ut.hpp"
 #include <memory>
 

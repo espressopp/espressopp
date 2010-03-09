@@ -1,9 +1,11 @@
 nobase_pkginclude_HEADERS += \
+	storage/Storage.hpp \
 	storage/DomainDecomposition.cpp \
 	storage/CellGrid.hpp \
 	storage/NodeGrid.hpp
 
 libespresso_common_la_SOURCES += \
+	storage/Storage.cpp \
 	storage/DomainDecomposition.cpp \
 	storage/CellGrid.cpp \
 	storage/NodeGrid.cpp

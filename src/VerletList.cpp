@@ -6,8 +6,8 @@
 #include "Particle.hpp"
 #include "Cell.hpp"
 #include "System.hpp"
-#include "Storage.hpp"
-#include "BC.hpp"
+#include "storage/Storage.hpp"
+#include "bc/BC.hpp"
 #include "iterator/CellListAllPairsIterator.hpp"
 
 using namespace espresso;

@@ -2,7 +2,7 @@
 #define _SYSTEM_HPP
 
 #include "types.hpp"
-#include "Interaction.hpp"
+#include "interaction/Interaction.hpp"
 
 namespace espresso {
 
@@ -15,8 +15,8 @@ namespace espresso {
     System(std::string &_name) : name(_name) {};
 
     std::string name;
-    shared_ptr< Storage > storage;
-    shared_ptr< BC > bc;
+    shared_ptr< storage::Storage > storage;
+    shared_ptr< bc::BC > bc;
     shared_ptr< esutil::RNG > rng;
 
     interaction::InteractionList shortRangeInteractions;

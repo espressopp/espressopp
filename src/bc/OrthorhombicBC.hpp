@@ -6,8 +6,6 @@
 #include "Real3D.hpp"
 
 namespace espresso {
-  class System;
-
   namespace bc {
     class OrthorhombicBC : public BC {
     private:

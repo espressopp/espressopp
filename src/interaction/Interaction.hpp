@@ -1,5 +1,5 @@
-#ifndef _INTERACTION_HPP
-#define _INTERACTION_HPP
+#ifndef _INTERACTION_INTERACTION_HPP
+#define _INTERACTION_INTERACTION_HPP
 
 #include "types.hpp"
 #include "logging.hpp"

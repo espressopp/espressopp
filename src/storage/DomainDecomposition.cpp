@@ -4,9 +4,9 @@
 #include "log4espp.hpp"
 #include "System.hpp"
 
-#include "DomainDecomposition.hpp"
-#include "BC.hpp"
 #include "Real3D.hpp"
+#include "DomainDecomposition.hpp"
+#include "bc/BC.hpp"
 
 using namespace boost;
 

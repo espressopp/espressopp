@@ -7,9 +7,6 @@
 #include "types.hpp"
 
 namespace espresso {
-
-  class System;
-
   namespace integrator {
 
     /** MOD Integrator base class. */

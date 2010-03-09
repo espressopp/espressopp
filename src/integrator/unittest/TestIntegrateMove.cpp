@@ -97,7 +97,7 @@ struct Fixture {
 
 // BOOST_GLOBAL_FIXTURE(Fixture);
 
-BOOST_FIXTURE_TEST_CASE(movePartlices, Fixture)
+BOOST_FIXTURE_TEST_CASE(moveParticles, Fixture)
 {
   // define a 0 potential, but with a cutoff
 

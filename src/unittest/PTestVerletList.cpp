@@ -170,7 +170,7 @@ BOOST_FIXTURE_TEST_CASE(LatticeTest, LatticeFixture)
 
   shared_ptr< VerletList > vl = make_shared< VerletList >(system, 0.0);
 
-  VerletList::PairList pairs = vl->getPairs();
+  PairList pairs = vl->getPairs();
 
   // there are no pairs for cutoff 0.0
 
@@ -231,7 +231,7 @@ BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
 
   shared_ptr< VerletList > vl = make_shared< VerletList >(system, cutoff);
 
-  VerletList::PairList pairs = vl->getPairs();
+  PairList pairs = vl->getPairs();
 
   for (size_t i = 0; i < pairs.size(); i++) {
      Particle *p1 = pairs[i].first;
