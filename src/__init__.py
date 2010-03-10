@@ -1,5 +1,5 @@
 # set up espresso paths and logging
-from espresso import __setup
+from espresso.main import __setup
 
 from espresso.esutil import pmiimport
 pmiimport('espresso')

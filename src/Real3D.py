@@ -53,10 +53,10 @@ class __Real3D(Real3D) :
 
     # string conversion
     def __str__(self) :
-        return str(tuple(self))
+        return str((self[0], self[1], self[2]))
 
     def __repr__(self) :
-        return 'Real3D' + str(tuple(self))
+        return 'Real3D' + str(self)
 
 def toReal3DFromVector(*args):
     """Try to convert the arguments to a Real3D.

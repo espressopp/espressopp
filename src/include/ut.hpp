@@ -12,7 +12,7 @@
 #ifdef PARALLEL_TEST_MODULE
 
 #include "mpi.hpp"
-#include "../espresso_common.hpp"
+#include "main/espresso_common.hpp"
 
 struct MPIFixture {  
   MPIFixture() { 

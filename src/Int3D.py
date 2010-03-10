@@ -53,10 +53,10 @@ class __Int3D(Int3D) :
 
     # string conversion
     def __str__(self) :
-        return str(tuple(self))
+        return str((self[0], self[1], self[2]))
 
     def __repr__(self) :
-        return 'Int3D' + str(tuple(self))
+        return 'Int3D' + str(self)
 
 def toInt3DFromVector(*args):
     """Try to convert the arguments to a Int3D.

@@ -10,7 +10,7 @@ AC_INIT([ESPResSo++],[0.1],[espressopp-user@www.espresso-pp.de],[espressopp])
 # basic autoconf configuration
 AC_CONFIG_MACRO_DIR(build-aux/macros)
 AC_CONFIG_AUX_DIR(build-aux)
-AC_CONFIG_SRCDIR([src/_espresso.cpp])
+AC_CONFIG_SRCDIR([src/main/_espresso.cpp])
 
 # we use automake
 AM_INIT_AUTOMAKE([gnu subdir-objects dist-bzip2])
@@ -238,7 +238,7 @@ AC_SUBST(pythondir)
 AC_SUBST([abs_top_builddir])
 
 # determine CPPFLAGS 
-AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/src -I\$(top_srcdir)/src/include -I\$(top_srcdir)/contrib/boostmpi/include"
+AM_CPPFLAGS="$AM_CPPFLAGS -I\$(top_srcdir)/src -I\$(top_srcdir)/src/include"
 test "x$PYTHON_CPPFLAGS" != "xno" && AM_CPPFLAGS="$AM_CPPFLAGS \$(PYTHON_CPPFLAGS)" 
 AC_SUBST([AM_CPPFLAGS])
 
@@ -276,8 +276,8 @@ AC_CONFIG_FILES([test/runtests.sh],
 
 # espresso setup scripts
 AC_CONFIG_FILES([
-	src/__setupPath.py:src/__setupPath.py.build.in
-	src/__setupPath.py.install:src/__setupPath.py.install.in
+	src/main/__setupPath.py:src/main/__setupPath.py.build.in
+	src/main/__setupPath.py.install:src/main/__setupPath.py.install.in
        	espresso_setup.sh:setup/espresso_setup.sh.build.in
        	espresso_setup.sh.install:setup/espresso_setup.sh.install.in
        	espresso_setup.csh:setup/espresso_setup.csh.build.in
@@ -286,7 +286,8 @@ AC_CONFIG_FILES([
 	poc/__init__.py
        ])
 
-# create a link to the src dir by the name of espresso, so 
+# create a link to the src dir by the name of espresso
+# so that Python can find the package espresso
 AC_CONFIG_COMMANDS([espresso],
 	[AS_IF([test ! -e espresso],[$LN_S src espresso],
                [test ! -h espresso], [

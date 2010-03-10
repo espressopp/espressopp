@@ -1,5 +1,5 @@
 # set the path
-from espresso import __setupPath
+from espresso.main import __setupPath
 
 # load mpi4py (must be loaded before _espresso)
 import MPI
