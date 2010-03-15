@@ -219,12 +219,20 @@ AC_ARG_VAR([DOXYGEN], [Doxygen code documentation tool])
 AC_PATH_PROG([DOXYGEN],[doxygen],[no])
 AM_CONDITIONAL(HAVE_DOXYGEN,[test "x$DOXYGEN" != "xno"])
 
+################################################################### 
+#                                                                 #
+#  ASTYLE                                                        #
+#                                                                 #
+################################################################### 
+
+AC_ARG_VAR([ASTYLE], [Artistic style code formatting tool])
+AC_PATH_PROG([ASTYLE],[astyle],[no])
+
 cat >& AS_MESSAGE_FD <<EOF
 **********************************************************************
 *                        Writing output files                        *
 **********************************************************************
 EOF
-
 
 ################################################################### 
 #                                                                 #
@@ -271,6 +279,8 @@ AC_CONFIG_FILES([bin/utexec],
                 [chmod ugo+x bin/utexec])
 AC_CONFIG_FILES([bin/espp_mpiexec.sh],
                 [chmod ugo+x bin/espp_mpiexec.sh])
+AC_CONFIG_FILES([bin/espp_format],
+                [chmod ugo+x bin/espp_format])
 AC_CONFIG_FILES([test/runtests.sh],
                 [chmod ugo+x test/runtests.sh])
 
@@ -357,6 +367,7 @@ cat >config.summary << EOF
     - $MYMPIEXEC
     - fallback: $MPIEXEC
  * Doxygen: $DOXYGEN
+ * astyle: $ASTYLE
 EOF
 
 cat config.summary >&AS_MESSAGE_FD
