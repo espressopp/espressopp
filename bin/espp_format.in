@@ -11,7 +11,7 @@ OUTPUT=$($ASTYLE --version 2>&1 | cat)
 VERSION=${OUTPUT#Artistic Style Version }
 
 OPTIONS="--options=none \
---indent=spaces=4 \
+--indent=spaces=2 \
 --brackets=attach \
 --indent-namespaces \
 --indent-preprocessor \
