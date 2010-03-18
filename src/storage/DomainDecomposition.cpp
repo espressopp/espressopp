@@ -565,7 +565,7 @@ namespace espresso {
     void
     DomainDecomposition::registerPython() {
       using namespace espresso::python;
-      class_< DomainDecomposition, boost::noncopyable >("DomainDecomposition", no_init)
+      class_< DomainDecomposition, boost::noncopyable >("storage_DomainDecomposition", no_init)
       ;
     }
   }

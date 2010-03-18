@@ -419,7 +419,7 @@ namespace espresso {
   void
   Storage::registerPython() {
     using namespace espresso::python;
-    class_< StorageWrap, boost::noncopyable >("Storage", no_init)
+    class_< StorageWrap, boost::noncopyable >("storage_Storage", no_init)
       .def("addParticle", &StorageWrap::addParticle)
     ;
   }
