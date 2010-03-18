@@ -10,14 +10,17 @@ namespace espresso {
   namespace bc {
     /* Constructor */
     OrthorhombicBC::
-    OrthorhombicBC(shared_ptr< System > _system, 
+    OrthorhombicBC(shared_ptr< System > _system,
 		   const ConstReal3DRef _boxL)
+
     { setBoxL(_boxL); 
-      system = _system;
-      if (!system.use_count()) {
-        printf("ERROR in OrthorhomicBC::Orthorhombic : no system (you should never see this line) !\n");
+
+      if (!_system) {
+        printf("Error: NULL system");
+        // throw an exception
       } else {
-        printf("OrthorhombicBC::OrthorhombicBC() : system.use_count()=%i\n",system.use_count());
+        // Note: this is the workaround for problem in Boost Python
+        system = _system->getShared();
         try {
           if (system.lock()->rng) {
             esutil::RNG &rng = *(system.lock()->rng);
@@ -33,7 +36,6 @@ namespace espresso {
       }
     }
   
-
     /* Setter method for the box length */
     void OrthorhombicBC::setBoxL(const ConstReal3DRef _boxL) {
       boxL = _boxL;
@@ -103,25 +105,17 @@ namespace espresso {
       for(int k = 0; k < 3; k++)
 	res[k] = boxL[k];
       
-      if (!system.use_count()) {
-        printf("ERROR in OrthorhomicBC::getRandomPos() : BC lost system !\n");
-      } else {
-        try {
-          esutil::RNG &rng = *(system.lock()->rng);
-          res[0] *= rng();
-          res[1] *= rng();
-          res[2] *= rng();
-        }
-        catch (boost::bad_weak_ptr) {
-          printf("ERROR in OrthorhombicBC::getRandomPos() : system lost RNG !\n");
-        }
-      }
+      esutil::RNG &rng = *(system.lock()->rng.get());
+
+      res[0] *= rng();
+      res[1] *= rng();
+      res[2] *= rng();
     }
     
     std::string
     OrthorhombicBC::
     printSystem() {
-      if (system.use_count()) {
+      if (!system.expired()) {
         try {
           return system.lock()->name;
         } 
@@ -134,6 +128,20 @@ namespace espresso {
       }
     }
 
+    shared_ptr<System> OrthorhombicBC::getSystem() const
+    { if (system.expired())
+        return shared_ptr<System>();
+      else
+        return system.lock();
+    }
+
+    void OrthorhombicBC::setSystem(shared_ptr< System > _system)
+    { if (!_system) {
+        printf("Error: NULL system");
+      } else {
+        system=_system->getShared(); 
+      }
+    }
 
     void 
     OrthorhombicBC::

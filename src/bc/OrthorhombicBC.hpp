@@ -27,8 +27,8 @@ namespace espresso {
       setBoxL(const ConstReal3DRef _boxL);
 
       /** Setter, Getter and Printer for system weak_ptr (implemented only for debugging)*/
-      virtual void setSystem(shared_ptr< System > _system) { system=weak_ptr< System >(_system); }
-      virtual shared_ptr< System > getSystem() { return system.lock(); }
+      virtual void setSystem(shared_ptr< System > _system); 
+      virtual shared_ptr< System > getSystem() const;
       virtual std::string printSystem();
 
       /** Getters for box dimensions */
