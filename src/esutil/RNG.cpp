@@ -64,7 +64,7 @@ RNG::registerPython() {
 
    real (RNG::*pyoperator)()=&RNG::operator();
 
-   class_< RNG >("RNG")
+   class_< RNG >("esutil_RNG")
     .def("__call__",pyoperator)
     .add_property("normal",&RNG::normal)
     ;
