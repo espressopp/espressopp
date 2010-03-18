@@ -2,6 +2,7 @@
 #define GRID_HPP
 
 #include "types.hpp"
+#include "Int3D.hpp"
 
 namespace espresso {
   namespace esutil {
@@ -17,7 +18,7 @@ namespace espresso {
 	size[2] = z;
       }
 
-      Grid(const int _size[3]) {
+      Grid(const ConstInt3DRef _size) {
 	for (int i = 0; i < 3; ++i) {
 	  size[i] = _size[i];
 	}

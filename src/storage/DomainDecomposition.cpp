@@ -3,10 +3,12 @@
 #include <cmath>
 #include "log4espp.hpp"
 #include "System.hpp"
+#include "python.hpp"
 
 #include "Real3D.hpp"
 #include "DomainDecomposition.hpp"
 #include "bc/BC.hpp"
+#include "Int3D.hpp"
 
 using namespace boost;
 
@@ -23,8 +25,8 @@ namespace espresso {
 
     DomainDecomposition::DomainDecomposition(shared_ptr< System > _system,
 					     const mpi::communicator &_comm,
-					     const int _nodeGrid[3],
-					     const int _cellGrid[3])
+					     const ConstInt3DRef _nodeGrid,
+					     const ConstInt3DRef _cellGrid)
       : Storage(_system, _comm), exchangeBufferSize(0) {
       LOG4ESPP_INFO(logger, "node grid = "
 		    << _nodeGrid[0] << "x" << _nodeGrid[1] << "x" << _nodeGrid[2]
@@ -37,7 +39,7 @@ namespace espresso {
       LOG4ESPP_DEBUG(logger, "done");
     }
 
-    void DomainDecomposition::createCellGrid(const int _nodeGrid[3], const int _cellGrid[3]) {
+    void DomainDecomposition::createCellGrid(const ConstInt3DRef _nodeGrid, const ConstInt3DRef _cellGrid) {
       real myLeft[3];
       real myRight[3];
 
@@ -152,11 +154,11 @@ namespace espresso {
       LOG4ESPP_DEBUG(logger, "done");
     }
 
-    Cell *DomainDecomposition::mapPositionToCellClipped(const real pos[3]) {
+    Cell *DomainDecomposition::mapPositionToCellClipped(const ConstReal3DRef pos) {
       return &cells[cellGrid.mapPositionToCellClipped(pos)];
     }
 
-    Cell *DomainDecomposition::mapPositionToCellChecked(const real pos[3]) {
+    Cell *DomainDecomposition::mapPositionToCellChecked(const ConstReal3DRef pos) {
       longint c = cellGrid.mapPositionToCellChecked(pos);
       if (c == CellGrid::noCell) {
 	return 0;
@@ -552,6 +554,19 @@ namespace espresso {
 	}
       }
       LOG4ESPP_DEBUG(logger, "ghost communication finished");
+    }
+ 
+
+
+    //////////////////////////////////////////////////
+    // REGISTRATION WITH PYTHON
+    //////////////////////////////////////////////////
+
+    void
+    DomainDecomposition::registerPython() {
+      using namespace espresso::python;
+      class_< DomainDecomposition, boost::noncopyable >("DomainDecomposition", no_init)
+      ;
     }
   }
 }

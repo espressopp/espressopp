@@ -4,6 +4,8 @@
 #include "log4espp.hpp"
 
 #include "CellGrid.hpp"
+#include "Int3D.hpp"
+#include "Real3D.hpp"
 
 using namespace std;
 using namespace espresso;
@@ -13,7 +15,7 @@ LOG4ESPP_LOGGER(CellGrid::logger, "DomainDecomposition.CellGrid");
 CellGridIllegal::CellGridIllegal()
   : std::runtime_error("cell grid dimensions have to be positive") {}
 
-CellGrid::CellGrid(const int _size[3],
+CellGrid::CellGrid(const ConstInt3DRef _size,
 		   const real _myLeft[3],
 		   const real _myRight[3],
 		   int _frame)
@@ -44,7 +46,7 @@ longint CellGrid::getNumberOfInnerCells() const
   return res;
 }
 
-longint CellGrid::mapPositionToCellClipped(const real pos[3]) const
+longint CellGrid::mapPositionToCellClipped(const ConstReal3DRef pos) const
 {
   int cpos[3];
 
@@ -63,7 +65,7 @@ longint CellGrid::mapPositionToCellClipped(const real pos[3]) const
   return mapPositionToIndex(cpos);  
 }
 
-longint CellGrid::mapPositionToCellChecked(const real pos[3]) const
+longint CellGrid::mapPositionToCellChecked(const ConstReal3DRef pos) const
 {
   int cpos[3];
 

@@ -2,6 +2,7 @@
 #include "log4espp.hpp"
 
 #include "Real3D.hpp"
+#include "Int3D.hpp"
 #include "NodeGrid.hpp"
 
 namespace espresso {
@@ -79,7 +80,7 @@ namespace espresso {
   }
 
   NodeGrid::
-  NodeGrid(const int grid[3],
+  NodeGrid(const ConstInt3DRef grid,
 	   const longint nodeId,
 	   const Real3D &domainSize)
     : Grid(grid)

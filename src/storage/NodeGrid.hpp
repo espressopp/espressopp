@@ -9,6 +9,8 @@
 #include "types.hpp"
 #include "logging.hpp"
 #include "esutil/Grid.hpp"
+#include "Real3D.hpp"
+#include "Int3D.hpp"
 
 namespace espresso {
 
@@ -39,7 +41,7 @@ namespace espresso {
       ToLeft = -1, ToRight = 1
     };
 
-    NodeGrid(const int grid[3],
+    NodeGrid(const ConstInt3DRef grid,
     	     const longint nodeId,
     	     const Real3D &_domainSize);
 

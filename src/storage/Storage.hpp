@@ -25,7 +25,7 @@ namespace espresso {
 	  with the give id already exists.  This is left to the parallel
 	  front end.
       */
-      Particle *addParticle(longint id, const real pos[3]);
+      Particle *addParticle(longint id, const ConstReal3DRef pos);
       /** lookup whether data for a given particle is available on this node,
 	  either as real or as ghost particle*/
       Particle *lookupLocalParticle(longint id) {
@@ -54,10 +54,10 @@ namespace espresso {
       /** map a position to a valid cell on this node.  If the position
 	  is outside the domain of this node, return the cell inside the
 	  domain that is closest to the position. */
-      virtual Cell *mapPositionToCellClipped(const real pos[3]) = 0;
+      virtual Cell *mapPositionToCellClipped(const ConstReal3DRef pos) = 0;
       /** map a position to a cell on this node.  If the position is
 	  outside the domain of this node, return 0. */
-      virtual Cell *mapPositionToCellChecked(const real pos[3]) = 0;
+      virtual Cell *mapPositionToCellChecked(const ConstReal3DRef pos) = 0;
 
       /** sort the particles. This should be called by the integrator
 	  instead of updateGhosts() whenever a particle might have moved
@@ -87,6 +87,8 @@ namespace espresso {
       virtual void collectGhostForces() = 0;
 
       boost::signals2::signal0<void> onResortParticles;
+
+      static void registerPython();
 
     protected:
       /** called by resortParticles to initiate resorting of the real

@@ -1,6 +1,7 @@
 #ifndef _STORAGE_DOMAINDECOMPOSITION_HPP
 #define _STORAGE_DOMAINDECOMPOSITION_HPP
 #include "Storage.hpp"
+#include "types.hpp"
 #include "CellGrid.hpp"
 #include "NodeGrid.hpp"
 
@@ -16,20 +17,21 @@ namespace espresso {
     public:
       DomainDecomposition(shared_ptr< System >,
 			  const boost::mpi::communicator &,
-			  const int nodeGrid[3],
-			  const int cellGrid[3]);
+			  const ConstInt3DRef nodeGrid,
+			  const ConstInt3DRef cellGrid);
 
       virtual ~DomainDecomposition() {}
 
-      virtual Cell *mapPositionToCellClipped(const real pos[3]);
-      virtual Cell *mapPositionToCellChecked(const real pos[3]);
+      virtual Cell *mapPositionToCellClipped(const ConstReal3DRef pos);
+      virtual Cell *mapPositionToCellChecked(const ConstReal3DRef pos);
 
       const NodeGrid &getNodeGrid() const { return nodeGrid; }
       const CellGrid &getCellGrid() const { return cellGrid; }
 
-    public:
       virtual void updateGhosts();
       virtual void collectGhostForces();
+
+      static void registerPython();
 
     protected:
       virtual void resortRealParticles();
@@ -44,7 +46,7 @@ namespace espresso {
       /// init global Verlet list
       void initCellInteractions();
       /// set the grids and allocate space accordingly
-      void createCellGrid(const int nodeGrid[3], const int cellGrid[3]);
+      void createCellGrid(const ConstInt3DRef nodeGrid, const ConstInt3DRef cellGrid);
       /// sort cells into local/ghost cell arrays
       void markCells();
       /// fill a list of cells with the cells from a certain region of the domain grid

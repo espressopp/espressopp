@@ -11,9 +11,9 @@ namespace espresso {
     private:
       Real3D boxL;
       Real3D invBoxL;
-      weak_ptr< System > system;
 
     public:
+      weak_ptr< System > system;
       /** Virtual destructor for boundary conditions. */
       virtual
       ~OrthorhombicBC() {}
