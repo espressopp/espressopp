@@ -2,13 +2,14 @@
 #define _SYSTEM_HPP
 
 #include "types.hpp"
+#include "boost/enable_shared_from_this.hpp"
 #include "interaction/Interaction.hpp"
 
 namespace espresso {
 
   namespace esutil { class RNG; }
 
-  class System {
+  class System : public enable_shared_from_this<System> {
 
   public:
     System() : name("DEFAULT") {};
@@ -21,9 +22,15 @@ namespace espresso {
 
     interaction::InteractionList shortRangeInteractions;
 
-    double skin;  //<! skin used for VerletList
+    real skin;  //<! skin used for VerletList
+
+    shared_ptr<System> getShared() { 
+      return shared_from_this();
+    }
 
     static void registerPython();
+
+    //!< keeps a pointer back to the Python object
 
   };
 }
