@@ -8,11 +8,11 @@
 
 namespace espresso {
   namespace interaction {
-    template < typename _InteractionFunction >
+    template < typename _Potential >
     class VerletListInteractionTemplate
         : public Interaction {
     protected:
-      typedef _InteractionFunction InteractionFunction;
+      typedef _Potential Potential;
     public:
       VerletListInteractionTemplate
       (shared_ptr < VerletList > _verletList)
@@ -29,12 +29,12 @@ namespace espresso {
       }
 
       void
-      setFunction(int type1, int type2, const InteractionFunction &func) {
+      setFunction(int type1, int type2, const Potential &func) {
         // TODO: automatically resize array
         functionArray[type1][type2] = func;
       }
 
-      InteractionFunction &getFunction(int type1, int type2) {
+      Potential &getFunction(int type1, int type2) {
         // TODO: automatically resize array
         return functionArray[type1][type2];
       }
@@ -46,14 +46,14 @@ namespace espresso {
     protected:
       int ntypes;
       shared_ptr < VerletList > verletList;
-      InteractionFunction functionArray[1][1];
+      Potential functionArray[1][1];
     };
 
-//////////////////////////////////////////////////
-// INLINE IMPLEMENTATION
-//////////////////////////////////////////////////
-    template < typename _InteractionFunction > inline void
-    VerletListInteractionTemplate < _InteractionFunction >::addForces() {
+    //////////////////////////////////////////////////
+    // INLINE IMPLEMENTATION
+    //////////////////////////////////////////////////
+    template < typename _Potential > inline void
+    VerletListInteractionTemplate < _Potential >::addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
       const PairList pairList = verletList->getPairs();
       Real3D dist;
@@ -65,17 +65,16 @@ namespace espresso {
         Particle &p2 = *pairList[i].second;
         int type1 = p1.p.type;
         int type2 = p2.p.type;
-        dist = p1.r.p - p2.r.p;
-        distSqr = dist.sqr();
-        const InteractionFunction &func = getFunction(type1, type2);
+        const Potential &func = getFunction(type1, type2);
 
-        if(distSqr < func.getCutoffSqr()) {
-          Real3D force;
-          func.getForce(p1, p2, dist, distSqr, force);
-          for(int k = 0; k < 3; k++) {
-            p1.f.f[k] += force[k];
-            p2.f.f[k] -= force[k];
-          }
+	Real3D force;
+	func.computeForce(p1, p2, force, nonzero);
+	if (nonzero) {
+	  for(int k = 0; k < 3; k++) {
+	    p1.f.f[k] += force[k];
+	    p2.f.f[k] -= force[k];
+	  }
+	}
 #if 0
           printf
           ("dist(%d,%d), dist = %f -> %f %f %f\n",
@@ -99,9 +98,9 @@ namespace espresso {
       }
     }
 
-    template < typename _InteractionFunction >
+    template < typename _Potential >
     inline real
-    VerletListInteractionTemplate < _InteractionFunction >::
+    VerletListInteractionTemplate < _Potential >::
     computeEnergy() {
       LOG4ESPP_INFO(theLogger, "compute energy by the Verlet List");
 
@@ -118,7 +117,7 @@ namespace espresso {
         int type2 = p2.p.type;
         dist = p1.r.p - p2.r.p;
         distSqr = dist.sqr();
-        const InteractionFunction &func = getFunction(type1, type2);
+        const Potential &func = getFunction(type1, type2);
         if(distSqr < func.getCutoffSqr()) {
           e += func.getEnergy(p1, p2, dist, distSqr);
         }
@@ -126,10 +125,10 @@ namespace espresso {
       return e;
     }
 
-    template < typename _InteractionFunction >
+    template < typename _Potential >
     inline real
     VerletListInteractionTemplate <
-    _InteractionFunction >::getMaxCutoff() {
+    _Potential >::getMaxCutoff() {
       real cutoff = 0.0;
 
       for(int i = 0; i < ntypes; i++) {
