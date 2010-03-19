@@ -7,7 +7,7 @@
 namespace espresso {
   namespace interaction {
     class LennardJonesFunction
-      : public InteractionFunction {
+      : public InteractionFunction< LennardJonesFunction > {
     private:
       real epsilon;
       real sigma;
@@ -39,12 +39,10 @@ namespace espresso {
       void setShift(real _shift) { shift = _shift; }
       real getShift() const { return shift; }
 
-      /** sets the shift to the value of the function at _x. */
       void setAutoShift();
       real getEnergy(Particle &p1, Particle &p2,
 		     const Real3DRef dist,
 		     const real distSqr) const;
-      
       void getForce(Particle &p1, Particle &p2,
 		    const Real3DRef dist,
 		    const real distSqr, Real3DRef force) const;
