@@ -293,8 +293,7 @@ namespace espresso {
 
   //////////////////////////////////////////////////
   // Real3D
-  inline Real3D::Real3D()
-  { for (int i = 0; i < 3; i++) data[i] = 0.0; }
+  inline Real3D::Real3D() {}
 
   inline Real3D::Real3D(real v) 
   { data[0] = data[1] = data[2] = v; }

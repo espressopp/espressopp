@@ -6,6 +6,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/mpi.hpp>
 #include <exception>
+#include <limits>
 #include "esconfig.hpp"
 
 namespace espresso {
@@ -19,6 +20,8 @@ namespace espresso {
   namespace mpi {
     using namespace boost::mpi;
   }
+
+  const real infinity = std::numeric_limits< real >::infinity();
 
   /* Forward declarations and typedefs. */
   namespace esutil {
