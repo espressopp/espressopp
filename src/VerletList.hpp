@@ -4,18 +4,20 @@
 #include "log4espp.hpp"
 #include "types.hpp"
 #include "Particle.hpp"
+#include "SystemAccess.hpp"
 
 namespace espresso {
 
 /** Class that builds and stores verlet lists.
 
-    Open: rebuild of verlet lists
+    ToDo: register at system for rebuild
 
 */
 
-  class VerletList {
+  class VerletList : public SystemAccess {
 
   public:
+
     /** Build a verlet list of all particle pairs in the storage
 	whose distance is less than a given cutoff.
 
@@ -28,7 +30,9 @@ namespace espresso {
 
     ~VerletList();
 
-    const PairList& getPairs() { return myList; }
+    const PairList& getPairs() const { return myList; }
+
+    void rebuild();
 
   private:
 

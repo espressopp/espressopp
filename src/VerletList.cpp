@@ -17,19 +17,30 @@ LOG4ESPP_LOGGER(VerletList::theLogger, "VerletList");
 
 /*-------------------------------------------------------------*/
 
-VerletList::VerletList(shared_ptr< System > system, real cut) 
+VerletList::VerletList(shared_ptr< System > system, real cut) : SystemAccess(system)
+
 {
-  LOG4ESPP_INFO(theLogger, "build VerletList, cut = " << cut);
+  LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << cut);
 
   cutsq = cut * cut;
 
-  CellList cl = system->storage->getRealCells();
+  rebuild();
+}
+
+/*-------------------------------------------------------------*/
+
+void VerletList::rebuild()
+{
+  myList.clear();
+
+  CellList cl = getSystem()->storage->getRealCells();
 
   for (CellListAllPairsIterator it(cl);it.isValid(); ++it) {
 
     checkPair(*it->first, *it->second);
   }
 
+  LOG4ESPP_INFO(theLogger, "rebuilt VerletList, cutsq = " << cutsq);
 }
 
 /*-------------------------------------------------------------*/
