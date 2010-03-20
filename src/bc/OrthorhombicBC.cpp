@@ -10,29 +10,15 @@ namespace espresso {
   namespace bc {
     /* Constructor */
     OrthorhombicBC::
-    OrthorhombicBC(shared_ptr< System > _system,
-		   const ConstReal3DRef _boxL)
+    OrthorhombicBC(shared_ptr< System > system,
+		   const ConstReal3DRef _boxL) :
+
+      SystemAccess(system)
 
     { setBoxL(_boxL); 
 
-      if (!_system) {
-        printf("Error: NULL system");
-        // throw an exception
-      } else {
-        // Note: this is the workaround for problem in Boost Python
-        system = _system->getShared();
-        try {
-          if (system.lock()->rng) {
-            esutil::RNG &rng = *(system.lock()->rng);
-            printf("OrthorhombicBC::OrthorhombicBC() : system.lock()->rng()=%f\n",rng());
-          }
-          else {
-            printf("Please define RNG in System first !\n");
-          }
-        }
-        catch (boost::bad_weak_ptr) {
-          printf("WARNING in OrthorhombicBC::Orthorhombic() : system has no RNG !\n");
-        }
+      if (!system->rng) {
+        LOG4ESPP_WARN(logger, "Please define RNG in System first");
       }
     }
   
@@ -105,53 +91,20 @@ namespace espresso {
       for(int k = 0; k < 3; k++)
 	res[k] = boxL[k];
       
-      esutil::RNG &rng = *(system.lock()->rng.get());
+      esutil::RNG &rng = *(getSystem()->rng.get());
 
       res[0] *= rng();
       res[1] *= rng();
       res[2] *= rng();
     }
     
-    std::string
-    OrthorhombicBC::
-    printSystem() {
-      if (!system.expired()) {
-        try {
-          return system.lock()->name;
-        } 
-        catch (boost::bad_weak_ptr) {
-          return "EXCEPTION boost::bad_weak_ptr in OrthorhombicBC::printSystem() !\n";
-        }
-      }
-      else {
-        return "no_system_defined";
-      }
-    }
-
-    shared_ptr<System> OrthorhombicBC::getSystem() const
-    { if (system.expired())
-        return shared_ptr<System>();
-      else
-        return system.lock();
-    }
-
-    void OrthorhombicBC::setSystem(shared_ptr< System > _system)
-    { if (!_system) {
-        printf("Error: NULL system");
-      } else {
-        system=_system->getShared(); 
-      }
-    }
-
     void 
     OrthorhombicBC::
     registerPython() {
       using namespace espresso::python;
       class_<OrthorhombicBC, bases< BC > >
 	("bc_OrthorhombicBC", init< shared_ptr< System >, Real3DRef >())
-        .def("setSystem",&OrthorhombicBC::setSystem)
-        .def("getSystem",&OrthorhombicBC::getSystem)
-        .def("printSystem",&OrthorhombicBC::printSystem)
+        .def("getSystem",&SystemAccess::getSystem)
       ;
     }
   }

@@ -25,7 +25,13 @@ namespace espresso {
 
     shared_ptr<System> getSystem() const;
 
+    /** Get a system reference */
+
+    System& getSystemRef() const { return *(getSystem().get()); }
+
   private:
+
+    /** Weak pointer to the system guarantees that system will be freed */
 
     weak_ptr< System > mySystem;
 

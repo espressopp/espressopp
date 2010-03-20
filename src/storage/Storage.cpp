@@ -23,9 +23,10 @@ namespace espresso {
   const int Storage::dataOfUpdateGhosts = 0;
   const int Storage::dataOfExchangeGhosts = DATA_PROPERTIES;
 
-  Storage::Storage(shared_ptr< System > _system,
-		   const boost::mpi::communicator &_comm)
-    : comm(_comm), system(_system)
+  Storage::Storage(shared_ptr< System > system,
+                   const boost::mpi::communicator &_comm)
+    : SystemAccess(system),
+      comm(_comm)
   {
   }
 
@@ -74,7 +75,7 @@ namespace espresso {
       n.r.p[i] = p[i];
       n.l.i[i] = 0;
     }
-    system.lock()->bc->foldPosition(n.r.p, n.l.i);
+    getSystem()->bc->foldPosition(n.r.p, n.l.i);
     cell = mapPositionToCellClipped(n.r.p);
 
     appendIndexedParticle(cell->particles, n);

@@ -3,33 +3,32 @@
 
 #include "types.hpp"
 #include "BC.hpp"
+#include "SystemAccess.hpp"
 #include "Real3D.hpp"
 
 namespace espresso {
   namespace bc {
-    class OrthorhombicBC : public BC {
+    class OrthorhombicBC : public BC,
+                           public SystemAccess {
     private:
       Real3D boxL;
       Real3D invBoxL;
 
     public:
-      weak_ptr< System > system;
+
       /** Virtual destructor for boundary conditions. */
       virtual
       ~OrthorhombicBC() {}
 
       /** Constructor */
-      OrthorhombicBC(shared_ptr< System > _system, 
+      OrthorhombicBC(shared_ptr< System > system, 
 		     const ConstReal3DRef _boxL);
 
       /** Method to set the length of the side of the cubic simulation cell */
       virtual void
       setBoxL(const ConstReal3DRef _boxL);
 
-      /** Setter, Getter and Printer for system weak_ptr (implemented only for debugging)*/
-      virtual void setSystem(shared_ptr< System > _system); 
-      virtual shared_ptr< System > getSystem() const;
-      virtual std::string printSystem();
+      /** Getter for system, NULL if expired */
 
       /** Getters for box dimensions */
       virtual Real3D getBoxL() { return boxL; }

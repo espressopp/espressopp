@@ -6,17 +6,18 @@
 #include <boost/signals2.hpp>
 #include "types.hpp"
 #include "log4espp.hpp"
+#include "SystemAccess.hpp"
 
 #include "Cell.hpp"
 
 namespace espresso {
   namespace storage {
     /** represents the particle storage of one system. */
-    class Storage {
+    class Storage : public SystemAccess {
     public:
       typedef boost::unordered_map< longint, Particle * > IdParticleMap;
 
-      Storage(shared_ptr< class System > _system,
+      Storage(shared_ptr< class System > system,
 	      const boost::mpi::communicator &);
       virtual ~Storage();
 
@@ -184,7 +185,6 @@ namespace espresso {
       /// map particle id to Particle * for all particles on this node
       boost::unordered_map<longint, Particle * > localParticles;
       mpi::communicator comm;
-      weak_ptr< class System > system;
   
       /** here the local particles are actually stored */
       LocalCellList cells;

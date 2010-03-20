@@ -5,13 +5,14 @@
 
 #include "logging.hpp"
 #include "types.hpp"
+#include "SystemAccess.hpp"
 
 namespace espresso {
   namespace integrator {
 
     /** MOD Integrator base class. */
 
-    class MDIntegrator {
+    class MDIntegrator : public SystemAccess {
 
       public:
 
@@ -37,10 +38,6 @@ namespace espresso {
         virtual void run(int nsteps) = 0;
 
       protected:
-
-        /** Integrator keeps a weak pointer to the system (otherwise self-cycles */
-
-        weak_ptr<class System> system;
 
         /** Timestep used for integration. */
 

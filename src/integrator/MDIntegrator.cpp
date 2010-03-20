@@ -7,11 +7,11 @@ using namespace integrator;
 
 LOG4ESPP_LOGGER(MDIntegrator::theLogger, "MDIntegrator");
 
-MDIntegrator::MDIntegrator(shared_ptr<System> _system)
+MDIntegrator::MDIntegrator(shared_ptr<System> system) :
+SystemAccess(system)
 {
-  system = _system;
   LOG4ESPP_INFO(theLogger, "construct Integrator");
-  if (!_system->storage) {
+  if (!system->storage) {
     LOG4ESPP_ERROR(theLogger, "system has no storage");
   }
 }

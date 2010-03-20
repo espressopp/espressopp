@@ -7,6 +7,8 @@
 namespace espresso {
   namespace bc {
 
+    LOG4ESPP_LOGGER(BC::logger, "BC");
+
     Real3D
     BC::getRandomPos() const {
       Real3D res;

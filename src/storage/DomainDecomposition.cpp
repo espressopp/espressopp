@@ -43,7 +43,7 @@ namespace espresso {
       real myLeft[3];
       real myRight[3];
 
-      nodeGrid = NodeGrid(_nodeGrid, comm.rank(), system.lock()->bc->getBoxL());
+      nodeGrid = NodeGrid(_nodeGrid, comm.rank(), getSystem()->bc->getBoxL());
 
       if (nodeGrid.getNumberOfCells() != comm.size()) {
 	throw NodeGridMismatch();
@@ -176,7 +176,7 @@ namespace espresso {
 	     end = l.end(); it != end; ++it) {
 
 	if (nodeGrid.getBoundary(dir) != 0) {
-	  system.lock()->bc->foldCoordinate(it->r.p, it->l.i, nodeGrid.convertDirToCoord(dir));
+	  getSystem()->bc->foldCoordinate(it->r.p, it->l.i, nodeGrid.convertDirToCoord(dir));
 	  LOG4ESPP_TRACE(logger, "folded coordinate " << nodeGrid.convertDirToCoord(dir) << " of particle " << it->p.id);
 	}
 
@@ -288,7 +288,7 @@ namespace espresso {
 	      // do not use an iterator here, since we have need to take out particles during the loop
 	      for (size_t p = 0; p < cell.particles.size(); ++p) {
 		Particle &part = cell.particles[p];
-		system.lock()->bc->foldCoordinate(part.r.p, part.l.i, coord);
+		getSystem()->bc->foldCoordinate(part.r.p, part.l.i, coord);
 		LOG4ESPP_TRACE(logger, "folded coordinate " << coord << " of particle " << part.p.id);
 
 		if (coord == 2) {
@@ -450,7 +450,7 @@ namespace espresso {
 	   particle.
 	*/
 	int coord = realToGhosts ? _coord : (2 - _coord);
-	real curCoordBoxL = system.lock()->bc->getBoxL(coord);
+	real curCoordBoxL = getSystem()->bc->getBoxL(coord);
 
 	// lr loop: left right
 	for (int lr = 0; lr < 2; ++lr) {

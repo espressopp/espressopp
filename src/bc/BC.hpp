@@ -2,6 +2,7 @@
 #define _BC_BC_HPP
 
 #include "types.hpp"
+#include "log4espp.hpp"
 
 namespace espresso {
   namespace bc {
@@ -73,6 +74,10 @@ namespace espresso {
       getRandomPos() const;
 
       static void registerPython();
+
+     protected:
+
+      static LOG4ESPP_DECL_LOGGER(logger);
 
     }; 
   }
