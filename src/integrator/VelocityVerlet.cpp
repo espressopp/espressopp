@@ -41,7 +41,9 @@ namespace espresso {
 
     void VelocityVerlet::run(int nsteps)
     {
-      storage::Storage &storage = *(getSystem()->storage);
+      System& system = getSystemRef();
+
+      storage::Storage& storage = *system.storage;
 
       if (langevin) langevin->init(dt);
 
@@ -96,7 +98,7 @@ namespace espresso {
 
       LOG4ESPP_INFO(theLogger, "run " << nsteps << " iterations");
   
-      real skinHalf = 0.5 * getSystem()->skin;
+      real skinHalf = 0.5 * system.skin;
 
       for (int i = 0; i < nsteps; i++) {
 
@@ -133,7 +135,9 @@ namespace espresso {
 
     real VelocityVerlet::integrate1()
     {
-      CellList realCells = getSystem()->storage->getRealCells();
+      System& system = getSystemRef();
+
+      CellList realCells = system.storage->getRealCells();
 
       // loop over all particles of the local cells
 
@@ -171,7 +175,8 @@ namespace espresso {
 
       real maxAllSqDist;
 
-      mpi::all_reduce(mpiWorld, maxSqDist, maxAllSqDist, boost::mpi::maximum<double>());
+      mpi::all_reduce(system.comm, maxSqDist, maxAllSqDist, 
+                      boost::mpi::maximum<double>());
 
       LOG4ESPP_INFO(theLogger, "moved " << count << " particles in integrate1" <<
 		    ", max move local = " << sqrt(maxSqDist) <<
@@ -184,7 +189,9 @@ namespace espresso {
 
     void VelocityVerlet::integrate2()
     {
-      CellList realCells = getSystem()->storage->getRealCells();
+      System& system = getSystemRef();
+
+      CellList realCells = system.storage->getRealCells();
 
       // loop over all particles of the local cells
 
@@ -252,7 +259,9 @@ namespace espresso {
 
       // ToDo: make one loop when getLocalCells() works
 
-      CellList localCells = getSystem()->storage->getLocalCells();
+      System& system = getSystemRef();
+
+      CellList localCells = system.storage->getLocalCells();
 
       LOG4ESPP_INFO(theLogger, "init forces for real + ghost particles");
 
@@ -269,19 +278,21 @@ namespace espresso {
     {
       // print forces of real + ghost particles
 
+      System& system = getSystemRef();
+
       CellList cells;
 
       if (withGhosts) {
-	cells = getSystem()->storage->getLocalCells();
-	LOG4ESPP_DEBUG(theLogger, "Proc " << mpiWorld.rank() << ": local forces");
+	cells = system.storage->getLocalCells();
+	LOG4ESPP_DEBUG(theLogger, "Proc " << system.comm.rank() << ": local forces");
       } else {
-	cells = getSystem()->storage->getRealCells();
-	LOG4ESPP_DEBUG(theLogger, "Proc " << mpiWorld.rank() << ": real forces");
+	cells = system.storage->getRealCells();
+	LOG4ESPP_DEBUG(theLogger, "Proc " << system.comm.rank() << ": real forces");
       }
   
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
 
-	LOG4ESPP_DEBUG(theLogger, "Proc " << mpiWorld.rank()
+	LOG4ESPP_DEBUG(theLogger, "Proc " << system.comm.rank()
 		       << ": Particle " << cit->p.id 
 		       << ", force = " << cit->f.f[0] << " "
 		       << cit->f.f[1] << " " <<  cit->f.f[2]);
@@ -294,19 +305,21 @@ namespace espresso {
     {
       // print positions of real + ghost particles
 
+      System& system = getSystemRef();
+
       CellList cells;
 
       if (withGhosts) {
-	cells = getSystem()->storage->getLocalCells();
-	LOG4ESPP_DEBUG(theLogger, "Proc " << mpiWorld.rank() << ": local positions");
+	cells = system.storage->getLocalCells();
+	LOG4ESPP_DEBUG(theLogger, "Proc " << system.comm.rank() << ": local positions");
       } else {
-	cells = getSystem()->storage->getRealCells();
-	LOG4ESPP_DEBUG(theLogger, "Proc " << mpiWorld.rank() << ": real positions");
+	cells = system.storage->getRealCells();
+	LOG4ESPP_DEBUG(theLogger, "Proc " << system.comm.rank() << ": real positions");
       }
   
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
 
-	LOG4ESPP_DEBUG(theLogger, "Proc " << mpiWorld.rank()
+	LOG4ESPP_DEBUG(theLogger, "Proc " << system.comm.rank()
 		       << ": Particle " << cit->p.id
 		       << ", position = " << cit->r.p[0] << " "
 		       << cit->r.p[1] << " " <<  cit->r.p[2]);
