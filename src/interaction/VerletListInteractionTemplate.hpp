@@ -13,11 +13,12 @@ namespace espresso {
         : public Interaction {
     protected:
       typedef _Potential Potential;
+      typedef VerletListInteractionTemplate< Potential> Super;
     public:
       VerletListInteractionTemplate
       (shared_ptr < VerletList > _verletList)
-        : verletList(_verletList) {
-      }
+        : verletList(_verletList) 
+      {}
 
       void
       setVerletList(shared_ptr < VerletList > _verletList) {
@@ -29,14 +30,16 @@ namespace espresso {
       }
 
       void
-      setFunction(int type1, int type2, const Potential &func) {
+      setPotential(int type1, int type2, const Potential &potential) {
         // TODO: automatically resize array
-        functionArray[type1][type2] = func;
+	//        potentialArray[type1][type2] = potential;
+	potentialArray = potential;
       }
 
-      Potential &getFunction(int type1, int type2) {
+      Potential &getPotential(int type1, int type2) {
         // TODO: automatically resize array
-        return functionArray[type1][type2];
+	//        return potentialArray[type1][type2];
+        return potentialArray;
       }
 
       virtual void addForces();
@@ -46,7 +49,7 @@ namespace espresso {
     protected:
       int ntypes;
       shared_ptr < VerletList > verletList;
-      Potential functionArray[1][1];
+      Potential potentialArray;
     };
 
     //////////////////////////////////////////////////
@@ -56,20 +59,17 @@ namespace espresso {
     VerletListInteractionTemplate < _Potential >::addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
       const PairList pairList = verletList->getPairs();
-      Real3D dist;
-      real distSqr;
 
       int npairs = pairList.size();
-      for(int i = 0; i < npairs; i++) {
+      for (int i = 0; i < npairs; i++) {
         Particle &p1 = *pairList[i].first;
         Particle &p2 = *pairList[i].second;
         int type1 = p1.p.type;
         int type2 = p2.p.type;
-        const Potential &func = getFunction(type1, type2);
+        const Potential &potential = getPotential(type1, type2);
 
 	Real3D force;
-	func.computeForce(p1, p2, force, nonzero);
-	if (nonzero) {
+	if (potential._computeForce(p1, p2, force))
 	  for(int k = 0; k < 3; k++) {
 	    p1.f.f[k] += force[k];
 	    p2.f.f[k] -= force[k];
@@ -94,10 +94,8 @@ namespace espresso {
              p2.f.f[0], p2.f.f[1], p2.f.f[0]);
           }
 #endif
-        }
-      }
     }
-
+    
     template < typename _Potential >
     inline real
     VerletListInteractionTemplate < _Potential >::
@@ -105,8 +103,6 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "compute energy by the Verlet List");
 
       const PairList pairList = verletList->getPairs();
-      Real3D dist;
-      real distSqr;
 
       int npairs = pairList.size();
       real e = 0.0;
@@ -115,12 +111,8 @@ namespace espresso {
         Particle &p2 = *pairList[i].second;
         int type1 = p1.p.type;
         int type2 = p2.p.type;
-        dist = p1.r.p - p2.r.p;
-        distSqr = dist.sqr();
-        const Potential &func = getFunction(type1, type2);
-        if(distSqr < func.getCutoffSqr()) {
-          e += func.getEnergy(p1, p2, dist, distSqr);
-        }
+        const Potential &potential = getPotential(type1, type2);
+	e += potential._computeEnergy(p1, p2);
       }
       return e;
     }
@@ -133,7 +125,7 @@ namespace espresso {
 
       for(int i = 0; i < ntypes; i++) {
         for(int j = 0; i < ntypes; i++) {
-          cutoff = std::max(cutoff, getFunction(i, j).getCutoff());
+          cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
         }
       }
       return cutoff;

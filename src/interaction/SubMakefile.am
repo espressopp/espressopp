@@ -5,7 +5,8 @@ nobase_pkginclude_HEADERS += \
 	interaction/LennardJones.hpp
 
 libespresso_common_la_SOURCES += \
-	interaction/Interaction.cpp
+	interaction/Interaction.cpp \
+	interaction/LennardJones.cpp
 
 #python_SCRIPTS +=
 

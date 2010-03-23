@@ -254,7 +254,7 @@ namespace espresso {
     }
 
     template < class Derived > 
-    inline bool 
+    inline bool
     PotentialTemplate< Derived >::
     _computeForce(Particle &p1, Particle &p2, 
 		  Real3DRef force) const {

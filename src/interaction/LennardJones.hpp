@@ -1,8 +1,8 @@
 #ifndef _INTERACTION_LENNARDJONES_HPP
 #define _INTERACTION_LENNARDJONES_HPP
 
-#include <logging.hpp>
 #include "Potential.hpp"
+#include "VerletListInteractionTemplate.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -21,6 +21,12 @@ namespace espresso {
 
     public:
       static void registerPython();
+
+      LennardJones()
+	: epsilon(0.0), sigma(0.0) {
+	setShift(0.0);
+	setCutoff(infinity);
+      }
 
       LennardJones(real _epsilon, real _sigma, 
 		   real _cutoff, real _shift) 
@@ -72,9 +78,18 @@ namespace espresso {
 	ffactor = 48.0 * epsilon * (frac6*frac6 - 0.5*frac6) 
 	  * distSqrInv;
 	force = dist * ffactor;
-
 	return true;
       }
+    };
+
+    // explicit template instatiations
+    // template class VerletListInteractionTemplate< LennardJones >;
+
+    class VerletListLennardJones 
+      : public VerletListInteractionTemplate< LennardJones > {
+      VerletListLennardJones(shared_ptr < VerletList > _verletList) 
+	: Super(_verletList)
+      {}
     };
   }
 }
