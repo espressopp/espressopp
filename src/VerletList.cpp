@@ -25,6 +25,11 @@ VerletList::VerletList(shared_ptr< System > system, real cut) : SystemAccess(sys
   cutsq = cut * cut;
 
   rebuild();
+
+  // make a connection to System to invoke rebuild on resort
+
+  connectionResort = system->storage->onResortParticles.connect(
+      boost::bind(&VerletList::rebuild, this));
 }
 
 /*-------------------------------------------------------------*/
@@ -67,7 +72,27 @@ void VerletList::checkPair(Particle& pt1, Particle& pt2)
 
 /*-------------------------------------------------------------*/
 
+int VerletList::totalSize() const
+{
+  System& system = getSystemRef();
+  
+  int size = myList.size();
+
+  int allsize;
+
+  mpi::all_reduce(system.comm, size, allsize, std::plus<int>());
+
+  return allsize;
+}
+
+/*-------------------------------------------------------------*/
+
 VerletList::~VerletList()
 {
+  LOG4ESPP_INFO(theLogger, "~VerletList");
+
+  if (!connectionResort.connected()) {
+    connectionResort.disconnect();
+  }
 }
 

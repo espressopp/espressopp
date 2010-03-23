@@ -5,6 +5,7 @@
 #include "types.hpp"
 #include "Particle.hpp"
 #include "SystemAccess.hpp"
+#include "boost/signals2.hpp"
 
 namespace espresso {
 
@@ -34,6 +35,10 @@ namespace espresso {
 
     void rebuild();
 
+    /** Get the total number of pairs for the Verlet list */
+
+    int totalSize() const;
+
   private:
 
     void checkPair(Particle &pt1, Particle &pt2);
@@ -42,9 +47,9 @@ namespace espresso {
 
     real cutsq;
 
-    static LOG4ESPP_DECL_LOGGER(theLogger);
+    boost::signals2::connection connectionResort;
 
-    shared_ptr< bc::BC > bc;
+    static LOG4ESPP_DECL_LOGGER(theLogger);
   };
 
 }
