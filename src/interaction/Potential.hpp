@@ -239,7 +239,7 @@ namespace espresso {
     inline Real3D 
     PotentialTemplate< Derived >::
     computeForce(Particle &p1, Particle &p2) const {
-      Real3D dist = p1.r.p - p2.r.p;
+      Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
       return computeForce(dist);
     }
     
@@ -258,7 +258,7 @@ namespace espresso {
     PotentialTemplate< Derived >::
     _computeForce(Particle &p1, Particle &p2, 
 		  Real3DRef force) const {
-      Real3D dist = p1.r.p - p2.r.p;
+      Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
       return _computeForce(dist, force);
     }
     
