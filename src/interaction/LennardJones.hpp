@@ -83,14 +83,11 @@ namespace espresso {
     };
 
     // explicit template instatiations
-    // template class VerletListInteractionTemplate< LennardJones >;
 
-    class VerletListLennardJones 
-      : public VerletListInteractionTemplate< LennardJones > {
-      VerletListLennardJones(shared_ptr < VerletList > _verletList) 
-	: Super(_verletList)
-      {}
-    };
+    template class VerletListInteractionTemplate< LennardJones >;
+
+    typedef class VerletListInteractionTemplate< LennardJones > VerletListLennardJones;
+
   }
 }
 

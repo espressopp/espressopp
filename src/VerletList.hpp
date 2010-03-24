@@ -39,6 +39,10 @@ namespace espresso {
 
     int totalSize() const;
 
+    /** Register this class so it can be used from Python. */
+
+    static void registerPython();
+
   private:
 
     void checkPair(Particle &pt1, Particle &pt2);
