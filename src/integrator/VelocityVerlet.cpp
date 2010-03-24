@@ -4,9 +4,11 @@
 
 #include "iterator/CellListIterator.hpp"
 #include "interaction/Interaction.hpp"
+#include "interaction/Potential.hpp"
 #include "System.hpp"
 #include "storage/Storage.hpp"
 #include "mpi.hpp"
+#include "python.hpp"
 
 using namespace espresso;
 using namespace interaction;
@@ -45,7 +47,7 @@ namespace espresso {
 
       storage::Storage& storage = *system.storage;
 
-      if (langevin) langevin->init(dt);
+      if (langevin) langevin->initialize(dt);
 
       // no more needed: setUp();
 
@@ -90,8 +92,6 @@ namespace espresso {
 	if (LOG4ESPP_DEBUG_ON(theLogger)) {
 	  printForces(false);   // forces are reduced to real particles
 	}
-
-	storage.collectGhostForces();
 
 	if (langevin) langevin->coolDown();
       }
@@ -171,8 +171,6 @@ namespace espresso {
 	maxSqDist = std::max(maxSqDist, sqDist);
       }
 
-      // ToDo: here or outside: mpi::all_reduce(maxval)
-
       real maxAllSqDist;
 
       mpi::all_reduce(system.comm, maxSqDist, maxAllSqDist, 
@@ -241,14 +239,11 @@ namespace espresso {
 
       for (size_t i = 0; i < srIL.size(); i++) {
 
-	LOG4ESPP_INFO(theLogger, "compute forces for srIL " << i << " of " << srIL.size());
+	LOG4ESPP_INFO(theLogger, "compute forces for srIL " << i 
+                                  << " of " << srIL.size());
 
 	srIL[i]->addForces();
       }
-
-      // Just for control now: compute + print energy
-
-      // LOG4ESPP_INFO(theLogger, "energy  = " << energy);
     }
 
     /*****************************************************************************/
@@ -256,8 +251,6 @@ namespace espresso {
     void VelocityVerlet::initForces()
     {
       // forces are initialized for real + ghost particles
-
-      // ToDo: make one loop when getLocalCells() works
 
       System& system = getSystemRef();
 
@@ -324,6 +317,24 @@ namespace espresso {
 		       << ", position = " << cit->r.p[0] << " "
 		       << cit->r.p[1] << " " <<  cit->r.p[2]);
       }
+    }
+
+    /****************************************************
+    ** REGISTRATION WITH PYTHON
+    ****************************************************/
+
+    void VelocityVerlet::registerPython() {
+
+      using namespace espresso::python;
+
+      // Note: use noncopyable and no_init for abstract classes
+
+      class_<VelocityVerlet, shared_ptr<VelocityVerlet>, bases<MDIntegrator> >
+
+        ("integrator_VelocityVerlet", init< shared_ptr<System> >())
+
+        .add_property("langevin", &VelocityVerlet::getLangevin, &VelocityVerlet::setLangevin)
+        ;
     }
   }
 }

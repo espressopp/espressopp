@@ -3,13 +3,14 @@
 
 #include "types.hpp"
 #include "logging.hpp"
+#include "SystemAccess.hpp"
 
 namespace espresso {
   namespace integrator {
 
     /** Langevin */
 
-    class Langevin  {
+    class Langevin : public SystemAccess {
 
       public:
 
@@ -25,7 +26,7 @@ namespace espresso {
 
         ~Langevin();
 
-        void init(real timestep);
+        void initialize(real timestep);
 
         /** update of forces to thermalize the system */
 
@@ -45,9 +46,13 @@ namespace espresso {
 
         void coolDown();
 
+        /** Register this class so it can be used from Python. */
+
+        static void registerPython();
+
       private:
 
-        void frictionThermo(class Particle*);
+        void frictionThermo(class Particle&);
 
         real gamma;        //!< friction coefficient
 
@@ -58,7 +63,7 @@ namespace espresso {
 
         real pref2buffer; //!< temporary to save value between heatUp/coolDown
 
-        weak_ptr<class System> system;
+        shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
 
         /** Logger */
 

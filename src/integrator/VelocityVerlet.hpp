@@ -20,7 +20,13 @@ namespace espresso {
 
         void setLangevin(shared_ptr<class Langevin> langevin);
 
+        shared_ptr<class Langevin> getLangevin() { return langevin; }
+
         void run(int nsteps);
+
+        /** Register this class so it can be used from Python. */
+
+        static void registerPython();
 
       private:
 

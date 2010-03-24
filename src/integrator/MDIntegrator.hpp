@@ -1,8 +1,6 @@
 #ifndef _INTEGRATOR_MD_INTEGRATOR_HPP
 #define _INTEGRATOR_MD_INTEGRATOR_HPP
 
-#include "boost/signals2.hpp"
-
 #include "logging.hpp"
 #include "types.hpp"
 #include "SystemAccess.hpp"
@@ -10,7 +8,11 @@
 namespace espresso {
   namespace integrator {
 
-    /** MOD Integrator base class. */
+    /** Abstract base class for Molecular Dynamics Integrator. 
+
+        Note: Class accesses system object for storage, bc, communicator,
+              interaction list.
+    */
 
     class MDIntegrator : public SystemAccess {
 
@@ -18,12 +20,12 @@ namespace espresso {
 
         /** Constructor for an integrator.
 
-            \param sim is reference to the system.
+            \param system is reference to the system.
 
             Note: This class will keep a weak reference to the system.
         */
 
-        MDIntegrator(shared_ptr<System>);
+        MDIntegrator(shared_ptr<System> system);
 
         /** Destructor. */
 
@@ -33,9 +35,17 @@ namespace espresso {
 
         void setTimeStep(real dt);
 
+        /** Getter routine for the timestep. */
+
+        real getTimeStep() { return dt; }
+
         /** This method runs the integration for a certain number of steps. */
 
         virtual void run(int nsteps) = 0;
+
+        /** Register this class so it can be used from Python. */
+
+        static void registerPython();
 
       protected:
 

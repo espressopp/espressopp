@@ -4,19 +4,28 @@
 
 #include "System.hpp"
 #include "storage/Storage.hpp"
+#include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
-
+#include "python.hpp"
 
 namespace espresso {
+
+  using namespace iterator;
+
   namespace integrator {
 
     LOG4ESPP_LOGGER(Langevin::theLogger, "Langevin");
 
-    Langevin::Langevin(shared_ptr<System> _system)
+    Langevin::Langevin(shared_ptr<System> system) : SystemAccess(system)
     {
-      system = _system;
       gamma  = 0.0;
       temperature = 0.0;
+
+      if (!system->rng) {
+        throw std::runtime_error("system has no RNG");
+      }
+
+      rng = system->rng;
 
       LOG4ESPP_INFO(theLogger, "Langevin constructed");
     }
@@ -47,35 +56,32 @@ namespace espresso {
 
     void Langevin::thermalize()
     {
-      LOG4ESPP_INFO(theLogger, "thermalize")
+      LOG4ESPP_INFO(theLogger, "thermalize");
 
-	CellList &localCells = system.lock()->storage->getLocalCells();
+      System& system = getSystemRef();
 
-      for (size_t c = 0; c < localCells.size(); c++) {
-	Cell* localCell = localCells[c];
-	for (size_t index = 0; index < localCell->particles.size(); index++) {
-	  Particle* particle  = &localCell->particles[index];
-	  frictionThermo(particle);
-	}
+      CellList cells = system.storage->getRealCells();
+
+      for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
+        frictionThermo(*cit);
       }
     }
 
-    void Langevin::frictionThermo(Particle *p)
+    void Langevin::frictionThermo(Particle& p)
     {
       // double massf = sqrt(PMASS(*p));
  
       double massf = 1.0;
 
       for (int j = 0 ; j < 3 ; j++) {
-	esutil::RNG &rng = *(system.lock()->rng);
-	p->f.f[j] += pref1*p->m.v[j] + pref2*(rng()-0.5)*massf;
+	p.f.f[j] += pref1 * p.m.v[j] + pref2*((*rng)()-0.5)*massf;
       }
 
-      LOG4ESPP_DEBUG(theLogger, "new force of p = " << p->f.f[0] << " "
-		     << p->f.f[1] << " " << p->f.f[2]);
+      LOG4ESPP_TRACE(theLogger, "new force of p = " << p.f.f[0] << " "
+		                 << p.f.f[1] << " " << p.f.f[2]);
     }
 
-    void Langevin::init(real timestep)
+    void Langevin::initialize(real timestep)
 
     { // calculate the prefactors
 
@@ -111,6 +117,23 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "coolDown");
 
       pref2 = pref2buffer;
+    }
+
+    /****************************************************
+    ** REGISTRATION WITH PYTHON
+    ****************************************************/
+
+    void Langevin::registerPython() {
+
+      using namespace espresso::python;
+
+      class_<Langevin, shared_ptr<Langevin> >
+
+        ("integrator_Langevin", init< shared_ptr<System> >())
+
+        .add_property("gamma", &Langevin::getGamma, &Langevin::setGamma)
+        .add_property("temperature", &Langevin::getTemperature, &Langevin::setTemperature)
+        ;
     }
 
   }
