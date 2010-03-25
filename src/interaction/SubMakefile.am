@@ -2,11 +2,13 @@ nobase_pkginclude_HEADERS += \
 	interaction/Interaction.hpp \
 	interaction/VerletListInteractionTemplate.hpp \
 	interaction/Potential.hpp \
-	interaction/LennardJones.hpp
+	interaction/LennardJones.hpp \
+        interaction/FENE.hpp
 
 libespresso_common_la_SOURCES += \
 	interaction/Interaction.cpp \
-	interaction/LennardJones.cpp
+	interaction/LennardJones.cpp \
+	interaction/FENE.cpp
 
 #python_SCRIPTS +=
 
