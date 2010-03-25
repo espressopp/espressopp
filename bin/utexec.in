@@ -260,17 +260,17 @@ for srcdir in dirs:
         # identify the different types of unittests
         global cpp_tests, py_tests, parpy_tests
         if test.endswith('.py'):
-            if test.startswith('test_'):
+            if test.startswith('Test'):
                 py_tests.append(test)
                 return
-            elif test.startswith('ptest_'):
+            elif test.startswith('PTest'):
                 parpy_tests.append(test)
                 return
-            elif os.access('test_' + test, os.R_OK):
-                py_tests.append('test_' + test)
+            elif os.access('Test' + test, os.R_OK):
+                py_tests.append('Test' + test)
                 return
-            elif os.access('ptest_' + test, os.R_OK):
-                parpy_tests.append('ptest_' + test)
+            elif os.access('PTest' + test, os.R_OK):
+                parpy_tests.append('PTest' + test)
                 return
         elif test.endswith('.cpp'):
             if test.startswith('Test'):
@@ -288,13 +288,13 @@ for srcdir in dirs:
         elif test.startswith('Test') and os.access(test + '.cpp', os.R_OK):
             cpp_tests.append(test + '.cpp')
             return
-        elif test.startswith('Ptest') and os.access(test + '.cpp', os.R_OK):
+        elif test.startswith('PTest') and os.access(test + '.cpp', os.R_OK):
             parcpp_tests.append(test + '.cpp')
             return
-        elif test.startswith('test_') and os.access(test + '.py', os.R_OK):
+        elif test.startswith('Test') and os.access(test + '.py', os.R_OK):
             py_tests.append(test + '.py')
             return
-        elif test.startswith('ptest_') and os.access(test + '.py', os.R_OK):
+        elif test.startswith('PTest') and os.access(test + '.py', os.R_OK):
             parpy_tests.append(test + '.py')
             return
         else:
@@ -305,11 +305,11 @@ for srcdir in dirs:
             if os.access('PTest' + test + '.cpp', os.R_OK):
                 parcpp_tests.append('PTest' + test + '.cpp')
                 found_one = True
-            if os.access('test_' + test + '.py', os.R_OK):
-                py_tests.append('test_' + test + '.py')
+            if os.access('Test' + test + '.py', os.R_OK):
+                py_tests.append('Test' + test + '.py')
                 found_one = True
-            if os.access('ptest_' + test + '.py', os.R_OK):
-                parpy_tests.append('ptest_' + test + '.py')
+            if os.access('PTest' + test + '.py', os.R_OK):
+                parpy_tests.append('PTest' + test + '.py')
                 found_one = True
             if not found_one:
                 die("Cannot identify test " + test)
@@ -331,9 +331,9 @@ for srcdir in dirs:
         if clean or do_parcpp:
             parcpp_tests = glob.glob('PTest*.cpp')
         if clean or do_python:
-            py_tests = glob.glob('test_*.py')
+            py_tests = glob.glob('Test*.py')
         if clean or do_parpy:
-            parpy_tests = glob.glob('ptest_*.py')
+            parpy_tests = glob.glob('PTest*.py')
 
     # Check whether there are any unittests to handle
     if not ((clean and 
