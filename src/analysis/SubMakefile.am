@@ -1,0 +1,8 @@
+nobase_pkginclude_HEADERS += \
+	analysis/Observable.hpp \
+        analysis/Temperature.hpp
+
+libespresso_common_la_SOURCES += \
+	analysis/Temperature.cpp
+
+#python_SCRIPTS +=

@@ -17,6 +17,7 @@ include iterator/SubMakefile.am
 include interaction/SubMakefile.am
 include integrator/SubMakefile.am
 include main/SubMakefile.am
+include analysis/SubMakefile.am
 
 ##############################
 ## PYTHON
