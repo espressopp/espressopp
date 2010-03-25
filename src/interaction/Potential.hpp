@@ -176,7 +176,7 @@ namespace espresso {
     inline real 
     PotentialTemplate< Derived >::
     computeEnergy(Particle &p1, Particle &p2) const {
-      Real3D dist = p1.r.p - p2.r.p;
+      Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
       return computeEnergy(dist);
     }
 
@@ -205,7 +205,7 @@ namespace espresso {
     inline real 
     PotentialTemplate< Derived >::
     _computeEnergy(Particle &p1, Particle &p2) const {
-      Real3D dist = p1.r.p - p2.r.p;
+      Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
       return _computeEnergy(dist);
     }
 
