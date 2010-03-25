@@ -8,6 +8,9 @@ from espresso.Real3D import *
 from espresso.Int3D import *
 from espresso import pmi
 
+infinity=float("inf")
+nan=float("nan")
+
 if pmi.isController :
     # make sure that the workers exit when the script ends
     pmi.registerAtExit()
