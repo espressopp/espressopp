@@ -1,8 +1,6 @@
 #include "python.hpp"
 #include "LennardJones.hpp"
 
-#define LOG4ESPP_LEVEL_DEBUG
-
 namespace espresso {
   namespace interaction {
     //////////////////////////////////////////////////
