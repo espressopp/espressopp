@@ -5,6 +5,7 @@
 #include <bc/bindings.hpp>
 #include <storage/bindings.hpp>
 #include <integrator/bindings.hpp>
+#include <interaction/bindings.hpp>
 #include <System.hpp>
 #include <VerletList.hpp>
 #include <Real3D.hpp>
@@ -24,6 +25,7 @@ void espresso::registerPython() {
   espresso::bc::registerPython();
   espresso::storage::registerPython();
   espresso::integrator::registerPython();
+  espresso::interaction::registerPython();
 
   log4espp::PyLogger::registerPython();
 }

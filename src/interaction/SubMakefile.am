@@ -3,12 +3,18 @@ nobase_pkginclude_HEADERS += \
 	interaction/VerletListInteractionTemplate.hpp \
 	interaction/Potential.hpp \
 	interaction/LennardJones.hpp \
-        interaction/FENE.hpp
+        interaction/FENE.hpp \
+	interaction/bindings.hpp 
 
 libespresso_common_la_SOURCES += \
 	interaction/Interaction.cpp \
+	interaction/Potential.cpp \
 	interaction/LennardJones.cpp \
-	interaction/FENE.cpp
+	interaction/FENE.cpp \
+	interaction/bindings.cpp 
 
-#python_SCRIPTS +=
+python_SCRIPTS += \
+	interaction/Potential.py \
+	interaction/LennardJones.py \
+	interaction/__init__.py
 
