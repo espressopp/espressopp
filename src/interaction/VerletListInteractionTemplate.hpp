@@ -69,7 +69,7 @@ namespace espresso {
         const Potential &potential = getPotential(type1, type2);
 
 	Real3D force;
-	if (potential._computeForce(p1, p2, force))
+	if (potential._computeForce(force, p1, p2))
 	  for(int k = 0; k < 3; k++) {
 	    p1.f.f[k] += force[k];
 	    p2.f.f[k] -= force[k];

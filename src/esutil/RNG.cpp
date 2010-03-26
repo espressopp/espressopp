@@ -62,7 +62,7 @@ void
 RNG::registerPython() {
   using namespace espresso::python;
 
-   real (RNG::*pyoperator)()=&RNG::operator();
+   real (RNG::*pyoperator)() = &RNG::operator();
 
    class_< RNG >("esutil_RNG")
     .def("__call__",pyoperator)
