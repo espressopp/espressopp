@@ -450,7 +450,7 @@ namespace espresso {
 	   particle.
 	*/
 	int coord = realToGhosts ? _coord : (2 - _coord);
-	real curCoordBoxL = getSystem()->bc->getBoxL(coord);
+	real curCoordBoxL = getSystem()->bc->getBoxL()[coord];
 
 	// lr loop: left right
 	for (int lr = 0; lr < 2; ++lr) {

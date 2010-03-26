@@ -31,7 +31,7 @@ struct Fixture {
 
 BOOST_FIXTURE_TEST_CASE(foldingTest, Fixture) {
   int dim = 2;
-  BOOST_CHECK_EQUAL(10.0, system->bc->getBoxL(dim));
+  BOOST_CHECK_EQUAL(Real3D(10.0), system->bc->getBoxL());
 
   Real3D pi(5.0, 5.0, 5.0);
   Real3D pj(11.0, 11.0, 11.0);

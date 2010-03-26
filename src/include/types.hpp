@@ -21,8 +21,6 @@ namespace espresso {
     using namespace boost::mpi;
   }
 
-  const real infinity = std::numeric_limits< real >::infinity();
-
   /* Forward declarations and typedefs. */
   namespace esutil {
     class RNG;

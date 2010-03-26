@@ -10,22 +10,13 @@ namespace espresso {
     class BC {
     public:
       /** Virtual destructor for boundary conditions. */
-      virtual ~BC() {};
+      virtual ~BC() {}
 
-      /** Method to set the length of the side of the simulation box */
-      virtual void
-      setBoxL(const ConstReal3DRef _boxL) = 0;
-      
-      /** Getters for box dimensions */
-      virtual Real3D getBoxL() = 0;
-      virtual real getBoxL(int i)      const = 0;
-
-      virtual Real3D getInvBoxL() = 0;
-      virtual real getInvBoxL(int i)   const = 0;
+      /** Getter for box dimensions */
+      virtual Real3D getBoxL() const = 0;
 
       /** Computes the minimum image distance vector between two
-	  positions. This routine must be implemented by derived
-	  classes (once the code stabilizes).
+	  positions.
 
 	  \param dist is the distance vector (pos2 - pos1)
 	  \param distSqr is the square of the magnitude
@@ -37,6 +28,10 @@ namespace espresso {
 			    const ConstReal3DRef pos1,
 			    const ConstReal3DRef pos2) const = 0;
 
+      virtual Real3D 
+      getMinimumImageVector(const ConstReal3DRef pos1,
+			    const ConstReal3DRef pos2) const;
+
       /** fold a coordinate to the primary simulation box.
 	  \param pos         the position...
 	  \param imageBox    and the box
@@ -45,7 +40,11 @@ namespace espresso {
 	  Both pos and image_box are I/O,
 	  i. e. a previously folded position will be folded correctly.
       */
-      virtual void foldCoordinate(Real3DRef pos, int imageBox[3], int dir) = 0;
+      virtual void 
+      foldCoordinate(Real3DRef pos, Int3DRef imageBox, int dir) const = 0;
+
+      virtual void 
+      unfoldCoordinate(Real3DRef pos, Int3DRef imageBox, int dir) const = 0;
 
       /** fold particle coordinates to the primary simulation box.
 	  \param pos the position...
@@ -54,7 +53,8 @@ namespace espresso {
 	  Both pos and image_box are I/O,
 	  i. e. a previously folded position will be folded correctly.
       */
-      virtual void foldPosition(Real3DRef pos, int imageBox[3]) = 0;
+      virtual void 
+      foldPosition(Real3DRef pos, Int3DRef imageBox) const;
 
       /** unfold coordinates to physical position.
 	  \param pos the position...
@@ -63,7 +63,8 @@ namespace espresso {
 	  Both pos and image_box are I/O, i.e. image_box will be (0,0,0)
 	  afterwards.
       */
-      virtual void unfoldPosition(Real3DRef pos, int imageBox[3]) = 0;
+      virtual void 
+      unfoldPosition(Real3DRef pos, Int3DRef imageBox) const;
 
       /** Get a random position within the central simulation box. The
 	  positions are assigned with each coordinate on [0, boxL]. */

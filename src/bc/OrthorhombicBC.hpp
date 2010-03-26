@@ -28,14 +28,8 @@ namespace espresso {
       virtual void
       setBoxL(const ConstReal3DRef _boxL);
 
-      /** Getter for system, NULL if expired */
-
       /** Getters for box dimensions */
-      virtual Real3D getBoxL() { return boxL; }
-      virtual real getBoxL(int i)      const { return boxL[i]; }
-
-      virtual Real3D getInvBoxL() { return invBoxL; }
-      virtual real getInvBoxL(int i)   const { return invBoxL[i]; }
+      virtual Real3D getBoxL() const { return boxL; }
 
       /** Computes the minimum image distance vector between two
           positions. This routine must be implemented by derived
@@ -57,25 +51,18 @@ namespace espresso {
 	  Both pos and image_box are I/O,
 	  i. e. a previously folded position will be folded correctly.
       */
-      virtual void foldCoordinate(Real3DRef pos, int imageBox[3], int dir);
+      virtual void 
+      foldCoordinate(Real3DRef pos, Int3DRef imageBox, int dir) const;
 
-      /** fold particle coordinates to the primary simulation box.
-	  \param pos the position...
-	  \param imageBox and the box
-
-	  Both pos and image_box are I/O,
-	  i. e. a previously folded position will be folded correctly.
-      */
-      virtual void foldPosition(Real3DRef pos, int imageBox[3]);
-
-      /** unfold coordinates to physical position.
+      /** unfold a coordinate to physical position.
 	  \param pos the position...
 	  \param imageBox and the box
 	
 	  Both pos and image_box are I/O, i.e. image_box will be (0,0,0)
 	  afterwards.
       */
-      virtual void unfoldPosition(Real3DRef pos, int imageBox[3]);
+      virtual void 
+      unfoldCoordinate(Real3DRef pos, Int3DRef imageBox, int dir) const;
 
       /** Get a random position within the central simulation box. The
           positions are assigned with each coordinate on [0, boxL]. */

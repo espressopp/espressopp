@@ -2,25 +2,18 @@
 #include <python.hpp>
 #include <cmath>
 #include "Real3D.hpp"
+#include "Int3D.hpp"
 #include "esutil/RNG.hpp"
 #include "System.hpp"
-#include "stdio.h"
 
 namespace espresso {
   namespace bc {
     /* Constructor */
     OrthorhombicBC::
     OrthorhombicBC(shared_ptr< System > system,
-		   const ConstReal3DRef _boxL) :
-
-      SystemAccess(system)
-
-    { setBoxL(_boxL); 
-
-      if (!system->rng) {
-        LOG4ESPP_WARN(logger, "Please define RNG in System first");
-      }
-    }
+		   const ConstReal3DRef _boxL) 
+      : SystemAccess(system)
+    { setBoxL(_boxL); }
   
     /* Setter method for the box length */
     void OrthorhombicBC::setBoxL(const ConstReal3DRef _boxL) {
@@ -29,7 +22,7 @@ namespace espresso {
 	invBoxL[i] = 1.0/boxL[i];
     }
 
-    /* Returns minimum image vector between two particles */
+    /* Returns the minimum image vector between two positions */
     void 
     OrthorhombicBC::
     getMinimumImageVector(Real3DRef dist,
@@ -46,15 +39,15 @@ namespace espresso {
     /* Fold an individual coordinate in the specified direction */
     void 
     OrthorhombicBC::
-    foldCoordinate(Real3DRef pos, int imageBox[3], int dir) {
-      int tmp = static_cast<int>(floor(pos[dir]*getInvBoxL(dir)));
+    foldCoordinate(Real3DRef pos, Int3DRef imageBox, int dir) const {
+      int tmp = static_cast<int>(floor(pos[dir]*invBoxL[dir]));
 
       imageBox[dir] += tmp;
-      pos[dir] -= tmp*getBoxL(dir);
+      pos[dir] -= tmp*boxL[dir];
 
-      if(pos[dir] < 0 || pos[dir] >= getBoxL(dir)) {
+      if(pos[dir] < 0 || pos[dir] >= boxL[dir]) {
 	/* slow but safe */
-	if (fabs(pos[dir]*getInvBoxL(dir)) >= INT_MAX/2) {
+	if (fabs(pos[dir]*invBoxL[dir]) >= INT_MAX/2) {
 # warning ERRORHANDLING MISSING
 #if 0
 	  char *errtext = runtime_error(128 + TCL_INTEGER_SPACE);
@@ -66,22 +59,13 @@ namespace espresso {
       }
     }
 
-    /* Fold coordinates */
-    void 
-    OrthorhombicBC::
-    foldPosition(Real3DRef pos, int imageBox[3]) {
-      for (int i = 0; i < 3; ++i)
-	foldCoordinate(pos, imageBox, i);
-    }
 
-    /* Unfold coordinates */
+    /* Unfold an individual coordinate in the specified direction */
     void 
     OrthorhombicBC::
-    unfoldPosition(Real3DRef pos, int imageBox[3]) {
-      for (int i = 0; i < 3; ++i) {
-	pos[i] = pos[i] + imageBox[i]*getBoxL(i);
-	imageBox[i] = 0;
-      }
+    unfoldCoordinate(Real3DRef pos, Int3DRef imageBox, int dir) const {
+      pos[dir] += imageBox[dir]*boxL[dir];
+      imageBox[dir] = 0;
     }
 
     /* Get random position in the central image box */
@@ -104,7 +88,7 @@ namespace espresso {
       using namespace espresso::python;
       class_<OrthorhombicBC, bases< BC > >
 	("bc_OrthorhombicBC", init< shared_ptr< System >, Real3DRef >())
-        .def("getSystem",&SystemAccess::getSystem)
+	.add_property("boxL", &OrthorhombicBC::getBoxL, &OrthorhombicBC::setBoxL)
       ;
     }
   }
