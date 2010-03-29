@@ -43,6 +43,12 @@ OPTIONS:
       Specify that the parallel C++ unittests are to be compiled,
       linked and run.
 
+  --no-exec
+      Do not execute C++ tests
+
+  --no-compile
+      Do not compile or link C++ tests
+
   -n, --dry-run
       Only print the commands that will be executed, don't actually
       run them.
@@ -97,8 +103,8 @@ CPPFLAGS += ' -I' + os.path.join(top_builddir, 'src')
 CPPFLAGS += ' -I' + os.path.join(top_srcdir, 'src')
 CPPFLAGS += ' -I' + os.path.join(top_srcdir, 'src' , 'include')
 if not EXTERNAL_BOOST:
-    CPPFLAGS += ' -I' + os.path.join(top_srcdir, 'contrib' , 'boost')
-    LDFLAGS += ' -I' + os.path.join(top_builddir, 'contrib', 'boost')
+    CPPFLAGS = ' -I' + os.path.join(top_srcdir, 'contrib' , 'boost') + CPPFLAGS
+    LDFLAGS  = ' -I' + os.path.join(top_builddir, 'contrib', 'boost') + LDFLAGS
 LIBS = os.path.join(top_builddir, 'src' , 'libespresso_common.la') 
 LIBS += ' ' + os.path.join(top_builddir, 'src' , 'libgenlogger.la') 
 LIBS += ' ' + BOOST_UNITTEST_LIBS
@@ -111,7 +117,7 @@ try:
         sys.argv[1:], 'nvhs:cCpPt:1r',
         ['dry-run', 'verbose', 'help', 'subdir=',
          'cpp', 'python', 'parallel-python', 'parallel-cpp',
-         'num-tasks=', 'clean', 'single-test', 'recursive'])
+         'num-tasks=', 'clean', 'single-test', 'recursive', 'no-exec', 'no-compile'])
 except getopt.GetoptError, e:
     print("Option error: " + str(e))
     Usage()
@@ -123,6 +129,8 @@ dryrun = False
 clean = False
 single_test = False
 do_python = do_cpp = do_parpy = do_parcpp = False
+no_exec=False
+no_compile=False
 num_tasks = 2
 recursive = False
 for k, v in optlist:
@@ -139,6 +147,10 @@ for k, v in optlist:
         do_python = True
     elif k in ('-P', '--parallel-python'):
         do_parpy = True
+    elif k == '--no-exec':
+        no_exec = True
+    elif k == '--no-compile':
+        no_compile = True
     elif k in ('-c', '--cpp'):
         do_cpp = True
     elif k in ('-C', '--parallel-cpp'):
@@ -425,7 +437,15 @@ for srcdir in dirs:
         # COMPILE, LINK AND RUN C++ UNITTESTS
         if cpp_tests:
             print("\n**************************************************")
-            print('**** COMPILING, LINKING AND RUNNING C++ UNITTESTS')
+            if no_compile and no_exec:
+                print('**** DOING NOTHING WITH C++ UNITTESTS')
+            elif no_compile:
+                print('**** ONLY RUNNING C++ UNITTESTS')
+            elif no_exec:
+                print('**** COMPILING AND LINKING C++ UNITTESTS')
+            else:
+                print('**** COMPILING, LINKING AND RUNNING C++ UNITTESTS')
+
             if verbose:
                 print("LTCXXCOMPILE = " + LTCXXCOMPILE)
                 print("LTCXXLINK = " + LTCXXLINK)
@@ -439,42 +459,53 @@ for srcdir in dirs:
                 # strip ".cpp" from the end
                 test = test[:-4]
 
-                print('** COMPILING ' + testname)
-                cmd = LTCXXCOMPILE + ' -c ' + os.path.join(srcdir, test + '.cpp')
-                print(cmd)
-                if not dryrun:
-                    if os.system(cmd):
-                        print('ERROR: Compiling test %s failed.' % test)
-                        compileerror.append(testname)
-                        continue
+                if not no_compile:
+                    print('** COMPILING ' + testname)
+                    cmd = LTCXXCOMPILE + ' -c ' + os.path.join(srcdir, test + '.cpp')
+                    print(cmd)
+                    if not dryrun:
+                        if os.system(cmd):
+                            print('ERROR: Compiling test %s failed.' % test)
+                            compileerror.append(testname)
+                            continue
 
-                print('\n** LINKING ' + testname)
-                cmd = LTCXXLINK + ' ' + test + '.lo -o ' + test
-                print(cmd)
-                if not dryrun:
-                    if os.system(cmd):
-                        linkerror.append(testname)
-                        continue
+                    print('\n** LINKING ' + testname)
+                    cmd = LTCXXLINK + ' ' + test + '.lo -o ' + test
+                    print(cmd)
+                    if not dryrun:
+                        if os.system(cmd):
+                            linkerror.append(testname)
+                            continue
 
-                print('\n** RUNNING ' + testname)
-                cmd = LTRUN + ' ./' + test
-                if verbose:
-                    cmd += ' --log_level=test_suite'
-                if single_test and subtests:
-                    cmd += ' --run_test=' + ','.join(subtests)
-                print(cmd)
-                if not dryrun:
-                    if os.system(cmd):
-                        error.append(testname)
-                    else:
-                        success.append(testname)
-                    print('')
+                if not no_exec:
+                    print('\n** RUNNING ' + testname)
+                    cmd = LTRUN + ' ./' + test
+                    if verbose:
+                        cmd += ' --log_level=test_suite'
+                    if single_test and subtests:
+                        cmd += ' --run_test=' + ','.join(subtests)
+                    print(cmd)
+                    if not dryrun:
+                        if os.system(cmd):
+                            error.append(testname)
+                        else:
+                            success.append(testname)
+
+                print('')
 
         ##############################################
         # COMPILE, LINK AND RUN PARALLEL C++ UNITTESTS
         if parcpp_tests:
             print("\n**************************************************")
-            print('**** COMPILING, LINKING AND RUNNING PARALLEL C++ UNITTESTS')
+            if no_compile and no_exec:
+                print('**** DOING NOTHING WITH PARALLEL C++ UNITTESTS')
+            elif no_compile:
+                print('**** ONLY RUNNING PARALLEL C++ UNITTESTS')
+            elif no_exec:
+                print('**** COMPILING AND LINKING PARALLEL C++ UNITTESTS')
+            else:
+                print('**** COMPILING, LINKING AND RUNNING PARALLEL C++ UNITTESTS')
+
             for test in parcpp_tests:
                 testname = os.path.join(subdir, test) 
                 print("**************************************************")
@@ -483,37 +514,40 @@ for srcdir in dirs:
                 # strip ".cpp" from the end
                 test = test[:-4]
 
-                print('** COMPILING ' + testname)
-                cmd = LTCXXCOMPILE + ' -c ' + os.path.join(srcdir, test + '.cpp')
-                print(cmd)
-                if not dryrun:
-                    if os.system(cmd):
-                        print('ERROR: Compiling test %s failed.' % test)
-                        compileerror.append(testname)
-                        continue
+                if not no_compile:
+                    print('** COMPILING ' + testname)
+                    cmd = LTCXXCOMPILE + ' -c ' + os.path.join(srcdir, test + '.cpp')
+                    print(cmd)
+                    if not dryrun:
+                        if os.system(cmd):
+                            print('ERROR: Compiling test %s failed.' % test)
+                            compileerror.append(testname)
+                            continue
 
-                print('\n** LINKING ' + testname)
-                cmd = LTCXXLINK + ' ' + test + '.lo -o ' + test
-                print(cmd)
-                if not dryrun:
-                    if os.system(cmd):
-                        linkerror.append(testname)
-                        continue
+                    print('\n** LINKING ' + testname)
+                    cmd = LTCXXLINK + ' ' + test + '.lo -o ' + test
+                    print(cmd)
+                    if not dryrun:
+                        if os.system(cmd):
+                            linkerror.append(testname)
+                            continue
 
-                print('\n** RUNNING ' + testname)
-                cmd = ' ' . join([ESPRESSO_MPIEXEC, '-n', 
-                                  str(num_tasks), LTRUN, ' ./' + test])
-                if verbose:
-                    cmd += ' --log_level=test_suite'
-                if single_test and subtests:
-                    cmd += ' --run_test=' + ','.join(subtests)
-                print(cmd)
-                if not dryrun:
-                    if os.system(cmd):
-                        error.append(testname)
-                    else:
-                        success.append(testname)
-                    print('')
+                if not no_exec:
+                    print('\n** RUNNING ' + testname)
+                    cmd = ' ' . join([ESPRESSO_MPIEXEC, '-n', 
+                                      str(num_tasks), LTRUN, ' ./' + test])
+                    if verbose:
+                        cmd += ' --log_level=test_suite'
+                    if single_test and subtests:
+                        cmd += ' --run_test=' + ','.join(subtests)
+                    print(cmd)
+                    if not dryrun:
+                        if os.system(cmd):
+                            error.append(testname)
+                        else:
+                            success.append(testname)
+
+                print('')
 
 
     ##############################################
