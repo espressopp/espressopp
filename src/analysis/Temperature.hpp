@@ -10,7 +10,7 @@ namespace espresso {
     class Temperature : public Observable {
     private:
       virtual real compute() const;
-      virtual real average();
+      //      virtual real average();
     };
   }
 }
