@@ -11,19 +11,20 @@ namespace espresso {
 	  RNG object, so that it is not destroyed if the espresso RNG
 	  object dies. */
     class NormalVariate 
-      : variate_generator< RNGType, normal_distribution< real > > 
+      : variate_generator< RNGType&, normal_distribution< real > > 
     {
       typedef normal_distribution< real > DistType;
-      typedef variate_generator< RNGType, DistType > Super;
+      typedef variate_generator< RNGType&, DistType > Super;
 
       /// store the shared pointer to the RNG
-      shared_ptr< RNGType > rng;
+      shared_ptr< RNG > rng;
 
     public:
-      NormalVariate(shared_ptr< RNGType > _rng,
+      NormalVariate(shared_ptr< RNG > _rng,
 		    const real mean = 0.0, 
 		    const real sigma = 1.0);
       using Super::operator();
+      static void registerPython();
     };
   }
 }

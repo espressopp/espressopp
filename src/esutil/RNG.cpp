@@ -1,71 +1,72 @@
-#include "RNG.hpp"
 #include "python.hpp"
+#include "RNG.hpp"
 #include "mpi.hpp"
 #include "types.hpp"
 
-using namespace espresso::esutil;
-using namespace espresso;
 using namespace boost;
 
-RNG::RNG(long _seed) 
-  : boostRNG(make_shared< RNGType >()), 
-    normalVariate(boostRNG),
-    uniformOnSphereVariate(boostRNG)
-{
-  seed(_seed);
-}
+namespace espresso {
+  namespace esutil {
 
-void
-RNG::seed(long _seed) {
-  // Seed the RNG for the given CPU
-  boostRNG->seed(_seed + mpiWorld.rank());
-}
+    RNG::RNG(long _seed) 
+      : boostRNG(make_shared< RNGType >(_seed + mpiWorld.rank())), 
+	normalVariate(*boostRNG, 
+		      normal_distribution< real >(0.0, 1.0)),
+	uniformOnSphereVariate(*boostRNG, 
+			       uniform_on_sphere< real, Real3D >(3))
+    {}
 
-real
-RNG::operator()() { 
-  return uniform_01<>()(*boostRNG);
-}
+    void
+    RNG::seed(long _seed) {
+      // Seed the RNG for the given CPU
+      boostRNG->seed(_seed + mpiWorld.rank());
+    }
 
-int
-RNG::operator()(int N) { 
-  return variate_generator< RNGType, uniform_smallint<> >
-    (*boostRNG, uniform_smallint<>(0, N-1))();
-}
+    real
+    RNG::operator()() { 
+      variate_generator< RNGType&, uniform_01<> >
+	uni(*boostRNG, uniform_01<>());
+      return uni();
+    }
 
+    int
+    RNG::operator()(int N) { 
+      uniform_smallint< int > uni_dist(0, N-1);
+      variate_generator< RNGType&, uniform_smallint< int > > 
+	uni(*boostRNG, uni_dist);
+      return uni();
+    }
 
-real
-RNG::normal() {
-  return normalVariate();
-}
+    real
+    RNG::normal() 
+    { return normalVariate(); }
 
-shared_ptr< NormalVariate >
-RNG::createNormalVariate(const real mean, const real sigma) {
-  return
-    make_shared< NormalVariate >(boostRNG, mean, sigma);
-}
+    Real3D
+    RNG::uniformOnSphere() 
+    { return uniformOnSphereVariate();}
 
-std::vector< real >
-RNG::uniformOnSphere() {
-  return uniformOnSphereVariate();
-}
+    shared_ptr< RNGType > 
+    RNG::getBoostRNG() 
+    { return boostRNG; }
 
-shared_ptr< UniformOnSphere >
-RNG::createUniformOnSphere(int dim) {
-  return
-    make_shared< UniformOnSphere >(boostRNG, dim);
-}
+    //////////////////////////////////////////////////
+    // REGISTRATION WITH PYTHON
+    //////////////////////////////////////////////////
+    void
+    RNG::registerPython() {
+      using namespace espresso::python;
 
-//////////////////////////////////////////////////
-// REGISTRATION WITH PYTHON
-//////////////////////////////////////////////////
-void
-RNG::registerPython() {
-  using namespace espresso::python;
+      real (RNG::*pyCall1)() = &RNG::operator();
+      int (RNG::*pyCall2)(int) = &RNG::operator();
 
-   real (RNG::*pyoperator)() = &RNG::operator();
-
-   class_< RNG >("esutil_RNG")
-    .def("__call__",pyoperator)
-    .add_property("normal",&RNG::normal)
-    ;
+      class_< RNG >("esutil_RNG", 
+		    init< boost::python::optional< long > >())
+	.def("seed", &RNG::seed)
+	.def("__call__", pyCall1)
+	.def("__call__", pyCall2)
+	.def("normal", &RNG::normal)
+	.def("uniformOnSphere", &RNG::uniformOnSphere)
+	;
+    }
+  }
 }

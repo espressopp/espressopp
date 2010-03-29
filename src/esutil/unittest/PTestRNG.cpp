@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(normal)
 {
   RNG rng;
 
-  const int N = 10000;
+  const int N = 100000;
 
   real r;
   real sum = 0.0;
@@ -96,30 +96,6 @@ BOOST_AUTO_TEST_CASE(normal)
   BOOST_CHECK_CLOSE(sigma, static_cast<real>(1.0), 1.0);
 }
 
-// Test whether r.createNormalVariate() creates a normal distribution
-BOOST_AUTO_TEST_CASE(normalDist)
-{
-  RNG rng;
-
-  const int N = 10000;
-  shared_ptr< NormalVariate > nv = rng.createNormalVariate(2.0, 0.5);
-
-  real r;
-  real sum = 0.0;
-  real sqrsum = 0.0;
-
-  for (int i = 0; i < N; i++) {
-    r = (*nv)();
-    sum += r;
-    sqrsum += r*r;
-  }
-  real mean = sum / N;
-  real sigma = sqrt(std::abs(mean*mean - sqrsum/N));
-
-  BOOST_CHECK_CLOSE(mean, static_cast<real>(2.0), 1.0);
-  BOOST_CHECK_CLOSE(sigma, static_cast<real>(0.5), 1.0);
-}
-
 // Test whether r.uniformOnSphere() creates unit vectors
 BOOST_AUTO_TEST_CASE(uniformOnSphere)
 {
@@ -128,24 +104,7 @@ BOOST_AUTO_TEST_CASE(uniformOnSphere)
   const int N = 10000;
 
   for (int i = 0; i < N; i++) {
-    std::vector< real > rs = rng.uniformOnSphere();
-    BOOST_CHECK_CLOSE(rs[0]*rs[0] + rs[1]*rs[1] + rs[2]*rs[2], 
-		      static_cast<real>(1.0), 1.0);
-  }
-}
-
-// Test whether r.uniformOnSphere() creates unit vectors
-BOOST_AUTO_TEST_CASE(uniformOnSphereVariate)
-{
-  RNG rng;
-  shared_ptr< UniformOnSphere > uv = 
-    rng.createUniformOnSphere(2);
-
-  const int N = 10000;
-
-  for (int i = 0; i < N; i++) {
-    std::vector< real > rs = (*uv)();
-    BOOST_CHECK_EQUAL(rs.size(), static_cast<size_t>(2));
+    Real3D rs = rng.uniformOnSphere();
     BOOST_CHECK_CLOSE(rs[0]*rs[0] + rs[1]*rs[1] + rs[2]*rs[2], 
 		      static_cast<real>(1.0), 1.0);
   }

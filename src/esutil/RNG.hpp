@@ -1,11 +1,10 @@
 #ifndef _ESUTIL_RNG_HPP
 #define _ESUTIL_RNG_HPP
 #include <boost/random.hpp>
+#include "Real3D.hpp"
 #include <vector>
 
 #include "types.hpp"
-#include "NormalVariate.hpp"
-#include "UniformOnSphere.hpp"
 
 namespace espresso {
   namespace esutil {
@@ -15,7 +14,6 @@ namespace espresso {
     using namespace boost;
 
     class RNG {
-      shared_ptr< RNGType > boostRNG;
 
     public:
       /** Init the RNG, use the given seed. */
@@ -38,24 +36,26 @@ namespace espresso {
 	  use createNormalVariate() to create a variate generator object. */
       real normal();
 
-      /** returns a variate generator object that generates random
-	  variates with a normal distribution and the given parameters. */
-      shared_ptr < NormalVariate > 
-      createNormalVariate(const real mean = 0.0,
-			  const real sigma = 1.0);
-
       /** returns a random 3D vector that is uniformly distributed on a sphere. */
-      std::vector< real > uniformOnSphere();
+      Real3D uniformOnSphere();
 
-      shared_ptr< UniformOnSphere >
-      createUniformOnSphere(int dim = 3);
+      shared_ptr< RNGType > getBoostRNG();
 
       static void registerPython();
 
     private:
-      // the standard normal variate (mean 0, sigma 1)
+      typedef 
+      variate_generator< RNGType&, normal_distribution< real > >
+      NormalVariate;
+
+      typedef 
+      variate_generator< RNGType&, uniform_on_sphere< real, Real3D > > 
+      UniformOnSphereVariate;
+    
+      shared_ptr< RNGType > boostRNG;
+
       NormalVariate normalVariate;
-      UniformOnSphere uniformOnSphereVariate;
+      UniformOnSphereVariate uniformOnSphereVariate;
     };
   }
 }

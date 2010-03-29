@@ -27,6 +27,9 @@ http://code.activestate.com/recipes/412717/ and
 http://www.boost.org/doc/libs/1_35_0/libs/python/doc/tutorial/doc/html/python/techniques.html#python.extending_wrapped_objects_in_python
 """
 from espresso import pmi
+from espresso.esutil.RNG import *
+from espresso.esutil.UniformOnSphere import *
+from espresso.esutil.NormalVariate import *
 
 class ExtendBaseClass (type) :
     def __new__(self, name, bases, dict):
@@ -64,3 +67,4 @@ else:
     def pmiimport(module):
         pass
         
+pmiimport('espresso.esutil')

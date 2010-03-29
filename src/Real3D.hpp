@@ -88,6 +88,8 @@ namespace espresso {
   class Real3D {
     real data[3];
   public:
+    typedef real* iterator;
+
     friend class ConstReal3DRef;
     friend class Real3DRef;
     
@@ -132,6 +134,10 @@ namespace espresso {
 
     real sqr() const;
     real abs() const;
+
+    // STL iterator interface
+    iterator begin();
+    iterator end();
 
     static void registerPython();
   };
@@ -404,6 +410,9 @@ namespace espresso {
 
   inline real Real3D::abs() const
   { return sqrt(sqr()); }
+
+  inline Real3D::iterator Real3D::begin() { return data; }
+  inline Real3D::iterator Real3D::end() { return data+3; }
 
   //////////////////////////////////////////////////
   // Global operators

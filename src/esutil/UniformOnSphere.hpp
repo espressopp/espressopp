@@ -2,6 +2,7 @@
 #define _ESUTIL_UNIFORMONSPHERE_HPP
 #include <boost/random.hpp>
 #include "types.hpp"
+#include "Real3D.hpp"
 
 namespace espresso {
   namespace esutil {
@@ -9,17 +10,18 @@ namespace espresso {
     /** This class generates random vectors that are uniformly
 	distributed on a sphere. */
     class UniformOnSphere
-      : variate_generator< RNGType, uniform_on_sphere< real > > 
+      : variate_generator< RNGType&, uniform_on_sphere< real, Real3D > > 
     {
-      typedef uniform_on_sphere< real > DistType;
-      typedef variate_generator< RNGType, DistType > Super;
+      typedef uniform_on_sphere< real, Real3D > DistType;
+      typedef variate_generator< RNGType&, DistType > Super;
       
       /// store the shared pointer to the RNG
-      shared_ptr< RNGType > rng;
+      shared_ptr< RNG > rng;
       
     public:
-      UniformOnSphere(shared_ptr< RNGType > _rng, int dim = 3);
+      UniformOnSphere(shared_ptr< RNG > _rng);
       using Super::operator();
+      static void registerPython();
     };
   }
 }

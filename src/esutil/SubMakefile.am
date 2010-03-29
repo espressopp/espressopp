@@ -20,6 +20,9 @@ libespresso_common_la_SOURCES += \
 
 python_SCRIPTS += \
 	esutil/__init__.py \
+	esutil/RNG.py \
+	esutil/UniformOnSphere.py \
+	esutil/NormalVariate.py \
 	esutil/collectives.py
 
 noinst_LTLIBRARIES += \
