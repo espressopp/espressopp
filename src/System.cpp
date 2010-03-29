@@ -1,13 +1,11 @@
+#include "python.hpp"
 #include "System.hpp"
-#include <python.hpp>
 #include "bc/BC.hpp"
 #include "storage/Storage.hpp"
 #include "interaction/Interaction.hpp"
 #include "esutil/RNG.hpp"
 
 namespace espresso {
-
-
   //////////////////////////////////////////////////
   // REGISTRATION WITH PYTHON
   //////////////////////////////////////////////////

@@ -1,12 +1,11 @@
+#include "python.hpp"
 #include "Langevin.hpp"
 
 #include "types.hpp"
-
 #include "System.hpp"
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
-#include "python.hpp"
 
 namespace espresso {
 
