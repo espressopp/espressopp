@@ -7,6 +7,7 @@ pmiimport('espresso')
 from espresso.Real3D import *
 from espresso.Int3D import *
 from espresso import pmi
+import _espresso 
 
 infinity=float("inf")
 nan=float("nan")

@@ -4,15 +4,14 @@
 #include "Real3D.hpp"
 #include "Int3D.hpp"
 #include "esutil/RNG.hpp"
-#include "System.hpp"
 
 namespace espresso {
   namespace bc {
     /* Constructor */
     OrthorhombicBC::
-    OrthorhombicBC(shared_ptr< System > system,
+    OrthorhombicBC(shared_ptr< esutil::RNG > _rng,
 		   const ConstReal3DRef _boxL) 
-      : SystemAccess(system)
+      : BC(_rng)
     { setBoxL(_boxL); }
   
     /* Setter method for the box length */
@@ -75,11 +74,9 @@ namespace espresso {
       for(int k = 0; k < 3; k++)
 	res[k] = boxL[k];
       
-      esutil::RNG &rng = *(getSystem()->rng.get());
-
-      res[0] *= rng();
-      res[1] *= rng();
-      res[2] *= rng();
+      res[0] *= (*rng)();
+      res[1] *= (*rng)();
+      res[2] *= (*rng)();
     }
     
     void 
@@ -87,7 +84,7 @@ namespace espresso {
     registerPython() {
       using namespace espresso::python;
       class_<OrthorhombicBC, bases< BC > >
-	("bc_OrthorhombicBC", init< shared_ptr< System >, Real3DRef >())
+	("bc_OrthorhombicBC", init< shared_ptr< esutil::RNG >, Real3DRef >())
 	.add_property("boxL", &OrthorhombicBC::getBoxL, &OrthorhombicBC::setBoxL)
       ;
     }

@@ -3,13 +3,11 @@
 
 #include "types.hpp"
 #include "BC.hpp"
-#include "SystemAccess.hpp"
 #include "Real3D.hpp"
 
 namespace espresso {
   namespace bc {
-    class OrthorhombicBC : public BC,
-                           public SystemAccess {
+    class OrthorhombicBC : public BC {
     private:
       Real3D boxL;
       Real3D invBoxL;
@@ -21,7 +19,7 @@ namespace espresso {
       ~OrthorhombicBC() {}
 
       /** Constructor */
-      OrthorhombicBC(shared_ptr< System > system, 
+      OrthorhombicBC(shared_ptr< esutil::RNG > _rng, 
 		     const ConstReal3DRef _boxL);
 
       /** Method to set the length of the side of the cubic simulation cell */

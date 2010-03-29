@@ -1,9 +1,10 @@
 #include <python.hpp>
-#include <cmath>
+#include <boost/python/tuple.hpp>
 
 #include "BC.hpp"
 #include "Real3D.hpp"
 #include "Int3D.hpp"
+#include "esutil/RNG.hpp"
 
 namespace espresso {
   namespace bc {
@@ -37,6 +38,27 @@ namespace espresso {
 	unfoldCoordinate(pos, imageBox, i);
     }
 
+    // define non-desctructive versions of foldPosition 
+    // and unfoldPosition for Python
+    class PyBC : public BC {
+    public:
+      virtual boost::python::tuple 
+      foldPosition(ConstReal3DRef pos, ConstInt3DRef imageBox) const {
+	Real3D foldedPos = pos;
+	Int3D foldedImageBox = imageBox;
+	foldPosition(foldedPos, foldedImageBox);
+	return boost::python::make_tuple(foldedPos, foldedImageBox);
+      }
+
+      virtual Real3D
+      unfoldPosition(ConstReal3DRef pos, ConstInt3DRef imageBox) const {
+	Real3D unfoldedPos = pos;
+	Int3D unfoldedImageBox = imageBox;
+	unfoldPosition(unfoldedPos, unfoldedImageBox);
+	return unfoldedPos;
+      }
+    };
+
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
@@ -53,11 +75,12 @@ namespace espresso {
 	= &BC::getMinimumImageVector;
       Real3D (BC::*pygetRandomPos)() const = &BC::getRandomPos;
     
-      class_<BC, boost::noncopyable >("bc_BC", no_init)
+      class_< BC, boost::noncopyable >("bc_BC", no_init)
 	.add_property("boxL", &BC::getBoxL)
+	.add_property("rng", &BC::getRng, &BC::setRng)
 	.def("getMinimumImageVector", pygetMinimumImageVector)
-	.def("foldPosition", &BC::foldPosition)
-	.def("unfoldPosition", &BC::unfoldPosition)
+	.def("foldPosition", &PyBC::foldPosition)
+	.def("unfoldPosition", &PyBC::unfoldPosition)
 	.def("getRandomPos", pygetRandomPos)
 	;
     }

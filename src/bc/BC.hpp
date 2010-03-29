@@ -9,11 +9,18 @@ namespace espresso {
     /** Abstract base class for boundary conditions. */
     class BC {
     public:
+      BC(shared_ptr< esutil::RNG > _rng) : rng(_rng) {}
+
       /** Virtual destructor for boundary conditions. */
       virtual ~BC() {}
 
       /** Getter for box dimensions */
       virtual Real3D getBoxL() const = 0;
+
+      /** Getter for the RNG. */
+      virtual shared_ptr< esutil::RNG > getRng() { return rng; }
+      /** Setter for RNG. */
+      virtual void setRng(shared_ptr< esutil::RNG > _rng) { rng = _rng; }
 
       /** Computes the minimum image distance vector between two
 	  positions.
@@ -77,6 +84,7 @@ namespace espresso {
       static void registerPython();
 
      protected:
+      shared_ptr< esutil::RNG > rng;
 
       static LOG4ESPP_DECL_LOGGER(logger);
 
