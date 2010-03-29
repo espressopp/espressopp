@@ -44,10 +44,10 @@ OPTIONS:
       linked and run.
 
   --no-exec
-      Do not execute C++ tests
+      Do not execute unittests (only compile and link).
 
   --no-compile
-      Do not compile or link C++ tests
+      Do not compile or link unittests (applies only to C++ unittests).
 
   -n, --dry-run
       Only print the commands that will be executed, don't actually
@@ -103,8 +103,8 @@ CPPFLAGS += ' -I' + os.path.join(top_builddir, 'src')
 CPPFLAGS += ' -I' + os.path.join(top_srcdir, 'src')
 CPPFLAGS += ' -I' + os.path.join(top_srcdir, 'src' , 'include')
 if not EXTERNAL_BOOST:
-    CPPFLAGS = ' -I' + os.path.join(top_srcdir, 'contrib' , 'boost') + CPPFLAGS
-    LDFLAGS  = ' -I' + os.path.join(top_builddir, 'contrib', 'boost') + LDFLAGS
+    CPPFLAGS = '-I' + os.path.join(top_srcdir, 'contrib' , 'boost') + ' ' + CPPFLAGS
+    LDFLAGS  = '-I' + os.path.join(top_builddir, 'contrib', 'boost') + ' ' + LDFLAGS
 LIBS = os.path.join(top_builddir, 'src' , 'libespresso_common.la') 
 LIBS += ' ' + os.path.join(top_builddir, 'src' , 'libgenlogger.la') 
 LIBS += ' ' + BOOST_UNITTEST_LIBS
@@ -554,22 +554,25 @@ for srcdir in dirs:
     # EXECUTE PYTHON UNITTESTS
     if do_python and py_tests:
         print("\n**************************************************")
-        print('**** RUNNING PYTHON UNITTESTS')
-        for test in py_tests:
-            testname = os.path.join(subdir, test) 
-            print("**************************************************")
-            print("** " + testname)
-            cmd = PYRUN + ' ' + os.path.join(srcdir, test)
-            if verbose: cmd += ' -v'
-            if single_test:
-                cmd += ' ' + ' '.join(subtests)
-            print(cmd)
-            if not dryrun:
-                if os.system(cmd):
-                    error.append(testname)
-                else:
-                    success.append(testname)
-                print('')
+        if no_exec:
+            print('**** DOING NOTHING WITH PYTHON UNITTESTS')
+        else:
+            print('**** RUNNING PYTHON UNITTESTS')
+            for test in py_tests:
+                testname = os.path.join(subdir, test) 
+                print("**************************************************")
+                print("** " + testname)
+                cmd = PYRUN + ' ' + os.path.join(srcdir, test)
+                if verbose: cmd += ' -v'
+                if single_test:
+                    cmd += ' ' + ' '.join(subtests)
+                print(cmd)
+                if not dryrun:
+                    if os.system(cmd):
+                        error.append(testname)
+                    else:
+                        success.append(testname)
+                    print('')
 
     ##############################################
     # EXECUTE PARALLEL PYTHON UNITTESTS
@@ -577,23 +580,26 @@ for srcdir in dirs:
         if verbose:
             print('Executing ptests using %s MPI tasks.' % num_tasks)
         print("\n**************************************************")
-        print('**** RUNNING PARALLEL PYTHON UNITTESTS (%d CPUs)' % num_tasks)
-        PARALLELPYTHON = ESPRESSO_MPIEXEC + ' -n ' + str(num_tasks) + ' ' + PYRUN
-        for test in parpy_tests:
-            testname = os.path.join(subdir, test) 
-            print("**************************************************")
-            print("** " + testname)
-            cmd = PARALLELPYTHON + ' ' + os.path.join(srcdir, test)
-            if verbose: cmd += ' -v'
-            if single_test:
-                cmd += ' ' + ' '.join(subtests)
-            print(cmd)
-            if not dryrun:
-                if os.system(cmd):
-                    error.append(testname)
-                else:
-                    success.append(testname)
-                print('')
+        if no_exec:
+            print('**** DOING NOTHING WITH PARALLEL PYTHON UNITTESTS')
+        else:
+            print('**** RUNNING PARALLEL PYTHON UNITTESTS (%d CPUs)' % num_tasks)
+            PARALLELPYTHON = ESPRESSO_MPIEXEC + ' -n ' + str(num_tasks) + ' ' + PYRUN
+            for test in parpy_tests:
+                testname = os.path.join(subdir, test) 
+                print("**************************************************")
+                print("** " + testname)
+                cmd = PARALLELPYTHON + ' ' + os.path.join(srcdir, test)
+                if verbose: cmd += ' -v'
+                if single_test:
+                    cmd += ' ' + ' '.join(subtests)
+                print(cmd)
+                if not dryrun:
+                    if os.system(cmd):
+                        error.append(testname)
+                    else:
+                        success.append(testname)
+                    print('')
 
 print("**************************************************")
 print("**************************************************")
