@@ -66,11 +66,11 @@ namespace espresso {
       foldPosition(Real3DRef pos) const;
 
       /** Get the folded position as a Python tuple. */
-      virtual class boost::python::tuple
+      virtual boost::python::tuple
       getFoldedPosition(ConstReal3DRef pos, 
 			ConstInt3DRef imageBox) const;
 
-      virtual class boost::python::tuple 
+      virtual boost::python::tuple 
       getFoldedPosition(ConstReal3DRef pos) const;
 
       /** unfold coordinates to physical position.

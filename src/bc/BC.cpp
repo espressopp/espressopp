@@ -105,7 +105,7 @@ namespace espresso {
 	.def("getMinimumImageVector", pygetMinimumImageVector)
 	.def("getFoldedPosition", pygetFoldedPosition1)
 	.def("getFoldedPosition", pygetFoldedPosition2)
-	.def("unfoldPosition", pygetUnfoldedPosition)
+	.def("getUnfoldedPosition", pygetUnfoldedPosition)
 	.def("getRandomPos", pygetRandomPos)
 	;
     }
