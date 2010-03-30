@@ -1,3 +1,4 @@
+#include "python.hpp"
 #define LOG4ESPP_LEVEL_DEBUG
 
 #include "VerletList.hpp"
@@ -9,7 +10,6 @@
 #include "storage/Storage.hpp"
 #include "bc/BC.hpp"
 #include "iterator/CellListAllPairsIterator.hpp"
-#include "python.hpp"
 
 namespace espresso {
 

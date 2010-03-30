@@ -75,7 +75,7 @@ def toReal3DFromVector(*args):
     raise TypeError("Specify x, y and z.")
 
 def toReal3D(*args):
-    """Try to convert the arguments to a Real3D, returns the rgument,
+    """Try to convert the arguments to a Real3D, returns the argument,
     if it is already a Real3D."""
     if len(args) == 1 and isinstance(args[0], Real3D):
         return args[0]

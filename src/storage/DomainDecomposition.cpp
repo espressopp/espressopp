@@ -1,9 +1,10 @@
+#include "python.hpp"
+
 #define LOG4ESPP_LEVEL_DEBUG
 #include <algorithm>
 #include <cmath>
 #include "log4espp.hpp"
 #include "System.hpp"
-#include "python.hpp"
 
 #include "Real3D.hpp"
 #include "DomainDecomposition.hpp"

@@ -1,6 +1,7 @@
 #ifndef _BC_BC_HPP
 #define _BC_BC_HPP
 
+#include <boost/python/tuple.hpp>
 #include "types.hpp"
 #include "log4espp.hpp"
 
@@ -26,8 +27,6 @@ namespace espresso {
 	  positions.
 
 	  \param dist is the distance vector (pos2 - pos1)
-	  \param distSqr is the square of the magnitude
-	  of the separation vector
 	  \param pos1, pos2 are the particle positions 
       */
       virtual void
@@ -53,7 +52,7 @@ namespace espresso {
       virtual void 
       unfoldCoordinate(Real3DRef pos, Int3DRef imageBox, int dir) const = 0;
 
-      /** fold particle coordinates to the primary simulation box.
+      /** Fold the coordinates to the primary simulation box.
 	  \param pos the position...
 	  \param imageBox and the box
 
@@ -62,6 +61,17 @@ namespace espresso {
       */
       virtual void 
       foldPosition(Real3DRef pos, Int3DRef imageBox) const;
+
+      virtual void
+      foldPosition(Real3DRef pos) const;
+
+      /** Get the folded position as a Python tuple. */
+      virtual class boost::python::tuple
+      getFoldedPosition(ConstReal3DRef pos, 
+			ConstInt3DRef imageBox) const;
+
+      virtual class boost::python::tuple 
+      getFoldedPosition(ConstReal3DRef pos) const;
 
       /** unfold coordinates to physical position.
 	  \param pos the position...
@@ -72,6 +82,9 @@ namespace espresso {
       */
       virtual void 
       unfoldPosition(Real3DRef pos, Int3DRef imageBox) const;
+
+      virtual Real3D
+      getUnfoldedPosition(ConstReal3DRef pos, ConstInt3DRef imageBox) const;
 
       /** Get a random position within the central simulation box. The
 	  positions are assigned with each coordinate on [0, boxL]. */

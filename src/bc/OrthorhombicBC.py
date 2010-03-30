@@ -2,13 +2,13 @@ from espresso.esutil import cxxinit
 from espresso import pmi
 from espresso import toReal3D
 
+from espresso.bc.BC import *
 from _espresso import bc_OrthorhombicBC 
 
-class OrthorhombicBCLocal(bc_OrthorhombicBC) :
+class OrthorhombicBCLocal(BCLocal, bc_OrthorhombicBC):
     'The (local) periodic boundary condition.'
-    def __init__(self, boxL=1.0):
-        boxL = toReal3D(boxL)
-        cxxinit(self, bc_OrthorhombicBC, boxL)
+    def __init__(self, rng, boxL=1.0):
+        cxxinit(self, bc_OrthorhombicBC, rng, toReal3D(boxL))
 
     # override length property
     def setBoxL(self, boxL):
@@ -16,17 +16,9 @@ class OrthorhombicBCLocal(bc_OrthorhombicBC) :
 
     boxL = property(bc_OrthorhombicBC.boxL.fget, setBoxL)
 
-#     def fold(self, v):
-#         return self.cxxclass.fold(self, toReal3D(v))
-
-#     def getDist(self, v1, v2):
-#         return self.cxxclass.getDist(self, toReal3D(v1), toReal3D(v2))
-
 if pmi.isController :
-    class OrthorhombicBC(object):
-        __metaclass__ = pmi.Proxy
+    class OrthorhombicBC(BC):
         pmiproxydefs = dict(
             cls =  'espresso.bc.OrthorhombicBCLocal',
-#            localcall = [ 'fold', 'foldThis', 'getDist', 'getRandomPos' ],
             pmiproperty = [ 'boxL' ]
             )

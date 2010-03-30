@@ -32,32 +32,43 @@ namespace espresso {
 	foldCoordinate(pos, imageBox, i);
     }
 
+    void
+    BC::foldPosition(Real3DRef pos) const {
+      Int3D imageBox(0, 0, 0);
+      foldPosition(pos, imageBox);
+    }
+
     void 
     BC::unfoldPosition(Real3DRef pos, Int3DRef imageBox) const {
       for (int i = 0; i < 3; ++i)
 	unfoldCoordinate(pos, imageBox, i);
     }
 
-    // define non-desctructive versions of foldPosition 
-    // and unfoldPosition for Python
-    class PyBC : public BC {
-    public:
-      virtual boost::python::tuple 
-      foldPosition(ConstReal3DRef pos, ConstInt3DRef imageBox) const {
-	Real3D foldedPos = pos;
-	Int3D foldedImageBox = imageBox;
-	foldPosition(foldedPos, foldedImageBox);
-	return boost::python::make_tuple(foldedPos, foldedImageBox);
-      }
+    boost::python::tuple 
+    BC::getFoldedPosition(ConstReal3DRef pos, 
+			  ConstInt3DRef imageBox) const {
+      Real3D foldedPos = pos;
+      Int3D foldedImageBox = imageBox;
+      foldPosition(foldedPos, foldedImageBox);
+      return boost::python::make_tuple(foldedPos, foldedImageBox);
+    }
 
-      virtual Real3D
-      unfoldPosition(ConstReal3DRef pos, ConstInt3DRef imageBox) const {
-	Real3D unfoldedPos = pos;
-	Int3D unfoldedImageBox = imageBox;
-	unfoldPosition(unfoldedPos, unfoldedImageBox);
-	return unfoldedPos;
-      }
-    };
+    boost::python::tuple 
+    BC::getFoldedPosition(ConstReal3DRef pos) const {
+      Real3D foldedPos = pos;
+      Int3D foldedImageBox(0, 0, 0);
+      foldPosition(foldedPos, foldedImageBox);
+      return boost::python::make_tuple(foldedPos, foldedImageBox);
+    }
+
+    Real3D
+    BC::getUnfoldedPosition(ConstReal3DRef pos, 
+			    ConstInt3DRef imageBox) const {
+      Real3D unfoldedPos = pos;
+      Int3D unfoldedImageBox = imageBox;
+      unfoldPosition(unfoldedPos, unfoldedImageBox);
+      return unfoldedPos;
+    }
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
@@ -73,14 +84,28 @@ namespace espresso {
       Real3D (BC::*pygetMinimumImageVector)(const ConstReal3DRef pos1,
 					    const ConstReal3DRef pos2) const 
 	= &BC::getMinimumImageVector;
+      
+      boost::python::tuple (BC::*pygetFoldedPosition1)
+	(ConstReal3DRef pos, ConstInt3DRef imageBox) const
+	= &BC::getFoldedPosition;
+
+      boost::python::tuple (BC::*pygetFoldedPosition2)
+	(ConstReal3DRef pos) const
+	= &BC::getFoldedPosition;
+
+      Real3D (BC::*pygetUnfoldedPosition)
+	(ConstReal3DRef pos, ConstInt3DRef imageBox) const 
+	= &BC::getUnfoldedPosition;
+
       Real3D (BC::*pygetRandomPos)() const = &BC::getRandomPos;
     
       class_< BC, boost::noncopyable >("bc_BC", no_init)
 	.add_property("boxL", &BC::getBoxL)
 	.add_property("rng", &BC::getRng, &BC::setRng)
 	.def("getMinimumImageVector", pygetMinimumImageVector)
-	.def("foldPosition", &PyBC::foldPosition)
-	.def("unfoldPosition", &PyBC::unfoldPosition)
+	.def("getFoldedPosition", pygetFoldedPosition1)
+	.def("getFoldedPosition", pygetFoldedPosition2)
+	.def("unfoldPosition", pygetUnfoldedPosition)
 	.def("getRandomPos", pygetRandomPos)
 	;
     }
