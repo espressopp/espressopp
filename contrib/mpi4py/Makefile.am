@@ -1,35 +1,46 @@
+mpi4py_srcdir = mpi4py-1.2.1
+
 noinst_HEADERS = \
-	atimport.h \
-	fallback.h \
-	missing.h \
-	vendor.h \
-	dynload.h \
-	config/unknown.h \
-	config/mpich2.h \
-	config/mpich2io.h \
-	config/sgimpi.h \
-	config/lammpi.h \
-	config/lammpiio.h \
-	config/mpich1.h \
-	config/mpich1io.h \
-	config/openmpi.h \
-	compat/mpich1.h \
-	compat/mpich2.h \
-	compat/openmpi.h \
-	compat/sgimpi.h \
-	compat/sicortex.h \
-	compat/lammpi.h \
-	MPI.c dynload.c mpi4py.MPI.c
+	$(mpi4py_srcdir)/src/atimport.h \
+	$(mpi4py_srcdir)/src/fallback.h \
+	$(mpi4py_srcdir)/src/missing.h \
+	$(mpi4py_srcdir)/src/vendor.h \
+	$(mpi4py_srcdir)/src/dynload.h \
+	$(mpi4py_srcdir)/src/config/unknown.h \
+	$(mpi4py_srcdir)/src/config/mpich2.h \
+	$(mpi4py_srcdir)/src/config/mpich2io.h \
+	$(mpi4py_srcdir)/src/config/sgimpi.h \
+	$(mpi4py_srcdir)/src/config/lammpi.h \
+	$(mpi4py_srcdir)/src/config/lammpiio.h \
+	$(mpi4py_srcdir)/src/config/mpich1.h \
+	$(mpi4py_srcdir)/src/config/mpich1io.h \
+	$(mpi4py_srcdir)/src/config/openmpi.h \
+	$(mpi4py_srcdir)/src/compat/mpich1.h \
+	$(mpi4py_srcdir)/src/compat/mpich2.h \
+	$(mpi4py_srcdir)/src/compat/openmpi.h \
+	$(mpi4py_srcdir)/src/compat/sgimpi.h \
+	$(mpi4py_srcdir)/src/compat/sicortex.h \
+	$(mpi4py_srcdir)/src/compat/lammpi.h \
+	$(mpi4py_srcdir)/src/mpi4py.MPI.c \
+	$(mpi4py_srcdir)/src/MPI.c \
+	$(mpi4py_srcdir)/src/dynload.c
+
+EXTRA_DIST = \
+	$(mpi4py_srcdir)/LICENSE.txt \
+	$(mpi4py_srcdir)/HISTORY.txt \
+	$(mpi4py_srcdir)/README.txt \
+	$(mpi4py_srcdir)/THANKS.txt
 
 # Create a convenience library version of the python module,
 # required for static linkage into pypresso
 noinst_LTLIBRARIES = libmpi4py.la
+libmpi4py_la_CPPFLAGS = -I $(srcdir)/$(mpi4py_srcdir)/src $(AM_CPPFLAGS)
 libmpi4py_la_LDFLAGS = -no-undefined
 libmpi4py_la_LIBADD = $(ESPRESSO_BOOST_LIBS)
 
 libmpi4py_la_SOURCES = MPI.cpp dynload.cpp
 
-# The python module boostmpi
+# The python module MPI
 # Build only if shared libs are built
 if ENABLE_SHARED
 python_LTLIBRARIES = MPI.la

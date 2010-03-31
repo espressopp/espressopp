@@ -1,0 +1,61 @@
+Metadata-Version: 1.1
+Name: mpi4py
+Version: 1.2.1
+Summary: MPI for Python
+Home-page: http://mpi4py.googlecode.com/
+Author: Lisandro Dalcin
+Author-email: dalcinl@gmail.com
+License: BSD
+Download-URL: http://mpi4py.googlecode.com/files/mpi4py-1.2.1.tar.gz
+Description: This package provides MPI support for Python scripting in parallel
+        environments. It is constructed on top of the MPI-1/MPI-2
+        specification, but provides an object oriented interface which closely
+        follows the MPI-2 C++ bindings.
+        
+        This module supports point-to-point (send, receive) and collective
+        (broadcast, scatter, gather, reduction) communications of any
+        *picklable* Python object.
+        
+        For objects exporting single-segment buffer interface (strings, NumPy
+        arrays, etc.), blocking/nonbloking/persistent point-to-point,
+        collective and one-sided (put, get, accumulate) communications are
+        fully supported, as well as parallel I/O (blocking and nonbloking,
+        collective and noncollective read and write operations using explicit
+        file offsets, individual file pointers and shared file
+        pointers).
+        
+        There is also full support for group and communicator (inter, intra,
+        Cartesian and graph topologies) creation and management, as well as
+        creating user-defined datatypes. Additionally, there is almost
+        complete support for dynamic process creation and management (spawn,
+        name publishing).
+Keywords: scientific computing,parallel computing,message passing,MPI
+Platform: Mac OS X
+Platform: Linux
+Platform: Solaris
+Platform: Unix
+Platform: Windows
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: POSIX :: SunOS/Solaris
+Classifier: Operating System :: Unix
+Classifier: Programming Language :: C
+Classifier: Programming Language :: Cython
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 3
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: System :: Distributed Computing
+Requires: pickle
+Provides: mpi4py
+Provides: mpi4py.dl
+Provides: mpi4py.rc
+Provides: mpi4py.MPI
+Provides: mpi4py.MPE
