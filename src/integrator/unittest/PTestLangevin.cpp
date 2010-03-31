@@ -75,7 +75,7 @@ struct Fixture {
 
     system = make_shared< System >();
     system->rng = make_shared< RNG >();
-    system->bc = make_shared< OrthorhombicBC >(system, boxLRef);
+    system->bc = make_shared< OrthorhombicBC >(system->rng, boxLRef);
     system->skin = skin;
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,

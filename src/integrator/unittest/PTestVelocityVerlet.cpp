@@ -35,8 +35,6 @@ struct LoggingFixture {
 
 static real cutoff1 = 1.4;
 static real cutoff2 = 1.0;
-static int  niter  = 60;
-static double timestep = 0.005;
 static int N = 3;
 static real size = N;
 
@@ -79,7 +77,7 @@ struct Fixture {
 
     system = make_shared< System >();
     system->rng = make_shared< RNG >();
-    system->bc = make_shared< OrthorhombicBC >(system, boxLRef);
+    system->bc = make_shared< OrthorhombicBC >(system->rng, boxLRef);
     system->skin = skin;
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,
@@ -162,7 +160,7 @@ struct DomainFixture {
 
     system = make_shared< System >();
     system->rng = make_shared< RNG >();
-    system->bc = make_shared< OrthorhombicBC >(system, boxL);
+    system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
     system->skin = skin;
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,

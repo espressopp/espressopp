@@ -15,9 +15,9 @@ public:
     return sqrt(distSqr);
   }
 
-  bool _computeForceRaw(ConstReal3DRef dist, 
-			real distSqr,
-			Real3DRef force) const {
+  bool _computeForceRaw(Real3DRef force,
+			ConstReal3DRef dist, 
+			real distSqr) const {
     force = dist;
     return true;
   }

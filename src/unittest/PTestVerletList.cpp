@@ -1,7 +1,6 @@
 #define PARALLEL_TEST_MODULE VerletList
 #include "ut.hpp"
 
-#include <memory>
 #include "mpi.hpp"
 #include "logging.hpp"
 #include "VerletList.hpp"
@@ -84,7 +83,8 @@ struct DomainFixture {
                                  cellGrid[1] << " x " << cellGrid[2]);
 
     system = make_shared< System >();
-    system->bc = make_shared< OrthorhombicBC >(system, boxL);
+    system->rng = make_shared< esutil::RNG >();
+    system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
     system->skin = skin;
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,

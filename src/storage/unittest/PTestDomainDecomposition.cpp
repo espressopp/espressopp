@@ -5,7 +5,7 @@
 #include "mpi.hpp"
 #include "logging.hpp"
 #include "esutil/RNG.hpp"
-#include "../DomainDecomposition.hpp"
+#include "storage/DomainDecomposition.hpp"
 #include "System.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "bc/OrthorhombicBC.hpp"
@@ -46,7 +46,8 @@ struct Fixture {
     }
     int cellGrid[3] = { 1, 2, 3 };
     system = make_shared< System >();
-    system->bc = make_shared< bc::OrthorhombicBC >(system, boxL);
+    system->rng = make_shared< esutil::RNG >();
+    system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
     domdec = make_shared< DomainDecomposition >(system,
     						mpiWorld,
     						nodeGrid,
@@ -68,7 +69,8 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
   Real3D boxL(1.0, 2.0, 3.0);
   shared_ptr< System > system;
   system = make_shared< System >();
-  system->bc = make_shared< bc::OrthorhombicBC >(system, boxL);
+  system->rng = make_shared< esutil::RNG >();
+  system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
 
   for(int i = 0; i < 3; ++i) {
     int nodeGrid[3] = { 1, 1, 1 };

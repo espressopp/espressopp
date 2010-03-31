@@ -4,9 +4,9 @@
 
 #include "mpi.hpp"
 #include "logging.hpp"
-#include "../OrthorhombicBC.hpp"
-#include "System.hpp"
 #include "Real3D.hpp"
+#include "esutil/RNG.hpp"
+#include "bc/OrthorhombicBC.hpp"
 
 using namespace espresso;
 
@@ -20,22 +20,22 @@ struct LoggingFixture {
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
 struct Fixture {
-  shared_ptr< System > system;
+  shared_ptr< bc::BC > bc;
 
   Fixture() {
     Real3D L(10.0, 10.0, 10.0);
-    system = make_shared< System >();
-    system->bc = make_shared< bc::OrthorhombicBC >(system, L);
+    shared_ptr< esutil::RNG > rng 
+      = make_shared< esutil::RNG >();
+    bc = make_shared< bc::OrthorhombicBC >(rng, L);
   }
 };
 
 BOOST_FIXTURE_TEST_CASE(foldingTest, Fixture) {
-  int dim = 2;
-  BOOST_CHECK_EQUAL(Real3D(10.0), system->bc->getBoxL());
+  BOOST_CHECK_EQUAL(Real3D(10.0), bc->getBoxL());
 
   Real3D pi(5.0, 5.0, 5.0);
   Real3D pj(11.0, 11.0, 11.0);
   Real3D rij;
-  system->bc->getMinimumImageVector(rij, pi, pj);
+  bc->getMinimumImageVector(rij, pi, pj);
   BOOST_CHECK_EQUAL(rij[0], 4.0);
 }
