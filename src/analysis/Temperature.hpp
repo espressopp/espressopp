@@ -8,9 +8,11 @@ namespace espresso {
   namespace analysis {
     /** Class to compute the temperature. */
     class Temperature : public Observable {
-    private:
+    public:
+      Temperature(shared_ptr< storage::Storage > storage) : Observable(storage) {}
+      ~Temperature() {}
       virtual real compute() const;
-      //      virtual real average();
+      //virtual real time_average() const;
     };
   }
 }
