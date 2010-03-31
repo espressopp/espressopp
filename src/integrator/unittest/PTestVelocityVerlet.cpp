@@ -1,6 +1,5 @@
 #define PARALLEL_TEST_MODULE VelocityVerlet
 #include "ut.hpp"
-//#include <memory>
 
 #include "types.hpp"
 #include "mpi.hpp"
@@ -60,7 +59,7 @@ struct Fixture {
 
     ConstReal3DRef boxLRef(boxL);
 
-    int nodeGrid[3] = { 1, 1, mpiWorld.size() };
+    int nodeGrid[3] = { 1, 1, mpiWorld->size() };
     int cellGrid[3] = { 1, 1, 1 };
 
     for (int i = 0; i < 3; i++) {
@@ -97,7 +96,7 @@ struct Fixture {
           real z = (k + r) / N * SIZE;
           real pos[3] = { x, y, z };
       
-          if (mpiWorld.rank() == 0) {
+          if (mpiWorld->rank() == 0) {
           
             printf("add particle at %f %f %f\n", x, y, z);
             domdec->addParticle(id, pos);
@@ -135,7 +134,7 @@ struct DomainFixture {
 
     real skin   = 0.3;
 
-    int nodeGrid[3] = { 1, 1, mpiWorld.size() };
+    int nodeGrid[3] = { 1, 1, mpiWorld->size() };
 
     int cellGrid[3] = { 1, 1, 1 };
 
@@ -188,7 +187,7 @@ struct LatticeFixture : DomainFixture {
           real z = (k + r) / N * SIZE;
           real pos[3] = { x, y, z };
 
-          if (mpiWorld.rank() == 0) {
+          if (mpiWorld->rank() == 0) {
             BOOST_MESSAGE("add particle at pos " << x << " " << y << " " << z);
             domdec->addParticle(id, pos);
           }
@@ -251,7 +250,7 @@ BOOST_FIXTURE_TEST_CASE(moveParticles, LatticeFixture)
 
   int val = 0;
 
-  boost::mpi::all_reduce(mpiWorld, val, val, std::plus<int>());
+  boost::mpi::all_reduce(*mpiWorld, val, val, std::plus<int>());
 
   printf("ready\n");
 }

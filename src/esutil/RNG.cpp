@@ -9,7 +9,7 @@ namespace espresso {
   namespace esutil {
 
     RNG::RNG(long _seed) 
-      : boostRNG(make_shared< RNGType >(_seed + mpiWorld.rank())), 
+      : boostRNG(make_shared< RNGType >(_seed + mpiWorld->rank())), 
 	normalVariate(*boostRNG, 
 		      normal_distribution< real >(0.0, 1.0)),
 	uniformOnSphereVariate(*boostRNG, 
@@ -19,7 +19,7 @@ namespace espresso {
     void
     RNG::seed(long _seed) {
       // Seed the RNG for the given CPU
-      boostRNG->seed(_seed + mpiWorld.rank());
+      boostRNG->seed(_seed + mpiWorld->rank());
     }
 
     real

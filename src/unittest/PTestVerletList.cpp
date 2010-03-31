@@ -59,7 +59,7 @@ struct DomainFixture {
 
     real skin   = 0.3;
     
-    int nodeGrid[3] = { 1, 1, mpiWorld.size() };
+    int nodeGrid[3] = { 1, 1, mpiWorld->size() };
 
     int cellGrid[3] = { 1, 1, 1 };
 
@@ -86,10 +86,7 @@ struct DomainFixture {
     system->rng = make_shared< esutil::RNG >();
     system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
     system->skin = skin;
-    domdec = make_shared< DomainDecomposition >(system,
-                                                mpiWorld,
-                                                nodeGrid,
-                                                cellGrid);
+    domdec = make_shared< DomainDecomposition >(system, mpiWorld, nodeGrid, cellGrid);
     system->storage = domdec;
   }
 };
@@ -112,7 +109,7 @@ struct LatticeFixture : DomainFixture {
           real z = (k + r) / N * SIZE;
           real pos[3] = { x, y, z };
       
-          if (mpiWorld.rank() == 0) {
+          if (mpiWorld->rank() == 0) {
             BOOST_MESSAGE("add particle at pos " << x << " " << y << " " << z);
             domdec->addParticle(id, pos);
           }
@@ -147,7 +144,7 @@ struct RandomFixture : DomainFixture {
 
       real pos[3] = { x, y, z };
 
-      if (mpiWorld.rank() == 0) {
+      if (mpiWorld->rank() == 0) {
         BOOST_MESSAGE("add particle at pos " << x << " " << y << " " << z);
         domdec->addParticle(id, pos);
       }
@@ -177,7 +174,7 @@ BOOST_FIXTURE_TEST_CASE(LatticeTest, LatticeFixture)
   int localPairs = pairs.size();
   int globalPairs;
 
-  boost::mpi::all_reduce(mpiWorld, localPairs, globalPairs, std::plus<int>());
+  boost::mpi::all_reduce(*mpiWorld, localPairs, globalPairs, std::plus<int>());
 
   BOOST_CHECK_EQUAL(globalPairs, 0);
 
@@ -187,7 +184,7 @@ BOOST_FIXTURE_TEST_CASE(LatticeTest, LatticeFixture)
 
   pairs = vl->getPairs();
   localPairs = pairs.size();
-  boost::mpi::all_reduce(mpiWorld, localPairs, globalPairs, std::plus<int>());
+  boost::mpi::all_reduce(*mpiWorld, localPairs, globalPairs, std::plus<int>());
 
   BOOST_CHECK_EQUAL(globalPairs, N * N * N * 3);
 
@@ -197,7 +194,7 @@ BOOST_FIXTURE_TEST_CASE(LatticeTest, LatticeFixture)
 
   pairs = vl->getPairs();
   localPairs = pairs.size();
-  boost::mpi::all_reduce(mpiWorld, localPairs, globalPairs, std::plus<int>());
+  boost::mpi::all_reduce(*mpiWorld, localPairs, globalPairs, std::plus<int>());
 
   BOOST_CHECK_EQUAL(globalPairs, N * N * N * 9);
 
@@ -205,7 +202,7 @@ BOOST_FIXTURE_TEST_CASE(LatticeTest, LatticeFixture)
 
   pairs = vl->getPairs();
   localPairs = pairs.size();
-  boost::mpi::all_reduce(mpiWorld, localPairs, globalPairs, std::plus<int>());
+  boost::mpi::all_reduce(*mpiWorld, localPairs, globalPairs, std::plus<int>());
 
   // there are N * N * N * 26 / 2 pairs in cutoff 
 
@@ -242,7 +239,7 @@ BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
 
   int totalPairs1;
 
-  boost::mpi::all_reduce(mpiWorld, (int) pairs.size(), totalPairs1, std::plus<int>());
+  boost::mpi::all_reduce(*mpiWorld, (int) pairs.size(), totalPairs1, std::plus<int>());
 
   // count pairs in a N square loop
 
@@ -271,7 +268,7 @@ BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
 
   int totalPairs2;
 
-  boost::mpi::all_reduce(mpiWorld, count, totalPairs2, std::plus<int>());
+  boost::mpi::all_reduce(*mpiWorld, count, totalPairs2, std::plus<int>());
 
   BOOST_CHECK_EQUAL(totalPairs1, totalPairs2);
 

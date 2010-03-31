@@ -58,7 +58,7 @@ struct Fixture {
 
     ConstReal3DRef boxLRef(boxL);
 
-    int nodeGrid[3] = { 1, 1, mpiWorld.size() };
+    int nodeGrid[3] = { 1, 1, mpiWorld->size() };
     int cellGrid[3] = { 1, 1, 1 };
 
     for (int i = 0; i < 3; i++) {
@@ -96,7 +96,7 @@ struct Fixture {
           real z = (k + r) / N * size;
           real pos[3] = { x, y, z };
 
-          if (mpiWorld.rank() == 0) {
+          if (mpiWorld->rank() == 0) {
 
             BOOST_MESSAGE("add particle at " << x << ", " << y << ", " << z);
             domdec->addParticle(id, pos);
@@ -169,7 +169,7 @@ BOOST_FIXTURE_TEST_CASE(moveParticles, Fixture)
 
   int val = 0;
 
-  boost::mpi::all_reduce(mpiWorld, val, val, std::plus<int>());
+  boost::mpi::all_reduce(*mpiWorld, val, val, std::plus<int>());
 
   BOOST_MESSAGE("moveParticles test ready");
 }

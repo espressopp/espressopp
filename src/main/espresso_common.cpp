@@ -1,11 +1,13 @@
 #include "espresso_common.hpp"
 
-#include <mpi.hpp>
+#include "mpi.hpp"
+#include "types.hpp"
 
 /** the one and only instance of the MPI environment */
 static boost::mpi::environment *theEnvironment = 0;
 
-boost::mpi::communicator mpiWorld;
+boost::shared_ptr< boost::mpi::communicator > mpiWorld 
+= boost::make_shared< boost::mpi::communicator >();
 
 /** Initialize MPI. */
 void initMPIEnv(int &argc, char **&argv) {

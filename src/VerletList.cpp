@@ -86,7 +86,7 @@ namespace espresso {
   
     int allsize;
   
-    mpi::all_reduce(system.comm, size, allsize, std::plus<int>());
+    mpi::all_reduce(*system.comm, size, allsize, std::plus<int>());
   
     return allsize;
   }

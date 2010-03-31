@@ -1,7 +1,7 @@
 #ifndef _STORAGE_STORAGE_HPP
 #define _STORAGE_STORAGE_HPP
 #include <vector>
-#include <mpi.hpp>
+#include "mpi.hpp"
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
 #include "types.hpp"
@@ -18,12 +18,12 @@ namespace espresso {
       typedef boost::unordered_map< longint, Particle * > IdParticleMap;
 
       Storage(shared_ptr< class System > system,
-	      const boost::mpi::communicator &);
+	      shared_ptr< boost::mpi::communicator > comm);
       virtual ~Storage();
 
       /** add a particle with given id and position. Note that this is a
 	  local operation, and therefore cannot check whether a particle
-	  with the give id already exists.  This is left to the parallel
+	  with the given id already exists.  This is left to the parallel
 	  front end.
       */
       Particle *addParticle(longint id, const ConstReal3DRef pos);
@@ -184,7 +184,7 @@ namespace espresso {
 
       /// map particle id to Particle * for all particles on this node
       boost::unordered_map<longint, Particle * > localParticles;
-      mpi::communicator comm;
+      shared_ptr< mpi::communicator > comm;
   
       /** here the local particles are actually stored */
       LocalCellList cells;

@@ -20,14 +20,16 @@ namespace espresso {
 
     LOG4ESPP_LOGGER(DomainDecomposition::logger, "DomainDecomposition");
 
-    NodeGridMismatch::NodeGridMismatch()
+    NodeGridMismatch::
+    NodeGridMismatch()
       : std::runtime_error("specified node grid does not match number of nodes in the communicator") {
     }
 
-    DomainDecomposition::DomainDecomposition(shared_ptr< System > _system,
-					     const mpi::communicator &_comm,
-					     const ConstInt3DRef _nodeGrid,
-					     const ConstInt3DRef _cellGrid)
+    DomainDecomposition::
+    DomainDecomposition(shared_ptr< System > _system,
+			shared_ptr< mpi::communicator > _comm,
+			const ConstInt3DRef _nodeGrid,
+			const ConstInt3DRef _cellGrid)
       : Storage(_system, _comm), exchangeBufferSize(0) {
       LOG4ESPP_INFO(logger, "node grid = "
 		    << _nodeGrid[0] << "x" << _nodeGrid[1] << "x" << _nodeGrid[2]
@@ -40,13 +42,15 @@ namespace espresso {
       LOG4ESPP_DEBUG(logger, "done");
     }
 
-    void DomainDecomposition::createCellGrid(const ConstInt3DRef _nodeGrid, const ConstInt3DRef _cellGrid) {
+    void DomainDecomposition::
+    createCellGrid(const ConstInt3DRef _nodeGrid, 
+		   const ConstInt3DRef _cellGrid) {
       real myLeft[3];
       real myRight[3];
 
-      nodeGrid = NodeGrid(_nodeGrid, comm.rank(), getSystem()->bc->getBoxL());
+      nodeGrid = NodeGrid(_nodeGrid, comm->rank(), getSystem()->bc->getBoxL());
 
-      if (nodeGrid.getNumberOfCells() != comm.size()) {
+      if (nodeGrid.getNumberOfCells() != comm->size()) {
 	throw NodeGridMismatch();
       }
 
@@ -54,7 +58,7 @@ namespace espresso {
 		    << nodeGrid.getNodePosition(0) << " "
 		    << nodeGrid.getNodePosition(1) << " "
 		    << nodeGrid.getNodePosition(2) << " -> "
-		    << comm.rank());
+		    << comm->rank());
 
       LOG4ESPP_DEBUG(logger, "my neighbors: "
 		     << nodeGrid.getNodeNeighbor(0) << "<->"
@@ -320,8 +324,8 @@ namespace espresso {
 	}
 
 	// Communicate wether particle exchange is finished
-	mpi::all_reduce(comm, finished, nNodesFinished, std::plus<int>());
-      } while (nNodesFinished < comm.size());
+	mpi::all_reduce(*comm, finished, nNodesFinished, std::plus<int>());
+      } while (nNodesFinished < comm->size());
 
       exchangeBufferSize = std::max(exchangeBufferSize,
 				    std::max(sendBufL.capacity(),
@@ -495,14 +499,14 @@ namespace espresso {
 	      if (nodeGrid.getNodePosition(coord) % 2 == 0) {
 		LOG4ESPP_DEBUG(logger, "sending to node " << nodeGrid.getNodeNeighbor(dir)
 			       << ", then receiving from node " << nodeGrid.getNodeNeighbor(oppositeDir));
-		comm.send(nodeGrid.getNodeNeighbor(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
-		comm.recv(nodeGrid.getNodeNeighbor(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
+		comm->send(nodeGrid.getNodeNeighbor(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
+		comm->recv(nodeGrid.getNodeNeighbor(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
 	      }
 	      else {
 		LOG4ESPP_DEBUG(logger, "receiving from node " << nodeGrid.getNodeNeighbor(oppositeDir)
 			       << ", then sending to node " << nodeGrid.getNodeNeighbor(dir));
-		comm.recv(nodeGrid.getNodeNeighbor(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
-		comm.send(nodeGrid.getNodeNeighbor(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
+		comm->recv(nodeGrid.getNodeNeighbor(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
+		comm->send(nodeGrid.getNodeNeighbor(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
 	      }
 
 	      // resize according to received information
@@ -514,8 +518,8 @@ namespace espresso {
 
 	    // prepare send and receive buffers
 	    longint oarRecver, iarSender;
-	    boost::mpi::packed_oarchive oar(comm);
-	    boost::mpi::packed_iarchive iar(comm);
+	    boost::mpi::packed_oarchive oar(*comm);
+	    boost::mpi::packed_iarchive iar(*comm);
 	    if (realToGhosts) {
 	      oarRecver = nodeGrid.getNodeNeighbor(dir);
 	      iarSender = nodeGrid.getNodeNeighbor(oppositeDir);
@@ -533,11 +537,11 @@ namespace espresso {
 
 	    // exchange particles, odd-even rule
 	    if (nodeGrid.getNodePosition(coord) % 2 == 0) {
-	      comm.send(oarRecver, DD_COMM_TAG, oar);
-	      comm.recv(iarSender, DD_COMM_TAG, iar);
+	      comm->send(oarRecver, DD_COMM_TAG, oar);
+	      comm->recv(iarSender, DD_COMM_TAG, iar);
 	    } else {
-	      comm.recv(iarSender, DD_COMM_TAG, iar);
-	      comm.send(oarRecver, DD_COMM_TAG, oar);
+	      comm->recv(iarSender, DD_COMM_TAG, iar);
+	      comm->send(oarRecver, DD_COMM_TAG, oar);
 	    }
 
 	    // unpack received data
@@ -556,17 +560,29 @@ namespace espresso {
       }
       LOG4ESPP_DEBUG(logger, "ghost communication finished");
     }
+
+    class PyDomainDecomposition : public DomainDecomposition {
+    public:
+      // TODO: Care for MPI communicator!
+      PyDomainDecomposition(shared_ptr< System > _system,
+			    boost::python::object pyComm,
+			    const ConstInt3DRef _nodeGrid,
+			    const ConstInt3DRef _cellGrid)
+ 	: DomainDecomposition(_system, mpiWorld, 
+ 			      _nodeGrid, _cellGrid)
+      {}
+    };
  
-
-
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
-
     void
     DomainDecomposition::registerPython() {
       using namespace espresso::python;
-      class_< DomainDecomposition, boost::noncopyable >("storage_DomainDecomposition", no_init)
+      class_< PyDomainDecomposition, boost::noncopyable >
+	("storage_DomainDecomposition", 
+	 init< shared_ptr< System >, boost::python::object, 
+	 const ConstInt3DRef, const ConstInt3DRef >())
       ;
     }
   }

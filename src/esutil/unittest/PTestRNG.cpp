@@ -40,11 +40,11 @@ BOOST_AUTO_TEST_CASE(different_tasks)
   RNG rng;
   real r = rng();
 
-  if (mpiWorld.rank() != 0) {
-    boost::mpi::gather(mpiWorld, r, 0);
+  if (mpiWorld->rank() != 0) {
+    boost::mpi::gather(*mpiWorld, r, 0);
   } else {
     std::vector< real > rs;
-    boost::mpi::gather(mpiWorld, r, rs, 0);
+    boost::mpi::gather(*mpiWorld, r, rs, 0);
     
     for (size_t i = 0; i < rs.size(); i++)
       for (size_t j = i+1; j < rs.size(); j++)

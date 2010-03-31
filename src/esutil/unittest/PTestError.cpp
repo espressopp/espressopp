@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(single)
 {
   Error myError = Error(mpiWorld);
 
-  if (mpiWorld.rank() == 0) {
+  if (mpiWorld->rank() == 0) {
 
     myError.setException("Set exception");
  

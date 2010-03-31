@@ -10,17 +10,13 @@ namespace espresso {
 
   namespace esutil { class RNG; }
 
-  class System : public enable_shared_from_this<System> {
+  class System : public enable_shared_from_this< System > {
 
   public:
 
-    System() : name("DEFAULT"), comm(mpiWorld) {}
+    System() : comm(mpiWorld) {}
 
-    System(std::string &_name) : name(_name), comm(mpiWorld) {}
-
-    std::string name;
-
-    mpi::communicator comm;
+    shared_ptr< mpi::communicator > comm;
 
     shared_ptr< storage::Storage > storage;
     shared_ptr< bc::BC > bc;
@@ -30,7 +26,7 @@ namespace espresso {
 
     real skin;  //<! skin used for VerletList
 
-    shared_ptr<System> getShared() { 
+    shared_ptr< System > getShared() { 
       return shared_from_this();
     }
 

@@ -26,11 +26,10 @@ namespace espresso {
   const int Storage::dataOfExchangeGhosts = DATA_PROPERTIES;
 
   Storage::Storage(shared_ptr< System > system,
-                   const boost::mpi::communicator &_comm)
+                   shared_ptr< boost::mpi::communicator >_comm)
     : SystemAccess(system),
       comm(_comm)
-  {
-  }
+  {}
 
   Storage::~Storage() {}
 
@@ -66,7 +65,8 @@ namespace espresso {
   }
 
 
-  Particle *Storage::addParticle(longint id, const ConstReal3DRef p)
+  Particle *Storage::
+  addParticle(longint id, const ConstReal3DRef p)
   {
     Cell *cell;
 
@@ -181,7 +181,7 @@ namespace espresso {
     LOG4ESPP_DEBUG(logger, "send " << l.size() << " particles to " << node);
 
     // pack for transport
-    mpi::packed_oarchive data(comm);
+    mpi::packed_oarchive data(*comm);
     int size = l.size();
     data << size;
     for (ParticleList::Iterator it(l); it.isValid(); ++it)
@@ -189,7 +189,7 @@ namespace espresso {
     l.clear();
 
     // ... and send
-    comm.send(node, STORAGE_COMM_TAG, data);
+    comm->send(node, STORAGE_COMM_TAG, data);
 
     LOG4ESPP_DEBUG(logger, "done");
   }
@@ -199,8 +199,8 @@ namespace espresso {
     LOG4ESPP_DEBUG(logger, "recv from " << node);
 
     // receive packed data
-    mpi::packed_iarchive data(comm);
-    comm.recv(node, STORAGE_COMM_TAG, data);
+    mpi::packed_iarchive data(*comm);
+    comm->recv(node, STORAGE_COMM_TAG, data);
 
     // ... and unpack
     int size;

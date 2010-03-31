@@ -5,8 +5,6 @@
 
 namespace espresso {
   namespace esutil {
-
-
   /** This class supports exception handling for MPI processors.
 
       The problem of MPI is that it is not possible to throw
@@ -23,7 +21,7 @@ namespace espresso {
 
       Be careful about the drawbacks:
 
-      - A processor continues exectution if it has set an exception
+      - A processor continues execution if it has set an exception
       - check for exceptions must be invoked explicitly.
 
   */
@@ -40,7 +38,7 @@ namespace espresso {
         this constrcutor.
     */
 
-    Error(boost::mpi::communicator comm);
+    Error(boost::shared_ptr< boost::mpi::communicator > comm);
 
     /** Destructor; will also test for pending exceptions. */
 
@@ -67,7 +65,7 @@ namespace espresso {
 
   private:    
 
-    boost::mpi::communicator comm;
+    boost::shared_ptr< boost::mpi::communicator > comm;
 
     std::string exceptionMessage;
 

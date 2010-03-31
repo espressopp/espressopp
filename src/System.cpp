@@ -14,11 +14,11 @@ namespace espresso {
     using namespace espresso::python;
 
     class_< System >("System")
-      .def_readwrite("name", &System::name)
       .def_readwrite("storage", &System::storage)
       .def_readwrite("bc", &System::bc)
-      .def_readwrite("shortRangeInteractions", &System::shortRangeInteractions)
       .def_readwrite("rng", &System::rng)
+      .def_readwrite("shortRangeInteractions", 
+		     &System::shortRangeInteractions)
       .def_readwrite("skin", &System::skin)
       ;
   }

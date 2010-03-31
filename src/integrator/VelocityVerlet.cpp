@@ -128,7 +128,7 @@ namespace espresso {
 	integrate2();
       }
 
-      LOG4ESPP_INFO(theLogger, "proc " << mpiWorld.rank() << ": finished run");
+      LOG4ESPP_INFO(theLogger, "finished run");
     }
 
     /*****************************************************************************/
@@ -173,7 +173,7 @@ namespace espresso {
 
       real maxAllSqDist;
 
-      mpi::all_reduce(system.comm, maxSqDist, maxAllSqDist, 
+      mpi::all_reduce(*system.comm, maxSqDist, maxAllSqDist, 
                       boost::mpi::maximum<double>());
 
       LOG4ESPP_INFO(theLogger, "moved " << count << " particles in integrate1" <<
@@ -213,7 +213,7 @@ namespace espresso {
 
       maxCut = 0.0;
 
-      for (int j = 0; j < srIL.size(); j++) {
+      for (size_t j = 0; j < srIL.size(); j++) {
 
 	real cut = srIL[j]->getMaxCutoff();
 
@@ -234,8 +234,6 @@ namespace espresso {
       System& sys = getSystemRef();
 
       const InteractionList& srIL = sys.shortRangeInteractions;
-
-      real energy = 0.0;
 
       for (size_t i = 0; i < srIL.size(); i++) {
 
@@ -277,16 +275,16 @@ namespace espresso {
 
       if (withGhosts) {
 	cells = system.storage->getLocalCells();
-	LOG4ESPP_DEBUG(theLogger, "Proc " << system.comm.rank() << ": local forces");
+	LOG4ESPP_DEBUG(theLogger, "local forces");
       } else {
 	cells = system.storage->getRealCells();
-	LOG4ESPP_DEBUG(theLogger, "Proc " << system.comm.rank() << ": real forces");
+	LOG4ESPP_DEBUG(theLogger, "real forces");
       }
   
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
 
-	LOG4ESPP_DEBUG(theLogger, "Proc " << system.comm.rank()
-		       << ": Particle " << cit->p.id 
+	LOG4ESPP_DEBUG(theLogger, 
+		       "Particle " << cit->p.id 
 		       << ", force = " << cit->f.f[0] << " "
 		       << cit->f.f[1] << " " <<  cit->f.f[2]);
       }
@@ -304,16 +302,16 @@ namespace espresso {
 
       if (withGhosts) {
 	cells = system.storage->getLocalCells();
-	LOG4ESPP_DEBUG(theLogger, "Proc " << system.comm.rank() << ": local positions");
+	LOG4ESPP_DEBUG(theLogger, "local positions");
       } else {
 	cells = system.storage->getRealCells();
-	LOG4ESPP_DEBUG(theLogger, "Proc " << system.comm.rank() << ": real positions");
+	LOG4ESPP_DEBUG(theLogger, "real positions");
       }
   
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
 
-	LOG4ESPP_DEBUG(theLogger, "Proc " << system.comm.rank()
-		       << ": Particle " << cit->p.id
+	LOG4ESPP_DEBUG(theLogger, 
+		       "Particle " << cit->p.id
 		       << ", position = " << cit->r.p[0] << " "
 		       << cit->r.p[1] << " " <<  cit->r.p[2]);
       }

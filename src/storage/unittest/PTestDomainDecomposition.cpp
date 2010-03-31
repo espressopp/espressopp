@@ -1,6 +1,5 @@
 #define PARALLEL_TEST_MODULE DomainDecomposition
 #include "ut.hpp"
-#include <memory>
 
 #include "mpi.hpp"
 #include "logging.hpp"
@@ -32,7 +31,7 @@ struct Fixture {
   Fixture() {
     Real3D boxL(1.0, 2.0, 3.0);
     int nodeGrid[3];
-    int nodes = mpiWorld.size();
+    int nodes = mpiWorld->size();
     for (int i = 0; i < 3; ++i) {
       // try to get 3 or 2 CPUs per column
       // otherwise take all nodes that are left
@@ -76,26 +75,22 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
     int nodeGrid[3] = { 1, 1, 1 };
     int cellGrid[3] = { 1, 1, 1 };
     nodeGrid[i] = 0;
-    BOOST_CHECK_THROW(DomainDecomposition(system,
-					  mpiWorld,
-					  nodeGrid,
-					  cellGrid),
+    BOOST_CHECK_THROW(DomainDecomposition
+		      (system, mpiWorld, nodeGrid, cellGrid),
 		      NodeGridIllegal);
   }
 
   for(int i = 0; i < 3; ++i) {
-    int nodeGrid[3] = { mpiWorld.size(), 1, 1 };
+    int nodeGrid[3] = { mpiWorld->size(), 1, 1 };
     int cellGrid[3] = { 1, 1, 1 };
     cellGrid[i] = 0;
-    BOOST_CHECK_THROW(DomainDecomposition(system,
-					  mpiWorld,
-					  nodeGrid,
-					  cellGrid),
+    BOOST_CHECK_THROW(DomainDecomposition
+		      (system, mpiWorld, nodeGrid, cellGrid),
 		      CellGridIllegal);
   }
 
   {
-    int nodeGrid[3] = { mpiWorld.size(), 2, 1 };
+    int nodeGrid[3] = { mpiWorld->size(), 2, 1 };
     int cellGrid[3] = { 1, 1, 1 };
     BOOST_CHECK_THROW(DomainDecomposition(system,
 					  mpiWorld,
@@ -104,7 +99,7 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
 		      NodeGridMismatch);
   }
 
-  int nodeGrid[3] = { mpiWorld.size(), 1, 1 };
+  int nodeGrid[3] = { mpiWorld->size(), 1, 1 };
   int cellGrid[3] = { 1, 2, 3 };
   DomainDecomposition domdec(system,
 			     mpiWorld,
@@ -172,7 +167,7 @@ BOOST_FIXTURE_TEST_CASE(fetchParticles, Fixture)
   }
   BOOST_CHECK_EQUAL(domdec->getNRealParticles(), ppn);
 
-  int nodeGrid[3] = { mpiWorld.size(), 1, 1 };
+  int nodeGrid[3] = { mpiWorld->size(), 1, 1 };
   int cellGrid[3] = { 10, 5, 4 };
 
   DomainDecomposition domdec2(system,
@@ -188,7 +183,7 @@ BOOST_FIXTURE_TEST_CASE(sortParticles, Fixture)
 {
   int initPPN = 100;
 
-  fillUp(mpiWorld.rank(), initPPN);
+  fillUp(mpiWorld->rank(), initPPN);
   BOOST_CHECK_EQUAL(domdec->getNRealParticles(), initPPN);
 
   BOOST_TEST_MESSAGE("starting to exchange and sort");
@@ -199,9 +194,9 @@ BOOST_FIXTURE_TEST_CASE(sortParticles, Fixture)
 
   longint myCount = domdec->getNRealParticles();
   longint total;
-  boost::mpi::all_reduce(mpiWorld, myCount, total, std::plus<int>());
+  boost::mpi::all_reduce(*mpiWorld, myCount, total, std::plus<int>());
 
-  BOOST_CHECK_EQUAL(total, mpiWorld.size()*initPPN);
+  BOOST_CHECK_EQUAL(total, mpiWorld->size()*initPPN);
 }
 
 BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture) 
