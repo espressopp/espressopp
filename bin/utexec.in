@@ -99,9 +99,11 @@ BOOST_UNITTEST_LIBS = '@BOOST_UNITTEST_LIBS@'
 LIBTOOL = os.getenv('LIBTOOL', os.path.join(top_builddir, 'libtool'))
 LIBTOOLFLAGS = os.getenv('LIBTOOLFLAGS', '')
 INCLUDES = os.getenv('INCLUDES', '')
+PYTHON_CPPFLAGS='@PYTHON_CPPFLAGS@'
 CPPFLAGS += ' -I' + os.path.join(top_builddir, 'src')
 CPPFLAGS += ' -I' + os.path.join(top_srcdir, 'src')
 CPPFLAGS += ' -I' + os.path.join(top_srcdir, 'src' , 'include')
+CPPFLAGS += ' ' + PYTHON_CPPFLAGS
 if not EXTERNAL_BOOST:
     CPPFLAGS = '-I' + os.path.join(top_srcdir, 'contrib' , 'boost') + ' ' + CPPFLAGS
     LDFLAGS  = '-I' + os.path.join(top_builddir, 'contrib', 'boost') + ' ' + LDFLAGS
