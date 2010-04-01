@@ -1,5 +1,5 @@
-#ifndef GRID_HPP
-#define GRID_HPP
+#ifndef _ESUTIL_GRID_HPP
+#define _ESUTIL_GRID_HPP
 
 #include "types.hpp"
 #include "Int3D.hpp"
@@ -25,7 +25,7 @@ namespace espresso {
       }
 
       longint getGridSize(int i) const { return size[i]; }
-      const int *getGridSize() const { return size; }
+      const Int3D &getGridSize() const { return size; }
 
       longint getNumberOfCells() const {
 	longint res = size[0];
@@ -38,7 +38,7 @@ namespace espresso {
       /// convert a grid position to a unique sequence index
       longint mapPositionToIndex(int p1, int p2, int p3) const
       { return p1 + size[0]*(p2 + size[1]*p3); }
-      longint mapPositionToIndex(const int pos[3]) const
+      longint mapPositionToIndex(const ConstInt3DRef pos) const
       { return mapPositionToIndex(pos[0], pos[1], pos[2]); }
 
       /// convert a sequence index back to a grid position
@@ -50,12 +50,12 @@ namespace espresso {
 	index /= size[1];
 	p3 = index;
       }
-      void mapIndexToPosition(int pos[3], longint index) const
+      void mapIndexToPosition(Int3DRef pos, longint index) const
       { mapIndexToPosition(pos[0], pos[1], pos[2], index); }
 
     private:
       /// number of grid points
-      int size[3];
+      Int3D size;
     };
   }
 }

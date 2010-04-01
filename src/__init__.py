@@ -11,6 +11,7 @@ from espresso.System import *
 
 infinity=float("inf")
 nan=float("nan")
+auto='auto'
 
 if pmi.isController :
     # make sure that the workers exit when the script ends

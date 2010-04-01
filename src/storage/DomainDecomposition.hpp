@@ -17,13 +17,15 @@ namespace espresso {
     public:
       DomainDecomposition(shared_ptr< System > system,
 			  shared_ptr< boost::mpi::communicator > comm,
-			  const ConstInt3DRef nodeGrid,
-			  const ConstInt3DRef cellGrid);
+			  const ConstInt3DRef _nodeGrid,
+			  const ConstInt3DRef _cellGrid);
 
       virtual ~DomainDecomposition() {}
 
       virtual Cell *mapPositionToCellClipped(const ConstReal3DRef pos);
       virtual Cell *mapPositionToCellChecked(const ConstReal3DRef pos);
+
+      longint mapPositionToNodeClipped(const ConstReal3DRef pos);
 
       const NodeGrid &getNodeGrid() const { return nodeGrid; }
       const CellGrid &getCellGrid() const { return cellGrid; }
@@ -53,6 +55,7 @@ namespace espresso {
       void fillCells(std::vector<Cell *> &,
 		     const int leftBoundary[3],
 		     const int rightBoundary[3]);
+
       /** read particles from a temporary buffer into the local cell structure.
 	  The direction determines in which direction to fold the particles position.
 	  Returns true if one of the given particles did not belong to this processors

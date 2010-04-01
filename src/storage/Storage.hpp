@@ -28,9 +28,6 @@ namespace espresso {
       */
       Particle *addParticle(longint id, const ConstReal3DRef pos);
 
-      /* variant for python that ignores the return value */
-      void pyAddParticle(longint id, const ConstReal3DRef pos);
-
 
       /** lookup whether data for a given particle is available on this node,
 	  either as real or as ghost particle*/
@@ -93,6 +90,9 @@ namespace espresso {
       virtual void collectGhostForces() = 0;
 
       boost::signals2::signal0<void> onResortParticles;
+
+      /* variant for python that ignores the return value */
+      void pyAddParticle(longint id, const ConstReal3DRef pos);
 
       static void registerPython();
 

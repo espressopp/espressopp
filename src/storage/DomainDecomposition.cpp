@@ -172,6 +172,11 @@ namespace espresso {
       }
     }
 
+    longint DomainDecomposition::
+    mapPositionToNodeClipped(const ConstReal3DRef pos) {
+      return nodeGrid.mapPositionToNodeClipped(pos);
+    }
+
     bool DomainDecomposition::appendParticles(ParticleList &l, int dir) {
       bool outlier = false;
 
@@ -581,7 +586,9 @@ namespace espresso {
       class_< PyDomainDecomposition, bases< Storage >, boost::noncopyable >
 	("storage_DomainDecomposition", 
 	 init< shared_ptr< System >, 
-               const ConstInt3DRef, const ConstInt3DRef >())
+	 const ConstInt3DRef, const ConstInt3DRef >())
+	.def("mapPositionToNodeClipped", 
+	     &DomainDecomposition::mapPositionToNodeClipped)
       ;
     }
   }
