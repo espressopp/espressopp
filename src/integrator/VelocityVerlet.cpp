@@ -1,3 +1,5 @@
+#include "python.hpp"
+
 #include "VelocityVerlet.hpp"
 
 #include "Langevin.hpp"
@@ -8,14 +10,11 @@
 #include "System.hpp"
 #include "storage/Storage.hpp"
 #include "mpi.hpp"
-#include "python.hpp"
-
-using namespace espresso;
-using namespace interaction;
-using namespace iterator;
 
 namespace espresso {
   namespace integrator {
+    using namespace interaction;
+    using namespace iterator;
 
     VelocityVerlet::VelocityVerlet(shared_ptr< System > system) : MDIntegrator(system)
     {

@@ -1,7 +1,6 @@
 #ifndef _BC_ORTHORHOMBICBC_HPP
 #define _BC_ORTHORHOMBICBC_HPP
 
-#include "types.hpp"
 #include "BC.hpp"
 #include "Real3D.hpp"
 

@@ -286,8 +286,8 @@ AC_CONFIG_FILES([test/runtests.sh],
 
 # espresso setup scripts
 AC_CONFIG_FILES([
-	src/main/__setupPath.py:src/main/__setupPath.py.build.in
-	src/main/__setupPath.py.install:src/main/__setupPath.py.install.in
+	src/main/_setupPath.py:src/main/_setupPath.py.build.in
+	src/main/_setupPath.py.install:src/main/_setupPath.py.install.in
        	espresso_setup.sh:setup/espresso_setup.sh.build.in
        	espresso_setup.sh.install:setup/espresso_setup.sh.install.in
        	espresso_setup.csh:setup/espresso_setup.csh.build.in

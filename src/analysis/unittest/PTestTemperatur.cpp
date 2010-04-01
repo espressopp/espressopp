@@ -1,18 +1,14 @@
 #define PARALLEL_TEST_MODULE ComputeTemperature
 #include "ut.hpp"
-//#include <memory>
 
 #include "types.hpp"
 #include "mpi.hpp"
 #include "logging.hpp"
 #include "esutil/RNG.hpp"
 #include "storage/DomainDecomposition.hpp"
-#include "interaction/LennardJones.hpp"
-#include "integrator/VelocityVerlet.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "bc/OrthorhombicBC.hpp"
 #include "System.hpp"
-#include "VerletList.hpp"
 #include "Real3D.hpp"
 
 #include "analysis/Temperature.hpp"
@@ -20,7 +16,6 @@
 using namespace espresso;
 using namespace storage;
 using namespace interaction;
-using namespace integrator;
 using namespace iterator;
 using namespace bc;
 using namespace esutil;
@@ -31,9 +26,6 @@ struct LoggingFixture {
   LoggingFixture() { 
     LOG4ESPP_CONFIGURE();
     log4espp::Logger::getRoot().setLevel(log4espp::Logger::WARN);
-    // log4espp::Logger::getInstance("VerletList").setLevel(log4espp::Logger::WARN);
-    // log4espp::Logger::getInstance("Storage").setLevel(log4espp::Logger::DEBUG);
-    log4espp::Logger::getInstance("MDIntegrator").setLevel(log4espp::Logger::WARN);
   }
 };
 
@@ -64,7 +56,7 @@ struct Fixture {
 
     ConstReal3DRef boxLRef(boxL);
 
-    int nodeGrid[3] = { 1, 1, mpiWorld.size() };
+    int nodeGrid[3] = { 1, 1, mpiWorld->size() };
     int cellGrid[3] = { 1, 1, 1 };
 
     for (int i = 0; i < 3; i++) {
@@ -101,7 +93,7 @@ struct Fixture {
           real z = (k + r) / N * SIZE;
           real pos[3] = { x, y, z };
       
-          if (mpiWorld.rank() == 0) {
+          if (mpiWorld->rank() == 0) {
           
             printf("add particle at %f %f %f\n", x, y, z);
             domdec->addParticle(id, pos);
@@ -139,7 +131,7 @@ struct DomainFixture {
 
     real skin   = 0.3;
 
-    int nodeGrid[3] = { 1, 1, mpiWorld.size() };
+    int nodeGrid[3] = { 1, 1, mpiWorld->size() };
 
     int cellGrid[3] = { 1, 1, 1 };
 
@@ -192,7 +184,7 @@ struct LatticeFixture : DomainFixture {
           real z = (k + r) / N * SIZE;
           real pos[3] = { x, y, z };
 
-          if (mpiWorld.rank() == 0) {
+          if (mpiWorld->rank() == 0) {
             BOOST_MESSAGE("add particle at pos " << x << " " << y << " " << z);
             domdec->addParticle(id, pos);
           }
@@ -206,7 +198,7 @@ struct LatticeFixture : DomainFixture {
 
     // loop over all particles of the real cells and set velocity in x - direction
     BOOST_MESSAGE("before lattice particles in storage = " <<
-                   domdec->getNRealParticles() << "  rank=" << mpiWorld.rank());
+                   domdec->getNRealParticles() << "  rank=" << mpiWorld->rank());
 
 
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
@@ -217,10 +209,10 @@ struct LatticeFixture : DomainFixture {
     // make analysis object and call compute temperature
     Temperature myT(domdec);
     real T = myT.compute();
-    if(mpiWorld.rank() == 0) BOOST_MESSAGE("T = " << T);
+    if(mpiWorld->rank() == 0) BOOST_MESSAGE("T = " << T);
 
     BOOST_MESSAGE("number of lattice particles in storage = " <<
-                   domdec->getNRealParticles() << "  rank=" << mpiWorld.rank());
+                   domdec->getNRealParticles() << "  rank=" << mpiWorld->rank());
 
   }
 };

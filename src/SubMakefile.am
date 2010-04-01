@@ -15,8 +15,9 @@ libespresso_common_la_SOURCES += \
 	bindings.cpp
 
 python_SCRIPTS += \
-	__init__.py \
 	unittest/__init__.py \
+	pmi.py \
 	Real3D.py \
 	Int3D.py \
-	pmi.py 
+	System.py \
+	__init__.py

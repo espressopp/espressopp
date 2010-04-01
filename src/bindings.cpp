@@ -15,7 +15,6 @@
 #include "bindings.hpp"
 
 void espresso::registerPython() {
-
   espresso::System::registerPython();
   espresso::VerletList::registerPython();
   espresso::Real3D::registerPython();

@@ -1,13 +1,13 @@
-# set up espresso paths and logging
-from espresso.main import __setup
+# set up espresso basics
+from espresso.main._setup import *
 
-from espresso.esutil import pmiimport
+# load espresso into PMI
 pmiimport('espresso')
 
+import _espresso
 from espresso.Real3D import *
 from espresso.Int3D import *
-from espresso import pmi
-import _espresso 
+from espresso.System import *
 
 infinity=float("inf")
 nan=float("nan")

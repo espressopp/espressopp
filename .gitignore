@@ -10,3 +10,4 @@ build-aux/install-sh
 build-aux/missing
 configure
 src/acconfig.hpp.in
+*.pyc

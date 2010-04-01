@@ -565,7 +565,6 @@ namespace espresso {
     public:
       // TODO: Care for MPI communicator!
       PyDomainDecomposition(shared_ptr< System > _system,
-			    boost::python::object pyComm,
 			    const ConstInt3DRef _nodeGrid,
 			    const ConstInt3DRef _cellGrid)
  	: DomainDecomposition(_system, mpiWorld, 
@@ -579,10 +578,10 @@ namespace espresso {
     void
     DomainDecomposition::registerPython() {
       using namespace espresso::python;
-      class_< PyDomainDecomposition, boost::noncopyable >
+      class_< PyDomainDecomposition, bases< Storage >, boost::noncopyable >
 	("storage_DomainDecomposition", 
-	 init< shared_ptr< System >, boost::python::object, 
-	 const ConstInt3DRef, const ConstInt3DRef >())
+	 init< shared_ptr< System >, 
+               const ConstInt3DRef, const ConstInt3DRef >())
       ;
     }
   }

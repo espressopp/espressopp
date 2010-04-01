@@ -3,7 +3,7 @@ noinst_HEADERS += \
 
 python_SCRIPTS += \
 	main/__init__.py \
-	main/__setup.py
+	main/_setup.py
 
 # the common part of all Espresso flavors
 noinst_LTLIBRARIES += libespresso_common.la
@@ -42,8 +42,8 @@ all-local:
 
 install-exec-local:
 # install espresso setup scripts
-	$(install_sh_SCRIPT) __setupPath.py.install $(DESTDIR)$(pkglibdir)/main/__setupPath.py
+	$(install_sh_SCRIPT) _setupPath.py.install $(DESTDIR)$(pkglibdir)/main/_setupPath.py
 
 uninstall-local:
-	rm -f $(DESTDIR)$(pkglibdir)/main/__setupPath.py
+	rm -f $(DESTDIR)$(pkglibdir)/main/_setupPath.py
 

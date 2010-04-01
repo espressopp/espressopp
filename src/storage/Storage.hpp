@@ -27,6 +27,11 @@ namespace espresso {
 	  front end.
       */
       Particle *addParticle(longint id, const ConstReal3DRef pos);
+
+      /* variant for python that ignores the return value */
+      void pyAddParticle(longint id, const ConstReal3DRef pos);
+
+
       /** lookup whether data for a given particle is available on this node,
 	  either as real or as ghost particle*/
       Particle *lookupLocalParticle(longint id) {

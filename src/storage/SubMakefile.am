@@ -12,5 +12,8 @@ libespresso_common_la_SOURCES += \
 	storage/NodeGrid.cpp \
         storage/bindings.cpp
 
-#python_SCRIPTS +=
+python_SCRIPTS += \
+	storage/Storage.py \
+	storage/DomainDecomposition.py \
+	storage/__init__.py
 

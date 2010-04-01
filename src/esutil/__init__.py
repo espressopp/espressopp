@@ -27,6 +27,15 @@ http://code.activestate.com/recipes/412717/ and
 http://www.boost.org/doc/libs/1_35_0/libs/python/doc/tutorial/doc/html/python/techniques.html#python.extending_wrapped_objects_in_python
 """
 from espresso import pmi
+if pmi.isController :
+    def pmiimport(module):
+        pmi.exec_('import ' + module)
+else:
+    def pmiimport(module):
+        pass
+        
+pmiimport('espresso.esutil')
+
 from espresso.esutil.RNG import *
 from espresso.esutil.UniformOnSphere import *
 from espresso.esutil.NormalVariate import *
@@ -60,11 +69,3 @@ def cxxinit(obj, cls, *args, **kwds):
 #     if not hasattr(obj, 'pmiobject'):
 #         obj.pmiobject = pmi.create(cls, *args, **kwds)
 
-if pmi.isController :
-    def pmiimport(module):
-        pmi.exec_('import ' + module)
-else:
-    def pmiimport(module):
-        pass
-        
-pmiimport('espresso.esutil')
