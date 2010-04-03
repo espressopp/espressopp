@@ -72,7 +72,7 @@ namespace espresso {
 	}
 	nodeNeighbors[2*dir] = mapPositionToIndex(nPos);
 	LOG4ESPP_DEBUG(logger, "left neighbor in dir " << dir << ": "
-		       << getNodeNeighbor(2*dir) << " <-> "
+		       << getNodeNeighborIndex(2*dir) << " <-> "
 		       << nPos[0] << " "
 		       << nPos[1] << " "
 		       << nPos[2]);
@@ -85,7 +85,7 @@ namespace espresso {
 	nodeNeighbors[2*dir + 1] = mapPositionToIndex(nPos);
 
 	LOG4ESPP_DEBUG(logger, "right neighbor in dir " << dir << ": "
-		       << getNodeNeighbor(2*dir+1) << " <-> "
+		       << getNodeNeighborIndex(2*dir+1) << " <-> "
 		       << nPos[0] << " "
 		       << nPos[1] << " "
 		       << nPos[2]);

@@ -61,12 +61,12 @@ namespace espresso {
 		    << comm->rank());
 
       LOG4ESPP_DEBUG(logger, "my neighbors: "
-		     << nodeGrid.getNodeNeighbor(0) << "<->"
-		     << nodeGrid.getNodeNeighbor(1) << ", "
-		     << nodeGrid.getNodeNeighbor(2) << "<->"
-		     << nodeGrid.getNodeNeighbor(3) << ", "
-		     << nodeGrid.getNodeNeighbor(4) << "<->"
-		     << nodeGrid.getNodeNeighbor(5));
+		     << nodeGrid.getNodeNeighborIndex(0) << "<->"
+		     << nodeGrid.getNodeNeighborIndex(1) << ", "
+		     << nodeGrid.getNodeNeighborIndex(2) << "<->"
+		     << nodeGrid.getNodeNeighborIndex(3) << ", "
+		     << nodeGrid.getNodeNeighborIndex(4) << "<->"
+		     << nodeGrid.getNodeNeighborIndex(5));
 
       for (int i = 0; i < 3; ++i) {
 	myLeft[i] = nodeGrid.getMyLeft(i);
@@ -269,15 +269,15 @@ namespace espresso {
 
 	    // Exchange particles, odd-even rule
 	    if (nodeGrid.getNodePosition(coord) % 2 == 0) {
-	      sendParticles(sendBufL, nodeGrid.getNodeNeighbor(2 * coord));
-	      recvParticles(recvBufR, nodeGrid.getNodeNeighbor(2 * coord + 1));
-	      sendParticles(sendBufR, nodeGrid.getNodeNeighbor(2 * coord + 1));
-	      recvParticles(recvBufL, nodeGrid.getNodeNeighbor(2 * coord));
+	      sendParticles(sendBufL, nodeGrid.getNodeNeighborIndex(2 * coord));
+	      recvParticles(recvBufR, nodeGrid.getNodeNeighborIndex(2 * coord + 1));
+	      sendParticles(sendBufR, nodeGrid.getNodeNeighborIndex(2 * coord + 1));
+	      recvParticles(recvBufL, nodeGrid.getNodeNeighborIndex(2 * coord));
 	    } else {
-	      recvParticles(recvBufR, nodeGrid.getNodeNeighbor(2 * coord + 1));
-	      sendParticles(sendBufL, nodeGrid.getNodeNeighbor(2 * coord));
-	      recvParticles(recvBufL, nodeGrid.getNodeNeighbor(2 * coord));
-	      sendParticles(sendBufR, nodeGrid.getNodeNeighbor(2 * coord + 1));
+	      recvParticles(recvBufR, nodeGrid.getNodeNeighborIndex(2 * coord + 1));
+	      sendParticles(sendBufL, nodeGrid.getNodeNeighborIndex(2 * coord));
+	      recvParticles(recvBufL, nodeGrid.getNodeNeighborIndex(2 * coord));
+	      sendParticles(sendBufR, nodeGrid.getNodeNeighborIndex(2 * coord + 1));
 	    }
 
 	    // sort received particles to cells
@@ -502,16 +502,16 @@ namespace espresso {
 
 	      // exchange sizes, odd-even rule
 	      if (nodeGrid.getNodePosition(coord) % 2 == 0) {
-		LOG4ESPP_DEBUG(logger, "sending to node " << nodeGrid.getNodeNeighbor(dir)
-			       << ", then receiving from node " << nodeGrid.getNodeNeighbor(oppositeDir));
-		comm->send(nodeGrid.getNodeNeighbor(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
-		comm->recv(nodeGrid.getNodeNeighbor(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
+		LOG4ESPP_DEBUG(logger, "sending to node " << nodeGrid.getNodeNeighborIndex(dir)
+			       << ", then receiving from node " << nodeGrid.getNodeNeighborIndex(oppositeDir));
+		comm->send(nodeGrid.getNodeNeighborIndex(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
+		comm->recv(nodeGrid.getNodeNeighborIndex(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
 	      }
 	      else {
-		LOG4ESPP_DEBUG(logger, "receiving from node " << nodeGrid.getNodeNeighbor(oppositeDir)
-			       << ", then sending to node " << nodeGrid.getNodeNeighbor(dir));
-		comm->recv(nodeGrid.getNodeNeighbor(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
-		comm->send(nodeGrid.getNodeNeighbor(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
+		LOG4ESPP_DEBUG(logger, "receiving from node " << nodeGrid.getNodeNeighborIndex(oppositeDir)
+			       << ", then sending to node " << nodeGrid.getNodeNeighborIndex(dir));
+		comm->recv(nodeGrid.getNodeNeighborIndex(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
+		comm->send(nodeGrid.getNodeNeighborIndex(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
 	      }
 
 	      // resize according to received information
@@ -526,15 +526,15 @@ namespace espresso {
 	    boost::mpi::packed_oarchive oar(*comm);
 	    boost::mpi::packed_iarchive iar(*comm);
 	    if (realToGhosts) {
-	      oarRecver = nodeGrid.getNodeNeighbor(dir);
-	      iarSender = nodeGrid.getNodeNeighbor(oppositeDir);
+	      oarRecver = nodeGrid.getNodeNeighborIndex(dir);
+	      iarSender = nodeGrid.getNodeNeighborIndex(oppositeDir);
 	      for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
 		packPositionsEtc(oar, *commCells[dir].reals[i], extradata, shift);
 	      }
 	    }
 	    else {
-	      oarRecver = nodeGrid.getNodeNeighbor(oppositeDir);
-	      iarSender = nodeGrid.getNodeNeighbor(dir);
+	      oarRecver = nodeGrid.getNodeNeighborIndex(oppositeDir);
+	      iarSender = nodeGrid.getNodeNeighborIndex(dir);
 	      for (int i = 0, end = commCells[dir].ghosts.size(); i < end; ++i) {
 		packForces(oar, *commCells[dir].ghosts[i]);
 	      }

@@ -50,6 +50,7 @@ namespace espresso {
 	index /= size[1];
 	p3 = index;
       }
+
       void mapIndexToPosition(Int3DRef pos, longint index) const
       { mapIndexToPosition(pos[0], pos[1], pos[2], index); }
 

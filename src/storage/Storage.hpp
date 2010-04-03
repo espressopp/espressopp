@@ -28,14 +28,15 @@ namespace espresso {
       */
       Particle *addParticle(longint id, const ConstReal3DRef pos);
 
-
       /** lookup whether data for a given particle is available on this node,
-	  either as real or as ghost particle*/
+	  either as real or as ghost particle. */
       Particle *lookupLocalParticle(longint id) {
 	IdParticleMap::iterator it = localParticles.find(id);
 	return (it != localParticles.end()) ? it->second : 0;
       }
-      /** lookup whether data for a given particle is available on this node. */
+
+      /** Lookup whether data for a given particle is available on this node. 
+       \return 0 if the particle wasn't available, the pointer to the Particle, if it was. */
       Particle *lookupRealParticle(longint id) {
 	IdParticleMap::iterator it = localParticles.find(id);
 	return (it != localParticles.end() && !(it->second->l.ghost)) ? it->second : 0;
