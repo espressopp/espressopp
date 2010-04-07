@@ -20,6 +20,7 @@ namespace espresso {
       .def_readwrite("shortRangeInteractions", 
 		     &System::shortRangeInteractions)
       .def_readwrite("skin", &System::skin)
+      .def_readwrite("comm", &System::comm)
       ;
   }
 }

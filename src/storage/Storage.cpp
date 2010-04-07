@@ -417,6 +417,8 @@ namespace espresso {
       using namespace espresso::python;
       class_< Storage, boost::noncopyable >("storage_Storage", no_init)
 	.def("addParticle", &Storage::pyAddParticle)
+	.def("resortParticles", &Storage::resortParticles)
+        .add_property("system", &Storage::getSystem)
 	;
     }
 

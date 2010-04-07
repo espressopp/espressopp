@@ -20,4 +20,5 @@ python_SCRIPTS += \
 	Real3D.py \
 	Int3D.py \
 	System.py \
+	VerletList.py \
 	__init__.py

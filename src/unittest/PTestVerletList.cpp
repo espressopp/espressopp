@@ -88,6 +88,7 @@ struct DomainFixture {
     system->skin = skin;
     domdec = make_shared< DomainDecomposition >(system, mpiWorld, nodeGrid, cellGrid);
     system->storage = domdec;
+    system->rng = make_shared< esutil::RNG >();
   }
 };
 
@@ -224,7 +225,7 @@ BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
 {
   real cutoff = 1.5;
 
-  BOOST_MESSAGE("build verlet lists for random particles, cutoff = " << cutoff);
+  BOOST_MESSAGE("RandomTest: build verlet lists, cutoff = " << cutoff);
 
   shared_ptr< VerletList > vl = make_shared< VerletList >(system, cutoff);
 
@@ -240,6 +241,10 @@ BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
   int totalPairs1;
 
   boost::mpi::all_reduce(*mpiWorld, (int) pairs.size(), totalPairs1, std::plus<int>());
+
+  BOOST_MESSAGE("RandomTest: VerletList has = " << totalPairs1 << " entries");
+
+  BOOST_MESSAGE("RandomTest: check cells");
 
   // count pairs in a N square loop
 

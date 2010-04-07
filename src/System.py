@@ -11,5 +11,5 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espresso.SystemLocal',
-            pmiproperty = ['storage', 'bc', 'rng', 'skin' ]
+            pmiproperty = ['storage', 'bc', 'rng', 'skin', 'comm' ]
             )
