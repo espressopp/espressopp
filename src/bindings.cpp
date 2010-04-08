@@ -11,6 +11,7 @@
 #include <Real3D.hpp>
 #include <Int3D.hpp>
 #include <esutil/PyLogger.hpp>
+#include <analysis/bindings.hpp>
 
 #include "bindings.hpp"
 
@@ -25,6 +26,7 @@ void espresso::registerPython() {
   espresso::storage::registerPython();
   espresso::integrator::registerPython();
   espresso::interaction::registerPython();
+  espresso::analysis::registerPython();
 
   log4espp::PyLogger::registerPython();
 }

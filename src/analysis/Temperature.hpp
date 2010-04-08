@@ -9,10 +9,12 @@ namespace espresso {
     /** Class to compute the temperature. */
     class Temperature : public Observable {
     public:
-      Temperature(shared_ptr< storage::Storage > storage) : Observable(storage) {}
+      Temperature(shared_ptr< System > system) : Observable(system) {}
       ~Temperature() {}
       virtual real compute() const;
       //virtual real time_average() const;
+
+      static void registerPython();
     };
   }
 }

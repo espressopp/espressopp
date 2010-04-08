@@ -55,7 +55,7 @@ namespace espresso {
 
     void Langevin::thermalize()
     {
-      LOG4ESPP_INFO(theLogger, "thermalize");
+      LOG4ESPP_DEBUG(theLogger, "thermalize");
 
       System& system = getSystemRef();
 

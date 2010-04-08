@@ -5,9 +5,11 @@ import espresso.unittest
 import espresso.storage
 import espresso.integrator
 import espresso.interaction
+import espresso.analysis
 import espresso.bc
 import MPI
 import math
+import logging
 
 from espresso import Real3D
 
@@ -34,8 +36,10 @@ class TestVerletList(espresso.unittest.TestCase) :
        bc   = espresso.bc.OrthorhombicBC(None, box)
 
        system.bc = bc
+       system.rng = rng 
+       system.skin = 0.3
 
-       cutoff = 1.733
+       cutoff = 4.6
 
        comm = espresso.MPI.COMM_WORLD
 
@@ -80,9 +84,11 @@ class TestVerletList(espresso.unittest.TestCase) :
   
        # now build Verlet List
 
-       vl = espresso.VerletList(system, cutoff = 2.5)
+       vl = espresso.VerletList(system, cutoff = cutoff)
 
-       potLJ = espresso.interaction.LennardJones(1.0, 1.0, cutoff = 2.5)
+       potLJ = espresso.interaction.LennardJones(1.0, 1.0, cutoff = cutoff, shift = 0.0)
+
+       print "potLJ, shift = %g"%potLJ.shift
 
        interLJ = espresso.interaction.VerletListLennardJones(vl)
 
@@ -96,11 +102,42 @@ class TestVerletList(espresso.unittest.TestCase) :
 
        print 'Start energy = %g'%interLJ.computeEnergy()
 
+       temp = espresso.analysis.Temperature(system)
+
+       print 'Start temperate = %g'%temp.compute()
+
        nsteps = 100
+
+       for i in range(100):
+          integrator.run(nsteps)
+          temperature = temp.compute()
+          kineticEnergy = temperature * (3 * N * N * N)
+          potentialEnergy = interLJ.computeEnergy()
+          print 'Step %6d: tot energy = %8.3f pot = %g kin = %g temp = %g'%(nsteps*(i+1), kineticEnergy + potentialEnergy,
+                     potentialEnergy, kineticEnergy, temperature)
+
+       potLJ = espresso.interaction.LennardJones(0.0, 0.0, cutoff = cutoff, shift = 0.0)
+       print "potLJ, shift = %g"%potLJ.shift
+       interLJ.setPotential(type1 = 0, type2 = 0, potential = potLJ)
+       for dist in (0.0, 0.5, 1.0, 1.5):
+          print 'LJenergy for dist = %g is %g'%(dist, potLJ.computeEnergy(dist))
 
        for i in range(10):
           integrator.run(nsteps)
-          print 'Step %d: energy = %g'%(nsteps*(i+1), interLJ.computeEnergy())
+          temperature = temp.compute()
+          kineticEnergy = temperature * (3 * N * N * N)
+          potentialEnergy = interLJ.computeEnergy()
+          print 'Step %6d: tot energy = %8.3f pot = %g kin = %g temp = %g'%(nsteps*(i+1), kineticEnergy + potentialEnergy,
+                     potentialEnergy, kineticEnergy, temperature)
+
+       # logging.getLogger("Langevin").setLevel(logging.INFO)
+
+       # langevin = espresso.integrator.Langevin(system)
+
+       # integrator.langevin = langevin
+
+       # langevin.gamma = 1.0
+       # langevin.temperature = 2.0
 
 if __name__ == "__main__":
 

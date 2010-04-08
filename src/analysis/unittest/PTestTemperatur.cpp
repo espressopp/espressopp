@@ -207,7 +207,7 @@ struct LatticeFixture : DomainFixture {
 
     domdec->resortParticles();
     // make analysis object and call compute temperature
-    Temperature myT(domdec);
+    Temperature myT(system);
     real T = myT.compute();
     if(mpiWorld->rank() == 0) BOOST_MESSAGE("T = " << T);
 

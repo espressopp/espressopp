@@ -2,18 +2,16 @@
 #define _ANALYSIS_OBSERVABLE_HPP
 
 #include "types.hpp"
+#include "SystemAccess.hpp"
 
-// TODO: (1) need to access storage through system
-//       (2) compute pressure
-//       (3) export to Python
+// TODO: compute pressure
 
 namespace espresso {
   namespace analysis {
     /** All quantities to be measured derive from this abstract base class. */
-    class Observable {
+    class Observable : public SystemAccess {
     public:
-      Observable() {}
-      Observable(shared_ptr< storage::Storage > _storage) : storage(_storage) {}
+      Observable(shared_ptr< System > system) : SystemAccess(system) {}
       ~Observable() {}
 
     public:
@@ -21,7 +19,11 @@ namespace espresso {
       //virtual real time_average() const = 0;
       //virtual real spatial_average() const = 0;
 
-      shared_ptr< storage::Storage > storage;
+      static void registerPython();
+
+     protected:
+      static LOG4ESPP_DECL_LOGGER(logger);
+
     };
   }
 }
