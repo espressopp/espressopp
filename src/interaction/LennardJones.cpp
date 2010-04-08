@@ -16,6 +16,11 @@ namespace espresso {
     	.add_property("sigma", &LennardJones::getSigma, &LennardJones::setSigma)
     	.add_property("epsilon", &LennardJones::getEpsilon, &LennardJones::setEpsilon)
     	;
+
+      class_<VerletListLennardJones, bases< Interaction> > 
+        ("interaction_VerletListLennardJones", init< shared_ptr<VerletList> >())
+        .def("setPotential", &VerletListLennardJones::setPotential);
+        ;
     }
     
   }

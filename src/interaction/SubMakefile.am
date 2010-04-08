@@ -15,6 +15,7 @@ libespresso_common_la_SOURCES += \
 
 python_SCRIPTS += \
 	interaction/Potential.py \
+	interaction/Interaction.py \
 	interaction/LennardJones.py \
 	interaction/FENE.py \
 	interaction/__init__.py

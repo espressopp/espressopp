@@ -30,6 +30,8 @@ namespace espresso {
       return shared_from_this();
     }
 
+    void addInteraction(shared_ptr< interaction::Interaction > ia);
+
     static void registerPython();
 
   };

@@ -19,6 +19,8 @@ namespace espresso {
       /** This method returns the maximal cutoff defined for one type pair. */
       virtual real getMaxCutoff() = 0;
 
+      static void registerPython();
+
     protected:
       /** Logger */
       static LOG4ESPP_DECL_LOGGER(theLogger);

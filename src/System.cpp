@@ -6,6 +6,12 @@
 #include "esutil/RNG.hpp"
 
 namespace espresso {
+
+  void System::addInteraction(shared_ptr< interaction::Interaction > ia)
+  {
+    shortRangeInteractions.push_back(ia);
+  }
+
   //////////////////////////////////////////////////
   // REGISTRATION WITH PYTHON
   //////////////////////////////////////////////////
@@ -21,6 +27,7 @@ namespace espresso {
 		     &System::shortRangeInteractions)
       .def_readwrite("skin", &System::skin)
       .def_readwrite("comm", &System::comm)
+      .def("addInteraction", &System::addInteraction)
       ;
   }
 }
