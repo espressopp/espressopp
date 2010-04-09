@@ -88,7 +88,7 @@ namespace espresso {
 		    ", gamma = " << gamma << 
 		    ", temperature = " << temperature);
 
-      pref1 = -gamma * timestep;
+      pref1 = -gamma;
       pref2 = sqrt(24.0 * temperature * gamma / timestep);
 
     }

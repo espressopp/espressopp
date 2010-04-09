@@ -71,25 +71,25 @@ namespace espresso {
 	if (langevin) langevin->heatUp();
 
 	if (LOG4ESPP_DEBUG_ON(theLogger)) {
-	  printPositions(false);
+	  // printPositions(false);
 	}
 
 	storage.updateGhosts();
 
 	if (LOG4ESPP_DEBUG_ON(theLogger)) {
-	  printPositions(true);
+	  // printPositions(true);
 	}
 
 	calcForces();
 
 	if (LOG4ESPP_DEBUG_ON(theLogger)) {
-	  printForces(true);    // check forces in real + ghost particles
+	  // printForces(true);    // check forces in real + ghost particles
 	}
 
 	storage.collectGhostForces();
 
 	if (LOG4ESPP_DEBUG_ON(theLogger)) {
-	  printForces(false);   // forces are reduced to real particles
+	  // printForces(false);   // forces are reduced to real particles
 	}
 
 	if (langevin) langevin->coolDown();
@@ -105,7 +105,7 @@ namespace espresso {
 
 	maxDist += integrate1();
 
-	LOG4ESPP_INFO(theLogger, "maxDist = " << maxDist);
+	LOG4ESPP_INFO(theLogger, "maxDist = " << maxDist << ", skin/2 = " << skinHalf);
 
 	if (maxDist > skinHalf) resortFlag = true;
 
@@ -122,8 +122,8 @@ namespace espresso {
 
 	storage.collectGhostForces();
 
-	if (langevin) langevin->thermalize();
-   
+        if (langevin) langevin->thermalize();
+
 	integrate2();
       }
 
@@ -156,10 +156,19 @@ namespace espresso {
 		       ", f = " << cit->f.f[0] << " " 
 		       << cit->f.f[1] << " " <<  cit->f.f[2]);
 
+        /* more precise for DEBUG:
+
+        printf("Particle %d, pos = %16.12f %16.12f %16.12f, v = %16.12f, %16.12f %16.12f, f = %16.12f %16.12f %16.12f\n",
+	        cit->p.id, cit->r.p[0], cit->r.p[1], cit->r.p[2],
+                cit->m.v[0], cit->m.v[1], cit->m.v[2],
+	        cit->f.f[0], cit->f.f[1], cit->f.f[2]);
+              
+        */
+
 	for (int j = 0; j < 3; j++) {
-	  /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
+	  // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) 
 	  cit->m.v[j] += 0.5 * dt * cit->f.f[j];
-	  /* Propagate positions (only NVT): p(t + dt)   = p(t) + dt * v(t+0.5*dt) */
+	  // Propagate positions (only NVT): p(t + dt)   = p(t) + dt * v(t+0.5*dt) 
 	  real deltaP = dt * cit->m.v[j];
 	  cit->r.p[j] += deltaP;
 	  sqDist += deltaP * deltaP;

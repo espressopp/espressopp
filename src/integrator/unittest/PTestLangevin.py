@@ -114,9 +114,7 @@ class TestVerletList(espresso.unittest.TestCase) :
        print 'Start: tot energy = %10.6f pot = %10.6f kin = %10.f temp = %10.6f'%(kineticEnergy + potentialEnergy,
                   potentialEnergy, kineticEnergy, temperature)
 
-       nsteps = 10
-
-       # logging.getLogger("MDIntegrator").setLevel(logging.DEBUG)
+       nsteps = 20
 
        for i in range(20):
           integrator.run(nsteps)
@@ -124,6 +122,37 @@ class TestVerletList(espresso.unittest.TestCase) :
           kineticEnergy = 0.5 * temperature * (3 * N * N * N)
           potentialEnergy = interLJ.computeEnergy()
           print 'Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f'%(nsteps*(i+1), 
+               kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature)
+
+       # logging.getLogger("Langevin").setLevel(logging.INFO)
+
+       langevin = espresso.integrator.Langevin(system)
+ 
+       integrator.langevin = langevin
+ 
+       langevin.gamma = 1.0
+       langevin.temperature = 4.0
+
+       print 'Heat up to t = ', langevin.temperature
+
+       for i in range(20):
+          integrator.run(nsteps)
+          temperature = temp.compute()
+          kineticEnergy = 0.5 * temperature * (3 * N * N * N)
+          potentialEnergy = interLJ.computeEnergy()
+          print 'Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f'%(nsteps*(i+1), 
+               kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature)
+
+       langevin.temperature = 0.5
+
+       print 'Cool down to t = ', langevin.temperature
+
+       for i in range(40):
+          integrator.run(nsteps)
+          temperature = temp.compute()
+          kineticEnergy = 0.5 * temperature * (3 * N * N * N)
+          potentialEnergy = interLJ.computeEnergy()
+          print 'Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f'%(nsteps*(i+1),
                kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature)
 
 if __name__ == "__main__":
