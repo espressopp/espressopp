@@ -13,7 +13,7 @@
 
 namespace espresso {
   namespace storage {
-    class NodeGridIllegal: public std::runtime_error
+    class NodeGridIllegal: public std::invalid_argument
     {
     public:
       NodeGridIllegal();

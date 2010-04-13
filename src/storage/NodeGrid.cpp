@@ -10,7 +10,7 @@ namespace espresso {
     LOG4ESPP_LOGGER(NodeGrid::logger, "DomainDecomposition.NodeGrid");
   
     NodeGridIllegal::NodeGridIllegal()
-      : std::runtime_error("node grid dimensions have to be positive") {}
+      : std::invalid_argument("node grid dimensions have to be positive") {}
   
     NodeGrid::
     NodeGrid(const ConstInt3DRef grid,

@@ -3,6 +3,7 @@
 #define LOG4ESPP_LEVEL_DEBUG
 #include <algorithm>
 #include <cmath>
+#include <sstream>
 #include "log4espp.hpp"
 #include "System.hpp"
 
@@ -20,10 +21,22 @@ namespace espresso {
 
     LOG4ESPP_LOGGER(DomainDecomposition::logger, "DomainDecomposition");
 
-    NodeGridMismatch::
-    NodeGridMismatch()
-      : std::runtime_error("specified node grid does not match number of nodes in the communicator") {
+    std::string formatMismatchMessage(Int3D gridRequested, 
+				      int nodesAvailable) {
+      std::ostringstream out;
+      out << "requested node grid (" 
+	  << gridRequested 
+	  << ") does not match number of nodes in the communicator (" 
+	  << nodesAvailable 
+	  << ")";
+      return out.str();
     }
+
+    NodeGridMismatch::
+    NodeGridMismatch(Int3D gridRequested, int nodesAvailable)
+      : std::invalid_argument
+	(formatMismatchMessage(gridRequested, nodesAvailable)) 
+    {}
 
     DomainDecomposition::
     DomainDecomposition(shared_ptr< System > _system,
@@ -51,7 +64,7 @@ namespace espresso {
       nodeGrid = NodeGrid(_nodeGrid, comm->rank(), getSystem()->bc->getBoxL());
 
       if (nodeGrid.getNumberOfCells() != comm->size()) {
-	throw NodeGridMismatch();
+	throw NodeGridMismatch(_nodeGrid, comm->size());
       }
 
       LOG4ESPP_INFO(logger, "my node grid position: "

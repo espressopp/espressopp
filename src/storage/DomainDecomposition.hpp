@@ -7,10 +7,10 @@
 
 namespace espresso {
   namespace storage {
-    class NodeGridMismatch: public std::runtime_error
+    class NodeGridMismatch: public std::invalid_argument
     {
     public:
-      NodeGridMismatch();
+      NodeGridMismatch(Int3D gridRequested, int nodesAvailable);
     };
 
     class DomainDecomposition: public Storage {
