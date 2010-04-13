@@ -22,7 +22,7 @@ c.setA(a2)
 del(c)
 
 # When returning an A from a Container, 
-# I can get it as internal reference
+# get it as internal reference
 print('* A as internal reference *')
 c = Container()
 a = c.getA()
@@ -30,6 +30,23 @@ print(a.s)
 del(c)
 print(a.s)
 del(a)
+
+# When returning an A from a Container, 
+# get it as internal reference
+print('* *A as internal reference *');
+c = Container()
+a = c.getAPtr()
+print(a.s)
+del(c)
+print(a.s)
+del(a)
+
+# Return a NULL pointer
+print('* NULL pointer as internal reference *');
+c = Container()
+a = c.getANullPtr()
+if a is None:
+    print('a=None')
 
 # When getting the A as an existing object,
 # it will be destroyed when the Container is deleted
