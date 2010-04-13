@@ -48,7 +48,7 @@ if pmi.isController:
             if nodeGrid == 'auto':
                 nodeGrid = Int3D(comm.rank, 1, 1)
             else:
-                nodeGrid = toInt3DFromVector(nodeGrid);
+                nodeGrid = toInt3DFromVector(nodeGrid)
 
             if cellGrid == 'auto':
                 # TODO: Implement

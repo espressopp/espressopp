@@ -7,18 +7,11 @@
 ###########################################################################
 
 import espresso
-import espresso.esutil
-import espresso.unittest
-import espresso.storage
-import espresso.integrator
-import espresso.interaction
-import espresso.analysis
-import espresso.bc
 import MPI
 import math
 import logging
 
-from espresso import Real3D
+from espresso import Real3D, Int3D
 
 # Input values for system
 
@@ -27,40 +20,33 @@ cutoff = 2.5
 skin   = 0.3
 
 def calcNumberCells(size, nodes, cutoff):
-
     ncells = 1
-
     while size / (ncells * nodes) >= cutoff:
        ncells = ncells + 1
-
     return ncells - 1
 
 system = espresso.System()
 
-rng  = espresso.esutil.RNG()
+system.rng  = espresso.esutil.RNG()
 
 SIZE = float(N)
 box  = Real3D(SIZE)
-bc   = espresso.bc.OrthorhombicBC(None, box)
+system.bc   = espresso.bc.OrthorhombicBC(system.rng, box)
 
-system.bc = bc
-system.rng = rng 
 system.skin = skin
 
-comm = espresso.MPI.COMM_WORLD
+comm = MPI.COMM_WORLD
 
-nodeGrid = (1, 1, comm.size)
-cellGrid = [1, 1, 1]
+nodeGrid = Int3D(1, 1, comm.size)
+cellGrid = Int3D(1, 1, 1)
 
 for i in range(3):
    cellGrid[i] = calcNumberCells(SIZE, nodeGrid[i], cutoff)
 
-print 'NodeGrid = %s'%(nodeGrid,)
-print 'CellGrid = %s'%cellGrid
+print 'NodeGrid = %s' % (nodeGrid,)
+print 'CellGrid = %s' % (cellGrid,)
 
-dd = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
-
-system.storage = dd
+system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
 
 id = 0
 
@@ -74,17 +60,17 @@ for i in range(N):
       y = (j + r) / N * SIZE
       z = (k + r) / N * SIZE
 
-      dd.addParticle(id, Real3D(x, y, z))
+      system.storage.addParticle(id, Real3D(x, y, z))
 
       # not yet: dd.setVelocity(id, (1.0, 0.0, 0.0))
 
       id = id + 1
 
-dd.resortParticles()
+system.storage.resortParticles()
 
 integrator = espresso.integrator.VelocityVerlet(system)
 
-print 'integrator.dt = %g, will be set to 0.005'%integrator.dt
+print 'integrator.dt = %g, will be set to 0.005' % integrator.dt
 
 integrator.dt = 0.005
 
