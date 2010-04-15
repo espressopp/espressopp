@@ -8,7 +8,7 @@ class PotentialLocal(object):
     def computeEnergy(self, *args):
         if len(args) == 1:
             arg0 = args[0]
-            if type(arg0) is float or type(arg0) is int:
+            if isinstance(arg0, float) or isinstance(arg0, int):
                 return self.cxxclass.computeEnergy(self, arg0)
         return self.cxxclass.computeEnergy(self, toReal3DFromVector(*args))
 
