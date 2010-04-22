@@ -253,6 +253,8 @@ BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
   CellList realCells = system->storage->getRealCells();
   CellList localCells = system->storage->getLocalCells();
 
+  real cutoff_skin = cutoff + system->skin;
+ 
   for(CellListIterator cit1(realCells); !cit1.isDone(); ++cit1) {
 
     for(CellListIterator cit2(localCells); !cit2.isDone(); ++cit2) {
@@ -261,7 +263,7 @@ BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
 
       real distsqr = getDistSqr(*cit1, *cit2);
 
-      if (distsqr >= cutoff * cutoff) continue;
+      if (distsqr >= cutoff_skin * cutoff_skin) continue;
 
       BOOST_MESSAGE("pair " << count << ": "
                  << cit1->p.id << " " << cit2->p.id
