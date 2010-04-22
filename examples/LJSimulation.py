@@ -31,7 +31,8 @@ system.rng  = espresso.esutil.RNG()
 
 SIZE = float(N)
 box  = Real3D(SIZE)
-system.bc   = espresso.bc.OrthorhombicBC(system.rng, box)
+
+system.bc = espresso.bc.OrthorhombicBC(system.rng, box)
 
 system.skin = skin
 
@@ -48,7 +49,7 @@ print 'CellGrid = %s' % (cellGrid,)
 
 system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
 
-id = 0
+pid = 0
 
 for i in range(N):
   for j in range(N):
@@ -60,11 +61,10 @@ for i in range(N):
       y = (j + r) / N * SIZE
       z = (k + r) / N * SIZE
 
-      system.storage.addParticle(id, Real3D(x, y, z))
+      system.storage.addParticle(pid, Real3D(x, y, z))
 
       # not yet: dd.setVelocity(id, (1.0, 0.0, 0.0))
-
-      id = id + 1
+      pid = pid + 1
 
 system.storage.resortParticles()
 

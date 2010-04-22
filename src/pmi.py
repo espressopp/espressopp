@@ -612,27 +612,28 @@ class Proxy(type):
                 method_self.pmiobjectclassdef = self.pmiobjectclassdef
                 pmiobjectclass = _translateClass(self.pmiobjectclassdef)
                 method_self.pmiobject = create(pmiobjectclass, *args, **kwds)
+                method_self.pmiobject._pmiproxy = method_self
 
     class _LocalCaller(object):
         def __init__(self, methodName):
             self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
             method = getattr(method_self.pmiobject, self.methodName)
-            return localcall(method, *args, **kwds)
+            return _backtranslateProxy(localcall(method, *args, **kwds))
 
     class _PMICaller(object):
         def __init__(self, methodName):
             self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
             method = getattr(method_self.pmiobject, self.methodName)
-            return call(method, *args, **kwds)
+            return _backtranslateProxy(call(method, *args, **kwds))
 
     class _PMIInvoker(object):
         def __init__(self, methodName):
             self.methodName = methodName
         def __call__(self, method_self, *args, **kwds):
             method = getattr(method_self.pmiobject, self.methodName)
-            return invoke(method, *args, **kwds)
+            return map(_backtranslateProxy, invoke(method, *args, **kwds))
 
     class _PropertyLocalGetter(object):
         def __init__(self, propName):
@@ -640,7 +641,7 @@ class Proxy(type):
         def __call__(self, method_self):
             property = getattr(method_self.pmiobject.__class__, self.propName)
             getter = getattr(property, 'fget')
-            return getter(method_self.pmiobject)
+            return _backtranslateProxy(getter(method_self.pmiobject))
 
     class _PropertyPMISetter(object):
         def __init__(self, propName):
@@ -653,7 +654,7 @@ class Proxy(type):
                 (method_self.pmiobjectclassdef,
                  self.propName, 
                  'fset'))
-            return call(setter, method_self, val)
+            return _backtranslateProxy(call(setter, method_self, val))
 
     def __addMethod(cls, methodName, caller):
         newMethod = types.MethodType(caller, None, cls)
@@ -905,14 +906,20 @@ def _translateOID(obj) :
     else:
         return obj
 
-def _transcendProxy(obj):
+def _backtranslateProxy(obj):
+    if hasattr(obj, '_pmiproxy'):
+        return obj._pmiproxy
+    else:
+        return obj
+
+def _translateProxy(obj):
     if _isProxy(obj):
         return obj.pmiobject
     else:
         return obj
 
-def __transcendProxies(args, kwds):
-    return __mapArgs(_transcendProxy, args, kwds)
+def __translateProxies(args, kwds):
+    return __mapArgs(_translateProxy, args, kwds)
 
 def __translateOIDs(args, kwds):
     """Internal function that translates all PMI object instances that
@@ -922,7 +929,7 @@ def __translateOIDs(args, kwds):
     return __mapArgs(_translateOID, args, kwds)
 
 def __translateArgs(args, kwds):
-    args, kwds = __transcendProxies(args, kwds)
+    args, kwds = __translateProxies(args, kwds)
 
     workerKwds={}
     controllerKwds={}
@@ -970,7 +977,7 @@ def __backtranslateOIDs(targs, tkwds):
 class __Method(object) :
     def __init__(self, funcname, im_self, im_class=None):
         self.__name__ = funcname
-        self.im_self = _transcendProxy(im_self)
+        self.im_self = _translateProxy(im_self)
         if im_class is None:
             self.im_class = self.im_self.__class__
         else:
