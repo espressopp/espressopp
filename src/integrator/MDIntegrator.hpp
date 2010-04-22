@@ -49,6 +49,8 @@ namespace espresso {
 
       protected:
 
+        bool timeFlag;
+
         /** Timestep used for integration. */
 
         real dt;

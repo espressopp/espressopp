@@ -57,7 +57,7 @@ struct DomainFixture {
 
     Real3D boxL(SIZE, SIZE, SIZE);
 
-    real skin   = 0.3;
+    real skin   = 0.001;
     
     int nodeGrid[3] = { 1, 1, mpiWorld->size() };
 
@@ -179,7 +179,7 @@ BOOST_FIXTURE_TEST_CASE(LatticeTest, LatticeFixture)
 
   BOOST_CHECK_EQUAL(globalPairs, 0);
 
-  vl = make_shared< VerletList >(system, 1.001);
+  vl = make_shared< VerletList >(system, 1.0);
 
   // there are N * N * N * 6 / 2 pairs in cutoff 1.0
 
@@ -191,7 +191,7 @@ BOOST_FIXTURE_TEST_CASE(LatticeTest, LatticeFixture)
 
   // there are N * N * N * 18 / 2 pairs in cutoff  sqrt(2.0)
 
-  vl = make_shared< VerletList >(system, pow(2.001, 0.5));
+  vl = make_shared< VerletList >(system, pow(2.0, 0.5));
 
   pairs = vl->getPairs();
   localPairs = pairs.size();
@@ -199,7 +199,7 @@ BOOST_FIXTURE_TEST_CASE(LatticeTest, LatticeFixture)
 
   BOOST_CHECK_EQUAL(globalPairs, N * N * N * 9);
 
-  vl = make_shared< VerletList >(system, pow(3.001, 0.5));
+  vl = make_shared< VerletList >(system, pow(3.0, 0.5));
 
   pairs = vl->getPairs();
   localPairs = pairs.size();

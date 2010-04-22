@@ -47,7 +47,8 @@ for i in range(3):
 print 'NodeGrid = %s' % (nodeGrid,)
 print 'CellGrid = %s' % (cellGrid,)
 
-system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
+dd = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
+system.storage = dd
 
 pid = 0
 
@@ -63,10 +64,14 @@ for i in range(N):
 
       system.storage.addParticle(pid, Real3D(x, y, z))
 
+      dd.addParticle(id, Real3D(x, y, z))
+
       # not yet: dd.setVelocity(id, (1.0, 0.0, 0.0))
       pid = pid + 1
 
-system.storage.resortParticles()
+# system.storage.resortParticles()
+
+dd.resortParticles()
 
 integrator = espresso.integrator.VelocityVerlet(system)
 
@@ -77,11 +82,11 @@ integrator.dt = 0.005
 print 'integrator.dt = %g, is now '%integrator.dt
 
 # now build Verlet List
-# ATTENTION: you have to add the skin explicitly here
+# ATTENTION: you must not add the skin explicitly here
 
 vl = espresso.VerletList(system, cutoff = cutoff + system.skin)
 
-potLJ = espresso.interaction.LennardJones(1.0, 1.0, cutoff = cutoff)
+potLJ = espresso.interaction.LennardJones(0.8, 0.8, cutoff = cutoff)
 
 # ATTENTION: auto shift was enabled
 
@@ -90,6 +95,10 @@ print "potLJ, shift = %g"%potLJ.shift
 interLJ = espresso.interaction.VerletListLennardJones(vl)
 
 interLJ.setPotential(type1 = 0, type2 = 0, potential = potLJ)
+
+potLJ1 = espresso.interaction.LennardJones(1.0, 1.0, cutoff = cutoff)
+
+interLJ.setPotential(type1 = 1, type2 = 1, potential = potLJ1)
 
 # Todo
 

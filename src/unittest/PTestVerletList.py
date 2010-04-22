@@ -33,6 +33,10 @@ class TestVerletList(espresso.unittest.TestCase) :
 
        system.bc = bc
 
+       # a small skin avoids rounding problems
+
+       system.skin = 0.001
+
        cutoff = 1.733
 
        comm = espresso.MPI.COMM_WORLD
@@ -73,7 +77,7 @@ class TestVerletList(espresso.unittest.TestCase) :
 
        self.assertEqual(vl.totalSize(), 0)
 
-       vl = espresso.VerletList(system, 1.001)
+       vl = espresso.VerletList(system, 1.0)
 
        # there are N * N * N * 6 / 2 pairs in cutoff 1.0
 
@@ -81,11 +85,11 @@ class TestVerletList(espresso.unittest.TestCase) :
 
        # there are N * N * N * 18 / 2 pairs in cutoff  sqrt(2.0)
 
-       vl = espresso.VerletList(system, math.sqrt(2.001))
+       vl = espresso.VerletList(system, math.sqrt(2.0))
 
        self.assertEqual(vl.totalSize(), N * N * N * 9);
 
-       vl = espresso.VerletList(system, math.sqrt(3.001))
+       vl = espresso.VerletList(system, math.sqrt(3.0))
 
        # there are N * N * N * 26 / 2 pairs in cutoff
 

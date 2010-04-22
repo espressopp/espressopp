@@ -28,7 +28,7 @@ struct LoggingFixture {
     log4espp::Logger::getRoot().setLevel(log4espp::Logger::WARN);
     // log4espp::Logger::getInstance("VerletList").setLevel(log4espp::Logger::WARN);
     // log4espp::Logger::getInstance("Storage").setLevel(log4espp::Logger::DEBUG);
-    log4espp::Logger::getInstance("MDIntegrator").setLevel(log4espp::Logger::WARN);
+    log4espp::Logger::getInstance("MDIntegrator").setLevel(log4espp::Logger::INFO);
   }
 };
 

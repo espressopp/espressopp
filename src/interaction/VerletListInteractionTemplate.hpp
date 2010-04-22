@@ -5,6 +5,7 @@
 #include "Real3D.hpp"
 #include "Particle.hpp"
 #include "VerletList.hpp"
+#include "esutil/Array2D.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -18,7 +19,9 @@ namespace espresso {
       VerletListInteractionTemplate
       (shared_ptr < VerletList > _verletList)
         : verletList(_verletList) 
-      {}
+      {
+        potentialArray = Array2D<Potential, enlarge>(0, 0, Potential());
+      }
 
       void
       setVerletList(shared_ptr < VerletList > _verletList) {
@@ -31,15 +34,14 @@ namespace espresso {
 
       void
       setPotential(int type1, int type2, const Potential &potential) {
-        // TODO: automatically resize array
-	//        potentialArray[type1][type2] = potential;
-	potentialArray = potential;
+        // automatically resizes array
+	potentialArray.at(type1, type2) = potential;
       }
 
       Potential &getPotential(int type1, int type2) {
         // TODO: automatically resize array
 	//        return potentialArray[type1][type2];
-        return potentialArray;
+        return potentialArray(type1, type2);
       }
 
       virtual void addForces();
@@ -49,7 +51,9 @@ namespace espresso {
     protected:
       int ntypes;
       shared_ptr < VerletList > verletList;
-      Potential potentialArray;
+      // Potential potentialArray;
+      // esutil::Array2D<Potential, esutil::enlarge> potentialArray;
+      Array2D<Potential, enlarge> potentialArray;
     };
 
     //////////////////////////////////////////////////

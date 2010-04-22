@@ -28,7 +28,9 @@ namespace espresso {
        throw std::runtime_error("system has no storage");
     }
 
-    cutsq = cut * cut;
+    real cutVerlet = cut + system->skin;
+
+    cutsq = cutVerlet * cutVerlet;
   
     rebuild();
   
@@ -51,7 +53,8 @@ namespace espresso {
       checkPair(*it->first, *it->second);
     }
   
-    LOG4ESPP_INFO(theLogger, "rebuilt VerletList, cutsq = " << cutsq);
+    LOG4ESPP_INFO(theLogger, "rebuilt VerletList, cutsq = " << cutsq 
+                 << " local size = " << myList.size());
   }
   
   /*-------------------------------------------------------------*/

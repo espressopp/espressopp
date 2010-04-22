@@ -18,6 +18,7 @@ namespace espresso {
       if (!system->storage) {
         LOG4ESPP_ERROR(theLogger, "system has no storage");
       }
+      timeFlag = true;
     }
     
     MDIntegrator::~MDIntegrator()
