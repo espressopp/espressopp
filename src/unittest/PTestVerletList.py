@@ -1,9 +1,5 @@
-import unittest
 import espresso
-import espresso.esutil
-import espresso.unittest
-import espresso.storage
-import espresso.bc
+from espresso import unittest
 import MPI
 import math
 
@@ -18,7 +14,7 @@ def calcNumberCells(size, nodes, cutoff):
 
     return ncells - 1
 
-class TestVerletList(espresso.unittest.TestCase) :
+class TestVerletList(unittest.TestCase) :
 
     def test0Build(self) :
 
@@ -54,7 +50,7 @@ class TestVerletList(espresso.unittest.TestCase) :
 
        system.storage = dd
 
-       id = 0
+       pid = 0
 
        for i in range(N):
          for j in range(N):
@@ -65,9 +61,9 @@ class TestVerletList(espresso.unittest.TestCase) :
              y = (j + r) / N * SIZE
              z = (k + r) / N * SIZE
    
-             dd.addParticle(id, Real3D(x, y, z))
+             dd.addParticle(pid, Real3D(x, y, z))
 
-             id = id + 1
+             pid = pid + 1
 
        dd.resortParticles()
 
@@ -95,8 +91,6 @@ class TestVerletList(espresso.unittest.TestCase) :
 
        self.assertEqual(vl.totalSize(), N * N * N * 13)
 
-        
 if __name__ == "__main__":
-
     unittest.main()
 

@@ -372,7 +372,7 @@ def __workerCall(function, *targs, **tkwds) :
 def localcall(*args, **kwds):
     if __checkController(localcall):
         cfunction, tfunction, args = __translateFunctionArgs(*args)
-        args, kwds = __transcendProxies(args, kwds)
+        args, kwds = __translateProxies(args, kwds)
         log.info("Calling locally: %s", __formatCall(cfunction, args, kwds))
         return cfunction(*args, **kwds)
     else:

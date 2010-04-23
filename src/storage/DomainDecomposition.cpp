@@ -602,7 +602,7 @@ namespace espresso {
 	 const ConstInt3DRef, const ConstInt3DRef >())
 	.def("mapPositionToNodeClipped", 
 	     &DomainDecomposition::mapPositionToNodeClipped)
-      ;
+	;
     }
   }
 }

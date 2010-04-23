@@ -14,11 +14,21 @@ import logging
 from espresso import Real3D, Int3D
 
 # Input values for system
-
-N      = 10
+N = 10
+# box size
+size   = (10.0, 10.0, 10.0)
+# number of particles
+numParticles = 1000
+# LJ cutoff
 cutoff = 2.5
+# LJ epsilon
+ljSigma = 1.0
+# LJ sigma
+ljEpsilon = 1.0
+# skin
 skin   = 0.3
 
+# compute the number of cells on each node
 def calcNumberCells(size, nodes, cutoff):
     ncells = 1
     while size / (ncells * nodes) >= cutoff:
@@ -29,26 +39,23 @@ system = espresso.System()
 
 system.rng  = espresso.esutil.RNG()
 
-SIZE = float(N)
-box  = Real3D(SIZE)
-
-system.bc = espresso.bc.OrthorhombicBC(system.rng, box)
+system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
 
 system.skin = skin
 
 comm = MPI.COMM_WORLD
 
 nodeGrid = Int3D(1, 1, comm.size)
-cellGrid = Int3D(1, 1, 1)
-
-for i in range(3):
-   cellGrid[i] = calcNumberCells(SIZE, nodeGrid[i], cutoff)
+cellGrid = Int3D(
+    calcNumberCells(size[0], nodeGrid[0], cutoff),
+    calcNumberCells(size[1], nodeGrid[1], cutoff),
+    calcNumberCells(size[2], nodeGrid[2], cutoff)
+    )
 
 print 'NodeGrid = %s' % (nodeGrid,)
 print 'CellGrid = %s' % (cellGrid,)
 
-dd = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
-system.storage = dd
+system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
 
 pid = 0
 
@@ -58,20 +65,18 @@ for i in range(N):
 
       m = (i + 2*j + 3*k) % 11
       r = 0.45 + m * 0.01
-      x = (i + r) / N * SIZE
-      y = (j + r) / N * SIZE
-      z = (k + r) / N * SIZE
+      x = (i + r) / N * size[0]
+      y = (j + r) / N * size[1]
+      z = (k + r) / N * size[2]
 
       system.storage.addParticle(pid, Real3D(x, y, z))
-
-      dd.addParticle(id, Real3D(x, y, z))
 
       # not yet: dd.setVelocity(id, (1.0, 0.0, 0.0))
       pid = pid + 1
 
 # system.storage.resortParticles()
 
-dd.resortParticles()
+system.storage.resortParticles()
 
 integrator = espresso.integrator.VelocityVerlet(system)
 
