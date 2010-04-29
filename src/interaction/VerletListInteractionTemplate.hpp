@@ -20,7 +20,7 @@ namespace espresso {
       (shared_ptr < VerletList > _verletList)
         : verletList(_verletList) 
       {
-        potentialArray = Array2D<Potential, enlarge>(0, 0, Potential());
+        potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
       }
 
       void
@@ -48,7 +48,7 @@ namespace espresso {
     protected:
       int ntypes;
       shared_ptr < VerletList > verletList;
-      Array2D<Potential, enlarge> potentialArray;
+      esutil::Array2D<Potential, esutil::enlarge> potentialArray;
     };
 
     //////////////////////////////////////////////////
