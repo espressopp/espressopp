@@ -56,10 +56,8 @@ struct Fixture {
 
     BOOST_MESSAGE("cellGrid = " << ncells << " x " << ncells << " x " << ncells);
 
-    ConstReal3DRef boxLRef(boxL);
-
-    int nodeGrid[3] = { 1, 1, mpiWorld.size() };
-    int cellGrid[3] = { 1, 1, 1 };
+    Int3D nodeGrid(1, 1, mpiWorld->size());
+    Int3D cellGrid(1, 1, 1);
 
     for (int i = 0; i < 3; i++) {
       int ncells = 1;
@@ -75,7 +73,7 @@ struct Fixture {
 
     system = make_shared< System >();
     system->rng = make_shared< RNG >();
-    system->bc = make_shared< OrthorhombicBC >(system, boxLRef);
+    system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
     system->skin = skin;
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,
@@ -96,7 +94,7 @@ struct Fixture {
           real z = (k + r) / N * size;
           real pos[3] = { x, y, z };
 
-          if (mpiWorld.rank() == 0) {
+          if (mpiWorld->rank() == 0) {
 
             // BOOST_MESSAGE("add particle at " << x << ", " << y << ", " << z);
             domdec->addParticle(id, pos);
