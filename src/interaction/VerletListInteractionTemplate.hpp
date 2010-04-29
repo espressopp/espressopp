@@ -1,6 +1,7 @@
 #ifndef _INTERACTION_VERLETLISTINTERACTIONTEMPLATE_HPP
 #define _INTERACTION_VERLETLISTINTERACTIONTEMPLATE_HPP
 
+#include "types.hpp"
 #include "Interaction.hpp"
 #include "Real3D.hpp"
 #include "Particle.hpp"
@@ -14,7 +15,6 @@ namespace espresso {
         : public Interaction {
     protected:
       typedef _Potential Potential;
-      typedef VerletListInteractionTemplate< Potential> Super;
     public:
       VerletListInteractionTemplate
       (shared_ptr < VerletList > _verletList)
@@ -34,13 +34,10 @@ namespace espresso {
 
       void
       setPotential(int type1, int type2, const Potential &potential) {
-        // automatically resizes array
 	potentialArray.at(type1, type2) = potential;
       }
 
       Potential &getPotential(int type1, int type2) {
-        // TODO: automatically resize array
-	//        return potentialArray[type1][type2];
         return potentialArray(type1, type2);
       }
 
@@ -51,8 +48,6 @@ namespace espresso {
     protected:
       int ntypes;
       shared_ptr < VerletList > verletList;
-      // Potential potentialArray;
-      // esutil::Array2D<Potential, esutil::enlarge> potentialArray;
       Array2D<Potential, enlarge> potentialArray;
     };
 
@@ -62,12 +57,10 @@ namespace espresso {
     template < typename _Potential > inline void
     VerletListInteractionTemplate < _Potential >::addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
-      const PairList pairList = verletList->getPairs();
-
-      int npairs = pairList.size();
-      for (int i = 0; i < npairs; i++) {
-        Particle &p1 = *pairList[i].first;
-        Particle &p2 = *pairList[i].second;
+      for (PairList::Iterator it(verletList->getPairs()); 
+	   it.isValid(); ++it) {
+        Particle &p1 = *it->first;
+        Particle &p2 = *it->second;
         int type1 = p1.p.type;
         int type2 = p2.p.type;
         const Potential &potential = getPotential(type1, type2);
@@ -104,15 +97,13 @@ namespace espresso {
     inline real
     VerletListInteractionTemplate < _Potential >::
     computeEnergy() {
-      LOG4ESPP_INFO(theLogger, "compute energy by the Verlet List");
+      LOG4ESPP_INFO(theLogger, "compute energy of the Verlet list pairs");
 
-      const PairList pairList = verletList->getPairs();
-
-      int npairs = pairList.size();
       real e = 0.0;
-      for(int i = 0; i < npairs; i++) {
-        Particle &p1 = *pairList[i].first;
-        Particle &p2 = *pairList[i].second;
+      for (PairList::Iterator it(verletList->getPairs()); 
+	   it.isValid(); ++it) {
+        Particle &p1 = *it->first;
+        Particle &p2 = *it->second;
         int type1 = p1.p.type;
         int type2 = p2.p.type;
         const Potential &potential = getPotential(type1, type2);
@@ -123,12 +114,12 @@ namespace espresso {
 
     template < typename _Potential >
     inline real
-    VerletListInteractionTemplate <
-    _Potential >::getMaxCutoff() {
+    VerletListInteractionTemplate< _Potential >::
+    getMaxCutoff() {
       real cutoff = 0.0;
 
-      for(int i = 0; i < ntypes; i++) {
-        for(int j = 0; i < ntypes; i++) {
+      for (int i = 0; i < ntypes; i++) {
+        for (int j = 0; j < ntypes; j++) {
           cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
         }
       }

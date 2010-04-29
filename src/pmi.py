@@ -867,7 +867,7 @@ def __checkWorker(func) :
         raise UserError("Cannot call %s on the controller!" % func.__name__)
 
 def _translateClass(cls):
-    """Returns the class object of the class decscribed by cls.
+    """Returns the class object of the class described by cls.
     """
     if cls is None :
         raise UserError("pmi.create expects at least 1 argument on controller")

@@ -31,7 +31,7 @@ namespace espresso {
 
     ~VerletList();
 
-    const PairList& getPairs() const { return myList; }
+    PairList& getPairs() { return myList; }
 
     void rebuild();
 

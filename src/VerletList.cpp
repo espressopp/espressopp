@@ -48,8 +48,7 @@ namespace espresso {
   
     CellList cl = getSystem()->storage->getRealCells();
   
-    for (CellListAllPairsIterator it(cl);it.isValid(); ++it) {
-  
+    for (CellListAllPairsIterator it(cl); it.isValid(); ++it) {
       checkPair(*it->first, *it->second);
     }
   
