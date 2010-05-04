@@ -1,5 +1,6 @@
-#ifndef _INTEGRATOR_MD_INTEGRATOR_HPP
-#define _INTEGRATOR_MD_INTEGRATOR_HPP
+// ESPP_CLASS
+#ifndef _INTEGRATOR_MDINTEGRATOR_HPP
+#define _INTEGRATOR_MDINTEGRATOR_HPP
 
 #include "logging.hpp"
 #include "types.hpp"

@@ -1,3 +1,4 @@
+// ESPP_CLASS
 #ifndef _ESUTIL_RNG_HPP
 #define _ESUTIL_RNG_HPP
 #include <boost/random.hpp>

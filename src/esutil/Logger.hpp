@@ -1,5 +1,6 @@
-#ifndef Logger_HPP
-#define Logger_HPP
+// ESPP_CLASS
+#ifndef _ESUTIL_LOGGER_HPP
+#define _ESUTIL_LOGGER_HPP
 
 /** \file Logger.hpp    Class for logging.
 

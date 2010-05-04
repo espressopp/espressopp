@@ -1,3 +1,4 @@
+// ESPP_CLASS
 #ifndef _ESUTIL_NORMALVARIATE_HPP
 #define _ESUTIL_NORMALVARIATE_HPP
 #include <boost/random.hpp>

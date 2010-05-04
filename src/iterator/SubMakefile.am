@@ -1,7 +1,0 @@
-nobase_pkginclude_HEADERS += \
-	iterator/CellListIterator.hpp \
-	iterator/NeighborCellListIterator.hpp \
-	iterator/CellListAllPairsIterator.hpp
-
-# libespresso_common_la_SOURCES +=
-

@@ -1,3 +1,4 @@
+// ESPP_CLASS
 #ifndef _ESUTIL_COLLECTIVES_HPP
 #define _ESUTIL_COLLECTIVES_HPP
 #include <stdexcept>

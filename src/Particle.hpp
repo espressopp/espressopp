@@ -1,3 +1,4 @@
+// ESPP_CLASS
 #ifndef _PARTICLE_HPP
 #define _PARTICLE_HPP
 

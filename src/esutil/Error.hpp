@@ -1,5 +1,6 @@
-#ifndef _ERROR_HPP
-#define _ERROR_HPP
+// ESPP_CLASS
+#ifndef _ESUTIL_ERROR_HPP
+#define _ESUTIL_ERROR_HPP
 
 #include "mpi.hpp"
 

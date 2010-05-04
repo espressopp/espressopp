@@ -1,3 +1,4 @@
+// ESPP_CLASS
 #ifndef _ESUTIL_TIMER_HPP
 #define _ESUTIL_TIMER_HPP
 

@@ -1,3 +1,4 @@
+// ESPP_CLASS
 #ifndef _ESUTIL_UNIFORMONSPHERE_HPP
 #define _ESUTIL_UNIFORMONSPHERE_HPP
 #include <boost/random.hpp>

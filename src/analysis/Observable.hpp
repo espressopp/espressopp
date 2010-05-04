@@ -1,10 +1,9 @@
+// ESPP_CLASS
 #ifndef _ANALYSIS_OBSERVABLE_HPP
 #define _ANALYSIS_OBSERVABLE_HPP
 
 #include "types.hpp"
 #include "SystemAccess.hpp"
-
-// TODO: compute pressure
 
 namespace espresso {
   namespace analysis {

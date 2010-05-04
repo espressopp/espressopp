@@ -1,6 +1,6 @@
-#ifndef _CELL_GRID_HPP
-#define _CELL_GRID_HPP
-
+// ESPP_CLASS
+#ifndef _STORAGE_CELLGRID_HPP
+#define _STORAGE_CELLGRID_HPP
 /*
   local ghost cell grid representation. Taken from domain_decomposition.c.
 */
