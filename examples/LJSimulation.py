@@ -110,6 +110,7 @@ interLJ.setPotential(type1 = 1, type2 = 1, potential = potLJ1)
 system.addInteraction(interLJ)
 
 temp = espresso.analysis.Temperature(system)
+press = espresso.analysis.Pressure(system)
 
 temperature = temp.compute()
 kineticEnergy = 0.5 * temperature * (3 * N * N * N)
@@ -122,10 +123,11 @@ nsteps = 20
 for i in range(20):
    integrator.run(nsteps)
    temperature = temp.compute()
+   p = press.compute()
    kineticEnergy = 0.5 * temperature * (3 * N * N * N)
    potentialEnergy = interLJ.computeEnergy()
-   print 'Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f'%(nsteps*(i+1), 
-        kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature)
+   print 'Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f p = %f'%(nsteps*(i+1), 
+        kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature, p)
 
 # logging.getLogger("Langevin").setLevel(logging.INFO)
 
@@ -141,10 +143,11 @@ print 'Heat up to t = ', langevin.temperature
 for i in range(20):
    integrator.run(nsteps)
    temperature = temp.compute()
+   p = press.compute()
    kineticEnergy = 0.5 * temperature * (3 * N * N * N)
    potentialEnergy = interLJ.computeEnergy()
-   print 'Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f'%(nsteps*(i+1), 
-        kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature)
+   print 'Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f p = %f'%(nsteps*(i+1), 
+        kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature, p)
 
 langevin.temperature = 0.5
 
@@ -153,7 +156,8 @@ print 'Cool down to t = ', langevin.temperature
 for i in range(40):
    integrator.run(nsteps)
    temperature = temp.compute()
+   p = press.compute()
    kineticEnergy = 0.5 * temperature * (3 * N * N * N)
    potentialEnergy = interLJ.computeEnergy()
-   print 'Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f'%(nsteps*(i+1),
-        kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature)
+   print 'Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f p = %f'%(nsteps*(i+1),
+        kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature, p)

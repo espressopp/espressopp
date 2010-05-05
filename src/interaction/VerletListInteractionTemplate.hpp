@@ -44,6 +44,7 @@ namespace espresso {
 
       virtual void addForces();
       virtual real computeEnergy();
+      virtual real computeVirial();
       virtual real getMaxCutoff();
 
     protected:
@@ -111,6 +112,28 @@ namespace espresso {
 	e += potential._computeEnergy(p1, p2);
       }
       return e;
+    }
+
+   template < typename _Potential > inline real
+    VerletListInteractionTemplate < _Potential >::computeVirial() {
+      LOG4ESPP_INFO(theLogger, "compute the virial for the Verlet List");
+      
+      real w = 0.0;
+      for (PairList::Iterator it(verletList->getPairs());                
+           it.isValid(); ++it) {                                         
+        Particle &p1 = *it->first;                                       
+        Particle &p2 = *it->second;                                      
+        int type1 = p1.p.type;                                           
+        int type2 = p2.p.type;
+        const Potential &potential = getPotential(type1, type2);
+
+        Real3D force;
+        if (potential._computeForce(force, p1, p2)) {
+          Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
+          w = w + dist * force;
+        }
+      }
+      return w; 
     }
 
     template < typename _Potential >

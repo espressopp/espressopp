@@ -1,6 +1,6 @@
 // ESPP_CLASS
-#ifndef _ANALYSIS_PRESSURE_HPP_
-#define _ANALYSIS_PRESSURE_HPP_
+#ifndef _ANALYSIS_PRESSURE_HPP
+#define _ANALYSIS_PRESSURE_HPP
 
 #include "types.hpp"
 #include "Observable.hpp"
