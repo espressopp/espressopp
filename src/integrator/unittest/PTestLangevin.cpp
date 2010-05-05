@@ -41,6 +41,9 @@ static real size = N;
 
 BOOST_GLOBAL_FIXTURE(LoggingFixture);
 
+typedef class VerletListInteractionTemplate< LennardJones > 
+VerletListLennardJones;
+
 struct Fixture {
   shared_ptr<DomainDecomposition> domdec;
   shared_ptr<System> system;
@@ -188,8 +191,8 @@ BOOST_FIXTURE_TEST_CASE(integrate, Fixture)
 
   BOOST_MESSAGE("build the LJ interaction");
 
-  shared_ptr<VerletListLennardJones> interLJ = 
-    make_shared<VerletListLennardJones>(vl);
+  shared_ptr< VerletListLennardJones > interLJ = 
+    make_shared< VerletListLennardJones >(vl);
 
   // define and set parameter functions
 

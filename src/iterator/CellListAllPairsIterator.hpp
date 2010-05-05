@@ -42,9 +42,6 @@ namespace espresso {
 
     //////////////////////////////////////////////////
     // INLINE IMPLEMENTATION
-    LOG4ESPP_LOGGER(CellListAllPairsIterator::theLogger, 
-		    "CellListAllPairsIterator");
-
     inline 
     CellListAllPairsIterator::
     CellListAllPairsIterator() 

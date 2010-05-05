@@ -33,12 +33,15 @@ namespace espresso {
       bool useAllPairs;
     };
 
+    //////////////////////////////////////////////////
     // INLINE IMPLEMENTATION
+    inline
     NeighborCellListIterator::
     NeighborCellListIterator() 
       : ncit(), pit(), useAllPairs(false)
     {}
 
+    inline
     NeighborCellListIterator::
     NeighborCellListIterator(NeighborCellList &cl, bool _useAllPairs) 
       : ncit(cl), pit(), useAllPairs(_useAllPairs)  {

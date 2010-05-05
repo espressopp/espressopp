@@ -3,7 +3,6 @@
 #define _INTERACTION_LENNARDJONES_HPP
 
 #include "Potential.hpp"
-#include "VerletListInteractionTemplate.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -82,13 +81,6 @@ namespace espresso {
 	return true;
       }
     };
-
-    // explicit template instatiations
-
-    template class VerletListInteractionTemplate< LennardJones >;
-
-    typedef class VerletListInteractionTemplate< LennardJones > VerletListLennardJones;
-
   }
 }
 

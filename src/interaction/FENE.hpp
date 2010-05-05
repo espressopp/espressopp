@@ -81,13 +81,6 @@ namespace espresso {
         return true;
       }
     };
-
-    // explicit template instatiations
-
-    template class VerletListInteractionTemplate< FENE >;
-
-    typedef class VerletListInteractionTemplate< FENE > VerletListFENE;
-
   }
 }
 
