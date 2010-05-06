@@ -6,6 +6,7 @@
 #                                                                         #
 ###########################################################################
 
+import sys
 import espresso
 import MPI
 import math
@@ -69,6 +70,10 @@ for i in range(N):
       y = (j + r) / N * size[1]
       z = (k + r) / N * size[2]
 
+      x = 1.0 * i
+      y = 1.0 * j
+      z = 1.0 * k
+
       system.storage.addParticle(pid, Real3D(x, y, z))
 
       # not yet: dd.setVelocity(id, (1.0, 0.0, 0.0))
@@ -90,20 +95,16 @@ print 'integrator.dt = %g, is now '%integrator.dt
 # ATTENTION: you must not add the skin explicitly here
 
 vl = espresso.VerletList(system, cutoff = cutoff + system.skin)
-
-potLJ = espresso.interaction.LennardJones(0.8, 0.8, cutoff = cutoff)
+potLJ = espresso.interaction.LennardJones(1.0, 1.0, cutoff = cutoff)
 
 # ATTENTION: auto shift was enabled
 
 print "potLJ, shift = %g"%potLJ.shift
 
 interLJ = espresso.interaction.VerletListLennardJones(vl)
-
 interLJ.setPotential(type1 = 0, type2 = 0, potential = potLJ)
-
 potLJ1 = espresso.interaction.LennardJones(1.0, 1.0, cutoff = cutoff)
 
-interLJ.setPotential(type1 = 1, type2 = 1, potential = potLJ1)
 
 # Todo
 
@@ -113,51 +114,24 @@ temp = espresso.analysis.Temperature(system)
 press = espresso.analysis.Pressure(system)
 
 temperature = temp.compute()
+p = press.compute()
 kineticEnergy = 0.5 * temperature * (3 * N * N * N)
 potentialEnergy = interLJ.computeEnergy()
-print 'Start: tot energy = %10.6f pot = %10.6f kin = %10.f temp = %10.6f'%(kineticEnergy + potentialEnergy,
-           potentialEnergy, kineticEnergy, temperature)
-
-nsteps = 20
-
-for i in range(20):
-   integrator.run(nsteps)
-   temperature = temp.compute()
-   p = press.compute()
-   kineticEnergy = 0.5 * temperature * (3 * N * N * N)
-   potentialEnergy = interLJ.computeEnergy()
-   print 'Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f p = %f'%(nsteps*(i+1), 
-        kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature, p)
-
-# logging.getLogger("Langevin").setLevel(logging.INFO)
+print 'Start: tot energy = %10.6f pot = %10.6f kin = %10.f temp = %10.6f p = %10.6f'%(kineticEnergy + potentialEnergy,
+           potentialEnergy, kineticEnergy, temperature, p)
 
 langevin = espresso.integrator.Langevin(system)
-
 integrator.langevin = langevin
-
 langevin.gamma = 1.0
-langevin.temperature = 4.0
+langevin.temperature = 1.0
 
-print 'Heat up to t = ', langevin.temperature
+nsteps = 100
 
-for i in range(20):
+for i in range(1000):
    integrator.run(nsteps)
    temperature = temp.compute()
    p = press.compute()
    kineticEnergy = 0.5 * temperature * (3 * N * N * N)
    potentialEnergy = interLJ.computeEnergy()
    print 'Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f p = %f'%(nsteps*(i+1), 
-        kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature, p)
-
-langevin.temperature = 0.5
-
-print 'Cool down to t = ', langevin.temperature
-
-for i in range(40):
-   integrator.run(nsteps)
-   temperature = temp.compute()
-   p = press.compute()
-   kineticEnergy = 0.5 * temperature * (3 * N * N * N)
-   potentialEnergy = interLJ.computeEnergy()
-   print 'Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f p = %f'%(nsteps*(i+1),
         kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature, p)

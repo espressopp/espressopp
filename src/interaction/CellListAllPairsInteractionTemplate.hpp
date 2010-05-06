@@ -71,7 +71,7 @@ namespace espresso {
     template < typename _Potential > inline real 
     CellListAllPairsInteractionTemplate < _Potential >::
     computeVirial() {
-      LOG4ESPP_INFO(theLogger, "add forces computed for all pairs in the cell lists");
+      LOG4ESPP_INFO(theLogger, "computed virial for all pairs in the cell lists");
      
       real w = 0.0;
       for (iterator::CellListAllPairsIterator it(storage->getRealCells());
