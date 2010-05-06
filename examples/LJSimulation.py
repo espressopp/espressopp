@@ -112,26 +112,29 @@ system.addInteraction(interLJ)
 
 temp = espresso.analysis.Temperature(system)
 press = espresso.analysis.Pressure(system)
+pressTensor = espresso.analysis.PressureTensor(system)
 
 temperature = temp.compute()
 p = press.compute()
-kineticEnergy = 0.5 * temperature * (3 * N * N * N)
-potentialEnergy = interLJ.computeEnergy()
-print 'Start: tot energy = %10.6f pot = %10.6f kin = %10.f temp = %10.6f p = %10.6f'%(kineticEnergy + potentialEnergy,
-           potentialEnergy, kineticEnergy, temperature, p)
+pij = pressTensor.compute()
+Ek = 0.5 * temperature * (3 * N**3)
+Ep = interLJ.computeEnergy()
+print 'Start: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f pij = %10.3f' \
+      % (Ek + Ep, Ep, Ek, temperature, p, pij)
 
 langevin = espresso.integrator.Langevin(system)
 integrator.langevin = langevin
 langevin.gamma = 1.0
 langevin.temperature = 1.0
 
-nsteps = 100
+nsteps = 10
 
-for i in range(1000):
+for i in range(20):
    integrator.run(nsteps)
    temperature = temp.compute()
    p = press.compute()
-   kineticEnergy = 0.5 * temperature * (3 * N * N * N)
-   potentialEnergy = interLJ.computeEnergy()
-   print 'Step %6d: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %f p = %f'%(nsteps*(i+1), 
-        kineticEnergy + potentialEnergy, potentialEnergy, kineticEnergy, temperature, p)
+   pij = pressTensor.compute()
+   Ek = 0.5 * temperature * (3 * N**3)
+   Ep = interLJ.computeEnergy()
+   print 'Step %6d: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f pij = %10.3f' % \
+         (nsteps*(i+1), Ek + Ep, Ep, Ek, temperature, p, pij)

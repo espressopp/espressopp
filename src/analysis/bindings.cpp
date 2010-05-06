@@ -2,6 +2,7 @@
 #include "Observable.hpp"
 #include "Temperature.hpp"
 #include "Pressure.hpp"
+#include "PressureTensor.hpp"
 
 namespace espresso {
   namespace analysis {
@@ -9,6 +10,7 @@ namespace espresso {
       Observable::registerPython();
       Temperature::registerPython();
       Pressure::registerPython();
+      PressureTensor::registerPython();
     }
   }
 }

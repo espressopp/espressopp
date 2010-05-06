@@ -17,6 +17,7 @@ namespace espresso {
       virtual void addForces() = 0;
       virtual real computeEnergy() = 0;
       virtual real computeVirial() = 0;
+      virtual real computeVirialTensor() = 0;
 
       /** This method returns the maximal cutoff defined for one type pair. */
       virtual real getMaxCutoff() = 0;
