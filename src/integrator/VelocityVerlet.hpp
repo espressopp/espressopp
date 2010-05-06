@@ -4,6 +4,7 @@
 
 #include "types.hpp"
 #include "MDIntegrator.hpp"
+#include "esutil/Timer.hpp"
 
 namespace espresso {
 
@@ -55,6 +56,21 @@ namespace espresso {
         void printForces(bool withGhost);
 
         void setUp();   //<! set up for a new run
+
+        void resetTimers();
+
+        void printTimers();
+
+        esutil::WallTimer timeIntegrate;  //!< used for timing
+
+        // variables that keep time information about different phases
+
+        real timeResort;
+        real timeForce;
+        real timeComm1;
+        real timeComm2;
+        real timeInt1;
+        real timeInt2;
     };
   }
 }

@@ -13,8 +13,10 @@
 
 namespace espresso {
   namespace integrator {
+
     using namespace interaction;
     using namespace iterator;
+    using namespace esutil;
 
     VelocityVerlet::VelocityVerlet(shared_ptr< System > system) : MDIntegrator(system)
     {
@@ -42,6 +44,14 @@ namespace espresso {
 
     void VelocityVerlet::run(int nsteps)
     {
+      int nResorts = 0;
+
+      real      time;
+
+      timeIntegrate.reset();
+
+      resetTimers();
+
       System& system = getSystemRef();
 
       storage::Storage& storage = *system.storage;
@@ -55,11 +65,13 @@ namespace espresso {
       real maxDist;
 
       if (resortFlag) {
+        // time = timeIntegrate.getElapsedTime();
 	LOG4ESPP_INFO(theLogger, "resort particles");
 	storage.resortParticles();
 	LOG4ESPP_INFO(theLogger, "particles resort");
 	maxDist = 0.0;
 	resortFlag = false;
+        // timeResort += timeIntegrate.getElapsedTime();
       }
 
       bool recalcForces = true;  // TODO: more intelligent
@@ -102,32 +114,71 @@ namespace espresso {
       for (int i = 0; i < nsteps; i++) {
 
 	LOG4ESPP_INFO(theLogger, "Next step " << i << " of " << nsteps << " starts");
-
-	maxDist += integrate1();
+ 
+        time = timeIntegrate.getElapsedTime();
+        maxDist += integrate1();
+        timeInt1 += timeIntegrate.getElapsedTime() - time;
 
 	LOG4ESPP_INFO(theLogger, "maxDist = " << maxDist << ", skin/2 = " << skinHalf);
 
 	if (maxDist > skinHalf) resortFlag = true;
 
 	if (resortFlag) {
+          time = timeIntegrate.getElapsedTime();
 	  LOG4ESPP_INFO(theLogger, "step " << i << ": resort particles");
 	  storage.resortParticles();
 	  maxDist  = 0.0;
 	  resortFlag = false;
+          nResorts ++;
+          timeResort += timeIntegrate.getElapsedTime() - time;
 	}
 
-	storage.updateGhosts();
+        time = timeIntegrate.getElapsedTime();
+        storage.updateGhosts();
+        timeComm1 += timeIntegrate.getElapsedTime() - time;
 
-	calcForces();
+        time = timeIntegrate.getElapsedTime();
+        calcForces();
+        timeForce += timeIntegrate.getElapsedTime() - time;
 
-	storage.collectGhostForces();
+        time = timeIntegrate.getElapsedTime();
+        storage.collectGhostForces();
+        timeComm2 += timeIntegrate.getElapsedTime() - time;
 
         if (langevin) langevin->thermalize();
 
-	integrate2();
+        time = timeIntegrate.getElapsedTime();
+        integrate2();
+        timeInt2 += timeIntegrate.getElapsedTime() - time;
+
       }
 
       LOG4ESPP_INFO(theLogger, "finished run");
+
+      // ToDo: print Timers only if INFO is enabled
+
+      printTimers();
+    }
+
+    void VelocityVerlet::resetTimers()
+    {
+      real      timeResort = 0;
+      real      timeForce  = 0;
+      real      timeComm1  = 0;
+      real      timeComm2  = 0;
+      real      timeInt1   = 0;
+      real      timeInt2   = 0;
+    }
+
+    void VelocityVerlet::printTimers()
+    {
+      std::cout << "time: run = " << timeIntegrate <<
+                   ", force = " << timeForce <<
+                   ", comm1 = " << timeComm1 <<
+                   ", comm2 = " << timeComm2 <<
+                   ", int1 = " << timeInt1 <<
+                   ", int2 = " << timeInt2 <<
+                   ", resort = " << timeResort << std::endl; 
     }
 
     /*****************************************************************************/
