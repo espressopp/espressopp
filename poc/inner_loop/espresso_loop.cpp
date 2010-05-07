@@ -14,8 +14,8 @@ using espresso::esutil::WallTimer;
 using espresso::shared_ptr;
 using espresso::make_shared;
 
-const int NP0 = 10000;
-const int NP1 = 10000;
+const int NP0 = 20000;
+const int NP1 = 20000;
 const real L = 100.0;
 
 longint counter;
@@ -231,7 +231,7 @@ void interactionLoop() {
   shared_ptr< HalfSquarePairSet > type1half = make_shared< HalfSquarePairSet >(type1);
   shared_ptr< FullSquarePairSet > type01full = make_shared< FullSquarePairSet >(type0, type1);
 
-  // create computers
+  // create Potentials
   shared_ptr< LennardJones > lj00 = make_shared< LennardJones >(1.0, 1.0);
   shared_ptr< LennardJones > lj10 = make_shared< LennardJones >(1.0, 1.5);
   shared_ptr< LennardJones > lj11 = make_shared< LennardJones >(1.0, 2.0);
@@ -253,7 +253,9 @@ void interactionLoop() {
   std::cout << "Interaction-based loop: " << timer << " counter=" << counter << std::endl;
 }
 
-int main() {
+int main(int argc, char** argv) {
+  new boost::mpi::environment(argc, argv);
+
   setupSystem();
   espressoLoop();
   interactionLoop();
