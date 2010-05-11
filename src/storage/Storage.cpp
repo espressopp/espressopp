@@ -64,7 +64,8 @@ namespace espresso {
       }
     }
 
-    Particle *Storage::
+    Particle * 
+    Storage::
     addParticle(longint id, const ConstReal3DRef p) {
       Cell *cell;
 
@@ -184,6 +185,8 @@ namespace espresso {
       data << size;
       for (ParticleList::Iterator it(l); it.isValid(); ++it)
 	data << *it;
+      beforeSendParticles(l, data);
+
       l.clear();
 
       // ... and send
@@ -212,6 +215,7 @@ namespace espresso {
 	  data >> l[curSize + i];
 	}
       }
+      afterRecvParticles(l, data);
 
       LOG4ESPP_DEBUG(logger, "done");
     }

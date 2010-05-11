@@ -80,8 +80,7 @@ namespace espresso {
 
   struct ParticleLocal {
     int i[3];
-    int ghost;
-    std::vector< longint > bondList;
+    bool ghost;
 
   private:
     friend class boost::serialization::access;
@@ -91,7 +90,6 @@ namespace espresso {
       for (int ii = 0; ii < 3; ++ii)
 	ar & i[ii];
       ar & ghost;
-      ar & bondList;
     }
   };
 
@@ -105,8 +103,9 @@ namespace espresso {
     Particle() { init(); }
 
     void init() {
-      m.v[0] = m.v[1] = m.v[2] = 0;
+      m.v[0] = m.v[1] = m.v[2] = 0.0;
       p.type = 0;
+      l.ghost = false;
     }
 
   private:

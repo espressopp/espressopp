@@ -1,5 +1,5 @@
+#include "python.hpp"
 #include <cmath>
-#include <python.hpp>
 #include "Pressure.hpp"
 #include "storage/DomainDecomposition.hpp"
 #include "iterator/CellListIterator.hpp"

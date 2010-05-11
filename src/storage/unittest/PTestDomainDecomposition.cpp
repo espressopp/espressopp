@@ -9,6 +9,7 @@
 #include "iterator/CellListIterator.hpp"
 #include "bc/OrthorhombicBC.hpp"
 #include "Real3D.hpp"
+#include <iostream>
 
 using namespace espresso;
 using namespace espresso::esutil;
@@ -18,7 +19,7 @@ using namespace espresso::iterator;
 struct LoggingFixture {  
   LoggingFixture() { 
     LOG4ESPP_CONFIGURE();
-    log4espp::Logger::getRoot().setLevel(log4espp::Logger::TRACE);
+    //    log4espp::Logger::getRoot().setLevel(log4espp::Logger::TRACE);
   }
 };
 
@@ -30,7 +31,7 @@ struct Fixture {
 
   Fixture() {
     Real3D boxL(1.0, 2.0, 3.0);
-    int nodeGrid[3];
+    Int3D nodeGrid;
     int nodes = mpiWorld->size();
     for (int i = 0; i < 3; ++i) {
       // try to get 3 or 2 CPUs per column
@@ -43,7 +44,7 @@ struct Fixture {
 	nodeGrid[i] = nodes; nodes = 1;
       }
     }
-    int cellGrid[3] = { 1, 2, 3 };
+    Int3D cellGrid(1, 2, 3);
     system = make_shared< System >();
     system->rng = make_shared< esutil::RNG >();
     system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
@@ -63,6 +64,31 @@ struct Fixture {
   }
 };
 
+BOOST_AUTO_TEST_CASE(addAndLookup) {
+  shared_ptr< DomainDecomposition > domdec;
+  shared_ptr< System > system;
+
+  Real3D boxL(1.0);
+  Int3D nodeGrid(mpiWorld->size(), 1, 1);
+  Int3D cellGrid(1);
+
+  system = make_shared< System >();
+  system->rng = make_shared< esutil::RNG >();
+  system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
+  domdec = make_shared< DomainDecomposition >(system,
+					      mpiWorld,
+					      nodeGrid,
+					      cellGrid);
+
+  
+  // create a single particle
+  Real3D pos(0.5, 0.5, 0.5);
+  Particle *p = domdec->addParticle(0, pos);
+
+  // now check whether it is there
+  BOOST_CHECK_EQUAL(domdec->lookupRealParticle(0), p);
+}
+
 BOOST_AUTO_TEST_CASE(constructDomainDecomposition) 
 {
   Real3D boxL(1.0, 2.0, 3.0);
@@ -72,8 +98,8 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
   system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
 
   for(int i = 0; i < 3; ++i) {
-    int nodeGrid[3] = { 1, 1, 1 };
-    int cellGrid[3] = { 1, 1, 1 };
+    Int3D nodeGrid(1);
+    Int3D cellGrid(1);
     nodeGrid[i] = 0;
     BOOST_CHECK_THROW(DomainDecomposition
 		      (system, mpiWorld, nodeGrid, cellGrid),
@@ -81,8 +107,8 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
   }
 
   for(int i = 0; i < 3; ++i) {
-    int nodeGrid[3] = { mpiWorld->size(), 1, 1 };
-    int cellGrid[3] = { 1, 1, 1 };
+    Int3D nodeGrid(mpiWorld->size(), 1, 1);
+    Int3D cellGrid(1);
     cellGrid[i] = 0;
     BOOST_CHECK_THROW(DomainDecomposition
 		      (system, mpiWorld, nodeGrid, cellGrid),
@@ -90,8 +116,8 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
   }
 
   {
-    int nodeGrid[3] = { mpiWorld->size(), 2, 1 };
-    int cellGrid[3] = { 1, 1, 1 };
+    Int3D nodeGrid(mpiWorld->size(), 2, 1);
+    Int3D cellGrid(1);
     BOOST_CHECK_THROW(DomainDecomposition(system,
 					  mpiWorld,
 					  nodeGrid,
@@ -357,4 +383,78 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
   }
 
   BOOST_TEST_MESSAGE("done with collect ghost forces");
+}
+
+bool afterResortCalled = false;
+bool beforeResortCalled = false;
+
+void beforeResort(ParticleList &pl, boost::mpi::packed_oarchive &ar) {
+  if (pl.size() == 1) {
+    beforeResortCalled = true;
+    int res = 42;
+    ar << res;
+  }
+}
+
+void afterResort(ParticleList &pl, boost::mpi::packed_iarchive &ar) {
+  if (pl.size() == 1) {
+    afterResortCalled = true;
+    int res;
+    ar >> res;
+    BOOST_CHECK_EQUAL(res, 42);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(migrateParticle) 
+{
+  // check whether a particle is migrated from one node to the other
+  // and whether it takes all data with it
+  shared_ptr< DomainDecomposition > domdec;
+  shared_ptr< System > system;
+
+  int nodes = mpiWorld->size();
+  int lastnode = nodes-1;
+  Real3D boxL(nodes*1.0, 1.0, 1.0);
+  Int3D nodeGrid(nodes, 1, 1);
+  Int3D cellGrid(1);
+
+  system = make_shared< System >();
+  system->rng = make_shared< esutil::RNG >();
+  system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
+  domdec = make_shared< DomainDecomposition >(system,
+					      mpiWorld,
+					      nodeGrid,
+					      cellGrid);
+
+  
+  BOOST_TEST_MESSAGE("Setting up system...");
+
+  // connect test functions to domdec
+  domdec->beforeSendParticles.connect(beforeResort);
+  domdec->afterRecvParticles.connect(afterResort);
+
+  // create a single particle on node 0 that really belongs to the last node
+  Real3D pos(nodes*1.0 - 0.5, 0.5, 0.5);
+  if (mpiWorld->rank() == 0) {
+    Particle *p = domdec->addParticle(0, pos);
+    BOOST_CHECK_EQUAL(domdec->lookupRealParticle(0), p);
+  }
+
+  BOOST_TEST_MESSAGE("Resorting particles...");
+
+  // now resort the particles
+  domdec->resortParticles();
+
+  // now the particle should be on the the last node
+  if (mpiWorld->rank() == lastnode) {
+    BOOST_CHECK_NE(domdec->lookupRealParticle(0), static_cast<Particle*>(0));
+  } else {
+    BOOST_CHECK_EQUAL(domdec->lookupRealParticle(0), static_cast<Particle*>(0));
+  }
+
+  if (mpiWorld->rank() == 0)
+    BOOST_CHECK(beforeResortCalled);
+
+  if (mpiWorld->rank() == lastnode)
+    BOOST_CHECK(afterResortCalled);
 }

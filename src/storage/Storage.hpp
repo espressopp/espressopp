@@ -92,6 +92,10 @@ namespace espresso {
       virtual void collectGhostForces() = 0;
 
       boost::signals2::signal0<void> onResortParticles;
+      boost::signals2::signal2<void, ParticleList&, mpi::packed_oarchive&> 
+      beforeSendParticles;
+      boost::signals2::signal2<void, ParticleList&, mpi::packed_iarchive&> 
+      afterRecvParticles;
 
       /* variant for python that ignores the return value */
       void pyAddParticle(longint id, const ConstReal3DRef pos);
