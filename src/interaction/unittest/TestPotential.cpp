@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(TestAbsoluteDistanceDependentPotential)
   Real3D f;
   r = 1.0;
   // non-virtual
-  BOOST_CHECK_EQUAL(pot._computeForce(r, f), true);
+  BOOST_CHECK_EQUAL(pot._computeForce(f, r), true);
   BOOST_CHECK_EQUAL(r, f);
 
   r = 2.0;
