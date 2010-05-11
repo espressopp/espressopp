@@ -1,8 +1,8 @@
 // ESPP_CLASS
 #ifndef _STORAGE_STORAGE_HPP
 #define _STORAGE_STORAGE_HPP
-#include <vector>
 #include "mpi.hpp"
+#include <vector>
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
 #include "types.hpp"

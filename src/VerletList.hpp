@@ -1,6 +1,6 @@
 // ESPP_CLASS
-#ifndef _VERLET_LIST_HPP
-#define _VERLET_LIST_HPP
+#ifndef _VERLETLIST_HPP
+#define _VERLETLIST_HPP
 
 #include "log4espp.hpp"
 #include "types.hpp"

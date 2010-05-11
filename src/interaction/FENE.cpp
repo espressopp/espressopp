@@ -26,13 +26,6 @@ namespace espresso {
         ("interaction_VerletListFENE", init< shared_ptr<VerletList> >())
         .def("setPotential", &VerletListFENE::setPotential);
       ;
-      
-      typedef class CellListAllPairsInteractionTemplate< FENE > 
-	CellListFENE;
-      class_< CellListFENE, bases< Interaction > > 
-        ("interaction_CellListFENE", init< shared_ptr< storage::Storage > >())
-        .def("setPotential", &CellListFENE::setPotential);
-        ;
     }
 
   }

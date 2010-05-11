@@ -36,3 +36,8 @@ for file in $FILES; do
     fi
 done
 echo >> SubMakefile.am
+
+# * check macro definition at the beggining of the .hpp file?
+# * check namespace in the file?
+# * add class to bindings.cpp
+# * add class to __init__.py?

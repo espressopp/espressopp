@@ -29,10 +29,10 @@ namespace espresso {
         .def("setPotential", &VerletListLennardJones::setPotential);
         ;
 
-      class_< CellListLennardJones, bases< Interaction > > 
-        ("interaction_CellListLennardJones", init< shared_ptr< storage::Storage > >())
-        .def("setPotential", &CellListLennardJones::setPotential);
-        ;
+	class_< CellListLennardJones, bases< Interaction > > 
+	  ("interaction_CellListLennardJones", init< shared_ptr< storage::Storage > >())
+	  .def("setPotential", &CellListLennardJones::setPotential);
+	;
     }
     
   }

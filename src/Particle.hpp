@@ -81,7 +81,7 @@ namespace espresso {
   struct ParticleLocal {
     int i[3];
     int ghost;
-    std::vector<int> bondList;
+    std::vector< longint > bondList;
 
   private:
     friend class boost::serialization::access;
