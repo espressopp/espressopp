@@ -2,6 +2,7 @@
 #include "Potential.hpp"
 #include "LennardJones.hpp"
 #include "FENE.hpp"
+#include "Tabulated.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -9,6 +10,7 @@ namespace espresso {
       Potential::registerPython();
       Interaction::registerPython();
       LennardJones::registerPython();
+      Tabulated::registerPython();
       FENE::registerPython();
     }
   }
