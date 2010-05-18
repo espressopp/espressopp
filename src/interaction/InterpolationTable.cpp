@@ -17,18 +17,13 @@ namespace espresso {
 
       energy2 = NULL;
       force2  = NULL;
+
+      allocated = false;
     }
 
     InterpolationTable::~InterpolationTable()
     {
-      // free the allocated memory
-
-      delete [] radius;
-      delete [] energy;
-      delete [] force;
-
-      delete [] energy2;
-      delete [] force2;
+      LOG4ESPP_INFO(theLogger, "~InterpolcationTable");
     }
 
     /** Spline read-in values. */
@@ -76,9 +71,11 @@ namespace espresso {
       delete [] u;
     }
 
-    int InterpolationTable::readFile(const char* file)
+    int InterpolationTable::readFile(const char* file, bool dummy)
     {
       char line[MAXLINE];
+
+      real r, e, f;
 
       FILE *fp = fopen(file, "r");
 
@@ -93,102 +90,62 @@ namespace espresso {
 
         if (fgets(line, MAXLINE, fp) == NULL) break;
 
-        real r, e, f;
-
         int k = sscanf(line, "%lg %lg %lg", &r, &e, &f);
 
         if (k < 3) continue;    // do not accept this line
+
+        if (!dummy) {
+          radius[N] = r;
+          energy[N] = e;
+          force[N]  = f;
+        }
 
         N++;   // increment counter for table entries
       }
 
       fclose(fp);
 
-      LOG4ESPP_INFO(theLogger, "found " << N << " valid lines in file " << file);
-  
-      if (N < 2) {
-        LOG4ESPP_ERROR(theLogger, "File " << file << " does not contain tabulated " <<
-                       "potential, need at least 2 lines: radius energy force");
-        return 0;
+      if (dummy) {
+        LOG4ESPP_INFO(theLogger, "found " << N << " table entries file " << file);
+      } else {
+        LOG4ESPP_INFO(theLogger, "read " << N << " table entries in file " << file);
       }
 
-      // allocate the arrays
+      return N;
+    }
+  
+    void InterpolationTable::read(mpi::communicator comm, const char* file)
+    {
+      int root = 0;  // control processor
+
+      if (comm.rank() == root) N = readFile(file, true);  // dummy read
+
+      mpi::broadcast(comm, N, root);
+
+      if (N < 2) {
+         throw std::runtime_error("illegal file for tabulated potential");
+      }
 
       radius = new real[N];
       energy = new real[N];
       force  = new real[N];
-      
-      // now read again and add set the values
 
-      N = 0;
+      if (comm.rank() == root) readFile(file, false);
 
-      fp = fopen(file, "r");
+      mpi::broadcast(comm, radius, N, root);
+      mpi::broadcast(comm, energy, N, root);
+      mpi::broadcast(comm, force, N, root);
 
-      assert (fp != NULL);
+      delta = radius[1] - radius[0];
 
-      while (1) {
-
-        if (fgets(line, MAXLINE, fp) == NULL) break;
-
-        real r, e, f;
-
-        int k = sscanf(line, "%lg %lg %lg", &r, &e, &f);
-
-        if (k < 3) continue;    // do not accept this line
-
-        radius[N] = r;
-        energy[N] = e;
-        force[N]  = f;
-
-        N++;   // increment counter for table entries
+      if (delta <= 0.0) {
+         LOG4ESPP_ERROR(theLogger, "illegal distance for entries")
       }
-
-      LOG4ESPP_INFO(theLogger, "made " << N << " entries from file " << file);
-
-      fclose(fp);
-
-      return N;
-    }
-
-    void InterpolationTable::read(const char* file)
-    {
-      int rank = 0;
-
-      if (rank == 0) {
- 
-        // only control processor reads the file
-
-        N = readFile(file);
-
-        // now broadcast the number of entries, take 0 as an error
-
-        // mpi::broadcast(N);
-
-        if (N < 1) return;
-
-      } else {
-
-        // mpi::broadcast(N);
-
-        // allocate the arrays
-
-        radius = new real[N];
-        energy = new real[N];
-        force  = new real[N];
-      }
-      
-      // mpi::broadcast(N);
-
-      // make some checks 
-
-      real dist = radius[1] - radius[0];
-
-      assert(dist > 0.0);
 
       for (int i = 2; i < N; i++) {
          real r = radius[i] - radius[i-1];
-         if (abs(r - dist) > 0.0001) {
-            LOG4ESPP_ERROR(theLogger, "distance " << r << " not same as " << dist);
+         if (fabs(r - delta) > 0.0001) {
+            LOG4ESPP_ERROR(theLogger, "delta " << r << " not same as " << delta);
          }
       }
 
@@ -197,7 +154,7 @@ namespace espresso {
       inner = radius[0];
       real outer = radius[N-1];
  
-      delta    = (outer - inner) / nbins;
+      delta  = (outer - inner) / nbins;
 
       LOG4ESPP_INFO(theLogger, "tab file has range " << inner << " - "
                               << outer << ", delta = " << delta);
@@ -223,17 +180,19 @@ namespace espresso {
       spline(radius, force, N, yp1, ypN, force2);
     }
 
-    real InterpolationTable::splineInterpolation(real r, const double* fn, const double* fn2) const
+    /**************************************************************************
+    *                                                                         *
+    **************************************************************************/
+
+    real InterpolationTable::splineInterpolation(real r, const double* fn, 
+                                                         const double* fn2) const
     {
       int index = static_cast<int>((r - inner) * invdelta);
-
-      // printf("r = %10.3f maps to index %d, N = %d\n", r, index, N);
 
       if (index < 0 || index >= N) {
          LOG4ESPP_ERROR(theLogger, "distance " << r << " out of range "
                         << inner << " - " << inner + (N - 1) * delta);
-         printf("invdelta = %f\n", invdelta);
-         exit(-1);
+         
       }
 
       real b = (r - radius[index]) * invdelta;

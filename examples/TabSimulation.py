@@ -31,21 +31,18 @@ def writeTabFile(name):
     outfile.close()
 
 # Input values for system
-N = 10
-# box size
-size   = (10.0, 10.0, 10.0)
-# number of particles
-numParticles = 1000
-# Cutoff
-cutoff = 2.5
-# File with tabulated energy and forces
-tabfile = "pair.txt"
-if not os.path.exists(tabfile):
-   writeTabFile(tabfile)
-# skin
-skin   = 0.3
+
+N = 10                                   # box size
+size  = (float(N), float(N), float(N))
+numParticles = 1000                      # number of particles
+
+cutoff = 2.5                             # Cutoff for LJ potential
+
+tabfile = "pair.txt"                     # File with tabulated potential
+skin    = 0.3                             # skin for Verlet lists
 
 # compute the number of cells on each node
+
 def calcNumberCells(size, nodes, cutoff):
     ncells = 1
     while size / (ncells * nodes) >= cutoff:

@@ -9,12 +9,14 @@ namespace espresso {
 
     void Tabulated::setFilename(const char* _filename)
     {
+      boost::mpi::communicator world;
+
       filename = _filename;
 
       // create a new InterpolationTable
 
-      table = InterpolationTable();
-      table.read(_filename);
+      table = make_shared< InterpolationTable > ();
+      table->read(world, _filename);
     }
 
     typedef class VerletListInteractionTemplate< Tabulated > 

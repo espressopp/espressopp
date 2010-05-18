@@ -4,6 +4,7 @@
 
 #include "types.hpp"
 #include "logging.hpp"
+#include "mpi.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -30,6 +31,7 @@ namespace espresso {
     */
 
     class InterpolationTable {
+
     public:
 
       InterpolationTable();
@@ -38,7 +40,7 @@ namespace espresso {
 
       /** Read in the radius, energy, force values; creates spline tables */
 
-      void read(const char* file);
+      void read(mpi::communicator comm, const char* file);
 
       real getEnergy(real r) const;
 
@@ -51,11 +53,17 @@ namespace espresso {
 
     private:
 
+      /** make copy constructor private because copy is not allowed. */
+
+      InterpolationTable(const InterpolationTable&) {}
+
       /** Reading values from file, control processor only; returns
           number of valid entries, error if value is less than 2 
+
+          if dummy is true, values will not be stored in arrays r, e, f
       */
 
-      int readFile(const char* file);
+      int readFile(const char* file, bool dummy);
 
       /** Spline read-in values. */
 
@@ -72,6 +80,8 @@ namespace espresso {
       real delta;
       real invdelta;
       real deltasq6;
+
+      bool allocated;
 
       real *radius;
       real *energy;
