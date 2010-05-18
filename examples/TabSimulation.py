@@ -7,12 +7,28 @@
 ###########################################################################
 
 import sys
+import os
 import espresso
 import MPI
 import math
 import logging
 
 from espresso import Real3D, Int3D
+
+def writeTabFile(name):
+    outfile = open(name, "w")
+    N = 151
+    inner = 0.5
+    outer = 2.5
+    delta = (outer - inner) / (N - 1)
+    for i in range(N):
+        r = inner + i * delta;
+        frac2 = 1.0 / (r * r);
+        frac6 = frac2 * frac2 * frac2;
+        force = 48.0 * (frac6 * frac6 - 0.5 * frac6);
+        energy = 4.0 * (frac6 * frac6 - frac6);
+        outfile.write("%15.8g %15.8g %15.8g\n"%(r, energy, force))
+    outfile.close()
 
 # Input values for system
 N = 10
@@ -24,6 +40,8 @@ numParticles = 1000
 cutoff = 2.5
 # File with tabulated energy and forces
 tabfile = "pair.txt"
+if not os.path.exists(tabfile):
+   writeTabFile(tabfile)
 # skin
 skin   = 0.3
 
@@ -92,9 +110,11 @@ print 'integrator.dt = %g, is now '%integrator.dt
 # now build Verlet List
 # ATTENTION: you must not add the skin explicitly here
 
+logging.getLogger("InterpolationTable").setLevel(logging.INFO)
+
 vl = espresso.VerletList(system, cutoff = cutoff + system.skin)
 potTab = espresso.interaction.Tabulated(filename = tabfile, cutoff = cutoff)
-potLJ = espresso.interaction.LennardJones(sigma = 1.0, epsilon = 1.0, shift = 0.0, cutoff = cutoff)
+potLJ  = espresso.interaction.LennardJones(sigma = 1.0, epsilon = 1.0, shift = 0.0, cutoff = cutoff)
 
 print('tabulated potential from file %s'%potTab.filename)
 
