@@ -3,6 +3,7 @@
 #define _INTERACTION_INTERPOLATION_TABLE_HPP
 
 #include "types.hpp"
+#include "logging.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -43,7 +44,18 @@ namespace espresso {
 
       real getForce(real r) const;
 
+    protected:
+
+      /** Logger */
+      static LOG4ESPP_DECL_LOGGER(theLogger);
+
     private:
+
+      /** Reading values from file, control processor only; returns
+          number of valid entries, error if value is less than 2 
+      */
+
+      int readFile(const char* file);
 
       /** Spline read-in values. */
 

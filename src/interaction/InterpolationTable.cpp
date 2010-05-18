@@ -1,10 +1,16 @@
 #include "InterpolationTable.hpp"
 
+#define MAXLINE 1024
+
 namespace espresso {
   namespace interaction {
 
+    LOG4ESPP_LOGGER(InterpolationTable::theLogger, "InterpolationTable");
+
     InterpolationTable::InterpolationTable()
     {
+      // NULLify pointers in case of errors
+
       radius = NULL;
       energy = NULL;
       force  = NULL;
@@ -70,35 +76,134 @@ namespace espresso {
       delete [] u;
     }
 
-    void InterpolationTable::read(const char* file)
+    int InterpolationTable::readFile(const char* file)
     {
-      inner = 0.6;
-      real outer = 3.0;
- 
-      N = 201;
+      char line[MAXLINE];
 
-      int nbins = N - 1;  // number of intervals is number of points - 1
+      FILE *fp = fopen(file, "r");
 
-      delta    = (outer - inner) / nbins;
-      invdelta = 1.0 / delta;
-      deltasq6 = delta * delta / 6.0;
+      if (fp == NULL) {
+        LOG4ESPP_ERROR(theLogger, "could not open file " << file);
+        return 0;
+      }
+
+      int N = 0;
+
+      while (1) {
+
+        if (fgets(line, MAXLINE, fp) == NULL) break;
+
+        real r, e, f;
+
+        int k = sscanf(line, "%lg %lg %lg", &r, &e, &f);
+
+        if (k < 3) continue;    // do not accept this line
+
+        N++;   // increment counter for table entries
+      }
+
+      fclose(fp);
+
+      LOG4ESPP_INFO(theLogger, "found " << N << " valid lines in file " << file);
+  
+      if (N < 2) {
+        LOG4ESPP_ERROR(theLogger, "File " << file << " does not contain tabulated " <<
+                       "potential, need at least 2 lines: radius energy force");
+        return 0;
+      }
 
       // allocate the arrays
 
       radius = new real[N];
       energy = new real[N];
       force  = new real[N];
+      
+      // now read again and add set the values
 
-      // start with a test file 
+      N = 0;
 
-      for (int i=0; i < N; i++) {
-         real r = inner + i * delta;
-         real frac2 = 1.0 / (r * r);
-         real frac6 = frac2 * frac2 * frac2;
-         radius[i] = r;
-         force[i] = 48.0 * (frac6 * frac6 - 0.5 * frac6);
-         energy[i] = 4.0 * (frac6 * frac6 - frac6);
+      fp = fopen(file, "r");
+
+      assert (fp != NULL);
+
+      while (1) {
+
+        if (fgets(line, MAXLINE, fp) == NULL) break;
+
+        real r, e, f;
+
+        int k = sscanf(line, "%lg %lg %lg", &r, &e, &f);
+
+        if (k < 3) continue;    // do not accept this line
+
+        radius[N] = r;
+        energy[N] = e;
+        force[N]  = f;
+
+        N++;   // increment counter for table entries
       }
+
+      LOG4ESPP_INFO(theLogger, "made " << N << " entries from file " << file);
+
+      fclose(fp);
+
+      return N;
+    }
+
+    void InterpolationTable::read(const char* file)
+    {
+      int rank = 0;
+
+      if (rank == 0) {
+ 
+        // only control processor reads the file
+
+        N = readFile(file);
+
+        // now broadcast the number of entries, take 0 as an error
+
+        // mpi::broadcast(N);
+
+        if (N < 1) return;
+
+      } else {
+
+        // mpi::broadcast(N);
+
+        // allocate the arrays
+
+        radius = new real[N];
+        energy = new real[N];
+        force  = new real[N];
+      }
+      
+      // mpi::broadcast(N);
+
+      // make some checks 
+
+      real dist = radius[1] - radius[0];
+
+      assert(dist > 0.0);
+
+      for (int i = 2; i < N; i++) {
+         real r = radius[i] - radius[i-1];
+         if (abs(r - dist) > 0.0001) {
+            LOG4ESPP_ERROR(theLogger, "distance " << r << " not same as " << dist);
+         }
+      }
+
+      int nbins = N - 1;  // number of intervals is number of points - 1
+
+      inner = radius[0];
+      real outer = radius[N-1];
+ 
+      delta    = (outer - inner) / nbins;
+
+      LOG4ESPP_INFO(theLogger, "tab file has range " << inner << " - "
+                              << outer << ", delta = " << delta);
+
+      invdelta = 1.0 / delta;
+      deltasq6 = delta * delta / 6.0;
 
       energy2 = new real[N];
       force2  = new real[N];
@@ -124,7 +229,12 @@ namespace espresso {
 
       // printf("r = %10.3f maps to index %d, N = %d\n", r, index, N);
 
-      assert(index >=0 && index < N-1);
+      if (index < 0 || index >= N) {
+         LOG4ESPP_ERROR(theLogger, "distance " << r << " out of range "
+                        << inner << " - " << inner + (N - 1) * delta);
+         printf("invdelta = %f\n", invdelta);
+         exit(-1);
+      }
 
       real b = (r - radius[index]) * invdelta;
       real a = 1.0 - b;
