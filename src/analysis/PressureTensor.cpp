@@ -1,5 +1,5 @@
+#include "python.hpp"
 #include <cmath>
-#include <python.hpp>
 #include "PressureTensor.hpp"
 #include "storage/DomainDecomposition.hpp"
 #include "iterator/CellListIterator.hpp"
@@ -57,9 +57,11 @@ namespace espresso {
       // compute the short-range nonbonded contribution
       // loop over interaction types
       real rij_dot_Fij = 0.0;
+      real wij[6];
       const InteractionList& srIL = system.shortRangeInteractions;
       for (size_t j = 0; j < srIL.size(); j++) {
-        rij_dot_Fij += srIL[j]->computeVirialTensor();
+        srIL[j]->computeVirialTensor(wij);
+        rij_dot_Fij += wij[3];
       }
       real p_nonbonded = rij_dot_Fij / (3.0 * V);
 
