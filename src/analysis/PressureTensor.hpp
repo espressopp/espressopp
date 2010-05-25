@@ -13,6 +13,7 @@ namespace espresso {
       PressureTensor(shared_ptr< System > system) : Observable(system) {}
       ~PressureTensor() {}
       virtual real compute() const;
+      virtual void computeTensor(real wij[6]) const;
 
       static void registerPython();
     };

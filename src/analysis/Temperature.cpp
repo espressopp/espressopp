@@ -3,7 +3,6 @@
 #include "Temperature.hpp"
 #include "storage/DomainDecomposition.hpp"
 #include "iterator/CellListIterator.hpp"
-#include "mpi.hpp"
 
 using namespace espresso;
 using namespace iterator;
@@ -29,8 +28,10 @@ namespace espresso {
 
       // will Controller always be 0?
       // how to do this with only 1 collective call?
-      boost::mpi::reduce(*mpiWorld, v2sum, sumT, std::plus<real>(), 0);
-      boost::mpi::reduce(*mpiWorld, myN, systemN, std::plus<int>(), 0);
+
+      sumT = system.sum(v2sum);
+      systemN = system.sum(myN);
+
       return sumT / (3.0 * systemN);
     }
 

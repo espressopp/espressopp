@@ -4,12 +4,32 @@
 #include "storage/Storage.hpp"
 #include "interaction/Interaction.hpp"
 #include "esutil/RNG.hpp"
+#include "mpi.hpp"
 
 namespace espresso {
 
   void System::addInteraction(shared_ptr< interaction::Interaction > ia)
   {
     shortRangeInteractions.push_back(ia);
+  }
+
+  int System::sum(int sumLocal)
+  {
+    int sumGlobal;
+    boost::mpi::reduce(*comm.get(), sumLocal, sumGlobal, std::plus<int>(), 0);
+    return sumGlobal;
+  }
+
+  real System::sum(real sumLocal)
+  {
+    real sumGlobal;
+    boost::mpi::reduce(*comm.get(), sumLocal, sumGlobal, std::plus<real>(), 0);
+    return sumGlobal;
+  }
+
+  void System::sum(real* sumLocal, real* sumGlobal, int N)
+  {
+    boost::mpi::reduce(*comm.get(), sumLocal, N, sumGlobal, std::plus<real>(), 0);
   }
 
   //////////////////////////////////////////////////

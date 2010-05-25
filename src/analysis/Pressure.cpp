@@ -7,7 +7,6 @@
 #include "interaction/Interaction.hpp"
 #include "interaction/Potential.hpp"
 #include "VerletList.hpp"
-#include "mpi.hpp"
 
 using namespace espresso;
 using namespace iterator;
@@ -23,7 +22,7 @@ namespace espresso {
       int N;
       int Nsum;
       N = system.storage->getNRealParticles();
-      boost::mpi::reduce(*mpiWorld, N, Nsum, std::plus<int>(), 0);
+      Nsum = system.sum(N);
 
       // determine volume of the box
       Real3D Li = system.bc->getBoxL();
@@ -38,7 +37,7 @@ namespace espresso {
       CellList realCells = system.storage->getRealCells();
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
         v2 = v2 + pow(cit->m.v[0], 2) + pow(cit->m.v[1], 2) + pow(cit->m.v[2], 2);
-      boost::mpi::reduce(*mpiWorld, v2, v2sum, std::plus<real>(), 0);
+      v2sum = system.sum(v2);
       e_kinetic = 0.5 * v2sum;
       p_kinetic = 2.0 * e_kinetic / (3.0 * V);
 
@@ -49,8 +48,8 @@ namespace espresso {
       for (size_t j = 0; j < srIL.size(); j++) {
         rij_dot_Fij += srIL[j]->computeVirial();
       }
-      real p_nonbonded = rij_dot_Fij / (3.0 * V);
-
+      real p_nonbonded = system.sum(rij_dot_Fij / (3.0 * V));
+ 
       return (p_kinetic + p_nonbonded);
     }
 
