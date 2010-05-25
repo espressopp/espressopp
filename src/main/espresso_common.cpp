@@ -18,7 +18,11 @@ void initMPIEnv(int &argc, char **&argv) {
 
 void initMPIEnv() {
   if (theEnvironment == 0) {
-    theEnvironment = new boost::mpi::environment();
+#ifdef BOOST_MPI_HAS_NOARG_INITIALIZATION
+    theEnvironment = new boost::mpi::environment1();
+#else
+    throw std::runtime_error("MPI cannot be initialized without arguments");
+#endif
   }
 }
 
