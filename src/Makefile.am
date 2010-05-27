@@ -17,8 +17,12 @@ noinst_HEADERS += \
 	include/mpi.hpp \
 	include/python.hpp \
 	include/types.hpp \
+	include/esconfig.hpp \
 	bindings.hpp \
+	SystemAccess.hpp \
 	esutil/bindings.hpp \
+	esutil/Grid.hpp \
+	esutil/Array2D.hpp \
 	bc/bindings.hpp \
 	storage/bindings.hpp \
 	interaction/bindings.hpp \

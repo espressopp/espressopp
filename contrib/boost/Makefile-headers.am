@@ -240,6 +240,7 @@ noinst_HEADERS = \
 	boost/smart_ptr/weak_ptr.hpp \
 	boost/smart_ptr/bad_weak_ptr.hpp \
 	boost/smart_ptr/scoped_ptr.hpp \
+	boost/smart_ptr/make_shared.hpp \
 	boost/smart_ptr/detail/spinlock.hpp \
 	boost/smart_ptr/detail/yield_k.hpp \
 	boost/smart_ptr/detail/sp_counted_base_acc_ia64.hpp \
@@ -754,6 +755,7 @@ noinst_HEADERS = \
 	boost/utility.hpp \
 	boost/progress.hpp \
 	boost/enable_shared_from_this.hpp \
+	boost/make_shared.hpp \
 	boost/next_prior.hpp \
 	boost/function/function3.hpp \
 	boost/function/function6.hpp \

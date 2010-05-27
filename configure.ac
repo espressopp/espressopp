@@ -263,7 +263,6 @@ AC_CONFIG_FILES([Makefile
                  contrib/boost/Makefile
                  contrib/mpi4py/Makefile
                  src/Makefile 
-		 poc/Makefile
 		 doc/Makefile
 		 doc/dg/Makefile
                  test/Makefile
@@ -293,7 +292,6 @@ AC_CONFIG_FILES([
        	espresso_setup.csh:setup/espresso_setup.csh.build.in
        	espresso_setup.py:setup/espresso_setup.py.build.in
        	espresso_setup.py.install:setup/espresso_setup.py.install.in
-	poc/__init__.py
        ])
 
 # create a link to the src dir by the name of espresso
