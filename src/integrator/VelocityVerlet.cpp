@@ -162,12 +162,12 @@ namespace espresso {
 
     void VelocityVerlet::resetTimers()
     {
-      real      timeResort = 0;
-      real      timeForce  = 0;
-      real      timeComm1  = 0;
-      real      timeComm2  = 0;
-      real      timeInt1   = 0;
-      real      timeInt2   = 0;
+      timeResort = 0;
+      timeForce  = 0;
+      timeComm1  = 0;
+      timeComm2  = 0;
+      timeInt1   = 0;
+      timeInt2   = 0;
     }
 
     void VelocityVerlet::printTimers()

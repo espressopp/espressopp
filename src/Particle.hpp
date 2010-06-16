@@ -6,12 +6,14 @@
 #include <vector>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/list.hpp>
+#include <boost/mpi.hpp>
 #include "esutil/ESPPIterator.hpp"
 
 namespace espresso {
   struct ParticleProperties {
     size_t id;
     size_t type;
+    real mass;
 
   private:
     friend class boost::serialization::access;
@@ -20,6 +22,7 @@ namespace espresso {
     {
       ar & id;
       ar & type;
+      ar & mass;
     }
   };
 
@@ -77,6 +80,7 @@ namespace espresso {
 	ar & v[i];
     }
   };
+
 
   struct ParticleLocal {
     int i[3];
@@ -145,4 +149,12 @@ namespace espresso {
   };
 
 }
+
+BOOST_IS_MPI_DATATYPE(espresso::ParticlePosition)
+BOOST_CLASS_TRACKING(espresso::ParticlePosition,track_never)
+BOOST_IS_MPI_DATATYPE(espresso::ParticleForce)
+BOOST_IS_MPI_DATATYPE(espresso::ParticleMomentum)
+BOOST_IS_MPI_DATATYPE(espresso::ParticleLocal)
+
+
 #endif
