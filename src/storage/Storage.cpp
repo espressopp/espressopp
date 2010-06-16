@@ -111,7 +111,8 @@ namespace espresso {
       return p;
     }
 
-    Particle *Storage::moveUnindexedParticle(ParticleList &dl, ParticleList &sl, int i)
+    Particle* Storage::
+    moveUnindexedParticle(ParticleList &dl, ParticleList &sl, int i)
     {
       dl.push_back(sl[i]);
       int newSize = sl.size() - 1;
@@ -122,7 +123,8 @@ namespace espresso {
       return &dl.back();
     }
 
-    Particle *Storage::moveIndexedParticle(ParticleList &dl, ParticleList &sl, int i)
+    Particle* Storage::
+    moveIndexedParticle(ParticleList &dl, ParticleList &sl, int i)
     {
       // see whether the arrays were resized; STL hack
       Particle *dbegin = &dl.front();

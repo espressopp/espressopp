@@ -1,4 +1,7 @@
-python_scripts=main.py hello.py
+# python script handling
+include $(top_srcdir)/build-aux/macros/axes_python.am
+
+python_SCRIPTS = main.py hello.py
 
 EXTRA_DIST = $(python_scripts)
 
@@ -24,8 +27,3 @@ espresso_SOURCES= main_embedded.cpp _espresso.cpp $(hello_sources)
 espresso_CPPFLAGS = $(AM_CPPFLAGS)
 espresso_LDADD=$(ESPRESSO_BOOST_LIBS) $(PYTHON_LIBS)
 
-# python script handling
-include $(top_srcdir)/build-aux/macros/axes_python.am
-
-all-local: python-all
-clean-local: python-clean

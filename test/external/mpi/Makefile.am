@@ -4,8 +4,7 @@
 #  MPI test programs verify that MPI works correctly
 #
 
-noinst_PROGRAMS = probe barrier
-check_PROGRAMS = cpi comm mpiTest
+check_PROGRAMS = cpi comm mpiTest barrier probe
 
 LDADD = $(MPI_LIBS)
 

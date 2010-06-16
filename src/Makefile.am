@@ -66,6 +66,8 @@ libpylogger_la_SOURCES = \
 libpylogger_la_LIBADD = \
 	$(ESPRESSO_BOOST_LIBS)
 
+EXTRA_DIST += $(python_SCRIPTS)
+
 # python script handling
 include $(top_srcdir)/build-aux/macros/axes_python.am
 
@@ -87,7 +89,7 @@ _espresso_la_LIBADD = \
 	libpylogger.la
 endif # ENABLE_SHARED
 
-# the embedded python interpreter that makes _espresso and _boostmpi a builtin
+# the embedded python interpreter that makes _espresso and MPI a builtin
 bin_PROGRAMS = pypresso 
 pypresso_SOURCES = main/pypresso.cpp
 pypresso_LDADD = \

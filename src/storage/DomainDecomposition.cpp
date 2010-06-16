@@ -190,7 +190,8 @@ namespace espresso {
       return nodeGrid.mapPositionToNodeClipped(pos);
     }
 
-    bool DomainDecomposition::appendParticles(ParticleList &l, int dir) {
+    bool DomainDecomposition::
+    appendParticles(ParticleList &l, int dir) {
       bool outlier = false;
 
       LOG4ESPP_DEBUG(logger, "got " << l.size() << " particles");
@@ -223,6 +224,7 @@ namespace espresso {
       LOG4ESPP_DEBUG(logger, "starting, expected comm buffer size " << exchangeBufferSize);
 
       // allocate send/recv buffers. We use the size as we need maximally so far, to avoid reallocation
+      // TODO: This might be a problem when all particles are created on a single node initially!
       ParticleList sendBufL;
       sendBufL.reserve(exchangeBufferSize);
       ParticleList sendBufR;
@@ -232,9 +234,9 @@ namespace espresso {
       ParticleList recvBufR;
       recvBufR.reserve(exchangeBufferSize);
 
-      int nNodesFinished;
+      bool allFinished;
       do {
-	int finished = 1;
+	bool finished = true;
 
 	for (int coord = 0; coord < 3; ++coord) {
 	  LOG4ESPP_DEBUG(logger, "starting with direction " << coord);
@@ -243,36 +245,41 @@ namespace espresso {
 	    for (std::vector<Cell*>::iterator it = realCells.begin(),
 		   end = realCells.end(); it != end; ++it) {
 	      Cell &cell = **it;
-	      // do not use an iterator here, since we have need to take out particles during the loop
+	      // do not use an iterator here, since we need to take out particles during the loop
 	      for (size_t p = 0; p < cell.particles.size(); ++p) {
 		Particle &part = cell.particles[p];
+		// check whether the particle is now "left" of the local domain
 		if (part.r.p[coord] - cellGrid.getMyLeft(coord) < -ROUND_ERROR_PREC) {
 		  LOG4ESPP_TRACE(logger, "send particle left " << part.p.id);
 		  moveIndexedParticle(sendBufL, cell.particles, p);
 		  localParticles.erase(part.p.id);
 		  // redo same particle since we took one out here, so it's a new one
 		  --p;
+		// check whether the particle is now "right" of the local domain
 		} else if (part.r.p[coord] - cellGrid.getMyRight(coord) >= ROUND_ERROR_PREC) {
 		  LOG4ESPP_TRACE(logger, "send particle right " << part.p.id);
 		  moveIndexedParticle(sendBufR, cell.particles, p);
 		  localParticles.erase(part.p.id);
 		  --p;
-		}                                
+		}
 		// Sort particles in cells of this node during last direction
 		else if (coord == 2) {
 		  Cell *sortCell = mapPositionToCellChecked(part.r.p);
 		  if (sortCell != &cell) {
 		    if (sortCell == 0) {
+		      // particle is not in the local domain
 		      LOG4ESPP_DEBUG(logger, "take another loop: particle " << part.p.id
 				     << " @ " << part.r.p[0] << ", " << part.r.p[1] << ", "
 				     << part.r.p[2] << " is not inside node domain after neighbor exchange");
 		      if (isnan(part.r.p[0]) || isnan(part.r.p[1]) || isnan(part.r.p[2])) {
+			// TODO: error handling
 			LOG4ESPP_ERROR(logger, "particle " << part.p.id << " has moved to outer space (one or more coordinates are nan)");
 		      } else {
 			// particle stays where it is, and will be sorted in the next round
-			finished = 0;
+			finished = false;
 		      }
 		    } else {
+		      // particle is in the local domain
 		      moveIndexedParticle(sortCell->particles, cell.particles, p);
 		      --p;
 		    }
@@ -295,18 +302,20 @@ namespace espresso {
 	    }
 
 	    // sort received particles to cells
-	    if (appendParticles(recvBufL, 2 * coord) && coord == 2) finished = 0;
-	    if (appendParticles(recvBufR, 2 * coord + 1) && coord == 2) finished = 0;
+	    if (appendParticles(recvBufL, 2 * coord) && coord == 2) finished = false;
+	    if (appendParticles(recvBufR, 2 * coord + 1) && coord == 2) finished = false;
 
 	    // reset send/recv buffers
 	    sendBufL.resize(0);
 	    sendBufR.resize(0);
 	    recvBufL.resize(0);
 	    recvBufR.resize(0);
+
+
 	  } else {
 	    /* Single node direction case (no communication)
 	       Fold particles that have left the box */
-	    for (std::vector<Cell*>::iterator it = realCells.begin(),
+	    for (std::vector< Cell* >::iterator it = realCells.begin(),
 		   end = realCells.end(); it != end; ++it) {
 	      Cell &cell = **it;
 	      // do not use an iterator here, since we have need to take out particles during the loop
@@ -327,7 +336,7 @@ namespace espresso {
 			LOG4ESPP_ERROR(logger, "particle " << part.p.id << " has moved to outer space (one or more coordinates are nan)");
 		      } else {
 			// particle stays where it is, and will be sorted in the next round
-			finished = 0;
+			finished = false;
 		      }
 		    } else {
 		      moveIndexedParticle(sortCell->particles, cell.particles, p);
@@ -343,8 +352,8 @@ namespace espresso {
 	}
 
 	// Communicate wether particle exchange is finished
-	mpi::all_reduce(*comm, finished, nNodesFinished, std::plus<int>());
-      } while (nNodesFinished < comm->size());
+	mpi::all_reduce(*comm, finished, allFinished, std::logical_and<bool>());
+      } while (!allFinished);
 
       exchangeBufferSize = std::max(exchangeBufferSize,
 				    std::max(sendBufL.capacity(),
@@ -457,10 +466,10 @@ namespace espresso {
       }
     }
 
-    void DomainDecomposition::doGhostCommunication(bool sizesFirst,
-						   bool realToGhosts,
-						   int extradata) {
-      LOG4ESPP_DEBUG(logger, "do ghost communication " << (sizesFirst ? "with sizes " : "") << (realToGhosts ? "reals to ghosts " : "ghosts to reals ") << extradata);
+    void DomainDecomposition::
+    doGhostCommunication(bool sizesFirst, bool realToGhosts, int extradata) {
+      LOG4ESPP_DEBUG(logger, "do ghost communication " << (sizesFirst ? "with sizes " : "") 
+		     << (realToGhosts ? "reals to ghosts " : "ghosts to reals ") << extradata);
       
       /* direction loop: x, y, z.
 	 Here we could in principle build in a one sided ghost

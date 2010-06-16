@@ -200,11 +200,11 @@ namespace espresso {
       /** here the local particles are actually stored */
       LocalCellList cells;
 
-      /** list of real cells */
+      /** List of real cells */
       CellList realCells;
-      /** list of ghost cells */
+      /** List of ghost cells */
       CellList ghostCells;
-      /** all cells on this CPU. Just an index of the cells */
+      /** All cells on this CPU, ghost and real cells. */
       CellList localCells;
 
       static LOG4ESPP_DECL_LOGGER(logger);
