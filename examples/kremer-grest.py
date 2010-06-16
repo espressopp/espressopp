@@ -19,7 +19,12 @@ ljfunc = interaction.LennardJonesFunction(
     epsilon=1.0, sigma=1.0, cutoff=2.0)
 ljint.setParameters(type1=0, type2=1, ljfunc)
 
+bonds = BondList(system)
+feneint = interation.BondListFENE(bonds)
+fenefunc = interaction.FENE(...)
+
 integrator = integrator.VelocityVerlet(system, timestep=0.001)
 integrator.addInteraction(ljint)
+integrator.addInteraction(feneint)
 
 integrator.run(steps=1000)

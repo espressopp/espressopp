@@ -103,8 +103,6 @@ print "potLJ, shift = %g"%potLJ.shift
 
 interLJ = espresso.interaction.VerletListLennardJones(vl)
 interLJ.setPotential(type1 = 0, type2 = 0, potential = potLJ)
-potLJ1 = espresso.interaction.LennardJones(1.0, 1.0, cutoff = cutoff)
-
 
 # Todo
 

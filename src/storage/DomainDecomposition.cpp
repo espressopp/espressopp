@@ -257,7 +257,8 @@ namespace espresso {
 		  moveIndexedParticle(sendBufR, cell.particles, p);
 		  localParticles.erase(part.p.id);
 		  --p;
-		}                                // Sort particles in cells of this node during last direction
+		}                                
+		// Sort particles in cells of this node during last direction
 		else if (coord == 2) {
 		  Cell *sortCell = mapPositionToCellChecked(part.r.p);
 		  if (sortCell != &cell) {
