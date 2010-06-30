@@ -68,9 +68,7 @@ namespace espresso {
 
     void Langevin::frictionThermo(Particle& p)
     {
-      // double massf = sqrt(PMASS(*p));
- 
-      double massf = 1.0;
+      double massf = sqrt(p.p.mass);
 
       for (int j = 0 ; j < 3 ; j++) {
 	p.f.f[j] += pref1 * p.m.v[j] + pref2*((*rng)()-0.5)*massf;

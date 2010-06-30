@@ -37,12 +37,13 @@ namespace espresso {
 
       CellList realCells = system.storage->getRealCells();
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-        vvLocal[0] += cit->m.v[0] * cit->m.v[0];
-        vvLocal[1] += cit->m.v[1] * cit->m.v[1];
-        vvLocal[2] += cit->m.v[2] * cit->m.v[2];
-        vvLocal[3] += cit->m.v[0] * cit->m.v[1];
-        vvLocal[4] += cit->m.v[0] * cit->m.v[2];
-        vvLocal[5] += cit->m.v[1] * cit->m.v[2];
+        real mass = cit->p.mass;
+        vvLocal[0] += mass * cit->m.v[0] * cit->m.v[0];
+        vvLocal[1] += mass * cit->m.v[1] * cit->m.v[1];
+        vvLocal[2] += mass * cit->m.v[2] * cit->m.v[2];
+        vvLocal[3] += mass * cit->m.v[0] * cit->m.v[1];
+        vvLocal[4] += mass * cit->m.v[0] * cit->m.v[2];
+        vvLocal[5] += mass * cit->m.v[1] * cit->m.v[2];
       }
 
       system.sum(vvLocal, vv, 6);

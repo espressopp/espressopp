@@ -36,7 +36,7 @@ namespace espresso {
 
       CellList realCells = system.storage->getRealCells();
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit)
-        v2 = v2 + pow(cit->m.v[0], 2) + pow(cit->m.v[1], 2) + pow(cit->m.v[2], 2);
+        v2 = v2 + cit->p.mass * (pow(cit->m.v[0], 2) + pow(cit->m.v[1], 2) + pow(cit->m.v[2], 2));
       v2sum = system.sum(v2);
       e_kinetic = 0.5 * v2sum;
       p_kinetic = 2.0 * e_kinetic / (3.0 * V);

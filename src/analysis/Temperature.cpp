@@ -21,7 +21,8 @@ namespace espresso {
       CellList realCells = system.storage->getRealCells();
 
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-        v2sum = v2sum + pow(cit->m.v[0], 2) + pow(cit->m.v[1], 2) + pow(cit->m.v[2], 2);
+        real v2 = pow(cit->m.v[0], 2) + pow(cit->m.v[1], 2) + pow(cit->m.v[2], 2);
+        v2sum += cit->p.mass * v2;
       }
       
       myN = system.storage->getNRealParticles();

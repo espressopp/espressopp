@@ -162,12 +162,12 @@ namespace espresso {
 
     void VelocityVerlet::resetTimers()
     {
-      timeResort = 0;
-      timeForce  = 0;
-      timeComm1  = 0;
-      timeComm2  = 0;
-      timeInt1   = 0;
-      timeInt2   = 0;
+      timeResort = 0.0;
+      timeForce  = 0.0;
+      timeComm1  = 0.0;
+      timeComm2  = 0.0;
+      timeInt1   = 0.0;
+      timeInt2   = 0.0;
     }
 
     void VelocityVerlet::printTimers()
@@ -216,9 +216,11 @@ namespace espresso {
               
         */
 
+        real dtfm = 0.5 * dt / cit->p.mass;
+
 	for (int j = 0; j < 3; j++) {
 	  // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) 
-	  cit->m.v[j] += 0.5 * dt * cit->f.f[j];
+	  cit->m.v[j] += dtfm * cit->f.f[j];
 	  // Propagate positions (only NVT): p(t + dt)   = p(t) + dt * v(t+0.5*dt) 
 	  real deltaP = dt * cit->m.v[j];
 	  cit->r.p[j] += deltaP;
@@ -254,10 +256,12 @@ namespace espresso {
 
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
+        real dtfm = 0.5 * dt / cit->p.mass;
+
 	for (int j = 0; j < 3; j++) {
 
 	  /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
-	  cit->m.v[j] += 0.5 * dt * cit->f.f[j];
+	  cit->m.v[j] += dtfm * cit->f.f[j];
 	}
       }
     }
