@@ -109,6 +109,7 @@ namespace espresso {
     void init() {
       m.v[0] = m.v[1] = m.v[2] = 0.0;
       p.type = 0;
+      p.mass = 1.0;
       l.ghost = false;
     }
 
@@ -150,11 +151,18 @@ namespace espresso {
 
 }
 
+BOOST_IS_MPI_DATATYPE(espresso::ParticleProperties)
 BOOST_IS_MPI_DATATYPE(espresso::ParticlePosition)
-BOOST_CLASS_TRACKING(espresso::ParticlePosition,track_never)
 BOOST_IS_MPI_DATATYPE(espresso::ParticleForce)
 BOOST_IS_MPI_DATATYPE(espresso::ParticleMomentum)
 BOOST_IS_MPI_DATATYPE(espresso::ParticleLocal)
+BOOST_IS_MPI_DATATYPE(espresso::Particle)
 
+BOOST_CLASS_TRACKING(espresso::ParticleProperties,track_never)
+BOOST_CLASS_TRACKING(espresso::ParticlePosition,track_never)
+BOOST_CLASS_TRACKING(espresso::ParticleForce,track_never)
+BOOST_CLASS_TRACKING(espresso::ParticleMomentum,track_never)
+BOOST_CLASS_TRACKING(espresso::ParticleLocal,track_never)
+BOOST_CLASS_TRACKING(espresso::Particle,track_never)
 
 #endif
