@@ -9,6 +9,7 @@ from espresso.Real3D import *
 from espresso.Int3D import *
 from espresso.System import *
 from espresso.VerletList import *
+from espresso.FixedPairList import *
 
 infinity=float("inf")
 nan=float("nan")

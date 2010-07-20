@@ -2,6 +2,7 @@
 #ifndef _FIXEDPAIRLIST_HPP
 #define _FIXEDPAIRLIST_HPP
 
+#include "log4espp.hpp"
 #include "types.hpp"
 
 #include "Particle.hpp"
@@ -30,6 +31,9 @@ namespace espresso {
     void afterRecvParticles(ParticleList& pl, 
 			    mpi::packed_iarchive& ar);
     void onResortParticles();
+    static void registerPython();
+  private:
+    static LOG4ESPP_DECL_LOGGER(theLogger);
   };
 }
 

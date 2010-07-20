@@ -1,3 +1,6 @@
+#include "python.hpp"
+#define LOG4ESPP_LEVEL_DEBUG
+
 #include "FixedPairList.hpp"
 
 #include <vector>
@@ -9,9 +12,14 @@
 using namespace std;
 
 namespace espresso {
+
+  LOG4ESPP_LOGGER(FixedPairList::theLogger, "FixedPairList");
+
   FixedPairList::FixedPairList(shared_ptr< storage::Storage > _storage) 
     : storage(_storage), globalPairs()
   {
+    LOG4ESPP_INFO(theLogger, "construct FixedPairList");
+
     con1 = storage->beforeSendParticles.connect
       (boost::bind(&FixedPairList::beforeSendParticles, this, _1, _2));
     con2 = storage->afterRecvParticles.connect
@@ -21,6 +29,9 @@ namespace espresso {
   }
 
   FixedPairList::~FixedPairList() {
+
+    LOG4ESPP_INFO(theLogger, "~FixedPairList");
+
     con1.disconnect();
     con2.disconnect();
     con3.disconnect();
@@ -35,6 +46,7 @@ namespace espresso {
   add(longint pid1, longint pid2) {
     if (pid1 > pid2)
       std::swap(pid1, pid2);
+
     // ADD THE LOCAL PAIR
     Particle *p1 = storage->lookupRealParticle(pid1);
     Particle *p2 = storage->lookupLocalParticle(pid2);
@@ -53,9 +65,10 @@ namespace espresso {
     std::pair<GlobalPairs::const_iterator, 
       GlobalPairs::const_iterator> equalRange 
       = globalPairs.equal_range(pid1);
-    if (equalRange.first == globalPairs.end())
+    if (equalRange.first == globalPairs.end()) {
       // if it hasn't, insert the new pair
       globalPairs.insert(make_pair(pid1, pid2));
+    }
     else {
       // otherwise test whether the pair already exists
       for (GlobalPairs::const_iterator it = equalRange.first;
@@ -66,6 +79,7 @@ namespace espresso {
       // if not, insert the new pair
       globalPairs.insert(equalRange.first, make_pair(pid1, pid2));
     }
+    LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
   }
 
   void FixedPairList::
@@ -101,6 +115,7 @@ namespace espresso {
     }
     // send the list
     ar << toSend;
+    LOG4ESPP_INFO(theLogger, "prepared fixed pair list before send particles");
   }
 
   void FixedPairList::
@@ -122,6 +137,7 @@ namespace espresso {
 	it = globalPairs.insert(it, make_pair(pid1, pid2));
       }
     }
+    LOG4ESPP_INFO(theLogger, "received fixed pair list after receive particles");
   }
 
   void FixedPairList::
@@ -140,5 +156,20 @@ namespace espresso {
       p2 = storage->lookupLocalParticle(it->second);
       this->add(p1, p2);
     }
+    LOG4ESPP_INFO(theLogger, "regenerated local fixed pair list from global list");
+  }
+
+  /****************************************************
+  ** REGISTRATION WITH PYTHON
+  ****************************************************/
+
+  void FixedPairList::registerPython() {
+
+    using namespace espresso::python;
+
+    class_<FixedPairList, shared_ptr<FixedPairList> >
+
+      ("FixedPairList", init< shared_ptr<storage::Storage> >())
+      ;
   }
 }
