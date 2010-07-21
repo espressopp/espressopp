@@ -55,9 +55,7 @@ class TestVerletList(espresso.unittest.TestCase) :
        print 'NodeGrid = %s'%(nodeGrid,)
        print 'CellGrid = %s'%cellGrid
 
-       dd = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
-
-       system.storage = dd
+       system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
 
        id = 0
 
@@ -71,13 +69,13 @@ class TestVerletList(espresso.unittest.TestCase) :
              y = (j + r) / N * SIZE
              z = (k + r) / N * SIZE
    
-             dd.addParticle(id, Real3D(x, y, z))
+             system.storage.addParticle(id, Real3D(x, y, z))
 
              # not yet: dd.setVelocity(id, (1.0, 0.0, 0.0))
 
              id = id + 1
 
-       dd.resortParticles()
+       system.storage.decompose()
 
        integrator = espresso.integrator.VelocityVerlet(system)
 

@@ -205,7 +205,7 @@ struct LatticeFixture : DomainFixture {
       cit->m.v[0] = 1.0;
     }
 
-    domdec->resortParticles();
+    domdec->decompose();
     // make analysis object and call compute temperature
     Temperature myT(system);
     real T = myT.compute();

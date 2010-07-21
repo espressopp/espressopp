@@ -77,7 +77,7 @@ class TestVerletList(espresso.unittest.TestCase) :
 
              id = id + 1
 
-       dd.resortParticles()
+       dd.decompose()
 
        integrator = espresso.integrator.VelocityVerlet(system)
 

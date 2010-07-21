@@ -208,7 +208,7 @@ struct LatticeFixture : DomainFixture {
     BOOST_MESSAGE("number of lattice particles in storage = " <<
                    domdec->getNRealParticles());
 
-    domdec->resortParticles();
+    domdec->decompose();
   }
 };
 
