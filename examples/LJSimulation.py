@@ -118,7 +118,7 @@ pij = pressTensor.compute()
 Ek = 0.5 * temperature * (3 * N**3)
 Ep = interLJ.computeEnergy()
 print 'Start: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f pij = %10.3f' \
-      % (Ek + Ep, Ep, Ek, temperature, p, pij)
+      % (Ek + Ep, Ep, Ek, temperature, p, pij[3])
 
 langevin = espresso.integrator.Langevin(system)
 integrator.langevin = langevin
@@ -135,4 +135,4 @@ for i in range(20):
    Ek = 0.5 * temperature * (3 * N**3)
    Ep = interLJ.computeEnergy()
    print 'Step %6d: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f pij = %10.3f' % \
-         (nsteps*(i+1), Ek + Ep, Ep, Ek, temperature, p, pij)
+         (nsteps*(i+1), Ek + Ep, Ep, Ek, temperature, p, pij[3])
