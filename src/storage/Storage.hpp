@@ -98,11 +98,15 @@ namespace espresso {
       afterRecvParticles;
 
       /* variant for python that ignores the return value */
-      void pyAddParticle(longint id, const ConstReal3DRef pos);
+      bool pyAddParticle(longint id, const ConstReal3DRef pos);
 
       static void registerPython();
 
     protected:
+      /** Check whether a particle belongs to this node. */
+      virtual bool checkIsRealParticle(longint id, 
+				       const ConstReal3DRef pos) = 0;
+
       /** called by resortParticles to initiate resorting of the real
 	  particles. This should _not_ touch the ghosts.
       */

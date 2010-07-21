@@ -64,9 +64,11 @@ namespace espresso {
       }
     }
 
-    Particle * 
-    Storage::
+    Particle* Storage::
     addParticle(longint id, const ConstReal3DRef p) {
+      if (!checkIsRealParticle(id, p))
+	return static_cast< Particle* >(0);
+
       Cell *cell;
 
       Particle n;
@@ -412,9 +414,9 @@ namespace espresso {
       }
     }
 
-    void Storage::
+    bool Storage::
     pyAddParticle(longint id, const ConstReal3DRef p) {
-      addParticle(id, p);
+      return addParticle(id, p) != 0;
     }
 
     //////////////////////////////////////////////////

@@ -37,6 +37,7 @@ namespace espresso {
       static void registerPython();
 
     protected:
+      virtual bool checkIsRealParticle(longint id, const ConstReal3DRef pos);
       virtual void resortRealParticles();
       virtual void exchangeGhosts();
 

@@ -17,7 +17,7 @@ namespace espresso {
 
   private:
     friend class boost::serialization::access;
-    template<class Archive>
+    template< class Archive >
     void serialize(Archive &ar, const unsigned int version)
     {
       ar & id;
@@ -37,7 +37,7 @@ namespace espresso {
 
   private:
     friend class boost::serialization::access;
-    template<class Archive>
+    template< class Archive >
     void serialize(Archive &ar, const unsigned int version)
     {
       for (int i = 0; i < 3; ++i)
@@ -60,7 +60,7 @@ namespace espresso {
 
   private:
     friend class boost::serialization::access;
-    template<class Archive>
+    template< class Archive >
     void serialize(Archive &ar, const unsigned int version)
     {
       for (int i = 0; i < 3; ++i)
@@ -73,7 +73,7 @@ namespace espresso {
 
   private:
     friend class boost::serialization::access;
-    template<class Archive>
+    template< class Archive >
     void serialize(Archive &ar, const unsigned int version)
     {
       for (int i = 0; i < 3; ++i)
@@ -88,7 +88,7 @@ namespace espresso {
 
   private:
     friend class boost::serialization::access;
-    template<class Archive>
+    template< class Archive >
     void serialize(Archive &ar, const unsigned int version)
     {
       for (int ii = 0; ii < 3; ++ii)
@@ -115,7 +115,7 @@ namespace espresso {
 
   private:
     friend class boost::serialization::access;
-    template<class Archive>
+    template< class Archive >
     void serialize(Archive &ar, const unsigned int version)
     {
       ar & p & r & m & f & l;

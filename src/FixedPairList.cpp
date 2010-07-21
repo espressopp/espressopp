@@ -37,13 +37,6 @@ namespace espresso {
     con3.disconnect();
   }
 
-  /** Add the given particle pair to the list on this processor if the
-      particle with the lower id belongs to this processor.  Note that
-      this routine does not check whether the pair is inserted on
-      another processor as well.  
-
-      \return whether the particle was inserted on this processor.
-   */
   bool FixedPairList::
   add(longint pid1, longint pid2) {
     if (pid1 > pid2)
@@ -56,7 +49,7 @@ namespace espresso {
       // Particle does not exist here, return false
       return false;
     if (!p2)
-      // TODO: Second particle do not exist here, throw exception!
+      // TODO: Second particle does not exist here, throw exception!
       return false;
     // add the pair locally
     this->add(p1, p2);

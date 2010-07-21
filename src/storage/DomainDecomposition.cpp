@@ -191,6 +191,11 @@ namespace espresso {
     }
 
     bool DomainDecomposition::
+    checkIsRealParticle(longint id, const ConstReal3DRef pos) {
+      return mpiWorld->rank() == mapPositionToNodeClipped(pos);
+    }
+
+    bool DomainDecomposition::
     appendParticles(ParticleList &l, int dir) {
       bool outlier = false;
 

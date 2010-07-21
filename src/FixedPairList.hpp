@@ -18,12 +18,19 @@ namespace espresso {
     typedef boost::unordered_multimap< longint, longint > GlobalPairs;
     GlobalPairs globalPairs;
 
-  public:
     using PairList::add;
 
+  public:
     FixedPairList(shared_ptr< storage::Storage > _storage);
     ~FixedPairList();
 
+    /** Add the given particle pair to the list on this processor if the
+	particle with the lower id belongs to this processor.  Note that
+	this routine does not check whether the pair is inserted on
+	another processor as well.  
+	
+	\return whether the particle was inserted on this processor.
+    */
     bool add(longint pid1, longint pid2);
 
     void beforeSendParticles(ParticleList& pl, 
