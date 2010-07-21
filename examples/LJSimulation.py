@@ -14,6 +14,9 @@ import logging
 
 from espresso import Real3D, Int3D
 
+# Kremer-Grest switch
+kg = True
+
 # Input values for system
 N = 10
 # box size
@@ -80,6 +83,14 @@ for i in range(N):
       pid = pid + 1
 
 system.storage.decompose()
+
+if kg:
+  fpl = espresso.FixedPairList(system.storage)
+  potFENE = espresso.interaction.FENE(K=1.0, r0=0.0, rMax=1.0)
+  interFENE = espresso.interaction.FixedPairListFENE(fpl)
+  # are types needed in next line
+  interFENE.setPotential(type1 = 0, type2 = 0, potential = potFENE)
+  system.addInteraction(interFENE)
 
 integrator = espresso.integrator.VelocityVerlet(system)
 
