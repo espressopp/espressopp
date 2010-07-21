@@ -37,7 +37,7 @@ namespace espresso {
 			     mpi::packed_oarchive& ar);
     void afterRecvParticles(ParticleList& pl, 
 			    mpi::packed_iarchive& ar);
-    void onResortParticles();
+    void onParticlesChanged();
     static void registerPython();
   private:
     static LOG4ESPP_DECL_LOGGER(theLogger);

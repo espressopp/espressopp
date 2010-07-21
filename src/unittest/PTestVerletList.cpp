@@ -92,41 +92,6 @@ struct DomainFixture {
   }
 };
 
-// sets up a storage with particles in a lattice
-
-struct LatticeFixture : DomainFixture {
-
-  LatticeFixture() : DomainFixture(1.0) {
-
-    int id = 0;
-    for (int i = 0; i < N; i++) {
-      for (int j = 0; j < N; j++) {
-        for (int k = 0; k < N; k++) {
-
-          // real r = 0.4 + 0.2 * rng();
-          real r = 0.5;
-          real x = (i + r) / N * SIZE;
-          real y = (j + r) / N * SIZE; 
-          real z = (k + r) / N * SIZE;
-          real pos[3] = { x, y, z };
-      
-          if (mpiWorld->rank() == 0) {
-            BOOST_MESSAGE("add particle at pos " << x << " " << y << " " << z);
-            domdec->addParticle(id, pos);
-          }
-
-          id++;
-        }
-      }
-    }
-
-    BOOST_MESSAGE("number of lattice particles in storage = " <<
-                   domdec->getNRealParticles());
-
-    domdec->resortParticles();
-  }
-};
-
 // sets up a storage with random particles
 
 struct RandomFixture : DomainFixture {
@@ -158,57 +123,9 @@ struct RandomFixture : DomainFixture {
     BOOST_MESSAGE("number of random particles in storage = " <<
                    domdec->getNRealParticles());
 
-    domdec->resortParticles();
+    domdec->decompose();
   }
 };
-
-BOOST_FIXTURE_TEST_CASE(LatticeTest, LatticeFixture)
-{
-  BOOST_MESSAGE("starting to build verlet lists");
-
-  shared_ptr< VerletList > vl = make_shared< VerletList >(system, 0.0);
-
-  PairList pairs = vl->getPairs();
-
-  // there are no pairs for cutoff 0.0
-
-  int localPairs = pairs.size();
-  int globalPairs;
-
-  boost::mpi::all_reduce(*mpiWorld, localPairs, globalPairs, std::plus<int>());
-
-  BOOST_CHECK_EQUAL(globalPairs, 0);
-
-  vl = make_shared< VerletList >(system, 1.0);
-
-  // there are N * N * N * 6 / 2 pairs in cutoff 1.0
-
-  pairs = vl->getPairs();
-  localPairs = pairs.size();
-  boost::mpi::all_reduce(*mpiWorld, localPairs, globalPairs, std::plus<int>());
-
-  BOOST_CHECK_EQUAL(globalPairs, N * N * N * 3);
-
-  // there are N * N * N * 18 / 2 pairs in cutoff  sqrt(2.0)
-
-  vl = make_shared< VerletList >(system, pow(2.0, 0.5));
-
-  pairs = vl->getPairs();
-  localPairs = pairs.size();
-  boost::mpi::all_reduce(*mpiWorld, localPairs, globalPairs, std::plus<int>());
-
-  BOOST_CHECK_EQUAL(globalPairs, N * N * N * 9);
-
-  vl = make_shared< VerletList >(system, pow(3.0, 0.5));
-
-  pairs = vl->getPairs();
-  localPairs = pairs.size();
-  boost::mpi::all_reduce(*mpiWorld, localPairs, globalPairs, std::plus<int>());
-
-  // there are N * N * N * 26 / 2 pairs in cutoff 
-
-  BOOST_CHECK_EQUAL(globalPairs, N * N * N * 13);
-}
 
 real getDistSqr(Particle& p1, Particle& p2)
 {

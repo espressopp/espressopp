@@ -38,7 +38,7 @@ namespace espresso {
 
     protected:
       virtual bool checkIsRealParticle(longint id, const ConstReal3DRef pos);
-      virtual void resortRealParticles();
+      virtual void decomposeRealParticles();
       virtual void exchangeGhosts();
 
       void doGhostCommunication(bool sizesFirst,

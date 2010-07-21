@@ -23,9 +23,6 @@ if pmi.isController:
     class Storage(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            localcall = [ ],
-            pmicall = [ "resortParticles", 
-                        "addParticle", 
-                        "addParticles" ],
+            pmicall = [ "decompose", "addParticle", "addParticles" ],
             pmiproperty = [ "system" ]
             )

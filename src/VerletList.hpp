@@ -37,11 +37,9 @@ namespace espresso {
     void rebuild();
 
     /** Get the total number of pairs for the Verlet list */
-
     int totalSize() const;
 
     /** Register this class so it can be used from Python. */
-
     static void registerPython();
 
   private:

@@ -24,8 +24,8 @@ namespace espresso {
       (boost::bind(&FixedPairList::beforeSendParticles, this, _1, _2));
     con2 = storage->afterRecvParticles.connect
       (boost::bind(&FixedPairList::afterRecvParticles, this, _1, _2));
-    con3 = storage->onResortParticles.connect
-      (boost::bind(&FixedPairList::onResortParticles, this));
+    con3 = storage->onParticlesChanged.connect
+      (boost::bind(&FixedPairList::onParticlesChanged, this));
   }
 
   FixedPairList::~FixedPairList() {
@@ -136,7 +136,7 @@ namespace espresso {
   }
 
   void FixedPairList::
-  onResortParticles() {
+  onParticlesChanged() {
     // (re-)generate the local bond list from the global list
     this->clear();
     longint lastpid1 = -1;

@@ -67,7 +67,7 @@ namespace espresso {
       if (resortFlag) {
         // time = timeIntegrate.getElapsedTime();
 	LOG4ESPP_INFO(theLogger, "resort particles");
-	storage.resortParticles();
+	storage.decompose();
 	LOG4ESPP_INFO(theLogger, "particles resort");
 	maxDist = 0.0;
 	resortFlag = false;
@@ -126,7 +126,7 @@ namespace espresso {
 	if (resortFlag) {
           time = timeIntegrate.getElapsedTime();
 	  LOG4ESPP_INFO(theLogger, "step " << i << ": resort particles");
-	  storage.resortParticles();
+	  storage.decompose();
 	  maxDist  = 0.0;
 	  resortFlag = false;
           nResorts ++;

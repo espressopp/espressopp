@@ -239,15 +239,14 @@ namespace espresso {
       }
     }
 
-    void Storage::resortParticles()
-    {
+    void Storage::decompose() {
       invalidateGhosts();
 
-      resortRealParticles();
+      decomposeRealParticles();
 
       exchangeGhosts();
 
-      onResortParticles();
+      onParticlesChanged();
     }
 
     void Storage::packPositionsEtc(boost::mpi::packed_oarchive &ar,
@@ -428,7 +427,7 @@ namespace espresso {
       using namespace espresso::python;
       class_< Storage, boost::noncopyable >("storage_Storage", no_init)
 	.def("addParticle", &Storage::pyAddParticle)
-	.def("resortParticles", &Storage::resortParticles)
+	.def("decompose", &Storage::decompose)
         .add_property("system", &Storage::getSystem)
 	;
     }

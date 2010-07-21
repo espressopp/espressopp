@@ -64,14 +64,22 @@ namespace espresso {
 	  outside the domain of this node, return 0. */
       virtual Cell *mapPositionToCellChecked(const ConstReal3DRef pos) = 0;
 
-      /** sort the particles. This should be called by the integrator
-	  instead of updateGhosts() whenever a particle might have moved
-	  more than a given skin. The skin is not an issue of the
-	  storage, but all algorithms using the particle data need to be
-	  aware that particles might located up to skin away from their
+      /** (Re-)Decompose the system, i.e. redistribute the particles
+	  to the correct processors.
+
+	  This should be called by any parallel algorithm that works
+	  with the particle data at the beggining of the
+	  algorithm. Otherwise, it is not guaranteed that the
+	  particles are at the correct processor.
+
+	  This should be called by the integrator instead of
+	  updateGhosts() whenever a particle might have moved more
+	  than a given skin. The skin is not an issue of the storage,
+	  but all algorithms using the particle data need to be aware
+	  that particles might located up to skin away from their
 	  current cell.
       */
-      void resortParticles();
+      void decompose();
 
       /** copy minimal information from the real to the ghost
 	  particles.  Typically this copies the positions and maybe the
@@ -91,7 +99,14 @@ namespace espresso {
       */
       virtual void collectGhostForces() = 0;
 
-      boost::signals2::signal0<void> onResortParticles;
+      /** Ths signal will be called whenever the storage was modified
+	  such that particle pointers have become invalid, e.g. at the
+	  end of decompose().  Classes that connect to this signal can
+	  update pointers to the particles in the call via
+	  lookupLocalParticle() and lookupRealParticle().
+       */
+      boost::signals2::signal0<void> onParticlesChanged;
+
       boost::signals2::signal2<void, ParticleList&, mpi::packed_oarchive&> 
       beforeSendParticles;
       boost::signals2::signal2<void, ParticleList&, mpi::packed_iarchive&> 
@@ -107,13 +122,14 @@ namespace espresso {
       virtual bool checkIsRealParticle(longint id, 
 				       const ConstReal3DRef pos) = 0;
 
-      /** called by resortParticles to initiate resorting of the real
-	  particles. This should _not_ touch the ghosts.
+      /** Decompose the real particles such that they are at the
+	  correct processor. This should _not_ touch the ghosts.
+	  Called by decompose.
       */
-      virtual void resortRealParticles() = 0;
+      virtual void decomposeRealParticles() = 0;
 
       /** used by the Storage to initiate the exchange of the full ghost
-	  information after resorting the particles.
+	  information after decomposition.
 
 	  Storage implementations should exchange particle positions,
 	  plus data fields as indicated by dataOfExchangeGhosts.

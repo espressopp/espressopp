@@ -16,8 +16,7 @@ def calcNumberCells(size, nodes, cutoff):
 
 class TestVerletList(unittest.TestCase) :
 
-    def test0Build(self) :
-
+    def test0Lattice(self) :
        system = espresso.System()
 
        rng  = espresso.esutil.RNG()
@@ -46,10 +45,7 @@ class TestVerletList(unittest.TestCase) :
        print 'NodeGrid = %s'%(nodeGrid,)
        print 'CellGrid = %s'%cellGrid
 
-       dd = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
-
-       system.storage = dd
-
+       system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
        pid = 0
 
        for i in range(N):
@@ -61,11 +57,11 @@ class TestVerletList(unittest.TestCase) :
              y = (j + r) / N * SIZE
              z = (k + r) / N * SIZE
    
-             dd.addParticle(pid, Real3D(x, y, z))
+             system.storage.addParticle(pid, Real3D(x, y, z))
 
              pid = pid + 1
 
-       dd.resortParticles()
+       system.storage.decompose()
 
        # now build Verlet List
 
@@ -90,6 +86,8 @@ class TestVerletList(unittest.TestCase) :
        # there are N * N * N * 26 / 2 pairs in cutoff
 
        self.assertEqual(vl.totalSize(), N * N * N * 13)
+
+
 
 if __name__ == "__main__":
     unittest.main()

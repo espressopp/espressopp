@@ -36,7 +36,7 @@ namespace espresso {
   
     // make a connection to System to invoke rebuild on resort
   
-    connectionResort = system->storage->onResortParticles.connect(
+    connectionResort = system->storage->onParticlesChanged.connect(
         boost::bind(&VerletList::rebuild, this));
   }
   
@@ -83,13 +83,10 @@ namespace espresso {
   int VerletList::totalSize() const
   {
     System& system = getSystemRef();
-    
     int size = myList.size();
-  
     int allsize;
   
     mpi::all_reduce(*system.comm, size, allsize, std::plus<int>());
-  
     return allsize;
   }
   

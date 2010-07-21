@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
   system->rng = make_shared< esutil::RNG >();
   system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
 
-  for(int i = 0; i < 3; ++i) {
+ for(int i = 0; i < 3; ++i) {
     Int3D nodeGrid(1);
     Int3D cellGrid(1);
     nodeGrid[i] = 0;
@@ -173,64 +173,74 @@ BOOST_FIXTURE_TEST_CASE(cellNeighbors, Fixture)
   }  
 }
 
-// BOOST_FIXTURE_TEST_CASE(fetchParticles, Fixture) 
-// {
-//   int ppn = 100;
-//   esutil::RNG rng;
-//   int numRealParticles = 0;
-//   int rank = mpiWorld->rank();
+BOOST_FIXTURE_TEST_CASE(decompose, Fixture) 
+{
+  int numRealParticles = 0;
+  longint myCount;
+  longint total;
+  esutil::RNG rng;
 
-//   for (int i = rank*ppn; i < (rank+1)*ppn; ++i) {
-//     real pos[3] = { 5*rng(), 3*rng(), 9*rng() };
-//     if (domdec->addParticle(i, pos) != static_cast<Particle*>(0))
-//       numRealParticles++;
-//   }
-//   BOOST_CHECK_EQUAL(domdec->getNRealParticles(), numRealParticles);
+  longint count = 0;
+  for (real x = 0.01; x < 1.0; x += 1.0/5)
+    for (real y = 0.01; y < 2.0; y += 2.0/3)
+      for (real z = 0.01; z < 3.0; z += 3.0/9) {
+	real pos[3] = { x, y, z };
+	if (domdec->addParticle(count, pos) != static_cast<Particle*>(0))
+	  numRealParticles++;
+	++count;
+      }
 
-//   int nodeGrid[3] = { mpiWorld->size(), 1, 1 };
-//   int cellGrid[3] = { 10, 5, 4 };
+  myCount = domdec->getNRealParticles();
+  BOOST_CHECK_EQUAL(myCount, numRealParticles);
 
-//   DomainDecomposition domdec2(system,
-//                               mpiWorld,
-//                               nodeGrid,
-//                               cellGrid);
-//   domdec2.fetchParticles(*domdec);
+  boost::mpi::all_reduce(*mpiWorld, myCount, total, std::plus<int>());
+  BOOST_CHECK_EQUAL(total, count);
 
-//   BOOST_CHECK_EQUAL(domdec2.getNRealParticles(), numRealParticles);
-// }
+  BOOST_TEST_MESSAGE("starting to exchange and sort");
 
-// BOOST_FIXTURE_TEST_CASE(decompose, Fixture) 
-// {
-//   int initPPN = 100;
-//   int rank = mpiWorld->rank();
-//   int numRealParticles = 0;
-//   longint myCount;
-//   longint total;
-//   esutil::RNG rng;
+  domdec->decompose();
 
-//   for (int i = 0; i < initPPN; ++i) {
-//     real pos[3] = { 5*rng(), 3*rng(), 9*rng() };
-//     if (domdec->addParticle(i, pos) != static_cast<Particle*>(0))
-//       numRealParticles++;
-//   }
+  BOOST_TEST_MESSAGE("still alive after exchange");
 
-//   myCount = domdec->getNRealParticles();
-//   BOOST_CHECK_EQUAL(myCount, numRealParticles);
+  myCount = domdec->getNRealParticles();
+  boost::mpi::all_reduce(*mpiWorld, myCount, total, std::plus<int>());
 
-//   boost::mpi::all_reduce(*mpiWorld, myCount, total, std::plus<int>());
-//   BOOST_CHECK_EQUAL(total, initPPN);
+  BOOST_CHECK_EQUAL(total, count);
+ }
 
-//   BOOST_TEST_MESSAGE("starting to exchange and sort");
+BOOST_FIXTURE_TEST_CASE(fetchParticles, Fixture) 
+{
+  esutil::RNG rng;
+  int numRealParticles = 0;
+  
+  longint count = 0;
+  for (real x = 0.01; x < 1.0; x += 1.0/5)
+    for (real y = 0.01; y < 2.0; y += 2.0/3)
+      for (real z = 0.01; z < 3.0; z += 3.0/9) {
+	real pos[3] = { x, y, z };
+	if (domdec->addParticle(count, pos) != static_cast<Particle*>(0))
+	  numRealParticles++;
+	++count;
+      }
 
-//   domdec->resortParticles();
+  BOOST_CHECK_EQUAL(domdec->getNRealParticles(), numRealParticles);
 
-//   BOOST_TEST_MESSAGE("still alive after exchange");
+  int nodeGrid[3] = { 1, mpiWorld->size(), 1 };
+  int cellGrid[3] = { 10, 5, 4 };
 
-//   myCount = domdec->getNRealParticles();
-//   boost::mpi::all_reduce(*mpiWorld, myCount, total, std::plus<int>());
+  DomainDecomposition domdec2(system,
+                              mpiWorld,
+                              nodeGrid,
+                              cellGrid);
+  domdec2.fetchParticles(*domdec);
 
-//   BOOST_CHECK_EQUAL(total, initPPN);
-// }
+  int total;
+  int myCount = domdec2.getNRealParticles();
+  boost::mpi::all_reduce(*mpiWorld, myCount, total, std::plus<int>());
+
+  BOOST_CHECK_EQUAL(total, count);
+}
+
 
 BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture) 
 {
@@ -266,7 +276,7 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
 
   BOOST_TEST_MESSAGE("resort particles");
 
-  domdec->resortParticles();
+  domdec->decompose();
 
   BOOST_TEST_MESSAGE("done with resort particles");
 

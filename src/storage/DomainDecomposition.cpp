@@ -225,7 +225,7 @@ namespace espresso {
       return outlier;
     }
 
-    void DomainDecomposition::resortRealParticles() {
+    void DomainDecomposition::decomposeRealParticles() {
       LOG4ESPP_DEBUG(logger, "starting, expected comm buffer size " << exchangeBufferSize);
 
       // allocate send/recv buffers. We use the size as we need maximally so far, to avoid reallocation
@@ -367,8 +367,6 @@ namespace espresso {
 							       recvBufR.capacity()))));
 
       LOG4ESPP_DEBUG(logger, "finished exchanging particles, new send/recv buffer size " << exchangeBufferSize);
-
-      LOG4ESPP_DEBUG(logger, "starting to exchange full ghost information");
 
       LOG4ESPP_DEBUG(logger, "done");
     }
