@@ -273,7 +273,7 @@ namespace espresso {
 	  ar << src->p;
 	}
 	if (extradata & DATA_MOMENTUM) {
-	  ar << src->p;
+	  ar << src->m;
 	}
 	if (extradata & DATA_LOCAL) {
 	  ar << src->l;
@@ -300,7 +300,7 @@ namespace espresso {
 	  ar >> dst->p;
 	}
 	if (extradata & DATA_MOMENTUM) {
-	  ar >> dst->p;
+	  ar >> dst->m;
 	}
 	if (extradata & DATA_LOCAL) {
 	  ar >> dst->l;
