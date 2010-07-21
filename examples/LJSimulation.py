@@ -79,9 +79,7 @@ for i in range(N):
       # not yet: dd.setVelocity(id, (1.0, 0.0, 0.0))
       pid = pid + 1
 
-# system.storage.resortParticles()
-
-system.storage.resortParticles()
+system.storage.decompose()
 
 integrator = espresso.integrator.VelocityVerlet(system)
 
@@ -117,7 +115,8 @@ p = press.compute()
 pij = pressTensor.compute()
 Ek = 0.5 * temperature * (3 * N**3)
 Ep = interLJ.computeEnergy()
-print 'Start: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f pij = %10.3f' \
+print (Ek + Ep, Ep, Ek, temperature, p, pij)
+print 'Start: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f pij = %s' \
       % (Ek + Ep, Ep, Ek, temperature, p, pij[3])
 
 langevin = espresso.integrator.Langevin(system)
@@ -134,5 +133,5 @@ for i in range(20):
    pij = pressTensor.compute()
    Ek = 0.5 * temperature * (3 * N**3)
    Ep = interLJ.computeEnergy()
-   print 'Step %6d: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f pij = %10.3f' % \
+   print 'Step %6d: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f pij = %s' % \
          (nsteps*(i+1), Ek + Ep, Ep, Ek, temperature, p, pij[3])

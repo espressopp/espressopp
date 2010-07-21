@@ -16,9 +16,9 @@ from espresso import Real3D, Int3D
 # Input values for system
 N = 10
 # box size
-size   = (10.0, 10.0, 10.0)
+size   = (float(N), float(N), float(N))
 # number of particles
-numParticles = 1000
+numParticles = N * N * N
 # LJ cutoff
 cutoff = 2.5
 # LJ epsilon
@@ -74,7 +74,7 @@ for i in range(N):
       # not yet: dd.setVelocity(id, (1.0, 0.0, 0.0))
       pid = pid + 1
 
-system.storage.resortParticles()
+system.storage.decompose()
 
 integrator = espresso.integrator.VelocityVerlet(system)
 
