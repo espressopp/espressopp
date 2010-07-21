@@ -37,12 +37,14 @@ namespace espresso {
     con3.disconnect();
   }
 
-  /** Add the given particle pair to the list on this processor. Note
-      that this routine does not check whether the pair is inserted on
-      another processor as well.
-      Correct distribution of particles needs to be handled in Python.
+  /** Add the given particle pair to the list on this processor if the
+      particle with the lower id belongs to this processor.  Note that
+      this routine does not check whether the pair is inserted on
+      another processor as well.  
+
+      \return whether the particle was inserted on this processor.
    */
-  void FixedPairList::
+  bool FixedPairList::
   add(longint pid1, longint pid2) {
     if (pid1 > pid2)
       std::swap(pid1, pid2);
@@ -51,12 +53,11 @@ namespace espresso {
     Particle *p1 = storage->lookupRealParticle(pid1);
     Particle *p2 = storage->lookupLocalParticle(pid2);
     if (!p1)
-      // TODO: Particle does not exist here, throw exception!
-      return
-      ;
+      // Particle does not exist here, return false
+      return false;
     if (!p2)
       // TODO: Second particle do not exist here, throw exception!
-      ;
+      return false;
     // add the pair locally
     this->add(p1, p2);
 
@@ -80,6 +81,7 @@ namespace espresso {
       globalPairs.insert(equalRange.first, make_pair(pid1, pid2));
     }
     LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
+    return true;
   }
 
   void FixedPairList::
@@ -167,9 +169,12 @@ namespace espresso {
 
     using namespace espresso::python;
 
-    class_<FixedPairList, shared_ptr<FixedPairList> >
+    bool (FixedPairList::*pyAdd)(longint pid1, longint pid2) 
+      = &FixedPairList::add;
 
-      ("FixedPairList", init< shared_ptr<storage::Storage> >())
+    class_< FixedPairList, shared_ptr< FixedPairList > >
+      ("FixedPairList", init< shared_ptr< storage::Storage > >())
+      .def("add", pyAdd)
       ;
   }
 }

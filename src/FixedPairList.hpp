@@ -24,7 +24,7 @@ namespace espresso {
     FixedPairList(shared_ptr< storage::Storage > _storage);
     ~FixedPairList();
 
-    void add(longint pid1, longint pid2);
+    bool add(longint pid1, longint pid2);
 
     void beforeSendParticles(ParticleList& pl, 
 			     mpi::packed_oarchive& ar);

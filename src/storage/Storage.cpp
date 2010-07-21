@@ -390,7 +390,8 @@ namespace espresso {
       }
     }
 
-    void Storage::addGhostForcesToReals(Cell &_ghosts, Cell &_reals)
+    void Storage::
+    addGhostForcesToReals(Cell &_ghosts, Cell &_reals)
     {
       LOG4ESPP_DEBUG(logger, "add forces from ghosts in cell "
 		     << (&_ghosts - getFirstCell()) << " to reals in cell "
@@ -403,14 +404,16 @@ namespace espresso {
 	  dst != end; ++dst, ++src) {
 
 	LOG4ESPP_TRACE(logger, "for particle " << dst->p.id << ": adding force "
-		       << src->f.f[0] << " " << src->f.f[1] << " "<< src->f.f[2] << " to "
+		       << src->f.f[0] << " " << src->f.f[1] << " "
+		       << src->f.f[2] << " to "
 		       << dst->f.f[0] << " " << dst->f.f[1] << " "<< dst->f.f[2]);
 
 	dst->f += src->f;
       }
     }
 
-    void Storage::pyAddParticle(longint id, const ConstReal3DRef p) {
+    void Storage::
+    pyAddParticle(longint id, const ConstReal3DRef p) {
       addParticle(id, p);
     }
 
