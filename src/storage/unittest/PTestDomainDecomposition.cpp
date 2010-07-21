@@ -53,15 +53,6 @@ struct Fixture {
     						nodeGrid,
     						cellGrid);
   }
-
-  /// fill with initPPN particles per node
-  void fillUp(int rank, int initPPN) {
-    esutil::RNG rng;
-    for (int i = 0; i < initPPN; ++i) {
-      real pos[3] = { 5*rng(), 3*rng(), 9*rng() };
-      domdec->addParticle(i + 100*rank, pos);
-    }
-  }
 };
 
 BOOST_AUTO_TEST_CASE(addAndLookup) {
@@ -182,48 +173,64 @@ BOOST_FIXTURE_TEST_CASE(cellNeighbors, Fixture)
   }  
 }
 
-BOOST_FIXTURE_TEST_CASE(fetchParticles, Fixture) 
-{
-  int ppn = 100;
-  esutil::RNG rng;
+// BOOST_FIXTURE_TEST_CASE(fetchParticles, Fixture) 
+// {
+//   int ppn = 100;
+//   esutil::RNG rng;
+//   int numRealParticles = 0;
+//   int rank = mpiWorld->rank();
 
-  for (int i = 0; i < ppn; ++i) {
-    real pos[3] = { 5*rng(), 3*rng(), 9*rng() };
-    domdec->addParticle(i, pos);
-  }
-  BOOST_CHECK_EQUAL(domdec->getNRealParticles(), ppn);
+//   for (int i = rank*ppn; i < (rank+1)*ppn; ++i) {
+//     real pos[3] = { 5*rng(), 3*rng(), 9*rng() };
+//     if (domdec->addParticle(i, pos) != static_cast<Particle*>(0))
+//       numRealParticles++;
+//   }
+//   BOOST_CHECK_EQUAL(domdec->getNRealParticles(), numRealParticles);
 
-  int nodeGrid[3] = { mpiWorld->size(), 1, 1 };
-  int cellGrid[3] = { 10, 5, 4 };
+//   int nodeGrid[3] = { mpiWorld->size(), 1, 1 };
+//   int cellGrid[3] = { 10, 5, 4 };
 
-  DomainDecomposition domdec2(system,
-                              mpiWorld,
-                              nodeGrid,
-                              cellGrid);
-  domdec2.fetchParticles(*domdec);
+//   DomainDecomposition domdec2(system,
+//                               mpiWorld,
+//                               nodeGrid,
+//                               cellGrid);
+//   domdec2.fetchParticles(*domdec);
 
-  BOOST_CHECK_EQUAL(domdec2.getNRealParticles(), ppn);
-}
+//   BOOST_CHECK_EQUAL(domdec2.getNRealParticles(), numRealParticles);
+// }
 
-BOOST_FIXTURE_TEST_CASE(sortParticles, Fixture) 
-{
-  int initPPN = 100;
+// BOOST_FIXTURE_TEST_CASE(decompose, Fixture) 
+// {
+//   int initPPN = 100;
+//   int rank = mpiWorld->rank();
+//   int numRealParticles = 0;
+//   longint myCount;
+//   longint total;
+//   esutil::RNG rng;
 
-  fillUp(mpiWorld->rank(), initPPN);
-  BOOST_CHECK_EQUAL(domdec->getNRealParticles(), initPPN);
+//   for (int i = 0; i < initPPN; ++i) {
+//     real pos[3] = { 5*rng(), 3*rng(), 9*rng() };
+//     if (domdec->addParticle(i, pos) != static_cast<Particle*>(0))
+//       numRealParticles++;
+//   }
 
-  BOOST_TEST_MESSAGE("starting to exchange and sort");
+//   myCount = domdec->getNRealParticles();
+//   BOOST_CHECK_EQUAL(myCount, numRealParticles);
 
-  domdec->resortParticles();
+//   boost::mpi::all_reduce(*mpiWorld, myCount, total, std::plus<int>());
+//   BOOST_CHECK_EQUAL(total, initPPN);
 
-  BOOST_TEST_MESSAGE("still alive after exchange");
+//   BOOST_TEST_MESSAGE("starting to exchange and sort");
 
-  longint myCount = domdec->getNRealParticles();
-  longint total;
-  boost::mpi::all_reduce(*mpiWorld, myCount, total, std::plus<int>());
+//   domdec->resortParticles();
 
-  BOOST_CHECK_EQUAL(total, mpiWorld->size()*initPPN);
-}
+//   BOOST_TEST_MESSAGE("still alive after exchange");
+
+//   myCount = domdec->getNRealParticles();
+//   boost::mpi::all_reduce(*mpiWorld, myCount, total, std::plus<int>());
+
+//   BOOST_CHECK_EQUAL(total, initPPN);
+// }
 
 BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture) 
 {
@@ -405,56 +412,56 @@ void afterResort(ParticleList &pl, boost::mpi::packed_iarchive &ar) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(migrateParticle) 
-{
-  // check whether a particle is migrated from one node to the other
-  // and whether it takes all data with it
-  shared_ptr< DomainDecomposition > domdec;
-  shared_ptr< System > system;
+// BOOST_AUTO_TEST_CASE(migrateParticle) 
+// {
+//   // check whether a particle is migrated from one node to the other
+//   // and whether it takes all data with it
+//   shared_ptr< DomainDecomposition > domdec;
+//   shared_ptr< System > system;
 
-  int nodes = mpiWorld->size();
-  int lastnode = nodes-1;
-  Real3D boxL(nodes*1.0, 1.0, 1.0);
-  Int3D nodeGrid(nodes, 1, 1);
-  Int3D cellGrid(1);
+//   int nodes = mpiWorld->size();
+//   int lastnode = nodes-1;
+//   Real3D boxL(nodes*1.0, 1.0, 1.0);
+//   Int3D nodeGrid(nodes, 1, 1);
+//   Int3D cellGrid(1);
 
-  system = make_shared< System >();
-  system->rng = make_shared< esutil::RNG >();
-  system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
-  domdec = make_shared< DomainDecomposition >(system,
-					      mpiWorld,
-					      nodeGrid,
-					      cellGrid);
+//   system = make_shared< System >();
+//   system->rng = make_shared< esutil::RNG >();
+//   system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
+//   domdec = make_shared< DomainDecomposition >(system,
+// 					      mpiWorld,
+// 					      nodeGrid,
+// 					      cellGrid);
 
   
-  BOOST_TEST_MESSAGE("Setting up system...");
+//   BOOST_TEST_MESSAGE("Setting up system...");
 
-  // connect test functions to domdec
-  domdec->beforeSendParticles.connect(beforeResort);
-  domdec->afterRecvParticles.connect(afterResort);
+//   // connect test functions to domdec
+//   domdec->beforeSendParticles.connect(beforeResort);
+//   domdec->afterRecvParticles.connect(afterResort);
 
-  // create a single particle on node 0 that really belongs to the last node
-  Real3D pos(nodes*1.0 - 0.5, 0.5, 0.5);
-  if (mpiWorld->rank() == 0) {
-    Particle *p = domdec->addParticle(0, pos);
-    BOOST_CHECK_EQUAL(domdec->lookupRealParticle(0), p);
-  }
+//   // create a single particle on node 0 that really belongs to the last node
+//   Real3D pos(nodes*1.0 - 0.5, 0.5, 0.5);
+//   if (mpiWorld->rank() == 0) {
+//     Particle *p = domdec->addParticle(0, pos);
+//     BOOST_CHECK_EQUAL(domdec->lookupRealParticle(0), p);
+//   }
 
-  BOOST_TEST_MESSAGE("Resorting particles...");
+//   BOOST_TEST_MESSAGE("Resorting particles...");
 
-  // now resort the particles
-  domdec->resortParticles();
+//   // now resort the particles
+//   domdec->resortParticles();
 
-  // now the particle should be on the the last node
-  if (mpiWorld->rank() == lastnode) {
-    BOOST_CHECK_NE(domdec->lookupRealParticle(0), static_cast<Particle*>(0));
-  } else {
-    BOOST_CHECK_EQUAL(domdec->lookupRealParticle(0), static_cast<Particle*>(0));
-  }
+//   // now the particle should be on the the last node
+//   if (mpiWorld->rank() == lastnode) {
+//     BOOST_CHECK_NE(domdec->lookupRealParticle(0), static_cast<Particle*>(0));
+//   } else {
+//     BOOST_CHECK_EQUAL(domdec->lookupRealParticle(0), static_cast<Particle*>(0));
+//   }
 
-  if (mpiWorld->rank() == 0)
-    BOOST_CHECK(beforeResortCalled);
+//   if (mpiWorld->rank() == 0)
+//     BOOST_CHECK(beforeResortCalled);
 
-  if (mpiWorld->rank() == lastnode)
-    BOOST_CHECK(afterResortCalled);
-}
+//   if (mpiWorld->rank() == lastnode)
+//     BOOST_CHECK(afterResortCalled);
+// }
