@@ -4,6 +4,7 @@
 
 #include "Potential.hpp"
 #include "VerletListInteractionTemplate.hpp"
+#include "FixedPairListInteractionTemplate.hpp"
 #include <cmath>
 
 namespace espresso {

@@ -6,6 +6,7 @@
 #include "Interaction.hpp"
 #include "Real3D.hpp"
 #include "Particle.hpp"
+#include "FixedPairList.hpp"
 #include "esutil/Array2D.hpp"
 
 namespace espresso {
@@ -59,8 +60,7 @@ namespace espresso {
     template < typename _Potential > inline void
     FixedPairListInteractionTemplate < _Potential >::addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the FixedPair List");
-      for (PairList::Iterator it(fixedpairList->getPairs()); 
-	   it.isValid(); ++it) {
+      for (FixedPairList::Iterator it(*fixedpairList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         int type1 = p1.p.type;
@@ -102,7 +102,7 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "compute energy of the FixedPair list pairs");
 
       real e = 0.0;
-      for (PairList::Iterator it(fixedpairList->getPairs()); 
+      for (FixedPairList::Iterator it(*fixedpairList); 
 	   it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
@@ -119,7 +119,7 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "compute the virial for the FixedPair List");
       
       real w = 0.0;
-      for (PairList::Iterator it(fixedpairList->getPairs());                
+      for (FixedPairList::Iterator it(*fixedpairList);                
            it.isValid(); ++it) {                                         
         Particle &p1 = *it->first;                                       
         Particle &p2 = *it->second;                                      
@@ -146,7 +146,7 @@ namespace espresso {
       wij_[3] = 0.0;
       wij_[4] = 0.0;
       wij_[5] = 0.0;
-      for (PairList::Iterator it(fixedpairList->getPairs());
+      for (FixedPairList::Iterator it(*fixedpairList);
            it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
