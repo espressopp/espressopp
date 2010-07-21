@@ -22,7 +22,7 @@ namespace espresso {
       int N;
       int Nsum;
       N = system.storage->getNRealParticles();
-      Nsum = system.sum(N);
+      boost::mpi::reduce(*mpiWorld, N, Nsum, std::plus<int>(), 0);
 
       // determine volume of the box
       Real3D Li = system.bc->getBoxL();
@@ -48,7 +48,8 @@ namespace espresso {
       for (size_t j = 0; j < srIL.size(); j++) {
         rij_dot_Fij += srIL[j]->computeVirial();
       }
-      real p_nonbonded = system.sum(rij_dot_Fij / (3.0 * V));
+      real p_nonbonded;
+      boost::mpi::reduce(*mpiWorld, rij_dot_Fij / (3.0 * V), p_nonbonded, std::plus<real>(), 0);
  
       return (p_kinetic + p_nonbonded);
     }

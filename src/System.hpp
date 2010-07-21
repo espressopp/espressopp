@@ -31,12 +31,6 @@ namespace espresso {
       return shared_from_this();
     }
 
-    // short versions of most relevant communication reductions
-
-    real sum(real);
-    int  sum(int);
-    void sum(real* local, real* global, int);
-
     void addInteraction(shared_ptr< interaction::Interaction > ia);
 
     static void registerPython();

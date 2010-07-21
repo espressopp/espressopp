@@ -22,14 +22,13 @@ namespace espresso {
       int N;
       int Nsum;
       N = system.storage->getNRealParticles();
-
-      Nsum = system.sum(N);
+      boost::mpi::reduce(*mpiWorld, N, Nsum, std::plus<int>(), 0);
 
       // determine volume of the box
       Real3D Li = system.bc->getBoxL();
       real V = Li[0] * Li[1] * Li[2];
 
-      // compute the kinetic contriubtion (2/3 \sum 1/2mv^2)
+      // compute the kinetic contribution (2/3 \sum 1/2mv^2)
       real e_kinetic;
       real p_kinetic;
       real vvLocal[6], vv[6];
@@ -45,25 +44,22 @@ namespace espresso {
         vvLocal[4] += mass * cit->m.v[0] * cit->m.v[2];
         vvLocal[5] += mass * cit->m.v[1] * cit->m.v[2];
       }
-
-      system.sum(vvLocal, vv, 6);
+      boost::mpi::reduce(*mpiWorld, vvLocal, 6, vv, std::plus<real>(), 0);
 
       // compute the short-range nonbonded contribution
-      // loop over interaction types
       real wijLocal[6];
       const InteractionList& srIL = system.shortRangeInteractions;
       for (size_t j = 0; j < srIL.size(); j++) {
         srIL[j]->computeVirialTensor(wijLocal);
       }
-
-      system.sum(wijLocal, wij, 6);
+      boost::mpi::reduce(*mpiWorld, wijLocal, 6, wij, std::plus<real>(), 0);
       for (size_t k = 0; k < 6; k++) wij[k] = (vv[k] + wij[k]) / (3.0 * V);
     }
 
     real PressureTensor::compute() const {
       real wij[6];
       computeTensor(wij);
-      return wij[0];
+      return (wij[0] + wij[1] + wij[2]) / 3.0;
     }
 
     using namespace boost::python;
