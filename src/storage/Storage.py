@@ -10,6 +10,6 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             localcall = [ "addParticle" ],
-            pmicall = [ "resortParticles" ],
+            pmicall = [ "resortParticles", "addParticles" ],
             pmiproperty = [ "system" ]
             )

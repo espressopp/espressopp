@@ -22,6 +22,22 @@ class DomainDecompositionLocal(StorageLocal,
         if comm.rank == 0:
            self.cxxclass.addParticle(self, pid, pos)
 
+    def addParticles(self, particleList):
+
+        comm = MPI.COMM_WORLD
+
+        for particle in particleList:
+
+            pid, pos = particle
+
+            # only owner node adds the particle
+            target = self.mapPositionToNodeClipped(pos)
+
+            print '%d: particle pid %d has target %d'%(comm.rank, pid, target)
+
+            if comm.rank == target:
+               self.cxxclass.addParticle(self, pid, pos)
+
 if pmi.isController:
     class DomainDecomposition(Storage):
         pmiproxydefs = dict(

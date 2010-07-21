@@ -14,10 +14,22 @@ class FixedPairListLocal(_espresso.FixedPairList):
         'add pair to fixed pair list'
         return self.cxxclass.add(self, pid1, pid2)
 
+    def addBonds(self, bondlist):
+        """
+        Each processor takes the broadcasted bondlist and
+        adds those pairs whose first particle is owned by
+        this processor.
+        """
+
+        for bond in bondlist:
+           pid1, pid2 = bond
+           self.cxxclass.add(self, pid1, pid2)
+
 if pmi.isController:
     class FixedPairList(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espresso.FixedPairListLocal',
-            pmicall = [ "add" ]
+            localcall = [ "add" ],
+            pmicall = [ "addBonds" ]
             )
