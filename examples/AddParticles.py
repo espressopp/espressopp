@@ -60,6 +60,7 @@ system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, ce
 pid = 0
 
 particleList = []
+velList = []
 bondList = []
 
 fpl = espresso.FixedPairList(system.storage)
@@ -74,12 +75,24 @@ for i in range(N):
       y = (j + r) / N * size[1]
       z = (k + r) / N * size[2]
 
-      particleList.append((pid, Real3D(x, y, z)))
+      vel  = (1.0, -0.3, 3.1)
+      type = 1
+      mass = 0.5 + m * 0.01
+
+      particle = (pid, Real3D(x, y, z), vel, type, mass)
+
+      particleList.append(particle)
+
       if k > 0: bondList.append([pid-1, pid])
 
       pid = pid + 1
 
-system.storage.addParticles(particleList)
+# logging.getLogger("Storage").setLevel(logging.DEBUG)
+
+system.storage.addParticles(particleList, "id", "pos", "v", "type", "mass")
+
+logging.getLogger("Storage").setLevel(logging.WARN)
+
 fpl.addBonds(bondList)
 
 # actualize ghost particles to compute energies
