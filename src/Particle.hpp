@@ -81,7 +81,6 @@ namespace espresso {
     }
   };
 
-
   struct ParticleLocal {
     int i[3];
     bool ghost;
@@ -113,6 +112,30 @@ namespace espresso {
       l.ghost = false;
     }
 
+    // getter and setter used for export in Python
+
+    real getVx() const { return m.v[0]; }
+    real getVy() const { return m.v[1]; }
+    real getVz() const { return m.v[2]; }
+  
+    real getFx() const { return f.f[0]; }
+    real getFy() const { return f.f[1]; }
+    real getFz() const { return f.f[2]; }
+
+    real getMass() const { return p.mass; }
+    real getType() const { return p.type; }
+  
+    void setVx(real vx) { m.v[0] = vx; }
+    void setVy(real vy) { m.v[1] = vy; }
+    void setVz(real vz) { m.v[2] = vz; }
+
+    void setFx(real fx) { f.f[0] = fx; }
+    void setFy(real fy) { f.f[1] = fy; }
+    void setFz(real fz) { f.f[2] = fz; }
+
+    void setType(int type) { p.type = type; }
+    void setMass(real mass) { p.mass = mass; }
+  
   private:
     friend class boost::serialization::access;
     template< class Archive >

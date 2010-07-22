@@ -113,8 +113,7 @@ namespace espresso {
       return p;
     }
 
-    Particle* Storage::
-    moveUnindexedParticle(ParticleList &dl, ParticleList &sl, int i)
+    Particle *Storage::moveUnindexedParticle(ParticleList &dl, ParticleList &sl, int i)
     {
       dl.push_back(sl[i]);
       int newSize = sl.size() - 1;
@@ -125,8 +124,7 @@ namespace espresso {
       return &dl.back();
     }
 
-    Particle* Storage::
-    moveIndexedParticle(ParticleList &dl, ParticleList &sl, int i)
+    Particle *Storage::moveIndexedParticle(ParticleList &dl, ParticleList &sl, int i)
     {
       // see whether the arrays were resized; STL hack
       Particle *dbegin = &dl.front();
@@ -247,6 +245,36 @@ namespace espresso {
       exchangeGhosts();
 
       onParticlesChanged();
+    }
+
+    void Storage::packPositionsEtc(double* buffer, int& m, 
+				   Cell &_reals, int extradata, const double shift[3])
+    {
+      ParticleList &reals  = _reals.particles;
+
+      for(ParticleList::iterator src = reals.begin(), end = reals.end(); src != end; ++src) {
+	{
+	  ParticlePosition r;
+	  src->r.copyShifted(r, shift);
+          buffer[m++] = r.p[0];
+          buffer[m++] = r.p[1];
+          buffer[m++] = r.p[2];
+	}
+      }
+    }
+
+    void Storage::unpackPositionsEtc(Cell &_ghosts, double* buffer, int& m, int extradata)
+    {
+      ParticleList &ghosts  = _ghosts.particles;
+
+      for(ParticleList::iterator dst = ghosts.begin(), end = ghosts.end(); dst != end; ++dst) {
+	{
+          dst->r.p[0] = buffer[m++];
+          dst->r.p[1] = buffer[m++];
+          dst->r.p[2] = buffer[m++];
+	}
+	dst->l.ghost = 1;
+      }
     }
 
     void Storage::packPositionsEtc(boost::mpi::packed_oarchive &ar,
@@ -413,11 +441,6 @@ namespace espresso {
       }
     }
 
-    bool Storage::
-    pyAddParticle(longint id, const ConstReal3DRef p) {
-      return addParticle(id, p) != 0;
-    }
-
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
@@ -425,11 +448,24 @@ namespace espresso {
     void
     Storage::registerPython() {
       using namespace espresso::python;
+
+      class_< Particle > ("ParticleRef", no_init)
+        .add_property("vx", &Particle::getVx, &Particle::setVx)
+        .add_property("vy", &Particle::getVy, &Particle::setVy)
+        .add_property("vz", &Particle::getVz, &Particle::setVz)
+        .add_property("fx", &Particle::getFx, &Particle::setFx)
+        .add_property("fy", &Particle::getFy, &Particle::setFy)
+        .add_property("fz", &Particle::getFz, &Particle::setFz)
+        .add_property("type", &Particle::getType, &Particle::setType)
+        .add_property("mass", &Particle::getMass, &Particle::setMass)
+      ;
+
       class_< Storage, boost::noncopyable >("storage_Storage", no_init)
-	.def("addParticle", &Storage::pyAddParticle)
+	.def("addParticle", &Storage::addParticle, return_value_policy<reference_existing_object>())
 	.def("decompose", &Storage::decompose)
         .add_property("system", &Storage::getSystem)
 	;
+
     }
 
   }

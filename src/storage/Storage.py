@@ -1,23 +1,90 @@
 from espresso import pmi
 import MPI
+import logging
 
 class StorageLocal(object):
     """Abstract local base class for storing particles"""
+
+    logger = logging.getLogger("Storage")
 
     def addParticle(self, pid, pos):
 
         self.cxxclass.addParticle(self, pid, pos)
 
-    def addParticles(self, particleList):
+    def addParticles(self, particleList, *properties):
+        """
+        This routine adds particles with certain properties to the storage
+        where only one processor adds the particle in its local storage.
+
+        :param particleList: list of particles to be added
+        :param properties: list of property strings
+
+        Each particle in the list must be itself a list where each entry corresponds
+        to the property specified in properties.
+
+        Improvement: make list of supported properties more flexible in use
+        """
 
         comm = MPI.COMM_WORLD
 
+        index_id   = -1
+        index_pos  = -1
+        index_v    = -1
+        index_f    = -1
+        index_type = -1
+        index_mass = -1
+
+        if properties == None:
+           # default properities = (id, pos)
+           index_id = 0
+           index_pos = 1
+           nindex = 2
+        else:
+           nindex = 0
+           for val in properties:
+              if val.lower() == "id": index_id = nindex
+              elif val.lower() == "pos": index_pos = nindex
+              elif val.lower() == "type": index_type = nindex
+              elif val.lower() == "mass": index_mass = nindex
+              elif val.lower() == "v": index_v = nindex
+              elif val.lower() == "f": index_f = force
+              else: raise "unknown particle property: %s"%val
+              nindex += 1
+        
+        if index_id < 0  : raise "particle property id is mandatory"
+        if index_pos < 0 : raise "particle property pos is mandatory"
+
         for particle in particleList:
+ 
+            # verify that each particle has enough entries, avoids index errors
 
-            pid, pos = particle
+            if len(particle) != nindex:
+               raise "particle has %d entries,but %d expected"%(len(particle), nindex)
 
-            self.cxxclass.addParticle(self, pid, pos)
+            id = particle[index_id]
+            pos = particle[index_pos]
 
+            storedParticle = self.cxxclass.addParticle(self, id, pos)
+
+            if storedParticle != None:
+
+               self.logger.debug("Processor %d stores particle id = %d"%(comm.rank, id))
+
+               # only the owner processor writes other properties
+
+               if index_v >= 0:
+                  vx, vy, vz = particle[index_v]
+                  storedParticle.vx = vx; storedParticle.vy = vy; storedParticle.vz = vz
+
+               if index_f >= 0:
+                  fx, fy, fz = particle[index_f]
+                  storedParticle.fx = fx; storedParticle.fy = fy; storedParticle.fz = vz
+
+               if index_type >= 0:
+                  storedParticle.type = particle[index_type]
+
+               if index_mass >= 0:
+                  storedParticle.mass = particle[index_mass]
 
 if pmi.isController:
     class Storage(object):

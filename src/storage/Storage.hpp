@@ -161,8 +161,13 @@ namespace espresso {
       */
       void packPositionsEtc(boost::mpi::packed_oarchive &ar,
 			    Cell &reals, int extradata, const double shift[3]);
+      void packPositionsEtc(double* buffer, int& m,
+                            Cell &_reals, int extradata, const double shift[3]);
+ 
       /** unpack received data for ghosts. */
       void unpackPositionsEtc(Cell &ghosts, boost::mpi::packed_iarchive &ar, int extradata);
+      void unpackPositionsEtc(Cell &_ghosts, double* buffer, int& m, int extradata);
+
       /** copy specified data elements between a real cell and one of its ghosts
 
 	  @param shift how to adjust the positions of the particles when sending
@@ -220,11 +225,11 @@ namespace espresso {
       /** here the local particles are actually stored */
       LocalCellList cells;
 
-      /** List of real cells */
+      /** list of real cells */
       CellList realCells;
-      /** List of ghost cells */
+      /** list of ghost cells */
       CellList ghostCells;
-      /** All cells on this CPU, ghost and real cells. */
+      /** all cells on this CPU. Just an index of the cells */
       CellList localCells;
 
       static LOG4ESPP_DECL_LOGGER(logger);
