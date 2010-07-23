@@ -31,6 +31,7 @@ class StorageLocal(object):
         index_pos  = -1
         index_v    = -1
         index_f    = -1
+        index_q    = -1
         index_type = -1
         index_mass = -1
 
@@ -47,7 +48,8 @@ class StorageLocal(object):
               elif val.lower() == "type": index_type = nindex
               elif val.lower() == "mass": index_mass = nindex
               elif val.lower() == "v": index_v = nindex
-              elif val.lower() == "f": index_f = force
+              elif val.lower() == "f": index_f = nindex
+              elif val.lower() == "q": index_q = nindex
               else: raise "unknown particle property: %s"%val
               nindex += 1
         
@@ -79,6 +81,10 @@ class StorageLocal(object):
                if index_f >= 0:
                   fx, fy, fz = particle[index_f]
                   storedParticle.fx = fx; storedParticle.fy = fy; storedParticle.fz = vz
+
+               if index_q >= 0:
+                  # not supported yet: storedParticle.q = particle[index_q]
+                  pass
 
                if index_type >= 0:
                   storedParticle.type = particle[index_type]
