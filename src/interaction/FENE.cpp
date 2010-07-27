@@ -21,13 +21,6 @@ namespace espresso {
 	.add_property("rMax", &FENE::getRMax, &FENE::setRMax)
     	;
 
-      typedef class VerletListInteractionTemplate< FENE > 
-	VerletListFENE;
-      class_< VerletListFENE, bases< Interaction > > 
-        ("interaction_VerletListFENE", init< shared_ptr<VerletList> >())
-        .def("setPotential", &VerletListFENE::setPotential);
-      ;
-
       typedef class FixedPairListInteractionTemplate< FENE >
         FixedPairListFENE;
       class_< FixedPairListFENE, bases< Interaction > >
