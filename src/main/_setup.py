@@ -29,7 +29,8 @@ def _setupLogging():
         log = logging.getLogger('root')
         log.info('Reading log config file %s', logConfigFile)
     else :
-        logging.basicConfig()
+        logging.basicConfig(
+           format = "%(process)d %(asctime)s %(name)s (%(filename)s::%(lineno)s,%(funcName)s) %(levelname)s: %(message)s")
         log = logging.getLogger('root')
         log.info('Did not find log config file %s, using basic configuration.', logConfigFile)
 
@@ -47,6 +48,7 @@ def _setupLogging():
         _espresso.setLogger()
 
 # execute the function
+
 _setupLogging()
 
 def _setupProperty():

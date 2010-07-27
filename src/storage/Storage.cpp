@@ -181,12 +181,22 @@ namespace espresso {
     {
       LOG4ESPP_DEBUG(logger, "send " << l.size() << " particles to " << node);
 
+      printf("me = %d: send %d particles to node %d\n", mpiWorld->rank(), 
+                      l.size(), node);
+
       // pack for transport
       mpi::packed_oarchive data(*comm);
       int size = l.size();
       data << size;
-      for (ParticleList::Iterator it(l); it.isValid(); ++it)
+      int count = 0;
+      for (ParticleList::Iterator it(l); it.isValid(); ++it) {
 	data << *it;
+        count++;
+      }
+      if (count != size) {
+        printf ("ATTENTION: only %d particles sent of %d\n", count, size);
+      }
+
       beforeSendParticles(l, data);
 
       l.clear();
@@ -201,6 +211,8 @@ namespace espresso {
     {
       LOG4ESPP_DEBUG(logger, "recv from " << node);
 
+      printf("me = %d: recv particles from node %d\n", mpiWorld->rank(), node);
+
       // receive packed data
       mpi::packed_iarchive data(*comm);
       comm->recv(node, STORAGE_COMM_TAG, data);
@@ -209,6 +221,9 @@ namespace espresso {
       int size;
       data >> size;
       int curSize = l.size();
+      printf("me = %d: recv particles from node %d, got %d, have %d\n", 
+                mpiWorld->rank(), node, size, curSize);
+
       LOG4ESPP_DEBUG(logger, "got " << size << " particles, have " << curSize);
       if (size > 0) {
 	l.resize(curSize + size);
@@ -238,12 +253,36 @@ namespace espresso {
     }
 
     void Storage::decompose() {
+
+      printf("decompose: now invaildateGhosts\n");
       invalidateGhosts();
 
+      printf("decompose: now decomposReal\n");
       decomposeRealParticles();
 
+      printf("decompose: now exchangeGhosts\n");
       exchangeGhosts();
 
+      // added to update mapping for ghost particles
+
+      CellList ghostCells = getGhostCells();
+      for(CellListIterator cit(ghostCells); !cit.isDone(); ++cit) {
+        localParticles[cit->p.id] = &(*cit);
+      }
+
+      printf("me = %d: real Particles: ", mpiWorld->rank());
+      CellList realCells = getRealCells();
+      for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+        printf(" %d %p", cit->p.id, lookupRealParticle(cit->p.id));
+      }
+      printf("\n");
+
+      printf("me = %d: ghost Particles: ", mpiWorld->rank());
+      for(CellListIterator cit(ghostCells); !cit.isDone(); ++cit) {
+        printf(" %d %p", cit->p.id, lookupLocalParticle(cit->p.id));
+      }
+      printf("\n");
+      printf("decompose: now call routines on signal onParticlesChanged\n");
       onParticlesChanged();
     }
 
