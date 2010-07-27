@@ -111,7 +111,9 @@ namespace espresso {
         const Potential &potential = getPotential(type1, type2);
 	e += potential._computeEnergy(p1, p2);
       }
-      return e;
+      real esum;
+      boost::mpi::reduce(*mpiWorld, e, esum, std::plus<real>(), 0);
+      return esum;
     }
 
     template < typename _Potential > inline real
