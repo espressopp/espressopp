@@ -25,15 +25,15 @@ integrate 0
 puts "\n\nInteractions==\n[inter]"
 puts "\n\nEnergy==\n[analyze energy]"
 puts "\n\nPressure==\n[analyze pressure]"
-puts "\n\nStress Tensor==\n[analyze stress_tensor]"
-puts "\n\nParticles==\n[part]"
+#puts "\n\nStress Tensor==\n[analyze stress_tensor]"
+#puts "\n\nParticles==\n[part]"
 
 puts "\n\nIntegrate one step\n"
 
-integrate 200
+integrate 100
 
 puts "\n\nInteractions==\n[inter]"
 puts "\n\nEnergy==\n[analyze energy]"
 puts "\n\nPressure==\n[analyze pressure]"
-puts "\n\nStress Tensor==\n[analyze stress_tensor]"
-puts "\n\nParticles==\n[part]"
+#puts "\n\nStress Tensor==\n[analyze stress_tensor]"
+#puts "\n\nParticles==\n[part]"
