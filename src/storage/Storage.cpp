@@ -190,6 +190,7 @@ namespace espresso {
       data << size;
       int count = 0;
       for (ParticleList::Iterator it(l); it.isValid(); ++it) {
+	localParticles.erase(it->p.id);
 	data << *it;
         count++;
       }
@@ -229,7 +230,9 @@ namespace espresso {
 	l.resize(curSize + size);
 
 	for (int i = 0; i < size; ++i) {
-	  data >> l[curSize + i];
+	  Particle *p = &l[curSize + i];
+	  data >> *p;
+	  localParticles[p->p.id] = p;
 	}
       }
       afterRecvParticles(l, data);
@@ -263,12 +266,7 @@ namespace espresso {
       printf("decompose: now exchangeGhosts\n");
       exchangeGhosts();
 
-      // added to update mapping for ghost particles
-
-      CellList ghostCells = getGhostCells();
-      for(CellListIterator cit(ghostCells); !cit.isDone(); ++cit) {
-        localParticles[cit->p.id] = &(*cit);
-      }
+      // TEMPORARY debug
 
       printf("me = %d: real Particles: ", mpiWorld->rank());
       CellList realCells = getRealCells();
@@ -365,6 +363,9 @@ namespace espresso {
 	}
 	if (extradata & DATA_PROPERTIES) {
 	  ar >> dst->p;
+
+	  if (localParticles.find(dst->p.id) != localParticles.end())
+	    localParticles[dst->p.id] = &(*dst);
 	}
 	if (extradata & DATA_MOMENTUM) {
 	  ar >> dst->m;
