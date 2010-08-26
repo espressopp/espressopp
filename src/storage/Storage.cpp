@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#define LOG4ESPP_LEVEL_DEBUG
+//#define LOG4ESPP_LEVEL_TRACE
 #include "log4espp.hpp"
 
 #include "System.hpp"
@@ -29,7 +29,9 @@ namespace espresso {
 		     shared_ptr< boost::mpi::communicator >_comm)
       : SystemAccess(system),
 	comm(_comm)
-    {}
+    {
+      //logger.setLevel(log4espp::Logger::TRACE);
+    }
 
     Storage::~Storage() {}
 
@@ -48,9 +50,35 @@ namespace espresso {
       return cnt;
     }
 
+    inline void Storage::removeFromLocalParticles(Particle *p, bool weak) {
+      if (!weak || localParticles[p->p.id] == p) {
+	LOG4ESPP_TRACE(logger, "removing local pointer for particle id="
+		       << p->p.id << " @ " << p);
+	localParticles.erase(p->p.id);
+      }
+      else {
+	LOG4ESPP_TRACE(logger, "NOT removing local pointer for particle id="
+		       << p->p.id << " @ " << p << " since pointer is @ "
+		       << localParticles[p->p.id]);
+      }
+    }
+
+    inline void Storage::updateInLocalParticles(Particle *p, bool weak) {
+      if (!weak || localParticles.find(p->p.id) == localParticles.end()) {
+	LOG4ESPP_TRACE(logger, "updating local pointer for particle id="
+		       << p->p.id << " @ " << p);
+	localParticles[p->p.id] = p;
+      }
+      else {
+	LOG4ESPP_TRACE(logger, "NOT updating local pointer for particle id="
+		       << p->p.id << " @ " << p << " has already pointer @ "
+		       << localParticles[p->p.id]);
+      }
+    }
+
     void Storage::updateLocalParticles(ParticleList &l) {
       for (ParticleList::Iterator it(l); it.isValid(); ++it) {
-	localParticles[it->p.id] = &(*it);
+	updateInLocalParticles(&(*it));
       }
     }
 
@@ -109,19 +137,8 @@ namespace espresso {
       if (begin != &l.front())
 	updateLocalParticles(l);
       else
-	localParticles[p->p.id] = p;
+	updateInLocalParticles(p);
       return p;
-    }
-
-    Particle *Storage::moveUnindexedParticle(ParticleList &dl, ParticleList &sl, int i)
-    {
-      dl.push_back(sl[i]);
-      int newSize = sl.size() - 1;
-      if (i != newSize) {
-	sl[i] = sl.back();
-      }
-      sl.resize(newSize);
-      return &dl.back();
     }
 
     Particle *Storage::moveIndexedParticle(ParticleList &dl, ParticleList &sl, int i)
@@ -141,11 +158,11 @@ namespace espresso {
       Particle *src = &(sl[i]);
 
       // fix up destination list
-      if (dbegin !=  &dl.front()) {
+      if (dbegin != &dl.front()) {
 	updateLocalParticles(dl);
       }
       else {
-	localParticles[dst->p.id] = dst;
+	updateInLocalParticles(dst);
       }
       // fix up resorted source list; due to moving, the last particle
       // might have been moved to the position of the actually moved one
@@ -153,7 +170,7 @@ namespace espresso {
 	updateLocalParticles(sl);
       }
       else if (i != newSize) {
-	localParticles[src->p.id] = src;
+	updateInLocalParticles(src);
       }
 
       return dst;
@@ -181,21 +198,13 @@ namespace espresso {
     {
       LOG4ESPP_DEBUG(logger, "send " << l.size() << " particles to " << node);
 
-      printf("me = %d: send %d particles to node %d\n", mpiWorld->rank(), 
-                      l.size(), node);
-
       // pack for transport
       mpi::packed_oarchive data(*comm);
       int size = l.size();
       data << size;
-      int count = 0;
       for (ParticleList::Iterator it(l); it.isValid(); ++it) {
-	localParticles.erase(it->p.id);
+	removeFromLocalParticles(&(*it));
 	data << *it;
-        count++;
-      }
-      if (count != size) {
-        printf ("ATTENTION: only %d particles sent of %d\n", count, size);
       }
 
       beforeSendParticles(l, data);
@@ -212,8 +221,6 @@ namespace espresso {
     {
       LOG4ESPP_DEBUG(logger, "recv from " << node);
 
-      printf("me = %d: recv particles from node %d\n", mpiWorld->rank(), node);
-
       // receive packed data
       mpi::packed_iarchive data(*comm);
       comm->recv(node, STORAGE_COMM_TAG, data);
@@ -222,17 +229,15 @@ namespace espresso {
       int size;
       data >> size;
       int curSize = l.size();
-      printf("me = %d: recv particles from node %d, got %d, have %d\n", 
-                mpiWorld->rank(), node, size, curSize);
-
       LOG4ESPP_DEBUG(logger, "got " << size << " particles, have " << curSize);
+
       if (size > 0) {
 	l.resize(curSize + size);
 
 	for (int i = 0; i < size; ++i) {
 	  Particle *p = &l[curSize + i];
 	  data >> *p;
-	  localParticles[p->p.id] = p;
+	  updateInLocalParticles(p);
 	}
       }
       afterRecvParticles(l, data);
@@ -249,73 +254,19 @@ namespace espresso {
 	   to implement pbc, the real particle will be the one accessible
 	   via localParticles.
 	*/
-	if (localParticles[it->p.id] == &(*it)) {
-	  localParticles.erase(it->p.id);
-	}
+	removeFromLocalParticles(&(*it), true);
       }
     }
 
     void Storage::decompose() {
-
-      printf("decompose: now invaildateGhosts\n");
       invalidateGhosts();
-
-      printf("decompose: now decomposReal\n");
       decomposeRealParticles();
-
-      printf("decompose: now exchangeGhosts\n");
       exchangeGhosts();
-
-      // TEMPORARY debug
-
-      printf("me = %d: real Particles: ", mpiWorld->rank());
-      CellList realCells = getRealCells();
-      for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-        printf(" %d %p", cit->p.id, lookupRealParticle(cit->p.id));
-      }
-      printf("\n");
-
-      printf("me = %d: ghost Particles: ", mpiWorld->rank());
-      for(CellListIterator cit(ghostCells); !cit.isDone(); ++cit) {
-        printf(" %d %p", cit->p.id, lookupLocalParticle(cit->p.id));
-      }
-      printf("\n");
-      printf("decompose: now call routines on signal onParticlesChanged\n");
       onParticlesChanged();
     }
 
-    void Storage::packPositionsEtc(double* buffer, int& m, 
-				   Cell &_reals, int extradata, const double shift[3])
-    {
-      ParticleList &reals  = _reals.particles;
-
-      for(ParticleList::iterator src = reals.begin(), end = reals.end(); src != end; ++src) {
-	{
-	  ParticlePosition r;
-	  src->r.copyShifted(r, shift);
-          buffer[m++] = r.p[0];
-          buffer[m++] = r.p[1];
-          buffer[m++] = r.p[2];
-	}
-      }
-    }
-
-    void Storage::unpackPositionsEtc(Cell &_ghosts, double* buffer, int& m, int extradata)
-    {
-      ParticleList &ghosts  = _ghosts.particles;
-
-      for(ParticleList::iterator dst = ghosts.begin(), end = ghosts.end(); dst != end; ++dst) {
-	{
-          dst->r.p[0] = buffer[m++];
-          dst->r.p[1] = buffer[m++];
-          dst->r.p[2] = buffer[m++];
-	}
-	dst->l.ghost = 1;
-      }
-    }
-
     void Storage::packPositionsEtc(boost::mpi::packed_oarchive &ar,
-				   Cell &_reals, int extradata, const double shift[3])
+				   Cell &_reals, int extradata, const real shift[3])
     {
       ParticleList &reals  = _reals.particles;
 
@@ -363,9 +314,7 @@ namespace espresso {
 	}
 	if (extradata & DATA_PROPERTIES) {
 	  ar >> dst->p;
-
-	  if (localParticles.find(dst->p.id) != localParticles.end())
-	    localParticles[dst->p.id] = &(*dst);
+	  updateInLocalParticles(&(*dst), true);
 	}
 	if (extradata & DATA_MOMENTUM) {
 	  ar >> dst->m;
@@ -379,7 +328,7 @@ namespace espresso {
 
     void Storage::copyRealsToGhosts(Cell &_reals, Cell &_ghosts,
 				    int extradata,
-				    const double shift[3])
+				    const real shift[3])
     {
       ParticleList &reals  = _reals.particles;
       ParticleList &ghosts = _ghosts.particles;

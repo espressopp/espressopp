@@ -160,13 +160,11 @@ namespace espresso {
 	  @param shift how to adjust the positions of the particles when sending
       */
       void packPositionsEtc(boost::mpi::packed_oarchive &ar,
-			    Cell &reals, int extradata, const double shift[3]);
-      void packPositionsEtc(double* buffer, int& m,
-                            Cell &_reals, int extradata, const double shift[3]);
+			    Cell &reals, int extradata, const real shift[3]);
+
  
       /** unpack received data for ghosts. */
       void unpackPositionsEtc(Cell &ghosts, boost::mpi::packed_iarchive &ar, int extradata);
-      void unpackPositionsEtc(Cell &_ghosts, double* buffer, int& m, int extradata);
 
       /** copy specified data elements between a real cell and one of its ghosts
 
@@ -174,7 +172,7 @@ namespace espresso {
       */
       void copyRealsToGhosts(Cell &reals, Cell &ghosts,
 			     int extradata,
-			     const double shift[3]);
+			     const real shift[3]);
 
       /** pack ghost forces for sending. */
       void packForces(boost::mpi::packed_oarchive &ar, Cell &ghosts);
@@ -205,6 +203,17 @@ namespace espresso {
 
       // update the id->local particle map for the given cell
       void updateLocalParticles(ParticleList &);
+      /* remove this particle from local particles.  If weak is true,
+	 the information is only removed if the pointer is actually at
+	 the current position. This is used for ghosts, which should
+	 not overwrite real particle pointers.
+       */
+      void removeFromLocalParticles(Particle *, bool weak = false);
+      /* update information for this particle from local particles. If weak is true,
+	 the information is only updated if no information is present yet. This is used
+	 for ghosts, which should not overwrite real particle pointers.
+       */
+      void updateInLocalParticles(Particle *, bool weak = false);
 
       // reserve space for nCells cells
       void resizeCells(longint nCells);
@@ -213,13 +222,9 @@ namespace espresso {
       Particle *appendUnindexedParticle(ParticleList &, Particle &);
       // append a particle to a list, updating localParticles
       Particle *appendIndexedParticle(ParticleList &, Particle &);
-      // move a particle from one list to another, without updating localParticles
-      Particle *moveUnindexedParticle(ParticleList &dst, ParticleList &src, int srcpos);
       // move a particle from one list to another, updating localParticles
       Particle *moveIndexedParticle(ParticleList &dst, ParticleList &src, int srcpos);
 
-      /// map particle id to Particle * for all particles on this node
-      boost::unordered_map<longint, Particle * > localParticles;
       shared_ptr< mpi::communicator > comm;
   
       /** here the local particles are actually stored */
@@ -233,6 +238,10 @@ namespace espresso {
       CellList localCells;
 
       static LOG4ESPP_DECL_LOGGER(logger);
+
+    private:
+      /// map particle id to Particle * for all particles on this node
+      boost::unordered_map<longint, Particle * > localParticles;
     };
   }
 }
