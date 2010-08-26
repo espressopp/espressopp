@@ -257,14 +257,12 @@ namespace espresso {
 		if (part.r.p[coord] - cellGrid.getMyLeft(coord) < -ROUND_ERROR_PREC) {
 		  LOG4ESPP_TRACE(logger, "send particle left " << part.p.id);
 		  moveIndexedParticle(sendBufL, cell.particles, p);
-		  localParticles.erase(part.p.id);
 		  // redo same particle since we took one out here, so it's a new one
 		  --p;
 		// check whether the particle is now "right" of the local domain
 		} else if (part.r.p[coord] - cellGrid.getMyRight(coord) >= ROUND_ERROR_PREC) {
 		  LOG4ESPP_TRACE(logger, "send particle right " << part.p.id);
 		  moveIndexedParticle(sendBufR, cell.particles, p);
-		  localParticles.erase(part.p.id);
 		  --p;
 		}
 		// Sort particles in cells of this node during last direction
