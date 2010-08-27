@@ -51,6 +51,11 @@ namespace espresso {
     }
 
     inline void Storage::removeFromLocalParticles(Particle *p, bool weak) {
+      /* no pointer left, can happen for ghosts when the real particle
+	 e has already been removed */
+      if (localParticles.find(p->p.id) == localParticles.end())
+	return;
+
       if (!weak || localParticles[p->p.id] == p) {
 	LOG4ESPP_TRACE(logger, "removing local pointer for particle id="
 		       << p->p.id << " @ " << p);
