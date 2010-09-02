@@ -24,7 +24,7 @@ skin = 0.3
 # compute the number of cells on each node
 def calcNumberCells(size, nodes, cutoff):
   ncells = 1
-  while size / (ncells * nodes) >= cutoff:
+  while size / (ncells * nodes) >= (cutoff + skin):
      ncells = ncells + 1
   return ncells - 1
 
@@ -66,6 +66,11 @@ potFENE = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
 interFENE = espresso.interaction.FixedPairListFENE(fpl)
 interFENE.setPotential(type1 = 0, type2 = 0, potential = potFENE)
 system.addInteraction(interFENE)
+
+# Cosine with FixedTriple list
+ftl = espresso.FixedPairList(system.storage)
+pairs = [(0, 1), (1, 2), (3, 4), (4, 5)]
+ftl.addBonds(pairs)
 
 # Lennard-Jones with Verlet list
 vl = espresso.VerletList(system, cutoff = cutoff + system.skin)

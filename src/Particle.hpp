@@ -3,6 +3,7 @@
 #define _PARTICLE_HPP
 
 #include "types.hpp"
+#include "triple.hpp"
 #include <vector>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/list.hpp>
@@ -149,6 +150,7 @@ namespace espresso {
     : public esutil::ESPPContainer < std::vector< Particle > > 
   {};
 
+  // pairs
   class ParticlePair 
     : public std::pair< class Particle*, class Particle* > 
   {
@@ -170,6 +172,30 @@ namespace espresso {
 
     void add(Particle &p1, Particle &p2) 
     { this->add(&p1, &p2); }
+  };
+
+  // triples
+  class ParticleTriple
+    : public triple< class Particle*, class Particle*, class Particle* >
+  {
+  private:
+    typedef triple< class Particle*, class Particle*, class Particle* > Super;
+  public:
+    ParticleTriple() : Super() {}
+    ParticleTriple(Particle* p1, Particle* p2, Particle* p3)
+      : Super(p1, p2, p3) {}
+    ParticleTriple(Particle &p1, Particle& p2, Particle& p3)
+      : Super(&p1, &p2, &p3) {}
+  };
+
+  struct TripleList
+    : public esutil::ESPPContainer< std::vector< ParticleTriple > >
+  {
+    void add(Particle *p1, Particle *p2, Particle *p3)
+    { this->push_back(ParticleTriple(p1, p2, p3)); }
+
+    void add(Particle &p1, Particle &p2, Particle &p3)
+    { this->add(&p1, &p2, &p3); }
   };
 
 }
