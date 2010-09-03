@@ -3,7 +3,6 @@
 #define _INTERACTION_FENE_HPP
 
 #include "Potential.hpp"
-#include "VerletListInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 #include <cmath>
 

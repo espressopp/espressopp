@@ -1,8 +1,6 @@
 #include "python.hpp"
 #include "FENE.hpp"
-#include "VerletListInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
-#include "CellListAllPairsInteractionTemplate.hpp"
 
 namespace espresso {
   namespace interaction {
