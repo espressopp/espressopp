@@ -4,7 +4,6 @@
 
 #include "log4espp.hpp"
 #include "types.hpp"
-#include "triple.hpp"
 
 #include "Particle.hpp"
 #include "esutil/ESPPIterator.hpp"
@@ -12,17 +11,14 @@
 #include <boost/signals2.hpp>
 
 namespace espresso {
-  class FixedTripleList : public PairList {
+  class FixedTripleList : public TripleList {
   protected:
     boost::signals2::connection con1, con2, con3;
     shared_ptr< storage::Storage > storage;
-    typedef boost::unordered_multimap< longint, longint > GlobalPairs;
-    typedef boost::unordered_multimap< longint, longint, longint > GlobalTriples;
-    GlobalPairs globalPairs;
-    GlobalPairs globalTriples;
+    typedef boost::unordered_multimap< longint, std::pair < longint, longint > > GlobalTriples;
+    GlobalTriples globalTriples;
 
-    //using TripleList::add;
-    using PairList::add;
+    using TripleList::add;
 
   public:
     FixedTripleList(shared_ptr< storage::Storage > _storage);
@@ -35,7 +31,7 @@ namespace espresso {
 	
 	\return whether the triple was inserted on this processor.
     */
-    bool add(longint pid1, longint pid2);
+    bool add(longint pid1, longint pid2, longint pid3);
 
     void beforeSendParticles(ParticleList& pl, 
 			     mpi::packed_oarchive& ar);

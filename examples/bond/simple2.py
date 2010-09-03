@@ -24,7 +24,7 @@ skin = 0.3
 # compute the number of cells on each node
 def calcNumberCells(size, nodes, cutoff):
   ncells = 1
-  while size / (ncells * nodes) >= (cutoff + skin):
+  while size / (ncells * nodes) >= (skin + cutoff):
      ncells = ncells + 1
   return ncells - 1
 
@@ -68,9 +68,9 @@ interFENE.setPotential(type1 = 0, type2 = 0, potential = potFENE)
 system.addInteraction(interFENE)
 
 # Cosine with FixedTriple list
-ftl = espresso.FixedPairList(system.storage)
-pairs = [(0, 1), (1, 2), (3, 4), (4, 5)]
-ftl.addBonds(pairs)
+ftl = espresso.FixedTripleList(system.storage)
+triples = [(0, 1, 2), (1, 2, 3), (3, 2, 4), (5, 4, 3)]
+ftl.addTriples(triples)
 
 # Lennard-Jones with Verlet list
 vl = espresso.VerletList(system, cutoff = cutoff + system.skin)
@@ -81,7 +81,7 @@ system.addInteraction(interLJ)
 
 # integrator
 integrator = espresso.integrator.VelocityVerlet(system)
-integrator.dt = 0.01
+integrator.dt = 0.001
 
 # analysis
 temp = espresso.analysis.Temperature(system)
@@ -102,7 +102,9 @@ print 'Ek = ', Ek
 print 'T = ', temperature
 print 'P = ', p
 
-integrator.run(100)
+integrator.run(0)
+#for i in range(100000):
+#  integrator.run(1)
 
 temperature = temp.compute()
 p = press.compute()

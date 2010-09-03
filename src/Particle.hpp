@@ -3,7 +3,7 @@
 #define _PARTICLE_HPP
 
 #include "types.hpp"
-#include "triple.hpp"
+#include "Triple.hpp"
 #include <vector>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/list.hpp>
@@ -176,10 +176,10 @@ namespace espresso {
 
   // triples
   class ParticleTriple
-    : public triple< class Particle*, class Particle*, class Particle* >
+    : public Triple< class Particle*, class Particle*, class Particle* >
   {
   private:
-    typedef triple< class Particle*, class Particle*, class Particle* > Super;
+    typedef Triple< class Particle*, class Particle*, class Particle* > Super;
   public:
     ParticleTriple() : Super() {}
     ParticleTriple(Particle* p1, Particle* p2, Particle* p3)
