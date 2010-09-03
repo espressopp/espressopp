@@ -125,7 +125,7 @@ namespace espresso {
   afterRecvParticles(ParticleList &pl, 
 		     mpi::packed_iarchive& ar) {
     vector< longint > received;
-    longint n;
+    int n;
     longint pid1, pid2;
     GlobalPairs::iterator it = globalPairs.begin();
     // receive the bond list

@@ -15,7 +15,8 @@ namespace espresso {
   protected:
     boost::signals2::connection con1, con2, con3;
     shared_ptr< storage::Storage > storage;
-    typedef boost::unordered_multimap< longint, std::pair < longint, longint > > GlobalTriples;
+    typedef boost::unordered_multimap< longint,
+            std::pair < longint, longint > > GlobalTriples;
     GlobalTriples globalTriples;
 
     using TripleList::add;
