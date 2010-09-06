@@ -69,8 +69,21 @@ system.addInteraction(interFENE)
 
 # Cosine with FixedTriple list
 ftl = espresso.FixedTripleList(system.storage)
-triples = [(0, 1, 2), (1, 2, 3), (3, 2, 4), (5, 4, 3)]
+triples = [(0, 1, 2), (1, 2, 3), (2, 3, 4), (3, 4, 5)]
 ftl.addTriples(triples)
+#potCosine = espresso.interaction.Cosine(K=1.5, theta0=3.1415)
+#interCosine = espresso.interaction.FixedTripleListCosine(ftl)
+#interCosine.setPotential(type1 = 0, potential = potCosine)
+#system.addInteraction(interCosine)
+
+# Harmonic with FixedQuadruple list
+fql = espresso.FixedQuadrupleList(system.storage)
+quadruples = [(0, 1, 2, 3), (1, 2, 3, 4), (2, 3, 4, 5)]
+fql.addQuadruples(quadruples)
+#potHarmonic = espresso.interaction.DihedralHarmonic(K=1.5, d=1, n=0)
+#interHarmonic = espresso.interaction.FixedQuadrupleListHarmonic(fql)
+#interHarmonic.setPotential(type1 = 0, potential = potHarmonic)
+#system.addInteraction(interHarmonic)
 
 # Lennard-Jones with Verlet list
 vl = espresso.VerletList(system, cutoff = cutoff + system.skin)

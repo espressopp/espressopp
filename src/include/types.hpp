@@ -39,6 +39,11 @@ namespace espresso {
   class ParticlePair;
   class PairList;
 
+  class ParticleTriple;
+  class TripleList;
+  class ParticleQuadruple;
+  class QuadrupleList;
+
   class Cell;
   class CellList;
   class NeighborCellList;

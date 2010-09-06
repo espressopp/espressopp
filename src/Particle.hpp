@@ -4,6 +4,7 @@
 
 #include "types.hpp"
 #include "Triple.hpp"
+#include "Quadruple.hpp"
 #include <vector>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/list.hpp>
@@ -160,7 +161,7 @@ namespace espresso {
     ParticlePair() : Super() {}
     ParticlePair(Particle* p1, Particle* p2) 
       : Super(p1, p2) {}
-    ParticlePair(Particle &p1, Particle& p2)
+    ParticlePair(Particle &p1, Particle &p2)
       : Super(&p1, &p2) {}
   };
 
@@ -196,6 +197,32 @@ namespace espresso {
 
     void add(Particle &p1, Particle &p2, Particle &p3)
     { this->add(&p1, &p2, &p3); }
+  };
+
+  // quadruples
+  class ParticleQuadruple
+    : public Quadruple< class Particle*, class Particle*,
+                        class Particle*, class Particle* >
+  {
+  private:
+    typedef Quadruple< class Particle*, class Particle*,
+                       class Particle*, class Particle* > Super;
+  public:
+    ParticleQuadruple() : Super() {}
+    ParticleQuadruple(Particle* p1, Particle* p2, Particle* p3, Particle* p4)
+      : Super(p1, p2, p3, p4) {}
+    ParticleQuadruple(Particle &p1, Particle& p2, Particle& p3, Particle& p4)
+      : Super(&p1, &p2, &p3, &p4) {}
+  };
+
+  struct QuadrupleList
+    : public esutil::ESPPContainer< std::vector< ParticleQuadruple > >
+  {
+    void add(Particle *p1, Particle *p2, Particle *p3, Particle *p4)
+    { this->push_back(ParticleQuadruple(p1, p2, p3, p4)); }
+
+    void add(Particle &p1, Particle &p2, Particle &p3, Particle &p4)
+    { this->add(&p1, &p2, &p3, &p4); }
   };
 
 }

@@ -10,6 +10,7 @@
 #include <VerletList.hpp>
 #include <FixedPairList.hpp>
 #include <FixedTripleList.hpp>
+#include <FixedQuadrupleList.hpp>
 #include <Real3D.hpp>
 #include <Int3D.hpp>
 #include <esutil/PyLogger.hpp>
@@ -22,6 +23,7 @@ void espresso::registerPython() {
   espresso::VerletList::registerPython();
   espresso::FixedPairList::registerPython();
   espresso::FixedTripleList::registerPython();
+  espresso::FixedQuadrupleList::registerPython();
   espresso::Real3D::registerPython();
   espresso::Int3D::registerPython();
 

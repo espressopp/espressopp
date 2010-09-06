@@ -15,7 +15,7 @@ namespace espresso {
 
   LOG4ESPP_LOGGER(FixedTripleList::theLogger, "FixedTripleList");
 
-  FixedTripleList::FixedTripleList(shared_ptr< storage::Storage > _storage) 
+  FixedTripleList::FixedTripleList(shared_ptr< storage::Storage > _storage)
     : storage(_storage), globalTriples()
   {
     LOG4ESPP_INFO(theLogger, "construct FixedTripleList");
