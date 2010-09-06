@@ -2,6 +2,7 @@
 #ifndef _INTERACTION_FIXEDPAIRLISTINTERACTIONTEMPLATE_HPP
 #define _INTERACTION_FIXEDPAIRLISTINTERACTIONTEMPLATE_HPP
 
+#include "mpi.hpp"
 #include "types.hpp"
 #include "Interaction.hpp"
 #include "Real3D.hpp"
