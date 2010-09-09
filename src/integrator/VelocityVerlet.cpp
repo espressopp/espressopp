@@ -157,7 +157,7 @@ namespace espresso {
 
       // ToDo: print Timers only if INFO is enabled
 
-      printTimers();
+      // printTimers();
     }
 
     void VelocityVerlet::resetTimers()

@@ -22,7 +22,8 @@ namespace espresso {
       typedef class FixedPairListInteractionTemplate< FENE >
         FixedPairListFENE;
       class_< FixedPairListFENE, bases< Interaction > >
-        ("interaction_FixedPairListFENE", init< shared_ptr<FixedPairList> >())
+        ("interaction_FixedPairListFENE", 
+           init< shared_ptr<System>, shared_ptr<FixedPairList> >())
         .def("setPotential", &FixedPairListFENE::setPotential);
       ;
 

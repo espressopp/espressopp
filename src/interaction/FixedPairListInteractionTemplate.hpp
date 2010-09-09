@@ -9,18 +9,23 @@
 #include "Particle.hpp"
 #include "FixedPairList.hpp"
 #include "esutil/Array2D.hpp"
+#include "bc/BC.hpp"
+#include "SystemAccess.hpp"
 
 namespace espresso {
   namespace interaction {
     template < typename _Potential >
     class FixedPairListInteractionTemplate
-        : public Interaction {
+       : public Interaction, SystemAccess {
     protected:
       typedef _Potential Potential;
     public:
       FixedPairListInteractionTemplate
-      (shared_ptr < FixedPairList > _fixedpairList)
-        : fixedpairList(_fixedpairList) 
+      (shared_ptr < System > system,
+       shared_ptr < FixedPairList > _fixedpairList)
+
+        : SystemAccess(system), fixedpairList(_fixedpairList) 
+
       {
         potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
       }
@@ -69,7 +74,8 @@ namespace espresso {
         const Potential &potential = getPotential(type1, type2);
 
 	Real3D force;
-	if (potential._computeForce(force, p1, p2))
+        Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
+	if (potential._computeForce(force, dist))
 	  for(int k = 0; k < 3; k++) {
 	    p1.f.f[k] += force[k];
 	    p2.f.f[k] -= force[k];
@@ -100,6 +106,7 @@ namespace espresso {
     inline real
     FixedPairListInteractionTemplate < _Potential >::
     computeEnergy() {
+
       LOG4ESPP_INFO(theLogger, "compute energy of the FixedPair list pairs");
 
       real e = 0.0;
@@ -110,7 +117,8 @@ namespace espresso {
         int type1 = p1.p.type;
         int type2 = p2.p.type;
         const Potential &potential = getPotential(type1, type2);
-	e += potential._computeEnergy(p1, p2);
+        Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
+	e += potential._computeEnergy(dist);
       }
       real esum;
       boost::mpi::reduce(*mpiWorld, e, esum, std::plus<real>(), 0);
@@ -131,8 +139,8 @@ namespace espresso {
         const Potential &potential = getPotential(type1, type2);
 
         Real3D force;
-        if (potential._computeForce(force, p1, p2)) {
-          Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
+        Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
+        if (potential._computeForce(force, dist)) {
           w = w + dist * force;
         }
       }
@@ -156,10 +164,9 @@ namespace espresso {
         int type1 = p1.p.type;
         int type2 = p2.p.type;
         const Potential &potential = getPotential(type1, type2);
-
         Real3D force;
-        if (potential._computeForce(force, p1, p2)) {
-          Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
+        Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
+        if (potential._computeForce(force, dist)) {
           wij_[0] += dist[0] * force[0];
           wij_[1] += dist[1] * force[1];
           wij_[2] += dist[2] * force[2];

@@ -17,8 +17,8 @@ class FENELocal(PotentialLocal, interaction_FENE):
 
 class FixedPairListFENELocal(InteractionLocal, interaction_FixedPairListFENE):
     'The (local) FENE interaction using FixedPair lists.'
-    def __init__(self, vl):
-        cxxinit(self, interaction_FixedPairListFENE, vl)
+    def __init__(self, system, vl):
+        cxxinit(self, interaction_FixedPairListFENE, system, vl)
 
     def setPotential(self, type1, type2, potential):
         self.cxxclass.setPotential(self, type1, type2, potential)

@@ -153,14 +153,14 @@ namespace espresso {
   void FixedPairList::
   onParticlesChanged() {
     // (re-)generate the local bond list from the global list
-    printf("FixedPairList: rebuild local bond list from global\n");
+    // printf("FixedPairList: rebuild local bond list from global\n");
     this->clear();
     longint lastpid1 = -1;
     Particle *p1;
     Particle *p2;
     for (GlobalPairs::const_iterator it = globalPairs.begin();
 	 it != globalPairs.end(); ++it) {
-      printf("lookup global pair %d %d\n", it->first, it->second);
+      // printf("lookup global pair %d %d\n", it->first, it->second);
       if (it->first != lastpid1) {
 	p1 = storage->lookupRealParticle(it->first);
         if (p1 == NULL) {
