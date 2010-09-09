@@ -11,6 +11,7 @@ import espresso
 import MPI
 import math
 import logging
+import sys
 
 from espresso import Real3D, Int3D
 
@@ -63,7 +64,7 @@ fpl = espresso.FixedPairList(system.storage)
 pairs = [(0, 1), (1, 2), (3, 4), (4, 5)]
 fpl.addBonds(pairs)
 potFENE = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
-interFENE = espresso.interaction.FixedPairListFENE(fpl)
+interFENE = espresso.interaction.FixedPairListFENE(system, fpl)
 interFENE.setPotential(type1 = 0, type2 = 0, potential = potFENE)
 system.addInteraction(interFENE)
 
@@ -115,20 +116,17 @@ print 'Ek = ', Ek
 print 'T = ', temperature
 print 'P = ', p
 
-integrator.run(0)
-#for i in range(100000):
-#  integrator.run(1)
+niter = 100
 
-temperature = temp.compute()
-p = press.compute()
-pij = pressTensor.compute()
-Ek = 0.5 * temperature * (3 * numParticles)
-Ep_LJ = interLJ.computeEnergy()
-Ep_FENE = interFENE.computeEnergy()
+for i in range(1):
+  integrator.run(niter)
+  temperature = temp.compute()
+  p = press.compute()
+  pij = pressTensor.compute()
+  Ek = 0.5 * temperature * (3 * numParticles)
+  Ep_LJ = interLJ.computeEnergy()
+  Ep_FENE = interFENE.computeEnergy()
 
-print 'E_total = ', Ek + Ep_LJ + Ep_FENE
-print 'Ep_LJ = ', Ep_LJ
-print 'Ep_FENE = ', Ep_FENE
-print 'Ek = ', Ek
-print 'T = ', temperature
-print 'P = ', p
+  print 'Iter %d = Energy: total = %g, lj = %g, fene = %g, kin = %g'% \
+         ((i+1) * niter, Ek + Ep_LJ + Ep_FENE, Ep_LJ, Ep_FENE, Ek)
+
