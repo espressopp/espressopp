@@ -6,6 +6,7 @@
 #include "CellGrid.hpp"
 #include "NodeGrid.hpp"
 
+
 namespace espresso {
   namespace storage {
     class NodeGridMismatch: public std::invalid_argument
