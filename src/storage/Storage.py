@@ -1,15 +1,18 @@
 from espresso import pmi
 import MPI
 import logging
+from espresso import toReal3DFromVector, ParticleLocal
 
 class StorageLocal(object):
     """Abstract local base class for storing particles"""
 
     logger = logging.getLogger("Storage")
 
-    def addParticle(self, pid, pos):
-
-        self.cxxclass.addParticle(self, pid, pos)
+    def addParticle(self, pid, *args):
+        self.cxxclass.addParticle(
+            self, pid, toReal3DFromVector(*args)
+            )
+        return ParticleLocal(pid, self)
 
     def addParticles(self, particleList, *properties):
         """

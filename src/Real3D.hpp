@@ -208,7 +208,7 @@ namespace espresso {
 
   inline real ConstReal3DRef::abs() const
   { return sqrt(sqr()); }
-  
+
   //////////////////////////////////////////////////
   // Real3DRef
   inline Real3DRef::Real3DRef(real v[3])

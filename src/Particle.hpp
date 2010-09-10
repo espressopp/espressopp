@@ -10,6 +10,7 @@
 #include <boost/serialization/list.hpp>
 #include <boost/mpi.hpp>
 #include "esutil/ESPPIterator.hpp"
+#include "Real3D.hpp"
 
 namespace espresso {
   struct ParticleProperties {
@@ -84,6 +85,7 @@ namespace espresso {
   };
 
   struct ParticleLocal {
+    // the image of the particle
     int i[3];
     bool ghost;
 
@@ -116,27 +118,40 @@ namespace espresso {
 
     // getter and setter used for export in Python
 
-    real getVx() const { return m.v[0]; }
-    real getVy() const { return m.v[1]; }
-    real getVz() const { return m.v[2]; }
-  
-    real getFx() const { return f.f[0]; }
-    real getFy() const { return f.f[1]; }
-    real getFz() const { return f.f[2]; }
+    // Properties
+    longint getId() const { return p.id; }
+
+    real getType() const { return p.type; }
+    void setType(int type) { p.type = type; }
 
     real getMass() const { return p.mass; }
-    real getType() const { return p.type; }
-  
-    void setVx(real vx) { m.v[0] = vx; }
-    void setVy(real vy) { m.v[1] = vy; }
-    void setVz(real vz) { m.v[2] = vz; }
-
-    void setFx(real fx) { f.f[0] = fx; }
-    void setFy(real fy) { f.f[1] = fy; }
-    void setFz(real fz) { f.f[2] = fz; }
-
-    void setType(int type) { p.type = type; }
     void setMass(real mass) { p.mass = mass; }
+
+    // Position
+    Real3D getPos() const { return Real3D(r.p); }
+    void setPos(const ConstReal3DRef &pos) {
+      r.p[0] = pos[0];
+      r.p[1] = pos[1]; 
+      r.p[2] = pos[2]; 
+    }
+
+    // Force
+    Real3D getF() const { return Real3D(f.f); }
+    void setF(const ConstReal3DRef &f) { 
+      this->f.f[0] = f[0]; 
+      this->f.f[1] = f[1]; 
+      this->f.f[2] = f[2]; 
+    }
+
+    // Momentum
+    Real3D getV() const { return Real3D(m.v); }
+    void setV(const ConstReal3DRef &v) { 
+      m.v[0] = v[0]; 
+      m.v[1] = v[1]; 
+      m.v[2] = v[2]; 
+    }
+
+    static void registerPython();
   
   private:
     friend class boost::serialization::access;

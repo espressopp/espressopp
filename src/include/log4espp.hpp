@@ -14,8 +14,8 @@
 *                                                                           *
 ****************************************************************************/
 
-#ifndef LOG4ESPP_H
-#define LOG4ESPP_H
+#ifndef _LOG4ESPP_HPP
+#define _LOG4ESPP_HPP
 
 /************************************************************************
 *                                                                       *
@@ -123,7 +123,7 @@
 
 #if defined(HAVE_LOG4CPP) and defined(LOG4ESPP_USE_LOG4CPP)
 
-#include <stdio.h>
+#include <cstdio>
 #include "log4cpp/Portability.hh"
 #ifdef LOG4CPP_HAVE_UNISTD_H
 #include <unistd.h>

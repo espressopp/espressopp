@@ -442,20 +442,13 @@ namespace espresso {
     void
     Storage::registerPython() {
       using namespace espresso::python;
-
-      class_< Particle > ("ParticleRef", no_init)
-        .add_property("vx", &Particle::getVx, &Particle::setVx)
-        .add_property("vy", &Particle::getVy, &Particle::setVy)
-        .add_property("vz", &Particle::getVz, &Particle::setVz)
-        .add_property("fx", &Particle::getFx, &Particle::setFx)
-        .add_property("fy", &Particle::getFy, &Particle::setFy)
-        .add_property("fz", &Particle::getFz, &Particle::setFz)
-        .add_property("type", &Particle::getType, &Particle::setType)
-        .add_property("mass", &Particle::getMass, &Particle::setMass)
-      ;
-
       class_< Storage, boost::noncopyable >("storage_Storage", no_init)
-	.def("addParticle", &Storage::addParticle, return_value_policy<reference_existing_object>())
+	.def("addParticle", &Storage::addParticle, 
+	     return_value_policy< reference_existing_object >())
+	.def("lookupLocalParticle", &Storage::lookupLocalParticle,
+	     return_value_policy< reference_existing_object >())
+	.def("lookupRealParticle", &Storage::lookupRealParticle,
+	     return_value_policy< reference_existing_object >())
 	.def("decompose", &Storage::decompose)
         .add_property("system", &Storage::getSystem)
 	;
