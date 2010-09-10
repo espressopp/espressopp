@@ -34,7 +34,7 @@ namespace espresso {
 
         bool resortFlag;  //!< true implies need for resort of particles
 
-        double maxCut;
+        real maxCut;
 
         shared_ptr< class Langevin > langevin;  //!< Langevin thermostat if available
 
@@ -43,11 +43,13 @@ namespace espresso {
             \return maximal square distance a particle has moved.
         */
 
-        double integrate1();
+        real integrate1();
 
         void integrate2();
 
         void initForces();
+
+        void updateForces();
 
         void calcForces();
 

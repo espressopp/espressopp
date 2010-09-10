@@ -28,10 +28,10 @@ namespace espresso {
 
     /** Spline read-in values. */
 
-    void InterpolationTable::spline(const double *x, const double *y, int n,
-                                    double yp1, double ypn, double *y2)
+    void InterpolationTable::spline(const real *x, const real *y, int n,
+                                    real yp1, real ypn, real *y2)
     {
-      double *u = new double[n];
+      real *u = new real[n];
 
       if (yp1 > 0.99e30) {
         y2[0] = 0.0;
@@ -43,8 +43,8 @@ namespace espresso {
     
       for (int i = 1; i < n-1; i++) {
 
-        double sig = (x[i] - x[i-1]) / (x[i+1]-x[i-1]);
-        double p   = sig * y2[i-1] + 2.0;
+        real sig = (x[i] - x[i-1]) / (x[i+1]-x[i-1]);
+        real p   = sig * y2[i-1] + 2.0;
     
         y2[i] = (sig-1.0) / p;
         u[i]  = (y[i+1] - y[i]) / (x[i+1] - x[i]) -
@@ -52,7 +52,7 @@ namespace espresso {
         u[i]  = (6.0*u[i] / (x[i+1]-x[i-1]) - sig*u[i-1]) / p;
       }
     
-      double qn, un;
+      real qn, un;
     
       if (ypn > 0.99e30) {
         qn = 0.0;
@@ -184,8 +184,8 @@ namespace espresso {
     *                                                                         *
     **************************************************************************/
 
-    real InterpolationTable::splineInterpolation(real r, const double* fn, 
-                                                         const double* fn2) const
+    real InterpolationTable::splineInterpolation(real r, const real* fn, 
+                                                         const real* fn2) const
     {
       int index = static_cast<int>((r - inner) * invdelta);
 

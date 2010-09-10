@@ -67,12 +67,12 @@ namespace espresso {
 
       /** Spline read-in values. */
 
-      void spline(const double* x, const double* y, int n,
-                  double yp1, double ypn, double* y2);
+      void spline(const real* x, const real* y, int n,
+                  real yp1, real ypn, real* y2);
 
       /** Spline interpolation */
 
-      real splineInterpolation(real r, const double* fn, const double* fn2) const;
+      real splineInterpolation(real r, const real* fn, const real* fn2) const;
 
       int N;  // number of read values
 

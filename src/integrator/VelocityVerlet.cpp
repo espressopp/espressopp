@@ -82,23 +82,7 @@ namespace espresso {
 
 	if (langevin) langevin->heatUp();
 
-	if (LOG4ESPP_DEBUG_ON(theLogger)) {
-	  // printPositions(false);
-	}
-
-	storage.updateGhosts();
-
-	if (LOG4ESPP_DEBUG_ON(theLogger)) {
-	  // printPositions(true);
-	}
-
-	calcForces();
-
-	if (LOG4ESPP_DEBUG_ON(theLogger)) {
-	  // printForces(true);    // check forces in real + ghost particles
-	}
-
-	storage.collectGhostForces();
+        updateForces();
 
 	if (LOG4ESPP_DEBUG_ON(theLogger)) {
 	  // printForces(false);   // forces are reduced to real particles
@@ -133,19 +117,7 @@ namespace espresso {
           timeResort += timeIntegrate.getElapsedTime() - time;
 	}
 
-        time = timeIntegrate.getElapsedTime();
-        storage.updateGhosts();
-        timeComm1 += timeIntegrate.getElapsedTime() - time;
-
-        time = timeIntegrate.getElapsedTime();
-        calcForces();
-        timeForce += timeIntegrate.getElapsedTime() - time;
-
-        time = timeIntegrate.getElapsedTime();
-        storage.collectGhostForces();
-        timeComm2 += timeIntegrate.getElapsedTime() - time;
-
-        if (langevin) langevin->thermalize();
+        updateForces();
 
         time = timeIntegrate.getElapsedTime();
         integrate2();
@@ -235,7 +207,7 @@ namespace espresso {
       real maxAllSqDist;
 
       mpi::all_reduce(*system.comm, maxSqDist, maxAllSqDist, 
-                      boost::mpi::maximum<double>());
+                      boost::mpi::maximum<real>());
 
       LOG4ESPP_INFO(theLogger, "moved " << count << " particles in integrate1" <<
 		    ", max move local = " << sqrt(maxSqDist) <<
@@ -305,6 +277,26 @@ namespace espresso {
 
 	srIL[i]->addForces();
       }
+    }
+
+    void VelocityVerlet::updateForces()
+    {
+      real time;
+      storage::Storage& storage = *getSystemRef().storage;
+
+      time = timeIntegrate.getElapsedTime();
+      storage.updateGhosts();
+      timeComm1 += timeIntegrate.getElapsedTime() - time;
+
+      time = timeIntegrate.getElapsedTime();
+      calcForces();
+      timeForce += timeIntegrate.getElapsedTime() - time;
+
+      time = timeIntegrate.getElapsedTime();
+      storage.collectGhostForces();
+      timeComm2 += timeIntegrate.getElapsedTime() - time;
+
+      if (langevin) langevin->thermalize();
     }
 
     /*****************************************************************************/

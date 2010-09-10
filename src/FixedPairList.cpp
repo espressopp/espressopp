@@ -86,14 +86,11 @@ namespace espresso {
 	 pit.isValid(); ++pit) {
       longint pid = pit->p.id;
       
-      // LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pid << ", find pairs");
-      printf ("me = %d: send particle with pid %d find pairs\n", mpiWorld->rank(), pid);
+      LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pid << ", find pairs");
 
       // find all pairs that involve this particle
       
       int n = globalPairs.count(pid);
-      printf ("me = %d: send particle with pid %d, has %d global pairs\n", 
-                mpiWorld->rank(), pid, n);
 
       if (n > 0) {
 	std::pair<GlobalPairs::const_iterator, 
@@ -109,7 +106,8 @@ namespace espresso {
 	for (GlobalPairs::const_iterator it = equalRange.first; 
 	     it != equalRange.second; ++it) {
 	  toSend.push_back(it->second);
-          printf ("send global bond: pid %d and partner %d\n", pid, it->second);
+          LOG4ESPP_DEBUG(theLogger, "send global bond: pid "
+                   << pid << " and partner " << it->second);
         }
 
 	// delete all of these pairs from the global list
@@ -135,32 +133,31 @@ namespace espresso {
       // unpack the list
       pid1 = received[i++];
       n = received[i++];
-      printf ("me = %d: recv particle with pid %d, has %d global pairs\n",
-                mpiWorld->rank(), pid1, n);
+      LOG4ESPP_DEBUG(theLogger, "recv particle " << pid1 << 
+                                ", has " << n << " global pairs");
       for (; n > 0; --n) {
 	pid2 = received[i++];
 	// add the bond to the global list
-        printf("received pair %d %d, add bond to global list\n", pid1, pid2);
+        LOG4ESPP_DEBUG(theLogger, "received pair " << pid1 << " , " << pid2);
 	it = globalPairs.insert(it, make_pair(pid1, pid2));
       }
     }
     if (i != size) {
-      printf("ATTETNTION:  recv particles might have read garbage\n");
+      LOG4ESPP_ERROR(theLogger, 
+        "ATTETNTION:  recv particles might have read garbage\n");
     }
     LOG4ESPP_INFO(theLogger, "received fixed pair list after receive particles");
   }
 
   void FixedPairList::
   onParticlesChanged() {
-    // (re-)generate the local bond list from the global list
-    // printf("FixedPairList: rebuild local bond list from global\n");
+    LOG4ESPP_INFO(theLogger, "rebuild local bond list from global\n");
     this->clear();
     longint lastpid1 = -1;
     Particle *p1;
     Particle *p2;
     for (GlobalPairs::const_iterator it = globalPairs.begin();
 	 it != globalPairs.end(); ++it) {
-      // printf("lookup global pair %d %d\n", it->first, it->second);
       if (it->first != lastpid1) {
 	p1 = storage->lookupRealParticle(it->first);
         if (p1 == NULL) {
