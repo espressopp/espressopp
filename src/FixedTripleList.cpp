@@ -101,12 +101,12 @@ namespace espresso {
       longint pid = pit->p.id;
       
       // LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pid << ", find triples");
-      printf ("me = %d: send particle with pid %d find triples\n", mpiWorld->rank(), pid);
+      //printf ("me = %d: send particle with pid %d find triples\n", mpiWorld->rank(), pid);
 
       // find all triples that involve this particle
       int n = globalTriples.count(pid);
-      printf ("me = %d: send particle with pid %d, has %d global triples\n", 
-                mpiWorld->rank(), pid, n);
+      //printf ("me = %d: send particle with pid %d, has %d global triples\n", 
+                //mpiWorld->rank(), pid, n);
 
       if (n > 0) {
 	std::pair<GlobalTriples::const_iterator, 
@@ -123,8 +123,8 @@ namespace espresso {
 	     it != equalRange.second; ++it) {
 	  toSend.push_back(it->second.first);
 	  toSend.push_back(it->second.second);
-          printf ("send global triple: pid %d and partner %d\n", pid, it->second.first);
-          printf ("send global triple: pid %d and partner %d\n", pid, it->second.second);
+          //printf ("send global triple: pid %d and partner %d\n", pid, it->second.first);
+          //printf ("send global triple: pid %d and partner %d\n", pid, it->second.second);
         }
 
 	// delete all of these triples from the global list
@@ -151,13 +151,13 @@ namespace espresso {
       // unpack the list
       pid1 = received[i++];
       n = received[i++];
-      printf ("me = %d: recv particle with pid %d, has %d global triples\n",
-                mpiWorld->rank(), pid1, n);
+      //printf ("me = %d: recv particle with pid %d, has %d global triples\n",
+                //mpiWorld->rank(), pid1, n);
       for (; n > 0; --n) {
 	pid2 = received[i++];
 	pid3 = received[i++];
 	// add the triple to the global list
-        printf("received triple %d %d %d, add triple to global list\n", pid1, pid2, pid3);
+        //printf("received triple %d %d %d, add triple to global list\n", pid1, pid2, pid3);
 	it = globalTriples.insert(it, std::make_pair(pid1,
              std::pair<longint, longint>(pid2, pid3)));
       }
@@ -171,7 +171,7 @@ namespace espresso {
   void FixedTripleList::onParticlesChanged() {
     
     // (re-)generate the local triple list from the global list
-    printf("FixedTripleList: rebuild local triple list from global\n");
+    //printf("FixedTripleList: rebuild local triple list from global\n");
     this->clear();
     longint lastpid1 = -1;
     Particle *p1;
@@ -179,7 +179,7 @@ namespace espresso {
     Particle *p3;
     for (GlobalTriples::const_iterator it = globalTriples.begin();
 	 it != globalTriples.end(); ++it) {
-      printf("lookup global triple %d %d %d\n", it->first, it->second.first, it->second.second);
+      //printf("lookup global triple %d %d %d\n", it->first, it->second.first, it->second.second);
       if (it->first != lastpid1) {
 	p1 = storage->lookupRealParticle(it->first);
         if (p1 == NULL) {

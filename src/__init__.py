@@ -28,6 +28,3 @@ if pmi.isController :
 else :
     pmi.startWorkerLoop()
     # the script will usually not reach this point on the workers
-
-
-    

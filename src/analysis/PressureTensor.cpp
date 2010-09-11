@@ -59,7 +59,7 @@ namespace espresso {
     real PressureTensor::compute() const {
       real wij[6];
       computeTensor(wij);
-      return (wij[0] + wij[1] + wij[2]) / 3.0;
+      return -1.0;
     }
 
     using namespace boost::python;

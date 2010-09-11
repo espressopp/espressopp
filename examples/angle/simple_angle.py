@@ -11,12 +11,11 @@ import espresso
 import MPI
 import math
 import logging
-import sys
 
 from espresso import Real3D, Int3D
 
 size = (10.0, 10.0, 10.0)
-numParticles = 6
+numParticles = 3
 cutoff = 2.5
 ljSigma = 1.0
 ljEpsilon = 1.0
@@ -52,16 +51,11 @@ system.storage.addParticle(0, Real3D(5.0, 5.0, 5.0))
 system.storage.addParticle(1, Real3D(5.9, 5.0, 5.0))
 system.storage.addParticle(2, Real3D(6.6, 5.5, 5.1))
 
-# chain 2
-system.storage.addParticle(3, Real3D(5.0, 5.0, 6.0))
-system.storage.addParticle(4, Real3D(5.9, 5.0, 6.0))
-system.storage.addParticle(5, Real3D(6.6, 5.5, 6.1))
-
 system.storage.decompose()
 
 # FENE with FixedPair list
 fpl = espresso.FixedPairList(system.storage)
-pairs = [(0, 1), (1, 2), (3, 4), (4, 5)]
+pairs = [(0, 1), (1, 2)]
 fpl.addBonds(pairs)
 potFENE = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
 interFENE = espresso.interaction.FixedPairListFENE(system, fpl)
@@ -70,21 +64,12 @@ system.addInteraction(interFENE)
 
 # Cosine with FixedTriple list
 ftl = espresso.FixedTripleList(system.storage)
-triples = [(0, 1, 2), (1, 2, 3), (2, 3, 4), (3, 4, 5)]
+triples = [(0, 1, 2)]
 ftl.addTriples(triples)
-potCosine = espresso.interaction.Cosine(K=1.5, theta0=3.1415)
+potCosine = espresso.interaction.Cosine(K=1.5, theta0=3.1415926)
 interCosine = espresso.interaction.FixedTripleListCosine(system, ftl)
 interCosine.setPotential(type1 = 0, type2 = 0, potential = potCosine)
 system.addInteraction(interCosine)
-
-# Harmonic with FixedQuadruple list
-fql = espresso.FixedQuadrupleList(system.storage)
-quadruples = [(0, 1, 2, 3), (1, 2, 3, 4), (2, 3, 4, 5)]
-fql.addQuadruples(quadruples)
-#potHarmonic = espresso.interaction.DihedralHarmonic(K=1.5, d=1, n=0)
-#interHarmonic = espresso.interaction.FixedQuadrupleListHarmonic(fql)
-#interHarmonic.setPotential(type1 = 0, potential = potHarmonic)
-#system.addInteraction(interHarmonic)
 
 # Lennard-Jones with Verlet list
 vl = espresso.VerletList(system, cutoff = cutoff + system.skin)
@@ -108,25 +93,33 @@ pij = pressTensor.compute()
 Ek = 0.5 * temperature * (3 * numParticles)
 Ep_LJ = interLJ.computeEnergy()
 Ep_FENE = interFENE.computeEnergy()
+Ep_Cosine = interCosine.computeEnergy()
 
-print 'E_total = ', Ek + Ep_LJ + Ep_FENE
+print 'E_total = ', Ek + Ep_LJ + Ep_FENE + Ep_Cosine
 print 'Ep_LJ = ', Ep_LJ
 print 'Ep_FENE = ', Ep_FENE
+print 'Ep_Cosine = ', Ep_Cosine
 print 'Ek = ', Ek
 print 'T = ', temperature
 print 'P = ', p
+print 'Pij = ', pij
 
-niter = 10000
+print '\nRunning ...\n'
+integrator.run(1000)
 
-for i in range(1):
-  integrator.run(niter)
-  temperature = temp.compute()
-  p = press.compute()
-  pij = pressTensor.compute()
-  Ek = 0.5 * temperature * (3 * numParticles)
-  Ep_LJ = interLJ.computeEnergy()
-  Ep_FENE = interFENE.computeEnergy()
+temperature = temp.compute()
+p = press.compute()
+pij = pressTensor.compute()
+Ek = 0.5 * temperature * (3 * numParticles)
+Ep_LJ = interLJ.computeEnergy()
+Ep_FENE = interFENE.computeEnergy()
+Ep_Cosine = interCosine.computeEnergy()
 
-  print 'Iter %d = Energy: total = %g, lj = %g, fene = %g, kin = %g'% \
-         ((i+1) * niter, Ek + Ep_LJ + Ep_FENE, Ep_LJ, Ep_FENE, Ek)
-
+print 'E_total = ', Ek + Ep_LJ + Ep_FENE + Ep_Cosine
+print 'Ep_LJ = ', Ep_LJ
+print 'Ep_FENE = ', Ep_FENE
+print 'Ep_Cosine = ', Ep_Cosine
+print 'Ek = ', Ek
+print 'T = ', temperature
+print 'P = ', p
+print 'Pij = ', pij

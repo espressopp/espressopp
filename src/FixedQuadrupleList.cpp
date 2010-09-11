@@ -97,12 +97,12 @@ namespace espresso {
       longint pid = pit->p.id;
       
       // LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pid << ", find quadruples");
-      printf ("me = %d: send particle with pid %d find quadruples\n", mpiWorld->rank(), pid);
+      //printf ("me = %d: send particle with pid %d find quadruples\n", mpiWorld->rank(), pid);
 
       // find all quadruples that involve this particle
       int n = globalQuadruples.count(pid);
-      printf ("me = %d: send particle with pid %d, has %d global quadruples\n", 
-                mpiWorld->rank(), pid, n);
+      //printf ("me = %d: send particle with pid %d, has %d global quadruples\n", 
+                //mpiWorld->rank(), pid, n);
 
       if (n > 0) {
 	std::pair<GlobalQuadruples::const_iterator, 
@@ -120,9 +120,9 @@ namespace espresso {
 	  toSend.push_back(it->second.first);
 	  toSend.push_back(it->second.second);
 	  toSend.push_back(it->second.third);
-          printf ("send global quadruple: pid %d and partner %d\n", pid, it->second.first);
-          printf ("send global quadruple: pid %d and partner %d\n", pid, it->second.second);
-          printf ("send global quadruple: pid %d and partner %d\n", pid, it->second.third);
+          //printf ("send global quadruple: pid %d and partner %d\n", pid, it->second.first);
+          //printf ("send global quadruple: pid %d and partner %d\n", pid, it->second.second);
+          //printf ("send global quadruple: pid %d and partner %d\n", pid, it->second.third);
         }
 
 	// delete all of these quadruples from the global list
@@ -149,14 +149,14 @@ namespace espresso {
       // unpack the list
       pid1 = received[i++];
       n = received[i++];
-      printf ("me = %d: recv particle with pid %d, has %d global quadruples\n",
-                mpiWorld->rank(), pid1, n);
+      //printf ("me = %d: recv particle with pid %d, has %d global quadruples\n",
+                //mpiWorld->rank(), pid1, n);
       for (; n > 0; --n) {
 	pid2 = received[i++];
 	pid3 = received[i++];
 	pid4 = received[i++];
 	// add the quadruple to the global list
-        printf("received quadruple %d %d %d %d, add quadruple to global list\n", pid1, pid2, pid3, pid4);
+        //printf("received quadruple %d %d %d %d, add quadruple to global list\n", pid1, pid2, pid3, pid4);
 	it = globalQuadruples.insert(it, std::make_pair(pid1,
           Triple<longint, longint, longint>(pid2, pid3, pid4)));
       }
@@ -170,7 +170,7 @@ namespace espresso {
   void FixedQuadrupleList::onParticlesChanged() {
     
     // (re-)generate the local quadruple list from the global list
-    printf("FixedQuadrupleList: rebuild local quadruple list from global\n");
+    //printf("FixedQuadrupleList: rebuild local quadruple list from global\n");
     this->clear();
     longint lastpid1 = -1;
     Particle *p1;
@@ -179,8 +179,8 @@ namespace espresso {
     Particle *p4;
     for (GlobalQuadruples::const_iterator it = globalQuadruples.begin();
 	 it != globalQuadruples.end(); ++it) {
-      printf("lookup global quadruple %d %d %d %d\n",
-        it->first, it->second.first, it->second.second, it->second.third);
+      //printf("lookup global quadruple %d %d %d %d\n",
+        //it->first, it->second.first, it->second.second, it->second.third);
       if (it->first != lastpid1) {
 	p1 = storage->lookupRealParticle(it->first);
         if (p1 == NULL) {
