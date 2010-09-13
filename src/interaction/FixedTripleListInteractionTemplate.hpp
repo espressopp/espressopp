@@ -120,7 +120,6 @@ namespace espresso {
         Particle &p3 = *it->third;
         int type1 = p1.p.type;
         int type2 = p2.p.type;
-        int type3 = p3.p.type;
         const Potential &potential = getPotential(type1, type2);
         Real3D force12;
         Real3D force32;
@@ -128,10 +127,7 @@ namespace espresso {
         Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
         potential._computeForce(force12, force32, dist12, dist32);
         w += dist12 * force12 + dist32 * force32;
-        //printf("w = %f\n", w);
       }
-      real wsum;
-      boost::mpi::reduce(*mpiWorld, w, wsum, std::plus<real>(), 0);
       return w;
     }
 
@@ -140,13 +136,16 @@ namespace espresso {
     FixedTripleListInteractionTemplate < _AngularPotential >::
     computeVirialTensor(real* wij_) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
-    
+
+      /* 
       wij_[0] = 0.0;
       wij_[1] = 0.0;
       wij_[2] = 0.0;
       wij_[3] = 0.0;
       wij_[4] = 0.0;
       wij_[5] = 0.0;
+      */
+     
       for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
@@ -159,17 +158,13 @@ namespace espresso {
         Real3D dist12 = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
         Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
         potential._computeForce(force12, force32, dist12, dist32);
-        wij_[0] += dist12[0] * force12[0] - dist32[0] * force32[0];
-        wij_[1] += dist12[1] * force12[1] - dist32[1] * force32[1];
-        wij_[2] += dist12[2] * force12[2] - dist32[2] * force32[2];
-        wij_[3] += dist12[0] * force12[1] - dist32[0] * force32[1];
-        wij_[4] += dist12[0] * force12[2] - dist32[0] * force32[2];
-        wij_[5] += dist12[1] * force12[2] - dist32[1] * force32[2];
+        wij_[0] += dist12[0] * force12[0] + dist32[0] * force32[0];
+        wij_[1] += dist12[1] * force12[1] + dist32[1] * force32[1];
+        wij_[2] += dist12[2] * force12[2] + dist32[2] * force32[2];
+        wij_[3] += dist12[0] * force12[1] + dist32[0] * force32[1];
+        wij_[4] += dist12[0] * force12[2] + dist32[0] * force32[2];
+        wij_[5] += dist12[1] * force12[2] + dist32[1] * force32[2];
       }
-      real wij_sum[6];
-      boost::mpi::reduce(*mpiWorld, wij_, 6, wij_sum, std::plus<real>(), 0);
-      for (size_t k = 0; k < 6; k++)
-        wij_[k] = wij_sum[k];
     }
 
     template < typename _AngularPotential >

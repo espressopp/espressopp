@@ -42,12 +42,14 @@ namespace espresso {
     // three swaps needed for (1, 2, 3) == (1, 3, 2)
     // this is important for the line:
     // if (it->second == std::pair<longint, longint>(pid2, pid3))
+    /*
     if (pid3 < pid2)
       std::swap(pid2, pid3);
     if (pid2 < pid1)
       std::swap(pid1, pid2); 
     if (pid3 < pid2)
       std::swap(pid2, pid3);
+    */
 
     // ADD THE LOCAL TRIPLET
     Particle *p1 = storage->lookupRealParticle(pid1);

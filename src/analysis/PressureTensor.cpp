@@ -47,13 +47,15 @@ namespace espresso {
       boost::mpi::reduce(*mpiWorld, vvLocal, 6, vv, std::plus<real>(), 0);
 
       // compute the short-range nonbonded contribution
-      real wijLocal[6];
+      real wijLocal[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
       const InteractionList& srIL = system.shortRangeInteractions;
       for (size_t j = 0; j < srIL.size(); j++) {
         srIL[j]->computeVirialTensor(wijLocal);
       }
       boost::mpi::reduce(*mpiWorld, wijLocal, 6, wij, std::plus<real>(), 0);
-      for (size_t k = 0; k < 6; k++) wij[k] = (vv[k] + wij[k]) / (3.0 * V);
+      for (size_t k = 0; k < 6; k++) {
+        wij[k] = (vv[k] + wij[k]) / V;
+      }
     }
 
     real PressureTensor::compute() const {

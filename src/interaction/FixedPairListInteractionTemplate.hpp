@@ -81,25 +81,6 @@ namespace espresso {
 	    p2.f.f[k] -= force[k];
 	  }
 	}
-#if 0
-          printf
-          ("dist(%d,%d), dist = %f -> %f %f %f\n",
-           p1.p.id, p2.p.id, distSqr, dist[0], dist[1], dist[2]);
-          printf
-          ("force(%d,%d), dist = %f -> %f %f %f\n",
-           p1.p.id, p2.p.id, distSqr,
-           force[0], force[1], force[2]);
-          if(p1.p.id == 0) {
-            printf
-            ("sum add force Particle 0 = %f %f %f\n",
-             p1.f.f[0], p1.f.f[1], p1.f.f[0]);
-          }
-          if(p2.p.id == 0) {
-            printf
-            ("sum sub force Particle 0 = %f %f %f\n",
-             p2.f.f[0], p2.f.f[1], p2.f.f[0]);
-          }
-#endif
     }
     
     template < typename _Potential >
@@ -141,7 +122,7 @@ namespace espresso {
         Real3D force;
         Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
         if (potential._computeForce(force, dist)) {
-          w = w + dist * force;
+          w += dist * force;
         }
       }
       return w; 
@@ -151,12 +132,14 @@ namespace espresso {
     FixedPairListInteractionTemplate < _Potential >::computeVirialTensor(real* wij_) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
 
+      /*
       wij_[0] = 0.0;
       wij_[1] = 0.0;
       wij_[2] = 0.0;
       wij_[3] = 0.0;
       wij_[4] = 0.0;
       wij_[5] = 0.0;
+      */
       for (FixedPairList::Iterator it(*fixedpairList);
            it.isValid(); ++it) {
         Particle &p1 = *it->first;

@@ -97,12 +97,14 @@ namespace espresso {
     computeVirialTensor(real* wij_) {
       LOG4ESPP_INFO(theLogger, "computed virial tensor for all pairs in the cell lists");
 
+      /*
       wij_[0] = 0.0;
       wij_[1] = 0.0;
       wij_[2] = 0.0;
       wij_[3] = 0.0;
       wij_[4] = 0.0;
       wij_[5] = 0.0;
+      */
       for (iterator::CellListAllPairsIterator it(storage->getRealCells());
            it.isValid(); ++it) {
         Particle &p1 = *it->first;

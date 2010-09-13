@@ -42,7 +42,6 @@ namespace espresso {
       p_kinetic = 2.0 * e_kinetic / (3.0 * V);
 
       // compute the short-range nonbonded contribution
-      // loop over interaction types
       real rij_dot_Fij = 0.0;
       const InteractionList& srIL = system.shortRangeInteractions;
       for (size_t j = 0; j < srIL.size(); j++) {

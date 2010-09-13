@@ -55,6 +55,8 @@ namespace espresso {
         dist32_magn = sqrt(dist32_sqr);
 
         cos_theta = dist12 * dist32 / (dist12_magn * dist32_magn);
+        if(cos_theta < -1.0) cos_theta = -1.0;
+        if(cos_theta >  1.0) cos_theta =  1.0;
         sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 
         dU_dtheta = K * sin(acos(cos_theta) - theta0);
@@ -62,10 +64,6 @@ namespace espresso {
         dnom = dist12_sqr * dist32_sqr * sin_theta;
         force12 = dU_dtheta * (dist12_magn * dist32_magn * dist32 - cos_theta * dist32_sqr * dist12) / dnom;
         force32 = dU_dtheta * (dist12_magn * dist32_magn * dist12 - cos_theta * dist12_sqr * dist32) / dnom;
-        //printf("r12 = %f %f %f\n", dist12[0], dist12[1], dist12[2]);
-        //printf("r32 = %f %f %f\n", dist32[0], dist32[1], dist32[2]);
-        //printf("f12 = %f %f %f\n", force12[0], force12[1], force12[2]);
-        //printf("f32 = %f %f %f\n", force32[0], force32[1], force32[2]);
       }
     };
   }

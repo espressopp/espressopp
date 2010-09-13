@@ -200,7 +200,7 @@ namespace espresso {
     ParticleTriple() : Super() {}
     ParticleTriple(Particle* p1, Particle* p2, Particle* p3)
       : Super(p1, p2, p3) {}
-    ParticleTriple(Particle &p1, Particle& p2, Particle& p3)
+    ParticleTriple(Particle &p1, Particle &p2, Particle &p3)
       : Super(&p1, &p2, &p3) {}
   };
 
@@ -226,7 +226,7 @@ namespace espresso {
     ParticleQuadruple() : Super() {}
     ParticleQuadruple(Particle* p1, Particle* p2, Particle* p3, Particle* p4)
       : Super(p1, p2, p3, p4) {}
-    ParticleQuadruple(Particle &p1, Particle& p2, Particle& p3, Particle& p4)
+    ParticleQuadruple(Particle &p1, Particle &p2, Particle &p3, Particle &p4)
       : Super(&p1, &p2, &p3, &p4) {}
   };
 

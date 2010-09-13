@@ -145,12 +145,14 @@ namespace espresso {
     VerletListInteractionTemplate < _Potential >::computeVirialTensor(real* wij_) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
 
+      /*
       wij_[0] = 0.0;
       wij_[1] = 0.0;
       wij_[2] = 0.0;
       wij_[3] = 0.0;
       wij_[4] = 0.0;
       wij_[5] = 0.0;
+      */
       for (PairList::Iterator it(verletList->getPairs());
            it.isValid(); ++it) {
         Particle &p1 = *it->first;
