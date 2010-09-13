@@ -7,6 +7,8 @@
 ###########################################################################
 
 import sys
+import time
+start_time = time.time()
 import espresso
 import MPI
 import logging
@@ -20,7 +22,7 @@ density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 rc = 2.5
 skin = 0.3
-nvt = True
+nvt = False
 print num_particles, density
 
 # compute the number of cells on each node
@@ -103,7 +105,7 @@ Ep = interLJ.computeEnergy()
 sys.stdout.write(' step     T        P        Pxy       etotal     epotential    ekinetic\n')
 sys.stdout.write('%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f\n' % (0, T, P, Pij[3], Ek + Ep, Ep, Ek))
 
-integrator.run(10000)
+integrator.run(1000)
 
 T = temperature.compute()
 P = pressure.compute()
@@ -111,8 +113,9 @@ Pij = pressureTensor.compute()
 Ek = 0.5 * T * (3 * num_particles)
 Ep = interLJ.computeEnergy()
 sys.stdout.write('%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f\n' % (10000, T, P, Pij[3], Ek + Ep, Ep, Ek))
-
+print time.time() - start_time
 sys.exit()
+
 nsteps = 10
 for i in range(1, 21):
   integrator.run(10)
