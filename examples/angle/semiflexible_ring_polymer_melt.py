@@ -30,6 +30,7 @@ rc = 2.0**(1.0/6.0)
 rc = 1.12246205
 print L, rc
 skin = 0.4
+nvt = True
 
 # compute the number of cells on each node
 def calcNumberCells(size, nodes, rc):
@@ -130,6 +131,12 @@ system.addInteraction(interCosine)
 integrator = espresso.integrator.VelocityVerlet(system)
 integrator.dt = 0.01
 
+if(nvt):
+  langevin = espresso.integrator.Langevin(system)
+  integrator.langevin = langevin
+  langevin.gamma = 1.0
+  langevin.temperature = 1.0
+
 # analysis
 temperature = espresso.analysis.Temperature(system)
 pressure = espresso.analysis.Pressure(system)
@@ -148,7 +155,7 @@ Etotal = Ek + Ep + Eb + Ea
 sys.stdout.write(' step     T        P        Pxy       etotal   ekinetic   epair   ebond   eangle\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
 
-integrator.run(1000)
+integrator.run(10000)
 T = temperature.compute()
 P = pressure.compute()
 Pij = pressureTensor.compute()
