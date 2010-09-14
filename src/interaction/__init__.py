@@ -7,9 +7,11 @@ from espresso.interaction.Potential import *
 from espresso.interaction.LennardJones import *
 from espresso.interaction.Tabulated import *
 from espresso.interaction.FENE import *
+from espresso.interaction.Harmonic import *
 
 from espresso.interaction.AngularPotential import *
 from espresso.interaction.Cosine import *
+from espresso.interaction.AngularHarmonic import *
 
 from espresso.interaction.DihedralPotential import *
 from espresso.interaction.OPLS import *

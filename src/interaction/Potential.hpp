@@ -224,7 +224,6 @@ namespace espresso {
       return _computeEnergySqr(dist*dist);
     }
 
-
     template < class Derived > 
     inline real
     PotentialTemplate< Derived >::
