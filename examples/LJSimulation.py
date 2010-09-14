@@ -23,7 +23,7 @@ density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 rc = 2.5
 skin = 0.3
-nvt = False
+nvt = True
 print "number of particles = ", num_particles
 print "density = ", density
 
@@ -107,7 +107,7 @@ Ep = interLJ.computeEnergy()
 sys.stdout.write(' step     T        P        Pxy       etotal     epotential    ekinetic\n')
 sys.stdout.write('%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f\n' % (0, T, P, Pij[3], Ek + Ep, Ep, Ek))
 
-integrator.run(10)
+integrator.run(10000)
 
 T = temperature.compute()
 P = pressure.compute()

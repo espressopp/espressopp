@@ -110,6 +110,7 @@ for particle in particles[1:]:
     newparticles.append(newparticle)
 
 system.storage.addParticles(newparticles, *properties)
+print newparticles
 
 # read in all bonds, type is ignored
 

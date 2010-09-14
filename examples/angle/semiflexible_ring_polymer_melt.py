@@ -131,7 +131,7 @@ system.addInteraction(interCosine)
 
 # integrator
 integrator = espresso.integrator.VelocityVerlet(system)
-integrator.dt = 0.01
+integrator.dt = 0.001
 
 if(nvt):
   langevin = espresso.integrator.Langevin(system)
@@ -157,7 +157,7 @@ Etotal = Ek + Ep + Eb + Ea
 sys.stdout.write(' step     T        P        Pxy       etotal   ekinetic   epair   ebond   eangle\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
 
-integrator.run(10)
+integrator.run(1000)
 T = temperature.compute()
 P = pressure.compute()
 Pij = pressureTensor.compute()
@@ -166,7 +166,7 @@ Ep = interLJ.computeEnergy()
 Eb = interFENE.computeEnergy()
 Ea = interCosine.computeEnergy()
 Etotal = Ek + Ep + Eb + Ea
-sys.stdout.write(fmt % (1000, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
+sys.stdout.write(fmt % (10000, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
 print "CPU time =", time.clock() - start_time, "s"
 sys.exit(1)
 
