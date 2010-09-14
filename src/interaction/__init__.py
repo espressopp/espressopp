@@ -5,6 +5,7 @@ from espresso.interaction.Interaction import *
 
 from espresso.interaction.Potential import *
 from espresso.interaction.LennardJones import *
+from espresso.interaction.CoulombTruncated import *
 from espresso.interaction.Tabulated import *
 from espresso.interaction.FENE import *
 from espresso.interaction.Harmonic import *

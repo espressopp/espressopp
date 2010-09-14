@@ -1,6 +1,7 @@
 #include "bindings.hpp"
 #include "Potential.hpp"
 #include "LennardJones.hpp"
+#include "CoulombTruncated.hpp"
 #include "FENE.hpp"
 #include "Harmonic.hpp"
 #include "Tabulated.hpp"
@@ -16,6 +17,7 @@ namespace espresso {
       Interaction::registerPython();
       Potential::registerPython();
       LennardJones::registerPython();
+      CoulombTruncated::registerPython();
       Tabulated::registerPython();
       FENE::registerPython();
       Harmonic::registerPython();
