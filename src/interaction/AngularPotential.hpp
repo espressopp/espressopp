@@ -57,7 +57,7 @@ namespace espresso {
       // Implements the non-virtual interface 
       // (used by e.g. the Interaction templates)
       real _computeEnergy(Particle &p1, Particle &p2, Particle &p3) const;
-      real _computeEnergy(ConstReal3DRef dist, ConstReal3DRef dist32) const;
+      real _computeEnergy(ConstReal3DRef dist12, ConstReal3DRef dist32) const;
       real _computeEnergy(real theta) const;
 
       void _computeForce(Real3DRef force12, Real3DRef force32,

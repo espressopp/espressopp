@@ -10,3 +10,6 @@ from espresso.interaction.FENE import *
 
 from espresso.interaction.AngularPotential import *
 from espresso.interaction.Cosine import *
+
+from espresso.interaction.DihedralPotential import *
+from espresso.interaction.OPLS import *

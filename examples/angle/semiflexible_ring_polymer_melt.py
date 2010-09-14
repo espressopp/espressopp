@@ -9,14 +9,14 @@
 import sys
 sys.path.append('../')
 import time
-start_time = time.time()
+start_time = time.clock()
 import espresso
 import MPI
-import math
 import logging
 import lammps_file
 from espresso import Real3D, Int3D
 
+# read coordinates and box size
 bonds, angles, x, y, z, Lx, Ly, Lz = lammps_file.read('rings.dat')
 
 #monomers = 200
@@ -28,7 +28,9 @@ L = Lx
 size = (L, L, L)
 rc = 2.0**(1.0/6.0)
 rc = 1.12246205
-print L, rc
+print "number of particles =", num_particles
+print "box size =", L
+print "cutoff =", rc
 skin = 0.4
 nvt = True
 
@@ -155,7 +157,7 @@ Etotal = Ek + Ep + Eb + Ea
 sys.stdout.write(' step     T        P        Pxy       etotal   ekinetic   epair   ebond   eangle\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
 
-integrator.run(10000)
+integrator.run(10)
 T = temperature.compute()
 P = pressure.compute()
 Pij = pressureTensor.compute()
@@ -165,12 +167,13 @@ Eb = interFENE.computeEnergy()
 Ea = interCosine.computeEnergy()
 Etotal = Ek + Ep + Eb + Ea
 sys.stdout.write(fmt % (1000, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
-print time.time() - start_time
+print "CPU time =", time.clock() - start_time, "s"
 sys.exit(1)
 
 nsteps = 10
-for i in range(1, 21):
-  integrator.run(10)
+intervals = 20
+for i in range(1, intervals + 1):
+  integrator.run(nsteps)
   step = nsteps * i
   T = temperature.compute()
   P = pressure.compute()
@@ -181,4 +184,4 @@ for i in range(1, 21):
   Ea = interCosine.computeEnergy()
   Etotal = Ek + Ep + Eb + Ea
   sys.stdout.write(fmt % (step, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
-print time.time() - start_time
+print "CPU time =", time.clock() - start_time, "s"

@@ -5,6 +5,8 @@
 #include "Tabulated.hpp"
 #include "AngularPotential.hpp"
 #include "Cosine.hpp"
+#include "DihedralPotential.hpp"
+#include "OPLS.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -16,6 +18,8 @@ namespace espresso {
       FENE::registerPython();
       AngularPotential::registerPython();
       Cosine::registerPython();
+      DihedralPotential::registerPython();
+      OPLS::registerPython();
     }
   }
 }

@@ -81,10 +81,10 @@ system.addInteraction(interCosine)
 fql = espresso.FixedQuadrupleList(system.storage)
 quadruples = [(0, 1, 2, 3), (1, 2, 3, 4), (2, 3, 4, 5)]
 fql.addQuadruples(quadruples)
-#potHarmonic = espresso.interaction.DihedralHarmonic(K=1.5, d=1, n=0)
-#interHarmonic = espresso.interaction.FixedQuadrupleListHarmonic(fql)
-#interHarmonic.setPotential(type1 = 0, potential = potHarmonic)
-#system.addInteraction(interHarmonic)
+potOPLS = espresso.interaction.OPLS(K1=1, K2=1, K3=1, K4=1)
+interOPLS = espresso.interaction.FixedQuadrupleListOPLS(system, fql)
+interOPLS.setPotential(type1 = 0, type2 = 0, potential = potOPLS)
+#system.addInteraction(interOPLS)
 
 # Lennard-Jones with Verlet list
 vl = espresso.VerletList(system, cutoff = cutoff + system.skin)

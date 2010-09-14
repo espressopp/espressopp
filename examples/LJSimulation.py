@@ -2,20 +2,20 @@
 
 ###########################################################################
 #                                                                         #
-# Example script for LJ simulation with or without Langevin thermostat    #
+#  Example script for LJ simulation with or without Langevin thermostat   #
 #                                                                         #
 ###########################################################################
 
 import sys
-sys.path.append('.')
 import time
-start_time = time.time()
+start_time = time.clock()
 import espresso
 import MPI
 import logging
 import lammps_file
 from espresso import Real3D, Int3D
 
+# read coordinates and box size
 x, y, z, Lx, Ly, Lz = lammps_file.read('data.lj')
 
 num_particles = len(x)
@@ -24,7 +24,8 @@ size = (Lx, Ly, Lz)
 rc = 2.5
 skin = 0.3
 nvt = False
-print num_particles, density
+print "number of particles = ", num_particles
+print "density = ", density
 
 # compute the number of cells on each node
 def calcNumberCells(size, nodes, rc):
@@ -106,7 +107,7 @@ Ep = interLJ.computeEnergy()
 sys.stdout.write(' step     T        P        Pxy       etotal     epotential    ekinetic\n')
 sys.stdout.write('%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f\n' % (0, T, P, Pij[3], Ek + Ep, Ep, Ek))
 
-integrator.run(100)
+integrator.run(10)
 
 T = temperature.compute()
 P = pressure.compute()
@@ -114,11 +115,12 @@ Pij = pressureTensor.compute()
 Ek = 0.5 * T * (3 * num_particles)
 Ep = interLJ.computeEnergy()
 sys.stdout.write('%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f\n' % (10000, T, P, Pij[3], Ek + Ep, Ep, Ek))
-print time.time() - start_time
+print "CPU time =", time.clock() - start_time, "s"
 sys.exit()
 
 nsteps = 10
-for i in range(1, 21):
+intervals = 20
+for i in range(1, intervals + 1):
   integrator.run(10)
   step = nsteps * i
   T = temperature.compute()
