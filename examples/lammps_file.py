@@ -7,6 +7,8 @@ def read(fin):
   num_bonds = int(f.readline().split()[0])
   num_angles = int(f.readline().split()[0])
   line = f.readline()
+  line = f.readline()
+  line = f.readline()
   num_types = int(f.readline().split()[0])
 
   # find and store size of box
