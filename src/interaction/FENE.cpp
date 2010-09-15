@@ -4,6 +4,9 @@
 
 namespace espresso {
   namespace interaction {
+      typedef class FixedPairListInteractionTemplate< FENE >
+      FixedPairListFENE;
+
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
@@ -19,14 +22,11 @@ namespace espresso {
 	.add_property("rMax", &FENE::getRMax, &FENE::setRMax)
     	;
 
-      typedef class FixedPairListInteractionTemplate< FENE >
-        FixedPairListFENE;
       class_< FixedPairListFENE, bases< Interaction > >
         ("interaction_FixedPairListFENE", 
-           init< shared_ptr<System>, shared_ptr<FixedPairList> >())
+          init< shared_ptr<System>, shared_ptr<FixedPairList> >())
         .def("setPotential", &FixedPairListFENE::setPotential);
-      ;
-
+        ;
     }
 
   }

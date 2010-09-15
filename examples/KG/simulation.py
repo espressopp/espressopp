@@ -111,6 +111,7 @@ for particle in particles[1:]:
 
 system.storage.addParticles(newparticles, *properties)
 print newparticles
+print properties
 
 # read in all bonds, type is ignored
 

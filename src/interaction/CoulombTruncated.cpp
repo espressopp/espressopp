@@ -2,6 +2,7 @@
 #include "CoulombTruncated.hpp"
 #include "VerletListInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
+#include "FixedPairListInteractionTemplate.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -9,6 +10,8 @@ namespace espresso {
     VerletListCoulombTruncated;
     typedef class CellListAllPairsInteractionTemplate< CoulombTruncated > 
     CellListCoulombTruncated;
+    typedef class FixedPairListInteractionTemplate< CoulombTruncated >
+    FixedPairListCoulombTruncated;
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
@@ -28,10 +31,16 @@ namespace espresso {
         .def("setPotential", &VerletListCoulombTruncated::setPotential);
         ;
 
-	class_< CellListCoulombTruncated, bases< Interaction > > 
-	  ("interaction_CellListCoulombTruncated", init< shared_ptr< storage::Storage > >())
-	  .def("setPotential", &CellListCoulombTruncated::setPotential);
+      class_< CellListCoulombTruncated, bases< Interaction > > 
+        ("interaction_CellListCoulombTruncated", init< shared_ptr< storage::Storage > >())
+        .def("setPotential", &CellListCoulombTruncated::setPotential);
 	;
+
+      class_< FixedPairListCoulombTruncated, bases< Interaction > >
+        ("interaction_FixedPairListCoulombTruncated",
+          init< shared_ptr<System>, shared_ptr<FixedPairList> >())
+        .def("setPotential", &FixedPairListCoulombTruncated::setPotential);
+        ;
     }
     
   }

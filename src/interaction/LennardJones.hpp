@@ -3,6 +3,7 @@
 #define _INTERACTION_LENNARDJONES_HPP
 
 #include "Potential.hpp"
+#include "FixedPairListInteractionTemplate.hpp"
 
 namespace espresso {
   namespace interaction {

@@ -3,7 +3,9 @@ from espresso.esutil import *
 
 from espresso.interaction.Potential import *
 from espresso.interaction.Interaction import *
-from _espresso import interaction_LennardJones, interaction_VerletListLennardJones
+from _espresso import interaction_LennardJones, \
+                      interaction_VerletListLennardJones, \
+                      interaction_FixedPairListLennardJones
 
 class LennardJonesLocal(PotentialLocal, interaction_LennardJones):
     'The (local) Lennard-Jones potential.'
@@ -25,6 +27,14 @@ class VerletListLennardJonesLocal(InteractionLocal, interaction_VerletListLennar
     def setPotential(self, type1, type2, potential):
         self.cxxclass.setPotential(self, type1, type2, potential)
 
+class FixedPairListLennardJonesLocal(InteractionLocal, interaction_FixedPairListLennardJones):
+    'The (local) Lennard-Jones interaction using FixedPair lists.'
+    def __init__(self, system, vl):
+        cxxinit(self, interaction_FixedPairListLennardJones, system, vl)
+
+    def setPotential(self, type1, type2, potential):
+        self.cxxclass.setPotential(self, type1, type2, potential)
+
 if pmi.isController:
     class LennardJones(Potential):
         'The Lennard-Jones potential.'
@@ -39,4 +49,9 @@ if pmi.isController:
             cls =  'espresso.interaction.VerletListLennardJonesLocal',
             pmicall = ['setPotential']
             )
-
+    class FixedPairListLennardJones(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espresso.interaction.FixedPairListLennardJonesLocal',
+            pmicall = ['setPotential']
+            )
