@@ -6,6 +6,8 @@ def read(fin):
   num_particles = int(f.readline().split()[0])
   num_bonds = int(f.readline().split()[0])
   num_angles = int(f.readline().split()[0])
+  line = f.readline()
+  num_types = int(f.readline().split()[0])
 
   # find and store size of box
   line = ''
@@ -24,17 +26,31 @@ def read(fin):
     line = f.readline()
   line = f.readline()
 
-  rstart = 3
-  if(num_bonds == 0): rstart = 2
+  if(num_types == 1):
+    rstart = 3
+    if(num_bonds == 0): rstart = 2
 
-  x = []
-  y = []
-  z = []
-  for i in range(num_particles):
-    rx, ry, rz = map(float, f.readline().split()[rstart:])
-    x.append(rx)
-    y.append(ry)
-    z.append(rz)
+    x = []
+    y = []
+    z = []
+    for i in range(num_particles):
+      rx, ry, rz = map(float, f.readline().split()[rstart:])
+      x.append(rx)
+      y.append(ry)
+      z.append(rz)
+  else:
+    p_type = []
+    q = []
+    x = []
+    y = []
+    z = []
+    for i in range(num_particles):
+      k, rq, rx, ry, rz = map(float, f.readline().split()[2:])
+      p_type.append(int(k))
+      q.append(rq)
+      x.append(rx)
+      y.append(ry)
+      z.append(rz)
 
   if(num_bonds != 0):
     # find and store bonds
@@ -58,6 +74,9 @@ def read(fin):
       angle_id, angle_type, pid1, pid2, pid3 = map(int, f.readline().split())
       angles.append((pid1, pid2, pid3))
     f.close()
+
+  if(num_types != 1):
+    return p_type, bonds, angles, q, x, y, z, Lx, Ly, Lz
 
   if(num_bonds == 0 and num_angles == 0):
     return x, y, z, Lx, Ly, Lz
