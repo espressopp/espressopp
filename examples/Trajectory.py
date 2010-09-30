@@ -2,7 +2,7 @@
 
 ###########################################################################
 #                                                                         #
-#  Test program for storage.addParticles(...) / FixedPairList.addPairs()  #
+#  Test program for writing Trajectories via Configurations               #
 #                                                                         #
 ###########################################################################
 
@@ -60,13 +60,13 @@ pid = 0
 particleList = []
 velList = []
 
-p0 = (0, Real3D(5.0, 5.0, 5.0))
-p1 = (1, Real3D(5.9, 5.0, 5.0))
-p2 = (2, Real3D(6.6, 5.5, 5.1))
+p0 = (10, Real3D(5.0, 5.0, 5.0))
+p1 = (15, Real3D(5.9, 5.0, 5.0))
+p2 = (26, Real3D(6.6, 5.5, 5.1))
 
-p3 = (3, Real3D(5.0, 5.0, 6.0))
-p4 = (4, Real3D(5.9, 5.0, 6.0))
-p5 = (5, Real3D(6.6, 5.5, 6.1))
+p3 = (31, Real3D(5.0, 5.0, 6.0))
+p4 = (49, Real3D(5.9, 5.0, 6.0))
+p5 = (53, Real3D(6.6, 5.5, 6.1))
 
 particleList = [p0, p1, p2, p3, p4, p5]
 
@@ -117,13 +117,13 @@ print 'Start: tot energy = %10.6f pot = %10.6f kin = %10.6f temp = %10.6f press 
 integrator = espresso.integrator.VelocityVerlet(system)
 integrator.dt = 0.01
 
-logging.getLogger("MDIntegrator").setLevel(logging.INFO)
-logging.getLogger("FixedPairList").setLevel(logging.DEBUG)
+# logging.getLogger("MDIntegrator").setLevel(logging.INFO)
+# logging.getLogger("FixedPairList").setLevel(logging.DEBUG)
 
-espresso.pmi.exec_('logging.getLogger("Configurations").setLevel(logging.INFO)')
+# espresso.pmi.exec_('logging.getLogger("Configurations").setLevel(logging.INFO)')
 
 configurations = espresso.analysis.Configurations(system)
-configurations.push()
+configurations.gather()
 
 for times in range(10):
 
@@ -140,17 +140,21 @@ for times in range(10):
            %(kineticEnergy + potentialEnergy,
              potentialEnergy, kineticEnergy, temperature, pressure)
 
-   configurations.push()
+   configurations.gather()
 
-print 'Writing trajectory, %d configurations'%configurations.size
+filename = "Trajectory.xyz"
 
-f = open("Configurations.out", "w")
+print 'Writing trajectory, %d configurations in file %s'%(configurations.size, filename)
 
-for i in range(configurations.size):
-   NP = configurations.getNParticles(i)
-   f.write("Configuration %d : %d particles\n"%(i, NP))
-   for k in range(NP):
-      pos = configurations.getCoordinates(k, i)
-      f.write("%d : %g %g %g\n"%(k, pos.x, pos.y, pos.z))
+f = open(filename, "w")
+
+for conf in configurations:
+   NP = conf.size
+   f.write("Configuration : %d particles\n"%NP)
+   for id in conf:
+      pos = conf[id]
+      f.write("%d : %g %g %g\n"%(id, pos.x, pos.y, pos.z))
 
 f.close()
+
+configurations.clear()
