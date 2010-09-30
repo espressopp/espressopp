@@ -1,12 +1,6 @@
-// ESPP_CLASS
 #ifndef _ESUTIL_LOGGER_HPP
 #define _ESUTIL_LOGGER_HPP
-
 /** \file Logger.hpp    Class for logging.
-
-<b>Responsible:</b>
-<a href="mailto:brandes@scai.fraunhofer.de">Thomas Brandes</a>
-
 */
 
 #include <string>

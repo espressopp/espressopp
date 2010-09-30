@@ -23,6 +23,7 @@ noinst_HEADERS += \
 	esutil/bindings.hpp \
 	esutil/Grid.hpp \
 	esutil/Array2D.hpp \
+	esutil/Logger.hpp \
 	bc/bindings.hpp \
 	storage/bindings.hpp \
 	interaction/bindings.hpp \

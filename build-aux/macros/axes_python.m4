@@ -39,7 +39,7 @@
 #
 # COPYLEFT
 #
-#   Copyright (c) 2009 Olaf Lenz <lenzo@mpip-mainz.mpg.de>
+#   Copyright (c) 2009,2010 Olaf Lenz <olenz@icp.uni-stuttgart.de>
 #   Copyright (c) 2008 Axel Arnold <Axel.Arnold@scai.fhg.de>
 #
 #   based on AX_PYTHON, which is copylefted as
