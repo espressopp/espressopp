@@ -1,4 +1,5 @@
 #include "python.hpp"
+#include <boost/python.hpp>
 #include "Configurations.hpp"
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
@@ -16,36 +17,30 @@ namespace espresso {
 
     LOG4ESPP_LOGGER(Configurations::logger, "Configurations");
 
-    Configurations::Configuration::Configuration(int nParticles) 
-    {
-      coordinates = new real[3*nParticles];
-      this->nParticles = nParticles;
-    }
-
-    Configurations::Configuration::~Configuration()
-    {
-      delete coordinates;
-    }
-
-    void Configurations::Configuration::set(int index, real x, real y, real z)
-    {
-      if (index < 0 || index >= nParticles) {
-         LOG4ESPP_ERROR(logger, "index = " << index << " out of range" <<
-                         ", must be >= 0 and < " << nParticles);
-      } else {
-        coordinates[3*index]   = x;
-        coordinates[3*index+1] = y;
-        coordinates[3*index+2] = z;
-      }
-    }
-
     void Configurations::setCapacity(int max) 
     {
       if (max < 0) {
          LOG4ESPP_ERROR(logger, "number for maximal configurations must be positive");
-      } else {
-         maxConfigs = max;
+         return;
       }
+
+      maxConfigs = max;
+
+      // if capacity has been reduced, delete configurations
+
+      int nconfigs = configurations.size();
+
+      if (maxConfigs < nconfigs) {
+
+         int diff = nconfigs - maxConfigs;
+
+         LOG4ESPP_INFO(logger, "delete " << diff << 
+              " configurations due to restricted capacity");
+
+         configurations.erase(configurations.begin(),
+                              configurations.begin() + diff);
+      }
+
     }
 
     int Configurations::getCapacity()
@@ -58,29 +53,47 @@ namespace espresso {
       return configurations.size();
     }
 
-    /** Get number of particles of a snapshop on the stack. */
+   
+    ConfigurationList Configurations::all()
+    {
+      return configurations;
+    }
 
-    int Configurations::getNParticles(int stackpos)
+    /** Get a configuration from stack */
+
+    ConfigurationPtr Configurations::get(int stackpos)
     {
       int nconfigs = configurations.size();
-
       if (0 <= stackpos and stackpos < nconfigs) {
-        return configurations[nconfigs - 1 - stackpos]->nParticles;
+        return configurations[nconfigs - 1 - stackpos];
+      } else {
+        LOG4ESPP_ERROR(logger, "Configurations::get <out-of-range>");
+        return shared_ptr<Configuration>();
       }
     }
 
-    Real3D Configurations::getCoordinates(int index, int stackpos) 
+    ConfigurationPtr Configurations::back()
     {
-      int nconfigs = configurations.size();
-
-      if (0 <= stackpos and stackpos < nconfigs) {
-        real* coords = configurations[nconfigs - 1 - stackpos]->coordinates;
-        coords += 3*index;
-        return Real3D(coords[0], coords[1], coords[2]);
-      }
+      return configurations.back();
     }
 
-    void Configurations::push() {
+    void Configurations::pushConfig(ConfigurationPtr config)
+    {
+      int nconfs = configurations.size();
+
+      if (maxConfigs && nconfs >= maxConfigs) {
+
+        LOG4ESPP_DEBUG(logger, "delete first configuration");
+
+        // remove the first configuration
+
+        configurations.erase(configurations.begin());
+      }
+
+      configurations.push_back(config);
+    }
+
+    void Configurations::gather() {
 
       System& system = getSystemRef();
   
@@ -136,29 +149,29 @@ namespace espresso {
 
            if (iproc) {
    
-              MPI_Status status;
-              MPI_Request request;
-
-              int nIds, nDoubles;   // number of received values
+              int nIds, nCoords;   // number of received values
               int tmp;
+
+              boost::mpi::request req;
+              boost::mpi::status  stat;
 
               LOG4ESPP_DEBUG(logger, "receive tags from " << iproc);
 
-              MPI_Irecv(ids, maxN, MPI_INT, iproc, DEFAULT_TAG, *system.comm, &request);
-              // send source processor an empty message that I am read to receive
-              MPI_Send(&tmp, 0, MPI_INT, iproc, DEFAULT_TAG, *system.comm);
-              // wait for the message
-              MPI_Wait(&request, &status);
-              MPI_Get_count(&status, MPI_INT, &nIds);
+              req = system.comm->irecv<int>(iproc, DEFAULT_TAG, ids, maxN);
+              system.comm->send(iproc, DEFAULT_TAG, 0);
+              stat = req.wait();
+              nIds = *stat.count<int>();
 
-              MPI_Irecv(coordinates, 3*maxN, MPI_DOUBLE, iproc, DEFAULT_TAG, *system.comm, &request);
-              MPI_Send(&tmp, 0, MPI_INT, iproc, DEFAULT_TAG, *system.comm);
-              MPI_Wait(&request, &status);
-              MPI_Get_count(&status, MPI_DOUBLE, &nDoubles);
+              req = system.comm->irecv<real>(iproc, DEFAULT_TAG, coordinates, 3*maxN);
+              system.comm->send(iproc, DEFAULT_TAG, 0);
+              stat = req.wait();
+              nCoords = *stat.count<real>();
   
-              if (nDoubles != 3 * nIds) {
+              // make sure to have 3 coordinate values for each id
+
+              if (nCoords != 3 * nIds) {
                 LOG4ESPP_ERROR(logger, "serious error collecting data, got " << 
-                              nIds << " ids, but " << nDoubles << " coordinates");
+                              nIds << " ids, but " << nCoords << " coordinates");
               }
 
               nother = nIds;
@@ -182,7 +195,7 @@ namespace espresso {
 
         LOG4ESPP_INFO(logger, "save the latest configuration");
 
-        configurations.push_back(config);
+        pushConfig(config);
 
       } else {
 
@@ -192,13 +205,15 @@ namespace espresso {
        // not master process, send data to master process
 
        int tmp;
-       MPI_Status status;
+
+       boost::mpi::status stat;
+
        // wait for a signal (empty message) before sending
-       MPI_Recv(&tmp, 0, MPI_INT, 0, DEFAULT_TAG, *system.comm, &status);
-       MPI_Rsend(ids, myN, MPI_INT, 0, DEFAULT_TAG, *system.comm);
-       MPI_Recv(&tmp, 0, MPI_INT, 0, DEFAULT_TAG, *system.comm, &status);
-       MPI_Rsend(coordinates, 3*myN, MPI_DOUBLE, 0, DEFAULT_TAG, *system.comm);
-       for (int i = 0; i < 3*myN; i++) printf ("coordinate[%d] = %g\n", i, coordinates[i]);
+
+       system.comm->irecv<int>(0, DEFAULT_TAG, tmp);
+       system.comm->send<int>(0, DEFAULT_TAG, ids, myN);
+       system.comm->irecv<int>(0, DEFAULT_TAG, tmp);
+       system.comm->send<real>(0, DEFAULT_TAG, coordinates, 3*myN);
       }
 
       // ToDo: remove first configuration if capacity is exhausted
@@ -209,19 +224,26 @@ namespace espresso {
       delete [] ids;
     }
 
-    real Configurations::compute() const {
-      return -1.0;
-    }
+    // Python wrapping
 
     void Configurations::registerPython() {
+
       using namespace espresso::python;
-      class_<Configurations, bases< Observable > >
+
+      class_<ConfigurationList> ("_ConfigurationList", no_init)
+      .def("__iter__", boost::python::iterator<ConfigurationList>())
+      ;
+
+      class_<Configurations>
         ("analysis_Configurations", init< shared_ptr< System > >())
       .add_property("size", &Configurations::getSize)
-      .add_property("capacity", &Configurations::getCapacity, &Configurations::setCapacity)
-      .def("push", &Configurations::push)
-      .def("getNParticles", &Configurations::getNParticles)
-      .def("getCoordinates", &Configurations::getCoordinates)
+      .add_property("capacity", &Configurations::getCapacity, 
+                                &Configurations::setCapacity)
+      .def("gather", &Configurations::gather)
+      .def("__getitem__", &Configurations::get)
+      .def("back", &Configurations::back)
+      .def("all", &Configurations::all)
+      .def("clear", &Configurations::clear)
       ;
     }
   }

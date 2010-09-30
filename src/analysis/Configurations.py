@@ -8,19 +8,20 @@ class ConfigurationsLocal(ObservableLocal, analysis_Configurations):
     'The (local) storage of configurations.'
     def __init__(self, system):
         cxxinit(self, analysis_Configurations, system)
-    def getNParticles(self, stackpos):
-        return self.cxxclass.getNParticles(self, stackpos)
-    def getCoordinates(self, index, stackpos):
-        return self.cxxclass.getCoordinates(self, index, stackpos)
-    def push(self):
-        return self.cxxclass.push(self)
+    def gather(self):
+        return self.cxxclass.gather(self)
+    def clear(self):
+        return self.cxxclass.clear(self)
+    def __iter__(self):
+        return self.cxxclass.all(self).__iter__()
 
 if pmi.isController :
     class Configurations(Observable):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.analysis.ConfigurationsLocal',
-            pmicall = [ "push" ],
-            localcall = ["getNParticles", "getCoordinates"],
+            pmicall = [ "gather", "clear" ],
+            localcall = ["getNParticles", "getCoordinates", 
+                         "__getitem__", "__iter__", "all"],
             pmiproperty = ["capacity", "size"]
             )

@@ -3,6 +3,7 @@
 #include "Temperature.hpp"
 #include "Pressure.hpp"
 #include "PressureTensor.hpp"
+#include "Configuration.hpp"
 #include "Configurations.hpp"
 
 namespace espresso {
@@ -12,6 +13,7 @@ namespace espresso {
       Temperature::registerPython();
       Pressure::registerPython();
       PressureTensor::registerPython();
+      Configuration::registerPython();
       Configurations::registerPython();
     }
   }

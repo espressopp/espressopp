@@ -1,9 +1,10 @@
 // ESPP_CLASS
-#ifndef _ANALYSIS_CONFIGURATION_HPP
-#define _ANALYSIS_CONFIGURATION_HPP
+#ifndef _ANALYSIS_CONFIGURATIONS_HPP
+#define _ANALYSIS_CONFIGURATIONS_HPP
 
 #include "types.hpp"
-#include "Observable.hpp"
+#include "SystemAccess.hpp"
+#include "Configuration.hpp"
 
 namespace espresso {
   namespace analysis {
@@ -14,13 +15,16 @@ namespace espresso {
         particles changes between different snapshots.
     */
 
-    class Configurations : public Observable {
+    typedef std::vector<ConfigurationPtr> ConfigurationList;
+
+    class Configurations : public SystemAccess {
 
     public:
 
       /** Constructor, allow for unlimited snapshots. */
 
-      Configurations(shared_ptr<System> system) : Observable(system) { maxConfigs = 0; }
+      Configurations(shared_ptr<System> system) : SystemAccess (system)
+      { maxConfigs = 0; }
 
       /** set number of maximal snapshots. */
 
@@ -38,35 +42,27 @@ namespace espresso {
 
       /** Gake a snapshot of all current particle positions. */
 
-      void push();
+      void gather();
 
-      /** Get number of particles of a snapshop on the stack. */
+      ConfigurationPtr get(int stackpos);
 
-      int getNParticles(int stackpos);
+      ConfigurationPtr back();
 
-      Real3D getCoordinates(int index, int stackpos);
+      ConfigurationList all();
+
+      void clear() { configurations.clear(); }
 
       static void registerPython();
     
-      real compute() const;
-
     protected:
 
       static LOG4ESPP_DECL_LOGGER(logger);
 
     private:
 
-      struct Configuration {
-        Configuration(int nParticles);
-        ~Configuration();
-        void set(int index, real x, real y, real z);
-        int nParticles;     // number of particles of the configuration
-        real* coordinates;   // size will be 3 * nParticles, contains sorted positions
-      };
-
-      typedef shared_ptr<Configuration> ConfigurationPtr;
-
-      std::vector<ConfigurationPtr> configurations;
+      void pushConfig(ConfigurationPtr config);
+ 
+      ConfigurationList configurations;
 
       int maxConfigs;
     };
