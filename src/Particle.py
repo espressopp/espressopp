@@ -1,5 +1,6 @@
 import _espresso
 import esutil
+import pmi
 from espresso import toReal3DFromVector
 
 # Controller Particle:
@@ -28,18 +29,27 @@ class ParticleLocal(object):
     * when a ghost particle is to be written 
     * when data is to be read from a ghost that is not available
     """
-    def __init__(self, id, storage):
-        self.id = id
+    def __init__(self, pid, storage):
+        self.pid = pid
         self.storage = storage
 
     def __getTmp(self):
-        tmp = self.storage.lookupLocalParticle(self.id)
+        tmp = self.storage.lookupLocalParticle(self.pid)
         if tmp is None:
             # TODO: Exception
             raise 'Particle not here!'
         else:
             return tmp
 
+    # Defining __getattr__ will make sure that you can use any
+    # property defined in _TmpParticle
+    def __getattr__(self, key):
+        return getattr(self.__getTmp(), key)
+
+#     def __setattr__(self, key, value):
+#         return setattr(self.__getTmp(), key, value)
+
+    # The following properties are modified between Python and C++
     @property
     def f(self): return self.__getTmp().f
     @f.setter
@@ -55,8 +65,21 @@ class ParticleLocal(object):
     @pos.setter
     def pos(self, val): self.__getTmp().pos = toReal3DFromVector(val)
 
-    def __getattr__(self, key):
-        return getattr(self.__getTmp(), key)
+    def getLocalData(self, key):
+        tmp = self.storage.lookupRealParticle(self.pid)
+        if tmp is not None:
+            return getattr(tmp, key)
+        else:
+            return None
 
-class Particle(object):
-    pass
+if pmi.isController:
+    class Particle(object):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls = 'espresso.ParticleLocal',
+            pmiproperty = [ "id", "storage" ]
+            )
+        def __getattr__(self, key):
+            node, value = pmi.reduce('getLocalData', espresso.MPI.MAXLOC)
+            return value
+

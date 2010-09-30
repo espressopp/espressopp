@@ -5,16 +5,20 @@ using namespace boost::mpi;
 using namespace espresso::python;
 using namespace espresso::esutil::Collectives;
 
+
+DuplicateError::DuplicateError():
+      std::runtime_error("item was found on more than one node")
+{}
+
 /**
    Reduction operator that evaluates to
    - NotHere iff all input values are NotHere
    - Duplicate iff more than one input value is not NotHere
    - the one value that is not NotHere otherwise
  */
-struct UniqueReduce: public std::binary_function<int, int, int> {
+struct UniqueReduce: public std::binary_function< int, int, int > {
   static const int NotHere   = -1;
   static const int Duplicate = -2;
-
   int operator() (int x, int y) {
     if (x == NotHere) {
       return y;
@@ -28,15 +32,7 @@ struct UniqueReduce: public std::binary_function<int, int, int> {
   }
 };
 
-DuplicateError::DuplicateError():
-      std::runtime_error("item was found on more than one node")
-{}
  
-namespace boost { namespace mpi {
-  template<>
-  struct is_commutative<UniqueReduce, int>: mpl::true_ { };
-} } 
-
 int espresso::esutil::Collectives::locateItem(bool here, int controller, communicator world) {
   int node = here ? world.rank() : UniqueReduce::NotHere;
 
@@ -55,8 +51,13 @@ int espresso::esutil::Collectives::locateItem(bool here, int controller, communi
 }
 
 static int pyLocateItem(bool here, int controller) {
-  return locateItem(here, controller, communicator());
+  return locateItem(here, controller, *mpiWorld);
 }
+
+namespace boost { namespace mpi {
+  template<>
+  struct is_commutative< UniqueReduce, int >: mpl::true_ { };
+} } 
 
 void espresso::esutil::Collectives::registerPython() {
   def("esutil_Collectives_locateItem", pyLocateItem);

@@ -13,6 +13,9 @@ class StorageLocal(object):
             self, pid, toReal3DFromVector(*args)
             )
         return ParticleLocal(pid, self)
+    
+    def getParticle(self, pid):
+        return ParticleLocal(pid, self)
 
     def addParticles(self, particleList, *properties):
         """
@@ -95,10 +98,12 @@ class StorageLocal(object):
                if index_mass >= 0:
                   storedParticle.mass = particle[index_mass]
 
+    
+
 if pmi.isController:
     class Storage(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            pmicall = [ "decompose", "addParticle", "addParticles" ],
+            pmicall = [ "decompose", "addParticle", "addParticles", "getParticle" ],
             pmiproperty = [ "system" ]
             )

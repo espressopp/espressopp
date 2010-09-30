@@ -438,7 +438,6 @@ namespace espresso {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
-
     void
     Storage::registerPython() {
       using namespace espresso::python;

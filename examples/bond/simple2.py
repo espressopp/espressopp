@@ -48,8 +48,11 @@ print 'CellGrid = %s' % (cellGrid,)
 system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
 
 # chain 1
-system.storage.addParticle(0, Real3D(5.0, 5.0, 5.0))
-system.storage.addParticle(1, Real3D(5.9, 5.0, 5.0))
+p = system.storage.addParticle(0, Real3D(5.0, 5.0, 5.0))
+print('id=%d pos=%s' % (p.id, p.pos))
+
+p = system.storage.addParticle(1, Real3D(5.9, 5.0, 5.0))
+print('id=%d pos=%s' % (p.id, p.pos))
 system.storage.addParticle(2, Real3D(6.6, 5.5, 5.1))
 
 # chain 2
