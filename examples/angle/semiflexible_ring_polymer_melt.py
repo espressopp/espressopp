@@ -19,6 +19,9 @@ from espresso import Real3D, Int3D
 # read coordinates and box size
 bonds, angles, x, y, z, Lx, Ly, Lz = lammps_file.read('rings.dat')
 
+# benchmark or production run (bench = True is a short job)
+bench = False
+
 #monomers = 200
 #chains = len(x) / monomers
 num_particles = len(x)
@@ -140,6 +143,9 @@ if(nvt):
   langevin.temperature = 1.0
 
 # analysis
+configurations = espresso.analysis.Configurations(system)
+configurations.gather()
+conf_steps = [0]
 temperature = espresso.analysis.Temperature(system)
 pressure = espresso.analysis.Pressure(system)
 pressureTensor = espresso.analysis.PressureTensor(system)
@@ -157,21 +163,23 @@ Etotal = Ek + Ep + Eb + Ea
 sys.stdout.write(' step     T        P        Pxy       etotal   ekinetic   epair   ebond   eangle\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
 
-integrator.run(1000)
-T = temperature.compute()
-P = pressure.compute()
-Pij = pressureTensor.compute()
-Ek = 0.5 * T * (3 * num_particles)
-Ep = interLJ.computeEnergy()
-Eb = interFENE.computeEnergy()
-Ea = interCosine.computeEnergy()
-Etotal = Ek + Ep + Eb + Ea
-sys.stdout.write(fmt % (10000, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
-print "CPU time =", time.clock() - start_time, "s"
-sys.exit(1)
+if(bench):
+  integrator.run(1000)
+  T = temperature.compute()
+  P = pressure.compute()
+  Pij = pressureTensor.compute()
+  Ek = 0.5 * T * (3 * num_particles)
+  Ep = interLJ.computeEnergy()
+  Eb = interFENE.computeEnergy()
+  Ea = interCosine.computeEnergy()
+  Etotal = Ek + Ep + Eb + Ea
+  sys.stdout.write(fmt % (10000, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
+  configurations.clear()
+  print 'CPU time =', time.clock() - start_time, 's'
+  sys.exit(1)
 
-nsteps = 10
-intervals = 20
+nsteps = 100000
+intervals = 1000
 for i in range(1, intervals + 1):
   integrator.run(nsteps)
   step = nsteps * i
@@ -183,5 +191,16 @@ for i in range(1, intervals + 1):
   Eb = interFENE.computeEnergy()
   Ea = interCosine.computeEnergy()
   Etotal = Ek + Ep + Eb + Ea
+  configurations.gather()
+  conf_steps.append(step)
   sys.stdout.write(fmt % (step, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
-print "CPU time =", time.clock() - start_time, "s"
+
+base = 'ring_melt.'
+for i, conf in enumerate(configurations):
+  f = open(base + str(conf_steps[i]), 'w')
+  for pid in conf:
+    pos = conf[pid]
+    f.write('%6d %10.3f %10.3f %10.3f\n' % (pid, pos.x, pos.y, pos.z))
+  f.close()
+configurations.clear()
+print 'CPU time =', time.clock() - start_time, 's'
