@@ -57,6 +57,13 @@ cellGrid = Int3D(
   calcNumberCells(size[2], nodeGrid[2], rc)
   )
 
+nodeGrid = Int3D(2, 2, 2)
+cellGrid = Int3D(
+  calcNumberCells(size[0], nodeGrid[0], rc),
+  calcNumberCells(size[1], nodeGrid[1], rc),
+  calcNumberCells(size[2], nodeGrid[2], rc)
+  )
+
 print 'NodeGrid = %s' % (nodeGrid,)
 print 'CellGrid = %s' % (cellGrid,)
 
@@ -137,6 +144,7 @@ integrator = espresso.integrator.VelocityVerlet(system)
 integrator.dt = 0.001
 
 if(nvt):
+  integrator.dt = 0.01
   langevin = espresso.integrator.Langevin(system)
   integrator.langevin = langevin
   langevin.gamma = 1.0
@@ -179,7 +187,7 @@ if(bench):
   sys.exit(1)
 
 nsteps = 100000
-intervals = 1000
+intervals = 200
 for i in range(1, intervals + 1):
   integrator.run(nsteps)
   step = nsteps * i
