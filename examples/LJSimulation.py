@@ -6,7 +6,6 @@
 #                                                                         #
 ###########################################################################
 
-import os.path
 import sys
 import time
 import espresso
@@ -14,6 +13,7 @@ import MPI
 import logging
 from espresso import Real3D, Int3D
 from espresso.tools.convert import lammps
+from espresso.tools import decomp
 
 # benchmark or production (bench = True is a short job)
 bench = True
@@ -29,33 +29,20 @@ size = (Lx, Ly, Lz)
 rc = 2.5
 skin = 0.3
 
-print "number of particles = ", num_particles
-print "density = ", density
-
-# compute the number of cells on each node
-def calcNumberCells(size, nodes, rc):
-    ncells = 1
-    while size / (ncells * nodes) >= (rc + skin):
-       ncells = ncells + 1
-    return ncells - 1
+print 'number of particles =', num_particles
+print 'density =', density
 
 system = espresso.System()
-system.rng  = espresso.esutil.RNG()
+system.rng = espresso.esutil.RNG()
 system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 comm = MPI.COMM_WORLD
-
-nodeGrid = Int3D(1, 1, comm.size)
-cellGrid = Int3D(
-    calcNumberCells(size[0], nodeGrid[0], rc),
-    calcNumberCells(size[1], nodeGrid[1], rc),
-    calcNumberCells(size[2], nodeGrid[2], rc)
-    )
+nodeGrid = decomp.nodeGrid(comm.size)
+cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
+system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
 
 print 'NodeGrid = %s' % (nodeGrid,)
 print 'CellGrid = %s' % (cellGrid,)
-
-system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
 
 if 0:
   pid = 0
@@ -105,13 +92,15 @@ temperature = espresso.analysis.Temperature(system)
 pressure = espresso.analysis.Pressure(system)
 pressureTensor = espresso.analysis.PressureTensor(system)
 
+fmt = '%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f\n'
+
 T = temperature.compute()
 P = pressure.compute()
 Pij = pressureTensor.compute()
 Ek = 0.5 * T * (3 * num_particles)
 Ep = interLJ.computeEnergy()
 sys.stdout.write(' step     T        P        Pxy       etotal     epotential    ekinetic\n')
-sys.stdout.write('%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f\n' % (0, T, P, Pij[3], Ek + Ep, Ep, Ek))
+sys.stdout.write(fmt % (0, T, P, Pij[3], Ek + Ep, Ep, Ek))
 
 if(bench):
   start_time = time.clock()
@@ -122,7 +111,7 @@ if(bench):
   Pij = pressureTensor.compute()
   Ek = 0.5 * T * (3 * num_particles)
   Ep = interLJ.computeEnergy()
-  sys.stdout.write('%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f\n' % (steps, T, P, Pij[3], Ek + Ep, Ep, Ek))
+  sys.stdout.write(fmt % (steps, T, P, Pij[3], Ek + Ep, Ep, Ek))
   sys.exit(1)
 
 intervals = 20
@@ -135,4 +124,4 @@ for i in range(1, intervals + 1):
   Pij = pressureTensor.compute()
   Ek = 0.5 * T * (3 * num_particles)
   Ep = interLJ.computeEnergy()
-  sys.stdout.write('%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f\n' % (step, T, P, Pij[3], Ek + Ep, Ep, Ek))
+  sys.stdout.write(fmt % (step, T, P, Pij[3], Ek + Ep, Ep, Ek))

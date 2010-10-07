@@ -13,6 +13,7 @@ import MPI
 import logging
 from espresso import Real3D, Int3D
 from espresso.tools.convert import lammps
+from espresso.tools import decomp
 
 # benchmark or production run (bench = True is a short job)
 bench = True
@@ -34,38 +35,17 @@ print 'number of particles =', num_particles
 print 'box size =', L
 print 'cutoff =', rc
 
-# compute the number of cells on each node
-def calcNumberCells(size, nodes, rc):
-  ncells = 1
-  while size / (ncells * nodes) >= (rc + skin):
-     ncells = ncells + 1
-  return ncells - 1
-
 system = espresso.System()
 system.rng = espresso.esutil.RNG()
 system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 comm = MPI.COMM_WORLD
-
-nodeGrid = Int3D(1, 1, comm.size)
-cellGrid = Int3D(
-  calcNumberCells(size[0], nodeGrid[0], rc),
-  calcNumberCells(size[1], nodeGrid[1], rc),
-  calcNumberCells(size[2], nodeGrid[2], rc)
-  )
-
-if(not bench):
-  nodeGrid = Int3D(2, 2, 2)
-  cellGrid = Int3D(
-    calcNumberCells(size[0], nodeGrid[0], rc),
-    calcNumberCells(size[1], nodeGrid[1], rc),
-    calcNumberCells(size[2], nodeGrid[2], rc)
-    )
+nodeGrid = decomp.nodeGrid(comm.size)
+cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
+system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
 
 print 'NodeGrid = %s' % (nodeGrid,)
 print 'CellGrid = %s' % (cellGrid,)
-
-system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
 
 # read in particle coordinates from file
 #f = open('rings.xyz')
