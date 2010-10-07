@@ -1,3 +1,6 @@
+"""This Python module allows one to use a LAMMPS data file as the
+   input to an ESPResSo++ simulation."""
+
 def read(fin):
 
   f = open(fin)

@@ -6,24 +6,29 @@
 #                                                                         #
 ###########################################################################
 
+import os.path
 import sys
 import time
-start_time = time.clock()
 import espresso
 import MPI
 import logging
-import lammps_file
 from espresso import Real3D, Int3D
+from espresso.tools.convert import lammps
 
-# read coordinates and box size
-x, y, z, Lx, Ly, Lz = lammps_file.read('data.lj')
+# benchmark or production (bench = True is a short job)
+bench = True
 
+# nvt or nve (nvt = False is nve)
+nvt = True
+
+steps = 1000
+x, y, z, Lx, Ly, Lz = lammps.read('data.lj')
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 rc = 2.5
 skin = 0.3
-nvt = True
+
 print "number of particles = ", num_particles
 print "density = ", density
 
@@ -90,9 +95,10 @@ integrator.dt = 0.001
 
 if(nvt):
   langevin = espresso.integrator.Langevin(system)
-  integrator.langevin = langevin
   langevin.gamma = 1.0
   langevin.temperature = 1.0
+  integrator.langevin = langevin
+  integrator.dt = 0.01
 
 # analysis
 temperature = espresso.analysis.Temperature(system)
@@ -107,21 +113,22 @@ Ep = interLJ.computeEnergy()
 sys.stdout.write(' step     T        P        Pxy       etotal     epotential    ekinetic\n')
 sys.stdout.write('%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f\n' % (0, T, P, Pij[3], Ek + Ep, Ep, Ek))
 
-integrator.run(10000)
+if(bench):
+  start_time = time.clock()
+  integrator.run(steps)
+  print 'CPU time =', time.clock() - start_time, 's'
+  T = temperature.compute()
+  P = pressure.compute()
+  Pij = pressureTensor.compute()
+  Ek = 0.5 * T * (3 * num_particles)
+  Ep = interLJ.computeEnergy()
+  sys.stdout.write('%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f\n' % (steps, T, P, Pij[3], Ek + Ep, Ep, Ek))
+  sys.exit(1)
 
-T = temperature.compute()
-P = pressure.compute()
-Pij = pressureTensor.compute()
-Ek = 0.5 * T * (3 * num_particles)
-Ep = interLJ.computeEnergy()
-sys.stdout.write('%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f\n' % (10000, T, P, Pij[3], Ek + Ep, Ep, Ek))
-print "CPU time =", time.clock() - start_time, "s"
-sys.exit()
-
-nsteps = 10
 intervals = 20
+nsteps = steps / intervals
 for i in range(1, intervals + 1):
-  integrator.run(10)
+  integrator.run(nsteps)
   step = nsteps * i
   T = temperature.compute()
   P = pressure.compute()

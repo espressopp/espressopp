@@ -7,23 +7,21 @@
 ###########################################################################
 
 import sys
-sys.path.append('../')
 import time
-start_time = time.clock()
 import espresso
 import MPI
 import logging
-import lammps_file
 from espresso import Real3D, Int3D
-
-# read coordinates and box size
-bonds, angles, x, y, z, Lx, Ly, Lz = lammps_file.read('rings.dat')
+from espresso.tools.convert import lammps
 
 # benchmark or production run (bench = True is a short job)
-bench = False
+bench = True
 
-#monomers = 200
-#chains = len(x) / monomers
+# nvt or nve (nvt = False is nve)
+nvt = True
+
+steps = 1000
+bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read('rings.dat')
 num_particles = len(x)
 density = 0.85
 L = (num_particles / density)**(1.0/3.0)
@@ -31,11 +29,10 @@ L = Lx
 size = (L, L, L)
 rc = 2.0**(1.0/6.0)
 rc = 1.12246205
-print "number of particles =", num_particles
-print "box size =", L
-print "cutoff =", rc
 skin = 0.4
-nvt = True
+print 'number of particles =', num_particles
+print 'box size =', L
+print 'cutoff =', rc
 
 # compute the number of cells on each node
 def calcNumberCells(size, nodes, rc):
@@ -57,12 +54,13 @@ cellGrid = Int3D(
   calcNumberCells(size[2], nodeGrid[2], rc)
   )
 
-nodeGrid = Int3D(2, 2, 2)
-cellGrid = Int3D(
-  calcNumberCells(size[0], nodeGrid[0], rc),
-  calcNumberCells(size[1], nodeGrid[1], rc),
-  calcNumberCells(size[2], nodeGrid[2], rc)
-  )
+if(not bench):
+  nodeGrid = Int3D(2, 2, 2)
+  cellGrid = Int3D(
+    calcNumberCells(size[0], nodeGrid[0], rc),
+    calcNumberCells(size[1], nodeGrid[1], rc),
+    calcNumberCells(size[2], nodeGrid[2], rc)
+    )
 
 print 'NodeGrid = %s' % (nodeGrid,)
 print 'CellGrid = %s' % (cellGrid,)
@@ -144,11 +142,11 @@ integrator = espresso.integrator.VelocityVerlet(system)
 integrator.dt = 0.001
 
 if(nvt):
-  integrator.dt = 0.01
   langevin = espresso.integrator.Langevin(system)
-  integrator.langevin = langevin
   langevin.gamma = 1.0
   langevin.temperature = 1.0
+  integrator.langevin = langevin
+  integrator.dt = 0.01
 
 # analysis
 configurations = espresso.analysis.Configurations(system)
@@ -172,7 +170,9 @@ sys.stdout.write(' step     T        P        Pxy       etotal   ekinetic   epai
 sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
 
 if(bench):
-  integrator.run(1000)
+  start_time = time.clock()
+  integrator.run(steps)
+  print 'CPU time =', time.clock() - start_time, 's'
   T = temperature.compute()
   P = pressure.compute()
   Pij = pressureTensor.compute()
@@ -181,13 +181,12 @@ if(bench):
   Eb = interFENE.computeEnergy()
   Ea = interCosine.computeEnergy()
   Etotal = Ek + Ep + Eb + Ea
-  sys.stdout.write(fmt % (10000, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
+  sys.stdout.write(fmt % (steps, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
   configurations.clear()
-  print 'CPU time =', time.clock() - start_time, 's'
   sys.exit(1)
 
-nsteps = 100000
-intervals = 200
+intervals = 20
+nsteps = steps / intervals
 for i in range(1, intervals + 1):
   integrator.run(nsteps)
   step = nsteps * i
@@ -211,4 +210,3 @@ for i, conf in enumerate(configurations):
     f.write('%6d %10.3f %10.3f %10.3f\n' % (pid, pos.x, pos.y, pos.z))
   f.close()
 configurations.clear()
-print 'CPU time =', time.clock() - start_time, 's'

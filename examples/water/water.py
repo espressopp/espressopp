@@ -7,17 +7,15 @@
 ###########################################################################
 
 import sys
-sys.path.append('../')
-
 import espresso
 import math
 import MPI
 import logging
-import lammps_file
 from espresso import Real3D, Int3D
+from espresso.tools.convert import lammps
 
 # read coordinates and box size
-p_type, bonds, angles, q, x, y, z, Lx, Ly, Lz = lammps_file.read('water.dat')
+p_type, bonds, angles, q, x, y, z, Lx, Ly, Lz = lammps.read('water.dat')
 
 num_particles = len(x)
 size = (Lx, Ly, Lz)
