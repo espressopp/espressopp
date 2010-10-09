@@ -1,0 +1,15 @@
+[ defaults ]
+; nbfunc   comb-rule	gen-pairs	fudgeLJ	fudgeQQ
+  1	   2		no		1.0	1.0
+
+[ atomtypes ]
+;name  mass        charge    ptype  sigma     epsilon
+  A    1.00000    0.0000    A       1.000000  1.000000
+
+#include "ring.itp"
+
+[ system ]
+Rings
+
+[ molecules ]
+RING    200

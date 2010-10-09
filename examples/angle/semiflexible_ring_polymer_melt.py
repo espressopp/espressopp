@@ -16,12 +16,12 @@ from espresso.tools.convert import lammps
 from espresso.tools import decomp
 
 # benchmark or production run (bench = True is a short job)
-bench = True
+bench = False
 
 # nvt or nve (nvt = False is nve)
 nvt = True
 
-steps = 1000
+steps = 50000000
 bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read('rings.dat')
 num_particles = len(x)
 density = 0.85
@@ -41,6 +41,7 @@ system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
+nodeGrid = Int3D(2, 2, 2)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
 
@@ -131,7 +132,6 @@ if(nvt):
 # analysis
 configurations = espresso.analysis.Configurations(system)
 configurations.gather()
-conf_steps = [0]
 temperature = espresso.analysis.Temperature(system)
 pressure = espresso.analysis.Pressure(system)
 pressureTensor = espresso.analysis.PressureTensor(system)
@@ -165,7 +165,8 @@ if(bench):
   configurations.clear()
   sys.exit(1)
 
-intervals = 20
+base = 'ring_melt.'
+intervals = 200
 nsteps = steps / intervals
 for i in range(1, intervals + 1):
   integrator.run(nsteps)
@@ -179,14 +180,11 @@ for i in range(1, intervals + 1):
   Ea = interCosine.computeEnergy()
   Etotal = Ek + Ep + Eb + Ea
   configurations.gather()
-  conf_steps.append(step)
-  sys.stdout.write(fmt % (step, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
-
-base = 'ring_melt.'
-for i, conf in enumerate(configurations):
-  f = open(base + str(conf_steps[i]), 'w')
-  for pid in conf:
-    pos = conf[pid]
-    f.write('%6d %10.3f %10.3f %10.3f\n' % (pid, pos.x, pos.y, pos.z))
+  f = open(base + str(step) + '.pos', 'w')
+  for conf in configurations:
+    for pid in conf:
+      pos = conf[pid]
+      f.write('%10.3f %10.3f %10.3f\n' % (pos.x, pos.y, pos.z))
   f.close()
-configurations.clear()
+  configurations.clear()
+  sys.stdout.write(fmt % (step, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
