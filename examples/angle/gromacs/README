@@ -5,9 +5,9 @@ ring polymer melt using GROMACS. This is for benchmarking and profiling
 purposes. The melt is composed of 200 chains with 200 monomers per
 chain.
 
-Step 1: grompp_d -c conf.gro -f grompp.mdp -p topol.top
+Step 1: grompp_d -maxwarn 2 -c conf.gro -f grompp.mdp -p topol.top
 
-This above step produces topol.tpr. This file is then used next:
+The step above produces the topol.tpr file. This file is then used next:
 
 Step 2: mdrun_d -s topol.tpr
 

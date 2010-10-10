@@ -3,14 +3,14 @@ define                   =
 integrator               = sd
 ; Start time and timestep in ps
 tinit                    = 0
-dt                       = 0.01
-nsteps                   = 1000
+dt                       = 0.001
+nsteps                   = 10000
 ; For exact run continuation or redoing part of a run
 init_step                = 0
 ; mode for center of mass motion removal
-comm-mode                = Linear
+comm-mode                = None
 ; number of steps for center of mass motion removal
-nstcomm                  = 0
+nstcomm                  = 
 ; group(s) for center of mass motion removal
 comm-grps                = 
 
@@ -20,8 +20,9 @@ nstxout                  = 0
 nstvout                  = 0
 nstfout                  = 0
 ; Output frequency for energies to log file and energy file
-nstlog                   = 0
-nstenergy                = 0
+nstlog                   = 1000
+nstcalcenergy            = 1000
+nstenergy                = 1000
 ; Output frequency and precision for xtc file
 nstxtcout                = 0
 xtc-precision            = 1000
@@ -37,21 +38,21 @@ ns-type                  = Grid
 ; Periodic boundary conditions: xyz, no, xy
 pbc                      = xyz
 periodic_molecules       = no
-; nblist cut-off        
-rlist                    = 1.12246
+; nblist cut-off
+rlist                    = 1.12246205
 
 ; OPTIONS FOR ELECTROSTATICS AND VDW
 ; Method for doing electrostatics
 coulombtype              = Cut-Off
 rcoulomb-switch          = 0
-rcoulomb                 = 1.12246
+rcoulomb                 = 1.12246205
 ; Relative dielectric constant for the medium and the reaction field
 epsilon_r                = 1
 ; Method for doing Van der Waals
 
 vdw-type                 = Cut-Off
-; cut-off lengths       
-rvdw                     = 1.12246
+; cut-off lengths
+rvdw                     = 1.12246205
 ; Apply long range dispersion corrections for Energy and Pressure
 DispCorr                 = no
 
@@ -59,13 +60,13 @@ DispCorr                 = no
 implicit_solvent         = No
 
 ; OPTIONS FOR WEAK COUPLING ALGORITHMS
-; Temperature coupling  
+; Temperature coupling
 Tcoupl                   = no
 ; Groups to couple separately
 tc-grps                  = System
 ; Time constant (ps) and reference temperature (K)
-tau_t                    = 1.0 
-ref_t                    = 120.272 
+tau_t                    = 1.0
+ref_t                    = 120.272
 ; Pressure coupling     
 Pcoupl                   = no
 
