@@ -8,6 +8,7 @@
 #include "AngularPotential.hpp"
 #include "Cosine.hpp"
 #include "AngularHarmonic.hpp"
+#include "AngularCosineSquared.hpp"
 #include "DihedralPotential.hpp"
 #include "OPLS.hpp"
 
@@ -24,6 +25,7 @@ namespace espresso {
       AngularPotential::registerPython();
       Cosine::registerPython();
       AngularHarmonic::registerPython();
+      AngularCosineSquared::registerPython();
       DihedralPotential::registerPython();
       OPLS::registerPython();
     }
