@@ -12,17 +12,26 @@ import espresso
 import MPI
 import logging
 from espresso import Real3D, Int3D
-from espresso.tools.convert import lammps
+from espresso.tools.convert import lammps, gromacs
 from espresso.tools import decomp
 
 # benchmark or production run (bench = True is a short job)
-bench = False
+bench = True
 
 # nvt or nve (nvt = False is nve)
 nvt = True
 
-steps = 50000000
-bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read('rings.dat')
+# lammps or gromacs (lammps_reader = False is gromacs)
+lammps_reader = False
+
+steps = 100
+if(lammps_reader):
+  bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read('rings.dat')
+else:
+  f1 = 'gromacs/conf.gro'
+  f2 = 'gromacs/topol.top'
+  f3 = 'gromacs/ring.itp'
+  bonds, angles, x, y, z, Lx, Ly, Lz = gromacs.read(f1, f2, f3)
 num_particles = len(x)
 density = 0.85
 L = (num_particles / density)**(1.0/3.0)
@@ -41,7 +50,6 @@ system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
-nodeGrid = Int3D(2, 2, 2)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
 

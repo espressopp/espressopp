@@ -21,7 +21,7 @@ bench = True
 # nvt or nve (nvt = False is nve)
 nvt = True
 
-steps = 1000
+steps = 500
 x, y, z, Lx, Ly, Lz = lammps.read('data.lj')
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
