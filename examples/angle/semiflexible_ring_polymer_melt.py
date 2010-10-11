@@ -19,12 +19,12 @@ from espresso.tools import decomp
 bench = True
 
 # nvt or nve (nvt = False is nve)
-nvt = True
+nvt = False
 
 # lammps or gromacs (lammps_reader = False is gromacs)
-lammps_reader = False
+lammps_reader = True
 
-steps = 100
+steps = 200
 if(lammps_reader):
   bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read('rings.dat')
 else:
@@ -118,13 +118,22 @@ system.addInteraction(interFENE)
 #  f.write('%d %d %d %d %d\n' % (i+1, 1, b[0]+1, b[1]+1, b[2]+1))
 #f.close()
 
-# Cosine with FixedTriple list
-ftl = espresso.FixedTripleList(system.storage)
-ftl.addTriples(angles)
-potCosine = espresso.interaction.Cosine(K=1.5, theta0=3.1415926)
-interCosine = espresso.interaction.FixedTripleListCosine(system, ftl)
-interCosine.setPotential(type1 = 0, type2 = 0, potential = potCosine)
-system.addInteraction(interCosine)
+if(lammps_reader):
+  # Cosine with FixedTriple list
+  ftl = espresso.FixedTripleList(system.storage)
+  ftl.addTriples(angles)
+  potCosine = espresso.interaction.Cosine(K=0.75, theta0=3.1415926)
+  interCosine = espresso.interaction.FixedTripleListCosine(system, ftl)
+  interCosine.setPotential(type1 = 0, type2 = 0, potential = potCosine)
+  system.addInteraction(interCosine)
+else:
+  # CosineSquared with FixedTriple list
+  ftl = espresso.FixedTripleList(system.storage)
+  ftl.addTriples(angles)
+  potCosineSq = espresso.interaction.AngularCosineSquared(K=0.75, theta0=3.1415926)
+  interCosineSq = espresso.interaction.FixedTripleListAngularCosineSquared(system, ftl)
+  interCosineSq.setPotential(type1 = 0, type2 = 0, potential = potCosineSq)
+  system.addInteraction(interCosine)
 
 # integrator
 integrator = espresso.integrator.VelocityVerlet(system)

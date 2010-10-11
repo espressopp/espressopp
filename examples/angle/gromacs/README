@@ -11,7 +11,17 @@ The step above produces the topol.tpr file. This file is then used next:
 
 Step 2: mdrun_d -s topol.tpr
 
-Examine md.log for CPU time. One must use bin/g_energy to examine ener.edr.
+Examine md.log for CPU time, etc. One must use bin/g_energy to examine ener.edr.
+
+To compute the energy and pressure at every time step modify grompp.mdp as follows:
+nstenergy = 1
+
+Then after Step 2 do the following from the shell:
+$ echo "Pressure" | g_energy -o pressure.xvg
+$ echo "Total-Energy" | g_energy -o energy.xvg
+pressure.xvg and energy.xvg will contain the time series. Keep in
+mind the Gromacs write the pressure in units of bar. To convert
+to LJ units use 1 kJ/mol/nm^3 = 16.6054 bar.
 
 
 The conf.gro file was created from rings.dat using the following
