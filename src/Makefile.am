@@ -52,7 +52,12 @@ python_SCRIPTS += \
 	integrator/__init__.py \
 	main/__init__.py \
 	main/_setup.py \
-	analysis/__init__.py
+	analysis/__init__.py \
+        tools/__init__.py \
+        tools/decomp.py \
+        tools/convert/__init__.py \
+        tools/convert/gromacs.py \
+        tools/convert/lammps.py
 
 noinst_LTLIBRARIES += \
 	libgenlogger.la \
