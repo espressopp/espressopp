@@ -1,0 +1,36 @@
+.. -*- restructuredtext -*-
+
+===============================
+README for Sphinx Documentation
+===============================
+
+Download + Installing
+=====================
+
+Use ``setup.py``::
+
+   python setup.py build
+   sudo python setup.py install
+
+
+Making the user docs
+====================
+
+After installing::
+
+   sphinx-build . _build/html
+
+Then, direct your browser to ``_build/html/index.html``.
+
+Advanced Features
+=================
+
+Configuration file of user documentation is conf.py
+
+  conf.py            : configuration file of user documenation
+
+  _static/Logo.png     : large ESPResSo++ Logo on first page
+  _static/top_logo_png : small logo on each page
+  _static/default.css  : setting colors for the documentation
+
+  _template/layout.html : designs the layout of the documentation
