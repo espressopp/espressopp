@@ -19,6 +19,8 @@ namespace espresso {
     private:
       real epsilon;
       real sigma;
+      real ff1, ff2;
+      real ef1, ef2;
 
     public:
       static void registerPython();
@@ -27,6 +29,7 @@ namespace espresso {
 	: epsilon(0.0), sigma(0.0) {
 	setShift(0.0);
 	setCutoff(infinity);
+        preset();
       }
 
       LennardJones(real _epsilon, real _sigma, 
@@ -34,6 +37,7 @@ namespace espresso {
 	: epsilon(_epsilon), sigma(_sigma) {
 	setShift(_shift);
 	setCutoff(_cutoff);
+        preset();
       }
 
       LennardJones(real _epsilon, real _sigma, 
@@ -43,18 +47,30 @@ namespace espresso {
 	autoShift = false;
 	setCutoff(_cutoff);
 	setAutoShift(); 
+        preset();
+      }
+
+      void preset() {
+        real sig2 = sigma * sigma;
+        real sig6 = sig2 * sig2 * sig2;
+        ff1 = 48.0 * epsilon * sig6 * sig6;
+        ff2 = 24.0 * epsilon * sig6;
+        ef1 =  4.0 * epsilon * sig6 * sig6;
+        ef2 =  4.0 * epsilon * sig6;
       }
 
       // Setter and getter
       void setEpsilon(real _epsilon) {
 	epsilon = _epsilon;
 	updateAutoShift();
+        preset();
       }
       real getEpsilon() const { return epsilon; }
 
       void setSigma(real _sigma) { 
 	sigma = _sigma; 
 	updateAutoShift();
+        preset();
       }
       real getSigma() const { return sigma; }
 
@@ -65,22 +81,18 @@ namespace espresso {
 	return energy;
       }
 
-      bool _computeForceRaw(Real3DRef force,
-			    ConstReal3DRef dist,
-			    real distSqr) const {
-	real frac2;
-	real frac6;
-	real distSqrInv;
-	real ffactor;
-    
-	distSqrInv = 1.0 / distSqr;
-	frac2 = sigma*sigma * distSqrInv;
-	frac6 = frac2 * frac2 * frac2;
-	ffactor = 48.0 * epsilon * (frac6*frac6 - 0.5*frac6) 
-	  * distSqrInv;
-	force = dist * ffactor;
-	return true;
+      void _computeForceRaw(double force[3],
+                            const double dist[3],
+                            real distSqr) const {
+
+        real frac2 = 1.0 / distSqr;
+        real frac6 = frac2 * frac2 * frac2;
+        real ffactor = frac6 * (ff1 * frac6 - ff2) * frac2;
+        force[0] = dist[0] * ffactor;
+        force[1] = dist[1] * ffactor;
+        force[2] = dist[2] * ffactor;
       }
+
     };
   }
 }

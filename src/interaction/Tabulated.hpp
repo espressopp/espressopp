@@ -53,13 +53,16 @@ namespace espresso {
 	return table->getEnergy(sqrt(distSqr));
       }
 
-      bool _computeForceRaw(Real3DRef force,
-			    ConstReal3DRef dist,
-			    real distSqr) const {
+      void _computeForceRaw(double force[3],
+                            const double dist[3],
+                            real distSqr) const {
+
 	real ffactor = table->getForce(sqrt(distSqr));
-	force = dist * ffactor;
-	return true;
+        force[0] = dist[0] * ffactor;
+        force[1] = dist[1] * ffactor;
+        force[2] = dist[2] * ffactor;
       }
+
     };
   }
 }

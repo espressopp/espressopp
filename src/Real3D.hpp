@@ -40,6 +40,8 @@ namespace espresso {
 
     real sqr() const;
     real abs() const;
+
+    const real* get() const { return data; }
   };
 
   //////////////////////////////////////////////////
@@ -82,6 +84,8 @@ namespace espresso {
 
     real sqr() const;
     real abs() const;
+
+    real* get() { return data; }
   };
   
   //////////////////////////////////////////////////
