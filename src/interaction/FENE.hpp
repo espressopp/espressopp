@@ -71,13 +71,13 @@ namespace espresso {
 	return energy;
       }
 
-      bool _computeForceRaw(Real3DRef force,
+      bool _computeForceRaw( force,
 			    ConstReal3DRef dist,
 			    real distSqr) const {
 
         real r = sqrt(distSqr);
-        if (r < 0.01) printf ("fene r = %g\n", r);
-        if (r > rMax) printf ("fene r = %g > rMax = %g\n", r, rMax);
+        //if (r < 0.01) printf ("fene r = %g\n", r);
+        //if (r > rMax) printf ("fene r = %g > rMax = %g\n", r, rMax);
         real ffactor = -K * (r - r0) / (1 - pow((r - r0) / rMax, 2)) / r;
         force = dist * ffactor;
         return true;

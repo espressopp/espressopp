@@ -73,7 +73,7 @@ namespace espresso {
         int type2 = p2.p.type;
         const Potential &potential = getPotential(type1, type2);
 
-	Real3D force;
+	real force[3];
         Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
 	if (potential._computeForce(force, dist))
 	  for(int k = 0; k < 3; k++) {
