@@ -1,7 +1,7 @@
 import _espresso
 import esutil
 import pmi
-from espresso import toReal3DFromVector
+from espresso import toReal3DFromVector, MPI
 
 # Controller Particle:
 # * requests are directly forwarded
@@ -72,6 +72,10 @@ class ParticleLocal(object):
         else:
             return None
 
+    def locateParticle(self):
+        tmp = self.storage.lookupRealParticle(self.pid)
+        return (tmp is not None)
+
 if pmi.isController:
     class Particle(object):
         __metaclass__ = pmi.Proxy
@@ -79,7 +83,13 @@ if pmi.isController:
             cls = 'espresso.ParticleLocal',
             pmiproperty = [ "id", "storage" ]
             )
+
+        @property
+        def node(self):
+            value, node = pmi.reduce(pmi.MAXLOC, self, 'locateParticle')
+            return node
+
         def __getattr__(self, key):
-            node, value = pmi.reduce('getLocalData', espresso.MPI.MAXLOC)
+            value, node = pmi.reduce(pmi.MAXLOC, self, 'getLocalData', key)
             return value
 

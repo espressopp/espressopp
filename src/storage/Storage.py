@@ -1,7 +1,7 @@
 from espresso import pmi
 import MPI
 import logging
-from espresso import toReal3DFromVector, ParticleLocal
+from espresso import toReal3DFromVector, ParticleLocal, Particle
 
 class StorageLocal(object):
     """Abstract local base class for storing particles"""
@@ -9,12 +9,14 @@ class StorageLocal(object):
     logger = logging.getLogger("Storage")
 
     def addParticle(self, pid, *args):
+        """Add a particle locally if it belongs to the local domain."""
         self.cxxclass.addParticle(
             self, pid, toReal3DFromVector(*args)
             )
-        return ParticleLocal(pid, self)
     
     def getParticle(self, pid):
+        """Get the local particle. If it is not on this node, any
+        attempt to access the particle will raise an exception."""
         return ParticleLocal(pid, self)
 
     def addParticles(self, particleList, *properties):
@@ -104,6 +106,13 @@ if pmi.isController:
     class Storage(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            pmicall = [ "decompose", "addParticle", "addParticles", "getParticle" ],
+            pmicall = [ "decompose", "addParticles" ],
             pmiproperty = [ "system" ]
             )
+
+        def addParticle(self, pid, *args):
+            pmi.call(self.pmiobject, 'addParticle', pid, *args)
+            return Particle(pid, self)
+
+        def getParticle(self, pid):
+            return Particle(pid, self)
