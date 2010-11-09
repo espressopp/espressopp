@@ -41,8 +41,8 @@ namespace espresso {
 	return energy;
       }
 
-      void _computeForceRaw(Real3DRef force12,
-                            Real3DRef force32,
+      void _computeForceRaw(real force12[3],
+                            real force32[3],
 			    ConstReal3DRef dist12,
 			    ConstReal3DRef dist32) const {
 
@@ -66,10 +66,16 @@ namespace espresso {
         sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 
         dU_dtheta = -2.0 * K * (cos_theta - cos_theta0) * sin_theta;
-
         dnom = dist12_sqr * dist32_sqr * sin_theta;
-        force12 = dU_dtheta * (dist12_magn * dist32_magn * dist32 - cos_theta * dist32_sqr * dist12) / dnom;
-        force32 = dU_dtheta * (dist12_magn * dist32_magn * dist12 - cos_theta * dist12_sqr * dist32) / dnom;
+
+        force12[0] = dU_dtheta * (dist12_magn * dist32_magn * dist32[0] - cos_theta * dist32_sqr * dist12[0]) / dnom;
+        force12[1] = dU_dtheta * (dist12_magn * dist32_magn * dist32[1] - cos_theta * dist32_sqr * dist12[1]) / dnom;
+        force12[2] = dU_dtheta * (dist12_magn * dist32_magn * dist32[2] - cos_theta * dist32_sqr * dist12[2]) / dnom;
+
+        force32[0] = dU_dtheta * (dist12_magn * dist32_magn * dist12[0] - cos_theta * dist12_sqr * dist32[0]) / dnom;
+        force32[1] = dU_dtheta * (dist12_magn * dist32_magn * dist12[1] - cos_theta * dist12_sqr * dist32[1]) / dnom;
+        force32[2] = dU_dtheta * (dist12_magn * dist32_magn * dist12[2] - cos_theta * dist12_sqr * dist32[2]) / dnom;
+
       }
     };
   }
