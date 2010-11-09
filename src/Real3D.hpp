@@ -144,6 +144,9 @@ namespace espresso {
     iterator begin();
     iterator end();
 
+    const real* get() const { return data; }
+    real* get() { return data; }
+
     static void registerPython();
   };
 

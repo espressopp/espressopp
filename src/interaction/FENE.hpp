@@ -72,7 +72,7 @@ namespace espresso {
       }
 
       bool _computeForceRaw(real force[3],
-			    ConstReal3DRef dist,
+			    const real dist[3],
 			    real distSqr) const {
 
         real r = sqrt(distSqr);

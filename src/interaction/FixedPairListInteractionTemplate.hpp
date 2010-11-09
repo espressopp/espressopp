@@ -75,7 +75,7 @@ namespace espresso {
 
 	real force[3];
         Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
-	if (potential._computeForce(force, dist))
+	if (potential._computeForce(force, dist.get()))
 	  for(int k = 0; k < 3; k++) {
 	    p1.f.f[k] += force[k];
 	    p2.f.f[k] -= force[k];
