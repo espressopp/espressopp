@@ -1,5 +1,5 @@
 # PMI - Parallel Method Invocation
-# Copyright (C) 2009 Olaf Lenz
+# Copyright (C) 2009,2010 Olaf Lenz
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -456,7 +456,7 @@ def reduce(*args, **kwds) :
         if len(args) <= 1:
             raise UserError('pmi.reduce expects at least 2 argument on controller!')
         # handle reduceOp argument
-        creduceOp, treduceOp, args = __translateFunctionArgs(*args)
+        creduceOp, treduceOp, args = __translateReduceOpArgs(*args)
         cfunction, tfunction, args = __translateFunctionArgs(*args)
         cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
         _broadcast(_REDUCE, treduceOp, tfunction, *targs, **tkwds)
@@ -468,7 +468,7 @@ def reduce(*args, **kwds) :
         return receive(_REDUCE)
 
 def __workerReduce(reduceOp, function, *targs, **tkwds) :
-    reduceOp = __backtranslateFunctionArg(reduceOp)
+    reduceOp = __backtranslateReduceOpArg(reduceOp)
     function = __backtranslateFunctionArg(function)
     args, kwds = __backtranslateOIDs(targs, tkwds)
     log.info("Reducing: %s", __formatCall(function, args, kwds))
@@ -513,10 +513,7 @@ def __workerDump() :
 ## AUTOMATIC OBJECT DELETION
 ##################################################
 def __delete():
-    """Internal implementation of sync(). If explicit is True, it will
-    send an empty sync signal to the workers, even if no objects need
-    to be deleted.
-    """
+    """Internal implementation of sync()."""
     global DELETED_OIDS
     if len(DELETED_OIDS) > 0:
         log.debug("Got %d objects in DELETED_OIDS.", len(DELETED_OIDS))
@@ -600,19 +597,20 @@ def registerAtExit() :
 ##################################################
 class Proxy(type):
     """A metaclass to be used to create frontend serial objects."""
+
     class _Initializer(object):
         def __init__(self, pmiobjectclassdef):
             self.pmiobjectclassdef = pmiobjectclassdef
         def __call__(self, method_self, *args, **kwds):
-            # create the pmi object
-            log.info('PMI.Proxy of type %s is creating pmi object of type %s',
-                     method_self.__class__.__name__,
-                     self.pmiobjectclassdef)
-            if not _isProxy(method_self):
-                method_self.pmiobjectclassdef = self.pmiobjectclassdef
-                pmiobjectclass = _translateClass(self.pmiobjectclassdef)
-                method_self.pmiobject = create(pmiobjectclass, *args, **kwds)
-                method_self.pmiobject._pmiproxy = method_self
+            # # create the pmi object
+            # log.info('PMI.Proxy of type %s is creating pmi object of type %s',
+            #          method_self.__class__.__name__,
+            #          self.pmiobjectclassdef)
+            # if not _isProxy(method_self):
+            method_self.pmiobjectclassdef = self.pmiobjectclassdef
+            pmiobjectclass = _translateClass(self.pmiobjectclassdef)
+            method_self.pmiobject = create(pmiobjectclass, *args, **kwds)
+            method_self.pmiobject._pmiproxy = method_self
 
     class _LocalCaller(object):
         def __init__(self, methodName):
@@ -1041,6 +1039,22 @@ def __backtranslateFunctionArg(arg0):
     else:
         return arg0
 
+def __translateReduceOpArgs(*args):
+    tfunction =  _MPITranslateReduceOp(*args)
+    if tfunction is not None:
+        function = args[0]
+        rargs = args[1:]
+        return function, tfunction, rargs
+    else:
+        return __translateFunctionArgs(*args)
+
+def __backtranslateReduceOpArg(arg0):
+    function = _MPIBacktranslateReduceOp(arg0)
+    if function is not None: 
+        return function
+    else:
+        return __backtranslateFunctionArg(arg0)
+
 def __formatCall(function, args, kwds) :
     def formatArgs(args, kwds) :
         arglist = [repr(arg) for arg in args]
@@ -1083,6 +1097,7 @@ inWorkerLoop = False
 ## MPI SETUP
 ##################################################
 import MPI
+from MPI import OP_NULL, MAX, MIN, SUM, PROD, LAND, BAND, LOR, BOR, LXOR, BXOR, MAXLOC, MINLOC, REPLACE
 
 def _MPIInit(comm=MPI.COMM_WORLD):
     # The communicator used by PMI
@@ -1134,6 +1149,38 @@ def _MPIMergeWithParent():
     if intercomm == MPI.COMM_NULL: return
     newcomm = intercomm.Merge(True)
     _MPIInit(newcomm)
+
+# map of command names and associated worker functions
+
+_REDUCEOP = [ OP_NULL, MAX, MIN, SUM, PROD, LAND, BAND, LOR, BOR,
+    LXOR, BXOR, MAXLOC, MINLOC, REPLACE ]
+
+class _ReduceOp(object):
+    def __init__(self, op):
+        self.op = op
+    def __getstate__(self):
+        i = 0
+        for op in _REDUCEOP:
+            if self.op is op:
+                return i
+            i += 1
+    def __setstate__(self, state):
+        self.op = _REDUCEOP[state]
+    def getOp(self):
+        return self.op
+
+def _MPITranslateReduceOp(*args):
+    arg0 = args[0]
+    if isinstance(arg0, MPI.Op):
+        return _ReduceOp(arg0)
+    else:
+        return None
+
+def _MPIBacktranslateReduceOp(arg0):
+    if isinstance(arg0, _ReduceOp):
+        return arg0.getOp()
+    else:
+        return None
 
 ##################################################
 ## SETUP
