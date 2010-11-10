@@ -39,7 +39,7 @@ elif(init_cfg == 2):
   rho = 0.8442
   x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False)
 else:
-  sys.std.write('init_cfg invalid: ' + str(init_cfg) + '. Exiting ...\n')
+  sys.stdout.write('init_cfg invalid: ' + str(init_cfg) + '. Exiting ...\n')
   sys.exit(1)
 
 
@@ -47,7 +47,7 @@ else:
 ######################################################################
 ### IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE ###
 ######################################################################
-
+sys.stdout.write('Setting up simulation ...\n')
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 system = espresso.System()
@@ -90,6 +90,8 @@ print 'density = %.4f' % (density)
 print 'rc =', rc
 print 'dt =', integrator.dt
 print 'skin =', system.skin
+print 'nvt =', nvt
+print 'steps =', steps
 print 'NodeGrid = %s' % (nodeGrid,)
 print 'CellGrid = %s' % (cellGrid,)
 print ''
