@@ -262,9 +262,11 @@ namespace espresso {
       dist[1] = p1.r.p[1] - p2.r.p[1];
       dist[2] = p1.r.p[2] - p2.r.p[2];
       real distSqr = dist[0]*dist[0] + dist[1]*dist[1] + dist[2]*dist[2];
-      if (distSqr > cutoffSqr) return false;
-      derived_this()->_computeForceRaw(force, dist, distSqr);
-      return true;
+      if (distSqr > cutoffSqr) {
+        return false;
+      } else {
+        return derived_this()->_computeForceRaw(force, dist, distSqr);
+      }
     }
     
     template < class Derived > 
@@ -272,9 +274,11 @@ namespace espresso {
     PotentialTemplate< Derived >::
     _computeForce(Real3DRef force, ConstReal3DRef dist) const {
       real distSqr = dist.sqr();
-      if (distSqr > cutoffSqr) return false;
-      derived_this()->_computeForceRaw(force.get(), dist.get(), distSqr);
-      return true;
+      if (distSqr > cutoffSqr) {
+        return false;
+      } else {
+        return derived_this()->_computeForceRaw(force.get(), dist.get(), distSqr);
+      }
     }
   }
 }

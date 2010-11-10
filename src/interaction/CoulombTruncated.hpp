@@ -51,7 +51,7 @@ namespace espresso {
 	return energy;
       }
 
-      void _computeForceRaw(real force[3],
+      bool _computeForceRaw(real force[3],
                             const real dist[3],
                             real distSqr) const {
 
@@ -60,6 +60,7 @@ namespace espresso {
         force[0] = dist[0] * ffactor;
         force[1] = dist[1] * ffactor;
         force[2] = dist[2] * ffactor;
+        return true;
       }
 
     };
