@@ -236,15 +236,15 @@ AC_ARG_ENABLE([logging], AS_HELP_STRING([--enable-logging@<:@=level@:>@],
       [enable logging at the given level (off, fatal, error, warn,
        debug, trace). Defaults to "off" or "debug" if --enable-logging is
        used.]) 
-      ,, [enable_logging="off"])
+      ,, [enable_logging="debug"])
+AS_IF([test "x$enable_logging" = "xno"], [enable_logging="off"])
+AS_IF([test "x$enable_logging" = "xyes"], [enable_logging="debug"])
 AS_CASE([$enable_logging],
 	[off], [AC_DEFINE(LOG4ESPP_LEVEL_OFF, [], [Logging level])],
-	[no], [AC_DEFINE(LOG4ESPP_LEVEL_OFF)],
-	[yes], [AC_DEFINE(LOG4ESPP_LEVEL_DEBUG, [], [Logging level])],
 	[fatal], [AC_DEFINE(LOG4ESPP_LEVEL_FATAL, [], [Logging level])],
 	[error], [AC_DEFINE(LOG4ESPP_LEVEL_ERROR, [], [Logging level])],
 	[warn], [AC_DEFINE(LOG4ESPP_LEVEL_WARN, [], [Logging level])],
-	[debug], [AC_DEFINE(LOG4ESPP_LEVEL_DEBUG)],
+	[debug], [AC_DEFINE(LOG4ESPP_LEVEL_DEBUG, [], [Logging level])],
 	[trace], [AC_DEFINE(LOG4ESPP_LEVEL_TRACE, [], [Logging level])],
 	[AC_DEFINE(LOG4ESPP_LEVEL_DEBUG)])
 AC_MSG_RESULT($enable_logging)
