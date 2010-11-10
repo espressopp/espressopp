@@ -12,6 +12,10 @@
 #include "Cell.hpp"
 
 namespace espresso {
+
+  class InBuffer;
+  class OutBuffer;
+
   namespace storage {
     /** represents the particle storage of one system. */
     class Storage : public SystemAccess {
@@ -107,9 +111,9 @@ namespace espresso {
        */
       boost::signals2::signal0<void> onParticlesChanged;
 
-      boost::signals2::signal2<void, ParticleList&, mpi::packed_oarchive&> 
+      boost::signals2::signal2<void, ParticleList&, class OutBuffer&> 
       beforeSendParticles;
-      boost::signals2::signal2<void, ParticleList&, mpi::packed_iarchive&> 
+      boost::signals2::signal2<void, ParticleList&, class InBuffer&> 
       afterRecvParticles;
 
       /* variant for python that ignores the return value */
@@ -159,12 +163,12 @@ namespace espresso {
 
 	  @param shift how to adjust the positions of the particles when sending
       */
-      void packPositionsEtc(boost::mpi::packed_oarchive &ar,
+      void packPositionsEtc(class OutBuffer& buf,
 			    Cell &reals, int extradata, const real shift[3]);
 
  
       /** unpack received data for ghosts. */
-      void unpackPositionsEtc(Cell &ghosts, boost::mpi::packed_iarchive &ar, int extradata);
+      void unpackPositionsEtc(Cell &ghosts, class InBuffer &buf, int extradata);
 
       /** copy specified data elements between a real cell and one of its ghosts
 
@@ -175,11 +179,11 @@ namespace espresso {
 			     const real shift[3]);
 
       /** pack ghost forces for sending. */
-      void packForces(boost::mpi::packed_oarchive &ar, Cell &ghosts);
+      void packForces(OutBuffer& buf, Cell &ghosts);
       /** unpack received ghost forces. This one ADDS, and is most likely, what you need. */
-      void unpackAndAddForces(Cell &reals, boost::mpi::packed_iarchive &ar);
+      void unpackAndAddForces(Cell &reals, class InBuffer &buf);
       /** unpack received ghost forces. This one OVERWRITES, and is probably what you don't need. */
-      void unpackForces(Cell &reals, boost::mpi::packed_iarchive &ar);
+      void unpackForces(Cell &reals, class InBuffer &buf);
       void addGhostForcesToReals(Cell &ghosts, Cell &reals);
 
       /** send particles of a cell to another node, and empty the cell

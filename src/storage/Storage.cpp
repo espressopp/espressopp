@@ -12,11 +12,13 @@
 #include "Real3D.hpp"
 #include "Int3D.hpp"
 #include "Particle.hpp"
+#include "Buffer.hpp"
 
 using namespace boost;
 using namespace espresso::iterator;
 
 namespace espresso {
+ 
   namespace storage {
     LOG4ESPP_LOGGER(Storage::logger, "Storage");
 
@@ -204,12 +206,12 @@ namespace espresso {
       LOG4ESPP_DEBUG(logger, "send " << l.size() << " particles to " << node);
 
       // pack for transport
-      mpi::packed_oarchive data(*comm);
+      OutBuffer data(*comm);
       int size = l.size();
-      data << size;
+      data.write(size);
       for (ParticleList::Iterator it(l); it.isValid(); ++it) {
 	removeFromLocalParticles(&(*it));
-	data << *it;
+	data.write(*it);
       }
 
       beforeSendParticles(l, data);
@@ -217,7 +219,7 @@ namespace espresso {
       l.clear();
 
       // ... and send
-      comm->send(node, STORAGE_COMM_TAG, data);
+      data.send(node, STORAGE_COMM_TAG);
 
       LOG4ESPP_DEBUG(logger, "done");
     }
@@ -227,12 +229,14 @@ namespace espresso {
       LOG4ESPP_DEBUG(logger, "recv from " << node);
 
       // receive packed data
-      mpi::packed_iarchive data(*comm);
-      comm->recv(node, STORAGE_COMM_TAG, data);
+
+      InBuffer data(*comm);
+
+      data.recv(node, STORAGE_COMM_TAG);
 
       // ... and unpack
       int size;
-      data >> size;
+      data.read(size);
       int curSize = l.size();
       LOG4ESPP_DEBUG(logger, "got " << size << " particles, have " << curSize);
 
@@ -241,7 +245,7 @@ namespace espresso {
 
 	for (int i = 0; i < size; ++i) {
 	  Particle *p = &l[curSize + i];
-	  data >> *p;
+	  data.read(*p);
 	  updateInLocalParticles(p);
 	}
       }
@@ -270,7 +274,7 @@ namespace espresso {
       onParticlesChanged();
     }
 
-    void Storage::packPositionsEtc(boost::mpi::packed_oarchive &ar,
+    void Storage::packPositionsEtc(OutBuffer &buf,
 				   Cell &_reals, int extradata, const real shift[3])
     {
       ParticleList &reals  = _reals.particles;
@@ -285,24 +289,12 @@ namespace espresso {
 		     << shift[0] << "," << shift[1] << "," << shift[2]);
 
       for(ParticleList::iterator src = reals.begin(), end = reals.end(); src != end; ++src) {
-	{
-	  ParticlePosition r;
-	  src->r.copyShifted(r, shift);
-	  ar << r;
-	}
-	if (extradata & DATA_PROPERTIES) {
-	  ar << src->p;
-	}
-	if (extradata & DATA_MOMENTUM) {
-	  ar << src->m;
-	}
-	if (extradata & DATA_LOCAL) {
-	  ar << src->l;
-	}
+
+        buf.write(*src, extradata, shift);
       }
     }
 
-    void Storage::unpackPositionsEtc(Cell &_ghosts, boost::mpi::packed_iarchive &ar, int extradata)
+    void Storage::unpackPositionsEtc(Cell &_ghosts, InBuffer &buf, int extradata)
     {
       ParticleList &ghosts  = _ghosts.particles;
 
@@ -314,18 +306,9 @@ namespace espresso {
 		     << ((extradata & DATA_LOCAL) ? "local " : ""));
 
       for(ParticleList::iterator dst = ghosts.begin(), end = ghosts.end(); dst != end; ++dst) {
-	{
-	  ar >> dst->r;
-	}
+        buf.read(*dst, extradata);
 	if (extradata & DATA_PROPERTIES) {
-	  ar >> dst->p;
 	  updateInLocalParticles(&(*dst), true);
-	}
-	if (extradata & DATA_MOMENTUM) {
-	  ar >> dst->m;
-	}
-	if (extradata & DATA_LOCAL) {
-	  ar >> dst->l;
 	}
 	dst->l.ghost = 1;
       }
@@ -352,6 +335,7 @@ namespace espresso {
 
       for(ParticleList::iterator src = reals.begin(), end = reals.end(), dst = ghosts.begin();
 	  src != end; ++src, ++dst) {
+
 	src->r.copyShifted(dst->r, shift);
 	if (extradata & DATA_PROPERTIES) {
 	  dst->p = src->p;
@@ -366,46 +350,46 @@ namespace espresso {
       }
     }
 
-    void Storage::packForces(boost::mpi::packed_oarchive &ar, Cell &_ghosts)
+    void Storage::packForces(OutBuffer &buf, Cell &_ghosts)
     {
-      LOG4ESPP_DEBUG(logger, "pack ghost forces to archive from cell "
+      LOG4ESPP_DEBUG(logger, "pack ghost forces to buffer from cell "
 		     << (&_ghosts - getFirstCell()));
 
       ParticleList &ghosts = _ghosts.particles;
   
       for(ParticleList::iterator src = ghosts.begin(), end = ghosts.end(); src != end; ++src) {
-	ar << src->f;
+        buf.write(src->f);
 	LOG4ESPP_TRACE(logger, "from particle " << src->p.id << ": packing force "
 		       << src->f.f[0] << " " << src->f.f[1] << " "<< src->f.f[2]);
       }
     }
 
-    void Storage::unpackForces(Cell &_reals, boost::mpi::packed_iarchive &ar)
+    void Storage::unpackForces(Cell &_reals, InBuffer &buf)
     {
-      LOG4ESPP_DEBUG(logger, "add forces from archive to cell "
+      LOG4ESPP_DEBUG(logger, "add forces from buffer to cell "
 		     << (&_reals - getFirstCell()));
 
       ParticleList &reals = _reals.particles;
 
       for(ParticleList::iterator dst = reals.begin(), end = reals.end(); dst != end; ++dst) {
 	ParticleForce f;
-	ar >> f;
+        buf.read(f);
 	LOG4ESPP_TRACE(logger, "for particle " << dst->p.id << ": unpacking force "
 		       << f.f[0] << " " << f.f[1] << " "<< f.f[2]);
 	dst->f = f;
       }
     }
 
-    void Storage::unpackAndAddForces(Cell &_reals, boost::mpi::packed_iarchive &ar)
+    void Storage::unpackAndAddForces(Cell &_reals, InBuffer &buf)
     {
-      LOG4ESPP_DEBUG(logger, "add forces from archive to cell "
+      LOG4ESPP_DEBUG(logger, "add forces from buffer to cell "
 		     << (&_reals - getFirstCell()));
 
       ParticleList &reals = _reals.particles;
 
       for(ParticleList::iterator dst = reals.begin(), end = reals.end(); dst != end; ++dst) {
 	ParticleForce f;
-	ar >> f;
+        buf.read(f);
 	LOG4ESPP_TRACE(logger, "for particle " << dst->p.id << ": unpacking force "
 		       << f.f[0] << " " << f.f[1] << " "<< f.f[2] << " and adding to "
 		       << dst->f.f[0] << " " << dst->f.f[1] << " "<< dst->f.f[2]);

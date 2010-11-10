@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <boost/bind.hpp>
 #include "storage/Storage.hpp"
+#include "Buffer.hpp"
 
 using namespace std;
 
@@ -94,8 +95,7 @@ namespace espresso {
   }
 
   void FixedTripleList::
-  beforeSendParticles(ParticleList& pl, 
-		      mpi::packed_oarchive& ar) {
+  beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
     
     vector< longint > toSend;
     // loop over the particle list
@@ -134,20 +134,19 @@ namespace espresso {
       }
     }
     // send the list
-    ar << toSend;
+    buf.write(toSend);
     LOG4ESPP_INFO(theLogger, "prepared fixed triple list before send particles");
   }
 
   void FixedTripleList::
-  afterRecvParticles(ParticleList &pl,
-		     mpi::packed_iarchive& ar) {
+  afterRecvParticles(ParticleList &pl, InBuffer& buf) {
 
     vector< longint > received;
     int n;
     longint pid1, pid2, pid3;
     GlobalTriples::iterator it = globalTriples.begin();
     // receive the triple list
-    ar >> received;
+    buf.read(received);
     int size = received.size(); int i = 0;
     while (i < size) {
       // unpack the list

@@ -34,13 +34,16 @@ namespace espresso {
     */
     bool add(longint pid1, longint pid2, longint pid3);
 
-    void beforeSendParticles(ParticleList& pl, 
-			     mpi::packed_oarchive& ar);
-    void afterRecvParticles(ParticleList& pl, 
-			    mpi::packed_iarchive& ar);
+    void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
+
+    void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
+
     void onParticlesChanged();
+
     static void registerPython();
+
   private:
+
     static LOG4ESPP_DECL_LOGGER(theLogger);
   };
 }

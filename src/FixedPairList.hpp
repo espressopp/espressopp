@@ -34,9 +34,9 @@ namespace espresso {
     bool add(longint pid1, longint pid2);
 
     void beforeSendParticles(ParticleList& pl, 
-			     mpi::packed_oarchive& ar);
+			     class OutBuffer& buf);
     void afterRecvParticles(ParticleList& pl, 
-			    mpi::packed_iarchive& ar);
+			    class InBuffer& buf);
     void onParticlesChanged();
     static void registerPython();
   private:

@@ -11,6 +11,7 @@
 #include "DomainDecomposition.hpp"
 #include "bc/BC.hpp"
 #include "Int3D.hpp"
+#include "Buffer.hpp"
 
 using namespace boost;
 
@@ -546,42 +547,42 @@ namespace espresso {
 	    }
 
 	    // prepare send and receive buffers
-	    longint oarRecver, iarSender;
-	    boost::mpi::packed_oarchive oar(*comm);
-	    boost::mpi::packed_iarchive iar(*comm);
+	    longint receiver, sender;
+	    OutBuffer outBuf(*comm);
+	    InBuffer inBuf(*comm);
 	    if (realToGhosts) {
-	      oarRecver = nodeGrid.getNodeNeighborIndex(dir);
-	      iarSender = nodeGrid.getNodeNeighborIndex(oppositeDir);
+	      receiver = nodeGrid.getNodeNeighborIndex(dir);
+	      sender = nodeGrid.getNodeNeighborIndex(oppositeDir);
 	      for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
-		packPositionsEtc(oar, *commCells[dir].reals[i], extradata, shift);
+		packPositionsEtc(outBuf, *commCells[dir].reals[i], extradata, shift);
 	      }
 	    }
 	    else {
-	      oarRecver = nodeGrid.getNodeNeighborIndex(oppositeDir);
-	      iarSender = nodeGrid.getNodeNeighborIndex(dir);
+	      receiver = nodeGrid.getNodeNeighborIndex(oppositeDir);
+	      sender = nodeGrid.getNodeNeighborIndex(dir);
 	      for (int i = 0, end = commCells[dir].ghosts.size(); i < end; ++i) {
-		packForces(oar, *commCells[dir].ghosts[i]);
+		packForces(outBuf, *commCells[dir].ghosts[i]);
 	      }
 	    }
 
 	    // exchange particles, odd-even rule
 	    if (nodeGrid.getNodePosition(coord) % 2 == 0) {
-	      comm->send(oarRecver, DD_COMM_TAG, oar);
-	      comm->recv(iarSender, DD_COMM_TAG, iar);
+              outBuf.send(receiver, DD_COMM_TAG);
+	      inBuf.recv(sender, DD_COMM_TAG);
 	    } else {
-	      comm->recv(iarSender, DD_COMM_TAG, iar);
-	      comm->send(oarRecver, DD_COMM_TAG, oar);
+	      inBuf.recv(sender, DD_COMM_TAG);
+              outBuf.send(receiver, DD_COMM_TAG);
 	    }
 
 	    // unpack received data
 	    if (realToGhosts) {
 	      for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
-		unpackPositionsEtc(*commCells[dir].ghosts[i], iar, extradata);
+		unpackPositionsEtc(*commCells[dir].ghosts[i], inBuf, extradata);
 	      }
 	    }
 	    else {
 	      for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
-		unpackAndAddForces(*commCells[dir].reals[i], iar);
+		unpackAndAddForces(*commCells[dir].reals[i], inBuf);
 	      }
 	    }
 	  }

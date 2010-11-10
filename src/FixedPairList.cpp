@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <boost/bind.hpp>
 #include "storage/Storage.hpp"
+#include "Buffer.hpp"
 
 using namespace std;
 
@@ -79,7 +80,7 @@ namespace espresso {
 
   void FixedPairList::
   beforeSendParticles(ParticleList& pl, 
-		      mpi::packed_oarchive& ar) {
+		      OutBuffer& buf) {
     vector< longint > toSend;
     // loop over the particle list
     for (ParticleList::Iterator pit(pl);
@@ -115,19 +116,19 @@ namespace espresso {
       }
     }
     // send the list
-    ar << toSend;
+    buf.write(toSend);
     LOG4ESPP_INFO(theLogger, "prepared fixed pair list before send particles");
   }
 
   void FixedPairList::
   afterRecvParticles(ParticleList &pl, 
-		     mpi::packed_iarchive& ar) {
+		     InBuffer& buf) {
     vector< longint > received;
     int n;
     longint pid1, pid2;
     GlobalPairs::iterator it = globalPairs.begin();
     // receive the bond list
-    ar >> received;
+    buf.read(received);
     int size = received.size(); int i = 0;
     while (i < size) {
       // unpack the list
