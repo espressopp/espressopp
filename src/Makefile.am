@@ -57,7 +57,9 @@ python_SCRIPTS += \
         tools/decomp.py \
         tools/convert/__init__.py \
         tools/convert/gromacs.py \
-        tools/convert/lammps.py
+        tools/convert/lammps.py \
+	tools/init_cfg/__init__.py \
+	tools/init_cfg/lattice.py
 
 noinst_LTLIBRARIES += \
 	libgenlogger.la \
