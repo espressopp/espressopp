@@ -214,7 +214,6 @@ AC_CACHE_SAVE
 #  DOXYGEN                                                        #
 #                                                                 #
 ################################################################### 
-
 AC_ARG_VAR([DOXYGEN], [Doxygen code documentation tool])
 AC_PATH_PROG([DOXYGEN],[doxygen],[no])
 AM_CONDITIONAL(HAVE_DOXYGEN,[test "x$DOXYGEN" != "xno"])
@@ -224,9 +223,31 @@ AM_CONDITIONAL(HAVE_DOXYGEN,[test "x$DOXYGEN" != "xno"])
 #  ASTYLE                                                        #
 #                                                                 #
 ################################################################### 
-
 AC_ARG_VAR([ASTYLE], [Artistic style code formatting tool])
 AC_PATH_PROG([ASTYLE],[astyle],[no])
+
+################################################################### 
+#
+#  LOGGING
+#
+################################################################### 
+AC_MSG_CHECKING([what logging level to activate])
+AC_ARG_ENABLE([logging], AS_HELP_STRING([--enable-logging@<:@=level@:>@],
+      [enable logging at the given level (off, fatal, error, warn,
+       debug, trace). Defaults to "off" or "debug" if --enable-logging is
+       used.]) 
+      ,, [enable_logging="off"])
+AS_CASE([$enable_logging],
+	[off], [AC_DEFINE(LOG4ESPP_LEVEL_OFF, [], [Logging level])],
+	[no], [AC_DEFINE(LOG4ESPP_LEVEL_OFF)],
+	[yes], [AC_DEFINE(LOG4ESPP_LEVEL_DEBUG, [], [Logging level])],
+	[fatal], [AC_DEFINE(LOG4ESPP_LEVEL_FATAL, [], [Logging level])],
+	[error], [AC_DEFINE(LOG4ESPP_LEVEL_ERROR, [], [Logging level])],
+	[warn], [AC_DEFINE(LOG4ESPP_LEVEL_WARN, [], [Logging level])],
+	[debug], [AC_DEFINE(LOG4ESPP_LEVEL_DEBUG)],
+	[trace], [AC_DEFINE(LOG4ESPP_LEVEL_TRACE, [], [Logging level])],
+	[AC_DEFINE(LOG4ESPP_LEVEL_DEBUG)])
+AC_MSG_RESULT($enable_logging)
 
 cat >& AS_MESSAGE_FD <<EOF
 **********************************************************************
@@ -344,6 +365,7 @@ cat >config.summary << EOF
    - AM_CPPFLAGS=$AM_CPPFLAGS (automatically determined by configure)
    - CXXFLAGS=$CXXFLAGS
    - LDFLAGS=$LDFLAGS
+   - logging level: $enable_logging
  * Library types to build:
    - static libs: $enable_static
    - shared libs: $enable_shared

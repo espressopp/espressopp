@@ -3,8 +3,9 @@ Benchmark ESPP++ vs LAMMPS
 
 Compiling
 ---------
-* use the option "CXXFLAGS=-O3" for configure
-* turn off logging "CPPFLAGS=-DLOG4ESPP_LEVEL_OFF"
+* Use the following options for configure:
+  --disable-logging
+  CXXFLAGS=-O3
 
 Running
 -------
