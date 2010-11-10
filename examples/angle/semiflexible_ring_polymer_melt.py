@@ -24,7 +24,7 @@ nvt = False
 # lammps or gromacs (lammps_reader = False is gromacs)
 lammps_reader = True
 
-steps = 200
+steps = 1000
 if(lammps_reader):
   bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read('rings.dat')
 else:
@@ -37,9 +37,8 @@ density = 0.85
 L = (num_particles / density)**(1.0/3.0)
 L = Lx
 size = (L, L, L)
-rc = 2.0**(1.0/6.0)
-rc = 1.12246205
-skin = 0.4
+rc = 1.12
+skin = 0.3
 print 'number of particles =', num_particles
 print 'box size =', L
 print 'cutoff =', rc

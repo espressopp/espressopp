@@ -2,7 +2,9 @@
 
 ###########################################################################
 #                                                                         #
-#  Example script for LJ simulation with or without Langevin thermostat   #
+#  This Python script may be used to simulate a monatomic LJ fluid in the #
+#  NVE or NVT ensemble. The starting configuration may be taken from      #
+#  either a LAMMPS data file or by generating coordinates on a lattice.   #
 #                                                                         #
 ###########################################################################
 
@@ -14,24 +16,40 @@ import logging
 from espresso import Real3D, Int3D
 from espresso.tools.convert import lammps
 from espresso.tools import decomp
+from espresso.tools.init_cfg import lattice
 
-# benchmark or production (bench = True is a short job)
-bench = True
-
-# nvt or nve (nvt = False is nve)
-nvt = True
-
-steps = 500
-x, y, z, Lx, Ly, Lz = lammps.read('data.lj')
-num_particles = len(x)
-density = num_particles / (Lx * Ly * Lz)
-size = (Lx, Ly, Lz)
+# integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
+steps = 1000
 rc = 2.5
 skin = 0.3
+nvt = False
 
-print 'number of particles =', num_particles
-print 'density =', density
+# initial configuration: (1) LAMMPS, (2) lattice or (3) GROMACS
+init_cfg = 1
 
+if(init_cfg == 1):
+  # LAMMPS with N = 32000
+  # useful for checking for identical results against LAMMPS
+  x, y, z, Lx, Ly, Lz = lammps.read('data.lj')
+  num_particles = len(x)
+elif(init_cfg == 2):
+  # cubic lattice with user-defined values of N and rho
+  # num_particles should be a perfect cube (e.g. 25**3=15625, 32**3=32768)
+  num_particles = 20**3
+  rho = 0.8442
+  x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False)
+else:
+  sys.std.write('init_cfg invalid: ' + str(init_cfg) + '. Exiting ...\n')
+  sys.exit(1)
+
+
+
+######################################################################
+### IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE ###
+######################################################################
+
+density = num_particles / (Lx * Ly * Lz)
+size = (Lx, Ly, Lz)
 system = espresso.System()
 system.rng = espresso.esutil.RNG()
 system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
@@ -40,27 +58,6 @@ comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
-
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-
-if 0:
-  pid = 0
-  N = 0
-  for i in range(N):
-    for j in range(N):
-      for k in range(N):
-	m = (i + 2*j + 3*k) % 11
-	r = 0.45 + m * 0.01
-	x = (i + r) / N * size[0]
-	y = (j + r) / N * size[1]
-	z = (k + r) / N * size[2]
-	x = 1.0 * i
-	y = 1.0 * j
-	z = 1.0 * k
-	system.storage.addParticle(pid, Real3D(x, y, z))
-	# not yet: dd.setVelocity(id, (1.0, 0.0, 0.0))
-	pid = pid + 1
 
 # add particles to the system
 for pid in range(num_particles):
@@ -87,6 +84,16 @@ if(nvt):
   integrator.langevin = langevin
   integrator.dt = 0.01
 
+print ''
+print 'number of particles =', num_particles
+print 'density = %.4f' % (density)
+print 'rc =', rc
+print 'dt =', integrator.dt
+print 'skin =', system.skin
+print 'NodeGrid = %s' % (nodeGrid,)
+print 'CellGrid = %s' % (cellGrid,)
+print ''
+
 # analysis
 temperature = espresso.analysis.Temperature(system)
 pressure = espresso.analysis.Pressure(system)
@@ -102,17 +109,17 @@ Ep = interLJ.computeEnergy()
 sys.stdout.write(' step     T        P        Pxy       etotal     epotential    ekinetic\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Ek + Ep, Ep, Ek))
 
-if(bench):
-  start_time = time.clock()
-  integrator.run(steps)
-  print 'CPU time =', time.clock() - start_time, 's'
-  T = temperature.compute()
-  P = pressure.compute()
-  Pij = pressureTensor.compute()
-  Ek = 0.5 * T * (3 * num_particles)
-  Ep = interLJ.computeEnergy()
-  sys.stdout.write(fmt % (steps, T, P, Pij[3], Ek + Ep, Ep, Ek))
-  sys.exit(1)
+start_time = time.clock()
+integrator.run(steps)
+print 'CPU time =', time.clock() - start_time, 's'
+T = temperature.compute()
+P = pressure.compute()
+Pij = pressureTensor.compute()
+Ek = 0.5 * T * (3 * num_particles)
+Ep = interLJ.computeEnergy()
+sys.stdout.write(fmt % (steps, T, P, Pij[3], Ek + Ep, Ep, Ek))
+sys.exit(1)
+# comment out line above for production run
 
 intervals = 20
 nsteps = steps / intervals

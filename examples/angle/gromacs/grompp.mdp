@@ -4,7 +4,7 @@ integrator               = md-vv
 ; Start time and timestep in ps
 tinit                    = 0
 dt                       = 0.001
-nsteps                   = 200
+nsteps                   = 1000
 ; For exact run continuation or redoing part of a run
 init_step                = 0
 ; mode for center of mass motion removal
@@ -21,7 +21,7 @@ nstvout                  = 0
 nstfout                  = 0
 ; Output frequency for energies to log file and energy file
 nstlog                   = 0
-nstenergy                = 1
+nstenergy                = 0
 ; Output frequency and precision for xtc file
 nstxtcout                = 0
 xtc-precision            = 1000
@@ -31,25 +31,25 @@ xtc-grps                 =
 
 ; NEIGHBORSEARCHING PARAMETERS
 ; nblist update frequency
-nstlist                  = 2
+nstlist                  = -1
 ; ns algorithm (simple or grid)
 ns-type                  = Grid
 ; Periodic boundary conditions: xyz, no, xy
 pbc                      = xyz
 periodic_molecules       = no
 ; nblist cut-off
-rlist                    = 1.12246205
+rlist                    = 1.42246205
 
 ; OPTIONS FOR ELECTROSTATICS AND VDW
 ; Method for doing electrostatics
-coulombtype              = Cut-Off
+coulombtype              = Shift
 rcoulomb-switch          = 0
 rcoulomb                 = 1.12246205
 ; Relative dielectric constant for the medium and the reaction field
 epsilon_r                = 1
 ; Method for doing Van der Waals
 
-vdw-type                 = Cut-Off
+vdw-type                 = Shift
 ; cut-off lengths
 rvdw                     = 1.12246205
 ; Apply long range dispersion corrections for Energy and Pressure
@@ -66,11 +66,11 @@ tc-grps                  = System
 ; Time constant (ps) and reference temperature (K)
 tau_t                    = 1.0
 ref_t                    = 120.2717
-; Pressure coupling     
+; Pressure coupling
 Pcoupl                   = no
 
 ; GENERATE VELOCITIES FOR STARTUP RUN
 gen-vel                  = no
 
-; OPTIONS FOR BONDS    
+; OPTIONS FOR BONDS
 constraints              = none
