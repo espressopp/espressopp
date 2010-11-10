@@ -2,7 +2,6 @@
 
 #include <algorithm>
 
-//#define LOG4ESPP_LEVEL_TRACE
 #include "log4espp.hpp"
 
 #include "System.hpp"

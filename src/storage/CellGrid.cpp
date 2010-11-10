@@ -1,6 +1,5 @@
 #include <cmath>
 
-#define LOG4ESPP_LEVEL_DEBUG
 #include "log4espp.hpp"
 
 #include "CellGrid.hpp"

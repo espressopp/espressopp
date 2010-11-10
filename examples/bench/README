@@ -1,6 +1,14 @@
 Benchmark ESPP++ vs LAMMPS
 ==========================
 
+Compiling
+---------
+* use the option "CXXFLAGS=-O3" for configure
+* turn off logging "CPPFLAGS=-DLOG4ESPP_LEVEL_OFF"
+
+Running
+-------
+
 Generation of input file data.lj:
 
   gen.py   -> generates data.lj with 8.000 particles on a lattice

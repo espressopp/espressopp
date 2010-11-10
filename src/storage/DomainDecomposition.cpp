@@ -1,6 +1,5 @@
 #include "python.hpp"
 
-#define LOG4ESPP_LEVEL_DEBUG
 #include <algorithm>
 #include <cmath>
 #include <sstream>
