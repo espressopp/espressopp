@@ -7,6 +7,7 @@
 ################################################################### 
 
 AC_INIT([ESPResSo++],[0.1],[espressopp-user@www.espresso-pp.de],[espressopp])
+AC_PREREQ([2.59])
 # basic autoconf configuration
 AC_CONFIG_MACRO_DIR(build-aux/macros)
 AC_CONFIG_AUX_DIR(build-aux)
@@ -233,20 +234,20 @@ AC_PATH_PROG([ASTYLE],[astyle],[no])
 ################################################################### 
 AC_MSG_CHECKING([what logging level to activate])
 AC_ARG_ENABLE([logging], AS_HELP_STRING([--enable-logging@<:@=level@:>@],
-      [enable logging at the given level (off, fatal, error, warn,
-       debug, trace). Defaults to "off" or "debug" if --enable-logging is
-       used.]) 
+      [enable logging at the given level (off, fatal, error, warn, info,
+       debug, trace). Defaults to "debug".]) 
       ,, [enable_logging="debug"])
 AS_IF([test "x$enable_logging" = "xno"], [enable_logging="off"])
 AS_IF([test "x$enable_logging" = "xyes"], [enable_logging="debug"])
-AS_CASE([$enable_logging],
-	[off], [AC_DEFINE(LOG4ESPP_LEVEL_OFF, [], [Logging level])],
-	[fatal], [AC_DEFINE(LOG4ESPP_LEVEL_FATAL, [], [Logging level])],
-	[error], [AC_DEFINE(LOG4ESPP_LEVEL_ERROR, [], [Logging level])],
-	[warn], [AC_DEFINE(LOG4ESPP_LEVEL_WARN, [], [Logging level])],
-	[debug], [AC_DEFINE(LOG4ESPP_LEVEL_DEBUG, [], [Logging level])],
-	[trace], [AC_DEFINE(LOG4ESPP_LEVEL_TRACE, [], [Logging level])],
-	[AC_DEFINE(LOG4ESPP_LEVEL_DEBUG)])
+
+AS_IF([test "x$enable_logging" = "xoff"], [AC_DEFINE(LOG4ESPP_LEVEL_OFF, [], [Logging level])])
+AS_IF([test "x$enable_logging" = "xfatal"], [AC_DEFINE(LOG4ESPP_LEVEL_FATAL, [], [Logging level])])
+AS_IF([test "x$enable_logging" = "xerror"], [AC_DEFINE(LOG4ESPP_LEVEL_ERROR, [], [Logging level])])
+AS_IF([test "x$enable_logging" = "xwarn"], [AC_DEFINE(LOG4ESPP_LEVEL_WARN, [], [Logging level])])
+AS_IF([test "x$enable_logging" = "xinfo"], [AC_DEFINE(LOG4ESPP_LEVEL_INFO, [], [Logging level])])
+AS_IF([test "x$enable_logging" = "xdebug"], [AC_DEFINE(LOG4ESPP_LEVEL_DEBUG, [], [Logging level])])
+AS_IF([test "x$enable_logging" = "xtrace"], [AC_DEFINE(LOG4ESPP_LEVEL_TRACE, [], [Logging level])])
+
 AC_MSG_RESULT($enable_logging)
 
 cat >& AS_MESSAGE_FD <<EOF
