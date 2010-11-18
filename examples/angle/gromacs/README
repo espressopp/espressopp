@@ -5,11 +5,25 @@ ring polymer melt using GROMACS. This is for benchmarking and profiling
 purposes. The melt is composed of 200 chains with 200 monomers per
 chain.
 
+
+=== Build Gromacs ===
+
+Below we build a double-precision single-processor version:
+
+./configure CXXFLAGS=-O3 --with-fft=fftw3 CPPFLAGS="-L$HOME/software/fftw3/include"
+            LDFLAGS="-L$HOME/software/fftw3/lib" --prefix=$HOME/software/gromacsO3
+            --without-x --disable-float
+make -j 3
+make install
+
+
+=== Running the benchmark ===
+
 Step 1: grompp_d -maxwarn 2 -c conf.gro -f grompp.mdp -p topol.top
 
 The step above produces the topol.tpr file. This file is then used next:
 
-Step 2: mdrun_d -s topol.tpr
+Step 2: mdrun_d -s topol.tpr -nt 1
 
 Examine md.log for CPU time, etc. One must use bin/g_energy to examine ener.edr.
 
@@ -20,9 +34,17 @@ Then after Step 2 do the following from the shell:
 $ echo "Pressure" | g_energy -o pressure.xvg
 $ echo "Total-Energy" | g_energy -o energy.xvg
 pressure.xvg and energy.xvg will contain the time series. Keep in
-mind the Gromacs write the pressure in units of bar. To convert
+mind that Gromacs writes the pressure in units of bar. To convert
 to LJ units use 1 kJ/mol/nm^3 = 16.6054 bar.
 
+
+=== Alternative version ===
+
+At MPIP do the following to get the version created by C. Junghans:
+source /sw/linux/gromacs/4.5/static/4.5.2/bin/GMXRC
+
+
+=== Creating the gro file ===
 
 The conf.gro file was created from rings.dat using the following
 Python script:

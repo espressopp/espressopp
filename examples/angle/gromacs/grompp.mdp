@@ -31,7 +31,7 @@ xtc-grps                 =
 
 ; NEIGHBORSEARCHING PARAMETERS
 ; nblist update frequency
-nstlist                  = -1
+nstlist                  = 3
 ; ns algorithm (simple or grid)
 ns-type                  = Grid
 ; Periodic boundary conditions: xyz, no, xy
@@ -44,7 +44,8 @@ rlist                    = 1.42246205
 ; Method for doing electrostatics
 coulombtype              = Shift
 rcoulomb-switch          = 0
-rcoulomb                 = 1.12246205
+;rcoulomb                 = 1.12246205
+rcoulomb                 = 0.1
 ; Relative dielectric constant for the medium and the reaction field
 epsilon_r                = 1
 ; Method for doing Van der Waals
