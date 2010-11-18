@@ -17,7 +17,8 @@ namespace espresso {
 	&AngularPotential::computeEnergy;
       void (AngularPotential::*computeForce)
         (real force12[3], real force32[3],
-         ConstReal3DRef dist12, ConstReal3DRef dist32) const =
+         const real dist12[3], const real dist32[3]) const =
+       //ConstReal3DRef dist12, ConstReal3DRef dist32) const =
 	&AngularPotential::computeForce;
 
       class_< AngularPotential, boost::noncopyable >

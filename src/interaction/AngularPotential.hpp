@@ -18,7 +18,10 @@ namespace espresso {
       virtual void computeForce(real force12[3], real force32[3],
                                 Particle &p1, Particle &p2, Particle &p3) const = 0;
       virtual void computeForce(real force12[3], real force32[3],
-                                ConstReal3DRef dist12, ConstReal3DRef dist32) const = 0;
+                                const real dist12[3], const real dist32[3]) const = 0;
+      //virtual void computeForce(real force12[3], real force32[3],
+      //                          ConstReal3DRef dist12, ConstReal3DRef dist32) const = 0;
+
 
       virtual void setCutoff(real _cutoff) = 0;
       virtual real getCutoff() const = 0;
@@ -49,7 +52,9 @@ namespace espresso {
       virtual void computeForce(real force12[3], real force32[3],
                                 Particle &p1, Particle &p2, Particle &p3) const;
       virtual void computeForce(real force12[3], real force32[3],
-                                ConstReal3DRef dist12, ConstReal3DRef dist32) const;
+                                const real dist12[3], const real dist32[3]) const;
+      //virtual void computeForce(real force12[3], real force32[3],
+      //                          ConstReal3DRef dist12, ConstReal3DRef dist32) const;
 
       virtual void setCutoff(real _cutoff);
       virtual real getCutoff() const;
@@ -63,7 +68,9 @@ namespace espresso {
       void _computeForce(real force12[3], real force32[3],
 			 Particle &p1, Particle &p2, Particle &p3) const;
       void _computeForce(real force12[3], real force32[3],
-			 ConstReal3DRef dist12, ConstReal3DRef dist32) const;
+			 const real dist12[3], const real dist32[3]) const;
+      //void _computeForce(real force12[3], real force32[3],
+      //                   ConstReal3DRef dist12, ConstReal3DRef dist32) const;
 
       // Requires the following non-virtual interface in Derived
       // real _computeEnergySqrRaw(real distSqr) const;
@@ -182,16 +189,26 @@ namespace espresso {
                  Particle &p1, Particle &p2, Particle &p3) const {
       Real3D dist12 = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
       Real3D dist32 = Real3DRef(p3.r.p) - Real3DRef(p2.r.p);
-      _computeForce(force12, force32, dist12, dist32);
+      _computeForce(force12, force32, dist12.get(), dist32.get());
     }
 
     template < class Derived >
     inline void
     AngularPotentialTemplate< Derived >::
     computeForce(real force12[3], real force32[3],
-                 ConstReal3DRef dist12, ConstReal3DRef dist32) const {
+                 const real dist12[3], const real dist32[3]) const {
       _computeForce(force12, force32, dist12, dist32);
     }
+
+    /*
+    template < class Derived >
+    inline void
+    AngularPotentialTemplate< Derived >::
+    computeForce(real force12[3], real force32[3],
+                 ConstReal3DRef dist12, ConstReal3DRef dist32) const {
+      _computeForce(force12, force32, dist12.get(), dist32.get());
+    }
+    */
 
     template < class Derived >
     inline void
@@ -200,7 +217,7 @@ namespace espresso {
                  Particle &p1, Particle &p2, Particle &p3) const {
       Real3D dist12 = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
       Real3D dist32 = Real3DRef(p3.r.p) - Real3DRef(p2.r.p);
-      _computeForce(force12, force32, dist12, dist32);
+      _computeForce(force12, force32, dist12.get(), dist32.get());
     }
 
     template < class Derived >
@@ -208,8 +225,8 @@ namespace espresso {
     AngularPotentialTemplate< Derived >::
     _computeForce(real force12[3],
                   real force32[3],
-                  ConstReal3DRef dist12,
-                  ConstReal3DRef dist32) const {
+                  const real dist12[3],
+                  const real dist32[3]) const {
       derived_this()->_computeForceRaw(force12, force32, dist12, dist32);
     }
   }
