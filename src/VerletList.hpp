@@ -39,17 +39,21 @@ namespace espresso {
     /** Get the total number of pairs for the Verlet list */
     int totalSize() const;
 
+    /** Get the number of times the Verlet list has been rebuilt */
+    int getBuilds() const { return builds; }
+
+    /** Set the number of times the Verlet list has been rebuilt */
+    void setBuilds(int _builds) { builds = _builds; }
+
     /** Register this class so it can be used from Python. */
     static void registerPython();
 
   private:
 
     void checkPair(Particle &pt1, Particle &pt2);
-
     PairList myList;
-
     real cutsq;
-
+    int builds;
     boost::signals2::connection connectionResort;
 
     static LOG4ESPP_DECL_LOGGER(theLogger);

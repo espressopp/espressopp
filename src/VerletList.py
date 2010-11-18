@@ -19,5 +19,6 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espresso.VerletListLocal',
-            pmicall = [ "totalSize" ]
+            pmiproperty = [ 'builds' ],
+            pmicall = [ 'totalSize' ]
             )

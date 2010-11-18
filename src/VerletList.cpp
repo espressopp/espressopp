@@ -1,7 +1,5 @@
 #include "python.hpp"
-
 #include "VerletList.hpp"
-
 #include "Real3D.hpp"
 #include "Particle.hpp"
 #include "Cell.hpp"
@@ -19,7 +17,6 @@ namespace espresso {
 /*-------------------------------------------------------------*/
 
   VerletList::VerletList(shared_ptr< System > system, real cut) : SystemAccess(system)
-
   {
     LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << cut);
   
@@ -28,13 +25,11 @@ namespace espresso {
     }
 
     real cutVerlet = cut + system->skin;
-
     cutsq = cutVerlet * cutVerlet;
-  
+    builds = 0;
     rebuild();
   
     // make a connection to System to invoke rebuild on resort
-  
     connectionResort = system->storage->onParticlesChanged.connect(
         boost::bind(&VerletList::rebuild, this));
   }
@@ -46,13 +41,13 @@ namespace espresso {
     myList.clear();
   
     CellList cl = getSystem()->storage->getRealCells();
-  
     for (CellListAllPairsIterator it(cl); it.isValid(); ++it) {
       checkPair(*it->first, *it->second);
     }
   
     LOG4ESPP_INFO(theLogger, "rebuilt VerletList, cutsq = " << cutsq 
                  << " local size = " << myList.size());
+    builds++;
   }
   
   /*-------------------------------------------------------------*/
@@ -105,17 +100,14 @@ namespace espresso {
   ****************************************************/
   
   void VerletList::registerPython() {
-
     using namespace espresso::python;
 
     class_<VerletList, shared_ptr<VerletList> >
-
       ("VerletList", init< shared_ptr<System>, real >())
-
       .add_property("system", &SystemAccess::getSystem)
+      .add_property("builds", &VerletList::getBuilds, &VerletList::setBuilds)
       .def("totalSize", &VerletList::totalSize)
       ;
   }
 
 }
-
