@@ -23,6 +23,7 @@ steps = 1000
 rc = 2.5
 skin = 0.3
 nvt = False
+timestep = 0.005
 
 # initial configuration: (1) LAMMPS, (2) lattice or (3) GROMACS
 init_cfg = 1
@@ -75,14 +76,14 @@ system.addInteraction(interLJ)
 
 # setup integrator
 integrator = espresso.integrator.VelocityVerlet(system)
-integrator.dt = 0.001
+integrator.dt = timestep
 
 if(nvt):
   langevin = espresso.integrator.Langevin(system)
   langevin.gamma = 1.0
   langevin.temperature = 1.0
   integrator.langevin = langevin
-  integrator.dt = 0.01
+  integrator.dt = timestep
 
 print ''
 print 'number of particles =', num_particles
@@ -113,13 +114,15 @@ sys.stdout.write(fmt % (0, T, P, Pij[3], Ek + Ep, Ep, Ek))
 
 start_time = time.clock()
 integrator.run(steps)
-print 'CPU time =', time.clock() - start_time, 's'
+end_time = time.clock()
 T = temperature.compute()
 P = pressure.compute()
 Pij = pressureTensor.compute()
 Ek = 0.5 * T * (3 * num_particles)
 Ep = interLJ.computeEnergy()
 sys.stdout.write(fmt % (steps, T, P, Pij[3], Ek + Ep, Ep, Ek))
+print 'Rebuilds =', vl.builds
+print 'CPU time =', end_time - start_time, 's'
 sys.exit(1)
 # comment out line above for production run
 

@@ -9,9 +9,9 @@ mass            1 1.0
 
 velocity        all create 0.0 87287
 
-pair_style	lj/cut 1.12
+pair_style	lj/cut 2.5
 pair_modify     shift no
-pair_coeff	1 1 1.0 1.0 1.12
+pair_coeff	1 1 1.0 1.0 2.5
 
 neighbor	0.3 bin
 neigh_modify	delay 0 every 1 check yes
@@ -20,9 +20,9 @@ thermo          1000
 thermo_style    custom step temp press pxy etotal pe ke
 thermo_modify   norm no
 
-timestep        0.01
+timestep        0.005
 
 fix             1 all nve
-fix             2 all langevin 1.0 1.0 1.0 699483
+#fix             2 all langevin 1.0 1.0 1.0 699483
 
 run		1000
