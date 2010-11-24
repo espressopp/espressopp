@@ -81,7 +81,7 @@ namespace espresso {
 	return energy;
       }
 
-      void _computeForceRaw(Real3DRef force,
+      bool _computeForceRaw(Real3DRef force,
                             ConstReal3DRef dist,
                             real distSqr) const {
 
@@ -89,8 +89,8 @@ namespace espresso {
         real frac6 = frac2 * frac2 * frac2;
         real ffactor = frac6 * (ff1 * frac6 - ff2) * frac2;
         force = dist * ffactor;
+        return true;
       }
-
     };
   }
 }

@@ -64,9 +64,9 @@ namespace espresso {
       real _computeEnergy(real dist) const;
       real _computeEnergySqr(real distSqr) const;
 
-      void _computeForce(Real3DRef force, 
+      bool _computeForce(Real3DRef force, 
 			 Particle &p1, Particle &p2) const;
-      void _computeForce(Real3DRef force, 
+      bool _computeForce(Real3DRef force, 
 			 ConstReal3DRef dist) const;
 
       // Requires the following non-virtual interface in Derived
@@ -248,29 +248,30 @@ namespace espresso {
     PotentialTemplate< Derived >::
     computeForce(ConstReal3DRef dist) const {
       Real3D force;
-      _computeForce(force, dist);
+      if(!_computeForce(force, dist))
 	force = 0.0;
       return force;
     }
 
     template < class Derived > 
-    inline void 
+    inline bool
     PotentialTemplate< Derived >::
     _computeForce(Real3DRef force, Particle &p1, Particle &p2) const {
       Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
-      _computeForce(force, dist);
+      return _computeForce(force, dist);
     }
 
     template < class Derived > 
-    inline void
+    inline bool
     PotentialTemplate< Derived >::
     _computeForce(Real3DRef force, ConstReal3DRef dist) const {
       real distSqr = dist.sqr();
-      if (distSqr < cutoffSqr) {
-        derived_this()->_computeForceRaw(force, dist, distSqr);
+      if (distSqr > cutoffSqr)
+        return false;
+      else {
+        return derived_this()->_computeForceRaw(force, dist, distSqr);
       }
     }
-
   }
 }
 

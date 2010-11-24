@@ -59,12 +59,13 @@ namespace espresso {
 	return energy;
       }
 
-      void _computeForceRaw(Real3DRef force,
+      bool _computeForceRaw(Real3DRef force,
 			    ConstReal3DRef dist,
                             real distSqr) const {
         real r = sqrt(distSqr);
         real ffactor = -2.0 * K * (r - r0) / r;
         force = dist * ffactor;
+        return true;
       }
     };
   }
