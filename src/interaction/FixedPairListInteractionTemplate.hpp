@@ -74,9 +74,7 @@ namespace espresso {
         const Potential &potential = getPotential(type1, type2);
 
 	real force[3];
-        real dist[3];
-        //Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
-        getSystemRef().bc->getMinimumImageVectorX(dist, p1.r.p, p2.r.p);
+        Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
 	potential._computeForce(force, dist);
 	  for(int k = 0; k < 3; k++) {
 	    p1.f.f[k] += force[k];
@@ -133,14 +131,6 @@ namespace espresso {
     FixedPairListInteractionTemplate < _Potential >::computeVirialTensor(real* wij_) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
 
-      /*
-      wij_[0] = 0.0;
-      wij_[1] = 0.0;
-      wij_[2] = 0.0;
-      wij_[3] = 0.0;
-      wij_[4] = 0.0;
-      wij_[5] = 0.0;
-      */
       for (FixedPairList::Iterator it(*fixedpairList);
            it.isValid(); ++it) {
         Particle &p1 = *it->first;
@@ -163,10 +153,8 @@ namespace espresso {
  
     template < typename _Potential >
     inline real
-    FixedPairListInteractionTemplate< _Potential >::
-    getMaxCutoff() {
+    FixedPairListInteractionTemplate< _Potential >::getMaxCutoff() {
       real cutoff = 0.0;
-
       for (int i = 0; i < ntypes; i++) {
         for (int j = 0; j < ntypes; j++) {
           cutoff = std::max(cutoff, getPotential(i, j).getCutoff());

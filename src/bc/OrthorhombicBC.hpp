@@ -13,7 +13,6 @@ namespace espresso {
       Real3D invBoxL;
 
     public:
-
       /** Virtual destructor for boundary conditions. */
       virtual
       ~OrthorhombicBC() {}

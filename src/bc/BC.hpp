@@ -44,7 +44,7 @@ namespace espresso {
 			    const ConstReal3DRef pos2) const;
 
       /** fold a coordinate to the primary simulation box.
-	  \param pos         the position...
+	  \param pos         the position
 	  \param imageBox    and the box
 	  \param dir         the coordinate to fold: dir = 0,1,2 for x, y and z coordinate.
 

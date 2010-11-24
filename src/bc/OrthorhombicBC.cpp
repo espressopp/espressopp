@@ -78,7 +78,6 @@ namespace espresso {
       }
     }
 
-
     /* Unfold an individual coordinate in the specified direction */
     void 
     OrthorhombicBC::

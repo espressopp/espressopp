@@ -64,12 +64,10 @@ namespace espresso {
       real _computeEnergy(real dist) const;
       real _computeEnergySqr(real distSqr) const;
 
-      void _computeForce(real force[3], 
+      void _computeForce(Real3DRef force, 
 			 Particle &p1, Particle &p2) const;
       void _computeForce(Real3DRef force, 
 			 ConstReal3DRef dist) const;
-      void _computeForce(real force[3], 
-                         const real dist[3]) const;
 
       // Requires the following non-virtual interface in Derived
       // real _computeEnergySqrRaw(real distSqr) const;
@@ -250,23 +248,17 @@ namespace espresso {
     PotentialTemplate< Derived >::
     computeForce(ConstReal3DRef dist) const {
       Real3D force;
-	force = 0.0;
       _computeForce(force, dist);
+	force = 0.0;
       return force;
     }
 
     template < class Derived > 
     inline void 
     PotentialTemplate< Derived >::
-    _computeForce(real force[3], Particle &p1, Particle &p2) const {
-      real dist[3];
-      dist[0] = p1.r.p[0] - p2.r.p[0];
-      dist[1] = p1.r.p[1] - p2.r.p[1];
-      dist[2] = p1.r.p[2] - p2.r.p[2];
-      real distSqr = dist[0]*dist[0] + dist[1]*dist[1] + dist[2]*dist[2];
-      if (distSqr < cutoffSqr) {
-        derived_this()->_computeForceRaw(force, dist, distSqr);
-      }
+    _computeForce(Real3DRef force, Particle &p1, Particle &p2) const {
+      Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
+      _computeForce(force, dist);
     }
 
     template < class Derived > 
@@ -275,20 +267,10 @@ namespace espresso {
     _computeForce(Real3DRef force, ConstReal3DRef dist) const {
       real distSqr = dist.sqr();
       if (distSqr < cutoffSqr) {
-        derived_this()->_computeForceRaw(force.get(), dist.get(), distSqr);
-      }
-    }
-
-    template < class Derived > 
-    inline void
-    PotentialTemplate< Derived >::
-    _computeForce(real force[3], const real dist[3]) const {
-      real distSqr = dist[0]*dist[0] + dist[1]*dist[1] + dist[2]*dist[2];
-      //real distSqr = dist.sqr();
-      if (distSqr < cutoffSqr) {
         derived_this()->_computeForceRaw(force, dist, distSqr);
       }
     }
+
   }
 }
 

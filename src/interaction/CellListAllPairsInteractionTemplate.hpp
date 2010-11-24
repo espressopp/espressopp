@@ -60,7 +60,7 @@ namespace espresso {
         int type2 = p2.p.type;
         const Potential &potential = getPotential(type1, type2);
 
-	real force[3];
+        Real3D force;
 	potential._computeForce(force, p1, p2);
 	  for (int k = 0; k < 3; k++) {
 	    p1.f.f[k] += force[k];
@@ -83,7 +83,7 @@ namespace espresso {
         int type2 = p2.p.type;
         const Potential &potential = getPotential(type1, type2);
 
-        real force[3];
+        Real3D force;
         potential._computeForce(force, p1, p2); 
           Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
           w = w + dist * Real3DRef(force);
@@ -96,14 +96,6 @@ namespace espresso {
     computeVirialTensor(real* wij_) {
       LOG4ESPP_INFO(theLogger, "computed virial tensor for all pairs in the cell lists");
 
-      /*
-      wij_[0] = 0.0;
-      wij_[1] = 0.0;
-      wij_[2] = 0.0;
-      wij_[3] = 0.0;
-      wij_[4] = 0.0;
-      wij_[5] = 0.0;
-      */
       for (iterator::CellListAllPairsIterator it(storage->getRealCells());
            it.isValid(); ++it) {
         Particle &p1 = *it->first;
@@ -112,7 +104,7 @@ namespace espresso {
         int type2 = p2.p.type;
         const Potential &potential = getPotential(type1, type2);
 
-        real force[3];
+        Real3D force;
         potential._computeForce(force, p1, p2); 
           Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
           wij_[0] += dist[0] * force[0];
@@ -145,10 +137,8 @@ namespace espresso {
 
     template < typename _Potential >
     inline real
-    CellListAllPairsInteractionTemplate < _Potential >::
-    getMaxCutoff() {
+    CellListAllPairsInteractionTemplate < _Potential >::getMaxCutoff() {
       real cutoff = 0.0;
-
       for(int i = 0; i < ntypes; i++) {
         for(int j = 0; j < ntypes; j++) {
           cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
