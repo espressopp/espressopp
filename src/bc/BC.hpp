@@ -35,6 +35,10 @@ namespace espresso {
 			    const ConstReal3DRef pos1,
 			    const ConstReal3DRef pos2) const = 0;
 
+      virtual void
+      getMinimumImageVectorX(real dist[3],
+			    const real pos1[3],
+			    const real pos2[3]) const = 0;
       virtual Real3D 
       getMinimumImageVector(const ConstReal3DRef pos1,
 			    const ConstReal3DRef pos2) const;

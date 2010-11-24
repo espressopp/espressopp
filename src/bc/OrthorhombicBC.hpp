@@ -40,7 +40,10 @@ namespace espresso {
       getMinimumImageVector(Real3DRef dist,
                             const ConstReal3DRef pos1,
                             const ConstReal3DRef pos2) const;
-
+      virtual void
+      getMinimumImageVectorX(real dist[3],
+                            const real pos1[3],
+                            const real pos2[3]) const;
       /** fold a coordinate to the primary simulation box.
 	  \param pos         the position...
 	  \param imageBox    and the box

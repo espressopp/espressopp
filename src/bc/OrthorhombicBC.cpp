@@ -35,6 +35,26 @@ namespace espresso {
       dist[2] -= round(dist[2] * invBoxL[2]) * boxL[2];
     }
 
+    /* Returns the minimum image vector between two positions */
+    void
+    OrthorhombicBC::
+    getMinimumImageVectorX(real dist[3],
+                          const real pos1[3],
+                          const real pos2[3]) const {
+
+      dist[0] = pos1[0];
+      dist[1] = pos1[1];
+      dist[2] = pos1[2];
+
+      dist[0] -= pos2[0];
+      dist[1] -= pos2[1];
+      dist[2] -= pos2[2];
+
+      dist[0] -= round(dist[0] * invBoxL[0]) * boxL[0];
+      dist[1] -= round(dist[1] * invBoxL[1]) * boxL[1];
+      dist[2] -= round(dist[2] * invBoxL[2]) * boxL[2];
+    }
+
     /* Fold an individual coordinate in the specified direction */
     void 
     OrthorhombicBC::
