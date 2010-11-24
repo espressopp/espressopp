@@ -31,7 +31,8 @@ init_cfg = 1
 if(init_cfg == 1):
   # LAMMPS with N = 32000
   # useful for checking for identical results against LAMMPS
-  x, y, z, Lx, Ly, Lz = lammps.read('data.lj')
+  file = sys.path[0][:sys.path[0].find('trunk')] + 'trunk/examples/data.lj'
+  x, y, z, Lx, Ly, Lz = lammps.read(file)
   num_particles = len(x)
 elif(init_cfg == 2):
   # cubic lattice with user-defined values of N and rho

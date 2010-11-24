@@ -19,7 +19,7 @@ from espresso.tools.init_cfg import lattice
 # cubic lattice with user-defined values of N and rho
 # num_particles should be a perfect cube (e.g. 25**3=15625, 32**3=32768)
 
-N = 20
+N = 10
 
 num_particles = N**3
 rho = 0.8442
