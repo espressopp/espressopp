@@ -61,7 +61,7 @@ namespace espresso {
         const Potential &potential = getPotential(type1, type2);
 
 	real force[3];
-	if (potential._computeForce(force, p1, p2))
+	potential._computeForce(force, p1, p2);
 	  for (int k = 0; k < 3; k++) {
 	    p1.f.f[k] += force[k];
 	    p2.f.f[k] -= force[k];
@@ -84,10 +84,9 @@ namespace espresso {
         const Potential &potential = getPotential(type1, type2);
 
         real force[3];
-        if (potential._computeForce(force, p1, p2)) {
+        potential._computeForce(force, p1, p2); 
           Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
           w = w + dist * Real3DRef(force);
-        }
       }
       return w;
     }
@@ -114,7 +113,7 @@ namespace espresso {
         const Potential &potential = getPotential(type1, type2);
 
         real force[3];
-        if (potential._computeForce(force, p1, p2)) {
+        potential._computeForce(force, p1, p2); 
           Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
           wij_[0] += dist[0] * force[0];
           wij_[1] += dist[1] * force[1];
@@ -122,7 +121,6 @@ namespace espresso {
           wij_[3] += dist[0] * force[1];
           wij_[4] += dist[0] * force[2];
           wij_[5] += dist[1] * force[2];
-        }
       }
     }
 

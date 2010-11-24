@@ -77,7 +77,7 @@ namespace espresso {
         real dist[3];
         //Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
         getSystemRef().bc->getMinimumImageVectorX(dist, p1.r.p, p2.r.p);
-	if (potential._computeForce(force, dist))
+	potential._computeForce(force, dist);
 	  for(int k = 0; k < 3; k++) {
 	    p1.f.f[k] += force[k];
 	    p2.f.f[k] -= force[k];
@@ -123,9 +123,8 @@ namespace espresso {
 
         Real3D force;
         Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
-        if (potential._computeForce(force, dist)) {
-          w += dist * force;
-        }
+        potential._computeForce(force, dist);
+        w += dist * force;
       }
       return w; 
     }
@@ -151,14 +150,14 @@ namespace espresso {
         const Potential &potential = getPotential(type1, type2);
         Real3D force;
         Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
-        if (potential._computeForce(force, dist)) {
+        potential._computeForce(force, dist); 
           wij_[0] += dist[0] * force[0];
           wij_[1] += dist[1] * force[1];
           wij_[2] += dist[2] * force[2];
           wij_[3] += dist[0] * force[1];
           wij_[4] += dist[0] * force[2];
           wij_[5] += dist[1] * force[2];
-        }
+        
       }
     }
  
