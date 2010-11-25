@@ -29,6 +29,13 @@ namespace espresso {
     }
   };
 
+  /**
+   * \brief position like properties
+   *
+   * This class contains all properties of a particle that behave like
+   * positions. Further extensions might be orientations. This is usefule
+   * to classify how properties behave e.g. on communication.
+   */
   struct ParticlePosition {
     real p[3];
 
@@ -48,6 +55,13 @@ namespace espresso {
     }
   };
 
+   /**
+   * \brief force like properties
+   *
+   * This class contains all properties of a particle that behave like
+   * forces. Further extensions might contain torques. This is usefule
+   * to classify how properties behave e.g. on communication.
+   */
   struct ParticleForce {
     real f[3];
 
@@ -71,6 +85,13 @@ namespace espresso {
     }
   };
 
+   /**
+   * \brief momentum like properties
+   *
+   * This class contains all properties of a particle that behave like
+   * a momentum. Further extensions might contain angular momentum. This is usefule
+   * to classify how properties behave e.g. on communication.
+   */
   struct ParticleMomentum {
     real v[3];
 
