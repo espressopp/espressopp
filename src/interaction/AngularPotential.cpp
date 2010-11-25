@@ -16,7 +16,7 @@ namespace espresso {
       real (AngularPotential::*computeEnergy2)(real theta) const =
 	&AngularPotential::computeEnergy;
       void (AngularPotential::*computeForce)
-        (Real3D force12, Real3D force32,
+        (Real3DRef force12, Real3DRef force32,
         ConstReal3DRef dist12, ConstReal3DRef dist32) const =
 	&AngularPotential::computeForce;
 

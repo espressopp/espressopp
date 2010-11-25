@@ -69,6 +69,7 @@ namespace espresso {
 
         real timeResort;
         real timeForce;
+        real timeForceComp[100];
         real timeComm1;
         real timeComm2;
         real timeInt1;

@@ -136,6 +136,8 @@ namespace espresso {
     {
       timeResort = 0.0;
       timeForce  = 0.0;
+      for(int i = 0; i < 100; i++)
+        timeForceComp[i] = 0.0;
       timeComm1  = 0.0;
       timeComm2  = 0.0;
       timeInt1   = 0.0;
@@ -145,7 +147,9 @@ namespace espresso {
     void VelocityVerlet::printTimers()
     {
       std::cout << "time: run = " << timeIntegrate <<
-                   ", force = " << timeForce <<
+                   ", pair = " << timeForceComp[0] <<
+                   ", FENE = " << timeForceComp[1] <<
+                   ", angle = " << timeForceComp[2] <<
                    ", comm1 = " << timeComm1 <<
                    ", comm2 = " << timeComm2 <<
                    ", int1 = " << timeInt1 <<
@@ -275,7 +279,10 @@ namespace espresso {
 	LOG4ESPP_INFO(theLogger, "compute forces for srIL " << i 
                                   << " of " << srIL.size());
 
+        real time;
+        time = timeIntegrate.getElapsedTime();
 	srIL[i]->addForces();
+        timeForceComp[i] += timeIntegrate.getElapsedTime() - time;
       }
     }
 

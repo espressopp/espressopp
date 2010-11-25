@@ -41,8 +41,8 @@ namespace espresso {
 	return energy;
       }
 
-      void _computeForceRaw(Real3D force12,
-                            Real3D force32,
+      void _computeForceRaw(Real3DRef force12,
+                            Real3DRef force32,
 			    ConstReal3DRef dist12,
 			    ConstReal3DRef dist32) const {
 
