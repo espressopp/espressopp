@@ -24,13 +24,15 @@ nvt = False
 # lammps or gromacs (lammps_reader = False is gromacs)
 lammps_reader = True
 
-steps = 1000
+steps = 100
 if(lammps_reader):
-  bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read('rings.dat')
+  file = sys.path[0][:sys.path[0].find('trunk')] + 'trunk/examples/angle/rings.dat'
+  bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read(file)
 else:
-  f1 = 'gromacs/conf.gro'
-  f2 = 'gromacs/topol.top'
-  f3 = 'gromacs/ring.itp'
+  base = sys.path[0][:sys.path[0].find('trunk')] + 'trunk/examples/'
+  f1 = base + 'gromacs/conf.gro'
+  f2 = base + 'gromacs/topol.top'
+  f3 = base + 'gromacs/ring.itp'
   bonds, angles, x, y, z, Lx, Ly, Lz = gromacs.read(f1, f2, f3)
 num_particles = len(x)
 density = 0.85
@@ -121,7 +123,7 @@ if(lammps_reader):
   # Cosine with FixedTriple list
   ftl = espresso.FixedTripleList(system.storage)
   ftl.addTriples(angles)
-  potCosine = espresso.interaction.Cosine(K=0.75, theta0=3.1415926)
+  potCosine = espresso.interaction.Cosine(K=1.5, theta0=3.1415926)
   interCosine = espresso.interaction.FixedTripleListCosine(system, ftl)
   interCosine.setPotential(type1 = 0, type2 = 0, potential = potCosine)
   system.addInteraction(interCosine)

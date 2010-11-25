@@ -75,7 +75,7 @@ namespace espresso {
         Real3D force32(0.0, 0.0, 0.0);
         Real3D dist12 = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
         Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
-	potential._computeForce(force12, force32, dist12.get(), dist32.get());
+	potential._computeForce(force12, force32, dist12, dist32);
 	for(int k = 0; k < 3; k++) {
 	  p1.f.f[k] += force12[k];
 	  p2.f.f[k] -= force12[k] + force32[k];
@@ -125,7 +125,7 @@ namespace espresso {
         Real3D force32(0.0, 0.0, 0.0);
         Real3D dist12 = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
         Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
-        potential._computeForce(force12, force32, dist12.get(), dist32.get());
+        potential._computeForce(force12, force32, dist12, dist32);
         w += dist12 * force12 + dist32 * force32;
       }
       return w;
@@ -148,7 +148,7 @@ namespace espresso {
         Real3D force32(0.0, 0.0, 0.0);
         Real3D dist12 = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
         Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
-        potential._computeForce(force12, force32, dist12.get(), dist32.get());
+        potential._computeForce(force12, force32, dist12, dist32);
         wij_[0] += dist12[0] * force12[0] + dist32[0] * force32[0];
         wij_[1] += dist12[1] * force12[1] + dist32[1] * force32[1];
         wij_[2] += dist12[2] * force12[2] + dist32[2] * force32[2];
