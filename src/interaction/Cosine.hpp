@@ -35,10 +35,10 @@ namespace espresso {
 	return energy;
       }
 
-      void _computeForceRaw(real force12[3],
-                            real force32[3],
-			    const real dist12[3],
-			    const real dist32[3]) const {
+      void _computeForceRaw(Real3D force12,
+                            Real3D force32,
+			    ConstReal3DRef dist12,
+			    ConstReal3DRef dist32) const {
 
         real dist12_sqr;
         real dist32_sqr;
@@ -49,32 +49,21 @@ namespace espresso {
         real cos_theta;
         real dU_dtheta;
 
-        real a[] = {dist12[0], dist12[1], dist12[2]};
-        real b[] = {dist32[0], dist32[1], dist32[2]};
-
-        //dist12_sqr = dist12[0] * dist12[0] + dist12[1] * dist12[1] + dist12[2] * dist12[2];
-        //dist32_sqr = dist32[0] * dist32[0] + dist32[1] * dist32[1] + dist32[2] * dist32[2];
-        dist12_sqr = a[0] * a[0] + a[1] * a[1] + a[2] * a[2];
-        dist32_sqr = b[0] * b[0] + b[1] * b[1] + b[2] * b[2];
+        dist12_sqr = dist12 * dist12;
+        dist32_sqr = dist32 * dist32;
         dist12_magn = sqrt(dist12_sqr);
         dist32_magn = sqrt(dist32_sqr);
 
-        //cos_theta = dist12 * dist32 / (dist12_magn * dist32_magn);
-        cos_theta = (a[0] * b[0] + a[1] * b[1] + a[2] * b[2]) / (dist12_magn * dist32_magn);
+        cos_theta = dist12 * dist32 / (dist12_magn * dist32_magn);
         if(cos_theta < -1.0) cos_theta = -1.0;
         if(cos_theta >  1.0) cos_theta =  1.0;
         sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 
         dU_dtheta = K * sin(acos(cos_theta) - theta0);
+
         dnom = dist12_sqr * dist32_sqr * sin_theta;
-
-        force12[0] = dU_dtheta * (dist12_magn * dist32_magn * dist32[0] - cos_theta * dist32_sqr * dist12[0]) / dnom;
-        force12[1] = dU_dtheta * (dist12_magn * dist32_magn * dist32[1] - cos_theta * dist32_sqr * dist12[1]) / dnom;
-        force12[2] = dU_dtheta * (dist12_magn * dist32_magn * dist32[2] - cos_theta * dist32_sqr * dist12[2]) / dnom;
-
-        force32[0] = dU_dtheta * (dist12_magn * dist32_magn * dist12[0] - cos_theta * dist12_sqr * dist32[0]) / dnom;
-        force32[1] = dU_dtheta * (dist12_magn * dist32_magn * dist12[1] - cos_theta * dist12_sqr * dist32[1]) / dnom;
-        force32[2] = dU_dtheta * (dist12_magn * dist32_magn * dist12[2] - cos_theta * dist12_sqr * dist32[2]) / dnom;
+        force12 = dU_dtheta * (dist12_magn * dist32_magn * dist32 - cos_theta * dist32_sqr * dist12) / dnom;
+        force32 = dU_dtheta * (dist12_magn * dist32_magn * dist12 - cos_theta * dist12_sqr * dist32) / dnom;
       }
     };
   }

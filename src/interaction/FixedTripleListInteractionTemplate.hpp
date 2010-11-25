@@ -71,8 +71,8 @@ namespace espresso {
         int type2 = p2.p.type;
         const Potential &potential = getPotential(type1, type2);
 
-	real force12[3];
-	real force32[3];
+        Real3D force12(0.0, 0.0, 0.0);
+        Real3D force32(0.0, 0.0, 0.0);
         Real3D dist12 = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
         Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
 	potential._computeForce(force12, force32, dist12.get(), dist32.get());
@@ -121,8 +121,8 @@ namespace espresso {
         int type1 = p1.p.type;
         int type2 = p2.p.type;
         const Potential &potential = getPotential(type1, type2);
-        real force12[3];
-        real force32[3];
+        Real3D force12(0.0, 0.0, 0.0);
+        Real3D force32(0.0, 0.0, 0.0);
         Real3D dist12 = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
         Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
         potential._computeForce(force12, force32, dist12.get(), dist32.get());
@@ -137,15 +137,6 @@ namespace espresso {
     computeVirialTensor(real* wij_) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 
-      /* 
-      wij_[0] = 0.0;
-      wij_[1] = 0.0;
-      wij_[2] = 0.0;
-      wij_[3] = 0.0;
-      wij_[4] = 0.0;
-      wij_[5] = 0.0;
-      */
-     
       for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
@@ -153,8 +144,8 @@ namespace espresso {
         int type1 = p1.p.type;
         int type2 = p2.p.type;
         const Potential &potential = getPotential(type1, type2);
-        real force12[3];
-        real force32[3];
+        Real3D force12(0.0, 0.0, 0.0);
+        Real3D force32(0.0, 0.0, 0.0);
         Real3D dist12 = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
         Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
         potential._computeForce(force12, force32, dist12.get(), dist32.get());
@@ -169,10 +160,8 @@ namespace espresso {
 
     template < typename _AngularPotential >
     inline real
-    FixedTripleListInteractionTemplate< _AngularPotential >::
-    getMaxCutoff() {
+    FixedTripleListInteractionTemplate< _AngularPotential >::getMaxCutoff() {
       real cutoff = 0.0;
-
       for (int i = 0; i < ntypes; i++) {
         for (int j = 0; j < ntypes; j++) {
           cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
