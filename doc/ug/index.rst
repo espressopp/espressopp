@@ -27,8 +27,10 @@ Contents:
    team.rst
    faq.rst
    pmi.rst
-
    bib.rst
+
+.. toctree::
+   :maxdepth: 2
 
 Indices and tables
 ==================
