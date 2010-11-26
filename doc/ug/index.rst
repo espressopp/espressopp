@@ -25,6 +25,7 @@ Contents:
 
    team.rst
    faq.rst
+   pmi.rst
 
 System Module:
 
