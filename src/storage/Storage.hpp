@@ -31,7 +31,7 @@ namespace espresso {
 	  with the given id already exists.  This is left to the parallel
 	  front end.
       */
-      Particle *addParticle(longint id, const ConstReal3DRef pos);
+      Particle *addParticle(longint id, const Real3D& pos);
 
       /** lookup whether data for a given particle is available on this node,
 	  either as real or as ghost particle. */
@@ -44,7 +44,7 @@ namespace espresso {
        \return 0 if the particle wasn't available, the pointer to the Particle, if it was. */
       Particle *lookupRealParticle(longint id) {
 	IdParticleMap::iterator it = localParticles.find(id);
-	return (it != localParticles.end() && !(it->second->l.ghost)) ? it->second : 0;
+	return (it != localParticles.end() && !(it->second->ghost())) ? it->second : 0;
       }
 
       /// get number of real particles on this node
@@ -63,10 +63,10 @@ namespace espresso {
       /** map a position to a valid cell on this node.  If the position
 	  is outside the domain of this node, return the cell inside the
 	  domain that is closest to the position. */
-      virtual Cell *mapPositionToCellClipped(const ConstReal3DRef pos) = 0;
+      virtual Cell *mapPositionToCellClipped(const Real3D& pos) = 0;
       /** map a position to a cell on this node.  If the position is
 	  outside the domain of this node, return 0. */
-      virtual Cell *mapPositionToCellChecked(const ConstReal3DRef pos) = 0;
+      virtual Cell *mapPositionToCellChecked(const Real3D& pos) = 0;
 
       /** (Re-)Decompose the system, i.e. redistribute the particles
 	  to the correct processors.
@@ -117,14 +117,14 @@ namespace espresso {
       afterRecvParticles;
 
       /* variant for python that ignores the return value */
-      bool pyAddParticle(longint id, const ConstReal3DRef pos);
+      bool pyAddParticle(longint id, const Real3D& pos);
 
       static void registerPython();
 
     protected:
       /** Check whether a particle belongs to this node. */
       virtual bool checkIsRealParticle(longint id, 
-				       const ConstReal3DRef pos) = 0;
+				       const Real3D& pos) = 0;
 
       /** Decompose the real particles such that they are at the
 	  correct processor. This should _not_ touch the ghosts.
@@ -164,7 +164,7 @@ namespace espresso {
 	  @param shift how to adjust the positions of the particles when sending
       */
       void packPositionsEtc(class OutBuffer& buf,
-			    Cell &reals, int extradata, const real shift[3]);
+			    Cell &reals, int extradata, const Real3D& shift);
 
  
       /** unpack received data for ghosts. */
@@ -176,7 +176,7 @@ namespace espresso {
       */
       void copyRealsToGhosts(Cell &reals, Cell &ghosts,
 			     int extradata,
-			     const real shift[3]);
+			     const Real3D& shift);
 
       /** pack ghost forces for sending. */
       void packForces(OutBuffer& buf, Cell &ghosts);

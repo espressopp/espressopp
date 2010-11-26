@@ -11,13 +11,13 @@ namespace espresso {
       using namespace espresso::python;
 
       real (AngularPotential::*computeEnergy1)
-        (ConstReal3DRef dist12, ConstReal3DRef dist32) const =
+        (const Real3D& dist12, const Real3D& dist32) const =
 	&AngularPotential::computeEnergy;
       real (AngularPotential::*computeEnergy2)(real theta) const =
 	&AngularPotential::computeEnergy;
       void (AngularPotential::*computeForce)
-        (Real3DRef force12, Real3DRef force32,
-        ConstReal3DRef dist12, ConstReal3DRef dist32) const =
+        (Real3D& force12, Real3D& force32,
+        const Real3D& dist12, const Real3D& dist32) const =
 	&AngularPotential::computeForce;
 
       class_< AngularPotential, boost::noncopyable >

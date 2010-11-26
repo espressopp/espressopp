@@ -62,31 +62,28 @@ namespace espresso {
     //////////////////////////////////////////////////
     template < typename _DihedralPotential > inline void
     FixedQuadrupleListInteractionTemplate < _DihedralPotential >::addForces() {
+
       LOG4ESPP_INFO(theLogger, "add forces computed by FixedQuadrupleList");
+
       for (FixedQuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         Particle &p3 = *it->third;
         Particle &p4 = *it->fourth;
-        int type1 = p1.p.type;
-        int type2 = p2.p.type;
-        const Potential &potential = getPotential(type1, type2);
+        const Potential &potential = getPotential(p1.type(), p2.type());
 
-	Real3D force1;
-	Real3D force2;
-	Real3D force3;
-	Real3D force4;
-        Real3D dist21 = getSystemRef().bc->getMinimumImageVector(p2.r.p, p1.r.p);
-        Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
-        Real3D dist43 = getSystemRef().bc->getMinimumImageVector(p4.r.p, p3.r.p);
+        Real3D dist21 = getSystemRef().bc->getMinimumImageVector(p2.position(), p1.position());
+        Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.position(), p2.position());
+        Real3D dist43 = getSystemRef().bc->getMinimumImageVector(p4.position(), p3.position());
+
+	Real3D force1, force2, force3, force4;  // result forces
+
 	potential._computeForce(force1, force2, force3, force4,
                                 dist21, dist32, dist43);
-	for(int k = 0; k < 3; k++) {
-	  p1.f.f[k] += force1[k];
-	  p2.f.f[k] -= force2[k];
-	  p3.f.f[k] += force3[k];
-	  p4.f.f[k] += force4[k];
-	}
+        p1.force() += force1;
+        p2.force() -= force2;
+        p3.force() += force3;
+        p4.force() += force4;
       }
     }
 
@@ -96,18 +93,17 @@ namespace espresso {
     computeEnergy() {
       LOG4ESPP_INFO(theLogger, "compute energy of the quadruples");
 
+      espresso::bc::BC& bc = *getSystemRef().bc;
       real e = 0.0;
       for (FixedQuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Particle &p3 = *it->third;
-        Particle &p4 = *it->fourth;
-        int type1 = p1.p.type;
-        int type2 = p2.p.type;
-        const Potential &potential = getPotential(type1, type2);
-        Real3D dist21 = getSystemRef().bc->getMinimumImageVector(p2.r.p, p1.r.p);
-        Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
-        Real3D dist43 = getSystemRef().bc->getMinimumImageVector(p4.r.p, p3.r.p);
+        const Particle &p1 = *it->first;
+        const Particle &p2 = *it->second;
+        const Particle &p3 = *it->third;
+        const Particle &p4 = *it->fourth;
+        const Potential &potential = getPotential(p1.type(), p2.type());
+        Real3D dist21 = bc.getMinimumImageVector(p2.position(), p1.position());
+        Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
+        Real3D dist43 = bc.getMinimumImageVector(p4.position(), p3.position());
         e += potential._computeEnergy(dist21, dist32, dist43);
       }
       real esum;
@@ -123,20 +119,19 @@ namespace espresso {
 
       real w = 0.0;
       for (FixedQuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Particle &p3 = *it->third;
-        Particle &p4 = *it->fourth;
-        int type1 = p1.p.type;
-        int type2 = p2.p.type;
-        const Potential &potential = getPotential(type1, type2);
+        const Particle &p1 = *it->first;
+        const Particle &p2 = *it->second;
+        const Particle &p3 = *it->third;
+        const Particle &p4 = *it->fourth;
+        const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D force1;
         Real3D force2;
         Real3D force3;
         Real3D force4;
-        Real3D dist21 = getSystemRef().bc->getMinimumImageVector(p2.r.p, p1.r.p);
-        Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
-        Real3D dist43 = getSystemRef().bc->getMinimumImageVector(p4.r.p, p3.r.p);
+        espresso::bc::BC& bc = *getSystemRef().bc;
+        Real3D dist21 = bc.getMinimumImageVector(p2.position(), p1.position());
+        Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
+        Real3D dist43 = bc.getMinimumImageVector(p4.position(), p3.position());
         potential._computeForce(force1, force2, force3, force4,
                                 dist21, dist32, dist43);
         w += dist21 * force1 + dist32 * force2;
@@ -158,21 +153,22 @@ namespace espresso {
       wij_[3] = 0.0;
       wij_[4] = 0.0;
       wij_[5] = 0.0;
+
+      espresso::bc::BC& bc = *getSystemRef().bc;
+
       for (FixedQuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Particle &p3 = *it->third;
-        Particle &p4 = *it->fourth;
-        int type1 = p1.p.type;
-        int type2 = p2.p.type;
-        const Potential &potential = getPotential(type1, type2);
+        const Particle &p1 = *it->first;
+        const Particle &p2 = *it->second;
+        const Particle &p3 = *it->third;
+        const Particle &p4 = *it->fourth;
+        const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D force1;
         Real3D force2;
         Real3D force3;
         Real3D force4;
-        Real3D dist21 = getSystemRef().bc->getMinimumImageVector(p2.r.p, p1.r.p);
-        Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
-        Real3D dist43 = getSystemRef().bc->getMinimumImageVector(p4.r.p, p3.r.p);
+        Real3D dist21 = bc.getMinimumImageVector(p2.position(), p1.position());
+        Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
+        Real3D dist43 = bc.getMinimumImageVector(p4.position(), p3.position());
         potential._computeForce(force1, force2, force3, force4,
                                 dist21, dist32, dist43);
         wij_[0] += dist21[0] * force1[0] - dist32[0] * force2[0];

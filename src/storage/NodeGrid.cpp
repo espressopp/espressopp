@@ -12,9 +12,9 @@ namespace espresso {
       : std::invalid_argument("node grid dimensions have to be positive") {}
   
     NodeGrid::
-    NodeGrid(const ConstInt3DRef grid,
+    NodeGrid(const Int3D& grid,
 	     const longint nodeId,
-	     const ConstReal3DRef domainSize)
+	     const Real3D& domainSize)
       : Grid(grid)
     {
       if (grid[0] <= 0 || grid[1] <= 0 || grid[2] <= 0) {
@@ -31,7 +31,7 @@ namespace espresso {
     }
 
     longint NodeGrid::
-    mapPositionToNodeClipped(const ConstReal3DRef pos) const
+    mapPositionToNodeClipped(const Real3D& pos) const
     {
       Int3D cpos;
     

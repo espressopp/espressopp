@@ -54,36 +54,36 @@ namespace espresso {
     inline void Storage::removeFromLocalParticles(Particle *p, bool weak) {
       /* no pointer left, can happen for ghosts when the real particle
 	 e has already been removed */
-      if (localParticles.find(p->p.id) == localParticles.end())
+      if (localParticles.find(p->id()) == localParticles.end())
 	return;
 
-      if (!weak || localParticles[p->p.id] == p) {
+      if (!weak || localParticles[p->id()] == p) {
 	LOG4ESPP_TRACE(logger, "removing local pointer for particle id="
-		       << p->p.id << " @ " << p);
-	localParticles.erase(p->p.id);
+		       << p->id() << " @ " << p);
+	localParticles.erase(p->id());
       }
       else {
 	LOG4ESPP_TRACE(logger, "NOT removing local pointer for particle id="
-		       << p->p.id << " @ " << p << " since pointer is @ "
-		       << localParticles[p->p.id]);
+		       << p->id() << " @ " << p << " since pointer is @ "
+		       << localParticles[p->id()]);
       }
     }
 
     inline void Storage::updateInLocalParticles(Particle *p, bool weak) {
-      if (!weak || localParticles.find(p->p.id) == localParticles.end()) {
+      if (!weak || localParticles.find(p->id()) == localParticles.end()) {
 	LOG4ESPP_TRACE(logger, "updating local pointer for particle id="
-		       << p->p.id << " @ " << p);
-	localParticles[p->p.id] = p;
+		       << p->id() << " @ " << p);
+	localParticles[p->id()] = p;
       }
       else {
 	LOG4ESPP_TRACE(logger, "NOT updating local pointer for particle id="
-		       << p->p.id << " @ " << p << " has already pointer @ "
-		       << localParticles[p->p.id]);
+		       << p->id() << " @ " << p << " has already pointer @ "
+		       << localParticles[p->id()]);
       }
     }
 
-    void Storage::updateLocalParticles(ParticleList &l) {
-      for (ParticleList::Iterator it(l); it.isValid(); ++it) {
+    void Storage::updateLocalParticles(ParticleList &list) {
+      for (ParticleList::Iterator it(list); it.isValid(); ++it) {
 	updateInLocalParticles(&(*it));
       }
     }
@@ -99,7 +99,7 @@ namespace espresso {
     }
 
     Particle* Storage::
-    addParticle(longint id, const ConstReal3DRef p) {
+    addParticle(longint id, const Real3D& p) {
       if (!checkIsRealParticle(id, p))
 	return static_cast< Particle* >(0);
 
@@ -107,18 +107,16 @@ namespace espresso {
 
       Particle n;
       n.init();
-      n.p.id = id;
-      for (int i = 0; i < 3 ; ++i) {
-	n.r.p[i] = p[i];
-	n.l.i[i] = 0;
-      }
-      getSystem()->bc->foldPosition(n.r.p, n.l.i);
-      cell = mapPositionToCellClipped(n.r.p);
+      n.id() = id;
+      n.position()= p;
+      n.image() = Int3D(0);
+      getSystem()->bc->foldPosition(n.position(), n.image());
+      cell = mapPositionToCellClipped(n.position());
 
       appendIndexedParticle(cell->particles, n);
 
-      LOG4ESPP_TRACE(logger, "got particle id="
-		     << id << " @ " << p[0] << " " << p[1] << " " << p[2] << " ; put it into cell " << cell - getFirstCell());
+      LOG4ESPP_TRACE(logger, "got particle id ="
+		     << id << " @ " << p << " ; put it into cell " << cell - getFirstCell());
       LOG4ESPP_TRACE(logger, "folded it to "
 		     << n.r.p[0] << " " << n.r.p[1] << " " << n.r.p[2] );
       LOG4ESPP_TRACE(logger, "cell size is now " << cell->particles.size());
@@ -190,7 +188,7 @@ namespace espresso {
       for (CellListIterator it(old.getRealCells());
 	   it.isValid(); ++it) {
 	Particle &part = *it;
-	Cell *nc = mapPositionToCellClipped(part.r.p);
+	Cell *nc = mapPositionToCellClipped(part.position());
 	appendUnindexedParticle(nc->particles, part);
       }
 
@@ -200,22 +198,22 @@ namespace espresso {
       }
     }
 
-    void Storage::sendParticles(ParticleList &l, longint node)
+    void Storage::sendParticles(ParticleList &list, longint node)
     {
-      LOG4ESPP_DEBUG(logger, "send " << l.size() << " particles to " << node);
+      LOG4ESPP_DEBUG(logger, "send " << list.size() << " particles to " << node);
 
       // pack for transport
       OutBuffer data(*comm);
-      int size = l.size();
+      int size = list.size();
       data.write(size);
-      for (ParticleList::Iterator it(l); it.isValid(); ++it) {
+      for (ParticleList::Iterator it(list); it.isValid(); ++it) {
 	removeFromLocalParticles(&(*it));
 	data.write(*it);
       }
 
-      beforeSendParticles(l, data);
+      beforeSendParticles(list, data);
 
-      l.clear();
+      list.clear();
 
       // ... and send
       data.send(node, STORAGE_COMM_TAG);
@@ -223,7 +221,7 @@ namespace espresso {
       LOG4ESPP_DEBUG(logger, "done");
     }
 
-    void Storage::recvParticles(ParticleList &l, longint node)
+    void Storage::recvParticles(ParticleList &list, longint node)
     {
       LOG4ESPP_DEBUG(logger, "recv from " << node);
 
@@ -236,19 +234,19 @@ namespace espresso {
       // ... and unpack
       int size;
       data.read(size);
-      int curSize = l.size();
+      int curSize = list.size();
       LOG4ESPP_DEBUG(logger, "got " << size << " particles, have " << curSize);
 
       if (size > 0) {
-	l.resize(curSize + size);
+	list.resize(curSize + size);
 
 	for (int i = 0; i < size; ++i) {
-	  Particle *p = &l[curSize + i];
+	  Particle *p = &list[curSize + i];
 	  data.read(*p);
 	  updateInLocalParticles(p);
 	}
       }
-      afterRecvParticles(l, data);
+      afterRecvParticles(list, data);
 
       LOG4ESPP_DEBUG(logger, "done");
     }
@@ -274,7 +272,7 @@ namespace espresso {
     }
 
     void Storage::packPositionsEtc(OutBuffer &buf,
-				   Cell &_reals, int extradata, const real shift[3])
+				   Cell &_reals, int extradata, const Real3D& shift)
     {
       ParticleList &reals  = _reals.particles;
 
@@ -309,13 +307,13 @@ namespace espresso {
 	if (extradata & DATA_PROPERTIES) {
 	  updateInLocalParticles(&(*dst), true);
 	}
-	dst->l.ghost = 1;
+	dst->ghost() = 1;
       }
     }
 
     void Storage::copyRealsToGhosts(Cell &_reals, Cell &_ghosts,
 				    int extradata,
-				    const real shift[3])
+				    const Real3D& shift)
     {
       ParticleList &reals  = _reals.particles;
       ParticleList &ghosts = _ghosts.particles;
@@ -335,17 +333,7 @@ namespace espresso {
       for(ParticleList::iterator src = reals.begin(), end = reals.end(), dst = ghosts.begin();
 	  src != end; ++src, ++dst) {
 
-	src->r.copyShifted(dst->r, shift);
-	if (extradata & DATA_PROPERTIES) {
-	  dst->p = src->p;
-	}
-	if (extradata & DATA_MOMENTUM) {
-	  dst->m = src->m;
-	}
-	if (extradata & DATA_LOCAL) {
-	  dst->l = src->l;
-	}
-	dst->l.ghost = 1;
+        dst->copyAsGhost(*src, extradata, shift);
       }
     }
 
@@ -357,9 +345,9 @@ namespace espresso {
       ParticleList &ghosts = _ghosts.particles;
   
       for(ParticleList::iterator src = ghosts.begin(), end = ghosts.end(); src != end; ++src) {
-        buf.write(src->f);
-	LOG4ESPP_TRACE(logger, "from particle " << src->p.id << ": packing force "
-		       << src->f.f[0] << " " << src->f.f[1] << " "<< src->f.f[2]);
+        buf.write(src->particleForce());
+	LOG4ESPP_TRACE(logger, "from particle " << src->id() 
+                               << ": packing force " << src->force());
       }
     }
 
@@ -373,9 +361,9 @@ namespace espresso {
       for(ParticleList::iterator dst = reals.begin(), end = reals.end(); dst != end; ++dst) {
 	ParticleForce f;
         buf.read(f);
-	LOG4ESPP_TRACE(logger, "for particle " << dst->p.id << ": unpacking force "
-		       << f.f[0] << " " << f.f[1] << " "<< f.f[2]);
-	dst->f = f;
+	LOG4ESPP_TRACE(logger, "for particle " << dst->id() 
+                        << ": unpacking force " << f.force());
+	dst->particleForce() = f;
       }
     }
 
@@ -389,10 +377,9 @@ namespace espresso {
       for(ParticleList::iterator dst = reals.begin(), end = reals.end(); dst != end; ++dst) {
 	ParticleForce f;
         buf.read(f);
-	LOG4ESPP_TRACE(logger, "for particle " << dst->p.id << ": unpacking force "
-		       << f.f[0] << " " << f.f[1] << " "<< f.f[2] << " and adding to "
-		       << dst->f.f[0] << " " << dst->f.f[1] << " "<< dst->f.f[2]);
-	dst->f += f;
+	LOG4ESPP_TRACE(logger, "for particle " << dst->id() << ": unpacking force "
+		       << f.f() << " and adding to " << dst->force());
+	dst->particleForce() += f;
       }
     }
 
@@ -409,12 +396,9 @@ namespace espresso {
       for(ParticleList::iterator dst = reals.begin(), end = reals.end(), src = ghosts.begin();
 	  dst != end; ++dst, ++src) {
 
-	LOG4ESPP_TRACE(logger, "for particle " << dst->p.id << ": adding force "
-		       << src->f.f[0] << " " << src->f.f[1] << " "
-		       << src->f.f[2] << " to "
-		       << dst->f.f[0] << " " << dst->f.f[1] << " "<< dst->f.f[2]);
-
-	dst->f += src->f;
+	LOG4ESPP_TRACE(logger, "for particle " << dst->id() << ": adding force "
+		       << src->force() << " to " << dst->force()); 
+	dst->particleForce() += src->particleForce();
       }
     }
 

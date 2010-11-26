@@ -31,17 +31,17 @@ namespace espresso {
 	  \param pos1, pos2 are the particle positions 
       */
       virtual void
-      getMinimumImageVector(Real3DRef dist,
-			    const ConstReal3DRef pos1,
-			    const ConstReal3DRef pos2) const = 0;
+      getMinimumImageVector(Real3D& dist,
+			    const Real3D& pos1,
+			    const Real3D& pos2) const = 0;
 
       virtual void
       getMinimumImageVectorX(real dist[3],
 			    const real pos1[3],
 			    const real pos2[3]) const = 0;
       virtual Real3D 
-      getMinimumImageVector(const ConstReal3DRef pos1,
-			    const ConstReal3DRef pos2) const;
+      getMinimumImageVector(const Real3D& pos1,
+			    const Real3D& pos2) const;
 
       /** fold a coordinate to the primary simulation box.
 	  \param pos         the position
@@ -52,10 +52,10 @@ namespace espresso {
 	  i. e. a previously folded position will be folded correctly.
       */
       virtual void 
-      foldCoordinate(Real3DRef pos, Int3DRef imageBox, int dir) const = 0;
+      foldCoordinate(Real3D& pos, Int3D& imageBox, int dir) const = 0;
 
       virtual void 
-      unfoldCoordinate(Real3DRef pos, Int3DRef imageBox, int dir) const = 0;
+      unfoldCoordinate(Real3D& pos, Int3D& imageBox, int dir) const = 0;
 
       /** Fold the coordinates to the primary simulation box.
 	  \param pos the position...
@@ -65,18 +65,18 @@ namespace espresso {
 	  i. e. a previously folded position will be folded correctly.
       */
       virtual void 
-      foldPosition(Real3DRef pos, Int3DRef imageBox) const;
+      foldPosition(Real3D& pos, Int3D& imageBox) const;
 
       virtual void
-      foldPosition(Real3DRef pos) const;
+      foldPosition(Real3D& pos) const;
 
       /** Get the folded position as a Python tuple. */
       virtual boost::python::tuple
-      getFoldedPosition(ConstReal3DRef pos, 
-			ConstInt3DRef imageBox) const;
+      getFoldedPosition(const Real3D& pos, 
+			const Int3D& imageBox) const;
 
       virtual boost::python::tuple 
-      getFoldedPosition(ConstReal3DRef pos) const;
+      getFoldedPosition(const Real3D& pos) const;
 
       /** unfold coordinates to physical position.
 	  \param pos the position...
@@ -86,15 +86,15 @@ namespace espresso {
 	  afterwards.
       */
       virtual void 
-      unfoldPosition(Real3DRef pos, Int3DRef imageBox) const;
+      unfoldPosition(Real3D& pos, Int3D& imageBox) const;
 
       virtual Real3D
-      getUnfoldedPosition(ConstReal3DRef pos, ConstInt3DRef imageBox) const;
+      getUnfoldedPosition(const Real3D& pos, const Int3D& imageBox) const;
 
       /** Get a random position within the central simulation box. The
 	  positions are assigned with each coordinate on [0, boxL]. */
       virtual void
-      getRandomPos(Real3DRef res) const = 0;
+      getRandomPos(Real3D& res) const = 0;
 
       virtual Real3D
       getRandomPos() const;

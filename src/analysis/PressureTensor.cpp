@@ -36,13 +36,14 @@ namespace espresso {
 
       CellList realCells = system.storage->getRealCells();
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-        real mass = cit->p.mass;
-        vvLocal[0] += mass * cit->m.v[0] * cit->m.v[0];
-        vvLocal[1] += mass * cit->m.v[1] * cit->m.v[1];
-        vvLocal[2] += mass * cit->m.v[2] * cit->m.v[2];
-        vvLocal[3] += mass * cit->m.v[0] * cit->m.v[1];
-        vvLocal[4] += mass * cit->m.v[0] * cit->m.v[2];
-        vvLocal[5] += mass * cit->m.v[1] * cit->m.v[2];
+        real mass = cit->mass();
+        Real3D& vel = cit->velocity();
+        vvLocal[0] += mass * vel[0] * vel[0];
+        vvLocal[1] += mass * vel[1] * vel[1];
+        vvLocal[2] += mass * vel[2] * vel[2];
+        vvLocal[3] += mass * vel[0] * vel[1];
+        vvLocal[4] += mass * vel[0] * vel[2];
+        vvLocal[5] += mass * vel[1] * vel[2];
       }
       boost::mpi::reduce(*mpiWorld, vvLocal, 6, vv, std::plus<real>(), 0);
 

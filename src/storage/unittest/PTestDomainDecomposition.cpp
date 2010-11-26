@@ -9,6 +9,7 @@
 #include "iterator/CellListIterator.hpp"
 #include "bc/OrthorhombicBC.hpp"
 #include "Real3D.hpp"
+#include "Buffer.hpp"
 #include <iostream>
 
 using namespace espresso;
@@ -116,8 +117,9 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
 		      NodeGridMismatch);
   }
 
-  int nodeGrid[3] = { mpiWorld->size(), 1, 1 };
-  int cellGrid[3] = { 1, 2, 3 };
+  Int3D nodeGrid(mpiWorld->size(), 1, 1);
+  Int3D cellGrid(1, 2, 3);
+
   DomainDecomposition domdec(system,
 			     mpiWorld,
 			     nodeGrid,
@@ -184,7 +186,7 @@ BOOST_FIXTURE_TEST_CASE(decompose, Fixture)
   for (real x = 0.01; x < 1.0; x += 1.0/5)
     for (real y = 0.01; y < 2.0; y += 2.0/3)
       for (real z = 0.01; z < 3.0; z += 3.0/9) {
-	real pos[3] = { x, y, z };
+	Real3D pos(x, y, z);
 	if (domdec->addParticle(count, pos) != static_cast<Particle*>(0))
 	  numRealParticles++;
 	++count;
@@ -217,7 +219,7 @@ BOOST_FIXTURE_TEST_CASE(fetchParticles, Fixture)
   for (real x = 0.01; x < 1.0; x += 1.0/5)
     for (real y = 0.01; y < 2.0; y += 2.0/3)
       for (real z = 0.01; z < 3.0; z += 3.0/9) {
-	real pos[3] = { x, y, z };
+	Real3D pos(x, y, z );
 	if (domdec->addParticle(count, pos) != static_cast<Particle*>(0))
 	  numRealParticles++;
 	++count;
@@ -225,8 +227,8 @@ BOOST_FIXTURE_TEST_CASE(fetchParticles, Fixture)
 
   BOOST_CHECK_EQUAL(domdec->getNRealParticles(), numRealParticles);
 
-  int nodeGrid[3] = { 1, mpiWorld->size(), 1 };
-  int cellGrid[3] = { 10, 5, 4 };
+  Int3D nodeGrid(1, mpiWorld->size(), 1 );
+  Int3D cellGrid(10, 5, 4);
 
   DomainDecomposition domdec2(system,
                               mpiWorld,
@@ -258,9 +260,9 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
   for(int x = 0; x < cGrid.getGridSize(0); ++x) {
     for(int y = 0; y < cGrid.getGridSize(1); ++y) {
       for(int z = 0; z < cGrid.getGridSize(2); ++z) {
-	int ipos[3] = { x, y, z };
+	Int3D ipos(x, y, z);
 	// center particle in cell's global position
-	real pos[3];
+	Real3D pos;
 	for (int i = 0; i < 3; ++i) {
 	  ipos[i] += nGrid.getNodePosition(i)*cGrid.getGridSize(i);
 	  pos[i] = (0.5 + ipos[i])*cGrid.getCellSize(i);
@@ -268,8 +270,8 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
 	
 	Particle *p = domdec->addParticle(c++, pos);
 
-	p->p.type = 10000*ipos[0] + 100*ipos[1] + ipos[2];
-	BOOST_TEST_MESSAGE("generated particle with type " << p->p.type);
+	p->type() = 10000*ipos[0] + 100*ipos[1] + ipos[2];
+	BOOST_TEST_MESSAGE("generated particle with type " << p->type());
       }
     }
   }
@@ -286,7 +288,7 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
     ParticleList &pl = (*it)->particles;
     int cnt = pl.size();
     // map back cell to coordinates
-    int ipos[3];
+    Int3D ipos;
     cGrid.mapIndexToPosition(ipos, *it - domdec->getFirstCell());
 
     BOOST_CHECK_EQUAL(cnt, 1);
@@ -294,7 +296,7 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
     if (cnt == 1) {
       /* recalculate expected particles position. Remember that this time ipos is
 	 a ghost frame position, not a inner position. Shift accordingly */
-      real pos[3];
+      Real3D pos;
       /* for checking the encoded type, we need the original cell */
       int origcpos[3];
       for (int i = 0; i < 3; ++i) {
@@ -314,29 +316,27 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
 	/* for the force test, set force according to original's
 	   absolute position that means that the forces on any ghost
 	   should always be the same as for its real particle. */
-	pl[0].f.f[i] = origcpos[i];
+	pl[0].force()[i] = origcpos[i];
       }
       size_t type = 10000*origcpos[0] + 100*origcpos[1] + origcpos[2];
-      BOOST_CHECK_EQUAL(pl[0].p.type, type);
-      failed = pl[0].p.type != type;
+      BOOST_CHECK_EQUAL(pl[0].type(), type);
+      failed = pl[0].type() != type;
 
-      real dst = 0;
-      for (int i = 0; i < 3; ++i) {
-	real dd = pos[i] - pl[0].r.p[i];
-	dst += dd*dd;
-      }
+      Real3D delta = pos - pl[0].position();
+
+      real dst = delta * delta;
       failed |= dst > 1e-10;
       BOOST_CHECK_SMALL(dst, 1e-10);
 
       if (failed) {
 	BOOST_TEST_MESSAGE("error at particle: expected "
-			   << pos[0] << " " <<  pos[1] << " " << pos[2] << " type " << type
+			   << pos << " type " << type
 			   << ", got "
-			   << pl[0].r.p[0] << " " << pl[0].r.p[1] << " " << pl[0].r.p[2] << " type " << pl[0].p.type);
+			   << pl[0].position() << " type " << pl[0].type());
       }
     }
     if (failed) {
-      BOOST_TEST_MESSAGE("error at cell: " << ipos[0] << " " <<  ipos[1] << " " << ipos[2]
+      BOOST_TEST_MESSAGE("error at cell: " << ipos
 			 << " on node " << nGrid.getNodePosition(0) << " "
 			 << nGrid.getNodePosition(1) << " " << nGrid.getNodePosition(2));
     }
@@ -351,7 +351,7 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
     ParticleList &pl = (*it)->particles;
     int cnt = pl.size();
     // map back cell to coordinates
-    int ipos[3];
+    Int3D ipos;
     cGrid.mapIndexToPosition(ipos, *it - domdec->getFirstCell());
 
     if (cnt == 1) {
@@ -373,28 +373,24 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
 	  }
 	}
       }
-      BOOST_TEST_MESSAGE("expect " << ghostCnt << " ghosts for particle at "
-			 << ipos[0] << " " <<  ipos[1] << " " << ipos[2]);
+      BOOST_TEST_MESSAGE("expect " << ghostCnt << " ghosts for particle at " << ipos);
       
       // calculate expected force from absolute cell location
-      real force[3];
+      Real3D force;
       for (int i = 0; i < 3; ++i) {
 	real ap = ipos[i] - cGrid.getFrameWidth() + nGrid.getNodePosition(i)*cGrid.getGridSize(i);
 	force[i] = ap*ghostCnt;
       }
       
-      real dst = 0;
-      for (int i = 0; i < 3; ++i) {
-	real dd = force[i] - pl[0].f.f[i];
-	dst += dd*dd;
-      }
+      Real3D delta = force - pl[0].force();
+      real dst = delta * delta;
       BOOST_CHECK_SMALL(dst, 1e-10);
       if (dst > 1e-10) {
-	BOOST_TEST_MESSAGE("error at cell: " << ipos[0] << " " <<  ipos[1] << " " << ipos[2]
+	BOOST_TEST_MESSAGE("error at cell: " << ipos
 			   << " on node " << nGrid.getNodePosition(0) << " "
 			   << nGrid.getNodePosition(1) << " " << nGrid.getNodePosition(2)
-			   << " expect force " << force[0] << " " << force[1] << " " << force[2]
-			   << " got force " << pl[0].f.f[0] << " " << pl[0].f.f[1] << " " << pl[0].f.f[2]);
+			   << " expect force " << force
+			   << " got force " << pl[0].force());
       }
     }
   }
@@ -405,19 +401,19 @@ BOOST_FIXTURE_TEST_CASE(checkGhosts, Fixture)
 bool afterResortCalled = false;
 bool beforeResortCalled = false;
 
-void beforeResort(ParticleList &pl, boost::mpi::packed_oarchive &ar) {
+void beforeResort(ParticleList &pl, OutBuffer& out) {
   if (pl.size() == 1) {
     beforeResortCalled = true;
     int res = 42;
-    ar << res;
+    out.write(res);
   }
 }
 
-void afterResort(ParticleList &pl, boost::mpi::packed_iarchive &ar) {
+void afterResort(ParticleList &pl, InBuffer& inbuf) {
   if (pl.size() == 1) {
     afterResortCalled = true;
     int res;
-    ar >> res;
+    inbuf.read(res);
     BOOST_CHECK_EQUAL(res, 42);
   }
 }
@@ -460,7 +456,7 @@ BOOST_AUTO_TEST_CASE(migrateParticle)
   BOOST_TEST_MESSAGE("Resorting particles...");
 
   // now resort the particles
-  domdec->resortParticles();
+  domdec->decompose();
 
   // now the particle should be on the the last node
   if (mpiWorld->rank() == lastnode) {

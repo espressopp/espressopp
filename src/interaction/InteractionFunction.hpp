@@ -16,8 +16,8 @@ namespace espresso {
 	  particles. 
 	  Returns whether the energy is non-zero.
       */
-      bool _getEnergy(Particle &p1, Particle &p2,
-		      const Real3DRef dist,
+      bool _getEnergy(const Particle &p1, const Particle &p2,
+		      const Real3D& dist,
 		      const real distSqr, real& energy) const {
 	return false;
       }
@@ -25,9 +25,9 @@ namespace espresso {
       /** Computes the force of the interaction for the two given
 	  particles.  Returns whether the force is non-zero.
       */
-      bool _getForce(Particle &p1, Particle &p2,
-		     const Real3DRef dist,
-		     const real distSqr, Real3DRef force) const {
+      bool _getForce(const Particle &p1, const Particle &p2,
+		     const Real3D& dist,
+		     const real distSqr, Real3D& force) const {
 	return false;
       }
     };
@@ -49,12 +49,12 @@ namespace espresso {
     template < class Derived > 
     class InteractionFunctionTemplate {
     public:
-      real getEnergy(Particle &p1, Particle &p2,
-		     const Real3DRef dist,
+      real getEnergy(const Particle &p1, const Particle &p2,
+		     const Real3D& dist,
 		     const real distSqr) const;
-      void getForce(Particle &p1, Particle &p2,
-		    const Real3DRef dist,
-		    const real distSqr, Real3DRef force) const;
+      void getForce(const Particle &p1, const Particle &p2,
+		    const Real3D& dist,
+		    const real distSqr, Real3D& force) const;
 
     protected:
       Derived* derived_this() {
@@ -69,8 +69,8 @@ namespace espresso {
     template < class Derived > 
     inline real
     InteractionFunctionTemplate< Derived >::
-    getEnergy(Particle &p1, Particle &p2,
-	      const Real3DRef dist,
+    getEnergy(const Particle &p1, const Particle &p2,
+	      const Real3D& dist,
 	      const real distSqr) const {
       derived_this()->getEnergy();
     }

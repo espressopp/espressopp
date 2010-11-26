@@ -10,12 +10,12 @@ namespace espresso {
     /* Constructor */
     OrthorhombicBC::
     OrthorhombicBC(shared_ptr< esutil::RNG > _rng,
-		   const ConstReal3DRef _boxL) 
+		   const Real3D& _boxL) 
       : BC(_rng)
     { setBoxL(_boxL); }
   
     /* Setter method for the box length */
-    void OrthorhombicBC::setBoxL(const ConstReal3DRef _boxL) {
+    void OrthorhombicBC::setBoxL(const Real3D& _boxL) {
       boxL = _boxL;
       for (int i = 0; i < 3; i++)
 	invBoxL[i] = 1.0/boxL[i];
@@ -24,9 +24,9 @@ namespace espresso {
     /* Returns the minimum image vector between two positions */
     void 
     OrthorhombicBC::
-    getMinimumImageVector(Real3DRef dist,
-			  const ConstReal3DRef pos1,
-			  const ConstReal3DRef pos2) const {
+    getMinimumImageVector(Real3D& dist,
+			  const Real3D& pos1,
+			  const Real3D& pos2) const {
       dist = pos1;
       dist -= pos2;
 
@@ -58,7 +58,7 @@ namespace espresso {
     /* Fold an individual coordinate in the specified direction */
     void 
     OrthorhombicBC::
-    foldCoordinate(Real3DRef pos, Int3DRef imageBox, int dir) const {
+    foldCoordinate(Real3D& pos, Int3D& imageBox, int dir) const {
       int tmp = static_cast<int>(floor(pos[dir]*invBoxL[dir]));
 
       imageBox[dir] += tmp;
@@ -81,7 +81,7 @@ namespace espresso {
     /* Unfold an individual coordinate in the specified direction */
     void 
     OrthorhombicBC::
-    unfoldCoordinate(Real3DRef pos, Int3DRef imageBox, int dir) const {
+    unfoldCoordinate(Real3D& pos, Int3D& imageBox, int dir) const {
       pos[dir] += imageBox[dir]*boxL[dir];
       imageBox[dir] = 0;
     }
@@ -89,7 +89,7 @@ namespace espresso {
     /* Get random position in the central image box */
     void 
     OrthorhombicBC::
-    getRandomPos(Real3DRef res) const {
+    getRandomPos(Real3D& res) const {
       for(int k = 0; k < 3; k++)
 	res[k] = boxL[k];
       
@@ -103,7 +103,7 @@ namespace espresso {
     registerPython() {
       using namespace espresso::python;
       class_<OrthorhombicBC, bases< BC > >
-	("bc_OrthorhombicBC", init< shared_ptr< esutil::RNG >, Real3DRef >())
+	("bc_OrthorhombicBC", init< shared_ptr< esutil::RNG >, Real3D& >())
 	.add_property("boxL", &OrthorhombicBC::getBoxL, &OrthorhombicBC::setBoxL)
       ;
     }

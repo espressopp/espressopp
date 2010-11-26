@@ -120,11 +120,13 @@ namespace espresso {
 
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
-        ids[i] = cit->p.id;
+        ids[i] = cit->id();
 
-        coordinates[3*i]   = cit->r.p[0];
-        coordinates[3*i+1] = cit->r.p[1];
-        coordinates[3*i+2] = cit->r.p[2];
+        Real3D& pos = cit->position();
+
+        coordinates[3*i]   = pos[0];
+        coordinates[3*i+1] = pos[1];
+        coordinates[3*i+2] = pos[2];
 
         i++;
       }

@@ -90,7 +90,7 @@ namespace espresso {
 
     void write(int& val) { ar << val; }
 
-    void write(Particle& p, int extradata, const real shift[3]) {
+    void write(Particle& p, int extradata, const Real3D& shift) {
 
       ParticlePosition r;
 

@@ -14,7 +14,7 @@ LOG4ESPP_LOGGER(CellGrid::logger, "DomainDecomposition.CellGrid");
 CellGridIllegal::CellGridIllegal()
   : std::runtime_error("cell grid dimensions have to be positive") {}
 
-CellGrid::CellGrid(const ConstInt3DRef _size,
+CellGrid::CellGrid(const Int3D& _size,
 		   const real _myLeft[3],
 		   const real _myRight[3],
 		   int _frame)
@@ -45,7 +45,7 @@ longint CellGrid::getNumberOfInnerCells() const
   return res;
 }
 
-longint CellGrid::mapPositionToCellClipped(const ConstReal3DRef pos) const
+longint CellGrid::mapPositionToCellClipped(const Real3D& pos) const
 {
   int cpos[3];
 
@@ -64,7 +64,7 @@ longint CellGrid::mapPositionToCellClipped(const ConstReal3DRef pos) const
   return mapPositionToIndex(cpos);  
 }
 
-longint CellGrid::mapPositionToCellChecked(const ConstReal3DRef pos) const
+longint CellGrid::mapPositionToCellChecked(const Real3D& pos) const
 {
   int cpos[3];
 
@@ -95,7 +95,7 @@ longint CellGrid::mapPositionToCellChecked(const ConstReal3DRef pos) const
   return mapPositionToIndex(cpos);  
 }
 
-bool CellGrid::mapPositionToCellCheckedAndClipped(longint &cell, const real pos[3]) const
+bool CellGrid::mapPositionToCellCheckedAndClipped(longint &cell, const Real3D& pos) const
 {
   int cpos[3];
   bool outside = false;

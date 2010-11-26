@@ -93,7 +93,7 @@ namespace espresso {
     vector< longint > toSend;
     // loop over the particle list
     for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
-      longint pid = pit->p.id;
+      longint pid = pit->id();
       
       // LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pid << ", find quadruples");
       //printf ("me = %d: send particle with pid %d find quadruples\n", mpiWorld->rank(), pid);

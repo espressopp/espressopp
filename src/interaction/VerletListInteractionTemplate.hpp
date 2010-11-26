@@ -64,16 +64,14 @@ namespace espresso {
 	   it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
-        int type1 = p1.p.type;
-        int type2 = p2.p.type;
+        int type1 = p1.type();
+        int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
 
 	Real3D force(0.0, 0.0, 0.0);
 	if(potential._computeForce(force, p1, p2)) {
-	  for(int k = 0; k < 3; k++) {
-	    p1.f.f[k] += force[k];
-	    p2.f.f[k] -= force[k];
-	  }
+          p1.force() += force;
+          p2.force() -= force;
         }
       }
     }
@@ -89,8 +87,8 @@ namespace espresso {
 	   it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
-        int type1 = p1.p.type;
-        int type2 = p2.p.type;
+        int type1 = p1.type();
+        int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
 	e += potential._computeEnergy(p1, p2);
       }
@@ -108,14 +106,14 @@ namespace espresso {
            it.isValid(); ++it) {                                         
         Particle &p1 = *it->first;                                       
         Particle &p2 = *it->second;                                      
-        int type1 = p1.p.type;                                           
-        int type2 = p2.p.type;
+        int type1 = p1.type();                                           
+        int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
         if(potential._computeForce(force, p1, p2)) {
-          Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
-          w = w + dist * Real3DRef(force);
+          Real3D dist = p1.position() - p2.position();
+          w = w + dist * force;
         }
       }
       real wsum;
@@ -131,13 +129,13 @@ namespace espresso {
            it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
-        int type1 = p1.p.type;
-        int type2 = p2.p.type;
+        int type1 = p1.type();
+        int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
         if(potential._computeForce(force, p1, p2)) {
-          Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
+          Real3D dist = p1.position() - p2.position();
           wij_[0] += dist[0] * force[0];
           wij_[1] += dist[1] * force[1];
           wij_[2] += dist[2] * force[2];

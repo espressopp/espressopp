@@ -68,14 +68,16 @@ namespace espresso {
 
     void Langevin::frictionThermo(Particle& p)
     {
-      real massf = sqrt(p.p.mass);
+      real massf = sqrt(p.mass());
 
-      for (int j = 0 ; j < 3 ; j++) {
-	p.f.f[j] += pref1 * p.m.v[j] + pref2*((*rng)()-0.5)*massf;
-      }
+      // get a random value for each vector component
 
-      LOG4ESPP_TRACE(theLogger, "new force of p = " << p.f.f[0] << " "
-		                 << p.f.f[1] << " " << p.f.f[2]);
+      Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);
+
+      p.force() += pref1 * p.velocity() + 
+                   pref2 * ranval * massf;
+
+      LOG4ESPP_TRACE(theLogger, "new force of p = " << p.force());
     }
 
     void Langevin::initialize(real timestep)

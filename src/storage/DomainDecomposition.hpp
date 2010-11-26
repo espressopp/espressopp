@@ -11,22 +11,22 @@ namespace espresso {
     class NodeGridMismatch: public std::invalid_argument
     {
     public:
-      NodeGridMismatch(Int3D gridRequested, int nodesAvailable);
+      NodeGridMismatch(const Int3D& gridRequested, int nodesAvailable);
     };
 
     class DomainDecomposition: public Storage {
     public:
       DomainDecomposition(shared_ptr< System > system,
 			  shared_ptr< boost::mpi::communicator > comm,
-			  const ConstInt3DRef _nodeGrid,
-			  const ConstInt3DRef _cellGrid);
+			  const Int3D& _nodeGrid,
+			  const Int3D& _cellGrid);
 
       virtual ~DomainDecomposition() {}
 
-      virtual Cell *mapPositionToCellClipped(const ConstReal3DRef pos);
-      virtual Cell *mapPositionToCellChecked(const ConstReal3DRef pos);
+      virtual Cell *mapPositionToCellClipped(const Real3D& pos);
+      virtual Cell *mapPositionToCellChecked(const Real3D& pos);
 
-      longint mapPositionToNodeClipped(const ConstReal3DRef pos);
+      longint mapPositionToNodeClipped(const Real3D& pos);
 
       const NodeGrid &getNodeGrid() const { return nodeGrid; }
       const CellGrid &getCellGrid() const { return cellGrid; }
@@ -37,7 +37,7 @@ namespace espresso {
       static void registerPython();
 
     protected:
-      virtual bool checkIsRealParticle(longint id, const ConstReal3DRef pos);
+      virtual bool checkIsRealParticle(longint id, const Real3D& pos);
       virtual void decomposeRealParticles();
       virtual void exchangeGhosts();
 
@@ -50,7 +50,7 @@ namespace espresso {
       /// init global Verlet list
       void initCellInteractions();
       /// set the grids and allocate space accordingly
-      void createCellGrid(const ConstInt3DRef nodeGrid, const ConstInt3DRef cellGrid);
+      void createCellGrid(const Int3D& nodeGrid, const Int3D& cellGrid);
       /// sort cells into local/ghost cell arrays
       void markCells();
       /// fill a list of cells with the cells from a certain region of the domain grid

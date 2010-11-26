@@ -41,13 +41,13 @@ namespace espresso {
 	ToLeft = -1, ToRight = 1
       };
 
-      NodeGrid(const ConstInt3DRef grid,
+      NodeGrid(const Int3D& grid,
 	       const longint nodeId,
-	       const ConstReal3DRef domainSize);
+	       const Real3D& domainSize);
 
       /// map coordinate to a node. Positions outside are clipped back
       longint 
-      mapPositionToNodeClipped(const ConstReal3DRef pos) const;
+      mapPositionToNodeClipped(const Real3D& pos) const;
 
       /// get this node's coordinates
       longint getNodePosition(int axis) const { return nodePos[axis]; }

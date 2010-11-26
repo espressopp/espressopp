@@ -10,11 +10,11 @@ namespace espresso {
     Potential::registerPython() {
       using namespace espresso::python;
 
-      real (Potential::*computeEnergy1)(ConstReal3DRef dist) const =
+      real (Potential::*computeEnergy1)(const Real3D& dist) const =
 	&Potential::computeEnergy;
       real (Potential::*computeEnergy2)(real dist) const =
 	&Potential::computeEnergy;
-      Real3D (Potential::*computeForce)(ConstReal3DRef dist) const =
+      Real3D (Potential::*computeForce)(const Real3D& dist) const =
 	&Potential::computeForce;
 
       class_< Potential, boost::noncopyable >

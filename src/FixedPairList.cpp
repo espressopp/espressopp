@@ -84,7 +84,7 @@ namespace espresso {
     // loop over the particle list
     for (ParticleList::Iterator pit(pl);
 	 pit.isValid(); ++pit) {
-      longint pid = pit->p.id;
+      longint pid = pit->id();
       
       LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pid << ", find pairs");
 

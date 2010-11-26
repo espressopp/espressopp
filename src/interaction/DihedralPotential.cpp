@@ -11,20 +11,20 @@ namespace espresso {
       using namespace espresso::python;
 
       real (DihedralPotential::*computeEnergy1)
-        (ConstReal3DRef dist21,
-         ConstReal3DRef dist32,
-         ConstReal3DRef dist43) const =
+        (const Real3D& dist21,
+         const Real3D& dist32,
+         const Real3D& dist43) const =
 	&DihedralPotential::computeEnergy;
       real (DihedralPotential::*computeEnergy2)(real phi) const =
 	&DihedralPotential::computeEnergy;
       void (DihedralPotential::*computeForce)
-        (Real3DRef force1,
-         Real3DRef force2,
-         Real3DRef force3,
-         Real3DRef force4,
-         ConstReal3DRef dist21,
-         ConstReal3DRef dist32,
-         ConstReal3DRef dist43) const =
+        (Real3D& force1,
+         Real3D& force2,
+         Real3D& force3,
+         Real3D& force4,
+         const Real3D& dist21,
+         const Real3D& dist32,
+         const Real3D& dist43) const =
 	&DihedralPotential::computeForce;
 
       class_< DihedralPotential, boost::noncopyable >

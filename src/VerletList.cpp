@@ -53,19 +53,14 @@ namespace espresso {
   /*-------------------------------------------------------------*/
   
   void VerletList::checkPair(Particle& pt1, Particle& pt2)
-    {
-    Real3DRef pos1 = pt1.r.p;
-    Real3DRef pos2 = pt2.r.p;
+  {
 
-    Real3D d;
-    real distsq;
+    Real3D d = pt1.position() - pt2.position();
+    real distsq = d.sqr();
 
-    d = pos1;
-    d -= pos2;
-    distsq = d.sqr();
-
-    LOG4ESPP_TRACE(theLogger, "p1: " << pt1.p.id << " @ " << pos1
-		   << " - p2: " << pt2.p.id << " @ " << pos2
+    LOG4ESPP_TRACE(theLogger, "p1: " << pt1.id() 
+                   << " @ " << pt1.position() 
+		   << " - p2: " << pt2.id() << " @ " << pt2.position()
 		   << " -> distsq = " << distsq);
   
     if (distsq > cutsq) return;

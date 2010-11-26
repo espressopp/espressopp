@@ -11,6 +11,7 @@
 #include <boost/mpi.hpp>
 #include "esutil/ESPPIterator.hpp"
 #include "Real3D.hpp"
+#include "Int3D.hpp"
 
 namespace espresso {
   struct ParticleProperties {
@@ -37,12 +38,11 @@ namespace espresso {
    * to classify how properties behave e.g. on communication.
    */
   struct ParticlePosition {
-    real p[3];
 
-    void copyShifted(ParticlePosition &dst, const real shift[3]) {
-      for (int i = 0; i < 3; ++i) {
-	dst.p[i] = p[i] + shift[i];
-      }
+    Real3D p;
+
+    void copyShifted(ParticlePosition &dst, const Real3D& shift) const {
+      dst.p = p + shift;
     }
 
   private:
@@ -61,17 +61,21 @@ namespace espresso {
    * This class contains all properties of a particle that behave like
    * forces. Further extensions might contain torques. This is usefule
    * to classify how properties behave e.g. on communication.
+   * Important: combiner operatior += must be available
+   * to combine results of ghosts with real particles.
    */
+
   struct ParticleForce {
-    real f[3];
+
+    Real3D f;
 
     /** add all force type properties of two particles
 	(typically used between a real particle and its
-	ghost image(s))*/
-    ParticleForce &operator+=(const ParticleForce &_f) {
-      for (int i = 0; i < 3; ++i) {
-        f[i] += _f.f[i];
-      }
+	ghost image(s))
+    */
+
+    ParticleForce& operator+=(const ParticleForce& otherF) {
+      f += otherF.f;
       return *this;
     }
 
@@ -93,7 +97,8 @@ namespace espresso {
    * to classify how properties behave e.g. on communication.
    */
   struct ParticleMomentum {
-    real v[3];
+
+    Real3D v;
 
   private:
     friend class boost::serialization::access;
@@ -106,8 +111,9 @@ namespace espresso {
   };
 
   struct ParticleLocal {
+
     // the image of the particle
-    int i[3];
+    Int3D i;
     bool ghost;
 
   private:
@@ -122,11 +128,19 @@ namespace espresso {
   };
 
   struct Particle {
-    ParticleProperties p;
-    ParticlePosition r;
-    ParticleMomentum m;
-    ParticleForce f;
-    ParticleLocal l;
+
+    friend class InBuffer;
+    friend class OutBuffer;
+
+    /** bitmask: which extra data elements to in- or exclude from
+        ghost sending
+    */
+
+    enum ExtraDataElements {
+      DATA_PROPERTIES=1,
+      DATA_MOMENTUM=2,
+      DATA_LOCAL=4
+    };
 
     Particle() { init(); }
 
@@ -140,41 +154,81 @@ namespace espresso {
     // getter and setter used for export in Python
 
     // Properties
+
+    size_t& id() { return p.id; }
+    const size_t& id() const { return p.id; }
     longint getId() const { return p.id; }
 
-    real getType() const { return p.type; }
+    size_t& type() { return p.type; }
+    const size_t& type() const { return p.type; }
+    int getType() const { return p.type; }
     void setType(int type) { p.type = type; }
 
+    real& mass() { return p.mass; }
+    const real& mass() const { return p.mass; }
     real getMass() const { return p.mass; }
     void setMass(real mass) { p.mass = mass; }
 
     // Position
-    Real3D getPos() const { return Real3D(r.p); }
-    void setPos(const ConstReal3DRef &pos) {
-      r.p[0] = pos[0];
-      r.p[1] = pos[1]; 
-      r.p[2] = pos[2]; 
-    }
+
+    Real3D& position() { return r.p; }
+    const Real3D& position() const { return r.p; }
+    Real3D getPos() const { return r.p; }
+    void setPos(const Real3D& pos) { r.p = pos; }
+
+    // All Forces
+
+    ParticleForce& particleForce() { return f; }
+    const ParticleForce& particleForce() const { return f; }
 
     // Force
-    Real3D getF() const { return Real3D(f.f); }
-    void setF(const ConstReal3DRef &f) { 
-      this->f.f[0] = f[0]; 
-      this->f.f[1] = f[1]; 
-      this->f.f[2] = f[2]; 
-    }
+
+    Real3D& force() { return f.f; }
+    const Real3D& force() const { return f.f; }
+
+    Real3D getF() const { return f.f; }
+    void setF(const Real3D& force) { f.f = force; }
 
     // Momentum
-    Real3D getV() const { return Real3D(m.v); }
-    void setV(const ConstReal3DRef &v) { 
-      m.v[0] = v[0]; 
-      m.v[1] = v[1]; 
-      m.v[2] = v[2]; 
-    }
 
+    Real3D& velocity() { return m.v; }
+    const Real3D& velocity() const { return m.v; }
+    Real3D getV() const { return m.v; }
+    void setV(const Real3D& velocity) { m.v = velocity; }
+
+    // Image, Ghost
+
+    Int3D& image() { return l.i; }
+    const Int3D& image() const { return l.i; }
+
+    bool& ghost() { return l.ghost; }
+    const bool& ghost() const { return l.ghost; }
+    
     static void registerPython();
   
+    void copyAsGhost(const Particle& src, int extradata, const Real3D& shift)
+    {
+      src.r.copyShifted(r, shift);
+      if (extradata & DATA_PROPERTIES) {
+        p = src.p;
+      }
+      if (extradata & DATA_MOMENTUM) {
+        m = src.m;
+      }
+      if (extradata & DATA_LOCAL) {
+        l = src.l;
+      }
+      ghost() = 1;
+    }
+
   private:
+
+    ParticleProperties p;
+    ParticlePosition r;
+    ParticleMomentum m;
+    ParticleLocal l;
+    ParticleForce f;
+
     friend class boost::serialization::access;
     template< class Archive >
     void serialize(Archive &ar, const unsigned int version)

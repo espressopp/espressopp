@@ -24,7 +24,7 @@ namespace espresso {
   public:
     CellGrid() {}
 
-    CellGrid(const ConstInt3DRef grid,
+    CellGrid(const Int3D& grid,
 	     const real _myLeft[3],
 	     const real _myRight[3],
 	     int frame);
@@ -32,12 +32,12 @@ namespace espresso {
     int getFrameWidth() const { return frame; }
 
     /// map coordinate to a non-ghost cell. Positions outside the inner grid are clipped back
-    longint mapPositionToCellClipped(const ConstReal3DRef pos) const;
+    longint mapPositionToCellClipped(const Real3D& pos) const;
     /// map coordinate to a non-ghost cell. Returns noCell if the position is outside the inner grid
-    longint mapPositionToCellChecked(const ConstReal3DRef pos) const;
+    longint mapPositionToCellChecked(const Real3D& pos) const;
     /** map coordinate to a non-ghost cell. Returns true if the returned cell is clipped, i.e. the
 	position is outside the inner grid */
-    bool mapPositionToCellCheckedAndClipped(longint &, const real pos[3]) const;
+    bool mapPositionToCellCheckedAndClipped(longint &, const Real3D& pos) const;
 
     /// check wether a position is in the inner domain
     bool isInnerPosition(real pos[3]) {

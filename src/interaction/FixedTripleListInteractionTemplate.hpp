@@ -67,20 +67,17 @@ namespace espresso {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         Particle &p3 = *it->third;
-        int type1 = p1.p.type;
-        int type2 = p2.p.type;
-        const Potential &potential = getPotential(type1, type2);
+        const Potential &potential = getPotential(p1.type(), p2.type());
 
         Real3D force12(0.0, 0.0, 0.0);
         Real3D force32(0.0, 0.0, 0.0);
-        Real3D dist12 = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
-        Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
+        const espresso::bc::BC& bc = *getSystemRef().bc;
+        Real3D dist12 = bc.getMinimumImageVector(p1.position(), p2.position());
+        Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
 	potential._computeForce(force12, force32, dist12, dist32);
-	for(int k = 0; k < 3; k++) {
-	  p1.f.f[k] += force12[k];
-	  p2.f.f[k] -= force12[k] + force32[k];
-	  p3.f.f[k] += force32[k];
-	}
+        p1.force() += force12;
+        p2.force() -= force12 + force32;
+	p3.force() += force32;
       }
     }
 
@@ -90,16 +87,15 @@ namespace espresso {
     computeEnergy() {
       LOG4ESPP_INFO(theLogger, "compute energy of the triples");
 
+      const espresso::bc::BC& bc = *getSystemRef().bc;
       real e = 0.0;
       for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Particle &p3 = *it->third;
-        int type1 = p1.p.type;
-        int type2 = p2.p.type;
-        const Potential &potential = getPotential(type1, type2);
-        Real3D dist12 = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
-        Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
+        const Particle &p1 = *it->first;
+        const Particle &p2 = *it->second;
+        const Particle &p3 = *it->third;
+        const Potential &potential = getPotential(p1.type(), p2.type());
+        Real3D dist12 = bc.getMinimumImageVector(p1.position(), p2.position());
+        Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
         e += potential._computeEnergy(dist12, dist32);
       }
       real esum;
@@ -115,16 +111,15 @@ namespace espresso {
 
       real w = 0.0;
       for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Particle &p3 = *it->third;
-        int type1 = p1.p.type;
-        int type2 = p2.p.type;
-        const Potential &potential = getPotential(type1, type2);
+        const Particle &p1 = *it->first;
+        const Particle &p2 = *it->second;
+        const Particle &p3 = *it->third;
+        const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D force12(0.0, 0.0, 0.0);
         Real3D force32(0.0, 0.0, 0.0);
-        Real3D dist12 = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
-        Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
+        const espresso::bc::BC& bc = *getSystemRef().bc;
+        Real3D dist12 = bc.getMinimumImageVector(p1.position(), p2.position());
+        Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
         potential._computeForce(force12, force32, dist12, dist32);
         w += dist12 * force12 + dist32 * force32;
       }
@@ -138,16 +133,15 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 
       for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        Particle &p3 = *it->third;
-        int type1 = p1.p.type;
-        int type2 = p2.p.type;
-        const Potential &potential = getPotential(type1, type2);
+        const Particle &p1 = *it->first;
+        const Particle &p2 = *it->second;
+        const Particle &p3 = *it->third;
+        const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D force12(0.0, 0.0, 0.0);
         Real3D force32(0.0, 0.0, 0.0);
-        Real3D dist12 = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
-        Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.r.p, p2.r.p);
+        const espresso::bc::BC& bc = *getSystemRef().bc;
+        Real3D dist12 = bc.getMinimumImageVector(p1.position(), p2.position());
+        Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
         potential._computeForce(force12, force32, dist12, dist32);
         wij_[0] += dist12[0] * force12[0] + dist32[0] * force32[0];
         wij_[1] += dist12[1] * force12[1] + dist32[1] * force32[1];

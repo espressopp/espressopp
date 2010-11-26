@@ -12,8 +12,8 @@ namespace espresso {
     LOG4ESPP_LOGGER(BC::logger, "BC");
 
     Real3D
-    BC::getMinimumImageVector(const ConstReal3DRef pos1,
-			      const ConstReal3DRef pos2) const {
+    BC::getMinimumImageVector(const Real3D& pos1,
+			      const Real3D& pos2) const {
       Real3D res;
       getMinimumImageVector(res, pos1, pos2);
       return res;
@@ -27,26 +27,26 @@ namespace espresso {
     }
 
     void 
-    BC::foldPosition(Real3DRef pos, Int3DRef imageBox) const {
+    BC::foldPosition(Real3D& pos, Int3D& imageBox) const {
       for (int i = 0; i < 3; ++i)
 	foldCoordinate(pos, imageBox, i);
     }
 
     void
-    BC::foldPosition(Real3DRef pos) const {
+    BC::foldPosition(Real3D& pos) const {
       Int3D imageBox(0, 0, 0);
       foldPosition(pos, imageBox);
     }
 
     void 
-    BC::unfoldPosition(Real3DRef pos, Int3DRef imageBox) const {
+    BC::unfoldPosition(Real3D& pos, Int3D& imageBox) const {
       for (int i = 0; i < 3; ++i)
 	unfoldCoordinate(pos, imageBox, i);
     }
 
     boost::python::tuple 
-    BC::getFoldedPosition(ConstReal3DRef pos, 
-			  ConstInt3DRef imageBox) const {
+    BC::getFoldedPosition(const Real3D& pos, 
+			  const Int3D& imageBox) const {
       Real3D foldedPos = pos;
       Int3D foldedImageBox = imageBox;
       foldPosition(foldedPos, foldedImageBox);
@@ -54,7 +54,7 @@ namespace espresso {
     }
 
     boost::python::tuple 
-    BC::getFoldedPosition(ConstReal3DRef pos) const {
+    BC::getFoldedPosition(const Real3D& pos) const {
       Real3D foldedPos = pos;
       Int3D foldedImageBox(0, 0, 0);
       foldPosition(foldedPos, foldedImageBox);
@@ -62,8 +62,8 @@ namespace espresso {
     }
 
     Real3D
-    BC::getUnfoldedPosition(ConstReal3DRef pos, 
-			    ConstInt3DRef imageBox) const {
+    BC::getUnfoldedPosition(const Real3D& pos, 
+			    const Int3D& imageBox) const {
       Real3D unfoldedPos = pos;
       Int3D unfoldedImageBox = imageBox;
       unfoldPosition(unfoldedPos, unfoldedImageBox);
@@ -81,20 +81,20 @@ namespace espresso {
       // be careful: boost::noncopyable must be used for abstract classes with pure routines
       // no_init must be used as the abstract class BC has no constructor
 
-      Real3D (BC::*pygetMinimumImageVector)(const ConstReal3DRef pos1,
-					    const ConstReal3DRef pos2) const 
+      Real3D (BC::*pygetMinimumImageVector)(const Real3D& pos1,
+					    const Real3D& pos2) const 
 	= &BC::getMinimumImageVector;
       
       boost::python::tuple (BC::*pygetFoldedPosition1)
-	(ConstReal3DRef pos, ConstInt3DRef imageBox) const
+	(const Real3D& pos, const Int3D& imageBox) const
 	= &BC::getFoldedPosition;
 
       boost::python::tuple (BC::*pygetFoldedPosition2)
-	(ConstReal3DRef pos) const
+	(const Real3D& pos) const
 	= &BC::getFoldedPosition;
 
       Real3D (BC::*pygetUnfoldedPosition)
-	(ConstReal3DRef pos, ConstInt3DRef imageBox) const 
+	(const Real3D& pos, const Int3D& imageBox) const 
 	= &BC::getUnfoldedPosition;
 
       Real3D (BC::*pygetRandomPos)() const = &BC::getRandomPos;

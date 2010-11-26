@@ -59,10 +59,8 @@ struct Fixture {
 
     BOOST_MESSAGE("cellGrid = " << ncells << " x " << ncells << " x " << ncells);
 
-    ConstReal3DRef boxLRef(boxL);
-
-    int nodeGrid[3] = { 1, 1, mpiWorld->size() };
-    int cellGrid[3] = { 1, 1, 1 };
+    Int3D nodeGrid(1, 1, mpiWorld->size());
+    Int3D cellGrid(1, 1, 1 );
 
     for (int i = 0; i < 3; i++) {
       int ncells = 1;
@@ -73,12 +71,11 @@ struct Fixture {
        cellGrid[i] = ncells;
     }
 
-    BOOST_MESSAGE("ncells in each dim / proc: " << cellGrid[0] << " x " <<
-                                 cellGrid[1] << " x " << cellGrid[2]);
+    BOOST_MESSAGE("ncells in each dim / proc: " << cellGrid);
 
     system = make_shared< System >();
     system->rng = make_shared< RNG >();
-    system->bc = make_shared< OrthorhombicBC >(system->rng, boxLRef);
+    system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
     system->skin = skin;
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,
@@ -97,7 +94,8 @@ struct Fixture {
           real x = (i + r) / N * size;
           real y = (j + r) / N * size;
           real z = (k + r) / N * size;
-          real pos[3] = { x, y, z };
+
+          Real3D pos(x, y, z);
 
           if (mpiWorld->rank() == 0) {
 
@@ -116,7 +114,7 @@ struct Fixture {
     // loop over all particles of the real cells and set velocity in x - direction
 
     for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-      cit->m.v[0] = 1.0;
+      cit->velocity() = Real3D(1.0, 0.0, 0.0);
     }
 
     system->storage = domdec;
@@ -154,7 +152,7 @@ BOOST_FIXTURE_TEST_CASE(moveParticles, Fixture)
 
   for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
-    int id = cit->p.id;
+    int id = cit->id();
 
     int z = id % N;
     int y = (id - z) / N % N;
@@ -163,9 +161,10 @@ BOOST_FIXTURE_TEST_CASE(moveParticles, Fixture)
     // printf("particle %d = (%d %d %d) has pos %f %f %f\n",
     //        id, x, y, z, cit->r.p[0], cit->r.p[1], cit->r.p[2]);
 
-    BOOST_CHECK_SMALL((x + 0.5) / N * size - cit->r.p[0], 1e-6);
-    BOOST_CHECK_SMALL((y + 0.5) / N * size - cit->r.p[1], 1e-6);
-    BOOST_CHECK_SMALL((z + 0.5) / N * size - cit->r.p[2], 1e-6);
+    const Real3D& pos = cit->position();
+    BOOST_CHECK_SMALL((x + 0.5) / N * size - pos[0], 1e-6);
+    BOOST_CHECK_SMALL((y + 0.5) / N * size - pos[1], 1e-6);
+    BOOST_CHECK_SMALL((z + 0.5) / N * size - pos[2], 1e-6);
   }
 
   // make a final reduction to synchronize the processors

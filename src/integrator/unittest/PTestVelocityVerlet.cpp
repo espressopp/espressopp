@@ -57,10 +57,8 @@ struct Fixture {
 
     real skin   = 0.3;
 
-    ConstReal3DRef boxLRef(boxL);
-
-    int nodeGrid[3] = { 1, 1, mpiWorld->size() };
-    int cellGrid[3] = { 1, 1, 1 };
+    Int3D nodeGrid(1, 1, mpiWorld->size());
+    Int3D cellGrid(1, 1, 1);
 
     for (int i = 0; i < 3; i++) {
       int ncells = 1;
@@ -71,12 +69,11 @@ struct Fixture {
        cellGrid[i] = ncells;
     }
 
-    BOOST_MESSAGE("ncells in each dim / proc: " << cellGrid[0] << " x " <<
-                                 cellGrid[1] << " x " << cellGrid[2]);
+    BOOST_MESSAGE("ncells in each dim / proc: " << cellGrid);
 
     system = make_shared< System >();
     system->rng = make_shared< RNG >();
-    system->bc = make_shared< OrthorhombicBC >(system->rng, boxLRef);
+    system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
     system->skin = skin;
     domdec = make_shared< DomainDecomposition >(system,
                                                 mpiWorld,
@@ -94,11 +91,12 @@ struct Fixture {
           real x = (i + r) / N * SIZE;
           real y = (j + r) / N * SIZE; 
           real z = (k + r) / N * SIZE;
-          real pos[3] = { x, y, z };
+
+          Real3D pos(x, y, z);
       
           if (mpiWorld->rank() == 0) {
           
-            printf("add particle at %f %f %f\n", x, y, z);
+            BOOST_MESSAGE("add particle at " << pos);
             domdec->addParticle(id, pos);
 
           }
@@ -134,9 +132,8 @@ struct DomainFixture {
 
     real skin   = 0.3;
 
-    int nodeGrid[3] = { 1, 1, mpiWorld->size() };
-
-    int cellGrid[3] = { 1, 1, 1 };
+    Int3D nodeGrid(1, 1, mpiWorld->size());
+    Int3D cellGrid(1, 1, 1);
 
     for (int i = 0; i < 3; i++) {
 
@@ -154,8 +151,7 @@ struct DomainFixture {
        cellGrid[i] = ncells;
     }
 
-    BOOST_MESSAGE("ncells in each dim / proc: " << cellGrid[0] << " x " <<
-                                 cellGrid[1] << " x " << cellGrid[2]);
+    BOOST_MESSAGE("ncells in each dim / proc: " << cellGrid);
 
     system = make_shared< System >();
     system->rng = make_shared< RNG >();
@@ -185,10 +181,11 @@ struct LatticeFixture : DomainFixture {
           real x = (i + r) / N * SIZE;
           real y = (j + r) / N * SIZE;
           real z = (k + r) / N * SIZE;
-          real pos[3] = { x, y, z };
+
+          Real3D pos(x, y, z);
 
           if (mpiWorld->rank() == 0) {
-            BOOST_MESSAGE("add particle at pos " << x << " " << y << " " << z);
+            BOOST_MESSAGE("add particle at pos " << pos);
             domdec->addParticle(id, pos);
           }
 
@@ -202,7 +199,7 @@ struct LatticeFixture : DomainFixture {
     // loop over all particles of the real cells and set velocity in x - direction
 
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-      cit->m.v[0] = 1.0;
+      cit->velocity() = Real3D(1.0, 0.0, 0.0);
     }
 
     BOOST_MESSAGE("number of lattice particles in storage = " <<
@@ -235,15 +232,17 @@ BOOST_FIXTURE_TEST_CASE(moveParticles, LatticeFixture)
 
   for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
-    int id = cit->p.id;
+    int id = cit->id();
 
     int z = id % N;
     int y = (id - z) / N % N;
     int x = (id - N * y - z);  x /= N * N; x %= N;
 
-    BOOST_CHECK_SMALL((x + 0.5) / N * size - cit->r.p[0], 1e-6);
-    BOOST_CHECK_SMALL((y + 0.5) / N * size - cit->r.p[1], 1e-6);
-    BOOST_CHECK_SMALL((z + 0.5) / N * size - cit->r.p[2], 1e-6);
+    const Real3D& pos = cit->position();
+
+    BOOST_CHECK_SMALL((x + 0.5) / N * size - pos[0], 1e-6);
+    BOOST_CHECK_SMALL((y + 0.5) / N * size - pos[1], 1e-6);
+    BOOST_CHECK_SMALL((z + 0.5) / N * size - pos[2], 1e-6);
   }
 
   // make a final reduction to synchronize the processors

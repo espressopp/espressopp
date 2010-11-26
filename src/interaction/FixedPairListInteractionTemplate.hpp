@@ -69,17 +69,14 @@ namespace espresso {
       for (FixedPairList::Iterator it(*fixedpairList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
-        int type1 = p1.p.type;
-        int type2 = p2.p.type;
-        const Potential &potential = getPotential(type1, type2);
+        const Potential &potential = getPotential(p1.type(), p2.type());
 
 	Real3D force(0.0, 0.0, 0.0);
-        Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
+        Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.position(), 
+                                                               p2.position());
 	if(potential._computeForce(force, dist)) {
-	  for(int k = 0; k < 3; k++) {
-	    p1.f.f[k] += force[k];
-	    p2.f.f[k] -= force[k];
-	  }
+          p1.force() += force;
+          p2.force() -= force;
         }
       }
     }
@@ -94,12 +91,10 @@ namespace espresso {
       real e = 0.0;
       for (FixedPairList::Iterator it(*fixedpairList); 
 	   it.isValid(); ++it) {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        int type1 = p1.p.type;
-        int type2 = p2.p.type;
-        const Potential &potential = getPotential(type1, type2);
-        Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
+        const Particle &p1 = *it->first;
+        const Particle &p2 = *it->second;
+        const Potential &potential = getPotential(p1.type(), p2.type());
+        Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.position(), p2.position());
 	e += potential._computeEnergy(dist);
       }
       real esum;
@@ -114,14 +109,12 @@ namespace espresso {
       real w = 0.0;
       for (FixedPairList::Iterator it(*fixedpairList);                
            it.isValid(); ++it) {                                         
-        Particle &p1 = *it->first;                                       
-        Particle &p2 = *it->second;                                      
-        int type1 = p1.p.type;                                           
-        int type2 = p2.p.type;
-        const Potential &potential = getPotential(type1, type2);
+        const Particle &p1 = *it->first;                                       
+        const Particle &p2 = *it->second;                                      
+        const Potential &potential = getPotential(p1.type(), p2.type());
 
         Real3D force(0.0, 0.0, 0.0);
-        Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
+        Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.position(), p2.position());
         if(potential._computeForce(force, dist)) {
           w += dist * force;
         }
@@ -135,13 +128,11 @@ namespace espresso {
 
       for (FixedPairList::Iterator it(*fixedpairList);
            it.isValid(); ++it) {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        int type1 = p1.p.type;
-        int type2 = p2.p.type;
-        const Potential &potential = getPotential(type1, type2);
+        const Particle &p1 = *it->first;
+        const Particle &p2 = *it->second;
+        const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D force(0.0, 0.0, 0.0);
-        Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.r.p, p2.r.p);
+        Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.position(), p2.position());
         if(potential._computeForce(force, dist)) { 
           wij_[0] += dist[0] * force[0];
           wij_[1] += dist[1] * force[1];

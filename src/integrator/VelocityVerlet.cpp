@@ -175,13 +175,10 @@ namespace espresso {
 
 	real sqDist = 0.0;
 
-	LOG4ESPP_DEBUG(theLogger, "Particle " << cit->p.id << 
-		       ", pos = " << cit->r.p[0] << " " 
-		       << cit->r.p[1] << " " <<  cit->r.p[2] <<
-		       ", v = " << cit->m.v[0] << " " 
-		       << cit->m.v[1] << " " <<  cit->m.v[2] <<
-		       ", f = " << cit->f.f[0] << " " 
-		       << cit->f.f[1] << " " <<  cit->f.f[2]);
+	LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() << 
+		       ", pos = " << cit->position() <<
+		       ", v = " << cit->velocity() << 
+		       ", f = " << cit->force());
 
         /* more precise for DEBUG:
 
@@ -192,16 +189,14 @@ namespace espresso {
               
         */
 
-        real dtfm = 0.5 * dt / cit->p.mass;
+        real dtfm = 0.5 * dt / cit->mass();
 
-	for (int j = 0; j < 3; j++) {
-	  // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) 
-	  cit->m.v[j] += dtfm * cit->f.f[j];
-	  // Propagate positions (only NVT): p(t + dt)   = p(t) + dt * v(t+0.5*dt) 
-	  real deltaP = dt * cit->m.v[j];
-	  cit->r.p[j] += deltaP;
-	  sqDist += deltaP * deltaP;
-	}
+        // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) 
+        cit->velocity() += dtfm * cit->force();
+        // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt) 
+        Real3D deltaP = dt * cit->velocity();
+        cit->position() += deltaP;
+        sqDist += deltaP * deltaP;
 
 	count++;
 
@@ -232,13 +227,11 @@ namespace espresso {
 
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
-        real dtfm = 0.5 * dt / cit->p.mass;
+        real dtfm = 0.5 * dt / cit->mass();
 
-	for (int j = 0; j < 3; j++) {
+	/* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
 
-	  /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
-	  cit->m.v[j] += dtfm * cit->f.f[j];
-	}
+	cit->velocity() += dtfm * cit->force();
       }
     }
 
@@ -319,9 +312,7 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "init forces for real + ghost particles");
 
       for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
-	for (int j = 0; j < 3; j++) {
-	  cit->f.f[j] = 0.0;
-	}
+	cit->force() = 0.0;
       }
     }
 
@@ -346,9 +337,8 @@ namespace espresso {
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
 
 	LOG4ESPP_DEBUG(theLogger, 
-		       "Particle " << cit->p.id 
-		       << ", force = " << cit->f.f[0] << " "
-		       << cit->f.f[1] << " " <<  cit->f.f[2]);
+		       "Particle " << cit->id()
+		       << ", force = " << cit->force());
       }
     }
 
@@ -373,9 +363,8 @@ namespace espresso {
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
 
 	LOG4ESPP_DEBUG(theLogger, 
-		       "Particle " << cit->p.id
-		       << ", position = " << cit->r.p[0] << " "
-		       << cit->r.p[1] << " " <<  cit->r.p[2]);
+		       "Particle " << cit->id()
+		       << ", position = " << cit->position());
       }
     }
 

@@ -10,13 +10,13 @@ namespace espresso {
   namespace interaction {
     class Potential {
     public:
-      virtual real computeEnergy(Particle &p1, Particle &p2) const = 0;
-      virtual real computeEnergy(ConstReal3DRef dist) const = 0;
+      virtual real computeEnergy(const Particle &p1, const Particle &p2) const = 0;
+      virtual real computeEnergy(const Real3D& dist) const = 0;
       virtual real computeEnergy(real dist) const = 0;
       virtual real computeEnergySqr(real distSqr) const = 0;
       
-      virtual Real3D computeForce(Particle &p1, Particle &p2) const = 0;
-      virtual Real3D computeForce(ConstReal3DRef dist) const = 0;
+      virtual Real3D computeForce(const Particle &p1, const Particle &p2) const = 0;
+      virtual Real3D computeForce(const Real3D& dist) const = 0;
 
       virtual void setCutoff(real _cutoff) = 0;
       virtual real getCutoff() const = 0;
@@ -44,12 +44,12 @@ namespace espresso {
       PotentialTemplate();
 
       // Implements the Potential virtual interface
-      virtual real computeEnergy(Particle &p1, Particle &p2) const;
-      virtual real computeEnergy(ConstReal3DRef dist) const;
+      virtual real computeEnergy(const Particle &p1, const Particle &p2) const;
+      virtual real computeEnergy(const Real3D& dist) const;
       virtual real computeEnergy(real dist) const;
       virtual real computeEnergySqr(real distsqr) const;
-      virtual Real3D computeForce(Particle &p1, Particle &p2) const;
-      virtual Real3D computeForce(ConstReal3DRef dist) const;
+      virtual Real3D computeForce(const Particle &p1, const Particle &p2) const;
+      virtual Real3D computeForce(const Real3D& dist) const;
       virtual void setCutoff(real _cutoff);
       virtual real getCutoff() const;
       virtual void setShift(real _shift);
@@ -59,23 +59,23 @@ namespace espresso {
 
       // Implements the non-virtual interface 
       // (used by e.g. the Interaction templates)
-      real _computeEnergy(Particle &p1, Particle &p2) const;
-      real _computeEnergy(ConstReal3DRef dist) const;
+      real _computeEnergy(const Particle &p1, const Particle &p2) const;
+      real _computeEnergy(const Real3D& dist) const;
       real _computeEnergy(real dist) const;
       real _computeEnergySqr(real distSqr) const;
 
-      bool _computeForce(Real3DRef force, 
-			 Particle &p1, Particle &p2) const;
-      bool _computeForce(Real3DRef force, 
-			 ConstReal3DRef dist) const;
+      bool _computeForce(Real3D& force, 
+			 const Particle &p1, const Particle &p2) const;
+      bool _computeForce(Real3D& force, 
+			 const Real3D& dist) const;
 
       // Requires the following non-virtual interface in Derived
       // real _computeEnergySqrRaw(real distSqr) const;
-      // bool _computeForceRaw(ConstReal3DRef dist, Real3DRef force) const;
+      // bool _computeForceRaw(const Real3D& dist, const Real3D& force) const;
 
 
-      // void _computeForce(Particle &p1, Particle &p2, 
-      // 			 Real3DRef force) const {
+      // void _computeForce(const Particle &p1, const Particle &p2, 
+      //                    Real3D& force) const {
       // 	Real3D dist = p1.r.p - p2.r.p;
       // 	derived_this()->_computeForce(dist, force);
       // }
@@ -107,7 +107,7 @@ namespace espresso {
     // 	throw Potential::BadCall();
     //   }
 
-    //   real computeEnergy(ConstReal3DRef dist) {
+    //   real computeEnergy(const Real3D& dist) {
     // 	return _computeEnergy(dist);
     //   }
     // };
@@ -176,15 +176,15 @@ namespace espresso {
     template < class Derived > 
     inline real 
     PotentialTemplate< Derived >::
-    computeEnergy(Particle &p1, Particle &p2) const {
-      Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
+    computeEnergy(const Particle& p1, const Particle& p2) const {
+      Real3D dist = p1.position() - p2.position();
       return computeEnergy(dist);
     }
 
     template < class Derived > 
     inline real 
     PotentialTemplate< Derived >::
-    computeEnergy(ConstReal3DRef dist) const {
+    computeEnergy(const Real3D& dist) const {
 	return computeEnergySqr(dist.sqr());
       }
 
@@ -205,15 +205,15 @@ namespace espresso {
     template < class Derived > 
     inline real 
     PotentialTemplate< Derived >::
-    _computeEnergy(Particle &p1, Particle &p2) const {
-      Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
+    _computeEnergy(const Particle& p1, const Particle& p2) const {
+      Real3D dist = p1.position() - p2.position();
       return _computeEnergy(dist);
     }
 
     template < class Derived > 
     inline real 
     PotentialTemplate< Derived >::
-    _computeEnergy(ConstReal3DRef dist) const {
+    _computeEnergy(const Real3D& dist) const {
       return _computeEnergySqr(dist.sqr());
     }
 
@@ -238,15 +238,15 @@ namespace espresso {
     template < class Derived > 
     inline Real3D 
     PotentialTemplate< Derived >::
-    computeForce(Particle &p1, Particle &p2) const {
-      Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
+    computeForce(const Particle& p1, const Particle& p2) const {
+      Real3D dist = p1.position() - p2.position();
       return computeForce(dist);
     }
     
     template < class Derived > 
     inline Real3D 
     PotentialTemplate< Derived >::
-    computeForce(ConstReal3DRef dist) const {
+    computeForce(const Real3D& dist) const {
       Real3D force;
       if(!_computeForce(force, dist))
 	force = 0.0;
@@ -256,15 +256,15 @@ namespace espresso {
     template < class Derived > 
     inline bool
     PotentialTemplate< Derived >::
-    _computeForce(Real3DRef force, Particle &p1, Particle &p2) const {
-      Real3D dist = Real3DRef(p1.r.p) - Real3DRef(p2.r.p);
+    _computeForce(Real3D& force, const Particle &p1, const Particle &p2) const {
+      Real3D dist = p1.position() - p2.position();
       return _computeForce(force, dist);
     }
 
     template < class Derived > 
     inline bool
     PotentialTemplate< Derived >::
-    _computeForce(Real3DRef force, ConstReal3DRef dist) const {
+    _computeForce(Real3D& force, const Real3D& dist) const {
       real distSqr = dist.sqr();
       if (distSqr > cutoffSqr)
         return false;

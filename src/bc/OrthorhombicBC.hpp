@@ -19,11 +19,11 @@ namespace espresso {
 
       /** Constructor */
       OrthorhombicBC(shared_ptr< esutil::RNG > _rng, 
-		     const ConstReal3DRef _boxL);
+		     const Real3D& _boxL);
 
       /** Method to set the length of the side of the cubic simulation cell */
       virtual void
-      setBoxL(const ConstReal3DRef _boxL);
+      setBoxL(const Real3D& _boxL);
 
       /** Getters for box dimensions */
       virtual Real3D getBoxL() const { return boxL; }
@@ -36,9 +36,9 @@ namespace espresso {
           \param pos1, pos2 are the particle positions 
       */
       virtual void
-      getMinimumImageVector(Real3DRef dist,
-                            const ConstReal3DRef pos1,
-                            const ConstReal3DRef pos2) const;
+      getMinimumImageVector(Real3D& dist,
+                            const Real3D& pos1,
+                            const Real3D& pos2) const;
       virtual void
       getMinimumImageVectorX(real dist[3],
                             const real pos1[3],
@@ -52,7 +52,7 @@ namespace espresso {
 	  i. e. a previously folded position will be folded correctly.
       */
       virtual void 
-      foldCoordinate(Real3DRef pos, Int3DRef imageBox, int dir) const;
+      foldCoordinate(Real3D& pos, Int3D& imageBox, int dir) const;
 
       /** unfold a coordinate to physical position.
 	  \param pos the position...
@@ -62,12 +62,12 @@ namespace espresso {
 	  afterwards.
       */
       virtual void 
-      unfoldCoordinate(Real3DRef pos, Int3DRef imageBox, int dir) const;
+      unfoldCoordinate(Real3D& pos, Int3D& imageBox, int dir) const;
 
       /** Get a random position within the central simulation box. The
           positions are assigned with each coordinate on [0, boxL]. */
       virtual void
-      getRandomPos(Real3DRef res) const;
+      getRandomPos(Real3D& res) const;
 
       static void registerPython();
     };
