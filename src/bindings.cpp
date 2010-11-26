@@ -4,6 +4,7 @@
 #include "bindings.hpp"
 
 #include <Particle.hpp>
+#include <ParticleGroup.hpp>
 #include <System.hpp>
 #include <VerletList.hpp>
 #include <FixedPairList.hpp>
@@ -22,6 +23,7 @@
 
 void espresso::registerPython() {
   espresso::Particle::registerPython();
+  espresso::ParticleGroup::registerPython();
   espresso::System::registerPython();
   espresso::VerletList::registerPython();
   espresso::FixedPairList::registerPython();

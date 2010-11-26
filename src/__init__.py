@@ -8,6 +8,7 @@ import _espresso
 from espresso.Real3D import *
 from espresso.Int3D import *
 from espresso.Particle import *
+from espresso.ParticleGroup import *
 from espresso.System import *
 from espresso.VerletList import *
 from espresso.FixedPairList import *

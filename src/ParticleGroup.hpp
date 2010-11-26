@@ -1,8 +1,10 @@
+// ESPP_CLASS
 #ifndef __ESPRESSOPP_PARTICLEGROUP_H
 #define	__ESPRESSOPP_PARTICLEGROUP_H
 
 #include "log4espp.hpp"
 #include "types.hpp"
+#include <list>
 
 namespace espresso {
 
@@ -27,10 +29,12 @@ namespace espresso {
 
     // for debugging purpose
     void print();
+
+    static void registerPython();
     
   protected:
-    //std::list<shared_ptr< storage::Particle > > active;
-    vector<int> particles;
+    //std::map<longint, storage::Particle*> active;
+    std::list<longint> particles;
 
     // some signalling stuff to keep track of the particles in cell
     /*boost::signals2::connection con_send, con_recv, con_changed;
@@ -40,9 +44,6 @@ namespace espresso {
 			    class InBuffer& buf);
     void onParticlesChanged();
     */
-    static void registerPython();
-
-  private:
     static LOG4ESPP_DECL_LOGGER(theLogger);
   };
 

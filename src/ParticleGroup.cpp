@@ -1,4 +1,6 @@
-#include "ParticleGroup.h"
+#include "python.hpp"
+#include <iostream>
+#include "ParticleGroup.hpp"
 
 namespace espresso {
 
@@ -19,26 +21,30 @@ ParticleGroup::~ParticleGroup()
     con_changed.disconnect();*/
 }
 
+  void ParticleGroup::add(longint pid)
+  {
+      // check unique
+      particles.push_back(pid);
+  }
+
+  // for debugging purpose
+  void ParticleGroup::print()
+  {
+    for(std::list<longint>::iterator iter = particles.begin();
+            iter!=particles.end(); ++iter) {
+        std::cout << *iter << " ";
+    }
+    std::cout << std::endl;
+  }
+
   void ParticleGroup::registerPython() {
 
     using namespace espresso::python;
 
-    bool (ParticleGroup::*pyAdd)(longint pid)
-      = &ParticleGroup::add;
-
-
     class_< ParticleGroup, shared_ptr< ParticleGroup > >
       ("ParticleGroup", init< shared_ptr< storage::Storage > >())
-      .def("add", pyAdd)
-      ;
-
-    bool (ParticleGroup::*pyPrint)()
-      = &ParticleGroup::print;
-
-
-    class_< ParticleGroup, shared_ptr< ParticleGroup > >
-      ("ParticleGroup", init< shared_ptr< storage::Storage > >())
-      .def("add", pyPrint)
+      .def("add", &ParticleGroup::add)
+      .def("show", &ParticleGroup::print)
       ;
   }
 }
