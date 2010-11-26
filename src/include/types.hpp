@@ -27,12 +27,7 @@ namespace espresso {
   }
 
   class Real3D;
-  class Real3DRef;
-  class ConstReal3DRef;
-
   class Int3D;
-  class Int3DRef;
-  class ConstInt3DRef;
 
   class Particle;
   class ParticleList;

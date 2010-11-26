@@ -18,7 +18,7 @@ namespace espresso {
 	size[2] = z;
       }
 
-      Grid(const ConstInt3DRef _size) {
+      Grid(const Int3D& _size) {
 	for (int i = 0; i < 3; ++i) {
 	  size[i] = _size[i];
 	}
@@ -38,7 +38,7 @@ namespace espresso {
       /// convert a grid position to a unique sequence index
       longint mapPositionToIndex(int p1, int p2, int p3) const
       { return p1 + size[0]*(p2 + size[1]*p3); }
-      longint mapPositionToIndex(const ConstInt3DRef pos) const
+      longint mapPositionToIndex(const Int3D& pos) const
       { return mapPositionToIndex(pos[0], pos[1], pos[2]); }
 
       /// convert a sequence index back to a grid position
@@ -51,7 +51,7 @@ namespace espresso {
 	p3 = index;
       }
 
-      void mapIndexToPosition(Int3DRef pos, longint index) const
+      void mapIndexToPosition(Int3D& pos, longint index) const
       { mapIndexToPosition(pos[0], pos[1], pos[2], index); }
 
     private:

@@ -127,15 +127,9 @@ struct RandomFixture : DomainFixture {
   }
 };
 
-real getDistSqr(Particle& p1, Particle& p2)
+real getDistSqr(const Particle& p1, const Particle& p2)
 {
-  real dx = p1.r.p[0] - p2.r.p[0];
-  real dy = p1.r.p[1] - p2.r.p[1];
-  real dz = p1.r.p[2] - p2.r.p[2];
-
-  real sqr = dx*dx + dy*dy + dz*dz;
-
-  return sqr;
+  return (p1.position() - p2.position()).sqr();
 }
 
 BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
@@ -151,7 +145,7 @@ BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
   for (size_t i = 0; i < pairs.size(); i++) {
      Particle *p1 = pairs[i].first;
      Particle *p2 = pairs[i].second;
-     BOOST_MESSAGE("pair " << i << ": " << p1->p.id << " " << p2->p.id
+     BOOST_MESSAGE("pair " << i << ": " << p1->id() << " " << p2->id()
                  << ", dist = " << sqrt(getDistSqr(*p1, *p2)));
   }
 
@@ -176,14 +170,14 @@ BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture)
 
     for(CellListIterator cit2(localCells); !cit2.isDone(); ++cit2) {
 
-      if (cit1->p.id >= cit2->p.id) continue;
+      if (cit1->id() >= cit2->id()) continue;
 
       real distsqr = getDistSqr(*cit1, *cit2);
 
       if (distsqr >= cutoff_skin * cutoff_skin) continue;
 
       BOOST_MESSAGE("pair " << count << ": "
-                 << cit1->p.id << " " << cit2->p.id
+                 << cit1->id() << " " << cit2->id()
                  << ", dist = " << sqrt(distsqr));
 
       count++;

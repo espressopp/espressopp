@@ -37,10 +37,5 @@ namespace espresso {
       .def_pickle(real3D_pickle_suite())
       ;
 
-    boost::python::implicitly_convertible<Real3D, Real3DRef>();
-    boost::python::implicitly_convertible<Real3DRef, Real3D>();
-    boost::python::implicitly_convertible<const Real3D, ConstReal3DRef>();
-    boost::python::implicitly_convertible<ConstReal3DRef, Real3D>();
-
   }
 }

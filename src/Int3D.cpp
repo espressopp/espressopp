@@ -28,10 +28,5 @@ namespace espresso {
       .def_pickle(int3D_pickle_suite())
       ;
 
-    boost::python::implicitly_convertible<Int3D, Int3DRef>();
-    boost::python::implicitly_convertible<Int3DRef, Int3D>();
-    boost::python::implicitly_convertible<const Int3D, ConstInt3DRef>();
-    boost::python::implicitly_convertible<ConstInt3DRef, Int3D>();
-
   }
 }
