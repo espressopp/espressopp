@@ -63,6 +63,7 @@ namespace espresso {
     template < typename _AngularPotential > inline void
     FixedTripleListInteractionTemplate < _AngularPotential >::addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by FixedTripleList");
+
       for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;

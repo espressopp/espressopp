@@ -2,6 +2,7 @@
 #include "Potential.hpp"
 #include "LennardJones.hpp"
 #include "CoulombTruncated.hpp"
+#include "SoftCosine.hpp"
 #include "FENE.hpp"
 #include "Harmonic.hpp"
 #include "Tabulated.hpp"
@@ -19,6 +20,7 @@ namespace espresso {
       Potential::registerPython();
       LennardJones::registerPython();
       CoulombTruncated::registerPython();
+      SoftCosine::registerPython();
       Tabulated::registerPython();
       FENE::registerPython();
       Harmonic::registerPython();
