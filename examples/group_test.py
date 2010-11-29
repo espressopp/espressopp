@@ -50,12 +50,16 @@ integrator.dt = timestep
 configurations = espresso.analysis.Configurations(system)
 configurations.gather()
 
-integrator.run(2000)
-configurations.gather()
+for i in range(1,10):
+  configurations.clear()
+  integrator.run(200)
+  configurations.gather()
 
-for conf in configurations:
-   NP = conf.size
-   print("Configuration : %d particles\n"%NP)
-   for id in conf:
-      pos = conf[id]
-      print("%d : %g %g %g\n"%(id, pos.x, pos.y, pos.z))
+  for conf in configurations:
+     NP = conf.size
+     print("Configuration : %d particles\n"%NP)
+     for id in conf:
+        pos = conf[id]
+        print("%d : %g %g %g\n"%(id, pos.x, pos.y, pos.z))
+
+  grp.show()

@@ -36,7 +36,8 @@ namespace espresso {
     
   protected:
     std::map<longint, Particle*> active;
-    std::list<longint> particles;
+    // replace this by a better thing
+    std::map<longint, longint> particles;
     shared_ptr< storage::Storage > storage;
 
     // some signalling stuff to keep track of the particles in cell
