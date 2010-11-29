@@ -50,7 +50,6 @@ struct Fixture {
     system->rng = make_shared< esutil::RNG >();
     system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
     domdec = make_shared< DomainDecomposition >(system,
-    						mpiWorld,
     						nodeGrid,
     						cellGrid);
   }
@@ -68,7 +67,6 @@ BOOST_AUTO_TEST_CASE(addAndLookup) {
   system->rng = make_shared< esutil::RNG >();
   system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
   domdec = make_shared< DomainDecomposition >(system,
-					      mpiWorld,
 					      nodeGrid,
 					      cellGrid);
 
@@ -94,7 +92,7 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
     Int3D cellGrid(1);
     nodeGrid[i] = 0;
     BOOST_CHECK_THROW(DomainDecomposition
-		      (system, mpiWorld, nodeGrid, cellGrid),
+		      (system, nodeGrid, cellGrid),
 		      NodeGridIllegal);
   }
 
@@ -103,7 +101,7 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
     Int3D cellGrid(1);
     cellGrid[i] = 0;
     BOOST_CHECK_THROW(DomainDecomposition
-		      (system, mpiWorld, nodeGrid, cellGrid),
+		      (system, nodeGrid, cellGrid),
 		      CellGridIllegal);
   }
 
@@ -111,7 +109,6 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
     Int3D nodeGrid(mpiWorld->size(), 2, 1);
     Int3D cellGrid(1);
     BOOST_CHECK_THROW(DomainDecomposition(system,
-					  mpiWorld,
 					  nodeGrid,
 					  cellGrid),
 		      NodeGridMismatch);
@@ -121,7 +118,6 @@ BOOST_AUTO_TEST_CASE(constructDomainDecomposition)
   Int3D cellGrid(1, 2, 3);
 
   DomainDecomposition domdec(system,
-			     mpiWorld,
 			     nodeGrid,
 			     cellGrid);
 
@@ -231,7 +227,6 @@ BOOST_FIXTURE_TEST_CASE(fetchParticles, Fixture)
   Int3D cellGrid(10, 5, 4);
 
   DomainDecomposition domdec2(system,
-                              mpiWorld,
                               nodeGrid,
                               cellGrid);
   domdec2.fetchParticles(*domdec);
@@ -435,7 +430,6 @@ BOOST_AUTO_TEST_CASE(migrateParticle)
   system->rng = make_shared< esutil::RNG >();
   system->bc = make_shared< bc::OrthorhombicBC >(system->rng, boxL);
   domdec = make_shared< DomainDecomposition >(system,
-					      mpiWorld,
 					      nodeGrid,
 					      cellGrid);
 

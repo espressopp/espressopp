@@ -22,8 +22,7 @@ namespace espresso {
     public:
       typedef boost::unordered_map< longint, Particle * > IdParticleMap;
 
-      Storage(shared_ptr< class System > system,
-	      shared_ptr< boost::mpi::communicator > comm);
+      Storage(shared_ptr< class System > system);
       virtual ~Storage();
 
       /** add a particle with given id and position. Note that this is a
@@ -229,8 +228,6 @@ namespace espresso {
       // move a particle from one list to another, updating localParticles
       Particle *moveIndexedParticle(ParticleList &dst, ParticleList &src, int srcpos);
 
-      shared_ptr< mpi::communicator > comm;
-  
       /** here the local particles are actually stored */
       LocalCellList cells;
 

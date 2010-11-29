@@ -17,7 +17,6 @@ namespace espresso {
     class DomainDecomposition: public Storage {
     public:
       DomainDecomposition(shared_ptr< System > system,
-			  shared_ptr< boost::mpi::communicator > comm,
 			  const Int3D& _nodeGrid,
 			  const Int3D& _cellGrid);
 
