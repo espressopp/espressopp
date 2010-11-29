@@ -5,6 +5,7 @@ from espresso.interaction.Potential import *
 from espresso.interaction.Interaction import *
 from _espresso import interaction_CoulombTruncated, \
                       interaction_VerletListCoulombTruncated, \
+                      interaction_CellListCoulombTruncated, \
                       interaction_FixedPairListCoulombTruncated
 
 class CoulombTruncatedLocal(PotentialLocal, interaction_CoulombTruncated):
@@ -27,6 +28,14 @@ class VerletListCoulombTruncatedLocal(InteractionLocal, interaction_VerletListCo
     def setPotential(self, type1, type2, potential):
         self.cxxclass.setPotential(self, type1, type2, potential)
 
+class CellListCoulombTruncatedLocal(InteractionLocal, interaction_CellListCoulombTruncated):
+    'The (local) CoulombTruncated interaction using cell lists.'
+    def __init__(self, stor):
+        cxxinit(self, interaction_CellListCoulombTruncated, stor)
+
+    def setPotential(self, type1, type2, potential):
+        self.cxxclass.setPotential(self, type1, type2, potential)
+
 class FixedPairListCoulombTruncatedLocal(InteractionLocal, interaction_FixedPairListCoulombTruncated):
     'The (local) CoulombTruncated interaction using FixedPair lists.'
     def __init__(self, system, vl):
@@ -42,14 +51,18 @@ if pmi.isController:
             cls = 'espresso.interaction.CoulombTruncatedLocal',
             pmiproperty = ['qq']
             )
-
     class VerletListCoulombTruncated(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListCoulombTruncatedLocal',
             pmicall = ['setPotential']
             )
-
+    class CellListCoulombTruncated(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espresso.interaction.CellListCoulombTruncatedLocal',
+            pmicall = ['setPotential']
+            )
     class FixedPairListCoulombTruncated(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
