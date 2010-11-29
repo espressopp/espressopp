@@ -11,6 +11,8 @@
 
 namespace espresso {
 
+  /** Communication buffer.  */
+
   class Buffer {
 
   public:
