@@ -35,6 +35,7 @@ namespace espresso {
 	return energy;
       }
 
+      // theta0 is ignored at the moment (TODO)
       void _computeForceRaw(Real3D& force12,
                             Real3D& force32,
 			    const Real3D& dist12,
@@ -44,17 +45,18 @@ namespace espresso {
         real dist32_sqr = dist32 * dist32;
         real dist12_magn = sqrt(dist12_sqr);
         real dist32_magn = sqrt(dist32_sqr);
+        real a11, a12, a22;
 
         real cos_theta = dist12 * dist32 / (dist12_magn * dist32_magn);
         if(cos_theta < -1.0) cos_theta = -1.0;
         if(cos_theta >  1.0) cos_theta =  1.0;
-        real sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 
-        real dU_dtheta = K * sin(acos(cos_theta) - theta0);
+        a11 = K * cos_theta / dist12_sqr;
+        a12 = -K / (dist12_magn * dist32_magn);
+        a22 = K * cos_theta / dist32_sqr;
 
-        real dnom = dist12_sqr * dist32_sqr * sin_theta;
-        force12 = dU_dtheta * (dist12_magn * dist32_magn * dist32 - cos_theta * dist32_sqr * dist12) / dnom;
-        force32 = dU_dtheta * (dist12_magn * dist32_magn * dist12 - cos_theta * dist12_sqr * dist32) / dnom;
+        force12 = a11 * dist12 + a12 * dist32;
+        force32 = a22 * dist32 + a12 * dist12;
       }
     };
   }
