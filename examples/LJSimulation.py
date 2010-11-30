@@ -31,7 +31,8 @@ init_cfg = 1
 if(init_cfg == 1):
   # LAMMPS with N = 32000
   # useful for checking for identical results against LAMMPS
-  file = sys.path[0][:sys.path[0].find('trunk')] + 'trunk/examples/data.lj'
+  file = sys.path[0][:sys.path[0].find('espressopp')] + 'espressopp/examples/data.lj'
+  print file
   x, y, z, Lx, Ly, Lz = lammps.read(file)
   num_particles = len(x)
 elif(init_cfg == 2):
@@ -53,13 +54,14 @@ sys.stdout.write('Setting up simulation ...\n')
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 system = espresso.System()
+sys.exit()
 system.rng = espresso.esutil.RNG()
 system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
-system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
+system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # add particles to the system
 for pid in range(num_particles):

@@ -26,7 +26,7 @@ lammps_reader = True
 
 steps = 100
 if(lammps_reader):
-  file = sys.path[0][:sys.path[0].find('trunk')] + 'trunk/examples/angle/rings.dat'
+  file = sys.path[0][:sys.path[0].find('espressopp')] + 'espressopp/examples/angle/rings.dat'
   bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read(file)
 else:
   base = sys.path[0][:sys.path[0].find('trunk')] + 'trunk/examples/'
@@ -52,7 +52,7 @@ system.skin = skin
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
-system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
+system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 print 'NodeGrid = %s' % (nodeGrid,)
 print 'CellGrid = %s' % (cellGrid,)
