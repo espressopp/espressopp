@@ -51,6 +51,9 @@ namespace espresso {
                 return (std::map<longint, Particle*>::iterator::operator*()).second;
             }
 
+            Particle *
+            operator->() const
+            { return (operator*()); }
         };
 
         /**

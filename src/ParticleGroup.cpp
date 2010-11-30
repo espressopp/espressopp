@@ -34,7 +34,7 @@ namespace espresso {
     void ParticleGroup::print() {
         std::cout << "####### I have " << active.size() << " active particles" << std::endl;
         for(iterator i=begin(); i!=end(); ++i )
-            std::cout << (*i)->getId() << " ";
+            std::cout << i->getId() << " ";
         std::cout << std::endl;
         for (std::map<longint,longint>::iterator iter = particles.begin();
                 iter != particles.end(); ++iter) {
