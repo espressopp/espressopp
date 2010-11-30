@@ -11,7 +11,7 @@
 
 namespace espresso {
 
-  /** Communication buffer.  */
+  /** Communication buffer for homogeneous systems.  */
 
   class Buffer {
 
