@@ -53,7 +53,7 @@ namespace espresso {
 
       real _computeEnergySqrRaw(real distSqr) const {
         real r = sqrt(distSqr);
-	real energy = A * (1.0 + cos(M_PI * r / getCutoff()));
+	real energy = A * (1.0 + cos(3.1415926 * r / getCutoff()));
 	return energy;
       }
 
@@ -62,7 +62,7 @@ namespace espresso {
                             real distSqr) const {
         real r = sqrt(distSqr);
         real rc = getCutoff();
-        real ffactor = (A * M_PI) * sin(M_PI * r / rc) / (rc * r);
+        real ffactor = (A * 3.1415926) * sin(3.1415926 * r / rc) / (rc * r);
         force = dist * ffactor;
         return true;
       }

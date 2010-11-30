@@ -66,14 +66,14 @@ namespace espresso {
     template < typename _Potential > inline void
     FixedPairListInteractionTemplate < _Potential >::addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the FixedPair List");
+      bc::BC& bc = *getSystemRef().bc;  // boundary conditions
       for (FixedPairList::Iterator it(*fixedpairList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
+        Real3D dist;
+        bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
         const Potential &potential = getPotential(p1.type(), p2.type());
-
-	Real3D force(0.0, 0.0, 0.0);
-        Real3D dist = getSystemRef().bc->getMinimumImageVector(p1.position(), 
-                                                               p2.position());
+	Real3D force;
 	if(potential._computeForce(force, dist)) {
           p1.force() += force;
           p2.force() -= force;

@@ -35,6 +35,21 @@ namespace espresso {
 			    const Real3D& pos1,
 			    const Real3D& pos2) const = 0;
 
+      /** Computes the minimum image distance vector between two
+          positions where both positions are in the box.
+
+          \param dist is the distance vector (pos2 - pos1)
+          \param pos1, pos2 are the particle positions 
+
+          Be careful: this routine is faster than getMinimumImageVector
+          but will only deliver corrrect result if the absolute distance
+          in each dimension is less than the box size.
+      */
+      virtual void
+      getMinimumImageVectorBox(Real3D& dist,
+                               const Real3D& pos1,
+                               const Real3D& pos2) const = 0;
+
       virtual void
       getMinimumImageVectorX(real dist[3],
 			    const real pos1[3],
@@ -42,6 +57,13 @@ namespace espresso {
       virtual Real3D 
       getMinimumImageVector(const Real3D& pos1,
 			    const Real3D& pos2) const;
+
+      /** Compute the minimum image distance where the distance
+          is given by two positions in the box.
+      */
+
+      virtual void
+      getMinimumDistance(Real3D& dist) const = 0;
 
       /** fold a coordinate to the primary simulation box.
 	  \param pos         the position

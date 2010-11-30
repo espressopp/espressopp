@@ -17,8 +17,10 @@ namespace espresso {
     /* Setter method for the box length */
     void OrthorhombicBC::setBoxL(const Real3D& _boxL) {
       boxL = _boxL;
-      for (int i = 0; i < 3; i++)
+      for (int i = 0; i < 3; i++) {
 	invBoxL[i] = 1.0/boxL[i];
+	boxL2[i] = 0.5*boxL[i];
+      }
     }
 
     /* Returns the minimum image vector between two positions */
@@ -33,6 +35,36 @@ namespace espresso {
       dist[0] -= round(dist[0] * invBoxL[0]) * boxL[0];
       dist[1] -= round(dist[1] * invBoxL[1]) * boxL[1];
       dist[2] -= round(dist[2] * invBoxL[2]) * boxL[2];
+    }
+
+    /* Returns the minimum image vector between two positions */
+    void 
+    OrthorhombicBC::
+    getMinimumImageVectorBox(Real3D& dist,
+                             const Real3D& pos1,
+                             const Real3D& pos2) const {
+      dist = pos1;
+      dist -= pos2;
+
+      if (dist[0] < -boxL2[0]) dist[0] += boxL[0];
+      else if (dist[0] > boxL2[0]) dist[0] -= boxL[0];
+      if (dist[1] < -boxL2[1]) dist[1] += boxL[1];
+      else if (dist[1] > boxL2[1]) dist[1] -= boxL[1];
+      if (dist[2] < -boxL2[2]) dist[2] += boxL[2];
+      else if (dist[2] > boxL2[2]) dist[2] -= boxL[2];
+    }
+
+    /* Fold back a nearby position into box */
+
+    void
+    OrthorhombicBC::getMinimumDistance(Real3D& dist) const {
+
+      if (dist[0] < -0.5 * boxL[0]) dist[0] += boxL[0];
+      else if (dist[0] > 0.5 * boxL[0]) dist[0] -= boxL[0];
+      if (dist[1] < -0.5 * boxL[1]) dist[1] += boxL[1];
+      else if (dist[1] > 0.5 * boxL[1]) dist[1] -= boxL[1];
+      if (dist[2] < -0.5 * boxL[2]) dist[2] += boxL[2];
+      else if (dist[2] > 0.5 * boxL[2]) dist[2] -= boxL[2];
     }
 
     /* Returns the minimum image vector between two positions */

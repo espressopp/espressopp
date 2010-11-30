@@ -7,11 +7,11 @@
 #include "Particle.hpp"
 #include <vector>
 
-#define BUFFER_SIZE 8 * 1024 * 1024
+#define BUFFER_SIZE 32 * 1024 * 1024
 
 namespace espresso {
 
-  /** Communication buffer for homogeneous systems.  */
+  /** Communication buffer.  */
 
   class Buffer {
 
@@ -29,7 +29,8 @@ namespace espresso {
 
     Buffer(const mpi::communicator &_comm) : comm(_comm) 
 
-    { pos = 0; size = BUFFER_SIZE; }
+    { pos = 0; size = BUFFER_SIZE; 
+    }
 
   protected:
 
@@ -48,7 +49,6 @@ namespace espresso {
   public:
 
     InBuffer(const mpi::communicator &comm) : Buffer(comm) {
-
     }
 
     template <class T>
@@ -88,11 +88,11 @@ namespace espresso {
     }
 
     void read(std::vector<longint> &v) {
-      int size;
-      read(size);
+      int nvals;
+      read(nvals);
       v.clear();
-      v.reserve(size);
-      for (int i = 0; i < size; i++) {
+      v.reserve(nvals);
+      for (int i = 0; i < nvals; i++) {
         int val;
         read(val);
         v.push_back(val);

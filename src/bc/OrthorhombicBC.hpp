@@ -10,6 +10,7 @@ namespace espresso {
     class OrthorhombicBC : public BC {
     private:
       Real3D boxL;
+      Real3D boxL2;  // half box length
       Real3D invBoxL;
 
     public:
@@ -39,10 +40,24 @@ namespace espresso {
       getMinimumImageVector(Real3D& dist,
                             const Real3D& pos1,
                             const Real3D& pos2) const;
+
+      virtual void
+      getMinimumImageVectorBox(Real3D& dist,
+                               const Real3D& pos1,
+                               const Real3D& pos2) const;
+
       virtual void
       getMinimumImageVectorX(real dist[3],
                             const real pos1[3],
                             const real pos2[3]) const;
+
+      /** Compute the minimum image distance where the distance
+          is given by two positions in the box.
+      */
+
+      virtual void
+      getMinimumDistance(Real3D& dist) const;
+
       /** fold a coordinate to the primary simulation box.
 	  \param pos         the position...
 	  \param imageBox    and the box

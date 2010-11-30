@@ -63,18 +63,16 @@ namespace espresso {
     template < typename _AngularPotential > inline void
     FixedTripleListInteractionTemplate < _AngularPotential >::addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by FixedTripleList");
-
+      bc::BC& bc = *getSystemRef().bc;  // boundary conditions
       for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         Particle &p3 = *it->third;
         const Potential &potential = getPotential(p1.type(), p2.type());
-
-        Real3D force12(0.0, 0.0, 0.0);
-        Real3D force32(0.0, 0.0, 0.0);
-        const espresso::bc::BC& bc = *getSystemRef().bc;
-        Real3D dist12 = bc.getMinimumImageVector(p1.position(), p2.position());
-        Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
+        Real3D dist12, dist32;
+        bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
+        bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+        Real3D force12, force32;
 	potential._computeForce(force12, force32, dist12, dist32);
         p1.force() += force12;
         p2.force() -= force12 + force32;

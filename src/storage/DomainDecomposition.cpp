@@ -40,9 +40,10 @@ namespace espresso {
 
     DomainDecomposition::
     DomainDecomposition(shared_ptr< System > _system,
+			shared_ptr< mpi::communicator > _comm,
 			const Int3D& _nodeGrid,
 			const Int3D& _cellGrid)
-      : Storage(_system), exchangeBufferSize(0) {
+      : Storage(_system, _comm), exchangeBufferSize(0) {
       LOG4ESPP_INFO(logger, "node grid = "
 		    << _nodeGrid[0] << "x" << _nodeGrid[1] << "x" << _nodeGrid[2]
 		    << " cell grid = "
@@ -60,17 +61,17 @@ namespace espresso {
       real myLeft[3];
       real myRight[3];
 
-      nodeGrid = NodeGrid(_nodeGrid, getSystem()->comm->rank(), getSystem()->bc->getBoxL());
+      nodeGrid = NodeGrid(_nodeGrid, comm->rank(), getSystem()->bc->getBoxL());
 
-      if (nodeGrid.getNumberOfCells() != getSystem()->comm->size()) {
-	throw NodeGridMismatch(_nodeGrid, getSystem()->comm->size());
+      if (nodeGrid.getNumberOfCells() != comm->size()) {
+	throw NodeGridMismatch(_nodeGrid, comm->size());
       }
 
       LOG4ESPP_INFO(logger, "my node grid position: "
 		    << nodeGrid.getNodePosition(0) << " "
 		    << nodeGrid.getNodePosition(1) << " "
 		    << nodeGrid.getNodePosition(2) << " -> "
-		    << getSystem()->comm->rank());
+		    << comm->rank());
 
       LOG4ESPP_DEBUG(logger, "my neighbors: "
 		     << nodeGrid.getNodeNeighborIndex(0) << "<->"
@@ -361,7 +362,7 @@ namespace espresso {
 	}
 
 	// Communicate wether particle exchange is finished
-	mpi::all_reduce(*getSystem()->comm, finished, allFinished, std::logical_and<bool>());
+	mpi::all_reduce(*comm, finished, allFinished, std::logical_and<bool>());
       } while (!allFinished);
 
       exchangeBufferSize = std::max(exchangeBufferSize,
@@ -376,15 +377,18 @@ namespace espresso {
     }
 
     void DomainDecomposition::exchangeGhosts() {
+      LOG4ESPP_DEBUG(logger, "exchangeGhosts -> ghost communication sizes first, real->ghost");
       doGhostCommunication(true, true, dataOfExchangeGhosts);
     }
 
     void DomainDecomposition::updateGhosts() {
+      LOG4ESPP_DEBUG(logger, "updateGhosts -> ghost communication no sizes, real->ghost");
       doGhostCommunication(false, true, dataOfUpdateGhosts);
     }
 
     void DomainDecomposition::collectGhostForces() {
-      doGhostCommunication(false, false);
+      LOG4ESPP_DEBUG(logger, "updateGhosts -> ghost communication no sizes, ghost->real");
+      doGhostCommunication(false, false, 0);
     }
 
     void DomainDecomposition::fillCells(std::vector<Cell *> &cv,
@@ -535,14 +539,14 @@ namespace espresso {
 	      if (nodeGrid.getNodePosition(coord) % 2 == 0) {
 		LOG4ESPP_DEBUG(logger, "sending to node " << nodeGrid.getNodeNeighborIndex(dir)
 			       << ", then receiving from node " << nodeGrid.getNodeNeighborIndex(oppositeDir));
-		getSystem()->comm->send(nodeGrid.getNodeNeighborIndex(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
-		getSystem()->comm->recv(nodeGrid.getNodeNeighborIndex(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
+		comm->send(nodeGrid.getNodeNeighborIndex(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
+		comm->recv(nodeGrid.getNodeNeighborIndex(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
 	      }
 	      else {
 		LOG4ESPP_DEBUG(logger, "receiving from node " << nodeGrid.getNodeNeighborIndex(oppositeDir)
 			       << ", then sending to node " << nodeGrid.getNodeNeighborIndex(dir));
-		getSystem()->comm->recv(nodeGrid.getNodeNeighborIndex(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
-		getSystem()->comm->send(nodeGrid.getNodeNeighborIndex(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
+		comm->recv(nodeGrid.getNodeNeighborIndex(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
+		comm->send(nodeGrid.getNodeNeighborIndex(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
 	      }
 
 	      // resize according to received information
@@ -554,8 +558,8 @@ namespace espresso {
 
 	    // prepare send and receive buffers
 	    longint receiver, sender;
-	    OutBuffer outBuf(*getSystem()->comm);
-	    InBuffer inBuf(*getSystem()->comm);
+	    OutBuffer outBuf(*comm);
+	    InBuffer inBuf(*comm);
 	    if (realToGhosts) {
 	      receiver = nodeGrid.getNodeNeighborIndex(dir);
 	      sender = nodeGrid.getNodeNeighborIndex(oppositeDir);
@@ -599,10 +603,12 @@ namespace espresso {
 
     class PyDomainDecomposition : public DomainDecomposition {
     public:
+      // TODO: Care for MPI communicator!
       PyDomainDecomposition(shared_ptr< System > _system,
 			    const Int3D& _nodeGrid,
 			    const Int3D& _cellGrid)
- 	: DomainDecomposition(_system, _nodeGrid, _cellGrid)
+ 	: DomainDecomposition(_system, mpiWorld, 
+ 			      _nodeGrid, _cellGrid)
       {}
     };
  
