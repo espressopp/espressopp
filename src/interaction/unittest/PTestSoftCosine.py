@@ -15,12 +15,12 @@ class TestSoftCosine(espresso.unittest.TestCase):
         self.assertAlmostEqual(sc.computeEnergy(0.0), 4.0)
 
     def testForce(self):
-        sc=SoftCosine(A=2.0, cutoff=1.1, shift=0.0)
+        sc=SoftCosine(A=1.0, cutoff=2.0, shift=0.0)
 
         # force in the minimum
-        #self.assertAlmostEqual(
-        #    (sc.computeForce(0.1, 0.2, 0.3) -
-        #     Real3D(0.0, 0.0, 0.0)).sqr(), 5.00675403)
+        self.assertAlmostEqual(
+            (sc.computeForce(0.1, 0.2, 0.3) -
+             Real3D(0.0, 0.0, 0.0)).sqr(), 0.87097538776667)
 
     def testProperties(self):
         sc=SoftCosine()

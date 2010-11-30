@@ -31,7 +31,8 @@ init_cfg = 1
 if(init_cfg == 1):
   # LAMMPS with N = 32000
   # useful for checking for identical results against LAMMPS
-  file = sys.path[0][:sys.path[0].find('trunk')] + 'trunk/examples/data.lj'
+  file = sys.path[0][:sys.path[0].find('espressopp')] + 'espressopp/examples/data.lj'
+  print file
   x, y, z, Lx, Ly, Lz = lammps.read(file)
   num_particles = len(x)
 elif(init_cfg == 2):
@@ -59,7 +60,7 @@ system.skin = skin
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
-system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
+system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # add particles to the system
 for pid in range(num_particles):
@@ -71,7 +72,9 @@ system.storage.decompose()
 # all particles interact via a LJ interaction (use Verlet lists)
 vl = espresso.VerletList(system, cutoff=rc+system.skin)
 potLJ = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=False)
+#potLJ = espresso.interaction.SoftCosine(A=1.0, cutoff=rc, shift=False)
 interLJ = espresso.interaction.VerletListLennardJones(vl)
+#interLJ = espresso.interaction.VerletListSoftCosine(vl)
 interLJ.setPotential(type1=0, type2=0, potential=potLJ)
 system.addInteraction(interLJ)
 
