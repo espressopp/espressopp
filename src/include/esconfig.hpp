@@ -3,6 +3,12 @@
 
 #include <boost/random.hpp>
 #include <limits>
+
+#include <cmath>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 namespace espresso {
   // define to "float" for single precision (i.e. typedef float real;)
   // define to "double" for double precision (i.e. typedef double real;)
