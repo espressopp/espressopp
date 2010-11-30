@@ -18,11 +18,10 @@ if pmi.isController:
             cls = 'espresso.storage.DomainDecompositionLocal',
             )
         def __init__(self, system, 
-                     comm=MPI.COMM_WORLD, 
                      nodeGrid='auto', 
                      cellGrid='auto'):
             if nodeGrid == 'auto':
-                nodeGrid = Int3D(comm.rank, 1, 1)
+                nodeGrid = Int3D(system.comm.rank, 1, 1)
             else:
                 nodeGrid = toInt3DFromVector(nodeGrid)
 

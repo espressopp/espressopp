@@ -26,10 +26,8 @@ namespace espresso {
     const int Storage::dataOfUpdateGhosts = 0;
     const int Storage::dataOfExchangeGhosts = DATA_PROPERTIES;
 
-    Storage::Storage(shared_ptr< System > system,
-		     shared_ptr< boost::mpi::communicator >_comm)
-      : SystemAccess(system),
-	comm(_comm)
+    Storage::Storage(shared_ptr< System > system)
+      : SystemAccess(system)
     {
       //logger.setLevel(log4espp::Logger::TRACE);
     }
@@ -203,7 +201,7 @@ namespace espresso {
       LOG4ESPP_DEBUG(logger, "send " << list.size() << " particles to " << node);
 
       // pack for transport
-      OutBuffer data(*comm);
+      OutBuffer data(*getSystem()->comm);
       int size = list.size();
       data.write(size);
       for (ParticleList::Iterator it(list); it.isValid(); ++it) {
@@ -227,7 +225,7 @@ namespace espresso {
 
       // receive packed data
 
-      InBuffer data(*comm);
+      InBuffer data(*getSystem()->comm);
 
       data.recv(node, STORAGE_COMM_TAG);
 

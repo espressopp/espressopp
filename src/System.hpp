@@ -4,6 +4,7 @@
 
 #include "types.hpp"
 #include "mpi.hpp"
+#include "python.hpp"
 #include "boost/enable_shared_from_this.hpp"
 #include "interaction/Interaction.hpp"
 
@@ -16,6 +17,7 @@ namespace espresso {
   public:
 
     System() : comm(mpiWorld) {}
+    System(python::object _pyobj);
 
     shared_ptr< mpi::communicator > comm;
 
