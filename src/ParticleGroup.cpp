@@ -45,7 +45,7 @@ namespace espresso {
 
     void ParticleGroup::beforeSendParticles(ParticleList& pl,
             class OutBuffer& buf) {
-        // loop over the particle list
+        // remove all particles that move to a different node
         for (ParticleList::Iterator pit(pl);
                 pit.isValid(); ++pit) {
             longint pid = pit->id();
@@ -60,6 +60,7 @@ namespace espresso {
 
     void ParticleGroup::afterRecvParticles(ParticleList& pl,
             class InBuffer& buf) {
+        // add all particles that moved to this node
         for (ParticleList::Iterator pit(pl);
                 pit.isValid(); ++pit) {
             longint pid = pit->id();
@@ -67,19 +68,21 @@ namespace espresso {
             std::map<longint, longint>::iterator p;
             p = particles.find(pid);
             if (p != particles.end())
-                active[pid] = NULL; // will by set in onchanged
+                active[pid] = NULL; // will be set in onchanged
         }
     }
 
     void ParticleGroup::onParticlesChanged() {
         std::map<longint, Particle*>::iterator p;
         std::list<longint> remove;
+
+        // update all pointers
         for (p = active.begin(); p != active.end(); ++p) {
-            // TODO this should be ok but check
             if(!(p->second = storage->lookupRealParticle(p->first)))
-                    remove.push_back(p->first);
+                    remove.push_back(p->first); // \todo do we need to check for ghosts here
         }
-        // needed to remove ghosts
+        // remove ghosts, check how iterators behave on erase,
+        // eventually this can be done in the loop
         while(!remove.empty()) {
             active.erase(remove.front());
             remove.pop_front();

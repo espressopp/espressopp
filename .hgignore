@@ -9,6 +9,7 @@ autom4te.cache/*
 *.lo
 *.o
 *.la
+*.pyc
 .deps/*
 .libs/*
 .dirstamp

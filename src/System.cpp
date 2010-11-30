@@ -42,7 +42,9 @@ namespace espresso {
   System::registerPython() {
     using namespace espresso::python;
 
-    class_< System >("System")
+    class_< System >
+      ("System", init<>())
+      .def(init< python::object >())
       .def_readwrite("storage", &System::storage)
       .def_readwrite("bc", &System::bc)
       .def_readwrite("rng", &System::rng)
