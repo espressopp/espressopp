@@ -170,7 +170,7 @@ namespace espresso {
 
       real maxSqDist = 0.0; // maximal square distance a particle moves
 
-      for(ParticleGroup::iterator cit(group.begin()); cit != group.end(); ++cit) {
+      for(ParticleGroup::iterator cit(group->begin()); cit != group->end(); ++cit) {
 
 	real sqDist = 0.0;
 
@@ -222,7 +222,7 @@ namespace espresso {
 
       // loop over all particles of the local cells
 
-      for(ParticleGroup::iterator cit(group.begin()); cit != group.end(); ++cit) {
+      for(ParticleGroup::iterator cit(group->begin()); cit != group->end(); ++cit) {
 
         real dtfm = 0.5 * dt / cit->mass();
 
@@ -308,7 +308,7 @@ namespace espresso {
 
       LOG4ESPP_INFO(theLogger, "init forces for real + ghost particles");
 
-      for(ParticleGroup::iterator cit(group.begin()); cit != group.end(); ++cit) {
+      for(ParticleGroup::iterator cit(group->begin()); cit != group->end(); ++cit) {
 	cit->force() = 0.0;
       }
     }
@@ -331,7 +331,7 @@ namespace espresso {
 	LOG4ESPP_DEBUG(theLogger, "real forces");
       }
   
-      for(ParticleGroup::iterator cit(group.begin()); cit != group.end(); ++cit) {
+      for(ParticleGroup::iterator cit(group->begin()); cit != group->end(); ++cit) {
 
 	LOG4ESPP_DEBUG(theLogger, 
 		       "Particle " << cit->id()
@@ -357,7 +357,7 @@ namespace espresso {
 	LOG4ESPP_DEBUG(theLogger, "real positions");
       }
   
-      for(ParticleGroup::iterator cit(group.begin()); cit != group.end(); ++cit) {
+      for(ParticleGroup::iterator cit(group->begin()); cit != group->end(); ++cit) {
 
 	LOG4ESPP_DEBUG(theLogger, 
 		       "Particle " << cit->id()
@@ -377,7 +377,7 @@ namespace espresso {
 
       class_<VelocityVerletOnGroup, shared_ptr<VelocityVerletOnGroup>, bases<MDIntegrator> >
 
-        ("integrator_VelocityVerletOnGroup", init< shared_ptr<System> >())
+        ("integrator_VelocityVerletOnGroup", init< shared_ptr<System>,  shared_ptr<ParticleGroup> >())
 
         .add_property("langevin", &VelocityVerletOnGroup::getLangevin, &VelocityVerletOnGroup::setLangevin)
         ;
