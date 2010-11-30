@@ -33,7 +33,24 @@ namespace espresso {
     void print();
 
     static void registerPython();
-    
+
+    struct iterator : std::map<longint, Particle*>::iterator {
+        iterator(const std::map<longint, Particle*>::iterator &i)
+                : std::map<longint, Particle*>::iterator(i) {}
+                
+        Particle * operator*() const
+            { return (std::map<longint, Particle*>::iterator::operator*()).second; }
+
+    };
+
+    iterator begin() {
+        return active.begin();
+    }
+
+    iterator end() {
+        return active.end();
+    }
+
   protected:
     std::map<longint, Particle*> active;
     // replace this by a better thing

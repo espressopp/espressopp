@@ -2,13 +2,17 @@ from espresso import pmi
 from espresso.esutil import cxxinit
 
 import _espresso
+import MPI
 
 class SystemLocal(_espresso.System):
     'The (local) System.'
-
-    def __init__(self):
+    def __init__(self, pmicomm=None):
         'Local construction of a System'
-        cxxinit(self, _espresso.System)
+        if not pmicomm :
+            comm = pmi._MPIcomm
+        else :
+            comm = pmicomm.getMPIsubcomm()
+        cxxinit(self, _espresso.System, comm)
 
     def addInteraction(self, interaction):
         'add a short range list interaction'
@@ -20,6 +24,6 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espresso.SystemLocal',
-            pmiproperty = ['storage', 'bc', 'rng', 'skin', 'comm', 'shortRangeInteractions' ],
+            pmiproperty = ['storage', 'bc', 'rng', 'skin', 'shortRangeInteractions' ],
             pmicall = ['addInteraction' ]
             )
