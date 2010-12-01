@@ -26,19 +26,18 @@ nvt = False
 timestep = 0.005
 
 # initial configuration: (1) LAMMPS, (2) lattice or (3) GROMACS
-init_cfg = 1
+init_cfg = 2
 
 if(init_cfg == 1):
   # LAMMPS with N = 32000
   # useful for checking for identical results against LAMMPS
   file = sys.path[0][:sys.path[0].find('espressopp')] + 'espressopp/examples/data.lj'
-  print file
   x, y, z, Lx, Ly, Lz = lammps.read(file)
   num_particles = len(x)
 elif(init_cfg == 2):
   # cubic lattice with user-defined values of N and rho
   # num_particles should be a perfect cube (e.g. 25**3=15625, 32**3=32768)
-  num_particles = 20**3
+  num_particles = 32**3
   rho = 0.8442
   x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False)
 else:
@@ -60,6 +59,8 @@ system.skin = skin
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
+print nodeGrid, cellGrid
+sys.exit()
 system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # add particles to the system
