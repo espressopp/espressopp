@@ -19,14 +19,14 @@ from espresso.tools import decomp
 from espresso.tools.init_cfg import lattice
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
-steps = 1000
+steps = 10
 rc = 2.5
 skin = 0.3
 nvt = False
 timestep = 0.005
 
 # initial configuration: (1) LAMMPS, (2) lattice or (3) GROMACS
-init_cfg = 2
+init_cfg = 1
 
 if(init_cfg == 1):
   # LAMMPS with N = 32000
@@ -37,7 +37,7 @@ if(init_cfg == 1):
 elif(init_cfg == 2):
   # cubic lattice with user-defined values of N and rho
   # num_particles should be a perfect cube (e.g. 25**3=15625, 32**3=32768)
-  num_particles = 32**3
+  num_particles = 20**3
   rho = 0.8442
   x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False)
 else:
@@ -59,8 +59,6 @@ system.skin = skin
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
-print nodeGrid, cellGrid
-sys.exit()
 system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # add particles to the system
@@ -127,6 +125,8 @@ Ek = 0.5 * T * (3 * num_particles)
 Ep = interLJ.computeEnergy()
 sys.stdout.write(fmt % (steps, T, P, Pij[3], Ek + Ep, Ep, Ek))
 print 'Rebuilds =', vl.builds
+print 'Total pairs =', vl.totalSize()
+print 'Integration steps =', integrator.step
 print 'CPU time =', end_time - start_time, 's'
 sys.exit(1)
 # comment out line above for production run

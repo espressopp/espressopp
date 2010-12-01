@@ -1,9 +1,7 @@
+#include <iomanip>
 #include "python.hpp"
-
 #include "VelocityVerlet.hpp"
-
 #include "Langevin.hpp"
-
 #include "iterator/CellListIterator.hpp"
 #include "interaction/Interaction.hpp"
 #include "interaction/Potential.hpp"
@@ -46,7 +44,7 @@ namespace espresso {
     {
       int nResorts = 0;
 
-      real      time;
+      real time;
 
       timeIntegrate.reset();
 
@@ -134,7 +132,6 @@ namespace espresso {
 
     void VelocityVerlet::resetTimers()
     {
-      timeResort = 0.0;
       timeForce  = 0.0;
       for(int i = 0; i < 100; i++)
         timeForceComp[i] = 0.0;
@@ -142,19 +139,40 @@ namespace espresso {
       timeComm2  = 0.0;
       timeInt1   = 0.0;
       timeInt2   = 0.0;
+      timeResort = 0.0;
     }
 
-    void VelocityVerlet::printTimers()
-    {
-      std::cout << "time: run = " << timeIntegrate <<
-                   ", pair = " << timeForceComp[0] <<
-                   ", FENE = " << timeForceComp[1] <<
-                   ", angle = " << timeForceComp[2] <<
-                   ", comm1 = " << timeComm1 <<
-                   ", comm2 = " << timeComm2 <<
-                   ", int1 = " << timeInt1 <<
-                   ", int2 = " << timeInt2 <<
-                   ", resort = " << timeResort << std::endl; 
+    void VelocityVerlet::printTimers() {
+
+      using namespace std;
+
+      real timeWall = timeIntegrate.getElapsedTime();
+      real timeLost;
+      timeLost = timeWall - (timeForceComp[0] + timeForceComp[1] + timeForceComp[2] +
+                 timeComm1 + timeComm2 + timeInt1 + timeInt2 + timeResort);
+      real pct;
+
+      cout << endl;
+      cout << "run = " << setiosflags(ios::fixed) << setprecision(1) << timeWall << endl;
+      pct = 100.0 * (timeForceComp[0] / timeWall);
+      cout << "pair (%) = " << timeForceComp[0] << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeForceComp[1] / timeWall);
+      cout << "FENE (%) = " << timeForceComp[1] << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeForceComp[2] / timeWall);
+      cout << "angle (%) = " << timeForceComp[2] << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeComm1 / timeWall);
+      cout << "comm1 (%) = " << timeComm1 << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeComm2 / timeWall);
+      cout << "comm2 (%) = " << timeComm2 << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeInt1 / timeWall);
+      cout << "int1 (%) = " << timeInt1 << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeInt2 / timeWall);
+      cout << "int2 (%) = " << timeInt2 << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeResort / timeWall);
+      cout << "resort (%) = " << timeResort << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeLost / timeWall);
+      cout << "other (%) = " << timeLost << " (" << pct << ")" << endl;
+      cout << endl;
     }
 
     /*****************************************************************************/
@@ -233,6 +251,7 @@ namespace espresso {
 
 	cit->velocity() += dtfm * cit->force();
       }
+      step++;
     }
 
     /*****************************************************************************/
@@ -377,11 +396,8 @@ namespace espresso {
       using namespace espresso::python;
 
       // Note: use noncopyable and no_init for abstract classes
-
       class_<VelocityVerlet, shared_ptr<VelocityVerlet>, bases<MDIntegrator> >
-
         ("integrator_VelocityVerlet", init< shared_ptr<System> >())
-
         .add_property("langevin", &VelocityVerlet::getLangevin, &VelocityVerlet::setLangevin)
         ;
     }

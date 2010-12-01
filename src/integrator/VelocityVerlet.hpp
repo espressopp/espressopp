@@ -7,11 +7,9 @@
 #include "esutil/Timer.hpp"
 
 namespace espresso {
-
   namespace integrator {
 
     /** Velocity Verlet Integrator */
-
     class VelocityVerlet : public MDIntegrator {
 
       public:
@@ -27,7 +25,6 @@ namespace espresso {
         void run(int nsteps);
 
         /** Register this class so it can be used from Python. */
-
         static void registerPython();
 
       private:
@@ -66,14 +63,13 @@ namespace espresso {
         esutil::WallTimer timeIntegrate;  //!< used for timing
 
         // variables that keep time information about different phases
-
-        real timeResort;
         real timeForce;
         real timeForceComp[100];
         real timeComm1;
         real timeComm2;
         real timeInt1;
         real timeInt2;
+        real timeResort;
     };
   }
 }
