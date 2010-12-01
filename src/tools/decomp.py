@@ -7,8 +7,20 @@ from espresso import Int3D
 def nodeGrid(p):
   return Int3D(1, 1, p)
 
-def cellGrid(box_size, node_grid, rc, skin):
-  ix = max(1, box_size[0] * node_grid[0] / (rc + skin))
-  iy = max(1, box_size[1] * node_grid[1] / (rc + skin))
-  iz = max(1, box_size[2] * node_grid[2] / (rc + skin))
+def cellGridX(box_size, node_grid, rc, skin):
+  ix = max(1, box_size[0] / (rc + skin))
+  iy = max(1, box_size[1] / (rc + skin))
+  iz = max(1, box_size[2] / (rc + skin))
   return Int3D(ix, iy, iz)
+
+def cellGrid(box_size, node_grid, rc, skin):
+  ix = calcNumberCells(box_size[0], node_grid[0], rc, skin)
+  iy = calcNumberCells(box_size[1], node_grid[1], rc, skin)
+  iz = calcNumberCells(box_size[2], node_grid[2], rc, skin)
+  return Int3D(ix, iy, iz)
+
+def calcNumberCells(size, nodes, rc, skin):
+  ncells = 1
+  while size / (ncells * nodes) >= (rc + skin):
+    ncells = ncells + 1
+  return ncells - 1

@@ -19,7 +19,7 @@ from espresso.tools import decomp
 from espresso.tools.init_cfg import lattice
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
-steps = 10
+steps = 500
 rc = 2.5
 skin = 0.3
 nvt = False
@@ -124,10 +124,11 @@ Pij = pressureTensor.compute()
 Ek = 0.5 * T * (3 * num_particles)
 Ep = interLJ.computeEnergy()
 sys.stdout.write(fmt % (steps, T, P, Pij[3], Ek + Ep, Ep, Ek))
-print 'Rebuilds =', vl.builds
-print 'Total pairs =', vl.totalSize()
+print 'Total # of neighbors =', vl.totalSize()
+print 'Ave neighs/atom = %.1f' % (vl.totalSize() / float(num_particles))
+print 'Neighbor list builds =', vl.builds
 print 'Integration steps =', integrator.step
-print 'CPU time =', end_time - start_time, 's'
+print 'CPU time = %.1f s' % (end_time - start_time)
 sys.exit(1)
 # comment out line above for production run
 
