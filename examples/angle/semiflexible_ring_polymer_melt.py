@@ -14,17 +14,18 @@ import logging
 from espresso import Real3D, Int3D
 from espresso.tools.convert import lammps, gromacs
 from espresso.tools import decomp
+from espresso.tools import timers
 
-# benchmark or production run (bench = True is a short job)
-bench = True
-
-# nvt or nve (nvt = False is nve)
+# integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
+steps = 10
+rc = 1.12
+skin = 0.3
 nvt = False
+timestep = 0.005
 
 # lammps or gromacs (lammps_reader = False is gromacs)
 lammps_reader = True
 
-steps = 100
 if(lammps_reader):
   file = sys.path[0][:sys.path[0].find('espressopp')] + 'espressopp/examples/angle/rings.dat'
   bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read(file)
@@ -34,17 +35,16 @@ else:
   f2 = base + 'gromacs/topol.top'
   f3 = base + 'gromacs/ring.itp'
   bonds, angles, x, y, z, Lx, Ly, Lz = gromacs.read(f1, f2, f3)
-num_particles = len(x)
-density = 0.85
-L = (num_particles / density)**(1.0/3.0)
-L = Lx
-size = (L, L, L)
-rc = 1.12
-skin = 0.3
-print 'number of particles =', num_particles
-print 'box size =', L
-print 'cutoff =', rc
 
+
+
+######################################################################
+### IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE ###
+######################################################################
+sys.stdout.write('Setting up simulation ...\n')
+num_particles = len(x)
+density = num_particles / (Lx * Ly * Lz)
+size = (Lx, Ly, Lz)
 system = espresso.System()
 system.rng = espresso.esutil.RNG()
 system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
@@ -54,19 +54,9 @@ nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-
-# read in particle coordinates from file
-#f = open('rings.xyz')
-#for id, line in enumerate(f):
-#  i, j, k, x, y, z = map(float, line.split())
-#  system.storage.addParticle(id, Real3D(x, y, z))
-#f.close()
-
+# add particles to the system and then decompose
 for pid in range(num_particles):
   system.storage.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
-
 system.storage.decompose()
 
 # Lennard-Jones with Verlet list
@@ -76,48 +66,13 @@ interLJ = espresso.interaction.VerletListLennardJones(vl)
 interLJ.setPotential(type1 = 0, type2 = 0, potential = potLJ)
 system.addInteraction(interLJ)
 
-# create a list of bonds
-#bonds = []
-#for i in range(chains):
-#  for j in range(monomers - 1):
-#    id1 = i * monomers + j
-#    id2 = id1 + 1
-#    bonds.append((id1, id2))
-#  bonds.append((i * monomers + monomers - 1, i * monomers))
-
-#f = open('bonds.dat', 'w')
-#for i, b in enumerate(bonds):
-#  f.write('%d %d %d %d\n' % (i+1, 1, b[0]+1, b[1]+1))
-#f.close()
-
+# FENE bonds
 fpl = espresso.FixedPairList(system.storage)
 fpl.addBonds(bonds)
 potFENE = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
 interFENE = espresso.interaction.FixedPairListFENE(system, fpl)
 interFENE.setPotential(type1 = 0, type2 = 0, potential = potFENE)
 system.addInteraction(interFENE)
-
-# create a list of angles
-#angles = []
-#for i in range(chains):
-#  for j in range(monomers - 2):
-#    id1 = i * monomers + j
-#    id2 = id1 + 1
-#    id3 = id1 + 2
-#    angles.append((id1, id2, id3))
-#  id1 = i * monomers + monomers - 2
-#  id2 = i * monomers + monomers - 1
-#  id3 = i * monomers
-#  angles.append((id1, id2, id3))
-#  id1 = i * monomers + monomers - 1
-#  id2 = i * monomers
-#  id3 = i * monomers + 1
-#  angles.append((id1, id2, id3))
-
-#f = open('angles.dat', 'w')
-#for i, b in enumerate(angles):
-#  f.write('%d %d %d %d %d\n' % (i+1, 1, b[0]+1, b[1]+1, b[2]+1))
-#f.close()
 
 if(lammps_reader):
   # Cosine with FixedTriple list
@@ -138,7 +93,7 @@ else:
 
 # integrator
 integrator = espresso.integrator.VelocityVerlet(system)
-integrator.dt = 0.001
+integrator.dt = 0.003
 
 if(nvt):
   langevin = espresso.integrator.Langevin(system)
@@ -146,6 +101,18 @@ if(nvt):
   langevin.temperature = 1.0
   integrator.langevin = langevin
   integrator.dt = 0.01
+
+print ''
+print 'number of particles =', num_particles
+print 'density = %.4f' % (density)
+print 'rc =', rc
+print 'dt =', integrator.dt
+print 'skin =', system.skin
+print 'nvt =', nvt
+print 'steps =', steps
+print 'NodeGrid = %s' % (nodeGrid,)
+print 'CellGrid = %s' % (cellGrid,)
+print ''
 
 # analysis
 configurations = espresso.analysis.Configurations(system)
@@ -164,45 +131,27 @@ Ep = interLJ.computeEnergy()
 Eb = interFENE.computeEnergy()
 Ea = interCosine.computeEnergy()
 Etotal = Ek + Ep + Eb + Ea
-sys.stdout.write(' step     T        P        Pxy       etotal   ekinetic   epair   ebond   eangle\n')
+sys.stdout.write(' step     T          P       Pxy        etotal      ekinetic      epair        ebond       eangle\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
 
-if(bench):
-  start_time = time.clock()
-  integrator.run(steps)
-  print 'CPU time =', time.clock() - start_time, 's'
-  T = temperature.compute()
-  P = pressure.compute()
-  Pij = pressureTensor.compute()
-  Ek = 0.5 * T * (3 * num_particles)
-  Ep = interLJ.computeEnergy()
-  Eb = interFENE.computeEnergy()
-  Ea = interCosine.computeEnergy()
-  Etotal = Ek + Ep + Eb + Ea
-  sys.stdout.write(fmt % (steps, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
-  configurations.clear()
-  sys.exit(1)
+start_time = time.clock()
+integrator.run(steps)
+end_time = time.clock()
+T = temperature.compute()
+P = pressure.compute()
+Pij = pressureTensor.compute()
+Ek = 0.5 * T * (3 * num_particles)
+Ep = interLJ.computeEnergy()
+Eb = interFENE.computeEnergy()
+Ea = interCosine.computeEnergy()
+Etotal = Ek + Ep + Eb + Ea
+sys.stdout.write(fmt % (steps, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
+sys.stdout.write('\n')
 
-base = 'ring_melt.'
-intervals = 200
-nsteps = steps / intervals
-for i in range(1, intervals + 1):
-  integrator.run(nsteps)
-  step = nsteps * i
-  T = temperature.compute()
-  P = pressure.compute()
-  Pij = pressureTensor.compute()
-  Ek = 0.5 * T * (3 * num_particles)
-  Ep = interLJ.computeEnergy()
-  Eb = interFENE.computeEnergy()
-  Ea = interCosine.computeEnergy()
-  Etotal = Ek + Ep + Eb + Ea
-  configurations.gather()
-  f = open(base + str(step) + '.pos', 'w')
-  for conf in configurations:
-    for pid in conf:
-      pos = conf[pid]
-      f.write('%10.3f %10.3f %10.3f\n' % (pos.x, pos.y, pos.z))
-  f.close()
-  configurations.clear()
-  sys.stdout.write(fmt % (step, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
+# print timings neighbor list information
+timers.show(integrator.getTimers(), precision=2)
+sys.stdout.write('Total # of neighbors = %d\n' % vl.totalSize())
+sys.stdout.write('Ave neighs/atom = %.1f\n' % (vl.totalSize() / float(num_particles)))
+sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
+sys.stdout.write('Integration steps = %d\n' % integrator.step)
+sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))

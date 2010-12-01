@@ -59,6 +59,7 @@ python_SCRIPTS += \
         tools/convert/gromacs.py \
         tools/convert/lammps.py \
 	tools/init_cfg/__init__.py \
+	tools/timers.py \
 	tools/init_cfg/lattice.py
 
 noinst_LTLIBRARIES += \

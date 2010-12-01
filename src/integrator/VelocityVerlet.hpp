@@ -23,6 +23,9 @@ namespace espresso {
         shared_ptr<class Langevin> getLangevin() { return langevin; }
 
         void run(int nsteps);
+        
+        /** Load timings in array to export to Python as a tuple. */
+        void loadTimers(real t[10]);
 
         /** Register this class so it can be used from Python. */
         static void registerPython();
@@ -63,6 +66,8 @@ namespace espresso {
         esutil::WallTimer timeIntegrate;  //!< used for timing
 
         // variables that keep time information about different phases
+        real timeRun;
+        real timeLost;
         real timeForce;
         real timeForceComp[100];
         real timeComm1;
