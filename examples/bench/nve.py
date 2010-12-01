@@ -36,7 +36,7 @@ system.skin = skin
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
-system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
+system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # add particles to the system
 for pid in range(num_particles):

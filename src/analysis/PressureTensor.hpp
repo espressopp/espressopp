@@ -4,6 +4,7 @@
 
 #include "types.hpp"
 #include "Observable.hpp"
+#include "Tensor.hpp"
 
 namespace espresso {
   namespace analysis {
@@ -13,7 +14,7 @@ namespace espresso {
       PressureTensor(shared_ptr< System > system) : Observable(system) {}
       ~PressureTensor() {}
       virtual real compute() const;
-      virtual void computeTensor(real wij[6]) const;
+      virtual Tensor computeTensor() const;
 
       static void registerPython();
     };
