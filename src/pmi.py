@@ -295,7 +295,7 @@ def create(cls=None, *args, **kwds) :
         # Create the destroyer so that the instances on the workers
         # are destroyed
         obj.__pmidestroyer = __Destroyer(oid)
-
+        print "obj=",obj
         return obj
     else :
         return receive(_CREATE)
@@ -508,6 +508,38 @@ def dump() :
 def __workerDump() :
     import pprint
     print("OBJECT_CACHE=%s", pprint.pformat(OBJECT_CACHE))
+
+##################################################
+## ACTIVATE
+##################################################
+def activate(*args,comm=None) :
+    """Activate"""
+    if __checkController(activate) :
+        comm = args[0]
+        pmioid = comm.localcomm.__pmioid
+        print "workerActivate",_MPIcomm.rank,pmioid
+        _broadcast(_ACTIVATE,pmioid)
+    else :
+        pmioid=receive(_ACTIVATE)
+
+def __workerActivate() :
+    global _MPIcomm
+    print "workerActivate",_MPIcomm.rank
+
+##################################################
+## DEACTIVATE
+##################################################
+def deactivate(*args) :
+    """Deactivate"""
+    if __checkController(deactivate) :
+        _broadcast(_DEACTIVATE)
+    else :
+        receive(_DEACTIVATE)
+    print "workerDeActivate",_MPIcomm.rank,args
+
+def __workerDeActivate() :
+    global _MPIcomm
+    print "workerDeActivate",_MPIcomm.rank
 
 ##################################################
 ## AUTOMATIC OBJECT DELETION
@@ -1076,7 +1108,9 @@ _CMD = [
     ('DELETE', __workerDelete),
     ('SYNC', __workerSync),
     ('STOP', __workerStop),
-    ('DUMP', __workerDump) 
+    ('DUMP', __workerDump),
+    ('ACTIVATE', __workerActivate),
+    ('DEACTIVATE', __workerDeActivate)
     ]
 
 _MAXCMD = len(_CMD)
@@ -1101,9 +1135,10 @@ from MPI import OP_NULL, MAX, MIN, SUM, PROD, LAND, BAND, LOR, BOR, LXOR, BXOR, 
 
 def _MPIInit(comm=MPI.COMM_WORLD):
     # The communicator used by PMI
-    global _MPIcomm, CONTROLLER, rank, size, \
+    global _MPIcomm, _MPIsubcomm, CONTROLLER, rank, size, \
         isController, isWorker, workerStr, log
     _MPIcomm = comm
+    _MPIsubcomm = None
 
     CONTROLLER = 0
     rank = _MPIcomm.rank
@@ -1121,16 +1156,34 @@ def _MPIInit(comm=MPI.COMM_WORLD):
         log = logging.getLogger('%s.worker%d' % (__name__, rank))
 
 def _MPIGather(value):
-    global CONTROLLER, _MPIcomm
-    return _MPIcomm.gather(value, root=CONTROLLER)
+    global CONTROLLER, _MPIcomm, _MPIsubcomm
+    if _MPIsubcomm :
+        if _MPIsubcomm != MPI.COMM_NULL :
+            return _MPIsubcomm.gather(value, root=CONTROLLER)
+        else :
+            print "ERROR: _MPIsubcomm is MPI.COMM_NULL in pmi._MPIGather"
+    else :
+        return _MPIcomm.gather(value, root=CONTROLLER)
 
 def _MPIBroadcast(value=None):
-    global CONTROLLER, _MPIcomm
-    return _MPIcomm.bcast(value, root=CONTROLLER)
+    global CONTROLLER, _MPIcomm, _MPIsubcomm
+    if _MPIsubcomm :
+        if _MPIsubcomm != MPI.COMM_NULL :
+            return _MPIsubcomm.bcast(value, root=CONTROLLER)
+        else :
+            print "ERROR: _MPIsubcomm is MPI.COMM_NULL in pmi._MPIBroadcast"
+    else :
+        return _MPIcomm.bcast(value, root=CONTROLLER)
 
 def _MPIReduce(op, value):
-    global CONTROLLER, _MPIcomm
-    return _MPIcomm.reduce(value, root=CONTROLLER, op=op)
+    global CONTROLLER, _MPIcomm, _MPIsubcomm
+    if _MPIsubcomm :
+        if _MPIsubcomm != MPI.COMM_NULL :
+            return _MPIsubcomm.reduce(value, root=CONTROLLER, op=op)
+        else :
+            print "ERROR: _MPIsubcomm is MPI.COMM_NULL in pmi._MPIReduce"
+    else :
+        return _MPIcomm.reduce(value, root=CONTROLLER, op=op)
 
 def _MPISpawnAndMerge(ntasks, command):
     cmd = command[0]
@@ -1181,6 +1234,40 @@ def _MPIBacktranslateReduceOp(arg0):
         return arg0.getOp()
     else:
         return None
+
+########################################
+# Communicator Class
+########################################
+
+class CommunicatorLocal(object) :
+    'PMI CommunicatorLocal class'
+    def __init__(self, cpugroup=None):
+        if not cpugroup :
+            cpugroup = range(0, _MPIcomm.size)
+        self._cpugroup = cpugroup
+        self._MPIsubcomm = None
+        if max(self._cpugroup) < _MPIcomm.size :
+            commgroup = _MPIcomm.Get_group()
+            subcommgroup = commgroup.Incl(self._cpugroup)
+            self._MPIsubcomm = _MPIcomm.Create(subcommgroup)
+
+    def getMPIsubcomm(self) :
+       'getter for MPIsubcomm'
+       return self._MPIsubcomm
+
+    def getMPIcpugroup(self):
+        'getter for MPIsubgroup'
+        return self._cpugroup
+
+class Communicator(object) :
+    'PMI Communicator class'
+    def __init__(self, *args, **kwds) :
+        if isController :
+            self.localcomm = create(_translateClass(CommunicatorLocal), *args, **kwds)
+    def getMPIsubcomm(self) :
+        return self.localcomm._MPIsubcomm
+    def getMPIcpugroup(self):
+        return self.localcomm._cpugroup
 
 ##################################################
 ## SETUP
