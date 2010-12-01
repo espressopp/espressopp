@@ -308,9 +308,10 @@ namespace espresso {
 
       LOG4ESPP_INFO(theLogger, "init forces for real + ghost particles");
 
-      for(ParticleGroup::iterator cit(group->begin()); cit != group->end(); ++cit) {
-	cit->force() = 0.0;
+      for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
+        cit->force() = 0.0;
       }
+
     }
 
     /*****************************************************************************/
@@ -331,11 +332,11 @@ namespace espresso {
 	LOG4ESPP_DEBUG(theLogger, "real forces");
       }
   
-      for(ParticleGroup::iterator cit(group->begin()); cit != group->end(); ++cit) {
+      for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
 
-	LOG4ESPP_DEBUG(theLogger, 
-		       "Particle " << cit->id()
-		       << ", force = " << cit->force());
+        LOG4ESPP_DEBUG(theLogger,
+                       "Particle " << cit->id()
+                       << ", force = " << cit->force());
       }
     }
 
