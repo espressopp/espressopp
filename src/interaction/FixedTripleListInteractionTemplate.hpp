@@ -6,6 +6,7 @@
 #include "types.hpp"
 #include "Interaction.hpp"
 #include "Real3D.hpp"
+#include "Tensor.hpp"
 #include "Particle.hpp"
 #include "FixedTripleList.hpp"
 #include "esutil/Array2D.hpp"
@@ -48,7 +49,7 @@ namespace espresso {
       virtual void addForces();
       virtual real computeEnergy();
       virtual real computeVirial();
-      virtual void computeVirialTensor(real* wij_);
+      virtual void computeVirialTensor(Tensor& w);
       virtual real getMaxCutoff();
 
     protected:
@@ -63,7 +64,7 @@ namespace espresso {
     template < typename _AngularPotential > inline void
     FixedTripleListInteractionTemplate < _AngularPotential >::addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by FixedTripleList");
-      bc::BC& bc = *getSystemRef().bc;  // boundary conditions
+      const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
       for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
@@ -86,7 +87,7 @@ namespace espresso {
     computeEnergy() {
       LOG4ESPP_INFO(theLogger, "compute energy of the triples");
 
-      const espresso::bc::BC& bc = *getSystemRef().bc;
+      const bc::BC& bc = *getSystemRef().bc;
       real e = 0.0;
       for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
@@ -108,17 +109,18 @@ namespace espresso {
     computeVirial() {
       LOG4ESPP_INFO(theLogger, "compute scalar virial of the triples");
 
+      const bc::BC& bc = *getSystemRef().bc;
       real w = 0.0;
       for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
         const Potential &potential = getPotential(p1.type(), p2.type());
-        Real3D force12(0.0, 0.0, 0.0);
-        Real3D force32(0.0, 0.0, 0.0);
         const espresso::bc::BC& bc = *getSystemRef().bc;
-        Real3D dist12 = bc.getMinimumImageVector(p1.position(), p2.position());
-        Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
+        Real3D dist12, dist32;
+        bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
+        bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+        Real3D force12, force32;
         potential._computeForce(force12, force32, dist12, dist32);
         w += dist12 * force12 + dist32 * force32;
       }
@@ -128,26 +130,21 @@ namespace espresso {
     template < typename _AngularPotential >
     inline void
     FixedTripleListInteractionTemplate < _AngularPotential >::
-    computeVirialTensor(real* wij_) {
+    computeVirialTensor(Tensor& w) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 
+      const bc::BC& bc = *getSystemRef().bc;
       for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
         const Potential &potential = getPotential(p1.type(), p2.type());
-        Real3D force12(0.0, 0.0, 0.0);
-        Real3D force32(0.0, 0.0, 0.0);
-        const espresso::bc::BC& bc = *getSystemRef().bc;
-        Real3D dist12 = bc.getMinimumImageVector(p1.position(), p2.position());
-        Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
+        Real3D dist12, dist32;
+        bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
+        bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+        Real3D force12, force32;
         potential._computeForce(force12, force32, dist12, dist32);
-        wij_[0] += dist12[0] * force12[0] + dist32[0] * force32[0];
-        wij_[1] += dist12[1] * force12[1] + dist32[1] * force32[1];
-        wij_[2] += dist12[2] * force12[2] + dist32[2] * force32[2];
-        wij_[3] += dist12[0] * force12[1] + dist32[0] * force32[1];
-        wij_[4] += dist12[0] * force12[2] + dist32[0] * force32[2];
-        wij_[5] += dist12[1] * force12[2] + dist32[1] * force32[2];
+        w += Tensor(dist12, force12) + Tensor(dist32, force32);
       }
     }
 

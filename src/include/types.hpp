@@ -28,6 +28,7 @@ namespace espresso {
 
   class Real3D;
   class Int3D;
+  class Tensor;
 
   class Particle;
   class ParticleList;

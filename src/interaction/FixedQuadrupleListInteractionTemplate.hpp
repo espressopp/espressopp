@@ -48,7 +48,7 @@ namespace espresso {
       virtual void addForces();
       virtual real computeEnergy();
       virtual real computeVirial();
-      virtual void computeVirialTensor(real* wij_);
+      virtual void computeVirialTensor(Tensor& w);
       virtual real getMaxCutoff();
 
     protected:
@@ -65,6 +65,8 @@ namespace espresso {
 
       LOG4ESPP_INFO(theLogger, "add forces computed by FixedQuadrupleList");
 
+      const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
+
       for (FixedQuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
@@ -72,9 +74,11 @@ namespace espresso {
         Particle &p4 = *it->fourth;
         const Potential &potential = getPotential(p1.type(), p2.type());
 
-        Real3D dist21 = getSystemRef().bc->getMinimumImageVector(p2.position(), p1.position());
-        Real3D dist32 = getSystemRef().bc->getMinimumImageVector(p3.position(), p2.position());
-        Real3D dist43 = getSystemRef().bc->getMinimumImageVector(p4.position(), p3.position());
+        Real3D dist21, dist32, dist43; // 
+
+        bc.getMinimumImageVectorBox(dist21, p2.position(), p1.position());
+        bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+        bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
 
 	Real3D force1, force2, force3, force4;  // result forces
 
@@ -93,7 +97,7 @@ namespace espresso {
     computeEnergy() {
       LOG4ESPP_INFO(theLogger, "compute energy of the quadruples");
 
-      espresso::bc::BC& bc = *getSystemRef().bc;
+      const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
       real e = 0.0;
       for (FixedQuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
@@ -101,9 +105,13 @@ namespace espresso {
         const Particle &p3 = *it->third;
         const Particle &p4 = *it->fourth;
         const Potential &potential = getPotential(p1.type(), p2.type());
-        Real3D dist21 = bc.getMinimumImageVector(p2.position(), p1.position());
-        Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
-        Real3D dist43 = bc.getMinimumImageVector(p4.position(), p3.position());
+
+        Real3D dist21, dist32, dist43; // 
+
+        bc.getMinimumImageVectorBox(dist21, p2.position(), p1.position());
+        bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+        bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
+
         e += potential._computeEnergy(dist21, dist32, dist43);
       }
       real esum;
@@ -118,22 +126,27 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "compute scalar virial of the quadruples");
 
       real w = 0.0;
+      const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
       for (FixedQuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
         const Particle &p4 = *it->fourth;
         const Potential &potential = getPotential(p1.type(), p2.type());
-        Real3D force1;
-        Real3D force2;
-        Real3D force3;
-        Real3D force4;
-        espresso::bc::BC& bc = *getSystemRef().bc;
-        Real3D dist21 = bc.getMinimumImageVector(p2.position(), p1.position());
-        Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
-        Real3D dist43 = bc.getMinimumImageVector(p4.position(), p3.position());
+
+        Real3D dist21, dist32, dist43; 
+
+        bc.getMinimumImageVectorBox(dist21, p2.position(), p1.position());
+        bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+        bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
+
+        Real3D force1, force2, force3, force4;
+
         potential._computeForce(force1, force2, force3, force4,
                                 dist21, dist32, dist43);
+
+        // TODO: formulas are not correct yet
+
         w += dist21 * force1 + dist32 * force2;
       }
       real wsum;
@@ -144,17 +157,10 @@ namespace espresso {
     template < typename _DihedralPotential >
     inline void
     FixedQuadrupleListInteractionTemplate < _DihedralPotential >::
-    computeVirialTensor(real* wij_) {
+    computeVirialTensor(Tensor& w) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the quadruples");
     
-      wij_[0] = 0.0;
-      wij_[1] = 0.0;
-      wij_[2] = 0.0;
-      wij_[3] = 0.0;
-      wij_[4] = 0.0;
-      wij_[5] = 0.0;
-
-      espresso::bc::BC& bc = *getSystemRef().bc;
+      const bc::BC& bc = *getSystemRef().bc;
 
       for (FixedQuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
@@ -162,26 +168,22 @@ namespace espresso {
         const Particle &p3 = *it->third;
         const Particle &p4 = *it->fourth;
         const Potential &potential = getPotential(p1.type(), p2.type());
-        Real3D force1;
-        Real3D force2;
-        Real3D force3;
-        Real3D force4;
-        Real3D dist21 = bc.getMinimumImageVector(p2.position(), p1.position());
-        Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
-        Real3D dist43 = bc.getMinimumImageVector(p4.position(), p3.position());
+
+        Real3D dist21, dist32, dist43; 
+
+        bc.getMinimumImageVectorBox(dist21, p2.position(), p1.position());
+        bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+        bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
+
+        Real3D force1, force2, force3, force4;
+
         potential._computeForce(force1, force2, force3, force4,
                                 dist21, dist32, dist43);
-        wij_[0] += dist21[0] * force1[0] - dist32[0] * force2[0];
-        wij_[1] += dist21[1] * force1[1] - dist32[1] * force2[1];
-        wij_[2] += dist21[2] * force1[2] - dist32[2] * force2[2];
-        wij_[3] += dist21[0] * force1[1] - dist32[0] * force2[1];
-        wij_[4] += dist21[0] * force1[2] - dist32[0] * force2[2];
-        wij_[5] += dist21[1] * force1[2] - dist32[1] * force2[2];
+
+        // TODO: formulas are not correct yet
+
+        w += Tensor(dist21, force1) - Tensor(dist32, force2);
       }
-      real wij_sum[6];
-      boost::mpi::reduce(*mpiWorld, wij_, 6, wij_sum, std::plus<real>(), 0);
-      for (size_t k = 0; k < 6; k++)
-        wij_[k] = wij_sum[k];
     }
 
     template < typename _DihedralPotential >
