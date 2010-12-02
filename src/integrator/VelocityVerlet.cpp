@@ -1,9 +1,7 @@
+#include <iomanip>
 #include "python.hpp"
-
 #include "VelocityVerlet.hpp"
-
 #include "Langevin.hpp"
-
 #include "iterator/CellListIterator.hpp"
 #include "interaction/Interaction.hpp"
 #include "interaction/Potential.hpp"
@@ -46,7 +44,7 @@ namespace espresso {
     {
       int nResorts = 0;
 
-      real      time;
+      real time;
 
       timeIntegrate.reset();
 
@@ -122,19 +120,19 @@ namespace espresso {
         time = timeIntegrate.getElapsedTime();
         integrate2();
         timeInt2 += timeIntegrate.getElapsedTime() - time;
-
       }
+
+      timeRun = timeIntegrate.getElapsedTime();
+      timeLost = timeRun - (timeForceComp[0] + timeForceComp[1] + timeForceComp[2] +
+                 timeComm1 + timeComm2 + timeInt1 + timeInt2 + timeResort);
 
       LOG4ESPP_INFO(theLogger, "finished run");
 
       // ToDo: print Timers only if INFO is enabled
-
-      printTimers();
+      //printTimers();
     }
 
-    void VelocityVerlet::resetTimers()
-    {
-      timeResort = 0.0;
+    void VelocityVerlet::resetTimers() {
       timeForce  = 0.0;
       for(int i = 0; i < 100; i++)
         timeForceComp[i] = 0.0;
@@ -142,19 +140,66 @@ namespace espresso {
       timeComm2  = 0.0;
       timeInt1   = 0.0;
       timeInt2   = 0.0;
+      timeResort = 0.0;
     }
 
-    void VelocityVerlet::printTimers()
-    {
-      std::cout << "time: run = " << timeIntegrate <<
-                   ", pair = " << timeForceComp[0] <<
-                   ", FENE = " << timeForceComp[1] <<
-                   ", angle = " << timeForceComp[2] <<
-                   ", comm1 = " << timeComm1 <<
-                   ", comm2 = " << timeComm2 <<
-                   ", int1 = " << timeInt1 <<
-                   ", int2 = " << timeInt2 <<
-                   ", resort = " << timeResort << std::endl; 
+    using namespace boost::python;
+
+    static object wrapGetTimers(class VelocityVerlet* obj) {
+      real tms[10];
+      obj->loadTimers(tms);
+      return make_tuple(tms[0],
+                        tms[1],
+                        tms[2],
+                        tms[3],
+                        tms[4],
+                        tms[5],
+                        tms[6],
+                        tms[7],
+                        tms[8],
+                        tms[9]);
+    }
+
+    void VelocityVerlet::loadTimers(real t[10]) {
+      t[0] = timeRun;
+      t[1] = timeForceComp[0];
+      t[2] = timeForceComp[1];
+      t[3] = timeForceComp[2];
+      t[4] = timeComm1;
+      t[5] = timeComm2;
+      t[6] = timeInt1;
+      t[7] = timeInt2;
+      t[8] = timeResort;
+      t[9] = timeLost;
+    }
+
+    void VelocityVerlet::printTimers() {
+
+      using namespace std;
+
+      real pct;
+
+      cout << endl;
+      cout << "run = " << setiosflags(ios::fixed) << setprecision(1) << timeRun << endl;
+      pct = 100.0 * (timeForceComp[0] / timeRun);
+      cout << "pair (%) = " << timeForceComp[0] << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeForceComp[1] / timeRun);
+      cout << "FENE (%) = " << timeForceComp[1] << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeForceComp[2] / timeRun);
+      cout << "angle (%) = " << timeForceComp[2] << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeComm1 / timeRun);
+      cout << "comm1 (%) = " << timeComm1 << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeComm2 / timeRun);
+      cout << "comm2 (%) = " << timeComm2 << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeInt1 / timeRun);
+      cout << "int1 (%) = " << timeInt1 << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeInt2 / timeRun);
+      cout << "int2 (%) = " << timeInt2 << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeResort / timeRun);
+      cout << "resort (%) = " << timeResort << " (" << pct << ")" << endl;
+      pct = 100.0 * (timeLost / timeRun);
+      cout << "other (%) = " << timeLost << " (" << pct << ")" << endl;
+      cout << endl;
     }
 
     /*****************************************************************************/
@@ -233,6 +278,7 @@ namespace espresso {
 
 	cit->velocity() += dtfm * cit->force();
       }
+      step++;
     }
 
     /*****************************************************************************/
@@ -377,12 +423,10 @@ namespace espresso {
       using namespace espresso::python;
 
       // Note: use noncopyable and no_init for abstract classes
-
       class_<VelocityVerlet, shared_ptr<VelocityVerlet>, bases<MDIntegrator> >
-
         ("integrator_VelocityVerlet", init< shared_ptr<System> >())
-
         .add_property("langevin", &VelocityVerlet::getLangevin, &VelocityVerlet::setLangevin)
+        .def("getTimers", &wrapGetTimers)
         ;
     }
   }

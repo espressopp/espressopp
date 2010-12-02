@@ -11,6 +11,6 @@ if pmi.isController :
         """Abstract base class for molecular dynamics integrator."""
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            pmiproperty = [ "dt" ],
-            pmicall = [ "run" ]
+            pmiproperty = [ 'dt', 'step' ],
+            pmicall = [ 'run' ]
             )

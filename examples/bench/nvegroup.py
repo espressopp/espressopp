@@ -13,21 +13,22 @@ import MPI
 import logging
 from espresso import Real3D, Int3D
 from espresso.tools.convert import lammps
-from espresso.tools import decomp, timers
+from espresso.tools import decomp
+
+# benchmark or production (bench = True is a short job)
+bench = True
 
 steps = 1000
-rc = 2.5
-skin = 0.3
-nvt = False
 x, y, z, Lx, Ly, Lz = lammps.read('data.lj')
-
-######################################################################
-### IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE ###
-######################################################################
-sys.stdout.write('Setting up simulation ...\n')
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
+rc = 2.5
+skin = 0.3
+
+print 'number of particles =', num_particles
+print 'density =', density
+
 system = espresso.System()
 system.rng = espresso.esutil.RNG()
 system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
@@ -37,9 +38,17 @@ nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
-# add particles to the system then decompose
+grp=espresso.ParticleGroup(system.storage)
+
+# add particles to the system
 for pid in range(num_particles):
   system.storage.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
+for pid in range(num_particles):
+  grp.add(pid+1)
+
+grp.show()
+
+# assign particles to processors then cells
 system.storage.decompose()
 
 # all particles interact via a LJ interaction (use Verlet lists)
@@ -50,20 +59,9 @@ interLJ.setPotential(type1=0, type2=0, potential=potLJ)
 system.addInteraction(interLJ)
 
 # setup integrator
-integrator = espresso.integrator.VelocityVerlet(system)
+# integrator = espresso.integrator.VelocityVerlet(system)
+integrator = espresso.integrator.VelocityVerletOnGroup(system, grp)
 integrator.dt = 0.005
-
-print ''
-print 'number of particles =', num_particles
-print 'density = %.4f' % (density)
-print 'rc =', rc
-print 'dt =', integrator.dt
-print 'skin =', system.skin
-print 'nvt =', nvt
-print 'steps =', steps
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
-print ''
 
 # analysis
 temperature = espresso.analysis.Temperature(system)
@@ -77,23 +75,16 @@ P = pressure.compute()
 Pij = pressureTensor.compute()
 Ek = 0.5 * T * (3 * num_particles)
 Ep = interLJ.computeEnergy()
-sys.stdout.write(' step      T        P        Pxy      etotal      epotential     ekinetic\n')
+sys.stdout.write(' step     T        P        Pxy       etotal     epotential    ekinetic\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Ek + Ep, Ep, Ek))
 
-time1 = time.clock()
+time1 = time.time()
 integrator.run(steps)
-time2 = time.clock()
+time2 = time.time()
 T = temperature.compute()
 P = pressure.compute()
 Pij = pressureTensor.compute()
 Ek = 0.5 * T * (3 * num_particles)
 Ep = interLJ.computeEnergy()
 sys.stdout.write(fmt % (steps, T, P, Pij[3], Ek + Ep, Ep, Ek))
-sys.stdout.write('\n')
-
-timers.show(integrator.getTimers(), precision=3)
-sys.stdout.write('Total # of neighbors = %d\n' % vl.totalSize())
-sys.stdout.write('Ave neighs/atom = %.1f\n' % (vl.totalSize() / float(num_particles)))
-sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
-sys.stdout.write('Integration steps = %d\n' % integrator.step)
-sys.stdout.write('CPU time = %.1f\n' % (time2 - time1))
+print("walltime = %g"%(time2 - time1))

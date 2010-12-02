@@ -5,6 +5,7 @@
 #include "types.hpp"
 #include "Interaction.hpp"
 #include "Real3D.hpp"
+#include "Tensor.hpp"
 #include "Particle.hpp"
 #include "VerletList.hpp"
 #include "esutil/Array2D.hpp"
@@ -45,7 +46,7 @@ namespace espresso {
       virtual void addForces();
       virtual real computeEnergy();
       virtual real computeVirial();
-      virtual void computeVirialTensor(real* wij_);
+      virtual void computeVirialTensor(Tensor& w);
       virtual real getMaxCutoff();
 
     protected:
@@ -122,7 +123,7 @@ namespace espresso {
     }
 
     template < typename _Potential > inline void
-    VerletListInteractionTemplate < _Potential >::computeVirialTensor(real* wij_) {
+    VerletListInteractionTemplate < _Potential >::computeVirialTensor(Tensor& w) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
 
       for (PairList::Iterator it(verletList->getPairs());
@@ -136,12 +137,7 @@ namespace espresso {
         Real3D force(0.0, 0.0, 0.0);
         if(potential._computeForce(force, p1, p2)) {
           Real3D dist = p1.position() - p2.position();
-          wij_[0] += dist[0] * force[0];
-          wij_[1] += dist[1] * force[1];
-          wij_[2] += dist[2] * force[2];
-          wij_[3] += dist[0] * force[1];
-          wij_[4] += dist[0] * force[2];
-          wij_[5] += dist[1] * force[2];
+          w += Tensor(dist, force);
         }
       }
     }

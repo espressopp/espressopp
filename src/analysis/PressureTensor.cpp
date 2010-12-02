@@ -14,7 +14,7 @@ using namespace interaction;
 
 namespace espresso {
   namespace analysis {
-    void PressureTensor::computeTensor(real wij[6]) const {
+    Tensor PressureTensor::computeTensor() const {
 
       System& system = getSystemRef();
   
@@ -31,53 +31,42 @@ namespace espresso {
       // compute the kinetic contribution (2/3 \sum 1/2mv^2)
       real e_kinetic;
       real p_kinetic;
-      real vvLocal[6], vv[6];
-      for (size_t j = 0; j < 6; j++) vvLocal[j] = 0.0;
+      Tensor vvLocal(0.0);
+      Tensor vv;
 
       CellList realCells = system.storage->getRealCells();
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         real mass = cit->mass();
         Real3D& vel = cit->velocity();
-        vvLocal[0] += mass * vel[0] * vel[0];
-        vvLocal[1] += mass * vel[1] * vel[1];
-        vvLocal[2] += mass * vel[2] * vel[2];
-        vvLocal[3] += mass * vel[0] * vel[1];
-        vvLocal[4] += mass * vel[0] * vel[2];
-        vvLocal[5] += mass * vel[1] * vel[2];
+        vvLocal += mass * Tensor(vel, vel);
       }
-      boost::mpi::reduce(*mpiWorld, vvLocal, 6, vv, std::plus<real>(), 0);
+      boost::mpi::reduce(*mpiWorld, vvLocal.get(), 6, vv.get(), std::plus<real>(), 0);
 
       // compute the short-range nonbonded contribution
-      real wijLocal[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+      Tensor wijLocal(0.0);
+      Tensor wij;
       const InteractionList& srIL = system.shortRangeInteractions;
       for (size_t j = 0; j < srIL.size(); j++) {
         srIL[j]->computeVirialTensor(wijLocal);
       }
-      boost::mpi::reduce(*mpiWorld, wijLocal, 6, wij, std::plus<real>(), 0);
-      for (size_t k = 0; k < 6; k++) {
-        wij[k] = (vv[k] + wij[k]) / V;
-      }
+      boost::mpi::reduce(*mpiWorld, wijLocal.get(), 6, wij.get(), std::plus<real>(), 0);
+      return (vv + wij) / V;
     }
 
+    // TODO: this dummy routine is still needed as we have not yet TensorObservable
+
     real PressureTensor::compute() const {
-      real wij[6];
-      computeTensor(wij);
       return -1.0;
     }
 
     using namespace boost::python;
 
-    static object wrapCompute(class PressureTensor* obj) {
-      real wij[6];
-      obj->computeTensor(wij);
-      return make_tuple(wij[0], wij[1], wij[2], wij[3], wij[4], wij[5]);
-    }
-
     void PressureTensor::registerPython() {
       using namespace espresso::python;
       class_<PressureTensor, bases< Observable > >
         ("analysis_PressureTensor", init< shared_ptr< System > >())
-        .def("compute", &wrapCompute) 
+        .def("compute", &PressureTensor::computeTensor) 
       ;
     }
   }

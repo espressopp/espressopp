@@ -19,6 +19,7 @@ namespace espresso {
         LOG4ESPP_ERROR(theLogger, "system has no storage");
       }
       timeFlag = true;
+      step = 0;
     }
     
     MDIntegrator::~MDIntegrator()
@@ -44,9 +45,9 @@ namespace espresso {
       using namespace espresso::python;
 
       // Note: use noncopyable and no_init for abstract classes
-
       class_<MDIntegrator, boost::noncopyable >("integrator_MDIntegrator", no_init)
         .add_property("dt", &MDIntegrator::getTimeStep, &MDIntegrator::setTimeStep)
+        .add_property("step", &MDIntegrator::getStep, &MDIntegrator::setStep)
         .add_property("system", &SystemAccess::getSystem)
         .def("run", &MDIntegrator::run)
         ;

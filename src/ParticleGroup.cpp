@@ -78,8 +78,10 @@ namespace espresso {
 
         // update all pointers
         for (p = active.begin(); p != active.end(); ++p) {
-            if(!(p->second = storage->lookupRealParticle(p->first)))
-                    remove.push_back(p->first); // \todo do we need to check for ghosts here
+            if(!(p->second = storage->lookupRealParticle(p->first))) {
+                fprintf(stderr, "ParticleGroup: non local particle\n");
+                remove.push_back(p->first); // \todo do we need to check for ghosts here
+            }
         }
         // remove ghosts, check how iterators behave on erase,
         // eventually this can be done in the loop

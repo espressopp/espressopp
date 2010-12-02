@@ -11,6 +11,7 @@
 #include <FixedTripleList.hpp>
 #include <FixedQuadrupleList.hpp>
 #include <Real3D.hpp>
+#include <Tensor.hpp>
 #include <Int3D.hpp>
 #include <esutil/PyLogger.hpp>
 
@@ -30,6 +31,7 @@ void espresso::registerPython() {
   espresso::FixedTripleList::registerPython();
   espresso::FixedQuadrupleList::registerPython();
   espresso::Real3D::registerPython();
+  espresso::Tensor::registerPython();
   espresso::Int3D::registerPython();
 
   espresso::esutil::registerPython();

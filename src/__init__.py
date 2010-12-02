@@ -6,6 +6,7 @@ pmiimport('espresso')
 
 import _espresso
 from espresso.Real3D import *
+from espresso.Tensor import *
 from espresso.Int3D import *
 from espresso.Particle import *
 from espresso.ParticleGroup import *

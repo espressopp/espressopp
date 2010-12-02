@@ -77,9 +77,12 @@ namespace espresso {
     protected:
 
         // list of active particles
+        // key: particle id, value: reference to local particle
         std::map<longint, Particle*> active;
+
         // list of all particles in group,
         /// \todo find better solution here
+        // key: particle id, value: NONE, just used for lookup
         std::map<longint, longint> particles;
 
         // pointer to storage object

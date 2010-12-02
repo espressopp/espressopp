@@ -17,9 +17,10 @@ from espresso import Real3D, Int3D
 from espresso.tools.convert import lammps
 from espresso.tools import decomp
 from espresso.tools.init_cfg import lattice
+from espresso.tools import timers
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
-steps = 1000
+steps = 10
 rc = 2.5
 skin = 0.3
 nvt = False
@@ -32,7 +33,6 @@ if(init_cfg == 1):
   # LAMMPS with N = 32000
   # useful for checking for identical results against LAMMPS
   file = sys.path[0][:sys.path[0].find('espressopp')] + 'espressopp/examples/data.lj'
-  print file
   x, y, z, Lx, Ly, Lz = lammps.read(file)
   num_particles = len(x)
 elif(init_cfg == 2):
@@ -62,11 +62,9 @@ nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
-# add particles to the system
+# add particles to the system and then decompose
 for pid in range(num_particles):
   system.storage.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
-
-# assign particles to processors then cells
 system.storage.decompose()
 
 # all particles interact via a LJ interaction (use Verlet lists)
@@ -113,7 +111,7 @@ P = pressure.compute()
 Pij = pressureTensor.compute()
 Ek = 0.5 * T * (3 * num_particles)
 Ep = interLJ.computeEnergy()
-sys.stdout.write(' step     T        P        Pxy       etotal     epotential    ekinetic\n')
+sys.stdout.write(' step     T          P        Pxy       etotal     epotential    ekinetic\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Ek + Ep, Ep, Ek))
 
 start_time = time.clock()
@@ -125,8 +123,14 @@ Pij = pressureTensor.compute()
 Ek = 0.5 * T * (3 * num_particles)
 Ep = interLJ.computeEnergy()
 sys.stdout.write(fmt % (steps, T, P, Pij[3], Ek + Ep, Ep, Ek))
-print 'Rebuilds =', vl.builds
-print 'CPU time =', end_time - start_time, 's'
+sys.stdout.write('\n')
+
+timers.show(integrator.getTimers(), precision=3)
+sys.stdout.write('Total # of neighbors = %d\n' % vl.totalSize())
+sys.stdout.write('Ave neighs/atom = %.1f\n' % (vl.totalSize() / float(num_particles)))
+sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
+sys.stdout.write('Integration steps = %d\n' % integrator.step)
+sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))
 sys.exit(1)
 # comment out line above for production run
 
