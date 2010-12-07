@@ -75,15 +75,17 @@ namespace espresso {
 			    const Real3D& dist,
 			    real distSqr) const {
 
-        // real r = sqrt(distSqr);
-        // real ffactor = -K * (r - r0) / (1 - pow((r - r0) / rMax, 2)) / r;
-
-        real r0sq = rMax * rMax;
-        real rlogarg = 1.0 - distSqr / r0sq;
-        real ffactor = -K / rlogarg;
+        real ffactor;
+        if(r0 == 0) {
+          real r = sqrt(distSqr);
+          ffactor = -K * (r - r0) / (1 - pow((r - r0) / rMax, 2)) / r;
+        } else {
+	  real r0sq = rMax * rMax;
+	  real rlogarg = 1.0 - distSqr / r0sq;
+	  ffactor = -K / rlogarg;
+        }
         force = dist * ffactor;
         return true;
-
       }
     };
   }
