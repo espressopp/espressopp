@@ -8,11 +8,13 @@ from _espresso import bc_OrthorhombicBC
 class OrthorhombicBCLocal(BCLocal, bc_OrthorhombicBC):
     'The (local) periodic boundary condition.'
     def __init__(self, rng, boxL=1.0):
-        cxxinit(self, bc_OrthorhombicBC, rng, toReal3D(boxL))
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()  or pmi.isController :
+            cxxinit(self, bc_OrthorhombicBC, rng, toReal3D(boxL))
 
     # override length property
     def setBoxL(self, boxL):
-        self.cxxclass.boxL.fset(self, toReal3D(boxL))
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup() or pmi.isController :
+            self.cxxclass.boxL.fset(self, toReal3D(boxL))
 
     boxL = property(bc_OrthorhombicBC.boxL.fget, setBoxL)
 

@@ -16,7 +16,7 @@ namespace espresso {
 
   public:
 
-    System() : comm(mpiWorld) {}
+    System();
     System(python::object _pyobj);
 
     shared_ptr< mpi::communicator > comm;
@@ -28,6 +28,8 @@ namespace espresso {
     interaction::InteractionList shortRangeInteractions;
 
     real skin;  //<! skin used for VerletList
+
+    bool CommunicatorIsInitialized;
 
     shared_ptr< System > getShared() { 
       return shared_from_this();

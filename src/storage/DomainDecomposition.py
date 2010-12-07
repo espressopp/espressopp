@@ -10,7 +10,8 @@ class DomainDecompositionLocal(StorageLocal,
                                storage_DomainDecomposition):
     'The (local) DomainDecomposition.'
     def __init__(self, system, nodeGrid, cellGrid):
-        cxxinit(self, storage_DomainDecomposition, system, nodeGrid, cellGrid)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, storage_DomainDecomposition, system, nodeGrid, cellGrid)
 
 if pmi.isController:
     class DomainDecomposition(Storage):

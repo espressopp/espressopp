@@ -10,14 +10,16 @@ class StorageLocal(object):
 
     def addParticle(self, pid, *args):
         """Add a particle locally if it belongs to the local domain."""
-        self.cxxclass.addParticle(
-            self, pid, toReal3DFromVector(*args)
-            )
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.addParticle(
+                self, pid, toReal3DFromVector(*args)
+                )
     
     def getParticle(self, pid):
         """Get the local particle. If it is not on this node, any
         attempt to access the particle will raise an exception."""
-        return ParticleLocal(pid, self)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return ParticleLocal(pid, self)
 
     def addParticles(self, particleList, *properties):
         """

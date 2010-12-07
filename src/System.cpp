@@ -9,15 +9,20 @@
 
 namespace espresso {
 
+  System::System() {
+    comm = mpiWorld;
+    CommunicatorIsInitialized = false;
+  }
+
   System::System(python::object _pyobj) {
 
-    /* This is defined in mpi4py.h
-    struct __pyx_obj_6mpi4py_3MPI_Comm {
-      PyObject_HEAD
-      MPI_Comm ob_mpi;
-      int flags;
-    };
-    */
+    //This is defined in mpi4py.h
+    //struct __pyx_obj_6mpi4py_3MPI_Comm {
+    //  PyObject_HEAD
+    //  MPI_Comm ob_mpi;
+    //  int flags;
+    //};
+    
 
     // Following is some extreme typecasting which we need to convert the
     // pmi python object pmi._MPIcomm into a shared_ptr< boost::mpi::communicator >
