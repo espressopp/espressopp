@@ -2,7 +2,7 @@ import espresso
 from espresso import Int3D
 
 L            = 10
-density      = 0.1
+density      = 0.01
 size         = (L, L, L)
 npart        = int(L * L * L * density)
 skin         = 0.3
