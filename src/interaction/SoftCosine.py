@@ -12,42 +12,51 @@ class SoftCosineLocal(PotentialLocal, interaction_SoftCosine):
     'The (local) SoftCosine potential.'
     def __init__(self, A=1.0, cutoff=infinity, shift="auto"):
         """Initialize the local SoftCosine object."""
-        if shift =="auto":
-            cxxinit(self, interaction_SoftCosine, A, cutoff)
-        else:
-            cxxinit(self, interaction_SoftCosine, A, cutoff, shift)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            if shift =="auto":
+                cxxinit(self, interaction_SoftCosine, A, cutoff)
+            else:
+                cxxinit(self, interaction_SoftCosine, A, cutoff, shift)
 
 class VerletListSoftCosineLocal(InteractionLocal, interaction_VerletListSoftCosine):
     'The (local) SoftCosine interaction using Verlet lists.'
     def __init__(self, vl):
-        cxxinit(self, interaction_VerletListSoftCosine, vl)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListSoftCosine, vl)
 
     def setPotential(self, type1, type2, potential):
-        self.cxxclass.setPotential(self, type1, type2, potential)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
 
 class VerletListSoftCosineLocal(InteractionLocal, interaction_VerletListSoftCosine):
     'The (local) SoftCosine interaction using cell lists.'
     def __init__(self, stor):
-        cxxinit(self, interaction_VerletListSoftCosine, stor)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListSoftCosine, stor)
 
     def setPotential(self, type1, type2, potential):
-        self.cxxclass.setPotential(self, type1, type2, potential)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
 
 class CellListSoftCosineLocal(InteractionLocal, interaction_CellListSoftCosine):
     'The (local) SoftCosine interaction using cell lists.'
     def __init__(self, stor):
-        cxxinit(self, interaction_CellListSoftCosine, stor)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_CellListSoftCosine, stor)
 
     def setPotential(self, type1, type2, potential):
-        self.cxxclass.setPotential(self, type1, type2, potential)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
 
 class FixedPairListSoftCosineLocal(InteractionLocal, interaction_FixedPairListSoftCosine):
     'The (local) SoftCosine interaction using FixedPair lists.'
     def __init__(self, system, vl):
-        cxxinit(self, interaction_FixedPairListSoftCosine, system, vl)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_FixedPairListSoftCosine, system, vl)
 
     def setPotential(self, type1, type2, potential):
-        self.cxxclass.setPotential(self, type1, type2, potential)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
 
 if pmi.isController:
     class SoftCosine(Potential):

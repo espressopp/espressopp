@@ -9,15 +9,18 @@ class OPLSLocal(DihedralPotentialLocal, interaction_OPLS):
     'The (local) OPLS potential.'
     def __init__(self, K1=1.0, K2=0.0, K3=0.0, K4=0.0):
         """Initialize the local OPLS object."""
-        cxxinit(self, interaction_OPLS, K1, K2, K3, K4)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_OPLS, K1, K2, K3, K4)
 
 class FixedQuadrupleListOPLSLocal(InteractionLocal, interaction_FixedQuadrupleListOPLS):
     'The (local) OPLS interaction using FixedQuadruple lists.'
     def __init__(self, system, vl):
-        cxxinit(self, interaction_FixedQuadrupleListOPLS, system, vl)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_FixedQuadrupleListOPLS, system, vl)
 
     def setPotential(self, type1, type2, potential):
-        self.cxxclass.setPotential(self, type1, type2, potential)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
 
 if pmi.isController:
     class OPLS(DihedralPotential):

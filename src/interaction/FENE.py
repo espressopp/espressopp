@@ -10,18 +10,21 @@ class FENELocal(PotentialLocal, interaction_FENE):
     def __init__(self, K=1.0, r0=0.0, rMax=1.0, 
                  cutoff=infinity, shift=0.0):
         """Initialize the local FENE object."""
-        if shift == "auto":
-            cxxinit(self, interaction_FENE, K, r0, rMax, cutoff)
-        else:
-            cxxinit(self, interaction_FENE, K, r0, rMax, cutoff, shift)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            if shift == "auto":
+                cxxinit(self, interaction_FENE, K, r0, rMax, cutoff)
+            else:
+                cxxinit(self, interaction_FENE, K, r0, rMax, cutoff, shift)
 
 class FixedPairListFENELocal(InteractionLocal, interaction_FixedPairListFENE):
     'The (local) FENE interaction using FixedPair lists.'
     def __init__(self, system, vl):
-        cxxinit(self, interaction_FixedPairListFENE, system, vl)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_FixedPairListFENE, system, vl)
 
     def setPotential(self, type1, type2, potential):
-        self.cxxclass.setPotential(self, type1, type2, potential)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
 
 if pmi.isController:
     class FENE(Potential):
