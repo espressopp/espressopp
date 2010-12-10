@@ -7,7 +7,8 @@ from _espresso import integrator_VelocityVerlet
 class VelocityVerletLocal(MDIntegratorLocal, integrator_VelocityVerlet):
     'The (local) Velocity Verlet Integrator.'
     def __init__(self, system):
-        cxxinit(self, integrator_VelocityVerlet, system)
+        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, integrator_VelocityVerlet, system)
 
 if pmi.isController :
     class VelocityVerlet(MDIntegrator):

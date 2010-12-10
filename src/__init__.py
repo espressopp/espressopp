@@ -15,6 +15,7 @@ from espresso.VerletList import *
 from espresso.FixedPairList import *
 from espresso.FixedTripleList import *
 from espresso.FixedQuadrupleList import *
+from espresso.MultiSystem import *
 
 infinity=float("inf")
 nan=float("nan")

@@ -183,13 +183,7 @@ def import_(*args) :
         # broadcast the statement
         _broadcast(_IMPORT, *args)
         # locally execute the statement
-        if _PMIComm :
-            if CONTROLLER in _PMIComm.getMPIcpugroup():
-                return __workerImport_(*args)
-            else :
-                pass
-        else :
-            return __workerImport_(*args)
+        return __workerImport_(*args)
 
     elif not inWorkerLoop:
         return receive(_IMPORT)
@@ -225,7 +219,7 @@ def exec_(*args) :
         # broadcast the statement
         _broadcast(_EXEC, *args)
         # locally execute the statement
-        if _PMIComm :
+        if _PMIComm and _PMIComm.isActive() :
             if CONTROLLER in _PMIComm.getMPIcpugroup():
                 return __workerExec_(*args)
             else :
@@ -248,7 +242,7 @@ def __workerExec_(*statements) :
 def execfile_(file):
     if __checkController(execfile_):
         _broadcast(_EXECFILE, file)
-        if _PMIComm :
+        if _PMIComm and _PMIComm.isActive():
             if CONTROLLER in _PMIComm.getMPIcpugroup():
                 return __workerExecfile_(file)
             else :
@@ -311,6 +305,7 @@ def create(cls=None, *args, **kwds) :
 
         # On the controller, store the oid in the instance
         obj.__pmioid = oid
+
         # Create the destroyer so that the instances on the workers
         # are destroyed
         obj.__pmidestroyer = __Destroyer(oid)
@@ -372,7 +367,7 @@ def call(*args, **kwds) :
         cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
         _broadcast(_CALL, tfunction, *targs, **tkwds)
         log.info("Calling: %s", __formatCall(cfunction, cargs, ckwds))
-        if _PMIComm :
+        if _PMIComm and _PMIComm.isActive():
             if CONTROLLER in _PMIComm.getMPIcpugroup():
                 return cfunction(*cargs, **ckwds)
             else :
@@ -440,7 +435,7 @@ def invoke(*args, **kwds) :
         cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
         _broadcast(_INVOKE, tfunction, *targs, **tkwds)
         log.info("Invoking: %s", __formatCall(cfunction, cargs, ckwds))
-        if _PMIComm :
+        if _PMIComm and _PMIComm.isActive():
             if CONTROLLER in _PMIComm.getMPIcpugroup():
                 value = cfunction(*cargs, **ckwds)
             else :
@@ -498,7 +493,7 @@ def reduce(*args, **kwds) :
         cargs, ckwds, targs, tkwds = __translateArgs(args, kwds)
         _broadcast(_REDUCE, treduceOp, tfunction, *targs, **tkwds)
         log.info("Reducing: %s", __formatCall(cfunction, cargs, ckwds))
-        if _PMIComm :
+        if _PMIComm and _PMIComm.isActive():
             if CONTROLLER in _PMIComm.getMPIcpugroup():
                 value = cfunction(*args, **ckwds)
             else :
@@ -558,18 +553,8 @@ def __workerDump() :
 def activate(*args) :
     """Activate"""
     global _MPIcomm, _PMIComm
-    if _PMIComm :
-        if _PMIComm.isActive() :
-            print "CPU%d: worker subgroup is already active - deactivate first !" % (_MPIComm.rank)
-        else :
-            if __checkController(activate) :
-                pmicomm = args[0]
-                pmioid = pmicomm.localcomm.__pmioid
-                _broadcast(_ACTIVATE,pmioid)
-                _PMIComm = pmicomm
-                _PMIComm.activate()
-            else :
-                pmioid=receive(_ACTIVATE)
+    if _PMIComm and _PMIComm.isActive() :
+            log.warning( "worker subgroup is already active - deactivate first !")
     else :
         if __checkController(activate) :
             pmicomm = args[0]
@@ -580,15 +565,13 @@ def activate(*args) :
         else :
             pmioid=receive(_ACTIVATE)
 
-
 def __workerActivate(pmioid) :
     global _MPIcomm, _PMIComm
     pmicomm=_backtranslateOID(pmioid)
     mpicomm=pmicomm.getMPIsubcommWithController()
-    if mpicomm :
-        if mpicomm != MPI.COMM_NULL :
-            _PMIComm = pmicomm
-            _PMIComm.activate()
+    if mpicomm and mpicomm != MPI.COMM_NULL :
+        _PMIComm = pmicomm
+        _PMIComm.activate()
 
 ##################################################
 ## DEACTIVATE
@@ -596,15 +579,14 @@ def __workerActivate(pmioid) :
 def deactivate(*args) :
     """Deactivate"""
     global _MPIcomm, _PMIComm
-    if _PMIComm :
-        if _PMIComm.isActive() :
-            if __checkController(deactivate) :
-                _broadcast(_DEACTIVATE)
-                _PMIComm.deactivate()
-            else :
-                receive(_DEACTIVATE)
+    if _PMIComm and _PMIComm.isActive() :
+        if __checkController(deactivate) :
+            _broadcast(_DEACTIVATE)
+            _PMIComm.deactivate()
         else :
-            print "CPU%d: worker subgroup is not active !" % (_MPIComm.rank)
+            receive(_DEACTIVATE)
+    else :
+        log.warning("worker subgroup is not active !")
 
 def __workerDeActivate() :
     global _MPIcomm, _PMIComm
@@ -627,10 +609,13 @@ def __workerDelete(*args) :
     if len(args) > 0:
         log.info("Deleting oids: %s", args)
         for oid in args:
-            obj=OBJECT_CACHE[oid]
-            log.debug("  %s [%s]" % (obj, oid))
-            # Delete the entry from the cache
-            del OBJECT_CACHE[oid]
+            try :
+                obj=OBJECT_CACHE[oid]
+                log.debug("  %s [%s]" % (obj, oid))
+                # Delete the entry from the cache
+                del OBJECT_CACHE[oid]
+            except KeyError:
+                log.debug("OID [%s] not found on worker%d" % (oid,_MPIcomm.rank))
 
 
 ##################################################
@@ -1228,35 +1213,29 @@ def _MPIInit(comm=MPI.COMM_WORLD):
 
 def _MPIGather(value):
     global CONTROLLER, _MPIcomm, _PMIComm
-    if _PMIComm:
-        if _PMIComm.isActive() :
-            return _PMIComm.getMPIsubcommWithController().gather(value, root=CONTROLLER)
-        else :
-            return _MPIcomm.gather(value, root=CONTROLLER)
+    if _PMIComm and _PMIComm.isActive() :
+        return _PMIComm.getMPIsubcommWithController().gather(value, root=CONTROLLER)
     else :
         return _MPIcomm.gather(value, root=CONTROLLER)
 
 def _MPIBroadcast(value=None):
     global CONTROLLER, _MPIcomm, _PMIComm
-    if _PMIComm :
-        if _PMIComm.isActive() :
-            return _PMIComm.getMPIsubcommWithController().bcast(value, root=CONTROLLER)
-        else :
-            return _MPIcomm.bcast(value, root=CONTROLLER)
+    if _PMIComm and _PMIComm.isActive() :
+        return _PMIComm.getMPIsubcommWithController().bcast(value, root=CONTROLLER)
     else :
         return _MPIcomm.bcast(value, root=CONTROLLER)
 
 def _MPIReduce(op, value):
     global CONTROLLER, _MPIcomm, _PMIComm
-    if _PMIComm :
-        if _PMIComm.isActive() :
-            return _PMIComm.getMPIsubcommWithController().reduce(value, root=CONTROLLER, op=op)
-        else :
-            return _MPIcomm.reduce(value, root=CONTROLLER, op=op)
+    if _PMIComm and _PMIComm.isActive() :
+        return _PMIComm.getMPIsubcommWithController().reduce(value, root=CONTROLLER, op=op)
     else :
         return _MPIcomm.reduce(value, root=CONTROLLER, op=op)
 
 def _MPISpawnAndMerge(ntasks, command):
+    if _PMIComm and _PMIComm.isActive():
+        raise UserError('Requested to SpawnAndMerge, but worker subcommunicator group is active.')
+
     cmd = command[0]
     if len(command) > 1:
         args = command[1:]
@@ -1269,6 +1248,9 @@ def _MPISpawnAndMerge(ntasks, command):
     _MPIInit(newcomm)
 
 def _MPIMergeWithParent():
+    if _PMIComm and _PMIComm.isActive():
+        raise UserError('Requested to MergeWithParent, but worker subcommunicator group is active.')
+
     intercomm = _MPIComm.Get_parent()
     if intercomm == MPI.COMM_NULL: return
     newcomm = intercomm.Merge(True)
@@ -1376,6 +1358,19 @@ class Communicator(object) :
 
     def deactivate(self):
         self.localcomm._isActive = False
+
+
+##################################################
+## check if worker is active
+##################################################
+def workerIsActive():
+    if _PMIComm and _PMIComm.isActive():
+        if _MPIcomm.rank in _PMIComm.getMPIcpugroup():
+            return True
+        else:
+            return False
+    else:
+        return True
 
 ##################################################
 ## SETUP

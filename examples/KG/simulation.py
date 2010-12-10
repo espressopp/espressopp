@@ -85,8 +85,6 @@ system.bc   = espresso.bc.OrthorhombicBC(system.rng, size)
 skin = reader["variable", "skin"]
 system.skin = float(skin[0])
 
-comm = MPI.COMM_WORLD
-
 from espresso import Real3D, Int3D
 
 nodeGrid = reader["variable", "node_grid"]
@@ -95,7 +93,7 @@ nodeGrid = Int3D(int(nodeGrid[0]), int(nodeGrid[1]), int(nodeGrid[2]))
 cellGrid = reader["variable", "cell_grid"]
 cellGrid = Int3D(int(cellGrid[0]), int(cellGrid[1]), int(cellGrid[2]))
 
-system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
+system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # read in all particles
 

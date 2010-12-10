@@ -8,11 +8,13 @@ class FixedPairListLocal(_espresso.FixedPairList):
 
     def __init__(self, storage):
         'Local construction of a fixed pair list'
-        cxxinit(self, _espresso.FixedPairList, storage)
+        if pmi.workerIsActive():
+            cxxinit(self, _espresso.FixedPairList, storage)
 
     def add(self, pid1, pid2):
         'add pair to fixed pair list'
-        return self.cxxclass.add(self, pid1, pid2)
+        if pmi.workerIsActive():
+            return self.cxxclass.add(self, pid1, pid2)
 
     def addBonds(self, bondlist):
         """
@@ -21,9 +23,10 @@ class FixedPairListLocal(_espresso.FixedPairList):
         this processor.
         """
 
-        for bond in bondlist:
-           pid1, pid2 = bond
-           self.cxxclass.add(self, pid1, pid2)
+        if pmi.workerIsActive():
+            for bond in bondlist:
+                pid1, pid2 = bond
+                self.cxxclass.add(self, pid1, pid2)
 
 if pmi.isController:
     class FixedPairList(object):

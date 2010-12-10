@@ -28,8 +28,8 @@ namespace espresso {
       myN = system.storage->getNRealParticles();
 
       // will Controller always be 0?
-      boost::mpi::reduce(*mpiWorld, v2sum, sumT, std::plus<real>(), 0);
-      boost::mpi::reduce(*mpiWorld, myN, systemN, std::plus<int>(), 0);
+      boost::mpi::reduce(*getSystem()->comm, v2sum, sumT, std::plus<real>(), 0);
+      boost::mpi::reduce(*getSystem()->comm, myN, systemN, std::plus<int>(), 0);
   
       return sumT / (3.0 * systemN);
     }

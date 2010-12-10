@@ -8,12 +8,12 @@ class VerletListLocal(_espresso.VerletList):
 
     def __init__(self, system, cutoff):
         'Local construction of a verlet list'
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if pmi.workerIsActive():
             cxxinit(self, _espresso.VerletList, system, cutoff)
             
     def totalSize(self):
         'count number of pairs in VerletList, involves global reduction'
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if pmi.workerIsActive():
             return self.cxxclass.totalSize(self)
 
 if pmi.isController:

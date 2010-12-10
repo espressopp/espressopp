@@ -94,7 +94,7 @@ namespace espresso {
 	e += potential._computeEnergy(p1, p2);
       }
       real esum;
-      boost::mpi::reduce(*mpiWorld, e, esum, std::plus<real>(), 0);
+      boost::mpi::reduce(*getVerletList()->getSystem()->comm, e, esum, std::plus<real>(), 0);
       return esum;
     }
 

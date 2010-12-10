@@ -8,7 +8,8 @@ class FixedToupleListLocal(_espresso.FixedToupleList):
 
     def __init__(self, storage):
         'Local construction of a fixed touple list'
-        cxxinit(self, _espresso.FixedToupleList, storage)
+        if pmi.workerIsActive():
+            cxxinit(self, _espresso.FixedToupleList, storage)
 
 
 if pmi.isController:

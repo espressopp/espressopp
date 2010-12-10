@@ -43,9 +43,7 @@ system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
 
 system.skin = skin
 
-comm = MPI.COMM_WORLD
-
-nodeGrid = Int3D(1, 1, comm.size)
+nodeGrid = Int3D(1, 1, espresso.pmi._MPIcomm.size)
 cellGrid = Int3D(
     calcNumberCells(size[0], nodeGrid[0], cutoff),
     calcNumberCells(size[1], nodeGrid[1], cutoff),
@@ -55,7 +53,7 @@ cellGrid = Int3D(
 print 'NodeGrid = %s' % (nodeGrid,)
 print 'CellGrid = %s' % (cellGrid,)
 
-system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
+system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 pid = 0
 

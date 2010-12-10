@@ -18,7 +18,7 @@ class SystemLocal(_espresso.System):
 
     def addInteraction(self, interaction):
         'add a short range list interaction'
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if pmi.workerIsActive():
             return self.cxxclass.addInteraction(self, interaction)
 
 if pmi.isController:

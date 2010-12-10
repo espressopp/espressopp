@@ -8,11 +8,13 @@ class FixedQuadrupleListLocal(_espresso.FixedQuadrupleList):
 
     def __init__(self, storage):
         'Local construction of a fixed quadruple list'
-        cxxinit(self, _espresso.FixedQuadrupleList, storage)
+        if pmi.workerIsActive():
+            cxxinit(self, _espresso.FixedQuadrupleList, storage)
 
     def add(self, pid1, pid2, pid3, pid4):
         'add quadruple to fixed quadruple list'
-        return self.cxxclass.add(self, pid1, pid2, pid3, pid4)
+        if pmi.workerIsActive():
+            return self.cxxclass.add(self, pid1, pid2, pid3, pid4)
 
     def addQuadruples(self, quadruplelist):
         """
@@ -21,9 +23,10 @@ class FixedQuadrupleListLocal(_espresso.FixedQuadrupleList):
         this processor.
         """
 
-        for quadruple in quadruplelist:
-           pid1, pid2, pid3, pid4 = quadruple
-           self.cxxclass.add(self, pid1, pid2, pid3, pid4)
+        if pmi.workerIsActive():
+            for quadruple in quadruplelist:
+                pid1, pid2, pid3, pid4 = quadruple
+                self.cxxclass.add(self, pid1, pid2, pid3, pid4)
 
 if pmi.isController:
     class FixedQuadrupleList(object):

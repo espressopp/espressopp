@@ -45,7 +45,7 @@ cellGrid = Int3D(
 print 'NodeGrid = %s' % (nodeGrid,)
 print 'CellGrid = %s' % (cellGrid,)
 
-system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
+system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # chain 1
 p = system.storage.addParticle(0, Real3D(5.0, 5.0, 5.0))

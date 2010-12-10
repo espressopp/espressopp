@@ -17,20 +17,14 @@ temperature2 = 0.5
 nodeGrid     = Int3D(2,1,1)
 cellGrid     = Int3D(3,3,3)
 
-def create_VV_integrator_with_Langevin(s,dt,gamma,temperature) :
-    integrator = espresso.integrator.VelocityVerlet(s)
-    integrator.dt = dt
-    integrator.langevin = espresso.integrator.Langevin(s)
-    integrator.langevin.gamma = gamma
-    integrator.langevin.temperature = temperature
-    return integrator
-
+multisystem = espresso.MultiSystem()
 
 ################################################
 # Setup system1
 ################################################
-comm1=espresso.pmi.Communicator([1,3])
+comm1=espresso.pmi.Communicator([1,2])
 espresso.pmi.activate(comm1)
+multisystem.beginSystemDefinition()
 
 system1         = espresso.System()
 rng1            = espresso.esutil.RNG()
@@ -46,17 +40,27 @@ interLJ1        = espresso.interaction.VerletListLennardJones(vl1)
 interLJ1.setPotential(type1=0, type2=0, potential=potLJ1)
 system1.addInteraction(interLJ1)
 for pid in range(npart) :
-    print "system1:",pid
     storage1.addParticle(pid+1, bc1.getRandomPos())
 storage1.decompose()
+integrator1           = espresso.integrator.VelocityVerlet(system1)
+integrator1.dt        = dt
+langevin1             = espresso.integrator.Langevin(system1)
+langevin1.gamma       = gamma
+langevin1.temperature = temperature1
+integrator1.langevin  = langevin1
+analysisT1 = espresso.analysis.Temperature(system1)
 
+multisystem.setIntegrator(integrator1)
+multisystem.setAnalysisPotential(interLJ1)
+multisystem.setAnalysisTemperature(analysisT1)
 espresso.pmi.deactivate(comm1)
 
 ################################################
 # Setup system2
 ################################################
-comm2=espresso.pmi.Communicator([0,2])
+comm2=espresso.pmi.Communicator([0,3])
 espresso.pmi.activate(comm2)
+multisystem.beginSystemDefinition()
 
 system2         = espresso.System()
 rng2            = espresso.esutil.RNG()
@@ -72,10 +76,30 @@ interLJ2        = espresso.interaction.VerletListLennardJones(vl2)
 interLJ2.setPotential(type1=0, type2=0, potential=potLJ2)
 system2.addInteraction(interLJ2)
 for pid in range(npart) :
-    print "system2:",pid
     storage2.addParticle(pid+1, bc2.getRandomPos())
-#storage2.decompose()
+storage2.decompose()
+integrator2           = espresso.integrator.VelocityVerlet(system2)
+integrator2.dt        = dt
+langevin2             = espresso.integrator.Langevin(system2)
+langevin2.gamma       = gamma
+langevin2.temperature = temperature2
+integrator2.langevin  = langevin2
+analysisT2 = espresso.analysis.Temperature(system2)
 
+multisystem.setIntegrator(integrator2)
+multisystem.setAnalysisPotential(interLJ2)
+multisystem.setAnalysisTemperature(analysisT2)
 espresso.pmi.deactivate(comm2)
 
+print "Potential Energy of system1 is ", multisystem.runAnalysisPotential()[0]
+print "Potential Energy of system2 is ", multisystem.runAnalysisPotential()[1]
+print "Temperature of system1 is ", multisystem.runAnalysisTemperature()[0]
+print "Temperature of system2 is ", multisystem.runAnalysisTemperature()[1]
+
+multisystem.runIntegrator(100)
+
+print "Potential Energy of system1 is ", multisystem.runAnalysisPotential()[0]
+print "Potential Energy of system2 is ", multisystem.runAnalysisPotential()[1]
+print "Temperature of system1 is ", multisystem.runAnalysisTemperature()[0]
+print "Temperature of system2 is ", multisystem.runAnalysisTemperature()[1]
 

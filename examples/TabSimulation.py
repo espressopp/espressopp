@@ -69,7 +69,7 @@ cellGrid = Int3D(
 print 'NodeGrid = %s' % (nodeGrid,)
 print 'CellGrid = %s' % (cellGrid,)
 
-system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
+system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 pid = 0
 
@@ -92,9 +92,7 @@ for i in range(N):
       # not yet: dd.setVelocity(id, (1.0, 0.0, 0.0))
       pid = pid + 1
 
-# system.storage.resortParticles()
-
-system.storage.resortParticles()
+system.storage.decompose()
 
 integrator = espresso.integrator.VelocityVerlet(system)
 
