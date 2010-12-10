@@ -13,7 +13,7 @@ class LennardJonesLocal(PotentialLocal, interaction_LennardJones):
     def __init__(self, epsilon=1.0, sigma=1.0, 
                  cutoff=infinity, shift="auto"):
         """Initialize the local Lennard Jones object."""
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
                 cxxinit(self, interaction_LennardJones, 
                         epsilon, sigma, cutoff)
@@ -24,31 +24,31 @@ class LennardJonesLocal(PotentialLocal, interaction_LennardJones):
 class VerletListLennardJonesLocal(InteractionLocal, interaction_VerletListLennardJones):
     'The (local) Lennard Jones interaction using Verlet lists.'
     def __init__(self, vl):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListLennardJones, vl)
 
     def setPotential(self, type1, type2, potential):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 class CellListLennardJonesLocal(InteractionLocal, interaction_CellListLennardJones):
     'The (local) Lennard Jones interaction using cell lists.'
     def __init__(self, stor):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListLennardJones, stor)
         
     def setPotential(self, type1, type2, potential):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 class FixedPairListLennardJonesLocal(InteractionLocal, interaction_FixedPairListLennardJones):
     'The (local) Lennard-Jones interaction using FixedPair lists.'
     def __init__(self, system, vl):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListLennardJones, system, vl)
         
     def setPotential(self, type1, type2, potential):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 if pmi.isController:

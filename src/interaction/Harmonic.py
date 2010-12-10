@@ -10,7 +10,7 @@ class HarmonicLocal(PotentialLocal, interaction_Harmonic):
     def __init__(self, K=1.0, r0=0.0, 
                  cutoff=infinity, shift=0.0):
         """Initialize the local Harmonic object."""
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
                 cxxinit(self, interaction_Harmonic, K, r0, cutoff)
             else:
@@ -19,11 +19,11 @@ class HarmonicLocal(PotentialLocal, interaction_Harmonic):
 class FixedPairListHarmonicLocal(InteractionLocal, interaction_FixedPairListHarmonic):
     'The (local) Harmonic interaction using FixedPair lists.'
     def __init__(self, system, vl):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListHarmonic, system, vl)
 
     def setPotential(self, type1, type2, potential):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 if pmi.isController:

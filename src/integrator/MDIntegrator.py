@@ -4,7 +4,7 @@ from _espresso import integrator_MDIntegrator
 class MDIntegratorLocal(object):
     """Abstract local base class for molecular dynamics integrator."""
     def run(self, niter):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.run(self, niter)
 
 if pmi.isController :

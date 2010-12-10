@@ -9,17 +9,17 @@ class AngularCosineSquaredLocal(AngularPotentialLocal, interaction_AngularCosine
     'The (local) AngularCosineSquared potential.'
     def __init__(self, K=1.0, theta0=0.0):
         """Initialize the local AngularCosineSquared object."""
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_AngularCosineSquared, K, theta0)
 
 class FixedTripleListAngularCosineSquaredLocal(InteractionLocal, interaction_FixedTripleListAngularCosineSquared):
     'The (local) AngularCosineSquared interaction using FixedTriple lists.'
     def __init__(self, system, vl):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedTripleListAngularCosineSquared, system, vl)
 
     def setPotential(self, type1, type2, potential):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 if pmi.isController:

@@ -6,7 +6,7 @@ from _espresso import integrator_Langevin
 class LangevinLocal(integrator_Langevin):
     'The (local) Velocity Verlet Integrator.'
     def __init__(self, system):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_Langevin, system)
 
 if pmi.isController :

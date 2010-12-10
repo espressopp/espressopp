@@ -8,7 +8,7 @@ class SystemLocal(_espresso.System):
     'The (local) System.'
     def __init__(self):
         'Local construction of a System'
-        if pmi._PMIComm :
+        if pmi._PMIComm and pmi._PMIComm.isActive():
             if pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
                 cxxinit(self, _espresso.System, pmi._PMIComm.getMPIsubcomm())
             else :
