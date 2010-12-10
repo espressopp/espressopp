@@ -45,7 +45,7 @@ class TestVerletList(unittest.TestCase) :
        print 'NodeGrid = %s'%(nodeGrid,)
        print 'CellGrid = %s'%cellGrid
 
-       system.storage = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
+       system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
        pid = 0
 
        for i in range(N):

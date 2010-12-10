@@ -8,10 +8,10 @@ using namespace espresso;
 
 
 // a storage that contains two fixed particles
-class MockStorage1 : public Storage {
+//class MockStorage1 : public Storage {
   
 
-};
+//};
 
 // add a bond
 // * on the wrong proc
@@ -25,6 +25,6 @@ class MockStorage1 : public Storage {
 // move a bond to another proc
 
 
-BOOST_FIXTURE_TEST_CASE() {
-  
-}
+//BOOST_FIXTURE_TEST_CASE(RandomTest, RandomFixture) {
+//  
+//}

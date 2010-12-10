@@ -8,7 +8,7 @@ class TestParticleLocal(unittest.TestCase) :
         system.rng = esutil.RNG()
         system.bc = bc.OrthorhombicBC(system.rng, (10.0, 10.0, 10.0))
         system.storage = espresso.storage.DomainDecomposition(
-            system=system, comm=MPI.COMM_WORLD, 
+            system=system,
             nodeGrid=(1,1,1), cellGrid=(1,1,1))
         p = system.storage.addParticle(0, (1.0, 1.0, 1.0))
         p.v = Real3D(1.0, 1.0, 1.0)

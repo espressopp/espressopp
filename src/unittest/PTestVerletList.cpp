@@ -86,7 +86,7 @@ struct DomainFixture {
     system->rng = make_shared< esutil::RNG >();
     system->bc = make_shared< OrthorhombicBC >(system->rng, boxL);
     system->skin = skin;
-    domdec = make_shared< DomainDecomposition >(system, mpiWorld, nodeGrid, cellGrid);
+    domdec = make_shared< DomainDecomposition >(system, nodeGrid, cellGrid);
     system->storage = domdec;
     system->rng = make_shared< esutil::RNG >();
   }
