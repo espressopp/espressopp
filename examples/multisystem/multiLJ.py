@@ -1,21 +1,23 @@
 import espresso
-from espresso import Int3D
+from espresso import Int3D, Real3D
+from espresso.tools.init_cfg import lattice
 
-L            = 10
-density      = 0.01
-size         = (L, L, L)
-npart        = int(L * L * L * density)
+rho          = 0.8442
+num_particles= 20**3
 skin         = 0.3
 rc           = 2.5
 epsilon      = 1.0
 sigma        = 1.0
 shift        = False
-dt           = 0.000000001
+dt           = 0.005
 gamma        = 10.0
 temperature1 = 1.0
 temperature2 = 0.5
 nodeGrid     = Int3D(2,1,1)
 cellGrid     = Int3D(3,3,3)
+
+x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False)
+size = (Lx, Ly, Lz)
 
 multisystem = espresso.MultiSystem()
 
@@ -39,8 +41,8 @@ potLJ1          = espresso.interaction.LennardJones(epsilon, sigma, rc, shift)
 interLJ1        = espresso.interaction.VerletListLennardJones(vl1)
 interLJ1.setPotential(type1=0, type2=0, potential=potLJ1)
 system1.addInteraction(interLJ1)
-for pid in range(npart) :
-    storage1.addParticle(pid+1, bc1.getRandomPos())
+for pid in range(num_particles):
+    storage1.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
 storage1.decompose()
 integrator1           = espresso.integrator.VelocityVerlet(system1)
 integrator1.dt        = dt
@@ -75,8 +77,8 @@ potLJ2          = espresso.interaction.LennardJones(epsilon, sigma, rc, shift)
 interLJ2        = espresso.interaction.VerletListLennardJones(vl2)
 interLJ2.setPotential(type1=0, type2=0, potential=potLJ2)
 system2.addInteraction(interLJ2)
-for pid in range(npart) :
-    storage2.addParticle(pid+1, bc2.getRandomPos())
+for pid in range(num_particles):
+    storage2.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
 storage2.decompose()
 integrator2           = espresso.integrator.VelocityVerlet(system2)
 integrator2.dt        = dt
@@ -102,4 +104,3 @@ print "Potential Energy of system1 is ", multisystem.runAnalysisPotential()[0]
 print "Potential Energy of system2 is ", multisystem.runAnalysisPotential()[1]
 print "Temperature of system1 is ", multisystem.runAnalysisTemperature()[0]
 print "Temperature of system2 is ", multisystem.runAnalysisTemperature()[1]
-
