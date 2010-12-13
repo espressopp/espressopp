@@ -20,7 +20,7 @@ from espresso.tools.init_cfg import lattice
 from espresso.tools import timers
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
-steps = 10
+steps = 1000
 rc = 2.5
 skin = 0.3
 nvt = False

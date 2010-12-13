@@ -17,11 +17,11 @@ from espresso.tools import decomp
 from espresso.tools import timers
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
-steps = 10
+steps = 2000
 rc = 1.12
 skin = 0.3
-nvt = False
-timestep = 0.005
+nvt = True
+timestep = 0.01
 
 # lammps or gromacs (lammps_reader = False is gromacs)
 lammps_reader = True

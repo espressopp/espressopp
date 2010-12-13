@@ -7,17 +7,16 @@
 ###########################################################################
 
 import sys
-sys.path.append('.')
-
 import time
 import espresso
 import MPI
 import logging
-import lammps_file
+from espresso.tools.convert import lammps
+from espresso.tools import decomp
 from espresso import Real3D, Int3D
 
 # read coordinates and box size
-x, y, z, Lx, Ly, Lz = lammps_file.read('data.lj')
+x, y, z, Lx, Ly, Lz = lammps.read('../data.lj')
 
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
@@ -31,19 +30,8 @@ print "  number of particles =", num_particles
 print "  density = %.4f" % density
 print "  cutoff =", rc
 
-# compute the number of cells on each node
-def calcNumberCells(size, nodes, rc):
-  ncells = 1
-  while size / (ncells * nodes) >= (rc + skin):
-    ncells = ncells + 1
-  return ncells - 1
-
-nodeGrid = Int3D(1, 1, comm.size)
-cellGrid = Int3D(
-  calcNumberCells(size[0], nodeGrid[0], rc),
-  calcNumberCells(size[1], nodeGrid[1], rc),
-  calcNumberCells(size[2], nodeGrid[2], rc)
-  )
+nodeGrid = decomp.nodeGrid(comm.size)
+cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 
 print ""
 print "Both systems are decomposed the same way:"
@@ -56,7 +44,7 @@ system1 = espresso.System()
 system1.rng = espresso.esutil.RNG()
 system1.bc = espresso.bc.OrthorhombicBC(system1.rng, size)
 system1.skin = skin
-system1.storage = espresso.storage.DomainDecomposition(system1, comm, nodeGrid, cellGrid)
+system1.storage = espresso.storage.DomainDecomposition(system1, nodeGrid, cellGrid)
 # add particles to system1
 for pid in range(num_particles):
   system1.storage.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
@@ -85,7 +73,7 @@ system2 = espresso.System()
 system2.rng = espresso.esutil.RNG()
 system2.bc = espresso.bc.OrthorhombicBC(system2.rng, size)
 system2.skin = skin
-system2.storage = espresso.storage.DomainDecomposition(system2, comm, nodeGrid, cellGrid)
+system2.storage = espresso.storage.DomainDecomposition(system2, nodeGrid, cellGrid)
 # add particles to system2
 for pid in range(num_particles):
   system2.storage.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
