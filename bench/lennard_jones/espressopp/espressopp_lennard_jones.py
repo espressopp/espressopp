@@ -20,7 +20,7 @@ from espresso.tools.init_cfg import lattice
 from espresso.tools import timers
 
 # simulation parameters (nvt = False implies NVE)
-steps = 10000
+steps = 1000
 rc = 2.5
 skin = 0.3
 nvt = False
