@@ -3,9 +3,17 @@
    the particle positions will be given random displacements
    with a magnitude of one-tenth the lattice spacing."""
 
-def create(N, density, perfect=True):
+def create(N, density, perfect=True, RNG=None):
+  
+  if RNG == None:
+    import random
+    random_gen = random.random()
+  else :
+    import espresso
+    random_gen = espresso.esutil.RNG()
 
-  import random
+  def rnd(magn_):
+    return magn_ * (2.0 * random_gen() - 1.0)
 
   cubes = []
   for i in range(100):
@@ -21,7 +29,6 @@ def create(N, density, perfect=True):
 
   lattice_spacing = L / a
 
-  random.seed(10)
   def rnd(magn_):
     return magn_ * (2.0 * random.random() - 1.0)
 
