@@ -13,7 +13,7 @@ Lx = Ly = Lz = 36.1033
 ###############################################################################
 #                                 ESPResSo++                                  #
 ###############################################################################
-f = open('../../examples/angle/rings.dat')
+f = open('../../examples/rings.dat')
 data = f.readlines()
 f.close()
 
@@ -26,7 +26,7 @@ sys.stdout.write('\nESPResSo++ input file written: espressopp/espressopp_polymer
 ###############################################################################
 #                                   LAMMPS                                    #
 ###############################################################################
-f = open('../../examples/angle/rings.dat')
+f = open('../../examples/rings.dat')
 data = f.readlines()
 f.close()
 
@@ -39,7 +39,7 @@ sys.stdout.write('LAMMPS input file written: lammps/lammps_polymer_melt.start\n'
 ###############################################################################
 #                                  ESPResSo                                   #
 ###############################################################################
-f = open('../../examples/angle/rings.dat')
+f = open('../../examples/rings.dat')
 data = f.readlines()
 f.close()
 data = data[20:num_particles + 20]
@@ -94,7 +94,7 @@ sys.stdout.write('ESPResSo input file written: espresso/espresso_polymer_melt.st
 ###############################################################################
 #                                   GROMACS                                   #
 ###############################################################################
-f = open('../../examples/angle/rings.dat')
+f = open('../../examples/rings.dat')
 data = f.readlines()
 f.close()
 data = data[20:num_particles + 20]
