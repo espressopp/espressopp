@@ -1,0 +1,19 @@
+Benchmarks
+==========
+
+Compiling
+---------
+* Use the following options for configure with ESPResSo++:
+  --disable-logging
+  CXXFLAGS=-O3
+
+Running
+-------
+
+To create input files for all codes run:
+
+  python gen_lennard_jones.py
+
+or
+
+  python gen_polymer_melt.py
