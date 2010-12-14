@@ -15,8 +15,8 @@ temperature1 = 1.0
 temperature2 = 1.0
 nodeGrid     = Int3D(2,1,1)
 cellGrid     = Int3D(3,3,3)
-
-x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False)
+rng=espresso.esutil.RNG()
+x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False, RNG=rng)
 size = (Lx, Ly, Lz)
 
 multisystem = espresso.MultiSystem()
@@ -24,7 +24,7 @@ multisystem = espresso.MultiSystem()
 ################################################
 # Setup system1
 ################################################
-comm1=espresso.pmi.Communicator([1,2])
+comm1=espresso.pmi.Communicator([0,1])
 espresso.pmi.activate(comm1)
 multisystem.beginSystemDefinition()
 
@@ -60,7 +60,7 @@ espresso.pmi.deactivate(comm1)
 ################################################
 # Setup system2
 ################################################
-comm2=espresso.pmi.Communicator([0,3])
+comm2=espresso.pmi.Communicator([2,3])
 espresso.pmi.activate(comm2)
 multisystem.beginSystemDefinition()
 
@@ -94,13 +94,13 @@ multisystem.setAnalysisTemperature(analysisT2)
 espresso.pmi.deactivate(comm2)
 
 print "Potential Energy of system1 is ", multisystem.runAnalysisPotential()[0]
-print "Potential Energy of system2 is ", multisystem.runAnalysisPotential()[1]
+print "Potential Energy of system2 is ", multisystem.runAnalysisPotential()[2]
 print "Temperature of system1 is ", multisystem.runAnalysisTemperature()[0]
-print "Temperature of system2 is ", multisystem.runAnalysisTemperature()[1]
+print "Temperature of system2 is ", multisystem.runAnalysisTemperature()[2]
 
 multisystem.runIntegrator(100)
 
 print "Potential Energy of system1 is ", multisystem.runAnalysisPotential()[0]
-print "Potential Energy of system2 is ", multisystem.runAnalysisPotential()[1]
+print "Potential Energy of system2 is ", multisystem.runAnalysisPotential()[2]
 print "Temperature of system1 is ", multisystem.runAnalysisTemperature()[0]
-print "Temperature of system2 is ", multisystem.runAnalysisTemperature()[1]
+print "Temperature of system2 is ", multisystem.runAnalysisTemperature()[2]
