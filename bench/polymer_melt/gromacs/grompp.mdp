@@ -1,0 +1,77 @@
+; RUN CONTROL PARAMETERS
+define                   = 
+integrator               = sd
+; Start time and timestep in ps
+tinit                    = 0
+dt                       = 0.01
+nsteps                   = 1000
+; For exact run continuation or redoing part of a run
+init_step                = 0
+; mode for center of mass motion removal
+comm-mode                = None
+; number of steps for center of mass motion removal
+nstcomm                  = 
+; group(s) for center of mass motion removal
+comm-grps                = 
+
+; OUTPUT CONTROL OPTIONS
+; Output frequency for coords (x), velocities (v) and forces (f)
+nstxout                  = 0
+nstvout                  = 0
+nstfout                  = 0
+; Output frequency for energies to log file and energy file
+nstlog                   = 0
+nstenergy                = 0
+; Output frequency and precision for xtc file
+nstxtcout                = 0
+xtc-precision            = 1000
+; This selects the subset of atoms for the xtc file. You can
+; select multiple groups. By default all atoms will be written.
+xtc-grps                 = 
+
+; NEIGHBORSEARCHING PARAMETERS
+; nblist update frequency
+nstlist                  = -1
+; ns algorithm (simple or grid)
+ns-type                  = Grid
+; Periodic boundary conditions: xyz, no, xy
+pbc                      = xyz
+periodic_molecules       = no
+; nblist cut-off
+rlist                    = 1.42246205
+
+; OPTIONS FOR ELECTROSTATICS AND VDW
+; Method for doing electrostatics
+coulombtype              = Shift
+rcoulomb-switch          = 0
+;rcoulomb                 = 1.12246205
+rcoulomb                 = 0.1
+; Relative dielectric constant for the medium and the reaction field
+epsilon_r                = 1
+; Method for doing Van der Waals
+
+vdw-type                 = Shift
+; cut-off lengths
+rvdw                     = 1.12246205
+; Apply long range dispersion corrections for Energy and Pressure
+DispCorr                 = no
+
+; IMPLICIT SOLVENT ALGORITHM
+implicit_solvent         = No
+
+; OPTIONS FOR WEAK COUPLING ALGORITHMS
+; Temperature coupling
+Tcoupl                   = no
+; Groups to couple separately
+tc-grps                  = System
+; Time constant (ps) and reference temperature (K)
+tau_t                    = 1.0
+ref_t                    = 120.2717
+; Pressure coupling
+Pcoupl                   = no
+
+; GENERATE VELOCITIES FOR STARTUP RUN
+gen-vel                  = no
+
+; OPTIONS FOR BONDS
+constraints              = none

@@ -1,0 +1,10 @@
+The simulation parameters of the Lennard-Jones benchmark are:
+
+number of particles = 32768
+density = 0.8442
+rc = 2.5
+dt = 0.005
+steps = 1000
+
+The skin size should be taken as the default for each code. For
+most codes this is 0.3. The potential is truncated at rc.

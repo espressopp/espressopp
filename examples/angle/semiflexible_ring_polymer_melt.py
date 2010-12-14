@@ -17,7 +17,7 @@ from espresso.tools import decomp
 from espresso.tools import timers
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
-steps = 2000
+steps = 1000
 rc = 1.12
 skin = 0.3
 nvt = True

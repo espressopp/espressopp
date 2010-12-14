@@ -10,9 +10,9 @@ epsilon      = 1.0
 sigma        = 1.0
 shift        = False
 dt           = 0.005
-gamma        = 10.0
+gamma        = 1.0
 temperature1 = 1.0
-temperature2 = 0.5
+temperature2 = 1.0
 nodeGrid     = Int3D(2,1,1)
 cellGrid     = Int3D(3,3,3)
 
@@ -49,7 +49,7 @@ integrator1.dt        = dt
 langevin1             = espresso.integrator.Langevin(system1)
 langevin1.gamma       = gamma
 langevin1.temperature = temperature1
-integrator1.langevin  = langevin1
+#integrator1.langevin  = langevin1
 analysisT1 = espresso.analysis.Temperature(system1)
 
 multisystem.setIntegrator(integrator1)
@@ -85,7 +85,7 @@ integrator2.dt        = dt
 langevin2             = espresso.integrator.Langevin(system2)
 langevin2.gamma       = gamma
 langevin2.temperature = temperature2
-integrator2.langevin  = langevin2
+#integrator2.langevin  = langevin2
 analysisT2 = espresso.analysis.Temperature(system2)
 
 multisystem.setIntegrator(integrator2)

@@ -1,9 +1,9 @@
-# rings plus linear contaminants with slow insert
+# polymer melt
 
 units           lj
 atom_style      angle
 
-read_data       rings.dat
+read_data       lammps_polymer_melt.start
 special_bonds   lj 1.0 1.0 1.0
 
 mass            1 1.0

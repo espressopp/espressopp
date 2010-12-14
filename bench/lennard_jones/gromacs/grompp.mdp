@@ -3,7 +3,7 @@ define                   =
 integrator               = md-vv
 ; Start time and timestep in ps
 tinit                    = 0
-dt                       = 0.001
+dt                       = 0.005
 nsteps                   = 1000
 ; For exact run continuation or redoing part of a run
 init_step                = 0
@@ -31,14 +31,14 @@ xtc-grps                 =
 
 ; NEIGHBORSEARCHING PARAMETERS
 ; nblist update frequency
-nstlist                  = 3
+nstlist                  = -1
 ; ns algorithm (simple or grid)
 ns-type                  = Grid
 ; Periodic boundary conditions: xyz, no, xy
 pbc                      = xyz
 periodic_molecules       = no
 ; nblist cut-off
-rlist                    = 1.42246205
+rlist                    = 2.8
 
 ; OPTIONS FOR ELECTROSTATICS AND VDW
 ; Method for doing electrostatics
@@ -52,7 +52,7 @@ epsilon_r                = 1
 
 vdw-type                 = Shift
 ; cut-off lengths
-rvdw                     = 1.12246205
+rvdw                     = 2.5
 ; Apply long range dispersion corrections for Energy and Pressure
 DispCorr                 = no
 

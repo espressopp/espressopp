@@ -21,6 +21,7 @@ def create(N, density, perfect=True):
 
   lattice_spacing = L / a
 
+  random.seed(10)
   def rnd(magn_):
     return magn_ * (2.0 * random.random() - 1.0)
 
