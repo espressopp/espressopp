@@ -10,6 +10,7 @@ autom4te.cache/*
 *.o
 *.la
 *.pyc
+*.start
 .deps/*
 .libs/*
 .dirstamp
