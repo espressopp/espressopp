@@ -4,13 +4,12 @@
    with a magnitude of one-tenth the lattice spacing."""
 
 def create(N, density, perfect=True, RNG=None):
-  
+
   if RNG == None:
     import random
     random_gen = random.random()
   else :
-    import espresso
-    random_gen = espresso.esutil.RNG()
+    random_gen = RNG
 
   def rnd(magn_):
     return magn_ * (2.0 * random_gen() - 1.0)
@@ -30,7 +29,7 @@ def create(N, density, perfect=True, RNG=None):
   lattice_spacing = L / a
 
   def rnd(magn_):
-    return magn_ * (2.0 * random.random() - 1.0)
+    return magn_ * (2.0 * random_gen() - 1.0)
 
   # magnitude of random displacements
   magn = lattice_spacing / 10.0
