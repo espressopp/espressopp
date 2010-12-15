@@ -27,9 +27,11 @@ src/acconfig.hpp.in
 bin/espp_format
 bin/espp_mpiexec.sh
 bin/utexec
+bin/pypresso
 config.log
 config.status
 config.summary
+espresso
 espresso_setup.csh
 espresso_setup.py
 espresso_setup.py.install
