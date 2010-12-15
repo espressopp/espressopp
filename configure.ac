@@ -26,11 +26,19 @@ cat >& AS_MESSAGE_FD <<EOF
 EOF
 
 # we use C++ as main code language
-# and libtool for building the shared libraries
-AC_PROG_CXX
 AC_LANG([C++])
 
+
+# AC_PROG_CXX
+# We are using mpi, that is why we cannot set CC in the AC_PROG_CXX macro,
+# since autoconf checks that the created file can be executed. This would
+# fail on platforms where MPI executables can only be run through a batchqueue.
+AC_CHECK_PROGS(CXX, mpixlcxx mpCC mpiCC mpc++)
+#other important flags like CXXFLAGS will be set by libtool anyway
+
+# libtool is used for building the shared libraries
 LT_INIT([dlopen])
+
 AM_CONDITIONAL(ENABLE_STATIC, [test "x$enable_static" = "xyes"])
 AM_CONDITIONAL(ENABLE_SHARED, [test "x$enable_shared" = "xyes"])
 
