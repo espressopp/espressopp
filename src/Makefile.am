@@ -1,6 +1,6 @@
 nobase_pkginclude_HEADERS =
 noinst_HEADERS =
-python_SCRIPTS =
+nobase_python_SCRIPTS =
 noinst_LTLIBRARIES =
 libespresso_common_la_SOURCES =
 DIST_SUBDIRS = 
@@ -40,7 +40,7 @@ libespresso_common_la_SOURCES += \
 	integrator/bindings.cpp \
 	analysis/bindings.cpp
 
-python_SCRIPTS += \
+nobase_python_SCRIPTS += \
 	pmi.py \
 	__init__.py \
 	unittest/__init__.py \
@@ -75,7 +75,7 @@ libpylogger_la_SOURCES = \
 libpylogger_la_LIBADD = \
 	$(ESPRESSO_BOOST_LIBS)
 
-EXTRA_DIST += $(python_SCRIPTS)
+EXTRA_DIST += $(nobase_python_SCRIPTS)
 
 # python script handling
 include $(top_srcdir)/build-aux/macros/axes_python.am
@@ -117,7 +117,7 @@ all-local:
 
 install-exec-local:
 # install espresso setup scripts
-	$(install_sh_SCRIPT) _setupPath.py.install $(DESTDIR)$(pkglibdir)/main/_setupPath.py
+	$(install_sh_SCRIPT) $(srcdir)/main/_setupPath.py.install $(DESTDIR)$(pkglibdir)/main/_setupPath.py
 
 uninstall-local:
 	rm -f $(DESTDIR)$(pkglibdir)/main/_setupPath.py

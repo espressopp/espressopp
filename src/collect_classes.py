@@ -80,7 +80,7 @@ outfile.write("\n\nlibespresso_common_la_SOURCES += \\\n\t")
 outfile.write(" \\\n\t".join(classcpp))
 
 # cpp files
-outfile.write("\n\npython_SCRIPTS += \\\n\t")
+outfile.write("\n\nnobase_python_SCRIPTS += \\\n\t")
 outfile.write(" \\\n\t".join(classpy))
 
 outfile.close()
