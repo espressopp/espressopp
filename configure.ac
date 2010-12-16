@@ -28,8 +28,9 @@ EOF
 # we use C++ as main code language
 AC_LANG([C++])
 
+#libtool needs a c compiler
+AC_PROG_CC( cc icc xlc gcc )
 
-# AC_PROG_CXX
 # We are using mpi, that is why we cannot set CC in the AC_PROG_CXX macro,
 # since autoconf checks that the created file can be executed. This would
 # fail on platforms where MPI executables can only be run through a batchqueue.
