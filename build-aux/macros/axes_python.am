@@ -11,13 +11,13 @@
 .PHONY: python-all python-clean
 
 python-all:
-	for f in $(python_SCRIPTS); do \
+	for f in $(nobase_python_SCRIPTS); do \
           if test ! -f $$f || test $(srcdir)/$$f -nt $$f; then \
             $(INSTALL) -D $(srcdir)/$$f $$f; \
           fi ; \
         done
 python-clean:
-	for f in $(python_SCRIPTS); do rm -f $${f}c ; done
+	for f in $(nobase_python_SCRIPTS); do rm -f $${f}c ; done
 
 clean-local: python-clean
 all-local: python-all
