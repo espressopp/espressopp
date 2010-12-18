@@ -12,7 +12,7 @@
 namespace espresso {
   // define to "float" for single precision (i.e. typedef float real;)
   // define to "double" for double precision (i.e. typedef double real;)
-  typedef float real;
+  typedef double real;
 
   static const real infinity = std::numeric_limits< real >::infinity();
   static const real ROUND_ERROR_PREC = std::numeric_limits< real >::epsilon();
