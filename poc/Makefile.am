@@ -1,4 +1,4 @@
-nobase_python_SCRIPTS =
+python_SCRIPTS =
 noinst_LTLIBRARIES =
 noinst_PROGRAMS =
 noinst_HEADERS =
@@ -43,4 +43,4 @@ interruptable_loop_LDADD = ../src/libespresso_common.la
 noinst_PROGRAMS += crtp 
 crtp_SOURCES = crtp.cpp
 
-nobase_python_SCRIPTS += __init__.py
+python_SCRIPTS += __init__.py
