@@ -1,7 +1,7 @@
 # python script handling
 include $(top_srcdir)/build-aux/macros/axes_python.am
 
-python_SCRIPTS = main.py hello.py
+nobase_python_SCRIPTS = main.py hello.py
 
 EXTRA_DIST = $(python_scripts)
 
