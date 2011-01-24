@@ -6,7 +6,7 @@
 #                                                                 #
 ################################################################### 
 
-AC_INIT([ESPResSo++],[0.1],[espressopp-user@www.espresso-pp.de],[espressopp])
+AC_INIT([ESPResSo++],[0.9],[espressopp-user@www.espresso-pp.de],[espressopp])
 AC_PREREQ([2.59])
 # basic autoconf configuration
 AC_CONFIG_MACRO_DIR(build-aux/macros)
