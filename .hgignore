@@ -43,3 +43,4 @@ src/main/_setupPath.py
 src/main/_setupPath.py.install
 src/pypresso
 test/runtests.sh
+build

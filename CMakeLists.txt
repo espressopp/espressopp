@@ -32,7 +32,7 @@ option(BUILD_SHARED_LIBS "Build shared libs" ON)
 find_package(MPI REQUIRED)
 include_directories(${MPI_INCLUDE_PATH})
 find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
+include_directories(${PYTHON_INCLUDE_PATH})
 
 ########################################################################
 # Basic system tests (standard libraries, headers, functions, types)   #
@@ -47,7 +47,7 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 add_definitions( -DHAVE_CONFIG_H )
 
 if (EXTERNAL_BOOST)
-  find_package(BOOST REQUIRED)
+  find_package(Boost REQUIRED)
   include_directories(${Boost_INCLUDE_DIRS})
   target_link_libraries(foo ${Boost_LIBRARIES})
 else(EXTERNAL_BOOST)
