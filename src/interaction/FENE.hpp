@@ -25,50 +25,49 @@ namespace espresso {
       static void registerPython();
 
       FENE()
-	: K(0.0), r0(0.0), rMax(0.0) {
-	setShift(0.0);
-	setCutoff(infinity);
+        : K(0.0), r0(0.0), rMax(0.0) {
+        setShift(0.0);
+        setCutoff(infinity);
       }
 
       FENE(real _K, real _r0, real _rMax, 
 		   real _cutoff, real _shift) 
-	: K(_K), r0(_r0), rMax(_rMax) {
-	setShift(_shift);
-	setCutoff(_cutoff);
+        : K(_K), r0(_r0), rMax(_rMax) {
+        setShift(_shift);
+        setCutoff(_cutoff);
       }
 
       FENE(real _K, real _r0, real _rMax, 
 		   real _cutoff)
-	: K(_K), r0(_r0), rMax(_rMax) 
-      {	
-	autoShift = false;
-	setCutoff(_cutoff);
-	setAutoShift(); 
+        : K(_K), r0(_r0), rMax(_rMax) {	
+        autoShift = false;
+        setCutoff(_cutoff);
+        setAutoShift(); 
       }
 
       // Setter and getter
       void setK(real _K) {
-	K = _K;
-	updateAutoShift();
+        K = _K;
+        updateAutoShift();
       }
       real getK() const { return K; }
 
       void setR0(real _r0) { 
-	r0 = _r0; 
-	updateAutoShift();
+        r0 = _r0; 
+        updateAutoShift();
       }
       real getR0() const { return r0; }
 
       void setRMax(real _rMax) { 
-	rMax = _rMax; 
-	updateAutoShift();
+        rMax = _rMax; 
+        updateAutoShift();
       }
       real getRMax() const { return rMax; }
 
       real _computeEnergySqrRaw(real distSqr) const {
         real energy = -0.5 * pow(rMax, 2) * K *
                       log(1 - pow((sqrt(distSqr) - r0) / rMax, 2));
-	return energy;
+        return energy;
       }
 
       bool _computeForceRaw(Real3D& force,
@@ -76,13 +75,14 @@ namespace espresso {
 			    real distSqr) const {
 
         real ffactor;
+        
         if(r0 == 0) {
           real r = sqrt(distSqr);
           ffactor = -K * (r - r0) / (1 - pow((r - r0) / rMax, 2)) / r;
         } else {
-	  real r0sq = rMax * rMax;
-	  real rlogarg = 1.0 - distSqr / r0sq;
-	  ffactor = -K / rlogarg;
+            real r0sq = rMax * rMax;
+            real rlogarg = 1.0 - distSqr / r0sq;
+            ffactor = -K / rlogarg;
         }
         force = dist * ffactor;
         return true;

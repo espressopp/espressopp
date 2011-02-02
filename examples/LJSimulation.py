@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+# -*- coding: iso-8859-1 -*-
+execfile("/people/thnfs/homes/bevc/espressopp/espresso_setup.py")
+
+
 
 ###########################################################################
 #                                                                         #
@@ -62,19 +66,27 @@ nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
+
+
 # add particles to the system and then decompose
 for pid in range(num_particles):
   system.storage.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
 system.storage.decompose()
 
+
+
 # all particles interact via a LJ interaction (use Verlet lists)
 vl = espresso.VerletList(system, cutoff=rc+system.skin)
+
 potLJ = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=False)
 #potLJ = espresso.interaction.SoftCosine(A=1.0, cutoff=rc, shift=False)
+
 interLJ = espresso.interaction.VerletListLennardJones(vl)
 #interLJ = espresso.interaction.VerletListSoftCosine(vl)
 interLJ.setPotential(type1=0, type2=0, potential=potLJ)
+
 system.addInteraction(interLJ)
+
 
 # setup integrator
 integrator = espresso.integrator.VelocityVerlet(system)

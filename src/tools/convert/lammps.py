@@ -1,18 +1,19 @@
+# -*- coding: iso-8859-1 -*-
 """This Python module allows one to use a LAMMPS data file as the
    input to an ESPResSo++ simulation."""
 
 def read(fin):
 
   f = open(fin)
-  line = f.readline()
-  line = f.readline()
+  line = f.readline() # comment line
+  line = f.readline() # blank line
   num_particles = int(f.readline().split()[0])
   num_bonds = int(f.readline().split()[0])
   num_angles = int(f.readline().split()[0])
-  line = f.readline()
-  line = f.readline()
-  line = f.readline()
-  num_types = int(f.readline().split()[0])
+  num_dihedrals = int(f.readline().split()[0])
+  line = f.readline() # impropers
+  line = f.readline() # blank line
+  num_types = int(f.readline().split()[0]) # atom types
 
   # find and store size of box
   line = ''
@@ -78,14 +79,31 @@ def read(fin):
     for i in range(num_angles):
       angle_id, angle_type, pid1, pid2, pid3 = map(int, f.readline().split())
       angles.append((pid1, pid2, pid3))
+
+
+  if(num_dihedrals != 0):
+    # find and store angles
+    line = ''
+    while not 'Dihedrals' in line:
+      line = f.readline()
+    line = f.readline()
+    dihedrals = []
+    for i in range(num_dihedrals):
+      dihedral_id, dihedral_type, pid1, pid2, pid3, pid4 = map(int, f.readline().split())
+      dihedrals.append((pid1, pid2, pid3, pid4))
+
+
     f.close()
+
 
   if(num_types != 1):
     return p_type, bonds, angles, q, x, y, z, Lx, Ly, Lz
 
-  if(num_bonds == 0 and num_angles == 0):
+  if(num_bonds == 0 and num_angles == 0 and num_dihedrals == 0):
     return x, y, z, Lx, Ly, Lz
-  elif(num_bonds != 0 and num_angles == 0):
+  elif(num_bonds != 0 and num_angles == 0 and num_dihedrals == 0):
     return bonds, x, y, z, Lx, Ly, Lz
-  else:
+  elif(num_bonds != 0 and num_angles != 0 and num_dihedrals == 0):
     return bonds, angles, x, y, z, Lx, Ly, Lz
+  else:
+    return bonds, angles, dihedrals, x, y, z, Lx, Ly, Lz

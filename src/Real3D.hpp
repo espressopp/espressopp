@@ -22,11 +22,11 @@ namespace espresso {
     // assignment is not the same as initialization
     Real3D& operator=(const Real3D& v);
 
-    real &operator[](int i);
-    const real &operator[](int i) const;
+    real& operator[](int i);
+    const real& operator[] (int i) const;
 
-    real &at(int i);
-    const real &at(int i) const;
+    real& at(int i);
+    const real& at(int i) const;
 
     void setItem(int i, real v);
     real getItem(int i) const;

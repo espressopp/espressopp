@@ -27,26 +27,25 @@ namespace espresso {
 
       LennardJones()
 	: epsilon(0.0), sigma(0.0) {
-	setShift(0.0);
-	setCutoff(infinity);
+        setShift(0.0);
+        setCutoff(infinity);
         preset();
       }
 
       LennardJones(real _epsilon, real _sigma, 
 		   real _cutoff, real _shift) 
 	: epsilon(_epsilon), sigma(_sigma) {
-	setShift(_shift);
-	setCutoff(_cutoff);
+        setShift(_shift);
+        setCutoff(_cutoff);
         preset();
       }
 
       LennardJones(real _epsilon, real _sigma, 
 		   real _cutoff)
-	: epsilon(_epsilon), sigma(_sigma) 
-      {	
-	autoShift = false;
-	setCutoff(_cutoff);
-	setAutoShift(); 
+	: epsilon(_epsilon), sigma(_sigma) {	
+        autoShift = false;
+        setCutoff(_cutoff);
+        setAutoShift(); 
         preset();
       }
 
@@ -61,24 +60,25 @@ namespace espresso {
 
       // Setter and getter
       void setEpsilon(real _epsilon) {
-	epsilon = _epsilon;
-	updateAutoShift();
+        epsilon = _epsilon;
+        updateAutoShift();
         preset();
       }
+      
       real getEpsilon() const { return epsilon; }
 
       void setSigma(real _sigma) { 
-	sigma = _sigma; 
-	updateAutoShift();
+        sigma = _sigma; 
+        updateAutoShift();
         preset();
       }
       real getSigma() const { return sigma; }
 
       real _computeEnergySqrRaw(real distSqr) const {
-	real frac2 = sigma*sigma / distSqr;
-	real frac6 = frac2 * frac2 * frac2;
-	real energy = 4.0 * epsilon * (frac6 * frac6 - frac6);
-	return energy;
+        real frac2 = sigma*sigma / distSqr;
+        real frac6 = frac2 * frac2 * frac2;
+        real energy = 4.0 * epsilon * (frac6 * frac6 - frac6);
+        return energy;
       }
 
       bool _computeForceRaw(Real3D& force,

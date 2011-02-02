@@ -13,12 +13,17 @@ namespace espresso {
       real (AngularPotential::*computeEnergy1)
         (const Real3D& dist12, const Real3D& dist32) const =
 	&AngularPotential::computeEnergy;
+    
       real (AngularPotential::*computeEnergy2)(real theta) const =
 	&AngularPotential::computeEnergy;
-      void (AngularPotential::*computeForce)
+    
+      void (AngularPotential::*computeForce1)
         (Real3D& force12, Real3D& force32,
         const Real3D& dist12, const Real3D& dist32) const =
 	&AngularPotential::computeForce;
+    
+      real (AngularPotential::*computeForce2)(real theta) const =
+        &AngularPotential::computeForce;
 
       class_< AngularPotential, boost::noncopyable >
 	("interaction_AngularPotential", no_init)
@@ -27,7 +32,8 @@ namespace espresso {
 		      &AngularPotential::setCutoff)
 	.def("computeEnergy", pure_virtual(computeEnergy1))
 	.def("computeEnergy", pure_virtual(computeEnergy2))
-	.def("computeForce", pure_virtual(computeForce))
+	.def("computeForce", pure_virtual(computeForce1))
+	.def("computeForce", pure_virtual(computeForce2))
 	;
     }
   }

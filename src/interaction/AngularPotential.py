@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-1 -*-
 from espresso import pmi
 from espresso import toReal3DFromVector
 from _espresso import interaction_AngularPotential
@@ -14,6 +15,10 @@ class AngularPotentialLocal(object):
 
     def computeForce(self, *args):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            if len(args) == 1: # in case theta is passed
+                arg0 = args[0]
+                if isinstance(arg0, float) or isinstance(arg0, int):
+                    return self.cxxclass.computeForce(self, arg0)
             return self.cxxclass.computeForce(self, toReal3DFromVector(*args))
 
 if pmi.isController:

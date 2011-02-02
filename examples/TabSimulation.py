@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+# -*- coding: iso-8859-1 -*-
+execfile("/people/thnfs/homes/bevc/espressopp/espresso_setup.py")
+
 
 ###########################################################################
 #                                                                         #
@@ -111,7 +114,7 @@ vl = espresso.VerletList(system, cutoff = cutoff + system.skin)
 potTab = espresso.interaction.Tabulated(filename = tabfile, cutoff = cutoff)
 potLJ  = espresso.interaction.LennardJones(sigma = 1.0, epsilon = 1.0, shift = 0.0, cutoff = cutoff)
 
-print('tabulated potential from file %s'%potTab.filename)
+print('tabulated potential from file %s' % potTab.filename)
 
 for r in (0.8, 0.9, 1.1, 1.3, 1.6, 1.9):
    msg = 'LJ:  r = %12.3f -> energy = %12.3f'

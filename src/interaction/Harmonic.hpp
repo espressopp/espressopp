@@ -19,49 +19,43 @@ namespace espresso {
     public:
       static void registerPython();
 
-      Harmonic()
-	: K(0.0), r0(0.0) {
-	setShift(0.0);
-	setCutoff(infinity);
+      Harmonic(): K(0.0), r0(0.0) {
+        setShift(0.0);
+        setCutoff(infinity);
       }
 
-      Harmonic(real _K, real _r0,
-		   real _cutoff, real _shift) 
-	: K(_K), r0(_r0) {
-	setShift(_shift);
-	setCutoff(_cutoff);
+      Harmonic(real _K, real _r0, real _cutoff, real _shift) : K(_K), r0(_r0) {
+        setShift(_shift);
+        setCutoff(_cutoff);
       }
 
-      Harmonic(real _K, real _r0,
-		   real _cutoff)
-	: K(_K), r0(_r0)
-      {	
-	autoShift = false;
-	setCutoff(_cutoff);
-	setAutoShift(); 
+      Harmonic(real _K, real _r0,  real _cutoff) : K(_K), r0(_r0) {
+        autoShift = false;
+        setCutoff(_cutoff);
+        setAutoShift();
       }
 
       // Setter and getter
       void setK(real _K) {
-	K = _K;
-	updateAutoShift();
+        K = _K;
+        updateAutoShift();
       }
+      
       real getK() const { return K; }
 
       void setR0(real _r0) { 
-	r0 = _r0; 
-	updateAutoShift();
+        r0 = _r0;
+        updateAutoShift();
       }
+      
       real getR0() const { return r0; }
 
       real _computeEnergySqrRaw(real distSqr) const {
         real energy = K * pow((sqrt(distSqr) - r0), 2);
-	return energy;
+        return energy;
       }
 
-      bool _computeForceRaw(Real3D& force,
-			    const Real3D& dist,
-                            real distSqr) const {
+      bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const {
         real r = sqrt(distSqr);
         real ffactor = -2.0 * K * (r - r0) / r;
         force = dist * ffactor;

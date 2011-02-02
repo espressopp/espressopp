@@ -16,17 +16,16 @@
 namespace espresso {
   namespace interaction {
     template < typename _Potential >
-    class FixedPairListInteractionTemplate
-       : public Interaction, SystemAccess {
+    class FixedPairListInteractionTemplate: public Interaction, SystemAccess {
+        
     protected:
       typedef _Potential Potential;
+      
     public:
       FixedPairListInteractionTemplate
       (shared_ptr < System > system,
        shared_ptr < FixedPairList > _fixedpairList)
-
         : SystemAccess(system), fixedpairList(_fixedpairList) 
-
       {
         potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
       }
@@ -42,7 +41,7 @@ namespace espresso {
 
       void
       setPotential(int type1, int type2, const Potential &potential) {
-	potentialArray.at(type1, type2) = potential;
+        potentialArray.at(type1, type2) = potential;
       }
 
       Potential &getPotential(int type1, int type2) {
@@ -74,8 +73,8 @@ namespace espresso {
         Real3D dist;
         bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
         const Potential &potential = getPotential(p1.type(), p2.type());
-	Real3D force;
-	if(potential._computeForce(force, dist)) {
+        Real3D force;
+        if(potential._computeForce(force, dist)) {
           p1.force() += force;
           p2.force() -= force;
         }
@@ -98,7 +97,7 @@ namespace espresso {
         const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D dist;
         bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
-	e += potential._computeEnergy(dist);
+        e += potential._computeEnergy(dist);
       }
       real esum;
       boost::mpi::reduce(*mpiWorld, e, esum, std::plus<real>(), 0);
@@ -106,7 +105,8 @@ namespace espresso {
     }
 
     template < typename _Potential > inline real
-    FixedPairListInteractionTemplate < _Potential >::computeVirial() {
+    FixedPairListInteractionTemplate < _Potential >::
+    computeVirial() {
       LOG4ESPP_INFO(theLogger, "compute the virial for the FixedPair List");
       
       real w = 0.0;

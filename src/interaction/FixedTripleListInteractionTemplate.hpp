@@ -17,8 +17,10 @@ namespace espresso {
   namespace interaction {
     template < typename _AngularPotential >
     class FixedTripleListInteractionTemplate : public Interaction, SystemAccess {
+        
     protected:
       typedef _AngularPotential Potential;
+      
     public:
       FixedTripleListInteractionTemplate
       (shared_ptr < System > _system,
@@ -39,7 +41,7 @@ namespace espresso {
 
       void
       setPotential(int type1, int type2, const Potential &potential) {
-	potentialArray.at(type1, type2) = potential;
+        potentialArray.at(type1, type2) = potential;
       }
 
       Potential &getPotential(int type1, int type2) {
@@ -62,7 +64,8 @@ namespace espresso {
     // INLINE IMPLEMENTATION
     //////////////////////////////////////////////////
     template < typename _AngularPotential > inline void
-    FixedTripleListInteractionTemplate < _AngularPotential >::addForces() {
+    FixedTripleListInteractionTemplate < _AngularPotential >::
+    addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by FixedTripleList");
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
       for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
@@ -74,10 +77,10 @@ namespace espresso {
         bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
         Real3D force12, force32;
-	potential._computeForce(force12, force32, dist12, dist32);
+        potential._computeForce(force12, force32, dist12, dist32);
         p1.force() += force12;
         p2.force() -= force12 + force32;
-	p3.force() += force32;
+        p3.force() += force32;
       }
     }
 
@@ -150,7 +153,8 @@ namespace espresso {
 
     template < typename _AngularPotential >
     inline real
-    FixedTripleListInteractionTemplate< _AngularPotential >::getMaxCutoff() {
+    FixedTripleListInteractionTemplate< _AngularPotential >::
+    getMaxCutoff() {
       real cutoff = 0.0;
       for (int i = 0; i < ntypes; i++) {
         for (int j = 0; j < ntypes; j++) {

@@ -7,11 +7,13 @@
 #include "FENE.hpp"
 #include "Harmonic.hpp"
 #include "Tabulated.hpp"
+#include "TabulatedAngular.hpp"
 #include "AngularPotential.hpp"
 #include "Cosine.hpp"
 #include "AngularHarmonic.hpp"
 #include "AngularCosineSquared.hpp"
 #include "DihedralPotential.hpp"
+#include "TabulatedDihedral.hpp"
 #include "OPLS.hpp"
 
 namespace espresso {
@@ -27,10 +29,12 @@ namespace espresso {
       FENE::registerPython();
       Harmonic::registerPython();
       AngularPotential::registerPython();
+      TabulatedAngular::registerPython();
       Cosine::registerPython();
       AngularHarmonic::registerPython();
       AngularCosineSquared::registerPython();
       DihedralPotential::registerPython();
+      TabulatedDihedral::registerPython();
       OPLS::registerPython();
     }
   }

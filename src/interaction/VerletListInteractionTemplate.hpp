@@ -15,13 +15,13 @@ namespace espresso {
     template < typename _Potential >
     class VerletListInteractionTemplate
         : public Interaction {
+    
     protected:
       typedef _Potential Potential;
+    
     public:
-      VerletListInteractionTemplate
-      (shared_ptr < VerletList > _verletList)
-        : verletList(_verletList) 
-      {
+      VerletListInteractionTemplate (shared_ptr < VerletList > _verletList)
+        : verletList(_verletList) {
         potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
       }
 
@@ -36,7 +36,7 @@ namespace espresso {
 
       void
       setPotential(int type1, int type2, const Potential &potential) {
-	potentialArray.at(type1, type2) = potential;
+        potentialArray.at(type1, type2) = potential;
       }
 
       Potential &getPotential(int type1, int type2) {

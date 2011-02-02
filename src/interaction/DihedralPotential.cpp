@@ -14,10 +14,13 @@ namespace espresso {
         (const Real3D& dist21,
          const Real3D& dist32,
          const Real3D& dist43) const =
-	&DihedralPotential::computeEnergy;
-      real (DihedralPotential::*computeEnergy2)(real phi) const =
-	&DihedralPotential::computeEnergy;
-      void (DihedralPotential::*computeForce)
+            &DihedralPotential::computeEnergy;
+    
+      real (DihedralPotential::*computeEnergy2)
+      (real phi) const =
+            &DihedralPotential::computeEnergy;
+    
+      void (DihedralPotential::*computeForce1)
         (Real3D& force1,
          Real3D& force2,
          Real3D& force3,
@@ -25,7 +28,11 @@ namespace espresso {
          const Real3D& dist21,
          const Real3D& dist32,
          const Real3D& dist43) const =
-	&DihedralPotential::computeForce;
+            &DihedralPotential::computeForce;
+    
+    real (DihedralPotential::*computeForce2)
+        (real phi) const =
+            &DihedralPotential::computeForce;
 
       class_< DihedralPotential, boost::noncopyable >
 	("interaction_DihedralPotential", no_init)
@@ -34,7 +41,8 @@ namespace espresso {
 		      &DihedralPotential::setCutoff)
 	.def("computeEnergy", pure_virtual(computeEnergy1))
 	.def("computeEnergy", pure_virtual(computeEnergy2))
-	.def("computeForce", pure_virtual(computeForce))
+	.def("computeForce", pure_virtual(computeForce1))
+	.def("computeForce", pure_virtual(computeForce2))
 	;
     }
   }

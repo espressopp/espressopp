@@ -64,11 +64,11 @@ namespace espresso {
 
       if (resortFlag) {
         // time = timeIntegrate.getElapsedTime();
-	LOG4ESPP_INFO(theLogger, "resort particles");
-	storage.decompose();
-	LOG4ESPP_INFO(theLogger, "particles resort");
-	maxDist = 0.0;
-	resortFlag = false;
+        LOG4ESPP_INFO(theLogger, "resort particles");
+        storage.decompose();
+        LOG4ESPP_INFO(theLogger, "particles resort");
+        maxDist = 0.0;
+        resortFlag = false;
         // timeResort += timeIntegrate.getElapsedTime();
       }
 
@@ -76,17 +76,14 @@ namespace espresso {
 
       if (recalcForces) {
 
-	LOG4ESPP_INFO(theLogger, "recalc Forces");
+        LOG4ESPP_INFO(theLogger, "recalc Forces");
 
-	if (langevin) langevin->heatUp();
-
+        if (langevin) langevin->heatUp();
         updateForces();
-
-	if (LOG4ESPP_DEBUG_ON(theLogger)) {
-	  // printForces(false);   // forces are reduced to real particles
-	}
-
-	if (langevin) langevin->coolDown();
+        if (LOG4ESPP_DEBUG_ON(theLogger)) {
+            // printForces(false);   // forces are reduced to real particles
+        }
+        if (langevin) langevin->coolDown();
       }
 
       LOG4ESPP_INFO(theLogger, "run " << nsteps << " iterations");
@@ -95,32 +92,32 @@ namespace espresso {
 
       for (int i = 0; i < nsteps; i++) {
 
-	LOG4ESPP_INFO(theLogger, "Next step " << i << " of " << nsteps << " starts");
- 
-        time = timeIntegrate.getElapsedTime();
-        maxDist += integrate1();
-        timeInt1 += timeIntegrate.getElapsedTime() - time;
+        LOG4ESPP_INFO(theLogger, "Next step " << i << " of " << nsteps << " starts");
+    
+            time = timeIntegrate.getElapsedTime();
+            maxDist += integrate1();
+            timeInt1 += timeIntegrate.getElapsedTime() - time;
 
-	LOG4ESPP_INFO(theLogger, "maxDist = " << maxDist << ", skin/2 = " << skinHalf);
+        LOG4ESPP_INFO(theLogger, "maxDist = " << maxDist << ", skin/2 = " << skinHalf);
 
-	if (maxDist > skinHalf) resortFlag = true;
+        if (maxDist > skinHalf) resortFlag = true;
 
-	if (resortFlag) {
-          time = timeIntegrate.getElapsedTime();
-	  LOG4ESPP_INFO(theLogger, "step " << i << ": resort particles");
-	  storage.decompose();
-	  maxDist  = 0.0;
-	  resortFlag = false;
-          nResorts ++;
-          timeResort += timeIntegrate.getElapsedTime() - time;
-	}
+        if (resortFlag) {
+            time = timeIntegrate.getElapsedTime();
+            LOG4ESPP_INFO(theLogger, "step " << i << ": resort particles");
+            storage.decompose();
+            maxDist  = 0.0;
+            resortFlag = false;
+            nResorts ++;
+            timeResort += timeIntegrate.getElapsedTime() - time;
+        }
 
         updateForces();
 
         time = timeIntegrate.getElapsedTime();
         integrate2();
         timeInt2 += timeIntegrate.getElapsedTime() - time;
-      }
+      } // for nsteps loop
 
       timeRun = timeIntegrate.getElapsedTime();
       timeLost = timeRun - (timeForceComp[0] + timeForceComp[1] + timeForceComp[2] +
@@ -218,34 +215,34 @@ namespace espresso {
 
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
-	real sqDist = 0.0;
+        real sqDist = 0.0;
 
-	LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() << 
-		       ", pos = " << cit->position() <<
-		       ", v = " << cit->velocity() << 
-		       ", f = " << cit->force());
+        LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() << 
+                ", pos = " << cit->position() <<
+                ", v = " << cit->velocity() << 
+                ", f = " << cit->force());
 
-        /* more precise for DEBUG:
+            /* more precise for DEBUG:
 
-        printf("Particle %d, pos = %16.12f %16.12f %16.12f, v = %16.12f, %16.12f %16.12f, f = %16.12f %16.12f %16.12f\n",
-	        cit->p.id, cit->r.p[0], cit->r.p[1], cit->r.p[2],
-                cit->m.v[0], cit->m.v[1], cit->m.v[2],
-	        cit->f.f[0], cit->f.f[1], cit->f.f[2]);
-              
-        */
+            printf("Particle %d, pos = %16.12f %16.12f %16.12f, v = %16.12f, %16.12f %16.12f, f = %16.12f %16.12f %16.12f\n",
+                cit->p.id, cit->r.p[0], cit->r.p[1], cit->r.p[2],
+                    cit->m.v[0], cit->m.v[1], cit->m.v[2],
+                cit->f.f[0], cit->f.f[1], cit->f.f[2]);
+                
+            */
 
-        real dtfm = 0.5 * dt / cit->mass();
+            real dtfm = 0.5 * dt / cit->mass();
 
-        // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) 
-        cit->velocity() += dtfm * cit->force();
-        // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt) 
-        Real3D deltaP = dt * cit->velocity();
-        cit->position() += deltaP;
-        sqDist += deltaP * deltaP;
+            // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) 
+            cit->velocity() += dtfm * cit->force();
+            // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt) 
+            Real3D deltaP = dt * cit->velocity();
+            cit->position() += deltaP;
+            sqDist += deltaP * deltaP;
 
-	count++;
+        count++;
 
-	maxSqDist = std::max(maxSqDist, sqDist);
+        maxSqDist = std::max(maxSqDist, sqDist);
       }
 
       real maxAllSqDist;
@@ -274,9 +271,9 @@ namespace espresso {
 
         real dtfm = 0.5 * dt / cit->mass();
 
-	/* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
+        /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
 
-	cit->velocity() += dtfm * cit->force();
+        cit->velocity() += dtfm * cit->force();
       }
       step++;
     }
@@ -320,7 +317,7 @@ namespace espresso {
 
         real time;
         time = timeIntegrate.getElapsedTime();
-	srIL[i]->addForces();
+        srIL[i]->addForces();
         timeForceComp[i] += timeIntegrate.getElapsedTime() - time;
       }
     }
@@ -358,7 +355,7 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "init forces for real + ghost particles");
 
       for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
-	cit->force() = 0.0;
+        cit->force() = 0.0;
       }
     }
 

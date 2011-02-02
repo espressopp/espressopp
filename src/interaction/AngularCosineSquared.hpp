@@ -40,7 +40,7 @@ namespace espresso {
         real energy = K * pow(cos(_theta) - cos_theta0, 2);
 	return energy;
       }
-
+/*
       void _computeForceRaw(Real3D& force12,
                             Real3D& force32,
 			    const Real3D& dist12,
@@ -50,18 +50,63 @@ namespace espresso {
         real dist32_sqr = dist32 * dist32;
         real dist12_magn = sqrt(dist12_sqr);
         real dist32_magn = sqrt(dist32_sqr);
+        real dist1232 = dist12_magn * dist32_magn;
 
-        real cos_theta = dist12 * dist32 / (dist12_magn * dist32_magn);
+        real cos_theta = dist12 * dist32 / dist1232;
         if(cos_theta < -1.0) cos_theta = -1.0;
         if(cos_theta >  1.0) cos_theta =  1.0;
         real sin_theta = sqrt(1.0 - cos_theta * cos_theta);
 
         real dU_dtheta = -2.0 * K * (cos_theta - cos_theta0) * sin_theta;
-
         real dnom = dist12_sqr * dist32_sqr * sin_theta;
-        force12 = dU_dtheta * (dist12_magn * dist32_magn * dist32 - cos_theta * dist32_sqr * dist12) / dnom;
-        force32 = dU_dtheta * (dist12_magn * dist32_magn * dist12 - cos_theta * dist12_sqr * dist32) / dnom;
+        dU_dtheta /= dnom;
+        force12 = dU_dtheta *
+                    (dist1232 * dist32 - cos_theta * dist32_sqr * dist12);
+        force32 = dU_dtheta *
+                    (dist1232 * dist12 - cos_theta * dist12_sqr * dist32);
+        
+      }*/
+
+
+      void _computeForceRaw(Real3D& force12,
+                            Real3D& force32,
+                const Real3D& dist12,
+                const Real3D& dist32) const {
+
+        real dist12_sqr = dist12 * dist12;
+        real dist32_sqr = dist32 * dist32;
+        real dist12_magn = sqrt(dist12_sqr);
+        real dist32_magn = sqrt(dist32_sqr);
+        real dist1232 = dist12_magn * dist32_magn;
+
+        real cos_theta = dist12 * dist32 / dist1232;
+        if(cos_theta < -1.0) cos_theta = -1.0;
+        else if(cos_theta >  1.0) cos_theta =  1.0;
+
+        real dU_dtheta = 2.0 * K * (cos_theta - cos_theta0);
+        
+        real a11 = dU_dtheta * cos_theta / dist12_sqr;
+        real a12 = -dU_dtheta / dist1232;
+        real a22 = dU_dtheta * cos_theta / dist32_sqr;
+        
+        force12 = a11 * dist12 + a12 * dist32;
+        force32 = a22 * dist32 + a12 * dist12;
+        
+        
       }
+
+
+      // used to generate the tabulated table
+      real _computeForceRaw(real theta) const {
+
+        real cos_theta = cos(theta);
+        if(cos_theta < -1.0) cos_theta = -1.0;
+        else if(cos_theta >  1.0) cos_theta =  1.0;
+
+        return 2.0 * K * (cos_theta - cos_theta0);
+
+      }
+      
     };
   }
 }

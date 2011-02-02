@@ -87,12 +87,14 @@ namespace espresso {
       bool autoShift;
 
       Derived* derived_this() {
-	return static_cast< Derived* >(this);
+        return static_cast< Derived* >(this);
       }
 
       const Derived* derived_this() const {
-	return static_cast< const Derived* >(this);
+        return static_cast< const Derived* >(this);
       }
+
+
     };
 
     // template < class Derived >
@@ -117,17 +119,12 @@ namespace espresso {
     //////////////////////////////////////////////////
     template < class Derived > 
     inline
-    PotentialTemplate< Derived >::
-    PotentialTemplate() 
-      : cutoff(infinity), cutoffSqr(infinity),
-	shift(0.0), autoShift(false)
-    {}
+    PotentialTemplate< Derived >::PotentialTemplate() : cutoff(infinity), cutoffSqr(infinity), shift(0.0), autoShift(false) {}
 
     // Shift/cutoff handling
     template < class Derived > 
     inline void 
-    PotentialTemplate< Derived >::
-    setCutoff(real _cutoff) {
+    PotentialTemplate< Derived >::setCutoff(real _cutoff) {
       cutoff = _cutoff;
       cutoffSqr = cutoff*cutoff;
       updateAutoShift();
@@ -135,14 +132,13 @@ namespace espresso {
 
     template < class Derived > 
     inline real 
-    PotentialTemplate< Derived >::
-    getCutoff() const 
-    { return cutoff; }
+    PotentialTemplate< Derived >::getCutoff() const {
+        return cutoff;
+    }
 
     template < class Derived > 
     inline void 
-    PotentialTemplate< Derived >::
-    setShift(real _shift) { 
+    PotentialTemplate< Derived >::setShift(real _shift) { 
       autoShift = false; 
       shift = _shift; 
     }
@@ -229,9 +225,9 @@ namespace espresso {
     PotentialTemplate< Derived >::
     _computeEnergySqr(real distSqr) const {
       if (distSqr > cutoffSqr) 
-	return 0.0;
+        return 0.0;
       else
-	return derived_this()->_computeEnergySqrRaw(distSqr) - shift;
+        return derived_this()->_computeEnergySqrRaw(distSqr) - shift;
     }
     
     // Force computation
@@ -249,7 +245,7 @@ namespace espresso {
     computeForce(const Real3D& dist) const {
       Real3D force;
       if(!_computeForce(force, dist))
-	force = 0.0;
+        force = 0.0;
       return force;
     }
 

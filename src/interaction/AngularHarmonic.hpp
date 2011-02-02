@@ -32,9 +32,9 @@ namespace espresso {
       real _computeEnergyRaw(real _theta) const {
         // _theta and theta0 should be in radians
         real energy = K * pow(_theta - theta0, 2);
-	return energy;
+        return energy;
       }
-
+/*
       void _computeForceRaw(Real3D& force12,
                             Real3D& force32,
 			    const Real3D& dist12,
@@ -49,13 +49,57 @@ namespace espresso {
         if(cos_theta < -1.0) cos_theta = -1.0;
         if(cos_theta >  1.0) cos_theta =  1.0;
         real sin_theta = sqrt(1.0 - cos_theta * cos_theta);
-
+        
         real dU_dtheta = 2.0 * K * (acos(cos_theta) - theta0);
-
         real dnom = dist12_sqr * dist32_sqr * sin_theta;
+        
         force12 = dU_dtheta * (dist12_magn * dist32_magn * dist32 - cos_theta * dist32_sqr * dist12) / dnom;
         force32 = dU_dtheta * (dist12_magn * dist32_magn * dist12 - cos_theta * dist12_sqr * dist32) / dnom;
+      }*/
+
+
+        void _computeForceRaw(Real3D& force12,
+                              Real3D& force32,
+                              const Real3D& dist12,
+                              const Real3D& dist32) const {
+
+            real dist12_sqr = dist12 * dist12;
+            real dist32_sqr = dist32 * dist32;
+            real dist12_magn = sqrt(dist12_sqr);
+            real dist32_magn = sqrt(dist32_sqr);
+            real dU_dtheta, dist1232, a11, a12, a22;
+            dist1232 = dist12_magn * dist32_magn;
+
+            real cos_theta = dist12 * dist32 / dist1232;
+            if(cos_theta < -1.0) cos_theta = -1.0;
+            else if(cos_theta >  1.0) cos_theta =  1.0;
+            real sin_theta = sqrt(1.0 - cos_theta * cos_theta);
+            
+            dU_dtheta = -2.0 * K * (acos(cos_theta) - theta0) / sin_theta;
+            
+            a11 = dU_dtheta * cos_theta / dist12_sqr;
+            a12 = -dU_dtheta / dist1232;
+            a22 = dU_dtheta * cos_theta / dist32_sqr;
+            
+            force12 = a11 * dist12 + a12 * dist32;
+            force32 = a22 * dist32 + a12 * dist12;
+            
       }
+
+      
+      
+      // used for generating tabular angular potential
+      real _computeForceRaw(const real theta) const {
+         
+        real cos_theta = cos(theta);
+        if(cos_theta < -1.0) cos_theta = -1.0;
+        else if(cos_theta >  1.0) cos_theta =  1.0;
+        real sin_theta = sqrt(1.0 - cos_theta * cos_theta);
+        
+        return -2.0 * K * (acos(cos_theta) - theta0) / sin_theta;
+        
+      }
+      
     };
   }
 }

@@ -33,28 +33,21 @@ namespace espresso {
     class InterpolationTable {
 
     public:
-
       InterpolationTable();
-
       ~InterpolationTable();
 
       /** Read in the radius, energy, force values; creates spline tables */
-
       void read(mpi::communicator comm, const char* file);
 
       real getEnergy(real r) const;
-
       real getForce(real r) const;
 
     protected:
-
       /** Logger */
       static LOG4ESPP_DECL_LOGGER(theLogger);
 
     private:
-
       /** make copy constructor private because copy is not allowed. */
-
       InterpolationTable(const InterpolationTable&) {}
 
       /** Reading values from file, control processor only; returns
@@ -62,16 +55,13 @@ namespace espresso {
 
           if dummy is true, values will not be stored in arrays r, e, f
       */
-
       int readFile(const char* file, bool dummy);
 
       /** Spline read-in values. */
-
       void spline(const real* x, const real* y, int n,
                   real yp1, real ypn, real* y2);
 
       /** Spline interpolation */
-
       real splineInterpolation(real r, const real* fn, const real* fn2) const;
 
       int N;  // number of read values

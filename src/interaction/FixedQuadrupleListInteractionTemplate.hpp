@@ -145,7 +145,7 @@ namespace espresso {
         potential._computeForce(force1, force2, force3, force4,
                                 dist21, dist32, dist43);
 
-        // TODO: formulas are not correct yet
+        // TODO: formulas are not correct yet?
 
         w += dist21 * force1 + dist32 * force2;
       }

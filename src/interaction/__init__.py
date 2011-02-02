@@ -1,3 +1,4 @@
+# -*- coding: iso-8859-1 -*-
 from espresso.esutil import pmiimport
 pmiimport('espresso.interaction')
 
@@ -14,8 +15,10 @@ from espresso.interaction.Harmonic import *
 
 from espresso.interaction.AngularPotential import *
 from espresso.interaction.Cosine import *
+from espresso.interaction.TabulatedAngular import *
 from espresso.interaction.AngularHarmonic import *
 from espresso.interaction.AngularCosineSquared import *
 
 from espresso.interaction.DihedralPotential import *
+from espresso.interaction.TabulatedDihedral import *
 from espresso.interaction.OPLS import *

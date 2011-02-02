@@ -32,7 +32,7 @@ namespace espresso {
       real _computeEnergyRaw(real _theta) const {
         // _theta and theta0 should be in radians
         real energy = K * (1.0 - cos(_theta - theta0));
-	return energy;
+        return energy;
       }
 
       // theta0 is ignored at the moment (TODO)
@@ -58,6 +58,24 @@ namespace espresso {
         force12 = a11 * dist12 + a12 * dist32;
         force32 = a22 * dist32 + a12 * dist12;
       }
+      
+      // used for generating tabular angular potential
+      real _computeForceRaw(real theta) const {
+
+        /*
+        real cos_theta = cos(theta);
+        if(cos_theta < -1.0) cos_theta = -1.0;
+        else if(cos_theta >  1.0) cos_theta =  1.0;
+
+        real sin_theta = sqrt(1.0 - cos_theta * cos_theta);
+        return K * sin_theta;
+        */
+        return K;
+        
+        
+      }
+      
+      
     };
   }
 }

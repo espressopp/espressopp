@@ -25,6 +25,9 @@ skin = 0.3
 nvt = True
 timestep = 0.01
 
+tabfileLJ = "pot-lj.txt"
+tabfileFENE = "pot-fene.txt"
+tabfileCosine = "pot-cosine.txt"
 
 ######################################################################
 ### IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE ###
@@ -35,7 +38,7 @@ num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 system = espresso.System()
-system.rng = espresso.esutil.RNG()
+system.rng = espresso.esutil.RNG(54321)
 system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 comm = MPI.COMM_WORLD
@@ -48,28 +51,58 @@ for pid in range(num_particles):
   system.storage.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
 system.storage.decompose()
 
+
+
 # Lennard-Jones with Verlet list
 vl = espresso.VerletList(system, cutoff = rc + system.skin)
-potLJ = espresso.interaction.LennardJones(1.0, 1.0, cutoff = rc, shift = False)
-interLJ = espresso.interaction.VerletListLennardJones(vl)
-interLJ.setPotential(type1 = 0, type2 = 0, potential = potLJ)
+potTabLJ = espresso.interaction.Tabulated(filename = tabfileLJ, cutoff = rc)
+potLJ = espresso.interaction.LennardJones(sigma=1.0, epsilon=1.0, cutoff=rc, shift=False)
+if sys.argv.count("tlj") > 0:
+    print('tabulated potential from file %s' % potTabLJ.filename)
+    interLJ = espresso.interaction.VerletListTabulated(vl)
+    interLJ.setPotential(type1 = 0, type2 = 0, potential = potTabLJ)
+else:
+    interLJ = espresso.interaction.VerletListLennardJones(vl)
+    interLJ.setPotential(type1 = 0, type2 = 0, potential = potLJ)
 system.addInteraction(interLJ)
+
+
+
 
 # FENE bonds
 fpl = espresso.FixedPairList(system.storage)
 fpl.addBonds(bonds)
+potTabFENE = espresso.interaction.Tabulated(filename = tabfileFENE)
 potFENE = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
-interFENE = espresso.interaction.FixedPairListFENE(system, fpl)
-interFENE.setPotential(type1 = 0, type2 = 0, potential = potFENE)
+if sys.argv.count("tfene") > 0:
+    print('tabulated potential from file %s' % potTabFENE.filename)
+    interFENE = espresso.interaction.FixedPairListTabulated(system, fpl)
+    interFENE.setPotential(type1 = 0, type2 = 0, potential = potTabFENE)
+else:
+    interFENE = espresso.interaction.FixedPairListFENE(system, fpl)
+    interFENE.setPotential(type1 = 0, type2 = 0, potential = potFENE)
 system.addInteraction(interFENE)
+
+
+
 
 # Cosine with FixedTriple list
 ftl = espresso.FixedTripleList(system.storage)
 ftl.addTriples(angles)
+potTabCosine = espresso.interaction.TabulatedAngular(filename = tabfileCosine)
 potCosine = espresso.interaction.Cosine(K=1.5, theta0=3.1415926)
-interCosine = espresso.interaction.FixedTripleListCosine(system, ftl)
-interCosine.setPotential(type1 = 0, type2 = 0, potential = potCosine)
+if sys.argv.count("tcos") > 0:
+    print('tabulated potential from file %s' % potTabCosine.filename)
+    interCosine = espresso.interaction.FixedTripleListTabulatedAngular(system, ftl)
+    interCosine.setPotential(type1 = 0, type2 = 0, potential = potTabCosine)
+else:
+    interCosine = espresso.interaction.FixedTripleListCosine(system, ftl)
+    interCosine.setPotential(type1 = 0, type2 = 0, potential = potCosine)
 system.addInteraction(interCosine)
+
+
+
+
 
 
 # integrator
@@ -119,6 +152,7 @@ sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea))
 start_time = time.clock()
 integrator.run(steps)
 end_time = time.clock()
+
 T = temperature.compute()
 P = pressure.compute()
 Pij = pressureTensor.compute()

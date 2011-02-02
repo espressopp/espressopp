@@ -7,115 +7,38 @@ namespace espresso {
 
     LOG4ESPP_LOGGER(InterpolationTable::theLogger, "InterpolationTable");
 
-    InterpolationTable::InterpolationTable()
-    {
+    InterpolationTable::InterpolationTable() {
       // NULLify pointers in case of errors
-
       radius = NULL;
       energy = NULL;
       force  = NULL;
-
+      
       energy2 = NULL;
       force2  = NULL;
-
+      
       allocated = false;
     }
 
-    InterpolationTable::~InterpolationTable()
-    {
+    InterpolationTable::~InterpolationTable() {
       LOG4ESPP_INFO(theLogger, "~InterpolcationTable");
     }
-
-    /** Spline read-in values. */
-
-    void InterpolationTable::spline(const real *x, const real *y, int n,
-                                    real yp1, real ypn, real *y2)
-    {
-      real *u = new real[n];
-
-      if (yp1 > 0.99e30) {
-        y2[0] = 0.0;
-        u[0]  = 0.0;
-      } else {
-        y2[0] = -0.5;
-        u[0]  = (3.0/(x[1]-x[0])) * ((y[1]-y[0]) / (x[1]-x[0]) - yp1);
-      }
     
-      for (int i = 1; i < n-1; i++) {
-
-        real sig = (x[i] - x[i-1]) / (x[i+1]-x[i-1]);
-        real p   = sig * y2[i-1] + 2.0;
     
-        y2[i] = (sig-1.0) / p;
-        u[i]  = (y[i+1] - y[i]) / (x[i+1] - x[i]) -
-                (y[i] - y[i-1]) / (x[i] - x[i-1]);
-        u[i]  = (6.0*u[i] / (x[i+1]-x[i-1]) - sig*u[i-1]) / p;
-      }
     
-      real qn, un;
-    
-      if (ypn > 0.99e30) {
-        qn = 0.0;
-        un = 0.0;
-      } else {
-        qn = 0.5;
-        un = (3.0 / (x[n-1]-x[n-2])) * (ypn - (y[n-1]-y[n-2]) / (x[n-1]-x[n-2]));
-      }
-    
-      y2[n-1] = (un - qn * u[n-2]) / (qn * y2[n-2] + 1.0);
-        
-      for (int k = n-2; k >= 0; k--) {
-        y2[k] = y2[k] * y2[k+1] + u[k];
-      }
-    
-      delete [] u;
+    real InterpolationTable::getEnergy(real r) const {
+      return splineInterpolation(r, energy, energy2);
     }
 
-    int InterpolationTable::readFile(const char* file, bool dummy)
-    {
-      char line[MAXLINE];
 
-      real r, e, f;
 
-      FILE *fp = fopen(file, "r");
-
-      if (fp == NULL) {
-        LOG4ESPP_ERROR(theLogger, "could not open file " << file);
-        return 0;
-      }
-
-      int N = 0;
-
-      while (1) {
-
-        if (fgets(line, MAXLINE, fp) == NULL) break;
-
-        int k = sscanf(line, "%lg %lg %lg", &r, &e, &f);
-
-        if (k < 3) continue;    // do not accept this line
-
-        if (!dummy) {
-          radius[N] = r;
-          energy[N] = e;
-          force[N]  = f;
-        }
-
-        N++;   // increment counter for table entries
-      }
-
-      fclose(fp);
-
-      if (dummy) {
-        LOG4ESPP_INFO(theLogger, "found " << N << " table entries file " << file);
-      } else {
-        LOG4ESPP_INFO(theLogger, "read " << N << " table entries in file " << file);
-      }
-
-      return N;
+    real InterpolationTable::getForce(real r) const {
+      return splineInterpolation(r, force, force2);
     }
-  
-    void InterpolationTable::read(mpi::communicator comm, const char* file)
-    {
+    
+
+
+    // this is called by the created InterpolationTable object
+    void InterpolationTable::read(mpi::communicator comm, const char* file) {
       int root = 0;  // control processor
 
       if (comm.rank() == root) N = readFile(file, true);  // dummy read
@@ -166,56 +89,139 @@ namespace espresso {
       force2  = new real[N];
 
       // the derivatives of energy are known by the forces
-
       real yp1 = -force[0];
       real ypN = -force[N-1];
 
       spline(radius, energy, N, yp1, ypN, energy2);
 
       // the derivatives of forces are approximated
-
       yp1 = (force[1] - force[0]) / (radius[1] - radius[0]);
       ypN = (force[N-1] - force[N-2]) / (radius[N-1] - radius[N-2]);
 
       spline(radius, force, N, yp1, ypN, force2);
-    }
+    }// read
+
+
+
+    // read file, store values in r, e, f, and return number of read lines
+    // (called by read())
+    int InterpolationTable::readFile(const char* file, bool dummy) {
+     
+      char line[MAXLINE];
+      real r, e, f;
+      FILE *fp = fopen(file, "r");
+     
+      if (fp == NULL) {
+        LOG4ESPP_ERROR(theLogger, "could not open file " << file);
+        return 0;
+      }
+     
+      int N = 0;
+     
+      while (1) {
+        if (fgets(line, MAXLINE, fp) == NULL) break;
+     
+        int k = sscanf(line, "%lg %lg %lg", &r, &e, &f);
+        if (k < 3) continue;    // do not accept this line
+     
+        if (!dummy) {
+          radius[N] = r;
+          energy[N] = e;
+           force[N] = f;
+        }
+     
+        N++;   // increment counter for table entries
+      }
+     
+      fclose(fp);
+     
+      if (dummy) {
+        LOG4ESPP_INFO(theLogger, "found " << N << " table entries file " << file);
+      } else {
+        LOG4ESPP_INFO(theLogger, "read " << N << " table entries in file " << file);
+      }
+     
+      return N;
+    }// readfile
+
+
+
+    /** Spline read-in values. */
+    void InterpolationTable::spline(const real *x, const real *y, int n,
+                                    real yp1, real ypn, real *y2) {
+      real *u = new real[n];
+     
+      if (yp1 > 0.99e30) {
+        y2[0] = 0.0;
+        u[0]  = 0.0;
+      }
+      else {
+        y2[0] = -0.5;
+        u[0]  = (3.0/(x[1]-x[0])) * ((y[1]-y[0]) / (x[1]-x[0]) - yp1);
+      }
+     
+      for (int i = 1; i < n-1; i++) {
+     
+        real sig = (x[i] - x[i-1]) / (x[i+1]-x[i-1]);
+        real p   = sig * y2[i-1] + 2.0;
+     
+        y2[i] = (sig-1.0) / p;
+        u[i]  = (y[i+1] - y[i]) / (x[i+1] - x[i]) -
+                (y[i] - y[i-1]) / (x[i] - x[i-1]);
+        u[i]  = (6.0*u[i] / (x[i+1]-x[i-1]) - sig*u[i-1]) / p;
+      }
+     
+      real qn, un;
+     
+      if (ypn > 0.99e30) {
+        qn = 0.0;
+        un = 0.0;
+      } else {
+        qn = 0.5;
+        un = (3.0 / (x[n-1]-x[n-2])) * (ypn - (y[n-1]-y[n-2]) / (x[n-1]-x[n-2]));
+      }
+     
+      y2[n-1] = (un - qn * u[n-2]) / (qn * y2[n-2] + 1.0);
+        
+      for (int k = n-2; k >= 0; k--) {
+        y2[k] = y2[k] * y2[k+1] + u[k];
+      }
+     
+      delete [] u;
+    }// spline
+
+
+
 
     /**************************************************************************
     *                                                                         *
     **************************************************************************/
 
     real InterpolationTable::splineInterpolation(real r, const real* fn, 
-                                                         const real* fn2) const
-    {
+                                                         const real* fn2) const {
+                                                             
       int index = static_cast<int>((r - inner) * invdelta);
 
-      if (index < 0 || index >= N) {
+      if (index < 0) {
          LOG4ESPP_ERROR(theLogger, "distance " << r << " out of range "
                         << inner << " - " << inner + (N - 1) * delta);
-         
+            index = 0;
+      } else if (index >= N) {
+            index = N-1;
       }
 
       real b = (r - radius[index]) * invdelta;
       real a = 1.0 - b;
-
-      real f = a * fn[index] + b * fn[index+1] +
-               ((a*a*a-a)*fn2[index] + (b*b*b-b)*fn2[index+1]) *
+      real f = a * fn[index] +
+               b * fn[index+1] +
+               ((a*a*a-a)*fn2[index] +
+                (b*b*b-b)*fn2[index+1]) *
                deltasq6;
 
       // printf("interpoloate %f, a = %f, b = %f, fn = %f - %f, fn2 = %f - %f\n", 
       //        r, a, b, fn[index], fn[index+1], fn2[index], fn2[index+1]);
-
       return f;
     }
 
-    real InterpolationTable::getEnergy(real r) const
-    {
-      return splineInterpolation(r, energy, energy2);
-    }
-
-    real InterpolationTable::getForce(real r) const
-    {
-      return splineInterpolation(r, force, force2);
-    }
   }
 }
