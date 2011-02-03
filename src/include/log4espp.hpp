@@ -125,7 +125,7 @@
 
 #include <cstdio>
 #include "log4cpp/Portability.hh"
-#ifdef LOG4CPP_HAVE_UNISTD_H
+#if defined(LOG4CPP_HAVE_UNISTD_H) or defined(CMAKE_HEADERS)
 #include <unistd.h>
 #endif
 #include <iostream>
