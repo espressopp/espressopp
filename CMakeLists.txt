@@ -38,7 +38,7 @@ include_directories(${PYTHON_INCLUDE_PATH})
 # Basic system tests (standard libraries, headers, functions, types)   #
 ########################################################################
 include(CheckIncludeFiles)
-check_include_files(sys/time.h sys/resource.h unistd.h CMAKE_HEADERS)
+check_include_files("sys/time.h;sys/resource.h;unistd.h" CMAKE_HEADERS)
 
 list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
