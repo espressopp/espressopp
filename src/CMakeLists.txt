@@ -15,14 +15,15 @@ file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
 
 file(GLOB_RECURSE PYTHON_SCRIPTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.py)
 
-if (NOT ${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-  add_custom_target(scripts ALL COMMENT "Copying scripts to builddir: *.py")
-  foreach(FILENAME ${PYTHON_SCRIPTS})
-    set(SRC "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
-    set(DST "${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}")
+add_custom_target(scripts ALL COMMENT "Copying scripts to builddir: *.py")
+foreach(FILENAME ${PYTHON_SCRIPTS})
+  set(SRC "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
+  set(DST "${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}")
+  if (NOT ${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
     add_custom_command(TARGET scripts COMMAND ${CMAKE_COMMAND} -E copy ${SRC} ${DST})
-  endforeach(FILENAME)
-endif(NOT ${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
+  endif(NOT ${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
+  install(FILES ${DST} DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/epresso)
+endforeach(FILENAME)
 
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
 
@@ -43,7 +44,10 @@ target_link_libraries(espresso_common ${BOOST} mpi4py ${PYTHON_LIBRARIES} ${MPI_
 add_executable(pypresso main/pypresso.cpp)
 target_link_libraries(pypresso espresso_common)
 add_dependencies(pypresso scripts)
+install(PROGRAMS pypresso DESTINATION bin)
+
 
 add_library(_espresso main/_espresso.cpp)
 target_link_libraries(_espresso espresso_common)
 add_dependencies(_espresso scripts)
+install(TARGETS _espresso LIBRARY DESTINATION lib)

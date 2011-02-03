@@ -55,15 +55,8 @@ else(EXTERNAL_BOOST)
 endif(EXTERNAL_BOOST)
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
-# Required for config.h
+# Required for acconfig.h
 include_directories(${CMAKE_BINARY_DIR}/src)
-
-########################################################################
-# Specify install locations and which subdirectories to process        #
-########################################################################
-set(BIN_INSTALL_DIR  ${CMAKE_INSTALL_PREFIX}/bin)
-set(MAN_INSTALL_DIR  ${CMAKE_INSTALL_PREFIX}/share/man)
-set(INCL_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include)
 
 ######################################
 # Include the following subdirectory # 
