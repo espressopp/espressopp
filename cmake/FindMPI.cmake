@@ -95,6 +95,8 @@ set(_MPI_PREFIX_PATH)
 if(WIN32)
   list(APPEND _MPI_PREFIX_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MPICH\\SMPD;binary]/..")
   list(APPEND _MPI_PREFIX_PATH "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MPICH2;Path]")
+else(WIN32)
+  list(APPEND _MPI_PREFIX_PATH "/usr/lpp/ppe.poe")
 endif()
 
 foreach(SystemPrefixDir ${CMAKE_SYSTEM_PREFIX_PATH})
