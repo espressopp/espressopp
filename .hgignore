@@ -19,6 +19,7 @@ stamp-h1
 COPYING
 INSTALL
 aclocal.m4
+build
 build-aux/depcomp
 build-aux/install-sh
 build-aux/missing
