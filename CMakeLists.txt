@@ -67,3 +67,6 @@ include_directories(${CMAKE_BINARY_DIR}/src)
 add_subdirectory(src)
 add_subdirectory(contrib)
 
+add_custom_target(symlink ALL COMMENT "Creating symlink")
+add_custom_command(TARGET symlink COMMAND ${CMAKE_COMMAND} -E create_symlink
+  ${CMAKE_BINARY_DIR}/src espresso)

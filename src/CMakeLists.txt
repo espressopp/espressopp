@@ -19,34 +19,30 @@ add_custom_target(scripts ALL COMMENT "Copying scripts to builddir: *.py")
 foreach(FILENAME ${PYTHON_SCRIPTS})
   set(SRC "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
   set(DST "${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}")
+  string(REGEX MATCH .*/ DIR "${FILENAME}")
   if (NOT ${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-    add_custom_command(TARGET scripts COMMAND ${CMAKE_COMMAND} -E copy ${SRC} ${DST})
+    add_custom_command(TARGET scripts COMMAND ${CMAKE_COMMAND} -E copy ${SRC} ${DST}
+      COMMENT "${FILENAME} to ${DIR}")
   endif(NOT ${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-  install(FILES ${DST} DESTINATION ${PYTHON_INSTDIR}/espresso)
+  install(FILES ${DST} DESTINATION ${PYTHON_INSTDIR}/espresso/${DIR})
 endforeach(FILENAME)
 
 #remove this two lines if autotools are gone
 add_custom_command(TARGET scripts COMMAND ${CMAKE_COMMAND} -E touch 
   ${CMAKE_CURRENT_BINARY_DIR}/main/_setupPath.py)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/main/_setupPath.py DESTINATION ${PYTHON_INSTDIR}/espresso)
-
-#small trick to make PYTHONPATH easy
-add_custom_command(TARGET scripts COMMAND ${CMAKE_COMMAND} -E create_symlink
-  ${CMAKE_BINARY_DIR}/contrib/mpi4py/MPI.so MPI.so)
-add_custom_command(TARGET scripts COMMAND ${CMAKE_COMMAND} -E create_symlink
-  ${CMAKE_CURRENT_BINARY_DIR} espresso)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/main/_setupPath.py DESTINATION ${PYTHON_INSTDIR}/espresso/main)
 
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
   ${CMAKE_CURRENT_BINARY_DIR}/acconfig.hpp)
 
-set (PYTHON_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib/mpi4py")
 set (BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 set (LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
   ${CMAKE_BINARY_DIR}/ESPRC @ONLY)
-set (PYTHON_DIR "${CMAKE_INSTALL_PREFIX}/${PYTHON_INSTDIR}/espresso")
+set (PYTHON_DIR "${CMAKE_INSTALL_PREFIX}/${PYTHON_INSTDIR}")
 set (BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin")
 set (LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein

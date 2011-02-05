@@ -18,6 +18,7 @@ autom4te.cache/*
 stamp-h1
 COPYING
 INSTALL
+ESPRC
 aclocal.m4
 build
 build-aux/depcomp
