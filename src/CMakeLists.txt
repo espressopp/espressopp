@@ -14,6 +14,7 @@ file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
   integrator/unittest/*.cpp
   thermostat.cpp
 )
+list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
 
 file(GLOB_RECURSE PYTHON_SCRIPTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.py)
 
@@ -40,7 +41,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
 
 #build ESPRC
 #CMAKE_BINARY_DIR for espresso, CMAKE_CURRENT_BINARY_DIR for for _espressos.so and contrib for MPI.so
-set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib/mpi4py")
+set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_CURRENT_BINARY_DIR}/pymodule:${CMAKE_BINARY_DIR}/contrib/mpi4py")
 #CMAKE_CURRENT_BINARY_DIR for pypresso
 set (BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 #CMAKE_CURRENT_BINARY_DIR for libespresso_common.so and contib for libespresso_boost
@@ -79,11 +80,5 @@ if(BUID_STANDALONE)
   install(TARGETS pypresso RUNTIME DESTINATION bin)
 endif(BUID_STANDALONE)
 
-if (BUID_PYTHON_MODULE)
-  add_library(_espresso main/_espresso.cpp)
-  target_link_libraries(_espresso espresso_common pylogger MPI)
-  add_dependencies(_espresso scripts)
-  #python libs have not prefix (default would be 'lib')
-  set_target_properties(_espresso PROPERTIES PREFIX "")
-  install(TARGETS _espresso LIBRARY DESTINATION ${PYTHON_INSTDIR})
-endif(BUID_PYTHON_MODULE)
+#we have to build _espresso in a subdir to avoid endless recursion in python
+add_subdirectory(pymodule)
