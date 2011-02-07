@@ -25,6 +25,11 @@ include(CheckCXXCompilerFlag)
 ########################################################################
 option(EXTERNAL_BOOST "Use external boost" OFF)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
+#if (BUILD_SHARED_LIBS)
+#  set(CMAKE_FIND_LIBRARY_SUFFIXES ".so;.a")
+#else(BUILD_SHARED_LIBS)
+#  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a;.so")
+#endif(BUILD_SHARED_LIBS)
 option(BUID_STANDALONE "Builds pypresso an standalone binary" OFF)
 option(BUID_PYTHON_MODULE "Builds epresso as python module" ON)
 
@@ -39,7 +44,7 @@ endif(NOT BUID_STANDALONE AND NOT BUID_PYTHON_MODULE)
 find_package(MPI REQUIRED)
 include_directories(${MPI_INCLUDE_PATH})
 find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_PATH})
+include_directories(${PYTHON_INCLUDE_DIR})
 
 find_package(PythonInterp REQUIRED)
 execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "from distutils import sysconfig;print sysconfig.get_python_lib(1,0,prefix='${CMAKE_INSTALL_EXEC_PREFIX}')"
