@@ -1,8 +1,9 @@
 file(GLOB_RECURSE ESPRESSO_SOURCES *.cpp)
 file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
-  "main/_espresso.cpp"
-  "main/pypresso.cpp"
-  "esutil/GenLogger.cpp"
+  main/_espresso.cpp
+  main/pypresso.cpp
+  esutil/GenLogger.cpp
+  esutil/PyLogger.cpp
   iterator/unittest/*.cpp
   interaction/unittest/*.cpp
   unittest/*.cpp
@@ -11,6 +12,7 @@ file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
   storage/unittest/*.cpp
   bc/unittest/*.cpp
   integrator/unittest/*.cpp
+  thermostat.cpp
 )
 
 file(GLOB_RECURSE PYTHON_SCRIPTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.py)
@@ -36,11 +38,17 @@ list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
   ${CMAKE_CURRENT_BINARY_DIR}/acconfig.hpp)
 
+#build ESPRC
+#CMAKE_BINARY_DIR for espresso, CMAKE_CURRENT_BINARY_DIR for for _espressos.so and contrib for MPI.so
 set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib/mpi4py")
+#CMAKE_CURRENT_BINARY_DIR for pypresso
 set (BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+#CMAKE_CURRENT_BINARY_DIR for libespresso_common.so and contib for libespresso_boost
 set (LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
   ${CMAKE_BINARY_DIR}/ESPRC @ONLY)
+
+#after install ESPRC
 set (PYTHON_DIR "${CMAKE_INSTALL_PREFIX}/${PYTHON_INSTDIR}")
 set (BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin")
 set (LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
@@ -57,20 +65,25 @@ else(EXTERNAL_BOOST)
 endif(EXTERNAL_BOOST)
 
 add_library(espresso_common ${ESPRESSO_SOURCES})
-target_link_libraries(espresso_common ${BOOST} MPI ${PYTHON_LIBRARIES} ${MPI_LIBRARIES})
+target_link_libraries(espresso_common ${BOOST} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES})
 install(TARGETS espresso_common LIBRARY DESTINATION lib)
+
+add_library(pylogger esutil/PyLogger.cpp)
+target_link_libraries(pylogger ${BOOST})
+install(TARGETS pylogger LIBRARY DESTINATION lib)
 
 if(BUID_STANDALONE)
   add_executable(pypresso main/pypresso.cpp)
-  target_link_libraries(pypresso espresso_common)
+  target_link_libraries(pypresso espresso_common pylogger MPI)
   add_dependencies(pypresso scripts)
   install(TARGETS pypresso RUNTIME DESTINATION bin)
 endif(BUID_STANDALONE)
 
 if (BUID_PYTHON_MODULE)
   add_library(_espresso main/_espresso.cpp)
-  target_link_libraries(_espresso espresso_common)
+  target_link_libraries(_espresso espresso_common pylogger MPI)
   add_dependencies(_espresso scripts)
+  #python libs have not prefix (default would be 'lib')
   set_target_properties(_espresso PROPERTIES PREFIX "")
   install(TARGETS _espresso LIBRARY DESTINATION ${PYTHON_INSTDIR})
 endif(BUID_PYTHON_MODULE)
