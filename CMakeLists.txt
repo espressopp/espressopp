@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 2.6)
 
-project(ESPResSo++)
+project(espressopp)
 
-set(PROJECT_VERSION "0.9")
+set(PROJECT_VERSION "0.9.0-dev")
+SET(CPACK_PACKAGE_VERSION_MAJOR "0")
+SET(CPACK_PACKAGE_VERSION_MINOR "9")
+SET(CPACK_PACKAGE_VERSION_PATCH "0")
 
 # Cmake modules/macros are in a subdirectory to keep this file cleaner
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -10,6 +13,23 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 enable_language(C)
 enable_language(CXX)
+
+
+######################################################################
+# cpack seetings
+#####################################################################
+set(CPACK_CMAKE_GENERATOR "Unix Makefiles")
+set(CPACK_GENERATOR "")
+set(CPACK_SOURCE_GENERATOR "TGZ")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_VENDOR "espresso-pp.de")
+set(CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "ESPResSo++ is a highly versatile software package for the scientific simulation ")
+set(CPACK_SOURCE_IGNORE_FILES ".*~;/\\\\.hg/;\\\\.hgignore;/CMakeFiles/;CMakeCache\\\\.txt$;cmake_install\\\\.cmake$;CPack.*\\\\.cmake$;Makefile$;ESPRC$")
+if (EXTERNAL_BOOST)
+  set(CPACK_SOURCE_IGNORE_FILES "${CPACK_SOURCE_IGNORE_FILES};contrib/boost/")
+endif (EXTERNAL_BOOST)
+include(CPack)
 
 
 ######################################################################
@@ -56,7 +76,7 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 add_definitions( -DHAVE_CONFIG_H )
 
 if (EXTERNAL_BOOST)
-  find_package(Boost REQUIRED COMPONENTS mpi python serialization )
+  find_package(Boost 1.42.0 REQUIRED COMPONENTS mpi python serialization )
   include_directories(${Boost_INCLUDE_DIRS})
 else(EXTERNAL_BOOST)
   include_directories(${CMAKE_SOURCE_DIR}/contrib/boost)
