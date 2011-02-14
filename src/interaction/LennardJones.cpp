@@ -6,12 +6,13 @@
 
 namespace espresso {
   namespace interaction {
-    typedef class VerletListInteractionTemplate< LennardJones > 
-    VerletListLennardJones;
-    typedef class CellListAllPairsInteractionTemplate< LennardJones > 
-    CellListLennardJones;
-    typedef class FixedPairListInteractionTemplate< LennardJones > 
-    FixedPairListLennardJones;
+      
+    typedef class VerletListInteractionTemplate <LennardJones>
+        VerletListLennardJones;
+    typedef class CellListAllPairsInteractionTemplate <LennardJones> 
+        CellListLennardJones;
+    typedef class FixedPairListInteractionTemplate <LennardJones> 
+        FixedPairListLennardJones;
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON

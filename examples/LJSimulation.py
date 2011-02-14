@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: iso-8859-1 -*-
-execfile("/people/thnfs/homes/bevc/espressopp/espresso_setup.py")
 
 
 

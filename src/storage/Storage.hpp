@@ -20,9 +20,9 @@ namespace espresso {
     /** represents the particle storage of one system. */
     class Storage : public SystemAccess {
     public:
-      typedef boost::unordered_map< longint, Particle * > IdParticleMap;
+      typedef boost::unordered_map <longint, Particle*> IdParticleMap;
 
-      Storage(shared_ptr< class System > system);
+      Storage(shared_ptr <class System> system);
       virtual ~Storage();
 
       /** add a particle with given id and position. Note that this is a
@@ -30,20 +30,20 @@ namespace espresso {
 	  with the given id already exists.  This is left to the parallel
 	  front end.
       */
-      Particle *addParticle(longint id, const Real3D& pos);
+      Particle* addParticle(longint id, const Real3D& pos);
 
       /** lookup whether data for a given particle is available on this node,
 	  either as real or as ghost particle. */
-      Particle *lookupLocalParticle(longint id) {
-	IdParticleMap::iterator it = localParticles.find(id);
-	return (it != localParticles.end()) ? it->second : 0;
+      Particle* lookupLocalParticle(longint id) {
+        IdParticleMap::iterator it = localParticles.find(id);
+        return (it != localParticles.end()) ? it->second : 0;
       }
 
       /** Lookup whether data for a given particle is available on this node. 
        \return 0 if the particle wasn't available, the pointer to the Particle, if it was. */
-      Particle *lookupRealParticle(longint id) {
-	IdParticleMap::iterator it = localParticles.find(id);
-	return (it != localParticles.end() && !(it->second->ghost())) ? it->second : 0;
+      Particle* lookupRealParticle(longint id) {
+        IdParticleMap::iterator it = localParticles.find(id);
+        return (it != localParticles.end() && !(it->second->ghost())) ? it->second : 0;
       }
 
       /// get number of real particles on this node
@@ -57,15 +57,15 @@ namespace espresso {
       CellList &getRealCells()  { return realCells; }
       CellList &getGhostCells() { return ghostCells; }
 
-      const Cell *getFirstCell() const { return &(cells[0]); }
+      const Cell* getFirstCell() const { return &(cells[0]); }
 
       /** map a position to a valid cell on this node.  If the position
 	  is outside the domain of this node, return the cell inside the
 	  domain that is closest to the position. */
-      virtual Cell *mapPositionToCellClipped(const Real3D& pos) = 0;
+      virtual Cell* mapPositionToCellClipped(const Real3D& pos) = 0;
       /** map a position to a cell on this node.  If the position is
 	  outside the domain of this node, return 0. */
-      virtual Cell *mapPositionToCellChecked(const Real3D& pos) = 0;
+      virtual Cell* mapPositionToCellChecked(const Real3D& pos) = 0;
 
       /** (Re-)Decompose the system, i.e. redistribute the particles
 	  to the correct processors.
@@ -108,12 +108,12 @@ namespace espresso {
 	  update pointers to the particles in the call via
 	  lookupLocalParticle() and lookupRealParticle().
        */
-      boost::signals2::signal0<void> onParticlesChanged;
+      boost::signals2::signal0 <void> onParticlesChanged;
 
-      boost::signals2::signal2<void, ParticleList&, class OutBuffer&> 
-      beforeSendParticles;
-      boost::signals2::signal2<void, ParticleList&, class InBuffer&> 
-      afterRecvParticles;
+      boost::signals2::signal2 <void, ParticleList&, class OutBuffer&> 
+        beforeSendParticles;
+      boost::signals2::signal2 <void, ParticleList&, class InBuffer&> 
+        afterRecvParticles;
 
       /* variant for python that ignores the return value */
       bool pyAddParticle(longint id, const Real3D& pos);
@@ -143,9 +143,9 @@ namespace espresso {
 	  ghost sending
       */
       enum ExtraDataElements {
-	DATA_PROPERTIES=1,
-	DATA_MOMENTUM=2,
-	DATA_LOCAL=4
+        DATA_PROPERTIES=1,
+        DATA_MOMENTUM=2,
+        DATA_LOCAL=4
       };
 
       /** for the moment, these are constants, defining what to transfer
@@ -211,22 +211,22 @@ namespace espresso {
 	 the current position. This is used for ghosts, which should
 	 not overwrite real particle pointers.
        */
-      void removeFromLocalParticles(Particle *, bool weak = false);
+      void removeFromLocalParticles(Particle*, bool weak = false);
       /* update information for this particle from local particles. If weak is true,
 	 the information is only updated if no information is present yet. This is used
 	 for ghosts, which should not overwrite real particle pointers.
        */
-      void updateInLocalParticles(Particle *, bool weak = false);
+      void updateInLocalParticles(Particle*, bool weak = false);
 
       // reserve space for nCells cells
       void resizeCells(longint nCells);
 
       // append a particle to a list, without updating localParticles
-      Particle *appendUnindexedParticle(ParticleList &, Particle &);
+      Particle* appendUnindexedParticle(ParticleList &, Particle &);
       // append a particle to a list, updating localParticles
-      Particle *appendIndexedParticle(ParticleList &, Particle &);
+      Particle* appendIndexedParticle(ParticleList &, Particle &);
       // move a particle from one list to another, updating localParticles
-      Particle *moveIndexedParticle(ParticleList &dst, ParticleList &src, int srcpos);
+      Particle* moveIndexedParticle(ParticleList &dst, ParticleList &src, int srcpos);
 
       /** here the local particles are actually stored */
       LocalCellList cells;

@@ -10,10 +10,10 @@ from _espresso import interaction_TabulatedAngular, \
 
 class TabulatedAngularLocal(AngularPotentialLocal, interaction_TabulatedAngular):
     'The (local) tabulated angular potential.'
-    def __init__(self, filename):
+    def __init__(self, itype, filename):
         """Initialize the local TabulatedAngularLocal object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_TabulatedAngular, filename)
+            cxxinit(self, interaction_TabulatedAngular, itype, filename)
 
 class FixedTripleListTabulatedAngularLocal(InteractionLocal, interaction_FixedTripleListTabulatedAngular):
     'The (local) tanulated angular interaction using FixedTriple lists.'
@@ -30,7 +30,7 @@ if pmi.isController:
         'The TabulatedAngular potential.'
         pmiproxydefs = dict(
             cls = 'espresso.interaction.TabulatedAngularLocal',
-            pmiproperty = ['filename']
+            pmiproperty = ['itype', 'filename']
             )
 
     class FixedTripleListTabulatedAngular(Interaction):

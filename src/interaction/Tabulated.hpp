@@ -3,7 +3,7 @@
 #define _INTERACTION_TABULATED_HPP
 
 #include "Potential.hpp"
-#include "InterpolationTable.hpp"
+#include "Interpolation.hpp"
 
 namespace espresso {
 
@@ -21,7 +21,7 @@ namespace espresso {
 
         private:
             std::string filename;
-            shared_ptr <InterpolationTable> table;
+            shared_ptr <Interpolation> table;
 
         public:
             static void registerPython();
@@ -32,20 +32,20 @@ namespace espresso {
             }
          
             // used for fixedpairlist (2-body bonded interaction)
-            Tabulated(const char* filename){
-                setFilename(filename);
+            Tabulated(int itype, const char* filename){
+                setFilename(itype, filename);
                 setShift(0.0);
                 setCutoff(infinity);
             }
          
-            Tabulated(const char* filename, real cutoff) {
-                setFilename(filename);
+            Tabulated(int itype, const char* filename, real cutoff) {
+                setFilename(itype, filename);
                 setShift(0.0);
                 setCutoff(cutoff);
             }
          
             /** Setter for the filename will read in the table. */
-            void setFilename(const char* _filename);
+            void setFilename(int itype, const char* _filename);
          
             /** Getter for the filename. */
             const char* getFilename() const { return filename.c_str(); }

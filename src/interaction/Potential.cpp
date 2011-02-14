@@ -6,30 +6,31 @@ namespace espresso {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
-    void
-    Potential::registerPython() {
-      using namespace espresso::python;
-
-      real (Potential::*computeEnergy1)(const Real3D& dist) const =
-	&Potential::computeEnergy;
-      real (Potential::*computeEnergy2)(real dist) const =
-	&Potential::computeEnergy;
-      Real3D (Potential::*computeForce)(const Real3D& dist) const =
-	&Potential::computeForce;
-
-      class_< Potential, boost::noncopyable >
-	("interaction_Potential", no_init)
-	.add_property("cutoff",  
-		      &Potential::getCutoff,
-		      &Potential::setCutoff)
-	.add_property("shift",  
-		      &Potential::getShift,  
-		      &Potential::setShift)
-	.def("setAutoShift", pure_virtual(&Potential::setAutoShift))
-	.def("computeEnergy", pure_virtual(computeEnergy1))
-	.def("computeEnergy", pure_virtual(computeEnergy2))
-	.def("computeForce", pure_virtual(computeForce))
-	;
+    void Potential::registerPython() {
+        using namespace espresso::python;
+        
+        real (Potential::*computeEnergy1)(const Real3D& dist) const =
+            &Potential::computeEnergy;
+            
+        real (Potential::*computeEnergy2)(real dist) const =
+            &Potential::computeEnergy;
+            
+        Real3D (Potential::*computeForce)(const Real3D& dist) const =
+            &Potential::computeForce;
+        
+        class_< Potential, boost::noncopyable >
+            ("interaction_Potential", no_init)
+            .add_property("cutoff",  
+                &Potential::getCutoff,
+                &Potential::setCutoff)
+            .add_property("shift",  
+                &Potential::getShift,  
+                &Potential::setShift)
+            .def("setAutoShift", pure_virtual(&Potential::setAutoShift))
+            .def("computeEnergy", pure_virtual(computeEnergy1))
+            .def("computeEnergy", pure_virtual(computeEnergy2))
+            .def("computeForce", pure_virtual(computeForce))
+        ;
     }
   }
 }

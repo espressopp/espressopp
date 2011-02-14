@@ -5,7 +5,7 @@
 
 namespace espresso {
 
-    ParticleGroup::ParticleGroup(shared_ptr< storage::Storage > _storage)
+    ParticleGroup::ParticleGroup(shared_ptr <storage::Storage> _storage)
     : storage(_storage) {
         con_send = storage->beforeSendParticles.connect
                 (boost::bind(&ParticleGroup::beforeSendParticles, this, _1, _2));
