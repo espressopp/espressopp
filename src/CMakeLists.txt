@@ -67,11 +67,11 @@ endif(EXTERNAL_BOOST)
 
 add_library(espresso_common ${ESPRESSO_SOURCES})
 target_link_libraries(espresso_common ${BOOST} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES})
-install(TARGETS espresso_common LIBRARY DESTINATION lib)
+install(TARGETS espresso_common LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 
 add_library(pylogger esutil/PyLogger.cpp)
 target_link_libraries(pylogger ${BOOST})
-install(TARGETS pylogger LIBRARY DESTINATION lib)
+install(TARGETS pylogger LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 
 if(BUID_STANDALONE)
   add_executable(pypresso main/pypresso.cpp)

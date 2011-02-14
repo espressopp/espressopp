@@ -45,12 +45,12 @@ include(CheckCXXCompilerFlag)
 ########################################################################
 option(EXTERNAL_BOOST "Use external boost" OFF)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
-option(BUID_STANDALONE "Builds pypresso an standalone binary" OFF)
-option(BUID_PYTHON_MODULE "Builds epresso as python module" ON)
+option(BUILD_STANDALONE "Builds pypresso an standalone binary" OFF)
+option(BUILD_PYTHON_MODULE "Builds epresso as python module" ON)
 
-if(NOT BUID_STANDALONE AND NOT BUID_PYTHON_MODULE)
+if(NOT BUILD_STANDALONE AND NOT BUILD_PYTHON_MODULE)
   message(FATAL_ERROR "You need to enable pypresso or the python module")
-endif(NOT BUID_STANDALONE AND NOT BUID_PYTHON_MODULE)
+endif(NOT BUILD_STANDALONE AND NOT BUILD_PYTHON_MODULE)
 
 
 ########################################################################
