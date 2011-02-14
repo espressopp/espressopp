@@ -3,7 +3,7 @@
 #define _INTERACTION_TABULATEDDIHEDRAL_HPP
 
 #include "DihedralPotential.hpp"
-#include "InterpolationTable.hpp"
+#include "Interpolation.hpp"
 
 namespace espresso {
     namespace interaction {
@@ -12,7 +12,7 @@ namespace espresso {
          
             private:
                 std::string filename;
-                shared_ptr <InterpolationTable> table;
+                shared_ptr <Interpolation> table;
          
             public:
                 static void registerPython();
@@ -21,16 +21,16 @@ namespace espresso {
                     //setCutoff(infinity);
                 }
              
-                TabulatedDihedral(const char* filename) {
-                    setFilename(filename);
+                TabulatedDihedral(int itype, const char* filename) {
+                    setFilename(itype, filename);
                 }
              
-                TabulatedDihedral(const char* filename, real cutoff) {
-                    setFilename(filename);
+                TabulatedDihedral(int itype, const char* filename, real cutoff) {
+                    setFilename(itype, filename);
                     setCutoff(cutoff);
                 }
              
-                void setFilename(const char* _filename);
+                void setFilename(int itype, const char* _filename);
              
                 const char* getFilename() const {
                     return filename.c_str();
@@ -103,9 +103,8 @@ namespace espresso {
                     
                     //phi = 1.0; //testing
 
-                    // force
+                    // read table
                     real a = table->getForce(phi);
-                    //std::cout << phi << ": " << a << std::endl; // testing
                     
                     c = c * a;
                     s12 = s12 * a;
@@ -127,8 +126,7 @@ namespace espresso {
                 }
              
                 real _computeForceRaw(real phi) const {
-                    real force = table->getForce(phi);
-                    return force;
+                    return table->getForce(phi);
                 }
              
         }; // class

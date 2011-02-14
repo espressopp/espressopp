@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: iso-8859-1 -*-
-execfile("/people/thnfs/homes/bevc/espressopp/espresso_setup.py")
 
 ###########################################################################
 #                                                                         #
@@ -25,12 +24,15 @@ skin = 0.3
 nvt = True
 timestep = 0.01
 
+# run with "tlj tfene tcos" to activate tabulated potentials
 tabfileLJ = "pot-lj.txt"
 tabfileFENE = "pot-fene.txt"
 tabfileCosine = "pot-cosine.txt"
+spline  = 2                          # spline interpolation type (1, 2, 3)
+
 
 ######################################################################
-### IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE ###
+##  IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE  ##
 ######################################################################
 sys.stdout.write('Setting up simulation ...\n')
 bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read('espressopp_polymer_melt.start')
@@ -55,7 +57,7 @@ system.storage.decompose()
 
 # Lennard-Jones with Verlet list
 vl = espresso.VerletList(system, cutoff = rc + system.skin)
-potTabLJ = espresso.interaction.Tabulated(filename = tabfileLJ, cutoff = rc)
+potTabLJ = espresso.interaction.Tabulated(itype=spline, filename=tabfileLJ, cutoff=rc)
 potLJ = espresso.interaction.LennardJones(sigma=1.0, epsilon=1.0, cutoff=rc, shift=False)
 if sys.argv.count("tlj") > 0:
     print('tabulated potential from file %s' % potTabLJ.filename)
@@ -72,7 +74,7 @@ system.addInteraction(interLJ)
 # FENE bonds
 fpl = espresso.FixedPairList(system.storage)
 fpl.addBonds(bonds)
-potTabFENE = espresso.interaction.Tabulated(filename = tabfileFENE)
+potTabFENE = espresso.interaction.Tabulated(itype=spline, filename=tabfileFENE)
 potFENE = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
 if sys.argv.count("tfene") > 0:
     print('tabulated potential from file %s' % potTabFENE.filename)
@@ -89,7 +91,7 @@ system.addInteraction(interFENE)
 # Cosine with FixedTriple list
 ftl = espresso.FixedTripleList(system.storage)
 ftl.addTriples(angles)
-potTabCosine = espresso.interaction.TabulatedAngular(filename = tabfileCosine)
+potTabCosine = espresso.interaction.TabulatedAngular(itype=spline, filename = tabfileCosine)
 potCosine = espresso.interaction.Cosine(K=1.5, theta0=3.1415926)
 if sys.argv.count("tcos") > 0:
     print('tabulated potential from file %s' % potTabCosine.filename)

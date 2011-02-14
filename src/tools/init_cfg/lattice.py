@@ -14,8 +14,6 @@ def create(N, density, perfect=True, RNG=None):
   else :
     random_gen = RNG
 
-  def rnd(magn_):
-    return magn_ * (2.0 * random_gen() - 1.0)
 
   cubes = []
   for i in range(100):
@@ -32,7 +30,7 @@ def create(N, density, perfect=True, RNG=None):
   lattice_spacing = L / a
 
   def rnd(magn_):
-    return magn_ * (2.0 * random_gen() - 1.0)
+    return magn_ * (2.0 * random_gen - 1.0)
 
   # magnitude of random displacements
   magn = lattice_spacing / 10.0

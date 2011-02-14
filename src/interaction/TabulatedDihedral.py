@@ -11,10 +11,10 @@ from _espresso import interaction_TabulatedDihedral, \
 
 class TabulatedDihedralLocal(DihedralPotentialLocal, interaction_TabulatedDihedral):
     'The (local) tabulated dihedral potential.'
-    def __init__(self, filename):
+    def __init__(self, itype, filename):
         """Initialize the local TabulatedDihedralLocal object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_TabulatedDihedral, filename)
+            cxxinit(self, interaction_TabulatedDihedral, itype, filename)
 
 class FixedQuadrupleListTabulatedDihedralLocal(InteractionLocal, interaction_FixedQuadrupleListTabulatedDihedral):
     'The (local) tanulated dihedral interaction using FixedQuadruple lists.'
@@ -31,7 +31,7 @@ if pmi.isController:
         'The TabulatedDihedral potential.'
         pmiproxydefs = dict(
             cls = 'espresso.interaction.TabulatedDihedralLocal',
-            pmiproperty = ['filename']
+            pmiproperty = ['itype', 'filename']
             )
 
     class FixedQuadrupleListTabulatedDihedral(Interaction):

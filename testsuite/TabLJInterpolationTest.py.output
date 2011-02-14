@@ -1,0 +1,20 @@
+
+-- Tabulated Interpolation Test -- 
+
+Tabulated potential from file: pot-lj.txt
+Steps: 500
+Particles: 1000
+Cutoff: 2.5
+
+Spline interpolation: Linear
+Start      : tot energy =  -3971.442 pot =  -3971.442 kin =      0.000 temp =      0.000 p =     12.301
+Step    500: tot energy =  -4165.732 pot =  -5703.389 kin =   1537.657 temp =      1.025 p =      5.492
+
+Spline interpolation: Akima
+Start      : tot energy =  -4019.080 pot =  -4019.080 kin =      0.000 temp =      0.000 p =     12.041
+Step    500: tot energy =  -4148.748 pot =  -5743.991 kin =   1595.243 temp =      1.063 p =      5.291
+
+Spline interpolation: Cubic
+Start      : tot energy =  -3982.341 pot =  -3982.341 kin =      0.000 temp =      0.000 p =     12.240
+Step    500: tot energy =  -4055.656 pot =  -5708.761 kin =   1653.105 temp =      1.102 p =      5.470
+

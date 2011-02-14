@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: iso-8859-1 -*-
-execfile("/people/thnfs/homes/bevc/espressopp/espresso_setup.py")
 
 
 ###########################################################################
@@ -10,6 +9,7 @@ execfile("/people/thnfs/homes/bevc/espressopp/espresso_setup.py")
 ###########################################################################
 
 import sys
+import time
 import os
 import espresso
 import MPI
@@ -17,6 +17,7 @@ import math
 import logging
 
 from espresso import Real3D, Int3D
+from espresso.tools import timers
 
 def writeTabFile(name):
     outfile = open(name, "w")
@@ -37,12 +38,17 @@ def writeTabFile(name):
 
 N = 10                                   # box size
 size  = (float(N), float(N), float(N))
-numParticles = 1000                      # number of particles
+#numParticles = 1000                      # number of particles
 
 cutoff = 2.5                             # Cutoff for LJ potential
 
-tabfile = "pair.txt"                     # File with tabulated potential
+tabfile = "pot-lj.txt"                     # File with tabulated potential
 skin    = 0.3                             # skin for Verlet lists
+spline  = 3                               # spline interpolation type (1, 2, 3)
+
+if len(sys.argv) == 2:
+    spline = int(sys.argv[1])
+    print "Using spline type "+ str(spline)
 
 # compute the number of cells on each node
 
@@ -74,6 +80,8 @@ print 'CellGrid = %s' % (cellGrid,)
 
 system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
+
+
 pid = 0
 
 for i in range(N):
@@ -95,7 +103,10 @@ for i in range(N):
       # not yet: dd.setVelocity(id, (1.0, 0.0, 0.0))
       pid = pid + 1
 
+
 system.storage.decompose()
+
+
 
 integrator = espresso.integrator.VelocityVerlet(system)
 
@@ -108,11 +119,12 @@ print 'integrator.dt = %g, is now '%integrator.dt
 # now build Verlet List
 # ATTENTION: you must not add the skin explicitly here
 
-logging.getLogger("InterpolationTable").setLevel(logging.INFO)
+logging.getLogger("Interpolation").setLevel(logging.INFO)
+
 
 vl = espresso.VerletList(system, cutoff = cutoff + system.skin)
-potTab = espresso.interaction.Tabulated(filename = tabfile, cutoff = cutoff)
-potLJ  = espresso.interaction.LennardJones(sigma = 1.0, epsilon = 1.0, shift = 0.0, cutoff = cutoff)
+potTab = espresso.interaction.Tabulated(itype=spline, filename=tabfile, cutoff=cutoff)
+potLJ  = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift = 0.0, cutoff = cutoff)
 
 print('tabulated potential from file %s' % potTab.filename)
 
@@ -148,8 +160,9 @@ integrator.langevin = langevin
 langevin.gamma = 1.0
 langevin.temperature = 1.0
 
-nsteps = 10
+nsteps = 100
 
+start_time = time.clock()
 for i in range(20):
    integrator.run(nsteps)
    temperature = temp.compute()
@@ -158,3 +171,6 @@ for i in range(20):
    Ep = interTab.computeEnergy()
    print 'Step %6d: tot energy = %10.3f pot = %10.3f kin = %10.3f temp = %10.3f p = %10.3f' % \
          (nsteps*(i+1), Ek + Ep, Ep, Ek, temperature, p)
+end_time = time.clock()
+
+timers.show(integrator.getTimers(), precision=2)

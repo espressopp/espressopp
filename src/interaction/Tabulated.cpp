@@ -1,5 +1,8 @@
 #include "python.hpp"
 #include "Tabulated.hpp"
+#include "InterpolationLinear.hpp"
+#include "InterpolationAkima.hpp"
+#include "InterpolationCubic.hpp"
 #include "VerletListInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
@@ -8,14 +11,26 @@ namespace espresso {
   namespace interaction {
 
 
-    void Tabulated::setFilename(const char* _filename) {
-      boost::mpi::communicator world;
-     
-      filename = _filename;
-     
-      // create a new InterpolationTable
-      table = make_shared <InterpolationTable> ();
-      table->read(world, _filename);
+    void Tabulated::setFilename(int itype, const char* _filename) {
+        boost::mpi::communicator world;
+        filename = _filename;
+        
+        if (itype == 1) { // create a new InterpolationLinear
+            table = make_shared <InterpolationLinear> ();
+            table->read(world, _filename);
+        }
+        
+        else if (itype == 2) { // create a new InterpolationAkima
+            table = make_shared <InterpolationAkima> ();
+            table->read(world, _filename);
+        }
+        
+        else if (itype == 3) { // create a new InterpolationCubic
+            table = make_shared <InterpolationCubic> ();
+            table->read(world, _filename);
+        }
+      
+      
     }
 
     typedef class VerletListInteractionTemplate <Tabulated> VerletListTabulated;
@@ -29,7 +44,7 @@ namespace espresso {
       using namespace espresso::python;
      
       class_ <Tabulated, bases <Potential> >
-        ("interaction_Tabulated", init <const char*, real>())
+        ("interaction_Tabulated", init <int, const char*, real>())
             .add_property("filename", &Tabulated::getFilename, &Tabulated::setFilename);
      
       class_ <VerletListTabulated, bases <Interaction> > 

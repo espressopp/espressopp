@@ -12,10 +12,10 @@ from _espresso import interaction_Tabulated, \
 
 class TabulatedLocal(PotentialLocal, interaction_Tabulated):
     'The (local) tabulated potential.'
-    def __init__(self, filename, cutoff=infinity):
+    def __init__(self, itype, filename, cutoff=infinity):
         """Initialize the local Tabulated object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_Tabulated, filename, cutoff)
+            cxxinit(self, interaction_Tabulated, itype, filename, cutoff)
 
 class VerletListTabulatedLocal(InteractionLocal, interaction_VerletListTabulated):
     'The (local) tabulated interaction using Verlet lists.'
@@ -65,7 +65,7 @@ if pmi.isController:
         'The Tabulated potential.'
         pmiproxydefs = dict(
             cls = 'espresso.interaction.TabulatedLocal',
-            pmiproperty = ['filename']
+            pmiproperty = ['itype', 'filename', 'cutoff']
             )
     class VerletListTabulated(Interaction):
         __metaclass__ = pmi.Proxy
