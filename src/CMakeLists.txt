@@ -73,12 +73,12 @@ add_library(pylogger esutil/PyLogger.cpp)
 target_link_libraries(pylogger ${BOOST})
 install(TARGETS pylogger LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 
-if(BUID_STANDALONE)
+if(BUILD_STANDALONE)
   add_executable(pypresso main/pypresso.cpp)
   target_link_libraries(pypresso espresso_common pylogger MPI)
   add_dependencies(pypresso scripts)
   install(TARGETS pypresso RUNTIME DESTINATION bin)
-endif(BUID_STANDALONE)
+endif(BUILD_STANDALONE)
 
 #we have to build _espresso in a subdir to avoid endless recursion in python
 add_subdirectory(pymodule)
