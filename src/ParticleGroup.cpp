@@ -1,5 +1,5 @@
 #include "python.hpp"
-#include <iostream>
+//#include <iostream>
 #include "ParticleGroup.hpp"
 #include "storage/Storage.hpp"
 
@@ -23,7 +23,8 @@ namespace espresso {
 
     void ParticleGroup::add(longint pid) {
         // check unique
-        particles[pid]=pid;
+        //particles[pid] = pid;
+    	particles.insert(pid);
         Particle *p1 = storage->lookupRealParticle(pid);
         if (p1)
             active[pid] = p1;
@@ -33,12 +34,15 @@ namespace espresso {
 
     void ParticleGroup::print() {
         std::cout << "####### I have " << active.size() << " active particles" << std::endl;
-        for(iterator i=begin(); i!=end(); ++i )
+        for(iterator i=begin(); i!=end(); ++i ) {
             std::cout << i->getId() << " ";
+        }
         std::cout << std::endl;
-        for (std::map<longint,longint>::iterator iter = particles.begin();
-                iter != particles.end(); ++iter) {
-            std::cout << iter->first << " ";
+        //for (std::map<longint,longint>::iterator iter = particles.begin();
+        for (std::set<longint>::iterator iter = particles.begin();
+        									iter != particles.end(); ++iter) {
+            //std::cout << iter->first << " ";
+        	std::cout << *iter << " ";
         }
         std::cout << std::endl;
     }
@@ -46,8 +50,7 @@ namespace espresso {
     void ParticleGroup::beforeSendParticles(ParticleList& pl,
             class OutBuffer& buf) {
         // remove all particles that move to a different node
-        for (ParticleList::Iterator pit(pl);
-                pit.isValid(); ++pit) {
+        for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
             longint pid = pit->id();
 
             std::map<longint, Particle*>::iterator p;
@@ -65,7 +68,8 @@ namespace espresso {
                 pit.isValid(); ++pit) {
             longint pid = pit->id();
 
-            std::map<longint, longint>::iterator p;
+            //std::map<longint, longint>::iterator p;
+            std::set<longint>::iterator p;
             p = particles.find(pid);
             if (p != particles.end())
                 active[pid] = NULL; // will be set in onchanged
@@ -97,8 +101,8 @@ namespace espresso {
 
         using namespace espresso::python;
 
-        class_< ParticleGroup, shared_ptr< ParticleGroup > >
-                ("ParticleGroup", init< shared_ptr< storage::Storage > >())
+        class_< ParticleGroup, shared_ptr <ParticleGroup> >
+                ("ParticleGroup", init <shared_ptr <storage::Storage> >())
                 .def("add", &ParticleGroup::add)
                 .def("show", &ParticleGroup::print)
                 ;

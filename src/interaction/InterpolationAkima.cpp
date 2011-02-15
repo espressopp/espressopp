@@ -34,11 +34,11 @@ namespace espresso {
         radius = new real[N];
         energy = new real[N];
         force  = new real[N];
-        p0e = new real[N];
-        p1e = new real[N];
-        p2e = new real[N];
-        p3e = new real[N];
-        p0f = new real[N];
+		p0e = new real[N];
+		p1e = new real[N];
+		p2e = new real[N];
+		p3e = new real[N];
+		p0f = new real[N];
         p1f = new real[N];
         p2f = new real[N];
         p3f = new real[N];

@@ -5,7 +5,7 @@
 #include "Particle.hpp"
 #include "log4espp.hpp"
 #include "types.hpp"
-#include <list>
+//#include <list>
 #include <boost/signals2.hpp>
 
 namespace espresso {
@@ -40,11 +40,12 @@ namespace espresso {
 
         /**
          * iterator for active particles
+         *
          */
-        struct iterator : std::map<longint, Particle*>::iterator {
+        struct iterator: std::map<longint, Particle*>::iterator {
 
-            iterator(const std::map<longint, Particle*>::iterator & i)
-            : std::map<longint, Particle*>::iterator(i) {
+            iterator(const std::map<longint, Particle*>::iterator &i)
+			: std::map<longint, Particle*>::iterator(i) {
             }
 
             Particle* operator*() const {
@@ -83,7 +84,8 @@ namespace espresso {
         // list of all particles in group,
         /// \todo find better solution here
         // key: particle id, value: NONE, just used for lookup
-        std::map<longint, longint> particles;
+        //std::map<longint, longint> particles;
+        std::set<longint> particles;
 
         // pointer to storage object
         shared_ptr<storage::Storage> storage;
