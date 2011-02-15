@@ -1,21 +1,21 @@
 libespresso_boost_la_LIBADD += $(MPI_LIBS)
 libespresso_boost_la_SOURCES += \
-	libs/mpi/src/broadcast.cpp \
-	libs/mpi/src/communicator.cpp \
-	libs/mpi/src/computation_tree.cpp \
-	libs/mpi/src/content_oarchive.cpp \
-	libs/mpi/src/environment.cpp \
-	libs/mpi/src/exception.cpp \
-	libs/mpi/src/graph_communicator.cpp \
-	libs/mpi/src/group.cpp \
-	libs/mpi/src/intercommunicator.cpp \
-	libs/mpi/src/mpi_datatype_cache.cpp \
-	libs/mpi/src/mpi_datatype_oarchive.cpp \
-	libs/mpi/src/packed_iarchive.cpp \
-	libs/mpi/src/packed_oarchive.cpp \
-	libs/mpi/src/packed_skeleton_iarchive.cpp \
-	libs/mpi/src/packed_skeleton_oarchive.cpp \
-	libs/mpi/src/point_to_point.cpp \
 	libs/mpi/src/request.cpp \
+	libs/mpi/src/group.cpp \
+	libs/mpi/src/environment.cpp \
+	libs/mpi/src/packed_oarchive.cpp \
+	libs/mpi/src/mpi_datatype_oarchive.cpp \
+	libs/mpi/src/point_to_point.cpp \
+	libs/mpi/src/packed_skeleton_iarchive.cpp \
 	libs/mpi/src/text_skeleton_oarchive.cpp \
-	libs/mpi/src/timer.cpp
+	libs/mpi/src/timer.cpp \
+	libs/mpi/src/graph_communicator.cpp \
+	libs/mpi/src/broadcast.cpp \
+	libs/mpi/src/exception.cpp \
+	libs/mpi/src/communicator.cpp \
+	libs/mpi/src/packed_skeleton_oarchive.cpp \
+	libs/mpi/src/mpi_datatype_cache.cpp \
+	libs/mpi/src/content_oarchive.cpp \
+	libs/mpi/src/computation_tree.cpp \
+	libs/mpi/src/packed_iarchive.cpp \
+	libs/mpi/src/intercommunicator.cpp
