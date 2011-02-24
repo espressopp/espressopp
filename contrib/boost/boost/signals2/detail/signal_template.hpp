@@ -229,7 +229,7 @@ namespace boost
             unique_lock<mutex_type> list_lock(_mutex);
             // only clean up if it is safe to do so
             if(_shared_state.unique())
-              nolock_cleanup_connections(false, 1);
+              nolock_cleanup_connections(false);
             /* Make a local copy of _shared_state while holding mutex, so we are
             thread safe against the combiner or connection list getting modified
             during invocation. */
@@ -253,7 +253,7 @@ namespace boost
             unique_lock<mutex_type> list_lock(_mutex);
             // only clean up if it is safe to do so
             if(_shared_state.unique())
-              nolock_cleanup_connections(false, 1);
+              nolock_cleanup_connections(false);
             /* Make a local copy of _shared_state while holding mutex, so we are
             thread safe against the combiner or connection list getting modified
             during invocation. */
@@ -412,15 +412,12 @@ namespace boost
         };
 
         // clean up disconnected connections
-        void nolock_cleanup_connections_from(bool grab_tracked,
-          const typename connection_list_type::iterator &begin, unsigned count = 0) const
+        void nolock_cleanup_connections(bool grab_tracked,
+          const typename connection_list_type::iterator &begin, bool break_on_connected = false) const
         {
           BOOST_ASSERT(_shared_state.unique());
           typename connection_list_type::iterator it;
-          unsigned i;
-          for(it = begin, i = 0;
-            it != _shared_state->connection_bodies().end() && (count == 0 || i < count);
-            ++i)
+          for(it = begin; it != _shared_state->connection_bodies().end();)
           {
             bool connected;
             {
@@ -435,12 +432,13 @@ namespace boost
             }else
             {
               ++it;
+              if(break_on_connected) break;
             }
           }
           _garbage_collector_it = it;
         }
         // clean up a few connections in constant time
-        void nolock_cleanup_connections(bool grab_tracked, unsigned count) const
+        void nolock_cleanup_connections(bool grab_tracked) const
         {
           BOOST_ASSERT(_shared_state.unique());
           typename connection_list_type::iterator begin;
@@ -451,7 +449,7 @@ namespace boost
           {
             begin = _garbage_collector_it;
           }
-          nolock_cleanup_connections_from(grab_tracked, begin, count);
+          nolock_cleanup_connections(grab_tracked, begin, true);
         }
         /* Make a new copy of the slot list if it is currently being read somewhere else
         */
@@ -460,13 +458,10 @@ namespace boost
           if(_shared_state.unique() == false)
           {
             _shared_state.reset(new invocation_state(*_shared_state, _shared_state->connection_bodies()));
-            nolock_cleanup_connections_from(true, _shared_state->connection_bodies().begin());
+            nolock_cleanup_connections(true, _shared_state->connection_bodies().begin());
           }else
           {
-            /* We need to try and check more than just 1 connection here to avoid corner
-            cases where certain repeated connect/disconnect patterns cause the slot
-            list to grow without limit. */
-            nolock_cleanup_connections(true, 2);
+            nolock_cleanup_connections(true);
           }
         }
         // force a full cleanup of the connection list
@@ -483,7 +478,7 @@ namespace boost
           {
             _shared_state.reset(new invocation_state(*_shared_state, _shared_state->connection_bodies()));
           }
-          nolock_cleanup_connections_from(false, _shared_state->connection_bodies().begin());
+          nolock_cleanup_connections(true, _shared_state->connection_bodies().begin());
         }
         shared_ptr<invocation_state> get_readable_state() const
         {

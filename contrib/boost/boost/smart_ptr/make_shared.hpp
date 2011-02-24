@@ -87,12 +87,10 @@ public:
 };
 
 #if defined( BOOST_HAS_RVALUE_REFS )
-
-template< class T > T&& sp_forward( T & t )
+template< class T > T&& forward( T &&t )
 {
-    return static_cast< T&& >( t );
+    return t;
 }
-
 #endif
 
 } // namespace detail
@@ -103,9 +101,9 @@ template< class T > T&& sp_forward( T & t )
 
 template< class T > boost::shared_ptr< T > make_shared()
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >() );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -120,9 +118,9 @@ template< class T > boost::shared_ptr< T > make_shared()
 
 template< class T, class A > boost::shared_ptr< T > allocate_shared( A const & a )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >(), a );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >(), a );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -139,15 +137,15 @@ template< class T, class A > boost::shared_ptr< T > allocate_shared( A const & a
 
 // Variadic templates, rvalue reference
 
-template< class T, class Arg1, class... Args > boost::shared_ptr< T > make_shared( Arg1 && arg1, Args && ... args )
+template< class T, class... Args > boost::shared_ptr< T > make_shared( Args && ... args )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >() );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
-    ::new( pv ) T( boost::detail::sp_forward<Arg1>( arg1 ), boost::detail::sp_forward<Args>( args )... );
+    ::new( pv ) T( detail::forward<Args>( args )... );
     pd->set_initialized();
 
     T * pt2 = static_cast< T* >( pv );
@@ -156,15 +154,15 @@ template< class T, class Arg1, class... Args > boost::shared_ptr< T > make_share
     return boost::shared_ptr< T >( pt, pt2 );
 }
 
-template< class T, class A, class Arg1, class... Args > boost::shared_ptr< T > allocate_shared( A const & a, Arg1 && arg1, Args && ... args )
+template< class T, class A, class... Args > boost::shared_ptr< T > allocate_shared( A const & a, Args && ... args )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >(), a );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >(), a );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
-    ::new( pv ) T( boost::detail::sp_forward<Arg1>( arg1 ), boost::detail::sp_forward<Args>( args )... );
+    ::new( pv ) T( detail::forward<Args>( args )... );
     pd->set_initialized();
 
     T * pt2 = static_cast< T* >( pv );
@@ -180,9 +178,9 @@ template< class T, class A, class Arg1, class... Args > boost::shared_ptr< T > a
 template< class T, class A1 >
 boost::shared_ptr< T > make_shared( A1 const & a1 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >() );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -198,9 +196,9 @@ boost::shared_ptr< T > make_shared( A1 const & a1 )
 template< class T, class A, class A1 >
 boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >(), a );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >(), a );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -216,9 +214,9 @@ boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1 )
 template< class T, class A1, class A2 >
 boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >() );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -234,9 +232,9 @@ boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2 )
 template< class T, class A, class A1, class A2 >
 boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1, A2 const & a2 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >(), a );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >(), a );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -252,9 +250,9 @@ boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1, A2 const & a
 template< class T, class A1, class A2, class A3 >
 boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2, A3 const & a3 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >() );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -270,9 +268,9 @@ boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2, A3 const & a3 
 template< class T, class A, class A1, class A2, class A3 >
 boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1, A2 const & a2, A3 const & a3 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >(), a );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >(), a );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -288,9 +286,9 @@ boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1, A2 const & a
 template< class T, class A1, class A2, class A3, class A4 >
 boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >() );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -306,9 +304,9 @@ boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2, A3 const & a3,
 template< class T, class A, class A1, class A2, class A3, class A4 >
 boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >(), a );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >(), a );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -324,9 +322,9 @@ boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1, A2 const & a
 template< class T, class A1, class A2, class A3, class A4, class A5 >
 boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >() );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -342,9 +340,9 @@ boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2, A3 const & a3,
 template< class T, class A, class A1, class A2, class A3, class A4, class A5 >
 boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >(), a );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >(), a );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -360,9 +358,9 @@ boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1, A2 const & a
 template< class T, class A1, class A2, class A3, class A4, class A5, class A6 >
 boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >() );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -378,9 +376,9 @@ boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2, A3 const & a3,
 template< class T, class A, class A1, class A2, class A3, class A4, class A5, class A6 >
 boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >(), a );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >(), a );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -396,9 +394,9 @@ boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1, A2 const & a
 template< class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7 >
 boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6, A7 const & a7 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >() );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -414,9 +412,9 @@ boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2, A3 const & a3,
 template< class T, class A, class A1, class A2, class A3, class A4, class A5, class A6, class A7 >
 boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6, A7 const & a7 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >(), a );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >(), a );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -432,9 +430,9 @@ boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1, A2 const & a
 template< class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8 >
 boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6, A7 const & a7, A8 const & a8 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >() );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -450,9 +448,9 @@ boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2, A3 const & a3,
 template< class T, class A, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8 >
 boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6, A7 const & a7, A8 const & a8 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >(), a );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >(), a );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -468,9 +466,9 @@ boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1, A2 const & a
 template< class T, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9 >
 boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6, A7 const & a7, A8 const & a8, A9 const & a9 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >() );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >() );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 
@@ -486,9 +484,9 @@ boost::shared_ptr< T > make_shared( A1 const & a1, A2 const & a2, A3 const & a3,
 template< class T, class A, class A1, class A2, class A3, class A4, class A5, class A6, class A7, class A8, class A9 >
 boost::shared_ptr< T > allocate_shared( A const & a, A1 const & a1, A2 const & a2, A3 const & a3, A4 const & a4, A5 const & a5, A6 const & a6, A7 const & a7, A8 const & a8, A9 const & a9 )
 {
-    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), boost::detail::sp_ms_deleter< T >(), a );
+    boost::shared_ptr< T > pt( static_cast< T* >( 0 ), detail::sp_ms_deleter< T >(), a );
 
-    boost::detail::sp_ms_deleter< T > * pd = boost::get_deleter< boost::detail::sp_ms_deleter< T > >( pt );
+    detail::sp_ms_deleter< T > * pd = boost::get_deleter< detail::sp_ms_deleter< T > >( pt );
 
     void * pv = pd->address();
 

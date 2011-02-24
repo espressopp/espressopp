@@ -24,19 +24,14 @@ namespace boost {
 
 namespace detail{
 
-#if !(defined(__EDG_VERSION__) && __EDG_VERSION__ <= 238) && !defined(BOOST_NO_INCLASS_MEMBER_INITIALIZATION)
+#if !(defined(__EDG_VERSION__) && __EDG_VERSION__ <= 238)
 
 template <class T>
 struct is_unsigned_values
 {
-   //
-   // Note that we cannot use BOOST_STATIC_CONSTANT here, using enum's
-   // rather than "real" static constants simply doesn't work or give
-   // the correct answer.
-   //
    typedef typename remove_cv<T>::type no_cv_t;
-   static const no_cv_t minus_one = (static_cast<no_cv_t>(-1));
-   static const no_cv_t zero = (static_cast<no_cv_t>(0));
+   BOOST_STATIC_CONSTANT(no_cv_t, minus_one = (static_cast<no_cv_t>(-1)));
+   BOOST_STATIC_CONSTANT(no_cv_t, zero = (static_cast<no_cv_t>(0)));
 };
 
 template <class T>

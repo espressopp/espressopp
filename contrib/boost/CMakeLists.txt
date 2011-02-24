@@ -1,7 +1,6 @@
 file(GLOB_RECURSE BOOST_SOURCES libs/*.cpp)
 file(GLOB_RECURSE NOT_BOOST_SOURCES
   libs/test/*
-  "libs/detail/utf8_codecvt_facet.cpp"
   "libs/test/src/cpp_main.cpp"
   "libs/test/src/test_main.cpp"
   "libs/serialization/src/basic_text_wiprimitive.cpp"

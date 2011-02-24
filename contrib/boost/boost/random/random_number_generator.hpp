@@ -7,7 +7,7 @@
  *
  * See http://www.boost.org for most recent version including documentation.
  *
- * $Id: random_number_generator.hpp 60755 2010-03-22 00:45:06Z steven_watanabe $
+ * $Id: random_number_generator.hpp 26164 2004-11-09 21:22:00Z jmaurer $
  *
  * Revision history
  *  2001-02-18  moved to individual header files
@@ -24,14 +24,7 @@
 
 namespace boost {
 
-/**
- * Instantiations of class template random_number_generator model a
- * RandomNumberGenerator (std:25.2.11 [lib.alg.random.shuffle]). On
- * each invocation, it returns a uniformly distributed integer in
- * the range [0..n).
- *
- * The template parameter IntType shall denote some integer-like value type.
- */
+// a model for RandomNumberGenerator std:25.2.11 [lib.alg.random.shuffle]
 template<class UniformRandomNumberGenerator, class IntType = long>
 class random_number_generator
 {
@@ -39,11 +32,6 @@ public:
   typedef UniformRandomNumberGenerator base_type;
   typedef IntType argument_type;
   typedef IntType result_type;
-  /**
-   * Constructs a random_number_generator functor with the given
-   * \uniform_random_number_generator as the underlying source of
-   * random numbers.
-   */
   random_number_generator(base_type& rng) : _rng(rng)
   { 
 #ifndef BOOST_NO_LIMITS_COMPILE_TIME_CONSTANTS
@@ -53,9 +41,6 @@ public:
   // compiler-generated copy ctor is fine
   // assignment is disallowed because there is a reference member
 
-  /**
-   * Returns a value in the range [0, n)
-   */
   result_type operator()(argument_type n)
   {
     typedef uniform_int<IntType> dist_type;

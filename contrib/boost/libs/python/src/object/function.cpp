@@ -144,7 +144,7 @@ PyObject* function::call(PyObject* args, PyObject* keywords) const
             if (n_keyword_actual > 0      // Keyword arguments were supplied
                  || n_actual < min_arity) // or default keyword values are needed
             {                            
-                if (f->m_arg_names.is_none())
+                if (f->m_arg_names.ptr() == Py_None) 
                 {
                     // this overload doesn't accept keywords
                     inner_args = handle<>();
@@ -487,7 +487,7 @@ void function::add_to_namespace(
         }
 
         // A function is named the first time it is added to a namespace.
-        if (new_func->name().is_none())
+        if (new_func->name().ptr() == Py_None)
             new_func->m_name = name;
 
         handle<> name_space_name(
@@ -653,7 +653,7 @@ extern "C"
     static PyObject* function_get_name(PyObject* op, void*)
     {
         function* f = downcast<function>(op);
-        if (f->name().is_none())
+        if (f->name().ptr() == Py_None)
 #if PY_VERSION_HEX >= 0x03000000
             return PyUnicode_InternFromString("<unnamed Boost.Python function>");
 #else
@@ -670,26 +670,11 @@ extern "C"
     {
         return python::incref(upcast<PyObject>(&PyCFunction_Type));
     }
-
-    static PyObject* function_get_module(PyObject* op, void*)
-    {
-        function* f = downcast<function>(op);
-        object const& ns = f->get_namespace();
-        if (!ns.is_none()) {
-            return python::incref(ns.ptr());
-        }
-        PyErr_SetString(
-            PyExc_AttributeError, const_cast<char*>(
-                "Boost.Python function __module__ unknown."));
-        return 0;
-    }
 }
 
 static PyGetSetDef function_getsetlist[] = {
     {const_cast<char*>("__name__"), (getter)function_get_name, 0, 0, 0 },
     {const_cast<char*>("func_name"), (getter)function_get_name, 0, 0, 0 },
-    {const_cast<char*>("__module__"), (getter)function_get_module, 0, 0, 0 },
-    {const_cast<char*>("func_module"), (getter)function_get_module, 0, 0, 0 },
     {const_cast<char*>("__class__"), (getter)function_get_class, 0, 0, 0 },    // see note above
     {const_cast<char*>("__doc__"), (getter)function_get_doc, (setter)function_set_doc, 0, 0},
     {const_cast<char*>("func_doc"), (getter)function_get_doc, (setter)function_set_doc, 0, 0},
