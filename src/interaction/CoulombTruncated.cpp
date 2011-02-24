@@ -38,7 +38,7 @@ namespace espresso {
 
       class_< FixedPairListCoulombTruncated, bases< Interaction > >
         ("interaction_FixedPairListCoulombTruncated",
-          init< shared_ptr<System>, shared_ptr<FixedPairList> >())
+          init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<CoulombTruncated> >())
         .def("setPotential", &FixedPairListCoulombTruncated::setPotential);
         ;
     }

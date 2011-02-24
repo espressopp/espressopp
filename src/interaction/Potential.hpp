@@ -5,6 +5,7 @@
 #include "types.hpp"
 #include "Real3D.hpp"
 #include "Particle.hpp"
+#include "logging.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -26,6 +27,8 @@ namespace espresso {
       virtual real setAutoShift() = 0;
 
       static void registerPython();
+
+      static LOG4ESPP_DECL_LOGGER(theLogger);
     };
 
     // enum PotentialType {

@@ -3,6 +3,9 @@
 
 namespace espresso {
   namespace interaction {
+
+    LOG4ESPP_LOGGER(Potential::theLogger, "Potential");
+
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////

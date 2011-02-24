@@ -29,6 +29,7 @@ namespace espresso {
             Tabulated() {
                 setShift(0.0);
                 setCutoff(infinity);
+                LOG4ESPP_WARN(theLogger, "default Tabulated potential will not work");
             }
          
             // used for fixedpairlist (2-body bonded interaction)
@@ -52,11 +53,16 @@ namespace espresso {
          
             real _computeEnergySqrRaw(real distSqr) const {
                 // make an interpolation
-                return table->getEnergy(sqrt(distSqr));
+                if (table) 
+                   return table->getEnergy(sqrt(distSqr));
             }
          
             bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const {
-                real ffactor = table->getForce(sqrt(distSqr));
+                real ffactor;
+                if (table) 
+                   ffactor = table->getForce(sqrt(distSqr));
+                else
+                   ffactor = 0.0;
                 force = dist * ffactor;
                 return true;
             }

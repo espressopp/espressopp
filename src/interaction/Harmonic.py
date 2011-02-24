@@ -18,9 +18,9 @@ class HarmonicLocal(PotentialLocal, interaction_Harmonic):
 
 class FixedPairListHarmonicLocal(InteractionLocal, interaction_FixedPairListHarmonic):
     'The (local) Harmonic interaction using FixedPair lists.'
-    def __init__(self, system, vl):
+    def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListHarmonic, system, vl)
+            cxxinit(self, interaction_FixedPairListHarmonic, system, vl, potential)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

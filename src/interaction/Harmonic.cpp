@@ -22,7 +22,7 @@ namespace espresso {
         FixedPairListHarmonic;
       class_< FixedPairListHarmonic, bases< Interaction > >
         ("interaction_FixedPairListHarmonic",
-           init< shared_ptr<System>, shared_ptr<FixedPairList> >())
+           init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr< Harmonic > >())
         .def("setPotential", &FixedPairListHarmonic::setPotential);
       ;
     }
