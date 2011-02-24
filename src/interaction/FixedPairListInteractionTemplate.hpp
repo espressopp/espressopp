@@ -45,7 +45,7 @@ namespace espresso {
       }
 
       Potential &getPotential(int type1, int type2) {
-        return potentialArray(type1, type2);
+        return potentialArray(0, 0);
       }
 
       virtual void addForces();

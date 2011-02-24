@@ -45,7 +45,7 @@ namespace espresso {
       }
 
       Potential &getPotential(int type1, int type2) {
-        return potentialArray(type1, type2);
+        return potentialArray.at(0, 0);
       }
 
       virtual void addForces();
@@ -141,7 +141,7 @@ namespace espresso {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
-        const Potential &potential = getPotential(p1.type(), p2.type());
+        const Potential &potential = getPotential(0, 0);
         Real3D dist12, dist32;
         bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
