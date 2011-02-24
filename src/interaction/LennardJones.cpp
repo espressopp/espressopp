@@ -40,7 +40,7 @@ namespace espresso {
 
       class_< FixedPairListLennardJones, bases< Interaction > >
         ("interaction_FixedPairListLennardJones",
-          init< shared_ptr<System>, shared_ptr<FixedPairList> >())
+          init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<LennardJones> >())
         .def("setPotential", &FixedPairListLennardJones::setPotential);
         ;
     }

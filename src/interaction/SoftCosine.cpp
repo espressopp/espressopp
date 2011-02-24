@@ -38,7 +38,8 @@ namespace espresso {
 
       class_< FixedPairListSoftCosine, bases< Interaction > >
         ("interaction_FixedPairListSoftCosine",
-          init< shared_ptr<System>, shared_ptr<FixedPairList> >())
+          init< shared_ptr<System>, shared_ptr<FixedPairList>, 
+                shared_ptr<SoftCosine> >())
         .def("setPotential", &FixedPairListSoftCosine::setPotential);
         ;
     }

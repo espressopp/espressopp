@@ -24,10 +24,14 @@ namespace espresso {
     public:
       FixedPairListInteractionTemplate
       (shared_ptr < System > system,
-       shared_ptr < FixedPairList > _fixedpairList)
-        : SystemAccess(system), fixedpairList(_fixedpairList) 
+       shared_ptr < FixedPairList > _fixedpairList,
+       shared_ptr < Potential > _potential)
+        : SystemAccess(system), fixedpairList(_fixedpairList),
+          potential(_potential)
       {
-        potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
+        if (! potential) {
+          LOG4ESPP_ERROR(theLogger, "NULL potential");
+        }
       }
 
       void
@@ -40,12 +44,16 @@ namespace espresso {
       }
 
       void
-      setPotential(int type1, int type2, const Potential &potential) {
-        potentialArray.at(type1, type2) = potential;
+      setPotential(shared_ptr < Potential> _potential) {
+        if (_potential) {
+          potential = _potential;
+        } else {
+          LOG4ESPP_ERROR(theLogger, "NULL potential");
+        }
       }
 
-      Potential &getPotential(int type1, int type2) {
-        return potentialArray(0, 0);
+      shared_ptr < Potential > getPotential() {
+        return potential;
       }
 
       virtual void addForces();
@@ -57,7 +65,7 @@ namespace espresso {
     protected:
       int ntypes;
       shared_ptr < FixedPairList > fixedpairList;
-      esutil::Array2D<Potential, esutil::enlarge> potentialArray;
+      shared_ptr < Potential > potential;
     };
 
     //////////////////////////////////////////////////
@@ -72,9 +80,8 @@ namespace espresso {
         Particle &p2 = *it->second;
         Real3D dist;
         bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
-        const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D force;
-        if(potential._computeForce(force, dist)) {
+        if(potential->_computeForce(force, dist)) {
           p1.force() += force;
           p2.force() -= force;
         }
@@ -94,10 +101,9 @@ namespace espresso {
 	   it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
-        const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D dist;
         bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
-        e += potential._computeEnergy(dist);
+        e += potential->_computeEnergy(dist);
       }
       real esum;
       boost::mpi::reduce(*mpiWorld, e, esum, std::plus<real>(), 0);
@@ -115,12 +121,11 @@ namespace espresso {
            it.isValid(); ++it) {                                         
         const Particle &p1 = *it->first;                                       
         const Particle &p2 = *it->second;                                      
-        const Potential &potential = getPotential(p1.type(), p2.type());
 
         Real3D dist;
         bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
         Real3D force;
-        if(potential._computeForce(force, dist)) {
+        if(potential->_computeForce(force, dist)) {
           w += dist * force;
         }
       }
@@ -135,11 +140,10 @@ namespace espresso {
            it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
-        const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D dist;
         bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
         Real3D force;
-        if(potential._computeForce(force, dist)) { 
+        if(potential->_computeForce(force, dist)) { 
           w += Tensor(dist, force);
         }
       }
@@ -148,13 +152,7 @@ namespace espresso {
     template < typename _Potential >
     inline real
     FixedPairListInteractionTemplate< _Potential >::getMaxCutoff() {
-      real cutoff = 0.0;
-      for (int i = 0; i < ntypes; i++) {
-        for (int j = 0; j < ntypes; j++) {
-          cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
-        }
-      }
-      return cutoff;
+      return potential->getCutoff();
     }
   }
 }
