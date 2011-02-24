@@ -79,33 +79,19 @@ class reverse_graph {
 
     typedef reverse_graph_tag graph_tag;
 
-    // Graph, vertex, and edge properties
-    typedef typename graph_property_type<base_type>::type graph_property_type;
-    typedef typename graph_bundle_type<base_type>::type graph_bundled;
-
-    typedef typename vertex_property_type<base_type>::type vertex_property_type;
-    typedef typename vertex_bundle_type<base_type>::type vertex_bundled;
-
-    typedef typename edge_property_type<base_type>::type edge_property_type;
-    typedef typename edge_bundle_type<base_type>::type edge_bundled;
-
 #ifndef BOOST_GRAPH_NO_BUNDLED_PROPERTIES
     // Bundled properties support
     template<typename Descriptor>
-    typename graph::detail::bundled_result<BidirectionalGraph, Descriptor>::type&
+    typename graph::detail::bundled_result<BidirectionalGraph, 
+                                           Descriptor>::type&
     operator[](Descriptor x)
     { return m_g[x]; }
 
     template<typename Descriptor>
-    typename graph::detail::bundled_result<BidirectionalGraph, Descriptor>::type const&
+    typename graph::detail::bundled_result<BidirectionalGraph, 
+                                           Descriptor>::type const&
     operator[](Descriptor x) const
     { return m_g[x]; }
-
-    graph_bundled& operator[](graph_bundle_t)
-    { return get_property(*this); }
-
-    graph_bundled const& operator[](graph_bundle_t) const
-    { return get_property(*this); }
 #endif // BOOST_GRAPH_NO_BUNDLED_PROPERTIES
 
     static vertex_descriptor null_vertex()
@@ -130,11 +116,11 @@ struct edge_property_type<reverse_graph<BidirectionalGraph, GraphRef> > {
 
 #ifndef BOOST_GRAPH_NO_BUNDLED_PROPERTIES
   template<typename Graph, typename GraphRef>
-  struct vertex_bundle_type<reverse_graph<Graph, GraphRef> >
+  struct vertex_bundle_type<reverse_graph<Graph, GraphRef> > 
     : vertex_bundle_type<Graph> { };
 
   template<typename Graph, typename GraphRef>
-  struct edge_bundle_type<reverse_graph<Graph, GraphRef> >
+  struct edge_bundle_type<reverse_graph<Graph, GraphRef> > 
     : edge_bundle_type<Graph> { };
 #endif // BOOST_GRAPH_NO_BUNDLED_PROPERTIES
 
@@ -208,7 +194,7 @@ vertex(const typename graph_traits<BidirectionalGraph>::vertices_size_type v,
 }
 
 template <class BidirectionalGraph, class GRef>
-inline std::pair<typename graph_traits<BidirectionalGraph>::edge_descriptor,
+inline std::pair<typename graph_traits<BidirectionalGraph>::edge_descriptor, 
                  bool>
 edge(const typename graph_traits<BidirectionalGraph>::vertex_descriptor u,
      const typename graph_traits<BidirectionalGraph>::vertex_descriptor v,
@@ -234,7 +220,7 @@ adjacent_vertices(typename graph_traits<BidirectionalGraph>::vertex_descriptor u
 {
     typedef reverse_graph<BidirectionalGraph,GRef> Graph;
     typename graph_traits<Graph>::out_edge_iterator first, last;
-    boost::tie(first, last) = out_edges(u, g);
+    tie(first, last) = out_edges(u, g);
     typedef typename graph_traits<Graph>::adjacency_iterator adjacency_iterator;
     return std::make_pair(adjacency_iterator(first, const_cast<Graph*>(&g)),
                           adjacency_iterator(last, const_cast<Graph*>(&g)));
@@ -332,7 +318,7 @@ put(Property p, const reverse_graph<BidirectionalGraph,GRef>& g, const Key& k,
 template<typename BidirectionalGraph, typename GRef, typename Tag,
          typename Value>
 inline void
-set_property(const reverse_graph<BidirectionalGraph,GRef>& g, Tag tag,
+set_property(const reverse_graph<BidirectionalGraph,GRef>& g, Tag tag, 
              const Value& value)
 {
   set_property(g.m_g, tag, value);

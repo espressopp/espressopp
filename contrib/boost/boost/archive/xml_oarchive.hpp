@@ -30,7 +30,6 @@ namespace std{
 #include <boost/archive/basic_text_oprimitive.hpp>
 #include <boost/archive/basic_xml_oarchive.hpp>
 #include <boost/archive/detail/register_archive.hpp>
-#include <boost/serialization/item_version_type.hpp>
 
 #include <boost/archive/detail/abi_prefix.hpp> // must be the last header
 
@@ -61,14 +60,6 @@ protected:
     template<class T>
     void save(const T & t){
         basic_text_oprimitive<std::ostream>::save(t);
-    }
-    void 
-    save(const version_type & t){
-        save(static_cast<const unsigned int>(t));
-    }
-    void 
-    save(const boost::serialization::item_version_type & t){
-        save(static_cast<const unsigned int>(t));
     }
     BOOST_ARCHIVE_DECL(void) 
     save(const char * t);

@@ -37,37 +37,37 @@ template<typename Base, typename Derived>
 struct is_virtual_base_of_impl<Base, Derived, mpl::true_>
 {
 #ifdef __BORLANDC__
-    struct boost_type_traits_internal_struct_X : public virtual Derived, public virtual Base 
+    struct X : public virtual Derived, public virtual Base 
     {
-       boost_type_traits_internal_struct_X();
-       boost_type_traits_internal_struct_X(const boost_type_traits_internal_struct_X&);
-       boost_type_traits_internal_struct_X& operator=(const boost_type_traits_internal_struct_X&);
-       ~boost_type_traits_internal_struct_X()throw();
+       X();
+       X(const X&);
+       X& operator=(const X&);
+       ~X()throw();
     };
-    struct boost_type_traits_internal_struct_Y : public virtual Derived 
+    struct Y : public virtual Derived 
     {
-       boost_type_traits_internal_struct_Y();
-       boost_type_traits_internal_struct_Y(const boost_type_traits_internal_struct_Y&);
-       boost_type_traits_internal_struct_Y& operator=(const boost_type_traits_internal_struct_Y&);
-       ~boost_type_traits_internal_struct_Y()throw();
+       Y();
+       Y(const Y&);
+       Y& operator=(const Y&);
+       ~Y()throw();
     };
 #else
-    struct boost_type_traits_internal_struct_X : Derived, virtual Base 
+    struct X : Derived, virtual Base 
     {
-       boost_type_traits_internal_struct_X();
-       boost_type_traits_internal_struct_X(const boost_type_traits_internal_struct_X&);
-       boost_type_traits_internal_struct_X& operator=(const boost_type_traits_internal_struct_X&);
-       ~boost_type_traits_internal_struct_X()throw();
+       X();
+       X(const X&);
+       X& operator=(const X&);
+       ~X()throw();
     };
-    struct boost_type_traits_internal_struct_Y : Derived 
+    struct Y : Derived 
     {
-       boost_type_traits_internal_struct_Y();
-       boost_type_traits_internal_struct_Y(const boost_type_traits_internal_struct_Y&);
-       boost_type_traits_internal_struct_Y& operator=(const boost_type_traits_internal_struct_Y&);
-       ~boost_type_traits_internal_struct_Y()throw();
+       Y();
+       Y(const Y&);
+       Y& operator=(const Y&);
+       ~Y()throw();
     };
 #endif
-    BOOST_STATIC_CONSTANT(bool, value = (sizeof(boost_type_traits_internal_struct_X)==sizeof(boost_type_traits_internal_struct_Y)));
+    BOOST_STATIC_CONSTANT(bool, value = (sizeof(X)==sizeof(Y)));
 };
 
 template<typename Base, typename Derived>

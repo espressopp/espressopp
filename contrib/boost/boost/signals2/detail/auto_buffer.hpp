@@ -993,6 +993,8 @@ namespace detail
                 uninitialized_grow( n - size() );
             else if( n < size() )
                 uninitialized_shrink( size() - n );
+            else
+                ;
 
            BOOST_ASSERT( size() == n );
         }

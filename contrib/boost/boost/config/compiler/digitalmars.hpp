@@ -51,7 +51,7 @@
 
 
 // check for exception handling support:
-#if !defined(_CPPUNWIND) && !defined(BOOST_NO_EXCEPTIONS)
+#ifndef _CPPUNWIND
 #  define BOOST_NO_EXCEPTIONS
 #endif
 
@@ -80,9 +80,6 @@
 #define BOOST_NO_TEMPLATE_ALIASES
 #define BOOST_NO_UNICODE_LITERALS
 #define BOOST_NO_VARIADIC_TEMPLATES
-#if (__DMC__ < 0x812)
-#define BOOST_NO_VARIADIC_MACROS
-#endif
 
 #if __DMC__ < 0x800
 #error "Compiler not supported or configured - please reconfigure"

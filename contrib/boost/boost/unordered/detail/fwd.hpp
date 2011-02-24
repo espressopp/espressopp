@@ -31,7 +31,7 @@
 // G = Grouped/Ungrouped
 // E = Key Extractor
 
-#if !defined(BOOST_NO_RVALUE_REFERENCES) && !defined(BOOST_NO_VARIADIC_TEMPLATES)
+#if defined(BOOST_HAS_RVALUE_REFS) && defined(BOOST_HAS_VARIADIC_TMPL)
 #   if defined(__SGI_STL_PORT) || defined(_STLPORT_VERSION)
         // STLport doesn't have std::forward.
 #   else
@@ -64,8 +64,6 @@ namespace boost { namespace unordered_detail {
     static const std::size_t default_bucket_count = 11;
     struct move_tag {};
 
-    template <class T> class hash_unique_table;
-    template <class T> class hash_equivalent_table;
     template <class Alloc, class Grouped>
     class hash_node_constructor;
     template <class ValueType>
@@ -569,9 +567,170 @@ namespace boost { namespace unordered_detail {
             node_constructor&, std::size_t);
     };
 
+    template <class T>
+    class hash_unique_table : public T::table
+    {
+    public:
+        typedef BOOST_DEDUCED_TYPENAME T::hasher hasher;
+        typedef BOOST_DEDUCED_TYPENAME T::key_equal key_equal;
+        typedef BOOST_DEDUCED_TYPENAME T::value_allocator value_allocator;
+        typedef BOOST_DEDUCED_TYPENAME T::key_type key_type;
+        typedef BOOST_DEDUCED_TYPENAME T::value_type value_type;
+        typedef BOOST_DEDUCED_TYPENAME T::table table;
+        typedef BOOST_DEDUCED_TYPENAME T::node_constructor node_constructor;
+
+        typedef BOOST_DEDUCED_TYPENAME T::node node;
+        typedef BOOST_DEDUCED_TYPENAME T::node_ptr node_ptr;
+        typedef BOOST_DEDUCED_TYPENAME T::bucket_ptr bucket_ptr;
+        typedef BOOST_DEDUCED_TYPENAME T::iterator_base iterator_base;
+        typedef BOOST_DEDUCED_TYPENAME T::extractor extractor;
+        
+        typedef std::pair<iterator_base, bool> emplace_return;
+
+        // Constructors
+
+        hash_unique_table(std::size_t n, hasher const& hf, key_equal const& eq,
+            value_allocator const& a)
+          : table(n, hf, eq, a) {}
+        hash_unique_table(hash_unique_table const& x)
+          : table(x, x.node_alloc()) {}
+        hash_unique_table(hash_unique_table const& x, value_allocator const& a)
+          : table(x, a) {}
+        hash_unique_table(hash_unique_table& x, move_tag m)
+          : table(x, m) {}
+        hash_unique_table(hash_unique_table& x, value_allocator const& a,
+            move_tag m)
+          : table(x, a, m) {}
+        ~hash_unique_table() {}
+
+        // Insert methods
+
+        emplace_return emplace_impl_with_node(node_constructor& a);
+        value_type& operator[](key_type const& k);
+
+        // equals
+
+        bool equals(hash_unique_table const&) const;
+
+        node_ptr add_node(node_constructor& a, bucket_ptr bucket);
+        
+#if defined(BOOST_UNORDERED_STD_FORWARD)
+
+        template<class... Args>
+        emplace_return emplace(Args&&... args);
+        template<class... Args>
+        emplace_return emplace_impl(key_type const& k, Args&&... args);
+        template<class... Args>
+        emplace_return emplace_impl(no_key, Args&&... args);
+        template<class... Args>
+        emplace_return emplace_empty_impl(Args&&... args);
+#else
+
+#define BOOST_UNORDERED_INSERT_IMPL(z, n, _)                                   \
+        template <BOOST_UNORDERED_TEMPLATE_ARGS(z, n)>                         \
+        emplace_return emplace(                                                \
+            BOOST_UNORDERED_FUNCTION_PARAMS(z, n));                            \
+        template <BOOST_UNORDERED_TEMPLATE_ARGS(z, n)>                         \
+        emplace_return emplace_impl(key_type const& k,                         \
+           BOOST_UNORDERED_FUNCTION_PARAMS(z, n));                             \
+        template <BOOST_UNORDERED_TEMPLATE_ARGS(z, n)>                         \
+        emplace_return emplace_impl(no_key,                                    \
+           BOOST_UNORDERED_FUNCTION_PARAMS(z, n));                             \
+        template <BOOST_UNORDERED_TEMPLATE_ARGS(z, n)>                         \
+        emplace_return emplace_empty_impl(                                     \
+           BOOST_UNORDERED_FUNCTION_PARAMS(z, n));
+
+        BOOST_PP_REPEAT_FROM_TO(1, BOOST_UNORDERED_EMPLACE_LIMIT,
+            BOOST_UNORDERED_INSERT_IMPL, _)
+
+#undef BOOST_UNORDERED_INSERT_IMPL
+
+#endif
+
+        // if hash function throws, or inserting > 1 element, basic exception
+        // safety strong otherwise
+        template <class InputIt>
+        void insert_range(InputIt i, InputIt j);
+        template <class InputIt>
+        void insert_range_impl(key_type const&, InputIt i, InputIt j);
+        template <class InputIt>
+        void insert_range_impl(no_key, InputIt i, InputIt j);
+    };
+
+    template <class T>
+    class hash_equivalent_table : public T::table
+    {
+    public:
+        typedef BOOST_DEDUCED_TYPENAME T::hasher hasher;
+        typedef BOOST_DEDUCED_TYPENAME T::key_equal key_equal;
+        typedef BOOST_DEDUCED_TYPENAME T::value_allocator value_allocator;
+        typedef BOOST_DEDUCED_TYPENAME T::key_type key_type;
+        typedef BOOST_DEDUCED_TYPENAME T::value_type value_type;
+        typedef BOOST_DEDUCED_TYPENAME T::table table;
+        typedef BOOST_DEDUCED_TYPENAME T::node_constructor node_constructor;
+
+        typedef BOOST_DEDUCED_TYPENAME T::node node;
+        typedef BOOST_DEDUCED_TYPENAME T::node_ptr node_ptr;
+        typedef BOOST_DEDUCED_TYPENAME T::bucket_ptr bucket_ptr;
+        typedef BOOST_DEDUCED_TYPENAME T::iterator_base iterator_base;
+        typedef BOOST_DEDUCED_TYPENAME T::extractor extractor;
+
+        // Constructors
+
+        hash_equivalent_table(std::size_t n,
+            hasher const& hf, key_equal const& eq, value_allocator const& a)
+          : table(n, hf, eq, a) {}
+        hash_equivalent_table(hash_equivalent_table const& x)
+          : table(x, x.node_alloc()) {}
+        hash_equivalent_table(hash_equivalent_table const& x,
+            value_allocator const& a)
+          : table(x, a) {}
+        hash_equivalent_table(hash_equivalent_table& x, move_tag m)
+          : table(x, m) {}
+        hash_equivalent_table(hash_equivalent_table& x,
+            value_allocator const& a, move_tag m)
+          : table(x, a, m) {}
+        ~hash_equivalent_table() {}
+
+        // Insert methods
+
+        iterator_base emplace_impl(node_constructor& a);
+        void emplace_impl_no_rehash(node_constructor& a);
+
+        // equals
+
+        bool equals(hash_equivalent_table const&) const;
+
+        inline node_ptr add_node(node_constructor& a,
+            bucket_ptr bucket, node_ptr pos);
+
+#if defined(BOOST_UNORDERED_STD_FORWARD)
+
+        template <class... Args>
+        iterator_base emplace(Args&&... args);
+
+#else
+
+#define BOOST_UNORDERED_INSERT_IMPL(z, n, _)                                   \
+        template <BOOST_UNORDERED_TEMPLATE_ARGS(z, n)>                         \
+        iterator_base emplace(BOOST_UNORDERED_FUNCTION_PARAMS(z, n));
+
+        BOOST_PP_REPEAT_FROM_TO(1, BOOST_UNORDERED_EMPLACE_LIMIT,
+            BOOST_UNORDERED_INSERT_IMPL, _)
+
+#undef BOOST_UNORDERED_INSERT_IMPL
+#endif
+
+        template <class I>
+        void insert_for_range(I i, I j, forward_traversal_tag);
+        template <class I>
+        void insert_for_range(I i, I j, boost::incrementable_traversal_tag);
+        template <class I>
+        void insert_range(I i, I j);
+    };
+
     // Iterator Access
 
-#if !defined(__clang__)
     class iterator_access
     {
     public:
@@ -582,28 +741,6 @@ namespace boost { namespace unordered_detail {
             return it.base_;
         }
     };
-#else
-    class iterator_access
-    {
-    public:
-        // Note: we access Iterator::base here, rather than in the function
-        // signature to work around a bug in the friend support of an
-        // early version of clang.
-
-        template <class Iterator>
-        struct base
-        {
-            typedef BOOST_DEDUCED_TYPENAME Iterator::base type;
-        };
-    
-        template <class Iterator>
-        static BOOST_DEDUCED_TYPENAME base<Iterator>::type const&
-            get(Iterator const& it)
-        {
-            return it.base_;
-        }
-    };
-#endif
 
     // Iterators
 
@@ -850,6 +987,52 @@ namespace boost { namespace unordered_detail {
         typedef BOOST_DEDUCED_TYPENAME buckets::node_allocator node_allocator;
 
         typedef std::pair<iterator_base, iterator_base> iterator_pair;
+    };
+
+    template <class H, class P, class A>
+    struct set : public types<
+        BOOST_DEDUCED_TYPENAME A::value_type,
+        BOOST_DEDUCED_TYPENAME A::value_type,
+        H, P, A,
+        set_extractor<BOOST_DEDUCED_TYPENAME A::value_type>,
+        ungrouped>
+    {        
+        typedef hash_unique_table<set<H, P, A> > impl;
+        typedef hash_table<set<H, P, A> > table;
+    };
+
+    template <class H, class P, class A>
+    struct multiset : public types<
+        BOOST_DEDUCED_TYPENAME A::value_type,
+        BOOST_DEDUCED_TYPENAME A::value_type,
+        H, P, A,
+        set_extractor<BOOST_DEDUCED_TYPENAME A::value_type>,
+        grouped>
+    {
+        typedef hash_equivalent_table<multiset<H, P, A> > impl;
+        typedef hash_table<multiset<H, P, A> > table;
+    };
+
+    template <class K, class H, class P, class A>
+    struct map : public types<
+        K, BOOST_DEDUCED_TYPENAME A::value_type,
+        H, P, A,
+        map_extractor<K, BOOST_DEDUCED_TYPENAME A::value_type>,
+        ungrouped>
+    {
+        typedef hash_unique_table<map<K, H, P, A> > impl;
+        typedef hash_table<map<K, H, P, A> > table;
+    };
+
+    template <class K, class H, class P, class A>
+    struct multimap : public types<
+        K, BOOST_DEDUCED_TYPENAME A::value_type,
+        H, P, A,
+        map_extractor<K, BOOST_DEDUCED_TYPENAME A::value_type>,
+        grouped>
+    {
+        typedef hash_equivalent_table<multimap<K, H, P, A> > impl;
+        typedef hash_table<multimap<K, H, P, A> > table;
     };
 }}
 

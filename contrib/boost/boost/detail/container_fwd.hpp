@@ -13,9 +13,7 @@
 #include <boost/config.hpp>
 #include <boost/detail/workaround.hpp>
 
-#if defined(BOOST_DETAIL_NO_CONTAINER_FWD) \
-    || ((defined(__GLIBCPP__) || defined(__GLIBCXX__)) \
-        && (defined(_GLIBCXX_DEBUG) || defined(_GLIBCXX_PARALLEL))) \
+#if ((defined(__GLIBCPP__) || defined(__GLIBCXX__)) && defined(_GLIBCXX_DEBUG)) \
     || BOOST_WORKAROUND(__BORLANDC__, > 0x551) \
     || BOOST_WORKAROUND(__DMC__, BOOST_TESTED_AT(0x842)) \
     || (defined(__SGI_STL_PORT) || defined(_STLPORT_VERSION))
