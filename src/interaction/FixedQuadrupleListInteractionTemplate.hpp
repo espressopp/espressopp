@@ -67,7 +67,7 @@ namespace espresso {
 
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
-      for (FixedQuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
+      for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         Particle &p3 = *it->third;
@@ -99,7 +99,7 @@ namespace espresso {
 
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
       real e = 0.0;
-      for (FixedQuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
+      for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
@@ -127,7 +127,7 @@ namespace espresso {
 
       real w = 0.0;
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      for (FixedQuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
+      for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
@@ -162,7 +162,7 @@ namespace espresso {
     
       const bc::BC& bc = *getSystemRef().bc;
 
-      for (FixedQuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
+      for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;

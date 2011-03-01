@@ -5,7 +5,7 @@
 #include "types.hpp"
 #include "Triple.hpp"
 #include "Quadruple.hpp"
-#include <vector>
+//#include <vector>
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/list.hpp>
 #include <boost/mpi.hpp>
@@ -233,7 +233,7 @@ namespace espresso {
     template< class Archive >
     void serialize(Archive &ar, const unsigned int version)
     {
-      ar & p & r & m & f & l;
+      ar &p &r &m &f &l;
     }
   };
 
@@ -258,11 +258,17 @@ namespace espresso {
   struct PairList
     : public esutil::ESPPContainer< std::vector< ParticlePair > >
   {
-    void add(Particle *p1, Particle *p2) 
-    { this->push_back(ParticlePair(p1, p2)); }
+    void add(Particle *p1, Particle *p2) {
+        std::cout << "add()" << std::endl;
+        this->push_back(ParticlePair(p1, p2));
+    }
 
     void add(Particle &p1, Particle &p2) 
     { this->add(&p1, &p2); }
+
+    void add(std::vector<Particle> particles) {
+        this->add(particles.at(0), particles.at(1));
+    }
   };
 
   // triples
@@ -282,11 +288,17 @@ namespace espresso {
   struct TripleList
     : public esutil::ESPPContainer< std::vector< ParticleTriple > >
   {
-    void add(Particle *p1, Particle *p2, Particle *p3)
-    { this->push_back(ParticleTriple(p1, p2, p3)); }
+    void add(Particle *p1, Particle *p2, Particle *p3) {
+        std::cout << "add()" << std::endl;
+        this->push_back(ParticleTriple(p1, p2, p3));
+    }
 
     void add(Particle &p1, Particle &p2, Particle &p3)
     { this->add(&p1, &p2, &p3); }
+
+    void add(std::vector<Particle> particles) {
+        this->add(particles.at(0), particles.at(1), particles.at(2));
+    }
   };
 
   // quadruples
@@ -308,11 +320,18 @@ namespace espresso {
   struct QuadrupleList
     : public esutil::ESPPContainer< std::vector< ParticleQuadruple > >
   {
-    void add(Particle *p1, Particle *p2, Particle *p3, Particle *p4)
-    { this->push_back(ParticleQuadruple(p1, p2, p3, p4)); }
+    void add(Particle *p1, Particle *p2, Particle *p3, Particle *p4) {
+        std::cout << "add()" << std::endl;
+        this->push_back(ParticleQuadruple(p1, p2, p3, p4));
+    }
 
     void add(Particle &p1, Particle &p2, Particle &p3, Particle &p4)
     { this->add(&p1, &p2, &p3, &p4); }
+
+    void add(std::vector<Particle> particles) {
+        this->add(particles.at(0), particles.at(1),
+                particles.at(2), particles.at(3));
+    }
   };
 
 }

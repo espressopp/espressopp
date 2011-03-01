@@ -19,7 +19,7 @@ from espresso.tools import decomp
 from espresso.tools import timers
 
 # simulation parameters (nvt = False is nve)
-steps = 10
+steps = 1000
 rc = 1.12
 skin = 0.3                                 # skin for Verlet lists
 nvt = True

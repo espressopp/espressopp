@@ -2,17 +2,18 @@
 
 #include "FixedTripleList.hpp"
 
-#include <vector>
-#include <utility>
-#include <algorithm>
+//#include <vector>
+//#include <utility>
+//#include <algorithm>
 #include <boost/bind.hpp>
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 
-using namespace std;
+//using namespace std;
 
 namespace espresso {
 
+  /*
   LOG4ESPP_LOGGER(FixedTripleList::theLogger, "FixedTripleList");
 
   FixedTripleList::FixedTripleList(shared_ptr< storage::Storage > _storage)
@@ -42,14 +43,14 @@ namespace espresso {
     // three swaps needed for (1, 2, 3) == (1, 3, 2)
     // this is important for the line:
     // if (it->second == std::pair<longint, longint>(pid2, pid3))
-    /*
-    if (pid3 < pid2)
-      std::swap(pid2, pid3);
-    if (pid2 < pid1)
-      std::swap(pid1, pid2); 
-    if (pid3 < pid2)
-      std::swap(pid2, pid3);
-    */
+
+    //if (pid3 < pid2)
+    //  std::swap(pid2, pid3);
+    //if (pid2 < pid1)
+    //  std::swap(pid1, pid2);
+    //if (pid3 < pid2)
+    //  std::swap(pid2, pid3);
+
 
     // ADD THE LOCAL TRIPLET
     Particle *p1 = storage->lookupLocalParticle(pid1);
@@ -68,7 +69,7 @@ namespace espresso {
     this->add(p1, p2, p3);
     //printf("me = %d: pid1 %d, pid2 %d, pid3 %d\n", mpiWorld->rank(), pid1, pid2, pid3);
 
-    // ADD THE GLOBAL PAIR
+    // ADD THE GLOBAL TRIPLET
     // see whether the particle already has triples
     std::pair<GlobalTriples::const_iterator,
               GlobalTriples::const_iterator> equalRange 
@@ -81,9 +82,9 @@ namespace espresso {
     else {
       // otherwise test whether the triple already exists
       for (GlobalTriples::const_iterator it = equalRange.first;
-	   it != equalRange.second; ++it)
-	if (it->second == std::pair<longint, longint>(pid1, pid3))
-	  // TODO: Triple already exists, generate error!
+           it != equalRange.second; ++it)
+        if (it->second == std::pair<longint, longint>(pid1, pid3))
+        // TODO: Triple already exists, generate error!
 	  ;
       // if not, insert the new triple
       globalTriples.insert(equalRange.first, std::make_pair(pid2,
@@ -95,7 +96,6 @@ namespace espresso {
 
   void FixedTripleList::
   beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
-    
     vector< longint > toSend;
     // loop over the particle list
     for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
@@ -110,26 +110,26 @@ namespace espresso {
                 //mpiWorld->rank(), pid, n);
 
       if (n > 0) {
-	std::pair<GlobalTriples::const_iterator, 
-	  GlobalTriples::const_iterator> equalRange 
-	  = globalTriples.equal_range(pid);
+          std::pair<GlobalTriples::const_iterator,
+          GlobalTriples::const_iterator> equalRange
+              = globalTriples.equal_range(pid);
 
-	// first write the pid of this particle
-	// then the number of partners (n)
-	// and then the pids of the partners
-	toSend.reserve(toSend.size()+2*n+1);
-	toSend.push_back(pid);
-	toSend.push_back(n);
-	for (GlobalTriples::const_iterator it = equalRange.first;
-	     it != equalRange.second; ++it) {
-	  toSend.push_back(it->second.first);
-	  toSend.push_back(it->second.second);
-          //printf ("send global triple: pid %d and partner %d\n", pid, it->second.first);
-          //printf ("send global triple: pid %d and partner %d\n", pid, it->second.second);
-        }
+          // first write the pid of this particle
+          // then the number of partners (n)
+          // and then the pids of the partners
+          toSend.reserve(toSend.size()+2*n+1);
+          toSend.push_back(pid);
+          toSend.push_back(n);
+          for (GlobalTriples::const_iterator it = equalRange.first;
+                  it != equalRange.second; ++it) {
+              toSend.push_back(it->second.first);
+              toSend.push_back(it->second.second);
+                  //printf ("send global triple: pid %d and partner %d\n", pid, it->second.first);
+                  //printf ("send global triple: pid %d and partner %d\n", pid, it->second.second);
+          }
 
-	// delete all of these triples from the global list
-	globalTriples.erase(equalRange.first, equalRange.second);
+          // delete all of these triples from the global list
+          globalTriples.erase(equalRange.first, equalRange.second);
       }
     }
     // send the list
@@ -178,14 +178,14 @@ namespace espresso {
     Particle *p2;
     Particle *p3;
     for (GlobalTriples::const_iterator it = globalTriples.begin();
-	 it != globalTriples.end(); ++it) {
+	it != globalTriples.end(); ++it) {
       //printf("lookup global triple %d %d %d\n", it->first, it->second.first, it->second.second);
       if (it->first != lastpid2) {
-	p2 = storage->lookupRealParticle(it->first);
+        p2 = storage->lookupRealParticle(it->first);
         if (p2 == NULL) {
           printf("SERIOUS ERROR: particle %d not available\n", it->first);
         }
-	lastpid2 = it->first;
+	    lastpid2 = it->first;
       }
       p1 = storage->lookupLocalParticle(it->second.first);
       if (p1 == NULL) {
@@ -199,6 +199,7 @@ namespace espresso {
     }
     LOG4ESPP_INFO(theLogger, "regenerated local fixed triple list from global list");
   }
+  */
 
   /****************************************************
   ** REGISTRATION WITH PYTHON
@@ -208,8 +209,10 @@ namespace espresso {
 
     using namespace espresso::python;
 
-    bool (FixedTripleList::*pyAdd)(longint pid1, longint pid2, longint pid3) 
-      = &FixedTripleList::add;
+    //bool (FixedTripleList::*pyAdd)(longint pid1, longint pid2, longint pid3)
+    //  = &FixedTripleList::add;
+    bool (FixedTripleList::*pyAdd)(pvec pids)
+          = &FixedTripleList::add;
 
     class_< FixedTripleList, shared_ptr< FixedTripleList > >
       ("FixedTripleList", init< shared_ptr< storage::Storage > >())

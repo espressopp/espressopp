@@ -2,17 +2,18 @@
 
 #include "FixedQuadrupleList.hpp"
 
-#include <vector>
-#include <utility>
-#include <algorithm>
+//#include <vector>
+//#include <utility>
+//#include <algorithm>
 #include <boost/bind.hpp>
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 
-using namespace std;
+//using namespace std;
 
 namespace espresso {
 
+  /*
   LOG4ESPP_LOGGER(FixedQuadrupleList::theLogger, "FixedQuadrupleList");
 
   FixedQuadrupleList::FixedQuadrupleList(shared_ptr< storage::Storage > _storage) 
@@ -62,7 +63,7 @@ namespace espresso {
     this->add(p1, p2, p3, p4);
     //printf("me = %d: pid1 %d, pid2 %d, pid3 %d\n", mpiWorld->rank(), pid1, pid2, pid3);
 
-    // ADD THE GLOBAL PAIR
+    // ADD THE GLOBAL QUADRUPLET
     // see whether the particle already has quadruples
     std::pair<GlobalQuadruples::const_iterator,
               GlobalQuadruples::const_iterator> equalRange 
@@ -202,6 +203,7 @@ namespace espresso {
     }
     LOG4ESPP_INFO(theLogger, "regenerated local fixed quadruple list from global list");
   }
+  */
 
   /****************************************************
   ** REGISTRATION WITH PYTHON
@@ -211,8 +213,10 @@ namespace espresso {
 
     using namespace espresso::python;
 
-    bool (FixedQuadrupleList::*pyAdd)(longint pid1, longint pid2,
-           longint pid3, longint pid4) = &FixedQuadrupleList::add;
+    //bool (FixedQuadrupleList::*pyAdd)(longint pid1, longint pid2,
+    //       longint pid3, longint pid4) = &FixedQuadrupleList::add;
+    bool (FixedQuadrupleList::*pyAdd)(pvec pids)
+              = &FixedQuadrupleList::add;
 
     class_< FixedQuadrupleList, shared_ptr< FixedQuadrupleList > >
       ("FixedQuadrupleList", init< shared_ptr< storage::Storage > >())

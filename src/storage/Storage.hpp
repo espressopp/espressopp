@@ -2,7 +2,7 @@
 #ifndef _STORAGE_STORAGE_HPP
 #define _STORAGE_STORAGE_HPP
 #include "mpi.hpp"
-#include <vector>
+//#include <vector>
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
 #include "types.hpp"
@@ -31,6 +31,8 @@ namespace espresso {
 	  front end.
       */
       Particle* addParticle(longint id, const Real3D& pos);
+
+      //Particle* addParticle(longint id, const Real3D& pos, int type);
 
       /** lookup whether data for a given particle is available on this node,
 	  either as real or as ghost particle. */

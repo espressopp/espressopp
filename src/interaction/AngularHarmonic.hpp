@@ -4,7 +4,7 @@
 
 #include "AngularPotential.hpp"
 #include "FixedTripleListInteractionTemplate.hpp"
-#include <cmath>
+//#include <cmath>
 
 namespace espresso {
   namespace interaction {
@@ -12,7 +12,7 @@ namespace espresso {
         the AngularHarmonic angular potential. To create a new angular potential
         one only needs to write the setter/getters and the variable
         dU_dtheta.*/
-    class AngularHarmonic : public AngularPotentialTemplate< AngularHarmonic > {
+    class AngularHarmonic : public AngularPotentialTemplate<AngularHarmonic> {
     private:
       real K;
       real theta0;

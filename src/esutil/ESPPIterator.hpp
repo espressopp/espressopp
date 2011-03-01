@@ -41,7 +41,7 @@ namespace espresso {
     protected:
       typedef STLContainer Super;
     public:
-      typedef ESPPIterator< STLContainer > Iterator;
+      typedef ESPPIterator<STLContainer> Iterator;
     };
   }
 }

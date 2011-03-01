@@ -26,11 +26,13 @@ class StorageLocal(object):
         This routine adds particles with certain properties to the storage
         where only one processor adds the particle in its local storage.
 
-        :param particleList: list of particles to be added
-        :param properties: list of property strings
+        :param particleList: list of list particles (and properties) to be added
+        :param properties: comma separated property strings
 
         Each particle in the list must be itself a list where each entry corresponds
         to the property specified in properties.
+        
+        Example: addParticles([[id, pos, type, ... ], ...], 'id', 'pos', 'type', ...)
 
         Improvement: make list of supported properties more flexible in use
         """
@@ -68,7 +70,6 @@ class StorageLocal(object):
             for particle in particleList:
 
                 # verify that each particle has enough entries, avoids index errors
-
                 if len(particle) != nindex:
                    raise "particle has %d entries,but %d expected"%(len(particle), nindex)
 

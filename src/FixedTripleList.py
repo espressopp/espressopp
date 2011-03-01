@@ -22,7 +22,6 @@ class FixedTripleListLocal(_espresso.FixedTripleList):
         adds those triples whose first particle is owned by
         this processor.
         """
-
         if pmi.workerIsActive():
             for triple in triplelist:
                 pid1, pid2, pid3 = triple

@@ -67,7 +67,7 @@ namespace espresso {
     FixedPairListInteractionTemplate < _Potential >::addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the FixedPair List");
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      for (FixedPairList::Iterator it(*fixedpairList); it.isValid(); ++it) {
+      for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         Real3D dist;
@@ -81,8 +81,7 @@ namespace espresso {
       }
     }
     
-    template < typename _Potential >
-    inline real
+    template < typename _Potential > inline real
     FixedPairListInteractionTemplate < _Potential >::
     computeEnergy() {
 
@@ -90,7 +89,7 @@ namespace espresso {
 
       real e = 0.0;
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      for (FixedPairList::Iterator it(*fixedpairList); 
+      for (FixedPairList::PairList::Iterator it(*fixedpairList);
 	   it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
@@ -111,7 +110,7 @@ namespace espresso {
       
       real w = 0.0;
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      for (FixedPairList::Iterator it(*fixedpairList);                
+      for (FixedPairList::PairList::Iterator it(*fixedpairList);
            it.isValid(); ++it) {                                         
         const Particle &p1 = *it->first;                                       
         const Particle &p2 = *it->second;                                      
@@ -131,7 +130,7 @@ namespace espresso {
     FixedPairListInteractionTemplate < _Potential >::computeVirialTensor(Tensor& w) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      for (FixedPairList::Iterator it(*fixedpairList);
+      for (FixedPairList::PairList::Iterator it(*fixedpairList);
            it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;

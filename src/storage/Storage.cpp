@@ -1,6 +1,6 @@
 #include "python.hpp"
 
-#include <algorithm>
+//#include <algorithm>
 
 #include "log4espp.hpp"
 
@@ -96,10 +96,9 @@ namespace espresso {
       }
     }
 
-    Particle* Storage::
-    addParticle(longint id, const Real3D& p) {
+    Particle* Storage::addParticle(longint id, const Real3D& p) {
       if (!checkIsRealParticle(id, p))
-	return static_cast< Particle* >(0);
+        return static_cast< Particle* >(0);
 
       Cell *cell;
 
@@ -121,6 +120,12 @@ namespace espresso {
 
       return &cell->particles.back();
     }
+
+    /*Particle* Storage::addParticle(longint id, const Real3D& p, int type) {
+        Particle* pt = addParticle(id, p);
+        pt->setType(type);
+        return pt;
+    }*/
 
     Particle *Storage::appendUnindexedParticle(ParticleList &l, Particle &part)
     {
@@ -407,12 +412,19 @@ namespace espresso {
     Storage::registerPython() {
       using namespace espresso::python;
       class_< Storage, boost::noncopyable >("storage_Storage", no_init)
+
 	.def("addParticle", &Storage::addParticle, 
 	     return_value_policy< reference_existing_object >())
+
+    .def("addParticle", &Storage::addParticle,
+         return_value_policy< reference_existing_object >())
+
 	.def("lookupLocalParticle", &Storage::lookupLocalParticle,
 	     return_value_policy< reference_existing_object >())
+
 	.def("lookupRealParticle", &Storage::lookupRealParticle,
 	     return_value_policy< reference_existing_object >())
+
 	.def("decompose", &Storage::decompose)
         .add_property("system", &Storage::getSystem)
 	;

@@ -56,7 +56,7 @@ namespace espresso {
 
     protected:
       int ntypes;
-      shared_ptr < FixedTripleList > fixedtripleList;
+      shared_ptr<FixedTripleList> fixedtripleList;
       esutil::Array2D<Potential, esutil::enlarge> potentialArray;
     };
 
@@ -64,11 +64,11 @@ namespace espresso {
     // INLINE IMPLEMENTATION
     //////////////////////////////////////////////////
     template < typename _AngularPotential > inline void
-    FixedTripleListInteractionTemplate < _AngularPotential >::
+    FixedTripleListInteractionTemplate <_AngularPotential>::
     addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by FixedTripleList");
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
+      for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         Particle &p3 = *it->third;
@@ -84,15 +84,14 @@ namespace espresso {
       }
     }
 
-    template < typename _AngularPotential >
-    inline real
+    template < typename _AngularPotential > inline real
     FixedTripleListInteractionTemplate < _AngularPotential >::
     computeEnergy() {
       LOG4ESPP_INFO(theLogger, "compute energy of the triples");
 
       const bc::BC& bc = *getSystemRef().bc;
       real e = 0.0;
-      for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
+      for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
@@ -106,15 +105,14 @@ namespace espresso {
       return esum;
     }
 
-    template < typename _AngularPotential >
-    inline real
+    template < typename _AngularPotential > inline real
     FixedTripleListInteractionTemplate < _AngularPotential >::
     computeVirial() {
       LOG4ESPP_INFO(theLogger, "compute scalar virial of the triples");
 
       const bc::BC& bc = *getSystemRef().bc;
       real w = 0.0;
-      for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
+      for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
@@ -130,14 +128,13 @@ namespace espresso {
       return w;
     }
 
-    template < typename _AngularPotential >
-    inline void
+    template < typename _AngularPotential > inline void
     FixedTripleListInteractionTemplate < _AngularPotential >::
     computeVirialTensor(Tensor& w) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 
       const bc::BC& bc = *getSystemRef().bc;
-      for (FixedTripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
+      for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
@@ -151,8 +148,7 @@ namespace espresso {
       }
     }
 
-    template < typename _AngularPotential >
-    inline real
+    template < typename _AngularPotential > inline real
     FixedTripleListInteractionTemplate< _AngularPotential >::
     getMaxCutoff() {
       real cutoff = 0.0;

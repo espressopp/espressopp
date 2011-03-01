@@ -9,11 +9,13 @@
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 
-using namespace std;
+//using namespace std;
 
 namespace espresso {
 
+  /*
   LOG4ESPP_LOGGER(FixedPairList::theLogger, "FixedPairList");
+
 
   FixedPairList::FixedPairList(shared_ptr< storage::Storage > _storage) 
     : storage(_storage), globalPairs()
@@ -36,6 +38,7 @@ namespace espresso {
     con2.disconnect();
     con3.disconnect();
   }
+
 
   bool FixedPairList::
   add(longint pid1, longint pid2) {
@@ -82,8 +85,7 @@ namespace espresso {
 		      OutBuffer& buf) {
     vector< longint > toSend;
     // loop over the particle list
-    for (ParticleList::Iterator pit(pl);
-	 pit.isValid(); ++pit) {
+    for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
       longint pid = pit->id();
       
       LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pid << ", find pairs");
@@ -93,25 +95,25 @@ namespace espresso {
       int n = globalPairs.count(pid);
 
       if (n > 0) {
-	std::pair<GlobalPairs::const_iterator, 
-	  GlobalPairs::const_iterator> equalRange 
-	  = globalPairs.equal_range(pid);
+        std::pair<GlobalPairs::const_iterator,
+          GlobalPairs::const_iterator> equalRange
+          = globalPairs.equal_range(pid);
 
-	// first write the pid of the first particle
-	// then the number of partners
-	// and then the pids of the partners
-	toSend.reserve(toSend.size()+n+1);
-	toSend.push_back(pid);
-	toSend.push_back(n);
-	for (GlobalPairs::const_iterator it = equalRange.first; 
-	     it != equalRange.second; ++it) {
-	  toSend.push_back(it->second);
+        // first write the pid of the first particle
+        // then the number of partners
+        // and then the pids of the partners
+        toSend.reserve(toSend.size()+n+1);
+        toSend.push_back(pid);
+        toSend.push_back(n);
+        for (GlobalPairs::const_iterator it = equalRange.first;
+             it != equalRange.second; ++it) {
+          toSend.push_back(it->second);
           LOG4ESPP_DEBUG(theLogger, "send global bond: pid "
-                   << pid << " and partner " << it->second);
+                       << pid << " and partner " << it->second);
         }
 
-	// delete all of these pairs from the global list
-	globalPairs.erase(equalRange.first, equalRange.second);
+        // delete all of these pairs from the global list
+        globalPairs.erase(equalRange.first, equalRange.second);
       }
     }
     // send the list
@@ -172,7 +174,7 @@ namespace espresso {
       this->add(p1, p2);
     }
     LOG4ESPP_INFO(theLogger, "regenerated local fixed pair list from global list");
-  }
+  }*/
 
   /****************************************************
   ** REGISTRATION WITH PYTHON
@@ -182,11 +184,13 @@ namespace espresso {
 
     using namespace espresso::python;
 
-    bool (FixedPairList::*pyAdd)(longint pid1, longint pid2) 
-      = &FixedPairList::add;
+    //bool (FixedPairList::*pyAdd)(longint pid1, longint pid2)
+    //  = &FixedPairList::add;
+    bool (FixedPairList::*pyAdd)(pvec pids)
+       = &FixedPairList::add;
 
-    class_< FixedPairList, shared_ptr< FixedPairList > >
-      ("FixedPairList", init< shared_ptr< storage::Storage > >())
+    class_<FixedPairList, shared_ptr<FixedPairList> >
+      ("FixedPairList", init <shared_ptr<storage::Storage> >())
       .def("add", pyAdd)
       ;
   }

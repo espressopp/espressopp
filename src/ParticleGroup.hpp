@@ -1,6 +1,6 @@
 // ESPP_CLASS
 #ifndef __ESPRESSOPP_PARTICLEGROUP_H
-#define	__ESPRESSOPP_PARTICLEGROUP_H
+#define	 __ESPRESSOPP_PARTICLEGROUP_H
 
 #include "Particle.hpp"
 #include "log4espp.hpp"
@@ -22,83 +22,86 @@ namespace espresso {
      *
      */
     class ParticleGroup {
-    public:
-        ParticleGroup(shared_ptr <storage::Storage> _storage);
-        ~ParticleGroup();
+        public:
+            ParticleGroup(shared_ptr <storage::Storage> _storage);
+            ~ParticleGroup();
 
-        /**
-         * \brief add particle to group
-         *
-         * @param pid particle id
-         */
-        void add(longint pid);
+            /**
+             * \brief add particle to group
+             *
+             * @param pid particle id
+             */
+            void add(longint pid);
 
-        // for debugging purpose
-        void print();
+            // for debugging purpose
+            void print();
 
-        static void registerPython();
+            static void registerPython();
 
-        /**
-         * iterator for active particles
-         *
-         */
-        struct iterator: std::map<longint, Particle*>::iterator {
+            /**
+             * iterator for active particles
+             *
+             */
+            struct iterator: std::map<longint, Particle*>::iterator {
 
-            iterator(const std::map<longint, Particle*>::iterator &i)
-			: std::map<longint, Particle*>::iterator(i) {
+                iterator(const std::map<longint, Particle*>::iterator &i)
+                : std::map<longint, Particle*>::iterator(i) {
+                }
+
+                Particle* operator*() const {
+                    return (std::map<longint, Particle*>::iterator::operator*()).second;
+                }
+
+                Particle* operator->() const {
+                    return (operator*());
+                }
+            };
+
+            /**
+             * \brief begin iterator for active particles
+             *
+             * @return begin iterator
+             */
+            iterator begin() {
+                return active.begin();
             }
 
-            Particle* operator*() const {
-                return (std::map<longint, Particle*>::iterator::operator*()).second;
+            /**
+             * \brief end iterator for active particles
+             *
+             * @return end iterator
+             */
+            iterator end() {
+                return active.end();
             }
 
-            Particle* operator->() const {
-                return (operator*());
-            }
-        };
+        protected:
 
-        /**
-         * \brief begin iterator for active particles
-         *
-         * @return begin iterator
-         */
-        iterator begin() {
-            return active.begin();
-        }
+            // list of active particles
+            // key: particle id, value: reference to local particle
+            std::map<longint, Particle*> active;
 
-        /**
-         * \brief end iterator for active particles
-         *
-         * @return end iterator
-         */
-        iterator end() {
-            return active.end();
-        }
+            // list of all particles in group,
+            /// \todo find better solution here
+            // key: particle id, value: NONE, just used for lookup
+            //std::map<longint, longint> particles;
+            std::set<longint> particles;
 
-    protected:
+            // pointer to storage object
+            shared_ptr<storage::Storage> storage;
 
-        // list of active particles
-        // key: particle id, value: reference to local particle
-        std::map<longint, Particle*> active;
+            // some signalling stuff to keep track of the particles in cell
+            boost::signals2::connection con_send, con_recv, con_changed;
 
-        // list of all particles in group,
-        /// \todo find better solution here
-        // key: particle id, value: NONE, just used for lookup
-        //std::map<longint, longint> particles;
-        std::set<longint> particles;
+            void beforeSendParticles(ParticleList& pl,
+                    class OutBuffer& buf);
 
-        // pointer to storage object
-        shared_ptr<storage::Storage> storage;
+            void afterRecvParticles(ParticleList& pl,
 
-        // some signalling stuff to keep track of the particles in cell
-        boost::signals2::connection con_send, con_recv, con_changed;
-        void beforeSendParticles(ParticleList& pl,
-                class OutBuffer& buf);
-        void afterRecvParticles(ParticleList& pl,
-                class InBuffer& buf);
-        void onParticlesChanged();
+                    class InBuffer& buf);
+            void onParticlesChanged();
 
-        static LOG4ESPP_DECL_LOGGER(theLogger);
+            static LOG4ESPP_DECL_LOGGER(theLogger);
     };
 
 }

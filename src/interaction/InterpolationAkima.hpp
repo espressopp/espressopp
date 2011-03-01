@@ -91,8 +91,6 @@ namespace espresso {
                         (fabs(m4 - m3) + fabs(m2 - m1));
             }
         }
-        
-        
     }//ns interaction
 }//ns espresso
 

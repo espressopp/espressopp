@@ -1,4 +1,4 @@
-# -*- coding: iso-8859-1 -*-
+# -*- coding: utf-8 -*-
 """This Python module allows one to use a LAMMPS data file as the
    input to an ESPResSo++ simulation."""
 

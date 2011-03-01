@@ -15,6 +15,8 @@ namespace espresso {
         boost::mpi::communicator world;
         filename = _filename;
         
+        std::cout << "Tabulated" << std::endl;
+
         if (itype == 1) { // create a new InterpolationLinear
             table = make_shared <InterpolationLinear> ();
             table->read(world, _filename);

@@ -17,10 +17,10 @@ namespace espresso {
 	.add_property("theta0", &AngularHarmonic::getTheta0, &AngularHarmonic::setTheta0)
     	;
 
-      typedef class FixedTripleListInteractionTemplate< AngularHarmonic >
+      typedef class FixedTripleListInteractionTemplate<AngularHarmonic>
         FixedTripleListAngularHarmonic;
         
-      class_< FixedTripleListAngularHarmonic, bases< Interaction > >
+      class_ <FixedTripleListAngularHarmonic, bases <Interaction> >
         ("interaction_FixedTripleListAngularHarmonic", init< shared_ptr<System>, shared_ptr<FixedTripleList> >())
         .def("setPotential", &FixedTripleListAngularHarmonic::setPotential);
       ;
