@@ -60,8 +60,11 @@ namespace espresso {
         ;
         
       class_ <FixedPairListTabulated, bases <Interaction> > 
-        ("interaction_FixedPairListTabulated",
-            init <shared_ptr<System>, shared_ptr <FixedPairList> >())
+        ("interaction_FixedPairListTabulated", 
+          init <shared_ptr<System>, 
+                shared_ptr<FixedPairList>, 
+                shared_ptr<Tabulated> >()
+        )
             .def("setPotential", &FixedPairListTabulated::setPotential);
         ;
         

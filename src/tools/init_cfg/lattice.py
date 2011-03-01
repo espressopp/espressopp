@@ -1,5 +1,4 @@
 # -*- coding: iso-8859-1 -*-
-execfile("/people/thnfs/homes/bevc/espressopp/espresso_setup.py")
 
 """This Python module initializes particles on the sites
    of a simple cubic lattice. By setting perfect=False

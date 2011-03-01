@@ -40,13 +40,13 @@ class CellListTabulatedLocal(InteractionLocal, interaction_CellListTabulated):
 
 class FixedPairListTabulatedLocal(InteractionLocal, interaction_FixedPairListTabulated):
     'The (local) tabulated interaction using FixedPair lists.'
-    def __init__(self, system, vl):
+    def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListTabulated, system, vl)
+            cxxinit(self, interaction_FixedPairListTabulated, system, vl, potential)
 
-    def setPotential(self, type1, type2, potential):
+    def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.setPotential(self, type1, type2, potential)
+            self.cxxclass.setPotential(self, potential)
 
 
 #class FixedTripleListTabulatedLocal(InteractionLocal, interaction_FixedTripleListTabulated):

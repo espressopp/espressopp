@@ -4,9 +4,22 @@
 import espresso
 from espresso import Int3D
 
-# need to factorize p to find optimum nodeGrid
-def nodeGrid(p):
-  return Int3D(1, 1, p)
+# need to factorize n to find optimum nodeGrid
+def nodeGrid(n):
+  ijkmax = 3*n*n + 1
+  d1 = 1
+  d2 = 2
+  d3 = n
+  for i in range(1,n):
+    for j in range(i,n):
+      for k in range(j,n):
+        if (i*j*k == n) and (i*i + j*j + k*k < ijkmax):
+          d1 = k
+          d2 = j
+          d3 = i
+          ijkmax = i*i + j*j + k*k
+          nodeGrid = toInt3DFromVector(d1, d2, d3)
+  return Int3D(d1,d2,d3)
 
 def cellGrid(box_size, node_grid, rc, skin):
   rc_skin = rc + skin

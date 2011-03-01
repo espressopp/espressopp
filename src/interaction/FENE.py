@@ -18,13 +18,13 @@ class FENELocal(PotentialLocal, interaction_FENE):
 
 class FixedPairListFENELocal(InteractionLocal, interaction_FixedPairListFENE):
     'The (local) FENE interaction using FixedPair lists.'
-    def __init__(self, system, vl):
+    def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListFENE, system, vl)
+            cxxinit(self, interaction_FixedPairListFENE, system, vl, potential)
 
-    def setPotential(self, type1, type2, potential):
+    def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.setPotential(self, type1, type2, potential)
+            self.cxxclass.setPotential(self, potential)
 
 if pmi.isController:
     class FENE(Potential):

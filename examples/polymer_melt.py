@@ -27,7 +27,7 @@ timestep = 0.01
 lammps_reader = True
 
 if(lammps_reader):
-  file = sys.path[0][:sys.path[0].find('espressopp')] + 'espressopp/examples/angle/rings.dat'
+  file = sys.path[0][:sys.path[0].find('espressopp')] + 'espressopp/examples/rings.dat'
   bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read(file)
 else:
   base = sys.path[0][:sys.path[0].find('trunk')] + 'trunk/examples/'
@@ -70,8 +70,7 @@ system.addInteraction(interLJ)
 fpl = espresso.FixedPairList(system.storage)
 fpl.addBonds(bonds)
 potFENE = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
-interFENE = espresso.interaction.FixedPairListFENE(system, fpl)
-interFENE.setPotential(type1 = 0, type2 = 0, potential = potFENE)
+interFENE = espresso.interaction.FixedPairListFENE(system, fpl, potFENE)
 system.addInteraction(interFENE)
 
 if(lammps_reader):

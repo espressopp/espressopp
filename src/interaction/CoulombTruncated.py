@@ -44,13 +44,13 @@ class CellListCoulombTruncatedLocal(InteractionLocal, interaction_CellListCoulom
 
 class FixedPairListCoulombTruncatedLocal(InteractionLocal, interaction_FixedPairListCoulombTruncated):
     'The (local) CoulombTruncated interaction using FixedPair lists.'
-    def __init__(self, system, vl):
+    def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListCoulombTruncated, system, vl)
+            cxxinit(self, interaction_FixedPairListCoulombTruncated, system, vl, potential)
 
-    def setPotential(self, type1, type2, potential):
+    def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.setPotential(self, type1, type2, potential)
+            self.cxxclass.setPotential(self, potential)
 
 if pmi.isController:
     class CoulombTruncated(Potential):

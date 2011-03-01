@@ -78,8 +78,7 @@ system.addInteraction(interTC)
 fpl = espresso.FixedPairList(system.storage)
 fpl.addBonds(bonds)
 potHarmonic = espresso.interaction.Harmonic(K=100, r0=1.0)
-interHarmonic = espresso.interaction.FixedPairListHarmonic(system, fpl)
-interHarmonic.setPotential(type1=1, type2=2, potential=potHarmonic)
+interHarmonic = espresso.interaction.FixedPairListHarmonic(system, fpl, potHarmonic))
 system.addInteraction(interHarmonic)
 
 # AngularHarmonic with FixedTriple list
@@ -107,6 +106,7 @@ for i in range(1, num_particles - 1, 3):
 fpl = espresso.FixedPairList(system.storage)
 fpl.addBonds(bondsHH)
 potLJ_subtract = espresso.interaction.LennardJones(epsilon=-0.10, sigma=1.0, cutoff=rc, shift=False)
+# CORRECT ? : fpl contains only particles of type (2, 2)
 interLJ_subtract = espresso.interaction.FixedPairListLennardJones(system, fpl)
 interLJ_subtract.setPotential(type1=2, type2=2, potential=potLJ_subtract)
 system.addInteraction(interLJ_subtract)
