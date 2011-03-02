@@ -38,8 +38,8 @@ system.rng = espresso.esutil.RNG()
 system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 comm = MPI.COMM_WORLD
-nodeGrid = decomp.nodeGrid(comm.size)
-cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
+nodeGrid = espresso.tools.decomp.nodeGrid(comm.size)
+cellGrid = espresso.tools.decomp.cellGrid(size,nodeGrid,rc,skin)
 system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # add particles to the system and then decompose
@@ -58,8 +58,7 @@ system.addInteraction(interLJ)
 fpl = espresso.FixedPairList(system.storage)
 fpl.addBonds(bonds)
 potFENE = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
-interFENE = espresso.interaction.FixedPairListFENE(system, fpl)
-interFENE.setPotential(type1 = 0, type2 = 0, potential = potFENE)
+interFENE = espresso.interaction.FixedPairListFENE(system, fpl, potFENE)
 system.addInteraction(interFENE)
 
 # Cosine with FixedTriple list
@@ -135,4 +134,4 @@ sys.stdout.write('Total # of neighbors = %d\n' % vl.totalSize())
 sys.stdout.write('Ave neighs/atom = %.1f\n' % (vl.totalSize() / float(num_particles)))
 sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
-sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))
+sys.stdout.write('CPUs = %i CPU time per CPU = %.1f\n' % (comm.size,end_time - start_time))
