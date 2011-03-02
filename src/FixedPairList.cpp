@@ -16,7 +16,7 @@ namespace espresso {
   : FixedListComm (_storage){}
 
   FixedPairList::~FixedPairList() {
-    std::cout << "~fixedpairlist" << std::endl;
+    //std::cout << "~fixedpairlist" << std::endl;
     //FixedListComm::~FixedListComm();
   }
 

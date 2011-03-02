@@ -1,8 +1,12 @@
 #include "python.hpp"
 #include "AngularPotential.hpp"
+#include "logging.hpp"
 
 namespace espresso {
   namespace interaction {
+
+    LOG4ESPP_LOGGER(AngularPotential::theLogger, "AngularPotential");
+
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////

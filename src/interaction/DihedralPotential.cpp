@@ -1,8 +1,12 @@
 #include "python.hpp"
 #include "DihedralPotential.hpp"
+#include "logging.hpp"
 
 namespace espresso {
   namespace interaction {
+
+    LOG4ESPP_LOGGER(DihedralPotential::theLogger, "DihedralPotential");
+
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////

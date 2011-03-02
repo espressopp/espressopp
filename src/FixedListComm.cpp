@@ -14,7 +14,7 @@ namespace espresso {
     FixedListComm::FixedListComm(shared_ptr <storage::Storage> _storage)
         : storage(_storage), globalLists(){
 
-        std::cout << "fixedlist" << std::endl;
+        //std::cout << "fixedlist" << std::endl;
 
         LOG4ESPP_INFO(theLogger, "construct FixedPairList");
         con1 = storage->beforeSendParticles.connect
@@ -27,7 +27,7 @@ namespace espresso {
 
     FixedListComm::~FixedListComm() {
 
-        std::cout << "~fixedlist" << std::endl;
+        //std::cout << "~fixedlist" << std::endl;
 
         LOG4ESPP_INFO(theLogger, "~FixedListComm");
 

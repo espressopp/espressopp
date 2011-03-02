@@ -19,6 +19,7 @@ namespace espresso {
              
                 TabulatedDihedral() {
                     //setCutoff(infinity);
+                    LOG4ESPP_WARN(theLogger, "default TabulatedDihedral potential will not work");
                 }
              
                 TabulatedDihedral(int itype, const char* filename) {

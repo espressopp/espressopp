@@ -24,7 +24,6 @@ class FixedPairListLocal(_espresso.FixedPairList):
         """
         
         if pmi.workerIsActive():
-            print "add"
             for bond in bondlist:
                 pid1, pid2 = bond
                 self.cxxclass.add(self, pid1, pid2)

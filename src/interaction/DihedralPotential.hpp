@@ -6,6 +6,7 @@
 #include "Real3D.hpp"
 #include "Particle.hpp"
 #include <cmath>
+#include "logging.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -31,6 +32,7 @@ namespace espresso {
       virtual real getCutoff() const = 0;
 
       static void registerPython();
+      static LOG4ESPP_DECL_LOGGER(theLogger);
     };
 
     template < class Derived >

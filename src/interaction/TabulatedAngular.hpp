@@ -19,6 +19,7 @@ namespace espresso {
              
                 TabulatedAngular() {
                     //setCutoff(infinity);
+                    LOG4ESPP_WARN(theLogger, "default TabulatedAngular potential will not work");
                 }
              
                 TabulatedAngular(int itype, const char* filename) {
