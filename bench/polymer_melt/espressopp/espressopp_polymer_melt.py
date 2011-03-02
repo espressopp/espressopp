@@ -29,7 +29,7 @@ timestep = 0.01
 ### IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE ###
 ######################################################################
 sys.stdout.write('Setting up simulation ...\n')
-types, bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read('espressopp_polymer_melt.start')
+bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read('espressopp_polymer_melt.start')
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
@@ -65,8 +65,8 @@ system.addInteraction(interFENE)
 ftl = espresso.FixedTripleList(system.storage)
 ftl.addTriples(angles)
 potCosine = espresso.interaction.Cosine(K=1.5, theta0=3.1415926)
-interCosine = espresso.interaction.FixedTripleListCosine(system, ftl)
-interCosine.setPotential(type1 = 0, type2 = 0, potential = potCosine)
+interCosine = espresso.interaction.FixedTripleListCosine(system, ftl, potCosine)
+#interCosine.setPotential(type1 = 0, type2 = 0, potential = potCosine)
 system.addInteraction(interCosine)
 
 
