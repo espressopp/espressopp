@@ -43,7 +43,9 @@ namespace espresso {
             
             class_ <FixedTripleListTabulatedAngular, bases <Interaction> > 
                 ("interaction_FixedTripleListTabulatedAngular",
-                init <shared_ptr<System>, shared_ptr <FixedTripleList> >())
+                init <shared_ptr<System>,
+                      shared_ptr <FixedTripleList>,
+                      shared_ptr <TabulatedAngular> >())
                 .def("setPotential", &FixedTripleListTabulatedAngular::setPotential);
         }
         

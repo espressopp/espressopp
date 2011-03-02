@@ -14,9 +14,9 @@ class OPLSLocal(DihedralPotentialLocal, interaction_OPLS):
 
 class FixedQuadrupleListOPLSLocal(InteractionLocal, interaction_FixedQuadrupleListOPLS):
     'The (local) OPLS interaction using FixedQuadruple lists.'
-    def __init__(self, system, vl):
+    def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedQuadrupleListOPLS, system, vl)
+            cxxinit(self, interaction_FixedQuadrupleListOPLS, system, vl, potential)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

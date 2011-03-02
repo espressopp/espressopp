@@ -22,7 +22,7 @@ namespace espresso {
 
         public:
             FixedTupleList(shared_ptr< storage::Storage > _storage);
-            ~FixedTupleList();
+            //~FixedTupleList();
 
             //bool add(longint pid1, longint pid2);
             //void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);

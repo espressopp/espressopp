@@ -259,7 +259,6 @@ namespace espresso {
     : public esutil::ESPPContainer< std::vector< ParticlePair > >
   {
     void add(Particle *p1, Particle *p2) {
-        std::cout << "add()" << std::endl;
         this->push_back(ParticlePair(p1, p2));
     }
 
@@ -289,7 +288,6 @@ namespace espresso {
     : public esutil::ESPPContainer< std::vector< ParticleTriple > >
   {
     void add(Particle *p1, Particle *p2, Particle *p3) {
-        std::cout << "add()" << std::endl;
         this->push_back(ParticleTriple(p1, p2, p3));
     }
 
@@ -321,7 +319,6 @@ namespace espresso {
     : public esutil::ESPPContainer< std::vector< ParticleQuadruple > >
   {
     void add(Particle *p1, Particle *p2, Particle *p3, Particle *p4) {
-        std::cout << "add()" << std::endl;
         this->push_back(ParticleQuadruple(p1, p2, p3, p4));
     }
 

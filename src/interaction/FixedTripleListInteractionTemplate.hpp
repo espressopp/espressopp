@@ -24,10 +24,15 @@ namespace espresso {
     public:
       FixedTripleListInteractionTemplate
       (shared_ptr < System > _system,
-       shared_ptr < FixedTripleList > _fixedtripleList)
-        : SystemAccess(_system), fixedtripleList(_fixedtripleList) 
+       shared_ptr < FixedTripleList > _fixedtripleList,
+       shared_ptr < Potential > _potential)
+        : SystemAccess(_system), fixedtripleList(_fixedtripleList),
+          potential(_potential)
       {
-        potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
+          if (! potential) {
+                LOG4ESPP_ERROR(theLogger, "NULL potential");
+          }
+        //potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
       }
 
       void
@@ -39,13 +44,25 @@ namespace espresso {
         return fixedtripleList;
       }
 
-      void
+      /*void
       setPotential(int type1, int type2, const Potential &potential) {
         potentialArray.at(type1, type2) = potential;
+      }*/
+      void
+      setPotential(shared_ptr < Potential> _potential) {
+         if (_potential) {
+            potential = _potential;
+         } else {
+            LOG4ESPP_ERROR(theLogger, "NULL potential");
+         }
       }
 
-      Potential &getPotential(int type1, int type2) {
+      /*Potential &getPotential(int type1, int type2) {
         return potentialArray.at(0, 0);
+      }*/
+
+      shared_ptr < Potential > getPotential() {
+        return potential;
       }
 
       virtual void addForces();
@@ -57,7 +74,8 @@ namespace espresso {
     protected:
       int ntypes;
       shared_ptr<FixedTripleList> fixedtripleList;
-      esutil::Array2D<Potential, esutil::enlarge> potentialArray;
+      //esutil::Array2D<Potential, esutil::enlarge> potentialArray;
+      shared_ptr < Potential > potential;
     };
 
     //////////////////////////////////////////////////
@@ -72,12 +90,12 @@ namespace espresso {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         Particle &p3 = *it->third;
-        const Potential &potential = getPotential(p1.type(), p2.type());
+        //const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D dist12, dist32;
         bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
         Real3D force12, force32;
-        potential._computeForce(force12, force32, dist12, dist32);
+        potential->_computeForce(force12, force32, dist12, dist32);
         p1.force() += force12;
         p2.force() -= force12 + force32;
         p3.force() += force32;
@@ -95,10 +113,10 @@ namespace espresso {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
-        const Potential &potential = getPotential(p1.type(), p2.type());
+        //const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D dist12 = bc.getMinimumImageVector(p1.position(), p2.position());
         Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
-        e += potential._computeEnergy(dist12, dist32);
+        e += potential->_computeEnergy(dist12, dist32);
       }
       real esum;
       boost::mpi::reduce(*mpiWorld, e, esum, std::plus<real>(), 0);
@@ -116,13 +134,13 @@ namespace espresso {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
-        const Potential &potential = getPotential(p1.type(), p2.type());
+        //const Potential &potential = getPotential(p1.type(), p2.type());
         const espresso::bc::BC& bc = *getSystemRef().bc;
         Real3D dist12, dist32;
         bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
         Real3D force12, force32;
-        potential._computeForce(force12, force32, dist12, dist32);
+        potential->_computeForce(force12, force32, dist12, dist32);
         w += dist12 * force12 + dist32 * force32;
       }
       return w;
@@ -138,26 +156,27 @@ namespace espresso {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
-        const Potential &potential = getPotential(0, 0);
+        //const Potential &potential = getPotential(0, 0);
         Real3D dist12, dist32;
         bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
         Real3D force12, force32;
-        potential._computeForce(force12, force32, dist12, dist32);
+        potential->_computeForce(force12, force32, dist12, dist32);
         w += Tensor(dist12, force12) + Tensor(dist32, force32);
-      }
+        }
     }
 
-    template < typename _AngularPotential > inline real
+    template < typename _AngularPotential >
+    inline real
     FixedTripleListInteractionTemplate< _AngularPotential >::
     getMaxCutoff() {
-      real cutoff = 0.0;
+      /*real cutoff = 0.0;
       for (int i = 0; i < ntypes; i++) {
         for (int j = 0; j < ntypes; j++) {
           cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
         }
-      }
-      return cutoff;
+      }*/
+      return potential->getCutoff();
     }
   }
 }

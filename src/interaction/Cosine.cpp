@@ -20,7 +20,10 @@ namespace espresso {
       typedef class FixedTripleListInteractionTemplate< Cosine >
         FixedTripleListCosine;
       class_< FixedTripleListCosine, bases< Interaction > >
-        ("interaction_FixedTripleListCosine", init< shared_ptr<System>, shared_ptr<FixedTripleList> >())
+        ("interaction_FixedTripleListCosine",
+           init<shared_ptr<System>,
+                shared_ptr<FixedTripleList>,
+                shared_ptr<Cosine> >())
         .def("setPotential", &FixedTripleListCosine::setPotential);
       ;
     }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: iso-8859-1 -*-
+# -*- coding: utf-8 -*-
 
 ###########################################################################
 #  ESPResSo++                                                             #
@@ -11,6 +11,7 @@ import sys
 import time
 import espresso
 import MPI
+import math
 import logging
 import os
 from espresso import Real3D, Int3D
@@ -19,7 +20,7 @@ from espresso.tools import decomp
 from espresso.tools import timers
 
 # simulation parameters (nvt = False is nve)
-steps = 1000
+steps = 100
 rc = 1.12
 skin = 0.3                                 # skin for Verlet lists
 nvt = True
@@ -66,6 +67,14 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
      
     outfile.close()
 
+# compute the number of cells on each node
+def calcNumberCells(size, nodes, cutoff):
+    ncells = 1
+    while size / (ncells * nodes) >= cutoff:
+       ncells = ncells + 1
+    return ncells - 1
+
+
 # write the tabulated potential files
 print 'Generating potential files ... (%2s, %2s, %2s)\n' % (tabfileLJ, tabfileFENE, tabfileCosine)
 potLJ  = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift=False, cutoff=rc)
@@ -95,6 +104,12 @@ for tabulation in [True, False]:
         
     nodeGrid = decomp.nodeGrid(comm.size)
     cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
+    #nodeGrid = Int3D(1, 1, comm.size)
+    #cellGrid = Int3D(
+        #calcNumberCells(size[0], nodeGrid[0], rc),
+        #calcNumberCells(size[1], nodeGrid[1], rc),
+        #calcNumberCells(size[2], nodeGrid[2], rc)
+        #)
     system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
         
     # add particles to the system and then decompose
@@ -118,11 +133,11 @@ for tabulation in [True, False]:
     fpl = espresso.FixedPairList(system.storage)
     fpl.addBonds(bonds)
     if tabulation:
-        interFENE = espresso.interaction.FixedPairListTabulated(system, fpl)
-        interFENE.setPotential(type1=0, type2=0, potential=potTabFENE)
+        interFENE = espresso.interaction.FixedPairListTabulated(system, fpl, potTabFENE)
+        #interFENE.setPotential(type1=0, type2=0, potential=potTabFENE) # no longer needed
     else:
-        interFENE = espresso.interaction.FixedPairListFENE(system, fpl)
-        interFENE.setPotential(type1=0, type2=0, potential=potFENE)
+        interFENE = espresso.interaction.FixedPairListFENE(system, fpl, potFENE)
+        #interFENE.setPotential(type1=0, type2=0, potential=potFENE)
     system.addInteraction(interFENE)
         
         
@@ -130,11 +145,11 @@ for tabulation in [True, False]:
     ftl = espresso.FixedTripleList(system.storage)
     ftl.addTriples(angles)
     if tabulation:
-        interCosine = espresso.interaction.FixedTripleListTabulatedAngular(system, ftl)
-        interCosine.setPotential(type1=0, type2=0, potential=potTabCosine)
+        interCosine = espresso.interaction.FixedTripleListTabulatedAngular(system, ftl, potTabCosine)
+        #interCosine.setPotential(type1=0, type2=0, potential=potTabCosine)
     else:
-        interCosine = espresso.interaction.FixedTripleListCosine(system, ftl)
-        interCosine.setPotential(type1=0, type2=0, potential=potCosine)
+        interCosine = espresso.interaction.FixedTripleListCosine(system, ftl, potCosine)
+        #interCosine.setPotential(type1=0, type2=0, potential=potCosine)
     system.addInteraction(interCosine)
         
         

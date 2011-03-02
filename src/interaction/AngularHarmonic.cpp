@@ -21,7 +21,10 @@ namespace espresso {
         FixedTripleListAngularHarmonic;
         
       class_ <FixedTripleListAngularHarmonic, bases <Interaction> >
-        ("interaction_FixedTripleListAngularHarmonic", init< shared_ptr<System>, shared_ptr<FixedTripleList> >())
+        ("interaction_FixedTripleListAngularHarmonic",
+           init<shared_ptr<System>,
+                shared_ptr<FixedTripleList>,
+                shared_ptr<AngularHarmonic> >())
         .def("setPotential", &FixedTripleListAngularHarmonic::setPotential);
       ;
     }

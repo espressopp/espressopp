@@ -14,9 +14,9 @@ class AngularCosineSquaredLocal(AngularPotentialLocal, interaction_AngularCosine
 
 class FixedTripleListAngularCosineSquaredLocal(InteractionLocal, interaction_FixedTripleListAngularCosineSquared):
     'The (local) AngularCosineSquared interaction using FixedTriple lists.'
-    def __init__(self, system, vl):
+    def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedTripleListAngularCosineSquared, system, vl)
+            cxxinit(self, interaction_FixedTripleListAngularCosineSquared, system, vl, potential)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

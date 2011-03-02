@@ -18,9 +18,9 @@ class TabulatedDihedralLocal(DihedralPotentialLocal, interaction_TabulatedDihedr
 
 class FixedQuadrupleListTabulatedDihedralLocal(InteractionLocal, interaction_FixedQuadrupleListTabulatedDihedral):
     'The (local) tanulated dihedral interaction using FixedQuadruple lists.'
-    def __init__(self, system, vl):
+    def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedQuadrupleListTabulatedDihedral, system, vl)
+            cxxinit(self, interaction_FixedQuadrupleListTabulatedDihedral, system, vl, potential)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

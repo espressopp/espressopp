@@ -24,7 +24,7 @@ namespace espresso {
 
   public:
     FixedQuadrupleList(shared_ptr< storage::Storage > _storage);
-    ~FixedQuadrupleList();
+    //~FixedQuadrupleList();
 
     /** Add the given particle quadruple to the list on this processor if the
 	particle with the lower id belongs to this processor.  Note that
@@ -33,7 +33,7 @@ namespace espresso {
 	
 	\return whether the quadruple was inserted on this processor.
     */
-    //bool add(longint pid1, longint pid2, longint pid3, longint pid4);
+    bool add(longint pid1, longint pid2, longint pid3, longint pid4);
     //void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
     //void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
     //void onParticlesChanged();

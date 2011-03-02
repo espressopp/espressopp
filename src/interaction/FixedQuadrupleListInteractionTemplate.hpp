@@ -21,10 +21,16 @@ namespace espresso {
     public:
       FixedQuadrupleListInteractionTemplate
       (shared_ptr < System > _system,
-       shared_ptr < FixedQuadrupleList > _fixedquadrupleList)
-        : SystemAccess(_system), fixedquadrupleList(_fixedquadrupleList) 
+       shared_ptr < FixedQuadrupleList > _fixedquadrupleList,
+       shared_ptr < Potential > _potential)
+        : SystemAccess(_system), fixedquadrupleList(_fixedquadrupleList),
+          potential(_potential)
       {
-        potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
+          if (! potential) {
+              LOG4ESPP_ERROR(theLogger, "NULL potential");
+          }
+
+        //potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
       }
 
       void
@@ -33,16 +39,30 @@ namespace espresso {
       }
 
       shared_ptr < FixedQuadrupleList > getFixedQuadrupleList() {
-        return fixedquadrupleList;
+             return fixedquadrupleList;
       }
 
       void
-      setPotential(int type1, int type2, const Potential &potential) {
-	potentialArray.at(type1, type2) = potential;
+      setPotential(shared_ptr < Potential> _potential) {
+           if (_potential) {
+              potential = _potential;
+           } else {
+              LOG4ESPP_ERROR(theLogger, "NULL potential");
+           }
       }
 
-      Potential &getPotential(int type1, int type2) {
+
+      /*void
+      setPotential(int type1, int type2, const Potential &potential) {
+	potentialArray.at(type1, type2) = potential;
+      }*/
+
+      /*Potential &getPotential(int type1, int type2) {
         return potentialArray(0, 0);
+      }*/
+
+      shared_ptr < Potential > getPotential() {
+        return potential;
       }
 
       virtual void addForces();
@@ -54,14 +74,16 @@ namespace espresso {
     protected:
       int ntypes;
       shared_ptr < FixedQuadrupleList > fixedquadrupleList;
-      esutil::Array2D<Potential, esutil::enlarge> potentialArray;
+      //esutil::Array2D<Potential, esutil::enlarge> potentialArray;
+      shared_ptr < Potential > potential;
     };
 
     //////////////////////////////////////////////////
     // INLINE IMPLEMENTATION
     //////////////////////////////////////////////////
     template < typename _DihedralPotential > inline void
-    FixedQuadrupleListInteractionTemplate < _DihedralPotential >::addForces() {
+    FixedQuadrupleListInteractionTemplate < _DihedralPotential >::
+    addForces() {
 
       LOG4ESPP_INFO(theLogger, "add forces computed by FixedQuadrupleList");
 
@@ -72,7 +94,7 @@ namespace espresso {
         Particle &p2 = *it->second;
         Particle &p3 = *it->third;
         Particle &p4 = *it->fourth;
-        const Potential &potential = getPotential(p1.type(), p2.type());
+        //const Potential &potential = getPotential(p1.type(), p2.type());
 
         Real3D dist21, dist32, dist43; // 
 
@@ -80,9 +102,9 @@ namespace espresso {
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
         bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
 
-	Real3D force1, force2, force3, force4;  // result forces
+	    Real3D force1, force2, force3, force4;  // result forces
 
-	potential._computeForce(force1, force2, force3, force4,
+	    potential->_computeForce(force1, force2, force3, force4,
                                 dist21, dist32, dist43);
         p1.force() += force1;
         p2.force() -= force2;
@@ -104,7 +126,7 @@ namespace espresso {
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
         const Particle &p4 = *it->fourth;
-        const Potential &potential = getPotential(p1.type(), p2.type());
+        //const Potential &potential = getPotential(p1.type(), p2.type());
 
         Real3D dist21, dist32, dist43; // 
 
@@ -112,7 +134,7 @@ namespace espresso {
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
         bc.getMinimumImageVectorBox(dist43, p4.position(), p3.position());
 
-        e += potential._computeEnergy(dist21, dist32, dist43);
+        e += potential->_computeEnergy(dist21, dist32, dist43);
       }
       real esum;
       boost::mpi::reduce(*mpiWorld, e, esum, std::plus<real>(), 0);
@@ -132,7 +154,7 @@ namespace espresso {
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
         const Particle &p4 = *it->fourth;
-        const Potential &potential = getPotential(p1.type(), p2.type());
+        //const Potential &potential = getPotential(p1.type(), p2.type());
 
         Real3D dist21, dist32, dist43; 
 
@@ -142,7 +164,7 @@ namespace espresso {
 
         Real3D force1, force2, force3, force4;
 
-        potential._computeForce(force1, force2, force3, force4,
+        potential->_computeForce(force1, force2, force3, force4,
                                 dist21, dist32, dist43);
 
         // TODO: formulas are not correct yet?
@@ -167,7 +189,7 @@ namespace espresso {
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
         const Particle &p4 = *it->fourth;
-        const Potential &potential = getPotential(p1.type(), p2.type());
+        //const Potential &potential = getPotential(p1.type(), p2.type());
 
         Real3D dist21, dist32, dist43; 
 
@@ -177,7 +199,7 @@ namespace espresso {
 
         Real3D force1, force2, force3, force4;
 
-        potential._computeForce(force1, force2, force3, force4,
+        potential->_computeForce(force1, force2, force3, force4,
                                 dist21, dist32, dist43);
 
         // TODO: formulas are not correct yet
@@ -190,14 +212,14 @@ namespace espresso {
     inline real
     FixedQuadrupleListInteractionTemplate< _DihedralPotential >::
     getMaxCutoff() {
-      real cutoff = 0.0;
+      /*real cutoff = 0.0;
 
       for (int i = 0; i < ntypes; i++) {
         for (int j = 0; j < ntypes; j++) {
           cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
         }
-      }
-      return cutoff;
+      }*/
+      return potential->getCutoff();
     }
   }
 }

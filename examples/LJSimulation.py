@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: iso-8859-1 -*-
+# -*- coding: utf-8 -*-
 
 
 
@@ -60,9 +60,25 @@ system = espresso.System()
 system.rng = espresso.esutil.RNG()
 system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
+
+# compute the number of cells on each node
+def calcNumberCells(size, nodes, cutoff):
+    ncells = 1
+    while size / (ncells * nodes) >= cutoff:
+       ncells = ncells + 1
+    return ncells - 1
+
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
+#nodeGrid = Int3D(1, 1, comm.size)
+#cellGrid = Int3D(
+    #calcNumberCells(size[0], nodeGrid[0], rc),
+    #calcNumberCells(size[1], nodeGrid[1], rc),
+    #calcNumberCells(size[2], nodeGrid[2], rc)
+    #)
+
+
 system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 

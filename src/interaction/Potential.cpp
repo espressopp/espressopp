@@ -1,5 +1,6 @@
 #include "python.hpp"
 #include "Potential.hpp"
+#include "logging.hpp"
 
 namespace espresso {
   namespace interaction {

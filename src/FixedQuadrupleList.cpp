@@ -13,6 +13,8 @@
 
 namespace espresso {
 
+  FixedQuadrupleList::FixedQuadrupleList(shared_ptr< storage::Storage > _storage)
+  : FixedListComm (_storage){}
   /*
   LOG4ESPP_LOGGER(FixedQuadrupleList::theLogger, "FixedQuadrupleList");
 
@@ -37,7 +39,20 @@ namespace espresso {
     con2.disconnect();
     con3.disconnect();
   }
+  */
 
+  bool FixedQuadrupleList::add(longint pid1, longint pid2, longint pid3, longint pid4) {
+      std::vector<longint> tmp;
+      tmp.push_back(pid1);
+      tmp.push_back(pid2);
+      tmp.push_back(pid3);
+      tmp.push_back(pid4);
+
+      return FixedListComm::add(tmp);
+  }
+
+
+  /*
   bool FixedQuadrupleList::
   add(longint pid1, longint pid2, longint pid3, longint pid4) {
     // here we assume pid1 < pid2 < pid3 < pid4
@@ -213,10 +228,10 @@ namespace espresso {
 
     using namespace espresso::python;
 
-    //bool (FixedQuadrupleList::*pyAdd)(longint pid1, longint pid2,
-    //       longint pid3, longint pid4) = &FixedQuadrupleList::add;
-    bool (FixedQuadrupleList::*pyAdd)(pvec pids)
-              = &FixedQuadrupleList::add;
+    bool (FixedQuadrupleList::*pyAdd)(longint pid1, longint pid2,
+           longint pid3, longint pid4) = &FixedQuadrupleList::add;
+    //bool (FixedQuadrupleList::*pyAdd)(pvec pids)
+    //          = &FixedQuadrupleList::add;
 
     class_< FixedQuadrupleList, shared_ptr< FixedQuadrupleList > >
       ("FixedQuadrupleList", init< shared_ptr< storage::Storage > >())

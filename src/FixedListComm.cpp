@@ -40,7 +40,6 @@ namespace espresso {
 
         //if (pid1 > pid2) std::swap(pid1, pid2);
 
-        std::cout << "addParticles()" << std::endl;
 
         // ADD THE LOCAL PARTICLES
         Particle* p;
@@ -136,7 +135,6 @@ namespace espresso {
         longint pid1;
         GlobalList::iterator it = globalLists.begin();
 
-        std::cout << "afterRecvParticles()" << std::endl;
 
         // receive the bond list
         buf.read(received);
@@ -181,7 +179,6 @@ namespace espresso {
         else if (size == 3) this->TripleList::clear();
         else if (size == 4) this->QuadrupleList::clear();
 
-        std::cout << "onParticlesChanged()" << std::endl;
 
         // iterate through keys of map
         for (;it != globalLists.end(); ++it) {

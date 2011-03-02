@@ -150,7 +150,8 @@ namespace espresso {
  
     template < typename _Potential >
     inline real
-    FixedPairListInteractionTemplate< _Potential >::getMaxCutoff() {
+    FixedPairListInteractionTemplate< _Potential >::
+    getMaxCutoff() {
       return potential->getCutoff();
     }
   }

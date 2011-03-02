@@ -14,9 +14,9 @@ class AngularHarmonicLocal(AngularPotentialLocal, interaction_AngularHarmonic):
 
 class FixedTripleListAngularHarmonicLocal(InteractionLocal, interaction_FixedTripleListAngularHarmonic):
     'The (local) AngularHarmonic interaction using FixedTriple lists.'
-    def __init__(self, system, vl):
+    def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedTripleListAngularHarmonic, system, vl)
+            cxxinit(self, interaction_FixedTripleListAngularHarmonic, system, vl, potential)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

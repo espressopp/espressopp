@@ -14,9 +14,9 @@ class CosineLocal(AngularPotentialLocal, interaction_Cosine):
 
 class FixedTripleListCosineLocal(InteractionLocal, interaction_FixedTripleListCosine):
     'The (local) Cosine interaction using FixedTriple lists.'
-    def __init__(self, system, vl):
+    def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedTripleListCosine, system, vl)
+            cxxinit(self, interaction_FixedTripleListCosine, system, vl, potential)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

@@ -18,7 +18,6 @@ def nodeGrid(n):
           d2 = j
           d3 = i
           ijkmax = i*i + j*j + k*k
-          nodeGrid = toInt3DFromVector(d1, d2, d3)
   return Int3D(d1,d2,d3)
 
 def cellGrid(box_size, node_grid, rc, skin):

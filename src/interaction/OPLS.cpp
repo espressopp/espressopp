@@ -24,7 +24,10 @@ namespace espresso {
       typedef class FixedQuadrupleListInteractionTemplate <OPLS>
         FixedQuadrupleListOPLS;
       class_ <FixedQuadrupleListOPLS, bases <Interaction> >
-        ("interaction_FixedQuadrupleListOPLS", init< shared_ptr<System>, shared_ptr<FixedQuadrupleList> >())
+        ("interaction_FixedQuadrupleListOPLS",
+                init< shared_ptr<System>,
+                      shared_ptr<FixedQuadrupleList>,
+                      shared_ptr<OPLS> >())
         .def("setPotential", &FixedQuadrupleListOPLS::setPotential);
       ;
     }

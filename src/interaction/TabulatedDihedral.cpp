@@ -45,7 +45,9 @@ namespace espresso {
             
             class_ <FixedQuadrupleListTabulatedDihedral, bases <Interaction> > 
                 ("interaction_FixedQuadrupleListTabulatedDihedral",
-                init <shared_ptr<System>, shared_ptr <FixedQuadrupleList> >())
+                        init <shared_ptr<System>,
+                              shared_ptr<FixedQuadrupleList>,
+                              shared_ptr<TabulatedDihedral> >())
                 .def("setPotential", &FixedQuadrupleListTabulatedDihedral::setPotential);
         }
         

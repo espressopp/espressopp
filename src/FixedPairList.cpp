@@ -12,6 +12,13 @@
 //using namespace std;
 
 namespace espresso {
+  FixedPairList::FixedPairList(shared_ptr< storage::Storage > _storage)
+  : FixedListComm (_storage){}
+
+  FixedPairList::~FixedPairList() {
+    std::cout << "~fixedpairlist" << std::endl;
+    //FixedListComm::~FixedListComm();
+  }
 
   /*
   LOG4ESPP_LOGGER(FixedPairList::theLogger, "FixedPairList");
@@ -37,9 +44,18 @@ namespace espresso {
     con1.disconnect();
     con2.disconnect();
     con3.disconnect();
+  }*/
+
+
+  bool FixedPairList::add(longint pid1, longint pid2) {
+    std::vector<longint> tmp;
+    tmp.push_back(pid1);
+    tmp.push_back(pid2);
+
+    return FixedListComm::add(tmp);
   }
 
-
+  /*
   bool FixedPairList::
   add(longint pid1, longint pid2) {
     if (pid1 > pid2)
@@ -184,10 +200,9 @@ namespace espresso {
 
     using namespace espresso::python;
 
-    //bool (FixedPairList::*pyAdd)(longint pid1, longint pid2)
-    //  = &FixedPairList::add;
-    bool (FixedPairList::*pyAdd)(pvec pids)
-       = &FixedPairList::add;
+    bool (FixedPairList::*pyAdd)(longint pid1, longint pid2)
+      = &FixedPairList::add;
+    //bool (FixedPairList::*pyAdd)(pvec pids) = &FixedPairList::add;
 
     class_<FixedPairList, shared_ptr<FixedPairList> >
       ("FixedPairList", init <shared_ptr<storage::Storage> >())
