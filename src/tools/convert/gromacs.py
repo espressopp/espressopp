@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import math
+from operator import itemgetter # for sorting a dict
 
 
 """This Python module allows one to use GROMACS data files as the
@@ -22,7 +23,7 @@ def read(gro_file, top_file):
         # store coordinates
         x, y, z = [], [], []
         for i in range(num_particles):
-            s = f.readline()[20:44]
+            s = f.readline()[20:44] # atom coordinates
             rx = float(s[0:8])
             ry = float(s[8:16])
             rz = float(s[16:24])
@@ -48,9 +49,9 @@ def read(gro_file, top_file):
         molecule_numbers = []
         readmolecules = False
         for line in f:
-            if 'atomtypes' in line: # map atom types (espresso uses ints)
+            if 'atomtypes' in line: # map atom types (espresso++ uses ints)
                 readtypes = True
-                print "Reading atomtypes"
+                print "Reading atomtypes: ",
                 continue
             
             if readtypes:
@@ -58,6 +59,7 @@ def read(gro_file, top_file):
                     continue
                 if line.strip() == "": # end of atomtypes section
                     readtypes = False
+                    print sorted(atomtypes.items(), key=itemgetter(1)) # prints gromacs type and esp++ type
                     continue
                 #print " "+line.strip('\n')
                 tmp = line.split()[0]
@@ -92,6 +94,7 @@ def read(gro_file, top_file):
             #num_chains = int(f.readline().split()[1])
             #monomers = num_particles / num_chains
         f.close()
+        
         
         if len(itp_files) == 0: # itp contents can be in top file
             itp_files = [top_file]
@@ -285,6 +288,15 @@ def read(gro_file, top_file):
 
 
 
+# Set interactions from a list of potentials and particle types.
+# potentials is a list of triples, where the triple is composed
+#  of two particle types folowed by a potential.
+#   example: [("A","A",potAB),("A","B",potAB),("B","B",potBB)]
+# particleTypes is dictionary where key is the particle type, and
+# value is a list of particle of that type.
+#   example: {"A":["A1m", "A2m"],"B":["B1u","B2u"]}
+#def setInteractions(potentials, particleTypes):
+    
 
 
 

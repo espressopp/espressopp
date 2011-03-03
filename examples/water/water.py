@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 ###########################################################################
 #                                                                         #
@@ -39,6 +40,9 @@ system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid
 print 'NodeGrid = %s' % (nodeGrid,)
 print 'CellGrid = %s' % (cellGrid,)
 
+
+print "Adding particles ..."
+
 # add particles
 props = ['id', 'pos', 'type', 'mass']
 new_particles = []
@@ -52,6 +56,7 @@ for i in range(1, num_particles - 1, 3):
 system.storage.addParticles(new_particles, *props)
 system.storage.decompose()
 
+
 # Lennard-Jones with Verlet list
 vl = espresso.VerletList(system, cutoff=rc+system.skin)
 potLJ1 = espresso.interaction.LennardJones(epsilon=0.16, sigma=3.2, cutoff=rc, shift=False)
@@ -62,6 +67,7 @@ interLJ.setPotential(type1=1, type2=1, potential=potLJ1)
 interLJ.setPotential(type1=1, type2=2, potential=potLJ2)
 interLJ.setPotential(type1=2, type2=2, potential=potLJ3)
 system.addInteraction(interLJ)
+
 
 # Truncated Coulomb with Verlet list
 vl = espresso.VerletList(system, cutoff=rc+system.skin)
@@ -74,50 +80,61 @@ interTC.setPotential(type1=1, type2=2, potential=potTC2)
 interTC.setPotential(type1=2, type2=2, potential=potTC3)
 system.addInteraction(interTC)
 
+
 # Harmonic with FixedPair list
 fpl = espresso.FixedPairList(system.storage)
 fpl.addBonds(bonds)
 potHarmonic = espresso.interaction.Harmonic(K=100, r0=1.0)
-interHarmonic = espresso.interaction.FixedPairListHarmonic(system, fpl, potHarmonic))
+interHarmonic = espresso.interaction.FixedPairListHarmonic(system, fpl, potHarmonic)
 system.addInteraction(interHarmonic)
+
 
 # AngularHarmonic with FixedTriple list
 ftl = espresso.FixedTripleList(system.storage)
 ftl.addTriples(angles)
 potAngHar = espresso.interaction.AngularHarmonic(K=100.0, theta0=104.0*math.pi/180.0)
-interAngHar = espresso.interaction.FixedTripleListAngularHarmonic(system, ftl)
-interAngHar.setPotential(type1=2, type2=1, potential=potAngHar)
+interAngHar = espresso.interaction.FixedTripleListAngularHarmonic(system, ftl, potAngHar)
+#interAngHar.setPotential(type1=2, type2=1, potential=potAngHar)
 system.addInteraction(interAngHar)
+
+
 
 # subtract out intramolecular Truncated Coulomb between O-H
 fpl = espresso.FixedPairList(system.storage)
 fpl.addBonds(bonds)
 potTC_subtract = espresso.interaction.CoulombTruncated(qq=0.84*0.42, cutoff=rc, shift=False)
-interTC_subtract = espresso.interaction.FixedPairListCoulombTruncated(system, fpl)
-interTC_subtract.setPotential(type1=1, type2=2, potential=potTC_subtract)
+interTC_subtract = espresso.interaction.FixedPairListCoulombTruncated(system, fpl, potTC_subtract)
+#interTC_subtract.setPotential(type1=1, type2=2, potential=potTC_subtract)
 system.addInteraction(interTC_subtract)
+
+
 
 # make list of H-H bonds
 bondsHH = []
 for i in range(1, num_particles - 1, 3):
   bondsHH.append((i+1, i+2))
 
+
+
 # subtract out intramolecular Lennard-Jones between H-H
 fpl = espresso.FixedPairList(system.storage)
 fpl.addBonds(bondsHH)
 potLJ_subtract = espresso.interaction.LennardJones(epsilon=-0.10, sigma=1.0, cutoff=rc, shift=False)
 # CORRECT ? : fpl contains only particles of type (2, 2)
-interLJ_subtract = espresso.interaction.FixedPairListLennardJones(system, fpl)
-interLJ_subtract.setPotential(type1=2, type2=2, potential=potLJ_subtract)
+interLJ_subtract = espresso.interaction.FixedPairListLennardJones(system, fpl, potLJ_subtract)
+#interLJ_subtract.setPotential(type1=2, type2=2, potential=potLJ_subtract)
 system.addInteraction(interLJ_subtract)
 
 # subtract out intramolecular Truncated Coulomb between H-H
 fpl = espresso.FixedPairList(system.storage)
 fpl.addBonds(bondsHH)
 potTC_subtract = espresso.interaction.CoulombTruncated(qq=-0.42*0.42, cutoff=rc, shift=False)
-interTC_subtract = espresso.interaction.FixedPairListCoulombTruncated(system, fpl)
-interTC_subtract.setPotential(type1=2, type2=2, potential=potTC_subtract)
+interTC_subtract = espresso.interaction.FixedPairListCoulombTruncated(system, fpl, potTC_subtract)
+#interTC_subtract.setPotential(type1=2, type2=2, potential=potTC_subtract)
 system.addInteraction(interTC_subtract)
+
+
+
 
 # integrator
 integrator = espresso.integrator.VelocityVerlet(system)

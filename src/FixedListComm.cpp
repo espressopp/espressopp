@@ -52,21 +52,22 @@ namespace espresso {
                 return false;
             tmp.push_back(p);
         }
-
         //add(tmp);
-        if (pids.size() == 2) this->PairList::add(tmp.at(0), tmp.at(1));
-        else if (pids.size() == 3) this->TripleList::add(tmp.at(0), tmp.at(1), tmp.at(2));
-        else if (pids.size() == 4) this->QuadrupleList::add(tmp.at(0), tmp.at(1), tmp.at(2), tmp.at(3));
+        if (pids.size() == 2) this->PairList::add(tmp.at(1), tmp.at(0));
+        else if (pids.size() == 3) this->TripleList::add(tmp.at(0), tmp.at(2), tmp.at(1));
+        else if (pids.size() == 4) this->QuadrupleList::add(tmp.at(3), tmp.at(0), tmp.at(1), tmp.at(2));
         tmp.clear();
 
         // ADD THE GLOBAL PARTICLES
+        longint pidK = pids.back(); // last pid is key
+        pids.pop_back(); // remove last pid
         std::pair<GlobalList::const_iterator, GlobalList::const_iterator>
-        equalRange = globalLists.equal_range(pids[0]);
+        equalRange = globalLists.equal_range(pidK);
         // see whether the particle already has pairs
         if (equalRange.first == globalLists.end()) {
             // it hasn't, insert the new pair
             //globalLists.insert(make_pair(pid1, pid2));
-            globalLists.insert(make_pair(pids.at(0), pids));
+            globalLists.insert(make_pair(pidK, pids));
         }
         else {// otherwise test whether the pair already exists
             for (GlobalList::const_iterator it = equalRange.first;
@@ -75,17 +76,19 @@ namespace espresso {
                    // TODO: Pair already exists, generate error!
                 }
                 // if not, insert the new pair
-                globalLists.insert(equalRange.first, make_pair(pids.at(0), pids));
+                globalLists.insert(equalRange.first, make_pair(pidK, pids));
             }
         }
         LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
+
         return true;
     }
 
     void FixedListComm::beforeSendParticles
-        (ParticleList& pl, OutBuffer& buf) {
-        std::vector<longint> toSend;
+                                    (ParticleList& pl, OutBuffer& buf) {
 
+
+        std::vector<longint> toSend;
 
         // loop over the particle list
         for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
@@ -98,6 +101,7 @@ namespace espresso {
                 std::pair<GlobalList::const_iterator,
                  GlobalList::const_iterator>
                 equalRange = globalLists.equal_range(pid);
+
                 // get the length of the vector in the map
                 int l = equalRange.first->second.size();
                 toSend.reserve(toSend.size()+3+n*l);
@@ -129,7 +133,8 @@ namespace espresso {
     }
 
     void FixedListComm::afterRecvParticles
-        (ParticleList &pl,InBuffer& buf) {
+                                    (ParticleList &pl,InBuffer& buf) {
+
         std::vector<longint> received, pids;
         int n, l, tl;
         longint pid1;
@@ -170,11 +175,11 @@ namespace espresso {
         //this->clear();
         longint lastpid1 = -1;
 
-        Particle* p;
+        Particle* p, * pK;
         std::vector<Particle*> tmp;
 
         GlobalList::const_iterator it = globalLists.begin();
-        int size = it->second.size();
+        int size = it->second.size()+1;
         if (size == 2) this->PairList::clear();
         else if (size == 3) this->TripleList::clear();
         else if (size == 4) this->QuadrupleList::clear();
@@ -183,8 +188,8 @@ namespace espresso {
         // iterate through keys of map
         for (;it != globalLists.end(); ++it) {
             if (it->first != lastpid1) { // don't check same pid twice
-                p = storage->lookupRealParticle(it->first);
-                if (p == NULL) {
+                pK = storage->lookupRealParticle(it->first);
+                if (pK == NULL) {
                     printf("SERIOUS ERROR: particle %d not available\n", it->first);
                 }
                 lastpid1 = it->first;
@@ -198,9 +203,9 @@ namespace espresso {
                 tmp.push_back(p);
             }
             // add the particles
-            if (size == 2) this->PairList::add(tmp.at(0), tmp.at(1));
-            else if (size == 3) this->TripleList::add(tmp.at(0), tmp.at(1), tmp.at(2));
-            else if (size == 4) this->QuadrupleList::add(tmp.at(0), tmp.at(1), tmp.at(2), tmp.at(3));
+            if (size == 2) this->PairList::add(pK, tmp.at(0));
+            else if (size == 3) this->TripleList::add(pK, tmp.at(0), tmp.at(1));
+            else if (size == 4) this->QuadrupleList::add(pK, tmp.at(0), tmp.at(1), tmp.at(2));
             tmp.clear();
         }
         LOG4ESPP_INFO(theLogger, "regenerated local fixed list from global list");

@@ -9,14 +9,15 @@
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 
-//using namespace std;
 
 namespace espresso {
 
+  /*
   FixedTripleList::FixedTripleList(shared_ptr< storage::Storage > _storage)
   : FixedListComm (_storage){}
+  */
 
-  /*
+
   LOG4ESPP_LOGGER(FixedTripleList::theLogger, "FixedTripleList");
 
   FixedTripleList::FixedTripleList(shared_ptr< storage::Storage > _storage)
@@ -39,19 +40,19 @@ namespace espresso {
     con1.disconnect();
     con2.disconnect();
     con3.disconnect();
-  }*/
+  }
 
+  /*
   bool FixedTripleList::add(longint pid1, longint pid2, longint pid3) {
       std::vector<longint> tmp;
       tmp.push_back(pid1);
-      tmp.push_back(pid2);
       tmp.push_back(pid3);
+      tmp.push_back(pid2); // this is used as key
 
       return FixedListComm::add(tmp);
-  }
+  }*/
 
 
-  /*
   bool FixedTripleList::
   add(longint pid1, longint pid2, longint pid3) {
     // three swaps needed for (1, 2, 3) == (1, 3, 2)
@@ -110,7 +111,7 @@ namespace espresso {
 
   void FixedTripleList::
   beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
-    vector< longint > toSend;
+    std::vector< longint > toSend;
     // loop over the particle list
     for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
       longint pid = pit->id();
@@ -154,7 +155,7 @@ namespace espresso {
   void FixedTripleList::
   afterRecvParticles(ParticleList &pl, InBuffer& buf) {
 
-    vector< longint > received;
+    std::vector< longint > received;
     int n;
     longint pid1, pid2, pid3;
     GlobalTriples::iterator it = globalTriples.begin();
@@ -213,7 +214,6 @@ namespace espresso {
     }
     LOG4ESPP_INFO(theLogger, "regenerated local fixed triple list from global list");
   }
-  */
 
   /****************************************************
   ** REGISTRATION WITH PYTHON

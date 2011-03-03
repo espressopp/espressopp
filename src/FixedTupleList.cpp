@@ -12,11 +12,9 @@
 //using namespace std;
 
 namespace espresso {
+
   FixedTupleList::FixedTupleList(shared_ptr< storage::Storage > _storage)
   : FixedListComm (_storage){};
-
-
-
 
 
   /****************************************************

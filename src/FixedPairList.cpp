@@ -12,15 +12,17 @@
 //using namespace std;
 
 namespace espresso {
+
+  /*
   FixedPairList::FixedPairList(shared_ptr< storage::Storage > _storage)
   : FixedListComm (_storage){}
 
   FixedPairList::~FixedPairList() {
     //std::cout << "~fixedpairlist" << std::endl;
     //FixedListComm::~FixedListComm();
-  }
+  }*/
 
-  /*
+
   LOG4ESPP_LOGGER(FixedPairList::theLogger, "FixedPairList");
 
 
@@ -44,18 +46,19 @@ namespace espresso {
     con1.disconnect();
     con2.disconnect();
     con3.disconnect();
+  }
+
+
+  /*
+  bool FixedPairList::add(longint pid1, longint pid2) {
+    std::vector<longint> tmp;
+    tmp.push_back(pid2);
+    tmp.push_back(pid1); // this is used as key
+
+    return FixedListComm::add(tmp);
   }*/
 
 
-  bool FixedPairList::add(longint pid1, longint pid2) {
-    std::vector<longint> tmp;
-    tmp.push_back(pid1);
-    tmp.push_back(pid2);
-
-    return FixedListComm::add(tmp);
-  }
-
-  /*
   bool FixedPairList::
   add(longint pid1, longint pid2) {
     if (pid1 > pid2)
@@ -80,7 +83,7 @@ namespace espresso {
       = globalPairs.equal_range(pid1);
     if (equalRange.first == globalPairs.end()) {
       // if it hasn't, insert the new pair
-      globalPairs.insert(make_pair(pid1, pid2));
+      globalPairs.insert(std::make_pair(pid1, pid2));
     }
     else {
       // otherwise test whether the pair already exists
@@ -90,7 +93,7 @@ namespace espresso {
 	  // TODO: Pair already exists, generate error!
 	  ;
       // if not, insert the new pair
-      globalPairs.insert(equalRange.first, make_pair(pid1, pid2));
+      globalPairs.insert(equalRange.first, std::make_pair(pid1, pid2));
     }
     LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
     return true;
@@ -99,7 +102,7 @@ namespace espresso {
   void FixedPairList::
   beforeSendParticles(ParticleList& pl, 
 		      OutBuffer& buf) {
-    vector< longint > toSend;
+    std::vector< longint > toSend;
     // loop over the particle list
     for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
       longint pid = pit->id();
@@ -140,7 +143,7 @@ namespace espresso {
   void FixedPairList::
   afterRecvParticles(ParticleList &pl, 
 		     InBuffer& buf) {
-    vector< longint > received;
+    std::vector< longint > received;
     int n;
     longint pid1, pid2;
     GlobalPairs::iterator it = globalPairs.begin();
@@ -157,7 +160,7 @@ namespace espresso {
 	pid2 = received[i++];
 	// add the bond to the global list
         LOG4ESPP_DEBUG(theLogger, "received pair " << pid1 << " , " << pid2);
-	it = globalPairs.insert(it, make_pair(pid1, pid2));
+	it = globalPairs.insert(it, std::make_pair(pid1, pid2));
       }
     }
     if (i != size) {
@@ -190,7 +193,7 @@ namespace espresso {
       this->add(p1, p2);
     }
     LOG4ESPP_INFO(theLogger, "regenerated local fixed pair list from global list");
-  }*/
+  }
 
   /****************************************************
   ** REGISTRATION WITH PYTHON

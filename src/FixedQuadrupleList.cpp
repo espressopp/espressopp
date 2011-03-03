@@ -13,9 +13,12 @@
 
 namespace espresso {
 
+  /*
   FixedQuadrupleList::FixedQuadrupleList(shared_ptr< storage::Storage > _storage)
   : FixedListComm (_storage){}
-  /*
+  */
+
+
   LOG4ESPP_LOGGER(FixedQuadrupleList::theLogger, "FixedQuadrupleList");
 
   FixedQuadrupleList::FixedQuadrupleList(shared_ptr< storage::Storage > _storage) 
@@ -39,20 +42,20 @@ namespace espresso {
     con2.disconnect();
     con3.disconnect();
   }
-  */
-
-  bool FixedQuadrupleList::add(longint pid1, longint pid2, longint pid3, longint pid4) {
-      std::vector<longint> tmp;
-      tmp.push_back(pid1);
-      tmp.push_back(pid2);
-      tmp.push_back(pid3);
-      tmp.push_back(pid4);
-
-      return FixedListComm::add(tmp);
-  }
 
 
   /*
+  bool FixedQuadrupleList::add(longint pid1, longint pid2, longint pid3, longint pid4) {
+      std::vector<longint> tmp;
+      tmp.push_back(pid2);
+      tmp.push_back(pid3);
+      tmp.push_back(pid4);
+      tmp.push_back(pid1); // this is used as key
+
+      return FixedListComm::add(tmp);
+  }*/
+
+
   bool FixedQuadrupleList::
   add(longint pid1, longint pid2, longint pid3, longint pid4) {
     // here we assume pid1 < pid2 < pid3 < pid4
@@ -106,7 +109,7 @@ namespace espresso {
   void FixedQuadrupleList::
   beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
     
-    vector< longint > toSend;
+    std::vector< longint > toSend;
     // loop over the particle list
     for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
       longint pid = pit->id();
@@ -152,7 +155,7 @@ namespace espresso {
   void FixedQuadrupleList::
   afterRecvParticles(ParticleList &pl, InBuffer& buf) {
 
-    vector< longint > received;
+    std::vector< longint > received;
     int n;
     longint pid1, pid2, pid3, pid4;
     GlobalQuadruples::iterator it = globalQuadruples.begin();
@@ -218,7 +221,7 @@ namespace espresso {
     }
     LOG4ESPP_INFO(theLogger, "regenerated local fixed quadruple list from global list");
   }
-  */
+
 
   /****************************************************
   ** REGISTRATION WITH PYTHON
