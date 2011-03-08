@@ -121,7 +121,6 @@ fpl = espresso.FixedPairList(system.storage)
 fpl.addBonds(bonds)
 potTab = espresso.interaction.Tabulated(itype=spline, filename=tab2b)
 interb = espresso.interaction.FixedPairListTabulated(system, fpl, potTab)
-#interb.setPotential(type1 = 0, type2 = 0, potential = potTab)
 system.addInteraction(interb)
 
 # 3-body bonded interactions
@@ -129,7 +128,6 @@ ftl = espresso.FixedTripleList(system.storage)
 ftl.addTriples(angles)
 potTab = espresso.interaction.TabulatedAngular(itype=spline, filename = tab3b)
 intera = espresso.interaction.FixedTripleListTabulatedAngular(system, ftl, potTab)
-#intera.setPotential(type1 = 0, type2 = 0, potential = potTab)
 system.addInteraction(intera)
 
 
