@@ -7,7 +7,7 @@
 #include "Particle.hpp"
 #include <vector>
 
-#define BUFFER_SIZE 32 * 1024 * 1024
+#define BUFFER_SIZE 2 * 1024 * 1024
 
 namespace espresso {
 

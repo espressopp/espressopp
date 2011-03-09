@@ -13,8 +13,7 @@ import MPI
 import logging
 from espresso import Real3D, Int3D
 from espresso.tools.convert import lammps, gromacs
-from espresso.tools import decomp
-from espresso.tools import timers
+from espresso.tools import decomp, timers, replicate
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
 steps = 1000
@@ -29,6 +28,8 @@ lammps_reader = True
 if(lammps_reader):
   file = sys.path[0][:sys.path[0].find('espressopp')] + 'espressopp/examples/rings.dat'
   bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read(file)
+  bonds, angles, x, y, z, Lx, Ly, Lz = replicate.replicate(bonds, angles, x, y, z, Lx, Ly, Lz, xdim=2, ydim=1, zdim=2)
+  print bonds
 else:
   base = sys.path[0][:sys.path[0].find('trunk')] + 'trunk/examples/'
   f1 = base + 'gromacs/conf.gro'
@@ -78,16 +79,14 @@ if(lammps_reader):
   ftl = espresso.FixedTripleList(system.storage)
   ftl.addTriples(angles)
   potCosine = espresso.interaction.Cosine(K=1.5, theta0=3.1415926)
-  interCosine = espresso.interaction.FixedTripleListCosine(system, ftl)
-  interCosine.setPotential(type1 = 0, type2 = 0, potential = potCosine)
+  interCosine = espresso.interaction.FixedTripleListCosine(system, ftl, potCosine)
   system.addInteraction(interCosine)
 else:
   # CosineSquared with FixedTriple list
   ftl = espresso.FixedTripleList(system.storage)
   ftl.addTriples(angles)
   potCosineSq = espresso.interaction.AngularCosineSquared(K=0.75, theta0=3.1415926)
-  interCosineSq = espresso.interaction.FixedTripleListAngularCosineSquared(system, ftl)
-  interCosineSq.setPotential(type1 = 0, type2 = 0, potential = potCosineSq)
+  interCosineSq = espresso.interaction.FixedTripleListAngularCosineSquared(system, ftl, potCosineSq)
   system.addInteraction(interCosine)
 
 # integrator
