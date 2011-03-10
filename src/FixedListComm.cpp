@@ -38,15 +38,18 @@ namespace espresso {
 
     bool FixedListComm::add(pvec pids) {
 
-        //if (pid1 > pid2) std::swap(pid1, pid2);
-
 
         // ADD THE LOCAL PARTICLES
         Particle* p;
         std::vector<Particle*> tmp;
-        for (pvec::iterator it = pids.begin(); it!=pids.end(); ++it) {
-            p = storage->lookupRealParticle(*it);
-            //Particle* p2 = storage->lookupLocalParticle(pid2);
+        
+        pvec::iterator it = pids.begin();
+        p = storage->lookupRealParticle(*it); //wrong, last particle is key
+        if (!p) return false;
+        tmp.push_back(p);
+        
+        for (++it; it!=pids.end(); ++it) {
+            p = storage->lookupLocalParticle(*it);
             if (!p)
                 // Particle does not exist here, return false
                 return false;
@@ -86,7 +89,6 @@ namespace espresso {
 
     void FixedListComm::beforeSendParticles
                                     (ParticleList& pl, OutBuffer& buf) {
-
 
         std::vector<longint> toSend;
 

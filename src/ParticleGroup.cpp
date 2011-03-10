@@ -15,23 +15,24 @@ namespace espresso {
                 (boost::bind(&ParticleGroup::onParticlesChanged, this));
     }
 
+
     ParticleGroup::~ParticleGroup() {
         con_send.disconnect();
         con_recv.disconnect();
         con_changed.disconnect();
     }
 
+
     void ParticleGroup::add(longint pid) {
         // check unique
         //particles[pid] = pid;
     	particles.insert(pid);
         Particle *p1 = storage->lookupRealParticle(pid);
-        if (p1)
-            active[pid] = p1;
+        if (p1) active[pid] = p1;
     }
 
-    // for debugging purpose
 
+    // for debugging purpose
     void ParticleGroup::print() {
         std::cout << "####### I have " << active.size() << " active particles" << std::endl;
         for(iterator i=begin(); i!=end(); ++i ) {
@@ -47,8 +48,8 @@ namespace espresso {
         std::cout << std::endl;
     }
 
-    void ParticleGroup::beforeSendParticles(ParticleList& pl,
-            class OutBuffer& buf) {
+
+    void ParticleGroup::beforeSendParticles(ParticleList& pl, class OutBuffer& buf) {
         // remove all particles that move to a different node
         for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
             longint pid = pit->id();
@@ -58,11 +59,10 @@ namespace espresso {
             if (p != active.end())
                 active.erase(p);
         }
-
     }
 
-    void ParticleGroup::afterRecvParticles(ParticleList& pl,
-            class InBuffer& buf) {
+
+    void ParticleGroup::afterRecvParticles(ParticleList& pl, class InBuffer& buf) {
         // add all particles that moved to this node
         for (ParticleList::Iterator pit(pl);
                 pit.isValid(); ++pit) {
@@ -75,6 +75,7 @@ namespace espresso {
                 active[pid] = NULL; // will be set in onchanged
         }
     }
+
 
     void ParticleGroup::onParticlesChanged() {
         std::map<longint, Particle*>::iterator p;
@@ -93,9 +94,8 @@ namespace espresso {
             active.erase(remove.front());
             remove.pop_front();
         }
-
-
     }
+
 
     void ParticleGroup::registerPython() {
 

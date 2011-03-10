@@ -318,11 +318,11 @@ namespace espresso {
   struct QuadrupleList
     : public esutil::ESPPContainer< std::vector< ParticleQuadruple > >
   {
-    void add(Particle *p1, Particle *p2, Particle *p3, Particle *p4) {
+    void add(Particle* p1, Particle* p2, Particle* p3, Particle* p4) {
         this->push_back(ParticleQuadruple(p1, p2, p3, p4));
     }
 
-    void add(Particle &p1, Particle &p2, Particle &p3, Particle &p4)
+    void add(Particle& p1, Particle& p2, Particle& p3, Particle& p4)
     { this->add(&p1, &p2, &p3, &p4); }
 
     void add(std::vector<Particle> particles) {
@@ -331,7 +331,29 @@ namespace espresso {
     }
   };
 
+    // tuples
+    class ParticleTuple
+       : public std::vector<class Particle*>
+    {
+    private:
+       typedef std::vector<class Particle*> Super;
+    public:
+       ParticleTuple()
+         : Super() {}
+       ParticleTuple(std::vector<Particle*> tuple)
+         : Super(tuple) {}
+    };
+
+
+    struct TupleList
+       : public esutil::ESPPContainer <std::vector<ParticleTuple> >
+    {
+       void add(std::vector<Particle*> particles) {
+           this->push_back(ParticleTuple(particles));
+       }
+    };
 }
+
 
 BOOST_IS_MPI_DATATYPE(espresso::ParticleProperties)
 BOOST_IS_MPI_DATATYPE(espresso::ParticlePosition)

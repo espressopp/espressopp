@@ -76,7 +76,6 @@ namespace espresso {
             }
 
         protected:
-
             // list of active particles
             // key: particle id, value: reference to local particle
             std::map<longint, Particle*> active;
@@ -95,9 +94,7 @@ namespace espresso {
 
             void beforeSendParticles(ParticleList& pl,
                     class OutBuffer& buf);
-
             void afterRecvParticles(ParticleList& pl,
-
                     class InBuffer& buf);
             void onParticlesChanged();
 
