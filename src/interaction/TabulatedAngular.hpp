@@ -19,7 +19,6 @@ namespace espresso {
              
                 TabulatedAngular() {
                     //setCutoff(infinity);
-                    LOG4ESPP_WARN(theLogger, "default TabulatedAngular potential will not work");
                 }
              
                 TabulatedAngular(int itype, const char* filename) {
@@ -38,25 +37,32 @@ namespace espresso {
                 }
              
                 real _computeEnergyRaw(real theta) const {
-                    return table->getEnergy(theta);
+                    if (table)
+                        return table->getEnergy(theta);
+                    else
+                        throw std::runtime_error("Tabulated potential table not available.");
                 }
              
                 void _computeForceRaw(Real3D& force12, Real3D& force32,
                                       const Real3D& dist12, const Real3D& dist32) const {
-                    real dist12_sqr = dist12 * dist12;
-                    real dist32_sqr = dist32 * dist32;
-                    real dist1232 = sqrt(dist12_sqr) * sqrt(dist32_sqr);
-                    real cos_theta = dist12 * dist32 / dist1232;
-                 
-                    real a = table->getForce(acos(cos_theta));
-                 
-                    real a11 = a * cos_theta / dist12_sqr;
-                    real a12 = -a / dist1232;
-                    real a22 = a * cos_theta / dist32_sqr;
-                 
-                    force12 = a11 * dist12 + a12 * dist32;
-                    force32 = a22 * dist32 + a12 * dist12;
-                 
+                    if (table) {
+                        real dist12_sqr = dist12 * dist12;
+                        real dist32_sqr = dist32 * dist32;
+                        real dist1232 = sqrt(dist12_sqr) * sqrt(dist32_sqr);
+                        real cos_theta = dist12 * dist32 / dist1232;
+
+                        real a = table->getForce(acos(cos_theta));
+
+                        real a11 = a * cos_theta / dist12_sqr;
+                        real a12 = -a / dist1232;
+                        real a22 = a * cos_theta / dist32_sqr;
+
+                        force12 = a11 * dist12 + a12 * dist32;
+                        force32 = a22 * dist32 + a12 * dist12;
+                    }
+                    else {
+                        throw std::runtime_error("Tabulated potential table not available.");
+                    }
                 }
              
                 real _computeForceRaw(real theta) const {
