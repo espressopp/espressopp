@@ -36,7 +36,10 @@ namespace espresso {
 
       void
       setPotential(int type1, int type2, const Potential &potential) {
-        potentialArray.at(type1, type2) = potential;
+          potentialArray.at(type1, type2) = potential;
+          if (type1 != type2) { // add potential in the other direction
+             potentialArray.at(type2, type1) = potential;
+          }
       }
 
       Potential &getPotential(int type1, int type2) {
