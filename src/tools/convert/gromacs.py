@@ -4,15 +4,19 @@ from operator import itemgetter # for sorting a dict
 
 
 """This Python module allows one to use GROMACS data files as the
-   input to an ESPResSo++ simulation. It can also convert GROMACS
-   tabulated potentials file into ESPResSo++ format"""
+   input to an ESPResSo++ simulation, set interactions for given
+   particle types and convert GROMACS potential tables into
+   ESPResSo++ tables.
+   It containts functions: read(), setInteractions(), convertTable()
+   """
 
-# read GORMACS data files
 def read(gro_file, top_file):
+    """ Read GROMACS data files.
 
-    # gro_file contains number of particles, positions, velocities and box size
-    # top_file contains topology information
-    # itp_files contains a list of included topology information
+    Keyword arguments:
+    gro_file -- contains coordinates of all particles, the number of particles, velocities and box size.
+    top_file -- contains topology information. Included topology files (.itp) are also read
+    """
 
     # read gro file
     if gro_file != "":
@@ -148,19 +152,7 @@ def read(gro_file, top_file):
                 print " "+line.strip('\n')
                 molecule_numbers.append(int(line.split()[1]))
             
-            ## find and store number of chains
-            #line = ''
-            #while not 'molecules' in line:
-                #line = f.readline()
-            #f.readline() # skip comment line
-            #num_chains = int(f.readline().split()[1])
-            #monomers = num_particles / num_chains
         f.close()
-        
-        #print bondtypes
-        #print angletypes
-        #print dihedraltypes
-        #exit()
         
         if len(itp_files) == 0: # itp contents can be in top file
             itp_files = [top_file]
@@ -185,7 +177,6 @@ def read(gro_file, top_file):
                 if not line: break # break out of while if EOF
             line = f.readline()
             while(len(line) != 1):
-                #print " current line: "+line.strip("\n")
                 if line[0] == ";":   # skip comment lines
                     #print "skipping line: "+line.strip("\n")
                     line = f.readline()
@@ -198,20 +189,14 @@ def read(gro_file, top_file):
             for i in range(num_chains):
                 types.extend(types_tmp)
             
-            #print len(types), types
-            #exit()
-            
             # find and store bonds
             line = ''
             while not 'bonds' in line:
                 line = f.readline()
                 if not line: break # break out of while if EOF
-            #bonds = []
             line = f.readline()
             while(len(line) != 1):
-                #print " current line: "+line.strip("\n")
                 if line[0] == ";":   # skip comment lines
-                    #print "skipping line: "+line.strip("\n")
                     line = f.readline()
                     continue
                 tmp = line.split()
@@ -232,39 +217,24 @@ def read(gro_file, top_file):
                 bonds_tmp.append((pid1 + ((monomers * num_chains) * (molecule-1)), \
                                    pid2 + ((monomers * num_chains) * (molecule-1)), pot))
                 line = f.readline()
-                
-            #print bonds_tmp
             
             # extend bonds to num_chains - 1 chains
             bonds_per_chain = len(bonds_tmp)
             for i in range(num_chains):
                 for j in range(bonds_per_chain):
                     pid1, pid2, pot = bonds_tmp[j][0:3]
-                    #pid2 = bonds_tmp[j][1]
-                    #bonds.append((pid1 + (i * monomers), \
-                                   #pid2 + (i * monomers)))
                     if pot in bonds:
                         bonds[pot].append((pid1 + (i * monomers), \
                                            pid2 + (i * monomers)))
                     else:
                         bonds.update({pot:[(pid1 + (i * monomers), \
                                             pid2 + (i * monomers))]})
-
-            #print "bonds len: "+str(len(bonds))
-            #print bonds_tmp[0]
-            #print bonds_tmp[bonds_per_chain-1]
-            #print bonds[0]
-            #print bonds[len(bonds)-1]
-            #print bonds
-            #exit()
             
             # find and store angles
             line = ''
             while not 'angles' in line:
                 line = f.readline()
                 if not line: break # break out of while if EOF
-            #angles = []
-            #f.readline() # skip comment line
             line = f.readline()
             while(len(line) != 1):
                 if line[0] == ";": # skip comment lines
@@ -289,20 +259,12 @@ def read(gro_file, top_file):
                                     pid2 + ((monomers * num_chains) * (molecule-1)), \
                                      pid3 + ((monomers * num_chains) * (molecule-1)), pot))
                 line = f.readline()
-                
-            #print angles_tmp
-            #exit()
             
             # extend angles to num_chains - 1 chains
             angles_per_chain = len(angles_tmp)
             for i in range(num_chains):
                 for j in range(angles_per_chain):
                     pid1, pid2, pid3, pot = angles_tmp[j][0:4]
-                    #pid2 = angles_tmp[j][1]
-                    #pid3 = angles_tmp[j][2]
-                    #angles.append((pid1 + (i * monomers), \
-                                    #pid2 + (i * monomers), \
-                                     #pid3 + (i * monomers)))
                     if pot in angles:
                         angles[pot].append((pid1 + (i * monomers), \
                                             pid2 + (i * monomers), \
@@ -346,19 +308,12 @@ def read(gro_file, top_file):
                                         pid3 + ((monomers * num_chains) * (molecule-1)), \
                                          pid4 + ((monomers * num_chains) * (molecule-1)), pot ))
                 line = f.readline()
-                
-            #print dihedrals_tmp
-            #exit()
-            
             
             # extend dihedrals to num_chains - 1 chains
             dihedrals_per_chain = len(dihedrals_tmp)
             for i in range(num_chains):
                 for j in range(dihedrals_per_chain):
                     pid1, pid2, pid3, pid4, pot = dihedrals_tmp[j][0:5]
-                    #pid2 = dihedrals_tmp[j][1]
-                    #pid3 = dihedrals_tmp[j][2]
-                    #pid4 = dihedrals_tmp[j][3]
                     if pot in dihedrals:
                         dihedrals[pot].append((pid1 + (i * monomers), \
                                                pid2 + (i * monomers), \
@@ -371,52 +326,6 @@ def read(gro_file, top_file):
                                                 pid4 + (i * monomers))]})
             
             f.close()
-        #exit()
-
-    #molecule = 0
-    #for num_chains in molecule_numbers:
-        #molecule += 1
-        #monomers = num_particles / num_chains
-        
-        ## extend bonds to num_chains - 1 chains
-        #bonds_per_chain = len(bonds)
-        #for i in range(num_chains - 1):
-            #for j in range(bonds_per_chain):
-                #pid1 = bonds[j][0]
-                #pid2 = bonds[j][1]
-                #bonds.append((pid1 + (i + 1) * monomers * molecule, \
-                              #pid2 + (i + 1) * monomers * molecule))
-        
-        ## extend angles to num_chains - 1 chains
-        #angles_per_chain = len(angles)
-        #for i in range(num_chains - 1):
-            #for j in range(angles_per_chain):
-                #pid1 = angles[j][0]
-                #pid2 = angles[j][1]
-                #pid3 = angles[j][2]
-                #angles.append((pid1 + (i + 1) * monomers * molecule, \
-                               #pid2 + (i + 1) * monomers * molecule, \
-                               #pid3 + (i + 1) * monomers * molecule))
-        
-        ## extend dihedrals to num_chains - 1 chains
-        #dihedrals_per_chain = len(dihedrals)
-        #for i in range(num_chains - 1):
-            #for j in range(dihedrals_per_chain):
-                #pid1 = dihedrals[j][0]
-                #pid2 = dihedrals[j][1]
-                #pid3 = dihedrals[j][2]
-                #pid4 = dihedrals[j][3]
-                #dihedrals.append((pid1 + (i + 1) * monomers * molecule, \
-                                  #pid2 + (i + 1) * monomers * molecule, \
-                                  #pid3 + (i + 1) * monomers * molecule, \
-                                  #pid4 + (i + 1) * monomers * molecule))
-
-    #if len(angles) != 0 and len(dihedrals) == 0:
-        #return types, bonds, angles, x, y, z, Lx, Ly, Lz
-    #elif len(dihedrals) != 0:
-        #return types, bonds, angles, dihedrals, x, y, z, Lx, Ly, Lz
-    #else:
-        #return types, bonds, x, y, z, Lx, Ly, Lz
 
     params = []
     if len(types) != 0:
@@ -432,18 +341,21 @@ def read(gro_file, top_file):
 
 
 
-# Set interactions for all given particle types.
-#  "potentials" is a dictionary where key is a string composed
-#   of two particle types and value is a potential.
-#    example: {"A_A":potAA, "A_B":potAB, "B_B":potBB}
-#  "particleTypes" is a dictionary where key is the particle type, and
-#  value is a list of particles of that type.
-#    example: {"A":["A1m", "A2m"],"B":["B1u","B2u"]}
-#  "system" is the system to which the interaction will be added
-#  "interaction" is the interaction to which to add the potentials
-# Return value is a system with all interactions added.
+
 def setInteractions(potentials, particleTypes, system, interaction):
-    
+    """Set interactions for all given particle types.
+    Return value is a system with all interactions added.
+
+    Keyword arguments:
+    potentials -- is a dictionary where key is a string composed
+    of two particle types and value is a potential.
+    example: {"A_A":potAA, "A_B":potAB, "B_B":potBB}
+    particleTypes -- is a dictionary where key is the particle type, and
+    value is a list of particles of that type.
+    example: {"A":["A1m", "A2m"],"B":["B1u","B2u"]}
+    system -- is the system to which the interaction will be added
+    interaction -- is the interaction to which to add the potentials
+    """
     allparticles = []
     for k, v in particleTypes.iteritems():
         for i in v:
@@ -461,14 +373,24 @@ def setInteractions(potentials, particleTypes, system, interaction):
 
 
 
-# Convert GROMACS tabulated file into
-#  ESPResSo++ tabulated file (new file is created).
-# First column can be either distance or angle.
-# Sigma and epsilon are optional, depending on whether you want
-#  to convert units or not.
-# For non-bonded files, c6 and c12 can be provided. Electrostatics
-#  are not taken into account (f and fd columns).
+
 def convertTable(gro_in_file, esp_out_file, sigma=1.0, epsilon=1.0, c6=1.0, c12=1.0):
+    """Convert GROMACS tabulated file into ESPResSo++ tabulated file (new file
+    is created). First column of input file can be either distance or angle.
+    For non-bonded files, c6 and c12 can be provided. Default value for sigma, epsilon,
+    c6 and c12 is 1.0. Electrostatics are not taken into account (f and fd columns).
+    
+    Keyword arguments:
+    gro_in_file -- the GROMACS tabulated file name (bonded, nonbonded, angle
+    or dihedral).
+    esp_out_file -- filename of the ESPResSo++ tabulated file to be written.
+    sigma -- optional, depending on whether you want to convert units or not.
+    epsilon -- optional, depending on whether you want to convert units or not.
+    c6 -- optional
+    c12 -- optional
+    """
+
+    
 
     # determine file type
     bonded, angle, dihedral = False, False, False
@@ -514,8 +436,8 @@ def convertTable(gro_in_file, esp_out_file, sigma=1.0, epsilon=1.0, c6=1.0, c12=
             
             columns = line.split()
             r = float(columns[0])
-            #f = float(columns[1]) # electrostatics, not implemented yet
-            #fd= float(columns[2]) # not implemented yet
+            #f = float(columns[1]) # electrostatics not implemented yet
+            #fd= float(columns[2]) # electrostatics not implemented yet
             g = float(columns[3]) # dispersion
             gd= float(columns[4])
             h = float(columns[5]) # repulsion
