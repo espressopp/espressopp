@@ -29,7 +29,7 @@ timestep = 0.01
 ######################################################################
 sys.stdout.write('Setting up simulation ...\n')
 bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read('espressopp_polymer_melt.start')
-bonds, angles, x, y, z, Lx, Ly, Lz = replicate.replicate(bonds, angles, x, y, z, Lx, Ly, Lz, xdim=3, ydim=3, zdim=3)
+bonds, angles, x, y, z, Lx, Ly, Lz = replicate.replicate(bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1)
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
