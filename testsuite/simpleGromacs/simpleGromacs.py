@@ -19,7 +19,7 @@ from espresso.tools import timers
 
 
 # simulation parameters (nvt = False is nve)
-steps = 3000
+steps = 1000
 check = 6   # how many times to display energies during run
 rc   = 1.5  # Verlet list cutoff
 rcaa = 2.5  # cutoff A-A
@@ -32,16 +32,19 @@ timestep = 0.001
 tabAAg = "table_A_A.xvg"        # non-bonded
 tabABg = "table_A_B.xvg"
 tabBBg = "table_B_B.xvg"
+
 tab2bg = "table_b1.xvg"         # 2-body bonded
 tab3bg = "table_a1.xvg"         # 3-body bonded
 spline = 2                      # spline interpolation type (1, 2, 3)
+
+
 
 # parameters to convert GROMACS tabulated potential file
 tabAA = "table_A_A.tab"         # output file names
 tabAB = "table_A_B.tab"
 tabBB = "table_B_B.tab"
 tab2b = "table_b1.tab" 
-tab3b = "table_a1.tab" 
+tab3b = "table_a1.tab"
 sigma = 1.0
 epsilon = 1.0
 c6 = 1.0
@@ -53,17 +56,16 @@ topfile = "topol.top"
 
 
 
+
 ######################################################################
 ##  IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE  ##
 ######################################################################
-sys.stdout.write('Setting up simulation ...\n')
 types, bonds, angles, x, y, z, Lx, Ly, Lz = gromacs.read(grofile, topfile)
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 
-#exit()
-
+sys.stdout.write('Setting up simulation ...\n')
 system = espresso.System()
 system.rng = espresso.esutil.RNG()
 system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
@@ -91,41 +93,34 @@ gromacs.convertTable(tab3bg, tab3b, sigma, epsilon, c6, c12)
 
 
 
+# non-bonded interactions, B is type 0, A is type 1
 # Verlet list
 vl = espresso.VerletList(system, cutoff = rc + system.skin)
-
-# B is type 0, A is type 1
-
+vl.exclude(bonds['1']) # intramolecular
+internb = espresso.interaction.VerletListTabulated(vl)
 # A-A with Verlet list      
 potTab = espresso.interaction.Tabulated(itype=spline, filename=tabAA, cutoff=rcaa)
-interaa = espresso.interaction.VerletListTabulated(vl)
-interaa.setPotential(type1 = 1, type2 = 1, potential = potTab)
-system.addInteraction(interaa)
-
+internb.setPotential(type1 = 1, type2 = 1, potential = potTab)
 # A-B with Verlet list      
 potTab = espresso.interaction.Tabulated(itype=spline, filename=tabAB, cutoff=rcab)
-interab = espresso.interaction.VerletListTabulated(vl)
-interab.setPotential(type1 = 1, type2 = 0, potential = potTab)
-system.addInteraction(interab)
-
+internb.setPotential(type1 = 1, type2 = 0, potential = potTab)
 # B-B with Verlet list      
 potTab = espresso.interaction.Tabulated(itype=spline, filename=tabBB, cutoff=rcbb)
-interbb = espresso.interaction.VerletListTabulated(vl)
-interbb.setPotential(type1 = 0, type2 = 0, potential = potTab)
-system.addInteraction(interbb)
+internb.setPotential(type1 = 0, type2 = 0, potential = potTab)
+system.addInteraction(internb)
 
 
 
 # 2-body bonded interactions
 fpl = espresso.FixedPairList(system.storage)
-fpl.addBonds(bonds)
+fpl.addBonds(bonds['1'])
 potTab = espresso.interaction.Tabulated(itype=spline, filename=tab2b)
 interb = espresso.interaction.FixedPairListTabulated(system, fpl, potTab)
 system.addInteraction(interb)
 
 # 3-body bonded interactions
 ftl = espresso.FixedTripleList(system.storage)
-ftl.addTriples(angles)
+ftl.addTriples(angles['1'])
 potTab = espresso.interaction.TabulatedAngular(itype=spline, filename = tab3b)
 intera = espresso.interaction.FixedTripleListTabulatedAngular(system, ftl, potTab)
 system.addInteraction(intera)
@@ -165,20 +160,21 @@ temperature = espresso.analysis.Temperature(system)
 pressure = espresso.analysis.Pressure(system)
 pressureTensor = espresso.analysis.PressureTensor(system)
 
-fmt = '%5d %8.4f %11.4f %11.4f %12.3f %12.3f %12.3f %12.3f %12.3f %12.3f %12.3f\n'
+fmt = '%5d %8.4f %11.4f %11.4f %12.3f %12.3f %12.3f %12.3f %12.3f\n'
 
 T = temperature.compute()
 P = pressure.compute()
 Pij = pressureTensor.compute()
 Ek = 0.5 * T * (3 * num_particles)
-Epaa = interaa.computeEnergy()
-Epab = interab.computeEnergy()
-Epbb = interbb.computeEnergy()
+#Epaa = interaa.computeEnergy()
+#Epab = interab.computeEnergy()
+#Epbb = interbb.computeEnergy()
+Epnb = internb.computeEnergy()
 Eb = interb.computeEnergy()
 Ea = intera.computeEnergy()
-Etotal = Ek + Epaa + Epab + Epbb + Eb + Ea
-sys.stdout.write(' step     T          P          Pxy        etotal      ekinetic      epairAA      epairAB      epairBB        ebond       eangle\n')
-sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Epaa, Epab, Epbb, Eb, Ea))
+Etotal = Ek + Epnb + Eb + Ea
+sys.stdout.write(' step     T          P          Pxy        etotal      ekinetic      epair        ebond       eangle\n')
+sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Epnb, Eb, Ea))
 
 start_time = time.clock()
 
@@ -188,13 +184,11 @@ for i in range(check):
     P = pressure.compute()
     Pij = pressureTensor.compute()
     Ek = 0.5 * T * (3 * num_particles)
-    Epaa = interaa.computeEnergy()
-    Epab = interab.computeEnergy()
-    Epbb = interbb.computeEnergy()
+    Epnb = internb.computeEnergy()
     Eb = interb.computeEnergy()
     Ea = intera.computeEnergy()
-    Etotal = Ek + Epaa + Epab + Epbb + Eb + Ea
-    sys.stdout.write(fmt % ((i+1)*(steps/check), T, P, Pij[3], Etotal, Ek, Epaa, Epab, Epbb, Eb, Ea))
+    Etotal = Ek + Epnb + Eb + Ea
+    sys.stdout.write(fmt % ((i+1)*(steps/check), T, P, Pij[3], Etotal, Ek, Epnb, Eb, Ea))
     #sys.stdout.write('\n')
 
 # print timings and neighbor list information
