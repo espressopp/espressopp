@@ -14,24 +14,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 enable_language(C)
 enable_language(CXX)
 
-
-######################################################################
-# cpack seetings
-#####################################################################
-set(CPACK_CMAKE_GENERATOR "Unix Makefiles")
-set(CPACK_GENERATOR "")
-set(CPACK_SOURCE_GENERATOR "TGZ")
-set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
-set(CPACK_PACKAGE_VENDOR "espresso-pp.de")
-set(CPACK_SOURCE_PACKAGE_FILE_NAME "${PROJECT_NAME}-${PROJECT_VERSION}")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "ESPResSo++ is a highly versatile software package for the scientific simulation ")
-set(CPACK_SOURCE_IGNORE_FILES ".*~;/\\\\.hg/;\\\\.hgignore;/CMakeFiles/;CMakeCache\\\\.txt$;cmake_install\\\\.cmake$;CPack.*\\\\.cmake$;Makefile$;ESPRC$")
-if (EXTERNAL_BOOST)
-  set(CPACK_SOURCE_IGNORE_FILES "${CPACK_SOURCE_IGNORE_FILES};contrib/boost/")
-endif (EXTERNAL_BOOST)
-include(CPack)
-
-
 ######################################################################
 # compiler tests
 # these need ot be done early (before further tests).
@@ -52,6 +34,11 @@ if(NOT BUILD_STANDALONE AND NOT BUILD_PYTHON_MODULE)
   message(FATAL_ERROR "You need to enable pypresso or the python module")
 endif(NOT BUILD_STANDALONE AND NOT BUILD_PYTHON_MODULE)
 
+IF(NOT CMAKE_BUILD_TYPE)
+  SET(CMAKE_BUILD_TYPE Release CACHE STRING
+      "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+      FORCE)
+ENDIF(NOT CMAKE_BUILD_TYPE)
 
 ########################################################################
 #Process MPI settings

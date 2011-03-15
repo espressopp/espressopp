@@ -1,6 +1,7 @@
 import espresso
 from espresso import Int3D, Real3D
 from espresso.tools.init_cfg import lattice
+import random
 
 rho          = 0.8442
 num_particles= 20**3
@@ -9,15 +10,14 @@ rc           = 2.5
 epsilon      = 1.0
 sigma        = 1.0
 shift        = False
-dt           = 0.005
+dt           = 0.01
 gamma        = 1.0
 temperature1 = 1.0
 temperature2 = 1.0
 nodeGrid     = Int3D(2,1,1)
 cellGrid     = Int3D(3,3,3)
-rng=espresso.esutil.RNG()
-x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False, RNG=rng)
-size = (Lx, Ly, Lz)
+# rng=espresso.esutil.RNG()
+# x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False, RNG=rng)
 
 multisystem = espresso.MultiSystem()
 
@@ -27,6 +27,11 @@ multisystem = espresso.MultiSystem()
 comm1=espresso.pmi.Communicator([0,1])
 espresso.pmi.activate(comm1)
 multisystem.beginSystemDefinition()
+
+random.seed(12345)
+rand1=random.random()
+x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False, RNG=rand1)
+size = (Lx, Ly, Lz)
 
 system1         = espresso.System()
 rng1            = espresso.esutil.RNG()
@@ -64,6 +69,11 @@ comm2=espresso.pmi.Communicator([2,3])
 espresso.pmi.activate(comm2)
 multisystem.beginSystemDefinition()
 
+random.seed(54321)
+rand2=random.random()
+x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False, RNG=rand2)
+size = (Lx, Ly, Lz)
+
 system2         = espresso.System()
 rng2            = espresso.esutil.RNG()
 bc2             = espresso.bc.OrthorhombicBC(rng2, size)
@@ -98,7 +108,7 @@ print "Potential Energy of system2 is ", multisystem.runAnalysisPotential()[2]
 print "Temperature of system1 is ", multisystem.runAnalysisTemperature()[0]
 print "Temperature of system2 is ", multisystem.runAnalysisTemperature()[2]
 
-multisystem.runIntegrator(100)
+multisystem.runIntegrator(1000)
 
 print "Potential Energy of system1 is ", multisystem.runAnalysisPotential()[0]
 print "Potential Energy of system2 is ", multisystem.runAnalysisPotential()[2]
