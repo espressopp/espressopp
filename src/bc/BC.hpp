@@ -61,7 +61,6 @@ namespace espresso {
       /** Compute the minimum image distance where the distance
           is given by two positions in the box.
       */
-
       virtual void
       getMinimumDistance(Real3D& dist) const = 0;
 

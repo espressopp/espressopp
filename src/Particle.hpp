@@ -31,40 +31,38 @@ namespace espresso {
   };
 
   /**
-   * \brief position like properties
+   * \brief position-like properties
    *
    * This class contains all properties of a particle that behave like
-   * positions. Further extensions might be orientations. This is usefule
+   * positions. Further extensions might be orientations. This is useful
    * to classify how properties behave e.g. on communication.
    */
   struct ParticlePosition {
 
     Real3D p;
 
-    void copyShifted(ParticlePosition &dst, const Real3D& shift) const {
+    void copyShifted(ParticlePosition& dst, const Real3D& shift) const {
       dst.p = p + shift;
     }
-
   private:
     friend class boost::serialization::access;
     template< class Archive >
-    void serialize(Archive &ar, const unsigned int version)
-    {
+    void serialize(Archive &ar, const unsigned int version) {
       for (int i = 0; i < 3; ++i)
-	ar & p[i];
+        ar & p[i];
     }
   };
 
-   /**
-   * \brief force like properties
+
+  /**
+   * \brief force-like properties
    *
    * This class contains all properties of a particle that behave like
-   * forces. Further extensions might contain torques. This is usefule
+   * forces. Further extensions might contain torques. This is useful
    * to classify how properties behave e.g. on communication.
    * Important: combiner operatior += must be available
    * to combine results of ghosts with real particles.
    */
-
   struct ParticleForce {
 
     Real3D f;
@@ -73,56 +71,51 @@ namespace espresso {
 	(typically used between a real particle and its
 	ghost image(s))
     */
-
     ParticleForce& operator+=(const ParticleForce& otherF) {
       f += otherF.f;
       return *this;
     }
-
   private:
     friend class boost::serialization::access;
     template< class Archive >
-    void serialize(Archive &ar, const unsigned int version)
-    {
+    void serialize(Archive &ar, const unsigned int version){
       for (int i = 0; i < 3; ++i)
-	ar & f[i];
+        ar & f[i];
     }
   };
 
-   /**
-   * \brief momentum like properties
+
+  /**
+   * \brief momentum-like properties
    *
    * This class contains all properties of a particle that behave like
-   * a momentum. Further extensions might contain angular momentum. This is usefule
+   * a momentum. Further extensions might contain angular momentum. This is useful
    * to classify how properties behave e.g. on communication.
    */
   struct ParticleMomentum {
 
     Real3D v;
-
   private:
     friend class boost::serialization::access;
     template< class Archive >
-    void serialize(Archive &ar, const unsigned int version)
-    {
+    void serialize(Archive &ar, const unsigned int version) {
       for (int i = 0; i < 3; ++i)
-	ar & v[i];
+        ar & v[i];
     }
   };
+
 
   struct ParticleLocal {
 
     // the image of the particle
     Int3D i;
     bool ghost;
-
   private:
     friend class boost::serialization::access;
     template< class Archive >
-    void serialize(Archive &ar, const unsigned int version)
-    {
+    void serialize(Archive &ar, const unsigned int version) {
       for (int ii = 0; ii < 3; ++ii)
-	ar & i[ii];
+        ar & i[ii];
       ar & ghost;
     }
   };
@@ -222,7 +215,6 @@ namespace espresso {
     }
 
   private:
-
     ParticleProperties p;
     ParticlePosition r;
     ParticleMomentum m;
@@ -265,7 +257,7 @@ namespace espresso {
     void add(Particle &p1, Particle &p2) 
     { this->add(&p1, &p2); }
 
-    void add(std::vector<Particle> particles) {
+    void add(std::vector<Particle*> particles) {
         this->add(particles.at(0), particles.at(1));
     }
   };
@@ -294,7 +286,7 @@ namespace espresso {
     void add(Particle &p1, Particle &p2, Particle &p3)
     { this->add(&p1, &p2, &p3); }
 
-    void add(std::vector<Particle> particles) {
+    void add(std::vector<Particle*> particles) {
         this->add(particles.at(0), particles.at(1), particles.at(2));
     }
   };
@@ -325,7 +317,7 @@ namespace espresso {
     void add(Particle& p1, Particle& p2, Particle& p3, Particle& p4)
     { this->add(&p1, &p2, &p3, &p4); }
 
-    void add(std::vector<Particle> particles) {
+    void add(std::vector<Particle*> particles) {
         this->add(particles.at(0), particles.at(1),
                 particles.at(2), particles.at(3));
     }

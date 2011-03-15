@@ -69,12 +69,12 @@ namespace espresso {
 
     inline void Storage::updateInLocalParticles(Particle *p, bool weak) {
       if (!weak || localParticles.find(p->id()) == localParticles.end()) {
-	LOG4ESPP_TRACE(logger, "updating local pointer for particle id="
+          LOG4ESPP_TRACE(logger, "updating local pointer for particle id="
 		       << p->id() << " @ " << p);
-	localParticles[p->id()] = p;
+          localParticles[p->id()] = p;
       }
       else {
-	LOG4ESPP_TRACE(logger, "NOT updating local pointer for particle id="
+          LOG4ESPP_TRACE(logger, "NOT updating local pointer for particle id="
 		       << p->id() << " @ " << p << " has already pointer @ "
 		       << localParticles[p->id()]);
       }
@@ -82,7 +82,7 @@ namespace espresso {
 
     void Storage::updateLocalParticles(ParticleList &list) {
       for (ParticleList::Iterator it(list); it.isValid(); ++it) {
-	updateInLocalParticles(&(*it));
+        updateInLocalParticles(&(*it));
       }
     }
 
@@ -92,7 +92,7 @@ namespace espresso {
       for (LocalCellList::iterator
 	     it = cells.begin(),
 	     end = cells.end(); it != end; ++it) {
-	localCells.push_back(&(*it));
+        localCells.push_back(&(*it));
       }
     }
 
@@ -190,14 +190,14 @@ namespace espresso {
 
       for (CellListIterator it(old.getRealCells());
 	   it.isValid(); ++it) {
-	Particle &part = *it;
-	Cell *nc = mapPositionToCellClipped(part.position());
-	appendUnindexedParticle(nc->particles, part);
+          Particle &part = *it;
+          Cell *nc = mapPositionToCellClipped(part.position());
+          appendUnindexedParticle(nc->particles, part);
       }
 
       // update localParticles
       for(CellList::Iterator it(realCells); it.isValid(); ++it) {
-	updateLocalParticles((*it)->particles);
+        updateLocalParticles((*it)->particles);
       }
     }
 
@@ -210,8 +210,8 @@ namespace espresso {
       int size = list.size();
       data.write(size);
       for (ParticleList::Iterator it(list); it.isValid(); ++it) {
-	removeFromLocalParticles(&(*it));
-	data.write(*it);
+          removeFromLocalParticles(&(*it));
+          data.write(*it);
       }
 
       beforeSendParticles(list, data);
@@ -241,13 +241,13 @@ namespace espresso {
       LOG4ESPP_DEBUG(logger, "got " << size << " particles, have " << curSize);
 
       if (size > 0) {
-	list.resize(curSize + size);
+        list.resize(curSize + size);
 
-	for (int i = 0; i < size; ++i) {
-	  Particle *p = &list[curSize + i];
-	  data.read(*p);
-	  updateInLocalParticles(p);
-	}
+        for (int i = 0; i < size; ++i) {
+          Particle *p = &list[curSize + i];
+          data.read(*p);
+          updateInLocalParticles(p);
+        }
       }
       afterRecvParticles(list, data);
 

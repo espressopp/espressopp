@@ -203,25 +203,4 @@ namespace espresso {
         }
         LOG4ESPP_INFO(theLogger, "regenerated local fixed list from global tuples");
     }
-
-
-
-
-
-  /****************************************************
-  ** REGISTRATION WITH PYTHON
-  ****************************************************/
-  /*
-  void FixedTupleList::registerPython() {
-
-    using namespace espresso::python;
-
-    bool (FixedTupleList::*pyAdd)(pvec pids)
-      = &FixedTupleList::add;
-
-    class_< FixedTupleList, shared_ptr <FixedTupleList> >
-      ("FixedTupleList", init <shared_ptr <storage::Storage> >())
-      .def("add", pyAdd)
-      ;
-  }*/
 }

@@ -50,13 +50,14 @@ namespace espresso {
 
       /// get number of real particles on this node
       longint getNRealParticles() const;
+
       /** insert the particles in the given storage into the current one.
 	  This is mainly used to switch from one storage to another.
       */
       void fetchParticles(Storage &);
 
       CellList &getLocalCells() { return localCells; }
-      CellList &getRealCells()  { return realCells; }
+      CellList &getRealCells()  { return realCells;  }
       CellList &getGhostCells() { return ghostCells; }
 
       const Cell* getFirstCell() const { return &(cells[0]); }
@@ -65,6 +66,7 @@ namespace espresso {
 	  is outside the domain of this node, return the cell inside the
 	  domain that is closest to the position. */
       virtual Cell* mapPositionToCellClipped(const Real3D& pos) = 0;
+
       /** map a position to a cell on this node.  If the position is
 	  outside the domain of this node, return 0. */
       virtual Cell* mapPositionToCellChecked(const Real3D& pos) = 0;
@@ -81,7 +83,7 @@ namespace espresso {
 	  updateGhosts() whenever a particle might have moved more
 	  than a given skin. The skin is not an issue of the storage,
 	  but all algorithms using the particle data need to be aware
-	  that particles might located up to skin away from their
+	  that particles might be located up to skin away from their
 	  current cell.
       */
       void decompose();
@@ -111,7 +113,6 @@ namespace espresso {
 	  lookupLocalParticle() and lookupRealParticle().
        */
       boost::signals2::signal0 <void> onParticlesChanged;
-
       boost::signals2::signal2 <void, ParticleList&, class OutBuffer&> 
         beforeSendParticles;
       boost::signals2::signal2 <void, ParticleList&, class InBuffer&> 
@@ -194,6 +195,7 @@ namespace espresso {
 	  The particles are not removed from localParticles!
       */
       void sendParticles(ParticleList &, longint node);
+
       /** receive particles from another node. The particles are added
 	  to the given cell. The operation is blocking: the
 	  operation will wait until the particles have been received.
@@ -208,12 +210,14 @@ namespace espresso {
 
       // update the id->local particle map for the given cell
       void updateLocalParticles(ParticleList &);
+
       /* remove this particle from local particles.  If weak is true,
 	 the information is only removed if the pointer is actually at
 	 the current position. This is used for ghosts, which should
 	 not overwrite real particle pointers.
        */
       void removeFromLocalParticles(Particle*, bool weak = false);
+
       /* update information for this particle from local particles. If weak is true,
 	 the information is only updated if no information is present yet. This is used
 	 for ghosts, which should not overwrite real particle pointers.
@@ -243,7 +247,7 @@ namespace espresso {
       static LOG4ESPP_DECL_LOGGER(logger);
 
     private:
-      /// map particle id to Particle * for all particles on this node
+      // map particle id to Particle * for all particles on this node
       boost::unordered_map<longint, Particle * > localParticles;
     };
   }

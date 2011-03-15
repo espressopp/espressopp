@@ -23,7 +23,7 @@ from espresso.tools.init_cfg import lattice
 from espresso.tools import timers
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
-steps = 1000
+steps = 100
 rc = 2.5
 skin = 0.3
 nvt = False
@@ -41,8 +41,8 @@ if(init_cfg == 1):
 elif(init_cfg == 2):
   # cubic lattice with user-defined values of N and rho
   # num_particles should be a perfect cube (e.g. 25**3=15625, 32**3=32768)
-  num_particles = 20**3
-  rho = 0.8442
+  num_particles = 3**3 # 20**3
+  rho = 0.8442 # density
   x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False)
 else:
   sys.stdout.write('init_cfg invalid: ' + str(init_cfg) + '. Exiting ...\n')
@@ -92,6 +92,7 @@ system.storage.decompose()
 
 # all particles interact via a LJ interaction (use Verlet lists)
 vl = espresso.VerletList(system, cutoff=rc+system.skin)
+vl.exclude([(1,2),(20, 15),(7, 10)])
 
 potLJ = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=False)
 #potLJ = espresso.interaction.SoftCosine(A=1.0, cutoff=rc, shift=False)

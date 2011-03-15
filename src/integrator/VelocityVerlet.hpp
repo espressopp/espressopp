@@ -57,7 +57,7 @@ namespace espresso {
 
         void printForces(bool withGhost);
 
-        void setUp();   //<! set up for a new run
+        void setUp();   //!< set up for a new run
 
         void resetTimers();
 

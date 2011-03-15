@@ -79,7 +79,7 @@ namespace espresso {
         LOG4ESPP_INFO(theLogger, "recalc Forces");
 
         if (langevin) langevin->heatUp();
-        updateForces();
+            updateForces();
         if (LOG4ESPP_DEBUG_ON(theLogger)) {
             // printForces(false);   // forces are reduced to real particles
         }
@@ -93,7 +93,7 @@ namespace espresso {
       for (int i = 0; i < nsteps; i++) {
 
         LOG4ESPP_INFO(theLogger, "Next step " << i << " of " << nsteps << " starts");
-    
+
             time = timeIntegrate.getElapsedTime();
             maxDist += integrate1();
             timeInt1 += timeIntegrate.getElapsedTime() - time;
@@ -117,7 +117,7 @@ namespace espresso {
         time = timeIntegrate.getElapsedTime();
         integrate2();
         timeInt2 += timeIntegrate.getElapsedTime() - time;
-      } // for nsteps loop
+      }
 
       timeRun = timeIntegrate.getElapsedTime();
       timeLost = timeRun - (timeForceComp[0] + timeForceComp[1] + timeForceComp[2] +
