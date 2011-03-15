@@ -65,6 +65,13 @@ namespace espresso {
   
     if (distsq > cutsq) return;
     
+    // see if it's in the exclusion list
+    if (exList.count(std::make_pair(pt1.id(), pt2.id())) == 1) {
+        std::cout << "particles " << pt1.id() << "," << pt2.id() << " excluded\n";
+
+        return;
+    }
+
     myList.add(pt1, pt2);
   }
   
@@ -79,7 +86,20 @@ namespace espresso {
     mpi::all_reduce(*system.comm, size, allsize, std::plus<int>());
     return allsize;
   }
+
+
+  bool VerletList::exclude(longint pid1, longint pid2) {
+
+      exList.insert(std::make_pair(pid1, pid2));
+
+      // broadcast exList to all nodes
+      //TODO
+
+      return true;
+  }
   
+
+
   /*-------------------------------------------------------------*/
   
   VerletList::~VerletList()
@@ -98,11 +118,15 @@ namespace espresso {
   void VerletList::registerPython() {
     using namespace espresso::python;
 
+    bool (VerletList::*pyExclude)(longint pid1, longint pid2)
+          = &VerletList::exclude;
+
     class_<VerletList, shared_ptr<VerletList> >
       ("VerletList", init< shared_ptr<System>, real >())
       .add_property("system", &SystemAccess::getSystem)
       .add_property("builds", &VerletList::getBuilds, &VerletList::setBuilds)
       .def("totalSize", &VerletList::totalSize)
+      .def("exclude", pyExclude)
       ;
   }
 

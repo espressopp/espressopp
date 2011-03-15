@@ -39,6 +39,9 @@ namespace espresso {
     /** Get the total number of pairs for the Verlet list */
     int totalSize() const;
 
+    /** Add pairs to exclusion list */
+    bool exclude(longint pid1, longint pid2);
+
     /** Get the number of times the Verlet list has been rebuilt */
     int getBuilds() const { return builds; }
 
@@ -52,6 +55,7 @@ namespace espresso {
 
     void checkPair(Particle &pt1, Particle &pt2);
     PairList myList;
+    std::set<std::pair<longint, longint> > exList; // exclusion list
     real cutsq;
     int builds;
     boost::signals2::connection connectionResort;
