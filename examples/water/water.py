@@ -57,8 +57,14 @@ system.storage.addParticles(new_particles, *props)
 system.storage.decompose()
 
 
+# make list of H-H bonds
+bondsHH = []
+for i in range(1, num_particles - 1, 3):
+  bondsHH.append((i+1, i+2))
+
 # Lennard-Jones with Verlet list
 vl = espresso.VerletList(system, cutoff=rc+system.skin)
+vl.exclude(bondsHH)
 potLJ1 = espresso.interaction.LennardJones(epsilon=0.16, sigma=3.2, cutoff=rc, shift=False)
 potLJ2 = espresso.interaction.LennardJones(epsilon=0.00, sigma=0.0, cutoff=rc, shift=False)
 potLJ3 = espresso.interaction.LennardJones(epsilon=0.10, sigma=1.0, cutoff=rc, shift=False)
@@ -71,6 +77,8 @@ system.addInteraction(interLJ)
 
 # Truncated Coulomb with Verlet list
 vl = espresso.VerletList(system, cutoff=rc+system.skin)
+vl.exclude(bondsHH) 
+vl.exclude(bonds) # intramolecular
 potTC1 = espresso.interaction.CoulombTruncated(qq=0.84*0.84, cutoff=rc, shift=False)
 potTC2 = espresso.interaction.CoulombTruncated(qq=-0.84*0.42, cutoff=rc, shift=False)
 potTC3 = espresso.interaction.CoulombTruncated(qq=0.42*0.42, cutoff=rc, shift=False)
@@ -99,39 +107,37 @@ system.addInteraction(interAngHar)
 
 
 
-# subtract out intramolecular Truncated Coulomb between O-H
-fpl = espresso.FixedPairList(system.storage)
-fpl.addBonds(bonds)
-potTC_subtract = espresso.interaction.CoulombTruncated(qq=0.84*0.42, cutoff=rc, shift=False)
-interTC_subtract = espresso.interaction.FixedPairListCoulombTruncated(system, fpl, potTC_subtract)
-#interTC_subtract.setPotential(type1=1, type2=2, potential=potTC_subtract)
-system.addInteraction(interTC_subtract)
+## subtract out intramolecular Truncated Coulomb between O-H
+#fpl = espresso.FixedPairList(system.storage)
+#fpl.addBonds(bonds)
+#potTC_subtract = espresso.interaction.CoulombTruncated(qq=0.84*0.42, cutoff=rc, shift=False)
+#interTC_subtract = espresso.interaction.FixedPairListCoulombTruncated(system, fpl, potTC_subtract)
+##interTC_subtract.setPotential(type1=1, type2=2, potential=potTC_subtract)
+#system.addInteraction(interTC_subtract)
 
 
 
-# make list of H-H bonds
-bondsHH = []
-for i in range(1, num_particles - 1, 3):
-  bondsHH.append((i+1, i+2))
+## make list of H-H bonds
+#bondsHH = []
+#for i in range(1, num_particles - 1, 3):
+  #bondsHH.append((i+1, i+2))
 
+## subtract out intramolecular Lennard-Jones between H-H
+#fpl = espresso.FixedPairList(system.storage)
+#fpl.addBonds(bondsHH)
+#potLJ_subtract = espresso.interaction.LennardJones(epsilon=-0.10, sigma=1.0, cutoff=rc, shift=False)
+## CORRECT ? : fpl contains only particles of type (2, 2)
+#interLJ_subtract = espresso.interaction.FixedPairListLennardJones(system, fpl, potLJ_subtract)
+##interLJ_subtract.setPotential(type1=2, type2=2, potential=potLJ_subtract)
+#system.addInteraction(interLJ_subtract)
 
-
-# subtract out intramolecular Lennard-Jones between H-H
-fpl = espresso.FixedPairList(system.storage)
-fpl.addBonds(bondsHH)
-potLJ_subtract = espresso.interaction.LennardJones(epsilon=-0.10, sigma=1.0, cutoff=rc, shift=False)
-# CORRECT ? : fpl contains only particles of type (2, 2)
-interLJ_subtract = espresso.interaction.FixedPairListLennardJones(system, fpl, potLJ_subtract)
-#interLJ_subtract.setPotential(type1=2, type2=2, potential=potLJ_subtract)
-system.addInteraction(interLJ_subtract)
-
-# subtract out intramolecular Truncated Coulomb between H-H
-fpl = espresso.FixedPairList(system.storage)
-fpl.addBonds(bondsHH)
-potTC_subtract = espresso.interaction.CoulombTruncated(qq=-0.42*0.42, cutoff=rc, shift=False)
-interTC_subtract = espresso.interaction.FixedPairListCoulombTruncated(system, fpl, potTC_subtract)
-#interTC_subtract.setPotential(type1=2, type2=2, potential=potTC_subtract)
-system.addInteraction(interTC_subtract)
+## subtract out intramolecular Truncated Coulomb between H-H
+#fpl = espresso.FixedPairList(system.storage)
+#fpl.addBonds(bondsHH)
+#potTC_subtract = espresso.interaction.CoulombTruncated(qq=-0.42*0.42, cutoff=rc, shift=False)
+#interTC_subtract = espresso.interaction.FixedPairListCoulombTruncated(system, fpl, potTC_subtract)
+##interTC_subtract.setPotential(type1=2, type2=2, potential=potTC_subtract)
+#system.addInteraction(interTC_subtract)
 
 
 

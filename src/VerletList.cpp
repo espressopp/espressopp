@@ -67,7 +67,7 @@ namespace espresso {
     
     // see if it's in the exclusion list
     if (exList.count(std::make_pair(pt1.id(), pt2.id())) == 1) {
-        std::cout << "particles " << pt1.id() << "," << pt2.id() << " excluded\n";
+        //std::cout << "particles " << pt1.id() << "," << pt2.id() << " excluded\n";
 
         return;
     }
