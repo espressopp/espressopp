@@ -1,0 +1,114 @@
+; forcefield for PS, CG model M2
+
+[ defaults ]
+; nbfunc       comb-rule      gen-pairs      fudgeLJ   fudgeQQ
+     1            1               no            1.0        1.0
+
+[ atomtypes ]
+;name        mass      charge   ptype       C6         C12
+A1m          27.0460     0.0000   A       1.0000      0.0000
+A2m          27.0460     0.0000   A       1.0000      0.0000
+A1r          27.0460     0.0000   A       1.0000      0.0000
+A2r          27.0460     0.0000   A       1.0000      0.0000
+B1u          77.1060     0.0000   A       1.0000      0.0000
+B2u          77.1060     0.0000   A       1.0000      0.0000
+B1d          77.1060     0.0000   A       1.0000      0.0000
+B2d          77.1060     0.0000   A       1.0000      0.0000
+
+[ bondtypes ]
+; i       j       func        table_nr      k    
+A1m      B1u        8        0               1.00
+A1m      B1d        8        0               1.00
+A2m      B1u        8        0               1.00
+A2m      B1d        8        0               1.00
+A2m      B2u        8        0               1.00
+A2m      B2d        8        0               1.00
+A1m      B2u        8        0               1.00
+A1m      B2d        8        0               1.00
+A1r      B1u        8        1               1.00
+A1r      B1d        8        1               1.00
+A2r      B1u        8        1               1.00
+A2r      B1d        8        1               1.00
+A2r      B2u        8        1               1.00
+A2r      B2d        8        1               1.00
+A1r      B2u        8        1               1.00
+A1r      B2d        8        1               1.00
+
+[ angletypes ]
+; i       j        k       func        table_nr     k    
+A1m      B1u      A2m        8         2             1.00
+A1m      B1u      A2r        8         1             1.00
+A1m      B1d      A2m        8         2             1.00
+A1m      B1d      A2r        8         1             1.00
+A1m      B2u      A2m        8         2             1.00
+A1m      B2u      A2r        8         1             1.00
+A1m      B2d      A2m        8         2             1.00
+A1m      B2d      A2r        8         1             1.00
+A1r      B1u      A2r        8         3             1.00
+A1r      B1u      A2m        8         1             1.00
+A1r      B1d      A2r        8         3             1.00
+A1r      B1d      A2m        8         1             1.00
+A1r      B2u      A2r        8         3             1.00
+A1r      B2u      A2m        8         1             1.00
+A1r      B2d      A2r        8         3             1.00
+A1r      B2d      A2m        8         1             1.00
+B1u      A1m      B2u        8         4             1.00
+B1u      A2m      B2u        8         4             1.00
+B1d      A1m      B2d        8         4             1.00
+B1d      A2m      B2d        8         4             1.00
+B1u      A1r      B2d        8         5             1.00
+B1u      A2r      B2d        8         5             1.00
+B1d      A1r      B2u        8         5             1.00
+B1d      A2r      B2u        8         5             1.00
+
+[ dihedraltypes ]
+; i       j        k        l       func    table_nr   k
+A1m      B1u      A2m      B2u        8     6         1.00
+A2m      B2u      A1m      B1u        8     6         1.00
+A1m      B2d      A2m      B1d        8     6         1.00
+A2m      B1d      A1m      B2d        8     6         1.00
+A1r      B1u      A2m      B2u        8     6         1.00
+A2r      B2u      A1m      B1u        8     6         1.00
+A1r      B2d      A2m      B1d        8     6         1.00
+A2r      B1d      A1m      B2d        8     6         1.00
+A1m      B1d      A2m      B2d        8     8         1.00
+A2m      B2d      A1m      B1d        8     8         1.00
+A1m      B2u      A2m      B1u        8     8         1.00
+A2m      B1u      A1m      B2u        8     8         1.00
+A1r      B1d      A2m      B2d        8     8         1.00
+A2r      B2d      A1m      B1d        8     8         1.00
+A1r      B2u      A2m      B1u        8     8         1.00
+A2r      B1u      A1m      B2u        8     8         1.00
+A1r      B1u      A2r      B2d        8     7         1.00
+A1r      B2d      A2r      B1u        8     7         1.00
+A2r      B2u      A1r      B1d        8     7         1.00
+A2r      B1d      A1r      B2u        8     7         1.00
+A1m      B1u      A2r      B2d        8     7         1.00
+A1m      B2d      A2r      B1u        8     7         1.00
+A2m      B2u      A1r      B1d        8     7         1.00
+A2m      B1d      A1r      B2u        8     7         1.00
+A1r      B1d      A2r      B2u        8     9         1.00
+A1r      B2u      A2r      B1d        8     9         1.00
+A2r      B2d      A1r      B1u        8     9         1.00
+A2r      B1u      A1r      B2d        8     9         1.00
+A1m      B1d      A2r      B2u        8     9         1.00
+A1m      B2u      A2r      B1d        8     9         1.00
+A2m      B2d      A1r      B1u        8     9         1.00
+A2m      B1u      A1r      B2d        8     9         1.00
+
+
+; Include Topology of All Chains
+#include "topol_PS1.itp"
+#include "topol_PS2.itp"
+#include "topol_PS3.itp"
+#include "topol_PS4.itp"
+
+[ system ]
+PS Melt CG
+
+[ molecules ]
+;molecule name number
+PS1       6
+PS2       6
+PS3       6
+PS4       6

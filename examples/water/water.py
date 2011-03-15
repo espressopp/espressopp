@@ -77,7 +77,7 @@ system.addInteraction(interLJ)
 
 # Truncated Coulomb with Verlet list
 vl = espresso.VerletList(system, cutoff=rc+system.skin)
-vl.exclude(bondsHH) 
+vl.exclude(bondsHH)
 vl.exclude(bonds) # intramolecular
 potTC1 = espresso.interaction.CoulombTruncated(qq=0.84*0.84, cutoff=rc, shift=False)
 potTC2 = espresso.interaction.CoulombTruncated(qq=-0.84*0.42, cutoff=rc, shift=False)
@@ -114,8 +114,6 @@ system.addInteraction(interAngHar)
 #interTC_subtract = espresso.interaction.FixedPairListCoulombTruncated(system, fpl, potTC_subtract)
 ##interTC_subtract.setPotential(type1=1, type2=2, potential=potTC_subtract)
 #system.addInteraction(interTC_subtract)
-
-
 
 ## make list of H-H bonds
 #bondsHH = []
