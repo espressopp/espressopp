@@ -23,11 +23,13 @@ namespace espresso {
              
                 TabulatedDihedral(int itype, const char* filename) {
                     setFilename(itype, filename);
+                    std::cout << "using tabulated potential " << filename << "\n";
                 }
              
                 TabulatedDihedral(int itype, const char* filename, real cutoff) {
                     setFilename(itype, filename);
                     setCutoff(cutoff);
+                    std::cout << "using tabulated potential " << filename << "\n";
                 }
              
                 void setFilename(int itype, const char* _filename);
@@ -40,7 +42,7 @@ namespace espresso {
                     if (table)
                         return table->getEnergy(phi);
                     else
-                        throw std::runtime_error("Tabulated potential table not available.");
+                        throw std::runtime_error("Tabulated dihedral potential table not available.");
                 }
              
                 void _computeForceRaw(Real3D& force1,
@@ -128,7 +130,7 @@ namespace espresso {
                         force3 = sf2 - force4;
                     }
                     else {
-                        throw std::runtime_error("Tabulated potential table not available.");
+                        throw std::runtime_error("Tabulated dihedral potential table not available.");
                     }
                     
                 }
@@ -137,7 +139,7 @@ namespace espresso {
                     if (table)
                         return table->getForce(phi);
                     else
-                        throw std::runtime_error("Tabulated potential table not available.");
+                        throw std::runtime_error("Tabulated dihedral potential table not available.");
                 }
              
         }; // class

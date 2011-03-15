@@ -19,15 +19,18 @@ namespace espresso {
              
                 TabulatedAngular() {
                     //setCutoff(infinity);
+                    //std::cout << "using default tabulated potential ...\n";
                 }
              
                 TabulatedAngular(int itype, const char* filename) {
                     setFilename(itype, filename);
+                    std::cout << "using tabulated potential " << filename << "\n";
                 }
              
                 TabulatedAngular(int itype, const char* filename, real cutoff) {
                     setFilename(itype, filename);
                     setCutoff(cutoff);
+                    std::cout << "using tabulated potential " << filename << "\n";
                 }
              
                 void setFilename(int itype, const char* _filename);
@@ -40,7 +43,7 @@ namespace espresso {
                     if (table)
                         return table->getEnergy(theta);
                     else
-                        throw std::runtime_error("Tabulated potential table not available.");
+                        throw std::runtime_error("Tabulated angular potential table not available.");
                 }
              
                 void _computeForceRaw(Real3D& force12, Real3D& force32,
@@ -61,7 +64,7 @@ namespace espresso {
                         force32 = a22 * dist32 + a12 * dist12;
                     }
                     else {
-                        throw std::runtime_error("Tabulated potential table not available.");
+                        throw std::runtime_error("Tabulated angular potential table not available.");
                     }
                 }
              

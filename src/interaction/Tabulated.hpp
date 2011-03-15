@@ -30,6 +30,7 @@ namespace espresso {
             Tabulated() {
                 setShift(0.0);
                 setCutoff(infinity);
+                //std::cout << "using default tabulated potential ...\n";
             }
          
             // used for fixedpairlist (2-body bonded interaction)
@@ -37,12 +38,14 @@ namespace espresso {
                 setFilename(itype, filename);
                 setShift(0.0);
                 setCutoff(infinity);
+                std::cout << "using tabulated potential " << filename << "\n";
             }
          
             Tabulated(int itype, const char* filename, real cutoff) {
                 setFilename(itype, filename);
                 setShift(0.0);
                 setCutoff(cutoff);
+                std::cout << "using tabulated potential " << filename << "\n";
             }
          
             /** Setter for the filename will read in the table. */
@@ -55,16 +58,20 @@ namespace espresso {
                 // make an interpolation
                 if (table) 
                     return table->getEnergy(sqrt(distSqr));
-                else
+                else {
                     throw std::runtime_error("Tabulated potential table not available.");
+                    //return 0.0;
+                }
             }
          
             bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const {
                 real ffactor;
                 if (table) 
                    ffactor = table->getForce(sqrt(distSqr));
-                else
+                else {
                     throw std::runtime_error("Tabulated potential table not available.");
+                    //return 0.0;
+                }
                 force = dist * ffactor;
                 return true;
             }
