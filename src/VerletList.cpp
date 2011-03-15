@@ -65,10 +65,13 @@ namespace espresso {
   
     if (distsq > cutsq) return;
     
-    // see if it's in the exclusion list
+    // see if it's in the exclusion list (both directions)
     if (exList.count(std::make_pair(pt1.id(), pt2.id())) == 1) {
-        //std::cout << "particles " << pt1.id() << "," << pt2.id() << " excluded\n";
-
+        //std::cout << "ex(" << pt1.id() << "," << pt2.id() << ") ";
+        return;
+    }
+    if (exList.count(std::make_pair(pt2.id(), pt1.id())) == 1) {
+        //std::cout << "ex(" << pt2.id() << "," << pt1.id() << ") ";
         return;
     }
 
@@ -91,9 +94,6 @@ namespace espresso {
   bool VerletList::exclude(longint pid1, longint pid2) {
 
       exList.insert(std::make_pair(pid1, pid2));
-
-      // broadcast exList to all nodes
-      //TODO
 
       return true;
   }

@@ -21,7 +21,6 @@ class VerletListLocal(_espresso.VerletList):
         Each processor takes the broadcasted exclusion list
         and adds it to its list.
         """
-        
         if pmi.workerIsActive():
             for pair in exclusionlist:
                 pid1, pid2 = pair
