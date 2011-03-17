@@ -21,7 +21,7 @@ from espresso.tools import timers
 # simulation parameters (nvt = False is nve)
 steps = 1000
 check = 6   # how many times to display energies during run
-rc   = 1.5  # Verlet list cutoff
+rc   = 2.5  # Verlet list cutoff
 rcaa = 2.5  # cutoff A-A
 rcab = 2.0  # cutoff A-B
 rcbb = 2.0  # cutoff B-B
