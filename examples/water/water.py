@@ -62,9 +62,11 @@ bondsHH = []
 for i in range(1, num_particles - 1, 3):
   bondsHH.append((i+1, i+2))
 
+exlist = bondsHH
+
 # Lennard-Jones with Verlet list
-vl = espresso.VerletList(system, cutoff=rc+system.skin)
-vl.exclude(bondsHH)
+vl = espresso.VerletList(system, cutoff=rc+system.skin, exclusionlist=exlist)
+#vl.exclude(bondsHH)
 potLJ1 = espresso.interaction.LennardJones(epsilon=0.16, sigma=3.2, cutoff=rc, shift=False)
 potLJ2 = espresso.interaction.LennardJones(epsilon=0.00, sigma=0.0, cutoff=rc, shift=False)
 potLJ3 = espresso.interaction.LennardJones(epsilon=0.10, sigma=1.0, cutoff=rc, shift=False)
@@ -75,10 +77,12 @@ interLJ.setPotential(type1=2, type2=2, potential=potLJ3)
 system.addInteraction(interLJ)
 
 
+exlist.extend(bonds) # add intramolecular exclusions
+
 # Truncated Coulomb with Verlet list
-vl = espresso.VerletList(system, cutoff=rc+system.skin)
-vl.exclude(bondsHH)
-vl.exclude(bonds) # intramolecular
+vl = espresso.VerletList(system, cutoff=rc+system.skin, exclusionlist=exlist)
+#vl.exclude(bondsHH)
+#vl.exclude(bonds) # intramolecular
 potTC1 = espresso.interaction.CoulombTruncated(qq=0.84*0.84, cutoff=rc, shift=False)
 potTC2 = espresso.interaction.CoulombTruncated(qq=-0.84*0.42, cutoff=rc, shift=False)
 potTC3 = espresso.interaction.CoulombTruncated(qq=0.42*0.42, cutoff=rc, shift=False)

@@ -16,7 +16,7 @@ namespace espresso {
 
 /*-------------------------------------------------------------*/
 
-  VerletList::VerletList(shared_ptr< System > system, real cut) : SystemAccess(system)
+  VerletList::VerletList(shared_ptr< System > system, real cut, bool rebuildVL) : SystemAccess(system)
   {
     LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << cut);
   
@@ -27,7 +27,8 @@ namespace espresso {
     real cutVerlet = cut + system->skin;
     cutsq = cutVerlet * cutVerlet;
     builds = 0;
-    rebuild();
+    if (rebuildVL) rebuild();
+
   
     // make a connection to System to invoke rebuild on resort
     connectionResort = system->storage->onParticlesChanged.connect(
@@ -39,12 +40,17 @@ namespace espresso {
   void VerletList::rebuild()
   {
     myList.clear();
-  
+
+    std::cout << "\nrebuild: ";
+    //std::cout << "exlist size: " << exList.size() << "\n";
+
     CellList cl = getSystem()->storage->getRealCells();
     for (CellListAllPairsIterator it(cl); it.isValid(); ++it) {
       checkPair(*it->first, *it->second);
     }
   
+    std::cout << "\n\n";
+
     LOG4ESPP_INFO(theLogger, "rebuilt VerletList, cutsq = " << cutsq 
                  << " local size = " << myList.size());
     builds++;
@@ -67,14 +73,14 @@ namespace espresso {
     
     // see if it's in the exclusion list (both directions)
     if (exList.count(std::make_pair(pt1.id(), pt2.id())) == 1) {
-        //std::cout << "ex(" << pt1.id() << "," << pt2.id() << ") ";
+        //std::cout << "ex(" << pt1.id() << ", " << pt2.id() << ")\n";
         return;
     }
     if (exList.count(std::make_pair(pt2.id(), pt1.id())) == 1) {
-        //std::cout << "ex(" << pt2.id() << "," << pt1.id() << ") ";
+        //std::cout << "ex(" << pt1.id() << ", " << pt2.id() << ")\n";
         return;
     }
-
+    std::cout << "(" << pt1.id() << ", " << pt2.id() << ") ";
     myList.add(pt1, pt2);
   }
   
@@ -122,11 +128,12 @@ namespace espresso {
           = &VerletList::exclude;
 
     class_<VerletList, shared_ptr<VerletList> >
-      ("VerletList", init< shared_ptr<System>, real >())
+      ("VerletList", init< shared_ptr<System>, real, bool >())
       .add_property("system", &SystemAccess::getSystem)
       .add_property("builds", &VerletList::getBuilds, &VerletList::setBuilds)
       .def("totalSize", &VerletList::totalSize)
       .def("exclude", pyExclude)
+      .def("rebuild", &VerletList::rebuild)
       ;
   }
 

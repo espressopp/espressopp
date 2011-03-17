@@ -28,7 +28,7 @@ namespace espresso {
 
     */
 
-    VerletList(shared_ptr< System >, real cut);
+    VerletList(shared_ptr< System >, real cut, bool rebuildVL);
 
     ~VerletList();
 
