@@ -29,7 +29,15 @@ namespace espresso {
 
     Buffer(const mpi::communicator &_comm) : comm(_comm) 
 
-    { pos = 0; size = BUFFER_SIZE; 
+    { pos      = 0; 
+      size     = 0;
+      capacity = BUFFER_SIZE;
+    }
+
+    void reset() 
+    {
+      pos  = 0;
+      size = 0;
     }
 
   protected:
@@ -40,6 +48,7 @@ namespace espresso {
 
     char buf[BUFFER_SIZE];
     int  size;
+    int  capacity;
     int  pos;
 
   };
@@ -100,8 +109,9 @@ namespace espresso {
     }
 
     void recv(longint sender, int tag) {
-      mpi::status stat = comm.recv(sender, tag, buf, BUFFER_SIZE);
+      mpi::status stat = comm.recv(sender, tag, buf, capacity);
       size = *stat.count<char>();
+      pos  = 0;  // reset the buffer position
       // printf("%d: received size = %d from %d\n", comm.rank(), size, sender);
     }
 
@@ -117,13 +127,15 @@ namespace espresso {
 
     template <class T>
     void writeAll(T& val) { 
-      T* tbuf = (T*) (buf + pos); 
-      pos += sizeof(T);
-      if (pos > size) {
-        fprintf(stderr, "size exhausted");
+      int len = sizeof(T);
+      if (pos + len > capacity) {
+        fprintf(stderr, "capacity exhausted");
         exit(-1);
       }
+      T* tbuf = (T*) (buf + pos); 
       *tbuf = val; 
+      pos += len;
+      size = pos;
     }
 
     void write(int& val) { writeAll<int>(val); }
