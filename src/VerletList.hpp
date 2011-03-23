@@ -39,6 +39,8 @@ namespace espresso {
     std::set<longint>& getAtmList() { return atmList; }
     std::vector<Real3D*>& getAtmPositions() { return atmPositions; }
     //std::set<Particle*>& getAdrZone() { return adrZone; }
+    real getHy() { return skin; }
+    real getEx() { return adresscut - skin; }
 
     void rebuild();
 
@@ -71,6 +73,7 @@ namespace espresso {
 
     real adresscut; // size of AdResS zone
     real adrsq;
+    real skin; // skin, but also used as the size of hybrid region
 
 
     void checkPair(Particle &pt1, Particle &pt2);

@@ -24,7 +24,8 @@ namespace espresso {
        throw std::runtime_error("system has no storage");
     }
 
-    real cutVerlet = cut + system->skin;
+    skin = system->skin;
+    real cutVerlet = cut + skin;
     cutsq = cutVerlet * cutVerlet;
     builds = 0;
 
