@@ -40,11 +40,22 @@ class VerletListLocal(_espresso.VerletList):
             # rebuild list with exclusions
             self.cxxclass.rebuild(self)
 
+
+    def addAtParticle(self, pids):
+        """
+        Each processor takes the broadcasted atomistic particles
+        and adds it to its list.
+        """
+        if pmi.workerIsActive():
+            for pid in pids:
+                self.cxxclass.addAtParticle(self, pid)
+
+
 if pmi.isController:
     class VerletList(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espresso.VerletListLocal',
             pmiproperty = [ 'builds' ],
-            pmicall = [ 'totalSize', 'exclude' ]
+            pmicall = [ 'totalSize', 'exclude', 'addAtParticle' ]
             )

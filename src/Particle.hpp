@@ -338,7 +338,7 @@ namespace espresso {
 
 
     struct TupleList
-       : public esutil::ESPPContainer <std::vector<ParticleTuple> >
+       : public esutil::ESPPContainer<std::vector<ParticleTuple> >
     {
        void add(std::vector<Particle*> particles) {
            this->push_back(ParticleTuple(particles));

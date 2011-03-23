@@ -7,6 +7,7 @@
 #include "Particle.hpp"
 #include "SystemAccess.hpp"
 #include "boost/signals2.hpp"
+#include "boost/unordered_set.hpp"
 
 namespace espresso {
 
@@ -32,7 +33,12 @@ namespace espresso {
 
     ~VerletList();
 
-    PairList& getPairs() { return myList; }
+    PairList& getPairs() { return vlPairs; }
+
+    PairList& getAdrPairs() { return adrPairs; }
+    std::set<longint>& getAtmList() { return atmList; }
+    std::vector<Real3D*>& getAtmPositions() { return atmPositions; }
+    //std::set<Particle*>& getAdrZone() { return adrZone; }
 
     void rebuild();
 
@@ -41,6 +47,9 @@ namespace espresso {
 
     /** Add pairs to exclusion list */
     bool exclude(longint pid1, longint pid2);
+
+    /** Add an atomistic particle (used for AdResS) to atList */
+    void addAtParticle(longint pid);
 
     /** Get the number of times the Verlet list has been rebuilt */
     int getBuilds() const { return builds; }
@@ -53,9 +62,20 @@ namespace espresso {
 
   private:
 
+    // AdResS stuff
+    void isPairInAdrZone(Particle &pt1, Particle &pt2);
+    std::set<longint> atmList;   // pids of particles defined as atomistic
+    std::vector<Real3D*> atmPositions; // positions of atomistic particles
+    std::set<Particle*> adrZone; // particles that are in the AdResS zone
+    PairList adrPairs;           // pairs that are in AdResS zone
+
+    real adresscut; // size of AdResS zone
+    real adrsq;
+
+
     void checkPair(Particle &pt1, Particle &pt2);
-    PairList myList;
-    std::set<std::pair<longint, longint> > exList; // exclusion list
+    PairList vlPairs;
+    boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list
     real cutsq;
     int builds;
     boost::signals2::connection connectionResort;
