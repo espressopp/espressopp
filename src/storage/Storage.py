@@ -47,22 +47,22 @@ class StorageLocal(object):
             index_mass = -1
 
             if properties == None:
-               # default properities = (id, pos)
-               index_id = 0
-               index_pos = 1
-               nindex = 2
+                # default properities = (id, pos)
+                index_id = 0
+                index_pos = 1
+                nindex = 2
             else:
-               nindex = 0
-               for val in properties:
-                  if val.lower() == "id": index_id = nindex
-                  elif val.lower() == "pos": index_pos = nindex
-                  elif val.lower() == "type": index_type = nindex
-                  elif val.lower() == "mass": index_mass = nindex
-                  elif val.lower() == "v": index_v = nindex
-                  elif val.lower() == "f": index_f = nindex
-                  elif val.lower() == "q": index_q = nindex
-                  else: raise "unknown particle property: %s"%val
-                  nindex += 1
+                nindex = 0
+                for val in properties:
+                    if val.lower() == "id": index_id = nindex
+                    elif val.lower() == "pos": index_pos = nindex
+                    elif val.lower() == "type": index_type = nindex
+                    elif val.lower() == "mass": index_mass = nindex
+                    elif val.lower() == "v": index_v = nindex
+                    elif val.lower() == "f": index_f = nindex
+                    elif val.lower() == "q": index_q = nindex
+                    else: raise "unknown particle property: %s"%val
+                    nindex += 1
 
             if index_id < 0  : raise "particle property id is mandatory"
             if index_pos < 0 : raise "particle property pos is mandatory"
@@ -71,7 +71,7 @@ class StorageLocal(object):
 
                 # verify that each particle has enough entries, avoids index errors
                 if len(particle) != nindex:
-                   raise "particle has %d entries,but %d expected"%(len(particle), nindex)
+                    raise "particle has %d entries,but %d expected"%(len(particle), nindex)
 
                 id = particle[index_id]
                 pos = particle[index_pos]
@@ -80,27 +80,27 @@ class StorageLocal(object):
 
                 if storedParticle != None:
 
-                   self.logger.debug("Processor %d stores particle id = %d"%(pmi._MPIcomm.rank, id))
+                    self.logger.debug("Processor %d stores particle id = %d"%(pmi._MPIcomm.rank, id))
 
-                   # only the owner processor writes other properties
+                    # only the owner processor writes other properties
 
-                   if index_v >= 0:
-                      vx, vy, vz = particle[index_v]
-                      storedParticle.vx = vx; storedParticle.vy = vy; storedParticle.vz = vz
+                    if index_v >= 0:
+                        vx, vy, vz = particle[index_v]
+                        storedParticle.vx = vx; storedParticle.vy = vy; storedParticle.vz = vz
 
-                   if index_f >= 0:
-                      fx, fy, fz = particle[index_f]
-                      storedParticle.fx = fx; storedParticle.fy = fy; storedParticle.fz = vz
+                    if index_f >= 0:
+                        fx, fy, fz = particle[index_f]
+                        storedParticle.fx = fx; storedParticle.fy = fy; storedParticle.fz = fz #<-- was vz, changed to fz 
 
-                   if index_q >= 0:
-                      # not supported yet: storedParticle.q = particle[index_q]
-                      pass
+                    if index_q >= 0:
+                        # not supported yet: storedParticle.q = particle[index_q]
+                        pass
 
-                   if index_type >= 0:
-                      storedParticle.type = particle[index_type]
+                    if index_type >= 0:
+                        storedParticle.type = particle[index_type]
 
-                   if index_mass >= 0:
-                      storedParticle.mass = particle[index_mass]
+                    if index_mass >= 0:
+                        storedParticle.mass = particle[index_mass]
  
     
 
