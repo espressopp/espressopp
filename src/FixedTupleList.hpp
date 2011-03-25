@@ -25,14 +25,17 @@ namespace espresso {
             FixedTupleList(shared_ptr<storage::Storage> _storage);
             ~FixedTupleList();
 
-            bool add(tuple pids);
+            void add(longint pid) { tmppids.push_back(pid); } // add particle id (called from python)
+            void addTs() { addT(tmppids); tmppids.clear(); } // add tuple
             void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);
             void afterRecvParticles(ParticleList& pl, class InBuffer& buf);
             void onParticlesChanged();
 
-            //static void registerPython();
+            static void registerPython();
 
         private:
+            tuple tmppids;
+            bool addT(tuple pids); // add tuple
             static LOG4ESPP_DECL_LOGGER(theLogger);
     };
 }

@@ -3,18 +3,31 @@ import _espresso
 import espresso
 from espresso.esutil import cxxinit
 
-class FixedToupleListLocal(_espresso.FixedToupleList):
+class FixedTupleListLocal(_espresso.FixedTupleList):
     'The (local) fixed touple list.'
 
     def __init__(self, storage):
         'Local construction of a fixed touple list'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.FixedToupleList, storage)
+            cxxinit(self, _espresso.FixedTupleList, storage)
+
+    def addTuples(self, tuplelist):
+        """
+        Each processor takes the broadcasted triplelist and
+        adds those triples whose first particle is owned by
+        this processor.
+        """
+        if pmi.workerIsActive():
+            for tuple in tuplelist: 
+                for pid in tuple:
+                    self.cxxclass.add(self, pid)
+                self.cxxclass.addTs(self);
 
 
 if pmi.isController:
-    class FixedToupleList(object):
+    class FixedTupleList(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.FixedToupleListLocal'
+            cls = 'espresso.FixedTupleListLocal',
+            pmicall = [ "addTuples" ]
             )

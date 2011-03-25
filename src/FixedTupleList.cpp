@@ -38,7 +38,9 @@ namespace espresso {
     }
 
 
-    bool FixedTupleList::add(tuple pids) {
+    bool FixedTupleList::addT(tuple pids) {
+
+        std::cout << "\n\nAdding tuple pids...\n";
 
         // ADD THE LOCAL PARTICLES
         Particle* p;
@@ -54,6 +56,9 @@ namespace espresso {
         tmp.push_back(p);
 
         for (++it; it != pids.end(); ++it) {
+
+            std::cout << "Add: " << *it << "\n";
+
             p = storage->lookupLocalParticle(*it);
             if (!p) // Particle does not exist here, return false
                 return false;
@@ -203,4 +208,22 @@ namespace espresso {
         }
         LOG4ESPP_INFO(theLogger, "regenerated local fixed list from global tuples");
     }
+
+    /****************************************************
+    ** REGISTRATION WITH PYTHON
+    ****************************************************/
+
+    void FixedTupleList::registerPython() {
+
+      using namespace espresso::python;
+
+      void (FixedTupleList::*pyAdd)(longint pid) = &FixedTupleList::add;
+
+      class_<FixedTupleList, shared_ptr<FixedTupleList> >
+        ("FixedTupleList", init<shared_ptr<storage::Storage> >())
+        .def("add", pyAdd)
+        .def("addTs", &FixedTupleList::addTs)
+        ;
+    }
+
 }
