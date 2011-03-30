@@ -268,6 +268,7 @@ namespace espresso {
     }
 
     void Storage::decompose() {
+      //std::cout << "\n-------------------------decompose---------------------";
       invalidateGhosts();
       decomposeRealParticles();
       exchangeGhosts();
@@ -415,9 +416,9 @@ namespace espresso {
 
 	.def("addParticle", &Storage::addParticle, 
 	     return_value_policy< reference_existing_object >())
-
-    .def("addParticle", &Storage::addParticle,
-         return_value_policy< reference_existing_object >())
+  //
+  //.def("addParticle", &Storage::addParticle,
+  //     return_value_policy< reference_existing_object >())
 
 	.def("lookupLocalParticle", &Storage::lookupLocalParticle,
 	     return_value_policy< reference_existing_object >())

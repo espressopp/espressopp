@@ -53,7 +53,8 @@ namespace espresso {
         if (!p) // Particle does not exist here, return false
             return false;
         pidK = *it; // first pid is key
-        tmp.push_back(p);
+        //tmp.push_back(p);
+        std::cout << "Add key: " << *it << "\n";
 
         for (++it; it != pids.end(); ++it) {
 
@@ -65,7 +66,7 @@ namespace espresso {
             tmp.push_back(p);
             pidstmp.push_back(*it); // pidK is not in this vector
         }
-        this->add(tmp);
+        this->add(pidK, tmp); // add to TupleList
         tmp.clear();
         pids.clear();
 
@@ -97,10 +98,14 @@ namespace espresso {
 
         std::vector<longint> toSend;
 
+        std::cout << "\nbeforeSendParticles\n";
+        std::cout << "pl size " << pl.size() << "\n";
+
         // loop over the particle list
         for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
             longint pidK = pit->id();
-            LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pidK << ", find pairs");
+            std::cout << "looping over "<< pidK << "\n";
+            LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pidK << ", find tuples");
 
             // find all particles that involve this particle id
             int n = globalTuples.count(pidK);
@@ -111,19 +116,23 @@ namespace espresso {
 
                 // first write the pid of the first particle
                 toSend.push_back(pidK);
+                std::cout << "pushback pidK "<< pidK << "\n";
                 // then the number of partners
                 toSend.push_back(n);
+                std::cout << "pushback n "<< n << "\n";
                 // and then the size and pids of the partners
                 for (GlobalTuples::const_iterator it = equalRange.first;
                 it != equalRange.second; ++it) {
                     // write the size of the vector first
                     int s = it->second.size();
                     toSend.push_back(s);
+                    std::cout << "pushback s "<< s << "\n";
 
                     // iterate through vector and add pids
                     for (tuple::const_iterator it2 = it->second.begin();
                     it2 != it->second.end(); ++it2) {
                         toSend.push_back(*it2);
+                        std::cout << "pushback pid "<< *it2 << "\n";
                         LOG4ESPP_DEBUG(theLogger, "send global bond: pid "
                                << pidK << " and its vector");
                     }
@@ -141,6 +150,8 @@ namespace espresso {
     void FixedTupleList::afterRecvParticles
                                     (ParticleList &pl,InBuffer& buf) {
 
+        std::cout << "\nafterRecvParticles\n";
+
         std::vector<longint> received, pids;
         int n, s, ts;
         longint pidK;
@@ -150,16 +161,21 @@ namespace espresso {
         // receive the bond list
         buf.read(received);
         int size = received.size();
+        std::cout << "received size "<< size << "\n";
+
         int i = 0;
         while (i < size) {
             // unpack the list
             pidK = received[i++];
+            std::cout << "pidK "<< pidK << "\n";
             n = received[i++];
+            std::cout << "n "<< n << "\n";
             LOG4ESPP_DEBUG(theLogger,
                     "recv particle " << pidK << ", has " << n << " global pairs");
             for (; n > 0; --n) {
                 s = received[i++];
                 for (ts = s; ts > 0; --ts) { // read the pids vector
+                    std::cout << "pushback "<< received[i] << "\n";
                     pids.push_back(received[i++]);
                 }
                 // add pids vector to global tuples
@@ -177,6 +193,9 @@ namespace espresso {
     }
 
     void FixedTupleList::onParticlesChanged() {
+
+        std::cout << "\nonParticlesChanged\n";
+
         LOG4ESPP_INFO(theLogger, "rebuild local particle list from global tuples\n");
         this->clear();
         longint lastpidK = -1;
@@ -191,19 +210,21 @@ namespace espresso {
             if (it->first != lastpidK) { // don't check same pidK twice
                 lastpidK = it->first;
                 p = storage->lookupRealParticle(lastpidK);
+                std::cout << "lookup pidK "<< lastpidK << "\n";
                 if (p == NULL)
                     printf("SERIOUS ERROR: particle %d not available\n", lastpidK);
-                tmp.push_back(p);
+                //tmp.push_back(p);
             }
             // iterate through vector in map
             for (tuple::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
                 p = storage->lookupLocalParticle(*it2);
+                std::cout << "lookup "<< *it2 << "\n";
                 if (p == NULL)
                   printf("SERIOUS ERROR: particle %d not available\n", *it2);
                 tmp.push_back(p);
             }
             // add the particles
-            this->add(tmp);
+            this->add(lastpidK, tmp);
             tmp.clear();
         }
         LOG4ESPP_INFO(theLogger, "regenerated local fixed list from global tuples");

@@ -55,9 +55,9 @@ namespace espresso {
       inSelfLoop = true;
       pit = ParticleList::Iterator((*cit)->particles);
       while (pit.isDone()) {
-	++cit;
-	if (cit.isDone()) return;
-	pit = ParticleList::Iterator((*cit)->particles);
+        ++cit;
+        if (cit.isDone()) return;
+        pit = ParticleList::Iterator((*cit)->particles);
       }
       
       npit = pit; 
@@ -69,49 +69,50 @@ namespace espresso {
     operator++() {
       ++npit;
       while (npit.isDone()) {
-	++pit;
-	while (pit.isDone()) {
-	  if (inSelfLoop) {
-	    LOG4ESPP_TRACE(theLogger, "pit.isDone(), inSelfLoop, starting neighbor loop");
-	    inSelfLoop = false;
-	    ncit = NeighborCellList::Iterator((*cit)->neighborCells);
-	  } else {
-	    LOG4ESPP_TRACE(theLogger, "pit.isDone(), !inSelfLoop, continuing neighbor loop");
-	    ++ncit;
-	  }
+        ++pit;
+        while (pit.isDone()) {
+          if (inSelfLoop) {
+            LOG4ESPP_TRACE(theLogger, "pit.isDone(), inSelfLoop, starting neighbor loop");
+            //std::cout << "\n";
+            inSelfLoop = false;
+            ncit = NeighborCellList::Iterator((*cit)->neighborCells);
+          } else {
+            LOG4ESPP_TRACE(theLogger, "pit.isDone(), !inSelfLoop, continuing neighbor loop");
+            ++ncit;
+          }
 
-	  while (ncit.isValid() && ncit->useForAllPairs)
-	    ++ncit;
+          while (ncit.isValid() && ncit->useForAllPairs)
+            ++ncit;
 
-	  if (ncit.isDone()) {
-	    LOG4ESPP_TRACE(theLogger, "ncit.isDone(), go to next cell");
-	    ++cit;
-	    if (cit.isDone()) {
-	      LOG4ESPP_TRACE(theLogger, "cit.isDone(), LOOP FINISHED");
-	      return *this;
-	    }
-	    inSelfLoop = true;
-	  }
-	  //assert(inSelfLoop || ncit.isValid());
-	  pit = ParticleList::Iterator((*cit)->particles);
-	}
-	//assert(pit.isValid());
+          if (ncit.isDone()) {
+            LOG4ESPP_TRACE(theLogger, "ncit.isDone(), go to next cell");
+            ++cit;
+            if (cit.isDone()) {
+              LOG4ESPP_TRACE(theLogger, "cit.isDone(), LOOP FINISHED");
+              return *this;
+            }
+            inSelfLoop = true;
+          }
+          //assert(inSelfLoop || ncit.isValid());
+          pit = ParticleList::Iterator((*cit)->particles);
+        }
+        //assert(pit.isValid());
 
-	if (inSelfLoop) {
-	  npit = pit;
-	  ++npit;
-	} else {
-	  npit = ParticleList::Iterator(ncit->cell->particles);
-	}
+        if (inSelfLoop) {
+          npit = pit;
+          ++npit;
+        } else {
+          npit = ParticleList::Iterator(ncit->cell->particles);
+        }
       }
 
       current.first = &*pit;
       current.second = &*npit;
 
-      LOG4ESPP_TRACE(theLogger, 
-		     "current pair: (" << current.first->p.id <<
-		     ", " << current.second->p.id << ")"
-		     );
+      LOG4ESPP_TRACE(theLogger,
+             "current pair: (" << current.first->p.id <<
+             ", " << current.second->p.id << ")"
+             );
       return *this;
     }
 

@@ -7,9 +7,11 @@
 #include <ParticleGroup.hpp>
 #include <System.hpp>
 #include <VerletList.hpp>
+#include <VerletListAdress.hpp>
 #include <FixedPairList.hpp>
 #include <FixedTripleList.hpp>
 #include <FixedQuadrupleList.hpp>
+#include <FixedTupleList.hpp>
 #include <Real3D.hpp>
 #include <Tensor.hpp>
 #include <Int3D.hpp>
@@ -27,9 +29,11 @@ void espresso::registerPython() {
   espresso::ParticleGroup::registerPython();
   espresso::System::registerPython();
   espresso::VerletList::registerPython();
+  espresso::VerletListAdress::registerPython();
   espresso::FixedPairList::registerPython();
   espresso::FixedTripleList::registerPython();
   espresso::FixedQuadrupleList::registerPython();
+  espresso::FixedTupleList::registerPython();
   espresso::Real3D::registerPython();
   espresso::Tensor::registerPython();
   espresso::Int3D::registerPython();

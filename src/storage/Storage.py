@@ -27,7 +27,7 @@ class StorageLocal(object):
         where only one processor adds the particle in its local storage.
 
         :param particleList: list of list particles (and properties) to be added
-        :param properties: comma separated property strings
+        :param properties: property strings
 
         Each particle in the list must be itself a list where each entry corresponds
         to the property specified in properties.
@@ -71,7 +71,7 @@ class StorageLocal(object):
 
                 # verify that each particle has enough entries, avoids index errors
                 if len(particle) != nindex:
-                    raise "particle has %d entries,but %d expected"%(len(particle), nindex)
+                    raise "particle has %d entries, but %d expected"%(len(particle), nindex)
 
                 id = particle[index_id]
                 pos = particle[index_pos]

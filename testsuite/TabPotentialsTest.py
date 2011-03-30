@@ -76,10 +76,11 @@ def calcNumberCells(size, nodes, cutoff):
 
 
 # write the tabulated potential files
-print 'Generating potential files ... (%2s, %2s, %2s)\n' % (tabfileLJ, tabfileFENE, tabfileCosine)
 potLJ  = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift=False, cutoff=rc)
 potFENE = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
 potCosine = espresso.interaction.Cosine(K=1.5, theta0=3.1415926)
+
+print 'Generating potential files ... (%2s, %2s, %2s)\n' % (tabfileLJ, tabfileFENE, tabfileCosine)
 writeTabFile(potLJ, tabfileLJ, N=257, low=0.01, high=potLJ.cutoff)
 writeTabFile(potFENE, tabfileFENE, N=257, low=0.0001, high=1.49)
 writeTabFile(potCosine, tabfileCosine, N=257, low=0.0001, high=3.14, body=3)

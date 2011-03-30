@@ -235,6 +235,7 @@ namespace espresso {
 
             // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) 
             cit->velocity() += dtfm * cit->force();
+
             // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt) 
             Real3D deltaP = dt * cit->velocity();
             cit->position() += deltaP;

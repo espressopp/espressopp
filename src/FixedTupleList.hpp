@@ -26,7 +26,7 @@ namespace espresso {
             ~FixedTupleList();
 
             void add(longint pid) { tmppids.push_back(pid); } // add particle id (called from python)
-            void addTs() { addT(tmppids); tmppids.clear(); } // add tuple
+            void addTs() { addT(tmppids); tmppids.clear(); } // add tuple (called from python)
             void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);
             void afterRecvParticles(ParticleList& pl, class InBuffer& buf);
             void onParticlesChanged();

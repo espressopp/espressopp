@@ -1,6 +1,6 @@
 // ESPP_CLASS
-#ifndef _VERLETLIST_HPP
-#define _VERLETLIST_HPP
+#ifndef _VERLETLISTADRESS_HPP
+#define _VERLETLISTADRESS_HPP
 
 #include "log4espp.hpp"
 #include "types.hpp"
@@ -17,7 +17,7 @@ namespace espresso {
 
 */
 
-  class VerletList : public SystemAccess {
+  class VerletListAdress : public SystemAccess {
 
   public:
 
@@ -29,11 +29,19 @@ namespace espresso {
 
     */
 
-    VerletList(shared_ptr< System >, real cut, bool rebuildVL);
+    VerletListAdress(shared_ptr< System >, real cut, bool rebuildVL);
 
-    ~VerletList();
+    ~VerletListAdress();
 
     PairList& getPairs() { return vlPairs; }
+
+    // AdResS stuff
+    PairList& getAdrPairs() { return adrPairs; }
+    std::set<longint>& getAtmList() { return atmList; }
+    std::vector<Real3D*>& getAtmPositions() { return atmPositions; }
+    //std::set<Particle*>& getAdrZone() { return adrZone; }
+    real getHy() { return skin; }
+    real getEx() { return adresscut - skin; }
 
     void rebuild();
 
@@ -42,6 +50,9 @@ namespace espresso {
 
     /** Add pairs to exclusion list */
     bool exclude(longint pid1, longint pid2);
+
+    /** Add an atomistic particle (used for AdResS) to atList */
+    void addAtParticle(longint pid);
 
     /** Get the number of times the Verlet list has been rebuilt */
     int getBuilds() const { return builds; }
@@ -53,6 +64,18 @@ namespace espresso {
     static void registerPython();
 
   private:
+
+    // AdResS stuff
+    void isPairInAdrZone(Particle &pt1, Particle &pt2);
+    std::set<longint> atmList;   // pids of particles defined as atomistic
+    std::vector<Real3D*> atmPositions; // positions of atomistic particles
+    std::set<Particle*> adrZone; // particles that are in the AdResS zone
+    PairList adrPairs;           // pairs that are in AdResS zone
+
+    real adresscut; // size of AdResS zone
+    real adrsq;
+    real skin; // skin, but also used as the size of hybrid region
+
 
     void checkPair(Particle &pt1, Particle &pt2);
     PairList vlPairs;

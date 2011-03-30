@@ -12,9 +12,11 @@ from espresso.Particle import *
 from espresso.ParticleGroup import *
 from espresso.System import *
 from espresso.VerletList import *
+from espresso.VerletListAdress import *
 from espresso.FixedPairList import *
 from espresso.FixedTripleList import *
 from espresso.FixedQuadrupleList import *
+from espresso.FixedTupleList import *
 from espresso.MultiSystem import *
 
 infinity=float("inf")

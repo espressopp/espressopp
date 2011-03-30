@@ -22,7 +22,7 @@ namespace espresso {
     public:
       typedef boost::unordered_map <longint, Particle*> IdParticleMap;
 
-      Storage(shared_ptr <class System> system);
+      Storage(shared_ptr<class System> system);
       virtual ~Storage();
 
       /** add a particle with given id and position. Note that this is a
@@ -248,7 +248,7 @@ namespace espresso {
 
     private:
       // map particle id to Particle * for all particles on this node
-      boost::unordered_map<longint, Particle * > localParticles;
+      boost::unordered_map<longint, Particle*> localParticles;
     };
   }
 }

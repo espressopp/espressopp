@@ -335,7 +335,6 @@ namespace espresso {
    : public esutil::ESPPContainer< std::map<longint, std::vector<Particle*> > >
   {
      void add(longint pid, std::vector<Particle*> particles) {
-         //std::cout << "\n-*-*-*-*-*-*-*-*-*-*-*-*-*-\nParticle.hpp add: " << pid << "\n\n";
          this->insert(make_pair(pid, particles));
      }
   };
