@@ -18,6 +18,7 @@ namespace espresso {
     size_t id;
     size_t type;
     real mass;
+    real q;
 
   private:
     friend class boost::serialization::access;
@@ -27,6 +28,7 @@ namespace espresso {
       ar & id;
       ar & type;
       ar & mass;
+      ar & q;
     }
   };
 
@@ -141,6 +143,7 @@ namespace espresso {
       m.v[0] = m.v[1] = m.v[2] = 0.0;
       p.type = 0;
       p.mass = 1.0;
+      p.q = 0.0;
       l.ghost = false;
     }
 
@@ -161,6 +164,11 @@ namespace espresso {
     const real& mass() const { return p.mass; }
     real getMass() const { return p.mass; }
     void setMass(real mass) { p.mass = mass; }
+
+    real& q() { return p.q; }
+    const real& q() const { return p.q; }
+    real getQ() const { return p.q; }
+    void setQ(real q) { p.q = q; }
 
     // Position
 
@@ -323,27 +331,15 @@ namespace espresso {
     }
   };
 
-    // tuples
-    class ParticleTuple
-       : public std::vector<class Particle*>
-    {
-    private:
-       typedef std::vector<class Particle*> Super;
-    public:
-       ParticleTuple()
-         : Super() {}
-       ParticleTuple(std::vector<Particle*> tuple)
-         : Super(tuple) {}
-    };
+  struct TupleList
+   : public esutil::ESPPContainer< std::map<longint, std::vector<Particle*> > >
+  {
+     void add(longint pid, std::vector<Particle*> particles) {
+         //std::cout << "\n-*-*-*-*-*-*-*-*-*-*-*-*-*-\nParticle.hpp add: " << pid << "\n\n";
+         this->insert(make_pair(pid, particles));
+     }
+  };
 
-
-    struct TupleList
-       : public esutil::ESPPContainer<std::vector<ParticleTuple> >
-    {
-       void add(std::vector<Particle*> particles) {
-           this->push_back(ParticleTuple(particles));
-       }
-    };
 }
 
 
