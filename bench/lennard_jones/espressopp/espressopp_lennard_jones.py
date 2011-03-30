@@ -19,6 +19,8 @@ from espresso.tools import decomp
 from espresso.tools.init_cfg import lattice
 from espresso.tools import timers
 
+# logging.getLogger("Storage").setLevel(logging.INFO)
+
 # simulation parameters (nvt = False implies NVE)
 steps = 1000
 rc = 2.5

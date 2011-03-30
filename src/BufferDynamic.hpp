@@ -6,8 +6,14 @@
 #include "mpi.hpp"
 #include "Particle.hpp"
 #include <vector>
+#include <boost/shared_ptr.hpp>
+#include <stdexcept>
 
-#define BUFFER_SIZE 2 * 1024 * 1024
+/** Initial buffer size for incoming and outgoing messages 
+    should fit for smaller messages
+*/
+
+#define BUFFER_SIZE 256
 
 namespace espresso {
 
@@ -28,16 +34,20 @@ namespace espresso {
     };
 
     Buffer(const mpi::communicator &_comm) : comm(_comm) 
+    { 
+      // take as default the static buffer to avoid dynamic allocation
 
-    { pos      = 0; 
-      size     = 0;
-      capacity = BUFFER_SIZE;
+      capacity  = BUFFER_SIZE; 
+      usedSize  = 0;
+      buf       = staticBuf;
+
+      pos = 0;  // set buffer position to the start
     }
 
-    void reset() 
+    void reset()
     {
-      pos  = 0;
-      size = 0;
+      usedSize = 0;
+      pos      = 0;
     }
 
   protected:
@@ -46,26 +56,48 @@ namespace espresso {
 
     const mpi::communicator &comm;
 
-    char buf[BUFFER_SIZE];
-    int  size;
-    int  capacity;
-    int  pos;
+    char* buf;   // pointer to static or dynamic buffer
 
+    char staticBuf[BUFFER_SIZE];       //!< buffer with static size
+
+    boost::scoped_array<char> dynBuf;  //!< dynamic buffer, auto freed
+
+    int  capacity;  //!< allocated size of the buffer
+    int  usedSize;   //!< used size of the buffer
+    int  pos;        //!< current buffer position
+
+    void allocate(int size) 
+    {
+       // fprintf(stderr, "realloc buffer from %d to capacity %d, used size = %d\n", capacity, size, usedSize);
+       capacity = size;
+       char* newBuf = new char[capacity];
+       for (int i = 0; i < usedSize; i++) newBuf[i] = buf[i];
+       dynBuf.reset(newBuf);
+       buf = dynBuf.get();
+    }
+      
+    void extend(int size) 
+    {
+       if (size <= capacity) return;
+       if (size < 1024) allocate(1024);
+       else allocate(2*size);
+    }
   };
 
   class InBuffer : public Buffer {
 
   public:
 
-    InBuffer(const mpi::communicator &comm) : Buffer(comm) {
+    explicit InBuffer(const mpi::communicator &comm) : Buffer(comm) {
     }
 
     template <class T>
     void readAll(T& val) { 
       T* tbuf = (T*) (buf + pos); 
       pos += sizeof(T);
-      if (pos > size) {
-        fprintf(stderr, "read at pos %d: size %d insufficient\n", pos, size);
+      if (pos > usedSize) {
+        fprintf(stderr, "read at pos %d: size %d insufficient\n", pos, usedSize);
+        exit(-1);
         return;
       }
       val = *tbuf; 
@@ -109,9 +141,28 @@ namespace espresso {
     }
 
     void recv(longint sender, int tag) {
-      mpi::status stat = comm.recv(sender, tag, buf, capacity);
-      size = *stat.count<char>();
-      pos  = 0;  // reset the buffer position
+
+      // blocking test for the incomming message
+
+      mpi::status stat = comm.probe(sender, tag);
+
+      int msgSize = *stat.count<char>();
+
+      // make sure that buffer will be suffient for receiving
+
+      if (msgSize > capacity) {
+        // reallocation necessary
+        allocate(msgSize);
+      }
+
+      stat = comm.recv(sender, tag, buf, capacity);
+
+      // incoming message might be smaller than allocated size
+
+      usedSize = *stat.count<char>();
+
+      pos      = 0;   // reset the buffer position
+
       // printf("%d: received size = %d from %d\n", comm.rank(), size, sender);
     }
 
@@ -126,16 +177,14 @@ namespace espresso {
     }
 
     template <class T>
-    void writeAll(T& val) { 
-      int len = sizeof(T);
-      if (pos + len > capacity) {
-        fprintf(stderr, "capacity exhausted");
-        exit(-1);
-      }
+    void writeAll(T& val) 
+    { 
+      int size = sizeof(T);  // needed size to write the data
+      extend(pos + size);    // make sure that buffer will be sufficient
       T* tbuf = (T*) (buf + pos); 
       *tbuf = val; 
-      pos += len;
-      size = pos;
+      pos += size;           // pos moves forward by size
+      usedSize = pos;
     }
 
     void write(int& val) { writeAll<int>(val); }

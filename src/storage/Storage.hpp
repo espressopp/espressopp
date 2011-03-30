@@ -10,11 +10,9 @@
 #include "SystemAccess.hpp"
 
 #include "Cell.hpp"
+#include "Buffer.hpp"
 
 namespace espresso {
-
-  class InBuffer;
-  class OutBuffer;
 
   namespace storage {
     /** represents the particle storage of one system. */
@@ -245,6 +243,9 @@ namespace espresso {
       CellList localCells;
 
       static LOG4ESPP_DECL_LOGGER(logger);
+
+      InBuffer inBuffer;
+      OutBuffer outBuffer;
 
     private:
       // map particle id to Particle * for all particles on this node

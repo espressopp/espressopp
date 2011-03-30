@@ -43,14 +43,52 @@ ENDIF(NOT CMAKE_BUILD_TYPE)
 ########################################################################
 #Process MPI settings
 ########################################################################
+
 find_package(MPI REQUIRED)
 include_directories(${MPI_INCLUDE_PATH})
-find_package(PythonLibs REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIR})
+
+########################################################################
+#Process Python settings
+########################################################################
 
 find_package(PythonInterp REQUIRED)
-execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "from distutils import sysconfig;print sysconfig.get_python_lib(1,0,prefix='${CMAKE_INSTALL_EXEC_PREFIX}')"
-    OUTPUT_VARIABLE PYTHON_INSTDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+execute_process(COMMAND ${PYTHON_EXECUTABLE}
+                -c "import distutils.sysconfig as cg; print cg.get_python_inc()"
+                OUTPUT_VARIABLE PYTHON_INCLUDE_PATH
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+set(PYTHON_INCLUDE_PATH ${PYTHON_INCLUDE_PATH} CACHE PATH "Python Include Directory")
+mark_as_advanced(PYTHON_INCLUDE_PATH)
+
+message(STATUS "PYTHON_INCLUDE_PATH = ${PYTHON_INCLUDE_PATH}")
+include_directories(${PYTHON_INCLUDE_PATH})
+
+execute_process(COMMAND ${PYTHON_EXECUTABLE} 
+                -c "import distutils.sysconfig as cg; print cg.get_python_lib(1,0,prefix='${CMAKE_INSTALL_EXEC_PREFIX}')"
+                OUTPUT_VARIABLE PYTHON_INSTDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+execute_process(COMMAND ${PYTHON_EXECUTABLE}
+                        -c "import sys; print sys.version[:3]"
+                        OUTPUT_VARIABLE PYTHON_VERSION
+                        OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+message(STATUS "PYTHON_VERSION = ${PYTHON_VERSION}")
+
+execute_process(COMMAND ${PYTHON_EXECUTABLE}
+                -c "import distutils.sysconfig as cg; print cg.get_config_var('LIBDIR')"
+                OUTPUT_VARIABLE PYTHON_LIBDIR
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+message(STATUS "PYTHON_LIBDIR = ${PYTHON_LIBDIR}")
+
+find_library(PYTHON_LIBRARIES
+             NAMES python${PYTHON_VERSION}
+             PATHS ${PYTHON_LIBDIR}  )
+
+message(STATUS "PYTHON_LIBRARIES = ${PYTHON_LIBRARIES}")
+
+mark_as_advanced(PYTHON_INCLUDE_PATH PYTHON_LIBRARIES)
 
 ########################################################################
 # Basic system tests (standard libraries, headers, functions, types)   #

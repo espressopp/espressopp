@@ -558,41 +558,40 @@ namespace espresso {
 
 	    // prepare send and receive buffers
 	    longint receiver, sender;
-	    OutBuffer outBuf(*getSystem()->comm);
-	    InBuffer inBuf(*getSystem()->comm);
+            outBuffer.reset();
 	    if (realToGhosts) {
 	      receiver = nodeGrid.getNodeNeighborIndex(dir);
 	      sender = nodeGrid.getNodeNeighborIndex(oppositeDir);
 	      for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
-		packPositionsEtc(outBuf, *commCells[dir].reals[i], extradata, shift);
+		packPositionsEtc(outBuffer, *commCells[dir].reals[i], extradata, shift);
 	      }
 	    }
 	    else {
 	      receiver = nodeGrid.getNodeNeighborIndex(oppositeDir);
 	      sender = nodeGrid.getNodeNeighborIndex(dir);
 	      for (int i = 0, end = commCells[dir].ghosts.size(); i < end; ++i) {
-		packForces(outBuf, *commCells[dir].ghosts[i]);
+		packForces(outBuffer, *commCells[dir].ghosts[i]);
 	      }
 	    }
 
 	    // exchange particles, odd-even rule
 	    if (nodeGrid.getNodePosition(coord) % 2 == 0) {
-              outBuf.send(receiver, DD_COMM_TAG);
-	      inBuf.recv(sender, DD_COMM_TAG);
+              outBuffer.send(receiver, DD_COMM_TAG);
+	      inBuffer.recv(sender, DD_COMM_TAG);
 	    } else {
-	      inBuf.recv(sender, DD_COMM_TAG);
-              outBuf.send(receiver, DD_COMM_TAG);
+	      inBuffer.recv(sender, DD_COMM_TAG);
+              outBuffer.send(receiver, DD_COMM_TAG);
 	    }
 
 	    // unpack received data
 	    if (realToGhosts) {
 	      for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
-		unpackPositionsEtc(*commCells[dir].ghosts[i], inBuf, extradata);
+		unpackPositionsEtc(*commCells[dir].ghosts[i], inBuffer, extradata);
 	      }
 	    }
 	    else {
 	      for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
-		unpackAndAddForces(*commCells[dir].reals[i], inBuf);
+		unpackAndAddForces(*commCells[dir].reals[i], inBuffer);
 	      }
 	    }
 	  }
