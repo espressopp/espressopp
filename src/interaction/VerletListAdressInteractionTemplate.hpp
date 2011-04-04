@@ -164,10 +164,10 @@ namespace espresso {
               std::vector<Particle*> atList;
               atList = it3->second;
 
+              // compute center of mass
               Real3D cm(0.0, 0.0, 0.0);
               real M = 0.0;
               std::cout << "vp id: " << vp.id()  << "-" << vp.ghost() << " pos: " << vp.position() << "\n";
-
               for (std::vector<Particle*>::iterator it = atList.begin();
                                    it != atList.end(); ++it) {
 
@@ -182,6 +182,40 @@ namespace espresso {
               std::cout << " cm: "  << cm << "\n\n";
               // update (overwrite) the posision of the VP
               vp.position() = cm;
+
+
+              // compute weights of VP
+              std::vector<Real3D*>::iterator it2 = verletList->getAtmPositions().begin();
+              Real3D pa = **it2; // position of atomistic particle
+              Real3D d1 = vp.position() - pa;
+              real distsq1 = d1.sqr();
+              real min1 = sqrt(distsq1);
+              // calculate distance to nearest atomistic particle
+              for (; it2 != verletList->getAtmPositions().end(); ++it2) {
+                   pa = **it2;
+                   d1 = vp.position() - pa;
+                   distsq1 = d1.sqr();
+                   if (distsq1 < min1) min1 = sqrt(distsq1);
+              }
+              std::cout << vp.id() << " min: " << min1 << "\n";
+              std::cout << vp.id() << " dex: " << dex << "\n";
+              std::cout << vp.id() << " dex+dhy: " << dexdhy << "\n";
+
+              // calculate weight and write it in the map
+              real w1, w2;
+              if (dex > min1) w1 = 1;
+              else if (dexdhy < min1) w1 = 0;
+              else {
+                   w1 = cos(pidhy2 * (min1 - dex));
+                   w1 *= w1;
+              }
+
+              weights.insert(std::make_pair(&vp, w1));
+
+              //if (w1 == 1 || w2 == 1) std::cout << p1.id() << " ";
+              std::cout << vp.id() << ": " << w1 << " weight\n\n";
+
+
           }
           else {
               std::cout << " particle not found in tuples.\n\n";
@@ -193,53 +227,18 @@ namespace espresso {
       //std::cout << "add forces computed by the AdResS List" << "\n";
       // Pairs inside AdResS zone
       for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it) {
+
+         // these are the two VP interacting
          Particle &p1 = *it->first;
          Particle &p2 = *it->second;
          int type1 = p1.type();
          int type2 = p2.type();
          const Potential &potential = getPotential(type1, type2);
 
-
-         // calculate distance to nearest atomistic particle
-         std::vector<Real3D*>::iterator it2 = verletList->getAtmPositions().begin();
-         Real3D pa = **it2; // position of atomistic particle
-         Real3D d1 = p1.position() - pa;
-         Real3D d2 = p2.position() - pa;
-         real distsq1 = d1.sqr();
-         real distsq2 = d2.sqr();
-         real min1 = distsq1;
-         real min2 = distsq2;
-         for (; it2 != verletList->getAtmPositions().end(); ++it2) {
-             pa = **it2;
-             d1 = p1.position() - pa;
-             d2 = p2.position() - pa;
-             distsq1 = d1.sqr();
-             distsq2 = d2.sqr();
-             if (distsq1 < min1) min1 = distsq1;
-             if (distsq2 < min2) min2 = distsq2;
-         }
-         //std::cout << "("<< p1.id() << ", " << p2.id() << " min: " << sqrt(min1) << ", " << sqrt(min2) << ") ";
-
-         // calculate weight of both particles
-         real w1, w2, w12;
-         if (dex > min1) w1 = 1;
-         else if (dexdhy < min1) w1 = 0;
-         else {
-             w1 = cos(pidhy2 * (min1 - dex));
-             w1 *= w1;
-         }
-
-         if (dex > min2) w2 = 1;
-         else if (dexdhy < min2) w2 = 0;
-         else {
-             w2 = cos(pidhy2 * (min2 - dex));
-             w2 *= w2;
-         }
-         w12 = w1 * w2;
-
-         //if (w1 == 1 || w2 == 1) std::cout << p1.id() << " ";
-         //std::cout << p1.id() << ": " << w1 << "\n";
-         //std::cout << p2.id() << ": " << w2 << "\n";
+         // read weights
+         real w1 = weights.find(&p1)->second;
+         real w2 = weights.find(&p2)->second;
+         real w12 = w1 * w2;
 
 
          // iterate through atomistic particles in fixedtuplelist
