@@ -76,6 +76,7 @@ namespace espresso {
       real pidhy2; // pi / (dhy * 2)
       real dexdhy; // dex + dhy
       real dex;
+      std::map<Particle*, real> weights;
 
     };
 
@@ -88,6 +89,7 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
 
       //std::cout << "add forces computed by the Verlet List" << "\n";
+      // Pairs not inside the AdResS Zone
       for (PairList::Iterator it(verletList->getPairs()); 
 	   it.isValid(); ++it) {
         Particle &p1 = *it->first;
@@ -112,10 +114,11 @@ namespace espresso {
           // iterate through atomistic particles in fixedtuplelist
           // and add them the proportional amount of force (depending
           // on their mass) to make them move along with their CG particles
+          // This is only used for the particles in the CG zone.
           FixedTupleList::iterator it3;
           FixedTupleList::iterator it4;
-          it3 = fixedtupleList->find(p1.id());
-          it4 = fixedtupleList->find(p2.id());
+          it3 = fixedtupleList->find(&p1);
+          it4 = fixedtupleList->find(&p2);
 
           if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end()) {
 
@@ -142,7 +145,53 @@ namespace espresso {
       }
 
       // adress TODO
+
+      // compute center of mass and weights for virtual particles in Adress zone
+      std::set<Particle*> adrZone = verletList->getAdrZone();
+      std::cout << "adrsize: " << adrZone.size() << "\n";
+      for (std::set<Particle*>::iterator it=adrZone.begin();
+              it != adrZone.end(); ++it) {
+
+          Particle &vp = **it;
+
+          FixedTupleList::iterator it3;
+          it3 = fixedtupleList->find(&vp);
+
+          std::cout << "it: " << vp.id() << "\n";
+
+          if (it3 != fixedtupleList->end()) {
+
+              std::vector<Particle*> atList;
+              atList = it3->second;
+
+              Real3D cm(0.0, 0.0, 0.0);
+              real M = 0.0;
+              std::cout << "vp id: " << vp.id()  << "-" << vp.ghost() << " pos: " << vp.position() << "\n";
+
+              for (std::vector<Particle*>::iterator it = atList.begin();
+                                   it != atList.end(); ++it) {
+
+                  Particle &at = **it;
+                  Real3D d1 = at.position() - vp.position();
+                  cm += at.mass() * d1;
+                  M += at.mass();
+                  std::cout << "at id: " << at.id() << "-" << at.ghost() << " pos: " << at.position() << " mass: " << at.mass() << "\n";
+              }
+              cm = cm / M;
+              cm += vp.position();
+              std::cout << " cm: "  << cm << "\n\n";
+              // update (overwrite) the posision of the VP
+              vp.position() = cm;
+          }
+          else {
+              std::cout << " particle not found in tuples.\n\n";
+          }
+      }
+
+
+
       //std::cout << "add forces computed by the AdResS List" << "\n";
+      // Pairs inside AdResS zone
       for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it) {
          Particle &p1 = *it->first;
          Particle &p2 = *it->second;
@@ -171,8 +220,8 @@ namespace espresso {
          }
          //std::cout << "("<< p1.id() << ", " << p2.id() << " min: " << sqrt(min1) << ", " << sqrt(min2) << ") ";
 
-         // calculate weight
-         real w1, w2;
+         // calculate weight of both particles
+         real w1, w2, w12;
          if (dex > min1) w1 = 1;
          else if (dexdhy < min1) w1 = 0;
          else {
@@ -186,17 +235,20 @@ namespace espresso {
              w2 = cos(pidhy2 * (min2 - dex));
              w2 *= w2;
          }
+         w12 = w1 * w2;
 
          //if (w1 == 1 || w2 == 1) std::cout << p1.id() << " ";
          //std::cout << p1.id() << ": " << w1 << "\n";
          //std::cout << p2.id() << ": " << w2 << "\n";
 
+
          // iterate through atomistic particles in fixedtuplelist
          FixedTupleList::iterator it3;
          FixedTupleList::iterator it4;
-         it3 = fixedtupleList->find(p1.id());
-         it4 = fixedtupleList->find(p2.id());
+         it3 = fixedtupleList->find(&p1);
+         it4 = fixedtupleList->find(&p2);
 
+         //std::cout << "\nInteraction " << p1.id() << " - " << p2.id() << "\n";
          if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end()) {
 
              std::vector<Particle*> atList1;
@@ -204,15 +256,15 @@ namespace espresso {
              atList1 = it3->second;
              atList2 = it4->second;
 
-             //std::cout << p1.id() << "-" << p2.id() << ":\n";
              for (std::vector<Particle*>::iterator itv = atList1.begin();
                      itv != atList1.end(); ++itv) {
+
+                 Particle &p3 = **itv;
+
                  for (std::vector<Particle*>::iterator itv2 = atList2.begin();
                                       itv2 != atList2.end(); ++itv2) {
 
-                     Particle &p3 = **itv;
                      Particle &p4 = **itv2;
-
                      //std::cout << p3.id()  << " " << p4.id() << "\n";
 
                      const Potential &potential2 =
@@ -221,22 +273,29 @@ namespace espresso {
                      // AT forces
                      Real3D force(0.0, 0.0, 0.0);
                      if(potential._computeForce(force, p3, p4)) {
-                        p3.force() += force;
-                        p4.force() -= force;
+                         force = w12 * force;
+                         p3.force() += force;
+                         p4.force() -= force;
                      }
+
                  }
+
              }
              //std::cout << "\n";
          }
 
 
-
-         // CG forces
-         Real3D force(0.0, 0.0, 0.0);
-         if(potential._computeForce(force, p1, p2)) {
-            p1.force() += force;
-            p2.force() -= force;
+         // force between CG/VP particles
+         Real3D forcecg(0.0, 0.0, 0.0);
+         if (w1 != 1 && w2 != 1) { // do not calulate if in AT region
+             if(potential._computeForce(forcecg, p1, p2)) {
+                 forcecg = (1 - w12) * forcecg;
+                 p1.force() += forcecg;
+                 p2.force() -= forcecg;
+             }
          }
+
+
       }
       //std::cout << "\n\n";
     }
