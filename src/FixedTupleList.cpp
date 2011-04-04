@@ -66,7 +66,7 @@ namespace espresso {
             tmp.push_back(p);
             pidstmp.push_back(*it); // pidK is not in this vector
         }
-        this->add(pidK, tmp); // add to TupleList
+        this->add(p, tmp); // add to TupleList
         tmp.clear();
         pids.clear();
 
@@ -200,7 +200,7 @@ namespace espresso {
         this->clear();
         longint lastpidK = -1;
 
-        Particle* p;
+        Particle* pK, * p;
         std::vector<Particle*> tmp;
 
         GlobalTuples::const_iterator it = globalTuples.begin();
@@ -209,9 +209,9 @@ namespace espresso {
         for (;it != globalTuples.end(); ++it) {
             if (it->first != lastpidK) { // don't check same pidK twice
                 lastpidK = it->first;
-                p = storage->lookupRealParticle(lastpidK);
+                pK = storage->lookupRealParticle(lastpidK);
                 std::cout << "lookup pidK "<< lastpidK << "\n";
-                if (p == NULL)
+                if (pK == NULL)
                     printf("SERIOUS ERROR: particle %d not available\n", lastpidK);
                 //tmp.push_back(p);
             }
@@ -224,7 +224,7 @@ namespace espresso {
                 tmp.push_back(p);
             }
             // add the particles
-            this->add(lastpidK, tmp);
+            this->add(pK, tmp);
             tmp.clear();
         }
         LOG4ESPP_INFO(theLogger, "regenerated local fixed list from global tuples");

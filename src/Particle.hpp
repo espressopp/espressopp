@@ -332,10 +332,10 @@ namespace espresso {
   };
 
   struct TupleList
-   : public esutil::ESPPContainer< std::map<longint, std::vector<Particle*> > >
+   : public esutil::ESPPContainer< std::map<Particle*, std::vector<Particle*> > >
   {
-     void add(longint pid, std::vector<Particle*> particles) {
-         this->insert(make_pair(pid, particles));
+     void add(Particle* p, std::vector<Particle*> particles) {
+         this->insert(make_pair(p, particles));
      }
   };
 

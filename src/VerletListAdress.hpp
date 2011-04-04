@@ -38,6 +38,7 @@ namespace espresso {
     // AdResS stuff
     PairList& getAdrPairs() { return adrPairs; }
     std::set<longint>& getAtmList() { return atmList; }
+    std::set<Particle*>& getAdrZone() { return adrZone; }
     std::vector<Real3D*>& getAtmPositions() { return atmPositions; }
     //std::set<Particle*>& getAdrZone() { return adrZone; }
     real getHy() { return skin; }
