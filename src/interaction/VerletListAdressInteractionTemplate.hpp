@@ -144,11 +144,10 @@ namespace espresso {
         }
       }
 
-      // adress TODO
 
       // compute center of mass and weights for virtual particles in Adress zone
       std::set<Particle*> adrZone = verletList->getAdrZone();
-      std::cout << "adrsize: " << adrZone.size() << "\n";
+      //std::cout << "adrsize: " << adrZone.size() << "\n";
       for (std::set<Particle*>::iterator it=adrZone.begin();
               it != adrZone.end(); ++it) {
 
@@ -167,20 +166,20 @@ namespace espresso {
               // compute center of mass
               Real3D cm(0.0, 0.0, 0.0);
               real M = 0.0;
-              std::cout << "vp id: " << vp.id()  << "-" << vp.ghost() << " pos: " << vp.position() << "\n";
-              for (std::vector<Particle*>::iterator it = atList.begin();
-                                   it != atList.end(); ++it) {
+              //std::cout << "vp id: " << vp.id()  << "-" << vp.ghost() << " pos: " << vp.position() << "\n";
+              for (std::vector<Particle*>::iterator it2 = atList.begin();
+                                   it2 != atList.end(); ++it2) {
 
-                  Particle &at = **it;
+                  Particle &at = **it2;
                   Real3D d1 = at.position() - vp.position();
                   cm += at.mass() * d1;
                   M += at.mass();
-                  std::cout << "at id: " << at.id() << "-" << at.ghost() << " pos: " << at.position() << " mass: " << at.mass() << "\n";
+                  //std::cout << "at id: " << at.id() << "-" << at.ghost() << " pos: " << at.position() << " mass: " << at.mass() << "\n";
               }
               cm = cm / M;
               cm += vp.position();
-              std::cout << " cm: "  << cm << "\n\n";
-              // update (overwrite) the posision of the VP
+              //std::cout << " cm: "  << cm << "\n\n";
+              // update (overwrite) the position of the VP
               vp.position() = cm;
 
 
@@ -189,17 +188,19 @@ namespace espresso {
               Real3D pa = **it2; // position of atomistic particle
               Real3D d1 = vp.position() - pa;
               real distsq1 = d1.sqr();
-              real min1 = sqrt(distsq1);
+              //real min1 = sqrt(distsq1);
+              real min1 = distsq1;
               // calculate distance to nearest atomistic particle
               for (; it2 != verletList->getAtmPositions().end(); ++it2) {
                    pa = **it2;
                    d1 = vp.position() - pa;
                    distsq1 = d1.sqr();
-                   if (distsq1 < min1) min1 = sqrt(distsq1);
+                   if (distsq1 < min1) min1 = distsq1;
               }
+              min1 = sqrt(min1);
               std::cout << vp.id() << " min: " << min1 << "\n";
-              std::cout << vp.id() << " dex: " << dex << "\n";
-              std::cout << vp.id() << " dex+dhy: " << dexdhy << "\n";
+              //std::cout << vp.id() << " dex: " << dex << "\n";
+              //std::cout << vp.id() << " dex+dhy: " << dexdhy << "\n";
 
               // calculate weight and write it in the map
               real w1, w2;
@@ -213,9 +214,7 @@ namespace espresso {
               weights.insert(std::make_pair(&vp, w1));
 
               //if (w1 == 1 || w2 == 1) std::cout << p1.id() << " ";
-              std::cout << vp.id() << ": " << w1 << " weight\n\n";
-
-
+              std::cout << vp.id() << " weight: " << w1 << "\n\n";
           }
           else {
               std::cout << " particle not found in tuples.\n\n";
@@ -224,7 +223,7 @@ namespace espresso {
 
 
 
-      //std::cout << "add forces computed by the AdResS List" << "\n";
+      //std::cout << "add forces computed for AdResS pairs" << "\n";
       // Pairs inside AdResS zone
       for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it) {
 
@@ -239,6 +238,16 @@ namespace espresso {
          real w1 = weights.find(&p1)->second;
          real w2 = weights.find(&p2)->second;
          real w12 = w1 * w2;
+
+         // force between CG/VP particles
+         Real3D forcecg(0.0, 0.0, 0.0);
+         if (w1 != 1 && w2 != 1) { // calculate if not in AT region
+             if(potential._computeForce(forcecg, p1, p2)) {
+                 forcecg = (1 - w12) * forcecg;
+                 p1.force() += forcecg;
+                 p2.force() -= forcecg;
+             }
+         }
 
 
          // iterate through atomistic particles in fixedtuplelist
@@ -264,7 +273,6 @@ namespace espresso {
                                       itv2 != atList2.end(); ++itv2) {
 
                      Particle &p4 = **itv2;
-                     //std::cout << p3.id()  << " " << p4.id() << "\n";
 
                      const Potential &potential2 =
                              getPotential(p3.type(),p4.type());
@@ -282,20 +290,51 @@ namespace espresso {
              }
              //std::cout << "\n";
          }
-
-
-         // force between CG/VP particles
-         Real3D forcecg(0.0, 0.0, 0.0);
-         if (w1 != 1 && w2 != 1) { // do not calulate if in AT region
-             if(potential._computeForce(forcecg, p1, p2)) {
-                 forcecg = (1 - w12) * forcecg;
-                 p1.force() += forcecg;
-                 p2.force() -= forcecg;
-             }
-         }
-
-
       }
+
+      weights.clear();
+
+      // distribute forces from VP to AT
+      std::cout << "\n\nUpdating forces...\n";
+      for (std::set<Particle*>::iterator it=adrZone.begin();
+                it != adrZone.end(); ++it) {
+
+        Particle &vp = **it;
+
+        FixedTupleList::iterator it3;
+        it3 = fixedtupleList->find(&vp);
+
+        std::cout << "it: " << vp.id() << "\n";
+
+        if (it3 != fixedtupleList->end()) {
+
+            std::vector<Particle*> atList;
+            atList = it3->second;
+
+            // total mass of AT particles belonging to a VP
+            real M = 0.0;
+            //std::cout << "vp id: " << vp.id()  << "-" << vp.ghost() << " pos: " << vp.position() << "\n";
+            for (std::vector<Particle*>::iterator it2 = atList.begin();
+                                 it2 != atList.end(); ++it2) {
+                Particle &at = **it2;
+                M += at.mass();
+                //std::cout << "at id: " << at.id() << "-" << at.ghost() << " pos: " << at.position() << " mass: " << at.mass() << "\n";
+            }
+
+            // update force of AT particles belonging to a VP
+            for (std::vector<Particle*>::iterator it2 = atList.begin();
+                                 it2 != atList.end(); ++it2) {
+                Particle &at = **it2;
+                std::cout << "old force: " << at.force() << "\n";
+                at.force() += at.mass() * vp.force() / M;
+                std::cout << "new force: " << at.force() << "\n";
+            }
+        }
+        else {
+            std::cout << " particle not found in tuples.\n\n";
+        }
+      }
+
       //std::cout << "\n\n";
     }
     
@@ -318,7 +357,7 @@ namespace espresso {
       }
 
       // adress TODO
-      //std::cout << "compute energy of the AdReSs list pairs" << "\n";
+      //std::cout << "compute energy of the AdReSs pairs" << "\n";
       for (PairList::Iterator it(verletList->getAdrPairs());
              it.isValid(); ++it) {
               Particle &p1 = *it->first;
