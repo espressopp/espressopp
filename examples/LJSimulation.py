@@ -26,11 +26,11 @@ from espresso.tools import timers
 steps = 1000
 rc = 2.5
 skin = 0.3
-nvt = False
+nvt = True
 timestep = 0.005
 
 # initial configuration: (1) LAMMPS, (2) lattice or (3) GROMACS
-init_cfg = 2
+init_cfg = 1
 
 if(init_cfg == 1):
   # LAMMPS with N = 32000
@@ -49,7 +49,6 @@ else:
   sys.exit(1)
 
 
-
 ######################################################################
 ### IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE ###
 ######################################################################
@@ -61,47 +60,23 @@ system.rng = espresso.esutil.RNG()
 system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 
-# compute the number of cells on each node
-def calcNumberCells(size, nodes, cutoff):
-    ncells = 1
-    while size / (ncells * nodes) >= cutoff:
-       ncells = ncells + 1
-    return ncells - 1
-
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
-#nodeGrid = Int3D(1, 1, comm.size)
-#cellGrid = Int3D(
-    #calcNumberCells(size[0], nodeGrid[0], rc),
-    #calcNumberCells(size[1], nodeGrid[1], rc),
-    #calcNumberCells(size[2], nodeGrid[2], rc)
-    #)
-
 
 system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
-
-
 
 # add particles to the system and then decompose
 for pid in range(num_particles):
   system.storage.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
 system.storage.decompose()
 
-
-
 # all particles interact via a LJ interaction (use Verlet lists)
 vl = espresso.VerletList(system, cutoff=rc+system.skin)
-
 potLJ = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=False)
-#potLJ = espresso.interaction.SoftCosine(A=1.0, cutoff=rc, shift=False)
-
 interLJ = espresso.interaction.VerletListLennardJones(vl)
-#interLJ = espresso.interaction.VerletListSoftCosine(vl)
 interLJ.setPotential(type1=0, type2=0, potential=potLJ)
-
 system.addInteraction(interLJ)
-
 
 # setup integrator
 integrator = espresso.integrator.VelocityVerlet(system)
@@ -130,12 +105,14 @@ print ''
 temperature = espresso.analysis.Temperature(system)
 pressure = espresso.analysis.Pressure(system)
 pressureTensor = espresso.analysis.PressureTensor(system)
+com = espresso.analysis.CenterOfMass(system)
 
 fmt = '%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f\n'
 
 T = temperature.compute()
 P = pressure.compute()
 Pij = pressureTensor.compute()
+CM = com.compute()
 Ek = 0.5 * T * (3 * num_particles)
 Ep = interLJ.computeEnergy()
 sys.stdout.write(' step     T          P        Pxy       etotal     epotential    ekinetic\n')

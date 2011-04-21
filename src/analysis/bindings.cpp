@@ -5,6 +5,7 @@
 #include "PressureTensor.hpp"
 #include "Configuration.hpp"
 #include "Configurations.hpp"
+#include "CenterOfMass.hpp"
 
 namespace espresso {
   namespace analysis {
@@ -15,6 +16,7 @@ namespace espresso {
       PressureTensor::registerPython();
       Configuration::registerPython();
       Configurations::registerPython();
+      CenterOfMass::registerPython();
     }
   }
 }

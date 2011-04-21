@@ -55,7 +55,6 @@ namespace espresso {
     }
 
     // TODO: this dummy routine is still needed as we have not yet TensorObservable
-
     real PressureTensor::compute() const {
       return -1.0;
     }
