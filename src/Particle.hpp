@@ -12,6 +12,7 @@
 #include "esutil/ESPPIterator.hpp"
 #include "Real3D.hpp"
 #include "Int3D.hpp"
+#include <map>
 
 namespace espresso {
   struct ParticleProperties {
