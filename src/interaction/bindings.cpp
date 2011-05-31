@@ -1,6 +1,7 @@
 #include "bindings.hpp"
 #include "Potential.hpp"
 #include "LennardJones.hpp"
+#include "LennardJonesExpand.hpp"
 #include "Morse.hpp"
 #include "CoulombTruncated.hpp"
 #include "SoftCosine.hpp"
@@ -22,6 +23,7 @@ namespace espresso {
       Interaction::registerPython();
       Potential::registerPython();
       LennardJones::registerPython();
+      LennardJonesExpand::registerPython();
       Morse::registerPython();
       CoulombTruncated::registerPython();
       SoftCosine::registerPython();
