@@ -81,20 +81,18 @@ class StorageLocal(object):
                 if storedParticle != None:
 
                     self.logger.debug("Processor %d stores particle id = %d"%(pmi._MPIcomm.rank, id))
+                    self.logger.debug("particle property indexes: id=%i pos=%i type=%i mass=%i v=%i f=%i q=%i"%(index_id,index_pos,index_type,index_mass,index_v,index_f,index_q))
 
                     # only the owner processor writes other properties
 
                     if index_v >= 0:
-                        vx, vy, vz = particle[index_v]
-                        storedParticle.vx = vx; storedParticle.vy = vy; storedParticle.vz = vz
+                        storedParticle.v = particle[index_v]
 
                     if index_f >= 0:
-                        fx, fy, fz = particle[index_f]
-                        storedParticle.fx = fx; storedParticle.fy = fy; storedParticle.fz = fz #<-- was vz, changed to fz 
+                        storedParticle.f = particle[index_f] 
 
                     if index_q >= 0:
-                        # not supported yet: storedParticle.q = particle[index_q]
-                        pass
+                        storedParticle.q = particle[index_q]
 
                     if index_type >= 0:
                         storedParticle.type = particle[index_type]

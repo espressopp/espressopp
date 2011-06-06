@@ -13,6 +13,7 @@ namespace espresso {
       .add_property("pos", &Particle::getPos, &Particle::setPos)
       .add_property("f", &Particle::getF, &Particle::setF)
       .add_property("v", &Particle::getV, &Particle::setV)
+      .add_property("q", &Particle::getQ, &Particle::setQ)
       ;
   }
 }
