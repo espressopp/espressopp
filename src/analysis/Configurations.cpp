@@ -3,6 +3,7 @@
 #include "Configurations.hpp"
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
+#include "bc/BC.hpp"
 #include "mpi.h"
 #include <cmath>
 
@@ -123,10 +124,12 @@ namespace espresso {
         ids[i] = cit->id();
 
         Real3D& pos = cit->position();
+        Int3D& img = cit->image();
+        Real3D L = system.bc->getBoxL();
 
-        coordinates[3*i]   = pos[0];
-        coordinates[3*i+1] = pos[1];
-        coordinates[3*i+2] = pos[2];
+        coordinates[3*i]   = pos[0] + img[0] * L[0];
+        coordinates[3*i+1] = pos[1] + img[1] * L[1];
+        coordinates[3*i+2] = pos[2] + img[2] * L[2];
 
         i++;
       }
