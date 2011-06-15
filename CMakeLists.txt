@@ -120,3 +120,39 @@ add_subdirectory(contrib)
 add_custom_target(symlink ALL COMMENT "Creating symlink")
 add_custom_command(TARGET symlink COMMAND ${CMAKE_COMMAND} -E create_symlink
   ${CMAKE_BINARY_DIR}/src espresso)
+
+######################################
+# System documentation (Doxygen)     # 
+######################################
+
+find_package( Doxygen QUIET )
+
+if ( DOXYGEN_FOUND )
+
+    set ( DOXYGEN_BUILD_ROOT "${CMAKE_SOURCE_DIR}/doc/dg" )
+    file ( MAKE_DIRECTORY ${DOXYGEN_BUILD_ROOT} )
+
+   # The initial rm command gets rid of everything previously built by this
+   # custom command.
+
+   add_custom_command(
+      OUTPUT ${DOXYGEN_BUILD_ROOT}/html/index.html
+      COMMAND rm -rf ${DOXYGEN_BUILD_ROOT}/html
+      COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_BUILD_ROOT}/doxygen.cfg
+      COMMAND echo "HTML documentation available at ${DOXYGEN_BUILD_ROOT}/html"
+      DEPENDS ${DOXYGEN_BUILD_ROOT}/doxygen.cfg
+      WORKING_DIRECTORY ${DOXYGEN_BUILD_ROOT}
+   )
+
+   add_custom_target(
+      doc
+      DEPENDS
+      ${DOXYGEN_BUILD_ROOT}/html/index.html
+   )
+
+   message ( STATUS "Generate system documentation via ${DOXYGEN_EXECUTABLE}: make doc")
+
+else ( DOXYGEN_FOUND )
+    message ( WARNING "Not building system documentation because Doxygen not found.")
+endif ( DOXYGEN_FOUND )
+
