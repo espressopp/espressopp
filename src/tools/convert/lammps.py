@@ -13,8 +13,10 @@ def read(fin):
   num_dihedrals = int(f.readline().split()[0])
   line = f.readline() # impropers
   line = f.readline() # blank line
-  num_types = int(f.readline().split()[0]) # atom types
-
+  line = f.readline() # atom types and maybe the word "velocities"
+  num_types = int(line.split()[0])
+  velocities = True if 'velocities' in line else False
+ 
   # find and store size of box
   line = ''
   while not 'xlo' in line:
@@ -92,15 +94,32 @@ def read(fin):
       dihedral_id, dihedral_type, pid1, pid2, pid3, pid4 = map(int, f.readline().split())
       dihedrals.append((pid1, pid2, pid3, pid4))
 
+  if(velocities):
+    # find and store velocities
+    line = ''
+    while not 'Velocities' in line:
+      line = f.readline()
+    line = f.readline() # blank line
+    vx = []
+    vy = []
+    vz = []
+    for i in range(num_particles):
+      vx_, vy_, vz_ = map(float, f.readline().split()[1:])
+      vx.append(vx_)
+      vy.append(vy_)
+      vz.append(vz_)
 
-    f.close()
+
+  f.close()
 
 
   if(num_types != 1):
     return p_type, bonds, angles, q, x, y, z, Lx, Ly, Lz
 
-  if(num_bonds == 0 and num_angles == 0 and num_dihedrals == 0):
+  if(num_bonds == 0 and num_angles == 0 and num_dihedrals == 0 and not velocities):
     return x, y, z, Lx, Ly, Lz
+  if(num_bonds == 0 and num_angles == 0 and num_dihedrals == 0 and velocities):
+    return x, y, z, Lx, Ly, Lz, vx, vy, vz
   elif(num_bonds != 0 and num_angles == 0 and num_dihedrals == 0):
     return bonds, x, y, z, Lx, Ly, Lz
   elif(num_bonds != 0 and num_angles != 0 and num_dihedrals == 0):

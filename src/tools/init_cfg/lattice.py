@@ -5,7 +5,7 @@
    the particle positions will be given random displacements
    with a magnitude of one-tenth the lattice spacing."""
 
-def create(N, density, perfect=True, RNG=None):
+def create(N, rho, perfect=True, RNG=None):
 
   if RNG == None:
     import random
@@ -20,7 +20,7 @@ def create(N, density, perfect=True, RNG=None):
     print '\nWARNING: num_particles is not a perfect cube. Initial'
     print '         configuration may be inhomogeneous.\n'
 
-  L = (N / density)**(1.0/3.0)
+  L = (N / rho)**(1.0/3.0)
   a = int(N**(1.0/3.0))
   if(a**3 < N):
     a = a + 1

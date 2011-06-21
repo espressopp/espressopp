@@ -33,7 +33,7 @@ timestep = 0.005
 ### IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE ###
 ######################################################################
 sys.stdout.write('Setting up simulation ...\n')
-x, y, z, Lx, Ly, Lz = lammps.read('espressopp_lennard_jones.start')
+x, y, z, Lx, Ly, Lz, vx, vy, vz = lammps.read('espressopp_lennard_jones.start')
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
@@ -47,8 +47,12 @@ cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # add particles to the system and then decompose
-for pid in range(num_particles):
-  system.storage.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
+props = ['id', 'type', 'mass', 'pos', 'v']
+new_particles = []
+for i in range(num_particles):
+  part = [i + 1, 0, 1.0, Real3D(x[i], y[i], z[i]), Real3D(vx[i], vy[i], vz[i])]
+  new_particles.append(part)
+system.storage.addParticles(new_particles, *props)
 system.storage.decompose()
 
 # all particles interact via a LJ interaction (use Verlet lists)
