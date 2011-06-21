@@ -14,6 +14,7 @@
 ###########################################################################
 
 import sys
+import random
 from espresso.tools.init_cfg import lattice
 
 
@@ -21,10 +22,11 @@ from espresso.tools.init_cfg import lattice
 # num_particles should be a perfect cube (e.g. 25**3=15625, 32**3=32768)
 
 N = 32
+T = 0.8 # temperature
 
 num_particles = N**3
 rho = 0.8442
-x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False)
+x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=True)
 
 ###############################################################################
 #                                  ESPResSo++                                 #
@@ -50,13 +52,47 @@ file.write("%.4f %.4f ylo yhi\n" % (0.0, Ly))
 file.write("%.4f %.4f zlo zhi\n" % (0.0, Lz))
 
 file.write("\n")
-file.write("Atoms \n")
+file.write("Atoms\n")
 file.write("\n")
 
 pid = 1
 for px, py, pz in zip(x, y, z):
    file.write("%d 1 %.3f %.3f %.3f\n"%(pid, px, py, pz))
    pid += 1
+
+file.write("\n")
+file.write("Velocities\n")
+file.write("\n")
+
+sqrtT = T**0.5
+random.seed(7654321)
+vx = []
+vy = []
+vz = []
+for i in range(num_particles):
+  vx.append(sqrtT * random.gauss(0, 1))
+  vy.append(sqrtT * random.gauss(0, 1))
+  vz.append(sqrtT * random.gauss(0, 1))
+
+# remove net momentum
+sumvx = 0.0
+sumvy = 0.0
+sumvz = 0.0
+for vx_, vy_, vz_ in zip(vx, vy, vz):
+  sumvx += vx_
+  sumvy += vy_
+  sumvz += vz_
+sumvx = sumvx / num_particles
+sumvy = sumvy / num_particles
+sumvz = sumvz / num_particles
+for i in range(num_particles):
+  vx[i] = vx[i] - sumvx
+  vy[i] = vy[i] - sumvy
+  vz[i] = vz[i] - sumvz
+
+# write velocities
+for i in range(num_particles):
+  file.write("%d %.3f %.3f %.3f\n"%(i + 1, vx[i], vy[i], vz[i]))
 file.close()
 sys.stdout.write('\nESPResSo++ input file written: espressopp/espressopp_lennard_jones.start\n')
 
@@ -85,13 +121,47 @@ file.write("%.4f %.4f ylo yhi\n" % (0.0, Ly))
 file.write("%.4f %.4f zlo zhi\n" % (0.0, Lz))
 
 file.write("\n")
-file.write("Atoms \n")
+file.write("Atoms\n")
 file.write("\n")
 
 pid = 1
 for px, py, pz in zip(x, y, z):
    file.write("%d 1 %.3f %.3f %.3f\n"%(pid, px, py, pz))
    pid += 1
+
+file.write("\n")
+file.write("Velocities\n")
+file.write("\n")
+
+sqrtT = T**0.5
+random.seed(7654321)
+vx = []
+vy = []
+vz = []
+for i in range(num_particles):
+  vx.append(sqrtT * random.gauss(0, 1))
+  vy.append(sqrtT * random.gauss(0, 1))
+  vz.append(sqrtT * random.gauss(0, 1))
+
+# remove net momentum
+sumvx = 0.0
+sumvy = 0.0
+sumvz = 0.0
+for vx_, vy_, vz_ in zip(vx, vy, vz):
+  sumvx += vx_
+  sumvy += vy_
+  sumvz += vz_
+sumvx = sumvx / num_particles
+sumvy = sumvy / num_particles
+sumvz = sumvz / num_particles
+for i in range(num_particles):
+  vx[i] = vx[i] - sumvx
+  vy[i] = vy[i] - sumvy
+  vz[i] = vz[i] - sumvz
+
+# write velocities
+for i in range(num_particles):
+  file.write("%d %.3f %.3f %.3f\n"%(i + 1, vx[i], vy[i], vz[i]))
 file.close()
 sys.stdout.write('LAMMPS input file written: lammps/lammps_lennard_jones.start\n')
 
