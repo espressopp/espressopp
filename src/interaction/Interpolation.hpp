@@ -2,6 +2,7 @@
 #ifndef _INTERACTION_INTERPOLATION_HPP
 #define _INTERACTION_INTERPOLATION_HPP
 
+#include <stdio.h>
 #include "types.hpp"
 #include "logging.hpp"
 #include "mpi.hpp"

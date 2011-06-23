@@ -2,6 +2,7 @@
 #ifndef _ESUTIL_ERROR_HPP
 #define _ESUTIL_ERROR_HPP
 
+#include <stdio.h>
 #include "mpi.hpp"
 
 namespace espresso {
