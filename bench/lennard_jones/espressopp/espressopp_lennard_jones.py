@@ -57,8 +57,10 @@ system.storage.decompose()
 
 # all particles interact via a LJ interaction (use Verlet lists)
 vl = espresso.VerletList(system, cutoff=rc+system.skin)
-potLJ = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=False)
-interLJ = espresso.interaction.VerletListLennardJones(vl)
+#potLJ = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=False)
+#interLJ = espresso.interaction.VerletListLennardJones(vl)
+potLJ = espresso.interaction.LennardJonesGromacs(epsilon=1.0, sigma=1.0, r1=0.0, cutoff=rc, shift=False)
+interLJ = espresso.interaction.VerletListLennardJonesGromacs(vl)
 interLJ.setPotential(type1=0, type2=0, potential=potLJ)
 system.addInteraction(interLJ)
 

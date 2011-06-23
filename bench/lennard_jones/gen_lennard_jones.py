@@ -148,4 +148,4 @@ for i in range(num_particles):
 s = '  %.4f %.4f %.4f\n' % (Lx, Ly, Lz)
 f.write(s)
 f.close()
-sys.stdout.write('GROMACS input file written: gromacs/gromacs_lennard_jones.start\n\n')
+sys.stdout.write('GROMACS input file written: gromacs/gromacs_lennard_jones.start (conf.gro)\n\n')

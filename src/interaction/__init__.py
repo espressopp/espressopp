@@ -7,6 +7,7 @@ from espresso.interaction.Interaction import *
 from espresso.interaction.Potential import *
 from espresso.interaction.LennardJones import *
 from espresso.interaction.LennardJonesExpand import *
+from espresso.interaction.LennardJonesGromacs import *
 from espresso.interaction.Morse import *
 from espresso.interaction.CoulombTruncated import *
 from espresso.interaction.SoftCosine import *
