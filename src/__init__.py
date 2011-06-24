@@ -18,6 +18,7 @@ from espresso.FixedTripleList import *
 from espresso.FixedQuadrupleList import *
 from espresso.FixedTupleList import *
 from espresso.MultiSystem import *
+from espresso.ParallelTempering import *
 
 infinity=float("inf")
 nan=float("nan")

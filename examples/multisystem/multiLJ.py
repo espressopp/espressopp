@@ -1,5 +1,6 @@
 import espresso
 from espresso import Int3D, Real3D
+from espresso.tools import decomp
 from espresso.tools.init_cfg import lattice
 import random
 
@@ -14,32 +15,34 @@ dt           = 0.01
 gamma        = 1.0
 temperature1 = 1.0
 temperature2 = 1.0
-nodeGrid     = Int3D(2,1,1)
-cellGrid     = Int3D(3,3,3)
-# rng=espresso.esutil.RNG()
-# x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False, RNG=rng)
 
 multisystem = espresso.MultiSystem()
+cpugroup1   = range(0, espresso.pmi.size/2)
+cpugroup2   = range(espresso.pmi.size/2,espresso.pmi.size)
+
+print "cpugroup1=",cpugroup1
+print "cpugroup2=",cpugroup2
 
 ################################################
 # Setup system1
 ################################################
-comm1=espresso.pmi.Communicator([0,1])
+comm1=espresso.pmi.Communicator(cpugroup1)
 espresso.pmi.activate(comm1)
 multisystem.beginSystemDefinition()
-
 random.seed(12345)
 rand1=random.random()
 x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False, RNG=rand1)
-size = (Lx, Ly, Lz)
+boxsize1 = (Lx, Ly, Lz)
 
 system1         = espresso.System()
 rng1            = espresso.esutil.RNG()
-bc1             = espresso.bc.OrthorhombicBC(rng1, size)
+bc1             = espresso.bc.OrthorhombicBC(rng1, boxsize1)
 system1.bc      = bc1
 system1.rng     = rng1
 system1.skin    = skin
-storage1        = espresso.storage.DomainDecomposition(system1, nodeGrid, cellGrid)
+nodeGrid1=espresso.tools.decomp.nodeGrid(len(cpugroup1))
+cellGrid1=espresso.tools.decomp.cellGrid(boxsize1,nodeGrid1,rc,skin)
+storage1        = espresso.storage.DomainDecomposition(system1, nodeGrid1, cellGrid1)
 system1.storage = storage1
 vl1             = espresso.VerletList(system1,cutoff=rc+skin)
 potLJ1          = espresso.interaction.LennardJones(epsilon, sigma, rc, shift)
@@ -65,22 +68,24 @@ espresso.pmi.deactivate(comm1)
 ################################################
 # Setup system2
 ################################################
-comm2=espresso.pmi.Communicator([2,3])
+comm2=espresso.pmi.Communicator(cpugroup2)
 espresso.pmi.activate(comm2)
 multisystem.beginSystemDefinition()
 
 random.seed(54321)
 rand2=random.random()
 x, y, z, Lx, Ly, Lz = lattice.create(num_particles, rho, perfect=False, RNG=rand2)
-size = (Lx, Ly, Lz)
+boxsize2 = (Lx, Ly, Lz)
 
 system2         = espresso.System()
 rng2            = espresso.esutil.RNG()
-bc2             = espresso.bc.OrthorhombicBC(rng2, size)
+bc2             = espresso.bc.OrthorhombicBC(rng2, boxsize2)
 system2.bc      = bc2
 system2.rng     = rng2
 system2.skin    = skin
-storage2        = espresso.storage.DomainDecomposition(system2, nodeGrid, cellGrid)
+nodeGrid2=espresso.tools.decomp.nodeGrid(len(cpugroup2))
+cellGrid2=espresso.tools.decomp.cellGrid(boxsize2,nodeGrid2,rc,skin)
+storage2        = espresso.storage.DomainDecomposition(system2, nodeGrid2, cellGrid2)
 system2.storage = storage2
 vl2             = espresso.VerletList(system2,cutoff=rc+skin)
 potLJ2          = espresso.interaction.LennardJones(epsilon, sigma, rc, shift)
@@ -103,14 +108,25 @@ multisystem.setAnalysisPotential(interLJ2)
 multisystem.setAnalysisTemperature(analysisT2)
 espresso.pmi.deactivate(comm2)
 
-print "Potential Energy of system1 is ", multisystem.runAnalysisPotential()[0]
-print "Potential Energy of system2 is ", multisystem.runAnalysisPotential()[2]
-print "Temperature of system1 is ", multisystem.runAnalysisTemperature()[0]
-print "Temperature of system2 is ", multisystem.runAnalysisTemperature()[2]
+multiEpot = multisystem.runAnalysisPotential()
+multiT    = multisystem.runAnalysisTemperature()
+print "multiEpot = ",multiEpot
+print "multiT    = ",multiT
+
+print "Potential Energy of system1 = ", multiEpot[cpugroup1[0]]
+print "Potential Energy of system2 = ", multiEpot[cpugroup2[0]]
+print "Temperature of system1      = ", multiT[cpugroup1[0]]
+print "Temperature of system2      = ", multiT[cpugroup2[0]]
 
 multisystem.runIntegrator(1000)
 
-print "Potential Energy of system1 is ", multisystem.runAnalysisPotential()[0]
-print "Potential Energy of system2 is ", multisystem.runAnalysisPotential()[2]
-print "Temperature of system1 is ", multisystem.runAnalysisTemperature()[0]
-print "Temperature of system2 is ", multisystem.runAnalysisTemperature()[2]
+multiEpot = multisystem.runAnalysisPotential()
+multiT    = multisystem.runAnalysisTemperature()
+print "multiEpot = ",multiEpot
+print "multiT    = ",multiT
+
+print "Potential Energy of system1 = ", multiEpot[cpugroup1[0]]
+print "Potential Energy of system2 = ", multiEpot[cpugroup2[0]]
+print "Temperature of system1      = ", multiT[cpugroup1[0]]
+print "Temperature of system2      = ", multiT[cpugroup2[0]]
+
