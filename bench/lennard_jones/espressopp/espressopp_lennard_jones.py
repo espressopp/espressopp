@@ -22,7 +22,7 @@ from espresso.tools import timers
 # logging.getLogger("Storage").setLevel(logging.INFO)
 
 # simulation parameters (nvt = False implies NVE)
-steps = 1000
+steps = 10
 rc = 2.5
 skin = 0.3
 nvt = False
@@ -59,10 +59,15 @@ system.storage.decompose()
 vl = espresso.VerletList(system, cutoff=rc+system.skin)
 #potLJ = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=False)
 #interLJ = espresso.interaction.VerletListLennardJones(vl)
-potLJ = espresso.interaction.LennardJonesGromacs(epsilon=1.0, sigma=1.0, r1=0.0, cutoff=rc, shift=False)
+potLJ = espresso.interaction.LennardJonesGromacs(epsilon=1.0, sigma=1.0, r1=2.0, cutoff=rc, shift=False)
+potLJX = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=False)
 interLJ = espresso.interaction.VerletListLennardJonesGromacs(vl)
 interLJ.setPotential(type1=0, type2=0, potential=potLJ)
 system.addInteraction(interLJ)
+
+for i in range(2,101):
+  r = (i/100.0) * rc
+  print r, potLJ.computeEnergy(r), potLJX.computeEnergy(r),  potLJX.computeForce(Real3D(r, 0, 0))
 
 # setup integrator
 integrator = espresso.integrator.VelocityVerlet(system)
