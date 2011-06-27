@@ -8,3 +8,4 @@ from espresso.analysis.PressureTensor import *
 from espresso.analysis.Configurations import *
 from espresso.analysis.Velocities import *
 from espresso.analysis.CenterOfMass import *
+from espresso.analysis.NPart import *

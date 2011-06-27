@@ -14,6 +14,7 @@ sigma        = 1.0
 shift        = False
 dt           = 0.01
 gamma        = 1.0
+temperature  = 1.0
 
 # Parallel Tempering (replica exchange) integrator 
 pt = espresso.ParallelTempering(NumberOfSystems = 4, coupleEveryNsteps = 100)
@@ -21,8 +22,8 @@ for i in range(0, pt.getNumberOfSystems()):
     pt.startDefiningSystem(i)
     
     random.seed(3456+i*43785)
-    rand[i]=random.random()
-    x, y, z, Lx, Ly, Lz  = lattice.create(num_particles, rho, perfect=False, RNG=rand[i])
+    rand=random.random()
+    x, y, z, Lx, Ly, Lz  = lattice.create(num_particles, rho, perfect=False, RNG=rand)
     boxsize              = (Lx, Ly, Lz)
     system               = espresso.System()
     rng                  = espresso.esutil.RNG()
@@ -51,27 +52,21 @@ for i in range(0, pt.getNumberOfSystems()):
     pt.setIntegrator(integrator)
     pt.setAnalysisE(interLJ)
     pt.setAnalysisT(espresso.analysis.Temperature(system))
+    pt.setAnalysisNPart(espresso.analysis.NPart(system))
     pt.endDefiningSystem(i)
 
-multiEpot = pt._multisystem.runAnalysisPotential()
-multiT    = pt._multisystem.runAnalysisTemperature()
-print "multiEpot = ",multiEpot
-print "multiT    = ",multiT
+multiEpot  = pt._multisystem.runAnalysisPotential()
+multiT     = pt._multisystem.runAnalysisTemperature()
+multiNPart = pt._multisystem.runAnalysisNPart()
+print "multiEpot  = ",multiEpot
+print "multiT     = ",multiT
+print "multiNPart = ",multiNPart
 
-print "Potential Energy of system1 = ", multiEpot[cpugroup1[0]]
-print "Potential Energy of system2 = ", multiEpot[cpugroup2[0]]
-print "Temperature of system1      = ", multiT[cpugroup1[0]]
-print "Temperature of system2      = ", multiT[cpugroup2[0]]
+pt.run(1000)
 
-multisystem.runIntegrator(1000)
-
-multiEpot = multisystem.runAnalysisPotential()
-multiT    = multisystem.runAnalysisTemperature()
-print "multiEpot = ",multiEpot
-print "multiT    = ",multiT
-
-print "Potential Energy of system1 = ", multiEpot[cpugroup1[0]]
-print "Potential Energy of system2 = ", multiEpot[cpugroup2[0]]
-print "Temperature of system1      = ", multiT[cpugroup1[0]]
-print "Temperature of system2      = ", multiT[cpugroup2[0]]
-
+multiEpot  = pt._multisystem.runAnalysisPotential()
+multiT     = pt._multisystem.runAnalysisTemperature()
+multiNPart = pt._multisystem.runAnalysisNPart()
+print "multiEpot  = ",multiEpot
+print "multiT     = ",multiT
+print "multiNPart = ",multiNPart

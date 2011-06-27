@@ -7,6 +7,7 @@
 #include "Configurations.hpp"
 #include "Velocities.hpp"
 #include "CenterOfMass.hpp"
+#include "NPart.hpp"
 
 namespace espresso {
   namespace analysis {
@@ -19,6 +20,7 @@ namespace espresso {
       Configurations::registerPython();
       Velocities::registerPython();
       CenterOfMass::registerPython();
+      NPart::registerPython();
     }
   }
 }
