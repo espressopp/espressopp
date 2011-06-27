@@ -16,8 +16,12 @@ dt           = 0.01
 gamma        = 1.0
 temperature  = 1.0
 
-# Parallel Tempering (replica exchange) integrator 
-pt = espresso.ParallelTempering(NumberOfSystems = 4, coupleEveryNsteps = 100)
+ptrng=random
+ptrng.seed(335977)
+
+# Parallel Tempering (replica exchange) integrator
+ptthermostats=[] 
+pt = espresso.ParallelTempering(NumberOfSystems = 4, RNG = ptrng)
 for i in range(0, pt.getNumberOfSystems()):
     pt.startDefiningSystem(i)
     
@@ -42,31 +46,27 @@ for i in range(0, pt.getNumberOfSystems()):
     integrator.dt        = dt
     langevin             = espresso.integrator.Langevin(system)
     langevin.gamma       = gamma
-    langevin.temperature = temperature
+    langevin.temperature = temperature*i/10 + 0.5
+    integrator.langevin  = langevin
     interLJ.setPotential(type1=0, type2=0, potential=potLJ)
     system.addInteraction(interLJ)
     for pid in range(num_particles):
         storage.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
     storage.decompose()
 
-    pt.setIntegrator(integrator)
+    pt.setIntegrator(integrator, langevin)
     pt.setAnalysisE(interLJ)
     pt.setAnalysisT(espresso.analysis.Temperature(system))
-    pt.setAnalysisNPart(espresso.analysis.NPart(system))
     pt.endDefiningSystem(i)
 
+for p in range(10):
+#    multiEpot  = pt._multisystem.runAnalysisPotential()
+    multiT     = pt._multisystem.runAnalysisTemperature()
+#    print "Epot_all= %s T_all= %s" % (multiEpot,multiT)
+    print "%s" % multiT
+    pt.run(200)
+    pt.exchange()
+
 multiEpot  = pt._multisystem.runAnalysisPotential()
 multiT     = pt._multisystem.runAnalysisTemperature()
-multiNPart = pt._multisystem.runAnalysisNPart()
-print "multiEpot  = ",multiEpot
-print "multiT     = ",multiT
-print "multiNPart = ",multiNPart
-
-pt.run(1000)
-
-multiEpot  = pt._multisystem.runAnalysisPotential()
-multiT     = pt._multisystem.runAnalysisTemperature()
-multiNPart = pt._multisystem.runAnalysisNPart()
-print "multiEpot  = ",multiEpot
-print "multiT     = ",multiT
-print "multiNPart = ",multiNPart
+print "Epot_all= %s T_all= %s" % (multiEpot,multiT)

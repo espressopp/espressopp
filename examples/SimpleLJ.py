@@ -66,5 +66,7 @@ print "t= %5.2f T= %5.2f E_pot= %8.5f" % (t, Temperature(s).compute(), interLJ.c
 for k in range(0,n_steps/n_analyze):
   integrator.run(n_analyze)
   t+=dt*n_analyze
+  if t>20:
+    thermostat.temperature = 0.1
   print "t= %5.2f T= %5.2f E_pot= %8.5f" % (t, Temperature(s).compute(), interLJ.computeEnergy()/num_particles)
 

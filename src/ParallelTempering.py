@@ -5,26 +5,28 @@ from math import exp
 
 class ParallelTempering(object):
     
-    def __init__(self, NumberOfSystems = 4, coupleEveryNsteps = 100):
-        if (NumberOfSystems < 2):
-            print "ERROR: Parallel Tempering needs at least 2 systems to be able to work"
-        else:
-            random.seed(12345)
-            print "WARNING: random.seed set to 12345 ... still need to workout some more randomness"
-            self._multisystem    = MultiSystem()
-            self._nsystems       = NumberOfSystems
-            self._couplesteps    = coupleEveryNsteps
-            self._cpugroup       = []
-            self._comm           = []
-            self._ncpustotal     = pmi.size
-            self._ncpuspersystem = self._ncpustotal / self._nsystems
-            self._oddeven        = 0
-            if (self._ncpuspersystem * self._nsystems != self._ncpustotal):
-                print "ERROR: Number of Parallel Tempering systems times CPUs per system does not match total number of CPUs"
-            else:
-                for i in range(self._nsystems):
-                    self._cpugroup.append( range(i * self._ncpuspersystem, (i+1) * self._ncpuspersystem) )
-                    self._comm.append(pmi.Communicator(self._cpugroup[i]))
+    def __init__(self, NumberOfSystems = 4, RNG = None):
+        if (RNG == None):
+            print "ERROR: ParallelTempering needs a random number generator"
+        else: 
+          if (NumberOfSystems < 2):
+              print "ERROR: Parallel Tempering needs at least 2 systems to be able to work"
+          else:
+              self._RNG            = RNG
+              self._multisystem    = MultiSystem()
+              self._nsystems       = NumberOfSystems
+              self._cpugroup       = []
+              self._comm           = []
+              self._thermostat     = []
+              self._ncpustotal     = pmi.size
+              self._ncpuspersystem = self._ncpustotal / self._nsystems
+              self._oddeven        = 0
+              if (self._ncpuspersystem * self._nsystems != self._ncpustotal):
+                  print "ERROR: Number of Parallel Tempering systems times CPUs per system does not match total number of CPUs"
+              else:
+                  for i in range(self._nsystems):
+                      self._cpugroup.append( range(i * self._ncpuspersystem, (i+1) * self._ncpuspersystem) )
+                      self._comm.append(pmi.Communicator(self._cpugroup[i]))
             
     def startDefiningSystem(self,n):
         if not (n in range(0,self._nsystems)):
@@ -45,8 +47,9 @@ class ParallelTempering(object):
     def getNumberOfCPUsPerSystem(self):
         return self._ncpuspersystem
     
-    def setIntegrator(self, integrator):
+    def setIntegrator(self, integrator, thermostat):
         self._multisystem.setIntegrator(integrator)
+        self._thermostat.append(thermostat)
         
     def setAnalysisE(self, analysisE):
         self._multisystem.setAnalysisPotential(analysisE)
@@ -58,28 +61,36 @@ class ParallelTempering(object):
         self._multisystem.setAnalysisNPart(analysisNPart)
         
     def run(self, nsteps):
-        totalsteps = 0
-        while totalsteps<nsteps:
-          if self._oddeven == 0:
-              self._oddeven = 1
-          else:
-              self._oddeven = 0;      
-          self._multisystem.runIntegrator(self._couplesteps)
-          energies     = self._multisystem.runAnalysisPotential()
-          temperatures = self._multisystem.runAnalysisTemperature()
-          for i in range(len(energies)/2):
-              m = 2 * i + self._oddeven
-              n = m + 1
-              if n<len(energies):
-                  metro = random.random()
-                  t1    = temperatures[m]
-                  t2    = temperatures[n]
-                  e1    = temperatures[m]
-                  e2    = temperatures[n]
-                  delta = exp(-(e1-e2)*(1/t2 -1/t1))
-                  if delta >= metro:
-                      temperatures[n] = t1
-                      temperatures[m] = t2
-# TODO       self._multisystem.setTemperaturesScaled(temperatures)
-          totalsteps += self._couplesteps
+        self._multisystem.runIntegrator(nsteps)
+
+    def exchange(self):
+        if self._oddeven == 0:
+            self._oddeven = 1
+        else:
+            self._oddeven = 0;      
+        energies     = self._multisystem.runAnalysisPotential()
+        temperatures = self._multisystem.runAnalysisTemperature()
+        for i in range(len(energies)/2):
+            m = 2 * i + self._oddeven
+            n = m + 1
+            if n<len(energies):
+                print "m=%i n=%i" %(m,n)
+                metro = self._RNG.random()
+                t1    = temperatures[m]
+                t2    = temperatures[n]
+                e1    = energies[m]
+                e2    = energies[n]
+                delta = exp(-(e1-e2)*(1/t2 -1/t1))
+                delta = 1.0
+#                print "delta=%10.5f metro=%10.5f" % (delta, metro)
+                if delta >= metro:
+                    # exchange temperature of system[n] <--> system[m]
+                    pmi.activate(self._comm[n])
+                    self._multisystem.beginSystemDefinition()
+                    self._thermostat[n].temperature = t1
+                    pmi.deactivate(self._comm[n])
+                    pmi.activate(self._comm[m])
+                    self._multisystem.beginSystemDefinition()
+                    self._thermostat[m].temperature = t2
+                    pmi.deactivate(self._comm[m])
           
