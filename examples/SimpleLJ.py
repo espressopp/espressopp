@@ -24,7 +24,7 @@ num_particles          = 20**3
 skin                   = 0.3   
 epsilon                = 1.0
 sigma                  = 1.0
-shift                  = False
+shift                  = "auto"
 dt                     = 0.01
 temperature            = 0.6
 gamma                  = 1.0
@@ -41,10 +41,8 @@ nG                     = nodeGrid(MPI.COMM_WORLD.size)
 cG                     = cellGrid(box, nG, rc, skin)
 s.storage              = DomainDecomposition(s,nG,cG)
 
-vl                     = VerletList(s,cutoff=rc+skin)
-potLJ                  = LennardJones(epsilon, sigma, rc, shift)
-interLJ                = VerletListLennardJones(vl)
-interLJ.setPotential(type1=0, type2=0, potential=potLJ)
+interLJ                = VerletListLennardJones(VerletList(s,cutoff=rc+skin))
+interLJ.setPotential(type1=0, type2=0, potential=LennardJones(epsilon, sigma, rc, shift))
 s.addInteraction(interLJ)
 
 integrator             = VelocityVerlet(s)
