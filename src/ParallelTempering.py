@@ -6,6 +6,7 @@ from math import exp
 class ParallelTempering(object):
     
     def __init__(self, NumberOfSystems = 4, RNG = None):
+        print "WARNING: ParallelTempering is running in test mode ( acceptance rate is 100% ! )"
         if (RNG == None):
             print "ERROR: ParallelTempering needs a random number generator"
         else: 
@@ -74,7 +75,7 @@ class ParallelTempering(object):
             m = 2 * i + self._oddeven
             n = m + 1
             if n<len(energies):
-                print "m=%i n=%i" %(m,n)
+#                print "m=%i n=%i" %(m,n)
                 metro = self._RNG.random()
                 t1    = temperatures[m]
                 t2    = temperatures[n]

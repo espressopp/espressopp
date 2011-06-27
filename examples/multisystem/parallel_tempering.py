@@ -60,13 +60,7 @@ for i in range(0, pt.getNumberOfSystems()):
     pt.endDefiningSystem(i)
 
 for p in range(10):
-#    multiEpot  = pt._multisystem.runAnalysisPotential()
-    multiT     = pt._multisystem.runAnalysisTemperature()
-#    print "Epot_all= %s T_all= %s" % (multiEpot,multiT)
-    print "%s" % multiT
     pt.run(200)
     pt.exchange()
-
-multiEpot  = pt._multisystem.runAnalysisPotential()
-multiT     = pt._multisystem.runAnalysisTemperature()
-print "Epot_all= %s T_all= %s" % (multiEpot,multiT)
+    multiT     = pt._multisystem.runAnalysisTemperature()
+    print "%s" % multiT
