@@ -45,6 +45,19 @@ longint CellGrid::getNumberOfInnerCells() const
   return res;
 }
 
+
+longint CellGrid::mapPositionToCell(const Real3D& pos) const {
+  int cpos[3];
+
+  for(int i = 0; i < 3; ++i) {
+    real lpos = pos[i] - myLeft[i];
+    if (lpos <= 0) cpos[i] = 0;
+    else cpos[i] = static_cast<int>(lpos*invCellSize[i]) + frame;
+  }
+  return mapPositionToIndex(cpos);
+}
+
+
 longint CellGrid::mapPositionToCellClipped(const Real3D& pos) const
 {
   int cpos[3];

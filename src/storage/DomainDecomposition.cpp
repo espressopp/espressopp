@@ -171,6 +171,10 @@ namespace espresso {
       LOG4ESPP_DEBUG(logger, "done");
     }
 
+    Cell *DomainDecomposition::mapPositionToCell(const Real3D& pos) {
+              return &cells[cellGrid.mapPositionToCell(pos)];
+    }
+
     Cell *DomainDecomposition::mapPositionToCellClipped(const Real3D& pos) {
       return &cells[cellGrid.mapPositionToCellClipped(pos)];
     }

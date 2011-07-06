@@ -77,6 +77,9 @@ namespace espresso {
 
       const Cell* getFirstCell() const { return &(cells[0]); }
 
+      /** map a position to a valid cell on this node. Used for AdResS */
+      virtual Cell* mapPositionToCell(const Real3D& pos) = 0;
+
       /** map a position to a valid cell on this node.  If the position
 	  is outside the domain of this node, return the cell inside the
 	  domain that is closest to the position. */

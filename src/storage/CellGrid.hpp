@@ -31,6 +31,8 @@ namespace espresso {
 
     int getFrameWidth() const { return frame; }
 
+    /// map coordinate to cell (ghost or non-ghost). This is used for AdResS
+    longint mapPositionToCell(const Real3D& pos) const;
     /// map coordinate to a non-ghost cell. Positions outside the inner grid are clipped back
     longint mapPositionToCellClipped(const Real3D& pos) const;
     /// map coordinate to a non-ghost cell. Returns noCell if the position is outside the inner grid
