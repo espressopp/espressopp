@@ -30,6 +30,16 @@ namespace espresso {
       */
       Particle* addParticle(longint id, const Real3D& pos);
 
+      /* add an adress AT particle with given id and position. Adress AT
+      paticles, are located only in localAdrATParticles map and in the
+      tuples of each coresponding VP.
+      Note that this is a local operation, and therefore cannot check whether a particle
+      with the given id already exists.  This is left to the parallel
+      front end.
+      */
+      Particle* addAdrATParticle(longint id, const Real3D& pos);
+
+
       //Particle* addParticle(longint id, const Real3D& pos, int type);
 
       /** lookup whether data for a given particle is available on this node,
@@ -44,6 +54,13 @@ namespace espresso {
       Particle* lookupRealParticle(longint id) {
         IdParticleMap::iterator it = localParticles.find(id);
         return (it != localParticles.end() && !(it->second->ghost())) ? it->second : 0;
+      }
+
+      /** Lookup whether data for a given adress AT particle is available on this node.
+      \return 0 if the particle wasn't available, the pointer to the Particle, if it was. */
+      Particle* lookupAdrATParticle(longint id) {
+        IdParticleMap::iterator it = localAdrATParticles.find(id);
+        return (it != localAdrATParticles.end()) ? it->second : 0;
       }
 
       /// get number of real particles on this node
@@ -250,6 +267,9 @@ namespace espresso {
     private:
       // map particle id to Particle * for all particles on this node
       boost::unordered_map<longint, Particle*> localParticles;
+
+      // local atomistic adress particles
+      boost::unordered_map<longint, Particle*> localAdrATParticles;
     };
   }
 }

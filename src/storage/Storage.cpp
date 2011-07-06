@@ -124,6 +124,21 @@ namespace espresso {
       return &cell->particles.back();
     }
 
+    Particle* Storage::addAdrATParticle(longint id, const Real3D& p) {
+
+      Particle n;
+      n.init();
+      n.id() = id;
+      n.position()= p;
+
+      if (localAdrATParticles.find(id) == localAdrATParticles.end()) {
+          localAdrATParticles[id] = &n;
+      }
+
+      return localAdrATParticles[id];
+    }
+
+
     /*Particle* Storage::addParticle(longint id, const Real3D& p, int type) {
         Particle* pt = addParticle(id, p);
         pt->setType(type);
@@ -420,6 +435,10 @@ namespace espresso {
 
 	.def("addParticle", &Storage::addParticle, 
 	     return_value_policy< reference_existing_object >())
+
+    .def("addAdrATParticle", &Storage::addAdrATParticle,
+         return_value_policy< reference_existing_object >())
+
   //
   //.def("addParticle", &Storage::addParticle,
   //     return_value_policy< reference_existing_object >())

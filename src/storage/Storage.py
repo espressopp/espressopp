@@ -45,6 +45,7 @@ class StorageLocal(object):
             index_q    = -1
             index_type = -1
             index_mass = -1
+            index_adrAT= -1 # adress AT particle if 1
 
             if properties == None:
                 # default properities = (id, pos)
@@ -61,6 +62,7 @@ class StorageLocal(object):
                     elif val.lower() == "v": index_v = nindex
                     elif val.lower() == "f": index_f = nindex
                     elif val.lower() == "q": index_q = nindex
+                    elif val.lower() == "adrat": index_adrAT = nindex
                     else: raise "unknown particle property: %s"%val
                     nindex += 1
 
@@ -76,7 +78,10 @@ class StorageLocal(object):
                 id = particle[index_id]
                 pos = particle[index_pos]
 
-                storedParticle = self.cxxclass.addParticle(self, id, pos)
+                if index_adrAT != 1:
+                    storedParticle = self.cxxclass.addParticle(self, id, pos)
+                else:
+                    storedParticle = self.cxxclass.addAdrATParticle(self, id, pos)
 
                 if storedParticle != None:
 
@@ -112,6 +117,10 @@ if pmi.isController:
 
         def addParticle(self, pid, *args):
             pmi.call(self.pmiobject, 'addParticle', pid, *args)
+            return Particle(pid, self)
+        
+        def addAdrATParticle(self, pid, *args):
+            pmi.call(self.pmiobject, 'addAdrATParticle', pid, *args)
             return Particle(pid, self)
 
         def getParticle(self, pid):
