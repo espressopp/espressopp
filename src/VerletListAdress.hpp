@@ -22,10 +22,10 @@ namespace espresso {
   public:
 
     /** Build a verlet list of all particle pairs in the storage
-	whose distance is less than a given cutoff.
+    whose distance is less than a given cutoff.
 
-	\param system is the system for which the verlet list is built
-	\param cut is the cutoff value for the 
+    \param system is the system for which the verlet list is built
+    \param cut is the cutoff value for the
 
     */
 
@@ -35,12 +35,12 @@ namespace espresso {
 
     PairList& getPairs() { return vlPairs; }
 
-    // AdResS stuff
     PairList& getAdrPairs() { return adrPairs; }
-    std::set<longint>& getAtmList() { return atmList; }
+    std::set<longint>& getAdrList() { return adrList; }
     std::set<Particle*>& getAdrZone() { return adrZone; }
-    std::vector<Real3D*>& getAtmPositions() { return atmPositions; }
+    std::set<Real3D*>& getAdrPositions() { return adrPositions; }
     //std::set<Particle*>& getAdrZone() { return adrZone; }
+
     real getHy() { return skin; }
     real getEx() { return adresscut - skin; }
 
@@ -53,7 +53,10 @@ namespace espresso {
     bool exclude(longint pid1, longint pid2);
 
     /** Add an atomistic particle (used for AdResS) to atList */
-    void addAtParticle(longint pid);
+    void addAdrParticle(longint pid);
+
+    /** Define the lowest atomistic type number */
+    void setAtType(size_t type);
 
     /** Get the number of times the Verlet list has been rebuilt */
     int getBuilds() const { return builds; }
@@ -68,14 +71,15 @@ namespace espresso {
 
     // AdResS stuff
     void isPairInAdrZone(Particle &pt1, Particle &pt2);
-    std::set<longint> atmList;   // pids of particles defined as atomistic
-    std::vector<Real3D*> atmPositions; // positions of atomistic particles
+    std::set<longint> adrList;   // pids of particles defined as adress particles
+    std::set<Real3D*> adrPositions; // positions of adress particles
     std::set<Particle*> adrZone; // particles that are in the AdResS zone
     PairList adrPairs;           // pairs that are in AdResS zone
 
     real adresscut; // size of AdResS zone
     real adrsq;
     real skin; // skin, but also used as the size of hybrid region
+    size_t atType; // types above this number are considered atomistic
 
 
     void checkPair(Particle &pt1, Particle &pt2);

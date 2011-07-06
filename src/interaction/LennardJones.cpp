@@ -37,7 +37,9 @@ namespace espresso {
       ;
 
       class_< VerletListAdressLennardJones, bases< Interaction > >
-        ("interaction_VerletListAdressLennardJones", init< shared_ptr<VerletListAdress> >())
+        ("interaction_VerletListAdressLennardJones",
+           init< shared_ptr<VerletListAdress>,
+                  shared_ptr<FixedTupleList> >())
         .def("setFixedTupleList", &VerletListAdressLennardJones::setFixedTupleList)
         .def("setPotential", &VerletListAdressLennardJones::setPotential);
       ;

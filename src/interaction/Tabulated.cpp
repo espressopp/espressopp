@@ -4,6 +4,7 @@
 #include "InterpolationAkima.hpp"
 #include "InterpolationCubic.hpp"
 #include "VerletListInteractionTemplate.hpp"
+#include "VerletListAdressInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
@@ -29,11 +30,10 @@ namespace espresso {
             table = make_shared <InterpolationCubic> ();
             table->read(world, _filename);
         }
-      
-      
     }
 
     typedef class VerletListInteractionTemplate <Tabulated> VerletListTabulated;
+    typedef class VerletListAdressInteractionTemplate <Tabulated> VerletListAdressTabulated;
     typedef class CellListAllPairsInteractionTemplate <Tabulated> CellListTabulated;
     typedef class FixedPairListInteractionTemplate <Tabulated> FixedPairListTabulated;
 
@@ -51,6 +51,15 @@ namespace espresso {
         ("interaction_VerletListTabulated", init <shared_ptr<VerletList> >())
             .def("setPotential", &VerletListTabulated::setPotential);
         ;
+
+      class_ <VerletListAdressTabulated, bases <Interaction> >
+        ("interaction_VerletListAdressTabulated",
+           init <shared_ptr<VerletListAdress>,
+                 shared_ptr<FixedTupleList> >()
+                )
+            .def("setFixedTupleList", &VerletListAdressTabulated::setFixedTupleList)
+            .def("setPotential", &VerletListAdressTabulated::setPotential);
+        ;
      
       class_ <CellListTabulated, bases <Interaction> > 
         ("interaction_CellListTabulated", init <shared_ptr <storage::Storage> >())
@@ -63,7 +72,7 @@ namespace espresso {
                 shared_ptr<FixedPairList>, 
                 shared_ptr<Tabulated> >()
         )
-            .def("setPotential", &FixedPairListTabulated::setPotential);
+        .def("setPotential", &FixedPairListTabulated::setPotential);
         ;
         
         
