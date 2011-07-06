@@ -78,10 +78,10 @@ class StorageLocal(object):
                 id = particle[index_id]
                 pos = particle[index_pos]
 
-                if index_adrAT != 1:
-                    storedParticle = self.cxxclass.addParticle(self, id, pos)
-                else:
+                if particle[index_adrAT] == 1:
                     storedParticle = self.cxxclass.addAdrATParticle(self, id, pos)
+                else:
+                    storedParticle = self.cxxclass.addParticle(self, id, pos)
 
                 if storedParticle != None:
 
