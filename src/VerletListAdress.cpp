@@ -7,7 +7,7 @@
 #include "storage/Storage.hpp"
 #include "bc/BC.hpp"
 #include "iterator/CellListAllPairsIterator.hpp"
-#include "iterator/CellListIterator.hpp" // TODO remove later, used just for testing
+#include "iterator/CellListIterator.hpp"
 
 namespace espresso {
 
@@ -69,19 +69,53 @@ namespace espresso {
       std::cout << "pairs: " << count << std::endl;
       */
 
-      /*
-      std::cout << "particles of all local cells:\n";
-      int count = 0;
+
+      // loop over all VP particles (reals and ghosts) on node
+      //std::cout << "particles of all local cells:\n";
+      //int count = 0;
       CellList localcells = getSystem()->storage->getLocalCells();
       Cell* cellp;
       for (CellListIterator it(localcells); it.isValid(); ++it) {
           cellp = getSystem()->storage->mapPositionToCell(it->position());
-          std::cout << it->id() << "-" << it->ghost() << " " << it->position()
-                  << " in cell " << cellp - (getSystem()->storage->getFirstCell()) << "\n";
-          ++count;
+          //++count;
+
+          /*std::cout << it->id() << "-" << it->ghost() << " " << it->position()
+                  << " in cell " << cellp - (getSystem()->storage->getFirstCell()) << "\n";*/
+
+          if (adrList.count(it->id()) == 1) {
+              std::cout << " adding particle position (" << it->position() << ") to adrPositions and adrZone\n";
+              adrPositions.insert(&(it->position()));
+              adrZone.insert(&(*it));
+          }
       }
-      std::cout << "(" << count <<" particles)\n";
-      */
+      //std::cout << "(" << count <<" particles)\n";
+
+
+      // again, loop over all VP particles and check if they are close enough to adrPositions and add to adrZone
+      //std::cout << "\nAdding particles to adrZone ...\n";
+      Real3D dist;
+      real distsq;
+      for (CellListIterator it(localcells); it.isValid(); ++it) {
+            cellp = getSystem()->storage->mapPositionToCell(it->position());
+
+            /*std::cout << it->id() << "-" << it->ghost() << " " << it->position()
+                    << " in cell " << cellp - (getSystem()->storage->getFirstCell()) << "\n";*/
+
+            // loop over positions
+            for (std::set<Real3D*>::iterator it2 = adrPositions.begin(); it2 != adrPositions.end(); ++it2){
+                dist = it->getPos() - **it2;
+                distsq = dist.sqr();
+
+                std::cout << "distance " << sqrt(distsq) << "\n";
+                if (distsq < adrsq) {
+                    adrZone.insert(&(*it));
+                    std::cout << " added " << it->getId() << "-" << it->ghost() <<  "\n";
+                    //std::cout << " adding particle " << it->getId() << "-" << it->ghost() << " to adrZone\n";
+                    break; // do not need to loop further
+                }
+            }
+
+      }
 
 
       // add particles to adress pairs and VL
@@ -125,7 +159,6 @@ namespace espresso {
           std::cout << (*it)->id() << "-";
           std::cout << (*it)->ghost() << " (";
           std::cout << (*it)->position() << ")\n";
-
       }
       std::cout << "\n";
 
