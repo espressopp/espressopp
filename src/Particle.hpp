@@ -15,12 +15,14 @@
 #include <map>
 
 namespace espresso {
+
+  struct TupleList;
+
   struct ParticleProperties {
     size_t id;
     size_t type;
     real mass;
     real q;
-
   private:
     friend class boost::serialization::access;
     template< class Archive >
@@ -208,8 +210,8 @@ namespace espresso {
     
     static void registerPython();
   
-    void copyAsGhost(const Particle& src, int extradata, const Real3D& shift)
-    {
+    void copyAsGhost(const Particle& src, int extradata, const Real3D& shift) {
+
       src.r.copyShifted(r, shift);
       if (extradata & DATA_PROPERTIES) {
         p = src.p;
@@ -333,10 +335,13 @@ namespace espresso {
   };
 
   struct TupleList
-   : public esutil::ESPPContainer< std::map<Particle*, std::vector<Particle*> > >
-  {
+   : public esutil::ESPPContainer< std::map<Particle*, std::vector<Particle*> > >  {
      void add(Particle* p, std::vector<Particle*> particles) {
          this->insert(make_pair(p, particles));
+     }
+
+     TupleList* get() {
+         return this;
      }
   };
 

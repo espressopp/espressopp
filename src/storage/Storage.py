@@ -15,6 +15,10 @@ class StorageLocal(object):
                 self, pid, toReal3DFromVector(*args)
                 )
     
+    def setFixedTuples(self, fixedtuples):
+        if pmi.workerIsActive():
+            self.cxxclass.setFixedTuples(self, fixedtuples)
+    
     def getParticle(self, pid):
         """Get the local particle. If it is not on this node, any
         attempt to access the particle will raise an exception."""
@@ -111,7 +115,7 @@ if pmi.isController:
     class Storage(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            pmicall = [ "decompose", "addParticles" ],
+            pmicall = [ "decompose", "addParticles", "setFixedTuples" ],
             pmiproperty = [ "system" ]
             )
 
@@ -122,6 +126,9 @@ if pmi.isController:
         def addAdrATParticle(self, pid, *args):
             pmi.call(self.pmiobject, 'addAdrATParticle', pid, *args)
             return Particle(pid, self)
+        
+        #def setFixedTuples(self, tuples):
+        #    pmi.call(self.pmiobject, 'setFixedTuples', tuples)
 
         def getParticle(self, pid):
             return Particle(pid, self)

@@ -26,6 +26,9 @@ namespace espresso {
           (boost::bind(&FixedTupleList::afterRecvParticles, this, _1, _2));
         con3 = storage->onParticlesChanged.connect
           (boost::bind(&FixedTupleList::onParticlesChanged, this));
+
+        //storage->setFixedTuples(this);
+
     }
 
     FixedTupleList::~FixedTupleList() {
@@ -40,55 +43,45 @@ namespace espresso {
 
     bool FixedTupleList::addT(tuple pids) {
 
-        std::cout << "\n\nAdding tuple pids...\n";
 
-        // ADD THE LOCAL PARTICLES
-        Particle* p;
+        // ADD THE LOCAL PARTICLES (pointers)
+        Particle* vp, *at;
         std::vector<Particle*> tmp; // temporary vector
         std::vector<longint> pidstmp; // temporary vector
         longint pidK; // the pid used as key
 
         tuple::iterator it = pids.begin();
-        p = storage->lookupRealParticle(*it);
-        if (!p) // Particle does not exist here, return false
+        vp = storage->lookupRealParticle(*it);
+        if (!vp) { // Particle does not exist here, return false
+            std::cout << "particle " << *it << " not found in localParticles \n";
             return false;
+        }
         pidK = *it; // first pid is key
-        //tmp.push_back(p);
-        std::cout << "Add key: " << *it << "\n";
+        std::cout << "Add key: " << vp->getId() << "\n";
 
         for (++it; it != pids.end(); ++it) {
 
-            std::cout << "Add: " << *it << "\n";
-
-            p = storage->lookupLocalParticle(*it);
-            if (!p) // Particle does not exist here, return false
+            at = storage->lookupAdrATParticle(*it);
+            if (!at) { // Particle does not exist here, return false
+                std::cout << "particle " << *it << " not found in localAdrATParticles \n";
                 return false;
-            tmp.push_back(p);
+            }
+            tmp.push_back(at);
+            std::cout << " add: " << at->getId() << " it: " << *it << "\n";
             pidstmp.push_back(*it); // pidK is not in this vector
         }
-        this->add(p, tmp); // add to TupleList
+        this->add(vp, tmp); // add to TupleList
+
+
+        // ADD THE GLOBAL PARTICLES (ids)
+        globalTuples.insert(make_pair(pidK, pidstmp));
+        LOG4ESPP_INFO(theLogger, "added fixed tuple to global tuples");
+
         tmp.clear();
         pids.clear();
+        pidstmp.clear();
 
-        // ADD THE GLOBAL PARTICLES
-        std::pair<GlobalTuples::const_iterator, GlobalTuples::const_iterator>
-        equalRange = globalTuples.equal_range(pidK);
-        // see whether the particle already has partners
-        if (equalRange.first == globalTuples.end()) {
-            // it hasn't, insert the new pair
-            globalTuples.insert(make_pair(pidK, pidstmp));
-        }
-        else {// otherwise test whether the pair already exists
-            for (GlobalTuples::const_iterator it = equalRange.first;
-            it != equalRange.second; ++it) {
-                if (it->second == pidstmp) {
-                   // TODO: Pair already exists, generate error!
-                }
-                // if not, insert the new pair
-                globalTuples.insert(equalRange.first, make_pair(pidK, pidstmp));
-            }
-        }
-        LOG4ESPP_INFO(theLogger, "added fixed tuple to global tuples");
+        std::cout << "\n";
 
         return true;
     }
@@ -96,9 +89,10 @@ namespace espresso {
     void FixedTupleList::beforeSendParticles
                                     (ParticleList& pl, OutBuffer& buf) {
 
-        std::vector<longint> toSend;
-
         std::cout << "\nbeforeSendParticles\n";
+
+        /*
+        std::vector<longint> toSend;
         std::cout << "pl size " << pl.size() << "\n";
 
         // loop over the particle list
@@ -145,6 +139,8 @@ namespace espresso {
         // send the list
         buf.write(toSend);
         LOG4ESPP_INFO(theLogger, "prepared fixed tuple before send particles");
+        */
+
     }
 
     void FixedTupleList::afterRecvParticles
@@ -152,6 +148,7 @@ namespace espresso {
 
         std::cout << "\nafterRecvParticles\n";
 
+        /*
         std::vector<longint> received, pids;
         int n, s, ts;
         longint pidK;
@@ -190,6 +187,7 @@ namespace espresso {
         }
         LOG4ESPP_INFO(theLogger,
                 "received fixed particle list after receive particles");
+        */
     }
 
     void FixedTupleList::onParticlesChanged() {
@@ -197,37 +195,34 @@ namespace espresso {
         std::cout << "\nonParticlesChanged\n";
 
         LOG4ESPP_INFO(theLogger, "rebuild local particle list from global tuples\n");
-        this->clear();
-        longint lastpidK = -1;
 
-        Particle* pK, * p;
+        this->clear();
+        std::cout << "\n\n ---- CLEAR TUPLES ----  \n\n";
+
+        Particle* vp, * at;
         std::vector<Particle*> tmp;
 
         GlobalTuples::const_iterator it = globalTuples.begin();
 
         // iterate through keys of map
         for (;it != globalTuples.end(); ++it) {
-            if (it->first != lastpidK) { // don't check same pidK twice
-                lastpidK = it->first;
-                pK = storage->lookupRealParticle(lastpidK);
-                std::cout << "lookup pidK "<< lastpidK << "\n";
-                if (pK == NULL)
-                    printf("SERIOUS ERROR: particle %d not available\n", lastpidK);
-                //tmp.push_back(p);
-            }
+            vp = storage->lookupRealParticle(it->first);
+            std::cout << "lookup pidK "<< it->first << "\n";
+            if (vp == NULL) printf("SERIOUS ERROR: particle %d not available\n", it->first);
+
             // iterate through vector in map
             for (tuple::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
-                p = storage->lookupLocalParticle(*it2);
-                std::cout << "lookup "<< *it2 << "\n";
-                if (p == NULL)
-                  printf("SERIOUS ERROR: particle %d not available\n", *it2);
-                tmp.push_back(p);
+                at = storage->lookupAdrATParticle(*it2);
+                std::cout << "lookup adrAT "<< *it2 << " found " << at->getId() << "\n";
+                if (at == NULL) printf("SERIOUS ERROR: particle %d not available\n", *it2);
+                tmp.push_back(at);
             }
             // add the particles
-            this->add(pK, tmp);
+            this->add(vp, tmp);
             tmp.clear();
         }
         LOG4ESPP_INFO(theLogger, "regenerated local fixed list from global tuples");
+
     }
 
     /****************************************************

@@ -17,7 +17,7 @@ namespace espresso {
             boost::signals2::connection con1, con2, con3;
             shared_ptr<storage::Storage> storage;
             typedef std::vector<longint> tuple;
-            typedef boost::unordered_multimap<longint, tuple> GlobalTuples;
+            typedef boost::unordered_map<longint, tuple> GlobalTuples;
             GlobalTuples globalTuples;
             using TupleList::add;
 

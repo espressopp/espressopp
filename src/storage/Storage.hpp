@@ -5,9 +5,11 @@
 //#include <vector>
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
+#include <list>
 #include "types.hpp"
 #include "log4espp.hpp"
 #include "SystemAccess.hpp"
+#include "FixedTupleList.hpp"
 
 #include "Cell.hpp"
 #include "Buffer.hpp"
@@ -19,6 +21,7 @@ namespace espresso {
     class Storage : public SystemAccess {
     public:
       typedef boost::unordered_map <longint, Particle*> IdParticleMap;
+      typedef std::list<Particle> ParticleListAdr;
 
       Storage(shared_ptr<class System> system);
       virtual ~Storage();
@@ -136,6 +139,10 @@ namespace espresso {
       boost::signals2::signal2 <void, ParticleList&, class InBuffer&> 
         afterRecvParticles;
 
+      void setFixedTuples(shared_ptr<FixedTupleList> _fixedtupleList){
+          fixedtupleList = _fixedtupleList;
+      }
+
       /* variant for python that ignores the return value */
       bool pyAddParticle(longint id, const Real3D& pos);
 
@@ -198,6 +205,8 @@ namespace espresso {
 			     int extradata,
 			     const Real3D& shift);
 
+      void copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift);
+
       /** pack ghost forces for sending. */
       void packForces(OutBuffer& buf, Cell &ghosts);
       /** unpack received ghost forces. This one ADDS, and is most likely, what you need. */
@@ -227,7 +236,7 @@ namespace espresso {
       void recvParticles(ParticleList &, longint node);
 
       // update the id->local particle map for the given cell
-      void updateLocalParticles(ParticleList &);
+      void updateLocalParticles(ParticleList &, bool adress = false);
 
       /* remove this particle from local particles.  If weak is true,
 	 the information is only removed if the pointer is actually at
@@ -242,13 +251,20 @@ namespace espresso {
        */
       void updateInLocalParticles(Particle*, bool weak = false);
 
+      void updateInLocalAdrATParticles(Particle *);
+
       // reserve space for nCells cells
       void resizeCells(longint nCells);
 
       // append a particle to a list, without updating localParticles
       Particle* appendUnindexedParticle(ParticleList &, Particle &);
+
+      // append a ghost AT adress particle to a list, without updating AdrATParticles
+      Particle* appendUnindexedAdrParticle(ParticleListAdr &, Particle &);
+
       // append a particle to a list, updating localParticles
       Particle* appendIndexedParticle(ParticleList &, Particle &);
+
       // move a particle from one list to another, updating localParticles
       Particle* moveIndexedParticle(ParticleList &dst, ParticleList &src, int srcpos);
 
@@ -267,11 +283,17 @@ namespace espresso {
       InBuffer inBuffer;
       OutBuffer outBuffer;
 
+      // used for AdResS
+      shared_ptr<FixedTupleList> fixedtupleList;
+
     private:
       // map particle id to Particle * for all particles on this node
       boost::unordered_map<longint, Particle*> localParticles;
 
-      // local atomistic adress particles
+      // local atomistic adress particles, and ghosts
+      ParticleList AdrATParticles;
+      ParticleListAdr AdrATParticlesG; // use list instead of vector to avoid memory realocation
+      // map particle id to Particle * for all adress AT particles on this node
       boost::unordered_map<longint, Particle*> localAdrATParticles;
     };
   }

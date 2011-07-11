@@ -75,6 +75,8 @@ namespace espresso {
           LOG4ESPP_TRACE(logger, "updating local pointer for particle id="
 		       << p->id() << " @ " << p);
           localParticles[p->id()] = p;
+          /*std::cout << "updating local pointer for VP particle id "
+                                << p->id() << " @ " << p << "\n";*/
       }
       else {
           LOG4ESPP_TRACE(logger, "NOT updating local pointer for particle id="
@@ -83,9 +85,22 @@ namespace espresso {
       }
     }
 
-    void Storage::updateLocalParticles(ParticleList &list) {
-      for (ParticleList::Iterator it(list); it.isValid(); ++it) {
-        updateInLocalParticles(&(*it));
+    inline void Storage::updateInLocalAdrATParticles(Particle *p) {
+          localAdrATParticles[p->id()] = p;
+          /*std::cout << " updating local pointer for AT particle id "
+                  << p->id() << " @ " << p << "\n";*/
+    }
+
+    void Storage::updateLocalParticles(ParticleList &list, bool adress) {
+      if (adress) {
+          for (ParticleList::Iterator it(list); it.isValid(); ++it) {
+              updateInLocalAdrATParticles(&(*it));
+          }
+      }
+      else {
+          for (ParticleList::Iterator it(list); it.isValid(); ++it) {
+              updateInLocalParticles(&(*it));
+          }
       }
     }
 
@@ -124,6 +139,7 @@ namespace espresso {
       return &cell->particles.back();
     }
 
+
     Particle* Storage::addAdrATParticle(longint id, const Real3D& p) {
 
       Particle n;
@@ -131,11 +147,20 @@ namespace espresso {
       n.id() = id;
       n.position()= p;
 
-      if (localAdrATParticles.find(id) == localAdrATParticles.end()) {
-          localAdrATParticles[id] = &n;
+      // see whether the array was resized; STL hack
+      Particle *begin = &AdrATParticles.front();
+
+      AdrATParticles.push_back(n);
+      Particle* local = &AdrATParticles.back();
+
+      if (begin != &AdrATParticles.front()) {
+          updateLocalParticles(AdrATParticles, true);
+      }
+      else {
+          updateInLocalAdrATParticles(local);
       }
 
-      return localAdrATParticles[id];
+      return local;
     }
 
 
@@ -151,6 +176,12 @@ namespace espresso {
       return &l.back();
     }
 
+    Particle *Storage::appendUnindexedAdrParticle(ParticleListAdr &l, Particle &part)
+    {
+      l.push_back(part);
+      return &l.back();
+    }
+
     Particle *Storage::appendIndexedParticle(ParticleList &l, Particle &part)
     {
       // see whether the array was resized; STL hack
@@ -159,10 +190,13 @@ namespace espresso {
       l.push_back(part);
       Particle *p = &l.back();
 
-      if (begin != &l.front())
-	updateLocalParticles(l);
-      else
-	updateInLocalParticles(p);
+      if (begin != &l.front()) {
+          updateLocalParticles(l);
+      }
+      else {
+          updateInLocalParticles(p);
+      }
+
       return p;
     }
 
@@ -175,7 +209,7 @@ namespace espresso {
       dl.push_back(sl[i]);
       int newSize = sl.size() - 1;
       if (i != newSize) {
-	sl[i] = sl.back();
+          sl[i] = sl.back();
       }
       sl.resize(newSize);
 
@@ -184,18 +218,18 @@ namespace espresso {
 
       // fix up destination list
       if (dbegin != &dl.front()) {
-	updateLocalParticles(dl);
+          updateLocalParticles(dl);
       }
       else {
-	updateInLocalParticles(dst);
+          updateInLocalParticles(dst);
       }
       // fix up resorted source list; due to moving, the last particle
       // might have been moved to the position of the actually moved one
       if (sbegin != &sl.front()) {
-	updateLocalParticles(sl);
+          updateLocalParticles(sl);
       }
       else if (i != newSize) {
-	updateInLocalParticles(src);
+          updateInLocalParticles(src);
       }
 
       return dst;
@@ -273,8 +307,7 @@ namespace espresso {
       LOG4ESPP_DEBUG(logger, "done");
     }
 
-    void Storage::invalidateGhosts()
-    {
+    void Storage::invalidateGhosts() {
       for(CellListIterator it(getGhostCells());
 	  it.isValid(); ++it) {
 	/* remove only ghosts from the hash if the localParticles hash
@@ -282,12 +315,13 @@ namespace espresso {
 	   to implement pbc, the real particle will be the one accessible
 	   via localParticles.
 	*/
-	removeFromLocalParticles(&(*it), true);
+          removeFromLocalParticles(&(*it), true);
       }
+      // for AdResS
+      //AdrATParticlesG.clear();
     }
 
     void Storage::decompose() {
-      //std::cout << "\n-------------------------decompose---------------------";
       invalidateGhosts();
       decomposeRealParticles();
       exchangeGhosts();
@@ -354,10 +388,58 @@ namespace espresso {
       ghosts.resize(reals.size());
 
       for(ParticleList::iterator src = reals.begin(), end = reals.end(), dst = ghosts.begin();
-	  src != end; ++src, ++dst) {
-
+              src != end; ++src, ++dst) {
         dst->copyAsGhost(*src, extradata, shift);
+
+        // for AdResS
+        //copyGhostTuples(*src, *dst, extradata, shift);
       }
+    }
+
+    void Storage::copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift) {
+
+        /*std::cout << src.id() << "-" << src.ghost() << " (" << src.position() << ") -> "
+                        << dst.id() << "-" << dst.ghost() << " (" << dst.position() << ") \n";*/
+
+        // create ghosts of particles in tuples
+        //std::cout << "VP particle is " << src->id() << " @ " << lookupRealParticle(src->id()) << "\n";
+        //std::cout << "VP particle is " << src->id() << " @ " << &(*src) << "\n";
+        //std::cout << "Creating ghost tuples...\n";
+        FixedTupleList::iterator it;
+        it = fixedtupleList->find(&src);
+        if (it != fixedtupleList->end()) {
+            std::vector<Particle*> atList;
+            atList = it->second;
+
+            Particle* atg; // atom, ghost
+            std::vector<Particle*> tmp; // temporary vector
+
+            for (std::vector<Particle*>::iterator itv = atList.begin();
+                  itv != atList.end(); ++itv) {
+                Particle &at = **itv;
+                Particle n; // temporary particle, to be inserted into adr. at. ghost part.
+                n.id() = at.getId();
+                n.type() = at.getType();
+
+
+                // see whether the array was resized; STL hack
+                //Particle *begin = &AdrATParticlesG.front();
+
+                atg = appendUnindexedAdrParticle(AdrATParticlesG, n);
+                atg->copyAsGhost(at, extradata, shift);
+                tmp.push_back(atg);
+
+                /*if (begin != &AdrATParticlesG.front())
+                    std::cout << "\n  -- AdrATParticlesG array resized!! --\n\n";*/
+
+                /*std::cout << " " << at.id() << "-" << at.ghost() << " (" << at.position() << ") -> "
+                        <<  atg->id() << "-" << atg->ghost() << " (" << atg->getPos() << ")\n";*/
+
+            }
+            fixedtupleList->insert(std::make_pair(&dst, tmp));
+            tmp.clear();
+            //std::cout << "\n";
+        }
     }
 
     void Storage::packForces(OutBuffer &buf, Cell &_ghosts)
@@ -431,6 +513,8 @@ namespace espresso {
     void
     Storage::registerPython() {
       using namespace espresso::python;
+
+
       class_< Storage, boost::noncopyable >("storage_Storage", no_init)
 
 	.def("addParticle", &Storage::addParticle, 
@@ -438,6 +522,9 @@ namespace espresso {
 
     .def("addAdrATParticle", &Storage::addAdrATParticle,
          return_value_policy< reference_existing_object >())
+
+    .def("setFixedTuples", &Storage::setFixedTuples)
+
 
   //
   //.def("addParticle", &Storage::addParticle,
