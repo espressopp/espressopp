@@ -16,8 +16,6 @@
 
 namespace espresso {
 
-  struct TupleList;
-
   struct ParticleProperties {
     size_t id;
     size_t type;
@@ -340,9 +338,6 @@ namespace espresso {
          this->insert(make_pair(p, particles));
      }
 
-     TupleList* get() {
-         return this;
-     }
   };
 
 }

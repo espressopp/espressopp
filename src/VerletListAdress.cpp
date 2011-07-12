@@ -106,10 +106,10 @@ namespace espresso {
                 dist = it->getPos() - **it2;
                 distsq = dist.sqr();
 
-                std::cout << "distance " << sqrt(distsq) << "\n";
+                //std::cout << "distance " << sqrt(distsq) << "\n";
                 if (distsq < adrsq) {
                     adrZone.insert(&(*it));
-                    std::cout << " added " << it->getId() << "-" << it->ghost() <<  "\n";
+                    //std::cout << " added " << it->getId() << "-" << it->ghost() <<  "\n";
                     //std::cout << " adding particle " << it->getId() << "-" << it->ghost() << " to adrZone\n";
                     break; // do not need to loop further
                 }

@@ -318,7 +318,7 @@ namespace espresso {
           removeFromLocalParticles(&(*it), true);
       }
       // for AdResS
-      AdrATParticlesG.clear(); //TODO reorganize later
+      //AdrATParticlesG.clear(); //TODO reorganize later
     }
 
     void Storage::decompose() {
@@ -392,7 +392,7 @@ namespace espresso {
         dst->copyAsGhost(*src, extradata, shift);
 
         // for AdResS
-        copyGhostTuples(*src, *dst, extradata, shift); //TODO reorganize later
+        //copyGhostTuples(*src, *dst, extradata, shift); //TODO reorganize later
       }
     }
 
@@ -507,8 +507,7 @@ namespace espresso {
 
 
           // for AdResS
-          addAdrGhostForcesToReals(*src, *dst); // TODO reorganize later
-
+          //addAdrGhostForcesToReals(*src, *dst); // TODO reorganize later
       }
     }
 
