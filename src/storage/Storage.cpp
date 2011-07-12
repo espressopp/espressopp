@@ -318,7 +318,7 @@ namespace espresso {
           removeFromLocalParticles(&(*it), true);
       }
       // for AdResS
-      //AdrATParticlesG.clear();
+      AdrATParticlesG.clear(); //TODO reorganize later
     }
 
     void Storage::decompose() {
@@ -392,7 +392,7 @@ namespace espresso {
         dst->copyAsGhost(*src, extradata, shift);
 
         // for AdResS
-        //copyGhostTuples(*src, *dst, extradata, shift);
+        copyGhostTuples(*src, *dst, extradata, shift); //TODO reorganize later
       }
     }
 
@@ -488,8 +488,7 @@ namespace espresso {
       }
     }
 
-    void Storage::
-    addGhostForcesToReals(Cell &_ghosts, Cell &_reals)
+    void Storage::addGhostForcesToReals(Cell &_ghosts, Cell &_reals)
     {
       LOG4ESPP_DEBUG(logger, "add forces from ghosts in cell "
 		     << (&_ghosts - getFirstCell()) << " to reals in cell "
@@ -499,13 +498,59 @@ namespace espresso {
       ParticleList &ghosts = _ghosts.particles;
 
       for(ParticleList::iterator dst = reals.begin(), end = reals.end(), src = ghosts.begin();
-	  dst != end; ++dst, ++src) {
+              dst != end; ++dst, ++src) {
+          LOG4ESPP_TRACE(logger, "for particle " << dst->id() << ": adding force "
+		       << src->force() << " to " << dst->force());
 
-	LOG4ESPP_TRACE(logger, "for particle " << dst->id() << ": adding force "
-		       << src->force() << " to " << dst->force()); 
-	dst->particleForce() += src->particleForce();
+          dst->particleForce() += src->particleForce();
+
+
+
+          // for AdResS
+          addAdrGhostForcesToReals(*src, *dst); // TODO reorganize later
+
       }
     }
+
+
+    void Storage::addAdrGhostForcesToReals(Particle& src, Particle& dst) {
+        std::cout << "adding force from " << src.id() << "-" << src.ghost() <<
+              " to " << dst.id() << "-" << dst.ghost() << "\n";
+
+        // iterate through atomistic particles in fixedtuplelist
+        FixedTupleList::iterator it3;
+        FixedTupleList::iterator it4;
+        it3 = fixedtupleList->find(&src);
+        it4 = fixedtupleList->find(&dst);
+
+        //std::cout << "\nInteraction " << p1.id() << " - " << p2.id() << "\n";
+        if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end()) {
+
+           std::vector<Particle*> atList1;
+           std::vector<Particle*> atList2;
+           atList1 = it3->second;
+           atList2 = it4->second;
+
+           //std::cout << "AT forces ...\n";
+           for (std::vector<Particle*>::iterator itv = atList1.begin(),
+                   itv2 = atList2.begin(); itv != atList1.end(); ++itv, ++itv2) {
+
+               Particle &p3 = **itv;
+               Particle &p4 = **itv2;
+
+               std::cout << " from " << p3.id() << "-" << p3.ghost() << " to " <<
+                       p4.id() << "-" << p4.ghost() << "\n";
+
+               p4.particleForce() += p3.particleForce();
+           }
+        }
+        else {
+           std::cout << " one of the VP particles not found in tuples: " << src.id() << "-" <<
+                   src.ghost() << ", " << dst.id() << "-" << dst.ghost();
+        }
+    }
+
+
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON

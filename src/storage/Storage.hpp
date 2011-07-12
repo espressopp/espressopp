@@ -139,6 +139,7 @@ namespace espresso {
       boost::signals2::signal2 <void, ParticleList&, class InBuffer&> 
         afterRecvParticles;
 
+      // for AdResS
       void setFixedTuples(shared_ptr<FixedTupleList> _fixedtupleList){
           fixedtupleList = _fixedtupleList;
       }
@@ -214,6 +215,8 @@ namespace espresso {
       /** unpack received ghost forces. This one OVERWRITES, and is probably what you don't need. */
       void unpackForces(Cell &reals, class InBuffer &buf);
       void addGhostForcesToReals(Cell &ghosts, Cell &reals);
+      // adds ghost forces of Adr AT particles to real Adr AT particles
+      void addAdrGhostForcesToReals(Particle& src, Particle& dst);
 
       /** send particles of a cell to another node, and empty the cell
 	  locally. The operation is blocking: the operation
@@ -292,7 +295,7 @@ namespace espresso {
 
       // local atomistic adress particles, and ghosts
       ParticleList AdrATParticles;
-      ParticleListAdr AdrATParticlesG; // use list instead of vector to avoid memory realocation
+      ParticleListAdr AdrATParticlesG; // use list instead of vector to avoid memory reallocation
       // map particle id to Particle * for all adress AT particles on this node
       boost::unordered_map<longint, Particle*> localAdrATParticles;
     };
