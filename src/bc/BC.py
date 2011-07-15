@@ -1,9 +1,28 @@
+"""
+************************************
+**BC** - Boundary Condition Object
+************************************
+
+This is the abstract base class for all boundary condition objects.
+It cannot be used directly. All derived classes implement at least
+the following methods:
+
+* `getMinimumImageVector(pos1, pos2)`
+* `getFoldedPosition(pos, imageBox)`
+* `getUnfoldedPosition(pos, imageBox)`
+* `getRandomPos()`
+
+`pos`, `pos1` and `pos2` are particle coordinates ( type: (`float`, `float`, `float`) ).
+`imageBox` ( type: (`int`, `int`, `int`) ) specifies the   
+
+"""
+
+
 from espresso import pmi
 from espresso import toReal3D, toReal3DFromVector, toInt3D, toInt3DFromVector
 from _espresso import bc_BC 
 
 class BCLocal(object):
-    """Abstract local base classs for boundary conditions."""
     def getMinimumImageVector(self, pos1, pos2):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup() or pmi.isController:
             return self.cxxclass.getMinimumImageVector(
