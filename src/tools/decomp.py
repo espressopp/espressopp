@@ -26,7 +26,7 @@ def cellGrid(box_size, node_grid, rc, skin):
   if rc_skin == 0:
     raise Error("interaction range (cutoff + skin) must be larger than 0")
   if (node_grid[0]<=0 or node_grid[1]<=0 or node_grid[2]<=0):
-    raise Error("invalid node grid %s" % node_grid)
+    raise Error("invalid node grid %s" % str(node_grid))
   ix = box_size[0] / (rc_skin * node_grid[0])
   if ix < 1:
     raise Error("local box size in direction 0 (=%6f) is smaller than interaction range (cutoff + skin = %6f)" % (ix, rc_skin))
