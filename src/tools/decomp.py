@@ -29,12 +29,15 @@ def cellGrid(box_size, node_grid, rc, skin):
     raise Error("invalid node grid %s" % str(node_grid))
   ix = box_size[0] / (rc_skin * node_grid[0])
   if ix < 1:
-    raise Error("local box size in direction 0 (=%6f) is smaller than interaction range (cutoff + skin = %6f)" % (ix, rc_skin))
+    raise Error("local box size in direction 0 (=%6f) is smaller than interaction range (cutoff + skin = %6f).\n \
+                 hint: number of CPUs maybe too high or is prime." % (ix, rc_skin))
   iy = box_size[1] / (rc_skin * node_grid[1])
   if iy < 1:
-    raise Error("local box size in direction 1 (=%6f) is smaller than interaction range (cutoff + skin = %6f)" % (iy, rc_skin))
+    raise Error("local box size in direction 1 (=%6f) is smaller than interaction range (cutoff + skin = %6f).\n \
+                 hint: number of CPUs maybe too high or is prime." % (iy, rc_skin))
   iz = box_size[2] / (rc_skin * node_grid[2])
   if iz < 1:
-    raise Error("local box size in direction 2 (=%6f) is smaller than interaction range (cutoff + skin = %6f)" % (iz, rc_skin))
+    raise Error("local box size in direction 2 (=%6f) is smaller than interaction range (cutoff + skin = %6f).\n \
+                 hint: number of CPUs maybe too high or is prime." % (iz, rc_skin))
   
   return Int3D(ix, iy, iz)
