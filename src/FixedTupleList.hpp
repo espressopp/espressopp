@@ -14,7 +14,7 @@
 namespace espresso {
     class FixedTupleList: public TupleList  {
         protected:
-            boost::signals2::connection con1, con2, con3;
+            boost::signals2::connection con1, con2, con3, con4;
             shared_ptr<storage::Storage> storage;
             typedef std::vector<longint> tuple;
             typedef boost::unordered_map<longint, tuple> GlobalTuples;

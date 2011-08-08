@@ -33,14 +33,21 @@ namespace espresso {
       */
       Particle* addParticle(longint id, const Real3D& pos);
 
-      /* add an adress AT particle with given id and position. Adress AT
-      paticles, are located only in localAdrATParticles map and in the
-      tuples of each coresponding VP.
+      /* add an adress AT particle with given id, position and it's VP position.
+      Adress AT paticles are located only in localAdrATParticles map.
       Note that this is a local operation, and therefore cannot check whether a particle
       with the given id already exists.  This is left to the parallel
       front end.
       */
-      Particle* addAdrATParticle(longint id, const Real3D& pos);
+      Particle* addAdrATParticle(longint id, const Real3D& pos, const Real3D& VPpos);
+
+      // similar as above, but only called from fixedtuplelist when rebuilding the tuples
+      Particle* addAdrATParticleFTPL(Particle n);
+
+
+      // remove an AdResS AT particle - it is removed from the vector and from the map
+      // called from FTPL
+      void removeAdrATParticle(longint id);
 
 
       //Particle* addParticle(longint id, const Real3D& pos, int type);
@@ -59,7 +66,7 @@ namespace espresso {
         return (it != localParticles.end() && !(it->second->ghost())) ? it->second : 0;
       }
 
-      /** Lookup whether data for a given adress AT particle is available on this node.
+      /** Lookup whether data for a given adress real AT particle is available on this node.
       \return 0 if the particle wasn't available, the pointer to the Particle, if it was. */
       Particle* lookupAdrATParticle(longint id) {
         IdParticleMap::iterator it = localAdrATParticles.find(id);
@@ -138,6 +145,11 @@ namespace espresso {
         beforeSendParticles;
       boost::signals2::signal2 <void, ParticleList&, class InBuffer&> 
         afterRecvParticles;
+
+      // for AdResS
+      // this is exactly the same as onParticlesChanged, but only used to rebuild tuples
+      boost::signals2::signal0 <void> onTuplesChanged;
+
 
       // for AdResS
       void setFixedTuples(shared_ptr<FixedTupleList> _fixedtupleList){
@@ -248,6 +260,11 @@ namespace espresso {
        */
       void removeFromLocalParticles(Particle*, bool weak = false);
 
+
+      // remove an AdResS AT particle - it is removed from the vector and from the map
+      //void removeFromLocalAdrATParticles(Particle *p);
+
+
       /* update information for this particle from local particles. If weak is true,
 	 the information is only updated if no information is present yet. This is used
 	 for ghosts, which should not overwrite real particle pointers.
@@ -293,10 +310,12 @@ namespace espresso {
       // map particle id to Particle * for all particles on this node
       boost::unordered_map<longint, Particle*> localParticles;
 
-      // local atomistic adress particles, and ghosts
-      ParticleList AdrATParticles;
-      ParticleListAdr AdrATParticlesG; // use list instead of vector to avoid memory reallocation
-      // map particle id to Particle * for all adress AT particles on this node
+
+      // AdResS atomistic particles (they are not stored in cells!)
+      ParticleList AdrATParticles; // local atomistic real adress particles
+      ParticleListAdr AdrATParticlesG; // ghosts, use list instead of vector to avoid memory reallocation
+
+      // map particle id to Particle * for all adress real AT particles on this node
       boost::unordered_map<longint, Particle*> localAdrATParticles;
     };
   }
