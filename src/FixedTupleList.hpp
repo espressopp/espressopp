@@ -31,6 +31,8 @@ namespace espresso {
             void afterRecvParticles(ParticleList& pl, class InBuffer& buf);
             void onParticlesChanged();
 
+            int getNumPart(longint pid); // get number of particles in globalmap for given pid
+
             static void registerPython();
 
         private:

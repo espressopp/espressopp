@@ -428,11 +428,7 @@ namespace espresso {
 
         //std::cout << getSystem()->comm->rank() << ": ";
         afterRecvParticles(list, data); // this also takes care of AdResS AT Particles
-
       }
-
-      //std::cout << getSystem()->comm->rank() << ": ";
-      //afterRecvParticles(list, data); // this also takes care of AdResS AT Particles
 
       LOG4ESPP_DEBUG(logger, "done");
     }
@@ -469,6 +465,7 @@ namespace espresso {
       decomposeRealParticles();
       //std::cout << getSystem()->comm->rank() << ": (onTuplesChanged) ";
       onTuplesChanged(); // for AdResS, renamed to not confuse with bonds
+      //std::cout << " ---- exchange ghosts ---- \n";
       exchangeGhosts();
       //std::cout << getSystem()->comm->rank() << ": ";
       onParticlesChanged();
@@ -505,6 +502,9 @@ namespace espresso {
 			std::vector<Particle*> atList;
 			atList = it->second;
 
+			int size = atList.size();
+			buf.write(size); // write size of vector first
+
 			for (std::vector<Particle*>::iterator itv = atList.begin();
 				  itv != atList.end(); ++itv) {
 				Particle &at = **itv;
@@ -512,13 +512,14 @@ namespace espresso {
 				/*std::cout << getSystem()->comm->rank() << ":  ---> " << at.id() << "-" << at.ghost() <<
 						" (" << at.position() << ") type " << at.type() << " \n";*/
 
-				if (at.type() == 0) { // TODO just for testing
+				/*
+				if (at.type() == 0) { // just for testing
 					std::cout << "SERIOUS ERROR, particle is of wrong type\n";
 					exit(1);
 					return;
-				}
+				}*/
 
-				buf.write(at, extradata, shift);
+				buf.write(at, 1, shift); // we force extradata to 1
 			}
 		}
 		else {
@@ -556,38 +557,58 @@ namespace espresso {
         // for AdResS
 
         /*std::cout << getSystem()->comm->rank() << ": <- " << dst->id() << "-" << dst->ghost() <<
-        		" (" << dst->getPos() << ") type " << dst->getType() << " \n";*/
+        		" (" << dst->getPos() << ") type " << dst->getType() << "\n";*/
 
-        std::vector<Particle*> tmp;
-        Particle* atg; // atom, ghost
-        Particle tmpatg; // temporary particle, to be inserted into adr. at. ghost part.
+        //int numAT = fixedtupleList->getNumPart(dst->id()); // does not work, not sure why
+        int numAT;
+        buf.read(numAT); // read number of AT particles
 
+        FixedTupleList::iterator it;
+        it = fixedtupleList->find(&(*dst));
+        if (it != fixedtupleList->end()) {
+            std::vector<Particle*> atList = it->second;
 
-        for (int i = 1; i <= 3; ++i) { // TODO change i to actual value
-        	// read the AT partcles
-        	//std::cout << getSystem()->comm->rank() << ": buf.read(AT particle, extradata) (unpackPosEtc), i: " << i << "\n";
-			buf.read(tmpatg, extradata);
+            for (std::vector<Particle*>::iterator itv = atList.begin();
+                    itv != atList.end(); ++itv) {
+                Particle &atg = **itv;
+                buf.read(atg, 1); // we force extradata to 1 (although not necessary here...)
 
-			atg = appendUnindexedAdrParticle(AdrATParticlesG, tmpatg);
-			atg->ghost() = 1;
-			atg->setType(1); // TODO it's fixed now, for testing purposes
-			atg->id() = dst->id()+i;
+                /*std::cout << getSystem()->comm->rank() << ":  <--- " << atg.id() << "-" << atg.ghost() <<
+                                " (" << atg.position() << ") type " << atg.type() <<
+                                " extradata: " << extradata << "\n";*/
+            }
+        }
+        else {
+            std::vector<Particle*> tmp;
+            Particle* atg; // atom, ghost
+            Particle tmpatg; // temporary particle, to be inserted into adr. at. ghost part.
 
-			tmp.push_back(atg);
+            for (int i = 1; i <= numAT; ++i) {
+                // read the AT partcles
+                //std::cout << getSystem()->comm->rank() << ": buf.read(AT particle, extradata) (unpackPosEtc), i: " << i << "\n";
+                buf.read(tmpatg, 1); // we force extradata to 1
 
-			/*std::cout << getSystem()->comm->rank() << ":  <--- " << atg->id() << "-" << atg->ghost() <<
-       	                		" (" << atg->getPos() << ") type " << atg->getType() << " \n";*/
+                atg = appendUnindexedAdrParticle(AdrATParticlesG, tmpatg);
+                atg->ghost() = 1;
 
-			if (atg->getType() == 0) { // TODO it's fixed now, for testing purposes
-				std::cout << "SERIOUS ERROR, particle is of wrong type\n";
-				exit(-1);
-				return;
-			}
+                tmp.push_back(atg);
 
+                /*std::cout << getSystem()->comm->rank() << ":  <--- " << atg->id() << "-" << atg->ghost() <<
+                                    " (" << atg->getPos() << ") type " << atg->getType() <<
+                                    " extradata: " << extradata << "\n";*/
+
+                /*if (atg->getType() == dst->getType()) { // for testing purposes
+                    std::cout << "SERIOUS ERROR, particle is of wrong type\n";
+                    exit(-1);
+                    return;
+                }*/
+            }
+            fixedtupleList->insert(std::make_pair(&(*dst), tmp));
+            tmp.clear();
         }
 
-        fixedtupleList->insert(std::make_pair(&(*dst), tmp));
-        tmp.clear();
+
+
 
       }
     }

@@ -43,6 +43,15 @@ namespace espresso {
         con4.disconnect();
     }
 
+    int FixedTupleList::getNumPart(longint pid) {
+        //std::cout << "looking up pid " << pid << "\n";
+        int size = 0;
+        GlobalTuples::const_iterator it = globalTuples.find(pid);
+        if (it != globalTuples.end()) {
+            size = it->second.size();
+        }
+        return size;
+    }
 
     bool FixedTupleList::addT(tuple pids) {
 
