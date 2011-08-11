@@ -95,8 +95,9 @@ namespace espresso {
     void readAll(T& val) { 
       T* tbuf = (T*) (buf + pos); 
       pos += sizeof(T);
+      //std::cout << comm.rank() << ": read pos: " << pos << ", usedSize: " << usedSize << "\n";
       if (pos > usedSize) {
-        fprintf(stderr, "read at pos %d: size %d insufficient\n", pos, usedSize);
+        fprintf(stderr, "%d: read at pos %d: size %d insufficient\n", comm.rank(), pos, usedSize);
         exit(-1);
         return;
       }
@@ -185,6 +186,7 @@ namespace espresso {
       *tbuf = val; 
       pos += size;           // pos moves forward by size
       usedSize = pos;
+      //std::cout << comm.rank() << ": write usedSize: " << usedSize << "\n";
     }
 
     void write(int& val) { writeAll<int>(val); }

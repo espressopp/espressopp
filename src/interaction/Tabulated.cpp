@@ -57,7 +57,6 @@ namespace espresso {
            init <shared_ptr<VerletListAdress>,
                  shared_ptr<FixedTupleList> >()
                 )
-            .def("setFixedTupleList", &VerletListAdressTabulated::setFixedTupleList)
             .def("setPotential", &VerletListAdressTabulated::setPotential);
         ;
      

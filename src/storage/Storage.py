@@ -14,6 +14,13 @@ class StorageLocal(object):
             self.cxxclass.addParticle(
                 self, pid, toReal3DFromVector(*args)
                 )
+            
+    def addAdrATParticle(self, pid, *args):
+        """Add a particle locally if it belongs to the local domain."""
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.addAdrATParticle(
+                self, pid, toReal3DFromVector(*args)
+                )
     
     def setFixedTuples(self, fixedtuples):
         if pmi.workerIsActive():
@@ -50,6 +57,8 @@ class StorageLocal(object):
             index_type = -1
             index_mass = -1
             index_adrAT= -1 # adress AT particle if 1
+            
+            last_pos = toReal3DFromVector([-99,-99,-99])
 
             if properties == None:
                 # default properities = (id, pos)
@@ -82,13 +91,16 @@ class StorageLocal(object):
                 id = particle[index_id]
                 pos = particle[index_pos]
 
-                if particle[index_adrAT] == 1:
-                    storedParticle = self.cxxclass.addAdrATParticle(self, id, pos)
-                else:
+                if particle[index_adrAT] == 0:
+                    #print "%d:  addParticle %d, last_pos=pos %d, %d, %d"%(pmi._MPIcomm.rank,id,pos[0], pos[1], pos[2])
                     storedParticle = self.cxxclass.addParticle(self, id, pos)
+                    last_pos = pos
+                else:
+                    #print "%d:  addAdrATparticle %d, last_pos %d, %d, %d"%(pmi._MPIcomm.rank,id,last_pos[0], last_pos[1], last_pos[2])
+                    storedParticle = self.cxxclass.addAdrATParticle(self, id, pos, last_pos)
+                    
 
                 if storedParticle != None:
-
                     self.logger.debug("Processor %d stores particle id = %d"%(pmi._MPIcomm.rank, id))
                     self.logger.debug("particle property indexes: id=%i pos=%i type=%i mass=%i v=%i f=%i q=%i"%(index_id,index_pos,index_type,index_mass,index_v,index_f,index_q))
 

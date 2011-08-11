@@ -97,6 +97,7 @@ namespace espresso {
         Particle &p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
+        //std::cout << " ---- get potential ---- \n";
         const Potential &potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
@@ -197,7 +198,7 @@ namespace espresso {
 
               // compute weights of VP
               //std::cout << "minimim distances...\n";
-              std::set<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
+              std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
               Real3D pa = **it2; // position of adress particle
               Real3D d1 = vp.position() - pa;
               real distsq1 = d1.sqr();
@@ -256,6 +257,7 @@ namespace espresso {
          // force between VP particles
          int type1 = p1.type();
          int type2 = p2.type();
+         //std::cout << " ---- get potential ---- \n";
          const Potential &potential = getPotential(type1, type2);
          Real3D forcevp(0.0, 0.0, 0.0);
          if (w1 != 1 && w2 != 1) { // calculate if not in AT region
@@ -299,6 +301,7 @@ namespace espresso {
 
                      // TODO check distance and if necessary skip force calculation
                      // AT forces
+                     //std::cout << " ---- get potential ---- \n";
                      const Potential &potential = getPotential(p3.type(), p4.type());
                      Real3D force(0.0, 0.0, 0.0);
                      if(potential._computeForce(force, p3, p4)) {

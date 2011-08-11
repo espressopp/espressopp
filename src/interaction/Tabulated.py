@@ -26,12 +26,7 @@ class VerletListAdressTabulatedLocal(InteractionLocal, interaction_VerletListAdr
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.setPotential(self, type1, type2, potential)
-            
-            
-    def setFixedTupleList(self, ftpl):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.setFixedTupleList(self, ftpl)
+            self.cxxclass.setPotential(self, type1, type2, potential)        
 
 class VerletListTabulatedLocal(InteractionLocal, interaction_VerletListTabulated):
     'The (local) tabulated interaction using Verlet lists.'
@@ -77,7 +72,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListAdressTabulatedLocal',
-            pmicall = ['setPotential', 'setFixedTupleList']
+            pmicall = ['setPotential']
             )
         
     class VerletListTabulated(Interaction):

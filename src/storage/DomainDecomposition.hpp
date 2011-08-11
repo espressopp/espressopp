@@ -78,8 +78,8 @@ namespace espresso {
 	  In case this is a communication with ourselves, the send-cells
 	  are transferred to the recv-cells. */
       struct CommCells {
-	std::vector<Cell *> reals;
-	std::vector<Cell *> ghosts;
+          std::vector<Cell *> reals;
+          std::vector<Cell *> ghosts;
       };
       /** which cells to send left, right, up, down, ...
 	  For the order, see NodeGrid.

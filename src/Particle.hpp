@@ -337,7 +337,6 @@ namespace espresso {
      void add(Particle* p, std::vector<Particle*> particles) {
          this->insert(make_pair(p, particles));
      }
-
   };
 
 }

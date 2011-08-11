@@ -205,32 +205,35 @@ namespace espresso {
       LOG4ESPP_DEBUG(logger, "got " << l.size() << " particles");
 
       for (ParticleList::iterator it = l.begin(),
-	     end = l.end(); it != end; ++it) {
+   	      end = l.end(); it != end; ++it) {
 
-        Real3D& pos = it->position();
+    	  Real3D& pos = it->position();
 
-	if (nodeGrid.getBoundary(dir) != 0) {
-	  getSystem()->bc->foldCoordinate(pos, it->image(), nodeGrid.convertDirToCoord(dir));
-	  LOG4ESPP_TRACE(logger, "folded coordinate " << nodeGrid.convertDirToCoord(dir) 
-                                 << " of particle " << it->id());
-	}
+    	  if (nodeGrid.getBoundary(dir) != 0) {
+    		  getSystem()->bc->foldCoordinate(pos, it->image(), nodeGrid.convertDirToCoord(dir));
+    		  LOG4ESPP_TRACE(logger, "folded coordinate " << nodeGrid.convertDirToCoord(dir)
+    				  << " of particle " << it->id());
+    	  }
 
-	longint cell;
-	if (cellGrid.mapPositionToCellCheckedAndClipped(cell, pos)) {
-	  LOG4ESPP_TRACE(logger, "particle " << it->id()
-			 << " @ " << pos << " is not inside node domain");
-	  outlier = true;
-	}
+    	  longint cell;
+    	  if (cellGrid.mapPositionToCellCheckedAndClipped(cell, pos)) {
+    		  LOG4ESPP_TRACE(logger, "particle " << it->id()
+    				  << " @ " << pos << " is not inside node domain");
+    		  outlier = true;
+    	  }
 
-	LOG4ESPP_TRACE(logger, "append part " << it->id() << " to cell "
-		       << cell);
+    	  LOG4ESPP_TRACE(logger, "append part " << it->id() << " to cell "
+    			  << cell);
 
-	appendIndexedParticle(cells[cell].particles, *it);
+    	  appendIndexedParticle(cells[cell].particles, *it);
       }
       return outlier;
     }
 
     void DomainDecomposition::decomposeRealParticles() {
+
+    	//std::cout << getSystem()->comm->rank() << ": " << " decomposeRealParticles\n";
+
       LOG4ESPP_DEBUG(logger, "starting, expected comm buffer size " << exchangeBufferSize);
 
       // allocate send/recv buffers. We use the size as we need maximally so far, to avoid reallocation
@@ -254,48 +257,53 @@ namespace espresso {
 	  if (nodeGrid.getGridSize(coord) > 1) {
 	    for (std::vector<Cell*>::iterator it = realCells.begin(),
 		   end = realCells.end(); it != end; ++it) {
+
 	      Cell &cell = **it;
+
 	      // do not use an iterator here, since we need to take out particles during the loop
 	      for (size_t p = 0; p < cell.particles.size(); ++p) {
-		Particle &part = cell.particles[p];
-                const Real3D& pos = part.position();
-		// check whether the particle is now "left" of the local domain
-		if (pos[coord] - cellGrid.getMyLeft(coord) < -ROUND_ERROR_PREC) {
-		  LOG4ESPP_TRACE(logger, "send particle left " << part.id());
-		  moveIndexedParticle(sendBufL, cell.particles, p);
-		  // redo same particle since we took one out here, so it's a new one
-		  --p;
-		// check whether the particle is now "right" of the local domain
-		} else if (pos[coord] - cellGrid.getMyRight(coord) >= ROUND_ERROR_PREC) {
-		  LOG4ESPP_TRACE(logger, "send particle right " << part.id());
-		  moveIndexedParticle(sendBufR, cell.particles, p);
-		  --p;
-		}
-		// Sort particles in cells of this node during last direction
-		else if (coord == 2) {
-                  const Real3D& pos = part.position();
-		  Cell *sortCell = mapPositionToCellChecked(pos);
-		  if (sortCell != &cell) {
-		    if (sortCell == 0) {
-		      // particle is not in the local domain
-		      LOG4ESPP_DEBUG(logger, "take another loop: particle " << part.id()
-				     << " @ " << pos << 
-                                  " is not inside node domain after neighbor exchange");
-		      if (isnan(pos[0]) || isnan(pos[1]) || isnan(pos[2])) {
-			// TODO: error handling
-			LOG4ESPP_ERROR(logger, "particle " << part.id() <<
-                          " has moved to outer space (one or more coordinates are nan)");
-		      } else {
-			// particle stays where it is, and will be sorted in the next round
-			finished = false;
-		      }
-		    } else {
-		      // particle is in the local domain
-		      moveIndexedParticle(sortCell->particles, cell.particles, p);
-		      --p;
-		    }
-		  }
-		}
+	    	  Particle &part = cell.particles[p];
+	    	  const Real3D& pos = part.position();
+
+	    	  // check whether the particle is now "left" of the local domain
+	    	  if (pos[coord] - cellGrid.getMyLeft(coord) < -ROUND_ERROR_PREC) {
+	    		  LOG4ESPP_TRACE(logger, "send particle left " << part.id());
+	    		  moveIndexedParticle(sendBufL, cell.particles, p);
+	    		  // redo same particle since we took one out here, so it's a new one
+	    		  --p;
+	    	  }
+	    	  // check whether the particle is now "right" of the local domain
+	    	  else if (pos[coord] - cellGrid.getMyRight(coord) >= ROUND_ERROR_PREC) {
+	    		  LOG4ESPP_TRACE(logger, "send particle right " << part.id());
+	    		  moveIndexedParticle(sendBufR, cell.particles, p);
+	    		  --p;
+	    	  }
+	    	  // Sort particles in cells of this node during last direction
+	    	  else if (coord == 2) {
+	    		  const Real3D& pos = part.position();
+	    		  Cell *sortCell = mapPositionToCellChecked(pos);
+	    		  if (sortCell != &cell) {
+	    			  if (sortCell == 0) {
+	    				  // particle is not in the local domain
+	    				  LOG4ESPP_DEBUG(logger, "take another loop: particle " << part.id()
+	    						  << " @ " << pos <<
+	    						  " is not inside node domain after neighbor exchange");
+	    				  if (isnan(pos[0]) || isnan(pos[1]) || isnan(pos[2])) {
+	    					  // TODO: error handling
+	    					  LOG4ESPP_ERROR(logger, "particle " << part.id() <<
+	    							  " has moved to outer space (one or more coordinates are nan)");
+	    				  } else {
+	    					  // particle stays where it is, and will be sorted in the next round
+	    					  finished = false;
+	    				  }
+	    			  } else {
+	    				  // particle is in the local domain
+	    				  moveIndexedParticle(sortCell->particles, cell.particles, p);
+	    				  --p;
+	    			  }
+	    		  }
+	    	  }
+
 	      }
 	    }
 
@@ -331,32 +339,32 @@ namespace espresso {
 	      Cell &cell = **it;
 	      // do not use an iterator here, since we have need to take out particles during the loop
 	      for (size_t p = 0; p < cell.particles.size(); ++p) {
-		Particle &part = cell.particles[p];
-		getSystem()->bc->foldCoordinate(part.position(), part.image(), coord);
-		LOG4ESPP_TRACE(logger, "folded coordinate " << coord << " of particle " << part.id());
+	    	  Particle &part = cell.particles[p];
+	    	  getSystem()->bc->foldCoordinate(part.position(), part.image(), coord);
+	    	  LOG4ESPP_TRACE(logger, "folded coordinate " << coord << " of particle " << part.id());
 
-		if (coord == 2) {
-		  Cell *sortCell = mapPositionToCellChecked(part.position());
+	    	  if (coord == 2) {
+	    		  Cell *sortCell = mapPositionToCellChecked(part.position());
 
-		  if (sortCell != &cell) {
-		    if (sortCell == 0) {
-		      LOG4ESPP_DEBUG(logger, "take another loop: particle " << part.id()
-				     << " @ " << part.position()
-				     << " is not inside node domain after neighbor exchange");
-                      const Real3D& pos = part.position();
-		      if (isnan(pos[0]) || isnan(pos[1]) || isnan(pos[2])) {
-			LOG4ESPP_ERROR(logger, "particle " << part.id() << 
-                          " has moved to outer space (one or more coordinates are nan)");
-		      } else {
-			// particle stays where it is, and will be sorted in the next round
-			finished = false;
-		      }
-		    } else {
-		      moveIndexedParticle(sortCell->particles, cell.particles, p);
-		      --p;
-		    }
-		  }
-		}
+	    		  if (sortCell != &cell) {
+	    			  if (sortCell == 0) {
+	    				  LOG4ESPP_DEBUG(logger, "take another loop: particle " << part.id()
+	    						  << " @ " << part.position()
+	    						  << " is not inside node domain after neighbor exchange");
+	    				  const Real3D& pos = part.position();
+	    				  if (isnan(pos[0]) || isnan(pos[1]) || isnan(pos[2])) {
+	    					  LOG4ESPP_ERROR(logger, "particle " << part.id() <<
+	    							  " has moved to outer space (one or more coordinates are nan)");
+	    				  } else {
+	    					  // particle stays where it is, and will be sorted in the next round
+	    					  finished = false;
+	    				  }
+	    			  } else {
+	    				  moveIndexedParticle(sortCell->particles, cell.particles, p);
+	    				  --p;
+	    			  }
+	    		  }
+	    	  }
 	      }
 	    }
 	  }
@@ -405,23 +413,23 @@ namespace espresso {
 
       longint total = 1;
       for (int i = 0; i < 3; ++i) {
-	if (leftBoundary[i] < 0 || leftBoundary[i] > cellGrid.getFrameGridSize(i) ||
-	    rightBoundary[i] < 0 || rightBoundary[i] > cellGrid.getFrameGridSize(i) ||
-	    leftBoundary[i] >= rightBoundary[i]) {
-	  throw std::runtime_error("DomainDecomposition::fillCells: wrong cell grid specified internally");
-	}
-	total *= (rightBoundary[i] - leftBoundary[i]);
+    	  if (leftBoundary[i] < 0 || leftBoundary[i] > cellGrid.getFrameGridSize(i) ||
+    			  rightBoundary[i] < 0 || rightBoundary[i] > cellGrid.getFrameGridSize(i) ||
+    			  leftBoundary[i] >= rightBoundary[i]) {
+    		  throw std::runtime_error("DomainDecomposition::fillCells: wrong cell grid specified internally");
+    	  }
+    	  total *= (rightBoundary[i] - leftBoundary[i]);
       }
       cv.reserve(total);
 
       for (int o = leftBoundary[0]; o < rightBoundary[0]; ++o) {
-	for (int n = leftBoundary[1]; n < rightBoundary[1]; ++n) {
-	  for (int m = leftBoundary[2]; m < rightBoundary[2]; ++m) {
-	    int i = cellGrid.mapPositionToIndex(o, n, m);
-	    LOG4ESPP_TRACE(logger, "add cell " << i);
-	    cv.push_back(&cells[i]);
-	  }
-	}
+    	  for (int n = leftBoundary[1]; n < rightBoundary[1]; ++n) {
+    		  for (int m = leftBoundary[2]; m < rightBoundary[2]; ++m) {
+    			  int i = cellGrid.mapPositionToIndex(o, n, m);
+    			  LOG4ESPP_TRACE(logger, "add cell " << i);
+    			  cv.push_back(&cells[i]);
+    		  }
+    	  }
       }
 
       LOG4ESPP_DEBUG(logger, "expected " << total << " cells, filled with " << cv.size());
@@ -430,54 +438,53 @@ namespace espresso {
     void DomainDecomposition::prepareGhostCommunication() {
       // direction loop: x, y, z
       for (int coord = 0; coord < 3; ++coord) {
-	// boundaries of area to send
-	int leftBoundary[3], rightBoundary[3];
-	/* boundaries perpendicular directions are the same for left/right send.
-	   We also send the ghost frame that we have already, so the data amount
-	   increase with each cycle.
+    	  // boundaries of area to send
+    	  int leftBoundary[3], rightBoundary[3];
+    	  /* boundaries perpendicular directions are the same for left/right send.
+	      We also send the ghost frame that we have already, so the data amount
+	      increase with each cycle.
 
-	   For a direction that was done already, i.e. is smaller than dir,
-	   we take the full ghost frame, otherwise only the inner frame.
-	*/
-	for (int offset = 1; offset <= 2; ++offset) {
-	  int otherCoord = (coord + offset) % 3;
-	  if (otherCoord < coord) {
-	    leftBoundary[otherCoord] = 0;
-	    rightBoundary[otherCoord] = cellGrid.getFrameGridSize(otherCoord);
-	  } else {
-	    leftBoundary[otherCoord] = cellGrid.getInnerCellsBegin(otherCoord);
-	    rightBoundary[otherCoord] = cellGrid.getInnerCellsEnd(otherCoord);
-	  }
-	}
+	      For a direction that was done already, i.e. is smaller than dir,
+	      we take the full ghost frame, otherwise only the inner frame.  */
+    	  for (int offset = 1; offset <= 2; ++offset) {
+    		  int otherCoord = (coord + offset) % 3;
+    		  if (otherCoord < coord) {
+    			  leftBoundary[otherCoord] = 0;
+    			  rightBoundary[otherCoord] = cellGrid.getFrameGridSize(otherCoord);
+    		  } else {
+    			  leftBoundary[otherCoord] = cellGrid.getInnerCellsBegin(otherCoord);
+    			  rightBoundary[otherCoord] = cellGrid.getInnerCellsEnd(otherCoord);
+    		  }
+    	  }
 
-	//  lr loop: left right - loop
-	for (int lr = 0; lr < 2; ++lr) {
-	  int dir = 2 * coord + lr;
+    	  //  lr loop: left right - loop
+    	  for (int lr = 0; lr < 2; ++lr) {
+    		  int dir = 2 * coord + lr;
 
-	  /* participating real particles from this node */
-	  LOG4ESPP_DEBUG(logger, "direction " << dir << " reals");
+    		  /* participating real particles from this node */
+    		  LOG4ESPP_DEBUG(logger, "direction " << dir << " reals");
 
-	  if (lr == 0) {
-	    leftBoundary[coord] = cellGrid.getInnerCellsBegin(coord);
-	    rightBoundary[coord] = cellGrid.getInnerCellsBegin(coord) + cellGrid.getFrameWidth();
-	  } else {
-	    leftBoundary[coord] = cellGrid.getInnerCellsEnd(coord) - cellGrid.getFrameWidth();
-	    rightBoundary[coord] = cellGrid.getInnerCellsEnd(coord);
-	  }
-	  fillCells(commCells[dir].reals, leftBoundary, rightBoundary);
+    		  if (lr == 0) {
+    			  leftBoundary[coord] = cellGrid.getInnerCellsBegin(coord);
+    			  rightBoundary[coord] = cellGrid.getInnerCellsBegin(coord) + cellGrid.getFrameWidth();
+    		  } else {
+    			  leftBoundary[coord] = cellGrid.getInnerCellsEnd(coord) - cellGrid.getFrameWidth();
+    			  rightBoundary[coord] = cellGrid.getInnerCellsEnd(coord);
+    		  }
+    		  fillCells(commCells[dir].reals, leftBoundary, rightBoundary);
 
-	  /* participating ghosts from this node */
-	  LOG4ESPP_DEBUG(logger, "direction " << dir << " ghosts");
+    		  /* participating ghosts from this node */
+    		  LOG4ESPP_DEBUG(logger, "direction " << dir << " ghosts");
 
-	  if (lr == 0) {
-	    leftBoundary[coord] = cellGrid.getInnerCellsEnd(coord);
-	    rightBoundary[coord] = cellGrid.getInnerCellsEnd(coord) + cellGrid.getFrameWidth();
-	  } else {
-	    leftBoundary[coord] = cellGrid.getInnerCellsBegin(coord) - cellGrid.getFrameWidth();
-	    rightBoundary[coord] = cellGrid.getInnerCellsBegin(coord);
-	  }
-	  fillCells(commCells[dir].ghosts, leftBoundary, rightBoundary);
-	}
+    		  if (lr == 0) {
+    			  leftBoundary[coord] = cellGrid.getInnerCellsEnd(coord);
+    			  rightBoundary[coord] = cellGrid.getInnerCellsEnd(coord) + cellGrid.getFrameWidth();
+    		  } else {
+    			  leftBoundary[coord] = cellGrid.getInnerCellsBegin(coord) - cellGrid.getFrameWidth();
+    			  rightBoundary[coord] = cellGrid.getInnerCellsBegin(coord);
+    		  }
+    		  fillCells(commCells[dir].ghosts, leftBoundary, rightBoundary);
+    	  }
       }
     }
 
@@ -521,12 +528,13 @@ namespace espresso {
 
 	    for (int i = 0, end = commCells[dir].ghosts.size(); i < end; ++i) {
 	      if (realToGhosts) {
-		copyRealsToGhosts(*commCells[dir].reals[i], *commCells[dir].ghosts[i], extradata, shift);
+            copyRealsToGhosts(*commCells[dir].reals[i], *commCells[dir].ghosts[i], extradata, shift);
 	      } else {
-		addGhostForcesToReals(*commCells[dir].ghosts[i], *commCells[dir].reals[i]);
+            addGhostForcesToReals(*commCells[dir].ghosts[i], *commCells[dir].reals[i]);
 	      }
 	    }
-	  } else {
+	  }
+	  else {
 	    // exchange size information, if necessary
 	    if (sizesFirst) {
 	      LOG4ESPP_DEBUG(logger, "exchanging ghost cell sizes");
@@ -535,67 +543,71 @@ namespace espresso {
 	      std::vector<longint> sendSizes, recvSizes;
 	      sendSizes.reserve(commCells[dir].reals.size());
 	      for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
-		sendSizes.push_back(commCells[dir].reals[i]->particles.size());
+            sendSizes.push_back(commCells[dir].reals[i]->particles.size());
 	      }
 	      recvSizes.resize(commCells[dir].ghosts.size());
 
 	      // exchange sizes, odd-even rule
 	      if (nodeGrid.getNodePosition(coord) % 2 == 0) {
-		LOG4ESPP_DEBUG(logger, "sending to node " << nodeGrid.getNodeNeighborIndex(dir)
-			       << ", then receiving from node " << nodeGrid.getNodeNeighborIndex(oppositeDir));
-		getSystem()->comm->send(nodeGrid.getNodeNeighborIndex(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
-		getSystem()->comm->recv(nodeGrid.getNodeNeighborIndex(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
+            LOG4ESPP_DEBUG(logger, "sending to node " << nodeGrid.getNodeNeighborIndex(dir)
+                       << ", then receiving from node " << nodeGrid.getNodeNeighborIndex(oppositeDir));
+            getSystem()->comm->send(nodeGrid.getNodeNeighborIndex(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
+            getSystem()->comm->recv(nodeGrid.getNodeNeighborIndex(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
 	      }
 	      else {
-		LOG4ESPP_DEBUG(logger, "receiving from node " << nodeGrid.getNodeNeighborIndex(oppositeDir)
-			       << ", then sending to node " << nodeGrid.getNodeNeighborIndex(dir));
-		getSystem()->comm->recv(nodeGrid.getNodeNeighborIndex(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
-		getSystem()->comm->send(nodeGrid.getNodeNeighborIndex(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
+            LOG4ESPP_DEBUG(logger, "receiving from node " << nodeGrid.getNodeNeighborIndex(oppositeDir)
+                       << ", then sending to node " << nodeGrid.getNodeNeighborIndex(dir));
+            getSystem()->comm->recv(nodeGrid.getNodeNeighborIndex(oppositeDir), DD_COMM_TAG, &(recvSizes[0]), recvSizes.size());
+            getSystem()->comm->send(nodeGrid.getNodeNeighborIndex(dir), DD_COMM_TAG, &(sendSizes[0]), sendSizes.size());
 	      }
 
 	      // resize according to received information
 	      for (int i = 0, end = commCells[dir].ghosts.size(); i < end; ++i) {
-		commCells[dir].ghosts[i]->particles.resize(recvSizes[i]);
+            commCells[dir].ghosts[i]->particles.resize(recvSizes[i]);
 	      }
 	      LOG4ESPP_DEBUG(logger, "exchanging ghost cell sizes done");
 	    }
 
 	    // prepare send and receive buffers
 	    longint receiver, sender;
-            outBuffer.reset();
+        outBuffer.reset();
 	    if (realToGhosts) {
 	      receiver = nodeGrid.getNodeNeighborIndex(dir);
 	      sender = nodeGrid.getNodeNeighborIndex(oppositeDir);
+	      //std::cout << getSystem()->comm->rank() << ": " << "packPositionsEtc --------\n";
 	      for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
-		packPositionsEtc(outBuffer, *commCells[dir].reals[i], extradata, shift);
+            packPositionsEtc(outBuffer, *commCells[dir].reals[i], extradata, shift);
 	      }
 	    }
 	    else {
 	      receiver = nodeGrid.getNodeNeighborIndex(oppositeDir);
 	      sender = nodeGrid.getNodeNeighborIndex(dir);
+	      //std::cout << getSystem()->comm->rank() << ": " << "packForces --------\n";
 	      for (int i = 0, end = commCells[dir].ghosts.size(); i < end; ++i) {
-		packForces(outBuffer, *commCells[dir].ghosts[i]);
+            packForces(outBuffer, *commCells[dir].ghosts[i]);
 	      }
 	    }
 
 	    // exchange particles, odd-even rule
 	    if (nodeGrid.getNodePosition(coord) % 2 == 0) {
-              outBuffer.send(receiver, DD_COMM_TAG);
+          outBuffer.send(receiver, DD_COMM_TAG);
 	      inBuffer.recv(sender, DD_COMM_TAG);
 	    } else {
 	      inBuffer.recv(sender, DD_COMM_TAG);
-              outBuffer.send(receiver, DD_COMM_TAG);
+          outBuffer.send(receiver, DD_COMM_TAG);
 	    }
 
 	    // unpack received data
 	    if (realToGhosts) {
+	      //std::cout << getSystem()->comm->rank() << ": " << "unpackPositionsEtc --------\n";
 	      for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
-		unpackPositionsEtc(*commCells[dir].ghosts[i], inBuffer, extradata);
+            unpackPositionsEtc(*commCells[dir].ghosts[i], inBuffer, extradata);
 	      }
 	    }
 	    else {
+	      //std::cout << getSystem()->comm->rank() << ": " << "unpackAndAddForces --------\n";
 	      for (int i = 0, end = commCells[dir].reals.size(); i < end; ++i) {
-		unpackAndAddForces(*commCells[dir].reals[i], inBuffer);
+            unpackAndAddForces(*commCells[dir].reals[i], inBuffer);
 	      }
 	    }
 	  }
