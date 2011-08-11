@@ -35,14 +35,20 @@ namespace espresso {
 
     PairList& getPairs() { return vlPairs; }
 
+    // AdResS stuff
     PairList& getAdrPairs() { return adrPairs; }
     std::set<longint>& getAdrList() { return adrList; }
     std::set<Particle*>& getAdrZone() { return adrZone; }
-    std::set<Real3D*>& getAdrPositions() { return adrPositions; }
+    std::vector<Real3D*>& getAdrPositions() { return adrPositions; }
     //std::set<Particle*>& getAdrZone() { return adrZone; }
-
     real getHy() { return skin; }
     real getEx() { return adresscut - skin; }
+    /** Add an atomistic particle (used for AdResS) to atList */
+    void addAdrParticle(longint pid);
+
+    /** Define the lowest atomistic type number */
+    //void setAtType(size_t type);
+
 
     void rebuild();
 
@@ -51,12 +57,6 @@ namespace espresso {
 
     /** Add pairs to exclusion list */
     bool exclude(longint pid1, longint pid2);
-
-    /** Add an atomistic particle (used for AdResS) to atList */
-    void addAdrParticle(longint pid);
-
-    /** Define the lowest atomistic type number */
-    void setAtType(size_t type);
 
     /** Get the number of times the Verlet list has been rebuilt */
     int getBuilds() const { return builds; }
@@ -70,21 +70,21 @@ namespace espresso {
   private:
 
     // AdResS stuff
-    void isPairInAdrZone(Particle &pt1, Particle &pt2);
     std::set<longint> adrList;   // pids of particles defined as adress particles
-    std::set<Real3D*> adrPositions; // positions of adress particles
+    std::vector<Real3D*> adrPositions; // positions of adress particles
     std::set<Particle*> adrZone; // particles that are in the AdResS zone
     PairList adrPairs;           // pairs that are in AdResS zone
-
     real adresscut; // size of AdResS zone
     real adrsq;
-    real skin; // skin, but also used as the size of hybrid region
-    size_t atType; // types above this number are considered atomistic
+
+    //size_t atType; // types above this number are considered atomistic
+    //void isPairInAdrZone(Particle &pt1, Particle &pt2); // not used anymore
 
 
     void checkPair(Particle &pt1, Particle &pt2);
     PairList vlPairs;
     boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list
+    real skin; // skin, but also used as the size of hybrid region
     real cutsq;
     int builds;
     boost::signals2::connection connectionResort;

@@ -33,7 +33,7 @@ namespace espresso {
       adresscut = cutVerlet; //TODO now it's fixed
       adrsq = adresscut * adresscut;
 
-      std::cout << "\n------constructor----- ";
+      std::cout << getSystem()->comm->rank() << ": " << "------constructor----- \n";
       if (rebuildVL) rebuild(); // not called if exclutions are provided
 
 
@@ -52,7 +52,7 @@ namespace espresso {
       adrPositions.clear(); // clear position pointers
 
 
-      std::cout << "\n-- VL Rebuild --\n";
+      //std::cout << getSystem()->comm->rank() << ": " << "-- VL Rebuild --\n";
 
       // add particles to adress zone
       /*
@@ -74,17 +74,17 @@ namespace espresso {
       //std::cout << "particles of all local cells:\n";
       //int count = 0;
       CellList localcells = getSystem()->storage->getLocalCells();
-      Cell* cellp;
+      //Cell* cellp;
       for (CellListIterator it(localcells); it.isValid(); ++it) {
-          cellp = getSystem()->storage->mapPositionToCell(it->position());
-          //++count;
 
-          /*std::cout << it->id() << "-" << it->ghost() << " " << it->position()
+    	  /*cellp = getSystem()->storage->mapPositionToCell(it->position());
+          ++count;
+          std::cout << it->id() << "-" << it->ghost() << " " << it->position()
                   << " in cell " << cellp - (getSystem()->storage->getFirstCell()) << "\n";*/
 
           if (adrList.count(it->id()) == 1) {
-              std::cout << " adding particle position (" << it->position() << ") to adrPositions and adrZone\n";
-              adrPositions.insert(&(it->position()));
+              //std::cout << getSystem()->comm->rank() << ": " << " adding particle position (" << it->position() << ") to adrPositions and adrZone\n";
+              adrPositions.push_back(&(it->position()));
               adrZone.insert(&(*it));
           }
       }
@@ -96,13 +96,13 @@ namespace espresso {
       Real3D dist;
       real distsq;
       for (CellListIterator it(localcells); it.isValid(); ++it) {
-            cellp = getSystem()->storage->mapPositionToCell(it->position());
 
-            /*std::cout << it->id() << "-" << it->ghost() << " " << it->position()
+            /*cellp = getSystem()->storage->mapPositionToCell(it->position());
+            std::cout << it->id() << "-" << it->ghost() << " " << it->position()
                     << " in cell " << cellp - (getSystem()->storage->getFirstCell()) << "\n";*/
 
             // loop over positions
-            for (std::set<Real3D*>::iterator it2 = adrPositions.begin(); it2 != adrPositions.end(); ++it2){
+            for (std::vector<Real3D*>::iterator it2 = adrPositions.begin(); it2 != adrPositions.end(); ++it2){
                 dist = it->getPos() - **it2;
                 distsq = dist.sqr();
 
@@ -114,19 +114,18 @@ namespace espresso {
                     break; // do not need to loop further
                 }
             }
-
       }
 
 
       // add particles to adress pairs and VL
       CellList cl = getSystem()->storage->getRealCells();
       for (CellListAllPairsIterator it(cl); it.isValid(); ++it) {
-        if ((*it->first).type() >= atType) continue;  // only check if VP/CG particle!
-        if ((*it->second).type() >= atType) continue; // only check if VP/CG particle!
+        //if ((*it->first).type() >= atType) continue;  // only check if VP/CG particle!
+        //if ((*it->second).type() >= atType) continue; // only check if VP/CG particle!
         checkPair(*it->first, *it->second);
       }
 
-      std::cout << "verlet list pairs (vlPairs size " << vlPairs.size() << "):\n";
+      std::cout << getSystem()->comm->rank() << ": " << "verlet list pairs (vlPairs size " << vlPairs.size() << "):\n";
       //std::cout << "\n\n";
 
 
@@ -154,21 +153,21 @@ namespace espresso {
 
 
       // print particles in adress zone
-      std::cout << "\nin adress zone (adrZone size " << adrZone.size() <<  "):\n";
-      for (std::set<Particle*>::iterator it = adrZone.begin(); it != adrZone.end(); ++it) {
+      std::cout << getSystem()->comm->rank() << ": " << "in adress zone (adrZone size " << adrZone.size() <<  "):\n";
+      /*for (std::set<Particle*>::iterator it = adrZone.begin(); it != adrZone.end(); ++it) {
           std::cout << (*it)->id() << "-";
           std::cout << (*it)->ghost() << " (";
           std::cout << (*it)->position() << ")\n";
-      }
+      }*/
       std::cout << "\n";
 
 
       // print adrPairs
-      std::cout << "adress pairs (adrPairs size " << adrPairs.size() << "):\n";
-      for (PairList::Iterator it(adrPairs); it.isValid(); ++it) {
+      std::cout << getSystem()->comm->rank() << ": " << "adress pairs (adrPairs size " << adrPairs.size() << "):\n";
+      /*for (PairList::Iterator it(adrPairs); it.isValid(); ++it) {
           std::cout << "(" << (*it->first).id() << "-" << (*it->first).ghost() <<
                   ", " << (*it->second).id() << "-" << (*it->second).ghost() << ") ";
-      }
+      }*/
       std::cout << "\n\n";
 
 
@@ -181,7 +180,8 @@ namespace espresso {
 
     /*-------------------------------------------------------------*/
 
-    // add particles to adress zone
+    // add particles to adress zone -- not used anymore
+    /*
     void VerletListAdress::isPairInAdrZone(Particle& pt1, Particle& pt2) {
 
         Real3D d = pt1.position() - pt2.position();
@@ -205,17 +205,17 @@ namespace espresso {
             //std::cout << "Add " << pt1.id() << " to adr zone\n";
         }
 
-        /*
         // insert and overwrite position
-        std::pair<std::map<longint, Real3D>::iterator,bool> res;
-        res = adrZone.insert(std::make_pair(pt1.id(), pt1.position()));
-        if(!res.second) // key was already in map change it.
-            res.first->second = pt1.position();
-        res = adrZone.insert(std::make_pair(pt2.id(), pt2.position()));
-        if(!res.second) // key was already in map change it.
-            res.first->second = pt2.position();
-        */
-    }
+        //std::pair<std::map<longint, Real3D>::iterator,bool> res;
+        //res = adrZone.insert(std::make_pair(pt1.id(), pt1.position()));
+        //if(!res.second) // key was already in map change it.
+        //   res.first->second = pt1.position();
+        //res = adrZone.insert(std::make_pair(pt2.id(), pt2.position()));
+        //if(!res.second) // key was already in map change it.
+        //    res.first->second = pt2.position();
+
+    }*/
+
 
     /*-------------------------------------------------------------*/
 
@@ -266,10 +266,11 @@ namespace espresso {
           adrList.insert(pid);
     }
 
+    /* not used anymore
     // types above this number are considered atomistic
     void VerletListAdress::setAtType(size_t type) {
         atType = type;
-    }
+    }*/
 
     /*-------------------------------------------------------------*/
 
@@ -295,8 +296,8 @@ namespace espresso {
       void (VerletListAdress::*pyAddAdrParticle)(longint pid)
             = &VerletListAdress::addAdrParticle;
 
-      void (VerletListAdress::*pySetAtType)(size_t type)
-            = &VerletListAdress::setAtType;
+      /*void (VerletListAdress::*pySetAtType)(size_t type)
+            = &VerletListAdress::setAtType;*/
 
       class_<VerletListAdress, shared_ptr<VerletList> >
         ("VerletListAdress", init< shared_ptr<System>, real, bool >())
@@ -306,7 +307,7 @@ namespace espresso {
         .def("exclude", pyExclude)
         .def("addAdrParticle", pyAddAdrParticle)
         .def("rebuild", &VerletListAdress::rebuild)
-        .def("setAtType", pySetAtType)
+        //.def("setAtType", pySetAtType)
         ;
     }
 
