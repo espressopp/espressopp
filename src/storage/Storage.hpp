@@ -114,7 +114,7 @@ namespace espresso {
 	  that particles might be located up to skin away from their
 	  current cell.
       */
-      void decompose();
+      virtual void decompose();
 
       /** copy minimal information from the real to the ghost
 	  particles.  Typically this copies the positions and maybe the
@@ -196,37 +196,37 @@ namespace espresso {
       static const int dataOfExchangeGhosts;
 
       /// remove ghost particles from the localParticles index
-      void invalidateGhosts();
+      virtual void invalidateGhosts();
 
       /** pack real particle data for sending. At least positions, maybe
 	  shifted, and possibly additional data according to extradata.
 
 	  @param shift how to adjust the positions of the particles when sending
       */
-      void packPositionsEtc(class OutBuffer& buf,
+      virtual void packPositionsEtc(class OutBuffer& buf,
 			    Cell &reals, int extradata, const Real3D& shift);
 
  
       /** unpack received data for ghosts. */
-      void unpackPositionsEtc(Cell &ghosts, class InBuffer &buf, int extradata);
+      virtual void unpackPositionsEtc(Cell &ghosts, class InBuffer &buf, int extradata);
 
       /** copy specified data elements between a real cell and one of its ghosts
 
 	  @param shift how to adjust the positions of the particles when sending
       */
-      void copyRealsToGhosts(Cell &reals, Cell &ghosts,
+      virtual void copyRealsToGhosts(Cell &reals, Cell &ghosts,
 			     int extradata,
 			     const Real3D& shift);
 
       void copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift);
 
       /** pack ghost forces for sending. */
-      void packForces(OutBuffer& buf, Cell &ghosts);
+      virtual void packForces(OutBuffer& buf, Cell &ghosts);
       /** unpack received ghost forces. This one ADDS, and is most likely, what you need. */
-      void unpackAndAddForces(Cell &reals, class InBuffer &buf);
+      virtual void unpackAndAddForces(Cell &reals, class InBuffer &buf);
       /** unpack received ghost forces. This one OVERWRITES, and is probably what you don't need. */
       void unpackForces(Cell &reals, class InBuffer &buf);
-      void addGhostForcesToReals(Cell &ghosts, Cell &reals);
+      virtual void addGhostForcesToReals(Cell &ghosts, Cell &reals);
       // adds ghost forces of Adr AT particles to real Adr AT particles
       void addAdrGhostForcesToReals(Particle& src, Particle& dst);
 
@@ -259,10 +259,6 @@ namespace espresso {
 	 not overwrite real particle pointers.
        */
       void removeFromLocalParticles(Particle*, bool weak = false);
-
-
-      // remove an AdResS AT particle - it is removed from the vector and from the map
-      //void removeFromLocalAdrATParticles(Particle *p);
 
 
       /* update information for this particle from local particles. If weak is true,
@@ -305,6 +301,8 @@ namespace espresso {
 
       // used for AdResS
       shared_ptr<FixedTupleList> fixedtupleList;
+      void clearAdrATParticlesG() { AdrATParticlesG.clear(); }
+      ParticleListAdr& getAdrATParticlesG() { return AdrATParticlesG; }
 
     private:
       // map particle id to Particle * for all particles on this node

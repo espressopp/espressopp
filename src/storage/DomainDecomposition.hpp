@@ -2,9 +2,11 @@
 #ifndef _STORAGE_DOMAINDECOMPOSITION_HPP
 #define _STORAGE_DOMAINDECOMPOSITION_HPP
 #include "Storage.hpp"
+#include "StorageAdress.hpp"
 #include "types.hpp"
 #include "CellGrid.hpp"
 #include "NodeGrid.hpp"
+
 
 namespace espresso {
   namespace storage {
@@ -14,7 +16,7 @@ namespace espresso {
       NodeGridMismatch(const Int3D& gridRequested, int nodesAvailable);
     };
 
-    class DomainDecomposition: public Storage {
+    class DomainDecomposition: public StorageAdress {
     public:
       DomainDecomposition(shared_ptr< System > system,
 			  const Int3D& _nodeGrid,
@@ -88,6 +90,7 @@ namespace espresso {
 
       static LOG4ESPP_DECL_LOGGER(logger);
     };
+
   }
 }
 #endif
