@@ -3,7 +3,7 @@ from espresso.main import _setupPath
 
 # now load the fundamental modules
 # load mpi4py (must be loaded before _espresso)
-from mpi4py import MPI
+import MPI
 # load the ES++-C++ module
 import _espresso
 

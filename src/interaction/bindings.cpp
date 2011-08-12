@@ -1,5 +1,6 @@
 #include "bindings.hpp"
 #include "Potential.hpp"
+#include "Zero.hpp"
 #include "LennardJones.hpp"
 #include "LennardJonesExpand.hpp"
 #include "LennardJonesGromacs.hpp"
@@ -23,6 +24,7 @@ namespace espresso {
     void registerPython() {
       Interaction::registerPython();
       Potential::registerPython();
+      Zero::registerPython();
       LennardJones::registerPython();
       LennardJonesExpand::registerPython();
       LennardJonesGromacs::registerPython();

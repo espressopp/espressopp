@@ -196,7 +196,7 @@ htmlhelp_basename = 'ESPResSodoc'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'ESPResSo.tex', u'ESPResSo++ Documentation',
-   u'Thomas Brandes', 'manual'),
+   u'Torsten Stuehn', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

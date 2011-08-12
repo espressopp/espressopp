@@ -5,6 +5,7 @@ pmiimport('espresso.interaction')
 from espresso.interaction.Interaction import *
 
 from espresso.interaction.Potential import *
+from espresso.interaction.Zero import *
 from espresso.interaction.LennardJones import *
 from espresso.interaction.LennardJonesExpand import *
 from espresso.interaction.LennardJonesGromacs import *

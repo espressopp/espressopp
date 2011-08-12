@@ -26,7 +26,7 @@ Contents:
    overview.rst
    team.rst
    faq.rst
-   pmi.rst
+   classdescription.rst
    bib.rst
 
 .. toctree::

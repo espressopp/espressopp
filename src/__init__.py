@@ -5,6 +5,7 @@ from espresso.main._setup import *
 pmiimport('espresso')
 
 import _espresso
+from espresso.Exceptions import *
 from espresso.Real3D import *
 from espresso.Tensor import *
 from espresso.Int3D import *
@@ -25,7 +26,7 @@ nan=float("nan")
 auto='auto'
 
 # fetch the different subpackages
-from espresso import esutil, bc, storage, integrator, interaction, analysis
+from espresso import esutil, bc, storage, integrator, interaction, analysis, tools
 
 if pmi.isController :
     # make sure that the workers exit when the script ends
