@@ -43,7 +43,7 @@ namespace espresso {
   DomainDecomposition(shared_ptr< System > _system,
           const Int3D& _nodeGrid,
           const Int3D& _cellGrid)
-    : StorageAdress(_system), exchangeBufferSize(0) {
+    : Storage(_system), exchangeBufferSize(0) {
     LOG4ESPP_INFO(logger, "node grid = "
           << _nodeGrid[0] << "x" << _nodeGrid[1] << "x" << _nodeGrid[2]
           << " cell grid = "

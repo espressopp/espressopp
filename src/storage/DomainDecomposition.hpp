@@ -16,7 +16,7 @@ namespace espresso {
       NodeGridMismatch(const Int3D& gridRequested, int nodesAvailable);
     };
 
-    class DomainDecomposition: public StorageAdress {
+    class DomainDecomposition: public Storage {
     public:
       DomainDecomposition(shared_ptr< System > system,
 			  const Int3D& _nodeGrid,
