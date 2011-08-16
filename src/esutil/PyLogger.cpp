@@ -261,7 +261,7 @@ void PyLogger::setPythonLoggers(string& parentName)
    setPythonLogger(pyLogger);
 
    for (size_t i = 0; i < sons.size(); i++) {
-       PyLogger* son = dynamic_cast<PyLogger*>(sons[i]);
+       PyLogger* son = (PyLogger*)(sons[i]);
        son->setPythonLoggers(fullName);
    }
 }
