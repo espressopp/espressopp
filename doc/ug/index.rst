@@ -27,6 +27,7 @@ Contents:
    team.rst
    faq.rst
    classdescription.rst
+   logging.rst
    bib.rst
 
 .. toctree::

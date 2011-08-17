@@ -17,7 +17,7 @@ from espresso.tools.convert import lammps, gromacs
 from espresso.tools import decomp, timers, replicate
 
 # simulation parameters (nvt = False is nve)
-steps = 10000
+steps = 1000
 rc = 1.12
 skin = 0.3
 nvt = True

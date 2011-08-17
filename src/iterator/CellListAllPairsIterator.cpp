@@ -2,7 +2,6 @@
 
 namespace espresso {
   namespace iterator {
-    LOG4ESPP_LOGGER(CellListAllPairsIterator::theLogger, 
-		    "CellListAllPairsIterator");
+    LOG4ESPP_LOGGER(CellListAllPairsIterator::theLogger, "CellListAllPairsIterator");
   }
 }
