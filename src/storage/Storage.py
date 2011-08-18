@@ -95,9 +95,15 @@ class StorageLocal(object):
                     #print "%d:  addParticle %d, last_pos=pos %d, %d, %d"%(pmi._MPIcomm.rank,id,pos[0], pos[1], pos[2])
                     storedParticle = self.cxxclass.addParticle(self, id, pos)
                     last_pos = pos
-                else:
+                elif particle[index_adrAT] == 1:
                     #print "%d:  addAdrATparticle %d, last_pos %d, %d, %d"%(pmi._MPIcomm.rank,id,last_pos[0], last_pos[1], last_pos[2])
-                    storedParticle = self.cxxclass.addAdrATParticle(self, id, pos, last_pos)
+                    storedParticle = self.cxxclass.addAdrATParticle(self, id, pos, last_pos) 
+                elif index_adrAT == -1:
+                    #print "%d:  addParticle %d, last_pos=pos %d, %d, %d"%(pmi._MPIcomm.rank,id,pos[0], pos[1], pos[2])
+                    storedParticle = self.cxxclass.addParticle(self, id, pos)
+                    last_pos = pos
+                else:
+                    print "Error adding particle"
                     
 
                 if storedParticle != None:
