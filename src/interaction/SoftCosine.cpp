@@ -40,6 +40,7 @@ namespace espresso {
         ("interaction_FixedPairListSoftCosine",
           init< shared_ptr<System>, shared_ptr<FixedPairList>, 
                 shared_ptr<SoftCosine> >())
+        .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<SoftCosine> >())
         .def("setPotential", &FixedPairListSoftCosine::setPotential);
         ;
     }

@@ -23,10 +23,12 @@ namespace espresso {
     	;
 
       class_< FixedPairListFENE, bases< Interaction > >
-        ("interaction_FixedPairListFENE", 
-          init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<FENE> >())
-        .def("setPotential", &FixedPairListFENE::setPotential);
-        ;
+      ("interaction_FixedPairListFENE",
+        init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<FENE> >())
+       .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<FENE> >())
+       .def("setPotential", &FixedPairListFENE::setPotential);
+      ;
+
     }
 
   }
