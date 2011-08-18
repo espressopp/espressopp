@@ -158,9 +158,9 @@ namespace espresso {
     setAutoShift() {
       autoShift = true;
       if (cutoffSqr == infinity) 
-	shift = 0.0;
+	    shift = 0.0;
       else 
-	shift = derived_this()->_computeEnergySqrRaw(cutoffSqr);
+	    shift = derived_this()->_computeEnergySqrRaw(cutoffSqr);
       return shift;
     }
 
@@ -229,8 +229,11 @@ namespace espresso {
     _computeEnergySqr(real distSqr) const {
       if (distSqr > cutoffSqr) 
         return 0.0;
-      else
-        return derived_this()->_computeEnergySqrRaw(distSqr) - shift;
+      else {
+        real e = derived_this()->_computeEnergySqrRaw(distSqr) - shift;
+        LOG4ESPP_TRACE(theLogger, "Epot(r*r=" << distSqr << ") = " << e);
+        return e;
+      }
     }
     
     // Force computation

@@ -11,7 +11,7 @@ namespace espresso {
     class NPart : public Observable {
     public:
       NPart(shared_ptr< System > system) : Observable(system) {}
-      ~NPart() {}
+      virtual ~NPart() {}
       virtual real compute() const;
 
       static void registerPython();

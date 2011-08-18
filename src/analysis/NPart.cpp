@@ -7,8 +7,13 @@ using namespace espresso;
 namespace espresso {
   namespace analysis {
     real NPart::compute() const {
+
+      int myN, systemN;
       System& system = getSystemRef();
-      return 1.0*system.storage->getNRealParticles();
+      myN = system.storage->getNRealParticles();
+      boost::mpi::reduce(*getSystem()->comm, myN, systemN, std::plus<int>(), 0);
+
+      return 1.0*systemN;
     }
 
     void NPart::registerPython() {

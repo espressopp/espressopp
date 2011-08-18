@@ -44,7 +44,7 @@ namespace espresso {
     // INLINE IMPLEMENTATION
     inline 
     CellListAllPairsIterator::
-    CellListAllPairsIterator() 
+    CellListAllPairsIterator()
     {}
 
     inline 
@@ -73,7 +73,6 @@ namespace espresso {
         while (pit.isDone()) {
           if (inSelfLoop) {
             LOG4ESPP_TRACE(theLogger, "pit.isDone(), inSelfLoop, starting neighbor loop");
-            //std::cout << "\n";
             inSelfLoop = false;
             ncit = NeighborCellList::Iterator((*cit)->neighborCells);
           } else {

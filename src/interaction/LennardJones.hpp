@@ -45,8 +45,8 @@ namespace espresso {
 	: epsilon(_epsilon), sigma(_sigma) {	
         autoShift = false;
         setCutoff(_cutoff);
-        setAutoShift(); 
         preset();
+        setAutoShift(); 
       }
 
       void preset() {

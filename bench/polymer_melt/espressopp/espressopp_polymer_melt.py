@@ -51,9 +51,10 @@ for i in range(num_particles):
   new_particles.append(part)
   if i % 1000 == 0:
     system.storage.addParticles(new_particles, *props)
-    new_particles = []
-    system.storage.addParticles(new_particles, *props)
     system.storage.decompose()
+    new_particles = []
+system.storage.addParticles(new_particles, *props)
+system.storage.decompose()
 
 # Lennard-Jones with Verlet list
 vl = espresso.VerletList(system, cutoff = rc + system.skin)

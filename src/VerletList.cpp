@@ -45,13 +45,15 @@ namespace espresso {
 
     // add particles to adress zone
     CellList cl = getSystem()->storage->getRealCells();
+    LOG4ESPP_DEBUG(theLogger, "local cell list size = " << cl.size());
     for (CellListAllPairsIterator it(cl); it.isValid(); ++it) {
       checkPair(*it->first, *it->second);
+      LOG4ESPP_DEBUG(theLogger, "checking particles " << it->first->id() << " and " << it->second->id());
     }
 
-    LOG4ESPP_INFO(theLogger, "rebuilt VerletList, cutsq = " << cutsq 
-                 << " local size = " << vlPairs.size());
     builds++;
+    LOG4ESPP_DEBUG(theLogger, "rebuilt VerletList (count=" << builds << "), cutsq = " << cutsq
+                 << " local size = " << vlPairs.size());
   }
   
 
@@ -63,7 +65,7 @@ namespace espresso {
     Real3D d = pt1.position() - pt2.position();
     real distsq = d.sqr();
 
-    LOG4ESPP_TRACE(theLogger, "p1: " << pt1.id() 
+    LOG4ESPP_TRACE(theLogger, "p1: " << pt1.id()
                    << " @ " << pt1.position() 
 		   << " - p2: " << pt2.id() << " @ " << pt2.position()
 		   << " -> distsq = " << distsq);

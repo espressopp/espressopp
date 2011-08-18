@@ -7,7 +7,7 @@
 
 namespace espresso {
   namespace interaction {
-      
+
     typedef class VerletListInteractionTemplate <LennardJones>
         VerletListLennardJones;
     typedef class VerletListAdressInteractionTemplate <LennardJones>

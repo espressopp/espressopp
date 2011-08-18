@@ -11,7 +11,7 @@ namespace espresso {
     class Temperature : public Observable {
     public:
       Temperature(shared_ptr< System > system) : Observable(system) {}
-      ~Temperature() {}
+      virtual ~Temperature() {}
       virtual real compute() const;
       //virtual real time_average() const;
 
