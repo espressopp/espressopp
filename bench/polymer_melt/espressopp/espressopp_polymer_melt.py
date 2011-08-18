@@ -17,7 +17,7 @@ from espresso.tools.convert import lammps, gromacs
 from espresso.tools import decomp, timers, replicate
 
 # simulation parameters (nvt = False is nve)
-steps = 1000
+steps = 10000
 rc = 1.12
 skin = 0.3
 nvt = True
@@ -29,7 +29,7 @@ timestep = 0.01
 ######################################################################
 sys.stdout.write('Setting up simulation ...\n')
 bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read('espressopp_polymer_melt.start')
-bonds, angles, x, y, z, Lx, Ly, Lz = replicate.replicate(bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1)
+bonds, angles, x, y, z, Lx, Ly, Lz = replicate(bonds, angles, x, y, z, Lx, Ly, Lz, xdim=2, ydim=2, zdim=2)
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
@@ -43,9 +43,17 @@ cellGrid = espresso.tools.decomp.cellGrid(size,nodeGrid,rc,skin)
 system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # add particles to the system and then decompose
-for pid in range(num_particles):
-  system.storage.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
-system.storage.decompose()
+# do this in chunks of 1000 particles to speed it up
+props = ['id', 'type', 'mass', 'pos']
+new_particles = []
+for i in range(num_particles):
+  part = [i + 1, 0, 1.0, Real3D(x[i], y[i], z[i])]
+  new_particles.append(part)
+  if i % 1000 == 0:
+    system.storage.addParticles(new_particles, *props)
+    new_particles = []
+    system.storage.addParticles(new_particles, *props)
+    system.storage.decompose()
 
 # Lennard-Jones with Verlet list
 vl = espresso.VerletList(system, cutoff = rc + system.skin)
@@ -72,14 +80,14 @@ system.addInteraction(interCosine)
 
 # integrator
 integrator = espresso.integrator.VelocityVerlet(system)
-integrator.dt = 0.003
+integrator.dt = timestep
 
 if(nvt):
   langevin = espresso.integrator.Langevin(system)
   langevin.gamma = 1.0
   langevin.temperature = 1.0
   integrator.langevin = langevin
-  integrator.dt = 0.01
+  integrator.dt = timestep
 
 # print simulation parameters
 print ''
@@ -90,13 +98,13 @@ print 'dt =', integrator.dt
 print 'skin =', system.skin
 print 'nvt =', nvt
 print 'steps =', steps
-print 'NodeGrid = %s' % (nodeGrid,)
-print 'CellGrid = %s' % (cellGrid,)
+print 'NodeGrid = %s' % (nodeGrid)
+print 'CellGrid = %s' % (cellGrid)
 print ''
 
 # analysis
-configurations = espresso.analysis.Configurations(system)
-configurations.gather()
+# configurations = espresso.analysis.Configurations(system)
+# configurations.gather()
 temperature = espresso.analysis.Temperature(system)
 pressure = espresso.analysis.Pressure(system)
 pressureTensor = espresso.analysis.PressureTensor(system)
