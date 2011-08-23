@@ -82,9 +82,7 @@ namespace espresso {
         if(potential._computeForce(force, p1, p2)) {
           p1.force() += force;
           p2.force() -= force;
-          LOG4ESPP_DEBUG(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" << force);
-        } else {
-            LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force= 0 (dist>cutoff)");
+          LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" << force);
         }
       }
     }
@@ -105,12 +103,11 @@ namespace espresso {
         const Potential &potential = getPotential(type1, type2);
         e   = potential._computeEnergy(p1, p2);
         es += e;
-        LOG4ESPP_DEBUG(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
+        LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
       }
 
       real esum;
-      boost::mpi::reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>(), 0);
-      return esum;
+      boost::mpi::reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>(), 0);      return esum;
     }
 
 
