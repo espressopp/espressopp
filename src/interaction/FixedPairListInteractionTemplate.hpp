@@ -9,6 +9,7 @@
 #include "Tensor.hpp"
 #include "Particle.hpp"
 #include "FixedPairList.hpp"
+#include "FixedPairListAdress.hpp"
 #include "esutil/Array2D.hpp"
 #include "bc/BC.hpp"
 #include "SystemAccess.hpp"

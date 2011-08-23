@@ -155,6 +155,8 @@ namespace espresso {
       void setFixedTuples(shared_ptr<FixedTupleList> _fixedtupleList){
           fixedtupleList = _fixedtupleList;
       }
+      ParticleList&    getAdrATParticles()  { return AdrATParticles; }
+      ParticleListAdr& getAdrATParticlesG() { return AdrATParticlesG; }
 
       /* variant for python that ignores the return value */
       bool pyAddParticle(longint id, const Real3D& pos);
@@ -302,7 +304,6 @@ namespace espresso {
       // used for AdResS
       shared_ptr<FixedTupleList> fixedtupleList;
       void clearAdrATParticlesG() { AdrATParticlesG.clear(); }
-      ParticleListAdr& getAdrATParticlesG() { return AdrATParticlesG; }
 
     private:
       // map particle id to Particle * for all particles on this node

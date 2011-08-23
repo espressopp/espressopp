@@ -31,10 +31,10 @@ namespace espresso {
 		another processor as well.
 		\return whether the particle was inserted on this processor.
 		*/
-		bool add(longint pid1, longint pid2);
+		virtual bool add(longint pid1, longint pid2);
 		void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);
 		void afterRecvParticles(ParticleList& pl, class InBuffer& buf);
-		void onParticlesChanged();
+		virtual void onParticlesChanged();
 
 		static void registerPython();
 

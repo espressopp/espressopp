@@ -219,15 +219,15 @@ namespace espresso {
               //std::cout << vp.id() << " dex+dhy: " << dexdhy << "\n";
 
               // calculate weight and write it in the map
-              real w1, w2;
-              if (dex > min1) w1 = 1;
-              else if (dexdhy < min1) w1 = 0;
+              real w;
+              if (dex > min1) w = 1;
+              else if (dexdhy < min1) w = 0;
               else {
-                   w1 = cos(pidhy2 * (min1 - dex));
-                   w1 *= w1;
+                   w = cos(pidhy2 * (min1 - dex));
+                   w *= w;
               }
 
-              weights.insert(std::make_pair(&vp, w1));
+              weights.insert(std::make_pair(&vp, w));
 
               //if (w1 == 1 || w2 == 1) std::cout << p1.id() << " ";
               //std::cout << vp.id() << " weight: " << w1 << "\n\n";

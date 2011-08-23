@@ -41,7 +41,7 @@ namespace espresso {
     std::set<Particle*>& getAdrZone() { return adrZone; }
     std::vector<Real3D*>& getAdrPositions() { return adrPositions; }
     //std::set<Particle*>& getAdrZone() { return adrZone; }
-    real getHy() { return skin; }
+    real getHy() { return skin; } // TODO hybrid region should be of custom size
     real getEx() { return adresscut - skin; }
     /** Add an atomistic particle (used for AdResS) to atList */
     void addAdrParticle(longint pid);

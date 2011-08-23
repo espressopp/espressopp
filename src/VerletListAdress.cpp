@@ -33,7 +33,7 @@ namespace espresso {
       adresscut = cutVerlet; //TODO now it's fixed
       adrsq = adresscut * adresscut;
 
-      std::cout << getSystem()->comm->rank() << ": " << "------constructor----- \n";
+      //std::cout << getSystem()->comm->rank() << ": " << "------constructor----- \n";
       if (rebuildVL) rebuild(); // not called if exclutions are provided
 
 
@@ -125,7 +125,7 @@ namespace espresso {
         checkPair(*it->first, *it->second);
       }
 
-      std::cout << getSystem()->comm->rank() << ": " << "verlet list pairs (vlPairs size " << vlPairs.size() << "):\n";
+      //std::cout << getSystem()->comm->rank() << ": " << "verlet list pairs (vlPairs size " << vlPairs.size() << "):\n";
       //std::cout << "\n\n";
 
 
@@ -153,22 +153,24 @@ namespace espresso {
 
 
       // print particles in adress zone
-      std::cout << getSystem()->comm->rank() << ": " << "in adress zone (adrZone size " << adrZone.size() <<  "):\n";
+      //std::cout << getSystem()->comm->rank() << ": " << "in adress zone (adrZone size " << adrZone.size() <<  "):\n";
+
       /*for (std::set<Particle*>::iterator it = adrZone.begin(); it != adrZone.end(); ++it) {
           std::cout << (*it)->id() << "-";
           std::cout << (*it)->ghost() << " (";
           std::cout << (*it)->position() << ")\n";
       }*/
-      std::cout << "\n";
+      //std::cout << "\n";
 
 
       // print adrPairs
-      std::cout << getSystem()->comm->rank() << ": " << "adress pairs (adrPairs size " << adrPairs.size() << "):\n";
+      //std::cout << getSystem()->comm->rank() << ": " << "adress pairs (adrPairs size " << adrPairs.size() << "):\n";
+
       /*for (PairList::Iterator it(adrPairs); it.isValid(); ++it) {
           std::cout << "(" << (*it->first).id() << "-" << (*it->first).ghost() <<
                   ", " << (*it->second).id() << "-" << (*it->second).ghost() << ") ";
       }*/
-      std::cout << "\n\n";
+      //std::cout << "\n\n";
 
 
 

@@ -41,6 +41,7 @@ namespace espresso {
       class_< FixedPairListMorse, bases< Interaction > >
         ("interaction_FixedPairListMorse",
           init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<Morse> >())
+        .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<Morse> >())
         .def("setPotential", &FixedPairListMorse::setPotential);
         ;
     }
