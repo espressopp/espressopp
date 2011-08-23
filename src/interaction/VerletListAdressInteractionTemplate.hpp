@@ -174,8 +174,9 @@ namespace espresso {
               atList = it3->second;
 
               // compute center of mass
-              Real3D cm(0.0, 0.0, 0.0);
-              real M = vp.getMass();
+              Real3D cmp(0.0, 0.0, 0.0); // center of mass position
+              Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
+              real M = vp.getMass(); // sum of mass of AT particles
               //real M = 0.0;
               //std::cout << "vp id: " << vp.id()  << "-" << vp.ghost() << " pos: " << vp.position() << "\n";
               for (std::vector<Particle*>::iterator it2 = atList.begin();
@@ -183,17 +184,22 @@ namespace espresso {
 
                   Particle &at = **it2;
                   Real3D d1 = at.position() - vp.position();
-                  cm += at.mass() * d1;
+                  cmp += at.mass() * d1;
+                  cmv += at.mass() * at.velocity();
+
                   //M += at.mass();
                   //std::cout << "at id: " << at.id() << "-" << at.ghost() <<
                   //" pos: " << at.position() << " mass: " << at.mass() << "\n";
               }
-              cm = cm / M;
-              cm += vp.position();
-              //std::cout << " cm M: "  << M << "\n\n";
-              //std::cout << "moving " << vp.id() << " to " << cm << "\n";
-              // update (overwrite) the position of the VP
-              vp.position() = cm;
+              cmp = cmp / M;
+              cmv = cmv / M;
+              cmp += vp.position(); // cmp is a relative position
+              //std::cout << " cmp M: "  << M << "\n\n";
+              //std::cout << "moving " << vp.id() << " to " << cmp << "\n";
+
+              // update (overwrite) the position and velocity of the VP
+              vp.position() = cmp;
+              vp.velocity() = cmv;
 
 
               // compute weights of VP
@@ -260,7 +266,7 @@ namespace espresso {
          //std::cout << " ---- get potential ---- \n";
          const Potential &potential = getPotential(type1, type2);
          Real3D forcevp(0.0, 0.0, 0.0);
-         if (w1 != 1 && w2 != 1) { // calculate if not in AT region
+         if (w12 != 1) { // calculate if not in AT region
              //std::cout << "VP forces ...\n";
              if(potential._computeForce(forcevp, p1, p2)) {
                  forcevp = (1 - w12) * forcevp;
