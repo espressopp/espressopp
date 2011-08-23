@@ -51,7 +51,7 @@ def translateParticle(particle, properties):
            vx = float(particle[index])
            vy = float(particle[index+1])
            vz = float(particle[index+2])
-           newparticle.append((vx, vy, vz))
+           newparticle.append(Real3D(vx, vy, vz))
            index += 3
 
         elif prop == "f":
@@ -59,7 +59,7 @@ def translateParticle(particle, properties):
            fx = float(particle[index])
            fy = float(particle[index+1])
            fz = float(particle[index+2])
-           newparticle.append((fx, fy, fz))
+           newparticle.append(Real3D(fx, fy, fz))
            index += 3
 
         else:
