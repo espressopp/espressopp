@@ -29,7 +29,7 @@ namespace espresso {
 
     */
 
-    VerletListAdress(shared_ptr< System >, real cut, bool rebuildVL);
+    VerletListAdress(shared_ptr< System >, real cut, bool rebuildVL, real _dEx, real _dHy);
 
     ~VerletListAdress();
 
@@ -41,11 +41,12 @@ namespace espresso {
     std::set<Particle*>& getAdrZone() { return adrZone; }
     std::vector<Real3D*>& getAdrPositions() { return adrPositions; }
     //std::set<Particle*>& getAdrZone() { return adrZone; }
-    real getHy() { return skin; } // TODO hybrid region should be of custom size
-    real getEx() { return adresscut - skin; }
+    real getHy() { return dHy; }
+    real getEx() { return dEx; }
     /** Add an atomistic particle (used for AdResS) to atList */
     void addAdrParticle(longint pid);
-
+    // set the center of AdResS zone
+    void setAdrCenter(real x, real y, real z);
     /** Define the lowest atomistic type number */
     //void setAtType(size_t type);
 
@@ -74,8 +75,11 @@ namespace espresso {
     std::vector<Real3D*> adrPositions; // positions of adress particles
     std::set<Particle*> adrZone; // particles that are in the AdResS zone
     PairList adrPairs;           // pairs that are in AdResS zone
-    real adresscut; // size of AdResS zone
+    real adresscut; // size of AdResS zone (dEx+dHy)
+    real dEx, dHy; // size of the expicit and hybrid zone
     real adrsq;
+    Real3D adrCenter; // center of adress zone, if set
+    bool adrCenterSet; // tells if adrCenter is set
 
     //size_t atType; // types above this number are considered atomistic
     //void isPairInAdrZone(Particle &pt1, Particle &pt2); // not used anymore
@@ -84,7 +88,7 @@ namespace espresso {
     void checkPair(Particle &pt1, Particle &pt2);
     PairList vlPairs;
     boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list
-    real skin; // skin, but also used as the size of hybrid region
+    real skin;
     real cutsq;
     int builds;
     boost::signals2::connection connectionResort;

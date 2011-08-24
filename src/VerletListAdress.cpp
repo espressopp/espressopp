@@ -17,7 +17,7 @@ namespace espresso {
 
   /*-------------------------------------------------------------*/
 
-    VerletListAdress::VerletListAdress(shared_ptr<System> system, real cut, bool rebuildVL) : SystemAccess(system)
+    VerletListAdress::VerletListAdress(shared_ptr<System> system, real cut, bool rebuildVL, real _dEx, real _dHy) : SystemAccess(system)
     {
       LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << cut);
 
@@ -30,12 +30,15 @@ namespace espresso {
       cutsq = cutVerlet * cutVerlet;
       builds = 0;
 
-      adresscut = cutVerlet; //TODO now it's fixed
+      // AdResS stuff
+      dEx = _dEx;
+      dHy = _dHy;
+      adrCenterSet = false;
+      adresscut = dEx + dHy;
       adrsq = adresscut * adresscut;
 
       //std::cout << getSystem()->comm->rank() << ": " << "------constructor----- \n";
       if (rebuildVL) rebuild(); // not called if exclutions are provided
-
 
       // make a connection to System to invoke rebuild on resort
       connectionResort = system->storage->onParticlesChanged.connect(
@@ -49,12 +52,11 @@ namespace espresso {
       vlPairs.clear();
       adrZone.clear(); // particles in adress zone
       adrPairs.clear(); // pairs in adress zone
-      adrPositions.clear(); // clear position pointers
 
 
       //std::cout << getSystem()->comm->rank() << ": " << "-- VL Rebuild --\n";
 
-      // add particles to adress zone
+      // add particles to adress zone -- not used anymore
       /*
       CellList cl = getSystem()->storage->getRealCells();
       int count = 0;
@@ -70,50 +72,71 @@ namespace espresso {
       */
 
 
-      // loop over all VP particles (reals and ghosts) on node
-      //std::cout << "particles of all local cells:\n";
-      //int count = 0;
+      // get local cells
       CellList localcells = getSystem()->storage->getLocalCells();
-      //Cell* cellp;
-      for (CellListIterator it(localcells); it.isValid(); ++it) {
 
-    	  /*cellp = getSystem()->storage->mapPositionToCell(it->position());
-          ++count;
-          std::cout << it->id() << "-" << it->ghost() << " " << it->position()
-                  << " in cell " << cellp - (getSystem()->storage->getFirstCell()) << "\n";*/
+      // if adrCenter is not set, the center of adress zone moves along with some particles
+      if (!adrCenterSet) {
+          // loop over all VP particles (reals and ghosts) on node
+          //std::cout << "particles of all local cells:\n";
+          //int count = 0;
+          //Cell* cellp;
+          adrPositions.clear(); // clear position pointers
+          for (CellListIterator it(localcells); it.isValid(); ++it) {
 
-          if (adrList.count(it->id()) == 1) {
-              //std::cout << getSystem()->comm->rank() << ": " << " adding particle position (" << it->position() << ") to adrPositions and adrZone\n";
-              adrPositions.push_back(&(it->position()));
-              adrZone.insert(&(*it));
+              /*cellp = getSystem()->storage->mapPositionToCell(it->position());
+              ++count;
+              std::cout << it->id() << "-" << it->ghost() << " " << it->position()
+                      << " in cell " << cellp - (getSystem()->storage->getFirstCell()) << "\n";*/
+
+              if (adrList.count(it->id()) == 1) {
+                  //std::cout << getSystem()->comm->rank() << ": " << " adding particle position (" << it->position() << ") to adrPositions and adrZone\n";
+                  adrPositions.push_back(&(it->position()));
+                  adrZone.insert(&(*it));
+              }
+          }
+          //std::cout << "(" << count <<" particles)\n";
+
+          // again, loop over all VP particles and check if they are close enough to adrPositions and add to adrZone
+          //std::cout << "\nAdding particles to adrZone ...\n";
+          Real3D dist;
+          real distsq;
+          for (CellListIterator it(localcells); it.isValid(); ++it) {
+
+                /*cellp = getSystem()->storage->mapPositionToCell(it->position());
+                std::cout << it->id() << "-" << it->ghost() << " " << it->position()
+                        << " in cell " << cellp - (getSystem()->storage->getFirstCell()) << "\n";*/
+
+                // loop over positions
+                for (std::vector<Real3D*>::iterator it2 = adrPositions.begin(); it2 != adrPositions.end(); ++it2){
+                    dist = it->getPos() - **it2;
+                    distsq = dist.sqr();
+
+                    //std::cout << "distance " << sqrt(distsq) << "\n";
+                    if (distsq < adrsq) {
+                        adrZone.insert(&(*it));
+                        //std::cout << " added " << it->getId() << "-" << it->ghost() <<  "\n";
+                        //std::cout << " adding particle " << it->getId() << "-" << it->ghost() << " to adrZone\n";
+                        break; // do not need to loop further
+                    }
+                }
           }
       }
-      //std::cout << "(" << count <<" particles)\n";
-
-
-      // again, loop over all VP particles and check if they are close enough to adrPositions and add to adrZone
-      //std::cout << "\nAdding particles to adrZone ...\n";
-      Real3D dist;
-      real distsq;
-      for (CellListIterator it(localcells); it.isValid(); ++it) {
-
-            /*cellp = getSystem()->storage->mapPositionToCell(it->position());
-            std::cout << it->id() << "-" << it->ghost() << " " << it->position()
-                    << " in cell " << cellp - (getSystem()->storage->getFirstCell()) << "\n";*/
-
-            // loop over positions
-            for (std::vector<Real3D*>::iterator it2 = adrPositions.begin(); it2 != adrPositions.end(); ++it2){
-                dist = it->getPos() - **it2;
-                distsq = dist.sqr();
-
-                //std::cout << "distance " << sqrt(distsq) << "\n";
-                if (distsq < adrsq) {
-                    adrZone.insert(&(*it));
-                    //std::cout << " added " << it->getId() << "-" << it->ghost() <<  "\n";
-                    //std::cout << " adding particle " << it->getId() << "-" << it->ghost() << " to adrZone\n";
-                    break; // do not need to loop further
-                }
-            }
+      // center of adress zone is fixed
+      else {
+          Real3D dist;
+          real distsq;
+          for (CellListIterator it(localcells); it.isValid(); ++it) {
+              // TODO temporary
+              dist = it->getPos() - adrCenter;
+              distsq = dist.sqr();
+              //std::cout << "distance " << sqrt(distsq) << "\n";
+              if (distsq < adrsq) {
+                  adrZone.insert(&(*it));
+                  //std::cout << " added " << it->getId() << "-" << it->ghost() <<  "\n";
+                  //std::cout << " adding particle " << it->getId() << "-" << it->ghost() << " to adrZone\n";
+              }
+          }
       }
 
 
@@ -154,23 +177,21 @@ namespace espresso {
 
       // print particles in adress zone
       //std::cout << getSystem()->comm->rank() << ": " << "in adress zone (adrZone size " << adrZone.size() <<  "):\n";
-
       /*for (std::set<Particle*>::iterator it = adrZone.begin(); it != adrZone.end(); ++it) {
           std::cout << (*it)->id() << "-";
           std::cout << (*it)->ghost() << " (";
           std::cout << (*it)->position() << ")\n";
-      }*/
-      //std::cout << "\n";
+      }
+      std::cout << "\n";*/
 
 
       // print adrPairs
       //std::cout << getSystem()->comm->rank() << ": " << "adress pairs (adrPairs size " << adrPairs.size() << "):\n";
-
       /*for (PairList::Iterator it(adrPairs); it.isValid(); ++it) {
           std::cout << "(" << (*it->first).id() << "-" << (*it->first).ghost() <<
                   ", " << (*it->second).id() << "-" << (*it->second).ghost() << ") ";
-      }*/
-      //std::cout << "\n\n";
+      }
+      std::cout << "\n\n";*/
 
 
 
@@ -268,6 +289,12 @@ namespace espresso {
           adrList.insert(pid);
     }
 
+    void VerletListAdress::setAdrCenter(real x, real y, real z){
+        adrCenter = Real3D(x, y, z);
+        adrCenterSet = true;
+        adrPositions.push_back(&adrCenter);
+    }
+
     /* not used anymore
     // types above this number are considered atomistic
     void VerletListAdress::setAtType(size_t type) {
@@ -298,16 +325,20 @@ namespace espresso {
       void (VerletListAdress::*pyAddAdrParticle)(longint pid)
             = &VerletListAdress::addAdrParticle;
 
+      void (VerletListAdress::*pySetAdrCenter)(real x, real y, real z)
+                  = &VerletListAdress::setAdrCenter;
+
       /*void (VerletListAdress::*pySetAtType)(size_t type)
             = &VerletListAdress::setAtType;*/
 
       class_<VerletListAdress, shared_ptr<VerletList> >
-        ("VerletListAdress", init< shared_ptr<System>, real, bool >())
+        ("VerletListAdress", init< shared_ptr<System>, real, bool, real, real>())
         .add_property("system", &SystemAccess::getSystem)
         .add_property("builds", &VerletListAdress::getBuilds, &VerletListAdress::setBuilds)
         .def("totalSize", &VerletListAdress::totalSize)
         .def("exclude", pyExclude)
         .def("addAdrParticle", pyAddAdrParticle)
+        .def("setAdrCenter", pySetAdrCenter)
         .def("rebuild", &VerletListAdress::rebuild)
         //.def("setAtType", pySetAtType)
         ;

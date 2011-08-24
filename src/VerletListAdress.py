@@ -6,10 +6,10 @@ from espresso.esutil import cxxinit
 class VerletListAdressLocal(_espresso.VerletListAdress):
     'The (local) verlet list AdResS'
 
-    def __init__(self, system, cutoff, pids, exclusionlist=[]):
+    def __init__(self, system, cutoff, dEx, dHy, adrCenter=[], pids=[], exclusionlist=[]):
         'Local construction of a verlet list for AdResS'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.VerletListAdress, system, cutoff, False)
+            cxxinit(self, _espresso.VerletListAdress, system, cutoff, False, dEx, dHy)
             #self.cxxclass.setAtType(self, atType)
             # check for exclusions
             if (exclusionlist != []):
@@ -18,8 +18,13 @@ class VerletListAdressLocal(_espresso.VerletListAdress):
                     pid1, pid2 = pair
                     self.cxxclass.exclude(self, pid1, pid2)
             # add adress particles
-            for pid in pids:
-                self.cxxclass.addAdrParticle(self, pid)
+            if (pids != []):
+                for pid in pids:
+                    self.cxxclass.addAdrParticle(self, pid)
+            # set adress center
+            if (adrCenter != []):
+                self.cxxclass.setAdrCenter(self, adrCenter[0], adrCenter[1], adrCenter[2])
+            
             # rebuild list now
             self.cxxclass.rebuild(self)
                 
