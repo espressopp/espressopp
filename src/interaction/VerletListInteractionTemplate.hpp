@@ -70,7 +70,6 @@ namespace espresso {
     addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
 
-      //std::cout << "add forces computed by the Verlet List" << "\n";
       for (PairList::Iterator it(verletList->getPairs()); 
 	   it.isValid(); ++it) {
         Particle &p1 = *it->first;
@@ -83,6 +82,7 @@ namespace espresso {
         if(potential._computeForce(force, p1, p2)) {
           p1.force() += force;
           p2.force() -= force;
+          LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" << force);
         }
       }
     }
@@ -93,21 +93,21 @@ namespace espresso {
     computeEnergy() {
       LOG4ESPP_INFO(theLogger, "compute energy of the Verlet list pairs");
 
-      //std::cout << "compute energy of the Verlet list pairs" << "\n";
       real e = 0.0;
-      for (PairList::Iterator it(verletList->getPairs()); 
-	   it.isValid(); ++it) {
+      real es = 0.0;
+      for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
-        e += potential._computeEnergy(p1, p2);
+        e   = potential._computeEnergy(p1, p2);
+        es += e;
+        LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
       }
 
       real esum;
-      boost::mpi::reduce(*getVerletList()->getSystem()->comm, e, esum, std::plus<real>(), 0);
-      return esum;
+      boost::mpi::reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>(), 0);      return esum;
     }
 
 
@@ -119,7 +119,6 @@ namespace espresso {
     computeVirial() {
       LOG4ESPP_INFO(theLogger, "compute the virial for the Verlet List");
       
-
       real w = 0.0;
       for (PairList::Iterator it(verletList->getPairs());                
            it.isValid(); ++it) {                                         

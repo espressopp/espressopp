@@ -26,7 +26,7 @@ print 'CellGrid = %s' % (cellGrid,)
 props = ['id', 'pos', 'v']
 parts = []
 for pid in range(num_particles):
-  parts.append([pid, Real3D(0, 0, 2.5*pid), (0,0,1) ])
+  parts.append([pid, Real3D(0, 0, 2.5*pid), Real3D(0,0,1) ])
 
 system.storage.addParticles(parts, *props)
 

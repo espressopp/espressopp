@@ -28,7 +28,7 @@ lammps_reader = True
 if(lammps_reader):
   file = sys.path[0][:sys.path[0].find('espressopp')] + 'espressopp/examples/rings.dat'
   bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read(file)
-  bonds, angles, x, y, z, Lx, Ly, Lz = replicate.replicate(bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1)
+  bonds, angles, x, y, z, Lx, Ly, Lz = replicate(bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1)
 
 else:
   base = sys.path[0][:sys.path[0].find('trunk')] + 'trunk/examples/'
