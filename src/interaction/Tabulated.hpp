@@ -38,14 +38,14 @@ namespace espresso {
                 setFilename(itype, filename);
                 setShift(0.0);
                 setCutoff(infinity);
-                std::cout << "using tabulated potential " << filename << "\n";
+                //std::cout << "using tabulated potential " << filename << "\n";
             }
          
             Tabulated(int itype, const char* filename, real cutoff) {
                 setFilename(itype, filename);
                 setShift(0.0);
                 setCutoff(cutoff);
-                std::cout << "using tabulated potential " << filename << "\n";
+                //std::cout << "using tabulated potential " << filename << "\n";
             }
          
             /** Setter for the filename will read in the table. */

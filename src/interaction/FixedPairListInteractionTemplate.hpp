@@ -85,6 +85,9 @@ namespace espresso {
         if(potential->_computeForce(force, dist)) {
           p1.force() += force;
           p2.force() -= force;
+
+          //std::cout << "force between " << p1.id() << "-" << p2.id() << " (" << sqrt(dist*dist) << ") is " << force << "";
+          //std::cout << " (" << p1.position() << ") (" << p2.position() << ")\n";
         }
       }
     }
@@ -104,9 +107,12 @@ namespace espresso {
         Real3D dist;
         bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
         e += potential->_computeEnergy(dist);
+
+        //std::cout << "energy between " << p1.id() << "-" << p2.id() << " (" << sqrt(dist*dist) << ") is " << potential->_computeEnergy(dist) << "\n";
       }
       real esum;
       boost::mpi::reduce(*mpiWorld, e, esum, std::plus<real>(), 0);
+      //std::cout << "sum of NRG is " << esum << " \n";
       return esum;
     }
 

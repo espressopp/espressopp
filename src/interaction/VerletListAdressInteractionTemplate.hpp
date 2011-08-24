@@ -97,7 +97,12 @@ namespace espresso {
         Particle &p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
-        //std::cout << " ---- get potential ---- \n";
+
+        Real3D dist = p1.position() - p2.position();
+        real distSqr = dist.sqr();
+        //std::cout << "CG ids: " << p1.id() << " - " << p2.id() <<  " (" << sqrt(distSqr) << ")" << " \n";
+        //std::cout << "CG types: " << type1 << ", " << type2 <<  " \n";
+
         const Potential &potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
@@ -107,7 +112,7 @@ namespace espresso {
           p1.force() += force;
           p2.force() -= force;
 
-          //std::cout << p1.id() << "-" << p2.id() << " force: (" << force << ")\n";
+          //std::cout << p1.id() << "-" << p2.id() << " CG force: (" << force << ")\n";
 
           // iterate through atomistic particles in fixedtuplelist
           // and add them the proportional amount of force (depending
@@ -211,6 +216,7 @@ namespace espresso {
               //real min1 = sqrt(distsq1);
               real min1 = distsq1;
               //std::cout << sqrt(distsq1) << "\n";
+
               // calculate distance to nearest adress particle
               for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                    pa = **it2;
@@ -219,6 +225,7 @@ namespace espresso {
                    //std::cout << pa << " " << sqrt(distsq1) << "\n";
                    if (distsq1 < min1) min1 = distsq1;
               }
+
               min1 = sqrt(min1);
               //std::cout << vp.id() << " min: " << min1 << "\n";
               //std::cout << vp.id() << " dex: " << dex << "\n";
@@ -272,6 +279,9 @@ namespace espresso {
                  forcevp = (1 - w12) * forcevp;
                  p1.force() += forcevp;
                  p2.force() -= forcevp;
+
+                 //std::cout << p1.id() << "-" << p2.id() << " VP force: (" << forcevp << ")\n";
+
              }
          }
          /*
@@ -315,6 +325,8 @@ namespace espresso {
                          p3.force() += force;
                          p4.force() -= force;
                          //std::cout << " potential OK for " << p3.id() << " - " << p4.id() << "\n";
+
+                         //std::cout << p3.id() << "-" << p4.id() << " AT force: (" << force << ")\n";
                      }
                      /*
                      else {
@@ -353,10 +365,9 @@ namespace espresso {
             atList = it3->second;
 
             // total mass of AT particles belonging to a VP
-            real M = vp.getMass();
+            real M = vp.getMass(); // instead of the code below
             /*
             real M = 0.0;
-            //std::cout << "vp id: " << vp.id()  << "-" << vp.ghost() << " pos: " << vp.position() << "\n";
             for (std::vector<Particle*>::iterator it2 = atList.begin();
                                  it2 != atList.end(); ++it2) {
                 Particle &at = **it2;
