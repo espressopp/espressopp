@@ -102,9 +102,7 @@ namespace espresso {
     void FixedTupleList::beforeSendParticles
                                     (ParticleList& pl, OutBuffer& buf) {
 
-        //std::cout << "beforeSendParticles\n";
-
-        //std::vector<longint> toSend;
+        std::vector<longint> atpl;
 
         // loop over the particle list
         for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
@@ -125,8 +123,10 @@ namespace espresso {
 				//toSend.push_back(s);
 				//std::cout << "write s "<< s << "\n";
 				buf.write(s);
+				atpl.reserve(s);
 
 				// iterate through vector and add pids
+				//std::cout << storage->getRank() << ": removing AT particles ";
 				for (tuple::const_iterator it2 = it->second.begin();
 				 it2 != it->second.end(); ++it2) {
 					//toSend.push_back(*it2);
@@ -135,11 +135,13 @@ namespace espresso {
 					Particle* tp = storage->lookupAdrATParticle(*it2);
 					//std::cout << " write " << tp->getId() << " ("  << tp->getPos() << ")\n";
 					buf.write(*tp);
+					atpl.push_back(*it2);
 
 					// remove AT particle from storage
 					storage->removeAdrATParticle(*it2);
-					//std::cout << "removing AT particle " << *it2 <<"\n";
+					//std::cout << " " << *it2;
 				}
+				//std::cout << "\n";
 
                 // delete this pid from the global list
                 globalTuples.erase(pidK);
@@ -147,15 +149,15 @@ namespace espresso {
             }
         }
 
-        // send the list
-        //buf.write(toSend);
+        beforeSendATParticles(atpl, buf);
     }
 
     /* recieve and rebuild global tuple information */
     void FixedTupleList::afterRecvParticles
                                     (ParticleList &pl, InBuffer& buf) {
 
-        //std::cout << "afterRecvParticles\n";
+        //std::cout << storage->getRank() << ": afterRecvParticles\n";
+
         /*
         std::vector<longint> received, pids;
         int n;
@@ -178,7 +180,6 @@ namespace espresso {
 
             for (; n > 0; --n) {
             	LOG4ESPP_DEBUG(theLogger, "received vector for pid " << pidK);
-                //std::cout << "receive pid "<< received[i] << "\n";
                 storage->addAdrATParticleFTPL(received[i]); // add AT particle to storage
                 pids.push_back(received[i++]);
             }
@@ -217,9 +218,9 @@ namespace espresso {
             buf.read(n);
             //std::cout << n << "\n";
 
+            //std::cout << storage->getRank() << ": add AT particles ";
             for (; n > 0; --n) {
                 LOG4ESPP_DEBUG(theLogger, "received vector for pid " << pidK);
-                //std::cout << "receive pid "<< received[i] << "\n";
                 //storage->addAdrATParticleFTPL(received[i]); // add AT particle to storage
                 //pids.push_back(received[i++]);
                 //Particle *p = storage->addAdrATParticleFTPL();
@@ -227,9 +228,10 @@ namespace espresso {
                 //std::cout << " read *p : ";
                 buf.read(p);
                 storage->addAdrATParticleFTPL(p);
-                //std::cout << p.getId() << " (" << p.getPos() << ")\n";
+                //std::cout << " " << p.getId();
                 pids.push_back(p.id());
             }
+            //std::cout << "\n";
 
             // add pids vector to global tuples
             it = globalTuples.insert(it, std::make_pair(pidK, pids));
@@ -239,8 +241,6 @@ namespace espresso {
     }
 
     void FixedTupleList::onParticlesChanged() {
-
-        //std::cout << "onParticlesChanged\n";
 
         LOG4ESPP_INFO(theLogger, "rebuild local particle list from global tuples\n");
 
@@ -263,17 +263,19 @@ namespace espresso {
             }
 
             // iterate through vector in map
+            //std::cout << storage->getRank() << ": loopup for AT particle: ";
             for (tuple::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
                 at = storage->lookupAdrATParticle(*it2);
-                //std::cout << "  " << *it2 << "\n";
                 if (at == NULL) {
                 	printf("SERIOUS ERROR: AT particle %d not available\n", *it2);
                 	exit(1);
                 	return;
                 }
+                //std::cout << " " << *it2;
                 tmp.push_back(at);
             }
-            // add the particles
+            //std::cout << "\n";
+            // add the particles to tuples
             this->add(vp, tmp);
             tmp.clear();
         }
@@ -291,7 +293,7 @@ namespace espresso {
 
       void (FixedTupleList::*pyAdd)(longint pid) = &FixedTupleList::add;
 
-      class_<FixedTupleList, shared_ptr<FixedTupleList> >
+      class_<FixedTupleList, shared_ptr<FixedTupleList>, boost::noncopyable >
         ("FixedTupleList", init<shared_ptr<storage::Storage> >())
         .def("add", pyAdd)
         .def("addTs", &FixedTupleList::addTs)

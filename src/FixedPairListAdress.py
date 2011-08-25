@@ -6,10 +6,10 @@ from espresso.esutil import cxxinit
 class FixedPairListAdressLocal(_espresso.FixedPairListAdress):
     'The (local) fixed pair list.'
 
-    def __init__(self, storage):
+    def __init__(self, storage, fixedtupleList):
         'Local construction of a fixed pair list'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.FixedPairListAdress, storage)
+            cxxinit(self, _espresso.FixedPairListAdress, storage, fixedtupleList)
 
     def add(self, pid1, pid2):
         'add pair to fixed pair list'

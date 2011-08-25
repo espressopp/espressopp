@@ -33,6 +33,11 @@ namespace espresso {
 
             int getNumPart(longint pid); // get number of particles in globalmap for given pid
 
+            // this signals the AT particles used to rebuild fixed pair, triple, quadruple AT bonds
+            // for now FixedPairListAdress connects to it
+            boost::signals2::signal2 <void, std::vector<longint>&, class OutBuffer&>
+                   beforeSendATParticles;
+
             static void registerPython();
 
         private:

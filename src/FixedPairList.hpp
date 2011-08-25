@@ -32,7 +32,7 @@ namespace espresso {
 		\return whether the particle was inserted on this processor.
 		*/
 		virtual bool add(longint pid1, longint pid2);
-		void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);
+		virtual void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);
 		void afterRecvParticles(ParticleList& pl, class InBuffer& buf);
 		virtual void onParticlesChanged();
 
