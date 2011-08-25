@@ -250,7 +250,7 @@ namespace espresso {
 
       // for AdResS
       // propagete real AT particles
-      ParticleList adrATparticles = system.storage->getAdrATParticles();
+      ParticleList& adrATparticles = system.storage->getAdrATParticles();
       for (std::vector<Particle>::iterator it = adrATparticles.begin();
               it != adrATparticles.end(); it++) {
 
@@ -299,7 +299,7 @@ namespace espresso {
 
       // for AdResS
       // propagete real AT particles
-      ParticleList adrATparticles = system.storage->getAdrATParticles();
+      ParticleList& adrATparticles = system.storage->getAdrATParticles();
       for (std::vector<Particle>::iterator it = adrATparticles.begin();
               it != adrATparticles.end(); it++) {
 
