@@ -75,11 +75,9 @@ namespace espresso {
       bool recalcForces = true;  // TODO: more intelligent
 
       if (recalcForces) {
-
         LOG4ESPP_INFO(theLogger, "recalc Forces");
-
         if (langevin) langevin->heatUp();
-            updateForces();
+        updateForces();
         if (LOG4ESPP_DEBUG_ON(theLogger)) {
             // printForces(false);   // forces are reduced to real particles
         }
@@ -325,9 +323,8 @@ namespace espresso {
 
       for (size_t j = 0; j < srIL.size(); j++) {
 
-	real cut = srIL[j]->getMaxCutoff();
-
-	maxCut = std::max(maxCut, cut);
+          real cut = srIL[j]->getMaxCutoff();
+          maxCut = std::max(maxCut, cut);
       }
 
       LOG4ESPP_INFO(theLogger, "maximal cutoff = " << maxCut);
@@ -392,6 +389,22 @@ namespace espresso {
       for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
         cit->force() = 0.0;
       }
+
+
+      // for AdResS
+      ParticleList& adrATparticles = system.storage->getAdrATParticles();
+      for (std::vector<Particle>::iterator it = adrATparticles.begin();
+            it != adrATparticles.end(); it++) {
+         it->force() = 0.0;
+      }
+
+      typedef std::list<Particle> ParticleListAdr;
+      ParticleListAdr& adrATparticlesG = system.storage->getAdrATParticlesG();
+      for (ParticleListAdr::iterator it = adrATparticlesG.begin();
+            it != adrATparticlesG.end(); it++) {
+         it->force() = 0.0;
+      }
+
     }
 
     /*****************************************************************************/
