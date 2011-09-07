@@ -2,6 +2,7 @@
 #include "Potential.hpp"
 #include "Zero.hpp"
 #include "LennardJones.hpp"
+#include "LennardJonesCapped.hpp"
 #include "LennardJonesExpand.hpp"
 #include "LennardJonesGromacs.hpp"
 #include "Morse.hpp"
@@ -26,6 +27,7 @@ namespace espresso {
       Potential::registerPython();
       Zero::registerPython();
       LennardJones::registerPython();
+      LennardJonesCapped::registerPython();
       LennardJonesExpand::registerPython();
       LennardJonesGromacs::registerPython();
       Morse::registerPython();
