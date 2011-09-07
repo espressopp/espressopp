@@ -56,20 +56,18 @@ namespace espresso {
 
       //std::cout << getSystem()->comm->rank() << ": " << "-- VL Rebuild --\n";
 
-      // add particles to adress zone -- not used anymore
       /*
+      // add particles to adress zone -- not used anymore
       CellList cl = getSystem()->storage->getRealCells();
-      int count = 0;
+      //int count = 0;
       for (CellListAllPairsIterator it(cl); it.isValid(); ++it) {
         std::cout << "p1: " << (*it->first).id() << "-" << (*it->first).ghost()
                 << " p2: " << (*it->second).id() << "-" << (*it->second).ghost() << "\n";
-        ++count;
-        if ((*it->first).type() >= atType) continue;  // only check if VP/CG particle!
-        if ((*it->second).type() >= atType) continue; // only check if VP/CG particle!
-        isPairInAdrZone(*it->first, *it->second);
-      }
-      std::cout << "pairs: " << count << std::endl;
-      */
+        //++count;
+        //if ((*it->first).type() >= atType) continue;  // only check if VP/CG particle!
+        //if ((*it->second).type() >= atType) continue; // only check if VP/CG particle!
+        //isPairInAdrZone(*it->first, *it->second);
+      }*/
 
 
       // get local cells
@@ -127,7 +125,6 @@ namespace espresso {
           Real3D dist;
           real distsq;
           for (CellListIterator it(localcells); it.isValid(); ++it) {
-              // TODO temporary
               dist = it->getPos() - adrCenter;
               distsq = dist.sqr();
               //std::cout << "distance " << sqrt(distsq) << "\n";
@@ -142,9 +139,11 @@ namespace espresso {
 
       // add particles to adress pairs and VL
       CellList cl = getSystem()->storage->getRealCells();
+      //std::cout << "local cell list size = " << cl.size() << "\n";
       for (CellListAllPairsIterator it(cl); it.isValid(); ++it) {
         //if ((*it->first).type() >= atType) continue;  // only check if VP/CG particle!
         //if ((*it->second).type() >= atType) continue; // only check if VP/CG particle!
+        //std::cout << "iterating over " << (*it->first).id() << ", " << (*it->second).id() << "\n";
         checkPair(*it->first, *it->second);
       }
 
@@ -253,16 +252,19 @@ namespace espresso {
              << " - p2: " << pt2.id() << " @ " << pt2.position()
              << " -> distsq = " << distsq);
 
-      if (distsq > cutsq) return;
+      //std::cout << "checkPair(" << pt1.id() << ", " << pt2.id() << ")\n";
+
       // see if it's in the exclusion list (both directions)
       if (exList.count(std::make_pair(pt1.id(), pt2.id())) == 1) return;
       if (exList.count(std::make_pair(pt2.id(), pt1.id())) == 1) return;
       // see if it's in the adress zone
       if (adrZone.count(&pt1) == 1 || adrZone.count(&pt2) == 1) {
           adrPairs.add(pt1, pt2); // add to adress pairs
+          //std::cout << "adding pair (" << pt1.id() << ", " << pt2.id() << ")\n";
       }
       else {
-          //std::cout << "(" << pt1.id() << "-" << pt1.ghost() << ", " << pt2.id() << "-" << pt2.ghost() << ") ";
+          if (distsq > cutsq) return;
+          //std::cout << "not adding, adding to VL (" << pt1.id() << "-" << pt1.ghost() << ", " << pt2.id() << "-" << pt2.ghost() << ")\n";
           vlPairs.add(pt1, pt2); // add pair to Verlet List
       }
     }
