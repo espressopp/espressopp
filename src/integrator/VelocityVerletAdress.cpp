@@ -100,9 +100,12 @@ namespace espresso {
 
         if (maxDist > skinHalf) resortFlag = true;
 
+        //std::cout << "maxDist: " << maxDist << "\n";
+
         if (resortFlag) {
             time = timeIntegrate.getElapsedTime();
             LOG4ESPP_INFO(theLogger, "step " << i << ": resort particles");
+            //std::cout << "step " << i << ": resort particles\n";
             storage.decompose();
             maxDist  = 0.0;
             resortFlag = false;
@@ -236,8 +239,10 @@ namespace espresso {
 
             // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt) 
             Real3D deltaP = dt * cit->velocity();
+            //std::cout << cit->id() << ": from (" << cit->position() << ")";
             cit->position() += deltaP;
             sqDist += deltaP * deltaP;
+            //std::cout << " to (" << cit->position() << ") " << sqrt(sqDist) << "\n";
 
         count++;
 
@@ -252,6 +257,8 @@ namespace espresso {
       for (std::vector<Particle>::iterator it = adrATparticles.begin();
               it != adrATparticles.end(); it++) {
 
+          real sqDist = 0.0;
+
           real dtfm = 0.5 * dt / it->mass();
 
           // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t)
@@ -259,7 +266,12 @@ namespace espresso {
 
           // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt)
           Real3D deltaP = dt * it->velocity();
+          //std::cout << "Moving AT " << it->id() << ": from (" << it->position() << ")";
           it->position() += deltaP;
+          sqDist += deltaP * deltaP;
+          //std::cout << " to (" << it->position() << ")\n";
+
+          maxSqDist = std::max(maxSqDist, sqDist);
       }
 
 
