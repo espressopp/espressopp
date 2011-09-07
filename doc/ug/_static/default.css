@@ -2,7 +2,8 @@
  * Sphinx stylesheet -- sphinxdoc theme
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * Originally created by Armin Ronacher for Werkzeug, adapted by Georg Brandl.
+ * Originally created by Armin Ronacher for Werkzeug, adapted by Georg Brandl,
+ * modified for ESPResSo++ by Torsten Stuehn
  */
 
 @import url("basic.css");
@@ -10,36 +11,89 @@
 /* -- page layout ----------------------------------------------------------- */
 
 body {
-    font-family: 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva',
-                 'Verdana', sans-serif;
-    font-size: 14px;
-    letter-spacing: -0.01em;
-    line-height: 150%;
-    text-align: center;
-    background-color: #00B075;
-    color: black;
-    padding: 0;
-    border: 1px solid #aaa;
+    font-family: 'Verdana', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva',
+                 sans-serif;
+/*    font-size: 14px; */
+/*    letter-spacing: -0.01em;    */
+/*    line-height: 150%;   */
+    text-align: center; 
+    background-color: #DACAA6;
+/*    color: black;   */
+/*    padding: 0;   */
+/*    border: 1px solid #aaa;  */
+/*    margin: 0px 20px 0px 20px;  */
+/*    min-width: 740px;   */
+}
 
-    margin: 0px 20px 0px 20px;
-    min-width: 740px;
+#impressum{
+padding-top:20px;
+}
+
+#outer{
+width: 960px;
+margin-left: auto;
+margin-right: auto;
+text-align: left;
+}
+
+div.header{
+width: 960px;
+height: 120px;
+top:0px;
+left:0px;
+margin-left: 5px;
+background-image:url(top_logo.png)
+}
+
+div.menu{
+    top: 120px;
+    left: 0px;
+    font-size: 90%;
+    width: 120px;
+    height: 100%
+    margin-right:10px;
+    margin-left: 5px;
+    padding-right: 10px;
+    float: left;
+    text-align:left;
+}
+
+div.menu li{
+color:#963;
+margin-top:10px;
+}
+
+div.menu a{
+text-decoration: none;
+color: #247B69;
+}
+
+div.menu a:hover{
+text-decoration: none;
+color: white;
+}
+
+ul.nav{
+list-style: none;
+text-indent: -2.5em;
 }
 
 div.document {
-    background-color: white;
+    background-color: #DACAA6;
     text-align: left;
     background-image: url(contents.png);
     background-repeat: repeat-x;
+    width: 960px;
 }
 
 div.bodywrapper {
-    margin: 0 240px 0 0;
-    border-right: 1px solid #ccc;
+    margin: 10px 0 0 160px;
+/*    border-left: 1px solid #b85;   */
 }
 
 div.body {
-    margin: 0;
-    padding: 0.5em 20px 20px 20px;
+/*    margin: 0;   */
+/*    padding: 0.5em 20px 20px 20px;   */
 }
 
 div.related {
@@ -68,12 +122,12 @@ div.related ul li.right {
 div.related ul li a {
     margin: 0;
     padding: 0 5px 0 5px;
-    line-height: 1.75em;
-    color: #EE9816;
+/*    line-height: 1.75em;   */
+    color: #247B68;
 }
 
 div.related ul li a:hover {
-    color: #3CA8E7;
+    color: white;
 }
 
 div.sphinxsidebarwrapper {
@@ -84,7 +138,7 @@ div.sphinxsidebar {
     margin: 0;
     padding: 0.5em 15px 15px 0;
     width: 210px;
-    float: right;
+    float: left;
     font-size: 1em;
     text-align: left;
 }
@@ -95,7 +149,7 @@ div.sphinxsidebar h3, div.sphinxsidebar h4 {
     padding: 0.1em 0 0.1em 0.5em;
     color: white;
     border: 1px solid #86989B;
-    background-color: #00B075;
+    background-color: #DACAA6;
 }
 
 div.sphinxsidebar h3 a {
@@ -114,7 +168,7 @@ div.sphinxsidebar ul ul {
 }
 
 div.footer {
-    background-color: #00B075;
+    background-color: #DACAA6;
     color: #86989B;
     padding: 3px 8px 3px 0;
     clear: both;
@@ -123,7 +177,8 @@ div.footer {
 }
 
 div.footer a {
-    color: #86989B;
+    color: white; 
+/*    color: #86989B; */
     text-decoration: underline;
 }
 
@@ -134,12 +189,15 @@ p {
 }
 
 a {
-    color: #CA7900;
+/*     color: #CA7900;  */
+    color: #247B68;
     text-decoration: none;
 }
 
 a:hover {
-    color: #2491CF;
+/*    color: #2491CF;    */
+    color: white;
+
 }
 
 div.body a {
@@ -149,8 +207,9 @@ div.body a {
 h1 {
     margin: 0;
     padding: 0.7em 0 0.3em 0;
-    font-size: 1.5em;
-    color: #11557C;
+    font-size: 1.35em;
+/*    color: #11557C;   */
+    color: black;
 }
 
 h2 {
@@ -165,7 +224,7 @@ h3 {
 }
 
 div.body h1 a, div.body h2 a, div.body h3 a, div.body h4 a, div.body h5 a, div.body h6 a {
-    color: black!important;
+    color: black!important; 
 }
 
 h1 a.anchor, h2 a.anchor, h3 a.anchor, h4 a.anchor, h5 a.anchor, h6 a.anchor {
@@ -177,7 +236,8 @@ h1 a.anchor, h2 a.anchor, h3 a.anchor, h4 a.anchor, h5 a.anchor, h6 a.anchor {
 
 h1:hover a.anchor, h2:hover a.anchor, h3:hover a.anchor, h4:hover a.anchor,
 h5:hover a.anchor, h6:hover a.anchor {
-    display: inline;
+/*     display: inline;   */
+    display: none;
 }
 
 h1 a.anchor:hover, h2 a.anchor:hover, h3 a.anchor:hover, h4 a.anchor:hover,
@@ -295,7 +355,7 @@ div.warning p.admonition-title {
     color: white;
     border-bottom: 1px solid #86989B;
     font-weight: bold;
-    background-color: #00B075;
+    background-color: #DACAA6;
 }
 
 div.warning {
