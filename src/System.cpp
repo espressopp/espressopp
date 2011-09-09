@@ -43,6 +43,17 @@ namespace espresso {
     shortRangeInteractions.push_back(ia);
   }
 
+  shared_ptr< interaction::Interaction > System::getInteraction(int i)
+  {
+	if (i >0 && i <= shortRangeInteractions.size())
+	return shortRangeInteractions[i-1];
+  }
+
+  int System::getNumberOfInteractions()
+  {
+	return shortRangeInteractions.size();
+  }
+
   //////////////////////////////////////////////////
   // REGISTRATION WITH PYTHON
   //////////////////////////////////////////////////
@@ -56,10 +67,12 @@ namespace espresso {
       .def_readwrite("storage", &System::storage)
       .def_readwrite("bc", &System::bc)
       .def_readwrite("rng", &System::rng)
-      .def_readwrite("shortRangeInteractions", 
-		     &System::shortRangeInteractions)
+//      .def_readwrite("shortRangeInteractions",
+//		     &System::shortRangeInteractions)
       .def_readwrite("skin", &System::skin)
       .def("addInteraction", &System::addInteraction)
+      .def("getInteraction", &System::getInteraction)
+      .def("getNumberOfInteractions", &System::getNumberOfInteractions)
       ;
   }
 }

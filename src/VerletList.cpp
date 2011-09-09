@@ -91,6 +91,13 @@ namespace espresso {
     return allsize;
   }
 
+  python::tuple VerletList::getPair(int i)
+  {
+	if (i > 0 && i <= vlPairs.size()) {
+	   return python::make_tuple(vlPairs[i-1].first->id(), vlPairs[i-1].second->id());
+	}
+  }
+
 
   bool VerletList::exclude(longint pid1, longint pid2) {
 
@@ -127,6 +134,7 @@ namespace espresso {
       .add_property("system", &SystemAccess::getSystem)
       .add_property("builds", &VerletList::getBuilds, &VerletList::setBuilds)
       .def("totalSize", &VerletList::totalSize)
+      .def("getPair", &VerletList::getPair)
       .def("exclude", pyExclude)
       .def("rebuild", &VerletList::rebuild)
       ;

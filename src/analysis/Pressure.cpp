@@ -45,10 +45,12 @@ namespace espresso {
 
       // compute the short-range nonbonded contribution
       real rij_dot_Fij = 0.0;
+
       const InteractionList& srIL = system.shortRangeInteractions;
       for (size_t j = 0; j < srIL.size(); j++) {
         rij_dot_Fij += srIL[j]->computeVirial();
       }
+
       // compiler complains when next two lines don't use double instead of real
       double p_nonbonded;
       boost::mpi::reduce(*mpiWorld, rij_dot_Fij / (3.0 * V), p_nonbonded, std::plus<double>(), 0);

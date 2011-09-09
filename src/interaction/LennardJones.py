@@ -32,6 +32,10 @@ class VerletListLennardJonesLocal(InteractionLocal, interaction_VerletListLennar
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
+    def getVerletListLocal(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getVerletList(self)
+
 class VerletListAdressLennardJonesLocal(InteractionLocal, interaction_VerletListAdressLennardJones):
     'The (local) Lennard Jones interaction using Verlet lists.'
     def __init__(self, vl, fixedtupleList):
@@ -74,7 +78,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListLennardJonesLocal',
-            pmicall = ['setPotential']
+            pmicall = ['setPotential','getVerletList']
             )
 
     class VerletListAdressLennardJones(Interaction):

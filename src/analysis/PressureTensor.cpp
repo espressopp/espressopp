@@ -46,10 +46,12 @@ namespace espresso {
 
       Tensor wijLocal(0.0);
       Tensor wij;
+
       const InteractionList& srIL = system.shortRangeInteractions;
       for (size_t j = 0; j < srIL.size(); j++) {
         srIL[j]->computeVirialTensor(wijLocal);
       }
+
       boost::mpi::reduce(*mpiWorld, wijLocal.get(), 6, wij.get(), std::plus<real>(), 0);
       return (vv + wij) / V;
     }

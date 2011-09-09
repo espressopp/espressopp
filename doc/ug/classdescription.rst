@@ -1,14 +1,9 @@
 ESPResSo++ Class Description
 ============================
-
-.. automodule:: espresso.pmi
-   :members:
-
-.. automodule:: espresso.System
-   :members:
-
-.. automodule:: espresso.bc.BC
-   :members:
-
-.. automodule:: espresso.bc.OrthorhombicBC
-   :members:
+.. toctree::
+   :maxdepth: 2
+   
+   espresso.pmi.rst
+   espresso.System.rst
+   espresso.bc.BC.rst
+   espresso.bc.OrthorhombicBC.rst

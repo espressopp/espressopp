@@ -33,6 +33,7 @@ namespace espresso {
 
       class_< VerletListLennardJones, bases< Interaction > > 
         ("interaction_VerletListLennardJones", init< shared_ptr<VerletList> >())
+        .def("getVerletList", &VerletListLennardJones::getVerletList)
         .def("setPotential", &VerletListLennardJones::setPotential);
       ;
 
