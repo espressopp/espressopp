@@ -32,6 +32,7 @@ namespace espresso {
         /** update of forces to thermalize the system */
 
         void thermalize();
+        void thermalizeAdr(); // same as above, for AdResS
 
         /** very nasty: if we recalculate force when leaving/reentering the integrator,
             a(t) and a((t-dt)+dt) are NOT equal in the vv algorithm. The random
