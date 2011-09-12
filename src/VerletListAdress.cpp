@@ -51,6 +51,7 @@ namespace espresso {
     {
       vlPairs.clear();
       adrZone.clear(); // particles in adress zone
+      cgZone.clear(); // particles in CG zone
       adrPairs.clear(); // pairs in adress zone
 
 
@@ -266,6 +267,8 @@ namespace espresso {
           if (distsq > cutsq) return;
           //std::cout << "not adding, adding to VL (" << pt1.id() << "-" << pt1.ghost() << ", " << pt2.id() << "-" << pt2.ghost() << ")\n";
           vlPairs.add(pt1, pt2); // add pair to Verlet List
+          cgZone.insert(&pt1);
+          cgZone.insert(&pt2);
       }
     }
 

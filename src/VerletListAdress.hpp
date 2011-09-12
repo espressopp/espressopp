@@ -39,6 +39,7 @@ namespace espresso {
     PairList& getAdrPairs() { return adrPairs; }
     std::set<longint>& getAdrList() { return adrList; }
     std::set<Particle*>& getAdrZone() { return adrZone; }
+    std::set<Particle*>& getCGZone() { return cgZone; }
     std::vector<Real3D*>& getAdrPositions() { return adrPositions; }
     //std::set<Particle*>& getAdrZone() { return adrZone; }
     real getHy() { return dHy; }
@@ -87,6 +88,7 @@ namespace espresso {
 
     void checkPair(Particle &pt1, Particle &pt2);
     PairList vlPairs;
+    std::set<Particle*> cgZone; // particles not in adress zone (same as in vlPairs)
     boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list
     real skin;
     real cutsq;

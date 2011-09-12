@@ -93,16 +93,15 @@ namespace espresso {
       //std::cout << "add forces computed by the Verlet List" << "\n";
 
       // Pairs not inside the AdResS Zone (CG region)
-      for (PairList::Iterator it(verletList->getPairs()); 
-       it.isValid(); ++it) {
+      for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
 
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
 
-        Real3D dist = p1.position() - p2.position();
-        real distSqr = dist.sqr();
+        //Real3D dist = p1.position() - p2.position();
+        //real distSqr = dist.sqr();
         //std::cout << "CG ids: " << p1.id() << " - " << p2.id() <<  " (" << sqrt(distSqr) << ")" << " \n";
         //std::cout << "CG types: " << type1 << ", " << type2 <<  " \n";
 
@@ -122,7 +121,7 @@ namespace espresso {
           // on their mass) to make them move along with their CG particles
           // This is only used for the particles in the CG zone.
 
-
+          /*
           FixedTupleList::iterator it3;
           FixedTupleList::iterator it4;
           it3 = fixedtupleList->find(&p1);
@@ -159,12 +158,38 @@ namespace espresso {
               std::cout << " one of the VP particles not found in tuples: " << p1.id() <<
                       "-" << p1.ghost() << ", " << p2.id() << "-" << p2.ghost();
               std::cout << " (" << p1.position() << ") (" << p2.position() << ") ";
-          }
+          }*/
 
         }
-
       }
 
+      // loop over CG particles and overwrite AT forces and velocity
+      std::set<Particle*> cgZone = verletList->getCGZone();
+      for (std::set<Particle*>::iterator it=cgZone.begin();
+                    it != cgZone.end(); ++it) {
+
+            Particle &p1 = **it;
+
+            FixedTupleList::iterator it3;
+            it3 = fixedtupleList->find(&p1);
+
+            if (it3 != fixedtupleList->end()) {
+
+                std::vector<Particle*> atList1;
+                atList1 = it3->second;
+
+                for (std::vector<Particle*>::iterator itv = atList1.begin();
+                        itv != atList1.end(); ++itv) {
+                    Particle &p3 = **itv;
+                    p3.velocity() = p1.velocity(); // overwrite velocity
+                    p3.force() += p1.force();
+                }
+
+            }
+            else {
+                std::cout << " VP particle not found in tuples: " << p1.id() << "-" << p1.ghost();
+            }
+      }
 
       // compute center of mass and weights for virtual particles in Adress zone (HY and AT region)
       std::set<Particle*> adrZone = verletList->getAdrZone();
