@@ -74,7 +74,7 @@ namespace espresso {
 
       Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);
 
-      p.force() += pref1 * p.velocity() + 
+      p.force() += pref1 * p.velocity() * p.mass() +
                    pref2 * ranval * massf;
 
       LOG4ESPP_TRACE(theLogger, "new force of p = " << p.force());
