@@ -59,6 +59,7 @@ namespace espresso {
     }
 
     void StorageAdress::decompose() {
+      //std::cout << " ---- decompose ----\n";
       invalidateGhosts();
       decomposeRealParticles();
       //std::cout << getSystem()->comm->rank() << ": (onTuplesChanged) ";
@@ -212,6 +213,84 @@ namespace espresso {
         copyGhostTuples(*src, *dst, extradata, shift);
       }
     }
+
+
+    void StorageAdress::copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift) {
+
+        // create ghosts of particles in tuples
+        FixedTupleList::iterator it;
+        it = fixedtupleList->find(&src);
+        if (it != fixedtupleList->end()) {
+            std::vector<Particle*> atList;
+            atList = it->second;
+
+            Particle* atg; // atom, ghost
+            std::vector<Particle*> tmp; // temporary vector
+
+            for (std::vector<Particle*>::iterator itv = atList.begin();
+                  itv != atList.end(); ++itv) {
+                Particle &at = **itv;
+
+                Particle n; // temporary particle, to be inserted into adr. at. ghost part.
+                n.id() = at.getId();
+                n.type() = at.getType();
+
+
+                // see whether the array was resized; STL hack
+                //Particle *begin = &AdrATParticlesG.front();
+
+                atg = appendUnindexedAdrParticle(getAdrATParticlesG(), n);
+                atg->copyAsGhost(at, extradata, shift);
+
+                tmp.push_back(atg);
+
+                /*if (begin != &AdrATParticlesG.front())
+                    std::cout << "\n  -- AdrATParticlesG array resized!! --\n\n";*/
+
+            }
+            fixedtupleList->insert(std::make_pair(&dst, tmp));
+            tmp.clear();
+        }
+        else {
+            std::cout << "copyGhostTuples: VP particle "<< src.id() << "-" << src.ghost() << " (" << src.position() << ")" << " not found in tuples!\n";
+            exit(1);
+            return;
+        }
+    }
+
+    /* -- this is now solved in FixedTupleList.cpp in onparticleschanged()
+    void StorageAdress::foldAdrPartCoor(Particle& part, Real3D& oldpos, int coord) {
+
+        if (part.position()[coord] != oldpos[coord]) {
+            real moved = oldpos[coord] - part.position()[coord];
+
+            FixedTupleList::iterator it;
+            it = fixedtupleList->find(&part);
+            if (it != fixedtupleList->end()) {
+                std::vector<Particle*> atList;
+                atList = it->second;
+
+                for (std::vector<Particle*>::iterator itv = atList.begin();
+                      itv != atList.end(); ++itv) {
+                    Particle &at = **itv;
+
+                    //std::cout << " updating position for AT part " << at.id() << " (" << at.position() << ") ";
+
+                    at.position()[coord] = at.position()[coord] - moved;
+                    //getSystem()->bc->foldCoordinate(at.position(), at.image(), coord);
+
+                    //std::cout << "to (" << at.position() << ")\n";
+                }
+            }
+            else {
+                std::cout << getSystem()->comm->rank() << ": foldAdrPartCoor "
+                        << "VP particle "<< part.id() << "-" << part.ghost() << " not found in tuples!\n";
+                exit(1);
+                return;
+            }
+        }
+    }
+    */
 
     void StorageAdress::packForces(OutBuffer &buf, Cell &_ghosts) {
 

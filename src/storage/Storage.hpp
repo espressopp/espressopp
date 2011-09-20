@@ -44,7 +44,6 @@ namespace espresso {
       // similar as above, but only called from fixedtuplelist when rebuilding the tuples
       Particle* addAdrATParticleFTPL(Particle n);
 
-
       // remove an AdResS AT particle - it is removed from the vector and from the map
       // called from FTPL
       void removeAdrATParticle(longint id);
@@ -66,12 +65,33 @@ namespace espresso {
         return (it != localParticles.end() && !(it->second->ghost())) ? it->second : 0;
       }
 
+
+      // same as above, used to make PDBs with adress particles
+      // TODO find another solution
+      /** Lookup whether data for a given particle is available on this node.
+      \return 0 if the particle wasn't available, the pointer to the Particle, if it was. */
+      /*
+      Particle* lookupRealParticle(longint id) {
+        IdParticleMap::iterator it = localParticles.find(id);
+
+        // for AdResS
+        if (it != localParticles.end() && !(it->second->ghost())) {
+            return it->second;
+         }
+        else {
+            return lookupAdrATParticle(id);
+        }
+      }
+      */
+
+
       /** Lookup whether data for a given adress real AT particle is available on this node.
       \return 0 if the particle wasn't available, the pointer to the Particle, if it was. */
       Particle* lookupAdrATParticle(longint id) {
         IdParticleMap::iterator it = localAdrATParticles.find(id);
         return (it != localAdrATParticles.end()) ? it->second : 0;
       }
+
 
       /// get number of real particles on this node
       longint getNRealParticles() const;
@@ -146,6 +166,7 @@ namespace espresso {
       boost::signals2::signal2 <void, ParticleList&, class InBuffer&> 
         afterRecvParticles;
 
+
       // for AdResS
       // this is exactly the same as onParticlesChanged, but only used to rebuild tuples
       boost::signals2::signal0 <void> onTuplesChanged;
@@ -157,6 +178,7 @@ namespace espresso {
       }
       ParticleList&    getAdrATParticles()  { return AdrATParticles; }
       ParticleListAdr& getAdrATParticlesG() { return AdrATParticlesG; }
+
 
       /* variant for python that ignores the return value */
       bool pyAddParticle(longint id, const Real3D& pos);
@@ -220,7 +242,7 @@ namespace espresso {
 			     int extradata,
 			     const Real3D& shift);
 
-      void copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift);
+      //void copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift);
 
       /** pack ghost forces for sending. */
       virtual void packForces(OutBuffer& buf, Cell &ghosts);
@@ -301,13 +323,16 @@ namespace espresso {
       InBuffer inBuffer;
       OutBuffer outBuffer;
 
+
       // used for AdResS
       shared_ptr<FixedTupleList> fixedtupleList;
       void clearAdrATParticlesG() { AdrATParticlesG.clear(); }
 
+
     private:
       // map particle id to Particle * for all particles on this node
       boost::unordered_map<longint, Particle*> localParticles;
+
 
 
       // AdResS atomistic particles (they are not stored in cells!)

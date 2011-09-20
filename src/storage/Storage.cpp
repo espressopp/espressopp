@@ -112,8 +112,35 @@ namespace espresso {
       if (!weak || localParticles.find(p->id()) == localParticles.end()) {
           LOG4ESPP_TRACE(logger, "updating local pointer for particle id="
 		       << p->id() << " @ " << p);
+
+
           localParticles[p->id()] = p;
 
+          /*
+          // AdResS testing TODO
+          Particle* oldp = localParticles[p->id()];
+          Particle* newp = p;
+
+          localParticles[p->id()] = p;
+
+          //std::cout << "old *p " << oldp << "\n";
+          //std::cout << "new *p " << newp << "\n";
+
+          // TODO reorganize
+          if (oldp && fixedtupleList) {
+              FixedTupleList::iterator it;
+              it = fixedtupleList->find(oldp);
+              if (it != fixedtupleList->end()) {
+                  std::vector<Particle*> tmp;
+                  tmp = it->second;
+                  fixedtupleList->insert(std::make_pair(newp, tmp));
+                  fixedtupleList->erase(it);
+              }
+              else {
+                  //std::cout << "updateInLocalParticles: Particle not found in tuples!\n";
+              }
+          }
+          */
       }
       else {
           LOG4ESPP_TRACE(logger, "NOT updating local pointer for particle id="
@@ -177,9 +204,9 @@ namespace espresso {
     }
 
 
-    Particle* Storage::addAdrATParticle(longint id, const Real3D& p, const Real3D& vpp) {
+    Particle* Storage::addAdrATParticle(longint id, const Real3D& p, const Real3D& _vpp) {
 
-      if (!checkIsRealParticle(id, vpp)) {
+      if (!checkIsRealParticle(id, _vpp)) {
     	return static_cast< Particle* >(0);
       }
 
@@ -187,6 +214,25 @@ namespace espresso {
       n.init();
       n.id() = id;
       n.position()= p;
+      n.image() = Int3D(0);
+
+
+      // fold AT particles for same amount as VP
+      Real3D vpp_old = _vpp;
+      Real3D vpp_new = _vpp;
+
+      getSystem()->bc->foldPosition(vpp_new);
+
+      if (vpp_old != vpp_new) {
+          //std::cout << "VP old pos (" << vpp_old << ") ";
+          //std::cout << "new pos (" << vpp_new << ")\n";
+
+          Real3D moved = vpp_old - vpp_new;
+          n.position() = n.position() - moved;
+
+          //std::cout << " Moved AT particle to " << n.position() << "\n";
+      }
+
 
       // see whether the array was resized; STL hack
       Particle *begin = &AdrATParticles.front();
@@ -207,10 +253,6 @@ namespace espresso {
     // this is called from fixedtuplelist only!
     Particle* Storage::addAdrATParticleFTPL(Particle n) {
 
-	  //Particle n;
-	  //n.init();
-	  //n.id() = id;
-
 	  // see whether the array was resized; STL hack
 	  Particle *begin = &AdrATParticles.front();
 
@@ -224,9 +266,7 @@ namespace espresso {
 		  updateInLocalAdrATParticles(local);
 	  }
 
-
 	  return local;
-
 	}
 
 
@@ -460,49 +500,6 @@ namespace espresso {
               src != end; ++src, ++dst) {
         dst->copyAsGhost(*src, extradata, shift);
       }
-    }
-
-    void Storage::copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift) {
-
-
-        // create ghosts of particles in tuples
-        FixedTupleList::iterator it;
-        it = fixedtupleList->find(&src);
-        if (it != fixedtupleList->end()) {
-            std::vector<Particle*> atList;
-            atList = it->second;
-
-            Particle* atg; // atom, ghost
-            std::vector<Particle*> tmp; // temporary vector
-
-            for (std::vector<Particle*>::iterator itv = atList.begin();
-                  itv != atList.end(); ++itv) {
-                Particle &at = **itv;
-
-                Particle n; // temporary particle, to be inserted into adr. at. ghost part.
-                n.id() = at.getId();
-                n.type() = at.getType();
-
-
-                // see whether the array was resized; STL hack
-                //Particle *begin = &AdrATParticlesG.front();
-
-                atg = appendUnindexedAdrParticle(AdrATParticlesG, n);
-                atg->copyAsGhost(at, extradata, shift);
-                tmp.push_back(atg);
-
-                /*if (begin != &AdrATParticlesG.front())
-                    std::cout << "\n  -- AdrATParticlesG array resized!! --\n\n";*/
-
-            }
-            fixedtupleList->insert(std::make_pair(&dst, tmp));
-            tmp.clear();
-        }
-        else {
-        	std::cout << "copyGhostTuples: VP particle "<< src.id() << "-" << src.ghost() << " (" << src.position() << ")" << " not found in tuples!\n";
-        	exit(1);
-        	return;
-        }
     }
 
     void Storage::packForces(OutBuffer &buf, Cell &_ghosts)

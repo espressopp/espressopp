@@ -59,10 +59,6 @@ namespace espresso {
       */
       virtual void collectGhostForces() = 0;
 
-      // for AdResS
-      // this is exactly the same as onParticlesChanged, but only used to rebuild tuples
-      //boost::signals2::signal0 <void> onTuplesChanged;
-
       static void registerPython();
 
 
@@ -110,7 +106,9 @@ namespace espresso {
 			     int extradata,
 			     const Real3D& shift);
 
-      //void copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift);
+      void copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift);
+
+      //void foldAdrPartCoor(Particle& part, Real3D& oldpos, int coord);
 
       /** pack ghost forces for sending. */
       void packForces(OutBuffer& buf, Cell &ghosts);
@@ -124,8 +122,6 @@ namespace espresso {
       //void addAdrGhostForcesToReals(Particle& src, Particle& dst);
 
       static LOG4ESPP_DECL_LOGGER(logger);
-
-
 
     };
   }
