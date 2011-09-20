@@ -116,12 +116,8 @@ namespace espresso {
 
           //std::cout << p1.id() << "-" << p2.id() << " CG force: (" << force << ")\n";
 
-          // iterate through atomistic particles in fixedtuplelist
-          // and add them the proportional amount of force (depending
-          // on their mass) to make them move along with their CG particles
-          // This is only used for the particles in the CG zone.
-
           /*
+          // loop over CG particles and overwrite AT forces and velocity
           FixedTupleList::iterator it3;
           FixedTupleList::iterator it4;
           it3 = fixedtupleList->find(&p1);
