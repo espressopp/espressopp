@@ -39,6 +39,16 @@ class VerletListLocal(_espresso.VerletList):
                 self.cxxclass.exclude(self, pid1, pid2)
             # rebuild list with exclusions
             self.cxxclass.rebuild(self)
+            
+    def getAllPairs(self):
+        'return the pairs of the local verlet list'
+        if pmi.workerIsActive():
+            pairs=[]
+            npairs=self.totalSize()
+            for i in range(npairs):
+              pair=self.cxxclass.getPair(self, i+1)
+              pairs.append(pair)
+            return pairs 
 
 
 if pmi.isController:
@@ -47,5 +57,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espresso.VerletListLocal',
             pmiproperty = [ 'builds' ],
-            pmicall = [ 'totalSize', 'exclude']
+            pmicall = [ 'totalSize', 'exclude' ],
+            pmiinvoke = [ 'getAllPairs' ]
             )

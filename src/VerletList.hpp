@@ -4,6 +4,7 @@
 
 #include "log4espp.hpp"
 #include "types.hpp"
+#include "python.hpp"
 #include "Particle.hpp"
 #include "SystemAccess.hpp"
 #include "boost/signals2.hpp"
@@ -34,6 +35,8 @@ namespace espresso {
     ~VerletList();
 
     PairList& getPairs() { return vlPairs; }
+
+    python::tuple getPair(int i);
 
     void rebuild();
 

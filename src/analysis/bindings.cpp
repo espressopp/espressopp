@@ -8,6 +8,7 @@
 #include "Velocities.hpp"
 #include "CenterOfMass.hpp"
 #include "NPart.hpp"
+#include "MaxPID.hpp"
 
 namespace espresso {
   namespace analysis {
@@ -21,6 +22,7 @@ namespace espresso {
       Velocities::registerPython();
       CenterOfMass::registerPython();
       NPart::registerPython();
+      MaxPID::registerPython();
     }
   }
 }

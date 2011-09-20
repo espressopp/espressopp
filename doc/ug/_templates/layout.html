@@ -1,14 +1,52 @@
-{% extends "agogo/layout.html" %}
+<div id="outer">
 
-{% block relbar1 %}
+{% extends "basic/layout.html" %}
 
-<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
-<a href="{{ pathto('index') }}"><img src="{{
-pathto("_static/top_logo.png", 1) }}" border="0" alt="espresso"/></a>
-</div>
-{{ super() }}
+{% block header %}
+  <div class="header"></div>
 {% endblock %}
+{% block relbar1 %}{% endblock %}
 
-{# put the sidebar before the body #}
-{% block sidebar1 %}{{ sidebar() }}{% endblock %}
+{%- block content %}
+
+  {% block sidebar1 %}
+    <div class="menu">
+      <ul class="nav">
+	<li><a href="../index.html">Home</a></li>
+	<li><a href="../Features.html">Features</a></li>
+	<li><a href="../Download.html">Download</a></li>
+	<li><a href="index.html">Documentation</a></li>
+	<li><a href="../Developer_Team.html">Developer Team</a></li>
+	<li id="impressum"><a href="http://www.mpip-mainz.mpg.de/www/pages/impressum">Impressum</a></li>
+      </ul>
+      <div id="searchbox" style="display: none">
+	<form class="search" action="{{ pathto('search') }}" method="get">
+	  <input type="text" name="q" size="12" />
+	  <input type="submit" value="{{ _('Search') }}" />
+	  <input type="hidden" name="check_keywords" value="yes" />
+	  <input type="hidden" name="area" value="default" />
+	</form>
+      </div>
+      <script type="text/javascript">$('#searchbox').show(0);</script>
+    </div>
+  {% endblock %} 
+
+  <div class="document">
+    {%- block document %}
+      <div class="documentwrapper">
+	<div class="bodywrapper">
+	  <div class="body">
+	    {% block body %} {% endblock %}
+	  </div>
+	</div>
+      </div>
+    {%- endblock %} 
+  </div>
+
+{%- endblock %}
+
+{% block relbar2 %}{% endblock %}
 {% block sidebar2 %}{% endblock %}
+{% block footer %}{% endblock %}
+
+</div>
