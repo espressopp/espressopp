@@ -9,6 +9,9 @@
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 
+#include "System.hpp"
+#include "bc/BC.hpp"
+
 //using namespace std;
 
 namespace espresso {
@@ -156,7 +159,7 @@ namespace espresso {
     void FixedTupleList::afterRecvParticles
                                     (ParticleList &pl, InBuffer& buf) {
 
-        //std::cout << storage->getRank() << ": afterRecvParticles\n";
+        //std::cout << "afterRecvParticles\n";
 
         /*
         std::vector<longint> received, pids;
@@ -212,7 +215,30 @@ namespace espresso {
             // receive the tuple list
             //std::cout << "receive pidK: ";
             buf.read(pidK);
-            //std::cout << pidK << "\n";
+            //std::cout << pidK << " at ";
+
+
+            /*
+            // testing
+            Particle* vp = storage->lookupRealParticle(pidK);
+            Real3D vpp = vp->position();
+
+            // see where VP is folded
+            Real3D vpp_old = vpp;
+            Real3D vpp_new = vpp;
+            Real3D moved;
+            int dir;
+            Int3D image(0,0,0);
+
+            for (dir = 0; dir < 3; ++dir) {
+                storage->getSystem()->bc->foldCoordinate(vpp_new, image, dir);
+                if (vpp_new[dir] != vpp_old[dir]) {
+                    moved[dir] = vpp_old[dir] - vpp_new[dir];
+                    break; // do not continue looping
+                }
+            }
+            */
+
 
             //std::cout << "receive n: ";
             buf.read(n);
@@ -221,14 +247,22 @@ namespace espresso {
             //std::cout << storage->getRank() << ": add AT particles ";
             for (; n > 0; --n) {
                 LOG4ESPP_DEBUG(theLogger, "received vector for pid " << pidK);
-                //storage->addAdrATParticleFTPL(received[i]); // add AT particle to storage
-                //pids.push_back(received[i++]);
-                //Particle *p = storage->addAdrATParticleFTPL();
+                /*storage->addAdrATParticleFTPL(received[i]); // add AT particle to storage
+                pids.push_back(received[i++]);
+                Particle *p = storage->addAdrATParticleFTPL();*/
+
                 Particle p;
                 //std::cout << " read *p : ";
                 buf.read(p);
+
+                //std::cout << " AT particle " << p.id() << " at " << p.position() << " ";
+                //p.position()[dir] = p.position()[dir] - moved[dir];
+                //std::cout << "--> moved to " << p.position() << "\n";
+
                 storage->addAdrATParticleFTPL(p);
-                //std::cout << " " << p.getId();
+
+
+                //std::cout << p.getId() << " at " << p.position() << "\n";
                 pids.push_back(p.id());
             }
             //std::cout << "\n";
@@ -271,6 +305,28 @@ namespace espresso {
                 	exit(1);
                 	return;
                 }
+
+
+                // fold AT coordinates to follow VP if necessary
+                real dif;
+                Real3D boxL = storage->getSystem()->bc->getBoxL();
+                for (int dir = 0; dir < 3; ++dir) {
+                    dif = vp->position()[dir] - at->position()[dir];
+                    if (dif > boxL[dir]/2) {
+                        //std::cout << "VP " << vp->getId() << " at " << vp->position() << "\n";
+                        //std::cout << " moving AT " << at->getId() << " " << at->position();
+                        at->position()[dir] = at->position()[dir] + boxL[dir];
+                        //std::cout << " --> " << at->position() << "\n";
+                    }
+                    else if (dif < -boxL[dir]/2) {
+                        //std::cout << "VP " << vp->getId() << " at " << vp->position() << "\n";
+                        //std::cout << " moving AT " << at->getId() << " " << at->position();
+                        at->position()[dir] = at->position()[dir] - boxL[dir];
+                        //std::cout << " --> " << at->position() << "\n";
+                    }
+                }
+
+
                 //std::cout << " " << *it2;
                 tmp.push_back(at);
             }

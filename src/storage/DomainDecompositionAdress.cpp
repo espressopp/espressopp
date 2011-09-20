@@ -209,6 +209,7 @@ namespace espresso {
         end = l.end(); it != end; ++it) {
 
         Real3D& pos = it->position();
+        Real3D oldpos = pos;
 
         if (nodeGrid.getBoundary(dir) != 0) {
             getSystem()->bc->foldCoordinate(pos, it->image(), nodeGrid.convertDirToCoord(dir));
@@ -322,7 +323,7 @@ namespace espresso {
       }
 
       // sort received particles to cells
-      if (appendParticles(recvBufL, 2 * coord) && coord == 2) finished = false;
+      if (appendParticles(recvBufL, 2 * coord    ) && coord == 2) finished = false;
       if (appendParticles(recvBufR, 2 * coord + 1) && coord == 2) finished = false;
 
       // reset send/recv buffers
@@ -341,6 +342,7 @@ namespace espresso {
         // do not use an iterator here, since we have need to take out particles during the loop
         for (size_t p = 0; p < cell.particles.size(); ++p) {
             Particle &part = cell.particles[p];
+            Real3D oldpos = part.position();
             getSystem()->bc->foldCoordinate(part.position(), part.image(), coord);
             LOG4ESPP_TRACE(logger, "folded coordinate " << coord << " of particle " << part.id());
 
