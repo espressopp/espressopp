@@ -216,12 +216,12 @@ namespace espresso {
 
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
-        real sqDist = 0.0;
+            real sqDist = 0.0;
 
-        LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() << 
-                ", pos = " << cit->position() <<
-                ", v = " << cit->velocity() << 
-                ", f = " << cit->force());
+            LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() <<
+                    ", pos = " << cit->position() <<
+                    ", v = " << cit->velocity() <<
+                    ", f = " << cit->force());
 
             /* more precise for DEBUG:
 
@@ -244,9 +244,9 @@ namespace espresso {
             sqDist += deltaP * deltaP;
             //std::cout << " to (" << cit->position() << ") " << sqrt(sqDist) << "\n";
 
-        count++;
+            count++;
 
-        maxSqDist = std::max(maxSqDist, sqDist);
+            maxSqDist = std::max(maxSqDist, sqDist);
       }
 
 
@@ -383,7 +383,7 @@ namespace espresso {
       storage.collectGhostForces();
       timeComm2 += timeIntegrate.getElapsedTime() - time;
 
-      if (langevin) langevin->thermalize();
+      if (langevin) langevin->thermalizeAdr();
     }
 
     /*****************************************************************************/
