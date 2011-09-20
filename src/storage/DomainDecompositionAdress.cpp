@@ -342,7 +342,6 @@ namespace espresso {
         // do not use an iterator here, since we have need to take out particles during the loop
         for (size_t p = 0; p < cell.particles.size(); ++p) {
             Particle &part = cell.particles[p];
-            Real3D oldpos = part.position();
             getSystem()->bc->foldCoordinate(part.position(), part.image(), coord);
             LOG4ESPP_TRACE(logger, "folded coordinate " << coord << " of particle " << part.id());
 
