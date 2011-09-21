@@ -202,6 +202,7 @@ namespace espresso {
 
     Int3D& image() { return l.i; }
     const Int3D& image() const { return l.i; }
+    Int3D getImage() const { return l.i; }
 
     bool& ghost() { return l.ghost; }
     const bool& ghost() const { return l.ghost; }
