@@ -99,6 +99,18 @@ namespace espresso {
     return true;
   }
 
+  python::list FixedPairList::getBonds()
+  {
+	python::tuple bond;
+	python::list bonds;
+	for (GlobalPairs::const_iterator it=globalPairs.begin(); it != globalPairs.end(); it++) {
+      bond = python::make_tuple(it->first, it->second);
+      bonds.append(bond);
+    }
+
+	return bonds;
+  }
+
   void FixedPairList::
   beforeSendParticles(ParticleList& pl, 
 		      OutBuffer& buf) {
@@ -210,6 +222,8 @@ namespace espresso {
     class_<FixedPairList, shared_ptr<FixedPairList> >
       ("FixedPairList", init <shared_ptr<storage::Storage> >())
       .def("add", pyAdd)
+      .def("size", &FixedPairList::size)
+      .def("getBonds",  &FixedPairList::getBonds)
       ;
   }
 }

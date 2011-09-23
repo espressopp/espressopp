@@ -52,8 +52,7 @@ namespace espresso {
 
   shared_ptr< interaction::Interaction > System::getInteraction(int i)
   {
-	if (i >0 && i <= shortRangeInteractions.size())
-	return shortRangeInteractions[i-1];
+    return shortRangeInteractions[i];
   }
 
   int System::getNumberOfInteractions()

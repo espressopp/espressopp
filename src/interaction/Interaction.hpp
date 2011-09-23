@@ -21,6 +21,7 @@ namespace espresso {
 
       /** This method returns the maximal cutoff defined for one type pair. */
       virtual real getMaxCutoff() = 0;
+      virtual bool isBonded() = 0;
 
       static void registerPython();
 
