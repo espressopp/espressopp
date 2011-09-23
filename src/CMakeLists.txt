@@ -66,7 +66,8 @@ else(EXTERNAL_BOOST)
 endif(EXTERNAL_BOOST)
 
 add_library(espresso_common ${ESPRESSO_SOURCES})
-target_link_libraries(espresso_common ${BOOST} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES})
+target_link_libraries(espresso_common ${BOOST} ${PYTHON_LIBRARIES}
+                                      ${VAMPIRTRACE_LIBRARIES} ${MPI_LIBRARIES})
 install(TARGETS espresso_common LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
 
 add_library(pylogger esutil/PyLogger.cpp)

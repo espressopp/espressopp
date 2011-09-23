@@ -41,6 +41,21 @@ IF(NOT CMAKE_BUILD_TYPE)
 ENDIF(NOT CMAKE_BUILD_TYPE)
 
 ########################################################################
+#VampirTrace settings
+########################################################################
+
+set(VAMPIRTRACE false)
+
+if(VAMPIRTRACE)
+   set(VAMPIRTRACE_ROOT /home/brandes/local/VampirTrace-5.11.2)
+   set(VAMPIRTRACE_LIBRARIES ${VAMPIRTRACE_ROOT}/lib/libvt-mpi.so
+                             ${VAMPIRTRACE_ROOT}/lib/libotf.so)
+   # Attention: VampirTrace should included before MPI
+   include_directories(${VAMPIRTRACE_ROOT}/include)
+   add_definitions( -DVTRACE )
+endif(VAMPIRTRACE)
+
+########################################################################
 #Process MPI settings
 ########################################################################
 

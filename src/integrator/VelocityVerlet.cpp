@@ -9,6 +9,12 @@
 #include "storage/Storage.hpp"
 #include "mpi.hpp"
 
+#ifdef VTRACE
+#include "vampirtrace/vt_user.h"
+#else
+#define VT_TRACER( name)
+#endif
+
 namespace espresso {
   namespace integrator {
 
@@ -42,6 +48,8 @@ namespace espresso {
 
     void VelocityVerlet::run(int nsteps)
     {
+      VT_TRACER("run");
+
       int nResorts = 0;
 
       real time;
@@ -63,6 +71,7 @@ namespace espresso {
       real maxDist;
 
       if (resortFlag) {
+        VT_TRACER("resort");
         // time = timeIntegrate.getElapsedTime();
         LOG4ESPP_INFO(theLogger, "resort particles");
         storage.decompose();
@@ -103,6 +112,7 @@ namespace espresso {
         if (maxDist > skinHalf) resortFlag = true;
 
         if (resortFlag) {
+            VT_TRACER("resort1");
             time = timeIntegrate.getElapsedTime();
             LOG4ESPP_INFO(theLogger, "step " << i << ": resort particles");
             storage.decompose();
@@ -303,6 +313,8 @@ namespace espresso {
 
     void VelocityVerlet::calcForces()
     {
+      VT_TRACER("forces");
+
       LOG4ESPP_INFO(theLogger, "calculate forces");
 
       initForces();
@@ -329,7 +341,10 @@ namespace espresso {
       storage::Storage& storage = *getSystemRef().storage;
 
       time = timeIntegrate.getElapsedTime();
-      storage.updateGhosts();
+      { 
+        VT_TRACER("commF");
+        storage.updateGhosts();
+      }
       timeComm1 += timeIntegrate.getElapsedTime() - time;
 
       time = timeIntegrate.getElapsedTime();
@@ -337,7 +352,10 @@ namespace espresso {
       timeForce += timeIntegrate.getElapsedTime() - time;
 
       time = timeIntegrate.getElapsedTime();
-      storage.collectGhostForces();
+      {
+        VT_TRACER("commR");
+        storage.collectGhostForces();
+      }
       timeComm2 += timeIntegrate.getElapsedTime() - time;
 
       if (langevin) langevin->thermalize();

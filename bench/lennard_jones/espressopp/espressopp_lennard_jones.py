@@ -8,8 +8,33 @@
 #                                                                         #
 ###########################################################################
 
+def openmpi_workaround():
+
+  # find the flag to be set to open all shared libraries at once
+
+  try:
+    import dl
+    globalFlag = dl.RTLD_GLOBAL
+  except:
+    try:
+      import ctypes
+      globalFlag = ctypes.RTLD_GLOBAL
+    except:
+      print 'ATTENTION: could not find flag RTLD_GLOBAL for dlopen'
+      # take a good value for Linux (but is platform-dependent)
+      globalFlag = 256
+
+  # now set this flag so that dlopen will use it
+
+  import sys
+  flags = sys.getdlopenflags()
+  sys.setdlopenflags(flags | globalFlag)
+
+openmpi_workaround()
+
 import sys
 import time
+import _espresso
 import espresso
 import MPI
 import logging

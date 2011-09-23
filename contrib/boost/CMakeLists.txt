@@ -19,5 +19,5 @@ file(GLOB_RECURSE NOT_BOOST_SOURCES
 list(REMOVE_ITEM BOOST_SOURCES ${NOT_BOOST_SOURCES})
 
 add_library(espresso_boost ${BOOST_SOURCES})
-target_link_libraries(espresso_boost ${PYTHON_LIBRARIES} ${MPI_LIBRARIES})
+target_link_libraries(espresso_boost ${PYTHON_LIBRARIES} ${VAMPIRTRACE_LIBRARIES} ${MPI_LIBRARIES})
 install(TARGETS espresso_boost LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)

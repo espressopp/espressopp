@@ -7,6 +7,13 @@
 #include "mpi.hpp"
 #include "../contrib/mpi4py/mpi4py-1.2.1/src/include/mpi4py/mpi4py.h"
 
+#ifdef VTRACE
+#include "vampirtrace/vt_user.h"
+#else
+# define VT_ON()
+# define VT_OFF()
+#endif
+
 namespace espresso {
 
   System::System() {
@@ -54,6 +61,18 @@ namespace espresso {
 	return shortRangeInteractions.size();
   }
 
+  static void setTrace(bool flag)
+  {
+     if (flag)
+     {
+        VT_ON();
+     }
+     else
+     {
+        VT_OFF();
+     }
+  }
+
   //////////////////////////////////////////////////
   // REGISTRATION WITH PYTHON
   //////////////////////////////////////////////////
@@ -74,5 +93,7 @@ namespace espresso {
       .def("getInteraction", &System::getInteraction)
       .def("getNumberOfInteractions", &System::getNumberOfInteractions)
       ;
+
+    def("setTrace", setTrace);
   }
 }
