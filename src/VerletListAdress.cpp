@@ -34,7 +34,7 @@ namespace espresso {
       dEx = _dEx;
       dHy = _dHy;
       adrCenterSet = false;
-      adresscut = dEx + dHy;
+      adresscut = dEx + dHy + skin;
       adrsq = adresscut * adresscut;
 
       //std::cout << getSystem()->comm->rank() << ": " << "------constructor----- \n";
