@@ -82,7 +82,7 @@ def connect(system):
   vmdfile.write("imd transfer 1\n")
   vmdfile.write("imd keep 1\n")
   vmdfile.close()
-  subprocess.Popen(['/sw/linux/vmd-1.8.7/bin/vmd', '-e', 'vmd.tcl'])
+  subprocess.Popen(['vmd', '-e', 'vmd.tcl'])
 
   sock = handshake(initsock)
   if (sock != 0):
