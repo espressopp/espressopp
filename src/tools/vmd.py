@@ -91,7 +91,7 @@ def connect(system):
   
   return sock
 
-def imd_positions(system, sock):
+def imd_positions(system, sock, folded=True):
   maxParticleID = int(espresso.analysis.MaxPID(system).compute())
   count  = 0
   pid    = 0
@@ -99,7 +99,11 @@ def imd_positions(system, sock):
   while pid <= maxParticleID:
     particle = system.storage.getParticle(pid)
     if particle.pos:
-        coords += struct.pack('!fff', particle.pos[0], particle.pos[1], particle.pos[2])
+        if folded:
+          p = particle.pos
+        else:
+          p = system.bc.getUnfoldedPosition(particle.pos, particle.imageBox)
+        coords += struct.pack('!fff', p[0], p[1], p[2])
         count  += 1
         pid    += 1
     else:
