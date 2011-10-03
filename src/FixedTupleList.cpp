@@ -46,6 +46,7 @@ namespace espresso {
         con4.disconnect();
     }
 
+    /* -- not used anymore
     int FixedTupleList::getNumPart(longint pid) {
         //std::cout << "looking up pid " << pid << "\n";
         int size = 0;
@@ -54,7 +55,7 @@ namespace espresso {
             size = it->second.size();
         }
         return size;
-    }
+    }*/
 
     bool FixedTupleList::addT(tuple pids) {
 
@@ -260,7 +261,6 @@ namespace espresso {
                 //std::cout << "--> moved to " << p.position() << "\n";
 
                 storage->addAdrATParticleFTPL(p);
-
 
                 //std::cout << p.getId() << " at " << p.position() << "\n";
                 pids.push_back(p.id());

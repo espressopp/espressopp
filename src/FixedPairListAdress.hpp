@@ -14,6 +14,12 @@
 
 
 namespace espresso {
+
+    /**
+     * This is a subclass of FixedPairList. It should be used for AdResS fixed
+     * pairs. It overrides some parent functions, to use AT particles.
+     *
+     */
 	class FixedPairListAdress : public FixedPairList {
 	  public:
 		FixedPairListAdress(shared_ptr<storage::Storage> _storage,

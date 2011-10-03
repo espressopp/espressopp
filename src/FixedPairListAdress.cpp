@@ -44,6 +44,7 @@ namespace espresso {
   }
 
 
+  // override parent function (use lookupAdrATParticle)
   bool FixedPairListAdress::add(longint pid1, longint pid2) {
 
     if (pid1 > pid2)
@@ -132,12 +133,14 @@ namespace espresso {
   }
 
 
-  // this should not be used
+  // override parent function, this one should be empty
   void FixedPairListAdress::beforeSendParticles(ParticleList& pl,
                                                     OutBuffer& buf) {
         //std::cout << storage->getSystem()->comm->rank() << ": beforeSendParticles() fixed pl (size " << pl.size() << ")\n";
   }
 
+
+  // override parent function (use lookupAdrATParticle())
   void FixedPairListAdress::onParticlesChanged() {
 
     LOG4ESPP_INFO(theLogger, "rebuild local bond list from global\n");

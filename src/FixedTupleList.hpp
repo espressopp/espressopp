@@ -31,10 +31,10 @@ namespace espresso {
             void afterRecvParticles(ParticleList& pl, class InBuffer& buf);
             void onParticlesChanged();
 
-            int getNumPart(longint pid); // get number of particles in globalmap for given pid
+            //int getNumPart(longint pid); // get number of particles in globalmap for given pid
 
-            // this signals the AT particles used to rebuild fixed pair, triple, quadruple AT bonds
-            // for now FixedPairListAdress connects to it
+            // this signals the AT particles to rebuild AT fixed pair, triple, quadruple bonds
+            // FixedPairListAdress connects to it (TODO: triple, quadruple not yet implemented)
             boost::signals2::signal2 <void, std::vector<longint>&, class OutBuffer&>
                    beforeSendATParticles;
 
