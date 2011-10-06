@@ -6,7 +6,6 @@ from math import exp
 class ParallelTempering(object):
     
     def __init__(self, NumberOfSystems = 4, RNG = None):
-        print "WARNING: ParallelTempering is running in test mode ( acceptance rate is 100% ! )"
         if (RNG == None):
             print "ERROR: ParallelTempering needs a random number generator"
         else: 
@@ -75,15 +74,17 @@ class ParallelTempering(object):
             m = 2 * i + self._oddeven
             n = m + 1
             if n<len(energies):
-#                print "m=%i n=%i" %(m,n)
                 metro = self._RNG.random()
                 t1    = temperatures[m]
                 t2    = temperatures[n]
                 e1    = energies[m]
                 e2    = energies[n]
                 delta = exp(-(e1-e2)*(1/t2 -1/t1))
-                delta = 1.0
-#                print "delta=%10.5f metro=%10.5f" % (delta, metro)
+                if delta >= metro:
+                  exyesno = 'yes'
+                else:
+                  exyesno = 'no'
+                print "systems %i and %i: dE=%10.5f random=%10.5f ==> exchange: %s" % (m, n, delta, metro, exyesno)
                 if delta >= metro:
                     # exchange temperature of system[n] <--> system[m]
                     pmi.activate(self._comm[n])
