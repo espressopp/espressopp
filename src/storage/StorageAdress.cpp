@@ -154,28 +154,46 @@ namespace espresso {
                 Particle &atg = **itv;
                 buf.read(atg, 1); // we force extradata to 1 (although not necessary here...)
 
-                /*std::cout << getSystem()->comm->rank() << ":  <--- " << atg.id() << "-" << atg.ghost() <<
+                /*std::cout << getSystem()->comm->rank() << ":  <1--- " << atg.id() << "-" << atg.ghost() <<
                                 " (" << atg.position() << ") type " << atg.type() <<
                                 " extradata: " << extradata << "\n";*/
             }
         }
         else {
             std::vector<Particle*> tmp;
-            Particle* atg; // atom, ghost
-            Particle tmpatg; // temporary particle, to be inserted into adr. at. ghost part.
+            //Particle* atg; // atom, ghost
+            //Particle tmpatg; // temporary particle, to be inserted into adr. at. ghost part.
 
-            for (int i = 1; i <= numAT; ++i) {
+
+            ParticleList tmp2; // temporary vector
+            tmp2.resize(numAT);
+            appendParticleListToGhosts(tmp2); // insert into list
+
+            ParticleList::iterator itv2  = (getAdrATParticlesG().back()).begin();
+
+
+            for (int i = 1; i <= numAT; ++i, ++itv2) {
                 // read the AT partcles
                 //std::cout << getSystem()->comm->rank() << ": buf.read(AT particle, extradata) (unpackPosEtc), i: " << i << "\n";
+
+                /*
                 buf.read(tmpatg, 1); // we force extradata to 1
 
                 atg = appendUnindexedAdrParticle(getAdrATParticlesG(), tmpatg);
                 atg->ghost() = 1;
 
-                tmp.push_back(atg);
+                tmp.push_back(atg);*/
 
-                /*std::cout << getSystem()->comm->rank() << ":  <--- " << atg->id() << "-" << atg->ghost() <<
-                                    " (" << atg->getPos() << ") type " << atg->getType() <<
+                Particle &atg = *itv2;
+                buf.read(atg, 1);
+
+                atg.ghost() = 1;
+                tmp.push_back(&atg);
+
+
+
+                /*std::cout << getSystem()->comm->rank() << ":  <2--- " << atg.id() << "-" << atg.ghost() <<
+                                    " (" << atg.getPos() << ") type " << atg.getType() <<
                                     " extradata: " << extradata << "\n";*/
 
                 /*if (atg->getType() == dst->getType()) { // for testing purposes
@@ -184,6 +202,7 @@ namespace espresso {
                     return;
                 }*/
             }
+
             fixedtupleList->insert(std::make_pair(&(*dst), tmp));
             tmp.clear();
         }
@@ -215,7 +234,7 @@ namespace espresso {
     }
 
 
-    void StorageAdress::copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift) {
+    inline void StorageAdress::copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift) {
 
         // create ghosts of particles in tuples
         FixedTupleList::iterator it;
@@ -224,13 +243,21 @@ namespace espresso {
             std::vector<Particle*> atList;
             atList = it->second;
 
-            Particle* atg; // atom, ghost
+            //Particle* atg; // atom, ghost
             std::vector<Particle*> tmp; // temporary vector
 
+            ParticleList tmp2; // temporary vector
+            tmp2.resize(atList.size());
+            appendParticleListToGhosts(tmp2); // insert into list
+
+            ParticleList::iterator itv2  = (getAdrATParticlesG().back()).begin();
+
+
             for (std::vector<Particle*>::iterator itv = atList.begin();
-                  itv != atList.end(); ++itv) {
+                  itv != atList.end(); ++itv, ++itv2) {
                 Particle &at = **itv;
 
+                /*
                 Particle n; // temporary particle, to be inserted into adr. at. ghost part.
                 n.id() = at.getId();
                 n.type() = at.getType();
@@ -243,11 +270,43 @@ namespace espresso {
                 atg->copyAsGhost(at, extradata, shift);
 
                 tmp.push_back(atg);
+                */
+
+                /*
+                if (at.id() == 12573) {
+                    std::cout << src.id() << "-" << src.ghost() << " (" << &src << "): copying 12573-" << at.ghost() << " (" << &at << ") pos (" << at.position() << ") to ghost at (";
+                }*/
+
+
+                Particle &atg = *itv2;
+                atg.id() = at.getId();
+                atg.type() = at.getType();
+                atg.copyAsGhost(at, extradata, shift);
+
+
+                /*
+                if (at.id() == 12573) {
+                    std::cout << &atg << ") pos (" << atg.position() << ")\n";
+                }*/
+
+
+                tmp.push_back(&atg);
 
                 /*if (begin != &AdrATParticlesG.front())
                     std::cout << "\n  -- AdrATParticlesG array resized!! --\n\n";*/
 
             }
+
+            /*
+            if (src.id() == 23147) {
+                std::cout << " tmp size is: " << tmp.size() << "\n";
+            }*/
+            /*
+                                    " contents are [" << tmp.at(0)->id() << ", "
+                                    << tmp.at(1)->id() << ", "
+                                    << tmp.at(2)->id() << ", "
+                                    << tmp.at(3)->id() << "]\n";*/
+
             fixedtupleList->insert(std::make_pair(&dst, tmp));
             tmp.clear();
         }
@@ -400,6 +459,41 @@ namespace espresso {
           addAdrGhostForcesToReals(*src, *dst);
       }
     }
+
+    inline void StorageAdress::addAdrGhostForcesToReals(Particle& src, Particle& dst) {
+
+        // iterate through atomistic particles in fixedtuplelist
+        FixedTupleList::iterator its;
+        FixedTupleList::iterator itd;
+        its = fixedtupleList->find(&src);
+        itd = fixedtupleList->find(&dst);
+
+        //std::cout << "\nInteraction " << p1.id() << " - " << p2.id() << "\n";
+        if (its != fixedtupleList->end() && itd != fixedtupleList->end()) {
+
+            std::vector<Particle*> atList1;
+            std::vector<Particle*> atList2;
+            atList1 = its->second;
+            atList2 = itd->second;
+
+            for (std::vector<Particle*>::iterator itv = atList1.begin(),
+                    itv2 = atList2.begin(); itv != atList1.end(); ++itv, ++itv2) {
+
+                Particle &p3 = **itv;
+                Particle &p4 = **itv2;
+
+                p4.particleForce() += p3.particleForce();
+            }
+        }
+        else {
+            std::cout << " one of the VP particles not found in tuples: " << src.id() << "-" <<
+                    src.ghost() << ", " << dst.id() << "-" << dst.ghost();
+            exit(1);
+            return;
+        }
+    }
+
+
 
 
 

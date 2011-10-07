@@ -282,11 +282,18 @@ namespace espresso {
       return &l.back();
     }
 
-    Particle *Storage::appendUnindexedAdrParticle(ParticleListAdr &l, Particle &part)
-    {
+    //Particle *Storage::appendUnindexedAdrParticle(ParticleListAdr &l, Particle &part)
+    Particle *Storage::appendUnindexedAdrParticle(ParticleList &l, Particle &part) {
       l.push_back(part);
       return &l.back();
     }
+
+    void Storage::appendParticleListToGhosts(ParticleList &l) {
+      AdrATParticlesG.push_back(l);
+    }
+
+
+
 
     Particle *Storage::appendIndexedParticle(ParticleList &l, Particle &part)
     {
@@ -566,41 +573,6 @@ namespace espresso {
           dst->particleForce() += src->particleForce();
       }
     }
-
-
-    void Storage::addAdrGhostForcesToReals(Particle& src, Particle& dst) {
-
-        // iterate through atomistic particles in fixedtuplelist
-        FixedTupleList::iterator it3;
-        FixedTupleList::iterator it4;
-        it3 = fixedtupleList->find(&src);
-        it4 = fixedtupleList->find(&dst);
-
-        //std::cout << "\nInteraction " << p1.id() << " - " << p2.id() << "\n";
-        if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end()) {
-
-           std::vector<Particle*> atList1;
-           std::vector<Particle*> atList2;
-           atList1 = it3->second;
-           atList2 = it4->second;
-
-           for (std::vector<Particle*>::iterator itv = atList1.begin(),
-                   itv2 = atList2.begin(); itv != atList1.end(); ++itv, ++itv2) {
-
-               Particle &p3 = **itv;
-               Particle &p4 = **itv2;
-
-               p4.particleForce() += p3.particleForce();
-           }
-        }
-        else {
-           std::cout << " one of the VP particles not found in tuples: " << src.id() << "-" <<
-                   src.ghost() << ", " << dst.id() << "-" << dst.ghost();
-           exit(1);
-           return;
-        }
-    }
-
 
 
     //////////////////////////////////////////////////

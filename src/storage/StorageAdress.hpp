@@ -119,7 +119,7 @@ namespace espresso {
       void addGhostForcesToReals(Cell &ghosts, Cell &reals);
 
       // adds ghost forces of Adr AT particles to real Adr AT particles
-      //void addAdrGhostForcesToReals(Particle& src, Particle& dst);
+      void addAdrGhostForcesToReals(Particle& src, Particle& dst);
 
       static LOG4ESPP_DECL_LOGGER(logger);
 

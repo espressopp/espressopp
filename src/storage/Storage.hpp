@@ -58,19 +58,20 @@ namespace espresso {
         return (it != localParticles.end()) ? it->second : 0;
       }
 
+
       /** Lookup whether data for a given particle is available on this node. 
        \return 0 if the particle wasn't available, the pointer to the Particle, if it was. */
+      /*
       Particle* lookupRealParticle(longint id) {
         IdParticleMap::iterator it = localParticles.find(id);
         return (it != localParticles.end() && !(it->second->ghost())) ? it->second : 0;
-      }
+      }*/
 
 
       // same as above, used to make PDBs with adress particles
       // TODO find another solution
       /** Lookup whether data for a given particle is available on this node.
       \return 0 if the particle wasn't available, the pointer to the Particle, if it was. */
-      /*
       Particle* lookupRealParticle(longint id) {
         IdParticleMap::iterator it = localParticles.find(id);
 
@@ -82,7 +83,6 @@ namespace espresso {
             return lookupAdrATParticle(id);
         }
       }
-      */
 
 
       /** Lookup whether data for a given adress real AT particle is available on this node.
@@ -177,7 +177,8 @@ namespace espresso {
           fixedtupleList = _fixedtupleList;
       }
       ParticleList&    getAdrATParticles()  { return AdrATParticles; }
-      ParticleListAdr& getAdrATParticlesG() { return AdrATParticlesG; }
+      //ParticleListAdr& getAdrATParticlesG() { return AdrATParticlesG; }
+      std::list<ParticleList>& getAdrATParticlesG() { return AdrATParticlesG; }
 
 
       /* variant for python that ignores the return value */
@@ -251,8 +252,6 @@ namespace espresso {
       /** unpack received ghost forces. This one OVERWRITES, and is probably what you don't need. */
       void unpackForces(Cell &reals, class InBuffer &buf);
       virtual void addGhostForcesToReals(Cell &ghosts, Cell &reals);
-      // adds ghost forces of Adr AT particles to real Adr AT particles
-      void addAdrGhostForcesToReals(Particle& src, Particle& dst);
 
       /** send particles of a cell to another node, and empty the cell
 	  locally. The operation is blocking: the operation
@@ -300,7 +299,12 @@ namespace espresso {
       Particle* appendUnindexedParticle(ParticleList &, Particle &);
 
       // append a ghost AT adress particle to a list, without updating AdrATParticles
-      Particle* appendUnindexedAdrParticle(ParticleListAdr &, Particle &);
+      //Particle* appendUnindexedAdrParticle(ParticleListAdr &, Particle &);
+      Particle* appendUnindexedAdrParticle(ParticleList &, Particle &);
+
+
+      void appendParticleListToGhosts(ParticleList &l);
+
 
       // append a particle to a list, updating localParticles
       Particle* appendIndexedParticle(ParticleList &, Particle &);
@@ -326,7 +330,12 @@ namespace espresso {
 
       // used for AdResS
       shared_ptr<FixedTupleList> fixedtupleList;
-      void clearAdrATParticlesG() { AdrATParticlesG.clear(); }
+      void clearAdrATParticlesG() {
+          //std::cout << "size of AdrATParticlesG: " << AdrATParticlesG.size() << ", clearing... \n";
+          AdrATParticlesG.clear();
+          //std::cout << " new size of AdrATParticlesG: " << AdrATParticlesG.size() << "\n";
+
+      }
 
 
     private:
@@ -337,7 +346,9 @@ namespace espresso {
 
       // AdResS atomistic particles (they are not stored in cells!)
       ParticleList AdrATParticles; // local atomistic real adress particles
-      ParticleListAdr AdrATParticlesG; // ghosts, use list instead of vector to avoid memory reallocation
+      //ParticleListAdr AdrATParticlesG; // ghosts, use list instead of vector to avoid memory reallocation
+      std::list<ParticleList> AdrATParticlesG;
+
 
       // map particle id to Particle * for all adress real AT particles on this node
       boost::unordered_map<longint, Particle*> localAdrATParticles;

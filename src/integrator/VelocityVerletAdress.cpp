@@ -92,6 +92,8 @@ namespace espresso {
 
         LOG4ESPP_INFO(theLogger, "Next step " << i << " of " << nsteps << " starts");
 
+        //std::cout << "-------------- Step " << i << " ---------------- \n";
+
         time = timeIntegrate.getElapsedTime();
         maxDist += integrate1();
         timeInt1 += timeIntegrate.getElapsedTime() - time;
@@ -105,7 +107,7 @@ namespace espresso {
         if (resortFlag) {
             time = timeIntegrate.getElapsedTime();
             LOG4ESPP_INFO(theLogger, "step " << i << ": resort particles");
-            //std::cout << "step " << i << ": resort particles\n";
+            //std::cout << " resort particles\n";
             storage.decompose();
             maxDist  = 0.0;
             resortFlag = false;
@@ -266,10 +268,16 @@ namespace espresso {
 
           // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt)
           Real3D deltaP = dt * it->velocity();
-          //std::cout << "Moving AT " << it->id() << ": from (" << it->position() << ")";
+          /*
+          if (it->getId() == 12573) {
+              std::cout << "Moving AT " << it->id() << " (" << &(*it) << "): from (" << it->position() << ")";
+          }*/
           it->position() += deltaP;
           sqDist += deltaP * deltaP;
-          //std::cout << " to (" << it->position() << ")\n";
+          /*
+          if (it->getId() == 12573) {
+              std::cout << " to (" << it->position() << ")\n";
+          }*/
 
           maxSqDist = std::max(maxSqDist, sqDist);
       }
@@ -311,7 +319,7 @@ namespace espresso {
       // propagete real AT particles
       ParticleList& adrATparticles = system.storage->getAdrATParticles();
       for (std::vector<Particle>::iterator it = adrATparticles.begin();
-              it != adrATparticles.end(); it++) {
+              it != adrATparticles.end(); ++it) {
 
           real dtfm = 0.5 * dt / it->mass();
 
@@ -404,18 +412,54 @@ namespace espresso {
 
 
       // for AdResS
+      // AT reals
       ParticleList& adrATparticles = system.storage->getAdrATParticles();
       for (std::vector<Particle>::iterator it = adrATparticles.begin();
-            it != adrATparticles.end(); it++) {
+            it != adrATparticles.end(); ++it) {
          it->force() = 0.0;
+
+         /*
+         if (it->getId() == 12573) {
+             std::cout << "resetting force of real  12573 (" << &(*it) << ")\n";
+         }*/
+
       }
 
+      // AT ghosts
+      /*
       typedef std::list<Particle> ParticleListAdr;
       ParticleListAdr& adrATparticlesG = system.storage->getAdrATParticlesG();
       for (ParticleListAdr::iterator it = adrATparticlesG.begin();
             it != adrATparticlesG.end(); it++) {
          it->force() = 0.0;
+      }*/
+
+      typedef std::list<ParticleList> ParticleListAdr;
+      ParticleListAdr& adrATparticlesG = system.storage->getAdrATParticlesG();
+      for (ParticleListAdr::iterator it = adrATparticlesG.begin();
+              it != adrATparticlesG.end(); ++it) {
+
+          //ParticleList& atgl = *it;
+
+          //std::cout << "atgl size: " << atgl.size() << "\n";
+
+          for (ParticleList::iterator it2 = it->begin();
+                  it2 != it->end(); ++it2) {
+
+              it2->force() = 0.0;
+
+              //Particle& atg = *it2;
+
+              /*
+              if (atg.getId() == 12573) {
+                  std::cout << "resetting force of ghost 12573 (" << &atg << ") pos (" <<
+                        atg.getPos() << ")\n";
+              }*/
+
+          }
+
       }
+
 
     }
 
