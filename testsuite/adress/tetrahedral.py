@@ -14,30 +14,38 @@ from espresso.tools import decomp
 from espresso.tools import timers
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
-steps = 5000
+steps = 10000
 rc = 2.31 # CG cutoff, Morse
 rca = 1.122462048309373 # AT cutoff (2^(1/6)), WCA
 skin = 0.8
 nvt = True
 timestep = 0.001
-intervals = 50
+intervals = 10
 
 ex_size = 12.0
 hy_size = 2.5
-pdb_dir = "./pdbs-ad-cg-ex-paral/"
+pdb_dir = "./pdbs-test/"
 writepdb = False
 
 # makes a pdb from a list of particles
-def make_pdb(particles, outfile="output", step=0):
+def make_pdb(system, num_particles, size, unfold=False, outfile="output", step=0):
     step = ("%04d" % step)  
     pdb = open(pdb_dir+outfile+step+".pdb", 'w')
     mol = 0
     moltmp = 0
-    for part in particles:
+    for i in range(num_particles):
+        part = system.storage.getParticle(i)
         moltmp = moltmp+1
+        pos = part.pos
+        
+        if (unfold):
+            # unfold position
+            for dir in range(3):
+                pos[dir] += part.image[dir] * size[dir]
+        
         #ATOM      1  N   ALA A   2      12.953  66.007  46.200  1.00 39.81           N  
         pdb.write("%-6s%5d  %-3s %3s %1s%4s %11.3f %7.3f %7.3f  0.00 00.00 %11s  \n" %
-                  ("ATOM", part.id, "FE", "UNX", "F", mol, part.pos[0], part.pos[1], part.pos[2], "T00"+str(part.type)))
+                  ("ATOM", part.id, "FE", "UNX", "F", mol, pos[0], pos[1], pos[2], "T00"+str(part.type)))
         if moltmp == 4:
             mol = mol+1
             moltmp = 0
@@ -206,7 +214,7 @@ vl = espresso.VerletListAdress(system, cutoff=rc+skin, dEx=ex_size, dHy=hy_size,
 
 # non-bonded potentials
 # Tabulated WCA between AT and tabulated Morse between CG particles
-interNB = espresso.interaction.VerletListAdressTabulated(vl, ftpl)  
+interNB = espresso.interaction.VerletListAdressTabulated(vl, ftpl)
 potWCA = espresso.interaction.Tabulated(itype=2, filename=tabWCA, cutoff=rca) # AT
 potMorse = espresso.interaction.Tabulated(itype=2, filename=tabMorse, cutoff=rc) # CG
 interNB.setPotential(type1=0, type2=0, potential=potMorse) # CG
@@ -277,28 +285,12 @@ for s in range(1, intervals + 1):
   Eb = interFENE.computeEnergy()
   sys.stdout.write(fmt % (step, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
   system.storage.decompose()
-#
-  # print particle properties
-#  for i in range(num_particles-1, num_particles+num_particlesCG): # CG particles
-#    id   = system.storage.getParticle(i).id
-#    pos  = system.storage.getParticle(i).pos
-#    type = system.storage.getParticle(i).type
-#    mass = system.storage.getParticle(i).mass
-#    q    = system.storage.getParticle(i).q
-#    v    = system.storage.getParticle(i).v
-#    f    = system.storage.getParticle(i).f
-#    print "%i %s %i %f %f %s %s" % (id, pos, type, mass, q, v, f)
-#
-#  for i in range(num_particles-1, num_particles+num_particlesCG): # CG particles
-#  for i in range(num_particles+num_particlesCG): # all particles
 
-  if writepdb == True:
-      #print "writing PDB ..."
-      particles = []
-      for i in range(num_particles): # AT particles
-          particles.append(system.storage.getParticle(i))
-      make_pdb(particles, outfile="atomsADR", step=s)
-#
+  if (writepdb):
+      #  for i in range(num_particles-1, num_particles+num_particlesCG): # CG particles
+      #num_particles = num_particles+num_particlesCG # all particles
+      make_pdb(system, num_particles, size, unfold=False, outfile="atomsADR", step=s) # AT particles
+
 end_time = time.clock()
 
 #start_time = time.clock()
