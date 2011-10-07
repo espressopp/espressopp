@@ -64,7 +64,17 @@ class ParticleLocal(object):
     def pos(self): return self.__getTmp().pos
     @pos.setter
     def pos(self, val): self.__getTmp().pos = toReal3DFromVector(val)
-
+    
+    @property
+    def imageBox(self): return self.__getTmp().imageBox
+    @imageBox.setter
+    def imageBox(self, val): self.__getTmp().imageBox = toInt3DFromVector(val)
+    
+    @property
+    def isGhost(self): return self.__getTmp().isGhost
+    @isGhost.setter
+    def isGhost(self, val): self.__getTmp().isGhost = val
+    
     def getLocalData(self, key):
         tmp = self.storage.lookupRealParticle(self.pid)
         if tmp is not None:
@@ -75,7 +85,7 @@ class ParticleLocal(object):
     def locateParticle(self):
         tmp = self.storage.lookupRealParticle(self.pid)
         return (tmp is not None)
-
+    
 if pmi.isController:
     class Particle(object):
         __metaclass__ = pmi.Proxy

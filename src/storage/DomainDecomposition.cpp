@@ -289,7 +289,8 @@ namespace espresso {
                         LOG4ESPP_DEBUG(logger, "take another loop: particle " << part.id()
                                 << " @ " << pos <<
                                 " is not inside node domain after neighbor exchange");
-                        if (isnan(pos[0]) || isnan(pos[1]) || isnan(pos[2])) {
+                        // isnan function is C99 only, x != x is only true if x == nan
+                        if (pos[0] != pos[0] || pos[1] != pos[1] || pos[2] != pos[2]) {
                             // TODO: error handling
                             LOG4ESPP_ERROR(logger, "particle " << part.id() <<
                                     " has moved to outer space (one or more coordinates are nan)");
@@ -353,7 +354,8 @@ namespace espresso {
                                 << " @ " << part.position()
                                 << " is not inside node domain after neighbor exchange");
                         const Real3D& pos = part.position();
-                        if (isnan(pos[0]) || isnan(pos[1]) || isnan(pos[2])) {
+                        // isnan function is C99 only, x != x is only true if x == nan
+                        if (pos[0] != pos[0] || pos[1] != pos[1] || pos[2] != pos[2]) {
                             LOG4ESPP_ERROR(logger, "particle " << part.id() <<
                                     " has moved to outer space (one or more coordinates are nan)");
                         } else {

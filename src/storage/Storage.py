@@ -125,13 +125,34 @@ class StorageLocal(object):
                     if index_mass >= 0:
                         storedParticle.mass = particle[index_mass]
  
-    
+    def modifyParticle(self, pid, property, value, decompose='yes'):
+        """
+        This routine allows to modify any properties of an already existing particle
+        where only one processor modifies the particle in its local storage.
+        
+        Example: modifyParticle(pid, 'pos', Real3D(new_x, new_y, new_z))
 
+        """
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            particle = self.getParticle(pid)
+            if particle:
+                if   property.lower() == "id"   : raise "particles pid cannot be modified !"
+                elif property.lower() == "pos"  : particle.pos  = value
+                elif property.lower() == "type" : particle.type = value
+                elif property.lower() == "mass" : particle.mass = value
+                elif property.lower() == "v"    : particle.v    = value
+                elif property.lower() == "f"    : particle.f    = value
+                elif property.lower() == "q"    : particle.q    = value
+                else: raise "unknown particle property: %s" % property    
+
+            if (decompose == 'yes'):
+                self.cxxclass.decompose(self)
+            
 if pmi.isController:
     class Storage(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            pmicall = [ "decompose", "addParticles", "setFixedTuples" ],
+            pmicall = [ "decompose", "addParticles", "setFixedTuples", "modifyParticle" ],
             pmiproperty = [ "system" ]
             )
 

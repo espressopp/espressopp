@@ -26,6 +26,18 @@ class FixedPairListFENELocal(InteractionLocal, interaction_FixedPairListFENE):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
+    def getPotential(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self)
+
+    def setFixedPairList(self, fixedpairlist):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setFixedPairList(self, fixedpairlist)
+
+    def getFixedPairList(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getFixedPairList(self)
+
 if pmi.isController:
     class FENE(Potential):
         'The FENE potential.'
@@ -38,6 +50,6 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.FixedPairListFENELocal',
-            pmicall = ['setPotential']
+            pmicall = ['setPotential','getPotential','setFixedPairList', 'getFixedPairList']
             )
 

@@ -16,6 +16,11 @@ class FixedPairListLocal(_espresso.FixedPairList):
         if pmi.workerIsActive():
             return self.cxxclass.add(self, pid1, pid2)
 
+    def size(self):
+        'count number of bonds in GlobalPairList, involves global reduction'
+        if pmi.workerIsActive():
+            return self.cxxclass.size(self)
+
     def addBonds(self, bondlist):
         """
         Each processor takes the broadcasted bondlist and
@@ -28,11 +33,18 @@ class FixedPairListLocal(_espresso.FixedPairList):
                 pid1, pid2 = bond
                 self.cxxclass.add(self, pid1, pid2)
 
+    def getBonds(self):
+        'return the bonds of the GlobalPairList'
+        if pmi.workerIsActive():
+          bonds=self.cxxclass.getBonds(self)
+          return bonds 
+
 if pmi.isController:
     class FixedPairList(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espresso.FixedPairListLocal',
             localcall = [ "add" ],
-            pmicall = [ "addBonds" ]
+            pmicall = [ "addBonds" ],
+            pmiinvoke = ['getBonds', 'size']
             )

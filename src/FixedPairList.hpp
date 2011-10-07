@@ -4,7 +4,7 @@
 
 #include "log4espp.hpp"
 #include "types.hpp"
-
+#include "python.hpp"
 #include "Particle.hpp"
 #include "esutil/ESPPIterator.hpp"
 #include <boost/unordered_map.hpp>
@@ -36,7 +36,14 @@ namespace espresso {
 		void afterRecvParticles(ParticleList& pl, class InBuffer& buf);
 		virtual void onParticlesChanged();
 
-		static void registerPython();
+	    python::list getBonds();
+
+	    /** Get the number of bonds in the GlobalPairs list */
+	    int size() {
+	    	return globalPairs.size();
+	    }
+
+	    static void registerPython();
 
 	  private:
 		static LOG4ESPP_DECL_LOGGER(theLogger);

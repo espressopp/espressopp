@@ -33,6 +33,7 @@ Example (not complete):
 
 from espresso import pmi
 from espresso.esutil import cxxinit
+from espresso.Exceptions import Error
 
 import _espresso
 import MPI
@@ -53,6 +54,23 @@ class SystemLocal(_espresso.System):
         'add a short range list interaction'
         if pmi.workerIsActive():
             return self.cxxclass.addInteraction(self, interaction)
+
+    def getNumberOfInteractions(self):
+        'get number of interactions of the system'
+        if pmi.workerIsActive():
+            return self.cxxclass.getNumberOfInteractions(self)
+
+    def getInteraction(self, number):
+        'get python object of the one single interaction number i' 
+        if pmi.workerIsActive():
+            ni = self.getNumberOfInteractions()
+            if ni > 0:
+                if number >=0 and number < ni: 
+                    return self.cxxclass.getInteraction(self, number)
+                else:
+                    raise Error("Interaction number %i does not exist" % number)
+            else:
+                raise Error("interaction list of system is empty")
 
 if pmi.isController:
     class System(object):
