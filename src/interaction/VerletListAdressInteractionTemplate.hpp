@@ -90,7 +90,6 @@ namespace espresso {
     VerletListAdressInteractionTemplate < _Potential >::
     addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
-      //std::cout << "add forces computed by the Verlet List" << "\n";
 
       // Pairs not inside the AdResS Zone (CG region)
       for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
@@ -100,66 +99,19 @@ namespace espresso {
         int type1 = p1.type();
         int type2 = p2.type();
 
-        //Real3D dist = p1.position() - p2.position();
-        //real distSqr = dist.sqr();
-        //std::cout << "CG ids: " << p1.id() << " - " << p2.id() <<  " (" << sqrt(distSqr) << ")" << " \n";
-        //std::cout << "CG types: " << type1 << ", " << type2 <<  " \n";
-
         const Potential &potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
 
-        //std::cout << "CG forces ...\n";
+        // CG forces
         if(potential._computeForce(force, p1, p2)) {
           p1.force() += force;
           p2.force() -= force;
-
-          //std::cout << p1.id() << "-" << p2.id() << " CG force: (" << force << ")\n";
-
-          /*
-          // loop over CG particles and overwrite AT forces and velocity
-          FixedTupleList::iterator it3;
-          FixedTupleList::iterator it4;
-          it3 = fixedtupleList->find(&p1);
-          it4 = fixedtupleList->find(&p2);
-
-          if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end()) {
-
-              Real3D force1(0.0, 0.0, 0.0);
-              Real3D force2(0.0, 0.0, 0.0);
-              force1 = force * p1.getMass();
-              force2 = force * p2.getMass();
-
-              std::vector<Particle*> atList1;
-              std::vector<Particle*> atList2;
-              atList1 = it3->second;
-              atList2 = it4->second;
-
-              for (std::vector<Particle*>::iterator itv = atList1.begin();
-                      itv != atList1.end(); ++itv) {
-                  Particle &p3 = **itv;
-                  p3.velocity() = p1.velocity(); // overwrite velocity
-                  p3.force() += force1 / p1.getMass();
-              }
-
-              for (std::vector<Particle*>::iterator itv2 = atList2.begin();
-                      itv2 != atList2.end(); ++itv2) {
-                  Particle &p4 = **itv2;
-                  p4.velocity() = p2.velocity(); // overwrite velocity
-                  p4.force() -= force2 / p2.getMass();
-              }
-              //std::cout << "\n";
-          }
-          else {
-              std::cout << " one of the VP particles not found in tuples: " << p1.id() <<
-                      "-" << p1.ghost() << ", " << p2.id() << "-" << p2.ghost();
-              std::cout << " (" << p1.position() << ") (" << p2.position() << ") ";
-          }*/
-
         }
       }
 
       // loop over CG particles and overwrite AT forces and velocity
+      // this makes the AT particles move along with CG particles
       std::set<Particle*> cgZone = verletList->getCGZone();
       for (std::set<Particle*>::iterator it=cgZone.begin();
                     it != cgZone.end(); ++it) {
@@ -182,15 +134,15 @@ namespace espresso {
                 }
 
             }
-            else {
+            else { // this should not happen
                 std::cout << " VP particle not found in tuples: " << p1.id() << "-" << p1.ghost();
+                exit(1);
+                return;
             }
       }
 
       // compute center of mass and weights for virtual particles in Adress zone (HY and AT region)
       std::set<Particle*> adrZone = verletList->getAdrZone();
-      //std::cout << "adrsize: " << adrZone.size() << "\n";
-      //std::cout << "Computing CM ...\n";
       for (std::set<Particle*>::iterator it=adrZone.begin();
               it != adrZone.end(); ++it) {
 
@@ -249,7 +201,7 @@ namespace espresso {
               real min1 = distsq1;
               //std::cout << sqrt(distsq1) << "\n";
 
-              // calculate distance to nearest adress particle
+              // calculate distance to nearest adress particle or center
               for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                    pa = **it2;
                    d1 = vp.position() - pa;
@@ -277,16 +229,16 @@ namespace espresso {
               //if (w1 == 1 || w2 == 1) std::cout << p1.id() << " ";
               //std::cout << vp.id() << " weight: " << w << "\n";
           }
-          else {
+          else { // this should not happen
               std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
               std::cout << " (" << vp.position() << ")\n";
+              exit(1);
+              return;
           }
       }
 
 
-
       // Compute forces (AT and VP) of Pairs inside AdResS zone
-      //std::cout << "Computing forces of adress pairs ...\n";
       for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it) {
 
          // these are the two VP interacting
@@ -298,22 +250,16 @@ namespace espresso {
          real w2 = weights.find(&p2)->second;
          real w12 = w1 * w2;
 
-         //TODO check distance and if necessary skip force calculation
          // force between VP particles
          int type1 = p1.type();
          int type2 = p2.type();
-         //std::cout << " ---- get potential ---- \n";
          const Potential &potential = getPotential(type1, type2);
          Real3D forcevp(0.0, 0.0, 0.0);
-         if (w12 != 1) { // calculate if in hybrid region (and not in AT region)
-             //std::cout << "VP forces, ("<< p1.id() << ", " << p2.id() << ") w1: " << w1 << " w2: " << w2 << "\n";
+         if (w12 != 1) { // calculate VP force if both VP are outside AT region (CG-HY, HY-HY)
              if(potential._computeForce(forcevp, p1, p2)) {
                  forcevp = (1 - w12) * forcevp;
                  p1.force() += forcevp;
                  p2.force() -= forcevp;
-
-                 //std::cout << p1.id() << "-" << p2.id() << " VP force: (" << forcevp << ")\n";
-
              }
          }
          /*
@@ -321,13 +267,12 @@ namespace espresso {
              std::cout << "skipping VP forces...\n";
          }*/
 
-         if (w12 != 0) { // calculate if not in CG region
-             // iterate through atomistic particles in fixedtuplelist
+         // force between AT particles
+         if (w12 != 0) { // calculate AT force if both VP are outside CG region (HY-HY, HY-AT, AT-AT)
              FixedTupleList::iterator it3;
              FixedTupleList::iterator it4;
              it3 = fixedtupleList->find(&p1);
              it4 = fixedtupleList->find(&p2);
-
 
              //std::cout << "Interaction " << p1.id() << " - " << p2.id() << "\n";
              if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end()) {
@@ -348,44 +293,25 @@ namespace espresso {
 
                          Particle &p4 = **itv2;
 
-                         // TODO check distance and if necessary skip force calculation
                          // AT forces
-                         //std::cout << " ---- get potential ---- \n";
                          const Potential &potential = getPotential(p3.type(), p4.type());
                          Real3D force(0.0, 0.0, 0.0);
                          if(potential._computeForce(force, p3, p4)) {
                              force = w12 * force;
                              p3.force() += force;
                              p4.force() -= force;
-                             //std::cout << " potential OK for " << p3.id() << " - " << p4.id() << "\n";
-
-                             /*
-                             real dist = sqrt((p3.position() - p4.position()).sqr());
-                             if (dist < 0.8) {
-                                std::cout << p3.id() << "-" << p3.ghost()
-                                        << " - " << p4.id() << "-" << p4.ghost()
-                                        << " AT force: (" << force << ") "
-                                        << "(" << p3.position() << ") "
-                                        << "(" << p4.position() << ") "
-                                        << " dist (" << dist << ")\n";
-                             }*/
-
-
                          }
-                         /*
-                         else {
-                             std::cout << " too far " << p3.id() << " - " << p4.id() << "\n";
-                         }*/
 
                      }
 
                  }
-                 //std::cout << "\n";
              }
-             else {
+             else { // this should not happen
                  std::cout << " one of the VP particles not found in tuples: " << p1.id() << "-" <<
                          p1.ghost() << ", " << p2.id() << "-" << p2.ghost();
                  std::cout << " (" << p1.position() << ") (" << p2.position() << ")\n";
+                 exit(1);
+                 return;
              }
          }
       }
@@ -393,7 +319,6 @@ namespace espresso {
       weights.clear();
 
       // distribute forces from VP to AT
-      //std::cout << "Updating forces...\n";
       for (std::set<Particle*>::iterator it=adrZone.begin();
                 it != adrZone.end(); ++it) {
 
@@ -402,8 +327,6 @@ namespace espresso {
         FixedTupleList::iterator it3;
         it3 = fixedtupleList->find(&vp);
 
-        //std::cout << " VP id: " << vp.id() << "\n";
-
         if (it3 != fixedtupleList->end()) {
 
             std::vector<Particle*> atList;
@@ -411,35 +334,29 @@ namespace espresso {
 
             // total mass of AT particles belonging to a VP
             real M = vp.getMass(); // instead of the code below
-            /*
-            real M = 0.0;
+            /*real M = 0.0;
             for (std::vector<Particle*>::iterator it2 = atList.begin();
                                  it2 != atList.end(); ++it2) {
                 Particle &at = **it2;
                 M += at.mass();
                 //std::cout << "at id: " << at.id() << "-" << at.ghost() <<
                 //" pos: " << at.position() << " mass: " << at.mass() << "\n";
-            }
-            */
-
+            }*/
 
             // update force of AT particles belonging to a VP
             for (std::vector<Particle*>::iterator it2 = atList.begin();
                                  it2 != atList.end(); ++it2) {
                 Particle &at = **it2;
-                //std::cout << at.id() << ": old AT force: " << at.force() << "\n";
                 at.force() += at.mass() * vp.force() / M;
-                //std::cout << " AT mass: " << at.mass() << " VP force: " << vp.force() << " M: " << M << "\n";
-                //std::cout << at.id() << ": new AT force: " << at.force() << "\n";
             }
         }
-        else {
+        else { // this should not happen
             std::cout << " particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
             std::cout << " (" << vp.position() << ")\n";
+            exit(1);
+            return;
         }
       }
-
-      //std::cout << "\n\n";
     }
     
     template < typename _Potential >
@@ -460,7 +377,6 @@ namespace espresso {
         e += potential._computeEnergy(p1, p2);
       }
 
-      // adress TODO
       //std::cout << "compute energy of the AdReSs pairs" << "\n";
       for (PairList::Iterator it(verletList->getAdrPairs());
              it.isValid(); ++it) {
@@ -503,7 +419,6 @@ namespace espresso {
         }
       }
 
-      //adress TODO
       for (PairList::Iterator it(verletList->getAdrPairs());
                  it.isValid(); ++it) {
               Particle &p1 = *it->first;
@@ -544,7 +459,6 @@ namespace espresso {
         }
       }
 
-      // adress TODO
       for (PairList::Iterator it(verletList->getAdrPairs());
                  it.isValid(); ++it) {
               Particle &p1 = *it->first;
