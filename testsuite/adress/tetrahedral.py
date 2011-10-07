@@ -41,7 +41,7 @@ def make_pdb(system, num_particles, size, unfold=False, outfile="output", step=0
         if (unfold):
             # unfold position
             for dir in range(3):
-                pos[dir] += part.image[dir] * size[dir]
+                pos[dir] += part.imageBox[dir] * size[dir]
         
         #ATOM      1  N   ALA A   2      12.953  66.007  46.200  1.00 39.81           N  
         pdb.write("%-6s%5d  %-3s %3s %1s%4s %11.3f %7.3f %7.3f  0.00 00.00 %11s  \n" %
