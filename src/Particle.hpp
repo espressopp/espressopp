@@ -202,10 +202,13 @@ namespace espresso {
 
     Int3D& image() { return l.i; }
     const Int3D& image() const { return l.i; }
-    Int3D getImage() const { return l.i; }
+    Int3D getImageBox() const { return l.i; }
+    void setImageBox(const Int3D& img) { l.i = img; }
 
     bool& ghost() { return l.ghost; }
     const bool& ghost() const { return l.ghost; }
+    bool getGhostStatus() const { return l.ghost; }
+    void setGhostStatus(const bool& gs) { l.ghost = gs; }
     
     static void registerPython();
   
