@@ -3,12 +3,14 @@ import random
 from espresso import Real3D
 from espresso.Exceptions import Error
 
-def polymerRW(pid, startpos, numberOfMonomers, bondlength):
+def polymerRW(pid, startpos, numberOfMonomers, bondlength, return_angles='False'):
 	x         = startpos[0]
 	y         = startpos[1]
 	z         = startpos[2]
 	positions = [ Real3D(x, y, z) ]
 	bonds     = []
+	if return_angles == 'True':
+		angles    = []
 	for i in range(numberOfMonomers-1):
 		nextZ = (2.0*random.uniform(0,1)-1.0)*bondlength;
 		rr    = math.sqrt(bondlength*bondlength-nextZ*nextZ);
@@ -23,8 +25,13 @@ def polymerRW(pid, startpos, numberOfMonomers, bondlength):
 		positions.append(Real3D(x, y, z))
 		# update bond list:
 		bonds.append((pid+i,pid+i+1))
-		
-	return positions, bonds
+		if return_angles == 'True':
+		    if i < numberOfMonomers-2:
+			    angles.append((pid+i, pid+i+1, pid+i+2))
+	if return_angles == 'True':	
+	    return positions, bonds, angles
+	else:
+		return positions, bonds
 	
 
 """

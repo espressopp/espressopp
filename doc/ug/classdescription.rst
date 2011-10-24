@@ -1,5 +1,5 @@
-ESPResSo++ Class Description
-============================
+ESPResSo++ User Interface - Class Description
+=============================================
 .. toctree::
    :maxdepth: 2
    
@@ -7,3 +7,5 @@ ESPResSo++ Class Description
    espresso.System.rst
    espresso.bc.BC.rst
    espresso.bc.OrthorhombicBC.rst
+   espresso.storage.rst
+

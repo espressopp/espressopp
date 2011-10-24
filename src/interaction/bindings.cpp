@@ -9,6 +9,7 @@
 #include "CoulombTruncated.hpp"
 #include "SoftCosine.hpp"
 #include "FENE.hpp"
+#include "FENECapped.hpp"
 #include "Harmonic.hpp"
 #include "Tabulated.hpp"
 #include "TabulatedAngular.hpp"
@@ -35,6 +36,7 @@ namespace espresso {
       SoftCosine::registerPython();
       Tabulated::registerPython();
       FENE::registerPython();
+      FENECapped::registerPython();
       Harmonic::registerPython();
       AngularPotential::registerPython();
       TabulatedAngular::registerPython();

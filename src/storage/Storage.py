@@ -1,3 +1,29 @@
+"""
+************************************
+**Storage** - Storage Object
+************************************
+
+This is the abstract base class for all storage objects.
+It cannot be used directly. All derived classes implement at least
+the following methods:
+
+* `decompose()`
+* `addParticle(pid, pos)`
+* `getParticle(pid)`
+* `addAdrParticle(pid, pos, last_pos)`
+* `setFixedTuples(fixed_tuple_list)`
+* `addParticles(particle_list, *properties)`
+* `modifyParticle(pid, property, value, decompose='yes')`
+
+The property 'system' returns the System object of the storage.
+
+Examples:
+>>> s.storage.addParticles([[1, espresso.Real3D(3,3,3)], [2, espresso.Real3D(4,4,4)]],'id','pos')
+>>> s.storage.decompose()
+
+"""
+
+
 from espresso import pmi
 import MPI
 import logging
