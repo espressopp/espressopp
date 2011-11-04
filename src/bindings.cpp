@@ -7,7 +7,6 @@
 #include <ParticleGroup.hpp>
 #include <System.hpp>
 #include <VerletList.hpp>
-#include <VerletListAutoBonds.hpp>
 #include <VerletListAdress.hpp>
 #include <FixedPairList.hpp>
 #include <FixedPairListAdress.hpp>
@@ -31,7 +30,6 @@ void espresso::registerPython() {
   espresso::ParticleGroup::registerPython();
   espresso::System::registerPython();
   espresso::VerletList::registerPython();
-  espresso::VerletListAutoBonds::registerPython();
   espresso::VerletListAdress::registerPython();
   espresso::FixedPairList::registerPython();
   espresso::FixedPairListAdress::registerPython();

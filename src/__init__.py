@@ -13,7 +13,6 @@ from espresso.Particle import *
 from espresso.ParticleGroup import *
 from espresso.System import *
 from espresso.VerletList import *
-from espresso.VerletListAutoBonds import *
 from espresso.VerletListAdress import *
 from espresso.FixedPairList import *
 from espresso.FixedPairListAdress import *
