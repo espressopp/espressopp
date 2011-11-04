@@ -34,6 +34,7 @@ namespace espresso {
       private:
 
         bool resortFlag;  //!< true implies need for resort of particles
+        real maxDist;
 
         real maxCut;
 

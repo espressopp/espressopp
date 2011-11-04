@@ -21,6 +21,7 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "construct VelocityVerletAdress");
 
       resortFlag = true;
+      maxDist = 0.0;
     }
 
     /*****************************************************************************/
@@ -59,8 +60,6 @@ namespace espresso {
       // no more needed: setUp();
 
       // Before start make sure that particles are on the right processor
-
-      real maxDist;
 
       if (resortFlag) {
         // time = timeIntegrate.getElapsedTime();
