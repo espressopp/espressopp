@@ -2,6 +2,7 @@ import _espresso
 import esutil
 import pmi
 from espresso import toReal3DFromVector, MPI
+from espresso.Exceptions import ParticleDoesNotExistHere
 
 # Controller Particle:
 # * requests are directly forwarded
@@ -37,7 +38,7 @@ class ParticleLocal(object):
         tmp = self.storage.lookupLocalParticle(self.pid)
         if tmp is None:
             # TODO: Exception
-            raise 'Particle not here!'
+            raise ParticleDoesNotExistHere('pid='+str(self.pid)+' rank='+str(pmi.rank) )
         else:
             return tmp
 

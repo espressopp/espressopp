@@ -68,6 +68,14 @@ namespace espresso {
       
       real getEpsilon() const { return epsilon; }
 
+      void setCaprad(real _caprad) {
+        caprad = _caprad;
+        updateAutoShift();
+        preset();
+      }
+
+      real getCaprad() const { return caprad; }
+
       void setSigma(real _sigma) { 
         sigma = _sigma; 
         updateAutoShift();
