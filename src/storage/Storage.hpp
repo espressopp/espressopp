@@ -176,6 +176,7 @@ namespace espresso {
       void setFixedTuples(shared_ptr<FixedTupleList> _fixedtupleList){
           fixedtupleList = _fixedtupleList;
       }
+      shared_ptr<FixedTupleList> getFixedTuples() { return fixedtupleList; }
       ParticleList&    getAdrATParticles()  { return AdrATParticles; }
       //ParticleListAdr& getAdrATParticlesG() { return AdrATParticlesG; }
       std::list<ParticleList>& getAdrATParticlesG() { return AdrATParticlesG; }

@@ -40,8 +40,8 @@ namespace espresso {
 		static void registerPython();
 
 	  protected:
-		// this connects to fixedtuple list and triggers beforeSendATParticles()
-		boost::signals2::connection con4;
+		// fixedtuple list connects to this and triggers beforeSendATParticles()
+		boost::signals2::connection con;
 
 	  private:
 		shared_ptr<FixedTupleList> fixedtupleList;

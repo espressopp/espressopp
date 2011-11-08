@@ -93,16 +93,15 @@ class StorageLocal(object):
 
                 if index_adrAT >= 0:
                     if particle[index_adrAT] == 0:
-                        #print "%d:  addParticle %d, last_pos=pos %d, %d, %d"%(pmi._MPIcomm.rank,id,pos[0], pos[1], pos[2])
+                        #print "%d:  addParticle %d, last_pos=pos %f, %f, %f"%(pmi._MPIcomm.rank,id,pos[0], pos[1], pos[2])
                         storedParticle = self.cxxclass.addParticle(self, id, pos)
                         last_pos = pos
                     else:
-                        #print "%d:  addAdrATparticle %d, last_pos %d, %d, %d"%(pmi._MPIcomm.rank,id,last_pos[0], last_pos[1], last_pos[2])
+                        #print "%d:  addAdrATparticle %d, pos %f, %f, %f, last_pos %f, %f, %f"%(pmi._MPIcomm.rank,id,pos[0],pos[1],pos[2],last_pos[0], last_pos[1], last_pos[2])
                         storedParticle = self.cxxclass.addAdrATParticle(self, id, pos, last_pos)
                 else:
-                    #print "%d:  addParticle %d, last_pos=pos %d, %d, %d"%(pmi._MPIcomm.rank,id,pos[0], pos[1], pos[2])
+                    #print "%d:  addParticle %d, last_pos=pos %f, %f, %f"%(pmi._MPIcomm.rank,id,pos[0], pos[1], pos[2])
                     storedParticle = self.cxxclass.addParticle(self, id, pos)
-                    last_pos = pos
                     
                 if storedParticle != None:
                     self.logger.debug("Processor %d stores particle id = %d"%(pmi._MPIcomm.rank, id))

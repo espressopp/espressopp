@@ -14,7 +14,7 @@ class FixedTupleListLocal(_espresso.FixedTupleList):
     def addTuples(self, tuplelist):
         """
         Each processor takes the broadcasted tuplelist and
-        adds those tuples whose first particle is owned by
+        adds those tuples whose virtual particle is owned by
         this processor.
         """
         if pmi.workerIsActive():

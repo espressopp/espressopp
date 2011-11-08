@@ -22,15 +22,7 @@ namespace espresso {
           : FixedPairList(_storage), fixedtupleList(_fixedtupleList) {
     LOG4ESPP_INFO(theLogger, "construct FixedPairListAdress");
 
-    /*
-    con1 = storage->beforeSendParticles.connect
-      (boost::bind(&FixedPairList::beforeSendParticles, this, _1, _2));
-    con2 = storage->afterRecvParticles.connect
-      (boost::bind(&FixedPairList::afterRecvParticles, this, _1, _2));
-    con3 = storage->onParticlesChanged.connect
-      (boost::bind(&FixedPairListAdress::onParticlesChanged, this));
-    */
-    con4 = fixedtupleList->beforeSendATParticles.connect
+    con = fixedtupleList->beforeSendATParticles.connect
           (boost::bind(&FixedPairListAdress::beforeSendATParticles, this, _1, _2));
   }
 
@@ -38,9 +30,7 @@ namespace espresso {
 
     LOG4ESPP_INFO(theLogger, "~FixedPairListAdress");
 
-    con1.disconnect();
-    con2.disconnect();
-    con3.disconnect();
+    con.disconnect();
   }
 
 

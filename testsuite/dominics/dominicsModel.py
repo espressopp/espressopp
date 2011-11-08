@@ -19,8 +19,8 @@ from espresso.tools import timers
 
 
 # simulation parameters (nvt = False is nve)
-steps = 250
-check = steps/10
+steps = 10000
+check = steps/100
 rc    = 1.1  # Verlet list cutoff
 skin  = 0.3
 timestep = 0.0004

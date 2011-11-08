@@ -13,14 +13,17 @@ from espresso.tools.convert import espresso_old
 from espresso.tools import decomp
 from espresso.tools import timers
 
+#logging.getLogger("StorageAdress").setLevel(logging.DEBUG)
+#logging.getLogger("BC").setLevel(logging.DEBUG)
+
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
-steps = 10000
+steps = 10
 rc = 2.31 # CG cutoff, Morse
 rca = 1.122462048309373 # AT cutoff (2^(1/6)), WCA
 skin = 0.8
 nvt = True
 timestep = 0.001
-intervals = 10
+intervals = 1
 
 ex_size = 12.0
 hy_size = 2.5
@@ -118,71 +121,51 @@ cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 system.storage = espresso.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
 
 
-## add CG and AT particles
-#allParticles = []
-#tuples = []
-#idx = 0 # just an index
-#for pidCG in range(num_particles, num_particles+num_particlesCG):
-#    #print pidCG,
-#    tmptuple = [pidCG] # first pid in tuple is pid of CG/VP particle
-#    allParticles.append([pidCG,
-#                         Real3D(x[pidCG], y[pidCG], z[pidCG]),
-#                         Real3D(vx[pidCG], vy[pidCG], vz[pidCG]),
-#                         Real3D(fx[pidCG], fy[pidCG], fz[pidCG]), 0, 4, 0])
-#    
-#    for pidAT in range(4): # each CG has 4 AT particles
-#        #print pidAT+idx,
-#        tmptuple.append(pidAT+idx) # other pids in tuple are pids of AT particles
-#        allParticles.append([pidAT+idx, Real3D(x[pidAT+idx], y[pidAT+idx], z[pidAT+idx]),
-#                             Real3D(vx[pidAT+idx], vy[pidAT+idx], vz[pidAT+idx]),
-#                             Real3D(fx[pidAT+idx], fy[pidAT+idx], fz[pidAT+idx]), 1, 1, 1])
-#        
-#    tuples.append(tmptuple) # add tuples
-#    idx += 4
-
-
-
-# add AT particles
+# prepare AT particles
 allParticlesAT = []
 allParticles = []
 tuples = []
 for pidAT in range(num_particles):
     #print pidAT,
-    allParticlesAT.append([pidAT, # add these particles just temporarly! 
+    allParticlesAT.append([pidAT, # add here these particles just temporarly! 
                          Real3D(x[pidAT], y[pidAT], z[pidAT]),
                          Real3D(vx[pidAT], vy[pidAT], vz[pidAT]),
-                         Real3D(fx[pidAT], fy[pidAT], fz[pidAT]), 1, 1, 1])
+                         Real3D(fx[pidAT], fy[pidAT], fz[pidAT]),
+                         1, 1.0, 1]) # type, mass, is AT particle
 
 # create CG particles from center of mass
 for pidCG in range(num_particlesCG):
     cmp = [0,0,0]
     cmv = [0,0,0]
     tmptuple = [pidCG+num_particles]
+    # com calculation
     for pidAT in range(4):
-        tmptuple.append(pidCG*4+pidAT)
-        pos = (allParticlesAT[pidCG*4+pidAT])[1]
-        vel = (allParticlesAT[pidCG*4+pidAT])[2]
-        cmp[0] += pos[0]
-        cmp[1] += pos[1]
-        cmp[2] += pos[2]
-        cmv[0] += vel[0]
-        cmv[1] += vel[1]
-        cmv[2] += vel[2]
-    cmp[0] /= 4
-    cmp[1] /= 4
-    cmp[2] /= 4
-    cmv[0] /= 4
-    cmv[1] /= 4
-    cmv[2] /= 4
+        pid = pidCG*4+pidAT
+        tmptuple.append(pid)
+        pos = (allParticlesAT[pid])[1]
+        vel = (allParticlesAT[pid])[2]
+        for i in range(3):
+            cmp[i] += pos[i] # masses are 1.0 so we skip multiplication
+            cmv[i] += vel[i]
+    for i in range(3):
+        cmp[i] /= 4.0 # 4.0 is the mass of molecule
+        cmv[i] /= 4.0
+        
     allParticles.append([pidCG+num_particles, # CG particle has to bo added first!
                          Real3D(cmp[0], cmp[1], cmp[2]),
                          Real3D(cmv[0], cmv[1], cmv[2]),
-                         Real3D(0, 0, 0), 0, 4, 0])
+                         Real3D(0, 0, 0),
+                         0, 4.0, 0]) # type, mass, is not AT particle
+    
     for pidAT in range(4): 
-        allParticles.append([pidCG*4+pidAT, # now the AT particles can be added
-                         Real3D(x[pidCG*4+pidAT], y[pidCG*4+pidAT], z[pidCG*4+pidAT]),
-                         Real3D(vx[pidCG*4+pidAT], vy[pidCG*4+pidAT], vz[pidCG*4+pidAT]),
-                         Real3D(fx[pidCG*4+pidAT], fy[pidCG*4+pidAT], fz[pidCG*4+pidAT]), 1, 1, 1])
+        pid = pidCG*4+pidAT
+        allParticles.append([pid, # now the AT particles can be added
+                            (allParticlesAT[pid])[1], # pos
+                            (allParticlesAT[pid])[2], # vel
+                            (allParticlesAT[pid])[3], # f
+                            (allParticlesAT[pid])[4], # type
+                            (allParticlesAT[pid])[5], # mass
+                            (allParticlesAT[pid])[6]]) # is AT particle 
         
     tuples.append(tmptuple)
     

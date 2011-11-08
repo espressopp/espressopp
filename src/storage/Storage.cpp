@@ -192,6 +192,8 @@ namespace espresso {
       getSystem()->bc->foldPosition(n.position(), n.image());
       cell = mapPositionToCellClipped(n.position());
 
+      //std::cout << "add particle: " << n.id() << " (" << n.position() << ")\n";
+
       appendIndexedParticle(cell->particles, n);
 
       LOG4ESPP_TRACE(logger, "got particle id ="
@@ -216,6 +218,7 @@ namespace espresso {
       n.position()= p;
       n.image() = Int3D(0);
 
+      //std::cout << "add ATparticle: " << n.id() << " (" << n.position() << ")\n";
 
       // fold AT particles for same amount as VP
       Real3D vpp_old = _vpp;
