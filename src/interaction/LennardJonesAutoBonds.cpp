@@ -25,8 +25,8 @@ namespace espresso {
       using namespace espresso::python;
 
       class_< LennardJonesAutoBonds, bases< Potential > >
-    	("interaction_LennardJonesAutoBonds", init< real, real, real >())
-	    .def(init< real, real, real, real>())
+    	("interaction_LennardJonesAutoBonds", init< real, real, real, shared_ptr<FixedPairList> >())
+	    .def(init< real, real, real, real, shared_ptr<FixedPairList> >())
     	.add_property("sigma", &LennardJonesAutoBonds::getSigma, &LennardJonesAutoBonds::setSigma)
     	.add_property("epsilon", &LennardJonesAutoBonds::getEpsilon, &LennardJonesAutoBonds::setEpsilon)
       ;

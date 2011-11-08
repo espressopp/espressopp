@@ -40,4 +40,15 @@ class UnknownParticleProperty(Exception):
     def __repr__(self) :
         return str(self)
 
-
+class MissingFixedPairList(Exception):
+    """ Raised to indicate, that a FixedPairList object is missing
+    """
+    def __init__(self, msg):
+        try:
+            raise Exception
+        except:
+            self.msg = msg
+    def __str__(self) :
+        return self.msg
+    def __repr__(self) :
+        return str(self)

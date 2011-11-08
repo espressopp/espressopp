@@ -1,5 +1,6 @@
 from espresso import pmi, infinity
 from espresso.esutil import *
+from espresso.Exceptions import MissingFixedPairList
 
 from espresso.interaction.Potential import *
 from espresso.interaction.Interaction import *
@@ -12,15 +13,12 @@ from _espresso import interaction_LennardJonesAutoBonds, \
 class LennardJonesAutoBondsLocal(PotentialLocal, interaction_LennardJonesAutoBonds):
     'The (local) Lennard-Jones auto bond potential.'
     def __init__(self, epsilon=1.0, sigma=1.0, 
-                 cutoff=infinity, shift="auto"):
+                 cutoff=infinity, bondlist=None):
         """Initialize the local Lennard Jones auto bonds object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            if shift =="auto":
-                cxxinit(self, interaction_LennardJonesAutoBonds, 
-                        epsilon, sigma, cutoff)
-            else:
-                cxxinit(self, interaction_LennardJonesAutoBonds, 
-                        epsilon, sigma, cutoff, shift)
+            if bondlist == None:
+              raise MissingFixedPairList('LennardsJonesAutoBonds needs a FixedPairList to be able to create new bonds')                                         
+            cxxinit(self, interaction_LennardJonesAutoBonds, epsilon, sigma, cutoff, bondlist)                
 
 class VerletListLennardJonesAutoBondsLocal(InteractionLocal, interaction_VerletListLennardJonesAutoBonds):
     'The (local) Lennard Jones auto bonds interaction using Verlet lists.'
