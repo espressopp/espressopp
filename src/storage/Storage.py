@@ -1,7 +1,34 @@
+"""
+************************************
+**Storage** - Storage Object
+************************************
+
+This is the abstract base class for all storage objects.
+It cannot be used directly. All derived classes implement at least
+the following methods:
+
+* `decompose()`
+* `addParticle(pid, pos)`
+* `getParticle(pid)`
+* `addAdrParticle(pid, pos, last_pos)`
+* `setFixedTuples(fixed_tuple_list)`
+* `addParticles(particle_list, *properties)`
+* `modifyParticle(pid, property, value, decompose='yes')`
+
+The property 'system' returns the System object of the storage.
+
+Examples:
+>>> s.storage.addParticles([[1, espresso.Real3D(3,3,3)], [2, espresso.Real3D(4,4,4)]],'id','pos')
+>>> s.storage.decompose()
+
+"""
+
+
 from espresso import pmi
 import MPI
 import logging
 from espresso import toReal3DFromVector, ParticleLocal, Particle
+from espresso.Exceptions import ParticleDoesNotExistHere
 
 class StorageLocal(object):
     """Abstract local base class for storing particles"""
@@ -104,7 +131,7 @@ class StorageLocal(object):
                     storedParticle = self.cxxclass.addParticle(self, id, pos)
                     
                 if storedParticle != None:
-                    self.logger.debug("Processor %d stores particle id = %d"%(pmi._MPIcomm.rank, id))
+                    self.logger.debug("Processor %d stores particle id = %d"%(pmi.rank, id))
                     self.logger.debug("particle property indexes: id=%i pos=%i type=%i mass=%i v=%i f=%i q=%i"%(index_id,index_pos,index_type,index_mass,index_v,index_f,index_q))
 
                     # only the owner processor writes other properties
@@ -124,7 +151,7 @@ class StorageLocal(object):
                     if index_mass >= 0:
                         storedParticle.mass = particle[index_mass]
  
-    def modifyParticle(self, pid, property, value, decompose='yes'):
+    def modifyParticle(self, pid, property, value):
         """
         This routine allows to modify any properties of an already existing particle
         where only one processor modifies the particle in its local storage.
@@ -135,17 +162,20 @@ class StorageLocal(object):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             particle = self.getParticle(pid)
             if particle:
-                if   property.lower() == "id"   : raise "particles pid cannot be modified !"
-                elif property.lower() == "pos"  : particle.pos  = value
-                elif property.lower() == "type" : particle.type = value
-                elif property.lower() == "mass" : particle.mass = value
-                elif property.lower() == "v"    : particle.v    = value
-                elif property.lower() == "f"    : particle.f    = value
-                elif property.lower() == "q"    : particle.q    = value
-                else: raise "unknown particle property: %s" % property    
-
-            if (decompose == 'yes'):
-                self.cxxclass.decompose(self)
+              try:
+                if not particle.isGhost:
+                  print "particle pid=%i rank=%i" % (pid, pmi.rank)
+                  if   property.lower() == "id"   : raise "particles pid cannot be modified !"
+                  elif property.lower() == "pos"  : particle.pos  = value
+                  elif property.lower() == "type" : particle.type = value
+                  elif property.lower() == "mass" : particle.mass = value
+                  elif property.lower() == "v"    : particle.v    = value
+                  elif property.lower() == "f"    : particle.f    = value
+                  elif property.lower() == "q"    : particle.q    = value
+                  else: raise UnknownParticleProperty( 'unknown particle property: %s' % property)
+              except ParticleDoesNotExistHere:
+                self.logger.debug("ParticleDoesNotExistHere pid=% rank=%i" % (pid, pmi.rank))
+                pass
             
 if pmi.isController:
     class Storage(object):
@@ -168,3 +198,4 @@ if pmi.isController:
 
         def getParticle(self, pid):
             return Particle(pid, self)
+

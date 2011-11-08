@@ -55,7 +55,7 @@ namespace espresso {
     /** Register this class so it can be used from Python. */
     static void registerPython();
 
-  private:
+  protected:
 
     void checkPair(Particle &pt1, Particle &pt2);
     PairList vlPairs;

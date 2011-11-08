@@ -50,6 +50,11 @@ namespace espresso {
     shortRangeInteractions.push_back(ia);
   }
 
+  void System::removeInteraction(int i)
+  {
+    shortRangeInteractions.erase(shortRangeInteractions.begin()+i);
+  }
+
   shared_ptr< interaction::Interaction > System::getInteraction(int i)
   {
     return shortRangeInteractions[i];
@@ -89,6 +94,7 @@ namespace espresso {
 //		     &System::shortRangeInteractions)
       .def_readwrite("skin", &System::skin)
       .def("addInteraction", &System::addInteraction)
+      .def("removeInteraction", &System::removeInteraction)
       .def("getInteraction", &System::getInteraction)
       .def("getNumberOfInteractions", &System::getNumberOfInteractions)
       ;

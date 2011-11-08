@@ -2,6 +2,7 @@
 #include "Potential.hpp"
 #include "Zero.hpp"
 #include "LennardJones.hpp"
+#include "LennardJonesAutoBonds.hpp"
 #include "LennardJonesCapped.hpp"
 #include "LennardJonesExpand.hpp"
 #include "LennardJonesGromacs.hpp"
@@ -9,6 +10,7 @@
 #include "CoulombTruncated.hpp"
 #include "SoftCosine.hpp"
 #include "FENE.hpp"
+#include "FENECapped.hpp"
 #include "Harmonic.hpp"
 #include "Tabulated.hpp"
 #include "TabulatedAngular.hpp"
@@ -27,6 +29,7 @@ namespace espresso {
       Potential::registerPython();
       Zero::registerPython();
       LennardJones::registerPython();
+      LennardJonesAutoBonds::registerPython();
       LennardJonesCapped::registerPython();
       LennardJonesExpand::registerPython();
       LennardJonesGromacs::registerPython();
@@ -35,6 +38,7 @@ namespace espresso {
       SoftCosine::registerPython();
       Tabulated::registerPython();
       FENE::registerPython();
+      FENECapped::registerPython();
       Harmonic::registerPython();
       AngularPotential::registerPython();
       TabulatedAngular::registerPython();

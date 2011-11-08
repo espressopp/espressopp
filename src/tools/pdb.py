@@ -14,7 +14,7 @@ def pdbwrite(filename, system):
         ypos   = particle.pos[1]
         zpos   = particle.pos[2]
         type   = particle.type
-        st = "ATOM %6d  FE  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d\n"%(count, pid, xpos, ypos, zpos, type)
+        st = "ATOM %6d  FE  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d\n"%(count, pid % 10000, xpos, ypos, zpos, type)
         file.write(st)
         count += 1
         pid   += 1

@@ -55,6 +55,11 @@ class SystemLocal(_espresso.System):
         if pmi.workerIsActive():
             return self.cxxclass.addInteraction(self, interaction)
 
+    def removeInteraction(self, number):
+        'remove a short range interaction, number is the number of the interaction in the short range interaction list'
+        if pmi.workerIsActive():
+            self.cxxclass.removeInteraction(self, number)
+
     def getNumberOfInteractions(self):
         'get number of interactions of the system'
         if pmi.workerIsActive():
@@ -79,6 +84,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espresso.SystemLocal',
             pmiproperty = ['storage', 'bc', 'rng', 'skin'],
-            pmicall = ['addInteraction','getInteraction','getNumberOfInteractions']
+            pmicall = ['addInteraction','removeInteraction','getInteraction','getNumberOfInteractions']
             )
 

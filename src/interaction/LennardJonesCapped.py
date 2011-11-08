@@ -32,6 +32,10 @@ class VerletListLennardJonesCappedLocal(InteractionLocal, interaction_VerletList
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
+    def getPotential(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self, type1, type2)
+
 class VerletListAdressLennardJonesCappedLocal(InteractionLocal, interaction_VerletListAdressLennardJonesCapped):
     'The (local) Lennard Jones interaction using Verlet lists.'
     def __init__(self, vl, fixedtupleList):
@@ -41,6 +45,10 @@ class VerletListAdressLennardJonesCappedLocal(InteractionLocal, interaction_Verl
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
+
+    def getPotential(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self, type1, type2)
 
 class CellListLennardJonesCappedLocal(InteractionLocal, interaction_CellListLennardJonesCapped):
     'The (local) Lennard Jones interaction using cell lists.'
@@ -52,6 +60,10 @@ class CellListLennardJonesCappedLocal(InteractionLocal, interaction_CellListLenn
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
+    def getPotential(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.setPotential(self, type1, type2)
+
 class FixedPairListLennardJonesCappedLocal(InteractionLocal, interaction_FixedPairListLennardJonesCapped):
     'The (local) Lennard-Jones interaction using FixedPair lists.'
     def __init__(self, system, vl, potential):
@@ -62,33 +74,37 @@ class FixedPairListLennardJonesCappedLocal(InteractionLocal, interaction_FixedPa
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
+    def getPotential(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.setPotential(self)
+
 if pmi.isController:
     class LennardJonesCapped(Potential):
         'The Lennard-Jones potential.'
         pmiproxydefs = dict(
             cls = 'espresso.interaction.LennardJonesCappedLocal',
-            pmiproperty = ['epsilon', 'sigma', 'caprad']
+            pmiproperty = ['epsilon', 'sigma', 'cutoff', 'caprad']
             )
 
     class VerletListLennardJonesCapped(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListLennardJonesCappedLocal',
-            pmicall = ['setPotential']
+            pmicall = ['setPotential', 'getPotential']
             )
 
     class VerletListAdressLennardJonesCapped(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListAdressLennardJonesCappedLocal',
-            pmicall = ['setPotential']
+            pmicall = ['setPotential', 'getPotential']
             )
 
     class CellListLennardJonesCapped(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.CellListLennardJonesCappedLocal',
-            pmicall = ['setPotential']
+            pmicall = ['setPotential', 'getPotential']
             )
         
     class FixedPairListLennardJonesCapped(Interaction):

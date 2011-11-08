@@ -29,23 +29,26 @@ namespace espresso {
 	    .def(init< real, real, real, real, real>())
     	.add_property("sigma", &LennardJonesCapped::getSigma, &LennardJonesCapped::setSigma)
     	.add_property("epsilon", &LennardJonesCapped::getEpsilon, &LennardJonesCapped::setEpsilon)
+    	.add_property("caprad", &LennardJonesCapped::getCaprad, &LennardJonesCapped::setCaprad)
       ;
 
       class_< VerletListLennardJonesCapped, bases< Interaction > >
         ("interaction_VerletListLennardJonesCapped", init< shared_ptr<VerletList> >())
-        .def("setPotential", &VerletListLennardJonesCapped::setPotential);
+        .def("setPotential", &VerletListLennardJonesCapped::setPotential)
+        .def("getPotential", &VerletListLennardJonesCapped::getPotential, return_value_policy< reference_existing_object >());
       ;
 
       class_< VerletListAdressLennardJonesCapped, bases< Interaction > >
         ("interaction_VerletListAdressLennardJonesCapped",
-           init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleList> >())
-        .def("setPotential", &VerletListAdressLennardJonesCapped::setPotential);
+         init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleList> >())
+         .def("setPotential", &VerletListAdressLennardJonesCapped::setPotential)
+         .def("getPotential", &VerletListAdressLennardJonesCapped::getPotential, return_value_policy< reference_existing_object >());
       ;
 
       class_< CellListLennardJonesCapped, bases< Interaction > >
         ("interaction_CellListLennardJonesCapped", init< shared_ptr< storage::Storage > >())
-        .def("setPotential", &CellListLennardJonesCapped::setPotential);
+        .def("setPotential", &CellListLennardJonesCapped::setPotential)
+        .def("getPotential", &CellListLennardJonesCapped::getPotential, return_value_policy< reference_existing_object >());
 	  ;
 
       class_< FixedPairListLennardJonesCapped, bases< Interaction > >

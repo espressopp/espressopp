@@ -2,6 +2,10 @@ import espresso
 import MPI
 
 def Default(box, rc=1.12246, skin=0.3, dt=0.005, temperature=None):
+  '''
+  return default system and integrator, no interactions, no particles are set
+  if tempearture is != None then Langevin thermostat is set to temperature (gamma is 1.0)
+  '''    
   system         = espresso.System()
   system.rng     = espresso.esutil.RNG()
   system.bc      = espresso.bc.OrthorhombicBC(system.rng, box)

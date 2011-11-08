@@ -21,7 +21,7 @@ Logging can be switched on in your python script with the following command:
 Example:
 
 >>> import espresso
->>> import logger
+>>> import logging
 >>> logging.getLogger("Storage").setLevel(logging.ERROR)
 
 To log everything (WARNING: this will produce **lots** of output):
