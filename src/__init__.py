@@ -19,6 +19,7 @@ from espresso.FixedPairListAdress import *
 from espresso.FixedTripleList import *
 from espresso.FixedQuadrupleList import *
 from espresso.FixedTupleList import *
+from espresso.Settle import *
 from espresso.MultiSystem import *
 from espresso.ParallelTempering import *
 

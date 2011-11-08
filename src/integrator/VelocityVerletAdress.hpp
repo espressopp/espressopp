@@ -5,6 +5,7 @@
 #include "types.hpp"
 #include "MDIntegrator.hpp"
 #include "esutil/Timer.hpp"
+#include <boost/signals2.hpp>
 
 namespace espresso {
   namespace integrator {
@@ -26,6 +27,12 @@ namespace espresso {
         
         /** Load timings in array to export to Python as a tuple. */
         void loadTimers(real t[10]);
+
+
+        // signals used for constraints
+        boost::signals2::signal0 <void> saveOldPos;
+        boost::signals2::signal0 <void> applyConstraints;
+
 
         /** Register this class so it can be used from Python. */
         static void registerPython();

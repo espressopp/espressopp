@@ -103,9 +103,11 @@ namespace espresso {
 
         LOG4ESPP_INFO(theLogger, "Next step " << i << " of " << nsteps << " starts");
 
-            time = timeIntegrate.getElapsedTime();
-            maxDist += integrate1();
-            timeInt1 += timeIntegrate.getElapsedTime() - time;
+        //saveOldPos(); // save particle positions needed for constraints
+
+        time = timeIntegrate.getElapsedTime();
+        maxDist += integrate1();
+        timeInt1 += timeIntegrate.getElapsedTime() - time;
 
         LOG4ESPP_INFO(theLogger, "maxDist = " << maxDist << ", skin/2 = " << skinHalf);
 
@@ -439,7 +441,7 @@ namespace espresso {
       using namespace espresso::python;
 
       // Note: use noncopyable and no_init for abstract classes
-      class_<VelocityVerlet, shared_ptr<VelocityVerlet>, bases<MDIntegrator> >
+      class_<VelocityVerlet, bases<MDIntegrator>, boost::noncopyable >
         ("integrator_VelocityVerlet", init< shared_ptr<System> >())
         .add_property("langevin", &VelocityVerlet::getLangevin, &VelocityVerlet::setLangevin)
         .def("getTimers", &wrapGetTimers)

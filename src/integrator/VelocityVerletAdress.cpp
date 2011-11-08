@@ -1,6 +1,7 @@
 #include <iomanip>
 #include "python.hpp"
 #include "VelocityVerletAdress.hpp"
+
 #include "Langevin.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "interaction/Interaction.hpp"
@@ -8,6 +9,7 @@
 #include "System.hpp"
 #include "storage/Storage.hpp"
 #include "mpi.hpp"
+
 
 namespace espresso {
   namespace integrator {
@@ -40,8 +42,7 @@ namespace espresso {
 
     /*****************************************************************************/
 
-    void VelocityVerletAdress::run(int nsteps)
-    {
+    void VelocityVerletAdress::run(int nsteps) {
       int nResorts = 0;
 
       real time;
@@ -92,17 +93,17 @@ namespace espresso {
 
         LOG4ESPP_INFO(theLogger, "Next step " << i << " of " << nsteps << " starts");
 
-        //std::cout << "-------------- Step " << i << " ---------------- \n";
+        saveOldPos(); // save particle positions needed for constraints
 
         time = timeIntegrate.getElapsedTime();
         maxDist += integrate1();
         timeInt1 += timeIntegrate.getElapsedTime() - time;
 
+        applyConstraints(); // apply constraints
+
         LOG4ESPP_INFO(theLogger, "maxDist = " << maxDist << ", skin/2 = " << skinHalf);
 
         if (maxDist > skinHalf) resortFlag = true;
-
-        //std::cout << "maxDist: " << maxDist << "\n";
 
         if (resortFlag) {
             time = timeIntegrate.getElapsedTime();
@@ -204,10 +205,8 @@ namespace espresso {
 
     /*****************************************************************************/
 
-    real VelocityVerletAdress::integrate1()
-    {
+    real VelocityVerletAdress::integrate1() {
       System& system = getSystemRef();
-
       CellList realCells = system.storage->getRealCells();
 
       // loop over all particles of the local cells
@@ -254,7 +253,7 @@ namespace espresso {
 
 
       // for AdResS
-      // propagete real AT particles
+      // propagate real AT particles
       ParticleList& adrATparticles = system.storage->getAdrATParticles();
       for (std::vector<Particle>::iterator it = adrATparticles.begin();
               it != adrATparticles.end(); it++) {
@@ -268,16 +267,10 @@ namespace espresso {
 
           // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt)
           Real3D deltaP = dt * it->velocity();
-          /*
-          if (it->getId() == 12573) {
-              std::cout << "Moving AT " << it->id() << " (" << &(*it) << "): from (" << it->position() << ")";
-          }*/
+          //std::cout << "Moving AT " << it->id() << " (" << &(*it) << "): from (" << it->position() << ")";
           it->position() += deltaP;
           sqDist += deltaP * deltaP;
-          /*
-          if (it->getId() == 12573) {
-              std::cout << " to (" << it->position() << ")\n";
-          }*/
+          //std::cout << " to (" << it->position() << ")\n";
 
           maxSqDist = std::max(maxSqDist, sqDist);
       }
@@ -515,6 +508,7 @@ namespace espresso {
       }
     }
 
+
     /****************************************************
     ** REGISTRATION WITH PYTHON
     ****************************************************/
@@ -524,7 +518,7 @@ namespace espresso {
       using namespace espresso::python;
 
       // Note: use noncopyable and no_init for abstract classes
-      class_<VelocityVerletAdress, shared_ptr<VelocityVerletAdress>, bases<MDIntegrator> >
+      class_< VelocityVerletAdress, bases<MDIntegrator>, boost::noncopyable >
         ("integrator_VelocityVerletAdress", init< shared_ptr<System> >())
         .add_property("langevin", &VelocityVerletAdress::getLangevin, &VelocityVerletAdress::setLangevin)
         .def("getTimers", &wrapGetTimers)

@@ -13,6 +13,7 @@
 #include <FixedTripleList.hpp>
 #include <FixedQuadrupleList.hpp>
 #include <FixedTupleList.hpp>
+#include <Settle.hpp>
 #include <Real3D.hpp>
 #include <Tensor.hpp>
 #include <Int3D.hpp>
@@ -36,6 +37,7 @@ void espresso::registerPython() {
   espresso::FixedTripleList::registerPython();
   espresso::FixedQuadrupleList::registerPython();
   espresso::FixedTupleList::registerPython();
+  espresso::Settle::registerPython();
   espresso::Real3D::registerPython();
   espresso::Tensor::registerPython();
   espresso::Int3D::registerPython();
