@@ -84,7 +84,7 @@ namespace espresso {
 
 
     /*
-     * Adapted from NAMD settle1().c
+     * Adapted from NAMD settle1()
      *
      * Reference for the SETTLE algorithm S. Miyamoto et al.,
      * J. Comp. Chem., 13, 952 (1992).
@@ -111,9 +111,11 @@ namespace espresso {
     	Particle* H1 = it->second.at(1);
     	Particle* H2 = it->second.at(2);
 
+    	/*
     	std::cout << "old  O pos: " << O->getPos() << "\n";
     	std::cout << "old H1 pos: " << H1->getPos() << "\n";
     	std::cout << "old H2 pos: " << H2->getPos() << "\n";
+    	*/
 
 
     	// --- Step1 A1' ---
@@ -208,9 +210,11 @@ namespace espresso {
     	H1->position() = Real3D(b3*m1, b3*m2, b3*m0) + d0;
     	H2->position() = Real3D(c3*m1, c3*m2, c3*m0) + d0;
 
+    	/*
     	std::cout << " new  O pos: " << O->getPos() << "\n";
         std::cout << " new H1 pos: " << H1->getPos() << "\n";
         std::cout << " new H2 pos: " << H2->getPos() << "\n";
+        */
     }
 
 
