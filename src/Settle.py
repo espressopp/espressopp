@@ -7,7 +7,7 @@ class SettleLocal(_espresso.Settle):
     'The (local) settle.'
 
     def __init__(self, storage, integrator, mO=16.0, mH=1.0, distHH=1.58, distOH=1.0):
-        'Local construction of a fixed touple list'
+        'Local construction of a settle class'
         if pmi.workerIsActive():
             cxxinit(self, _espresso.Settle, storage, integrator, mO, mH, distHH, distOH)
 

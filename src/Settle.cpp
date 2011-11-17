@@ -19,8 +19,6 @@ namespace espresso {
 
         LOG4ESPP_INFO(theLogger, "construct Settle");
 
-        std::cout << "construct settle... \n";
-
         con1 = integrator->saveOldPos.connect
           (boost::bind(&Settle::saveOldPos, this));
         con2 = integrator->applyConstraints.connect
@@ -133,7 +131,7 @@ namespace espresso {
     	Real3D c1 = H2->position() - d0;
 
     	// Vectors describing transformation from original coordinate system to
-    	// the 'primed' coordinate system as in the diagram.
+    	// the 'primed' coordinate system
     	Real3D n0 = b0.cross(c0);
     	Real3D n1 = a1.cross(n0);
     	Real3D n2 = n0.cross(n1);
