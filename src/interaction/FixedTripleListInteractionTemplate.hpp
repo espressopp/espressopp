@@ -9,6 +9,7 @@
 #include "Tensor.hpp"
 #include "Particle.hpp"
 #include "FixedTripleList.hpp"
+#include "FixedTripleListAdress.hpp"
 #include "esutil/Array2D.hpp"
 #include "bc/BC.hpp"
 #include "SystemAccess.hpp"

@@ -11,6 +11,7 @@
 #include <FixedPairList.hpp>
 #include <FixedPairListAdress.hpp>
 #include <FixedTripleList.hpp>
+#include <FixedTripleListAdress.hpp>
 #include <FixedQuadrupleList.hpp>
 #include <FixedTupleList.hpp>
 #include <Settle.hpp>
@@ -35,6 +36,7 @@ void espresso::registerPython() {
   espresso::FixedPairList::registerPython();
   espresso::FixedPairListAdress::registerPython();
   espresso::FixedTripleList::registerPython();
+  espresso::FixedTripleListAdress::registerPython();
   espresso::FixedQuadrupleList::registerPython();
   espresso::FixedTupleList::registerPython();
   espresso::Settle::registerPython();

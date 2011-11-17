@@ -32,10 +32,10 @@ namespace espresso {
 		another processor as well.
 		\return whether the triple was inserted on this processor.
 		*/
-		bool add(longint pid1, longint pid2, longint pid3);
-		void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
+		virtual bool add(longint pid1, longint pid2, longint pid3);
+		virtual void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
 		void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
-		void onParticlesChanged();
+		virtual void onParticlesChanged();
 
 		static void registerPython();
 	

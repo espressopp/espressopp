@@ -34,7 +34,7 @@ namespace espresso {
             //int getNumPart(longint pid); // get number of particles in globalmap for given pid
 
             // this signals the AT particles to rebuild AT fixed pair, triple, quadruple bonds
-            // FixedPairListAdress connects to it (TODO: triple, quadruple not yet implemented)
+            // Fixed{Pair|Triple}ListAdress connects to it (TODO: quadruple not yet implemented)
             boost::signals2::signal2 <void, std::vector<longint>&, class OutBuffer&>
                    beforeSendATParticles;
 
