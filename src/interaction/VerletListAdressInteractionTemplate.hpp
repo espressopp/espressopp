@@ -18,18 +18,20 @@
 
 namespace espresso {
   namespace interaction {
-    template < typename _Potential >
+    template < typename _PotentialAT, typename _PotentialCG >
     class VerletListAdressInteractionTemplate: public Interaction {
     
     protected:
-      typedef _Potential Potential;
+      typedef _PotentialAT PotentialAT;
+      typedef _PotentialCG PotentialCG;
     
     public:
       VerletListAdressInteractionTemplate
       (shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleList> _fixedtupleList)
                 : verletList(_verletList), fixedtupleList(_fixedtupleList) {
 
-          potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
+          potentialArrayAT = esutil::Array2D<PotentialAT, esutil::enlarge>(0, 0, PotentialAT());
+          potentialArrayCG = esutil::Array2D<PotentialCG, esutil::enlarge>(0, 0, PotentialCG());
 
           // AdResS stuff
           pidhy2 = M_PI/(verletList->getHy() * 2);
@@ -52,15 +54,27 @@ namespace espresso {
       }
 
       void
-      setPotential(int type1, int type2, const Potential &potential) {
-          potentialArray.at(type1, type2) = potential;
+      setPotentialAT(int type1, int type2, const PotentialAT &potential) {
+          potentialArrayAT.at(type1, type2) = potential;
           if (type1 != type2) { // add potential in the other direction
-             potentialArray.at(type2, type1) = potential;
+             potentialArrayAT.at(type2, type1) = potential;
           }
       }
 
-      Potential &getPotential(int type1, int type2) {
-        return potentialArray.at(type1, type2);
+      void
+      setPotentialCG(int type1, int type2, const PotentialCG &potential) {
+         potentialArrayCG.at(type1, type2) = potential;
+         if (type1 != type2) { // add potential in the other direction
+             potentialArrayCG.at(type2, type1) = potential;
+         }
+      }
+
+      PotentialAT &getPotentialAT(int type1, int type2) {
+        return potentialArrayAT.at(type1, type2);
+      }
+
+      PotentialCG &getPotentialCG(int type1, int type2) {
+        return potentialArrayCG.at(type1, type2);
       }
 
       virtual void addForces();
@@ -74,7 +88,8 @@ namespace espresso {
       int ntypes;
       shared_ptr<VerletListAdress> verletList;
       shared_ptr<FixedTupleList> fixedtupleList;
-      esutil::Array2D<Potential, esutil::enlarge> potentialArray;
+      esutil::Array2D<PotentialAT, esutil::enlarge> potentialArrayAT;
+      esutil::Array2D<PotentialCG, esutil::enlarge> potentialArrayCG;
 
       // AdResS stuff
       real pidhy2; // pi / (dhy * 2)
@@ -87,8 +102,8 @@ namespace espresso {
     //////////////////////////////////////////////////
     // INLINE IMPLEMENTATION
     //////////////////////////////////////////////////
-    template < typename _Potential > inline void
-    VerletListAdressInteractionTemplate < _Potential >::
+    template < typename _PotentialAT, typename _PotentialCG > inline void
+    VerletListAdressInteractionTemplate < _PotentialAT, _PotentialCG >::
     addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
 
@@ -100,12 +115,12 @@ namespace espresso {
         int type1 = p1.type();
         int type2 = p2.type();
 
-        const Potential &potential = getPotential(type1, type2);
+        const PotentialCG &potentialCG = getPotentialCG(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
 
         // CG forces
-        if(potential._computeForce(force, p1, p2)) {
+        if(potentialCG._computeForce(force, p1, p2)) {
           p1.force() += force;
           p2.force() -= force;
         }
@@ -254,10 +269,10 @@ namespace espresso {
          // force between VP particles
          int type1 = p1.type();
          int type2 = p2.type();
-         const Potential &potential = getPotential(type1, type2);
+         const PotentialCG &potentialCG = getPotentialCG(type1, type2);
          Real3D forcevp(0.0, 0.0, 0.0);
          if (w12 != 1) { // calculate VP force if both VP are outside AT region (CG-HY, HY-HY)
-             if(potential._computeForce(forcevp, p1, p2)) {
+             if(potentialCG._computeForce(forcevp, p1, p2)) {
                  forcevp = (1 - w12) * forcevp;
                  p1.force() += forcevp;
                  p2.force() -= forcevp;
@@ -295,9 +310,9 @@ namespace espresso {
                          Particle &p4 = **itv2;
 
                          // AT forces
-                         const Potential &potential = getPotential(p3.type(), p4.type());
+                         const PotentialAT &potentialAT = getPotentialAT(p3.type(), p4.type());
                          Real3D force(0.0, 0.0, 0.0);
-                         if(potential._computeForce(force, p3, p4)) {
+                         if(potentialAT._computeForce(force, p3, p4)) {
                              force = w12 * force;
                              p3.force() += force;
                              p4.force() -= force;
@@ -360,9 +375,9 @@ namespace espresso {
       }
     }
     
-    template < typename _Potential >
+    template < typename _PotentialAT, typename _PotentialCG >
     inline real
-    VerletListAdressInteractionTemplate < _Potential >::
+    VerletListAdressInteractionTemplate < _PotentialAT, _PotentialCG >::
     computeEnergy() {
       LOG4ESPP_INFO(theLogger, "compute energy of the Verlet list pairs");
 
@@ -374,7 +389,7 @@ namespace espresso {
         Particle &p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        const PotentialCG &potential = getPotentialCG(type1, type2);
         e += potential._computeEnergy(p1, p2);
       }
 
@@ -385,7 +400,7 @@ namespace espresso {
               Particle &p2 = *it->second;
               int type1 = p1.type();
               int type2 = p2.type();
-              const Potential &potential = getPotential(type1, type2);
+              const PotentialCG &potential = getPotentialCG(type1, type2);
               e += potential._computeEnergy(p1, p2);
       }
 
@@ -398,8 +413,8 @@ namespace espresso {
 
 
 
-    template < typename _Potential > inline real
-    VerletListAdressInteractionTemplate < _Potential >::
+    template < typename _PotentialAT, typename _PotentialCG > inline real
+    VerletListAdressInteractionTemplate < _PotentialAT, _PotentialCG >::
     computeVirial() {
       LOG4ESPP_INFO(theLogger, "compute the virial for the Verlet List");
       
@@ -411,7 +426,7 @@ namespace espresso {
         Particle &p2 = *it->second;                                      
         int type1 = p1.type();                                           
         int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        const PotentialCG &potential = getPotentialCG(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
         if(potential._computeForce(force, p1, p2)) {
@@ -426,7 +441,7 @@ namespace espresso {
               Particle &p2 = *it->second;
               int type1 = p1.type();
               int type2 = p2.type();
-              const Potential &potential = getPotential(type1, type2);
+              const PotentialCG &potential = getPotentialCG(type1, type2);
 
               Real3D force(0.0, 0.0, 0.0);
               if(potential._computeForce(force, p1, p2)) {
@@ -440,8 +455,8 @@ namespace espresso {
       return wsum; 
     }
 
-    template < typename _Potential > inline void
-    VerletListAdressInteractionTemplate < _Potential >::
+    template < typename _PotentialAT, typename _PotentialCG > inline void
+    VerletListAdressInteractionTemplate < _PotentialAT, _PotentialCG >::
     computeVirialTensor(Tensor& w) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
 
@@ -451,7 +466,7 @@ namespace espresso {
         Particle &p2 = *it->second;
         int type1 = p1.type();
         int type2 = p2.type();
-        const Potential &potential = getPotential(type1, type2);
+        const PotentialCG &potential = getPotentialCG(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
         if(potential._computeForce(force, p1, p2)) {
@@ -466,7 +481,7 @@ namespace espresso {
               Particle &p2 = *it->second;
               int type1 = p1.type();
               int type2 = p2.type();
-              const Potential &potential = getPotential(type1, type2);
+              const PotentialCG &potential = getPotentialCG(type1, type2);
 
               Real3D force(0.0, 0.0, 0.0);
               if(potential._computeForce(force, p1, p2)) {
@@ -477,14 +492,14 @@ namespace espresso {
 
     }
  
-    template < typename _Potential >
+    template < typename _PotentialAT, typename _PotentialCG >
     inline real
-    VerletListAdressInteractionTemplate< _Potential >::
+    VerletListAdressInteractionTemplate< _PotentialAT, _PotentialCG >::
     getMaxCutoff() {
       real cutoff = 0.0;
       for (int i = 0; i < ntypes; i++) {
         for (int j = 0; j < ntypes; j++) {
-          cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
+          cutoff = std::max(cutoff, getPotentialCG(i, j).getCutoff());
         }
       }
       return cutoff;

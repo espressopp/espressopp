@@ -24,9 +24,13 @@ class VerletListAdressTabulatedLocal(InteractionLocal, interaction_VerletListAdr
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListAdressTabulated, vl, fixedtupleList)
 
-    def setPotential(self, type1, type2, potential):
+    def setPotentialAT(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.setPotential(self, type1, type2, potential)        
+            self.cxxclass.setPotentialAT(self, type1, type2, potential)        
+            
+    def setPotentialCG(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialCG(self, type1, type2, potential)
 
 class VerletListTabulatedLocal(InteractionLocal, interaction_VerletListTabulated):
     'The (local) tabulated interaction using Verlet lists.'
@@ -72,7 +76,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListAdressTabulatedLocal',
-            pmicall = ['setPotential']
+            pmicall = ['setPotentialAT', 'setPotentialCG']
             )
         
     class VerletListTabulated(Interaction):

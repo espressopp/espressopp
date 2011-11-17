@@ -42,13 +42,21 @@ class VerletListAdressLennardJonesCappedLocal(InteractionLocal, interaction_Verl
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListAdressLennardJonesCapped, vl, fixedtupleList)
 
-    def setPotential(self, type1, type2, potential):
+    def setPotentialAT(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.setPotential(self, type1, type2, potential)
+            self.cxxclass.setPotentialAT(self, type1, type2, potential)
 
-    def getPotential(self, type1, type2):
+    def setPotentialCG(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.getPotential(self, type1, type2)
+            self.cxxclass.setPotentialCG(self, type1, type2, potential)
+
+    def getPotentialAT(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotentialAT(self, type1, type2)
+
+    def getPotentialCG(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotentialCG(self, type1, type2)
 
 class CellListLennardJonesCappedLocal(InteractionLocal, interaction_CellListLennardJonesCapped):
     'The (local) Lennard Jones interaction using cell lists.'
@@ -97,7 +105,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListAdressLennardJonesCappedLocal',
-            pmicall = ['setPotential', 'getPotential']
+            pmicall = ['setPotentialAT', 'setPotentialCG', 'getPotentialAT', 'getPotentialCG']
             )
 
     class CellListLennardJonesCapped(Interaction):

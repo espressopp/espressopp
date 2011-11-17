@@ -1,5 +1,6 @@
 #include "python.hpp"
 #include "LennardJones.hpp"
+#include "Tabulated.hpp"
 #include "VerletListInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
@@ -10,7 +11,7 @@ namespace espresso {
 
     typedef class VerletListInteractionTemplate <LennardJones>
         VerletListLennardJones;
-    typedef class VerletListAdressInteractionTemplate <LennardJones>
+    typedef class VerletListAdressInteractionTemplate <LennardJones, Tabulated>
         VerletListAdressLennardJones;
     typedef class CellListAllPairsInteractionTemplate <LennardJones> 
         CellListLennardJones;
@@ -41,7 +42,8 @@ namespace espresso {
         ("interaction_VerletListAdressLennardJones",
            init< shared_ptr<VerletListAdress>,
                   shared_ptr<FixedTupleList> >())
-        .def("setPotential", &VerletListAdressLennardJones::setPotential);
+        .def("setPotentialAT", &VerletListAdressLennardJones::setPotentialAT)
+        .def("setPotentialCG", &VerletListAdressLennardJones::setPotentialCG);
       ;
 
       class_< CellListLennardJones, bases< Interaction > > 

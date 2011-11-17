@@ -33,7 +33,7 @@ namespace espresso {
     }
 
     typedef class VerletListInteractionTemplate <Tabulated> VerletListTabulated;
-    typedef class VerletListAdressInteractionTemplate <Tabulated> VerletListAdressTabulated;
+    typedef class VerletListAdressInteractionTemplate <Tabulated, Tabulated> VerletListAdressTabulated;
     typedef class CellListAllPairsInteractionTemplate <Tabulated> CellListTabulated;
     typedef class FixedPairListInteractionTemplate <Tabulated> FixedPairListTabulated;
 
@@ -57,7 +57,8 @@ namespace espresso {
            init <shared_ptr<VerletListAdress>,
                  shared_ptr<FixedTupleList> >()
                 )
-            .def("setPotential", &VerletListAdressTabulated::setPotential);
+            .def("setPotentialAT", &VerletListAdressTabulated::setPotentialAT)
+            .def("setPotentialCG", &VerletListAdressTabulated::setPotentialCG);
         ;
      
       class_ <CellListTabulated, bases <Interaction> > 

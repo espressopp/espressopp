@@ -5,6 +5,7 @@ from espresso.interaction.Potential import *
 from espresso.interaction.Interaction import *
 from _espresso import interaction_Morse, \
                       interaction_VerletListMorse, \
+                      interaction_VerletListAdressMorse, \
                       interaction_CellListMorse, \
                       interaction_FixedPairListMorse
 
@@ -30,6 +31,20 @@ class VerletListMorseLocal(InteractionLocal, interaction_VerletListMorse):
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
+
+class VerletListAdressMorseLocal(InteractionLocal, interaction_VerletListAdressMorse):
+    'The (local) Morse interaction using Verlet lists.'
+    def __init__(self, vl, fixedtupleList):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListMorse, vl, fixedtupleList)
+
+    def setPotentialAT(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialAT(self, type1, type2, potential)
+
+    def setPotentialCG(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialAT(self, type1, type2, potential)
 
 class CellListMorseLocal(InteractionLocal, interaction_CellListMorse):
     'The (local) Morse interaction using cell lists.'
@@ -65,12 +80,21 @@ if pmi.isController:
             cls =  'espresso.interaction.VerletListMorseLocal',
             pmicall = ['setPotential']
             )
+
+    class VerletListAdressMorse(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espresso.interaction.VerletListAdressMorseLocal',
+            pmicall = ['setPotentialAT', 'setPotentialCG']
+            )
+
     class CellListMorse(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.CellListMorseLocal',
             pmicall = ['setPotential']
             )
+
     class FixedPairListMorse(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(

@@ -1,6 +1,8 @@
 #include "python.hpp"
 #include "Morse.hpp"
+#include "Tabulated.hpp"
 #include "VerletListInteractionTemplate.hpp"
+#include "VerletListAdressInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
@@ -8,6 +10,8 @@ namespace espresso {
   namespace interaction {
     typedef class VerletListInteractionTemplate< Morse >
     VerletListMorse;
+    typedef class VerletListAdressInteractionTemplate< Morse, Tabulated >
+    VerletListAdressMorse;
     typedef class CellListAllPairsInteractionTemplate< Morse >
     CellListMorse;
     typedef class FixedPairListInteractionTemplate< Morse >
@@ -31,6 +35,13 @@ namespace espresso {
       class_< VerletListMorse, bases< Interaction > > 
         ("interaction_VerletListMorse", init< shared_ptr<VerletList> >())
         .def("setPotential", &VerletListMorse::setPotential);
+        ;
+
+      class_< VerletListAdressMorse, bases< Interaction > >
+        ("interaction_VerletListAdressMorse",
+                init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleList> >())
+        .def("setPotentialAT", &VerletListAdressMorse::setPotentialAT)
+        .def("setPotentialCG", &VerletListAdressMorse::setPotentialCG);
         ;
 
       class_< CellListMorse, bases< Interaction > > 

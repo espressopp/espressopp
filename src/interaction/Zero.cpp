@@ -1,5 +1,6 @@
 #include "python.hpp"
 #include "Zero.hpp"
+#include "Tabulated.hpp"
 #include "VerletListInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
@@ -10,7 +11,7 @@ namespace espresso {
       
     typedef class VerletListInteractionTemplate <Zero>
         VerletListZero;
-    typedef class VerletListAdressInteractionTemplate <Zero>
+    typedef class VerletListAdressInteractionTemplate <Zero, Tabulated>
         VerletListAdressZero;
     typedef class CellListAllPairsInteractionTemplate <Zero>
         CellListZero;
@@ -39,7 +40,8 @@ namespace espresso {
            init< shared_ptr<VerletListAdress>,
                   shared_ptr<FixedTupleList> >())
         .def("setFixedTupleList", &VerletListAdressZero::setFixedTupleList)
-        .def("setPotential", &VerletListAdressZero::setPotential);
+        .def("setPotentialAT", &VerletListAdressZero::setPotentialAT)
+        .def("setPotentialCG", &VerletListAdressZero::setPotentialCG);
       ;
 
       class_< CellListZero, bases< Interaction > >

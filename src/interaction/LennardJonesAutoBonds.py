@@ -83,7 +83,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListAdressLennardJonesAutoBondsLocal',
-            pmicall = ['setPotential']
+            pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
     class CellListLennardJonesAutoBonds(Interaction):
