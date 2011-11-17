@@ -13,6 +13,7 @@ from espresso.interaction.LennardJonesExpand import *
 from espresso.interaction.LennardJonesGromacs import *
 from espresso.interaction.Morse import *
 from espresso.interaction.CoulombTruncated import *
+from espresso.interaction.ReactionFieldGeneralized import *
 from espresso.interaction.SoftCosine import *
 from espresso.interaction.Tabulated import *
 from espresso.interaction.FENE import *
