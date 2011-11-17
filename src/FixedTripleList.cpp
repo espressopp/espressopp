@@ -204,11 +204,11 @@ namespace espresso {
       }
       p1 = storage->lookupLocalParticle(it->second.first);
       if (p1 == NULL) {
-        printf("SERIOUS ERROR: 2nddd particle %d not available\n", it->second.first);
+        printf("SERIOUS ERROR: 2nd particle %d not available\n", it->second.first);
       }
       p3 = storage->lookupLocalParticle(it->second.second);
       if (p3 == NULL) {
-        printf("SERIOUS ERROR: 3rddd particle %d not available\n", it->second.second);
+        printf("SERIOUS ERROR: 3rd particle %d not available\n", it->second.second);
       }
       this->add(p1, p2, p3);
     }
