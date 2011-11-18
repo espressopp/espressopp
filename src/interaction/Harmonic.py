@@ -26,6 +26,15 @@ class FixedPairListHarmonicLocal(InteractionLocal, interaction_FixedPairListHarm
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
+    def setFixedPairList(self, fixedpairlist):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setFixedPairList(self, fixedpairlist)
+
+    
+    def getFixedPairList(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getFixedPairList(self)
+
 if pmi.isController:
     class Harmonic(Potential):
         'The Harmonic potential.'
@@ -38,5 +47,5 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.FixedPairListHarmonicLocal',
-            pmicall = ['setPotential']
+            pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']
             )

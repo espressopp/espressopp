@@ -13,12 +13,12 @@ from _espresso import interaction_LennardJonesAutoBonds, \
 class LennardJonesAutoBondsLocal(PotentialLocal, interaction_LennardJonesAutoBonds):
     'The (local) Lennard-Jones auto bond potential.'
     def __init__(self, epsilon=1.0, sigma=1.0, 
-                 cutoff=infinity, bondlist=None):
+                 cutoff=infinity, bondlist=None, maxcrosslinks=2):
         """Initialize the local Lennard Jones auto bonds object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if bondlist == None:
               raise MissingFixedPairList('LennardsJonesAutoBonds needs a FixedPairList to be able to create new bonds')                                         
-            cxxinit(self, interaction_LennardJonesAutoBonds, epsilon, sigma, cutoff, bondlist)                
+            cxxinit(self, interaction_LennardJonesAutoBonds, epsilon, sigma, cutoff, bondlist, maxcrosslinks)                
 
 class VerletListLennardJonesAutoBondsLocal(InteractionLocal, interaction_VerletListLennardJonesAutoBonds):
     'The (local) Lennard Jones auto bonds interaction using Verlet lists.'

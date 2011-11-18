@@ -164,7 +164,7 @@ class StorageLocal(object):
             if particle:
               try:
                 if not particle.isGhost:
-                  print "particle pid=%i rank=%i" % (pid, pmi.rank)
+                  self.logger.info("particle pid=%i rank=%i" % (pid, pmi.rank))
                   if   property.lower() == "id"   : raise "particles pid cannot be modified !"
                   elif property.lower() == "pos"  : particle.pos  = value
                   elif property.lower() == "type" : particle.type = value

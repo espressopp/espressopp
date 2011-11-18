@@ -67,7 +67,7 @@ def psfwrite(filename, system):
                   j += 1
           except:
               pass
-  
+              
   bond.sort()
   
   file.write("%8d !NBOND\n" % (len(bond)))
