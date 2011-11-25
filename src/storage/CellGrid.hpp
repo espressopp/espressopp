@@ -90,6 +90,20 @@ namespace espresso {
 
     static const longint noCell = static_cast<longint>(-1);
 
+    void scaleVolume(real s) {
+      if (s > 0) {
+    	for (int i=0; i<3; ++i) {
+    	  myLeft[i] *= s;
+    	  myRight[i] *= s;
+    	  cellSize[i] *= s;
+    	  invCellSize[i] /= s;
+    	}
+      } else {
+    	  ;
+    	  // TODO: do nothing or throw error if s <= 0 ?
+      }
+    }
+
   private:
     /// size of frame around
     int frame;

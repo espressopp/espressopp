@@ -135,6 +135,12 @@ namespace espresso {
     }
   }
 
+  /** scale position coordinates of all real particles by factor s */
+  void DomainDecomposition::scaleVolume(real s) {
+	Storage::scaleVolume(s);
+	cellGrid.scaleVolume(s);
+  }
+
   void DomainDecomposition::initCellInteractions() {
     LOG4ESPP_DEBUG(logger, "setting up neighbors for " << cells.size() << " cells");
 

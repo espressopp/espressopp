@@ -76,6 +76,11 @@ class SystemLocal(_espresso.System):
                     raise Error("Interaction number %i does not exist" % number)
             else:
                 raise Error("interaction list of system is empty")
+            
+    def scaleVolume(self, factor):
+        'scale the Volume of the system, which means in detail: scale all particle coordinates, scale box length, scale cellgrid (if it exists)'
+        if pmi.workerIsActive():
+            self.cxxclass.scaleVolume(self, factor)
 
 if pmi.isController:
     class System(object):
@@ -84,6 +89,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espresso.SystemLocal',
             pmiproperty = ['storage', 'bc', 'rng', 'skin'],
-            pmicall = ['addInteraction','removeInteraction','getInteraction','getNumberOfInteractions']
+            pmicall = ['addInteraction','removeInteraction','getInteraction','getNumberOfInteractions','scaleVolume']
             )
 

@@ -65,6 +65,12 @@ namespace espresso {
 	return shortRangeInteractions.size();
   }
 
+  // Scale all coordinates of the system
+  void System::scaleVolume(real s) {
+	storage->scaleVolume(s);
+	bc->scaleVolume(s);
+  }
+
   static void setTrace(bool flag)
   {
      if (flag)
@@ -97,6 +103,7 @@ namespace espresso {
       .def("removeInteraction", &System::removeInteraction)
       .def("getInteraction", &System::getInteraction)
       .def("getNumberOfInteractions", &System::getNumberOfInteractions)
+      .def("scaleVolume", &System::scaleVolume)
       ;
 
     def("setTrace", setTrace);

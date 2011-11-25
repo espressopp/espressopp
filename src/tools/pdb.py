@@ -1,4 +1,5 @@
 import espresso
+from math import sqrt
 
 def pdbwrite(filename, system):
   file = open(filename,'w')
@@ -24,7 +25,7 @@ def pdbwrite(filename, system):
   file.write('END\n')
   file.close()
 
-def psfwrite(filename, system):
+def psfwrite(filename, system, maxdist=None):
   file = open(filename,'w')
   maxParticleID = int(espresso.analysis.MaxPID(system).compute())
   nParticles    = int(espresso.analysis.NPart(system).compute())
@@ -55,18 +56,36 @@ def psfwrite(filename, system):
   nInteractions = system.getNumberOfInteractions()
   for i in range(nInteractions):
       if system.getInteraction(i).isBonded():
-          try:
+#          try:
               FixedPairList = system.getInteraction(i).getFixedPairList().getBonds()
               j = 0
               while j < len(FixedPairList):
                   fplb = FixedPairList[j]
                   k = 0
                   while k < len(fplb):
+                    if maxdist != None:
+                      pid1 = fplb[k][0]
+                      pid2 = fplb[k][1]
+                      p1 = system.storage.getParticle(pid1)
+                      p2 = system.storage.getParticle(pid2)
+                      x1 = p1.pos[0]
+                      y1 = p1.pos[1]
+                      z1 = p1.pos[2]
+                      x2 = p2.pos[0]
+                      y2 = p2.pos[1]
+                      z2 = p2.pos[2]
+                      xx = (x1-x2) * (x1-x2)
+                      yy = (y1-y2) * (y1-y2)
+                      zz = (z1-z2) * (z1-z2)
+                      d = sqrt( xx + yy + zz )
+                      if (d <= maxdist):
+                        bond.append(fplb[k])
+                    else:
                       bond.append(fplb[k])
-                      k += 1
+                    k += 1                        
                   j += 1
-          except:
-              pass
+#          except:
+#              pass
               
   bond.sort()
   

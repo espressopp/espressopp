@@ -72,6 +72,14 @@ namespace espresso {
       }
     }
 
+    /** scale position coordinates of all real particles by factor s */
+    void Storage::scaleVolume(real s) {
+      for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+        Real3D pos = cit->getPos();
+        pos *= s;
+        cit->setPos(pos);
+      }
+    }
 
     void Storage::removeAdrATParticle(longint id) {
 
@@ -576,7 +584,6 @@ namespace espresso {
           dst->particleForce() += src->particleForce();
       }
     }
-
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
