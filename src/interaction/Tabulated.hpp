@@ -69,7 +69,7 @@ namespace espresso {
                 if (table) {
                    real distrt = sqrt(distSqr);
                    ffactor = table->getForce(distrt);
-                   ffactor /= sqrt(distrt);
+                   ffactor /= distrt;
                 }
 
                 else {
