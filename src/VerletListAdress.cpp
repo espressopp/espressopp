@@ -255,7 +255,7 @@ namespace espresso {
 
       //std::cout << "checkPair(" << pt1.id() << ", " << pt2.id() << ")\n";
 
-      // see if it's in the exclusion list (both directions)
+      // see if it's in the exclusion list (both directions, CG particles only)
       if (exList.count(std::make_pair(pt1.id(), pt2.id())) == 1) return;
       if (exList.count(std::make_pair(pt2.id(), pt1.id())) == 1) return;
       // see if it's in the adress zone

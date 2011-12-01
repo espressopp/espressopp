@@ -71,7 +71,7 @@ namespace espresso {
 
   private:
 
-    // AdResS stuff
+    // AdResS stuff (adress particles are AdResS centers)
     std::set<longint> adrList;   // pids of particles defined as adress particles
     std::vector<Real3D*> adrPositions; // positions of adress particles
     std::set<Particle*> adrZone; // particles that are in the AdResS zone
