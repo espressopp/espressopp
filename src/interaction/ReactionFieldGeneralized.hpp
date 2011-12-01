@@ -21,7 +21,10 @@ namespace espresso {
                 real B1, B0;
                 real prefactor;
 
+                real fac_rf;
+
                 void initialize() {
+
                     real krc = kappa*rc;
                     real tmp1 = (epsilon1 - 4*epsilon2) *
                             (1 + krc) - 2*epsilon2 * krc*krc;
@@ -34,6 +37,7 @@ namespace espresso {
                     B0 = (1+B0) / rc;
                     prefactor = 176.788 * 3.9176;
                     qq = qq*prefactor / epsilon1;
+
                 }
 
             public:
