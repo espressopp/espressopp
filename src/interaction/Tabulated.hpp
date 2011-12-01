@@ -66,11 +66,15 @@ namespace espresso {
          
             bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const {
                 real ffactor;
-                if (table) 
-                   ffactor = table->getForce(sqrt(distSqr));
+                if (table) {
+                   real distrt = sqrt(distSqr);
+                   ffactor = table->getForce(distrt);
+                   ffactor /= sqrt(distrt);
+                }
+
                 else {
                     throw std::runtime_error("Tabulated potential table not available.");
-                    //return 0.0;
+                    //return false;
                 }
                 force = dist * ffactor;
                 return true;
