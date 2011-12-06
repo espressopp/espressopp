@@ -56,7 +56,7 @@ def psfwrite(filename, system, maxdist=None):
   nInteractions = system.getNumberOfInteractions()
   for i in range(nInteractions):
       if system.getInteraction(i).isBonded():
-#          try:
+         try:
               FixedPairList = system.getInteraction(i).getFixedPairList().getBonds()
               j = 0
               while j < len(FixedPairList):
@@ -84,8 +84,8 @@ def psfwrite(filename, system, maxdist=None):
                       bond.append(fplb[k])
                     k += 1                        
                   j += 1
-#          except:
-#              pass
+         except:
+           pass
               
   bond.sort()
   
