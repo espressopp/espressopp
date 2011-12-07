@@ -98,8 +98,6 @@ namespace espresso {
 
           // again, loop over all VP particles and check if they are close enough to adrPositions and add to adrZone
           //std::cout << "\nAdding particles to adrZone ...\n";
-          Real3D dist;
-          real distsq;
           for (CellListIterator it(localcells); it.isValid(); ++it) {
 
                 /*cellp = getSystem()->storage->mapPositionToCell(it->position());
@@ -108,8 +106,8 @@ namespace espresso {
 
                 // loop over positions
                 for (std::vector<Real3D*>::iterator it2 = adrPositions.begin(); it2 != adrPositions.end(); ++it2){
-                    dist = it->getPos() - **it2;
-                    distsq = dist.sqr();
+                    Real3D dist = it->getPos() - **it2;
+                    real distsq = dist.sqr();
 
                     //std::cout << "distance " << sqrt(distsq) << "\n";
                     if (distsq < adrsq) {
@@ -123,11 +121,9 @@ namespace espresso {
       }
       // center of adress zone is fixed
       else {
-          Real3D dist;
-          real distsq;
           for (CellListIterator it(localcells); it.isValid(); ++it) {
-              dist = it->getPos() - adrCenter;
-              distsq = dist.sqr();
+              Real3D dist = it->getPos() - adrCenter;
+              real distsq = dist.sqr();
               //std::cout << "distance " << sqrt(distsq) << "\n";
               if (distsq < adrsq) {
                   adrZone.insert(&(*it));
