@@ -3,6 +3,7 @@
 #include "VelocityVerletAdress.hpp"
 
 #include "Langevin.hpp"
+#include "TDforce.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "interaction/Interaction.hpp"
 #include "interaction/Potential.hpp"
@@ -18,8 +19,7 @@ namespace espresso {
     using namespace iterator;
     using namespace esutil;
 
-    VelocityVerletAdress::VelocityVerletAdress(shared_ptr< System > system) : MDIntegrator(system)
-    {
+    VelocityVerletAdress::VelocityVerletAdress(shared_ptr< System > system) : MDIntegrator(system) {
       LOG4ESPP_INFO(theLogger, "construct VelocityVerletAdress");
 
       resortFlag = true;
@@ -28,17 +28,20 @@ namespace espresso {
 
     /*****************************************************************************/
 
-    VelocityVerletAdress::~VelocityVerletAdress()
-    {
+    VelocityVerletAdress::~VelocityVerletAdress() {
       LOG4ESPP_INFO(theLogger, "free VelocityVerletAdress");
     }
 
     /*****************************************************************************/
 
-    void VelocityVerletAdress::setLangevin(shared_ptr< Langevin > _langevin)
-    {
+    void VelocityVerletAdress::setLangevin(shared_ptr<Langevin> _langevin) {
       LOG4ESPP_INFO(theLogger, "set Langevin thermostat");
       langevin = _langevin;
+    }
+
+    void VelocityVerletAdress::setTDforce(shared_ptr<TDforce> _tdforce) {
+      LOG4ESPP_INFO(theLogger, "set thermodynamic force");
+      tdf = _tdforce;
     }
 
     /*****************************************************************************/
@@ -47,13 +50,10 @@ namespace espresso {
       int nResorts = 0;
 
       real time;
-
       timeIntegrate.reset();
-
       resetTimers();
 
       System& system = getSystemRef();
-
       storage::Storage& storage = *system.storage;
 
       if (langevin) langevin->initialize(dt);
@@ -61,7 +61,6 @@ namespace espresso {
       // no more needed: setUp();
 
       // Before start make sure that particles are on the right processor
-
       if (resortFlag) {
         // time = timeIntegrate.getElapsedTime();
         LOG4ESPP_INFO(theLogger, "resort particles");
@@ -289,10 +288,8 @@ namespace espresso {
 
     /*****************************************************************************/
 
-    void VelocityVerletAdress::integrate2()
-    {
+    void VelocityVerletAdress::integrate2() {
       System& system = getSystemRef();
-
       CellList realCells = system.storage->getRealCells();
 
       // loop over all particles of the local cells
@@ -325,10 +322,8 @@ namespace espresso {
 
     /*****************************************************************************/
 
-    void VelocityVerletAdress::setUp()
-    {
+    void VelocityVerletAdress::setUp() {
       System& system = getSystemRef();
-
       const InteractionList& srIL = system.shortRangeInteractions;
 
       maxCut = 0.0;
@@ -344,18 +339,18 @@ namespace espresso {
 
     /*****************************************************************************/
 
-    void VelocityVerletAdress::calcForces()
-    {
+    void VelocityVerletAdress::calcForces() {
       LOG4ESPP_INFO(theLogger, "calculate forces");
 
       initForces();
+
+      if (tdf) tdf->applyForce(); // thermodynamic force
 
       System& sys = getSystemRef();
 
       const InteractionList& srIL = sys.shortRangeInteractions;
 
       for (size_t i = 0; i < srIL.size(); i++) {
-
         LOG4ESPP_INFO(theLogger, "compute forces for srIL " << i
                                   << " of " << srIL.size());
 
@@ -366,8 +361,7 @@ namespace espresso {
       }
     }
 
-    void VelocityVerletAdress::updateForces()
-    {
+    void VelocityVerletAdress::updateForces() {
       real time;
       storage::Storage& storage = *getSystemRef().storage;
 
@@ -388,8 +382,7 @@ namespace espresso {
 
     /*****************************************************************************/
 
-    void VelocityVerletAdress::initForces()
-    {
+    void VelocityVerletAdress::initForces() {
       // forces are initialized for real + ghost particles
 
       System& system = getSystemRef();
@@ -457,12 +450,10 @@ namespace espresso {
 
     /*****************************************************************************/
 
-    void VelocityVerletAdress::printForces(bool withGhosts)
-    {
+    void VelocityVerletAdress::printForces(bool withGhosts) {
       // print forces of real + ghost particles
 
       System& system = getSystemRef();
-
       CellList cells;
 
       if (withGhosts) {
@@ -474,8 +465,7 @@ namespace espresso {
       }
   
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
-
-	LOG4ESPP_DEBUG(theLogger, 
+          LOG4ESPP_DEBUG(theLogger,
 		       "Particle " << cit->id()
 		       << ", force = " << cit->force());
       }
@@ -483,12 +473,10 @@ namespace espresso {
 
     /*****************************************************************************/
 
-    void VelocityVerletAdress::printPositions(bool withGhosts)
-    {
+    void VelocityVerletAdress::printPositions(bool withGhosts) {
       // print positions of real + ghost particles
 
       System& system = getSystemRef();
-
       CellList cells;
 
       if (withGhosts) {
@@ -500,8 +488,7 @@ namespace espresso {
       }
   
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
-
-	LOG4ESPP_DEBUG(theLogger, 
+          LOG4ESPP_DEBUG(theLogger,
 		       "Particle " << cit->id()
 		       << ", position = " << cit->position());
       }
@@ -520,6 +507,7 @@ namespace espresso {
       class_< VelocityVerletAdress, bases<MDIntegrator>, boost::noncopyable >
         ("integrator_VelocityVerletAdress", init< shared_ptr<System> >())
         .add_property("langevin", &VelocityVerletAdress::getLangevin, &VelocityVerletAdress::setLangevin)
+        .add_property("tdforce", &VelocityVerletAdress::getTDforce, &VelocityVerletAdress::setTDforce)
         .def("getTimers", &wrapGetTimers)
         ;
     }
