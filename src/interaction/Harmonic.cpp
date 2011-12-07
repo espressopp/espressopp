@@ -24,8 +24,11 @@ namespace espresso {
         ("interaction_FixedPairListHarmonic",
            init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<Harmonic> >())
         .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<Harmonic> >())
-        .def("setPotential", &FixedPairListHarmonic::setPotential);
-      ;
+        .def("setPotential", &FixedPairListHarmonic::setPotential)
+        .def("getPotential", &FixedPairListHarmonic::getPotential)
+        .def("setFixedPairList", &FixedPairListHarmonic::setFixedPairList)
+        .def("getFixedPairList", &FixedPairListHarmonic::getFixedPairList);
+     ;
     }
 
   }

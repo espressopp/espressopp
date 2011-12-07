@@ -67,6 +67,21 @@ class ParticleLocal(object):
     def pos(self, val): self.__getTmp().pos = toReal3DFromVector(val)
     
     @property
+    def type(self): return self.__getTmp().type
+    @pos.setter
+    def type(self, val): self.__getTmp().type = val
+    
+    @property
+    def mass(self): return self.__getTmp().mass
+    @pos.setter
+    def mass(self, val): self.__getTmp().type = val
+    
+    @property
+    def q(self): return self.__getTmp().q
+    @pos.setter
+    def q(self, val): self.__getTmp().type = val
+    
+    @property
     def imageBox(self): return self.__getTmp().imageBox
     @imageBox.setter
     def imageBox(self, val): self.__getTmp().imageBox = toInt3DFromVector(val)

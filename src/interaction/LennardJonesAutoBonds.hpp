@@ -23,6 +23,7 @@ namespace espresso {
       real ff1, ff2;
       real ef1, ef2;
       shared_ptr < FixedPairList > bondlist;
+      int max_crosslinks;
 
     public:
       static void registerPython();
@@ -30,21 +31,21 @@ namespace espresso {
       LennardJonesAutoBonds()
 	: epsilon(0.0), sigma(0.0) {
         setShift(0.0);
-        setCutoff(infinity);
-        preset();
+        setCutoff(0.0);
+        max_crosslinks = 0;
       }
 
       LennardJonesAutoBonds(real _epsilon, real _sigma,
-		   real _cutoff, real _shift, shared_ptr < FixedPairList > _fpl)
-	: epsilon(_epsilon), sigma(_sigma), bondlist(_fpl) {
+		   real _cutoff, real _shift, shared_ptr < FixedPairList > _fpl, int _max_crosslinks)
+	: epsilon(_epsilon), sigma(_sigma), bondlist(_fpl), max_crosslinks(_max_crosslinks) {
         setShift(_shift);
         setCutoff(_cutoff);
         preset();
       }
 
       LennardJonesAutoBonds(real _epsilon, real _sigma,
-		   real _cutoff, shared_ptr < FixedPairList > _fpl)
-	: epsilon(_epsilon), sigma(_sigma), bondlist(_fpl) {
+		   real _cutoff, shared_ptr < FixedPairList > _fpl, int _max_crosslinks)
+	: epsilon(_epsilon), sigma(_sigma), bondlist(_fpl), max_crosslinks(_max_crosslinks) {
         autoShift = false;
         setCutoff(_cutoff);
         preset();
@@ -76,18 +77,24 @@ namespace espresso {
       }
       real getSigma() const { return sigma; }
 
-      real computeEnergy(const Particle& p1, const Particle& p2) const {
+      real getMaxCrosslinks() const { return max_crosslinks; }
+
+      void setMaxCrosslinks(int _max_crosslinks) {
+    	  max_crosslinks = _max_crosslinks;
+      }
+
+      inline real computeEnergy(const Particle& p1, const Particle& p2) const {
         Real3D dist = p1.position() - p2.position();
         return computeEnergy(dist);
       }
 
-      void setCutoff(real _cutoff) {
+      inline void setCutoff(real _cutoff) {
         cutoff = _cutoff;
         cutoffSqr = cutoff*cutoff;
         updateAutoShift();
       }
 
-      real setAutoShift() {
+      inline real setAutoShift() {
         autoShift = true;
         if (cutoffSqr == infinity)
   	    shift = 0.0;
@@ -96,36 +103,36 @@ namespace espresso {
         return shift;
       }
 
-      void updateAutoShift() {
+      inline void updateAutoShift() {
          if (autoShift) setAutoShift();
       }
 
-      real computeEnergy(const Real3D& dist) const {
+      inline real computeEnergy(const Real3D& dist) const {
   	     return computeEnergySqr(dist.sqr());
       }
 
-      real computeEnergy(real dist) const {
+      inline real computeEnergy(real dist) const {
          return computeEnergySqr(dist*dist);
       }
 
-      real computeEnergySqr(real distsqr) const {
+      inline real computeEnergySqr(real distsqr) const {
          return _computeEnergySqr(distsqr);
       }
 
-      real _computeEnergy(const Particle& p1, const Particle& p2) const {
+      inline real _computeEnergy(const Particle& p1, const Particle& p2) const {
         Real3D dist = p1.position() - p2.position();
         return _computeEnergy(dist);
       }
 
-      real _computeEnergy(const Real3D& dist) const {
+      inline real _computeEnergy(const Real3D& dist) const {
         return _computeEnergySqr(dist.sqr());
       }
 
-      real _computeEnergy(real dist) const {
+      inline real _computeEnergy(real dist) const {
         return _computeEnergySqr(dist*dist);
       }
 
-      real _computeEnergySqr(real distSqr) const {
+      inline real _computeEnergySqr(real distSqr) const {
         if (distSqr > cutoffSqr)
           return 0.0;
         else {
@@ -136,39 +143,157 @@ namespace espresso {
       }
 
 
-      Real3D computeForce(const Particle& p1, const Particle& p2) const {
+      inline Real3D computeForce(const Particle& p1, const Particle& p2) const {
         Real3D dist = p1.position() - p2.position();
         return computeForce(dist);
       }
 
-      Real3D computeForce(const Real3D& dist) const {
+      inline Real3D computeForce(const Real3D& dist) const {
         Real3D force;
         if(!_computeForce(force, dist))
           force = 0.0;
         return force;
       }
 
-      bool _computeForce(Real3D& force, const Particle &p1, const Particle &p2) const {
+/*
+
+      inline bool _computeForce(Real3D& force, const Particle &p1, const Particle &p2) const {
         Real3D dist = p1.position() - p2.position();
         bool found = false;
+        Particle &pa;
+        Particle &pb;
+        int p1_count = 0;
+        int p2_count = 0;
         if (dist.sqr() <= cutoffSqr) {
-          for (FixedPairList::PairList::Iterator it(*bondlist); it.isValid(); ++it) {
-            if ( (it->first->id() == p1.id() && it->second->id() == p2.id()) ||
-                 (it->first->id() == p2.id() && it->second->id() == p1.id()) ) {
-              found = true;
-            }
+          switch (max_crosslinks) {
+            case 1 :
+              for (FixedPairList::PairList::Iterator it(*bondlist); it.isValid(); ++it) {
+            	if ( ( p1.id() == it->first->id() || p1.id() == it->second->id() ) ||
+            	     ( p2.id() == it->first->id() || p2.id() == it->second->id() ) ) {
+            	  found = true;
+            	}
+              if (!found) {
+                bondlist->add(p1.id(), p2.id());
+              }
+              break;
+              };
+            case 2 :
+              if (p1.ghost() && p2.ghost()) {
+            	  printf("ERROR: both particles are ghosts in _computeForce !!!\n");
+            	  printf("       This should never happen !\n");
+              }
+              else
+              if (p1.ghost()) {
+            	  pa = p2;
+            	  pb = p1;
+              }
+              else
+              if (p2.ghost()) {
+            	  pa = p1;
+            	  pb = p2;
+              }
+              else {
+            	  pa = p1;
+            	  pb = p2;
+              }
+              for (FixedPairList::PairList::Iterator it(*bondlist); it.isValid(); ++it) {
+             	if ( pa.id() == it->first->id() || pa.id() == it->second->id() ) {
+             		++p1_count;
+             	}
+             	if ( p2.id() == it->first->id() || p2.id() == it->second->id() ) {
+             		++p2_count;
+             	}
+              }
+              if (p1_count + p2_count <= 1) {
+                  bondlist->add(pa.id(), pb.id());
+              }
+              if (p1_count + p2_count == 1) {
+              }
+              break;
+            default :
+              printf("WARNING: currently crosslinking will only work for pair and triple joints. No crosslinking done.\n");
+              break;
           }
-          if ( !found ) {
-            if (bondlist->add(p1.id(), p2.id())) {
-              // printf("added particle pair (%i, %i) to bond list\n", p1.id(), p2.id());
-              ;
-            }
+        }
+        return _computeForce(force, dist);
+      }
+*/
+
+/* this version will not run correctly with more than 1 CPU */
+      inline bool _computeForce(Real3D& force, const Particle &p1, const Particle &p2) const {
+        Real3D dist = p1.position() - p2.position();
+        bool found = false;
+        long pa;
+        long pb;
+        bool add_second = false;
+        int p1_count = 0;
+        int p2_count = 0;
+        bool pa_isghost = false;
+        bool pb_isghost = false;
+        if (dist.sqr() <= cutoffSqr) {
+          switch (max_crosslinks) {
+            case 1 :
+              for (FixedPairList::PairList::Iterator it(*bondlist); it.isValid(); ++it) {
+            	if ( ( p1.id() == it->first->id() || p1.id() == it->second->id() ) ||
+            	     ( p2.id() == it->first->id() || p2.id() == it->second->id() ) ) {
+            	  found = true;
+            	}
+              if (!found) {
+                bondlist->add(p1.id(), p2.id());
+              }
+              break;
+              };
+            case 2 :
+              for (FixedPairList::PairList::Iterator it(*bondlist); it.isValid(); ++it) {
+             	if ( p1.id() == it->first->id() || p1.id() == it->second->id() ) {
+             		++p1_count;
+             		if (p1.id() == it->first->id()) {
+             			pa = p2.id();
+             			pa_isghost = p2.ghost();
+             			pb = it->second->id();
+             			pb_isghost = it->second->ghost();
+             		} else {
+             			pa = p2.id();
+             			pa_isghost = p2.ghost();
+             			pb = it->first->id();
+             			pb_isghost = it->first->ghost();
+             		}
+             	}
+             	if ( p2.id() == it->first->id() || p2.id() == it->second->id() ) {
+             		++p2_count;
+             		if (p2.id() == it->first->id()) {
+             			pa = p1.id();
+             			pa_isghost = p1.ghost();
+             			pb = it->second->id();
+             			pb_isghost = it->second->ghost();
+             		} else {
+             			pa = p1.id();
+             			pa_isghost = p1.ghost();
+             			pb = it->first->id();
+             			pb_isghost = it->first->ghost();
+             		}
+             	}
+              }
+              if (p1_count + p2_count <= 1) {
+                  bondlist->add(p1.id(), p2.id());
+              }
+              if (p1_count + p2_count == 1) {
+            	if (!(pa_isghost && pb_isghost)) {
+                    bondlist->add(pa, pb);
+            	} else {
+            		printf("WARNING: didn't add second crosslink, because both particles were ghosts");
+            	}
+              }
+              break;
+            default :
+              printf("WARNING: currently crosslinking will only work for pair and triple joints. No crosslinking done.\n");
+              break;
           }
         }
         return _computeForce(force, dist);
       }
 
-      bool _computeForce(Real3D& force, const Real3D& dist) const {
+      inline bool _computeForce(Real3D& force, const Real3D& dist) const {
         real distSqr = dist.sqr();
         if (distSqr > cutoffSqr)
           return false;

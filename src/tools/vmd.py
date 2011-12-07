@@ -54,7 +54,7 @@ def drain_socket(sock):
   return
 
 def connect(system):
-  espresso.tools.psfwrite("vmd.psf", system)
+  espresso.tools.psfwrite("vmd.psf", system, maxdist=3.0)
   espresso.tools.pdbwrite("vmd.pdb", system)
   initsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
   hostname = socket.gethostname()
@@ -75,7 +75,8 @@ def connect(system):
   vmdfile.write("logfile vmd.log\n")
   vmdfile.write("rotate stop\n")
   vmdfile.write("logfile off\n")
-  vmdfile.write("mol modstyle 0 0 CPK 1.800000 0.300000 8.000000 6.000000\n")
+  # vmdfile.write("mol modstyle 0 0 CPK 1.800000 0.300000 8.000000 6.000000\n")
+  vmdfile.write("mol modstyle 0 0 VDW 0.5 16\n")
   vmdfile.write("mol modcolor 0 0 SegName\n")
   st = "imd connect %s %i\n" % (hostname, port)
   vmdfile.write(st)

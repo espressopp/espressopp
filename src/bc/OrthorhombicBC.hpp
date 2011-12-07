@@ -29,6 +29,13 @@ namespace espresso {
       /** Getters for box dimensions */
       virtual Real3D getBoxL() const { return boxL; }
 
+      /** Scale the Volume of the box by s^(1/3) (Box-Length is scaled by s) */
+      virtual void scaleVolume(real s) {
+    	  boxL *= s;
+    	  boxL2 *= s;
+    	  invBoxL /= s;
+      }
+
       /** Computes the minimum image distance vector between two
           positions. This routine must be implemented by derived
           classes (once the code stabilizes).

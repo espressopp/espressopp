@@ -24,6 +24,8 @@ namespace espresso {
 
       virtual ~DomainDecomposition() {}
 
+      virtual void scaleVolume(real s);
+
       virtual Cell *mapPositionToCell(const Real3D& pos);
       virtual Cell *mapPositionToCellClipped(const Real3D& pos);
       virtual Cell *mapPositionToCellChecked(const Real3D& pos);

@@ -26,6 +26,9 @@ namespace espresso {
       Storage(shared_ptr<class System> system);
       virtual ~Storage();
 
+      /** Scale Volume of the storage */
+      virtual void scaleVolume(real s);
+
       /** add a particle with given id and position. Note that this is a
 	  local operation, and therefore cannot check whether a particle
 	  with the given id already exists.  This is left to the parallel

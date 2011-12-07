@@ -35,6 +35,7 @@ namespace espresso {
       return shared_from_this();
     }
 
+    void scaleVolume(real s);
     void addInteraction(shared_ptr< interaction::Interaction > ia);
     void removeInteraction(int i);
     shared_ptr< interaction::Interaction > getInteraction(int i);
