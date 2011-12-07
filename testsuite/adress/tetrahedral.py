@@ -17,7 +17,7 @@ from espresso.tools import timers
 #logging.getLogger("BC").setLevel(logging.DEBUG)
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
-steps = 1000
+steps = 10000
 rc = 2.31 # CG cutoff, Morse
 rca = 1.122462048309373 # AT cutoff (2^(1/6)), WCA
 skin = 0.8
@@ -65,7 +65,7 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
         energy = pot.computeEnergy(r)
         if body == 2:# this is for 2-body potentials
             force = pot.computeForce(Real3D(r, 0.0, 0.0))[0]
-            force /= r
+            #force /= r
         else: # this is for 3- and 4-body potentials
             force = pot.computeForce(r)
         outfile.write("%15.8g %15.8g %15.8g\n"%(r, energy, force))
