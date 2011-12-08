@@ -1,0 +1,3 @@
+.. automodule:: espresso.Version
+   :members:
+

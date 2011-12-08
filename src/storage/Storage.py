@@ -3,23 +3,67 @@
 **Storage** - Storage Object
 ************************************
 
-This is the abstract base class for all storage objects.
-It cannot be used directly. All derived classes implement at least
-the following methods:
+This is the base class for all storage objects.
+All derived classes implement at least the following methods:
 
 * `decompose()`
-* `addParticle(pid, pos)`
-* `getParticle(pid)`
-* `addAdrParticle(pid, pos, last_pos)`
-* `setFixedTuples(fixed_tuple_list)`
-* `addParticles(particle_list, *properties)`
-* `modifyParticle(pid, property, value, decompose='yes')`
 
-The property 'system' returns the System object of the storage.
+   Send all particles to their corresponding cell/cpu
+   
+* `addParticle(pid, pos)`:
+
+   Add a particle to the storage
+   
+* `getParticle(pid)`:
+
+   Get a particle object.
+   This can be used to get specific particle information:
+   
+   >>> particle = system.storage.getParticle(15)
+   >>> print "Particle ID is       : ", particle.id
+   >>> print "Particle position is : ", particle.pos
+   
+   you cannot use this particle object to modify particle data.
+   You have to use the modifyParticle command for that (see below).
+   
+* `addAdrParticle(pid, pos, last_pos)`:
+
+   Add an AdResS Particle to the storage
+
+* `setFixedTuples(fixed_tuple_list)`:
+
+* `addParticles(particle_list, *properties)`:
+
+   This routine adds particles with certain properties to the storage.
+
+   :param particleList: list of particles (and properties) to be added
+   :param properties: property strings
+
+   Each particle in the list must be itself a list where each entry corresponds
+   to the property specified in properties.
+        
+   Example: 
+   
+   >>> addParticles([[id, pos, type, ... ], ...], 'id', 'pos', 'type', ...)
+
+* `modifyParticle(pid, property, value, decompose='yes')`
+    
+   This routine allows to modify any properties of an already existing particle.
+        
+   Example: 
+   
+   >>> modifyParticle(pid, 'pos', Real3D(new_x, new_y, new_z))
+
+
+* 'system':
+
+  The property 'system' returns the System object of the storage.
 
 Examples:
+
 >>> s.storage.addParticles([[1, espresso.Real3D(3,3,3)], [2, espresso.Real3D(4,4,4)]],'id','pos')
 >>> s.storage.decompose()
+>>> s.storage.modifyParticle(15, 'pos', Real3D(new_x, new_y, new_z))
 
 """
 
@@ -31,19 +75,16 @@ from espresso import toReal3DFromVector, ParticleLocal, Particle
 from espresso.Exceptions import ParticleDoesNotExistHere
 
 class StorageLocal(object):
-    """Abstract local base class for storing particles"""
 
     logger = logging.getLogger("Storage")
 
     def addParticle(self, pid, *args):
-        """Add a particle locally if it belongs to the local domain."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.addParticle(
                 self, pid, toReal3DFromVector(*args)
                 )
             
     def addAdrATParticle(self, pid, *args):
-        """Add a particle locally if it belongs to the local domain."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.addAdrATParticle(
                 self, pid, toReal3DFromVector(*args)
@@ -54,26 +95,10 @@ class StorageLocal(object):
             self.cxxclass.setFixedTuples(self, fixedtuples)
     
     def getParticle(self, pid):
-        """Get the local particle. If it is not on this node, any
-        attempt to access the particle will raise an exception."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return ParticleLocal(pid, self)
 
     def addParticles(self, particleList, *properties):
-        """
-        This routine adds particles with certain properties to the storage
-        where only one processor adds the particle in its local storage.
-
-        :param particleList: list of list particles (and properties) to be added
-        :param properties: property strings
-
-        Each particle in the list must be itself a list where each entry corresponds
-        to the property specified in properties.
-        
-        Example: addParticles([[id, pos, type, ... ], ...], 'id', 'pos', 'type', ...)
-
-        Improvement: make list of supported properties more flexible in use
-        """
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 
             index_id   = -1
@@ -152,13 +177,6 @@ class StorageLocal(object):
                         storedParticle.mass = particle[index_mass]
  
     def modifyParticle(self, pid, property, value):
-        """
-        This routine allows to modify any properties of an already existing particle
-        where only one processor modifies the particle in its local storage.
-        
-        Example: modifyParticle(pid, 'pos', Real3D(new_x, new_y, new_z))
-
-        """
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             particle = self.getParticle(pid)
             if particle:
