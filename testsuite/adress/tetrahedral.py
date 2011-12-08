@@ -17,13 +17,13 @@ from espresso.tools import timers
 #logging.getLogger("BC").setLevel(logging.DEBUG)
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
-steps = 10
+steps = 10000
 rc = 2.31 # CG cutoff, Morse
 rca = 1.122462048309373 # AT cutoff (2^(1/6)), WCA
 skin = 0.8
 nvt = True
 timestep = 0.001
-intervals = 1
+intervals = 10
 
 ex_size = 12.0
 hy_size = 2.5
@@ -65,7 +65,7 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
         energy = pot.computeEnergy(r)
         if body == 2:# this is for 2-body potentials
             force = pot.computeForce(Real3D(r, 0.0, 0.0))[0]
-            force /= r
+            #force /= r
         else: # this is for 3- and 4-body potentials
             force = pot.computeForce(r)
         outfile.write("%15.8g %15.8g %15.8g\n"%(r, energy, force))
@@ -73,15 +73,17 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
     outfile.close()
 
 
-# capped LJ
-tabWCA = "pot-wca.txt"
-potLJ  = espresso.interaction.LennardJonesCapped(epsilon=1.0, sigma=1.0, shift=True, caprad=0.27, cutoff=rca)
-writeTabFile(potLJ, tabWCA, N=512, low=0.005, high=rca)
+# capped LJ - uncomment to plot
+#tabWCA = "pot-wca.txt"
+#potLJ  = espresso.interaction.LennardJonesCapped(epsilon=1.0, sigma=1.0, shift=True, caprad=0.27, cutoff=rca)
+#writeTabFile(potLJ, tabWCA, N=512, low=0.005, high=rca)
 
+# FENE - uncomment to plot
 #tabFENE = "pot-fene.txt"
 #potFENE  = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
 #writeTabFile(potFENE, tabFENE, N=512, low=0.005, high=2.0)
 
+# tabulated morse potential used for CG interactions
 tabMorse = "pot-morse.txt"
 potMorse = espresso.interaction.Morse(epsilon=0.105, alpha=2.4, rMin=rc, cutoff=rc, shift="auto")
 writeTabFile(potMorse, tabMorse, N=512, low=0.005, high=rc)
@@ -152,9 +154,9 @@ for pidCG in range(num_particlesCG):
         cmv[i] /= 4.0
         
     allParticles.append([pidCG+num_particles, # CG particle has to bo added first!
-                         Real3D(cmp[0], cmp[1], cmp[2]),
-                         Real3D(cmv[0], cmv[1], cmv[2]),
-                         Real3D(0, 0, 0),
+                         Real3D(cmp[0], cmp[1], cmp[2]), # pos
+                         Real3D(cmv[0], cmv[1], cmv[2]), # vel
+                         Real3D(0, 0, 0), # f
                          0, 4.0, 0]) # type, mass, is not AT particle
     
     for pidAT in range(4): 
@@ -169,14 +171,10 @@ for pidCG in range(num_particlesCG):
         
     tuples.append(tmptuple)
     
-#print allParticles
-#print tuples
-#exit()
 
 # add particles
 system.storage.addParticles(allParticles, "id", "pos", "v", "f", "type", "mass", "adrat")
 
-#exit()
 
 # add tuples
 ftpl = espresso.FixedTupleList(system.storage)
@@ -196,12 +194,12 @@ system.storage.decompose()
 vl = espresso.VerletListAdress(system, cutoff=rc+skin, dEx=ex_size, dHy=hy_size, adrCenter=[18.42225, 18.42225, 18.42225])
 
 # non-bonded potentials
-# Tabulated WCA between AT and tabulated Morse between CG particles
-interNB = espresso.interaction.VerletListAdressTabulated(vl, ftpl)
-potWCA = espresso.interaction.Tabulated(itype=2, filename=tabWCA, cutoff=rca) # AT
+# LJ Capped WCA between AT and tabulated Morse between CG particles
+interNB = espresso.interaction.VerletListAdressLennardJonesCapped(vl, ftpl)
+potWCA  = espresso.interaction.LennardJonesCapped(epsilon=1.0, sigma=1.0, shift=True, caprad=0.27, cutoff=rca)
 potMorse = espresso.interaction.Tabulated(itype=2, filename=tabMorse, cutoff=rc) # CG
-interNB.setPotential(type1=0, type2=0, potential=potMorse) # CG
-interNB.setPotential(type1=1, type2=1, potential=potWCA) # AT
+interNB.setPotentialAT(type1=1, type2=1, potential=potWCA) # AT
+interNB.setPotentialCG(type1=0, type2=0, potential=potMorse) # CG
 system.addInteraction(interNB)
 
 # bonded potentials
@@ -270,22 +268,10 @@ for s in range(1, intervals + 1):
   system.storage.decompose()
 
   if (writepdb):
-      #  for i in range(num_particles-1, num_particles+num_particlesCG): # CG particles
       #num_particles = num_particles+num_particlesCG # all particles
       make_pdb(system, num_particles, size, unfold=False, outfile="atomsADR", step=s) # AT particles
 
 end_time = time.clock()
-
-#start_time = time.clock()
-#integrator.run(steps)
-#T = temperature.compute()
-#P = pressure.compute()
-#Pij = pressureTensor.compute()
-#Ek = 0.5 * T * (3 * num_particles)
-#Ep = interNB.computeEnergy()
-#Eb = interFENE.computeEnergy()
-#end_time = time.clock()
-#sys.stdout.write(fmt % (steps, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
 
 timers.show(integrator.getTimers(), precision=3)
 sys.stdout.write('Total # of neighbors = %d\n' % vl.totalSize())

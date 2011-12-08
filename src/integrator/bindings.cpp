@@ -4,6 +4,7 @@
 #include "VelocityVerletAdress.hpp"
 #include "VelocityVerletOnGroup.hpp"
 #include "Langevin.hpp"
+#include "TDforce.hpp"
 
 namespace espresso {
   namespace integrator {
@@ -13,6 +14,7 @@ namespace espresso {
       VelocityVerletAdress::registerPython();
       VelocityVerletOnGroup::registerPython();
       Langevin::registerPython();
+      TDforce::registerPython();
     }
   }
 }

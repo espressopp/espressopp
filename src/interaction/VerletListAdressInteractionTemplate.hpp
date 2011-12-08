@@ -36,7 +36,9 @@ namespace espresso {
           // AdResS stuff
           pidhy2 = M_PI/(verletList->getHy() * 2);
           dex = verletList->getEx();
+          dex2 = dex * dex;
           dexdhy = dex + verletList->getHy();
+          dexdhy2 = dexdhy * dexdhy;
       }
 
       void
@@ -94,7 +96,9 @@ namespace espresso {
       // AdResS stuff
       real pidhy2; // pi / (dhy * 2)
       real dexdhy; // dex + dhy
+      real dexdhy2; // dexdhy^2
       real dex;
+      real dex2; // dex^2
       std::map<Particle*, real> weights;
 
     };
@@ -126,8 +130,8 @@ namespace espresso {
         }
       }
 
-      // loop over CG particles and overwrite AT forces and velocity
-      // this makes the AT particles move along with CG particles
+      // Loop over CG particles and overwrite AT forces and velocity.
+      // This makes the AT particles move along with CG particles.
       std::set<Particle*> cgZone = verletList->getCGZone();
       for (std::set<Particle*>::iterator it=cgZone.begin();
                     it != cgZone.end(); ++it) {
@@ -157,7 +161,7 @@ namespace espresso {
             }
       }
 
-      // compute center of mass and weights for virtual particles in Adress zone (HY and AT region)
+      // Compute center of mass and weights for virtual particles in Adress zone (HY and AT region).
       std::set<Particle*> adrZone = verletList->getAdrZone();
       for (std::set<Particle*>::iterator it=adrZone.begin();
               it != adrZone.end(); ++it) {
@@ -167,7 +171,6 @@ namespace espresso {
           FixedTupleList::iterator it3;
           it3 = fixedtupleList->find(&vp);
 
-          //std::cout << "it: " << vp.id() << "\n";
           if (it3 != fixedtupleList->end()) {
 
               std::vector<Particle*> atList;
@@ -176,29 +179,21 @@ namespace espresso {
               // compute center of mass
               Real3D cmp(0.0, 0.0, 0.0); // center of mass position
               Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
-              real M = vp.getMass(); // sum of mass of AT particles
-              //real M = 0.0;
-              //std::cout << "vp id: " << vp.id()  << "-" << vp.ghost() << " pos: " << vp.position() << "\n";
+              //real M = vp.getMass(); // sum of mass of AT particles
               for (std::vector<Particle*>::iterator it2 = atList.begin();
                                    it2 != atList.end(); ++it2) {
-
                   Particle &at = **it2;
-                  Real3D d1 = at.position() - vp.position();
+                  //Real3D d1 = at.position() - vp.position();
                   //Real3D d1;
                   //verletList->getSystem()->bc->getMinimumImageVectorBox(d1, at.position(), vp.position());
-                  cmp += at.mass() * d1;
-                  cmv += at.mass() * at.velocity();
+                  //cmp += at.mass() * d1;
 
-                  //M += at.mass();
-                  //std::cout << " at id: " << at.id() << "-" << at.ghost() <<
-                    //" pos: " << at.position() << "\n";
-                    /*" d1: " << d1 <<
-                    " adding to cmp " << at.mass() * d1 <<
-                    " current cmp " << cmp << "\n";*/
+                  cmp += at.mass() * at.position();
+                  cmv += at.mass() * at.velocity();
               }
-              cmp = cmp / M;
-              cmv = cmv / M;
-              cmp += vp.position(); // cmp is a relative position
+              cmp /= vp.getMass();
+              cmv /= vp.getMass();
+              //cmp += vp.position(); // cmp is a relative position
               //std::cout << " cmp M: "  << M << "\n\n";
               //std::cout << "  moving VP to " << cmp << ", velocitiy is " << cmv << "\n";
 
@@ -206,37 +201,31 @@ namespace espresso {
               vp.position() = cmp;
               vp.velocity() = cmv;
 
-
-              // compute weights of VP
-              //std::cout << "minimim distances...\n";
+              // calculate distance to nearest adress particle or center
               std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
               Real3D pa = **it2; // position of adress particle
               Real3D d1 = vp.position() - pa;
-              real distsq1 = d1.sqr();
-              //real min1 = sqrt(distsq1);
-              real min1 = distsq1;
-              //std::cout << sqrt(distsq1) << "\n";
-
-              // calculate distance to nearest adress particle or center
+              real min1sq = d1.sqr(); // set min1sq before loop
+              ++it2;
               for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                    pa = **it2;
                    d1 = vp.position() - pa;
-                   distsq1 = d1.sqr();
+                   real distsq1 = d1.sqr();
                    //std::cout << pa << " " << sqrt(distsq1) << "\n";
-                   if (distsq1 < min1) min1 = distsq1;
+                   if (distsq1 < min1sq) min1sq = distsq1;
               }
 
-              min1 = sqrt(min1);
+              //real min1 = sqrt(min1sq);
               //std::cout << vp.id() << " min: " << min1 << "\n";
               //std::cout << vp.id() << " dex: " << dex << "\n";
               //std::cout << vp.id() << " dex+dhy: " << dexdhy << "\n";
 
               // calculate weight and write it in the map
               real w;
-              if (dex > min1) w = 1;
-              else if (dexdhy < min1) w = 0;
+              if (dex2 > min1sq) w = 1;
+              else if (dexdhy2 < min1sq) w = 0;
               else {
-                   w = cos(pidhy2 * (min1 - dex));
+                   w = cos(pidhy2 * (sqrt(min1sq) - dex));
                    w *= w;
               }
 
@@ -273,7 +262,7 @@ namespace espresso {
          Real3D forcevp(0.0, 0.0, 0.0);
          if (w12 != 1) { // calculate VP force if both VP are outside AT region (CG-HY, HY-HY)
              if(potentialCG._computeForce(forcevp, p1, p2)) {
-                 forcevp = (1 - w12) * forcevp;
+                 forcevp *= (1 - w12);
                  p1.force() += forcevp;
                  p2.force() -= forcevp;
              }
@@ -313,7 +302,7 @@ namespace espresso {
                          const PotentialAT &potentialAT = getPotentialAT(p3.type(), p4.type());
                          Real3D force(0.0, 0.0, 0.0);
                          if(potentialAT._computeForce(force, p3, p4)) {
-                             force = w12 * force;
+                             force *= w12;
                              p3.force() += force;
                              p4.force() -= force;
                          }
@@ -334,7 +323,7 @@ namespace espresso {
 
       weights.clear();
 
-      // distribute forces from VP to AT
+      // distribute forces from VP to AT (HY and AT region)
       for (std::set<Particle*>::iterator it=adrZone.begin();
                 it != adrZone.end(); ++it) {
 
@@ -348,22 +337,12 @@ namespace espresso {
             std::vector<Particle*> atList;
             atList = it3->second;
 
-            // total mass of AT particles belonging to a VP
-            real M = vp.getMass(); // instead of the code below
-            /*real M = 0.0;
-            for (std::vector<Particle*>::iterator it2 = atList.begin();
-                                 it2 != atList.end(); ++it2) {
-                Particle &at = **it2;
-                M += at.mass();
-                //std::cout << "at id: " << at.id() << "-" << at.ghost() <<
-                //" pos: " << at.position() << " mass: " << at.mass() << "\n";
-            }*/
-
             // update force of AT particles belonging to a VP
+            Real3D vpfm = vp.force() / vp.getMass();
             for (std::vector<Particle*>::iterator it2 = atList.begin();
                                  it2 != atList.end(); ++it2) {
                 Particle &at = **it2;
-                at.force() += at.mass() * vp.force() / M;
+                at.force() += at.mass() * vpfm;
             }
         }
         else { // this should not happen

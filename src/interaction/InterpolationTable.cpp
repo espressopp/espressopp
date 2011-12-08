@@ -207,6 +207,8 @@ namespace espresso {
                         << inner << " - " << inner + (N - 1) * delta);
             index = 0;
       } else if (index >= N) {
+         LOG4ESPP_ERROR(theLogger, "distance " << r << " out of range "
+                        << inner << " - " << inner + (N - 1) * delta);
             index = N-1;
       }
 

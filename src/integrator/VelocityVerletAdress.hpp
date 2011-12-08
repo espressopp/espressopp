@@ -10,18 +10,19 @@
 namespace espresso {
   namespace integrator {
 
-    /** Velocity Verlet Integrator */
+    /** Velocity Verlet Adress Integrator */
     class VelocityVerletAdress: public MDIntegrator {
 
       public:
 
         VelocityVerletAdress(shared_ptr<class espresso::System> system);
-
         ~VelocityVerletAdress();
 
         void setLangevin(shared_ptr<class Langevin> langevin);
-
         shared_ptr<class Langevin> getLangevin() { return langevin; }
+
+        void setTDforce(shared_ptr<class TDforce> tdf);
+        shared_ptr<class TDforce> getTDforce() { return tdf; }
 
         void run(int nsteps);
         
@@ -33,42 +34,35 @@ namespace espresso {
         boost::signals2::signal0 <void> saveOldPos;
         boost::signals2::signal0 <void> applyConstraints;
 
-
         /** Register this class so it can be used from Python. */
         static void registerPython();
 
       private:
 
         bool resortFlag;  //!< true implies need for resort of particles
-        real maxDist;
 
+        real maxDist;
         real maxCut;
 
-        shared_ptr< class Langevin > langevin;  //!< Langevin thermostat if available
+        shared_ptr<class Langevin> langevin;  // Langevin thermostat if available
+        shared_ptr<class TDforce> tdf;  // TD force if available
 
         /** Method updates particle positions and velocities.
-
             \return maximal square distance a particle has moved.
         */
-
         real integrate1();
-
         void integrate2();
 
         void initForces();
-
         void updateForces();
-
         void calcForces();
 
         void printPositions(bool withGhost);
-
         void printForces(bool withGhost);
 
         void setUp();   //!< set up for a new run
 
         void resetTimers();
-
         void printTimers();
 
         esutil::WallTimer timeIntegrate;  //!< used for timing
