@@ -1,18 +1,15 @@
-The ESPResSo++ Development Team
-===============================
+The ESPResSo++ Developer Team
+=============================
 
-.. image:: _static/scai_190x52.png
+(in alphabetical order)
 
-SCAI: `Institute for Algorithms and Scientific Computing <http://www.scai.fraunhofer.de>`_ 
-
- - Thomas Brandes
- - Axel Arnold
- - Dirk Reith
-
-.. image:: _static/mpip.png
-
-MPIP: `Max Planck Institute for Polymer Research <http://www.mpip-mainz.mpg.de>`_ 
-
- - Jonathan Halverson
- - Olaf Lenz
- - Torsten Stuehn
+- Axel Arnold (Institute for Computational Physics, Uni-Stuttgart, Germany)
+- Stas Bevc (National Institute of Chemistry, Slovenia)
+- Thomas Brandes (Fraunhofer Institute SCAI, Germany)
+- Jonathan Halverson (Max Planck Institute for Polymer Research, Germany)
+- Christoph Junghans (Max Planck Institute for Polymer Research, Germany)
+- Olaf Lenz (Institute for Computational Physics, Uni-Stuttgart, Germany)
+- Dirk Reith (Fraunhofer Institute SCAI, Germany)
+- Victor Ruehle (Max Planck Institute for Polymer Research, Germany)
+- Vitalii Starchenko (Max Planck Institute for Polymer Research, Germany)
+- Torsten Stuehn (Max Planck Institute for Polymer Research, Germany) 

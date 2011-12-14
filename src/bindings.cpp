@@ -18,8 +18,9 @@
 #include <Real3D.hpp>
 #include <Tensor.hpp>
 #include <Int3D.hpp>
-#include <esutil/PyLogger.hpp>
+#include <Version.hpp>
 
+#include <esutil/PyLogger.hpp>
 #include <esutil/bindings.hpp>
 #include <bc/bindings.hpp>
 #include <storage/bindings.hpp>
@@ -43,6 +44,7 @@ void espresso::registerPython() {
   espresso::Real3D::registerPython();
   espresso::Tensor::registerPython();
   espresso::Int3D::registerPython();
+  espresso::Version::registerPython();
 
   espresso::esutil::registerPython();
   espresso::bc::registerPython();

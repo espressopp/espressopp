@@ -47,7 +47,6 @@ class BCLocal(object):
     
 if pmi.isController :
     class BC(object):
-        """Abstract base class for boundary conditions."""
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             pmiproperty = [ "boxL", "rng" ],

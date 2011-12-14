@@ -29,6 +29,8 @@ foreach(FILENAME ${PYTHON_SCRIPTS})
   install(FILES ${DST} DESTINATION ${PYTHON_INSTDIR}/espresso/${DIR})
 endforeach(FILENAME)
 
+add_custom_target(hgversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_MODULE_PATH}/hgversion.cmake)
+
 #remove this two lines if autotools are gone
 add_custom_command(TARGET scripts COMMAND ${CMAKE_COMMAND} -E touch 
   ${CMAKE_CURRENT_BINARY_DIR}/main/_setupPath.py)
@@ -83,3 +85,6 @@ endif(BUILD_STANDALONE)
 
 #we have to build _espresso in a subdir to avoid endless recursion in python
 add_subdirectory(pymodule)
+
+
+add_dependencies(espresso_common hgversion)

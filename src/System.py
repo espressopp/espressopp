@@ -84,7 +84,6 @@ class SystemLocal(_espresso.System):
 
 if pmi.isController:
     class System(object):
-        'System object.'
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espresso.SystemLocal',
