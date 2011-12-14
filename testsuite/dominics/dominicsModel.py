@@ -89,7 +89,7 @@ potentials = genTabPotentials(tabfilesnb)
 ######################################################################
 ##  IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE  ##
 ######################################################################
-types, bonds, angles, dihedrals, x, y, z, Lx, Ly, Lz = gromacs.read(grofile, topfile)
+types, bonds, angles, dihedrals, x, y, z, vx, vy, vz, Lx, Ly, Lz = gromacs.read(grofile, topfile)
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
@@ -106,10 +106,13 @@ cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # add particles to the system and then decompose
+props = ['id', 'pos', 'v', 'type']
+allParticles = []
 for pid in range(num_particles):
-    #system.storage.addParticle(pid + 1, Real3D(x[pid], y[pid], z[pid]))
-    system.storage.addParticles([[pid + 1, Real3D(x[pid], y[pid], z[pid]), types[pid]]], "id", "pos", "type")
-    #system.storage.addParticles([[pid + 1, Real3D(x[pid], y[pid], z[pid])]], "id", "pos")
+    part = [pid + 1, Real3D(x[pid], y[pid], z[pid]),
+            Real3D(vx[pid], vy[pid], vz[pid]), types[pid]]
+    allParticles.append(part)
+system.storage.addParticles(allParticles, *props)    
 system.storage.decompose()
 
 

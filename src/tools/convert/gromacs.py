@@ -10,7 +10,7 @@ from operator import itemgetter # for sorting a dict
    It containts functions: read(), setInteractions(), convertTable()
    """
 
-def read(gro_file, top_file):
+def read(gro_file, top_file=""):
     """ Read GROMACS data files.
 
     Keyword arguments:
@@ -24,16 +24,21 @@ def read(gro_file, top_file):
         f.readline() # skip comment line
         num_particles = int(f.readline())
         
-        # store coordinates
+        # store coordinates and velocities
         x, y, z = [], [], []
+        vx, vy, vz = [], [], []
         for i in range(num_particles):
-            s = f.readline()[20:44] # atom coordinates
-            rx = float(s[0:8])
-            ry = float(s[8:16])
-            rz = float(s[16:24])
-            x.append(rx)
-            y.append(ry)
-            z.append(rz)
+            s = f.readline()[20:69]
+            # coordinates
+            x.append(float(s[0:8]))
+            y.append(float(s[8:16]))
+            z.append(float(s[16:24]))
+            
+            if len(s.split()) > 3:
+                # velocities
+                vx.append(float(s[24:32]))
+                vy.append(float(s[32:40]))
+                vz.append(float(s[40:49]))
         
         # store box size
         Lx, Ly, Lz = map(float, f.readline().split()) # read last line, convert to float
@@ -41,6 +46,8 @@ def read(gro_file, top_file):
 
 
     # read top and itp files
+    types = []
+    bonds, angles, dihedrals = {}, {}, {}
     if top_file != "":
         f = open(top_file)
         
@@ -159,8 +166,6 @@ def read(gro_file, top_file):
         
         # read itp files
         molecule = 0
-        types = []
-        bonds, angles, dihedrals = {}, {}, {}
         print "Reading included topology:"
         for itp_file in itp_files:
             print " "+itp_file
@@ -336,7 +341,10 @@ def read(gro_file, top_file):
         params.append(angles)
     if len(dihedrals) != 0:
         params.append(dihedrals)
-    params.extend([x, y, z, Lx, Ly, Lz])
+    params.extend([x, y, z])
+    if len(vx) != 0:
+        params.extend([vx, vy, vz])
+    params.extend([Lx, Ly, Lz])
     return tuple(params)
 
 
