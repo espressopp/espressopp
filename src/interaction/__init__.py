@@ -29,3 +29,4 @@ from espresso.interaction.AngularCosineSquared import *
 from espresso.interaction.DihedralPotential import *
 from espresso.interaction.TabulatedDihedral import *
 from espresso.interaction.OPLS import *
+from espresso.interaction.EwaldKSpace import *
