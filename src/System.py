@@ -82,12 +82,17 @@ class SystemLocal(_espresso.System):
         if pmi.workerIsActive():
             self.cxxclass.scaleVolume(self, factor)
 
+    def setTrace(self, switch):
+        'switch on or off VampirTrace'
+        if pmi.workerIsActive():
+            self.cxxclass.setTrace(self, switch)
+
 if pmi.isController:
     class System(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espresso.SystemLocal',
             pmiproperty = ['storage', 'bc', 'rng', 'skin'],
-            pmicall = ['addInteraction','removeInteraction','getInteraction','getNumberOfInteractions','scaleVolume']
+            pmicall = ['addInteraction','removeInteraction','getInteraction','getNumberOfInteractions','scaleVolume', 'setTrace']
             )
 

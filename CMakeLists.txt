@@ -44,13 +44,13 @@ ENDIF(NOT CMAKE_BUILD_TYPE)
 #VampirTrace settings
 ########################################################################
 
-set(VAMPIRTRACE false)
+set(VAMPIRTRACE False)
 
 if(VAMPIRTRACE)
-   set(VAMPIRTRACE_ROOT /home/brandes/local/VampirTrace-5.11.2)
+   set(VAMPIRTRACE_ROOT /people/thnfs/homes/stuehn/software)
    set(VAMPIRTRACE_LIBRARIES ${VAMPIRTRACE_ROOT}/lib/libvt-mpi.so
                              ${VAMPIRTRACE_ROOT}/lib/libotf.so)
-   # Attention: VampirTrace should included before MPI
+   # Attention: VampirTrace should be included before MPI
    include_directories(${VAMPIRTRACE_ROOT}/include)
    add_definitions( -DVTRACE )
 endif(VAMPIRTRACE)

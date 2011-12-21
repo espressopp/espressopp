@@ -2,11 +2,18 @@
 #include "python.hpp"
 #include <sstream>
 
+#ifdef VTRACE
+#include "vampirtrace/vt_user.h"
+#else
+# define VT_ON()
+# define VT_OFF()
+#endif
+
 namespace espresso {
 
   Version::Version() {
 	  name          = "ESPResSo++";
-      major         = MAJORVERSION;
+          major         = MAJORVERSION;
 	  minor         = MINORVERSION;
 	  patchlevel    = PATCHLEVEL;
 	  hgrevision    = hgversion;
@@ -20,6 +27,9 @@ namespace espresso {
 	  ss << " patchlevel " << patchlevel;
 	  ss << ", Mercurial(hg) revision: " << hgrevision;
 	  ss << ", compiled on " << date << ", " << time;
+#ifdef VTRACE
+	  ss << ", VampirTrace mode";
+#endif
 	  return ss.str();
   }
 

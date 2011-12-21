@@ -71,7 +71,7 @@ namespace espresso {
 	bc->scaleVolume(s);
   }
 
-  static void setTrace(bool flag)
+  void System::setTrace(bool flag)
   {
      if (flag)
      {
@@ -104,8 +104,7 @@ namespace espresso {
       .def("getInteraction", &System::getInteraction)
       .def("getNumberOfInteractions", &System::getNumberOfInteractions)
       .def("scaleVolume", &System::scaleVolume)
+      .def("setTrace", &System::setTrace)
       ;
-
-    def("setTrace", setTrace);
   }
 }
