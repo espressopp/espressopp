@@ -28,7 +28,7 @@ namespace espresso {
       virtual real computeEnergy();
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& wij);
-      virtual real getMaxCutoff();
+      virtual real getMaxCutoff() { return 0.0; }
       virtual bool isBonded() { return false; }
 
     protected:
@@ -45,14 +45,8 @@ namespace espresso {
     addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed for all particles in the cell lists");
 
-      for (iterator::CellListIterator it(storage->getRealCells());
-	   !it.isDone(); ++it) {
-        Particle p = *it;
+      potential->_computeForce(storage->getRealCells());
 
-        Real3D force(0.0, 0.0, 0.0);
-	if(potential->_computeForce()) {
-        }
-      }
     }
 
     template < typename _Potential > inline real 
