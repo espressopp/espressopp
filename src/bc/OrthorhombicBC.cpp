@@ -18,9 +18,16 @@ namespace espresso {
     void OrthorhombicBC::setBoxL(const Real3D& _boxL) {
       boxL = _boxL;
       for (int i = 0; i < 3; i++) {
-	invBoxL[i] = 1.0/boxL[i];
-	boxL2[i] = 0.5*boxL[i];
+	    invBoxL[i] = 1.0/boxL[i];
+	    boxL2[i] = 0.5*boxL[i];
       }
+      onBoxDimensionsChanged();
+    }
+    void OrthorhombicBC::scaleVolume(real s) {
+  	  boxL *= s;
+  	  boxL2 *= s;
+  	  invBoxL /= s;
+  	  onBoxDimensionsChanged();
     }
 
     /* Returns the minimum image vector between two positions */
@@ -134,7 +141,7 @@ namespace espresso {
     OrthorhombicBC::
     registerPython() {
       using namespace espresso::python;
-      class_<OrthorhombicBC, bases< BC > >
+      class_<OrthorhombicBC, bases< BC >, boost::noncopyable >
 	("bc_OrthorhombicBC", init< shared_ptr< esutil::RNG >, Real3D& >())
 	.add_property("boxL", &OrthorhombicBC::getBoxL, &OrthorhombicBC::setBoxL)
       ;

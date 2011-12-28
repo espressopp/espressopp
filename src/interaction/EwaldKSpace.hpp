@@ -2,11 +2,13 @@
 #ifndef _INTERACTION_EWALDKSPACE_HPP
 #define _INTERACTION_EWALDKSPACE_HPP
 
+#include <boost/signals2.hpp>
+#include "mpi.hpp"
 #include "Potential.hpp"
 #include "CellListAllParticlesInteractionTemplate.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "Cell.hpp"
-#include "mpi.hpp"
+#include "bc/BC.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -15,18 +17,14 @@ namespace espresso {
     private:
       real alpha;
       int kmax;
+      // we need the boundary condition object to be able to access the box dimensions
+      shared_ptr< bc::BC > bc;
       
       int * kvector;
     public:
       static void registerPython();
 
-      // empty constructor the variables should be initialized later
-      EwaldKSpace(): alpha(0.0), kmax(0) {
-        preset();
-      }
-      EwaldKSpace(real _alpha, int _kmax): alpha(_alpha), kmax(_kmax) {
-        preset();
-      }
+      EwaldKSpace(shared_ptr< bc::BC > _bc, real _alpha, int _kmax);
 
       // at this point we are ready to prepare the kvector[], it can be done just once at the begin
       void preset(){
@@ -79,7 +77,8 @@ namespace espresso {
       bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const {
 
       }
-
+    protected:
+      boost::signals2::connection connectionRecalcKVec;
 
     };
   }

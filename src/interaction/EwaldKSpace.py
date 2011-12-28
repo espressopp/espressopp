@@ -7,10 +7,10 @@ from _espresso import interaction_EwaldKSpace, interaction_CellListEwaldKSpace
 
 class EwaldKSpaceLocal(PotentialLocal, interaction_EwaldKSpace):
     'The (local) EwaldKSpace potential.'
-    def __init__(self, alpha=0.0, kmax=0):
+    def __init__(self, bc, alpha=0.0, kmax=0):
         """Initialize the local EwaldKSpace object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_EwaldKSpace, alpha, kmax)
+            cxxinit(self, interaction_EwaldKSpace, bc, alpha, kmax)
 
 class CellListEwaldKSpaceLocal(InteractionLocal, interaction_CellListEwaldKSpace):
     'The (local) EwaldKSpace interaction using CellListAllParticles.'

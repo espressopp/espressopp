@@ -3,8 +3,10 @@
 #define _BC_BC_HPP
 
 #include <boost/python/tuple.hpp>
+#include <boost/signals2.hpp>
 #include "types.hpp"
 #include "log4espp.hpp"
+#include "SystemAccess.hpp"
 
 namespace espresso {
   namespace bc {
@@ -19,7 +21,6 @@ namespace espresso {
       /** Getter for box dimensions */
       virtual Real3D getBoxL() const = 0;
       virtual void scaleVolume(real s) = 0;
-
       /** Getter for the RNG. */
       virtual shared_ptr< esutil::RNG > getRng() { return rng; }
       /** Setter for RNG. */
@@ -120,6 +121,10 @@ namespace espresso {
 
       virtual Real3D
       getRandomPos() const;
+
+      // This signal is called whenever the box dimensions did change
+      // (e.g. when scaling the Volume or when setting boxL)
+      boost::signals2::signal0 <void> onBoxDimensionsChanged;
 
       static void registerPython();
 
