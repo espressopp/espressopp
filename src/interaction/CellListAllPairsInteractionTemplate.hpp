@@ -54,16 +54,15 @@ namespace espresso {
     addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed for all pairs in the cell lists");
 
-      for (iterator::CellListAllPairsIterator it(storage->getRealCells());
-	   it.isValid(); ++it) {
+      for (iterator::CellListAllPairsIterator it(storage->getRealCells()); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         const Potential &potential = getPotential(p1.type(), p2.type());
 
         Real3D force(0.0, 0.0, 0.0);
-	if(potential._computeForce(force, p1, p2)) {
-	  p1.force() += force;
-	  p2.force() -= force;
+        if(potential._computeForce(force, p1, p2)) {
+          p1.force() += force;
+          p2.force() -= force;
         }
       }
     }

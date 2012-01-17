@@ -85,9 +85,9 @@ namespace espresso {
     CellListIterator::
     findNonemptyCell() {
       while (pit.isDone()) {
-	++cit;
-	if (cit.isDone()) break;
-	pit = ParticleList::Iterator((*cit)->particles);
+        ++cit;
+        if (cit.isDone()) break;
+        pit = ParticleList::Iterator((*cit)->particles);
       }
     }
   }

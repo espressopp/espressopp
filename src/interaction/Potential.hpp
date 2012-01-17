@@ -71,7 +71,9 @@ namespace espresso {
 			 const Particle &p1, const Particle &p2) const;
       bool _computeForce(Real3D& force, 
 			 const Real3D& dist) const;
-
+      
+      //bool _computeForce(CellList realcells) const;
+      
       // Requires the following non-virtual interface in Derived
       // real _computeEnergySqrRaw(real distSqr) const;
       // bool _computeForceRaw(const Real3D& dist, const Real3D& force) const;
@@ -274,6 +276,15 @@ namespace espresso {
         return derived_this()->_computeForceRaw(force, dist, distSqr);
       }
     }
+    
+    /*
+    template < class Derived > 
+    inline bool   
+    PotentialTemplate< Derived >::
+    _computeForce(CellList realcells) const {
+      return false;
+    }
+    */
   }
 }
 

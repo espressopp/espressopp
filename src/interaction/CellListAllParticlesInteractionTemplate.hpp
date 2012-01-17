@@ -46,7 +46,6 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "add forces computed for all particles in the cell lists");
 
       potential->_computeForce(storage->getRealCells());
-
     }
 
     template < typename _Potential > inline real 
@@ -66,9 +65,7 @@ namespace espresso {
     CellListAllParticlesInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor& wij) {
       LOG4ESPP_INFO(theLogger, "computed virial tensor for all particles in the cell lists");
-
       // TODO: computeVirialTensor not yet implemented for AllParticlesInteraction (e.G. k-space EWALD)
-
     }
 
     template < typename _Potential >
@@ -76,18 +73,10 @@ namespace espresso {
     CellListAllParticlesInteractionTemplate < _Potential >::
     computeEnergy() {
       LOG4ESPP_INFO(theLogger, "compute energy for all particles in cell list");
-
-      real e = 0.0;
-      for (iterator::CellListIterator it(storage->getRealCells());
-	   !it.isDone(); ++it) {
-        const Particle p = *it;
-    	e += potential->_computeEnergy();
-      }
-
-      return e;
+      return ( potential->_computeEnergy(storage->getRealCells()) );
     }
-}
-
+  
+  }
 }
 
 

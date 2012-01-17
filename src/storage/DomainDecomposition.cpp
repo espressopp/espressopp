@@ -96,8 +96,8 @@ namespace espresso {
     longint nLocalCells = 1;
     longint nRealCells = 1;
     for (int i = 0; i < 3; ++i) {
-  nRealCells *= cellGrid.getGridSize(i);
-  nLocalCells *= cellGrid.getFrameGridSize(i);
+      nRealCells *= cellGrid.getGridSize(i);
+      nLocalCells *= cellGrid.getFrameGridSize(i);
     }
 
     resizeCells(nLocalCells);
@@ -120,18 +120,18 @@ namespace espresso {
     ghostCells.resize(0);
 
     for (int o = 0; o < cellGrid.getFrameGridSize(2); ++o) {
-  for (int n = 0; n < cellGrid.getFrameGridSize(1); ++n) {
-    for (int m = 0; m < cellGrid.getFrameGridSize(0); ++m) {
-      Cell *cur = &cells[cellGrid.mapPositionToIndex(m, n, o)];
-      if (cellGrid.isInnerCell(m, n, o)) {
-        LOG4ESPP_TRACE(logger, "cell " << (cur - &cells[0]) << " is inner cell (" << m << ", " << n << ", " << o << ")");
-        realCells.push_back(cur);
-      } else {
-        LOG4ESPP_TRACE(logger, "cell " << (cur - &cells[0]) << " is ghost cell (" << m << ", " << n << ", " << o << ")");
-        ghostCells.push_back(cur);
+      for (int n = 0; n < cellGrid.getFrameGridSize(1); ++n) {
+        for (int m = 0; m < cellGrid.getFrameGridSize(0); ++m) {
+          Cell *cur = &cells[cellGrid.mapPositionToIndex(m, n, o)];
+          if (cellGrid.isInnerCell(m, n, o)) {
+            LOG4ESPP_TRACE(logger, "cell " << (cur - &cells[0]) << " is inner cell (" << m << ", " << n << ", " << o << ")");
+            realCells.push_back(cur);
+          } else {
+            LOG4ESPP_TRACE(logger, "cell " << (cur - &cells[0]) << " is ghost cell (" << m << ", " << n << ", " << o << ")");
+            ghostCells.push_back(cur);
+          }
+        }
       }
-    }
-  }
     }
   }
 
