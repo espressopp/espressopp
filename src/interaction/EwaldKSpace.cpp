@@ -14,9 +14,10 @@ namespace espresso {
       alpha = _alpha;
       kmax  = _kmax;
       preset();
-      getParticleNumber(); // geting the number of particles for the current node
+      // getParticleNumber(); // geting the number of particles for the current node // it's done in preset
       
-      // This function calculates the square of all particle charges. It should be called one time.
+      // This function calculates the square of all particle charges. It should be called ones,
+      // if the total number of particles doesn't change.
       count_charges(system->storage->getRealCells()); 
 
       // make a connection to boundary conditions to invoke recalculation of KVec if box dimensions change

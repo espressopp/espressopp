@@ -2,8 +2,7 @@
 #ifndef _INTERACTION_EWALDKSPACE_HPP
 #define _INTERACTION_EWALDKSPACE_HPP
 
-//#include <vector>
-//#include <complex>
+#include <cmath>
 
 #include <boost/signals2.hpp>
 #include "mpi.hpp"
@@ -25,11 +24,14 @@ typedef complex<double> dcomplex;
 #define M_2PI (2*M_PIl)
 #define M_PI2 (M_PIl*M_PIl)
 
-#define M_1_SQRTPI (M_2_SQRTPIl * .5) /* 2/sqrt(pi)/2 = 1/sqrt(pi) */
+#define M_1_SQRTPI (M_2_SQRTPIl * 0.5) /* 2/sqrt(pi)/2 = 1/sqrt(pi) */
 
 namespace espresso {
   namespace interaction {
-    /** This class provides methods to compute forces and energies of the EwaldKSpace part*/
+    /** This class provides methods to compute forces and energies of the EwaldKSpace part.
+     *  Curently it works with cubes and rectangular cuboids.
+     *  Does not work for triclinic box, slab geometry.
+     */
     class EwaldKSpace : public PotentialTemplate< EwaldKSpace > {
     private:
       real prefactor;
@@ -67,7 +69,7 @@ namespace espresso {
       
       real sum_q2;
         
-      // @todo one should clean the memory then
+      // @TODO one should clean the memory then
       dcomplex* sum; 
       dcomplex* totsum; 
     public:
@@ -83,34 +85,38 @@ namespace espresso {
         Ly = Li[1];
         Lz = Li[2];
         
-        int kmaxsq = kmax * kmax;
+        real skmaxsq = pow( kmax / min(Lx, min(Ly,Lz)), 2 ); // we chose the biggest cutoff 
         
         rclx = M_2PI / Lx;
         rcly = M_2PI / Ly;
         rclz = M_2PI / Lz;
         
-        force_prefac[0] = prefactor * (-2.0) * M_2PI / Lx;
-        force_prefac[1] = prefactor * (-2.0) * M_2PI / Ly;
-        force_prefac[2] = prefactor * (-2.0) * M_2PI / Lz;
+        force_prefac[0] = prefactor * (-2.0) * rclx;
+        force_prefac[1] = prefactor * (-2.0) * rcly;
+        force_prefac[2] = prefactor * (-2.0) * rclz;
         
         // precalculate factors
         real B = M_PI2 / (alpha * alpha);
-        real V = Lx * Ly * Lz * M_2PI;
+        real V = M_2PI * Lx * Ly * Lz;
         
         /* calculate the k-vector array */
-        int ksq,kx,ky,kz;
-        real rksq, rkx,rky,rkz;
+        int ksq,kx2,ky2,kz2;
+        real rksq, rkx2,rky2,rkz2;
         kVectorLength = 0;
-        for(kx = 0; kx <= kmax; kx++){
-          rkx = kx / Lx;
-          for(ky = -kmax; ky <= kmax; ky++){
-            rky = ky / Ly;
-            for(kz = -kmax; kz <= kmax; kz++) {
-              rkz = kz / Lz;
-              ksq=kx*kx+ky*ky+kz*kz;
-              if( (ksq < kmaxsq) && (ksq !=0) ){
-                rksq = rkx*rkx+rky*rky+rkz*rkz;
-                
+        for(int kx = 0; kx <= kmax; kx++){
+          kx2  = pow( kx , 2 );
+          rkx2 = kx2 / pow( Lx, 2 );
+          for(int ky = -kmax; ky <= kmax; ky++){
+            ky2  = pow( ky, 2 );
+            rky2 = ky2 / pow( Ly, 2 );
+            for(int kz = -kmax; kz <= kmax; kz++) {
+              kz2  = pow( kz, 2 );
+              rkz2 = kz2 / pow( Lz, 2 );
+              
+              ksq  = kx2+ky2+kz2;
+              rksq = rkx2+rky2+rkz2;
+              
+              if( (rksq < skmaxsq) && (ksq !=0) ){
                 kvector.push_back(  exp( -rksq * B)/( rksq * V)  );
                 
                 kxfield.push_back( kx );
@@ -130,7 +136,9 @@ namespace espresso {
         sum = NULL;
         totsum = NULL;
         sum = new dcomplex[kVectorLength]; 
-        totsum = new dcomplex[kVectorLength]; 
+        totsum = new dcomplex[kVectorLength];
+        
+        getParticleNumber();
       }
       
       // here we get the current particle number on the current node
@@ -142,9 +150,10 @@ namespace espresso {
         eiky = vector< vector<dcomplex> > (2*kmax+1, vector<dcomplex>(nParticles, 0));
         eikz = vector< vector<dcomplex> > (2*kmax+1, vector<dcomplex>(nParticles, 0));
         
-        eik = vector< vector<dcomplex> > (kVectorLength, vector<dcomplex>(nParticles, 0));
+        eik  = vector< vector<dcomplex> > (kVectorLength, vector<dcomplex>(nParticles, 0));
       }
       
+      // it counts the squared charges over all system. It is used for self energy calculations
       void count_charges(CellList realcells){
         real node_sum_q2 = 0.0;
         for (iterator::CellListIterator it(realcells); !it.isDone(); ++it) {
@@ -173,7 +182,6 @@ namespace espresso {
 
       
       // compute force and energy
-      
       void exponentPrecalculation(CellList realcells){
         /* Calculation of k space sums */
         // -1, 0, 1
@@ -200,22 +208,23 @@ namespace espresso {
           j=0;
           for (iterator::CellListIterator it(realcells); !it.isDone(); ++it) {
             Particle &p = *it;
-            
-            eikx[     k][j] = eikx[     k-1][j] * eikx[     1][j];
 
+            eikx[     k][j] = eikx[     k-1][j] * eikx[     1][j];
+            
             eiky[kmax+k][j] = eiky[kmax+k-1][j] * eiky[kmax+1][j];
             eiky[kmax-k][j] = conj( eiky[kmax+k][j] );
 
             eikz[kmax+k][j] = eikz[kmax+k-1][j] * eikz[kmax+1][j];
             eikz[kmax-k][j] = conj( eikz[kmax+k][j] );
+
             j++;
           }
         }
         
         real q; // particle charge, auxiliary
         for (int k=0; k<kVectorLength; k++) {
-          sum[k] = dcomplex(0.0, 0.0);
-          totsum[k] = dcomplex(0.0, 0.0); // @todo do we need to do that?
+          sum[k]    = dcomplex(0.0, 0.0);
+          totsum[k] = dcomplex(0.0, 0.0);
           j=0;
           for (iterator::CellListIterator it(realcells); !it.isDone(); ++it) {
             Particle &p = *it;
@@ -239,6 +248,7 @@ namespace espresso {
         int n_nodes = communic.size();
         int this_node = communic.rank();
         
+        // @TODO it could be a problem if   n_nodes > kVectorLength
         int numk = kVectorLength / n_nodes + 1;
         int mink = this_node * numk;
         int maxk = mink + numk;
@@ -250,7 +260,7 @@ namespace espresso {
             fact=1.0;
           else
             fact=2.0;
-          node_energy += fact * kvector[k] *  norm( totsum[k] );
+          node_energy += fact * kvector[k] * norm( totsum[k] );
         }
         real energy = 0;
         mpi::all_reduce( *system -> comm, node_energy, energy, plus<real>() );
@@ -282,13 +292,11 @@ namespace espresso {
             
             real tf = 0.0;
             if( p.q()!=0 ){
-            
               tf= imag( tff  *  conj( eik[k][j] ) );
             
               p.force()[0] += force_prefac[0] * tf * kxfield[k];
               p.force()[1] += force_prefac[1] * tf * kyfield[k];
               p.force()[2] += force_prefac[2] * tf * kzfield[k];
-              
             }
             j++;
           }
@@ -297,7 +305,6 @@ namespace espresso {
         
         return true;
       }
-
 
       // @todo this functions should be somehow cleaned
       real _computeEnergySqrRaw(real distSqr) const {
