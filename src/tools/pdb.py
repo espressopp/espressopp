@@ -51,11 +51,11 @@ def psfwrite(filename, system, maxdist=None):
         pid   += 1
     else:
         pid   += 1
-   
+
   bond = []
   nInteractions = system.getNumberOfInteractions()
   for i in range(nInteractions):
-      if system.getInteraction(i).isBonded():
+      if system.getInteraction(i).bondType() == espresso.interaction.Pair:
          try:
               FixedPairList = system.getInteraction(i).getFixedPairList().getBonds()
               j = 0
@@ -98,3 +98,34 @@ def psfwrite(filename, system, maxdist=None):
     i += 1
 
   file.close()
+  
+  
+  
+  
+  """
+  NOT finished yet - working on that see lammps.write how to do this!
+   
+  bonds     = []
+  angles    = []
+  dihedrals = [] 
+  nInteractions = system.getNumberOfInteractions()
+  for i in range(nInteractions):
+      bT = system.getInteraction.bondType
+      if   bT == espresso.interaction.Pair:
+             bl = system.getInteraction(i).getFixedPairList().getBonds
+             for j in range(len(bl)):
+               bonds.extend(bl[j])
+      elif bT == espresso.interaction.Angle:
+             an = system.getInteraction(i).getFixedTripleList().getTriples
+             for j in range(len(an)):
+               angles.extend(an[j])
+      elif bT == espresso.interaction.Dihedral:
+             di = system.getInteraction(i).getFixedQuadrupleList().getQuadruples
+             for j in range(len(di)):
+               dihedrals.extend(di[j])
+  
+  nbonds     = len(bonds)
+  nangles    = len(angles)
+  ndihedrals = len(dihedrals)
+"""
+  

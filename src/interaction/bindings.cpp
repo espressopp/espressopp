@@ -4,6 +4,7 @@
 #include "LennardJones.hpp"
 #include "LennardJonesAutoBonds.hpp"
 #include "LennardJonesCapped.hpp"
+#include "LennardJonesEnergyCapped.hpp"
 #include "LennardJonesExpand.hpp"
 #include "LennardJonesGromacs.hpp"
 #include "Morse.hpp"
@@ -34,6 +35,7 @@ namespace espresso {
       LennardJones::registerPython();
       LennardJonesAutoBonds::registerPython();
       LennardJonesCapped::registerPython();
+      LennardJonesEnergyCapped::registerPython();
       LennardJonesExpand::registerPython();
       LennardJonesGromacs::registerPython();
       Morse::registerPython();

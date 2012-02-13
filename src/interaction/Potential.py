@@ -15,6 +15,11 @@ class PotentialLocal(object):
 
     def computeForce(self, *args):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            if len(args) == 1:
+                arg0 = args[0]
+                if isinstance(arg0, float) or isinstance(arg0, int):
+                    newargs = [arg0, 0, 0]
+                    return self.cxxclass.computeForce(self, toReal3DFromVector(*newargs))[0]
             return self.cxxclass.computeForce(self, toReal3DFromVector(*args))
 
     def _setShift(self, shift="auto"):

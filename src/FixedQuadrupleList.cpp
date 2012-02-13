@@ -106,6 +106,18 @@ namespace espresso {
     return true;
   }
 
+  python::list FixedQuadrupleList::getQuadruples()
+  {
+	python::tuple quadruple;
+	python::list quadruples;
+	for (GlobalQuadruples::const_iterator it=globalQuadruples.begin(); it != globalQuadruples.end(); it++) {
+      quadruple = python::make_tuple(it->first, it->second.first, it->second.second, it->second.third);
+      quadruples.append(quadruple);
+    }
+
+	return quadruples;
+  }
+
   void FixedQuadrupleList::
   beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
     
@@ -239,6 +251,8 @@ namespace espresso {
     class_< FixedQuadrupleList, shared_ptr< FixedQuadrupleList > >
       ("FixedQuadrupleList", init< shared_ptr< storage::Storage > >())
       .def("add", pyAdd)
-      ;
+      .def("size", &FixedQuadrupleList::size)
+      .def("getQuadruples",  &FixedQuadrupleList::getQuadruples)
+     ;
   }
 }

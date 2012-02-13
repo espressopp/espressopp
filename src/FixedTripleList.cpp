@@ -109,6 +109,18 @@ namespace espresso {
     return true;
   }
 
+  python::list FixedTripleList::getTriples()
+  {
+	python::tuple triple;
+	python::list triples;
+	for (GlobalTriples::const_iterator it=globalTriples.begin(); it != globalTriples.end(); it++) {
+      triple = python::make_tuple(it->first, it->second.first, it->second.second);
+      triples.append(triple);
+    }
+
+	return triples;
+  }
+
   void FixedTripleList::
   beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
     std::vector< longint > toSend;
@@ -231,6 +243,8 @@ namespace espresso {
     class_< FixedTripleList, shared_ptr< FixedTripleList > >
       ("FixedTripleList", init< shared_ptr< storage::Storage > >())
       .def("add", pyAdd)
-      ;
+      .def("size", &FixedTripleList::size)
+      .def("getTriples",  &FixedTripleList::getTriples)
+     ;
   }
 }

@@ -27,11 +27,36 @@ class FixedTripleListLocal(_espresso.FixedTripleList):
                 pid1, pid2, pid3 = triple
                 self.cxxclass.add(self, pid1, pid2, pid3)
 
+    def size(self):
+        'count number of Triples in GlobalTripleList, involves global reduction'
+        if pmi.workerIsActive():
+            return self.cxxclass.size(self)
+
+    def addTriples(self, triplelist):
+        """
+        Each processor takes the broadcasted triplelist and
+        adds those triples whose first particle is owned by
+        this processor.
+        """
+        
+        if pmi.workerIsActive():
+            for triple in triplelist:
+                pid1, pid2, pid3 = triple
+                self.cxxclass.add(self, pid1, pid2, pid3)
+
+
+    def getTriples(self):
+        'return the triples of the GlobalTripleList'
+        if pmi.workerIsActive():
+          triples = self.cxxclass.getTriples(self)
+          return triples 
+
 if pmi.isController:
     class FixedTripleList(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espresso.FixedTripleListLocal',
             localcall = [ "add" ],
-            pmicall = [ "addTriples" ]
+            pmicall = [ "addTriples" ],
+            pmiinvoke = ["getTriples", "size"]
             )

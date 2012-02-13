@@ -37,6 +37,13 @@ namespace espresso {
 		void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
 		virtual void onParticlesChanged();
 
+		python::list getTriples();
+
+	    /** Get the number of triples in the GlobalTriples list */
+	    int size() {
+	    	return globalTriples.size();
+	    }
+
 		static void registerPython();
 	
 

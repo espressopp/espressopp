@@ -24,7 +24,8 @@ namespace espresso {
            init<shared_ptr<System>,
                 shared_ptr<FixedTripleList>,
                 shared_ptr<Cosine> >())
-        .def("setPotential", &FixedTripleListCosine::setPotential);
+        .def("setPotential", &FixedTripleListCosine::setPotential)
+        .def("getFixedTripleList", &FixedTripleListCosine::getFixedTripleList);
       ;
     }
   }

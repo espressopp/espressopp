@@ -37,6 +37,14 @@ namespace espresso {
     void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
     void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
     void onParticlesChanged();
+
+    python::list getQuadruples();
+
+    /** Get the number of quadruples in the GlobalQuadruples list */
+    int size() {
+    	return globalQuadruples.size();
+    }
+
     static void registerPython();
 
   private:

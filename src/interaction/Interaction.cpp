@@ -16,7 +16,7 @@ namespace espresso {
 
       class_< Interaction, boost::noncopyable >("interaction_Interaction", no_init)
         .def("computeEnergy", &Interaction::computeEnergy)
-        .def("isBonded", &Interaction::isBonded)
+        .def("bondType", &Interaction::bondType)
       ;
     }
   }

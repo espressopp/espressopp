@@ -22,9 +22,9 @@ class FixedTripleListCosineLocal(InteractionLocal, interaction_FixedTripleListCo
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
-    def getFixedPairList(self):
+    def getFixedTripleList(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return []
+            return self.cxxclass.getFixedTripleList(self)
 
 if pmi.isController:
     class Cosine(AngularPotential):
@@ -38,5 +38,5 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.FixedTripleListCosineLocal',
-            pmicall = ['setPotential','getFixedPairList']
+            pmicall = ['setPotential','getFixedTripleList']
             )

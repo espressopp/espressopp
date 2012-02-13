@@ -9,6 +9,8 @@
 namespace espresso {
   namespace interaction {
 
+    enum bondTypes {unused, Nonbonded, Pair, Angular, Dihedral};
+
     /** Interaction base class. */
 
     class Interaction {
@@ -21,7 +23,7 @@ namespace espresso {
 
       /** This method returns the maximal cutoff defined for one type pair. */
       virtual real getMaxCutoff() = 0;
-      virtual bool isBonded() = 0;
+      virtual int bondType() = 0;
 
       static void registerPython();
 

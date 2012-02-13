@@ -68,18 +68,18 @@ class ParticleLocal(object):
     
     @property
     def type(self): return self.__getTmp().type
-    @pos.setter
+    @type.setter
     def type(self, val): self.__getTmp().type = val
     
     @property
     def mass(self): return self.__getTmp().mass
-    @pos.setter
-    def mass(self, val): self.__getTmp().type = val
+    @mass.setter
+    def mass(self, val): self.__getTmp().mass = val
     
     @property
     def q(self): return self.__getTmp().q
-    @pos.setter
-    def q(self, val): self.__getTmp().type = val
+    @q.setter
+    def q(self, val): self.__getTmp().q = val
     
     @property
     def imageBox(self): return self.__getTmp().imageBox

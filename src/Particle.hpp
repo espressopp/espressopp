@@ -113,6 +113,9 @@ namespace espresso {
     // the image of the particle
     Int3D i;
     bool ghost;
+    bool dummy1;
+    bool dummy2;
+    bool dummy3;
   private:
     friend class boost::serialization::access;
     template< class Archive >

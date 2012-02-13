@@ -3,30 +3,30 @@ from espresso.esutil import *
 
 from espresso.interaction.Potential import *
 from espresso.interaction.Interaction import *
-from _espresso import interaction_LennardJonesCapped, \
-                      interaction_VerletListLennardJonesCapped, \
-                      interaction_VerletListAdressLennardJonesCapped, \
-                      interaction_CellListLennardJonesCapped, \
-                      interaction_FixedPairListLennardJonesCapped
+from _espresso import interaction_LennardJonesEnergyCapped, \
+                      interaction_VerletListLennardJonesEnergyCapped, \
+                      interaction_VerletListAdressLennardJonesEnergyCapped, \
+                      interaction_CellListLennardJonesEnergyCapped, \
+                      interaction_FixedPairListLennardJonesEnergyCapped
 
-class LennardJonesCappedLocal(PotentialLocal, interaction_LennardJonesCapped):
-    'The (local) Lennard-Jones potential with force capping.'
+class LennardJonesEnergyCappedLocal(PotentialLocal, interaction_LennardJonesEnergyCapped):
+    'The (local) Lennard-Jones potential with energy capping.'
     def __init__(self, epsilon=1.0, sigma=1.0, 
-                 cutoff=infinity, caprad=0.0, shift="auto"):
+                 cutoff=infinity, caprad=0.0 ,shift="auto"):
         """Initialize the local Lennard Jones object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
-                cxxinit(self, interaction_LennardJonesCapped, 
+                cxxinit(self, interaction_LennardJonesEnergyCapped, 
                         epsilon, sigma, cutoff, caprad)
             else:
-                cxxinit(self, interaction_LennardJonesCapped, 
+                cxxinit(self, interaction_LennardJonesEnergyCapped, 
                         epsilon, sigma, cutoff, caprad, shift)
 
-class VerletListLennardJonesCappedLocal(InteractionLocal, interaction_VerletListLennardJonesCapped):
+class VerletListLennardJonesEnergyCappedLocal(InteractionLocal, interaction_VerletListLennardJonesEnergyCapped):
     'The (local) Lennard Jones interaction using Verlet lists.'
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListLennardJonesCapped, vl)
+            cxxinit(self, interaction_VerletListLennardJonesEnergyCapped, vl)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -36,11 +36,11 @@ class VerletListLennardJonesCappedLocal(InteractionLocal, interaction_VerletList
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
-class VerletListAdressLennardJonesCappedLocal(InteractionLocal, interaction_VerletListAdressLennardJonesCapped):
+class VerletListAdressLennardJonesEnergyCappedLocal(InteractionLocal, interaction_VerletListAdressLennardJonesEnergyCapped):
     'The (local) Lennard Jones interaction using Verlet lists.'
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListAdressLennardJonesCapped, vl, fixedtupleList)
+            cxxinit(self, interaction_VerletListAdressLennardJonesEnergyCapped, vl, fixedtupleList)
 
     def setPotentialAT(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -58,11 +58,11 @@ class VerletListAdressLennardJonesCappedLocal(InteractionLocal, interaction_Verl
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotentialCG(self, type1, type2)
 
-class CellListLennardJonesCappedLocal(InteractionLocal, interaction_CellListLennardJonesCapped):
+class CellListLennardJonesEnergyCappedLocal(InteractionLocal, interaction_CellListLennardJonesEnergyCapped):
     'The (local) Lennard Jones interaction using cell lists.'
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_CellListLennardJonesCapped, stor)
+            cxxinit(self, interaction_CellListLennardJonesEnergyCapped, stor)
         
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -72,11 +72,11 @@ class CellListLennardJonesCappedLocal(InteractionLocal, interaction_CellListLenn
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.setPotential(self, type1, type2)
 
-class FixedPairListLennardJonesCappedLocal(InteractionLocal, interaction_FixedPairListLennardJonesCapped):
+class FixedPairListLennardJonesEnergyCappedLocal(InteractionLocal, interaction_FixedPairListLennardJonesEnergyCapped):
     'The (local) Lennard-Jones interaction using FixedPair lists.'
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListLennardJonesCapped, system, vl, potential)
+            cxxinit(self, interaction_FixedPairListLennardJonesEnergyCapped, system, vl, potential)
         
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -87,37 +87,37 @@ class FixedPairListLennardJonesCappedLocal(InteractionLocal, interaction_FixedPa
             return self.cxxclass.setPotential(self)
 
 if pmi.isController:
-    class LennardJonesCapped(Potential):
+    class LennardJonesEnergyCapped(Potential):
         'The Lennard-Jones potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.LennardJonesCappedLocal',
+            cls = 'espresso.interaction.LennardJonesEnergyCappedLocal',
             pmiproperty = ['epsilon', 'sigma', 'cutoff', 'caprad']
             )
 
-    class VerletListLennardJonesCapped(Interaction):
+    class VerletListLennardJonesEnergyCapped(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListLennardJonesCappedLocal',
+            cls =  'espresso.interaction.VerletListLennardJonesEnergyCappedLocal',
             pmicall = ['setPotential', 'getPotential']
             )
 
-    class VerletListAdressLennardJonesCapped(Interaction):
+    class VerletListAdressLennardJonesEnergyCapped(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListAdressLennardJonesCappedLocal',
+            cls =  'espresso.interaction.VerletListAdressLennardJonesEnergyCappedLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG', 'getPotentialAT', 'getPotentialCG']
             )
 
-    class CellListLennardJonesCapped(Interaction):
+    class CellListLennardJonesEnergyCapped(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.CellListLennardJonesCappedLocal',
+            cls =  'espresso.interaction.CellListLennardJonesEnergyCappedLocal',
             pmicall = ['setPotential', 'getPotential']
             )
         
-    class FixedPairListLennardJonesCapped(Interaction):
+    class FixedPairListLennardJonesEnergyCapped(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedPairListLennardJonesCappedLocal',
+            cls =  'espresso.interaction.FixedPairListLennardJonesEnergyCappedLocal',
             pmicall = ['setPotential']
             )

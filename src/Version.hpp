@@ -3,8 +3,8 @@
 #define _VERSION_HPP
 #include <string>
 
-#define MAJORVERSION 0
-#define MINORVERSION 9
+#define MAJORVERSION 1
+#define MINORVERSION 0
 #define PATCHLEVEL   0
 #include "hgversion.hpp"
 

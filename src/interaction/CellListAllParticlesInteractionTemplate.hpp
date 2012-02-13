@@ -29,7 +29,7 @@ namespace espresso {
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& wij);
       virtual real getMaxCutoff() { return 0.0; }
-      virtual bool isBonded() { return false; }
+      virtual int bondType() { return Nonbonded; }
 
     protected:
       int ntypes;

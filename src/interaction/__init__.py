@@ -9,6 +9,7 @@ from espresso.interaction.Zero import *
 from espresso.interaction.LennardJones import *
 from espresso.interaction.LennardJonesAutoBonds import *
 from espresso.interaction.LennardJonesCapped import *
+from espresso.interaction.LennardJonesEnergyCapped import *
 from espresso.interaction.LennardJonesExpand import *
 from espresso.interaction.LennardJonesGromacs import *
 from espresso.interaction.Morse import *
