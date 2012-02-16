@@ -9,4 +9,5 @@ ESPResSo++ User Interface - Class Description
    espresso.bc.BC.rst
    espresso.bc.OrthorhombicBC.rst
    espresso.storage.rst
+   espresso.integrator.Berendsen.rst
 
