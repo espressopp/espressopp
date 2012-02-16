@@ -28,6 +28,8 @@ namespace espresso {
 
       /** Scale Volume of the storage */
       virtual void scaleVolume(real s);
+      /** Scale Volume of the storage. Anisotropic case */
+      virtual void scaleVolume(Real3D s);
 
       /** add a particle with given id and position. Note that this is a
 	  local operation, and therefore cannot check whether a particle

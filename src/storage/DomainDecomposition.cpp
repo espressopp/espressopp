@@ -140,6 +140,11 @@ namespace espresso {
 	Storage::scaleVolume(s);
 	cellGrid.scaleVolume(s);
   }
+  // anisotropic version
+  void DomainDecomposition::scaleVolume(Real3D s) {
+	Storage::scaleVolume(s);
+	cellGrid.scaleVolume(s);
+  }
 
   void DomainDecomposition::initCellInteractions() {
     LOG4ESPP_DEBUG(logger, "setting up neighbors for " << cells.size() << " cells");

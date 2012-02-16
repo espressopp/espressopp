@@ -20,8 +20,13 @@ namespace espresso {
         ~VelocityVerlet();
 
         void setLangevin(shared_ptr<class Langevin> langevin);
-
+        
         shared_ptr<class Langevin> getLangevin() { return langevin; }
+        
+        // set & get barostat
+        void setBerendsen(shared_ptr<class Berendsen> berendsen);
+        shared_ptr<class Berendsen> getBerendsen() { return berendsen; }
+        
 
         void run(int nsteps);
         
@@ -50,6 +55,8 @@ namespace espresso {
             \return maximal square distance a particle has moved.
         */
 
+        shared_ptr< class Berendsen > berendsen;  //!< Berendsen barostat if available
+        
         real integrate1();
 
         void integrate2();

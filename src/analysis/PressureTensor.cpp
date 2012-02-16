@@ -18,11 +18,13 @@ namespace espresso {
 
       System& system = getSystemRef();
   
+      /* don't need these lines
       // determine number of local particles and total particles
       int N;
       int Nsum;
       N = system.storage->getNRealParticles();
       boost::mpi::reduce(*mpiWorld, N, Nsum, std::plus<int>(), 0);
+      */
 
       // determine volume of the box
       Real3D Li = system.bc->getBoxL();
@@ -40,7 +42,8 @@ namespace espresso {
         Real3D& vel = cit->velocity();
         vvLocal += mass * Tensor(vel, vel);
       }
-      boost::mpi::reduce(*mpiWorld, vvLocal.get(), 6, vv.get(), std::plus<real>(), 0);
+      //boost::mpi::reduce(*mpiWorld, vvLocal.get(), 6, vv.get(), std::plus<real>(), 0); //reduce is uncorrect
+      boost::mpi::all_reduce(*mpiWorld, vvLocal.get(), 6, vv.get(), std::plus<real>());
 
       // compute the short-range nonbonded contribution
 
@@ -52,7 +55,8 @@ namespace espresso {
         srIL[j]->computeVirialTensor(wijLocal);
       }
 
-      boost::mpi::reduce(*mpiWorld, wijLocal.get(), 6, wij.get(), std::plus<real>(), 0);
+      //boost::mpi::reduce(*mpiWorld, wijLocal.get(), 6, wij.get(), std::plus<real>(), 0); //reduce is uncorrect
+      boost::mpi::all_reduce(*mpiWorld, wijLocal.get(), 6, wij.get(), std::plus<real>());
       return (vv + wij) / V;
     }
 

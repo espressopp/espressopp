@@ -7,3 +7,5 @@ from espresso.integrator.VelocityVerletAdress import *
 from espresso.integrator.VelocityVerletOnGroup import *
 from espresso.integrator.Langevin import *
 from espresso.integrator.TDforce import *
+
+from espresso.integrator.Berendsen import *

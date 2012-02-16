@@ -18,11 +18,13 @@ namespace espresso {
 
       System& system = getSystemRef();
   
+      /* don't need these lines
       // determine number of local particles and total particles
       int N;
       int Nsum;
       N = system.storage->getNRealParticles();
-      boost::mpi::reduce(*mpiWorld, N, Nsum, std::plus<int>(), 0);
+      boost::mpi::all_reduce(*mpiWorld, N, Nsum, std::plus<int>());
+      */
 
       // determine volume of the box
       Real3D Li = system.bc->getBoxL();
@@ -39,7 +41,7 @@ namespace espresso {
         const Particle& p = *cit;
         v2 = v2 + p.mass() * (p.velocity() * p.velocity());
       }
-      boost::mpi::reduce(*mpiWorld, v2, v2sum, std::plus<real>(), 0);
+      boost::mpi::all_reduce(*mpiWorld, v2, v2sum, std::plus<real>());
       e_kinetic = 0.5 * v2sum;
       p_kinetic = 2.0 * e_kinetic / (3.0 * V);
 
@@ -53,7 +55,7 @@ namespace espresso {
 
       // compiler complains when next two lines don't use double instead of real
       double p_nonbonded;
-      boost::mpi::reduce(*mpiWorld, rij_dot_Fij / (3.0 * V), p_nonbonded, std::plus<double>(), 0);
+      boost::mpi::all_reduce(*mpiWorld, rij_dot_Fij / (3.0 * V), p_nonbonded, std::plus<double>());
  
       return (p_kinetic + p_nonbonded);
     }

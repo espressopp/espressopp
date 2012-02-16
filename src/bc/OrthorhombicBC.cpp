@@ -29,6 +29,18 @@ namespace espresso {
   	  invBoxL /= s;
   	  onBoxDimensionsChanged();
     }
+    void OrthorhombicBC::scaleVolume(Real3D s) {
+  	  boxL[0] *= s[0];
+  	  boxL[1] *= s[1];
+  	  boxL[2] *= s[2];
+  	  boxL2[0] *= s[0];
+  	  boxL2[1] *= s[1];
+  	  boxL2[2] *= s[2];
+  	  invBoxL[0] /= s[0];
+  	  invBoxL[1] /= s[1];
+  	  invBoxL[2] /= s[2];
+  	  onBoxDimensionsChanged();
+    }
 
     /* Returns the minimum image vector between two positions */
     void 
@@ -104,16 +116,16 @@ namespace espresso {
       pos[dir] -= tmp*boxL[dir];
 
       if(pos[dir] < 0 || pos[dir] >= boxL[dir]) {
-	/* slow but safe */
-	if (fabs(pos[dir]*invBoxL[dir]) >= INT_MAX/2) {
+        /* slow but safe */
+        if (fabs(pos[dir]*invBoxL[dir]) >= INT_MAX/2) {
 # warning ERRORHANDLING MISSING
 #if 0
-	  char *errtext = runtime_error(128 + TCL_INTEGER_SPACE);
-	  ERROR_SPRINTF(errtext,"{086 particle coordinate out of range, pos = %f, image box = %d} ", pos[dir], image_box[dir]);
+  char *errtext = runtime_error(128 + TCL_INTEGER_SPACE);
+  ERROR_SPRINTF(errtext,"{086 particle coordinate out of range, pos = %f, image box = %d} ", pos[dir], image_box[dir]);
 #endif
-	  imageBox[dir] = 0;
-	  pos[dir] = 0;
-	}
+          imageBox[dir] = 0;
+          pos[dir] = 0;
+        }
       }
     }
 
@@ -130,7 +142,7 @@ namespace espresso {
     OrthorhombicBC::
     getRandomPos(Real3D& res) const {
       for(int k = 0; k < 3; k++)
-	res[k] = boxL[k];
+        res[k] = boxL[k];
       
       res[0] *= (*rng)();
       res[1] *= (*rng)();

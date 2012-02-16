@@ -2,6 +2,9 @@
 #include "python.hpp"
 #include "VelocityVerlet.hpp"
 #include "Langevin.hpp"
+
+#include "Berendsen.hpp"
+
 #include "iterator/CellListIterator.hpp"
 #include "interaction/Interaction.hpp"
 #include "interaction/Potential.hpp"
@@ -47,6 +50,14 @@ namespace espresso {
 
     /*****************************************************************************/
 
+    void VelocityVerlet::setBerendsen(shared_ptr< Berendsen > _berendsen)
+    {
+      LOG4ESPP_INFO(theLogger, "set Berendsen barostat");
+      berendsen = _berendsen;
+    }
+
+    /*****************************************************************************/
+    
     void VelocityVerlet::run(int nsteps)
     {
       VT_TRACER("run");
@@ -65,6 +76,7 @@ namespace espresso {
 
       if (langevin) langevin->initialize(dt);
 
+      if (berendsen) berendsen->initialize(dt);
       // no more needed: setUp();
 
       // Before start make sure that particles are on the right processor
@@ -87,7 +99,7 @@ namespace espresso {
         LOG4ESPP_INFO(theLogger, "recalc Forces");
 
         if (langevin) langevin->heatUp();
-            updateForces();
+        updateForces();
         if (LOG4ESPP_DEBUG_ON(theLogger)) {
             // printForces(false);   // forces are reduced to real particles
         }
@@ -128,6 +140,8 @@ namespace espresso {
         time = timeIntegrate.getElapsedTime();
         integrate2();
         timeInt2 += timeIntegrate.getElapsedTime() - time;
+        
+        if (berendsen) berendsen->barostat(); // adjust the system pressure to desired in 
       }
 
       timeRun = timeIntegrate.getElapsedTime();
@@ -443,6 +457,7 @@ namespace espresso {
       class_<VelocityVerlet, bases<MDIntegrator>, boost::noncopyable >
         ("integrator_VelocityVerlet", init< shared_ptr<System> >())
         .add_property("langevin", &VelocityVerlet::getLangevin, &VelocityVerlet::setLangevin)
+        .add_property("berendsen", &VelocityVerlet::getBerendsen, &VelocityVerlet::setBerendsen)
         .def("getTimers", &wrapGetTimers)
         ;
     }

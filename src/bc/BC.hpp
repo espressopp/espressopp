@@ -21,6 +21,7 @@ namespace espresso {
       /** Getter for box dimensions */
       virtual Real3D getBoxL() const = 0;
       virtual void scaleVolume(real s) = 0;
+      virtual void scaleVolume(Real3D s) = 0;
       /** Getter for the RNG. */
       virtual shared_ptr< esutil::RNG > getRng() { return rng; }
       /** Setter for RNG. */

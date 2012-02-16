@@ -13,6 +13,9 @@
 #include "Particle.hpp"
 #include "Buffer.hpp"
 
+#include <iostream>
+using namespace std;
+
 using namespace boost;
 using namespace espresso::iterator;
 
@@ -77,6 +80,16 @@ namespace espresso {
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Real3D pos = cit->getPos();
         pos *= s;
+        cit->setPos(pos);
+      }
+    }
+    /** anisotropic case */
+    void Storage::scaleVolume(Real3D s) {
+      for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+        Real3D pos = cit->getPos();
+        pos[0] *= s[0];
+        pos[1] *= s[1];
+        pos[2] *= s[2];
         cit->setPos(pos);
       }
     }

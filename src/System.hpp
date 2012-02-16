@@ -36,6 +36,8 @@ namespace espresso {
     }
 
     void scaleVolume(real s);
+    void scaleVolume(Real3D s);
+    void scaleVolume3D(Real3D s);
     void setTrace(bool flag);
     void addInteraction(shared_ptr< interaction::Interaction > ia);
     void removeInteraction(int i);

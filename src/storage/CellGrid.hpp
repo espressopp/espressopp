@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include "esutil/Grid.hpp"
 #include "types.hpp"
+#include "Real3D.hpp"
 
 namespace espresso {
   class CellGridIllegal: public std::runtime_error
@@ -98,11 +99,27 @@ namespace espresso {
     	  cellSize[i] *= s;
     	  invCellSize[i] /= s;
     	}
-      } else {
+      }
+      else {
     	  ;
     	  // TODO: do nothing or throw error if s <= 0 ?
       }
     }
+    void scaleVolume(Real3D s) {
+      if (s[0]>0 && s[1]>0 && s[2]>0) {
+    	for (int i=0; i<3; ++i) {
+    	  myLeft[i] *= s[i];
+    	  myRight[i] *= s[i];
+    	  cellSize[i] *= s[i];
+    	  invCellSize[i] /= s[i];
+    	}
+      }
+      else {
+    	  ;
+    	  // TODO: do nothing or throw error if s <= 0 ?
+      }
+    }
+    
 
   private:
     /// size of frame around

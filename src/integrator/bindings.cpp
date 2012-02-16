@@ -6,6 +6,8 @@
 #include "Langevin.hpp"
 #include "TDforce.hpp"
 
+#include "Berendsen.hpp"
+
 namespace espresso {
   namespace integrator {
     void registerPython() {
@@ -15,6 +17,8 @@ namespace espresso {
       VelocityVerletOnGroup::registerPython();
       Langevin::registerPython();
       TDforce::registerPython();
+      
+      Berendsen::registerPython();
     }
   }
 }

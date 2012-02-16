@@ -31,7 +31,7 @@ Example (not complete):
 
 """
 
-from espresso import pmi
+from espresso import pmi, Real3D, toReal3DFromVector
 from espresso.esutil import cxxinit
 from espresso.Exceptions import Error
 
@@ -77,11 +77,32 @@ class SystemLocal(_espresso.System):
             else:
                 raise Error("interaction list of system is empty")
             
-    def scaleVolume(self, factor):
+    def scaleVolume(self, *args):
         'scale the Volume of the system, which means in detail: scale all particle coordinates, scale box length, scale cellgrid (if it exists)'
         if pmi.workerIsActive():
-            self.cxxclass.scaleVolume(self, factor)
-
+          if len(args) == 1:
+            arg0 = args[0]
+            if isinstance(arg0, Real3D):
+              #print arg0," is a Real3D object"
+              self.cxxclass.scaleVolume(arg0)
+            elif hasattr(arg0, '__iter__'):
+              if len(arg0) == 3:
+                #print args, " has iterator and length 3"
+                self.cxxclass.scaleVolume(toReal3DFromVector(arg0))
+              elif len(arg0) == 1:
+                #print args, " has iterator and length 1"
+                self.cxxclass.scaleVolume( toReal3DFromVector(arg0[0], arg0[0], arg0[0]) )
+              else:
+                print args, " is invalid"
+            else:
+              #print args, " is scalar"
+              self.cxxclass.scaleVolume(self, toReal3DFromVector( [arg0, arg0, arg0] ) )
+          elif len(args) == 3:          
+            #print args, " is 3 numbers"
+            self.cxxclass.scaleVolume( toReal3DFromVector(*args) )
+          else:
+            print args, " is invalid"
+          
     def setTrace(self, switch):
         'switch on or off VampirTrace'
         if pmi.workerIsActive():

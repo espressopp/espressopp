@@ -65,22 +65,47 @@ namespace espresso {
 	return shortRangeInteractions.size();
   }
 
-  // Scale all coordinates of the system
+  /* If one wants overload scaleVolume it should be done here as well:
+   * - Storage
+   * - BC
+   * - DomainDecomposition
+   * - CellGrid
+   */
+  
+  // Scale all coordinates of the system, isotropic case (cubic box)
   void System::scaleVolume(real s) {
 	storage->scaleVolume(s);
 	bc->scaleVolume(s);
   }
-
-  void System::setTrace(bool flag)
-  {
-     if (flag)
-     {
+  
+  // Scale all coordinates of the system, anisotropic case (rectangular system!!!).
+  // Now the scale parameter is vector (Real3D). It is the case of the anisotropic extension of the
+  // system. Certainly it should be modified for triclinic box. Scale parameter s should be not
+  // Real3D but tensor.
+  void System::scaleVolume(Real3D s) {
+	storage->scaleVolume(s);
+	bc->scaleVolume(s);
+  }
+  
+  void System::setTrace(bool flag) {
+     if (flag){
         VT_ON();
      }
-     else
-     {
+     else{
         VT_OFF();
      }
+  }
+  
+  /////////////////////////////////////////////////////
+  // Helper Function for Python interface  ////////////
+  /////////////////////////////////////////////////////
+  void System::scaleVolume3D(Real3D s) {
+    if(s[0]==s[1] && s[0]==s[2]){
+      real s1 = s[0];
+      scaleVolume(s1);
+    }
+    else
+      scaleVolume(s);
   }
 
   //////////////////////////////////////////////////
@@ -103,7 +128,7 @@ namespace espresso {
       .def("removeInteraction", &System::removeInteraction)
       .def("getInteraction", &System::getInteraction)
       .def("getNumberOfInteractions", &System::getNumberOfInteractions)
-      .def("scaleVolume", &System::scaleVolume)
+      .def("scaleVolume", &System::scaleVolume3D)
       .def("setTrace", &System::setTrace)
       ;
   }
