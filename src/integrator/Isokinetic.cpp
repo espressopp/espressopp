@@ -18,6 +18,8 @@ namespace espresso {
     Isokinetic::Isokinetic(shared_ptr<System> system) : SystemAccess(system)
     {
       temperature = 0.0;
+      coupling    = 1; // couple to thermostat in every md step
+      couplecount = 0;
 
       // if (!system->rng) {
       //  throw std::runtime_error("system has no RNG");
@@ -38,12 +40,29 @@ namespace espresso {
       return temperature;
     }
 
+    void Isokinetic::setCoupling(int _coupling)
+    {
+      coupling = _coupling;
+    }
+
+    int Isokinetic::getCoupling()
+    {
+      return coupling;
+    }
+
     Isokinetic::~Isokinetic()
     {
     }
     
     void Isokinetic::rescaleVelocities() {
       LOG4ESPP_DEBUG(theLogger, "rescaleVelocities");
+
+      couplecount++;
+      if (couplecount < coupling) {
+    	  return;
+      } else {
+    	  couplecount = 0;
+      }
 
       int NPart_local, NPart;
       real EKin = 0.0;
@@ -88,6 +107,7 @@ namespace espresso {
         ("integrator_Isokinetic", init< shared_ptr<System> >())
 
         .add_property("temperature", &Isokinetic::getTemperature, &Isokinetic::setTemperature)
+        .add_property("coupling", &Isokinetic::getCoupling, &Isokinetic::setCoupling)
         ;
     }
 

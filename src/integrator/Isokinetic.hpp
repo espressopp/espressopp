@@ -21,6 +21,10 @@ namespace espresso {
 
         real getTemperature();
 
+        void setCoupling(int coupling);
+
+        int getCoupling();
+
         ~Isokinetic();
 
         void rescaleVelocities();
@@ -30,6 +34,8 @@ namespace espresso {
 
       private:
         real temperature;  //!< desired user temperature
+        int coupling; // how often to couple to the thermostat
+        int couplecount;
 
         // not yet needed
         // shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
