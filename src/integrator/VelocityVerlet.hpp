@@ -20,8 +20,10 @@ namespace espresso {
         ~VelocityVerlet();
 
         void setLangevin(shared_ptr<class Langevin> langevin);
-        
         shared_ptr<class Langevin> getLangevin() { return langevin; }
+
+        void setIsokinetic(shared_ptr<class Isokinetic> isokinetic);
+        shared_ptr<class Isokinetic> getIsokinetic() { return isokinetic; }
         
         // set & get barostat
         void setBerendsen(shared_ptr<class Berendsen> berendsen);
@@ -49,6 +51,8 @@ namespace espresso {
         real maxCut;
 
         shared_ptr< class Langevin > langevin;  //!< Langevin thermostat if available
+
+        shared_ptr< class Isokinetic > isokinetic;  //!< Isokinetic thermostat if available
 
         /** Method updates particle positions and velocities.
 

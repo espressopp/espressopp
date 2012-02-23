@@ -4,6 +4,7 @@
 #include "Langevin.hpp"
 
 #include "Berendsen.hpp"
+#include "Isokinetic.hpp"
 
 #include "iterator/CellListIterator.hpp"
 #include "interaction/Interaction.hpp"
@@ -46,6 +47,14 @@ namespace espresso {
     {
       LOG4ESPP_INFO(theLogger, "set Langevin thermostat");
       langevin = _langevin;
+    }
+
+    /*****************************************************************************/
+
+    void VelocityVerlet::setIsokinetic(shared_ptr< Isokinetic > _isokinetic)
+    {
+      LOG4ESPP_INFO(theLogger, "set Isokinetic thermostat");
+      isokinetic = _isokinetic;
     }
 
     /*****************************************************************************/
@@ -142,6 +151,8 @@ namespace espresso {
         timeInt2 += timeIntegrate.getElapsedTime() - time;
         
         if (berendsen) berendsen->barostat(); // adjust the system pressure to desired in 
+
+        if (isokinetic) isokinetic->rescaleVelocities(); // scale all particle velocities to match isokinetic temperature
       }
 
       timeRun = timeIntegrate.getElapsedTime();
@@ -458,6 +469,7 @@ namespace espresso {
         ("integrator_VelocityVerlet", init< shared_ptr<System> >())
         .add_property("langevin", &VelocityVerlet::getLangevin, &VelocityVerlet::setLangevin)
         .add_property("berendsen", &VelocityVerlet::getBerendsen, &VelocityVerlet::setBerendsen)
+        .add_property("isokinetic", &VelocityVerlet::getIsokinetic, &VelocityVerlet::setIsokinetic)
         .def("getTimers", &wrapGetTimers)
         ;
     }

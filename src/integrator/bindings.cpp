@@ -4,6 +4,7 @@
 #include "VelocityVerletAdress.hpp"
 #include "VelocityVerletOnGroup.hpp"
 #include "Langevin.hpp"
+#include "Isokinetic.hpp"
 #include "TDforce.hpp"
 
 #include "Berendsen.hpp"
@@ -16,6 +17,7 @@ namespace espresso {
       VelocityVerletAdress::registerPython();
       VelocityVerletOnGroup::registerPython();
       Langevin::registerPython();
+      Isokinetic::registerPython();
       TDforce::registerPython();
       
       Berendsen::registerPython();
