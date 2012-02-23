@@ -65,9 +65,9 @@ namespace espresso {
       boost::mpi::reduce(*getSystem()->comm, EKin_local, EKin, std::plus<real>(), 0);
       boost::mpi::reduce(*getSystem()->comm, NPart_local, NPart, std::plus<int>(), 0);
 
-      DegreesOfFreedom   = 3.0 * NPart;
+      DegreesOfFreedom   = 3.0/2.0 * NPart;
       currentTemperature = EKin / DegreesOfFreedom;
-      SkalingFaktor      = temperature / currentTemperature;
+      SkalingFaktor      = sqrt(temperature / currentTemperature);
 
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         cit->velocity() *= SkalingFaktor;
