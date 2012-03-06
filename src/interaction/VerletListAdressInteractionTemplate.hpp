@@ -136,26 +136,27 @@ namespace espresso {
       for (std::set<Particle*>::iterator it=cgZone.begin();
                     it != cgZone.end(); ++it) {
 
-            Particle &p1 = **it;
+            Particle &vp = **it;
 
             FixedTupleList::iterator it3;
-            it3 = fixedtupleList->find(&p1);
+            it3 = fixedtupleList->find(&vp);
 
             if (it3 != fixedtupleList->end()) {
 
                 std::vector<Particle*> atList1;
                 atList1 = it3->second;
 
+                Real3D vpfm = vp.force() / vp.getMass();
                 for (std::vector<Particle*>::iterator itv = atList1.begin();
                         itv != atList1.end(); ++itv) {
-                    Particle &p3 = **itv;
-                    p3.velocity() = p1.velocity(); // overwrite velocity
-                    p3.force() += p1.force();
+                    Particle &at = **itv;
+                    at.velocity() = vp.velocity(); // overwrite velocity
+                    at.force() += at.mass() * vpfm;
                 }
 
             }
             else { // this should not happen
-                std::cout << " VP particle not found in tuples: " << p1.id() << "-" << p1.ghost();
+                std::cout << " VP particle not found in tuples: " << vp.id() << "-" << vp.ghost();
                 exit(1);
                 return;
             }
