@@ -29,7 +29,7 @@ namespace espresso {
 
     */
 
-    VerletListAdress(shared_ptr< System >, real cut, bool rebuildVL, real _dEx, real _dHy);
+    VerletListAdress(shared_ptr< System >, real cut, real adrcut, bool rebuildVL, real _dEx, real _dHy);
 
     ~VerletListAdress();
 
@@ -71,14 +71,15 @@ namespace espresso {
 
   private:
 
-    // AdResS stuff (adress particles are AdResS centers)
+    // AdResS stuff
     std::set<longint> adrList;   // pids of particles defined as adress particles
     std::vector<Real3D*> adrPositions; // positions of adress particles
     std::set<Particle*> adrZone; // particles that are in the AdResS zone
+    std::set<Particle*> cgZone; // particles not in adress zone (same as in vlPairs)
     PairList adrPairs;           // pairs that are in AdResS zone
-    real adresscut; // size of AdResS zone (dEx+dHy)
     real dEx, dHy; // size of the expicit and hybrid zone
-    real adrsq;
+    real adrsq, adrcutsq;
+    real skin;
     Real3D adrCenter; // center of adress zone, if set
     bool adrCenterSet; // tells if adrCenter is set
 
@@ -88,9 +89,7 @@ namespace espresso {
 
     void checkPair(Particle &pt1, Particle &pt2);
     PairList vlPairs;
-    std::set<Particle*> cgZone; // particles not in adress zone (same as in vlPairs)
     boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list
-    real skin;
     real cutsq;
     int builds;
     boost::signals2::connection connectionResort;

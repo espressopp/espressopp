@@ -6,10 +6,10 @@ from espresso.esutil import cxxinit
 class VerletListAdressLocal(_espresso.VerletListAdress):
     'The (local) verlet list AdResS'
 
-    def __init__(self, system, cutoff, dEx, dHy, adrCenter=[], pids=[], exclusionlist=[]):
+    def __init__(self, system, cutoff, adrcut, dEx, dHy, adrCenter=[], pids=[], exclusionlist=[]):
         'Local construction of a verlet list for AdResS'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.VerletListAdress, system, cutoff, False, dEx, dHy)
+            cxxinit(self, _espresso.VerletListAdress, system, cutoff, adrcut, False, dEx, dHy)
             #self.cxxclass.setAtType(self, atType)
             # check for exclusions
             if (exclusionlist != []):

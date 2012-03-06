@@ -17,24 +17,27 @@ namespace espresso {
 
   /*-------------------------------------------------------------*/
 
-    VerletListAdress::VerletListAdress(shared_ptr<System> system, real cut, bool rebuildVL, real _dEx, real _dHy) : SystemAccess(system)
-    {
+    VerletListAdress::VerletListAdress(shared_ptr<System> system, real cut, real adrCut,
+                                       bool rebuildVL, real _dEx, real _dHy)
+    :SystemAccess(system) {
       LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << cut);
 
       if (!system->storage) {
          throw std::runtime_error("system has no storage");
       }
 
-      real cutVerlet = cut;
-      cutsq = cutVerlet * cutVerlet;
+      cutsq = cut * cut;
       builds = 0;
 
       // AdResS stuff
+      skin = system->skin;
       dEx = _dEx;
       dHy = _dHy;
       adrCenterSet = false;
-      adresscut = dEx + dHy + skin;
-      adrsq = adresscut * adresscut;
+      real adressSize = dEx + dHy + skin; // adress region size
+      if (dEx + dHy == 0) adressSize = 0; // 0 should be 0
+      adrsq = adressSize * adressSize;
+      adrcutsq = adrCut*adrCut;
 
       //std::cout << getSystem()->comm->rank() << ": " << "------constructor----- \n";
       if (rebuildVL) rebuild(); // not called if exclutions are provided
@@ -124,7 +127,7 @@ namespace espresso {
               Real3D dist = it->getPos() - adrCenter;
               real distsq = dist.sqr();
               //std::cout << "distance " << sqrt(distsq) << "\n";
-              if (distsq < adrsq) {
+              if (distsq <= adrsq) {
                   adrZone.insert(&(*it));
                   //std::cout << " added " << it->getId() << "-" << it->ghost() <<  "\n";
                   //std::cout << " adding particle " << it->getId() << "-" << it->ghost() << " to adrZone\n";
@@ -255,6 +258,7 @@ namespace espresso {
       if (exList.count(std::make_pair(pt2.id(), pt1.id())) == 1) return;
       // see if it's in the adress zone
       if (adrZone.count(&pt1) == 1 || adrZone.count(&pt2) == 1) {
+          if (distsq > adrcutsq) return;
           adrPairs.add(pt1, pt2); // add to adress pairs
           //std::cout << "adding pair (" << pt1.id() << ", " << pt2.id() << ")\n";
       }
@@ -332,7 +336,7 @@ namespace espresso {
             = &VerletListAdress::setAtType;*/
 
       class_<VerletListAdress, shared_ptr<VerletList> >
-        ("VerletListAdress", init< shared_ptr<System>, real, bool, real, real>())
+        ("VerletListAdress", init< shared_ptr<System>, real, real, bool, real, real>())
         .add_property("system", &SystemAccess::getSystem)
         .add_property("builds", &VerletListAdress::getBuilds, &VerletListAdress::setBuilds)
         .def("totalSize", &VerletListAdress::totalSize)

@@ -191,7 +191,9 @@ system.storage.decompose()
 
 
 # AdResS Verlet list
-vl = espresso.VerletListAdress(system, cutoff=rc+skin, dEx=ex_size, dHy=hy_size, adrCenter=[18.42225, 18.42225, 18.42225])
+vl = espresso.VerletListAdress(system, cutoff=rc+skin, adrcut=rc+skin,
+                                dEx=ex_size, dHy=hy_size,
+                                adrCenter=[18.42225, 18.42225, 18.42225])
 
 # non-bonded potentials
 # LJ Capped WCA between AT and tabulated Morse between CG particles
