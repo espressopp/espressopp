@@ -317,12 +317,14 @@ namespace espresso {
                         //std::cout << " moving AT " << at->getId() << " " << at->position();
                         at->position()[dir] = at->position()[dir] + boxL[dir];
                         //std::cout << " --> " << at->position() << "\n";
+                        at->image()[dir] = vp->image()[dir];
                     }
                     else if (dif < -boxL[dir]/2) {
                         //std::cout << "VP " << vp->getId() << " at " << vp->position() << "\n";
                         //std::cout << " moving AT " << at->getId() << " " << at->position();
                         at->position()[dir] = at->position()[dir] - boxL[dir];
                         //std::cout << " --> " << at->position() << "\n";
+                        at->image()[dir] = vp->image()[dir];
                     }
                 }
 
