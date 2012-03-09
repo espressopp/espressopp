@@ -73,7 +73,7 @@ namespace espresso {
 
     void VelocityVerlet::setLangevinBarostat(shared_ptr< LangevinBarostat > _langevinBarostat)
     {
-      LOG4ESPP_INFO(theLogger, "set constant pressure. Langevin-Hoover dynamics");
+      LOG4ESPP_INFO(theLogger, "set Hoover style barostat. Langevin dynamics");
       langevinBarostat = _langevinBarostat;
     }
     
