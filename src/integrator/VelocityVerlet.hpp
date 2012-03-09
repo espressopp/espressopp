@@ -19,15 +19,20 @@ namespace espresso {
 
         ~VelocityVerlet();
 
+        // set & get termostat (Langevin)
         void setLangevin(shared_ptr<class Langevin> langevin);
         shared_ptr<class Langevin> getLangevin() { return langevin; }
 
         void setIsokinetic(shared_ptr<class Isokinetic> isokinetic);
         shared_ptr<class Isokinetic> getIsokinetic() { return isokinetic; }
         
-        // set & get barostat
+        // set & get barostat (Berendsen)
         void setBerendsen(shared_ptr<class Berendsen> berendsen);
         shared_ptr<class Berendsen> getBerendsen() { return berendsen; }
+        
+        // set & get barostat (Langevin-Hoover)
+        void setLangevinBarostat(shared_ptr<class LangevinBarostat> langevinBarostat);
+        shared_ptr<class LangevinBarostat> getLangevinBarostat() { return langevinBarostat; }
         
 
         void run(int nsteps);
@@ -55,11 +60,12 @@ namespace espresso {
         shared_ptr< class Isokinetic > isokinetic;  //!< Isokinetic thermostat if available
 
         /** Method updates particle positions and velocities.
-
             \return maximal square distance a particle has moved.
         */
 
         shared_ptr< class Berendsen > berendsen;  //!< Berendsen barostat if available
+        
+        shared_ptr< class LangevinBarostat > langevinBarostat;  //!< Langevin-Hoover barostat if available
         
         real integrate1();
 

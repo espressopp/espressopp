@@ -52,7 +52,7 @@ namespace espresso {
       
       real mu = pow( 1 + pref * (P - P0) , 1.0/3.0 );  // calculating the current scaling parameter
 
-      system.scaleVolume( mu );
+      system.scaleVolume( mu, true );
     }
 
      // calculate the prefactors

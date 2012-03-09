@@ -68,22 +68,22 @@ namespace espresso {
   /* If one wants overload scaleVolume it should be done here as well:
    * - Storage
    * - BC
-   * - DomainDecomposition
+   * - DomainDecomposition, etc.
    * - CellGrid
    */
   
   // Scale all coordinates of the system, isotropic case (cubic box)
-  void System::scaleVolume(real s) {
-	storage->scaleVolume(s);
+  void System::scaleVolume(real s, bool particleCoordinates) {
+	storage->scaleVolume(s, particleCoordinates);
 	bc->scaleVolume(s);
   }
-  
+
   // Scale all coordinates of the system, anisotropic case (rectangular system!!!).
   // Now the scale parameter is vector (Real3D). It is the case of the anisotropic extension of the
   // system. Certainly it should be modified for triclinic box. Scale parameter s should be not
   // Real3D but tensor.
-  void System::scaleVolume(Real3D s) {
-	storage->scaleVolume(s);
+  void System::scaleVolume(Real3D s, bool particleCoordinates) {
+	storage->scaleVolume(s, particleCoordinates);
 	bc->scaleVolume(s);
   }
   
@@ -99,13 +99,14 @@ namespace espresso {
   /////////////////////////////////////////////////////
   // Helper Function for Python interface  ////////////
   /////////////////////////////////////////////////////
+  // this function is called from python by default
   void System::scaleVolume3D(Real3D s) {
     if(s[0]==s[1] && s[0]==s[2]){
       real s1 = s[0];
-      scaleVolume(s1);
+      scaleVolume(s1, true);
     }
     else
-      scaleVolume(s);
+      scaleVolume(s, true);
   }
 
   //////////////////////////////////////////////////

@@ -8,6 +8,7 @@
 #include "TDforce.hpp"
 
 #include "Berendsen.hpp"
+#include "LangevinBarostat.hpp"
 
 namespace espresso {
   namespace integrator {
@@ -21,6 +22,7 @@ namespace espresso {
       TDforce::registerPython();
       
       Berendsen::registerPython();
+      LangevinBarostat::registerPython();
     }
   }
 }

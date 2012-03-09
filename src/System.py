@@ -84,11 +84,11 @@ class SystemLocal(_espresso.System):
             arg0 = args[0]
             if isinstance(arg0, Real3D):
               #print arg0," is a Real3D object"
-              self.cxxclass.scaleVolume(arg0)
+              self.cxxclass.scaleVolume( arg0 )
             elif hasattr(arg0, '__iter__'):
               if len(arg0) == 3:
                 #print args, " has iterator and length 3"
-                self.cxxclass.scaleVolume(toReal3DFromVector(arg0))
+                self.cxxclass.scaleVolume(toReal3DFromVector(arg0) )
               elif len(arg0) == 1:
                 #print args, " has iterator and length 1"
                 self.cxxclass.scaleVolume( toReal3DFromVector(arg0[0], arg0[0], arg0[0]) )

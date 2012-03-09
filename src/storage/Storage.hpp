@@ -26,10 +26,15 @@ namespace espresso {
       Storage(shared_ptr<class System> system);
       virtual ~Storage();
 
-      /** Scale Volume of the storage */
-      virtual void scaleVolume(real s);
-      /** Scale Volume of the storage. Anisotropic case */
-      virtual void scaleVolume(Real3D s);
+      /** Scale Volume, only for Storage. It scales only the particle coord. */
+      void scaleVolume(real s);
+      /** Scale Volume, only for Storage. It scales only the particle coord. Anisotropic case */
+      void scaleVolume(Real3D s);
+      
+      /** Scale Volume for derived classes, pS define the particle coordinates scaling*/
+      virtual void scaleVolume(real s, bool pS) = 0;
+      /** Scale Volume for derived classes, pS define the particle coordinates scaling. Anisotropic case */
+      virtual void scaleVolume(Real3D s, bool pS) = 0;
 
       /** add a particle with given id and position. Note that this is a
 	  local operation, and therefore cannot check whether a particle

@@ -4,6 +4,7 @@
 #include "Langevin.hpp"
 
 #include "Berendsen.hpp"
+#include "LangevinBarostat.hpp"
 #include "Isokinetic.hpp"
 
 #include "iterator/CellListIterator.hpp"
@@ -20,6 +21,9 @@
 #endif
 
 namespace espresso {
+
+  using namespace std;
+  
   namespace integrator {
 
     using namespace interaction;
@@ -66,6 +70,14 @@ namespace espresso {
     }
 
     /*****************************************************************************/
+
+    void VelocityVerlet::setLangevinBarostat(shared_ptr< LangevinBarostat > _langevinBarostat)
+    {
+      LOG4ESPP_INFO(theLogger, "set constant pressure. Langevin-Hoover dynamics");
+      langevinBarostat = _langevinBarostat;
+    }
+    
+    /*****************************************************************************/
     
     void VelocityVerlet::run(int nsteps)
     {
@@ -85,7 +97,16 @@ namespace espresso {
 
       if (langevin) langevin->initialize(dt);
 
+      // @TODO temperature should be introduced nicely
+      if (langevinBarostat){
+        if(langevin)
+          langevinBarostat->initialize(dt, langevin->getTemperature());
+        else
+          langevinBarostat->initialize(dt, 1.0);
+      }
+      
       if (berendsen) berendsen->initialize(dt);
+      
       // no more needed: setUp();
 
       // Before start make sure that particles are on the right processor
@@ -108,11 +129,14 @@ namespace espresso {
         LOG4ESPP_INFO(theLogger, "recalc Forces");
 
         if (langevin) langevin->heatUp();
+        //if (langevinBarostat) langevinBarostat->heatUp();   do it needs heatUp analog?
+        
         updateForces();
         if (LOG4ESPP_DEBUG_ON(theLogger)) {
             // printForces(false);   // forces are reduced to real particles
         }
         if (langevin) langevin->coolDown();
+        //if (langevinBarostat) langevinBarostat->coolDown();  the same question like for heatUp
       }
 
       LOG4ESPP_INFO(theLogger, "run " << nsteps << " iterations");
@@ -241,6 +265,13 @@ namespace espresso {
     {
       System& system = getSystemRef();
 
+      if (langevinBarostat){
+        /* update the volume V(t+0.5*dt)=V(t)+dt/2. * V'  */
+        langevinBarostat->updVolume( 0.5 * dt );
+        /* update the local barostat momentum pe(t+0.5*dt)=pe(t)+dt/2. * pe'  */
+        langevinBarostat->updVolumeMomentum( 0.5 * dt );
+      }
+      
       CellList realCells = system.storage->getRealCells();
 
       // loop over all particles of the local cells
@@ -274,6 +305,9 @@ namespace espresso {
 
             // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt) 
             Real3D deltaP = dt * cit->velocity();
+            
+            if (langevinBarostat) deltaP += dt * (langevinBarostat->updDisplacement()) * cit->position(); // updDisplacement is just coefficient
+            
             cit->position() += deltaP;
             sqDist += deltaP * deltaP;
 
@@ -281,16 +315,15 @@ namespace espresso {
 
         maxSqDist = std::max(maxSqDist, sqDist);
       }
-
+      
       real maxAllSqDist;
 
-      mpi::all_reduce(*system.comm, maxSqDist, maxAllSqDist, 
-                      boost::mpi::maximum<real>());
+      mpi::all_reduce(*system.comm, maxSqDist, maxAllSqDist, boost::mpi::maximum<real>());
 
       LOG4ESPP_INFO(theLogger, "moved " << count << " particles in integrate1" <<
 		    ", max move local = " << sqrt(maxSqDist) <<
 		    ", global = " << sqrt(maxAllSqDist));
-
+      
       return sqrt(maxAllSqDist);
     }
 
@@ -312,10 +345,18 @@ namespace espresso {
 
         cit->velocity() += dtfm * cit->force();
       }
+      
+      if (langevinBarostat){
+        /* update the local momentum pe(t+dt)=pe(t+0.5*dt)+dt/2. * pe'  */
+        langevinBarostat->updVolumeMomentum( 0.5 * dt );
+        /* update the volume V(t+dt)=V(t+0.5*dt)+dt/2. * V'  */
+        langevinBarostat->updVolume( 0.5 * dt );
+      }
+      
       step++;
     }
 
-    /*****************************************************************************/
+    /*************DO NOT NEED, PROBABLY SHOULD BE DELETED*************************
 
     void VelocityVerlet::setUp()
     {
@@ -326,10 +367,8 @@ namespace espresso {
       maxCut = 0.0;
 
       for (size_t j = 0; j < srIL.size(); j++) {
-
-	real cut = srIL[j]->getMaxCutoff();
-
-	maxCut = std::max(maxCut, cut);
+        real cut = srIL[j]->getMaxCutoff();
+        maxCut = std::max(maxCut, cut);
       }
 
       LOG4ESPP_INFO(theLogger, "maximal cutoff = " << maxCut);
@@ -385,6 +424,7 @@ namespace espresso {
       timeComm2 += timeIntegrate.getElapsedTime() - time;
 
       if (langevin) langevin->thermalize();
+      if (langevinBarostat) langevinBarostat->updForces();
     }
 
     /*****************************************************************************/
@@ -469,6 +509,7 @@ namespace espresso {
         ("integrator_VelocityVerlet", init< shared_ptr<System> >())
         .add_property("langevin", &VelocityVerlet::getLangevin, &VelocityVerlet::setLangevin)
         .add_property("berendsen", &VelocityVerlet::getBerendsen, &VelocityVerlet::setBerendsen)
+        .add_property("langevinBarostat", &VelocityVerlet::getLangevinBarostat, &VelocityVerlet::setLangevinBarostat)
         .add_property("isokinetic", &VelocityVerlet::getIsokinetic, &VelocityVerlet::setIsokinetic)
         .def("getTimers", &wrapGetTimers)
         ;

@@ -75,7 +75,7 @@ namespace espresso {
       }
     }
 
-    /** scale position coordinates of all real particles by factor s */
+    /** Scale coordinates of all real particles by factor s */
     void Storage::scaleVolume(real s) {
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Real3D pos = cit->getPos();
@@ -83,7 +83,7 @@ namespace espresso {
         cit->setPos(pos);
       }
     }
-    /** anisotropic case */
+    /** Scale coordinates of all real particles by factor s. Anisotropic case */
     void Storage::scaleVolume(Real3D s) {
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Real3D pos = cit->getPos();

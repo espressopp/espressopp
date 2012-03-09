@@ -23,7 +23,11 @@ namespace espresso {
 			  const Int3D& _cellGrid);
 
       virtual ~DomainDecompositionAdress() {}
-
+      
+      // scale the particle coordinates and cell size
+      virtual void scaleVolume(real s, bool particleCoordinates);
+      virtual void scaleVolume(Real3D s, bool particleCoordinates);
+      
       virtual Cell *mapPositionToCell(const Real3D& pos);
       virtual Cell *mapPositionToCellClipped(const Real3D& pos);
       virtual Cell *mapPositionToCellChecked(const Real3D& pos);

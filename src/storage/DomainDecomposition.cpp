@@ -136,13 +136,13 @@ namespace espresso {
   }
 
   /** scale position coordinates of all real particles by factor s */
-  void DomainDecomposition::scaleVolume(real s) {
-	Storage::scaleVolume(s);
-	cellGrid.scaleVolume(s);
+  void DomainDecomposition::scaleVolume(real s, bool particleCoordinates){
+	if(particleCoordinates) Storage::scaleVolume( s );
+	cellGrid.scaleVolume( s );
   }
   // anisotropic version
-  void DomainDecomposition::scaleVolume(Real3D s) {
-	Storage::scaleVolume(s);
+  void DomainDecomposition::scaleVolume(Real3D s, bool particleCoordinates){
+	if(particleCoordinates) Storage::scaleVolume( s );
 	cellGrid.scaleVolume(s);
   }
 

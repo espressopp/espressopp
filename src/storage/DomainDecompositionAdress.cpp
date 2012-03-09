@@ -135,6 +135,16 @@ namespace espresso {
     }
   }
 
+  
+  // @TODO should be some implementation for adress!!!
+  /** scale position coordinates of all real particles by factor s */
+  void DomainDecompositionAdress::scaleVolume(real s, bool particleCoordinates){
+  }
+  // anisotropic version
+  void DomainDecompositionAdress::scaleVolume(Real3D s, bool particleCoordinates){
+  }
+  
+  
   void DomainDecompositionAdress::initCellInteractions() {
     LOG4ESPP_DEBUG(logger, "setting up neighbors for " << cells.size() << " cells");
 

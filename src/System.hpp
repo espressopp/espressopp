@@ -34,9 +34,9 @@ namespace espresso {
     shared_ptr< System > getShared() { 
       return shared_from_this();
     }
-
-    void scaleVolume(real s);
-    void scaleVolume(Real3D s);
+    
+    void scaleVolume(real s, bool particleCoordinates);
+    void scaleVolume(Real3D s, bool particleCoordinates);
     void scaleVolume3D(Real3D s);
     void setTrace(bool flag);
     void addInteraction(shared_ptr< interaction::Interaction > ia);
