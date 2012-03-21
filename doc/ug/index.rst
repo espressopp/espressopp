@@ -24,6 +24,7 @@ Contents:
    overview.rst
    team.rst
    faq.rst
+   tutorial.rst
    classdescription.rst
    logging.rst
    bib.rst

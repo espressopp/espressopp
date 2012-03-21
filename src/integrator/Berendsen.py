@@ -1,7 +1,7 @@
 """
-************************************
+*****************************************
 **Berendsen** - Berendsen barostat Object
-************************************
+*****************************************
 
 This is the Berendsen barostat implementation according to the original paper [Berendsen84]_.
 If Berendsen barostat is defined (as a property of integrator) then at the each run the system size
