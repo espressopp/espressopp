@@ -19,14 +19,23 @@ namespace espresso {
     public:
       CellListAllPairsInteractionTemplate
       (shared_ptr < storage::Storage > _storage)
-        : storage(_storage) 
-      {
+      : storage(_storage){
         potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
+        ntypes=0;
       }
 
       void
       setPotential(int type1, int type2, const Potential &potential) {
-	potentialArray.at(type1, type2) = potential;
+        // typeX+1 because i<ntypes
+        ntypes = std::max(ntypes, std::max(type1+1, type2+1));
+        
+        potentialArray.at(type1, type2) = potential;
+        
+        // @TODO should it be here???
+//        if (type1 != type2) { // add potential in the other direction
+//           potentialArray.at(type2, type1) = potential;
+//        }
+        
       }
 
       Potential &getPotential(int type1, int type2) {

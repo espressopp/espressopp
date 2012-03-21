@@ -26,7 +26,9 @@ namespace espresso {
       VerletListInteractionTemplate
           (shared_ptr<VerletList> _verletList)
           : verletList(_verletList) {
-          potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
+        potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
+          
+        ntypes = 0;
       }
 
       void
@@ -40,10 +42,13 @@ namespace espresso {
 
       void
       setPotential(int type1, int type2, const Potential &potential) {
-          potentialArray.at(type1, type2) = potential;
-          if (type1 != type2) { // add potential in the other direction
-             potentialArray.at(type2, type1) = potential;
-          }
+        // typeX+1 because i<ntypes
+        ntypes = std::max(ntypes, std::max(type1+1, type2+1));
+        
+        potentialArray.at(type1, type2) = potential;
+        if (type1 != type2) { // add potential in the other direction
+           potentialArray.at(type2, type1) = potential;
+        }
       }
 
       Potential &getPotential(int type1, int type2) {

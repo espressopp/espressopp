@@ -18,12 +18,12 @@ namespace espresso {
       : Grid(grid)
     {
       if (grid[0] <= 0 || grid[1] <= 0 || grid[2] <= 0) {
-	throw NodeGridIllegal();
+        throw NodeGridIllegal();
       }
 
       for(int i = 0; i < 3; ++i) {
-	localBoxSize[i] = domainSize[i]/static_cast<real>(getGridSize(i));
-	invLocalBoxSize[i] = 1.0/localBoxSize[i];
+        localBoxSize[i] = domainSize[i]/static_cast<real>(getGridSize(i));
+        invLocalBoxSize[i] = 1.0/localBoxSize[i];
       }
       smallestLocalBoxDiameter = std::min(std::min(localBoxSize[0], localBoxSize[1]), localBoxSize[2]);
 
@@ -36,13 +36,13 @@ namespace espresso {
       Int3D cpos;
     
       for (int i = 0; i < 3; ++i) {
-	cpos[i] = static_cast< int >(pos[i]*invLocalBoxSize[i]);
-	if (cpos[i] < 0) {
-	  cpos[i] = 0;
-	}
-	else if (cpos[i] >= getGridSize(i)) {
-	  cpos[i] = getGridSize(i) - 1;
-	}
+        cpos[i] = static_cast< int >(pos[i]*invLocalBoxSize[i]);
+        if (cpos[i] < 0) {
+          cpos[i] = 0;
+        }
+        else if (cpos[i] >= getGridSize(i)) {
+          cpos[i] = getGridSize(i) - 1;
+        }
       }
       return mapPositionToIndex(cpos);
     }

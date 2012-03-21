@@ -39,6 +39,8 @@ namespace espresso {
           dex2 = dex * dex;
           dexdhy = dex + verletList->getHy();
           dexdhy2 = dexdhy * dexdhy;
+          
+          ntypes = 0;
       }
 
       void
@@ -57,6 +59,9 @@ namespace espresso {
 
       void
       setPotentialAT(int type1, int type2, const PotentialAT &potential) {
+          // typeX+1 because i<ntypes
+          ntypes = std::max(ntypes, std::max(type1+1, type2+1));
+        
           potentialArrayAT.at(type1, type2) = potential;
           if (type1 != type2) { // add potential in the other direction
              potentialArrayAT.at(type2, type1) = potential;
@@ -65,6 +70,9 @@ namespace espresso {
 
       void
       setPotentialCG(int type1, int type2, const PotentialCG &potential) {
+          // typeX+1 because i<ntypes
+          ntypes = std::max(ntypes, std::max(type1+1, type2+1));
+        
          potentialArrayCG.at(type1, type2) = potential;
          if (type1 != type2) { // add potential in the other direction
              potentialArrayCG.at(type2, type1) = potential;

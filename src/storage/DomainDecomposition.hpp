@@ -19,13 +19,17 @@ namespace espresso {
     class DomainDecomposition: public Storage {
     public:
       DomainDecomposition(shared_ptr< System > system,
-			  const Int3D& _nodeGrid,
+              const Int3D& _nodeGrid,
 			  const Int3D& _cellGrid);
 
       virtual ~DomainDecomposition() {}
 
       virtual void scaleVolume(real s, bool particleCoordinates);
       virtual void scaleVolume(Real3D s, bool particleCoordinates);
+      
+      // it returns current cell grid like a vector Int3D
+      // mainly in order to use from python
+      Int3D getInt3DCellGrid();
 
       virtual Cell *mapPositionToCell(const Real3D& pos);
       virtual Cell *mapPositionToCellClipped(const Real3D& pos);
@@ -62,6 +66,10 @@ namespace espresso {
       void fillCells(std::vector<Cell *> &,
 		     const int leftBoundary[3],
 		     const int rightBoundary[3]);
+      
+      // it modifies the cell structure if the cell size becomes smaller then cutoff+skin
+      // as a consequence of the system resizing
+      void cellAdjust();
 
       /** read particles from a temporary buffer into the local cell structure.
 	  The direction determines in which direction to fold the particles position.
@@ -83,8 +91,8 @@ namespace espresso {
 	  In case this is a communication with ourselves, the send-cells
 	  are transferred to the recv-cells. */
       struct CommCells {
-          std::vector<Cell *> reals;
-          std::vector<Cell *> ghosts;
+        std::vector<Cell *> reals;
+        std::vector<Cell *> ghosts;
       };
       /** which cells to send left, right, up, down, ...
 	  For the order, see NodeGrid.

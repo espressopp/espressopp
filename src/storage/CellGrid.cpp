@@ -14,12 +14,9 @@ LOG4ESPP_LOGGER(CellGrid::logger, "DomainDecomposition.CellGrid");
 CellGridIllegal::CellGridIllegal()
   : std::runtime_error("cell grid dimensions have to be positive") {}
 
-CellGrid::CellGrid(const Int3D& _size,
-		   const real _myLeft[3],
-		   const real _myRight[3],
-		   int _frame)
-  : Grid(_size[0]+2*_frame, _size[1]+2*_frame, _size[2]+2*_frame),
-    frame(_frame), extraSize(2*frame)
+CellGrid::CellGrid(const Int3D& _size, const real _myLeft[3], const real _myRight[3], int _frame):
+        Grid(_size[0]+2*_frame, _size[1]+2*_frame, _size[2]+2*_frame),
+        frame(_frame), extraSize(2*frame)
 {
   if (_size[0] <= 0 || _size[1] <= 0 || _size[2] <= 0) {
     throw CellGridIllegal();

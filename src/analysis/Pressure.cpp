@@ -53,9 +53,8 @@ namespace espresso {
         rij_dot_Fij += srIL[j]->computeVirial();
       }
 
-      // compiler complains when next two lines don't use double instead of real
-      double p_nonbonded;
-      boost::mpi::all_reduce(*mpiWorld, rij_dot_Fij / (3.0 * V), p_nonbonded, std::plus<double>());
+      real p_nonbonded;
+      mpi::all_reduce(*mpiWorld, rij_dot_Fij / (3.0 * V), p_nonbonded, std::plus<real>());
  
       return (p_kinetic + p_nonbonded);
     }

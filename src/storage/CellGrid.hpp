@@ -45,15 +45,14 @@ namespace espresso {
     /// check wether a position is in the inner domain
     bool isInnerPosition(real pos[3]) {
       return (pos[0] >= getMyLeft(0) && pos[0] < getMyRight(0) &&
-	      pos[1] >= getMyLeft(1) && pos[1] < getMyRight(1) &&
-	      pos[2] >= getMyLeft(2) && pos[2] < getMyRight(2));
+              pos[1] >= getMyLeft(1) && pos[1] < getMyRight(1) &&
+              pos[2] >= getMyLeft(2) && pos[2] < getMyRight(2));
     }
     /// check whether a cell is in the inner grid
     bool isInnerCell(int m, int n, int o) const {
-      return
-	(m >= getInnerCellsBegin(0) && m < getInnerCellsEnd(0)) &&
-	(n >= getInnerCellsBegin(1) && n < getInnerCellsEnd(1)) &&
-	(o >= getInnerCellsBegin(2) && o < getInnerCellsEnd(2));
+      return (m >= getInnerCellsBegin(0) && m < getInnerCellsEnd(0)) &&
+             (n >= getInnerCellsBegin(1) && n < getInnerCellsEnd(1)) &&
+             (o >= getInnerCellsBegin(2) && o < getInnerCellsEnd(2));
     }
 
     /// get start of inner grid
@@ -99,6 +98,7 @@ namespace espresso {
     	  cellSize[i] *= s;
     	  invCellSize[i] /= s;
     	}
+        smallestCellDiameter *= s;
       }
       else {
     	  ;
@@ -113,6 +113,7 @@ namespace espresso {
     	  cellSize[i] *= s[i];
     	  invCellSize[i] /= s[i];
     	}
+        smallestCellDiameter = std::min(std::min(cellSize[0], cellSize[1]), cellSize[2]);
       }
       else {
     	  ;

@@ -24,16 +24,17 @@ namespace espresso {
 
     LOG4ESPP_LOGGER(LangevinBarostat::theLogger, "LangevinBarostat");
 
-    LangevinBarostat::LangevinBarostat(shared_ptr<System> _system, shared_ptr< esutil::RNG > _rng) : SystemAccess(_system), rng(_rng){
+    LangevinBarostat::LangevinBarostat(shared_ptr<System> _system, shared_ptr< esutil::RNG > _rng) : SystemAccess(_system){ //, rng(_rng)
       // external parameters
       gammaP = 0.0;
       mass = 0.0;
       externalPressure = 0.0;
       
-      // internal parameter
+      // local variable
       momentum = 0.0;
 
-      //rng = _rng;
+      // random number generator
+      rng = _rng;
       
       LOG4ESPP_INFO(theLogger, "LangevinBarostat constructed");
     }
@@ -64,7 +65,7 @@ namespace espresso {
     void LangevinBarostat::updVolume(real dt_2){
       System& system = getSystemRef();
       
-      // V(t+1/2*dt) = V(t) + 1/2*dt*V';    V' = d*V*pe/W
+      // The volume is scaled according to the equations V(t+1/2*dt) = V(t) + 1/2*dt*V'; V' = d*V*pe/W
       real scale_factor = pow( 1 + dt_2 * 3.0 * momentum, 1./3.);  // calculating the current scaling parameter
       
       //mpi::communicator communic = *system.comm;
@@ -73,14 +74,14 @@ namespace espresso {
       system.scaleVolume( scale_factor, false);
     }
     
-    // @TODO should be optimized 
+    // @TODO should be optimized!!!
     void LangevinBarostat::updVolumeMomentum(real dt_2){
       // dt_2 is timestep/2. 
       System& system = getSystemRef();
       Real3D Li = system.bc -> getBoxL(); // getting the system size
       real V = Li[0] * Li[1] * Li[2];     // system volume
       
-      // get a random value for each vector component
+      // get a random value and distribute the same value over all of the CPUs
       mpi::communicator communic = *system.comm;
       real rannum; 
       if (communic.rank() == 0) rannum = rng->normal();
@@ -150,22 +151,19 @@ namespace espresso {
        */
       // determine number of local particles and total particles
       System& system = getSystemRef();
-      int N, Nsum;
-      N = system.storage->getNRealParticles();
+      int Nsum = 0;
+      int N = system.storage->getNRealParticles();
       boost::mpi::all_reduce(*mpiWorld, N, Nsum, std::plus<int>());
-      real Ntotal = Nsum;
 
-      pref6 = 1./Ntotal;
+      pref6 = 1./(double)Nsum;
       
       pref3 = - (1+pref6);
       
+      // pressure friction prefactor
       pref4 = -gammaP;
+      
       // normal distribution prefactor
       pref5 = sqrt(24.0 * desiredTemperature * gammaP * mass / timestep);
-
-//      mpi::communicator communic = *system.comm;
-//      cout << "g:  " << gammaP<< "   P: "<< externalPressure << "    M: " << mass<< "   T:  "<< desiredTemperature  <<
-//              "     cpu:"<< communic.rank() <<  "         !!!!!!!!!!!!!" << endl ;
     }
 
     /****************************************************

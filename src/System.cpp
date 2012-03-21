@@ -19,6 +19,8 @@ namespace espresso {
   System::System() {
     comm = mpiWorld;
     CommunicatorIsInitialized = false;
+    
+    maxCutoff = 0.0;
   }
 
   System::System(python::object _pyobj) {
@@ -43,16 +45,31 @@ namespace espresso {
     shared_ptr< mpi::communicator > newcomm = make_shared< mpi::communicator >(*comm_p, mpi::comm_attach);
 
     comm = newcomm;
+    maxCutoff = 0.0;
   }
 
-  void System::addInteraction(shared_ptr< interaction::Interaction > ia)
-  {
+  void System::addInteraction(shared_ptr< interaction::Interaction > ia){
     shortRangeInteractions.push_back(ia);
+    
+    // check if the cutoff of this interaction is bigger then maxCutoff
+    real cut = ia->getMaxCutoff();
+    if(cut > maxCutoff) maxCutoff=cut;
   }
 
-  void System::removeInteraction(int i)
-  {
+  void System::removeInteraction(int i){
+    size_t iIter = i;
+    real maxCutoffDelete = shortRangeInteractions[iIter]->getMaxCutoff();
+    
     shortRangeInteractions.erase(shortRangeInteractions.begin()+i);
+    
+    // check if the maxCutoff changed or not
+    if(maxCutoffDelete>=maxCutoff){
+      maxCutoff=0.0;
+      for (size_t j = 0; j < shortRangeInteractions.size(); j++) {
+        real cut = shortRangeInteractions[j]->getMaxCutoff();
+        maxCutoff = std::max(maxCutoff, cut);
+      }
+    }
   }
 
   shared_ptr< interaction::Interaction > System::getInteraction(int i)
@@ -74,8 +91,10 @@ namespace espresso {
   
   // Scale all coordinates of the system, isotropic case (cubic box)
   void System::scaleVolume(real s, bool particleCoordinates) {
+	// the size of the system should be modified first because of the cell size recalculation
+    // in xDecomposition
+    bc->scaleVolume(s);
 	storage->scaleVolume(s, particleCoordinates);
-	bc->scaleVolume(s);
   }
 
   // Scale all coordinates of the system, anisotropic case (rectangular system!!!).
@@ -83,8 +102,10 @@ namespace espresso {
   // system. Certainly it should be modified for triclinic box. Scale parameter s should be not
   // Real3D but tensor.
   void System::scaleVolume(Real3D s, bool particleCoordinates) {
-	storage->scaleVolume(s, particleCoordinates);
+	// the size of the system should be modified first because of the cell size recalculation
+    // in xDecomposition
 	bc->scaleVolume(s);
+	storage->scaleVolume(s, particleCoordinates);
   }
   
   void System::setTrace(bool flag) {

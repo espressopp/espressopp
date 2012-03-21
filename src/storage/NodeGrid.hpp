@@ -31,19 +31,19 @@ namespace espresso {
 
       /// order of node neighbors
       enum Directions {
-	Left = 0, Right,
-	Bottom,   Top,
-	Front,    Back
+        Left = 0, Right,
+        Bottom,   Top,
+        Front,    Back
       };
 
       /// order coordinates
       enum FoldDirections {
-	ToLeft = -1, ToRight = 1
+        ToLeft = -1, ToRight = 1
       };
 
       NodeGrid(const Int3D& grid,
-	       const longint nodeId,
-	       const Real3D& domainSize);
+               const longint nodeId,
+               const Real3D& domainSize);
 
       /// map coordinate to a node. Positions outside are clipped back
       longint 
@@ -59,20 +59,20 @@ namespace espresso {
       /// calculate start of local box
       real getMyLeft(int axis) const { return nodePos[axis]*localBoxSize[axis]; }
       Real3D getMyLeft() const { 
-	return Real3D(getMyLeft(0), getMyLeft(1), getMyLeft(2));
+        return Real3D(getMyLeft(0), getMyLeft(1), getMyLeft(2));
       }
 
       /// calculate end of local box
       real getMyRight(int axis) const { return (nodePos[axis] + 1)*localBoxSize[axis]; }
       Real3D getMyRight() const { 
-	return Real3D(getMyRight(0), getMyRight(1), getMyRight(2));
+        return Real3D(getMyRight(0), getMyRight(1), getMyRight(2));
       }
 
       Real3D getMyCenter() const {
-	Real3D center = getMyLeft();
-	center += getMyRight();
-	center *= 0.5;
-	return center;
+        Real3D center = getMyLeft();
+        center += getMyRight();
+        center *= 0.5;
+        return center;
       }
 
       longint getNodeNeighborIndex(int dir) const 

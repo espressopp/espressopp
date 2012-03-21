@@ -6,18 +6,22 @@ import MPI
 
 from espresso.storage.Storage import *
 
-class DomainDecompositionLocal(StorageLocal, 
-                               storage_DomainDecomposition):
+class DomainDecompositionLocal(StorageLocal, storage_DomainDecomposition):
     'The (local) DomainDecomposition.'
     def __init__(self, system, nodeGrid, cellGrid):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, storage_DomainDecomposition, system, nodeGrid, cellGrid)
+    
+    def getCellGrid(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getCellGrid(self)
 
 if pmi.isController:
     class DomainDecomposition(Storage):
         pmiproxydefs = dict(
-            cls = 'espresso.storage.DomainDecompositionLocal',
-            )
+          cls = 'espresso.storage.DomainDecompositionLocal',  
+          pmicall = ['getCellGrid']
+          )
         def __init__(self, system, 
                      nodeGrid='auto', 
                      cellGrid='auto'):

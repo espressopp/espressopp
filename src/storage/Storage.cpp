@@ -42,15 +42,12 @@ namespace espresso {
 
     longint Storage::getNRealParticles() const {
       longint cnt = 0;
-      for (CellList::const_iterator 
-	     it = realCells.begin(),
-	     end = realCells.end();
-	   it != end; ++it) {
-	longint size = (*it)->particles.size();
-	if (size) {
-	  LOG4ESPP_TRACE(logger, "cell " << ((*it) - getFirstCell()) << " size " << size);
-	}
-	cnt += size;
+      for (CellList::const_iterator it = realCells.begin(), end = realCells.end(); it != end; ++it) {
+        longint size = (*it)->particles.size();
+        if (size) {
+          LOG4ESPP_TRACE(logger, "cell " << ((*it) - getFirstCell()) << " size " << size);
+        }
+        cnt += size;
       }
       return cnt;
     }
@@ -191,9 +188,7 @@ namespace espresso {
     void Storage::resizeCells(longint nCells) {
       cells.resize(nCells);
       localCells.reserve(nCells);
-      for (LocalCellList::iterator
-	     it = cells.begin(),
-	     end = cells.end(); it != end; ++it) {
+      for (LocalCellList::iterator it = cells.begin(), end = cells.end(); it != end; ++it) {
         localCells.push_back(&(*it));
       }
     }
@@ -449,14 +444,13 @@ namespace espresso {
     }
 
     void Storage::invalidateGhosts() {
-      for(CellListIterator it(getGhostCells());
-	  it.isValid(); ++it) {
-	/* remove only ghosts from the hash if the localParticles hash
-	   actually points to the ghost.  If there are local ghost cells
-	   to implement pbc, the real particle will be the one accessible
-	   via localParticles.
-	*/
-          removeFromLocalParticles(&(*it), true);
+      for(CellListIterator it(getGhostCells()); it.isValid(); ++it) {
+        /* remove only ghosts from the hash if the localParticles hash
+          actually points to the ghost.  If there are local ghost cells
+          to implement pbc, the real particle will be the one accessible
+          via localParticles.
+        */
+        removeFromLocalParticles(&(*it), true);
       }
     }
 

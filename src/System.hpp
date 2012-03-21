@@ -28,6 +28,8 @@ namespace espresso {
     interaction::InteractionList shortRangeInteractions;
 
     real skin;  //<! skin used for VerletList
+    
+    real maxCutoff;     // maximal cutoff over all of the interactions
 
     bool CommunicatorIsInitialized;
 
