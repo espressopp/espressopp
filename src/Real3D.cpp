@@ -20,7 +20,7 @@ namespace espresso {
       .def("__getitem__", &Real3D::getItem)
       .def("__setitem__", &Real3D::setItem)
       .def("sqr", &Real3D::sqr)
-      .def("__abs__", &Real3D::abs)
+      .def("abs", &Real3D::abs)
       .def(self += self)
       .def(self -= self)
       .def(self *= real())
