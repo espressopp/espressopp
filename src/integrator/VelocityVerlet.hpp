@@ -27,8 +27,8 @@ namespace espresso {
         shared_ptr<class Isokinetic> getIsokinetic() { return isokinetic; }
         
         // set & get barostat (Berendsen)
-        void setBerendsen(shared_ptr<class Berendsen> berendsen);
-        shared_ptr<class Berendsen> getBerendsen() { return berendsen; }
+        void setBerendsenBarostat(shared_ptr<class BerendsenBarostat> berendsenBarostat);
+        shared_ptr<class BerendsenBarostat> getBerendsenBarostat() { return berendsenBarostat; }
         
         // set & get barostat (Langevin-Hoover)
         void setLangevinBarostat(shared_ptr<class LangevinBarostat> langevinBarostat);
@@ -63,7 +63,7 @@ namespace espresso {
             \return maximal square distance a particle has moved.
         */
 
-        shared_ptr< class Berendsen > berendsen;  //!< Berendsen barostat if available
+        shared_ptr< class BerendsenBarostat > berendsenBarostat;  //!< Berendsen barostat if available
         
         shared_ptr< class LangevinBarostat > langevinBarostat;  //!< Langevin-Hoover barostat if available
         

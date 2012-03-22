@@ -1,6 +1,6 @@
 """
 *****************************************
-**Berendsen** - Berendsen barostat Object
+**BerendsenBarostat** - Berendsen barostat Object
 *****************************************
 
 This is the Berendsen barostat implementation according to the original paper [Berendsen84]_.
@@ -15,10 +15,10 @@ where :math:`\Delta t` - integration timestep, :math:`\\tau` - time parameter (c
 
 Example:
 
-    >>> berendsen = espresso.integrator.Berendsen(system)
-    >>> berendsen.tau = 0.1
-    >>> berendsen.pressure = 1.0
-    >>> integrator.berendsen = berendsen
+    >>> berendsenP = espresso.integrator.BerendsenBarostat(system)
+    >>> berendsenP.tau = 0.1
+    >>> berendsenP.pressure = 1.0
+    >>> integrator.berendsenBarostat = berendsenP
 
 **!IMPORTANT** In order to run *npt* simulation one should separately define thermostat as well.
 
@@ -26,7 +26,7 @@ Definition:
 
     In order to define the Berendsen barostat
     
-    >>> berendsen = espresso.integrator.Berendsen(system)
+    >>> berendsenP = espresso.integrator.BerendsenBarostat(system)
     
     one should have the System_ defined.
 
@@ -34,26 +34,26 @@ Definition:
 
 Properties:
 
-*   *berendsen.tau*
+*   *berendsenP.tau*
 
     The property 'tau' defines the time parameter :math:`\\tau`.
 
-*   *berendsen.pressure*
+*   *berendsenP.pressure*
     
     The property 'pressure' defines the external pressure :math:`P_{0}`.
     
 Setting the integration property:
     
-    >>> integrator.berendsen = berendsen
+    >>> integrator.berendsenBarostat = berendsenP
     
     It will define Berendsen barostat as a property of integrator.
     
 One more example:
 
-    >>> berendsen_barostat = espresso.integrator.Berendsen(system)
+    >>> berendsen_barostat = espresso.integrator.BerendsenBarostat(system)
     >>> berendsen_barostat.tau = 10.0
     >>> berendsen_barostat.pressure = 3.5
-    >>> integrator.berendsen = berendsen_barostat
+    >>> integrator.berendsenBarostat = berendsen_barostat
 
 
 Canceling the barostat:
@@ -62,15 +62,15 @@ Canceling the barostat:
     the ensamble or whatever :)
 
     >>> # define barostat with parameters
-    >>> berendsen = espresso.integrator.Berendsen(system)
+    >>> berendsen = espresso.integrator.BerendsenBarostat(system)
     >>> berendsen.tau = 0.8
     >>> berendsen.pressure = 15.0
-    >>> integrator.berendsen = berendsen
+    >>> integrator.berendsenBarostat = berendsen
     >>> ...
     >>> # some runs
     >>> ...
     >>> # erase Berendsen barostat
-    >>> integrator.berendsen = None
+    >>> integrator.berendsenBarostat = None
     >>> # the next runs will not include the system size and particle coordinates scaling
 
 References:
@@ -83,16 +83,16 @@ References:
 from espresso.esutil import cxxinit
 from espresso import pmi
 
-from _espresso import integrator_Berendsen
+from _espresso import integrator_BerendsenBarostat
 
-class BerendsenLocal(integrator_Berendsen):
+class BerendsenBarostatLocal(integrator_BerendsenBarostat):
   def __init__(self, system):
     'The (local) Velocity Verlet Integrator.'
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      cxxinit(self, integrator_Berendsen, system)
+      cxxinit(self, integrator_BerendsenBarostat, system)
 
 if pmi.isController:
-  class Berendsen(object):
+  class BerendsenBarostat(object):
     __metaclass__ = pmi.Proxy
-    pmiproxydefs = dict( cls =  'espresso.integrator.BerendsenLocal',
+    pmiproxydefs = dict( cls =  'espresso.integrator.BerendsenBarostatLocal',
     pmiproperty = [ 'tau', 'pressure' ])

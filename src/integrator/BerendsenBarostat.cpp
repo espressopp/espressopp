@@ -1,4 +1,4 @@
-#include "Berendsen.hpp"
+#include "BerendsenBarostat.hpp"
 
 #include "python.hpp"
 #include "System.hpp"
@@ -11,34 +11,34 @@ namespace espresso {
   
   namespace integrator {
 
-    LOG4ESPP_LOGGER(Berendsen::theLogger, "Berendsen");
+    LOG4ESPP_LOGGER(BerendsenBarostat::theLogger, "BerendsenBarostat");
 
-    Berendsen::Berendsen(shared_ptr<System> system) : SystemAccess(system) {
+    BerendsenBarostat::BerendsenBarostat(shared_ptr<System> system) : SystemAccess(system) {
       tau  = 1.0;
       P0 = 1.0;
       
-      LOG4ESPP_INFO(theLogger, "Berendsen constructed");
+      LOG4ESPP_INFO(theLogger, "BerendsenBarostat constructed");
     }
 
     // set and get time constant for Berendsen barostat
-    void Berendsen::setTau(real _tau) {
+    void BerendsenBarostat::setTau(real _tau) {
       tau = _tau;
     }
-    real Berendsen::getTau() {
+    real BerendsenBarostat::getTau() {
       return tau;
     }
     // set and get external pressure
-    void Berendsen::setPressure(real _P0) {
+    void BerendsenBarostat::setPressure(real _P0) {
       P0 = _P0;
     }
-    real Berendsen::getPressure() {
+    real BerendsenBarostat::getPressure() {
       return P0;
     }
 
-    Berendsen::~Berendsen(){
+    BerendsenBarostat::~BerendsenBarostat(){
     }
 
-    void Berendsen::barostat(){
+    void BerendsenBarostat::barostat(){
       LOG4ESPP_DEBUG(theLogger, "equilibrating the pressure");
 
       System& system = getSystemRef();
@@ -47,16 +47,13 @@ namespace espresso {
       
       real P = Pcurrent.compute();  // calculating the current pressure in system
       
-      //shared_ptr<mpi::communicator> commun = system.comm;
-      //cout << "current pressure:  " << P << "   rank: "<< commun->rank() << endl;
-      
       real mu = pow( 1 + pref * (P - P0) , 1.0/3.0 );  // calculating the current scaling parameter
 
       system.scaleVolume( mu, true );
     }
 
      // calculate the prefactors
-    void Berendsen::initialize(real timestep){
+    void BerendsenBarostat::initialize(real timestep){
       LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
                                    ", tau = " << tau << 
                                    ", external pressure = " << P0);
@@ -68,16 +65,16 @@ namespace espresso {
     ** REGISTRATION WITH PYTHON
     ****************************************************/
 
-    void Berendsen::registerPython() {
+    void BerendsenBarostat::registerPython() {
 
       using namespace espresso::python;
 
-      class_<Berendsen, shared_ptr<Berendsen> >
+      class_<BerendsenBarostat, shared_ptr<BerendsenBarostat> >
 
-        ("integrator_Berendsen", init< shared_ptr<System> >())
+        ("integrator_BerendsenBarostat", init< shared_ptr<System> >())
 
-        .add_property("tau", &Berendsen::getTau, &Berendsen::setTau)
-        .add_property("pressure", &Berendsen::getPressure, &Berendsen::setPressure);
+        .add_property("tau", &BerendsenBarostat::getTau, &BerendsenBarostat::setTau)
+        .add_property("pressure", &BerendsenBarostat::getPressure, &BerendsenBarostat::setPressure);
     }
 
   }

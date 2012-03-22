@@ -34,7 +34,7 @@ namespace espresso {
 
       class_< EwaldKSpace, bases< Potential > >
     	("interaction_EwaldKSpace", init< shared_ptr< System >, real, real, int >())
-    	.add_property("alpha", &EwaldKSpace::getPrefactor, &EwaldKSpace::setPrefactor)
+    	.add_property("prefactor", &EwaldKSpace::getPrefactor, &EwaldKSpace::setPrefactor)
     	.add_property("alpha", &EwaldKSpace::getAlpha, &EwaldKSpace::setAlpha)
     	.add_property("kmax", &EwaldKSpace::getKMax, &EwaldKSpace::setKMax)
       ;

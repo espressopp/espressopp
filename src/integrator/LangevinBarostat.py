@@ -3,12 +3,10 @@
 **LangevinBarostat** - Langevin-Hoover barostat Object
 ******************************************************
 
-** NOT FINISHED **
-
 This is the barostat implementation to perform Langevin dynamics in a Hoover style extended system
 according to the original paper [Quigley04]_.
 If LangevinBarostat is defined (as a property of integrator) the integration equations will be 
-modified. The volume of system :math:`V` introduced as a dynamical variable:
+modified. The volume of system :math:`V` is introduced as a dynamical variable:
 
 .. math:: \\boldsymbol{\dot{r}}_{i} = \\frac{\\boldsymbol{p}_{i}}{m_{i}} +
           \\frac{p_{\epsilon}}{W}\\boldsymbol{r}_{i}
@@ -31,52 +29,59 @@ scaled by
 
 .. math:: \sqrt{\\frac{2k_{B}TW\gamma_{p}}{\Delta t}}
 
+**!IMPORTANT** Terms :math:`- \gamma\\boldsymbol{p}_{i} + \\boldsymbol{R}_{i}` correspond to the 
+termostat. They are not included here.
+
 Example:
 
     >>> rng = espresso.esutil.RNG()
     >>> langevinP = espresso.integrator.LangevinBarostat(system, rng)
     >>> langevinP.gammaP = 0.05
     >>> langevinP.pressure = 1.0
-    >>> langevinP.piston = pow(10.0, 4)
+    >>> langevinP.mass = pow(10.0, 4)
     >>> integrator.langevinBarostat = langevinP
 
 **!IMPORTANT** In order to run *npt* simulation one should separately define thermostat as well.
 
-********************************* end
-
 Definition:
 
-    In order to define the Berendsen barostat
+    In order to define the Langevin-Hoover barostat
     
-    >>> berendsen = espresso.integrator.Berendsen(system)
+    >>> langevinP = espresso.integrator.LangevinBarostat(system, rng)
     
-    one should have the System_ defined.
+    one should have the System_ and RNG_ defined.
 
 .. _System: espresso.System.html
+.. _RNG:
 
 Properties:
 
-*   *berendsen.tau*
+*   *langevinP.gammaP*
 
-    The property 'tau' defines the time parameter :math:`\\tau`.
+    The property 'gammaP' defines the friction coefficient :math:`\gamma_{p}`.
 
-*   *berendsen.pressure*
+*   *langevinP.pressure*
     
-    The property 'pressure' defines the external pressure :math:`P_{0}`.
+    The property 'pressure' defines the external pressure :math:`P_{ext}`.
+    
+*   *langevinP.mass*
+
+    The property 'mass' defines the fictitious mass :math:`W`.
     
 Setting the integration property:
     
-    >>> integrator.berendsen = berendsen
+    >>> integrator.langevinBarostat = langevinP
     
-    It will define Berendsen barostat as a property of integrator.
+    It will define Langevin-Hoover barostat as a property of integrator.
     
 One more example:
 
-    >>> berendsen_barostat = espresso.integrator.Berendsen(system)
-    >>> berendsen_barostat.tau = 10.0
-    >>> berendsen_barostat.pressure = 3.5
-    >>> integrator.berendsen = berendsen_barostat
-
+    >>> rngBaro = espresso.esutil.RNG()
+    >>> lP = espresso.integrator.LangevinBarostat(system, rngBaro)
+    >>> lP.gammaP = .5
+    >>> lP.pressure = 1.0
+    >>> lP.mass = pow(10.0, 5)
+    >>> integrator.langevinBarostat = lP
 
 Canceling the barostat:
     
@@ -84,16 +89,18 @@ Canceling the barostat:
     the ensamble or whatever :)
 
     >>> # define barostat with parameters
-    >>> berendsen = espresso.integrator.Berendsen(system)
-    >>> berendsen.tau = 0.8
-    >>> berendsen.pressure = 15.0
-    >>> integrator.berendsen = berendsen
+    >>> rngBaro = espresso.esutil.RNG()
+    >>> lP = espresso.integrator.LangevinBarostat(system, rngBaro)
+    >>> lP.gammaP = .5
+    >>> lP.pressure = 1.0
+    >>> lP.mass = pow(10.0, 5)
+    >>> integrator.langevinBarostat = lP
     >>> ...
     >>> # some runs
     >>> ...
-    >>> # erase Berendsen barostat
-    >>> integrator.berendsen = None
-    >>> # the next runs will not include the system size and particle coordinates scaling
+    >>> # erase barostat
+    >>> integrator.langevinBarostat = None
+    >>> # the next runs will not include the modification of integration equations
 
 References:
 

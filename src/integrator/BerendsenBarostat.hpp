@@ -1,7 +1,7 @@
 /* Berendsen barostat */
 
-#ifndef _INTEGRATOR_BERENDSEN_HPP
-#define	_INTEGRATOR_BERENDSEN_HPP
+#ifndef _INTEGRATOR_BERENDSENBAROSTAT_HPP
+#define	_INTEGRATOR_BERENDSENBAROSTAT_HPP
 
 #include "types.hpp"
 #include "logging.hpp"
@@ -15,17 +15,17 @@ namespace espresso {
 
   namespace integrator {
 
-    class Berendsen: public SystemAccess {
+    class BerendsenBarostat: public SystemAccess {
 
       public:
-        Berendsen(shared_ptr< System > system);
+        BerendsenBarostat(shared_ptr< System > system);
         
         void setTau(real tau);
         real getTau();
         void setPressure(real P0);
         real getPressure();
 
-        ~Berendsen();
+        ~BerendsenBarostat();
 
         void initialize(real timestep);
 
@@ -47,6 +47,5 @@ namespace espresso {
   }
 }
 
-
-#endif	/* _INTEGRATOR_BERENDSEN_HPP */
+#endif	/* _INTEGRATOR_BERENDSENBAROSTAT_HPP */
 

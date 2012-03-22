@@ -7,7 +7,7 @@
 #include "Isokinetic.hpp"
 #include "TDforce.hpp"
 
-#include "Berendsen.hpp"
+#include "BerendsenBarostat.hpp"
 #include "LangevinBarostat.hpp"
 
 namespace espresso {
@@ -21,7 +21,7 @@ namespace espresso {
       Isokinetic::registerPython();
       TDforce::registerPython();
       
-      Berendsen::registerPython();
+      BerendsenBarostat::registerPython();
       LangevinBarostat::registerPython();
     }
   }

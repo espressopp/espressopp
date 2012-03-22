@@ -3,7 +3,7 @@
 #include "VelocityVerlet.hpp"
 #include "Langevin.hpp"
 
-#include "Berendsen.hpp"
+#include "BerendsenBarostat.hpp"
 #include "LangevinBarostat.hpp"
 #include "Isokinetic.hpp"
 
@@ -63,10 +63,10 @@ namespace espresso {
 
     /*****************************************************************************/
 
-    void VelocityVerlet::setBerendsen(shared_ptr< Berendsen > _berendsen)
+    void VelocityVerlet::setBerendsenBarostat(shared_ptr< BerendsenBarostat > _berendsenP)
     {
       LOG4ESPP_INFO(theLogger, "set Berendsen barostat");
-      berendsen = _berendsen;
+      berendsenBarostat = _berendsenP;
     }
 
     /*****************************************************************************/
@@ -105,7 +105,7 @@ namespace espresso {
           langevinBarostat->initialize(dt, 1.0);
       }
       
-      if (berendsen) berendsen->initialize(dt);
+      if (berendsenBarostat) berendsenBarostat->initialize(dt);
       
       // no more needed: setUp();
 
@@ -174,7 +174,7 @@ namespace espresso {
         integrate2();
         timeInt2 += timeIntegrate.getElapsedTime() - time;
         
-        if (berendsen) berendsen->barostat(); // adjust the system pressure to desired in 
+        if (berendsenBarostat) berendsenBarostat->barostat(); // adjust the system pressure to desired in 
 
         if (isokinetic) isokinetic->rescaleVelocities(); // scale all particle velocities to match isokinetic temperature
       }
@@ -508,7 +508,7 @@ namespace espresso {
       class_<VelocityVerlet, bases<MDIntegrator>, boost::noncopyable >
         ("integrator_VelocityVerlet", init< shared_ptr<System> >())
         .add_property("langevin", &VelocityVerlet::getLangevin, &VelocityVerlet::setLangevin)
-        .add_property("berendsen", &VelocityVerlet::getBerendsen, &VelocityVerlet::setBerendsen)
+        .add_property("berendsenBarostat", &VelocityVerlet::getBerendsenBarostat, &VelocityVerlet::setBerendsenBarostat)
         .add_property("langevinBarostat", &VelocityVerlet::getLangevinBarostat, &VelocityVerlet::setLangevinBarostat)
         .add_property("isokinetic", &VelocityVerlet::getIsokinetic, &VelocityVerlet::setIsokinetic)
         .def("getTimers", &wrapGetTimers)
