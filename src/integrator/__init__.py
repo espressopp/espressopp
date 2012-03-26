@@ -10,4 +10,5 @@ from espresso.integrator.Isokinetic import *
 from espresso.integrator.TDforce import *
 
 from espresso.integrator.BerendsenBarostat import *
+from espresso.integrator.BerendsenThermostat import *
 from espresso.integrator.LangevinBarostat import *

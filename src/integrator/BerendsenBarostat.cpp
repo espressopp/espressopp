@@ -3,7 +3,6 @@
 #include "python.hpp"
 #include "System.hpp"
 
-//The problem appeared after the plugins update (openSUSE 11.2 (x86_64))
 namespace espresso {
   
   using namespace std;

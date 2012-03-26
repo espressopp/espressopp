@@ -18,6 +18,7 @@
 #include "boost/serialization/vector.hpp"
 
 using namespace boost;
+using namespace std;
 
 namespace espresso { 
   namespace storage {
@@ -135,30 +136,42 @@ namespace espresso {
     }
   }
 
+  // TODO one should take care of rc and system size
   /** scale position coordinates of all real particles by factor s */
   void DomainDecomposition::scaleVolume(real s, bool particleCoordinates){
 	if(particleCoordinates) Storage::scaleVolume( s );
     
-    real maxCut = getSystem()->maxCutoff;
+    real maxCut = getSystem() -> maxCutoff;
     real skinL = getSystem() -> skin;
     
-    if( maxCut+skinL > s*cellGrid.getSmallestCellDiameter() ){
+    if( maxCut+skinL > s*cellGrid.getSmallestCellDiameter() )
       cellAdjust();
-    }
     else
       cellGrid.scaleVolume( s );
-      
   }
   // anisotropic version
   void DomainDecomposition::scaleVolume(Real3D s, bool particleCoordinates){
 	if(particleCoordinates) Storage::scaleVolume( s );
-    cellGrid.scaleVolume(s);
+    
+    real maxCut = getSystem() -> maxCutoff;
+    real skinL = getSystem() -> skin;
+    real cellD = cellGrid.getSmallestCellDiameter();
+    
+    real r0 = s[0]*cellD;
+    real r1 = s[1]*cellD;
+    real r2 = s[2]*cellD;
+    
+    if( maxCut+skinL > min( min( r0, r1), r2 ) )
+      cellAdjust();
+    else
+      cellGrid.scaleVolume(s);
   }
   
   Int3D DomainDecomposition::getInt3DCellGrid(){
     return Int3D( cellGrid.getGridSize(0),
             cellGrid.getGridSize(1),
-            cellGrid.getGridSize(2) );
+            cellGrid.getGridSize(2)
+            );
   }
 
   void DomainDecomposition::cellAdjust(){

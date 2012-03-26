@@ -4,6 +4,7 @@
 #include "Langevin.hpp"
 
 #include "BerendsenBarostat.hpp"
+#include "BerendsenThermostat.hpp"
 #include "LangevinBarostat.hpp"
 #include "Isokinetic.hpp"
 
@@ -63,16 +64,21 @@ namespace espresso {
 
     /*****************************************************************************/
 
-    void VelocityVerlet::setBerendsenBarostat(shared_ptr< BerendsenBarostat > _berendsenP)
-    {
+    void VelocityVerlet::setBerendsenBarostat(shared_ptr< BerendsenBarostat > _berendsenP){
       LOG4ESPP_INFO(theLogger, "set Berendsen barostat");
       berendsenBarostat = _berendsenP;
     }
 
     /*****************************************************************************/
 
-    void VelocityVerlet::setLangevinBarostat(shared_ptr< LangevinBarostat > _langevinBarostat)
-    {
+    void VelocityVerlet::setBerendsenThermostat(shared_ptr< BerendsenThermostat > _berendsenT){
+      LOG4ESPP_INFO(theLogger, "set Berendsen thermostat");
+      berendsenThermostat = _berendsenT;
+    }
+
+    /*****************************************************************************/
+
+    void VelocityVerlet::setLangevinBarostat(shared_ptr< LangevinBarostat > _langevinBarostat){
       LOG4ESPP_INFO(theLogger, "set Hoover style barostat. Langevin dynamics");
       langevinBarostat = _langevinBarostat;
     }
@@ -106,6 +112,7 @@ namespace espresso {
       }
       
       if (berendsenBarostat) berendsenBarostat->initialize(dt);
+      if (berendsenThermostat) berendsenThermostat->initialize(dt);
       
       // no more needed: setUp();
 
@@ -174,7 +181,8 @@ namespace espresso {
         integrate2();
         timeInt2 += timeIntegrate.getElapsedTime() - time;
         
-        if (berendsenBarostat) berendsenBarostat->barostat(); // adjust the system pressure to desired in 
+        if (berendsenThermostat) berendsenThermostat->thermostat(); // adjust temperature
+        if (berendsenBarostat) berendsenBarostat->barostat(); // adjust pressure
 
         if (isokinetic) isokinetic->rescaleVelocities(); // scale all particle velocities to match isokinetic temperature
       }
@@ -289,27 +297,27 @@ namespace espresso {
                 ", v = " << cit->velocity() << 
                 ", f = " << cit->force());
 
-            /* more precise for DEBUG:
+        /* more precise for DEBUG:
 
-            printf("Particle %d, pos = %16.12f %16.12f %16.12f, v = %16.12f, %16.12f %16.12f, f = %16.12f %16.12f %16.12f\n",
-                cit->p.id, cit->r.p[0], cit->r.p[1], cit->r.p[2],
-                    cit->m.v[0], cit->m.v[1], cit->m.v[2],
-                cit->f.f[0], cit->f.f[1], cit->f.f[2]);
-                
-            */
+        printf("Particle %d, pos = %16.12f %16.12f %16.12f, v = %16.12f, %16.12f %16.12f, f = %16.12f %16.12f %16.12f\n",
+            cit->p.id, cit->r.p[0], cit->r.p[1], cit->r.p[2],
+                cit->m.v[0], cit->m.v[1], cit->m.v[2],
+            cit->f.f[0], cit->f.f[1], cit->f.f[2]);
 
-            real dtfm = 0.5 * dt / cit->mass();
+        */
 
-            // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) 
-            cit->velocity() += dtfm * cit->force();
+        real dtfm = 0.5 * dt / cit->mass();
 
-            // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt) 
-            Real3D deltaP = dt * cit->velocity();
-            
-            if (langevinBarostat) deltaP += dt * (langevinBarostat->updDisplacement()) * cit->position(); // updDisplacement is just coefficient
-            
-            cit->position() += deltaP;
-            sqDist += deltaP * deltaP;
+        // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) 
+        cit->velocity() += dtfm * cit->force();
+
+        // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt) 
+        Real3D deltaP = dt * cit->velocity();
+
+        if (langevinBarostat) deltaP += dt * (langevinBarostat->updDisplacement()) * cit->position(); // updDisplacement is just coefficient
+
+        cit->position() += deltaP;
+        sqDist += deltaP * deltaP;
 
         count++;
 
@@ -509,6 +517,7 @@ namespace espresso {
         ("integrator_VelocityVerlet", init< shared_ptr<System> >())
         .add_property("langevin", &VelocityVerlet::getLangevin, &VelocityVerlet::setLangevin)
         .add_property("berendsenBarostat", &VelocityVerlet::getBerendsenBarostat, &VelocityVerlet::setBerendsenBarostat)
+        .add_property("berendsenThermostat", &VelocityVerlet::getBerendsenThermostat, &VelocityVerlet::setBerendsenThermostat)
         .add_property("langevinBarostat", &VelocityVerlet::getLangevinBarostat, &VelocityVerlet::setLangevinBarostat)
         .add_property("isokinetic", &VelocityVerlet::getIsokinetic, &VelocityVerlet::setIsokinetic)
         .def("getTimers", &wrapGetTimers)
