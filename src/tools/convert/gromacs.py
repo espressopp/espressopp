@@ -60,14 +60,14 @@ def read(gro_file, top_file=""):
         molecule_numbers = []
         readmolecules = False
         for line in f:
+            if line[0] == ";":  # skip comment line
+                continue
             if 'atomtypes' in line: # map atom types (espresso++ uses ints)
                 readattypes = True
                 print "Reading atomtypes: ",
                 continue
             
             if readattypes:
-                if line[0] == ";":  # skip comment line
-                    continue
                 if line.strip() == "": # end of atomtypes section
                     readattypes = False
                     print sorted(atomtypes.items(), key=itemgetter(1)) # prints gromacs type and esp++ type
@@ -83,8 +83,6 @@ def read(gro_file, top_file=""):
                 continue
             
             if readbdtypes:
-                if line[0] == ";":  # skip comment line
-                    continue
                 if line.strip() == "": # end of bondtypes section
                     readbdtypes = False
                     continue
@@ -101,8 +99,6 @@ def read(gro_file, top_file=""):
                 continue
             
             if readantypes:
-                if line[0] == ";":  # skip comment line
-                    continue
                 if line.strip() == "": # end of angletypes section
                     readantypes = False
                     continue
@@ -122,8 +118,6 @@ def read(gro_file, top_file=""):
                 continue
             
             if readdhtypes:
-                if line[0] == ";":  # skip comment line
-                    continue
                 if line.strip() == "": # end of angletypes section
                     readdhtypes = False
                     continue
@@ -151,8 +145,6 @@ def read(gro_file, top_file=""):
                 continue
             
             if readmolecules:
-                if line[0] == ";":  # skip comment line
-                    continue
                 if line.strip() == "": # end of molecules section
                     readmolecules = False
                     continue

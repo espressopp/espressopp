@@ -5,6 +5,6 @@ ESPResSo++ Tutorial
    
    tutorial.SystemSetup.rst
    tutorial.LennardJones.rst
-   tutorial.PolymerMelt.rst
-   tutorial.AdResS.rst
+..   tutorial.PolymerMelt.rst
+..   tutorial.AdResS.rst
 

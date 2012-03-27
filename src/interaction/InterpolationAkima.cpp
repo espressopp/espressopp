@@ -106,7 +106,7 @@ namespace espresso {
         } else {
             LOG4ESPP_INFO(theLogger, "read " << N << " table entries in file " << file);
         }
-        
+
         return N;
     }// readFile
 

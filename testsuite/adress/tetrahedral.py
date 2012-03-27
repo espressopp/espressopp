@@ -96,7 +96,6 @@ num_particlesCG = 5001 # number of VP/CG particles
 #num_particles = len(x) - num_particlesCG  # 20004 = 25005 - 5001 
 num_particles = len(x) # 20004
 
-
 #Lx, Ly, Lz = 45, 45, 45
 
 sys.stdout.write('Setting up simulation ...\n')

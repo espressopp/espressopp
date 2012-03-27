@@ -7,3 +7,6 @@ from espresso.tools.topology import *
 from espresso.tools.vmd import *
 from espresso.tools.info import *
 from espresso.tools.DumpConfigurations import *
+from espresso.tools.convert import *
+from espresso.tools.analyse import *
+from espresso.tools.tabulated import *
