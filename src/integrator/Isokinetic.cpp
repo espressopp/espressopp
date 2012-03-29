@@ -75,16 +75,14 @@ namespace espresso {
       CellList realCells = system.storage->getRealCells();
 
       NPart_local = system.storage->getNRealParticles();
-      printf("CPU %i: NPart=%i NPart_local=%i\n", getSystem()->comm->rank(), NPart, NPart_local);
 
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Real3D vel = cit->velocity();
         EKin_local += 0.5 * cit->mass() * (vel * vel);
       }
 
-      // boost::mpi::reduce(*getSystem()->comm, EKin_local, EKin, std::plus<real>(), 0);
+      boost::mpi::all_reduce(*getSystem()->comm, EKin_local, EKin, std::plus<real>());
       boost::mpi::all_reduce(*getSystem()->comm, NPart_local, NPart, std::plus<int>());
-      //printf("CPU %i: Ekin=%f   NPart=%i NPart_local=%i\n", getSystem()->comm->rank(), EKin, NPart, NPart_local);
 
       DegreesOfFreedom   = 3.0/2.0 * NPart;
       currentTemperature = EKin / DegreesOfFreedom;
