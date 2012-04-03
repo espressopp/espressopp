@@ -10,6 +10,10 @@ class InteractionLocal(object):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.computeEnergy(self)
 
+    def computeVirial(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.computeVirial(self)
+
     def bondType(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return int(self.cxxclass.bondType(self))
@@ -19,5 +23,5 @@ if pmi.isController :
         """Abstract base class for interaction."""
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            pmicall = [ "computeEnergy", "bondType" ]
+            pmicall = [ "computeEnergy", "computeVirial", "bondType" ]
             )

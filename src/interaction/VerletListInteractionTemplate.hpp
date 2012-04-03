@@ -112,8 +112,10 @@ namespace espresso {
         LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
       }
 
-      real esum;
-      boost::mpi::reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>(), 0);      return esum;
+      real esum=0;
+      boost::mpi::reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>(), 0);
+      
+      return esum;
     }
 
 

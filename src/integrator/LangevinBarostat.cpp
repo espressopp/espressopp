@@ -6,9 +6,10 @@
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 
+#include "interaction/Interaction.hpp"
 #include "esutil/RNG.hpp"
 
-#include "analysis/Pressure.hpp"
+//#include "analysis/Pressure.hpp"
 #include "bc/BC.hpp"
 
 #include "mpi.hpp"
@@ -16,9 +17,10 @@
 namespace espresso {
 
   using namespace std;
-  using namespace analysis;
+  //using namespace analysis;
   
   using namespace iterator;
+  using namespace interaction;
 
   namespace integrator {
 
@@ -68,9 +70,6 @@ namespace espresso {
       // The volume is scaled according to the equations V(t+1/2*dt) = V(t) + 1/2*dt*V'; V' = d*V*pe/W
       real scale_factor = pow( 1 + dt_2 * 3.0 * momentum, 1./3.);  // calculating the current scaling parameter
       
-      //mpi::communicator communic = *system.comm;
-      //cout << "VOL:    " << 1 + dt_2 * 3.0 * momentum << "     cpu:"<< communic.rank() <<  "         !!!!!!!!!!!!!" << endl ;
-
       system.scaleVolume( scale_factor, false);
     }
     
@@ -85,10 +84,10 @@ namespace espresso {
       mpi::communicator communic = *system.comm;
       real rannum; 
       if (communic.rank() == 0) rannum = rng->normal();
-      boost::mpi::broadcast(communic, rannum, 0);
+      mpi::broadcast(communic, rannum, 0);
       
-//*************************************************************************************************
       // compute the kinetic contribution (2/3 \sum 1/2mv^2)
+      // it's not efficient to use the analysis.Pressure because of double calculation of m*v*v
       real v2sum;
       real v2 = 0.0;
       CellList realCells = system.storage->getRealCells();
@@ -96,11 +95,20 @@ namespace espresso {
         const Particle& p = *cit;
         v2 = v2 + p.mass() * (p.velocity() * p.velocity());
       }
-      boost::mpi::all_reduce( communic, v2, v2sum, std::plus<real>());
-//*************************************************************************************************
+      mpi::all_reduce( communic, v2, v2sum, std::plus<real>());
+
+      real p_kinetic = v2sum / (3.0 * V);
       
-      static Pressure Pcurrent( getSystem() );
-      real P = Pcurrent.compute();  // calculating the current pressure in system
+      // compute the short-range nonbonded contribution
+      real rij_dot_Fij = 0.0;
+      const InteractionList& srIL = system.shortRangeInteractions;
+      for (size_t j = 0; j < srIL.size(); j++) {
+        rij_dot_Fij += srIL[j]->computeVirial();
+      }
+      real p_nonbonded = 0.0;
+      mpi::all_reduce(*mpiWorld, rij_dot_Fij / (3.0 * V), p_nonbonded, std::plus<real>());
+      
+      real P = p_kinetic + p_nonbonded;
       
       // @TODO one should check that X is not the instantaneous pressure, 
       // while it does not include the white noise from thermostat
@@ -109,7 +117,7 @@ namespace espresso {
       real pe_deriv = 3 * V * (X - externalPressure)  + pref6 * v2sum +
               pref4 * momentum + pref5 * rannum;
       
-      pe_deriv /= mass; // momentum is already normalized by mass
+      pe_deriv /= mass; // momentum is normalized by mass already
       
       momentum += dt_2 * pe_deriv;
     }
@@ -144,17 +152,16 @@ namespace espresso {
               ", external pressure = " << externalPressure <<
               ", fictitious mass = " << mass );
 
-      // barostat
+      // TODO implement Nf for the system with constarins
       /* Nf - degrees of freedom. For N particles in d-dimentional system without constrains
        * Nf = d * N
-       * !!!!!!!!!!!!!!!!!!!!! @TODO Should be changed, now just test case !!!!!!!!!!!
        */
-      // determine number of local particles and total particles
+      // determine the number of local particles and total particles
       System& system = getSystemRef();
       int Nsum = 0;
       int N = system.storage->getNRealParticles();
       boost::mpi::all_reduce(*mpiWorld, N, Nsum, std::plus<int>());
-
+      
       pref6 = 1./(double)Nsum;
       
       pref3 = - (1+pref6);

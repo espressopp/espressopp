@@ -143,9 +143,18 @@ namespace espresso {
     
     real maxCut = getSystem() -> maxCutoff;
     real skinL = getSystem() -> skin;
-    
-    if( maxCut+skinL > s*cellGrid.getSmallestCellDiameter() )
-      cellAdjust();
+    real cs = maxCut + skinL;
+    if( cs > s*cellGrid.getSmallestCellDiameter() ){
+      Real3D Li = getSystem() -> bc -> getBoxL(); // getting the system size
+      real minL = min(Li[0], min(Li[1],Li[2]));
+      if(cs > minL){
+        cout << "The current system size "<< minL <<" smaller then cutoff+skin "<< cs << endl;
+        // TODO error handling
+        exit(-1);
+      }
+      else
+        cellAdjust();
+    }
     else
       cellGrid.scaleVolume( s );
   }
@@ -155,14 +164,25 @@ namespace espresso {
     
     real maxCut = getSystem() -> maxCutoff;
     real skinL = getSystem() -> skin;
+    real cs = maxCut + skinL;
     real cellD = cellGrid.getSmallestCellDiameter();
     
     real r0 = s[0]*cellD;
     real r1 = s[1]*cellD;
     real r2 = s[2]*cellD;
     
-    if( maxCut+skinL > min( min( r0, r1), r2 ) )
-      cellAdjust();
+    
+    if( cs > min( min( r0, r1), r2 ) ){
+      Real3D Li = getSystem() -> bc -> getBoxL(); // getting the system size
+      real minL = min(Li[0], min(Li[1],Li[2]));
+      if(cs > minL){
+        cout << "The current system size "<< minL <<" smaller then cutoff+skin "<< cs << endl;
+        // TODO error handling
+        exit(-1);
+      }
+      else
+        cellAdjust();
+    }
     else
       cellGrid.scaleVolume(s);
   }

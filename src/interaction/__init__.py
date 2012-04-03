@@ -31,6 +31,6 @@ from espresso.interaction.DihedralPotential import *
 from espresso.interaction.TabulatedDihedral import *
 from espresso.interaction.OPLS import *
 
-from espresso.interaction.EwaldKSpace import *
+from espresso.interaction.CoulombKSpaceEwald import *
 
 from espresso.interaction.CoulombRSpace import *

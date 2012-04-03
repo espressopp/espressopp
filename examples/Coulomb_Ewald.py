@@ -90,9 +90,9 @@ system.addInteraction(coulombR_int)
   It is based on the system information (system), Coulomb prefactor (coulomb_prefactor),
   Ewald parameter (alpha), and the cutoff in K space (kspacecutoff)
 '''
-ewaldK_pot = espresso.interaction.EwaldKSpace(system, coulomb_prefactor, alpha, kspacecutoff)
+ewaldK_pot = espresso.interaction.CoulombKSpaceEwald(system, coulomb_prefactor, alpha, kspacecutoff)
 # creating the interaction based on the Cell list for all particle interaction and potential in K space
-ewaldK_int = espresso.interaction.CellListEwaldKSpace(system.storage, ewaldK_pot)
+ewaldK_int = espresso.interaction.CellListCoulombKSpaceEwald(system.storage, ewaldK_pot)
 # adding the interaction to the system
 system.addInteraction(ewaldK_int)
 

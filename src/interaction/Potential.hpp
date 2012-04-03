@@ -124,7 +124,8 @@ namespace espresso {
     //////////////////////////////////////////////////
     template < class Derived > 
     inline
-    PotentialTemplate< Derived >::PotentialTemplate() : cutoff(infinity), cutoffSqr(infinity), shift(0.0), autoShift(false) {}
+    PotentialTemplate< Derived >::PotentialTemplate() : cutoff(infinity), cutoffSqr(infinity), shift(0.0), autoShift(false){
+    }
 
     // Shift/cutoff handling
     template < class Derived > 
@@ -277,14 +278,6 @@ namespace espresso {
       }
     }
     
-    /*
-    template < class Derived > 
-    inline bool   
-    PotentialTemplate< Derived >::
-    _computeForce(CellList realcells) const {
-      return false;
-    }
-    */
   }
 }
 

@@ -1,6 +1,6 @@
 // ESPP_CLASS
-#ifndef _INTERACTION_EWALDKSPACE_HPP
-#define _INTERACTION_EWALDKSPACE_HPP
+#ifndef _INTERACTION_COULOMBKSPACEEWALD_HPP
+#define _INTERACTION_COULOMBKSPACEEWALD_HPP
 
 #include <cmath>
 
@@ -11,6 +11,8 @@
 #include "iterator/CellListIterator.hpp"
 #include "Cell.hpp"
 #include "bc/BC.hpp"
+
+#include "Tensor.hpp"
 
 #include "System.hpp"
 
@@ -28,24 +30,25 @@ typedef complex<double> dcomplex;
 
 namespace espresso {
   namespace interaction {
-    /** This class provides methods to compute forces and energies of the EwaldKSpace part.
-     *  Curently it works with cubes and rectangular cuboids.
+    /** This class provides methods to compute forces and energies of the CoulombKSpaceEwald part.
+     *  Currently it works with cubes and rectangular cuboids.
      *  Does not work for triclinic box, slab geometry.
      */
-    class EwaldKSpace : public PotentialTemplate< EwaldKSpace > {
+    
+    // TODO should be optimized (force energy and virial calculate the same stuff)
+    
+    class CoulombKSpaceEwald : public PotentialTemplate< CoulombKSpaceEwald > {
     private:
       real prefactor;
       real alpha; // Ewald parameter
       int kmax; // cutoff in k space
-      // we need the system object to be able to access the box dimensions, communicator
-      // number of particles, signals
-      shared_ptr< System > system;
       
-      real Lx, Ly, Lz; // system size the information could be got from bc
-      int nParticles;  // number of particles 
-      real rclx;
-      real rcly;
-      real rclz;
+      shared_ptr< System > system; // we need the system object to be able to access the box
+                                   // dimensions, communicator, number of particles, signals
+      
+      real Lx, Ly, Lz; // local variable for system size
+      int nParticles;  // local variable for the number of particles
+      real rclx, rcly, rclz;
       real force_prefac[3]; // real array for force prefactors [0]: x,[1]: y,[2]: z
       
       vector<real> kvector; // precalculated k-vector
@@ -59,6 +62,11 @@ namespace espresso {
       vector<int> kx_ind;
       vector<int> ky_ind;
       vector<int> kz_ind;
+      
+      // precalculated factors for the virial and virial tensor
+      vector<real> virialPref;
+      vector<Tensor> virialTensorPref;
+      Tensor I;
 
       // exponent array
       vector< vector<dcomplex> > eikx;
@@ -70,22 +78,26 @@ namespace espresso {
       real sum_q2;
         
       // @TODO one should clean the memory then
-      dcomplex* sum; 
-      dcomplex* totsum; 
+      dcomplex* sum;
+      dcomplex* totsum;
     public:
       static void registerPython();
 
-      EwaldKSpace(shared_ptr< System > _system, real _prefactor, real _alpha, int _kmax);
+      CoulombKSpaceEwald(shared_ptr< System > _system, real _prefactor, real _alpha, int _kmax);
+      
+      ~CoulombKSpaceEwald();
       
       // at this point we are ready to prepare the kvector[], it can be done just once at the begin
       void preset(){
-        // @todo it could be parallelized too !!!
+        cout << " Preset is called!!! "<< endl;
+        
+        // TODO it could be parallelized too
         Real3D Li = system -> bc -> getBoxL(); // getting the system size
         Lx = Li[0];
         Ly = Li[1];
         Lz = Li[2];
         
-        real skmaxsq = pow( kmax / min(Lx, min(Ly,Lz)), 2 ); // we chose the biggest cutoff 
+        real skmaxsq = pow( kmax / min(Lx, min(Ly,Lz)), 2 ); // we choose the biggest cutoff 
         
         rclx = M_2PI / Lx;
         rcly = M_2PI / Ly;
@@ -96,22 +108,42 @@ namespace espresso {
         force_prefac[2] = prefactor * (-2.0) * rclz;
         
         // precalculate factors
-        real B = M_PI2 / (alpha * alpha);
+        real invAlpha2 = 1.0 / (alpha * alpha);
+        real B = M_PI2 * invAlpha2; // PI^2 / alpha^2
+        real inv2alpha2 = 0.5 * invAlpha2; // 1.0 / (2*alpha^2)
         real V = M_2PI * Lx * Ly * Lz;
         
         /* calculate the k-vector array */
-        int ksq,kx2,ky2,kz2;
-        real rksq, rkx2,rky2,rkz2;
+        int ksq, kx2, ky2, kz2;
+        real rksq, rkx2, rky2, rkz2;
+        real rLx2 = 1. / pow( Lx, 2 );
+        real rLy2 = 1. / pow( Ly, 2 );
+        real rLz2 = 1. / pow( Lz, 2 );
+        real rk2PIx, rk2PIy, rk2PIz;
         kVectorLength = 0;
+        // clear all vectors
+        kvector.clear();
+        kxfield.clear();
+        kyfield.clear();
+        kzfield.clear();
+
+        kx_ind.clear();
+        ky_ind.clear();
+        kz_ind.clear();
+        virialPref.clear();
+        virialTensorPref.clear();
         for(int kx = 0; kx <= kmax; kx++){
-          kx2  = pow( kx , 2 );
-          rkx2 = kx2 / pow( Lx, 2 );
+          kx2  = pow( kx, 2 );
+          rkx2 = kx2 * rLx2;
+          rk2PIx = kx * rclx;
           for(int ky = -kmax; ky <= kmax; ky++){
             ky2  = pow( ky, 2 );
-            rky2 = ky2 / pow( Ly, 2 );
+            rky2 = ky2 * rLy2;
+            rk2PIy = ky * rcly;
             for(int kz = -kmax; kz <= kmax; kz++) {
               kz2  = pow( kz, 2 );
-              rkz2 = kz2 / pow( Lz, 2 );
+              rkz2 = kz2 * rLz2;
+              rk2PIz = kz * rclz;
               
               ksq  = kx2+ky2+kz2;
               rksq = rkx2+rky2+rkz2;
@@ -127,14 +159,28 @@ namespace espresso {
                 ky_ind.push_back( kmax + ky );
                 kz_ind.push_back( kmax + kz );
                 
+                // the tensor should be: deltaKronecker(i,j) - 2*hi*hj / h^2 - hi*hj / (2*alfa^2)
+                Real3D h(rk2PIx, rk2PIy, rk2PIz);
+                real h2 = h * h;
+                Tensor hh(h, h); // it is tensor: hi*hj
+                
+                virialPref.push_back( 1 - h2 * inv2alpha2 );
+                virialTensorPref.push_back( I - 2 * hh / h2 - hh * inv2alpha2 );
+                
                 kVectorLength++;
               }
             }
           }
         }
         
-        sum = NULL;
-        totsum = NULL;
+        if(sum != NULL){
+          delete [] sum;
+          sum = NULL;
+        }
+        if(totsum != NULL){
+          delete [] totsum;
+          totsum = NULL;
+        }
         sum = new dcomplex[kVectorLength]; 
         totsum = new dcomplex[kVectorLength];
         
@@ -160,6 +206,7 @@ namespace espresso {
           Particle &p = *it;
           node_sum_q2 += (p.q() * p.q());
         }
+        sum_q2 = 0.0;
         mpi::all_reduce( *system -> comm, node_sum_q2, sum_q2, plus<real>() );
       }
       
@@ -180,7 +227,6 @@ namespace espresso {
       }
       int getKMax() const { return kmax; }
 
-      
       // compute force and energy
       void exponentPrecalculation(CellList realcells){
         /* Calculation of k space sums */
@@ -248,7 +294,7 @@ namespace espresso {
         int n_nodes = communic.size();
         int this_node = communic.rank();
         
-        // @TODO it could be a problem if   n_nodes > kVectorLength
+        // TODO it could be a problem if   n_nodes > kVectorLength
         int numk = kVectorLength / n_nodes + 1;
         int mink = this_node * numk;
         int maxk = mink + numk;
@@ -263,7 +309,7 @@ namespace espresso {
           node_energy += fact * kvector[k] * norm( totsum[k] );
         }
         real energy = 0;
-        mpi::all_reduce( *system -> comm, node_energy, energy, plus<real>() );
+        mpi::all_reduce( communic, node_energy, energy, plus<real>() );
         
         /* self energy correction */
         energy -= sum_q2 * alpha * M_1_SQRTPI;
@@ -305,19 +351,90 @@ namespace espresso {
         
         return true;
       }
-
-      // @todo this functions should be somehow cleaned
+      
+      // compute virial for this interaction
+      // (!note: all particle interaction contains only one potential)
+      real _computeVirial(CellList realcells){
+        // TODO it's exactly the same part as energy has
+        // exponent array
+        exponentPrecalculation(realcells);
+        
+        mpi::communicator communic = *system->comm;
+        
+        int n_nodes = communic.size();
+        int this_node = communic.rank();
+        
+        // TODO it could be a problem if   n_nodes > kVectorLength
+        int numk = kVectorLength / n_nodes + 1;
+        int mink = this_node * numk;
+        int maxk = mink + numk;
+        if(maxk>kVectorLength) maxk = kVectorLength;
+        real fact;
+        real node_virial = 0;
+        for(int k=mink; k<maxk; k++) {
+          if (kxfield[k]==0) 
+            fact=1.0;
+          else
+            fact=2.0;
+          node_virial += fact * virialPref[k] * kvector[k] * norm( totsum[k] );
+        }
+        real virial = 0;
+        mpi::all_reduce( communic, node_virial, virial, plus<real>() );
+        
+        return virial;
+      }
+      
+      // compute virial Tensor for this interaction
+      // (!note: all particle interaction contains only one potential)
+      Tensor _computeVirialTensor(CellList realcells){
+        // TODO it's exactly the same part as energy does
+        // exponent array
+        exponentPrecalculation(realcells);
+        
+        mpi::communicator communic = *system->comm;
+        
+        int n_nodes = communic.size();
+        int this_node = communic.rank();
+        
+        // TODO it could be a problem if   n_nodes > kVectorLength
+        int numk = kVectorLength / n_nodes + 1;
+        int mink = this_node * numk;
+        int maxk = mink + numk;
+        if(maxk>kVectorLength) maxk = kVectorLength;
+        real fact;
+        Tensor node_virialTensor = 0;
+        for(int k=mink; k<maxk; k++) {
+          if (kxfield[k]==0) 
+            fact=1.0;
+          else
+            fact=2.0;
+          node_virialTensor += fact * kvector[k] * norm( totsum[k] ) * virialTensorPref[k];
+        }
+        
+        real virTreal[6];
+        for(int j=0; j<6; j++) virTreal[j] = node_virialTensor[j];
+        real virTrealSum[6];
+        mpi::all_reduce( communic, virTreal, 6, virTrealSum, plus<real>() );
+        
+        Tensor virialTensor = 0;
+        for(int j=0; j<6; j++) virialTensor.setItem(j, virTrealSum[j]);
+        
+        return virialTensor;
+      }
+      
       real _computeEnergySqrRaw(real distSqr) const {
-        cout << "This function currently doesn't work" << endl;
+        cout << "There is no sense to call this function for Ewald summation" << endl;
         return 0.0;
       }
       bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const {
-        cout << "This function currently doesn't work" << endl;
+        cout << "There is no sense to call this function for Ewald summation" << endl;
         return false;
       }
       
     protected:
+      // it's responsible for the k vector recalculation when the box size changes
       boost::signals2::connection connectionRecalcKVec;
+      // --||-- when the particle number is changed
       boost::signals2::connection connectionGetParticleNumber;
     };
   }

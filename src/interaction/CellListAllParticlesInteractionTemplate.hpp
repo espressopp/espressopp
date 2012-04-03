@@ -53,12 +53,11 @@ namespace espresso {
     computeVirial() {
       LOG4ESPP_INFO(theLogger, "computed virial for all particles in the cell lists");
      
-      real w = 0.0;
-
+      //real w = 0.0;
       // w = w + dist * force
       // TODO: computeVirial not yet implemented for AllParticlesInteraction (e.G. k-space EWALD)
 
-      return w;
+      return potential -> _computeVirial(storage->getRealCells());
     }
 
     template < typename _Potential > inline void
@@ -66,6 +65,8 @@ namespace espresso {
     computeVirialTensor(Tensor& wij) {
       LOG4ESPP_INFO(theLogger, "computed virial tensor for all particles in the cell lists");
       // TODO: computeVirialTensor not yet implemented for AllParticlesInteraction (e.G. k-space EWALD)
+      
+      wij += potential -> _computeVirialTensor(storage->getRealCells());
     }
 
     template < typename _Potential >

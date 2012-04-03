@@ -20,7 +20,10 @@ Example:
     >>> berendsenP.pressure = 1.0
     >>> integrator.berendsenBarostat = berendsenP
 
-**!IMPORTANT** In order to run *npt* simulation one should separately define thermostat as well.
+**!IMPORTANT** In order to run *npt* simulation one should separately define thermostat as well 
+(e.g. BerendsenThermostat_).
+
+.. _BerendsenThermostat: espresso.integrator.BerendsenThermostat.html
 
 Definition:
 

@@ -23,7 +23,7 @@
 #include "DihedralPotential.hpp"
 #include "TabulatedDihedral.hpp"
 #include "OPLS.hpp"
-#include "EwaldKSpace.hpp"
+#include "CoulombKSpaceEwald.hpp"
 #include "CoulombRSpace.hpp"
 
 namespace espresso {
@@ -55,7 +55,7 @@ namespace espresso {
       TabulatedDihedral::registerPython();
       OPLS::registerPython();
       
-      EwaldKSpace::registerPython();
+      CoulombKSpaceEwald::registerPython();
       
       CoulombRSpace::registerPython();
     }

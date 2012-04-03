@@ -8,6 +8,8 @@
 #include "interaction/Potential.hpp"
 #include "VerletList.hpp"
 
+#include "Tensor.hpp"
+
 using namespace espresso;
 using namespace iterator;
 using namespace interaction;
@@ -18,21 +20,11 @@ namespace espresso {
 
       System& system = getSystemRef();
   
-      /* don't need these lines
-      // determine number of local particles and total particles
-      int N;
-      int Nsum;
-      N = system.storage->getNRealParticles();
-      boost::mpi::reduce(*mpiWorld, N, Nsum, std::plus<int>(), 0);
-      */
-
       // determine volume of the box
       Real3D Li = system.bc->getBoxL();
       real V = Li[0] * Li[1] * Li[2];
 
       // compute the kinetic contribution (2/3 \sum 1/2mv^2)
-      real e_kinetic;
-      real p_kinetic;
       Tensor vvLocal(0.0);
       Tensor vv;
 
@@ -46,7 +38,6 @@ namespace espresso {
       boost::mpi::all_reduce(*mpiWorld, vvLocal.get(), 6, vv.get(), std::plus<real>());
 
       // compute the short-range nonbonded contribution
-
       Tensor wijLocal(0.0);
       Tensor wij;
 

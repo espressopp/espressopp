@@ -9,7 +9,7 @@
 #  the same system. Ewald parameter (alpha = 1.112583061), Cutoff in R space (rspacecutoff = 4.9)
 #  cutoff in K space (kspacecutoff = 30). It compares the results of Markus Deserno with Espresso++
 #  implementation. The forces which affect the particles, total energy and the differences between
-#  Deserno results and Espresso++ implementation are printed at the end of the script.
+#  Deserno's results and Espresso++ implementation are printed at the end of the script.
 '''
 
 # this is an auxiliary function. It reads the results of Deserno from "deserno_ewald.dat"
@@ -127,9 +127,9 @@ system.addInteraction(coulombR_int)
   It is based on the system information (system), Coulomb prefactor (coulomb_prefactor),
   Ewald parameter (alpha), and the cutoff in K space (kspacecutoff)
 '''
-ewaldK_pot = espresso.interaction.EwaldKSpace(system, coulomb_prefactor, alpha, kspacecutoff)
+ewaldK_pot = espresso.interaction.CoulombKSpaceEwald(system, coulomb_prefactor, alpha, kspacecutoff)
 # creating the interaction based on the Cell list for all particle interaction and potential in K space
-ewaldK_int = espresso.interaction.CellListEwaldKSpace(system.storage, ewaldK_pot)
+ewaldK_int = espresso.interaction.CellListCoulombKSpaceEwald(system.storage, ewaldK_pot)
 # adding the interaction to the system
 system.addInteraction(ewaldK_int)
 
@@ -146,7 +146,7 @@ energy_Deserno, forceX_Deserno, forceY_Deserno, forceZ_Deserno = readingDesernoF
 
 # printing the particle id, force (x,y,z), and force difference (x,y,z)
 format0 = '\n %45s %105s \n'
-print (format0 % ('forces', 'the difference between Deserno result and forces by Espresso++'))
+print (format0 % ('forces', 'the difference between Deserno\'s result and forces by Espresso++'))
 format1 = '%3s %20s %20s %20s %10s %20s %25s %25s\n'
 print (format1 % ('id', 'fx', 'fy', 'fz', ' ', 'dfx', 'dfy', 'dfz'))
 format2 = '%3d %3s %3.17f %3s %3.17f %3s %3.17f %10s %3.17f %3s %3.17f %3s %3.17f'
@@ -168,6 +168,6 @@ enK = ewaldK_int.computeEnergy()
 enTot = enR + enK
 
 # printing the total energy and the difference with Deserno results
-print '\nTotal energy: %5.16f;         The difference in energy (Deserno result, Espresso++): %5.16f\n' % (enTot, enTot-energy_Deserno)
+print '\nTotal energy: %5.16f;         The difference in energy (Deserno\'s result, Espresso++): %5.16f\n' % (enTot, enTot-energy_Deserno)
 
 sys.exit()
