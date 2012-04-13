@@ -38,6 +38,10 @@ namespace espresso {
 
     python::tuple getPair(int i);
 
+    void connect();
+
+    void disconnect();
+
     void rebuild();
 
     /** Get the total number of pairs for the Verlet list */

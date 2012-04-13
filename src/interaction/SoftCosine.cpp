@@ -28,7 +28,8 @@ namespace espresso {
 
       class_< VerletListSoftCosine, bases< Interaction > > 
         ("interaction_VerletListSoftCosine", init< shared_ptr<VerletList> >())
-        .def("setPotential", &VerletListSoftCosine::setPotential);
+        .def("setPotential", &VerletListSoftCosine::setPotential, return_value_policy< reference_existing_object >())
+        .def("getPotential", &VerletListSoftCosine::getPotential, return_value_policy< reference_existing_object >())
         ;
 
       class_< CellListSoftCosine, bases< Interaction > > 

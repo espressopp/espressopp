@@ -520,6 +520,7 @@ namespace espresso {
         .add_property("berendsenThermostat", &VelocityVerlet::getBerendsenThermostat, &VelocityVerlet::setBerendsenThermostat)
         .add_property("langevinBarostat", &VelocityVerlet::getLangevinBarostat, &VelocityVerlet::setLangevinBarostat)
         .add_property("isokinetic", &VelocityVerlet::getIsokinetic, &VelocityVerlet::setIsokinetic)
+        .def("resetTimers", &VelocityVerlet::resetTimers)
         .def("getTimers", &wrapGetTimers)
         ;
     }

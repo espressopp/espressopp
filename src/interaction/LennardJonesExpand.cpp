@@ -30,7 +30,8 @@ namespace espresso {
 
       class_< VerletListLennardJonesExpand, bases< Interaction > > 
         ("interaction_VerletListLennardJonesExpand", init< shared_ptr<VerletList> >())
-        .def("setPotential", &VerletListLennardJonesExpand::setPotential);
+        .def("setPotential", &VerletListLennardJonesExpand::setPotential, return_value_policy< reference_existing_object >())
+        .def("getPotential", &VerletListLennardJonesExpand::getPotential, return_value_policy< reference_existing_object >())
         ;
 
       class_< CellListLennardJonesExpand, bases< Interaction > >

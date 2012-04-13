@@ -44,6 +44,7 @@ namespace espresso {
         /** Load timings in array to export to Python as a tuple. */
         void loadTimers(real t[10]);
 
+        void resetTimers();
 
         // signal to save positions before integration. Used for constraints.
 		//boost::signals2::signal0 <void> saveOldPos;
@@ -87,8 +88,6 @@ namespace espresso {
         void printForces(bool withGhost);
 
         void setUp();   //!< set up for a new run
-
-        void resetTimers();
 
         void printTimers();
 

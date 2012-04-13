@@ -26,7 +26,8 @@ namespace espresso {
       VerletListInteractionTemplate
           (shared_ptr<VerletList> _verletList)
           : verletList(_verletList) {
-        potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
+    	  potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
+    	  // potentialArray = esutil::Array2D< shared_ptr<Potential>, esutil::enlarge>(0, 0, shared_ptr<Potential>());
           
         ntypes = 0;
       }
@@ -40,8 +41,8 @@ namespace espresso {
         return verletList;
       }
 
-      void
-      setPotential(int type1, int type2, const Potential &potential) {
+      Potential &setPotential(int type1, int type2, const Potential &potential) {
+       //setPotential(int type1, int type2, shared_ptr<Potential> potential) {
         // typeX+1 because i<ntypes
         ntypes = std::max(ntypes, std::max(type1+1, type2+1));
         
@@ -49,9 +50,11 @@ namespace espresso {
         if (type1 != type2) { // add potential in the other direction
            potentialArray.at(type2, type1) = potential;
         }
+        return potentialArray.at(type1, type2);
       }
 
       Potential &getPotential(int type1, int type2) {
+      // shared_ptr<Potential> getPotential(int type1, int type2) {
         return potentialArray.at(type1, type2);
       }
 
@@ -66,6 +69,7 @@ namespace espresso {
       int ntypes;
       shared_ptr<VerletList> verletList;
       esutil::Array2D<Potential, esutil::enlarge> potentialArray;
+      //esutil::Array2D<shared_ptr<Potential>, esutil::enlarge> potentialArray;
     };
 
     //////////////////////////////////////////////////
@@ -83,9 +87,11 @@ namespace espresso {
         int type1 = p1.type();
         int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
+        // shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
         if(potential._computeForce(force, p1, p2)) {
+        //if(potential->_computeForce(force, p1, p2)) {
           p1.force() += force;
           p2.force() -= force;
           LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" << force);
@@ -107,7 +113,9 @@ namespace espresso {
         int type1 = p1.type();
         int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
+        // shared_ptr<Potential> potential = getPotential(type1, type2);
         e   = potential._computeEnergy(p1, p2);
+        // e   = potential->_computeEnergy(p1, p2);
         es += e;
         LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
       }
@@ -135,9 +143,11 @@ namespace espresso {
         int type1 = p1.type();                                           
         int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
+        // shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
         if(potential._computeForce(force, p1, p2)) {
+        // if(potential->_computeForce(force, p1, p2)) {
           Real3D dist = p1.position() - p2.position();
           w = w + dist * force;
         }
@@ -160,9 +170,11 @@ namespace espresso {
         int type1 = p1.type();
         int type2 = p2.type();
         const Potential &potential = getPotential(type1, type2);
+        // shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
         if(potential._computeForce(force, p1, p2)) {
+        // if(potential->_computeForce(force, p1, p2)) {
           Real3D dist = p1.position() - p2.position();
           w += Tensor(dist, force);
         }
@@ -176,7 +188,8 @@ namespace espresso {
       real cutoff = 0.0;
       for (int i = 0; i < ntypes; i++) {
         for (int j = 0; j < ntypes; j++) {
-          cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
+            cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
+            // cutoff = std::max(cutoff, getPotential(i, j)->getCutoff());
         }
       }
       return cutoff;

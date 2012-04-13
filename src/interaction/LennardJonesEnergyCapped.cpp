@@ -35,8 +35,8 @@ namespace espresso {
 
       class_< VerletListLennardJonesEnergyCapped, bases< Interaction > >
         ("interaction_VerletListLennardJonesEnergyCapped", init< shared_ptr<VerletList> >())
-        .def("setPotential", &VerletListLennardJonesEnergyCapped::setPotential)
-        .def("getPotential", &VerletListLennardJonesEnergyCapped::getPotential, return_value_policy< reference_existing_object >());
+        .def("setPotential", &VerletListLennardJonesEnergyCapped::setPotential, return_value_policy< reference_existing_object >())
+        .def("getPotential", &VerletListLennardJonesEnergyCapped::getPotential, return_value_policy< reference_existing_object >())
       ;
 
       class_< VerletListAdressLennardJonesEnergyCapped, bases< Interaction > >

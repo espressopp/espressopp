@@ -26,7 +26,8 @@ namespace espresso {
       class_< VerletListCoulombRSpace, bases< Interaction > >
         ("interaction_VerletListCoulombRSpace", init< shared_ptr<VerletList> >())
         .def("getVerletList", &VerletListCoulombRSpace::getVerletList)
-        .def("setPotential", &VerletListCoulombRSpace::setPotential)
+        .def("setPotential", &VerletListCoulombRSpace::setPotential, return_value_policy< reference_existing_object >())
+        .def("getPotential", &VerletListCoulombRSpace::getPotential, return_value_policy< reference_existing_object >())
       ;
     }
     

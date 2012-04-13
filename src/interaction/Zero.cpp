@@ -32,7 +32,8 @@ namespace espresso {
 
       class_< VerletListZero, bases< Interaction > >
         ("interaction_VerletListZero", init< shared_ptr<VerletList> >())
-        .def("setPotential", &VerletListZero::setPotential);
+        .def("setPotential", &VerletListZero::setPotential, return_value_policy< reference_existing_object >())
+        .def("getPotential", &VerletListZero::getPotential, return_value_policy< reference_existing_object >())
       ;
 
       class_< VerletListAdressZero, bases< Interaction > >

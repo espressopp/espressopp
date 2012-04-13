@@ -36,6 +36,21 @@ namespace espresso {
         boost::bind(&VerletList::rebuild, this));
   }
   
+  void VerletList::connect()
+  {
+
+  // make a connection to System to invoke rebuild on resort
+  connectionResort = getSystem()->storage->onParticlesChanged.connect(
+      boost::bind(&VerletList::rebuild, this));
+  }
+
+  void VerletList::disconnect()
+  {
+
+  // disconnect from System to avoid rebuild on resort
+  connectionResort.disconnect();
+  }
+
   /*-------------------------------------------------------------*/
   
   void VerletList::rebuild()
@@ -136,6 +151,8 @@ namespace espresso {
       .def("getPair", &VerletList::getPair)
       .def("exclude", pyExclude)
       .def("rebuild", &VerletList::rebuild)
+      .def("connect", &VerletList::connect)
+      .def("disconnect", &VerletList::disconnect)
       ;
   }
 
