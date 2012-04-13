@@ -15,6 +15,6 @@ if pmi.isController :
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.integrator.VelocityVerletLocal',
-            pmiproperty = [ 'langevin', 'berendsenBarostat', 'berendsenThermostat', 'langevinBarostat', 'isokinetic' ],
+            pmiproperty = [ 'langevin', 'berendsenBarostat', 'berendsenThermostat', 'langevinBarostat', 'isokinetic', 'stochasticVelocityRescaling'],
             pmicall = [ 'getTimers', 'resetTimers' ]
             )

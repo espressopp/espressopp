@@ -23,6 +23,9 @@ namespace espresso {
         void setLangevin(shared_ptr<class Langevin> langevin);
         shared_ptr<class Langevin> getLangevin() { return langevin; }
 
+        void setStochasticVelocityRescaling(shared_ptr<class StochasticVelocityRescaling> stochasticVelocityRescaling);
+        shared_ptr<class StochasticVelocityRescaling> getStochasticVelocityRescaling() { return stochasticVelocityRescaling; }
+
         void setIsokinetic(shared_ptr<class Isokinetic> isokinetic);
         shared_ptr<class Isokinetic> getIsokinetic() { return isokinetic; }
         
@@ -63,6 +66,7 @@ namespace espresso {
         shared_ptr< class Langevin > langevin;  //!< Langevin thermostat if available
 
         shared_ptr< class Isokinetic > isokinetic;  //!< Isokinetic thermostat if available
+        shared_ptr< class StochasticVelocityRescaling > stochasticVelocityRescaling;  //!< Stochastic velocity rescaling thermostat if available
 
         /** Method updates particle positions and velocities.
             \return maximal square distance a particle has moved.

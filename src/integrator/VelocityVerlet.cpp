@@ -7,6 +7,7 @@
 #include "BerendsenThermostat.hpp"
 #include "LangevinBarostat.hpp"
 #include "Isokinetic.hpp"
+#include "StochasticVelocityRescaling.hpp"
 
 #include "iterator/CellListIterator.hpp"
 #include "interaction/Interaction.hpp"
@@ -60,6 +61,14 @@ namespace espresso {
     {
       LOG4ESPP_INFO(theLogger, "set Isokinetic thermostat");
       isokinetic = _isokinetic;
+    }
+
+    /*****************************************************************************/
+
+    void VelocityVerlet::setStochasticVelocityRescaling(shared_ptr< StochasticVelocityRescaling > _stochasticVelocityRescaling)
+    {
+      LOG4ESPP_INFO(theLogger, "set StochasticVelocityRescaling thermostat");
+      stochasticVelocityRescaling = _stochasticVelocityRescaling;
     }
 
     /*****************************************************************************/
@@ -185,6 +194,9 @@ namespace espresso {
         if (berendsenBarostat) berendsenBarostat->barostat(); // adjust pressure
 
         if (isokinetic) isokinetic->rescaleVelocities(); // scale all particle velocities to match isokinetic temperature
+
+        if (stochasticVelocityRescaling) stochasticVelocityRescaling->rescaleVelocities(); // scale all particle velocities according to a canonical distribution
+
       }
 
       timeRun = timeIntegrate.getElapsedTime();
@@ -520,8 +532,9 @@ namespace espresso {
         .add_property("berendsenThermostat", &VelocityVerlet::getBerendsenThermostat, &VelocityVerlet::setBerendsenThermostat)
         .add_property("langevinBarostat", &VelocityVerlet::getLangevinBarostat, &VelocityVerlet::setLangevinBarostat)
         .add_property("isokinetic", &VelocityVerlet::getIsokinetic, &VelocityVerlet::setIsokinetic)
-        .def("resetTimers", &VelocityVerlet::resetTimers)
+        .add_property("stochasticVelocityRescaling", &VelocityVerlet::getStochasticVelocityRescaling, &VelocityVerlet::setStochasticVelocityRescaling)
         .def("getTimers", &wrapGetTimers)
+        .def("resetTimers", &VelocityVerlet::resetTimers)
         ;
     }
   }
