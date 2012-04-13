@@ -36,7 +36,6 @@ def psfwrite(filename, system, maxdist=None, molsize=4):
   file = open(filename,'w')
   maxParticleID = int(espresso.analysis.MaxPID(system).compute())
   nParticles    = int(espresso.analysis.NPart(system).compute())
-  nParticles = 4
   file.write("PSF\n")
   st = "%8d !NATOM\n" % nParticles
   file.write(st)
