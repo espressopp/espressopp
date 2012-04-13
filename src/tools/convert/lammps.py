@@ -9,8 +9,9 @@ def read(fin):
 
   f = open(fin)
   line = f.readline() # comment line
-  line = f.readline() # blank line
-  num_particles = int(f.readline().split()[0])
+  while not 'atoms' in line: #skip possible blank line
+    line = f.readline()
+  num_particles = int(line.split()[0])
   num_bonds = int(f.readline().split()[0])
   num_angles = int(f.readline().split()[0])
   num_dihedrals = int(f.readline().split()[0])
@@ -18,7 +19,7 @@ def read(fin):
   line = f.readline() # blank line
   line = f.readline() # atom types and maybe the word "velocities"
   num_types = int(line.split()[0])
-  velocities = True if 'velocities' in line else False
+  velocities = True if 'velocities' in line else False #TODO fix this? why should there be the velocity keyword?
  
   # find and store size of box
   line = ''
