@@ -102,7 +102,11 @@ class VerletListCoulombRSpaceLocal(InteractionLocal, interaction_VerletListCoulo
   def setPotential(self, type1, type2, potential):
     'The method sets the potential for the particles of `type1` and `type2` from the interaction'
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      self.cxxclass.setPotential(self, type1, type2, potential)
+      return self.cxxclass.setPotential(self, type1, type2, potential)
+
+  def getPotential(self, type1, type2):
+    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+      return self.cxxclass.getPotential(self, type1, type2)
 
   def getVerletListLocal(self):
     'The method gets the VerletList from the interaction'
@@ -117,4 +121,5 @@ if pmi.isController:
 
   class VerletListCoulombRSpace(Interaction):
     __metaclass__ = pmi.Proxy
-    pmiproxydefs = dict( cls = 'espresso.interaction.VerletListCoulombRSpaceLocal', pmicall = ['setPotential','getVerletList'] )
+    pmiproxydefs = dict( cls = 'espresso.interaction.VerletListCoulombRSpaceLocal',
+    pmicall      = ['setPotential', 'getPotential', 'getVerletList'] )

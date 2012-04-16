@@ -29,7 +29,11 @@ class VerletListLennardJonesGromacsLocal(InteractionLocal, interaction_VerletLis
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.setPotential(self, type1, type2, potential)
+            return self.cxxclass.setPotential(self, type1, type2, potential)
+
+    def getPotential(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self, type1, type2)
 
 class CellListLennardJonesGromacsLocal(InteractionLocal, interaction_CellListLennardJonesGromacs):
     'The (local) LennardJonesGromacs interaction using cell lists.'
@@ -63,7 +67,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListLennardJonesGromacsLocal',
-            pmicall = ['setPotential']
+            pmicall = ['setPotential','getPotential']
             )
     class CellListLennardJonesGromacs(Interaction):
         __metaclass__ = pmi.Proxy

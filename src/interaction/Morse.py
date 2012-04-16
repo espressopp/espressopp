@@ -30,7 +30,11 @@ class VerletListMorseLocal(InteractionLocal, interaction_VerletListMorse):
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.setPotential(self, type1, type2, potential)
+            return self.cxxclass.setPotential(self, type1, type2, potential)
+
+    def getPotential(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self, type1, type2)
 
 class VerletListAdressMorseLocal(InteractionLocal, interaction_VerletListAdressMorse):
     'The (local) Morse interaction using Verlet lists.'
@@ -78,7 +82,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListMorseLocal',
-            pmicall = ['setPotential']
+            pmicall = ['setPotential','getPotential']
             )
 
     class VerletListAdressMorse(Interaction):
