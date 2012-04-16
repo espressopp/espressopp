@@ -17,6 +17,7 @@ namespace espresso {
 	  minor         = MINORVERSION;
 	  patchlevel    = PATCHLEVEL;
 	  hgrevision    = hgversion;
+          boostversion  = BOOST_LIB_VERSION;
 	  date          = __DATE__;
 	  time          = __TIME__;
   }
@@ -26,6 +27,7 @@ namespace espresso {
 	  ss << name << " v"  << major << "." << minor;
 	  ss << " patchlevel " << patchlevel;
 	  ss << ", Mercurial(hg) revision: " << hgrevision;
+          ss << ", Boost Version: " << boostversion;
 	  ss << ", compiled on " << date << ", " << time;
 #ifdef VTRACE
 	  ss << ", VampirTrace mode";
@@ -45,6 +47,7 @@ namespace espresso {
       .def_readonly("major", &Version::major)
       .def_readonly("minor", &Version::minor)
       .def_readonly("hgrevision", &Version::hgrevision)
+      .def_readonly("boostversion", &Version::boostversion)
       .def_readonly("patchlevel", &Version::patchlevel)
       .def_readonly("date", &Version::date)
       .def_readonly("time", &Version::time)

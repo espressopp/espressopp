@@ -1,16 +1,11 @@
 /*=============================================================================
-    Copyright (c) 2001-2006 Joel de Guzman
+    Copyright (c) 2001-2011 Joel de Guzman
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying 
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
 #if !defined(FUSION_VECTOR_ITERATOR_05042005_0635)
 #define FUSION_VECTOR_ITERATOR_05042005_0635
-
-#if defined (BOOST_MSVC)
-#  pragma warning(push)
-#  pragma warning (disable: 4512) // assignment operator could not be generated.
-#endif
 
 #include <boost/fusion/support/iterator_base.hpp>
 #include <boost/fusion/container/vector/detail/deref_impl.hpp>
@@ -41,15 +36,15 @@ namespace boost { namespace fusion
         typedef vector_iterator_identity<
             typename add_const<Vector>::type, N> identity;
 
-        vector_iterator(Vector& vec)
-            : vec(vec) {}
+        vector_iterator(Vector& in_vec)
+            : vec(in_vec) {}
         Vector& vec;
+
+    private:
+        // silence MSVC warning C4512: assignment operator could not be generated
+        vector_iterator& operator= (vector_iterator const&);
     };
 }}
-
-#if defined (BOOST_MSVC)
-#  pragma warning(pop)
-#endif
 
 #endif
 

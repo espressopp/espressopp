@@ -12,6 +12,7 @@ Example:
 >>> print "Major version number   = ", version.major
 >>> print "Minor version number   = ", version.minor
 >>> print "Mercurial(hg) revision = ", version.hgrevision
+>>> print "boost version          = ", version.boostversion
 >>> print "Patchlevel             = ", version.patchlevel
 >>> print "Compilation date       = ", version.date
 >>> print "Compilation time       = ", version.time
@@ -45,7 +46,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espresso.VersionLocal',
-            pmiproperty = ['major', 'minor', 'hgrevision', 'patchlevel', 'date', 'time', 'name'],
+            pmiproperty = ['major', 'minor', 'hgrevision', 'boostversion', 'patchlevel', 'date', 'time', 'name'],
             pmicall = ['info']
             )
 

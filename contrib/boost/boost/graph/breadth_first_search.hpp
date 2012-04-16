@@ -24,6 +24,7 @@
 #include <boost/graph/overloading.hpp>
 #include <boost/graph/graph_concepts.hpp>
 #include <boost/graph/two_bit_color_map.hpp>
+#include <boost/concept/assert.hpp>
 
 #ifdef BOOST_GRAPH_USE_MPI
 #include <boost/graph/distributed/concepts.hpp>
@@ -34,7 +35,7 @@ namespace boost {
   template <class Visitor, class Graph>
   struct BFSVisitorConcept {
     void constraints() {
-      function_requires< CopyConstructibleConcept<Visitor> >();
+      BOOST_CONCEPT_ASSERT(( CopyConstructibleConcept<Visitor> ));
       vis.initialize_vertex(u, g);
       vis.discover_vertex(u, g);
       vis.examine_vertex(u, g);
@@ -59,12 +60,12 @@ namespace boost {
      typename graph_traits<IncidenceGraph>::vertex_descriptor s,
      Buffer& Q, BFSVisitor vis, ColorMap color)
   {
-    function_requires< IncidenceGraphConcept<IncidenceGraph> >();
+    BOOST_CONCEPT_ASSERT(( IncidenceGraphConcept<IncidenceGraph> ));
     typedef graph_traits<IncidenceGraph> GTraits;
     typedef typename GTraits::vertex_descriptor Vertex;
     typedef typename GTraits::edge_descriptor Edge;
-    function_requires< BFSVisitorConcept<BFSVisitor, IncidenceGraph> >();
-    function_requires< ReadWritePropertyMapConcept<ColorMap, Vertex> >();
+    BOOST_CONCEPT_ASSERT(( BFSVisitorConcept<BFSVisitor, IncidenceGraph> ));
+    BOOST_CONCEPT_ASSERT(( ReadWritePropertyMapConcept<ColorMap, Vertex> ));
     typedef typename property_traits<ColorMap>::value_type ColorValue;
     typedef color_traits<ColorValue> Color;
     typename GTraits::out_edge_iterator ei, ei_end;
@@ -73,7 +74,7 @@ namespace boost {
     Q.push(s);
     while (! Q.empty()) {
       Vertex u = Q.top(); Q.pop();            vis.examine_vertex(u, g);
-      for (tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) {
+      for (boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) {
         Vertex v = target(*ei, g);            vis.examine_edge(*ei, g);
         ColorValue v_color = get(color, v);
         if (v_color == Color::white()) {      vis.tree_edge(*ei, g);
@@ -100,7 +101,7 @@ namespace boost {
     typedef typename property_traits<ColorMap>::value_type ColorValue;
     typedef color_traits<ColorValue> Color;
     typename boost::graph_traits<VertexListGraph>::vertex_iterator i, i_end;
-    for (tie(i, i_end) = vertices(g); i != i_end; ++i) {
+    for (boost::tie(i, i_end) = vertices(g); i != i_end; ++i) {
       vis.initialize_vertex(*i, g);
       put(color, *i, Color::white());
     }

@@ -4,7 +4,7 @@
 #endif
 
 /////////1/////////2/////////3/////////4/////////5/////////6/////////7/////////8
-// shared_ptr_helper.hpp: serialization for boost shared pointer
+// shared_ptr_helper.hpp: serialization for boost shared pointern
 
 // (C) Copyright 2004-2009 Robert Ramey, Martin Ecker and Takatoshi Kondo
 // Use, modification and distribution is subject to the Boost Software
@@ -19,6 +19,9 @@
 #include <cstddef> // NULL
 
 #define BOOST_ARCHIVE_SOURCE
+// include this to prevent linker errors when the
+// same modules are marked export and import.
+#define BOOST_SERIALIZATION_SOURCE
 
 #include <boost/serialization/throw_exception.hpp>
 #include <boost/serialization/void_cast.hpp>
@@ -66,11 +69,8 @@ shared_ptr_helper::get_od(
     collection_type::iterator i = m_pointers->find(sp);
 
     if(i == m_pointers->end()){
-        std::pair<collection_type::iterator, bool> result;
-        shared_ptr<const void> sp(const_cast<void * >(od), void_deleter(true_type));
-        result = m_pointers->insert(sp);
-        assert(result.second);
-        i = result.first;
+        shared_ptr<void> np;
+        return np;
     }
     od = void_upcast(
         *true_type, 
@@ -92,11 +92,26 @@ shared_ptr_helper::get_od(
     );
 }
 
+BOOST_ARCHIVE_DECL(void)
+shared_ptr_helper::append(const boost::shared_ptr<const void> &sp){
+    // make tracking array if necessary
+    if(NULL == m_pointers)
+        m_pointers = new collection_type;
+
+    collection_type::iterator i = m_pointers->find(sp);
+
+    if(i == m_pointers->end()){
+        std::pair<collection_type::iterator, bool> result;
+        result = m_pointers->insert(sp);
+        BOOST_ASSERT(result.second);
+    }
+}
+
 //  #ifdef BOOST_SERIALIZATION_SHARED_PTR_132_HPP
 BOOST_ARCHIVE_DECL(void)
-shared_ptr_helper::append(const boost_132::shared_ptr<void> & t){
+shared_ptr_helper::append(const boost_132::shared_ptr<const void> & t){
     if(NULL == m_pointers_132)
-        m_pointers_132 = new std::list<boost_132::shared_ptr<void> >;
+        m_pointers_132 = new std::list<boost_132::shared_ptr<const void> >;
     m_pointers_132->push_back(t);
 }
 //  #endif

@@ -14,6 +14,7 @@ file(GLOB_RECURSE NOT_BOOST_SOURCES
   "libs/serialization/src/codecvt_null.cpp"
   "libs/serialization/src/binary_wiarchive.cpp"
   "libs/serialization/src/binary_woarchive.cpp"
+  "libs/detail/utf8_codecvt_facet.cpp"
 )
 
 list(REMOVE_ITEM BOOST_SOURCES ${NOT_BOOST_SOURCES})

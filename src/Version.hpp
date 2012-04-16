@@ -2,9 +2,10 @@
 #ifndef _VERSION_HPP
 #define _VERSION_HPP
 #include <string>
+#include "boost/version.hpp"
 
 #define MAJORVERSION 1
-#define MINORVERSION 1
+#define MINORVERSION 2
 #define PATCHLEVEL   0
 #include "hgversion.hpp"
 
@@ -22,6 +23,7 @@ namespace espresso {
     int patchlevel;
     std::string name;
     std::string hgrevision;
+    std::string boostversion;
     std::string date;
     std::string time;
   };
