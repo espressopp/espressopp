@@ -3,6 +3,7 @@
 #include "RNG.hpp"
 #include "UniformOnSphere.hpp"
 #include "NormalVariate.hpp"
+#include "GammaVariate.hpp"
 
 namespace espresso {
   namespace esutil {
@@ -11,6 +12,7 @@ namespace espresso {
       RNG::registerPython();
       UniformOnSphere::registerPython();
       NormalVariate::registerPython();
+      GammaVariate::registerPython();
     }
   }
 }

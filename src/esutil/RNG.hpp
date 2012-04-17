@@ -5,6 +5,7 @@
 #include "Real3D.hpp"
 #include <vector>
 
+
 #include "types.hpp"
 
 namespace espresso {
@@ -37,6 +38,11 @@ namespace espresso {
 	  use createNormalVariate() to create a variate generator object. */
       real normal();
 
+      /** returns a gamma distributed random number with shape parameter
+       \alpha and scale parameter 1.  */
+      real gamma(int alpha=1);
+      real gammaOf1(){return gamma(1);}; //this would look nicer with an optional argument, but it did not work (for boost)
+
       /** returns a random 3D vector that is uniformly distributed on a sphere. */
       Real3D uniformOnSphere();
 
@@ -49,6 +55,10 @@ namespace espresso {
       variate_generator< RNGType&, normal_distribution< real > >
       NormalVariate;
 
+//      typedef
+//      variate_generator< RNGType&, gamma_distribution< real > >
+//      GammaVariate;
+
       typedef 
       variate_generator< RNGType&, uniform_on_sphere< real, Real3D > > 
       UniformOnSphereVariate;
@@ -56,6 +66,9 @@ namespace espresso {
       shared_ptr< RNGType > boostRNG;
 
       NormalVariate normalVariate;
+
+      //GammaVariate gammaVariate;
+
       UniformOnSphereVariate uniformOnSphereVariate;
     };
   }
