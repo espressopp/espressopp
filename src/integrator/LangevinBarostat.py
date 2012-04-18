@@ -4,7 +4,8 @@
 ******************************************************
 
 This is the barostat implementation to perform Langevin dynamics in a Hoover style extended system
-according to the original paper [Quigley04]_.
+according to the paper [Quigley04]_. It includes corrections of Hoover approach which were introduced
+by Martyna et al [Martyna94]_.
 If LangevinBarostat is defined (as a property of integrator) the integration equations will be 
 modified. The volume of system :math:`V` is introduced as a dynamical variable:
 
@@ -30,7 +31,8 @@ scaled by
 .. math:: \sqrt{\\frac{2k_{B}TW\gamma_{p}}{\Delta t}}
 
 **!IMPORTANT** Terms :math:`- \gamma\\boldsymbol{p}_{i} + \\boldsymbol{R}_{i}` correspond to the 
-termostat. They are not included here.
+termostat. They are not included here and will not be calculated if the Langevin Thermostat is not
+defined.
 
 Example:
 
@@ -41,7 +43,9 @@ Example:
     >>> langevinP.mass = pow(10.0, 4)
     >>> integrator.langevinBarostat = langevinP
 
-**!IMPORTANT** In order to run *npt* simulation one should separately define thermostat as well.
+**!IMPORTANT**  This barostat is supposed to be run in a couple with thermostat in order 
+to simulate the *npt* ensamble, because the term :math:`R_{p}` needs the temperature as a 
+parameter. Otherwise it will set the temperature to 1.0.
 
 Definition:
 
@@ -105,6 +109,8 @@ Canceling the barostat:
 References:
 
 .. [Quigley04] D. Quigley, M.I.J. Probert, *J. Chem. Phys.*, 120, **2004**, p. 11432
+
+.. [Martyna94] G. Martyna, D. Tobias, M. Klein, *J. Chem. Phys.*, 101, **1994**, p. 4177
 
 """
 

@@ -9,7 +9,6 @@
 #include "interaction/Interaction.hpp"
 #include "esutil/RNG.hpp"
 
-//#include "analysis/Pressure.hpp"
 #include "bc/BC.hpp"
 
 #include "mpi.hpp"
@@ -17,7 +16,6 @@
 namespace espresso {
 
   using namespace std;
-  //using namespace analysis;
   
   using namespace iterator;
   using namespace interaction;
@@ -26,7 +24,9 @@ namespace espresso {
 
     LOG4ESPP_LOGGER(LangevinBarostat::theLogger, "LangevinBarostat");
 
-    LangevinBarostat::LangevinBarostat(shared_ptr<System> _system, shared_ptr< esutil::RNG > _rng) : SystemAccess(_system){ //, rng(_rng)
+    // TODO It is very sensitive to parameters (the ensemble). The manual how to choose the
+    // parameters for simple system should be written.
+    LangevinBarostat::LangevinBarostat(shared_ptr<System> _system, shared_ptr< esutil::RNG > _rng) : SystemAccess(_system), rng(_rng){
       // external parameters
       gammaP = 0.0;
       mass = 0.0;
@@ -34,10 +34,8 @@ namespace espresso {
       
       // local variable
       momentum = 0.0;
+      momentum_mass = 0.0;
 
-      // random number generator
-      rng = _rng;
-      
       LOG4ESPP_INFO(theLogger, "LangevinBarostat constructed");
     }
 
@@ -68,17 +66,23 @@ namespace espresso {
       System& system = getSystemRef();
       
       // The volume is scaled according to the equations V(t+1/2*dt) = V(t) + 1/2*dt*V'; V' = d*V*pe/W
-      real scale_factor = pow( 1 + dt_2 * 3.0 * momentum, 1./3.);  // calculating the current scaling parameter
+      real scale_factor = pow( 1 + dt_2 * 3.0 * momentum_mass, 1./3.);  // calculating the current scaling parameter
       
       system.scaleVolume( scale_factor, false);
     }
     
-    // @TODO should be optimized!!!
+    // TODO should be optimized!!!
+    /*
+     *  TODO now it is valid for nonbonded systems because the value of degreees of freedom
+     *  Nf = 3*N, N - number of particles, 3 - d-dimensional system (d=3). Thus d/Nf is 
+     *  replaced by 1/N.
+     */
     void LangevinBarostat::updVolumeMomentum(real dt_2){
       // dt_2 is timestep/2. 
       System& system = getSystemRef();
       Real3D Li = system.bc -> getBoxL(); // getting the system size
       real V = Li[0] * Li[1] * Li[2];     // system volume
+      real m3V = 3 * V;
       
       // get a random value and distribute the same value over all of the CPUs
       mpi::communicator communic = *system.comm;
@@ -93,11 +97,11 @@ namespace espresso {
       CellList realCells = system.storage->getRealCells();
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         const Particle& p = *cit;
-        v2 = v2 + p.mass() * (p.velocity() * p.velocity());
+        v2 += p.mass() * (p.velocity() * p.velocity());
       }
       mpi::all_reduce( communic, v2, v2sum, std::plus<real>());
 
-      real p_kinetic = v2sum / (3.0 * V);
+      real p_kinetic = v2sum;
       
       // compute the short-range nonbonded contribution
       real rij_dot_Fij = 0.0;
@@ -106,20 +110,21 @@ namespace espresso {
         rij_dot_Fij += srIL[j]->computeVirial();
       }
       real p_nonbonded = 0.0;
-      mpi::all_reduce(*mpiWorld, rij_dot_Fij / (3.0 * V), p_nonbonded, std::plus<real>());
-      
-      real P = p_kinetic + p_nonbonded;
+      mpi::all_reduce( communic, rij_dot_Fij, p_nonbonded, std::plus<real>());
       
       // @TODO one should check that X is not the instantaneous pressure, 
-      // while it does not include the white noise from thermostat
-      real X = P; 
-      // local momentum derivative;   3 - dimensions
-      real pe_deriv = 3 * V * (X - externalPressure)  + pref6 * v2sum +
+      // because it does not include the white noise from thermostat
+      real X = p_kinetic + p_nonbonded;
+      // in order not to do double calculations X is not divided by 3V and term in the next line
+      // 3V * (X - externalPressure) is replaced by (X - 3V * externalPressure)
+      
+      // local momentum derivative; in order to optimize term pref6 * v2sum could be coupled
+      // with X.
+      real pe_deriv = (X - m3V * externalPressure)  + pref6 * v2sum +
               pref4 * momentum + pref5 * rannum;
       
-      pe_deriv /= mass; // momentum is normalized by mass already
-      
       momentum += dt_2 * pe_deriv;
+      momentum_mass = momentum / mass; // momentum is normalized by mass already
     }
     
     void LangevinBarostat::updForces(){
@@ -135,12 +140,11 @@ namespace espresso {
     
     real LangevinBarostat::updDisplacement(){
       // should return pe/W
-      return (momentum); // momentum is normalized by fictitious mass already
+      return (momentum_mass); // momentum is normalized by fictitious mass already
     }
 
     void LangevinBarostat::frictionBarostat(Particle& p){
-      
-      p.force() += pref3  * momentum * p.velocity() * p.mass();
+      p.force() += pref3  * momentum_mass * p.velocity() * p.mass();
       
       LOG4ESPP_TRACE(theLogger, "new particle force = " << p.force());
     }
@@ -148,9 +152,9 @@ namespace espresso {
     void LangevinBarostat::initialize(real timestep, real desiredTemperature){
       // calculate the prefactors
       LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
-              ", gammaP = " << gammaP << 
-              ", external pressure = " << externalPressure <<
-              ", fictitious mass = " << mass );
+                               ", gammaP = " << gammaP << 
+                               ", external pressure = " << externalPressure <<
+                               ", fictitious mass = " << mass );
 
       // TODO implement Nf for the system with constarins
       /* Nf - degrees of freedom. For N particles in d-dimentional system without constrains

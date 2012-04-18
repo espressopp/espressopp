@@ -50,6 +50,7 @@ namespace espresso {
         
         // system variable
         real momentum;              // momentum variable corresponding to the volume variable
+        real momentum_mass;         // momentum variable divided by mass pe/w
         
         real pref3;  // prefactor, force term
         real pref4;  // prefactor, for the volume momentum
