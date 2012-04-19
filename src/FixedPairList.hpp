@@ -14,10 +14,12 @@
 
 namespace espresso {
 	class FixedPairList : public PairList {
+	  public:
+	    typedef boost::unordered_multimap <longint, longint> GlobalPairs;
+
 	  protected:
 		boost::signals2::connection con1, con2, con3;
 		shared_ptr <storage::Storage> storage;
-		typedef boost::unordered_multimap <longint, longint> GlobalPairs;
 		GlobalPairs globalPairs;
 		using PairList::add;
 
@@ -37,6 +39,7 @@ namespace espresso {
 		virtual void onParticlesChanged();
 
 	    python::list getBonds();
+	    GlobalPairs* getGlobalPairs() {return &globalPairs;};
 
 	    /** Get the number of bonds in the GlobalPairs list */
 	    int size() {

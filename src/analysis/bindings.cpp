@@ -9,6 +9,8 @@
 #include "CenterOfMass.hpp"
 #include "NPart.hpp"
 #include "MaxPID.hpp"
+#include "AllParticlePos.hpp"
+#include "IntraChainDistSq.hpp"
 
 namespace espresso {
   namespace analysis {
@@ -23,6 +25,8 @@ namespace espresso {
       CenterOfMass::registerPython();
       NPart::registerPython();
       MaxPID::registerPython();
+      AllParticlePos::registerPython();
+      IntraChainDistSq::registerPython();
     }
   }
 }

@@ -10,3 +10,5 @@ from espresso.analysis.Velocities import *
 from espresso.analysis.CenterOfMass import *
 from espresso.analysis.NPart import *
 from espresso.analysis.MaxPID import *
+from espresso.analysis.AllParticlePos import *
+from espresso.analysis.IntraChainDistSq import *
