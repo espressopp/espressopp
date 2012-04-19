@@ -89,8 +89,6 @@ namespace espresso {
       
       // at this point we are ready to prepare the kvector[], it can be done just once at the begin
       void preset(){
-        cout << " Preset is called!!! "<< endl;
-        
         // TODO it could be parallelized too
         Real3D Li = system -> bc -> getBoxL(); // getting the system size
         Lx = Li[0];

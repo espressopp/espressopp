@@ -116,6 +116,12 @@ namespace espresso {
       if (langevinBarostat){
         if(langevin)
           langevinBarostat->initialize(dt, langevin->getTemperature());
+        else if(berendsenThermostat)
+          langevinBarostat->initialize(dt, berendsenThermostat->getTemperature());
+        else if(isokinetic)
+          langevinBarostat->initialize(dt, isokinetic->getTemperature());
+        else if(stochasticVelocityRescaling)
+          langevinBarostat->initialize(dt, stochasticVelocityRescaling->getTemperature());
         else
           langevinBarostat->initialize(dt, 1.0);
       }
@@ -286,10 +292,11 @@ namespace espresso {
       System& system = getSystemRef();
 
       if (langevinBarostat){
+        real half_dt = 0.5 * dt;
         /* update the volume V(t+0.5*dt)=V(t)+dt/2. * V'  */
-        langevinBarostat->updVolume( 0.5 * dt );
+        langevinBarostat->updVolume( half_dt );
         /* update the local barostat momentum pe(t+0.5*dt)=pe(t)+dt/2. * pe'  */
-        langevinBarostat->updVolumeMomentum( 0.5 * dt );
+        langevinBarostat->updVolumeMomentum( half_dt );
       }
       
       CellList realCells = system.storage->getRealCells();
@@ -324,9 +331,11 @@ namespace espresso {
         cit->velocity() += dtfm * cit->force();
 
         // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt) 
-        Real3D deltaP = dt * cit->velocity();
+        Real3D deltaP = cit->velocity();
 
-        if (langevinBarostat) deltaP += dt * (langevinBarostat->updDisplacement()) * cit->position(); // updDisplacement is just coefficient
+        if(langevinBarostat) deltaP += (langevinBarostat->updDisplacement()) * cit->position(); // updDisplacement is just coefficient
+        
+        deltaP *= dt;
 
         cit->position() += deltaP;
         sqDist += deltaP * deltaP;
