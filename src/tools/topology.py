@@ -1,37 +1,76 @@
-import math
+from math import sqrt, pi, cos, sin
 import random
 from espresso import Real3D
 from espresso.Exceptions import Error
 
-def polymerRW(pid, startpos, numberOfMonomers, bondlength, return_angles='False'):
+def polymerRW(pid, startpos, numberOfMonomers, bondlength, return_angles=False, mindist=None):
 	x         = startpos[0]
 	y         = startpos[1]
 	z         = startpos[2]
 	positions = [ Real3D(x, y, z) ]
 	bonds     = []
+	avecostheta = 0.0
 	if return_angles == 'True':
-		angles    = []
+	   angles    = []
 	for i in range(numberOfMonomers-1):
+	  if mindist and i > 0:
+		while True:
+		  nextZ = (2.0*random.uniform(0,1)-1.0)*bondlength;
+		  rr    = sqrt(bondlength*bondlength-nextZ*nextZ);
+		  phi   = 2.0*pi*random.uniform(0,1);
+		  nextX = rr*cos(phi);
+		  nextY = rr*sin(phi);				
+		  
+		  ax    = positions[i][0] - positions[i-1][0]
+		  ay    = positions[i][1] - positions[i-1][1]
+		  az    = positions[i][2] - positions[i-1][2]
+		  la    = sqrt(ax*ax + ay*ay + az*az)
+		  
+		  bx    = - nextX
+		  by    = - nextY
+		  bz    = - nextZ
+		  lb    = sqrt(bx*bx + by*by + bz*bz)
+		  
+		  cx    = ax - bx
+		  cy    = ay - by
+		  cz    = az - bz
+		  lc    = sqrt(cx*cx + cy*cy + cz*cz)
+		  
+		  if lc > mindist:
+		  	avecostheta += (ax*bx + ay*by + az*bz) / (la * lb)
+		  	break
+		  
+		  	
+	  else:
 		nextZ = (2.0*random.uniform(0,1)-1.0)*bondlength;
-		rr    = math.sqrt(bondlength*bondlength-nextZ*nextZ);
-		phi   = 2.0*math.pi*random.uniform(0,1);
-		nextX = rr*math.cos(phi);
-		nextY = rr*math.sin(phi);				
+		rr    = sqrt(bondlength*bondlength-nextZ*nextZ);
+		phi   = 2.0*pi*random.uniform(0,1);
+		nextX = rr*cos(phi);
+		nextY = rr*sin(phi);				
 
-		x += nextX
-		y += nextY
-		z += nextZ
-		# update monomer list:
-		positions.append(Real3D(x, y, z))
-		# update bond list:
-		bonds.append((pid+i,pid+i+1))
-		if return_angles == 'True':
-		    if i < numberOfMonomers-2:
-			    angles.append((pid+i, pid+i+1, pid+i+2))
-	if return_angles == 'True':	
-	    return positions, bonds, angles
+ 	  x += nextX
+	  y += nextY
+	  z += nextZ
+	  # update monomer list:
+	  positions.append(Real3D(x, y, z))
+	  # update bond list:
+	  bonds.append((pid+i,pid+i+1))
+	  if return_angles == True:
+	    if i < numberOfMonomers-2:
+		  angles.append((pid+i, pid+i+1, pid+i+2))
+		  
+	avecostheta /= (numberOfMonomers-2)
+    
+	if return_angles == True:
+		if mindist:	
+			return positions, bonds, angles, avecostheta
+		else:
+			return positions, bonds, angles
 	else:
-		return positions, bonds
+		if mindist:
+			return positions, bonds, avecostheta
+		else:	
+			return positions, bonds
 	
 
 """
