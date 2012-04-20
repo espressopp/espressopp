@@ -35,12 +35,18 @@ public:
 /** Gamma distribution, from Numerical Recipes, 2nd edition, pages 292 & 293 */
 class GammaDistributionNR2nd: public GammaDistribution {
 public:
+	GammaDistributionNR2nd(shared_ptr<esutil::RNG> _rng) :
+			GammaDistribution(_rng) {
+	}
 	const real drawNumber(const unsigned int ia);
 };
 
 /** Gamma distribution, from Numerical Recipes, 3rd edition, pages 370 & 371 */
 class GammaDistributionNR3rd: public GammaDistribution {
 public:
+	GammaDistributionNR3rd(shared_ptr<esutil::RNG> _rng) :
+			GammaDistribution(_rng) {
+	}
 	const real drawNumber(const unsigned int ia);
 };
 

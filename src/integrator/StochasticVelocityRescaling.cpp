@@ -30,10 +30,10 @@ StochasticVelocityRescaling::StochasticVelocityRescaling(
 
 	rng = system->rng;
 
-	//chose on of currently three implementations of a gamma-distributed random number
+	//chose one of currently three implementations of a gamma-distributed random number
 	gammaDist = new GammaDistributionBoost(rng);
-	gammaDist = new GammaDistributionNR2nd(rng);
-	gammaDist = new GammaDistributionNR3rd(rng);
+	//gammaDist = new GammaDistributionNR2nd(rng);
+	//gammaDist = new GammaDistributionNR3rd(rng);
 	//TODO benchmark those distributions! a first dirty benchmark did not show any significant difference in computational time
 
 	LOG4ESPP_INFO(theLogger, "StochasticVelocityRescaling constructed");
@@ -122,7 +122,6 @@ const real StochasticVelocityRescaling::stochasticVR_sumGaussians(const int n) {
 		return 2.0 * gammaDist->drawNumber(n / 2);
 	} else {
 		rr = rng->normal();
-		GammaDistributionNR3rd
 		return 2.0 * gammaDist->drawNumber((n - 1) / 2) + rr * rr;
 	}
 }
