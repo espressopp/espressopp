@@ -40,7 +40,7 @@ namespace espresso {
 
       /** returns a gamma distributed random number with shape parameter
        \alpha and scale parameter 1.  */
-      real gamma(int alpha=1);
+      real gamma(unsigned int alpha=1);
       real gammaOf1(){return gamma(1);}; //this would look nicer with an optional argument, but it did not work (for boost)
 
       /** returns a random 3D vector that is uniformly distributed on a sphere. */

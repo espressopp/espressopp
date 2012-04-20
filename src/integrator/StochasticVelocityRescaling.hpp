@@ -7,63 +7,91 @@
 #include "SystemAccess.hpp"
 
 namespace espresso {
-  namespace integrator {
+namespace integrator {
 
-    class StochasticVelocityRescaling : public SystemAccess {
+class GammaDistribution {
+public:
+	GammaDistribution(shared_ptr<esutil::RNG> _rng) :
+			rng(_rng) {
+	}
+	virtual ~GammaDistribution() {
+	}
+	;
+	virtual const real drawNumber(const unsigned int alpha) = 0;
 
-      public:
+protected:
+	shared_ptr<esutil::RNG> rng;
+};
 
-    	StochasticVelocityRescaling(shared_ptr< System > system);
+/** Gamma distribution, from Boost */
+class GammaDistributionBoost: public GammaDistribution {
+public:
+	GammaDistributionBoost(shared_ptr<esutil::RNG> _rng) :
+			GammaDistribution(_rng) {
+	}
+	const real drawNumber(const unsigned int ia);
+};
 
-        void setTemperature(real temperature);
+/** Gamma distribution, from Numerical Recipes, 2nd edition, pages 292 & 293 */
+class GammaDistributionNR2nd: public GammaDistribution {
+public:
+	const real drawNumber(const unsigned int ia);
+};
 
-        real getTemperature();
+/** Gamma distribution, from Numerical Recipes, 3rd edition, pages 370 & 371 */
+class GammaDistributionNR3rd: public GammaDistribution {
+public:
+	const real drawNumber(const unsigned int ia);
+};
 
-        void setCoupling(int coupling);
+class StochasticVelocityRescaling: public SystemAccess {
 
-        int getCoupling();
+public:
 
-        ~StochasticVelocityRescaling();
+	StochasticVelocityRescaling(shared_ptr<System> system);
 
-        /** Gamma distribution, from Numerical Recipes, 2nd edition, pages 292 & 293 */
-        static real stochasticVR_gammaDeviate2nd(int ia, esutil::RNG rng);
+	void setTemperature(real temperature);
 
-        /** Gamma distribution, from Numerical Recipes, 3rd edition, pages 370 & 371 */
-        static real stochasticVR_gammaDeviate3rd(int ia, esutil::RNG rng);
+	real getTemperature();
 
-        /** Sum n squared Gaussian numbers - shortcut via Gamma distribution */
-        static real stochasticVR_sumGaussians(int n, esutil::RNG rng);
+	void setCoupling(real coupling);
 
-        /** Pull new value for the kinetic energy following the canonical distribution
-         *  Cite: Bussi et al JCP (2007) (there's a typo in the paper - this code is correct
-         *  Ekin: current kinetic energy
-         *  Ekin_ref: reference kinetic energy
-         *  dof: degrees of freedom
-         *  taut: coupling time/strength
-         *  */
-        static real stochasticVR_pullEkin(real Ekin,
-        		real Ekin_ref,
-        		int dof,
-        		real taut,
-        		esutil::RNG rng);
+	real getCoupling();
 
-        void rescaleVelocities();
+	~StochasticVelocityRescaling();
 
-        /** Register this class so it can be used from Python. */
-        static void registerPython();
+	/** Sum n squared Gaussian numbers - shortcut via Gamma distribution */
+	const real stochasticVR_sumGaussians(const int n);
 
-      private:
-        real temperature;  //!< desired user temperature
-        int coupling; // how often to couple to the thermostat
-        int couplecount;
+	/** Pull new value for the kinetic energy following the canonical distribution
+	 *  Cite: Bussi et al JCP (2007) (there's a typo in the paper - this code is correct
+	 *  Ekin: current kinetic energy
+	 *  Ekin_ref: reference kinetic energy
+	 *  dof: degrees of freedom
+	 *  taut: coupling time/strength
+	 *  */
+	const real stochasticVR_pullEkin(real Ekin, real Ekin_ref, int dof,
+			real taut, shared_ptr<esutil::RNG> rng);
 
+	void rescaleVelocities();
 
-        shared_ptr< esutil::RNG > rng;  //!< random number generator
+	/** Register this class so it can be used from Python. */
+	static void registerPython();
 
-        /** Logger */
-        static LOG4ESPP_DECL_LOGGER(theLogger);
-    };
-  }
+private:
+	real temperature; //!< desired user temperature
+	real coupling; // how strong is the coupling, i.e., tau_t coupling time
+
+	shared_ptr<esutil::RNG> rng; //!< random number generator
+
+	GammaDistribution *gammaDist;
+
+	/** Logger */
+	static LOG4ESPP_DECL_LOGGER(theLogger)
+	;
+};
+
+}
 }
 
 #endif
