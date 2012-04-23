@@ -63,7 +63,6 @@ class ParticleLocal(object):
 
     @property
     def pos(self): return self.__getTmp().pos
-    def unfoldedPos(self): return self.__getTmp().unfoldedPos
     @pos.setter
     def pos(self, val): self.__getTmp().pos = toReal3DFromVector(val)
     

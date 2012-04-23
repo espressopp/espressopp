@@ -180,12 +180,6 @@ namespace espresso {
     const Real3D& position() const { return r.p; }
     Real3D getPos() const { return r.p; }
     void setPos(const Real3D& pos) { r.p = pos; }
-    Real3D getUnfoldedPos() const {
-    	Real3D up;
-    	for (int i=0; i<3; i++)
-    	  up[i] = r.p[i]+l.i[i];
-        return up;
-    }
 
     // All Forces
 
