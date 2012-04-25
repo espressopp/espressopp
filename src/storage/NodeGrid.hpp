@@ -94,6 +94,33 @@ namespace espresso {
 
       static const int numNodeNeighbors = Back + 1;
 
+      void scaleVolume(real s) {
+        if (s > 0) {
+          for (int i=0; i<3; ++i) {
+            localBoxSize[i] *= s;
+            invLocalBoxSize[i] /= s;
+          }
+          smallestLocalBoxDiameter *= s;
+        }
+        else {
+            ;
+            // TODO: do nothing or throw error if s <= 0 ?
+        }
+      }
+      void scaleVolume(Real3D s) {
+        if (s[0]>0 && s[1]>0 && s[2]>0) {
+          for (int i=0; i<3; ++i) {
+            localBoxSize[i] *= s[i];
+            invLocalBoxSize[i] /= s[i];
+          }
+          smallestLocalBoxDiameter = std::min(std::min(localBoxSize[0], localBoxSize[1]), localBoxSize[2]);
+        }
+        else {
+            ;
+            // TODO: do nothing or throw error if s <= 0 ?
+        }
+      }
+      
     private:
       void calcNodeNeighbors(longint node);
 

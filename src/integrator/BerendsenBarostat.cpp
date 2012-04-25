@@ -42,7 +42,7 @@ namespace espresso {
 
       System& system = getSystemRef();
       
-      static Pressure Pcurrent(getSystem());
+      Pressure Pcurrent(getSystem());
       
       real P = Pcurrent.compute();  // calculating the current pressure in system
       

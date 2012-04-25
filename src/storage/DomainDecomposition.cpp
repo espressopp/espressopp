@@ -152,11 +152,14 @@ namespace espresso {
         // TODO error handling
         exit(-1);
       }
-      else
+      else{
         cellAdjust();
+      }
     }
-    else
+    else{
       cellGrid.scaleVolume( s );
+      nodeGrid.scaleVolume( s );
+    }
   }
   // anisotropic version
   void DomainDecomposition::scaleVolume(Real3D s, bool particleCoordinates){
@@ -171,7 +174,6 @@ namespace espresso {
     real r1 = s[1]*cellD;
     real r2 = s[2]*cellD;
     
-    
     if( cs > min( min( r0, r1), r2 ) ){
       Real3D Li = getSystem() -> bc -> getBoxL(); // getting the system size
       real minL = min(Li[0], min(Li[1],Li[2]));
@@ -183,8 +185,10 @@ namespace espresso {
       else
         cellAdjust();
     }
-    else
+    else{
       cellGrid.scaleVolume(s);
+      nodeGrid.scaleVolume(s);
+    }
   }
   
   Int3D DomainDecomposition::getInt3DCellGrid(){
@@ -214,13 +218,12 @@ namespace espresso {
     std::vector<ParticleList> tmp_pl;
     size_t _N = realCells.size();
     tmp_pl.reserve( _N );
-    for (std::vector<Cell*>::iterator it = realCells.begin(), end = realCells.end(); it != end; ++it) {
-      Cell &cell = **it;
-      ParticleList pl = cell.particles;
-      tmp_pl.push_back(pl);
+    for(CellList::Iterator it(realCells); it.isValid(); ++it) {
+      tmp_pl.push_back((*it)->particles);
     }
     
     // reset all cells info
+    invalidateGhosts();
     cells.clear();
     localCells.clear();
     realCells.clear();
@@ -234,19 +237,23 @@ namespace espresso {
     createCellGrid(_nodeGrid, _newCellGrid);
     initCellInteractions();
     prepareGhostCommunication();
-
+    
     // pushing the particles back to the empty cell ("do we have to check particles?")
     for(int i=0; i<tmp_pl.size(); i++){
       for (size_t p = 0; p < tmp_pl[i].size(); ++p) {
-        Particle &part = tmp_pl[i][p];
+        Particle& part = tmp_pl[i][p];
         const Real3D& pos = part.position();
         Cell *sortCell = mapPositionToCellClipped(pos);
-        appendIndexedParticle(sortCell->particles, part);
+        appendUnindexedParticle(sortCell->particles, part);
       }
     }
+
+    for(CellList::Iterator it(realCells); it.isValid(); ++it) {
+      updateLocalParticles((*it)->particles);
+    }
     
-    // decompose the system
-    decompose();
+    exchangeGhosts();
+    onParticlesChanged();
   }
 
   void DomainDecomposition::initCellInteractions() {

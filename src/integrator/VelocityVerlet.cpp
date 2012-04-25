@@ -290,11 +290,11 @@ namespace espresso {
     real VelocityVerlet::integrate1()
     {
       System& system = getSystemRef();
+      real half_dt = 0.5 * dt; 
 
       if (langevinBarostat){
-        real half_dt = 0.5 * dt;
         /* update the volume V(t+0.5*dt)=V(t)+dt/2. * V'  */
-        langevinBarostat->updVolume( half_dt );
+        langevinBarostat->updVolume( dt );
         /* update the local barostat momentum pe(t+0.5*dt)=pe(t)+dt/2. * pe'  */
         langevinBarostat->updVolumeMomentum( half_dt );
       }
@@ -325,7 +325,7 @@ namespace espresso {
 
         */
 
-        real dtfm = 0.5 * dt / cit->mass();
+        real dtfm = half_dt / cit->mass();
 
         // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) 
         cit->velocity() += dtfm * cit->force();
@@ -366,9 +366,10 @@ namespace espresso {
 
       // loop over all particles of the local cells
 
+      real half_dt = 0.5 * dt; 
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
-        real dtfm = 0.5 * dt / cit->mass();
+        real dtfm = half_dt / cit->mass();
 
         /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
 
@@ -377,9 +378,9 @@ namespace espresso {
       
       if (langevinBarostat){
         /* update the local momentum pe(t+dt)=pe(t+0.5*dt)+dt/2. * pe'  */
-        langevinBarostat->updVolumeMomentum( 0.5 * dt );
+        langevinBarostat->updVolumeMomentum( half_dt );
         /* update the volume V(t+dt)=V(t+0.5*dt)+dt/2. * V'  */
-        langevinBarostat->updVolume( 0.5 * dt );
+        langevinBarostat->updVolume( dt );
       }
       
       step++;
