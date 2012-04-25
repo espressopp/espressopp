@@ -41,7 +41,7 @@ namespace espresso {
         static void registerPython();
 
       private:
-        void frictionBarostat(class Particle&);
+        void frictionBarostat(class Particle&, real);
 
         // initial parameters
         real gammaP;                // friction coefficient for pressure control

@@ -58,17 +58,17 @@ namespace espresso {
       /* no pointer left, can happen for ghosts when the real particle
 	 e has already been removed */
       if (localParticles.find(p->id()) == localParticles.end())
-	return;
+        return;
 
       if (!weak || localParticles[p->id()] == p) {
-	LOG4ESPP_TRACE(logger, "removing local pointer for particle id="
-		       << p->id() << " @ " << p);
-	localParticles.erase(p->id());
+        LOG4ESPP_TRACE(logger, "removing local pointer for particle id="
+                  << p->id() << " @ " << p);
+        localParticles.erase(p->id());
       }
       else {
-	LOG4ESPP_TRACE(logger, "NOT removing local pointer for particle id="
-		       << p->id() << " @ " << p << " since pointer is @ "
-		       << localParticles[p->id()]);
+        LOG4ESPP_TRACE(logger, "NOT removing local pointer for particle id="
+                  << p->id() << " @ " << p << " since pointer is @ "
+                  << localParticles[p->id()]);
       }
     }
 
@@ -375,11 +375,10 @@ namespace espresso {
       LOG4ESPP_DEBUG(logger, "number of received cells = "
 		     << old.getRealCells().size());
 
-      for (CellListIterator it(old.getRealCells());
-	   it.isValid(); ++it) {
-          Particle &part = *it;
-          Cell *nc = mapPositionToCellClipped(part.position());
-          appendUnindexedParticle(nc->particles, part);
+      for (CellListIterator it(old.getRealCells()); it.isValid(); ++it) {
+        Particle &part = *it;
+        Cell *nc = mapPositionToCellClipped(part.position());
+        appendUnindexedParticle(nc->particles, part);
       }
 
       // update localParticles
