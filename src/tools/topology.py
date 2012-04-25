@@ -10,7 +10,7 @@ def polymerRW(pid, startpos, numberOfMonomers, bondlength, return_angles=False, 
 	positions = [ Real3D(x, y, z) ]
 	bonds     = []
 	avecostheta = 0.0
-	if return_angles == 'True':
+	if return_angles == True:
 	   angles    = []
 	for i in range(numberOfMonomers-1):
 	  if mindist and i > 0:
