@@ -192,11 +192,11 @@ namespace espresso {
     for (GlobalPairs::const_iterator it = globalPairs.begin();
 	 it != globalPairs.end(); ++it) {
       if (it->first != lastpid1) {
-	p1 = storage->lookupRealParticle(it->first);
+	    p1 = storage->lookupRealParticle(it->first);
         if (p1 == NULL) {
           printf("SERIOUS ERROR: particle %d not available\n", it->first);
         }
-	lastpid1 = it->first;
+	    lastpid1 = it->first;
       }
       p2 = storage->lookupLocalParticle(it->second);
       if (p2 == NULL) {

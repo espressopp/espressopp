@@ -5,7 +5,7 @@
 #include "bc/BC.hpp"
 #include "mpi.h"
 #include <map>
-#include "boost/serialization/map.hpp"
+#include <boost/serialization/map.hpp>
 
 using namespace espresso;
 

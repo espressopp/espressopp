@@ -41,14 +41,15 @@ def PolymerMelt(num_chains, monomers_per_chain, box, bondlen=2.0, rc=1.12246, sk
     pid += monomers_per_chain
     type += 1
     system.storage.addParticles(chain, *props)
+    system.storage.decompose()
     chain = []
     bondlist.addBonds(bonds)
+
+  system.storage.decompose()
 
   # FENE bonds
   potFENE   = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
   interFENE = espresso.interaction.FixedPairListFENE(system, bondlist, potFENE)
   system.addInteraction(interFENE)
     
-  system.storage.decompose()
- 
   return system, integrator
