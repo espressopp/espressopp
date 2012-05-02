@@ -41,6 +41,9 @@ namespace espresso {
         void setLangevinBarostat(shared_ptr<class LangevinBarostat> langevinBarostat);
         shared_ptr<class LangevinBarostat> getLangevinBarostat() { return langevinBarostat; }
         
+        // set & get FixPositions
+        void setFixPositions(shared_ptr <class FixPositions> _fixPositions);
+        shared_ptr<class FixPositions> getFixPositions () {return fixPositions; }
 
         void run(int nsteps);
         
@@ -77,6 +80,8 @@ namespace espresso {
         
         shared_ptr< class LangevinBarostat > langevinBarostat;  //!< Langevin-Hoover barostat if available
         
+        shared_ptr< class FixPositions > fixPositions; // fix positions of a group of particles
+
         real integrate1();
 
         void integrate2();

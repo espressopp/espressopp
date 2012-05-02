@@ -19,11 +19,15 @@ class ParticleGroupLocal(_espresso.ParticleGroup):
         if pmi.workerIsActive():
             self.cxxclass.show(self)
 
+    def has(self, pid):
+        if pmi.workerIsActive():
+            return self.cxxclass.has(self, pid)
+
 if pmi.isController:
     class ParticleGroup(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espresso.ParticleGroupLocal',
-            pmicall = [ "add", "show" ]
+            pmicall = [ "add", "show", "has" ]
             )
 

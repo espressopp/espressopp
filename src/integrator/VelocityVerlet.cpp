@@ -8,6 +8,7 @@
 #include "LangevinBarostat.hpp"
 #include "Isokinetic.hpp"
 #include "StochasticVelocityRescaling.hpp"
+#include "FixPositions.hpp"
 
 #include "iterator/CellListIterator.hpp"
 #include "interaction/Interaction.hpp"
@@ -93,7 +94,15 @@ namespace espresso {
     }
     
     /*****************************************************************************/
+
     
+    void VelocityVerlet::setFixPositions(shared_ptr <class FixPositions> _fixPositions) {
+    	LOG4ESPP_INFO(theLogger, "set fixPositions to fix positions of a group of particles");
+    	fixPositions = _fixPositions;
+    }
+
+
+
     void VelocityVerlet::run(int nsteps)
     {
       VT_TRACER("run");
@@ -337,8 +346,14 @@ namespace espresso {
         
         deltaP *= dt;
 
-        cit->position() += deltaP;
-        sqDist += deltaP * deltaP;
+        if (fixPositions) {
+        	fixPositions->apply(cit->id(), cit->velocity(), deltaP);
+            cit->position() += deltaP;
+            sqDist += deltaP * deltaP;
+        } else {
+            cit->position() += deltaP;
+            sqDist += deltaP * deltaP;
+        }
 
         count++;
 
@@ -543,6 +558,7 @@ namespace espresso {
         .add_property("langevinBarostat", &VelocityVerlet::getLangevinBarostat, &VelocityVerlet::setLangevinBarostat)
         .add_property("isokinetic", &VelocityVerlet::getIsokinetic, &VelocityVerlet::setIsokinetic)
         .add_property("stochasticVelocityRescaling", &VelocityVerlet::getStochasticVelocityRescaling, &VelocityVerlet::setStochasticVelocityRescaling)
+        .add_property("fixpositions", &VelocityVerlet::getFixPositions, &VelocityVerlet::setFixPositions)
         .def("getTimers", &wrapGetTimers)
         .def("resetTimers", &VelocityVerlet::resetTimers)
         ;

@@ -36,6 +36,8 @@ namespace espresso {
             // for debugging purpose
             void print();
 
+            const bool has(longint pid);
+
             static void registerPython();
 
             /**

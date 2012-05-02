@@ -32,6 +32,10 @@ namespace espresso {
     }
 
 
+    const bool ParticleGroup::has(longint pid) {
+    	return particles.find(pid) != particles.end();
+    }
+
     // for debugging purpose
     void ParticleGroup::print() {
         std::cout << "####### I have " << active.size() << " active particles" << std::endl;
@@ -105,6 +109,7 @@ namespace espresso {
                 ("ParticleGroup", init <shared_ptr <storage::Storage> >())
                 .def("add", &ParticleGroup::add)
                 .def("show", &ParticleGroup::print)
+                .def("has", &ParticleGroup::has)
                 ;
     }
 }

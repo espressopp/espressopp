@@ -12,6 +12,7 @@
 #include "BerendsenBarostat.hpp"
 #include "BerendsenThermostat.hpp"
 #include "LangevinBarostat.hpp"
+#include "FixPositions.hpp"
 
 namespace espresso {
   namespace integrator {
@@ -28,6 +29,7 @@ namespace espresso {
       BerendsenBarostat::registerPython();
       BerendsenThermostat::registerPython();
       LangevinBarostat::registerPython();
+      FixPositions::registerPython();
     }
   }
 }

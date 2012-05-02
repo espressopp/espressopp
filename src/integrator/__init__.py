@@ -13,3 +13,4 @@ from espresso.integrator.TDforce import *
 from espresso.integrator.BerendsenBarostat import *
 from espresso.integrator.BerendsenThermostat import *
 from espresso.integrator.LangevinBarostat import *
+from espresso.integrator.FixPositions import *
