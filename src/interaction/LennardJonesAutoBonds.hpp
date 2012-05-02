@@ -142,7 +142,6 @@ namespace espresso {
         }
       }
 
-
       inline Real3D computeForce(const Particle& p1, const Particle& p2) const {
         Real3D dist = p1.position() - p2.position();
         return computeForce(dist);
@@ -155,140 +154,18 @@ namespace espresso {
         return force;
       }
 
-/*
-
       inline bool _computeForce(Real3D& force, const Particle &p1, const Particle &p2) const {
         Real3D dist = p1.position() - p2.position();
-        bool found = false;
-        Particle &pa;
-        Particle &pb;
-        int p1_count = 0;
-        int p2_count = 0;
+    	if (p1.ghost()) {
+    		printf("WARNING (this should never happen !): didn't add crosslink, because particle1 is ghosts");
+    		return _computeForce(force, dist);
+    	}
         if (dist.sqr() <= cutoffSqr) {
-          switch (max_crosslinks) {
-            case 1 :
-              for (FixedPairList::PairList::Iterator it(*bondlist); it.isValid(); ++it) {
-            	if ( ( p1.id() == it->first->id() || p1.id() == it->second->id() ) ||
-            	     ( p2.id() == it->first->id() || p2.id() == it->second->id() ) ) {
-            	  found = true;
-            	}
-              if (!found) {
-                bondlist->add(p1.id(), p2.id());
-              }
-              break;
-              };
-            case 2 :
-              if (p1.ghost() && p2.ghost()) {
-            	  printf("ERROR: both particles are ghosts in _computeForce !!!\n");
-            	  printf("       This should never happen !\n");
-              }
-              else
-              if (p1.ghost()) {
-            	  pa = p2;
-            	  pb = p1;
-              }
-              else
-              if (p2.ghost()) {
-            	  pa = p1;
-            	  pb = p2;
-              }
-              else {
-            	  pa = p1;
-            	  pb = p2;
-              }
-              for (FixedPairList::PairList::Iterator it(*bondlist); it.isValid(); ++it) {
-             	if ( pa.id() == it->first->id() || pa.id() == it->second->id() ) {
-             		++p1_count;
-             	}
-             	if ( p2.id() == it->first->id() || p2.id() == it->second->id() ) {
-             		++p2_count;
-             	}
-              }
-              if (p1_count + p2_count <= 1) {
-                  bondlist->add(pa.id(), pb.id());
-              }
-              if (p1_count + p2_count == 1) {
-              }
-              break;
-            default :
-              printf("WARNING: currently crosslinking will only work for pair and triple joints. No crosslinking done.\n");
-              break;
-          }
-        }
-        return _computeForce(force, dist);
-      }
-*/
-
-/* this version will not run correctly with more than 1 CPU */
-      inline bool _computeForce(Real3D& force, const Particle &p1, const Particle &p2) const {
-        Real3D dist = p1.position() - p2.position();
-        bool found = false;
-        long pa;
-        long pb;
-        bool add_second = false;
-        int p1_count = 0;
-        int p2_count = 0;
-        bool pa_isghost = false;
-        bool pb_isghost = false;
-        if (dist.sqr() <= cutoffSqr) {
-          switch (max_crosslinks) {
-            case 1 :
-              for (FixedPairList::PairList::Iterator it(*bondlist); it.isValid(); ++it) {
-            	if ( ( p1.id() == it->first->id() || p1.id() == it->second->id() ) ||
-            	     ( p2.id() == it->first->id() || p2.id() == it->second->id() ) ) {
-            	  found = true;
-            	}
-              if (!found) {
-                bondlist->add(p1.id(), p2.id());
-              }
-              break;
-              };
-            case 2 :
-              for (FixedPairList::PairList::Iterator it(*bondlist); it.isValid(); ++it) {
-             	if ( p1.id() == it->first->id() || p1.id() == it->second->id() ) {
-             		++p1_count;
-             		if (p1.id() == it->first->id()) {
-             			pa = p2.id();
-             			pa_isghost = p2.ghost();
-             			pb = it->second->id();
-             			pb_isghost = it->second->ghost();
-             		} else {
-             			pa = p2.id();
-             			pa_isghost = p2.ghost();
-             			pb = it->first->id();
-             			pb_isghost = it->first->ghost();
-             		}
-             	}
-             	if ( p2.id() == it->first->id() || p2.id() == it->second->id() ) {
-             		++p2_count;
-             		if (p2.id() == it->first->id()) {
-             			pa = p1.id();
-             			pa_isghost = p1.ghost();
-             			pb = it->second->id();
-             			pb_isghost = it->second->ghost();
-             		} else {
-             			pa = p1.id();
-             			pa_isghost = p1.ghost();
-             			pb = it->first->id();
-             			pb_isghost = it->first->ghost();
-             		}
-             	}
-              }
-              if (p1_count + p2_count <= 1) {
-                  bondlist->add(p1.id(), p2.id());
-              }
-              if (p1_count + p2_count == 1) {
-            	if (!(pa_isghost && pb_isghost)) {
-                    bondlist->add(pa, pb);
-            	} else {
-            		printf("WARNING: didn't add second crosslink, because both particles were ghosts");
-            	}
-              }
-              break;
-            default :
-              printf("WARNING: currently crosslinking will only work for pair and triple joints. No crosslinking done.\n");
-              break;
-          }
+          FixedPairList::GlobalPairs* globalPairs = bondlist->getGlobalPairs();
+          if (globalPairs->count(p1.id()) + globalPairs->count(p2.id()) < max_crosslinks) {
+       	    globalPairs->insert(globalPairs->begin(), std::make_pair(p1.id(), p2.id()));
+            bondlist->add(p1.id(), p2.id());
+          };
         }
         return _computeForce(force, dist);
       }
