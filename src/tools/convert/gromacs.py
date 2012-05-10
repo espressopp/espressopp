@@ -57,20 +57,22 @@ def read(gro_file, top_file=""):
         a = 0
         readattypes, readbdtypes, readantypes, readdhtypes  = False, False, False, False
         atomtypes, bondtypes, angletypes, dihedraltypes = {}, {}, {}, {}
-        molecule_numbers = []
+        molecules = {}
         readmolecules = False
         for line in f:
             if line[0] == ";":  # skip comment line
                 continue
             if 'atomtypes' in line: # map atom types (espresso++ uses ints)
                 readattypes = True
-                print "Reading atomtypes: ",
+                print "Reading atomtypes (GROMACS: ESPResSo++): "
                 continue
             
             if readattypes:
                 if line.strip() == "": # end of atomtypes section
                     readattypes = False
-                    print sorted(atomtypes.items(), key=itemgetter(1)) # prints gromacs type and esp++ type
+                    # prints gromacs type and esp++ type
+                    for t in sorted(atomtypes.items(), key=itemgetter(1)):
+                        print " %s: %d"%(t[0],t[1])
                     continue
                 #print " "+line.strip('\n')
                 tmp = line.split()[0]
@@ -149,180 +151,71 @@ def read(gro_file, top_file=""):
                     readmolecules = False
                     continue
                 print " "+line.strip('\n')
-                molecule_numbers.append(int(line.split()[1]))
+                mol, nrmol = line.split()
+                molecules.update({mol:int(nrmol)})
             
         f.close()
         
-        if len(itp_files) == 0: # itp contents can be in top file
-            itp_files = [top_file]
         
-        # read itp files
-        molecule = 0
-        print "Reading included topology:"
-        for itp_file in itp_files:
-            print " "+itp_file
-            types_tmp, bonds_tmp, angles_tmp, dihedrals_tmp = [], [], [], []
-            molecule += 1
-            num_chains = molecule_numbers[molecule-1] # read number of molecules from array
-            monomers = num_particles / (num_chains * len(molecule_numbers))
-            f = open(itp_file)
-            
-            # find and store atom types
+        if len(itp_files) == 0: # itp contents can be in top file
+            f = open(top_file) # open same file again
+            molecule=0
             line = ''
-            while not 'atoms' in line:
-                line = f.readline()
-                if not line: break # break out of while if EOF
-            line = f.readline()
-            while(len(line) != 1):
-                if line[0] == ";":   # skip comment lines
-                    #print "skipping line: "+line.strip("\n")
-                    line = f.readline()
-                    continue
-                types_tmp.append(atomtypes[line.split()[1]]) # map str type to int type
-                line = f.readline()
             
-            # extend types to num_chains - 1 chains
-            types_per_chain = len(types_tmp)
-            for i in range(num_chains):
-                types.extend(types_tmp)
-            
-            # find and store bonds
-            line = ''
-            while not 'bonds' in line:
-                line = f.readline()
-                if not line: break # break out of while if EOF
-            line = f.readline()
-            while(len(line) != 1):
-                if line[0] == ";":   # skip comment lines
-                    line = f.readline()
-                    continue
-                tmp = line.split()
-                pid1, pid2, fun = map(int, tmp[0:3])
-                if (fun < 8):
-                    pot = fun
-                elif (fun > 7) and (len(tmp) == 3): # look for the potential in the bondtypes dict
-                    t1, t2 = types[pid1-1], types[pid2-1]
-                    if t1 > t2: # interactions in the other way
-                        t1, t2 = t2, t1
-                    pot = bondtypes[t1][t2]
-                elif (fun > 7) and (len(tmp) > 3):
-                    pot = tmp[3]
-                else:
-                    print "error while reading bond potential, line:"
-                    print line
-                    exit()
-                bonds_tmp.append((pid1 + ((monomers * num_chains) * (molecule-1)), \
-                                   pid2 + ((monomers * num_chains) * (molecule-1)), pot))
-                line = f.readline()
-            
-            # extend bonds to num_chains - 1 chains
-            bonds_per_chain = len(bonds_tmp)
-            for i in range(num_chains):
-                for j in range(bonds_per_chain):
-                    pid1, pid2, pot = bonds_tmp[j][0:3]
-                    if pot in bonds:
-                        bonds[pot].append((pid1 + (i * monomers), \
-                                           pid2 + (i * monomers)))
-                    else:
-                        bonds.update({pot:[(pid1 + (i * monomers), \
-                                            pid2 + (i * monomers))]})
-            
-            # find and store angles
-            line = ''
-            while not 'angles' in line:
-                line = f.readline()
-                if not line: break # break out of while if EOF
-            line = f.readline()
-            while(len(line) != 1):
-                if line[0] == ";": # skip comment lines
-                    line = f.readline()
-                    continue
-                tmp = line.split()
-                pid1, pid2, pid3, fun = map(int, tmp[0:4])
-                if (fun < 8):
-                    pot = fun
-                elif (fun > 7) and (len(tmp) == 4): # look for the potential in the angletypes dict
-                    t1, t2, t3 = types[pid1-1], types[pid2-1], types[pid3-1]
-                    if t1 not in angletypes: # interactions in the other way
-                        t1, t3 = t3, t1
-                    pot = angletypes[t1][t2][t3]
-                elif (fun > 7) and (len(tmp) > 4):
-                    pot = tmp[4]
-                else:
-                    print "error while reading angle potential, line:"
-                    print line
-                    exit()
-                angles_tmp.append((pid1 + ((monomers * num_chains) * (molecule-1)), \
-                                    pid2 + ((monomers * num_chains) * (molecule-1)), \
-                                     pid3 + ((monomers * num_chains) * (molecule-1)), pot))
-                line = f.readline()
-            
-            # extend angles to num_chains - 1 chains
-            angles_per_chain = len(angles_tmp)
-            for i in range(num_chains):
-                for j in range(angles_per_chain):
-                    pid1, pid2, pid3, pot = angles_tmp[j][0:4]
-                    if pot in angles:
-                        angles[pot].append((pid1 + (i * monomers), \
-                                            pid2 + (i * monomers), \
-                                            pid3 + (i * monomers)))
-                    else:
-                        angles.update({pot:[(pid1 + (i * monomers), \
-                                             pid2 + (i * monomers), \
-                                             pid3 + (i * monomers))]})
-            
-            
-            
-            
-            # find and store dihedrals
-            line = ''
-            while not 'dihedrals' in line:
-                line = f.readline()
-                if not line: break # break out of while if EOF
-            #dihedrals = []
-            line = f.readline()
-            while(len(line) != 0):
-                if line[0] == ";": # skip comment lines
-                    line = f.readline()
-                    continue
-                tmp = line.split()
-                pid1, pid2, pid3, pid4, fun = map(int, tmp[0:5])
-                if (fun < 8):
-                    pot = fun
-                elif (fun > 7) and (len(tmp) == 5): # look for the potential in the dihedraltypes dict
-                    t1, t2, t3, t4 = types[pid1-1], types[pid2-1], types[pid3-1], types[pid4-1] # get types of particles
-                    if t1 not in dihedraltypes: # interactions in the other way
-                        t1, t2, t3, t4 = t4, t1, t2, t3
-                    pot = dihedraltypes[t1][t2][t3][t4]
-                elif (fun > 7) and (len(tmp) > 5):
-                    pot = tmp[5]
-                else:
-                    print "error while reading dihedral potential, line:"
-                    print line
-                    exit()
-                dihedrals_tmp.append((pid1 + ((monomers * num_chains) * (molecule-1)), \
-                                       pid2 + ((monomers * num_chains) * (molecule-1)), \
-                                        pid3 + ((monomers * num_chains) * (molecule-1)), \
-                                         pid4 + ((monomers * num_chains) * (molecule-1)), pot ))
-                line = f.readline()
-            
-            # extend dihedrals to num_chains - 1 chains
-            dihedrals_per_chain = len(dihedrals_tmp)
-            for i in range(num_chains):
-                for j in range(dihedrals_per_chain):
-                    pid1, pid2, pid3, pid4, pot = dihedrals_tmp[j][0:5]
-                    if pot in dihedrals:
-                        dihedrals[pot].append((pid1 + (i * monomers), \
-                                               pid2 + (i * monomers), \
-                                               pid3 + (i * monomers), \
-                                               pid4 + (i * monomers)))
-                    else:
-                        dihedrals.update({pot:[(pid1 + (i * monomers), \
-                                                pid2 + (i * monomers), \
-                                                pid3 + (i * monomers), \
-                                                pid4 + (i * monomers))]})
+            for mol in molecules:
+                print "Preparing %d %s molecules... " %(molecules[mol], mol) 
+                molecule += 1 
+                
+                # find and store number of molecules
+                num_chains = storeMolecules(f, molecules, mol)
+                monomers = num_particles / (num_chains * len(molecules))
+                
+                # find and store atom types
+                types = storeAtoms(f, types, atomtypes, num_chains)
+                    
+                # find and store bonds
+                bonds = storeBonds(f, types, bondtypes, bonds,
+                                   molecule, monomers, num_chains)
+                
+                # find and store angles
+                angles = storeAngles(f, types, angletypes, angles,
+                                     molecule, monomers, num_chains)
+                
+                # find and store dihedrals
+                dihedrals = storeDihedrals(f, types, dihedraltypes, dihedrals,
+                                           molecule, monomers, num_chains)
             
             f.close()
+            
+            
+        else: # read itp files
+            molecule = 0
+            print "Reading included topology:"
+            for itp_file in itp_files:
+                f = open(itp_file)
+                print " "+itp_file
+                molecule += 1
+
+                # find and store number of molecules                
+                num_chains = storeMolecules(f, molecules)
+                monomers = num_particles / (num_chains * len(molecules))
+                
+                # find and store atom types
+                types = storeAtoms(f, types, atomtypes, num_chains)
+                
+                # find and store bonds
+                bonds = storeBonds(f, types, bondtypes, bonds,
+                                   molecule, monomers, num_chains)
+                
+                # find and store angles
+                angles = storeAngles(f, types, angletypes, angles,
+                                     molecule, monomers, num_chains)
+                
+                # find and store dihedrals
+                dihedrals = storeDihedrals(f, types, dihedraltypes, dihedrals,
+                                           molecule, monomers, num_chains)
+                
+                f.close()
 
     params = []
     if len(types) != 0:
@@ -339,6 +232,201 @@ def read(gro_file, top_file=""):
     params.extend([Lx, Ly, Lz])
     return tuple(params)
 
+
+def storeMolecules(f, molecules, mol=""):
+    line = ''
+    while not 'moleculetype' in line:
+        line = f.readline()
+        if not line: break # break out of while if EOF
+    line = f.readline()
+    while(len(line) > 1):
+        if line[0] == ";":   # skip comment lines
+            #print "skipping line: "+line.strip("\n")
+            line = f.readline()
+            continue
+        mol = line.split()[0]
+        line = f.readline()
+    
+    return molecules[mol]
+
+
+def storeAtoms(f, types, atomtypes, num_chains):
+    line = ''
+    types_tmp = []
+    while not 'atoms' in line:
+        line = f.readline()
+        if not line: break # break out of while if EOF
+    line = f.readline()
+    while(len(line) > 1):
+        if line[0] == ";":   # skip comment lines
+            #print "skipping line: "+line.strip("\n")
+            line = f.readline()
+            continue
+        types_tmp.append(atomtypes[line.split()[1]]) # map str type to int type
+        line = f.readline()
+    
+    # extend types to num_chains - 1 chains
+    types_per_chain = len(types_tmp)
+    for i in range(num_chains):
+        types.extend(types_tmp)
+        
+    return types
+
+def storeBonds(f, types, bondtypes, bonds, molecule, monomers, num_chains):
+    line = ''
+    bonds_tmp = []
+    top = False
+    pos = f.tell()
+    while not 'bonds' in line:
+        line = f.readline()
+        if 'moleculetype' in line:
+            f.seek(pos)
+            return bonds
+        if not line: break # break out of while if EOF
+    line = f.readline()
+    while(len(line) > 1):
+        if line[0] == ";":   # skip comment lines
+            line = f.readline()
+            continue
+        tmp = line.split()
+        pid1, pid2, fun = map(int, tmp[0:3])
+        if (fun < 8):
+            pot = fun
+        elif (fun > 7) and (len(tmp) == 3): # look for the potential in the bondtypes dict
+            t1, t2 = types[pid1-1], types[pid2-1]
+            if t1 > t2: # interactions in the other way
+                t1, t2 = t2, t1
+            pot = bondtypes[t1][t2]
+        elif (fun > 7) and (len(tmp) > 3):
+            pot = tmp[3]
+        else:
+            print "error while reading bond potential, line:"
+            print line
+            exit()
+        bonds_tmp.append((pid1 + ((monomers * num_chains) * (molecule-1)), \
+                           pid2 + ((monomers * num_chains) * (molecule-1)), pot))
+        line = f.readline()
+        
+    # extend bonds to num_chains - 1 chains
+    bonds_per_chain = len(bonds_tmp)
+    for i in range(num_chains):
+        for j in range(bonds_per_chain):
+            pid1, pid2, pot = bonds_tmp[j][0:3]
+            if pot in bonds:
+                bonds[pot].append((pid1 + (i * monomers), \
+                                   pid2 + (i * monomers)))
+            else:
+                bonds.update({pot:[(pid1 + (i * monomers), \
+                                    pid2 + (i * monomers))]})
+    
+    return bonds
+        
+
+def storeAngles(f, types, angletypes, angles, molecule, monomers, num_chains):
+    line = ''
+    angles_tmp = []
+    pos = f.tell()
+    while not 'angles' in line:
+        line = f.readline()
+        if 'moleculetype' in line:
+            f.seek(pos)
+            return angles
+        if not line: break # break out of while if EOF
+    line = f.readline()
+    while(len(line) > 1):
+        if line[0] == ";": # skip comment lines
+            line = f.readline()
+            continue
+        tmp = line.split()
+        pid1, pid2, pid3, fun = map(int, tmp[0:4])
+        if (fun < 8):
+            pot = fun
+        elif (fun > 7) and (len(tmp) == 4): # look for the potential in the angletypes dict
+            t1, t2, t3 = types[pid1-1], types[pid2-1], types[pid3-1]
+            if t1 not in angletypes: # interactions in the other way
+                t1, t3 = t3, t1
+            pot = angletypes[t1][t2][t3]
+        elif (fun > 7) and (len(tmp) > 4):
+            pot = tmp[4]
+        else:
+            print "error while reading angle potential, line:"
+            print line
+            exit()
+        angles_tmp.append((pid1 + ((monomers * num_chains) * (molecule-1)), \
+                            pid2 + ((monomers * num_chains) * (molecule-1)), \
+                             pid3 + ((monomers * num_chains) * (molecule-1)), pot))
+        line = f.readline()
+    
+    # extend angles to num_chains - 1 chains
+    angles_per_chain = len(angles_tmp)
+    for i in range(num_chains):
+        for j in range(angles_per_chain):
+            pid1, pid2, pid3, pot = angles_tmp[j][0:4]
+            if pot in angles:
+                angles[pot].append((pid1 + (i * monomers), \
+                                    pid2 + (i * monomers), \
+                                    pid3 + (i * monomers)))
+            else:
+                angles.update({pot:[(pid1 + (i * monomers), \
+                                     pid2 + (i * monomers), \
+                                     pid3 + (i * monomers))]})
+    
+    return angles
+
+
+def storeDihedrals(f, types, dihedraltypes, dihedrals, molecule, monomers, num_chains):
+    line = ''
+    dihedrals_tmp = []
+    pos = f.tell()
+    while not 'dihedrals' in line:
+        line = f.readline()
+        if 'moleculetype' in line:
+            f.seek(pos)
+            return dihedrals
+        if not line: break # break out of while if EOF
+    line = f.readline()
+    while(len(line) > 1):
+        if line[0] == ";": # skip comment lines
+            line = f.readline()
+            continue
+        tmp = line.split()
+        pid1, pid2, pid3, pid4, fun = map(int, tmp[0:5])
+        if (fun < 8):
+            pot = fun
+        elif (fun > 7) and (len(tmp) == 5): # look for the potential in the dihedraltypes dict
+            t1, t2, t3, t4 = types[pid1-1], types[pid2-1], types[pid3-1], types[pid4-1] # get types of particles
+            if t1 not in dihedraltypes: # interactions in the other way
+                t1, t2, t3, t4 = t4, t1, t2, t3
+            pot = dihedraltypes[t1][t2][t3][t4]
+        elif (fun > 7) and (len(tmp) > 5):
+            pot = tmp[5]
+        else:
+            print "error while reading dihedral potential, line:"
+            print line
+            exit()
+        dihedrals_tmp.append((pid1 + ((monomers * num_chains) * (molecule-1)), \
+                               pid2 + ((monomers * num_chains) * (molecule-1)), \
+                                pid3 + ((monomers * num_chains) * (molecule-1)), \
+                                 pid4 + ((monomers * num_chains) * (molecule-1)), pot ))
+        line = f.readline()
+    
+    # extend dihedrals to num_chains - 1 chains
+    dihedrals_per_chain = len(dihedrals_tmp)
+    for i in range(num_chains):
+        for j in range(dihedrals_per_chain):
+            pid1, pid2, pid3, pid4, pot = dihedrals_tmp[j][0:5]
+            if pot in dihedrals:
+                dihedrals[pot].append((pid1 + (i * monomers), \
+                                       pid2 + (i * monomers), \
+                                       pid3 + (i * monomers), \
+                                       pid4 + (i * monomers)))
+            else:
+                dihedrals.update({pot:[(pid1 + (i * monomers), \
+                                        pid2 + (i * monomers), \
+                                        pid3 + (i * monomers), \
+                                        pid4 + (i * monomers))]})
+    
+    return dihedrals
 
 
 
