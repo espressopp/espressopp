@@ -128,7 +128,7 @@ class StorageLocal(object):
                     elif val.lower() == "f": index_f = nindex
                     elif val.lower() == "q": index_q = nindex
                     elif val.lower() == "adrat": index_adrAT = nindex
-                    else: raise "unknown particle property: %s"%val
+                    else: raise SyntaxError("unknown particle property: %s"%val)
                     nindex += 1
 
             if index_id < 0  : raise "particle property id is mandatory"
@@ -138,7 +138,7 @@ class StorageLocal(object):
 
                 # verify that each particle has enough entries, avoids index errors
                 if len(particle) != nindex:
-                    raise "particle has %d entries, but %d expected"%(len(particle), nindex)
+                    raise SyntaxError("particle has %d entries, but %d expected"%(len(particle), nindex))
 
                 id = particle[index_id]
                 pos = particle[index_pos]
@@ -190,7 +190,7 @@ class StorageLocal(object):
                   elif property.lower() == "v"    : particle.v    = value
                   elif property.lower() == "f"    : particle.f    = value
                   elif property.lower() == "q"    : particle.q    = value
-                  else: raise UnknownParticleProperty( 'unknown particle property: %s' % property)
+                  else: raise SyntaxError( 'unknown particle property: %s' % property) # UnknownParticleProperty exception is not implemented
               except ParticleDoesNotExistHere:
                 self.logger.debug("ParticleDoesNotExistHere pid=% rank=%i" % (pid, pmi.rank))
                 pass
