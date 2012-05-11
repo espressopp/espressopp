@@ -23,6 +23,14 @@ using namespace std;
 
 typedef complex<double> dcomplex;
 
+// the following two constants are not defined everywhere (e.g. not in Mac OS X)
+#ifndef M_PIl
+#define M_PIl 3.1415926535897932384626433832795029L
+#endif
+#ifndef M_2_SQRTPIl
+#define M_2_SQRTPIl 1.1283791670955125738961589031215452L
+#endif
+
 #define M_2PI (2*M_PIl)
 #define M_PI2 (M_PIl*M_PIl)
 
@@ -94,8 +102,9 @@ namespace espresso {
         Lx = Li[0];
         Ly = Li[1];
         Lz = Li[2];
-        
-        real skmaxsq = pow( kmax / min(Lx, min(Ly,Lz)), 2 ); // we choose the biggest cutoff 
+       
+        int skmax = kmax / min(Lx, min(Ly,Lz)); 
+        real skmaxsq = skmax * skmax ; // we choose the biggest cutoff 
         
         rclx = M_2PI / Lx;
         rcly = M_2PI / Ly;
@@ -114,9 +123,9 @@ namespace espresso {
         /* calculate the k-vector array */
         int ksq, kx2, ky2, kz2;
         real rksq, rkx2, rky2, rkz2;
-        real rLx2 = 1. / pow( Lx, 2 );
-        real rLy2 = 1. / pow( Ly, 2 );
-        real rLz2 = 1. / pow( Lz, 2 );
+        real rLx2 = 1. / ( Lx * Lx );
+        real rLy2 = 1. / ( Ly * Ly );
+        real rLz2 = 1. / ( Lz * Lz );
         real rk2PIx, rk2PIy, rk2PIz;
         kVectorLength = 0;
         // clear all vectors
@@ -131,15 +140,15 @@ namespace espresso {
         virialPref.clear();
         virialTensorPref.clear();
         for(int kx = 0; kx <= kmax; kx++){
-          kx2  = pow( kx, 2 );
+          kx2  = kx * kx;
           rkx2 = kx2 * rLx2;
           rk2PIx = kx * rclx;
           for(int ky = -kmax; ky <= kmax; ky++){
-            ky2  = pow( ky, 2 );
+            ky2  = ky * ky;
             rky2 = ky2 * rLy2;
             rk2PIy = ky * rcly;
             for(int kz = -kmax; kz <= kmax; kz++) {
-              kz2  = pow( kz, 2 );
+              kz2  = kz * kz;
               rkz2 = kz2 * rLz2;
               rk2PIz = kz * rclz;
               
