@@ -37,7 +37,7 @@ defined.
 Example:
 
     >>> rng = espresso.esutil.RNG()
-    >>> langevinP = espresso.integrator.LangevinBarostat(system, rng)
+    >>> langevinP = espresso.integrator.LangevinBarostat(system, rng, desiredTemperature)
     >>> langevinP.gammaP = 0.05
     >>> langevinP.pressure = 1.0
     >>> langevinP.mass = pow(10.0, 4)
@@ -45,15 +45,15 @@ Example:
 
 **!IMPORTANT**  This barostat is supposed to be run in a couple with thermostat in order 
 to simulate the *npt* ensamble, because the term :math:`R_{p}` needs the temperature as a 
-parameter. Otherwise it will set the temperature to 1.0.
+parameter. 
 
 Definition:
 
     In order to define the Langevin-Hoover barostat
     
-    >>> langevinP = espresso.integrator.LangevinBarostat(system, rng)
+    >>> langevinP = espresso.integrator.LangevinBarostat(system, rng, desiredTemperature)
     
-    one should have the System_ and RNG_ defined.
+    one should have the System_ and RNG_ defined and know the desired temperature.
 
 .. _System: espresso.System.html
 .. _RNG:
@@ -71,6 +71,17 @@ Properties:
 *   *langevinP.mass*
 
     The property 'mass' defines the fictitious mass :math:`W`.
+
+Methods:
+
+*   *setMassByFrequency( frequency )*
+
+    Set the proper *langevinP.mass* using expression :math:`W=dNk_{b}T/\omega_{b}^{2}`, where
+    frequency, :math:`\omega_{b}`, is the frequency of required volume fluctuations. The value of
+    :math:`\omega_{b}` should be less then the lowest frequency which appears in the NVT temperature
+    spectrum [Quigley04]_ in order to match the canonical distribution. :math:`d` - dimensions,
+    :math:`N` - number of particles, :math:`k_{b}` - Boltzmann constant, :math:`T` - desired
+    temperature.
     
 Setting the integration property:
     
@@ -81,7 +92,7 @@ Setting the integration property:
 One more example:
 
     >>> rngBaro = espresso.esutil.RNG()
-    >>> lP = espresso.integrator.LangevinBarostat(system, rngBaro)
+    >>> lP = espresso.integrator.LangevinBarostat(system, rngBaro, desiredTemperature)
     >>> lP.gammaP = .5
     >>> lP.pressure = 1.0
     >>> lP.mass = pow(10.0, 5)
@@ -94,7 +105,7 @@ Canceling the barostat:
 
     >>> # define barostat with parameters
     >>> rngBaro = espresso.esutil.RNG()
-    >>> lP = espresso.integrator.LangevinBarostat(system, rngBaro)
+    >>> lP = espresso.integrator.LangevinBarostat(system, rngBaro, desiredTemperature)
     >>> lP.gammaP = .5
     >>> lP.pressure = 1.0
     >>> lP.mass = pow(10.0, 5)
@@ -121,12 +132,16 @@ from espresso import pmi
 from _espresso import integrator_LangevinBarostat
 
 class LangevinBarostatLocal(integrator_LangevinBarostat):
-  def __init__(self, system, rng):
+  def __init__(self, system, rng, temperature):
     'The (local) Velocity Verlet Integrator.'
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      cxxinit(self, integrator_LangevinBarostat, system, rng)
+      cxxinit(self, integrator_LangevinBarostat, system, rng, temperature)
 
 if pmi.isController :
   class LangevinBarostat(object):
     __metaclass__ = pmi.Proxy
-    pmiproxydefs = dict( cls =  'espresso.integrator.LangevinBarostatLocal', pmiproperty = [ 'gammaP', 'pressure', 'mass' ] )
+    pmiproxydefs = dict(
+      cls =  'espresso.integrator.LangevinBarostatLocal',
+      pmiproperty = [ 'gammaP', 'pressure', 'mass' ],
+      pmicall = [ "setMassByFrequency" ]
+    )

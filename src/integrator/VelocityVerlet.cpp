@@ -121,18 +121,8 @@ namespace espresso {
 
       if (langevin) langevin->initialize(dt);
 
-      // @TODO temperature should be introduced nicely
       if (langevinBarostat){
-        if(langevin)
-          langevinBarostat->initialize(dt, langevin->getTemperature());
-        else if(berendsenThermostat)
-          langevinBarostat->initialize(dt, berendsenThermostat->getTemperature());
-        else if(isokinetic)
-          langevinBarostat->initialize(dt, isokinetic->getTemperature());
-        else if(stochasticVelocityRescaling)
-          langevinBarostat->initialize(dt, stochasticVelocityRescaling->getTemperature());
-        else
-          langevinBarostat->initialize(dt, 1.0);
+        langevinBarostat->initialize(dt);
       }
       
       if (berendsenBarostat) berendsenBarostat->initialize(dt);
