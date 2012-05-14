@@ -7,6 +7,10 @@
 #include "Potential.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
+#ifndef M_2_SQRTPIl
+#define M_2_SQRTPIl 1.1283791670955125738961589031215452L
+#endif
+
 using namespace std;
 
 namespace espresso {

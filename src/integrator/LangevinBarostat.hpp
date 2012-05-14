@@ -10,13 +10,12 @@ namespace espresso {
   namespace integrator {
 
     /** Barostat. In a couple with Langevin thermostat it performs Langevin dynamics in 
-     * a Hoover-style extendet system. See
+     * a Hoover-style extended system. See
      * D. Quigley, M.I.J. Probert, J. Chem. Phys., 120, 2004, p. 11432 */
     class LangevinBarostat : public SystemAccess {
 
       public:
-
-        LangevinBarostat(shared_ptr< System >, shared_ptr< esutil::RNG >);
+        LangevinBarostat(shared_ptr< System >, shared_ptr< esutil::RNG >, real);
 
         void setGammaP(real);
         real getGammaP();
@@ -27,10 +26,11 @@ namespace espresso {
         void setMass(real);
         real getMass();
 
+        void setMassByFrequency(real);
+        
         ~LangevinBarostat();
 
-        void initialize(real, real);    // initialize barostat prefactors. It needs timestep and
-                                        // desired temperature
+        void initialize(real);    // initialize barostat prefactors. It needs timestep.
 
         void updVolume(real);           // scale the volume according to the evolution equations
         void updVolumeMomentum(real);   // update local momentum which corresponds to the volume variable
@@ -48,9 +48,12 @@ namespace espresso {
         real mass;                  // fictitious mass
         real externalPressure;      // desired external pressure
         
+        real desiredTemperature;    // desired temperature
+        
         // system variable
         real momentum;              // momentum variable corresponding to the volume variable
         real momentum_mass;         // momentum variable divided by mass pe/w
+        
         
         real pref3;  // prefactor, force term
         real pref4;  // prefactor, for the volume momentum

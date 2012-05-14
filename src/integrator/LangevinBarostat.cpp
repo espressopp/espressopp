@@ -26,7 +26,12 @@ namespace espresso {
 
     // TODO It is very sensitive to parameters (the ensemble). The manual how to choose the
     // parameters for simple system should be written.
-    LangevinBarostat::LangevinBarostat(shared_ptr<System> _system, shared_ptr< esutil::RNG > _rng) : SystemAccess(_system), rng(_rng){
+    // one of the parametes should be desired temperature
+    LangevinBarostat::LangevinBarostat(shared_ptr<System> _system,
+                                       shared_ptr<esutil::RNG> _rng,
+                                       real _temperature) : SystemAccess(_system), 
+                                                            rng(_rng), 
+                                                            desiredTemperature(_temperature){
       // external parameters
       gammaP = 0.0;
       mass = 0.0;
@@ -58,6 +63,19 @@ namespace espresso {
     }
     real LangevinBarostat::getMass(){
       return mass;
+    }
+    
+    // 
+    void LangevinBarostat::setMassByFrequency(real freq){
+      System& system = getSystemRef();
+      int N = 0;
+      int Nloc = system.storage->getNRealParticles();
+      boost::mpi::all_reduce(*mpiWorld, Nloc, N, std::plus<int>());
+      
+      // TODO introduce dimension as a parameter
+      real d = 3;
+      
+      mass = d*N*desiredTemperature / (freq*freq);
     }
 
     LangevinBarostat::~LangevinBarostat(){}
@@ -157,7 +175,7 @@ namespace espresso {
       LOG4ESPP_TRACE(theLogger, "new particle force = " << p.force());
     }
 
-    void LangevinBarostat::initialize(real timestep, real desiredTemperature){
+    void LangevinBarostat::initialize(real timestep){
       // calculate the prefactors
       LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
                                ", gammaP = " << gammaP << 
@@ -194,11 +212,14 @@ namespace espresso {
 
       class_<LangevinBarostat, shared_ptr<LangevinBarostat> >
 
-        ("integrator_LangevinBarostat", init< shared_ptr<System>, shared_ptr<esutil::RNG> >())
+        ("integrator_LangevinBarostat", init< shared_ptr<System>, shared_ptr<esutil::RNG>, real >() )
 
         .add_property("gammaP", &LangevinBarostat::getGammaP, &LangevinBarostat::setGammaP)
         .add_property("pressure", &LangevinBarostat::getPressure, &LangevinBarostat::setPressure)
-        .add_property("mass", &LangevinBarostat::getMass, &LangevinBarostat::setMass);
+        .add_property("mass", &LangevinBarostat::getMass, &LangevinBarostat::setMass)
+      
+        .def("setMassByFrequency", &LangevinBarostat::setMassByFrequency)
+      ;
     }
 
   }
