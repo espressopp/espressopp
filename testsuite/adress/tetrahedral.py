@@ -17,11 +17,11 @@ from espresso.tools import timers
 #logging.getLogger("BC").setLevel(logging.DEBUG)
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
-steps = 10000
+steps = 1000
 rc = 2.31 # CG cutoff, Morse
 rca = 1.122462048309373 # AT cutoff (2^(1/6)), WCA
 skin = 0.8
-nvt = True
+nvt = False
 timestep = 0.001
 intervals = 10
 
@@ -215,8 +215,12 @@ system.addInteraction(interLJ)
 
 
 # AdResS integrator
-integrator = espresso.integrator.VelocityVerletAdress(system)
+#integrator = espresso.integrator.VelocityVerletAdress(system)
+integrator = espresso.integrator.VelocityVerlet(system)
 integrator.dt = timestep
+
+adress = espresso.Adress(system, integrator)
+
 
 if(nvt):
   langevin = espresso.integrator.Langevin(system)
