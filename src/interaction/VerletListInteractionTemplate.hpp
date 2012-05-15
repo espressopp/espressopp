@@ -121,13 +121,12 @@ namespace espresso {
       }
 
       real esum=0;
-      boost::mpi::reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>(), 0);
+      // ??? reduce doesn't work for barostating!
+      // boost::mpi::reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>(), 0);
+      boost::mpi::all_reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>());
       
       return esum;
     }
-
-
-
 
 
     template < typename _Potential > inline real
@@ -154,7 +153,9 @@ namespace espresso {
       }
 
       real wsum;
-      boost::mpi::reduce(*mpiWorld, w, wsum, std::plus<real>(), 0);
+      // ??? reduce doesn't work for barostating!
+      //boost::mpi::reduce(*mpiWorld, w, wsum, std::plus<real>(), 0);
+      boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
       return wsum; 
     }
 

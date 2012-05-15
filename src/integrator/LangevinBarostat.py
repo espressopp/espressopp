@@ -83,6 +83,9 @@ Methods:
     :math:`N` - number of particles, :math:`k_{b}` - Boltzmann constant, :math:`T` - desired
     temperature.
     
+**NOTE** The *langevinP.mass* can be set both directly and using the 
+(*setMassByFrequency( frequency )*) 
+
 Setting the integration property:
     
     >>> integrator.langevinBarostat = langevinP

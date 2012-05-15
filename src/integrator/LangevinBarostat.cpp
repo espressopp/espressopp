@@ -135,8 +135,10 @@ namespace espresso {
       for (size_t j = 0; j < srIL.size(); j++) {
         rij_dot_Fij += srIL[j]->computeVirial();
       }
-      real p_nonbonded = 0.0;
-      mpi::all_reduce( communic, rij_dot_Fij, p_nonbonded, std::plus<real>());
+      real p_nonbonded = rij_dot_Fij;
+      //mpi::all_reduce( communic, rij_dot_Fij, p_nonbonded, std::plus<real>());
+      
+      // TODO optimization is needed, some terms are the same at the begin and at the end of integration
       
       // @TODO one should check that X is not the instantaneous pressure, 
       // because it does not include the white noise from thermostat
@@ -154,14 +156,13 @@ namespace espresso {
     
     void LangevinBarostat::updForces(){
       LOG4ESPP_DEBUG(theLogger, "barostating");
-
+      
       System& system = getSystemRef();
       CellList cells = system.storage->getRealCells();
-
+      
       real factor = pref3  * momentum_mass;
-      for(CellListIterator cit(cells); !cit.isDone(); ++cit){
+      for(CellListIterator cit(cells); !cit.isDone(); ++cit)
         frictionBarostat(*cit, factor);
-      }
     }
     
     real LangevinBarostat::updDisplacement(){
@@ -174,7 +175,7 @@ namespace espresso {
       
       LOG4ESPP_TRACE(theLogger, "new particle force = " << p.force());
     }
-
+     
     void LangevinBarostat::initialize(real timestep){
       // calculate the prefactors
       LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
@@ -199,8 +200,8 @@ namespace espresso {
       // pressure friction prefactor
       pref4 = -gammaP;
       
-      // uniform distribution prefactor. (it could be used instead of normal distribution)
-      pref5 = 2.0 * sqrt(2.0 * desiredTemperature * gammaP * mass / timestep);
+      // uniform distribution prefactor. (it can be used instead of normal distribution)
+      pref5 = sqrt( 8.0 * desiredTemperature * gammaP * mass / timestep );
     }
 
     /****************************************************

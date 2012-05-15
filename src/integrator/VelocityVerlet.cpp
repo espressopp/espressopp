@@ -126,9 +126,7 @@ namespace espresso {
       /* -- use signal instead
       if (langevin) langevin->initialize(dt);
 
-      if (langevinBarostat){
-        langevinBarostat->initialize(dt);
-      }
+      if (langevinBarostat) langevinBarostat->initialize(dt);
       
       if (berendsenBarostat) berendsenBarostat->initialize(dt);
       if (berendsenThermostat) berendsenThermostat->initialize(dt);
@@ -371,18 +369,12 @@ namespace espresso {
         
         // use signal instead ?
         /*
-        //if(langevinBarostat) deltaP += (langevinBarostat->updDisplacement()) * cit->position(); // updDisplacement is just coefficient
+        if(langevinBarostat) deltaP += (langevinBarostat->updDisplacement()) * cit->position(); // updDisplacement is just coefficient
 
         deltaP *= dt;
 
-        if (fixPositions) {
-        	fixPositions->apply(cit->id(), cit->velocity(), deltaP);
-            cit->position() += deltaP;
-            sqDist += deltaP * deltaP;
-        } else {
-            cit->position() += deltaP;
-            sqDist += deltaP * deltaP;
-        }
+        if (fixPositions) fixPositions->apply(cit->id(), cit->velocity(), deltaP);
+
         */
 
         deltaP *= dt;
