@@ -121,9 +121,7 @@ namespace espresso {
 
       if (langevin) langevin->initialize(dt);
 
-      if (langevinBarostat){
-        langevinBarostat->initialize(dt);
-      }
+      if (langevinBarostat) langevinBarostat->initialize(dt);
       
       if (berendsenBarostat) berendsenBarostat->initialize(dt);
       if (berendsenThermostat) berendsenThermostat->initialize(dt);
@@ -336,14 +334,9 @@ namespace espresso {
         
         deltaP *= dt;
 
-        if (fixPositions) {
-        	fixPositions->apply(cit->id(), cit->velocity(), deltaP);
-            cit->position() += deltaP;
-            sqDist += deltaP * deltaP;
-        } else {
-            cit->position() += deltaP;
-            sqDist += deltaP * deltaP;
-        }
+        if (fixPositions) fixPositions->apply(cit->id(), cit->velocity(), deltaP);
+        cit->position() += deltaP;
+        sqDist += deltaP * deltaP;
 
         count++;
 

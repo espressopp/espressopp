@@ -58,7 +58,7 @@ namespace espresso {
       LOG4ESPP_DEBUG(theLogger, "thermalize");
 
       System& system = getSystemRef();
-
+      
       CellList cells = system.storage->getRealCells();
 
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {

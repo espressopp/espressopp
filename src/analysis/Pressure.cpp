@@ -20,7 +20,7 @@ namespace espresso {
   
       // determine volume of the box
       Real3D Li = system.bc->getBoxL();
-      real V = Li[0] * Li[1] * Li[2];
+      real tripleV = 3.0 * Li[0] * Li[1] * Li[2];
 
       // compute the kinetic contriubtion (2/3 \sum 1/2mv^2)
       real p_kinetic;
@@ -33,7 +33,7 @@ namespace espresso {
         v2 = v2 + p.mass() * (p.velocity() * p.velocity());
       }
       boost::mpi::all_reduce(*mpiWorld, v2, v2sum, std::plus<real>());
-      p_kinetic = v2sum / (3.0 * V);
+      p_kinetic = v2sum / tripleV;
       
       // compute the short-range nonbonded contribution
       real rij_dot_Fij = 0.0;
@@ -43,8 +43,9 @@ namespace espresso {
         rij_dot_Fij += srIL[j]->computeVirial();
       }
 
-      real p_nonbonded;
-      mpi::all_reduce(*mpiWorld, rij_dot_Fij / (3.0 * V), p_nonbonded, std::plus<real>());
+      real p_nonbonded = rij_dot_Fij / tripleV;
+      // computeVirial() returns already reduced value
+      //mpi::all_reduce(*mpiWorld, rij_dot_Fij / (3.0 * V), p_nonbonded, std::plus<real>());
  
       return (p_kinetic + p_nonbonded);
     }
