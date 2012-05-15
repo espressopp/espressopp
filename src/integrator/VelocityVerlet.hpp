@@ -52,8 +52,25 @@ namespace espresso {
 
         void resetTimers();
 
-        // signal to save positions before integration. Used for constraints.
-		//boost::signals2::signal0 <void> saveOldPos;
+
+        // signal used for constraints
+        //boost::signals2::signal0 <void> saveOldPos;
+		//boost::signals2::signal0 <void> applyPosConst;
+		//boost::signals2::signal0 <void> applyVelConst;
+
+
+        // signals to extend the integrator
+        boost::signals2::signal0 <void> runInit; // initialization of run()
+        boost::signals2::signal0 <void> recalc1; // inside recalc, before updateForces()
+        boost::signals2::signal0 <void> recalc2; // inside recalc, after  updateForces()
+        boost::signals2::signal0 <void> befIntP; // before integrate1()
+        boost::signals2::signal1 <void, real&> inIntP; // inside end of integrate1()
+        boost::signals2::signal0 <void> aftIntP; // after  integrate1()
+        boost::signals2::signal0 <void> aftInitF; // after initForces()
+        boost::signals2::signal0 <void> aftCalcF; // after calcForces()
+        boost::signals2::signal0 <void> befIntV; // before integrate2()
+        boost::signals2::signal0 <void> aftIntV; // after  integrate2()
+
 
 
         /** Register this class so it can be used from Python. */
@@ -65,6 +82,7 @@ namespace espresso {
         real maxDist;
 
         real maxCut;
+
 
         shared_ptr< class Langevin > langevin;  //!< Langevin thermostat if available
 

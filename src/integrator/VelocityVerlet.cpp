@@ -119,6 +119,11 @@ namespace espresso {
 
       storage::Storage& storage = *system.storage;
 
+
+      // signal
+      runInit();
+
+      /* -- use signal instead
       if (langevin) langevin->initialize(dt);
 
       if (langevinBarostat){
@@ -127,6 +132,8 @@ namespace espresso {
       
       if (berendsenBarostat) berendsenBarostat->initialize(dt);
       if (berendsenThermostat) berendsenThermostat->initialize(dt);
+      */
+
       
       // no more needed: setUp();
 
@@ -149,14 +156,21 @@ namespace espresso {
 
         LOG4ESPP_INFO(theLogger, "recalc Forces");
 
-        if (langevin) langevin->heatUp();
+        // signal
+        recalc1();
+
+        //if (langevin) langevin->heatUp();
         //if (langevinBarostat) langevinBarostat->heatUp();   do it needs heatUp analog?
         
         updateForces();
         if (LOG4ESPP_DEBUG_ON(theLogger)) {
             // printForces(false);   // forces are reduced to real particles
         }
-        if (langevin) langevin->coolDown();
+
+        // signal
+        recalc2();
+
+        //if (langevin) langevin->coolDown();
         //if (langevinBarostat) langevinBarostat->coolDown();  the same question like for heatUp
       }
 
@@ -170,9 +184,18 @@ namespace espresso {
 
         //saveOldPos(); // save particle positions needed for constraints
 
+        // signal
+        befIntP();
+
+
         time = timeIntegrate.getElapsedTime();
         maxDist += integrate1();
         timeInt1 += timeIntegrate.getElapsedTime() - time;
+
+
+        // signal
+        aftIntP();
+
 
         LOG4ESPP_INFO(theLogger, "maxDist = " << maxDist << ", skin/2 = " << skinHalf);
 
@@ -191,16 +214,26 @@ namespace espresso {
 
         updateForces();
 
+
+        // signal
+        befIntV();
+
+
         time = timeIntegrate.getElapsedTime();
         integrate2();
         timeInt2 += timeIntegrate.getElapsedTime() - time;
         
+
+        // signal
+        aftIntV();
+
+
+        /* -- use signals instead
         if (berendsenThermostat) berendsenThermostat->thermostat(); // adjust temperature
         if (berendsenBarostat) berendsenBarostat->barostat(); // adjust pressure
-
         if (isokinetic) isokinetic->rescaleVelocities(); // scale all particle velocities to match isokinetic temperature
-
         if (stochasticVelocityRescaling) stochasticVelocityRescaling->rescaleVelocities(); // scale all particle velocities according to a canonical distribution
+        */
 
       }
 
@@ -291,12 +324,15 @@ namespace espresso {
       System& system = getSystemRef();
       real half_dt = 0.5 * dt; 
 
+
+      /* -- use signal instead
       if (langevinBarostat){
-        /* update the volume V(t+0.5*dt)=V(t)+dt/2. * V'  */
+        // update the volume V(t+0.5*dt)=V(t)+dt/2. * V'
         langevinBarostat->updVolume( dt );
-        /* update the local barostat momentum pe(t+0.5*dt)=pe(t)+dt/2. * pe'  */
+        // update the local barostat momentum pe(t+0.5*dt)=pe(t)+dt/2. * pe'
         langevinBarostat->updVolumeMomentum( half_dt );
       }
+      */
       
       CellList realCells = system.storage->getRealCells();
 
@@ -332,8 +368,11 @@ namespace espresso {
         // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt) 
         Real3D deltaP = cit->velocity();
 
-        if(langevinBarostat) deltaP += (langevinBarostat->updDisplacement()) * cit->position(); // updDisplacement is just coefficient
         
+        // use signal instead ?
+        /*
+        //if(langevinBarostat) deltaP += (langevinBarostat->updDisplacement()) * cit->position(); // updDisplacement is just coefficient
+
         deltaP *= dt;
 
         if (fixPositions) {
@@ -344,12 +383,23 @@ namespace espresso {
             cit->position() += deltaP;
             sqDist += deltaP * deltaP;
         }
+        */
+
+        deltaP *= dt;
+        cit->position() += deltaP;
+        sqDist += deltaP * deltaP;
+
 
         count++;
 
         maxSqDist = std::max(maxSqDist, sqDist);
       }
       
+
+
+      // signal
+      inIntP(maxSqDist);
+
       real maxAllSqDist;
 
       mpi::all_reduce(*system.comm, maxSqDist, maxAllSqDist, boost::mpi::maximum<real>());
@@ -381,12 +431,15 @@ namespace espresso {
         cit->velocity() += dtfm * cit->force();
       }
       
+
+      /* -- use signal instead
       if (langevinBarostat){
-        /* update the local momentum pe(t+dt)=pe(t+0.5*dt)+dt/2. * pe'  */
+        // update the local momentum pe(t+dt)=pe(t+0.5*dt)+dt/2. * pe'
         langevinBarostat->updVolumeMomentum( half_dt );
-        /* update the volume V(t+dt)=V(t+0.5*dt)+dt/2. * V'  */
+        // update the volume V(t+dt)=V(t+0.5*dt)+dt/2. * V'
         langevinBarostat->updVolume( dt );
-      }
+      }*/
+
       
       step++;
     }
@@ -418,6 +471,10 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "calculate forces");
 
       initForces();
+
+      // signal
+      aftInitF();
+
 
       System& sys = getSystemRef();
 
@@ -458,8 +515,11 @@ namespace espresso {
       }
       timeComm2 += timeIntegrate.getElapsedTime() - time;
 
-      if (langevin) langevin->thermalize();
-      if (langevinBarostat) langevinBarostat->updForces();
+      // signal
+      aftCalcF();
+
+      //if (langevin) langevin->thermalize();
+      //if (langevinBarostat) langevinBarostat->updForces();
     }
 
     /*****************************************************************************/
