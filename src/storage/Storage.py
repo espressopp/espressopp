@@ -14,6 +14,14 @@ All derived classes implement at least the following methods:
 
    Add a particle to the storage
    
+* `removeParticle(pid)`:
+
+   Remove a particle with id number *pid* from the storage.
+   
+   >>> system.storage.removeParticle(4)
+   
+   There is an example in *examples* folder
+   
 * `getParticle(pid)`:
 
    Get a particle object.
@@ -83,6 +91,19 @@ class StorageLocal(object):
             self.cxxclass.addParticle(
                 self, pid, toReal3DFromVector(*args)
                 )
+                
+    def removeParticle(self, pid):
+      'remove a particle'
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        particle = self.getParticle(pid)
+        # TODO at the moment one can remove the nonexisting particle. Should be fixed.
+        if particle:
+          try:
+            self.cxxclass.removeParticle(self, pid)
+          except ParticleDoesNotExistHere:
+            self.logger.debug("ParticleDoesNotExistHere pid=% rank=%i" % (pid, pmi.rank))
+            pass
+        
             
     def addAdrATParticle(self, pid, *args):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -199,7 +220,7 @@ if pmi.isController:
     class Storage(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            pmicall = [ "decompose", "addParticles", "setFixedTuples", "modifyParticle" ],
+            pmicall = [ "decompose", "addParticles", "setFixedTuples", "modifyParticle", "removeParticle" ],
             pmiproperty = [ "system" ]
             )
 

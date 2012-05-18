@@ -220,7 +220,41 @@ namespace espresso {
 
       return &cell->particles.back();
     }
+    
+    void Storage::removeParticle(longint id){
+      
+      Particle* p = lookupRealParticle(id);
+      
+      if(p){
+        //cout << "sentPart: " << p->position() << endl;
+        
+        Cell *cell = mapPositionToCellChecked(p->position());
+        
+        int cellSize = cell->particles.size();
+        int ind_er = -1;
+        for (size_t ind = 0; ind < cellSize; ++ind) {
+          if(id==cell->particles[ind].id()){
+            ind_er = ind;
+            break;
+          }
+        }
 
+    	int newSize = cellSize - 1;
+    	if (ind_er != newSize) {
+          cell->particles[ind_er] = cell->particles.back();
+    	}
+    	cell->particles.resize(newSize);
+
+        //localParticles.erase(id);
+        removeFromLocalParticles( p );
+
+        ParticleList &pl = cell->particles;
+
+        updateLocalParticles( pl );
+
+        onParticlesChanged();
+      }
+    }
 
     Particle* Storage::addAdrATParticle(longint id, const Real3D& p, const Real3D& _vpp) {
 
@@ -604,6 +638,8 @@ namespace espresso {
 	.def("addParticle", &Storage::addParticle, 
 	     return_value_policy< reference_existing_object >())
 
+	.def("removeParticle", &Storage::removeParticle)
+      
     .def("addAdrATParticle", &Storage::addAdrATParticle,
          return_value_policy< reference_existing_object >())
 
