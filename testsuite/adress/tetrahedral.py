@@ -219,7 +219,9 @@ system.addInteraction(interLJ)
 integrator = espresso.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
-adress = espresso.Adress(system, integrator)
+#extension = espresso.integrator.Extension(integrator)
+adress = espresso.integrator.Adress(system)
+integrator.addExtension(adress)
 
 
 if(nvt):
@@ -227,7 +229,6 @@ if(nvt):
   langevin.gamma = 0.5
   langevin.temperature = 1.0
   integrator.langevin = langevin
-  integrator.dt = timestep
 
 print ''
 print 'number of AT particles =', num_particles
