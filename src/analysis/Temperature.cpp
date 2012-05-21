@@ -29,7 +29,7 @@ namespace espresso {
 
       mpi::all_reduce(*getSystem()->comm, v2sum, sumT, std::plus<real>());
       mpi::all_reduce(*getSystem()->comm, myN, systemN, std::plus<int>());
-  
+      
       return sumT / (3.0 * systemN);
     }
 
