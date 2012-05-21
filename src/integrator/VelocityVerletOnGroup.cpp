@@ -375,8 +375,7 @@ namespace espresso {
 
       // Note: use noncopyable and no_init for abstract classes
 
-      class_<VelocityVerletOnGroup, shared_ptr<VelocityVerletOnGroup>, bases<MDIntegrator> >
-
+      class_<VelocityVerletOnGroup, bases<MDIntegrator>, boost::noncopyable >
         ("integrator_VelocityVerletOnGroup", init< shared_ptr<System>,  shared_ptr<ParticleGroup> >())
 
         .add_property("langevin", &VelocityVerletOnGroup::getLangevin, &VelocityVerletOnGroup::setLangevin)

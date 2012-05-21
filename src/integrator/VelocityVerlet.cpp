@@ -533,6 +533,12 @@ namespace espresso {
 
     /*****************************************************************************/
 
+    /*
+    System& getSystem() {
+        return getsystemRef();
+    }*/
+
+
     void VelocityVerlet::printForces(bool withGhosts)
     {
       // print forces of real + ghost particles

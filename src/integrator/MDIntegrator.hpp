@@ -6,6 +6,10 @@
 #include "types.hpp"
 #include "SystemAccess.hpp"
 
+#include "Extension.hpp"
+#include <boost/signals2.hpp>
+
+
 namespace espresso {
   namespace integrator {
 
@@ -14,6 +18,8 @@ namespace espresso {
         Note: Class accesses system object for storage, bc, communicator,
               interaction list.
     */
+
+    class Extension; //fwd declaration
 
     class MDIntegrator : public SystemAccess {
       public:
@@ -41,12 +47,34 @@ namespace espresso {
         /** This method runs the integration for a certain number of steps. */
         virtual void run(int nsteps) = 0;
 
+        void addExtension(shared_ptr<integrator::Extension> extension) {
+           //shared_ptr <MDIntegrator> integrator = this;
+           //shared_ptr <System> extension.system = this.getSystemRef();
+           //exList.push_back(extension);
+        }
+
+
+        // signals to extend the integrator
+        boost::signals2::signal0 <void> runInit; // initialization of run()
+        boost::signals2::signal0 <void> recalc1; // inside recalc, before updateForces()
+        boost::signals2::signal0 <void> recalc2; // inside recalc, after  updateForces()
+        boost::signals2::signal0 <void> befIntP; // before integrate1()
+        boost::signals2::signal1 <void, real&> inIntP; // inside end of integrate1()
+        boost::signals2::signal0 <void> aftIntP; // after  integrate1()
+        boost::signals2::signal0 <void> aftInitF; // after initForces()
+        boost::signals2::signal0 <void> aftCalcF; // after calcForces()
+        boost::signals2::signal0 <void> befIntV; // before integrate2()
+        boost::signals2::signal0 <void> aftIntV; // after  integrate2()
+
+
         /** Register this class so it can be used from Python. */
         static void registerPython();
 
       protected:
 
         bool timeFlag;
+
+        //ExtensionList exList;
 
         /** Integration step */
         long long step;
@@ -57,6 +85,12 @@ namespace espresso {
         /** Logger */
         static LOG4ESPP_DECL_LOGGER(theLogger);
     };
+
+    struct ExtensionList
+      : public std::vector<shared_ptr<Extension> > {
+      typedef esutil::ESPPIterator<std::vector<Extension> > Iterator;
+    };
+
   }
 }
 

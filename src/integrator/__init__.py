@@ -9,6 +9,8 @@ from espresso.integrator.Langevin import *
 from espresso.integrator.Isokinetic import *
 from espresso.integrator.StochasticVelocityRescaling import *
 from espresso.integrator.TDforce import *
+from espresso.integrator.Extension import *
+from espresso.integrator.Adress import *
 
 from espresso.integrator.BerendsenBarostat import *
 from espresso.integrator.BerendsenThermostat import *

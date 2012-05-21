@@ -59,6 +59,7 @@ namespace espresso {
 		//boost::signals2::signal0 <void> applyVelConst;
 
 
+        /* -- moved to superclass
         // signals to extend the integrator
         boost::signals2::signal0 <void> runInit; // initialization of run()
         boost::signals2::signal0 <void> recalc1; // inside recalc, before updateForces()
@@ -70,7 +71,9 @@ namespace espresso {
         boost::signals2::signal0 <void> aftCalcF; // after calcForces()
         boost::signals2::signal0 <void> befIntV; // before integrate2()
         boost::signals2::signal0 <void> aftIntV; // after  integrate2()
+        */
 
+        //System& getSystem();
 
 
         /** Register this class so it can be used from Python. */
