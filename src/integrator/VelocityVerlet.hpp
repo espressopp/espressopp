@@ -19,7 +19,7 @@ namespace espresso {
 
         ~VelocityVerlet();
 
-        // set & get termostat (Langevin)
+        /* TODO should be removed after signals will be tested
         void setLangevin(shared_ptr<class Langevin> langevin);
         shared_ptr<class Langevin> getLangevin() { return langevin; }
 
@@ -44,6 +44,7 @@ namespace espresso {
         // set & get FixPositions
         void setFixPositions(shared_ptr <class FixPositions> _fixPositions);
         shared_ptr<class FixPositions> getFixPositions () {return fixPositions; }
+        */
 
         void run(int nsteps);
         
@@ -87,21 +88,22 @@ namespace espresso {
         real maxCut;
 
 
+        /* TODO should be removed after signals will be tested
         shared_ptr< class Langevin > langevin;  //!< Langevin thermostat if available
-
         shared_ptr< class Isokinetic > isokinetic;  //!< Isokinetic thermostat if available
         shared_ptr< class StochasticVelocityRescaling > stochasticVelocityRescaling;  //!< Stochastic velocity rescaling thermostat if available
-
-        /** Method updates particle positions and velocities.
-            \return maximal square distance a particle has moved.
-        */
-
         shared_ptr< class BerendsenBarostat > berendsenBarostat;  //!< Berendsen barostat if available
         shared_ptr< class BerendsenThermostat> berendsenThermostat;  //!< Berendsen thermostat if available
         
         shared_ptr< class LangevinBarostat > langevinBarostat;  //!< Langevin-Hoover barostat if available
         
         shared_ptr< class FixPositions > fixPositions; // fix positions of a group of particles
+        */
+
+        /** Method updates particle positions and velocities.
+            \return maximal square distance a particle has moved.
+        */
+
 
         real integrate1();
 

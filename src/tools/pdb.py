@@ -7,6 +7,7 @@ def pdbwrite(filename, system, molsize=4):
   file.write(s)
   maxParticleID = int(espresso.analysis.MaxPID(system).compute())
   pid    = 0
+  addToPid = 0 # if pid begins from 0, then addToPid should be +1
   mol    = 0
   molcnt = 0
   #following http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
@@ -17,13 +18,15 @@ def pdbwrite(filename, system, molsize=4):
     particle = system.storage.getParticle(pid)
     if particle:
       if particle.pos:
+        if(pid==0):
+          addToPid = 1
         xpos   = particle.pos[0]
         ypos   = particle.pos[1]
         zpos   = particle.pos[2]
         type   = particle.type
         #st = "ATOM %6d  FE  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d\n"%(pid, mol, xpos, ypos, zpos, type)
         #following http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
-        st = "%-6s%5d %-4s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      T%03d%2s%2s\n"%('ATOM  ',pid,'FE','','UNX','F',mol%10000,'',xpos,ypos,zpos,0,0,type,'','')#the additional 'T' in the string is needed to be recognized as string,%10000 to obey the fixed-width format
+        st = "%-6s%5d %-4s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      T%03d%2s%2s\n"%('ATOM  ',pid+addToPid,'FE','','UNX','F',mol%10000,'',xpos,ypos,zpos,0,0,type,'','')#the additional 'T' in the string is needed to be recognized as string,%10000 to obey the fixed-width format
         file.write(st)
         pid    += 1
         molcnt += 1
@@ -42,22 +45,25 @@ def psfwrite(filename, system, maxdist=None, molsize=4):
   file = open(filename,'w')
   maxParticleID = int(espresso.analysis.MaxPID(system).compute())
   nParticles    = int(espresso.analysis.NPart(system).compute())
-  file.write("PSF\n")
-  st = "%8d !NATOM\n" % nParticles
+  file.write("PSF CMAP\n")
+  st = "\n%8d !NATOM\n" % nParticles
   file.write(st)
   
   pid    = 0
+  addToPid = 0 # if pid begins from 0, then addToPid should be +1
   mol    = 0
   molcnt = 0
   while pid <= maxParticleID:
     particle = system.storage.getParticle(pid)
     if particle:
       if particle.pos:
+        if(pid==0):
+          addToPid = 1
         xpos   = particle.pos[0]
         ypos   = particle.pos[1]
         zpos   = particle.pos[2]
         type   = particle.type
-        st = "%8d T%03d %4d UNX  FE   FE                    \n" % (pid, type, mol)
+        st = "%8d T%03d %4d UNX  FE   FE                    \n" % (pid+addToPid, type, mol)
         file.write(st)
         pid    += 1
         molcnt += 1
@@ -73,49 +79,52 @@ def psfwrite(filename, system, maxdist=None, molsize=4):
   nInteractions = system.getNumberOfInteractions()
   for i in range(nInteractions):
       if system.getInteraction(i).bondType() == espresso.interaction.Pair:
-         try:
-              FixedPairList = system.getInteraction(i).getFixedPairList().getBonds()
-              j = 0
-              while j < len(FixedPairList):
-                  fplb = FixedPairList[j]
-                  k = 0
-                  while k < len(fplb):
-                    if maxdist != None:
-                      pid1 = fplb[k][0]
-                      pid2 = fplb[k][1]
-                      p1 = system.storage.getParticle(pid1)
-                      p2 = system.storage.getParticle(pid2)
-                      x1 = p1.pos[0]
-                      y1 = p1.pos[1]
-                      z1 = p1.pos[2]
-                      x2 = p2.pos[0]
-                      y2 = p2.pos[1]
-                      z2 = p2.pos[2]
-                      xx = (x1-x2) * (x1-x2)
-                      yy = (y1-y2) * (y1-y2)
-                      zz = (z1-z2) * (z1-z2)
-                      d = sqrt( xx + yy + zz )
-                      if (d <= maxdist):
-                        bond.append(fplb[k])
-                    else:
-                      bond.append(fplb[k])
-                    k += 1                        
-                  j += 1
-         except:
-           pass
+        try:
+           
+          FixedPairList = system.getInteraction(i).getFixedPairList().getBonds()
+          j = 0
+          while j < len(FixedPairList):
+              fplb = FixedPairList[j]
+              k = 0
+              while k < len(fplb):
+                if maxdist != None:
+                  pid1 = fplb[k][0]
+                  pid2 = fplb[k][1]
+                  p1 = system.storage.getParticle(pid1)
+                  p2 = system.storage.getParticle(pid2)
+                  x1 = p1.pos[0]
+                  y1 = p1.pos[1]
+                  z1 = p1.pos[2]
+                  x2 = p2.pos[0]
+                  y2 = p2.pos[1]
+                  z2 = p2.pos[2]
+                  xx = (x1-x2) * (x1-x2)
+                  yy = (y1-y2) * (y1-y2)
+                  zz = (z1-z2) * (z1-z2)
+                  d = sqrt( xx + yy + zz )
+                  if (d <= maxdist):
+                    bond.append(fplb[k])
+                else:
+                  bond.append(fplb[k])
+                k += 1
+                
+              j += 1
+              
+        except:
+          pass
               
   bond.sort()
-  
-  file.write("%8d !NBOND\n" % (len(bond)))
+
+  file.write("\n%8d !NBOND:\n" % (len(bond)))
   i = 0
   while i < len(bond):
-    file.write("%8d%8d" % (bond[i][0], pid_count_translate[bond[i][1]]) )
+    file.write("%8d%8d" % (bond[i][0]+addToPid, bond[i][1]+addToPid) ) #pid_count_translate[bond[i][1]]
     if ( ((i+1) % 4) == 0 and (i != 0) ) or i == len(bond)-1 :
       file.write("\n")
     i += 1
 
+  file.write('END\n')
   file.close()
-  
   
   
   

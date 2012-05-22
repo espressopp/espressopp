@@ -17,12 +17,32 @@ namespace espresso {
 
     LOG4ESPP_LOGGER(BerendsenThermostat::theLogger, "BerendsenThermostat");
 
-    BerendsenThermostat::BerendsenThermostat(shared_ptr<System> system) : SystemAccess(system) {
+    BerendsenThermostat::BerendsenThermostat(shared_ptr<System> system) : Extension(system) {
       tau  = 1.0;
       T0 = 1.0;
       
       LOG4ESPP_INFO(theLogger, "BerendsenThermostat constructed");
     }
+
+    BerendsenThermostat::~BerendsenThermostat(){
+      LOG4ESPP_INFO(theLogger, "~BerendsenThermostat");
+      disconnect();
+    }
+    
+    
+    void BerendsenThermostat::disconnect(){
+      _runInit.disconnect();
+      _aftIntV.disconnect();
+    }
+
+    void BerendsenThermostat::connect(){
+      // connection to initialisation
+      _runInit = integrator->runInit.connect( boost::bind(&BerendsenThermostat::initialize, this));
+
+      // connection to the signal at the end of the run
+      _aftIntV = integrator->aftIntV.connect( boost::bind(&BerendsenThermostat::thermostat, this));
+    }
+    
 
     // set and get time constant for Berendsen thermostat
     void BerendsenThermostat::setTau(real _tau) {
@@ -39,9 +59,6 @@ namespace espresso {
       return T0;
     }
 
-    BerendsenThermostat::~BerendsenThermostat(){
-    }
-
     void BerendsenThermostat::thermostat(){
       LOG4ESPP_DEBUG(theLogger, "equilibrating the temperature");
 
@@ -51,7 +68,7 @@ namespace espresso {
       
       real T = Tcurrent.compute();  // calculating the current temperature in system
       
-      real lambda = sqrt( 1 + pref * (T0/T - 1) );  // calculating the current scaling parameter
+      real lambda = sqrt( 1 + pref * (T0/T - 1) );  // current scaling parameter
 
       CellList cells = system.storage->getRealCells();
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
@@ -64,11 +81,11 @@ namespace espresso {
     }
     
     // calculate the prefactors
-    void BerendsenThermostat::initialize(real timestep){
-      LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
-                                   ", tau = " << tau << 
+    void BerendsenThermostat::initialize(){
+      LOG4ESPP_INFO(theLogger, "init, tau = " << tau << 
                                    ", external temperature = " << T0);
-      pref = timestep / tau;
+      real dt = integrator->getTimeStep();
+      pref = dt / tau;
     }
 
 
@@ -80,12 +97,17 @@ namespace espresso {
 
       using namespace espresso::python;
 
-      class_<BerendsenThermostat, shared_ptr<BerendsenThermostat> >
+      class_<BerendsenThermostat, shared_ptr<BerendsenThermostat>, bases<Extension> >
 
         ("integrator_BerendsenThermostat", init< shared_ptr<System> >())
 
         .add_property("tau", &BerendsenThermostat::getTau, &BerendsenThermostat::setTau)
-        .add_property("temperature", &BerendsenThermostat::getTemperature, &BerendsenThermostat::setTemperature);
+        .add_property("temperature", &BerendsenThermostat::getTemperature,
+              &BerendsenThermostat::setTemperature)
+      
+        .def("connect", &BerendsenThermostat::connect)
+        .def("disconnect", &BerendsenThermostat::disconnect)
+      ;
     }
 
   }

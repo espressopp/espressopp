@@ -1,14 +1,16 @@
 #include <iomanip>
 #include "python.hpp"
 #include "VelocityVerlet.hpp"
-#include "Langevin.hpp"
 
+/* TODO should be removed after signals will be tested
+#include "Langevin.hpp"
 #include "BerendsenBarostat.hpp"
 #include "BerendsenThermostat.hpp"
 #include "LangevinBarostat.hpp"
 #include "Isokinetic.hpp"
 #include "StochasticVelocityRescaling.hpp"
 #include "FixPositions.hpp"
+*/
 
 #include "iterator/CellListIterator.hpp"
 #include "interaction/Interaction.hpp"
@@ -48,15 +50,13 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "free VelocityVerlet");
     }
 
-    /*****************************************************************************/
-
+    // TODO should be removed after signals will be tested
+    /*****************************************************************************
     void VelocityVerlet::setLangevin(shared_ptr< Langevin > _langevin)
     {
       LOG4ESPP_INFO(theLogger, "set Langevin thermostat");
       langevin = _langevin;
     }
-
-    /*****************************************************************************/
 
     void VelocityVerlet::setIsokinetic(shared_ptr< Isokinetic > _isokinetic)
     {
@@ -64,44 +64,32 @@ namespace espresso {
       isokinetic = _isokinetic;
     }
 
-    /*****************************************************************************/
-
     void VelocityVerlet::setStochasticVelocityRescaling(shared_ptr< StochasticVelocityRescaling > _stochasticVelocityRescaling)
     {
       LOG4ESPP_INFO(theLogger, "set StochasticVelocityRescaling thermostat");
       stochasticVelocityRescaling = _stochasticVelocityRescaling;
     }
 
-    /*****************************************************************************/
-
     void VelocityVerlet::setBerendsenBarostat(shared_ptr< BerendsenBarostat > _berendsenP){
       LOG4ESPP_INFO(theLogger, "set Berendsen barostat");
       berendsenBarostat = _berendsenP;
     }
-
-    /*****************************************************************************/
 
     void VelocityVerlet::setBerendsenThermostat(shared_ptr< BerendsenThermostat > _berendsenT){
       LOG4ESPP_INFO(theLogger, "set Berendsen thermostat");
       berendsenThermostat = _berendsenT;
     }
 
-    /*****************************************************************************/
-
     void VelocityVerlet::setLangevinBarostat(shared_ptr< LangevinBarostat > _langevinBarostat){
       LOG4ESPP_INFO(theLogger, "set Hoover style barostat. Langevin dynamics");
       langevinBarostat = _langevinBarostat;
     }
     
-    /*****************************************************************************/
-
-    
     void VelocityVerlet::setFixPositions(shared_ptr <class FixPositions> _fixPositions) {
     	LOG4ESPP_INFO(theLogger, "set fixPositions to fix positions of a group of particles");
     	fixPositions = _fixPositions;
     }
-
-
+    *****************************************************************************/
 
     void VelocityVerlet::run(int nsteps)
     {
@@ -600,6 +588,7 @@ namespace espresso {
       // Note: use noncopyable and no_init for abstract classes
       class_<VelocityVerlet, bases<MDIntegrator>, boost::noncopyable >
         ("integrator_VelocityVerlet", init< shared_ptr<System> >())
+        /* TODO should be removed after signals will be tested
         .add_property("langevin", &VelocityVerlet::getLangevin, &VelocityVerlet::setLangevin)
         .add_property("berendsenBarostat", &VelocityVerlet::getBerendsenBarostat, &VelocityVerlet::setBerendsenBarostat)
         .add_property("berendsenThermostat", &VelocityVerlet::getBerendsenThermostat, &VelocityVerlet::setBerendsenThermostat)
@@ -607,6 +596,7 @@ namespace espresso {
         .add_property("isokinetic", &VelocityVerlet::getIsokinetic, &VelocityVerlet::setIsokinetic)
         .add_property("stochasticVelocityRescaling", &VelocityVerlet::getStochasticVelocityRescaling, &VelocityVerlet::setStochasticVelocityRescaling)
         .add_property("fixpositions", &VelocityVerlet::getFixPositions, &VelocityVerlet::setFixPositions)
+         */
         .def("getTimers", &wrapGetTimers)
         .def("resetTimers", &VelocityVerlet::resetTimers)
         ;
