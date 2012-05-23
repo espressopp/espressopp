@@ -77,16 +77,19 @@ References:
 from espresso.esutil import cxxinit
 from espresso import pmi
 
+from espresso.integrator.Extension import *
 from _espresso import integrator_BerendsenThermostat
 
-class BerendsenThermostatLocal(integrator_BerendsenThermostat):
+class BerendsenThermostatLocal(ExtensionLocal, integrator_BerendsenThermostat):
   def __init__(self, system):
     'The (local) Velocity Verlet Integrator.'
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, integrator_BerendsenThermostat, system)
 
 if pmi.isController:
-  class BerendsenThermostat(object):
+  class BerendsenThermostat(Extension):
     __metaclass__ = pmi.Proxy
-    pmiproxydefs = dict( cls =  'espresso.integrator.BerendsenThermostatLocal',
-    pmiproperty = [ 'tau', 'temperature' ])
+    pmiproxydefs = dict(
+      cls =  'espresso.integrator.BerendsenThermostatLocal',
+      pmiproperty = [ 'tau', 'temperature' ]
+    )
