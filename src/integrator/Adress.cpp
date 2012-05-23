@@ -21,8 +21,6 @@ namespace espresso {
         LOG4ESPP_INFO(theLogger, "construct Adress");
     }
 
-    /*-------------------------------------------------------------*/
-
 
     Adress::~Adress() {
       LOG4ESPP_INFO(theLogger, "~Adress");

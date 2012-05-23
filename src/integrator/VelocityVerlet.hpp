@@ -20,8 +20,8 @@ namespace espresso {
         ~VelocityVerlet();
 
         // set & get termostat (Langevin)
-        void setLangevin(shared_ptr<class Langevin> langevin);
-        shared_ptr<class Langevin> getLangevin() { return langevin; }
+        void setLangevin(shared_ptr<class LangevinThermostat> langevin);
+        shared_ptr<class LangevinThermostat> getLangevin() { return langevin; }
 
         void setStochasticVelocityRescaling(shared_ptr<class StochasticVelocityRescaling> stochasticVelocityRescaling);
         shared_ptr<class StochasticVelocityRescaling> getStochasticVelocityRescaling() { return stochasticVelocityRescaling; }
@@ -87,7 +87,7 @@ namespace espresso {
         real maxCut;
 
 
-        shared_ptr< class Langevin > langevin;  //!< Langevin thermostat if available
+        shared_ptr< class LangevinThermostat > langevin;  //!< Langevin thermostat if available
 
         shared_ptr< class Isokinetic > isokinetic;  //!< Isokinetic thermostat if available
         shared_ptr< class StochasticVelocityRescaling > stochasticVelocityRescaling;  //!< Stochastic velocity rescaling thermostat if available

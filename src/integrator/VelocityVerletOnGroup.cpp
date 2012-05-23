@@ -2,7 +2,7 @@
 
 #include "VelocityVerletOnGroup.hpp"
 
-#include "Langevin.hpp"
+#include "LangevinThermostat.hpp"
 
 #include "iterator/CellListIterator.hpp"
 #include "interaction/Interaction.hpp"
@@ -36,7 +36,7 @@ namespace espresso {
 
     /*****************************************************************************/
 
-    void VelocityVerletOnGroup::setLangevin(shared_ptr< Langevin > _langevin)
+    void VelocityVerletOnGroup::setLangevin(shared_ptr< LangevinThermostat > _langevin)
     {
       LOG4ESPP_INFO(theLogger, "set Langevin thermostat");
       langevin = _langevin;
@@ -58,7 +58,7 @@ namespace espresso {
 
       storage::Storage& storage = *system.storage;
 
-      if (langevin) langevin->initialize(dt);
+      //if (langevin) langevin->initialize(dt);
 
       // no more needed: setUp();
 

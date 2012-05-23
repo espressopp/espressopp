@@ -21,9 +21,9 @@ namespace espresso {
 
         ~VelocityVerletOnGroup();
 
-        void setLangevin(shared_ptr<class Langevin> langevin);
+        void setLangevin(shared_ptr<class LangevinThermostat> langevin);
 
-        shared_ptr<class Langevin> getLangevin() { return langevin; }
+        shared_ptr<class LangevinThermostat> getLangevin() { return langevin; }
 
         void run(int nsteps);
 
@@ -38,7 +38,7 @@ namespace espresso {
 
         real maxCut;
 
-        shared_ptr< class Langevin > langevin;  //!< Langevin thermostat if available
+        shared_ptr< class LangevinThermostat > langevin;  //!< Langevin thermostat if available
         shared_ptr<class espresso::ParticleGroup> group;
 
         /** Method updates particle positions and velocities.

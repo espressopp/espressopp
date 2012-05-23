@@ -1,7 +1,7 @@
 #include <iomanip>
 #include "python.hpp"
 #include "VelocityVerlet.hpp"
-#include "Langevin.hpp"
+#include "LangevinThermostat.hpp"
 
 #include "BerendsenBarostat.hpp"
 #include "BerendsenThermostat.hpp"
@@ -50,7 +50,7 @@ namespace espresso {
 
     /*****************************************************************************/
 
-    void VelocityVerlet::setLangevin(shared_ptr< Langevin > _langevin)
+    void VelocityVerlet::setLangevin(shared_ptr< LangevinThermostat > _langevin)
     {
       LOG4ESPP_INFO(theLogger, "set Langevin thermostat");
       langevin = _langevin;

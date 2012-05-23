@@ -1,5 +1,5 @@
 #include "python.hpp"
-#include "Langevin.hpp"
+#include "LangevinThermostat.hpp"
 
 #include "types.hpp"
 #include "System.hpp"
@@ -9,14 +9,15 @@
 
 namespace espresso {
 
-  using namespace iterator;
-
   namespace integrator {
 
-    LOG4ESPP_LOGGER(Langevin::theLogger, "Langevin");
+    using namespace espresso::iterator;
 
-    Langevin::Langevin(shared_ptr<System> system) : SystemAccess(system)
-    {
+
+    LangevinThermostat::LangevinThermostat(shared_ptr<System> system)
+    :Extension(system) {
+
+
       gamma  = 0.0;
       temperature = 0.0;
 
@@ -27,33 +28,77 @@ namespace espresso {
       rng = system->rng;
 
       LOG4ESPP_INFO(theLogger, "Langevin constructed");
+
+
     }
 
-    void Langevin::setGamma(real _gamma)
+    void LangevinThermostat::setGamma(real _gamma)
     {
       gamma = _gamma;
     }
 
-    real Langevin::getGamma()
+    real LangevinThermostat::getGamma()
     {
       return gamma;
     }
 
-    void Langevin::setTemperature(real _temperature)
+    void LangevinThermostat::setAdress(bool _adress){
+        adress = _adress;
+    }
+
+    bool LangevinThermostat::getAdress(){
+        return adress;
+    }
+
+    void LangevinThermostat::setTemperature(real _temperature)
     {
       temperature = _temperature;
     }
 
-    real Langevin::getTemperature()
+    real LangevinThermostat::getTemperature()
     {
       return temperature;
     }
 
-    Langevin::~Langevin()
-    {
+    LangevinThermostat::~LangevinThermostat() {
+        disconnect();
     }
 
-    void Langevin::thermalize()
+
+    void LangevinThermostat::disconnect() {
+
+        _initialize.disconnect();
+        _heatUp.disconnect();
+        _coolDown.disconnect();
+        _thermalize.disconnect();
+        _thermalizeAdr.disconnect();
+
+    }
+
+    void LangevinThermostat::connect() {
+
+        // connect to initialization inside run()
+        _initialize = integrator->runInit.connect(
+                boost::bind(&LangevinThermostat::initialize, this));
+
+        _heatUp = integrator->recalc1.connect(
+                boost::bind(&LangevinThermostat::heatUp, this));
+
+        _coolDown = integrator->recalc2.connect(
+                boost::bind(&LangevinThermostat::coolDown, this));
+
+        if (adress) {
+            _thermalizeAdr = integrator->aftCalcF.connect(
+                boost::bind(&LangevinThermostat::thermalizeAdr, this));
+        }
+        else {
+            _thermalize = integrator->aftCalcF.connect(
+                boost::bind(&LangevinThermostat::thermalize, this));
+        }
+    }
+
+
+    void LangevinThermostat::thermalize()
     {
       LOG4ESPP_DEBUG(theLogger, "thermalize");
 
@@ -67,7 +112,7 @@ namespace espresso {
     }
 
     // for AdResS
-    void Langevin::thermalizeAdr()
+    void LangevinThermostat::thermalizeAdr()
     {
       LOG4ESPP_DEBUG(theLogger, "thermalize");
 
@@ -88,7 +133,7 @@ namespace espresso {
       
     }
 
-    void Langevin::frictionThermo(Particle& p)
+    void LangevinThermostat::frictionThermo(Particle& p)
     {
       real massf = sqrt(p.mass());
 
@@ -102,9 +147,10 @@ namespace espresso {
       LOG4ESPP_TRACE(theLogger, "new force of p = " << p.force());
     }
 
-    void Langevin::initialize(real timestep)
-
+    void LangevinThermostat::initialize()
     { // calculate the prefactors
+
+        real timestep = integrator->getTimeStep();
 
       LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
 		    ", gamma = " << gamma << 
@@ -123,7 +169,7 @@ namespace espresso {
 	are affected.
     */
 
-    void Langevin::heatUp()
+    void LangevinThermostat::heatUp()
     {
       LOG4ESPP_INFO(theLogger, "heatUp");
 
@@ -133,7 +179,7 @@ namespace espresso {
 
     /** Opposite to heatUp */
 
-    void Langevin::coolDown()
+    void LangevinThermostat::coolDown()
     {
       LOG4ESPP_INFO(theLogger, "coolDown");
 
@@ -144,18 +190,24 @@ namespace espresso {
     ** REGISTRATION WITH PYTHON
     ****************************************************/
 
-    void Langevin::registerPython() {
+    void LangevinThermostat::registerPython() {
+
 
       using namespace espresso::python;
 
-      class_<Langevin, shared_ptr<Langevin> >
 
-        ("integrator_Langevin", init< shared_ptr<System> >())
-
-        .add_property("gamma", &Langevin::getGamma, &Langevin::setGamma)
-        .add_property("temperature", &Langevin::getTemperature, &Langevin::setTemperature)
+      class_<LangevinThermostat, shared_ptr<LangevinThermostat>, bases<Extension> >
+        ("integrator_LangevinThermostat", init<shared_ptr<System> >())
+        .def("connect", &LangevinThermostat::connect)
+        .def("disconnect", &LangevinThermostat::disconnect)
+        .add_property("adress", &LangevinThermostat::getAdress, &LangevinThermostat::setAdress)
+        .add_property("gamma", &LangevinThermostat::getGamma, &LangevinThermostat::setGamma)
+        .add_property("temperature", &LangevinThermostat::getTemperature, &LangevinThermostat::setTemperature)
         ;
+
+
     }
 
   }
 }
+

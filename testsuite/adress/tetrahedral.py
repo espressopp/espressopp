@@ -21,7 +21,6 @@ steps = 1000
 rc = 2.31 # CG cutoff, Morse
 rca = 1.122462048309373 # AT cutoff (2^(1/6)), WCA
 skin = 0.8
-nvt = False
 timestep = 0.001
 intervals = 10
 
@@ -99,7 +98,6 @@ num_particles = len(x) # 20004
 #Lx, Ly, Lz = 45, 45, 45
 
 sys.stdout.write('Setting up simulation ...\n')
-print Lx, Ly, Lz
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 system = espresso.System()
@@ -185,7 +183,7 @@ fpl = espresso.FixedPairListAdress(system.storage, ftpl)
 fpl.addBonds(bonds)
 
 # decompose after adding tuples and bonds
-print "\n\nAdded tuples and bonds, decomposing now ..." 
+print "Added tuples and bonds, decomposing now ..." 
 system.storage.decompose()
 
 
@@ -214,21 +212,21 @@ system.addInteraction(interLJ)
 
 
 
-# AdResS integrator
-#integrator = espresso.integrator.VelocityVerletAdress(system)
+# VV integrator
 integrator = espresso.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
-#extension = espresso.integrator.Extension(integrator)
+# add AdResS extension
 adress = espresso.integrator.Adress(system)
 integrator.addExtension(adress)
 
+# add Langevin thermostat extension
+langevin = espresso.integrator.LangevinThermostat(system)
+langevin.gamma = 0.5
+langevin.temperature = 1.0
+langevin.adress = True
+integrator.addExtension(langevin)
 
-if(nvt):
-  langevin = espresso.integrator.Langevin(system)
-  langevin.gamma = 0.5
-  langevin.temperature = 1.0
-  integrator.langevin = langevin
 
 print ''
 print 'number of AT particles =', num_particles
@@ -237,7 +235,6 @@ print 'density = %.4f' % (density)
 print 'rc =', rc
 print 'dt =', integrator.dt
 print 'skin =', system.skin
-print 'nvt =', nvt
 print 'steps =', steps
 print 'NodeGrid = %s' % (nodeGrid,)
 print 'CellGrid = %s' % (cellGrid,)
