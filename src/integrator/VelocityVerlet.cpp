@@ -51,9 +51,6 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "free VelocityVerlet");
     }
 
-    /*****************************************************************************/
-
-    void VelocityVerlet::setLangevin(shared_ptr< LangevinThermostat > _langevin)
 
     // TODO should be removed after signals will be tested
     /*****************************************************************************
