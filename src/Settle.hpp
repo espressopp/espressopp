@@ -7,7 +7,8 @@
 #include "iterator/CellListIterator.hpp"
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
-#include "integrator/VelocityVerletAdress.hpp"
+//#include "integrator/VelocityVerletAdress.hpp"
+#include "integrator/VelocityVerlet.hpp"
 #include "Triple.hpp"
 #include "FixedTupleList.hpp"
 
@@ -16,7 +17,7 @@ namespace espresso {
 
         public:
             Settle(shared_ptr<storage::Storage> _storage,
-            		shared_ptr<integrator::VelocityVerletAdress> _integrator,
+            		shared_ptr<integrator::VelocityVerlet> _integrator,
             		real mO, real mH,
             		real distHH, real distOH);
             ~Settle();
@@ -43,7 +44,7 @@ namespace espresso {
 
             boost::signals2::connection con1, con2;
 			shared_ptr<storage::Storage> storage;
-			shared_ptr<integrator::VelocityVerletAdress> integrator; // this is needed for signal connection
+			shared_ptr<integrator::VelocityVerlet> integrator; // this is needed for signal connection
 			shared_ptr<FixedTupleList> fixedtupleList;
 
             static LOG4ESPP_DECL_LOGGER(theLogger);

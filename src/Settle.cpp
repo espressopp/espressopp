@@ -12,17 +12,19 @@ namespace espresso {
     LOG4ESPP_LOGGER(Settle::theLogger, "Settle");
 
     Settle::Settle(shared_ptr<storage::Storage> _storage,
-    		shared_ptr<integrator::VelocityVerletAdress> _integrator,
+    		shared_ptr<integrator::VelocityVerlet> _integrator,
     		real _mO, real _mH, real _distHH, real _distOH)
     : storage(_storage), integrator(_integrator),
       mO(_mO), mH(_mH), distHH(_distHH), distOH(_distOH){
 
         LOG4ESPP_INFO(theLogger, "construct Settle");
 
+        /*
         con1 = integrator->saveOldPos.connect
           (boost::bind(&Settle::saveOldPos, this));
         con2 = integrator->applyConstraints.connect
           (boost::bind(&Settle::applyConstraints, this));
+        */
 
         // initialize settle variables
         real rmT = 1.0 / (mO + mH + mH);
@@ -41,8 +43,10 @@ namespace espresso {
 
     Settle::~Settle() {
         LOG4ESPP_INFO(theLogger, "~Settle");
+        /*
         con1.disconnect();
         con2.disconnect();
+        */
     }
 
 
@@ -229,7 +233,7 @@ namespace espresso {
       class_<Settle, shared_ptr<Settle> >
         ("Settle", init<
         		shared_ptr<storage::Storage>,
-        		shared_ptr<integrator::VelocityVerletAdress>,
+        		shared_ptr<integrator::VelocityVerlet>,
         		real, real, real, real>())
         .def("add", pyAdd)
         ;
