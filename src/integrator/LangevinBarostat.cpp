@@ -29,7 +29,7 @@ namespace espresso {
     // one of the parametes should be desired temperature
     LangevinBarostat::LangevinBarostat(shared_ptr<System> _system,
                                        shared_ptr<esutil::RNG> _rng,
-                                       real _temperature) : SystemAccess(_system), 
+                                       real _temperature) : Extension(_system), 
                                                             rng(_rng), 
                                                             desiredTemperature(_temperature){
       // external parameters
@@ -44,6 +44,32 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "LangevinBarostat constructed");
     }
 
+    LangevinBarostat::~LangevinBarostat(){
+      LOG4ESPP_INFO(theLogger, "~LangevinBarostat");
+      disconnect();
+    }
+
+    void LangevinBarostat::disconnect(){
+      _runInit.disconnect();
+      _befIntP.disconnect();
+      _inIntP.disconnect();
+      _aftIntV.disconnect();
+      _aftCalcF.disconnect();
+    }
+
+    void LangevinBarostat::connect(){
+      // connection to initialisation
+      _runInit = integrator->runInit.connect( boost::bind(&LangevinBarostat::initialize, this));
+      
+      _befIntP = integrator->befIntP.connect( boost::bind(&LangevinBarostat::upd_Vp, this));
+              
+      _inIntP = integrator->inIntP.connect( boost::bind(&LangevinBarostat::updDisplacement, this, _1));
+              
+      _aftIntV = integrator->aftIntV.connect( boost::bind(&LangevinBarostat::upd_pV, this));
+              
+      _aftCalcF = integrator->aftCalcF.connect( boost::bind(&LangevinBarostat::updForces, this));
+    }
+    
     void LangevinBarostat::setGammaP(real _gammaP){
       gammaP = _gammaP;
     }
@@ -77,10 +103,21 @@ namespace espresso {
       
       mass = d*N*desiredTemperature / (freq*freq);
     }
+    
+    // it is for signals at first we modify volume then momentum
+    void LangevinBarostat::upd_Vp(){
+      updVolume();
+      updVolumeMomentum();
+    }
+    // the other way around
+    void LangevinBarostat::upd_pV(){
+      updVolumeMomentum();
+      updVolume();
+    }
 
-    LangevinBarostat::~LangevinBarostat(){}
-
-    void LangevinBarostat::updVolume(real dt){
+    void LangevinBarostat::updVolume(){
+      real dt = integrator->getTimeStep();
+      
       System& system = getSystemRef();
       
       // The volume is scaled according to the equations V(t+1/2*dt) = V(t) + 1/2*dt*V'; V' = d*V*pe/W
@@ -104,7 +141,9 @@ namespace espresso {
      *  Nf = 3*N, N - number of particles, 3 - d-dimensional system (d=3). Thus d/Nf is 
      *  replaced by 1/N.
      */
-    void LangevinBarostat::updVolumeMomentum(real dt_2){
+    void LangevinBarostat::updVolumeMomentum(){
+      real dt_2 = 0.5 * integrator->getTimeStep();
+
       // dt_2 is timestep/2. 
       System& system = getSystemRef();
       Real3D Li = system.bc -> getBoxL(); // getting the system size
@@ -161,13 +200,27 @@ namespace espresso {
       CellList cells = system.storage->getRealCells();
       
       real factor = pref3  * momentum_mass;
-      for(CellListIterator cit(cells); !cit.isDone(); ++cit)
+      for(CellListIterator cit(cells); !cit.isDone(); ++cit){
         frictionBarostat(*cit, factor);
+      }
     }
     
-    real LangevinBarostat::updDisplacement(){
-      // should return pe/W
-      return (momentum_mass); // momentum is normalized by fictitious mass already
+    void LangevinBarostat::updDisplacement(real& maxSqDist){
+      // TODO the maxSqDist should be introduced
+      System& system = getSystemRef();
+      CellList cells = system.storage->getRealCells();
+      real dt = integrator->getTimeStep();
+      
+      real coef = dt * momentum_mass;
+      for(CellListIterator cit(cells); !cit.isDone(); ++cit){
+        Particle& p = *cit;
+        Real3D delta = coef * p.position();
+        p.position() += delta;
+        real sqDist = delta * delta;
+        maxSqDist = std::max(maxSqDist, sqDist);
+      }
+      
+      //return (momentum_mass); // momentum is normalized by fictitious mass already
     }
 
     void LangevinBarostat::frictionBarostat(Particle& p, real factor){
@@ -176,10 +229,9 @@ namespace espresso {
       LOG4ESPP_TRACE(theLogger, "new particle force = " << p.force());
     }
      
-    void LangevinBarostat::initialize(real timestep){
+    void LangevinBarostat::initialize(){
       // calculate the prefactors
-      LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
-                               ", gammaP = " << gammaP << 
+      LOG4ESPP_INFO(theLogger, "init, gammaP = " << gammaP << 
                                ", external pressure = " << externalPressure <<
                                ", fictitious mass = " << mass );
 
@@ -200,8 +252,10 @@ namespace espresso {
       // pressure friction prefactor
       pref4 = -gammaP;
       
+      real dt = integrator->getTimeStep();
+      
       // uniform distribution prefactor. (it can be used instead of normal distribution)
-      pref5 = sqrt( 8.0 * desiredTemperature * gammaP * mass / timestep );
+      pref5 = sqrt( 8.0 * desiredTemperature * gammaP * mass / dt );
     }
 
     /****************************************************
@@ -211,7 +265,7 @@ namespace espresso {
     void LangevinBarostat::registerPython() {
       using namespace espresso::python;
 
-      class_<LangevinBarostat, shared_ptr<LangevinBarostat> >
+      class_<LangevinBarostat, shared_ptr<LangevinBarostat>, bases<Extension> >
 
         ("integrator_LangevinBarostat", init< shared_ptr<System>, shared_ptr<esutil::RNG>, real >() )
 
@@ -220,6 +274,9 @@ namespace espresso {
         .add_property("mass", &LangevinBarostat::getMass, &LangevinBarostat::setMass)
       
         .def("setMassByFrequency", &LangevinBarostat::setMassByFrequency)
+      
+        .def("connect", &LangevinBarostat::connect)
+        .def("disconnect", &LangevinBarostat::disconnect)
       ;
     }
 

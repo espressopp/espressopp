@@ -5,7 +5,6 @@
 
 #include "types.hpp"
 #include "logging.hpp"
-//#include "SystemAccess.hpp"
 
 #include "analysis/Temperature.hpp"
 #include "Extension.hpp"

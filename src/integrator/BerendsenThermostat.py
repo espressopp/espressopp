@@ -18,7 +18,8 @@ Example:
     >>> berendsenT = espresso.integrator.BerendsenThermostat(system)
     >>> berendsenT.tau = 1.0
     >>> berendsenT.temperature = 1.0
-    >>> integrator.berendsenThermostat = berendsenT
+    >>> integrator.addExtension(berendsenT)
+
 
 Definition:
 
@@ -42,7 +43,7 @@ Properties:
     
 Setting the integration property:
     
-    >>> integrator.berendsenThermostat = berendsenT
+    >>> integrator.addExtension(berendsenT)
     
     It will define Berendsen thermostat as a property of integrator.
     
@@ -51,7 +52,7 @@ One more example:
     >>> berendsen_thermostat = espresso.integrator.BerendsenThermostat(system)
     >>> berendsen_thermostat.tau = 0.1
     >>> berendsen_thermostat.temperature = 3.2
-    >>> integrator.berendsenThermostat = berendsen_thermostat
+    >>> integrator.addExtension(berendsen_thermostat)
 
 
 Canceling the thermostat:
@@ -60,12 +61,12 @@ Canceling the thermostat:
     >>> berendsen = espresso.integrator.BerendsenThermostat(system)
     >>> berendsen.tau = 2.0
     >>> berendsen.temperature = 5.0
-    >>> integrator.berendsenThermostat = berendsen
+    >>> integrator.addExtension(berendsen)
     >>> ...
     >>> # some runs
     >>> ...
     >>> # erase Berendsen thermostat
-    >>> integrator.berendsenThermostat = None
+    >>> berendsen.disconnect()
 
 References:
 
@@ -83,7 +84,8 @@ from _espresso import integrator_BerendsenThermostat
 class BerendsenThermostatLocal(ExtensionLocal, integrator_BerendsenThermostat):
   def __init__(self, system):
     'The (local) Velocity Verlet Integrator.'
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or \
+            pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, integrator_BerendsenThermostat, system)
 
 if pmi.isController:

@@ -4,7 +4,11 @@
 
 #include "types.hpp"
 #include "logging.hpp"
-#include "SystemAccess.hpp"
+
+#include "Extension.hpp"
+#include "VelocityVerlet.hpp"
+
+#include "boost/signals2.hpp"
 
 namespace espresso {
 namespace integrator {
@@ -50,7 +54,7 @@ public:
 	const real drawNumber(const unsigned int ia);
 };
 
-class StochasticVelocityRescaling: public SystemAccess {
+class StochasticVelocityRescaling: public Extension {
 
 public:
 
@@ -79,12 +83,12 @@ public:
 	const real stochasticVR_pullEkin(real Ekin, real Ekin_ref, int dof,
 			real taut, shared_ptr<esutil::RNG> rng);
 
-	void rescaleVelocities();
-
 	/** Register this class so it can be used from Python. */
 	static void registerPython();
 
 private:
+    boost::signals2::connection _aftIntV;
+    
 	real temperature; //!< desired user temperature
 	real coupling; // how strong is the coupling, i.e., tau_t coupling time
 
@@ -92,6 +96,11 @@ private:
 
 	GammaDistribution *gammaDist;
 
+	void rescaleVelocities();
+
+    void connect();
+    void disconnect();
+    
 	/** Logger */
 	static LOG4ESPP_DECL_LOGGER(theLogger)
 	;
