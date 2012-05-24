@@ -15,10 +15,10 @@ namespace espresso {
 
     using namespace espresso::iterator;
 
-
     Adress::Adress(shared_ptr<System> system)
         :Extension(system){
         LOG4ESPP_INFO(theLogger, "construct Adress");
+        type = Extension::Adress;
     }
 
 

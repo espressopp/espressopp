@@ -17,6 +17,7 @@ namespace espresso {
     LangevinThermostat::LangevinThermostat(shared_ptr<System> system)
     :Extension(system) {
 
+      type = Extension::Thermostat;
 
       gamma  = 0.0;
       temperature = 0.0;

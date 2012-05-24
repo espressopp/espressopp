@@ -23,27 +23,34 @@ namespace espresso {
         ~Extension();
 
 
+        enum ExtensionType {
+            Thermostat=1,
+            Barostat=2,
+            Constraint=3,
+            Adress=4
+        };
+
+
+        //type of extension
+        ExtensionType type;
+
+        //ExtensionType getType() { return type; }
+
+
         /** Register this class so it can be used from Python. */
         static void registerPython();
 
       protected:
 
         shared_ptr<MDIntegrator> integrator; // this is needed for signal connection
-        //shared_ptr<System> system;
 
         void setIntegrator(shared_ptr<MDIntegrator> _integrator);
 
-        //System& system;
 
         // pure virtual functions
         virtual void connect() = 0;
         virtual void disconnect() = 0;
 
-        // list of extensions
-        //TODO
-
-        //type of extension
-        //TODO
 
         /** Logger */
         static LOG4ESPP_DECL_LOGGER(theLogger);

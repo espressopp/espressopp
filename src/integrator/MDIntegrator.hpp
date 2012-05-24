@@ -21,6 +21,10 @@ namespace espresso {
 
     class Extension; //fwd declaration
 
+    struct ExtensionList : public std::vector<shared_ptr<Extension> > {
+          typedef esutil::ESPPIterator<std::vector<Extension> > Iterator;
+    };
+
     class MDIntegrator : public SystemAccess {
       public:
         /** Constructor for an integrator.
@@ -47,12 +51,7 @@ namespace espresso {
         /** This method runs the integration for a certain number of steps. */
         virtual void run(int nsteps) = 0;
 
-        void addExtension(shared_ptr<integrator::Extension> extension) {
-           //shared_ptr <MDIntegrator> integrator = this;
-           //shared_ptr <System> extension.system = this.getSystemRef();
-           //exList.push_back(extension);
-        }
-
+        void addExtension(shared_ptr<integrator::Extension> extension);
 
         // signals to extend the integrator
         boost::signals2::signal0 <void> runInit; // initialization of run()
@@ -74,7 +73,7 @@ namespace espresso {
 
         bool timeFlag;
 
-        //ExtensionList exList;
+        ExtensionList exList;
 
         /** Integration step */
         long long step;
@@ -86,10 +85,6 @@ namespace espresso {
         static LOG4ESPP_DECL_LOGGER(theLogger);
     };
 
-    struct ExtensionList
-      : public std::vector<shared_ptr<Extension> > {
-      typedef esutil::ESPPIterator<std::vector<Extension> > Iterator;
-    };
 
   }
 }

@@ -17,15 +17,20 @@ from espresso.tools import timers
 #logging.getLogger("BC").setLevel(logging.DEBUG)
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
-steps = 1000
+steps = 10
+timestep = 0.001
+intervals = 2
+
 rc = 2.31 # CG cutoff, Morse
 rca = 1.122462048309373 # AT cutoff (2^(1/6)), WCA
 skin = 0.8
-timestep = 0.001
-intervals = 10
+
+gamma = 0.5
+temp = 1.0
 
 ex_size = 12.0
 hy_size = 2.5
+
 pdb_dir = "./pdbs-test/"
 writepdb = False
 
@@ -186,6 +191,7 @@ fpl.addBonds(bonds)
 print "Added tuples and bonds, decomposing now ..." 
 system.storage.decompose()
 
+print "done decomposing"
 
 # AdResS Verlet list
 vl = espresso.VerletListAdress(system, cutoff=rc+skin, adrcut=rc+skin,
@@ -222,10 +228,11 @@ integrator.addExtension(adress)
 
 # add Langevin thermostat extension
 langevin = espresso.integrator.LangevinThermostat(system)
-langevin.gamma = 0.5
-langevin.temperature = 1.0
+langevin.gamma = gamma
+langevin.temperature = temp
 langevin.adress = True
 integrator.addExtension(langevin)
+
 
 
 print ''
@@ -252,7 +259,7 @@ P = pressure.compute()
 Pij = pressureTensor.compute()
 Ek = 0.5 * T * (3 * num_particles)
 Ep = interNB.computeEnergy()
-Eb = interFENE.computeEnergy()
+Eb = 0#interFENE.computeEnergy()
 sys.stdout.write(' step     T          P        Pxy       etotal     epotential      ebonded     ekinetic\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
 
@@ -266,7 +273,7 @@ for s in range(1, intervals + 1):
   Pij = pressureTensor.compute()
   Ek = 0.5 * T * (3 * num_particles)
   Ep = interNB.computeEnergy()
-  Eb = interFENE.computeEnergy()
+  Eb = 0#interFENE.computeEnergy()
   sys.stdout.write(fmt % (step, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
   system.storage.decompose()
 

@@ -37,6 +37,24 @@ namespace espresso {
       dt = _dt;
     }
 
+
+    void MDIntegrator::addExtension(shared_ptr<integrator::Extension> extension) {
+       //extension->setIntegrator(this); // this is done in python
+       //std::cout << "type is: " << extension->type << "\n";
+
+       // warn if there is already an extension of the same type
+       for (ExtensionList::iterator it = exList.begin();
+               it != exList.end(); ++it){
+           if ((*it)->type == extension->type) {
+               //LOG4ESPP_WARN(theLogger, "extension of same type already added!");
+              printf("\nWARNING: extension of same type already added!\n\n");
+           }
+       }
+       // add extension to the list
+       exList.push_back(extension);
+    }
+
+
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
