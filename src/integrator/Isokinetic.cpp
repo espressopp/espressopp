@@ -1,5 +1,5 @@
-#include "python.hpp"
 #include "Isokinetic.hpp"
+#include "python.hpp"
 
 #include "types.hpp"
 #include "System.hpp"
@@ -15,7 +15,7 @@ namespace espresso {
 
     LOG4ESPP_LOGGER(Isokinetic::theLogger, "Isokinetic");
 
-    Isokinetic::Isokinetic(shared_ptr<System> system) : SystemAccess(system)
+    Isokinetic::Isokinetic(shared_ptr<System> system) : Extension(system)
     {
       temperature = 0.0;
       coupling    = 1; // couple to thermostat in every md step
@@ -30,6 +30,21 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "Isokinetic constructed");
     }
 
+    Isokinetic::~Isokinetic()
+    {
+      LOG4ESPP_INFO(theLogger, "~Isokinetic");
+      disconnect();
+    }
+    
+    void Isokinetic::disconnect(){
+      _aftIntV.disconnect();
+    }
+
+    void Isokinetic::connect(){
+      // connection to the signal at the end of the run
+      _aftIntV = integrator->aftIntV.connect( boost::bind(&Isokinetic::rescaleVelocities, this));
+    }
+    
     void Isokinetic::setTemperature(real _temperature)
     {
       temperature = _temperature;
@@ -50,10 +65,6 @@ namespace espresso {
       return coupling;
     }
 
-    Isokinetic::~Isokinetic()
-    {
-    }
-    
     void Isokinetic::rescaleVelocities() {
       LOG4ESPP_DEBUG(theLogger, "rescaleVelocities");
 
@@ -78,13 +89,14 @@ namespace espresso {
 
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         Real3D vel = cit->velocity();
-        EKin_local += 0.5 * cit->mass() * (vel * vel);
+        EKin_local += cit->mass() * (vel * vel); //0.5 * 
       }
+      EKin_local *= 0.5;
 
       boost::mpi::all_reduce(*getSystem()->comm, EKin_local, EKin, std::plus<real>());
       boost::mpi::all_reduce(*getSystem()->comm, NPart_local, NPart, std::plus<int>());
 
-      DegreesOfFreedom   = 3.0/2.0 * NPart;
+      DegreesOfFreedom   = 1.5 * NPart; //3.0/2.0
       currentTemperature = EKin / DegreesOfFreedom;
       SkalingFaktor      = sqrt(temperature / currentTemperature);
 
@@ -102,12 +114,15 @@ namespace espresso {
 
       using namespace espresso::python;
 
-      class_<Isokinetic, shared_ptr<Isokinetic> >
+      class_<Isokinetic, shared_ptr<Isokinetic>, bases<Extension> >
 
         ("integrator_Isokinetic", init< shared_ptr<System> >())
 
         .add_property("temperature", &Isokinetic::getTemperature, &Isokinetic::setTemperature)
         .add_property("coupling", &Isokinetic::getCoupling, &Isokinetic::setCoupling)
+      
+        .def("connect", &Isokinetic::connect)
+        .def("disconnect", &Isokinetic::disconnect)
         ;
     }
 

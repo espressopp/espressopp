@@ -311,8 +311,6 @@ namespace espresso {
     real VelocityVerlet::integrate1()
     {
       System& system = getSystemRef();
-      real half_dt = 0.5 * dt; 
-
 
       /* -- use signal instead
       if (langevinBarostat){
@@ -349,7 +347,7 @@ namespace espresso {
 
         */
 
-        real dtfm = half_dt / cit->mass();
+        real dtfm = 0.5 * dt / cit->mass();
 
         // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) 
         cit->velocity() += dtfm * cit->force();

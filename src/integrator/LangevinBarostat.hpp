@@ -4,7 +4,11 @@
 
 #include "types.hpp"
 #include "logging.hpp"
-#include "SystemAccess.hpp"
+
+#include "Extension.hpp"
+#include "VelocityVerlet.hpp"
+
+#include "boost/signals2.hpp"
 
 namespace espresso {
   namespace integrator {
@@ -12,7 +16,7 @@ namespace espresso {
     /** Barostat. In a couple with Langevin thermostat it performs Langevin dynamics in 
      * a Hoover-style extended system. See
      * D. Quigley, M.I.J. Probert, J. Chem. Phys., 120, 2004, p. 11432 */
-    class LangevinBarostat : public SystemAccess {
+    class LangevinBarostat : public Extension {
 
       public:
         LangevinBarostat(shared_ptr< System >, shared_ptr< esutil::RNG >, real);
@@ -30,17 +34,12 @@ namespace espresso {
         
         ~LangevinBarostat();
 
-        void initialize(real);    // initialize barostat prefactors. It needs timestep.
-
-        void updVolume(real);           // scale the volume according to the evolution equations
-        void updVolumeMomentum(real);   // update local momentum which corresponds to the volume variable
-        void updForces();               // update forces with an additional term
-        real updDisplacement();         // returns pe/W in order to update particle positions
-        
         /** Register this class so it can be used from Python. */
         static void registerPython();
 
       private:
+        boost::signals2::connection _runInit, _befIntP, _inIntP, _aftIntV, _aftCalcF;
+        
         void frictionBarostat(class Particle&, real);
 
         // initial parameters
@@ -62,6 +61,19 @@ namespace espresso {
 
         shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
 
+        void initialize();    // initialize barostat prefactors
+        
+        void upd_Vp(); // it is for signals at first we modify volume then momentum
+        void upd_pV(); // the other way around
+
+        void updVolume();           // scale the volume according to the evolution equations
+        void updVolumeMomentum();   // update local momentum which corresponds to the volume variable
+        void updForces();               // update forces with an additional term
+        void updDisplacement(real&);         // returns pe/W in order to update particle positions
+        
+        void connect();
+        void disconnect();
+        
         /** Logger */
         static LOG4ESPP_DECL_LOGGER(theLogger);
     };

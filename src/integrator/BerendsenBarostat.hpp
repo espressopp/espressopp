@@ -5,9 +5,11 @@
 
 #include "types.hpp"
 #include "logging.hpp"
-#include "SystemAccess.hpp"
 
 #include "analysis/Pressure.hpp"
+#include "Extension.hpp"
+
+#include "boost/signals2.hpp"
 
 namespace espresso {
   
@@ -15,31 +17,36 @@ namespace espresso {
 
   namespace integrator {
 
-    class BerendsenBarostat: public SystemAccess {
+    class BerendsenBarostat: public Extension {
 
       public:
         BerendsenBarostat(shared_ptr< System > system);
         
-        void setTau(real tau);
+        void setTau(real);
         real getTau();
-        void setPressure(real P0);
+        void setPressure(real);
         real getPressure();
 
         ~BerendsenBarostat();
-
-        void initialize(real timestep);
-
-        /* rescale the system size and coord. of particles */
-        void barostat();
 
         /* Register in Python. */
         static void registerPython();
 
       private:
+        boost::signals2::connection _runInit, _aftIntV;
+        
         real tau;   // time constant
         real P0;    // external pressure
         
         real pref;  // prefactor for the pressure calc
+        
+        void initialize();
+
+        /* rescale the system size and coord. of particles */
+        void barostat();
+
+        void connect();
+        void disconnect();
         
         /* Logger */
         static LOG4ESPP_DECL_LOGGER(theLogger);

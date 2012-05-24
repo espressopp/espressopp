@@ -9,7 +9,6 @@
 
 namespace espresso {
   
-  using namespace std;
   using namespace analysis;
   using namespace iterator;
   
@@ -17,7 +16,7 @@ namespace espresso {
 
     LOG4ESPP_LOGGER(BerendsenThermostat::theLogger, "BerendsenThermostat");
 
-    BerendsenThermostat::BerendsenThermostat(shared_ptr<System> system) : Extension(system) {
+    BerendsenThermostat::BerendsenThermostat(shared_ptr<System> system): Extension(system){
       tau  = 1.0;
       T0 = 1.0;
       
@@ -28,7 +27,6 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "~BerendsenThermostat");
       disconnect();
     }
-    
     
     void BerendsenThermostat::disconnect(){
       _runInit.disconnect();

@@ -20,7 +20,7 @@ LOG4ESPP_LOGGER(StochasticVelocityRescaling::theLogger,
 
 StochasticVelocityRescaling::StochasticVelocityRescaling(
 		shared_ptr<System> system) :
-		SystemAccess(system) {
+		Extension(system) {
 	temperature = 0.0;
 	coupling = 1; //tau_t coupling
 
@@ -39,6 +39,19 @@ StochasticVelocityRescaling::StochasticVelocityRescaling(
 	LOG4ESPP_INFO(theLogger, "StochasticVelocityRescaling constructed");
 }
 
+StochasticVelocityRescaling::~StochasticVelocityRescaling() {
+    LOG4ESPP_INFO(theLogger, "~StochasticVelocityRescaling");
+    disconnect();
+}
+void StochasticVelocityRescaling::disconnect(){
+  _aftIntV.disconnect();
+}
+
+void StochasticVelocityRescaling::connect(){
+  // connection to the signal at the end of the run
+  _aftIntV = integrator->aftIntV.connect( boost::bind(&StochasticVelocityRescaling::rescaleVelocities, this));
+}
+
 void StochasticVelocityRescaling::setTemperature(real _temperature) {
 	temperature = _temperature;
 }
@@ -53,9 +66,6 @@ void StochasticVelocityRescaling::setCoupling(real _coupling) {
 
 real StochasticVelocityRescaling::getCoupling() {
 	return coupling;
-}
-
-StochasticVelocityRescaling::~StochasticVelocityRescaling() {
 }
 
 void StochasticVelocityRescaling::rescaleVelocities() {
@@ -212,14 +222,18 @@ void StochasticVelocityRescaling::registerPython() {
 
 	using namespace espresso::python;
 
-	class_<StochasticVelocityRescaling, shared_ptr<StochasticVelocityRescaling> >
+	class_<StochasticVelocityRescaling, shared_ptr<StochasticVelocityRescaling>, bases<Extension> >
 
 	("integrator_StochasticVelocityRescaling", init<shared_ptr<System> >())
 
 	.add_property("temperature", &StochasticVelocityRescaling::getTemperature,
 			&StochasticVelocityRescaling::setTemperature).add_property(
 			"coupling", &StochasticVelocityRescaling::getCoupling,
-			&StochasticVelocityRescaling::setCoupling);
+			&StochasticVelocityRescaling::setCoupling)
+    
+   .def("connect", &StochasticVelocityRescaling::connect)
+   .def("disconnect", &StochasticVelocityRescaling::disconnect)
+    ;
 }
 
 }

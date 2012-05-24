@@ -4,17 +4,17 @@
 
 #include "types.hpp"
 #include "logging.hpp"
-#include "SystemAccess.hpp"
+
+#include "Extension.hpp"
+#include "boost/signals2.hpp"
 
 namespace espresso {
   namespace integrator {
-
     /** Langevin */
 
-    class Isokinetic : public SystemAccess {
+    class Isokinetic : public Extension{
 
       public:
-
         Isokinetic(shared_ptr< System > system);
 
         void setTemperature(real temperature);
@@ -27,12 +27,12 @@ namespace espresso {
 
         ~Isokinetic();
 
-        void rescaleVelocities();
-
         /** Register this class so it can be used from Python. */
         static void registerPython();
 
       private:
+        boost::signals2::connection _aftIntV;
+        
         real temperature;  //!< desired user temperature
         int coupling; // how often to couple to the thermostat
         int couplecount;
@@ -40,6 +40,11 @@ namespace espresso {
         // not yet needed
         // shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
 
+        void rescaleVelocities();
+
+        void connect();
+        void disconnect();
+        
         /** Logger */
         static LOG4ESPP_DECL_LOGGER(theLogger);
     };

@@ -18,7 +18,7 @@ Example:
     >>> berendsenP = espresso.integrator.BerendsenBarostat(system)
     >>> berendsenP.tau = 0.1
     >>> berendsenP.pressure = 1.0
-    >>> integrator.berendsenBarostat = berendsenP
+    >>> integrator.addExtension(berendsenP)
 
 **!IMPORTANT** In order to run *npt* simulation one should separately define thermostat as well 
 (e.g. BerendsenThermostat_).
@@ -47,7 +47,7 @@ Properties:
     
 Setting the integration property:
     
-    >>> integrator.berendsenBarostat = berendsenP
+    >>> integrator.addExtension(berendsenP)
     
     It will define Berendsen barostat as a property of integrator.
     
@@ -56,7 +56,7 @@ One more example:
     >>> berendsen_barostat = espresso.integrator.BerendsenBarostat(system)
     >>> berendsen_barostat.tau = 10.0
     >>> berendsen_barostat.pressure = 3.5
-    >>> integrator.berendsenBarostat = berendsen_barostat
+    >>> integrator.addExtension(berendsen_barostat)
 
 
 Canceling the barostat:
@@ -68,12 +68,12 @@ Canceling the barostat:
     >>> berendsen = espresso.integrator.BerendsenBarostat(system)
     >>> berendsen.tau = 0.8
     >>> berendsen.pressure = 15.0
-    >>> integrator.berendsenBarostat = berendsen
+    >>> integrator.addExtension(berendsen)
     >>> ...
     >>> # some runs
     >>> ...
     >>> # erase Berendsen barostat
-    >>> integrator.berendsenBarostat = None
+    >>> berendsen.disconnect()
     >>> # the next runs will not include the system size and particle coordinates scaling
 
 References:
@@ -86,16 +86,20 @@ References:
 from espresso.esutil import cxxinit
 from espresso import pmi
 
+from espresso.integrator.Extension import *
 from _espresso import integrator_BerendsenBarostat
 
-class BerendsenBarostatLocal(integrator_BerendsenBarostat):
+class BerendsenBarostatLocal(ExtensionLocal, integrator_BerendsenBarostat):
   def __init__(self, system):
     'The (local) Velocity Verlet Integrator.'
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or \
+            pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, integrator_BerendsenBarostat, system)
 
 if pmi.isController:
-  class BerendsenBarostat(object):
+  class BerendsenBarostat(Extension):
     __metaclass__ = pmi.Proxy
-    pmiproxydefs = dict( cls =  'espresso.integrator.BerendsenBarostatLocal',
-    pmiproperty = [ 'tau', 'pressure' ])
+    pmiproxydefs = dict(
+      cls =  'espresso.integrator.BerendsenBarostatLocal',
+      pmiproperty = [ 'tau', 'pressure' ]
+    )
