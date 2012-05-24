@@ -41,6 +41,8 @@ namespace espresso {
       momentum = 0.0;
       momentum_mass = 0.0;
 
+      type = Extension::Barostat;
+
       LOG4ESPP_INFO(theLogger, "LangevinBarostat constructed");
     }
 

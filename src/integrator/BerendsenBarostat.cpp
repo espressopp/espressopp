@@ -15,6 +15,8 @@ namespace espresso {
       tau  = 1.0;
       P0 = 1.0;
       
+      type = Extension::Barostat;
+
       LOG4ESPP_INFO(theLogger, "BerendsenBarostat constructed");
     }
 

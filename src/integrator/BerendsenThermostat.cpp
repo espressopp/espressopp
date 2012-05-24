@@ -20,6 +20,8 @@ namespace espresso {
       tau  = 1.0;
       T0 = 1.0;
       
+      type = Extension::Thermostat;
+
       LOG4ESPP_INFO(theLogger, "BerendsenThermostat constructed");
     }
 

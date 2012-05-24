@@ -24,6 +24,8 @@ StochasticVelocityRescaling::StochasticVelocityRescaling(
 	temperature = 0.0;
 	coupling = 1; //tau_t coupling
 
+	type = Extension::Thermostat;
+
 	if (!system->rng) {
 		throw std::runtime_error("system has no RNG");
 	}
