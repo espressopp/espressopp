@@ -17,13 +17,13 @@ from espresso.tools import timers
 #logging.getLogger("BC").setLevel(logging.DEBUG)
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
-steps = 10
+steps = 310
 timestep = 0.001
-intervals = 2
+intervals = 31
 
 rc = 2.31 # CG cutoff, Morse
 rca = 1.122462048309373 # AT cutoff (2^(1/6)), WCA
-skin = 0.8
+skin = 0.4
 
 gamma = 0.5
 temp = 1.0
@@ -230,8 +230,14 @@ integrator.addExtension(adress)
 langevin = espresso.integrator.LangevinThermostat(system)
 langevin.gamma = gamma
 langevin.temperature = temp
-langevin.adress = True
+langevin.adress = True # enable AdResS!
 integrator.addExtension(langevin)
+
+# add TDF (dummy, just testing)
+#tdf = espresso.integrator.TDforce(system, center=[18.42225, 18.42225, 18.42225])
+#tdf.addForce(itype=2, filename=tabMorse, type=0)
+#integrator.addExtension(tdf)
+
 
 
 

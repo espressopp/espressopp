@@ -9,10 +9,17 @@
 #include "interaction/Interpolation.hpp"
 #include <map>
 
+
+#include "Extension.hpp"
+#include "VelocityVerlet.hpp"
+
+#include "boost/signals2.hpp"
+
+
 namespace espresso {
   namespace integrator {
 
-    class TDforce : public SystemAccess {
+    class TDforce : public Extension {
 
       public:
         TDforce(shared_ptr<System> system);
@@ -29,6 +36,12 @@ namespace espresso {
         static void registerPython();
 
       private:
+
+        boost::signals2::connection _applyForce;
+
+        void connect();
+        void disconnect();
+
         Real3D center;
         std::string filename;
         typedef shared_ptr <interaction::Interpolation> Table;

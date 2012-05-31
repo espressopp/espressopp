@@ -17,8 +17,7 @@ namespace espresso {
     LOG4ESPP_LOGGER(TDforce::theLogger, "TDforce");
 
     TDforce::TDforce(shared_ptr<System> system)
-    : SystemAccess(system) {
-        //setFilename(itype, filename);
+    :Extension(system) {
 
         center = (0.0,0.0,0.0);
 
@@ -26,6 +25,18 @@ namespace espresso {
     }
 
     TDforce::~TDforce() {}
+
+
+
+    void TDforce::connect(){
+        _applyForce = integrator->aftCalcF.connect(
+            boost::bind(&TDforce::applyForce, this));
+    }
+
+    void TDforce::disconnect(){
+        _applyForce.disconnect();
+    }
+
 
     void TDforce::addForce(int itype, const char* _filename, int type) {
         boost::mpi::communicator world;
@@ -52,20 +63,14 @@ namespace espresso {
 
 
     void TDforce::applyForce() {
-          LOG4ESPP_DEBUG(theLogger, "thermodynamically forcelize");
+          LOG4ESPP_DEBUG(theLogger, "apply TD force");
 
           System& system = getSystemRef();
 
           // iterate over CG particles
           CellList cells = system.storage->getRealCells();
           for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
-              //frictionThermo(*cit);
 
-              /*
-              std::map<int, Table>::iterator it;
-              it = forces.find(cit->getType());
-              Table table = *it;
-              */
               Table table = forces.find(cit->getType())->second;
 
               if (table) {
@@ -73,14 +78,19 @@ namespace espresso {
                   Real3D dist3D = cit->getPos() - center;
                   real dist = sqrt(dist3D.sqr());
 
-                  // read force from table
-                  real ffactor = table->getForce(dist);
-
-                  std::cout << "ffactor of particle " << cit->getId()
-                          << " is " << ffactor << "\n";
+                  // read fforce from table
+                  real fforce = table->getForce(dist);
+                  fforce /= dist;
 
                   // substract td force
-                  cit->force() -= ffactor;
+                  cit->force() -= (dist3D * fforce);
+
+                  /*
+                  // use this if you need 1-dir force only!
+                  real d1 = cit->getPos()[0] - center[0];
+                  real force = table->getForce(d1);
+                  cit->force()[0] -= force;
+                  */
               }
           }
     }
@@ -104,10 +114,11 @@ namespace espresso {
       void (TDforce::*pyAddForce)(int itype, const char* filename, int type)
                         = &TDforce::addForce;
 
-      class_<TDforce, shared_ptr<TDforce> >
-
+      class_<TDforce, shared_ptr<TDforce>, bases<Extension> >
         ("integrator_TDforce", init< shared_ptr<System> >())
         .add_property("filename", &TDforce::getFilename)
+        .def("connect", &TDforce::connect)
+        .def("disconnect", &TDforce::disconnect)
         .def("setCenter", pySetCenter)
         .def("addForce", pyAddForce)
         ;
