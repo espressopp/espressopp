@@ -16,12 +16,16 @@ class DomainDecompositionLocal(StorageLocal, storage_DomainDecomposition):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getCellGrid(self)
 
+    def getNodeGrid(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getNodeGrid(self)
+          
 if pmi.isController:
     class DomainDecomposition(Storage):
         pmiproxydefs = dict(
           cls = 'espresso.storage.DomainDecompositionLocal',  
-          pmicall = ['getCellGrid']
-          )
+          pmicall = ['getCellGrid', 'getNodeGrid', 'cellAdjust']
+        )
         def __init__(self, system, 
                      nodeGrid='auto', 
                      cellGrid='auto'):

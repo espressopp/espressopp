@@ -30,6 +30,11 @@ namespace espresso {
       // it returns current cell grid like a vector Int3D
       // mainly in order to use from python
       Int3D getInt3DCellGrid();
+      Int3D getInt3DNodeGrid();
+
+      // it modifies the cell structure if the cell size becomes smaller then cutoff+skin
+      // as a consequence of the system resizing
+      void cellAdjust();
 
       virtual Cell *mapPositionToCell(const Real3D& pos);
       virtual Cell *mapPositionToCellClipped(const Real3D& pos);
@@ -67,10 +72,6 @@ namespace espresso {
 		     const int leftBoundary[3],
 		     const int rightBoundary[3]);
       
-      // it modifies the cell structure if the cell size becomes smaller then cutoff+skin
-      // as a consequence of the system resizing
-      void cellAdjust();
-
       /** read particles from a temporary buffer into the local cell structure.
 	  The direction determines in which direction to fold the particles position.
 	  Returns true if one of the given particles did not belong to this processors

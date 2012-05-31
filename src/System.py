@@ -109,11 +109,11 @@ class SystemLocal(_espresso.System):
             self.cxxclass.setTrace(self, switch)
 
 if pmi.isController:
-    class System(object):
-        __metaclass__ = pmi.Proxy
-        pmiproxydefs = dict(
-            cls = 'espresso.SystemLocal',
-            pmiproperty = ['storage', 'bc', 'rng', 'skin'],
-            pmicall = ['addInteraction','removeInteraction','getInteraction','getNumberOfInteractions','scaleVolume', 'setTrace']
-            )
+  class System(object):
+    __metaclass__ = pmi.Proxy
+    pmiproxydefs = dict(
+      cls = 'espresso.SystemLocal',
+      pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff'],
+      pmicall = ['addInteraction','removeInteraction','getInteraction','getNumberOfInteractions','scaleVolume', 'setTrace']
+    )
 

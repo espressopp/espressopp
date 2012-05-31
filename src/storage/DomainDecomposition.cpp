@@ -197,6 +197,12 @@ namespace espresso {
             cellGrid.getGridSize(2)
             );
   }
+  Int3D DomainDecomposition::getInt3DNodeGrid(){
+    return Int3D( nodeGrid.getGridSize(0),
+            nodeGrid.getGridSize(1),
+            nodeGrid.getGridSize(2)
+            );
+  }
 
   void DomainDecomposition::cellAdjust(){
     // create an appropriate cell grid
@@ -753,6 +759,8 @@ namespace espresso {
     ("storage_DomainDecomposition", init< shared_ptr< System >, const Int3D&, const Int3D& >())
     .def("mapPositionToNodeClipped", &DomainDecomposition::mapPositionToNodeClipped)
     .def("getCellGrid", &DomainDecomposition::getInt3DCellGrid)
+    .def("getNodeGrid", &DomainDecomposition::getInt3DNodeGrid)
+    .def("cellAdjust", &DomainDecomposition::cellAdjust)
     ;
   }
 

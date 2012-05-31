@@ -223,10 +223,7 @@ namespace espresso {
     
     void Storage::removeParticle(longint id){
       Particle* p = lookupRealParticle(id);
-      
       if(p){
-        //cout << "sentPart: " << p->position() << endl;
-        
         Cell *cell = mapPositionToCellChecked(p->position());
         
         Particle *part_first = &cell->particles.front(); // see whether the array was moved
@@ -239,16 +236,11 @@ namespace espresso {
     	}
     	cell->particles.resize(newSize);
 
-        //localParticles.erase(id);
         removeFromLocalParticles( p );
-
-        //ParticleList &pl = cell->particles;
-
         updateLocalParticles( cell->particles );
 
         onParticlesChanged();
       }
-      
     }
 
     Particle* Storage::addAdrATParticle(longint id, const Real3D& p, const Real3D& _vpp) {

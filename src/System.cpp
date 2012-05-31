@@ -146,6 +146,7 @@ namespace espresso {
 //      .def_readwrite("shortRangeInteractions",
 //		     &System::shortRangeInteractions)
       .def_readwrite("skin", &System::skin)
+      .def_readonly("maxCutoff", &System::maxCutoff)
       .def("addInteraction", &System::addInteraction)
       .def("removeInteraction", &System::removeInteraction)
       .def("getInteraction", &System::getInteraction)
