@@ -27,14 +27,13 @@ namespace espresso {
             Thermostat=1,
             Barostat=2,
             Constraint=3,
-            Adress=4
+            Adress=4,
+            TDforce=5
         };
 
 
         //type of extension
         ExtensionType type;
-
-        //ExtensionType getType() { return type; }
 
 
         /** Register this class so it can be used from Python. */

@@ -19,6 +19,8 @@ namespace espresso {
     TDforce::TDforce(shared_ptr<System> system)
     :Extension(system) {
 
+        type = Extension::TDforce;
+
         center = (0.0,0.0,0.0);
 
         LOG4ESPP_INFO(theLogger, "TDforce constructed");
