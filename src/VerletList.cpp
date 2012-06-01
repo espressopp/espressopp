@@ -8,6 +8,8 @@
 #include "bc/BC.hpp"
 #include "iterator/CellListAllPairsIterator.hpp"
 
+#include <cmath>
+
 namespace espresso {
 
   using namespace espresso::iterator;
@@ -34,6 +36,10 @@ namespace espresso {
     // make a connection to System to invoke rebuild on resort
     connectionResort = system->storage->onParticlesChanged.connect(
         boost::bind(&VerletList::rebuild, this));
+  }
+  
+  real VerletList::getCutoff(){
+    return sqrt(cutsq);
   }
   
   void VerletList::connect()
@@ -153,6 +159,8 @@ namespace espresso {
       .def("rebuild", &VerletList::rebuild)
       .def("connect", &VerletList::connect)
       .def("disconnect", &VerletList::disconnect)
+    
+      .def("getCutoff", &VerletList::getCutoff)
       ;
   }
 

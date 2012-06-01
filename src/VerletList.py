@@ -57,6 +57,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espresso.VerletListLocal',
             pmiproperty = [ 'builds' ],
-            pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect' ],
+            pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'updateCutoff', 'getCutoff' ],
             pmiinvoke = [ 'getAllPairs' ]
             )

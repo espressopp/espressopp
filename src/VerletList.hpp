@@ -37,6 +37,8 @@ namespace espresso {
     PairList& getPairs() { return vlPairs; }
 
     python::tuple getPair(int i);
+    
+    real getCutoff();
 
     void connect();
 

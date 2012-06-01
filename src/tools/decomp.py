@@ -48,23 +48,30 @@ def cellGrid(box_size, node_grid, rc, skin):
   return Int3D(ix, iy, iz)
 
 def tuneSkin(system, integrator, precision):
+  print 'Warning! It\'s a testing version right now.'
   print 'The tuning is started. It can take some time. It depends on your system.'
   nodeGrid = system.storage.getNodeGrid()
   box      = system.bc.boxL
   minNodeLength = min( box[0]/nodeGrid[0], min( box[1]/nodeGrid[1], box[2]/nodeGrid[2] )  )
   maximumCut = system.maxCutoff # biggest value
   
+  # !!! not nice at all !!!
+  ourInter = system.getInteraction(0)
+  ourVerletList = ourInter.getVerletList()
+  ourCutoff = system.maxCutoff # not correct in general!!! just for test
+  
   fi = (1.0+math.sqrt(5.0))/2.0 # golden ratio
   
   # initial data
   minSkin = 0.01 # lowest value
-  maxSkin = 1.0 #minNodeLength - maximumCut
+  maxSkin = (minNodeLength - maximumCut)/2.0
   
   while (maxSkin-minSkin>=precision):
     sk1 = maxSkin - (maxSkin-minSkin)/fi
     sk2 = minSkin + (maxSkin-minSkin)/fi
 
     system.skin = sk1
+    ourVerletList.updateCutoff(system.skin+ourCutoff)
     system.storage.cellAdjust()
     start_time = time.time()
     integrator.run(2000)
@@ -72,6 +79,7 @@ def tuneSkin(system, integrator, precision):
     time1 = end_time - start_time
 
     system.skin = sk2
+    ourVerletList.updateCutoff(system.skin+ourCutoff)
     system.storage.cellAdjust()
     start_time = time.time()
     integrator.run(2000)
@@ -89,3 +97,51 @@ def tuneSkin(system, integrator, precision):
   system.storage.cellAdjust()
   
   return (maxSkin+minSkin)/2.0
+
+def printTimeVsSkin(system, integrator):
+  print 'Calculations is started. It can take some time. It depends on your system.'
+  nodeGrid = system.storage.getNodeGrid()
+  box      = system.bc.boxL
+  minNodeLength = min( box[0]/nodeGrid[0], min( box[1]/nodeGrid[1], box[2]/nodeGrid[2] )  )
+  maximumCut = system.maxCutoff # biggest value
+  
+  # !!! not nice at all !!!
+  ourInter = system.getInteraction(0)
+  ourVerletList = ourInter.getVerletList()
+  ourCutoff = system.maxCutoff # not correct in general!!! just for test
+  
+  # initial data
+  minSkin = 0.01 # lowest value
+  maxSkin = 3.0 #(minNodeLength - maximumCut)/2.0
+  
+  skinStep = 0.01
+  
+  #steps = int( (maxSkin - minSkin) / skinStep )
+  
+  curSkin = minSkin
+  
+  fmt2 = ' %8.4f %8.4f\n' # format for writing the data
+  nameFile = 'timeVSskin.dat'
+  resFile = open (nameFile, 'a')
+
+  count = 0
+  while (curSkin < maxSkin):
+    system.skin = curSkin
+    ourVerletList.updateCutoff(system.skin+ourCutoff)
+    system.storage.cellAdjust()
+    start_time = time.time()
+    integrator.run(8000)
+    end_time = time.time()
+    time1 = end_time - start_time
+    
+    resFile.write(fmt2 % ( system.skin, time1 ))
+
+    count = count +1
+    if (count == 20):
+      print 'skin: ', system.skin
+      count = 0
+    
+    curSkin = curSkin + skinStep
+  
+  return
+  
