@@ -37,8 +37,6 @@ namespace espresso {
     PairList& getPairs() { return vlPairs; }
 
     python::tuple getPair(int i);
-    
-    real getCutoff();
 
     void connect();
 
@@ -48,6 +46,9 @@ namespace espresso {
 
     /** Get the total number of pairs for the Verlet list */
     int totalSize() const;
+
+    //** Get the number of pairs for the local Verlet list */
+    int localSize() const;
 
     /** Add pairs to exclusion list */
     bool exclude(longint pid1, longint pid2);

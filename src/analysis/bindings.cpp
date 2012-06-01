@@ -11,6 +11,7 @@
 #include "MaxPID.hpp"
 #include "AllParticlePos.hpp"
 #include "IntraChainDistSq.hpp"
+#include "NeighborFluctuation.hpp"
 
 namespace espresso {
   namespace analysis {
@@ -27,6 +28,7 @@ namespace espresso {
       MaxPID::registerPython();
       AllParticlePos::registerPython();
       IntraChainDistSq::registerPython();
+      NeighborFluctuation::registerPython();
     }
   }
 }

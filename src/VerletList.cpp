@@ -8,8 +8,6 @@
 #include "bc/BC.hpp"
 #include "iterator/CellListAllPairsIterator.hpp"
 
-#include <cmath>
-
 namespace espresso {
 
   using namespace espresso::iterator;
@@ -36,10 +34,6 @@ namespace espresso {
     // make a connection to System to invoke rebuild on resort
     connectionResort = system->storage->onParticlesChanged.connect(
         boost::bind(&VerletList::rebuild, this));
-  }
-  
-  real VerletList::getCutoff(){
-    return sqrt(cutsq);
   }
   
   void VerletList::connect()
@@ -104,18 +98,26 @@ namespace espresso {
   int VerletList::totalSize() const
   {
     System& system = getSystemRef();
-    int size = vlPairs.size();
+    int size = localSize();
     int allsize;
   
     mpi::all_reduce(*system.comm, size, allsize, std::plus<int>());
     return allsize;
   }
 
-  python::tuple VerletList::getPair(int i)
+  int VerletList::localSize() const
   {
-	if (i > 0 && i <= vlPairs.size()) {
-	   return python::make_tuple(vlPairs[i-1].first->id(), vlPairs[i-1].second->id());
-	}
+    System& system = getSystemRef();
+    return vlPairs.size();
+  }
+
+  python::tuple VerletList::getPair(int i) {
+	  if (i <= 0 || i > vlPairs.size()) {
+	    std::cout << "ERROR VerletList pair " << i << " does not exists" << std::endl;
+	    return python::make_tuple();
+	  } else {
+	    return python::make_tuple(vlPairs[i-1].first->id(), vlPairs[i-1].second->id());
+	  }
   }
 
 
@@ -154,13 +156,12 @@ namespace espresso {
       .add_property("system", &SystemAccess::getSystem)
       .add_property("builds", &VerletList::getBuilds, &VerletList::setBuilds)
       .def("totalSize", &VerletList::totalSize)
+      .def("localSize", &VerletList::localSize)
       .def("getPair", &VerletList::getPair)
       .def("exclude", pyExclude)
       .def("rebuild", &VerletList::rebuild)
       .def("connect", &VerletList::connect)
       .def("disconnect", &VerletList::disconnect)
-    
-      .def("getCutoff", &VerletList::getCutoff)
       ;
   }
 

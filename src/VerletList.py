@@ -28,6 +28,11 @@ class VerletListLocal(_espresso.VerletList):
         if pmi.workerIsActive():
             return self.cxxclass.totalSize(self)
         
+    def localSize(self):
+        'count number of pairs in local VerletList'
+        if pmi.workerIsActive():
+            return self.cxxclass.localSize(self)
+        
     def exclude(self, exclusionlist):
         """
         Each processor takes the broadcasted exclusion list
@@ -44,7 +49,7 @@ class VerletListLocal(_espresso.VerletList):
         'return the pairs of the local verlet list'
         if pmi.workerIsActive():
             pairs=[]
-            npairs=self.totalSize()
+            npairs=self.localSize()
             for i in range(npairs):
               pair=self.cxxclass.getPair(self, i+1)
               pairs.append(pair)
@@ -57,6 +62,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espresso.VerletListLocal',
             pmiproperty = [ 'builds' ],
-            pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'updateCutoff', 'getCutoff' ],
+            pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect' ],
             pmiinvoke = [ 'getAllPairs' ]
             )
