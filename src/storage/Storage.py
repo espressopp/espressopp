@@ -199,13 +199,14 @@ class StorageLocal(object):
  
     def modifyParticle(self, pid, property, value):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            particle = self.getParticle(pid)
-            if particle:
+           particle = self.getParticle(pid)
+           if particle:
               try:
                 if not particle.isGhost:
                   self.logger.info("particle pid=%i rank=%i" % (pid, pmi.rank))
                   if   property.lower() == "id"   : raise "particles pid cannot be modified !"
                   elif property.lower() == "pos"  : particle.pos  = value
+                  elif property.lower() == "img"  : particle.imageBox = value
                   elif property.lower() == "type" : particle.type = value
                   elif property.lower() == "mass" : particle.mass = value
                   elif property.lower() == "v"    : particle.v    = value

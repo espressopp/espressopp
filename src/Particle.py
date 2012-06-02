@@ -1,7 +1,7 @@
 import _espresso
 import esutil
 import pmi
-from espresso import toReal3DFromVector, MPI
+from espresso import toReal3DFromVector, toInt3DFromVector, MPI
 from espresso.Exceptions import ParticleDoesNotExistHere
 
 # Controller Particle:
