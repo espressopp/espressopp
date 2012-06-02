@@ -1,6 +1,6 @@
 import espresso
 
-def writexyz(filename, system, velocities = True):
+def writexyz(filename, system, velocities = True, unfolded = False):
   file = open(filename,'w')
   numParticles  = int(espresso.analysis.NPart(system).compute())
   box_x = system.bc.boxL[0]
@@ -13,9 +13,15 @@ def writexyz(filename, system, velocities = True):
   while pid <= maxParticleID:
     particle = system.storage.getParticle(pid)
     if particle.pos:
-        xpos   = particle.pos[0]
-        ypos   = particle.pos[1]
-        zpos   = particle.pos[2]
+        if unfolded == False:
+          xpos   = particle.pos[0]
+          ypos   = particle.pos[1]
+          zpos   = particle.pos[2]
+        else:
+          unfoldedpos = system.bc.getUnfoldedPosition(particle.pos, particle.imageBox)
+          xpos   = unfoldedpos[0]
+          ypos   = unfoldedpos[1]
+          zpos   = unfoldedpos[2]
         xvel   = particle.v[0]
         yvel   = particle.v[1]
         zvel   = particle.v[2]
