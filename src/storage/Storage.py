@@ -77,6 +77,7 @@ Examples:
 
 
 from espresso import pmi
+from espresso import Int3D
 import MPI
 import logging
 from espresso import toReal3DFromVector, ParticleLocal, Particle
@@ -205,7 +206,9 @@ class StorageLocal(object):
                 if not particle.isGhost:
                   self.logger.info("particle pid=%i rank=%i" % (pid, pmi.rank))
                   if   property.lower() == "id"   : raise "particles pid cannot be modified !"
-                  elif property.lower() == "pos"  : particle.pos  = value
+                  elif property.lower() == "pos"  : # alway assume unfolded coordinates
+                                                    particle.pos       = value
+                                                    particle.imageBox  = Int3D(0, 0, 0)
                   elif property.lower() == "img"  : particle.imageBox = value
                   elif property.lower() == "type" : particle.type = value
                   elif property.lower() == "mass" : particle.mass = value

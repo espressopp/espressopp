@@ -59,7 +59,8 @@ def polymerRW(pid, startpos, numberOfMonomers, bondlength, return_angles=False, 
 	    if i < numberOfMonomers-2:
 		  angles.append((pid+i, pid+i+1, pid+i+2))
 		  
-	avecostheta /= (numberOfMonomers-2)
+	if mindist:	  
+	  avecostheta /= (numberOfMonomers-2)
     
 	if return_angles == True:
 		if mindist:	
