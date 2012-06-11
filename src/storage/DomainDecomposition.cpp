@@ -142,7 +142,7 @@ namespace espresso {
 	if(particleCoordinates) Storage::scaleVolume( s );
     
     real maxCut = getSystem() -> maxCutoff;
-    real skinL = getSystem() -> skin;
+    real skinL = getSystem() -> getSkin();
     real cs = maxCut + skinL;
     if( cs > s*cellGrid.getSmallestCellDiameter() ){
       Real3D Li = getSystem() -> bc -> getBoxL(); // getting the system size
@@ -166,7 +166,7 @@ namespace espresso {
 	if(particleCoordinates) Storage::scaleVolume( s );
     
     real maxCut = getSystem() -> maxCutoff;
-    real skinL = getSystem() -> skin;
+    real skinL = getSystem() -> getSkin();
     real cs = maxCut + skinL;
     real cellD = cellGrid.getSmallestCellDiameter();
     
@@ -207,7 +207,7 @@ namespace espresso {
   void DomainDecomposition::cellAdjust(){
     // create an appropriate cell grid
     Real3D box_sizeL = getSystem() -> bc -> getBoxL();
-    real skinL = getSystem() -> skin;
+    real skinL = getSystem() -> getSkin();
     real maxCutoffL = getSystem() -> maxCutoff;
             
     // TODO probably one should handle the error

@@ -30,7 +30,7 @@ namespace espresso {
       builds = 0;
 
       // AdResS stuff
-      skin = system->skin;
+      skin = system->getSkin();
       dEx = _dEx;
       dHy = _dHy;
       adrCenterSet = false;

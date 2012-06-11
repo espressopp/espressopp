@@ -47,13 +47,14 @@ def cellGrid(box_size, node_grid, rc, skin):
   
   return Int3D(ix, iy, iz)
 
-def tuneSkin(system, integrator, precision):
-  print 'Warning! It\'s a testing version right now.'
+def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.2, precision=0.001):
+  print 'Warning! It\'s a testing version now.'
   print 'The tuning is started. It can take some time. It depends on your system.'
-  nodeGrid = system.storage.getNodeGrid()
-  box      = system.bc.boxL
-  minNodeLength = min( box[0]/nodeGrid[0], min( box[1]/nodeGrid[1], box[2]/nodeGrid[2] )  )
-  maximumCut = system.maxCutoff # biggest value
+  
+  #nodeGrid = system.storage.getNodeGrid()
+  #box      = system.bc.boxL
+  #minNodeLength = min( box[0]/nodeGrid[0], min( box[1]/nodeGrid[1], box[2]/nodeGrid[2] )  )
+  #maximumCut = system.maxCutoff # biggest value
   
   # !!! not nice at all !!!
   ourInter = system.getInteraction(0)
@@ -63,23 +64,25 @@ def tuneSkin(system, integrator, precision):
   fi = (1.0+math.sqrt(5.0))/2.0 # golden ratio
   
   # initial data
-  minSkin = 0.01 # lowest value
-  maxSkin = (minNodeLength - maximumCut)/2.0
+  #minSkin = 0.01 # lowest value
+  #maxSkin = (minNodeLength - maximumCut)/2.0
+  
+  # what is appropriate runs value?
   
   while (maxSkin-minSkin>=precision):
-    sk1 = maxSkin - (maxSkin-minSkin)/fi
-    sk2 = minSkin + (maxSkin-minSkin)/fi
+    skin1 = maxSkin - (maxSkin-minSkin)/fi
+    skin2 = minSkin + (maxSkin-minSkin)/fi
 
-    system.skin = sk1
-    ourVerletList.updateCutoff(system.skin+ourCutoff)
+    system.skin = skin1
+    #ourVerletList.updateCutoff(system.skin+ourCutoff)
     system.storage.cellAdjust()
     start_time = time.time()
     integrator.run(2000)
     end_time = time.time()
     time1 = end_time - start_time
 
-    system.skin = sk2
-    ourVerletList.updateCutoff(system.skin+ourCutoff)
+    system.skin = skin2
+    #ourVerletList.updateCutoff(system.skin+ourCutoff)
     system.storage.cellAdjust()
     start_time = time.time()
     integrator.run(2000)
@@ -87,9 +90,9 @@ def tuneSkin(system, integrator, precision):
     time2 = end_time - start_time
 
     if(time1>time2):
-      minSkin = sk1
+      minSkin = skin1
     else:
-      maxSkin = sk2
+      maxSkin = skin2
       
     print 'time1: ', time1, '  time2: ', time2, '  deltaSkin: ', (maxSkin-minSkin)
     

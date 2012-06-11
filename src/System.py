@@ -114,6 +114,7 @@ if pmi.isController:
     pmiproxydefs = dict(
       cls = 'espresso.SystemLocal',
       pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff'],
-      pmicall = ['addInteraction','removeInteraction','getInteraction','getNumberOfInteractions','scaleVolume', 'setTrace']
+      pmicall = ['addInteraction','removeInteraction','getInteraction',
+            'getNumberOfInteractions','scaleVolume', 'setTrace']
     )
 

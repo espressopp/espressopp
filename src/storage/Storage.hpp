@@ -33,8 +33,12 @@ namespace espresso {
       
       /** Scale Volume for derived classes, pS define the particle coordinates scaling*/
       virtual void scaleVolume(real s, bool pS) = 0;
-      /** Scale Volume for derived classes, pS define the particle coordinates scaling. Anisotropic case */
+      /** Scale Volume for derived classes, pS define the particle coordinates scaling.
+       *  Anisotropic case */
       virtual void scaleVolume(Real3D s, bool pS) = 0;
+      
+      /** It should be used at the place where is the possibility of cell size<cutoff+skin*/
+      virtual void cellAdjust() = 0;
 
       /** add a particle with given id and position. Note that this is a
 	  local operation, and therefore cannot check whether a particle

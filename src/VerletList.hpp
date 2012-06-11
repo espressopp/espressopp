@@ -67,7 +67,10 @@ namespace espresso {
     void checkPair(Particle &pt1, Particle &pt2);
     PairList vlPairs;
     boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list
+    
     real cutsq;
+    real cut;
+    
     int builds;
     boost::signals2::connection connectionResort;
 

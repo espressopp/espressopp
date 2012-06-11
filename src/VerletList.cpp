@@ -16,15 +16,17 @@ namespace espresso {
 
 /*-------------------------------------------------------------*/
 
-  VerletList::VerletList(shared_ptr<System> system, real cut, bool rebuildVL) : SystemAccess(system)
+  // cut is a cutoff (without skin)
+  VerletList::VerletList(shared_ptr<System> system, real _cut, bool rebuildVL) : SystemAccess(system)
   {
-    LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << cut);
+    LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << _cut);
   
     if (!system->storage) {
        throw std::runtime_error("system has no storage");
     }
 
-    real cutVerlet = cut;
+    cut = _cut;
+    real cutVerlet = cut + system -> getSkin();
     cutsq = cutVerlet * cutVerlet;
     builds = 0;
 
@@ -55,6 +57,9 @@ namespace espresso {
   
   void VerletList::rebuild()
   {
+    real cutVerlet = cut + getSystem() -> getSkin();
+    cutsq = cutVerlet * cutVerlet;
+    
     vlPairs.clear();
 
     // add particles to adress zone

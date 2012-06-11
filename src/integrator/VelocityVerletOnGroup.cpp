@@ -93,7 +93,7 @@ namespace espresso {
 
       LOG4ESPP_INFO(theLogger, "run " << nsteps << " iterations");
   
-      real skinHalf = 0.5 * system.skin;
+      real skinHalf = 0.5 * system.getSkin();
 
       for (int i = 0; i < nsteps; i++) {
 

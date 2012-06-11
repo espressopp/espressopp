@@ -143,6 +143,9 @@ namespace espresso {
   // anisotropic version
   void DomainDecompositionAdress::scaleVolume(Real3D s, bool particleCoordinates){
   }
+  // it modifies the cell structure if the cell size becomes smaller then cutoff+skin
+  void DomainDecompositionAdress::cellAdjust(){
+  }
   
   
   void DomainDecompositionAdress::initCellInteractions() {

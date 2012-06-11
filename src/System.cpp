@@ -48,6 +48,16 @@ namespace espresso {
     maxCutoff = 0.0;
   }
 
+  void System::setSkin(real _skin){
+    skin = _skin;
+    if(storage) storage -> cellAdjust();
+    //storage -> decompose();  // it's not nessesary because at the end of cellAdjust()
+                               // the signal onParticlesChanged is sent
+  }
+  real System::getSkin(){
+    return skin;
+  }
+
   void System::addInteraction(shared_ptr< interaction::Interaction > ia){
     shortRangeInteractions.push_back(ia);
     
@@ -137,15 +147,16 @@ namespace espresso {
   System::registerPython() {
     using namespace espresso::python;
 
-    class_< System >
-      ("System", init<>())
+    class_< System > ("System", init<>())
+      .add_property("skin", &System::getSkin, &System::setSkin)
+    
       .def(init< python::object >())
       .def_readwrite("storage", &System::storage)
       .def_readwrite("bc", &System::bc)
       .def_readwrite("rng", &System::rng)
 //      .def_readwrite("shortRangeInteractions",
 //		     &System::shortRangeInteractions)
-      .def_readwrite("skin", &System::skin)
+//      .def_readwrite("skin", &System::skin)
       .def_readonly("maxCutoff", &System::maxCutoff)
       .def("addInteraction", &System::addInteraction)
       .def("removeInteraction", &System::removeInteraction)

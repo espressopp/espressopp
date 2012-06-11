@@ -27,6 +27,8 @@ namespace espresso {
       // scale the particle coordinates and cell size
       virtual void scaleVolume(real s, bool particleCoordinates);
       virtual void scaleVolume(Real3D s, bool particleCoordinates);
+      virtual void cellAdjust();
+      
       
       virtual Cell *mapPositionToCell(const Real3D& pos);
       virtual Cell *mapPositionToCellClipped(const Real3D& pos);

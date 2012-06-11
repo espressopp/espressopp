@@ -13,6 +13,9 @@ namespace espresso {
   namespace esutil { class RNG; }
 
   class System : public enable_shared_from_this< System > {
+  
+  private:
+    real skin;  //<! skin used for VerletList
 
   public:
 
@@ -27,8 +30,6 @@ namespace espresso {
 
     interaction::InteractionList shortRangeInteractions;
 
-    real skin;  //<! skin used for VerletList
-    
     real maxCutoff;     // maximal cutoff over all of the interactions
 
     bool CommunicatorIsInitialized;
@@ -36,6 +37,9 @@ namespace espresso {
     shared_ptr< System > getShared() { 
       return shared_from_this();
     }
+    
+    void setSkin(real);
+    real getSkin();
     
     void scaleVolume(real s, bool particleCoordinates);
     void scaleVolume(Real3D s, bool particleCoordinates);
