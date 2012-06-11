@@ -2,7 +2,6 @@
 #ifndef _STORAGE_DOMAINDECOMPOSITIONADRESS_HPP
 #define _STORAGE_DOMAINDECOMPOSITIONADRESS_HPP
 #include "Storage.hpp"
-#include "StorageAdress.hpp"
 #include "types.hpp"
 #include "CellGrid.hpp"
 #include "NodeGrid.hpp"
@@ -16,7 +15,7 @@ namespace espresso {
       NodeGridMismatch2(const Int3D& gridRequested, int nodesAvailable);
     };
 
-    class DomainDecompositionAdress: public StorageAdress {
+    class DomainDecompositionAdress: public Storage {
     public:
       DomainDecompositionAdress(shared_ptr< System > system,
 			  const Int3D& _nodeGrid,
@@ -27,9 +26,11 @@ namespace espresso {
       // scale the particle coordinates and cell size
       virtual void scaleVolume(real s, bool particleCoordinates);
       virtual void scaleVolume(Real3D s, bool particleCoordinates);
+      
+      // it modifies the cell structure if the cell size becomes smaller then cutoff+skin
+      // as a consequence of the system resizing
       virtual void cellAdjust();
-      
-      
+
       virtual Cell *mapPositionToCell(const Real3D& pos);
       virtual Cell *mapPositionToCellClipped(const Real3D& pos);
       virtual Cell *mapPositionToCellChecked(const Real3D& pos);
@@ -39,12 +40,63 @@ namespace espresso {
       const NodeGrid &getNodeGrid() const { return nodeGrid; }
       const CellGrid &getCellGrid() const { return cellGrid; }
 
+
+      // this overrides the Storage decompose(), for the purpose of AdResS
+      void decompose();
+
+
+
       virtual void updateGhosts();
       virtual void collectGhostForces();
 
       static void registerPython();
 
     protected:
+
+      /**
+        The below 9 functions override those defined
+        in Storage, for the purpose of AdResS
+       */
+
+      // remove ghost particles from the localParticles index
+      void invalidateGhosts();
+
+      /** pack real particle data for sending. At least positions, maybe
+          shifted, and possibly additional data according to extradata.
+
+          @param shift how to adjust the positions of the particles when sending
+      */
+      void packPositionsEtc(class OutBuffer& buf,
+                      Cell &reals, int extradata, const Real3D& shift);
+
+      /** unpack received data for ghosts. */
+      void unpackPositionsEtc(Cell &ghosts, class InBuffer &buf, int extradata);
+
+      /** copy specified data elements between a real cell and one of its ghosts
+
+          @param shift how to adjust the positions of the particles when sending
+      */
+      void copyRealsToGhosts(Cell &reals, Cell &ghosts,
+                       int extradata,
+                       const Real3D& shift);
+
+      void copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift);
+
+      // pack ghost forces for sending.
+      void packForces(OutBuffer& buf, Cell &ghosts);
+
+      // unpack received ghost forces. This one ADDS, and is most likely, what you need.
+      void unpackAndAddForces(Cell &reals, class InBuffer &buf);
+
+      void addGhostForcesToReals(Cell &ghosts, Cell &reals);
+
+      // adds ghost forces of Adr AT particles to real Adr AT particles
+      void addAdrGhostForcesToReals(Particle& src, Particle& dst);
+
+
+
+
+
       virtual bool checkIsRealParticle(longint id, const Real3D& pos);
       virtual void decomposeRealParticles();
       virtual void exchangeGhosts();

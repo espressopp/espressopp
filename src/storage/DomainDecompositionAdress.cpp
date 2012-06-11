@@ -9,10 +9,12 @@
 #include "Real3D.hpp"
 #include "DomainDecompositionAdress.hpp"
 #include "bc/BC.hpp"
+#include "iterator/CellListIterator.hpp"
 #include "Int3D.hpp"
 #include "Buffer.hpp"
 
 using namespace boost;
+using namespace espresso::iterator;
 
 namespace espresso { 
   namespace storage {
@@ -43,7 +45,7 @@ namespace espresso {
   DomainDecompositionAdress(shared_ptr< System > _system,
           const Int3D& _nodeGrid,
           const Int3D& _cellGrid)
-    : StorageAdress(_system), exchangeBufferSize(0) {
+    : Storage(_system), exchangeBufferSize(0) {
     LOG4ESPP_INFO(logger, "node grid = "
           << _nodeGrid[0] << "x" << _nodeGrid[1] << "x" << _nodeGrid[2]
           << " cell grid = "
@@ -143,11 +145,71 @@ namespace espresso {
   // anisotropic version
   void DomainDecompositionAdress::scaleVolume(Real3D s, bool particleCoordinates){
   }
-  // it modifies the cell structure if the cell size becomes smaller then cutoff+skin
+  
+  
+
+
   void DomainDecompositionAdress::cellAdjust(){
+      // create an appropriate cell grid
+      Real3D box_sizeL = getSystem() -> bc -> getBoxL();
+      real skinL = getSystem() -> getSkin();
+      real maxCutoffL = getSystem() -> maxCutoff;
+
+      // TODO probably one should handle the error
+      // nodeGrid is already defined
+      Int3D _nodeGrid(nodeGrid.getGridSize());
+      // new cellGrid
+      real rc_skin = maxCutoffL + skinL;
+      int ix = (int)(box_sizeL[0] / (rc_skin * _nodeGrid[0]));
+      int iy = (int)(box_sizeL[1] / (rc_skin * _nodeGrid[1]));
+      int iz = (int)(box_sizeL[2] / (rc_skin * _nodeGrid[2]));
+      Int3D _newCellGrid(ix, iy, iz);
+
+      // save all particles to temporary vector
+      std::vector<ParticleList> tmp_pl;
+      size_t _N = realCells.size();
+      tmp_pl.reserve( _N );
+      for(CellList::Iterator it(realCells); it.isValid(); ++it) {
+        tmp_pl.push_back((*it)->particles);
+      }
+
+      // reset all cells info
+      invalidateGhosts();
+      cells.clear();
+      localCells.clear();
+      realCells.clear();
+      ghostCells.clear();
+      for(int i=0; i<6; i++){
+        commCells[i].reals.clear();
+        commCells[i].ghosts.clear();
+      }
+
+      // creating new grids
+      createCellGrid(_nodeGrid, _newCellGrid);
+      initCellInteractions();
+      prepareGhostCommunication();
+
+      // pushing the particles back to the empty cell ("do we have to check particles?")
+      for(int i=0; i<tmp_pl.size(); i++){
+        for (size_t p = 0; p < tmp_pl[i].size(); ++p) {
+          Particle& part = tmp_pl[i][p];
+          const Real3D& pos = part.position();
+          Cell *sortCell = mapPositionToCellClipped(pos);
+          appendUnindexedParticle(sortCell->particles, part);
+        }
+      }
+
+      for(CellList::Iterator it(realCells); it.isValid(); ++it) {
+        updateLocalParticles((*it)->particles);
+      }
+
+      exchangeGhosts();
+      onParticlesChanged();
   }
-  
-  
+
+
+
+
   void DomainDecompositionAdress::initCellInteractions() {
     LOG4ESPP_DEBUG(logger, "setting up neighbors for " << cells.size() << " cells");
 
@@ -211,6 +273,482 @@ namespace espresso {
   checkIsRealParticle(longint id, const Real3D& pos) {
     return getSystem()->comm->rank() == mapPositionToNodeClipped(pos);
   }
+
+
+
+
+  void DomainDecompositionAdress::invalidateGhosts() {
+    for(CellListIterator it(getGhostCells());
+    it.isValid(); ++it) {
+  /* remove only ghosts from the hash if the localParticles hash
+     actually points to the ghost.  If there are local ghost cells
+     to implement pbc, the real particle will be the one accessible
+     via localParticles.
+  */
+        removeFromLocalParticles(&(*it), true);
+    }
+
+    // for AdResS
+    //std::cout << getSystem()->comm->rank() << ": ----- CLEAR GHOST ADRESS PARTICLES (AdrATParticlesG) ----\n";
+    //AdrATParticlesG.clear();
+    clearAdrATParticlesG();
+    // clear ghost tuples
+    FixedTupleList::iterator it = fixedtupleList->begin();
+    for (;it != fixedtupleList->end(); ++it) {
+        Particle* vp = it->first;
+        if (vp->ghost()) {
+            //std::cout << "erasing ghost particle in tuple: " << vp->id() << "-" << vp->ghost() << "\n";
+            fixedtupleList->erase(it);
+        }
+    }
+  }
+
+  void DomainDecompositionAdress::decompose() {
+    //std::cout << " ---- decompose ----\n";
+    invalidateGhosts();
+    decomposeRealParticles();
+    //std::cout << getSystem()->comm->rank() << ": (onTuplesChanged) ";
+    onTuplesChanged(); // for AdResS, renamed to not confuse with bonds
+    //std::cout << " ---- exchange ghosts ---- \n";
+    exchangeGhosts();
+    //std::cout << getSystem()->comm->rank() << ": ";
+    onParticlesChanged();
+  }
+
+  void DomainDecompositionAdress::packPositionsEtc(OutBuffer &buf,
+                 Cell &_reals, int extradata, const Real3D& shift) {
+    ParticleList &reals  = _reals.particles;
+
+    for(ParticleList::iterator src = reals.begin(), end = reals.end(); src != end; ++src) {
+
+      buf.write(*src, extradata, shift);
+
+
+      /*std::cout << getSystem()->comm->rank() << ": -> " << src->id() << "-" << src->ghost() <<
+              " (" << src->getPos() << ") type " << src->getType() << " @ " << &(*src) << " \n";*/
+
+
+      // for AdResS
+      // write all AT particles belonging to this VP into the buffer
+      FixedTupleList::iterator it;
+      it = fixedtupleList->find(&(*src));
+      if (it != fixedtupleList->end()) {
+          std::vector<Particle*> atList;
+          atList = it->second;
+
+          int size = atList.size();
+          buf.write(size); // write size of vector first
+
+          for (std::vector<Particle*>::iterator itv = atList.begin();
+                itv != atList.end(); ++itv) {
+              Particle &at = **itv;
+
+              /*std::cout << getSystem()->comm->rank() << ":  ---> " << at.id() << "-" << at.ghost() <<
+                      " (" << at.position() << ") type " << at.type() << " \n";*/
+
+              /*
+              if (at.type() == 0) { // just for testing
+                  std::cout << "SERIOUS ERROR, particle is of wrong type\n";
+                  exit(1);
+                  return;
+              }*/
+
+              buf.write(at, 1, shift); // we force extradata to 1
+          }
+      }
+      else {
+          std::cout << getSystem()->comm->rank() << ": packposetc " << "VP particle "<< src->id() << "-" << src->ghost() << " not found in tuples!\n";
+          exit(1);
+          return;
+      }
+
+    }
+  }
+
+  void DomainDecompositionAdress::unpackPositionsEtc(Cell &_ghosts, InBuffer &buf, int extradata) {
+    ParticleList &ghosts  = _ghosts.particles;
+
+    for(ParticleList::iterator dst = ghosts.begin(), end = ghosts.end(); dst != end; ++dst) {
+
+      //std::cout << getSystem()->comm->rank() << ": buf.read(particle, extradata) (unpackPosEtc) \n";
+      buf.read(*dst, extradata);
+
+      if (extradata & DATA_PROPERTIES) {
+          updateInLocalParticles(&(*dst), true);
+      }
+
+      dst->ghost() = 1;
+
+
+      // for AdResS
+
+      /*std::cout << getSystem()->comm->rank() << ": <- " << dst->id() << "-" << dst->ghost() <<
+              " (" << dst->getPos() << ") type " << dst->getType() << "\n";*/
+
+      //int numAT = fixedtupleList->getNumPart(dst->id()); // does not work, not sure why
+      int numAT;
+      buf.read(numAT); // read number of AT particles
+
+      FixedTupleList::iterator it;
+      it = fixedtupleList->find(&(*dst));
+      if (it != fixedtupleList->end()) {
+          std::vector<Particle*> atList = it->second;
+
+          for (std::vector<Particle*>::iterator itv = atList.begin();
+                  itv != atList.end(); ++itv) {
+              Particle &atg = **itv;
+              buf.read(atg, 1); // we force extradata to 1 (although not necessary here...)
+
+              /*std::cout << getSystem()->comm->rank() << ":  <1--- " << atg.id() << "-" << atg.ghost() <<
+                              " (" << atg.position() << ") type " << atg.type() <<
+                              " extradata: " << extradata << "\n";*/
+          }
+      }
+      else {
+          std::vector<Particle*> tmp;
+          //Particle* atg; // atom, ghost
+          //Particle tmpatg; // temporary particle, to be inserted into adr. at. ghost part.
+
+
+          ParticleList tmp2; // temporary vector
+          tmp2.resize(numAT);
+          appendParticleListToGhosts(tmp2); // insert into list
+
+          ParticleList::iterator itv2  = (getAdrATParticlesG().back()).begin();
+
+
+          for (int i = 1; i <= numAT; ++i, ++itv2) {
+              // read the AT partcles
+              //std::cout << getSystem()->comm->rank() << ": buf.read(AT particle, extradata) (unpackPosEtc), i: " << i << "\n";
+
+              /*
+              buf.read(tmpatg, 1); // we force extradata to 1
+
+              atg = appendUnindexedAdrParticle(getAdrATParticlesG(), tmpatg);
+              atg->ghost() = 1;
+
+              tmp.push_back(atg);*/
+
+              Particle &atg = *itv2;
+              buf.read(atg, 1);
+
+              atg.ghost() = 1;
+              tmp.push_back(&atg);
+
+
+
+              /*std::cout << getSystem()->comm->rank() << ":  <2--- " << atg.id() << "-" << atg.ghost() <<
+                                  " (" << atg.getPos() << ") type " << atg.getType() <<
+                                  " extradata: " << extradata << "\n";*/
+
+              /*if (atg->getType() == dst->getType()) { // for testing purposes
+                  std::cout << "SERIOUS ERROR, particle is of wrong type\n";
+                  exit(-1);
+                  return;
+              }*/
+          }
+
+          fixedtupleList->insert(std::make_pair(&(*dst), tmp));
+          tmp.clear();
+      }
+
+
+
+
+    }
+  }
+
+  void DomainDecompositionAdress::copyRealsToGhosts(Cell &_reals, Cell &_ghosts,
+                  int extradata,
+                  const Real3D& shift) {
+
+    ParticleList &reals  = _reals.particles;
+    ParticleList &ghosts = _ghosts.particles;
+
+    ghosts.resize(reals.size());
+
+    //std::cout << "Copy reals to ghosts ... \n";
+
+    for(ParticleList::iterator src = reals.begin(), end = reals.end(), dst = ghosts.begin();
+            src != end; ++src, ++dst) {
+      dst->copyAsGhost(*src, extradata, shift);
+
+      // for AdResS
+      copyGhostTuples(*src, *dst, extradata, shift);
+    }
+  }
+
+
+  inline void DomainDecompositionAdress::copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift) {
+
+      // create ghosts of particles in tuples
+      FixedTupleList::iterator it;
+      it = fixedtupleList->find(&src);
+      if (it != fixedtupleList->end()) {
+          std::vector<Particle*> atList;
+          atList = it->second;
+
+          //Particle* atg; // atom, ghost
+          std::vector<Particle*> tmp; // temporary vector
+
+          ParticleList tmp2; // temporary vector
+          tmp2.resize(atList.size());
+          appendParticleListToGhosts(tmp2); // insert into list
+
+          ParticleList::iterator itv2  = (getAdrATParticlesG().back()).begin();
+
+
+          for (std::vector<Particle*>::iterator itv = atList.begin();
+                itv != atList.end(); ++itv, ++itv2) {
+              Particle &at = **itv;
+
+              /*
+              Particle n; // temporary particle, to be inserted into adr. at. ghost part.
+              n.id() = at.getId();
+              n.type() = at.getType();
+
+
+              // see whether the array was resized; STL hack
+              //Particle *begin = &AdrATParticlesG.front();
+
+              atg = appendUnindexedAdrParticle(getAdrATParticlesG(), n);
+              atg->copyAsGhost(at, extradata, shift);
+
+              tmp.push_back(atg);
+              */
+
+              /*
+              if (at.id() == 12573) {
+                  std::cout << src.id() << "-" << src.ghost() << " (" << &src << "): copying 12573-" << at.ghost() << " (" << &at << ") pos (" << at.position() << ") to ghost at (";
+              }*/
+
+
+              Particle &atg = *itv2;
+              atg.id() = at.getId();
+              atg.type() = at.getType();
+              atg.copyAsGhost(at, extradata, shift);
+
+
+              /*
+              if (at.id() == 12573) {
+                  std::cout << &atg << ") pos (" << atg.position() << ")\n";
+              }*/
+
+
+              tmp.push_back(&atg);
+
+              /*if (begin != &AdrATParticlesG.front())
+                  std::cout << "\n  -- AdrATParticlesG array resized!! --\n\n";*/
+
+          }
+
+          /*
+          if (src.id() == 23147) {
+              std::cout << " tmp size is: " << tmp.size() << "\n";
+          }*/
+          /*
+                                  " contents are [" << tmp.at(0)->id() << ", "
+                                  << tmp.at(1)->id() << ", "
+                                  << tmp.at(2)->id() << ", "
+                                  << tmp.at(3)->id() << "]\n";*/
+
+          fixedtupleList->insert(std::make_pair(&dst, tmp));
+          tmp.clear();
+      }
+      else {
+          std::cout << "copyGhostTuples: VP particle "<< src.id() << "-" << src.ghost() << " (" << src.position() << ")" << " not found in tuples!\n";
+          exit(1);
+          return;
+      }
+  }
+
+  /* -- this is now solved in FixedTupleList.cpp in onparticleschanged()
+  void DomainDecompositionAdress::foldAdrPartCoor(Particle& part, Real3D& oldpos, int coord) {
+
+      if (part.position()[coord] != oldpos[coord]) {
+          real moved = oldpos[coord] - part.position()[coord];
+
+          FixedTupleList::iterator it;
+          it = fixedtupleList->find(&part);
+          if (it != fixedtupleList->end()) {
+              std::vector<Particle*> atList;
+              atList = it->second;
+
+              for (std::vector<Particle*>::iterator itv = atList.begin();
+                    itv != atList.end(); ++itv) {
+                  Particle &at = **itv;
+
+                  //std::cout << " updating position for AT part " << at.id() << " (" << at.position() << ") ";
+
+                  at.position()[coord] = at.position()[coord] - moved;
+                  //getSystem()->bc->foldCoordinate(at.position(), at.image(), coord);
+
+                  //std::cout << "to (" << at.position() << ")\n";
+              }
+          }
+          else {
+              std::cout << getSystem()->comm->rank() << ": foldAdrPartCoor "
+                      << "VP particle "<< part.id() << "-" << part.ghost() << " not found in tuples!\n";
+              exit(1);
+              return;
+          }
+      }
+  }
+  */
+
+  void DomainDecompositionAdress::packForces(OutBuffer &buf, Cell &_ghosts) {
+
+    ParticleList &ghosts = _ghosts.particles;
+
+    for(ParticleList::iterator src = ghosts.begin(), end = ghosts.end(); src != end; ++src) {
+
+      buf.write(src->particleForce());
+
+      LOG4ESPP_TRACE(logger, "from particle " << src->id() << ": packing force " << src->force());
+
+
+      /*std::cout << getSystem()->comm->rank() << ": " << " from particle " << src->id()
+              << " packing force " << src->force() << "\n";*/
+
+
+
+      // for AdResS
+      // write all AT particle forces belonging to this VP into the buffer
+      FixedTupleList::iterator it;
+      it = fixedtupleList->find(&(*src));
+      if (it != fixedtupleList->end()) {
+          std::vector<Particle*> atList;
+          atList = it->second;
+
+          for (std::vector<Particle*>::iterator itv = atList.begin();
+                itv != atList.end(); ++itv) {
+              Particle &at = **itv;
+
+              /*std::cout << getSystem()->comm->rank() << ":  ---> " << at.id() << "-" << at.ghost() <<
+                      " (" << at.position() << ") type " << at.type() << " \n";*/
+
+              buf.write(at.particleForce());
+          }
+      }
+      else {
+          std::cout << getSystem()->comm->rank() << ": packforces " << "VP particle "<< src->id() << "-" << src->ghost() << " not found in tuples!\n";
+          exit(1);
+          return;
+      }
+    }
+  }
+
+  void DomainDecompositionAdress::unpackAndAddForces(Cell &_reals, InBuffer &buf)
+  {
+    LOG4ESPP_DEBUG(logger, "add forces from buffer to cell "
+           << (&_reals - getFirstCell()));
+
+    ParticleList &reals = _reals.particles;
+
+    for(ParticleList::iterator dst = reals.begin(), end = reals.end(); dst != end; ++dst) {
+        ParticleForce f;
+        //std::cout << getSystem()->comm->rank() << ": buf.read(force) (unpackAndAddForces) \n";
+        buf.read(f);
+        LOG4ESPP_TRACE(logger, "for particle " << dst->id() << ": unpacking force "
+             << f.f() << " and adding to " << dst->force());
+        dst->particleForce() += f;
+
+
+
+        /*std::cout << getSystem()->comm->rank() << ": " << " for particle " << dst->id() << " unpacking force "
+            << " and adding to " << dst->force() << "\n";*/
+
+
+        // for AdResS
+
+        // iterate through atomistic particles in fixedtuplelist
+        FixedTupleList::iterator it;
+        it = fixedtupleList->find(&(*dst));
+
+        if (it != fixedtupleList->end()) {
+
+           std::vector<Particle*> atList1;
+           atList1 = it->second;
+
+           //std::cout << "AT forces ...\n";
+           for (std::vector<Particle*>::iterator itv = atList1.begin(); itv != atList1.end(); ++itv) {
+               Particle &p3 = **itv;
+               //std::cout << getSystem()->comm->rank() << ": buf.read(AT force) (unpackAndAddForces) \n";
+               buf.read(f);
+               p3.particleForce() += f;
+           }
+        }
+        else {
+           std::cout << " unpackForces: one of the VP particles not found in tuples: " << dst->id() << "-" << dst->ghost();
+           exit(1);
+           return;
+        }
+
+    }
+  }
+
+  void DomainDecompositionAdress::addGhostForcesToReals(Cell &_ghosts, Cell &_reals)
+  {
+
+    ParticleList &reals  = _reals.particles;
+    ParticleList &ghosts = _ghosts.particles;
+
+    for(ParticleList::iterator dst = reals.begin(), end = reals.end(), src = ghosts.begin();
+            dst != end; ++dst, ++src) {
+        LOG4ESPP_TRACE(logger, "for particle " << dst->id() << ": adding force "
+             << src->force() << " to " << dst->force());
+
+        dst->particleForce() += src->particleForce();
+
+        // for AdResS
+        addAdrGhostForcesToReals(*src, *dst);
+    }
+  }
+
+  inline void DomainDecompositionAdress::addAdrGhostForcesToReals(Particle& src, Particle& dst) {
+
+      // iterate through atomistic particles in fixedtuplelist
+      FixedTupleList::iterator its;
+      FixedTupleList::iterator itd;
+      its = fixedtupleList->find(&src);
+      itd = fixedtupleList->find(&dst);
+
+      //std::cout << "\nInteraction " << p1.id() << " - " << p2.id() << "\n";
+      if (its != fixedtupleList->end() && itd != fixedtupleList->end()) {
+
+          std::vector<Particle*> atList1;
+          std::vector<Particle*> atList2;
+          atList1 = its->second;
+          atList2 = itd->second;
+
+          for (std::vector<Particle*>::iterator itv = atList1.begin(),
+                  itv2 = atList2.begin(); itv != atList1.end(); ++itv, ++itv2) {
+
+              Particle &p3 = **itv;
+              Particle &p4 = **itv2;
+
+              p4.particleForce() += p3.particleForce();
+          }
+      }
+      else {
+          std::cout << " one of the VP particles not found in tuples: " << src.id() << "-" <<
+                  src.ghost() << ", " << dst.id() << "-" << dst.ghost();
+          exit(1);
+          return;
+      }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
 
   bool DomainDecompositionAdress::
   appendParticles(ParticleList &l, int dir) {
