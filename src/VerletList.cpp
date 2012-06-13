@@ -26,7 +26,7 @@ namespace espresso {
     }
 
     cut = _cut;
-    real cutVerlet = cut + system -> getSkin();
+    cutVerlet = cut + system -> getSkin();
     cutsq = cutVerlet * cutVerlet;
     builds = 0;
 
@@ -36,6 +36,10 @@ namespace espresso {
     // make a connection to System to invoke rebuild on resort
     connectionResort = system->storage->onParticlesChanged.connect(
         boost::bind(&VerletList::rebuild, this));
+  }
+  
+  real VerletList::getVerletCutoff(){
+    return cutVerlet;
   }
   
   void VerletList::connect()
@@ -57,7 +61,8 @@ namespace espresso {
   
   void VerletList::rebuild()
   {
-    real cutVerlet = cut + getSystem() -> getSkin();
+    //real cutVerlet = cut + getSystem() -> getSkin();
+    cutVerlet = cut + getSystem() -> getSkin();
     cutsq = cutVerlet * cutVerlet;
     
     vlPairs.clear();
@@ -167,6 +172,8 @@ namespace espresso {
       .def("rebuild", &VerletList::rebuild)
       .def("connect", &VerletList::connect)
       .def("disconnect", &VerletList::disconnect)
+    
+      .def("getVerletCutoff", &VerletList::getVerletCutoff)
       ;
   }
 

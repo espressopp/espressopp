@@ -39,6 +39,9 @@ namespace espresso {
       
       /** It should be used at the place where is the possibility of cell size<cutoff+skin*/
       virtual void cellAdjust() = 0;
+      
+      /** It should return cell grid as an integer vector*/
+      virtual Int3D getInt3DCellGrid() =0;
 
       /** add a particle with given id and position. Note that this is a
 	  local operation, and therefore cannot check whether a particle

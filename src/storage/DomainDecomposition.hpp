@@ -28,7 +28,7 @@ namespace espresso {
       
       // it returns current cell grid like a vector Int3D
       // mainly in order to use from python
-      Int3D getInt3DCellGrid();
+      virtual Int3D getInt3DCellGrid();
       Int3D getInt3DNodeGrid();
 
       // it modifies the cell structure if the cell size becomes smaller then cutoff+skin

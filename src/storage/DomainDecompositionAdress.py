@@ -17,6 +17,7 @@ if pmi.isController:
     class DomainDecompositionAdress(Storage):
         pmiproxydefs = dict(
             cls = 'espresso.storage.DomainDecompositionAdressLocal',
+            pmicall = ['getCellGrid', 'cellAdjust']
             )
         def __init__(self, system, 
                      nodeGrid='auto', 

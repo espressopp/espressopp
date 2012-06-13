@@ -193,15 +193,15 @@ namespace espresso {
   
   Int3D DomainDecomposition::getInt3DCellGrid(){
     return Int3D( cellGrid.getGridSize(0),
-            cellGrid.getGridSize(1),
-            cellGrid.getGridSize(2)
-            );
+                  cellGrid.getGridSize(1),
+                  cellGrid.getGridSize(2)
+                );
   }
   Int3D DomainDecomposition::getInt3DNodeGrid(){
     return Int3D( nodeGrid.getGridSize(0),
-            nodeGrid.getGridSize(1),
-            nodeGrid.getGridSize(2)
-            );
+                  nodeGrid.getGridSize(1),
+                  nodeGrid.getGridSize(2)
+                );
   }
 
   void DomainDecomposition::cellAdjust(){

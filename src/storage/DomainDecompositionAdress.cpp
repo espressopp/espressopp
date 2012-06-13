@@ -141,9 +141,11 @@ namespace espresso {
   // @TODO should be some implementation for adress!!!
   /** scale position coordinates of all real particles by factor s */
   void DomainDecompositionAdress::scaleVolume(real s, bool particleCoordinates){
+    std::cout<<"Nothing happened"<<std::endl;
   }
   // anisotropic version
   void DomainDecompositionAdress::scaleVolume(Real3D s, bool particleCoordinates){
+    std::cout<<"Nothing happened"<<std::endl;
   }
   
   
@@ -207,6 +209,12 @@ namespace espresso {
       onParticlesChanged();
   }
 
+  Int3D DomainDecompositionAdress::getInt3DCellGrid(){
+    return Int3D( cellGrid.getGridSize(0),
+                  cellGrid.getGridSize(1),
+                  cellGrid.getGridSize(2)
+                );
+  }
 
 
 
@@ -1190,8 +1198,9 @@ namespace espresso {
   ("storage_DomainDecompositionAdress",
    init< shared_ptr< System >,
    const Int3D&, const Int3D& >())
-  .def("mapPositionToNodeClipped",
-       &DomainDecompositionAdress::mapPositionToNodeClipped)
+  .def("mapPositionToNodeClipped", &DomainDecompositionAdress::mapPositionToNodeClipped)
+  .def("getCellGrid", &DomainDecompositionAdress::getInt3DCellGrid)
+  .def("cellAdjust", &DomainDecompositionAdress::cellAdjust)
   ;
   }
 

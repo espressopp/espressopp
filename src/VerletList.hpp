@@ -37,6 +37,8 @@ namespace espresso {
     PairList& getPairs() { return vlPairs; }
 
     python::tuple getPair(int i);
+    
+    real getVerletCutoff(); // returns cutoff + skin
 
     void connect();
 
@@ -70,6 +72,7 @@ namespace espresso {
     
     real cutsq;
     real cut;
+    real cutVerlet;
     
     int builds;
     boost::signals2::connection connectionResort;

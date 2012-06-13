@@ -57,11 +57,11 @@ class VerletListLocal(_espresso.VerletList):
 
 
 if pmi.isController:
-    class VerletList(object):
-        __metaclass__ = pmi.Proxy
-        pmiproxydefs = dict(
-            cls = 'espresso.VerletListLocal',
-            pmiproperty = [ 'builds' ],
-            pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect' ],
-            pmiinvoke = [ 'getAllPairs' ]
-            )
+  class VerletList(object):
+    __metaclass__ = pmi.Proxy
+    pmiproxydefs = dict(
+      cls = 'espresso.VerletListLocal',
+      pmiproperty = [ 'builds' ],
+      pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff' ],
+      pmiinvoke = [ 'getAllPairs' ]
+    )

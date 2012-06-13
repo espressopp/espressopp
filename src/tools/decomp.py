@@ -1,11 +1,34 @@
-"""Python functions to determine how the processors are distributed
-   and how the cells are arranged."""
+"""
+************************************
+**decomp.py** - Auxiliary python functions
+************************************
 
-from sys import exit
+
+*  `nodeGrid(n)`:
+
+    It determines how the processors are distributed and how the cells are arranged.
+    `n` - number of processes 
+
+*  `cellGrid(box_size, node_grid, rc, skin)`:
+
+    It returns an appropriate grid of cells.
+    
+*  `tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.2, precision=0.001)`:
+
+    It tunes the skin size for the current system
+    
+*  `printTimeVsSkin(system, integrator, minSkin=0.01, maxSkin=1.5, skinStep = 0.01)`:
+    
+    It prints time of running versus skin size in the range [minSkin, maxSkin] with
+    the step skinStep
+"""
+
+
+import sys
+import espresso
+
 from espresso import Int3D
 from espresso.Exceptions import Error
-
-from espresso.tools import timers
 
 import math
 import time
@@ -48,44 +71,37 @@ def cellGrid(box_size, node_grid, rc, skin):
   return Int3D(ix, iy, iz)
 
 def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.2, precision=0.001):
-  print 'Warning! It\'s a testing version now.'
-  print 'The tuning is started. It can take some time. It depends on your system.'
-  
-  #nodeGrid = system.storage.getNodeGrid()
-  #box      = system.bc.boxL
-  #minNodeLength = min( box[0]/nodeGrid[0], min( box[1]/nodeGrid[1], box[2]/nodeGrid[2] )  )
-  #maximumCut = system.maxCutoff # biggest value
-  
-  # !!! not nice at all !!!
-  ourInter = system.getInteraction(0)
-  ourVerletList = ourInter.getVerletList()
-  ourCutoff = system.maxCutoff # not correct in general!!! just for test
+  print 'The tuning is started. It can take some time depending on your system.'
   
   fi = (1.0+math.sqrt(5.0))/2.0 # golden ratio
   
-  # initial data
-  #minSkin = 0.01 # lowest value
-  #maxSkin = (minNodeLength - maximumCut)/2.0
+  npart = espresso.analysis.NPart(system).compute()
   
-  # what is appropriate runs value?
+  # this is an empirical formula in order to get the appropriate number of steps
+  nsteps = int( espresso.MPI.COMM_WORLD.size * 20000000.0 / float(npart) )
+  
+  sys.stdout.write('\nSteps     = %d\n' % nsteps)
+  sys.stdout.write('Precision = %g\n' % precision)
+  sys.stdout.write('It runs till deltaSkin<precision\n')
+  
+  prnt_format1 = '\n%9s %10s %10s %10s %14s\n'
+  sys.stdout.write(prnt_format1 % ('time1: ',' time2: ',' skin1: ', ' skin2: ', ' deltaSkin: '))
   
   while (maxSkin-minSkin>=precision):
     skin1 = maxSkin - (maxSkin-minSkin)/fi
     skin2 = minSkin + (maxSkin-minSkin)/fi
 
     system.skin = skin1
-    #ourVerletList.updateCutoff(system.skin+ourCutoff)
     system.storage.cellAdjust()
     start_time = time.time()
-    integrator.run(2000)
+    integrator.run(nsteps)
     end_time = time.time()
     time1 = end_time - start_time
 
     system.skin = skin2
-    #ourVerletList.updateCutoff(system.skin+ourCutoff)
     system.storage.cellAdjust()
     start_time = time.time()
-    integrator.run(2000)
+    integrator.run(nsteps)
     end_time = time.time()
     time2 = end_time - start_time
 
@@ -94,46 +110,39 @@ def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.2, precision=0.001):
     else:
       maxSkin = skin2
       
-    print 'time1: ', time1, '  time2: ', time2, '  deltaSkin: ', (maxSkin-minSkin)
+    prnt_format2 = '%7.3f %10.3f %11.4f %10.4f %12.6f\n'
+    sys.stdout.write(prnt_format2 % (time1, time2, minSkin, maxSkin, (maxSkin-minSkin)) )
     
+  sys.stdout.write('\nNew skin: %g\n' % system.skin)
+  sys.stdout.write('\nNew cell grid: %s\n' % system.storage.getCellGrid())
+  
   system.skin = (maxSkin+minSkin)/2.0
   system.storage.cellAdjust()
   
   return (maxSkin+minSkin)/2.0
 
-def printTimeVsSkin(system, integrator):
-  print 'Calculations is started. It can take some time. It depends on your system.'
-  nodeGrid = system.storage.getNodeGrid()
-  box      = system.bc.boxL
-  minNodeLength = min( box[0]/nodeGrid[0], min( box[1]/nodeGrid[1], box[2]/nodeGrid[2] )  )
-  maximumCut = system.maxCutoff # biggest value
+def printTimeVsSkin(system, integrator, minSkin=0.01, maxSkin=1.5, skinStep = 0.01):
+  npart = espresso.analysis.NPart(system).compute()
+  # this is an empirical formula in order to get the appropriate number of steps
+  nsteps = int( espresso.MPI.COMM_WORLD.size * 20000000.0 / float(npart) )
   
-  # !!! not nice at all !!!
-  ourInter = system.getInteraction(0)
-  ourVerletList = ourInter.getVerletList()
-  ourCutoff = system.maxCutoff # not correct in general!!! just for test
-  
-  # initial data
-  minSkin = 0.01 # lowest value
-  maxSkin = 3.0 #(minNodeLength - maximumCut)/2.0
-  
-  skinStep = 0.01
-  
-  #steps = int( (maxSkin - minSkin) / skinStep )
+  print '      Calculations is started. It will print out the dependece of time of \n\
+      running of %d steps on the skin size into the file \'timeVSskin.dat\'.\n\
+      The range of skin sizes is [%g, %g], skin step is %g. It can take some \n\
+      time depending on your system.' % (nsteps, minSkin, maxSkin, skinStep)
   
   curSkin = minSkin
   
   fmt2 = ' %8.4f %8.4f\n' # format for writing the data
   nameFile = 'timeVSskin.dat'
-  resFile = open (nameFile, 'a')
+  resFile = open (nameFile, 'w')
 
   count = 0
   while (curSkin < maxSkin):
     system.skin = curSkin
-    ourVerletList.updateCutoff(system.skin+ourCutoff)
     system.storage.cellAdjust()
     start_time = time.time()
-    integrator.run(8000)
+    integrator.run(nsteps)
     end_time = time.time()
     time1 = end_time - start_time
     
@@ -145,6 +154,8 @@ def printTimeVsSkin(system, integrator):
       count = 0
     
     curSkin = curSkin + skinStep
+  
+  resFile.close()
   
   return
   

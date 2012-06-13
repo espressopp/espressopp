@@ -26,7 +26,8 @@ namespace espresso {
       // scale the particle coordinates and cell size
       virtual void scaleVolume(real s, bool particleCoordinates);
       virtual void scaleVolume(Real3D s, bool particleCoordinates);
-      
+      virtual Int3D getInt3DCellGrid();
+            
       // it modifies the cell structure if the cell size becomes smaller then cutoff+skin
       // as a consequence of the system resizing
       virtual void cellAdjust();

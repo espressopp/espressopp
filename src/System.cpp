@@ -50,7 +50,16 @@ namespace espresso {
 
   void System::setSkin(real _skin){
     skin = _skin;
-    if(storage) storage -> cellAdjust();
+    if(storage){
+      // TODO !! It may give an error for decompositions different from 
+      // DomainDecomposition
+      // probably function getInt3DCellGrid() should be pure virtual in Storage
+      Int3D cellGr = storage->getInt3DCellGrid();
+      real cs = maxCutoff + skin;
+      if( cs > std::min( std::min( cellGr[0], cellGr[1]), cellGr[2] ) ){
+        storage -> cellAdjust();
+      }
+    }
     //storage -> decompose();  // it's not nessesary because at the end of cellAdjust()
                                // the signal onParticlesChanged is sent
   }
