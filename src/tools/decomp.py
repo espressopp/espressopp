@@ -70,7 +70,7 @@ def cellGrid(box_size, node_grid, rc, skin):
   
   return Int3D(ix, iy, iz)
 
-def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.2, precision=0.001):
+def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.5, precision=0.001, printInfo=True):
   print 'The tuning is started. It can take some time depending on your system.'
   
   fi = (1.0+math.sqrt(5.0))/2.0 # golden ratio
@@ -78,14 +78,16 @@ def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.2, precision=0.001):
   npart = espresso.analysis.NPart(system).compute()
   
   # this is an empirical formula in order to get the appropriate number of steps
-  nsteps = int( espresso.MPI.COMM_WORLD.size * 20000000.0 / float(npart) )
+  nsteps = int( espresso.MPI.COMM_WORLD.size * 10000000.0 / float(npart) )
   
+  print 'CellGrid before tuning: ', system.storage.getCellGrid()
   sys.stdout.write('\nSteps     = %d\n' % nsteps)
   sys.stdout.write('Precision = %g\n' % precision)
   sys.stdout.write('It runs till deltaSkin<precision\n')
   
-  prnt_format1 = '\n%9s %10s %10s %10s %14s\n'
-  sys.stdout.write(prnt_format1 % ('time1: ',' time2: ',' skin1: ', ' skin2: ', ' deltaSkin: '))
+  if printInfo:
+    prnt_format1 = '\n%9s %10s %10s %10s %14s\n'
+    sys.stdout.write(prnt_format1 % ('time1: ',' time2: ',' skin1: ', ' skin2: ', ' deltaSkin: '))
   
   while (maxSkin-minSkin>=precision):
     skin1 = maxSkin - (maxSkin-minSkin)/fi
@@ -110,8 +112,9 @@ def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.2, precision=0.001):
     else:
       maxSkin = skin2
       
-    prnt_format2 = '%7.3f %10.3f %11.4f %10.4f %12.6f\n'
-    sys.stdout.write(prnt_format2 % (time1, time2, minSkin, maxSkin, (maxSkin-minSkin)) )
+    if printInfo:
+      prnt_format2 = '%7.3f %10.3f %11.4f %10.4f %12.6f\n'
+      sys.stdout.write(prnt_format2 % (time1, time2, minSkin, maxSkin, (maxSkin-minSkin)) )
     
   sys.stdout.write('\nNew skin: %g\n' % system.skin)
   sys.stdout.write('\nNew cell grid: %s\n' % system.storage.getCellGrid())
@@ -121,7 +124,7 @@ def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.2, precision=0.001):
   
   return (maxSkin+minSkin)/2.0
 
-def printTimeVsSkin(system, integrator, minSkin=0.01, maxSkin=1.5, skinStep = 0.01):
+def printTimeVsSkin(system, integrator, minSkin=0.01, maxSkin=1.5, skinStep = 0.005):
   npart = espresso.analysis.NPart(system).compute()
   # this is an empirical formula in order to get the appropriate number of steps
   nsteps = int( espresso.MPI.COMM_WORLD.size * 20000000.0 / float(npart) )

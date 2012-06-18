@@ -57,8 +57,9 @@ namespace espresso {
     void Storage::removeFromLocalParticles(Particle *p, bool weak) {
       /* no pointer left, can happen for ghosts when the real particle
 	 e has already been removed */
-      if (localParticles.find(p->id()) == localParticles.end())
+      if (localParticles.find(p->id()) == localParticles.end()){
         return;
+      }
 
       if (!weak || localParticles[p->id()] == p) {
         LOG4ESPP_TRACE(logger, "removing local pointer for particle id="
@@ -226,20 +227,22 @@ namespace espresso {
       if(p){
         Cell *cell = mapPositionToCellChecked(p->position());
         
-        Particle *part_first = &cell->particles.front(); // see whether the array was moved
-    	int rem_part_ind = p - &cell->particles[0];
-        
+        removeFromLocalParticles( p );
+
+        int rem_part_ind = p - &cell->particles[0];
     	int newSize = cell->particles.size() - 1;
-        
     	if (rem_part_ind != newSize) {
           cell->particles[rem_part_ind] = cell->particles.back();
     	}
-    	cell->particles.resize(newSize);
-
-        removeFromLocalParticles( p );
+        cell->particles.resize(newSize);
+        
         updateLocalParticles( cell->particles );
 
         onParticlesChanged();
+      }
+      Particle* p1 = lookupRealParticle(id);
+      if(p1){
+        std::cout<< "Part still exst" << std::endl;
       }
     }
 

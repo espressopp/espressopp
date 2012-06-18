@@ -105,6 +105,7 @@ class StorageLocal(object):
             self.logger.debug("ParticleDoesNotExistHere pid=% rank=%i" % (pid, pmi.rank))
             pass
         
+        
             
     def addAdrATParticle(self, pid, *args):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

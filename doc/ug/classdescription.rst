@@ -14,4 +14,5 @@ ESPResSo++ User Interface - Class Description
    espresso.integrator.LangevinBarostat.rst
    espresso.interaction.CoulombRSpace.rst
    espresso.interaction.CoulombKSpaceEwald.rst
+   espresso.tools.decomp.rst
 
