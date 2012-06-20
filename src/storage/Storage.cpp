@@ -222,7 +222,7 @@ namespace espresso {
       return &cell->particles.back();
     }
     
-    void Storage::removeParticle(longint id){
+    int Storage::removeParticle(longint id){
       Particle* p = lookupRealParticle(id);
       if(p){
         Cell *cell = mapPositionToCellChecked(p->position());
@@ -239,11 +239,18 @@ namespace espresso {
         updateLocalParticles( cell->particles );
 
         onParticlesChanged();
+        Particle* p1 = lookupRealParticle(id);
+        if(p1){
+          // it should not be printed out
+          std::cout<< "Part still exst. pid: " << id << "  rpid: " << p1->id() << std::endl;
+        }
+        return 1;
       }
-      Particle* p1 = lookupRealParticle(id);
-      if(p1){
-        std::cout<< "Part still exst" << std::endl;
+      else {
+        return 0;
       }
+      
+      
     }
 
     Particle* Storage::addAdrATParticle(longint id, const Real3D& p, const Real3D& _vpp) {

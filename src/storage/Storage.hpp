@@ -51,7 +51,7 @@ namespace espresso {
       Particle* addParticle(longint id, const Real3D& pos);
 
       // remove particle from the system
-      void removeParticle(longint id);
+      int removeParticle(longint id);
       
       /* add an adress AT particle with given id, position and it's VP position.
       Adress AT paticles are located only in localAdrATParticles map.

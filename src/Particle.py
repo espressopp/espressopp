@@ -31,21 +31,22 @@ class ParticleLocal(object):
     * when data is to be read from a ghost that is not available
     """
     def __init__(self, pid, storage):
-        self.pid = pid
-        self.storage = storage
+      self.pid = pid
+      self.storage = storage
 
     def __getTmp(self):
-        tmp = self.storage.lookupLocalParticle(self.pid)
-        if tmp is None:
+      return self.storage.lookupRealParticle(self.pid)
+      
+        #if tmp is None:
             # TODO: Exception
-            raise ParticleDoesNotExistHere('pid='+str(self.pid)+' rank='+str(pmi.rank) )
-        else:
-            return tmp
+            # raise ParticleDoesNotExistHere('pid='+str(self.pid)+' rank='+str(pmi.rank) )
+        #else:
+        #  return tmp
 
     # Defining __getattr__ will make sure that you can use any
     # property defined in _TmpParticle
     def __getattr__(self, key):
-        return getattr(self.__getTmp(), key)
+      return getattr(self.__getTmp(), key)
 
 #     def __setattr__(self, key, value):
 #         return setattr(self.__getTmp(), key, value)
