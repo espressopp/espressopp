@@ -1,6 +1,7 @@
 #include "bindings.hpp"
 #include "MDIntegrator.hpp"
 #include "VelocityVerlet.hpp"
+#include "VelocityVerletFixedParticles.hpp"
 #include "VelocityVerletOnGroup.hpp"
 
 #include "Extension.hpp"
@@ -12,13 +13,13 @@
 #include "StochasticVelocityRescaling.hpp"
 #include "LangevinThermostat.hpp"
 #include "LangevinBarostat.hpp"
-#include "FixPositions.hpp"
 
 namespace espresso {
   namespace integrator {
     void registerPython() {
       MDIntegrator::registerPython();
       VelocityVerlet::registerPython();
+      VelocityVerletFixedParticles::registerPython();
       VelocityVerletOnGroup::registerPython();
       Extension::registerPython();
       Adress::registerPython();
@@ -29,7 +30,6 @@ namespace espresso {
       StochasticVelocityRescaling::registerPython();
       TDforce::registerPython();
       LangevinThermostat::registerPython();
-      FixPositions::registerPython();
     }
   }
 }

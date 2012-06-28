@@ -3,6 +3,7 @@ pmiimport('espresso.integrator')
 
 from espresso.integrator.MDIntegrator import *
 from espresso.integrator.VelocityVerlet import *
+from espresso.integrator.VelocityVerletFixedParticles import *
 from espresso.integrator.VelocityVerletOnGroup import *
 from espresso.integrator.Isokinetic import *
 from espresso.integrator.StochasticVelocityRescaling import *
@@ -14,4 +15,3 @@ from espresso.integrator.BerendsenBarostat import *
 from espresso.integrator.BerendsenThermostat import *
 from espresso.integrator.LangevinThermostat import *
 from espresso.integrator.LangevinBarostat import *
-from espresso.integrator.FixPositions import *

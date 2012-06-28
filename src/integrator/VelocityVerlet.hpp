@@ -80,7 +80,8 @@ namespace espresso {
         /** Register this class so it can be used from Python. */
         static void registerPython();
 
-      private:
+      protected:
+
 
         bool resortFlag;  //!< true implies need for resort of particles
         real maxDist;
