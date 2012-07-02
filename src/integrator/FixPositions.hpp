@@ -4,15 +4,18 @@
 
 #include "types.hpp"
 #include "logging.hpp"
-#include "SystemAccess.hpp"
+#include "Extension.hpp"
 #include "ParticleGroup.hpp"
+#include "boost/signals2.hpp"
+#include "Real3D.hpp"
+#include "Particle.hpp"
 
 namespace espresso {
   namespace integrator {
 
     /** Langevin */
 
-    class FixPositions : public SystemAccess {
+    class FixPositions : public Extension {
 
       public:
 
@@ -28,14 +31,19 @@ namespace espresso {
 
         ~FixPositions() {};
 
-        void apply(longint pid, Real3D& vel, Real3D& dp);
+        void savePositions();
+        void restorePositions(real& maxSqDist);
 
         /** Register this class so it can be used from Python. */
         static void registerPython();
 
       private:
+        boost::signals2::connection _runInit, _inIntP;
         shared_ptr< ParticleGroup > particleGroup;
         Int3D fixMask;
+        std::list< std::pair<Particle *, Real3D> > savePos;
+        void connect();
+        void disconnect();
 
         /** Logger */
         static LOG4ESPP_DECL_LOGGER(theLogger);

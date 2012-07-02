@@ -15,9 +15,20 @@ namespace espresso {
     LOG4ESPP_LOGGER(FixPositions::theLogger, "FixPositions");
 
     FixPositions::FixPositions(shared_ptr<System> system, shared_ptr< ParticleGroup > _particleGroup, const Int3D& _fixMask)
-          : SystemAccess(system), particleGroup(_particleGroup), fixMask(_fixMask)
+          : Extension(system), particleGroup(_particleGroup), fixMask(_fixMask)
     {
       LOG4ESPP_INFO(theLogger, "Isokinetic constructed");
+    }
+
+    void FixPositions::disconnect(){
+      _runInit.disconnect();
+      _inIntP.disconnect();
+    }
+
+    void FixPositions::connect(){
+      // connection to initialisation
+      _runInit  = integrator->runInit.connect( boost::bind(&FixPositions::savePositions, this));
+      _inIntP   = integrator->inIntP.connect( boost::bind(&FixPositions::restorePositions, this, _1));
     }
 
     void FixPositions::setParticleGroup(shared_ptr< ParticleGroup > _particleGroup) {
@@ -36,14 +47,25 @@ namespace espresso {
      	return fixMask;
      }
 
-    void FixPositions::apply(longint pid, Real3D& vel, Real3D& dp) {
-    	if (particleGroup->has(pid)) {
-    	    for (int i=0; i<3; i++) {
-    		     dp[i] *= fixMask[i];
-    		    vel[i] *= fixMask[i];
-    	    }
-    	}
-    }
+     void FixPositions::savePositions() {
+    	 savePos.clear();
+    	 for (ParticleGroup::iterator it=particleGroup->begin(); it != particleGroup->end(); it++ ) {
+             savePos.push_back(std::pair<Particle *, Real3D>(*it, it->getPos()));
+    	 }
+     }
+
+     void FixPositions::restorePositions(real& maxSqDist) {
+    	 for (std::list< std::pair<Particle *, Real3D> >::iterator it=savePos.begin(); it!=savePos.end(); it++) {
+    		 Real3D savpos = it->second;
+    		 Real3D newpos = it->first->getPos();
+    		 for (int i=0; i<3; i++) {
+    			 if (fixMask[i] != 0) {
+    				 newpos[i] = savpos[i];
+    			 }
+    		 }
+   	         it->first->setPos(newpos);
+    	 }
+     }
 
     /****************************************************
     ** REGISTRATION WITH PYTHON
@@ -53,12 +75,14 @@ namespace espresso {
 
       using namespace espresso::python;
 
-      class_<FixPositions, shared_ptr<FixPositions> >
+      class_<FixPositions, shared_ptr<FixPositions>, bases<Extension> >
 
         ("integrator_FixPositions", init< shared_ptr< System >, shared_ptr< ParticleGroup >, const Int3D& >())
         .add_property("particleGroup", &FixPositions::getParticleGroup, &FixPositions::setParticleGroup)
         .def("getFixMask", &FixPositions::getFixMask, return_value_policy< reference_existing_object >() )
         .def("setFixMask", &FixPositions::setFixMask )
+        .def("connect", &FixPositions::connect)
+        .def("disconnect", &FixPositions::disconnect)
         ;
     }
 
