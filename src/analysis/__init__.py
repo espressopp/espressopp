@@ -13,3 +13,6 @@ from espresso.analysis.MaxPID import *
 from espresso.analysis.AllParticlePos import *
 from espresso.analysis.IntraChainDistSq import *
 from espresso.analysis.NeighborFluctuation import *
+
+from espresso.analysis.ConfigsParticleDecomp import *
+from espresso.analysis.VelocityAutocorrelation import *

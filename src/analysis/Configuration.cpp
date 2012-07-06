@@ -12,9 +12,9 @@ using namespace boost::python;
 namespace espresso {
   namespace analysis {
 
-    Configuration::Configuration(int nParticles) 
+    Configuration::Configuration()  //int nParticles
     {
-      this->nParticles = nParticles;
+      //this->nParticles = nParticles;
     }
 
     Configuration::~Configuration()

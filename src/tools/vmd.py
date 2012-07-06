@@ -114,8 +114,8 @@ def imd_positions(system, sock, folded=True):
   pid    = 0
   coords = struct.pack('')
   while pid <= maxParticleID:
-    particle = system.storage.getParticle(pid)
-    if particle.pos:
+    if system.storage.particleExists(pid):
+        particle = system.storage.getParticle(pid)
         if folded:
           p = particle.pos
         else:

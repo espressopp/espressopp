@@ -142,7 +142,7 @@ namespace espresso {
 
       if (system.comm->rank() == 0) {
 
-         ConfigurationPtr config = make_shared<Configuration> (totalN);
+         ConfigurationPtr config = make_shared<Configuration> (); //totalN
 
          // root process collects data from all processors and sets it
 

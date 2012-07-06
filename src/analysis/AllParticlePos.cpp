@@ -51,11 +51,18 @@ namespace espresso {
 
       numParticles = AllPositions.size();
     }
+    
+    ConfMap AllParticlePos::getAllPositions(){
+      return AllPositions;
+    }
+    
 
     void AllParticlePos::registerPython() {
       using namespace espresso::python;
 
       class_<AllParticlePos, boost::noncopyable>("analysis_AllParticlePos", no_init)
+      
+        .def("gatherAllPositions", &AllParticlePos::gatherAllPositions)
         ;
     }
 

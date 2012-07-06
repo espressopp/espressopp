@@ -9,9 +9,6 @@ def create(N, rho, perfect=True, RNG=None):
 
   if RNG == None:
     import random
-    random_gen = random.random()
-  else :
-    random_gen = RNG
   
   cubes = []
   for i in range(100):
@@ -28,7 +25,11 @@ def create(N, rho, perfect=True, RNG=None):
   lattice_spacing = L / a
 
   def rnd(magn_):
-    return magn_ * (2.0 * random_gen - 1.0)
+    if RNG == None:
+      rand = random.random()
+    else :
+      rand = RNG()
+    return magn_ * (2.0 * rand - 1.0)
 
   # magnitude of random displacements
   magn = 0.0 if perfect else lattice_spacing / 10.0

@@ -10,7 +10,16 @@ namespace espresso {
   // Real3D
   class Real3D {
     real data[3];
+
+  private:
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version) {
+      for(int i = 0; i < 3; ++i) ar & data[i];      
+    }
+    
   public:
+    
     typedef real* iterator;
 
     Real3D();

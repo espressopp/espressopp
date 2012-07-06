@@ -18,7 +18,7 @@ namespace espresso {
       template<class Archive>
       void serialize(Archive & ar, const unsigned int version) {
    	    for (int i = 0; i < 3; ++i) ar & r[i];
-       }
+      }
     };
 
     typedef std::map< size_t, sBuf > ConfMap;
@@ -29,6 +29,9 @@ namespace espresso {
       ~AllParticlePos() {};
       /** gather and broadcast all particle positions to all cpus */
       void gatherAllPositions();
+      
+      ConfMap getAllPositions();
+      
       static void registerPython();
 
       ConfMap AllPositions;

@@ -36,7 +36,7 @@ namespace espresso {
 
      public:
 
-      Configuration(int nParticles);
+      Configuration(); //int nParticles
 
       ~Configuration();
 
@@ -46,7 +46,7 @@ namespace espresso {
 
       void set(int id, real x, real y, real z);
 
-      int nParticles;     // number of particles of the configuration
+      //int nParticles;     // number of particles of the configuration
 
       static void registerPython();
 

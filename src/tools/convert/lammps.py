@@ -41,7 +41,7 @@ def read(fin):
   if(num_types == 1):
     rstart = 3
     if(num_bonds == 0): rstart = 2
-
+    
     x = []
     y = []
     z = []
@@ -185,8 +185,8 @@ def write(fout, system, writeVelocities=False):
   maxParticleID = int(espresso.analysis.MaxPID(system).compute())
   pid   = 0
   while pid <= maxParticleID:
-    particle = system.storage.getParticle(pid)
-    if particle.pos:
+    if system.storage.particleExists(pid):
+        particle = system.storage.getParticle(pid)
         type   = particle.type
         if type in atomtypes:
           pid   += 1
@@ -220,8 +220,8 @@ def write(fout, system, writeVelocities=False):
   file.write('\nAtoms\n\n');
   pid   = 0
   while pid <= maxParticleID:
-    particle = system.storage.getParticle(pid)
-    if particle.pos:
+    if system.storage.particleExists(pid):
+        particle = system.storage.getParticle(pid)
         p = system.bc.getUnfoldedPosition(particle.pos, particle.imageBox)
         xpos   = p[0]
         ypos   = p[1]
@@ -239,8 +239,8 @@ def write(fout, system, writeVelocities=False):
     file.write('\nVelocities\n\n');
     pid   = 0
     while pid <= maxParticleID:
-      particle = system.storage.getParticle(pid)
-      if particle.pos:
+      if system.storage.particleExists(pid):
+          particle = system.storage.getParticle(pid)
           xvel   = particle.v[0]
           yvel   = particle.v[1]
           zvel   = particle.v[2]
