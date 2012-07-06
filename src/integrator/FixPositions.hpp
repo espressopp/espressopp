@@ -32,13 +32,13 @@ namespace espresso {
         ~FixPositions() {};
 
         void savePositions();
-        void restorePositions(real& maxSqDist);
+        void restorePositions();
 
         /** Register this class so it can be used from Python. */
         static void registerPython();
 
       private:
-        boost::signals2::connection _runInit, _inIntP;
+        boost::signals2::connection _befIntP, _aftIntP;
         shared_ptr< ParticleGroup > particleGroup;
         Int3D fixMask;
         std::list< std::pair<Particle *, Real3D> > savePos;

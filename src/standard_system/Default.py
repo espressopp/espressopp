@@ -14,12 +14,14 @@ def Default(box, rc=1.12246, skin=0.3, dt=0.005, temperature=None):
   cellGrid       = espresso.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
   system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
+  print "nodeGrid: ",nodeGrid, " cellGrid: ",cellGrid
+
   integrator     = espresso.integrator.VelocityVerlet(system)  
   integrator.dt  = dt
   if (temperature != None):
-    thermostat             = espresso.integrator.Langevin(system)
+    thermostat             = espresso.integrator.LangevinThermostat(system)
     thermostat.gamma       = 1.0
     thermostat.temperature = temperature
-    integrator.langevin    = thermostat
+    integrator.addExtension(thermostat)
    
   return system, integrator

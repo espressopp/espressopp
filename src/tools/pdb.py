@@ -15,26 +15,23 @@ def pdbwrite(filename, system, molsize=4):
   st = "%-6s%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4d\n"%('CRYST1',system.bc.boxL[0],system.bc.boxL[1],system.bc.boxL[2],90.00,90.00,90,'P 1',1) #boxes are orthorhombic for now
   file.write(st)
   while pid <= maxParticleID:
-    particle = system.storage.getParticle(pid)
-    if particle:
-      if particle.pos:
-        if(pid==0):
-          addToPid = 1
-        xpos   = particle.pos[0]
-        ypos   = particle.pos[1]
-        zpos   = particle.pos[2]
-        type   = particle.type
-        #st = "ATOM %6d  FE  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d\n"%(pid, mol, xpos, ypos, zpos, type)
-        #following http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
-        st = "%-6s%5d %-4s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      T%03d%2s%2s\n"%('ATOM  ',pid+addToPid,'FE','','UNX','F',mol%10000,'',xpos,ypos,zpos,0,0,type,'','')#the additional 'T' in the string is needed to be recognized as string,%10000 to obey the fixed-width format
-        file.write(st)
-        pid    += 1
-        molcnt += 1
-        if molcnt == molsize:
-          mol   += 1
-          molcnt = 0
-      else:
-        pid += 1
+    if system.storage.particleExists(pid):
+      particle = system.storage.getParticle(pid)
+      if(pid==0):
+        addToPid = 1
+      xpos   = particle.pos[0]
+      ypos   = particle.pos[1]
+      zpos   = particle.pos[2]
+      type   = particle.type
+      #st = "ATOM %6d  FE  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d\n"%(pid, mol, xpos, ypos, zpos, type)
+      #following http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
+      st = "%-6s%5d %-4s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      T%03d%2s%2s\n"%('ATOM  ',pid+addToPid,'FE','','UNX','F',mol%10000,'',xpos,ypos,zpos,0,0,type,'','')#the additional 'T' in the string is needed to be recognized as string,%10000 to obey the fixed-width format
+      file.write(st)
+      pid    += 1
+      molcnt += 1
+      if molcnt == molsize:  
+        mol   += 1
+        molcnt = 0
     else:
       pid   += 1
   
@@ -54,26 +51,23 @@ def psfwrite(filename, system, maxdist=None, molsize=4):
   mol    = 0
   molcnt = 0
   while pid <= maxParticleID:
-    particle = system.storage.getParticle(pid)
-    if particle:
-      if particle.pos:
-        if(pid==0):
-          addToPid = 1
-        xpos   = particle.pos[0]
-        ypos   = particle.pos[1]
-        zpos   = particle.pos[2]
-        type   = particle.type
-        st = "%8d T%03d %4d UNX  FE   FE                    \n" % (pid+addToPid, type, mol)
-        file.write(st)
-        pid    += 1
-        molcnt += 1
-        if molcnt == molsize:
-          mol   += 1
-          molcnt = 0
-      else:
-        pid += 1
+    if system.storage.particleExists(pid):
+      particle = system.storage.getParticle(pid)
+      if(pid==0):
+        addToPid = 1
+      xpos   = particle.pos[0]
+      ypos   = particle.pos[1]
+      zpos   = particle.pos[2]
+      type   = particle.type
+      st = "%8d T%03d %4d UNX  FE   FE                    \n" % (pid+addToPid, type, mol)
+      file.write(st)
+      pid    += 1
+      molcnt += 1
+      if molcnt == molsize:
+        mol   += 1
+        molcnt = 0
     else:
-        pid += 1
+      pid += 1
 
   bond = []
   nInteractions = system.getNumberOfInteractions()

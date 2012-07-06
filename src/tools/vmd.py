@@ -53,9 +53,9 @@ def drain_socket(sock):
     res = select.select([sock],[],[],0)[0]
   return
 
-def connect(system):
+def connect(system, molsize=10):
   espresso.tools.psfwrite("vmd.psf", system, maxdist=3.0)
-  espresso.tools.pdbwrite("vmd.pdb", system)
+  espresso.tools.pdbwrite("vmd.pdb", system, molsize=molsize)
   initsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
   hostname = socket.gethostname()
   port     = 10000

@@ -21,14 +21,14 @@ namespace espresso {
     }
 
     void FixPositions::disconnect(){
-      _runInit.disconnect();
-      _inIntP.disconnect();
+      _befIntP.disconnect();
+      _aftIntP.disconnect();
     }
 
     void FixPositions::connect(){
       // connection to initialisation
-      _runInit  = integrator->runInit.connect( boost::bind(&FixPositions::savePositions, this));
-      _inIntP   = integrator->inIntP.connect( boost::bind(&FixPositions::restorePositions, this, _1));
+      _befIntP  = integrator->befIntP.connect( boost::bind(&FixPositions::savePositions, this));
+      _aftIntP  = integrator->aftIntP.connect( boost::bind(&FixPositions::restorePositions, this));
     }
 
     void FixPositions::setParticleGroup(shared_ptr< ParticleGroup > _particleGroup) {
@@ -54,7 +54,7 @@ namespace espresso {
     	 }
      }
 
-     void FixPositions::restorePositions(real& maxSqDist) {
+     void FixPositions::restorePositions() {
     	 for (std::list< std::pair<Particle *, Real3D> >::iterator it=savePos.begin(); it!=savePos.end(); it++) {
     		 Real3D savpos = it->second;
     		 Real3D newpos = it->first->getPos();
