@@ -41,7 +41,7 @@ Example:
     >>> langevinP.gammaP = 0.05
     >>> langevinP.pressure = 1.0
     >>> langevinP.mass = pow(10.0, 4)
-    >>> integrator.langevinBarostat = langevinP
+    >>> integrator.addExtension(langevinP)
 
 **!IMPORTANT**  This barostat is supposed to be run in a couple with thermostat in order 
 to simulate the *npt* ensamble, because the term :math:`R_{p}` needs the temperature as a 

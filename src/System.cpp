@@ -5,6 +5,9 @@
 #include "interaction/Interaction.hpp"
 #include "esutil/RNG.hpp"
 #include "mpi.hpp"
+
+#include <limits>
+
 #include "../contrib/mpi4py/mpi4py-1.2.1/src/include/mpi4py/mpi4py.h"
 
 #ifdef VTRACE
@@ -72,7 +75,11 @@ namespace espresso {
     
     // check if the cutoff of this interaction is bigger then maxCutoff
     real cut = ia->getMaxCutoff();
-    if(cut > maxCutoff) maxCutoff=cut;
+    
+    bool isCutoffInf = std::numeric_limits<real>::has_infinity &&
+            cut == std::numeric_limits<real>::infinity();
+
+    if( !isCutoffInf && cut > maxCutoff) maxCutoff=cut;
   }
 
   void System::removeInteraction(int i){
@@ -165,7 +172,6 @@ namespace espresso {
       .def_readwrite("rng", &System::rng)
 //      .def_readwrite("shortRangeInteractions",
 //		     &System::shortRangeInteractions)
-//      .def_readwrite("skin", &System::skin)
       .def_readonly("maxCutoff", &System::maxCutoff)
       .def("addInteraction", &System::addInteraction)
       .def("removeInteraction", &System::removeInteraction)

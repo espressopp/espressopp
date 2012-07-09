@@ -35,6 +35,7 @@ namespace espresso {
     public:
       // Constructor, allow for unlimited snapshots. It defines how many particles
       // correspond to different cpu.
+      // TODO !!Warning. Now it works only for sequential id 0 - num_of_part
       ConfigsParticleDecomp(shared_ptr<System> system): SystemAccess (system){
         num_of_part = system -> storage -> getNRealParticles();
         int n_nodes = system -> comm -> size();
@@ -94,7 +95,6 @@ namespace espresso {
  
       // the list of snapshots
       ConfigurationList configurations;
-      
     };
   }
 }

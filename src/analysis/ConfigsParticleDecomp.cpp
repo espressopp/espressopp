@@ -42,9 +42,21 @@ namespace espresso {
 
     void ConfigsParticleDecomp::gather() {
       System& system = getSystemRef();
-
+      
       int nprocs = system.comm->size();
       int myrank = system.comm->rank();
+
+      if(myrank==0){
+        // check whether the number of particles is the same during the gathering
+        int curNumP = system.storage->getNRealParticles();
+        if(curNumP != num_of_part){
+          cout<<"   ConfigsParticleDecomp gathers the configurations of the same system\n"
+                " with the same number of particles. If you need to store the systems\n"
+                " with different number of particles you should use something else."
+                " E.g `Configurations`"<< endl;
+          return;
+        }
+      }
 
       ConfigurationPtr config = make_shared<Configuration> ();
       for (int rank_i=0; rank_i<nprocs; rank_i++) {

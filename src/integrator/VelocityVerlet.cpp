@@ -589,15 +589,6 @@ namespace espresso {
       // Note: use noncopyable and no_init for abstract classes
       class_<VelocityVerlet, bases<MDIntegrator>, boost::noncopyable >
         ("integrator_VelocityVerlet", init< shared_ptr<System> >())
-        /* TODO should be removed after signals will be tested
-        .add_property("langevin", &VelocityVerlet::getLangevin, &VelocityVerlet::setLangevin)
-        .add_property("berendsenBarostat", &VelocityVerlet::getBerendsenBarostat, &VelocityVerlet::setBerendsenBarostat)
-        .add_property("berendsenThermostat", &VelocityVerlet::getBerendsenThermostat, &VelocityVerlet::setBerendsenThermostat)
-        .add_property("langevinBarostat", &VelocityVerlet::getLangevinBarostat, &VelocityVerlet::setLangevinBarostat)
-        .add_property("isokinetic", &VelocityVerlet::getIsokinetic, &VelocityVerlet::setIsokinetic)
-        .add_property("stochasticVelocityRescaling", &VelocityVerlet::getStochasticVelocityRescaling, &VelocityVerlet::setStochasticVelocityRescaling)
-        .add_property("fixpositions", &VelocityVerlet::getFixPositions, &VelocityVerlet::setFixPositions)
-         */
         .def("getTimers", &wrapGetTimers)
         .def("resetTimers", &VelocityVerlet::resetTimers)
         ;
