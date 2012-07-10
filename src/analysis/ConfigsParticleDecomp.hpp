@@ -7,8 +7,9 @@
 #include "Configuration.hpp"
 
 #include "storage/Storage.hpp"
-
 #include "python.hpp"
+
+#include <string>
 
 using namespace std;
 
@@ -37,7 +38,12 @@ namespace espresso {
       // correspond to different cpu.
       // TODO !!Warning. Now it works only for sequential id 0 - num_of_part
       ConfigsParticleDecomp(shared_ptr<System> system): SystemAccess (system){
-        num_of_part = system -> storage -> getNRealParticles();
+        // by default key = "position", it will store the particle positions
+        key = "position";
+        
+        int localN = system -> storage ->getNRealParticles();
+        boost::mpi::all_reduce(*system->comm, localN, num_of_part, std::plus<int>());
+        
         int n_nodes = system -> comm -> size();
         int this_node = system -> comm -> rank();
         
@@ -50,6 +56,7 @@ namespace espresso {
         
         if(num_of_part <= n_nodes){
           cout<<"Warning. Number of particles less then the number of nodes."<<endl;
+          cout<<"nparts="<<num_of_part<<"  nnodes="<<n_nodes<<endl;
         }
       }
       ~ConfigsParticleDecomp() {}
@@ -88,6 +95,8 @@ namespace espresso {
       longint local_num_of_part;
       longint min_id;
       longint max_id;
+      
+      string key; // it can be "position", "velocity" or "unfolded"
       
     private:
 

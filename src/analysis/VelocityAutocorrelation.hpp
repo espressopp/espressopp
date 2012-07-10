@@ -10,12 +10,14 @@ namespace espresso {
     /*
      * Class derives from ConfigsParticleDecomp
     */
-
+    // TODO !!Error handling. If the time interval is not the same between two samples.
+    // TODO key??
     class VelocityAutocorrelation : public ConfigsParticleDecomp {
 
     public:
       
       VelocityAutocorrelation(shared_ptr<System> system): ConfigsParticleDecomp (system){
+        key = "velocity";
       }
       ~VelocityAutocorrelation() {}
       

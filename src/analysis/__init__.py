@@ -16,3 +16,4 @@ from espresso.analysis.NeighborFluctuation import *
 
 from espresso.analysis.ConfigsParticleDecomp import *
 from espresso.analysis.VelocityAutocorrelation import *
+from espresso.analysis.MeanSquareDispl import *

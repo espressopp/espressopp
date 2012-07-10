@@ -2,6 +2,7 @@
 
 #include "ConfigsParticleDecomp.hpp"
 #include "iterator/CellListIterator.hpp"
+#include "bc/BC.hpp"
 
 #include <boost/serialization/map.hpp>
 
@@ -45,11 +46,14 @@ namespace espresso {
       
       int nprocs = system.comm->size();
       int myrank = system.comm->rank();
-
+      
+      int localN = system.storage->getNRealParticles();
+      
+      int curNumP = 0;
+      boost::mpi::all_reduce(*system.comm, localN, curNumP, std::plus<int>());
       if(myrank==0){
         // check whether the number of particles is the same during the gathering
-        int curNumP = system.storage->getNRealParticles();
-        if(curNumP != num_of_part){
+        if( curNumP != num_of_part ){
           cout<<"   ConfigsParticleDecomp gathers the configurations of the same system\n"
                 " with the same number of particles. If you need to store the systems\n"
                 " with different number of particles you should use something else."
@@ -65,8 +69,22 @@ namespace espresso {
           CellList realCells = system.storage->getRealCells();
           for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
             int id = cit->id();
-            Real3D& vel = cit->velocity();
-            conf[id] = vel;
+            Real3D property = Real3D(0,0,0);
+            if(key=="position")
+              property = cit->position();
+            else if(key=="velocity")
+              property = cit->velocity();
+            else if(key=="unfolded"){
+              Real3D& pos = cit->position();
+              Int3D& img = cit->image();
+              Real3D Li = system.bc->getBoxL();
+              for (int i = 0; i < 3; ++i) property[i] = pos[i] + img[i] * Li[i];
+            }
+            else
+              cout<<"Error. Key "<<key<<" is unknown. Please use position, unfolded or"
+                      " velocity."<<endl;
+            
+            conf[id] = property;
           }
     	}
 

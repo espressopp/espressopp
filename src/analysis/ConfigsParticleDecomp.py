@@ -14,9 +14,6 @@ class ConfigsParticleDecompLocal(object): #analysis_ConfigsParticleDecomp
     def __iter__(self):
       return self.cxxclass.all(self).__iter__()
       
-    #def calcAutocorrelation(self):
-      #return self.cxxclass.calcAutocorrelation(self)
-      
     def compute(self):
       return self.cxxclass.compute(self)
 

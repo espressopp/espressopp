@@ -7,7 +7,7 @@ namespace espresso {
   namespace analysis {
 
     //using namespace iterator;
-
+    
     // calc <vx(0) * vx(t)>
     // !!!! all confs should contain the same num  of particles
     python::list VelocityAutocorrelation::compute() const{
@@ -24,6 +24,7 @@ namespace espresso {
       
       for(int m=0; m<M; m++){
         totZ[m] = 0.0;
+        Z[m] = 0.0;
         for(int n=0; n<M-m; n++){
           for(int i=min_id; i<max_id; i++){
             Real3D vel1 = getConf(n + m)->getCoordinates(i);
@@ -38,7 +39,7 @@ namespace espresso {
       if(system.comm->rank()==0)
         cout<<"calculation progress (velocity autocorrelation): "<< (int)(100*(real)M/(real)M) << " %" <<endl;
       
-      mpi::all_reduce( *system.comm, Z, M, totZ, plus<real>() );
+      boost::mpi::all_reduce( *system.comm, Z, M, totZ, plus<real>() );
       
       for(int m=0; m<M; m++){
         totZ[m] /= (real)(M - m);
