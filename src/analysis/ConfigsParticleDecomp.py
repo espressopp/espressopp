@@ -24,7 +24,6 @@ if pmi.isController:
     pmiproxydefs = dict(
       #cls =  'espresso.analysis.ConfigsParticleDecompLocal',
       pmicall = [ "gather", "clear", "compute" ],
-      localcall = ["getNParticles", "getCoordinates", 
-                   "__getitem__", "__iter__", "all"],
+      localcall = ["__getitem__", "all", "back"],
       pmiproperty = ["size"]
     )

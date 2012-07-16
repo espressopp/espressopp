@@ -41,7 +41,7 @@ namespace espresso {
         // by default key = "position", it will store the particle positions
         key = "position";
         
-        int localN = system -> storage ->getNRealParticles();
+        int localN = system -> storage -> getNRealParticles();
         boost::mpi::all_reduce(*system->comm, localN, num_of_part, std::plus<int>());
         
         int n_nodes = system -> comm -> size();

@@ -14,6 +14,7 @@
 #include "ConfigsParticleDecomp.hpp"
 #include "VelocityAutocorrelation.hpp"
 #include "MeanSquareDispl.hpp"
+#include "Autocorrelation.hpp"
 
 #include "IntraChainDistSq.hpp"
 #include "NeighborFluctuation.hpp"
@@ -38,6 +39,8 @@ namespace espresso {
       ConfigsParticleDecomp::registerPython();
       VelocityAutocorrelation::registerPython();
       MeanSquareDispl::registerPython();
+      
+      Autocorrelation::registerPython();
     }
   }
 }
