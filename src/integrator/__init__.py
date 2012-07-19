@@ -13,5 +13,6 @@ from espresso.integrator.Adress import *
 from espresso.integrator.BerendsenBarostat import *
 from espresso.integrator.BerendsenThermostat import *
 from espresso.integrator.LangevinThermostat import *
+from espresso.integrator.DPDThermostat import *
 from espresso.integrator.LangevinBarostat import *
 from espresso.integrator.FixPositions import *
