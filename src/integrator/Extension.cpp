@@ -38,6 +38,8 @@ namespace espresso {
       class_< Extension, boost::noncopyable >
         ("integrator_Extension", no_init)
         .def("setIntegrator", &Extension::setIntegrator)
+        .def("connect", &Extension::connect)
+        .def("disconnect", &Extension::disconnect)
         ;
     }
   }
