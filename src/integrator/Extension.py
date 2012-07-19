@@ -21,6 +21,10 @@ class ExtensionLocal(object):
     #        if pmi.workerIsActive():
     #            self.cxxclass.addForce(self, itype, filename, type)
     
+    def connect(self):
+      return self.cxxclass.connect(self)
+    def disconnect(self):
+      return self.cxxclass.disconnect(self)
 
 if pmi.isController :
     class Extension(object):
@@ -29,4 +33,5 @@ if pmi.isController :
             #cls =  'espresso.integrator.Extension',
             #pmiproperty = [ 'itype', 'filename'],
             #pmicall = ['addForce']
-            )
+            pmicall = [ 'connect', 'disconnect' ]
+        )

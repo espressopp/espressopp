@@ -49,6 +49,7 @@ namespace espresso {
       
       for(int m=0; m<M; m++){
         totZ[m] /= Z0;
+        //totZ[m] /= (real)num_of_part;
         pyli.append( totZ[m] );
       }
       
