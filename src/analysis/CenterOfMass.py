@@ -14,4 +14,4 @@ if pmi.isController :
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espresso.analysis.CenterOfMassLocal'
-            )
+        )

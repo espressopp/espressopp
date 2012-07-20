@@ -4,6 +4,8 @@
 #include "iterator/CellListIterator.hpp"
 #include "bc/BC.hpp"
 
+#include "CenterOfMass.hpp"
+
 #include <boost/serialization/map.hpp>
 
 using namespace std;
@@ -33,12 +35,27 @@ namespace espresso {
       }
     }
 
-    ConfigurationPtr ConfigsParticleDecomp::back() const{
-      return configurations.back();
-    }
-
     void ConfigsParticleDecomp::pushConfig(ConfigurationPtr config){
       configurations.push_back(config);
+    }
+    
+    CenterOfMassList ConfigsParticleDecomp::allCOM() const{
+      return coMass;
+    }
+
+    Real3D ConfigsParticleDecomp::getCOM(int position) const{
+      int nconfigs = coMass.size();
+      if (0 <= position and position < nconfigs) {
+        return coMass[position];
+      }
+      else{
+        cout << "Error. Velocities::get <out-of-range>" << endl;
+        return Real3D(0,0,0);
+      }
+    }
+
+    void ConfigsParticleDecomp::pushCOM(Real3D com){
+      coMass.push_back(com);
     }
 
     void ConfigsParticleDecomp::gather() {
@@ -99,6 +116,8 @@ namespace espresso {
       }
 
       pushConfig(config);
+      
+      pushCOM( CenterOfMass( getSystem() ).computeVector() );
     }
     
     // Python wrapping
@@ -113,7 +132,6 @@ namespace espresso {
       
       .def("gather", &ConfigsParticleDecomp::gather)
       .def("__getitem__", &ConfigsParticleDecomp::getConf)
-      .def("back", &ConfigsParticleDecomp::back)
       .def("all", &ConfigsParticleDecomp::all)
       .def("clear", &ConfigsParticleDecomp::clear)
       .def("compute", &ConfigsParticleDecomp::compute)

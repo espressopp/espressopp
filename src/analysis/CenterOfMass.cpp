@@ -31,13 +31,15 @@ namespace espresso {
         zcom += p.mass() * p.position()[2];
         mass += p.mass();
       }
-      boost::mpi::reduce(*mpiWorld, xcom, xcom_sum, std::plus<real>(), 0);
-      boost::mpi::reduce(*mpiWorld, ycom, ycom_sum, std::plus<real>(), 0);
-      boost::mpi::reduce(*mpiWorld, zcom, zcom_sum, std::plus<real>(), 0);
-      boost::mpi::reduce(*mpiWorld, mass, mass_sum, std::plus<real>(), 0);
+      
+      // it was reduce, but we need it for all cpus
+      boost::mpi::all_reduce(*mpiWorld, xcom, xcom_sum, std::plus<real>());
+      boost::mpi::all_reduce(*mpiWorld, ycom, ycom_sum, std::plus<real>());
+      boost::mpi::all_reduce(*mpiWorld, zcom, zcom_sum, std::plus<real>());
+      boost::mpi::all_reduce(*mpiWorld, mass, mass_sum, std::plus<real>());
 
       //Real3D force(0.0, 0.0, 0.0);
-      return Real3D(xcom / mass_sum, ycom / mass_sum, zcom / mass_sum);
+      return Real3D(xcom_sum / mass_sum, ycom_sum / mass_sum, zcom_sum / mass_sum);
     }
 
     // TODO: this dummy routine is still needed as we have not yet ObservableVector

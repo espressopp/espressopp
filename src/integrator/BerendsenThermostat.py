@@ -65,8 +65,13 @@ Canceling the thermostat:
     >>> ...
     >>> # some runs
     >>> ...
-    >>> # erase Berendsen thermostat
+    >>> # disconnect Berendsen thermostat
     >>> berendsen.disconnect()
+
+    
+  Connecting the thermostat back after the disconnection
+  
+    >>> berendsen.connect()
 
 References:
 

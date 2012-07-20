@@ -45,11 +45,10 @@ namespace espresso {
         totZ[m] /= (real)(M - m);
       }
       
-      real Z0 =  totZ[0];
+      real coef = 3.0 * num_of_part;
       
       for(int m=0; m<M; m++){
-        totZ[m] /= Z0;
-        //totZ[m] /= (real)num_of_part;
+        totZ[m] /= coef;
         pyli.append( totZ[m] );
       }
       
@@ -62,7 +61,6 @@ namespace espresso {
     }
     
     // Python wrapping
-
     void VelocityAutocorrelation::registerPython() {
       using namespace espresso::python;
 

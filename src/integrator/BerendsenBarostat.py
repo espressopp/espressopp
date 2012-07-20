@@ -72,9 +72,14 @@ Canceling the barostat:
     >>> ...
     >>> # some runs
     >>> ...
-    >>> # erase Berendsen barostat
+    >>> # disconnect Berendsen barostat
     >>> berendsen.disconnect()
     >>> # the next runs will not include the system size and particle coordinates scaling
+
+    
+  Connecting the barostat back after the disconnection
+  
+    >>> berendsen.connect()
 
 References:
 

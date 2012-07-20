@@ -8,8 +8,15 @@ namespace espresso {
 
     //using namespace iterator;
     
-    // calc <vx(0) * vx(t)>
-    // !!!! all confs should contain the same num  of particles
+    /*
+     * calc <r^2> the output is the average mean sq. displacement over 3 directions.
+     * !! Important!! For D calculation one have to divide slope by /2.0 (not 6.0)! It is
+     * already taken into account.
+     * !! all confs should contain the same num  of particles
+    */
+    
+    // TODO center of mass correction
+    
     python::list MeanSquareDispl::compute() const{
       
       int M = getListSize();
@@ -23,12 +30,14 @@ namespace espresso {
       System& system = getSystemRef();
       
       for(int m=0; m<M; m++){
+        
         totZ[m] = 0.0;
         Z[m] = 0.0;
         for(int n=0; n<M-m; n++){
+          // including center of mass
           for(int i=min_id; i<max_id; i++){
-            Real3D pos1 = getConf(n + m)->getCoordinates(i);
-            Real3D pos2 = getConf(n)->getCoordinates(i);
+            Real3D pos1 = getConf(n + m)->getCoordinates(i)  - getCOM(n+m);
+            Real3D pos2 = getConf(n)->getCoordinates(i)      - getCOM(n);
             Real3D delta = pos2 - pos1;
             Z[m] += delta.sqr();
           }
@@ -45,7 +54,7 @@ namespace espresso {
         totZ[m] /= (real)(M - m);
       }
       
-      real coef =  num_of_part * 3;
+      real coef = 3 * num_of_part;
       
       for(int m=0; m<M; m++){
         totZ[m] /= coef;
@@ -61,7 +70,6 @@ namespace espresso {
     }
     
     // Python wrapping
-
     void MeanSquareDispl::registerPython() {
       using namespace espresso::python;
 

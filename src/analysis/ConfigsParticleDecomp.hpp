@@ -30,6 +30,7 @@ namespace espresso {
     */
 
     typedef vector<ConfigurationPtr> ConfigurationList;
+    typedef vector<Real3D> CenterOfMassList;
 
     class ConfigsParticleDecomp : public SystemAccess {
 
@@ -70,16 +71,19 @@ namespace espresso {
       // Get a configuration from ConfigurationList
       ConfigurationPtr getConf(int position) const;
 
-      // returns last configuration 
-      ConfigurationPtr back() const;
-
       // it returns all the configurations
       ConfigurationList all() const;
 
       // it erases all the configurations from ConfigurationList
       void clear(){
         configurations.clear();
+        coMass.clear();
       }
+      
+      // Get a COM from CenterOfMassList
+      Real3D getCOM(int position) const;
+      // it returns all the COMs
+      CenterOfMassList allCOM() const;
 
       virtual python::list compute() const = 0;
 
@@ -101,9 +105,11 @@ namespace espresso {
     private:
 
       void pushConfig(ConfigurationPtr config);
+      void pushCOM(Real3D com);
  
       // the list of snapshots
       ConfigurationList configurations;
+      CenterOfMassList coMass;
     };
   }
 }

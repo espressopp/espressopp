@@ -86,9 +86,9 @@ Methods:
 **NOTE** The *langevinP.mass* can be set both directly and using the 
 (*setMassByFrequency( frequency )*) 
 
-Setting the integration property:
+Adding to the integration:
     
-    >>> integrator.langevinBarostat = langevinP
+    >>> integrator.addExtension(langevinP)
     
     It will define Langevin-Hoover barostat as a property of integrator.
     
@@ -99,7 +99,7 @@ One more example:
     >>> lP.gammaP = .5
     >>> lP.pressure = 1.0
     >>> lP.mass = pow(10.0, 5)
-    >>> integrator.langevinBarostat = lP
+    >>> integrator.addExtension(lP)
 
 Canceling the barostat:
     
@@ -116,9 +116,14 @@ Canceling the barostat:
     >>> ...
     >>> # some runs
     >>> ...
-    >>> # erase barostat
-    >>> integrator.langevinBarostat = None
+    >>> # disconnect barostat
+    >>> langevinBarostat.disconnect()
     >>> # the next runs will not include the modification of integration equations
+
+    
+  Connecting the barostat back after the disconnection
+  
+    >>> langevinBarostat.connect()
 
 References:
 

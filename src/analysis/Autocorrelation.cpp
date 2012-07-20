@@ -42,8 +42,6 @@ namespace espresso {
     
     python::list Autocorrelation::compute() {
       int M = getListSize();
-      real* totZ;
-      totZ = new real[M];
       
       python::list pyli;
       
@@ -102,27 +100,21 @@ namespace espresso {
       if(system.comm->rank()==0)
         cout<<"calculation progress (autocorrelation): 100 %" <<endl;
       
-      for(unsigned long int m=min_m; m<max_m; m++){
-        Z[m] /= (real)(M - m);
+      real coef = 3.0; // only if value is Real3D
+      for(int m=min_m; m<max_m; m++){
+        Z[m] /= ( (real)(M-m)*coef );
       }
       
       // probably could be done nicer. gather doesn't work with different length of array
       unsigned long int MM = M * n_nodes;
-      real* totZaux = new real[MM];
-      boost::mpi::gather(*system.comm, Z, M, totZaux, 0);
+      real* totZ = new real[MM];
+      boost::mpi::gather(*system.comm, Z, M, totZ, 0);
       
       if(this_node == 0){
         int count = 0;
-        for(int i=0; i<M; i++){
-          if( i >= num_m[count] ) count ++;
-          totZ[i] = totZaux[M*count + i];
-        }
-        
-        real coef = totZ[0];
-
         for(int m=0; m<M; m++){
-          totZ[m] /= coef;
-          pyli.append( totZ[m] );
+          if( m >= num_m[count] ) count ++;
+          pyli.append( totZ[M*count + m] );
         }
       }
       
@@ -130,8 +122,6 @@ namespace espresso {
       Z = NULL;
       delete [] totZ;
       totZ = NULL;
-      delete [] totZaux;
-      totZaux = NULL;
       
       return pyli;
     }
