@@ -1,7 +1,4 @@
-#include "mpi.h"
-
 #include "ConfigsParticleDecomp.hpp"
-#include "iterator/CellListIterator.hpp"
 #include "bc/BC.hpp"
 
 #include "CenterOfMass.hpp"
@@ -39,25 +36,6 @@ namespace espresso {
       configurations.push_back(config);
     }
     
-    CenterOfMassList ConfigsParticleDecomp::allCOM() const{
-      return coMass;
-    }
-
-    Real3D ConfigsParticleDecomp::getCOM(int position) const{
-      int nconfigs = coMass.size();
-      if (0 <= position and position < nconfigs) {
-        return coMass[position];
-      }
-      else{
-        cout << "Error. Velocities::get <out-of-range>" << endl;
-        return Real3D(0,0,0);
-      }
-    }
-
-    void ConfigsParticleDecomp::pushCOM(Real3D com){
-      coMass.push_back(com);
-    }
-
     void ConfigsParticleDecomp::gather() {
       System& system = getSystemRef();
       
@@ -110,14 +88,12 @@ namespace espresso {
         for (map<size_t,Real3D>::iterator itr=conf.begin(); itr != conf.end(); ++itr) {
           size_t id = itr->first;
           Real3D p = itr->second;
-          if(id>=min_id && id<max_id)
+          if(idToCpu[id]==myrank)
             config->set(id, p[0], p[1], p[2]);
         }
       }
 
       pushConfig(config);
-      
-      pushCOM( CenterOfMass( getSystem() ).computeVector() );
     }
     
     // Python wrapping

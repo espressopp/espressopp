@@ -22,7 +22,8 @@ namespace espresso {
         }
       }
 
-      boost::mpi::reduce(*getSystem()->comm, myMaxPID, systemMaxPID, mpi::maximum<long>(), 0);
+      // it was reduce
+      boost::mpi::all_reduce(*getSystem()->comm, myMaxPID, systemMaxPID, mpi::maximum<long>());
 
       return 1.0*systemMaxPID;
 

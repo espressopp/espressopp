@@ -249,7 +249,7 @@ namespace espresso {
       else {
         return 0;
       }
-      
+      // TODO particle should be removed from different particle groups and lists too
       
     }
 

@@ -9,6 +9,8 @@ using namespace iterator;
 
 namespace espresso {
   namespace analysis {
+    
+    // ! it's folded COM
     Real3D CenterOfMass::computeVector() const {
 
       System& system = getSystemRef();
