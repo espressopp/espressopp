@@ -29,7 +29,7 @@ namespace espresso {
 
         Int3D& getFixMask();
 
-        ~FixPositions() {};
+        virtual ~FixPositions() {};
 
         void savePositions();
         void restorePositions();

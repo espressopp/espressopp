@@ -32,6 +32,8 @@ namespace espresso {
         ntypes = 0;
       }
 
+      virtual ~VerletListInteractionTemplate() {};
+
       void
       setVerletList(shared_ptr < VerletList > _verletList) {
         verletList = _verletList;

@@ -96,11 +96,12 @@ namespace espresso {
     }
     else {
       // otherwise test whether the triple already exists
-      for (GlobalTriples::const_iterator it = equalRange.first;
-           it != equalRange.second; ++it)
-        if (it->second == std::pair<longint, longint>(pid1, pid3))
-        // TODO: Triple already exists, generate error!
-	  ;
+      for (GlobalTriples::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
+        if (it->second == std::pair<longint, longint>(pid1, pid3)) {
+          // TODO: Triple already exists, generate error!
+	      ;
+        }
+      }
       // if not, insert the new triple
       globalTriples.insert(equalRange.first, std::make_pair(pid2,
                            std::pair<longint, longint>(pid1, pid3)));

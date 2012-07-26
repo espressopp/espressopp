@@ -20,7 +20,7 @@ namespace espresso {
 
         Extension(shared_ptr<System> system);
 
-        ~Extension();
+        virtual ~Extension();
 
 
         enum ExtensionType {

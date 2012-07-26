@@ -16,6 +16,7 @@ namespace espresso {
     class Interaction {
 
     public:
+      virtual ~Interaction() {};
       virtual void addForces() = 0;
       virtual real computeEnergy() = 0;
       virtual real computeVirial() = 0;

@@ -38,6 +38,8 @@ namespace espresso {
         fixedquadrupleList = _fixedquadrupleList;
       }
 
+      virtual ~FixedQuadrupleListInteractionTemplate() {};
+
       shared_ptr < FixedQuadrupleList > getFixedQuadrupleList() {
              return fixedquadrupleList;
       }

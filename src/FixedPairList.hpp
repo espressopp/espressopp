@@ -25,7 +25,7 @@ namespace espresso {
 
 	  public:
 		FixedPairList(shared_ptr <storage::Storage> _storage);
-		~FixedPairList();
+		virtual ~FixedPairList();
 
 		/** Add the given particle pair to the list on this processor if the
 		particle with the lower id belongs to this processor.  Note that

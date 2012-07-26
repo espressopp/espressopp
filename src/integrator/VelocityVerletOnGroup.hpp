@@ -19,7 +19,7 @@ namespace espresso {
 
         VelocityVerletOnGroup(shared_ptr<class espresso::System> system, shared_ptr<class espresso::ParticleGroup> group_);
 
-        ~VelocityVerletOnGroup();
+        virtual ~VelocityVerletOnGroup();
 
         void setLangevin(shared_ptr<class LangevinThermostat> langevin);
 

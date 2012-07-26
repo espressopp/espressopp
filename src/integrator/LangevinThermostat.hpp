@@ -24,7 +24,7 @@ namespace espresso {
       public:
 
         LangevinThermostat(shared_ptr<System> system);
-        ~LangevinThermostat();
+        virtual ~LangevinThermostat();
 
         void setGamma(real gamma);
         real getGamma();

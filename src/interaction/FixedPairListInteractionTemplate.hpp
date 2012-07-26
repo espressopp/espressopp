@@ -35,6 +35,8 @@ namespace espresso {
         }
       }
 
+      virtual ~FixedPairListInteractionTemplate() {};
+
       void
       setFixedPairList(shared_ptr < FixedPairList > _fixedpairList) {
         fixedpairList = _fixedpairList;

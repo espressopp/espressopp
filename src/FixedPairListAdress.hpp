@@ -24,7 +24,7 @@ namespace espresso {
 	  public:
 		FixedPairListAdress(shared_ptr<storage::Storage> _storage,
 		        shared_ptr<FixedTupleList> _fixedtupleList);
-		~FixedPairListAdress();
+		virtual ~FixedPairListAdress();
 
 		/** Add the given particle pair to the list on this processor if the
 		particle with the lower id belongs to this processor.  Note that

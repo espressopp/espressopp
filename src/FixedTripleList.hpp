@@ -24,7 +24,7 @@ namespace espresso {
 
 	  public:
 		FixedTripleList(shared_ptr<storage::Storage> _storage);
-		~FixedTripleList();
+		virtual ~FixedTripleList();
 		//bool add(pvec pids) { _comm.add(pids); }
 		/** Add the given particle triple to the list on this processor if the
 		particle with the lower id belongs to this processor.  Note that

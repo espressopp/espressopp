@@ -63,11 +63,12 @@ namespace espresso {
     }
     else {
       // otherwise test whether the pair already exists
-      for (GlobalPairs::const_iterator it = equalRange.first;
-	   it != equalRange.second; ++it)
-	if (it->second == pid2)
-	  // TODO: Pair already exists, generate error!
-	  ;
+      for (GlobalPairs::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
+	    if (it->second == pid2) {
+	      // TODO: Pair already exists, generate error!
+	      ;
+	    }
+      }
       // if not, insert the new pair
       globalPairs.insert(equalRange.first, std::make_pair(pid1, pid2));
     }

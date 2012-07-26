@@ -50,6 +50,8 @@ namespace espresso {
         setAutoShift(); 
       }
 
+      virtual ~LennardJonesCapped() {};
+
       void preset() {
         real sig2 = sigma * sigma;
         real sig6 = sig2 * sig2 * sig2;

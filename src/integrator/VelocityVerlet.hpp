@@ -17,7 +17,7 @@ namespace espresso {
 
         VelocityVerlet(shared_ptr<class espresso::System> system);
 
-        ~VelocityVerlet();
+        virtual ~VelocityVerlet();
 
         /* TODO should be removed after signals will be tested
         void setLangevin(shared_ptr<class Langevin> langevin);

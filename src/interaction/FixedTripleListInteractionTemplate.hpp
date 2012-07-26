@@ -36,6 +36,8 @@ namespace espresso {
         //potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
       }
 
+      virtual ~FixedTripleListInteractionTemplate() {};
+
       void
       setFixedTripleList(shared_ptr < FixedTripleList > _fixedtripleList) {
         fixedtripleList = _fixedtripleList;

@@ -32,7 +32,7 @@ namespace espresso {
 
         void setMassByFrequency(real);
         
-        ~LangevinBarostat();
+        virtual ~LangevinBarostat();
 
         /** Register this class so it can be used from Python. */
         static void registerPython();

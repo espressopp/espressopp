@@ -34,7 +34,7 @@ namespace espresso {
         MDIntegrator(shared_ptr<System> system);
 
         /** Destructor. */
-        ~MDIntegrator();
+        virtual ~MDIntegrator();
 
         /** Setter routine for the timestep. */
         void setTimeStep(real dt);

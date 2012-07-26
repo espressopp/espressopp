@@ -11,6 +11,7 @@ namespace espresso {
   namespace interaction {
     class Potential {
     public:
+      virtual ~Potential() {};
       virtual real computeEnergy(const Particle &p1, const Particle &p2) const = 0;
       virtual real computeEnergy(const Real3D& dist) const = 0;
       virtual real computeEnergy(real dist) const = 0;
@@ -45,6 +46,7 @@ namespace espresso {
     class PotentialTemplate : public Potential {
     public:
       PotentialTemplate();
+      virtual ~PotentialTemplate() {};
 
       // Implements the Potential virtual interface
       virtual real computeEnergy(const Particle &p1, const Particle &p2) const;
