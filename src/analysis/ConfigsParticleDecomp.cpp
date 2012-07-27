@@ -27,7 +27,11 @@ namespace espresso {
         return configurations[position];
       }
       else{
-        cout << "Error. Velocities::get <out-of-range>" << endl;
+        System& system = getSystemRef();
+        esutil::Error err(system.comm);
+        stringstream msg;
+        msg << "Error. Velocities::get <out-of-range>" << endl;
+        err.setException( msg.str() );
         return shared_ptr<Configuration>();
       }
     }
@@ -38,6 +42,7 @@ namespace espresso {
     
     void ConfigsParticleDecomp::gather() {
       System& system = getSystemRef();
+      esutil::Error err(system.comm);
       
       int nprocs = system.comm->size();
       int myrank = system.comm->rank();
@@ -49,11 +54,12 @@ namespace espresso {
       if(myrank==0){
         // check whether the number of particles is the same during the gathering
         if( curNumP != num_of_part ){
-          cout<<"   ConfigsParticleDecomp gathers the configurations of the same system\n"
+          stringstream msg;
+          msg<<"   ConfigsParticleDecomp gathers the configurations of the same system\n"
                 " with the same number of particles. If you need to store the systems\n"
                 " with different number of particles you should use something else."
-                " E.g `Configurations`"<< endl;
-          return;
+                " E.g `Configurations`";
+          err.setException( msg.str() );
         }
       }
 
@@ -75,9 +81,12 @@ namespace espresso {
               Real3D Li = system.bc->getBoxL();
               for (int i = 0; i < 3; ++i) property[i] = pos[i] + img[i] * Li[i];
             }
-            else
-              cout<<"Error. Key "<<key<<" is unknown. Please use position, unfolded or"
-                      " velocity."<<endl;
+            else{
+              stringstream msg;
+              msg<<"Error. Key "<<key<<" is unknown. Please use position, unfolded or"
+                      " velocity.";
+              err.setException( msg.str() );
+            }
             
             conf[id] = property;
           }
@@ -88,8 +97,7 @@ namespace espresso {
         for (map<size_t,Real3D>::iterator itr=conf.begin(); itr != conf.end(); ++itr) {
           size_t id = itr->first;
           Real3D p = itr->second;
-          if(idToCpu[id]==myrank)
-            config->set(id, p[0], p[1], p[2]);
+          if(idToCpu[id]==myrank) config->set(id, p[0], p[1], p[2]);
         }
       }
 

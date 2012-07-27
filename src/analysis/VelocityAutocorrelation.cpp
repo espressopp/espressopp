@@ -9,7 +9,6 @@ namespace espresso {
     using namespace iterator;
     
     // calc <vx(0) * vx(t)>
-    // !!!! all confs should contain the same num  of particles
     python::list VelocityAutocorrelation::compute() const{
       
       int M = getListSize();
@@ -26,12 +25,15 @@ namespace espresso {
         totZ[m] = 0.0;
         Z[m] = 0.0;
         for(int n=0; n<M-m; n++){
-          //for(int i=min_id; i<max_id; i++){
           for (map<size_t,int>::const_iterator itr=idToCpu.begin(); itr!=idToCpu.end(); ++itr) {
             size_t i = itr->first;
-            Real3D vel1 = getConf(n + m)->getCoordinates(i);
-            Real3D vel2 = getConf(n)->getCoordinates(i);
-            Z[m] += vel1 * vel2;
+            int whichCPU = itr->second;
+            
+            if(system.comm->rank()==whichCPU){
+              Real3D vel1 = getConf(n + m)->getCoordinates(i);
+              Real3D vel2 = getConf(n)->getCoordinates(i);
+              Z[m] += vel1 * vel2;
+            }
           }
           
         }

@@ -11,6 +11,7 @@
 #include "iterator/CellListIterator.hpp"
 #include "Cell.hpp"
 #include "bc/BC.hpp"
+#include "esutil/Error.hpp"
 
 #include "Tensor.hpp"
 
@@ -38,8 +39,8 @@ typedef complex<double> dcomplex;
 
 namespace espresso {
   namespace interaction {
-    /** This class provides methods to compute forces and energies of the CoulombKSpaceEwald part.
-     *  Currently it works with cubes and rectangular cuboids.
+    /** This class provides methods to compute forces and energies of the
+     *  CoulombKSpaceEwald part. Currently it works with cubes and rectangular cuboids.
      *  Does not work for triclinic box, slab geometry.
      */
     
@@ -430,11 +431,17 @@ namespace espresso {
       }
       
       real _computeEnergySqrRaw(real distSqr) const {
-        cout << "There is no sense to call this function for Ewald summation" << endl;
+        esutil::Error err(system->comm);
+        stringstream msg;
+        msg << "There is no sense to call this function for Ewald summation";
+        err.setException( msg.str() );
         return 0.0;
       }
       bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const {
-        cout << "There is no sense to call this function for Ewald summation" << endl;
+        esutil::Error err(system->comm);
+        stringstream msg;
+        msg << "There is no sense to call this function for Ewald summation";
+        err.setException( msg.str() );
         return false;
       }
       

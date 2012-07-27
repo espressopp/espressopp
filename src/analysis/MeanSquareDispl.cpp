@@ -35,7 +35,6 @@ namespace espresso {
         Real3D posCOM_sum = Real3D(0.0,0.0,0.0);
         real mass_sum = 0.0;
 
-        // it is correct if all the particles has equal masses
         for (map<size_t,int>::const_iterator itr=idToCpu.begin(); itr!=idToCpu.end(); ++itr) {
           size_t i = itr->first;
           int whichCPU = itr->second;

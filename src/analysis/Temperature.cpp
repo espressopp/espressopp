@@ -12,7 +12,6 @@ namespace espresso {
     real Temperature::compute() const {
 
       int myN, systemN;
-      real T = 0.0;
       real sumT = 0.0;
       real v2sum = 0.0;
 

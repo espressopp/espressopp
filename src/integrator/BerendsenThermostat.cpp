@@ -6,6 +6,7 @@
 
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
+#include "esutil/Error.hpp"
 
 namespace espresso {
   
@@ -63,12 +64,22 @@ namespace espresso {
       LOG4ESPP_DEBUG(theLogger, "equilibrating the temperature");
 
       System& system = getSystemRef();
+      esutil::Error err(system.comm);
       
       static Temperature Tcurrent(getSystem());
       
       real T = Tcurrent.compute();  // calculating the current temperature in system
       
-      real lambda = sqrt( 1 + pref * (T0/T - 1) );  // current scaling parameter
+      real lambda2 = 1 + pref * (T0/T - 1);
+      
+      if(lambda2<0.0){
+        std::stringstream msg;
+        msg << "Scaling coefficient is <0 (Berendsen thermostat). lambda^2="<<lambda2;
+        err.setException( msg.str() );
+        err.checkException();
+      }
+
+      real lambda = sqrt( lambda2 );  // current scaling parameter
 
       CellList cells = system.storage->getRealCells();
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {

@@ -10,7 +10,6 @@ namespace espresso {
   namespace esutil {
 
     /********************************************************************/
-
     Error::Error(shared_ptr< mpi::communicator > _comm)
     {
       comm = _comm;
@@ -22,21 +21,7 @@ namespace espresso {
     Error::~Error()
     {
       // final test for any hanging exception
-
       checkException();
-    }
-
-    /********************************************************************/
-
-    void Error::setException(const char* msg, bool add)
-    {
-      // do not add message if not first and add == false
-
-      if (noExceptions == 0 || add) {
-        exceptionMessage += msg;
-      } 
-
-      noExceptions++;
     }
 
     /********************************************************************/
@@ -49,8 +34,8 @@ namespace espresso {
 
       mpi::all_reduce(*comm, noExceptions, totalExceptions, std::plus<int>());
 
-      printf("On proc %d: noExceptions = %d, total = %d\n",
-	     comm->rank(), noExceptions, totalExceptions);
+      //printf("On proc %d: noExceptions = %d, total = %d\n",
+	  //   comm->rank(), noExceptions, totalExceptions);
 
       if (totalExceptions > 0) {
 
@@ -59,7 +44,11 @@ namespace espresso {
         msg << totalExceptions << " exceptions occurred";
 
         if (exceptionMessage.length() > 0) {
-          msg << ": " << exceptionMessage;
+          msg << ":\n cpu "<< comm->rank()<< ":  Exception message(s):\n" << exceptionMessage;
+          msg <<"\n";
+          msg << "On proc "<< comm->rank()<< ": noExceptions = "<<noExceptions<<
+                  ", total = "<< totalExceptions <<"\n";
+ 
           exceptionMessage.clear();
         }
 

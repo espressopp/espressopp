@@ -10,6 +10,7 @@
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "python.hpp"
+#include "esutil/Error.hpp"
 
 #include <string>
 
@@ -30,6 +31,7 @@ namespace espresso {
      * 
      * Important: Mainly it was created in order to observe the system in time.
      * !!At the moment the number of particles should be the same for different snapshots.!!
+     * Otherwise it will throw an runtime error exception
     */
 
     typedef vector<ConfigurationPtr> ConfigurationList;
@@ -44,6 +46,8 @@ namespace espresso {
       ConfigsParticleDecomp(shared_ptr<System> system): SystemAccess (system){
         // by default key = "position", it will store the particle positions
         // (option: "velocity" or "unfolded")
+        esutil::Error err(system->comm);
+        
         key = "position";
         
         int localN = system -> storage -> getNRealParticles();
@@ -52,7 +56,6 @@ namespace espresso {
         int n_nodes = system -> comm -> size();
         int this_node = system -> comm -> rank();
         
-        // TODO it could be a problem if   n_nodes > kVectorLength !!!
         int local_num_of_part = num_of_part / n_nodes + 1;
 
         vector<int> tot_idList;
@@ -97,12 +100,20 @@ namespace espresso {
             count = 0;
             nodeNum++;
           }
-          //cout << "cpu: "<< system->comm->rank() << " i= " << *it <<endl;
         }        
         
-        if(num_of_part <= n_nodes){
-          cout<<"Warning. Number of particles less then the number of nodes."<<endl;
-          cout<<"nparts="<<num_of_part<<"  nnodes="<<n_nodes<<endl;
+        try{
+          if(num_of_part <= n_nodes){
+            stringstream msg;
+            msg<<"Warning. Number of particles less then the number of nodes.\n";
+            msg<<"It might be a problem. NPart="<<num_of_part<<" NNodes="<<n_nodes;
+            err.setException( msg.str() );
+            err.checkException();
+          }
+        }
+        catch(std::exception const& e){
+          if(this_node==0)
+            cout << "Exception: " << e.what() << "\n";
         }
       }
       ~ConfigsParticleDecomp() {}

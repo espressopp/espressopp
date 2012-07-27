@@ -210,7 +210,6 @@ namespace espresso {
     real skinL = getSystem() -> getSkin();
     real maxCutoffL = getSystem() -> maxCutoff;
             
-    // TODO probably one should handle the error
     // nodeGrid is already defined
     Int3D _nodeGrid(nodeGrid.getGridSize());
     // new cellGrid

@@ -3,9 +3,13 @@
 #include "python.hpp"
 #include "System.hpp"
 
+#include "esutil/Error.hpp"
+
 namespace espresso {
   
   using namespace analysis;
+  using namespace esutil;
+  using namespace std;
   
   namespace integrator {
 
@@ -62,7 +66,17 @@ namespace espresso {
       
       real P = Pcurrent.compute();  // calculating the current pressure in system
       
-      real mu = pow( 1 + pref * (P - P0) , 1.0/3.0 );  // calculating the current scaling parameter
+      real mu3 = 1 + pref * (P - P0);
+      
+      Error err(system.comm);
+      if(mu3<0.0){
+        stringstream msg;
+        msg << "Scaling coefficient is <0 (Berendsen barostat). mu^3="<<mu3;
+        err.setException( msg.str() );
+        err.checkException();
+      }
+      
+      real mu = pow(  mu3, 1.0/3.0 );  // calculating the current scaling parameter
 
       system.scaleVolume( mu, true );
     }

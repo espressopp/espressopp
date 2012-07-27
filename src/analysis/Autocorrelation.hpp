@@ -17,9 +17,9 @@ namespace espresso {
      * computation) of autocorrelation function. It is useful for example for viscosity
      * calculations.
      * 
+     * !Important! It should be the same time period between snapshots.
     */
     
-    // TODO it should be the same time period between snapshots.
     // now the single value is Real3D
     // TODO probably template realization
 

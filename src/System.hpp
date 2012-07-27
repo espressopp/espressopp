@@ -10,13 +10,15 @@
 
 namespace espresso {
 
-  namespace esutil { class RNG; }
+  namespace esutil { 
+    class RNG;
+  }
 
   class System : public enable_shared_from_this< System > {
   
   private:
     real skin;  //<! skin used for VerletList
-
+    
   public:
 
     System();

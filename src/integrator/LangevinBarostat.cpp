@@ -8,6 +8,7 @@
 
 #include "interaction/Interaction.hpp"
 #include "esutil/RNG.hpp"
+#include "esutil/Error.hpp"
 
 #include "bc/BC.hpp"
 
@@ -24,9 +25,8 @@ namespace espresso {
 
     LOG4ESPP_LOGGER(LangevinBarostat::theLogger, "LangevinBarostat");
 
-    // TODO It is very sensitive to parameters (the ensemble). The manual how to choose the
+    // TODO The ensemble is very sensitive to parameters. The manual how to choose the
     // parameters for simple system should be written.
-    // one of the parametes should be desired temperature
     LangevinBarostat::LangevinBarostat(shared_ptr<System> _system,
                                        shared_ptr<esutil::RNG> _rng,
                                        real _temperature) : Extension(_system), 
@@ -100,7 +100,8 @@ namespace espresso {
       int Nloc = system.storage->getNRealParticles();
       boost::mpi::all_reduce(*mpiWorld, Nloc, N, std::plus<int>());
       
-      // TODO introduce dimension as a parameter
+      // TODO introduce dimension as a parameter. It will be done by introducing
+      // degree of freedom as a property of System.
       real d = 3;
       
       mass = d*N*desiredTemperature / (freq*freq);
@@ -121,18 +122,21 @@ namespace espresso {
       real dt = integrator->getTimeStep();
       
       System& system = getSystemRef();
+      esutil::Error err(system.comm);
       
-      // The volume is scaled according to the equations V(t+1/2*dt) = V(t) + 1/2*dt*V'; V' = d*V*pe/W
+      // The volume is scaled according to the equations V(t+1/2*dt) = V(t) + 1/2*dt*V';
+      // V' = d*V*pe/W
       // in order to accelerate  1.5 * dt := 0.5dt * 3
       real volScale = 1 + dt * 1.5 * momentum_mass;
       real scale_factor = 0;
       if( volScale < 0.0){
-        cout << "The volume scaling is not possible. Volume scaling factor: "<< volScale << endl;
-        // TODO error handling
-        exit(-1);
+        stringstream msg;
+        msg << "Scaling coefficient is <0 (Langevin barostat). coef="<<volScale;
+        err.setException( msg.str() );
+        err.checkException();
       }
-      else
-        scale_factor = pow( volScale, 1./3.);  // calculating the current scaling parameter
+
+      scale_factor = pow( volScale, 1./3.);  // calculating the current scaling parameter
       
       system.scaleVolume( scale_factor, false);
     }
@@ -180,9 +184,6 @@ namespace espresso {
       //mpi::all_reduce( communic, rij_dot_Fij, p_nonbonded, std::plus<real>());
       
       // TODO optimization is needed, some terms are the same at the begin and at the end of integration
-      
-      // @TODO one should check that X is not the instantaneous pressure, 
-      // because it does not include the white noise from thermostat
       real X = p_kinetic + p_nonbonded;
       /*
        * in order not to do double calculations X is not divided by 3V and term in the next line
@@ -208,7 +209,6 @@ namespace espresso {
     }
     
     void LangevinBarostat::updDisplacement(real& maxSqDist){
-      // TODO the maxSqDist should be introduced
       System& system = getSystemRef();
       CellList cells = system.storage->getRealCells();
       real dt = integrator->getTimeStep();
@@ -221,8 +221,6 @@ namespace espresso {
         real sqDist = delta * delta;
         maxSqDist = std::max(maxSqDist, sqDist);
       }
-      
-      //return (momentum_mass); // momentum is normalized by fictitious mass already
     }
 
     void LangevinBarostat::frictionBarostat(Particle& p, real factor){

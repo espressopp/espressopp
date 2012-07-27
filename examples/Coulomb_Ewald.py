@@ -68,7 +68,7 @@ system.storage.decompose()
 
 # the R space part of electrostatic interaction according to the Ewald method
 # setting the Verlet list
-vl = espresso.VerletList(system, rspacecutoff+skin)
+vl = espresso.VerletList(system, rspacecutoff)
 '''
   Creating the Coulomb potential which is responsible for the R space part according to the
   Ewald method.
@@ -79,7 +79,7 @@ coulombR_pot = espresso.interaction.CoulombRSpace(coulomb_prefactor, alpha, rspa
 # creating the interaction based on the Verlet list
 coulombR_int = espresso.interaction.VerletListCoulombRSpace(vl)
 # setting the potential for the interaction between particles of type 0 and 0
-coulombR_int.setPotential(type1=0, type2=0, potential = coulombR_pot)
+coulombR_pot = coulombR_int.setPotential(type1=0, type2=0, potential = coulombR_pot)
 # adding the interaction to the system
 system.addInteraction(coulombR_int)
 

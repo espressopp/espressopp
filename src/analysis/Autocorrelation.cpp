@@ -2,11 +2,9 @@
 
 #include "Autocorrelation.hpp"
 #include "iterator/CellListIterator.hpp"
-
-//#include <boost/serialization/map.hpp>
+#include "esutil/Error.hpp"
 
 using namespace std;
-//using namespace espresso;
 
 namespace espresso {
   namespace analysis {
@@ -22,12 +20,16 @@ namespace espresso {
     }
 
     Real3D Autocorrelation::getValue(int position) const{
+      System& system = getSystemRef();
+      esutil::Error err(system.comm);
       int nconfigs = getListSize();
       if (0 <= position and position < nconfigs) {
         return valueList[position];
       }
       else{
-        cout << "Error. Velocities::get <out-of-range>" << endl;
+        stringstream msg;
+        msg << "Error. Velocities::get <out-of-range>";
+        err.setException( msg.str() );
         return Real3D(0,0,0);
       }
     }
@@ -101,6 +103,7 @@ namespace espresso {
         cout<<"calculation progress (autocorrelation): 100 %" <<endl;
       
       real coef = 3.0; // only if value is Real3D
+      
       for(int m=min_m; m<max_m; m++){
         Z[m] /= ( (real)(M-m)*coef );
       }
