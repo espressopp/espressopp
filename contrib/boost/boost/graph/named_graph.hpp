@@ -346,9 +346,7 @@ inline void BGL_NAMED_GRAPH::added_vertex(Vertex vertex)
 template<BGL_NAMED_GRAPH_PARAMS>
 inline void BGL_NAMED_GRAPH::removing_vertex(Vertex vertex)
 {
-  typedef typename BGL_NAMED_GRAPH::vertex_name_type vertex_name_type;
-  const vertex_name_type& vertex_name = extract_name(derived()[vertex]);
-  named_vertices.erase(vertex_name);
+  named_vertices.erase(vertex);
 }
 
 template<BGL_NAMED_GRAPH_PARAMS>

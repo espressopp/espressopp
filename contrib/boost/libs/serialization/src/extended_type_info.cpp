@@ -15,7 +15,7 @@
 #include <algorithm>
 #include <set>
 #include <utility>
-#include <boost/assert.hpp>
+#include <cassert>
 #include <cstddef> // NULL
 
 #include <boost/config.hpp> // msvc needs this to suppress warning
@@ -52,9 +52,9 @@ struct key_compare
         if(lhs == rhs)
             return false;
         const char * l = lhs->get_key();
-        BOOST_ASSERT(NULL != l);
+        assert(NULL != l);
         const char * r = rhs->get_key();
-        BOOST_ASSERT(NULL != r);
+        assert(NULL != r);
         // performance shortcut
         // shortcut to exploit string pooling
         if(l == r)
@@ -77,23 +77,23 @@ class extended_type_info_arg : public extended_type_info
 {
     virtual bool
     is_less_than(const extended_type_info & /*rhs*/) const {
-        BOOST_ASSERT(false);
+        assert(false);
         return false;
     };
     virtual bool
     is_equal(const extended_type_info & /*rhs*/) const {
-        BOOST_ASSERT(false);
+        assert(false);
         return false;
     };
     virtual const char * get_debug_info() const {
         return get_key();
     }
     virtual void * construct(unsigned int /*count*/, ...) const{
-        BOOST_ASSERT(false);
+        assert(false);
         return NULL;
     }
     virtual void destroy(void const * const /*p*/) const {
-        BOOST_ASSERT(false);
+        assert(false);
     }
 public:
     extended_type_info_arg(const char * key) :
@@ -137,7 +137,7 @@ extended_type_info::key_unregister() const{
 
 BOOST_SERIALIZATION_DECL(const extended_type_info *) 
 extended_type_info::find(const char *key) {
-    BOOST_ASSERT(NULL != key);
+    assert(NULL != key);
     const detail::ktmap & k = singleton<detail::ktmap>::get_const_instance();
     const detail::extended_type_info_arg eti_key(key);
     const detail::ktmap::const_iterator it = k.find(& eti_key);

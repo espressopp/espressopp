@@ -15,7 +15,7 @@
 #define BOOST_ARCHIVE_SOURCE
 #include <boost/archive/impl/basic_xml_grammar.hpp>
 
-using namespace boost::spirit::classic;
+using namespace boost::spirit;
 
 #include <boost/config.hpp>
 

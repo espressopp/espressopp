@@ -153,9 +153,7 @@ namespace boost
             };
         };
 # endif
-// EAN: preprocess this block out on advice of Peder Holt
-// to eliminate errors in type_traits/common_type.hpp
-# if 0 //BOOST_WORKAROUND(BOOST_MSVC,==1310)
+# if BOOST_WORKAROUND(BOOST_MSVC,==1310)
         template<const std::type_info& ref_type_info>
         struct msvc_typeid_wrapper {
             typedef typename msvc_extract_type<msvc_typeid_wrapper>::id2type id2type;

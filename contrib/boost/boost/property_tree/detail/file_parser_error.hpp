@@ -26,11 +26,11 @@ namespace boost { namespace property_tree
         // Construction & destruction
 
         // Construct error
-        file_parser_error(const std::string &msg,
-                          const std::string &file,
-                          unsigned long l) :
-            ptree_error(format_what(msg, file, l)),
-            m_message(msg), m_filename(file), m_line(l)
+        file_parser_error(const std::string &message,
+                          const std::string &filename,
+                          unsigned long line) :
+            ptree_error(format_what(message, filename, line)),
+            m_message(message), m_filename(filename), m_line(line)
         {
         }
 
@@ -45,19 +45,19 @@ namespace boost { namespace property_tree
 
         // Get error message (without line and file - use what() to get
         // full message)
-        std::string message() const
+        std::string message()
         {
             return m_message;
         }
 
         // Get error filename
-        std::string filename() const
+        std::string filename()
         {
             return m_filename;
         }
 
         // Get error line number
-        unsigned long line() const
+        unsigned long line()
         {
             return m_line;
         }
@@ -69,15 +69,20 @@ namespace boost { namespace property_tree
         unsigned long m_line;
 
         // Format error message to be returned by std::runtime_error::what()
-        static std::string format_what(const std::string &msg,
-                                       const std::string &file,
-                                       unsigned long l)
+        std::string format_what(const std::string &message,
+                                const std::string &filename,
+                                unsigned long line)
         {
             std::stringstream stream;
-            stream << (file.empty() ? "<unspecified file>" : file.c_str());
-            if (l > 0)
-                stream << '(' << l << ')';
-            stream << ": " << msg;
+            if (line > 0)
+                stream << (filename.empty() ? "<unspecified file>"
+                                            : filename.c_str())
+                       << '(' << line << "): "
+                       << message;
+            else
+                stream << (filename.empty() ? "<unspecified file>"
+                                            : filename.c_str())
+                       << ": " << message;
             return stream.str();
         }
 

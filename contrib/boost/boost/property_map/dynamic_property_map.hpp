@@ -18,7 +18,6 @@
 
 
 #include <boost/config.hpp>
-#include <boost/throw_exception.hpp>
 #include <boost/property_map/property_map.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/any.hpp>
@@ -30,7 +29,6 @@
 #include <sstream>
 #include <map>
 #include <boost/type.hpp>
-#include <boost/smart_ptr.hpp>
 
 namespace boost {
 
@@ -167,7 +165,7 @@ class dynamic_property_map_adaptor : public dynamic_property_map
 
   void do_put(const any&, const any&, mpl::bool_<false>)
   {
-    BOOST_THROW_EXCEPTION(dynamic_const_put_error());
+    throw dynamic_const_put_error();
   }
 
 public:
@@ -225,9 +223,9 @@ private:
 //
 struct dynamic_properties
 {
-  typedef std::multimap<std::string, boost::shared_ptr<dynamic_property_map> >
+  typedef std::multimap<std::string, dynamic_property_map*>
     property_maps_type;
-  typedef boost::function3<boost::shared_ptr<dynamic_property_map>,
+  typedef boost::function3<std::auto_ptr<dynamic_property_map>,
                            const std::string&,
                            const boost::any&,
                            const boost::any&> generate_fn_type;
@@ -239,16 +237,24 @@ public:
   dynamic_properties() : generate_fn() { }
   dynamic_properties(const generate_fn_type& g) : generate_fn(g) {}
 
-  ~dynamic_properties() {}
+  ~dynamic_properties()
+  {
+    for (property_maps_type::iterator i = property_maps.begin();
+         i != property_maps.end(); ++i) {
+      delete i->second;
+    }
+  }
 
   template<typename PropertyMap>
   dynamic_properties&
   property(const std::string& name, PropertyMap property_map)
   {
     // Tbd: exception safety
-    boost::shared_ptr<dynamic_property_map> pm(
+    std::auto_ptr<dynamic_property_map> pm(
       new detail::dynamic_property_map_adaptor<PropertyMap>(property_map));
-    property_maps.insert(property_maps_type::value_type(name, pm));
+    property_maps_type::iterator i =
+      property_maps.insert(property_maps_type::value_type(name, (dynamic_property_map*)0));
+    i->second = pm.release();
 
     return *this;
   }
@@ -265,17 +271,17 @@ public:
   { return property_maps.lower_bound(name); }
 
   void
-  insert(const std::string& name, boost::shared_ptr<dynamic_property_map> pm)
+  insert(const std::string& name, std::auto_ptr<dynamic_property_map> pm)
   {
-    property_maps.insert(property_maps_type::value_type(name, pm));
+    property_maps.insert(property_maps_type::value_type(name, pm.release()));
   }
 
   template<typename Key, typename Value>
-  boost::shared_ptr<dynamic_property_map>
+  std::auto_ptr<dynamic_property_map>
   generate(const std::string& name, const Key& key, const Value& value)
   {
     if(!generate_fn) {
-      BOOST_THROW_EXCEPTION(property_not_found(name));
+      throw property_not_found(name);
     } else {
       return generate_fn(name,key,value);
     }
@@ -299,7 +305,7 @@ put(const std::string& name, dynamic_properties& dp, const Key& key,
     }
   }
 
-  boost::shared_ptr<dynamic_property_map> new_map = dp.generate(name, key, value);
+  std::auto_ptr<dynamic_property_map> new_map = dp.generate(name, key, value);
   if (new_map.get()) {
     new_map->put(key, value);
     dp.insert(name, new_map);
@@ -320,7 +326,7 @@ get(const std::string& name, const dynamic_properties& dp, const Key& key)
       return any_cast<Value>(i->second->get(key));
   }
 
-  BOOST_THROW_EXCEPTION(dynamic_get_failure(name));
+  throw dynamic_get_failure(name);
 }
 #endif
 
@@ -334,7 +340,7 @@ get(const std::string& name, const dynamic_properties& dp, const Key& key, type<
       return any_cast<Value>(i->second->get(key));
   }
 
-  BOOST_THROW_EXCEPTION(dynamic_get_failure(name));
+  throw dynamic_get_failure(name);
 }
 
 template<typename Key>
@@ -347,16 +353,16 @@ get(const std::string& name, const dynamic_properties& dp, const Key& key)
       return i->second->get_string(key);
   }
 
-  BOOST_THROW_EXCEPTION(dynamic_get_failure(name));
+  throw dynamic_get_failure(name);
 }
 
 // The easy way to ignore properties.
 inline
-boost::shared_ptr<boost::dynamic_property_map> 
+std::auto_ptr<boost::dynamic_property_map> 
 ignore_other_properties(const std::string&,
                         const boost::any&,
                         const boost::any&) {
-  return boost::shared_ptr<boost::dynamic_property_map>();
+  return std::auto_ptr<boost::dynamic_property_map>(0);
 }
 
 } // namespace boost

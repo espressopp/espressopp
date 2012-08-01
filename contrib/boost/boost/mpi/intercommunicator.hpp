@@ -59,9 +59,9 @@ private:
    * underlying MPI_Comm. This operation is used for "casting" from a
    * communicator to an intercommunicator.
    */
-  explicit intercommunicator(const shared_ptr<MPI_Comm>& cp)
+  explicit intercommunicator(const shared_ptr<MPI_Comm>& comm_ptr)
   {
-    this->comm_ptr = cp;
+    this->comm_ptr = comm_ptr;
   }
 
 public:

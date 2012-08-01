@@ -20,6 +20,7 @@ namespace std{
 } // namespace std
 #endif
 
+
 #ifndef BOOST_NO_CWCHAR
 #include <cwchar>
 #ifdef BOOST_NO_STDC_NAMESPACE
@@ -29,6 +30,9 @@ namespace std{ using ::wcslen; }
 
 #include <boost/detail/workaround.hpp>
 
+#include <boost/serialization/throw_exception.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/archive/archive_exception.hpp>
 #include <boost/archive/add_facet.hpp>
 #include <boost/archive/codecvt_null.hpp>
 
@@ -81,7 +85,6 @@ basic_binary_oprimitive<Archive, Elem, Tr>::save(const wchar_t * ws)
     this->This()->save(l);
     save_binary(ws, l * sizeof(wchar_t) / sizeof(char));
 }
-#endif
 
 #ifndef BOOST_NO_STD_WSTRING
 template<class Archive, class Elem, class Tr>
@@ -92,6 +95,7 @@ basic_binary_oprimitive<Archive, Elem, Tr>::save(const std::wstring &ws)
     this->This()->save(l);
     save_binary(ws.data(), l * sizeof(wchar_t) / sizeof(char));
 }
+#endif
 #endif
 
 template<class Archive, class Elem, class Tr>

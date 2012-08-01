@@ -12,12 +12,12 @@
 #  pragma warning (disable : 4786) // too long name, harmless warning
 #endif
 
+#define BOOST_ARCHIVE_SOURCE
 
 #include <exception>
-#include <boost/assert.hpp>
+#include <cassert>
 #include <string>
 
-#define BOOST_ARCHIVE_SOURCE
 #include <boost/archive/xml_archive_exception.hpp>
 
 namespace boost {
@@ -47,7 +47,7 @@ xml_archive_exception::xml_archive_exception(
             m_msg = "Invalid XML tag name";
             break;
         default:
-            BOOST_ASSERT(false);
+            assert(false);
             break;
         }
     }

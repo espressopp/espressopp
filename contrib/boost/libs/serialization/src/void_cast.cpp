@@ -13,7 +13,7 @@
 # pragma warning (disable : 4786) // too long name, harmless warning
 #endif
 
-#include <boost/assert.hpp>
+#include <cassert>
 #include <cstddef> // NULL
 #ifdef BOOST_SERIALIZATION_LOG
 #include <iostream>
@@ -23,11 +23,13 @@
 #include <set>
 #include <functional>
 #include <algorithm>
-#include <boost/assert.hpp>
+#include <cassert>
 
 // BOOST
 #define BOOST_SERIALIZATION_SOURCE
 #include <boost/serialization/singleton.hpp>
+
+#define BOOST_SERIALIZATION_SOURCE
 #include <boost/serialization/extended_type_info.hpp>
 #include <boost/serialization/void_cast.hpp>
 
@@ -97,9 +99,6 @@ class void_caster_shortcut : public void_caster
     }
     virtual bool is_shortcut() const {
         return true;
-    }
-    virtual bool has_virtual_base() const {
-        return m_includes_virtual_base;
     }
 public:
     void_caster_shortcut(
@@ -185,17 +184,13 @@ class void_caster_argument : public void_caster
 {
     virtual void const *
     upcast(void const * const /*t*/) const {
-        BOOST_ASSERT(false);
+        assert(false);
         return NULL;
     }
     virtual void const *
     downcast( void const * const /*t*/) const {
-        BOOST_ASSERT(false);
+        assert(false);
         return NULL;
-    }
-    virtual bool has_virtual_base() const {
-        BOOST_ASSERT(false);
-        return false;
     }
 public:
     void_caster_argument(
@@ -226,9 +221,8 @@ void_caster::recursive_register(bool includes_virtual_base) const {
     #endif
 
     std::pair<void_cast_detail::set_type::const_iterator, bool> result;
-    // comment this out for now.  
     result = s.insert(this);
-    //assert(result.second);
+    assert(result.second);
 
     // generate all implied void_casts.
     void_cast_detail::set_type::const_iterator it;
@@ -245,7 +239,7 @@ void_caster::recursive_register(bool includes_virtual_base) const {
                     (*it)->m_derived, 
                     m_base,
                     m_difference + (*it)->m_difference,
-                    (*it)->has_virtual_base() || includes_virtual_base,
+                    includes_virtual_base,
                     this
                 );
             }
@@ -262,7 +256,7 @@ void_caster::recursive_register(bool includes_virtual_base) const {
                     m_derived, 
                     (*it)->m_base, 
                     m_difference + (*it)->m_difference,
-                    (*it)->has_virtual_base() || includes_virtual_base,
+                    includes_virtual_base,
                     this
                 );
             }
@@ -290,10 +284,6 @@ void_caster::recursive_unregister() const {
     void_cast_detail::set_type::iterator it;
     for(it = s.begin(); it != s.end();){
         const void_caster * vc = *it;
-        if(vc == this){
-            s.erase(it++);
-        }
-        else
         if(vc->m_parent == this){
             s.erase(it);
             delete vc;

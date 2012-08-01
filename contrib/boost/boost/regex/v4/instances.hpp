@@ -118,14 +118,10 @@ template class BOOST_REGEX_TEMPLATE_DECL ::boost::re_detail::perl_matcher< std::
 
 #undef BOOST_REGEX_TEMPLATE_DECL
 
-#elif (defined(__GNUC__) && (__GNUC__ >= 3)) || !defined(BOOST_NO_EXTERN_TEMPLATE)
+#elif (defined(__GNUC__) && (__GNUC__ >= 3))
 
 #  ifndef BOOST_REGEX_INSTANTIATE
-#     ifdef __GNUC__
-#        define template __extension__ extern template
-#     else
-#        define template extern template
-#     endif
+#     define template __extension__ extern template
 #  endif
 
 #if !defined(BOOST_NO_STD_LOCALE) && !defined(BOOST_REGEX_ICU_INSTANCES)

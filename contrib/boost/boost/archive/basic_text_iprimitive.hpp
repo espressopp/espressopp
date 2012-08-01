@@ -24,7 +24,7 @@
 // in such cases.   So we can't use basic_ostream<IStream::char_type> but rather
 // use two template parameters
 
-#include <boost/assert.hpp>
+#include <cassert>
 #include <locale>
 #include <cstddef> // size_t
 
@@ -46,8 +46,8 @@ namespace std{
 #include <boost/limits.hpp>
 #include <boost/io/ios_state.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/static_assert.hpp>
 
+#include <boost/serialization/collection_size_type.hpp>
 #include <boost/serialization/throw_exception.hpp>
 #include <boost/archive/archive_exception.hpp>
 #include <boost/archive/basic_streambuf_locale_saver.hpp>
@@ -58,11 +58,6 @@ namespace archive {
 
 /////////////////////////////////////////////////////////////////////////
 // class basic_text_iarchive - load serialized objects from a input text stream
-#if defined(_MSC_VER)
-#pragma warning( push )
-#pragma warning( disable : 4244 4267 )
-#endif
-
 template<class IStream>
 class basic_text_iprimitive
 {
@@ -86,41 +81,52 @@ public:
     template<class T>
     void load(T & t)
     {
-        if(! is.fail()){
-            is >> t;
-            return;
-        }
-        boost::serialization::throw_exception(
-            archive_exception(archive_exception::input_stream_error)
-        );
-    }
-
-    void load(char & t)
-    {
-        short int i;
-        load(i);
-        t = i;
-    }
-    void load(signed char & t)
-    {
-        short int i;
-        load(i);
-        t = i;
+        if(is.fail())
+            boost::serialization::throw_exception(
+                archive_exception(archive_exception::stream_error)
+            );
+        is >> t;
     }
     void load(unsigned char & t)
     {
+        if(is.fail())
+            boost::serialization::throw_exception(
+                archive_exception(archive_exception::stream_error)
+            );
         unsigned short int i;
-        load(i);
-        t = i;
+        is >> i;
+        t = static_cast<unsigned char>(i);
     }
-
+    void load(signed char & t)
+    {
+        if(is.fail())
+            boost::serialization::throw_exception(
+                archive_exception(archive_exception::stream_error)
+            );
+        signed short int i;
+        is >> i;
+        t = static_cast<signed char>(i);
+    }
+    void load(char & t)
+    {
+        if(is.fail())
+            boost::serialization::throw_exception(
+                archive_exception(archive_exception::stream_error)
+            );
+        short int i;
+        is >> i;
+        t = static_cast<char>(i);
+    }
     #ifndef BOOST_NO_INTRINSIC_WCHAR_T
     void load(wchar_t & t)
     {
-        BOOST_STATIC_ASSERT(sizeof(wchar_t) <= sizeof(int));
-        int i;
-        load(i);
-        t = i;
+        if(is.fail())
+            boost::serialization::throw_exception(
+                archive_exception(archive_exception::stream_error)
+            );
+        unsigned i;
+        is >> i;
+        t = static_cast<wchar_t>(i);
     }
     #endif
     BOOST_ARCHIVE_OR_WARCHIVE_DECL(BOOST_PP_EMPTY()) 
@@ -131,10 +137,6 @@ public:
     BOOST_ARCHIVE_OR_WARCHIVE_DECL(void)
     load_binary(void *address, std::size_t count);
 };
-
-#if defined(_MSC_VER)
-#pragma warning( pop )
-#endif
 
 } // namespace archive
 } // namespace boost

@@ -9,7 +9,6 @@
 #include "BerendsenBarostat.hpp"
 #include "BerendsenThermostat.hpp"
 #include "Isokinetic.hpp"
-#include "StochasticVelocityRescaling.hpp"
 #include "LangevinThermostat.hpp"
 #include "DPDThermostat.hpp"
 #include "LangevinBarostat.hpp"
@@ -27,7 +26,6 @@ namespace espresso {
       BerendsenThermostat::registerPython();
       LangevinBarostat::registerPython();
       Isokinetic::registerPython();
-      StochasticVelocityRescaling::registerPython();
       TDforce::registerPython();
       LangevinThermostat::registerPython();
       DPDThermostat::registerPython();

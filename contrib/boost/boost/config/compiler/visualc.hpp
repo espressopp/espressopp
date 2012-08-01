@@ -37,9 +37,6 @@
    //
 #endif
 
-/// Visual Studio has no fenv.h
-#define BOOST_NO_FENV_H
-
 #if (_MSC_VER <= 1300)  // 1300 == VC++ 7.0
 
 #  if !defined(_MSC_EXTENSIONS) && !defined(BOOST_NO_DEPENDENT_TYPES_IN_TEMPLATE_VALUE_PARAMETERS)      // VC7 bug with /Za
@@ -82,10 +79,6 @@
 // although a conforming signature for swprint exists in VC7.1
 // it appears not to actually work:
 #  define BOOST_NO_SWPRINTF
-// Our extern template tests also fail for this compiler:
-#  define BOOST_NO_EXTERN_TEMPLATE
-// Variadic macros do not exist for VC7.1 and lower
-#  define BOOST_NO_VARIADIC_MACROS
 #endif
 
 #if defined(UNDER_CE)
@@ -97,27 +90,13 @@
 #  define BOOST_NO_MEMBER_TEMPLATE_FRIENDS
 #endif
 
+#if _MSC_VER <= 1600  // 1600 == VC++ 10.0
+#  define BOOST_NO_TWO_PHASE_NAME_LOOKUP
+#endif
+
 #if _MSC_VER == 1500  // 1500 == VC++ 9.0
    // A bug in VC9:
 #  define BOOST_NO_ADL_BARRIER
-#endif
-
-
-#if (_MSC_VER <= 1600)
-// MSVC (including the latest checked version) has not yet completely 
-// implemented value-initialization, as is reported:
-// "VC++ does not value-initialize members of derived classes without 
-// user-declared constructor", reported in 2009 by Sylvester Hesp:
-// https://connect.microsoft.com/VisualStudio/feedback/details/484295
-// "Presence of copy constructor breaks member class initialization",
-// reported in 2009 by Alex Vakulenko:
-// https://connect.microsoft.com/VisualStudio/feedback/details/499606
-// "Value-initialization in new-expression", reported in 2005 by
-// Pavel Kuznetsov (MetaCommunications Engineering):
-// https://connect.microsoft.com/VisualStudio/feedback/details/100744
-// See also: http://www.boost.org/libs/utility/value_init.htm#compiler_issues
-// (Niels Dekker, LKEB, May 2010)
-#define BOOST_NO_COMPLETE_VALUE_INITIALIZATION
 #endif
 
 #if _MSC_VER <= 1500  || !defined(BOOST_STRICT_CONFIG) // 1500 == VC++ 9.0
@@ -129,18 +108,14 @@
 #endif
 
 #if defined(_WIN32_WCE) || defined(UNDER_CE)
+#  define BOOST_NO_THREADEX
+#  define BOOST_NO_GETSYSTEMTIMEASFILETIME
 #  define BOOST_NO_SWPRINTF
-#endif
-
-// we have ThreadEx or GetSystemTimeAsFileTime unless we're running WindowsCE
-#if !defined(_WIN32_WCE) && !defined(UNDER_CE)
-#  define BOOST_HAS_THREADEX
-#  define BOOST_HAS_GETSYSTEMTIMEASFILETIME
 #endif
 
 //   
 // check for exception handling support:   
-#if !defined(_CPPUNWIND) && !defined(BOOST_NO_EXCEPTIONS)
+#ifndef _CPPUNWIND 
 #  define BOOST_NO_EXCEPTIONS   
 #endif 
 
@@ -150,7 +125,7 @@
 #if (_MSC_VER >= 1200)
 #   define BOOST_HAS_MS_INT64
 #endif
-#if (_MSC_VER >= 1310) && (defined(_MSC_EXTENSIONS) || (_MSC_VER >= 1400))
+#if (_MSC_VER >= 1310) && (defined(_MSC_EXTENSIONS) || (_MSC_VER >= 1500))
 #   define BOOST_HAS_LONG_LONG
 #else
 #   define BOOST_NO_LONG_LONG
@@ -170,6 +145,11 @@
 #endif
 
 //
+// all versions support __declspec:
+//
+#define BOOST_HAS_DECLSPEC
+
+//
 // C++0x features
 //
 //   See above for BOOST_NO_LONG_LONG
@@ -179,36 +159,31 @@
 #if _MSC_VER < 1600
 #define BOOST_NO_AUTO_DECLARATIONS
 #define BOOST_NO_AUTO_MULTIDECLARATIONS
+#define BOOST_NO_DECLTYPE
 #define BOOST_NO_LAMBDAS
 #define BOOST_NO_RVALUE_REFERENCES
 #define BOOST_NO_STATIC_ASSERT
-#define BOOST_NO_NULLPTR
-#define BOOST_NO_DECLTYPE
 #endif // _MSC_VER < 1600
-
-#if _MSC_VER >= 1600
-#define BOOST_HAS_STDINT_H
-#endif
 
 // C++0x features not supported by any versions
 #define BOOST_NO_CHAR16_T
 #define BOOST_NO_CHAR32_T
+#define BOOST_NO_CONCEPTS
 #define BOOST_NO_CONSTEXPR
-#define BOOST_NO_DECLTYPE_N3276
 #define BOOST_NO_DEFAULTED_FUNCTIONS
 #define BOOST_NO_DELETED_FUNCTIONS
 #define BOOST_NO_EXPLICIT_CONVERSION_OPERATORS
+#define BOOST_NO_EXTERN_TEMPLATE
 #define BOOST_NO_FUNCTION_TEMPLATE_DEFAULT_ARGS
 #define BOOST_NO_INITIALIZER_LISTS
-#define BOOST_NO_NOEXCEPT
+#define BOOST_NO_NULLPTR
 #define BOOST_NO_RAW_LITERALS
 #define BOOST_NO_SCOPED_ENUMS
+#define BOOST_NO_SFINAE_EXPR
 #define BOOST_NO_TEMPLATE_ALIASES
 #define BOOST_NO_UNICODE_LITERALS
 #define BOOST_NO_VARIADIC_TEMPLATES
-#define BOOST_NO_SFINAE_EXPR
-#define BOOST_NO_TWO_PHASE_NAME_LOOKUP
-#define BOOST_NO_UNIFIED_INITIALIZATION_SYNTAX
+
 //
 // prefix and suffix headers:
 //
@@ -236,8 +211,6 @@
 #     define BOOST_COMPILER_VERSION evc9
 #   elif _MSC_VER == 1600
 #     define BOOST_COMPILER_VERSION evc10
-#   elif _MSC_VER == 1700 
-#     define BOOST_COMPILER_VERSION evc11 
 #   else
 #      if defined(BOOST_ASSERT_CONFIG)
 #         error "Unknown EVC++ compiler version - please run the configure tests and report the results"
@@ -261,8 +234,6 @@
 #     define BOOST_COMPILER_VERSION 9.0
 #   elif _MSC_VER == 1600
 #     define BOOST_COMPILER_VERSION 10.0
-#   elif _MSC_VER == 1700 
-#     define BOOST_COMPILER_VERSION 11.0 
 #   else
 #     define BOOST_COMPILER_VERSION _MSC_VER
 #   endif
@@ -277,8 +248,8 @@
 #error "Compiler not supported or configured - please reconfigure"
 #endif
 //
-// last known and checked version is 1700 (VC11, aka 2011):
-#if (_MSC_VER > 1700)
+// last known and checked version is 1600 (VC10, aka 2010):
+#if (_MSC_VER > 1600)
 #  if defined(BOOST_ASSERT_CONFIG)
 #     error "Unknown compiler version - please run the configure tests and report the results"
 #  else

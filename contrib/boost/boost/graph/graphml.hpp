@@ -24,7 +24,6 @@
 #include <boost/mpl/find.hpp>
 #include <boost/mpl/for_each.hpp>
 #include <boost/property_tree/detail/xml_parser_utils.hpp>
-#include <boost/throw_exception.hpp>
 #include <exception>
 #include <sstream>
 
@@ -102,16 +101,12 @@ class mutate_graph_impl : public mutate_graph
         }
         catch (bad_lexical_cast)
         {
-            BOOST_THROW_EXCEPTION(
-              parse_error("invalid value \"" + value + "\" for key " +
-                          name + " of type " + value_type));
+            throw parse_error("invalid value \"" + value + "\" for key " +
+                              name + " of type " + value_type);
         }
         if (!type_found)
-        {
-            BOOST_THROW_EXCEPTION(
-              parse_error("unrecognized type \"" + value_type +
-                          "\" for key " + name));
-        }
+            throw  parse_error("unrecognized type \"" + value_type +
+                               "\" for key " + name);
 
     }
 
@@ -127,16 +122,12 @@ class mutate_graph_impl : public mutate_graph
         }
         catch (bad_lexical_cast)
         {
-            BOOST_THROW_EXCEPTION(
-              parse_error("invalid value \"" + value + "\" for key " +
-                          name + " of type " + value_type));
+            throw parse_error("invalid value \"" + value + "\" for key " +
+                              name + " of type " + value_type);
         }
         if (!type_found)
-        {
-            BOOST_THROW_EXCEPTION(
-              parse_error("unrecognized type \"" + value_type +
-                          "\" for key " + name));
-        }
+            throw  parse_error("unrecognized type \"" + value_type +
+                               "\" for key " + name);
 
     }
 
@@ -152,16 +143,12 @@ class mutate_graph_impl : public mutate_graph
         }
         catch (bad_lexical_cast)
         {
-            BOOST_THROW_EXCEPTION(
-              parse_error("invalid value \"" + value + "\" for key " +
-                          name + " of type " + value_type));
+            throw parse_error("invalid value \"" + value + "\" for key " +
+                              name + " of type " + value_type);
         }
         if (!type_found)
-        {
-            BOOST_THROW_EXCEPTION(
-              parse_error("unrecognized type \"" + value_type +
-                          "\" for key " + name));
-        }
+            throw  parse_error("unrecognized type \"" + value_type +
+                               "\" for key " + name);
     }
 
     template <typename Key, typename ValueVector>
@@ -263,7 +250,7 @@ write_graphml(std::ostream& out, const Graph& g, VertexIndexMap vertex_index,
     {
         std::string key_id = "key" + lexical_cast<std::string>(key_count++);
         if (i->second->key() == typeid(Graph))
-            graph_key_ids[i->first] = key_id;
+            vertex_key_ids[i->first] = key_id;
         else if (i->second->key() == typeid(vertex_descriptor))
             vertex_key_ids[i->first] = key_id;
         else if (i->second->key() == typeid(edge_descriptor))
@@ -296,7 +283,7 @@ write_graphml(std::ostream& out, const Graph& g, VertexIndexMap vertex_index,
 
     typedef typename graph_traits<Graph>::vertex_iterator vertex_iterator;
     vertex_iterator v, v_end;
-    for (boost::tie(v, v_end) = vertices(g); v != v_end; ++v)
+    for (tie(v, v_end) = vertices(g); v != v_end; ++v)
     {
         out << "    <node id=\"n" << get(vertex_index, *v) << "\">\n";
         // Output data
@@ -314,7 +301,7 @@ write_graphml(std::ostream& out, const Graph& g, VertexIndexMap vertex_index,
     typedef typename graph_traits<Graph>::edge_iterator edge_iterator;
     edge_iterator e, e_end;
     typename graph_traits<Graph>::edges_size_type edge_count = 0;
-    for (boost::tie(e, e_end) = edges(g); e != e_end; ++e)
+    for (tie(e, e_end) = edges(g); e != e_end; ++e)
     {
         out << "    <edge id=\"e" << edge_count++ << "\" source=\"n"
             << get(vertex_index, source(*e, g)) << "\" target=\"n"

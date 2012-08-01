@@ -10,8 +10,8 @@
 #pragma once
 #endif
 
-#include <boost/config.hpp>
 #include <boost/cstdint.hpp> // for boost::uintmax_t
+#include <boost/config.hpp>
 #include <boost/detail/workaround.hpp>
 #include <algorithm>  // for min and max
 #include <boost/config/no_tr1/cmath.hpp>
@@ -23,8 +23,8 @@
 #include <boost/math/tools/user.hpp>
 #include <boost/math/special_functions/detail/round_fwd.hpp>
 
-#if (defined(__CYGWIN__) || defined(__FreeBSD__) || defined(__NetBSD__) \
-   || (defined(__hppa) && !defined(__OpenBSD__)) || defined(__NO_LONG_DOUBLE_MATH)) && !defined(BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS)
+#if defined(__CYGWIN__) || defined(__FreeBSD__) || defined(__NetBSD__) \
+   || defined(__hppa) || defined(__NO_LONG_DOUBLE_MATH)
 #  define BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
 #endif
 #if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x582))
@@ -38,14 +38,14 @@
 #  define BOOST_MATH_CONTROL_FP _control87(MCW_EM,MCW_EM)
 #  include <float.h>
 #endif
-#if (defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__)) && ((LDBL_MANT_DIG == 106) || (__LDBL_MANT_DIG__ == 106)) && !defined(BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS)
+#if (defined(macintosh) || defined(__APPLE__) || defined(__APPLE_CC__)) && ((LDBL_MANT_DIG == 106) || (__LDBL_MANT_DIG__ == 106))
 //
 // Darwin's rather strange "double double" is rather hard to
 // support, it should be possible given enough effort though...
 //
 #  define BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS
 #endif
-#if defined(unix) && defined(__INTEL_COMPILER) && (__INTEL_COMPILER <= 1000) && !defined(BOOST_MATH_NO_LONG_DOUBLE_MATH_FUNCTIONS)
+#if defined(unix) && defined(__INTEL_COMPILER) && (__INTEL_COMPILER <= 1000)
 //
 // Intel compiler prior to version 10 has sporadic problems
 // calling the long double overloads of the std lib math functions:
@@ -132,7 +132,7 @@
 
 #endif // defined BOOST_NO_EXPLICIT_FUNCTION_TEMPLATE_ARGUMENTS
 
-#if (defined(__SUNPRO_CC) || defined(__hppa) || defined(__GNUC__)) && !defined(BOOST_MATH_SMALL_CONSTANT)
+#if defined(__SUNPRO_CC) || defined(__hppa) || defined(__GNUC__)
 // Sun's compiler emits a hard error if a constant underflows,
 // as does aCC on PA-RISC, while gcc issues a large number of warnings:
 #  define BOOST_MATH_SMALL_CONSTANT(x) 0
@@ -153,7 +153,7 @@
 // Tune performance options for specific compilers:
 //
 #ifdef BOOST_MSVC
-#  define BOOST_MATH_POLY_METHOD 2
+#  define BOOST_MATH_POLY_METHOD 3
 #elif defined(BOOST_INTEL)
 #  define BOOST_MATH_POLY_METHOD 2
 #  define BOOST_MATH_RATIONAL_METHOD 2
@@ -252,23 +252,14 @@ inline T max BOOST_PREVENT_MACRO_SUBSTITUTION(T a, T b, T c, T d)
 {
    return (std::max)((std::max)(a, b), (std::max)(c, d));
 }
-
 } // namespace tools
-
-template <class T>
-void suppress_unused_variable_warning(const T&)
-{
-}
-
 }} // namespace boost namespace math
 
-#if ((defined(__linux__) && !defined(__UCLIBC__)) || defined(__QNX__) || defined(__IBMCPP__)) && !defined(BOOST_NO_FENV_H)
+#if (defined(__linux__) && !defined(__UCLIBC__)) || defined(__QNX__) || defined(__IBMCPP__)
 
-   #include <boost/detail/fenv.hpp>
+   #include <fenv.h>
 
-#  ifdef FE_ALL_EXCEPT
-
-namespace boost{ namespace math{
+   namespace boost{ namespace math{
    namespace detail
    {
    struct fpu_guard
@@ -289,16 +280,8 @@ namespace boost{ namespace math{
    } // namespace detail
    }} // namespaces
 
-#    define BOOST_FPU_EXCEPTION_GUARD boost::math::detail::fpu_guard local_guard_object;
-#    define BOOST_MATH_INSTRUMENT_FPU do{ fexcept_t cpu_flags; fegetexceptflag(&cpu_flags, FE_ALL_EXCEPT); BOOST_MATH_INSTRUMENT_VARIABLE(cpu_flags); } while(0); 
-
-#  else
-
-#    define BOOST_FPU_EXCEPTION_GUARD
-#    define BOOST_MATH_INSTRUMENT_FPU
-
-#  endif
-
+#  define BOOST_FPU_EXCEPTION_GUARD boost::math::detail::fpu_guard local_guard_object;
+#  define BOOST_MATH_INSTRUMENT_FPU do{ fexcept_t cpu_flags; fegetexceptflag(&cpu_flags, FE_ALL_EXCEPT); BOOST_MATH_INSTRUMENT_VARIABLE(cpu_flags); } while(0); 
 #else // All other platforms.
 #  define BOOST_FPU_EXCEPTION_GUARD
 #  define BOOST_MATH_INSTRUMENT_FPU

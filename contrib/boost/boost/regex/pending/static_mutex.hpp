@@ -96,14 +96,8 @@ class BOOST_REGEX_DECL scoped_static_mutex_lock
 public:
    scoped_static_mutex_lock(static_mutex& mut, bool lk = true);
    ~scoped_static_mutex_lock();
-   operator void const*()const
-   {
-      return locked() ? this : 0;
-   }
-   bool locked()const
-   {
-      return m_have_lock;
-   }
+   operator void const*()const;
+   bool locked()const;
    void lock();
    void unlock();
 private:
@@ -112,6 +106,16 @@ private:
    scoped_static_mutex_lock(const scoped_static_mutex_lock&);
    scoped_static_mutex_lock& operator=(const scoped_static_mutex_lock&);
 };
+
+inline scoped_static_mutex_lock::operator void const*()const
+{
+   return locked() ? this : 0;
+}
+
+inline bool scoped_static_mutex_lock::locked()const
+{
+   return m_have_lock;
+}
 
 } // namespace
 

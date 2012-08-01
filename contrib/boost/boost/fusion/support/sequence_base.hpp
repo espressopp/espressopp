@@ -1,5 +1,5 @@
 /*=============================================================================
-    Copyright (c) 2001-2011 Joel de Guzman
+    Copyright (c) 2001-2006 Joel de Guzman
     Copyright (c) 2007 Tobias Schwinger
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -12,14 +12,10 @@
 
 namespace boost { namespace fusion
 {
-    namespace detail
-    {
-        struct from_sequence_convertible_type
-        {};
-    }
+    struct sequence_root {};
 
     template <typename Sequence>
-    struct sequence_base
+    struct sequence_base : sequence_root
     {
         Sequence const&
         derived() const
@@ -31,11 +27,6 @@ namespace boost { namespace fusion
         derived()
         {
             return static_cast<Sequence&>(*this);
-        }
-
-        operator detail::from_sequence_convertible_type()const
-        {
-            return detail::from_sequence_convertible_type();
         }
     };
 

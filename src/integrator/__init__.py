@@ -5,7 +5,6 @@ from espresso.integrator.MDIntegrator import *
 from espresso.integrator.VelocityVerlet import *
 from espresso.integrator.VelocityVerletOnGroup import *
 from espresso.integrator.Isokinetic import *
-from espresso.integrator.StochasticVelocityRescaling import *
 from espresso.integrator.TDforce import *
 
 from espresso.integrator.Extension import *

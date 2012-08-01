@@ -20,13 +20,10 @@
 
 #include <boost/mpi/datatype.hpp>
 #include <boost/archive/detail/auto_link_archive.hpp>
-#include <boost/archive/detail/common_iarchive.hpp>
+#include <boost/archive/basic_binary_iarchive.hpp>
 #include <boost/archive/shared_ptr_helper.hpp>
 #include <boost/mpi/detail/packed_iprimitive.hpp>
 #include <boost/mpi/detail/binary_buffer_iprimitive.hpp>
-#include <boost/serialization/string.hpp>
-#include <boost/serialization/collection_size_type.hpp>
-#include <boost/serialization/item_version_type.hpp>
 #include <boost/assert.hpp>
 
 namespace boost { namespace mpi {
@@ -47,7 +44,7 @@ namespace boost { namespace mpi {
  */
 class BOOST_MPI_DECL packed_iarchive
   : public iprimitive
-  , public archive::detail::common_iarchive<packed_iarchive>
+  , public archive::basic_binary_iarchive<packed_iarchive>
   , public archive::detail::shared_ptr_helper
 {
 public:
@@ -70,7 +67,7 @@ public:
    */
   packed_iarchive(MPI_Comm const & comm, buffer_type & b, unsigned int flags = boost::archive::no_header, int position = 0)
         : iprimitive(b,comm,position),
-          archive::detail::common_iarchive<packed_iarchive>(flags)
+          archive::basic_binary_iarchive<packed_iarchive>(flags)
         {}
 
   /**
@@ -90,7 +87,7 @@ public:
           ( MPI_Comm const & comm , std::size_t s=0, 
            unsigned int flags = boost::archive::no_header)
          : iprimitive(internal_buffer_,comm)
-         , archive::detail::common_iarchive<packed_iarchive>(flags)
+         , archive::basic_binary_iarchive<packed_iarchive>(flags)
          , internal_buffer_(s)
         {}
 
@@ -98,7 +95,7 @@ public:
   template<class T>
   void load_override(T& x, int version, mpl::false_)
   {
-    archive::detail::common_iarchive<packed_iarchive>::load_override(x,version);
+    archive::basic_binary_iarchive<packed_iarchive>::load_override(x,version);
   }
 
   // Load it directly using the primnivites
@@ -116,19 +113,6 @@ public:
       , BOOST_DEDUCED_TYPENAME remove_const<T>::type
     >::type use_optimized;
     load_override(x, version, use_optimized());
-  }
-
-  // input archives need to ignore  the optional information 
-  void load_override(archive::class_id_optional_type & /*t*/, int){}
-
-  void load_override(archive::class_name_type & t, int)
-  {
-    std::string cn;
-    cn.reserve(BOOST_SERIALIZATION_MAX_KEY_SIZE);
-    * this->This() >> cn;
-    std::memcpy(t, cn.data(), cn.size());
-    // borland tweak
-    t.t[cn.size()] = '\0';
   }
 
 private:

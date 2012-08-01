@@ -31,18 +31,14 @@ namespace boost { namespace property_tree { namespace xml_parser
     void write_xml_comment(std::basic_ostream<Ch> &stream,
                            const std::basic_string<Ch> &s, 
                            int indent,
-                           bool separate_line,
                            const xml_writer_settings<Ch> & settings
                            )
     {
         typedef typename std::basic_string<Ch> Str;
-        if (separate_line)
-            write_xml_indent(stream,indent,settings);
+        write_xml_indent(stream,indent,settings);
         stream << Ch('<') << Ch('!') << Ch('-') << Ch('-');
         stream << s;
-        stream << Ch('-') << Ch('-') << Ch('>');
-        if (separate_line)
-            stream << Ch('\n');
+        stream << Ch('-') << Ch('-') << Ch('>') << std::endl;
     }
     
     template<class Ch>
@@ -56,7 +52,7 @@ namespace boost { namespace property_tree { namespace xml_parser
         if (separate_line)    
             write_xml_indent(stream,indent,settings);
         stream << encode_char_entities(s);
-        if (separate_line)
+        if (separate_line)    
             stream << Ch('\n');
     }
 
@@ -96,9 +92,7 @@ namespace boost { namespace property_tree { namespace xml_parser
             {
                 write_xml_indent(stream,indent,settings);
                 stream << Ch('<') << key << 
-                          Ch('/') << Ch('>');
-                if (want_pretty)
-                    stream << Ch('\n');
+                          Ch('/') << Ch('>') << std::endl;
             }
         }
         else    // Nonempty key
@@ -115,11 +109,8 @@ namespace boost { namespace property_tree { namespace xml_parser
                 // Write attributes
                 if (optional<const Ptree &> attribs = pt.get_child_optional(xmlattr<Ch>()))
                     for (It it = attribs.get().begin(); it != attribs.get().end(); ++it)
-                        stream << Ch(' ') << it->first << Ch('=')
-                               << Ch('"')
-                               << encode_char_entities(
-                                    it->second.template get_value<std::basic_string<Ch> >())
-                               << Ch('"');
+                        stream << Ch(' ') << it->first << Ch('=') << 
+                                  Ch('"') << it->second.template get_value<std::basic_string<Ch> >() << Ch('"');
 
                 if ( has_attrs_only )
                 {
@@ -153,7 +144,7 @@ namespace boost { namespace property_tree { namespace xml_parser
                 else if (it->first == xmlcomment<Ch>())
                     write_xml_comment(stream,
                         it->second.template get_value<std::basic_string<Ch> >(),
-                        indent + 1, want_pretty, settings);
+                        indent + 1, settings);
                 else if (it->first == xmltext<Ch>())
                     write_xml_text(stream,
                         it->second.template get_value<std::basic_string<Ch> >(),

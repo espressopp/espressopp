@@ -21,7 +21,6 @@
 #include <boost/graph/named_function_params.hpp>
 #include <boost/ref.hpp>
 #include <boost/implicit_cast.hpp>
-#include <boost/concept/assert.hpp>
 
 #include <vector>
 #include <utility>
@@ -32,7 +31,7 @@ namespace boost {
   class DFSVisitorConcept {
   public:
     void constraints() {
-      BOOST_CONCEPT_ASSERT(( CopyConstructibleConcept<Visitor> ));
+      function_requires< CopyConstructibleConcept<Visitor> >();
       vis.initialize_vertex(u, g);
       vis.start_vertex(u, g);
       vis.discover_vertex(u, g);
@@ -81,12 +80,12 @@ namespace boost {
        DFSVisitor& vis,
        ColorMap color, TerminatorFunc func = TerminatorFunc())
     {
-      BOOST_CONCEPT_ASSERT(( IncidenceGraphConcept<IncidenceGraph> ));
-      BOOST_CONCEPT_ASSERT(( DFSVisitorConcept<DFSVisitor, IncidenceGraph> ));
+      function_requires<IncidenceGraphConcept<IncidenceGraph> >();
+      function_requires<DFSVisitorConcept<DFSVisitor, IncidenceGraph> >();
       typedef typename graph_traits<IncidenceGraph>::vertex_descriptor Vertex;
-      BOOST_CONCEPT_ASSERT(( ReadWritePropertyMapConcept<ColorMap, Vertex> ));
+      function_requires< ReadWritePropertyMapConcept<ColorMap, Vertex> >();
       typedef typename property_traits<ColorMap>::value_type ColorValue;
-      BOOST_CONCEPT_ASSERT(( ColorValueConcept<ColorValue> ));
+      function_requires< ColorValueConcept<ColorValue> >();
       typedef color_traits<ColorValue> Color;
       typedef typename graph_traits<IncidenceGraph>::out_edge_iterator Iter;
       typedef std::pair<Vertex, std::pair<Iter, Iter> > VertexInfo;
@@ -101,7 +100,7 @@ namespace boost {
 
       put(color, u, Color::gray());
       vis.discover_vertex(u, g);
-      boost::tie(ei, ei_end) = out_edges(u, g);
+      tie(ei, ei_end) = out_edges(u, g);
       // Variable is needed to workaround a borland bug.
       TF& fn = static_cast<TF&>(func);
       if (fn(u, g)) {
@@ -113,7 +112,7 @@ namespace boost {
       while (!stack.empty()) {
         VertexInfo& back = stack.back();
         u = back.first;
-        boost::tie(ei, ei_end) = back.second;
+        tie(ei, ei_end) = back.second;
         stack.pop_back();
         while (ei != ei_end) {
           Vertex v = target(*ei, g);
@@ -125,7 +124,7 @@ namespace boost {
             u = v;
             put(color, u, Color::gray());
             vis.discover_vertex(u, g);
-            boost::tie(ei, ei_end) = out_edges(u, g);
+            tie(ei, ei_end) = out_edges(u, g);
             if (fn(u, g)) {
                 ei = ei_end;
             }
@@ -152,12 +151,12 @@ namespace boost {
        DFSVisitor& vis,  // pass-by-reference here, important!
        ColorMap color, TerminatorFunc func)
     {
-      BOOST_CONCEPT_ASSERT(( IncidenceGraphConcept<IncidenceGraph> ));
-      BOOST_CONCEPT_ASSERT(( DFSVisitorConcept<DFSVisitor, IncidenceGraph> ));
+      function_requires<IncidenceGraphConcept<IncidenceGraph> >();
+      function_requires<DFSVisitorConcept<DFSVisitor, IncidenceGraph> >();
       typedef typename graph_traits<IncidenceGraph>::vertex_descriptor Vertex;
-      BOOST_CONCEPT_ASSERT(( ReadWritePropertyMapConcept<ColorMap, Vertex> ));
+      function_requires< ReadWritePropertyMapConcept<ColorMap, Vertex> >();
       typedef typename property_traits<ColorMap>::value_type ColorValue;
-      BOOST_CONCEPT_ASSERT(( ColorValueConcept<ColorValue> ));
+      function_requires< ColorValueConcept<ColorValue> >();
       typedef color_traits<ColorValue> Color;
       typename graph_traits<IncidenceGraph>::out_edge_iterator ei, ei_end;
 
@@ -167,7 +166,7 @@ namespace boost {
       // Variable is needed to workaround a borland bug.
       TF& fn = static_cast<TF&>(func);
       if (!fn(u, g))
-        for (boost::tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) {
+        for (tie(ei, ei_end) = out_edges(u, g); ei != ei_end; ++ei) {
           Vertex v = target(*ei, g);           vis.examine_edge(*ei, g);
           ColorValue v_color = get(color, v);
           if (v_color == Color::white()) {     vis.tree_edge(*ei, g);
@@ -188,12 +187,12 @@ namespace boost {
                      typename graph_traits<VertexListGraph>::vertex_descriptor start_vertex)
   {
     typedef typename graph_traits<VertexListGraph>::vertex_descriptor Vertex;
-    BOOST_CONCEPT_ASSERT(( DFSVisitorConcept<DFSVisitor, VertexListGraph> ));
+    function_requires<DFSVisitorConcept<DFSVisitor, VertexListGraph> >();
     typedef typename property_traits<ColorMap>::value_type ColorValue;
     typedef color_traits<ColorValue> Color;
 
     typename graph_traits<VertexListGraph>::vertex_iterator ui, ui_end;
-    for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
+    for (tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
       Vertex u = implicit_cast<Vertex>(*ui);
       put(color, u, Color::white()); vis.initialize_vertex(u, g);
     }
@@ -203,7 +202,7 @@ namespace boost {
                                      detail::nontruth2());
     }
 
-    for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
+    for (tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
       Vertex u = implicit_cast<Vertex>(*ui);
       ColorValue u_color = get(color, u);
       if (u_color == Color::white()) {       vis.start_vertex(u, g);
@@ -298,7 +297,7 @@ namespace boost {
     depth_first_search
       (g,
        arg_pack[_visitor | make_dfs_visitor(null_visitor())],
-       boost::detail::make_color_map_from_arg_pack(g, arg_pack),
+       boost::detail::color_map_maker<VertexListGraph, arg_pack_type>::make_map(g, arg_pack),
        arg_pack[_root_vertex | *vertices(g).first]
       );
   }

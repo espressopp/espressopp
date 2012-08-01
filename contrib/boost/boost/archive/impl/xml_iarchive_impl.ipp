@@ -112,7 +112,7 @@ xml_iarchive_impl<Archive>::load(wchar_t * ws){
     }
     *ws = L'\0';
 }
-#endif // BOOST_NO_INTRINSIC_WCHAR_T
+#endif
 
 #endif // BOOST_NO_CWCHAR
 
@@ -157,7 +157,7 @@ BOOST_ARCHIVE_DECL(void)
 xml_iarchive_impl<Archive>::init(){
     gimpl->init(is);
     this->set_library_version(
-        library_version_type(gimpl->rv.version)
+        version_type(gimpl->rv.version)
     );
 }
 

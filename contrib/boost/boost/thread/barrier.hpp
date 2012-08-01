@@ -9,7 +9,6 @@
 #define BOOST_BARRIER_JDM030602_HPP
 
 #include <boost/thread/detail/config.hpp>
-#include <boost/throw_exception.hpp>
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
@@ -28,7 +27,7 @@ namespace boost
             : m_threshold(count), m_count(count), m_generation(0)
         {
             if (count == 0)
-                boost::throw_exception(std::invalid_argument("count cannot be zero."));
+                throw std::invalid_argument("count cannot be zero.");
         }
     
         bool wait()

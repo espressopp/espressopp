@@ -641,18 +641,6 @@ namespace boost
    template <class T>
    bool isnormal BOOST_NO_MACRO_EXPAND(T t);
 
-   template<class T> 
-   int signbit BOOST_NO_MACRO_EXPAND(T x);
-
-   template <class T>
-   int sign BOOST_NO_MACRO_EXPAND(const T& z);
-
-   template <class T>
-   T copysign BOOST_NO_MACRO_EXPAND(const T& x, const T& y);
-
-   template <class T>
-   T changesign BOOST_NO_MACRO_EXPAND(const T& z);
-
    // Exponential integrals:
    namespace detail{
 
@@ -892,6 +880,7 @@ namespace boost
    inline typename boost::math::tools::promote_args<RT>::type falling_factorial(RT x, unsigned n){ return boost::math::falling_factorial(x, n, Policy()); }\
    template <class RT>\
    inline typename boost::math::tools::promote_args<RT>::type rising_factorial(RT x, unsigned n){ return boost::math::rising_factorial(x, n, Policy()); }\
+   using boost::math::fpclassify;\
 \
    template <class RT>\
    inline typename boost::math::tools::promote_args<RT>::type tgamma(RT z){ return boost::math::tgamma(z, Policy()); }\
@@ -1014,10 +1003,6 @@ namespace boost
    using boost::math::isinf;\
    using boost::math::isnan;\
    using boost::math::isnormal;\
-   using boost::math::signbit;\
-   using boost::math::sign;\
-   using boost::math::copysign;\
-   using boost::math::changesign;\
    \
    template <class T, class U>\
    inline typename boost::math::tools::promote_args<T,U>::type expint(T const& z, U const& u)\

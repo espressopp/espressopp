@@ -10,11 +10,4 @@ from espresso.analysis.Velocities import *
 from espresso.analysis.CenterOfMass import *
 from espresso.analysis.NPart import *
 from espresso.analysis.MaxPID import *
-from espresso.analysis.AllParticlePos import *
-from espresso.analysis.IntraChainDistSq import *
 from espresso.analysis.NeighborFluctuation import *
-
-from espresso.analysis.ConfigsParticleDecomp import *
-from espresso.analysis.VelocityAutocorrelation import *
-from espresso.analysis.MeanSquareDispl import *
-from espresso.analysis.Autocorrelation import *

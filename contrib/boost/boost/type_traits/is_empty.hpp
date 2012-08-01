@@ -31,23 +31,11 @@
 // should be always the last #include directive
 #include <boost/type_traits/detail/bool_trait_def.hpp>
 
-#ifndef BOOST_INTERNAL_IS_EMPTY
-#define BOOST_INTERNAL_IS_EMPTY(T) false
-#else
-#define BOOST_INTERNAL_IS_EMPTY(T) BOOST_IS_EMPTY(T)
-#endif
-
 namespace boost {
 
 namespace detail {
 
 #ifndef BOOST_NO_TEMPLATE_PARTIAL_SPECIALIZATION
-
-#ifdef BOOST_MSVC
-#pragma warning(push)
-#pragma warning(disable:4624) // destructor could not be generated
-#endif
-
 template <typename T>
 struct empty_helper_t1 : public T
 {
@@ -58,10 +46,6 @@ private:
    empty_helper_t1(const empty_helper_t1&);
    empty_helper_t1& operator=(const empty_helper_t1&);
 };
-
-#ifdef BOOST_MSVC
-#pragma warning(pop)
-#endif
 
 struct empty_helper_t2 { int i[256]; };
 
@@ -89,7 +73,7 @@ struct is_empty_impl
         bool, value = (
             ::boost::type_traits::ice_or<
               ::boost::detail::empty_helper<cvt,::boost::is_class<T>::value>::value
-              , BOOST_INTERNAL_IS_EMPTY(cvt)
+              , BOOST_IS_EMPTY(cvt)
             >::value
             ));
 };
@@ -124,7 +108,7 @@ struct is_empty_impl
                 , ::boost::is_class<T>::value
                 , ::boost::is_convertible< r_type,int>::value
               >::value
-              , BOOST_INTERNAL_IS_EMPTY(cvt)
+              , BOOST_IS_EMPTY(cvt)
            >::value));
 };
 
@@ -193,14 +177,14 @@ struct is_empty_impl
    typedef typename result::type eh_type;
 
    BOOST_STATIC_CONSTANT(bool, value =
-      (::boost::type_traits::ice_or<eh_type::value, BOOST_INTERNAL_IS_EMPTY(T)>::value));
+      (::boost::type_traits::ice_or<eh_type::value, BOOST_IS_EMPTY(T)>::value));
 };
 
 #else
 
 template <typename T> struct is_empty_impl
 {
-    BOOST_STATIC_CONSTANT(bool, value = BOOST_INTERNAL_IS_EMPTY(T));
+    BOOST_STATIC_CONSTANT(bool, value = BOOST_IS_EMPTY(T));
 };
 
 #endif  // BOOST_MSVC6_MEMBER_TEMPLATES
@@ -222,8 +206,6 @@ BOOST_TT_AUX_BOOL_TRAIT_DEF1(is_empty,T,::boost::detail::is_empty_impl<T>::value
 } // namespace boost
 
 #include <boost/type_traits/detail/bool_trait_undef.hpp>
-
-#undef BOOST_INTERNAL_IS_EMPTY
 
 #endif // BOOST_TT_IS_EMPTY_HPP_INCLUDED
 

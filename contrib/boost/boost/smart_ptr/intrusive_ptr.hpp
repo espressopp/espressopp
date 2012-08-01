@@ -15,6 +15,11 @@
 
 #include <boost/config.hpp>
 
+#ifdef BOOST_MSVC  // moved here to work around VC++ compiler crash
+# pragma warning(push)
+# pragma warning(disable:4284) // odd return type for operator->
+#endif
+
 #include <boost/assert.hpp>
 #include <boost/detail/workaround.hpp>
 #include <boost/smart_ptr/detail/sp_convertible.hpp>
@@ -285,15 +290,10 @@ template<class E, class T, class Y> std::basic_ostream<E, T> & operator<< (std::
 
 #endif // !defined(BOOST_NO_IOSTREAM)
 
-// hash_value
-
-template< class T > struct hash;
-
-template< class T > std::size_t hash_value( boost::intrusive_ptr<T> const & p )
-{
-    return boost::hash< T* >()( p.get() );
-}
-
 } // namespace boost
+
+#ifdef BOOST_MSVC
+# pragma warning(pop)
+#endif    
 
 #endif  // #ifndef BOOST_SMART_PTR_INTRUSIVE_PTR_HPP_INCLUDED

@@ -39,7 +39,6 @@ pmiimport('espresso.esutil')
 from espresso.esutil.RNG import *
 from espresso.esutil.UniformOnSphere import *
 from espresso.esutil.NormalVariate import *
-from espresso.esutil.GammaVariate import *
 
 
 class ExtendBaseClass (type) :

@@ -1,67 +1,48 @@
 /*=============================================================================
-    Copyright (c) 2001-2011 Joel de Guzman
+    Copyright (c) 2001-2006 Joel de Guzman
     Copyright (c) 2005-2006 Dan Marsden
-    Copyright (c) 2009-2010 Christopher Schmidt
 
     Distributed under the Boost Software License, Version 1.0. (See accompanying
     file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 ==============================================================================*/
+#if !defined(BOOST_FUSION_END_IMPL_24122005_1755)
+#define BOOST_FUSION_END_IMPL_24122005_1755
 
-#ifndef BOOST_FUSION_ADAPTED_STRUCT_DETAIL_END_IMPL_HPP
-#define BOOST_FUSION_ADAPTED_STRUCT_DETAIL_END_IMPL_HPP
+#include <boost/fusion/adapted/struct/struct_iterator.hpp>
 
-#include <boost/fusion/iterator/basic_iterator.hpp>
-
-namespace boost { namespace fusion { namespace extension
+namespace boost { namespace fusion
 {
-    template <typename>
-    struct end_impl;
+    struct struct_tag;
 
-    template <>
-    struct end_impl<struct_tag>
+    namespace extension
     {
-        template <typename Seq>
-        struct apply
+        template <typename Tag>
+        struct end_impl;
+
+        template <typename Struct>
+        struct struct_size;
+
+        template <>
+        struct end_impl<struct_tag>
         {
-            typedef
-                basic_iterator<
-                    struct_iterator_tag
-                  , random_access_traversal_tag
-                  , Seq
-                  , struct_size<typename remove_const<Seq>::type>::value
-                >
-            type;
-
-            static type
-            call(Seq& seq)
+            template <typename Sequence>
+            struct apply
             {
-                return type(seq,0);
-            }
-        };
-    };
+                typedef
+                    struct_iterator<
+                        Sequence
+                      , struct_size<Sequence>::value
+                    >
+                type;
 
-    template <>
-    struct end_impl<assoc_struct_tag>
-    {
-        template <typename Seq>
-        struct apply
-        {
-            typedef
-                basic_iterator<
-                    struct_iterator_tag
-                  , assoc_struct_category
-                  , Seq
-                  , struct_size<typename remove_const<Seq>::type>::value
-                >
-            type;
-
-            static type
-            call(Seq& seq)
-            {
-                return type(seq,0);
-            }
+                static type
+                call(Sequence& v)
+                {
+                    return type(v);
+                }
+            };
         };
-    };
-}}}
+    }
+}}
 
 #endif

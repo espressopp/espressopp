@@ -60,8 +60,8 @@ template <class T>
 T user_denorm_error(const char* function, const char* message, const T& val);
 template <class T>
 T user_evaluation_error(const char* function, const char* message, const T& val);
-template <class T, class TargetType>
-T user_rounding_error(const char* function, const char* message, const T& val, const TargetType& t);
+template <class T>
+T user_rounding_error(const char* function, const char* message, const T& val);
 template <class T>
 T user_indeterminate_result_error(const char* function, const char* message, const T& val);
 
@@ -381,12 +381,11 @@ inline T raise_evaluation_error(
    return user_evaluation_error(function, message, val);
 }
 
-template <class T, class TargetType>
+template <class T>
 inline T raise_rounding_error(
            const char* function, 
            const char* message, 
            const T& val, 
-           const TargetType&,
            const  ::boost::math::policies::rounding_error< ::boost::math::policies::throw_on_error>&)
 {
    raise_error<boost::math::rounding_error, T>(function, message, val);
@@ -394,42 +393,39 @@ inline T raise_rounding_error(
    return T(0);
 }
 
-template <class T, class TargetType>
+template <class T>
 inline T raise_rounding_error(
            const char* , 
            const char* , 
            const T& val, 
-           const TargetType&,
            const  ::boost::math::policies::rounding_error< ::boost::math::policies::ignore_error>&)
 {
    // This may or may not do the right thing, but the user asked for the error
    // to be ignored so here we go anyway:
-   return std::numeric_limits<T>::is_specialized ? (val > 0 ? (std::numeric_limits<T>::max)() : -(std::numeric_limits<T>::max)()): val;
+   return val;
 }
 
-template <class T, class TargetType>
+template <class T>
 inline T raise_rounding_error(
            const char* , 
            const char* , 
            const T& val, 
-           const TargetType&,
            const  ::boost::math::policies::rounding_error< ::boost::math::policies::errno_on_error>&)
 {
    errno = ERANGE;
    // This may or may not do the right thing, but the user asked for the error
    // to be silent so here we go anyway:
-   return std::numeric_limits<T>::is_specialized ? (val > 0 ? (std::numeric_limits<T>::max)() : -(std::numeric_limits<T>::max)()): val;
+   return val;
 }
 
-template <class T, class TargetType>
+template <class T>
 inline T raise_rounding_error(
            const char* function, 
            const char* message, 
            const T& val, 
-           const TargetType& t,
            const  ::boost::math::policies::rounding_error< ::boost::math::policies::user_error>&)
 {
-   return user_rounding_error(function, message, val, t);
+   return user_rounding_error(function, message, val);
 }
 
 template <class T, class R>
@@ -540,13 +536,13 @@ inline T raise_evaluation_error(const char* function, const char* message, const
       val, policy_type());
 }
 
-template <class T, class TargetType, class Policy>
-inline T raise_rounding_error(const char* function, const char* message, const T& val, const TargetType& t, const Policy&)
+template <class T, class Policy>
+inline T raise_rounding_error(const char* function, const char* message, const T& val, const Policy&)
 {
    typedef typename Policy::rounding_error_type policy_type;
    return detail::raise_rounding_error(
       function, message ? message : "Value %1% can not be represented in the target integer type.", 
-      val, t, policy_type());
+      val, policy_type());
 }
 
 template <class T, class R, class Policy>
@@ -616,7 +612,7 @@ inline R checked_narrowing_cast(T val, const char* function)
    //
    // Most of what follows will evaluate to a no-op:
    //
-   R result = 0;
+   R result;
    if(detail::check_overflow<R>(val, &result, function, overflow_type()))
       return result;
    if(detail::check_underflow<R>(val, &result, function, underflow_type()))
@@ -627,22 +623,22 @@ inline R checked_narrowing_cast(T val, const char* function)
    return static_cast<R>(val);
 }
 
-template <class T, class Policy>
+template <class Policy>
 inline void check_series_iterations(const char* function, boost::uintmax_t max_iter, const Policy& pol)
 {
    if(max_iter >= policies::get_max_series_iterations<Policy>())
-      raise_evaluation_error<T>(
+      raise_evaluation_error<boost::uintmax_t>(
          function,
-         "Series evaluation exceeded %1% iterations, giving up now.", static_cast<T>(static_cast<double>(max_iter)), pol);
+         "Series evaluation exceeded %1% iterations, giving up now.", max_iter, pol);
 }
 
-template <class T, class Policy>
+template <class Policy>
 inline void check_root_iterations(const char* function, boost::uintmax_t max_iter, const Policy& pol)
 {
    if(max_iter >= policies::get_max_root_iterations<Policy>())
-      raise_evaluation_error<T>(
+      raise_evaluation_error<boost::uintmax_t>(
          function,
-         "Root finding evaluation exceeded %1% iterations, giving up now.", static_cast<T>(static_cast<double>(max_iter)), pol);
+         "Root finding evaluation exceeded %1% iterations, giving up now.", max_iter, pol);
 }
 
 } //namespace policies

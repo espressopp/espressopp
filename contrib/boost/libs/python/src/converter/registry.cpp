@@ -243,7 +243,7 @@ namespace registry
   }
 
   // Insert an rvalue from_python converter
-  void insert(convertible_function convertible
+  void insert(void* (*convertible)(PyObject*)
               , constructor_function construct
               , type_info key
               , PyTypeObject const* (*exp_pytype)())
@@ -261,7 +261,7 @@ namespace registry
   }
 
   // Insert an rvalue from_python converter
-  void push_back(convertible_function convertible
+  void push_back(void* (*convertible)(PyObject*)
               , constructor_function construct
               , type_info key
               , PyTypeObject const* (*exp_pytype)())

@@ -9,14 +9,6 @@
 #include "CenterOfMass.hpp"
 #include "NPart.hpp"
 #include "MaxPID.hpp"
-#include "AllParticlePos.hpp"
-
-#include "ConfigsParticleDecomp.hpp"
-#include "VelocityAutocorrelation.hpp"
-#include "MeanSquareDispl.hpp"
-#include "Autocorrelation.hpp"
-
-#include "IntraChainDistSq.hpp"
 #include "NeighborFluctuation.hpp"
 
 namespace espresso {
@@ -32,15 +24,7 @@ namespace espresso {
       CenterOfMass::registerPython();
       NPart::registerPython();
       MaxPID::registerPython();
-      AllParticlePos::registerPython();
-      IntraChainDistSq::registerPython();
       NeighborFluctuation::registerPython();
-
-      ConfigsParticleDecomp::registerPython();
-      VelocityAutocorrelation::registerPython();
-      MeanSquareDispl::registerPython();
-      
-      Autocorrelation::registerPython();
     }
   }
 }

@@ -34,8 +34,7 @@ namespace detail {
 
 class basic_serializer;
 
-class BOOST_ARCHIVE_OR_WARCHIVE_DECL(BOOST_PP_EMPTY())
-basic_serializer_map : public
+class BOOST_ARCHIVE_OR_WARCHIVE_DECL(BOOST_PP_EMPTY()) basic_serializer_map : public
     boost::noncopyable
 {
     struct type_info_pointer_compare
@@ -44,10 +43,7 @@ basic_serializer_map : public
             const basic_serializer * lhs, const basic_serializer * rhs
         ) const ;
     };
-    typedef std::set<
-        const basic_serializer *, 
-        type_info_pointer_compare
-    > map_type;
+    typedef std::set<const basic_serializer *, type_info_pointer_compare> map_type;
     map_type m_map;
 public:
     bool insert(const basic_serializer * bs);

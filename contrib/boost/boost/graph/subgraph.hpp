@@ -16,14 +16,13 @@
 #include <list>
 #include <vector>
 #include <map>
-#include <boost/assert.hpp>
+#include <cassert>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/graph_mutability_traits.hpp>
 #include <boost/graph/properties.hpp>
 #include <boost/iterator/indirect_iterator.hpp>
 
 #include <boost/static_assert.hpp>
-#include <boost/assert.hpp>
 #include <boost/type_traits/is_same.hpp>
 
 namespace boost {
@@ -79,12 +78,12 @@ class subgraph {
     typedef graph_traits<Graph> Traits;
     typedef std::list<subgraph<Graph>*> ChildrenList;
 public:
-    // Graph requirements
-    typedef typename Traits::vertex_descriptor         vertex_descriptor;
-    typedef typename Traits::edge_descriptor           edge_descriptor;
-    typedef typename Traits::directed_category         directed_category;
-    typedef typename Traits::edge_parallel_category    edge_parallel_category;
-    typedef typename Traits::traversal_category        traversal_category;
+// Graph requirements
+typedef typename Traits::vertex_descriptor         vertex_descriptor;
+typedef typename Traits::edge_descriptor           edge_descriptor;
+typedef typename Traits::directed_category         directed_category;
+typedef typename Traits::edge_parallel_category    edge_parallel_category;
+typedef typename Traits::traversal_category        traversal_category;
 
     // IncidenceGraph requirements
     typedef typename Traits::out_edge_iterator         out_edge_iterator;
@@ -125,7 +124,7 @@ public:
     {
         typename Graph::vertex_iterator v, v_end;
         vertices_size_type i = 0;
-        for(boost::tie(v, v_end) = vertices(m_graph); v != v_end; ++v)
+        for(tie(v, v_end) = vertices(m_graph); v != v_end; ++v)
             m_global_vertex[i++] = *v;
     }
 
@@ -181,8 +180,8 @@ public:
     vertex_descriptor global_to_local(vertex_descriptor u_global) const {
         vertex_descriptor u_local; bool in_subgraph;
         if (is_root()) return u_global;
-        boost::tie(u_local, in_subgraph) = this->find_vertex(u_global);
-        BOOST_ASSERT(in_subgraph == true);
+        tie(u_local, in_subgraph) = this->find_vertex(u_global);
+        assert(in_subgraph == true);
         return u_local;
     }
 
@@ -197,20 +196,10 @@ public:
     std::pair<vertex_descriptor, bool>
     find_vertex(vertex_descriptor u_global) const {
         if (is_root()) return std::make_pair(u_global, true);
-        typename LocalVertexMap::const_iterator i = m_local_vertex.find(u_global);
+        typename std::map<vertex_descriptor, vertex_descriptor>::const_iterator
+            i = m_local_vertex.find(u_global);
         bool valid = i != m_local_vertex.end();
         return std::make_pair((valid ? (*i).second : null_vertex()), valid);
-    }
-
-    // Is edge e (of the root graph) contained in this subgraph?
-    // If so, return the matching local edge.
-    std::pair<edge_descriptor, bool>
-    find_edge(edge_descriptor e_global) const {
-        if (is_root()) return std::make_pair(e_global, true);
-        typename LocalEdgeMap::const_iterator i =
-          m_local_edge.find(get(get(edge_index, root().m_graph), e_global));
-        bool valid = i != m_local_edge.end();
-        return std::make_pair((valid ? (*i).second : edge_descriptor()), valid);
     }
 
     // Return the parent graph.
@@ -326,7 +315,7 @@ public: // Probably shouldn't be public....
     {
         edge_descriptor e_local;
         bool inserted;
-        boost::tie(e_local, inserted) = add_edge(u_local, v_local, m_graph);
+        tie(e_local, inserted) = add_edge(u_local, v_local, m_graph);
         put(edge_index, m_graph, e_local, m_edge_counter++);
         m_global_edge.push_back(e_global);
         m_local_edge[get(get(edge_index, this->root()), e_global)] = e_local;
@@ -356,8 +345,8 @@ typename subgraph<G>::vertex_descriptor
 add_vertex(typename subgraph<G>::vertex_descriptor u_global,
            subgraph<G>& g)
 {
-    BOOST_ASSERT(!g.is_root());
-    typename subgraph<G>::vertex_descriptor u_local, v_global;
+    assert(!g.is_root());
+    typename subgraph<G>::vertex_descriptor u_local, v_global, uu_global;
     typename subgraph<G>::edge_descriptor e_global;
 
     u_local = add_vertex(g.m_graph);
@@ -369,7 +358,7 @@ add_vertex(typename subgraph<G>::vertex_descriptor u_global,
     // remember edge global and local maps
     {
         typename subgraph<G>::out_edge_iterator ei, ei_end;
-        for (boost::tie(ei, ei_end) = out_edges(u_global, r);
+        for (tie(ei, ei_end) = out_edges(u_global, r);
             ei != ei_end; ++ei) {
             e_global = *ei;
             v_global = target(e_global, r);
@@ -380,15 +369,13 @@ add_vertex(typename subgraph<G>::vertex_descriptor u_global,
     if (is_directed(g)) { // not necessary for undirected graph
         typename subgraph<G>::vertex_iterator vi, vi_end;
         typename subgraph<G>::out_edge_iterator ei, ei_end;
-        for(boost::tie(vi, vi_end) = vertices(r); vi != vi_end; ++vi) {
+        for(tie(vi, vi_end) = vertices(r); vi != vi_end; ++vi) {
             v_global = *vi;
-            if (v_global == u_global)
-                continue; // don't insert self loops twice!
-            if (!g.find_vertex(v_global).second)
-                continue; // not a subgraph vertex => try next one
-            for(boost::tie(ei, ei_end) = out_edges(*vi, r); ei != ei_end; ++ei) {
+            if(g.find_vertex(v_global).second)
+            for(tie(ei, ei_end) = out_edges(*vi, r); ei != ei_end; ++ei) {
                 e_global = *ei;
-                if(target(e_global, r) == u_global) {
+                uu_global = target(e_global, r);
+                if(uu_global == u_global && g.find_vertex(v_global).second) {
                     g.local_add_edge(g.global_to_local(v_global), u_local, e_global);
                 }
             }
@@ -520,8 +507,8 @@ namespace detail {
             // add local edge only if u_global and v_global are in subgraph g
             Vertex u_local, v_local;
             bool u_in_subgraph, v_in_subgraph;
-            boost::tie(u_local, u_in_subgraph) = g.find_vertex(u_global);
-            boost::tie(v_local, v_in_subgraph) = g.find_vertex(v_global);
+            tie(u_local, u_in_subgraph) = g.find_vertex(u_global);
+            tie(v_local, v_in_subgraph) = g.find_vertex(v_global);
             if(u_in_subgraph && v_in_subgraph) {
                 g.local_add_edge(u_local, v_local, e_global);
             }
@@ -538,7 +525,7 @@ namespace detail {
         if(g.is_root()) {
             typename subgraph<Graph>::edge_descriptor e_global;
             bool inserted;
-            boost::tie(e_global, inserted) = add_edge(u_global, v_global, ep, g.m_graph);
+            tie(e_global, inserted) = add_edge(u_global, v_global, ep, g.m_graph);
             put(edge_index, g.m_graph, e_global, g.m_edge_counter++);
             g.m_global_edge.push_back(e_global);
             children_add_edge(u_global, v_global, e_global, g.m_children, orig);
@@ -567,7 +554,7 @@ add_edge(typename subgraph<G>::vertex_descriptor u,
     } else {
         typename subgraph<G>::edge_descriptor e_local, e_global;
         bool inserted;
-        boost::tie(e_global, inserted) =
+        tie(e_global, inserted) =
             detail::add_edge_recur_up(g.local_to_global(u),
                                       g.local_to_global(v),
                                       ep, g, &g);
@@ -628,18 +615,38 @@ namespace detail {
 
     //-------------------------------------------------------------------------
     // implementation of remove_edge(e,g)
+    template <typename Edge, typename Graph>
+    void remove_edge_recur_down(Edge e_global, subgraph<Graph>& g);
 
-    template <typename G, typename Edge, typename Children>
+    template <typename Edge, typename Children>
     void children_remove_edge(Edge e_global, Children& c)
     {
         for(typename Children::iterator i = c.begin(); i != c.end(); ++i) {
-            std::pair<typename subgraph<G>::edge_descriptor, bool> found =
-              (*i)->find_edge(e_global);
-            if (!found.second) {
-              continue;
+            if((*i)->find_vertex(source(e_global, **i)).second &&
+               (*i)->find_vertex(target(e_global, **i)).second)
+            {
+                remove_edge_recur_down(source(e_global, **i),
+                                       target(e_global, **i),
+                                       **i);
             }
-            children_remove_edge<G>(e_global, (*i)->m_children);
-            remove_edge(found.first, (*i)->m_graph);
+        }
+    }
+
+    template <typename Edge, typename Graph>
+    void remove_edge_recur_down(Edge e_global, subgraph<Graph>& g)
+    {
+        remove_edge(g.global_to_local(e_global), g.m_graph);
+        children_remove_edge(e_global, g.m_children);
+    }
+
+    template <typename Edge, typename Graph>
+    void remove_edge_recur_up(Edge e_global, subgraph<Graph>& g)
+    {
+        if (g.is_root()) {
+            remove_edge(e_global, g.m_graph);
+            children_remove_edge(e_global, g.m_children);
+        } else {
+            remove_edge_recur_up(e_global, *g.m_parent);
         }
     }
 
@@ -663,45 +670,24 @@ template <typename G>
 void
 remove_edge(typename subgraph<G>::edge_descriptor e, subgraph<G>& g)
 {
-    typename subgraph<G>::edge_descriptor e_global = g.local_to_global(e);
-#ifndef NDEBUG
-    std::pair<typename subgraph<G>::edge_descriptor, bool> fe = g.find_edge(e_global);
-    BOOST_ASSERT(fe.second && fe.first == e);
-#endif //NDEBUG
-    subgraph<G> &root = g.root(); // chase to root
-    detail::children_remove_edge<G>(e_global, root.m_children);
-    remove_edge(e_global, root.m_graph); // kick edge from root
+    if(g.is_root()) {
+        detail::remove_edge_recur_up(e, g);
+    } else {
+        detail::remove_edge_recur_up(g.local_to_global(e), g);
+    }
 }
 
-// This is slow, but there may not be a good way to do it safely otherwise
+// TODO: This is wrong...
 template <typename Predicate, typename G>
 void
-remove_edge_if(Predicate p, subgraph<G>& g) {
-  while (true) {
-    bool any_removed = false;
-    typedef typename subgraph<G>::edge_iterator ei_type;
-    for (std::pair<ei_type, ei_type> ep = edges(g);
-         ep.first != ep.second; ++ep.first) {
-      if (p(*ep.first)) {
-        any_removed = true;
-        remove_edge(*ep.first, g);
-        break; /* Since iterators may be invalidated */
-      }
-    }
-    if (!any_removed) break;
-  }
-}
+remove_edge_if(Predicate p, subgraph<G>& g)
+{ remove_edge_if(p, g.m_graph); }
 
+// TODO: Ths is wrong
 template <typename G>
 void
-clear_vertex(typename subgraph<G>::vertex_descriptor v, subgraph<G>& g) {
-  while (true) {
-    typedef typename subgraph<G>::out_edge_iterator oei_type;
-    std::pair<oei_type, oei_type> p = out_edges(v, g);
-    if (p.first == p.second) break;
-    remove_edge(*p.first, g);
-  }
-}
+clear_vertex(typename subgraph<G>::vertex_descriptor v, subgraph<G>& g)
+{ clear_vertex(v, g.m_graph); }
 
 namespace detail {
     template <typename G>
@@ -741,12 +727,10 @@ add_vertex(subgraph<G>& g)
 }
 
 
-#if 0
 // TODO: Under Construction
 template <typename G>
 void remove_vertex(typename subgraph<G>::vertex_descriptor u, subgraph<G>& g)
-{ BOOST_ASSERT(false); }
-#endif
+{ assert(false); }
 
 //===========================================================================
 // Functions required by the PropertyGraph concept

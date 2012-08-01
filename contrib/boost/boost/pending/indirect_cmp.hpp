@@ -65,7 +65,7 @@ namespace boost {
     inline indirect_pmap(const ReadablePropertyMap& df)
       : d(df) { }
 
-    inline T operator()(const K& u) const {
+    inline bool operator()(const K& u) const {
       return get(d, u);
     }
   protected:

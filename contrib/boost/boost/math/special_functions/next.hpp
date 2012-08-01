@@ -55,13 +55,9 @@ T float_next(const T& val, const Policy& pol)
    static const char* function = "float_next<%1%>(%1%)";
 
    if(!(boost::math::isfinite)(val))
-   {
-      if(val < 0)
-         return -tools::max_value<T>();
       return policies::raise_domain_error<T>(
          function,
          "Argument must be finite, but got %1%", val, pol);
-   }
 
    if(val >= tools::max_value<T>())
       return policies::raise_overflow_error<T>(function, 0, pol);
@@ -83,7 +79,7 @@ inline double float_next(const double& val, const Policy& pol)
 {
    static const char* function = "float_next<%1%>(%1%)";
 
-   if(!(boost::math::isfinite)(val) && (val > 0))
+   if(!(boost::math::isfinite)(val))
       return policies::raise_domain_error<double>(
          function,
          "Argument must be finite, but got %1%", val, pol);
@@ -109,13 +105,9 @@ T float_prior(const T& val, const Policy& pol)
    static const char* function = "float_prior<%1%>(%1%)";
 
    if(!(boost::math::isfinite)(val))
-   {
-      if(val > 0)
-         return tools::max_value<T>();
       return policies::raise_domain_error<T>(
          function,
          "Argument must be finite, but got %1%", val, pol);
-   }
 
    if(val <= -tools::max_value<T>())
       return -policies::raise_overflow_error<T>(function, 0, pol);
@@ -138,7 +130,7 @@ inline double float_prior(const double& val, const Policy& pol)
 {
    static const char* function = "float_prior<%1%>(%1%)";
 
-   if(!(boost::math::isfinite)(val) && (val < 0))
+   if(!(boost::math::isfinite)(val))
       return policies::raise_domain_error<double>(
          function,
          "Argument must be finite, but got %1%", val, pol);
@@ -208,6 +200,7 @@ T float_distance(const T& a, const T& b, const Policy& pol)
    BOOST_ASSERT(a >= 0);
    BOOST_ASSERT(b >= a);
 
+   BOOST_MATH_STD_USING
    int expon;
    //
    // Note that if a is a denorm then the usual formula fails

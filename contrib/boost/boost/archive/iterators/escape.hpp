@@ -16,7 +16,7 @@
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 
-#include <boost/assert.hpp>
+#include <cassert>
 #include <cstddef> // NULL
 
 #include <boost/config.hpp> // for BOOST_DEDUCED_TYPENAME

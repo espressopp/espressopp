@@ -1,5 +1,4 @@
-#ifndef BOOST_SERIALIZATION_CONFIG_HPP
-#define BOOST_SERIALIZATION_CONFIG_HPP
+// note lack of include guards.  This is intentional
 
 //  config.hpp  ---------------------------------------------//
 
@@ -81,5 +80,3 @@
     #include <boost/config/auto_link.hpp>
 
 #endif  
-
-#endif // BOOST_SERIALIZATION_CONFIG_HPP
