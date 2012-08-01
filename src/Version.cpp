@@ -12,7 +12,7 @@
 namespace espresso {
 
   Version::Version() {
-	  name          = "ESPResSo++";
+	  name          = "ESPResSo++ (stable)";
           major         = MAJORVERSION;
 	  minor         = MINORVERSION;
 	  patchlevel    = PATCHLEVEL;
