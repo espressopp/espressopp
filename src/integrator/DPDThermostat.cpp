@@ -94,6 +94,9 @@ namespace espresso {
     void DPDThermostat::thermalize() {
         LOG4ESPP_DEBUG(theLogger, "thermalize DPD");
 
+        System& system = getSystemRef();
+        system.storage->updateGhostsV();
+
         // loop over VL pairs
         for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
             Particle &p1 = *it->first;
