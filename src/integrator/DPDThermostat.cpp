@@ -86,7 +86,7 @@ namespace espresso {
         _coolDown = integrator->recalc2.connect(
                 boost::bind(&DPDThermostat::coolDown, this));
 
-        _thermalize = integrator->aftCalcF.connect(
+        _thermalize = integrator->aftInitF.connect(
                 boost::bind(&DPDThermostat::thermalize, this));
     }
 
