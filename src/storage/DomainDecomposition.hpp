@@ -45,6 +45,7 @@ namespace espresso {
       const CellGrid &getCellGrid() const { return cellGrid; }
 
       virtual void updateGhosts();
+      virtual void updateGhostsV();
       virtual void collectGhostForces();
 
       static void registerPython();

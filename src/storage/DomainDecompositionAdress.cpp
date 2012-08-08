@@ -961,6 +961,11 @@ namespace espresso {
     doGhostCommunication(false, true, dataOfUpdateGhosts);
   }
 
+  void DomainDecompositionAdress::updateGhostsV() {
+    LOG4ESPP_DEBUG(logger, "updateGhostsV -> ghost communication no sizes, real->ghost velocities");
+    doGhostCommunication(false, true, 2); // 2 is the bitflag for particle momentum
+  }
+
   void DomainDecompositionAdress::collectGhostForces() {
     LOG4ESPP_DEBUG(logger, "collectGhosts -> ghost communication no sizes, ghost->real");
     doGhostCommunication(false, false);

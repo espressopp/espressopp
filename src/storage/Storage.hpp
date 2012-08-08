@@ -166,6 +166,13 @@ namespace espresso {
       */
       virtual void updateGhosts() = 0;
 
+
+      /**
+       * Copies just velocites of real particles to their ghosts.
+       * Needed for DPD thermostat for example.
+       */
+      virtual void updateGhostsV() = 0;
+
       /** read back forces from ghost particles by two-sided
 	  communication.
 

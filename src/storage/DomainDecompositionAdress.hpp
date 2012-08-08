@@ -48,6 +48,7 @@ namespace espresso {
 
 
       virtual void updateGhosts();
+      virtual void updateGhostsV();
       virtual void collectGhostForces();
 
       static void registerPython();
