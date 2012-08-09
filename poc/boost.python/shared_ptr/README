@@ -1,8 +1,0 @@
-Example that demonstrates the use of Boost-Python and Boost Shared Pointers
-===========================================================================
-
-Problem:
-
-- Python generates new C++ objects that will be linked with objects in C++
-- Objects will live as long as there is a reference from C++ or Python
-
