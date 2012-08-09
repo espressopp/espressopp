@@ -15,6 +15,7 @@
 #include "VelocityAutocorrelation.hpp"
 #include "MeanSquareDispl.hpp"
 #include "Autocorrelation.hpp"
+#include "RadialDistrF.hpp"
 
 #include "IntraChainDistSq.hpp"
 #include "NeighborFluctuation.hpp"
@@ -39,6 +40,7 @@ namespace espresso {
       ConfigsParticleDecomp::registerPython();
       VelocityAutocorrelation::registerPython();
       MeanSquareDispl::registerPython();
+      RadialDistrF::registerPython();
       
       Autocorrelation::registerPython();
     }

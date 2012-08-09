@@ -1,8 +1,6 @@
 #include "ConfigsParticleDecomp.hpp"
 #include "bc/BC.hpp"
 
-#include "CenterOfMass.hpp"
-
 #include <boost/serialization/map.hpp>
 
 using namespace std;

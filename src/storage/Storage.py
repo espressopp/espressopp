@@ -231,6 +231,20 @@ class StorageLocal(object):
           #else:
            # print "WARNING: Particle ", pid, " does not exist and was not modified"
             
+
+    def savePositions(self, idList):
+      'it is responsibility of user to save existing particles, otherwise nothing will be saved'
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        for pid in idList:
+          self.cxxclass.savePosition(self, pid)
+        
+    def restorePositions(self):
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        self.cxxclass.restorePositions(self)
+
+    def clearSavedPositions(self):
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        self.cxxclass.clearSavedPositions(self)
             
 if pmi.isController:
     class Storage(object):
@@ -283,4 +297,14 @@ if pmi.isController:
           else:
             print "WARNING: Particle ", pid, " does not exist"
             return None
+        
+        def savePositions(self, idList):
+          pmi.call(self.pmiobject, 'clearSavedPositions')
+          pmi.call(self.pmiobject, 'savePositions', idList)
+        
+        def restorePositions(self):
+          pmi.call(self.pmiobject, 'restorePositions')
 
+        def clearSavedPositions(self):
+          pmi.call(self.pmiobject, 'clearSavedPositions')
+        

@@ -98,7 +98,7 @@ namespace espresso {
         // for AdResS
         if (it != localParticles.end() && !(it->second->ghost())) {
             return it->second;
-         }
+        }
         else {
             return lookupAdrATParticle(id);
         }
@@ -364,12 +364,14 @@ namespace espresso {
           //std::cout << " new size of AdrATParticlesG: " << AdrATParticlesG.size() << "\n";
 
       }
-
+      
+      void savePosition(size_t id);
+      void restorePositions();
+      void clearSavedPositions();
 
     private:
       // map particle id to Particle * for all particles on this node
       boost::unordered_map<longint, Particle*> localParticles;
-
 
 
       // AdResS atomistic particles (they are not stored in cells!)
@@ -380,6 +382,9 @@ namespace espresso {
 
       // map particle id to Particle * for all adress real AT particles on this node
       boost::unordered_map<longint, Particle*> localAdrATParticles;
+      
+      // we need to snap shot the particle coordinates
+      std::map< size_t, Real3D > savedRealPositions;
     };
   }
 }

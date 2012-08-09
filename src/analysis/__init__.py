@@ -18,3 +18,4 @@ from espresso.analysis.ConfigsParticleDecomp import *
 from espresso.analysis.VelocityAutocorrelation import *
 from espresso.analysis.MeanSquareDispl import *
 from espresso.analysis.Autocorrelation import *
+from espresso.analysis.RadialDistrF import *

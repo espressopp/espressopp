@@ -12,6 +12,7 @@
 #include "Int3D.hpp"
 #include "Particle.hpp"
 #include "Buffer.hpp"
+#include "esutil/Error.hpp"
 
 #include <iostream>
 using namespace std;
@@ -621,6 +622,51 @@ namespace espresso {
           dst->particleForce() += src->particleForce();
       }
     }
+    
+
+    void Storage::clearSavedPositions(){
+      savedRealPositions.clear();
+    }
+    void Storage::savePosition(size_t id){
+      if( getSystemRef().comm->size()==1 ){
+        Particle* p = lookupRealParticle(id);
+        if(p){
+          savedRealPositions[id] = p->position();
+        }
+      }
+      else{
+        esutil::Error err(getSystem()->comm);
+        stringstream msg;
+        msg<<" At the moment it works only for one CPU. One can not store old positions"
+                " for several CPUs";
+        err.setException( msg.str() );
+      }
+    }
+    
+    void Storage::restorePositions(){
+      int count = 0;
+      int totCount = 0;
+      if( !savedRealPositions.empty() ){
+        for (map<size_t,Real3D>::iterator itr=savedRealPositions.begin(); itr != savedRealPositions.end(); ++itr) {
+          size_t id = itr->first;
+          Particle* p = lookupRealParticle(id);
+          if(p){
+            p->position() = itr->second;
+          }
+        }
+        count++;
+      }
+      
+      mpi::all_reduce(*getSystem()->comm, count, totCount, std::plus<int>());
+      
+      if(totCount == 0){
+        esutil::Error err(getSystem()->comm);
+        stringstream msg;
+        msg<<" There is nothing to restore. Check whether you saved positions";
+        err.setException( msg.str() );
+      }
+    }
+    
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
@@ -632,6 +678,12 @@ namespace espresso {
 
       class_< Storage, boost::noncopyable >("storage_Storage", no_init)
 
+	.def("clearSavedPositions", &Storage::clearSavedPositions)
+      
+	.def("savePosition", &Storage::savePosition)
+      
+	.def("restorePositions", &Storage::restorePositions)
+      
 	.def("addParticle", &Storage::addParticle, 
 	     return_value_policy< reference_existing_object >())
 
