@@ -626,12 +626,14 @@ namespace espresso {
 
     void Storage::clearSavedPositions(){
       savedRealPositions.clear();
+      savedImages.clear();
     }
     void Storage::savePosition(size_t id){
       if( getSystemRef().comm->size()==1 ){
         Particle* p = lookupRealParticle(id);
         if(p){
           savedRealPositions[id] = p->position();
+          savedImages[id] = p->image();
         }
       }
       else{
@@ -652,6 +654,13 @@ namespace espresso {
           Particle* p = lookupRealParticle(id);
           if(p){
             p->position() = itr->second;
+          }
+        }
+        for (map<size_t,Int3D>::iterator itr=savedImages.begin(); itr != savedImages.end(); ++itr) {
+          size_t id = itr->first;
+          Particle* p = lookupRealParticle(id);
+          if(p){
+            p->image() = itr->second;
           }
         }
         count++;

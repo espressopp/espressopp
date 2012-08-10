@@ -385,6 +385,7 @@ namespace espresso {
       
       // we need to snap shot the particle coordinates
       std::map< size_t, Real3D > savedRealPositions;
+      std::map< size_t, Int3D > savedImages;
     };
   }
 }
