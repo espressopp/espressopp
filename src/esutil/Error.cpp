@@ -46,7 +46,7 @@ namespace espresso {
         if (exceptionMessage.length() > 0) {
           msg << ":\n cpu "<< comm->rank()<< ":  Exception message(s):\n" << exceptionMessage;
           msg <<"\n";
-          msg << "On proc "<< comm->rank()<< ": noExceptions = "<<noExceptions<<
+          msg << "On proc "<< comm->rank()<< ": exceptions = "<<noExceptions<<
                   ", total = "<< totalExceptions <<"\n";
  
           exceptionMessage.clear();
