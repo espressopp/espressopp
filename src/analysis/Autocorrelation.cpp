@@ -20,13 +20,13 @@ namespace espresso {
     }
 
     Real3D Autocorrelation::getValue(int position) const{
-      System& system = getSystemRef();
-      esutil::Error err(system.comm);
       int nconfigs = getListSize();
       if (0 <= position and position < nconfigs) {
         return valueList[position];
       }
       else{
+        System& system = getSystemRef();
+        esutil::Error err(system.comm);
         stringstream msg;
         msg << "Error. Velocities::get <out-of-range>";
         err.setException( msg.str() );
@@ -97,8 +97,9 @@ namespace espresso {
           Z[m] += getValue(n + m) *  getValue(n);
         }
         if(system.comm->rank()==0)
-          cout<<"calculation progress (autocorrelation): "<< (int)(100*(real)m/(real)(max_m-min_m)) << " %\r"<<flush;
+          cout<<"calculation progress (autocorrelation): "<< (int)(100*(real)m/(real)(max_m-min_m)) << " %\r" <<flush;
       }
+      
       if(system.comm->rank()==0)
         cout<<"calculation progress (autocorrelation): 100 %" <<endl;
       
@@ -108,7 +109,7 @@ namespace espresso {
         Z[m] /= ( (real)(M-m)*coef );
       }
       
-      // probably could be done nicer. gather doesn't work with different length of array
+      // TODO probably could be done nicer. gather doesn't work with different length of array
       unsigned long int MM = M * n_nodes;
       real* totZ = new real[MM];
       boost::mpi::gather(*system.comm, Z, M, totZ, 0);
