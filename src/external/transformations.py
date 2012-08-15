@@ -185,10 +185,8 @@ import os
 import warnings
 import math
 
-try:
-  import numpy
-except ImportError:
-  print 'WARNING: module numpy not available'
+import numpy
+
 
 def identity_matrix():
     """Return 4x4 identity/unit matrix.
