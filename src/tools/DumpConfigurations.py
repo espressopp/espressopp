@@ -36,3 +36,37 @@ def writexyz(filename, system, velocities = True, unfolded = False):
         pid   += 1
   
   file.close()
+
+def readxyz(filename):
+  file = open(filename)
+  line = file.readline()
+  num_particles = int(line.split()[0])
+  line = file.readline()
+  Lx = float(line.split()[0])
+  Ly = float(line.split()[1])
+  Lz = float(line.split()[2])
+  pid  = []
+  type = []
+  xpos = []
+  ypos = []
+  zpos = []
+  xvel = []
+  yvel = []
+  zvel = []
+  for i in range(num_particles):
+    line = file.readline().split()
+    pid.append(int(line[0]))
+    type.append(int(line[1]))
+    xpos.append(float(line[2]))
+    ypos.append(float(line[3]))
+    zpos.append(float(line[4]))
+    if len(line) > 5:
+      xvel.append(float(line[5]))
+      yvel.append(float(line[6]))
+      zvel.append(float(line[7]))
+    else:
+      xvel.append(0.0)
+      yvel.append(0.0)
+      zvel.append(0.0)
+  return pid, type, xpos, ypos, zpos, xvel, yvel, zvel, Lx, Ly, Lz
+  file.close()
