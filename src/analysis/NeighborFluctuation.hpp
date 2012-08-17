@@ -7,6 +7,7 @@
 #include "esutil/Error.hpp"
 #include "bc/BC.hpp"
 #include "Real3D.hpp"
+#include "python.hpp"
 
 #include "storage/DomainDecomposition.hpp"
 #include "storage/CellGrid.hpp"
@@ -35,6 +36,9 @@ namespace espresso {
       }
       virtual ~NeighborFluctuation() {}
       virtual real compute() const;
+      
+      // it returns two values <n^2>-<n>^2 and <n>
+      virtual python::list computeValues() const;
 
       static void registerPython();
 

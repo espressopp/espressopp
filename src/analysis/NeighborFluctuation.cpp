@@ -1,4 +1,4 @@
-#include "python.hpp"
+//#include "python.hpp"
 //#include "NPart.hpp"
 #include "NeighborFluctuation.hpp"
 #include "storage/Storage.hpp"
@@ -17,7 +17,7 @@ namespace espresso {
 
     
     // 
-    real NeighborFluctuation::compute() const {
+    python::list NeighborFluctuation::computeValues() const {
 
       real radsq = radius*radius;
       
@@ -62,7 +62,11 @@ namespace espresso {
     	    nsqsum += n*n;
     	  }
       }
-      nave_sq = (1.0*(real)nsum/(real)n_part) * (1.0*(real)nsum/(real)n_part);
+      
+      real nave = (1.0*(real)nsum/(real)n_part);
+      real naveTot = 0.0;
+      
+      nave_sq = nave * nave;
       nsq_ave = (1.0*(real)nsqsum/(real)n_part);
 
       real myE = nsq_ave - nave_sq;
@@ -72,14 +76,27 @@ namespace espresso {
       //cout << "nave_sq="<<nave_sq<<" nsq_ave="<<nsq_ave<< " myE="<< myE << endl;
 
       mpi::all_reduce(*system.comm, myE, E, std::plus<real>());
+      
+      mpi::all_reduce(*system.comm, nave, naveTot, std::plus<real>());
+      
+      python::list pyList;
+      
+      pyList.append( E / (real)( system.comm->size() ) );
+      
+      pyList.append( naveTot / (real)( system.comm->size() ) ) ;
 
-      return E / (real)( system.comm->size() );
+      return pyList;
+    }
+    
+    real NeighborFluctuation::compute() const {
+      return -1.0;
     }
 
     void NeighborFluctuation::registerPython() {
       using namespace espresso::python;
       class_<NeighborFluctuation, bases< Observable > >
         ("analysis_NeighborFluctuation", init< shared_ptr< System > , real >())
+        .def("compute", &NeighborFluctuation::computeValues) 
       ;
     }
   }
