@@ -13,9 +13,7 @@
 namespace espresso {
 
 /** Class that builds and stores verlet lists for 3-body interactions.
-
     ToDo: register at system for rebuild
-
 */
 
   class VerletListTriple : public SystemAccess {
@@ -34,9 +32,11 @@ namespace espresso {
 
     ~VerletListTriple();
 
-    ParticleTriple& getTriples() { return vlTriples; }
+    TripleList& getTriples() { return vlTriples; }
 
     python::tuple getTriple(int i);
+
+    real getVerletCutoff(); // returns cutoff + skin
 
     void connect();
 
@@ -44,16 +44,19 @@ namespace espresso {
 
     void rebuild();
 
-    /** Get the total number of pairs for the Verlet list */
+    /** Get the total number of triples for the Verlet Triple list */
     int totalSize() const;
 
+    //** Get the number of triples for the local Verlet list */
+    int localSize() const;
+    
     /** Add Triples to exclusion list */
     bool exclude(longint pid1, longint pid2, longint pid3);
 
-    /** Get the number of times the Verlet list has been rebuilt */
+    /** Get the number of times the Verlet Triple list has been rebuilt */
     int getBuilds() const { return builds; }
 
-    /** Set the number of times the Verlet list has been rebuilt */
+    /** Set the number of times the Verlet Triple  list has been rebuilt */
     void setBuilds(int _builds) { builds = _builds; }
 
     /** Register this class so it can be used from Python. */
@@ -62,9 +65,14 @@ namespace espresso {
   protected:
 
     void checkTriple(Particle &pt1, Particle &pt2, Particle &pt3);
-    ParticleTriple vlTriples;
-    boost::unordered_set<std::tuple<longint, longint, longint> > exList; // exclusion list
+    TripleList vlTriples;
+    
+    boost::unordered_set< boost::tuple<longint, longint, longint> > exList; // exclusion list
+    
     real cutsq;
+    real cut;
+    real cutVerlet;
+    
     int builds;
     boost::signals2::connection connectionResort;
 

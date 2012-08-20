@@ -130,19 +130,19 @@ namespace espresso {
     inline bool 
     CellListAllTriplesIterator::
     isValid() const 
-    { return cit.isValid(); }
+    { return cit1.isValid(); }
 
     inline bool 
     CellListAllTriplesIterator::
     isDone() const 
     { return !isValid(); }
       
-    inline const ParticlePair &
+    inline const ParticleTriple &
     CellListAllTriplesIterator::
     operator*() const 
     { return current; }
     
-    inline const ParticlePair *
+    inline const ParticleTriple *
     CellListAllTriplesIterator::
     operator->() const 
     { return &(**this); }

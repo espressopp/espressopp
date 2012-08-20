@@ -8,6 +8,7 @@
 #include <System.hpp>
 #include <VerletList.hpp>
 #include <VerletListAdress.hpp>
+#include <VerletListTriple.hpp>
 #include <FixedPairList.hpp>
 #include <FixedPairListAdress.hpp>
 #include <FixedTripleList.hpp>
@@ -34,6 +35,7 @@ void espresso::registerPython() {
   espresso::System::registerPython();
   espresso::VerletList::registerPython();
   espresso::VerletListAdress::registerPython();
+  espresso::VerletListTriple::registerPython();
   espresso::FixedPairList::registerPython();
   espresso::FixedPairListAdress::registerPython();
   espresso::FixedTripleList::registerPython();
