@@ -17,7 +17,7 @@ namespace espresso {
 
      public:
 
-      ConfigurationIterator(std::map<int, Real3D>& coordinates);
+      ConfigurationIterator(std::map<size_t, Real3D>& coordinates);
 
       /** Get next particle id for which coordinates are available */
 
@@ -26,8 +26,8 @@ namespace espresso {
 
      private:
 
-      std::map<int, Real3D>::iterator it;
-      std::map<int, Real3D>::iterator end;
+      std::map<size_t, Real3D>::iterator it;
+      std::map<size_t, Real3D>::iterator end;
     };
 
     /** Class that stores particle positions for later analysis. */
@@ -40,11 +40,11 @@ namespace espresso {
 
       ~Configuration();
 
-      Real3D getCoordinates(int id);
+      Real3D getCoordinates(size_t id);
 
-      int getSize();
+      size_t getSize();
 
-      void set(int id, real x, real y, real z);
+      void set(size_t id, real x, real y, real z);
 
       //int nParticles;     // number of particles of the configuration
 
@@ -54,7 +54,7 @@ namespace espresso {
 
      private:
 
-      std::map<int, Real3D> coordinates;
+      std::map<size_t, Real3D> coordinates;
     };
 
   }

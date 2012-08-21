@@ -21,17 +21,17 @@ namespace espresso {
     {
     }
 
-    void Configuration::set(int index, real x, real y, real z)
+    void Configuration::set(size_t index, real x, real y, real z)
     {
       coordinates[index] = Real3D(x, y, z);
     }
 
-    Real3D Configuration::getCoordinates(int index)
+    Real3D Configuration::getCoordinates(size_t index)
     {
       return coordinates[index];
     }
 
-    int Configuration::getSize()
+    size_t Configuration::getSize()
     {
       return coordinates.size();
     }
@@ -41,7 +41,7 @@ namespace espresso {
       return ConfigurationIterator(coordinates);
     }
 
-    ConfigurationIterator::ConfigurationIterator(std::map<int, Real3D>& coordinates)
+    ConfigurationIterator::ConfigurationIterator(std::map<size_t, Real3D>& coordinates)
     {
       it = coordinates.begin();
       end = coordinates.end();
