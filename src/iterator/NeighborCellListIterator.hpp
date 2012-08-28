@@ -47,18 +47,19 @@ namespace espresso {
       : ncit(cl), pit(), useAllPairs(_useAllPairs)  {
       // advance to the first valid neighbor list
       if (useAllPairs)
-	while (ncit.isValid() && !ncit->useForAllPairs)
-	  ++ncit;
+        while (ncit.isValid() && !ncit->useForAllPairs)
+          ++ncit;
+      
       if (ncit.isDone()) return;
       pit = ParticleList::Iterator(ncit->cell->particles);
 
       while (pit.isDone()) {
-	++ncit;
-	if (useAllPairs)
-	  while (ncit.isValid() && !ncit->useForAllPairs)
-	    ++ncit;
-	if (ncit.isDone()) break;
-	pit = ParticleList::Iterator(ncit->cell->particles);
+        ++ncit;
+        if (useAllPairs)
+          while (ncit.isValid() && !ncit->useForAllPairs)
+            ++ncit;
+        if (ncit.isDone()) break;
+        pit = ParticleList::Iterator(ncit->cell->particles);
       }
     }
 
@@ -66,12 +67,12 @@ namespace espresso {
     NeighborCellListIterator::operator++() {
       ++pit;
       while (pit.isDone()) {
-	++ncit;
-	if (useAllPairs)
-	  while (ncit.isValid() && !(ncit->useForAllPairs))
-	    ++ncit;
-	if (ncit.isDone()) break;
-	pit = ParticleList::Iterator(ncit->cell->particles);
+        ++ncit;
+        if (useAllPairs)
+          while (ncit.isValid() && !(ncit->useForAllPairs))
+            ++ncit;
+        if (ncit.isDone()) break;
+        pit = ParticleList::Iterator(ncit->cell->particles);
       }
       return *this;
     }

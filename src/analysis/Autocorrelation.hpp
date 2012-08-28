@@ -29,16 +29,18 @@ namespace espresso {
       // Constructor, allow for unlimited snapshots.
       Autocorrelation(shared_ptr<System> system): SystemAccess (system){
       }
-      ~Autocorrelation() {}
+      ~Autocorrelation(){
+        valueList.clear();
+      }
 
       // get number of available snapshots. Returns the size of ValueList
-      int getListSize() const;
+      unsigned int getListSize() const;
 
       // Take a snapshot (save the current value)
       void gather(Real3D);
       
       // Get a configuration from ConfigurationList
-      Real3D getValue(int position) const;
+      Real3D getValue(unsigned int position) const;
 
       // it returns all values
       vector<Real3D> all() const;

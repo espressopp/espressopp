@@ -5,7 +5,11 @@
 #include "Cell.hpp"
 #include "log4espp.hpp"
 #include "iterator/CellListIterator.hpp"
-#include "iterator/NeighborCellListIterator.hpp"
+//#include "iterator/NeighborCellListIterator.hpp"
+
+#include "esutil/Error.hpp"
+
+using namespace std;
 
 namespace espresso {
   namespace iterator {
@@ -27,20 +31,31 @@ namespace espresso {
 
       ParticleTriple current;
 
+      /* In general, we have 4 possibilities (?5):
+       * 0) cit1 = cit2 = cit3:  inSelfLoop = 0
+       * 1) cit1 != cit2; cit1 = cit3 and cit1 = cit2; cit1 != cit3: inSelfLoop = 1
+       *      (!may be not the same)
+       * 2) cit1 != cit2; cit2 = cit3:  inSelfLoop = 2
+       * 3) cit1 != cit2 != cit3; cit1 != cit3: inSelfLoop = 3
+       * 4) next cit1
+       */
+      short int inSelfLoop; // can be 0, 1, 2, 3
+      
       bool inSelfLoop1;
-      bool inSelfLoop2;
+      //bool inSelfLoop2;
 
       // current cell1
       CellList::Iterator cit1;
       // current particle1
       ParticleList::Iterator pit1;
 
-      // current cell1
+      // we need two neighbors because three particles may be in different cells
+      // current neighbor cell
       NeighborCellList::Iterator cit2;
       // current particle2
       ParticleList::Iterator pit2;
 
-      // current cell3
+      // current neighbor cell
       NeighborCellList::Iterator cit3;
       // current particle3
       ParticleList::Iterator pit3;
@@ -59,7 +74,7 @@ namespace espresso {
 
       cit1 = CellList::Iterator(cl);
       if (cit1.isDone()) return;
-      inSelfLoop1 = true;
+      inSelfLoop = 0;
       pit1 = ParticleList::Iterator((*cit1)->particles);
       while (pit1.isDone()) {
         ++cit1;
@@ -68,58 +83,234 @@ namespace espresso {
       }
       
       pit2 = pit1;
+      ++pit2;
+      if(pit2.isDone()){
+        // means that in cit1 only 1 particle
+        inSelfLoop = 2;
+        cit2 = NeighborCellList::Iterator((*cit1)->neighborCells);
+        pit2 = ParticleList::Iterator(cit2->cell->particles);
+      }
+      while (pit2.isDone()) {
+        ++cit2;
+        if (cit2.isDone()){
+          // it is clear that there is no more particles in system
+          while(cit1.isValid()) ++cit1;
+          return;
+        }
+        pit2 = ParticleList::Iterator(cit2->cell->particles);
+      }
+              
+      pit3 = pit2;
       this->operator++();
     }
 
     inline CellListAllTriplesIterator &
     CellListAllTriplesIterator::
     operator++() {
-      ++pit2;
-      while (pit2.isDone()) {
-        ++pit1;
-        while (pit1.isDone()) {
-          if (inSelfLoop1) {
-            LOG4ESPP_TRACE(theLogger, "pit1.isDone(), inSelfLoop1, starting neighbor loop");
-            inSelfLoop1 = false;
-            cit2 = NeighborCellList::Iterator((*cit1)->neighborCells);
-          } else {
-            LOG4ESPP_TRACE(theLogger, "pit1.isDone(), !inSelfLoop1, continuing neighbor loop");
-            ++cit2;
+//pit1 = ParticleList::Iterator((*cit1)->particles);
+//cit2 = NeighborCellList::Iterator((*cit1)->neighborCells);
+//pit2 = ParticleList::Iterator(cit2->cell->particles);
+//std::cout << "p1: "<< pit1->id() << " p2isd: "<<pit2.isValid()<<std::endl;
+//if(pit2.isDone()) cout << "Something strange pit2 isDone by inSelfLoop="<< inSelfLoop <<endl;
+//exit(0);
+      bool shouldNotReturn = true;
+      while(shouldNotReturn){
+        
+        shouldNotReturn = false;
+        ++pit3;
+        if(pit3.isValid() && pit3->id()==pit1->id()){
+          ++pit3;
+        }
+        if(inSelfLoop==2 && pit3.isValid() && pit3->id()==pit2->id()){
+          ++pit3;
+        }
+        while (pit3.isDone()) {
+          switch ( inSelfLoop ) {
+            case 0:
+              ++pit2;
+              if(pit2.isValid() && pit2->id()==pit1->id()){
+                ++pit2;
+              }
+              break;
+            case 1:
+              ++cit3;
+              if(cit3.isDone()){
+                ++pit2;
+                if(pit2.isValid() && pit2->id()==pit1->id()){
+                  ++pit2;
+                }
+                cit3 = NeighborCellList::Iterator((*cit1)->neighborCells);
+              }
+              break;
+            case 2:
+              ++pit2;
+              break;
+            case 3:
+              ++cit3;
+              if(cit3.isDone()){
+                ++pit2;
+                cit3 = NeighborCellList::Iterator((*cit1)->neighborCells);
+              }
+              break;
+            default:
+              cout<<"It is default. pit3 is done. BEGIN"<<endl;
           }
-
-          while (cit2.isValid() && cit2->useForAllPairs)
-            ++cit2;
-
-          if (cit2.isDone()) {
-            LOG4ESPP_TRACE(theLogger, "cit2.isDone(), go to next cell");
-            ++cit1;
-            if (cit1.isDone()) {
-              LOG4ESPP_TRACE(theLogger, "cit1.isDone(), LOOP FINISHED");
-              return *this;
+          
+          while (pit2.isDone()) {
+            
+            switch ( inSelfLoop ) {
+              case 0:
+                ++pit1;
+                break;
+              case 1:
+                ++pit1;
+                break;
+              case 2:
+                ++cit2;
+                if(cit2.isDone()){
+                  ++pit1;
+                  cit2 = NeighborCellList::Iterator((*cit1)->neighborCells);
+                }
+                break;
+              case 3:
+                ++cit2;
+                if(cit2.isDone()){
+                  ++pit1;
+                  cit2 = NeighborCellList::Iterator((*cit1)->neighborCells);
+                }
+                break;
+              default:
+                cout<<"It is default. pit3 is done. BEGIN"<<endl;
             }
-            inSelfLoop1 = true;
-          }
-          //assert(inSelfLoop1 || cit2.isValid());
-          pit1 = ParticleList::Iterator((*cit1)->particles);
-        }
-        //assert(pit1.isValid());
+            
+            while (pit1.isDone()) {
 
-        if (inSelfLoop1) {
-          pit2 = pit1;
-          ++pit2;
-        } else {
-          pit2 = ParticleList::Iterator(cit2->cell->particles);
+              switch ( inSelfLoop ) {
+                case 0:
+                  inSelfLoop = 1;
+                  pit1 = ParticleList::Iterator((*cit1)->particles);
+                  cit3 = NeighborCellList::Iterator((*cit1)->neighborCells);
+                  //pit3 = ParticleList::Iterator(cit3->cell->particles);
+                  //cout << "HHHH1: "<< inSelfLoop <<endl;
+                  break;
+                case 1:
+                  inSelfLoop = 2;
+                  pit1 = ParticleList::Iterator((*cit1)->particles);
+                  cit2 = NeighborCellList::Iterator((*cit1)->neighborCells);
+                  //cit3 = cit2;
+                  //pit2 = ParticleList::Iterator(cit2->cell->particles);
+                  //pit3 = ParticleList::Iterator(cit3->cell->particles);
+                  shouldNotReturn = true;
+                  //cout << "HHHH2: "<< inSelfLoop <<endl;
+                  break;
+                case 2:
+                  inSelfLoop = 3;
+                  pit1 = ParticleList::Iterator((*cit1)->particles);
+                  cit2 = NeighborCellList::Iterator((*cit1)->neighborCells);
+                  cit3 = cit2;
+                  ++cit3;
+                  //pit2 = ParticleList::Iterator(cit2->cell->particles);
+                  //pit3 = ParticleList::Iterator(cit3->cell->particles);
+                  //cout << "HHHH3: "<< inSelfLoop <<endl;
+                  break;
+                case 3:
+                  ++cit1;
+                  if(cit1.isDone())return *this;
+                  inSelfLoop = 0;
+                  pit1 = ParticleList::Iterator((*cit1)->particles);
+                  while (pit1.isDone()) {
+                    ++cit1;
+                    if (cit1.isDone()) return *this;
+                    pit1 = ParticleList::Iterator((*cit1)->particles);
+                  }
+                  shouldNotReturn = true;
+                  break;
+                default:
+                  cout<<"It is default"<<endl;
+              }
+              //cout << "After "<< inSelfLoop << " pit1 "<< pit1.isValid() <<endl;
+
+            }
+            // pit 2 is done
+            switch ( inSelfLoop ) {
+              case 0:
+                pit2 = ParticleList::Iterator((*cit1)->particles);
+                if(pit2->id()==pit1->id()){
+                  ++pit2;
+                }
+                break;
+              case 1:
+                pit2 = ParticleList::Iterator((*cit1)->particles);
+                if(pit2->id()==pit1->id()){
+                  ++pit2;
+                }
+                break;
+              case 2:
+                //cit2 = NeighborCellList::Iterator((*cit1)->neighborCells);
+                pit2 = ParticleList::Iterator(cit2->cell->particles);
+                break;
+              case 3:
+                pit2 = ParticleList::Iterator(cit2->cell->particles);
+                break;
+              default:
+                cout<<"It is default. pit2 is done"<<endl;
+            }
+          }
+
+          // pit 3 is done
+          switch ( inSelfLoop ) {
+            case 0:
+              pit3 = pit2;
+              ++pit3;
+              if(pit3->id()==pit1->id()){
+                ++pit3;
+              }
+              break;
+            case 1:
+              //cit3 = NeighborCellList::Iterator((*cit1)->neighborCells);
+              pit3 = ParticleList::Iterator(cit3->cell->particles);
+              //cout << "case1 part3 "<< inSelfLoop << " pit3 "<< pit3.isValid() <<endl;
+              break;
+            case 2:
+              cit3 = cit2;
+              pit3 = ParticleList::Iterator(cit3->cell->particles);
+              if(pit3->id()==pit2->id()){
+                ++pit3;
+              }
+              break;
+            case 3:
+              //cit3 = NeighborCellList::Iterator((*cit1)->neighborCells);
+              if(cit3->cell == cit2->cell)
+                ++cit3;
+              if(cit3.isValid()){
+                pit3 = ParticleList::Iterator(cit3->cell->particles);
+              }
+              else{
+                cout<<"cit 3 is not valid"<<endl;
+              }
+              break;
+            default:
+              cout<<"It is default. pit3 is done"<<endl;
+          }
         }
+      
+      }
+      
+      current.second = &*pit1;
+      if(pit2->id()<pit3->id()){
+        current.first  = &*pit2;
+        current.third  = &*pit3;
+      }
+      else{
+        current.first  = &*pit3;
+        current.third  = &*pit2;
       }
 
-      // WARNING : CellListAllTriplesIterator not finished yet DOES NOT WORK !
-      // TODO: This still has to be implemented !
-      pit3 = pit2;
-
-      current.first  = &*pit1;
-      current.second = &*pit2;
-      current.third  = &*pit3;
-
+      std::cout << "current triple: (" << current.first->id() << ", " 
+              << current.second->id() << ", " << current.third->id() << ")";
+      std::cout << "  isGhost: (" << current.first->ghost() << ", " 
+              << current.second->ghost() << ", " << current.third->ghost() << ")"<<std::endl;
+      
       LOG4ESPP_TRACE(theLogger,
              "current triple: (" << current.first->p.id <<
              ", " << current.second->p.id << ", " << current.third->p.id << ")"
@@ -149,31 +340,5 @@ namespace espresso {
 
   }
 }
-
-    // foreach(CellList &cl) {
-    //   // loop over all cells
-    //   for (cit = CellList::Iterator(cl); cit.isValid(); ++cit) {
-    // 	// loop over pairs of particles where both particles are in
-    // 	// the local cell
-    // 	for (pit = ParticleList::Iterator(*cit); pit.isValid(); ++pit) {
-    // 	  // loop over particles in the cell itself
-    // 	  npit = pit; 
-    // 	  ++npit;
-    // 	  for (; npit.isValid(); ++npit)
-    // 	    yield(*pit, *npit);
-    // 	}
-
-    // 	// now loop over pairs of particles in the cell that involve
-    // 	// neighbor cells
-    // 	for (ncit = NeighborCellList::Iterator(cit->neighborCells);
-    // 	     ncit.isValid(); ++ncit) {
-    // 	  if (ncit->useForAllPairs)
-    // 	    for (pit = ParticleList::Iterator(*cit); pit.isValid(); ++pit)
-    // 	      for (npit = ParticleList::Iterator(ncit->cell->particles); 
-    // 		   npit.isValid(); ++npit)
-    // 		yield(*pit, *npit);
-    // 	}
-    //   }
-    // }
 
 #endif

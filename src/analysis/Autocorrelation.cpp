@@ -11,7 +11,7 @@ namespace espresso {
 
     using namespace iterator;
 
-    int Autocorrelation::getListSize() const{
+    unsigned int Autocorrelation::getListSize() const{
       return valueList.size();
     }
    
@@ -19,8 +19,8 @@ namespace espresso {
       return valueList;
     }
 
-    Real3D Autocorrelation::getValue(int position) const{
-      int nconfigs = getListSize();
+    Real3D Autocorrelation::getValue(unsigned int position) const{
+      unsigned int nconfigs = getListSize();
       if (0 <= position and position < nconfigs) {
         return valueList[position];
       }
@@ -43,7 +43,7 @@ namespace espresso {
     }
     
     python::list Autocorrelation::compute() {
-      int M = getListSize();
+      unsigned int M = getListSize();
       
       python::list pyli;
       
@@ -53,8 +53,8 @@ namespace espresso {
       int this_node = system.comm -> rank();
 
       // TODO it could be a problem if   n_nodes > total_num !!!
-      int num_m[n_nodes];
-      int num_mH[n_nodes];
+      unsigned int num_m[n_nodes];
+      unsigned int num_mH[n_nodes];
       
       if(this_node == 0){
         
@@ -64,9 +64,9 @@ namespace espresso {
         for(int i=0; i<n_nodes; i++){
           double max_num = (i+1) * local_num;
           
-          int m_max = (int) ( ( sqrt(1.0+8.0*max_num) - 1.0 )/2. );
+          unsigned int m_max = (unsigned int) ( ( sqrt(1.0+8.0*max_num) - 1.0 )/2. );
           
-          int lastNum = (i==0) ? 0 : num_mH[i-1];
+          unsigned int lastNum = (i==0) ? 0 : num_mH[i-1];
           
           if(m_max-lastNum==0)
             num_mH[i] = num_mH[i-1] + 1;
@@ -85,15 +85,15 @@ namespace espresso {
       
       // now num_m[i], i - cpu number, is a number of series in "for" statement for each cpu
       
-      int min_m = (this_node==0) ? 0 : num_m[this_node-1];
-      int max_m = num_m[this_node];
+      unsigned int min_m = (this_node==0) ? 0 : num_m[this_node-1];
+      unsigned int max_m = num_m[this_node];
 
       real* Z;
       Z = new real[M];
       
-      for(int m=min_m; m<max_m; m++){
+      for(unsigned int m=min_m; m<max_m; m++){
         Z[m] = 0.0;
-        for(int n=0; n<M-m; n++){
+        for(unsigned int n=0; n<M-m; n++){
           Z[m] += getValue(n + m) *  getValue(n);
         }
         if(system.comm->rank()==0)
@@ -105,7 +105,7 @@ namespace espresso {
       
       real coef = 3.0; // only if value is Real3D
       
-      for(int m=min_m; m<max_m; m++){
+      for(unsigned int m=min_m; m<max_m; m++){
         Z[m] /= ( (real)(M-m)*coef );
       }
       

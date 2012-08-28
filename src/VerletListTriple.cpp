@@ -76,22 +76,19 @@ namespace espresso {
   
   void VerletListTriple::checkTriple(Particle& pt1, Particle& pt2, Particle& pt3){
     Real3D d1 = pt1.position() - pt2.position();
-    Real3D d2 = pt1.position() - pt3.position();
-    Real3D d3 = pt3.position() - pt3.position();
+    Real3D d2 = pt2.position() - pt3.position();
     
     real distsq1 = d1.sqr();
     real distsq2 = d2.sqr();
-    real distsq3 = d3.sqr();
 
     LOG4ESPP_TRACE(theLogger, "p1: " << pt1.id()
                    << " @ " << pt1.position() 
 		   << " - p2: " << pt2.id() << " @ " << pt2.position()
 		   << " - p3: " << pt3.id() << " @ " << pt3.position()
 		   << " -> distsq1 = " << distsq1
-		   << " -> distsq2 = " << distsq2
-		   << " -> distsq3 = " << distsq3);
+		   << " -> distsq2 = " << distsq2);
 
-    if (distsq1>cutsq || distsq2>cutsq || distsq3>cutsq) return;
+    if (distsq1>cutsq || distsq2>cutsq) return;
 
     // see if it's in the exclusion list (both directions)
     /*
