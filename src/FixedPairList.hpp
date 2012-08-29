@@ -7,7 +7,8 @@
 #include "python.hpp"
 #include "Particle.hpp"
 #include "esutil/ESPPIterator.hpp"
-#include <boost/unordered_map.hpp>
+//#include <boost/unordered_map.hpp>
+#include <map>
 #include <boost/signals2.hpp>
 
 //#include "FixedListComm.hpp"
@@ -15,7 +16,7 @@
 namespace espresso {
 	class FixedPairList : public PairList {
 	  public:
-	    typedef boost::unordered_multimap <longint, longint> GlobalPairs;
+	    typedef std::multimap<longint, longint> GlobalPairs;
 
 	  protected:
 		boost::signals2::connection con1, con2, con3;

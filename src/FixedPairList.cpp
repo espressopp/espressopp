@@ -1,7 +1,6 @@
+#include <sstream>
 #include "python.hpp"
-
 #include "FixedPairList.hpp"
-
 //#include <vector>
 //#include <utility>
 //#include <algorithm>
@@ -70,32 +69,17 @@ namespace espresso {
     if (!p1)
       // Particle does not exist here, return false
       return false;
-    if (!p2)
-      // TODO: Second particle does not exist here, throw exception!
-      return false;
+    if (!p2) {
+      std::stringstream err;
+      err << "bond particle p2 " << pid2 << " does not exists here and cannot be added";
+      std::runtime_error(err.str());
+    }
     // add the pair locally
     this->add(p1, p2);
 
-    // ADD THE GLOBAL PAIR
-    // see whether the particle already has pairs
-    std::pair<GlobalPairs::const_iterator, 
-      GlobalPairs::const_iterator> equalRange 
-      = globalPairs.equal_range(pid1);
-    if (equalRange.first == globalPairs.end()) {
-      // if it hasn't, insert the new pair
-      globalPairs.insert(std::make_pair(pid1, pid2));
-    }
-    else {
-      // otherwise test whether the pair already exists
-      for (GlobalPairs::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
-	    if (it->second == pid2) {
-	      // TODO: Pair already exists, generate error!
-	      ;
-	    }
-      }
-      // if not, insert the new pair
-      globalPairs.insert(equalRange.first, std::make_pair(pid1, pid2));
-    }
+    // add the particle pair to the globalPairs list
+    globalPairs.insert(std::make_pair(pid1, pid2));
+
     LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
     return true;
   }
@@ -145,7 +129,9 @@ namespace espresso {
         }
 
         // delete all of these pairs from the global list
-        globalPairs.erase(equalRange.first, equalRange.second);
+        //globalPairs.erase(equalRange.first->first, equalRange.second->first);
+        globalPairs.erase(pid);
+        // std::cout << "erasing particle " << pid << " from here" << std::endl;
       }
     }
     // send the list
@@ -195,13 +181,17 @@ namespace espresso {
       if (it->first != lastpid1) {
 	    p1 = storage->lookupRealParticle(it->first);
         if (p1 == NULL) {
-          printf("SERIOUS ERROR: particle %d not available\n", it->first);
+          std::stringstream err;
+          err << "bond particle p1 " << it->first << " does not exists here";
+          std::runtime_error(err.str());
         }
 	    lastpid1 = it->first;
       }
       p2 = storage->lookupLocalParticle(it->second);
       if (p2 == NULL) {
-        printf("SERIOUS ERROR: 2nd particle %d not available\n", it->second);
+          std::stringstream err;
+          err << "bond particle p2 " << it->second << " does not exists here";
+          std::runtime_error(err.str());
       }
       this->add(p1, p2);
     }

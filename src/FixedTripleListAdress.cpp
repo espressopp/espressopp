@@ -1,5 +1,5 @@
 #include "python.hpp"
-
+#include <sstream>
 #include "FixedTripleListAdress.hpp"
 
 //#include <vector>
@@ -44,39 +44,30 @@ namespace espresso {
     Particle *p1 = storage->lookupAdrATParticle(pid1);
     Particle *p2 = storage->lookupAdrATParticle(pid2);
     Particle *p3 = storage->lookupAdrATParticle(pid3);
-    if (!p1)
-      // Particle does not exist here, return false
-      return false;
+
+    // middle particle is the reference particle and must exist here
     if (!p2)
-      // TODO: Second particle does not exist here, throw exception!
+      // particle does not exists here (some other CPU must have it)
       return false;
-    if (!p3)
-      // TODO: Third particle does not exist here, throw exception!
-      return false;
+
+
+    if (!p1) {
+        std::stringstream err;
+        err << "atomistic triple particle p1 " << pid1 << " does not exists here and cannot be added";
+        std::runtime_error(err.str());
+    }
+
+    if (!p3) {
+        std::stringstream err;
+        err << "atomistic triple particle p3 " << pid1 << " does not exists here and cannot be added";
+        std::runtime_error(err.str());
+    }
+
     // add the triple locally
     this->add(p1, p2, p3);
 
-    // ADD THE GLOBAL TRIPLET
-    // see whether the particle already has triples
-    std::pair<GlobalTriples::const_iterator,
-              GlobalTriples::const_iterator> equalRange
-      = globalTriples.equal_range(pid2);
-    if (equalRange.first == globalTriples.end()) {
-      // if it hasn't, insert the new triple
-      globalTriples.insert(std::make_pair(pid2,
-                           std::pair<longint, longint>(pid1, pid3)));
-    }
-    else {
-      // otherwise test whether the triple already exists
-      for (GlobalTriples::const_iterator it = equalRange.first;
-           it != equalRange.second; ++it)
-        if (it->second == std::pair<longint, longint>(pid1, pid3))
-        // TODO: Triple already exists, generate error!
-      ;
-      // if not, insert the new triple
-      globalTriples.insert(equalRange.first, std::make_pair(pid2,
-                           std::pair<longint, longint>(pid1, pid3)));
-    }
+    globalTriples.insert(std::make_pair(pid2, std::make_pair(pid1, pid3)));
+
     LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
     return true;
   }
@@ -117,7 +108,7 @@ namespace espresso {
             }
 
             // delete all of these triples from the global list
-            globalTriples.erase(equalRange.first, equalRange.second);
+            globalTriples.erase(pid);
           }
         }
 
@@ -149,22 +140,27 @@ namespace espresso {
         it != globalTriples.end(); ++it) {
 
           //printf("lookup global triple %d %d %d\n", it->first, it->second.first, it->second.second);
+
           if (it->first != lastpid2) {
             p2 = storage->lookupAdrATParticle(it->first);
             if (p2 == NULL) {
-              printf("SERIOUS ERROR: particle %d not available\n", it->first);
+              std::stringstream err;
+              err << "atomistic triple particle p2 " << it->first << " does not exists here";
+              std::runtime_error(err.str());
             }
-            lastpid2 = it->first;
+    	    lastpid2 = it->first;
           }
-
           p1 = storage->lookupAdrATParticle(it->second.first);
           if (p1 == NULL) {
-            printf("SERIOUS ERROR: 2nd particle %d not available\n", it->second.first);
+            std::stringstream err;
+            err << "atomistic triple particle p1 " << it->second.first << " does not exists here";
+            std::runtime_error(err.str());
           }
-
           p3 = storage->lookupAdrATParticle(it->second.second);
           if (p3 == NULL) {
-            printf("SERIOUS ERROR: 3rd particle %d not available\n", it->second.second);
+            std::stringstream err;
+            err << "atomistic triple particle p3 " << it->second.second << " does not exists here";
+            std::runtime_error(err.str());
           }
 
           this->add(p1, p2, p3);

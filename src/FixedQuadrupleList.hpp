@@ -8,7 +8,8 @@
 
 #include "Particle.hpp"
 #include "esutil/ESPPIterator.hpp"
-#include <boost/unordered_map.hpp>
+//#include <boost/unordered_map.hpp>
+#include <map>
 #include <boost/signals2.hpp>
 //#include "FixedListComm.hpp"
 
@@ -17,7 +18,7 @@ namespace espresso {
   protected:
     boost::signals2::connection con1, con2, con3;
     shared_ptr< storage::Storage > storage;
-    typedef boost::unordered_multimap< longint,
+    typedef std::multimap< longint,
             Triple < longint, longint, longint > > GlobalQuadruples;
     GlobalQuadruples globalQuadruples;
     using QuadrupleList::add;
