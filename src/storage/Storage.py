@@ -93,9 +93,9 @@ class StorageLocal(object):
         else:
           return False
 
-    def addParticle(self, pid, *args):
+    def addParticle(self, pid, pos):
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-        self.cxxclass.addParticle(self, pid, toReal3DFromVector(*args))
+        self.cxxclass.addParticle(self, pid, toReal3DFromVector(pos))
                 
     def removeParticle(self, pid):
       'remove a particle, will return if particle exists on this worker 0 else'
@@ -257,13 +257,16 @@ if pmi.isController:
         def particleExists(self, pid):
             return pmi.reduce(pmi.BOR, self.pmiobject, 'particleExists', pid)
         
-        def addParticle(self, pid, *args):
-          if( self.particleExists(pid) ):
-            print "WARNING: Particle ", pid, " already exists. Therefore it was not added."
-            return None
+        def addParticle(self, pid, pos, checkexist=True):
+          if checkexist:
+            if( self.particleExists(pid) ):
+              print "WARNING: Particle ", pid, " already exists. Therefore it was not added."
+              return None
+            else:
+              pmi.call(self.pmiobject, 'addParticle', pid, pos)
+              return Particle(pid, self)
           else:
-            pmi.call(self.pmiobject, 'addParticle', pid, *args)
-            return Particle(pid, self)
+            pmi.call(self.pmiobject, 'addParticle', pid, pos)
           
         def removeParticle(self, pid):
             n = pmi.reduce(pmi.SUM, self.pmiobject, 'removeParticle', pid)

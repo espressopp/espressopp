@@ -70,6 +70,9 @@ class ParallelTempering(object):
             self._oddeven = 0;      
         energies     = self._multisystem.runAnalysisPotential()
         temperatures = self._multisystem.runAnalysisTemperature()
+        nparts       = self._multisystem.runAnalysisNPart()
+        print "energies     = ", energies
+        print "temperatures = ", temperatures
         for i in range(len(energies)/2):
             m = 2 * i + self._oddeven
             n = m + 1
@@ -79,7 +82,9 @@ class ParallelTempering(object):
                 t2    = temperatures[n]
                 e1    = energies[m]
                 e2    = energies[n]
-                delta = exp(-(e1-e2)*(1/t2 -1/t1))
+                n1    = nparts[m]
+                n2    = nparts[n]
+                delta = exp(-(e1/n1-e2/n2)*(1/t2 -1/t1))
                 if delta >= metro:
                   exyesno = 'yes'
                 else:
