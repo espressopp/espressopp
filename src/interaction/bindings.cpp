@@ -25,6 +25,8 @@
 #include "OPLS.hpp"
 #include "CoulombKSpaceEwald.hpp"
 #include "CoulombRSpace.hpp"
+#include "StillingerWeberPairTerm.hpp"
+#include "StillingerWeberTripleTerm.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -56,8 +58,9 @@ namespace espresso {
       OPLS::registerPython();
       
       CoulombKSpaceEwald::registerPython();
-      
       CoulombRSpace::registerPython();
+      StillingerWeberPairTerm::registerPython();
+      StillingerWeberTripleTerm::registerPython();
     }
   }
 }

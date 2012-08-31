@@ -133,8 +133,12 @@ namespace espresso {
 
 
   bool VerletListTriple::exclude(longint pid1, longint pid2, longint pid3) {
-    //exList.insert(boost::make_tuple(pid1, pid2, pid3));
-    return true;
+    //boost::tuple<longint, longint, longint> loctuple = boost::make_tuple(pid1, pid2, pid3);
+    //exList.insert(loctuple);
+    //return true;
+    std::cout<<"Warning! Exclusion list is not yet implemented to the "
+            "triple verlet list"<<std::endl;
+    return false;
   }
   
 

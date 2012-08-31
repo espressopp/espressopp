@@ -25,7 +25,7 @@ namespace espresso {
       (shared_ptr < System > _system,
        shared_ptr < VerletListTriple > _verletlisttriple,
        shared_ptr < Potential > _potential)
-        : SystemAccess(_system), verletlisttriple(_verletlisttriple),
+        : SystemAccess(_system), verletListTriple(_verletlisttriple),
           potential(_potential)
       {
           if (! potential) {
@@ -36,11 +36,11 @@ namespace espresso {
 
       void
       setVerletListTriple(shared_ptr < VerletListTriple > _verletlisttriple) {
-        verletlisttriple = _verletlisttriple;
+        verletListTriple = _verletlisttriple;
       }
 
       shared_ptr < VerletListTriple > getVerletListTriple() {
-        return verletlisttriple;
+        return verletListTriple;
       }
 
       /*void
@@ -73,7 +73,7 @@ namespace espresso {
 
     protected:
       int ntypes;
-      shared_ptr<VerletListTriple> verletlisttriple;
+      shared_ptr<VerletListTriple> verletListTriple;
       //esutil::Array2D<Potential, esutil::enlarge> potentialArray;
       shared_ptr < Potential > potential;
     };
@@ -86,9 +86,10 @@ namespace espresso {
     addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by VerletListTriple");
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      for (VerletListTriple::TripleList::Iterator it(*verletlisttriple); it.isValid(); ++it) {
+      //for (VerletListTriple::TripleList::Iterator it(*verletlisttriple); it.isValid(); ++it) {
+      for (TripleList::Iterator it(verletListTriple->getTriples()); it.isValid(); ++it) {
         Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
+        Particle &p2 = *it->second; // the main particle
         Particle &p3 = *it->third;
         //const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D dist12, dist32;
@@ -109,7 +110,8 @@ namespace espresso {
 
       const bc::BC& bc = *getSystemRef().bc;
       real e = 0.0;
-      for (VerletListTriple::TripleList::Iterator it(*verletlisttriple); it.isValid(); ++it) {
+      //for (VerletListTriple::TripleList::Iterator it(*verletListTriple); it.isValid(); ++it) {
+      for (TripleList::Iterator it(verletListTriple->getTriples()); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
@@ -130,7 +132,8 @@ namespace espresso {
 
       const bc::BC& bc = *getSystemRef().bc;
       real w = 0.0;
-      for (VerletListTriple::TripleList::Iterator it(*verletlisttriple); it.isValid(); ++it) {
+      //for (VerletListTriple::TripleList::Iterator it(*verletListTriple); it.isValid(); ++it) {
+      for (TripleList::Iterator it(verletListTriple->getTriples()); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
@@ -152,7 +155,8 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 
       const bc::BC& bc = *getSystemRef().bc;
-      for (VerletListTriple::TripleList::Iterator it(*verletlisttriple); it.isValid(); ++it) {
+      //for (VerletListTriple::TripleList::Iterator it(*verletListTriple); it.isValid(); ++it) {
+      for (TripleList::Iterator it(verletListTriple->getTriples()); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
@@ -163,7 +167,7 @@ namespace espresso {
         Real3D force12, force32;
         potential->_computeForce(force12, force32, dist12, dist32);
         w += Tensor(dist12, force12) + Tensor(dist32, force32);
-        }
+      }
     }
 
     template < typename _ThreeBodyPotential >

@@ -32,5 +32,6 @@ from espresso.interaction.TabulatedDihedral import *
 from espresso.interaction.OPLS import *
 
 from espresso.interaction.CoulombKSpaceEwald import *
-
 from espresso.interaction.CoulombRSpace import *
+from espresso.interaction.StillingerWeberPairTerm import *
+from espresso.interaction.StillingerWeberTripleTerm import *

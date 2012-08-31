@@ -112,7 +112,7 @@ namespace espresso {
 //pit2 = ParticleList::Iterator(cit2->cell->particles);
 //std::cout << "p1: "<< pit1->id() << " p2isd: "<<pit2.isValid()<<std::endl;
 //if(pit2.isDone()) cout << "Something strange pit2 isDone by inSelfLoop="<< inSelfLoop <<endl;
-//exit(0);
+      
       bool shouldNotReturn = true;
       while(shouldNotReturn){
         
