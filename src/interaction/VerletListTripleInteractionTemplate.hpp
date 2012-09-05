@@ -87,14 +87,25 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "add forces computed by VerletListTriple");
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
       //for (VerletListTriple::TripleList::Iterator it(*verletlisttriple); it.isValid(); ++it) {
+/*      
+Real3D res;
+Real3D pp1(1.0,2.0,3.0);
+Real3D pp2(1.5,2.5,3.5);
+        
+bc.getMinimumImageVectorBox(res, pp1, pp2);
+std::cout<<"In force loop. F1:"<< res << "  F2: "<< pp1 <<std::endl;
+exit(0);
+*/
       for (TripleList::Iterator it(verletListTriple->getTriples()); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second; // the main particle
         Particle &p3 = *it->third;
         //const Potential &potential = getPotential(p1.type(), p2.type());
         Real3D dist12, dist32;
-        bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
-        bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+        //bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
+        //bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+        bc.getMinimumImageVectorBox(dist12, p2.position(), p1.position());
+        bc.getMinimumImageVectorBox(dist32, p2.position(), p3.position());
         Real3D force12, force32;
         potential->_computeForce(force12, force32, dist12, dist32);
         p1.force() += force12;
@@ -121,7 +132,8 @@ namespace espresso {
         e += potential->_computeEnergy(dist12, dist32);
       }
       real esum;
-      boost::mpi::reduce(*mpiWorld, e, esum, std::plus<real>(), 0);
+      //boost::mpi::reduce(*mpiWorld, e, esum, std::plus<real>(), 0);
+      boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
       return esum;
     }
 

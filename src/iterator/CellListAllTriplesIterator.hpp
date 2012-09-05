@@ -147,7 +147,7 @@ namespace espresso {
               break;
             case 3:
               ++cit3;
-              if(cit3->cell == cit2->cell){
+              if(cit3.isValid() &&  cit3->cell == cit2->cell){
                 ++cit3;
               }
               if(cit3.isDone()){
@@ -160,7 +160,6 @@ namespace espresso {
                   cout<<"cit3 is done. But it should not happen"<<endl;
                 }
               }
-              
               break;
             default:
               cout<<"It is default. pit3 is done. BEGIN"<<endl;
@@ -196,12 +195,6 @@ namespace espresso {
                   cit3 = cit2;
                   ++cit3;
                 }
-                
-                // **
-                //cit3 = NeighborCellList::Iterator((*cit1)->neighborCells);
-                //if(cit3->cell == cit2->cell){
-                //  ++cit3;
-                //}
                 break;
               default:
                 cout<<"It is default. pit3 is done. BEGIN"<<endl;
@@ -215,13 +208,16 @@ namespace espresso {
                   pit1 = ParticleList::Iterator((*cit1)->particles);
                   cit3 = NeighborCellList::Iterator((*cit1)->neighborCells);
                   //pit3 = ParticleList::Iterator(cit3->cell->particles);
-                  //cout << "HHHH1: "<< inSelfLoop <<endl;
+//if(pit1->id()==0)
+//  cout << "inSelfLoop 0->1: "<< inSelfLoop <<endl;
                   break;
                 case 1:
                   inSelfLoop = 2;
                   pit1 = ParticleList::Iterator((*cit1)->particles);
                   cit2 = NeighborCellList::Iterator((*cit1)->neighborCells);
                   //shouldNotReturn = true;
+//if(pit1->id()==0)
+                  //cout << "inSelfLoop 1->2: "<< inSelfLoop <<endl;
                   break;
                 case 2:
                   inSelfLoop = 3;
@@ -229,6 +225,8 @@ namespace espresso {
                   cit2 = NeighborCellList::Iterator((*cit1)->neighborCells);
                   cit3 = cit2;
                   ++cit3;
+//if(pit1->id()==0)
+                  //cout << "inSelfLoop 2->3: "<< inSelfLoop <<endl;
                   break;
                 case 3:
                   ++cit1;
@@ -240,7 +238,9 @@ namespace espresso {
                     if (cit1.isDone()) return *this;
                     pit1 = ParticleList::Iterator((*cit1)->particles);
                   }
-                  shouldNotReturn = true;
+                  //shouldNotReturn = true;
+//if(pit1->id()==0)
+                  //cout << "inSelfLoop 3->0: "<< inSelfLoop <<endl;
                   break;
                 default:
                   cout<<"It is default"<<endl;
@@ -278,7 +278,8 @@ namespace espresso {
             case 0:
               pit3 = pit2;
               ++pit3;
-              if(pit3->id()==pit1->id()){
+              
+              if(pit3.isValid() && pit3->id()==pit1->id()){
                 ++pit3;
               }
               break;
@@ -309,7 +310,9 @@ namespace espresso {
         current.third  = &*pit2;
       }
 
-      if(current.first->id()==0 && current.second->id()==6 &&  current.third->id()==5){
+      
+      /*
+      if(current.first->id()==1 && current.second->id()==0 &&  current.third->id()==6){
 cout << "case1 part3 "<< inSelfLoop <<endl;
         
       std::cout << "current triple: (" << current.first->id() << ", " 
@@ -318,7 +321,8 @@ cout << "case1 part3 "<< inSelfLoop <<endl;
               << current.second->ghost() << ", " << current.third->ghost() << ")";
       std::cout << "  real: (" << pit2->id() << ", " 
               << pit1->id() << ", " << pit3->id() << ")"<<std::endl;
-      }
+      }*/
+      
       
       LOG4ESPP_TRACE(theLogger,
              "current triple: (" << current.first->p.id <<

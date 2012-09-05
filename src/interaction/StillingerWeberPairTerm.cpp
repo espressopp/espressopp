@@ -1,10 +1,6 @@
 #include "python.hpp"
 #include "StillingerWeberPairTerm.hpp"
 #include "Tabulated.hpp"
-#include "VerletListInteractionTemplate.hpp"
-#include "VerletListAdressInteractionTemplate.hpp"
-#include "CellListAllPairsInteractionTemplate.hpp"
-#include "FixedPairListInteractionTemplate.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -26,8 +22,12 @@ namespace espresso {
       using namespace espresso::python;
 
       class_< StillingerWeberPairTerm, bases< Potential > >
-    	("interaction_StillingerWeberPairTerm", init< real, real, real >())
-	    .def(init< real, real, real, real>())
+    	("interaction_StillingerWeberPairTerm", init< real, real, real, real, real, real, real >())
+	    //.def(init< real, real, real, real, real, real, real, real>())
+        .add_property("A", &StillingerWeberPairTerm::getA, &StillingerWeberPairTerm::setA)
+        .add_property("B", &StillingerWeberPairTerm::getB, &StillingerWeberPairTerm::setB)
+        .add_property("p", &StillingerWeberPairTerm::getP, &StillingerWeberPairTerm::setP)
+        .add_property("q", &StillingerWeberPairTerm::getQ, &StillingerWeberPairTerm::setQ)
     	.add_property("sigma", &StillingerWeberPairTerm::getSigma, &StillingerWeberPairTerm::setSigma)
     	.add_property("epsilon", &StillingerWeberPairTerm::getEpsilon, &StillingerWeberPairTerm::setEpsilon)
       ;
@@ -41,8 +41,8 @@ namespace espresso {
 
       class_< VerletListAdressStillingerWeberPairTerm, bases< Interaction > >
         ("interaction_VerletListAdressStillingerWeberPairTerm",
-           init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleList> >())
+            init< shared_ptr<VerletListAdress>,
+            shared_ptr<FixedTupleList> >())
         .def("setPotentialAT", &VerletListAdressStillingerWeberPairTerm::setPotentialAT)
         .def("setPotentialCG", &VerletListAdressStillingerWeberPairTerm::setPotentialCG);
       ;

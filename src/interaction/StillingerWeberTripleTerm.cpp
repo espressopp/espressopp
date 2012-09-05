@@ -20,12 +20,8 @@ namespace espresso {
 
       class_< StillingerWeberTripleTerm, bases< AngularPotential > >(
             "interaction_StillingerWeberTripleTerm",
-            init< real, real, real, real, real, real, real, real, real >()
+            init< real, real, real, real, real, real >()
       )
-      .add_property("A", &StillingerWeberTripleTerm::getA, &StillingerWeberTripleTerm::setA)
-      .add_property("B", &StillingerWeberTripleTerm::getB, &StillingerWeberTripleTerm::setB)
-      .add_property("p", &StillingerWeberTripleTerm::getP, &StillingerWeberTripleTerm::setP)
-      .add_property("q", &StillingerWeberTripleTerm::getQ, &StillingerWeberTripleTerm::setQ)
       .add_property("gamma", &StillingerWeberTripleTerm::getGamma, &StillingerWeberTripleTerm::setGamma)
       .add_property("theta0", &StillingerWeberTripleTerm::getTheta0, &StillingerWeberTripleTerm::setTheta0)
       .add_property("lambda", &StillingerWeberTripleTerm::getLambda, &StillingerWeberTripleTerm::setLambda)
