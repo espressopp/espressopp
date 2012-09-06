@@ -2,9 +2,18 @@
 
 import sys
 
-def show(t, precision=1):
+def show(alltimers, precision=1):
+    
   fmt1 = '%.' + str(precision) + 'f\n'
   fmt2 = '%.' + str(precision) + 'f (%.'+ str(precision) + 'f)\n'
+  t=[]
+  nprocs = len(alltimers)
+  for ntimer in range(10):
+    t.append(0.0)
+    for k in range(nprocs):
+      t[ntimer] += alltimers[k][ntimer]
+    t[ntimer] /= nprocs          
+          
   sys.stdout.write('Run    time (%) = ' + fmt1 % t[0])
   sys.stdout.write('Pair   time (%) = ' + fmt2 % (t[1], 100*t[1]/t[0]))
   sys.stdout.write('FENE   time (%) = ' + fmt2 % (t[2], 100*t[2]/t[0]))

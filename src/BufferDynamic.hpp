@@ -167,6 +167,25 @@ namespace espresso {
       // printf("%d: received size = %d from %d\n", comm.rank(), size, sender);
     }
 
+    mpi::request irecv(longint sender, int tag) {
+      // blocking test for the incomming message
+      mpi::status stat = comm.probe(sender, tag);
+      int msgSize = *stat.count<char>();
+
+      // make sure that buffer will be suffient for receiving
+      if (msgSize > capacity) {
+        // reallocation necessary
+        allocate(msgSize);
+      }
+
+      mpi::request req = comm.irecv(sender, tag, buf, capacity);
+      // incoming message might be smaller than allocated size
+      // usedSize = req->count<char>();
+      usedSize = msgSize;
+      pos      = 0;   // reset the buffer position
+      return req;
+    }
+
   };
 
   class OutBuffer : public Buffer {
@@ -230,6 +249,10 @@ namespace espresso {
     void send(longint receiver, int tag) {
       comm.send(receiver, tag, buf, pos);
       // printf("%d: send size = %d to %d\n", comm.rank(), pos, receiver);
+    }
+
+    mpi::request isend(longint receiver, int tag) {
+      return comm.isend(receiver, tag, buf, pos);
     }
 
   };

@@ -51,6 +51,8 @@ namespace espresso {
 
   namespace storage {
     class Storage;
+    class DomainDecomposition;
+    class DomainDecompositionNonBlocking;
   }
 
   namespace bc {

@@ -13,11 +13,11 @@ namespace espresso {
 
   Version::Version() {
 	  name          = "ESPResSo++";
-          major         = MAJORVERSION;
+      major         = MAJORVERSION;
 	  minor         = MINORVERSION;
 	  patchlevel    = PATCHLEVEL;
 	  hgrevision    = hgversion;
-          boostversion  = BOOST_LIB_VERSION;
+      boostversion  = BOOST_LIB_VERSION;
 	  date          = __DATE__;
 	  time          = __TIME__;
   }
@@ -26,8 +26,9 @@ namespace espresso {
 	  std::stringstream ss;
 	  ss << name << " v"  << major << "." << minor;
 	  ss << " patchlevel " << patchlevel;
-	  ss << ", Mercurial(hg) revision: " << hgrevision;
-          ss << ", Boost Version: " << boostversion;
+	  if (hgrevision != "")
+	    ss << ", Mercurial(hg) revision: " << hgrevision;
+      ss << ", Boost Version: " << boostversion;
 	  ss << ", compiled on " << date << ", " << time;
 #ifdef VTRACE
 	  ss << ", VampirTrace mode";

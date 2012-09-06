@@ -55,7 +55,7 @@ namespace espresso {
       virtual void decomposeRealParticles();
       virtual void exchangeGhosts();
 
-      void doGhostCommunication(bool sizesFirst,
+      virtual void doGhostCommunication(bool sizesFirst,
 				bool realToGhosts,
 				const int dataElements = 0);
 
@@ -102,7 +102,6 @@ namespace espresso {
 
       static LOG4ESPP_DECL_LOGGER(logger);
     };
-
   }
 }
 #endif

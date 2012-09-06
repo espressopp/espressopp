@@ -742,24 +742,12 @@ namespace espresso {
     LOG4ESPP_DEBUG(logger, "ghost communication finished");
   }
 
-
-
-  class PyDomainDecomposition : public DomainDecomposition {
-      public:
-        PyDomainDecomposition(shared_ptr< System > _system,
-                  const Int3D& _nodeGrid,
-                  const Int3D& _cellGrid)
-      : DomainDecomposition(_system, _nodeGrid, _cellGrid)
-        {}
-  };
-
-
   //////////////////////////////////////////////////
   // REGISTRATION WITH PYTHON
   //////////////////////////////////////////////////
   void DomainDecomposition::registerPython() {
     using namespace espresso::python;
-    class_< PyDomainDecomposition, bases< Storage >, boost::noncopyable >
+    class_< DomainDecomposition, bases< Storage >, boost::noncopyable >
     ("storage_DomainDecomposition", init< shared_ptr< System >, const Int3D&, const Int3D& >())
     .def("mapPositionToNodeClipped", &DomainDecomposition::mapPositionToNodeClipped)
     .def("getCellGrid", &DomainDecomposition::getInt3DCellGrid)
