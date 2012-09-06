@@ -162,8 +162,12 @@ namespace espresso {
 
       real dist12_sqr = dist12 * dist12;
       real dist32_sqr = dist32 * dist32;
-      real cos_theta = dist12 * dist32 / (sqrt(dist12_sqr) * sqrt(dist32_sqr));
-      return _computeEnergy(acos(cos_theta));
+      if (dist12_sqr >= cutoffSqr || dist32_sqr >= cutoffSqr )
+        return 0.0;
+      else{
+        real cos_theta = dist12 * dist32 / (sqrt(dist12_sqr) * sqrt(dist32_sqr));
+        return _computeEnergy(acos(cos_theta));
+      }
     }
 
     template < class Derived > 
@@ -213,6 +217,7 @@ namespace espresso {
                   Real3D& force32,
                   const Real3D& dist12,
                   const Real3D& dist32) const {
+      
       derived_this()->_computeForceRaw(force12, force32, dist12, dist32);
     }
     
