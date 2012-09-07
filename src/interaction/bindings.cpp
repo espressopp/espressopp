@@ -27,6 +27,7 @@
 #include "CoulombRSpace.hpp"
 #include "StillingerWeberPairTerm.hpp"
 #include "StillingerWeberTripleTerm.hpp"
+#include "StillingerWeberPairTermCapped.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -61,6 +62,7 @@ namespace espresso {
       CoulombRSpace::registerPython();
       StillingerWeberPairTerm::registerPython();
       StillingerWeberTripleTerm::registerPython();
+      StillingerWeberPairTermCapped::registerPython();
     }
   }
 }
