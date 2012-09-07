@@ -28,14 +28,13 @@ namespace espresso {
       
       multiset<longint> neighbNum;
       
-      int nsum    = 0;
-      int nsqsum  = 0;
-      real nsq_ave = 0.0;
-      real nave_sq = 0.0;
-
       System& system = getSystemRef();
 
       CellList cl = getSystem()->storage->getRealCells();
+      
+      longint myN, systemN;
+      myN = system.storage->getNRealParticles();
+      mpi::all_reduce(*getSystem()->comm, myN, systemN, std::plus<int>());
       
       for (CellListAllPairsIterator it(cl); it.isValid(); ++it) {
     	Real3D d = it->first->position() - it->second->position();
@@ -51,33 +50,41 @@ namespace espresso {
     	}
       }
       
-      int n_part = 0;
+      
+      real nsum    = 0;
+      real nsqsum  = 0;
+      real nsq_ave = 0.0;
+      real nave_sq = 0.0;
+      
+      real inv_num_part = 1. / (real)systemN;
+
       for(CellListIterator it(cl); !it.isDone(); ++it) {
     	  //int n = pairs.count(it->id());
     	  int n = neighbNum.count(it->id());
     	  //std::cout << "n of pid " << it->id() << " = " << n << "  pos:"<< it->position() << std::endl;
     	  if (n > 0) {
-    		n_part++;
-    	    nsum   += n;
-    	    nsqsum += n*n;
+    	    nsum   += n   * inv_num_part;
+    	    nsqsum += n*n * inv_num_part;
     	  }
       }
       
-      real nave = (1.0*(real)nsum/(real)n_part);
-      real naveTot = 0.0;
+      cout << "11111nave="<<nsum<<" nsqsum="<<nsqsum<< endl;
       
-      nave_sq = nave * nave;
-      nsq_ave = (1.0*(real)nsqsum/(real)n_part);
+      //real nave = (1.0*(real)nsum/(real)n_part);
+      
+      nave_sq = nsum * nsum;
+      nsq_ave = nsqsum;
 
       real myE = nsq_ave - nave_sq;
       real E;
 
       //std::cout << "nave_sq="<<nave_sq<<" nsq_ave="<<nsq_ave<< " myE="<< myE << std::endl;
-      //cout << "nave_sq="<<nave_sq<<" nsq_ave="<<nsq_ave<< " myE="<< myE << endl;
+      cout << "nave_sq="<<nave_sq<<" nsq_ave="<<nsq_ave<< " myE="<< myE << endl;
 
       mpi::all_reduce(*system.comm, myE, E, std::plus<real>());
       
-      mpi::all_reduce(*system.comm, nave, naveTot, std::plus<real>());
+      real naveTot = 0.0;
+      mpi::all_reduce(*system.comm, nsum, naveTot, std::plus<real>());
       
       python::list pyList;
       

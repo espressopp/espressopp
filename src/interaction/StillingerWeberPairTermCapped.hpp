@@ -93,6 +93,9 @@ namespace espresso {
 
         real d12 = sqrt(distSqr);
         
+//std::cout << " caprad: "<< getCaprad()<< std::endl;
+//exit(0);
+        
         real inv_d12vec = 1.0 / d12;
         real inv_d12 = inv_d12vec;
         if (d12 < getCaprad()){
