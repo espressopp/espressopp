@@ -1,7 +1,11 @@
 import espresso
 
-def writexyz(filename, system, velocities = True, unfolded = False):
-  file = open(filename,'w')
+def writexyz(filename, system, velocities = True, unfolded = False, append = False):
+
+  if append:
+    file = open(filename,'a')
+  else:
+    file = open(filename,'w')
   numParticles  = int(espresso.analysis.NPart(system).compute())
   box_x = system.bc.boxL[0]
   box_y = system.bc.boxL[1]
@@ -11,8 +15,8 @@ def writexyz(filename, system, velocities = True, unfolded = False):
   maxParticleID = int(espresso.analysis.MaxPID(system).compute())
   pid   = 0
   while pid <= maxParticleID:
-    particle = system.storage.getParticle(pid)
-    if particle.pos:
+    if system.storage.particleExists(pid):
+        particle = system.storage.getParticle(pid)
         if unfolded == False:
           xpos   = particle.pos[0]
           ypos   = particle.pos[1]

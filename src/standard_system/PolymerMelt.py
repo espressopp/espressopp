@@ -20,10 +20,10 @@ def PolymerMelt(num_chains, monomers_per_chain, box, bondlen=2.0, rc=1.12246, sk
   integrator     = espresso.integrator.VelocityVerlet(system)  
   integrator.dt  = dt
   if (temperature != None):
-    thermostat             = espresso.integrator.Langevin(system)
+    thermostat             = espresso.integrator.LangevinThermostat(system)
     thermostat.gamma       = 1.0
     thermostat.temperature = temperature
-    integrator.langevin    = thermostat
+    integrator.addExtension(thermostat)
   
   props    = ['id', 'type', 'mass', 'pos', 'v']
   vel_zero = espresso.Real3D(0.0, 0.0, 0.0)

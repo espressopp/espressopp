@@ -17,10 +17,10 @@ def Minimal(num_particles, box, rc=1.12246, skin=0.3, dt=0.005, temperature=None
   integrator     = espresso.integrator.VelocityVerlet(system)  
   integrator.dt  = dt
   if (temperature != None):
-    thermostat             = espresso.integrator.Langevin(system)
+    thermostat             = espresso.integrator.LangevinThermostat(system)
     thermostat.gamma       = 1.0
     thermostat.temperature = temperature
-    integrator.langevin    = thermostat
+    integrator.addExtension(thermostat)
   
   props = ['id', 'type', 'mass', 'pos', 'v']
   new_particles = []

@@ -11,9 +11,9 @@ def info(system, integrator, per_atom=False):
   Epot   = []
   Etotal = 0.0
   if per_atom:
-    tot    = '%5d %8.6f %10.6f %10.6f %12.8f' % (step, T, P, Pij[3], Ek/NPart)
+    tot    = '%5d %10.4f %10.6f %10.6f %12.8f' % (step, T, P, Pij[3], Ek/NPart)
   else:
-    tot    = '%5d %8.6f %10.6f %10.6f %12.3f' % (step, T, P, Pij[3], Ek)      
+    tot    = '%5d %10.4f %10.6f %10.6f %12.3f' % (step, T, P, Pij[3], Ek)      
   tt     = ''
   for k in range(system.getNumberOfInteractions()):
     e       = system.getInteraction(k).computeEnergy()
@@ -35,9 +35,9 @@ def info(system, integrator, per_atom=False):
   tt  += '    boxL     \n'
   if step == 0:
     if per_atom:
-      sys.stdout.write(' step     T          P        Pxy         ekin/N   ' + tt)
+      sys.stdout.write(' step      T          P        Pxy         ekin/N  ' + tt)
     else:
-      sys.stdout.write(' step     T          P        Pxy          ekin    ' + tt)        
+      sys.stdout.write(' step      T          P        Pxy          ekin   ' + tt)        
   sys.stdout.write(tot)
 
 def final_info(system, integrator, vl, start_time, end_time):
