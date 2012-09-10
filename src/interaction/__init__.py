@@ -35,3 +35,4 @@ from espresso.interaction.CoulombKSpaceEwald import *
 from espresso.interaction.CoulombRSpace import *
 from espresso.interaction.StillingerWeberPairTerm import *
 from espresso.interaction.StillingerWeberTripleTerm import *
+from espresso.interaction.StillingerWeberPairTermCapped import *

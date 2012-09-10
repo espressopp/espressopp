@@ -1,6 +1,6 @@
 // ESPP_CLASS
-#ifndef _INTERACTION_STILLINGERWEBERPAIRTERM_HPP
-#define _INTERACTION_STILLINGERWEBERPAIRTERM_HPP
+#ifndef _INTERACTION_STILLINGERWEBERPAIRTERMCAPPED_HPP
+#define _INTERACTION_STILLINGERWEBERPAIRTERMCAPPED_HPP
 
 #include "Potential.hpp"
 
@@ -16,31 +16,32 @@ namespace espresso {
     /** This class provides methods to compute forces and energies of
 	2 body term of Stillinger-Weber potential.
     */
-    class StillingerWeberPairTerm : public PotentialTemplate< StillingerWeberPairTerm > {
+    class StillingerWeberPairTermCapped : public PotentialTemplate< StillingerWeberPairTermCapped > {
     private:
       // 2 body
       real A, B, p, q;
       real epsilon;
       real sigma;
       
+      real caprad;
     public:
       static void registerPython();
 
-      StillingerWeberPairTerm(): A(0.0), B(0.0), p(0.0), q(0.0), epsilon(0.0), sigma(0.0){
+      StillingerWeberPairTermCapped(): A(0.0), B(0.0), p(0.0), q(0.0), epsilon(0.0), sigma(0.0), caprad(0.0){
         setShift(0.0);
         setCutoff(infinity);
         preset();
       }
 
-      StillingerWeberPairTerm(real _A, real _B, real _p, real _q, real _epsilon,
-                real _sigma, real _cutoff):
-                A(_A), B(_B), p(_p), q(_q), epsilon(_epsilon), sigma(_sigma){
+      StillingerWeberPairTermCapped(real _A, real _B, real _p, real _q, real _epsilon,
+                real _sigma, real _cutoff, real _caprad):
+                A(_A), B(_B), p(_p), q(_q), epsilon(_epsilon), sigma(_sigma), caprad(_caprad){
         setShift(0.0);
         setCutoff(_cutoff);
         preset();
       }
 
-      virtual ~StillingerWeberPairTerm() {};
+      virtual ~StillingerWeberPairTermCapped() {};
 
       void setA(real _A) { A = _A; }
       real getA() const { return A; }
@@ -59,7 +60,6 @@ namespace espresso {
         epsilon = _epsilon;
         preset();
       }
-      
       real getEpsilon() const { return epsilon; }
 
       void setSigma(real _sigma) { 
@@ -67,6 +67,12 @@ namespace espresso {
         preset();
       }
       real getSigma() const { return sigma; }
+      
+      void setCaprad(real _caprad) {
+        caprad = _caprad;
+        preset();
+      }
+      real getCaprad() const { return caprad; }
 
       
       void preset() {
@@ -74,6 +80,9 @@ namespace espresso {
 
       real _computeEnergySqrRaw(real distSqr) const {
         real d12 = sqrt(distSqr);
+        
+        if (d12 < getCaprad()) d12 = getCaprad();
+        
         real inv_d12_a = 1.0 / (d12-getCutoff());
         //real energy = epsilon*A * ( B/pow(d12, p)-1.0/pow(d12, q) ) * exp ( inv_d12_a );
         real energy = A * ( B*pow(d12, -p) - pow(d12, -q) ) * exp ( inv_d12_a );
@@ -83,7 +92,17 @@ namespace espresso {
       bool _computeForceRaw(Real3D& force, const Real3D& r12, real distSqr) const {
 
         real d12 = sqrt(distSqr);
-        real inv_d12 = 1.0 / d12;
+        
+//std::cout << " caprad: "<< getCaprad()<< std::endl;
+//exit(0);
+        
+        real inv_d12vec = 1.0 / d12;
+        real inv_d12 = inv_d12vec;
+        if (d12 < getCaprad()){
+          d12 = getCaprad();
+          inv_d12 = 1.0 / d12;
+        }
+        
         real inv_d12_a = 1.0 / (d12-getCutoff());
         
         real term1 = B * pow(d12, -p);
@@ -98,7 +117,7 @@ namespace espresso {
         
         real ffactor = energy * ( term3 + inv_d12_a2);
         
-        force = r12 * inv_d12 * ffactor;
+        force = r12 * inv_d12vec * ffactor;
         return true;
       }
     };
