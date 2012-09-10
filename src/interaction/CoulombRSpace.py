@@ -102,7 +102,7 @@ class VerletListCoulombRSpaceLocal(InteractionLocal, interaction_VerletListCoulo
   def setPotential(self, type1, type2, potential):
     'The method sets the potential for the particles of `type1` and `type2` from the interaction'
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      return self.cxxclass.setPotential(self, type1, type2, potential)
+      self.cxxclass.setPotential(self, type1, type2, potential)
 
   def getPotential(self, type1, type2):
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

@@ -43,7 +43,8 @@ namespace espresso {
         return verletList;
       }
 
-      Potential &setPotential(int type1, int type2, const Potential &potential) {
+      void
+      setPotential(int type1, int type2, const Potential &potential) {
        //setPotential(int type1, int type2, shared_ptr<Potential> potential) {
         // typeX+1 because i<ntypes
         ntypes = std::max(ntypes, std::max(type1+1, type2+1));
@@ -52,7 +53,6 @@ namespace espresso {
         if (type1 != type2) { // add potential in the other direction
            potentialArray.at(type2, type1) = potential;
         }
-        return potentialArray.at(type1, type2);
       }
 
       Potential &getPotential(int type1, int type2) {

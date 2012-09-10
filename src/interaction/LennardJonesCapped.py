@@ -30,7 +30,7 @@ class VerletListLennardJonesCappedLocal(InteractionLocal, interaction_VerletList
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.setPotential(self, type1, type2, potential)
+            self.cxxclass.setPotential(self, type1, type2, potential)
 
     def getPotential(self, type1, type2):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -70,7 +70,7 @@ class CellListLennardJonesCappedLocal(InteractionLocal, interaction_CellListLenn
 
     def getPotential(self, type1, type2):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.setPotential(self, type1, type2)
+            return self.cxxclass.getPotential(self, type1, type2)
 
 class FixedPairListLennardJonesCappedLocal(InteractionLocal, interaction_FixedPairListLennardJonesCapped):
     'The (local) Lennard-Jones interaction using FixedPair lists.'
@@ -84,7 +84,7 @@ class FixedPairListLennardJonesCappedLocal(InteractionLocal, interaction_FixedPa
 
     def getPotential(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.setPotential(self)
+            return self.cxxclass.getPotential(self)
 
 if pmi.isController:
     class LennardJonesCapped(Potential):
