@@ -27,7 +27,7 @@ nvt = True
 timestep = 0.01
 spline  = 2                                # spline interpolation type (1, 2, 3)
 
-conffile = 'espressopp_polymer_melt.start' # file with inital configuration
+conffile = 'polymer_melt.start' # file with inital configuration
 tabfileLJ = "pot-lj.txt"
 tabfileFENE = "pot-fene.txt"
 tabfileCosine = "pot-cosine.txt"
@@ -160,10 +160,10 @@ for tabulation in [True, False]:
     integrator.dt = timestep
         
     if(nvt):
-        langevin = espresso.integrator.Langevin(system)
+        langevin = espresso.integrator.LangevinThermostat(system)
         langevin.gamma = 1.0
         langevin.temperature = 1.0
-        integrator.langevin = langevin
+        integrator.addExtension(langevin)
         
         
     # analysis

@@ -146,8 +146,8 @@ for spline in range(1,len(splinetypes)+1):
         % ("", Ek + Ep, Ep, Ek, temperature, p)
         
     # langevin thermostat
-    langevin = espresso.integrator.Langevin(system)
-    integrator.langevin = langevin
+    langevin = espresso.integrator.LangevinThermostat(system)
+    integrator.addExtension(langevin)
     langevin.gamma = 1.0
     langevin.temperature = 1.0
      

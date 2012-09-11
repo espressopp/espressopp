@@ -128,11 +128,11 @@ system.addInteraction(intera)
 
 
 # langevin thermostat
-langevin = espresso.integrator.Langevin(system)
+langevin = espresso.integrator.LangevinThermostat(system)
 langevin.gamma = 1.0
 langevin.temperature = 1.0
 integrator = espresso.integrator.VelocityVerlet(system)
-integrator.langevin = langevin
+integrator.addExtension(langevin)
 integrator.dt = timestep
 
 
