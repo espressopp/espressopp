@@ -1,9 +1,0 @@
-if ENABLE_SHARED
-noinst_LTLIBRARIES += _diamond.la
-_diamond_la_SOURCES = \
-	boost.python/diamond/diamond.cpp
-# use -rpath to make sure that a shared lib is built
-_diamond_la_LDFLAGS = -shared -module -avoid-version -no-undefined -rpath /nowhere
-_diamond_la_LIBADD = $(ESPRESSO_BOOST_LIBS) $(PYTHON_LIBS)
-endif
-

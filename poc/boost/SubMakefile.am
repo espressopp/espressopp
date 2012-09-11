@@ -1,4 +1,0 @@
-noinst_PROGRAMS += boost/shared_ptr
-
-boost_shared_ptr_SOURCES = boost/shared_ptr.cpp
-boost_shared_ptr_LDADD = $(ESPRESSO_BOOST_LIBS)
