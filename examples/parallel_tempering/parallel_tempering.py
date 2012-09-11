@@ -3,6 +3,7 @@ from espresso import Int3D, Real3D
 from espresso.tools import decomp
 from espresso.tools.init_cfg import lattice
 import random
+import sys
          
 # some global definitions
 skin         = 0.3
@@ -16,6 +17,10 @@ temperature  = 1.0
 
 ptrng=random
 ptrng.seed(335977)
+
+if espresso.MPI.COMM_WORLD.size != 4:
+  print "currently this example can only be run with 4 CPUs"
+  sys.exit(0)
 
 # Parallel Tempering (replica exchange) integrator
 ptthermostats=[] 
