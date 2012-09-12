@@ -68,7 +68,8 @@ namespace espresso {
 
       void _computeForce(Real3D& force12, Real3D& force32,
 			 const Particle &p1, const Particle &p2, const Particle &p3) const;
-      void _computeForce(Real3D& force12, Real3D& force32,
+      
+      bool _computeForce(Real3D& force12, Real3D& force32,
 			 const Real3D& dist12, const Real3D& dist32) const;
 
       // Requires the following non-virtual interface in Derived
@@ -211,14 +212,14 @@ namespace espresso {
     }
 
     template < class Derived >
-    inline void
+    inline bool
     AngularPotentialTemplate< Derived >::
     _computeForce(Real3D& force12,
                   Real3D& force32,
                   const Real3D& dist12,
                   const Real3D& dist32) const {
       
-      derived_this()->_computeForceRaw(force12, force32, dist12, dist32);
+      return derived_this()->_computeForceRaw(force12, force32, dist12, dist32);
     }
     
     // used for generating tabular angular potential

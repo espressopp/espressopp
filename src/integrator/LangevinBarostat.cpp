@@ -192,6 +192,8 @@ namespace espresso {
        */
       real pe_deriv = (X - m3V * externalPressure) + pref6 * v2sum + pref4 * momentum + pref5 * rannum;
       
+      //cout<< "externalPressure: " << externalPressure << endl;
+      
       momentum += dt_2 * pe_deriv;
       momentum_mass = momentum / mass; // momentum is normalized by mass already
     }

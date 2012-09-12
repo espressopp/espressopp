@@ -85,7 +85,7 @@ namespace espresso {
         }
       }
       
-      void _computeForceRaw(Real3D& force12, Real3D& force32,
+      bool _computeForceRaw(Real3D& force12, Real3D& force32,
 			    const Real3D& r12, const Real3D& r32) const{
         
         real d12 = r12.abs();
@@ -94,6 +94,7 @@ namespace espresso {
         if (d12 >= getCutoff() || d32 >= getCutoff() ){
           force12 = 0.0;
           force32 = 0.0;
+          return false;
         }
         else{
           real inv_d12 = 1.0 / d12;
@@ -101,7 +102,6 @@ namespace espresso {
           
           Real3D e12 = r12 * inv_d12;
           Real3D e32 = r32 * inv_d32;
-          
           
           real inv_d12_a = 1.0 / (d12 - getCutoff());
           real inv_d32_a = 1.0 / (d32 - getCutoff());
@@ -117,19 +117,19 @@ namespace espresso {
           
           real energy3 = expProduct * difCos2;
           
-          real factor = - gamma * energy3; // - gamma * energy(r12, r32)
+          real factor = gamma * energy3;
           
           real expTerm = 2.0 * expProduct * difCos;
 
-          force12 = factor * e12 * inv_d12_a2 +
+          force12 = factor * e12 * inv_d12_a2 -
                     expTerm * (e32 - e12 * cosTeta123) * inv_d12;
 
-          force32 = factor * e32 * inv_d32_a2 +
+          force32 = factor * e32 * inv_d32_a2 -
                     expTerm * (e12 - e32 * cosTeta123) * inv_d32;
+          return true;
         }
         
       }
-      
       
       real _computeEnergyRaw(real _theta) const {
         std::cout<<"Function _computeEnergyRaw doesn't work in StillingerWeberTripleTerm"<<std::endl;
@@ -138,11 +138,9 @@ namespace espresso {
       }
 
       real _computeForceRaw(real theta) const {
-
         std::cout<<"Function _computeForceRaw(teta) doesn't work in StillingerWeberTripleTerm"<<std::endl;
         return 0.0;
       }
-      
       
     };
   }

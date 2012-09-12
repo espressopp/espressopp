@@ -46,7 +46,7 @@ namespace espresso {
                         throw std::runtime_error("Tabulated angular potential table not available.");
                 }
              
-                void _computeForceRaw(Real3D& force12, Real3D& force32,
+                bool _computeForceRaw(Real3D& force12, Real3D& force32,
                                       const Real3D& dist12, const Real3D& dist32) const {
                     if (table) {
                         real dist12_sqr = dist12 * dist12;
@@ -66,6 +66,7 @@ namespace espresso {
                     else {
                         throw std::runtime_error("Tabulated angular potential table not available.");
                     }
+                    return true;
                 }
              
                 real _computeForceRaw(real theta) const {

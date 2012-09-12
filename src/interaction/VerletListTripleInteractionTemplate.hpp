@@ -86,16 +86,7 @@ namespace espresso {
     addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by VerletListTriple");
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      //for (VerletListTriple::TripleList::Iterator it(*verletlisttriple); it.isValid(); ++it) {
-/*      
-Real3D res;
-Real3D pp1(1.0,2.0,3.0);
-Real3D pp2(1.5,2.5,3.5);
-        
-bc.getMinimumImageVectorBox(res, pp1, pp2);
-std::cout<<"In force loop. F1:"<< res << "  F2: "<< pp1 <<std::endl;
-exit(0);
-*/
+      
       for (TripleList::Iterator it(verletListTriple->getTriples()); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second; // the main particle
@@ -104,13 +95,14 @@ exit(0);
         Real3D dist12, dist32;
         //bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
         //bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
-        bc.getMinimumImageVectorBox(dist12, p2.position(), p1.position());
-        bc.getMinimumImageVectorBox(dist32, p2.position(), p3.position());
+        bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
+        bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
         Real3D force12, force32;
-        potential->_computeForce(force12, force32, dist12, dist32);
-        p1.force() += force12;
-        p2.force() -= force12 + force32;
-        p3.force() += force32;
+        if(potential->_computeForce(force12, force32, dist12, dist32)){
+          p1.force() += force12;
+          p2.force() -= force12 + force32;
+          p3.force() += force32;
+        }
       }
     }
 
@@ -144,7 +136,6 @@ exit(0);
 
       const bc::BC& bc = *getSystemRef().bc;
       real w = 0.0;
-      //for (VerletListTriple::TripleList::Iterator it(*verletListTriple); it.isValid(); ++it) {
       for (TripleList::Iterator it(verletListTriple->getTriples()); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
@@ -155,10 +146,15 @@ exit(0);
         bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
         Real3D force12, force32;
-        potential->_computeForce(force12, force32, dist12, dist32);
-        w += dist12 * force12 + dist32 * force32;
+        if(potential->_computeForce(force12, force32, dist12, dist32)){
+          w += dist12 * force12 + dist32 * force32;
+        }
       }
-      return w;
+      
+      real wsum;
+      boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
+      
+      return wsum;
     }
 
     template < typename _ThreeBodyPotential > inline void
@@ -167,7 +163,6 @@ exit(0);
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 
       const bc::BC& bc = *getSystemRef().bc;
-      //for (VerletListTriple::TripleList::Iterator it(*verletListTriple); it.isValid(); ++it) {
       for (TripleList::Iterator it(verletListTriple->getTriples()); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
@@ -177,8 +172,9 @@ exit(0);
         bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
         Real3D force12, force32;
-        potential->_computeForce(force12, force32, dist12, dist32);
-        w += Tensor(dist12, force12) + Tensor(dist32, force32);
+        if(potential->_computeForce(force12, force32, dist12, dist32)){
+          w += Tensor(dist12, force12) + Tensor(dist32, force32);
+        }
       }
     }
 

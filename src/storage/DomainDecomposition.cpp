@@ -14,6 +14,7 @@
 #include "Buffer.hpp"
 
 #include "iterator/CellListIterator.hpp"
+#include "esutil/Error.hpp"
 
 #include "boost/serialization/vector.hpp"
 
@@ -148,9 +149,10 @@ namespace espresso {
       Real3D Li = getSystem() -> bc -> getBoxL(); // getting the system size
       real minL = min(Li[0], min(Li[1],Li[2]));
       if(cs > minL){
-        cout << "The current system size "<< minL <<" smaller then cutoff+skin "<< cs << endl;
-        // TODO error handling
-        exit(-1);
+        esutil::Error err(getSystemRef().comm);
+        stringstream msg;
+        msg<<"Error. The current system size "<< minL <<" smaller then cutoff+skin "<< cs;
+        err.setException( msg.str() );
       }
       else{
         cellAdjust();
@@ -178,9 +180,10 @@ namespace espresso {
       Real3D Li = getSystem() -> bc -> getBoxL(); // getting the system size
       real minL = min(Li[0], min(Li[1],Li[2]));
       if(cs > minL){
-        cout << "The current system size "<< minL <<" smaller then cutoff+skin "<< cs << endl;
-        // TODO error handling
-        exit(-1);
+        esutil::Error err(getSystemRef().comm);
+        stringstream msg;
+        msg<<"Error. The current system size "<< minL <<" smaller then cutoff+skin "<< cs;
+        err.setException( msg.str() );
       }
       else
         cellAdjust();

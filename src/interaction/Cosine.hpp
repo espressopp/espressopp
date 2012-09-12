@@ -36,7 +36,7 @@ namespace espresso {
       }
 
       // theta0 is ignored at the moment (TODO)
-      void _computeForceRaw(Real3D& force12,
+      bool _computeForceRaw(Real3D& force12,
                             Real3D& force32,
 			    const Real3D& dist12,
 			    const Real3D& dist32) const {
@@ -57,6 +57,8 @@ namespace espresso {
 
         force12 = a11 * dist12 + a12 * dist32;
         force32 = a22 * dist32 + a12 * dist12;
+        
+        return true;
       }
       
       // used for generating tabular angular potential
