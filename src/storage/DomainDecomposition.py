@@ -2,6 +2,8 @@ from espresso import pmi
 from espresso.esutil import cxxinit
 from _espresso import storage_DomainDecomposition
 from espresso import Int3D, toInt3DFromVector
+from espresso.tools import decomp
+from espresso import check
 import MPI
 
 from espresso.storage.Storage import *
@@ -29,16 +31,22 @@ if pmi.isController:
         def __init__(self, system, 
                      nodeGrid='auto', 
                      cellGrid='auto'):
-            if nodeGrid == 'auto':
-                nodeGrid = Int3D(system.comm.rank, 1, 1)
-            else:
+            # do sanity checks for the system first
+            if check.System(system, 'bc'):
+              if nodeGrid == 'auto':
+                nodeGrid = decomp.nodeGrid(system.comm.rank)
+              else:
                 nodeGrid = toInt3DFromVector(nodeGrid)
-
-            if cellGrid == 'auto':
-                # TODO: Implement
-                raise 'Automatic cell size calculation not yet implemented'
-            else:
+              if cellGrid == 'auto':
+                cellGrid = Int3D(2,2,2)
+              else:
                 cellGrid = toInt3DFromVector(cellGrid)
-
-            self.next_id = 0
-            self.pmiinit(system, nodeGrid, cellGrid)
+              # minimum image convention check:
+              for k in range(3):
+                if nodeGrid[k]*cellGrid[k] == 1 :
+                  cellGrid[k] = 2
+                  print 'cellGrid[%i] has been adjusted to 2'                  
+              self.next_id = 0
+              self.pmiinit(system, nodeGrid, cellGrid)
+            else:
+              print 'Error: could not create DomainDecomposition object'

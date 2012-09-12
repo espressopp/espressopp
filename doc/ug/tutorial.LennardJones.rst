@@ -43,13 +43,13 @@ And lets add some random particles:
 
 All particles should interact via a Lennard Jones potential:
 
->>> LJPot = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=maxcutoff, shift=True)
+>>> LJPot = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=maxcutoff, shift='auto')
 
 shift=True means that the potential will be shifted at the cutoff so that potLJ(cutoff)=0
 Next we create a VerletList which will than be used in the interaction:
 (the Verlet List object needs to know from which system to get its particles and which cutoff to use)
 
->>> verletlist = espresso.VerletList(system, cutoff=maxcutoff+system.skin)
+>>> verletlist = espresso.VerletList(system, cutoff=maxcutoff)
 
 Now create a non bonded interaction object and add the Lennard Jones potential to that:
 
@@ -60,17 +60,27 @@ Tell the system about the newly created NonBondedInteraction object:
 
 >>> system.addInteraction(NonBondedInteraction)
 
-We should set the langevin thermostat in the integrator to cool down the random particles:
+We should set the langevin thermostat in the integrator to cool down the random particle system:
 
->>> langevin             = espresso.integrator.Langevin(system)
+>>> langevin             = espresso.integrator.LangevinThermostat(system)
 >>> langevin.gamma       = 1.0
 >>> langevin.temperature = 1.0
->>> integrator.langevin  = langevin
+>>> integrator.addExtension(langevin)
 
-and finally let the system run and see how it relaxes:
+and finally let the system run and see how it relaxes or explodes:   
 
 >>> espresso.tools.analyse.info(system, integrator)
 >>> for k in range(100):
 >>>   integrator.run(10)
 >>>   espresso.tools.analyse.info(system, integrator)
 
+Due to the random particle positions it may happen, that two or more particles are very close to
+each other and the resulting repulsive force between them are so high that they 'shoot off' in
+different directions with very high speed. Usually the numbers are then larger than the computer
+can deal with. A typical error message you get could look like this:
+
+.. note::
+   ERROR: particle 5 has moved to outer space (one or more coordinates are nan)
+   
+In order to prevent this, systems that are setup in a random way and thus have strong overlaps between particels
+have to be "warmed up" before they can be equilibrated. 

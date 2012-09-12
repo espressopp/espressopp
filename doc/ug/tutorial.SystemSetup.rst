@@ -60,7 +60,7 @@ Tell the system about it:
 In the most simple case, if you want to use only one CPU, the *nodeGrid* and the *cellGrid* could look like this:
 
 >>> nodeGrid       = (1,1,1)
->>> cellGrid       = (1,1,1)
+>>> cellGrid       = (2,2,2)
 
 In general you don't need to take care of that yourself. Just use the corresponding |espp| routines to
 calculate a reasonable  *nodeGrid* and *cellGrid*:
@@ -124,13 +124,12 @@ Every particle in |espp| has a unique particle id and a position (this is obliga
 >>>                                # at the beginning of your script
 >>> system.storage.addParticle(pid, pos)
 
-Of course nothing will happen if we integrate this. The particle will stay where it is.
+Of course nothing will happen when we integrate this. The particle will stay where it is.
 Add some initial velocity to the particle by adding the follow line to the script:
 
 >>> system.storage.modifyParticle(pid, 'v', Real3D(1.0, 0, 0))
 
-In a multi cpu (MPI) environment you should make sure that all particles are distributed
-to their correct processor by calling
+After particles have been modified make sure that this information is distributed to all CPUs:
 
 >>> system.storage.decompose()
 
@@ -163,7 +162,7 @@ a particle list first:
 
 To have a look at the overall system there are several possibilities.
 The easiest way to get a nice picture is by writing out a PDB file and
-look at the configuration with some visualization programm (e.g. VMD):
+looking at the configuration with some visualization programm (e.g. VMD):
 
 >>> filename = "myconf.pdb"
 >>> espresso.tools.pdb.pdbwrite(filename, system)
