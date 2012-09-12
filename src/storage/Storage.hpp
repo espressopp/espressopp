@@ -43,6 +43,13 @@ namespace espresso {
       /** It should return cell grid as an integer vector*/
       virtual Int3D getInt3DCellGrid() =0;
 
+      virtual real getLocalBoxXMin() =0;
+      virtual real getLocalBoxYMin() =0;
+      virtual real getLocalBoxZMin() =0;
+      virtual real getLocalBoxXMax() =0;
+      virtual real getLocalBoxYMax() =0;
+      virtual real getLocalBoxZMax() =0;
+
       /** add a particle with given id and position. Note that this is a
 	  local operation, and therefore cannot check whether a particle
 	  with the given id already exists.  This is left to the parallel

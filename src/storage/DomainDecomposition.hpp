@@ -44,6 +44,13 @@ namespace espresso {
       const NodeGrid &getNodeGrid() const { return nodeGrid; }
       const CellGrid &getCellGrid() const { return cellGrid; }
 
+      virtual real getLocalBoxXMin() { return nodeGrid.getMyLeft(0); }
+      virtual real getLocalBoxYMin() { return nodeGrid.getMyLeft(1); }
+      virtual real getLocalBoxZMin() { return nodeGrid.getMyLeft(2); }
+      virtual real getLocalBoxXMax() { return nodeGrid.getMyRight(0); }
+      virtual real getLocalBoxYMax() { return nodeGrid.getMyRight(1); }
+      virtual real getLocalBoxZMax() { return nodeGrid.getMyRight(2); }
+
       virtual void updateGhosts();
       virtual void updateGhostsV();
       virtual void collectGhostForces();
