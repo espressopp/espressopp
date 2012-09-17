@@ -98,7 +98,7 @@ namespace espresso {
           real inv_d32_a = 1.0 / (d32 - sigma * getCutoff());
 
           real cosTeta123 = (r12 * r32) / (d12 * d32);
-          real difCos = cosTeta123 + cosTeta0;
+          real difCos = cosTeta123 - cosTeta0;
           real difCos2 = difCos * difCos;
           
           real expProduct = exp( sigmaGamma * (inv_d12_a+inv_d32_a) );
@@ -134,7 +134,7 @@ namespace espresso {
           real inv_d32_a2 = inv_d32_a*inv_d32_a;
 
           real cosTeta123 = (r12 * r32) * ( inv_d12 * inv_d32 );
-          real difCos = cosTeta123 + cosTeta0;
+          real difCos = cosTeta123 - cosTeta0;
           real difCos2 = difCos * difCos;
           
           real expProduct = epsilonLambda * exp( sigmaGamma*(inv_d12_a+inv_d32_a) );
