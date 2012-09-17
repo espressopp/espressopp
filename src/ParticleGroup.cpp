@@ -110,6 +110,7 @@ namespace espresso {
                 .def("add", &ParticleGroup::add)
                 .def("show", &ParticleGroup::print)
                 .def("has", &ParticleGroup::has)
+                .def("size", &ParticleGroup::size)
                 ;
     }
 }

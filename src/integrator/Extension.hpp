@@ -28,7 +28,8 @@ namespace espresso {
             Barostat=2,
             Constraint=3,
             Adress=4,
-            TDforce=5
+            TDforce=5,
+            ExtForce=6
         };
 
 

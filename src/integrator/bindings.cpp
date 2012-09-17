@@ -14,6 +14,7 @@
 #include "DPDThermostat.hpp"
 #include "LangevinBarostat.hpp"
 #include "FixPositions.hpp"
+#include "ExtForce.hpp"
 
 namespace espresso {
   namespace integrator {
@@ -32,6 +33,7 @@ namespace espresso {
       LangevinThermostat::registerPython();
       DPDThermostat::registerPython();
       FixPositions::registerPython();
+      ExtForce::registerPython();
     }
   }
 }

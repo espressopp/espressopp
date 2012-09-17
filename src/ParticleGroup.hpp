@@ -38,6 +38,8 @@ namespace espresso {
 
             const bool has(longint pid);
 
+            longint size() {return particles.size();}
+
             static void registerPython();
 
             /**
