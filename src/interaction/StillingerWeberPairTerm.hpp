@@ -23,6 +23,7 @@ namespace espresso {
       real epsilon;
       real sigma;
       
+      real epsilonA;
     public:
       static void registerPython();
 
@@ -42,7 +43,10 @@ namespace espresso {
 
       virtual ~StillingerWeberPairTerm() {};
 
-      void setA(real _A) { A = _A; }
+      void setA(real _A) {
+        A = _A;
+        preset();
+      }
       real getA() const { return A; }
 
       void setB(real _B) { B = _B; }
@@ -70,31 +74,36 @@ namespace espresso {
 
       
       void preset() {
+        epsilonA = epsilon * A;
       }
 
       real _computeEnergySqrRaw(real distSqr) const {
-        real d12 = sqrt(distSqr);
-        real inv_d12_a = 1.0 / (d12-getCutoff());
-        //real energy = epsilon*A * ( B/pow(d12, p)-1.0/pow(d12, q) ) * exp ( inv_d12_a );
-        real energy = A * ( B*pow(d12, -p) - pow(d12, -q) ) * exp ( inv_d12_a );
+        real d12 = sqrt(distSqr) / sigma;
+        real inv_d12_a = 1.0 / (d12 - getCutoff());
+        
+        real energy = epsilonA * ( B * pow(d12, -p) - pow(d12, -q) ) * exp(inv_d12_a);
         return energy;
       }
 
       bool _computeForceRaw(Real3D& force, const Real3D& r12, real distSqr) const {
 
-        real d12 = sqrt(distSqr);
-        real inv_d12 = 1.0 / d12;
+        
+        real d12aux = sqrt(distSqr);
+        real inv_d12 = 1.0 / d12aux;
+        
+        real d12 = d12aux / sigma;
+        real sigmaInv_d12 = sigma * inv_d12;
         real inv_d12_a = 1.0 / (d12-getCutoff());
         
         real term1 = B * pow(d12, -p);
         real term2 = pow(d12, -q);
         real term12 = term1 - term2;
         
-        real energy = A * term12 * exp ( inv_d12_a );
+        real energy = epsilonA * term12 * exp ( inv_d12_a );
         
         real inv_d12_a2 = inv_d12_a*inv_d12_a;
         
-        real term3 = ( p*term1 - q*term2 ) * inv_d12 / term12;
+        real term3 = ( p*term1 - q*term2 ) * sigmaInv_d12 / term12;
         
         real ffactor = energy * ( term3 + inv_d12_a2);
         
