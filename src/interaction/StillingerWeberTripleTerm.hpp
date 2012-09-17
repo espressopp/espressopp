@@ -7,6 +7,10 @@
 #include "FixedTripleListInteractionTemplate.hpp"
 #include <cmath>
 
+#ifndef M_PIl
+#define M_PIl 3.1415926535897932384626433832795029L
+#endif
+
 namespace espresso {
   namespace interaction {
     /* This class provides methods to compute forces and energies of
@@ -21,6 +25,8 @@ namespace espresso {
       real epsilon, sigma, rc;
       
       real cosTeta0;
+      
+      real sigmaGamma, epsilonLambda;
     public:
       static void registerPython();
 
@@ -39,23 +45,42 @@ namespace espresso {
 
       virtual ~StillingerWeberTripleTerm() {};
       
-      void setGamma(real _gamma) { gamma = _gamma; }
+      void setGamma(real _gamma) {
+        gamma = _gamma;
+        preset();
+      }
       real getGamma() const { return gamma; }
       
-      void setTheta0(real _theta0) { theta0 = _theta0; }
+      void setTheta0(real _theta0) {
+        theta0 = _theta0;
+        preset();
+      }
       real getTheta0() const { return theta0; }
 
-      void setLambda(real _lambda) { lambda = _lambda; }
+      void setLambda(real _lambda) {
+        lambda = _lambda;
+        preset();
+      }
       real getLambda() const { return lambda; }
       
-      void setEpsilon(real _epsilon) { epsilon = _epsilon; }
+      void setEpsilon(real _epsilon) {
+        epsilon = _epsilon;
+        preset();
+      }
       real getEpsilon() const { return epsilon; }
       
-      void setSigma(real _sigma) { sigma = _sigma; }
+      void setSigma(real _sigma) {
+        sigma = _sigma;
+        preset();
+      }
       real getSigma() const { return sigma; }
       
       void preset() {
-        cosTeta0 = 1.0/3.0;
+        // convert degrees to radians
+        theta0 = theta0 * M_PIl/180;
+        cosTeta0 = cos(theta0);
+        sigmaGamma = sigma * gamma;
+        epsilonLambda = epsilon * lambda;
       }
       
       
@@ -69,17 +94,16 @@ namespace espresso {
         if (d12 >= getCutoff() || d32 >= getCutoff() )
           return 0.0;
         else{
-          real inv_d12_a = 1.0 / (d12 - getCutoff());
-          real inv_d32_a = 1.0 / (d32 - getCutoff());
+          real inv_d12_a = 1.0 / (d12 - sigma * getCutoff());
+          real inv_d32_a = 1.0 / (d32 - sigma * getCutoff());
 
           real cosTeta123 = (r12 * r32) / (d12 * d32);
           real difCos = cosTeta123 + cosTeta0;
           real difCos2 = difCos * difCos;
-          real expProduct = exp( gamma*(inv_d12_a+inv_d32_a) );
-
-          //real energy3 = epsilon*lambda* exp( gamma*inv_d12_a) * exp(gamma*inv_d32_a) * difCos2;
           
-          real energy3 = lambda * expProduct * difCos2;
+          real expProduct = exp( sigmaGamma * (inv_d12_a+inv_d32_a) );
+
+          real energy3 = epsilonLambda * expProduct * difCos2;
 
           return energy3;
         }
@@ -103,8 +127,8 @@ namespace espresso {
           Real3D e12 = r12 * inv_d12;
           Real3D e32 = r32 * inv_d32;
           
-          real inv_d12_a = 1.0 / (d12 - getCutoff());
-          real inv_d32_a = 1.0 / (d32 - getCutoff());
+          real inv_d12_a = 1.0 / (d12 - sigma * getCutoff());
+          real inv_d32_a = 1.0 / (d32 - sigma * getCutoff());
 
           real inv_d12_a2 = inv_d12_a*inv_d12_a;
           real inv_d32_a2 = inv_d32_a*inv_d32_a;
@@ -113,11 +137,11 @@ namespace espresso {
           real difCos = cosTeta123 + cosTeta0;
           real difCos2 = difCos * difCos;
           
-          real expProduct = lambda * exp( gamma*(inv_d12_a+inv_d32_a) );
+          real expProduct = epsilonLambda * exp( sigmaGamma*(inv_d12_a+inv_d32_a) );
           
           real energy3 = expProduct * difCos2;
           
-          real factor = gamma * energy3;
+          real factor = sigmaGamma * energy3;
           
           real expTerm = 2.0 * expProduct * difCos;
 
