@@ -68,7 +68,7 @@ namespace espresso {
     	  }
       }
       
-      cout << "11111nave="<<nsum<<" nsqsum="<<nsqsum<< endl;
+      //cout << "11111nave="<<nsum<<" nsqsum="<<nsqsum<< endl;
       
       //real nave = (1.0*(real)nsum/(real)n_part);
       
@@ -79,7 +79,7 @@ namespace espresso {
       real E;
 
       //std::cout << "nave_sq="<<nave_sq<<" nsq_ave="<<nsq_ave<< " myE="<< myE << std::endl;
-      cout << "nave_sq="<<nave_sq<<" nsq_ave="<<nsq_ave<< " myE="<< myE << endl;
+      //cout << "nave_sq="<<nave_sq<<" nsq_ave="<<nsq_ave<< " myE="<< myE << endl;
 
       mpi::all_reduce(*system.comm, myE, E, std::plus<real>());
       
