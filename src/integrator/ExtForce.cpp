@@ -29,15 +29,15 @@ namespace espresso {
     }
 
     void ExtForce::disconnect(){
-      _aftCalcF.disconnect();
+      _aftInitF.disconnect();
     }
 
     void ExtForce::connect(){
       // connection to initialisation
       if (!allParticles) {
-        _aftCalcF  = integrator->aftCalcF.connect( boost::bind(&ExtForce::applyForceToGroup, this));
+        _aftInitF  = integrator->aftInitF.connect( boost::bind(&ExtForce::applyForceToGroup, this));
       } else {
-    	_aftCalcF  = integrator->aftCalcF.connect( boost::bind(&ExtForce::applyForceToAll, this));
+    	_aftInitF  = integrator->aftInitF.connect( boost::bind(&ExtForce::applyForceToAll, this));
       }
     }
 

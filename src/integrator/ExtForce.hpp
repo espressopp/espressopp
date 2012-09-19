@@ -40,7 +40,7 @@ namespace espresso {
         static void registerPython();
 
       private:
-        boost::signals2::connection _aftCalcF;
+        boost::signals2::connection _aftInitF;
         shared_ptr< ParticleGroup > particleGroup;
         bool allParticles;
         Real3D extForce;
