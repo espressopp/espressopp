@@ -12,7 +12,7 @@ L   = pow(num_particles/rho, 1.0/3.0)
 # this system is likely to explode on integration, because particles can strongly overlap
 system, integrator = espresso.standard_system.LennardJones(num_particles, box=(L, L, L), temperature=1.0)
 
-# use a very small timestep
+# choose a smaller timestep
 integrator.dt = 0.0001
 
 if forceCapping:
@@ -24,18 +24,17 @@ if forceCapping:
 
 espresso.tools.analyse.info(system, integrator)
 
-integrator.run(50)
-capForce.disconnect()
-
 sock = espresso.tools.vmd.connect(system)
 for i in range(1000):
   # make 10 Velocity-Verlet integration steps
-  integrator.run(100)
+  integrator.run(10)
+  # print system information
   espresso.tools.analyse.info(system, integrator)
-  #switch off force capping after some time
-  if forceCapping and i>1:
-    capForce.disconnect()
-    forceCapping = False
   # update postions in VMD
   espresso.tools.vmd.imd_positions(system, sock)
+  #switch off force capping after some time
+  if forceCapping and i>100:
+    capForce.disconnect()
+    forceCapping = False
+    print "switching off force capping"
 
