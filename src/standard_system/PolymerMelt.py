@@ -1,7 +1,7 @@
 import espresso
 import MPI
 
-def PolymerMelt(num_chains, monomers_per_chain, box, bondlen=2.0, rc=1.12246, skin=0.3, dt=0.005, epsilon=1.0, sigma=1.0, shift='auto', temperature=None):
+def PolymerMelt(num_chains, monomers_per_chain, box, bondlen=0.97, rc=1.12246, skin=0.3, dt=0.005, epsilon=1.0, sigma=1.0, shift='auto', temperature=None):
   '''
   returns random walk polymer melt system and integrator:
   if tempearture is != None then Langevin thermostat is set to temperature (gamma is 1.0)
