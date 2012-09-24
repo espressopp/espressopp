@@ -107,15 +107,12 @@ namespace espresso {
 	   it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
-        Real3D dist;
-        bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
-        e += potential->_computeEnergy(dist);
-
-        //std::cout << "energy between " << p1.id() << "-" << p2.id() << " (" << sqrt(dist*dist) << ") is " << potential->_computeEnergy(dist) << "\n";
+        Real3D r21;
+        bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
+        e += potential->_computeEnergy(r21);
       }
       real esum;
-      boost::mpi::reduce(*mpiWorld, e, esum, std::plus<real>(), 0);
-      //std::cout << "sum of NRG is " << esum << " \n";
+      boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
       return esum;
     }
 
@@ -131,31 +128,41 @@ namespace espresso {
         const Particle &p1 = *it->first;                                       
         const Particle &p2 = *it->second;                                      
 
-        Real3D dist;
-        bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
+        Real3D r21;
+        bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
         Real3D force;
-        if(potential->_computeForce(force, dist)) {
-          w += dist * force;
+        if(potential->_computeForce(force, r21)) {
+          w += r21 * force;
         }
       }
-      return w; 
+      
+      real wsum;
+      boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
+      return wsum;
     }
 
     template < typename _Potential > inline void
-    FixedPairListInteractionTemplate < _Potential >::computeVirialTensor(Tensor& w) {
+    FixedPairListInteractionTemplate < _Potential >::computeVirialTensor(Tensor& w){
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
+
+      Tensor wlocal(0.0);
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
       for (FixedPairList::PairList::Iterator it(*fixedpairList);
            it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
-        Real3D dist;
-        bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
+        Real3D r21;
+        bc.getMinimumImageVectorBox(r21, p1.position(), p2.position());
         Real3D force;
-        if(potential->_computeForce(force, dist)) { 
-          w += Tensor(dist, force);
+        if(potential->_computeForce(force, r21)) { 
+          wlocal += Tensor(r21, force);
         }
       }
+      
+      // reduce over all CPUs
+      Tensor wsum(0.0);
+      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      w += wsum;
     }
  
     template < typename _Potential >

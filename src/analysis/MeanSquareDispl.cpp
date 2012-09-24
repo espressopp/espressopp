@@ -53,6 +53,7 @@ namespace espresso {
       }
       
       // MSD calculation
+      int perc=0, perc1=0;
       for(int m=0; m<M; m++){
         
         totZ[m] = 0.0;
@@ -70,8 +71,13 @@ namespace espresso {
             }
           }
         }
-        if(system.comm->rank()==0)
-          cout<<"calculation progress (mean square displacement): "<< (int)(100*(real)m/(real)M) << " %\r"<<flush;
+        if(system.comm->rank()==0){
+          perc = (int)(100*(real)m/(real)M);
+          if(perc>perc1){
+            cout<<"calculation progress (mean square displacement): "<< perc << " %\r"<<flush;
+            perc1 = perc;
+          }
+        }
       }
       if(system.comm->rank()==0)
         cout<<"calculation progress (mean square displacement): "<< (int)(100*(real)M/(real)M) << " %" <<endl;

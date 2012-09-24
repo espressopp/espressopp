@@ -419,14 +419,8 @@ namespace espresso {
           node_virialTensor += fact * kvector[k] * norm( totsum[k] ) * virialTensorPref[k];
         }
         
-        real virTreal[6];
-        for(int j=0; j<6; j++) virTreal[j] = node_virialTensor[j];
-        real virTrealSum[6];
-        mpi::all_reduce( communic, virTreal, 6, virTrealSum, plus<real>() );
-        
-        Tensor virialTensor = 0;
-        for(int j=0; j<6; j++) virialTensor.setItem(j, virTrealSum[j]);
-        
+        Tensor virialTensor(0.0);
+        mpi::all_reduce( communic, node_virialTensor, virialTensor, plus<Tensor>());
         return virialTensor;
       }
       

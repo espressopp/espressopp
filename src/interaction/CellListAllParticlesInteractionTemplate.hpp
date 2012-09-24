@@ -48,15 +48,22 @@ namespace espresso {
       potential->_computeForce(storage->getRealCells());
     }
 
+    template < typename _Potential >
+    inline real
+    CellListAllParticlesInteractionTemplate < _Potential >::
+    computeEnergy() {
+      LOG4ESPP_INFO(theLogger, "compute energy for all particles in cell list");
+      
+      // for the long range interaction the energy is already reduced in _computeEnergy
+      return potential->_computeEnergy(storage->getRealCells());
+    }
+    
     template < typename _Potential > inline real 
     CellListAllParticlesInteractionTemplate < _Potential >::
     computeVirial() {
       LOG4ESPP_INFO(theLogger, "computed virial for all particles in the cell lists");
      
-      //real w = 0.0;
-      // w = w + dist * force
-      // TODO: computeVirial not yet implemented for AllParticlesInteraction (e.G. k-space EWALD)
-
+      // for the long range interaction the virial is already reduced in _computeVirial
       return potential -> _computeVirial(storage->getRealCells());
     }
 
@@ -64,19 +71,11 @@ namespace espresso {
     CellListAllParticlesInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor& wij) {
       LOG4ESPP_INFO(theLogger, "computed virial tensor for all particles in the cell lists");
-      // TODO: computeVirialTensor not yet implemented for AllParticlesInteraction (e.G. k-space EWALD)
       
+      // for the long range interaction the virialTensor is already reduced in _computeVirialTensor
       wij += potential -> _computeVirialTensor(storage->getRealCells());
     }
 
-    template < typename _Potential >
-    inline real
-    CellListAllParticlesInteractionTemplate < _Potential >::
-    computeEnergy() {
-      LOG4ESPP_INFO(theLogger, "compute energy for all particles in cell list");
-      return ( potential->_computeEnergy(storage->getRealCells()) );
-    }
-  
   }
 }
 

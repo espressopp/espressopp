@@ -76,6 +76,25 @@ namespace espresso {
       }
     }
 
+    template < typename _Potential > inline real
+    CellListAllPairsInteractionTemplate < _Potential >::
+    computeEnergy() {
+      LOG4ESPP_INFO(theLogger, "compute energy by the Verlet List");
+
+      real e = 0.0;
+      for (iterator::CellListAllPairsIterator it(storage->getRealCells()); it.isValid(); ++it) {
+        const Particle &p1 = *it->first;
+        const Particle &p2 = *it->second;
+        const Potential &potential = getPotential(p1.type(), p2.type());
+        e += potential._computeEnergy(p1, p2);
+      }
+
+      // reduce over all CPUs
+      real esum;
+      boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
+      return esum;
+    }
+
     template < typename _Potential > inline real 
     CellListAllPairsInteractionTemplate < _Potential >::
     computeVirial() {
@@ -96,7 +115,11 @@ namespace espresso {
           w = w + dist * force;
         }
       }
-      return w;
+      
+      // reduce over all CPUs
+      real wsum;
+      boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
+      return wsum; 
     }
 
     template < typename _Potential > inline void
@@ -104,6 +127,7 @@ namespace espresso {
     computeVirialTensor(Tensor& wij) {
       LOG4ESPP_INFO(theLogger, "computed virial tensor for all pairs in the cell lists");
 
+      Tensor wlocal(0.0);
       for (iterator::CellListAllPairsIterator it(storage->getRealCells());
            it.isValid(); ++it) {
         const Particle &p1 = *it->first;
@@ -113,26 +137,14 @@ namespace espresso {
         Real3D force(0.0, 0.0, 0.0);
         if(potential._computeForce(force, p1, p2)) {
           Real3D dist = p1.position() - p2.position();
-          wij += Tensor(dist, force);
+          wlocal += Tensor(dist, force);
         }
       }
-    }
-
-    template < typename _Potential >
-    inline real
-    CellListAllPairsInteractionTemplate < _Potential >::
-    computeEnergy() {
-      LOG4ESPP_INFO(theLogger, "compute energy by the Verlet List");
-
-      real e = 0.0;
-      for (iterator::CellListAllPairsIterator it(storage->getRealCells());
-	   it.isValid(); ++it) {
-        const Particle &p1 = *it->first;
-        const Particle &p2 = *it->second;
-        const Potential &potential = getPotential(p1.type(), p2.type());
-	e += potential._computeEnergy(p1, p2);
-      }
-      return e;
+      
+      // reduce over all CPUs
+      Tensor wsum(0.0);
+      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      wij += wsum;
     }
 
     template < typename _Potential >

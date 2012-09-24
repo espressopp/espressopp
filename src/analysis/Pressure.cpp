@@ -17,7 +17,8 @@ namespace espresso {
     real Pressure::compute() const {
 
       System& system = getSystemRef();
-  
+      mpi::communicator communic = *system.comm;
+
       // determine volume of the box
       Real3D Li = system.bc->getBoxL();
       real tripleV = 3.0 * Li[0] * Li[1] * Li[2];
@@ -32,22 +33,19 @@ namespace espresso {
         const Particle& p = *cit;
         v2 = v2 + p.mass() * (p.velocity() * p.velocity());
       }
-      boost::mpi::all_reduce(*mpiWorld, v2, v2sum, std::plus<real>());
-      p_kinetic = v2sum / tripleV;
+      boost::mpi::all_reduce( communic, v2, v2sum, std::plus<real>());
+      p_kinetic = v2sum;
       
       // compute the short-range nonbonded contribution
       real rij_dot_Fij = 0.0;
-
       const InteractionList& srIL = system.shortRangeInteractions;
       for (size_t j = 0; j < srIL.size(); j++) {
         rij_dot_Fij += srIL[j]->computeVirial();
       }
 
-      real p_nonbonded = rij_dot_Fij / tripleV;
-      // computeVirial() returns already reduced value
-      //mpi::all_reduce(*mpiWorld, rij_dot_Fij / (3.0 * V), p_nonbonded, std::plus<real>());
+      real p_nonbonded = rij_dot_Fij;
  
-      return (p_kinetic + p_nonbonded);
+      return (p_kinetic + p_nonbonded) / tripleV;
     }
 
     void Pressure::registerPython() {

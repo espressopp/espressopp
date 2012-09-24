@@ -140,7 +140,7 @@ namespace espresso {
         e += potential->_computeEnergy(dist21, dist32, dist43);
       }
       real esum;
-      boost::mpi::reduce(*mpiWorld, e, esum, std::plus<real>(), 0);
+      boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
       return esum;
     }
 
@@ -174,8 +174,9 @@ namespace espresso {
 
         w += dist21 * force1 + dist32 * force2;
       }
+      
       real wsum;
-      boost::mpi::reduce(*mpiWorld, w, wsum, std::plus<real>(), 0);
+      boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
       return w;
     }
 
@@ -185,6 +186,7 @@ namespace espresso {
     computeVirialTensor(Tensor& w) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the quadruples");
     
+      Tensor wlocal(0.0);
       const bc::BC& bc = *getSystemRef().bc;
 
       for (FixedQuadrupleList::QuadrupleList::Iterator it(*fixedquadrupleList); it.isValid(); ++it) {
@@ -207,8 +209,12 @@ namespace espresso {
 
         // TODO: formulas are not correct yet
 
-        w += Tensor(dist21, force1) - Tensor(dist32, force2);
+        wlocal += Tensor(dist21, force1) - Tensor(dist32, force2);
       }
+      // reduce over all CPUs
+      Tensor wsum(0.0);
+      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      w += wsum;
     }
 
     template < typename _DihedralPotential >

@@ -11,6 +11,14 @@ namespace espresso {
 
   class Tensor {
     real data[6];
+    
+  private:
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version) {
+      for(int i = 0; i < 6; ++i) ar & data[i];      
+    }
+    
   public:
 
     Tensor();

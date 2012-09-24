@@ -123,7 +123,7 @@ namespace espresso {
         e += potential->_computeEnergy(dist12, dist32);
       }
       real esum;
-      boost::mpi::reduce(*mpiWorld, e, esum, std::plus<real>(), 0);
+      boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
       return esum;
     }
 
@@ -147,7 +147,9 @@ namespace espresso {
         potential->_computeForce(force12, force32, dist12, dist32);
         w += dist12 * force12 + dist32 * force32;
       }
-      return w;
+      real wsum;
+      boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
+      return wsum;
     }
 
     template < typename _AngularPotential > inline void
@@ -155,19 +157,25 @@ namespace espresso {
     computeVirialTensor(Tensor& w) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 
+      Tensor wlocal(0.0);
       const bc::BC& bc = *getSystemRef().bc;
-      for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
+      for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it){
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
         //const Potential &potential = getPotential(0, 0);
-        Real3D dist12, dist32;
-        bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
-        bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
+        Real3D r12, r32;
+        bc.getMinimumImageVectorBox(r12, p1.position(), p2.position());
+        bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
         Real3D force12, force32;
-        potential->_computeForce(force12, force32, dist12, dist32);
-        w += Tensor(dist12, force12) + Tensor(dist32, force32);
-        }
+        potential->_computeForce(force12, force32, r12, r32);
+        wlocal += Tensor(r12, force12) + Tensor(r32, force32);
+      }
+      
+      // reduce over all CPUs
+      Tensor wsum(0.0);
+      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      w += wsum;
     }
 
     template < typename _AngularPotential >

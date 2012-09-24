@@ -122,14 +122,11 @@ namespace espresso {
         LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
       }
 
-      real esum=0;
-      // ??? reduce doesn't work for barostating!
-      // boost::mpi::reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>(), 0);
+      // reduce over all CPUs
+      real esum;
       boost::mpi::all_reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>());
-      
       return esum;
     }
-
 
     template < typename _Potential > inline real
     VerletListInteractionTemplate < _Potential >::
@@ -149,14 +146,13 @@ namespace espresso {
         Real3D force(0.0, 0.0, 0.0);
         if(potential._computeForce(force, p1, p2)) {
         // if(potential->_computeForce(force, p1, p2)) {
-          Real3D dist = p1.position() - p2.position();
-          w = w + dist * force;
+          Real3D r21 = p1.position() - p2.position();
+          w = w + r21 * force;
         }
       }
 
+      // reduce over all CPUs
       real wsum;
-      // ??? reduce doesn't work for barostating!
-      //boost::mpi::reduce(*mpiWorld, w, wsum, std::plus<real>(), 0);
       boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
       return wsum; 
     }
@@ -166,6 +162,7 @@ namespace espresso {
     computeVirialTensor(Tensor& w) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
 
+      Tensor wlocal(0.0);
       for (PairList::Iterator it(verletList->getPairs());
            it.isValid(); ++it) {
         Particle &p1 = *it->first;
@@ -178,10 +175,15 @@ namespace espresso {
         Real3D force(0.0, 0.0, 0.0);
         if(potential._computeForce(force, p1, p2)) {
         // if(potential->_computeForce(force, p1, p2)) {
-          Real3D dist = p1.position() - p2.position();
-          w += Tensor(dist, force);
+          Real3D r21 = p1.position() - p2.position();
+          wlocal += Tensor(r21, force);
         }
       }
+      
+      // reduce over all CPUs
+      Tensor wsum(0.0);
+      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      w += wsum;
     }
  
     template < typename _Potential >

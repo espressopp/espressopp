@@ -35,8 +35,8 @@ namespace espresso {
       Real3D& vel = cit->velocity();
       vvLocal += mass * Tensor(vel, vel);
     }
-    //boost::mpi::reduce(*mpiWorld, vvLocal.get(), 6, vv.get(), std::plus<real>(), 0); //reduce is uncorrect
-    boost::mpi::all_reduce(*mpiWorld, vvLocal.get(), 6, vv.get(), std::plus<real>());
+    
+    boost::mpi::all_reduce(*mpiWorld, vvLocal, vv, std::plus<Tensor>());
 
     // compute the short-range nonbonded contribution
     Tensor wijLocal(0.0);
@@ -47,11 +47,11 @@ namespace espresso {
       srIL[j]->computeVirialTensor(wijLocal);
     }
 
-    //boost::mpi::reduce(*mpiWorld, wijLocal.get(), 6, wij.get(), std::plus<real>(), 0); //reduce is uncorrect
-    boost::mpi::all_reduce(*mpiWorld, wijLocal.get(), 6, wij.get(), std::plus<real>());
+    boost::mpi::all_reduce(*mpiWorld, wijLocal, wij, std::plus<Tensor>());
     return (vv + wij) / V;
   }
 
+  /*
   python::list PressureTensor::computeTensorLocal() const {
 
     System& system = getSystemRef();
@@ -100,6 +100,7 @@ namespace espresso {
 
     return res;
   }
+   */
 
     // TODO: this dummy routine is still needed as we have not yet TensorObservable
     real PressureTensor::compute() const {
@@ -113,7 +114,7 @@ namespace espresso {
       class_<PressureTensor, bases< Observable > >
         ("analysis_PressureTensor", init< shared_ptr< System > >())
         .def("compute", &PressureTensor::computeTensor) 
-        .def("computeLocal", &PressureTensor::computeTensorLocal)
+        //.def("computeLocal", &PressureTensor::computeTensorLocal)
       ;
     }
   }

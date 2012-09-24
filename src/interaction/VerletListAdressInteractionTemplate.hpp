@@ -393,7 +393,7 @@ namespace espresso {
       }
 
       real esum;
-      boost::mpi::reduce(*getVerletList()->getSystem()->comm, e, esum, std::plus<real>(), 0);
+      boost::mpi::all_reduce(*getVerletList()->getSystem()->comm, e, esum, std::plus<real>());
       return esum;
     }
 
@@ -439,8 +439,8 @@ namespace espresso {
       }
 
       real wsum;
-      boost::mpi::reduce(*mpiWorld, w, wsum, std::plus<real>(), 0);
-      return wsum; 
+      boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
+      return wsum;
     }
 
     template < typename _PotentialAT, typename _PotentialCG > inline void
@@ -448,8 +448,8 @@ namespace espresso {
     computeVirialTensor(Tensor& w) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
 
-      for (PairList::Iterator it(verletList->getPairs());
-           it.isValid(); ++it) {
+      Tensor wlocal(0.0);
+      for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it){
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         int type1 = p1.type();
@@ -458,13 +458,12 @@ namespace espresso {
 
         Real3D force(0.0, 0.0, 0.0);
         if(potential._computeForce(force, p1, p2)) {
-          Real3D dist = p1.position() - p2.position();
-          w += Tensor(dist, force);
+          Real3D r21 = p1.position() - p2.position();
+          wlocal += Tensor(r21, force);
         }
       }
 
-      for (PairList::Iterator it(verletList->getAdrPairs());
-                 it.isValid(); ++it) {
+      for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it){
               Particle &p1 = *it->first;
               Particle &p2 = *it->second;
               int type1 = p1.type();
@@ -473,11 +472,14 @@ namespace espresso {
 
               Real3D force(0.0, 0.0, 0.0);
               if(potential._computeForce(force, p1, p2)) {
-                Real3D dist = p1.position() - p2.position();
-                w += Tensor(dist, force);
+                Real3D r21 = p1.position() - p2.position();
+                wlocal += Tensor(r21, force);
               }
       }
 
+      Tensor wsum(0.0);
+      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      w += wsum;
     }
  
     template < typename _PotentialAT, typename _PotentialCG >
