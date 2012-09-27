@@ -181,8 +181,6 @@ namespace espresso {
         rij_dot_Fij += srIL[j]->computeVirial();
       }
       real p_nonbonded = rij_dot_Fij;
-      //mpi::all_reduce( communic, rij_dot_Fij, p_nonbonded, std::plus<real>());
-      
       // TODO optimization is needed, some terms are the same at the begin and at the end of integration
       real X = p_kinetic + p_nonbonded;
       /*

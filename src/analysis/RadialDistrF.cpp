@@ -68,6 +68,7 @@ namespace espresso {
       
       if(maxi>num_part) maxi = num_part;
       
+      int perc=0, perc1=0;
       for(int i = mini; i<maxi; i++){
         Real3D coordP1 = config->getCoordinates(i);
         for(int j = i+1; j<num_part; j++){
@@ -86,8 +87,13 @@ namespace espresso {
           }
           
         }
-        if(system.comm->rank()==0)
-          cout<<"calculation progress (radial distr. func.): "<< (int)(100*(real)(i-mini)/(real)(maxi-mini)) << " %\r"<<flush;
+        if(system.comm->rank()==0){
+          perc = (int)(100*(real)(i-mini)/(real)(maxi-mini));
+          if(perc>perc1){
+            cout<<"calculation progress (radial distr. func.): "<< perc << " %\r"<<flush;
+            perc1 = perc;
+          }
+        }
       }
       if(system.comm->rank()==0)
         cout<<"calculation progress (radial distr. func.): "<< 100 << " %" <<endl;

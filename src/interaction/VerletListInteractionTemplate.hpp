@@ -82,8 +82,7 @@ namespace espresso {
     addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
 
-      for (PairList::Iterator it(verletList->getPairs()); 
-	   it.isValid(); ++it) {
+      for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         int type1 = p1.type();

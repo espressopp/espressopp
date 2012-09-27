@@ -64,7 +64,7 @@ namespace espresso {
     			 }
     		 }
    	         it->first->setPos(newpos);
-   	         it->first->setV( Real3D(0,0,0) );
+   	         it->first->setV( Real3D(0.0, 0.0, 0.0) );
    	         //it->first->setF( Real3D(0,0,0) );
     	 }
      }
