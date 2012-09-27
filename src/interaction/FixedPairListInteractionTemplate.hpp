@@ -63,6 +63,8 @@ namespace espresso {
       virtual real computeEnergy();
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& w);
+      virtual void computeVirialTensor(Tensor& w, real xmin, real xmax,
+          real ymin, real ymax, real zmin, real zmax);
       virtual real getMaxCutoff();
       virtual int bondType() { return Pair; }
 
@@ -164,7 +166,44 @@ namespace espresso {
       boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
       w += wsum;
     }
- 
+
+    // compute the pressure tensor localized between xmin, xmax, ymin, ymax, zmin, zmax
+    // TODO (vit) physics should be checked
+    template < typename _Potential > inline void
+    FixedPairListInteractionTemplate < _Potential >::computeVirialTensor(Tensor& w,
+            real xmin, real xmax, real ymin, real ymax, real zmin, real zmax){
+      LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
+
+      Tensor wlocal(0.0);
+      const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
+      for (FixedPairList::PairList::Iterator it(*fixedpairList);
+           it.isValid(); ++it) {
+        const Particle &p1 = *it->first;
+        const Particle &p2 = *it->second;
+        Real3D p1pos = p1.position();
+        Real3D p2pos = p2.position();
+        
+        if(  (p1pos[0]>xmin && p1pos[0]<xmax && 
+              p1pos[1]>ymin && p1pos[1]<ymax && 
+              p1pos[2]>zmin && p1pos[2]<zmax) ||
+             (p2pos[0]>xmin && p2pos[0]<xmax && 
+              p2pos[1]>ymin && p2pos[1]<ymax && 
+              p2pos[2]>zmin && p2pos[2]<zmax) ){
+          Real3D r21;
+          bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
+          Real3D force;
+          if(potential->_computeForce(force, r21)) { 
+            wlocal += Tensor(r21, force);
+          }
+        }
+      }
+      
+      // reduce over all CPUs
+      Tensor wsum(0.0);
+      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      w += wsum;
+    }
+    
     template < typename _Potential >
     inline real
     FixedPairListInteractionTemplate< _Potential >::

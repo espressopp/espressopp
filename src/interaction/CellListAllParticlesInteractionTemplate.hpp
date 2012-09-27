@@ -28,6 +28,8 @@ namespace espresso {
       virtual real computeEnergy();
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& wij);
+      virtual void computeVirialTensor(Tensor& w, real xmin, real xmax,
+          real ymin, real ymax, real zmin, real zmax);
       virtual real getMaxCutoff() { return 0.0; }
       virtual int bondType() { return Nonbonded; }
 
@@ -74,6 +76,15 @@ namespace espresso {
       
       // for the long range interaction the virialTensor is already reduced in _computeVirialTensor
       wij += potential -> _computeVirialTensor(storage->getRealCells());
+    }
+    
+    
+    template < typename _Potential > inline void
+    CellListAllParticlesInteractionTemplate < _Potential >::
+    computeVirialTensor(Tensor& wij,
+            real xmin, real xmax, real ymin, real ymax, real zmin, real zmax) {
+      std::cout<<"Warning! Calculate virial in defined volume is not supported for "
+              "long range interactions. Nothing was done"<<std::endl;
     }
 
   }

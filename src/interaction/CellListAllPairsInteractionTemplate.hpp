@@ -46,6 +46,8 @@ namespace espresso {
       virtual real computeEnergy();
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& wij);
+      virtual void computeVirialTensor(Tensor& w, real xmin, real xmax,
+          real ymin, real ymax, real zmin, real zmax);
       virtual real getMaxCutoff();
       virtual int bondType() { return Nonbonded; }
 
@@ -138,6 +140,45 @@ namespace espresso {
         if(potential._computeForce(force, p1, p2)) {
           Real3D dist = p1.position() - p2.position();
           wlocal += Tensor(dist, force);
+        }
+      }
+      
+      // reduce over all CPUs
+      Tensor wsum(0.0);
+      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      wij += wsum;
+    }
+    
+
+    // compute the pressure tensor localized between xmin, xmax, ymin, ymax, zmin, zmax
+    // TODO (vit) physics should be checked
+    template < typename _Potential > inline void
+    CellListAllPairsInteractionTemplate < _Potential >::
+    computeVirialTensor(Tensor& wij,
+            real xmin, real xmax, real ymin, real ymax, real zmin, real zmax) {
+      LOG4ESPP_INFO(theLogger, "computed virial tensor for all pairs in the cell lists");
+
+      Tensor wlocal(0.0);
+      for (iterator::CellListAllPairsIterator it(storage->getRealCells());
+           it.isValid(); ++it) {
+        const Particle &p1 = *it->first;
+        const Particle &p2 = *it->second;
+        Real3D p1pos = p1.position();
+        Real3D p2pos = p2.position();
+        
+        if(  (p1pos[0]>xmin && p1pos[0]<xmax && 
+              p1pos[1]>ymin && p1pos[1]<ymax && 
+              p1pos[2]>zmin && p1pos[2]<zmax) ||
+             (p2pos[0]>xmin && p2pos[0]<xmax && 
+              p2pos[1]>ymin && p2pos[1]<ymax && 
+              p2pos[2]>zmin && p2pos[2]<zmax) ){
+          const Potential &potential = getPotential(p1.type(), p2.type());
+
+          Real3D force(0.0, 0.0, 0.0);
+          if(potential._computeForce(force, p1, p2)) {
+            Real3D dist = p1pos - p2pos;
+            wlocal += Tensor(dist, force);
+          }
         }
       }
       

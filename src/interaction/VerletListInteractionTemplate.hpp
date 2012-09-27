@@ -64,6 +64,8 @@ namespace espresso {
       virtual real computeEnergy();
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& w);
+      virtual void computeVirialTensor(Tensor& w, real xmin, real xmax,
+          real ymin, real ymax, real zmin, real zmax);
       virtual real getMaxCutoff();
       virtual int bondType() { return Nonbonded; }
 
@@ -184,7 +186,49 @@ namespace espresso {
       boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
       w += wsum;
     }
- 
+
+    
+    // compute the pressure tensor localized between xmin, xmax, ymin, ymax, zmin, zmax
+    // TODO (vit) physics should be checked
+    template < typename _Potential > inline void
+    VerletListInteractionTemplate < _Potential >::
+    computeVirialTensor(Tensor& w,
+            real xmin, real xmax, real ymin, real ymax, real zmin, real zmax) {
+      LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
+
+      Tensor wlocal(0.0);
+      for (PairList::Iterator it(verletList->getPairs());
+           it.isValid(); ++it) {
+        Particle &p1 = *it->first;
+        Particle &p2 = *it->second;
+        int type1 = p1.type();
+        int type2 = p2.type();
+        Real3D p1pos = p1.position();
+        Real3D p2pos = p2.position();
+        
+        if(  (p1pos[0]>xmin && p1pos[0]<xmax && 
+              p1pos[1]>ymin && p1pos[1]<ymax && 
+              p1pos[2]>zmin && p1pos[2]<zmax) ||
+             (p2pos[0]>xmin && p2pos[0]<xmax && 
+              p2pos[1]>ymin && p2pos[1]<ymax && 
+              p2pos[2]>zmin && p2pos[2]<zmax) ){
+          const Potential &potential = getPotential(type1, type2);
+
+          Real3D force(0.0, 0.0, 0.0);
+          if(potential._computeForce(force, p1, p2)) {
+            Real3D r21 = p1pos - p2pos;
+            wlocal += Tensor(r21, force);
+          }
+        }
+      }
+      
+      // reduce over all CPUs
+      Tensor wsum(0.0);
+      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      w += wsum;
+    }
+
+    
     template < typename _Potential >
     inline real
     VerletListInteractionTemplate< _Potential >::

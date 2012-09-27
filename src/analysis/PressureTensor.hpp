@@ -15,7 +15,8 @@ namespace espresso {
       ~PressureTensor() {}
       virtual real compute() const;
       virtual Tensor computeTensor() const;
-      //virtual python::list computeTensorLocal() const;
+      
+      virtual Tensor computeTensor1(real,real,real,real,real,real) const;
 
       static void registerPython();
     };

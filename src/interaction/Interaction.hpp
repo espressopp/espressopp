@@ -21,6 +21,8 @@ namespace espresso {
       virtual real computeEnergy() = 0;
       virtual real computeVirial() = 0;
       virtual void computeVirialTensor(Tensor& w) = 0;
+      virtual void computeVirialTensor(Tensor& w, real xmin, real xmax,
+          real ymin, real ymax, real zmin, real zmax) = 0;
 
       /** This method returns the maximal cutoff defined for one type pair. */
       virtual real getMaxCutoff() = 0;
