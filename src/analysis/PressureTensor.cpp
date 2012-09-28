@@ -39,15 +39,13 @@ namespace espresso {
     boost::mpi::all_reduce(*mpiWorld, vvLocal, vv, std::plus<Tensor>());
 
     // compute the short-range nonbonded contribution
-    Tensor wijLocal(0.0);
-    Tensor wij;
-
+    Tensor wij(0.0);
+    // virial is already reduced
     const InteractionList& srIL = system.shortRangeInteractions;
     for (size_t j = 0; j < srIL.size(); j++) {
-      srIL[j]->computeVirialTensor(wijLocal);
+      srIL[j]->computeVirialTensor(wij);
     }
 
-    boost::mpi::all_reduce(*mpiWorld, wijLocal, wij, std::plus<Tensor>());
     return (vv + wij) / V;
   }
 
