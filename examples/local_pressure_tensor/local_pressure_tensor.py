@@ -1,12 +1,11 @@
 """
 We just want to read in a particle configuration of an equilibrated
 lennard-jones fluid and calculate the pressure tensor in slabs along
-the z-direction of the simulation box. This can be done by manually
-specifying a slab node grid for the domain decomposition storage and
-calculating the pressure tensor for each node (cpu) locally.
+the z-direction of the simulation box.
 """
 
 import espresso
+import MPI
 
 # define some global values
 skin = 0.3
@@ -29,17 +28,15 @@ system.rng         = espresso.esutil.RNG()
 system.bc          = espresso.bc.OrthorhombicBC(system.rng, box)
 # we also have to provide a skin for things like Verlet-Lists
 system.skin        = skin
-# get the number of CPUs to use
-NCPUs              = espresso.MPI.COMM_WORLD.size
-# manually specify the node grid e.g. slabs in z-direction
-# (we want to calculate the pressure tensor in slabs)
-nodeGrid           = (1,1,NCPUs)
+
+comm = MPI.COMM_WORLD
+
+nodeGrid = espresso.tools.decomp.nodeGrid(comm.size)
 # calculate a 3D subgrid to speed up verlet list builds and communication
 cellGrid           = espresso.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
 # create a domain decomposition particle storage with the specified nodeGrid and cellGrid
 system.storage     = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
-print "NCPUs              = ", NCPUs
 print "nodeGrid           = ", nodeGrid
 print "cellGrid           = ", cellGrid
 print "NPart              = ", NPart
@@ -81,19 +78,25 @@ print "system setup finished"
 
 # setup the analysis for the pressure tensor
 Pxy = espresso.analysis.PressureTensor(system)
-# compute the tensor locally and return each nodes values in a python list
-LocalPxy = Pxy.computeLocal()
+# compute the tensor for whole box
+Pijtot = Pxy.compute()
+print 'total tensor'
+print '   Pxx      Pyy      Pzz      Pxy      Pxz      Pyz'
+fmt1 = '%8.4f %8.4f %8.4f %8.4f %8.4f %8.4f'
+print(fmt1 % (Pijtot[0], Pijtot[1], Pijtot[2], Pijtot[3], Pijtot[4], Pijtot[5]))
 
-for i in range(len(LocalPxy)):
-  nodePxy = LocalPxy[i]
-  # the volume box of the nodes domain is also returned by the command
-  volumeBox   = nodePxy[0]
-  # t is the local tensor
-  t    = nodePxy[1]
-  xmin = volumeBox[0]
-  xmax = volumeBox[1]
-  ymin = volumeBox[2]
-  ymax = volumeBox[3]
-  zmin = volumeBox[4]
-  zmax = volumeBox[5]
-  print "volume(%f %f %f %f %f %f): Pxx= %f Pyy= %f Pzz= %f Pxy= %f Pxz= %f Pyz= %f" % (xmin, xmax, ymin, ymax, zmin, zmax, t[0], t[1], t[2], t[3], t[4], t[5])
+# compute the tensor locally and return each nodes values in a python list
+n = 30; # we will divide the box in 30 slabs (z direction)
+dLz = Lz / float(n)
+Pijloc = []
+for i in range(n):
+  # The rutine .compute(xmin, xmax, ymin, ymax, zmin, zmax) will return the 
+  # pressure tensor for defined volume
+  Pij = Pxy.compute(0.0, Lx, 0.0, Ly, 0.0, dLz*(i+1))
+  Pijloc.append(Pij)
+
+fmt2 = '%8.4f %8.4f %8.4f %8.4f %8.4f %8.4f %8.4f'
+print 'local tensor'
+print '  zcoord      Pxx      Pyy      Pzz      Pxy      Pxz      Pyz'
+for i in range(n):
+  print(fmt2 % ( dLz*(i+0.5), Pijloc[i][0], Pijloc[i][1], Pijloc[i][2], Pijloc[i][3], Pijloc[i][4], Pijloc[i][5]))
