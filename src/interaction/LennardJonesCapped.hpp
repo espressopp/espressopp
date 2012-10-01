@@ -109,9 +109,6 @@ namespace espresso {
 
           real capradSqr = caprad * caprad;
 
-//std::cout << " eps: "<< epsilon<< std::endl;
-//exit(0);
-
           if (distSqr > capradSqr) {
               real frac2 = 1.0 / distSqr;
               real frac6 = frac2 * frac2 * frac2;

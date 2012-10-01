@@ -53,3 +53,15 @@ def PolymerMelt(num_chains, monomers_per_chain, box, bondlen=0.97, rc=1.12246, s
   system.addInteraction(interFENE)
     
   return system, integrator
+  
+  
+  class KGMelt:
+    def __init__(self, num_chains, chain_len):
+      self._num_chains    = num_chains
+      self._chain_len     = chain_len
+      self._num_particles = num_chains * chain_len
+      self._density       = 0.8449
+      self._L             = pow(self._num_particles / self._density, 1.0/3.0)
+      self._box           = (L, L, L)
+      self._system        = espress.System()
+
