@@ -4,6 +4,14 @@ from espresso.tools import decomp
 from espresso.tools.init_cfg import lattice
 import random
 import sys
+
+print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+print "+ Due to a recent change in the design of ESPResSo++ the Parallel Tempering     +"
+print "+ Class is not available in the current version. This Class will be back soon.  +"
+print "+ Multisystem simulations are still possible but have to be setup manually.     +"
+print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+
+sys.exit(0) 
          
 # some global definitions
 skin         = 0.3
@@ -39,7 +47,7 @@ for i in range(0, pt.getNumberOfSystems()):
     system.skin          = skin
     nodeGrid             = espresso.tools.decomp.nodeGrid(pt.getNumberOfCPUsPerSystem())
     cellGrid             = espresso.tools.decomp.cellGrid(boxsize,nodeGrid,rc,skin)
-    storage              = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+    storage              = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid, nocheck=True)
     system.storage       = storage
     vl                   = espresso.VerletList(system,cutoff=rc)
     potLJ                = espresso.interaction.LennardJones(epsilon, sigma, rc, shift)
@@ -48,7 +56,7 @@ for i in range(0, pt.getNumberOfSystems()):
     integrator.dt        = dt
     langevin             = espresso.integrator.LangevinThermostat(system)
     langevin.gamma       = gamma
-    langevin.temperature = temperature*i/10 + 0.5
+    langevin.temperature = temperature*i/20 + 0.2
     integrator.addExtension(langevin)
     interLJ.setPotential(type1=0, type2=0, potential=potLJ)
     system.addInteraction(interLJ)
@@ -61,6 +69,12 @@ for i in range(0, pt.getNumberOfSystems()):
     pt.setAnalysisT(espresso.analysis.Temperature(system))
     pt.setAnalysisNPart(espresso.analysis.NPart(system))
     pt.endDefiningSystem(i)
+
+# let each system reach its temperature
+for p in range(100):
+    pt.run(100)
+    multiT     = pt._multisystem.runAnalysisTemperature()
+    print "%s" % multiT
 
 for p in range(10):
     pt.run(200)

@@ -6,6 +6,12 @@ from math import exp
 class ParallelTempering(object):
     
     def __init__(self, NumberOfSystems = 4, RNG = None):
+        print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        print "+ Due to a recent change in the design of ESPResSo++ the Parallel Tempering     +"
+        print "+ Class is not available in the current version. This Class will be back soon.  +"
+        print "+ Multisystem simulations are still possible but have to be setup manually.     +"
+        print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        return 0 
         if (RNG == None):
             print "ERROR: ParallelTempering needs a random number generator"
         else: 
@@ -84,13 +90,16 @@ class ParallelTempering(object):
                 e2    = energies[n]
                 n1    = nparts[m]
                 n2    = nparts[n]
-                delta = exp(-(e1/n1-e2/n2)*(1/t2 -1/t1))
-                if delta >= metro:
+                delta = (1/t2-1/t1)*(e1/n1-e2/n2)
+                if delta <= 0:
                   exyesno = 'yes'
                 else:
-                  exyesno = 'no'
+                  if exp(-delta) > metro:
+                    exyesno = 'yes'
+                  else:
+                    exyesno = 'no'
                 print "systems %i and %i: dE=%10.5f random=%10.5f ==> exchange: %s" % (m, n, delta, metro, exyesno)
-                if delta >= metro:
+                if exyesno=='yes':
                     # exchange temperature of system[n] <--> system[m]
                     pmi.activate(self._comm[n])
                     self._multisystem.beginSystemDefinition()
