@@ -84,3 +84,42 @@ can deal with. A typical error message you get could look like this:
    
 In order to prevent this, systems that are setup in a random way and thus have strong overlaps between particels
 have to be "warmed up" before they can be equilibrated. 
+
+In |espp| there are several possible ways of warming up a system. As a first approach one could simply constrain
+the forces in the integrator. For this purpose |espp| provides an integrator Extension
+named CapForces. The two parameters of this Extension are the system and the maximum force that
+a particle can get. The following python code shows how CapForces can be used. Add it to your
+Lennard-Jones example just after adding the Langevin Extension:
+
+>>> print "starting warmup with force capping ..."
+>>> force_capping   = espresso.integrator.CapForce(system, 1000000.0)
+>>> integrator.addExtension(force_capping)
+>>> # reduce the time step of the integrator to make the integration numerically more stable
+>>> integrator.dt = 0.0001
+>>> espresso.tools.analyse.info(system, integrator)
+>>> for k in range(10):
+>>>   integrator.run(1000)
+>>>   espresso.tools.analyse.info(system, integrator)
+
+After the warmup the time step of the integrator can be set to a larger value.
+The CapForce extension can be disconnected after the warmup to get the original 
+full Lennard-Jones potential back.
+
+>>> integrator.dt   = 0.005
+>>> integrator.step = 0
+>>> force_capping.disconnect()
+>>> print "warmup finished - force capping switched off."
+
+Task 1: 
+-------
+
+write a python script that creates a random configuration of 1000 Lennard Jones
+particles with a number density of 0.85 in a cubic simulation box.
+Warm up and equilibrate this configuration.
+Examine the output of the command
+
+>>> espresso.tools.analyse.info(system, integrator)
+
+after each integration step. How fast is the energy of the system going down ?
+How long do you have to warmup ? What are good parameters for
+dt, force_capping and number of integration steps ?
