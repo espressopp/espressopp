@@ -3,6 +3,7 @@
 #include "Tabulated.hpp"
 #include "VerletListInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
+#include "VerletListHadressInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
