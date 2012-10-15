@@ -19,6 +19,11 @@ import espresso
   read returns:
   Lx, Ly, Lz, p_ids, p_types, poss, vels, bonds, angles, dihedrals
   if something does not exist then it will return the empty list
+  bonds, angles, dihedrals - will return list [type, (x,x,x,x)],
+  where type is the type of bond, angle or dihedral
+  (x,x,x,x) is (pid1,pid2) for bonds,
+               (pid1,pid2,pid3) for angles
+               (pid1,pid2,pid3,pid4) for dihedrals
 """   
 
 def write(fileName, system, writeVelocities=False):
@@ -196,7 +201,7 @@ def read(fileName, readVelocities=False):
     k, kk, rx, ry, rz = map(float, f.readline().split()[0:])
     p_ids.append(int(k))
     p_types.append(int(kk))
-    poss.append((rx, ry, rz))
+    poss.append(espresso.Real3D(rx, ry, rz))
 
   vels = []
   if(readVelocities):
@@ -207,8 +212,8 @@ def read(fileName, readVelocities=False):
     line = f.readline() # blank line
     for i in range(num_particles):
       vx_, vy_, vz_ = map(float, f.readline().split()[0:])
-      vels.append((vx_, vy_, vz_))
-      
+      vels.append(espresso.Real3D(vx_, vy_, vz_))
+
   bonds = []
   if(num_bonds != 0):
     # find and store bonds
@@ -218,7 +223,7 @@ def read(fileName, readVelocities=False):
     line = f.readline()
     for i in range(num_bonds):
       bond_id, bond_type, pid1, pid2 = map(int, f.readline().split())
-      bonds.append((pid1, pid2))
+      bonds.append([bond_type, (pid1, pid2)])
 
   angles = []
   if(num_angles != 0):
@@ -229,7 +234,7 @@ def read(fileName, readVelocities=False):
     line = f.readline()
     for i in range(num_angles):
       angle_id, angle_type, pid1, pid2, pid3 = map(int, f.readline().split())
-      angles.append((pid1, pid2, pid3))
+      angles.append([angle_type, (pid1, pid2, pid3)])
 
 
   dihedrals = []
@@ -241,7 +246,7 @@ def read(fileName, readVelocities=False):
     line = f.readline()
     for i in range(num_dihedrals):
       dihedral_id, dihedral_type, pid1, pid2, pid3, pid4 = map(int, f.readline().split())
-      dihedrals.append((pid1, pid2, pid3, pid4))
+      dihedrals.append([dihedral_type, (pid1, pid2, pid3, pid4)])
 
   f.close()
 
