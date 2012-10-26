@@ -26,6 +26,7 @@ from espresso.interaction.Cosine import *
 from espresso.interaction.TabulatedAngular import *
 from espresso.interaction.AngularHarmonic import *
 from espresso.interaction.AngularCosineSquared import *
+#from espresso.interaction.AngularUniqueCosineSquared import *
 
 from espresso.interaction.DihedralPotential import *
 from espresso.interaction.TabulatedDihedral import *

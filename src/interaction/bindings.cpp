@@ -20,6 +20,7 @@
 #include "Cosine.hpp"
 #include "AngularHarmonic.hpp"
 #include "AngularCosineSquared.hpp"
+//#include "AngularUniqueCosineSquared.hpp"
 #include "DihedralPotential.hpp"
 #include "TabulatedDihedral.hpp"
 #include "OPLS.hpp"
@@ -54,6 +55,7 @@ namespace espresso {
       Cosine::registerPython();
       AngularHarmonic::registerPython();
       AngularCosineSquared::registerPython();
+      //AngularUniqueCosineSquared::registerPython();
       DihedralPotential::registerPython();
       TabulatedDihedral::registerPython();
       OPLS::registerPython();

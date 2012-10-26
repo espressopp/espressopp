@@ -32,6 +32,7 @@ class FixedTripleListLocal(_espresso.FixedTripleList):
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 
+    '''
     def addTriples(self, triplelist):
         """
         Each processor takes the broadcasted triplelist and
@@ -43,7 +44,7 @@ class FixedTripleListLocal(_espresso.FixedTripleList):
             for triple in triplelist:
                 pid1, pid2, pid3 = triple
                 self.cxxclass.add(self, pid1, pid2, pid3)
-
+    '''
 
     def getTriples(self):
         'return the triples of the GlobalTripleList'
@@ -59,4 +60,4 @@ if pmi.isController:
             localcall = [ "add" ],
             pmicall = [ "addTriples" ],
             pmiinvoke = ["getTriples", "size"]
-            )
+        )

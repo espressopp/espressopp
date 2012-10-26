@@ -63,9 +63,9 @@ namespace espresso {
     CellList realCells = system.storage->getRealCells();
     for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
       Real3D pos = cit->position();
-      if( pos[0]>xmin && pos[0]<xmax && 
-              pos[1]>ymin && pos[1]<ymax && 
-              pos[2]>zmin && pos[2]<zmax ){
+      if( pos[0]>=xmin && pos[0]<xmax && 
+              pos[1]>=ymin && pos[1]<ymax && 
+              pos[2]>=zmin && pos[2]<zmax ){
         real mass = cit->mass();
         Real3D& vel = cit->velocity();
         vvlocal += mass * Tensor(vel, vel);

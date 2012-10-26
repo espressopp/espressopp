@@ -27,11 +27,11 @@ namespace espresso {
      * Here the concept of particle decomposition is used, i.e. each processor stores
      * relevant number of particles. It's useless to get the data on python level from
      * here. Therefore it is abstract class. A derived class should realize the function
-     * `calculate`.
+     * `compute`.
      * 
      * Important: Mainly it was created in order to observe the system in time.
      * !!At the moment the number of particles should be the same for different snapshots.!!
-     * Otherwise it will throw an runtime error exception
+     * Otherwise it will throw a runtime error exception
     */
 
     typedef vector<ConfigurationPtr> ConfigurationList;

@@ -103,7 +103,7 @@ system.storage.decompose()
 ## potential and interaction ##
 
 # setting the Verlet list
-vl = espresso.VerletList(system, rspacecutoff+skin)
+vl = espresso.VerletList(system, rspacecutoff)
 
 # the R space part of electrostatic interaction according to the Ewald method
 '''
