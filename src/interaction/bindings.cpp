@@ -17,10 +17,15 @@
 #include "Tabulated.hpp"
 #include "TabulatedAngular.hpp"
 #include "AngularPotential.hpp"
+
+#include "AngularUniquePotential.hpp"
+
 #include "Cosine.hpp"
 #include "AngularHarmonic.hpp"
 #include "AngularCosineSquared.hpp"
+
 #include "AngularUniqueCosineSquared.hpp"
+
 #include "DihedralPotential.hpp"
 #include "TabulatedDihedral.hpp"
 #include "OPLS.hpp"
@@ -51,11 +56,16 @@ namespace espresso {
       FENECapped::registerPython();
       Harmonic::registerPython();
       AngularPotential::registerPython();
+
+      AngularUniquePotential::registerPython();
+      
       TabulatedAngular::registerPython();
       Cosine::registerPython();
       AngularHarmonic::registerPython();
       AngularCosineSquared::registerPython();
+      
       AngularUniqueCosineSquared::registerPython();
+      
       DihedralPotential::registerPython();
       TabulatedDihedral::registerPython();
       OPLS::registerPython();

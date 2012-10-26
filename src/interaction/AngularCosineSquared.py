@@ -22,6 +22,10 @@ class FixedTripleListAngularCosineSquaredLocal(InteractionLocal, interaction_Fix
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
+    def getFixedTripleList(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getFixedTripleList(self)
+
 if pmi.isController:
     class AngularCosineSquared(AngularPotential):
         'The AngularCosineSquared potential.'
@@ -34,5 +38,5 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.FixedTripleListAngularCosineSquaredLocal',
-            pmicall = ['setPotential']
-            )
+            pmicall = ['setPotential','getFixedTripleList']
+        )
