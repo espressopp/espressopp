@@ -12,7 +12,7 @@
 #include <FixedPairList.hpp>
 #include <FixedPairListAdress.hpp>
 #include <FixedTripleList.hpp>
-//#include <FixedTripleAngleList.hpp>
+#include <FixedTripleCosList.hpp>
 #include <FixedTripleListAdress.hpp>
 #include <FixedQuadrupleList.hpp>
 #include <FixedTupleList.hpp>
@@ -40,7 +40,7 @@ void espresso::registerPython() {
   espresso::FixedPairList::registerPython();
   espresso::FixedPairListAdress::registerPython();
   espresso::FixedTripleList::registerPython();
-  //espresso::FixedTripleAngleList::registerPython();
+  espresso::FixedTripleCosList::registerPython();
   espresso::FixedTripleListAdress::registerPython();
   espresso::FixedQuadrupleList::registerPython();
   espresso::FixedTupleList::registerPython();
