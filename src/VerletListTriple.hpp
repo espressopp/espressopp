@@ -50,8 +50,8 @@ namespace espresso {
     //** Get the number of triples for the local Verlet list */
     int localSize() const;
     
-    /** Add Triples to exclusion list */
-    bool exclude(longint pid1, longint pid2, longint pid3);
+    /** Add particle to exclusion list */
+    bool exclude(longint pid);
 
     /** Get the number of times the Verlet Triple list has been rebuilt */
     int getBuilds() const { return builds; }

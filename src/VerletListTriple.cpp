@@ -152,8 +152,7 @@ namespace espresso {
   void VerletListTriple::registerPython() {
     using namespace espresso::python;
 
-    bool (VerletListTriple::*pyExclude)(longint pid1, longint pid2, longint pid3)
-          = &VerletListTriple::exclude;
+    bool (VerletListTriple::*pyExclude)(longint pid) = &VerletListTriple::exclude;
 
     class_<VerletListTriple, shared_ptr<VerletListTriple> >
       ("VerletListTriple", init< shared_ptr<System>, real, bool >())
