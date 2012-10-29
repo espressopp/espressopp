@@ -56,6 +56,8 @@ namespace espresso {
 
 	  private:
 		static LOG4ESPP_DECL_LOGGER(theLogger);
+        
+        void setCos(int, int, int);
 
 
   };
