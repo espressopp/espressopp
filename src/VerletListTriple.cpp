@@ -62,8 +62,6 @@ namespace espresso {
     LOG4ESPP_DEBUG(theLogger, "local cell list size = " << cl.size());
     for (CellListAllTriplesIterator it(cl); it.isValid(); ++it) {
       checkTriple(*it->first, *it->second, *it->third);
-      LOG4ESPP_DEBUG(theLogger, "checking particles " << it->first->id() <<
-              ", " << it->second->id()<< " and "<<it->third->id());
     }
 
     builds++;
@@ -75,6 +73,9 @@ namespace espresso {
   /*-------------------------------------------------------------*/
   
   void VerletListTriple::checkTriple(Particle& pt1, Particle& pt2, Particle& pt3){
+    // check if central particle is in the exclusion list
+    if (exList.count(pt2.id()) > 0) return;
+    
     Real3D d1 = pt1.position() - pt2.position();
     Real3D d2 = pt2.position() - pt3.position();
     
@@ -89,17 +90,6 @@ namespace espresso {
 		   << " -> distsq2 = " << distsq2);
 
     if (distsq1>cutsq || distsq2>cutsq) return;
-
-    // see if it's in the exclusion list (both directions)
-    /*
-    if (exList.count(boost::make_tuple(pt1.id(), pt2.id(), pt3.id())) == 1) return;
-    if (exList.count(boost::make_tuple(pt3.id(), pt1.id(), pt2.id())) == 1) return;
-    if (exList.count(boost::make_tuple(pt2.id(), pt3.id(), pt1.id())) == 1) return;
-    
-    if (exList.count(boost::make_tuple(pt2.id(), pt1.id(), pt3.id())) == 1) return;
-    if (exList.count(boost::make_tuple(pt1.id(), pt3.id(), pt2.id())) == 1) return;
-    if (exList.count(boost::make_tuple(pt3.id(), pt2.id(), pt1.id())) == 1) return;
-    */
     
     vlTriples.add(pt1, pt2, pt3); // add triple to Verlet List
   }
@@ -132,13 +122,15 @@ namespace espresso {
   }
 
 
-  bool VerletListTriple::exclude(longint pid1, longint pid2, longint pid3) {
-    //boost::tuple<longint, longint, longint> loctuple = boost::make_tuple(pid1, pid2, pid3);
-    //exList.insert(loctuple);
-    //return true;
+  bool VerletListTriple::exclude(longint pid) {
+    exList.insert( pid );
+    return true;
+    
+    /*
     std::cout<<"Warning! Exclusion list is not yet implemented to the "
             "triple verlet list"<<std::endl;
     return false;
+    */
   }
   
 

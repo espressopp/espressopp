@@ -9,26 +9,24 @@ class VerletListTripleLocal(_espresso.VerletListTriple):
     def __init__(self, system, cutoff, exclusionlist=[]):
         'Local construction of a verlet triple list'
         if pmi.workerIsActive():
+          '''
           cxxinit(self, _espresso.VerletListTriple, system, cutoff, True)
           if (exclusionlist != []):
             print 'Warning! Exclusion list is not yet implemented to the triple verlet \
                   list. Nothing happend to exclusion list'
+          '''
 
-          '''
           if (exclusionlist == []):
-              # rebuild list in constructor
-              cxxinit(self, _espresso.VerletListTriple, system, cutoff, True)
+            # rebuild list in constructor
+            cxxinit(self, _espresso.VerletListTriple, system, cutoff, True)
           else:
-              # do not rebuild list in constructor
-              cxxinit(self, _espresso.VerletListTriple, system, cutoff, False)
-              # add exclusions
-              for triple in exclusionlist:
-                  pid1, pid2, pid3 = triple
-                  self.cxxclass.exclude(self, pid1, pid2, pid3)
-              # now rebuild list with exclusions
-              self.cxxclass.rebuild(self)
-          '''
-                
+            # do not rebuild list in constructor
+            cxxinit(self, _espresso.VerletListTriple, system, cutoff, False)
+            # add exclusions
+            for pid in exclusionlist:
+                self.cxxclass.exclude(self, pid)
+            # now rebuild list with exclusions
+            self.cxxclass.rebuild(self)
             
     def totalSize(self):
         'count number of triples in VerletListTriple, involves global reduction'
@@ -44,18 +42,14 @@ class VerletListTripleLocal(_espresso.VerletListTriple):
         """
         Each processor takes the broadcasted exclusion list
         and adds it to its list.
-        """
         if pmi.workerIsActive():
           print 'Warning! Exclusion list is not yet implemented to the triple verlet \
                 list. Nothing happend'
-          '''
-          for triple in exclusionlist:
-              pid1, pid2, pid3 = triple
-              self.cxxclass.exclude(self, pid1, pid2, pid3)
-          # rebuild list with exclusions
-          self.cxxclass.rebuild(self)
-          '''
-          
+        """
+        for pid in exclusionlist:
+            self.cxxclass.exclude(self, pid)
+        # rebuild list with exclusions
+        self.cxxclass.rebuild(self)
             
     def getAllTriples(self):
         'return the triples of the local verlet list'

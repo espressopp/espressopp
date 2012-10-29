@@ -67,7 +67,7 @@ namespace espresso {
     void checkTriple(Particle &pt1, Particle &pt2, Particle &pt3);
     TripleList vlTriples;
     
-    boost::unordered_set< boost::tuple<longint, longint, longint> > exList; // exclusion list
+    boost::unordered_set< longint> exList; // exclusion list
     
     real cutsq;
     real cut;
