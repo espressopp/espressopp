@@ -80,7 +80,7 @@ namespace espresso {
     real cosVal = r12*r32 / r12.abs() / r32.abs();
 
     // ADD THE GLOBAL TRIPLET
-    triplesCos.insert(std::make_pair(pid2, boost::make_tuple(pid1, pid3, cosVal)));
+    triplesCos.insert(std::make_pair(pid2, std::make_pair(std::make_pair(pid1, pid3), cosVal)));
     LOG4ESPP_INFO(theLogger, "added fixed triple to global triple list");
     return true;
   }
@@ -89,7 +89,7 @@ namespace espresso {
 	python::tuple triple;
 	python::list triples;
 	for (TriplesCos::const_iterator it=triplesCos.begin(); it!=triplesCos.end(); it++) {
-      triple = python::make_tuple(it->first, it->second.get<0>(), it->second.get<1>());
+      triple = python::make_tuple(it->first, it->second.first.first, it->second.first.second);
       triples.append(triple);
     }
 
@@ -109,11 +109,12 @@ namespace espresso {
 
 	// get an iterator to the element that is one past the last element associated with key
 	lastElement = triplesCos.upper_bound(pid2);
+    
+    std::pair<longint, longint> neededPair = std::make_pair(pid1, pid3);
 
 	for ( ; itr != lastElement; ++itr){
-      boost::tuple<longint, longint, real> pair = itr->second;
-      if(pair.get<0>()==pid1 && pair.get<1>()==pid3){
-        returnVal = pair.get<2>();
+      if(neededPair==itr->second.first){
+        returnVal = itr->second.second;
         break;
       }
     }
@@ -135,12 +136,10 @@ namespace espresso {
 	// get an iterator to the element that is one past the last element associated with key
 	lastElement = triplesCos.upper_bound(pid2);
 
+    std::pair<longint, longint> neededPair = std::make_pair(pid1, pid3);
 	for ( ; itr != lastElement; ++itr){
-      boost::tuple<longint, longint, real> pair = itr->second;
-      longint locpid1 = pair.get<0>();
-      longint locpid3 = pair.get<1>();
       
-      if(locpid1==pid1 && locpid3==pid3){
+      if(neededPair==itr->second.first){
         Particle *p1 = storage->lookupLocalParticle(pid1);
         Particle *p2 = storage->lookupRealParticle(pid2);
         Particle *p3 = storage->lookupLocalParticle(pid3);
@@ -154,7 +153,7 @@ namespace espresso {
 
         real cosVal = r12*r32 / r12.abs() / r32.abs();
         
-        itr->second = boost::make_tuple(pid1, pid3, cosVal);
+        itr->second.second = cosVal;
 
         break;
       }
@@ -186,8 +185,8 @@ namespace espresso {
         toSend.push_back(pid);
         toSend.push_back(n);
         for(TriplesCos::const_iterator it = equalRange.first; it!=equalRange.second; ++it) {
-          toSend.push_back(it->second.get<0>());
-          toSend.push_back(it->second.get<1>());
+          toSend.push_back(it->second.first.first);
+          toSend.push_back(it->second.first.second);
         }
 
         // delete all of these triples from the global list
@@ -217,23 +216,8 @@ namespace espresso {
       for (; n > 0; --n) {
         pid1 = received[i++];
         pid3 = received[i++];
-        // add the triple to the global list
-        
-        /*
-        Particle *p1 = storage->lookupLocalParticle(pid1);
-        Particle *p2 = storage->lookupRealParticle(pid2);
-        Particle *p3 = storage->lookupLocalParticle(pid3);
-
-        Real3D pos1 = p1->position();
-        Real3D pos2 = p2->position();
-        Real3D pos3 = p3->position();
-
-        Real3D r12 = pos2 - pos1;
-        Real3D r32 = pos2 - pos3;
-
-        real cosVal = r12*r32 / r12.abs() / r32.abs();
-        */
-        it = triplesCos.insert(it, std::make_pair(pid2, boost::make_tuple(pid1, pid3, 0.0)));
+        // add the triple
+        it = triplesCos.insert(it, std::make_pair(pid2, std::make_pair(std::make_pair(pid1, pid3), 0.0)));
       }
     }
     if (i != size) {
@@ -261,21 +245,21 @@ namespace espresso {
         }
 	    lastpid2 = it->first;
       }
-      p1 = storage->lookupLocalParticle(it->second.get<0>());
+      p1 = storage->lookupLocalParticle(it->second.first.first);
       if (p1 == NULL) {
         std::stringstream err;
-        err << "triple particle p1 " << it->second.get<0>() << " does not exists here";
+        err << "triple particle p1 " << it->second.first.first << " does not exists here";
         std::runtime_error(err.str());
       }
-      p3 = storage->lookupLocalParticle(it->second.get<1>());
+      p3 = storage->lookupLocalParticle(it->second.first.second);
       if (p3 == NULL) {
         std::stringstream err;
-        err << "triple particle p3 " << it->second.get<1>() << " does not exists here";
+        err << "triple particle p3 " << it->second.first.second << " does not exists here";
         std::runtime_error(err.str());
       }
       this->add(p1, p2, p3);
       
-      setCos(it->second.get<0>(),it->first,it->second.get<1>());
+      setCos(it->second.first.first,it->first,it->second.first.second);
     }
     LOG4ESPP_INFO(theLogger, "regenerated local fixed triple list from global list");
   }

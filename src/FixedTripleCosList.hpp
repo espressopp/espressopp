@@ -22,7 +22,8 @@ namespace espresso {
       protected:
 		boost::signals2::connection con1, con2, con3;
 		shared_ptr<storage::Storage> storage;
-		typedef std::multimap <longint,boost::tuple<longint, longint, real> > TriplesCos;
+		//typedef std::multimap <longint,boost::tuple<longint, longint, real> > TriplesCos;
+		typedef std::multimap <longint,std::pair<std::pair<longint, longint>, real> > TriplesCos;
 		TriplesCos triplesCos;
 		using TripleList::add;
 
