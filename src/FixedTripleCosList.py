@@ -6,10 +6,11 @@ from espresso.esutil import cxxinit
 class FixedTripleCosListLocal(_espresso.FixedTripleCosList):
     'The (local) fixed triple list.'
 
-    def __init__(self, storage):
+    def __init__(self, system):
         'Local construction of a fixed triple list'
-        if pmi.workerIsActive():
-            cxxinit(self, _espresso.FixedTripleCosList, storage)
+        #if pmi.workerIsActive():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, _espresso.FixedTripleCosList, system)
 
     def add(self, pid1, pid2, pid3):
         'add triple to fixed triple list'

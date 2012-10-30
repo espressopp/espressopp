@@ -11,6 +11,7 @@
 #include <map>
 #include <boost/signals2.hpp>
 //#include "FixedListComm.hpp"
+#include "SystemAccess.hpp"
 
 /*
  * This list is temporary solution. In general it should be derived from FixedTripleList.
@@ -18,17 +19,18 @@
  */
 
 namespace espresso {
-  class FixedTripleCosList : public TripleList {
+  class FixedTripleCosList : public TripleList, SystemAccess{
       protected:
 		boost::signals2::connection con1, con2, con3;
-		shared_ptr<storage::Storage> storage;
+		//shared_ptr<storage::Storage> storage;
+        
 		//typedef std::multimap <longint,boost::tuple<longint, longint, real> > TriplesCos;
 		typedef std::multimap <longint,std::pair<std::pair<longint, longint>, real> > TriplesCos;
 		TriplesCos triplesCos;
 		using TripleList::add;
 
 	  public:
-		FixedTripleCosList( shared_ptr<storage::Storage> _storage );
+		FixedTripleCosList( shared_ptr< System > system ); //shared_ptr<storage::Storage> _storage
 		virtual ~FixedTripleCosList();
 		//bool add(pvec pids) { _comm.add(pids); }
 		/** Add the given particle triple to the list on this processor if the
@@ -58,9 +60,7 @@ namespace espresso {
 	  private:
 		static LOG4ESPP_DECL_LOGGER(theLogger);
         
-        void setCos(int, int, int);
-
-
+        void setCos(TriplesCos::iterator itr);
   };
 }
 

@@ -8,6 +8,9 @@
 #include <boost/bind.hpp>
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
+#include "bc/BC.hpp"
+//#include "System.hpp"
+
 
 namespace espresso {
 
@@ -19,16 +22,18 @@ namespace espresso {
 
   LOG4ESPP_LOGGER(FixedTripleCosList::theLogger, "FixedTripleCosList");
 
-  FixedTripleCosList::FixedTripleCosList(shared_ptr< storage::Storage > _storage)
-    : storage(_storage), triplesCos()
+  FixedTripleCosList::FixedTripleCosList(shared_ptr< System > _system)
+  : SystemAccess(_system), triplesCos()
   {
     LOG4ESPP_INFO(theLogger, "construct FixedTripleCosList");
+    
+    System& system = getSystemRef();
 
-    con1 = storage->beforeSendParticles.connect
+    con1 = system.storage->beforeSendParticles.connect
       (boost::bind(&FixedTripleCosList::beforeSendParticles, this, _1, _2));
-    con2 = storage->afterRecvParticles.connect
+    con2 = system.storage->afterRecvParticles.connect
       (boost::bind(&FixedTripleCosList::afterRecvParticles, this, _1, _2));
-    con3 = storage->onParticlesChanged.connect
+    con3 = system.storage->onParticlesChanged.connect
       (boost::bind(&FixedTripleCosList::onParticlesChanged, this));
   }
 
@@ -43,10 +48,12 @@ namespace espresso {
 
   bool FixedTripleCosList::
   add(longint pid1, longint pid2, longint pid3) {
+    System& system = getSystemRef();
+
     // ADD THE LOCAL TRIPLET
-    Particle *p1 = storage->lookupLocalParticle(pid1);
-    Particle *p2 = storage->lookupRealParticle(pid2);
-    Particle *p3 = storage->lookupLocalParticle(pid3);
+    Particle *p1 = system.storage->lookupLocalParticle(pid1);
+    Particle *p2 = system.storage->lookupRealParticle(pid2);
+    Particle *p3 = system.storage->lookupLocalParticle(pid3);
 
     // middle particle is the reference particle and must exist here
     if (!p2)
@@ -74,8 +81,8 @@ namespace espresso {
     Real3D pos2 = p2->position();
     Real3D pos3 = p3->position();
     
-    Real3D r12 = pos2 - pos1;
-    Real3D r32 = pos2 - pos3;
+    Real3D r12 = system.bc->getMinimumImageVector( pos2, pos1);
+    Real3D r32 = system.bc->getMinimumImageVector( pos2, pos3);
     
     real cosVal = r12*r32 / r12.abs() / r32.abs();
 
@@ -122,42 +129,27 @@ namespace espresso {
 	return returnVal;
   }
   
-  void FixedTripleCosList::setCos(int pid1, int pid2, int pid3){
-    TriplesCos::iterator itr;
-	TriplesCos::iterator lastElement;
-	
-	// locate an iterator to the first pair object associated with key
-	itr = triplesCos.find(pid2);
-	if (itr == triplesCos.end())
-      std::cout<<"Warning! triplesCos was not modified because the triple "
-              "doesn't exists here"<<std::endl;
-      return; // no elements associated with key, so return immediately
+  void FixedTripleCosList::setCos(TriplesCos::iterator itr){
+    System& system = getSystemRef();
 
-	// get an iterator to the element that is one past the last element associated with key
-	lastElement = triplesCos.upper_bound(pid2);
-
-    std::pair<longint, longint> neededPair = std::make_pair(pid1, pid3);
-	for ( ; itr != lastElement; ++itr){
-      
-      if(neededPair==itr->second.first){
-        Particle *p1 = storage->lookupLocalParticle(pid1);
-        Particle *p2 = storage->lookupRealParticle(pid2);
-        Particle *p3 = storage->lookupLocalParticle(pid3);
-
-        Real3D pos1 = p1->position();
-        Real3D pos2 = p2->position();
-        Real3D pos3 = p3->position();
-
-        Real3D r12 = pos2 - pos1;
-        Real3D r32 = pos2 - pos3;
-
-        real cosVal = r12*r32 / r12.abs() / r32.abs();
+    int pid1 = itr->second.first.first;
+    int pid2 = itr->first;
+    int pid3 = itr->second.first.second;
         
-        itr->second.second = cosVal;
+    Particle *p1 = system.storage->lookupLocalParticle(pid1);
+    Particle *p2 = system.storage->lookupRealParticle(pid2);
+    Particle *p3 = system.storage->lookupLocalParticle(pid3);
 
-        break;
-      }
-    }
+    Real3D pos1 = p1->position();
+    Real3D pos2 = p2->position();
+    Real3D pos3 = p3->position();
+
+    Real3D r12 = system.bc->getMinimumImageVector( pos2, pos1);
+    Real3D r32 = system.bc->getMinimumImageVector( pos2, pos3);
+
+    real cosVal = r12*r32 / r12.abs() / r32.abs();
+
+    itr->second.second = cosVal;
   }
 
   void FixedTripleCosList::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
@@ -227,6 +219,8 @@ namespace espresso {
   }
 
   void FixedTripleCosList::onParticlesChanged() {
+    System& system = getSystemRef();
+
     // (re-)generate the local triple list from the global list
     //printf("FixedTripleCosList: rebuild local triple list from global\n");
     this->clear();
@@ -234,10 +228,10 @@ namespace espresso {
     Particle *p1;
     Particle *p2;
     Particle *p3;
-    for (TriplesCos::const_iterator it = triplesCos.begin(); it!=triplesCos.end(); ++it) {
+    for (TriplesCos::iterator it = triplesCos.begin(); it!=triplesCos.end(); ++it) {
       //printf("lookup global triple %d %d %d\n", it->first, it->second.first, it->second.second);
       if (it->first != lastpid2) {
-        p2 = storage->lookupRealParticle(it->first);
+        p2 = system.storage->lookupRealParticle(it->first);
         if (p2 == NULL) {
           std::stringstream err;
           err << "triple particle p2 " << it->first << " does not exists here";
@@ -245,13 +239,13 @@ namespace espresso {
         }
 	    lastpid2 = it->first;
       }
-      p1 = storage->lookupLocalParticle(it->second.first.first);
+      p1 = system.storage->lookupLocalParticle(it->second.first.first);
       if (p1 == NULL) {
         std::stringstream err;
         err << "triple particle p1 " << it->second.first.first << " does not exists here";
         std::runtime_error(err.str());
       }
-      p3 = storage->lookupLocalParticle(it->second.first.second);
+      p3 = system.storage->lookupLocalParticle(it->second.first.second);
       if (p3 == NULL) {
         std::stringstream err;
         err << "triple particle p3 " << it->second.first.second << " does not exists here";
@@ -259,7 +253,7 @@ namespace espresso {
       }
       this->add(p1, p2, p3);
       
-      setCos(it->second.first.first,it->first,it->second.first.second);
+      setCos(it);
     }
     LOG4ESPP_INFO(theLogger, "regenerated local fixed triple list from global list");
   }
@@ -278,7 +272,7 @@ namespace espresso {
     //      = &FixedTripleCosList::add;
 
     class_< FixedTripleCosList, shared_ptr< FixedTripleCosList > >
-      ("FixedTripleCosList", init< shared_ptr< storage::Storage > >())
+      ("FixedTripleCosList", init< shared_ptr< System > >()) //init< shared_ptr< storage::Storage > >()
       .def("add", pyAdd)
       .def("size", &FixedTripleCosList::size)
       .def("getTriples",  &FixedTripleCosList::getTriples)
