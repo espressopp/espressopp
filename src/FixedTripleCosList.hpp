@@ -16,16 +16,17 @@
 /*
  * This list is temporary solution. In general it should be derived from FixedTripleList.
  * in order not to generate similar code.
+ * 
+ * It will store the initial angle for each triple
  */
+
+using namespace std;
 
 namespace espresso {
   class FixedTripleCosList : public TripleList, SystemAccess{
       protected:
 		boost::signals2::connection con1, con2, con3;
-		//shared_ptr<storage::Storage> storage;
-        
-		//typedef std::multimap <longint,boost::tuple<longint, longint, real> > TriplesCos;
-		typedef std::multimap <longint,std::pair<std::pair<longint, longint>, real> > TriplesCos;
+		typedef multimap <longint,pair<pair<longint, longint>, real> > TriplesCos;
 		TriplesCos triplesCos;
 		using TripleList::add;
 
@@ -47,6 +48,7 @@ namespace espresso {
 		python::list getTriples();
         
         // get cos value for current triple
+        //real getAngle(int, int, int);
         real getCos(int, int, int);
 
 	    /** Get the number of triples in the GlobalTriples list */
@@ -59,8 +61,6 @@ namespace espresso {
 
 	  private:
 		static LOG4ESPP_DECL_LOGGER(theLogger);
-        
-        void setCos(TriplesCos::iterator itr);
   };
 }
 

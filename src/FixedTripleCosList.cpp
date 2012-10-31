@@ -85,6 +85,9 @@ namespace espresso {
     Real3D r32 = system.bc->getMinimumImageVector( pos2, pos3);
     
     real cosVal = r12*r32 / r12.abs() / r32.abs();
+    
+    if(cosVal>1) cosVal=1;
+    if(cosVal<-1) cosVal=-1;
 
     // ADD THE GLOBAL TRIPLET
     triplesCos.insert(std::make_pair(pid2, std::make_pair(std::make_pair(pid1, pid3), cosVal)));
@@ -129,31 +132,9 @@ namespace espresso {
 	return returnVal;
   }
   
-  void FixedTripleCosList::setCos(TriplesCos::iterator itr){
-    System& system = getSystemRef();
-
-    int pid1 = itr->second.first.first;
-    int pid2 = itr->first;
-    int pid3 = itr->second.first.second;
-        
-    Particle *p1 = system.storage->lookupLocalParticle(pid1);
-    Particle *p2 = system.storage->lookupRealParticle(pid2);
-    Particle *p3 = system.storage->lookupLocalParticle(pid3);
-
-    Real3D pos1 = p1->position();
-    Real3D pos2 = p2->position();
-    Real3D pos3 = p3->position();
-
-    Real3D r12 = system.bc->getMinimumImageVector( pos2, pos1);
-    Real3D r32 = system.bc->getMinimumImageVector( pos2, pos3);
-
-    real cosVal = r12*r32 / r12.abs() / r32.abs();
-
-    itr->second.second = cosVal;
-  }
-
   void FixedTripleCosList::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
-    std::vector< longint > toSend;
+    std::vector< longint > toSendInt;
+    std::vector< real > toSendReal;
     // loop over the particle list
     for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
       longint pid = pit->id();
@@ -173,12 +154,22 @@ namespace espresso {
         // first write the pid of this particle
         // then the number of partners (n)
         // and then the pids of the partners
-        toSend.reserve(toSend.size()+2*n+1);
-        toSend.push_back(pid);
-        toSend.push_back(n);
+        
+        /*
+        buf.write(pid);
+        buf.write(n);
+
+        buf.write(it->second.first.first);
+        */
+        
+        toSendInt.reserve(toSendInt.size()+2*n+1);
+        toSendReal.reserve(toSendReal.size()+n);
+        toSendInt.push_back(pid);
+        toSendInt.push_back(n);
         for(TriplesCos::const_iterator it = equalRange.first; it!=equalRange.second; ++it) {
-          toSend.push_back(it->second.first.first);
-          toSend.push_back(it->second.first.second);
+          toSendInt.push_back(it->second.first.first);
+          toSendInt.push_back(it->second.first.second);
+          toSendReal.push_back(it->second.second);
         }
 
         // delete all of these triples from the global list
@@ -186,30 +177,39 @@ namespace espresso {
       }
     }
     // send the list
-    buf.write(toSend);
+    buf.write(toSendInt);
+    buf.write(toSendReal);
     LOG4ESPP_INFO(theLogger, "prepared fixed triple list before send particles");
   }
 
   void FixedTripleCosList::afterRecvParticles(ParticleList &pl, InBuffer& buf) {
 
-    std::vector< longint > received;
+    std::vector< longint > receivedInt;
+    std::vector< real > receivedReal;
     int n;
     longint pid1, pid2, pid3;
+    real cosVal;
     TriplesCos::iterator it = triplesCos.begin();
     // receive the triple list
-    buf.read(received);
-    int size = received.size(); int i = 0;
+    buf.read(receivedInt);
+    buf.read(receivedReal);
+    int size = receivedInt.size(); int i = 0;  int j = 0;
     while (i < size) {
       // unpack the list
-      pid2 = received[i++];
-      n = received[i++];
+      pid2 = receivedInt[i++];
+      n = receivedInt[i++];
       //printf ("me = %d: recv particle with pid %d, has %d global triples\n",
                 //mpiWorld->rank(), pid1, n);
       for (; n > 0; --n) {
-        pid1 = received[i++];
-        pid3 = received[i++];
+        pid1 = receivedInt[i++];
+        pid3 = receivedInt[i++];
+        cosVal = receivedReal[j++];
+        
+//std::cout<<"cosVal = "<<cosVal<<std::endl;
+//exit(0);
+        
         // add the triple
-        it = triplesCos.insert(it, std::make_pair(pid2, std::make_pair(std::make_pair(pid1, pid3), 0.0)));
+        it = triplesCos.insert(it, std::make_pair(pid2, std::make_pair(std::make_pair(pid1, pid3), cosVal)));
       }
     }
     if (i != size) {
@@ -252,8 +252,6 @@ namespace espresso {
         std::runtime_error(err.str());
       }
       this->add(p1, p2, p3);
-      
-      setCos(it);
     }
     LOG4ESPP_INFO(theLogger, "regenerated local fixed triple list from global list");
   }

@@ -105,6 +105,8 @@ namespace espresso {
     }
 
     void read(int& val) { readAll<int>(val); }
+    
+    void read(real& val) { readAll<real>(val); }
 
     void read(Particle& p, int extradata) {
 
@@ -136,6 +138,18 @@ namespace espresso {
       v.reserve(nvals);
       for (int i = 0; i < nvals; i++) {
         int val;
+        read(val);
+        v.push_back(val);
+      }
+    }
+
+    void read(std::vector<real> &v) {
+      int nvals;
+      read(nvals);
+      v.clear();
+      v.reserve(nvals);
+      for (int i = 0; i < nvals; i++) {
+        real val;
         read(val);
         v.push_back(val);
       }
@@ -209,6 +223,8 @@ namespace espresso {
     }
 
     void write(int& val) { writeAll<int>(val); }
+    
+    void write(real& val) { writeAll<real>(val); }
 
     void write(Particle& p, int extradata, const Real3D& shift) {
 
@@ -242,6 +258,15 @@ namespace espresso {
       write(size);
       for (longint i = 0; i < size; i++) {
         int val = v[i];
+        write(val);
+      }
+    }
+
+    void write(std::vector<real> &v) {
+      int size = v.size();
+      write(size);
+      for (longint i = 0; i < size; i++) {
+        real val = v[i];
         write(val);
       }
     }
