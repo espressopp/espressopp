@@ -1,16 +1,16 @@
 from espresso import pmi
 import _espresso
-import espresso
+#import espresso
 from espresso.esutil import cxxinit
 
-class FixedTripleCosListLocal(_espresso.FixedTripleCosList):
+class FixedTripleAngleListLocal(_espresso.FixedTripleAngleList):
     'The (local) fixed triple list.'
 
     def __init__(self, system):
         'Local construction of a fixed triple list'
         #if pmi.workerIsActive():
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, _espresso.FixedTripleCosList, system)
+            cxxinit(self, _espresso.FixedTripleAngleList, system)
 
     def add(self, pid1, pid2, pid3):
         'add triple to fixed triple list'
@@ -39,22 +39,29 @@ class FixedTripleCosListLocal(_espresso.FixedTripleCosList):
           triples = self.cxxclass.getTriples(self)
           return triples
         
-    def getCosine(self, pid1, pid2, pid3):
+    'returns the list of (pid1, pid2, pid3, angle(123))'
+    def getTriplesAngles(self):
+        'return the triples of the GlobalTripleList'
         if pmi.workerIsActive():
-          return self.cxxclass.getCos(self, pid1, pid2, pid3)
+          triples_angles = self.cxxclass.getTriplesAngles(self)
+          return triples_angles
+        
+    def getAngle(self, pid1, pid2, pid3):
+        if pmi.workerIsActive():
+          return self.cxxclass.getAngle(self, pid1, pid2, pid3)
 
 if pmi.isController:
-  class FixedTripleCosList(object):
+  class FixedTripleAngleList(object):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-        cls = 'espresso.FixedTripleCosListLocal',
+        cls = 'espresso.FixedTripleAngleListLocal',
         localcall = [ "add" ],
         pmicall = [ "addTriples" ],
-        pmiinvoke = ["getTriples", "size"]
+        pmiinvoke = ["getTriples", "getTriplesAngles", "size"]
     )
 
-    def getCos(self, pid1, pid2, pid3 ):
-      cosines = pmi.invoke(self.pmiobject, 'getCosine', pid1, pid2, pid3 )
-      for i in cosines:
+    def getAngle(self, pid1, pid2, pid3 ):
+      angles = pmi.invoke(self.pmiobject, 'getAngle', pid1, pid2, pid3 )
+      for i in angles:
         if( i != -1 ):
           return i        

@@ -12,15 +12,17 @@ namespace espresso {
   namespace interaction {
     class AngularUniquePotential {
     public:
-      virtual real computeEnergy(const Particle &p1, const Particle &p2, const Particle &p3, real cos0) const = 0;
-      virtual real computeEnergy(const Real3D& dist12, const Real3D& dist32, real cos0) const = 0;
-      virtual real computeEnergy(real theta, real cos0) const = 0;
+      virtual real computeEnergy(const Particle &p1, const Particle &p2,
+                const Particle &p3, real theta0) const = 0;
+      virtual real computeEnergy(const Real3D& r12, const Real3D& r32,
+                real theta0) const = 0;
+      virtual real computeEnergy(real theta, real theta0) const = 0;
 
-      virtual void computeForce(Real3D& force12, Real3D& force32,
-                                const Particle &p1, const Particle &p2, const Particle &p3, real cos0) const = 0;
-      virtual void computeForce(Real3D& force12, Real3D& force32,
-                                const Real3D& dist12, const Real3D& dist32, real cos0) const = 0;
-      virtual real computeForce(real theta, real cos0) const = 0; // used for generating tabular file
+      virtual void computeForce(Real3D& force12, Real3D& force32, const Particle &p1,
+                const Particle &p2, const Particle &p3, real theta0) const = 0;
+      virtual void computeForce(Real3D& force12, Real3D& force32, const Real3D& r12,
+                const Real3D& r32, real theta0) const = 0;
+      virtual real computeForce(real theta, real theta0) const = 0; // used for generating tabular file
 
 
       virtual void setCutoff(real _cutoff) = 0;
@@ -37,14 +39,16 @@ namespace espresso {
       AngularUniquePotentialTemplate();
 
       // Implements the Potential virtual interface
-      virtual real computeEnergy(const Particle &p1, const Particle &p2, const Particle &p3, real cos0) const;
-      virtual real computeEnergy(const Real3D& dist12, const Real3D& dist32, real cos0) const;
-      virtual real computeEnergy(const real theta, real cos0) const;
+      virtual real computeEnergy(const Particle &p1, const Particle &p2,
+                const Particle &p3, real theta0) const;
+      virtual real computeEnergy(const Real3D& r12,
+                const Real3D& r32, real theta0) const;
+      virtual real computeEnergy(const real theta, real theta0) const;
 
-      virtual void computeForce(Real3D& force12, Real3D& force32,
-                                const Particle &p1, const Particle &p2, const Particle &p3, real cos0) const;
-      virtual void computeForce(Real3D& force12, Real3D& force32,
-                                const Real3D& dist12, const Real3D& dist32, real cos0) const;
+      virtual void computeForce(Real3D& force12, Real3D& force32, const Particle &p1,
+                const Particle &p2, const Particle &p3, real theta0) const;
+      virtual void computeForce(Real3D& force12, Real3D& force32, const Real3D& r12,
+                const Real3D& r32, real cos0) const;
       virtual real computeForce(real theta, real cos0) const; // used for generating tabular file
 
       virtual void setCutoff(real _cutoff);
@@ -52,15 +56,16 @@ namespace espresso {
 
       // Implements the non-virtual interface 
       // (used by e.g. the Interaction templates)
-      real _computeEnergy(const Particle &p1, const Particle &p2, const Particle &p3, real cos0) const;
-      real _computeEnergy(const Real3D& dist12, const Real3D& dist32, real cos0) const;
-      real _computeEnergy(real theta, real cos0) const;
+      real _computeEnergy(const Particle &p1, const Particle &p2,
+                const Particle &p3, real theta0) const;
+      real _computeEnergy(const Real3D& r12, const Real3D& r32, real theta0) const;
+      real _computeEnergy(real theta, real theta0) const;
 
-      void _computeForce(Real3D& force12, Real3D& force32,
-			 const Particle &p1, const Particle &p2, const Particle &p3, real cos0) const;
+      void _computeForce(Real3D& force12, Real3D& force32, const Particle &p1,
+                const Particle &p2, const Particle &p3, real theta0) const;
       
       bool _computeForce(Real3D& force12, Real3D& force32,
-			 const Real3D& dist12, const Real3D& dist32, real cos0) const;
+			 const Real3D& r12, const Real3D& r32, real theta0) const;
 
     protected:
       real cutoff;
@@ -70,7 +75,7 @@ namespace espresso {
         return static_cast< Derived* >(this);
       }
 
-    const Derived* derived_this() const {
+      const Derived* derived_this() const {
         return static_cast< const Derived* >(this);
       }
     };
@@ -104,57 +109,57 @@ namespace espresso {
     template < class Derived >
     inline real
     AngularUniquePotentialTemplate< Derived >::
-    computeEnergy(const Particle &p1, const Particle &p2, const Particle &p3, real cos0) const {
-      Real3D dist12 = p1.position() - p2.position();
-      Real3D dist32 = p3.position() - p2.position();
-      return computeEnergy(dist12, dist32, cos0);
+    computeEnergy(const Particle &p1, const Particle &p2, const Particle &p3, real theta0) const {
+      Real3D r12 = p1.position() - p2.position();
+      Real3D r32 = p3.position() - p2.position();
+      return computeEnergy(r12, r32, theta0);
     }
 
     template < class Derived >
     inline real
     AngularUniquePotentialTemplate< Derived >::
-    computeEnergy(const Real3D& dist12, const Real3D& dist32, real cos0) const {
-      real dist12Sqr = dist12 * dist12;
-      real dist32Sqr = dist32 * dist32;
-      real cos_theta = dist12 * dist32 / (sqrt(dist12Sqr) * sqrt(dist32Sqr));
-      return computeEnergy(acos(cos_theta), cos0);
+    computeEnergy(const Real3D& r12, const Real3D& r32, real theta0) const {
+      real dist12Sqr = r12.sqr();
+      real dist32Sqr = r32.sqr();
+      real cos_theta = r12 * r32 / (sqrt(dist12Sqr) * sqrt(dist32Sqr));
+      return computeEnergy(acos(cos_theta), theta0);
     }
 
     template < class Derived >
     inline real 
     AngularUniquePotentialTemplate< Derived >::
-    computeEnergy(real theta, real cos0) const {
-      return _computeEnergy(theta, cos0); // a bug was here (it was: return computeEnergy(theta);)
+    computeEnergy(real theta, real theta0) const {
+      return _computeEnergy(theta, theta0); // a bug was here (it was: return computeEnergy(theta);)
     }
     
     template < class Derived > 
     inline real 
     AngularUniquePotentialTemplate< Derived >::
-    _computeEnergy(const Particle &p1, const Particle &p2, const Particle &p3, real cos0) const {
-      Real3D dist12 = p1.position() - p2.position();
-      Real3D dist32 = p3.position() - p2.position();
-      return _computeEnergy(dist12, dist32, cos0);
+    _computeEnergy(const Particle &p1, const Particle &p2, const Particle &p3, real theta0) const {
+      Real3D r12 = p1.position() - p2.position();
+      Real3D r32 = p3.position() - p2.position();
+      return _computeEnergy(r12, r32, theta0);
     }
 
     template < class Derived >
     inline real
     AngularUniquePotentialTemplate< Derived >::
-    _computeEnergy(const Real3D& dist12, const Real3D& dist32, real cos0) const {
-      real dist12_sqr = dist12 * dist12;
-      real dist32_sqr = dist32 * dist32;
+    _computeEnergy(const Real3D& r12, const Real3D& r32, real theta0) const {
+      real dist12_sqr = r12.sqr();
+      real dist32_sqr = r32.sqr();
       if (dist12_sqr >= cutoffSqr || dist32_sqr >= cutoffSqr )
         return 0.0;
       else{
-        real cos_theta = dist12 * dist32 / (sqrt(dist12_sqr) * sqrt(dist32_sqr));
-        return _computeEnergy(acos(cos_theta), cos0);
+        real cos_theta = r12 * r32 / (sqrt(dist12_sqr) * sqrt(dist32_sqr));
+        return _computeEnergy(acos(cos_theta), theta0);
       }
     }
 
     template < class Derived > 
     inline real
     AngularUniquePotentialTemplate< Derived >::
-    _computeEnergy(real theta, real cos0) const {
-      return derived_this()->_computeEnergyRaw(theta, cos0);
+    _computeEnergy(real theta, real theta0) const {
+      return derived_this()->_computeEnergyRaw(theta, theta0);
     }
     
     // Force computation
@@ -163,10 +168,11 @@ namespace espresso {
     AngularUniquePotentialTemplate< Derived >::
     computeForce(Real3D& force12,
                  Real3D& force32,
-                 const Particle &p1, const Particle &p2, const Particle &p3, real cos0) const {
-      Real3D dist12 = p1.position() - p2.position();
-      Real3D dist32 = p3.position() - p2.position();
-      _computeForce(force12, force32, dist12, dist32, cos0);
+                 const Particle &p1, const Particle &p2,
+                 const Particle &p3, real theta0) const {
+      Real3D r12 = p1.position() - p2.position();
+      Real3D r32 = p3.position() - p2.position();
+      _computeForce(force12, force32, r12, r32, theta0);
     }
 
     template < class Derived >
@@ -174,9 +180,9 @@ namespace espresso {
     AngularUniquePotentialTemplate< Derived >::
     computeForce(Real3D& force12,
                  Real3D& force32,
-                 const Real3D& dist12,
-                 const Real3D& dist32, real cos0) const {
-      _computeForce(force12, force32, dist12, dist32, cos0);
+                 const Real3D& r12,
+                 const Real3D& r32, real theta0) const {
+      _computeForce(force12, force32, r12, r32, theta0);
     }
 
     template < class Derived >
@@ -184,10 +190,11 @@ namespace espresso {
     AngularUniquePotentialTemplate< Derived >::
     _computeForce(Real3D& force12,
                   Real3D& force32,
-                  const Particle &p1, const Particle &p2, const Particle &p3, real cos0) const {
-      Real3D dist12 = p1.position() - p2.position();
-      Real3D dist32 = p3.position() - p2.position();
-      _computeForce(force12, force32, dist12, dist32, cos0);
+                  const Particle &p1, const Particle &p2,
+                  const Particle &p3, real theta0) const {
+      Real3D r12 = p1.position() - p2.position();
+      Real3D r32 = p3.position() - p2.position();
+      _computeForce(force12, force32, r12, r32, theta0);
     }
 
     template < class Derived >
@@ -195,18 +202,18 @@ namespace espresso {
     AngularUniquePotentialTemplate< Derived >::
     _computeForce(Real3D& force12,
                   Real3D& force32,
-                  const Real3D& dist12,
-                  const Real3D& dist32, real cos0) const {
+                  const Real3D& r12,
+                  const Real3D& r32, real theta0) const {
       
-      return derived_this()->_computeForceRaw(force12, force32, dist12, dist32, cos0);
+      return derived_this()->_computeForceRaw(force12, force32, r12, r32, theta0);
     }
     
     // used for generating tabular angular potential
     template < class Derived >
     inline real
     AngularUniquePotentialTemplate< Derived >::
-    computeForce(real theta, real cos0) const {
-      return derived_this()->_computeForceRaw(theta, cos0);
+    computeForce(real theta, real theta0) const {
+      return derived_this()->_computeForceRaw(theta, theta0);
     }
     
   }

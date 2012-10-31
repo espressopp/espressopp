@@ -3,7 +3,7 @@
 #define _INTERACTION_ANGULARUNIQUECOSINESQUARED_HPP
 
 #include "AngularUniquePotential.hpp"
-#include "FixedTripleCosListInteractionTemplate.hpp"
+#include "FixedTripleAngleListInteractionTemplate.hpp"
 #include <cmath>
 
 namespace espresso {
@@ -26,13 +26,13 @@ namespace espresso {
       void setK(real _K) { K = _K; }
       real getK() const { return K; }
 
-      real _computeEnergyRaw(real _theta, real cos_theta0) const {
+      real _computeEnergyRaw(real _theta, real _theta0) const {
         // _theta and theta0 should be in radians
-        real energy = K * pow(cos(_theta) - cos_theta0, 2);
+        real energy = K * pow( cos(_theta) - cos(_theta0), 2);
     	return energy;
       }
 
-      bool _computeForceRaw(Real3D& force12, Real3D& force32, const Real3D& r12, const Real3D& r32, real cos_theta0)const{
+      bool _computeForceRaw(Real3D& force12, Real3D& force32, const Real3D& r12, const Real3D& r32, real _theta0)const{
         real dist12_sqr = r12.sqr();
         real dist32_sqr = r32.sqr();
         real dist12_magn = sqrt(dist12_sqr);
@@ -43,7 +43,7 @@ namespace espresso {
         if(cos_theta < -1.0) cos_theta = -1.0;
         else if(cos_theta >  1.0) cos_theta =  1.0;
 
-        real dU_dtheta = 2.0 * K * (cos_theta - cos_theta0);
+        real dU_dtheta = 2.0 * K * (cos_theta - cos(_theta0));
         
         real a11 = dU_dtheta * cos_theta / dist12_sqr;
         real a12 = -dU_dtheta * inv_dist1232;
@@ -56,12 +56,12 @@ namespace espresso {
       }
 
       // used to generate the tabulated table
-      real _computeForceRaw(real theta, real cos_theta0) const {
+      real _computeForceRaw(real theta, real _theta0) const {
         real cos_theta = cos(theta);
         if(cos_theta < -1.0) cos_theta = -1.0;
         else if(cos_theta >  1.0) cos_theta =  1.0;
 
-        return 2.0 * K * (cos_theta - cos_theta0);
+        return 2.0 * K * (cos_theta - cos(_theta0));
 
       }
       

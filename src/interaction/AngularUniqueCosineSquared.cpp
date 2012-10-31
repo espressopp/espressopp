@@ -1,6 +1,6 @@
 #include "python.hpp"
 #include "AngularUniqueCosineSquared.hpp"
-#include "FixedTripleCosListInteractionTemplate.hpp"
+#include "FixedTripleAngleListInteractionTemplate.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -16,15 +16,15 @@ namespace espresso {
         .add_property("K", &AngularUniqueCosineSquared::getK, &AngularUniqueCosineSquared::setK)
       ;
 
-      typedef class FixedTripleCosListInteractionTemplate< AngularUniqueCosineSquared >
-        FixedTripleCosListAngularUniqueCosineSquared;
-        class_< FixedTripleCosListAngularUniqueCosineSquared, bases< Interaction > >
-          ("interaction_FixedTripleCosListAngularUniqueCosineSquared",
+      typedef class FixedTripleAngleListInteractionTemplate< AngularUniqueCosineSquared >
+        FixedTripleAngleListAngularUniqueCosineSquared;
+        class_< FixedTripleAngleListAngularUniqueCosineSquared, bases< Interaction > >
+          ("interaction_FixedTripleAngleListAngularUniqueCosineSquared",
                   init<shared_ptr<System>,
-                      shared_ptr<FixedTripleCosList>,
+                      shared_ptr<FixedTripleAngleList>,
                       shared_ptr<AngularUniqueCosineSquared> >())
-          .def("setPotential", &FixedTripleCosListAngularUniqueCosineSquared::setPotential)
-          .def("getFixedTripleList", &FixedTripleCosListAngularUniqueCosineSquared::getFixedTripleList)
+          .def("setPotential", &FixedTripleAngleListAngularUniqueCosineSquared::setPotential)
+          .def("getFixedTripleList", &FixedTripleAngleListAngularUniqueCosineSquared::getFixedTripleList)
         ;
     }
   }

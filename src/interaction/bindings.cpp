@@ -22,6 +22,7 @@
 
 #include "Cosine.hpp"
 #include "AngularHarmonic.hpp"
+#include "AngularUniqueHarmonic.hpp"
 #include "AngularCosineSquared.hpp"
 
 #include "AngularUniqueCosineSquared.hpp"
@@ -62,6 +63,7 @@ namespace espresso {
       TabulatedAngular::registerPython();
       Cosine::registerPython();
       AngularHarmonic::registerPython();
+      AngularUniqueHarmonic::registerPython();
       AngularCosineSquared::registerPython();
       
       AngularUniqueCosineSquared::registerPython();

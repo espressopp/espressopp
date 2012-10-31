@@ -3,7 +3,8 @@ from espresso.esutil import *
 
 from espresso.interaction.AngularUniquePotential import *
 from espresso.interaction.Interaction import *
-from _espresso import interaction_AngularUniqueCosineSquared, interaction_FixedTripleCosListAngularUniqueCosineSquared
+from _espresso import interaction_AngularUniqueCosineSquared, \
+                      interaction_FixedTripleAngleListAngularUniqueCosineSquared
 
 class AngularUniqueCosineSquaredLocal(AngularUniquePotentialLocal, interaction_AngularUniqueCosineSquared):
     'The (local) AngularUniqueCosineSquared potential.'
@@ -12,11 +13,11 @@ class AngularUniqueCosineSquaredLocal(AngularUniquePotentialLocal, interaction_A
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
           cxxinit(self, interaction_AngularUniqueCosineSquared, K)
 
-class FixedTripleCosListAngularUniqueCosineSquaredLocal(InteractionLocal, interaction_FixedTripleCosListAngularUniqueCosineSquared):
-    'The (local) AngularUniqueCosineSquared interaction using FixedTripleCos lists.'
+class FixedTripleAngleListAngularUniqueCosineSquaredLocal(InteractionLocal, interaction_FixedTripleAngleListAngularUniqueCosineSquared):
+    'The (local) AngularUniqueCosineSquared interaction using FixedTripleAngle lists.'
     def __init__(self, system, ftcl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          cxxinit(self, interaction_FixedTripleCosListAngularUniqueCosineSquared, system, ftcl, potential)
+          cxxinit(self, interaction_FixedTripleAngleListAngularUniqueCosineSquared, system, ftcl, potential)
 
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -34,9 +35,9 @@ if pmi.isController:
         pmiproperty = ['K']
       )
 
-    class FixedTripleCosListAngularUniqueCosineSquared(Interaction):
+    class FixedTripleAngleListAngularUniqueCosineSquared(Interaction):
       __metaclass__ = pmi.Proxy
       pmiproxydefs = dict(
-        cls =  'espresso.interaction.FixedTripleCosListAngularUniqueCosineSquaredLocal',
+        cls =  'espresso.interaction.FixedTripleAngleListAngularUniqueCosineSquaredLocal',
         pmicall = ['setPotential','getFixedTripleList']
       )

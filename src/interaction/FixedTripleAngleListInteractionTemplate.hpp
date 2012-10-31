@@ -1,6 +1,6 @@
 // ESPP_CLASS
-#ifndef _INTERACTION_FIXEDTRIPLECOSLISTINTERACTIONTEMPLATE_HPP
-#define _INTERACTION_FIXEDTRIPLECOSLISTINTERACTIONTEMPLATE_HPP
+#ifndef _INTERACTION_FIXEDTRIPLEANGLELISTINTERACTIONTEMPLATE_HPP
+#define _INTERACTION_FIXEDTRIPLEANGLELISTINTERACTIONTEMPLATE_HPP
 
 #include "mpi.hpp"
 #include "types.hpp"
@@ -8,7 +8,7 @@
 #include "Real3D.hpp"
 #include "Tensor.hpp"
 #include "Particle.hpp"
-#include "FixedTripleCosList.hpp"
+#include "FixedTripleAngleList.hpp"
 //#include "FixedTripleListAdress.hpp"
 #include "esutil/Array2D.hpp"
 #include "bc/BC.hpp"
@@ -16,21 +16,21 @@
 
 /*
  * Temporary interaction template for angular potential based on fixed triple list
- * with fixed unique angles (cosines)
+ * with fixed unique angles
  */
 
 namespace espresso {
   namespace interaction {
     template < typename _AngularPotential >
-    class FixedTripleCosListInteractionTemplate : public Interaction, SystemAccess {
+    class FixedTripleAngleListInteractionTemplate : public Interaction, SystemAccess {
         
     protected:
       typedef _AngularPotential Potential;
       
     public:
-      FixedTripleCosListInteractionTemplate
+      FixedTripleAngleListInteractionTemplate
       (shared_ptr < System > _system,
-       shared_ptr < FixedTripleCosList > _fixedtripleList,
+       shared_ptr < FixedTripleAngleList > _fixedtripleList,
        shared_ptr < Potential > _potential)
         : SystemAccess(_system), fixedtripleList(_fixedtripleList), potential(_potential)
       {
@@ -39,14 +39,14 @@ namespace espresso {
         }
       }
 
-      virtual ~FixedTripleCosListInteractionTemplate() {};
+      virtual ~FixedTripleAngleListInteractionTemplate() {};
 
       void
-      setFixedTripleCosList(shared_ptr < FixedTripleCosList > _fixedtripleList) {
+      setFixedTripleAngleList(shared_ptr < FixedTripleAngleList > _fixedtripleList) {
         fixedtripleList = _fixedtripleList;
       }
 
-      shared_ptr < FixedTripleCosList > 
+      shared_ptr < FixedTripleAngleList > 
       getFixedTripleList() {
         return fixedtripleList;
       }
@@ -77,7 +77,7 @@ namespace espresso {
 
     protected:
       int ntypes;
-      shared_ptr<FixedTripleCosList> fixedtripleList;
+      shared_ptr<FixedTripleAngleList> fixedtripleList;
       shared_ptr < Potential > potential;
     };
 
@@ -85,11 +85,11 @@ namespace espresso {
     // INLINE IMPLEMENTATION
     //////////////////////////////////////////////////
     template < typename _AngularPotential > inline void
-    FixedTripleCosListInteractionTemplate <_AngularPotential>::
+    FixedTripleAngleListInteractionTemplate <_AngularPotential>::
     addForces() {
-      LOG4ESPP_INFO(theLogger, "add forces computed by FixedTripleCosList");
+      LOG4ESPP_INFO(theLogger, "add forces computed by FixedTripleAngleList");
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      for (FixedTripleCosList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
+      for (FixedTripleAngleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         Particle &p3 = *it->third;
@@ -99,9 +99,9 @@ namespace espresso {
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
         Real3D force12, force32;
         
-        real currentCos = fixedtripleList->getCos(p1.getId(), p2.getId(), p3.getId());
+        real currentAngle = fixedtripleList->getAngle(p1.getId(), p2.getId(), p3.getId());
         
-        potential->_computeForce(force12, force32, dist12, dist32, currentCos);
+        potential->_computeForce(force12, force32, dist12, dist32, currentAngle);
         p1.force() += force12;
         p2.force() -= force12 + force32;
         p3.force() += force32;
@@ -109,13 +109,13 @@ namespace espresso {
     }
 
     template < typename _AngularPotential > inline real
-    FixedTripleCosListInteractionTemplate < _AngularPotential >::
+    FixedTripleAngleListInteractionTemplate < _AngularPotential >::
     computeEnergy() {
       LOG4ESPP_INFO(theLogger, "compute energy of the triples");
 
       const bc::BC& bc = *getSystemRef().bc;
       real e = 0.0;
-      for (FixedTripleCosList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
+      for (FixedTripleAngleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
@@ -123,9 +123,9 @@ namespace espresso {
         Real3D dist12 = bc.getMinimumImageVector(p1.position(), p2.position());
         Real3D dist32 = bc.getMinimumImageVector(p3.position(), p2.position());
         
-        real currentCos = fixedtripleList->getCos(p1.getId(), p2.getId(), p3.getId());
+        real currentAngle = fixedtripleList->getAngle(p1.getId(), p2.getId(), p3.getId());
         
-        e += potential->_computeEnergy(dist12, dist32, currentCos);
+        e += potential->_computeEnergy(dist12, dist32, currentAngle);
       }
       real esum;
       boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
@@ -133,13 +133,13 @@ namespace espresso {
     }
 
     template < typename _AngularPotential > inline real
-    FixedTripleCosListInteractionTemplate < _AngularPotential >::
+    FixedTripleAngleListInteractionTemplate < _AngularPotential >::
     computeVirial() {
       LOG4ESPP_INFO(theLogger, "compute scalar virial of the triples");
 
       const bc::BC& bc = *getSystemRef().bc;
       real w = 0.0;
-      for (FixedTripleCosList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
+      for (FixedTripleAngleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
@@ -150,9 +150,9 @@ namespace espresso {
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
         Real3D force12, force32;
 
-        real currentCos = fixedtripleList->getCos(p1.getId(), p2.getId(), p3.getId());
+        real currentAngle = fixedtripleList->getAngle(p1.getId(), p2.getId(), p3.getId());
         
-        potential->_computeForce(force12, force32, dist12, dist32, currentCos);
+        potential->_computeForce(force12, force32, dist12, dist32, currentAngle);
         w += dist12 * force12 + dist32 * force32;
       }
       real wsum;
@@ -161,13 +161,13 @@ namespace espresso {
     }
 
     template < typename _AngularPotential > inline void
-    FixedTripleCosListInteractionTemplate < _AngularPotential >::
+    FixedTripleAngleListInteractionTemplate < _AngularPotential >::
     computeVirialTensor(Tensor& w) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 
       Tensor wlocal(0.0);
       const bc::BC& bc = *getSystemRef().bc;
-      for (FixedTripleCosList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it){
+      for (FixedTripleAngleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it){
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
@@ -177,9 +177,9 @@ namespace espresso {
         bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
         Real3D force12, force32;
 
-        real currentCos = fixedtripleList->getCos(p1.getId(), p2.getId(), p3.getId());
+        real currentAngle = fixedtripleList->getAngle(p1.getId(), p2.getId(), p3.getId());
         
-        potential->_computeForce(force12, force32, r12, r32, currentCos);
+        potential->_computeForce(force12, force32, r12, r32, currentAngle);
         wlocal += Tensor(r12, force12) + Tensor(r32, force32);
       }
       
@@ -193,14 +193,14 @@ namespace espresso {
     // TODO physics should be checked
     // now it calculates if the 2 particle is inside the volume
     template < typename _AngularPotential > inline void
-    FixedTripleCosListInteractionTemplate < _AngularPotential >::
+    FixedTripleAngleListInteractionTemplate < _AngularPotential >::
     computeVirialTensor(Tensor& w,
             real xmin, real xmax, real ymin, real ymax, real zmin, real zmax) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
 
       Tensor wlocal(0.0);
       const bc::BC& bc = *getSystemRef().bc;
-      for (FixedTripleCosList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it){
+      for (FixedTripleAngleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it){
         const Particle &p1 = *it->first;
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
@@ -215,9 +215,9 @@ namespace espresso {
           bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
           Real3D force12, force32;
 
-          real currentCos = fixedtripleList->getCos(p1.getId(), p2.getId(), p3.getId());
+          real currentAngle = fixedtripleList->getAngle(p1.getId(), p2.getId(), p3.getId());
         
-          potential->_computeForce(force12, force32, r12, r32, currentCos);
+          potential->_computeForce(force12, force32, r12, r32, currentAngle);
           wlocal += Tensor(r12, force12) + Tensor(r32, force32);
         }
       }
@@ -230,7 +230,7 @@ namespace espresso {
     
     template < typename _AngularPotential >
     inline real
-    FixedTripleCosListInteractionTemplate< _AngularPotential >::
+    FixedTripleAngleListInteractionTemplate< _AngularPotential >::
     getMaxCutoff() {
       return potential->getCutoff();
     }
