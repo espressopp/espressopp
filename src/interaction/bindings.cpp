@@ -9,6 +9,7 @@
 #include "LennardJonesGromacs.hpp"
 #include "Morse.hpp"
 #include "CoulombTruncated.hpp"
+#include "GravityTruncated.hpp"
 #include "ReactionFieldGeneralized.hpp"
 #include "SoftCosine.hpp"
 #include "FENE.hpp"
@@ -50,6 +51,7 @@ namespace espresso {
       LennardJonesGromacs::registerPython();
       Morse::registerPython();
       CoulombTruncated::registerPython();
+      GravityTruncated::registerPython();
       ReactionFieldGeneralized::registerPython();
       SoftCosine::registerPython();
       Tabulated::registerPython();
