@@ -11,6 +11,7 @@
 #include "VerletListTriple.hpp"
 #include "bc/BC.hpp"
 #include "SystemAccess.hpp"
+#include "esutil/Array3D.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -22,46 +23,35 @@ namespace espresso {
       
     public:
       VerletListTripleInteractionTemplate
-      (shared_ptr < System > _system,
-       shared_ptr < VerletListTriple > _verletlisttriple,
-       shared_ptr < Potential > _potential)
-        : SystemAccess(_system), verletListTriple(_verletlisttriple),
-          potential(_potential)
+      (shared_ptr < System > _system,shared_ptr < VerletListTriple > _verletlisttriple)
+      : SystemAccess(_system), verletListTriple(_verletlisttriple)
       {
-          if (! potential) {
-                LOG4ESPP_ERROR(theLogger, "NULL potential");
-          }
-        //potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
+        potentialArray = esutil::Array3D<Potential, esutil::enlarge>(0, 0, 0, Potential());
+        ntypes = 0;
       }
 
       void
       setVerletListTriple(shared_ptr < VerletListTriple > _verletlisttriple) {
         verletListTriple = _verletlisttriple;
       }
-
       shared_ptr < VerletListTriple > getVerletListTriple() {
         return verletListTriple;
       }
 
-      /*void
-      setPotential(int type1, int type2, const Potential &potential) {
-        potentialArray.at(type1, type2) = potential;
-      }*/
+      
+      /* it will create the table for every possible combination
+       * For example, type1 = 0, type2 = 1:
+       * 000, 100, 001, 010, 101, 111
+       */
       void
-      setPotential(shared_ptr < Potential> _potential) {
-         if (_potential) {
-            potential = _potential;
-         } else {
-            LOG4ESPP_ERROR(theLogger, "NULL potential");
-         }
+      setPotential(int type1, int type2, int type3, const Potential &potential) {
+        ntypes = std::max(ntypes, std::max(type1+1, std::max(type2+1, type3+1)));
+        
+        potentialArray.at(type1, type2, type3) = potential;
       }
 
-      /*Potential &getPotential(int type1, int type2) {
-        return potentialArray.at(0, 0);
-      }*/
-
-      shared_ptr < Potential > getPotential() {
-        return potential;
+      Potential &getPotential(int type1, int type2, int type3) {
+        return potentialArray.at(type1, type2, type3);
       }
 
       virtual void addForces();
@@ -76,8 +66,7 @@ namespace espresso {
     protected:
       int ntypes;
       shared_ptr<VerletListTriple> verletListTriple;
-      //esutil::Array2D<Potential, esutil::enlarge> potentialArray;
-      shared_ptr < Potential > potential;
+      esutil::Array3D<Potential, esutil::enlarge> potentialArray;
     };
 
     //////////////////////////////////////////////////
@@ -96,8 +85,15 @@ namespace espresso {
         Real3D r12, r32;
         bc.getMinimumImageVectorBox(r12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
-        Real3D force12, force32;
-        if(potential->_computeForce(force12, force32, r12, r32)){
+        
+        int type1 = p1.type();
+        int type2 = p2.type();
+        int type3 = p3.type();
+        const Potential &potential = getPotential(type1, type2, type3);
+        
+        Real3D force12(0.0,0.0,0.0), force32(0.0,0.0,0.0);
+        
+        if(potential._computeForce(force12, force32, r12, r32)){
           p1.force() += force12;
           p2.force() -= force12 + force32;
           p3.force() += force32;
@@ -118,7 +114,13 @@ namespace espresso {
         const Particle &p3 = *it->third;
         Real3D r12 = bc.getMinimumImageVector(p1.position(), p2.position());
         Real3D r32 = bc.getMinimumImageVector(p3.position(), p2.position());
-        e += potential->_computeEnergy(r12, r32);
+        
+        int type1 = p1.type();
+        int type2 = p2.type();
+        int type3 = p3.type();
+        const Potential &potential = getPotential(type1, type2, type3);
+        
+        e += potential._computeEnergy(r12, r32);
       }
       real esum;
       boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
@@ -141,8 +143,14 @@ namespace espresso {
         Real3D dist12, dist32;
         bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());
-        Real3D force12, force32;
-        if(potential->_computeForce(force12, force32, dist12, dist32)){
+
+        int type1 = p1.type();
+        int type2 = p2.type();
+        int type3 = p3.type();
+        const Potential &potential = getPotential(type1, type2, type3);
+        
+        Real3D force12(0.0,0.0,0.0), force32(0.0,0.0,0.0);
+        if(potential._computeForce(force12, force32, dist12, dist32)){
           w += dist12 * force12 + dist32 * force32;
         }
       }
@@ -166,8 +174,14 @@ namespace espresso {
         Real3D r12, r32;
         bc.getMinimumImageVectorBox(r12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
-        Real3D force12, force32;
-        if(potential->_computeForce(force12, force32, r12, r32)){
+        
+        int type1 = p1.type();
+        int type2 = p2.type();
+        int type3 = p3.type();
+        const Potential &potential = getPotential(type1, type2, type3);
+        
+        Real3D force12(0.0,0.0,0.0), force32(0.0,0.0,0.0);
+        if(potential._computeForce(force12, force32, r12, r32)){
           wlocal += Tensor(r12, force12) + Tensor(r32, force32);
         }
       }
@@ -203,8 +217,14 @@ namespace espresso {
           Real3D r12, r32;
           bc.getMinimumImageVectorBox(r12, p1.position(), p2.position());
           bc.getMinimumImageVectorBox(r32, p3.position(), p2.position());
-          Real3D force12, force32;
-          if(potential->_computeForce(force12, force32, r12, r32)){
+          
+          int type1 = p1.type();
+          int type2 = p2.type();
+          int type3 = p3.type();
+          const Potential &potential = getPotential(type1, type2, type3);
+
+          Real3D force12(0.0,0.0,0.0), force32(0.0,0.0,0.0);
+          if(potential._computeForce(force12, force32, r12, r32)){
             wlocal += Tensor(r12, force12) + Tensor(r32, force32);
           }
         }
@@ -220,13 +240,15 @@ namespace espresso {
     inline real
     VerletListTripleInteractionTemplate< _ThreeBodyPotential >::
     getMaxCutoff() {
-      /*real cutoff = 0.0;
+      real cutoff = 0.0;
       for (int i = 0; i < ntypes; i++) {
         for (int j = 0; j < ntypes; j++) {
-          cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
+          for (int k = 0; k < ntypes; k++) {
+            cutoff = std::max(cutoff, getPotential(i, j, k).getCutoff());
+          }
         }
-      }*/
-      return potential->getCutoff();
+      }
+      return cutoff;
     }
   }
 }
