@@ -8,9 +8,10 @@
 #################################
 
 '''
-This is an example for an MD simulation of a Si using Stillinger-Weber nonbonded 
-3-body potential.
-The initial configuration is a diamond structure.
+  This is an example for an MD simulation of a Si using Stillinger-Weber nonbonded 
+  3-body potential.
+  The initial configuration is a diamond structure.
+  The result is radial distribution function 'rdf.dat' (units - [nm])
 '''
 
 import sys
@@ -108,14 +109,54 @@ print ''
 vl = espresso.VerletList(system, cutoff=rc)
 potSWpair = espresso.interaction.StillingerWeberPairTerm(A=_A, B=_B, p=_p, q=_q, epsilon=_eps, sigma=_sig, cutoff=rc)
 interSWpair = espresso.interaction.VerletListStillingerWeberPairTerm(vl)
-potSWpair = interSWpair.setPotential(type1=0, type2=0, potential=potSWpair)
+interSWpair.setPotential(type1=0, type2=0, potential=potSWpair)
 system.addInteraction(interSWpair)
 
 # Stillinger Weber triple potential (3-body nonbonded interaction)
 vl3 = espresso.VerletListTriple(system, cutoff=rc)
 potSWtriple = espresso.interaction.StillingerWeberTripleTerm(gamma=_gamma, theta0=_theta, lmbd=_lambda, epsilon=_eps, sigma=_sig, cutoff=rc)
-interSWtriple = espresso.interaction.VerletListStillingerWeberTripleTerm(system, vl3, potSWtriple)
+interSWtriple = espresso.interaction.VerletListStillingerWeberTripleTerm(system, vl3)
+interSWtriple.setPotential(type1=0, type2=0, type3=0, potential=potSWtriple)
 system.addInteraction(interSWtriple)
+
+#######################################################################
+#                               IMPORTANT                             #
+#  Currently in order to use many particle types one have to          #
+#  introduce whole set of possible triples with appropriate           #
+#  parameters. For example, we have two types, then:                  #
+# >> interSWtriple.setPotential(type1=0, \                            #
+#                               type2=0, \                            #
+#                               type3=0, \                            #
+#                               potential=potSWtriple000)             #
+# >> interSWtriple.setPotential(type1=1, \                            #
+#                               type2=0, \                            #
+#                               type3=0, \                            #
+#                               potential=potSWtriple100)             #
+# >> interSWtriple.setPotential(type1=1, \                            #
+#                               type2=1, \                            #
+#                               type3=0, \                            #
+#                               potential=potSWtriple110)             #
+# >> interSWtriple.setPotential(type1=1, \                            #
+#                               type2=1, \                            #
+#                               type3=1, \                            #
+#                               potential=potSWtriple111)             #
+# >> interSWtriple.setPotential(type1=0, \                            #
+#                               type2=1, \                            #
+#                               type3=0, \                            #
+#                               potential=potSWtriple010)             #
+# >> interSWtriple.setPotential(type1=0, \                            #
+#                               type2=1, \                            #
+#                               type3=1, \                            #
+#                               potential=potSWtriple011)             #
+# >> interSWtriple.setPotential(type1=0, \                            #
+#                               type2=0, \                            #
+#                               type3=1, \                            #
+#                               potential=potSWtriple001)             #
+# >> interSWtriple.setPotential(type1=1, \                            #
+#                               type2=0, \                            #
+#                               type3=1, \                            #
+#                               potential=potSWtriple101)             #
+#######################################################################
 
 # setup integrator
 integrator = espresso.integrator.VelocityVerlet(system)
@@ -127,13 +168,12 @@ lT.gamma       = 1.0
 lT.temperature = desiredT
 integrator.addExtension(lT)
 
-
 print 'Equilibration.'
+in_time = time.time()
 espresso.tools.analyse.info(system, integrator)
 for i in range (10):
   integrator.run(1000)
   espresso.tools.info(system, integrator)
-
 
 ##############################################
 # calculate the radial distribution function #
@@ -144,7 +184,6 @@ ncycles = 2
 nruns = 100
 
 print '\n Measurements!'
-in_time = time.time()
 
 rdf_array_total = []
 
