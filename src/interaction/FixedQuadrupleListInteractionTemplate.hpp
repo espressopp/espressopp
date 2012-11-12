@@ -6,6 +6,7 @@
 #include "types.hpp"
 #include "Interaction.hpp"
 #include "Real3D.hpp"
+#include "Tensor.hpp"
 #include "Particle.hpp"
 #include "FixedQuadrupleList.hpp"
 #include "esutil/Array2D.hpp"
@@ -30,7 +31,6 @@ namespace espresso {
               LOG4ESPP_ERROR(theLogger, "NULL potential");
           }
 
-        //potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
       }
 
       void
@@ -41,7 +41,7 @@ namespace espresso {
       virtual ~FixedQuadrupleListInteractionTemplate() {};
 
       shared_ptr < FixedQuadrupleList > getFixedQuadrupleList() {
-             return fixedquadrupleList;
+        return fixedquadrupleList;
       }
 
       void
@@ -52,16 +52,6 @@ namespace espresso {
               LOG4ESPP_ERROR(theLogger, "NULL potential");
            }
       }
-
-
-      /*void
-      setPotential(int type1, int type2, const Potential &potential) {
-	potentialArray.at(type1, type2) = potential;
-      }*/
-
-      /*Potential &getPotential(int type1, int type2) {
-        return potentialArray(0, 0);
-      }*/
 
       shared_ptr < Potential > getPotential() {
         return potential;
@@ -79,7 +69,6 @@ namespace espresso {
     protected:
       int ntypes;
       shared_ptr < FixedQuadrupleList > fixedquadrupleList;
-      //esutil::Array2D<Potential, esutil::enlarge> potentialArray;
       shared_ptr < Potential > potential;
     };
 
@@ -99,7 +88,6 @@ namespace espresso {
         Particle &p2 = *it->second;
         Particle &p3 = *it->third;
         Particle &p4 = *it->fourth;
-        //const Potential &potential = getPotential(p1.type(), p2.type());
 
         Real3D dist21, dist32, dist43; // 
 
@@ -112,7 +100,7 @@ namespace espresso {
 	    potential->_computeForce(force1, force2, force3, force4,
                                 dist21, dist32, dist43);
         p1.force() += force1;
-        p2.force() -= force2;
+        p2.force() += force2; //p2.force() -= force2;
         p3.force() += force3;
         p4.force() += force4;
       }
@@ -131,7 +119,6 @@ namespace espresso {
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
         const Particle &p4 = *it->fourth;
-        //const Potential &potential = getPotential(p1.type(), p2.type());
 
         Real3D dist21, dist32, dist43; // 
 
@@ -159,7 +146,6 @@ namespace espresso {
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
         const Particle &p4 = *it->fourth;
-        //const Potential &potential = getPotential(p1.type(), p2.type());
 
         Real3D dist21, dist32, dist43; 
 
@@ -196,7 +182,6 @@ namespace espresso {
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
         const Particle &p4 = *it->fourth;
-        //const Potential &potential = getPotential(p1.type(), p2.type());
 
         Real3D dist21, dist32, dist43; 
 
@@ -266,13 +251,6 @@ namespace espresso {
     inline real
     FixedQuadrupleListInteractionTemplate< _DihedralPotential >::
     getMaxCutoff() {
-      /*real cutoff = 0.0;
-
-      for (int i = 0; i < ntypes; i++) {
-        for (int j = 0; j < ntypes; j++) {
-          cutoff = std::max(cutoff, getPotential(i, j).getCutoff());
-        }
-      }*/
       return potential->getCutoff();
     }
   }

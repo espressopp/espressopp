@@ -18,15 +18,15 @@ namespace espresso {
       ;
 
       typedef class FixedTripleListInteractionTemplate< AngularCosineSquared >
-        FixedTripleListAngularCosineSquared;
-        class_< FixedTripleListAngularCosineSquared, bases< Interaction > >
-          ("interaction_FixedTripleListAngularCosineSquared",
-                  init<shared_ptr<System>,
-                      shared_ptr<FixedTripleList>,
-                      shared_ptr<AngularCosineSquared> >())
-          .def("setPotential", &FixedTripleListAngularCosineSquared::setPotential)
-          .def("getFixedTripleList", &FixedTripleListAngularCosineSquared::getFixedTripleList)
-        ;
+      FixedTripleListAngularCosineSquared;
+      class_< FixedTripleListAngularCosineSquared, bases< Interaction > >
+        ("interaction_FixedTripleListAngularCosineSquared",
+                init<shared_ptr<System>,
+                    shared_ptr<FixedTripleList>,
+                    shared_ptr<AngularCosineSquared> >())
+        .def("setPotential", &FixedTripleListAngularCosineSquared::setPotential)
+        .def("getFixedTripleList", &FixedTripleListAngularCosineSquared::getFixedTripleList)
+      ;
     }
   }
 }

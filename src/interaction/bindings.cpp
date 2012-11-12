@@ -31,6 +31,7 @@
 #include "DihedralPotential.hpp"
 #include "TabulatedDihedral.hpp"
 #include "OPLS.hpp"
+#include "DihedralHarmonicCos.hpp"
 #include "CoulombKSpaceEwald.hpp"
 #include "CoulombRSpace.hpp"
 #include "StillingerWeberPairTerm.hpp"
@@ -58,21 +59,20 @@ namespace espresso {
       FENE::registerPython();
       FENECapped::registerPython();
       Harmonic::registerPython();
-      AngularPotential::registerPython();
-
-      AngularUniquePotential::registerPython();
       
+      AngularPotential::registerPython();
+      AngularUniquePotential::registerPython();
       TabulatedAngular::registerPython();
       Cosine::registerPython();
       AngularHarmonic::registerPython();
       AngularUniqueHarmonic::registerPython();
       AngularCosineSquared::registerPython();
-      
       AngularUniqueCosineSquared::registerPython();
       
       DihedralPotential::registerPython();
       TabulatedDihedral::registerPython();
       OPLS::registerPython();
+      DihedralHarmonicCos::registerPython();
       
       CoulombKSpaceEwald::registerPython();
       CoulombRSpace::registerPython();

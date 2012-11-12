@@ -3,7 +3,8 @@ from espresso.esutil import *
 
 from espresso.interaction.AngularPotential import *
 from espresso.interaction.Interaction import *
-from _espresso import interaction_AngularCosineSquared, interaction_FixedTripleListAngularCosineSquared
+from _espresso import interaction_AngularCosineSquared, \
+                      interaction_FixedTripleListAngularCosineSquared
 
 class AngularCosineSquaredLocal(AngularPotentialLocal, interaction_AngularCosineSquared):
     'The (local) AngularCosineSquared potential.'

@@ -23,19 +23,18 @@ from espresso.interaction.FENECapped import *
 from espresso.interaction.Harmonic import *
 
 from espresso.interaction.AngularPotential import *
-
 from espresso.interaction.AngularUniquePotential import *
-
 from espresso.interaction.Cosine import *
 from espresso.interaction.TabulatedAngular import *
+from espresso.interaction.AngularHarmonic import *
 from espresso.interaction.AngularUniqueHarmonic import *
 from espresso.interaction.AngularCosineSquared import *
-
 from espresso.interaction.AngularUniqueCosineSquared import *
 
 from espresso.interaction.DihedralPotential import *
 from espresso.interaction.TabulatedDihedral import *
 from espresso.interaction.OPLS import *
+from espresso.interaction.DihedralHarmonicCos import *
 
 from espresso.interaction.CoulombKSpaceEwald import *
 from espresso.interaction.CoulombRSpace import *

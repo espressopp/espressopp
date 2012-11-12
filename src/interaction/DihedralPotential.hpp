@@ -140,12 +140,12 @@ namespace espresso {
     template < class Derived >
     inline real
     DihedralPotentialTemplate< Derived >::
-    _computeEnergy(const Real3D& dist21,
-                   const Real3D& dist32,
-                   const Real3D& dist43) const {
+    _computeEnergy(const Real3D& r21,
+                   const Real3D& r32,
+                   const Real3D& r43) const {
                        
                        
-                       
+/*                       
         // compute phi
         real dist21_sqr = dist21 * dist21;
         real dist32_sqr = dist32 * dist32;
@@ -199,7 +199,26 @@ namespace espresso {
         // phi
         real phi = acos(c);
         if (dx < 0.0) phi *= -1.0;
+ */
+      
+        Real3D rijjk = r21.cross(r32); // [r21 x r32]
+        Real3D rjkkn = r32.cross(r43); // [r32 x r43]
         
+        real rijjk_sqr = rijjk.sqr();
+        real rjkkn_sqr = rjkkn.sqr();
+        
+        real rijjk_abs = sqrt(rijjk_sqr);
+        real rjkkn_abs = sqrt(rjkkn_sqr);
+        
+        real inv_rijjk = 1.0 / rijjk_abs;
+        real inv_rjkkn = 1.0 / rjkkn_abs;
+        
+        // cosine between planes
+        real cos_phi = (rijjk * rjkkn) * (inv_rijjk * inv_rjkkn);
+        if (cos_phi > 1.0) cos_phi = 1.0;
+        else if (cos_phi < -1.0) cos_phi = -1.0;
+        
+        real phi = acos(cos_phi);
         
         return _computeEnergy(phi);
       
