@@ -17,21 +17,21 @@
 #include "Harmonic.hpp"
 #include "Tabulated.hpp"
 #include "TabulatedAngular.hpp"
+
 #include "AngularPotential.hpp"
-
 #include "AngularUniquePotential.hpp"
-
 #include "Cosine.hpp"
 #include "AngularHarmonic.hpp"
 #include "AngularUniqueHarmonic.hpp"
 #include "AngularCosineSquared.hpp"
-
 #include "AngularUniqueCosineSquared.hpp"
 
 #include "DihedralPotential.hpp"
+#include "DihedralUniquePotential.hpp"
 #include "TabulatedDihedral.hpp"
 #include "OPLS.hpp"
 #include "DihedralHarmonicCos.hpp"
+#include "DihedralHarmonicUniqueCos.hpp"
 #include "CoulombKSpaceEwald.hpp"
 #include "CoulombRSpace.hpp"
 #include "StillingerWeberPairTerm.hpp"
@@ -70,9 +70,11 @@ namespace espresso {
       AngularUniqueCosineSquared::registerPython();
       
       DihedralPotential::registerPython();
+      DihedralUniquePotential::registerPython();
       TabulatedDihedral::registerPython();
       OPLS::registerPython();
       DihedralHarmonicCos::registerPython();
+      DihedralHarmonicUniqueCos::registerPython();
       
       CoulombKSpaceEwald::registerPython();
       CoulombRSpace::registerPython();

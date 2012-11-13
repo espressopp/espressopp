@@ -1,7 +1,6 @@
 #include "python.hpp"
 #include <sstream>
 #include "FixedTripleAngleList.hpp"
-
 #include <boost/bind.hpp>
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
@@ -261,6 +260,7 @@ namespace espresso {
       .def("add", pyAdd)
       .def("size", &FixedTripleAngleList::size)
       .def("getTriples",  &FixedTripleAngleList::getTriples)
+      .def("getTriplesAngles",  &FixedTripleAngleList::getTriplesAngles)
       .def("getAngle",  &FixedTripleAngleList::getAngle)
      ;
   }

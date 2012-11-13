@@ -15,6 +15,7 @@
 #include <FixedTripleAngleList.hpp>
 #include <FixedTripleListAdress.hpp>
 #include <FixedQuadrupleList.hpp>
+#include <FixedQuadrupleAngleList.hpp>
 #include <FixedTupleList.hpp>
 #include <Settle.hpp>
 #include <Real3D.hpp>
@@ -43,6 +44,7 @@ void espresso::registerPython() {
   espresso::FixedTripleAngleList::registerPython();
   espresso::FixedTripleListAdress::registerPython();
   espresso::FixedQuadrupleList::registerPython();
+  espresso::FixedQuadrupleAngleList::registerPython();
   espresso::FixedTupleList::registerPython();
   espresso::Settle::registerPython();
   espresso::Real3D::registerPython();
