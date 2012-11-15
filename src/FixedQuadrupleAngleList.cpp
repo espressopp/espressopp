@@ -5,8 +5,20 @@
 #include "storage/Storage.hpp"
 #include "bc/BC.hpp"
 #include "Buffer.hpp"
+#include "esutil/Error.hpp"
 
 namespace espresso {
+  
+  /* We assume that the particle with pid2 is a real one, others can be ghosts.
+   * It is in order to minimize the cize of the cell, because otherwise user should 
+   * be sure that
+   * (r4-r1) < cell size
+   * distance between first and the last particle should be smaller then the cell size.
+   * Now it is (r3-r1)
+   * 
+   * That means that the structure of our quadruple in our local list will be the next
+   * multimap< pid2, pair<Triple < pid1, pid3, pid4 >, angle> >
+   */
 
   LOG4ESPP_LOGGER(FixedQuadrupleAngleList::theLogger, "FixedQuadrupleAngleList");
 
@@ -36,85 +48,111 @@ namespace espresso {
   bool FixedQuadrupleAngleList::
   add(longint pid1, longint pid2, longint pid3, longint pid4) {
     // here we assume pid1 < pid2 < pid3 < pid4
+    bool returnVal = true;
     System& system = getSystemRef();
-
+    esutil::Error err(system.comm);
+    
+    //std::cout<< "AAAAAAAADDDDDDDDDD    Begin  "<< system.comm->rank() << std::endl;
+    
     // ADD THE LOCAL QUADRUPLET
-    Particle *p1 = system.storage->lookupRealParticle(pid1);
-    Particle *p2 = system.storage->lookupLocalParticle(pid2);
+    //Particle *p1 = system.storage->lookupRealParticle(pid1);
+    //Particle *p2 = system.storage->lookupLocalParticle(pid2);
+    Particle *p1 = system.storage->lookupLocalParticle(pid1);
+    Particle *p2 = system.storage->lookupRealParticle(pid2);
     Particle *p3 = system.storage->lookupLocalParticle(pid3);
     Particle *p4 = system.storage->lookupLocalParticle(pid4);
-    if (!p1)
+    
+    // at first we check the real particle
+    if (!p2){
+      returnVal = false;
       // Particle does not exist here, return false
-      return false;
-    if (!p2) {
-      std::stringstream err;
-      err << "quadruple particle p2 " << pid2 << " does not exists here and cannot be added";
-      std::runtime_error(err.str());
     }
-    if (!p3) {
-      std::stringstream err;
-      err << "quadruple particle p3 " << pid3 << " does not exists here and cannot be added";
-      std::runtime_error(err.str());
+    else{
+      if (!p1) {
+        std::stringstream msg;
+        msg << "quadruple particle p1 " << pid1 << " does not exists here and cannot be added";
+        //std::runtime_error(err.str());
+        err.setException( msg.str() );
+      }
+      if (!p3) {
+        std::stringstream msg;
+        msg << "quadruple particle p3 " << pid3 << " does not exists here and cannot be added";
+        //std::runtime_error(err.str());
+        err.setException( msg.str() );
+      }
+      if (!p4) {
+        std::stringstream msg;
+        msg << "quadruple particle p4 " << pid4 << " does not exists here and cannot be added";
+        //std::runtime_error(err.str());
+        err.setException( msg.str() );
+      }
     }
-    if (!p4) {
-      std::stringstream err;
-      err << "quadruple particle p4 " << pid4 << " does not exists here and cannot be added";
-      std::runtime_error(err.str());
-    }
-    // add the quadruple locally
-    this->add(p1, p2, p3, p4);
-    //printf("me = %d: pid1 %d, pid2 %d, pid3 %d\n", mpiWorld->rank(), pid1, pid2, pid3);
-
-    Real3D pos1 = p1->position();
-    Real3D pos2 = p2->position();
-    Real3D pos3 = p3->position();
-    Real3D pos4 = p4->position();
     
-    Real3D r21 = system.bc->getMinimumImageVector( pos2, pos1);
-    Real3D r32 = system.bc->getMinimumImageVector( pos3, pos2);
-    Real3D r43 = system.bc->getMinimumImageVector( pos4, pos3);
+    err.checkException();
     
-    Real3D rijjk = r21.cross(r32); // [r21 x r32]
-    Real3D rjkkn = r32.cross(r43); // [r32 x r43]
+    if(returnVal){
+      // add the quadruple locally
+      this->add(p1, p2, p3, p4);
+      //printf("me = %d: pid1 %d, pid2 %d, pid3 %d\n", mpiWorld->rank(), pid1, pid2, pid3);
 
-    real rijjk_sqr = rijjk.sqr();
-    real rjkkn_sqr = rjkkn.sqr();
+      Real3D pos1 = p1->position();
+      Real3D pos2 = p2->position();
+      Real3D pos3 = p3->position();
+      Real3D pos4 = p4->position();
 
-    real rijjk_abs = sqrt(rijjk_sqr);
-    real rjkkn_abs = sqrt(rjkkn_sqr);
+      Real3D r21 = system.bc->getMinimumImageVector( pos2, pos1);
+      Real3D r32 = system.bc->getMinimumImageVector( pos3, pos2);
+      Real3D r43 = system.bc->getMinimumImageVector( pos4, pos3);
 
-    real inv_rijjk = 1.0 / rijjk_abs;
-    real inv_rjkkn = 1.0 / rjkkn_abs;
+      Real3D rijjk = r21.cross(r32); // [r21 x r32]
+      Real3D rjkkn = r32.cross(r43); // [r32 x r43]
 
-    // cosine between planes
-    real cos_phi = (rijjk * rjkkn) * (inv_rijjk * inv_rjkkn);
-    if (cos_phi > 1.0) cos_phi = 1.0;
-    else if (cos_phi < -1.0) cos_phi = -1.0;
+      real rijjk_sqr = rijjk.sqr();
+      real rjkkn_sqr = rjkkn.sqr();
 
-    quadruplesAngles.insert(std::make_pair(pid1, 
-            std::make_pair(Triple<longint, longint, longint>(pid2, pid3, pid4),
-                           acos(cos_phi))));
+      real rijjk_abs = sqrt(rijjk_sqr);
+      real rjkkn_abs = sqrt(rjkkn_sqr);
 
+      real inv_rijjk = 1.0 / rijjk_abs;
+      real inv_rjkkn = 1.0 / rjkkn_abs;
+
+      // cosine between planes
+      real cos_phi = (rijjk * rjkkn) * (inv_rijjk * inv_rjkkn);
+      if (cos_phi > 1.0) cos_phi = 1.0;
+      else if (cos_phi < -1.0) cos_phi = -1.0;
+
+      quadruplesAngles.insert(std::make_pair(pid2, 
+              std::make_pair(Triple<longint, longint, longint>(pid1, pid3, pid4),
+                            acos(cos_phi))));
+    }
     LOG4ESPP_INFO(theLogger, "added fixed quadruple to global quadruple list");
-    return true;
+    
+    //std::cout<< "AAAAAAAADDDDDDDDDD    End  "<< system.comm->rank() << std::endl;
+    return returnVal;
   }
 
+  // anyway it returns (pid1, pid2, pid3, pid4)
   python::list FixedQuadrupleAngleList::getQuadruples(){
 	python::tuple quadruple;
 	python::list quadruples;
 	for (QuadruplesAngles::const_iterator it=quadruplesAngles.begin(); it != quadruplesAngles.end(); it++) {
-      quadruple = python::make_tuple(it->first, it->second.first.first, it->second.first.second, it->second.first.third);
+      quadruple = python::make_tuple(it->second.first.first,
+              it->first,
+              it->second.first.second,
+              it->second.first.third);
       quadruples.append(quadruple);
     }
 
 	return quadruples;
   }
+  
+  // anyway it returns (pid1, pid2, pid3, pid4, angle)
   python::list FixedQuadrupleAngleList::getQuadruplesAngles(){
 	python::tuple quadruple;
 	python::list quadruples;
 	for (QuadruplesAngles::const_iterator it=quadruplesAngles.begin(); it != quadruplesAngles.end(); it++) {
-      quadruple = python::make_tuple(it->first,
-              it->second.first.first,
+      quadruple = python::make_tuple(it->second.first.first,
+              it->first,
               it->second.first.second,
               it->second.first.third,
               it->second.second);
@@ -130,14 +168,14 @@ namespace espresso {
 	QuadruplesAngles::iterator lastElement;
 	
 	// locate an iterator to the first pair object associated with key
-	itr = quadruplesAngles.find(pid1);
+	itr = quadruplesAngles.find(pid2);
 	if (itr == quadruplesAngles.end())
-		return returnVal; // no elements associated with key, so return immediately
+      return returnVal; // no elements associated with key, so return immediately
 
 	// get an iterator to the element that is one past the last element associated with key
 	lastElement = quadruplesAngles.upper_bound(pid2);
     
-    Triple<longint, longint, longint> neededTriple = Triple<longint, longint, longint>(pid2, pid3, pid4);
+    Triple<longint, longint, longint> neededTriple = Triple<longint, longint, longint>(pid1, pid3, pid4);
 
 	for ( ; itr != lastElement; ++itr){
       if(neededTriple==itr->second.first){
@@ -205,16 +243,16 @@ namespace espresso {
     int size = receivedInt.size(); int i = 0; int j = 0;
     while (i < size) {
       // unpack the list
-      pid1 = receivedInt[i++];
+      pid2 = receivedInt[i++];
       n = receivedInt[i++];
       for (; n > 0; --n) {
-        pid2 = receivedInt[i++];
+        pid1 = receivedInt[i++];
         pid3 = receivedInt[i++];
         pid4 = receivedInt[i++];
         angleVal = receivedReal[j++];
         // add the quadruple to the global list
-        it = quadruplesAngles.insert(it, std::make_pair(pid1,
-              std::make_pair(Triple<longint, longint, longint>(pid2, pid3, pid4),
+        it = quadruplesAngles.insert(it, std::make_pair(pid2,
+              std::make_pair(Triple<longint, longint, longint>(pid1, pid3, pid4),
                              angleVal)));
       }
     }
@@ -226,47 +264,76 @@ namespace espresso {
 
   void FixedQuadrupleAngleList::onParticlesChanged() {
     System& system = getSystemRef();
+    esutil::Error err(system.comm);
+    
+    //std::cout<< "Begin  "<< system.comm->rank() << std::endl;
     
     // (re-)generate the local quadruple list from the global list
-    //printf("FixedQuadrupleAngleList: rebuild local quadruple list from global\n");
     this->clear();
-    longint lastpid1 = -1;
+    longint lastpid2 = -1;
     Particle *p1;
     Particle *p2;
     Particle *p3;
     Particle *p4;
-    for (QuadruplesAngles::const_iterator it = quadruplesAngles.begin(); it != quadruplesAngles.end(); ++it) {
-      //it->first, it->second.first, it->second.second, it->second.third);
-      if (it->first != lastpid1) {
-        //p1 = system.storage->lookupRealParticle(it->first);
-        p1 = system.storage->lookupRealParticle(it->first);
-        if(p1 == NULL) {
-          std::stringstream err;
-          err << "quadruple particle p1 " << it->first << " does not exists here";
-          std::runtime_error(err.str());
+    for (QuadruplesAngles::const_iterator it = quadruplesAngles.begin();
+            it != quadruplesAngles.end(); ++it) {
+      /*
+    std::cout<< "Inters  "<< system.comm->rank() <<
+            "  pid1: "<< it->second.first.first <<
+            "  pid2: "<< it->first <<
+            "  pid3: "<< it->second.first.second <<
+            "  pid4: "<< it->second.first.third <<
+            std::endl;
+       */
+    
+      if (it->first != lastpid2) {
+        //p2 = system.storage->lookupLocalParticle(it->second.first.first);
+        p2 = system.storage->lookupRealParticle(it->first);
+        if (p2 == NULL) {
+          std::stringstream msg;
+          msg << "quadruple particle p2 " << it->first << " does not exists here";
+          err.setException( msg.str() );
         }
-        lastpid1 = it->first;
+        lastpid2 = it->first;
       }
-      p2 = system.storage->lookupLocalParticle(it->second.first.first);
-      if (p2 == NULL) {
-        std::stringstream err;
-        err << "quadruple particle p2 " << it->second.first.first << " does not exists here";
-        std::runtime_error(err.str());
+        
+      //p1 = system.storage->lookupRealParticle(it->first);
+      p1 = system.storage->lookupLocalParticle(it->second.first.first);
+      if(p1 == NULL) {
+        std::stringstream msg;
+        msg << "quadruple particle p1 " << it->second.first.first << " does not exists here";
+        err.setException( msg.str() );
       }
+        
       p3 = system.storage->lookupLocalParticle(it->second.first.second);
       if (p3 == NULL) {
-        std::stringstream err;
-        err << "quadruple particle p3 " << it->second.first.second << " does not exists here";
-        std::runtime_error(err.str());
+        std::stringstream msg;
+        msg << "quadruple particle p3 " << it->second.first.second << " does not exists here";
+        err.setException( msg.str() );
       }
       p4 = system.storage->lookupLocalParticle(it->second.first.third);
       if (p4 == NULL) {
-        std::stringstream err;
-        err << "quadruple particle p4 " << it->second.first.third << " does not exists here";
-        std::runtime_error(err.str());
+        std::stringstream msg;
+        msg << "quadruple particle p4 " << it->second.first.third << " does not exists here";
+        err.setException( msg.str() );
       }
+
+      /*
+    std::cout<< "Inters  "<< system.comm->rank() <<
+            "  p1: "<< p1 <<
+            "  p2: "<< p2 <<
+            "  p3: "<< p3 <<
+            "  p4: "<< p4 <<
+            std::endl;
+       */
+    
+      //err.checkException();
+      
       this->add(p1, p2, p3, p4);
     }
+    err.checkException();
+    
+    //std::cout<< "End  "<< system.comm->rank() << std::endl;
     LOG4ESPP_INFO(theLogger, "regenerated local fixed quadruple list from global list");
   }
 
