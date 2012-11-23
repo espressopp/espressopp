@@ -5,6 +5,7 @@
 #include "interaction/Interaction.hpp"
 #include "esutil/RNG.hpp"
 #include "mpi.hpp"
+#include "esutil/Error.hpp"
 
 #include <limits>
 
@@ -83,6 +84,15 @@ namespace espresso {
   }
 
   void System::removeInteraction(int i){
+    esutil::Error err(comm);
+    if(i>=shortRangeInteractions.size()){
+      std::stringstream msg;
+      msg << "Probably you are trying to remove the interaction "<<i<<
+              " which does not exist. Check your script!";
+      err.setException( msg.str() );
+    }
+    err.checkException();
+    
     size_t iIter = i;
     real maxCutoffDelete = shortRangeInteractions[iIter]->getMaxCutoff();
     

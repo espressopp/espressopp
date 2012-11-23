@@ -9,6 +9,8 @@
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 
+#include "esutil/Error.hpp"
+
 
 namespace espresso {
 
@@ -65,7 +67,10 @@ namespace espresso {
     //  std::swap(pid1, pid2);
     //if (pid3 < pid2)
     //  std::swap(pid2, pid3);
-
+    
+    bool returnVal = true;
+    System& system = storage->getSystemRef();
+    esutil::Error err(system.comm);
 
     // ADD THE LOCAL TRIPLET
     Particle *p1 = storage->lookupLocalParticle(pid1);
@@ -73,31 +78,37 @@ namespace espresso {
     Particle *p3 = storage->lookupLocalParticle(pid3);
 
     // middle particle is the reference particle and must exist here
-    if (!p2)
+    if (!p2){
       // particle does not exists here (some other CPU must have it)
-      return false;
-
-
-    if (!p1) {
-        std::stringstream err;
-        err << "triple particle p1 " << pid1 << " does not exists here and cannot be added";
-        std::runtime_error(err.str());
+      returnVal = false;
+    }
+    else{
+      if (!p1) {
+          std::stringstream msg;
+          msg << "adding error: triple particle p1 " << pid1 << " does not exists here and cannot be added";
+          //std::runtime_error(err.str());
+          err.setException( msg.str() );
+      }
+      if (!p3) {
+          std::stringstream msg;
+          msg << "adding error: triple particle p3 " << pid1 << " does not exists here and cannot be added";
+          //std::runtime_error(err.str());
+          err.setException( msg.str() );
+      }
     }
 
-    if (!p3) {
-        std::stringstream err;
-        err << "triple particle p3 " << pid1 << " does not exists here and cannot be added";
-        std::runtime_error(err.str());
+    err.checkException();
+    
+    if(returnVal){
+      // add the triple locally
+      this->add(p1, p2, p3);
+      //printf("me = %d: pid1 %d, pid2 %d, pid3 %d\n", mpiWorld->rank(), pid1, pid2, pid3);
+
+      // ADD THE GLOBAL TRIPLET
+      globalTriples.insert(std::make_pair(pid2, std::make_pair(pid1, pid3)));
     }
-
-    // add the triple locally
-    this->add(p1, p2, p3);
-    //printf("me = %d: pid1 %d, pid2 %d, pid3 %d\n", mpiWorld->rank(), pid1, pid2, pid3);
-
-    // ADD THE GLOBAL TRIPLET
-    globalTriples.insert(std::make_pair(pid2, std::make_pair(pid1, pid3)));
     LOG4ESPP_INFO(theLogger, "added fixed triple to global triple list");
-    return true;
+    return returnVal;
   }
 
   python::list FixedTripleList::getTriples()
@@ -187,6 +198,9 @@ namespace espresso {
 
   void FixedTripleList::onParticlesChanged() {
     
+    System& system = storage->getSystemRef();
+    esutil::Error err(system.comm);
+    
     // (re-)generate the local triple list from the global list
     //printf("FixedTripleList: rebuild local triple list from global\n");
     this->clear();
@@ -200,26 +214,28 @@ namespace espresso {
       if (it->first != lastpid2) {
         p2 = storage->lookupRealParticle(it->first);
         if (p2 == NULL) {
-          std::stringstream err;
-          err << "triple particle p2 " << it->first << " does not exists here";
-          std::runtime_error(err.str());
+          std::stringstream msg;
+          msg << "triple particle p2 " << it->first << " does not exists here";
+          err.setException( msg.str() );
         }
 	    lastpid2 = it->first;
       }
       p1 = storage->lookupLocalParticle(it->second.first);
       if (p1 == NULL) {
-        std::stringstream err;
-        err << "triple particle p1 " << it->second.first << " does not exists here";
-        std::runtime_error(err.str());
+        std::stringstream msg;
+        msg << "triple particle p1 " << it->second.first << " does not exists here";
+        err.setException( msg.str() );
       }
       p3 = storage->lookupLocalParticle(it->second.second);
       if (p3 == NULL) {
-        std::stringstream err;
-        err << "triple particle p3 " << it->second.second << " does not exists here";
-        std::runtime_error(err.str());
+        std::stringstream msg;
+        msg << "triple particle p3 " << it->second.second << " does not exists here";
+        err.setException( msg.str() );
       }
       this->add(p1, p2, p3);
     }
+    err.checkException();
+    
     LOG4ESPP_INFO(theLogger, "regenerated local fixed triple list from global list");
   }
 

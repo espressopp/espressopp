@@ -9,6 +9,8 @@
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 
+#include "esutil/Error.hpp"
+
 //using namespace std;
 
 namespace espresso {
@@ -59,39 +61,46 @@ namespace espresso {
   bool FixedQuadrupleList::
   add(longint pid1, longint pid2, longint pid3, longint pid4) {
     // here we assume pid1 < pid2 < pid3 < pid4
+    bool returnVal = true;
+    System& system = storage->getSystemRef();
+    esutil::Error err(system.comm);
 
     // ADD THE LOCAL QUADRUPLET
     Particle *p1 = storage->lookupRealParticle(pid1);
     Particle *p2 = storage->lookupLocalParticle(pid2);
     Particle *p3 = storage->lookupLocalParticle(pid3);
     Particle *p4 = storage->lookupLocalParticle(pid4);
-    if (!p1)
+    if (!p1){
       // Particle does not exist here, return false
-      return false;
-    if (!p2) {
-      std::stringstream err;
-      err << "quadruple particle p2 " << pid2 << " does not exists here and cannot be added";
-      std::runtime_error(err.str());
+      returnVal = false;
     }
-    if (!p3) {
-      std::stringstream err;
-      err << "quadruple particle p3 " << pid3 << " does not exists here and cannot be added";
-      std::runtime_error(err.str());
+    else{
+      if (!p2) {
+        std::stringstream msg;
+        msg << "quadruple particle p2 " << pid2 << " does not exists here and cannot be added";
+        err.setException( msg.str() );
+      }
+      if (!p3) {
+        std::stringstream msg;
+        msg << "quadruple particle p3 " << pid3 << " does not exists here and cannot be added";
+        err.setException( msg.str() );
+      }
+      if (!p4) {
+        std::stringstream msg;
+        msg << "quadruple particle p4 " << pid4 << " does not exists here and cannot be added";
+        err.setException( msg.str() );
+      }
     }
-    if (!p4) {
-      std::stringstream err;
-      err << "quadruple particle p4 " << pid4 << " does not exists here and cannot be added";
-      std::runtime_error(err.str());
+    err.checkException();
+    
+    if(returnVal){
+      // add the quadruple locally
+      this->add(p1, p2, p3, p4);
+      globalQuadruples.insert(std::make_pair(pid1, Triple<longint, longint, longint>(pid2, pid3, pid4)));
     }
-    // add the quadruple locally
-    this->add(p1, p2, p3, p4);
-    //printf("me = %d: pid1 %d, pid2 %d, pid3 %d\n", mpiWorld->rank(), pid1, pid2, pid3);
-
-
-    globalQuadruples.insert(std::make_pair(pid1, Triple<longint, longint, longint>(pid2, pid3, pid4)));
 
     LOG4ESPP_INFO(theLogger, "added fixed quadruple to global quadruple list");
-    return true;
+    return returnVal;
   }
 
   python::list FixedQuadrupleList::getQuadruples()
@@ -188,6 +197,9 @@ namespace espresso {
     
     // (re-)generate the local quadruple list from the global list
     //printf("FixedQuadrupleList: rebuild local quadruple list from global\n");
+    System& system = storage->getSystemRef();
+    esutil::Error err(system.comm);
+    
     this->clear();
     longint lastpid1 = -1;
     Particle *p1;
@@ -200,29 +212,29 @@ namespace espresso {
       if (it->first != lastpid1) {
 	  p1 = storage->lookupRealParticle(it->first);
       if (p1 == NULL) {
-        std::stringstream err;
-        err << "quadruple particle p1 " << it->first << " does not exists here";
-        std::runtime_error(err.str());
+        std::stringstream msg;
+        msg << "quadruple particle p1 " << it->first << " does not exists here";
+        err.setException( msg.str() );
       }
 	  lastpid1 = it->first;
       }
       p2 = storage->lookupLocalParticle(it->second.first);
       if (p2 == NULL) {
-        std::stringstream err;
-        err << "quadruple particle p2 " << it->second.first << " does not exists here";
-        std::runtime_error(err.str());
+        std::stringstream msg;
+        msg << "quadruple particle p2 " << it->second.first << " does not exists here";
+        err.setException( msg.str() );
       }
       p3 = storage->lookupLocalParticle(it->second.second);
       if (p3 == NULL) {
-        std::stringstream err;
-        err << "quadruple particle p3 " << it->second.second << " does not exists here";
-        std::runtime_error(err.str());
+        std::stringstream msg;
+        msg << "quadruple particle p3 " << it->second.second << " does not exists here";
+        err.setException( msg.str() );
       }
       p4 = storage->lookupLocalParticle(it->second.third);
       if (p4 == NULL) {
-        std::stringstream err;
-        err << "quadruple particle p4 " << it->second.third << " does not exists here";
-        std::runtime_error(err.str());
+        std::stringstream msg;
+        msg << "quadruple particle p4 " << it->second.third << " does not exists here";
+        err.setException( msg.str() );
       }
       this->add(p1, p2, p3, p4);
     }

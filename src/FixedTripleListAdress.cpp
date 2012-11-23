@@ -9,6 +9,8 @@
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 
+#include "esutil/Error.hpp"
+
 //using namespace std;
 
 namespace espresso {
@@ -36,6 +38,9 @@ namespace espresso {
 
   // override parent function (use lookupAdrATParticle)
   bool FixedTripleListAdress::add(longint pid1, longint pid2, longint pid3) {
+    bool returnVal = true;
+    System& system = storage->getSystemRef();
+    esutil::Error err(system.comm);
 
     if (pid1 > pid2)
       std::swap(pid1, pid2);
@@ -46,30 +51,34 @@ namespace espresso {
     Particle *p3 = storage->lookupAdrATParticle(pid3);
 
     // middle particle is the reference particle and must exist here
-    if (!p2)
+    if (!p2){
       // particle does not exists here (some other CPU must have it)
-      return false;
-
-
-    if (!p1) {
-        std::stringstream err;
-        err << "atomistic triple particle p1 " << pid1 << " does not exists here and cannot be added";
-        std::runtime_error(err.str());
+      returnVal = false;
     }
+    else{
+      if (!p1) {
+          std::stringstream msg;
+          msg << "atomistic triple particle p1 " << pid1 << " does not exists here and cannot be added";
+          err.setException( msg.str() );
+      }
 
-    if (!p3) {
-        std::stringstream err;
-        err << "atomistic triple particle p3 " << pid1 << " does not exists here and cannot be added";
-        std::runtime_error(err.str());
+      if (!p3) {
+          std::stringstream msg;
+          msg << "atomistic triple particle p3 " << pid1 << " does not exists here and cannot be added";
+          err.setException( msg.str() );
+      }
     }
+    err.checkException();
+    
+    if(returnVal){
+      // add the triple locally
+      this->add(p1, p2, p3);
 
-    // add the triple locally
-    this->add(p1, p2, p3);
-
-    globalTriples.insert(std::make_pair(pid2, std::make_pair(pid1, pid3)));
+      globalTriples.insert(std::make_pair(pid2, std::make_pair(pid1, pid3)));
+    }
 
     LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
-    return true;
+    return returnVal;
   }
 
 
@@ -130,6 +139,9 @@ namespace espresso {
 
     LOG4ESPP_INFO(theLogger, "rebuild local bond list from global\n");
 
+    System& system = storage->getSystemRef();
+    esutil::Error err(system.comm);
+    
     this->clear();
     longint lastpid2 = -1;
     Particle *p1;
@@ -144,27 +156,28 @@ namespace espresso {
           if (it->first != lastpid2) {
             p2 = storage->lookupAdrATParticle(it->first);
             if (p2 == NULL) {
-              std::stringstream err;
-              err << "atomistic triple particle p2 " << it->first << " does not exists here";
-              std::runtime_error(err.str());
+              std::stringstream msg;
+              msg << "atomistic triple particle p2 " << it->first << " does not exists here";
+              err.setException( msg.str() );
             }
     	    lastpid2 = it->first;
           }
           p1 = storage->lookupAdrATParticle(it->second.first);
           if (p1 == NULL) {
-            std::stringstream err;
-            err << "atomistic triple particle p1 " << it->second.first << " does not exists here";
-            std::runtime_error(err.str());
+            std::stringstream msg;
+            msg<< "atomistic triple particle p1 " << it->second.first << " does not exists here";
+            err.setException( msg.str() );
           }
           p3 = storage->lookupAdrATParticle(it->second.second);
           if (p3 == NULL) {
-            std::stringstream err;
-            err << "atomistic triple particle p3 " << it->second.second << " does not exists here";
-            std::runtime_error(err.str());
+            std::stringstream msg;
+            msg << "atomistic triple particle p3 " << it->second.second << " does not exists here";
+            err.setException( msg.str() );
           }
 
           this->add(p1, p2, p3);
-        }
+    }
+    err.checkException();
     LOG4ESPP_INFO(theLogger, "regenerated local fixed pair list from global list");
   }
 

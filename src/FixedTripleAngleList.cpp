@@ -5,6 +5,7 @@
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
 #include "bc/BC.hpp"
+#include "esutil/Error.hpp"
 
 #include <cmath>
 
@@ -12,18 +13,16 @@ namespace espresso {
 
   LOG4ESPP_LOGGER(FixedTripleAngleList::theLogger, "FixedTripleAngleList");
 
-  FixedTripleAngleList::FixedTripleAngleList(shared_ptr< System > _system)
-  : SystemAccess(_system), triplesAngles()
+  FixedTripleAngleList::FixedTripleAngleList(shared_ptr< storage::Storage > _storage)
+  : storage(_storage), triplesAngles()
   {
     LOG4ESPP_INFO(theLogger, "construct FixedTripleAngleList");
     
-    System& system = getSystemRef();
-
-    con1 = system.storage->beforeSendParticles.connect
+    con1 = storage->beforeSendParticles.connect
       (boost::bind(&FixedTripleAngleList::beforeSendParticles, this, _1, _2));
-    con2 = system.storage->afterRecvParticles.connect
+    con2 = storage->afterRecvParticles.connect
       (boost::bind(&FixedTripleAngleList::afterRecvParticles, this, _1, _2));
-    con3 = system.storage->onParticlesChanged.connect
+    con3 = storage->onParticlesChanged.connect
       (boost::bind(&FixedTripleAngleList::onParticlesChanged, this));
   }
 
@@ -38,51 +37,59 @@ namespace espresso {
 
   bool FixedTripleAngleList::
   add(longint pid1, longint pid2, longint pid3) {
-    System& system = getSystemRef();
+    bool returnVal = true;
+    System& system = storage->getSystemRef();
+    esutil::Error err(system.comm);
 
     // ADD THE LOCAL TRIPLET
-    Particle *p1 = system.storage->lookupLocalParticle(pid1);
-    Particle *p2 = system.storage->lookupRealParticle(pid2);
-    Particle *p3 = system.storage->lookupLocalParticle(pid3);
+    Particle *p1 = storage->lookupLocalParticle(pid1);
+    Particle *p2 = storage->lookupRealParticle(pid2);
+    Particle *p3 = storage->lookupLocalParticle(pid3);
 
     // middle particle is the reference particle and must exist here
-    if (!p2)
+    if (!p2){
       // particle does not exists here (some other CPU must have it)
-      return false;
-
-
-    if (!p1) {
-      std::stringstream err;
-      err << "triple particle p1 " << pid1 << " does not exists here and cannot be added";
-      std::runtime_error(err.str());
+      returnVal = false;
     }
+    else{
+      if (!p1) {
+        std::stringstream msg;
+        msg << "triple particle p1 " << pid1 << " does not exists here and cannot be added";
+        err.setException( msg.str() );
+      }
 
-    if (!p3) {
-      std::stringstream err;
-      err << "triple particle p3 " << pid1 << " does not exists here and cannot be added";
-      std::runtime_error(err.str());
+      if (!p3) {
+        std::stringstream msg;
+        msg << "triple particle p3 " << pid1 << " does not exists here and cannot be added";
+        err.setException( msg.str() );
+      }
     }
+    err.checkException();
+    
+    if(returnVal){
+      // add the triple locally
+      this->add(p1, p2, p3);
+      //printf("me = %d: pid1 %d, pid2 %d, pid3 %d\n", mpiWorld->rank(), pid1, pid2, pid3);
 
-    // add the triple locally
-    this->add(p1, p2, p3);
-    //printf("me = %d: pid1 %d, pid2 %d, pid3 %d\n", mpiWorld->rank(), pid1, pid2, pid3);
-    
-    Real3D pos1 = p1->position();
-    Real3D pos2 = p2->position();
-    Real3D pos3 = p3->position();
-    
-    Real3D r12 = system.bc->getMinimumImageVector( pos2, pos1);
-    Real3D r32 = system.bc->getMinimumImageVector( pos2, pos3);
-    
-    real cosVal = r12*r32 / (r12.abs() * r32.abs());
-    
-    if(cosVal>1) cosVal=1;
-    if(cosVal<-1) cosVal=-1;
-    
-    triplesAngles.insert(std::make_pair(pid2, 
-            std::make_pair(std::make_pair(pid1, pid3), acos(cosVal) )));
+      Real3D pos1 = p1->position();
+      Real3D pos2 = p2->position();
+      Real3D pos3 = p3->position();
+
+      Real3D r12(0.0,0.0,0.0);
+      system.bc->getMinimumImageVectorBox(r12, pos2, pos1);
+      Real3D r32(0.0,0.0,0.0);
+      system.bc->getMinimumImageVectorBox(r32, pos2, pos3);
+
+      real cosVal = r12*r32 / (r12.abs() * r32.abs());
+
+      if(cosVal>1) cosVal=1;
+      if(cosVal<-1) cosVal=-1;
+
+      triplesAngles.insert(std::make_pair(pid2, 
+              std::make_pair(std::make_pair(pid1, pid3), acos(cosVal) )));
+    }
     LOG4ESPP_INFO(theLogger, "added fixed triple to global triple list");
-    return true;
+    return returnVal;
   }
 
   python::list FixedTripleAngleList::getTriples(){
@@ -205,8 +212,9 @@ namespace espresso {
   }
 
   void FixedTripleAngleList::onParticlesChanged() {
-    System& system = getSystemRef();
-
+    System& system = storage->getSystemRef();
+    esutil::Error err(system.comm);
+    
     // (re-)generate the local triple list from the global list
     //printf("FixedTripleAngleList: rebuild local triple list from global\n");
     this->clear();
@@ -217,28 +225,29 @@ namespace espresso {
     for (TriplesAngles::const_iterator it = triplesAngles.begin(); it!=triplesAngles.end(); ++it) {
       //printf("lookup global triple %d %d %d\n", it->first, it->second.first, it->second.second);
       if (it->first != lastpid2) {
-        p2 = system.storage->lookupRealParticle(it->first);
+        p2 = storage->lookupRealParticle(it->first);
         if (p2 == NULL) {
-          std::stringstream err;
-          err << "triple particle p2 " << it->first << " does not exists here";
-          std::runtime_error(err.str());
+          std::stringstream msg;
+          msg << "triple particle p2 " << it->first << " does not exists here";
+          err.setException( msg.str() );
         }
 	    lastpid2 = it->first;
       }
-      p1 = system.storage->lookupLocalParticle(it->second.first.first);
+      p1 = storage->lookupLocalParticle(it->second.first.first);
       if (p1 == NULL) {
-        std::stringstream err;
-        err << "triple particle p1 " << it->second.first.first << " does not exists here";
-        std::runtime_error(err.str());
+        std::stringstream msg;
+        msg << "triple particle p1 " << it->second.first.first << " does not exists here";
+        err.setException( msg.str() );
       }
-      p3 = system.storage->lookupLocalParticle(it->second.first.second);
+      p3 = storage->lookupLocalParticle(it->second.first.second);
       if (p3 == NULL) {
-        std::stringstream err;
-        err << "triple particle p3 " << it->second.first.second << " does not exists here";
-        std::runtime_error(err.str());
+        std::stringstream msg;
+        msg<< "triple particle p3 " << it->second.first.second << " does not exists here";
+        err.setException( msg.str() );
       }
       this->add(p1, p2, p3);
     }
+    err.checkException();
     LOG4ESPP_INFO(theLogger, "regenerated local fixed triple list from global list");
   }
 
@@ -256,7 +265,7 @@ namespace espresso {
     //      = &FixedTripleAngleList::add;
 
     class_< FixedTripleAngleList, shared_ptr< FixedTripleAngleList > >
-      ("FixedTripleAngleList", init< shared_ptr< System > >()) //init< shared_ptr< storage::Storage > >()
+      ("FixedTripleAngleList", init< shared_ptr< storage::Storage > >())
       .def("add", pyAdd)
       .def("size", &FixedTripleAngleList::size)
       .def("getTriples",  &FixedTripleAngleList::getTriples)

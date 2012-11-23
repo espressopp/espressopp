@@ -6,10 +6,10 @@ from espresso.esutil import cxxinit
 class FixedQuadrupleAngleListLocal(_espresso.FixedQuadrupleAngleList):
     'The (local) fixed quadruple list.'
 
-    def __init__(self, system):
+    def __init__(self, storage):
         'Local construction of a fixed quadruple list'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.FixedQuadrupleAngleList, system)
+            cxxinit(self, _espresso.FixedQuadrupleAngleList, storage)
 
     def add(self, pid1, pid2, pid3, pid4):
         'add quadruple to fixed quadruple list'

@@ -12,19 +12,18 @@
 #include <map>
 #include <boost/signals2.hpp>
 
-#include "SystemAccess.hpp"
-
 namespace espresso {
-  class FixedQuadrupleAngleList : public QuadrupleList, SystemAccess {
+  class FixedQuadrupleAngleList : public QuadrupleList{
   protected:
     boost::signals2::connection con1, con2, con3;
     typedef std::multimap< longint,
             std::pair<Triple < longint, longint, longint >, real> > QuadruplesAngles;
+    shared_ptr <storage::Storage> storage;
     QuadruplesAngles quadruplesAngles;
     using QuadrupleList::add;
 
   public:
-    FixedQuadrupleAngleList(shared_ptr< System > system);
+    FixedQuadrupleAngleList(shared_ptr <storage::Storage> _storage);
     ~FixedQuadrupleAngleList();
 
     /** Add the given particle quadruple to the list on this processor if the

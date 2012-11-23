@@ -1,5 +1,6 @@
 #include "bindings.hpp"
 #include "Potential.hpp"
+#include "PotentialUniqueDist.hpp"
 #include "Zero.hpp"
 #include "LennardJones.hpp"
 #include "LennardJonesAutoBonds.hpp"
@@ -15,6 +16,8 @@
 #include "FENE.hpp"
 #include "FENECapped.hpp"
 #include "Harmonic.hpp"
+#include "HarmonicUnique.hpp"
+
 #include "Tabulated.hpp"
 #include "TabulatedAngular.hpp"
 
@@ -43,6 +46,7 @@ namespace espresso {
     void registerPython() {
       Interaction::registerPython();
       Potential::registerPython();
+      PotentialUniqueDist::registerPython();
       Zero::registerPython();
       LennardJones::registerPython();
       LennardJonesAutoBonds::registerPython();
@@ -59,6 +63,7 @@ namespace espresso {
       FENE::registerPython();
       FENECapped::registerPython();
       Harmonic::registerPython();
+      HarmonicUnique::registerPython();
       
       AngularPotential::registerPython();
       AngularUniquePotential::registerPython();

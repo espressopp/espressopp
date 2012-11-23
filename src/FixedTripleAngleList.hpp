@@ -11,7 +11,6 @@
 #include <map>
 #include <boost/signals2.hpp>
 //#include "FixedListComm.hpp"
-#include "SystemAccess.hpp"
 
 /*
  * This list is temporary solution. In general it should be derived from FixedTripleList.
@@ -23,15 +22,16 @@
 using namespace std;
 
 namespace espresso {
-  class FixedTripleAngleList: public TripleList, SystemAccess{
+  class FixedTripleAngleList: public TripleList{
       protected:
 		boost::signals2::connection con1, con2, con3;
 		typedef multimap <longint,pair<pair<longint, longint>, real> > TriplesAngles;
+		shared_ptr <storage::Storage> storage;
 		TriplesAngles triplesAngles;
 		using TripleList::add;
 
 	  public:
-		FixedTripleAngleList( shared_ptr< System > system ); //shared_ptr<storage::Storage> _storage
+		FixedTripleAngleList( shared_ptr<storage::Storage> _storage );
 		virtual ~FixedTripleAngleList();
 		/** Add the given particle triple to the list on this processor if the
 		particle with the lower id belongs to this processor.  Note that

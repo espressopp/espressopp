@@ -10,6 +10,7 @@
 #include <VerletListAdress.hpp>
 #include <VerletListTriple.hpp>
 #include <FixedPairList.hpp>
+#include <FixedPairDistList.hpp>
 #include <FixedPairListAdress.hpp>
 #include <FixedTripleList.hpp>
 #include <FixedTripleAngleList.hpp>
@@ -39,6 +40,7 @@ void espresso::registerPython() {
   espresso::VerletListAdress::registerPython();
   espresso::VerletListTriple::registerPython();
   espresso::FixedPairList::registerPython();
+  espresso::FixedPairDistList::registerPython();
   espresso::FixedPairListAdress::registerPython();
   espresso::FixedTripleList::registerPython();
   espresso::FixedTripleAngleList::registerPython();

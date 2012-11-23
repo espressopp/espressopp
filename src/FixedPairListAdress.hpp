@@ -12,7 +12,6 @@
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
 
-
 namespace espresso {
 
     /**
@@ -20,7 +19,7 @@ namespace espresso {
      * pairs. It overrides some parent functions, to use AT particles.
      *
      */
-	class FixedPairListAdress : public FixedPairList {
+	class FixedPairListAdress : public FixedPairList{
 	  public:
 		FixedPairListAdress(shared_ptr<storage::Storage> _storage,
 		        shared_ptr<FixedTupleList> _fixedtupleList);

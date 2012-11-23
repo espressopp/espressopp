@@ -22,18 +22,16 @@ namespace espresso {
 
   LOG4ESPP_LOGGER(FixedQuadrupleAngleList::theLogger, "FixedQuadrupleAngleList");
 
-  FixedQuadrupleAngleList::FixedQuadrupleAngleList(shared_ptr< System > _system) 
-    : SystemAccess(_system), quadruplesAngles()
+  FixedQuadrupleAngleList::FixedQuadrupleAngleList(shared_ptr< storage::Storage > _storage) 
+    : storage(_storage), quadruplesAngles()
   {
     LOG4ESPP_INFO(theLogger, "construct FixedQuadrupleAngleList");
 
-    System& system = getSystemRef();
-
-    con1 = system.storage->beforeSendParticles.connect
+    con1 = storage->beforeSendParticles.connect
       (boost::bind(&FixedQuadrupleAngleList::beforeSendParticles, this, _1, _2));
-    con2 = system.storage->afterRecvParticles.connect
+    con2 = storage->afterRecvParticles.connect
       (boost::bind(&FixedQuadrupleAngleList::afterRecvParticles, this, _1, _2));
-    con3 = system.storage->onParticlesChanged.connect
+    con3 = storage->onParticlesChanged.connect
       (boost::bind(&FixedQuadrupleAngleList::onParticlesChanged, this));
   }
 
@@ -47,20 +45,15 @@ namespace espresso {
 
   bool FixedQuadrupleAngleList::
   add(longint pid1, longint pid2, longint pid3, longint pid4) {
-    // here we assume pid1 < pid2 < pid3 < pid4
     bool returnVal = true;
-    System& system = getSystemRef();
+    System& system = storage->getSystemRef();
     esutil::Error err(system.comm);
     
-    //std::cout<< "AAAAAAAADDDDDDDDDD    Begin  "<< system.comm->rank() << std::endl;
-    
     // ADD THE LOCAL QUADRUPLET
-    //Particle *p1 = system.storage->lookupRealParticle(pid1);
-    //Particle *p2 = system.storage->lookupLocalParticle(pid2);
-    Particle *p1 = system.storage->lookupLocalParticle(pid1);
-    Particle *p2 = system.storage->lookupRealParticle(pid2);
-    Particle *p3 = system.storage->lookupLocalParticle(pid3);
-    Particle *p4 = system.storage->lookupLocalParticle(pid4);
+    Particle *p1 = storage->lookupLocalParticle(pid1);
+    Particle *p2 = storage->lookupRealParticle(pid2);
+    Particle *p3 = storage->lookupLocalParticle(pid3);
+    Particle *p4 = storage->lookupLocalParticle(pid4);
     
     // at first we check the real particle
     if (!p2){
@@ -70,20 +63,17 @@ namespace espresso {
     else{
       if (!p1) {
         std::stringstream msg;
-        msg << "quadruple particle p1 " << pid1 << " does not exists here and cannot be added";
-        //std::runtime_error(err.str());
+        msg << "adding error: quadruple particle p1 " << pid1 << " does not exists here and cannot be added";
         err.setException( msg.str() );
       }
       if (!p3) {
         std::stringstream msg;
-        msg << "quadruple particle p3 " << pid3 << " does not exists here and cannot be added";
-        //std::runtime_error(err.str());
+        msg << "adding error: quadruple particle p3 " << pid3 << " does not exists here and cannot be added";
         err.setException( msg.str() );
       }
       if (!p4) {
         std::stringstream msg;
-        msg << "quadruple particle p4 " << pid4 << " does not exists here and cannot be added";
-        //std::runtime_error(err.str());
+        msg << "adding error: quadruple particle p4 " << pid4 << " does not exists here and cannot be added";
         err.setException( msg.str() );
       }
     }
@@ -93,16 +83,18 @@ namespace espresso {
     if(returnVal){
       // add the quadruple locally
       this->add(p1, p2, p3, p4);
-      //printf("me = %d: pid1 %d, pid2 %d, pid3 %d\n", mpiWorld->rank(), pid1, pid2, pid3);
 
       Real3D pos1 = p1->position();
       Real3D pos2 = p2->position();
       Real3D pos3 = p3->position();
       Real3D pos4 = p4->position();
 
-      Real3D r21 = system.bc->getMinimumImageVector( pos2, pos1);
-      Real3D r32 = system.bc->getMinimumImageVector( pos3, pos2);
-      Real3D r43 = system.bc->getMinimumImageVector( pos4, pos3);
+      Real3D r21(0.0,0.0,0.0);
+      system.bc->getMinimumImageVectorBox(r21, pos2, pos1);
+      Real3D r32(0.0,0.0,0.0);
+      system.bc->getMinimumImageVectorBox(r32, pos3, pos2);
+      Real3D r43(0.0,0.0,0.0);
+      system.bc->getMinimumImageVectorBox(r43, pos4, pos3);
 
       Real3D rijjk = r21.cross(r32); // [r21 x r32]
       Real3D rjkkn = r32.cross(r43); // [r32 x r43]
@@ -127,7 +119,6 @@ namespace espresso {
     }
     LOG4ESPP_INFO(theLogger, "added fixed quadruple to global quadruple list");
     
-    //std::cout<< "AAAAAAAADDDDDDDDDD    End  "<< system.comm->rank() << std::endl;
     return returnVal;
   }
 
@@ -263,10 +254,8 @@ namespace espresso {
   }
 
   void FixedQuadrupleAngleList::onParticlesChanged() {
-    System& system = getSystemRef();
+    System& system = storage->getSystemRef();
     esutil::Error err(system.comm);
-    
-    //std::cout<< "Begin  "<< system.comm->rank() << std::endl;
     
     // (re-)generate the local quadruple list from the global list
     this->clear();
@@ -277,18 +266,9 @@ namespace espresso {
     Particle *p4;
     for (QuadruplesAngles::const_iterator it = quadruplesAngles.begin();
             it != quadruplesAngles.end(); ++it) {
-      /*
-    std::cout<< "Inters  "<< system.comm->rank() <<
-            "  pid1: "<< it->second.first.first <<
-            "  pid2: "<< it->first <<
-            "  pid3: "<< it->second.first.second <<
-            "  pid4: "<< it->second.first.third <<
-            std::endl;
-       */
     
       if (it->first != lastpid2) {
-        //p2 = system.storage->lookupLocalParticle(it->second.first.first);
-        p2 = system.storage->lookupRealParticle(it->first);
+        p2 = storage->lookupRealParticle(it->first);
         if (p2 == NULL) {
           std::stringstream msg;
           msg << "quadruple particle p2 " << it->first << " does not exists here";
@@ -297,43 +277,30 @@ namespace espresso {
         lastpid2 = it->first;
       }
         
-      //p1 = system.storage->lookupRealParticle(it->first);
-      p1 = system.storage->lookupLocalParticle(it->second.first.first);
+      p1 = storage->lookupLocalParticle(it->second.first.first);
       if(p1 == NULL) {
         std::stringstream msg;
         msg << "quadruple particle p1 " << it->second.first.first << " does not exists here";
         err.setException( msg.str() );
       }
         
-      p3 = system.storage->lookupLocalParticle(it->second.first.second);
+      p3 = storage->lookupLocalParticle(it->second.first.second);
       if (p3 == NULL) {
         std::stringstream msg;
         msg << "quadruple particle p3 " << it->second.first.second << " does not exists here";
         err.setException( msg.str() );
       }
-      p4 = system.storage->lookupLocalParticle(it->second.first.third);
+      p4 = storage->lookupLocalParticle(it->second.first.third);
       if (p4 == NULL) {
         std::stringstream msg;
         msg << "quadruple particle p4 " << it->second.first.third << " does not exists here";
         err.setException( msg.str() );
       }
 
-      /*
-    std::cout<< "Inters  "<< system.comm->rank() <<
-            "  p1: "<< p1 <<
-            "  p2: "<< p2 <<
-            "  p3: "<< p3 <<
-            "  p4: "<< p4 <<
-            std::endl;
-       */
-    
-      //err.checkException();
-      
       this->add(p1, p2, p3, p4);
     }
     err.checkException();
     
-    //std::cout<< "End  "<< system.comm->rank() << std::endl;
     LOG4ESPP_INFO(theLogger, "regenerated local fixed quadruple list from global list");
   }
 
@@ -350,7 +317,7 @@ namespace espresso {
            longint pid3, longint pid4) = &FixedQuadrupleAngleList::add;
 
     class_< FixedQuadrupleAngleList, shared_ptr< FixedQuadrupleAngleList > >
-      ("FixedQuadrupleAngleList", init< shared_ptr< System > >())
+      ("FixedQuadrupleAngleList", init< shared_ptr< storage::Storage > >())
       .def("add", pyAdd)
       .def("size", &FixedQuadrupleAngleList::size)
       .def("getQuadruples",  &FixedQuadrupleAngleList::getQuadruples)

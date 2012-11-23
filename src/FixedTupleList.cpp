@@ -12,6 +12,7 @@
 #include "System.hpp"
 #include "bc/BC.hpp"
 
+#include "esutil/Error.hpp"
 //using namespace std;
 
 namespace espresso {
@@ -58,7 +59,9 @@ namespace espresso {
     }*/
 
     bool FixedTupleList::addT(tuple pids) {
-
+        bool returnVal = true;
+        System& system = storage->getSystemRef();
+        esutil::Error err(system.comm);
 
         // ADD THE LOCAL PARTICLES (pointers)
         Particle* vp, *at;
@@ -70,27 +73,35 @@ namespace espresso {
         vp = storage->lookupRealParticle(*it);
         if (!vp) { // Particle does not exist here, return false
             //std::cout << "particle " << *it << " not found in localParticles \n";
-            return false;
+            returnVal = false;
         }
-        pidK = *it; // first pid is key
-        //std::cout << "Add key: " << *it << "\n";
+        else{
+          pidK = *it; // first pid is key
+          //std::cout << "Add key: " << *it << "\n";
 
-        for (++it; it != pids.end(); ++it) {
+          for (++it; it != pids.end(); ++it) {
 
-            at = storage->lookupAdrATParticle(*it);
-            if (!at) { // Particle does not exist here, return false
-                std::cout << "ERROR: AT particle " << *it << " not found in localAdrATParticles \n";
-                return false;
-            }
-            tmp.push_back(at);
-            //std::cout << " add: " << *it << "\n";
-            pidstmp.push_back(*it); // pidK is not in this vector
+              at = storage->lookupAdrATParticle(*it);
+              if (!at) { // Particle does not exist here, return false
+                  std::stringstream msg;
+                  msg << "ERROR: AT particle " << *it << " not found in localAdrATParticles \n";
+                  err.setException( msg.str() );
+                  returnVal = false;
+                  break;
+              }
+              tmp.push_back(at);
+              //std::cout << " add: " << *it << "\n";
+              pidstmp.push_back(*it); // pidK is not in this vector
+          }
         }
-        this->add(vp, tmp); // add to TupleList
+        err.checkException();
+        
+        if(returnVal){
+            this->add(vp, tmp); // add to TupleList
 
-
-        // ADD THE GLOBAL PARTICLES (ids)
-        globalTuples.insert(make_pair(pidK, pidstmp));
+            // ADD THE GLOBAL PARTICLES (ids)
+            globalTuples.insert(make_pair(pidK, pidstmp));
+        }
         LOG4ESPP_INFO(theLogger, "added fixed tuple to global tuples");
 
         tmp.clear();
@@ -99,7 +110,7 @@ namespace espresso {
 
         //std::cout << "\n";
 
-        return true;
+        return returnVal;
     }
 
     /* send global tuple information */
@@ -275,6 +286,8 @@ namespace espresso {
     }
 
     void FixedTupleList::onParticlesChanged() {
+      
+      // TODO errors should be thrown in a nice way
 
         LOG4ESPP_INFO(theLogger, "rebuild local particle list from global tuples\n");
 
