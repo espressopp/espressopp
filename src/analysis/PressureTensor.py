@@ -9,11 +9,13 @@ class PressureTensorLocal(ObservableLocal, analysis_PressureTensor):
     def __init__(self, system):
         cxxinit(self, analysis_PressureTensor, system)
 
-    def compute(self, xmin = None, xmax = None, ymin = None, ymax = None, zmin = None, zmax = None):
-      if (xmin == None) or (xmax == None) or (ymin == None) or (ymax == None) or (zmin == None) or (zmax == None):
+    def compute(self, z = None, dz = None):
+      if (z == None) or (dz == None):
         return self.cxxclass.compute1(self)
+      elif(z.is_integer() and z!=0):
+        return self.cxxclass.compute2(self, z, dz)
       else:
-        return self.cxxclass.compute2(self, xmin, xmax, ymin, ymax, zmin, zmax)
+        return self.cxxclass.compute3(self, z, dz)
 
 if pmi.isController:
   class PressureTensor(Observable):

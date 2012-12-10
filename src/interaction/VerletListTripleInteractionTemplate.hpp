@@ -58,8 +58,8 @@ namespace espresso {
       virtual real computeEnergy();
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& w);
-      virtual void computeVirialTensor(Tensor& w, real xmin, real xmax,
-          real ymin, real ymax, real zmin, real zmax);
+      virtual void computeVirialTensor(Tensor& w, real z);
+      virtual void computeVirialTensor(Tensor *w, int n);
       virtual real getMaxCutoff();
       virtual int bondType() { return Angular; }
 
@@ -193,15 +193,15 @@ namespace espresso {
     }
 
 
-    // compute the pressure tensor localized between xmin, xmax, ymin, ymax, zmin, zmax
-    // TODO physics should be checked
-    // now it calculates if the 2 particle is inside the volume
+    // Irvin-Kirkwood method
     template < typename _ThreeBodyPotential > inline void
     VerletListTripleInteractionTemplate < _ThreeBodyPotential >::
-    computeVirialTensor(Tensor& w,
-            real xmin, real xmax, real ymin, real ymax, real zmin, real zmax) {
+    computeVirialTensor(Tensor& w, real z) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the triples");
+      
+      std::cout << "At the moment IK computeVirialTensor for triples does'n work"<<std::endl;
 
+      /*
       Tensor wlocal(0.0);
       const bc::BC& bc = *getSystemRef().bc;
       for (TripleList::Iterator it(verletListTriple->getTriples()); it.isValid(); ++it) {
@@ -234,6 +234,13 @@ namespace espresso {
       Tensor wsum(0.0);
       boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
       w += wsum;
+       */
+    }
+    // Irvin-Kirkwood method
+    template < typename _ThreeBodyPotential > inline void
+    VerletListTripleInteractionTemplate < _ThreeBodyPotential >::
+    computeVirialTensor(Tensor *w, int n) {
+      std::cout << "At the moment IK computeVirialTensor for triples does'n work"<<std::endl;
     }
     
     template < typename _ThreeBodyPotential >

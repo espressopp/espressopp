@@ -16,7 +16,8 @@ namespace espresso {
       virtual real compute() const;
       virtual Tensor computeTensor() const;
       
-      virtual Tensor computeTensor1(real,real,real,real,real,real) const;
+      virtual python::list computeTensorIKz1(int, real) const;
+      virtual Tensor computeTensorIKz2(real,real) const;
 
       static void registerPython();
     };

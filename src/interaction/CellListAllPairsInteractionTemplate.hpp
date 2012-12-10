@@ -46,8 +46,8 @@ namespace espresso {
       virtual real computeEnergy();
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& wij);
-      virtual void computeVirialTensor(Tensor& w, real xmin, real xmax,
-          real ymin, real ymax, real zmin, real zmax);
+      virtual void computeVirialTensor(Tensor& w, real z);
+      virtual void computeVirialTensor(Tensor *w, int n);
       virtual real getMaxCutoff();
       virtual int bondType() { return Nonbonded; }
 
@@ -149,16 +149,13 @@ namespace espresso {
       wij += wsum;
     }
     
-
-    // compute the pressure tensor localized between xmin, xmax, ymin, ymax, zmin, zmax
-    // TODO (vit) physics should be checked
     template < typename _Potential > inline void
     CellListAllPairsInteractionTemplate < _Potential >::
-    computeVirialTensor(Tensor& wij,
-            real xmin, real xmax, real ymin, real ymax, real zmin, real zmax) {
+    computeVirialTensor(Tensor& wij, real z) {
       LOG4ESPP_INFO(theLogger, "computed virial tensor for all pairs in the cell lists");
 
       Tensor wlocal(0.0);
+      const bc::BC& bc = *storage->getSystemRef().bc;  // boundary conditions
       for (iterator::CellListAllPairsIterator it(storage->getRealCells());
            it.isValid(); ++it) {
         const Particle &p1 = *it->first;
@@ -166,18 +163,15 @@ namespace espresso {
         Real3D p1pos = p1.position();
         Real3D p2pos = p2.position();
         
-        if(  (p1pos[0]>xmin && p1pos[0]<xmax && 
-              p1pos[1]>ymin && p1pos[1]<ymax && 
-              p1pos[2]>zmin && p1pos[2]<zmax) ||
-             (p2pos[0]>xmin && p2pos[0]<xmax && 
-              p2pos[1]>ymin && p2pos[1]<ymax && 
-              p2pos[2]>zmin && p2pos[2]<zmax) ){
+        if(  (p1pos[2]>=z && p2pos[2]<=z) ||
+             (p1pos[2]<=z && p2pos[2]>=z) ){
           const Potential &potential = getPotential(p1.type(), p2.type());
 
           Real3D force(0.0, 0.0, 0.0);
           if(potential._computeForce(force, p1, p2)) {
-            Real3D dist = p1pos - p2pos;
-            wlocal += Tensor(dist, force);
+            Real3D r21;
+            bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
+            wlocal += Tensor(r21, force);
           }
         }
       }
@@ -188,6 +182,54 @@ namespace espresso {
       wij += wsum;
     }
 
+
+    template < typename _Potential > inline void
+    CellListAllPairsInteractionTemplate < _Potential >::
+    computeVirialTensor(Tensor *wij, int n) {
+      LOG4ESPP_INFO(theLogger, "computed virial tensor for all pairs in the cell lists");
+
+      const bc::BC& bc = *storage->getSystemRef().bc;  // boundary conditions
+      Real3D Li = bc.getBoxL();
+      Tensor wlocal[n];
+      for (iterator::CellListAllPairsIterator it(storage->getRealCells());
+           it.isValid(); ++it) {
+        const Particle &p1 = *it->first;
+        const Particle &p2 = *it->second;
+        Real3D p1pos = p1.position();
+        Real3D p2pos = p2.position();
+        
+        int position1 = (int)( n * p1pos[2]/Li[2]);
+        int position2 = (int)( n * p1pos[2]/Li[2]);
+        
+        int maxpos = std::max(position1, position2);
+        int minpos = std::min(position1, position2); 
+        
+        const Potential &potential = getPotential(p1.type(), p2.type());
+
+        Real3D force(0.0, 0.0, 0.0);
+        Tensor ww;
+        if(potential._computeForce(force, p1, p2)) {
+          Real3D r21;
+          bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
+          ww = Tensor(r21, force);
+        }
+        
+        int i = minpos + 1;
+        while(i<=maxpos){
+          wlocal[i] += ww;
+          i++;
+        }
+      }
+      
+      // reduce over all CPUs
+      Tensor wsum[n];
+      boost::mpi::all_reduce(*mpiWorld, wlocal, n, wsum, std::plus<Tensor>());
+      
+      for(int j=0; j<n; j++){
+        wij[j] += wsum[j];
+      }
+    }
+    
     template < typename _Potential >
     inline real
     CellListAllPairsInteractionTemplate < _Potential >::getMaxCutoff() {

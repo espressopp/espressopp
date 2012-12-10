@@ -89,13 +89,20 @@ namespace espresso {
         maxDist += integrate1();
         timeInt1 += timeIntegrate.getElapsedTime() - time;
 
+        /*
+        real cellsize = 1.4411685442;
+        if (maxDist > 1.4411685442){
+          cout<<"WARNING!!!!!! huge jump: "<<maxDist<<endl;
+          exit(1);
+        }*/
+        
         // signal
         aftIntP();
 
         LOG4ESPP_INFO(theLogger, "maxDist = " << maxDist << ", skin/2 = " << skinHalf);
 
         if (maxDist > skinHalf) resortFlag = true;
-
+        
         if (resortFlag) {
             VT_TRACER("resort1");
             time = timeIntegrate.getElapsedTime();

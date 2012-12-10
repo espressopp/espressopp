@@ -13,6 +13,7 @@
 #include "VerletList.hpp"
 #include "FixedTupleList.hpp"
 #include "esutil/Array2D.hpp"
+#include "bc/BC.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -64,8 +65,8 @@ namespace espresso {
       virtual real computeEnergy();
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& w);
-      virtual void computeVirialTensor(Tensor& w, real xmin, real xmax,
-          real ymin, real ymax, real zmin, real zmax);
+      virtual void computeVirialTensor(Tensor& w, real z);
+      virtual void computeVirialTensor(Tensor *w, int n);
       virtual real getMaxCutoff();
       virtual int bondType() { return Nonbonded; }
 
@@ -188,15 +189,95 @@ namespace espresso {
     }
 
     
-    // compute the pressure tensor localized between xmin, xmax, ymin, ymax, zmin, zmax
-    // TODO (vit) physics should be checked
     template < typename _Potential > inline void
     VerletListInteractionTemplate < _Potential >::
-    computeVirialTensor(Tensor& w,
-            real xmin, real xmax, real ymin, real ymax, real zmin, real zmax) {
+    computeVirialTensor(Tensor& w, real z) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
 
+      System& system = verletList->getSystemRef();
+      Real3D Li = system.bc->getBoxL();
+      
+      real rc_cutoff = verletList->getVerletCutoff();
+      
+      // boundaries should be taken into account
+      bool ghost_layer = false;
+      real zghost = -100;
+      if(z<rc_cutoff){
+        zghost = z + Li[2];
+        ghost_layer = true;
+      }
+      else if(z>=Li[2]-rc_cutoff){
+        zghost = z - Li[2];
+        ghost_layer = true;
+      }
+      
+      int count =0;
       Tensor wlocal(0.0);
+      for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
+        Particle &p1 = *it->first;
+        Particle &p2 = *it->second;
+        Real3D p1pos = p1.position();
+        Real3D p2pos = p2.position();
+
+        
+        if( (p1pos[2]>z && p2pos[2]<z) || 
+            (p1pos[2]<z && p2pos[2]>z) ||
+                (ghost_layer &&
+                ((p1pos[2]>zghost && p2pos[2]<zghost) || 
+                 (p1pos[2]<zghost && p2pos[2]>zghost))
+                ) 
+          ){
+         
+        /*
+        if( (p1pos[2]-z>0.0 && p2pos[2]-z<0.0) || 
+            (p1pos[2]-z<0.0 && p2pos[2]-z>0.0)
+          ){*/
+          int type1 = p1.type();
+          int type2 = p2.type();
+          const Potential &potential = getPotential(type1, type2);
+
+          Real3D force(0.0, 0.0, 0.0);
+          if(potential._computeForce(force, p1, p2)) {
+            Real3D r21 = p1pos - p2pos;
+            //wlocal += Tensor(r21, force) / r21.abs();
+            Tensor ttt = Tensor(r21, force) / r21.abs();
+            ttt[2] /= 2.0;
+            
+            wlocal += ttt;
+            
+            /*
+            if(r21.abs()<1.0)
+              std::cout<<"cpu: "<< system.comm->rank() << "  p1= "<< p1pos[2] << "  p2= "<< p2pos[2]
+                      << "  r21= " << r21.abs() << "  z= " << z << "  wloc= "<< ttt[0] <<std::endl;
+             **/
+             
+          }
+          count ++;
+          //if(count == 10000) exit(1);
+        }
+      }
+      
+      /*
+      std::cout<<"cpu: "<< system.comm->rank() << "  count= "<< count
+              << "  z= " << z << "  wloc= "<< wlocal[0] <<std::endl;
+      **/
+      // reduce over all CPUs
+      Tensor wsum(0.0);
+      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      w += wsum;
+    }
+    
+    
+    // TODO it doesn't work yet
+    template < typename _Potential > inline void
+    VerletListInteractionTemplate < _Potential >::
+    computeVirialTensor(Tensor *w, int n) {
+      LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
+
+      System& system = verletList->getSystemRef();
+      Real3D Li = system.bc->getBoxL();
+      
+      Tensor wlocal[n];
       for (PairList::Iterator it(verletList->getPairs());
            it.isValid(); ++it) {
         Particle &p1 = *it->first;
@@ -206,28 +287,36 @@ namespace espresso {
         Real3D p1pos = p1.position();
         Real3D p2pos = p2.position();
         
-        if(  (p1pos[0]>xmin && p1pos[0]<xmax && 
-              p1pos[1]>ymin && p1pos[1]<ymax && 
-              p1pos[2]>zmin && p1pos[2]<zmax) ||
-             (p2pos[0]>xmin && p2pos[0]<xmax && 
-              p2pos[1]>ymin && p2pos[1]<ymax && 
-              p2pos[2]>zmin && p2pos[2]<zmax) ){
-          const Potential &potential = getPotential(type1, type2);
+        int position1 = (int)( n * p1pos[2]/Li[2]);
+        int position2 = (int)( n * p2pos[2]/Li[2]);
+        
+        int maxpos = std::max(position1, position2);
+        int minpos = std::min(position1, position2); 
+        
+        const Potential &potential = getPotential(type1, type2);
 
-          Real3D force(0.0, 0.0, 0.0);
-          if(potential._computeForce(force, p1, p2)) {
-            Real3D r21 = p1pos - p2pos;
-            wlocal += Tensor(r21, force);
-          }
+        Real3D force(0.0, 0.0, 0.0);
+        Tensor ww;
+        if(potential._computeForce(force, p1, p2)) {
+          Real3D r21 = p1pos - p2pos;
+          ww = Tensor(r21, force);
+        }
+        
+        int i = minpos + 1;
+        while(i<=maxpos){
+          wlocal[i] += ww;
+          i++;
         }
       }
       
       // reduce over all CPUs
-      Tensor wsum(0.0);
-      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
-      w += wsum;
+      Tensor wsum[n];
+      boost::mpi::all_reduce(*mpiWorld, wlocal, n, wsum, std::plus<Tensor>());
+      
+      for(int j=0; j<n; j++){
+        w[j] += wsum[j];
+      }
     }
-
     
     template < typename _Potential >
     inline real

@@ -63,8 +63,8 @@ namespace espresso {
       virtual real computeEnergy();
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& w);
-      virtual void computeVirialTensor(Tensor& w, real xmin, real xmax,
-          real ymin, real ymax, real zmin, real zmax);
+      virtual void computeVirialTensor(Tensor& w, real z);
+      virtual void computeVirialTensor(Tensor *w, int n);
       virtual real getMaxCutoff();
       virtual int bondType() { return Pair; }
 
@@ -173,11 +173,9 @@ namespace espresso {
       w += wsum;
     }
 
-    // compute the pressure tensor localized between xmin, xmax, ymin, ymax, zmin, zmax
-    // TODO (vit) physics should be checked
     template < typename _Potential > inline void
-    FixedPairDistListInteractionTemplate < _Potential >::computeVirialTensor(Tensor& w,
-            real xmin, real xmax, real ymin, real ymax, real zmin, real zmax){
+    FixedPairDistListInteractionTemplate < _Potential >::
+    computeVirialTensor(Tensor& w, real z){
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
 
       Tensor wlocal(0.0);
@@ -189,12 +187,8 @@ namespace espresso {
         Real3D p1pos = p1.position();
         Real3D p2pos = p2.position();
         
-        if(  (p1pos[0]>xmin && p1pos[0]<xmax && 
-              p1pos[1]>ymin && p1pos[1]<ymax && 
-              p1pos[2]>zmin && p1pos[2]<zmax) ||
-             (p2pos[0]>xmin && p2pos[0]<xmax && 
-              p2pos[1]>ymin && p2pos[1]<ymax && 
-              p2pos[2]>zmin && p2pos[2]<zmax) ){
+        if(  (p1pos[2]>=z && p2pos[2]<=z) ||
+             (p1pos[2]<=z && p2pos[2]>=z) ){
           Real3D r21(0.0,0.0,0.0);
           bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
           real currentDist = fixedPairDistList->getDist(p1.getId(), p2.getId());
@@ -210,6 +204,53 @@ namespace espresso {
       Tensor wsum(0.0);
       boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
       w += wsum;
+    }
+    
+    template < typename _Potential > inline void
+    FixedPairDistListInteractionTemplate < _Potential >::
+    computeVirialTensor(Tensor *w, int n){
+      LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
+
+      const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
+      Real3D Li = bc.getBoxL();
+      Tensor wlocal[n];
+      for (FixedPairDistList::PairList::Iterator it(*fixedPairDistList);
+           it.isValid(); ++it) {
+        const Particle &p1 = *it->first;
+        const Particle &p2 = *it->second;
+        Real3D p1pos = p1.position();
+        Real3D p2pos = p2.position();
+        
+        int position1 = (int)( n * p1pos[2]/Li[2]);
+        int position2 = (int)( n * p1pos[2]/Li[2]);
+        
+        int maxpos = std::max(position1, position2);
+        int minpos = std::min(position1, position2); 
+        
+        Real3D r21(0.0,0.0,0.0);
+        bc.getMinimumImageVectorBox(r21, p1pos, p2pos);
+        real currentDist = fixedPairDistList->getDist(p1.getId(), p2.getId());
+
+        Real3D force;
+        Tensor ww;
+        if(potential->_computeForce(force, r21, currentDist)) { 
+          ww = Tensor(r21, force);
+        }
+        
+        int i = minpos + 1;
+        while(i<=maxpos){
+          wlocal[i] += ww;
+          i++;
+        }
+      }
+      
+      // reduce over all CPUs
+      Tensor wsum[n];
+      boost::mpi::all_reduce(*mpiWorld, wlocal, n, wsum, std::plus<Tensor>());
+      
+      for(int j=0; j<n; j++){
+        w[j] += wsum[j];
+      }
     }
     
     template < typename _Potential >

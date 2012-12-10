@@ -60,8 +60,8 @@ namespace espresso {
       virtual real computeEnergy();
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& w);
-      virtual void computeVirialTensor(Tensor& w, real xmin, real xmax,
-          real ymin, real ymax, real zmin, real zmax);
+      virtual void computeVirialTensor(Tensor& w, real z);
+      virtual void computeVirialTensor(Tensor *w, int n);
       virtual real getMaxCutoff();
       virtual int bondType() { return Dihedral; }
 
@@ -216,13 +216,11 @@ namespace espresso {
     }
 
 
-    // compute the pressure tensor localized between xmin, xmax, ymin, ymax, zmin, zmax
     // TODO !!!!! This doesn't work
     template < typename _DihedralPotential >
     inline void
     FixedQuadrupleAngleListInteractionTemplate < _DihedralPotential >::
-    computeVirialTensor(Tensor& w,
-            real xmin, real xmax, real ymin, real ymax, real zmin, real zmax) {
+    computeVirialTensor(Tensor& w, real z) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor of the quadruples");
     
       Tensor wlocal(0.0);
@@ -261,6 +259,17 @@ namespace espresso {
       w += wsum;
     }
 
+    
+    // TODO !!!!! This doesn't work
+    template < typename _DihedralPotential >
+    inline void
+    FixedQuadrupleAngleListInteractionTemplate < _DihedralPotential >::
+    computeVirialTensor(Tensor *w, int n) {
+      std::cout<<"Warning!!! computeVirialTensor in specified volume doesn't work for "
+              "FixedQuadrupleAngleListInteractionTemplate at the moment"<<std::endl;
+    }
+    
+    
     template < typename _DihedralPotential >
     inline real
     FixedQuadrupleAngleListInteractionTemplate< _DihedralPotential >::

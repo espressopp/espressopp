@@ -91,8 +91,8 @@ namespace espresso {
       virtual real computeEnergy();
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& w);
-      virtual void computeVirialTensor(Tensor& w, real xmin, real xmax,
-          real ymin, real ymax, real zmin, real zmax);
+      virtual void computeVirialTensor(Tensor& w, real z);
+      virtual void computeVirialTensor(Tensor *w, int n);
       virtual real getMaxCutoff();
       virtual int bondType() { return Nonbonded; }
 
@@ -484,15 +484,14 @@ namespace espresso {
       w += wsum;
     }
     
- 
-    // compute the pressure tensor localized between xmin, xmax, ymin, ymax, zmin, zmax
-    // TODO (vit) physics should be checked
     template < typename _PotentialAT, typename _PotentialCG > inline void
     VerletListAdressInteractionTemplate < _PotentialAT, _PotentialCG >::
-    computeVirialTensor(Tensor& w,
-            real xmin, real xmax, real ymin, real ymax, real zmin, real zmax) {
+    computeVirialTensor(Tensor& w, real z) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
 
+      std::cout << "Warning! At the moment IK computeVirialTensor in VerletListAdress does'n work"<<std::endl;
+      
+      /*
       Tensor wlocal(0.0);
       for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it){
         Particle &p1 = *it->first;
@@ -544,8 +543,15 @@ namespace espresso {
       Tensor wsum(0.0);
       boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
       w += wsum;
+       */
     }
 
+    
+    template < typename _PotentialAT, typename _PotentialCG > inline void
+    VerletListAdressInteractionTemplate < _PotentialAT, _PotentialCG >::
+    computeVirialTensor(Tensor *w, int n) {
+      std::cout << "Warning! At the moment IK computeVirialTensor in VerletListAdress does'n work"<<std::endl;
+    }
     
     template < typename _PotentialAT, typename _PotentialCG >
     inline real

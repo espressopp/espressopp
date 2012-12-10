@@ -21,8 +21,12 @@ namespace espresso {
       virtual real computeEnergy() = 0;
       virtual real computeVirial() = 0;
       virtual void computeVirialTensor(Tensor& w) = 0;
-      virtual void computeVirialTensor(Tensor& w, real xmin, real xmax,
-          real ymin, real ymax, real zmin, real zmax) = 0;
+
+      // this should compute the virial locally around a surface which crosses the box at
+      // z (according to the method of Irving and Kirkwood)
+      virtual void computeVirialTensor(Tensor& w, real z) = 0;
+      // the same Irving - Kirkwood method, but Z direction is divided by n planes
+      virtual void computeVirialTensor(Tensor *w, int n) = 0;
 
       /** This method returns the maximal cutoff defined for one type pair. */
       virtual real getMaxCutoff() = 0;
