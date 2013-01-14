@@ -4,7 +4,7 @@ import espresso
 from espresso.esutil import cxxinit
 
 class VerletListTripleLocal(_espresso.VerletListTriple):
-    'The (local) verlet triple list.'
+    'The (local) verlet triple list'
 
     def __init__(self, system, cutoff, exclusionlist=[]):
         'Local construction of a verlet triple list'

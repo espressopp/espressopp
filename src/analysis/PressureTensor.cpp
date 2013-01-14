@@ -161,7 +161,7 @@ namespace espresso {
       
       w = w / A;
       
-      return ( vv - w );
+      return ( vv + w );
     }
 
     real PressureTensor::compute() const {
