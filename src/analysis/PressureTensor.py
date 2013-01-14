@@ -12,7 +12,7 @@ class PressureTensorLocal(ObservableLocal, analysis_PressureTensor):
     def compute(self, z = None, dz = None):
       if (z == None) or (dz == None):
         return self.cxxclass.compute1(self)
-      elif(z.is_integer() and z!=0):
+      elif(isinstance(z, int) and z!=0):
         return self.cxxclass.compute2(self, z, dz)
       else:
         return self.cxxclass.compute3(self, z, dz)

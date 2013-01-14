@@ -188,6 +188,7 @@ namespace espresso {
       w += wsum;
     }
     
+    // local pressure tensor for layer, plane is defined by z coordinate
     template < typename _Potential > inline void
     VerletListInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor& w, real z) {
@@ -244,6 +245,7 @@ namespace espresso {
     }
     
     // it will calculate the pressure in 'n' layers along Z axis
+    // the first layer has coordinate Lz/n the last - Lz.
     template < typename _Potential > inline void
     VerletListInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor *w, int n) {
@@ -253,20 +255,8 @@ namespace espresso {
       real rc_cutoff = verletList->getVerletCutoff();
       Real3D Li = system.bc->getBoxL();
       
-      real z0 = Li[2] / float(n);  //z coordinate of initial layer
+      real z_dist = Li[2] / float(n);  // distance between two layers
 
-      // boundaries should be taken into account
-      bool ghost_layer = false;
-      real zghost = -100.0;
-      if(z<rc_cutoff){
-        zghost = z + Li[2];
-        ghost_layer = true;
-      }
-      else if(z>=Li[2]-rc_cutoff){
-        zghost = z - Li[2];
-        ghost_layer = true;
-      }
-      
       Tensor wlocal[n];
       for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
         Particle &p1 = *it->first;
@@ -276,12 +266,6 @@ namespace espresso {
         Real3D p1pos = p1.position();
         Real3D p2pos = p2.position();
         
-        int position1 = (int)( n * p1pos[2]/Li[2]);
-        int position2 = (int)( n * p2pos[2]/Li[2]);
-        
-        int maxpos = std::max(position1, position2);
-        int minpos = std::min(position1, position2); 
-        
         const Potential &potential = getPotential(type1, type2);
 
         Real3D force(0.0, 0.0, 0.0);
@@ -289,12 +273,36 @@ namespace espresso {
         if(potential._computeForce(force, p1, p2)) {
           Real3D r21 = p1pos - p2pos;
           ww = Tensor(r21, force);
+          
+          // boundaries should be taken into account
+          bool boundaries = false;
+          if( fabs(p2pos[2]-p1pos[2])> Li[2]/2.0 ){
+            boundaries = true;
+          }
+          
+          int position1 = (int)( p1pos[2]/z_dist );
+          int position2 = (int)( p2pos[2]/z_dist );
+
+          int maxpos = std::max(position1, position2);
+          int minpos = std::min(position1, position2); 
+        
+          if(!boundaries){
+            for(int i = minpos + 1; i<=maxpos; i++){
+              wlocal[i] += ww;
+            }
+          }
+          else{
+            for(int i = 0; i<=minpos; i++){
+              wlocal[i] += ww;
+            }
+            for(int i = maxpos; i<n; i++){
+              wlocal[i] += ww;
+            }
+            
+          }
         }
         
         
-        for(int i = minpos + 1; i<=maxpos; i++){
-          wlocal[i] += ww;
-        }
       }
       
       // reduce over all CPUs

@@ -49,6 +49,8 @@ namespace espresso {
       return (vv + wij) / V;
     }
 
+    // it will calculate the pressure in 'n' layers along Z axis
+    // the first layer has coordinate Lz/n the last - Lz.
     python::list PressureTensor::computeTensorIKz1(int n, real dz) const {
 
       System& system = getSystemRef();
@@ -72,9 +74,36 @@ namespace espresso {
         Real3D& vel = cit->velocity();
         Tensor vvt = mass * Tensor(vel, vel);
         
-        int position = (int)( n * pos[2]/Li[2]);
+        real position1 = pos[2] - dz;
+        real position2 = pos[2] + dz;
         
-        vvlocal[position] += vvt;
+        // boundaries should be taken into account
+        bool ghost_layer = false;
+        real zghost = -100.0;
+        if(position1<0){
+          zghost = position1 + Li[2];
+          ghost_layer = true;
+        }
+        else if(position2>=Li[2]){
+          zghost = z - Li[2];
+          ghost_layer = true;
+        }
+
+        int maxpos = std::max(position1, position2);
+        int minpos = std::min(position1, position2); 
+          
+        int position = (int)( pos[2]/lZ );
+        
+        if( pos[2] - position*lZ < dz){
+          if(position==0)
+            vvlocal[n-1] += vvt;
+          else
+            vvlocal[position-1] += vvt;
+        }
+        if( (position+1)*lZ - pos[2] < dz){
+          vvlocal[position] += vvt;
+        }
+        
       }
       Tensor vv[n];
       
@@ -94,7 +123,6 @@ namespace espresso {
         vv[i] = vv[i]/V;
         w[i] = w[i] / A;
         
-        //Tensor sum = vv[i] + w[i];
         pijarr.append(vv[i] + w[i]);
       }
 
