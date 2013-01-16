@@ -55,17 +55,18 @@ namespace espresso {
 
       System& system = getSystemRef();
       //const bc::BC& bc = *system.bc;  // boundary conditions
+      system.storage->decompose();
 
       Real3D Li = system.bc->getBoxL();
       // determine the local volume size
       real A = Li[0] * Li[1];
       real V = A * (2 * dz);
       
-      Tensor vvlocal[n];
-      
       // n * lZ is always Lz
       real lZ = Li[2] / (double)n;
 
+      Tensor vvlocal[n];
+      for(int i=0; i<n; i++) vvlocal[i] = Tensor(0.0);
       // compute the kinetic contribution (2/3 \sum 1/2mv^2)
       CellList realCells = system.storage->getRealCells();
       for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
@@ -74,39 +75,41 @@ namespace espresso {
         Real3D& vel = cit->velocity();
         Tensor vvt = mass * Tensor(vel, vel);
         
-        real position1 = pos[2] - dz;
-        real position2 = pos[2] + dz;
+        real zminBC = pos[2] - dz;
+        real zmaxBC = pos[2] + dz;
         
-        // boundaries should be taken into account
-        bool ghost_layer = false;
-        real zghost = -100.0;
-        if(position1<0){
-          zghost = position1 + Li[2];
-          ghost_layer = true;
+        // boundary condition for orthorhombic box
+        bool boundary = false;
+        if(zminBC<0.0){
+          zminBC += Li[2];
+          boundary = true;
         }
-        else if(position2>=Li[2]){
-          zghost = z - Li[2];
-          ghost_layer = true;
+        else if(zmaxBC>=Li[2]){
+          zmaxBC -= Li[2];
+          boundary = true;
+        }
+        
+        int minpos = (int)( zminBC/lZ );
+        int maxpos = (int)( zmaxBC/lZ );
+        
+        if(boundary){
+          
+          for(int i = 0; i<=maxpos; i++){
+            vvlocal[i] += vvt;
+          }
+          for(int i = minpos+1; i<n; i++){
+            vvlocal[i] += vvt;
+          }
+        }
+        else{
+          for(int i = minpos+1; i<=maxpos; i++){
+            vvlocal[i] += vvt;
+          }
         }
 
-        int maxpos = std::max(position1, position2);
-        int minpos = std::min(position1, position2); 
-          
-        int position = (int)( pos[2]/lZ );
-        
-        if( pos[2] - position*lZ < dz){
-          if(position==0)
-            vvlocal[n-1] += vvt;
-          else
-            vvlocal[position-1] += vvt;
-        }
-        if( (position+1)*lZ - pos[2] < dz){
-          vvlocal[position] += vvt;
-        }
-        
       }
-      Tensor vv[n];
       
+      Tensor vv[n];
       mpi::all_reduce(*mpiWorld, vvlocal, n, vv, std::plus<Tensor>());
       
       // compute the short-range nonbonded contribution
@@ -118,7 +121,6 @@ namespace espresso {
       
       //python::tuple pijz;
       python::list pijarr;
-      
       for(int i=0; i<n;i++){
         vv[i] = vv[i]/V;
         w[i] = w[i] / A;
@@ -129,6 +131,8 @@ namespace espresso {
       return pijarr;
     }
 
+    // calculates the pressure for layer with z coordinate
+    // in kinetic particles in [z-dz, z+dz] slab will be taken into account
     Tensor PressureTensor::computeTensorIKz2(real z, real dz) const {
       System& system = getSystemRef();
       Real3D Li = system.bc->getBoxL();

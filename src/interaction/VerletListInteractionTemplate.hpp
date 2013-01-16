@@ -15,6 +15,8 @@
 #include "esutil/Array2D.hpp"
 #include "bc/BC.hpp"
 
+#include "storage/Storage.hpp"
+
 namespace espresso {
   namespace interaction {
     template < typename _Potential >
@@ -245,19 +247,18 @@ namespace espresso {
     }
     
     // it will calculate the pressure in 'n' layers along Z axis
-    // the first layer has coordinate Lz/n the last - Lz.
+    // the first layer has coordinate 0.0 the last - (Lz - Lz/n)
     template < typename _Potential > inline void
     VerletListInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor *w, int n) {
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
 
       System& system = verletList->getSystemRef();
-      real rc_cutoff = verletList->getVerletCutoff();
       Real3D Li = system.bc->getBoxL();
       
       real z_dist = Li[2] / float(n);  // distance between two layers
-
       Tensor wlocal[n];
+      for(int i=0; i<n; i++) wlocal[i] = Tensor(0.0);
       for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
@@ -272,13 +273,7 @@ namespace espresso {
         Tensor ww;
         if(potential._computeForce(force, p1, p2)) {
           Real3D r21 = p1pos - p2pos;
-          ww = Tensor(r21, force);
-          
-          // boundaries should be taken into account
-          bool boundaries = false;
-          if( fabs(p2pos[2]-p1pos[2])> Li[2]/2.0 ){
-            boundaries = true;
-          }
+          ww = Tensor(r21, force) / fabs(r21[2]);
           
           int position1 = (int)( p1pos[2]/z_dist );
           int position2 = (int)( p2pos[2]/z_dist );
@@ -286,23 +281,32 @@ namespace espresso {
           int maxpos = std::max(position1, position2);
           int minpos = std::min(position1, position2); 
         
-          if(!boundaries){
-            for(int i = minpos + 1; i<=maxpos; i++){
+          // boundaries should be taken into account
+          bool boundaries1 = false;
+          bool boundaries2 = false;
+          if(minpos < 0){
+            minpos += n;
+            boundaries1 =true;
+          }
+          if(maxpos >=n){
+            maxpos -= n;
+            boundaries2 =true;
+          }
+          
+          if(boundaries1 || boundaries2){
+            for(int i = 0; i<=maxpos; i++){
+              wlocal[i] += ww;
+            }
+            for(int i = minpos+1; i<n; i++){
               wlocal[i] += ww;
             }
           }
           else{
-            for(int i = 0; i<=minpos; i++){
+            for(int i = minpos+1; i<=maxpos; i++){
               wlocal[i] += ww;
             }
-            for(int i = maxpos; i<n; i++){
-              wlocal[i] += ww;
-            }
-            
           }
         }
-        
-        
       }
       
       // reduce over all CPUs
