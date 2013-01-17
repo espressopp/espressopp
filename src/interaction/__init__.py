@@ -14,6 +14,7 @@ from espresso.interaction.LennardJonesCapped import *
 from espresso.interaction.LennardJonesEnergyCapped import *
 from espresso.interaction.LennardJonesExpand import *
 from espresso.interaction.LennardJonesGromacs import *
+from espresso.interaction.LJcos import *
 from espresso.interaction.Morse import *
 from espresso.interaction.CoulombTruncated import *
 from espresso.interaction.GravityTruncated import *

@@ -8,6 +8,7 @@
 #include "LennardJonesEnergyCapped.hpp"
 #include "LennardJonesExpand.hpp"
 #include "LennardJonesGromacs.hpp"
+#include "LJcos.hpp"
 #include "Morse.hpp"
 #include "CoulombTruncated.hpp"
 #include "GravityTruncated.hpp"
@@ -49,6 +50,7 @@ namespace espresso {
       PotentialUniqueDist::registerPython();
       Zero::registerPython();
       LennardJones::registerPython();
+      LJcos::registerPython();
       LennardJonesAutoBonds::registerPython();
       LennardJonesCapped::registerPython();
       LennardJonesEnergyCapped::registerPython();
