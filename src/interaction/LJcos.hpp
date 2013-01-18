@@ -58,7 +58,7 @@ namespace espresso {
         beta = M_PIl - sqr_pot_border*alpha;
       }
 
-      // Setter and getter
+      // Setter and getter phi
       void setPhi(real _phi) {
         phi = _phi;
         preset();
