@@ -91,13 +91,19 @@ namespace espresso {
       real* Z;
       Z = new real[M];
       
+      int perc=0, perc1=0;
       for(unsigned int m=min_m; m<max_m; m++){
         Z[m] = 0.0;
         for(unsigned int n=0; n<M-m; n++){
           Z[m] += getValue(n + m) *  getValue(n);
         }
-        if(system.comm->rank()==0)
-          cout<<"calculation progress (autocorrelation): "<< (int)(100*(real)m/(real)(max_m-min_m)) << " %\r" <<flush;
+        if(system.comm->rank()==0){
+          perc = (int)(100*(real)m/(real)(max_m-min_m));
+          if(perc>perc1){
+            cout<<"calculation progress (autocorrelation): "<< perc << " %\r" <<flush;
+            perc1=perc;
+          }
+        }
       }
       
       if(system.comm->rank()==0)

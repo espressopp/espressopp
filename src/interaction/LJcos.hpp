@@ -47,15 +47,15 @@ namespace espresso {
       virtual ~LJcos() {};
 
       void preset() {
-        one_phi = 1.0 - phi;
-        half_phi = 0.5 * phi;
-        phi_alpha = phi * alpha;
-        
         sqrcutoff = 1.5 * 1.5;
         pot_border = pow(2.0, 1.0/6.0);
         sqr_pot_border = pot_border * pot_border;
         alpha = M_PIl / (2.25 - sqr_pot_border);
         beta = M_PIl - sqr_pot_border*alpha;
+        
+        one_phi = 1.0 - phi;
+        half_phi = 0.5 * phi;
+        phi_alpha = phi * alpha;
       }
 
       // Setter and getter phi
@@ -93,8 +93,10 @@ namespace espresso {
           force = r21 * ffactor;
         }
         else if(distSqr>sqr_pot_border && distSqr<sqrcutoff){
+          std::cout<< sqr_pot_border << " < " << distSqr << " < " << distSqr<<std::endl;
           real ffactor = phi_alpha * sin( alpha * distSqr + beta );
           force = r21 * ffactor;
+          std::cout<< " force: " << force << "  phi: "  << phi <<std::endl;
         }
         else{
           force = 0.0;
