@@ -93,10 +93,8 @@ namespace espresso {
           force = r21 * ffactor;
         }
         else if(distSqr>sqr_pot_border && distSqr<sqrcutoff){
-          std::cout<< sqr_pot_border << " < " << distSqr << " < " << distSqr<<std::endl;
           real ffactor = phi_alpha * sin( alpha * distSqr + beta );
           force = r21 * ffactor;
-          std::cout<< " force: " << force << "  phi: "  << phi <<std::endl;
         }
         else{
           force = 0.0;
