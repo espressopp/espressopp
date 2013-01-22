@@ -38,14 +38,6 @@ class FixedPairListFENELocal(InteractionLocal, interaction_FixedPairListFENE):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getFixedPairList(self)
 
-    def resetLongestBond(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.resetLongestBond(self)
-
-    def getLongestBondList(self):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.getLongestBond(self)
-
 if pmi.isController:
     class FENE(Potential):
         'The FENE potential.'
@@ -58,10 +50,5 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.FixedPairListFENELocal',
-            pmicall = ['setPotential','getPotential','setFixedPairList', 'getFixedPairList', 'resetLongestBond'],
-            pmiinvoke = ['getLongestBondList']
+            pmicall = ['setPotential','getPotential','setFixedPairList', 'getFixedPairList']
             )
-
-        def getLongestBond(self):
-            return max(self.getLongestBondList())
-            
