@@ -23,10 +23,15 @@ namespace espresso {
 		shared_ptr <storage::Storage> storage;
 		GlobalPairs globalPairs;
 		using PairList::add;
+		real longtimeMaxBondSqr;
 
 	  public:
 		FixedPairList(shared_ptr <storage::Storage> _storage);
 		virtual ~FixedPairList();
+
+		real getLongtimeMaxBondSqr();
+		void setLongtimeMaxBondSqr(real d);
+		void resetLongtimeMaxBondSqr();
 
 		/** Add the given particle pair to the list on this processor if the
 		particle with the lower id belongs to this processor.  Note that

@@ -59,6 +59,17 @@ namespace espresso {
     return FixedListComm::add(tmp);
   }*/
 
+  real FixedPairList::getLongtimeMaxBondSqr() {
+	  return longtimeMaxBondSqr;
+  }
+
+  void FixedPairList::setLongtimeMaxBondSqr(real d) {
+	  longtimeMaxBondSqr = d;
+  }
+
+  void FixedPairList::resetLongtimeMaxBondSqr() {
+	  longtimeMaxBondSqr = 0.0;
+  }
 
   bool FixedPairList::
   add(longint pid1, longint pid2) {
@@ -237,6 +248,8 @@ namespace espresso {
       .def("add", pyAdd)
       .def("size", &FixedPairList::size)
       .def("getBonds",  &FixedPairList::getBonds)
+      .def("resetLongtimeMaxBondSqr", &FixedPairList::resetLongtimeMaxBondSqr)
+      .def("getLongtimeMaxBondSqr", &FixedPairList::getLongtimeMaxBondSqr)
       ;
   }
 }

@@ -81,12 +81,18 @@ namespace espresso {
     FixedPairListInteractionTemplate < _Potential >::addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the FixedPair List");
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
+      real ltMaxBondSqr = fixedpairList->getLongtimeMaxBondSqr();
       for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it) {
         Particle &p1 = *it->first;
         Particle &p2 = *it->second;
         Real3D dist;
         bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
         Real3D force;
+        real d = dist.sqr();
+        if (d > ltMaxBondSqr) {
+        	fixedpairList->setLongtimeMaxBondSqr(d);
+        	ltMaxBondSqr = d;
+        }
         if(potential->_computeForce(force, dist)) {
           p1.force() += force;
           p2.force() -= force;

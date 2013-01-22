@@ -2,6 +2,7 @@ from espresso import pmi
 import _espresso 
 import espresso
 from espresso.esutil import cxxinit
+from math import sqrt
 
 class FixedPairListLocal(_espresso.FixedPairList):
     'The (local) fixed pair list.'
@@ -37,14 +38,28 @@ class FixedPairListLocal(_espresso.FixedPairList):
         'return the bonds of the GlobalPairList'
         if pmi.workerIsActive():
           bonds=self.cxxclass.getBonds(self)
-          return bonds 
-
+          return bonds
+      
+    def resetLongtimeMaxBond(self):
+        'reset long time maximum bond to 0.0' 
+        if pmi.workerIsActive():
+          self.cxxclass.resetLongtimeMaxBondSqr(self)
+          
+    def getLongtimeMaxBondLocal(self):
+        'return the maximum bond length this pairlist ever had (since reset or construction)'
+        if pmi.workerIsActive(): 
+            mxsqr = self.cxxclass.getLongtimeMaxBondSqr(self)
+            return sqrt(mxsqr)
+            
 if pmi.isController:
     class FixedPairList(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espresso.FixedPairListLocal',
-            #localcall = [ "add" ],
-            pmicall = [ "add", "addBonds" ],
-            pmiinvoke = ['getBonds', 'size']
+            #localcall = [ 'add' ],
+            pmicall = [ 'add', 'addBonds', 'resetLongtimeMaxBond' ],
+            pmiinvoke = ['getBonds', 'size', 'getLongtimeMaxBondLocal']
         )
+        
+        def getLongtimeMaxBond(self):
+            return max(self.getLongtimeMaxBondLocal())
