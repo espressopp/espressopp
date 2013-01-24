@@ -29,7 +29,7 @@ timestep = 0.01
 ######################################################################
 sys.stdout.write('Setting up simulation ...\n')
 bonds, angles, x, y, z, Lx, Ly, Lz = lammps.read('espressopp_polymer_melt.start')
-bonds, angles, x, y, z, Lx, Ly, Lz = replicate(bonds, angles, x, y, z, Lx, Ly, Lz, xdim=2, ydim=2, zdim=2)
+bonds, angles, x, y, z, Lx, Ly, Lz = replicate(bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1)
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
@@ -84,11 +84,10 @@ integrator = espresso.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
 if(nvt):
-  langevin = espresso.integrator.Langevin(system)
+  langevin = espresso.integrator.LangevinThermostat(system)
   langevin.gamma = 1.0
   langevin.temperature = 1.0
-  integrator.langevin = langevin
-  integrator.dt = timestep
+  integrator.addExtension(langevin)
 
 # print simulation parameters
 print ''

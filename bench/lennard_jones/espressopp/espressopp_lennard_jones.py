@@ -99,11 +99,10 @@ integrator = espresso.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
 if(nvt):
-  langevin = espresso.integrator.Langevin(system)
+  langevin = espresso.integrator.LangevinThermostat(system)
   langevin.gamma = 1.0
   langevin.temperature = 1.0
-  integrator.langevin = langevin
-  integrator.dt = timestep
+  integrator.addExtension(langevin)
 
 print ''
 print 'number of particles =', num_particles
