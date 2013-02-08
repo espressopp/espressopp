@@ -13,7 +13,6 @@ namespace espresso {
 
     using namespace espresso::iterator;
 
-
     DPDThermostat::DPDThermostat(
     		shared_ptr<System> system,
     		shared_ptr<VerletList> _verletList)
@@ -24,6 +23,9 @@ namespace espresso {
       gamma  = 0.0;
       temperature = 0.0;
 
+      current_cutoff = verletList->getVerletCutoff() - system->getSkin();
+      current_cutoff_sqr = current_cutoff*current_cutoff;
+      
       if (!system->rng) {
         throw std::runtime_error("system has no RNG");
       }
@@ -108,35 +110,24 @@ namespace espresso {
 
 
     void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2) {
-
-      System& system = getSystemRef();
-
-      Real3D dist3D = p1.position() - p2.position();
-      real distsq = dist3D.sqr();
-      real dist = sqrt(distsq);
-      real current_verl_cut = verletList->getVerletCutoff();
-      real current_cut = current_verl_cut - system.getSkin();
+      Real3D r = p1.position() - p2.position();
+      real dist2 = r.sqr();
+      if(dist2 < current_cutoff_sqr && gamma > 0.0){
+        real dist = sqrt(dist2);
       
-      if(dist < current_cut){
-        real omega = 1-dist/current_cut;
+        real omega = 1-dist/current_cutoff;
         real omega2 = omega*omega;
 
-        //real omega2 = 1.0 / distsq;
-        //real omega = sqrt(omega2);
-
         // standard DPD part
-        if (gamma > 0.0) {
-          real veldiff = (p1.velocity() - p2.velocity()) * dist3D;
-          real friction = pref1 * omega2 * veldiff;
-          real noise = pref2 * omega * ((*rng)() - 0.5);
+        real veldiff = (p1.velocity() - p2.velocity()) * r;
+        real friction = pref1 * omega2 * veldiff;
+        real noise = pref2 * omega * ((*rng)() - 0.5);
 
-          Real3D f = (noise - friction) * dist3D;
-          p1.force() += f;
-          p2.force() -= f;
-        }
+        Real3D f = (noise - friction) * r;
+        p1.force() += f;
+        p2.force() -= f;
       }
     }
-
 
     void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2) {
 
@@ -179,20 +170,23 @@ namespace espresso {
 		}
 	}
 
-
     void DPDThermostat::initialize() {
     	// calculate the prefactors
-    	real timestep = integrator->getTimeStep();
+      System& system = getSystemRef();
+      current_cutoff = verletList->getVerletCutoff() - system.getSkin();
+      current_cutoff_sqr = current_cutoff*current_cutoff;
+      
+      real timestep = integrator->getTimeStep();
 
-    	LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
-    			", gamma = " << gamma <<
-    			", tgamma = " << tgamma <<
-    			", temperature = " << temperature);
+      LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
+              ", gamma = " << gamma <<
+              ", tgamma = " << tgamma <<
+              ", temperature = " << temperature);
 
-    	pref1 = gamma;
-    	pref2 = sqrt(24.0 * temperature * gamma/timestep);
-    	pref3 = tgamma;
-    	pref4 = sqrt(24.0 * temperature * tgamma);
+      pref1 = gamma;
+      pref2 = sqrt(24.0 * temperature * gamma/timestep);
+      pref3 = tgamma;
+      pref4 = sqrt(24.0 * temperature * tgamma);
     }
 
     /** very nasty: if we recalculate force when leaving/reentering the integrator,

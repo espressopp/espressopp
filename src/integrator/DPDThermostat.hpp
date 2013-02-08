@@ -74,7 +74,9 @@ namespace espresso {
 		real pref1, pref2, pref3, pref4;  //!< prefactor, reduces complexity of thermalize
 		real pref2buffer, pref4buffer; //!< temporary to save value between heatUp/coolDown
 
-		shared_ptr<VerletList> verletList;
+		real current_cutoff;
+		real current_cutoff_sqr;
+        shared_ptr<VerletList> verletList;
         shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
 
     };
