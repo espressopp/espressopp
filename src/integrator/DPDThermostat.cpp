@@ -109,10 +109,20 @@ namespace espresso {
 
     void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2) {
 
-        Real3D dist3D = p1.position() - p2.position();
-        real distsq = dist3D.sqr();
-        real omega2 = 1.0 / distsq;
-        real omega = sqrt(omega2);
+      System& system = getSystemRef();
+
+      Real3D dist3D = p1.position() - p2.position();
+      real distsq = dist3D.sqr();
+      real dist = sqrt(distsq);
+      real current_verl_cut = verletList->getVerletCutoff();
+      real current_cut = current_verl_cut - system.getSkin();
+      
+      if(dist < current_cut){
+        real omega = 1-dist/current_cut;
+        real omega2 = omega*omega;
+
+        //real omega2 = 1.0 / distsq;
+        //real omega = sqrt(omega2);
 
         // standard DPD part
         if (gamma > 0.0) {
@@ -124,6 +134,7 @@ namespace espresso {
           p1.force() += f;
           p2.force() -= f;
         }
+      }
     }
 
 
@@ -195,10 +206,12 @@ namespace espresso {
     void DPDThermostat::heatUp() {
     	LOG4ESPP_INFO(theLogger, "heatUp");
 
-    	pref2buffer = pref2;
+    	
+        pref2buffer = pref2;
     	pref2       *= sqrt(3.0);
     	pref4buffer = pref4;
     	pref4       *= sqrt(3.0);
+        
     }
 
     /** Opposite to heatUp */
@@ -206,8 +219,10 @@ namespace espresso {
     void DPDThermostat::coolDown(){
         LOG4ESPP_INFO(theLogger, "coolDown");
 
+        
         pref2 = pref2buffer;
         pref4 = pref4buffer;
+        
     }
 
     /****************************************************

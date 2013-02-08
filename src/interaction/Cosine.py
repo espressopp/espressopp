@@ -18,9 +18,9 @@ class FixedTripleListCosineLocal(InteractionLocal, interaction_FixedTripleListCo
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedTripleListCosine, system, vl, potential)
 
-    def setPotential(self, type1, type2, potential):
+    def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.setPotential(self, type1, type2, potential)
+            self.cxxclass.setPotential(self, potential)
 
     def getFixedTripleList(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
