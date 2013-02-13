@@ -5,6 +5,8 @@
 #include "NormalVariate.hpp"
 #include "GammaVariate.hpp"
 
+#include "Grid.hpp"
+
 namespace espresso {
   namespace esutil {
     void registerPython() {
@@ -13,6 +15,7 @@ namespace espresso {
       UniformOnSphere::registerPython();
       NormalVariate::registerPython();
       GammaVariate::registerPython();
+      Grid::registerPython();
     }
   }
 }

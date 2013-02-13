@@ -41,6 +41,8 @@ from espresso.esutil.UniformOnSphere import *
 from espresso.esutil.NormalVariate import *
 from espresso.esutil.GammaVariate import *
 
+from espresso.esutil.Grid import *
+
 
 class ExtendBaseClass (type) :
     def __new__(self, name, bases, dict):
