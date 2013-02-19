@@ -1,25 +1,31 @@
-from espresso.esutil import cxxinit
 from espresso import pmi
+from espresso.esutil import cxxinit
 
-from espresso.analysis.Autocorrelation import *
 from _espresso import analysis_Viscosity
 
-class ViscosityLocal(AutocorrelationLocal, analysis_Viscosity):
+from espresso.analysis.Autocorrelation import *
+
+class ViscosityLocal(AutocorrelationLocal, analysis_Viscosity):  
     'The (local) storage of configurations.'
     def __init__(self, system):
-      cxxinit(self, analysis_Viscosity, system)
+      if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        cxxinit(self, analysis_Viscosity, system)
       
     def gather(self):
-      return self.cxxclass.gather(self)
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        return self.cxxclass.gather(self)
       
-    def compute(self, t0, dt):
-      return self.cxxclass.compute(self, t0, dt)
+    def compute(self, t0, dt, T):
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        return self.cxxclass.compute(self, t0, dt, T)
     
 if pmi.isController:
   class Viscosity(Autocorrelation):
     """Class for parallel analysis"""
-    __metaclass__ = pmi.Proxy
+    #__metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
       cls =  'espresso.analysis.ViscosityLocal',
-      pmicall = [ "gather", "compute" ]
+      pmicall = [ 'gather', 'compute' ]
     )
+    def __init__(self, system):
+      self.pmiinit(system)
