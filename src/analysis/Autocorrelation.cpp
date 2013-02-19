@@ -43,9 +43,7 @@ namespace espresso {
     }
     
     python::list Autocorrelation::compute() {
-      unsigned int M = getListSize();
-      
-      python::list pyli;
+      size_t M = getListSize();
       
       System& system = getSystemRef();
       
@@ -119,6 +117,8 @@ namespace espresso {
       unsigned long int MM = M * n_nodes;
       real* totZ = new real[MM];
       boost::mpi::gather(*system.comm, Z, M, totZ, 0);
+      
+      python::list pyli;
       
       if(this_node == 0){
         int count = 0;

@@ -16,6 +16,7 @@
 #include "MeanSquareDispl.hpp"
 #include "Autocorrelation.hpp"
 #include "RadialDistrF.hpp"
+#include "Viscosity.hpp"
 
 #include "IntraChainDistSq.hpp"
 #include "NeighborFluctuation.hpp"
@@ -43,6 +44,7 @@ namespace espresso {
       RadialDistrF::registerPython();
       
       Autocorrelation::registerPython();
+      Viscosity::registerPython();
     }
   }
 }
