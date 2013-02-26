@@ -41,6 +41,33 @@ def writexyz(filename, system, velocities = True, unfolded = False, append = Fal
   
   file.close()
 
+def fastwritexyz(filename, system, append = False):
+
+  if append:
+    file = open(filename,'a')
+  else:
+    file = open(filename,'w')
+    
+  configurations = espresso.analysis.Configurations(system)
+  configurations.gather()
+  configuration = configurations[0]
+    
+  numParticles  = configuration.size
+  box_x = system.bc.boxL[0]
+  box_y = system.bc.boxL[1]
+  box_z = system.bc.boxL[2]
+  st = "%d\n%15.10f %15.10f %15.10f\n" % (numParticles, box_x, box_y, box_z)
+  file.write(st)
+  
+  for pid in configuration:
+    xpos   = configuration[pid][0]
+    ypos   = configuration[pid][1]
+    zpos   = configuration[pid][2]
+    st = "%d %15.10f %15.10f %15.10f\n"%(pid, xpos, ypos, zpos)
+    file.write(st)
+  
+  file.close()
+
 def readxyz(filename):
   file = open(filename)
   line = file.readline()
