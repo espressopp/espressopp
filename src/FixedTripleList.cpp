@@ -105,9 +105,28 @@ namespace espresso {
       //printf("me = %d: pid1 %d, pid2 %d, pid3 %d\n", mpiWorld->rank(), pid1, pid2, pid3);
 
       // ADD THE GLOBAL TRIPLET
-      globalTriples.insert(std::make_pair(pid2, std::make_pair(pid1, pid3)));
+      // see whether the particle already has triples
+      std::pair<GlobalTriples::const_iterator,
+                GlobalTriples::const_iterator> equalRange
+        = globalTriples.equal_range(pid2);
+      if (equalRange.first == globalTriples.end()) {
+        // if it hasn't, insert the new triple
+        globalTriples.insert(std::make_pair(pid2,
+                             std::pair<longint, longint>(pid1, pid3)));
+      }
+      else {
+        // otherwise test whether the triple already exists
+        for (GlobalTriples::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
+          if (it->second == std::pair<longint, longint>(pid1, pid3)) {
+            // TODO: Triple already exists, generate error!
+  	      ;
+          }
+        }
+        // if not, insert the new triple
+        globalTriples.insert(equalRange.first, std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
+      }
+      LOG4ESPP_INFO(theLogger, "added fixed triple to global triple list");
     }
-    LOG4ESPP_INFO(theLogger, "added fixed triple to global triple list");
     return returnVal;
   }
 
@@ -158,7 +177,7 @@ namespace espresso {
           }
 
           // delete all of these triples from the global list
-          globalTriples.erase(pid);
+          globalTriples.erase(equalRange.first, equalRange.second);
       }
     }
     // send the list
@@ -183,11 +202,11 @@ namespace espresso {
       //printf ("me = %d: recv particle with pid %d, has %d global triples\n",
                 //mpiWorld->rank(), pid1, n);
       for (; n > 0; --n) {
-	pid1 = received[i++];
-	pid3 = received[i++];
-	// add the triple to the global list
+	    pid1 = received[i++];
+	    pid3 = received[i++];
+	    // add the triple to the global list
         //printf("received triple %d %d %d, add triple to global list\n", pid1, pid2, pid3);
-	it = globalTriples.insert(it, std::make_pair(pid2, std::make_pair(pid1, pid3)));
+	    it = globalTriples.insert(it, std::make_pair(pid2,std::pair<longint, longint>(pid1, pid3)));
       }
     }
     if (i != size) {
