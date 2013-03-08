@@ -219,16 +219,22 @@ def read(gro_file, top_file=""):
 
     params = []
     if len(types) != 0:
+        print "Found ", len(types), " atoms"
         params.append(types)
     if len(bonds) != 0:
+        print "Found ", len(bonds), " bond types"
         params.append(bonds)
     if len(angles) != 0:
+        print "Found ", len(angles), " angle types"
         params.append(angles)
     if len(dihedrals) != 0:
+        print "Found ", len(dihedrals), " dihedral types"
         params.append(dihedrals)
     params.extend([x, y, z])
+    print "Found Box:", [Lx, Ly, Lz]
     if len(vx) != 0:
         params.extend([vx, vy, vz])
+        print "Found ", len(vx), " velocities"
     params.extend([Lx, Ly, Lz])
     return tuple(params)
 

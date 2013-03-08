@@ -282,7 +282,7 @@ struct erf_roots
       BOOST_MATH_STD_USING
       T derivative = sign * (2 / sqrt(constants::pi<T>())) * exp(-(guess * guess));
       T derivative2 = -2 * guess * derivative;
-      return boost::math::make_tuple(((sign > 0) ? boost::math::erf(guess, Policy()) : boost::math::erfc(guess, Policy())) - target, derivative, derivative2);
+      return boost::math::make_tuple(((sign > 0) ? static_cast<T>(boost::math::erf(guess, Policy()) - target) : static_cast<T>(boost::math::erfc(guess, Policy())) - target), derivative, derivative2);
    }
    erf_roots(T z, int s) : target(z), sign(s) {}
 private:
@@ -339,10 +339,20 @@ struct erf_inv_initializer
          boost::math::erfc_inv(static_cast<T>(1e-15), Policy());
          if(static_cast<T>(BOOST_MATH_BIG_CONSTANT(T, 64, 1e-130)) != 0)
             boost::math::erfc_inv(static_cast<T>(BOOST_MATH_BIG_CONSTANT(T, 64, 1e-130)), Policy());
+
+         // Some compilers choke on constants that would underflow, even in code that isn't instantiated
+         // so try and filter these cases out in the preprocessor:
+#if LDBL_MAX_10_EXP >= 800
          if(static_cast<T>(BOOST_MATH_BIG_CONSTANT(T, 64, 1e-800)) != 0)
             boost::math::erfc_inv(static_cast<T>(BOOST_MATH_BIG_CONSTANT(T, 64, 1e-800)), Policy());
          if(static_cast<T>(BOOST_MATH_BIG_CONSTANT(T, 64, 1e-900)) != 0)
             boost::math::erfc_inv(static_cast<T>(BOOST_MATH_BIG_CONSTANT(T, 64, 1e-900)), Policy());
+#else
+         if(static_cast<T>(BOOST_MATH_HUGE_CONSTANT(T, 64, 1e-800)) != 0)
+            boost::math::erfc_inv(static_cast<T>(BOOST_MATH_HUGE_CONSTANT(T, 64, 1e-800)), Policy());
+         if(static_cast<T>(BOOST_MATH_HUGE_CONSTANT(T, 64, 1e-900)) != 0)
+            boost::math::erfc_inv(static_cast<T>(BOOST_MATH_HUGE_CONSTANT(T, 64, 1e-900)), Policy());
+#endif
       }
       void force_instantiate()const{}
    };

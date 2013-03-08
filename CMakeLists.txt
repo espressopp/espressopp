@@ -126,6 +126,8 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 # Required for acconfig.h
 include_directories(${CMAKE_BINARY_DIR}/src)
 
+set ( RT_LIBRARIES rt )
+
 ######################################
 # Include the following subdirectory # 
 ######################################

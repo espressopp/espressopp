@@ -63,6 +63,8 @@ namespace espresso {
                               const Real3D& dist12,
                               const Real3D& dist32) const {
 
+        	const real SMALL_EPSILON = 1.0E-9;
+
             real dist12_sqr = dist12 * dist12;
             real dist32_sqr = dist32 * dist32;
             real dist12_magn = sqrt(dist12_sqr);
@@ -74,13 +76,14 @@ namespace espresso {
             if(cos_theta < -1.0) cos_theta = -1.0;
             else if(cos_theta >  1.0) cos_theta =  1.0;
             real sin_theta = sqrt(1.0 - cos_theta * cos_theta);
+
+            if (sin_theta < SMALL_EPSILON) sin_theta = SMALL_EPSILON;
+            // sin_theta = 1.0/sin_theta; ???
             
             dU_dtheta = -2.0 * K * (acos(cos_theta) - theta0) / sin_theta;
-            
             a11 = dU_dtheta * cos_theta / dist12_sqr;
             a12 = -dU_dtheta / dist1232;
             a22 = dU_dtheta * cos_theta / dist32_sqr;
-            
             force12 = a11 * dist12 + a12 * dist32;
             force32 = a22 * dist32 + a12 * dist12;
             return true;

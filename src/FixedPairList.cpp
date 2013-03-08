@@ -101,11 +101,28 @@ namespace espresso {
     if(returnVal){
       // add the pair locally
       this->add(p1, p2);
-
-      // add the particle pair to the globalPairs list
-      globalPairs.insert(std::make_pair(pid1, pid2));
+      // ADD THE GLOBAL PAIR
+      // see whether the particle already has pairs
+      std::pair<GlobalPairs::const_iterator,
+        GlobalPairs::const_iterator> equalRange
+        = globalPairs.equal_range(pid1);
+      if (equalRange.first == globalPairs.end()) {
+        // if it hasn't, insert the new pair
+        globalPairs.insert(std::make_pair(pid1, pid2));
+      }
+      else {
+        // otherwise test whether the pair already exists
+        for (GlobalPairs::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
+  	    if (it->second == pid2) {
+  	      // TODO: Pair already exists, generate error!
+  	      ;
+  	    }
+        }
+        // if not, insert the new pair
+        globalPairs.insert(equalRange.first, std::make_pair(pid1, pid2));
+      }
+      LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
     }
-    LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
     return returnVal;
   }
 
@@ -154,8 +171,7 @@ namespace espresso {
         }
 
         // delete all of these pairs from the global list
-        //globalPairs.erase(equalRange.first->first, equalRange.second->first);
-        globalPairs.erase(pid);
+        globalPairs.erase(equalRange.first, equalRange.second);
         // std::cout << "erasing particle " << pid << " from here" << std::endl;
       }
     }

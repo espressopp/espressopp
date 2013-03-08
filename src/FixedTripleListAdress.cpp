@@ -74,10 +74,28 @@ namespace espresso {
       // add the triple locally
       this->add(p1, p2, p3);
 
-      globalTriples.insert(std::make_pair(pid2, std::make_pair(pid1, pid3)));
-    }
-
+      // ADD THE GLOBAL TRIPLET
+      // see whether the particle already has triples
+      std::pair<GlobalTriples::const_iterator,
+                GlobalTriples::const_iterator> equalRange
+        = globalTriples.equal_range(pid2);
+      if (equalRange.first == globalTriples.end()) {
+        // if it hasn't, insert the new triple
+        globalTriples.insert(std::make_pair(pid2,
+                             std::pair<longint, longint>(pid1, pid3)));
+      }
+      else {
+        // otherwise test whether the triple already exists
+        for (GlobalTriples::const_iterator it = equalRange.first;
+             it != equalRange.second; ++it)
+          if (it->second == std::pair<longint, longint>(pid1, pid3))
+          // TODO: Triple already exists, generate error!
+        ;
+        // if not, insert the new triple
+        globalTriples.insert(equalRange.first, std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
+      }
     LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
+    }
     return returnVal;
   }
 
@@ -117,7 +135,7 @@ namespace espresso {
             }
 
             // delete all of these triples from the global list
-            globalTriples.erase(pid);
+            globalTriples.erase(equalRange.first, equalRange.second);
           }
         }
 

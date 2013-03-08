@@ -96,7 +96,26 @@ namespace espresso {
     if(returnVal){
       // add the quadruple locally
       this->add(p1, p2, p3, p4);
-      globalQuadruples.insert(std::make_pair(pid1, Triple<longint, longint, longint>(pid2, pid3, pid4)));
+      // ADD THE GLOBAL QUADRUPLET
+      // see whether the particle already has quadruples
+      std::pair<GlobalQuadruples::const_iterator,
+                GlobalQuadruples::const_iterator> equalRange
+        = globalQuadruples.equal_range(pid1);
+      if (equalRange.first == globalQuadruples.end()) {
+        // if it hasn't, insert the new quadruple
+        globalQuadruples.insert(std::make_pair(pid1,
+          Triple<longint, longint, longint>(pid2, pid3, pid4)));
+      }
+      else {
+        // otherwise test whether the quadruple already exists
+        for (GlobalQuadruples::const_iterator it = equalRange.first; it != equalRange.second; ++it)
+  	      if (it->second == Triple<longint, longint, longint>(pid2, pid3, pid4))
+  	        // TODO: Quadruple already exists, generate error!
+  	    	;
+        // if not, insert the new quadruple
+        globalQuadruples.insert(equalRange.first,
+          std::make_pair(pid1, Triple<longint, longint, longint>(pid2, pid3, pid4)));
+      }
     }
 
     LOG4ESPP_INFO(theLogger, "added fixed quadruple to global quadruple list");
@@ -132,28 +151,23 @@ namespace espresso {
                 //mpiWorld->rank(), pid, n);
 
       if (n > 0) {
-	std::pair<GlobalQuadruples::const_iterator, 
-	  GlobalQuadruples::const_iterator> equalRange 
-	  = globalQuadruples.equal_range(pid);
-
-	// first write the pid of this particle
-	// then the number of partners (n)
-	// and then the pids of the partners
-	toSend.reserve(toSend.size()+3*n+1);
-	toSend.push_back(pid);
-	toSend.push_back(n);
-	for (GlobalQuadruples::const_iterator it = equalRange.first;
-	     it != equalRange.second; ++it) {
-	  toSend.push_back(it->second.first);
-	  toSend.push_back(it->second.second);
-	  toSend.push_back(it->second.third);
+	    std::pair<GlobalQuadruples::const_iterator, GlobalQuadruples::const_iterator> equalRange = globalQuadruples.equal_range(pid);
+	    // first write the pid of this particle
+	    // then the number of partners (n)
+	    // and then the pids of the partners
+	    toSend.reserve(toSend.size()+3*n+1);
+	    toSend.push_back(pid);
+	    toSend.push_back(n);
+	    for (GlobalQuadruples::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
+	      toSend.push_back(it->second.first);
+	      toSend.push_back(it->second.second);
+	      toSend.push_back(it->second.third);
           //printf ("send global quadruple: pid %d and partner %d\n", pid, it->second.first);
           //printf ("send global quadruple: pid %d and partner %d\n", pid, it->second.second);
           //printf ("send global quadruple: pid %d and partner %d\n", pid, it->second.third);
         }
-
-	// delete all of these quadruples from the global list
-	globalQuadruples.erase(pid);
+	    // delete all of these quadruples from the global list
+	    globalQuadruples.erase(equalRange.first, equalRange.second);
       }
     }
     // send the list

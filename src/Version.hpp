@@ -5,7 +5,7 @@
 #include "boost/version.hpp"
 
 #define MAJORVERSION 1
-#define MINORVERSION 4
+#define MINORVERSION 5
 #define PATCHLEVEL   0
 #include "hgversion.hpp"
 
