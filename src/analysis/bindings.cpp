@@ -4,7 +4,9 @@
 #include "Pressure.hpp"
 #include "PressureTensor.hpp"
 #include "Configuration.hpp"
+#include "ConfigurationExt.hpp"
 #include "Configurations.hpp"
+#include "ConfigurationsExt.hpp"
 #include "Velocities.hpp"
 #include "CenterOfMass.hpp"
 #include "NPart.hpp"
@@ -30,6 +32,8 @@ namespace espresso {
       PressureTensor::registerPython();
       Configuration::registerPython();
       Configurations::registerPython();
+      ConfigurationExt::registerPython();
+      ConfigurationsExt::registerPython();
       Velocities::registerPython();
       CenterOfMass::registerPython();
       NPart::registerPython();

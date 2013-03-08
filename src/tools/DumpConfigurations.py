@@ -41,6 +41,8 @@ def writexyz(filename, system, velocities = True, unfolded = False, append = Fal
   
   file.close()
 
+
+"""
 def fastwritexyz(filename, system, append = False):
 
   if append:
@@ -67,6 +69,7 @@ def fastwritexyz(filename, system, append = False):
     file.write(st)
   
   file.close()
+"""
 
 def readxyz(filename):
   file = open(filename)
@@ -101,3 +104,46 @@ def readxyz(filename):
       zvel.append(0.0)
   return pid, type, xpos, ypos, zpos, xvel, yvel, zvel, Lx, Ly, Lz
   file.close()
+
+
+# Livia's modified writexyz to fastwritexyz with velocities
+
+def fastwritexyz(filename, system, velocities = True, append = False):
+
+  if append:
+    file = open(filename,'a')
+  else:
+    file = open(filename,'w')
+
+  configurations = espresso.analysis.ConfigurationsExt(system)
+  configurations.gather()
+  configuration = configurations[0]
+
+  if velocities:
+    velocities = espresso.analysis.Velocities(system)
+    velocities.gather()
+    velocity = velocities[0]
+
+  numParticles  = int(espresso.analysis.NPart(system).compute())
+  box_x = system.bc.boxL[0]
+  box_y = system.bc.boxL[1]
+  box_z = system.bc.boxL[2]
+  st = "%d\n%15.10f %15.10f %15.10f\n" % (numParticles, box_x, box_y, box_z)
+  file.write(st)
+
+  for pid in configuration:
+        xpos   = configuration[pid][0]
+        ypos   = configuration[pid][1]
+        zpos   = configuration[pid][2]
+        if velocities:
+          xvel   = velocity[pid][0]
+          yvel   = velocity[pid][1]
+          zvel   = velocity[pid][2]
+          st = "%d %15.10f %15.10f %15.10f %15.10f %15.10f %15.10f\n"%(pid, xpos, ypos, zpos, xvel, yvel, zvel)
+        else:
+          st = "%d %15.10f %15.10f %15.10f\n"%(pid, xpos, ypos, zpos)
+        file.write(st)
+        pid   += 1
+  
+  file.close()
+
