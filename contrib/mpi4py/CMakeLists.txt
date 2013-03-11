@@ -1,4 +1,4 @@
-set(MPI4PY_DIR mpi4py-1.2.1) 
+set(MPI4PY_DIR mpi4py-1.3) 
 set(MPI4PY_SOURCES ${MPI4PY_DIR}/src/MPI.c)
 set(DL_SOURCES ${MPI4PY_DIR}/src/dynload.c)
 
