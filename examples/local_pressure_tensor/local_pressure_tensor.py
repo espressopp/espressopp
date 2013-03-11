@@ -92,7 +92,7 @@ Pijloc = []
 for i in range(n):
   # The rutine .compute(xmin, xmax, ymin, ymax, zmin, zmax) will return the 
   # pressure tensor for defined volume
-  Pij = Pxy.compute(0.0, Lx, 0.0, Ly, dLz*i, dLz*(i+1))
+  Pij = Pxy.compute(dLz*i, dLz*(i+1))
   Pijloc.append(Pij)
 
 fmt2 = '%8.4f %8.4f %8.4f %8.4f %8.4f %8.4f %8.4f'
