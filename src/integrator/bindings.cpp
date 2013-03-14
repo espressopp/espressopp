@@ -16,6 +16,7 @@
 #include "FixPositions.hpp"
 #include "ExtForce.hpp"
 #include "CapForce.hpp"
+#include "ExtAnalyze.hpp"
 
 namespace espresso {
   namespace integrator {
@@ -36,6 +37,7 @@ namespace espresso {
       FixPositions::registerPython();
       ExtForce::registerPython();
       CapForce::registerPython();
+      ExtAnalyze::registerPython();
     }
   }
 }
