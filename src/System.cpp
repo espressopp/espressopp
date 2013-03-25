@@ -36,7 +36,6 @@ namespace espresso {
     //  int flags;
     //};
     
-
     // Following is some extreme typecasting which we need to convert the
     // pmi python object pmi._MPIcomm into a shared_ptr< boost::mpi::communicator >
     // I have not yet figured out how to do it in a more elegant way

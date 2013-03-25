@@ -1,7 +1,6 @@
 #include <sstream>
 #include "python.hpp"
 #include "FixedPairList.hpp"
-//#include <vector>
 //#include <utility>
 //#include <algorithm>
 #include <boost/bind.hpp>

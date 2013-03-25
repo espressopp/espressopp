@@ -132,7 +132,7 @@ namespace espresso {
     }
 
     // calculates the pressure for layer with z coordinate
-    // in kinetic particles in [z-dz, z+dz] slab will be taken into account
+    // kinetic part: particles in [z-dz, z+dz] slab are taken into account
     Tensor PressureTensor::computeTensorIKz2(real z, real dz) const {
       System& system = getSystemRef();
       Real3D Li = system.bc->getBoxL();

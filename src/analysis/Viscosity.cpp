@@ -16,6 +16,9 @@ namespace espresso {
     python::list Viscosity::compute(real t0, real dt, real T) {
       python::list auto_pxy_pxy_py = Autocorrelation::compute();
       size_t M = getListSize();
+      
+      cout << "M: "<< M << endl;
+      
       real* auto_pxy_pxy = new real[M];
       
       System& system = getSystemRef();

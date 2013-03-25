@@ -86,7 +86,6 @@ namespace espresso {
       
       real sum_q2;
         
-      // @TODO one should clean the memory then
       dcomplex* sum;
       dcomplex* totsum;
     public:

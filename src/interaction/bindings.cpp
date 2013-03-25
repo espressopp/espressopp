@@ -42,6 +42,8 @@
 #include "StillingerWeberTripleTerm.hpp"
 #include "StillingerWeberPairTermCapped.hpp"
 
+#include "CoulombKSpaceP3M.hpp"
+
 namespace espresso {
   namespace interaction {
     void registerPython() {
@@ -88,6 +90,8 @@ namespace espresso {
       StillingerWeberPairTerm::registerPython();
       StillingerWeberTripleTerm::registerPython();
       StillingerWeberPairTermCapped::registerPython();
+      
+      CoulombKSpaceP3M::registerPython();
     }
   }
 }
