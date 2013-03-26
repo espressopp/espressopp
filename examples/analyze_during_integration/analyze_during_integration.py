@@ -16,10 +16,13 @@ integrator.dt=0.005
 integrator.run(50000)
 
 T = espresso.analysis.Temperature(system)
+PressureTensor = espresso.analysis.PressureTensor(system)
 # interval between measurements
 interval = 10
 ExtAnalyzeT = espresso.integrator.ExtAnalyze(T, interval=interval)
 integrator.addExtension(ExtAnalyzeT)
+ExtAnalyzePressureTensor = espresso.integrator.ExtAnalyze(PressureTensor, interval=interval)
+integrator.addExtension(ExtAnalyzePressureTensor)
 
 print "starting integration ... measuring temperature every ", interval, " steps"
 integrator.run(10000)

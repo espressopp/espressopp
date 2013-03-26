@@ -63,6 +63,13 @@ find_package(MPI REQUIRED)
 include_directories(${MPI_INCLUDE_PATH})
 
 ########################################################################
+#Process FFTW3 settings
+########################################################################
+
+find_package(FFTW3 REQUIRED)
+include_directories(${FFTW3_INCLUDE_PATH})
+
+########################################################################
 #Process Python settings
 ########################################################################
 

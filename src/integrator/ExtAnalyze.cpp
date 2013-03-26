@@ -15,6 +15,7 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "Analyze observable in integrator");
       observable     = _observable;
       reset();
+      type = Extension::ExtAnalysis;
     }
 
     void ExtAnalyze::disconnect(){

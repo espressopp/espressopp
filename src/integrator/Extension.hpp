@@ -29,13 +29,13 @@ namespace espresso {
             Constraint=3,
             Adress=4,
             TDforce=5,
-            ExtForce=6
+            ExtForce=6,
+            ExtAnalysis=7
         };
 
 
         //type of extension
         ExtensionType type;
-
 
         /** Register this class so it can be used from Python. */
         static void registerPython();

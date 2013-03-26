@@ -49,6 +49,14 @@ namespace espresso {
       return (vv + wij) / V;
     }
 
+
+    void PressureTensor::compute_real_vector() {
+   	  Tensor res = computeTensor();
+      result_real_vector.clear();
+      for (int i=0; i<6; i++) result_real_vector.push_back(res[i]);
+      return;
+    }
+
     // it will calculate the pressure in 'n' layers along Z axis
     // the first layer has coordinate Lz/n the last - Lz.
     python::list PressureTensor::computeTensorIKz1(int n, real dz) const {
@@ -196,19 +204,16 @@ namespace espresso {
       return ( vv + w );
     }
 
-    real PressureTensor::compute() const {
-      return -1.0;
-    }
-
     // TODO it is fast solution. one should think about the overloading
     
+
     using namespace boost::python;
 
     void PressureTensor::registerPython() {
       using namespace espresso::python;
       class_<PressureTensor, bases< Observable > >
         ("analysis_PressureTensor", init< shared_ptr< System > >())
-        .def("compute1", &PressureTensor::computeTensor)
+        .def("compute1", &PressureTensor::compute_real_vector_python)
         .def("compute2", &PressureTensor::computeTensorIKz1)
         .def("compute3", &PressureTensor::computeTensorIKz2)
       ;
