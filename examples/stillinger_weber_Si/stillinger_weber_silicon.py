@@ -54,8 +54,6 @@ mass_real     = 27.9861 # amu
 
 time_real = sigma_real * math.sqrt(mass_real / epsilon_real) # ps
 
-print 'timestep (in real units [ps]): ', time_real * timestep
-
 # reading initial file
 file = open('ini_conf_diamond.xyz')
 lines = file.readlines()
@@ -105,7 +103,9 @@ system.storage.decompose()
 
 print ''
 print 'number of particles =', num_particles
-print 'box: ', box
+print 'timestep: %f / %10.9f [ps]' % (timestep, time_real * timestep)
+print 'box: ', '(%6.3f, %6.3f, %6.3f) / (%6.3f, %6.3f, %6.3f) [nm]' %  \
+        (Lx, Ly, Lz, sigma_real*Lx, sigma_real*Ly, sigma_real*Lz)
 print 'density = %.4f' % (density)
 print 'NodeGrid = %s' % (nodeGrid,)
 print 'CellGrid = %s' % (cellGrid,)
