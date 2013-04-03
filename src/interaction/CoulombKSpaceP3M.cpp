@@ -8,30 +8,24 @@ namespace espresso {
 
     typedef class CellListAllParticlesInteractionTemplate <CoulombKSpaceP3M> CellListCoulombKSpaceP3M;
 
-    CoulombKSpaceP3M::CoulombKSpaceP3M(shared_ptr< System > _system, real _prefactor, real _alpha, int _kmax){
+    CoulombKSpaceP3M::
+    CoulombKSpaceP3M(shared_ptr< System > _system, real _prefactor, real _alpha, int _kmax){
       system = _system;
       
-      /*
-      prefactor = _prefactor;
-      alpha = _alpha;
-      kmax  = _kmax;
-      
-      I = Tensor(1.0, 1.0, 1.0, 0.0, 0.0, 0.0);
-      sum = NULL;
-      totsum = NULL;
-      */
-      
       preset();
-      // getParticleNumber(); // geting the number of particles for the current node // it's done in preset
       
       // This function calculates the square of all particle charges. It should be called ones,
       // if the total number of particles doesn't change.
       count_charges(system->storage->getRealCells()); 
 
-      // make a connection to boundary conditions to invoke recalculation of KVec if box dimensions change
-      connectionRecalcKVec = system->bc->onBoxDimensionsChanged.connect(boost::bind(&CoulombKSpaceP3M::preset, this));
-      // make a connection to storage to get number of particles
-      connectionGetParticleNumber = system->storage->onParticlesChanged.connect(boost::bind(&CoulombKSpaceP3M::getParticleNumber, this));
+      /* make a connection to boundary conditions to invoke recalculation of KVec if box
+         dimensions change
+      */
+      connectionRecalcKVec = system->bc->onBoxDimensionsChanged.
+              connect(boost::bind(&CoulombKSpaceP3M::preset, this));
+      // make a connection to storage in order to get number of particles
+      connectionGetParticleNumber = system->storage->onParticlesChanged.
+              connect(boost::bind(&CoulombKSpaceP3M::getParticleNumber, this));
     }
     
     CoulombKSpaceP3M::~CoulombKSpaceP3M(){

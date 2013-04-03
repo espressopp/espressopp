@@ -11,9 +11,11 @@ namespace espresso {
     /** Class to compute the pressure tensor. */
     class PressureTensor : public Observable {
     public:
-      PressureTensor(shared_ptr< System > system) : Observable(system) { result_type=real_vector; };
+      PressureTensor(shared_ptr< System > system) : Observable(system) {
+        result_type=real_vector;
+      }
       ~PressureTensor() {}
-      virtual real compute() const { return 0.0; };
+      
       virtual Tensor computeTensor() const;
       virtual void compute_real_vector();
       

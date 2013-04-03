@@ -50,7 +50,7 @@ namespace espresso {
     }
 
 
-    void PressureTensor::compute_real_vector() {
+    void PressureTensor::compute_real_vector(){
    	  Tensor res = computeTensor();
       result_real_vector.clear();
       for (int i=0; i<6; i++) result_real_vector.push_back(res[i]);

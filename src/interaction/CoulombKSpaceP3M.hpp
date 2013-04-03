@@ -15,7 +15,6 @@
 
 #include "bc/BC.hpp"
 
-
 //#include "Cell.hpp"
 
 //#include "Tensor.hpp"
@@ -39,14 +38,13 @@ using namespace std;
 
 #define M_2PI (2*M_PIl)
 #define M_PI2 (M_PIl*M_PIl)
-
 #define M_1_SQRTPI (M_2_SQRTPIl * 0.5) /* 2/sqrt(pi)/2 = 1/sqrt(pi) */
 
 namespace espresso {
   namespace interaction {
     /** This class provides methods to compute forces and energies of the
      *  CoulombKSpaceP3M part. Currently it works with cubes and rectangular cuboids.
-     *  Does not work for triclinic box, slab geometry.
+     *  Does not work for triclinic box and slab geometry.
      */
     
     // TODO should be optimized (force energy and virial calculate the same stuff)
@@ -55,6 +53,15 @@ namespace espresso {
     private:
       shared_ptr< System > system; // we need the system object to be able to access the box
                                    // dimensions, communicator, number of particles, signals
+      
+      real prefactor; // Coulomb prefactor
+      
+      int Mx, My, Mz; // number of mesh-points
+      int P; // interpolation order
+      real alpha; // splitting parameter of the Ewald sum
+      real rc; // cutoff in real space
+      
+      
       
     public:
       static void registerPython();
@@ -93,8 +100,18 @@ namespace espresso {
       }
       //int getKMax() const { return kmax; }
 
-      // compute force and energy
-      void exponentPrecalculation(CellList realcells){
+      // here we generate mesh based charge density
+      void create_mesh(CellList realCells){
+        
+      }
+      // here we generate mesh based charge density
+      void gen_mesh(CellList realCells){
+        
+        for(iterator::CellListIterator it(realCells); it.isValid(); ++it){
+          Particle &p = *it;
+          
+          
+        }
       }
       
       real _computeEnergy(CellList realcells){
@@ -111,6 +128,7 @@ namespace espresso {
 
       // @TODO this function could be void, 
       bool _computeForce(CellList realcells){
+        
         
         return true;
       }

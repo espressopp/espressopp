@@ -20,13 +20,13 @@ namespace espresso {
       /** for compatibilty with old compute function only, will be deleted soon */
       virtual real compute() const { return 0.0; };
       /** returns observable of type real, used for Python and on C++ level*/
-      virtual real compute_real() { return 0.0; };
+      virtual real compute_real() const { return 0.0;};
       /** returns observable of type int, used for Python and on C++ level*/
-      virtual int compute_int() { return 0; };
+      virtual int compute_int() const { return 0; };
       /** computes vector of real values (e.g. pressure tensor, ...), used on C++ level only */
-      virtual void compute_real_vector() const { return; };
+      virtual void compute_real_vector(){ return; };
       /** computes vector of integer values, used on C++ level only */
-      virtual void compute_int_vector() { return; };
+      virtual void compute_int_vector(){ return; };
 
       /** returns python list of real values (e.g. pressure tensor, ...), used on Python level*/
       virtual python::list compute_real_vector_python();
@@ -34,7 +34,10 @@ namespace espresso {
       virtual python::list compute_int_vector_python();
 
       /** returns the result type of the observable */
-      result_types getResultType() { return result_type; };
+      // TODO at the moment it returns int instead, because it was causing an error
+      // trying to convert result_types to python
+      //result_types getResultType() { return result_type; };
+      int getResultType() { return result_type; };
 
       static void registerPython();
 
