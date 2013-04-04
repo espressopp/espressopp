@@ -7,6 +7,7 @@ from espresso.interaction.Interaction import *
 from _espresso import interaction_Tabulated, \
                       interaction_VerletListTabulated, \
                       interaction_VerletListAdressTabulated, \
+                      interaction_VerletListHadressTabulated, \
                       interaction_CellListTabulated, \
                       interaction_FixedPairListTabulated
                       #interaction_FixedTripleListTabulated
@@ -23,6 +24,20 @@ class VerletListAdressTabulatedLocal(InteractionLocal, interaction_VerletListAdr
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListAdressTabulated, vl, fixedtupleList)
+
+    def setPotentialAT(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialAT(self, type1, type2, potential)        
+            
+    def setPotentialCG(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialCG(self, type1, type2, potential)
+            
+class VerletListHadressTabulatedLocal(InteractionLocal, interaction_VerletListHadressTabulated):
+    'The (local) tabulated interaction using Verlet lists.'
+    def __init__(self, vl, fixedtupleList):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListHadressTabulated, vl, fixedtupleList)
 
     def setPotentialAT(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -80,6 +95,13 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListAdressTabulatedLocal',
+            pmicall = ['setPotentialAT', 'setPotentialCG']
+            )
+            
+    class VerletListHadressTabulated(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espresso.interaction.VerletListHadressTabulatedLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
         

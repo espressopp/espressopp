@@ -110,6 +110,7 @@ namespace espresso {
       real dex;
       real dex2; // dex^2
       std::map<Particle*, real> weights;
+      std::map<Particle*, real> energydiff;  // Energydifference V_AA - V_CG map for particles in hybrid region for drift term calculation in H-AdResS
 
     };
 
@@ -215,14 +216,15 @@ namespace espresso {
               // calculate distance to nearest adress particle or center
               std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
               Real3D pa = **it2; // position of adress particle
-              //Real3D d1 = vp.position() - pa;
-	      real d1 = vp.position()[0] - pa[0];
-              real min1sq = d1*d1; // d1.sqr(); // set min1sq before loop
+              Real3D d1 = vp.position() - pa;
+	      //real d1 = vp.position()[0] - pa[0];
+              real min1sq = d1.sqr(); // d1.sqr(); // set min1sq before loop
               ++it2;
               for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                    pa = **it2;
-                   d1 = vp.position()[0] - pa[0];
-                   real distsq1 = d1*d1; //d1.sqr();
+                   d1 = vp.position() - pa;
+                   //d1 = vp.position()[0] - pa[0];
+                   real distsq1 = d1.sqr(); //d1.sqr();
                    //std::cout << pa << " " << sqrt(distsq1) << "\n";
                    if (distsq1 < min1sq) min1sq = distsq1;
               }
@@ -265,20 +267,33 @@ namespace espresso {
          // read weights
          real w1 = weights.find(&p1)->second;
          real w2 = weights.find(&p2)->second;
-         real w12 = w1 * w2;
+         real w12 = (w1 + w2)/2.0;  // H-AdResS
 
          // force between VP particles
          int type1 = p1.type();
          int type2 = p2.type();
          const PotentialCG &potentialCG = getPotentialCG(type1, type2);
          Real3D forcevp(0.0, 0.0, 0.0);
-         if (w12 != 1) { // calculate VP force if both VP are outside AT region (CG-HY, HY-HY)
-             if(potentialCG._computeForce(forcevp, p1, p2)) {
-                 forcevp *= (1 - w12);
-                 p1.force() += forcevp;
-                 p2.force() -= forcevp;
-             }
-         }
+                if (w12 != 1) { // calculate VP force if both VP are outside AT region (CG-HY, HY-HY)
+                    if (potentialCG._computeForce(forcevp, p1, p2)) {
+                        forcevp *= (1 - w12);
+                        p1.force() += forcevp;
+                        p2.force() -= forcevp;
+                    }
+
+                    // H-AdResS - Drift Term part 1
+                    // Compute CG energies of particles in the hybrid and store and add up in map energydiff
+                    if (w12 != 0) {   //at least one particle in hybrid region => need to do the energy calculation
+                        real energyvp = potentialCG._computeEnergy(p1, p2);
+                        if (w1 != 0) {   // if particle one is in hybrid region
+                            energydiff[&p1] += energyvp;   // add CG energy for virtual particle 1
+                        }
+                        if (w2 != 0) {   // if particle two is in hybrid region
+                            energydiff[&p2] += energyvp;   // add CG energy for virtual particle 2
+                        }
+                    }
+
+            }
          /*
          else {
              std::cout << "skipping VP forces...\n";
@@ -318,6 +333,20 @@ namespace espresso {
                              p3.force() += force;
                              p4.force() -= force;
                          }
+                         
+                         // H-AdResS - Drift Term part 2
+                         // Compute AT energies of particles in the hybrid and store and subtract in map energydiff
+                         if(w12!=1){   //at least one particle in hybrid region => need to do the energy calculation
+                             real energyat = potentialAT._computeEnergy(p3, p4);   
+                             if(w1!=1){   // if particle one is in hybrid region
+                                    //energydiff.find(&p1)->second -= energyat;
+                                    energydiff[&p1] -= energyat;   // subtract AT energy for virtual particle 1
+                             }
+                             if(w2!=1){   // if particle two is in hybrid region
+                                    //energydiff.find(&p2)->second -= energyat;
+                                    energydiff[&p2] -= energyat;   // subtract AT energy for virtual particle 2
+                             }              
+                         }                       
 
                      }
 
@@ -332,7 +361,46 @@ namespace espresso {
              }
          }
       }
-
+      
+      // H-AdResS - Drift Term part 3
+      // Iterate over all particles in the hybrid region and calculate drift force
+      for (std::set<Particle*>::iterator it=adrZone.begin();
+        it != adrZone.end(); ++it) {   // Iterate over all particles
+          Particle &vp = **it;
+          real w = weights.find(&vp)->second;
+                  
+          if(w!=1 && w!=0){   //   only chose those in the hybrid region
+              
+              // calculate distance to nearest adress particle or center
+              std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
+              Real3D pa = **it2; // position of adress particle
+              Real3D mindriftforce = vp.position() - pa;
+              //real d1 = vp.position()[0] - pa[0];
+              real min1sq = mindriftforce.sqr(); // d1.sqr(); // set min1sq before loop
+              ++it2;
+              for (; it2 != verletList->getAdrPositions().end(); ++it2) {
+                   pa = **it2;
+                   Real3D driftforce = vp.position() - pa;
+                   //d1 = vp.position()[0] - pa[0];
+                   real distsq1 = driftforce.sqr(); //d1.sqr();
+                   //std::cout << pa << " " << sqrt(distsq1) << "\n";
+                   if (distsq1 < min1sq) {
+                        min1sq = distsq1;
+                        mindriftforce = driftforce;
+                   }
+              }
+              min1sq = sqrt(min1sq);   // distance to nearest adress particle or center
+              mindriftforce = (1.0/min1sq)*mindriftforce;  // normalized driftforce vector
+              real argument = pidhy2 * (min1sq - dex);   // argument of cosine/sine functions in weighting function
+              mindriftforce *= -pidhy2 * 2.0 * cos(argument) * sin(argument);   // derivative of weighting function
+              mindriftforce *= energydiff.find(&vp)->second;   // get the energy differences which were calculated previously and put in drift force
+              vp.force() += mindriftforce;   // add drift force to virtual particles
+          }
+          
+      }
+      
+      energydiff.clear();  // clear the energy difference map
+      
       weights.clear();
 
       // distribute forces from VP to AT (HY and AT region)
@@ -484,7 +552,6 @@ namespace espresso {
       boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
       w += wsum;
     }
-    
  
     template < typename _PotentialAT, typename _PotentialCG > inline void
     VerletListHadressInteractionTemplate < _PotentialAT, _PotentialCG >::
@@ -548,6 +615,7 @@ namespace espresso {
        */
     }
 
+    
     template < typename _PotentialAT, typename _PotentialCG > inline void
     VerletListHadressInteractionTemplate < _PotentialAT, _PotentialCG >::
     computeVirialTensor(Tensor *w, int n) {

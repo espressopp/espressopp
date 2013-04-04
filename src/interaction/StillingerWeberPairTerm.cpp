@@ -9,6 +9,8 @@ namespace espresso {
         VerletListStillingerWeberPairTerm;
     typedef class VerletListAdressInteractionTemplate <StillingerWeberPairTerm, Tabulated>
         VerletListAdressStillingerWeberPairTerm;
+    typedef class VerletListHadressInteractionTemplate <StillingerWeberPairTerm, Tabulated>
+        VerletListHadressStillingerWeberPairTerm;
     typedef class CellListAllPairsInteractionTemplate <StillingerWeberPairTerm> 
         CellListStillingerWeberPairTerm;
     typedef class FixedPairListInteractionTemplate <StillingerWeberPairTerm> 
@@ -47,6 +49,14 @@ namespace espresso {
         .def("setPotentialCG", &VerletListAdressStillingerWeberPairTerm::setPotentialCG);
       ;
 
+      class_< VerletListHadressStillingerWeberPairTerm, bases< Interaction > >
+        ("interaction_VerletListHadressStillingerWeberPairTerm",
+            init< shared_ptr<VerletListAdress>,
+            shared_ptr<FixedTupleList> >())
+        .def("setPotentialAT", &VerletListHadressStillingerWeberPairTerm::setPotentialAT)
+        .def("setPotentialCG", &VerletListHadressStillingerWeberPairTerm::setPotentialCG);
+      ;
+      
       class_< CellListStillingerWeberPairTerm, bases< Interaction > > 
         ("interaction_CellListStillingerWeberPairTerm", init< shared_ptr< storage::Storage > >())
         .def("setPotential", &CellListStillingerWeberPairTerm::setPotential);

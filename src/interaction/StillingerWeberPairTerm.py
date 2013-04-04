@@ -6,6 +6,7 @@ from espresso.interaction.Interaction import *
 from _espresso import interaction_StillingerWeberPairTerm, \
                       interaction_VerletListStillingerWeberPairTerm, \
                       interaction_VerletListAdressStillingerWeberPairTerm, \
+                      interaction_VerletListHadressStillingerWeberPairTerm, \
                       interaction_CellListStillingerWeberPairTerm, \
                       interaction_FixedPairListStillingerWeberPairTerm
 
@@ -47,7 +48,21 @@ class VerletListAdressStillingerWeberPairTermLocal(InteractionLocal, interaction
   def setPotentialCG(self, type1, type2, potential):
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       self.cxxclass.setPotentialCG(self, type1, type2, potential)
+      
+class VerletListHadressStillingerWeberPairTermLocal(InteractionLocal, interaction_VerletListHadressStillingerWeberPairTerm):
+  'The (local) Lennard Jones interaction using Verlet lists.'
+  def __init__(self, vl, fixedtupleList):
+    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+      cxxinit(self, interaction_VerletListHadressStillingerWeberPairTerm, vl, fixedtupleList)
 
+  def setPotentialAT(self, type1, type2, potential):
+    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+      self.cxxclass.setPotentialAT(self, type1, type2, potential)
+
+  def setPotentialCG(self, type1, type2, potential):
+    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+      self.cxxclass.setPotentialCG(self, type1, type2, potential)
+      
 class CellListStillingerWeberPairTermLocal(InteractionLocal, interaction_CellListStillingerWeberPairTerm):
   'The (local) Lennard Jones interaction using cell lists.'
   def __init__(self, stor):
@@ -87,6 +102,13 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
           cls =  'espresso.interaction.VerletListAdressStillingerWeberPairTermLocal',
+          pmicall = ['setPotentialAT', 'setPotentialCG']
+        )
+        
+    class VerletListHadressStillingerWeberPairTerm(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+          cls =  'espresso.interaction.VerletListHadressStillingerWeberPairTermLocal',
           pmicall = ['setPotentialAT', 'setPotentialCG']
         )
 

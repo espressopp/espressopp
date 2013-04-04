@@ -216,11 +216,13 @@ namespace espresso {
               std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
               Real3D pa = **it2; // position of adress particle
               Real3D d1 = vp.position() - pa;
+              //real d1 = vp.position()[0] - pa[0];
               real min1sq = d1.sqr(); // set min1sq before loop
               ++it2;
               for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                    pa = **it2;
                    d1 = vp.position() - pa;
+                   //d1 = vp.position()[0] - pa[0];
                    real distsq1 = d1.sqr();
                    //std::cout << pa << " " << sqrt(distsq1) << "\n";
                    if (distsq1 < min1sq) min1sq = distsq1;
@@ -264,7 +266,7 @@ namespace espresso {
          // read weights
          real w1 = weights.find(&p1)->second;
          real w2 = weights.find(&p2)->second;
-         real w12 = w1 * w2;
+         real w12 = w1 * w2;  // AdResS
 
          // force between VP particles
          int type1 = p1.type();
@@ -545,7 +547,7 @@ namespace espresso {
       w += wsum;
        */
     }
-
+    
     
     template < typename _PotentialAT, typename _PotentialCG > inline void
     VerletListAdressInteractionTemplate < _PotentialAT, _PotentialCG >::

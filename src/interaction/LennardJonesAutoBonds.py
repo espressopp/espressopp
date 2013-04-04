@@ -7,6 +7,7 @@ from espresso.interaction.Interaction import *
 from _espresso import interaction_LennardJonesAutoBonds, \
                       interaction_VerletListLennardJonesAutoBonds, \
                       interaction_VerletListAdressLennardJonesAutoBonds, \
+                      interaction_VerletListHadressLennardJonesAutoBonds, \
                       interaction_CellListLennardJonesAutoBonds, \
                       interaction_FixedPairListLennardJonesAutoBonds
 
@@ -43,6 +44,16 @@ class VerletListAdressLennardJonesAutoBondsLocal(InteractionLocal, interaction_V
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListAdressLennardJonesAutoBonds, vl, fixedtupleList)
+
+    def setPotential(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
+            
+class VerletListHadressLennardJonesAutoBondsLocal(InteractionLocal, interaction_VerletListHadressLennardJonesAutoBonds):
+    'The (local) Lennard Jones auto bonds interaction using Verlet lists.'
+    def __init__(self, vl, fixedtupleList):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListHadressLennardJonesAutoBonds, vl, fixedtupleList)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -87,6 +98,13 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListAdressLennardJonesAutoBondsLocal',
+            pmicall = ['setPotentialAT', 'setPotentialCG']
+            )
+            
+    class VerletListHadressLennardJonesAutoBonds(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espresso.interaction.VerletListHadressLennardJonesAutoBondsLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
