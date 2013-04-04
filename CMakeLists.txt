@@ -63,6 +63,13 @@ find_package(MPI REQUIRED)
 include_directories(${MPI_INCLUDE_PATH})
 
 ########################################################################
+#Process FFTW3 settings
+########################################################################
+
+find_package(FFTW3 REQUIRED)
+include_directories(${FFTW3_INCLUDE_PATH})
+
+########################################################################
 #Process Python settings
 ########################################################################
 
@@ -113,7 +120,8 @@ check_include_files("sys/time.h;sys/resource.h;unistd.h" CMAKE_HEADERS)
 
 list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
-add_definitions( -DHAVE_CONFIG_H )
+# this conflicts with mpi4py-1.3 (is used to check for MPI version there)
+# add_definitions( -DHAVE_CONFIG_H )
 
 if (EXTERNAL_BOOST)
   find_package(Boost 1.42.0 REQUIRED COMPONENTS mpi python serialization )

@@ -18,3 +18,4 @@ from espresso.integrator.LangevinBarostat import *
 from espresso.integrator.FixPositions import *
 from espresso.integrator.ExtForce import *
 from espresso.integrator.CapForce import *
+from espresso.integrator.ExtAnalyze import *

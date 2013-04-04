@@ -10,9 +10,9 @@ namespace espresso {
     /** Class to get the number of particles in the system. */
     class NPart : public Observable {
     public:
-      NPart(shared_ptr< System > system) : Observable(system) {}
+      NPart(shared_ptr< System > system) : Observable(system) {result_type=real_scalar;}
       virtual ~NPart() {}
-      virtual real compute() const;
+      virtual real compute_real() const;
 
       static void registerPython();
     };

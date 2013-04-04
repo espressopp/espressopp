@@ -9,13 +9,19 @@ class PressureTensorLocal(ObservableLocal, analysis_PressureTensor):
     def __init__(self, system):
         cxxinit(self, analysis_PressureTensor, system)
 
+    '''
     def compute(self, z = None, dz = None):
       if (z == None) or (dz == None):
-        return self.cxxclass.compute1(self)
+        ret = self.cxxclass.compute1(self)
+        print 'pressure tensor return:', ret
+        exit(0)
+        return ret
       elif(isinstance(z, int) and z!=0):
         return self.cxxclass.compute2(self, z, dz)
       else:
         return self.cxxclass.compute3(self, z, dz)
+    '''
+        
 
 if pmi.isController:
   class PressureTensor(Observable):
@@ -23,5 +29,5 @@ if pmi.isController:
     pmiproxydefs = dict(
       cls =  'espresso.analysis.PressureTensorLocal',
       #pmiinvoke = ['computeLocal']
-      pmicall = ['compute']
+      #pmicall = ['compute']
     )

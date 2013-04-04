@@ -8,14 +8,15 @@
 #################################
 
 '''
-  This is an example for an MD simulation of a Si using Stillinger-Weber nonbonded 
-  3-body potential.
+  This is an example of using Stillinger-Weber nonbonded 
+  3-body potential (Si melt).
   The initial configuration is a diamond structure.
-  The result is radial distribution function 'rdf.dat' (units - [nm])
+  A result is radial distribution function 'rdf.dat' (units - [nm])
 '''
 
 import sys
 import time
+import math
 import espresso
 import MPI
 from espresso import Real3D
@@ -49,6 +50,9 @@ desiredT = 0.15 # it corresponds to 3770 K
 # units
 sigma_real    = 0.20951 # nm
 epsilon_real  = 209     # kJ/mol
+mass_real     = 27.9861 # amu
+
+time_real = sigma_real * math.sqrt(mass_real / epsilon_real) # ps
 
 # reading initial file
 file = open('ini_conf_diamond.xyz')
@@ -99,7 +103,9 @@ system.storage.decompose()
 
 print ''
 print 'number of particles =', num_particles
-print 'box: ', box
+print 'timestep: %f / %10.9f [ps]' % (timestep, time_real * timestep)
+print 'box: ', '(%6.3f, %6.3f, %6.3f) / (%6.3f, %6.3f, %6.3f) [nm]' %  \
+        (Lx, Ly, Lz, sigma_real*Lx, sigma_real*Ly, sigma_real*Lz)
 print 'density = %.4f' % (density)
 print 'NodeGrid = %s' % (nodeGrid,)
 print 'CellGrid = %s' % (cellGrid,)

@@ -11,10 +11,13 @@ namespace espresso {
     /** Class to compute the pressure tensor. */
     class PressureTensor : public Observable {
     public:
-      PressureTensor(shared_ptr< System > system) : Observable(system) {}
+      PressureTensor(shared_ptr< System > system) : Observable(system) {
+        result_type=real_vector;
+      }
       ~PressureTensor() {}
-      virtual real compute() const;
+      
       virtual Tensor computeTensor() const;
+      virtual void compute_real_vector();
       
       virtual python::list computeTensorIKz1(int, real) const;
       virtual Tensor computeTensorIKz2(real,real) const;

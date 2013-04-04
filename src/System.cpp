@@ -9,7 +9,7 @@
 
 #include <limits>
 
-#include "../contrib/mpi4py/mpi4py-1.2.1/src/include/mpi4py/mpi4py.h"
+#include "../contrib/mpi4py/mpi4py-1.3/src/include/mpi4py/mpi4py.h"
 
 #ifdef VTRACE
 #include "vampirtrace/vt_user.h"
@@ -36,15 +36,14 @@ namespace espresso {
     //  int flags;
     //};
     
-
     // Following is some extreme typecasting which we need to convert the
     // pmi python object pmi._MPIcomm into a shared_ptr< boost::mpi::communicator >
     // I have not yet figured out how to do it in a more elegant way
     PyObject *pyobj = _pyobj.ptr();
     // in mpi4py.1.2.1 this has to be:
-    __pyx_obj_6mpi4py_3MPI_Comm * pyMPIComm = (__pyx_obj_6mpi4py_3MPI_Comm *) pyobj;
-    // in mpi4py.1.2.2 this has to be:
-    // PyMPICommObject* pyMPIComm = (PyMPICommObject*) pyobj;
+    // __pyx_obj_6mpi4py_3MPI_Comm * pyMPIComm = (__pyx_obj_6mpi4py_3MPI_Comm *) pyobj;
+    // in version >= mpi4py.1.2.2 this has to be:
+    PyMPICommObject* pyMPIComm = (PyMPICommObject*) pyobj;
     MPI_Comm * comm_p = &pyMPIComm->ob_mpi;
     shared_ptr< mpi::communicator > newcomm = make_shared< mpi::communicator >(*comm_p, mpi::comm_attach);
 

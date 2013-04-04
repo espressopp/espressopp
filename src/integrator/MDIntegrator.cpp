@@ -42,14 +42,18 @@ namespace espresso {
        //extension->setIntegrator(this); // this is done in python
        //std::cout << "type is: " << extension->type << "\n";
 
+       /*
+       //currently we do not check this, some Extensions are allowed multiple times,
+       //e.g. ExtAnalyze or FixParticles with different particle groups
        // warn if there is already an extension of the same type
-       for (ExtensionList::iterator it = exList.begin();
-               it != exList.end(); ++it){
+       for (ExtensionList::iterator it = exList.begin(); it != exList.end(); ++it) {
            if ((*it)->type == extension->type) {
-               //LOG4ESPP_WARN(theLogger, "extension of same type already added!");
+              LOG4ESPP_WARN(theLogger, "extension of same type already added!");
               printf("\nWARNING: extension of same type already added!\n\n");
            }
        }
+       */
+
        // add extension to the list
        exList.push_back(extension);
     }

@@ -11,8 +11,7 @@
 namespace espresso {
   namespace interaction {
     template < typename _Potential >
-    class CellListAllParticlesInteractionTemplate
-        : public Interaction {
+    class CellListAllParticlesInteractionTemplate: public Interaction {
     protected:
       typedef _Potential Potential;
     public:
@@ -82,15 +81,15 @@ namespace espresso {
     template < typename _Potential > inline void
     CellListAllParticlesInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor& wij, real z) {
-      std::cout<<"Warning! Calculate virial in defined volume is not supported for "
-              "long range interactions. Nothing was done"<<std::endl;
+      std::cout<<"Warning! Calculating virial layerwise is not supported for "
+              "long range interactions."<<std::endl;
     }
     
     template < typename _Potential > inline void
     CellListAllParticlesInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor *wij, int n) {
-      std::cout<<"Warning! Calculate virial in defined volume is not supported for "
-              "long range interactions. Nothing was done"<<std::endl;
+      std::cout<<"Warning! Calculating virial layerwise is not supported for "
+              "long range interactions."<<std::endl;
     }
 
   }

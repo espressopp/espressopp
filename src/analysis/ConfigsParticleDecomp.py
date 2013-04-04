@@ -3,10 +3,10 @@ from espresso import pmi
 
 from _espresso import analysis_ConfigsParticleDecomp
 
-class ConfigsParticleDecompLocal(object): #analysis_ConfigsParticleDecomp
+class ConfigsParticleDecompLocal(analysis_ConfigsParticleDecomp):
     'The (local) storage of configurations.'
-    #def __init__(self, system):
-      #cxxinit(self, analysis_ConfigsParticleDecomp, system)
+    def __init__(self, system):
+      cxxinit(self, analysis_ConfigsParticleDecomp, system)
     def gather(self):
       return self.cxxclass.gather(self)
     def clear(self):
