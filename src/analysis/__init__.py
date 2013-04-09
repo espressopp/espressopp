@@ -22,3 +22,4 @@ from espresso.analysis.Autocorrelation import *
 from espresso.analysis.RadialDistrF import *
 from espresso.analysis.Energy import *
 from espresso.analysis.Viscosity import *
+from espresso.analysis.XDensity import *

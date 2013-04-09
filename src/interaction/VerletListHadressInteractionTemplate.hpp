@@ -122,6 +122,63 @@ namespace espresso {
     addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
 
+                  
+      // Update CG particle position according to center of masses of AT particles (CG region).
+      
+      // Note (Karsten): This is a different approach compared to Force-AdResS. In
+      // Force-AdResS, we overwrite intra-molecular rotations and vibrations in the CG zone. This leads to failures in the kinetic energy. However, in Force-AdResS there is no energy
+      // conservation anyway. In Force-AdResS we calculate CG forces/velocities and distribute them to AT particles. 
+      // In contrast, in H-AdResS, we calculate AT forces from intra-molecular interactions and inter-molecular center-of-mass interactions and just update the positions
+      // of the center-of-mass CG particles.
+      std::set<Particle*> cgZone = verletList->getCGZone();
+      for (std::set<Particle*>::iterator it=cgZone.begin();
+              it != cgZone.end(); ++it) {
+
+          Particle &vp = **it;
+
+          FixedTupleList::iterator it3;
+          it3 = fixedtupleList->find(&vp);
+
+          if (it3 != fixedtupleList->end()) {
+
+              std::vector<Particle*> atList;
+              atList = it3->second;
+
+              // compute center of mass
+              Real3D cmp(0.0, 0.0, 0.0); // center of mass position
+              //Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
+              //real M = vp.getMass(); // sum of mass of AT particles
+              for (std::vector<Particle*>::iterator it2 = atList.begin();
+                                   it2 != atList.end(); ++it2) {
+                  Particle &at = **it2;
+                  //Real3D d1 = at.position() - vp.position();
+                  //Real3D d1;
+                  //verletList->getSystem()->bc->getMinimumImageVectorBox(d1, at.position(), vp.position());
+                  //cmp += at.mass() * d1;
+
+                  cmp += at.mass() * at.position();
+                  //cmv += at.mass() * at.velocity();
+              }
+              cmp /= vp.getMass();
+              //cmv /= vp.getMass();
+              //cmp += vp.position(); // cmp is a relative position
+              //std::cout << " cmp M: "  << M << "\n\n";
+              //std::cout << "  moving VP to " << cmp << ", velocitiy is " << cmv << "\n";
+
+              // update (overwrite) the position and velocity of the VP
+              vp.position() = cmp;
+              //vp.velocity() = cmv;
+
+          }
+          else { // this should not happen
+              std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
+              std::cout << " (" << vp.position() << ")\n";
+              exit(1);
+              return;
+          }
+      }
+      
+       
       // Pairs not inside the AdResS Zone (CG region)
       for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
 
@@ -143,7 +200,7 @@ namespace espresso {
 
       // Loop over CG particles and overwrite AT forces and velocity.
       // This makes the AT particles move along with CG particles.
-      std::set<Particle*> cgZone = verletList->getCGZone();
+      // std::set<Particle*> cgZone = verletList->getCGZone();
       for (std::set<Particle*>::iterator it=cgZone.begin();
                     it != cgZone.end(); ++it) {
 
@@ -161,7 +218,7 @@ namespace espresso {
                 for (std::vector<Particle*>::iterator itv = atList1.begin();
                         itv != atList1.end(); ++itv) {
                     Particle &at = **itv;
-                    at.velocity() = vp.velocity(); // overwrite velocity
+                    // at.velocity() = vp.velocity(); // overwrite velocity
                     at.force() += at.mass() * vpfm;
                 }
 
@@ -216,15 +273,15 @@ namespace espresso {
               // calculate distance to nearest adress particle or center
               std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
               Real3D pa = **it2; // position of adress particle
-              Real3D d1 = vp.position() - pa;
-	      //real d1 = vp.position()[0] - pa[0];
-              real min1sq = d1.sqr(); // d1.sqr(); // set min1sq before loop
+              //Real3D d1 = vp.position() - pa;                                               // X SPLIT VS SPHERE CHANGE
+	      real d1 = vp.position()[0] - pa[0];                                             // X SPLIT VS SPHERE CHANGE
+              real min1sq = d1*d1; // d1.sqr(); // set min1sq before loop                     // X SPLIT VS SPHERE CHANGE
               ++it2;
               for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                    pa = **it2;
-                   d1 = vp.position() - pa;
-                   //d1 = vp.position()[0] - pa[0];
-                   real distsq1 = d1.sqr(); //d1.sqr();
+                   //d1 = vp.position() - pa;                                                 // X SPLIT VS SPHERE CHANGE
+                   d1 = vp.position()[0] - pa[0];                                             // X SPLIT VS SPHERE CHANGE
+                   real distsq1 = d1*d1; //d1.sqr();
                    //std::cout << pa << " " << sqrt(distsq1) << "\n";
                    if (distsq1 < min1sq) min1sq = distsq1;
               }
@@ -374,15 +431,15 @@ namespace espresso {
               // calculate distance to nearest adress particle or center
               std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
               Real3D pa = **it2; // position of adress particle
-              Real3D mindriftforce = vp.position() - pa;
-              //real d1 = vp.position()[0] - pa[0];
-              real min1sq = mindriftforce.sqr(); // d1.sqr(); // set min1sq before loop
+              //Real3D mindriftforce = vp.position() - pa;                                                 // X SPLIT VS SPHERE CHANGE
+              real mindriftforce = vp.position()[0] - pa[0];                                               // X SPLIT VS SPHERE CHANGE
+              real min1sq = mindriftforce*mindriftforce; // mindriftforce.sqr(); // set min1sq before loop
               ++it2;
               for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                    pa = **it2;
-                   Real3D driftforce = vp.position() - pa;
-                   //d1 = vp.position()[0] - pa[0];
-                   real distsq1 = driftforce.sqr(); //d1.sqr();
+                   //Real3D driftforce = vp.position() - pa;                                                 // X SPLIT VS SPHERE CHANGE
+                   real driftforce = vp.position()[0] - pa[0];                                               // X SPLIT VS SPHERE CHANGE
+                   real distsq1 = driftforce*driftforce; //driftforce.sqr();
                    //std::cout << pa << " " << sqrt(distsq1) << "\n";
                    if (distsq1 < min1sq) {
                         min1sq = distsq1;
@@ -394,7 +451,9 @@ namespace espresso {
               real argument = pidhy2 * (min1sq - dex);   // argument of cosine/sine functions in weighting function
               mindriftforce *= -pidhy2 * 2.0 * cos(argument) * sin(argument);   // derivative of weighting function
               mindriftforce *= energydiff.find(&vp)->second;   // get the energy differences which were calculated previously and put in drift force
-              vp.force() += mindriftforce;   // add drift force to virtual particles
+              //vp.force() += mindriftforce;   // add drift force to virtual particles                                                           // X SPLIT VS SPHERE CHANGE
+              Real3D driftforceadd(mindriftforce,0.0,0.0);                                                                                       // X SPLIT VS SPHERE CHANGE
+              vp.force() += driftforceadd;                                                                                                       // X SPLIT VS SPHERE CHANGE
           }
           
       }

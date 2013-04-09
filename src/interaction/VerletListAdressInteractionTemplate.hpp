@@ -142,6 +142,11 @@ namespace espresso {
 
       // Loop over CG particles and overwrite AT forces and velocity.
       // This makes the AT particles move along with CG particles.
+      
+      // Note (Karsten): This is a different approach compared to H-AdResS. Here, we overwrite intra-atomistic
+      // rotations and vibrations in the CG zone. This leads to failures in the kinetic energy. However, in Force-AdResS there is no energy conservation anyway.
+      // Here we calculate CG forces/velocities and distribute them to AT particles. In contrast, in H-AdResS, we calculate AT forces from intra-molecular
+      // interactions and inter-molecular center-of-mass interactions and just update the positions of the center-of-mass CG particles.
       std::set<Particle*> cgZone = verletList->getCGZone();
       for (std::set<Particle*>::iterator it=cgZone.begin();
                     it != cgZone.end(); ++it) {
@@ -160,7 +165,7 @@ namespace espresso {
                 for (std::vector<Particle*>::iterator itv = atList1.begin();
                         itv != atList1.end(); ++itv) {
                     Particle &at = **itv;
-                    at.velocity() = vp.velocity(); // overwrite velocity
+                    at.velocity() = vp.velocity(); // Overwrite velocity - Note (Karsten): See comment above.
                     at.force() += at.mass() * vpfm;
                 }
 
@@ -217,13 +222,13 @@ namespace espresso {
               Real3D pa = **it2; // position of adress particle
               Real3D d1 = vp.position() - pa;
               //real d1 = vp.position()[0] - pa[0];
-              real min1sq = d1.sqr(); // set min1sq before loop
+              real min1sq = d1.sqr(); // set min1sq before loop  // d1*d1;
               ++it2;
               for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                    pa = **it2;
                    d1 = vp.position() - pa;
                    //d1 = vp.position()[0] - pa[0];
-                   real distsq1 = d1.sqr();
+                   real distsq1 = d1.sqr(); // d1*d1;
                    //std::cout << pa << " " << sqrt(distsq1) << "\n";
                    if (distsq1 < min1sq) min1sq = distsq1;
               }
