@@ -18,6 +18,7 @@
 #include "FENECapped.hpp"
 #include "Harmonic.hpp"
 #include "HarmonicUnique.hpp"
+#include "Quartic.hpp"
 
 #include "Tabulated.hpp"
 #include "TabulatedAngular.hpp"
@@ -68,6 +69,7 @@ namespace espresso {
       FENECapped::registerPython();
       Harmonic::registerPython();
       HarmonicUnique::registerPython();
+      Quartic::registerPython();
       
       AngularPotential::registerPython();
       AngularUniquePotential::registerPython();
