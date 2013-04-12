@@ -9,7 +9,7 @@
 
 namespace espresso {
   namespace analysis {
-    /** Class to compute the density in slabs along the x-direction of the system. */
+    // Class to compute the density profile along slabs in the x-direction of the system.
     class XDensity : public Observable {
     public:
       XDensity(shared_ptr< System > system) : Observable(system) {}

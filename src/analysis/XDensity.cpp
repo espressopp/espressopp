@@ -16,13 +16,12 @@ using namespace std;
 namespace espresso {
   namespace analysis {
     
-    // splitN is a level of discretisation of rdf (how many elements it contains)
+    // splitN is a level of discretisation of density profile (how many elements it contains)
     python::list XDensity::computeArray(int splitN) const {
 
       System& system = getSystemRef();
       esutil::Error err(system.comm);
       Real3D Li = system.bc->getBoxL();
-      //Real3D Li_half = Li / 2.;
       
       int nprocs = system.comm->size();
       int myrank = system.comm->rank();
@@ -86,12 +85,9 @@ namespace espresso {
       
       // normalizing
       int nconfigs = 1; //config - 1
-      //avg_part = part_total / float(nconfigs)
       real rho = (real)num_part / splitN;
-      //real factor = 2.0 * M_PIl * dr * rho * (real)nconfigs * (real)num_part;
       
       for(int i=0; i < splitN; i++){
-        //real radius = (i + 0.5) * dr;
         totHistogram[i] /= rho;
       }
       
