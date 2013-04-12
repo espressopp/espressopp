@@ -9,6 +9,7 @@ Current developers:
     Livia Moreira (Max Planck Institute for Polymer Research, Germany)
     Raffaello Potestio (Max Planck Institute for Polymer Research, Germany)
     Karsten Kreis (Max Planck Institute for Polymer Research, Germany)
+    Sebastian Fritsch (Max Planck Institute for Polymer Research, Germany)
     Stas Bevc (National Institute of Chemistry, Slovenia) 
 
 Former developers:
