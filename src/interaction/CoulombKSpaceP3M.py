@@ -79,11 +79,11 @@ from _espresso import interaction_CoulombKSpaceP3M, \
                       interaction_CellListCoulombKSpaceP3M
 
 class CoulombKSpaceP3MLocal(PotentialLocal, interaction_CoulombKSpaceP3M):
-    def __init__(self, system, prefactor, alpha, kmax):
+    def __init__(self, system, alpha, M, P, rcut, C_pref, epsilon):
       'The (local) CoulombKSpaceP3M potential.'
       """Initialize the local CoulombKSpaceP3M object."""
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-        cxxinit(self, interaction_CoulombKSpaceP3M, system, prefactor, alpha, kmax)
+        cxxinit(self, interaction_CoulombKSpaceP3M, system, alpha, M, P, rcut, C_pref, epsilon)
 
 class CellListCoulombKSpaceP3MLocal(InteractionLocal, interaction_CellListCoulombKSpaceP3M):
     def __init__(self, storage, potential):
@@ -99,8 +99,8 @@ if pmi.isController:
   class CoulombKSpaceP3M(Potential):
     pmiproxydefs = dict(
       cls = 'espresso.interaction.CoulombKSpaceP3MLocal',
-      pmiproperty = ['prefactor', 'alpha', 'kmax']
-      )
+      pmiproperty = ['prefactor']  #, 'alpha', 'kmax'
+    )
 
   class CellListCoulombKSpaceP3M(Interaction):
     __metaclass__ = pmi.Proxy

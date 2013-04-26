@@ -26,7 +26,7 @@
 
 using namespace std;
 
-//typedef complex<double> dcomplex;
+typedef complex<double> dcomplex;
 
 // the following two constants are not defined everywhere (e.g. not in Mac OS X)
 #ifndef M_PIl
@@ -54,25 +54,40 @@ namespace espresso {
       shared_ptr< System > system; // we need the system object to be able to access the box
                                    // dimensions, communicator, number of particles, signals
       
-      real prefactor; // Coulomb prefactor
-      
-      int Mx, My, Mz; // number of mesh-points
-      int P; // interpolation order
-      real alpha; // splitting parameter of the Ewald sum
+      real alpha; // Ewald splitting parameter
+      Int3D M; // number of mesh-points
+      int P; // charge assignment order
       real rc; // cutoff in real space
-      
-      
+      real C_pref; // Coulomb prefactor
+      real epsilon;
       
     public:
       static void registerPython();
 
-      CoulombKSpaceP3M(shared_ptr< System > _system, real _prefactor, real _alpha, int _kmax);
+      CoulombKSpaceP3M(shared_ptr< System > _system,
+                       real _alpha,
+                       Int3D _M,
+                       int _P,
+                       real _rcut,
+                       real _coulomb_prefactor,
+                       real _epsilon
+              );
       
       ~CoulombKSpaceP3M();
       
-      // at this point we are ready to prepare the kvector[], it can be done just once at the begin
+      // 
       void preset(){
+
       }
+      
+      
+      // set/get the parameters
+      void setPrefactor(real _prefactor) {
+      	C_pref = _prefactor;
+        preset();
+      }
+      real getPrefactor() const { return C_pref; }
+      
       
       // here we get the current particle number on the current node
       // and set the auxiliary arrays eikx, eiky, eikz
@@ -83,56 +98,29 @@ namespace espresso {
       void count_charges(CellList realcells){
       }
       
-      // set/get the parameters
-      void setPrefactor(real _prefactor) {
-      	//prefactor = _prefactor;
-        preset();
-      }
-      //real getPrefactor() const { return prefactor; }
-      void setAlpha(real _alpha) {
-        //alpha = _alpha;
-        preset();
-      }
-      //real getAlpha() const { return alpha; }
-      void setKMax(int _kmax) {
-        //kmax = _kmax;
-        preset();
-      }
-      //int getKMax() const { return kmax; }
-
-      // here we generate mesh based charge density
-      void create_mesh(CellList realCells){
-        
-      }
-      // here we generate mesh based charge density
-      void gen_mesh(CellList realCells){
-        
-        for(iterator::CellListIterator it(realCells); it.isValid(); ++it){
-          Particle &p = *it;
-          
-          
-        }
-      }
+      // 
       
-      real _computeEnergy(CellList realcells){
+      real _computeEnergy(CellList realCells){
         real energy = 0;
-        //mpi::all_reduce( communic, node_energy, energy, plus<real>() );
         
+        //mpi::all_reduce( communic, node_energy, energy, plus<real>() );
         /* self energy correction */
         //energy -= sum_q2 * alpha * M_1_SQRTPI;
-        
         //energy *= prefactor;
+        
         
         return energy;
       }
 
       // @TODO this function could be void, 
-      bool _computeForce(CellList realcells){
+      bool _computeForce(CellList realCells){
         
         
+        // usual return from espresso
         return true;
       }
       
+
       // compute virial for this interaction
       // (!note: all particle interaction contains only one potential)
       real _computeVirial(CellList realcells){
