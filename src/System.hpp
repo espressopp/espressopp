@@ -2,11 +2,11 @@
 #ifndef _SYSTEM_HPP
 #define _SYSTEM_HPP
 
-#include "types.hpp"
-#include "mpi.hpp"
 #include "python.hpp"
+#include "mpi.hpp"
 #include "boost/enable_shared_from_this.hpp"
 #include "interaction/Interaction.hpp"
+#include "types.hpp"
 
 namespace espresso {
 

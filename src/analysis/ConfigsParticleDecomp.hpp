@@ -2,6 +2,7 @@
 #ifndef _ANALYSIS_CONFIGSPARTICLEDECOMP_HPP
 #define _ANALYSIS_CONFIGSPARTICLEDECOMP_HPP
 
+#include "python.hpp"
 #include "mpi.h"
 #include "types.hpp"
 #include "SystemAccess.hpp"
@@ -9,7 +10,6 @@
 
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
-#include "python.hpp"
 #include "esutil/Error.hpp"
 
 #include <string>

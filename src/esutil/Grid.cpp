@@ -1,5 +1,5 @@
-#include "Grid.hpp"
 #include "python.hpp"
+#include "Grid.hpp"
 
 namespace espresso {
   namespace esutil {

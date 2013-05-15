@@ -1,6 +1,6 @@
-#include "Tensor.hpp"
 #include <python.hpp>
 #include <boost/python/implicit.hpp>
+#include "Tensor.hpp"
 
 namespace espresso {
   struct tensor_pickle_suite : boost::python::pickle_suite {

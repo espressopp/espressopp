@@ -1,8 +1,8 @@
-#include "bindings.hpp"
-#include "Storage.hpp"
-#include "DomainDecomposition.hpp"
 #include "DomainDecompositionNonBlocking.hpp"
 #include "DomainDecompositionAdress.hpp"
+#include "DomainDecomposition.hpp"
+#include "Storage.hpp"
+#include "bindings.hpp"
 
 namespace espresso {
   namespace storage {

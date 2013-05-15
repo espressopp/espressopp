@@ -1,12 +1,10 @@
-#include "BerendsenThermostat.hpp"
-
 #include "python.hpp"
 #include "System.hpp"
 #include "Particle.hpp"
-
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "esutil/Error.hpp"
+#include "BerendsenThermostat.hpp"
 
 namespace espresso {
   

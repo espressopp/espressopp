@@ -1,5 +1,5 @@
-#include "Version.hpp"
 #include "python.hpp"
+#include "Version.hpp"
 #include <sstream>
 
 #ifdef VTRACE

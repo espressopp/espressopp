@@ -2,10 +2,9 @@
 #ifndef _ANALYSIS_AUTOCORRELATION_HPP
 #define _ANALYSIS_AUTOCORRELATION_HPP
 
-#include "types.hpp"
-#include "SystemAccess.hpp"
-
 #include "python.hpp"
+#include "SystemAccess.hpp"
+#include "types.hpp"
 
 using namespace std;
 

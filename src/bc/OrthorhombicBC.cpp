@@ -4,6 +4,7 @@
 #include "Real3D.hpp"
 #include "Int3D.hpp"
 #include "esutil/RNG.hpp"
+#include "esutil/Error.hpp"
 
 namespace espresso {
   namespace bc {
@@ -111,6 +112,7 @@ namespace espresso {
     OrthorhombicBC::
     foldCoordinate(Real3D& pos, Int3D& imageBox, int dir) const {
       int tmp = static_cast<int>(floor(pos[dir]*invBoxL[dir]));
+      esutil::Error err(mpiWorld);
 
       imageBox[dir] += tmp;
       pos[dir] -= tmp*boxL[dir];
@@ -118,15 +120,15 @@ namespace espresso {
       if(pos[dir] < 0 || pos[dir] >= boxL[dir]) {
         /* slow but safe */
         if (fabs(pos[dir]*invBoxL[dir]) >= INT_MAX/2) {
-# warning ERRORHANDLING MISSING
-#if 0
-  char *errtext = runtime_error(128 + TCL_INTEGER_SPACE);
-  ERROR_SPRINTF(errtext,"{086 particle coordinate out of range, pos = %f, image box = %d} ", pos[dir], image_box[dir]);
-#endif
+          std::stringstream msg;
+          msg << "particle coordinate out of range, pos= " << pos[dir] << " image box=" << imageBox[dir];
+          err.setException( msg.str() );
           imageBox[dir] = 0;
           pos[dir] = 0;
         }
       }
+
+      err.checkException();
     }
 
     /* Unfold an individual coordinate in the specified direction */

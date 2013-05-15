@@ -1,11 +1,10 @@
-#include "Isokinetic.hpp"
 #include "python.hpp"
-
 #include "types.hpp"
 #include "System.hpp"
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
+#include "Isokinetic.hpp"
 
 namespace espresso {
 

@@ -2,8 +2,8 @@
 #ifndef _ANALYSIS_INTRACHAINDISTSQ_HPP
 #define _ANALYSIS_INTRACHAINDISTSQ_HPP
 
-#include "types.hpp"
 #include "python.hpp"
+#include "types.hpp"
 #include "SystemAccess.hpp"
 #include "FixedPairList.hpp"
 #include "AllParticlePos.hpp"

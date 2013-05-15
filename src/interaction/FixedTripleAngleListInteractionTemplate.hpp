@@ -3,7 +3,6 @@
 #define _INTERACTION_FIXEDTRIPLEANGLELISTINTERACTIONTEMPLATE_HPP
 
 #include "mpi.hpp"
-#include "types.hpp"
 #include "Interaction.hpp"
 #include "Real3D.hpp"
 #include "Tensor.hpp"
@@ -13,6 +12,7 @@
 #include "esutil/Array2D.hpp"
 #include "bc/BC.hpp"
 #include "SystemAccess.hpp"
+#include "types.hpp"
 
 /*
  * Temporary interaction template for angular potential based on fixed triple list

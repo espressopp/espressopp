@@ -1,8 +1,6 @@
-#include "BerendsenBarostat.hpp"
-
 #include "python.hpp"
+#include "BerendsenBarostat.hpp"
 #include "System.hpp"
-
 #include "esutil/Error.hpp"
 
 namespace espresso {
