@@ -20,8 +20,8 @@
 #include "RadialDistrF.hpp"
 #include "Viscosity.hpp"
 #include "XDensity.hpp"
-#include "AnalysisBase.hpp"
-#include "Test.hpp"
+// #include "AnalysisBase.hpp"
+// #include "Test.hpp"
 
 #include "IntraChainDistSq.hpp"
 #include "NeighborFluctuation.hpp"
@@ -50,8 +50,8 @@ namespace espresso {
       MeanSquareDispl::registerPython();
       RadialDistrF::registerPython();
       XDensity::registerPython();
-      AnalysisBase::registerPython();
-      Test::registerPython();
+      // AnalysisBase::registerPython();
+      // Test::registerPython();
       
       Autocorrelation::registerPython();
       Viscosity::registerPython();
