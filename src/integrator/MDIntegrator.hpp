@@ -7,6 +7,7 @@
 #include "Extension.hpp"
 #include <boost/signals2.hpp>
 #include "types.hpp"
+#include "esutil/Error.hpp"
 
 
 namespace espresso {
