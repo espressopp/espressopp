@@ -81,7 +81,7 @@ namespace espresso {
             }
             else{
               stringstream msg;
-              msg<<"Error. Key "<<key<<" is unknown. Please use position, unfolded or"
+              msg<<"Error. Key "<<key<<" is unknown. Use position, unfolded or"
                       " velocity.";
               err.setException( msg.str() );
             }

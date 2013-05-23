@@ -317,9 +317,6 @@ namespace espresso {
 
       // signal
       aftCalcF();
-
-      //if (langevin) langevin->thermalize();
-      //if (langevinBarostat) langevinBarostat->updForces();
     }
 
     void VelocityVerlet::initForces()

@@ -5,7 +5,7 @@
    the particle positions will be given random displacements
    with a magnitude of one-tenth the lattice spacing."""
 
-def create(N, rho, perfect=True, RNG=None):
+def createCubic(N, rho, perfect=True, RNG=None):
 
   if RNG == None:
     import random
@@ -41,11 +41,11 @@ def create(N, rho, perfect=True, RNG=None):
   for i in range(a):
     for j in range(a):
       for k in range(a):
-	if(ct < N):
-	  x.append(0.5 * lattice_spacing + i * lattice_spacing + rnd(magn))
-	  y.append(0.5 * lattice_spacing + j * lattice_spacing + rnd(magn))
-	  z.append(0.5 * lattice_spacing + k * lattice_spacing + rnd(magn))
-	  ct += 1
+        if(ct < N):
+          x.append(0.5 * lattice_spacing + i * lattice_spacing + rnd(magn))
+          y.append(0.5 * lattice_spacing + j * lattice_spacing + rnd(magn))
+          z.append(0.5 * lattice_spacing + k * lattice_spacing + rnd(magn))
+          ct += 1
 
   return x, y, z, L, L, L
 
