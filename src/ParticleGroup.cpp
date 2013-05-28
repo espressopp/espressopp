@@ -32,7 +32,7 @@ namespace espresso {
     }
 
 
-    const bool ParticleGroup::has(longint pid) {
+    bool ParticleGroup::has(longint pid) {
     	return particles.find(pid) != particles.end();
     }
 
