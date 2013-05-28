@@ -12,7 +12,7 @@ namespace espresso {
     * corresponding template.
     * The following functions have to be implemented by the derived class:
     * virtual ResultType computeRaw()
-    * virtual python::list getInstantValue()
+    * virtual python::list compute()
     * virtual python::list getAverageValue()
     * virtual void resetAverage()
     * virtual void updateAverage(ResultType res) = 0;
@@ -21,9 +21,9 @@ namespace espresso {
     public:
       AnalysisBase(shared_ptr< System > system) : SystemAccess(system) {}
       virtual ~AnalysisBase() {}
-      virtual void compute() = 0;
+      virtual void performMeasurement() = 0;
       virtual void reset() = 0;
-      virtual python::list getInstantValue() = 0;
+      virtual python::list compute() = 0;
       virtual python::list getAverageValue() = 0;
       virtual int getNumberOfMeasurements() = 0;
       static void registerPython();
@@ -33,10 +33,12 @@ namespace espresso {
     template < class ResultType >
     class AnalysisBaseTemplate : public AnalysisBase {
     public:
-      AnalysisBaseTemplate(shared_ptr< System > system) : AnalysisBase(system) {};
+      AnalysisBaseTemplate(shared_ptr< System > system) : AnalysisBase(system) {
+    	  //this->reset();
+      };
       virtual ~AnalysisBaseTemplate() {};
       virtual ResultType computeRaw() = 0;
-      virtual void compute();
+      virtual void performMeasurement();
       virtual void reset();
       virtual void resetAverage() = 0;
       virtual void updateAverage(ResultType res) = 0;
@@ -54,7 +56,7 @@ namespace espresso {
     *
     template < class ResultType >
     inline python::list
-    AnalysisBaseTemplate< ResultType >::getInstantValue() {
+    AnalysisBaseTemplate< ResultType >::compute() {
         python::list ret;
         ResultType res = computeRaw();
         // BOOST_FOREACH(real value, result_real_vector) ret.append(value);
@@ -75,12 +77,12 @@ namespace espresso {
     }
     */
 
-    /** This method will compute the observable and can be called from within the integrator
+    /** This method will measure the observable and can be called from within the integrator
      * by using the ExtAnalyse extension. It can also be called from python.
      * It will also update the average value (typically also the variance) of the observable **/
     template < class ResultType >
     inline void
-    AnalysisBaseTemplate< ResultType >::compute() {
+    AnalysisBaseTemplate< ResultType >::performMeasurement() {
     	ResultType res = computeRaw();
     	nMeasurements++;
     	updateAverage(res);
@@ -114,7 +116,7 @@ namespace espresso {
     };
     */
 
-    /** return the number of measurements/computes since the last reset **/
+    /** return the number of measurements since the last reset **/
     template < class ResultType >
     inline int
     AnalysisBaseTemplate< ResultType >::getNumberOfMeasurements() {

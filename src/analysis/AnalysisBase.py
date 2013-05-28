@@ -1,23 +1,43 @@
+"""
+***************************************************************
+**AnalysisBase** - abstract base class for analysis/measurement
+***************************************************************
+
+This abstract base class provides the interface and some basic
+functionality for classes that do analysis or observable measurements
+  
+It provides the following methods:
+
+* performMeasurement()
+    computes the observable and updates average and standard deviation
+* reset()
+    resets average and standard deviation
+* compute()
+    computes the instant value of the observable, return value is a python list or a scalar
+* getAverageValue()
+    returns the average value for the observable and the standard deviation,
+    return value is a python list
+* getNumberOfMeasurements()
+    counts the number of measurements that have been performed (standalone or in integrator)
+    does _not_ include measurements that have been done using "compute()"
+"""
+
 from espresso import pmi
 from _espresso import analysis_AnalysisBase
 
 class AnalysisBaseLocal(analysis_AnalysisBase):
     """Abstract local base class for observables."""
-    def __init__(self, system):
+    def performMeasurement(self):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, analysis_AnalysisBase, system)
-
-    def compute(self):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.compute(self)
+            self.cxxclass.performMeasurement(self)
 
     def reset(self):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.reset(self)
 
-    def getInstantValue(self):
+    def compute(self):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            res = self.cxxclass.getInstantValue(self)
+            res = self.cxxclass.compute(self)
             if len(res) > 1:
                 return res
             else:
@@ -36,5 +56,5 @@ if pmi.isController :
         """Abstract base class for observable."""
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            pmicall = [ "compute", "reset", "getInstantValue", "getAverageValue", "getNumberOfMeasurements" ]
+            pmicall = [ "performMeasurement", "reset", "compute", "getAverageValue", "getNumberOfMeasurements" ]
             )

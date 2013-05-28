@@ -1,5 +1,4 @@
 #include "python.hpp"
-#include <cmath>
 #include "Test.hpp"
 
 namespace espresso {

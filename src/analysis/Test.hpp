@@ -19,7 +19,7 @@ namespace espresso {
         return 99;
       }
 
-      python::list getInstantValue() {
+      python::list compute() {
         python::list ret;
         int res = computeRaw();
         ret.append(res);

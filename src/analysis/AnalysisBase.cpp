@@ -14,9 +14,9 @@ namespace espresso {
       using namespace espresso::python;
     
       class_< AnalysisBase, boost::noncopyable >("analysis_AnalysisBase", no_init)
-      .def("compute", pure_virtual(&AnalysisBase::compute))
+      .def("performMeasurement", pure_virtual(&AnalysisBase::performMeasurement))
 	  .def("reset", pure_virtual(&AnalysisBase::reset))
-	  .def("getInstantValue", pure_virtual(&AnalysisBase::getInstantValue))
+	  .def("compute", pure_virtual(&AnalysisBase::compute))
 	  .def("getAverageValue", pure_virtual(&AnalysisBase::getAverageValue))
 	  .def("getNumberOfMeasurements", pure_virtual(&AnalysisBase::getNumberOfMeasurements))
       ;
