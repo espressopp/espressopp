@@ -114,7 +114,7 @@ void StochasticVelocityRescaling::rescaleVelocities() {
 
 }
 
-const real StochasticVelocityRescaling::stochasticVR_sumGaussians(const int n) {
+real StochasticVelocityRescaling::stochasticVR_sumGaussians(const int n) {
 
 	/** plain implementation **/
 	/*	real tmp, sum = 0.0;
@@ -138,7 +138,7 @@ const real StochasticVelocityRescaling::stochasticVR_sumGaussians(const int n) {
 	}
 }
 
-const real StochasticVelocityRescaling::stochasticVR_pullEkin(real Ekin,
+real StochasticVelocityRescaling::stochasticVR_pullEkin(real Ekin,
 		real Ekin_ref, int dof, real taut, shared_ptr<esutil::RNG> rng) {
 	real factor, rr;
 
@@ -162,12 +162,12 @@ const real StochasticVelocityRescaling::stochasticVR_pullEkin(real Ekin,
 			+ 2.0 * rr * sqrt(Ekin * Ekin_ref / dof * (1.0 - factor) * factor);
 }
 
-const real GammaDistributionBoost::drawNumber(const unsigned int ia) {
+real GammaDistributionBoost::drawNumber(const unsigned int ia) {
 	return rng->gamma(ia);
 }
 
 /** Gamma distribution, from Numerical Recipes, 2nd edition, pages 292 & 293 */
-const real GammaDistributionNR2nd::drawNumber(const unsigned int ia) {
+real GammaDistributionNR2nd::drawNumber(const unsigned int ia) {
 	real x, v1, v2, y, am, s, e;
 
 	if (ia < 1)
@@ -175,7 +175,7 @@ const real GammaDistributionNR2nd::drawNumber(const unsigned int ia) {
 				"Error in routine stochasticVR_gammaDeviate2nd"); //TODO: how do I get __FUNCTION__ in here?
 	if (ia < 6) {
 		x = 1.0;
-		for (int j; j <= ia; j++)
+		for (int j=0; j <= ia; j++)
 			x = x * (*rng)();
 		x = -log(x);
 	} else {
@@ -197,7 +197,7 @@ const real GammaDistributionNR2nd::drawNumber(const unsigned int ia) {
 }
 
 /** Gamma distribution, from Numerical Recipes, 3rd edition, pages 370 & 371 */
-const real GammaDistributionNR3rd::drawNumber(const unsigned int ia) {
+real GammaDistributionNR3rd::drawNumber(const unsigned int ia) {
 	real a1, a2, x, v, u;
 	if (ia <= 0)
 		throw std::runtime_error(
