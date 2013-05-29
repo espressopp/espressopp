@@ -31,11 +31,11 @@ namespace espresso {
     
     void MDIntegrator::setTimeStep(real _dt)
     {
-      if (_dt <= 0) {
+      if (_dt == 0.0) {
         System& system = getSystemRef();
         esutil::Error err(system.comm);
         std::stringstream msg;
-        msg << "timestep must be positive";
+        msg << "Ttimestep  'dt' must be non-zero!";
         err.setException(msg.str());
       }
 
