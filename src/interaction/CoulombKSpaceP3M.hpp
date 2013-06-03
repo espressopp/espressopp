@@ -86,7 +86,7 @@ namespace espresso {
       real af_coef[8][7][7]; // matrix of predefined assigned function coefficients
       
       
-      real oddeven1, oddeven2; // supporting variables odd/even interpolation order
+      //real oddeven1, oddeven2; // supporting variables odd/even interpolation order
     public:
       static void registerPython();
 
@@ -370,8 +370,8 @@ namespace espresso {
       real _computeEnergy(CellList realCells){
         real energy = 0;
         
-        common_part(realCells, 1);
         
+        common_part(realCells, 1);
         
         int MM[3];
         for(int i=0; i<3; i++) MM[i] = M[i];
@@ -384,7 +384,10 @@ namespace espresso {
         
         inE = reinterpret_cast<fftw_complex*>( &QQQ[0] );
         
-        fftw_execute(pE); // repeat as needed 
+        std::cout<<"segfalll."<<std::endl;
+        exit(0);
+        
+        fftw_execute(pE);
         
         // stupid slow way of copying an array
         for(int i=0; i<M[0]; i++){
@@ -397,7 +400,7 @@ namespace espresso {
         }
         
         // TODO fix bug
-        fftw_destroy_plan(pE);
+        //fftw_destroy_plan(pE);
         //fftw_free(inE); fftw_free(outE);
         
         
@@ -460,6 +463,7 @@ namespace espresso {
           Gi  = Int3D(d1 + modadd2) + assignshift;
           arg = Int3D( (d1 - dround(d1) + 0.5)*_2interp );
           
+          // specific for force !!!!!!!!
           g_ca.push_back( Gi );
           
           // Calculate the mesh based charges
@@ -474,11 +478,12 @@ namespace espresso {
                 int zpos = (Gi[2] + l) % M[2];
                 T3 = T2 * precalc_interp_caf[l][arg[2]];
 
+                // specific for force !!!!!!!!
                 q_l[p.id()][xpos][ypos][zpos] = T3;
                 
                 int index = zpos + M[2] * (ypos + M[1] * xpos);
                 
-                
+                // TODO not nice solution
                 while(index>=QQQ.size())
                   QQQ.push_back( dcomplex(0.0) );
                 
@@ -520,6 +525,7 @@ namespace espresso {
         fftw_destroy_plan(p);
         fftw_free(in); fftw_free(out);
         
+        /*
         vector<vector<vector<Real3D> > > phi_re;
         phi_re = vector< vector<vector<Real3D> > > (M[0], 
                       vector<vector<Real3D> >(M[1], 
@@ -528,6 +534,12 @@ namespace espresso {
         phi_im = vector< vector<vector<Real3D> > > (M[0], 
                       vector<vector<Real3D> >(M[1], 
                              vector<Real3D>(M[2], Real3D(0.0) )) );
+        */
+        vector<vector<vector<vector<dcomplex> > > > phi;
+        phi = vector< vector< vector<vector<dcomplex> > > > (3, 
+                      vector< vector<vector<dcomplex> > > (M[0], 
+                              vector<vector<dcomplex> >(M[1], 
+                                     vector<dcomplex>(M[2], dcomplex(0.0) ))));
         
         
         // Calculate the supporting arrays phi_?_??:
@@ -535,12 +547,15 @@ namespace espresso {
           for (int j=0; j<M[1]; j++){
             for (int k=0; k<M[2]; k++) {  
 
-              Real3D aux3D(d_op[0][i], d_op[1][j], d_op[2][k]);
-
               // new definition:
               int index = k + M[2] * (j + M[1] * i);
-              phi_re[i][j][k] = - gf[i][j][k] * QQQ[index].imag() * aux3D;
-              phi_im[i][j][k] =   gf[i][j][k] * QQQ[index].real() * aux3D;
+              for (int ii=0; ii<3; ii++){
+                phi[ii][i][j][k] =  d_op[ii][i] * gf[i][j][k] * 
+                        swap_complex( conj( QQQ[index] ) );
+                        //dcomplex( -QQQ[index].imag(), QQQ[index].real() );
+                //phi_re[i][j][k] = - gf[i][j][k] * QQQ[index].imag() * aux3D;
+                //phi_im[i][j][k] =   gf[i][j][k] * QQQ[index].real() * aux3D;
+              }
             }
           }
         }
@@ -561,8 +576,10 @@ namespace espresso {
             for(int j=0; j<M[1]; j++){
               for(int k=0; k<M[2]; k++){
                 int index = k + M[2] * (j + M[1] * i);
-                inB[index][0] = phi_re[i][j][k][l];
-                inB[index][1] = phi_im[i][j][k][l];
+                inB[index][0] = phi[l][i][j][k].real();
+                inB[index][1] = phi[l][i][j][k].imag();
+                //inB[index][0] = phi_re[i][j][k][l];
+                //inB[index][1] = phi_im[i][j][k][l];
               }
             }
           }
@@ -574,8 +591,9 @@ namespace espresso {
             for(int j=0; j<M[1]; j++){
               for(int k=0; k<M[2]; k++){
                 int index = k + M[2] * (j + M[1] * i);
-                phi_re[i][j][k][l] = outB[index][0];
-                phi_im[i][j][k][l] = outB[index][1];
+                phi[l][i][j][k] = dcomplex(outB[index][0], outB[index][1]);
+                //phi_re[i][j][k][l] = outB[index][0];
+                //phi_im[i][j][k][l] = outB[index][1];
               }
             }
           }
@@ -596,9 +614,13 @@ namespace espresso {
               int ypos = (g_ca[iii][1] + j) % M[1];
               for (int k = 0; k < P; k++) {
                 int zpos = (g_ca[iii][2] + k) % M[2];
+                
+                Real3D fff_add( phi[0][xpos][ypos][zpos].real(),
+                                phi[1][xpos][ypos][zpos].real(),
+                                phi[2][xpos][ypos][zpos].real());
 
                 fff += C_pref * q_l[p.id()][xpos][ypos][zpos]  *  
-                        phi_re[xpos][ypos][zpos] / 
+                        fff_add /   //phi_re[xpos][ypos][zpos] / 
                         (real)(M[0]*M[1]*M[2]);
               }
             }
@@ -610,6 +632,10 @@ namespace espresso {
         
         // usual return from espresso
         return true;
+      }
+    
+      dcomplex swap_complex(dcomplex C){
+        return dcomplex(C.imag(), C.real());
       }
       
 
