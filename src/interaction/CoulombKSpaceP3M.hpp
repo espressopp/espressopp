@@ -370,7 +370,6 @@ namespace espresso {
       real _computeEnergy(CellList realCells){
         real energy = 0;
         
-        
         common_part(realCells, 1);
         
         int MM[3];
@@ -384,9 +383,6 @@ namespace espresso {
         
         inE = reinterpret_cast<fftw_complex*>( &QQQ[0] );
         
-        std::cout<<"segfalll."<<std::endl;
-        exit(0);
-        
         fftw_execute(pE);
         
         // stupid slow way of copying an array
@@ -399,10 +395,13 @@ namespace espresso {
           }
         }
         
-        // TODO fix bug
-        //fftw_destroy_plan(pE);
-        //fftw_free(inE); fftw_free(outE);
+        //std::cout<<"segfalll."<<std::endl;
+        //exit(0);
         
+        // TODO fix bug
+        fftw_destroy_plan(pE);
+        inE = NULL; outE = NULL;
+        fftw_free(inE); fftw_free(outE);
         
         energy = 0.0;
         for (int i=0; i<M[0]; i++){
@@ -430,7 +429,7 @@ namespace espresso {
         //initialize();
         
         // TODO check variable assignshift and provide better logic
-        int assignshift = M[0]- floor((real)(P-1)/2.0);  // floor here for code c
+        int assignshift = M[0]- floor((real)(P-1)/2.0);
         
         real  modadd1, modadd2;
         // odd and even interpolation order
@@ -444,11 +443,10 @@ namespace espresso {
         // alternative reference to the arrays G[i][3] 
         Int3D Gi, arg;
 
-        
         g_ca.clear();
         QQQ.clear();
-        QQQ.reserve(M[0]*M[1]*M[2]);
-        //QQQ = vector<dcomplex>(M[0]*M[1]*M[2], 0.0);
+        //QQQ.reserve(M[0]*M[1]*M[2]);
+        QQQ = vector<dcomplex>(M[0]*M[1]*M[2], dcomplex(0.0));
         
         std::cout<< "QQQ.size(): "<< QQQ.size()<< "  i="<< iii << std::endl;
         
@@ -483,11 +481,6 @@ namespace espresso {
                 
                 int index = zpos + M[2] * (ypos + M[1] * xpos);
                 
-                // TODO not nice solution
-                while(index>=QQQ.size())
-                  QQQ.push_back( dcomplex(0.0) );
-                
-                //QQQ[xpos][ypos][zpos] += dcomplex(T3, 0.0);
                 QQQ[index] += dcomplex(T3, 0.0);
               }
             }
@@ -523,23 +516,19 @@ namespace espresso {
         QQQ.assign(outdc, outdc+M[0]*M[1]*M[2]);
         
         fftw_destroy_plan(p);
+        in = NULL; out = NULL;
         fftw_free(in); fftw_free(out);
         
         /*
-        vector<vector<vector<Real3D> > > phi_re;
-        phi_re = vector< vector<vector<Real3D> > > (M[0], 
-                      vector<vector<Real3D> >(M[1], 
-                             vector<Real3D>(M[2], Real3D(0.0) )) );
-        vector<vector<vector<Real3D> > > phi_im;
-        phi_im = vector< vector<vector<Real3D> > > (M[0], 
-                      vector<vector<Real3D> >(M[1], 
-                             vector<Real3D>(M[2], Real3D(0.0) )) );
-        */
         vector<vector<vector<vector<dcomplex> > > > phi;
         phi = vector< vector< vector<vector<dcomplex> > > > (3, 
                       vector< vector<vector<dcomplex> > > (M[0], 
                               vector<vector<dcomplex> >(M[1], 
                                      vector<dcomplex>(M[2], dcomplex(0.0) ))));
+         */
+        vector<vector<dcomplex> > phi;
+        phi = vector<vector<dcomplex> > (3, 
+                     vector<dcomplex> (M[0]*M[1]*M[2], dcomplex(0.0) ));
         
         
         // Calculate the supporting arrays phi_?_??:
@@ -550,11 +539,9 @@ namespace espresso {
               // new definition:
               int index = k + M[2] * (j + M[1] * i);
               for (int ii=0; ii<3; ii++){
-                phi[ii][i][j][k] =  d_op[ii][i] * gf[i][j][k] * 
+                //phi[ii][i][j][k] =  d_op[ii][i] * gf[i][j][k] * 
+                phi[ii][index] =  d_op[ii][i] * gf[i][j][k] * 
                         swap_complex( conj( QQQ[index] ) );
-                        //dcomplex( -QQQ[index].imag(), QQQ[index].real() );
-                //phi_re[i][j][k] = - gf[i][j][k] * QQQ[index].imag() * aux3D;
-                //phi_im[i][j][k] =   gf[i][j][k] * QQQ[index].real() * aux3D;
               }
             }
           }
@@ -571,6 +558,7 @@ namespace espresso {
         pB = fftw_plan_dft(3, MMM, inB, outB, FFTW_BACKWARD, FFTW_ESTIMATE);
         
         for(int l=0; l<3; l++){
+          /*
           // stupid slow way of copying an array
           for(int i=0; i<M[0]; i++){
             for(int j=0; j<M[1]; j++){
@@ -578,28 +566,33 @@ namespace espresso {
                 int index = k + M[2] * (j + M[1] * i);
                 inB[index][0] = phi[l][i][j][k].real();
                 inB[index][1] = phi[l][i][j][k].imag();
-                //inB[index][0] = phi_re[i][j][k][l];
-                //inB[index][1] = phi_im[i][j][k][l];
               }
             }
-          }
+          }*/
+          
+          inB = reinterpret_cast<fftw_complex*>( &phi[l][0] );
 
           fftw_execute(pB);
 
+          dcomplex *outdcB = reinterpret_cast<dcomplex*>( outB );
+          phi[l].assign(outdcB, outdcB+M[0]*M[1]*M[2]);
+          
+          /*
           // stupid slow way of copying an array
           for(int i=0; i<M[0]; i++){
             for(int j=0; j<M[1]; j++){
               for(int k=0; k<M[2]; k++){
                 int index = k + M[2] * (j + M[1] * i);
                 phi[l][i][j][k] = dcomplex(outB[index][0], outB[index][1]);
-                //phi_re[i][j][k][l] = outB[index][0];
-                //phi_im[i][j][k][l] = outB[index][1];
               }
             }
-          }
+          }*/
         }
 
         fftw_destroy_plan(pB);
+        
+        inB = NULL; outB = NULL;
+        
         fftw_free(inB); fftw_free(outB);
         
         int iii = 0;
@@ -615,13 +608,14 @@ namespace espresso {
               for (int k = 0; k < P; k++) {
                 int zpos = (g_ca[iii][2] + k) % M[2];
                 
-                Real3D fff_add( phi[0][xpos][ypos][zpos].real(),
-                                phi[1][xpos][ypos][zpos].real(),
-                                phi[2][xpos][ypos][zpos].real());
+                int index = zpos + M[2] * (ypos + M[1] * xpos);
+                
+                Real3D fff_add( phi[0][index].real(),
+                                phi[1][index].real(),
+                                phi[2][index].real());
 
                 fff += C_pref * q_l[p.id()][xpos][ypos][zpos]  *  
-                        fff_add /   //phi_re[xpos][ypos][zpos] / 
-                        (real)(M[0]*M[1]*M[2]);
+                        fff_add / (real)(M[0]*M[1]*M[2]);
               }
             }
           }

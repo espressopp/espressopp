@@ -186,8 +186,8 @@ for j in range(0, 6):
     abs(systemEwald.storage.getParticle(j).f.y - systemPPPM.storage.getParticle(j).f.y), \
     abs(systemEwald.storage.getParticle(j).f.z - systemPPPM.storage.getParticle(j).f.z)) )
 
-print 'no energy calc'
-exit(0)
+#print 'no energy calc'
+#exit(0)
 
 # calculating the R space part of electrostatic energy
 energyEwaldR = coulombR_intEwald.computeEnergy()
