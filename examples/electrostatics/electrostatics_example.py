@@ -159,8 +159,9 @@ p3m_int = espresso.interaction.CellListCoulombKSpaceP3M(systemPPPM.storage, p3m_
 # adding the interaction to the system
 systemPPPM.addInteraction(p3m_int)
 
-
+hhh = ( p3m_int.computeEnergy() + coulombR_intPPPM.computeEnergy() )
 ### Integrators for Ewald and PPPM
+print '   AAAenergyPPP: ', hhh, p3m_int.computeEnergy(), coulombR_intPPPM.computeEnergy()
 
 # creating the integrator which based on the Verlet algorithm
 integratorEwald    = espresso.integrator.VelocityVerlet(systemEwald)
@@ -213,5 +214,4 @@ print 'The difference in energy (Ewald - PPPM): %5.16f\n' % (enTotEwald-enTotPPP
 a = 2 * pow( Lx*Ly*Lz / num_particles , 1./3. )
 madelung_NaCl = -1.747564594633182190636212035544397403481
 print ("Madelung constant is: %14.10f\n" % (enTotEwald/num_particles * a))
-print (" error: %e\n\n" % ( 
-      abs( abs( enTotEwald/num_particles * a) - abs(madelung_NaCl))))
+print (" error: %e\n\n" % ( abs( abs( enTotPPPM/num_particles * a) - abs(madelung_NaCl))))

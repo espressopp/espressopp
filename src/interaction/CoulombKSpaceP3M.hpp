@@ -60,6 +60,8 @@ namespace espresso {
       int interpolation; // number of interpolation points for the charge assignment 
                         // function
       
+      int MMM;  // MMM = M[0]*M[1]*M[2]
+      
       // Brillouin zones for the optimal influence function
       static const int brillouin = 1;
       
@@ -69,15 +71,18 @@ namespace espresso {
       
       vector< vector<real> > d_op; 
       
-      vector< vector< vector<real> > >gf; // influence function
+      //vector< vector< vector<real> > >gf; // influence function
+      vector<real> gf; // influence function
       
       //vector< vector< vector< dcomplex > > > QQQ;
       vector<  dcomplex > QQQ;
       
+      vector<vector<dcomplex> > phi;
+        
       // reference points in the lattice, needed for the charge assignment
       vector<Int3D> g_ca;
       // mesh contributions of the charged particles
-      vector< vector< vector< vector< real > > > > q_l;
+      vector< vector< real > > q_l;
       
       int nParticles;  // number of particles in system
       Real3D sysL;     // system size
@@ -85,6 +90,9 @@ namespace espresso {
       
       real af_coef[8][7][7]; // matrix of predefined assigned function coefficients
       
+      // fftw elements
+      fftw_complex *in_array;
+      fftw_plan plan;
       
       //real oddeven1, oddeven2; // supporting variables odd/even interpolation order
     public:
@@ -104,6 +112,7 @@ namespace espresso {
       // 
       void preset(){
         sysL = system -> bc -> getBoxL();
+        MMM = M[0] * M[1] * M[2];
       }
       
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -141,6 +150,8 @@ namespace espresso {
 /////////////////////////////////////////////////////////////////////////////////////////
 
       void initialize(){
+        set_fftw();
+        
         precalc_interp_caf = vector< vector<real> > (P, vector<real>(2*interpolation+1, 0.0) );
         precalc_interpol_charge_assignment_f();
         
@@ -155,28 +166,33 @@ namespace espresso {
         
         calc_differential_operator();
         
+        /*
         gf = vector< vector<vector<real> > > (M[0], 
                      vector<vector<real> >(M[1], 
                      vector<real>(M[2], 0.0)) );
+         */
+        gf = vector<real>(MMM, 0.0);
         
         calc_opt_influence_function();
         
         // -----------------------------------------
         // charge assignment
-        /*
-        QQQ = vector< vector<vector<dcomplex> > > (M[0], 
-                      vector<vector<dcomplex> >(M[1], 
-                             vector<dcomplex>(M[2], 0.0)) );
-         */
-        QQQ = vector<dcomplex>(M[0]*M[1]*M[2], 0.0);
+        QQQ = vector<dcomplex>(MMM, 0.0);
         
         
+        // TODO check double use in common part
         g_ca = vector<Int3D>(0, Int3D(0) );
 
+        /*
         q_l = vector< vector<vector< vector<real> > > > (nParticles,
                       vector<vector< vector<real> > >(M[0], 
                              vector< vector<real> >(M[1], 
                                      vector<real>(M[2], 0.0))) );
+         */
+        q_l = vector< vector<real> > (nParticles, vector<real>(MMM, 0.0) );
+        
+        // force specific
+        phi = vector<vector<dcomplex> > (3, vector<dcomplex> (MMM, dcomplex(0.0) ));
       }
       
       // get the current particle number on the current node
@@ -243,8 +259,9 @@ namespace espresso {
         for ( N[0] = 0; N[0] < M[0]; N[0]++){
           for ( N[1] = 0; N[1] < M[1]; N[1]++){
             for ( N[2] = 0; N[2] < M[2]; N[2]++){
+              int indx = N[2] + M[2] * (N[1] + M[1] * N[0]);
               if ( N == Int3D(0) )
-                gf[ N[0] ][ N[1] ][ N[2] ] = 0.0;
+                gf[ indx ] = 0.0;
               else{
                 aliasing_sum( N, &nom, &denom);
                 for(int i=0; i<3; i++){
@@ -253,8 +270,7 @@ namespace espresso {
 
                 real D2 = D.sqr();
 
-                gf[ N[0] ][ N[1] ][ N[2] ] = 
-                        (D2 > 1e-10) ? coef * ( D*nom ) / ( D2*denom*denom ) : 0.0;
+                gf[ indx ] = (D2 > 1e-10) ? coef * ( D*nom ) / ( D2*denom*denom ) : 0.0;
               }
             }
           }
@@ -366,56 +382,37 @@ namespace espresso {
         return out;
       }
       
-      
-      real _computeEnergy(CellList realCells){
-        real energy = 0;
-        
-        common_part(realCells, 1);
-        
+      void set_fftw(){
         int MM[3];
         for(int i=0; i<3; i++) MM[i] = M[i];
         
-        fftw_complex *inE, *outE;
-        fftw_plan pE;
-        inE = (fftw_complex*) fftw_malloc( M[0]*M[1]*M[2] * sizeof(fftw_complex));
-        outE = (fftw_complex*) fftw_malloc( M[0]*M[1]*M[2] * sizeof(fftw_complex));
-        pE = fftw_plan_dft(3, MM, inE, outE, FFTW_FORWARD, FFTW_ESTIMATE);
+        in_array = (fftw_complex*) fftw_malloc( MMM * sizeof(fftw_complex));
+        plan = fftw_plan_dft(3, MM, in_array, in_array, FFTW_FORWARD, FFTW_ESTIMATE);
+      }
+      void clean_fftw(){
+        fftw_destroy_plan(plan);
+        in_array = NULL;
+        fftw_free(in_array);
+      }
+      
+      
+      real _computeEnergy(CellList realCells){
         
-        inE = reinterpret_cast<fftw_complex*>( &QQQ[0] );
+        common_part(realCells, 1);
         
-        fftw_execute(pE);
+        real energy = 0.0;
         
-        // stupid slow way of copying an array
-        for(int i=0; i<M[0]; i++){
-          for(int j=0; j<M[1]; j++){
-            for(int k=0; k<M[2]; k++){
-              int index = k + M[2] * (j + M[1] * i);
-              QQQ[index] = dcomplex(outE[index][0], outE[index][1]);
-            }
-          }
-        }
-        
-        //std::cout<<"segfalll."<<std::endl;
-        //exit(0);
-        
-        // TODO fix bug
-        fftw_destroy_plan(pE);
-        inE = NULL; outE = NULL;
-        fftw_free(inE); fftw_free(outE);
-        
-        energy = 0.0;
         for (int i=0; i<M[0]; i++){
           for (int j=0; j<M[1]; j++){
             for (int k=0; k<M[2]; k++){
-              int index = k + M[2] * (j + M[1] * i);
-              //energy += gf[i][j][k] * norm( QQQ[i][j][k] ) ;
-              energy += gf[i][j][k] * norm( QQQ[index] ) ;
+              int indx = k + M[2] * (j + M[1] * i);
+              energy += gf[indx] * norm( QQQ[indx] ) ;
             }
           }
         }
 
         // TODO sysL[0]?? what about [1] and [2]?
-        energy *= ( C_pref * sysL[0] / ((real)M[0]*(real)M[1]*(real)M[2]*4.0*M_PIl) );
+        energy *= ( C_pref * sysL[0] / (4.0*MMM*M_PIl) );
         // self energy and net charge correction: 
         energy -= C_pref * ( sum_q2 * alpha / sqrt(M_PIl)  +  
                         sumq_2 * M_PIl / (2.0* sysL[0]*sysL[1]*sysL[2] *pow(alpha,2)) );
@@ -425,8 +422,6 @@ namespace espresso {
       
       void common_part(CellList realCells, int iii){
         real _2interp = 2.0 * interpolation;
-        
-        //initialize();
         
         // TODO check variable assignshift and provide better logic
         int assignshift = M[0]- floor((real)(P-1)/2.0);
@@ -444,12 +439,14 @@ namespace espresso {
         Int3D Gi, arg;
 
         g_ca.clear();
+        g_ca = vector<Int3D>(nParticles, Int3D(0) );
         QQQ.clear();
         //QQQ.reserve(M[0]*M[1]*M[2]);
-        QQQ = vector<dcomplex>(M[0]*M[1]*M[2], dcomplex(0.0));
+        QQQ = vector<dcomplex>(MMM, dcomplex(0.0));
         
         std::cout<< "QQQ.size(): "<< QQQ.size()<< "  i="<< iii << std::endl;
         
+        int count = 0;
         for(iterator::CellListIterator it(realCells); it.isValid(); ++it){
           Particle &p = *it;
           Real3D ppos = p.position();
@@ -462,7 +459,8 @@ namespace espresso {
           arg = Int3D( (d1 - dround(d1) + 0.5)*_2interp );
           
           // specific for force !!!!!!!!
-          g_ca.push_back( Gi );
+          g_ca[count] = Gi;
+          count++;
           
           // Calculate the mesh based charges
           real T1,T2,T3;
@@ -476,23 +474,23 @@ namespace espresso {
                 int zpos = (Gi[2] + l) % M[2];
                 T3 = T2 * precalc_interp_caf[l][arg[2]];
 
+                int indx = zpos + M[2] * (ypos + M[1] * xpos);
+                
                 // specific for force !!!!!!!!
-                q_l[p.id()][xpos][ypos][zpos] = T3;
-                
-                int index = zpos + M[2] * (ypos + M[1] * xpos);
-                
-                QQQ[index] += dcomplex(T3, 0.0);
+                q_l[p.id()][indx] = T3;
+                QQQ[indx] += dcomplex(T3, 0.0);
               }
             }
           }
         }
         
+        in_array = reinterpret_cast<fftw_complex*>( &QQQ[0] );
+        fftw_execute(plan);
+        
         /*
         if(iii==1)
           exit(0);
          */
-         
-        
       }
 
       // @TODO this function could be void, 
@@ -500,100 +498,25 @@ namespace espresso {
 
         common_part(realCells, 0);
         
-        int MM[3];
-        for(int i=0; i<3; i++) MM[i] = M[i];
-        fftw_complex *in, *out;
-        fftw_plan p;
-        in = (fftw_complex*) fftw_malloc( M[0]*M[1]*M[2] * sizeof(fftw_complex));
-        out = (fftw_complex*) fftw_malloc( M[0]*M[1]*M[2] * sizeof(fftw_complex));
-        p = fftw_plan_dft(3, MM, in, out, FFTW_FORWARD, FFTW_ESTIMATE);
-        
-        in = reinterpret_cast<fftw_complex*>( &QQQ[0] );
-        
-        fftw_execute(p); // repeat as needed 
-        
-        dcomplex *outdc = reinterpret_cast<dcomplex*>( out );
-        QQQ.assign(outdc, outdc+M[0]*M[1]*M[2]);
-        
-        fftw_destroy_plan(p);
-        in = NULL; out = NULL;
-        fftw_free(in); fftw_free(out);
-        
-        /*
-        vector<vector<vector<vector<dcomplex> > > > phi;
-        phi = vector< vector< vector<vector<dcomplex> > > > (3, 
-                      vector< vector<vector<dcomplex> > > (M[0], 
-                              vector<vector<dcomplex> >(M[1], 
-                                     vector<dcomplex>(M[2], dcomplex(0.0) ))));
-         */
-        vector<vector<dcomplex> > phi;
-        phi = vector<vector<dcomplex> > (3, 
-                     vector<dcomplex> (M[0]*M[1]*M[2], dcomplex(0.0) ));
-        
-        
         // Calculate the supporting arrays phi_?_??:
         for (int i=0; i<M[0]; i++){
           for (int j=0; j<M[1]; j++){
             for (int k=0; k<M[2]; k++) {  
 
               // new definition:
-              int index = k + M[2] * (j + M[1] * i);
+              int indx = k + M[2] * (j + M[1] * i);
               for (int ii=0; ii<3; ii++){
-                //phi[ii][i][j][k] =  d_op[ii][i] * gf[i][j][k] * 
-                phi[ii][index] =  d_op[ii][i] * gf[i][j][k] * 
-                        swap_complex( conj( QQQ[index] ) );
+                phi[ii][indx] =  d_op[ii][i] * gf[indx] * 
+                        swap_complex( conj( QQQ[indx] ) );
               }
             }
           }
         }
-        
-        
 
-        fftw_plan pB;
-        fftw_complex *inB, *outB;
-        int MMM[3];
-        for(int i=0;i<3;i++) MMM[i] = M[i];
-        inB  = (fftw_complex*) fftw_malloc( M[0]*M[1]*M[2] * sizeof(fftw_complex));
-        outB = (fftw_complex*) fftw_malloc( M[0]*M[1]*M[2] * sizeof(fftw_complex));
-        pB = fftw_plan_dft(3, MMM, inB, outB, FFTW_BACKWARD, FFTW_ESTIMATE);
-        
         for(int l=0; l<3; l++){
-          /*
-          // stupid slow way of copying an array
-          for(int i=0; i<M[0]; i++){
-            for(int j=0; j<M[1]; j++){
-              for(int k=0; k<M[2]; k++){
-                int index = k + M[2] * (j + M[1] * i);
-                inB[index][0] = phi[l][i][j][k].real();
-                inB[index][1] = phi[l][i][j][k].imag();
-              }
-            }
-          }*/
-          
-          inB = reinterpret_cast<fftw_complex*>( &phi[l][0] );
-
-          fftw_execute(pB);
-
-          dcomplex *outdcB = reinterpret_cast<dcomplex*>( outB );
-          phi[l].assign(outdcB, outdcB+M[0]*M[1]*M[2]);
-          
-          /*
-          // stupid slow way of copying an array
-          for(int i=0; i<M[0]; i++){
-            for(int j=0; j<M[1]; j++){
-              for(int k=0; k<M[2]; k++){
-                int index = k + M[2] * (j + M[1] * i);
-                phi[l][i][j][k] = dcomplex(outB[index][0], outB[index][1]);
-              }
-            }
-          }*/
+          in_array = reinterpret_cast<fftw_complex*>( &phi[l][0] );
+          fftw_execute(plan);
         }
-
-        fftw_destroy_plan(pB);
-        
-        inB = NULL; outB = NULL;
-        
-        fftw_free(inB); fftw_free(outB);
         
         int iii = 0;
         for(iterator::CellListIterator it(realCells); it.isValid(); ++it){
@@ -608,14 +531,13 @@ namespace espresso {
               for (int k = 0; k < P; k++) {
                 int zpos = (g_ca[iii][2] + k) % M[2];
                 
-                int index = zpos + M[2] * (ypos + M[1] * xpos);
+                int indx = zpos + M[2] * (ypos + M[1] * xpos);
                 
-                Real3D fff_add( phi[0][index].real(),
-                                phi[1][index].real(),
-                                phi[2][index].real());
+                Real3D fff_add( phi[0][indx].real(),
+                                phi[1][indx].real(),
+                                phi[2][indx].real());
 
-                fff += C_pref * q_l[p.id()][xpos][ypos][zpos]  *  
-                        fff_add / (real)(M[0]*M[1]*M[2]);
+                fff += C_pref * q_l[p.id()][indx]  *  fff_add / (real)MMM;
               }
             }
           }

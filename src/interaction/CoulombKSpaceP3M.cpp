@@ -200,6 +200,7 @@ namespace espresso {
       sum = NULL;
       totsum = NULL;
       */
+      clean_fftw();
     }
 
     //////////////////////////////////////////////////
