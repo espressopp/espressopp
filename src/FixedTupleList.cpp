@@ -28,8 +28,8 @@ namespace espresso {
           (boost::bind(&FixedTupleList::beforeSendParticles, this, _1, _2));
         con2 = storage->afterRecvParticles.connect
           (boost::bind(&FixedTupleList::afterRecvParticles, this, _1, _2));
-        con3 = storage->onParticlesChanged.connect
-          (boost::bind(&FixedTupleList::onParticlesChanged, this));
+        /*con3 = storage->onParticlesChanged.connect
+          (boost::bind(&FixedTupleList::onParticlesChanged, this));*/
         con4 = storage->onTuplesChanged.connect
           (boost::bind(&FixedTupleList::onParticlesChanged, this));
 
@@ -43,7 +43,7 @@ namespace espresso {
 
         con1.disconnect();
         con2.disconnect();
-        con3.disconnect();
+        //con3.disconnect();
         con4.disconnect();
     }
 
