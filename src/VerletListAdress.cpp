@@ -25,19 +25,21 @@ namespace espresso {
       if (!system->storage) {
          throw std::runtime_error("system has no storage");
       }
-
-      cutsq = cut * cut;
+      skin = system->getSkin();
+      cutverlet = cut + skin;
+      cutsq = cutverlet * cutverlet;
       builds = 0;
 
       // AdResS stuff
-      skin = system->getSkin();
+      //skin = system->getSkin();
       dEx = _dEx;
       dHy = _dHy;
       adrCenterSet = false;
       real adressSize = dEx + dHy + skin; // adress region size
       if (dEx + dHy == 0) adressSize = 0; // 0 should be 0
       adrsq = adressSize * adressSize;
-      adrcutsq = adrCut*adrCut;
+      adrCutverlet = adrCut + skin;
+      adrcutsq = adrCutverlet*adrCutverlet;
 
       //std::cout << getSystem()->comm->rank() << ": " << "------constructor----- \n";
       if (rebuildVL) rebuild(); // not called if exclutions are provided
@@ -72,7 +74,7 @@ namespace espresso {
         //isPairInAdrZone(*it->first, *it->second);
       }*/
 
-
+      
       // get local cells
       CellList localcells = getSystem()->storage->getLocalCells();
 
@@ -120,6 +122,7 @@ namespace espresso {
                     }
                 }
           }
+          std::cout  << "rebuild:!!!! adrZone count: " << adrZone.size() << std::endl;
       }
       // center of adress zone is fixed
       else {
@@ -134,18 +137,25 @@ namespace espresso {
                   //std::cout << " adding particle " << it->getId() << "-" << it->ghost() << " to adrZone\n";
               }
           }
+          std::cout << "rebuild: adrZone count: " << adrZone.size() << std::endl;
       }
 
 
       // add particles to adress pairs and VL
       CellList cl = getSystem()->storage->getRealCells();
-      //std::cout << "local cell list size = " << cl.size() << "\n";
+      std::cout << "local cell list size = " << cl.size() << "\n";
+      int count=0;
+      
       for (CellListAllPairsIterator it(cl); it.isValid(); ++it) {
         //if ((*it->first).type() >= atType) continue;  // only check if VP/CG particle!
         //if ((*it->second).type() >= atType) continue; // only check if VP/CG particle!
         //std::cout << "iterating over " << (*it->first).id() << ", " << (*it->second).id() << "\n";
         checkPair(*it->first, *it->second);
+        count+=1;
       }
+      std::cout << "CellListAllPairs iterator finds" <<  count << std::endl;
+      
+      std::cout << "verlet list: adrPairs" <<  adrPairs.size() << std::endl;
 
       //std::cout << getSystem()->comm->rank() << ": " << "verlet list pairs (vlPairs size " << vlPairs.size() << "):\n";
       //std::cout << "\n\n";

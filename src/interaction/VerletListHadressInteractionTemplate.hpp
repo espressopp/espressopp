@@ -35,7 +35,7 @@ namespace espresso {
 
           // AdResS stuff
           dhy = verletList->getHy();
-          pidhy2 = M_PI/(dhy * 2);
+          pidhy2 = M_PI/(dhy * 2.0);
           dex = verletList->getEx();
           dex2 = dex * dex;
           dexdhy = dex + verletList->getHy();
@@ -327,6 +327,7 @@ namespace espresso {
       makeWeights();
       
       // Compute forces (AT and VP) of Pairs inside AdResS zone
+      int count = 0;
       for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it) {
 
          // these are the two VP interacting
@@ -398,6 +399,9 @@ namespace espresso {
                          const PotentialAT &potentialAT = getPotentialAT(p3.type(), p4.type());
                          Real3D force(0.0, 0.0, 0.0);
                          if(potentialAT._computeForce(force, p3, p4)) {
+                            
+                             if(force[0]!=0.0 || force[1]!=0.0 || force[2]!=0.0){count +=1;} 
+                             
                              force *= w12;
                              p3.force() += force;
                              p4.force() -= force;
@@ -430,6 +434,7 @@ namespace espresso {
              }
          }
       }
+            std::cout << "Count Adr " << count << std::endl;
       
       // H-AdResS - Drift Term part 3
       // Iterate over all particles in the hybrid region and calculate drift force
@@ -493,6 +498,7 @@ namespace espresso {
                                  it2 != atList.end(); ++it2) {
                 Particle &at = **it2;
                 at.force() += at.mass() * vpfm;
+                //std::cout << "Force of atomistic particle (AdResS sim.) with id " << at.id() << " is: " << at.force() << "\n";
             }
         }
         else { // this should not happen
@@ -504,6 +510,7 @@ namespace espresso {
       }
     }
     
+    // Energy calculation does currently only work if integrator.run( ) (also with 0) and decompose have been executed before. This is due to the initialization of the tuples.
     template < typename _PotentialAT, typename _PotentialCG >
     inline real
     VerletListHadressInteractionTemplate < _PotentialAT, _PotentialCG >::
@@ -522,10 +529,12 @@ namespace espresso {
           e += potential._computeEnergy(p1, p2);
           //std::cout << "Energy calculation CG region done" << "\n";
       }
-      
+      //std::cout << "Energy CG region:" << e << "\n";
       makeWeights();
+      int counter = 0;
       for (PairList::Iterator it(verletList->getAdrPairs()); 
-           it.isValid(); ++it) {                         
+           it.isValid(); ++it) {
+          counter += 1;
           Particle &p1 = *it->first;
           Particle &p2 = *it->second;                           
           real w1 = weights.find(&p1)->second;
@@ -534,8 +543,8 @@ namespace espresso {
           int type1 = p1.type();
           int type2 = p2.type();
           const PotentialCG &potentialCG = getPotentialCG(type1, type2);
-          e += (1-w12)*potentialCG._computeEnergy(p1, p2);
-          //std::cout << "CG Energy calculation AT/HY region done" << "\n";
+          e += (1.0-w12)*potentialCG._computeEnergy(p1, p2);
+          //std::cout << "CG Energy calculation AT/HY region done:" << e << "\n";
           
           FixedTupleList::iterator it3;
           FixedTupleList::iterator it4;
@@ -556,15 +565,18 @@ namespace espresso {
                                        itv2 != atList2.end(); ++itv2) {
                       Particle &p4 = **itv2;
 
-                      // AT forces
+                      // AT energies
                       const PotentialAT &potentialAT = getPotentialAT(p3.type(), p4.type());
                       e += w12*potentialAT._computeEnergy(p3, p4);
-                      //std::cout << "AT Energy calculation AT/HY region done" << "\n";
+                      //std::cout << "Nonbonded AT energy: " << e << "\n";
+                      //counter += 1;
+                      //std::cout << "AT Energy calculation AT/HY region done, w12 = " << w12 << " and w1 = " << w1 << " and w2 = " << w2 << " okay...\n";
                   }                  
               }              
           }          
       }
-      
+      //std::cout << "Energy AT + CG region:" << e << "\n";
+      std::cout << "Total number of pairs in calculation (AdResS):" << counter << "\n";        
       real esum;
       boost::mpi::all_reduce(*getVerletList()->getSystem()->comm, e, esum, std::plus<real>());
       return esum;      

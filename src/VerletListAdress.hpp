@@ -78,7 +78,7 @@ namespace espresso {
     std::set<Particle*> cgZone; // particles not in adress zone (same as in vlPairs)
     PairList adrPairs;           // pairs that are in AdResS zone
     real dEx, dHy; // size of the expicit and hybrid zone
-    real adrsq, adrcutsq;
+    real adrsq, adrcutsq, adrCutverlet, cutverlet;
     real skin;
     Real3D adrCenter; // center of adress zone, if set
     bool adrCenterSet; // tells if adrCenter is set
