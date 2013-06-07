@@ -28,9 +28,9 @@ namespace espresso {
             using namespace espresso::python;
 
             class_<ReactionFieldGeneralized, bases<Potential> >
-                ("interaction_ReactionFieldGeneralized", init<real, real, real, real, real>())
-                .def(init<real, real, real, real, real, bool>())
-                .add_property("qq", &ReactionFieldGeneralized::getQQ, &ReactionFieldGeneralized::setQQ)
+                ("interaction_ReactionFieldGeneralized", init< real, real, real, real, real>())
+                .def(init< real, real, real, real, real, real>())
+                .add_property("prefactor", &ReactionFieldGeneralized::getPrefactor, &ReactionFieldGeneralized::setPrefactor)
             ;
 
             class_<VerletListReactionFieldGeneralized, bases<Interaction> >
