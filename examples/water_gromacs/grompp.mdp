@@ -1,0 +1,81 @@
+; RUN CONTROL PARAMETERS
+integrator               = md
+; Start time and timestep in ps
+tinit                    = 0
+dt                       = 0.0001
+nsteps                   = 50
+; For exact run continuation or redoing part of a run
+init_step                = 0
+
+; OUTPUT CONTROL OPTIONS
+; Output frequency for coords (x), velocities (v) and forces (f)
+nstxout                  = 100
+nstvout                  = 10000
+nstfout                  = 10000
+
+; Checkpointing helps you continue after crashes
+nstcheckpoint            = 1000
+; Output frequency for energies to log file and energy file
+nstlog                   = 0
+nstenergy                = 1
+; Output frequency and precision for xtc file
+nstxtcout                = 1000
+xtc-precision            = 100000
+; This selects the subset of atoms for the xtc file. You can
+; select multiple groups. By default all atoms will be written.
+xtc-grps                 = 
+; Selection of energy groups
+energygrps               = 
+
+; NEIGHBORSEARCHING PARAMETERS
+; nblist update frequency
+nstlist                  = 1
+; ns algorithm (simple or grid)
+ns-type                  = Grid
+; Periodic boundary conditions: xyz, no, xy
+pbc                      = xyz
+periodic_molecules       = no
+; nblist cut-off        
+rlist                    = 0.9 
+
+; OPTIONS FOR ELECTROSTATICS AND VDW
+; Method for doing electrostatics
+coulombtype              = reaction-field
+rcoulomb-switch          = 0
+rcoulomb                 = 0.9 
+
+; Relative dielectric constant for the medium and the reaction field
+ epsilon_r                = 1
+ epsilon_rf               = 80
+; Method for doing Van der Waals
+vdw-type                 = Cut-off
+; cut-off lengths       
+rvdw-switch              = 0
+rvdw                     = 0.9 
+; Apply long range dispersion corrections for Energy and Pressure
+DispCorr                 = no 
+; Extension of the potential lookup tables beyond the cut-off
+table-extension          = 1
+; Seperate tables between energy group pairs
+energygrp_table          = 
+
+tc-grps                  = System
+; Time constant (ps) and reference temperature (K)
+tau_t                    = 0.5
+ref_t                    = 300 
+; Pressure coupling     
+Pcoupl                   = no
+Pcoupltype               = isotropic
+; Time constant (ps), compressibility (1/bar) and reference P (bar)
+tau_p                    = 5
+compressibility          = 4.5e-5
+ref_p                    = 1.0
+; Scaling of reference coordinates, No, All or COM
+refcoord_scaling         = No
+; Random seed for Andersen thermostat
+andersen_seed            = 815131
+
+; GENERATE VELOCITIES FOR STARTUP RUN
+gen-vel                  = no 
+
+
