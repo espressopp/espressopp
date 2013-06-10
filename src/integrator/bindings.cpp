@@ -14,6 +14,7 @@
 #include "DPDThermostat.hpp"
 #include "LangevinBarostat.hpp"
 #include "FixPositions.hpp"
+#include "LatticeBoltzmann.hpp"
 #include "ExtForce.hpp"
 #include "CapForce.hpp"
 #include "ExtAnalyze.hpp"
@@ -35,6 +36,7 @@ namespace espresso {
       LangevinThermostat::registerPython();
       DPDThermostat::registerPython();
       FixPositions::registerPython();
+      LatticeBoltzmann::registerPython();
       ExtForce::registerPython();
       CapForce::registerPython();
       ExtAnalyze::registerPython();

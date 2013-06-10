@@ -2,9 +2,9 @@
 #ifndef _VERLETLISTTRIPLE_HPP
 #define _VERLETLISTTRIPLE_HPP
 
+#include "python.hpp"
 #include "log4espp.hpp"
 #include "types.hpp"
-#include "python.hpp"
 #include "Particle.hpp"
 #include "SystemAccess.hpp"
 #include "boost/signals2.hpp"

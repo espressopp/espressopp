@@ -2,12 +2,12 @@
 #ifndef _ANALYSIS_NEIGHBORFLUCTUATION_HPP
 #define _ANALYSIS_NEIGHBORFLUCTUATION_HPP
 
+#include "python.hpp"
 #include "types.hpp"
 #include "Observable.hpp"
 #include "esutil/Error.hpp"
 #include "bc/BC.hpp"
 #include "Real3D.hpp"
-#include "python.hpp"
 
 #include "storage/DomainDecomposition.hpp"
 #include "storage/CellGrid.hpp"

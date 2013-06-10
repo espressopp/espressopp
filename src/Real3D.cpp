@@ -1,6 +1,6 @@
-#include "Real3D.hpp"
-#include <python.hpp>
 #include <boost/python/implicit.hpp>
+#include "python.hpp"
+#include "Real3D.hpp"
 
 namespace espresso {
   struct real3D_pickle_suite : boost::python::pickle_suite {

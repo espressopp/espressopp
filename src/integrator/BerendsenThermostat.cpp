@@ -1,12 +1,10 @@
-#include "BerendsenThermostat.hpp"
-
 #include "python.hpp"
 #include "System.hpp"
 #include "Particle.hpp"
-
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "esutil/Error.hpp"
+#include "BerendsenThermostat.hpp"
 
 namespace espresso {
   
@@ -68,7 +66,7 @@ namespace espresso {
       
       static Temperature Tcurrent(getSystem());
       
-      real T = Tcurrent.compute();  // calculating the current temperature in system
+      real T = Tcurrent.computeRaw();  // calculating the current temperature in system
       
       real lambda2 = 1 + pref * (T0/T - 1);
       

@@ -9,7 +9,7 @@ namespace espresso {
   namespace analysis {
 
     void Viscosity::gather() {
-      Tensor prt = PressureTensor(getSystem()).computeTensor();
+      Tensor prt = PressureTensor(getSystem()).computeRaw();
       Autocorrelation::gather( Real3D(prt[3], prt[4], prt[5]) );
     }
     

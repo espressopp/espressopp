@@ -21,7 +21,7 @@ public:
 	virtual ~GammaDistribution() {
 	}
 	;
-	virtual const real drawNumber(const unsigned int alpha) = 0;
+	virtual real drawNumber(const unsigned int alpha) = 0;
 
 protected:
 	shared_ptr<esutil::RNG> rng;
@@ -33,7 +33,7 @@ public:
 	GammaDistributionBoost(shared_ptr<esutil::RNG> _rng) :
 			GammaDistribution(_rng) {
 	}
-	const real drawNumber(const unsigned int ia);
+	real drawNumber(const unsigned int ia);
 };
 
 /** Gamma distribution, from Numerical Recipes, 2nd edition, pages 292 & 293 */
@@ -42,7 +42,7 @@ public:
 	GammaDistributionNR2nd(shared_ptr<esutil::RNG> _rng) :
 			GammaDistribution(_rng) {
 	}
-	const real drawNumber(const unsigned int ia);
+	real drawNumber(const unsigned int ia);
 };
 
 /** Gamma distribution, from Numerical Recipes, 3rd edition, pages 370 & 371 */
@@ -51,7 +51,7 @@ public:
 	GammaDistributionNR3rd(shared_ptr<esutil::RNG> _rng) :
 			GammaDistribution(_rng) {
 	}
-	const real drawNumber(const unsigned int ia);
+	real drawNumber(const unsigned int ia);
 };
 
 class StochasticVelocityRescaling: public Extension {
@@ -71,7 +71,7 @@ public:
 	~StochasticVelocityRescaling();
 
 	/** Sum n squared Gaussian numbers - shortcut via Gamma distribution */
-	const real stochasticVR_sumGaussians(const int n);
+	real stochasticVR_sumGaussians(const int n);
 
 	/** Pull new value for the kinetic energy following the canonical distribution
 	 *  Cite: Bussi et al JCP (2007) (there's a typo in the paper - this code is correct
@@ -80,7 +80,7 @@ public:
 	 *  dof: degrees of freedom
 	 *  taut: coupling time/strength
 	 *  */
-	const real stochasticVR_pullEkin(real Ekin, real Ekin_ref, int dof,
+	real stochasticVR_pullEkin(real Ekin, real Ekin_ref, int dof,
 			real taut, shared_ptr<esutil::RNG> rng);
 
 	/** Register this class so it can be used from Python. */

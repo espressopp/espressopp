@@ -3,6 +3,7 @@
 #define _INT3D_HPP
 
 #include "types.hpp"
+#include "Real3D.hpp"
 
 namespace espresso {
   //////////////////////////////////////////////////
@@ -19,6 +20,7 @@ namespace espresso {
     Int3D(int v); 
     Int3D(int x, int y, int z);
     Int3D(const int v[3]);
+    Int3D(const Real3D v);
 
     // assignment is not the same as initialization
     Int3D &operator=(const Int3D &v);
@@ -73,6 +75,10 @@ namespace espresso {
   inline Int3D::Int3D(const int v[3]) {
     for (int i = 0; i < 3; i++)
       data[i] = v[i];
+  }
+  inline Int3D::Int3D(const Real3D v) {
+    for (int i = 0; i < 3; i++)
+      data[i] = (int)v[i];
   }
   
   inline Int3D &Int3D::operator=(const Int3D &v) {

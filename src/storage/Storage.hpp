@@ -1,18 +1,17 @@
 // ESPP_CLASS
 #ifndef _STORAGE_STORAGE_HPP
 #define _STORAGE_STORAGE_HPP
+#include "SystemAccess.hpp"
 #include "mpi.hpp"
 //#include <vector>
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
 #include <list>
-#include "types.hpp"
 #include "log4espp.hpp"
-#include "SystemAccess.hpp"
 #include "FixedTupleList.hpp"
-
 #include "Cell.hpp"
 #include "Buffer.hpp"
+#include "types.hpp"
 
 namespace espresso {
 

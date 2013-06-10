@@ -1,8 +1,7 @@
-#include "mpi.h"
-
 #include "Autocorrelation.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "esutil/Error.hpp"
+#include "mpi.h"
 
 using namespace std;
 

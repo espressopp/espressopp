@@ -99,6 +99,14 @@ IF(MERCURIAL_EXECUTABLE)
 	  MERCURIAL_log_OUTPUT "${MERCURIAL_log_OUTPUT}")
 
 	FOREACH(line ${MERCURIAL_log_OUTPUT})
+	  # commit changeset info of this changeset
+	  IF(line MATCHES "^changeset:")
+	    STRING(REGEX REPLACE "^changeset:[ ]+(.+)"
+	      "\\1" tmp_changeset "${line}")
+            STRING(REGEX REPLACE ":.*"
+              " " ${prefix}_HG_CHANGESET ${tmp_changeset})
+	  ENDIF(line MATCHES "^changeset:")
+
 	  # commit author of this changeset
 	  IF(line MATCHES "^user:")
 	    STRING(REGEX REPLACE "^user:[ ]+(.+)"

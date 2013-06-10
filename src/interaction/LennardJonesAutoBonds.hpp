@@ -2,9 +2,9 @@
 #ifndef _INTERACTION_LENNARDJONESAUTOBONDS_HPP
 #define _INTERACTION_LENNARDJONESAUTOBONDS_HPP
 
-#include "Potential.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 #include "FixedPairList.hpp"
+#include "Potential.hpp"
 
 namespace espresso {
   namespace interaction {

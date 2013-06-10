@@ -1,5 +1,5 @@
-#include "Int3D.hpp"
 #include <python.hpp>
+#include "Int3D.hpp"
 #include <boost/python/implicit.hpp>
 
 namespace espresso {
