@@ -21,6 +21,7 @@ namespace espresso {
     size_t type;
     real mass;
     real q;
+    real radius;
   private:
     friend class boost::serialization::access;
     template< class Archive >
