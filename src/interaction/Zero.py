@@ -6,6 +6,7 @@ from espresso.interaction.Interaction import *
 from _espresso import interaction_Zero, \
                       interaction_VerletListZero, \
                       interaction_VerletListAdressZero, \
+                      interaction_VerletListHadressZero, \
                       interaction_CellListZero, \
                       interaction_FixedPairListZero
 
@@ -36,6 +37,23 @@ class VerletListAdressZeroLocal(InteractionLocal, interaction_VerletListAdressZe
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListAdressZero, vl)
+
+    def setPotentialAT(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialAT(self, type1, type2, potential)
+            
+    def setPotentialCG(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialAT(self, type1, type2, potential)            
+            
+    def setFixedTupleList(self, ftpl):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setFixedTupleList(self, ftpl)
+            
+class VerletListHadressZeroLocal(InteractionLocal, interaction_VerletListHadressZero):
+    def __init__(self, vl):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListHadressZero, vl)
 
     def setPotentialAT(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -85,6 +103,13 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListAdressZeroLocal',
+            pmicall = ['setPotentialAT', 'setPotentialCG']
+            )
+            
+    class VerletListHadressZero(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espresso.interaction.VerletListHadressZeroLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 

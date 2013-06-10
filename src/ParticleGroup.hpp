@@ -36,7 +36,7 @@ namespace espresso {
             // for debugging purpose
             void print();
 
-            const bool has(longint pid);
+            bool has(longint pid);
 
             longint size() {return particles.size();}
 

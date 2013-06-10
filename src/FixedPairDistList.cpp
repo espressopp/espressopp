@@ -1,4 +1,3 @@
-#include <sstream>
 #include "python.hpp"
 #include "FixedPairDistList.hpp"
 #include <boost/bind.hpp>

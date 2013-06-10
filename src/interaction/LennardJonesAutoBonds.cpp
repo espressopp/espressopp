@@ -3,6 +3,7 @@
 #include "Tabulated.hpp"
 #include "VerletListInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
+#include "VerletListHadressInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
@@ -13,6 +14,8 @@ namespace espresso {
         VerletListLennardJonesAutoBonds;
     typedef class VerletListAdressInteractionTemplate <LennardJonesAutoBonds, Tabulated>
         VerletListAdressLennardJonesAutoBonds;
+    typedef class VerletListHadressInteractionTemplate <LennardJonesAutoBonds, Tabulated>
+        VerletListHadressLennardJonesAutoBonds;
     typedef class CellListAllPairsInteractionTemplate <LennardJonesAutoBonds>
         CellListLennardJonesAutoBonds;
     typedef class FixedPairListInteractionTemplate <LennardJonesAutoBonds>
@@ -46,6 +49,14 @@ namespace espresso {
                   shared_ptr<FixedTupleList> >())
         .def("setPotentialAT", &VerletListAdressLennardJonesAutoBonds::setPotentialAT)
         .def("setPotentialCG", &VerletListAdressLennardJonesAutoBonds::setPotentialCG);
+      ;
+      
+      class_< VerletListHadressLennardJonesAutoBonds, bases< Interaction > >
+        ("interaction_VerletListHadressLennardJonesAutoBonds",
+           init< shared_ptr<VerletListAdress>,
+                  shared_ptr<FixedTupleList> >())
+        .def("setPotentialAT", &VerletListHadressLennardJonesAutoBonds::setPotentialAT)
+        .def("setPotentialCG", &VerletListHadressLennardJonesAutoBonds::setPotentialCG);
       ;
 
       class_< CellListLennardJonesAutoBonds, bases< Interaction > >

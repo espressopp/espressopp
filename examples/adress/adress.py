@@ -247,6 +247,9 @@ for s in range(1, intervals + 1):
   sys.stdout.write(fmt % (step, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
   system.storage.decompose()
 
+  filename = "adress_tetra_liquid.pdb"
+  espresso.tools.pdbwrite(filename, system, molsize=num_particles+num_particlesCG, append=True)
+
 end_time = time.clock()
 
 timers.show(integrator.getTimers(), precision=3)

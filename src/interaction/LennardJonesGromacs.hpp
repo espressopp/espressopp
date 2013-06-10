@@ -2,8 +2,8 @@
 #ifndef _INTERACTION_LENNARDJONESGROMACS_HPP
 #define _INTERACTION_LENNARDJONESGROMACS_HPP
 
-#include "Potential.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
+#include "Potential.hpp"
 
 namespace espresso {
   namespace interaction {

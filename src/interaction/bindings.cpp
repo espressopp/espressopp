@@ -1,5 +1,5 @@
+#include "python.hpp"
 #include "bindings.hpp"
-#include "Potential.hpp"
 #include "PotentialUniqueDist.hpp"
 #include "Zero.hpp"
 #include "LennardJones.hpp"
@@ -18,6 +18,7 @@
 #include "FENECapped.hpp"
 #include "Harmonic.hpp"
 #include "HarmonicUnique.hpp"
+#include "Quartic.hpp"
 
 #include "Tabulated.hpp"
 #include "TabulatedAngular.hpp"
@@ -43,6 +44,7 @@
 #include "StillingerWeberPairTermCapped.hpp"
 
 #include "CoulombKSpaceP3M.hpp"
+#include "Potential.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -68,6 +70,7 @@ namespace espresso {
       FENECapped::registerPython();
       Harmonic::registerPython();
       HarmonicUnique::registerPython();
+      Quartic::registerPython();
       
       AngularPotential::registerPython();
       AngularUniquePotential::registerPython();

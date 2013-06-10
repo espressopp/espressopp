@@ -124,8 +124,9 @@ namespace espresso {
       // center of adress zone is fixed
       else {
           for (CellListIterator it(localcells); it.isValid(); ++it) {
-              Real3D dist = it->getPos() - adrCenter;
-              real distsq = dist.sqr();
+              //Real3D dist = it->getPos() - adrCenter;                                   					        // CHANGE FOR X SPLIT VS SPHERE
+	      real dist = it->getPos()[0] - adrCenter[0];                                  					        // CHANGE FOR X SPLIT VS SPHERE
+              real distsq = dist*dist;  //dist.spr()                               							// CHANGE FOR X SPLIT VS SPHERE
               //std::cout << "distance " << sqrt(distsq) << "\n";
               if (distsq <= adrsq) {
                   adrZone.insert(&(*it));

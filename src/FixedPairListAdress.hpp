@@ -3,7 +3,6 @@
 #define _FIXEDPAIRLISTADRESS_HPP
 
 #include "log4espp.hpp"
-#include "types.hpp"
 
 //#include "Particle.hpp"
 #include "FixedPairList.hpp"
@@ -11,6 +10,7 @@
 #include "esutil/ESPPIterator.hpp"
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
+#include "types.hpp"
 
 namespace espresso {
 

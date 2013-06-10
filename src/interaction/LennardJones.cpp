@@ -3,6 +3,7 @@
 #include "Tabulated.hpp"
 #include "VerletListInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
+#include "VerletListHadressInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
@@ -13,6 +14,8 @@ namespace espresso {
         VerletListLennardJones;
     typedef class VerletListAdressInteractionTemplate <LennardJones, Tabulated>
         VerletListAdressLennardJones;
+    typedef class VerletListHadressInteractionTemplate <LennardJones, Tabulated>
+        VerletListHadressLennardJones;
     typedef class CellListAllPairsInteractionTemplate <LennardJones> 
         CellListLennardJones;
     typedef class FixedPairListInteractionTemplate <LennardJones> 
@@ -47,6 +50,14 @@ namespace espresso {
         .def("setPotentialCG", &VerletListAdressLennardJones::setPotentialCG);
       ;
 
+      class_< VerletListHadressLennardJones, bases< Interaction > >
+        ("interaction_VerletListHadressLennardJones",
+           init< shared_ptr<VerletListAdress>,
+                  shared_ptr<FixedTupleList> >())
+        .def("setPotentialAT", &VerletListHadressLennardJones::setPotentialAT)
+        .def("setPotentialCG", &VerletListHadressLennardJones::setPotentialCG);
+      ;
+      
       class_< CellListLennardJones, bases< Interaction > > 
         ("interaction_CellListLennardJones", init< shared_ptr< storage::Storage > >())
         .def("setPotential", &CellListLennardJones::setPotential);

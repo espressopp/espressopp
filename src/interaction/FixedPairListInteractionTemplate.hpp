@@ -3,7 +3,6 @@
 #define _INTERACTION_FIXEDPAIRLISTINTERACTIONTEMPLATE_HPP
 
 #include "mpi.hpp"
-#include "types.hpp"
 #include "Interaction.hpp"
 #include "Real3D.hpp"
 #include "Tensor.hpp"
@@ -13,6 +12,8 @@
 #include "esutil/Array2D.hpp"
 #include "bc/BC.hpp"
 #include "SystemAccess.hpp"
+#include "Interaction.hpp"
+#include "types.hpp"
 
 namespace espresso {
   namespace interaction {

@@ -1,5 +1,6 @@
 #include "bindings.hpp"
 #include "Observable.hpp"
+#include "AnalysisBase.hpp"
 #include "Temperature.hpp"
 #include "Pressure.hpp"
 #include "PressureTensor.hpp"
@@ -19,6 +20,8 @@
 #include "Autocorrelation.hpp"
 #include "RadialDistrF.hpp"
 #include "Viscosity.hpp"
+#include "XDensity.hpp"
+#include "Test.hpp"
 
 #include "IntraChainDistSq.hpp"
 #include "NeighborFluctuation.hpp"
@@ -27,6 +30,7 @@ namespace espresso {
   namespace analysis {
     void registerPython() {
       Observable::registerPython();
+      AnalysisBase::registerPython();
       Temperature::registerPython();
       Pressure::registerPython();
       PressureTensor::registerPython();
@@ -46,6 +50,8 @@ namespace espresso {
       VelocityAutocorrelation::registerPython();
       MeanSquareDispl::registerPython();
       RadialDistrF::registerPython();
+      XDensity::registerPython();
+      Test::registerPython();
       
       Autocorrelation::registerPython();
       Viscosity::registerPython();

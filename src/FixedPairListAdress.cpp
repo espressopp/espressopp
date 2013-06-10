@@ -1,15 +1,7 @@
-#include <sstream>
-#include "python.hpp"
-
-#include "FixedPairListAdress.hpp"
-
-//#include <vector>
-//#include <utility>
-//#include <algorithm>
-#include <boost/bind.hpp>
 #include "storage/Storage.hpp"
+#include <boost/bind.hpp>
+#include "FixedPairListAdress.hpp"
 #include "Buffer.hpp"
-
 #include "esutil/Error.hpp"
 
 //using namespace std;

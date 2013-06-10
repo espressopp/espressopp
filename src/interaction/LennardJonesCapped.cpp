@@ -3,6 +3,7 @@
 #include "Tabulated.hpp"
 #include "VerletListInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
+#include "VerletListHadressInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
@@ -13,6 +14,8 @@ namespace espresso {
         VerletListLennardJonesCapped;
     typedef class VerletListAdressInteractionTemplate <LennardJonesCapped, Tabulated>
         VerletListAdressLennardJonesCapped;
+    typedef class VerletListHadressInteractionTemplate <LennardJonesCapped, Tabulated>
+        VerletListHadressLennardJonesCapped;
     typedef class CellListAllPairsInteractionTemplate <LennardJonesCapped>
         CellListLennardJonesCapped;
     typedef class FixedPairListInteractionTemplate <LennardJonesCapped>
@@ -50,6 +53,17 @@ namespace espresso {
                        return_value_policy< reference_existing_object >());
       ;
 
+      class_< VerletListHadressLennardJonesCapped, bases< Interaction > >
+        ("interaction_VerletListHadressLennardJonesCapped",
+         init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleList> >())
+         .def("setPotentialAT", &VerletListHadressLennardJonesCapped::setPotentialAT)
+         .def("setPotentialCG", &VerletListHadressLennardJonesCapped::setPotentialCG)
+         .def("getPotentialAT", &VerletListHadressLennardJonesCapped::getPotentialAT,
+                 return_value_policy< reference_existing_object >())
+         .def("getPotentialCG", &VerletListHadressLennardJonesCapped::getPotentialCG,
+                       return_value_policy< reference_existing_object >());
+      ;
+      
       class_< CellListLennardJonesCapped, bases< Interaction > >
         ("interaction_CellListLennardJonesCapped", init< shared_ptr< storage::Storage > >())
         .def("setPotential", &CellListLennardJonesCapped::setPotential)

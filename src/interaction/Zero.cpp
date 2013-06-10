@@ -14,6 +14,8 @@ namespace espresso {
         VerletListZero;
     typedef class VerletListAdressInteractionTemplate <Zero, Tabulated>
         VerletListAdressZero;
+    typedef class VerletListHadressInteractionTemplate <Zero, Tabulated>
+        VerletListHadressZero;
     typedef class CellListAllPairsInteractionTemplate <Zero>
         CellListZero;
     typedef class FixedPairListInteractionTemplate <Zero>
@@ -46,6 +48,15 @@ namespace espresso {
         .def("setPotentialCG", &VerletListAdressZero::setPotentialCG);
       ;
 
+      class_< VerletListHadressZero, bases< Interaction > >
+        ("interaction_VerletListHadressZero",
+           init< shared_ptr<VerletListAdress>,
+                  shared_ptr<FixedTupleList> >())
+        .def("setFixedTupleList", &VerletListHadressZero::setFixedTupleList)
+        .def("setPotentialAT", &VerletListHadressZero::setPotentialAT)
+        .def("setPotentialCG", &VerletListHadressZero::setPotentialCG);
+      ;
+      
       class_< CellListZero, bases< Interaction > >
         ("interaction_CellListZero", init< shared_ptr< storage::Storage > >())
         .def("setPotential", &CellListZero::setPotential);

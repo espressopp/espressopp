@@ -8,6 +8,7 @@
 #include <exception>
 #include <limits>
 #include "esconfig.hpp"
+#include "types.hpp"
 
 namespace espresso {
   using boost::shared_ptr;

@@ -120,13 +120,13 @@ namespace espresso {
         if (fabs(pos[dir]*invBoxL[dir]) >= INT_MAX/2) {
 # warning ERRORHANDLING MISSING
 #if 0
-  char *errtext = runtime_error(128 + TCL_INTEGER_SPACE);
-  ERROR_SPRINTF(errtext,"{086 particle coordinate out of range, pos = %f, image box = %d} ", pos[dir], image_box[dir]);
+// errortext: particle coordinate out of range
 #endif
           imageBox[dir] = 0;
           pos[dir] = 0;
         }
       }
+
     }
 
     /* Unfold an individual coordinate in the specified direction */

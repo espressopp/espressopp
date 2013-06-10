@@ -3,6 +3,7 @@
 #include "Tabulated.hpp"
 #include "VerletListInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
+#include "VerletListHadressInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
@@ -12,6 +13,8 @@ namespace espresso {
     VerletListMorse;
     typedef class VerletListAdressInteractionTemplate< Morse, Tabulated >
     VerletListAdressMorse;
+    typedef class VerletListHadressInteractionTemplate< Morse, Tabulated >
+    VerletListHadressMorse;
     typedef class CellListAllPairsInteractionTemplate< Morse >
     CellListMorse;
     typedef class FixedPairListInteractionTemplate< Morse >
@@ -44,7 +47,14 @@ namespace espresso {
         .def("setPotentialAT", &VerletListAdressMorse::setPotentialAT)
         .def("setPotentialCG", &VerletListAdressMorse::setPotentialCG);
         ;
-
+        
+      class_< VerletListHadressMorse, bases< Interaction > >
+        ("interaction_VerletListHadressMorse",
+                init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleList> >())
+        .def("setPotentialAT", &VerletListHadressMorse::setPotentialAT)
+        .def("setPotentialCG", &VerletListHadressMorse::setPotentialCG);
+        ;
+        
       class_< CellListMorse, bases< Interaction > > 
         ("interaction_CellListMorse", init< shared_ptr< storage::Storage > >())
         .def("setPotential", &CellListMorse::setPotential);

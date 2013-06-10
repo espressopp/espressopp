@@ -5,6 +5,7 @@
 #include "InterpolationCubic.hpp"
 #include "VerletListInteractionTemplate.hpp"
 #include "VerletListAdressInteractionTemplate.hpp"
+#include "VerletListHadressInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
@@ -34,6 +35,7 @@ namespace espresso {
 
     typedef class VerletListInteractionTemplate <Tabulated> VerletListTabulated;
     typedef class VerletListAdressInteractionTemplate <Tabulated, Tabulated> VerletListAdressTabulated;
+    typedef class VerletListHadressInteractionTemplate <Tabulated, Tabulated> VerletListHadressTabulated;
     typedef class CellListAllPairsInteractionTemplate <Tabulated> CellListTabulated;
     typedef class FixedPairListInteractionTemplate <Tabulated> FixedPairListTabulated;
 
@@ -60,6 +62,15 @@ namespace espresso {
                 )
             .def("setPotentialAT", &VerletListAdressTabulated::setPotentialAT)
             .def("setPotentialCG", &VerletListAdressTabulated::setPotentialCG);
+        ;
+        
+      class_ <VerletListHadressTabulated, bases <Interaction> >
+        ("interaction_VerletListHadressTabulated",
+           init <shared_ptr<VerletListAdress>,
+                 shared_ptr<FixedTupleList> >()
+                )
+            .def("setPotentialAT", &VerletListHadressTabulated::setPotentialAT)
+            .def("setPotentialCG", &VerletListHadressTabulated::setPotentialCG);
         ;
      
       class_ <CellListTabulated, bases <Interaction> > 

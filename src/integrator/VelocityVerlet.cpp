@@ -1,4 +1,4 @@
-#include <iomanip>
+//#include <iomanip>
 #include "python.hpp"
 #include "VelocityVerlet.hpp"
 #include "iterator/CellListIterator.hpp"
@@ -317,9 +317,6 @@ namespace espresso {
 
       // signal
       aftCalcF();
-
-      //if (langevin) langevin->thermalize();
-      //if (langevinBarostat) langevinBarostat->updForces();
     }
 
     void VelocityVerlet::initForces()

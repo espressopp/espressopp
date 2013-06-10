@@ -21,6 +21,7 @@ namespace espresso {
       }
       timeFlag = true;
       step = 0;
+      dt = 0.005;
     }
     
     MDIntegrator::~MDIntegrator()
@@ -30,8 +31,12 @@ namespace espresso {
     
     void MDIntegrator::setTimeStep(real _dt)
     {
-      if (dt <= 0) {
-        std::runtime_error("timestep must be positive");
+      if (_dt == 0.0) {
+        System& system = getSystemRef();
+        esutil::Error err(system.comm);
+        std::stringstream msg;
+        msg << "Ttimestep  'dt' must be non-zero!";
+        err.setException(msg.str());
       }
 
       dt = _dt;

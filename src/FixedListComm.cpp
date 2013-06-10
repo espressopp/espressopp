@@ -1,9 +1,7 @@
-#include "FixedListComm.hpp"
-
-
-#include <boost/bind.hpp>
 #include "storage/Storage.hpp"
+#include <boost/bind.hpp>
 #include "Buffer.hpp"
+#include "FixedListComm.hpp"
 
 //using namespace std;
 

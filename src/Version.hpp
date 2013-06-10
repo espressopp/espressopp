@@ -6,7 +6,7 @@
 
 #define MAJORVERSION 1
 #define MINORVERSION 5
-#define PATCHLEVEL   3
+#define PATCHLEVEL   5
 #include "hgversion.hpp"
 
 namespace espresso {

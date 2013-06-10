@@ -6,6 +6,7 @@ from espresso.interaction.Interaction import *
 from _espresso import interaction_ReactionFieldGeneralized, \
                       interaction_VerletListReactionFieldGeneralized, \
                       interaction_VerletListAdressReactionFieldGeneralized, \
+                      interaction_VerletListHadressReactionFieldGeneralized, \
                       interaction_CellListReactionFieldGeneralized
                       #interaction_FixedPairListReactionFieldGeneralized
 
@@ -48,7 +49,21 @@ class VerletListAdressReactionFieldGeneralizedLocal(InteractionLocal, interactio
     def setPotentialCG(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
+            
+class VerletListHadressReactionFieldGeneralizedLocal(InteractionLocal, interaction_VerletListHadressReactionFieldGeneralized):
+    'The (local) ReactionFieldGeneralized interaction using Verlet lists.'
+    def __init__(self, vl, fixedtupleList):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListHadressReactionFieldGeneralized, vl, fixedtupleList)
 
+    def setPotentialAT(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialAT(self, type1, type2, potential)
+
+    def setPotentialCG(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialCG(self, type1, type2, potential)
+            
 
 class CellListReactionFieldGeneralizedLocal(InteractionLocal, interaction_CellListReactionFieldGeneralized):
     'The (local) ReactionFieldGeneralized interaction using cell lists.'
@@ -91,7 +106,14 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListAdressReactionFieldGeneralizedLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
-            )        
+            )
+            
+    class VerletListHadressReactionFieldGeneralized(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espresso.interaction.VerletListHadressReactionFieldGeneralizedLocal',
+            pmicall = ['setPotentialAT', 'setPotentialCG']
+            )     
         
     class CellListReactionFieldGeneralized(Interaction):
         __metaclass__ = pmi.Proxy

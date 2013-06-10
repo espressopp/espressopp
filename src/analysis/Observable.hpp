@@ -1,10 +1,10 @@
 // ESPP_CLASS
 #ifndef _ANALYSIS_OBSERVABLE_HPP
 #define _ANALYSIS_OBSERVABLE_HPP
-#include <vector>
-#include "types.hpp"
 #include "python.hpp"
+#include "types.hpp"
 #include "SystemAccess.hpp"
+#include <vector>
 
 namespace espresso {
   namespace analysis {
