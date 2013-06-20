@@ -166,11 +166,6 @@ namespace espresso {
         
         calc_differential_operator();
         
-        /*
-        gf = vector< vector<vector<real> > > (M[0], 
-                     vector<vector<real> >(M[1], 
-                     vector<real>(M[2], 0.0)) );
-         */
         gf = vector<real>(MMM, 0.0);
         
         calc_opt_influence_function();
@@ -183,12 +178,6 @@ namespace espresso {
         // TODO check double use in common part
         g_ca = vector<Int3D>(0, Int3D(0) );
 
-        /*
-        q_l = vector< vector<vector< vector<real> > > > (nParticles,
-                      vector<vector< vector<real> > >(M[0], 
-                             vector< vector<real> >(M[1], 
-                                     vector<real>(M[2], 0.0))) );
-         */
         q_l = vector< vector<real> > (nParticles, vector<real>(MMM, 0.0) );
         
         // force specific
@@ -224,9 +213,11 @@ namespace espresso {
         
         for (int i=-interpolation; i<=interpolation; i++) {
           real x = i * _2interpol_inv;
-          for(int j = 0; j<P; j++)
-            precalc_interp_caf[j][i+interpolation] = asignment_f(x, j, P);
+          for(int j = 0; j<P; j++){
+            precalc_interp_caf[j][i+interpolation] = asignment_f2(j, x, P);
+          }
         }
+//std::cout<< " ^^^^precalc_interp_caf:  "<< precalc_interp_caf[5][12] << std::endl;
       }
       
       // calculate differential operator
@@ -251,21 +242,21 @@ namespace espresso {
       // calculates the optimal influence function
       void calc_opt_influence_function(){
         
-        real coef  = 2.0 * M[0]*M[1]*M[2] / (sysL[0]*sysL[1]);
+        real coef  = 2.0 * MMM / (sysL[0]*sysL[1]);
 
         real denom;
         Real3D nom, D;
-        Int3D N;
-        for ( N[0] = 0; N[0] < M[0]; N[0]++){
-          for ( N[1] = 0; N[1] < M[1]; N[1]++){
-            for ( N[2] = 0; N[2] < M[2]; N[2]++){
-              int indx = N[2] + M[2] * (N[1] + M[1] * N[0]);
-              if ( N == Int3D(0) )
+        Int3D i;
+        for ( i[0] = 0; i[0] < M[0]; i[0]++){
+          for ( i[1] = 0; i[1] < M[1]; i[1]++){
+            for ( i[2] = 0; i[2] < M[2]; i[2]++){
+              int indx = i[2] + M[2] * (i[1] + M[1] * i[0]);
+              if ( i == Int3D(0) )
                 gf[ indx ] = 0.0;
               else{
-                aliasing_sum( N, &nom, &denom);
-                for(int i=0; i<3; i++){
-                  D[i] = d_op[i][N[i]]; 
+                aliasing_sum( i, &nom, &denom);
+                for(int l=0; l<3; l++){
+                  D[l] = d_op[l][i[l]]; 
                 }
 
                 real D2 = D.sqr();
@@ -289,7 +280,7 @@ namespace espresso {
         }
       }
       
-      real aliasing_sum(Int3D N, Real3D *nominator, real *denominator){
+      real aliasing_sum(Int3D i, Real3D *nominator, real *denominator){
         /*
          * taken from Deserno's code
          *  calculates the aliasing sums in the nominator and denominator of the 
@@ -300,7 +291,7 @@ namespace espresso {
                                                  aliasing sum.
            *denominator : aliasing sum in the denominator. */
 
-        Real3D ms(mesh_shift[0][N[0]], mesh_shift[1][N[1]], mesh_shift[2][N[2]]);
+        Real3D ms(mesh_shift[0][i[0]], mesh_shift[1][i[1]], mesh_shift[2][i[2]]);
         
         real sc;
         Real3D nml(0.0);
@@ -375,10 +366,11 @@ namespace espresso {
         for(int i=0;i<3;i++) res *= sinc(X[i]);
         return res;
       }
+      
       real dround(real x) { return floor(x+0.5); }
       Real3D dround(Real3D x) {
         Real3D out;
-        for(int i=0; i<3; i++) out[i] = dround(x[i]+0.5);
+        for(int i=0; i<3; i++) out[i] = dround(x[i]); //+0.5
         return out;
       }
       
@@ -402,17 +394,15 @@ namespace espresso {
         
         real energy = 0.0;
         
-        for (int i=0; i<M[0]; i++){
-          for (int j=0; j<M[1]; j++){
-            for (int k=0; k<M[2]; k++){
-              int indx = k + M[2] * (j + M[1] * i);
-              energy += gf[indx] * norm( QQQ[indx] ) ;
-            }
-          }
+        for (int i=0; i<MMM; i++){
+          energy += gf[i] * norm( QQQ[i] );
         }
-
+        
         // TODO sysL[0]?? what about [1] and [2]?
         energy *= ( C_pref * sysL[0] / (4.0*MMM*M_PIl) );
+
+std::cout<< "\n energy: " << energy << std::endl;
+        
         // self energy and net charge correction: 
         energy -= C_pref * ( sum_q2 * alpha / sqrt(M_PIl)  +  
                         sumq_2 * M_PIl / (2.0* sysL[0]*sysL[1]*sysL[2] *pow(alpha,2)) );
@@ -420,10 +410,12 @@ namespace espresso {
         return energy;
       }
       
+      // TODO get rid of iii at the end
       void common_part(CellList realCells, int iii){
-        real _2interp = 2.0 * interpolation;
+        initialize();
         
-        // TODO check variable assignshift and provide better logic
+        real _2interp = 2.0 * interpolation;
+        // TODO assignshift probably should be [3]
         int assignshift = M[0]- floor((real)(P-1)/2.0);
         
         real  modadd1, modadd2;
@@ -435,8 +427,6 @@ namespace espresso {
             { modadd1 = 0.0; modadd2 =  0.5;} break;
         }
 
-        // alternative reference to the arrays G[i][3] 
-        Int3D Gi, arg;
 
         g_ca.clear();
         g_ca = vector<Int3D>(nParticles, Int3D(0) );
@@ -444,9 +434,11 @@ namespace espresso {
         //QQQ.reserve(M[0]*M[1]*M[2]);
         QQQ = vector<dcomplex>(MMM, dcomplex(0.0));
         
-        std::cout<< "QQQ.size(): "<< QQQ.size()<< "  i="<< iii << std::endl;
+        //std::cout<< "QQQ.size(): "<< QQQ.size()<< "  i="<< iii << std::endl;
         
         int count = 0;
+        // alternative reference to the arrays G[i][3] 
+        Int3D Gi, arg;
         for(iterator::CellListIterator it(realCells); it.isValid(); ++it){
           Particle &p = *it;
           Real3D ppos = p.position();
@@ -457,11 +449,17 @@ namespace espresso {
           }
           Gi  = Int3D(d1 + modadd2) + assignshift;
           arg = Int3D( (d1 - dround(d1) + 0.5)*_2interp );
-          
+
+/*          
+if(iii==1){
+  std::cout<< " arg:  "<< (d1 - dround(d1) + 0.5) << "   pos: "<< ppos << std::endl;
+}
+ */
           // specific for force !!!!!!!!
           g_ca[count] = Gi;
           count++;
           
+          int ccc = 0;
           // Calculate the mesh based charges
           real T1,T2,T3;
           for (int j = 0; j < P; j++) {
@@ -473,19 +471,85 @@ namespace espresso {
               for (int l = 0; l < P; l++) {
                 int zpos = (Gi[2] + l) % M[2];
                 T3 = T2 * precalc_interp_caf[l][arg[2]];
-
+/*                
+if(iii==1 && p.id()==0){
+     ccc++;
+    if(ccc>20) exit(0);
+    std::cout<< "T3: "<< T3 << " arg:  "<< arg << "   PPP: "<< ppos << std::endl;
+}
+ */
                 int indx = zpos + M[2] * (ypos + M[1] * xpos);
                 
                 // specific for force !!!!!!!!
                 q_l[p.id()][indx] = T3;
                 QQQ[indx] += dcomplex(T3, 0.0);
+//if(iii==1 && indx==0){
+//    std::cout<< " QQQQ ins:  "<< T3 << std::endl;
+//}
+        
               }
             }
           }
+
+/*          
+if(iii==1){
+    std::cout<< " QQQQ ins:  "<< QQQ[0] << "   pos: "<< ppos << std::endl;
+}
+ */
+          
         }
+ 
+/*        
+if(iii==1){
+exit(0);
+}
         
-        in_array = reinterpret_cast<fftw_complex*>( &QQQ[0] );
-        fftw_execute(plan);
+if(iii==1){
+  //int indx = 3 + M[2] * (1 + M[1] * 1);
+  for(int jjj=0; jjj<20; jjj++){
+    int indx = jjj + M[2] * (0 + M[1] * 0);
+    std::cout<< " QWQWQWQ:  "<< QQQ[indx] << std::endl;
+  }
+}
+*/
+        //in_array = reinterpret_cast<fftw_complex*>( &QQQ[0] );
+        //fftw_execute(plan);
+        
+        fftw_plan pB;
+        fftw_complex *inB, *outB;
+        int MM[3];
+        for(int i=0;i<3;i++) MM[i] = M[i];
+        inB  = (fftw_complex*) fftw_malloc( MMM * sizeof(fftw_complex));
+        outB = (fftw_complex*) fftw_malloc( MMM * sizeof(fftw_complex));
+        pB = fftw_plan_dft(3, MM, inB, outB, FFTW_FORWARD, FFTW_ESTIMATE);
+        //pB = fftw_plan_dft_1d( MMM, inB, outB, FFTW_FORWARD, FFTW_ESTIMATE);
+        
+        // slow way
+        for(int i=0; i<M[0]; i++){
+          for(int j=0; j<M[1]; j++){
+            for(int k=0; k<M[2]; k++){
+              int indx = k + M[2] * (j + M[1] * i);
+              inB[indx][0] = QQQ[indx].real();
+              inB[indx][1] = QQQ[indx].imag();
+            }
+          }
+        }
+
+        fftw_execute(pB);
+
+        // slow way
+        for(int i=0; i<M[0]; i++){
+          for(int j=0; j<M[1]; j++){
+            for(int k=0; k<M[2]; k++){
+              int indx = k + M[2] * (j + M[1] * i);
+              QQQ[indx] = dcomplex(outB[indx][0], outB[indx][1]);
+            }
+          }
+        }
+
+        fftw_destroy_plan(pB);
+        fftw_free(inB); fftw_free(outB);
+        
         
         /*
         if(iii==1)
@@ -506,17 +570,57 @@ namespace espresso {
               // new definition:
               int indx = k + M[2] * (j + M[1] * i);
               for (int ii=0; ii<3; ii++){
-                phi[ii][indx] =  d_op[ii][i] * gf[indx] * 
-                        swap_complex( conj( QQQ[indx] ) );
+                phi[ii][indx] = d_op[ii][i] * gf[indx] * swap_complex( conj( QQQ[indx] ) );
+                //phi[ii][indx] = d_op[ii][i] * gf[indx] *  conj( QQQ[indx] ) ;
+                //phi[ii][indx] = 0.0;
               }
             }
           }
         }
 
+        /*
         for(int l=0; l<3; l++){
           in_array = reinterpret_cast<fftw_complex*>( &phi[l][0] );
           fftw_execute(plan);
         }
+         */
+
+        fftw_plan pE;
+        fftw_complex *inE, *outE;
+        int MM[3];
+        for(int i=0;i<3;i++) MM[i] = M[i];
+        inE  = (fftw_complex*) fftw_malloc( MMM * sizeof(fftw_complex));
+        outE = (fftw_complex*) fftw_malloc( MMM * sizeof(fftw_complex));
+        pE = fftw_plan_dft( 3, MM, inE, outE, FFTW_BACKWARD, FFTW_ESTIMATE);
+
+        for(int l=0; l<3; l++){
+          // slow way
+          for(int i=0; i<M[0]; i++){
+            for(int j=0; j<M[1]; j++){
+              for(int k=0; k<M[2]; k++){
+                int indx = k + M[2] * (j + M[1] * i);
+                inE[indx][0] = phi[l][indx].real();
+                inE[indx][1] = phi[l][indx].imag();
+              }
+            }
+          }
+
+          fftw_execute(pE);
+
+          // slow way
+          for(int i=0; i<M[0]; i++){
+            for(int j=0; j<M[1]; j++){
+              for(int k=0; k<M[2]; k++){
+                int indx = k + M[2] * (j + M[1] * i);
+                phi[l][indx] = dcomplex(outE[indx][0], outE[indx][1]);
+              }
+            }
+          }
+
+        }
+        fftw_destroy_plan(pE);
+        fftw_free(inE); fftw_free(outE);
+
         
         int iii = 0;
         for(iterator::CellListIterator it(realCells); it.isValid(); ++it){
@@ -589,7 +693,7 @@ namespace espresso {
       }
       
       
-      real asignment_f(real x, int k, int P) {
+      real asignment_f1(real x, int k, int P) {
         esutil::Error err(system->comm);
         stringstream msg;
         if(P<1 || P>7){
@@ -607,6 +711,94 @@ namespace espresso {
         }
         return res;
       }
+       
+      real asignment_f2(int i, real x, int P) {
+      mpi::communicator communic = *system->comm;
+      int this_node = communic.rank();
+      switch (P) {
+        case 1 : return 1.0;
+        case 2 : {
+          switch (i) {
+          case 0: return 0.5-x;
+          case 1: return 0.5+x;
+          default:
+            fprintf(stderr,"%d: Tried to access charge assignment "
+                    "function of degree %d in scheme of order %d.\n",this_node,i,P);
+            return 0.0;
+          }
+        }
+        case 3 : {
+          switch (i) {
+          case 0: return 0.5 * (0.5 - x);
+          case 1: return 0.75 - pow(x, 2);
+          case 2: return 0.5 * pow(0.5 + x, 2);
+          default:
+            fprintf(stderr,"%d: Tried to access charge assignment function"
+                    " of degree %d in scheme of order %d.\n",this_node,i,P);
+            return 0.0;
+          }
+        case 4 : {
+          switch (i) {
+          case 0: return ( 1.0+x*( -6.0+x*( 12.0-x* 8.0)))/48.0;
+          case 1: return (23.0+x*(-30.0+x*(-12.0+x*24.0)))/48.0;
+          case 2: return (23.0+x*( 30.0+x*(-12.0-x*24.0)))/48.0;
+          case 3: return ( 1.0+x*(  6.0+x*( 12.0+x* 8.0)))/48.0;
+          default:
+            fprintf(stderr,"%d: Tried to access charge assignment function"
+                    " of degree %d in scheme of order %d.\n",this_node,i,P);
+            return 0.0;
+          }
+        }
+        case 5 : {
+          switch (i) {
+          case 0: return (  1.0+x*( -8.0+x*(  24.0+x*(-32.0+x*16.0))))/384.0;
+          case 1: return ( 19.0+x*(-44.0+x*(  24.0+x*( 16.0-x*16.0))))/ 96.0;
+          case 2: return (115.0+x*       x*(-120.0+x*       x*48.0))  /192.0;
+          case 3: return ( 19.0+x*( 44.0+x*(  24.0+x*(-16.0-x*16.0))))/ 96.0;
+          case 4: return (  1.0+x*(  8.0+x*(  24.0+x*( 32.0+x*16.0))))/384.0;
+          default:
+            fprintf(stderr,"%d: Tried to access charge assignment function"
+                    " of degree %d in scheme of order %d.\n",this_node,i,P);
+            return 0.0;
+          }
+        }
+        case 6 : {
+          switch (i) {
+          case 0: return (  1.0+x*( -10.0+x*(  40.0+x*( -80.0+x*(  80.0-x* 32.0)))))/3840.0;
+          case 1: return (237.0+x*(-750.0+x*( 840.0+x*(-240.0+x*(-240.0+x*160.0)))))/3840.0;
+          case 2: return (841.0+x*(-770.0+x*(-440.0+x*( 560.0+x*(  80.0-x*160.0)))))/1920.0;
+          case 3: return (841.0+x*(+770.0+x*(-440.0+x*(-560.0+x*(  80.0+x*160.0)))))/1920.0;
+          case 4: return (237.0+x*( 750.0+x*( 840.0+x*( 240.0+x*(-240.0-x*160.0)))))/3840.0;
+          case 5: return (  1.0+x*(  10.0+x*(  40.0+x*(  80.0+x*(  80.0+x* 32.0)))))/3840.0;
+          default:
+            fprintf(stderr,"%d: Tried to access charge assignment function"
+                    " of degree %d in scheme of order %d.\n", this_node, i, P);
+            return 0.0;
+          }
+        }
+        case 7 : {
+          switch (i) {
+          case 0: return (    1.0+x*(   -12.0+x*(   60.0+x*( -160.0+x*(  240.0+x*(-192.0+x* 64.0))))))/46080.0;
+          case 1: return (  361.0+x*( -1416.0+x*( 2220.0+x*(-1600.0+x*(  240.0+x*( 384.0-x*192.0))))))/23040.0;
+          case 2: return (10543.0+x*(-17340.0+x*( 4740.0+x*( 6880.0+x*(-4080.0+x*(-960.0+x*960.0))))))/46080.0;
+          case 3: return ( 5887.0+x*          x*(-4620.0+x*         x*( 1680.0-x*        x*320.0)))   /11520.0;
+          case 4: return (10543.0+x*( 17340.0+x*( 4740.0+x*(-6880.0+x*(-4080.0+x*( 960.0+x*960.0))))))/46080.0;
+          case 5: return (  361.0+x*(  1416.0+x*( 2220.0+x*( 1600.0+x*(  240.0+x*(-384.0-x*192.0))))))/23040.0;
+          case 6: return (    1.0+x*(    12.0+x*(   60.0+x*(  160.0+x*(  240.0+x*( 192.0+x* 64.0))))))/46080.0;
+          default:
+            fprintf(stderr,"%d: Tried to access charge assignment function"
+                    " of degree %d in scheme of order %d.\n", this_node, i, P);
+            return 0.0;
+          }
+        }
+        default :{
+          fprintf(stderr,"%d: Charge assignment order %d unknown.\n",this_node, P);
+          return 0.0;
+        }
+        }
+      }
+    }
+                                                                  
       
     protected:
       // it's responsible for the k vector recalculation when the box size changes

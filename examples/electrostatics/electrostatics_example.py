@@ -27,13 +27,32 @@ import espresso
 from espresso import Real3D
 
 # initial parameters
-N = 10                 # number of particles on lattice site
+N = 2                 # number of particles on lattice site
 num_particles = N**3   # total number of particles 
-rho = 0.5              # number density of particles, number of particles devided by volume
+rho = 0.0079999999              # number density of particles, number of particles devided by volume
 
 # creating a cubic NaCl crystal
-print 'Creating a simple cubic structure...'
-x, y, z, Lx, Ly, Lz = espresso.tools.init_cfg.lattice.createCubic(num_particles, rho)
+#print 'Creating a simple cubic structure...'
+#x, y, z, Lx, Ly, Lz = espresso.tools.init_cfg.lattice.createCubic(num_particles, rho)
+
+x = []
+y = []
+z = []
+for i in range(0,8):
+  x.append(0.0)
+  y.append(0.0)
+  z.append(0.0)
+
+x[0]=4.159994;   y[0]=0.919649;   z[0]=7.564105
+x[1]=5.297002;   y[1]=9.304365;   z[1]=3.835021
+x[2]=6.539190;   y[2]=0.668422;   z[2]=7.226604
+x[3]=6.711494;   y[3]=3.834157;   z[3]=6.316347
+x[4]=8.847071;   y[4]=5.194164;   z[4]=6.515186
+x[5]=2.377744;   y[5]=2.624530;   z[5]=7.621980
+x[6]=7.533558;   y[6]=9.092081;   z[6]=0.726859
+x[7]=2.727100;   y[7]=8.976563;   z[7]=2.749068
+
+Lx = Ly = Lz = 10.0
 
 # creating the system box
 box = (Lx, Ly, Lz)
@@ -161,7 +180,8 @@ systemPPPM.addInteraction(p3m_int)
 
 hhh = ( p3m_int.computeEnergy() + coulombR_intPPPM.computeEnergy() )
 ### Integrators for Ewald and PPPM
-print '   AAAenergyPPP: ', hhh, p3m_int.computeEnergy(), coulombR_intPPPM.computeEnergy()
+print '   PPP_energy: ', hhh, p3m_int.computeEnergy(), coulombR_intPPPM.computeEnergy()
+print '   Ewald_energy: ', ewaldK_int.computeEnergy(), coulombR_intEwald.computeEnergy()
 
 # creating the integrator which based on the Verlet algorithm
 integratorEwald    = espresso.integrator.VelocityVerlet(systemEwald)
@@ -181,11 +201,20 @@ integratorPPPM.run(0)
 print ('\n    Difference between forces calculated by Ewald summation and PPPM (first 6 particles)')
 print ('%3s %20s %20s %20s\n' % ('id', 'dfx', 'dfy', 'dfz'))
 
-for j in range(0, 6):
+sock = espresso.tools.vmd.connect(systemPPPM)
+espresso.tools.vmd.imd_positions(systemPPPM, sock)
+
+for j in range(0, num_particles):
+  print 'position:', j, systemPPPM.storage.getParticle(j).pos, '   ', systemEwald.storage.getParticle(j).pos
+  
+  
+for j in range(0, num_particles):
   print ( '%3d     %3.17f     %3.17f     %3.17f' % (j, \
     abs(systemEwald.storage.getParticle(j).f.x - systemPPPM.storage.getParticle(j).f.x), \
     abs(systemEwald.storage.getParticle(j).f.y - systemPPPM.storage.getParticle(j).f.y), \
     abs(systemEwald.storage.getParticle(j).f.z - systemPPPM.storage.getParticle(j).f.z)) )
+  
+  print 'force:', systemPPPM.storage.getParticle(j).f, '   ', systemEwald.storage.getParticle(j).f
 
 #print 'no energy calc'
 #exit(0)
