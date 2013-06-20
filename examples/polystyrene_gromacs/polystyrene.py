@@ -19,8 +19,8 @@ from espresso.tools import timers
 
 
 # simulation parameters (nvt = False is nve)
-steps = 10000
-check = steps/100
+steps = 1 
+check = steps
 rc    = 1.1  # Verlet list cutoff
 skin  = 0.3
 timestep = 0.0004
@@ -89,7 +89,7 @@ potentials = genTabPotentials(tabfilesnb)
 ######################################################################
 ##  IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE  ##
 ######################################################################
-types, bonds, angles, dihedrals, x, y, z, vx, vy, vz, Lx, Ly, Lz = gromacs.read(grofile, topfile)
+defaults, types, masses, charges, atomtypeparameters, bondtypes, bondtypeparams, angletypes, angletypeparams, dihedraltypes, dihedraltypeparams, exclusions, x, y, z, vx, vy, vz, Lx, Ly, Lz = gromacs.read(grofile, topfile)
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
@@ -120,43 +120,51 @@ system.storage.decompose()
 # Tabulated Verlet list for non-bonded interactions
 vl = espresso.VerletList(system, cutoff = rc + system.skin)
 internb = espresso.interaction.VerletListTabulated(vl)
-system = gromacs.setInteractions(potentials, particleTypes, system, internb)
+gromacs.setTabulatedInteractions(potentials, particleTypes, system, internb)
+
+vl.exclude(exclusions)
 
 
 # bonded 2-body interactions
-for k, v in bonds.iteritems(): # k is number of potential table, v is bondlist
-    fpl = espresso.FixedPairList(system.storage)
-    fpl.addBonds(v)
-    fg = "table_b"+k+".xvg"
-    fe = fg.split(".")[0]+".tab" # name of espresso file
-    gromacs.convertTable(fg, fe, sigma, epsilon, c6, c12)
-    potTab = espresso.interaction.Tabulated(itype=spline, filename=fe)
-    interb = espresso.interaction.FixedPairListTabulated(system, fpl, potTab)
-    system.addInteraction(interb)
+bondedinteractions=gromacs.setBondedInteractions(system, bondtypes, bondtypeparams)
+# alternative, manual way for setting up bonded interactions
+#for k, v in bonds.iteritems(): # k is number of potential table, v is bondlist
+#    fpl = espresso.FixedPairList(system.storage)
+#    fpl.addBonds(v)
+#    fg = "table_b"+k+".xvg"
+#    fe = fg.split(".")[0]+".tab" # name of espresso file
+#    gromacs.convertTable(fg, fe, sigma, epsilon, c6, c12)
+#    potTab = espresso.interaction.Tabulated(itype=spline, filename=fe)
+#    interb = espresso.interaction.FixedPairListTabulated(system, fpl, potTab)
+#    system.addInteraction(interb)
 
 
 # bonded 3-body interactions
-for k, v in angles.iteritems(): # k is number of potential table, v is anglelist
-    ftl = espresso.FixedTripleList(system.storage)
-    ftl.addTriples(v)
-    fg = "table_a"+k+".xvg"
-    fe = fg.split(".")[0]+".tab" # name of espresso file
-    gromacs.convertTable(fg, fe, sigma, epsilon, c6, c12)
-    potTab = espresso.interaction.TabulatedAngular(itype=spline, filename=fe)
-    intera = espresso.interaction.FixedTripleListTabulatedAngular(system, ftl, potTab)
-    system.addInteraction(intera)
+angleinteractions=gromacs.setAngleInteractions(system, angletypes, angletypeparams)
+# alternative, manual way for setting up angular interactions
+#for k, v in angles.iteritems(): # k is number of potential table, v is anglelist
+#    ftl = espresso.FixedTripleList(system.storage)
+#    ftl.addTriples(v)
+#    fg = "table_a"+k+".xvg"
+#    fe = fg.split(".")[0]+".tab" # name of espresso file
+#    gromacs.convertTable(fg, fe, sigma, epsilon, c6, c12)
+#    potTab = espresso.interaction.TabulatedAngular(itype=spline, filename=fe)
+#    intera = espresso.interaction.FixedTripleListTabulatedAngular(system, ftl, potTab)
+#    system.addInteraction(intera)
     
 
 # bonded 4-body interactions
-for k, v in dihedrals.iteritems(): # k is number of potential table, v is anglelist
-    fql = espresso.FixedQuadrupleList(system.storage)
-    fql.addQuadruples(v)
-    fg = "table_d"+k+".xvg"
-    fe = fg.split(".")[0]+".tab" # name of espresso file
-    gromacs.convertTable(fg, fe, sigma, epsilon, c6, c12)
-    potTab = espresso.interaction.TabulatedDihedral(itype=spline, filename=fe)
-    interd = espresso.interaction.FixedQuadrupleListTabulatedDihedral(system, fql, potTab)
-    system.addInteraction(interd)
+dihedralinteractions=gromacs.setDihedralInteractions(system, dihedraltypes, dihedraltypeparams)
+# alternative, manual way for setting up dihedral interactions:
+#for k, v in dihedrals.iteritems(): # k is number of potential table, v is anglelist
+#    fql = espresso.FixedQuadrupleList(system.storage)
+#    fql.addQuadruples(v)
+#    fg = "table_d"+k+".xvg"
+#    fe = fg.split(".")[0]+".tab" # name of espresso file
+#    gromacs.convertTable(fg, fe, sigma, epsilon, c6, c12)
+#    potTab = espresso.interaction.TabulatedDihedral(itype=spline, filename=fe)
+#    interd = espresso.interaction.FixedQuadrupleListTabulatedDihedral(system, fql, potTab)
+#    system.addInteraction(interd)
 
 
 
@@ -206,27 +214,35 @@ P = 0
 Pij = [0,0,0,0,0,0]
 Ek = 0.5 * T * (3 * num_particles)
 Ep = internb.computeEnergy()
-Eb = interb.computeEnergy()
-Ea = intera.computeEnergy()
-Ed = interd.computeEnergy()
+Eb, Ea, Ed=0,0,0
+for bd in bondedinteractions.values():Eb+=bd.computeEnergy()
+for ang in angleinteractions.values(): Ea+=ang.computeEnergy()
+for dih in dihedralinteractions.values(): Ed+=dih.computeEnergy()
+
 Etotal = Ek + Ep + Eb + Ea + Ed
 sys.stdout.write(' step     T          P          Pxy        etotal      ekinetic      epair         ebond       eangle       edihedral\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea, Ed))
 
 start_time = time.clock()
 
+espresso.tools.pdb.pdbwrite("traj.pdb", system, append=False)
+
 for i in range(check):
+
     integrator.run(steps/check) # print out every steps/check steps
     T = temperature.compute()
     P = pressure.compute()
     Pij = pressureTensor.compute()
     Ek = 0.5 * T * (3 * num_particles)
     Ep = internb.computeEnergy()
-    Eb = interb.computeEnergy()
-    Ea = intera.computeEnergy()
-    Ed = interd.computeEnergy()
+    
+    Eb, Ea, Ed=0,0,0
+    for bd in bondedinteractions.values():Eb+=bd.computeEnergy()
+    for ang in angleinteractions.values(): Ea+=ang.computeEnergy()
+    for dih in dihedralinteractions.values(): Ed+=dih.computeEnergy()
     Etotal = Ek + Ep + Eb + Ea + Ed
     sys.stdout.write(fmt % ((i+1)*(steps/check), T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea, Ed))
+    #espresso.tools.pdb.pdbwrite("traj.pdb", system, append=True)
     #sys.stdout.write('\n')
 
 # print timings and neighbor list information

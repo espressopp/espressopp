@@ -60,7 +60,7 @@ topfile = "topol.top"
 ######################################################################
 ##  IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE  ##
 ######################################################################
-types, bonds, angles, x, y, z, Lx, Ly, Lz = gromacs.read(grofile, topfile)
+defaults, types, masses, charges, atomtypeparameters, bondtypes, bondtypeparams, angletypes, angletypeparams, exclusions, x, y, z, Lx, Ly, Lz= gromacs.read(grofile, topfile)
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
@@ -96,7 +96,11 @@ gromacs.convertTable(tab3bg, tab3b, sigma, epsilon, c6, c12)
 # non-bonded interactions, B is type 0, A is type 1
 # Verlet list
 vl = espresso.VerletList(system, cutoff = rc + system.skin)
-vl.exclude(bonds['1']) # intramolecular
+# note: in the previous version of this example, exclusions were treated
+# incorrectly. Here the nrexcl=3 parameter is taken into account 
+# which excludes all neighbors up to 3 bonds away
+vl.exclude(exclusions)
+
 internb = espresso.interaction.VerletListTabulated(vl)
 # A-A with Verlet list      
 potTab = espresso.interaction.Tabulated(itype=spline, filename=tabAA, cutoff=rcaa)
@@ -112,18 +116,23 @@ system.addInteraction(internb)
 
 
 # 2-body bonded interactions
-fpl = espresso.FixedPairList(system.storage)
-fpl.addBonds(bonds['1'])
-potTab = espresso.interaction.Tabulated(itype=spline, filename=tab2b)
-interb = espresso.interaction.FixedPairListTabulated(system, fpl, potTab)
-system.addInteraction(interb)
+bondedinteractions=gromacs.setBondedInteractions(system, bondtypes, bondtypeparams)
+#This could also be done manually:
+#fpl = espresso.FixedPairList(system.storage)
+#fpl.addBonds(bonds['1'])
+#potTab = espresso.interaction.Tabulated(itype=spline, filename=tab2b)
+#interb = espresso.interaction.FixedPairListTabulated(system, fpl, potTab)
+#system.addInteraction(interb)
 
 # 3-body bonded interactions
-ftl = espresso.FixedTripleList(system.storage)
-ftl.addTriples(angles['1'])
-potTab = espresso.interaction.TabulatedAngular(itype=spline, filename = tab3b)
-intera = espresso.interaction.FixedTripleListTabulatedAngular(system, ftl, potTab)
-system.addInteraction(intera)
+angleinteractions=gromacs.setAngleInteractions(system, angletypes, angletypeparams)
+
+#This could also be done manually:
+#ftl = espresso.FixedTripleList(system.storage)
+#ftl.addTriples(angles['1'])
+#potTab = espresso.interaction.TabulatedAngular(itype=spline, filename = tab3b)
+#intera = espresso.interaction.FixedTripleListTabulatedAngular(system, ftl, potTab)
+#system.addInteraction(intera)
 
 
 
@@ -170,8 +179,8 @@ Ek = 0.5 * T * (3 * num_particles)
 #Epab = interab.computeEnergy()
 #Epbb = interbb.computeEnergy()
 Epnb = internb.computeEnergy()
-Eb = interb.computeEnergy()
-Ea = intera.computeEnergy()
+Eb = bondedinteractions[0].computeEnergy()
+Ea = angleinteractions[0].computeEnergy()
 Etotal = Ek + Epnb + Eb + Ea
 sys.stdout.write(' step     T          P          Pxy        etotal      ekinetic      epair        ebond       eangle\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Epnb, Eb, Ea))
@@ -185,8 +194,8 @@ for i in range(check):
     Pij = pressureTensor.compute()
     Ek = 0.5 * T * (3 * num_particles)
     Epnb = internb.computeEnergy()
-    Eb = interb.computeEnergy()
-    Ea = intera.computeEnergy()
+    Eb = bondedinteractions[0].computeEnergy()
+    Ea = angleinteractions[0].computeEnergy()
     Etotal = Ek + Epnb + Eb + Ea
     sys.stdout.write(fmt % ((i+1)*(steps/check), T, P, Pij[3], Etotal, Ek, Epnb, Eb, Ea))
     #sys.stdout.write('\n')

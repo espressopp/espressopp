@@ -12,14 +12,14 @@ from _espresso import interaction_ReactionFieldGeneralized, \
 
 class ReactionFieldGeneralizedLocal(PotentialLocal, interaction_ReactionFieldGeneralized):
     'The (local) ReactionFieldGeneralized potential.'
-    def __init__(self, qq=0.0, kappa=0.0, epsilon1=1.0, epsilon2=80.0, cutoff=infinity, shift="auto"):
+    def __init__(self, prefactor=1.0, kappa=0.0, epsilon1=1.0, epsilon2=80.0, cutoff=infinity, shift="auto"):
         """Initialize the local ReactionFieldGeneralized object."""
         if shift =="auto":
             if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-                cxxinit(self, interaction_ReactionFieldGeneralized, qq, kappa, epsilon1, epsilon2, cutoff)
+                cxxinit(self, interaction_ReactionFieldGeneralized, prefactor, kappa, epsilon1, epsilon2, cutoff)
         else:
             if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-                cxxinit(self, interaction_ReactionFieldGeneralized, qq, kappa, epsilon1, epsilon2, cutoff, shift)
+                cxxinit(self, interaction_ReactionFieldGeneralized, prefactor, kappa, epsilon1, epsilon2, cutoff, shift)
 
 class VerletListReactionFieldGeneralizedLocal(InteractionLocal, interaction_VerletListReactionFieldGeneralized):
     'The (local) ReactionFieldGeneralized interaction using Verlet lists.'
@@ -91,7 +91,7 @@ if pmi.isController:
         'The ReactionFieldGeneralized potential.'
         pmiproxydefs = dict(
             cls = 'espresso.interaction.ReactionFieldGeneralizedLocal',
-            pmiproperty = ['qq']
+            pmiproperty = ['prefactor']#['qq']
             )
         
     class VerletListReactionFieldGeneralized(Interaction):
