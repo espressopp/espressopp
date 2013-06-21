@@ -88,17 +88,23 @@ namespace espresso {
       real* Z;
       Z = new real[M];
       
-      int perc=0, perc1=0;
+      cout<< "calculating autocorrelation.." << endl;
+      int perc=0;
+      real denom = 100.0 / (real)(max_m-min_m);
       for(unsigned int m=min_m; m<max_m; m++){
         Z[m] = 0.0;
         for(unsigned int n=0; n<M-m; n++){
           Z[m] += getValue(n + m) *  getValue(n);
         }
+        
+        /*
+         * additional calculations slow down routine but from the other hand
+         * it helps to monitor progress
+         */
         if(system.comm->rank()==0){
-          perc = (int)(100*(real)m/(real)(max_m-min_m));
-          if(perc>perc1){
+          perc = (int)(m*denom);
+          if(perc%5==0){
             cout<<"calculation progress (autocorrelation): "<< perc << " %\r" <<flush;
-            perc1=perc;
           }
         }
       }

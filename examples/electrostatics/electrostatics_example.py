@@ -201,8 +201,8 @@ integratorPPPM.run(0)
 print ('\n    Difference between forces calculated by Ewald summation and PPPM (first 6 particles)')
 print ('%3s %20s %20s %20s\n' % ('id', 'dfx', 'dfy', 'dfz'))
 
-sock = espresso.tools.vmd.connect(systemPPPM)
-espresso.tools.vmd.imd_positions(systemPPPM, sock)
+#sock = espresso.tools.vmd.connect(systemPPPM)
+#espresso.tools.vmd.imd_positions(systemPPPM, sock)
 
 for j in range(0, num_particles):
   print 'position:', j, systemPPPM.storage.getParticle(j).pos, '   ', systemEwald.storage.getParticle(j).pos

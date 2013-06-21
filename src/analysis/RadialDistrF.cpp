@@ -68,7 +68,8 @@ namespace espresso {
       
       if(maxi>num_part) maxi = num_part;
       
-      int perc=0, perc1=0;
+      int perc=0;
+      real denom = 100.0 / (real)(maxi-mini);
       for(int i = mini; i<maxi; i++){
         Real3D coordP1 = config->getCoordinates(i);
         for(int j = i+1; j<num_part; j++){
@@ -87,16 +88,20 @@ namespace espresso {
           }
           
         }
+        /*
+         * additional calculations slow down routine but from the other hand
+         * it helps to monitor progress
+         */
         if(system.comm->rank()==0){
-          perc = (int)(100*(real)(i-mini)/(real)(maxi-mini));
-          if(perc>perc1){
+          perc = (int)((i-mini)*denom);
+          if(perc%5==0){
             cout<<"calculation progress (radial distr. func.): "<< perc << " %\r"<<flush;
-            perc1 = perc;
           }
         }
+        
       }
       if(system.comm->rank()==0)
-        cout<<"calculation progress (radial distr. func.): "<< 100 << " %" <<endl;
+        cout<<"calculation progress (radial distr. func.): 100 %" <<endl;
 
       real totHistogram[rdfN];
       boost::mpi::all_reduce(*system.comm, histogram, rdfN, totHistogram, plus<real>());

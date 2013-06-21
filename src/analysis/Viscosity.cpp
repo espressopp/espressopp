@@ -17,7 +17,7 @@ namespace espresso {
       python::list auto_pxy_pxy_py = Autocorrelation::compute();
       size_t M = getListSize();
       
-      cout << "M: "<< M << endl;
+      cout << "Size of array: " << M << endl;
       
       real* auto_pxy_pxy = new real[M];
       
@@ -69,13 +69,13 @@ namespace espresso {
       if(this_node==0)
         cout<<"integration..." <<endl;
 
-      real SUM = (auto_pxy_pxy[0]+auto_pxy_pxy[min_m])/2.;
+      real SUM = (auto_pxy_pxy[0]+auto_pxy_pxy[min_m]) * 0.5;
       for (int j=1; j<min_m; j++)
         SUM += auto_pxy_pxy[j];
 
       integr.append( python::make_tuple(t0+min_m*dt, SUM*dt) );
       for(int i=min_m+1; i<max_m; i++){
-        SUM += (auto_pxy_pxy[i-1]+auto_pxy_pxy[i])/2.;
+        SUM += (auto_pxy_pxy[i-1]+auto_pxy_pxy[i]) * 0.5;
         integr.append( python::make_tuple(t0+i*dt, SUM*dt) );
       }
 

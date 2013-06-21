@@ -21,7 +21,8 @@ namespace espresso {
       
       System& system = getSystemRef();
  
-      int perc=0, perc1=0;
+      int perc=0;
+      real denom = 100.0 / (real)M;
       for(int m=0; m<M; m++){
         totZ[m] = 0.0;
         Z[m] = 0.0;
@@ -38,16 +39,19 @@ namespace espresso {
           }
           
         }
+        /*
+         * additional calculations slow down routine but from the other hand
+         * it helps to monitor progress
+         */
         if(system.comm->rank()==0){
-          perc = (int)(100*(real)m/(real)M);
-          if(perc>perc1){
+          perc = (int)(m*denom);
+          if(perc%5==0){
             cout<<"calculation progress (velocity autocorrelation): "<< perc << " %\r"<<flush;
-            perc1 = perc;
           }
         }
       }
       if(system.comm->rank()==0)
-        cout<<"calculation progress (velocity autocorrelation): "<< (int)(100*(real)M/(real)M) << " %" <<endl;
+        cout<<"calculation progress (velocity autocorrelation): 100 %" <<endl;
       
       boost::mpi::all_reduce( *system.comm, Z, M, totZ, plus<real>() );
       
