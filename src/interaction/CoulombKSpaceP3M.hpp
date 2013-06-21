@@ -93,6 +93,7 @@ namespace espresso {
       // fftw elements
       fftw_complex *in_array;
       fftw_plan plan;
+      int MM[3]; // auxiliary array for plan generation
       
       //real oddeven1, oddeven2; // supporting variables odd/even interpolation order
     public:
@@ -113,6 +114,7 @@ namespace espresso {
       void preset(){
         sysL = system -> bc -> getBoxL();
         MMM = M[0] * M[1] * M[2];
+        for(int i=0; i<3; i++) MM[i] = M[i];
       }
       
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -375,10 +377,10 @@ namespace espresso {
       }
       
       void set_fftw(){
-        int MM[3];
-        for(int i=0; i<3; i++) MM[i] = M[i];
-        
         in_array = (fftw_complex*) fftw_malloc( MMM * sizeof(fftw_complex));
+        set_plan();
+      }
+      void set_plan(){
         plan = fftw_plan_dft(3, MM, in_array, in_array, FFTW_FORWARD, FFTW_ESTIMATE);
       }
       void clean_fftw(){
@@ -401,8 +403,6 @@ namespace espresso {
         // TODO sysL[0]?? what about [1] and [2]?
         energy *= ( C_pref * sysL[0] / (4.0*MMM*M_PIl) );
 
-std::cout<< "\n energy: " << energy << std::endl;
-        
         // self energy and net charge correction: 
         energy -= C_pref * ( sum_q2 * alpha / sqrt(M_PIl)  +  
                         sumq_2 * M_PIl / (2.0* sysL[0]*sysL[1]*sysL[2] *pow(alpha,2)) );
@@ -431,7 +431,6 @@ std::cout<< "\n energy: " << energy << std::endl;
         g_ca.clear();
         g_ca = vector<Int3D>(nParticles, Int3D(0) );
         QQQ.clear();
-        //QQQ.reserve(M[0]*M[1]*M[2]);
         QQQ = vector<dcomplex>(MMM, dcomplex(0.0));
         
         //std::cout<< "QQQ.size(): "<< QQQ.size()<< "  i="<< iii << std::endl;
@@ -471,17 +470,12 @@ if(iii==1){
               for (int l = 0; l < P; l++) {
                 int zpos = (Gi[2] + l) % M[2];
                 T3 = T2 * precalc_interp_caf[l][arg[2]];
-/*                
-if(iii==1 && p.id()==0){
-     ccc++;
-    if(ccc>20) exit(0);
-    std::cout<< "T3: "<< T3 << " arg:  "<< arg << "   PPP: "<< ppos << std::endl;
-}
- */
+                
                 int indx = zpos + M[2] * (ypos + M[1] * xpos);
                 
                 // specific for force !!!!!!!!
                 q_l[p.id()][indx] = T3;
+                
                 QQQ[indx] += dcomplex(T3, 0.0);
 //if(iii==1 && indx==0){
 //    std::cout<< " QQQQ ins:  "<< T3 << std::endl;
@@ -491,70 +485,18 @@ if(iii==1 && p.id()==0){
             }
           }
 
-/*          
-if(iii==1){
-    std::cout<< " QQQQ ins:  "<< QQQ[0] << "   pos: "<< ppos << std::endl;
-}
- */
-          
         }
  
+        in_array = reinterpret_cast<fftw_complex*>( &QQQ[0] );
+        set_plan();
+        fftw_execute(plan);
+  
 /*        
 if(iii==1){
-exit(0);
+  std::cout<< " QQQ posle:  "<< QQQ[10] << std::endl;
+  exit(0);
 }
-        
-if(iii==1){
-  //int indx = 3 + M[2] * (1 + M[1] * 1);
-  for(int jjj=0; jjj<20; jjj++){
-    int indx = jjj + M[2] * (0 + M[1] * 0);
-    std::cout<< " QWQWQWQ:  "<< QQQ[indx] << std::endl;
-  }
-}
-*/
-        //in_array = reinterpret_cast<fftw_complex*>( &QQQ[0] );
-        //fftw_execute(plan);
-        
-        fftw_plan pB;
-        fftw_complex *inB, *outB;
-        int MM[3];
-        for(int i=0;i<3;i++) MM[i] = M[i];
-        inB  = (fftw_complex*) fftw_malloc( MMM * sizeof(fftw_complex));
-        outB = (fftw_complex*) fftw_malloc( MMM * sizeof(fftw_complex));
-        pB = fftw_plan_dft(3, MM, inB, outB, FFTW_FORWARD, FFTW_ESTIMATE);
-        //pB = fftw_plan_dft_1d( MMM, inB, outB, FFTW_FORWARD, FFTW_ESTIMATE);
-        
-        // slow way
-        for(int i=0; i<M[0]; i++){
-          for(int j=0; j<M[1]; j++){
-            for(int k=0; k<M[2]; k++){
-              int indx = k + M[2] * (j + M[1] * i);
-              inB[indx][0] = QQQ[indx].real();
-              inB[indx][1] = QQQ[indx].imag();
-            }
-          }
-        }
-
-        fftw_execute(pB);
-
-        // slow way
-        for(int i=0; i<M[0]; i++){
-          for(int j=0; j<M[1]; j++){
-            for(int k=0; k<M[2]; k++){
-              int indx = k + M[2] * (j + M[1] * i);
-              QQQ[indx] = dcomplex(outB[indx][0], outB[indx][1]);
-            }
-          }
-        }
-
-        fftw_destroy_plan(pB);
-        fftw_free(inB); fftw_free(outB);
-        
-        
-        /*
-        if(iii==1)
-          exit(0);
-         */
+ */
       }
 
       // @TODO this function could be void, 
@@ -563,14 +505,18 @@ if(iii==1){
         common_part(realCells, 0);
         
         // Calculate the supporting arrays phi_?_??:
-        for (int i=0; i<M[0]; i++){
-          for (int j=0; j<M[1]; j++){
-            for (int k=0; k<M[2]; k++) {  
+        Int3D i;
+        for ( i[0]=0; i[0]<M[0]; i[0]++){
+          for ( i[1]=0; i[1]<M[1]; i[1]++){
+            for ( i[2]=0; i[2]<M[2]; i[2]++) {  
 
               // new definition:
-              int indx = k + M[2] * (j + M[1] * i);
+              int indx = i[2] + M[2] * (i[1] + M[1] * i[0]);
+              
+              dcomplex phi_aux = gf[indx] * swap_complex( conj( QQQ[indx] ) );
+              
               for (int ii=0; ii<3; ii++){
-                phi[ii][indx] = d_op[ii][i] * gf[indx] * swap_complex( conj( QQQ[indx] ) );
+                phi[ii][indx] = d_op[ii][i[ii]] * phi_aux;
                 //phi[ii][indx] = d_op[ii][i] * gf[indx] *  conj( QQQ[indx] ) ;
                 //phi[ii][indx] = 0.0;
               }
@@ -587,8 +533,6 @@ if(iii==1){
 
         fftw_plan pE;
         fftw_complex *inE, *outE;
-        int MM[3];
-        for(int i=0;i<3;i++) MM[i] = M[i];
         inE  = (fftw_complex*) fftw_malloc( MMM * sizeof(fftw_complex));
         outE = (fftw_complex*) fftw_malloc( MMM * sizeof(fftw_complex));
         pE = fftw_plan_dft( 3, MM, inE, outE, FFTW_BACKWARD, FFTW_ESTIMATE);
@@ -628,6 +572,8 @@ if(iii==1){
           
           Real3D fff(0.0);
           
+          real C_MMM_inv = C_pref / (real)MMM;
+          
           for (int i = 0; i < P; i++) {
             int xpos = (g_ca[iii][0] + i) % M[0];
             for (int j = 0; j < P; j++) {
@@ -641,7 +587,7 @@ if(iii==1){
                                 phi[1][indx].real(),
                                 phi[2][indx].real());
 
-                fff += C_pref * q_l[p.id()][indx]  *  fff_add / (real)MMM;
+                fff += C_MMM_inv * q_l[p.id()][indx]  *  fff_add ;
               }
             }
           }
