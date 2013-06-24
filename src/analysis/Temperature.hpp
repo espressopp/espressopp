@@ -69,7 +69,9 @@ namespace espresso {
       
       mpi::all_reduce(*getSystem()->comm, v2sum, sumT, std::plus<real>());
       mpi::all_reduce(*getSystem()->comm, myN, systemN, std::plus<int>());
-
+        
+      //std::cout << "Count in Temperature calculation: " << systemN << std::endl;
+      //std::cout << "sumT in Temperature calculation: " << sumT << std::endl;
       return sumT / (3.0 * systemN); 
       }
 

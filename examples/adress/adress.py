@@ -60,7 +60,7 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
 # tabulated morse potential used for CG interactions
 tabMorse = "pot-morse.txt"
 potMorse = espresso.interaction.Morse(epsilon=0.105, alpha=2.4, rMin=rc, cutoff=rc, shift="auto")
-writeTabFile(potMorse, tabMorse, N=512, low=0.005, high=rc)
+writeTabFile(potMorse, tabMorse, N=512, low=0.005, high=4.5)
 
 
 

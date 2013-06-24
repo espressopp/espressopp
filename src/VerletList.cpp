@@ -74,7 +74,7 @@ namespace espresso {
       checkPair(*it->first, *it->second);
       LOG4ESPP_DEBUG(theLogger, "checking particles " << it->first->id() << " and " << it->second->id());
     }
-
+    
     builds++;
     LOG4ESPP_DEBUG(theLogger, "rebuilt VerletList (count=" << builds << "), cutsq = " << cutsq
                  << " local size = " << vlPairs.size());

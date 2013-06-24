@@ -122,13 +122,14 @@ namespace espresso {
                     }
                 }
           }
-          std::cout  << "rebuild:!!!! adrZone count: " << adrZone.size() << std::endl;
+          //std::cout  << "rebuild:!!!! adrZone count: " << adrZone.size() << std::endl;
       }
       // center of adress zone is fixed
       else {
           for (CellListIterator it(localcells); it.isValid(); ++it) {
               //Real3D dist = it->getPos() - adrCenter;                                   					        // CHANGE FOR X SPLIT VS SPHERE
-	      real dist = it->getPos()[0] - adrCenter[0];                                  					        // CHANGE FOR X SPLIT VS SPHERE
+	      // TODO: USE PBC!
+              real dist = it->getPos()[0] - adrCenter[0];                                  					        // CHANGE FOR X SPLIT VS SPHERE
               real distsq = dist*dist;  //dist.spr()                               							// CHANGE FOR X SPLIT VS SPHERE
               //std::cout << "distance " << sqrt(distsq) << "\n";
               if (distsq <= adrsq) {
@@ -136,14 +137,17 @@ namespace espresso {
                   //std::cout << " added " << it->getId() << "-" << it->ghost() <<  "\n";
                   //std::cout << " adding particle " << it->getId() << "-" << it->ghost() << " to adrZone\n";
               }
+              else {
+              cgZone.insert(&(*it));
+              }
           }
-          std::cout << "rebuild: adrZone count: " << adrZone.size() << std::endl;
+          //std::cout << "rebuild: adrZone count: " << adrZone.size() << std::endl;
       }
 
 
       // add particles to adress pairs and VL
       CellList cl = getSystem()->storage->getRealCells();
-      std::cout << "local cell list size = " << cl.size() << "\n";
+      //std::cout << "local cell list size = " << cl.size() << "\n";
       int count=0;
       
       for (CellListAllPairsIterator it(cl); it.isValid(); ++it) {
@@ -153,9 +157,11 @@ namespace espresso {
         checkPair(*it->first, *it->second);
         count+=1;
       }
-      std::cout << "CellListAllPairs iterator finds" <<  count << std::endl;
-      
-      std::cout << "verlet list: adrPairs" <<  adrPairs.size() << std::endl;
+      //std::cout << "CellListAllPairs iterator finds" <<  count << std::endl;
+      //std::cout << "rebuild: cgZone count: " << cgZone.size() << std::endl;     
+      //std::cout << "rebuild: adrZone count: " << adrZone.size() << std::endl;    
+      //std::cout << "verlet list: adrPairs" <<  adrPairs.size() << std::endl;
+      //std::cout << "verlet list: vlPairs" <<  vlPairs.size() << std::endl;
 
       //std::cout << getSystem()->comm->rank() << ": " << "verlet list pairs (vlPairs size " << vlPairs.size() << "):\n";
       //std::cout << "\n\n";
@@ -274,11 +280,13 @@ namespace espresso {
           //std::cout << "adding pair (" << pt1.id() << ", " << pt2.id() << ")\n";
       }
       else {
+          //cgZone.insert(&pt1);
+          //cgZone.insert(&pt2);
           if (distsq > cutsq) return;
           //std::cout << "not adding, adding to VL (" << pt1.id() << "-" << pt1.ghost() << ", " << pt2.id() << "-" << pt2.ghost() << ")\n";
           vlPairs.add(pt1, pt2); // add pair to Verlet List
-          cgZone.insert(&pt1);
-          cgZone.insert(&pt2);
+          //cgZone.insert(&pt1);
+          //cgZone.insert(&pt2);
       }
     }
 

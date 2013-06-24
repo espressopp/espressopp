@@ -14,8 +14,12 @@ namespace espresso {
         VerletListLennardJones;
     typedef class VerletListAdressInteractionTemplate <LennardJones, Tabulated>
         VerletListAdressLennardJones;
+    typedef class VerletListAdressInteractionTemplate <LennardJones, LennardJones>
+        VerletListAdressLennardJones2;
     typedef class VerletListHadressInteractionTemplate <LennardJones, Tabulated>
         VerletListHadressLennardJones;
+    typedef class VerletListHadressInteractionTemplate <LennardJones, LennardJones>
+        VerletListHadressLennardJones2;
     typedef class CellListAllPairsInteractionTemplate <LennardJones> 
         CellListLennardJones;
     typedef class FixedPairListInteractionTemplate <LennardJones> 
@@ -49,6 +53,14 @@ namespace espresso {
         .def("setPotentialAT", &VerletListAdressLennardJones::setPotentialAT)
         .def("setPotentialCG", &VerletListAdressLennardJones::setPotentialCG);
       ;
+      
+      class_< VerletListAdressLennardJones2, bases< Interaction > >
+        ("interaction_VerletListAdressLennardJones2",
+           init< shared_ptr<VerletListAdress>,
+                  shared_ptr<FixedTupleList> >())
+        .def("setPotentialAT", &VerletListAdressLennardJones2::setPotentialAT)
+        .def("setPotentialCG", &VerletListAdressLennardJones2::setPotentialCG);
+      ;
 
       class_< VerletListHadressLennardJones, bases< Interaction > >
         ("interaction_VerletListHadressLennardJones",
@@ -56,6 +68,14 @@ namespace espresso {
                   shared_ptr<FixedTupleList> >())
         .def("setPotentialAT", &VerletListHadressLennardJones::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressLennardJones::setPotentialCG);
+      ;
+      
+      class_< VerletListHadressLennardJones2, bases< Interaction > >
+        ("interaction_VerletListHadressLennardJones2",
+           init< shared_ptr<VerletListAdress>,
+                  shared_ptr<FixedTupleList> >())
+        .def("setPotentialAT", &VerletListHadressLennardJones2::setPotentialAT)
+        .def("setPotentialCG", &VerletListHadressLennardJones2::setPotentialCG);
       ;
       
       class_< CellListLennardJones, bases< Interaction > > 
