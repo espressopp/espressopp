@@ -27,9 +27,9 @@ import espresso
 from espresso import Real3D
 
 # initial parameters
-N = 3                 # number of particles on lattice site
+N = 16                 # number of particles on lattice site
 num_particles = N**3   # total number of particles 
-rho = 0.0079999999              # number density of particles, number of particles devided by volume
+rho = 0.03              # number density of particles, number of particles devided by volume
 
 # creating a cubic NaCl crystal
 #print 'Creating a simple cubic structure...'
@@ -50,15 +50,16 @@ print 'Ewald parameters:'
 print 'alfa=%f, rcutoff=%f, kcutoff=%d' % (alphaEwald, rspacecutoff, kspacecutoff)
 
 #  P3M parameters
-M              = espresso.Int3D(8, 8, 8)
+M              = espresso.Int3D(64, 64, 64)
 P              = 7
+#alphaP3M       = 1.112583061 #  alpha - Ewald parameter
 alphaP3M       = 0.660557
 
 print 'P3M parameters:'
 print 'Mesh=', M,', charge assignment order=%d,  alphaP3M=%lf' % ( P, alphaP3M)
 
 # a skin for Verlet list
-skin           = 0.2
+skin              = 0.2
 
 # Coulomb prefactor parameters
 bjerrumlength     = 1.0
@@ -67,6 +68,12 @@ coulomb_prefactor = bjerrumlength * temperature
 
 nodeGrid          = espresso.tools.decomp.nodeGrid(MPI.COMM_WORLD.size)
 cellGrid          = espresso.tools.decomp.cellGrid(box, nodeGrid, rspacecutoff, skin)
+
+print ''
+print 'density = %.4f' % (rho)
+print 'NodeGrid = %s' % (nodeGrid,)
+print 'CellGrid = %s' % (cellGrid,)
+print ''
 
 '''
   Below two systems for Ewald summation and PPPM methods will be created.
@@ -100,6 +107,7 @@ new_particles = []
 countX = countY = countZ = 0
 for i in range(0, num_particles):
   
+  # charge should be accordingly to NaCl crystall
   charge = pow(-1, countX + countY + countZ)
   part = [ i, Real3D(x[i], y[i], z[i]), 0, charge ]
   new_particles.append(part)
@@ -111,7 +119,6 @@ for i in range(0, num_particles):
     if countY >= N:
       countY = 0
       countZ += 1
-
 
 # adding particles to Ewald system
 systemEwald.storage.addParticles(new_particles, *props)
@@ -125,7 +132,7 @@ systemPPPM.storage.decompose()
 
 # setting a Verlet list
 vlEwald = espresso.VerletList(systemEwald, rspacecutoff)
-vlPPPM = espresso.VerletList(systemPPPM, rspacecutoff)
+vlPPPM  = espresso.VerletList(systemPPPM,  rspacecutoff)
 
 # real space interaction for Ewald system
 # R space part of electrostatic interaction
@@ -161,11 +168,7 @@ p3m_int = espresso.interaction.CellListCoulombKSpaceP3M(systemPPPM.storage, p3m_
 # adding the interaction to the system
 systemPPPM.addInteraction(p3m_int)
 
-hhh = ( p3m_int.computeEnergy() + coulombR_intPPPM.computeEnergy() )
 ### Integrators for Ewald and PPPM
-print '   PPP_energy: ', hhh, p3m_int.computeEnergy(), coulombR_intPPPM.computeEnergy()
-print '   Ewald_energy: ', ewaldK_int.computeEnergy(), coulombR_intEwald.computeEnergy()
-
 # creating the integrator which based on the Verlet algorithm
 integratorEwald    = espresso.integrator.VelocityVerlet(systemEwald)
 # seting the time step (it is not important here)
@@ -187,20 +190,16 @@ print ('%3s %20s %20s %20s\n' % ('id', 'dfx', 'dfy', 'dfz'))
 #sock = espresso.tools.vmd.connect(systemPPPM)
 #espresso.tools.vmd.imd_positions(systemPPPM, sock)
 
-for j in range(0, num_particles):
-  print 'position:', j, systemPPPM.storage.getParticle(j).pos, '   ', systemEwald.storage.getParticle(j).pos
-  
-  
-for j in range(0, num_particles):
+print_N = min(num_particles, 20)
+
+for j in range(0, print_N):
   print ( '%3d     %3.17f     %3.17f     %3.17f' % (j, \
     abs(systemEwald.storage.getParticle(j).f.x - systemPPPM.storage.getParticle(j).f.x), \
     abs(systemEwald.storage.getParticle(j).f.y - systemPPPM.storage.getParticle(j).f.y), \
     abs(systemEwald.storage.getParticle(j).f.z - systemPPPM.storage.getParticle(j).f.z)) )
   
   print 'force:', systemPPPM.storage.getParticle(j).f, '   ', systemEwald.storage.getParticle(j).f
-
-#print 'no energy calc'
-#exit(0)
+  
 
 # calculating the R space part of electrostatic energy
 energyEwaldR = coulombR_intEwald.computeEnergy()
@@ -209,14 +208,12 @@ energyEwaldK = ewaldK_int.computeEnergy()
 # total energy (Ewald summation)
 enTotEwald = energyEwaldR + energyEwaldK
 
-
 # calculating the R space part of electrostatic energy
 energyPPPMR = coulombR_intPPPM.computeEnergy()
 # calculating the K space part of electrostatic energy
 energyPPPMK = p3m_int.computeEnergy()
 # total energy (PPPM)
 enTotPPPM = energyPPPMR + energyPPPMK
-
 
 
 # printing the total energy and the difference
