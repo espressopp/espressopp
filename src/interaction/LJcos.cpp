@@ -29,8 +29,8 @@ namespace espresso {
       using namespace espresso::python;
 
       class_< LJcos, bases< Potential > >
-    	("interaction_LJcos", init< real >())
-    	.add_property("sigma", &LJcos::getPhi, &LJcos::setPhi)
+        ("interaction_LJcos", init< real >())
+    	.add_property("phi", &LJcos::getPhi, &LJcos::setPhi)
       ;
 
       class_< VerletListLJcos, bases< Interaction > > 
@@ -42,16 +42,14 @@ namespace espresso {
 
       class_< VerletListAdressLJcos, bases< Interaction > >
         ("interaction_VerletListAdressLJcos",
-           init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleList> >())
+           init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleList> >())
         .def("setPotentialAT", &VerletListAdressLJcos::setPotentialAT)
         .def("setPotentialCG", &VerletListAdressLJcos::setPotentialCG);
       ;
 
       class_< VerletListHadressLJcos, bases< Interaction > >
         ("interaction_VerletListHadressLJcos",
-           init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleList> >())
+           init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleList> >())
         .def("setPotentialAT", &VerletListHadressLJcos::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressLJcos::setPotentialCG);
       ;

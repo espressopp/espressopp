@@ -20,12 +20,6 @@ namespace espresso {
               ): system(_system), C_pref(_coulomb_prefactor), alpha(_alpha),
                     M(_M), P(_P), rc(_rcut), interpolation(_interpolation){
       
-      getParticleNumber();
-      preset();
-      
-      // first initialize
-      initialize();
-      
       // predefined assigned function coefficients
       af_coef[1][0][0] = 1.0;
 
@@ -175,6 +169,11 @@ namespace espresso {
       af_coef[7][6][5] =    192./46080.;
       af_coef[7][6][6] =     64./46080.;
       
+      getParticleNumber();
+      preset();
+      
+      // first initialize
+      initialize();
         
       // This function calculates the square of all particle charges. It should be called ones,
       // if the total number of particles doesn't change.

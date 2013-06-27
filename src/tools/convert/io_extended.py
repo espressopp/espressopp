@@ -4,6 +4,7 @@ import espresso
 
 """
   This Python module allows one to read and write configurational files.
+  One can choose folded or unfolded coordinates and write down velocities or not.
   It is similar to lammps read and write, but it writes down only:
   1) number of particles + types
   2) number of bonds (number of pairs) + types
@@ -26,7 +27,7 @@ import espresso
                (pid1,pid2,pid3,pid4) for dihedrals
 """   
 
-def write(fileName, system, writeVelocities=False):
+def write(fileName, system, folded=True, writeVelocities=False):
     
   # first collect all the information that we need to write into the file
   numParticles  = int(espresso.analysis.NPart(system).compute())
@@ -105,21 +106,26 @@ def write(fileName, system, writeVelocities=False):
   file.write('%5d angle types\n' % nangletypes)
   file.write('%5d dihedral types\n' % ndihedraltypes)
   
-  file.write('%.9f %.9f xlo xhi\n' % (0.0, box_x))
-  file.write('%.9f %.9f ylo yhi\n' % (0.0, box_y))
-  file.write('%.9f %.9f zlo zhi\n' % (0.0, box_z))
+  file.write('%.15f %.15f xlo xhi\n' % (0.0, box_x))
+  file.write('%.15f %.15f ylo yhi\n' % (0.0, box_y))
+  file.write('%.15f %.15f zlo zhi\n' % (0.0, box_z))
   
   file.write('\nAtoms\n\n');
   pid = 0
   while pid <= maxParticleID:
     if system.storage.particleExists(pid):
       particle = system.storage.getParticle(pid)
-      p = system.bc.getUnfoldedPosition(particle.pos, particle.imageBox)
-      xpos   = p[0]
-      ypos   = p[1]
-      zpos   = p[2]
+      if folded:
+        xpos   = particle.pos.x
+        ypos   = particle.pos.y
+        zpos   = particle.pos.z
+      else:
+        p = system.bc.getUnfoldedPosition(particle.pos, particle.imageBox)
+        xpos   = p[0]
+        ypos   = p[1]
+        zpos   = p[2]
       type   = particle.type
-      st = "%d %d %.9f %.9f %.9f\n"%(pid, type, xpos, ypos, zpos)
+      st = "%d %d %.15f %.15f %.15f\n"%(pid, type, xpos, ypos, zpos)
       file.write(st)
     pid   += 1
 

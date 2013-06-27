@@ -84,6 +84,8 @@ namespace espresso {
       // mesh contributions of the charged particles
       vector< vector< real > > q_l;
       
+      vector< vector< vector< int > > > map_indx;
+      
       int nParticles;  // number of particles in system
       Real3D sysL;     // system size
       real sumq_2, sum_q2; // squared sum of charges and sum of squared charges
@@ -115,6 +117,24 @@ namespace espresso {
         sysL = system -> bc -> getBoxL();
         MMM = M[0] * M[1] * M[2];
         for(int i=0; i<3; i++) MM[i] = M[i];
+        
+        // map xpos, ypos and zpos to index = zpos + M[2] * (ypos + M[1] * xpos)
+        map_indx = vector< vector< vector<int> > > (M[0],
+                           vector< vector<int> >   (M[1],
+                                   vector<int>     (M[2], 0) ));
+        for(int i=0; i<M[0]; i++){
+          int mi = M[1] * i;
+          for(int j=0; j<M[1]; j++){
+            int mj = M[2] * (j + mi);
+            for(int k=0; k<M[2]; k++){
+              map_indx[i][j][k] = k + mj;
+            }
+          }
+        }
+        
+        precalc_interp_caf = vector< vector<real> > (P, vector<real>(2*interpolation+1, 0.0) );
+        precalc_interpol_charge_assignment_f();
+        
       }
       
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -152,10 +172,8 @@ namespace espresso {
 /////////////////////////////////////////////////////////////////////////////////////////
 
       void initialize(){
-        set_fftw();
         
-        precalc_interp_caf = vector< vector<real> > (P, vector<real>(2*interpolation+1, 0.0) );
-        precalc_interpol_charge_assignment_f();
+        set_fftw_array();
         
         mesh_shift = vector< vector<real> >(3, vector<real>() );
         d_op = vector< vector<real> >(3, vector<real>() );
@@ -216,10 +234,10 @@ namespace espresso {
         for (int i=-interpolation; i<=interpolation; i++) {
           real x = i * _2interpol_inv;
           for(int j = 0; j<P; j++){
-            precalc_interp_caf[j][i+interpolation] = asignment_f2(j, x, P);
+            //precalc_interp_caf[j][i+interpolation] = asignment_f2(j, x, P);
+            precalc_interp_caf[j][i+interpolation] = asignment_f1(x, j, P);
           }
         }
-//std::cout<< " ^^^^precalc_interp_caf:  "<< precalc_interp_caf[5][12] << std::endl;
       }
       
       // calculate differential operator
@@ -240,7 +258,6 @@ namespace espresso {
       void assign_charge_for_single_particle(real q, Real3D particle_pos){
       }
       
-      
       // calculates the optimal influence function
       void calc_opt_influence_function(){
         
@@ -252,17 +269,13 @@ namespace espresso {
         for ( i[0] = 0; i[0] < M[0]; i[0]++){
           for ( i[1] = 0; i[1] < M[1]; i[1]++){
             for ( i[2] = 0; i[2] < M[2]; i[2]++){
-              int indx = i[2] + M[2] * (i[1] + M[1] * i[0]);
+              int indx = map_indx[i[0]][i[1]][i[2]];
               if ( i == Int3D(0) )
                 gf[ indx ] = 0.0;
               else{
                 aliasing_sum( i, &nom, &denom);
-                for(int l=0; l<3; l++){
-                  D[l] = d_op[l][i[l]]; 
-                }
-
+                for(int l=0; l<3; l++) D[l] = d_op[l][i[l]];
                 real D2 = D.sqr();
-
                 gf[ indx ] = (D2 > 1e-10) ? coef * ( D*nom ) / ( D2*denom*denom ) : 0.0;
               }
             }
@@ -270,7 +283,6 @@ namespace espresso {
         }
         
       }
-
       
       void calc_m_shift(){
         for(int i=0; i<3; i++){
@@ -376,12 +388,14 @@ namespace espresso {
         return out;
       }
       
-      void set_fftw(){
+      void set_fftw_array(){
         in_array = (fftw_complex*) fftw_malloc( MMM * sizeof(fftw_complex));
-        set_plan();
       }
-      void set_plan(){
+      void set_plan_frw(){
         plan = fftw_plan_dft(3, MM, in_array, in_array, FFTW_FORWARD, FFTW_ESTIMATE);
+      }
+      void set_plan_bcw(){
+        plan = fftw_plan_dft(3, MM, in_array, in_array, FFTW_BACKWARD, FFTW_ESTIMATE);
       }
       void clean_fftw(){
         fftw_destroy_plan(plan);
@@ -427,16 +441,11 @@ namespace espresso {
             { modadd1 = 0.0; modadd2 =  0.5;} break;
         }
 
-
         g_ca.clear();
         g_ca = vector<Int3D>(nParticles, Int3D(0) );
         QQQ.clear();
         QQQ = vector<dcomplex>(MMM, dcomplex(0.0));
         
-        //std::cout<< "QQQ.size(): "<< QQQ.size()<< "  i="<< iii << std::endl;
-        
-        int count = 0;
-        // alternative reference to the arrays G[i][3] 
         Int3D Gi, arg;
         for(iterator::CellListIterator it(realCells); it.isValid(); ++it){
           Particle &p = *it;
@@ -449,38 +458,27 @@ namespace espresso {
           Gi  = Int3D(d1 + modadd2) + assignshift;
           arg = Int3D( (d1 - dround(d1) + 0.5)*_2interp );
 
-/*          
-if(iii==1){
-  std::cout<< " arg:  "<< (d1 - dround(d1) + 0.5) << "   pos: "<< ppos << std::endl;
-}
- */
           // specific for force !!!!!!!!
-          g_ca[count] = Gi;
-          count++;
+          g_ca[p.id()] = Gi;
           
-          int ccc = 0;
           // Calculate the mesh based charges
           real T1,T2,T3;
-          for (int j = 0; j < P; j++) {
-            int xpos = (Gi[0] + j) % M[0];
-            T1 = p.q() * precalc_interp_caf[j][arg[0]];
-            for (int k = 0; k < P; k++) {
-              int ypos = (Gi[1] + k) % M[1];
-              T2 = T1 * precalc_interp_caf[k][arg[1]];
-              for (int l = 0; l < P; l++) {
-                int zpos = (Gi[2] + l) % M[2];
-                T3 = T2 * precalc_interp_caf[l][arg[2]];
+          for (int i = 0; i < P; i++) {
+            int xpos = (Gi[0] + i) % M[0];
+            T1 = p.q() * precalc_interp_caf[i][arg[0]];
+            for (int j = 0; j < P; j++) {
+              int ypos = (Gi[1] + j) % M[1];
+              T2 = T1 * precalc_interp_caf[j][arg[1]];
+              for (int k = 0; k < P; k++) {
+                int zpos = (Gi[2] + k) % M[2];
+                T3 = T2 * precalc_interp_caf[k][arg[2]];
                 
-                int indx = zpos + M[2] * (ypos + M[1] * xpos);
+                int indx = map_indx[xpos][ypos][zpos];
                 
                 // specific for force !!!!!!!!
                 q_l[p.id()][indx] = T3;
                 
                 QQQ[indx] += dcomplex(T3, 0.0);
-//if(iii==1 && indx==0){
-//    std::cout<< " QQQQ ins:  "<< T3 << std::endl;
-//}
-        
               }
             }
           }
@@ -488,15 +486,8 @@ if(iii==1){
         }
  
         in_array = reinterpret_cast<fftw_complex*>( &QQQ[0] );
-        set_plan();
+        set_plan_frw();
         fftw_execute(plan);
-  
-/*        
-if(iii==1){
-  std::cout<< " QQQ posle:  "<< QQQ[10] << std::endl;
-  exit(0);
-}
- */
       }
 
       // @TODO this function could be void, 
@@ -509,71 +500,26 @@ if(iii==1){
         for ( i[0]=0; i[0]<M[0]; i[0]++){
           for ( i[1]=0; i[1]<M[1]; i[1]++){
             for ( i[2]=0; i[2]<M[2]; i[2]++) {  
-
-              // new definition:
-              int indx = i[2] + M[2] * (i[1] + M[1] * i[0]);
-              
+              int indx = map_indx[i[0]][i[1]][i[2]];
               dcomplex phi_aux = gf[indx] * swap_complex( conj( QQQ[indx] ) );
               
-              for (int ii=0; ii<3; ii++){
-                phi[ii][indx] = d_op[ii][i[ii]] * phi_aux;
-                //phi[ii][indx] = d_op[ii][i] * gf[indx] *  conj( QQQ[indx] ) ;
-                //phi[ii][indx] = 0.0;
-              }
+              for (int ii=0; ii<3; ii++) phi[ii][indx] = d_op[ii][i[ii]] * phi_aux;
             }
           }
         }
 
-        /*
         for(int l=0; l<3; l++){
           in_array = reinterpret_cast<fftw_complex*>( &phi[l][0] );
+          set_plan_bcw();
           fftw_execute(plan);
         }
-         */
-
-        fftw_plan pE;
-        fftw_complex *inE, *outE;
-        inE  = (fftw_complex*) fftw_malloc( MMM * sizeof(fftw_complex));
-        outE = (fftw_complex*) fftw_malloc( MMM * sizeof(fftw_complex));
-        pE = fftw_plan_dft( 3, MM, inE, outE, FFTW_BACKWARD, FFTW_ESTIMATE);
-
-        for(int l=0; l<3; l++){
-          // slow way
-          for(int i=0; i<M[0]; i++){
-            for(int j=0; j<M[1]; j++){
-              for(int k=0; k<M[2]; k++){
-                int indx = k + M[2] * (j + M[1] * i);
-                inE[indx][0] = phi[l][indx].real();
-                inE[indx][1] = phi[l][indx].imag();
-              }
-            }
-          }
-
-          fftw_execute(pE);
-
-          // slow way
-          for(int i=0; i<M[0]; i++){
-            for(int j=0; j<M[1]; j++){
-              for(int k=0; k<M[2]; k++){
-                int indx = k + M[2] * (j + M[1] * i);
-                phi[l][indx] = dcomplex(outE[indx][0], outE[indx][1]);
-              }
-            }
-          }
-
-        }
-        fftw_destroy_plan(pE);
-        fftw_free(inE); fftw_free(outE);
-
         
-        int iii = 0;
+        real C_MMM_inv = C_pref / (real)MMM;
         for(iterator::CellListIterator it(realCells); it.isValid(); ++it){
           Particle &p = *it;
           
-          Real3D fff(0.0);
-          
-          real C_MMM_inv = C_pref / (real)MMM;
-          
+          int iii = p.id();
+          Real3D ff(0.0);
           for (int i = 0; i < P; i++) {
             int xpos = (g_ca[iii][0] + i) % M[0];
             for (int j = 0; j < P; j++) {
@@ -581,19 +527,18 @@ if(iii==1){
               for (int k = 0; k < P; k++) {
                 int zpos = (g_ca[iii][2] + k) % M[2];
                 
-                int indx = zpos + M[2] * (ypos + M[1] * xpos);
+                int indx = map_indx[xpos][ypos][zpos];
                 
-                Real3D fff_add( phi[0][indx].real(),
-                                phi[1][indx].real(),
-                                phi[2][indx].real());
+                Real3D f_add( phi[0][indx].real(),
+                              phi[1][indx].real(),
+                              phi[2][indx].real());
 
-                fff += C_MMM_inv * q_l[p.id()][indx]  *  fff_add ;
+                ff += C_MMM_inv * q_l[iii][indx]  *  f_add ;
               }
             }
           }
 
-          p.force() -= fff;
-          iii++;
+          p.force() -= ff;
         }
         
         // usual return from espresso
@@ -647,9 +592,8 @@ if(iii==1){
           err.setException( msg.str() );
         }
         err.checkException();
-          
-        real res = af_coef[P][k][0];
         
+        real res = af_coef[P][k][0];
         real xx = 1.0;
         for(int i=1; i<P; i++){
           xx *= x;

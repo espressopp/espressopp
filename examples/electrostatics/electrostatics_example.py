@@ -27,32 +27,13 @@ import espresso
 from espresso import Real3D
 
 # initial parameters
-N = 2                 # number of particles on lattice site
+N = 3                 # number of particles on lattice site
 num_particles = N**3   # total number of particles 
 rho = 0.0079999999              # number density of particles, number of particles devided by volume
 
 # creating a cubic NaCl crystal
 #print 'Creating a simple cubic structure...'
-#x, y, z, Lx, Ly, Lz = espresso.tools.init_cfg.lattice.createCubic(num_particles, rho)
-
-x = []
-y = []
-z = []
-for i in range(0,8):
-  x.append(0.0)
-  y.append(0.0)
-  z.append(0.0)
-
-x[0]=4.159994;   y[0]=0.919649;   z[0]=7.564105
-x[1]=5.297002;   y[1]=9.304365;   z[1]=3.835021
-x[2]=6.539190;   y[2]=0.668422;   z[2]=7.226604
-x[3]=6.711494;   y[3]=3.834157;   z[3]=6.316347
-x[4]=8.847071;   y[4]=5.194164;   z[4]=6.515186
-x[5]=2.377744;   y[5]=2.624530;   z[5]=7.621980
-x[6]=7.533558;   y[6]=9.092081;   z[6]=0.726859
-x[7]=2.727100;   y[7]=8.976563;   z[7]=2.749068
-
-Lx = Ly = Lz = 10.0
+x, y, z, Lx, Ly, Lz = espresso.tools.init_cfg.lattice.createCubic(num_particles, rho, False)
 
 # creating the system box
 box = (Lx, Ly, Lz)
@@ -60,19 +41,21 @@ print 'System box size: ',      box
 print 'Number of particles = ', num_particles
 
 #  Ewald summation parameters
-alpha          = 1.112583061 #  alpha - Ewald parameter
+#alphaEwald     = 1.112583061 #  alpha - Ewald parameter
+alphaEwald     = 0.660557
 rspacecutoff   = 4.9 #  rspacecutoff - the cutoff in real space
 kspacecutoff   = 30 #  kspacecutoff - the cutoff in reciprocal space
 
 print 'Ewald parameters:'
-print 'alfa=%f, rcutoff=%f, kcutoff=%d' % (alpha, rspacecutoff, kspacecutoff)
+print 'alfa=%f, rcutoff=%f, kcutoff=%d' % (alphaEwald, rspacecutoff, kspacecutoff)
 
 #  P3M parameters
-M              = espresso.Int3D(16, 16, 16)
+M              = espresso.Int3D(8, 8, 8)
 P              = 7
+alphaP3M       = 0.660557
 
 print 'P3M parameters:'
-print 'Mesh=', M, ', charge assignment order=%d' % (P)
+print 'Mesh=', M,', charge assignment order=%d,  alphaP3M=%lf' % ( P, alphaP3M)
 
 # a skin for Verlet list
 skin           = 0.2
@@ -144,35 +127,35 @@ systemPPPM.storage.decompose()
 vlEwald = espresso.VerletList(systemEwald, rspacecutoff)
 vlPPPM = espresso.VerletList(systemPPPM, rspacecutoff)
 
-# R space part of electrostatic interaction
-# potential is the same for Ewald summation and PPPM
-coulombR_pot = espresso.interaction.CoulombRSpace(coulomb_prefactor, alpha, rspacecutoff)
-
 # real space interaction for Ewald system
+# R space part of electrostatic interaction
+coulombR_potEwald = espresso.interaction.CoulombRSpace(coulomb_prefactor, alphaEwald, rspacecutoff)
 # creating an interaction based on the Verlet list
 coulombR_intEwald = espresso.interaction.VerletListCoulombRSpace(vlEwald)
 # setting the potential for the interaction between particles of type 0 and 0
-coulombR_intEwald.setPotential(type1=0, type2=0, potential = coulombR_pot)
+coulombR_intEwald.setPotential(type1=0, type2=0, potential = coulombR_potEwald)
 # adding the interaction to the system
 systemEwald.addInteraction(coulombR_intEwald)
 
 # real space interaction for PPPM system
+# R space part of electrostatic interaction
+coulombR_potP3M = espresso.interaction.CoulombRSpace(coulomb_prefactor, alphaP3M, rspacecutoff)
 # creating an interaction based on the Verlet list
 coulombR_intPPPM = espresso.interaction.VerletListCoulombRSpace(vlPPPM)
 # setting the potential for the interaction between particles of type 0 and 0
-coulombR_intPPPM.setPotential(type1=0, type2=0, potential = coulombR_pot)
+coulombR_intPPPM.setPotential(type1=0, type2=0, potential = coulombR_potP3M)
 # adding the interaction to the system
 systemPPPM.addInteraction(coulombR_intPPPM)
 
 # K space part of electrostatic interaction
-ewaldK_pot = espresso.interaction.CoulombKSpaceEwald(systemEwald, coulomb_prefactor, alpha, kspacecutoff)
+ewaldK_pot = espresso.interaction.CoulombKSpaceEwald(systemEwald, coulomb_prefactor, alphaEwald, kspacecutoff)
 # creating an interaction based on the Cell list for all particle interaction and potential in K space
 ewaldK_int = espresso.interaction.CellListCoulombKSpaceEwald(systemEwald.storage, ewaldK_pot)
 # adding the interaction to the system
 systemEwald.addInteraction(ewaldK_int)
 
 # PPPM system
-p3m_pot = espresso.interaction.CoulombKSpaceP3M( systemPPPM, coulomb_prefactor, alpha, M, P, rspacecutoff)
+p3m_pot = espresso.interaction.CoulombKSpaceP3M( systemPPPM, coulomb_prefactor, alphaP3M, M, P, rspacecutoff)
 # creating the interaction based on the Cell list for all particle interaction and potential in K space
 p3m_int = espresso.interaction.CellListCoulombKSpaceP3M(systemPPPM.storage, p3m_pot)
 # adding the interaction to the system

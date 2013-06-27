@@ -11,11 +11,7 @@
 namespace espresso {
   namespace interaction {
     /** This class provides methods to compute forces and energies of
-	the Lennard Jones potential.
-
-	\f[ V(r) = 4 \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} -
-	\left( \frac{\sigma}{r} \right)^{6} \right]
-	\f]
+	the modified Lennard Jones potential. It has cutoff 1.5 LJ units
 
     */
     class LJcos : public PotentialTemplate< LJcos > {
@@ -27,6 +23,12 @@ namespace espresso {
       real alpha, beta;
       real sqrcutoff;
 
+      real auxCoef; // This is temporary solution for empty potential. This problem
+                    // appears when there is a potential for, for example,  00 and
+                    // 01, but no potential for 11. The loop in interaction
+                    // template will call potential(1, 1) anyway if these particles are
+                    // within the range. Thus one have to set coefficient to 0,
+                    // in order to get zero forces. 
     public:
       static void registerPython();
 
@@ -35,6 +37,7 @@ namespace espresso {
         autoShift = false;
         setCutoff(1.5);
         preset();
+        auxCoef = 0.0;
       }
 
       LJcos(real _phi): phi(_phi){	
@@ -42,6 +45,7 @@ namespace espresso {
         autoShift = false;
         setCutoff(1.5);
         preset();
+        auxCoef = 1.0;
       }
 
       virtual ~LJcos() {};
@@ -57,7 +61,7 @@ namespace espresso {
         half_phi = 0.5 * phi;
         phi_alpha = phi * alpha;
       }
-
+      
       // Setter and getter phi
       void setPhi(real _phi) {
         phi = _phi;
@@ -68,15 +72,12 @@ namespace espresso {
       real _computeEnergySqrRaw(real distSqr) const {
         real energy;
         if(distSqr<=sqr_pot_border){
-          real frac2 = 1.0 / distSqr;
+          real frac2 = auxCoef / distSqr;
           real frac6 = frac2 * frac2 * frac2;
           energy = 4.0 * (frac6 * frac6 - frac6) + one_phi;
         }
-        else if(distSqr>sqr_pot_border && distSqr<sqrcutoff){
-          energy = half_phi * cos(alpha*distSqr+beta) - half_phi;
-        }
         else{
-          energy = 0.0;
+          energy = half_phi * cos(alpha*distSqr+beta) - half_phi;
         }
         
         return energy;
@@ -85,21 +86,16 @@ namespace espresso {
       bool _computeForceRaw(Real3D& force,
                             const Real3D& r21,
                             real distSqr) const {
-
+        real ffactor;
         if(distSqr<=sqr_pot_border){
-          real frac2 = 1.0 / distSqr;
+          real frac2 = auxCoef / distSqr;
           real frac6 = frac2 * frac2 * frac2;
-          real ffactor = frac6 * ( 48.0 * frac6 - 24.0 ) * frac2;
-          force = r21 * ffactor;
-        }
-        else if(distSqr>sqr_pot_border && distSqr<sqrcutoff){
-          real ffactor = phi_alpha * sin( alpha * distSqr + beta );
-          force = r21 * ffactor;
+          ffactor = frac6 * ( 48.0 * frac6 - 24.0 ) * frac2;
         }
         else{
-          force = 0.0;
+          ffactor = phi_alpha * sin( alpha * distSqr + beta );
         }
-        
+        force = r21 * ffactor;
         return true;
       }
     };

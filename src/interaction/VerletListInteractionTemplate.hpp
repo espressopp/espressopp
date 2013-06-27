@@ -95,7 +95,7 @@ namespace espresso {
         const Potential &potential = getPotential(type1, type2);
         // shared_ptr<Potential> potential = getPotential(type1, type2);
 
-        Real3D force(0.0, 0.0, 0.0);
+        Real3D force(0.0);
         if(potential._computeForce(force, p1, p2)) {
         //if(potential->_computeForce(force, p1, p2)) {
           p1.force() += force;
