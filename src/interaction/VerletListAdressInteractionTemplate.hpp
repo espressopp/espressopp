@@ -140,7 +140,7 @@ namespace espresso {
         }
       }
 
-      // Loop over CG particles and overwrite AT forces and velocity.
+      /*// Loop over CG particles and overwrite AT forces and velocity.
       // This makes the AT particles move along with CG particles.
       
       // Note (Karsten): This is a different approach compared to H-AdResS. Here, we overwrite intra-atomistic
@@ -175,7 +175,7 @@ namespace espresso {
                 exit(1);
                 return;
             }
-      }
+      }*/
 
       // Compute center of mass and weights for virtual particles in Adress zone (HY and AT region).
       std::set<Particle*> adrZone = verletList->getAdrZone();
@@ -339,8 +339,47 @@ namespace espresso {
          }
       }
 
-      weights.clear();
+      weights.clear();     
 
+      
+      // Loop over CG particles and overwrite AT forces and velocity.
+      // This makes the AT particles move along with CG particles.
+      
+      // Note (Karsten): This is a different approach compared to H-AdResS. Here, we overwrite intra-atomistic
+      // rotations and vibrations in the CG zone. This leads to failures in the kinetic energy. However, in Force-AdResS there is no energy conservation anyway.
+      // Here we calculate CG forces/velocities and distribute them to AT particles. In contrast, in H-AdResS, we calculate AT forces from intra-molecular
+      // interactions and inter-molecular center-of-mass interactions and just update the positions of the center-of-mass CG particles.
+      std::set<Particle*> cgZone = verletList->getCGZone();
+      for (std::set<Particle*>::iterator it=cgZone.begin();
+                    it != cgZone.end(); ++it) {
+
+            Particle &vp = **it;
+
+            FixedTupleList::iterator it3;
+            it3 = fixedtupleList->find(&vp);
+
+            if (it3 != fixedtupleList->end()) {
+
+                std::vector<Particle*> atList1;
+                atList1 = it3->second;
+
+                Real3D vpfm = vp.force() / vp.getMass();
+                for (std::vector<Particle*>::iterator itv = atList1.begin();
+                        itv != atList1.end(); ++itv) {
+                    Particle &at = **itv;
+                    at.velocity() = vp.velocity(); // Overwrite velocity - Note (Karsten): See comment above.
+                    at.force() += at.mass() * vpfm;
+                }
+
+            }
+            else { // this should not happen
+                std::cout << " VP particle not found in tuples: " << vp.id() << "-" << vp.ghost();
+                exit(1);
+                return;
+            }
+      }
+      
+      
       // distribute forces from VP to AT (HY and AT region)
       for (std::set<Particle*>::iterator it=adrZone.begin();
                 it != adrZone.end(); ++it) {
@@ -371,7 +410,7 @@ namespace espresso {
         }
       }
     }
-    
+      
     template < typename _PotentialAT, typename _PotentialCG >
     inline real
     VerletListAdressInteractionTemplate < _PotentialAT, _PotentialCG >::
