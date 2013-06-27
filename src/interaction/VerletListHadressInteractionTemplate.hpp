@@ -121,14 +121,14 @@ namespace espresso {
           else if (dexdhy2 < distanceSqr) return 0.0;
           else {
               real argument = sqrt(distanceSqr) - dex;
-              //return 1.0-(30.0/(pow(dhy, 5.0)))*(1.0/5.0*pow(argument, 5.0)-dhy/2.0*pow(argument, 4.0)+1.0/3.0*pow(argument, 3.0)*dhy*dhy);
-              return pow(cos(pidhy2 * argument),2.0); // for cosine squared weighting function
+              return 1.0-(30.0/(pow(dhy, 5.0)))*(1.0/5.0*pow(argument, 5.0)-dhy/2.0*pow(argument, 4.0)+1.0/3.0*pow(argument, 3.0)*dhy*dhy);
+              //return pow(cos(pidhy2 * argument),2.0); // for cosine squared weighting function
           }
       }
       real weightderivative(real distance){
           real argument = distance - dex;
-          //return -(30.0/(pow(dhy, 5.0)))*(pow(argument, 4.0)-2.0*dhy*pow(argument, 3.0)+argument*argument*dhy*dhy);
-          return -pidhy2 * 2.0 * cos(pidhy2*argument) * sin(pidhy2*argument); // for cosine squared weighting function
+          return -(30.0/(pow(dhy, 5.0)))*(pow(argument, 4.0)-2.0*dhy*pow(argument, 3.0)+argument*argument*dhy*dhy);
+          //return -pidhy2 * 2.0 * cos(pidhy2*argument) * sin(pidhy2*argument); // for cosine squared weighting function
       }
 
       // Compute center of mass and set the weights for virtual particles in AdResS zone (HY and AT region).

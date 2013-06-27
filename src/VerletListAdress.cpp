@@ -79,7 +79,7 @@ namespace espresso {
       CellList localcells = getSystem()->storage->getLocalCells();
 
       // if adrCenter is not set, the center of adress zone moves along with some particles
-      if (!adrCenterSet) {
+      if (!adrCenterSet) { // NOT WORKING CURRENTLY - ONLY ADR ZONE DONE HERE, NO CG ZONE
           // loop over all VP particles (reals and ghosts) on node
           //std::cout << "particles of all local cells:\n";
           //int count = 0;

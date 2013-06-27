@@ -125,6 +125,8 @@ namespace espresso {
         frictionThermo(*cit);
       }
 
+      // TODO: It doesn't make that much sense to thermalize both CG and AT particles, since CG particles get velocities of AT particles anyway.
+      
       // thermalize AT particles
       ParticleList& adrATparticles = system.storage->getAdrATParticles();
       for (std::vector<Particle>::iterator it = adrATparticles.begin();

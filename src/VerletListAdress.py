@@ -1,3 +1,39 @@
+"""
+************************************
+**VerletListAdress** - Object
+************************************
+
+The VerletListAdress is the Verlet List to be used for AdResS or H-AdResS
+simulations. When creating the VerletListAdress one has to provide the system 
+and specify both cutoff for the CG interaction and adrcutoff for the atomistic
+interaction. Often, it is important to set the atomistic adrcutoff much bigger
+than the actual interaction's cutoff would be, since also the atomistic part of
+the VerletListAdress (adrPairs) is built based on the coarse-grained particle
+positions. For a much larger coarse-grained cutoff it is for example possible
+to also set the atomistic cutoff on the same value as the coarse-grained one.
+
+Furthermore, the sizes of the explicit and hybrid region have to be
+provided (dEx and dHy in the example below) and the center of the atomistic
+region has to be set (adrCenter). In the current implementation this results in
+a resolution change along the x-direction of the box. A spherical symmetry can
+be obtained by only minor code changes.
+
+Bascially the VerListAdress provides 4 lists:
+---------------------------------------------
+
+* adrZone: A list which holds all particles in the atomistic and hybrid region
+* cgZone: A list which holds all particles in the coarse-grained region
+* adrPairs: A list which holds all pairs which have at least one particle in the
+  adrZone, i.e. in the atomistic or hybrid region
+* vlPairs: A list which holds all pairs which have both particles in the cgZone,
+  i.e. in the coarse-grained region
+
+Example - creating the VerletListAdress:
+
+>>> vl      = espresso.VerletListAdress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, adrCenter=[Lx/2, Ly/2, Lz/2])
+
+"""
+
 from espresso import pmi
 import _espresso 
 import espresso

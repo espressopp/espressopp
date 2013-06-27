@@ -69,13 +69,13 @@ namespace espresso {
         int bin = floor (coordP1[0]/dr);
         histogram[bin] += 1.0;
         
-        if(system.comm->rank()==0){
+        /*if(system.comm->rank()==0){
           perc = (int)(100*(real)(i-mini)/(real)(maxi-mini));
           if(perc>perc1){
             cout<<"calculation progress (density profile along x axis): "<< perc << " %\r"<<flush;
             perc1 = perc;
           }
-        }
+        }*/
       }
       //if(system.comm->rank()==0)
         //cout<<"calculation progress (density profile along x axis): "<< 100 << " %" <<endl;
