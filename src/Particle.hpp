@@ -31,6 +31,7 @@ namespace espresso {
       ar & type;
       ar & mass;
       ar & q;
+      ar & radius;
     }
   };
 
@@ -149,6 +150,7 @@ namespace espresso {
       p.type = 0;
       p.mass = 1.0;
       p.q = 0.0;
+      p.radius = 1.0;
       l.ghost = false;
     }
 
@@ -174,6 +176,12 @@ namespace espresso {
     const real& q() const { return p.q; }
     real getQ() const { return p.q; }
     void setQ(real q) { p.q = q; }
+
+    // Radius
+    real& radius() { return p.radius; }
+    const real& radius() const { return p.radius; }
+    real getRadius() const { return p.radius; }
+    void setRadius(real q) { p.radius = q; }
 
     // Position
 

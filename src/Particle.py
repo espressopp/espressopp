@@ -83,6 +83,11 @@ class ParticleLocal(object):
     def q(self, val): self.__getTmp().q = val
     
     @property
+    def radius(self): return self.__getTmp().radius
+    @radius.setter
+    def radius(self, val): self.__getTmp().radius = val
+    
+    @property
     def imageBox(self): return self.__getTmp().imageBox
     @imageBox.setter
     def imageBox(self, val): self.__getTmp().imageBox = toInt3DFromVector(val)
