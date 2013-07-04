@@ -6,7 +6,7 @@ system, integrator = espresso.standard_system.LennardJones(0, (10*1.12, 10*1.12,
 C_FIXED = 1
 C_FREE  = 0
 # fix x,y and z coord axis
-fixMask = espresso.Int3D(C_FIXED, C_FIXED, C_FIXED)
+fixMask = espresso.Int3D(C_FREE, C_FIXED, C_FREE)
 
 # create a particel group that will contain the fixed particles
 fixedWall  = espresso.ParticleGroup(system.storage)

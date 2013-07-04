@@ -58,13 +58,15 @@ namespace espresso {
     	 for (std::list< std::pair<Particle *, Real3D> >::iterator it=savePos.begin(); it!=savePos.end(); it++) {
     		 Real3D savpos = it->second;
     		 Real3D newpos = it->first->getPos();
+                 Real3D velo   = it->first->getV();
     		 for (int i=0; i<3; i++) {
     			 if (fixMask[i] != 0) {
     				 newpos[i] = savpos[i];
+                                 velo[i] = 0.0;
     			 }
     		 }
    	         it->first->setPos(newpos);
-   	         it->first->setV( Real3D(0.0, 0.0, 0.0) );
+   	         it->first->setV( velo );
    	         //it->first->setF( Real3D(0,0,0) );
     	 }
      }
