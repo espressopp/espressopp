@@ -106,6 +106,53 @@ def readxyz(filename):
   file.close()
 
 
+
+def readxyzr(filename):
+  file = open(filename)
+  line = file.readline()
+  num_particles = int(line.split()[0])
+  line = file.readline()
+  Lx = float(line.split()[0])
+  Ly = float(line.split()[1])
+  Lz = float(line.split()[2])
+  pid  = []
+  type = []
+  xpos = []
+  ypos = []
+  zpos = []
+  xvel = []
+  yvel = []
+  zvel = []
+  radius = []
+  for i in range(num_particles):
+    line = file.readline().split()
+    if len(line) == 7:
+      line.insert(1,'0')
+    pid.append(int(line[0]))
+    type.append(int(line[1]))
+    xpos.append(float(line[2]))
+    ypos.append(float(line[3]))
+    zpos.append(float(line[4]))
+    if len(line) == 6:
+        radius.append(float(line[5]))
+    else:
+        radius.append(0.0)
+    if len(line) > 5 and len(line) <= 8 and len(line) != 6:
+      xvel.append(float(line[5]))
+      yvel.append(float(line[6]))
+      zvel.append(float(line[7]))
+    else:
+      xvel.append(0.0)
+      yvel.append(0.0)
+      zvel.append(0.0)
+    if len(line) == 9:
+        radius.append(float(line[8]))
+    else:
+        if len(line) != 6:
+          radius.append(0.0)
+  return pid, type, xpos, ypos, zpos, xvel, yvel, zvel, Lx, Ly, Lz, radius
+  file.close()
+
 # Livia's modified writexyz to fastwritexyz with velocities
 
 def fastwritexyz(filename, system, velocities = True, append = False):

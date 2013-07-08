@@ -53,9 +53,12 @@ def drain_socket(sock):
     res = select.select([sock],[],[],0)[0]
   return
 
-def connect(system, molsize=10):
+def connect(system, molsize=10, pqrfile=None):
   espresso.tools.psfwrite("vmd.psf", system, molsize=molsize, maxdist=system.bc.boxL[0]/2)
-  espresso.tools.pdbwrite("vmd.pdb", system, molsize=molsize)
+  if pqrfile==True:
+    espresso.tools.pqrwrite("vmd.pqr", system, molsize=molsize)
+  else:
+    espresso.tools.pdbwrite("vmd.pdb", system, molsize=molsize)
   initsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
   hostname = socket.gethostname()
   port     = 10000
@@ -71,7 +74,10 @@ def connect(system, molsize=10):
     return initsock
 
   vmdfile = open("vmd.tcl","w")
-  vmdfile.write("mol load psf vmd.psf pdb vmd.pdb\n")
+  if pqrfile == True:
+    vmdfile.write("mol load psf vmd.psf pqr vmd.pqr\n")
+  else:
+    vmdfile.write("mol load psf vmd.psf pdb vmd.pdb\n")
   vmdfile.write("logfile vmd.log\n")
   vmdfile.write("rotate stop\n")
   vmdfile.write("logfile off\n")

@@ -1,15 +1,22 @@
 import espresso
 import MPI
+import sys
 
-def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.12246, skin=0.3, dt=0.005, epsilon=1.0, sigma=1.0, shift='auto', temperature=None, xyzfilename=None):
+def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.12246, skin=0.3, dt=0.005, epsilon=1.0, sigma=1.0, shift='auto', temperature=None, xyzfilename=None, xyzrfilename=None):
   '''
   returns random walk polymer melt system and integrator:
   if tempearture is != None then Langevin thermostat is set to temperature (gamma is 1.0)
   '''
 
-  if xyzfilename: 
-    pidf, typef, xposf, yposf, zposf, xvelf, yvelf, zvelf, Lxf, Lyf, Lzf = espresso.tools.readxyz(xyzfilename)
+  if xyzfilename and xyzrfilename:
+     print "ERROR: only one of xyzfilename (only xyz data) or xyzrfilename (additional particle radius data) can be provided."
+     sys.exit(1)
+
+  if xyzrfilename: 
+    pidf, typef, xposf, yposf, zposf, xvelf, yvelf, zvelf, Lxf, Lyf, Lzf, radiusf = espresso.tools.readxyzr(xyzrfilename)
     box = (Lxf, Lyf, Lzf)
+  elif xyzfilename:
+    pidf, typef, xposf, yposf, zposf, xvelf, yvelf, zvelf, Lxf, Lyf, Lzf = espresso.tools.readxyz(xyzfilename)
   else:
     if box[0]<=0 or box[1]<=0 or box[2]<=0:
       print "WARNING: no valid box size specified, box size set to (100,100,100) !"
@@ -33,10 +40,10 @@ def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.
     thermostat.temperature = temperature
     integrator.addExtension(thermostat)
 
-  props    = ['id', 'type', 'mass', 'pos', 'v']
+  props    = ['id', 'type', 'mass', 'pos', 'v', 'radius']
   mass     = 1.0  
 
-  if xyzfilename: 
+  if xyzrfilename: 
     bondlist = espresso.FixedPairList(system.storage)
     for i in range(num_chains):
       chain = []
@@ -45,7 +52,24 @@ def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.
         idx  =  i * monomers_per_chain + k
         part = [ pidf[idx], typef[idx], mass,
                  espresso.Real3D(xposf[idx],yposf[idx],zposf[idx]),
-                 espresso.Real3D(xvelf[idx],yvelf[idx],zvelf[idx]) ]
+                 espresso.Real3D(xvelf[idx],yvelf[idx],zvelf[idx]),
+                 radiusf[idx] ]
+        chain.append(part)
+        if k>0:
+          bonds.append((pidf[idx-1], pidf[idx]))
+      system.storage.addParticles(chain, *props)
+      system.storage.decompose()
+      bondlist.addBonds(bonds)
+  elif xyzfilename: 
+    bondlist = espresso.FixedPairList(system.storage)
+    for i in range(num_chains):
+      chain = []
+      bonds = []
+      for k in range(monomers_per_chain):
+        idx  =  i * monomers_per_chain + k
+        part = [ pidf[idx], typef[idx], mass,
+                 espresso.Real3D(xposf[idx],yposf[idx],zposf[idx]),
+                 espresso.Real3D(xvelf[idx],yvelf[idx],zvelf[idx])]
         chain.append(part)
         if k>0:
           bonds.append((pidf[idx-1], pidf[idx]))
@@ -62,7 +86,7 @@ def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.
       startpos = system.bc.getRandomPos()
       positions, bonds = espresso.tools.topology.polymerRW(pid, startpos, monomers_per_chain, bondlen)
       for k in range(monomers_per_chain):  
-        part = [pid + k, type, mass, positions[k], vel_zero]
+        part = [pid + k, type, mass, positions[k], vel_zero, 1.0]
         chain.append(part)
       pid += monomers_per_chain
       type += 1
