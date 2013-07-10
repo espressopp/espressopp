@@ -16,6 +16,7 @@ if pmi.isController :
   class RadialDistrF(Observable):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
+      pmiproperty = [ 'print_progress' ],
       pmicall = [ "compute" ],
       cls = 'espresso.analysis.RadialDistrFLocal'
     )

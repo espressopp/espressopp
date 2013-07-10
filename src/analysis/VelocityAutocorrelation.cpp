@@ -43,7 +43,7 @@ namespace espresso {
          * additional calculations slow down routine but from the other hand
          * it helps to monitor progress
          */
-        if(system.comm->rank()==0){
+        if(print_progress && system.comm->rank()==0){
           perc = (int)(m*denom);
           if(perc%5==0){
             cout<<"calculation progress (velocity autocorrelation): "<< perc << " %\r"<<flush;
@@ -78,10 +78,10 @@ namespace espresso {
     void VelocityAutocorrelation::registerPython() {
       using namespace espresso::python;
 
-      class_<VelocityAutocorrelation, bases<ConfigsParticleDecomp> >(
-        "analysis_VelocityAutocorrelation",
-        init< shared_ptr< System > >()
-      );
+      class_<VelocityAutocorrelation, bases<ConfigsParticleDecomp> >
+      ("analysis_VelocityAutocorrelation",init< shared_ptr< System > >() )
+        .add_property("print_progress", &VelocityAutocorrelation::getPrint_progress, &VelocityAutocorrelation::setPrint_progress)
+      ;
     }
   }
 }

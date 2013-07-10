@@ -18,5 +18,6 @@ if pmi.isController:
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
       cls =  'espresso.analysis.MeanSquareDisplLocal',
+      pmiproperty = [ 'print_progress' ],
       pmicall = ['strange']
     )

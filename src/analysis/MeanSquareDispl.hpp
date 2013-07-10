@@ -20,13 +20,23 @@ namespace espresso {
     public:
       
       MeanSquareDispl(shared_ptr<System> system): ConfigsParticleDecomp (system){
+        // by default 
+        setPrint_progress(true);
+        
         key = "unfolded";
       }
       ~MeanSquareDispl() {}
       
       virtual python::list compute() const;
 
+      void setPrint_progress(bool _print_progress){
+        print_progress = _print_progress;
+      }
+      bool getPrint_progress(){return print_progress;}
+      
       static void registerPython();
+    private:
+      bool print_progress;
     };
   }
 }

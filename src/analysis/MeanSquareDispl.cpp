@@ -71,7 +71,7 @@ namespace espresso {
             }
           }
         }
-        if(system.comm->rank()==0){
+        if(print_progress && system.comm->rank()==0){
           perc = (int)(100*(real)m/(real)M);
           if(perc>perc1){
             cout<<"calculation progress (mean square displacement): "<< perc << " %\r"<<flush;
@@ -107,10 +107,10 @@ namespace espresso {
     void MeanSquareDispl::registerPython() {
       using namespace espresso::python;
 
-      class_<MeanSquareDispl, bases<ConfigsParticleDecomp> >(
-        "analysis_MeanSquareDispl",
-        init< shared_ptr< System > >()
-      );
+      class_<MeanSquareDispl, bases<ConfigsParticleDecomp> >
+      ("analysis_MeanSquareDispl", init< shared_ptr< System > >() )
+        .add_property("print_progress", &MeanSquareDispl::getPrint_progress, &MeanSquareDispl::setPrint_progress)
+      ;
     }
   }
 }

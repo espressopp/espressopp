@@ -92,7 +92,7 @@ namespace espresso {
          * additional calculations slow down routine but from the other hand
          * it helps to monitor progress
          */
-        if(system.comm->rank()==0){
+        if(print_progress && system.comm->rank()==0){
           perc = (int)((i-mini)*denom);
           if(perc%5==0){
             cout<<"calculation progress (radial distr. func.): "<< perc << " %\r"<<flush;
@@ -133,6 +133,7 @@ namespace espresso {
       using namespace espresso::python;
       class_<RadialDistrF, bases< Observable > >
         ("analysis_RadialDistrF", init< shared_ptr< System > >())
+        .add_property("print_progress", &RadialDistrF::getPrint_progress, &RadialDistrF::setPrint_progress)
         .def("compute", &RadialDistrF::computeArray)
       ;
     }

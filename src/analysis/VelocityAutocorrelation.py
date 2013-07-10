@@ -13,5 +13,6 @@ if pmi.isController:
   class VelocityAutocorrelation(ConfigsParticleDecomp):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
+      pmiproperty = [ 'print_progress' ],
       cls =  'espresso.analysis.VelocityAutocorrelationLocal'
     )
