@@ -59,10 +59,10 @@ namespace espresso {
         totZ[m] /= (real)(M - m);
       }
       
-      real coef = 3.0 * num_of_part;
+      real inv_coef = 1.0 / (3.0 * num_of_part);
       
       for(int m=0; m<M; m++){
-        totZ[m] /= coef;
+        totZ[m] *= inv_coef;
         pyli.append( totZ[m] );
       }
       

@@ -10,8 +10,7 @@ namespace espresso {
     
     /*
      * calc <r^2> the output is the average mean sq. displacement over 3 directions.
-     * !! Important!! For D calculation one have to divide slope by /2.0 (not 6.0)! It is
-     * already taken into account.
+     * !! Important!! For D calculation factor 1/6 is already taken into account.
      * !! all confs should contain the same number of particles
     */
     
@@ -88,10 +87,10 @@ namespace espresso {
         totZ[m] /= (real)(M - m);
       }
       
-      real coef = 3 * num_of_part;
+      real inv_coef = 1.0 / (6.0 * num_of_part);
       
       for(int m=0; m<M; m++){
-        totZ[m] /= coef;
+        totZ[m] *= inv_coef;
         pyli.append( totZ[m] );
       }
       
