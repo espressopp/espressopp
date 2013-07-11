@@ -15,6 +15,7 @@
 #include "LangevinBarostat.hpp"
 #include "FixPositions.hpp"
 #include "LatticeBoltzmann.hpp"
+#include "LatticeSite.hpp"
 #include "ExtForce.hpp"
 #include "CapForce.hpp"
 #include "ExtAnalyze.hpp"
