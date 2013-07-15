@@ -74,5 +74,5 @@ if pmi.isController :
             cls =  'espresso.analysis.ConfigurationsExtLocal',
             pmicall = [ "gather", "clear", "back" ],
             localcall = ["__getitem__", "__iter__"],
-            pmiproperty = ["capacity", "size"]
+            pmiproperty = ["capacity", "size", 'unfolded']
             )

@@ -41,7 +41,8 @@ namespace espresso {
          configurationsExt.erase(configurationsExt.begin(),
                               configurationsExt.begin() + diff);
       }
-
+      
+      unfolded = true; // by default it writes unfolded coordinates
     }
 
     int ConfigurationsExt::getCapacity()
@@ -120,24 +121,45 @@ namespace espresso {
 
       int i = 0; 
 
-      for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+      if( unfolded ){
+        for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
-        ids[i] = cit->id();
+          ids[i] = cit->id();
 
-        Real3D& pos = cit->position();
-        Real3D& vel = cit->velocity();
-        Int3D& img = cit->image();
-        Real3D L = system.bc->getBoxL();
+          Real3D& pos = cit->position();
+          Real3D& vel = cit->velocity();
+          Int3D& img = cit->image();
+          Real3D L = system.bc->getBoxL();
 
-        coordinates[3*i]   = pos[0] + img[0] * L[0];
-        coordinates[3*i+1] = pos[1] + img[1] * L[1];
-        coordinates[3*i+2] = pos[2] + img[2] * L[2];
+          coordinates[3*i]   = pos[0] + img[0] * L[0];
+          coordinates[3*i+1] = pos[1] + img[1] * L[1];
+          coordinates[3*i+2] = pos[2] + img[2] * L[2];
 
-        velocities[3*i]   = vel[0];
-        velocities[3*i+1] = vel[1];
-        velocities[3*i+2] = vel[2];
+          velocities[3*i]   = vel[0];
+          velocities[3*i+1] = vel[1];
+          velocities[3*i+2] = vel[2];
 
-        i++;
+          i++;
+        }
+      }
+      else{
+        for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+
+          ids[i] = cit->id();
+
+          Real3D& pos = cit->position();
+          Real3D& vel = cit->velocity();
+
+          coordinates[3*i]   = pos[0];
+          coordinates[3*i+1] = pos[1];
+          coordinates[3*i+2] = pos[2];
+
+          velocities[3*i]   = vel[0];
+          velocities[3*i+1] = vel[1];
+          velocities[3*i+2] = vel[2];
+
+          i++;
+        }
       }
 
       if (i != myN) {
@@ -161,7 +183,7 @@ namespace espresso {
            if (iproc) {
    
               int nIds, nCoords, nVelocs;   // number of received values
-              int tmp;
+              //int tmp;
 
               boost::mpi::request req;
               boost::mpi::status  stat;
@@ -268,6 +290,8 @@ namespace espresso {
       .add_property("size", &ConfigurationsExt::getSize)
       .add_property("capacity", &ConfigurationsExt::getCapacity, 
                                 &ConfigurationsExt::setCapacity)
+      .add_property("unfolded", &ConfigurationsExt::getUnfolded, 
+                                &ConfigurationsExt::setUnfolded)
       .def("gather", &ConfigurationsExt::gather)
       .def("__getitem__", &ConfigurationsExt::get)
       .def("back", &ConfigurationsExt::back)

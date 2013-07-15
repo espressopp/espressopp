@@ -39,6 +39,9 @@ namespace espresso {
       int getSize();
 
       ~ConfigurationsExt() {}
+      
+      bool getUnfolded(){return unfolded;}
+      void setUnfolded(bool v){unfolded = v;}
 
       /** Gake a snapshot of all current particle positions. */
 
@@ -65,6 +68,8 @@ namespace espresso {
       ConfigurationExtList configurationsExt;
 
       int maxConfigs;
+      
+      bool unfolded;  // one can choose folded or unfolded coordinates, by default it is unfolded
     };
   }
 }

@@ -194,3 +194,51 @@ def fastwritexyz(filename, system, velocities = True, append = False):
   
   file.close()
 
+
+'''
+  Fast write standard xyz file. Generally standard xyz file is
+  
+  >  number of particles
+  >  comment line
+  >  type x y z
+  >  ......
+  >  ......
+  >  ......
+  
+  Additional information can be found here:
+  Wiki:  http://en.wikipedia.org/wiki/XYZ_file_format
+  OpenBabel: http://openbabel.org/wiki/XYZ_%28format%29
+  
+  In this case one can choose folded or unfolded coordinates.
+  Currently it writes only particle type = 0 and pid is a line number.
+  Later different types should be implemented.
+'''
+def fastwritexyz_standard(filename, system, unfolded = False, append = False):
+
+  if append:
+    file = open(filename,'a')
+  else:
+    file = open(filename,'w')
+
+  conf = espresso.analysis.ConfigurationsExt(system)
+  conf.unfolded = unfolded
+  conf.gather()
+
+  numParticles  = int(espresso.analysis.NPart(system).compute())
+  box_x = system.bc.boxL[0]
+  box_y = system.bc.boxL[1]
+  box_z = system.bc.boxL[2]
+  st = "%d\n%18.12f %18.12f %18.12f\n" % (numParticles, box_x, box_y, box_z)
+  file.write(st)
+
+  for pid in conf[0]:
+    xpos   = conf[0][pid][0]
+    ypos   = conf[0][pid][1]
+    zpos   = conf[0][pid][2]
+
+    st = "%d %15.10f %15.10f %15.10f\n"%(0, xpos, ypos, zpos)
+    file.write(st)
+    pid   += 1
+  
+  file.close()
+
