@@ -89,6 +89,8 @@ def readxyz(filename):
   zvel = []
   for i in range(num_particles):
     line = file.readline().split()
+    if len(line) == 7:
+      line.insert(1,'0')
     pid.append(int(line[0]))
     type.append(int(line[1]))
     xpos.append(float(line[2]))
