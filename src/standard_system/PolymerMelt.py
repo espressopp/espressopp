@@ -17,6 +17,7 @@ def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.
     box = (Lxf, Lyf, Lzf)
   elif xyzfilename:
     pidf, typef, xposf, yposf, zposf, xvelf, yvelf, zvelf, Lxf, Lyf, Lzf = espresso.tools.readxyz(xyzfilename)
+    box = (Lxf, Lyf, Lzf)
   else:
     if box[0]<=0 or box[1]<=0 or box[2]<=0:
       print "WARNING: no valid box size specified, box size set to (100,100,100) !"
@@ -40,10 +41,10 @@ def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.
     thermostat.temperature = temperature
     integrator.addExtension(thermostat)
 
-  props    = ['id', 'type', 'mass', 'pos', 'v', 'radius']
   mass     = 1.0  
 
   if xyzrfilename: 
+    props    = ['id', 'type', 'mass', 'pos', 'v', 'radius']
     bondlist = espresso.FixedPairList(system.storage)
     for i in range(num_chains):
       chain = []
@@ -61,6 +62,7 @@ def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.
       system.storage.decompose()
       bondlist.addBonds(bonds)
   elif xyzfilename: 
+    props    = ['id', 'type', 'mass', 'pos', 'v']
     bondlist = espresso.FixedPairList(system.storage)
     for i in range(num_chains):
       chain = []
@@ -77,6 +79,7 @@ def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.
       system.storage.decompose()
       bondlist.addBonds(bonds)
   else:            
+    props    = ['id', 'type', 'mass', 'pos', 'v']
     vel_zero = espresso.Real3D(0.0, 0.0, 0.0)
     bondlist = espresso.FixedPairList(system.storage)
     pid      = 1
