@@ -5,7 +5,7 @@ import math
 N = 4
 num_particles = pow(N, 3)
 # create particle positions in 3d lattice
-x, y, z, Lx, Ly, Lz = espresso.tools.lattice.create(N=num_particles, rho=0.5)
+x, y, z, Lx, Ly, Lz = espresso.tools.lattice.createCubic(N=num_particles, rho=0.5)
 
 # setup LennardJones system (with 0 particles)
 system, integrator = espresso.standard_system.LennardJones(0, box=(4*Lx, Ly, Lz))
