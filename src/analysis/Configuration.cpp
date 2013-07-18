@@ -12,30 +12,113 @@ using namespace boost::python;
 namespace espresso {
   namespace analysis {
 
-    Configuration::Configuration()  //int nParticles
+    Configuration::Configuration(bool _pos, bool _vel, bool _force, bool _radius)
+                : gatherPos(_pos), gatherVel(_vel), gatherForce(_force), gatherRadius(_radius)
     {
-      //this->nParticles = nParticles;
+    }
+
+    Configuration::Configuration() {
+  	  gatherPos=true;
+	  gatherVel=false;
+	  gatherForce=false;
+	  gatherRadius=false;
     }
 
     Configuration::~Configuration()
     {
     }
 
-    void Configuration::set(size_t index, real x, real y, real z)
-    {
-      coordinates[index] = Real3D(x, y, z);
+    void Configuration::set(size_t index, real x, real y, real z) {
+      if (gatherPos)
+        coordinates[index] = Real3D(x, y, z);
+      else {
+    	  std::cout << "Error: This configuration does not store coordinates" << std::endl;
+      }
     }
 
-    Real3D Configuration::getCoordinates(size_t index)
-    {
-      return coordinates[index];
+    void Configuration::setCoordinates(size_t index, Real3D _pos) {
+      if (gatherPos)
+        coordinates[index] = _pos;
+      else {
+    	  std::cout << "Error: This configuration does not store coordinates" << std::endl;
+      }
     }
 
-    size_t Configuration::getSize()
-    {
-      return coordinates.size();
+    void Configuration::setVelocities(size_t index, Real3D _vel) {
+      if (gatherVel)
+        velocities[index] = _vel;
+      else {
+    	  std::cout << "Error: This configuration does not store velocities" << std::endl;
+      }
     }
 
+    void Configuration::setForces(size_t index, Real3D _forces) {
+      if (gatherForce)
+        forces[index] = _forces;
+      else {
+    	  std::cout << "Error: This configuration does not store forces" << std::endl;
+      }
+    }
+
+    void Configuration::setRadius(size_t index, real _radius) {
+      if (gatherRadius)
+        radii[index] = _radius;
+      else {
+    	  std::cout << "Error: This configuration does not store radii" << std::endl;
+      }
+    }
+
+    Real3D Configuration::getCoordinates(size_t index) {
+      if (gatherPos)
+        return coordinates[index];
+      else {
+    	  std::cout << "Error: This configuration has no information about coordinates" << std::endl;
+    	  return Real3D(0,0,0);
+      }
+    }
+
+    Real3D Configuration::getVelocities(size_t index) {
+      if (gatherVel)
+        return velocities[index];
+      else {
+    	  std::cout << "Error: This configuration has no information about velocities" << std::endl;
+    	  return Real3D(0,0,0);
+      }
+    }
+
+    Real3D Configuration::getForces(size_t index) {
+      if (gatherForce)
+        return forces[index];
+      else {
+    	  std::cout << "Error: This configuration has no information about forces" << std::endl;
+    	  return Real3D(0,0,0);
+      }
+    }
+
+    real Configuration::getRadius(size_t index) {
+      if (gatherRadius)
+        return radii[index];
+      else {
+    	  std::cout << "Error: This configuration has no information about radii" << std::endl;
+    	  return 0;
+      }
+    }
+
+    size_t Configuration::getSize() {
+      size_t sizePos    = coordinates.size();
+      size_t sizeVel    = velocities.size();
+      size_t sizeForce  = forces.size();
+      size_t sizeRadius = radii.size();
+
+      if (sizePos    > 0) return sizePos;
+      if (sizeVel    > 0) return sizeVel;
+      if (sizeForce  > 0) return sizeForce;
+      if (sizeRadius > 0) return sizeRadius;
+
+      return 0;
+    }
+
+/*
     ConfigurationIterator Configuration::getIterator()
     {
       return ConfigurationIterator(coordinates);
@@ -72,20 +155,21 @@ namespace espresso {
     }
 
     inline object pass_through(object const& o) { return o; }
+*/
 
     void Configuration::registerPython() {
       using namespace espresso::python;
-
+/*
       class_<ConfigurationIterator>("ConfigurationIterator", no_init)
       .def("next", &ConfigurationIterator::nextId)
       .def("__iter__", pass_through)
       ;
-
+*/
       class_<Configuration>
         ("analysis_Configuration", no_init)
       .add_property("size", &Configuration::getSize)
       .def("__getitem__", &Configuration::getCoordinates)
-      .def("__iter__", &Configuration::getIterator)
+      // .def("__iter__", &Configuration::getIterator)
       ;
     }
 

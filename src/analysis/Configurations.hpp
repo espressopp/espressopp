@@ -22,8 +22,15 @@ namespace espresso {
     public:
 
       /** Constructor, allow for unlimited snapshots. */
-
-      Configurations(shared_ptr<System> system) : SystemAccess (system)
+      Configurations(shared_ptr<System> system) : SystemAccess (system) {
+    	  gatherPos = true;
+    	  gatherVel = false;
+    	  gatherForce = false;
+    	  gatherRadius = false;
+    	  maxConfigs = 0;
+      }
+      Configurations(shared_ptr<System> system, bool _pos, bool _vel, bool _force, bool _radius, bool _folded)
+                    : SystemAccess (system), gatherPos(_pos), gatherVel(_vel), gatherForce(_force), gatherRadius(_radius), folded(_folded)
       { maxConfigs = 0; }
 
       /** set number of maximal snapshots. */
@@ -65,6 +72,8 @@ namespace espresso {
       ConfigurationList configurations;
 
       int maxConfigs;
+
+      bool gatherPos, gatherVel, gatherForce, gatherRadius, folded;
     };
   }
 }

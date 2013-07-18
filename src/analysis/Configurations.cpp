@@ -110,27 +110,36 @@ namespace espresso {
       LOG4ESPP_INFO(logger, "#Partices: me = " << myN << ", max = " << maxN
                             << ", totalN = " << totalN);
 
-      real* coordinates = new real [3 * maxN];  // buffer for gather
       int*  ids         = new int [maxN];  // buffer for gather
+      Real3D* coordinates;
+      Real3D* velocities;
+      Real3D* forces;
+      real* radii;
+
+      if (gatherPos)    coordinates = new Real3D [maxN];  // buffer for gather
+      if (gatherVel)    velocities  = new Real3D [maxN];  // buffer for gather
+      if (gatherForce)  forces      = new Real3D [maxN];  // buffer for gather
+      if (gatherRadius) radii       = new real [maxN];  // buffer for gather
 
       // fill the buffer with my values
 
       CellList realCells = system.storage->getRealCells();
 
       int i = 0; 
-
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-
         ids[i] = cit->id();
-
-        Real3D& pos = cit->position();
-        Int3D& img = cit->image();
-        Real3D L = system.bc->getBoxL();
-
-        coordinates[3*i]   = pos[0] + img[0] * L[0];
-        coordinates[3*i+1] = pos[1] + img[1] * L[1];
-        coordinates[3*i+2] = pos[2] + img[2] * L[2];
-
+        if (gatherPos) {
+          Real3D pos = cit->position();
+          Int3D img = cit->image();
+          if (folded)
+        	system.bc->foldPosition(pos, img);
+          else
+        	system.bc->unfoldPosition(pos, img);
+          coordinates[i] = pos;
+        }
+        if (gatherVel)    velocities[i]  = cit->velocity();
+        if (gatherForce)  forces[i]      = cit->force();
+        if (gatherRadius) radii[i]       = cit->radius();
         i++;
       }
 
@@ -149,38 +158,58 @@ namespace espresso {
          int nproc = system.comm->size();
 
          for (int iproc = 0; iproc < nproc; iproc++) {
-
            int nother;
-
            if (iproc) {
-   
-              int nIds, nCoords;   // number of received values
+              int nIds, nVals;   // number of received values
               int tmp;
-
               boost::mpi::request req;
               boost::mpi::status  stat;
-
               LOG4ESPP_DEBUG(logger, "receive tags from " << iproc);
-
               req = system.comm->irecv<int>(iproc, DEFAULT_TAG, ids, maxN);
               system.comm->send(iproc, DEFAULT_TAG, 0);
               stat = req.wait();
               nIds = *stat.count<int>();
-
-              req = system.comm->irecv<real>(iproc, DEFAULT_TAG, coordinates, 3*maxN);
-              system.comm->send(iproc, DEFAULT_TAG, 0);
-              stat = req.wait();
-              nCoords = *stat.count<real>();
-  
-              // make sure to have 3 coordinate values for each id
-
-              if (nCoords != 3 * nIds) {
-                LOG4ESPP_ERROR(logger, "serious error collecting data, got " << 
-                              nIds << " ids, but " << nCoords << " coordinates");
+              if (gatherPos) {
+                req = system.comm->irecv<Real3D>(iproc, DEFAULT_TAG, coordinates, maxN);
+                system.comm->send(iproc, DEFAULT_TAG, 0);
+                stat = req.wait();
+                nVals = *stat.count<Real3D>();
+                if (nVals != nIds) {
+                  LOG4ESPP_ERROR(logger, "serious error collecting data, got " <<
+                                nIds << " ids, but " << nVals << " coordinates");
+                }
               }
-
+              if (gatherVel) {
+                req = system.comm->irecv<Real3D>(iproc, DEFAULT_TAG, velocities, maxN);
+                system.comm->send(iproc, DEFAULT_TAG, 0);
+                stat = req.wait();
+                nVals = *stat.count<Real3D>();
+                if (nVals != nIds) {
+                  LOG4ESPP_ERROR(logger, "serious error collecting data, got " <<
+                                nIds << " ids, but " << nVals << " velocities");
+                }
+              }
+              if (gatherForce) {
+                req = system.comm->irecv<Real3D>(iproc, DEFAULT_TAG, forces, maxN);
+                system.comm->send(iproc, DEFAULT_TAG, 0);
+                stat = req.wait();
+                nVals = *stat.count<Real3D>();
+                if (nVals != nIds) {
+                  LOG4ESPP_ERROR(logger, "serious error collecting data, got " <<
+                                nIds << " ids, but " << nVals << " forces");
+                }
+              }
+              if (gatherRadius) {
+                req = system.comm->irecv<real>(iproc, DEFAULT_TAG, radii, maxN);
+                system.comm->send(iproc, DEFAULT_TAG, 0);
+                stat = req.wait();
+                nVals = *stat.count<real>();
+                if (nVals != nIds) {
+                  LOG4ESPP_ERROR(logger, "serious error collecting data, got " <<
+                                nIds << " ids, but " << nVals << " radii");
+                }
+              }
               nother = nIds;
-
            } else {
              nother = myN;
            }
@@ -188,13 +217,13 @@ namespace espresso {
            LOG4ESPP_INFO(logger, "add " << nother << " coordinates of proc " << iproc);
 
            for (int i = 0; i < nother; i++) {
-
+             //LOG4ESPP_DEBUG(logger, "set coordinates of particle with id = " << index <<
+             //                       ": " << coordinates[3*i] << " " <<  coordinates[3*i+1] << " " << coordinates[3*i+2]);
              int index = ids[i];
-
-             LOG4ESPP_INFO(logger, "set coordianates of particle with id = " << index <<
-                                    ": " << coordinates[3*i] << " " <<  coordinates[3*i+1] << " " << coordinates[3*i+2]);
-
-             config->set(index, coordinates[3*i], coordinates[3*i+1], coordinates[3*i+2]);
+             if (gatherPos)    config->setCoordinates(index, coordinates[i]);
+             if (gatherVel)    config->setVelocities(index, velocities[i]);
+             if (gatherForce)  config->setForces(index, forces[i]);
+             if (gatherRadius) config->setRadius(index, radii[i]);
            }
         }
 
@@ -217,15 +246,32 @@ namespace espresso {
 
        system.comm->irecv<int>(0, DEFAULT_TAG, tmp);
        system.comm->send<int>(0, DEFAULT_TAG, ids, myN);
-       system.comm->irecv<int>(0, DEFAULT_TAG, tmp);
-       system.comm->send<real>(0, DEFAULT_TAG, coordinates, 3*myN);
+       if (gatherPos) {
+         system.comm->irecv<int>(0, DEFAULT_TAG, tmp);
+         system.comm->send<Real3D>(0, DEFAULT_TAG, coordinates, myN);
+       }
+       if (gatherVel) {
+         system.comm->irecv<int>(0, DEFAULT_TAG, tmp);
+         system.comm->send<Real3D>(0, DEFAULT_TAG, velocities, myN);
+       }
+       if (gatherForce) {
+         system.comm->irecv<int>(0, DEFAULT_TAG, tmp);
+         system.comm->send<Real3D>(0, DEFAULT_TAG, forces, myN);
+       }
+       if (gatherRadius) {
+         system.comm->irecv<int>(0, DEFAULT_TAG, tmp);
+         system.comm->send<real>(0, DEFAULT_TAG, radii, myN);
+       }
       }
 
       // ToDo: remove first configuration if capacity is exhausted
 
       // master process saves the configuration
 
-      delete [] coordinates;
+      if (gatherRadius) delete [] radii;
+      if (gatherForce)  delete [] forces;
+      if (gatherVel)    delete [] velocities;
+      if (gatherPos)    delete [] coordinates;
       delete [] ids;
     }
 
