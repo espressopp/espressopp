@@ -106,7 +106,10 @@ void StochasticVelocityRescaling::rescaleVelocities() {
 		throw std::runtime_error(
 				"EKin_new in StochasticVelocityRescaling::rescaleVelocities() is equal or smaller than 0");
 
-	ScalingFactor = sqrt(EKin_new / EKin);
+  if(getSystem()->comm->rank() == 0)
+          ScalingFactor = sqrt(EKin_new / EKin);
+      
+  boost::mpi::broadcast(*getSystem()->comm, ScalingFactor, 0);
 
 	for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 		cit->velocity() *= ScalingFactor;
