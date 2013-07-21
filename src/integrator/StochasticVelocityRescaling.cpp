@@ -46,10 +46,13 @@ StochasticVelocityRescaling::~StochasticVelocityRescaling() {
     disconnect();
 }
 void StochasticVelocityRescaling::disconnect(){
+  _runInit.disconnect();
   _aftIntV.disconnect();
 }
 
 void StochasticVelocityRescaling::connect(){
+  // connection to initialization
+  _runInit = integrator->runInit.connect( boost::bind(&StochasticVelocityRescaling::initialize, this));
   // connection to the signal at the end of the run
   _aftIntV = integrator->aftIntV.connect( boost::bind(&StochasticVelocityRescaling::rescaleVelocities, this));
 }
@@ -70,14 +73,26 @@ real StochasticVelocityRescaling::getCoupling() {
 	return coupling;
 }
 
+void StochasticVelocityRescaling::initialize() {
+  LOG4ESPP_INFO(theLogger, "init, coupling = " << coupling << 
+                                ", external temperature = " << temperature);
+  real dt = integrator->getTimeStep();
+  pref = coupling / dt;
+
+	System& system = getSystemRef();
+	NPart_local = system.storage->getNRealParticles();
+	boost::mpi::all_reduce(*getSystem()->comm, NPart_local, NPart,
+			std::plus<int>());
+	DegreesOfFreedom = 3.0 * NPart; //TODO this is _only_ true for simple system without any constraints
+	//calculate the reference kinetic energy based on reference temperature 'temperature'
+	EKin_ref = 0.5 * temperature * BOLTZMANN * DegreesOfFreedom;
+}
+
 void StochasticVelocityRescaling::rescaleVelocities() {
 	LOG4ESPP_DEBUG(theLogger, "rescaleVelocities");
 
-	int NPart_local, NPart;
 	real EKin = 0.0;
 	real EKin_local = 0.0;
-	real EKin_ref = 0.0;
-	int DegreesOfFreedom;
 	real EKin_new = 0.0;
 	real ScalingFactor;
 
@@ -89,17 +104,10 @@ void StochasticVelocityRescaling::rescaleVelocities() {
 		EKin_local += 0.5 * cit->mass() * (vel * vel); //FIXME do not forget that his is only correct for velocity-verlet; leap-frog would require adjustments
 	}
 
-	NPart_local = system.storage->getNRealParticles();
-
 	boost::mpi::all_reduce(*getSystem()->comm, EKin_local, EKin,
 			std::plus<real>());
-	boost::mpi::all_reduce(*getSystem()->comm, NPart_local, NPart,
-			std::plus<int>());
 
-	DegreesOfFreedom = 3.0 * NPart; //TODO this is _only_ true for simple system without any constraints
-	//calculate the reference kinetic energy based on reference temperature 'temperature'
-	EKin_ref = 0.5 * temperature * BOLTZMANN * DegreesOfFreedom;
-	EKin_new = stochasticVR_pullEkin(EKin, EKin_ref, DegreesOfFreedom, coupling,
+	EKin_new = stochasticVR_pullEkin(EKin, EKin_ref, DegreesOfFreedom, pref,
 			rng);
 	// it should always be larger than 0
 	if (EKin_new <= 0)

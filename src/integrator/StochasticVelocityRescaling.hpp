@@ -87,10 +87,16 @@ public:
 	static void registerPython();
 
 private:
-    boost::signals2::connection _aftIntV;
+    boost::signals2::connection _runInit, _aftIntV;
     
 	real temperature; //!< desired user temperature
 	real coupling; // how strong is the coupling, i.e., tau_t coupling time
+  real pref; // factor in the rescaling part
+  
+  int NPart, NPart_local, DegreesOfFreedom;
+  real EKin_ref;
+
+  void initialize();
 
 	shared_ptr<esutil::RNG> rng; //!< random number generator
 
