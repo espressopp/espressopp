@@ -36,11 +36,41 @@ namespace espresso {
       for (int rank_i=0; rank_i<nprocs; rank_i++) {
         map< size_t, Real3D > conf;
         if (rank_i == myrank) {
-          CellList realCells = system.storage->getRealCells();
-          for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-            int id = cit->id();
-            conf[id] = cit->position();
-          }
+            if(system.storage->getFixedTuples()){
+                shared_ptr<FixedTupleList> fixedtupleList=system.storage->getFixedTuples();
+                CellList realCells = system.storage->getRealCells();
+                                
+                for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {  // Iterate over all (CG) particles.              
+                    Particle &vp = *cit;
+                    FixedTupleList::iterator it2;
+                    it2 = fixedtupleList->find(&vp);
+
+                    if (it2 != fixedtupleList->end()) {  // Are there atomistic particles for given CG particle? If yes, use those for calculation.
+                          std::vector<Particle*> atList;
+                          atList = it2->second;
+                          for (std::vector<Particle*>::iterator it3 = atList.begin();
+                                               it3 != atList.end(); ++it3) {
+                              Particle &at = **it3;
+                              int id = at.id();
+                              conf[id] = at.position();
+                          }  
+                    }
+
+                    else{   // If not, use CG particle itself for calculation.
+                          int id = cit->id();
+                          conf[id] = cit->position();
+                    }
+
+                }
+            
+            }
+            else{
+                CellList realCells = system.storage->getRealCells();
+                for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+                  int id = cit->id();
+                  conf[id] = cit->position();
+                }
+            }
     	}
 
         boost::mpi::broadcast(*system.comm, conf, rank_i);
@@ -69,13 +99,13 @@ namespace espresso {
         int bin = floor (coordP1[0]/dr);
         histogram[bin] += 1.0;
         
-        if(system.comm->rank()==0){
+        /*if(system.comm->rank()==0){
           perc = (int)(100*(real)(i-mini)/(real)(maxi-mini));
           if(perc>perc1){
             cout<<"calculation progress (density profile along x axis): "<< perc << " %\r"<<flush;
             perc1 = perc;
           }
-        }
+        }*/
       }
       //if(system.comm->rank()==0)
         //cout<<"calculation progress (density profile along x axis): "<< 100 << " %" <<endl;

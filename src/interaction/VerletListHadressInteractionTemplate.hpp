@@ -35,7 +35,7 @@ namespace espresso {
 
           // AdResS stuff
           dhy = verletList->getHy();
-          pidhy2 = M_PI/(dhy * 2);
+          pidhy2 = M_PI/(dhy * 2.0);
           dex = verletList->getEx();
           dex2 = dex * dex;
           dexdhy = dex + verletList->getHy();
@@ -133,6 +133,15 @@ namespace espresso {
 
       // Compute center of mass and set the weights for virtual particles in AdResS zone (HY and AT region).
       void makeWeights(){
+          
+          std::set<Particle*> cgZone = verletList->getCGZone();
+          for (std::set<Particle*>::iterator it=cgZone.begin();
+              it != cgZone.end(); ++it) {
+
+          Particle &vp = **it;
+          weights.insert(std::make_pair(&vp, 0.0));
+          }
+          
           adrZone = verletList->getAdrZone();
           for (std::set<Particle*>::iterator it=adrZone.begin();
                   it != adrZone.end(); ++it) {
@@ -175,15 +184,17 @@ namespace espresso {
                   // calculate distance to nearest adress particle or center
                   std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
                   Real3D pa = **it2; // position of adress particle
-                  //Real3D d1 = vp.position() - pa;                                               // X SPLIT VS SPHERE CHANGE
-                  real d1 = vp.position()[0] - pa[0];                                             // X SPLIT VS SPHERE CHANGE
-                  real min1sq = d1*d1; // d1.sqr(); // set min1sq before loop                     // X SPLIT VS SPHERE CHANGE
+                  //Real3D d1 = vp.position() - pa;                                                      // X SPLIT VS SPHERE CHANGE
+                  real d1 = vp.position()[0] - pa[0];                                                // X SPLIT VS SPHERE CHANGE
+                  //real min1sq = d1.sqr();  // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
+                  real min1sq = d1*d1;   // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
                   ++it2;
                   for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                        pa = **it2;
-                       //d1 = vp.position() - pa;                                                 // X SPLIT VS SPHERE CHANGE
-                       d1 = vp.position()[0] - pa[0];                                             // X SPLIT VS SPHERE CHANGE
-                       real distsq1 = d1*d1; //d1.sqr();
+                       //d1 = vp.position() - pa;                                                          // X SPLIT VS SPHERE CHANGE
+                       d1 = vp.position()[0] - pa[0];                                                  // X SPLIT VS SPHERE CHANGE
+                       //real distsq1 = d1.sqr();                                                          // X SPLIT VS SPHERE CHANGE
+                       real distsq1 = d1*d1;                                                           // X SPLIT VS SPHERE CHANGE
                        //std::cout << pa << " " << sqrt(distsq1) << "\n";
                        if (distsq1 < min1sq) min1sq = distsq1;
                   }
@@ -192,8 +203,6 @@ namespace espresso {
                   
                   weights.insert(std::make_pair(&vp, w));
 
-                  //if (w1 == 1 || w2 == 1) std::cout << p1.id() << " ";
-                  //std::cout << vp.id() << " weight: " << w << "\n";
               }
               else { // this should not happen
                   std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
@@ -201,7 +210,7 @@ namespace espresso {
                   exit(1);
                   return;
               }
-          }      
+          }
         }
       
     };
@@ -225,6 +234,54 @@ namespace espresso {
       std::set<Particle*> cgZone = verletList->getCGZone();
       for (std::set<Particle*>::iterator it=cgZone.begin();
               it != cgZone.end(); ++it) {
+
+          Particle &vp = **it;
+
+          FixedTupleList::iterator it3;
+          it3 = fixedtupleList->find(&vp);
+
+          if (it3 != fixedtupleList->end()) {
+
+              std::vector<Particle*> atList;
+              atList = it3->second;
+
+              // compute center of mass
+              Real3D cmp(0.0, 0.0, 0.0); // center of mass position
+              //Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
+              //real M = vp.getMass(); // sum of mass of AT particles
+              for (std::vector<Particle*>::iterator it2 = atList.begin();
+                                   it2 != atList.end(); ++it2) {
+                  Particle *at = *it2;
+                  //Real3D d1 = at.position() - vp.position();
+                  //Real3D d1;
+                  //verletList->getSystem()->bc->getMinimumImageVectorBox(d1, at.position(), vp.position());
+                  //cmp += at.mass() * d1;
+
+                  cmp += at->mass() * at->position();
+                  //cmv += at.mass() * at.velocity();
+              }
+              cmp /= vp.getMass();
+              //cmv /= vp.getMass();
+              //cmp += vp.position(); // cmp is a relative position
+              //std::cout << " cmp M: "  << M << "\n\n";
+              //std::cout << "  moving VP to " << cmp << ", velocitiy is " << cmv << "\n";
+
+              // update (overwrite) the position and velocity of the VP
+              vp.position() = cmp;
+              //vp.velocity() = cmv;
+
+          }
+          else { // this should not happen
+              std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
+              std::cout << " (" << vp.position() << ")\n";
+              exit(1);
+              return;
+          }
+      }
+      
+      std::set<Particle*> adrZone = verletList->getAdrZone();
+      for (std::set<Particle*>::iterator it=adrZone.begin();
+              it != adrZone.end(); ++it) {
 
           Particle &vp = **it;
 
@@ -290,52 +347,43 @@ namespace espresso {
         }
       }
 
-      // Loop over CG particles and overwrite AT forces and velocity.
-      // This makes the AT particles move along with CG particles.
-      // std::set<Particle*> cgZone = verletList->getCGZone();
-      for (std::set<Particle*>::iterator it=cgZone.begin();
-                    it != cgZone.end(); ++it) {
-
-            Particle &vp = **it;
-
-            FixedTupleList::iterator it3;
-            it3 = fixedtupleList->find(&vp);
-
-            if (it3 != fixedtupleList->end()) {
-
-                std::vector<Particle*> atList1;
-                atList1 = it3->second;
-
-                Real3D vpfm = vp.force() / vp.getMass();
-                for (std::vector<Particle*>::iterator itv = atList1.begin();
-                        itv != atList1.end(); ++itv) {
-                    Particle &at = **itv;
-                    // at.velocity() = vp.velocity(); // overwrite velocity
-                    at.force() += at.mass() * vpfm;
-                }
-
-            }
-            else { // this should not happen
-                std::cout << " VP particle not found in tuples: " << vp.id() << "-" << vp.ghost();
-                exit(1);
-                return;
-            }
-      }
-
       // Compute center of mass and weights for virtual particles in Adress zone (HY and AT region).
       //std::set<Particle*> adrZone = verletList->getAdrZone();
       makeWeights();
       
       // Compute forces (AT and VP) of Pairs inside AdResS zone
+      int count = 0;
       for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it) {
-
+         real w1, w2;
          // these are the two VP interacting
          Particle &p1 = *it->first;
          Particle &p2 = *it->second;
 
          // read weights
-         real w1 = weights.find(&p1)->second;
-         real w2 = weights.find(&p2)->second;
+         std::map<Particle*, real>::iterator wit;
+         
+         wit=weights.find(&p1);
+         if (wit != weights.end()){ w1=wit->second;}
+         else { // this should not happen
+              std::cout << " Particle has no weight, id: " << p1.id() << std::endl;
+              std::cout << " Particle has no weight, pos: " << p1.position() << std::endl;
+              real test=wit->second;
+              std::cout << " Particle has no weight, fakew: " << test << std::endl;
+              exit(1);
+              return;
+          }
+         wit=weights.find(&p2);
+         if (wit != weights.end()){ w2=wit->second;}
+         else { // this should not happen
+              std::cout << " Particle has no weight, id: " << p2.id() << std::endl;
+              std::cout << " Particle has no weight, pos: " << p2.position() << std::endl;
+              real test=wit->second;
+              std::cout << " Particle has no weight, fakew: " << test << std::endl;
+              exit(1);
+              return;
+          }
+         
+         
          real w12 = (w1 + w2)/2.0;  // H-AdResS
 
          // force between VP particles
@@ -398,6 +446,9 @@ namespace espresso {
                          const PotentialAT &potentialAT = getPotentialAT(p3.type(), p4.type());
                          Real3D force(0.0, 0.0, 0.0);
                          if(potentialAT._computeForce(force, p3, p4)) {
+                            
+                             if(force[0]!=0.0 || force[1]!=0.0 || force[2]!=0.0){count +=1;} 
+                             
                              force *= w12;
                              p3.force() += force;
                              p4.force() -= force;
@@ -430,6 +481,7 @@ namespace espresso {
              }
          }
       }
+            //std::cout << "Count Adr " << count << std::endl;
       
       // H-AdResS - Drift Term part 3
       // Iterate over all particles in the hybrid region and calculate drift force
@@ -443,15 +495,16 @@ namespace espresso {
               // calculate distance to nearest adress particle or center
               std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
               Real3D pa = **it2; // position of adress particle
-              //Real3D mindriftforce = vp.position() - pa;                                                 // X SPLIT VS SPHERE CHANGE
-              real mindriftforce = vp.position()[0] - pa[0];                                               // X SPLIT VS SPHERE CHANGE
+              //Real3D mindriftforce = vp.position() - pa;                                                           // X SPLIT VS SPHERE CHANGE
+              real mindriftforce = vp.position()[0] - pa[0];                                                         // X SPLIT VS SPHERE CHANGE
               real min1sq = mindriftforce*mindriftforce; // mindriftforce.sqr(); // set min1sq before loop
               ++it2;
               for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                    pa = **it2;
-                   //Real3D driftforce = vp.position() - pa;                                                 // X SPLIT VS SPHERE CHANGE
-                   real driftforce = vp.position()[0] - pa[0];                                               // X SPLIT VS SPHERE CHANGE
-                   real distsq1 = driftforce*driftforce; //driftforce.sqr();
+                   //Real3D driftforce = vp.position() - pa;                                                          // X SPLIT VS SPHERE CHANGE
+                   real driftforce = vp.position()[0] - pa[0];                                                    // X SPLIT VS SPHERE CHANGE
+                   //real distsq1 = driftforce.sqr();//driftforce*driftforce; //driftforce.sqr();                     // X SPLIT VS SPHERE CHANGE
+                   real distsq1 = driftforce*driftforce;                                                          // X SPLIT VS SPHERE CHANGE
                    //std::cout << pa << " " << sqrt(distsq1) << "\n";
                    if (distsq1 < min1sq) {
                         min1sq = distsq1;
@@ -461,10 +514,13 @@ namespace espresso {
               min1sq = sqrt(min1sq);   // distance to nearest adress particle or center
               mindriftforce = (1.0/min1sq)*mindriftforce;  // normalized driftforce vector
               mindriftforce *= weightderivative(min1sq);  // multiplication with derivative of the weighting function
+              mindriftforce *= 0.5;
               mindriftforce *= energydiff.find(&vp)->second;   // get the energy differences which were calculated previously and put in drift force
-              //vp.force() += mindriftforce;   // add drift force to virtual particles                                                           // X SPLIT VS SPHERE CHANGE
-              Real3D driftforceadd(mindriftforce,0.0,0.0);                                                                                       // X SPLIT VS SPHERE CHANGE
-              vp.force() += driftforceadd;                                                                                                       // X SPLIT VS SPHERE CHANGE
+              //vp.force() += mindriftforce;   // add drift force to virtual particles                                                                    // X SPLIT VS SPHERE CHANGE
+              Real3D driftforceadd(mindriftforce,0.0,0.0);                                                                                            // X SPLIT VS SPHERE CHANGE
+              //Real3D driftforceadd(0.0,0.0,0.0);   
+              //std::cout << "Driftforce: " << driftforceadd << std::endl;
+              vp.force() += driftforceadd;                                                                                                            // X SPLIT VS SPHERE CHANGE
           }
           
       }
@@ -493,6 +549,7 @@ namespace espresso {
                                  it2 != atList.end(); ++it2) {
                 Particle &at = **it2;
                 at.force() += at.mass() * vpfm;
+                //std::cout << "Force of atomistic particle (AdResS sim.) with id " << at.id() << " is: " << at.force() << "\n";
             }
         }
         else { // this should not happen
@@ -502,8 +559,40 @@ namespace espresso {
             return;
         }
       }
+      
+      for (std::set<Particle*>::iterator it=cgZone.begin();
+                    it != cgZone.end(); ++it) {
+
+            Particle &vp = **it;
+
+            FixedTupleList::iterator it3;
+            it3 = fixedtupleList->find(&vp);
+
+            if (it3 != fixedtupleList->end()) {
+
+                std::vector<Particle*> atList1;
+                atList1 = it3->second;
+
+                Real3D vpfm = vp.force() / vp.getMass();
+                for (std::vector<Particle*>::iterator itv = atList1.begin();
+                        itv != atList1.end(); ++itv) {
+                    Particle &at = **itv;
+                    // at.velocity() = vp.velocity(); // overwrite velocity
+                    at.force() += at.mass() * vpfm;
+                    //std::cout << "f" << at.mass() * vpfm << " m " << at.mass() << " M "<<  vp.getMass() << " id " << at.id() << std::endl;
+                }
+
+            }
+            else { // this should not happen
+                std::cout << " VP particle not found in tuples: " << vp.id() << "-" << vp.ghost();
+                exit(1);
+                return;
+            }
+      }
+      
     }
     
+    // Energy calculation does currently only work if integrator.run( ) (also with 0) and decompose have been executed before. This is due to the initialization of the tuples.
     template < typename _PotentialAT, typename _PotentialCG >
     inline real
     VerletListHadressInteractionTemplate < _PotentialAT, _PotentialCG >::
@@ -522,10 +611,12 @@ namespace espresso {
           e += potential._computeEnergy(p1, p2);
           //std::cout << "Energy calculation CG region done" << "\n";
       }
-      
+      //std::cout << "Energy CG region:" << e << "\n";
       makeWeights();
+      int counter = 0;
       for (PairList::Iterator it(verletList->getAdrPairs()); 
-           it.isValid(); ++it) {                         
+           it.isValid(); ++it) {
+          counter += 1;
           Particle &p1 = *it->first;
           Particle &p2 = *it->second;                           
           real w1 = weights.find(&p1)->second;
@@ -534,8 +625,8 @@ namespace espresso {
           int type1 = p1.type();
           int type2 = p2.type();
           const PotentialCG &potentialCG = getPotentialCG(type1, type2);
-          e += (1-w12)*potentialCG._computeEnergy(p1, p2);
-          //std::cout << "CG Energy calculation AT/HY region done" << "\n";
+          e += (1.0-w12)*potentialCG._computeEnergy(p1, p2);
+          //std::cout << "CG Energy calculation AT/HY region done:" << e << "\n";
           
           FixedTupleList::iterator it3;
           FixedTupleList::iterator it4;
@@ -556,15 +647,18 @@ namespace espresso {
                                        itv2 != atList2.end(); ++itv2) {
                       Particle &p4 = **itv2;
 
-                      // AT forces
+                      // AT energies
                       const PotentialAT &potentialAT = getPotentialAT(p3.type(), p4.type());
                       e += w12*potentialAT._computeEnergy(p3, p4);
-                      //std::cout << "AT Energy calculation AT/HY region done" << "\n";
+                      //std::cout << "Nonbonded AT energy: " << e << "\n";
+                      //counter += 1;
+                      //std::cout << "AT Energy calculation AT/HY region done, w12 = " << w12 << " and w1 = " << w1 << " and w2 = " << w2 << " okay...\n";
                   }                  
               }              
           }          
       }
-      
+      //std::cout << "Energy AT + CG region:" << e << "\n";
+      //std::cout << "Total number of pairs in calculation (AdResS):" << counter << "\n";        
       real esum;
       boost::mpi::all_reduce(*getVerletList()->getSystem()->comm, e, esum, std::plus<real>());
       return esum;      

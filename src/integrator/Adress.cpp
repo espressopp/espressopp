@@ -8,6 +8,7 @@
 #include "bc/BC.hpp"
 #include "iterator/CellListAllPairsIterator.hpp"
 #include "iterator/CellListIterator.hpp"
+#include <iomanip>
 
 namespace espresso {
 
@@ -83,7 +84,14 @@ namespace espresso {
         ParticleList& adrATparticles = system.storage->getAdrATParticles();
         for (std::vector<Particle>::iterator it = adrATparticles.begin();
                 it != adrATparticles.end(); it++) {
-
+            
+            //if(it->id()==2135){
+            //   std::cout << "Force of atomistic particle (AdResS. sim.) with id " << it->id() << " is: " << std::setprecision(15) << it->force() << "\n";  // FOR DEBUGGING
+            //}
+            
+            //std::cout << "Force of atomistic particle (AdResS. sim.) with id " << it->id() << " is: " << std::setprecision(15) << it->force() << "\n";  // FOR DEBUGGING
+            //std::cout << "Position of atomistic particle (AdResS. sim.) with id " << it->id() << " is: " << std::setprecision(15) << it->position() << "\n";
+            
             real sqDist = 0.0;
             real dtfm = 0.5 * dt / it->mass();
 

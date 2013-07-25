@@ -2,7 +2,7 @@
 #include "storage/DomainDecomposition.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "Configuration.hpp"
-#include "RadialDistrF.hpp"
+#include "RDFatomistic.hpp"
 #include "esutil/Error.hpp"
 #include "bc/BC.hpp"
 
@@ -21,7 +21,7 @@ namespace espresso {
     
     // TODO currently works correctly for Lx = Ly = Lz
     // rdfN is a level of discretisation of rdf (how many elements it contains)
-    python::list RadialDistrF::computeArray(int rdfN) const {
+    python::list RDFatomistic::computeArray(int rdfN) const {
 
       System& system = getSystemRef();
       esutil::Error err(system.comm);
@@ -42,10 +42,30 @@ namespace espresso {
       for (int rank_i=0; rank_i<nprocs; rank_i++) {
         map< size_t, Real3D > conf;
         if (rank_i == myrank) {
+          shared_ptr<FixedTupleList> fixedtupleList = system.storage->getFixedTuples();
           CellList realCells = system.storage->getRealCells();
           for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-            int id = cit->id();
-            conf[id] = cit->position();
+              
+                Particle &vp = *cit;
+                FixedTupleList::iterator it2;
+                it2 = fixedtupleList->find(&vp);
+
+                if (it2 != fixedtupleList->end()) {  // Are there atomistic particles for given CG particle? If yes, use those for calculation.
+                      std::vector<Particle*> atList;
+                      atList = it2->second;
+                      for (std::vector<Particle*>::iterator it3 = atList.begin();
+                                           it3 != atList.end(); ++it3) {
+                          Particle &at = **it3;
+                          int id = at.id();
+                          conf[id] = at.position();
+                      }  
+                }
+
+                else{   // If not, use CG particle itself for calculation.
+                      int id = cit->id();
+                      conf[id] = cit->position();
+                }
+  
           }
     	}
 
@@ -69,8 +89,7 @@ namespace espresso {
       
       if(maxi>num_part) maxi = num_part;
       
-      int perc=0;
-      real denom = 100.0 / (real)(maxi-mini);
+      int perc=0, perc1=0;
       for(int i = mini; i<maxi; i++){
         Real3D coordP1 = config->getCoordinates(i);
         for(int j = i+1; j<num_part; j++){
@@ -89,20 +108,16 @@ namespace espresso {
           }
           
         }
-        /*
-         * additional calculations slow down routine but from the other hand
-         * it helps to monitor progress
-         */
-        if(print_progress && system.comm->rank()==0){
-          perc = (int)((i-mini)*denom);
-          if(perc%5==0){
+        /*if(system.comm->rank()==0){
+          perc = (int)(100*(real)(i-mini)/(real)(maxi-mini));
+          if(perc>perc1){
             cout<<"calculation progress (radial distr. func.): "<< perc << " %\r"<<flush;
-          }
+            perc1 = perc;
         }
-        
+      }*/
       }
-      if(system.comm->rank()==0)
-        cout<<"calculation progress (radial distr. func.): 100 %" <<endl;
+      /*if(system.comm->rank()==0)
+        cout<<"calculation progress (radial distr. func.): "<< 100 << " %" <<endl;*/
 
       real totHistogram[rdfN];
       boost::mpi::all_reduce(*system.comm, histogram, rdfN, totHistogram, plus<real>());
@@ -126,16 +141,15 @@ namespace espresso {
     }
 
     // TODO: this dummy routine is still needed as we have not yet ObservableVector
-    real RadialDistrF::compute() const {
+    real RDFatomistic::compute() const {
       return -1.0;
     }
 
-    void RadialDistrF::registerPython() {
+    void RDFatomistic::registerPython() {
       using namespace espresso::python;
-      class_<RadialDistrF, bases< Observable > >
-        ("analysis_RadialDistrF", init< shared_ptr< System > >())
-        .add_property("print_progress", &RadialDistrF::getPrint_progress, &RadialDistrF::setPrint_progress)
-        .def("compute", &RadialDistrF::computeArray)
+      class_<RDFatomistic, bases< Observable > >
+        ("analysis_RDFatomistic", init< shared_ptr< System > >())
+        .def("compute", &RDFatomistic::computeArray)
       ;
     }
   }

@@ -6,7 +6,9 @@ from espresso.interaction.Interaction import *
 from _espresso import interaction_LennardJones, \
                       interaction_VerletListLennardJones, \
                       interaction_VerletListAdressLennardJones, \
+                      interaction_VerletListAdressLennardJones2, \
                       interaction_VerletListHadressLennardJones, \
+                      interaction_VerletListHadressLennardJones2, \
                       interaction_CellListLennardJones, \
                       interaction_FixedPairListLennardJones
 
@@ -55,11 +57,39 @@ class VerletListAdressLennardJonesLocal(InteractionLocal, interaction_VerletList
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
             
+class VerletListAdressLennardJones2Local(InteractionLocal, interaction_VerletListAdressLennardJones2):
+    'The (local) Lennard Jones interaction using Verlet lists.'
+    def __init__(self, vl, fixedtupleList):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListAdressLennardJones2, vl, fixedtupleList)
+
+    def setPotentialAT(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialAT(self, type1, type2, potential)
+
+    def setPotentialCG(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialCG(self, type1, type2, potential)
+                  
 class VerletListHadressLennardJonesLocal(InteractionLocal, interaction_VerletListHadressLennardJones):
     'The (local) Lennard Jones interaction using Verlet lists.'
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListHadressLennardJones, vl, fixedtupleList)
+
+    def setPotentialAT(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialAT(self, type1, type2, potential)
+
+    def setPotentialCG(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialCG(self, type1, type2, potential)
+            
+class VerletListHadressLennardJones2Local(InteractionLocal, interaction_VerletListHadressLennardJones2):
+    'The (local) Lennard Jones interaction using Verlet lists.'
+    def __init__(self, vl, fixedtupleList):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListHadressLennardJones2, vl, fixedtupleList)
 
     def setPotentialAT(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -119,10 +149,25 @@ if pmi.isController:
             cls =  'espresso.interaction.VerletListAdressLennardJonesLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
+            
+    class VerletListAdressLennardJones2(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espresso.interaction.VerletListAdressLennardJones2Local',
+            pmicall = ['setPotentialAT', 'setPotentialCG']
+            )
+            
     class VerletListHadressLennardJones(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListHadressLennardJonesLocal',
+            pmicall = ['setPotentialAT', 'setPotentialCG']
+            )
+            
+    class VerletListHadressLennardJones2(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espresso.interaction.VerletListHadressLennardJones2Local',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 

@@ -1,3 +1,28 @@
+"""
+************************************
+**AdResS** - Object
+************************************
+
+The AdResS object is an extension to the integrator. It makes sure that the
+integrator also processes the atomistic particles and not only the CG particles.
+Hence, this object is of course only used when performing AdResS or H-AdResS
+simulations.
+
+In detail the AdResS extension makes sure:
+---------------------------------------------
+
+* that also the forces on the atomistic particles are initialized and set to
+  by Adress::initForces
+* that also the atomistic particles are integrated and propagated by
+  Adress::integrate1 and Adress::integrate2
+
+Example - how to turn on the AdResS integrator extension:
+
+>>> adress      = espresso.integrator.Adress(system)
+>>> integrator.addExtension(adress)
+
+"""
+
 from espresso.esutil import cxxinit
 from espresso import pmi
 

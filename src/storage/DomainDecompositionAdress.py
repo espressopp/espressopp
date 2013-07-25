@@ -1,3 +1,20 @@
+"""
+************************************
+**DomainDecompositionAdress** - Object
+************************************
+
+The DomainDecompositionAdress is the Domain Decomposition for AdResS and H-
+AdResS simulations. It makes sure that tuples (i.e. a coarse-grained particle
+and its corresponding atomistic particles) are always stored together on one CPU.
+When setting DomainDecompositionAdress you have to provide the system as well as
+the nodegrid and the cellgrid.
+
+Example - setting DomainDecompositionAdress:
+
+>>> system.storage = espresso.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
+
+"""
+
 from espresso import pmi
 from espresso.esutil import cxxinit
 from _espresso import storage_DomainDecompositionAdress

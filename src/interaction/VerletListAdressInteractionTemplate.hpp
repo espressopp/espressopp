@@ -140,7 +140,7 @@ namespace espresso {
         }
       }
 
-      // Loop over CG particles and overwrite AT forces and velocity.
+      /*// Loop over CG particles and overwrite AT forces and velocity.
       // This makes the AT particles move along with CG particles.
       
       // Note (Karsten): This is a different approach compared to H-AdResS. Here, we overwrite intra-atomistic
@@ -175,7 +175,7 @@ namespace espresso {
                 exit(1);
                 return;
             }
-      }
+      }*/
 
       // Compute center of mass and weights for virtual particles in Adress zone (HY and AT region).
       std::set<Particle*> adrZone = verletList->getAdrZone();
@@ -339,8 +339,47 @@ namespace espresso {
          }
       }
 
-      weights.clear();
+      weights.clear();     
 
+      
+      // Loop over CG particles and overwrite AT forces and velocity.
+      // This makes the AT particles move along with CG particles.
+      
+      // Note (Karsten): This is a different approach compared to H-AdResS. Here, we overwrite intra-atomistic
+      // rotations and vibrations in the CG zone. This leads to failures in the kinetic energy. However, in Force-AdResS there is no energy conservation anyway.
+      // Here we calculate CG forces/velocities and distribute them to AT particles. In contrast, in H-AdResS, we calculate AT forces from intra-molecular
+      // interactions and inter-molecular center-of-mass interactions and just update the positions of the center-of-mass CG particles.
+      std::set<Particle*> cgZone = verletList->getCGZone();
+      for (std::set<Particle*>::iterator it=cgZone.begin();
+                    it != cgZone.end(); ++it) {
+
+            Particle &vp = **it;
+
+            FixedTupleList::iterator it3;
+            it3 = fixedtupleList->find(&vp);
+
+            if (it3 != fixedtupleList->end()) {
+
+                std::vector<Particle*> atList1;
+                atList1 = it3->second;
+
+                Real3D vpfm = vp.force() / vp.getMass();
+                for (std::vector<Particle*>::iterator itv = atList1.begin();
+                        itv != atList1.end(); ++itv) {
+                    Particle &at = **itv;
+                    at.velocity() = vp.velocity(); // Overwrite velocity - Note (Karsten): See comment above.
+                    at.force() += at.mass() * vpfm;
+                }
+
+            }
+            else { // this should not happen
+                std::cout << " VP particle not found in tuples: " << vp.id() << "-" << vp.ghost();
+                exit(1);
+                return;
+            }
+      }
+      
+      
       // distribute forces from VP to AT (HY and AT region)
       for (std::set<Particle*>::iterator it=adrZone.begin();
                 it != adrZone.end(); ++it) {
@@ -371,39 +410,159 @@ namespace espresso {
         }
       }
     }
-    
+      
     template < typename _PotentialAT, typename _PotentialCG >
     inline real
     VerletListAdressInteractionTemplate < _PotentialAT, _PotentialCG >::
     computeEnergy() {
+        
+      std::set<Particle*> adrZone = verletList->getAdrZone();
+      for (std::set<Particle*>::iterator it=adrZone.begin();
+              it != adrZone.end(); ++it) {
+
+          Particle &vp = **it;
+
+          FixedTupleList::iterator it3;
+          it3 = fixedtupleList->find(&vp);
+
+          if (it3 != fixedtupleList->end()) {
+
+              std::vector<Particle*> atList;
+              atList = it3->second;
+
+              // compute center of mass
+              Real3D cmp(0.0, 0.0, 0.0); // center of mass position
+              Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
+              //real M = vp.getMass(); // sum of mass of AT particles
+              for (std::vector<Particle*>::iterator it2 = atList.begin();
+                                   it2 != atList.end(); ++it2) {
+                  Particle &at = **it2;
+                  //Real3D d1 = at.position() - vp.position();
+                  //Real3D d1;
+                  //verletList->getSystem()->bc->getMinimumImageVectorBox(d1, at.position(), vp.position());
+                  //cmp += at.mass() * d1;
+
+                  cmp += at.mass() * at.position();
+                  cmv += at.mass() * at.velocity();
+              }
+              cmp /= vp.getMass();
+              cmv /= vp.getMass();
+              //cmp += vp.position(); // cmp is a relative position
+              //std::cout << " cmp M: "  << M << "\n\n";
+              //std::cout << "  moving VP to " << cmp << ", velocitiy is " << cmv << "\n";
+
+              // update (overwrite) the position and velocity of the VP
+              vp.position() = cmp;
+              vp.velocity() = cmv;
+
+              // calculate distance to nearest adress particle or center
+              std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
+              Real3D pa = **it2; // position of adress particle
+              Real3D d1 = vp.position() - pa;
+              //real d1 = vp.position()[0] - pa[0];
+              real min1sq = d1.sqr(); // set min1sq before loop  // d1*d1;
+              ++it2;
+              for (; it2 != verletList->getAdrPositions().end(); ++it2) {
+                   pa = **it2;
+                   d1 = vp.position() - pa;
+                   //d1 = vp.position()[0] - pa[0];
+                   real distsq1 = d1.sqr(); // d1*d1;
+                   //std::cout << pa << " " << sqrt(distsq1) << "\n";
+                   if (distsq1 < min1sq) min1sq = distsq1;
+              }
+
+              //real min1 = sqrt(min1sq);
+              //std::cout << vp.id() << " min: " << min1 << "\n";
+              //std::cout << vp.id() << " dex: " << dex << "\n";
+              //std::cout << vp.id() << " dex+dhy: " << dexdhy << "\n";
+
+              // calculate weight and write it in the map
+              real w;
+              if (dex2 > min1sq) w = 1;
+              else if (dexdhy2 < min1sq) w = 0;
+              else {
+                   w = cos(pidhy2 * (sqrt(min1sq) - dex));
+                   w *= w;
+              }
+
+              weights.insert(std::make_pair(&vp, w));
+
+              //if (w1 == 1 || w2 == 1) std::cout << p1.id() << " ";
+              //std::cout << vp.id() << " weight: " << w << "\n";
+          }
+          else { // this should not happen
+              std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
+              std::cout << " (" << vp.position() << ")\n";
+              exit(1);
+              //return;
+          }
+      }
+        
       LOG4ESPP_INFO(theLogger, "compute energy of the Verlet list pairs");
-
       //std::cout << "compute energy of the Verlet list pairs" << "\n";
-      real e = 0.0;
+      
+      real e = 0.0;        
       for (PairList::Iterator it(verletList->getPairs()); 
-	   it.isValid(); ++it) {
-        Particle &p1 = *it->first;
-        Particle &p2 = *it->second;
-        int type1 = p1.type();
-        int type2 = p2.type();
-        const PotentialCG &potential = getPotentialCG(type1, type2);
-        e += potential._computeEnergy(p1, p2);
+           it.isValid(); ++it) {
+          Particle &p1 = *it->first;
+          Particle &p2 = *it->second;
+          int type1 = p1.type();
+          int type2 = p2.type();
+          const PotentialCG &potential = getPotentialCG(type1, type2);
+          e += potential._computeEnergy(p1, p2);
+          //std::cout << "Energy calculation CG region done" << "\n";
       }
+      //std::cout << "Energy CG region:" << e << "\n";
+      //makeWeights();
+      int counter = 0;
+      for (PairList::Iterator it(verletList->getAdrPairs()); 
+           it.isValid(); ++it) {
+          counter += 1;
+          Particle &p1 = *it->first;
+          Particle &p2 = *it->second;                           
+          real w1 = weights.find(&p1)->second;
+          real w2 = weights.find(&p2)->second;
+          real w12 = w1 * w2;
+          int type1 = p1.type();
+          int type2 = p2.type();
+          const PotentialCG &potentialCG = getPotentialCG(type1, type2);
+          e += (1.0-w12)*potentialCG._computeEnergy(p1, p2);
+          //std::cout << "CG Energy calculation AT/HY region done:" << e << "\n";
+          
+          FixedTupleList::iterator it3;
+          FixedTupleList::iterator it4;
+          it3 = fixedtupleList->find(&p1);
+          it4 = fixedtupleList->find(&p2);
 
-      //std::cout << "compute energy of the AdReSs pairs" << "\n";
-      for (PairList::Iterator it(verletList->getAdrPairs());
-             it.isValid(); ++it) {
-              Particle &p1 = *it->first;
-              Particle &p2 = *it->second;
-              int type1 = p1.type();
-              int type2 = p2.type();
-              const PotentialCG &potential = getPotentialCG(type1, type2);
-              e += potential._computeEnergy(p1, p2);
+          if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end()) {
+              std::vector<Particle*> atList1;
+              std::vector<Particle*> atList2;
+              atList1 = it3->second;
+              atList2 = it4->second;
+
+              for (std::vector<Particle*>::iterator itv = atList1.begin();
+                      itv != atList1.end(); ++itv) {
+
+                  Particle &p3 = **itv;
+                  for (std::vector<Particle*>::iterator itv2 = atList2.begin();
+                                       itv2 != atList2.end(); ++itv2) {
+                      Particle &p4 = **itv2;
+
+                      // AT energies
+                      const PotentialAT &potentialAT = getPotentialAT(p3.type(), p4.type());
+                      e += w12*potentialAT._computeEnergy(p3, p4);
+                      //std::cout << "Nonbonded AT energy: " << e << "\n";
+                      //counter += 1;
+                      //std::cout << "AT Energy calculation AT/HY region done, w12 = " << w12 << " and w1 = " << w1 << " and w2 = " << w2 << " okay...\n";
+                  }                  
+              }              
+          }          
       }
-
+      //std::cout << "Energy AT + CG region:" << e << "\n";
+      std::cout << "Total number of pairs in calculation (AdResS):" << counter << "\n";        
       real esum;
       boost::mpi::all_reduce(*getVerletList()->getSystem()->comm, e, esum, std::plus<real>());
-      return esum;
+      return esum;      
     }
 
 
