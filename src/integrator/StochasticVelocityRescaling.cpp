@@ -107,15 +107,16 @@ void StochasticVelocityRescaling::rescaleVelocities() {
 	boost::mpi::all_reduce(*getSystem()->comm, EKin_local, EKin,
 			std::plus<real>());
 
-	EKin_new = stochasticVR_pullEkin(EKin, EKin_ref, DegreesOfFreedom, pref,
-			rng);
-	// it should always be larger than 0
-	if (EKin_new <= 0)
-		throw std::runtime_error(
-				"EKin_new in StochasticVelocityRescaling::rescaleVelocities() is equal or smaller than 0");
 
-  if(getSystem()->comm->rank() == 0)
-          ScalingFactor = sqrt(EKin_new / EKin);
+  if(getSystem()->comm->rank() == 0){
+    EKin_new = stochasticVR_pullEkin(EKin, EKin_ref, DegreesOfFreedom, pref,
+        rng);
+    // it should always be larger than 0
+    if (EKin_new <= 0)
+      throw std::runtime_error(
+          "EKin_new in StochasticVelocityRescaling::rescaleVelocities() is equal or smaller than 0");
+    ScalingFactor = sqrt(EKin_new / EKin);
+  }
       
   boost::mpi::broadcast(*getSystem()->comm, ScalingFactor, 0);
 
