@@ -184,15 +184,17 @@ namespace espresso {
                   // calculate distance to nearest adress particle or center
                   std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
                   Real3D pa = **it2; // position of adress particle
-                  //Real3D d1 = vp.position() - pa;                                               // X SPLIT VS SPHERE CHANGE
-                  real d1 = vp.position()[0] - pa[0];                                             // X SPLIT VS SPHERE CHANGE
-                  real min1sq = d1*d1; // d1.sqr(); // set min1sq before loop                     // X SPLIT VS SPHERE CHANGE
+                  //Real3D d1 = vp.position() - pa;                                                      // X SPLIT VS SPHERE CHANGE
+                  real d1 = vp.position()[0] - pa[0];                                                // X SPLIT VS SPHERE CHANGE
+                  //real min1sq = d1.sqr();  // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
+                  real min1sq = d1*d1;   // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
                   ++it2;
                   for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                        pa = **it2;
-                       //d1 = vp.position() - pa;                                                 // X SPLIT VS SPHERE CHANGE
-                       d1 = vp.position()[0] - pa[0];                                             // X SPLIT VS SPHERE CHANGE
-                       real distsq1 = d1*d1; //d1.sqr();
+                       //d1 = vp.position() - pa;                                                          // X SPLIT VS SPHERE CHANGE
+                       d1 = vp.position()[0] - pa[0];                                                  // X SPLIT VS SPHERE CHANGE
+                       //real distsq1 = d1.sqr();                                                          // X SPLIT VS SPHERE CHANGE
+                       real distsq1 = d1*d1;                                                           // X SPLIT VS SPHERE CHANGE
                        //std::cout << pa << " " << sqrt(distsq1) << "\n";
                        if (distsq1 < min1sq) min1sq = distsq1;
                   }
@@ -493,15 +495,16 @@ namespace espresso {
               // calculate distance to nearest adress particle or center
               std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
               Real3D pa = **it2; // position of adress particle
-              //Real3D mindriftforce = vp.position() - pa;                                                 // X SPLIT VS SPHERE CHANGE
-              real mindriftforce = vp.position()[0] - pa[0];                                               // X SPLIT VS SPHERE CHANGE
+              //Real3D mindriftforce = vp.position() - pa;                                                           // X SPLIT VS SPHERE CHANGE
+              real mindriftforce = vp.position()[0] - pa[0];                                                         // X SPLIT VS SPHERE CHANGE
               real min1sq = mindriftforce*mindriftforce; // mindriftforce.sqr(); // set min1sq before loop
               ++it2;
               for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                    pa = **it2;
-                   //Real3D driftforce = vp.position() - pa;                                                 // X SPLIT VS SPHERE CHANGE
-                   real driftforce = vp.position()[0] - pa[0];                                               // X SPLIT VS SPHERE CHANGE
-                   real distsq1 = driftforce*driftforce; //driftforce.sqr();
+                   //Real3D driftforce = vp.position() - pa;                                                          // X SPLIT VS SPHERE CHANGE
+                   real driftforce = vp.position()[0] - pa[0];                                                    // X SPLIT VS SPHERE CHANGE
+                   //real distsq1 = driftforce.sqr();//driftforce*driftforce; //driftforce.sqr();                     // X SPLIT VS SPHERE CHANGE
+                   real distsq1 = driftforce*driftforce;                                                          // X SPLIT VS SPHERE CHANGE
                    //std::cout << pa << " " << sqrt(distsq1) << "\n";
                    if (distsq1 < min1sq) {
                         min1sq = distsq1;
@@ -513,11 +516,11 @@ namespace espresso {
               mindriftforce *= weightderivative(min1sq);  // multiplication with derivative of the weighting function
               mindriftforce *= 0.5;
               mindriftforce *= energydiff.find(&vp)->second;   // get the energy differences which were calculated previously and put in drift force
-              //vp.force() += mindriftforce;   // add drift force to virtual particles                                                           // X SPLIT VS SPHERE CHANGE
-              Real3D driftforceadd(mindriftforce,0.0,0.0);                                                                                       // X SPLIT VS SPHERE CHANGE
+              //vp.force() += mindriftforce;   // add drift force to virtual particles                                                                    // X SPLIT VS SPHERE CHANGE
+              Real3D driftforceadd(mindriftforce,0.0,0.0);                                                                                            // X SPLIT VS SPHERE CHANGE
               //Real3D driftforceadd(0.0,0.0,0.0);   
               //std::cout << "Driftforce: " << driftforceadd << std::endl;
-              vp.force() += driftforceadd;                                                                                                       // X SPLIT VS SPHERE CHANGE
+              vp.force() += driftforceadd;                                                                                                            // X SPLIT VS SPHERE CHANGE
           }
           
       }

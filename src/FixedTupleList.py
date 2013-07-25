@@ -1,3 +1,25 @@
+"""
+************************************
+**FixedTupleList** - Object
+************************************
+
+The FixedTupleList is important for AdResS and H-AdResS simulations. It is the
+connection between the atomistic and coarse-grained particles. It defines which
+atomistic particles belong to which coarse-grained particle. In the following
+example "tuples" is a python list of the form
+( (pid_CG1, pidAT11,  pidAT12, pidAT13, ...), (pid_CG2, pidAT21,  pidAT22, pidAT23, ...), ...).
+Each inner list (pid_CG1, pidAT11,  pidAT12, pidAT13, ...) defines a tuple. The
+first number is the particle id of the coarse-grained particle while the
+following numbers are the particle ids of the corresponding atomistic particles. 
+
+Example - creating the FixedTupleList:
+
+>>> ftpl = espresso.FixedTupleList(system.storage)
+>>> ftpl.addTuples(tuples)
+>>> system.storage.setFixedTuples(ftpl)
+
+"""
+
 from espresso import pmi
 import _espresso 
 import espresso

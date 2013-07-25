@@ -1,3 +1,22 @@
+"""
+************************************
+**FixedPairListAdress** - Object
+************************************
+
+The FixedPairListAdress is the Fixed Pair List to be used for AdResS or H-AdResS
+simulations. When creating the FixedPairListAdress one has to provide the storage
+and the tuples. Afterwards the bonds can be added. In the example "bonds" is a
+python list of the form ( (pid1, pid2), (pid3, pid4), ...) where each inner pair
+defines a bond between the particles with the given particle ids. 
+
+Example - creating the FixedPairListAdress and adding bonds:
+
+>>> ftpl = espresso.FixedTupleList(system.storage)
+>>> fpl = espresso.FixedPairListAdress(system.storage, ftpl)
+>>> fpl.addBonds(bonds)
+
+"""
+
 from espresso import pmi
 import _espresso 
 import espresso
