@@ -111,7 +111,7 @@ class HarmonicAngleInteractionType(InteractionType):
 
 class TabulatedBondInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
-        spline = 2
+        spline = 3
         fg = "table_b"+str(self.parameters['tablenr'])+".xvg"
         fe = fg.split(".")[0]+".tab" # name of espresso file
         gromacs.convertTable(fg, fe)
@@ -123,7 +123,7 @@ class TabulatedBondInteractionType(InteractionType):
     
 class TabulatedAngleInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
-        spline = 2
+        spline = 3
         fg = "table_a"+str(self.parameters['tablenr'])+".xvg"
         fe = fg.split(".")[0]+".tab" # name of espresso file
         gromacs.convertTable(fg, fe)
@@ -132,7 +132,7 @@ class TabulatedAngleInteractionType(InteractionType):
         return interb  
 class TabulatedDihedralInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
-        spline = 2
+        spline = 3
         fg = "table_d"+str(self.parameters['tablenr'])+".xvg"
         fe = fg.split(".")[0]+".tab" # name of espresso file
         gromacs.convertTable(fg, fe)
