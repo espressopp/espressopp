@@ -55,7 +55,9 @@ namespace espresso {
                         real cos_theta = dist12 * dist32 / dist1232;
 
                         real a = table->getForce(acos(cos_theta));
-
+                        
+                        a*=1.0/(sqrt(1.0-cos_theta*cos_theta));
+                        
                         real a11 = a * cos_theta / dist12_sqr;
                         real a12 = -a / dist1232;
                         real a22 = a * cos_theta / dist32_sqr;

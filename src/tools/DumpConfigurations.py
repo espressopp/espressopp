@@ -157,7 +157,7 @@ def readxyzr(filename):
 
 # Livia's modified writexyz to fastwritexyz with velocities
 
-def fastwritexyz(filename, system, velocities = True, append = False):
+def fastwritexyz(filename, system, velocities = True, append = False, scale=1.0):
 
   if append:
     file = open(filename,'a')
@@ -174,25 +174,25 @@ def fastwritexyz(filename, system, velocities = True, append = False):
     velocity = velocities[0]
 
   numParticles  = int(espresso.analysis.NPart(system).compute())
-  box_x = system.bc.boxL[0]
-  box_y = system.bc.boxL[1]
-  box_z = system.bc.boxL[2]
+  box_x = system.bc.boxL[0]*scale
+  box_y = system.bc.boxL[1]*scale
+  box_z = system.bc.boxL[2]*scale
   st = "%d\n%15.10f %15.10f %15.10f\n" % (numParticles, box_x, box_y, box_z)
   file.write(st)
 
   for pid in configuration:
-        xpos   = configuration[pid][0]
-        ypos   = configuration[pid][1]
-        zpos   = configuration[pid][2]
+        xpos   = configuration[pid][0]*scale
+        ypos   = configuration[pid][1]*scale
+        zpos   = configuration[pid][2]*scale
         if velocities:
-          xvel   = velocity[pid][0]
-          yvel   = velocity[pid][1]
-          zvel   = velocity[pid][2]
+          xvel   = velocity[pid][0]*scale
+          yvel   = velocity[pid][1]*scale
+          zvel   = velocity[pid][2]*scale
           st = "%d %15.10f %15.10f %15.10f %15.10f %15.10f %15.10f\n"%(pid, xpos, ypos, zpos, xvel, yvel, zvel)
         else:
           st = "%d %15.10f %15.10f %15.10f\n"%(pid, xpos, ypos, zpos)
         file.write(st)
-        pid   += 1
+        #pid   += 1
   
   file.close()
 

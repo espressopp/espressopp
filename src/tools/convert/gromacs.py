@@ -704,7 +704,7 @@ def setTabulatedInteractions(potentials, particleTypes, system, interaction):
             interaction.setPotential(i, j, potentials[key])
 
     system.addInteraction(interaction)
-    return
+    return interaction
 
 
 
@@ -754,6 +754,7 @@ def convertTable(gro_in_file, esp_out_file, sigma=1.0, epsilon=1.0, c6=1.0, c12=
             # convert units
             if angle or dihedral: # degrees to radians
                 r = math.radians(r)
+                fd=fd*180/math.pi
             else:
                 r = r / sigma
             e = f / epsilon
