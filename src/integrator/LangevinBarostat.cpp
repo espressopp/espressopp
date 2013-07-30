@@ -256,6 +256,7 @@ namespace espresso {
       
       // uniform distribution prefactor. (it can be used instead of normal distribution)
       pref5 = sqrt( 8.0 * desiredTemperature * gammaP * mass / dt );
+      //pref5 = sqrt( 8.0 * gammaP * mass / dt );
     }
 
     /****************************************************

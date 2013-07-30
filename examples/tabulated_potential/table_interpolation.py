@@ -124,7 +124,7 @@ for spline in range(1,len(splinetypes)+1):
     # now build Verlet List
     # ATTENTION: you must not add the skin explicitly here
     logging.getLogger("Interpolation").setLevel(logging.INFO)
-    vl = espresso.VerletList(system, cutoff = cutoff + system.skin)
+    vl = espresso.VerletList(system, cutoff = cutoff)
         
     potTab = espresso.interaction.Tabulated(itype=spline, filename=tabfile, cutoff=cutoff)
     # ATTENTION: auto shift was enabled

@@ -55,6 +55,13 @@ def read(gro_file, top_file="", doRegularExcl=True):
     angles={} # dict: key angletype value: tuple of triples
     dihedrals = {} #same...
     exclusions=[] #list of atom pairs no considered in non-bonded interactions
+    
+    defaults={} # gromacs default values
+    atomtypeparams={} # a dict: key atomtypeid , value : class storing actual parameters of each type e.g. c6, c12, etc..      
+    bondtypeparams={} # same for bonds
+    angletypeparams={} # same for angles
+    dihedraltypeparams={} # same for dihedrals
+    
     if top_file != "":
         #f = open(top_file)
         # FileBuffer: a class which behaves like a file, but all lines are in memory
@@ -76,10 +83,11 @@ def read(gro_file, top_file="", doRegularExcl=True):
         angletypes={} # a dict: key atomindex(int), atomindex(int),atomindex(int) value: angletypeid(int)
         dihedraltypes={} # a dict: key atomtindex(int), atomindex(int), atomindex(int),atomindex(int) value: dihedraltypeid(int)
         
-        atomtypeparams={} # a dict: key atomtypeid , value : class storing actual parameters of each type e.g. c6, c12, etc..      
-        bondtypeparams={} # same for bonds
-        angletypeparams={} # same for angles
-        dihedraltypeparams={} # same for dihedrals
+        # it was moved out of "if" statement
+        #atomtypeparams={} # a dict: key atomtypeid , value : class storing actual parameters of each type e.g. c6, c12, etc..      
+        #bondtypeparams={} # same for bonds
+        #angletypeparams={} # same for angles
+        #dihedraltypeparams={} # same for dihedrals
         
         #atomparams={} # key: atomindex(int) value: per atom parameters e.g. q, mass
         molecules=[]

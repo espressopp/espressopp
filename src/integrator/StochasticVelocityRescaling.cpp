@@ -119,7 +119,7 @@ void StochasticVelocityRescaling::rescaleVelocities() {
   }
       
   boost::mpi::broadcast(*getSystem()->comm, ScalingFactor, 0);
-
+    
 	for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 		cit->velocity() *= ScalingFactor;
 	}
