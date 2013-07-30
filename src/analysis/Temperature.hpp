@@ -75,7 +75,7 @@ namespace espresso {
       return sumT / (3.0 * systemN); 
       }
 
-/*
+
       python::list compute() {
         python::list ret;
         real res = computeRaw();
@@ -114,8 +114,6 @@ namespace espresso {
     	}
         return;
       }
-*/
-
     };
   }
 }
