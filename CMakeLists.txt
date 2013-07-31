@@ -134,7 +134,11 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 # Required for acconfig.h
 include_directories(${CMAKE_BINARY_DIR}/src)
 
-set ( RT_LIBRARIES rt )
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set ( RT_LIBRARIES )
+else()
+  set ( RT_LIBRARIES rt )
+endif()
 
 ######################################
 # Include the following subdirectory # 
