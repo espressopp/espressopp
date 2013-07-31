@@ -38,14 +38,14 @@ namespace espresso {
     	  //this->reset();
       };
       virtual ~AnalysisBaseTemplate() {};
-      virtual ResultType computeRaw() = 0;
       virtual void performMeasurement();
       virtual void reset();
-      virtual python::list compute();
-      virtual python::list getAverageValue();
-      virtual void resetAverage();
-      virtual void updateAverage(ResultType res);
       virtual int getNumberOfMeasurements();
+      virtual python::list compute() = 0;
+      virtual python::list getAverageValue() = 0;
+      virtual void resetAverage() = 0;
+      virtual ResultType computeRaw() = 0;
+      virtual void updateAverage(ResultType res) = 0;
 
     protected:
       ResultType newAverage, lastAverage;
