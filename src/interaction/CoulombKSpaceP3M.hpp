@@ -294,7 +294,7 @@ namespace espresso {
         }
       }
       
-      real aliasing_sum(Int3D i, Real3D *nominator, real *denominator){
+      void aliasing_sum(Int3D i, Real3D *nominator, real *denominator){
         /*
          * taken from Deserno's code
          *  calculates the aliasing sums in the nominator and denominator of the 
