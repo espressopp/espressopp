@@ -213,7 +213,8 @@ namespace espresso {
 
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
       Real3D Li = bc.getBoxL();
-      Tensor wlocal[n];
+      Tensor *wlocal = new Tensor[n];
+      for(int i=0; i<n; i++) wlocal[i] = Tensor(0.0);
       for (FixedPairDistList::PairList::Iterator it(*fixedPairDistList);
            it.isValid(); ++it) {
         const Particle &p1 = *it->first;
@@ -245,12 +246,15 @@ namespace espresso {
       }
       
       // reduce over all CPUs
-      Tensor wsum[n];
+      Tensor *wsum = new Tensor[n];
       boost::mpi::all_reduce(*mpiWorld, wlocal, n, wsum, std::plus<Tensor>());
       
       for(int j=0; j<n; j++){
         w[j] += wsum[j];
       }
+
+      delete [] wsum;
+      delete [] wlocal;
     }
     
     template < typename _Potential >

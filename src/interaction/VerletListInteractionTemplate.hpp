@@ -257,7 +257,7 @@ namespace espresso {
       Real3D Li = system.bc->getBoxL();
       
       real z_dist = Li[2] / float(n);  // distance between two layers
-      Tensor wlocal[n];
+      Tensor *wlocal = new Tensor[n];
       for(int i=0; i<n; i++) wlocal[i] = Tensor(0.0);
       for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
         Particle &p1 = *it->first;
@@ -310,12 +310,15 @@ namespace espresso {
       }
       
       // reduce over all CPUs
-      Tensor wsum[n];
+      Tensor *wsum = new Tensor[n];
       boost::mpi::all_reduce(*mpiWorld, wlocal, n, wsum, std::plus<Tensor>());
       
       for(int j=0; j<n; j++){
         w[j] += wsum[j];
       }
+
+      delete [] wsum;
+      delete [] wlocal;
     }
     
     template < typename _Potential >
