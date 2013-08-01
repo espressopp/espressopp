@@ -20,6 +20,15 @@ namespace espresso {
       python::list pyli;
       
       System& system = getSystemRef();
+      
+      vector<longint> localIDs;
+      for (map<size_t,int>::const_iterator itr=idToCpu.begin(); itr!=idToCpu.end(); ++itr) {
+        size_t i = itr->first;
+        int whichCPU = itr->second;
+        if(system.comm->rank()==whichCPU){
+          localIDs.push_back(i);
+        }
+      }
  
       int perc=0;
       real denom = 100.0 / (real)M;
@@ -27,17 +36,12 @@ namespace espresso {
         totZ[m] = 0.0;
         Z[m] = 0.0;
         for(int n=0; n<M-m; n++){
-          for (map<size_t,int>::const_iterator itr=idToCpu.begin(); itr!=idToCpu.end(); ++itr) {
-            size_t i = itr->first;
-            int whichCPU = itr->second;
-            
-            if(system.comm->rank()==whichCPU){
-              Real3D vel1 = getConf(n + m)->getCoordinates(i);
-              Real3D vel2 = getConf(n)->getCoordinates(i);
-              Z[m] += vel1 * vel2;
-            }
+          for (vector<longint>::iterator itr=localIDs.begin(); itr!=localIDs.end(); ++itr) {
+            size_t i = *itr;
+            Real3D vel1 = getConf(n + m)->getCoordinates(i);
+            Real3D vel2 = getConf(n)->getCoordinates(i);
+            Z[m] += vel1 * vel2;
           }
-          
         }
         /*
          * additional calculations slow down routine but from the other hand
