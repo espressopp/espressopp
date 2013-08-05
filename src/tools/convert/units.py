@@ -1,6 +1,6 @@
 '''
 *****************************************
-**BerendsenBarostat** - Berendsen barostat Object
+**units** - Real_Units
 *****************************************
 
   Espresso++ returns temperature, energy, pressure, box length etc. in dimensionless
@@ -30,10 +30,11 @@ Example:
 import espresso
 import math
 
-kB = 1.3806488 * pow(10,-23) # m^2 * kg * s^-2 * K^-1
-Na = 6.0221413 * pow(10, 23) # mol^-1
+kB  = 1.3806488 * pow(10,-23) # m^2 * kg * s^-2 * K^-1
+Na  = 6.0221413 * pow(10, 23) # mol^-1
+amu = 1.6605389 #* pow(10,-27)
 
-class real_units:
+class Real_Units:
   def __init__(self, _length, _energy, _mass, _charge):
     self.length_factor = _length
     self.energy_factor = _energy
@@ -43,7 +44,7 @@ class real_units:
     self.pressure_factor     = self.energy_factor / pow(self.length_factor, 3)
     self.temperature_factor  = self.energy_factor / (kB * Na) * 1000
     self.time_factor         = self.length_factor * math.sqrt( self.mass_factor / self.energy_factor)
-    self.density_factor      = self.mass_factor / pow(self.length_factor, 3)
+    self.density_factor      = self.mass_factor * amu / pow(self.length_factor, 3)
   
   def length(self, dl_length):
     return dl_length * self.length_factor
