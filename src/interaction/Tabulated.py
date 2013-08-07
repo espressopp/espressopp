@@ -123,6 +123,6 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.FixedPairListTabulatedLocal',
-            pmicall = ['setPotential']
+            pmicall = ['setPotential', 'setFixedPairList', 'getFixedPairList']
             )
         
