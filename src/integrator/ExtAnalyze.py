@@ -28,13 +28,13 @@ from _espresso import integrator_ExtAnalyze
 
 class ExtAnalyzeLocal(ExtensionLocal, integrator_ExtAnalyze):
     'The (local) extension analyze.'
-    def __init__(self, analysis, interval=1):
+    def __init__(self, action_obj, interval=1):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-           cxxinit(self, integrator_ExtAnalyze, analysis, interval)
+           cxxinit(self, integrator_ExtAnalyze, action_obj, interval)
 
 if pmi.isController :
     class ExtAnalyze(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.integrator.ExtAnalyzeLocal',
-            )
+        )

@@ -1,6 +1,8 @@
 #include <python.hpp>
 #include "AnalysisBase.hpp"
 
+//#include "ParticleAccess.hpp"
+
 namespace espresso {
   namespace analysis {
 
@@ -13,8 +15,9 @@ namespace espresso {
     AnalysisBase::registerPython() {
       using namespace espresso::python;
     
-      class_< AnalysisBase, boost::noncopyable >("analysis_AnalysisBase", no_init)
-      .def("performMeasurement", pure_virtual(&AnalysisBase::performMeasurement))
+      //class_< AnalysisBase, boost::noncopyable >("analysis_AnalysisBase", no_init)
+      class_< AnalysisBase, bases<ParticleAccess>, boost::noncopyable >("analysis_AnalysisBase", no_init)
+          .def("performMeasurement", pure_virtual(&AnalysisBase::performMeasurement))
 	  .def("reset", pure_virtual(&AnalysisBase::reset))
 	  .def("compute", pure_virtual(&AnalysisBase::compute))
 	  .def("getAverageValue", pure_virtual(&AnalysisBase::getAverageValue))

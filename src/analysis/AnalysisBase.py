@@ -23,9 +23,11 @@ It provides the following methods:
 """
 
 from espresso import pmi
+
+from espresso.ParticleAccess import *
 from _espresso import analysis_AnalysisBase
 
-class AnalysisBaseLocal(analysis_AnalysisBase):
+class AnalysisBaseLocal(ParticleAccessLocal, analysis_AnalysisBase):
     """Abstract local base class for observables."""
     def performMeasurement(self):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -52,7 +54,7 @@ class AnalysisBaseLocal(analysis_AnalysisBase):
             return self.cxxclass.getNumberOfMeasurements(self)
 
 if pmi.isController :
-    class AnalysisBase(object):
+    class AnalysisBase(ParticleAccess):
         """Abstract base class for observable."""
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(

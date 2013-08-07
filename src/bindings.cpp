@@ -23,6 +23,7 @@
 #include <Tensor.hpp>
 #include <Int3D.hpp>
 #include <Version.hpp>
+#include <ParticleAccess.hpp>
 
 #include <esutil/PyLogger.hpp>
 #include <esutil/bindings.hpp>
@@ -31,6 +32,7 @@
 #include <integrator/bindings.hpp>
 #include <interaction/bindings.hpp>
 #include <analysis/bindings.hpp>
+#include <io/bindings.hpp>
 
 void espresso::registerPython() {
   espresso::Particle::registerPython();
@@ -53,6 +55,7 @@ void espresso::registerPython() {
   espresso::Tensor::registerPython();
   espresso::Int3D::registerPython();
   espresso::Version::registerPython();
+  espresso::ParticleAccess::registerPython();
 
   espresso::esutil::registerPython();
   espresso::bc::registerPython();
@@ -60,6 +63,7 @@ void espresso::registerPython() {
   espresso::integrator::registerPython();
   espresso::interaction::registerPython();
   espresso::analysis::registerPython();
+  espresso::io::registerPython();
 
   log4espp::PyLogger::registerPython();
 }
