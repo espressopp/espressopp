@@ -19,6 +19,7 @@
 #include "MeanSquareDispl.hpp"
 #include "Autocorrelation.hpp"
 #include "RadialDistrF.hpp"
+#include "StaticStructF.hpp"
 #include "RDFatomistic.hpp"
 #include "Viscosity.hpp"
 #include "XDensity.hpp"
@@ -51,6 +52,7 @@ namespace espresso {
       VelocityAutocorrelation::registerPython();
       MeanSquareDispl::registerPython();
       RadialDistrF::registerPython();
+      StaticStructF::registerPython();
       RDFatomistic::registerPython();
       XDensity::registerPython();
       Test::registerPython();
