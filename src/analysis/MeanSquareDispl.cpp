@@ -51,35 +51,41 @@ namespace espresso {
         centerOfMassList.push_back( posCOM_sum / mass_sum );
       }
       
+      vector<longint> localIDs;
+      for (map<size_t,int>::const_iterator itr=idToCpu.begin(); itr!=idToCpu.end(); ++itr) {
+        size_t i = itr->first;
+        int whichCPU = itr->second;
+        if(system.comm->rank()==whichCPU){
+          localIDs.push_back(i);
+        }
+      }
+      
       // MSD calculation
       int perc=0, perc1=0;
+      real denom = 100.0 / (real)M;
       for(int m=0; m<M; m++){
         
         totZ[m] = 0.0;
         Z[m] = 0.0;
         for(int n=0; n<M-m; n++){
-          for (map<size_t,int>::const_iterator itr=idToCpu.begin(); itr!=idToCpu.end(); ++itr) {
-            size_t i = itr->first;
-            int whichCPU = itr->second;
+          for (vector<longint>::iterator itr=localIDs.begin(); itr!=localIDs.end(); ++itr) {
+            size_t i = *itr;
             
-            if(system.comm->rank()==whichCPU){
-              Real3D pos1 = getConf(n + m)->getCoordinates(i) - centerOfMassList[n+m];
-              Real3D pos2 = getConf(n)->getCoordinates(i)     - centerOfMassList[n];
-              Real3D delta = pos2 - pos1;
-              Z[m] += delta.sqr();
-            }
+            Real3D pos1 = getConf(n + m)->getCoordinates(i) - centerOfMassList[n+m];
+            Real3D pos2 = getConf(n)->getCoordinates(i)     - centerOfMassList[n];
+            Real3D delta = pos2 - pos1;
+            Z[m] += delta.sqr();
           }
         }
         if(print_progress && system.comm->rank()==0){
-          perc = (int)(100*(real)m/(real)M);
-          if(perc>perc1){
+          perc = (int)(m*denom);
+          if(perc%5==0){
             cout<<"calculation progress (mean square displacement): "<< perc << " %\r"<<flush;
-            perc1 = perc;
           }
         }
       }
       if(system.comm->rank()==0)
-        cout<<"calculation progress (mean square displacement): "<< (int)(100*(real)M/(real)M) << " %" <<endl;
+        cout<<"calculation progress (mean square displacement): 100%"<<endl;
       
       boost::mpi::all_reduce( *system.comm, Z, M, totZ, plus<real>() );
       

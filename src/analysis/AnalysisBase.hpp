@@ -3,7 +3,8 @@
 #define _ANALYSIS_ANALYSISBASE_HPP
 #include "types.hpp"
 #include "python.hpp"
-#include "SystemAccess.hpp"
+//#include "SystemAccess.hpp"
+#include "ParticleAccess.hpp"
 #include <limits>
 
 namespace espresso {
@@ -18,15 +19,20 @@ namespace espresso {
     * virtual void resetAverage()
     * virtual void updateAverage(ResultType res) = 0;
     * */
-    class AnalysisBase : public SystemAccess {
-    public:
-      AnalysisBase(shared_ptr< System > system) : SystemAccess(system) {}
-      virtual ~AnalysisBase() {}
+      class AnalysisBase : public ParticleAccess{ //SystemAccess {
+      public:
+        AnalysisBase(shared_ptr< System > system) : ParticleAccess(system) {}
+        virtual ~AnalysisBase() {}
       virtual void performMeasurement() = 0;
       virtual void reset() = 0;
       virtual python::list compute() = 0;
       virtual python::list getAverageValue() = 0;
       virtual int getNumberOfMeasurements() = 0;
+      
+      void perform_action(){
+        performMeasurement();
+      }
+      
       static void registerPython();
       static LOG4ESPP_DECL_LOGGER(logger);
     };

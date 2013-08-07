@@ -85,7 +85,9 @@ namespace espresso {
                 shared_ptr<Tabulated> >()
         )
         .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<Tabulated> >())
-        .def("setPotential", &FixedPairListTabulated::setPotential);
+        .def("setPotential", &FixedPairListTabulated::setPotential)
+        .def("setFixedPairList", &FixedPairListTabulated::setFixedPairList)
+        .def("getFixedPairList", &FixedPairListTabulated::getFixedPairList);
         ;
         
         
