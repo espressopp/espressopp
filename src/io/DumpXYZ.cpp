@@ -36,7 +36,7 @@ namespace espresso {
           Real3D Li = system->bc->getBoxL();
           
           // for noncubic simulation boxes
-          myfile << Li[0] << "  0.0  0.0  "<< Li[1] << "  0.0  0.0  "<< Li[2] << endl;
+          myfile << Li[0] << "  0.0  0.0  0.0  "<< Li[1] << "  0.0  0.0  0.0  "<< Li[2] << endl;
           
           ConfigurationExtIterator cei = conf_real-> getIterator();
           for(size_t i=0; i<num_of_particles; i++){
