@@ -89,7 +89,7 @@ def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.
       startpos = system.bc.getRandomPos()
       positions, bonds = espresso.tools.topology.polymerRW(pid, startpos, monomers_per_chain, bondlen)
       for k in range(monomers_per_chain):  
-        part = [pid + k, type, mass, positions[k], vel_zero, 1.0]
+        part = [pid + k, type, mass, positions[k], vel_zero]
         chain.append(part)
       pid += monomers_per_chain
       type += 1
