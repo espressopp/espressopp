@@ -72,7 +72,7 @@ namespace espresso {
         boost::python::throw_error_already_set();
       }
 
-      Real3D coords = (*it).first;
+      Real3D coords = (*it).second;
       it++;
       return coords;
     }

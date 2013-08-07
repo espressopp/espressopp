@@ -2,58 +2,45 @@
 #ifndef _IO_DUMPXYZ_HPP
 #define _IO_DUMPXYZ_HPP
 
-
-#include "mpi.h"
-#include "types.hpp"
-#include "python.hpp"
 #include "ParticleAccess.hpp"
-#include "SystemAccess.hpp"
+#include "integrator/MDIntegrator.hpp"
 
-#include "storage/Storage.hpp"
+/////#include "../System.hpp"
+//#include "analysis/ConfigurationsExt.hpp"
 
-// ******************************************************************************************
+//using namespace espresso::analysis;
 
 namespace espresso {
   namespace io{
-
-    //typedef std::vector<ConfigurationExtPtr> ConfigurationExtList;
 
     class DumpXYZ : public ParticleAccess {
 
     public:
 
-      /** Constructor, allow for unlimited snapshots. */
-
-      DumpXYZ(shared_ptr<System> system) : ParticleAccess(system){ 
-        //maxConfigs = 0; 
-        
-        //System& system1 = getSystemRef();
-        //int step = system.integrator->getStep();
-        //int myN = system1.storage->getNRealParticles();
-        //int myrank = system1.comm->rank();
-
-        //std::cout << "CONSTRUCTOR   N:  " << myN << "  cpu: "<< myrank << std::endl;
-
+      DumpXYZ(shared_ptr<System> system, 
+              shared_ptr<integrator::MDIntegrator> _integrator,
+              std::string _file_name,
+              bool _unfolded) : 
+                        ParticleAccess(system), 
+                        integrator(_integrator),
+                        file_name( _file_name ),
+                        unfolded(_unfolded){ 
+                          
+        //ConfigurationsExt _conf( system );
+        //conf = _conf;
       }
       ~DumpXYZ() {}
 
       void perform_action(){
-        //dump();
+        dump();
       }
       
-      //void dump();
+      void dump();
       
-      /*
-
+      std::string getFilename(){return file_name;}
+      void setFilename(std::string v){file_name = v;}
       bool getUnfolded(){return unfolded;}
       void setUnfolded(bool v){unfolded = v;}
-
-      void gather();
-      ConfigurationExtPtr get(int stackpos);
-      ConfigurationExtPtr back();
-      ConfigurationExtList all();
-      void clear() { configurationsExt.clear(); }
-      */
 
       static void registerPython();
     
@@ -62,12 +49,14 @@ namespace espresso {
       //static LOG4ESPP_DECL_LOGGER(logger);
 
     private:
-/*
-      void pushConfig(ConfigurationExtPtr config);
-      ConfigurationExtList configurationsExt;
-      int maxConfigs;
-      bool unfolded;  // one can choose folded or unfolded coordinates, by default it is unfolded
- */
+      
+      //ConfigurationsExt conf( System() );
+      // integrator we need to know an integration step
+      shared_ptr<integrator::MDIntegrator> integrator;
+      
+      std::string file_name;
+      
+      bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
     };
   }
 }

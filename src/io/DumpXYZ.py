@@ -4,7 +4,7 @@
 *******************************************
 
 * `dump()`
-  write configuration to trajectory XYZ file
+  write configuration to trajectory XYZ file. Default filename is "out.xyz"
 
 usage:
 
@@ -28,19 +28,19 @@ from _espresso import io_DumpXYZ
 
 class DumpXYZLocal(ParticleAccessLocal, io_DumpXYZ):
   'The (local) storage of configurations.'
-  def __init__(self, system):
-    cxxinit(self, io_DumpXYZ, system)
-
-  '''
+  def __init__(self, system, integrator, filename='out.xyz', unfolded=False):
+    cxxinit(self, io_DumpXYZ, system, integrator, filename, unfolded)
+  
   def dump(self):
     if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       self.cxxclass.dump(self)
-  '''
+  
   
 if pmi.isController :
   class DumpXYZ(ParticleAccess):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls =  'espresso.io.DumpXYZLocal'
-      #pmicall = [ 'dump' ]
+      cls =  'espresso.io.DumpXYZLocal',
+      pmicall = [ 'dump' ],
+        pmiproperty = ['filename', 'unfolded']
     )
