@@ -46,7 +46,8 @@ namespace espresso {
                 init <shared_ptr<System>,
                       shared_ptr <FixedTripleList>,
                       shared_ptr <TabulatedAngular> >())
-                .def("setPotential", &FixedTripleListTabulatedAngular::setPotential);
+                .def("setPotential", &FixedTripleListTabulatedAngular::setPotential)
+                .def("getFixedTripleList", &FixedTripleListTabulatedAngular::getFixedTripleList);
         }
         
     } // ns interaction

@@ -37,5 +37,5 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.FixedTripleListTabulatedAngularLocal',
-            pmicall = ['setPotential']
+            pmicall = ['setPotential', 'getFixedTripleList']
             )
