@@ -48,7 +48,8 @@ namespace espresso {
                         init <shared_ptr<System>,
                               shared_ptr<FixedQuadrupleList>,
                               shared_ptr<TabulatedDihedral> >())
-                .def("setPotential", &FixedQuadrupleListTabulatedDihedral::setPotential);
+                .def("setPotential", &FixedQuadrupleListTabulatedDihedral::setPotential)
+                .def("getFixedQuadrupleList", &FixedQuadrupleListTabulatedDihedral::getFixedQuadrupleList);
         }
         
     } // ns interaction
