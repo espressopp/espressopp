@@ -135,7 +135,7 @@ namespace espresso {
 	python::tuple triple;
 	python::list triples;
 	for (GlobalTriples::const_iterator it=globalTriples.begin(); it != globalTriples.end(); it++) {
-      triple = python::make_tuple(it->first, it->second.first, it->second.second);
+      triple = python::make_tuple( it->second.first,it->first, it->second.second);
       triples.append(triple);
     }
 
