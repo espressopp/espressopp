@@ -108,8 +108,11 @@ def read(gro_file, top_file="", doRegularExcl=True):
                     print "Defaults: ", defaults
                 else:
                     fields=line.split()
-                    defaults={"nbtype":fields[0], "combinationrule":fields[1],
-                    "genpairs":fields[2], "fudgeLJ":fields[3], "fudgeQQ":fields[4]}
+                    if len(fields)==5: 
+                        defaults={"nbtype":fields[0], "combinationrule":fields[1],
+                        "genpairs":fields[2], "fudgeLJ":fields[3], "fudgeQQ":fields[4]}
+                    else: 
+                        defaults={"nbtype":fields[0], "combinationrule":fields[1]} 
             
             if 'atomtypes' in line: # map atom types (espresso++ uses ints)
                 readattypes = True
@@ -350,6 +353,7 @@ def read(gro_file, top_file="", doRegularExcl=True):
 
 
 def storeMolecules(f, molecules, mol=""):
+    nrexcl=0
     line = ''
     line=f.readlastline()
     while not 'moleculetype' in line:

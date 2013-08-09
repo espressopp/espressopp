@@ -26,7 +26,8 @@ namespace espresso {
                 shared_ptr<FixedTripleList>,
                 shared_ptr<AngularHarmonic> >())
         .def(init< shared_ptr<System>, shared_ptr<FixedTripleListAdress>, shared_ptr<AngularHarmonic> >())
-        .def("setPotential", &FixedTripleListAngularHarmonic::setPotential);
+        .def("setPotential", &FixedTripleListAngularHarmonic::setPotential)
+        .def("getFixedTripleList", &FixedTripleListAngularHarmonic::getFixedTripleList);
       ;
     }
   }

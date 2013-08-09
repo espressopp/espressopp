@@ -36,11 +36,21 @@ namespace espresso {
           Real3D Li = system->bc->getBoxL();
           
           // for noncubic simulation boxes
-          myfile << Li[0] << "  0.0  0.0  0.0  "<< Li[1] << "  0.0  0.0  0.0  "<< Li[2] << endl;
+          myfile << Li[0] * length_factor << "  0.0  0.0  0.0  "<< 
+                  Li[1] * length_factor << "  0.0  0.0  0.0  "<< Li[2] * length_factor;
+          // additional info to comment line
+          myfile << "  currentStep " << integrator->getStep() << "  lengthUnit "<< length_unit << endl;
           
           ConfigurationExtIterator cei = conf_real-> getIterator();
-          for(size_t i=0; i<num_of_particles; i++){
-            myfile << "  0  " << cei.nextCoordinates() << endl;
+          if(length_factor == 1.0){
+            for(size_t i=0; i<num_of_particles; i++){
+              myfile << "  0  " << cei.nextCoordinates() << endl;
+            }
+          }
+          else{
+            for(size_t i=0; i<num_of_particles; i++){
+              myfile << "  0  " << length_factor * cei.nextCoordinates() << endl;
+            }
           }
           myfile.close();
         }
@@ -58,11 +68,18 @@ namespace espresso {
       class_<DumpXYZ, bases<ParticleAccess>, boost::noncopyable >
       ("io_DumpXYZ", init< shared_ptr< System >, 
                            shared_ptr< integrator::MDIntegrator >, 
-                           std::string, bool >())
+                           std::string, 
+                           bool,
+                           real,
+                           std::string >())
         .add_property("filename", &DumpXYZ::getFilename, 
                                   &DumpXYZ::setFilename)
         .add_property("unfolded", &DumpXYZ::getUnfolded, 
                                   &DumpXYZ::setUnfolded)
+        .add_property("length_factor", &DumpXYZ::getLengthFactor, 
+                                       &DumpXYZ::setLengthFactor)
+        .add_property("length_unit", &DumpXYZ::getLengthUnit, 
+                                     &DumpXYZ::setLengthUnit)
         .def("dump", &DumpXYZ::dump)
       ;
     }

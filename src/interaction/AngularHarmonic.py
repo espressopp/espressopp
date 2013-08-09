@@ -34,5 +34,5 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.FixedTripleListAngularHarmonicLocal',
-            pmicall = ['setPotential']
+            pmicall = ['setPotential', 'getFixedTripleList']
             )
