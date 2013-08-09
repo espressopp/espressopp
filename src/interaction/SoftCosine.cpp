@@ -24,6 +24,7 @@ namespace espresso {
     	("interaction_SoftCosine", init< real, real >())
 	.def(init< real, real, real>())
     	.add_property("A", &SoftCosine::getA, &SoftCosine::setA)
+    	.def_pickle(SoftCosine_pickle())
     	;
 
       class_< VerletListSoftCosine, bases< Interaction > > 

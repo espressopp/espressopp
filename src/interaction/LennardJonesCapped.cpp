@@ -34,6 +34,7 @@ namespace espresso {
     	.add_property("sigma", &LennardJonesCapped::getSigma, &LennardJonesCapped::setSigma)
     	.add_property("epsilon", &LennardJonesCapped::getEpsilon, &LennardJonesCapped::setEpsilon)
     	.add_property("caprad", &LennardJonesCapped::getCaprad, &LennardJonesCapped::setCaprad)
+    	.def_pickle(LennardJonesCapped_pickle())
       ;
 
       class_< VerletListLennardJonesCapped, bases< Interaction > >

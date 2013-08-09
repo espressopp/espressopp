@@ -133,6 +133,25 @@ namespace espresso {
 
 
     };
+    // provide pickle support
+    struct LennardJonesCapped_pickle : boost::python::pickle_suite
+    {
+      static
+      boost::python::tuple
+      getinitargs(LennardJonesCapped const& pot)
+      {
+    	  real eps;
+          real sig;
+          real rc;
+          real sh;
+          eps=pot.getEpsilon();
+          sig=pot.getSigma();
+          rc =pot.getCutoff();
+          sh =pot.getShift();
+          return boost::python::make_tuple(eps, sig, rc, sh);
+      }
+    };
+
   }
 }
 

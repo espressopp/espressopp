@@ -31,6 +31,7 @@ namespace espresso {
       class_< Zero, bases< Potential > >
     	("interaction_Zero", init<>())
 	    .def(init<>())
+	    .def_pickle(Zero_pickle())
       ;
 
       class_< VerletListZero, bases< Interaction > >

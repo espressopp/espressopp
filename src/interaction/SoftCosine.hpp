@@ -67,6 +67,23 @@ namespace espresso {
         return true;
       }
     };
+    // provide pickle support
+    struct SoftCosine_pickle : boost::python::pickle_suite
+    {
+      static
+      boost::python::tuple
+      getinitargs(SoftCosine const& pot)
+      {
+          real a;
+          real rc;
+          real sh;
+          a=pot.getA();
+          rc =pot.getCutoff();
+          sh =pot.getShift();
+          return boost::python::make_tuple(a, rc, sh);
+      }
+    };
+
   }
 }
 

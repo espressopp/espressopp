@@ -47,7 +47,9 @@ namespace espresso {
      
       class_ <Tabulated, bases <Potential> >
         ("interaction_Tabulated", init <int, const char*, real>())
-            .add_property("filename", &Tabulated::getFilename, &Tabulated::setFilename);
+            .add_property("filename", &Tabulated::getFilename, &Tabulated::setFilename)
+            .def_pickle(Tabulated_pickle())
+        ;
      
       class_ <VerletListTabulated, bases <Interaction> > 
         ("interaction_VerletListTabulated", init <shared_ptr<VerletList> >())

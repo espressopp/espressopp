@@ -27,6 +27,17 @@ namespace espresso {
         return true;
       }
     };
+    // provide pickle support
+    struct Zero_pickle : boost::python::pickle_suite
+    {
+      static
+      boost::python::tuple
+      getinitargs(Zero const& pot)
+      {
+          return boost::python::make_tuple();
+      }
+    };
+
   }
 }
 

@@ -34,9 +34,11 @@ namespace espresso {
 
       class_< LennardJones, bases< Potential > >
     	("interaction_LennardJones", init< real, real, real >())
-	    .def(init< real, real, real, real>())
+	    .def(init< real, real, real, real >())
     	.add_property("sigma", &LennardJones::getSigma, &LennardJones::setSigma)
     	.add_property("epsilon", &LennardJones::getEpsilon, &LennardJones::setEpsilon)
+        .def_pickle(LennardJones_pickle())
+
       ;
 
       class_< VerletListLennardJones, bases< Interaction > > 

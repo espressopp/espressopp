@@ -23,6 +23,7 @@ namespace espresso {
         private:
             std::string filename;
             shared_ptr <Interpolation> table;
+            int interpolationType;
 
         public:
             static void registerPython();
@@ -30,11 +31,13 @@ namespace espresso {
             Tabulated() {
                 setShift(0.0);
                 setCutoff(infinity);
+                interpolationType=0;
                 //std::cout << "using default tabulated potential ...\n";
             }
          
             // used for fixedpairlist (2-body bonded interaction)
             Tabulated(int itype, const char* filename){
+            	setInterpolationType(itype);
                 setFilename(itype, filename);
                 setShift(0.0);
                 setCutoff(infinity);
@@ -42,12 +45,19 @@ namespace espresso {
             }
          
             Tabulated(int itype, const char* filename, real cutoff) {
+            	setInterpolationType(itype);
                 setFilename(itype, filename);
                 setShift(0.0);
                 setCutoff(cutoff);
                 //std::cout << "using tabulated potential " << filename << "\n";
             }
          
+            /** Setter for the interpolation type */
+            void setInterpolationType(int itype) { interpolationType = itype; }
+
+            /** Getter for the interpolation type */
+            int getInterpolationType() const { return interpolationType; }
+
             /** Setter for the filename will read in the table. */
             void setFilename(int itype, const char* _filename);
          
@@ -81,6 +91,20 @@ namespace espresso {
             }
 
     };//class
+
+    // provide pickle support
+    struct Tabulated_pickle : boost::python::pickle_suite
+    {
+      static
+      boost::python::tuple
+      getinitargs(Tabulated const& pot)
+      {   int itp        = pot.getInterpolationType();
+    	  std::string fn = pot.getFilename();
+    	  real rc        = pot.getCutoff();
+          return boost::python::make_tuple(itp, fn,rc);
+      }
+    };
+
   }
 }
 

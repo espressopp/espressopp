@@ -31,6 +31,7 @@ namespace espresso {
       class_< LJcos, bases< Potential > >
         ("interaction_LJcos", init< real >())
     	.add_property("phi", &LJcos::getPhi, &LJcos::setPhi)
+    	.def_pickle(LJcos_pickle())
       ;
 
       class_< VerletListLJcos, bases< Interaction > > 

@@ -26,6 +26,7 @@ namespace espresso {
     	.add_property("epsilon", &LennardJonesExpand::getEpsilon, &LennardJonesExpand::setEpsilon)
     	.add_property("sigma", &LennardJonesExpand::getSigma, &LennardJonesExpand::setSigma)
     	.add_property("delta", &LennardJonesExpand::getDelta, &LennardJonesExpand::setDelta)
+    	.def_pickle(LennardJonesExpand_pickle())
     	;
 
       class_< VerletListLennardJonesExpand, bases< Interaction > > 

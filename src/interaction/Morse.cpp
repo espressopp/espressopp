@@ -33,6 +33,7 @@ namespace espresso {
     	.add_property("epsilon", &Morse::getEpsilon, &Morse::setEpsilon)
     	.add_property("alpha", &Morse::getAlpha, &Morse::setAlpha)
     	.add_property("rMin", &Morse::getRMin, &Morse::setRMin)
+    	.def_pickle(Morse_pickle())
     	;
 
       class_< VerletListMorse, bases< Interaction > > 

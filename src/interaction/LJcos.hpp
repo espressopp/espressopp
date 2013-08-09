@@ -99,6 +99,19 @@ namespace espresso {
         return true;
       }
     };
+    // provide pickle support
+    struct LJcos_pickle : boost::python::pickle_suite
+    {
+      static
+      boost::python::tuple
+      getinitargs(LJcos const& pot)
+      {
+          real p;
+          p=pot.getPhi();
+          return boost::python::make_tuple(p);
+      }
+    };
+
   }
 }
 

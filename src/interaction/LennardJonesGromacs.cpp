@@ -26,6 +26,7 @@ namespace espresso {
     	.add_property("epsilon", &LennardJonesGromacs::getEpsilon, &LennardJonesGromacs::setEpsilon)
     	.add_property("sigma", &LennardJonesGromacs::getSigma, &LennardJonesGromacs::setSigma)
     	.add_property("r1", &LennardJonesGromacs::getR1, &LennardJonesGromacs::setR1)
+    	.def_pickle(LennardJonesGromacs_pickle())
     	;
 
       class_< VerletListLennardJonesGromacs, bases< Interaction > > 

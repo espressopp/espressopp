@@ -80,6 +80,22 @@ namespace espresso {
         return true;
       }
     };
+
+    // provide pickle support
+    struct Morse_pickle : boost::python::pickle_suite
+    {
+      static
+      boost::python::tuple
+      getinitargs(Morse const& pot)
+      {
+    	  real eps;
+          real al;
+          eps=pot.getEpsilon();
+          al=pot.getAlpha();
+          return boost::python::make_tuple(eps, al);
+      }
+    };
+
   }
 }
 

@@ -154,6 +154,28 @@ namespace espresso {
         return true;
       }
     };
+
+    // provide pickle support
+    struct LennardJonesGromacs_pickle : boost::python::pickle_suite
+    {
+      static
+      boost::python::tuple
+      getinitargs(LennardJonesGromacs const& pot)
+      {
+    	  real eps;
+          real sig;
+          real rc;
+          real sh;
+          real r1;
+          eps=pot.getEpsilon();
+          sig=pot.getSigma();
+          rc =pot.getCutoff();
+          sh =pot.getShift();
+          r1 =pot.getR1();
+          return boost::python::make_tuple(eps, sig, r1, rc, sh);
+      }
+    };
+
   }
 }
 
