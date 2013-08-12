@@ -66,25 +66,26 @@ namespace espresso {
          
             real _computeEnergySqrRaw(real distSqr) const {
                 // make an interpolation
-                if (table) 
+                if (interpolationType!=0) 
                     return table->getEnergy(sqrt(distSqr));
-                else {
+                else
+                    return 0;
+                /*else {
                     throw std::runtime_error("Tabulated potential table not available.");
                     //return 0.0;
-                }
+                }*/
             }
          
             bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const {
                 real ffactor;
-                if (table) {
+                if (interpolationType!=0){ 
                    real distrt = sqrt(distSqr);
                    ffactor = table->getForce(distrt);
                    ffactor /= distrt;
                 }
-
                 else {
-                    throw std::runtime_error("Tabulated potential table not available.");
-                    //return false;
+                    //throw std::runtime_error("Tabulated potential table not available.");
+                    return false;
                 }
                 force = dist * ffactor;
                 return true;
