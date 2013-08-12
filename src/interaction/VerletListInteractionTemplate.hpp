@@ -63,6 +63,12 @@ namespace espresso {
         return potentialArray.at(type1, type2);
       }
 
+      shared_ptr<Potential> clonePotential(int type1, int type2) {
+      // shared_ptr<Potential> getPotential(int type1, int type2) {
+        //return potentialArray.at(type1, type2);
+    	return make_shared<Potential>(potentialArray.at(type1, type2));
+      }
+
       virtual void addForces();
       virtual real computeEnergy();
       virtual real computeVirial();
