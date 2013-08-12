@@ -15,6 +15,8 @@ namespace espresso {
       .add_property("v", &Particle::getV, &Particle::setV)
       .add_property("q", &Particle::getQ, &Particle::setQ)
       .add_property("radius", &Particle::getRadius, &Particle::setRadius)
+      .add_property("fradius", &Particle::getFRadius, &Particle::setFRadius)
+      .add_property("vradius", &Particle::getVRadius, &Particle::setVRadius)
       .add_property("imageBox", &Particle::getImageBox, &Particle::setImageBox)
       .add_property("isGhost", &Particle::getGhostStatus, &Particle::setGhostStatus)
       ;

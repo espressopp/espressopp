@@ -119,15 +119,17 @@ class StorageLocal(object):
     def addParticles(self, particleList, *properties):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 
-            index_id     = -1
-            index_pos    = -1
-            index_v      = -1
-            index_f      = -1
-            index_q      = -1
-            index_radius = -1
-            index_type   = -1
-            index_mass   = -1
-            index_adrAT  = -1 # adress AT particle if 1
+            index_id      = -1
+            index_pos     = -1
+            index_v       = -1
+            index_f       = -1
+            index_q       = -1
+            index_radius  = -1
+            index_fradius = -1
+            index_vradius = -1
+            index_type    = -1
+            index_mass    = -1
+            index_adrAT   = -1 # adress AT particle if 1
             
             last_pos = toReal3DFromVector([-99,-99,-99])
 
@@ -147,6 +149,8 @@ class StorageLocal(object):
                     elif val.lower() == "f": index_f = nindex
                     elif val.lower() == "q": index_q = nindex
                     elif val.lower() == "radius": index_radius = nindex
+                    elif val.lower() == "fradius": index_fradius = nindex
+                    elif val.lower() == "vradius": index_vradius = nindex
                     elif val.lower() == "adrat": index_adrAT = nindex
                     else: raise SyntaxError("unknown particle property: %s"%val)
                     nindex += 1
@@ -205,6 +209,12 @@ class StorageLocal(object):
                     if index_radius >= 0:
                         storedParticle.radius = particle[index_radius]
 
+                    if index_fradius >= 0:
+                        storedParticle.fradius = particle[index_fradius]
+
+                    if index_vradius >= 0:
+                        storedParticle.vradius = particle[index_vradius]
+
                     if index_type >= 0:
                         storedParticle.type = particle[index_type]
 
@@ -230,6 +240,8 @@ class StorageLocal(object):
                   elif property.lower() == "f"    : particle.f    = value
                   elif property.lower() == "q"    : particle.q    = value
                   elif property.lower() == "radius" : particle.radius = value
+                  elif property.lower() == "fradius" : particle.fradius = value
+                  elif property.lower() == "vradius" : particle.vradius = value
                   else: raise SyntaxError( 'unknown particle property: %s' % property) # UnknownParticleProperty exception is not implemented
               #except ParticleDoesNotExistHere:
                # self.logger.debug("ParticleDoesNotExistHere pid=% rank=%i" % (pid, pmi.rank))

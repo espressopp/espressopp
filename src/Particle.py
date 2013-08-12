@@ -88,6 +88,16 @@ class ParticleLocal(object):
     def radius(self, val): self.__getTmp().radius = val
     
     @property
+    def fradius(self): return self.__getTmp().fradius
+    @radius.setter
+    def fradius(self, val): self.__getTmp().fradius = val
+    
+    @property
+    def vradius(self): return self.__getTmp().vradius
+    @radius.setter
+    def vradius(self, val): self.__getTmp().vradius = val
+    
+    @property
     def imageBox(self): return self.__getTmp().imageBox
     @imageBox.setter
     def imageBox(self, val): self.__getTmp().imageBox = toInt3DFromVector(val)

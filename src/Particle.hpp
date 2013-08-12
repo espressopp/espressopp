@@ -21,7 +21,6 @@ namespace espresso {
     size_t type;
     real mass;
     real q;
-    real radius;
   private:
     friend class boost::serialization::access;
     template< class Archive >
@@ -31,7 +30,6 @@ namespace espresso {
       ar & type;
       ar & mass;
       ar & q;
-      ar & radius;
     }
   };
 
@@ -45,6 +43,7 @@ namespace espresso {
   struct ParticlePosition {
 
     Real3D p;
+    real radius;
 
     void copyShifted(ParticlePosition& dst, const Real3D& shift) const {
       dst.p = p + shift;
@@ -55,6 +54,7 @@ namespace espresso {
     void serialize(Archive &ar, const unsigned int version) {
       for (int i = 0; i < 3; ++i)
         ar & p[i];
+      ar & radius;
     }
   };
 
@@ -71,6 +71,8 @@ namespace espresso {
   struct ParticleForce {
 
     Real3D f;
+    // force associated with second derivative of particle radius
+    real fradius;
 
     /** add all force type properties of two particles
 	(typically used between a real particle and its
@@ -78,6 +80,7 @@ namespace espresso {
     */
     ParticleForce& operator+=(const ParticleForce& otherF) {
       f += otherF.f;
+      fradius += otherF.fradius;
       return *this;
     }
   private:
@@ -86,6 +89,7 @@ namespace espresso {
     void serialize(Archive &ar, const unsigned int version){
       for (int i = 0; i < 3; ++i)
         ar & f[i];
+      ar & fradius;
     }
   };
 
@@ -100,12 +104,15 @@ namespace espresso {
   struct ParticleMomentum {
 
     Real3D v;
+    // force associated with first derivative of particle radius
+    real vradius;
   private:
     friend class boost::serialization::access;
     template< class Archive >
     void serialize(Archive &ar, const unsigned int version) {
       for (int i = 0; i < 3; ++i)
         ar & v[i];
+      ar & vradius;
     }
   };
 
@@ -147,11 +154,13 @@ namespace espresso {
 
     void init() {
       m.v[0] = m.v[1] = m.v[2] = 0.0;
-      p.type = 0;
-      p.mass = 1.0;
-      p.q = 0.0;
-      p.radius = 1.0;
-      l.ghost = false;
+      p.type    = 0;
+      p.mass    = 1.0;
+      p.q       = 0.0;
+      r.radius  = 1.0;
+      f.fradius = 0.0;
+      m.vradius = 0.0;
+      l.ghost   = false;
     }
 
     // getter and setter used for export in Python
@@ -178,10 +187,10 @@ namespace espresso {
     void setQ(real q) { p.q = q; }
 
     // Radius
-    real& radius() { return p.radius; }
-    const real& radius() const { return p.radius; }
-    real getRadius() const { return p.radius; }
-    void setRadius(real q) { p.radius = q; }
+    real& radius() { return r.radius; }
+    const real& radius() const { return r.radius; }
+    real getRadius() const { return r.radius; }
+    void setRadius(real q) { r.radius = q; }
 
     // Position
 
@@ -203,12 +212,24 @@ namespace espresso {
     Real3D getF() const { return f.f; }
     void setF(const Real3D& force) { f.f = force; }
 
+    real& fradius() {return f.fradius; }
+    const real& fradius() const { return f.fradius; }
+
+    real getFRadius() const { return f.fradius; }
+    void setFRadius(const real &fr) { f.fradius = fr; }
+
     // Momentum
 
     Real3D& velocity() { return m.v; }
     const Real3D& velocity() const { return m.v; }
     Real3D getV() const { return m.v; }
     void setV(const Real3D& velocity) { m.v = velocity; }
+
+    real vradius() { return m.vradius; }
+    const real& vradius() const { return m.vradius; }
+
+    real getVRadius() const { return m.vradius; }
+    void setVRadius(const real& vr) { m.vradius = vr;}
 
     // Image, Ghost
 
