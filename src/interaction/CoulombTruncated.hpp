@@ -62,6 +62,22 @@ namespace espresso {
       }
 
     };
+    // provide pickle support
+    struct CoulombTruncated_pickle : boost::python::pickle_suite
+    {
+      static
+      boost::python::tuple
+      getinitargs(CoulombTruncated const& pot)
+      {
+    	  real q2;
+          real rc;
+          real sh;
+          q2 =pot.getQQ();
+          rc =pot.getCutoff();
+          sh =pot.getShift();
+          return boost::python::make_tuple(q2, rc, sh);
+      }
+    };
   }
 }
 

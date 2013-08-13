@@ -22,8 +22,9 @@ namespace espresso {
 
       class_< CoulombTruncated, bases< Potential > >
     	("interaction_CoulombTruncated", init< real, real >())
-	.def(init< real, real, real>())
+	    .def(init< real, real, real>())
     	.add_property("qq", &CoulombTruncated::getQQ, &CoulombTruncated::setQQ)
+    	.def_pickle(CoulombTruncated_pickle())
     	;
 
       class_< VerletListCoulombTruncated, bases< Interaction > > 

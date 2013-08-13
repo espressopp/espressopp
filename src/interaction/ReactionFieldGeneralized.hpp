@@ -86,6 +86,10 @@ namespace espresso {
                     initialize();
                 }
 
+                real getKappa() const { return kappa; }
+                real getEpsilon1() const { return epsilon1; }
+                real getEpsilon2() const { return epsilon2; }
+
                 void setCutoff(real _cutoff) {
                     cutoff = _cutoff;
                     cutoffSqr = cutoff*cutoff;
@@ -152,6 +156,24 @@ namespace espresso {
                     return true;
                 }*/
         };
+
+        // provide pickle support
+        struct ReactionFieldGeneralized_pickle : boost::python::pickle_suite
+        {
+          static
+          boost::python::tuple
+          getinitargs(ReactionFieldGeneralized const& pot)
+          {
+              real _prefactor = pot.getPrefactor();
+              real _kappa     = pot.getKappa();
+              real _eps1      = pot.getEpsilon1();
+              real _eps2      = pot.getEpsilon2();
+              real rc         = pot.getCutoff();
+              real sh         = pot.getShift();
+              return boost::python::make_tuple(_prefactor, _kappa, _eps1, _eps2, rc, sh);
+          }
+        };
+
     }
 }
 

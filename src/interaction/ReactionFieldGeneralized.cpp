@@ -34,6 +34,7 @@ namespace espresso {
             class_<ReactionFieldGeneralized, bases<Potential> >
                 ("interaction_ReactionFieldGeneralized", init< real, real, real, real, real>())
                 .def(init< real, real, real, real, real, real>())
+                .def_pickle(ReactionFieldGeneralized_pickle())
                 .add_property("prefactor", &ReactionFieldGeneralized::getPrefactor, &ReactionFieldGeneralized::setPrefactor)
             ;
 
