@@ -43,14 +43,14 @@ namespace espresso {
 
       class_< VerletListAdressLJcos, bases< Interaction > >
         ("interaction_VerletListAdressLJcos",
-           init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleList> >())
+           init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListAdressLJcos::setPotentialAT)
         .def("setPotentialCG", &VerletListAdressLJcos::setPotentialCG);
       ;
 
       class_< VerletListHadressLJcos, bases< Interaction > >
         ("interaction_VerletListHadressLJcos",
-           init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleList> >())
+           init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListHadressLJcos::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressLJcos::setPotentialCG);
       ;

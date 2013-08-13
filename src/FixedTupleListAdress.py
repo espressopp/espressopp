@@ -1,9 +1,9 @@
 """
 ************************************
-**FixedTupleList** - Object
+**FixedTupleListAdress** - Object
 ************************************
 
-The FixedTupleList is important for AdResS and H-AdResS simulations. It is the
+The FixedTupleListAdress is important for AdResS and H-AdResS simulations. It is the
 connection between the atomistic and coarse-grained particles. It defines which
 atomistic particles belong to which coarse-grained particle. In the following
 example "tuples" is a python list of the form
@@ -12,9 +12,9 @@ Each inner list (pid_CG1, pidAT11,  pidAT12, pidAT13, ...) defines a tuple. The
 first number is the particle id of the coarse-grained particle while the
 following numbers are the particle ids of the corresponding atomistic particles. 
 
-Example - creating the FixedTupleList:
+Example - creating the FixedTupleListAdress:
 
->>> ftpl = espresso.FixedTupleList(system.storage)
+>>> ftpl = espresso.FixedTupleListAdress(system.storage)
 >>> ftpl.addTuples(tuples)
 >>> system.storage.setFixedTuples(ftpl)
 
@@ -25,13 +25,13 @@ import _espresso
 import espresso
 from espresso.esutil import cxxinit
 
-class FixedTupleListLocal(_espresso.FixedTupleList):
+class FixedTupleListAdressLocal(_espresso.FixedTupleListAdress):
     'The (local) fixed touple list.'
 
     def __init__(self, storage):
         'Local construction of a fixed touple list'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.FixedTupleList, storage)
+            cxxinit(self, _espresso.FixedTupleListAdress, storage)
 
     def addTuples(self, tuplelist):
         """
@@ -47,9 +47,9 @@ class FixedTupleListLocal(_espresso.FixedTupleList):
 
 
 if pmi.isController:
-    class FixedTupleList(object):
+    class FixedTupleListAdress(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.FixedTupleListLocal',
+            cls = 'espresso.FixedTupleListAdressLocal',
             pmicall = [ "addTuples" ]
             )

@@ -143,7 +143,7 @@ system.storage.addParticles(allParticles, "id", "pos", "v", "f", "type", "mass",
 
 
 # add tuples
-ftpl = espresso.FixedTupleList(system.storage)
+ftpl = espresso.FixedTupleListAdress(system.storage)
 ftpl.addTuples(tuples)
 system.storage.setFixedTuples(ftpl)
 

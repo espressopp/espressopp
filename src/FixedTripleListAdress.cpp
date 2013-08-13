@@ -20,7 +20,7 @@ namespace espresso {
 
   FixedTripleListAdress::
   FixedTripleListAdress(shared_ptr< storage::Storage > _storage,
-          shared_ptr<FixedTupleList> _fixedtupleList)
+          shared_ptr<FixedTupleListAdress> _fixedtupleList)
           : FixedTripleList(_storage), fixedtupleList(_fixedtupleList) {
     LOG4ESPP_INFO(theLogger, "construct FixedTripleListAdress");
 
@@ -213,7 +213,7 @@ namespace espresso {
     class_<FixedTripleListAdress, shared_ptr<FixedTripleListAdress> >
       ("FixedTripleListAdress",
               init <shared_ptr<storage::Storage>,
-                     shared_ptr<FixedTupleList> >())
+                     shared_ptr<FixedTupleListAdress> >())
       .def("add", pyAdd)
       ;
   }

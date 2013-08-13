@@ -13,7 +13,7 @@
 #include "Tensor.hpp"
 #include "Particle.hpp"
 #include "VerletListAdress.hpp"
-#include "FixedTupleList.hpp"
+#include "FixedTupleListAdress.hpp"
 #include "esutil/Array2D.hpp"
 
 namespace espresso {
@@ -27,7 +27,7 @@ namespace espresso {
     
     public:
       VerletListAdressInteractionTemplate
-      (shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleList> _fixedtupleList)
+      (shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList)
                 : verletList(_verletList), fixedtupleList(_fixedtupleList) {
 
           potentialArrayAT = esutil::Array2D<PotentialAT, esutil::enlarge>(0, 0, PotentialAT());
@@ -53,7 +53,7 @@ namespace espresso {
       }
 
       void
-      setFixedTupleList(shared_ptr<FixedTupleList> _fixedtupleList) {
+      setFixedTupleList(shared_ptr<FixedTupleListAdress> _fixedtupleList) {
           fixedtupleList = _fixedtupleList;
       }
 
@@ -99,7 +99,7 @@ namespace espresso {
     protected:
       int ntypes;
       shared_ptr<VerletListAdress> verletList;
-      shared_ptr<FixedTupleList> fixedtupleList;
+      shared_ptr<FixedTupleListAdress> fixedtupleList;
       esutil::Array2D<PotentialAT, esutil::enlarge> potentialArrayAT;
       esutil::Array2D<PotentialCG, esutil::enlarge> potentialArrayCG;
 
@@ -184,7 +184,7 @@ namespace espresso {
 
           Particle &vp = **it;
 
-          FixedTupleList::iterator it3;
+          FixedTupleListAdress::iterator it3;
           it3 = fixedtupleList->find(&vp);
 
           if (it3 != fixedtupleList->end()) {
@@ -292,8 +292,8 @@ namespace espresso {
 
          // force between AT particles
          if (w12 != 0) { // calculate AT force if both VP are outside CG region (HY-HY, HY-AT, AT-AT)
-             FixedTupleList::iterator it3;
-             FixedTupleList::iterator it4;
+             FixedTupleListAdress::iterator it3;
+             FixedTupleListAdress::iterator it4;
              it3 = fixedtupleList->find(&p1);
              it4 = fixedtupleList->find(&p2);
 
@@ -355,7 +355,7 @@ namespace espresso {
 
             Particle &vp = **it;
 
-            FixedTupleList::iterator it3;
+            FixedTupleListAdress::iterator it3;
             it3 = fixedtupleList->find(&vp);
 
             if (it3 != fixedtupleList->end()) {
@@ -386,7 +386,7 @@ namespace espresso {
 
         Particle &vp = **it;
 
-        FixedTupleList::iterator it3;
+        FixedTupleListAdress::iterator it3;
         it3 = fixedtupleList->find(&vp);
 
         if (it3 != fixedtupleList->end()) {
@@ -422,7 +422,7 @@ namespace espresso {
 
           Particle &vp = **it;
 
-          FixedTupleList::iterator it3;
+          FixedTupleListAdress::iterator it3;
           it3 = fixedtupleList->find(&vp);
 
           if (it3 != fixedtupleList->end()) {
@@ -529,8 +529,8 @@ namespace espresso {
           e += (1.0-w12)*potentialCG._computeEnergy(p1, p2);
           //std::cout << "CG Energy calculation AT/HY region done:" << e << "\n";
           
-          FixedTupleList::iterator it3;
-          FixedTupleList::iterator it4;
+          FixedTupleListAdress::iterator it3;
+          FixedTupleListAdress::iterator it4;
           it3 = fixedtupleList->find(&p1);
           it4 = fixedtupleList->find(&p2);
 

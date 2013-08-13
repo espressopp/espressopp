@@ -47,14 +47,14 @@ namespace espresso {
 
             class_<VerletListAdressReactionFieldGeneralized, bases<Interaction> >
                 ("interaction_VerletListAdressReactionFieldGeneralized",
-                        init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleList> >())
+                        init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
                 .def("setPotentialAT", &VerletListAdressReactionFieldGeneralized::setPotentialAT)
                 .def("setPotentialCG", &VerletListAdressReactionFieldGeneralized::setPotentialCG);
             ;
 
             class_<VerletListHadressReactionFieldGeneralized, bases<Interaction> >
                 ("interaction_VerletListHadressReactionFieldGeneralized",
-                        init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleList> >())
+                        init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
                 .def("setPotentialAT", &VerletListHadressReactionFieldGeneralized::setPotentialAT)
                 .def("setPotentialCG", &VerletListHadressReactionFieldGeneralized::setPotentialCG);
             ;

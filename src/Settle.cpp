@@ -61,7 +61,7 @@ namespace espresso {
             if (molIDs.count(cit->id()) > 0) {
 
                 // lookup cit in tuples, and save AT positions
-                FixedTupleList::iterator it;
+                FixedTupleListAdress::iterator it;
                 it = fixedtupleList->find(&(*cit));
 
                 oldPos.insert(std::make_pair(cit->id(),
@@ -106,7 +106,7 @@ namespace espresso {
 
     	// retrieve particles from tuples
     	Particle* vp = storage->lookupRealParticle(molID);
-    	FixedTupleList::iterator it;
+    	FixedTupleListAdress::iterator it;
     	it = fixedtupleList->find(&(*vp));
 
     	Particle* O  = it->second.at(0);

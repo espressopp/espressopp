@@ -10,7 +10,7 @@
 //#include "integrator/VelocityVerletAdress.hpp"
 #include "integrator/VelocityVerlet.hpp"
 #include "Triple.hpp"
-#include "FixedTupleList.hpp"
+#include "FixedTupleListAdress.hpp"
 
 namespace espresso {
     class Settle  {
@@ -45,7 +45,7 @@ namespace espresso {
             boost::signals2::connection con1, con2;
 			shared_ptr<storage::Storage> storage;
 			shared_ptr<integrator::VelocityVerlet> integrator; // this is needed for signal connection
-			shared_ptr<FixedTupleList> fixedtupleList;
+			shared_ptr<FixedTupleListAdress> fixedtupleList;
 
             static LOG4ESPP_DECL_LOGGER(theLogger);
     };

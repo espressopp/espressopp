@@ -42,12 +42,12 @@ namespace espresso {
       for (int rank_i=0; rank_i<nprocs; rank_i++) {
         map< size_t, Real3D > conf;
         if (rank_i == myrank) {
-          shared_ptr<FixedTupleList> fixedtupleList = system.storage->getFixedTuples();
+          shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
           CellList realCells = system.storage->getRealCells();
           for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
               
                 Particle &vp = *cit;
-                FixedTupleList::iterator it2;
+                FixedTupleListAdress::iterator it2;
                 it2 = fixedtupleList->find(&vp);
 
                 if (it2 != fixedtupleList->end()) {  // Are there atomistic particles for given CG particle? If yes, use those for calculation.

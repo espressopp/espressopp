@@ -45,14 +45,14 @@ namespace espresso {
 
       class_< VerletListAdressMorse, bases< Interaction > >
         ("interaction_VerletListAdressMorse",
-                init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleList> >())
+                init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListAdressMorse::setPotentialAT)
         .def("setPotentialCG", &VerletListAdressMorse::setPotentialCG);
         ;
         
       class_< VerletListHadressMorse, bases< Interaction > >
         ("interaction_VerletListHadressMorse",
-                init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleList> >())
+                init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListHadressMorse::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressMorse::setPotentialCG);
         ;

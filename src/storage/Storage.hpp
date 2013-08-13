@@ -8,7 +8,7 @@
 #include <boost/signals2.hpp>
 #include <list>
 #include "log4espp.hpp"
-#include "FixedTupleList.hpp"
+#include "FixedTupleListAdress.hpp"
 #include "Cell.hpp"
 #include "Buffer.hpp"
 #include "types.hpp"
@@ -206,10 +206,10 @@ namespace espresso {
 
 
       // for AdResS
-      void setFixedTuples(shared_ptr<FixedTupleList> _fixedtupleList){
+      void setFixedTuples(shared_ptr<FixedTupleListAdress> _fixedtupleList){
           fixedtupleList = _fixedtupleList;
       }
-      shared_ptr<FixedTupleList> getFixedTuples() { return fixedtupleList; }
+      shared_ptr<FixedTupleListAdress> getFixedTuples() { return fixedtupleList; }
       ParticleList&    getAdrATParticles()  { return AdrATParticles; }
       //ParticleListAdr& getAdrATParticlesG() { return AdrATParticlesG; }
       std::list<ParticleList>& getAdrATParticlesG() { return AdrATParticlesG; }
@@ -363,7 +363,7 @@ namespace espresso {
 
 
       // used for AdResS
-      shared_ptr<FixedTupleList> fixedtupleList;
+      shared_ptr<FixedTupleListAdress> fixedtupleList;
       void clearAdrATParticlesG() {
           //std::cout << "size of AdrATParticlesG: " << AdrATParticlesG.size() << ", clearing... \n";
           AdrATParticlesG.clear();

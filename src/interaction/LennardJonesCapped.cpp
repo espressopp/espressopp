@@ -45,7 +45,7 @@ namespace espresso {
 
       class_< VerletListAdressLennardJonesCapped, bases< Interaction > >
         ("interaction_VerletListAdressLennardJonesCapped",
-         init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleList> >())
+         init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
          .def("setPotentialAT", &VerletListAdressLennardJonesCapped::setPotentialAT)
          .def("setPotentialCG", &VerletListAdressLennardJonesCapped::setPotentialCG)
          .def("getPotentialAT", &VerletListAdressLennardJonesCapped::getPotentialAT,
@@ -56,7 +56,7 @@ namespace espresso {
 
       class_< VerletListHadressLennardJonesCapped, bases< Interaction > >
         ("interaction_VerletListHadressLennardJonesCapped",
-         init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleList> >())
+         init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
          .def("setPotentialAT", &VerletListHadressLennardJonesCapped::setPotentialAT)
          .def("setPotentialCG", &VerletListHadressLennardJonesCapped::setPotentialCG)
          .def("getPotentialAT", &VerletListHadressLennardJonesCapped::getPotentialAT,

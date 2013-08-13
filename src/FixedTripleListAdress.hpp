@@ -7,7 +7,7 @@
 
 //#include "Particle.hpp"
 #include "FixedTripleList.hpp"
-#include "FixedTupleList.hpp"
+#include "FixedTupleListAdress.hpp"
 #include "esutil/ESPPIterator.hpp"
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
@@ -23,7 +23,7 @@ namespace espresso {
 	class FixedTripleListAdress : public FixedTripleList {
 	  public:
 		FixedTripleListAdress(shared_ptr<storage::Storage> _storage,
-		        shared_ptr<FixedTupleList> _fixedtupleList);
+		        shared_ptr<FixedTupleListAdress> _fixedtupleList);
 		~FixedTripleListAdress();
 
 		/** Add the given particle triple to the list on this processor if the
@@ -44,7 +44,7 @@ namespace espresso {
 		boost::signals2::connection con;
 
 	  private:
-		shared_ptr<FixedTupleList> fixedtupleList;
+		shared_ptr<FixedTupleListAdress> fixedtupleList;
 		using TripleList::add;
 		static LOG4ESPP_DECL_LOGGER(theLogger);
 	};

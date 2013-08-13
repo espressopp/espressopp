@@ -301,7 +301,7 @@ namespace espresso {
     //AdrATParticlesG.clear();
     clearAdrATParticlesG();
     // clear ghost tuples
-    FixedTupleList::iterator it = fixedtupleList->begin();
+    FixedTupleListAdress::iterator it = fixedtupleList->begin();
     for (;it != fixedtupleList->end(); ++it) {
         Particle* vp = it->first;
         if (vp->ghost()) {
@@ -338,7 +338,7 @@ namespace espresso {
 
         // for AdResS
         // write all AT particles belonging to this VP into the buffer
-        FixedTupleList::iterator it;
+        FixedTupleListAdress::iterator it;
         it = fixedtupleList->find(&(*src));
         if (it != fixedtupleList->end()) {
             std::vector<Particle*> atList;
@@ -390,7 +390,7 @@ namespace espresso {
         int numAT;
         buf.read(numAT); // read number of AT particles
 
-        FixedTupleList::iterator it;
+        FixedTupleListAdress::iterator it;
         it = fixedtupleList->find(&(*dst));
         if (it != fixedtupleList->end()) {
             std::vector<Particle*> atList = it->second;
@@ -483,14 +483,14 @@ namespace espresso {
   inline void DomainDecompositionAdress::copyGhostTuples(Particle& src, Particle& dst, int extradata, const Real3D& shift) {
 
         // create ghosts of particles in tuples
-        FixedTupleList::iterator its;
+        FixedTupleListAdress::iterator its;
         its = fixedtupleList->find(&src);
         if (its != fixedtupleList->end()) {
 
             std::vector<Particle*> atList;
             atList = its->second; // src atomistic list
 
-            FixedTupleList::iterator itd;
+            FixedTupleListAdress::iterator itd;
             itd = fixedtupleList->find(&dst);
             if (itd == fixedtupleList->end()) { // if there is no dst tuple
                 std::vector<Particle*> tmp; // temporary vector
@@ -581,7 +581,7 @@ namespace espresso {
 
       // for AdResS
       // write all AT particle forces belonging to this VP into the buffer
-      FixedTupleList::iterator it;
+      FixedTupleListAdress::iterator it;
       it = fixedtupleList->find(&(*src));
       if (it != fixedtupleList->end()) {
           std::vector<Particle*> atList;
@@ -629,7 +629,7 @@ namespace espresso {
         // for AdResS
 
         // iterate through atomistic particles in fixedtuplelist
-        FixedTupleList::iterator it;
+        FixedTupleListAdress::iterator it;
         it = fixedtupleList->find(&(*dst));
 
         if (it != fixedtupleList->end()) {
@@ -675,8 +675,8 @@ namespace espresso {
   inline void DomainDecompositionAdress::addAdrGhostForcesToReals(Particle& src, Particle& dst) {
 
       // iterate through atomistic particles in fixedtuplelist
-      FixedTupleList::iterator its;
-      FixedTupleList::iterator itd;
+      FixedTupleListAdress::iterator its;
+      FixedTupleListAdress::iterator itd;
       its = fixedtupleList->find(&src);
       itd = fixedtupleList->find(&dst);
 

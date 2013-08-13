@@ -13,7 +13,7 @@ namespace espresso {
 
   FixedPairListAdress::
   FixedPairListAdress(shared_ptr< storage::Storage > _storage,
-          shared_ptr<FixedTupleList> _fixedtupleList)
+          shared_ptr<FixedTupleListAdress> _fixedtupleList)
           : FixedPairList(_storage), fixedtupleList(_fixedtupleList) {
     LOG4ESPP_INFO(theLogger, "construct FixedPairListAdress");
     
@@ -196,7 +196,7 @@ namespace espresso {
     class_<FixedPairListAdress, shared_ptr<FixedPairListAdress> >
       ("FixedPairListAdress",
               init <shared_ptr<storage::Storage>,
-                     shared_ptr<FixedTupleList> >())
+                     shared_ptr<FixedTupleListAdress> >())
       .def("add", pyAdd)
       ;
   }

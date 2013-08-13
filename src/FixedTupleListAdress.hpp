@@ -12,7 +12,7 @@
 //#include "FixedListComm.hpp"
 
 namespace espresso {
-    class FixedTupleList: public TupleList  {
+    class FixedTupleListAdress: public TupleList  {
         protected:
             boost::signals2::connection con1, con2, con3, con4;
             shared_ptr<storage::Storage> storage;
@@ -22,8 +22,8 @@ namespace espresso {
             using TupleList::add;
 
         public:
-            FixedTupleList(shared_ptr<storage::Storage> _storage);
-            ~FixedTupleList();
+            FixedTupleListAdress(shared_ptr<storage::Storage> _storage);
+            ~FixedTupleListAdress();
 
             void add(longint pid) { tmppids.push_back(pid); } // add particle id (called from python)
             void addTs() { addT(tmppids); tmppids.clear(); } // add tuple (called from python)

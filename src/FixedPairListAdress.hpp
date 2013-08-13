@@ -6,7 +6,7 @@
 
 //#include "Particle.hpp"
 #include "FixedPairList.hpp"
-#include "FixedTupleList.hpp"
+#include "FixedTupleListAdress.hpp"
 #include "esutil/ESPPIterator.hpp"
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
@@ -22,7 +22,7 @@ namespace espresso {
 	class FixedPairListAdress : public FixedPairList{
 	  public:
 		FixedPairListAdress(shared_ptr<storage::Storage> _storage,
-		        shared_ptr<FixedTupleList> _fixedtupleList);
+		        shared_ptr<FixedTupleListAdress> _fixedtupleList);
 		virtual ~FixedPairListAdress();
 
 		/** Add the given particle pair to the list on this processor if the
@@ -43,7 +43,7 @@ namespace espresso {
 		boost::signals2::connection con;
 
 	  private:
-		shared_ptr<FixedTupleList> fixedtupleList;
+		shared_ptr<FixedTupleListAdress> fixedtupleList;
 		using PairList::add;
 		static LOG4ESPP_DECL_LOGGER(theLogger);
 	};

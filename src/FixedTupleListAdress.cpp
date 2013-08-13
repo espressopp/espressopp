@@ -1,6 +1,6 @@
 #include "python.hpp"
 
-#include "FixedTupleList.hpp"
+#include "FixedTupleListAdress.hpp"
 
 //#include <vector>
 //#include <utility>
@@ -17,29 +17,29 @@
 
 namespace espresso {
 
-    LOG4ESPP_LOGGER(FixedTupleList::theLogger, "FixedTupleList");
+    LOG4ESPP_LOGGER(FixedTupleListAdress::theLogger, "FixedTupleListAdress");
 
-    FixedTupleList::FixedTupleList(shared_ptr<storage::Storage> _storage)
+    FixedTupleListAdress::FixedTupleListAdress(shared_ptr<storage::Storage> _storage)
         : storage(_storage), globalTuples(){
 
-        LOG4ESPP_INFO(theLogger, "construct FixedTupleList");
+        LOG4ESPP_INFO(theLogger, "construct FixedTupleListAdress");
 
         con1 = storage->beforeSendParticles.connect
-          (boost::bind(&FixedTupleList::beforeSendParticles, this, _1, _2));
+          (boost::bind(&FixedTupleListAdress::beforeSendParticles, this, _1, _2));
         con2 = storage->afterRecvParticles.connect
-          (boost::bind(&FixedTupleList::afterRecvParticles, this, _1, _2));
+          (boost::bind(&FixedTupleListAdress::afterRecvParticles, this, _1, _2));
         /*con3 = storage->onParticlesChanged.connect
-          (boost::bind(&FixedTupleList::onParticlesChanged, this));*/
+          (boost::bind(&FixedTupleListAdress::onParticlesChanged, this));*/
         con4 = storage->onTuplesChanged.connect
-          (boost::bind(&FixedTupleList::onParticlesChanged, this));
+          (boost::bind(&FixedTupleListAdress::onParticlesChanged, this));
 
         //storage->setFixedTuples(this);
 
     }
 
-    FixedTupleList::~FixedTupleList() {
+    FixedTupleListAdress::~FixedTupleListAdress() {
 
-        LOG4ESPP_INFO(theLogger, "~FixedTupleList");
+        LOG4ESPP_INFO(theLogger, "~FixedTupleListAdress");
 
         con1.disconnect();
         con2.disconnect();
@@ -48,7 +48,7 @@ namespace espresso {
     }
 
     /* -- not used anymore
-    int FixedTupleList::getNumPart(longint pid) {
+    int FixedTupleListAdress::getNumPart(longint pid) {
         //std::cout << "looking up pid " << pid << "\n";
         int size = 0;
         GlobalTuples::const_iterator it = globalTuples.find(pid);
@@ -58,7 +58,7 @@ namespace espresso {
         return size;
     }*/
 
-    bool FixedTupleList::addT(tuple pids) {
+    bool FixedTupleListAdress::addT(tuple pids) {
         bool returnVal = true;
         System& system = storage->getSystemRef();
         esutil::Error err(system.comm);
@@ -114,7 +114,7 @@ namespace espresso {
     }
 
     /* send global tuple information */
-    void FixedTupleList::beforeSendParticles
+    void FixedTupleListAdress::beforeSendParticles
                                     (ParticleList& pl, OutBuffer& buf) {
 
         std::vector<longint> atpl;
@@ -168,7 +168,7 @@ namespace espresso {
     }
 
     /* recieve and rebuild global tuple information */
-    void FixedTupleList::afterRecvParticles
+    void FixedTupleListAdress::afterRecvParticles
                                     (ParticleList &pl, InBuffer& buf) {
 
         //std::cout << "afterRecvParticles\n";
@@ -285,7 +285,7 @@ namespace espresso {
 
     }
 
-    void FixedTupleList::onParticlesChanged() {
+    void FixedTupleListAdress::onParticlesChanged() {
       
       // TODO errors should be thrown in a nice way
 
@@ -358,16 +358,16 @@ namespace espresso {
     ** REGISTRATION WITH PYTHON
     ****************************************************/
 
-    void FixedTupleList::registerPython() {
+    void FixedTupleListAdress::registerPython() {
 
       using namespace espresso::python;
 
-      void (FixedTupleList::*pyAdd)(longint pid) = &FixedTupleList::add;
+      void (FixedTupleListAdress::*pyAdd)(longint pid) = &FixedTupleListAdress::add;
 
-      class_<FixedTupleList, shared_ptr<FixedTupleList>, boost::noncopyable >
-        ("FixedTupleList", init<shared_ptr<storage::Storage> >())
+      class_<FixedTupleListAdress, shared_ptr<FixedTupleListAdress>, boost::noncopyable >
+        ("FixedTupleListAdress", init<shared_ptr<storage::Storage> >())
         .def("add", pyAdd)
-        .def("addTs", &FixedTupleList::addTs)
+        .def("addTs", &FixedTupleListAdress::addTs)
         ;
     }
 
