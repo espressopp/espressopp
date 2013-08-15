@@ -701,7 +701,7 @@ namespace espresso {
     .def("addAdrATParticle", &Storage::addAdrATParticle,
          return_value_policy< reference_existing_object >())
 
-    .def("setFixedTuples", &Storage::setFixedTuples)
+    .def("setFixedTuplesAdress", &Storage::setFixedTuplesAdress)
 
 
   //

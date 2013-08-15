@@ -38,7 +38,7 @@ All derived classes implement at least the following methods:
 
    Add an AdResS Particle to the storage
 
-* `setFixedTuples(fixed_tuple_list)`:
+* `setFixedTuplesAdress(fixed_tuple_list)`:
 
 * `addParticles(particle_list, *properties)`:
 
@@ -108,9 +108,9 @@ class StorageLocal(object):
                 self, pid, toReal3DFromVector(*args)
                 )
     
-    def setFixedTuples(self, fixedtuples):
+    def setFixedTuplesAdress(self, fixedtuples):
         if pmi.workerIsActive():
-            self.cxxclass.setFixedTuples(self, fixedtuples)
+            self.cxxclass.setFixedTuplesAdress(self, fixedtuples)
     
     def getParticle(self, pid):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -268,7 +268,7 @@ if pmi.isController:
     class Storage(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            pmicall = [ "decompose", "addParticles", "setFixedTuples"],
+            pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress"],
             pmiproperty = [ "system" ]
             )
 

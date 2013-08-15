@@ -206,7 +206,7 @@ namespace espresso {
 
 
       // for AdResS
-      void setFixedTuples(shared_ptr<FixedTupleListAdress> _fixedtupleList){
+      void setFixedTuplesAdress(shared_ptr<FixedTupleListAdress> _fixedtupleList){
           fixedtupleList = _fixedtupleList;
       }
       shared_ptr<FixedTupleListAdress> getFixedTuples() { return fixedtupleList; }

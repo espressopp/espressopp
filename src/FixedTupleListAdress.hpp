@@ -1,6 +1,6 @@
 // ESPP_CLASS
-#ifndef _FIXEDTUPLELIST_HPP
-#define _FIXEDTUPLELIST_HPP
+#ifndef _FIXEDTUPLELISTADRESS_HPP
+#define _FIXEDTUPLELISTADRESS_HPP
 
 #include "log4espp.hpp"
 //#include "types.hpp"
@@ -30,7 +30,7 @@ namespace espresso {
             void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);
             void afterRecvParticles(ParticleList& pl, class InBuffer& buf);
             void onParticlesChanged();
-
+            
             //int getNumPart(longint pid); // get number of particles in globalmap for given pid
 
             // this signals the AT particles to rebuild AT fixed pair, triple, quadruple bonds

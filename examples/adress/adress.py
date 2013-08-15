@@ -145,7 +145,7 @@ system.storage.addParticles(allParticles, "id", "pos", "v", "f", "type", "mass",
 # add tuples
 ftpl = espresso.FixedTupleListAdress(system.storage)
 ftpl.addTuples(tuples)
-system.storage.setFixedTuples(ftpl)
+system.storage.setFixedTuplesAdress(ftpl)
 
 # add bonds between AT particles
 fpl = espresso.FixedPairListAdress(system.storage, ftpl)
