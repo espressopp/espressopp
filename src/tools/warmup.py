@@ -18,7 +18,7 @@ The method needs the following parameters:
 import espresso
 from espresso import Real3D
 
-def warmup(system, integrator, number=80)
+def warmup(system, integrator, number=80):
 
   print "starting warmup"
 
