@@ -25,6 +25,7 @@
 #include <Int3D.hpp>
 #include <Version.hpp>
 #include <ParticleAccess.hpp>
+#include <RealND.hpp>
 
 #include <esutil/PyLogger.hpp>
 #include <esutil/bindings.hpp>
@@ -54,6 +55,7 @@ void espresso::registerPython() {
   espresso::FixedTupleListAdress::registerPython();
   espresso::Settle::registerPython();
   espresso::Real3D::registerPython();
+  espresso::RealND::registerPython();
   espresso::Tensor::registerPython();
   espresso::Int3D::registerPython();
   espresso::Version::registerPython();

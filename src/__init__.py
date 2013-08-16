@@ -7,6 +7,8 @@ pmiimport('espresso')
 import _espresso
 from espresso.Exceptions import *
 from espresso.Real3D import *
+from espresso.RealND import *
+
 from espresso.Tensor import *
 from espresso.Int3D import *
 from espresso.Particle import *
@@ -29,6 +31,7 @@ from espresso.Settle import *
 from espresso.MultiSystem import *
 from espresso.ParallelTempering import *
 from espresso.Version import *
+
 
 infinity=float("inf")
 nan=float("nan")

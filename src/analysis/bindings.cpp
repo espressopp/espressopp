@@ -28,6 +28,8 @@
 #include "IntraChainDistSq.hpp"
 #include "NeighborFluctuation.hpp"
 
+#include "OrderParameter.hpp"
+
 namespace espresso {
   namespace analysis {
     void registerPython() {
@@ -47,6 +49,7 @@ namespace espresso {
       AllParticlePos::registerPython();
       IntraChainDistSq::registerPython();
       NeighborFluctuation::registerPython();
+      OrderParameter::registerPython();
 
       ConfigsParticleDecomp::registerPython();
       VelocityAutocorrelation::registerPython();

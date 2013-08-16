@@ -4,7 +4,8 @@
 
 #include "types.hpp"
 #include "AnalysisBase.hpp"
-#include "storage/DomainDecomposition.hpp"
+//#include "storage/DomainDecomposition.hpp"
+#include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 
 namespace espresso {
