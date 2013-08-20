@@ -20,3 +20,4 @@ from espresso.integrator.LatticeBoltzmann import *
 from espresso.integrator.ExtForce import *
 from espresso.integrator.CapForce import *
 from espresso.integrator.ExtAnalyze import *
+from espresso.integrator.VelocityVerletOnRadius import *

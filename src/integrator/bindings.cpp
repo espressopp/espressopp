@@ -19,6 +19,7 @@
 #include "ExtForce.hpp"
 #include "CapForce.hpp"
 #include "ExtAnalyze.hpp"
+#include "VelocityVerletOnRadius.hpp"
 
 namespace espresso {
   namespace integrator {
@@ -41,6 +42,7 @@ namespace espresso {
       ExtForce::registerPython();
       CapForce::registerPython();
       ExtAnalyze::registerPython();
+      VelocityVerletOnRadius::registerPython();
     }
   }
 }
