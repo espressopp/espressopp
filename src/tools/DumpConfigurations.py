@@ -75,10 +75,16 @@ def readxyz(filename):
   file = open(filename)
   line = file.readline()
   num_particles = int(line.split()[0])
-  line = file.readline()
-  Lx = float(line.split()[0])
-  Ly = float(line.split()[1])
-  Lz = float(line.split()[2])
+  line = file.readline().split()
+  if len(line) == 3:
+    Lx = float(line[0])
+    Ly = float(line[1])
+    Lz = float(line[2])
+  else:
+    Lx = float(line[0])
+    Ly = float(line[4])
+    Lz = float(line[8])
+    
   pid  = []
   type = []
   xpos = []

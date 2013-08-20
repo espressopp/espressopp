@@ -23,17 +23,15 @@ using namespace boost;
 
 typedef complex<double> dcomplex;
 
-// the following two constants are not defined everywhere (e.g. not in Mac OS X)
+// the following constant is not defined everywhere (e.g. not in Mac OS X)
 #ifndef M_PIl
 #define M_PIl 3.1415926535897932384626433832795029L
 #endif
 
 
 /*
- *   This code is based on the stuff written by Konstantin Koschke.
- * The main reason for fork was on the fly analysis.
  * 
- * Currently not parallelized!!!
+ * Currently code is not parallel!!!
  * 
  */
 
@@ -42,15 +40,17 @@ namespace espresso {
     using namespace iterator;
     class OrderParticleProps{
     protected:
-      vector<dcomplex> qlm; //[13]  depends on angular_momentum =2*angular_momentum+1
+      vector<dcomplex> qlm; //  depends on angular_momentum =2*angular_momentum+1
       real d;
       real qlmSumSqrt;
       int nnns;     // number of near neighbors
       
+      real nbond;
+      
       int ang_m;
       
-      boost::unordered_multiset< longint > nns;        // set of near neighbor id's
-      //Average<double> X;
+      //boost::unordered_multiset< longint > nns;        // set of near neighbor id's
+      vector<longint> nns;
       
       bool solid;
       
@@ -69,7 +69,11 @@ namespace espresso {
       
       void insertNN(longint i){
         nnns++; // increase the number of near neighbors
-        nns.insert( i );
+        //nns.insert( i );
+        nns.push_back( i );
+      }
+      longint getNN(int i){
+        return nns[i];
       }
       
       int getNumNN(){ return nnns; }
@@ -123,16 +127,16 @@ namespace espresso {
 
       // important - verlet list should be separate from any other vl in system
       // could be done in python as well as disconnection
-      OrderParameter(shared_ptr< System > system
+      OrderParameter(shared_ptr< System > system, 
+                     real _cutoff,
+                     int _angular_momentum,
+                     real _threshold
                      ) :
-                     AnalysisBaseTemplate< RealND >(system)
-      {
-        // TODO implement these parameters as properties
-        cutoff = 1.2;
+                     AnalysisBaseTemplate< RealND >(system),
+                     cutoff(_cutoff),
+                     angular_momentum(_angular_momentum),
+                     threshold(_threshold){
         cutoff_sq = cutoff * cutoff;
-        angular_momentum = 6;
-        
-        threshold =  0.6;
       }
       virtual ~OrderParameter() {
       }
@@ -141,6 +145,13 @@ namespace espresso {
       
       int getAngularMomentum(){ return angular_momentum; }
       void setAngularMomentum(int v){ angular_momentum = v; }
+      real getCutoff(){ return cutoff; }
+      void setCutoff(real v){
+        cutoff = v;
+        cutoff_sq = cutoff * cutoff;
+      }
+      real getThreshold(){ return threshold; }
+      void setThreshold(real v){ threshold = v; }
       
       RealND computeRaw() {
         
@@ -172,23 +183,23 @@ namespace espresso {
             opp_i1->insertNN( it->second->id() );
             opp_i2->insertNN( it->first->id() );
             
-            // @ from Konstantin.
-            // @ split loop into two parts
-            // @ first part: m=0, represented as the lth element of the array
             dcomplex tmpVar = SphHarm(angular_momentum, 0, r);
+            dcomplex tmpVar1 = SphHarm(angular_momentum, 0, (-1)*r);
             opp_i1->setQlm( 0, (opp_i1-> getQlm(0) + tmpVar) );
-            opp_i2->setQlm( 0, (opp_i2-> getQlm(0) + tmpVar) );
+            opp_i2->setQlm( 0, (opp_i2-> getQlm(0) + tmpVar1) );
             
             //
             for (int m = 1; m <= angular_momentum; m++) {
                 tmpVar = SphHarm(angular_momentum, m, r);
+                tmpVar1 = SphHarm(angular_momentum, m, (-1)*r);
                 
-                opp_i1->setQlm( m, (opp_i1-> getQlm(m) + tmpVar) );
-                opp_i2->setQlm( m, (opp_i2-> getQlm(m) + tmpVar) );
+                opp_i1->setQlm( m, (opp_i1->getQlm(m) + tmpVar) );
+                opp_i2->setQlm( m, (opp_i2->getQlm(m) + tmpVar1) );
                 
                 dcomplex conj_tmpVar = pow(-1.0, (real)m) * conj( tmpVar );
+                dcomplex conj_tmpVar1 = pow(-1.0, (real)m) * conj( tmpVar1 );
                 opp_i1->setQlm( -m, (opp_i1->getQlm(-m) + conj_tmpVar) );
-                opp_i2->setQlm( -m, (opp_i2->getQlm(-m) + conj_tmpVar) );
+                opp_i2->setQlm( -m, (opp_i2->getQlm(-m) + conj_tmpVar1) );
             }
             
           }
@@ -248,13 +259,6 @@ namespace espresso {
           ret[pid] = opp_i->getD();
         }
         
-        /*
-        for(unordered_multimap<longint, OrderParticleProps>::iterator it = opp_map.begin(); it != opp_map.end(); it++) {
-          cout << it->first << '\t';
-          cout << (it->second).getNumNN() << endl;
-        }
-         */
-         
         return ret;
       }
       
