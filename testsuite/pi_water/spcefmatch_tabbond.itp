@@ -1,0 +1,21 @@
+[ moleculetype ]
+; molname       nrexcl
+SOL             2
+
+[ atoms ]
+;   nr   type  resnr residue  atom   cgnr     charge       mass
+     1     OW      1    SOL     OW      1       0
+     2     HW      1    SOL    HW1      2       0
+     3     HW      1    SOL    HW2      3       0
+
+
+[ bonds ]
+; i     j       funct   tablenr  force.c.
+1       2       8       1   1
+1       3       8       1   1
+
+
+[ angles ]
+; i     j       k       funct   angle   force.c.
+2       1       3       8       1     1
+
