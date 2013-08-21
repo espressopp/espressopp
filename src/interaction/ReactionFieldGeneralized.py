@@ -35,11 +35,6 @@ class VerletListReactionFieldGeneralizedLocal(InteractionLocal, interaction_Verl
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
     
-    def clonePotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.clonePotential(self, type1, type2)
-
-
 class VerletListAdressReactionFieldGeneralizedLocal(InteractionLocal, interaction_VerletListAdressReactionFieldGeneralized):
     'The (local) ReactionFieldGeneralized interaction using Verlet lists.'
     def __init__(self, vl, fixedtupleList):
@@ -102,7 +97,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListReactionFieldGeneralizedLocal',
-            pmicall = ['setPotential','getPotential', 'clonePotential']
+            pmicall = ['setPotential','getPotential']
             )
         
     class VerletListAdressReactionFieldGeneralized(Interaction):

@@ -35,9 +35,6 @@ class VerletListCoulombTruncatedLocal(InteractionLocal, interaction_VerletListCo
     def getPotential(self, type1, type2):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
-    def clonePotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.clonePotential(self, type1, type2)        
 
 class CellListCoulombTruncatedLocal(InteractionLocal, interaction_CellListCoulombTruncated):
     'The (local) CoulombTruncated interaction using cell lists.'
@@ -70,7 +67,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListCoulombTruncatedLocal',
-            pmicall = ['setPotential','getPotential', 'clonePotential']
+            pmicall = ['setPotential','getPotential']
             )
     class CellListCoulombTruncated(Interaction):
         __metaclass__ = pmi.Proxy
