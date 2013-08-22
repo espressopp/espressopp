@@ -19,10 +19,12 @@ namespace espresso {
         /** Register this class so it can be used from Python. */
         static void registerPython();
       private:
-        boost::signals2::connection _befIntP, _aftIntP;
+        boost::signals2::connection _aftIntP, _aftIntV, _aftInitF;
         void connect();
         void disconnect();
-
+        void integrate1();
+        void integrate2();
+        void initForces();
         /** Logger */
         static LOG4ESPP_DECL_LOGGER(theLogger);
     };

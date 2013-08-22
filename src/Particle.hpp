@@ -225,7 +225,7 @@ namespace espresso {
     Real3D getV() const { return m.v; }
     void setV(const Real3D& velocity) { m.v = velocity; }
 
-    real vradius() { return m.vradius; }
+    real& vradius() { return m.vradius; }
     const real& vradius() const { return m.vradius; }
 
     real getVRadius() const { return m.vradius; }
