@@ -30,7 +30,8 @@ namespace espresso {
             Adress=4,
             TDforce=5,
             ExtForce=6,
-            ExtAnalysis=7
+            ExtAnalysis=7,
+            ExtVirtualParticles=8
         };
 
 

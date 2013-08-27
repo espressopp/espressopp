@@ -8,7 +8,6 @@
 #include <boost/bind.hpp>
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
-
 #include "esutil/Error.hpp"
 
 
@@ -163,6 +162,30 @@ namespace espresso {
         it = globalTuples.insert(it, std::make_pair(pidK, pids));
         pids.clear();
 
+    }
+   Real3D FixedTupleList::calcTupleCOM(int id){
+	   System& system = storage->getSystemRef();
+	   esutil::Error err(system.comm);
+	   GlobalTuples::const_iterator it;
+	   it=globalTuples.find(id);
+	   Real3D com=Real3D(0,0,0);
+	   if (it!=globalTuples.end()){
+		   Particle* p;
+		   real M=0.0;
+		   for (tuple::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+			   p = storage->lookupLocalParticle(*it2);
+			   M+=p->getMass();
+			   com+=p->getPos()*p->getMass();
+		   }
+		   if (M>0) com/=M;
+		   return com;
+	   }
+	   else{
+		   std::stringstream msg;
+		   msg << " tuple with key id " << id << " does not exists here";
+		   err.setException( msg.str() );
+		   return com;
+	   }
     }
 
 

@@ -20,6 +20,7 @@
 #include "CapForce.hpp"
 #include "ExtAnalyze.hpp"
 #include "VelocityVerletOnRadius.hpp"
+#include "ExtVirtualParticles.hpp"
 
 namespace espresso {
   namespace integrator {
@@ -29,6 +30,7 @@ namespace espresso {
       VelocityVerletOnGroup::registerPython();
       Extension::registerPython();
       Adress::registerPython();
+      ExtVirtualParticles::registerPython();
       BerendsenBarostat::registerPython();
       BerendsenThermostat::registerPython();
       LangevinBarostat::registerPython();

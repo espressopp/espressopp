@@ -10,6 +10,7 @@ from espresso.integrator.TDforce import *
 
 from espresso.integrator.Extension import *
 from espresso.integrator.Adress import *
+from espresso.integrator.ExtVirtualParticles import *
 from espresso.integrator.BerendsenBarostat import *
 from espresso.integrator.BerendsenThermostat import *
 from espresso.integrator.LangevinThermostat import *

@@ -9,13 +9,14 @@
 #include "esutil/ESPPIterator.hpp"
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
+#include "Real3D.hpp"
 
 namespace espresso {
   class FixedTupleList : public TupleList {
       protected:
 		boost::signals2::connection con1, con2, con3;
 		shared_ptr<storage::Storage> storage;
-                typedef std::vector<longint> tuple;
+        typedef std::vector<longint> tuple;
 		typedef std::multimap <longint,tuple > GlobalTuples;
 		GlobalTuples globalTuples;
 		using TupleList::add;
@@ -31,6 +32,8 @@ namespace espresso {
 		virtual void onParticlesChanged();
 
 		python::list getTuples();
+
+		Real3D calcTupleCOM(int tupleid);
 
 	    /** Get the number of triples in the GlobalTriples list */
 	    int size() {

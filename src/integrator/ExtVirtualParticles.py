@@ -21,11 +21,20 @@ class ExtVirtualParticlesLocal(ExtensionLocal, integrator_ExtVirtualParticles):
         if pmi.workerIsActive():
             cxxinit(self, integrator_ExtVirtualParticles, system)
 
+    def addVirtualParticleTypes(self, pids):
+        """
+        Each processor takes the broadcasted atomistic particles
+        and adds it to its list.
+        """
+        if pmi.workerIsActive():
+            for pid in pids:
+                self.cxxclass.addVirtualParticleType(self, pid)
+
 if pmi.isController:
     class ExtVirtualParticles(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.integrator.ExtVirtualParticlesLocal' #,
+            cls = 'espresso.integrator.ExtVirtualParticlesLocal',
             #pmiproperty = [ 'builds' ],
-            #pmicall = [ 'totalSize', 'exclude', 'addAdrParticles', 'rebuild' ]
+            pmicall = [ 'addVirtualParticleTypes', 'setFixedTupleList' ]
             )
