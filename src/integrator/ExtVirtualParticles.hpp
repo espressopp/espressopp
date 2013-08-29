@@ -29,7 +29,7 @@ namespace espresso {
 
       public:
 
-        ExtVirtualParticles(shared_ptr<System> system);
+        ExtVirtualParticles(shared_ptr<System> system, shared_ptr<CellList> _cl);
 
         ~ExtVirtualParticles();
 
@@ -58,10 +58,13 @@ namespace espresso {
         void connect();
         void disconnect();
 
+        //CellList *getCellList(){return &vrealCells;}
+
         void onCellListsChanged(); // called by signal onCellListsChanged, will copy cellList structure to vrealCells vghostCells
 
         std::vector<int> vp_types; // Types of virtual particles
-        CellList vrealCells, vghostCells;
+        CellList vghostCells;
+        shared_ptr<CellList> vrealCells;
         shared_ptr<FixedTupleList> fixedTupleList;
         std::map<Cell*, Cell*> cellmap; // need to know which one of the new cells corresponds to which original cell
       };

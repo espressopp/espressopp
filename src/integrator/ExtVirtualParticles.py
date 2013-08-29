@@ -16,10 +16,15 @@ from _espresso import integrator_ExtVirtualParticles
 class ExtVirtualParticlesLocal(ExtensionLocal, integrator_ExtVirtualParticles):
     'The (local) AdResS'
 
-    def __init__(self, system):
+    def __init__(self, system, cl):
         'construction of a verlet list of virtual particles'
         if pmi.workerIsActive():
-            cxxinit(self, integrator_ExtVirtualParticles, system)
+            cxxinit(self, integrator_ExtVirtualParticles, system, cl)
+
+    def getCellList(self):
+        'get number of interactions of the system'
+        if pmi.workerIsActive():
+            return self.cxxclass.getCellList(self)
 
     def addVirtualParticleTypes(self, pids):
         """

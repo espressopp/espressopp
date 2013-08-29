@@ -17,10 +17,11 @@ namespace espresso {
 
     using namespace espresso::iterator;
 
-    ExtVirtualParticles::ExtVirtualParticles(shared_ptr<System> system)
+    ExtVirtualParticles::ExtVirtualParticles(shared_ptr<System> system, shared_ptr<CellList> _cl)
         :Extension(system){
         LOG4ESPP_INFO(theLogger, "construct ExtVirtualParticles");
         type = Extension::ExtVirtualParticles;
+        vrealCells=_cl;
         onCellListsChanged();
     }
 
@@ -76,8 +77,9 @@ namespace espresso {
 		esutil::Error err(system.comm);
 		cout << "CellListsChanged" << endl;
 
+		CellList & vcl = *vrealCells;
 		// Clean up
-		for (CellList::iterator it = vrealCells.begin(); it != vrealCells.end(); it++) {
+		for (CellList::iterator it = vcl.begin(); it != vcl.end(); it++) {
 			(*it)->neighborCells.clear();
 			(*it)->particles.clear();
 			delete (*it);
@@ -88,14 +90,14 @@ namespace espresso {
 			delete (*it);
 		}
 
-		vrealCells.clear();
+		vcl.clear();
 		vghostCells.clear();
 		cellmap.clear();
 
 		const CellList & cl = system.storage->getRealCells();
 		for (CellList::const_iterator it = cl.begin(); it != cl.end(); it++) {
 			Cell * cellCopy= new Cell();
-			vrealCells.push_back(cellCopy);
+			vcl.push_back(cellCopy);
 			cellmap.insert(std::make_pair<Cell*, Cell*>(*it, cellCopy));
 		}
 		const CellList & gcl = system.storage->getGhostCells();
@@ -211,11 +213,12 @@ namespace espresso {
       using namespace espresso::python;
 
       class_<ExtVirtualParticles, shared_ptr<ExtVirtualParticles>, bases<Extension> >
-        ("integrator_ExtVirtualParticles", init<shared_ptr<System> >())
+        ("integrator_ExtVirtualParticles", init<shared_ptr<System>, shared_ptr<CellList>  >())
         .def("connect", &ExtVirtualParticles::connect)
         .def("disconnect", &ExtVirtualParticles::disconnect)
         .def("addVirtualParticleType", &ExtVirtualParticles::addVirtualParticleType)
         .def("setFixedTupleList", &ExtVirtualParticles::setFixedTupleList)
+        //.def("getCellList", &ExtVirtualParticles::getCellList, return_value_policy< reference_existing_object >())
         ;
     }
 

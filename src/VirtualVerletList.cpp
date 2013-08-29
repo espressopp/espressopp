@@ -1,5 +1,5 @@
 #include "python.hpp"
-#include "VerletList.hpp"
+#include "VirtualVerletList.hpp"
 #include "Real3D.hpp"
 #include "Particle.hpp"
 #include "Cell.hpp"
@@ -7,19 +7,20 @@
 #include "storage/Storage.hpp"
 #include "bc/BC.hpp"
 #include "iterator/CellListAllPairsIterator.hpp"
+#include "esutil/Error.hpp"
 
 namespace espresso {
 
   using namespace espresso::iterator;
 
-  LOG4ESPP_LOGGER(VerletList::theLogger, "VerletList");
+  LOG4ESPP_LOGGER(VirtualVerletList::theLogger, "VirtualVerletList");
 
 /*-------------------------------------------------------------*/
 
   // cut is a cutoff (without skin)
-  VerletList::VerletList(shared_ptr<System> system, real _cut, bool rebuildVL) : SystemAccess(system)
+  VirtualVerletList::VirtualVerletList(shared_ptr<System> system, real _cut, bool rebuildVL) : SystemAccess(system)
   {
-    LOG4ESPP_INFO(theLogger, "construct VerletList, cut = " << _cut);
+    LOG4ESPP_INFO(theLogger, "construct VirtualVerletList, cut = " << _cut);
   
     if (!system->storage) {
        throw std::runtime_error("system has no storage");
@@ -30,27 +31,27 @@ namespace espresso {
     cutsq = cutVerlet * cutVerlet;
     builds = 0;
 
-    if (rebuildVL) rebuild(); // not called if exclutions are provided
+    //if (rebuildVL && cellList ) rebuild(); // not called if exclutions are provided
 
   
     // make a connection to System to invoke rebuild on resort
     connectionResort = system->storage->onParticlesChanged.connect(
-        boost::bind(&VerletList::rebuild, this));
+        boost::bind(&VirtualVerletList::rebuild, this));
   }
   
-  real VerletList::getVerletCutoff(){
+  real VirtualVerletList::getVerletCutoff(){
     return cutVerlet;
   }
   
-  void VerletList::connect()
+  void VirtualVerletList::connect()
   {
 
   // make a connection to System to invoke rebuild on resort
   connectionResort = getSystem()->storage->onParticlesChanged.connect(
-      boost::bind(&VerletList::rebuild, this));
+      boost::bind(&VirtualVerletList::rebuild, this));
   }
 
-  void VerletList::disconnect()
+  void VirtualVerletList::disconnect()
   {
 
   // disconnect from System to avoid rebuild on resort
@@ -59,15 +60,27 @@ namespace espresso {
 
   /*-------------------------------------------------------------*/
   
-  void VerletList::rebuild()
+  void VirtualVerletList::rebuild()
   {
+  	System& system = getSystemRef();
+	esutil::Error err(system.comm);
+
+	/*if(!cellList){
+		std::stringstream msg;
+		msg << "VirtualVerleList: no cell list set!";
+		err.setException( msg.str() );
+		exit(0);
+	}*/
+
     //real cutVerlet = cut + getSystem() -> getSkin();
     cutVerlet = cut + getSystem() -> getSkin();
     cutsq = cutVerlet * cutVerlet;
     
     vlPairs.clear();
 
-    CellList cl = getSystem()->storage->getRealCells();
+    //CellList cl = getSystem()->storage->getRealCells();
+    CellList &cl = (*cellList);
+    std::cout<<"VVL got" << cl.size() << std::endl;
     LOG4ESPP_DEBUG(theLogger, "local cell list size = " << cl.size());
     for (CellListAllPairsIterator it(cl); it.isValid(); ++it) {
       checkPair(*it->first, *it->second);
@@ -75,14 +88,14 @@ namespace espresso {
     }
     
     builds++;
-    LOG4ESPP_DEBUG(theLogger, "rebuilt VerletList (count=" << builds << "), cutsq = " << cutsq
+    LOG4ESPP_DEBUG(theLogger, "rebuilt VirtualVerletList (count=" << builds << "), cutsq = " << cutsq
                  << " local size = " << vlPairs.size());
   }
   
 
   /*-------------------------------------------------------------*/
   
-  void VerletList::checkPair(Particle& pt1, Particle& pt2)
+  void VirtualVerletList::checkPair(Particle& pt1, Particle& pt2)
   {
 
     Real3D d = pt1.position() - pt2.position();
@@ -104,7 +117,7 @@ namespace espresso {
   
   /*-------------------------------------------------------------*/
   
-  int VerletList::totalSize() const
+  int VirtualVerletList::totalSize() const
   {
     System& system = getSystemRef();
     int size = localSize();
@@ -114,15 +127,15 @@ namespace espresso {
     return allsize;
   }
 
-  int VerletList::localSize() const
+  int VirtualVerletList::localSize() const
   {
     System& system = getSystemRef();
     return vlPairs.size();
   }
 
-  python::tuple VerletList::getPair(int i) {
+  python::tuple VirtualVerletList::getPair(int i) {
 	  if (i <= 0 || i > vlPairs.size()) {
-	    std::cout << "ERROR VerletList pair " << i << " does not exists" << std::endl;
+	    std::cout << "ERROR VirtualVerletList pair " << i << " does not exists" << std::endl;
 	    return python::make_tuple();
 	  } else {
 	    return python::make_tuple(vlPairs[i-1].first->id(), vlPairs[i-1].second->id());
@@ -130,7 +143,7 @@ namespace espresso {
   }
 
 
-  bool VerletList::exclude(longint pid1, longint pid2) {
+  bool VirtualVerletList::exclude(longint pid1, longint pid2) {
 
       exList.insert(std::make_pair(pid1, pid2));
 
@@ -140,9 +153,9 @@ namespace espresso {
 
   /*-------------------------------------------------------------*/
   
-  VerletList::~VerletList()
+  VirtualVerletList::~VirtualVerletList()
   {
-    LOG4ESPP_INFO(theLogger, "~VerletList");
+    LOG4ESPP_INFO(theLogger, "~VirtualVerletList");
   
     if (!connectionResort.connected()) {
       connectionResort.disconnect();
@@ -153,26 +166,27 @@ namespace espresso {
   ** REGISTRATION WITH PYTHON
   ****************************************************/
   
-  void VerletList::registerPython() {
+  void VirtualVerletList::registerPython() {
     using namespace espresso::python;
 
-    bool (VerletList::*pyExclude)(longint pid1, longint pid2)
-          = &VerletList::exclude;
+    bool (VirtualVerletList::*pyExclude)(longint pid1, longint pid2)
+          = &VirtualVerletList::exclude;
 
 
-    class_<VerletList, shared_ptr<VerletList> >
-      ("VerletList", init< shared_ptr<System>, real, bool >())
+    class_<VirtualVerletList, shared_ptr<VirtualVerletList> >
+      ("VirtualVerletList", init< shared_ptr<System>, real, bool >())
       .add_property("system", &SystemAccess::getSystem)
-      .add_property("builds", &VerletList::getBuilds, &VerletList::setBuilds)
-      .def("totalSize", &VerletList::totalSize)
-      .def("localSize", &VerletList::localSize)
-      .def("getPair", &VerletList::getPair)
+      .add_property("builds", &VirtualVerletList::getBuilds, &VirtualVerletList::setBuilds)
+      .def("totalSize", &VirtualVerletList::totalSize)
+      .def("localSize", &VirtualVerletList::localSize)
+      .def("getPair", &VirtualVerletList::getPair)
       .def("exclude", pyExclude)
-      .def("rebuild", &VerletList::rebuild)
-      .def("connect", &VerletList::connect)
-      .def("disconnect", &VerletList::disconnect)
+      .def("rebuild", &VirtualVerletList::rebuild)
+      .def("connect", &VirtualVerletList::connect)
+      .def("disconnect", &VirtualVerletList::disconnect)
     
-      .def("getVerletCutoff", &VerletList::getVerletCutoff)
+      .def("getVerletCutoff", &VirtualVerletList::getVerletCutoff)
+      .def("setCellList", &VirtualVerletList::setCellList)
       ;
   }
 

@@ -31,6 +31,8 @@ from espresso.Settle import *
 from espresso.MultiSystem import *
 from espresso.ParallelTempering import *
 from espresso.Version import *
+from espresso.CellList import *
+from espresso.VirtualVerletList import *
 
 
 infinity=float("inf")
