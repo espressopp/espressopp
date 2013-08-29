@@ -25,6 +25,7 @@ from espresso.interaction.FENE import *
 from espresso.interaction.FENECapped import *
 from espresso.interaction.Harmonic import *
 from espresso.interaction.Quartic import *
+from espresso.interaction.VSphere import *
 
 from espresso.interaction.HarmonicUnique import *
 

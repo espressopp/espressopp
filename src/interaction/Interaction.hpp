@@ -9,7 +9,7 @@
 namespace espresso {
   namespace interaction {
 
-    enum bondTypes {unused, Nonbonded, Pair, Angular, Dihedral};
+    enum bondTypes {unused, Nonbonded, Single, Pair, Angular, Dihedral};
 
     /** Interaction base class. */
 

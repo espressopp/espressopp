@@ -3,6 +3,7 @@
 #define _PARTICLE_HPP
 
 #include "types.hpp"
+#include "Single.hpp"
 #include "Triple.hpp"
 #include "Quadruple.hpp"
 //#include <vector>
@@ -278,6 +279,34 @@ namespace espresso {
   struct ParticleList 
     : public esutil::ESPPContainer < std::vector< Particle > > 
   {};
+
+  // singles
+  class ParticleSingle
+    : public Single< class Particle* >
+  {
+  private:
+    typedef Single< class Particle* > Super;
+  public:
+    ParticleSingle() : Super() {}
+    ParticleSingle(Particle *p) : Super(p) {}
+    ParticleSingle(Particle &p) : Super(&p) {}
+  };
+
+  struct SingleList
+    : public esutil::ESPPContainer< std::vector< ParticleSingle > >
+  {
+    void add(Particle *p) {
+    	this->push_back(ParticleSingle(p));
+    }
+
+    void add(Particle &p) {
+    	this->add(&p);
+    }
+
+    void add(std::vector<Particle*> particles) {
+    	this->add(particles.at(0));
+    }
+  };
 
   // pairs
   class ParticlePair 

@@ -19,6 +19,7 @@
 #include "Harmonic.hpp"
 #include "HarmonicUnique.hpp"
 #include "Quartic.hpp"
+#include "VSphere.hpp"
 
 #include "Tabulated.hpp"
 #include "TabulatedAngular.hpp"
@@ -71,6 +72,7 @@ namespace espresso {
       Harmonic::registerPython();
       HarmonicUnique::registerPython();
       Quartic::registerPython();
+      VSphere::registerPython();
       
       AngularPotential::registerPython();
       AngularUniquePotential::registerPython();
