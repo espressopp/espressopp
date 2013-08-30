@@ -2,10 +2,13 @@
 #ifndef _ANALYSIS_ORDERPARAMETER_HPP
 #define _ANALYSIS_ORDERPARAMETER_HPP
 
+#include "mpi.hpp"
 #include "types.hpp"
 #include "AnalysisBase.hpp"
 #include "RealND.hpp"
 #include "storage/Storage.hpp"
+#include "esutil/Error.hpp"
+
 #include "iterator/CellListIterator.hpp"
 #include "iterator/CellListAllPairsIterator.hpp"
 #include "Cell.hpp"
@@ -18,6 +21,8 @@
 
 #include <boost/math/special_functions/spherical_harmonic.hpp>
 
+#include <algorithm>
+
 using namespace std;
 using namespace boost;
 
@@ -29,55 +34,66 @@ typedef complex<double> dcomplex;
 #endif
 
 
-/*
- * 
- * Currently code is not parallel!!!
- * 
- */
-
 namespace espresso {
   namespace analysis {
     using namespace iterator;
     class OrderParticleProps{
-    protected:
-      vector<dcomplex> qlm; //  depends on angular_momentum =2*angular_momentum+1
+    private:
       real d;
       real qlmSumSqrt;
       int nnns;     // number of near neighbors
       
-      real nbond;
-      
       int ang_m;
+      int particle_id;
+        
+      vector<int> nns;
+      vector<dcomplex> qlm; //  depends on angular_momentum =2*angular_momentum+1
       
-      //boost::unordered_multiset< longint > nns;        // set of near neighbor id's
-      vector<longint> nns;
-      
-      bool solid;
+      friend class boost::serialization::access;
+      template<class Archive>
+      void serialize(Archive & ar, const unsigned int version) {
+        ar & d;
+        ar & qlmSumSqrt;
+        ar & nnns;
+        ar & ang_m;
+        ar & particle_id;
+        ar & nns;
+        ar & qlm;
+      }
       
     public:
-      OrderParticleProps(int am){
+      OrderParticleProps() : d(0),
+                             qlmSumSqrt(0),
+                             nnns(0),
+                             ang_m(0),
+                             particle_id(-1) {}
+      
+      OrderParticleProps(int am) : d(0),
+                                   qlmSumSqrt(0),
+                                   nnns(0),
+                                   ang_m(am),
+                                   particle_id(-1) {
         qlm = vector<dcomplex>(2*am+1, dcomplex(0.0, 0.0) );
-        d = 0;
-        qlmSumSqrt = 0;
-        nnns = 0;
-        
-        ang_m = am;
-        
-        solid = false;
+      }
+      OrderParticleProps(int am, int pid) : d(0),
+                                            qlmSumSqrt(0),
+                                            nnns(0),
+                                            ang_m(am),
+                                            particle_id(pid) {
+        qlm = vector<dcomplex>(2*am+1, dcomplex(0.0, 0.0) );
       }
       ~OrderParticleProps(){}
       
-      void insertNN(longint i){
+      void insertNN(int i){
         nnns++; // increase the number of near neighbors
-        //nns.insert( i );
         nns.push_back( i );
       }
-      longint getNN(int i){
+      int getNN(int i){
         return nns[i];
       }
       
       int getNumNN(){ return nnns; }
-      
+
       // index defined as -l, -l+1, ..., 0, ..., l-1, l for convenience 
       void setQlm(int indx, dcomplex v){
         int hh = indx + ang_m;
@@ -89,8 +105,26 @@ namespace espresso {
         if(hh<0 || hh>=2*ang_m+1) cout<<"OUT OF RANGE!!"<<endl;
         return qlm[ indx + ang_m ];
       }
+      vector<dcomplex> getQlmVector(){
+        return qlm;
+      }
+      void addQlmVector(vector<dcomplex> v){
+        if( v.size() != qlm.size() )
+          cout<<"Vectors have not the same size. Local: "<< qlm.size() << "  added  "<< v.size() <<endl;
+        for(int i=0; i<qlm.size(); i++){
+          qlm[ i ] += v[ i ];
+        }
+      }
+      void setQlm(vector<dcomplex> v){
+        if( v.size() != qlm.size() )
+          cout<<"Vectors have not the same size. Local: "<< qlm.size() << "  new  "<< v.size() <<endl;
+        for(int i=0; i<qlm.size(); i++){
+          qlm[ i ] = v[ i ];
+        }
+      }
 
       void calculateSumQlm(){
+        qlmSumSqrt = 0;
         for(vector<dcomplex>::iterator it = qlm.begin(); it!=qlm.end(); ++it){
           qlmSumSqrt += norm( *it );
         }
@@ -103,8 +137,8 @@ namespace espresso {
       void setD(real v){ d = v;}
       real getD(){ return d;}
       
-      void setSolid(bool v){ solid = v;}
-      bool getSolid(){ return solid;}
+      void setPID(int v){ particle_id = v;}
+      int getPID(){ return particle_id;}
     };
     
     /** Class to compute order parameter. */
@@ -113,15 +147,12 @@ namespace espresso {
       real cutoff;     // cut off in order to define pairs
       real cutoff_sq;  // cutoff^2
       real threshold;  // for local order parameter
-      
-      int num_solid;   // number of solid particles
+      int angular_momentum;   // angular momentum
       
       vector<OrderParticleProps> opp;   // additional properties
-      boost::unordered_multimap <longint, OrderParticleProps> opp_map;
+      boost::unordered_multimap <int, OrderParticleProps> opp_map;
       
-      boost::unordered_multimap <longint, longint> pairs;
-      
-      int angular_momentum;   // angular momentum
+      boost::unordered_multimap <int, int> pairs;
     public:
       static void registerPython();
 
@@ -153,25 +184,27 @@ namespace espresso {
       real getThreshold(){ return threshold; }
       void setThreshold(real v){ threshold = v; }
       
+      /*
+       * It is efficient only when communications are optimized.
+       */
       RealND computeRaw() {
         
-        // number of local particles
-        int localN = getSystem()->storage->getNRealParticles();
+        shared_ptr< storage::Storage > stor = getSystem()->storage;
+        shared_ptr< mpi::communicator > cmm = getSystem()->comm;
+        int this_node = getSystem() -> comm -> rank();
         
-        RealND ret(localN, 0.0);
-        
-        // additional properties for each particle
-        opp = vector<OrderParticleProps>(localN, OrderParticleProps(angular_momentum) );
-        // iterate over local particles
-        CellList cells = getSystem()->storage->getRealCells();
-        vector<OrderParticleProps>::iterator opp_it = opp.begin();
-        for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
+        // ------------------------------------------------------------------------------
+        // iterate over local particles, create a map of additional properties
+        CellList cells_loc = stor->getLocalCells();
+        for(CellListIterator cit(cells_loc); !cit.isDone(); ++cit) {
           Particle& p = *cit;
-          opp_map.insert( make_pair(p.id(), *opp_it) );
-          ++opp_it;
+          opp_map.insert( make_pair(p.id(), OrderParticleProps(angular_momentum, p.id()) ) );
         }
-
-        for (CellListAllPairsIterator it(cells); it.isValid(); ++it) {
+        
+        // ------------------------------------------------------------------------------
+        // create pairs
+        CellList cells_real = stor->getRealCells();
+        for (CellListAllPairsIterator it(cells_real); it.isValid(); ++it) {
           Real3D r = it->first->position() - it->second->position();
           real dist_sq = r.sqr();
           // setup NN list within cutoff
@@ -188,36 +221,101 @@ namespace espresso {
             opp_i1->setQlm( 0, (opp_i1-> getQlm(0) + tmpVar) );
             opp_i2->setQlm( 0, (opp_i2-> getQlm(0) + tmpVar1) );
             
-            //
             for (int m = 1; m <= angular_momentum; m++) {
-                tmpVar = SphHarm(angular_momentum, m, r);
-                tmpVar1 = SphHarm(angular_momentum, m, (-1)*r);
+              tmpVar = SphHarm(angular_momentum, m, r);
+              tmpVar1 = SphHarm(angular_momentum, m, (-1)*r);
                 
-                opp_i1->setQlm( m, (opp_i1->getQlm(m) + tmpVar) );
-                opp_i2->setQlm( m, (opp_i2->getQlm(m) + tmpVar1) );
+              opp_i1->setQlm( m, (opp_i1->getQlm(m) + tmpVar) );
+              opp_i2->setQlm( m, (opp_i2->getQlm(m) + tmpVar1) );
                 
-                dcomplex conj_tmpVar = pow(-1.0, (real)m) * conj( tmpVar );
-                dcomplex conj_tmpVar1 = pow(-1.0, (real)m) * conj( tmpVar1 );
-                opp_i1->setQlm( -m, (opp_i1->getQlm(-m) + conj_tmpVar) );
-                opp_i2->setQlm( -m, (opp_i2->getQlm(-m) + conj_tmpVar1) );
+              dcomplex conj_tmpVar = pow(-1.0, (real)m) * conj( tmpVar );
+              dcomplex conj_tmpVar1 = pow(-1.0, (real)m) * conj( tmpVar1 );
+              opp_i1->setQlm( -m, (opp_i1->getQlm(-m) + conj_tmpVar) );
+              opp_i2->setQlm( -m, (opp_i2->getQlm(-m) + conj_tmpVar1) );
             }
-            
           }
         }
         
-        // loop over particles and calc SumQlm
-        for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
+        // ------------------------------------------------------------------------------
+        // here communicate, send all ghost info 
+        //   TODO not the best way all to all communication.
+        vector <OrderParticleProps> sendGhostInfo;
+        for(boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin(); opm!=opp_map.end(); ++opm){
+          int id = (*opm).first;
+          if( !getSystem()->storage->lookupRealParticle(id) ){
+            OrderParticleProps &op = (*opm).second;
+            if( !op.getNumNN()==0 ) sendGhostInfo.push_back( (*opm).second );
+          }
+        }
+        
+        int maxSize, vecSize  = sendGhostInfo.size();
+        mpi::all_reduce( *cmm, vecSize, maxSize, mpi::maximum<int>() );
+        while(sendGhostInfo.size()<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
+
+        vector< OrderParticleProps > totID;
+        boost::mpi::all_gather( *getSystem()->comm, &sendGhostInfo[0], maxSize, totID);
+        
+        // TODO use set instead of vector
+        vector<int> realHere;
+        for(vector<OrderParticleProps>::iterator it = totID.begin(); it!=totID.end(); ++it){
+          OrderParticleProps &gop = *it;
+          if( gop.getPID()!=-1 && stor->lookupRealParticle( gop.getPID() ) ){
+            if( find( realHere.begin(), realHere.end(), gop.getPID() ) == realHere.end() )
+              realHere.push_back( gop.getPID() );
+            
+            OrderParticleProps *opp_i = &(opp_map.find( gop.getPID() ))->second;
+            opp_i->addQlmVector( gop.getQlmVector() );
+            int numPadd = gop.getNumNN();
+            for(int  i = 0; i< numPadd; i++){
+              opp_i->insertNN( gop.getNN(i) );
+            }
+          }
+        }
+        
+        // ------------------------------------------------------------------------------
+        // loop over all real particles and calculate SumQlm
+        for(CellListIterator cit(cells_real); !cit.isDone(); ++cit) {
           Particle& p = *cit;
-          OrderParticleProps *opp_i = &(opp_map.find( p.id() ))->second;
+          OrderParticleProps *opp_i = &( opp_map.find( p.id() ) )->second;
           opp_i->calculateSumQlm();
         }
         
+        // ------------------------------------------------------------------------------
+        // communicate back info to ghost particles
+        sendGhostInfo.clear();
+        for(vector<int>::iterator it = realHere.begin(); it!=realHere.end(); ++it){
+          sendGhostInfo.push_back( opp_map.find( *it )->second );
+        }
+        
+        maxSize, vecSize  = sendGhostInfo.size();
+        mpi::all_reduce( *cmm, vecSize, maxSize, mpi::maximum<int>() );
+        while(sendGhostInfo.size()<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
+        
+        totID.clear();
+        boost::mpi::all_gather( *cmm, &sendGhostInfo[0], sendGhostInfo.size(), totID);
+        
+        for(vector<OrderParticleProps>::iterator it = totID.begin(); it!=totID.end(); ++it){
+          OrderParticleProps &gop = *it;
+          if( gop.getPID()!=-1 && stor->lookupGhostParticle( gop.getPID() ) ){
+            (opp_map.find( gop.getPID() ))->second = gop;
+          }
+        }
+        
+        // ------------------------------------------------------------------------------
         // loop over pairs
-        for(boost::unordered_multimap<longint, longint>::iterator pit = pairs.begin(); pit != pairs.end(); ++pit){
-          longint first = (*pit).first;
-          longint second = (*pit).second;
+        for(boost::unordered_multimap<int, int>::iterator pit = pairs.begin(); pit != pairs.end(); ++pit){
+          int first = (*pit).first;
+          int second = (*pit).second;
           OrderParticleProps *opp_i1 = &(opp_map.find( first ))->second;
           OrderParticleProps *opp_i2 = &(opp_map.find( second ))->second;
+          
+          // checking 0 sum Qlm
+          if(opp_i2->getSumQlm() == 0){
+            cerr<<" Bead2: "<< second << " in pair has 0 sum: "<< opp_i2->getSumQlm()<<endl;
+          }
+          if(opp_i1->getSumQlm() == 0){
+            cerr<<" Bead1: "<< first << " in pair has 0 sum: "<< opp_i1->getSumQlm()<<endl;
+          }
           
           for (int m = -angular_momentum; m <= angular_momentum; m++) {
             real d1 = (opp_i1->getQlm(m) * conj( opp_i2->getQlm(m) )).real() / opp_i2->getSumQlm();
@@ -226,15 +324,41 @@ namespace espresso {
             opp_i2->setD( opp_i2->getD() + d2 );
           }
         }
+
+        // ------------------------------------------------------------------------------
+        // communicate D information
+        sendGhostInfo.clear();
+        for(boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin(); opm!=opp_map.end(); ++opm){
+          int id = (*opm).first;
+          if( getSystem()->storage->lookupGhostParticle(id) ){
+            OrderParticleProps &op = (*opm).second;
+            if( !op.getNumNN()==0 ) sendGhostInfo.push_back( (*opm).second );
+          }
+        }
         
+        maxSize, vecSize  = sendGhostInfo.size();
+        mpi::all_reduce( *cmm, vecSize, maxSize, mpi::maximum<int>() );
+        while(sendGhostInfo.size()<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
+        totID.clear();
+        boost::mpi::all_gather( *getSystem()->comm, &sendGhostInfo[0], maxSize, totID);
+        
+        for(vector<OrderParticleProps>::iterator it = totID.begin(); it!=totID.end(); ++it){
+          OrderParticleProps &gop = *it;
+          if( gop.getPID()!=-1 && getSystem()->storage->lookupRealParticle( gop.getPID() ) ){
+            OrderParticleProps *opp_i = &(opp_map.find( gop.getPID() ))->second;
+            opp_i->setD(  opp_i->getD() + gop.getD() );
+          }
+        }
+        
+        // ------------------------------------------------------------------------------
         // loop over particles and normalize d
-        for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
+        for(CellListIterator cit(cells_real); !cit.isDone(); ++cit) {
           Particle& p = *cit;
           int pid = p.id();
           OrderParticleProps *opp_i = &(opp_map.find( pid ))->second;
           
           //catch particles without neighbors 
-          if ( opp_i->getNumNN() == 0){
+          if ( opp_i->getNumNN() == 0 ){
             cerr << "Bead: "<< pid << " has no neighbors - setting OP to zero" << endl;
             opp_i->setD( 0.0 );
             continue;
@@ -244,21 +368,16 @@ namespace espresso {
           
           //check for NAN
           if ( opp_i->getD() != opp_i->getD() ) {
-              cerr << "Current bead: " << p.id() << endl;
-              cerr << "qlmSumSqrt: " << opp_i->getSumQlm() << endl;
-              cerr << "near neibs: " << opp_i->getNumNN() << endl;
-              throw std::runtime_error("result: NAN - this should never happen..." );
+            cerr << "Current bead: " << p.id() << endl;
+            cerr << "qlmSumSqrt: " << opp_i->getSumQlm() << endl;
+            cerr << "near neibs: " << opp_i->getNumNN() << endl;
+            throw std::runtime_error("result: NAN - this should never happen..." );
           }
-          
-          // assigning to the list of solid particles
-          if( opp_i->getD() >= threshold ){
-            num_solid++;
-            opp_i->setSolid( true );
-          }
-          
-          ret[pid] = opp_i->getD();
+           
+          //ret[pid] = opp_i->getD();
         }
         
+        RealND ret(1, 0.0);
         return ret;
       }
       
@@ -268,18 +387,43 @@ namespace espresso {
         RealND res = computeRaw();
         
         CellList cells = getSystem()->storage->getRealCells();
+        int this_node = getSystem() -> comm -> rank();
+        
+        vector <OrderParticleProps> sendGhostInfo;
         for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
           Particle& p = *cit;
           int pid = p.id();
-          OrderParticleProps *opp_i = &(opp_map.find( pid ))->second;
-          
-          python::tuple pt = python::make_tuple( pid, opp_i->getD(), opp_i->getNumNN());
-          
-          //ret.insert( pid, pt );
-          ret.append( pt );
+          OrderParticleProps opp_i = (opp_map.find( pid ))->second;
+          sendGhostInfo.push_back( opp_i );
         }
         
-        ret.sort();
+        vector<int> sendSizes;
+        int ss  = sendGhostInfo.size();
+        boost::mpi::all_gather( *getSystem()->comm, ss, sendSizes);
+        int maxSize=0;
+        for(vector<int>::iterator it = sendSizes.begin(); it!=sendSizes.end(); ++it){
+          maxSize = max(maxSize, *it);
+        }
+        while(sendGhostInfo.size()<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
+
+        int numProc = getSystem()->comm->size();
+        vector<OrderParticleProps> totID = vector<OrderParticleProps>( numProc * maxSize, OrderParticleProps() );
+        boost::mpi::gather( *getSystem()->comm, &sendGhostInfo[0], maxSize, totID, 0);
+
+        if( getSystem()->comm->rank()==0 ){
+          for(vector<OrderParticleProps>::iterator it=totID.begin(); it!=totID.end(); ++it) {
+            OrderParticleProps &gop = *it;
+            if(gop.getPID()>=0){
+              python::tuple pt = python::make_tuple( gop.getPID(), gop.getD(), gop.getNumNN());
+              ret.append( pt );
+            }
+          }
+
+          ret.sort();
+        }
+        else{
+          ret.append(0);
+        }
         
         return ret;
       }

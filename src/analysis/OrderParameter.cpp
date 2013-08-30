@@ -34,11 +34,7 @@ namespace espresso {
         phi = 0.0;
       }
       
-      dcomplex res = boost::math::spherical_harmonic(l, m, theta, phi);
-      
-      //std::cout << " boost gets: l=" << l << "  m="<<m<<"  theta="<<theta<<"  phi="<<phi << std::endl;
-      //std::cout << " SphHarm returns: " << res << std::endl;
-      return res;
+      return boost::math::spherical_harmonic(l, m, theta, phi);
     }
     
     void OrderParameter::registerPython() {

@@ -52,6 +52,29 @@ namespace espresso {
       }
       return cnt;
     }
+    
+    longint Storage::getNLocalParticles() const {
+      longint cnt = 0;
+      for (CellList::const_iterator it = localCells.begin(), end = localCells.end(); it != end; ++it) {
+        longint size = (*it)->particles.size();
+        if (size) {
+          LOG4ESPP_TRACE(logger, "cell " << ((*it) - getFirstCell()) << " size " << size);
+        }
+        cnt += size;
+      }
+      return cnt;
+    }
+    longint Storage::getNGhostParticles() const {
+      longint cnt = 0;
+      for (CellList::const_iterator it = ghostCells.begin(), end = ghostCells.end(); it != end; ++it) {
+        longint size = (*it)->particles.size();
+        if (size) {
+          LOG4ESPP_TRACE(logger, "cell " << ((*it) - getFirstCell()) << " size " << size);
+        }
+        cnt += size;
+      }
+      return cnt;
+    }
 
     // TODO find out why python crashes if inlined
     //inline
