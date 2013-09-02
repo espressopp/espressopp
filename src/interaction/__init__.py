@@ -50,5 +50,7 @@ from espresso.interaction.CoulombRSpace import *
 from espresso.interaction.StillingerWeberPairTerm import *
 from espresso.interaction.StillingerWeberTripleTerm import *
 from espresso.interaction.StillingerWeberPairTermCapped import *
+from espresso.interaction.TersoffPairTerm import *
+from espresso.interaction.TersoffTripleTerm import *
 
 from espresso.interaction.CoulombKSpaceP3M import *

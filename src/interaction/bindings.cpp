@@ -43,6 +43,8 @@
 #include "StillingerWeberPairTerm.hpp"
 #include "StillingerWeberTripleTerm.hpp"
 #include "StillingerWeberPairTermCapped.hpp"
+#include "TersoffPairTerm.hpp"
+#include "TersoffTripleTerm.hpp"
 
 #include "CoulombKSpaceP3M.hpp"
 #include "Potential.hpp"
@@ -95,6 +97,8 @@ namespace espresso {
       StillingerWeberPairTerm::registerPython();
       StillingerWeberTripleTerm::registerPython();
       StillingerWeberPairTermCapped::registerPython();
+      TersoffPairTerm::registerPython();
+      TersoffTripleTerm::registerPython();
       
       CoulombKSpaceP3M::registerPython();
     }
