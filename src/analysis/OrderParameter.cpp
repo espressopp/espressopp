@@ -40,16 +40,13 @@ namespace espresso {
     void OrderParameter::registerPython() {
       using namespace espresso::python;
       class_<OrderParameter, bases< AnalysisBase > >
-        ("analysis_OrderParameter", init< shared_ptr<System>, real, int, real >())
+        ("analysis_OrderParameter", init< shared_ptr<System>, real, int>())
         .add_property("l", 
               &OrderParameter::getAngularMomentum,
               &OrderParameter::setAngularMomentum)
         .add_property("cutoff", 
               &OrderParameter::getCutoff,
               &OrderParameter::setCutoff)
-        .add_property("threshold", 
-              &OrderParameter::getThreshold,
-              &OrderParameter::setThreshold)
       ;
     }
   }

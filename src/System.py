@@ -99,7 +99,7 @@ class SystemLocal(_espresso.System):
               self.cxxclass.scaleVolume(self, toReal3DFromVector( [arg0, arg0, arg0] ) )
           elif len(args) == 3:          
             #print args, " is 3 numbers"
-            self.cxxclass.scaleVolume( toReal3DFromVector(*args) )
+            self.cxxclass.scaleVolume(self, toReal3DFromVector(*args) )
           else:
             print args, " is invalid"
           
