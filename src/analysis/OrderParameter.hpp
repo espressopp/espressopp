@@ -163,7 +163,7 @@ namespace espresso {
       real cutoff_sq;  // cutoff^2
       int angular_momentum;   // angular momentum
       
-      vector<OrderParticleProps> opp;   // additional properties
+      //vector<OrderParticleProps> opp;   // additional properties
       boost::unordered_multimap <int, OrderParticleProps> opp_map;
       
       boost::unordered_multimap <int, int> pairs;
@@ -235,9 +235,12 @@ namespace espresso {
        */
       RealND computeRaw() {
         
+        opp_map.clear();
+        pairs.clear();
+        
         shared_ptr< storage::Storage > stor = getSystem()->storage;
         shared_ptr< mpi::communicator > cmm = getSystem()->comm;
-        int this_node = getSystem() -> comm -> rank();
+        int this_node = cmm -> rank();
         
         // ------------------------------------------------------------------------------
         // iterate over local particles, create a map of additional properties
@@ -288,7 +291,7 @@ namespace espresso {
         vector <OrderParticleProps> sendGhostInfo;
         for(boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin(); opm!=opp_map.end(); ++opm){
           int id = (*opm).first;
-          if( !getSystem()->storage->lookupRealParticle(id) ){
+          if( !stor->lookupRealParticle(id) ){
             OrderParticleProps &op = (*opm).second;
             if( !op.getNumNN()==0 ) sendGhostInfo.push_back( (*opm).second );
           }
@@ -376,7 +379,7 @@ namespace espresso {
         sendGhostInfo.clear();
         for(boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin(); opm!=opp_map.end(); ++opm){
           int id = (*opm).first;
-          if( getSystem()->storage->lookupGhostParticle(id) ){
+          if( stor->lookupGhostParticle(id) ){
             OrderParticleProps &op = (*opm).second;
             if( !op.getNumNN()==0 ) sendGhostInfo.push_back( (*opm).second );
           }
@@ -390,7 +393,7 @@ namespace espresso {
         
         for(vector<OrderParticleProps>::iterator it = totID.begin(); it!=totID.end(); ++it){
           OrderParticleProps &gop = *it;
-          if( gop.getPID()!=-1 && getSystem()->storage->lookupRealParticle( gop.getPID() ) ){
+          if( gop.getPID()!=-1 && stor->lookupRealParticle( gop.getPID() ) ){
             OrderParticleProps *opp_i = &(opp_map.find( gop.getPID() ))->second;
             opp_i->setD(  opp_i->getD() + gop.getD() );
           }
