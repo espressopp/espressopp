@@ -191,17 +191,19 @@ namespace espresso {
 
       OrderParameter(shared_ptr< System > system, 
                      real _cutoff,
-                     int _angular_momentum) :
+                     int _angular_momentum,
+                     bool _do_cl_an,
+                     bool _incl_surface,
+                     real _d_min,
+                     real _d_max) :
                         AnalysisBaseTemplate< RealND >(system),
                         cutoff(_cutoff),
-                        angular_momentum(_angular_momentum){
+                        angular_momentum(_angular_momentum),
+                        do_cl_an(_do_cl_an),
+                        incl_surface(_incl_surface),
+                        d_min(_d_min),
+                        d_max(_d_max){
         cutoff_sq = cutoff * cutoff;
-        
-        do_cl_an = true;
-        incl_surface = true;
-        
-        d_min = -1.0;
-        d_max = -0.75;
       }
       virtual ~OrderParameter() {
       }
@@ -428,20 +430,16 @@ namespace espresso {
       void define_solid(){
         CellList cells = getSystem()->storage->getRealCells();
         
-        int count = 0;
         for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
           Particle& p = *cit;
           int pid = p.id();
           OrderParticleProps *opp_i = &(opp_map.find( pid ))->second;
           if( opp_i->getD() >= d_min && opp_i->getD() <= d_max ){
             opp_i->setSolid( true );
-            count++;
           }
         }
-        cout<< " Number of solid particles without surface: "<< count<< endl;
         
         if(incl_surface){
-          int count1 = 0;
           for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
             Particle& p = *cit;
             int pid = p.id();
@@ -453,13 +451,11 @@ namespace espresso {
                 if( !opp_i_surf->getSolid() ){
                   //opp_i_surf->setSolid(true);
                   opp_i_surf->setSurface(true);
-                  count1++;
                 }
               }
             }
             
           }
-          cout<< " count1: "<< count1 << endl;
           
           // -----------------------------------------------------------------------
           // send ghost info
@@ -485,19 +481,28 @@ namespace espresso {
             OrderParticleProps &gop = *it;
             if( gop.getPID()!=-1 && getSystem()->storage->lookupRealParticle( gop.getPID() ) ){
               OrderParticleProps *opp_i_loc = &(opp_map.find( gop.getPID() ))->second;
-              opp_i_loc->setSolid( gop.getSolid() );
+              //opp_i_loc->setSolid( gop.getSolid() );
+              opp_i_loc->setSurface( gop.getSurface() );
             }
           }
           //--------------------------------------------------------------------------
         }
-        cout<< " Number of solid particles: "<< count<< endl;
-        
         
       }
       
       void cluster_analysis(){
+        local_cluster_analysis();
+        
+        global_cluster_analysis();
+      }
+      
+      void local_cluster_analysis(){
         
       }
+      void global_cluster_analysis(){
+        
+      }
+      
       
       python::list compute() {
         python::list ret;
@@ -507,7 +512,7 @@ namespace espresso {
         if( do_cl_an ){
           define_solid();
           
-          cluster_analysis();
+          //cluster_analysis();
         }
         
         
