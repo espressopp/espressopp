@@ -36,7 +36,10 @@ typedef complex<double> dcomplex;
 
 namespace espresso {
   namespace analysis {
+    
     using namespace iterator;
+    
+    // auxiliary class for storing additional properties of each bead for order analysis
     class OrderParticleProps{
     private:
       real d;
@@ -45,6 +48,9 @@ namespace espresso {
       
       int ang_m;
       int particle_id;
+      
+      bool is_solid;   // if true the particle belongs to solid phase
+      bool is_surface; // if true the particle belongs to the surface
         
       vector<int> nns;
       vector<dcomplex> qlm; //  depends on angular_momentum =2*angular_momentum+1
@@ -59,6 +65,7 @@ namespace espresso {
         ar & particle_id;
         ar & nns;
         ar & qlm;
+        ar & is_solid;
       }
       
     public:
@@ -66,7 +73,10 @@ namespace espresso {
                              qlmSumSqrt(0),
                              nnns(0),
                              ang_m(0),
-                             particle_id(-1) {}
+                             particle_id(-1) {
+        is_solid = false;
+        is_surface = false;
+      }
       
       OrderParticleProps(int am) : d(0),
                                    qlmSumSqrt(0),
@@ -74,6 +84,8 @@ namespace espresso {
                                    ang_m(am),
                                    particle_id(-1) {
         qlm = vector<dcomplex>(2*am+1, dcomplex(0.0, 0.0) );
+        is_solid = false;
+        is_surface = false;
       }
       OrderParticleProps(int am, int pid) : d(0),
                                             qlmSumSqrt(0),
@@ -81,6 +93,8 @@ namespace espresso {
                                             ang_m(am),
                                             particle_id(pid) {
         qlm = vector<dcomplex>(2*am+1, dcomplex(0.0, 0.0) );
+        is_solid = false;
+        is_surface = false;
       }
       ~OrderParticleProps(){}
       
@@ -88,9 +102,7 @@ namespace espresso {
         nnns++; // increase the number of near neighbors
         nns.push_back( i );
       }
-      int getNN(int i){
-        return nns[i];
-      }
+      int getNN(int i){ return nns[i]; }
       
       int getNumNN(){ return nnns; }
 
@@ -105,9 +117,7 @@ namespace espresso {
         if(hh<0 || hh>=2*ang_m+1) cout<<"OUT OF RANGE!!"<<endl;
         return qlm[ indx + ang_m ];
       }
-      vector<dcomplex> getQlmVector(){
-        return qlm;
-      }
+      vector<dcomplex> getQlmVector(){ return qlm; }
       void addQlmVector(vector<dcomplex> v){
         if( v.size() != qlm.size() )
           cout<<"Vectors have not the same size. Local: "<< qlm.size() << "  added  "<< v.size() <<endl;
@@ -130,43 +140,69 @@ namespace espresso {
         }
         qlmSumSqrt = sqrt(qlmSumSqrt);
       }
-      real getSumQlm(){
-        return qlmSumSqrt;
-      }
+      real getSumQlm(){ return qlmSumSqrt; }
       
       void setD(real v){ d = v;}
       real getD(){ return d;}
       
       void setPID(int v){ particle_id = v;}
       int getPID(){ return particle_id;}
+      
+      void setSolid(bool v){ is_solid = v;}
+      bool getSolid(){ return is_solid;}
+      void setSurface(bool v){ is_surface = v;}
+      bool getSurface(){ return is_surface;}
     };
     
-    /** Class to compute order parameter. */
+    
+    
+    /** compute order parameter. */
     class OrderParameter : public AnalysisBaseTemplate< RealND > {
     private:
       real cutoff;     // cut off in order to define pairs
       real cutoff_sq;  // cutoff^2
-      real threshold;  // for local order parameter
       int angular_momentum;   // angular momentum
       
-      vector<OrderParticleProps> opp;   // additional properties
+      //vector<OrderParticleProps> opp;   // additional properties
       boost::unordered_multimap <int, OrderParticleProps> opp_map;
       
       boost::unordered_multimap <int, int> pairs;
+
+      /*
+       * Cluster analysis.
+       */
+      bool do_cl_an;  // if true, then cluster analysis will be performed after calculation of d
+      bool incl_surface;  // if true, then the surface particle will be included as well
+      /*
+       * -1 <= d <= 1, thus d_min and d_max should maintain the same property.
+       * 
+       *  if d_min < d_max, then the solid particle will be defined
+       *  in range d_min <= d <= d_max
+       * 
+       *  if d_min > d_max, then 
+       *     -1.0 <= d <= d_min 
+       *    d_max <= d <= 1.0
+       */
+      real d_min, d_max;
+      
+      
     public:
       static void registerPython();
 
-      // important - verlet list should be separate from any other vl in system
-      // could be done in python as well as disconnection
       OrderParameter(shared_ptr< System > system, 
                      real _cutoff,
                      int _angular_momentum,
-                     real _threshold
-                     ) :
-                     AnalysisBaseTemplate< RealND >(system),
-                     cutoff(_cutoff),
-                     angular_momentum(_angular_momentum),
-                     threshold(_threshold){
+                     bool _do_cl_an,
+                     bool _incl_surface,
+                     real _d_min,
+                     real _d_max) :
+                        AnalysisBaseTemplate< RealND >(system),
+                        cutoff(_cutoff),
+                        angular_momentum(_angular_momentum),
+                        do_cl_an(_do_cl_an),
+                        incl_surface(_incl_surface),
+                        d_min(_d_min),
+                        d_max(_d_max){
         cutoff_sq = cutoff * cutoff;
       }
       virtual ~OrderParameter() {
@@ -174,24 +210,37 @@ namespace espresso {
       
       dcomplex SphHarm(int l_, int m_, Real3D r_);
       
-      int getAngularMomentum(){ return angular_momentum; }
       void setAngularMomentum(int v){ angular_momentum = v; }
-      real getCutoff(){ return cutoff; }
+      int getAngularMomentum(){ return angular_momentum; }
       void setCutoff(real v){
         cutoff = v;
         cutoff_sq = cutoff * cutoff;
       }
-      real getThreshold(){ return threshold; }
-      void setThreshold(real v){ threshold = v; }
+      real getCutoff(){ return cutoff; }
+
+      // **************************** cluster analysis
+      void setDo_cl_an(bool v){ do_cl_an = v; }
+      bool getDo_cl_an(){ return do_cl_an; }
+
+      void setIncl_surface(bool v){ incl_surface = v; }
+      bool getIncl_surface(){ return incl_surface; }
+      
+      void setD_min(int v){ d_min = v; }
+      int getD_min(){ return d_min; }
+      void setD_max(int v){ d_max = v; }
+      int getD_max(){ return d_max; }
       
       /*
        * It is efficient only when communications are optimized.
        */
       RealND computeRaw() {
         
+        opp_map.clear();
+        pairs.clear();
+        
         shared_ptr< storage::Storage > stor = getSystem()->storage;
         shared_ptr< mpi::communicator > cmm = getSystem()->comm;
-        int this_node = getSystem() -> comm -> rank();
+        int this_node = cmm -> rank();
         
         // ------------------------------------------------------------------------------
         // iterate over local particles, create a map of additional properties
@@ -242,7 +291,7 @@ namespace espresso {
         vector <OrderParticleProps> sendGhostInfo;
         for(boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin(); opm!=opp_map.end(); ++opm){
           int id = (*opm).first;
-          if( !getSystem()->storage->lookupRealParticle(id) ){
+          if( !stor->lookupRealParticle(id) ){
             OrderParticleProps &op = (*opm).second;
             if( !op.getNumNN()==0 ) sendGhostInfo.push_back( (*opm).second );
           }
@@ -330,7 +379,7 @@ namespace espresso {
         sendGhostInfo.clear();
         for(boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin(); opm!=opp_map.end(); ++opm){
           int id = (*opm).first;
-          if( getSystem()->storage->lookupGhostParticle(id) ){
+          if( stor->lookupGhostParticle(id) ){
             OrderParticleProps &op = (*opm).second;
             if( !op.getNumNN()==0 ) sendGhostInfo.push_back( (*opm).second );
           }
@@ -344,7 +393,7 @@ namespace espresso {
         
         for(vector<OrderParticleProps>::iterator it = totID.begin(); it!=totID.end(); ++it){
           OrderParticleProps &gop = *it;
-          if( gop.getPID()!=-1 && getSystem()->storage->lookupRealParticle( gop.getPID() ) ){
+          if( gop.getPID()!=-1 && stor->lookupRealParticle( gop.getPID() ) ){
             OrderParticleProps *opp_i = &(opp_map.find( gop.getPID() ))->second;
             opp_i->setD(  opp_i->getD() + gop.getD() );
           }
@@ -381,10 +430,94 @@ namespace espresso {
         return ret;
       }
       
+      void define_solid(){
+        CellList cells = getSystem()->storage->getRealCells();
+        
+        for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
+          Particle& p = *cit;
+          int pid = p.id();
+          OrderParticleProps *opp_i = &(opp_map.find( pid ))->second;
+          if( opp_i->getD() >= d_min && opp_i->getD() <= d_max ){
+            opp_i->setSolid( true );
+          }
+        }
+        
+        if(incl_surface){
+          for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
+            Particle& p = *cit;
+            int pid = p.id();
+            OrderParticleProps *opp_i = &(opp_map.find( pid ))->second;
+            if( opp_i->getSolid() && !opp_i->getSurface() ){
+              int nnn = opp_i->getNumNN();
+              for(int i=0; i<nnn; i++){
+                OrderParticleProps *opp_i_surf = &(opp_map.find( opp_i->getNN(i) ))->second;
+                if( !opp_i_surf->getSolid() ){
+                  //opp_i_surf->setSolid(true);
+                  opp_i_surf->setSurface(true);
+                }
+              }
+            }
+            
+          }
+          
+          // -----------------------------------------------------------------------
+          // send ghost info
+          shared_ptr< mpi::communicator > cmm = getSystem()->comm;
+          
+          vector <OrderParticleProps> sendGhostInfo;
+          for(boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin(); opm!=opp_map.end(); ++opm){
+            int id = (*opm).first;
+            if( !getSystem()->storage->lookupRealParticle(id) ){
+              OrderParticleProps &op = (*opm).second;
+              if( !op.getNumNN()==0 ) sendGhostInfo.push_back( (*opm).second );
+            }
+          }
+
+          int maxSize, vecSize  = sendGhostInfo.size();
+          mpi::all_reduce( *cmm, vecSize, maxSize, mpi::maximum<int>() );
+          while(sendGhostInfo.size()<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
+
+          vector< OrderParticleProps > totID;
+          boost::mpi::all_gather( *getSystem()->comm, &sendGhostInfo[0], maxSize, totID);
+
+          for(vector<OrderParticleProps>::iterator it = totID.begin(); it!=totID.end(); ++it){
+            OrderParticleProps &gop = *it;
+            if( gop.getPID()!=-1 && getSystem()->storage->lookupRealParticle( gop.getPID() ) ){
+              OrderParticleProps *opp_i_loc = &(opp_map.find( gop.getPID() ))->second;
+              //opp_i_loc->setSolid( gop.getSolid() );
+              opp_i_loc->setSurface( gop.getSurface() );
+            }
+          }
+          //--------------------------------------------------------------------------
+        }
+        
+      }
+      
+      void cluster_analysis(){
+        local_cluster_analysis();
+        
+        global_cluster_analysis();
+      }
+      
+      void local_cluster_analysis(){
+        
+      }
+      void global_cluster_analysis(){
+        
+      }
+      
+      
       python::list compute() {
         python::list ret;
         
         RealND res = computeRaw();
+        
+        if( do_cl_an ){
+          define_solid();
+          
+          //cluster_analysis();
+        }
+        
         
         CellList cells = getSystem()->storage->getRealCells();
         int this_node = getSystem() -> comm -> rank();
@@ -414,7 +547,15 @@ namespace espresso {
           for(vector<OrderParticleProps>::iterator it=totID.begin(); it!=totID.end(); ++it) {
             OrderParticleProps &gop = *it;
             if(gop.getPID()>=0){
-              python::tuple pt = python::make_tuple( gop.getPID(), gop.getD(), gop.getNumNN());
+              python::list nn;
+              
+              for(int i=0; i<gop.getNumNN(); i++){
+                nn.append( gop.getNN(i) );
+              }
+              
+              //cout<< "Pid: "<< gop.getPID() << "  solid:  "<< gop.getSolid() << endl;
+              python::tuple pt = python::make_tuple( gop.getPID(), gop.getD(),
+                      gop.getNumNN(), gop.getSolid(), gop.getSurface(), nn);
               ret.append( pt );
             }
           }
@@ -428,8 +569,6 @@ namespace espresso {
         return ret;
       }
 
-      // functions below should be revised. it doesn't work good for RealND
-      
       python::list getAverageValue() {
         python::list ret;
         /*
