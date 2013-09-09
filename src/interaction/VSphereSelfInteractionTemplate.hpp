@@ -1,50 +1,41 @@
 // ESPP_CLASS
-#ifndef _INTERACTION_FIXEDSINGLELISTINTERACTIONTEMPLATE_HPP
-#define _INTERACTION_FIXEDSINGLELISTINTERACTIONTEMPLATE_HPP
+#ifndef _INTERACTION_VSPHERESELFINTERACTIONTEMPLATE_HPP
+#define _INTERACTION_VSPHERESELFINTERACTIONTEMPLATE_HPP
 
 #include "mpi.hpp"
 #include "Interaction.hpp"
 #include "Real3D.hpp"
 #include "Tensor.hpp"
 #include "Particle.hpp"
-#include "FixedSingleList.hpp"
+#include "iterator/CellListIterator.hpp"
 #include "esutil/Array2D.hpp"
 #include "bc/BC.hpp"
 #include "SystemAccess.hpp"
+#include "storage/Storage.hpp"
 #include "Interaction.hpp"
 #include "types.hpp"
 
 namespace espresso {
   namespace interaction {
+  using namespace iterator;
     template < typename _Potential >
-    class FixedSingleListInteractionTemplate: public Interaction, SystemAccess {
+    class VSphereSelfInteractionTemplate: public Interaction, SystemAccess {
         
     protected:
       typedef _Potential Potential;
       
     public:
-      FixedSingleListInteractionTemplate
+      VSphereSelfInteractionTemplate
       (shared_ptr < System > system,
-       shared_ptr < FixedSingleList > _fixedsingleList,
        shared_ptr < Potential > _potential)
-        : SystemAccess(system), fixedsingleList(_fixedsingleList),
-          potential(_potential)
+        : SystemAccess(system), potential(_potential)
       {
         if (! potential) {
           LOG4ESPP_ERROR(theLogger, "NULL potential");
         }
       }
 
-      virtual ~FixedSingleListInteractionTemplate() {};
-
-      void
-      setFixedSingleList(shared_ptr < FixedSingleList > _fixedsingleList) {
-        fixedsingleList = _fixedsingleList;
-      }
-
-      shared_ptr < FixedSingleList > getFixedSingleList() {
-        return fixedsingleList;
-      }
+      virtual ~VSphereSelfInteractionTemplate() {};
 
       void
       setPotential(shared_ptr < Potential> _potential) {
@@ -78,32 +69,33 @@ namespace espresso {
     // INLINE IMPLEMENTATION
     //////////////////////////////////////////////////
     template < typename _Potential > inline void
-    FixedSingleListInteractionTemplate < _Potential >::addForces() {
-      LOG4ESPP_INFO(theLogger, "add forces computed by the FixedSingle List");
-      const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      real dist_dummy = 1.0;
-      Real3D force;
-      for (FixedSingleList::SingleList::Iterator it(*fixedsingleList); it.isValid(); ++it) {
-        Particle &p1 = *it->first;
-        if(potential->_computeForce(force, dist_dummy)) {
-          p1.force() += force;
-        }
+    VSphereSelfInteractionTemplate < _Potential >::addForces() {
+      LOG4ESPP_INFO(theLogger, "compute force of the VSphere Self potential");
+      System& system = getSystemRef();
+      CellList realCells = system.storage->getRealCells();
+      // loop over all particles of the real cells
+      Real3D radius = 0.0;
+      Real3D force  = 0.0;
+      for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+    	  radius[0] = cit->radius();
+          if(potential->_computeForce(force, radius)) {
+            cit->fradius() += force[0];
+          }
       }
     }
     
     template < typename _Potential > inline real
-    FixedSingleListInteractionTemplate < _Potential >::
+    VSphereSelfInteractionTemplate < _Potential >::
     computeEnergy() {
-
-      LOG4ESPP_INFO(theLogger, "compute energy of the FixedSingle list");
-
+      LOG4ESPP_INFO(theLogger, "compute energy of the VSphere Self potential");
+      System& system = getSystemRef();
+      CellList realCells = system.storage->getRealCells();
+      // loop over all particles of the real cells
       real e = 0.0;
-      const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
-      for (FixedSingleList::SingleList::Iterator it(*fixedsingleList);
-	   it.isValid(); ++it) {
-        const Particle &p1 = *it->first;
-        Real3D r21_dummy = 1.0;
-        e += potential->_computeEnergy(r21_dummy);
+      Real3D radius = 0.0;
+      for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+    	radius[0] = cit->radius();
+        e += potential->_computeEnergy(radius);
       }
       real esum;
       boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
@@ -111,31 +103,31 @@ namespace espresso {
     }
 
     template < typename _Potential > inline real
-    FixedSingleListInteractionTemplate < _Potential >::
+    VSphereSelfInteractionTemplate < _Potential >::
     computeVirial() {
       return 0.0;
     }
 
     template < typename _Potential > inline void
-    FixedSingleListInteractionTemplate < _Potential >::computeVirialTensor(Tensor& w){
-      LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
+    VSphereSelfInteractionTemplate < _Potential >::computeVirialTensor(Tensor& w){
+      LOG4ESPP_INFO(theLogger, "The virial of the VSphere Self potential is 0");
     }
 
     template < typename _Potential > inline void
-    FixedSingleListInteractionTemplate < _Potential >::
+    VSphereSelfInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor& w, real z){
-      LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
+      LOG4ESPP_INFO(theLogger, "The virial of the VSphere Self potential is 0");
     }
     
     template < typename _Potential > inline void
-    FixedSingleListInteractionTemplate < _Potential >::
+    VSphereSelfInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor *w, int n){
-      LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
+      LOG4ESPP_INFO(theLogger, "The virial of the VSphere Self potential is 0");
     }
     
     template < typename _Potential >
     inline real
-    FixedSingleListInteractionTemplate< _Potential >::
+    VSphereSelfInteractionTemplate< _Potential >::
     getMaxCutoff() {
       return potential->getCutoff();
     }
