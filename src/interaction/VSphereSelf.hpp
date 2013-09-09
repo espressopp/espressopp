@@ -22,8 +22,8 @@ namespace espresso {
     class VSphereSelf : public PotentialTemplate< VSphereSelf > {
     private:
       real e1;
-      real a1, a16;
-      real a2, a22;
+      real a1, a16, a16NbNbNb;
+      real a2, a22, a2dNb, a22dNb;
       real mth;
       int Nb, NbNbNb;
 
@@ -58,7 +58,10 @@ namespace espresso {
     	mth = - (3.0/2.0);
     	a16 = 6*a1;
     	a22 = 2*a2;
+    	a22dNb = a22 / Nb;
     	NbNbNb = Nb*Nb*Nb;
+    	a16NbNbNb = a16 * NbNbNb;
+    	a2dNb = a2 / Nb;
       }
 
       // Setter and getter
@@ -92,7 +95,10 @@ namespace espresso {
 
       real _computeEnergySqrRaw(real distSqr) const {
     	real sigma2 = distSqr;
-        real energy = e1*pow(M_4PI3*sigma2, mth);
+        real energy;
+        energy  =   e1*pow(M_4PI3*sigma2, mth)       \
+                  + a1*NbNbNb/(sigma2*sigma2*sigma2) \
+                  + a22dNb*sigma2;
         return energy;
       }
 
@@ -100,7 +106,12 @@ namespace espresso {
 			    const Real3D& dist,
 			    real distSqr) const {
 
-        force = 0.0;
+    	real sigma  = dist[0];
+    	real sigma2 = distSqr;
+        force[1] = force[2] = 0.0;
+        force[0] =   M_4PI*e1*pow(M_4PI3*sigma2, mth)*sigma   \
+        		   + a16NbNbNb/(sigma2*sigma2*sigma2*sigma) \
+        		   - a22dNb*sigma;
         return true;
       }
     };
