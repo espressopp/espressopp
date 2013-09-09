@@ -3,7 +3,6 @@
 #define _INTERACTION_VSPHERESELF_HPP
 
 #include "Potential.hpp"
-#include "FixedSingleListInteractionTemplate.hpp"
 #include <cmath>
 
 #ifndef M_PIl

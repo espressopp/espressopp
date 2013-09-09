@@ -61,7 +61,6 @@ namespace espresso {
 
     protected:
       int ntypes;
-      shared_ptr < FixedSingleList > fixedsingleList;
       shared_ptr < Potential > potential;
     };
 
