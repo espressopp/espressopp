@@ -88,10 +88,10 @@ class SystemLocal(_espresso.System):
             elif hasattr(arg0, '__iter__'):
               if len(arg0) == 3:
                 #print args, " has iterator and length 3"
-                self.cxxclass.scaleVolume(toReal3DFromVector(arg0) )
+                self.cxxclass.scaleVolume(self, toReal3DFromVector(arg0) )
               elif len(arg0) == 1:
                 #print args, " has iterator and length 1"
-                self.cxxclass.scaleVolume( toReal3DFromVector(arg0[0], arg0[0], arg0[0]) )
+                self.cxxclass.scaleVolume(self, toReal3DFromVector(arg0[0], arg0[0], arg0[0]) )
               else:
                 print args, " is invalid"
             else:
