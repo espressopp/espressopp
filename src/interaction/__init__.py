@@ -5,6 +5,7 @@ pmiimport('espresso.interaction')
 from espresso.interaction.Interaction import *
 
 from espresso.interaction.Potential import *
+from espresso.interaction.PotentialVSpherePair import *
 from espresso.interaction.PotentialUniqueDist import *
 
 from espresso.interaction.Zero import *
@@ -25,7 +26,8 @@ from espresso.interaction.FENE import *
 from espresso.interaction.FENECapped import *
 from espresso.interaction.Harmonic import *
 from espresso.interaction.Quartic import *
-from espresso.interaction.VSphere import *
+from espresso.interaction.VSphereSelf import *
+from espresso.interaction.VSpherePair import *
 
 from espresso.interaction.HarmonicUnique import *
 

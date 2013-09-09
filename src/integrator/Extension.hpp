@@ -24,6 +24,7 @@ namespace espresso {
 
 
         enum ExtensionType {
+        	all=0,
             Thermostat=1,
             Barostat=2,
             Constraint=3,
