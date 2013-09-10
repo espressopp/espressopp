@@ -101,8 +101,8 @@ namespace espresso {
         if(potential._computeForce(force, fsi, fsj, p1, p2)) {
           p1.force() += force;
           p2.force() -= force;
-          p1.radius() += fsi;
-          p2.radius() += fsj;
+          p1.fradius() += fsi;
+          p2.fradius() += fsj;
           LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" << force);
         }
       }
