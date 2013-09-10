@@ -17,9 +17,8 @@ namespace espresso {
       using namespace espresso::python;
 
       class_< VSpherePair, bases< Potential > >
-    	("interaction_VSpherePair", init< real, real, real >())
-	    .def(init< real, real, real, real >())
-    	.add_property("sigma", &VSpherePair::getSigma, &VSpherePair::setSigma)
+    	("interaction_VSpherePair", init< real, real >())
+	    .def(init< real, real, real >())
     	.add_property("epsilon", &VSpherePair::getEpsilon, &VSpherePair::setEpsilon)
         .def_pickle(VSpherePair_pickle())
       ;

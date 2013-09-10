@@ -26,7 +26,6 @@ namespace espresso {
     class VSpherePair : public PotentialVSpherePairTemplate< VSpherePair > {
     private:
       real epsilon;
-      real sigma;
       real ff1;
       real ef1;
       real mth, mfh;
@@ -35,23 +34,21 @@ namespace espresso {
       static void registerPython();
 
       VSpherePair()
-	: epsilon(0.0), sigma(0.0) {
+	: epsilon(0.0) {
         setShift(0.0);
         setCutoff(infinity);
         preset();
       }
 
-      VSpherePair(real _epsilon, real _sigma,
-		   real _cutoff, real _shift) 
-	: epsilon(_epsilon), sigma(_sigma) {
+      VSpherePair(real _epsilon, real _cutoff, real _shift)
+	: epsilon(_epsilon) {
         setShift(_shift);
         setCutoff(_cutoff);
         preset();
       }
 
-      VSpherePair(real _epsilon, real _sigma,
-		   real _cutoff)
-	: epsilon(_epsilon), sigma(_sigma) {	
+      VSpherePair(real _epsilon, real _cutoff)
+	: epsilon(_epsilon) {
         autoShift = false;
         setCutoff(_cutoff);
         preset();
@@ -75,13 +72,6 @@ namespace espresso {
       }
       
       real getEpsilon() const { return epsilon; }
-
-      void setSigma(real _sigma) { 
-        sigma = _sigma; 
-        updateAutoShift();
-        preset();
-      }
-      real getSigma() const { return sigma; }
 
       real _computeEnergySqrRaw(real distSqr, real sigmaij) const {
     	real rij = sqrt(distSqr);
@@ -113,14 +103,12 @@ namespace espresso {
       getinitargs(VSpherePair const& pot)
       {
     	  real eps;
-          real sig;
           real rc;
           real sh;
           eps=pot.getEpsilon();
-          sig=pot.getSigma();
           rc =pot.getCutoff();
           sh =pot.getShift();
-          return boost::python::make_tuple(eps, sig, rc, sh);
+          return boost::python::make_tuple(eps, rc, sh);
       }
     };
 
