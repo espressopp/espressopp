@@ -24,6 +24,7 @@
 #include "Viscosity.hpp"
 #include "XDensity.hpp"
 #include "Test.hpp"
+#include "ParticleRadiusDistribution.hpp"
 
 #include "IntraChainDistSq.hpp"
 #include "NeighborFluctuation.hpp"
@@ -59,6 +60,7 @@ namespace espresso {
       RDFatomistic::registerPython();
       XDensity::registerPython();
       Test::registerPython();
+      ParticleRadiusDistribution::registerPython();
       
       Autocorrelation::registerPython();
       Viscosity::registerPython();

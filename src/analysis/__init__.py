@@ -28,3 +28,4 @@ from espresso.analysis.Energy import *
 from espresso.analysis.Viscosity import *
 from espresso.analysis.XDensity import *
 from espresso.analysis.Test import *
+from espresso.analysis.ParticleRadiusDistribution import *
