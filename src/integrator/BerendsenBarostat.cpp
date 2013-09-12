@@ -17,6 +17,10 @@ namespace espresso {
       tau  = 1.0;
       P0 = 1.0;
       
+      fixed = Int3D(1,1,1);
+      
+      exponent = 1./3.;
+      
       type = Extension::Barostat;
 
       LOG4ESPP_INFO(theLogger, "BerendsenBarostat constructed");
@@ -54,6 +58,16 @@ namespace espresso {
     real BerendsenBarostat::getPressure() {
       return P0;
     }
+    void BerendsenBarostat::setFixed(Int3D _fix) {
+      fixed = _fix;
+      int e=0;
+      for(int i=0;i<3;i++)
+        e+=fixed[i];
+      exponent = 1.0/(real)e;
+    }
+    Int3D BerendsenBarostat::getFixed() {
+      return fixed;
+    }
 
     void BerendsenBarostat::barostat(){
       LOG4ESPP_DEBUG(theLogger, "equilibrating the pressure");
@@ -74,9 +88,14 @@ namespace espresso {
         err.checkException();
       }
       
-      real mu = pow(  mu3, 1.0/3.0 );  // calculating the current scaling parameter
+      real mu = pow(  mu3, exponent );  // calculating the current scaling parameter
+      
+      Real3D mu3D( 1.0 );
+      for(int i=0;i<3;i++)
+        if( fixed[i]>0 )
+          mu3D[i]=mu;
 
-      system.scaleVolume( mu, true );
+      system.scaleVolume( mu3D, true );
     }
 
      // calculate the prefactors
@@ -100,9 +119,15 @@ namespace espresso {
 
         ("integrator_BerendsenBarostat", init< shared_ptr<System> >())
 
-        .add_property("tau", &BerendsenBarostat::getTau, &BerendsenBarostat::setTau)
-        .add_property("pressure", &BerendsenBarostat::getPressure, 
+        .add_property("tau",
+              &BerendsenBarostat::getTau,
+              &BerendsenBarostat::setTau)
+        .add_property("pressure",
+              &BerendsenBarostat::getPressure, 
               &BerendsenBarostat::setPressure)
+        .add_property("fixed",
+              &BerendsenBarostat::getFixed, 
+              &BerendsenBarostat::setFixed)
       
         .def("connect", &BerendsenBarostat::connect)
         .def("disconnect", &BerendsenBarostat::disconnect)
