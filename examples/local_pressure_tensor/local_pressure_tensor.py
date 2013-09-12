@@ -1,36 +1,32 @@
 """
    This script is an example of pressure tensor calculation layerwise according to the
  Irvin Kirwood method.
- Layers should be
- perpendicular to the z-direction of the simulation box. Information about simulation
- box and particles will be read from configuration file 'lennard_jones.xyz'. It is 
- already equilibrated lennard-jones fluid.
+ Initial configuration file is 'lennard_jones.xyz' (equilibrated lennard-jones fluid).
 """
 
 import espresso
 import MPI
 
-# define some global values
+# skin for Verlet list
 skin = 0.3
-# this is the cutoff of our LJ-interaction
+# LJ cutoff
 rc   = 2.5
 # integration step
 dt   = 0.005
 
-# read the configuration from a file
+# read a configuration from a file
 pid, type, xpos, ypos, zpos, xvel, yvel, zvel, Lx, Ly, Lz = \
         espresso.tools.readxyz('lennard_jones.xyz')
-# we can get the number of particles of the system from the length of the pid-list
+# number of particles
 NPart              = len(xpos)
-# get the box size from the file
+# system box size
 box                = (Lx, Ly, Lz)
-# create the basic system
+# create a basic system
 system             = espresso.System()
-# we always have to specify a random number generator (even if we do not need it in this example)
+# specify a random number generator
 system.rng         = espresso.esutil.RNG()
 # use orthorhombic periodic boundary conditions
 system.bc          = espresso.bc.OrthorhombicBC(system.rng, box)
-# we also have to provide a skin for things like Verlet-Lists
 system.skin        = skin
 
 comm = MPI.COMM_WORLD
@@ -54,7 +50,6 @@ print "setting up system ..."
 properties = ['id', 'type', 'pos', 'v']
 particles  = []
 for i in range(NPart):
-  #part = [pid[i], type[i], espresso.Real3D(xpos[i], ypos[i], zpos[i]+Lz/2.), espresso.Real3D(xvel[i], yvel[i], zvel[i])]
   part = [pid[i], type[i], espresso.Real3D(xpos[i], ypos[i], zpos[i]), espresso.Real3D(xvel[i], yvel[i], zvel[i])]
   particles.append(part)
   # add particles in chunks of 1000 particles, this is faster than adding each single particle
@@ -82,37 +77,41 @@ integrator.run(1)
 
 print "system setup finished"
 
-# setup the analysis for the pressure tensor
-pressure_tensor = espresso.analysis.PressureTensor(system)
-
 print 'Calculating pressure...'
 
-n = int(10)         # we will calculate pressure in 10 layers in z direction
-z0 = Lz / float(n)  # z coordinate of initial layer
-dz = 3.             # area around the layer where the pressure will be calculated
-n_measurements = 10 # result will be averaged over 100 measurements
+n = int(10)         # 10 layers in z direction
+h0 = Lz / float(n)  # z coordinate of initial layer
+dh = 3.             # area around the layer for kinetic part of the pressure tensor
+
+pressure_tensor    = espresso.analysis.PressureTensor(system)
+pressure_tensor_l  = espresso.analysis.PressureTensorLayer(system, h0, dh)
+pressure_tensor_ml = espresso.analysis.PressureTensorMultiLayer(system, n, dh)
+
+n_measurements = 10 # result will be averaged over 10 measurements
 
 print 'result will be averaged over ', n_measurements, ' measurements'
 
 pij_layers1 = []
 pij_layers2 = []
 Pijtot = espresso.Tensor(0.0)
+
 for i in range(n_measurements):
   integrator.run(10)
-  print 'measurement Nr:', (i+1), 'of', n_measurements
+  print 'measurement Nr: %d of %d' % ( i+1, n_measurements )
   
-  # compute the tensor for whole box
+  # compute the total pressure tensor
   Pijtot += espresso.Tensor( pressure_tensor.compute() )
   
   # layerwise
-  pij_aux = pressure_tensor.compute(n, dz)
+  pij_aux = pressure_tensor_ml.compute()
   
   for j in range(n):
-    if(i==0):
-      pij_layers1.append( pressure_tensor.compute( j * z0, dz) )
+    pressure_tensor_l.h0 = j * h0
+    if(j>= len( pij_layers1 ) ):
+      pij_layers1.append( espresso.Tensor( pressure_tensor_l.compute() ) )
       pij_layers2.append( pij_aux[j] )
     else:
-      pij_layers1[j] += pressure_tensor.compute( j * z0, dz)
+      pij_layers1[j] += espresso.Tensor( pressure_tensor_l.compute() )
       pij_layers2[j] += pij_aux[j]
   
 
@@ -127,19 +126,17 @@ print '   Pxx      Pyy      Pzz      Pxy      Pxz      Pyz'
 fmt1 = '%8.4f %8.4f %8.4f %8.4f %8.4f %8.4f'
 print(fmt1 % (Pijtot[0], Pijtot[1], Pijtot[2], Pijtot[3], Pijtot[4], Pijtot[5]))
 
-print '\npressure layerwise; this is the function where one should set a Z coordinate of the plane (float number) \n \
-where pressure tensor will be calculated. (Advantage: one can set the position precisely)'
+print '\nPressure tensor by PressureTensorLayer (caculated for each layer separatelly).'
       
 print 'layer number     z coord of layer        pressure tensor'
 for i in range(n):
-  print ('%4d           %7.3f              ' % (i, i * z0)) , pij_layers1[i]
+  print ('%4d           %7.3f              ' % (i, i * h0)) , pij_layers1[i]
 
-print '\npressure layerwise; this is the function where one should set a number of layers (integer number N). \n \
-Lz will be devided by N and then pressure tensor will be calculated in each layer. (Advantage: it is faster)'
+print '\nPressure tensor by PressureTensorMultiLayer (caculated for each layer at once).'
 
 print 'layer number     z coord of layer        pressure tensor'
 for i in range(n):
-  print ('%4d           %7.3f              ' % (i, i * z0)) , pij_layers2[i]
+  print ('%4d           %7.3f              ' % (i, i * h0)) , pij_layers2[i]
   
 print 'done'
 print 'both functions should give the same result'
