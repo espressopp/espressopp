@@ -4,6 +4,7 @@
 #include "Temperature.hpp"
 #include "Pressure.hpp"
 #include "PressureTensor.hpp"
+#include "PressureTensorLayer.hpp"
 #include "Configuration.hpp"
 #include "ConfigurationExt.hpp"
 #include "Configurations.hpp"
@@ -39,6 +40,7 @@ namespace espresso {
       Temperature::registerPython();
       Pressure::registerPython();
       PressureTensor::registerPython();
+      PressureTensorLayer::registerPython();
       Configuration::registerPython();
       Configurations::registerPython();
       ConfigurationExt::registerPython();

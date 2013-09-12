@@ -90,7 +90,7 @@ print 'Calculating pressure...'
 n = int(10)         # we will calculate pressure in 10 layers in z direction
 z0 = Lz / float(n)  # z coordinate of initial layer
 dz = 3.             # area around the layer where the pressure will be calculated
-n_measurements = 10 # result will be averaged over 100 maesurements
+n_measurements = 10 # result will be averaged over 100 measurements
 
 print 'result will be averaged over ', n_measurements, ' measurements'
 
@@ -102,7 +102,7 @@ for i in range(n_measurements):
   print 'measurement Nr:', (i+1), 'of', n_measurements
   
   # compute the tensor for whole box
-  Pijtot += pressure_tensor.compute()
+  Pijtot += espresso.Tensor( pressure_tensor.compute() )
   
   # layerwise
   pij_aux = pressure_tensor.compute(n, dz)
