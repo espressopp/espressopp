@@ -1,36 +1,40 @@
 """
 ************************************
-**PressureTensorLayer** - Analysis
+**PressureTensorMultiLayer** - Analysis
 ************************************
 
-This class computes the pressure tensor of the system in layer h0.
+This class computes the pressure tensor of the system in `n` layers.
+Layers are perpendicular to Z direction and are equidistant(distance is Lz/n).
 It can be used as standalone class in python as well as
 in combination with the integrator extension ExtAnalyze.
 
 Standalone Usage:
 -----------------
 
->>> pt = espresso.analysis.PressureTensorLayer(system, h0, dh)
->>> print "pressure tensor of current configuration = ", pt.compute()
+>>> pt = espresso.analysis.PressureTensorMultiLayer(system, n, dh)
+>>> for i in range(n):
+>>>     print "pressure tensor in layer %d: %s" % ( i, pt.compute())
 
 or 
 
->>> pt = espresso.analysis.PressureTensorLayer(system)
+>>> pt = espresso.analysis.PressureTensorMultiLayer(system, n, dh)
 >>> for k in range(100):
 >>>     integrator.run(100)
 >>>     pt.performMeasurement()
->>> print "average pressure tensor = ", pt.getAverageValue()
+>>> for i in range(n):
+>>>     print "average pressure tensor in layer %d: %s" % ( i, pt.compute())
 
 Usage in integrator with ExtAnalyze:
 ------------------------------------
 
->>> pt           = espresso.analysis.PressureTensorLayer(system)
+>>> pt           = espresso.analysis.PressureTensorMultiLayer(system, n, dh)
 >>> extension_pt = espresso.integrator.ExtAnalyze(pt , interval=100)
 >>> integrator.addExtension(extension_pt)
 >>> integrator.run(10000)
 >>> pt_ave = pt.getAverageValue()
->>> print "average Pressure Tensor = ", pt_ave[:6]
->>> print "          std deviation = ", pt_ave[6:]
+>>> for i in range(n):
+>>>   print "average Pressure Tensor = ", pt_ave[i][:6]
+>>>   print "          std deviation = ", pt_ave[i][6:]
 >>> print "number of measurements  = ", pt.getNumberOfMeasurements()
 
 The following methods are supported:
@@ -40,7 +44,7 @@ The following methods are supported:
 * reset()
     resets average and standard deviation to 0
 * compute()
-    computes the instant pressure tensor in layer h0, return value: [xx, yy, zz, xy, xz, yz]
+    computes the instant pressure tensor in `n` layers, return value: [xx, yy, zz, xy, xz, yz]
 * getAverageValue()
     returns the average pressure tensor and the standard deviation,
     return value: [xx, yy, zz, xy, xz, yz, +-xx, +-yy, +-zz, +-xy, +-xz, +-yz]
@@ -53,18 +57,18 @@ from espresso.esutil import cxxinit
 from espresso import pmi
 
 from espresso.analysis.AnalysisBase import *
-from _espresso import analysis_PressureTensorLayer
+from _espresso import analysis_PressureTensorMultiLayer
 
-class PressureTensorLayerLocal(AnalysisBaseLocal, analysis_PressureTensorLayer):
+class PressureTensorMultiLayerLocal(AnalysisBaseLocal, analysis_PressureTensorMultiLayer):
     'The (local) compute of pressure tensor.'
-    def __init__(self, system, h0, dh):
+    def __init__(self, system, n, dh):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, analysis_PressureTensorLayer, system, h0, dh)
+            cxxinit(self, analysis_PressureTensorMultiLayer, system, n, dh)
 
 if pmi.isController:
-    class PressureTensorLayer(AnalysisBase):
+    class PressureTensorMultiLayer(AnalysisBase):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.PressureTensorLayerLocal',
-            pmiproperty = [ 'h0', 'dh' ]
+            cls =  'espresso.analysis.PressureTensorMultiLayerLocal',
+            pmiproperty = [ 'n', 'dh' ]
         )
