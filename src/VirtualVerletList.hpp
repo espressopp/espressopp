@@ -10,6 +10,9 @@
 #include "boost/signals2.hpp"
 #include "boost/unordered_set.hpp"
 #include "Cell.hpp"
+#include "VerletList.hpp"
+#include "esutil/Array2D.hpp"
+#include "FixedTupleList.hpp"
 
 namespace espresso {
 
@@ -31,7 +34,7 @@ namespace espresso {
 
     */
 
-    VirtualVerletList(shared_ptr< System >, real cut, bool rebuildVL);
+    VirtualVerletList(shared_ptr< System >, real cut, shared_ptr<FixedTupleList> ftpl, bool rebuildVL);
 
     ~VirtualVerletList();
 
@@ -65,6 +68,10 @@ namespace espresso {
     /** Register this class so it can be used from Python. */
     static void registerPython();
 
+    void addTypeToVLMap(int typeI, int typeJ, shared_ptr<VerletList> vl){
+    	vlArray.at(typeI, typeJ)= vl;
+    }
+
     void setCellList(shared_ptr<CellList> _cellList){
     	std::cout<<"cell list set " << _cellList->size() << std::endl;
     	cellList=_cellList;
@@ -85,6 +92,13 @@ namespace espresso {
     boost::signals2::connection connectionResort;
 
     shared_ptr<CellList> cellList;
+
+    typedef std::map<int, shared_ptr<VerletList> > TypeToVLMap;
+    TypeToVLMap typemap;
+
+    esutil::Array2D<shared_ptr<VerletList>, esutil::enlarge> vlArray;
+
+    shared_ptr <FixedTupleList> ftpl;
 
     static LOG4ESPP_DECL_LOGGER(theLogger);
   };

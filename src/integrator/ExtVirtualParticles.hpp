@@ -48,7 +48,7 @@ namespace espresso {
 
       private:
 
-        boost::signals2::connection _initForces, _integrate1, _integrate2;
+        boost::signals2::connection _initForces, _integrate1, _integrate2, _runInit;
         boost::signals2::connection _onCellListsChanged;
 
         void integrate1(real&);
@@ -57,6 +57,8 @@ namespace espresso {
 
         void connect();
         void disconnect();
+
+        void initRun();
 
         //CellList *getCellList(){return &vrealCells;}
 

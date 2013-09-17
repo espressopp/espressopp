@@ -9,6 +9,7 @@
 #include "iterator/CellListAllPairsIterator.hpp"
 #include "esutil/Error.hpp"
 
+
 namespace espresso {
 
   using namespace espresso::iterator;
@@ -18,7 +19,8 @@ namespace espresso {
 /*-------------------------------------------------------------*/
 
   // cut is a cutoff (without skin)
-  VirtualVerletList::VirtualVerletList(shared_ptr<System> system, real _cut, bool rebuildVL) : SystemAccess(system)
+  VirtualVerletList::VirtualVerletList(shared_ptr<System> system, real _cut,
+		  shared_ptr<FixedTupleList> _ftpl, bool rebuildVL) : SystemAccess(system)
   {
     LOG4ESPP_INFO(theLogger, "construct VirtualVerletList, cut = " << _cut);
   
@@ -30,6 +32,7 @@ namespace espresso {
     cutVerlet = cut + system -> getSkin();
     cutsq = cutVerlet * cutVerlet;
     builds = 0;
+    ftpl = _ftpl;
 
     //if (rebuildVL && cellList ) rebuild(); // not called if exclutions are provided
 
@@ -37,6 +40,8 @@ namespace espresso {
     // make a connection to System to invoke rebuild on resort
     connectionResort = system->storage->onParticlesChanged.connect(
         boost::bind(&VirtualVerletList::rebuild, this));
+
+    vlArray = esutil::Array2D<shared_ptr<VerletList>, esutil::enlarge>(0, 0, shared_ptr<VerletList>());
   }
   
   real VirtualVerletList::getVerletCutoff(){
@@ -80,10 +85,12 @@ namespace espresso {
 
     //CellList cl = getSystem()->storage->getRealCells();
     CellList &cl = (*cellList);
-    std::cout<<"VVL got" << cl.size() << std::endl;
+    std::cout << "VVL rebuild: " << cl.size() << std::endl;
+
     LOG4ESPP_DEBUG(theLogger, "local cell list size = " << cl.size());
     for (CellListAllPairsIterator it(cl); it.isValid(); ++it) {
       checkPair(*it->first, *it->second);
+
       LOG4ESPP_DEBUG(theLogger, "checking particles " << it->first->id() << " and " << it->second->id());
     }
     
@@ -101,6 +108,8 @@ namespace espresso {
     Real3D d = pt1.position() - pt2.position();
     real distsq = d.sqr();
 
+    //std::cout << "Handling vp pair" << pt1.id() << " " << pt2.id() << std::endl;
+
     LOG4ESPP_TRACE(theLogger, "p1: " << pt1.id()
                    << " @ " << pt1.position() 
 		   << " - p2: " << pt2.id() << " @ " << pt2.position()
@@ -112,7 +121,38 @@ namespace espresso {
     if (exList.count(std::make_pair(pt1.id(), pt2.id())) == 1) return;
     if (exList.count(std::make_pair(pt2.id(), pt1.id())) == 1) return;
 
-    vlPairs.add(pt1, pt2); // add pair to Verlet List
+
+    //std::cout << "sizex " << vlArray.size_x() << "sizey " << vlArray.size_y() << std::endl;
+    //std::cout << "t1 " << pt1.type() << "t2 " << pt2.type() << std::endl;
+    FixedTupleList::iterator it;
+
+    std::cout << "Unpacking pair ids " << pt1.id() << "  " << pt2.id() << std::endl;
+    std::vector<Particle *> tup1=ftpl->getTupleByID(pt1.id());
+    std::vector<Particle *> tup2=ftpl->getTupleByID(pt2.id());
+
+
+    std::vector<Particle*>::iterator pit1= tup1.begin();
+
+
+    for(; pit1!=tup1.end(); pit1++){
+    	for(std::vector<Particle*>::iterator pit2= tup2.begin(); pit2!=tup2.end(); pit2++){
+    		Particle* p1=*pit1;
+    		Particle* p2=*pit2;
+    		std::cout<< "Mapping t1" << p1->type() << " t2 " <<  p2->type() << " id1 " << p1->id() << " id2 " << p2->id();
+
+    		if (p1->type()< vlArray.size_x() && p2->type()< vlArray.size_y()){
+    				shared_ptr<VerletList> mappedVl=vlArray.at(p1->type(), p2->type());
+    				if (mappedVl){
+    					std::cout<<" to " << mappedVl.get();
+    					mappedVl->vlPairs.add(p1, p2);
+    				}
+    				std::cout << std::endl;
+    		}
+    	}
+    }
+
+
+    //vlPairs.add(pt1, pt2); // add pair to Verlet List
   }
   
   /*-------------------------------------------------------------*/
@@ -174,7 +214,7 @@ namespace espresso {
 
 
     class_<VirtualVerletList, shared_ptr<VirtualVerletList> >
-      ("VirtualVerletList", init< shared_ptr<System>, real, bool >())
+      ("VirtualVerletList", init< shared_ptr<System>, real, shared_ptr<FixedTupleList>, bool >())
       .add_property("system", &SystemAccess::getSystem)
       .add_property("builds", &VirtualVerletList::getBuilds, &VirtualVerletList::setBuilds)
       .def("totalSize", &VirtualVerletList::totalSize)
@@ -187,6 +227,7 @@ namespace espresso {
     
       .def("getVerletCutoff", &VirtualVerletList::getVerletCutoff)
       .def("setCellList", &VirtualVerletList::setCellList)
+      .def("addTypeToVLMap", &VirtualVerletList::addTypeToVLMap)
       ;
   }
 

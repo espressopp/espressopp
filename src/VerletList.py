@@ -6,12 +6,12 @@ from espresso.esutil import cxxinit
 class VerletListLocal(_espresso.VerletList):
     'The (local) verlet list.'
 
-    def __init__(self, system, cutoff, exclusionlist=[]):
+    def __init__(self, system, cutoff, exclusionlist=[], rebuild=True):
         'Local construction of a verlet list'
         if pmi.workerIsActive():
             if (exclusionlist == []):
                 # rebuild list in constructor
-                cxxinit(self, _espresso.VerletList, system, cutoff, True)
+                cxxinit(self, _espresso.VerletList, system, cutoff, rebuild)
             else:
                 # do not rebuild list in constructor
                 cxxinit(self, _espresso.VerletList, system, cutoff, False)

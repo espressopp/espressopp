@@ -39,6 +39,8 @@ namespace espresso {
 
     void ExtVirtualParticles::connect() {
 
+    	_runInit = integrator->runInit.connect(boost::bind(&ExtVirtualParticles::initRun, this));
+
         // connection to after initForces()
         _initForces = integrator->aftInitF.connect(
                 boost::bind(&ExtVirtualParticles::initForces, this));
@@ -55,9 +57,11 @@ namespace espresso {
               boost::bind(&ExtVirtualParticles::onCellListsChanged, this));
     }
 
-
+    void ExtVirtualParticles::initRun(){
+    	rebuildVCellLists();
+    }
     void ExtVirtualParticles::initForces(){
-
+    	rebuildVCellLists();
     }
 
 
@@ -68,7 +72,7 @@ namespace espresso {
 
 
     void ExtVirtualParticles::integrate2() {
-        rebuildVCellLists();
+
 
     }
 
@@ -185,7 +189,6 @@ namespace espresso {
 			ParticleList &part = (*it)->particles;
 
 			for (ParticleList::iterator it2 = part.begin(); it2 != part.end();it2++) {
-				std::vector<int>::iterator idit;
 				Particle &p = (*it2);
 
 				if (std::find(vp_types.begin(), vp_types.end(), p.getType())
@@ -193,7 +196,7 @@ namespace espresso {
 					// This is a virtual particle, update its position based on the COM
 					Real3D com =fixedTupleList->calcTupleCOM(p.getId());
 					p.setPos(com);
-					cellCopy->particles.push_back(p);
+					cellCopy->particles.push_back(p); //copy of p is made
 				}
 			}
 

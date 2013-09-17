@@ -6,15 +6,15 @@ from espresso.esutil import cxxinit
 class VirtualVerletListLocal(_espresso.VirtualVerletList):
     'The (local) verlet list.'
 
-    def __init__(self, system, cutoff, exclusionlist=[]):
+    def __init__(self, system, cutoff, ftpl, exclusionlist=[]):
         'Local construction of a verlet list'
         if pmi.workerIsActive():
             if (exclusionlist == []):
                 # rebuild list in constructor
-                cxxinit(self, _espresso.VirtualVerletList, system, cutoff, True)
+                cxxinit(self, _espresso.VirtualVerletList, system, cutoff, ftpl, True )
             else:
                 # do not rebuild list in constructor
-                cxxinit(self, _espresso.VirtualVerletList, system, cutoff, False)
+                cxxinit(self, _espresso.VirtualVerletList, system, cutoff, ftpl, False)
                 # add exclusions
                 for pair in exclusionlist:
                     pid1, pid2 = pair
@@ -60,6 +60,12 @@ class VirtualVerletListLocal(_espresso.VirtualVerletList):
               pairs.append(pair)
             return pairs 
 
+    def mapTypeToVerletList(self, types, vl):
+		#add a tuple of type. Atoms of that type are put in a seperate vl
+		if pmi.workerIsActive():
+			for t in types:
+				for u in types:
+					self.cxxclass.addTypeToVLMap(self, t, u, vl)
 
 if pmi.isController:
   class VirtualVerletList(object):
@@ -67,6 +73,6 @@ if pmi.isController:
     pmiproxydefs = dict(
       cls = 'espresso.VirtualVerletListLocal',
       pmiproperty = [ 'builds' ],
-      pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff', 'setCellList' ],
+      pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff', 'setCellList','mapTypeToVerletList'],
       pmiinvoke = [ 'getAllPairs' ]
     )

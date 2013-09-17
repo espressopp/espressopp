@@ -106,6 +106,18 @@ namespace espresso {
         return alltuples;
     }
 
+   std::vector<Particle *> FixedTupleList::getTupleByID(int id){
+	   // TODO: enable fast access through an unordererd map id-> tuple
+	   Particle * vp = storage->lookupLocalParticle(id);
+	   TupleList::iterator mapit= this->find(vp);
+	   if (mapit == this->end()){
+		   std::cout << "ERROR: VP with id " << id << "not found." << std::endl;
+		   exit(0);
+	   }
+	   std::cout<< "found id in ftpl: " << id <<std::endl;
+	   return mapit->second;
+   }
+
   void FixedTupleList::
     beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
         std::vector<longint> toSend;

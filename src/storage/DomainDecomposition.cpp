@@ -262,8 +262,9 @@ namespace espresso {
     }
     
     exchangeGhosts();
-    onParticlesChanged();
     onCellListsChanged();
+    onParticlesChanged();
+
   }
 
   void DomainDecomposition::initCellInteractions() {

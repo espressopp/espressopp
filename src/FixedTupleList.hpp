@@ -11,6 +11,7 @@
 #include <boost/signals2.hpp>
 #include "Real3D.hpp"
 
+
 namespace espresso {
   class FixedTupleList : public TupleList {
       protected:
@@ -20,6 +21,7 @@ namespace espresso {
 		typedef std::multimap <longint,tuple > GlobalTuples;
 		GlobalTuples globalTuples;
 		using TupleList::add;
+
 
       //FixedListComm<FixedTupleList, 3> _comm;
 
@@ -34,6 +36,9 @@ namespace espresso {
 		python::list getTuples();
 
 		Real3D calcTupleCOM(int tupleid);
+
+		std::vector<Particle *> getTupleByID(int id);
+
 
 	    /** Get the number of triples in the GlobalTriples list */
 	    int size() {

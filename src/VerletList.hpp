@@ -9,6 +9,7 @@
 #include "SystemAccess.hpp"
 #include "boost/signals2.hpp"
 #include "boost/unordered_set.hpp"
+#include "VirtualVerletList.hpp"
 
 namespace espresso {
 
@@ -63,6 +64,9 @@ namespace espresso {
 
     /** Register this class so it can be used from Python. */
     static void registerPython();
+
+    /**need to access protected functions from VirtualVerletList */
+    friend class VirtualVerletList;
 
   protected:
 
