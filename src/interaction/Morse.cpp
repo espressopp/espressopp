@@ -41,6 +41,8 @@ namespace espresso {
         .def("setPotential", &VerletListMorse::setPotential, return_value_policy< reference_existing_object >())
         .def("getPotential", &VerletListMorse::getPotential, return_value_policy< reference_existing_object >())
         .def("clonePotential", &VerletListMorse::clonePotential)
+        .def("getVerletList", &VerletListMorse::getVerletList)
+        .def("setVerletList", &VerletListMorse::setVerletList)
       ;
 
       class_< VerletListAdressMorse, bases< Interaction > >

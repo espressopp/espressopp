@@ -43,6 +43,8 @@ namespace espresso {
                 .def("setPotential", &VerletListReactionFieldGeneralized::setPotential, return_value_policy< reference_existing_object >())
                 .def("getPotential", &VerletListReactionFieldGeneralized::getPotential, return_value_policy< reference_existing_object >())
                 .def("clonePotential", &VerletListReactionFieldGeneralized::clonePotential)
+                .def("getVerletList", &VerletListReactionFieldGeneralized::getVerletList)
+                .def("setVerletList", &VerletListReactionFieldGeneralized::setVerletList)
             ;
 
             class_<VerletListAdressReactionFieldGeneralized, bases<Interaction> >

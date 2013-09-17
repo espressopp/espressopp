@@ -40,6 +40,12 @@ class VerletListMorseLocal(InteractionLocal, interaction_VerletListMorse):
     def clonePotential(self, type1, type2):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.clonePotential(self, type1, type2)
+    def getVerletListLocal(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getVerletList(self)
+	def setVerletList(self, vl):
+		if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+		  return self.cxxclass.setVerletList(self, vl)
 
 class VerletListAdressMorseLocal(InteractionLocal, interaction_VerletListAdressMorse):
     'The (local) Morse interaction using Verlet lists.'

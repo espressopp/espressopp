@@ -63,6 +63,12 @@ class VerletListTabulatedLocal(InteractionLocal, interaction_VerletListTabulated
     def clonePotential(self, type1, type2):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.clonePotential(self, type1, type2)
+	def getVerletList(self):
+		if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+		  return self.cxxclass.getVerletList(self)
+	def setVerletList(self, vl):
+		if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+		  return self.cxxclass.setVerletList(self, vl)
 
 class CellListTabulatedLocal(InteractionLocal, interaction_CellListTabulated):
     'The (local) tabulated interaction using cell lists.'
@@ -112,7 +118,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListTabulatedLocal',
-            pmicall = ['setPotential','getPotential', 'clonePotential']
+            pmicall = ['setPotential','getPotential', 'clonePotential', 'getVerletList', 'setVerletList']
             )
         
     class CellListTabulated(Interaction):

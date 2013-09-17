@@ -32,6 +32,8 @@ namespace espresso {
         .def("setPotential", &VerletListCoulombTruncated::setPotential, return_value_policy< reference_existing_object >())
         .def("getPotential", &VerletListCoulombTruncated::getPotential, return_value_policy< reference_existing_object >())
         .def("clonePotential", &VerletListCoulombTruncated::clonePotential)
+        .def("getVerletList", &VerletListCoulombTruncated::getVerletList)
+        .def("setVerletList", &VerletListCoulombTruncated::setVerletList)
         ;
 
       class_< CellListCoulombTruncated, bases< Interaction > > 

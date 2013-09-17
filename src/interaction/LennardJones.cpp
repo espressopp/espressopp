@@ -47,6 +47,7 @@ namespace espresso {
         .def("setPotential", &VerletListLennardJones::setPotential, return_value_policy< reference_existing_object >())
         .def("getPotential", &VerletListLennardJones::getPotential, return_value_policy< reference_existing_object >())
         .def("clonePotential", &VerletListLennardJones::clonePotential)
+        .def("setVerletList", &VerletListLennardJones::setVerletList)
       ;
 
       class_< VerletListAdressLennardJones, bases< Interaction > >

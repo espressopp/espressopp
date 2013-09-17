@@ -56,6 +56,8 @@ namespace espresso {
             .def("setPotential", &VerletListTabulated::setPotential, return_value_policy< reference_existing_object >())
             .def("getPotential", &VerletListTabulated::getPotential, return_value_policy< reference_existing_object >())
             .def("clonePotential", &VerletListTabulated::clonePotential)
+            .def("getVerletList", &VerletListTabulated::getVerletList)
+            .def("setVerletList", &VerletListTabulated::setVerletList)
         ;
 
       class_ <VerletListAdressTabulated, bases <Interaction> >
