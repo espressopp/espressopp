@@ -59,6 +59,8 @@ namespace espresso {
       // remove particle from the system
       int removeParticle(longint id);
       
+      void removeAllParticles();
+      
       /* add an adress AT particle with given id, position and it's VP position.
       Adress AT paticles are located only in localAdrATParticles map.
       Note that this is a local operation, and therefore cannot check whether a particle

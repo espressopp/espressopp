@@ -15,6 +15,7 @@
 #include "esutil/Error.hpp"
 
 #include <iostream>
+#include <boost/unordered/unordered_map.hpp>
 using namespace std;
 
 using namespace boost;
@@ -276,6 +277,15 @@ namespace espresso {
       // TODO particle should be removed from different particle groups and lists too
       
     }
+    
+    void Storage::removeAllParticles(){
+      localParticles.clear();
+      for (CellList::iterator it = localCells.begin(), end = localCells.end(); it != end; ++it) {
+        (*it)->particles.clear();
+      }
+      onParticlesChanged();
+    }
+    
 
     Particle* Storage::addAdrATParticle(longint id, const Real3D& p, const Real3D& _vpp) {
 
@@ -720,6 +730,8 @@ namespace espresso {
 	     return_value_policy< reference_existing_object >())
 
 	.def("removeParticle", &Storage::removeParticle)
+      
+	.def("removeAllParticles", &Storage::removeAllParticles)
       
     .def("addAdrATParticle", &Storage::addAdrATParticle,
          return_value_policy< reference_existing_object >())
