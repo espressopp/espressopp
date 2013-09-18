@@ -137,7 +137,7 @@ namespace espresso {
     inline void
     FixedTripleAngleListInteractionTemplate < _AngularPotential >::
     computeVirialX(std::vector<real> &p_xx_total, int bins) {
-        std::cout << "Warning! At the moment computeVirialX in FixedTripleAngleListInteractionTemplate does not work." << std::endl << "Therefore, the corresponding interactions won't be included in calculation." << std::endl;
+        //std::cout << "Warning! At the moment computeVirialX in FixedTripleAngleListInteractionTemplate does not work." << std::endl << "Therefore, the corresponding interactions won't be included in calculation." << std::endl;
     }
 
     template < typename _AngularPotential > inline real
