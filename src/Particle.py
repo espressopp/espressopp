@@ -107,6 +107,11 @@ class ParticleLocal(object):
     @isGhost.setter
     def isGhost(self, val): self.__getTmp().isGhost = val
     
+    @property
+    def lambda_adr(self): return self.__getTmp().lambda_adr
+    @isGhost.setter
+    def lambda_adr(self, val): self.__getTmp().lambda_adr = val
+    
     def getLocalData(self, key):
         tmp = self.storage.lookupRealParticle(self.pid)
         if tmp is not None:

@@ -126,6 +126,7 @@ namespace espresso {
     bool dummy1;
     bool dummy2;
     bool dummy3;
+    real lambda;
   private:
     friend class boost::serialization::access;
     template< class Archive >
@@ -162,6 +163,7 @@ namespace espresso {
       f.fradius = 0.0;
       m.vradius = 0.0;
       l.ghost   = false;
+      l.lambda  = 0.0;
     }
 
     // getter and setter used for export in Python
@@ -244,6 +246,12 @@ namespace espresso {
     bool getGhostStatus() const { return l.ghost; }
     void setGhostStatus(const bool& gs) { l.ghost = gs; }
     
+    // weight/lambda (used in H-Adress)
+    real& lambda() { return l.lambda; }
+    const real& lambda() const { return l.lambda; }
+    real getLambda() const { return l.lambda; }
+    void setLambda(const real& _lambda) { l.lambda = _lambda; }
+
     static void registerPython();
   
     void copyAsGhost(const Particle& src, int extradata, const Real3D& shift) {
