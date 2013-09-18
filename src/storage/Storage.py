@@ -101,6 +101,11 @@ class StorageLocal(object):
       'remove a particle, will return if particle exists on this worker 0 else'
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         return self.cxxclass.removeParticle(self, pid)
+      
+    def removeAllParticles(self):
+      'remove all particles'
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        return self.cxxclass.removeAllParticles(self)
             
     def addAdrATParticle(self, pid, *args):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -268,7 +273,7 @@ if pmi.isController:
     class Storage(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress"],
+            pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress", "removeAllParticles"],
             pmiproperty = [ "system" ]
             )
 

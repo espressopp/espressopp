@@ -2,7 +2,7 @@ from espresso import pmi
 from _espresso import interaction_Interaction
 
 
-unused, Nonbonded, Pair, Angular, Dihedral = range(5)
+unused, Nonbonded, Single, Pair, Angular, Dihedral = range(6)
 
 class InteractionLocal(object):
     """Abstract local base class for interactions."""

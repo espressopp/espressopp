@@ -59,6 +59,8 @@ namespace espresso {
       // remove particle from the system
       int removeParticle(longint id);
       
+      void removeAllParticles();
+      
       /* add an adress AT particle with given id, position and it's VP position.
       Adress AT paticles are located only in localAdrATParticles map.
       Note that this is a local operation, and therefore cannot check whether a particle
@@ -84,6 +86,10 @@ namespace espresso {
         return (it != localParticles.end()) ? it->second : 0;
       }
 
+      Particle* lookupGhostParticle(longint id) {
+        IdParticleMap::iterator it = localParticles.find(id);
+        return (it != localParticles.end() && it->second->ghost() ) ? it->second : 0;
+      }
 
       /** Lookup whether data for a given particle is available on this node. 
        \return 0 if the particle wasn't available, the pointer to the Particle, if it was. */
@@ -121,6 +127,11 @@ namespace espresso {
 
       /// get number of real particles on this node
       longint getNRealParticles() const;
+      
+    // returns number of all particles real and ghost
+      longint getNLocalParticles() const;
+    // returns number of ghosts
+      longint getNGhostParticles() const;
 
       /** insert the particles in the given storage into the current one.
 	  This is mainly used to switch from one storage to another.

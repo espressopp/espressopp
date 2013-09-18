@@ -11,6 +11,7 @@
 #include "Isokinetic.hpp"
 #include "StochasticVelocityRescaling.hpp"
 #include "LangevinThermostat.hpp"
+#include "LangevinThermostat1D.hpp"
 #include "DPDThermostat.hpp"
 #include "LangevinBarostat.hpp"
 #include "FixPositions.hpp"
@@ -36,6 +37,7 @@ namespace espresso {
       StochasticVelocityRescaling::registerPython();
       TDforce::registerPython();
       LangevinThermostat::registerPython();
+      LangevinThermostat1D::registerPython();
       DPDThermostat::registerPython();
       FixPositions::registerPython();
       LatticeBoltzmann::registerPython();

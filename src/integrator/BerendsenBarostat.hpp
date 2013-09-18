@@ -10,6 +10,7 @@
 #include "Extension.hpp"
 
 #include "boost/signals2.hpp"
+#include "Int3D.hpp"
 
 namespace espresso {
   
@@ -22,6 +23,8 @@ namespace espresso {
       public:
         BerendsenBarostat(shared_ptr< System > system);
         
+        void setFixed(Int3D);
+        Int3D getFixed();
         void setTau(real);
         real getTau();
         void setPressure(real);
@@ -29,6 +32,9 @@ namespace espresso {
 
         ~BerendsenBarostat();
 
+        void connect();
+        void disconnect();
+        
         /* Register in Python. */
         static void registerPython();
 
@@ -40,14 +46,15 @@ namespace espresso {
         
         real pref;  // prefactor for the pressure calc
         
+        Int3D fixed; // fixed directions. If (0,1,1) then Lx=const.
+                     // By default (1,1,1). Can not be (0,0,0)
+        real exponent; // precalculated exponent
+        
         void initialize();
 
         /* rescale the system size and coord. of particles */
         void barostat();
 
-        void connect();
-        void disconnect();
-        
         /* Logger */
         static LOG4ESPP_DECL_LOGGER(theLogger);
     };
