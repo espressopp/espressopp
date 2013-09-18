@@ -19,7 +19,7 @@ namespace espresso {
     TDforce::TDforce(shared_ptr<System> system)
     :Extension(system) {
 
-        type = Extension::TDforce;
+        type = Extension::FreeEnergyCompensation;
 
         center = (0.0,0.0,0.0);
 

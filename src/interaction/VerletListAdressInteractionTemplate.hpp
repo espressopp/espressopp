@@ -110,7 +110,7 @@ namespace espresso {
       real dexdhy2; // dexdhy^2
       real dex;
       real dex2; // dex^2
-      std::map<Particle*, real> weights;
+      //std::map<Particle*, real> weights;
 
     };
 
@@ -178,7 +178,17 @@ namespace espresso {
             }
       }*/
 
-      // Compute center of mass and weights for virtual particles in Adress zone (HY and AT region).
+      // Compute center of mass and weights for virtual particles in Adress and CG zone (HY and AT and CG region).
+      
+      std::set<Particle*> cgZone = verletList->getCGZone();
+      for (std::set<Particle*>::iterator it=cgZone.begin();
+          it != cgZone.end(); ++it) {
+
+      Particle &vp = **it;
+      vp.lambda() = 0.0;
+      //weights.insert(std::make_pair(&vp, 0.0));
+      }
+      
       std::set<Particle*> adrZone = verletList->getAdrZone();
       for (std::set<Particle*>::iterator it=adrZone.begin();
               it != adrZone.end(); ++it) {
@@ -248,7 +258,8 @@ namespace espresso {
                    w *= w;
               }
 
-              weights.insert(std::make_pair(&vp, w));
+              vp.lambda() = w;
+              //weights.insert(std::make_pair(&vp, w));
 
               //if (w1 == 1 || w2 == 1) std::cout << p1.id() << " ";
               //std::cout << vp.id() << " weight: " << w << "\n";
@@ -270,8 +281,10 @@ namespace espresso {
          Particle &p2 = *it->second;
 
          // read weights
-         real w1 = weights.find(&p1)->second;
-         real w2 = weights.find(&p2)->second;
+         real w1 = p1.lambda();
+         real w2 = p2.lambda();        
+         //real w1 = weights.find(&p1)->second;
+         //real w2 = weights.find(&p2)->second;
          real w12 = w1 * w2;  // AdResS
 
          // force between VP particles
@@ -340,7 +353,7 @@ namespace espresso {
          }
       }
 
-      weights.clear();     
+      //weights.clear();     
 
       
       // Loop over CG particles and overwrite AT forces and velocity.
@@ -350,7 +363,7 @@ namespace espresso {
       // rotations and vibrations in the CG zone. This leads to failures in the kinetic energy. However, in Force-AdResS there is no energy conservation anyway.
       // Here we calculate CG forces/velocities and distribute them to AT particles. In contrast, in H-AdResS, we calculate AT forces from intra-molecular
       // interactions and inter-molecular center-of-mass interactions and just update the positions of the center-of-mass CG particles.
-      std::set<Particle*> cgZone = verletList->getCGZone();
+      //std::set<Particle*> cgZone = verletList->getCGZone();
       for (std::set<Particle*>::iterator it=cgZone.begin();
                     it != cgZone.end(); ++it) {
 
@@ -485,8 +498,8 @@ namespace espresso {
                    w = cos(pidhy2 * (sqrt(min1sq) - dex));
                    w *= w;
               }
-
-              weights.insert(std::make_pair(&vp, w));
+              vp.lambda() = w;
+              //weights.insert(std::make_pair(&vp, w));
 
               //if (w1 == 1 || w2 == 1) std::cout << p1.id() << " ";
               //std::cout << vp.id() << " weight: " << w << "\n";
@@ -520,9 +533,11 @@ namespace espresso {
            it.isValid(); ++it) {
           counter += 1;
           Particle &p1 = *it->first;
-          Particle &p2 = *it->second;                           
-          real w1 = weights.find(&p1)->second;
-          real w2 = weights.find(&p2)->second;
+          Particle &p2 = *it->second; 
+          real w1 = p1.lambda();
+          real w2 = p2.lambda();
+          //real w1 = weights.find(&p1)->second;
+          //real w2 = weights.find(&p2)->second;
           real w12 = w1 * w2;
           int type1 = p1.type();
           int type2 = p2.type();
@@ -560,7 +575,7 @@ namespace espresso {
           }          
       }
       //std::cout << "Energy AT + CG region:" << e << "\n";
-      std::cout << "Total number of pairs in calculation (AdResS):" << counter << "\n";        
+      //std::cout << "Total number of pairs in calculation (AdResS):" << counter << "\n";        
       real esum;
       boost::mpi::all_reduce(*getVerletList()->getSystem()->comm, e, esum, std::plus<real>());
       return esum;      

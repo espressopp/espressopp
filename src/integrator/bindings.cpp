@@ -5,6 +5,7 @@
 
 #include "Extension.hpp"
 #include "TDforce.hpp"
+#include "FreeEnergyCompensation.hpp"
 #include "Adress.hpp"
 #include "BerendsenBarostat.hpp"
 #include "BerendsenThermostat.hpp"
@@ -36,6 +37,7 @@ namespace espresso {
       Isokinetic::registerPython();
       StochasticVelocityRescaling::registerPython();
       TDforce::registerPython();
+      FreeEnergyCompensation::registerPython();
       LangevinThermostat::registerPython();
       LangevinThermostat1D::registerPython();
       DPDThermostat::registerPython();

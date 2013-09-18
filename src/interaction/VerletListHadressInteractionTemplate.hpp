@@ -97,7 +97,7 @@ namespace espresso {
       virtual void computeVirialTensor(Tensor *w, int n);
       virtual real getMaxCutoff();
       virtual int bondType() { return Nonbonded; }
-
+      
     protected:
       int ntypes;
       shared_ptr<VerletListAdress> verletList;
@@ -112,7 +112,7 @@ namespace espresso {
       real dex;
       real dhy;
       real dex2; // dex^2
-      std::map<Particle*, real> weights;
+      //std::map<Particle*, real> weights;
       std::map<Particle*, real> energydiff;  // Energydifference V_AA - V_CG map for particles in hybrid region for drift term calculation in H-AdResS
       std::set<Particle*> adrZone;  // Virtual particles in AdResS zone (HY and AT region)
 
@@ -140,7 +140,8 @@ namespace espresso {
               it != cgZone.end(); ++it) {
 
           Particle &vp = **it;
-          weights.insert(std::make_pair(&vp, 0.0));
+          vp.lambda() = 0.0;
+          //weights.insert(std::make_pair(&vp, 0.0));
           }
           
           adrZone = verletList->getAdrZone();
@@ -202,7 +203,8 @@ namespace espresso {
                   
                   real w = weight(min1sq);
                   
-                  weights.insert(std::make_pair(&vp, w));
+                  vp.lambda() = w;
+                  //weights.insert(std::make_pair(&vp, w));
 
               }
               else { // this should not happen
@@ -360,9 +362,11 @@ namespace espresso {
          Particle &p2 = *it->second;
 
          // read weights
-         std::map<Particle*, real>::iterator wit;
+         //std::map<Particle*, real>::iterator wit;
+
+         w1 = p1.lambda();
          
-         wit=weights.find(&p1);
+         /*wit=weights.find(&p1);
          if (wit != weights.end()){ w1=wit->second;}
          else { // this should not happen
               std::cout << " Particle has no weight, id: " << p1.id() << std::endl;
@@ -371,8 +375,11 @@ namespace espresso {
               std::cout << " Particle has no weight, fakew: " << test << std::endl;
               exit(1);
               return;
-          }
-         wit=weights.find(&p2);
+          }*/
+         
+         w2 = p2.lambda();
+         
+         /*wit=weights.find(&p2);
          if (wit != weights.end()){ w2=wit->second;}
          else { // this should not happen
               std::cout << " Particle has no weight, id: " << p2.id() << std::endl;
@@ -381,7 +388,7 @@ namespace espresso {
               std::cout << " Particle has no weight, fakew: " << test << std::endl;
               exit(1);
               return;
-          }
+          }*/
          
          
          real w12 = (w1 + w2)/2.0;  // H-AdResS
@@ -484,7 +491,8 @@ namespace espresso {
       for (std::set<Particle*>::iterator it=adrZone.begin();
         it != adrZone.end(); ++it) {   // Iterate over all particles
           Particle &vp = **it;
-          real w = weights.find(&vp)->second;
+          real w = vp.lambda(); 
+          //real w = weights.find(&vp)->second;
                   
           if(w!=1.0 && w!=0.0){   //   only chose those in the hybrid region
               
@@ -523,7 +531,7 @@ namespace espresso {
       
       energydiff.clear();  // clear the energy difference map
       
-      weights.clear();
+      //weights.clear();
 
       // distribute forces from VP to AT (HY and AT region)
       for (std::set<Particle*>::iterator it=adrZone.begin();
@@ -614,9 +622,11 @@ namespace espresso {
            it.isValid(); ++it) {
           counter += 1;
           Particle &p1 = *it->first;
-          Particle &p2 = *it->second;                           
-          real w1 = weights.find(&p1)->second;
-          real w2 = weights.find(&p2)->second;
+          Particle &p2 = *it->second;      
+          real w1 = p1.lambda();
+          real w2 = p2.lambda();
+          //real w1 = weights.find(&p1)->second;
+          //real w2 = weights.find(&p2)->second;
           real w12 = (w1 + w2)/2.0;
           int type1 = p1.type();
           int type2 = p2.type();
@@ -846,9 +856,10 @@ namespace espresso {
          Particle &p2 = *it->second;
      
          // read weights
-         std::map<Particle*, real>::iterator wit;
+         //std::map<Particle*, real>::iterator wit;
          
-         wit=weights.find(&p1);
+         w1 = p1.lambda();
+         /*wit=weights.find(&p1);
          if (wit != weights.end()){ w1=wit->second;}
          else { // this should not happen
               std::cout << " Particle has no weight, id: " << p1.id() << std::endl;
@@ -857,8 +868,10 @@ namespace espresso {
               std::cout << " Particle has no weight, fakew: " << test << std::endl;
               exit(1);
               return;
-          }
-         wit=weights.find(&p2);
+          }*/
+         
+         w2 = p2.lambda();
+         /*wit=weights.find(&p2);
          if (wit != weights.end()){ w2=wit->second;}
          else { // this should not happen
               std::cout << " Particle has no weight, id: " << p2.id() << std::endl;
@@ -867,7 +880,7 @@ namespace espresso {
               std::cout << " Particle has no weight, fakew: " << test << std::endl;
               exit(1);
               return;
-          }         
+          }*/         
          
          real w12 = (w1 + w2)/2.0;  // H-AdResS
         
@@ -1013,7 +1026,7 @@ namespace espresso {
          }
       }
 
-      weights.clear();
+      //weights.clear();
       std::vector <real> p_xx_sum(size);
       for (i = 0; i < bins; ++i)
         {
