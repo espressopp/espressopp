@@ -90,6 +90,7 @@ namespace espresso {
 
       virtual void addForces();
       virtual real computeEnergy();
+      virtual void computeVirialX(std::vector<real> &p_xx_total, int bins); 
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& w);
       virtual void computeVirialTensor(Tensor& w, real z);
@@ -352,7 +353,6 @@ namespace espresso {
       makeWeights();
       
       // Compute forces (AT and VP) of Pairs inside AdResS zone
-      int count = 0;
       for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it) {
          real w1, w2;
          // these are the two VP interacting
@@ -446,9 +446,6 @@ namespace espresso {
                          const PotentialAT &potentialAT = getPotentialAT(p3.type(), p4.type());
                          Real3D force(0.0, 0.0, 0.0);
                          if(potentialAT._computeForce(force, p3, p4)) {
-                            
-                             if(force[0]!=0.0 || force[1]!=0.0 || force[2]!=0.0){count +=1;} 
-                             
                              force *= w12;
                              p3.force() += force;
                              p4.force() -= force;
@@ -481,7 +478,6 @@ namespace espresso {
              }
          }
       }
-            //std::cout << "Count Adr " << count << std::endl;
       
       // H-AdResS - Drift Term part 3
       // Iterate over all particles in the hybrid region and calculate drift force
@@ -664,7 +660,378 @@ namespace espresso {
       return esum;      
     }
 
+    template < typename _PotentialAT, typename _PotentialCG > inline void
+    VerletListHadressInteractionTemplate < _PotentialAT, _PotentialCG >::
+    computeVirialX(std::vector<real> &p_xx_total, int bins) {
+      LOG4ESPP_INFO(theLogger, "compute virial p_xx of the pressure tensor slabwise");
+      
+      std::set<Particle*> cgZone = verletList->getCGZone();
+      for (std::set<Particle*>::iterator it=cgZone.begin();
+              it != cgZone.end(); ++it) {
 
+          Particle &vp = **it;
+
+          FixedTupleListAdress::iterator it3;
+          it3 = fixedtupleList->find(&vp);
+
+          if (it3 != fixedtupleList->end()) {
+
+              std::vector<Particle*> atList;
+              atList = it3->second;
+
+              // compute center of mass
+              Real3D cmp(0.0, 0.0, 0.0); // center of mass position
+              //Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
+              //real M = vp.getMass(); // sum of mass of AT particles
+              for (std::vector<Particle*>::iterator it2 = atList.begin();
+                                   it2 != atList.end(); ++it2) {
+                  Particle *at = *it2;
+                  //Real3D d1 = at.position() - vp.position();
+                  //Real3D d1;
+                  //verletList->getSystem()->bc->getMinimumImageVectorBox(d1, at.position(), vp.position());
+                  //cmp += at.mass() * d1;
+
+                  cmp += at->mass() * at->position();
+                  //cmv += at.mass() * at.velocity();
+              }
+              cmp /= vp.getMass();
+              //cmv /= vp.getMass();
+              //cmp += vp.position(); // cmp is a relative position
+              //std::cout << " cmp M: "  << M << "\n\n";
+              //std::cout << "  moving VP to " << cmp << ", velocitiy is " << cmv << "\n";
+
+              // update (overwrite) the position and velocity of the VP
+              vp.position() = cmp;
+              //vp.velocity() = cmv;
+
+          }
+          else { // this should not happen
+              std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
+              std::cout << " (" << vp.position() << ")\n";
+              exit(1);
+              return;
+          }
+      }
+      
+      std::set<Particle*> adrZone = verletList->getAdrZone();
+      for (std::set<Particle*>::iterator it=adrZone.begin();
+              it != adrZone.end(); ++it) {
+
+          Particle &vp = **it;
+
+          FixedTupleListAdress::iterator it3;
+          it3 = fixedtupleList->find(&vp);
+
+          if (it3 != fixedtupleList->end()) {
+
+              std::vector<Particle*> atList;
+              atList = it3->second;
+
+              // compute center of mass
+              Real3D cmp(0.0, 0.0, 0.0); // center of mass position
+              //Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
+              //real M = vp.getMass(); // sum of mass of AT particles
+              for (std::vector<Particle*>::iterator it2 = atList.begin();
+                                   it2 != atList.end(); ++it2) {
+                  Particle &at = **it2;
+                  //Real3D d1 = at.position() - vp.position();
+                  //Real3D d1;
+                  //verletList->getSystem()->bc->getMinimumImageVectorBox(d1, at.position(), vp.position());
+                  //cmp += at.mass() * d1;
+
+                  cmp += at.mass() * at.position();
+                  //cmv += at.mass() * at.velocity();
+              }
+              cmp /= vp.getMass();
+              //cmv /= vp.getMass();
+              //cmp += vp.position(); // cmp is a relative position
+              //std::cout << " cmp M: "  << M << "\n\n";
+              //std::cout << "  moving VP to " << cmp << ", velocitiy is " << cmv << "\n";
+
+              // update (overwrite) the position and velocity of the VP
+              vp.position() = cmp;
+              //vp.velocity() = cmv;
+
+          }
+          else { // this should not happen
+              std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
+              std::cout << " (" << vp.position() << ")\n";
+              exit(1);
+              return;
+          }
+      }
+      
+      int i = 0;
+      int bin1 = 0;
+      int bin2 = 0;
+      
+      System& system = verletList->getSystemRef();
+      Real3D Li = system.bc->getBoxL();
+      real Delta_x = Li[0] / (real)bins;
+      real ThreeVolume = Li[1] * Li[2] * Delta_x * 3.0;
+      //real Volume = Li[1] * Li[2] * Delta_x;
+                    
+      size_t size = bins;
+      std::vector <real> p_xx_local(size);
+      for (i = 0; i <= bins; ++i)
+        {
+          p_xx_local[i] = 0.0;
+        }
+      
+      for (PairList::Iterator it(verletList->getPairs());                
+           it.isValid(); ++it) {                                         
+        Particle &p1 = *it->first;                                       
+        Particle &p2 = *it->second;                                      
+        int type1 = p1.type();                                           
+        int type2 = p2.type();
+        const PotentialCG &potential = getPotentialCG(type1, type2);
+
+        Real3D force(0.0, 0.0, 0.0);
+        if(potential._computeForce(force, p1, p2)) {
+          Real3D dist = p1.position() - p2.position();
+          real vir_temp = 0.5 * dist[0] * force[0];
+          
+          if (p1.position()[0] > Li[0])
+          {
+              real p1_wrap = p1.position()[0] - Li[0];
+              bin1 = floor (p1_wrap / Delta_x);    
+          }         
+          else if (p1.position()[0] < 0.0)
+          {
+              real p1_wrap = p1.position()[0] + Li[0];
+              bin1 = floor (p1_wrap / Delta_x);    
+          }
+          else
+          {
+              bin1 = floor (p1.position()[0] / Delta_x);          
+          }
+          
+          if (p2.position()[0] > Li[0])
+          {
+              real p2_wrap = p2.position()[0] - Li[0];
+              bin2 = floor (p2_wrap / Delta_x);     
+          }         
+          else if (p2.position()[0] < 0.0)
+          {
+              real p2_wrap = p2.position()[0] + Li[0];
+              bin2 = floor (p2_wrap / Delta_x);     
+          }
+          else
+          {
+              bin2 = floor (p2.position()[0] / Delta_x);          
+          }
+              
+          //int bin1 = floor (p1.position()[0] / Delta_x);
+          //int bin2 = floor (p2.position()[0] / Delta_x);
+          
+          if (bin1 >= p_xx_local.size() || bin2 >= p_xx_local.size()){
+              std::cout << "p_xx_local.size() " << p_xx_local.size() << "\n";
+              std::cout << "bin1 " << bin1 << " bin2 " << bin2 << "\n";
+              std::cout << "p1.position()[0] " << p1.position()[0] << " p2.position()[0]" << p2.position()[0] << "\n";
+              std::cout << "FATAL ERROR: computeVirialX error" << "\n";
+              exit(0);
+          }
+          
+          p_xx_local[bin1] += vir_temp;
+          p_xx_local[bin2] += vir_temp;            
+        }
+      }
+      
+      makeWeights();
+      
+      for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it) {
+         real w1, w2;
+         // these are the two VP interacting
+         Particle &p1 = *it->first;
+         Particle &p2 = *it->second;
+     
+         // read weights
+         std::map<Particle*, real>::iterator wit;
+         
+         wit=weights.find(&p1);
+         if (wit != weights.end()){ w1=wit->second;}
+         else { // this should not happen
+              std::cout << " Particle has no weight, id: " << p1.id() << std::endl;
+              std::cout << " Particle has no weight, pos: " << p1.position() << std::endl;
+              real test=wit->second;
+              std::cout << " Particle has no weight, fakew: " << test << std::endl;
+              exit(1);
+              return;
+          }
+         wit=weights.find(&p2);
+         if (wit != weights.end()){ w2=wit->second;}
+         else { // this should not happen
+              std::cout << " Particle has no weight, id: " << p2.id() << std::endl;
+              std::cout << " Particle has no weight, pos: " << p2.position() << std::endl;
+              real test=wit->second;
+              std::cout << " Particle has no weight, fakew: " << test << std::endl;
+              exit(1);
+              return;
+          }         
+         
+         real w12 = (w1 + w2)/2.0;  // H-AdResS
+        
+         // force between VP particles
+         int type1 = p1.type();
+         int type2 = p2.type();
+         const PotentialCG &potentialCG = getPotentialCG(type1, type2);
+         Real3D forcevp(0.0, 0.0, 0.0);
+                if (w12 != 1.0) { // calculate VP force if both VP are outside AT region (CG-HY, HY-HY)
+                    if (potentialCG._computeForce(forcevp, p1, p2)) {
+                          forcevp *= (1.0 - w12);
+                          Real3D dist = p1.position() - p2.position();
+                          real vir_temp = 0.5 * dist[0] * forcevp[0];
+                          
+                          if (p1.position()[0] > Li[0])
+                          {
+                              real p1_wrap = p1.position()[0] - Li[0];
+                              bin1 = floor (p1_wrap / Delta_x);    
+                          }         
+                          else if (p1.position()[0] < 0.0)
+                          {
+                              real p1_wrap = p1.position()[0] + Li[0];
+                              bin1 = floor (p1_wrap / Delta_x);    
+                          }
+                          else
+                          {
+                              bin1 = floor (p1.position()[0] / Delta_x);          
+                          }
+
+                          if (p2.position()[0] > Li[0])
+                          {
+                              real p2_wrap = p2.position()[0] - Li[0];
+                              bin2 = floor (p2_wrap / Delta_x);     
+                          }         
+                          else if (p2.position()[0] < 0.0)
+                          {
+                              real p2_wrap = p2.position()[0] + Li[0];
+                              bin2 = floor (p2_wrap / Delta_x);     
+                          }
+                          else
+                          {
+                              bin2 = floor (p2.position()[0] / Delta_x);          
+                          }
+                          
+                          //int bin1 = floor (p1.position()[0] / Delta_x);
+                          //int bin2 = floor (p2.position()[0] / Delta_x);
+                          p_xx_local[bin1] += vir_temp;
+                          p_xx_local[bin2] += vir_temp;        
+                    }
+                }
+       
+         // force between AT particles
+         if (w12 != 0.0) { // calculate AT force if both VP are outside CG region (HY-HY, HY-AT, AT-AT)
+             FixedTupleListAdress::iterator it3;
+             FixedTupleListAdress::iterator it4;
+             it3 = fixedtupleList->find(&p1);
+             it4 = fixedtupleList->find(&p2);
+
+             //std::cout << "Interaction " << p1.id() << " - " << p2.id() << "\n";
+             if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end()) {
+
+                 std::vector<Particle*> atList1;
+                 std::vector<Particle*> atList2;
+                 atList1 = it3->second;
+                 atList2 = it4->second;
+     
+                 //std::cout << "AT forces ...\n";
+                 for (std::vector<Particle*>::iterator itv = atList1.begin();
+                         itv != atList1.end(); ++itv) {
+
+                     Particle &p3 = **itv;
+
+                     for (std::vector<Particle*>::iterator itv2 = atList2.begin();
+                                          itv2 != atList2.end(); ++itv2) {
+
+                         Particle &p4 = **itv2;
+
+                         // AT forces
+                         const PotentialAT &potentialAT = getPotentialAT(p3.type(), p4.type());
+                         Real3D force(0.0, 0.0, 0.0);
+                         if(potentialAT._computeForce(force, p3, p4)) {
+                              force *= w12;
+                              Real3D dist = p3.position() - p4.position();
+                              real vir_temp = 0.5 * dist[0] * force[0];
+                              //int bin1 = floor (p3.position()[0] / Delta_x);
+                              //int bin2 = floor (p4.position()[0] / Delta_x);
+                              
+                              if (p3.position()[0] > Li[0])
+                              {
+                                  real p3_wrap = p3.position()[0] - Li[0];
+                                  bin1 = floor (p3_wrap / Delta_x);    
+                              }         
+                              else if (p3.position()[0] < 0.0)
+                              {
+                                  real p3_wrap = p3.position()[0] + Li[0];
+                                  bin1 = floor (p3_wrap / Delta_x);    
+                              }
+                              else
+                              {
+                                  bin1 = floor (p3.position()[0] / Delta_x);          
+                              }
+
+                              if (p4.position()[0] > Li[0])
+                              {
+                                  real p4_wrap = p4.position()[0] - Li[0];
+                                  bin2 = floor (p4_wrap / Delta_x);     
+                              }         
+                              else if (p4.position()[0] < 0.0)
+                              {
+                                  real p4_wrap = p4.position()[0] + Li[0];
+                                  bin2 = floor (p4_wrap / Delta_x);     
+                              }
+                              else
+                              {
+                                  bin2 = floor (p4.position()[0] / Delta_x);          
+                              }
+
+                              //int bin1 = floor (p1.position()[0] / Delta_x);
+                              //int bin2 = floor (p2.position()[0] / Delta_x);
+
+                              if (bin1 >= p_xx_local.size() || bin2 >= p_xx_local.size()){
+                                  std::cout << "p_xx_local.size() " << p_xx_local.size() << "\n";
+                                  std::cout << "bin1 " << bin1 << " bin2 " << bin2 << "\n";
+                                  std::cout << "p3.position()[0] " << p3.position()[0] << " p4.position()[0]" << p4.position()[0] << "\n";
+                                  std::cout << "FATAL ERROR: computeVirialX error" << "\n";
+                                  exit(0);
+                              }                             
+                              
+                              p_xx_local[bin1] += vir_temp;
+                              p_xx_local[bin2] += vir_temp;        
+                         }                     
+                     }
+
+                 }
+             }
+             else { // this should not happen
+                 std::cout << " one of the VP particles not found in tuples: " << p1.id() << "-" <<
+                         p1.ghost() << ", " << p2.id() << "-" << p2.ghost();
+                 std::cout << " (" << p1.position() << ") (" << p2.position() << ")\n";
+                 exit(1);
+                 return;
+             }
+         }
+      }
+
+      weights.clear();
+      std::vector <real> p_xx_sum(size);
+      for (i = 0; i < bins; ++i)
+        {
+          p_xx_sum[i] = 0.0;         
+          boost::mpi::all_reduce(*mpiWorld, p_xx_local[i], p_xx_sum[i], std::plus<real>());
+        }
+   
+      std::transform(p_xx_sum.begin(), p_xx_sum.end(), p_xx_sum.begin(),std::bind1st(std::divides<real>(),ThreeVolume));     
+      std::transform(p_xx_total.begin(), p_xx_total.end(), p_xx_sum.begin(), p_xx_sum.begin(),std::plus<real>());    
+      
+      /*for(int i=0; i < bins; ++i){
+        p_xx_sum[i] /= (ThreeVolume);
+      }*/
+      
+      /*for(int i=0; i < bins; ++i){ 
+        p_xx_total[i] += p_xx_sum[i];
+      }*/
+    }
 
 
 

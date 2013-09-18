@@ -5,7 +5,7 @@ from espresso.analysis.Observable import *
 from _espresso import analysis_XDensity
 
 class XDensityLocal(ObservableLocal, analysis_XDensity):
-  'The (local) compute the radial distr function.'
+  'The (local) compute the density profile in x direction.'
   def __init__(self, system):
     cxxinit(self, analysis_XDensity, system)
     

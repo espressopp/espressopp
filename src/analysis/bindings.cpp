@@ -23,6 +23,7 @@
 #include "RDFatomistic.hpp"
 #include "Viscosity.hpp"
 #include "XDensity.hpp"
+#include "XPressure.hpp"
 #include "Test.hpp"
 
 #include "IntraChainDistSq.hpp"
@@ -58,6 +59,7 @@ namespace espresso {
       StaticStructF::registerPython();
       RDFatomistic::registerPython();
       XDensity::registerPython();
+      XPressure::registerPython();
       Test::registerPython();
       
       Autocorrelation::registerPython();

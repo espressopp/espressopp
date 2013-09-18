@@ -27,4 +27,5 @@ from espresso.analysis.RDFatomistic import *
 from espresso.analysis.Energy import *
 from espresso.analysis.Viscosity import *
 from espresso.analysis.XDensity import *
+from espresso.analysis.XPressure import *
 from espresso.analysis.Test import *
