@@ -70,27 +70,56 @@ namespace espresso {
 
 
     void FreeEnergyCompensation::applyForce() {
-          LOG4ESPP_DEBUG(theLogger, "apply TD force");
+          LOG4ESPP_DEBUG(theLogger, "apply Free Energy Compensation force");
 
           System& system = getSystemRef();
 
           // iterate over CG particles
           CellList cells = system.storage->getRealCells();
+          shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
+          FixedTupleListAdress::iterator it2;
           for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
 
-              Table table = forces.find(cit->getType())->second;
-
+              Table table = forces.find(cit->getType())->second;                                       
               if (table) {
+                  
+                  Particle &vp = *cit;
+                  real weight = vp.lambda();  
+
+                  if (weight != 1.0 && weight != 0.0){
+                          real fforce = table->getForce(weight);                          
+                          real dist = vp.position()[0]-center[0];
+                          if ( dist >= 0.0 ) {dist = 1.0;}
+                          else {dist = -1.0;}
+                          fforce *=dist;
+                          
+                          it2 = fixedtupleList->find(&vp);
+                          if (it2 != fixedtupleList->end()) {  // Are there atomistic particles for given CG particle? If yes, use those for calculation.
+                                std::vector<Particle*> atList;
+                                atList = it2->second;
+                                for (std::vector<Particle*>::iterator it3 = atList.begin();
+                                                     it3 != atList.end(); ++it3) {
+                                    Particle &at = **it3;
+                                    at.force()[0] += vp.lambdaDeriv() * at.mass() * fforce / vp.mass();
+                                }  
+                          }
+                          else{   // If not, use CG particle itself for calculation.
+                                     std::cout << "Particle " << vp.id() << " not found in tuples!" << std::endl << "It's unclear how FEC work when combining particles, which do change resolution with particles that don't." << std::endl;
+                                     exit(1);
+                                     return;
+                          }
+                  }
                   // calculate distance from reference point
-                  Real3D dist3D = cit->getPos() - center;
-                  real dist = sqrt(dist3D.sqr());
+                  //real dist3D = cit->getPos()[0] - center[0];                  // X SPLIT VS SPHERE CHANGE
+                  //Real3D dist3D = cit->getPos() - center;                    // X SPLIT VS SPHERE CHANGE
+
 
                   // read fforce from table
-                  real fforce = table->getForce(dist);
-                  fforce /= dist;
-
-                  // substract td force
-                  cit->force() -= (dist3D * fforce);
+                  //real fforce = table->getForce(weight);
+                  //fforce = fforce /
+                  
+                  // add FEC force
+                  //cit->force()[0] += fforce;
 
                   /*
                   // use this if you need 1-dir force only!
@@ -99,9 +128,42 @@ namespace espresso {
                   cit->force()[0] -= force;
                   */
               }
+              else{
+                  std::cout << "ERROR: Using FEC Extension without providing table." << std::endl;
+                  exit(1);
+                  return;              
+              } 
+              
           }
     }
 
+    real FreeEnergyCompensation::computeCompEnergy() {
+          LOG4ESPP_DEBUG(theLogger, "compute Free Energy Compensation Energies");
+          
+          real CompEnergy = 0.0;
+          real CompEnergySum = 0.0;
+          System& system = getSystemRef();
+
+          // iterate over CG particles
+          CellList cells = system.storage->getRealCells();
+          for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
+
+              Table table = forces.find(cit->getType())->second;                                       
+              if (table) {                 
+                  Particle &vp = *cit;
+                  real weight = vp.lambda();  
+                  CompEnergy += table->getEnergy(weight);                               
+              }
+              else{
+                  std::cout << "ERROR: Using FEC Extension without providing table." << std::endl;
+                  exit(1);
+                  return 0.0;              
+              } 
+           
+          }
+          mpi::all_reduce(*getSystem()->comm, CompEnergy, CompEnergySum, std::plus<real>());          
+          return CompEnergySum;
+    }
 
     void FreeEnergyCompensation::setCenter(real x, real y, real z){
             center = Real3D(x, y, z);
@@ -115,19 +177,23 @@ namespace espresso {
 
       using namespace espresso::python;
 
-      void (FreeEnergyCompensation::*pySetCenter)(real x, real y, real z)
-                        = &FreeEnergyCompensation::setCenter;
+      //void (FreeEnergyCompensation::*pySetCenter)(real x, real y, real z)
+      //                  = &FreeEnergyCompensation::setCenter;
 
-      void (FreeEnergyCompensation::*pyAddForce)(int itype, const char* filename, int type)
-                        = &FreeEnergyCompensation::addForce;
+      //void (FreeEnergyCompensation::*pyAddForce)(int itype, const char* filename, int type)
+      //                  = &FreeEnergyCompensation::addForce;
+      
+      //real (FreeEnergyCompensation::*pyComputeCompEnergy)()
+      //                  = &FreeEnergyCompensation::computeCompEnergy;
 
       class_<FreeEnergyCompensation, shared_ptr<FreeEnergyCompensation>, bases<Extension> >
         ("integrator_FreeEnergyCompensation", init< shared_ptr<System> >())
         .add_property("filename", &FreeEnergyCompensation::getFilename)
         .def("connect", &FreeEnergyCompensation::connect)
         .def("disconnect", &FreeEnergyCompensation::disconnect)
-        .def("setCenter", pySetCenter)
-        .def("addForce", pyAddForce)
+        .def("setCenter", &FreeEnergyCompensation::setCenter) // pySetCenter)
+        .def("addForce",  &FreeEnergyCompensation::addForce )// pyAddForce)
+        .def("computeCompEnergy", &FreeEnergyCompensation::computeCompEnergy)
         ;
     }
 

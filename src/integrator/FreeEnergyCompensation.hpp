@@ -30,6 +30,8 @@ namespace espresso {
         const char* getFilename() const { return filename.c_str(); }
 
         void applyForce();
+        
+        real computeCompEnergy();
 
         void setCenter(real x, real y, real z);
 

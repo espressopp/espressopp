@@ -127,6 +127,7 @@ namespace espresso {
     bool dummy2;
     bool dummy3;
     real lambda;
+    real lambdaDeriv;
   private:
     friend class boost::serialization::access;
     template< class Archive >
@@ -156,14 +157,15 @@ namespace espresso {
 
     void init() {
       m.v[0] = m.v[1] = m.v[2] = 0.0;
-      p.type    = 0;
-      p.mass    = 1.0;
-      p.q       = 0.0;
-      r.radius  = 1.0;
-      f.fradius = 0.0;
-      m.vradius = 0.0;
-      l.ghost   = false;
-      l.lambda  = 0.0;
+      p.type         = 0;
+      p.mass         = 1.0;
+      p.q            = 0.0;
+      r.radius       = 1.0;
+      f.fradius      = 0.0;
+      m.vradius      = 0.0;
+      l.ghost        = false;
+      l.lambda       = 0.0;      
+      l.lambdaDeriv  = 0.0;      
     }
 
     // getter and setter used for export in Python
@@ -251,6 +253,12 @@ namespace espresso {
     const real& lambda() const { return l.lambda; }
     real getLambda() const { return l.lambda; }
     void setLambda(const real& _lambda) { l.lambda = _lambda; }
+    
+    // weight/lambda derivative (used in H-Adress)
+    real& lambdaDeriv() { return l.lambdaDeriv; }
+    const real& lambdaDeriv() const { return l.lambdaDeriv; }
+    real getLambdaDeriv() const { return l.lambdaDeriv; }
+    void setLambdaDeriv(const real& _lambdaDeriv) { l.lambdaDeriv = _lambdaDeriv; }
 
     static void registerPython();
   

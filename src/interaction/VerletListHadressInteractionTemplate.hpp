@@ -201,11 +201,13 @@ namespace espresso {
                        if (distsq1 < min1sq) min1sq = distsq1;
                   }
                   
-                  real w = weight(min1sq);
-                  
-                  vp.lambda() = w;
+                  real w = weight(min1sq);                  
+                  vp.lambda() = w;                  
                   //weights.insert(std::make_pair(&vp, w));
-
+                  
+                  real wDeriv = weightderivative(sqrt(min1sq));
+                  vp.lambdaDeriv() = wDeriv;
+                  
               }
               else { // this should not happen
                   std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";

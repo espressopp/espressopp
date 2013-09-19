@@ -20,6 +20,7 @@ namespace espresso {
       .add_property("imageBox", &Particle::getImageBox, &Particle::setImageBox)
       .add_property("isGhost", &Particle::getGhostStatus, &Particle::setGhostStatus)
       .add_property("lambda_adr", &Particle::getLambda, &Particle::setLambda)
+      .add_property("lambda_adrd", &Particle::getLambdaDeriv, &Particle::setLambdaDeriv)
       ;
   }
 }
