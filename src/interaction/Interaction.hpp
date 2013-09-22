@@ -19,6 +19,8 @@ namespace espresso {
       virtual ~Interaction() {};
       virtual void addForces() = 0;
       virtual real computeEnergy() = 0;
+      virtual real computeEnergyAA() = 0;
+      virtual real computeEnergyCG() = 0;
       virtual real computeVirial() = 0;
       virtual void computeVirialTensor(Tensor& w) = 0;      
       virtual void computeVirialX(std::vector<real> &p_xx_total, int bins) = 0; 

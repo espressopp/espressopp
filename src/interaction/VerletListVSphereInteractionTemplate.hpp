@@ -66,6 +66,8 @@ namespace espresso {
 
       virtual void addForces();
       virtual real computeEnergy();
+      virtual real computeEnergyAA();
+      virtual real computeEnergyCG();      
       virtual void computeVirialX(std::vector<real> &p_xx_total, int bins); 
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& w);
@@ -136,11 +138,25 @@ namespace espresso {
       return esum;
     }
     
+    template < typename _Potential > inline real
+    VerletListVSphereInteractionTemplate < _Potential >::
+    computeEnergyAA() {
+      std::cout << "Warning! At the moment computeEnergyAA() in VerletListVSphereInteractionTemplate does not work." << std::endl;
+      return 0.0;
+    }
+    
+    template < typename _Potential > inline real
+    VerletListVSphereInteractionTemplate < _Potential >::
+    computeEnergyCG() {
+      std::cout << "Warning! At the moment computeEnergyCG() in VerletListVSphereInteractionTemplate does not work." << std::endl;
+      return 0.0;
+    }
+    
     template < typename _Potential >
     inline void
     VerletListVSphereInteractionTemplate < _Potential >::
     computeVirialX(std::vector<real> &p_xx_total, int bins) {
-        //std::cout << "Warning! At the moment computeVirialX in VerletListInteractionTemplate does not work." << std::endl << "Therefore, the corresponding interactions won't be included in calculation." << std::endl;
+        std::cout << "Warning! At the moment computeVirialX in VerletListInteractionTemplate does not work." << std::endl << "Therefore, the corresponding interactions won't be included in calculation." << std::endl;
     }
 
     template < typename _Potential > inline real
