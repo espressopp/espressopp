@@ -53,7 +53,7 @@ namespace espresso {
 
             class_<VerletListHadressReactionFieldGeneralized, bases<Interaction> >
                 ("interaction_VerletListHadressReactionFieldGeneralized",
-                        init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+                        init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress>, bool >())
                 .def("setPotentialAT", &VerletListHadressReactionFieldGeneralized::setPotentialAT)
                 .def("setPotentialCG", &VerletListHadressReactionFieldGeneralized::setPotentialCG);
             ;

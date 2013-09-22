@@ -51,9 +51,9 @@ class VerletListAdressLennardJonesAutoBondsLocal(InteractionLocal, interaction_V
             
 class VerletListHadressLennardJonesAutoBondsLocal(InteractionLocal, interaction_VerletListHadressLennardJonesAutoBonds):
     'The (local) Lennard Jones auto bonds interaction using Verlet lists.'
-    def __init__(self, vl, fixedtupleList):
+    def __init__(self, vl, fixedtupleList, KTI = False):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListHadressLennardJonesAutoBonds, vl, fixedtupleList)
+            cxxinit(self, interaction_VerletListHadressLennardJonesAutoBonds, vl, fixedtupleList, KTI)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

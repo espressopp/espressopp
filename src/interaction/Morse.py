@@ -53,9 +53,9 @@ class VerletListAdressMorseLocal(InteractionLocal, interaction_VerletListAdressM
             
 class VerletListHadressMorseLocal(InteractionLocal, interaction_VerletListHadressMorse):
     'The (local) Morse interaction using Verlet lists.'
-    def __init__(self, vl, fixedtupleList):
+    def __init__(self, vl, fixedtupleList, KTI = False):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListHadressMorse, vl, fixedtupleList)
+            cxxinit(self, interaction_VerletListHadressMorse, vl, fixedtupleList, KTI)
 
     def setPotentialAT(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

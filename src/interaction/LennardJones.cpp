@@ -67,7 +67,7 @@ namespace espresso {
       class_< VerletListHadressLennardJones, bases< Interaction > >
         ("interaction_VerletListHadressLennardJones",
            init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress> >())
+                  shared_ptr<FixedTupleListAdress>, bool >())
         .def("setPotentialAT", &VerletListHadressLennardJones::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressLennardJones::setPotentialCG);
       ;
@@ -75,7 +75,7 @@ namespace espresso {
       class_< VerletListHadressLennardJones2, bases< Interaction > >
         ("interaction_VerletListHadressLennardJones2",
            init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress> >())
+                  shared_ptr<FixedTupleListAdress>, bool >())
         .def("setPotentialAT", &VerletListHadressLennardJones2::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressLennardJones2::setPotentialCG);
       ;

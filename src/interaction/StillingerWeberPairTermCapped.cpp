@@ -54,7 +54,7 @@ namespace espresso {
       class_< VerletListHadressStillingerWeberPairTermCapped, bases< Interaction > >
         ("interaction_VerletListHadressStillingerWeberPairTermCapped",
             init< shared_ptr<VerletListAdress>,
-            shared_ptr<FixedTupleListAdress> >())
+            shared_ptr<FixedTupleListAdress>, bool >())
         .def("setPotentialAT", &VerletListHadressStillingerWeberPairTermCapped::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressStillingerWeberPairTermCapped::setPotentialCG);
       ;

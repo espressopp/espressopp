@@ -525,7 +525,8 @@ namespace espresso {
               }
               min1sq = sqrt(min1sq);   // distance to nearest adress particle or center
               mindriftforce = (1.0/min1sq)*mindriftforce;  // normalized driftforce vector
-              mindriftforce *= weightderivative(min1sq);  // multiplication with derivative of the weighting function
+              //mindriftforce *= weightderivative(min1sq);  // multiplication with derivative of the weighting function
+              mindriftforce *= vp.lambdaDeriv();  // multiplication with derivative of the weighting function
               mindriftforce *= 0.5;
               mindriftforce *= energydiff.find(&vp)->second;   // get the energy differences which were calculated previously and put in drift force
               //vp.force() += mindriftforce;   // add drift force to virtual particles                                                                    // X SPLIT VS SPHERE CHANGE
