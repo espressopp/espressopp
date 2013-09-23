@@ -134,7 +134,7 @@ class StorageLocal(object):
             index_vradius     = -1
             index_type        = -1
             index_mass        = -1            
-            index_adrA        = -1 # adress AT particle if 1
+            index_adrAT       = -1 # adress AT particle if 1
             index_lambda_adr  = -1
             index_lambda_adrd = -1
             
