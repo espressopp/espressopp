@@ -123,7 +123,56 @@ namespace espresso {
     VerletListAdressInteractionTemplate < _PotentialAT, _PotentialCG >::
     addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
+      std::set<Particle*> cgZone = verletList->getCGZone();
+      for (std::set<Particle*>::iterator it=cgZone.begin();
+              it != cgZone.end(); ++it) {
 
+          Particle &vp = **it;
+          vp.lambda() = 0.0;
+          
+          FixedTupleListAdress::iterator it3;
+          it3 = fixedtupleList->find(&vp);
+
+          if (it3 != fixedtupleList->end()) {
+
+              std::vector<Particle*> atList;
+              atList = it3->second;
+
+              // compute center of mass
+              Real3D cmp(0.0, 0.0, 0.0); // center of mass position
+              //Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
+              //real M = vp.getMass(); // sum of mass of AT particles
+              for (std::vector<Particle*>::iterator it2 = atList.begin();
+                                   it2 != atList.end(); ++it2) {
+                  Particle *at = *it2;
+                  //Real3D d1 = at.position() - vp.position();
+                  //Real3D d1;
+                  //verletList->getSystem()->bc->getMinimumImageVectorBox(d1, at.position(), vp.position());
+                  //cmp += at.mass() * d1;
+
+                  cmp += at->mass() * at->position();
+                  //cmv += at.mass() * at.velocity();
+              }
+              cmp /= vp.getMass();
+              //cmv /= vp.getMass();
+              //cmp += vp.position(); // cmp is a relative position
+              //std::cout << " cmp M: "  << M << "\n\n";
+              //std::cout << "  moving VP to " << cmp << ", velocitiy is " << cmv << "\n";
+
+              // update (overwrite) the position and velocity of the VP
+              vp.position() = cmp;
+              //vp.velocity() = cmv;
+
+          }
+          else { // this should not happen
+              std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
+              std::cout << " (" << vp.position() << ")\n";
+              exit(1);
+              return;
+          }
+      }     
+      
+      
       // Pairs not inside the AdResS Zone (CG region)
       for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
 
@@ -182,14 +231,14 @@ namespace espresso {
 
       // Compute center of mass and weights for virtual particles in Adress and CG zone (HY and AT and CG region).
       
-      std::set<Particle*> cgZone = verletList->getCGZone();
+      /*std::set<Particle*> cgZone = verletList->getCGZone();
       for (std::set<Particle*>::iterator it=cgZone.begin();
           it != cgZone.end(); ++it) {
 
       Particle &vp = **it;
       vp.lambda() = 0.0;
       //weights.insert(std::make_pair(&vp, 0.0));
-      }
+      }*/
       
       std::set<Particle*> adrZone = verletList->getAdrZone();
       for (std::set<Particle*>::iterator it=adrZone.begin();
@@ -431,6 +480,15 @@ namespace espresso {
     inline real
     VerletListAdressInteractionTemplate < _PotentialAT, _PotentialCG >::
     computeEnergy() {
+ 
+      std::set<Particle*> cgZone = verletList->getCGZone();
+      for (std::set<Particle*>::iterator it=cgZone.begin();
+          it != cgZone.end(); ++it) {
+
+      Particle &vp = **it;
+      vp.lambda() = 0.0;
+      //weights.insert(std::make_pair(&vp, 0.0));
+      }
         
       std::set<Particle*> adrZone = verletList->getAdrZone();
       for (std::set<Particle*>::iterator it=adrZone.begin();
@@ -530,10 +588,8 @@ namespace espresso {
       }
       //std::cout << "Energy CG region:" << e << "\n";
       //makeWeights();
-      int counter = 0;
       for (PairList::Iterator it(verletList->getAdrPairs()); 
            it.isValid(); ++it) {
-          counter += 1;
           Particle &p1 = *it->first;
           Particle &p2 = *it->second; 
           real w1 = p1.lambda();
