@@ -57,7 +57,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espresso.FixedTripleListLocal',
-            localcall = [ "add" ],
-            pmicall = [ "addTriples" ],
+            localcall = [],
+            pmicall = [ "add", "addTriples" ],
             pmiinvoke = ["getTriples", "size"]
         )
