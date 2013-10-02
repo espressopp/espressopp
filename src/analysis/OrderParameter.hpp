@@ -26,7 +26,7 @@
 using namespace std;
 using namespace boost;
 
-typedef complex<double> dcomplex;
+typedef complex<espresso::real> dcomplex;
 
 // the following constant is not defined everywhere (e.g. not in Mac OS X)
 #ifndef M_PIl
