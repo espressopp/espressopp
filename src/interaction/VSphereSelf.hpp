@@ -24,7 +24,7 @@ namespace espresso {
       real e1;
       real a1, a16, a16NbNbNb;
       real a2, a22, a2dNb, a22dNb;
-      real mth;
+      real mth, mfh;
       int Nb, NbNbNb;
 
     public:
@@ -56,6 +56,7 @@ namespace espresso {
 
       void preset() {
     	mth = - (3.0/2.0);
+    	mfh = - (5.0/2.0);
     	a16 = 6*a1;
     	a22 = 2*a2;
     	a22dNb = a22 / Nb;
@@ -96,7 +97,7 @@ namespace espresso {
       real _computeEnergySqrRaw(real distSqr) const {
     	real sigma2 = distSqr;
         real energy;
-        energy  =   e1*pow(M_4PI3*sigma2, mth)       \
+        energy  =   e1*pow(1.0L*M_4PI3*sigma2, 1.0L*mth)       \
                   + a1*NbNbNb/(sigma2*sigma2*sigma2) \
                   + a22dNb*sigma2;
         return energy;
@@ -109,7 +110,7 @@ namespace espresso {
     	real sigma  = dist[0];
     	real sigma2 = distSqr;
         force[1] = force[2] = 0.0;
-        force[0] =   M_4PI*e1*pow(M_4PI3*sigma2, mth)*sigma   \
+        force[0] =   M_4PI*e1*pow(1.0L*M_4PI3*sigma2, 1.0L*mfh)*sigma \
         		   + a16NbNbNb/(sigma2*sigma2*sigma2*sigma) \
         		   - a22dNb*sigma;
         return true;

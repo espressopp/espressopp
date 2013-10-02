@@ -60,7 +60,7 @@ namespace espresso {
       void preset() {
       	mfh = -(3.0/2.0);
     	mth = -(5.0/2.0);
-        ef1 = epsilon*pow((2*M_PIl/3.0), mth);
+        ef1 = epsilon*pow(1.0L*(2*M_PIl/3.0), 1.0L*mth);
         ff1 = 3 * ef1;
       }
 
@@ -75,7 +75,7 @@ namespace espresso {
 
       real _computeEnergySqrRaw(real distSqr, real sigmaij) const {
     	real rij = sqrt(distSqr);
-        real energy = ef1*pow(sigmaij, mth)*exp(mth*rij/sigmaij);
+        real energy = ef1*pow(1.0L*sigmaij, 1.0L*mth)*exp(mth*rij/sigmaij);
         return energy;
       }
 
@@ -87,8 +87,8 @@ namespace espresso {
     	real rij     = sqrt(distSqr);
     	real invrij  = 1/rij;
     	real eh      = exp(mth*rij/sigmaij);
-    	real fs      = ff1*pow(sigmaij, mfh) * eh * (1 + rij);
-    	force        = ff1*pow(sigmaij, mth) * eh * dist * invrij;
+    	real fs      = ff1*pow(1.0L*sigmaij, 1.0L*mfh) * eh * (1 + rij);
+    	force        = ff1*pow(1.0L*sigmaij, 1.0L*mth) * eh * dist * invrij;
     	fsi          = fs * sigmai;
     	fsj          = fs * sigmaj;
     	return true;
