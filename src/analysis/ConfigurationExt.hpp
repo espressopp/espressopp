@@ -17,18 +17,22 @@ namespace espresso {
 
      public:
 
-      ConfigurationExtIterator(std::map<size_t, Real3D>& coordinates);
+      ConfigurationExtIterator(std::map<size_t, std::vector<Real3D> >& coordinates);
+      //ConfigurationExtIterator(std::map<size_t, Real3D>& coordinates);
 
-      /** Get next particle id for which coordinates are available */
+      /** Get next particle id for which properties are available */
 
       int nextId();
-      Real3D nextCoordinates();
-      Real3D nextVelocities();
+      const std::vector<Real3D> nextProperties();
+      //Real3D nextCoordinates();
+      //Real3D nextVelocities();
 
      private:
 
-      std::map<size_t, Real3D>::iterator it;
-      std::map<size_t, Real3D>::iterator end;
+      std::map<size_t, std::vector<Real3D> >::iterator it;
+      std::map<size_t, std::vector<Real3D> >::iterator end;
+      //std::map<size_t, Real3D>::iterator it;
+      //std::map<size_t, Real3D>::iterator end;
     };
 
     /** Class that stores particle positions for later analysis. */
@@ -41,12 +45,15 @@ namespace espresso {
 
       ~ConfigurationExt();
 
-      Real3D getCoordinates(size_t id);
-      Real3D getVelocities(size_t id);
+      const std::vector<Real3D>& getProperties(size_t id);
+      //Real3D getCoordinates(size_t id);
+      //Real3D getVelocities(size_t id);
 
-      size_t getSize();
+      inline size_t getSize(){return particleProperties.size();}
+      //size_t getSize();
 
-      void set(size_t id, real x, real y, real z, real vx, real vy, real vz);
+      void set(size_t id, std::vector<Real3D> vec) ;
+      //void set(size_t id, real x, real y, real z, real vx, real vy, real vz);
 
       //int nParticles;     // number of particles of the configuration
 
@@ -56,8 +63,9 @@ namespace espresso {
 
      private:
 
-      std::map<size_t, Real3D> coordinates;
-      std::map<size_t, Real3D> velocities;
+      std::map<size_t, std::vector<Real3D> > particleProperties;
+//      std::map<size_t, Real3D> coordinates;
+//      std::map<size_t, Real3D> velocities;
     };
 
   }
