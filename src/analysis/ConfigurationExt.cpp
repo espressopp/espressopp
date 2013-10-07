@@ -119,7 +119,7 @@ namespace espresso {
       class_<ConfigurationExt>
         ("analysis_ConfigurationExt", no_init)
       .add_property("size", &ConfigurationExt::getSize)
-      .def("__getitem__", &ConfigurationExt::getProperties)
+      //.def("__getitem__", &ConfigurationExt::getProperties)
       //.def("__getitem__", &ConfigurationExt::getCoordinates)
       .def("__iter__", &ConfigurationExt::getIterator)
       ;
