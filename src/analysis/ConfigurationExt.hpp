@@ -46,7 +46,7 @@ namespace espresso {
 
       ~ConfigurationExt();
 
-      const RealND& getProperties(size_t id);
+      RealND getProperties(size_t id);
       //Real3D getCoordinates(size_t id);
       //Real3D getVelocities(size_t id);
 

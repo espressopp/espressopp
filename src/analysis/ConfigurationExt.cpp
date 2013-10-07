@@ -33,7 +33,7 @@ namespace espresso {
       //velocities[index] = Real3D(vx, vy, vz);
     }
 
-    const RealND& ConfigurationExt::getProperties(size_t index)
+    RealND ConfigurationExt::getProperties(size_t index)
     {
       return particleProperties[index];
     }
@@ -120,7 +120,7 @@ namespace espresso {
       class_<ConfigurationExt>
         ("analysis_ConfigurationExt", no_init)
       .add_property("size", &ConfigurationExt::getSize)
-      //.def("__getitem__", &ConfigurationExt::getProperties) // TODO fix this!
+      .def("__getitem__", &ConfigurationExt::getProperties) 
       //.def("__getitem__", &ConfigurationExt::getCoordinates)
       .def("__iter__", &ConfigurationExt::getIterator)
       ;
