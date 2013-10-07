@@ -44,12 +44,16 @@ namespace espresso {
           ConfigurationExtIterator cei = conf_real-> getIterator();
           if(length_factor == 1.0){
             for(size_t i=0; i<num_of_particles; i++){
-              myfile << "  0  " << cei.nextCoordinates() << endl;
+            	//myfile << "bla" << endl;
+              myfile << "  0  " << cei.nextProperties() << endl;
+              //myfile << "  0  " << cei.nextCoordinates() << endl;
             }
           }
           else{
             for(size_t i=0; i<num_of_particles; i++){
-              myfile << "  0  " << length_factor * cei.nextCoordinates() << endl;
+            	//myfile << "bla" << endl;
+              myfile << "  0  " << length_factor * cei.nextProperties() << endl;
+              //myfile << "  0  " << length_factor * cei.nextCoordinates() << endl;
             }
           }
           myfile.close();

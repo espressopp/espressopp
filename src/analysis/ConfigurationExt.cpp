@@ -21,18 +21,19 @@ namespace espresso {
     {
     }
 
-    //TODO: check comment below
+    //FIXME
     //passing std::vector by value is very slow and should be avoided
     //however, passing reference is dangerous, since the original object might not survive until the end of this class
     //how should I use const here?
-    void ConfigurationExt::set(size_t index, std::vector<Real3D> vec)
+    void ConfigurationExt::set(size_t index, RealND vec)
     {
+      particleProperties[index].setDimension(vec.getDimension());
       particleProperties[index] = vec;
       //coordinates[index] = Real3D(x, y, z);
       //velocities[index] = Real3D(vx, vy, vz);
     }
 
-    const std::vector<Real3D>& ConfigurationExt::getProperties(size_t index)
+    const RealND& ConfigurationExt::getProperties(size_t index)
     {
       return particleProperties[index];
     }
@@ -60,7 +61,7 @@ namespace espresso {
     }
 
     //ConfigurationExtIterator::ConfigurationExtIterator(std::map<size_t, Real3D>& coordinates)
-    ConfigurationExtIterator::ConfigurationExtIterator(std::map<size_t, std::vector<Real3D> >& particleProperties)
+    ConfigurationExtIterator::ConfigurationExtIterator(std::map<size_t, RealND >& particleProperties)
     {
       it = particleProperties.begin();
       end = particleProperties.end();
@@ -81,14 +82,14 @@ namespace espresso {
     }
     
     //bad performance - or the compiler is smart
-    const std::vector<Real3D> ConfigurationExtIterator::nextProperties()
+    const RealND ConfigurationExtIterator::nextProperties()
     {
       if (it == end) {
         PyErr_SetString(PyExc_StopIteration, "No more data.");
         boost::python::throw_error_already_set();
       }
 
-      std::vector<Real3D> props = (*it).second;
+     RealND props = (*it).second;
       it++;
       return props;
     }
@@ -119,7 +120,7 @@ namespace espresso {
       class_<ConfigurationExt>
         ("analysis_ConfigurationExt", no_init)
       .add_property("size", &ConfigurationExt::getSize)
-      //.def("__getitem__", &ConfigurationExt::getProperties)
+      //.def("__getitem__", &ConfigurationExt::getProperties) // TODO fix this!
       //.def("__getitem__", &ConfigurationExt::getCoordinates)
       .def("__iter__", &ConfigurationExt::getIterator)
       ;
