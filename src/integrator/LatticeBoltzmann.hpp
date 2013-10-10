@@ -7,6 +7,7 @@
 #include "Extension.hpp"
 #include "boost/signals2.hpp"
 #include "Real3D.hpp"
+#include "Int3D.hpp"
 #include "LatticeSite.hpp"
 
 namespace espresso {
@@ -32,27 +33,37 @@ namespace espresso {
       *
       */
       public:
-        LatticeBoltzmann (shared_ptr< System > _system, int _x, int _y, int _z,
+        LatticeBoltzmann (shared_ptr< System > _system, Int3D _Ni,
             real _a, real _tau, real _rho0, Real3D _u0, int _numDims, int _numVels);
-        LatticeBoltzmann (shared_ptr< System > _system, int _x, int _y, int _z,
-            real _a, real _tau, real _rho0, Real3D _u0);
-        LatticeBoltzmann (shared_ptr< System > _system, int _x, int _y, int _z);
         ~LatticeBoltzmann ();
 
         /* SET AND GET DECLARATION */
-        void setNx(int _Nx);         	  // set lattice size in x-direction
-        void setNy(int _Ny);         	  // set lattice size in y-direction
-        void setNz(int _Nz);         	  // set lattice size in z-direction
-
-        int getNx();              	      // get lattice size in x-direction
-        int getNy();              	      // get lattice size in y-direction
-        int getNz();                	    // get lattice size in z-direction
+        void setNi(Int3D _Ni);         	  // set lattice size in x,y and z-directions
+        Int3D getNi();              	      // get lattice size in x,y and z-directions
 
         void setA (real _a);             // set lattice spacing
         real getA ();                    // get lattice spacing
 
         void setTau (real _tau);         // set lattice timestep
         real getTau ();                  // get lattice timestep
+
+        void setGammaB (real _gamma_b); // set gamma for bulk
+        real getGammaB ();  			// get gamma for bulk
+
+        void setGammaS (real _gamma_s); // set gamma for shear
+        real getGammaS ();  			// get gamma for shear
+
+        void setGammaOdd (real _gamma_odd); // set gamma odd
+        real getGammaOdd ();  				// get gamma odd
+
+        void setGammaEven (real _gamma_even); 	// set gamma even
+        real getGammaEven ();  					// get gamma even
+
+        void setExtForce (Real3D _extForce);    // set external force
+        Real3D getExtForce ();                  // get external force
+
+        void setExtForceFlag (int _extForceFlag); // set a flag for external force
+        int getExtForceFlag ();                   // get a flag for external force
 
         void setInitDen (real _rho0);	  // set initial density
         real getInitDen ();		          // get initial density
@@ -66,18 +77,43 @@ namespace espresso {
         void setNumVels (int _numVels);	// set number of velocities
         int getNumVels ();              // get number of velocities
 
+        void setStepNum (int _step);			// set current step number
+        int getStepNum ();				// get current step number
+
+        void setNBins (int _nBins);      // set number of bins
+        int getNBins ();        // get number of bins
+
+        void setDistr (int _i, real _distr); // set distribution
+        real getDistr (int _i);      // get distribution
+        void incDistr (int _i);     // increment distribution
+
+        void setLBTemp (real _lbTemp); // set LB-temperature
+        real getLBTemp ();      // get LB-temperature
+
+        void setLBTempFlag (int _lbTempFlag);   // set a flag for fluctuations
+        int getLBTempFlag ();                   // get a flag for fluctuations
+
         void setEqWeight (int _l, real _value); // set eq.weights
         real getEqWeight (int _l);      // get eq.weights
 
         void setCi (int _l, Real3D _vec); // set c_i's
         Real3D getCi (int _l);           // get c_i's
 
+        void setCs2 (real _cs2);		// set cs2
+        real getCs2 ();					// get cs2
+
         void setInvBi (int _l, real _value);    // set inverse b_i's
         real getInvBi (int _l);         // get inverse b_i's
+
+        void setPhi (int _l, real _value); 	// set phi for fluctuations
+        real getPhi (int _l);  				// get phi for fluctuations
         /* END OF SET AND GET DECLARATION */
 
         /* FUNCTIONS DECLARATION */
         void initLatticeModel ();   // initialize lattice model (weights, cis)
+        void initGammas (int _idGamma); // (re)initialize gammas
+        void initExtForce ();         // (re)initialize external forces
+        void initFluctuations ();   // (re)initialize fluctuation parameters
         void initPopulations (real _rho0, Real3D _u0); // initialize populations
         void makeLBStep ();          // perform one step of LB
         void addPolyLBForces();     // add to polymers forces due to LBsites
@@ -87,7 +123,7 @@ namespace espresso {
         void streaming (int _i, int _j, int _k);  // streaming along the velocity vectors
 
         /* control functions */
-        void computeDensity (int _i, int _j, int _k, int _numVels);
+        void computeDensity (int _i, int _j, int _k, int _numVels, int _step);
         void computeMomentum (int _i, int _j, int _k, int _numVels);
         /* END OF FUNCTIONS DECLARATION */
 
@@ -101,12 +137,22 @@ namespace espresso {
         real invCs2;          		  // inverse square of speed of sound
         real a;                     // lattice spacing
         real tau;                   // lattice timestep
+        real gamma_b;
+        real gamma_s;
+        real gamma_odd;
+        real gamma_even;
+        real lbTemp;
+        int lbTempFlag;
+        int stepNum;				// step number
         std::vector<real> eqWeight; // lattice weights
         std::vector<Real3D> c_i;    // velocity vectors
         std::vector<real> inv_b_i;  // back-transformation weights
+        std::vector<real> phi;		// amplitudes of fluctuations
         real rho0;	      		      // initial density
         Real3D u0;	      		      // initial velocity
-        int Nx, Ny, Nz;     		    // lattice lengths in 3D
+        Real3D extForce;            // external force
+        int extForceFlag;           // flag for external force
+        Int3D Ni;              		    // lattice lengths in 3D
         int idX, idY, idZ, index;	  // indexes in 3D and aligned 1D index
 
         /* two lattices. lbfluid has f,m and meq. ghostlat has f only.
@@ -114,6 +160,11 @@ namespace espresso {
          * */
         std::vector< std::vector< std::vector<LBSite> > > lbfluid;
         std::vector< std::vector< std::vector<GhostLattice> > > ghostlat;
+
+        int nBins;
+        std::vector<real> distr;
+
+        shared_ptr< esutil::RNG > rng;  //!< random number generator used for fluctuations
 
         boost::signals2::connection _befIntP, _befIntV;
         void connect();
