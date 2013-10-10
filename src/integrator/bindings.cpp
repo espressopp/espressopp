@@ -8,6 +8,7 @@
 #include "FreeEnergyCompensation.hpp"
 #include "Adress.hpp"
 #include "BerendsenBarostat.hpp"
+#include "BerendsenBarostatAnisotropic.hpp"
 #include "BerendsenThermostat.hpp"
 #include "Isokinetic.hpp"
 #include "StochasticVelocityRescaling.hpp"
@@ -32,6 +33,7 @@ namespace espresso {
       Extension::registerPython();
       Adress::registerPython();
       BerendsenBarostat::registerPython();
+      BerendsenBarostatAnisotropic::registerPython();
       BerendsenThermostat::registerPython();
       LangevinBarostat::registerPython();
       Isokinetic::registerPython();
