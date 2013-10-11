@@ -23,8 +23,6 @@ namespace espresso {
       public:
         BerendsenBarostatAnisotropic(shared_ptr< System > system);
         
-        void setFixed(Int3D);
-        Int3D getFixed();
         void setTau(real);
         real getTau();
         void setPressure(Real3D);
@@ -46,8 +44,6 @@ namespace espresso {
         
         real pref;  // prefactor for the pressure calc
         
-        Int3D fixed; // fixed directions. If (0,1,1) then Lx=const.
-                     // By default (1,1,1). Can not be (0,0,0)
         real exponent; // precalculated exponent
         
         void initialize();

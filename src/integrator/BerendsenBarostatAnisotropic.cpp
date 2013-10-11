@@ -17,7 +17,6 @@ namespace espresso {
       tau  = 1.0;
       P0 = Real3D(1.0);
       
-      fixed = Int3D(1,1,1);
       
       exponent = 1./3.;
       
@@ -58,16 +57,6 @@ namespace espresso {
     Real3D BerendsenBarostatAnisotropic::getPressure() {
       return P0;
     }
-    void BerendsenBarostatAnisotropic::setFixed(Int3D _fix) {
-      fixed = _fix;
-      int e=0;
-      for(int i=0;i<3;i++)
-        e+=fixed[i];
-      exponent = 1.0/(real)e;
-    }
-    Int3D BerendsenBarostatAnisotropic::getFixed() {
-      return fixed;
-    }
 
     void BerendsenBarostatAnisotropic::barostat(){
       LOG4ESPP_DEBUG(theLogger, "equilibrating the pressure");
@@ -80,7 +69,7 @@ namespace espresso {
       //std::cout << Ptensor << std::endl;
       Real3D P = Real3D(Ptensor[0], Ptensor[1], Ptensor[2]); //take the diagonal elements, xx, yy, zz from the ordered pressure tensor, ignore xy etc since only orthorhombic cells are considered so far //FIXME
       
-      Real3D mu3 = Real3D(1) + pref * (P - P0);
+      Real3D mu3 = Real3D(1) + pref * (P - P0)/3.0;// calculating the current scaling parameter // this is the tensorial form in Berendsen's paper from 1984
       
       Error err(system.comm);
       if(mu3[0]<0.0 || mu3[1]<0.0 || mu3[2]<0.0){
@@ -90,13 +79,7 @@ namespace espresso {
         err.checkException();
       }
       
-      Real3D mu(1.0);
-      
-      for(int i=0;i<3;i++)
-        if( fixed[i]>0 )
-          mu[i] = pow(mu3[i], exponent);// calculating the current scaling parameter
-
-      system.scaleVolume( mu, true );
+      system.scaleVolume( mu3, true );
     }
 
      // calculate the prefactors
@@ -126,9 +109,6 @@ namespace espresso {
         .add_property("pressure",
               &BerendsenBarostatAnisotropic::getPressure, 
               &BerendsenBarostatAnisotropic::setPressure)
-        .add_property("fixed",
-              &BerendsenBarostatAnisotropic::getFixed, 
-              &BerendsenBarostatAnisotropic::setFixed)
       
         .def("connect", &BerendsenBarostatAnisotropic::connect)
         .def("disconnect", &BerendsenBarostatAnisotropic::disconnect)
