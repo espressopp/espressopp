@@ -2,6 +2,7 @@
 #ifndef _IO_DUMPGRO_HPP
 #define _IO_DUMPGRO_HPP
 
+#include "io/FileBackup.hpp"
 #include "ParticleAccess.hpp"
 #include "integrator/MDIntegrator.hpp"
 
@@ -28,8 +29,23 @@ namespace espresso {
                         unfolded(_unfolded),
                         length_factor(_length_factor){ 
         setLengthUnit(_length_unit);
+        /*
+
+        shared_ptr<System> system = getSystem();
+        ConfigurationsExt conf( system );
+        conf.gather();
+        
+        if( system->comm->rank()==0 ){
+          ConfigurationExtPtr conf_real = conf.back();
+          
+          int num_of_particles = conf_real->getSize();
+        }
+        particleIDToType.resize(num_of_particles);
+
+        */
+        FileBackup backup(file_name); //backup trajectory if it already exists
       }
-      ~DumpGRO() {}
+      ~DumpGRO() {std::cout << "DumpGRO destructor" << std::endl;} // never called, right?
 
       void perform_action(){
         dump();
@@ -69,6 +85,10 @@ namespace espresso {
       shared_ptr<integrator::MDIntegrator> integrator;
       
       std::string file_name;
+
+      //an array or an map where key: particle id and value: particle type
+      //we assume, that the type of a particle does not change over time
+      //std::vector<int> particleIDToType;
       
       bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
       real length_factor;  // for example 
