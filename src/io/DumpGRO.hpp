@@ -43,7 +43,9 @@ namespace espresso {
         particleIDToType.resize(num_of_particles);
 
         */
-        FileBackup backup(file_name); //backup trajectory if it already exists
+        if( system->comm->rank()==0 ){
+          FileBackup backup(file_name); //backup trajectory if it already exists
+        }
       }
       ~DumpGRO() {std::cout << "DumpGRO destructor" << std::endl;} // never called, right?
 
