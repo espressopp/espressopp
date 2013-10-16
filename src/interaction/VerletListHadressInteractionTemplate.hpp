@@ -776,7 +776,7 @@ namespace espresso {
           int type1 = p1.type();
           int type2 = p2.type();
           const PotentialCG &potentialCG = getPotentialCG(type1, type2);
-          e += potentialCG._computeEnergy(p1, p2);         
+          e += potentialCG._computeEnergy(p1, p2);
       }
        
       real esum;
