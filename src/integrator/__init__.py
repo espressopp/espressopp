@@ -12,6 +12,7 @@ from espresso.integrator.FreeEnergyCompensation import *
 from espresso.integrator.Extension import *
 from espresso.integrator.Adress import *
 from espresso.integrator.BerendsenBarostat import *
+from espresso.integrator.BerendsenBarostatAnisotropic import *
 from espresso.integrator.BerendsenThermostat import *
 from espresso.integrator.LangevinThermostat import *
 from espresso.integrator.LangevinThermostat1D import *

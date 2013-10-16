@@ -238,7 +238,14 @@ namespace espresso {
                                    ": " << coordinates[3*i] << " " <<  coordinates[3*i+1] << " " << coordinates[3*i+2] << 
                                    "and velocities: " <<  velocities[3*i] << " " <<  velocities[3*i+1] << " " << velocities[3*i+2]);
 
-             config->set(index, coordinates[3*i], coordinates[3*i+1], coordinates[3*i+2], velocities[3*i], velocities[3*i+1], velocities[3*i+2]);
+
+             RealND _vec(6);
+             for (int k=0; k<3; k++)
+               _vec.setItem(k, coordinates[3*i + k]);
+
+             for (int k=0; k<3; k++)
+               _vec.setItem(k+3, velocities[3*i + k]);
+             config->set(index, _vec);
            }
         }
 
