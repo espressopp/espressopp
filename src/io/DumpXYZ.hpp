@@ -4,6 +4,7 @@
 
 #include "ParticleAccess.hpp"
 #include "integrator/MDIntegrator.hpp"
+#include "io/FileBackup.hpp"
 
 #include "esutil/Error.hpp"
 
@@ -28,6 +29,8 @@ namespace espresso {
                         unfolded(_unfolded),
                         length_factor(_length_factor){ 
         setLengthUnit(_length_unit);
+        if (system->comm->rank() == 0 )
+          FileBackup backup(file_name);
       }
       ~DumpXYZ() {}
 
