@@ -22,6 +22,8 @@ namespace espresso {
     size_t type;
     real mass;
     real q;
+    real lambda;
+    real lambdaDeriv;
   private:
     friend class boost::serialization::access;
     template< class Archive >
@@ -31,6 +33,8 @@ namespace espresso {
       ar & type;
       ar & mass;
       ar & q;
+      ar & lambda;
+      ar & lambdaDeriv;
     }
   };
 
@@ -126,8 +130,6 @@ namespace espresso {
     bool dummy1;
     bool dummy2;
     bool dummy3;
-    real lambda;
-    real lambdaDeriv;
   private:
     friend class boost::serialization::access;
     template< class Archive >
@@ -164,8 +166,8 @@ namespace espresso {
       f.fradius      = 0.0;
       m.vradius      = 0.0;
       l.ghost        = false;
-      l.lambda       = 0.0;      
-      l.lambdaDeriv  = 0.0;      
+      p.lambda       = 0.0;      
+      p.lambdaDeriv  = 0.0;      
     }
 
     // getter and setter used for export in Python
@@ -249,16 +251,16 @@ namespace espresso {
     void setGhostStatus(const bool& gs) { l.ghost = gs; }
     
     // weight/lambda (used in H-Adress)
-    real& lambda() { return l.lambda; }
-    const real& lambda() const { return l.lambda; }
-    real getLambda() const { return l.lambda; }
-    void setLambda(const real& _lambda) { l.lambda = _lambda; }
+    real& lambda() { return p.lambda; }
+    const real& lambda() const { return p.lambda; }
+    real getLambda() const { return p.lambda; }
+    void setLambda(const real& _lambda) { p.lambda = _lambda; }
     
     // weight/lambda derivative (used in H-Adress)
-    real& lambdaDeriv() { return l.lambdaDeriv; }
-    const real& lambdaDeriv() const { return l.lambdaDeriv; }
-    real getLambdaDeriv() const { return l.lambdaDeriv; }
-    void setLambdaDeriv(const real& _lambdaDeriv) { l.lambdaDeriv = _lambdaDeriv; }
+    real& lambdaDeriv() { return p.lambdaDeriv; }
+    const real& lambdaDeriv() const { return p.lambdaDeriv; }
+    real getLambdaDeriv() const { return p.lambdaDeriv; }
+    void setLambdaDeriv(const real& _lambdaDeriv) { p.lambdaDeriv = _lambdaDeriv; }
 
     static void registerPython();
   
