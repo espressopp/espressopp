@@ -33,53 +33,41 @@ namespace espresso {
 
     void ExtVirtualParticles::disconnect(){
         _initForces.disconnect();
-        _integrate1.disconnect();
-        _integrate2.disconnect();
+        _beforeIntegrate.disconnect();
+        _afterIntegrate.disconnect();
     }
 
     void ExtVirtualParticles::connect() {
 
-    	_runInit = integrator->runInit.connect(boost::bind(&ExtVirtualParticles::initRun, this));
+    	/*  needed for updating each step */
+    	_afterIntegrate = integrator->aftIntP.connect(boost::bind(&ExtVirtualParticles::updateVParticles, this));
+    	_afterUpdateGhosts =  integrator->aftUpdGhosts.connect(boost::bind(&ExtVirtualParticles::rebuildVCellLists, this));
 
-        // connection to after initForces()
-        _initForces = integrator->aftInitF.connect(
-                boost::bind(&ExtVirtualParticles::initForces, this));
-
-        // connection to inside of integrate1()
-        _integrate1 = integrator->inIntP.connect(
-                boost::bind(&ExtVirtualParticles::integrate1, this, _1));
-
-        // connection to after integrate2()
-        _integrate2 = integrator->aftIntV.connect(
-                boost::bind(&ExtVirtualParticles::integrate2, this));
-
+    	/* needed for updating on decomposition event */
         _onCellListsChanged = getSystem()->storage->onCellListsChanged.connect(
               boost::bind(&ExtVirtualParticles::onCellListsChanged, this));
+
+        _beforeDecompose = getSystem()->storage->beforeDecompose.connect(0, boost::bind(&ExtVirtualParticles::updateVParticles, this));
+
+        _onParticlesChanged = getSystem()->storage->onParticlesChanged.connect(1, boost::bind(&ExtVirtualParticles::onParticlesChanged, this));
+
+
     }
 
     void ExtVirtualParticles::initRun(){
-    	rebuildVCellLists();
     }
     void ExtVirtualParticles::initForces(){
+
+    }
+
+    void ExtVirtualParticles::onParticlesChanged(){
     	rebuildVCellLists();
     }
 
-
-
-    void ExtVirtualParticles::integrate1(real& maxSqDist){
-
-    }
-
-
-    void ExtVirtualParticles::integrate2() {
-
-
-    }
 
     void ExtVirtualParticles::onCellListsChanged(){
     	System& system = getSystemRef();
 		esutil::Error err(system.comm);
-		cout << "CellListsChanged" << endl;
 
 		CellList & vcl = *vrealCells;
 		// Clean up
@@ -104,6 +92,7 @@ namespace espresso {
 			vcl.push_back(cellCopy);
 			cellmap.insert(std::make_pair<Cell*, Cell*>(*it, cellCopy));
 		}
+		cout << "Real Cells : " << cl.size() << endl;
 		const CellList & gcl = system.storage->getGhostCells();
 		for (CellList::const_iterator it = gcl.begin(); it != gcl.end(); it++) {
 			Cell * cellCopy= new Cell();
@@ -121,13 +110,14 @@ namespace espresso {
 				std::stringstream msg;
 				msg << "Missing real cell in ExtVirtualParticle";
 				err.setException(msg.str());
+				exit(0);
 			} else {
 				cellCopy = cellmap_it->second;
 			}
 			NeighborCellList &nb = ((*it)->neighborCells);
 			for (NeighborCellList::iterator nbit = nb.begin(); nbit != nb.end();
 					nbit++) {
-				//create or lookup cells
+				//lookup nb cells
 				NeighborCellInfo & nbinfo = (*nbit);
 				//see if we have copied this cell already
 				cellmap_it = cellmap.find(nbinfo.cell);
@@ -136,29 +126,21 @@ namespace espresso {
 					std::stringstream msg;
 					msg << "Missing cell in ExtVirtualParticle";
 					err.setException(msg.str());
-					// not copied yet, make an emtpy copy and store it
-					//Cell* mapped_cell = new Cell();
-					//mappednb= new NeighborCellInfo(mapped_cell,nbinfo.useForAllPairs);
-					//cellmap.insert(std::make_pair<Cell*, Cell*>(nbinfo.cell, mapped_cell));
+					exit(0);
 
 				} else {
 					// store the reference
-					//mappednb = new NeighborCellInfo(*cellmap_it->second, nbinfo.useForAllPairs);
-					cellCopy->neighborCells.push_back(
-							NeighborCellInfo(*cellmap_it->second,
-									nbinfo.useForAllPairs));
+					cellCopy->neighborCells.push_back(NeighborCellInfo(*cellmap_it->second,nbinfo.useForAllPairs));
 				}
 
 			}
 		}
 
-		cout << "lenth cellmap" << cellmap.size() << endl;
     }
 
-	void ExtVirtualParticles::rebuildVCellLists() {
+	void ExtVirtualParticles::updateVParticles() {
     	System& system = getSystemRef();
 		esutil::Error err(system.comm);
-
 		if(cellmap.size()==0){
 			cout<< "Cellmap has size 0, rebuild!" << endl;
 			onCellListsChanged();
@@ -168,11 +150,10 @@ namespace espresso {
 			std::stringstream msg;
 			msg << "FixedTupleList not set in ExtVirtualParticles";
 			err.setException( msg.str() );
-			exit(0);
 		}
 
 		std::map<Cell*, Cell*>::iterator cellmap_it;
-		const CellList & cl = system.storage->getLocalCells();
+		const CellList & cl = system.storage->getRealCells();
 		for (CellList::const_iterator it = cl.begin(); it != cl.end(); it++) {
 			Cell * cellCopy;
 			/* Check if this this cell has been copied already in NeighborCellList?*/
@@ -185,7 +166,7 @@ namespace espresso {
 				cellCopy=cellmap_it->second;
 			}
 			//clear particles from last built
-			cellCopy->particles.clear();
+			//cellCopy->particles.clear();
 			ParticleList &part = (*it)->particles;
 
 			for (ParticleList::iterator it2 = part.begin(); it2 != part.end();it2++) {
@@ -196,15 +177,61 @@ namespace espresso {
 					// This is a virtual particle, update its position based on the COM
 					Real3D com =fixedTupleList->calcTupleCOM(p.getId());
 					p.setPos(com);
-					cellCopy->particles.push_back(p); //copy of p is made
+
 				}
 			}
+		}
 
+		err.checkException();
 
+	}
 
+void ExtVirtualParticles::rebuildVCellLists() {
+	System& system = getSystemRef();
+	esutil::Error err(system.comm);
+
+	if (cellmap.size() == 0) {
+		cout << "Cellmap has size 0, rebuild!" << endl;
+		onCellListsChanged();
+	}
+
+	if (!fixedTupleList) {
+		std::stringstream msg;
+		msg << "FixedTupleList not set in ExtVirtualParticles";
+		err.setException(msg.str());
+		exit(0);
+	}
+
+	std::map<Cell*, Cell*>::iterator cellmap_it;
+	const CellList & cl = system.storage->getLocalCells();
+	for (CellList::const_iterator it = cl.begin(); it != cl.end(); it++) {
+		Cell * cellCopy;
+		/* Check if this this cell has been copied already in NeighborCellList?*/
+		cellmap_it = cellmap.find(*it);
+		if (cellmap_it == cellmap.end()) {
+			std::stringstream msg;
+			msg << "Missing real cell in ExtVirtualParticle";
+			err.setException(msg.str());
+		} else {
+			cellCopy = cellmap_it->second;
+		}
+		//clear particles from last built
+		cellCopy->particles.clear();
+		ParticleList &part = (*it)->particles;
+
+		for (ParticleList::iterator it2 = part.begin(); it2 != part.end();
+				it2++) {
+			Particle &p = (*it2);
+
+			if (std::find(vp_types.begin(), vp_types.end(), p.getType())
+					!= vp_types.end()) {
+				cellCopy->particles.push_back(p); //copy of p is made
+			}
 		}
 
 	}
+
+}
 
 
 

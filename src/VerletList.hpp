@@ -68,6 +68,8 @@ namespace espresso {
     /**need to access protected functions from VirtualVerletList */
     friend class VirtualVerletList;
 
+    void clearPairs(){vlPairs.clear();}
+
   protected:
 
     void checkPair(Particle &pt1, Particle &pt2);

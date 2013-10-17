@@ -13,6 +13,9 @@
 
 
 namespace espresso {
+	/* A list of particles, where the first particle is a dependent (virtual) particle.
+	 *  All particles reside on the same node of the first particle.
+	 */
   class FixedTupleList : public TupleList {
       protected:
 		boost::signals2::connection con1, con2, con3;
@@ -22,9 +25,6 @@ namespace espresso {
 		GlobalTuples globalTuples;
 		using TupleList::add;
 
-
-      //FixedListComm<FixedTupleList, 3> _comm;
-
 	  public:
 		FixedTupleList(shared_ptr<storage::Storage> _storage);
 		virtual ~FixedTupleList();
@@ -32,6 +32,7 @@ namespace espresso {
 		virtual void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
 		void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
 		virtual void onParticlesChanged();
+		void unwrapMinimumImage(int id);
 
 		python::list getTuples();
 

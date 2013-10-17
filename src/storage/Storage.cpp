@@ -486,6 +486,7 @@ namespace espresso {
     }
 
     void Storage::decompose() {
+      beforeDecompose();
       invalidateGhosts();
       decomposeRealParticles();
       exchangeGhosts();

@@ -307,6 +307,8 @@ namespace espresso {
         VT_TRACER("commF");
         storage.updateGhosts();
       }
+      aftUpdGhosts(); //signal
+
       timeComm1 += timeIntegrate.getElapsedTime() - time;
       time = timeIntegrate.getElapsedTime();
       calcForces();

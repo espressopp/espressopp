@@ -195,6 +195,7 @@ namespace espresso {
        */
       boost::signals2::signal0 <void> onParticlesChanged;
       boost::signals2::signal0 <void> onCellListsChanged;
+      boost::signals2::signal0 <void> beforeDecompose;
       boost::signals2::signal2 <void, ParticleList&, class OutBuffer&> 
         beforeSendParticles;
       boost::signals2::signal2 <void, ParticleList&, class InBuffer&> 

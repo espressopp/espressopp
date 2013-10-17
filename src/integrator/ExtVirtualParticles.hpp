@@ -25,7 +25,14 @@ namespace espresso {
 
   namespace integrator {
 
+
+
       class ExtVirtualParticles : public Extension {
+    	  /* Provides an extension class which takes care of updating 'virtual' particles in each step.
+    	   * Currently, the virtual particle is placed in the center of mass of the constituting particles.
+    	   * A cell list is provided which contains the virtual particles. This can be used to build verlet lists using the VirtualVerletList
+    	   * class.
+    	   */
 
       public:
 
@@ -33,7 +40,7 @@ namespace espresso {
 
         ~ExtVirtualParticles();
 
-        void rebuildVCellLists(); // update local cellLists (fill them with virtual particles and update their center of mass)
+
 
         /** Register this class so it can be used from Python. */
         static void registerPython();
@@ -48,21 +55,20 @@ namespace espresso {
 
       private:
 
-        boost::signals2::connection _initForces, _integrate1, _integrate2, _runInit;
-        boost::signals2::connection _onCellListsChanged;
+        boost::signals2::connection _initForces, _runInit, _beforeIntegrate, _afterIntegrate, _afterUpdateGhosts, _beforeDecompose;
+        boost::signals2::connection _onCellListsChanged, _onParticlesChanged;
 
-        void integrate1(real&);
         void initForces();
-        void integrate2();
 
         void connect();
         void disconnect();
 
         void initRun();
 
-        //CellList *getCellList(){return &vrealCells;}
-
         void onCellListsChanged(); // called by signal onCellListsChanged, will copy cellList structure to vrealCells vghostCells
+        void rebuildVCellLists(); // update local cellLists (fill them with virtual particles)
+        void updateVParticles(); /*update the positions of the virtual particles */
+        void onParticlesChanged();
 
         std::vector<int> vp_types; // Types of virtual particles
         CellList vghostCells;
