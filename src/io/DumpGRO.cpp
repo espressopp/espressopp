@@ -108,11 +108,14 @@ namespace espresso {
                            std::string, 
                            bool,
                            real,
-                           std::string >())
+                           std::string,
+                           bool>())
         .add_property("filename", &DumpGRO::getFilename, 
                                   &DumpGRO::setFilename)
         .add_property("unfolded", &DumpGRO::getUnfolded, 
                                   &DumpGRO::setUnfolded)
+        .add_property("append", &DumpGRO::getAppend, 
+                                  &DumpGRO::setAppend)
         .add_property("length_factor", &DumpGRO::getLengthFactor, 
                                        &DumpGRO::setLengthFactor)
         .add_property("length_unit", &DumpGRO::getLengthUnit, 

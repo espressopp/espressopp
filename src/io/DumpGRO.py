@@ -15,6 +15,9 @@
 * `unfolded`
   False if coordinates are folded, True if unfolded. By default - False
   
+* `append`
+  True if new trajectory data is appended to existing trajectory file. By default - True
+
 * `length_factor`
   If length dimension in current system is nm, and unit is 0.23 nm, for example, then
   length_factor should be 0.23
@@ -44,7 +47,7 @@ setting up length scale
 
 For example, the Lennard-Jones model for liquid argon with :math:`\sigma=0.34 [nm]` 
 
->>> dump_conf_gro = espresso.io.DumpGRO(system, integrator, filename='trj.gro', unfolded=False, length_factor=0.34, length_unit='nm')
+>>> dump_conf_gro = espresso.io.DumpGRO(system, integrator, filename='trj.gro', unfolded=False, length_factor=0.34, length_unit='nm', append=True)
 
 will produce trj.gro with in nanometers
 """
@@ -57,8 +60,8 @@ from _espresso import io_DumpGRO
 
 class DumpGROLocal(ParticleAccessLocal, io_DumpGRO):
   'The (local) storage of configurations.'
-  def __init__(self, system, integrator, filename='out.gro', unfolded=False, length_factor=1.0, length_unit='LJ'):
-    cxxinit(self, io_DumpGRO, system, integrator, filename, unfolded, length_factor, length_unit)
+  def __init__(self, system, integrator, filename='out.gro', unfolded=False, length_factor=1.0, length_unit='LJ', append=True):
+    cxxinit(self, io_DumpGRO, system, integrator, filename, unfolded, length_factor, length_unit, append)
   
   def dump(self):
     if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -71,5 +74,5 @@ if pmi.isController :
     pmiproxydefs = dict(
       cls =  'espresso.io.DumpGROLocal',
       pmicall = [ 'dump' ],
-      pmiproperty = ['filename', 'unfolded', 'length_factor', 'length_unit']
+      pmiproperty = ['filename', 'unfolded', 'length_factor', 'length_unit', 'append']
     )
