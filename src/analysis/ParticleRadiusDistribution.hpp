@@ -51,8 +51,8 @@ namespace espresso {
           localaverage += cit->radius();
         }
 
-        mpi::all_reduce(*getSystem()->comm, localaverage, radave, std::plus<real>());
-        mpi::all_reduce(*getSystem()->comm, localbin, bin, std::plus<real>());
+        // mpi::all_reduce(*getSystem()->comm, localaverage, radave, std::plus<real>());
+        // mpi::all_reduce(*getSystem()->comm, localbin, bin, std::plus<real>());
 
         radave /= systemN;
         
