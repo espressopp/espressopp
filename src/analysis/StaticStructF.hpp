@@ -8,7 +8,6 @@
 
 namespace espresso {
     namespace analysis {
-
         /** Class to compute the static structure function of the system. */
         class StaticStructF : public Observable {
         public:
