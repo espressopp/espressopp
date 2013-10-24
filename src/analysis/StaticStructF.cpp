@@ -8,6 +8,9 @@
 
 #include <boost/serialization/map.hpp>
 
+#include <math.h>       //cos and ceil and sqrt
+#include <algorithm>    // std::min
+#include <functional>   // std::plus
 #include <fstream> //outputfile
 #include <iomanip> //setprecision
 
@@ -36,7 +39,7 @@ namespace espresso {
 
             int nprocs = system.comm->size(); // number of CPUs
             int myrank = system.comm->rank(); // current CPU's number
-            //cout << "1 \n";
+            //cout << "1 \n"; //flag
             // FM do not need this - no histogram
             /*
             real histogram [rdfN];
@@ -56,7 +59,7 @@ namespace espresso {
                         int id = cit->id();
                         conf[id] = cit->position();
                     }
-                    //cout << "2 \n";    
+                    //cout << "2 \n";   //flag 
                 }
                 boost::mpi::broadcast(*system.comm, conf, rank_i);
 
@@ -69,14 +72,14 @@ namespace espresso {
                     num_part++;
                 }
             }
-            //cout << "3 \n";
+            //cout << "3 \n";//flag
             // now all CPUs have all particle coords and num_part is the total number
             // of particles
 
             // use all cpus
             // TODO it could be a problem if   n_nodes > num_part
 
-            // here starts calculation of the stif (myrank == 0) {atic structure factor
+            // here starts calculation of the static structure factor
 
             //step size for qx, qy, qz
             real dqs[3];
@@ -84,7 +87,7 @@ namespace espresso {
             dqs[1] = 2. * M_PIl / Li[1];
             dqs[2] = 2. * M_PIl / Li[2];
 
-            Real3D q; // = Real3D(dqs);
+            Real3D q;
 
             //calculations for binning
             real bin_size = bin_factor * min(dqs[0], (dqs[1], dqs[2]));
@@ -106,7 +109,6 @@ namespace espresso {
                         << "q_max    \t" << q_max << "\n";
             }
 
-            //real s_q = 0;
             real n_reci = 1. / num_part;
             real scos = 0;
             real ssin = 0;
@@ -152,21 +154,16 @@ namespace espresso {
                             ssin_local += sin(q * coordP);
                         }
 
-                        //            real out;
-                        //            boost::mpi::reduce(*system.comm, (real)myrank, out, plus<real>(),0);
-
                         boost::mpi::reduce(*system.comm, scos_local, scos, plus<real > (), 0);
                         boost::mpi::reduce(*system.comm, ssin_local, ssin, plus<real > (), 0);
 
                         if (myrank == 0) {
-                            //                s_q = out;
-                            //s_q = n_reci * (scos * scos + ssin * ssin);
-                            //pyli.append(s_q);
                             sq_bin[bin_i] += scos * scos + ssin * ssin;
                         }
                     }
                 }
             }
+            //creates an output file with q and S(q) values
             ofstream outfile;
             if (myrank == 0) {
                 outfile.open("q_sq_values.txt");
@@ -189,15 +186,6 @@ namespace espresso {
             return pyli;
 
         }
-
-        void StaticStructF::printVec(vector<real>& v) const {
-            for (int i = 0; i < v.size(); i++)
-                cout << v[i] << "\t";
-            cout << "\n";
-            return;
-        }
-
-
         // TODO: this dummy routine is still needed as we have not yet ObservableVector
 
         real StaticStructF::compute() const {
