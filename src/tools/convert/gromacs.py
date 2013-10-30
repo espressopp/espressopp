@@ -239,7 +239,12 @@ def read(gro_file, top_file="", doRegularExcl=True):
                 else:
                     print " "+line.strip('\n')
                     mol, nrmol = line.split()
-                    molecules.append({'name':mol, 'count':int(nrmol)})
+                    #we have to check if the same molecules comes multiple times in the molecules section
+                    if len(molecules) == 0:
+                      molecules.append({'name':mol, 'count':int(nrmol)})
+                    elif molecules[-1]['name'] == mol: #check if mol was added earlier already
+                        molecules[-1]['count'] = molecules[-1]['count'] + int(nrmol) #update count
+                    else: molecules.append({'name':mol, 'count':int(nrmol)}) #if mol newly added
               
         
         molstartindex=0 #this is the index of the first atom in the molecule being parsed

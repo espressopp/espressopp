@@ -14,7 +14,8 @@ namespace espresso {
 
     LOG4ESPP_LOGGER(VelocityVerletOnRadius::theLogger, "VelocityVerletOnRadius");
 
-    VelocityVerletOnRadius::VelocityVerletOnRadius(shared_ptr<System> system) : Extension(system)
+    VelocityVerletOnRadius::VelocityVerletOnRadius(shared_ptr<System> system, real _radialDampingMass)
+      : Extension(system), radialDampingMass(_radialDampingMass)
     {
       LOG4ESPP_INFO(theLogger, "VelocityVerletOnRadius constructed");
     }
@@ -36,10 +37,13 @@ namespace espresso {
       System& system = getSystemRef();
       CellList realCells = system.storage->getRealCells();
       // loop over all particles of the local cells
+      real dt = integrator->getTimeStep();
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-        LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() <<  ", radius = " << cit->radius());
-        real dt = integrator->getTimeStep();
-        real dtfm = 0.5 * dt / cit->mass();
+	    LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() << ", forceRadius = " << cit->fradius());
+      }
+     for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+        //LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() <<  ", radius = " << cit->radius());
+        real dtfm = 0.5 * dt / radialDampingMass;
         // Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t)
         cit->vradius() += dtfm * cit->fradius();
         // Propagate radius (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt)
@@ -56,7 +60,7 @@ namespace espresso {
       real dt = integrator->getTimeStep();
       real half_dt = 0.5 * dt;
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-        real dtfm = half_dt / cit->mass();
+        real dtfm = half_dt / radialDampingMass;
         /* Propagate radius velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
         cit->vradius() += dtfm * cit->fradius();
       }
@@ -65,9 +69,9 @@ namespace espresso {
     void VelocityVerletOnRadius::initForces() {
       // fradius is initialized for real + ghost particles
       System& system = getSystemRef();
-      CellList localCells = system.storage->getLocalCells();
-      LOG4ESPP_INFO(theLogger, "init fradius for real + ghost particles");
-      for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
+      CellList realCells = system.storage->getRealCells();
+      LOG4ESPP_INFO(theLogger, "init fradius for real particles");
+      for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         cit->fradius() = 0.0;
       }
     }
@@ -82,9 +86,10 @@ namespace espresso {
       using namespace espresso::python;
 
       class_<VelocityVerletOnRadius, shared_ptr<VelocityVerletOnRadius>, bases<Extension> >
-        ("integrator_VelocityVerletOnRadius", init< shared_ptr< System > >())
+        ("integrator_VelocityVerletOnRadius", init< shared_ptr< System >, real >())
         .def("connect", &VelocityVerletOnRadius::connect)
         .def("disconnect", &VelocityVerletOnRadius::disconnect)
+        .add_property("radialDampingMass" ,&VelocityVerletOnRadius::getRadialDampingMass, &VelocityVerletOnRadius::setRadialDampingMass )
         ;
     }
 

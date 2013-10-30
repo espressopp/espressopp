@@ -6,63 +6,88 @@
 #include "AnalysisBase.hpp"
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
+#include <vector>
 
 namespace espresso {
   namespace analysis {
     using namespace iterator;
     /** Class to compute the particle radius distribution. */
-    class ParticleRadiusDistribution : public AnalysisBaseTemplate< real > {
+
+    typedef std::vector< real > result;
+
+    class ParticleRadiusDistribution : public AnalysisBaseTemplate< result > {
     public:
       static void registerPython();
 
-      ParticleRadiusDistribution(shared_ptr< System > system) : AnalysisBaseTemplate< real >(system) {}
+      ParticleRadiusDistribution(shared_ptr< System > system) : AnalysisBaseTemplate< result >(system) {
+    	  // default binwidth for particle radius histogram
+    	  binwidth=0.1;
+    	  radave=0.0;
+      }
       virtual ~ParticleRadiusDistribution() {}
 
-      real computeRaw() {
-      int myN, systemN;
-      real radsumlocal = 0.0;
-      real radsum = 0.0;
-      System& system = getSystemRef();
+      result computeRaw() {
+    	// get total number of particles from the system by getting
+    	// local number on each CPU and then adding all up (over mpi)
+        int myN, systemN;
+        System& system = getSystemRef();
+        mpi::all_reduce(*getSystem()->comm, myN, systemN, std::plus<int>());
+
+        result localbin;
+        result bin;
+        real localaverage=0.0;
+
+        CellList realCells = system.storage->getRealCells();
+        for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+          real r = cit->radius();
+          if (r<0) {
+        	std::cout << "WARNING: radius of particle is negative, setting it to zero !";
+        	r = 0.0;
+          }
+          int idx = floor( (cit->radius() + 0.5*binwidth) / binwidth );
+          // increment corresponding count in bin
+          ++localbin[idx];
+          // add up radii (to calculate average)
+          localaverage += cit->radius();
+        }
+
+        // mpi::all_reduce(*getSystem()->comm, localaverage, radave, std::plus<real>());
+        // mpi::all_reduce(*getSystem()->comm, localbin, bin, std::plus<real>());
+
+        radave /= systemN;
         
-      CellList realCells = system.storage->getRealCells();
-      for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-        radsumlocal += cit->radius() * cit->radius();
-      }
-          
-      myN = system.storage->getNRealParticles();
-      
-      mpi::all_reduce(*getSystem()->comm, radsumlocal, radsum, std::plus<real>());
-      mpi::all_reduce(*getSystem()->comm, myN, systemN, std::plus<int>());
-        
-      return 4*radsum/systemN;
+        return bin;
       }
 
 
       python::list compute() {
         python::list ret;
-        real res = computeRaw();
-        ret.append(res);
+        result res = computeRaw();
+        for (int i=0; i<res.size(); i++) {
+          ret.append(res[i]);
+        }
         return ret;
       }
 
       python::list getAverageValue() {
         python::list ret;
         real res;
-        res = nMeasurements>0 ? newAverage : 0;
+        res = 0.0; //nMeasurements>0 ? newAverage : 0;
         ret.append(res);
-        res = nMeasurements>0 ? newVariance : 0;
-        ret.append(sqrt(res/(nMeasurements-1)));
+        res = 0.0; //nMeasurements>0 ? newVariance : 0;
+        ret.append(res); //sqrt(res/(nMeasurements-1)));
         return ret;
       }
 
       void resetAverage() {
-        newAverage   = 0;
-        lastAverage  = 0;
-        newVariance  = 0;
-        lastVariance = 0;
+        //newAverage   = 0;
+        //lastAverage  = 0;
+        //newVariance  = 0;
+        //lastVariance = 0;
       }
 
-      void updateAverage(real res) {
+      void updateAverage(result res) {
+    	/*
     	if (nMeasurements > 0) {
     	  if (nMeasurements == 1) {
               newAverage     = res;
@@ -75,7 +100,13 @@ namespace espresso {
           }
     	}
         return;
+        */
       }
+    private:
+      // bin width of the histogram for the radii
+      real binwidth;
+      // average radius
+      real radave;
     };
   }
 }

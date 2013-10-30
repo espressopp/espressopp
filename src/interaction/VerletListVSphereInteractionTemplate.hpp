@@ -100,12 +100,13 @@ namespace espresso {
         // shared_ptr<Potential> potential = getPotential(type1, type2);
 
         Real3D force(0.0);
-        real fsi, fsj;
+        real fsi=0.0, fsj=0.0;
         if(potential._computeForce(force, fsi, fsj, p1, p2)) {
           p1.force() += force;
           p2.force() -= force;
-          p1.fradius() += fsi;
-          p2.fradius() += fsj;
+          p1.fradius() = fsi;
+          p2.fradius() = fsj;
+          std::cout << "(" << p1.id() << ", " << p2.id() << ") force=" << force << " fradius: (" << p1.fradius() << ", " << p2.fradius() << ")" << std::endl;
           LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" << force);
         }
       }

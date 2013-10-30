@@ -14,8 +14,17 @@ namespace espresso {
 
     class VelocityVerletOnRadius : public Extension {
       public:
-        VelocityVerletOnRadius(shared_ptr< System > _system);
+        VelocityVerletOnRadius(shared_ptr< System > _system, real _radialDampingMass);
         virtual ~VelocityVerletOnRadius() {};
+
+        void setRadialDampingMass(real _radialDampingMass) {
+        	radialDampingMass = _radialDampingMass;
+        }
+
+        real getRadialDampingMass() {
+        	return radialDampingMass;
+        }
+
         /** Register this class so it can be used from Python. */
         static void registerPython();
       private:
@@ -25,6 +34,7 @@ namespace espresso {
         void integrate1();
         void integrate2();
         void initForces();
+        real radialDampingMass;
         /** Logger */
         static LOG4ESPP_DECL_LOGGER(theLogger);
     };

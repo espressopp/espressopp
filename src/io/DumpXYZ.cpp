@@ -75,7 +75,8 @@ namespace espresso {
                            std::string, 
                            bool,
                            real,
-                           std::string >())
+                           std::string , 
+                           bool>())
         .add_property("filename", &DumpXYZ::getFilename, 
                                   &DumpXYZ::setFilename)
         .add_property("unfolded", &DumpXYZ::getUnfolded, 
@@ -84,6 +85,8 @@ namespace espresso {
                                        &DumpXYZ::setLengthFactor)
         .add_property("length_unit", &DumpXYZ::getLengthUnit, 
                                      &DumpXYZ::setLengthUnit)
+        .add_property("append", &DumpXYZ::getAppend, 
+                                  &DumpXYZ::setAppend)
         .def("dump", &DumpXYZ::dump)
       ;
     }
