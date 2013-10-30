@@ -35,6 +35,7 @@ namespace espresso {
 		void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);
 		void beforeSendATParticles(std::vector<longint>& atpl, class OutBuffer& buf);
 		void onParticlesChanged();
+		python::list getBonds();
 
 		static void registerPython();
 

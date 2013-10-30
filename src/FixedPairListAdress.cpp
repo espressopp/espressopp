@@ -182,6 +182,18 @@ namespace espresso {
     LOG4ESPP_INFO(theLogger, "regenerated local fixed pair list from global list");
   }
 
+  python::list FixedPairListAdress::getBonds()
+  {
+	python::tuple bond;
+	python::list bonds;
+	for (GlobalPairs::const_iterator it=globalPairs.begin(); it != globalPairs.end(); it++) {
+      bond = python::make_tuple(it->first, it->second);
+      bonds.append(bond);
+    }
+
+	return bonds;
+  }
+
   /****************************************************
   ** REGISTRATION WITH PYTHON
   ****************************************************/
@@ -198,6 +210,7 @@ namespace espresso {
               init <shared_ptr<storage::Storage>,
                      shared_ptr<FixedTupleListAdress> >())
       .def("add", pyAdd)
+      .def("getBonds",  &FixedPairListAdress::getBonds)
       ;
   }
 
