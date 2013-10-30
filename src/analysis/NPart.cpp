@@ -11,6 +11,7 @@ namespace espresso {
       int myN, systemN;
       System& system = getSystemRef();
       myN = system.storage->getNRealParticles();
+      myN += system.storage->getNAdressParticles();
       boost::mpi::reduce(*getSystem()->comm, myN, systemN, std::plus<int>(), 0);
       
       return 1.0*systemN;

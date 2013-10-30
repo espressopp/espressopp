@@ -76,6 +76,10 @@ namespace espresso {
       }
       return cnt;
     }
+    longint Storage::getNAdressParticles() const {
+          longint cnt = 0;
+            return localAdrATParticles.size();
+    }
 
     // TODO find out why python crashes if inlined
     //inline
