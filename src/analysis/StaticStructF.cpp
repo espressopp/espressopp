@@ -112,7 +112,7 @@ namespace espresso {
 
             Real3D coordP;
 
-            python::list pyli;
+            python::list pyli;           
 
             //loop over different q values
             for (int hx = -nqx; hx <= nqx; hx++) {
@@ -167,7 +167,10 @@ namespace espresso {
                     real c = (count_bin[bin_i]) ? 1 / (real) count_bin[bin_i] : 0;
                     sq_bin[bin_i] = n_reci * sq_bin[bin_i] * c;
                     q_bin[bin_i] = q_bin[bin_i] * c;
-                    pyli.append(sq_bin[bin_i]);
+                    
+                    python::tuple q_Sq_pair;
+                    q_Sq_pair = python::make_tuple(q_bin[bin_i], sq_bin[bin_i]);
+                    pyli.append(q_Sq_pair);                    
                 }
             }
             return pyli;
