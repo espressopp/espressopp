@@ -104,8 +104,8 @@ namespace espresso {
             }
 
             real n_reci = 1. / num_part;
-//            real scos = 0;
-//            real ssin = 0;
+            //            real scos = 0;
+            //            real ssin = 0;
             real scos_local = 0;
             real ssin_local = 0;
             int ppp = (int) ceil((double) num_part / nprocs);
@@ -126,10 +126,10 @@ namespace espresso {
                         q[1] = hy * dqs[1];
                         q[2] = hz * dqs[2];
                         real q_abs = q.abs();
-//                        if (myrank == 0) {
-//                            cout << "q.abs for (" << hx << "," << hy << "," << hz << "): "
-//                                    << q_abs << "\n";
-//                        }
+                        //                        if (myrank == 0) {
+                        //                            cout << "q.abs for (" << hx << "," << hy << "," << hz << "): "
+                        //                                    << q_abs << "\n";
+                        //                        }
                         //determining the bin number
                         int bin_i = (int) floor(q_abs / bin_size);
                         q_bin[bin_i] += q_abs;
@@ -146,43 +146,31 @@ namespace espresso {
                             scos_local += cos(q * coordP);
                             ssin_local += sin(q * coordP);
                         }
-                        if(myrank != 0){
-                            boost::mpi::reduce(*system.comm, scos_local, plus<real > (),0);
-                            boost::mpi::reduce(*system.comm, ssin_local, plus<real > (),0);
+                        if (myrank != 0) {
+                            boost::mpi::reduce(*system.comm, scos_local, plus<real > (), 0);
+                            boost::mpi::reduce(*system.comm, ssin_local, plus<real > (), 0);
                         }
 
                         if (myrank == 0) {
                             real scos = 0;
                             real ssin = 0;
-                            boost::mpi::reduce(*system.comm, scos_local, scos, plus<real > (),0);
-                            boost::mpi::reduce(*system.comm, ssin_local, ssin, plus<real > (),0);
+                            boost::mpi::reduce(*system.comm, scos_local, scos, plus<real > (), 0);
+                            boost::mpi::reduce(*system.comm, ssin_local, ssin, plus<real > (), 0);
                             sq_bin[bin_i] += scos * scos + ssin * ssin;
                         }
                     }
                 }
             }
-            //creates an output file with q and S(q) values
-            ofstream outfile;
+            //creates the python list with the results            
             if (myrank == 0) {
-                outfile.open("q_sq_values.txt");
                 for (int bin_i = 1; bin_i < num_bins; bin_i++) {
                     real c = (count_bin[bin_i]) ? 1 / (real) count_bin[bin_i] : 0;
                     sq_bin[bin_i] = n_reci * sq_bin[bin_i] * c;
                     q_bin[bin_i] = q_bin[bin_i] * c;
                     pyli.append(sq_bin[bin_i]);
-                    
-                    if(outfile.is_open()){
-                        outfile << setprecision(8);
-                        outfile << fixed;
-                        outfile << q_bin[bin_i] << "   \t" << sq_bin[bin_i] << "\n";                       
-                    }
-                    else cout << "Unable to open output file";                    
                 }
-                outfile.close();
             }
-
             return pyli;
-
         }
         // TODO: this dummy routine is still needed as we have not yet ObservableVector
 
