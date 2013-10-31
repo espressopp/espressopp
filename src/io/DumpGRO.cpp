@@ -62,8 +62,8 @@ namespace espresso {
           short ind;
           for(size_t i=0; i<num_of_particles; i++){
             myfile << setw(5) << i+1;    //FIXME this should be the molecule number, not atom number
-            myfile << setiosflags(ios::left) << setw(5) << "LJ" << resetiosflags(ios::left); //FIXME this should be the molecule name/id or something, use 'LJ' for now, then replace by particle id and use mol name if implemented into esp++
-            myfile << setw(5) << "LJ"; //FIXME this should be the atom name/id; use 'LJ' for now, replace by particle id
+            myfile << setiosflags(ios::left) << setw(1) << "T" << setw(4) <<   particleIDToType.find(i+1)->second <<resetiosflags(ios::left);  // pid starts at 1 // set(1)+set(4) makes in total 5, as required by the fixed format 
+            myfile << setw(4) << setiosflags(ios::right) << "T" << setw(1)<<particleIDToType.find(i+1)->second << resetiosflags(ios::right);
             myfile << setw(5) << i+1;    //NOTE this is the actual atom number - wrapped at 99999
             // while get token 
             // print with setw(8) << setprecision(3)

@@ -125,6 +125,7 @@ namespace espresso {
       }
 
 
+
       /// get number of real particles on this node
       longint getNRealParticles() const;
       
@@ -132,6 +133,8 @@ namespace espresso {
       longint getNLocalParticles() const;
     // returns number of ghosts
       longint getNGhostParticles() const;
+      //returns number of atomistic adress particles
+      longint getNAdressParticles() const;
 
       /** insert the particles in the given storage into the current one.
 	  This is mainly used to switch from one storage to another.
