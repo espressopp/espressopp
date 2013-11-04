@@ -2,7 +2,8 @@ import espresso
 from math import sqrt
 from espresso import Real3D
 
-def pdbwrite(filename, system, molsize=4, append=False):
+def pdbwrite(filename, system, molsize=4, append=False, typenames=None):
+  #typenames: a map of typeid to typename to be written, e.g. for water typenames={0:'H', 1:'O'}
   if append:
     file = open(filename, 'a')
     s = "\n"  
@@ -15,6 +16,7 @@ def pdbwrite(filename, system, molsize=4, append=False):
   addToPid = 0 # if pid begins from 0, then addToPid should be +1
   mol    = 0
   molcnt = 0
+  name='FE' # default name, overwritten when typenames map is given
   #following http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
   #crystal header
   st = "%-6s%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f %-11s%4d\n"%('CRYST1',system.bc.boxL[0],system.bc.boxL[1],system.bc.boxL[2],90.00,90.00,90,'P 1',1) #boxes are orthorhombic for now
@@ -28,9 +30,12 @@ def pdbwrite(filename, system, molsize=4, append=False):
       ypos   = particle.pos[1]
       zpos   = particle.pos[2]
       type   = particle.type
+      
+      if typenames:
+	  name=typenames[type]
       #st = "ATOM %6d  FE  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d\n"%(pid, mol, xpos, ypos, zpos, type)
       #following http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
-      st = "%-6s%5d %-4s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f     T%04d%2s%2s\n"%('ATOM  ',pid+addToPid,'FE','','UNX','F',mol%10000,'',xpos,ypos,zpos,0,0,mol%10000,'','')#the additional 'T' in the string is needed to be recognized as string,%10000 to obey the fixed-width format
+      st = "%-6s%5d %-4s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f     T%04d%2s%2s\n"%('ATOM  ',pid+addToPid,name,'','UNX','F',mol%10000,'',xpos,ypos,zpos,0,0,mol%10000,'','')#the additional 'T' in the string is needed to be recognized as string,%10000 to obey the fixed-width format
       file.write(st)
       pid    += 1
       molcnt += 1
@@ -129,7 +134,7 @@ def pqrwrite(filename, system, molsize=4, append=False):
   file.write('END\n')
   file.close()
 
-def psfwrite(filename, system, maxdist=None, molsize=4):
+def psfwrite(filename, system, maxdist=None, molsize=4, typenames=None):
   file = open(filename,'w')
   maxParticleID = int(espresso.analysis.MaxPID(system).compute())
   nParticles    = int(espresso.analysis.NPart(system).compute())
@@ -141,6 +146,7 @@ def psfwrite(filename, system, maxdist=None, molsize=4):
   addToPid = 0 # if pid begins from 0, then addToPid should be +1
   mol    = 0
   molcnt = 0
+  name='FE' # default name, overwritten when typenames map is given
   while pid <= maxParticleID:
     if system.storage.particleExists(pid):
       particle = system.storage.getParticle(pid)
@@ -150,7 +156,9 @@ def psfwrite(filename, system, maxdist=None, molsize=4):
       ypos   = particle.pos[1]
       zpos   = particle.pos[2]
       type   = particle.type
-      st = "%8d T%03d %4d UNX  FE   FE                    \n" % (pid+addToPid, type, mol)
+      if typenames:
+	  name=typenames[type]
+      st = "%8d T%03d %4d UNX  %2s   %2s                    \n" % (pid+addToPid, type, mol, name, name)
       file.write(st)
       pid    += 1
       molcnt += 1
