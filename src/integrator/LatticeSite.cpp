@@ -154,14 +154,6 @@ namespace espresso {
         jLoc[2] += 0.5*getExtForceLoc().getItem(2);
       }
 
-      // eq. mass mode (conserved)
-      setMeq_i (0, getM_i(0));
-
-      // eq. momentum modes (conserved)
-      setMeq_i (1, getM_i(1));
-      setMeq_i (2, getM_i(2));
-      setMeq_i (3, getM_i(3));
-
       // eq. stress modes
       setMeq_i (4, jLoc.sqr() / rhoLoc);
       setMeq_i (5, (jLoc[0]*jLoc[0] - jLoc[1]*jLoc[1]) / rhoLoc);
@@ -180,9 +172,6 @@ namespace espresso {
 
     void LBSite::relaxMoments (int _numVels) {
       real pi_eq[6];
-      // moments on the site
-      Real3D jLoc(getM_i(1), getM_i(2), getM_i(3));
-      jLoc *= (aLocal / tauLocal);
 
       pi_eq[0] =  getMeq_i(4); pi_eq[1] =  getMeq_i(5); pi_eq[2] =  getMeq_i(6);
       pi_eq[3] =  getMeq_i(7); pi_eq[4] =  getMeq_i(8); pi_eq[5] =  getMeq_i(9);
@@ -214,12 +203,12 @@ namespace espresso {
     void LBSite::thermalFluct(int _numVels) {
     	/* set phi values */
         // rooted density on the site
-        real rootRhoLoc = sqrt(12.*getM_i(0));    // factor 12. comes from the fact that one uses
+        real rootRhoLoc = sqrt(getM_i(0));    // factor 12. comes from the fact that one uses
                                                   // not gaussian but uniformly distributed rand.
         real _valueToAdd;
 
         for (int l = 4; l < _numVels; l++) {
-        	_valueToAdd = rootRhoLoc*getPhiLoc(l)*((*rng)() - 0.5);
+        	_valueToAdd = rootRhoLoc*getPhiLoc(l)*((*rng).normal() - 0.5);
 /*      	    std::cout << "PhiLoc[" << l << "] = " << getPhiLoc (l);
         	if (l == 4) {
 //        		std::cout << "_valueToAdd is " << _valueToAdd;

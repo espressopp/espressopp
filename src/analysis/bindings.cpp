@@ -34,6 +34,11 @@
 
 #include "OrderParameter.hpp"
 
+#include "LBOutput.hpp"
+#include "LBOutputProfileVzOfX.hpp"
+#include "LBOutputScreen.hpp"
+#include "LBOutputVzInTime.hpp"
+
 namespace espresso {
   namespace analysis {
     void registerPython() {
@@ -70,6 +75,11 @@ namespace espresso {
       
       Autocorrelation::registerPython();
       Viscosity::registerPython();
+
+      LBOutput::registerPython();
+      LBOutputProfileVzOfX::registerPython();
+      LBOutputScreen::registerPython();
+      LBOutputVzInTime::registerPython();
     }
   }
 }

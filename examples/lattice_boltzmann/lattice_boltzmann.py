@@ -8,32 +8,49 @@
 # vide low Mach number, i.e. f_z|max = 0.0005 that is smaller than the speed of
 # sound (1./3.).
 import espresso
-import cProfile, pstats
+#import cProfile, pstats
 from espresso import Int3D
 from espresso import Real3D
 
 # create default Lennard Jones (WCA) system with 0 particles and cubic box (L=40)
-system, integrator = espresso.standard_system.LennardJones(0, box=(40, 40, 40), temperature=1.0)
+system, integrator = espresso.standard_system.LennardJones(0, box=(20, 20, 20), temperature=1.0)
 
 # define a LB grid
-lb = espresso.integrator.LatticeBoltzmann(system, Ni=Int3D(40, 40, 40))
+lb = espresso.integrator.LatticeBoltzmann(system, Ni=Int3D(20, 20, 20))
 
 # declare gammas responsible for viscosities (if they differ from 0)
 lb.gamma_b = 0.5
 lb.gamma_s = 0.5
 
 # specify desired temperature (set the fluctuations if any)
-lb.lbTemp = 0.0
-#lb.lbTemp = 0.00001
+#lb.lbTemp = 0.0
+lb.lbTemp = 0.00001
 
 # ask to set the external force to zero. The program then goes to the function initExtForce
 # and sets the force to a harmonic one.
-lb.extForce = Real3D(0.,0.,0.)
+lb.extForce = Real3D(0.,0.,0.0005)
 
 # add extension to the integrator
 integrator.addExtension(lb)
 
+# output velocity profile vz (x)
+#lboutputVzOfX = espresso.analysis.LBOutputProfileVzOfX(system,lb)
+#OUT1=espresso.integrator.ExtAnalyze(lboutputVzOfX,100)
+#integrator.addExtension(OUT1)
+
+# output velocity vz at a certain lattice site as a function of time
+#lboutputVzInTime = espresso.analysis.LBOutputVzInTime(system,lb)
+#OUT2=espresso.integrator.ExtAnalyze(lboutputVzInTime,100)
+#integrator.addExtension(OUT2)
+
+# output onto the screen
+lboutputScreen = espresso.analysis.LBOutputScreen(system,lb)
+OUT3=espresso.integrator.ExtAnalyze(lboutputScreen,100)
+integrator.addExtension(OUT3)
+
 # add some profiling statistics for the run
-cProfile.run("integrator.run(200)",'profiler_stats')
-p = pstats.Stats('profiler_stats')
-p.strip_dirs().sort_stats("time").print_stats(10)
+integrator.run(1000)
+#
+#cProfile.run("integrator.run(1000)",'profiler_stats')
+#p = pstats.Stats('profiler_stats')
+#p.strip_dirs().sort_stats("time").print_stats(10)
