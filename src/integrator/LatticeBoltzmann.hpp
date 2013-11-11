@@ -107,6 +107,8 @@ namespace espresso {
 
         void setPhi (int _l, real _value); 	// set phi for fluctuations
         real getPhi (int _l);  				// get phi for fluctuations
+
+        real getLBFluid (Int3D _Ni, int _l);
         /* END OF SET AND GET DECLARATION */
 
         /* FUNCTIONS DECLARATION */

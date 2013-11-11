@@ -182,6 +182,10 @@ namespace espresso {
     void LatticeBoltzmann::setInitVel (Real3D _u0) { u0 = _u0;}
     Real3D LatticeBoltzmann::getInitVel () {return u0;}
 
+    real LatticeBoltzmann::getLBFluid (Int3D _Ni, int _l) {
+      return lbfluid[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].getF_i(_l);
+    }
+
     /* Initialization of the lattice model: eq.weights, ci's, ... */
     void LatticeBoltzmann::initLatticeModel () {
       using std::setprecision;
@@ -414,14 +418,13 @@ namespace espresso {
     /* Make one LB step. Push-pull scheme is used */
     void LatticeBoltzmann::makeLBStep () {
       /* printing out info about the LB step */
-      static int stepNumbLoc = 0;
-      ++stepNumbLoc;
-      setStepNum(stepNumbLoc);
-
-      if (stepNumbLoc % 50 == 0 || stepNumbLoc == 1) {
-        printf ("starting %d LB step inside makeLBStep function!\n", getStepNum());
+      setStepNum(integrator->getStep());
+/*
+      if (getStepNum() % 100 == 0) {
+        printf ("starting %d LB step!\n", getStepNum());
       } else {
       }
+*/
       /* PUSH-scheme (first collide then stream) */
       collideStream ();
     }
@@ -525,44 +528,12 @@ namespace espresso {
     }
 
     void LatticeBoltzmann::computeDensity (int _i, int _j, int _k, int _numVels, int _step) {
-      using std::string;
       real denLoc = 0.;
-      real jxLoc = 0.;
-      real jyLoc = 0.;
       real jzLoc = 0.;
-
-      FILE * pFile;
-      FILE * velProfFile;
 
       for (int l = 0; l < _numVels; l++) {
         denLoc += lbfluid[_i][_j][_k].getF_i(l);
-        jxLoc += lbfluid[_i][_j][_k].getF_i(l) * getCi(l).getItem(0);
-        jyLoc += lbfluid[_i][_j][_k].getF_i(l) * getCi(l).getItem(1);
         jzLoc += lbfluid[_i][_j][_k].getF_i(l) * getCi(l).getItem(2);
-      }
-
-      std::string number;
-      std::string filename;
-      std::ostringstream convert;
-      convert << _step;
-
-//      if (_step % 50 == 1 && _j == 0 && _k == 0) {
-      if (_j == 0 && _k == 0) {
-        filename = "vz_of_x";
-        filename.append(convert.str());
-        filename.append(".dat");
-
-        velProfFile = fopen(filename.c_str(),"a");
-        fprintf (velProfFile, "%9d %9.6f %9.6f  \n", _i, denLoc, jzLoc/denLoc);
-        fclose (velProfFile);
-      }
-
-      if (_i == (int) (getNi().getItem(0) * 0.25) && _j == 0 && _k == 0) {
-            pFile = fopen ("myfile.dat","a");
-            fprintf (pFile, "%9d %9.6f %9.6f  \n", _step, denLoc, jzLoc/denLoc);
-            fclose (pFile);
-            printf ("site (%2d,%2d,%2d) = den %5.3f   v_z %5.3f  \n", _i, _j, _k, denLoc, jzLoc/denLoc);
-      } else {
       }
 
       /* check velocity fluctuations at the lattice sites */

@@ -8,11 +8,9 @@
 
 #include <boost/serialization/map.hpp>
 
-#include <math.h>       //cos and ceil and sqrt
+#include <math.h>       // cos and ceil and sqrt
 #include <algorithm>    // std::min
 #include <functional>   // std::plus
-#include <fstream> //outputfile
-#include <iomanip> //setprecision
 
 #ifndef M_PIl
 #define M_PIl 3.1415926535897932384626433832795029L
@@ -54,7 +52,6 @@ namespace espresso {
                         int id = cit->id();
                         conf[id] = cit->position();
                     }
-
                 }
                 boost::mpi::broadcast(*system.comm, conf, rank_i);
 
@@ -70,7 +67,7 @@ namespace espresso {
             // now all CPUs have all particle coords and num_part is the total number
             // of particles
 
-            // use all cpus
+            // use all CPUs
             // TODO it could be a problem if   n_nodes > num_part
 
             // here starts calculation of the static structure factor
@@ -104,8 +101,6 @@ namespace espresso {
             }
 
             real n_reci = 1. / num_part;
-            //            real scos = 0;
-            //            real ssin = 0;
             real scos_local = 0;
             real ssin_local = 0;
             int ppp = (int) ceil((double) num_part / nprocs);
@@ -118,18 +113,13 @@ namespace espresso {
             for (int hx = -nqx; hx <= nqx; hx++) {
                 for (int hy = -nqy; hy <= nqy; hy++) {
                     for (int hz = -nqz; hz <= nqz; hz++) {
-                        //int hy = 1;
-                        //int hz = 1;
 
                         //values of q-vector
                         q[0] = hx * dqs[0];
                         q[1] = hy * dqs[1];
                         q[2] = hz * dqs[2];
                         real q_abs = q.abs();
-                        //                        if (myrank == 0) {
-                        //                            cout << "q.abs for (" << hx << "," << hy << "," << hz << "): "
-                        //                                    << q_abs << "\n";
-                        //                        }
+
                         //determining the bin number
                         int bin_i = (int) floor(q_abs / bin_size);
                         q_bin[bin_i] += q_abs;
