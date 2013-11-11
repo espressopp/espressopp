@@ -16,8 +16,8 @@ namespace espresso {
 
     /* LB Constructor; expects 3 reals, 1 vector and 5 integers */
     LatticeBoltzmann::LatticeBoltzmann(shared_ptr<System> system, Int3D _Ni,
-        real _a, real _tau, real _rho0, Real3D _u0, int _numDims, int _numVels)
-    : Extension(system), Ni(_Ni), a(_a), tau(_tau), rho0(_rho0), u0(_u0),
+        real _a, real _tau, int _numDims, int _numVels)
+    : Extension(system), Ni(_Ni), a(_a), tau(_tau),
       numDims(_numDims), numVels(_numVels)
        {
       /* create storage for variables equivalent at all the nodes */
@@ -87,7 +87,6 @@ namespace espresso {
       std::cout << "-------------------------------------\n";
 
       initLatticeModel();				// initialize all the global weights and coefficients
-      initPopulations(_rho0, _u0);		// initialize the liquid by its density and velocity at the lattice site
 
       printf("Constructor has finished!!!\n");
       std::cout << "-------------------------------------\n";
@@ -169,21 +168,26 @@ namespace espresso {
     void LatticeBoltzmann::setGammaEven (real _gamma_even) {gamma_even = _gamma_even; initGammas(3);}
     real LatticeBoltzmann::getGammaEven () { return gamma_even;}
 
-    void LatticeBoltzmann::setExtForce (Real3D _extForce) {extForce = _extForce; initExtForce();}
-    Real3D LatticeBoltzmann::getExtForce () {return extForce;}
-
     void LatticeBoltzmann::setExtForceFlag (int _extForceFlag) {extForceFlag = _extForceFlag;}
     int LatticeBoltzmann::getExtForceFlag () {return extForceFlag;}
 
-    /* Initialization of density and velocity on lattice sites */
-    void LatticeBoltzmann::setInitDen (real _rho0) { rho0 = _rho0;}
-    real LatticeBoltzmann::getInitDen () {return rho0;}
-
-    void LatticeBoltzmann::setInitVel (Real3D _u0) { u0 = _u0;}
-    Real3D LatticeBoltzmann::getInitVel () {return u0;}
-
+    void LatticeBoltzmann::setLBFluid (Int3D _Ni, int _l, real _value) {
+      lbfluid[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setF_i(_l, _value);
+    }
     real LatticeBoltzmann::getLBFluid (Int3D _Ni, int _l) {
       return lbfluid[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].getF_i(_l);
+    }
+
+    void LatticeBoltzmann::setForceLoc (Int3D _Ni, Real3D _extForceLoc) {
+      return lbfluid[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setExtForceLoc(_extForceLoc);
+    }
+
+    Real3D LatticeBoltzmann::getForceLoc (Int3D _Ni) {
+      return lbfluid[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].getExtForceLoc();
+    }
+
+    void LatticeBoltzmann::setGhostFluid (Int3D _Ni, int _l, real _value) {
+      ghostlat[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setPop_i(_l, _value);
     }
 
     /* Initialization of the lattice model: eq.weights, ci's, ... */
@@ -264,6 +268,11 @@ namespace espresso {
           }
         }
       }
+
+      // check sound speed
+      printf ("cs2 and invCs2 are %8.4f %8.4f \n", getCs2(), 1./getCs2());
+      printf("-------------------------------------\n");
+
     }
 
     /* (Re)initialization of gammas */
@@ -316,7 +325,8 @@ namespace espresso {
         // account for fluctuations being turned on!
         setLBTempFlag(1);
 
-        std::cout << setprecision(6); std::cout << fixed;   // some output tricks
+        std::cout << setprecision(8);
+        std::cout << fixed;   // some output tricks
         std::cout << "The fluctuations have been introduced into the system:\n";
         std::cout << "lbTemp = " << getLBTemp() << "\n";
 
@@ -344,74 +354,6 @@ namespace espresso {
         }
         std::cout << "The amplitudes phi_i of the fluctuations have been redefined.\n";
         std::cout << "-------------------------------------\n";
-      }
-    }
-
-    /* (Re)initialization of external force */
-    void LatticeBoltzmann::initExtForce () {
-      using std::setprecision;
-      using std::fixed;
-      using std::setw;
-      Real3D _extForce = (0.,0.,0.);
-      setExtForceFlag(0);           // we initialize the flag as if no forces are present
-      // that is to account for the situation when after some time external forces are canceled!
-
-      // (re)set values of external forces
-      for (int i = 0; i < getNi().getItem(0); i++) {
-        for (int j = 0; j < getNi().getItem(1); j++) {
-          for (int k = 0; k < getNi().getItem(2); k++) {
-//            _extForce = getExtForce();  // at the moment we test the code with sin force f_z(x)
-            _extForce = Real3D (0.,0.,0.0005 * sin (2 * M_PI * i / getNi().getItem(0)));
-            if (_extForce != Real3D(0.,0.,0.)) {
-              setExtForceFlag(1);
-              lbfluid[i][j][k].setExtForceLoc(_extForce);
-            }
-          }
-        }
-      }
-      // print for control getNi().getItem(0) * 0.25
-      std::cout << "External force has been changed:\n";
-      std::cout << " extForce.x is " << lbfluid[getNi().getItem(0) * 0.25][0][0].getExtForceLoc().getItem(0) << "\n";
-      std::cout << " extForce.y is " << lbfluid[getNi().getItem(0) * 0.25][0][0].getExtForceLoc().getItem(1) << "\n";
-      std::cout << " extForce.z is " << lbfluid[getNi().getItem(0) * 0.25][0][0].getExtForceLoc().getItem(2) << "\n";
-      std::cout << "-------------------------------------\n";
-    }
-
-    /* Initialization of populations on lattice sites */
-    void LatticeBoltzmann::initPopulations (real _rho0, Real3D _u0) {
-      setInitDen(_rho0);
-      setInitVel(_u0);
-
-      real invCs2 = 1. / getCs2();
-
-      real invCs4 = invCs2*invCs2;
-      //real trace = u0*u0*invCs2;
-      real scalp, value;
-
-      // check lattice creation
-      printf ("Check vector creation. Its size is "); printf (" %d x ", lbfluid.size());
-      printf (" %d x ", lbfluid[0].size());
-      printf (" %d and ghostlattice is ", lbfluid[0][0].size()); printf (" %d x ", ghostlat.size());
-      printf (" %d x ", ghostlat[0].size()); printf (" %d\n", ghostlat[0][0].size());
-
-      // check sound speed
-      printf ("cs2 and invCs2 are %8.4f %8.4f \n", getCs2(), invCs2);
-
-      // set initial velocity of the populations from Maxwell's distribution
-      for (int i = 0; i < getNi().getItem(0); i++) {
-    	// test the damping of a sin-like initial velocities:
-//        setInitVel(Real3D(0., 0., 0.05 * sin (2. * M_PI * i / getNi().getItem(0))));
-        real trace = u0*u0*invCs2;
-        for (int j = 0; j < getNi().getItem(1); j++) {
-          for (int k = 0; k < getNi().getItem(2); k++) {
-            for (int l = 0; l < numVels; l++) {
-              scalp = getInitVel() * getCi(l);
-              value = 0.5 * getEqWeight(l) * getInitDen() * (2. + 2. * scalp * invCs2 + scalp * scalp * invCs4 - trace);
-              lbfluid[i][j][k].setF_i(l,value);
-              ghostlat[i][j][k].setPop_i(l,0.0);
-            }
-          }
-        }
       }
     }
 
@@ -583,12 +525,10 @@ namespace espresso {
       class_<LatticeBoltzmann, shared_ptr<LatticeBoltzmann>, bases<Extension> >
 
         ("integrator_LatticeBoltzmann", init< shared_ptr< System >, Int3D,
-                                        real, real, real, Real3D, int, int >())
+                                        real, real, int, int >())
         .add_property("Ni", &LatticeBoltzmann::getNi, &LatticeBoltzmann::setNi)
         .add_property("a", &LatticeBoltzmann::getA, &LatticeBoltzmann::setA)
         .add_property("tau", &LatticeBoltzmann::getTau, &LatticeBoltzmann::setTau)
-        .add_property("rho0", &LatticeBoltzmann::getInitDen, &LatticeBoltzmann::setInitDen)
-        .add_property("u0", &LatticeBoltzmann::getInitVel, &LatticeBoltzmann::setInitVel)
         .add_property("numDims", &LatticeBoltzmann::getNumDims, &LatticeBoltzmann::setNumDims)
         .add_property("numVels", &LatticeBoltzmann::getNumVels, &LatticeBoltzmann::setNumVels)
         .add_property("gamma_b", &LatticeBoltzmann::getGammaB, &LatticeBoltzmann::setGammaB)
@@ -596,7 +536,6 @@ namespace espresso {
         .add_property("gamma_odd", &LatticeBoltzmann::getGammaOdd, &LatticeBoltzmann::setGammaOdd)
         .add_property("gamma_even", &LatticeBoltzmann::getGammaEven, &LatticeBoltzmann::setGammaEven)
         .add_property("lbTemp", &LatticeBoltzmann::getLBTemp, &LatticeBoltzmann::setLBTemp)
-        .add_property("extForce", &LatticeBoltzmann::getExtForce, &LatticeBoltzmann::setExtForce)
         .def("connect", &LatticeBoltzmann::connect)
         .def("disconnect", &LatticeBoltzmann::disconnect)
         ;

@@ -19,6 +19,11 @@
 #include "FixPositions.hpp"
 #include "LatticeBoltzmann.hpp"
 #include "LatticeSite.hpp"
+#include "LBInit.hpp"
+#include "LBInitConstForce.hpp"
+#include "LBInitPeriodicForce.hpp"
+#include "LBInitPopUniform.hpp"
+#include "LBInitPopWave.hpp"
 #include "ExtForce.hpp"
 #include "CapForce.hpp"
 #include "ExtAnalyze.hpp"
@@ -45,6 +50,11 @@ namespace espresso {
       DPDThermostat::registerPython();
       FixPositions::registerPython();
       LatticeBoltzmann::registerPython();
+      LBInit::registerPython();
+      LBInitConstForce::registerPython();
+      LBInitPeriodicForce::registerPython();
+      LBInitPopUniform::registerPython();
+      LBInitPopWave::registerPython();
       ExtForce::registerPython();
       CapForce::registerPython();
       ExtAnalyze::registerPython();

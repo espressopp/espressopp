@@ -34,7 +34,7 @@ namespace espresso {
       */
       public:
         LatticeBoltzmann (shared_ptr< System > _system, Int3D _Ni,
-            real _a, real _tau, real _rho0, Real3D _u0, int _numDims, int _numVels);
+            real _a, real _tau, int _numDims, int _numVels);
         ~LatticeBoltzmann ();
 
         /* SET AND GET DECLARATION */
@@ -59,17 +59,8 @@ namespace espresso {
         void setGammaEven (real _gamma_even); 	// set gamma even
         real getGammaEven ();  					// get gamma even
 
-        void setExtForce (Real3D _extForce);    // set external force
-        Real3D getExtForce ();                  // get external force
-
         void setExtForceFlag (int _extForceFlag); // set a flag for external force
         int getExtForceFlag ();                   // get a flag for external force
-
-        void setInitDen (real _rho0);	  // set initial density
-        real getInitDen ();		          // get initial density
-
-        void setInitVel (Real3D _u0);	  // set initial velocity
-        Real3D getInitVel ();		        // get initial velocity
 
         void setNumDims (int _numDims);	// set number of dimensions
         int getNumDims ();		            // get number of dimensions
@@ -108,15 +99,19 @@ namespace espresso {
         void setPhi (int _l, real _value); 	// set phi for fluctuations
         real getPhi (int _l);  				// get phi for fluctuations
 
+        void setLBFluid (Int3D _Ni, int _l, real _value);
         real getLBFluid (Int3D _Ni, int _l);
+
+        void setForceLoc (Int3D _Ni, Real3D _extForceLoc);
+        Real3D getForceLoc (Int3D _Ni);
+
+        void setGhostFluid (Int3D _Ni, int _l, real _value);
         /* END OF SET AND GET DECLARATION */
 
         /* FUNCTIONS DECLARATION */
         void initLatticeModel ();   // initialize lattice model (weights, cis)
         void initGammas (int _idGamma); // (re)initialize gammas
-        void initExtForce ();         // (re)initialize external forces
         void initFluctuations ();   // (re)initialize fluctuation parameters
-        void initPopulations (real _rho0, Real3D _u0); // initialize populations
         void makeLBStep ();          // perform one step of LB
         void addPolyLBForces();     // add to polymers forces due to LBsites
 
@@ -150,9 +145,6 @@ namespace espresso {
         std::vector<Real3D> c_i;    // velocity vectors
         std::vector<real> inv_b_i;  // back-transformation weights
         std::vector<real> phi;		// amplitudes of fluctuations
-        real rho0;	      		      // initial density
-        Real3D u0;	      		      // initial velocity
-        Real3D extForce;            // external force
         int extForceFlag;           // flag for external force
         Int3D Ni;              		    // lattice lengths in 3D
         int idX, idY, idZ, index;	  // indexes in 3D and aligned 1D index
