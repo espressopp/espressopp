@@ -287,6 +287,7 @@ namespace espresso {
           }
       }
       
+
       std::set<Particle*> adrZone = verletList->getAdrZone();
       for (std::set<Particle*>::iterator it=adrZone.begin();
               it != adrZone.end(); ++it) {
@@ -335,6 +336,14 @@ namespace espresso {
           }
       }
       
+
+      for (std::set<Particle*>::iterator it=adrZone.begin();
+                    it != adrZone.end(); ++it) {
+                  	Particle &p = **it;
+                  	// intitialize energy diff AA-CG
+                  	energydiff[&p]=0.0;
+      }
+
        
       // Pairs not inside the AdResS Zone (CG region)
       for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
