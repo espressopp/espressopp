@@ -442,6 +442,8 @@ namespace espresso {
           }
         }
         
+        //cout<<"cpu: "<< getSystem()->comm->rank()<< "  incl_surf: "<< incl_surface<<endl;
+        
         if(incl_surface){
           for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
             Particle& p = *cit;
@@ -452,7 +454,6 @@ namespace espresso {
               for(int i=0; i<nnn; i++){
                 OrderParticleProps *opp_i_surf = &(opp_map.find( opp_i->getNN(i) ))->second;
                 if( !opp_i_surf->getSolid() ){
-                  //opp_i_surf->setSolid(true);
                   opp_i_surf->setSurface(true);
                 }
               }
@@ -469,7 +470,8 @@ namespace espresso {
             int id = (*opm).first;
             if( !getSystem()->storage->lookupRealParticle(id) ){
               OrderParticleProps &op = (*opm).second;
-              if( !op.getNumNN()==0 ) sendGhostInfo.push_back( (*opm).second );
+              //if( !op.getNumNN()==0 ) sendGhostInfo.push_back( (*opm).second );
+              sendGhostInfo.push_back( (*opm).second );
             }
           }
 

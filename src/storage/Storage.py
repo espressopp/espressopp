@@ -61,8 +61,11 @@ All derived classes implement at least the following methods:
    Example: 
    
    >>> modifyParticle(pid, 'pos', Real3D(new_x, new_y, new_z))
+   
+* `removeAllParticles()`:
 
-
+   This routine removes all particles from the storage.
+   
 * 'system':
 
   The property 'system' returns the System object of the storage.
