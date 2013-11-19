@@ -8,10 +8,10 @@ Makefile
 COPYING
 INSTALL
 ESPRC
-aclocal.m4
-build
 espresso
 src/acconfig.hpp
+src/main/_setupPath.py
+src/hgversion.hpp
 src/pypresso
 build
 CMakeFiles/*
