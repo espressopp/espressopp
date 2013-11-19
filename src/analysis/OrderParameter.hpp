@@ -613,12 +613,14 @@ namespace espresso {
           OrderParticleProps opp_i = (opp_map.find( pid ))->second;
           sendGhostInfo.push_back( opp_i );
           
+          /*
           if( opp_i.getSurface() )
             loc_count++;
           if( opp_i.getSolid() )
             loc_count_solid++;
+          */
         }
-cout<<"cpu: "<< this_node << "  loc_surf: "<< loc_count<< "  loc_solid: "<< loc_count_solid<<endl;
+//cout<<"cpu: "<< this_node << "  loc_surf: "<< loc_count<< "  loc_solid: "<< loc_count_solid<<endl;
         
         
         vector<int> sendSizes;
