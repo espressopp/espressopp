@@ -1,6 +1,6 @@
 #include "Timer.hpp"
 
-#if defined(HAVE_SYS_RESOURCE_H) or defined(CMAKE_HEADERS)
+#ifdef CMAKE_HEADERS
 
 #include <sys/resource.h>
 

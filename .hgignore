@@ -10,7 +10,6 @@ INSTALL
 ESPRC
 espresso
 src/acconfig.hpp
-src/main/_setupPath.py
 src/hgversion.hpp
 src/pypresso
 build
