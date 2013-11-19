@@ -66,6 +66,7 @@ namespace espresso {
         ar & nns;
         ar & qlm;
         ar & is_solid;
+        ar & is_surface;
       }
       
     public:
@@ -324,6 +325,7 @@ namespace espresso {
         // ------------------------------------------------------------------------------
         // loop over all real particles and calculate SumQlm
         for(CellListIterator cit(cells_real); !cit.isDone(); ++cit) {
+        //for(CellListIterator cit(cells_loc); !cit.isDone(); ++cit) {
           Particle& p = *cit;
           OrderParticleProps *opp_i = &( opp_map.find( p.id() ) )->second;
           opp_i->calculateSumQlm();
@@ -394,6 +396,7 @@ namespace espresso {
         for(vector<OrderParticleProps>::iterator it = totID.begin(); it!=totID.end(); ++it){
           OrderParticleProps &gop = *it;
           if( gop.getPID()!=-1 && stor->lookupRealParticle( gop.getPID() ) ){
+          //if( gop.getPID()!=-1 && stor->lookupLocalParticle( gop.getPID() ) ){
             OrderParticleProps *opp_i = &(opp_map.find( gop.getPID() ))->second;
             opp_i->setD(  opp_i->getD() + gop.getD() );
           }
@@ -432,6 +435,7 @@ namespace espresso {
       
       void define_solid(){
         CellList cells = getSystem()->storage->getRealCells();
+        CellList cells_l = getSystem()->storage->getLocalCells();
         
         for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
           Particle& p = *cit;
@@ -445,7 +449,8 @@ namespace espresso {
         //cout<<"cpu: "<< getSystem()->comm->rank()<< "  incl_surf: "<< incl_surface<<endl;
         
         if(incl_surface){
-          for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
+          /*
+          for(CellListIterator cit(cells_l); !cit.isDone(); ++cit) {
             Particle& p = *cit;
             int pid = p.id();
             OrderParticleProps *opp_i = &(opp_map.find( pid ))->second;
@@ -460,35 +465,110 @@ namespace espresso {
             }
             
           }
+           */
           
           // -----------------------------------------------------------------------
           // send ghost info
           shared_ptr< mpi::communicator > cmm = getSystem()->comm;
-          
           vector <OrderParticleProps> sendGhostInfo;
-          for(boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin(); opm!=opp_map.end(); ++opm){
-            int id = (*opm).first;
-            if( !getSystem()->storage->lookupRealParticle(id) ){
-              OrderParticleProps &op = (*opm).second;
-              //if( !op.getNumNN()==0 ) sendGhostInfo.push_back( (*opm).second );
-              sendGhostInfo.push_back( (*opm).second );
-            }
+          //for(boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin(); opm!=opp_map.end(); ++opm){
+          for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
+            Particle& p = *cit;
+            int pid = p.id();
+            OrderParticleProps *opp_i = &(opp_map.find( pid ))->second;
+            sendGhostInfo.push_back( *opp_i );
+            
+            //int id = (*opm).first;
+            //if( getSystem()->storage->lookupGhostParticle(id) ){
+            //if( getSystem()->storage->lookupLocalParticle(id) ){
+            //if( getSystem()->storage->lookupRealParticle(id) ){
+            //  OrderParticleProps &op = (*opm).second;
+            //  if( op.getNumNN()!=0 ) sendGhostInfo.push_back( (*opm).second );
+            //}
           }
 
           int maxSize, vecSize  = sendGhostInfo.size();
           mpi::all_reduce( *cmm, vecSize, maxSize, mpi::maximum<int>() );
           while(sendGhostInfo.size()<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
-
           vector< OrderParticleProps > totID;
-          boost::mpi::all_gather( *getSystem()->comm, &sendGhostInfo[0], maxSize, totID);
+          mpi::all_gather( *cmm, &sendGhostInfo[0], maxSize, totID);
 
           for(vector<OrderParticleProps>::iterator it = totID.begin(); it!=totID.end(); ++it){
             OrderParticleProps &gop = *it;
-            if( gop.getPID()!=-1 && getSystem()->storage->lookupRealParticle( gop.getPID() ) ){
-              OrderParticleProps *opp_i_loc = &(opp_map.find( gop.getPID() ))->second;
-              //opp_i_loc->setSolid( gop.getSolid() );
-              opp_i_loc->setSurface( gop.getSurface() );
+            
+            if( gop.getPID()!=-1 ){
+              if( gop.getSolid() && !gop.getSurface() ){
+                int nnn = gop.getNumNN();
+                for(int i=0; i<nnn; i++){
+
+                    if( getSystem()->storage->lookupRealParticle( gop.getNN(i) ) ){
+                      OrderParticleProps *opp_i_surf = &(opp_map.find( gop.getNN(i) ))->second;
+                      if( !opp_i_surf->getSolid() ){
+                        opp_i_surf->setSurface(true);
+                      }
+                    }
+                }
+
+
+                /*
+                if( !opp_i_loc->getSolid() ){
+                  //opp_i_loc->setSolid( gop.getSolid() );
+                }
+                if( !opp_i_loc->getSolid() && !opp_i_loc->getSurface() ){
+                  opp_i_loc->setSurface( gop.getSurface() );
+                }
+
+                /*
+                if( !opp_i_loc->getSolid() && gop.getSolid() ){
+                  int nnn = gop.getNumNN();
+                  for(int i=0; i<nnn; i++){
+                    if( getSystem()->storage->lookupRealParticle( gop.getNN(i) ) ){
+                      OrderParticleProps *opp_i_surf = &(opp_map.find( gop.getNN(i) ))->second;
+                      if( !opp_i_surf->getSolid() ){
+                        opp_i_surf->setSurface(true);
+                      }
+                    }
+                  }
+                }
+                 */
+
+
+              }
             }
+            
+            /*
+            if( gop.getPID()!=-1 && gop.getSolid() && !gop.getSurface() ){
+              int nnn = gop.getNumNN();
+              for(int i=0; i<nnn; i++){
+                if( getSystem()->storage->lookupRealParticle( gop.getNN(i) ) ){
+                  OrderParticleProps *opp_i_surf = &(opp_map.find( gop.getNN(i) ))->second;
+                  if( !opp_i_surf->getSolid() ){
+                    opp_i_surf->setSurface(true);
+                  }
+                }
+              }
+            }
+             
+             
+             
+            /*
+            // add surface on the other site
+            if( gop.getPID()!=-1 && getSystem()->storage->lookupLocalParticle( gop.getPID() ) ){
+              OrderParticleProps *opp_i_loc = &(opp_map.find( gop.getPID() ))->second;
+              if( opp_i_loc->getSolid() && !opp_i_loc->getSurface() ){
+                int nnn = opp_i_loc->getNumNN();
+                for(int i=0; i<nnn; i++){
+                  OrderParticleProps *opp_i_surf = &(opp_map.find( opp_i_loc->getNN(i) ))->second;
+                  if( !opp_i_surf->getSolid() ){
+                    opp_i_surf->setSurface(true);
+                  }
+                }
+              }
+            }
+            */
+            
+            
+            
           }
           //--------------------------------------------------------------------------
         }
@@ -524,13 +604,22 @@ namespace espresso {
         CellList cells = getSystem()->storage->getRealCells();
         int this_node = getSystem() -> comm -> rank();
         
+        int loc_count = 0;
+        int loc_count_solid = 0;
         vector <OrderParticleProps> sendGhostInfo;
         for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
           Particle& p = *cit;
           int pid = p.id();
           OrderParticleProps opp_i = (opp_map.find( pid ))->second;
           sendGhostInfo.push_back( opp_i );
+          
+          if( opp_i.getSurface() )
+            loc_count++;
+          if( opp_i.getSolid() )
+            loc_count_solid++;
         }
+cout<<"cpu: "<< this_node << "  loc_surf: "<< loc_count<< "  loc_solid: "<< loc_count_solid<<endl;
+        
         
         vector<int> sendSizes;
         int ss  = sendGhostInfo.size();
