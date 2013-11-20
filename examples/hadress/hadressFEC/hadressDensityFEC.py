@@ -192,7 +192,7 @@ Eb = interQuartic.computeEnergy()
 Ecorr = fec.computeCompEnergy()
 sys.stdout.write(' step    Temp       etotal      enonbonded    ebonded     ekinetic     ecorrection\n')
 sys.stdout.write(fmt % (0, T, Ek + Ep + Eb + Ecorr, Ep, Eb, Ek, Ecorr))
-weihnachten = 0.0
+
 # Density profile preparation
 density_array_total = []
 Adds = 0.0

@@ -28,7 +28,7 @@ from espresso.tools import timers
 # simulation parameters (nvt = False is nve)
 steps = 10000
 check = steps/100
-timestep = 0.00005
+timestep = 0.0005
 # parameters to convert GROMACS tabulated potential file
 sigma = 1.0
 epsilon = 1.0
@@ -174,11 +174,11 @@ bondedinteractions=gromacs.setBondedInteractions(system, bondtypes, bondtypepara
 verletlist.exclude(exclusions)
 
 # langevin thermostat
-#langevin = espresso.integrator.LangevinThermostat(system)
-#langevin.gamma = 2.0
-#langevin.temperature = 2.4942 # kT in gromacs units
+langevin = espresso.integrator.LangevinThermostat(system)
+langevin.gamma = 2.0
+langevin.temperature = 2.4942 # kT in gromacs units
 integrator = espresso.integrator.VelocityVerlet(system)
-#integrator.addExtension(langevin)
+integrator.addExtension(langevin)
 integrator.dt = timestep
 
 adress = espresso.integrator.Adress(system)

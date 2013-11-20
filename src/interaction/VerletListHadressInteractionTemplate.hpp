@@ -180,7 +180,7 @@ namespace espresso {
                   // calculate distance to nearest adress particle or center
                   std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
                   Real3D pa = **it2; // position of adress particle
-                  Real3D d1 = (0,0,0);          
+                  Real3D d1(0.0, 0.0, 0.0);          
                   //Real3D d1 = vp.position() - pa;                                                      // X SPLIT VS SPHERE CHANGE
                   //real d1 = vp.position()[0] - pa[0];                                                // X SPLIT VS SPHERE CHANGE
                   verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
@@ -260,7 +260,7 @@ namespace espresso {
                   // calculate distance to nearest adress particle or center
                   std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
                   Real3D pa = **it2; // position of adress particle
-                  Real3D d1 = (0,0,0);
+                  Real3D d1(0.0, 0.0, 0.0);
                   //Real3D d1 = vp.position() - pa;                                                      // X SPLIT VS SPHERE CHANGE
                   verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
                   //real d1 = vp.position()[0] - pa[0];                                                // X SPLIT VS SPHERE CHANGE
@@ -558,7 +558,7 @@ namespace espresso {
               // calculate distance to nearest adress particle or center
               std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
               Real3D pa = **it2; // position of adress particle
-              Real3D mindriftforce = (0,0,0);
+              Real3D mindriftforce(0.0, 0.0, 0.0);
               //Real3D mindriftforce = vp.position() - pa;                                                           // X SPLIT VS SPHERE CHANGE
               //real mindriftforce = vp.position()[0] - pa[0];                                                         // X SPLIT VS SPHERE CHANGE
               verletList->getSystem()->bc->getMinimumImageVector(mindriftforce, vp.position(), pa);
@@ -566,7 +566,7 @@ namespace espresso {
               ++it2;
               for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                    pa = **it2;
-                   Real3D driftforce = (0,0,0);
+                   Real3D driftforce(0.0, 0.0, 0.0);
                    //Real3D driftforce = vp.position() - pa;                                                          // X SPLIT VS SPHERE CHANGE
                    //real driftforce = vp.position()[0] - pa[0];                                                    // X SPLIT VS SPHERE CHANGE
                    verletList->getSystem()->bc->getMinimumImageVector(driftforce, vp.position(), pa);
