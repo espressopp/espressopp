@@ -20,6 +20,7 @@ namespace espresso {
                 real kappa;
                 real epsilon1, epsilon2;
                 real rc, rc3; // cutoff, cutoff^3
+                real rc2;
                 real B1, B0, B1_half;
                 real prefactor;
                 real crf; /* const to make potential zero at cutoff, corresponding
@@ -32,6 +33,7 @@ namespace espresso {
                     real tmp2 = (epsilon1 + 2.0*epsilon2) *
                             (1.0 + krc) + epsilon2 * krc*krc;
                     rc3 = pow(rc,3);
+                    rc2 = pow(rc,2);
                     B1 = tmp1/tmp2;
                     B1 = (1.0+B1) / rc3;
                     B1_half = B1/2.0;
@@ -108,11 +110,13 @@ namespace espresso {
                 real _computeEnergy(const Particle& p1, const Particle& p2) const {
                     Real3D dist = p1.position() - p2.position();
                     real distSqr = dist.sqr();
+                    if (distSqr>rc2) return 0.0;
                     real qq = p1.q()*p2.q();
                     /* Note: this implementation counts minus integral of the force as energy
                          which is not the same as the full electrostatic energy
                          See the original paper Tironi et al J.Chem.Phys 102, 13, 1995
                          for details*/
+
                     real energy = prefactor*qq * (1.0 / sqrt(distSqr) - B1_half*distSqr -crf);     
                     return energy;
                 }
@@ -128,6 +132,7 @@ namespace espresso {
                          const Particle &p2) const {
                     Real3D dist = p1.position() - p2.position();
                     real r2 = dist.sqr();
+                    if (r2>rc2) return true;
                     real r = sqrt(r2);
                     real qq = p1.q()*p2.q();
                     real ffactor = prefactor*qq* (1.0/(r*r2) + B1);
