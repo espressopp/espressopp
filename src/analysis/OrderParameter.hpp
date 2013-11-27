@@ -55,6 +55,8 @@ namespace espresso {
       vector<int> nns;
       vector<dcomplex> qlm; //  depends on angular_momentum =2*angular_momentum+1
       
+      int label; // variable for cluster analysis
+      
       friend class boost::serialization::access;
       template<class Archive>
       void serialize(Archive & ar, const unsigned int version) {
@@ -66,6 +68,8 @@ namespace espresso {
         ar & nns;
         ar & qlm;
         ar & is_solid;
+        ar & is_surface;
+        ar & label;
       }
       
     public:
@@ -73,7 +77,8 @@ namespace espresso {
                              qlmSumSqrt(0),
                              nnns(0),
                              ang_m(0),
-                             particle_id(-1) {
+                             particle_id(-1),
+                             label(-1){
         is_solid = false;
         is_surface = false;
       }
@@ -82,7 +87,8 @@ namespace espresso {
                                    qlmSumSqrt(0),
                                    nnns(0),
                                    ang_m(am),
-                                   particle_id(-1) {
+                                   particle_id(-1),
+                                   label(-1){
         qlm = vector<dcomplex>(2*am+1, dcomplex(0.0, 0.0) );
         is_solid = false;
         is_surface = false;
@@ -91,7 +97,8 @@ namespace espresso {
                                             qlmSumSqrt(0),
                                             nnns(0),
                                             ang_m(am),
-                                            particle_id(pid) {
+                                            particle_id(pid),
+                                            label(-1){
         qlm = vector<dcomplex>(2*am+1, dcomplex(0.0, 0.0) );
         is_solid = false;
         is_surface = false;
@@ -152,6 +159,9 @@ namespace espresso {
       bool getSolid(){ return is_solid;}
       void setSurface(bool v){ is_surface = v;}
       bool getSurface(){ return is_surface;}
+      
+      void setLabel(int v){ label = v;}
+      int getLabel(){ return label;}
     };
     
     
@@ -185,6 +195,7 @@ namespace espresso {
        */
       real d_min, d_max;
       
+      int max_cluster, number_of_clust; // a size of a biggest cluster and number of clusters
       
     public:
       static void registerPython();
@@ -204,6 +215,8 @@ namespace espresso {
                         d_min(_d_min),
                         d_max(_d_max){
         cutoff_sq = cutoff * cutoff;
+        max_cluster = 0;
+        number_of_clust = 0;
       }
       virtual ~OrderParameter() {
       }
@@ -230,6 +243,10 @@ namespace espresso {
       void setD_max(int v){ d_max = v; }
       int getD_max(){ return d_max; }
       
+      void setMax_Cl(int v){ max_cluster = v; }
+      int getMax_Cl(){ return max_cluster; }
+      void setNum_of_Cl(int v){ number_of_clust = v; }
+      int getNum_of_Cl(){ return number_of_clust; }
       /*
        * It is efficient only when communications are optimized.
        */
@@ -324,6 +341,7 @@ namespace espresso {
         // ------------------------------------------------------------------------------
         // loop over all real particles and calculate SumQlm
         for(CellListIterator cit(cells_real); !cit.isDone(); ++cit) {
+        //for(CellListIterator cit(cells_loc); !cit.isDone(); ++cit) {
           Particle& p = *cit;
           OrderParticleProps *opp_i = &( opp_map.find( p.id() ) )->second;
           opp_i->calculateSumQlm();
@@ -394,6 +412,7 @@ namespace espresso {
         for(vector<OrderParticleProps>::iterator it = totID.begin(); it!=totID.end(); ++it){
           OrderParticleProps &gop = *it;
           if( gop.getPID()!=-1 && stor->lookupRealParticle( gop.getPID() ) ){
+          //if( gop.getPID()!=-1 && stor->lookupLocalParticle( gop.getPID() ) ){
             OrderParticleProps *opp_i = &(opp_map.find( gop.getPID() ))->second;
             opp_i->setD(  opp_i->getD() + gop.getD() );
           }
@@ -443,50 +462,41 @@ namespace espresso {
         }
         
         if(incl_surface){
+          // -----------------------------------------------------------------------
+          // send ghost info
+          shared_ptr< mpi::communicator > cmm = getSystem()->comm;
+          vector <OrderParticleProps> sendGhostInfo;
           for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
             Particle& p = *cit;
             int pid = p.id();
             OrderParticleProps *opp_i = &(opp_map.find( pid ))->second;
-            if( opp_i->getSolid() && !opp_i->getSurface() ){
-              int nnn = opp_i->getNumNN();
-              for(int i=0; i<nnn; i++){
-                OrderParticleProps *opp_i_surf = &(opp_map.find( opp_i->getNN(i) ))->second;
-                if( !opp_i_surf->getSolid() ){
-                  //opp_i_surf->setSolid(true);
-                  opp_i_surf->setSurface(true);
-                }
-              }
-            }
-            
-          }
-          
-          // -----------------------------------------------------------------------
-          // send ghost info
-          shared_ptr< mpi::communicator > cmm = getSystem()->comm;
-          
-          vector <OrderParticleProps> sendGhostInfo;
-          for(boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin(); opm!=opp_map.end(); ++opm){
-            int id = (*opm).first;
-            if( !getSystem()->storage->lookupRealParticle(id) ){
-              OrderParticleProps &op = (*opm).second;
-              if( !op.getNumNN()==0 ) sendGhostInfo.push_back( (*opm).second );
-            }
+            sendGhostInfo.push_back( *opp_i );
           }
 
           int maxSize, vecSize  = sendGhostInfo.size();
           mpi::all_reduce( *cmm, vecSize, maxSize, mpi::maximum<int>() );
           while(sendGhostInfo.size()<maxSize) sendGhostInfo.push_back( OrderParticleProps() );
-
           vector< OrderParticleProps > totID;
-          boost::mpi::all_gather( *getSystem()->comm, &sendGhostInfo[0], maxSize, totID);
+          mpi::all_gather( *cmm, &sendGhostInfo[0], maxSize, totID);
 
           for(vector<OrderParticleProps>::iterator it = totID.begin(); it!=totID.end(); ++it){
             OrderParticleProps &gop = *it;
-            if( gop.getPID()!=-1 && getSystem()->storage->lookupRealParticle( gop.getPID() ) ){
-              OrderParticleProps *opp_i_loc = &(opp_map.find( gop.getPID() ))->second;
-              //opp_i_loc->setSolid( gop.getSolid() );
-              opp_i_loc->setSurface( gop.getSurface() );
+            
+            if( gop.getPID()!=-1 ){
+              if( gop.getSolid() && !gop.getSurface() ){
+                int nnn = gop.getNumNN();
+                for(int i=0; i<nnn; i++){
+
+                    if( getSystem()->storage->lookupRealParticle( gop.getNN(i) ) ){
+                      OrderParticleProps *opp_i_surf = &(opp_map.find( gop.getNN(i) ))->second;
+                      if( !opp_i_surf->getSolid() ){
+                        opp_i_surf->setSurface(true);
+                      }
+                    }
+                }
+              }
             }
+            
           }
           //--------------------------------------------------------------------------
         }
@@ -494,18 +504,97 @@ namespace espresso {
       }
       
       void cluster_analysis(){
-        local_cluster_analysis();
+        local_cluster_search();
         
-        global_cluster_analysis();
+        //global_cluster_analysis();
+        
+        biggest_cluster();
       }
       
-      void local_cluster_analysis(){
-        
+      void local_cluster_search(){
+        int cur_label = 0;
+        CellList cells = getSystem()->storage->getRealCells();
+        for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
+          Particle& p = *cit;
+          int pid = p.id();
+          OrderParticleProps &opp_i = (opp_map.find( pid ))->second;
+          if ( opp_i.getLabel() == -1 && (opp_i.getSolid() || opp_i.getSurface()) ){
+            cluster_walk(pid, cur_label, opp_i);
+            cur_label++;
+          }
+        }
       }
+      
       void global_cluster_analysis(){
         
       }
+
+      void cluster_walk(int pid, int cur_lab, OrderParticleProps &opp){
+        opp.setLabel(cur_lab);
+        int num_nn = opp.getNumNN();
+        
+        for( int j=0; j< num_nn; j++) {
+          int pid_neib = opp.getNN(j);
+          
+          if( getSystem()->storage->lookupGhostParticle( pid_neib ) ){
+            cout<< " ghost particle: "<< pid_neib << endl;
+          }
+          
+          OrderParticleProps &opp_neib = (opp_map.find( pid_neib ))->second;
+          int lab_neib = opp_neib.getLabel();
+          
+          if ( lab_neib != cur_lab && pid_neib!=pid &&
+                  (opp_neib.getSolid() || opp_neib.getSurface()) ){
+            
+            int min_lab=0, max_lab=0;
+            if ( lab_neib == -1){
+              min_lab = cur_lab;
+            }
+            else{
+              min_lab = min(lab_neib, cur_lab);
+              max_lab = max(lab_neib, cur_lab);
+              relab(min_lab, max_lab);
+            }
+
+            cluster_walk(pid_neib, min_lab, opp_neib);
+          }
+        }
+      }
       
+      void relab(int new_lab, int old_lab){
+        for(boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin(); opm!=opp_map.end(); ++opm){
+          OrderParticleProps &opp = (*opm).second;
+          if( opp.getLabel() == old_lab ){
+            opp.setLabel(new_lab);
+          }
+        }
+      }
+
+      void biggest_cluster(){
+        vector< vector<int> > clusters;
+
+        for(boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin(); opm!=opp_map.end(); ++opm){
+          OrderParticleProps &opp = (*opm).second;
+          
+          if( opp.getLabel()>=0 ){
+            while( (int)clusters.size() <= (int)opp.getLabel() ){
+              clusters.push_back( vector<int>(0, 0) );
+            }
+            clusters[ opp.getLabel() ].push_back( opp.getPID() );
+          }
+        }
+
+        int max_size = 0;
+        for (vector< vector<int> >::iterator it = clusters.begin() ; it != clusters.end(); ++it){
+          max_size = max(max_size, (int)( (*it).size() ) );
+        }
+        int num_clusters = clusters.size();
+        setNum_of_Cl(num_clusters);
+        setMax_Cl(max_size);
+      }
+
+
+
       
       python::list compute() {
         python::list ret;
@@ -515,13 +604,11 @@ namespace espresso {
         if( do_cl_an ){
           define_solid();
           
-          //cluster_analysis();
+          cluster_analysis();
         }
-        
-        
+
+        /*
         CellList cells = getSystem()->storage->getRealCells();
-        int this_node = getSystem() -> comm -> rank();
-        
         vector <OrderParticleProps> sendGhostInfo;
         for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
           Particle& p = *cit;
@@ -532,7 +619,7 @@ namespace espresso {
         
         vector<int> sendSizes;
         int ss  = sendGhostInfo.size();
-        boost::mpi::all_gather( *getSystem()->comm, ss, sendSizes);
+        mpi::all_gather( *getSystem()->comm, ss, sendSizes);
         int maxSize=0;
         for(vector<int>::iterator it = sendSizes.begin(); it!=sendSizes.end(); ++it){
           maxSize = max(maxSize, *it);
@@ -541,9 +628,16 @@ namespace espresso {
 
         int numProc = getSystem()->comm->size();
         vector<OrderParticleProps> totID = vector<OrderParticleProps>( numProc * maxSize, OrderParticleProps() );
-        boost::mpi::gather( *getSystem()->comm, &sendGhostInfo[0], maxSize, totID, 0);
+        mpi::gather( *getSystem()->comm, &sendGhostInfo[0], maxSize, totID, 0);
 
+        int myN = getSystem()->storage->getNRealParticles();
+        int num_part=0;
+        mpi::all_reduce(*getSystem()->comm, myN, num_part, std::plus<int>());
+        */
+        
         if( getSystem()->comm->rank()==0 ){
+          
+          /*
           for(vector<OrderParticleProps>::iterator it=totID.begin(); it!=totID.end(); ++it) {
             OrderParticleProps &gop = *it;
             if(gop.getPID()>=0){
@@ -553,7 +647,6 @@ namespace espresso {
                 nn.append( gop.getNN(i) );
               }
               
-              //cout<< "Pid: "<< gop.getPID() << "  solid:  "<< gop.getSolid() << endl;
               python::tuple pt = python::make_tuple( gop.getPID(), gop.getD(),
                       gop.getNumNN(), gop.getSolid(), gop.getSurface(), nn);
               ret.append( pt );
@@ -561,6 +654,12 @@ namespace espresso {
           }
 
           ret.sort();
+          
+          cout << "\n   inside OP:  max_cl: "<< getMax_Cl() << "  num_cl: "<< getNum_of_Cl()<< endl;
+          */
+          
+          ret.append(getMax_Cl());
+          ret.append(getNum_of_Cl());
         }
         else{
           ret.append(0);

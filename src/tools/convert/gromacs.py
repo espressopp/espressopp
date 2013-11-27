@@ -673,7 +673,7 @@ def setLennardJonesInteractions(system, defaults, atomtypeparams, verletlist, cu
                 eps=float(pi['eps'])
             if (sig>0 and eps >0):
                 #print "Setting LJ interaction for", i, j, "to sig ", sig, "eps", eps, "cutoff", cutoff
-                ljpot= espresso.interaction.LennardJones(epsilon=eps, sigma=sig, cutoff=cutoff, shift=0)
+                ljpot= espresso.interaction.LennardJones(epsilon=eps, sigma=sig, shift='auto', cutoff=cutoff)
                 if not hadress:
 		    interaction.setPotential(type1=i, type2=j, potential=ljpot)
 		else:

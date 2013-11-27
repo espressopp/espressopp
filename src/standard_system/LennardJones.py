@@ -29,7 +29,7 @@ def LennardJones(num_particles, box=(0,0,0), rc=1.12246, skin=0.3, dt=0.005, eps
   nodeGrid       = espresso.tools.decomp.nodeGrid(MPI.COMM_WORLD.size)
   cellGrid       = espresso.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
   system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
-  interaction    = espresso.interaction.VerletListLennardJones(espresso.VerletList(system, cutoff=rc+skin))
+  interaction    = espresso.interaction.VerletListLennardJones(espresso.VerletList(system, cutoff=rc))
   interaction.setPotential(type1=0, type2=0, potential=espresso.interaction.LennardJones(epsilon, sigma, rc, shift))
   system.addInteraction(interaction)
 

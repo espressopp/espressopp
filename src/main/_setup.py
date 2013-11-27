@@ -1,6 +1,3 @@
-# set the path
-from espresso.main import _setupPath
-
 # now load the fundamental modules
 # load mpi4py (must be loaded before _espresso)
 import MPI

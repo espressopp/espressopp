@@ -20,6 +20,11 @@ from espresso.integrator.DPDThermostat import *
 from espresso.integrator.LangevinBarostat import *
 from espresso.integrator.FixPositions import *
 from espresso.integrator.LatticeBoltzmann import *
+from espresso.integrator.LBInit import *
+from espresso.integrator.LBInitConstForce import *
+from espresso.integrator.LBInitPeriodicForce import *
+from espresso.integrator.LBInitPopUniform import *
+from espresso.integrator.LBInitPopWave import *
 from espresso.integrator.ExtForce import *
 from espresso.integrator.CapForce import *
 from espresso.integrator.ExtAnalyze import *
