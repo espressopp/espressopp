@@ -23,12 +23,28 @@ class StaticStructFLocal(ObservableLocal, analysis_StaticStructF):
           line = str(result[i][0]) + "\t" + str(result[i][1]) + "\n"
           outfile.write(line)
         outfile.close()
-      return result   
+      return result  
+
+  def computeSingleChain(self, nqx, nqy, nqz, bin_factor, chainlength, ofile = None):
+    if ofile is None:
+      return self.cxxclass.computeSingleChain(self, nqx, nqy, nqz, bin_factor, chainlength)
+    else:
+      #run computeSingleChain on each CPU
+      result = self.cxxclass.computeSingleChain(self, nqx, nqy, nqz, bin_factor, chainlength)
+      #create the outfile only on CPU 0
+      if pmi.isController:
+        myofile = 'qsq_singleChain' + str(ofile) + '.txt'
+        outfile = open (myofile, 'w')
+        for i in range (len(result)):
+          line = str(result[i][0]) + "\t" + str(result[i][1]) + "\n"
+          outfile.write(line)
+        outfile.close()
+      return result
    
-if pmi.isController :
+if pmi.isController:
   class StaticStructF(Observable):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      pmicall = [ "compute" ],
+      pmicall = [ "compute", "computeSingleChain" ],
       cls = 'espresso.analysis.StaticStructFLocal'
     )
