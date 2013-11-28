@@ -90,7 +90,7 @@ namespace espresso {
         }
 
         Tensor vv[n];
-        mpi::all_reduce(*mpiWorld, vvlocal, n, vv, std::plus<Tensor>());
+        mpi::all_reduce(*mpiWorld, (double*)&vvlocal, n, (double*)&vv, std::plus<double>());
 
         // compute the short-range nonbonded contribution
         Tensor w[n];

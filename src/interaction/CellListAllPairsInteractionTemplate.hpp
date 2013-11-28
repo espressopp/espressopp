@@ -169,7 +169,7 @@ namespace espresso {
       
       // reduce over all CPUs
       Tensor wsum(0.0);
-      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
       wij += wsum;
     }
     
@@ -202,7 +202,7 @@ namespace espresso {
       
       // reduce over all CPUs
       Tensor wsum(0.0);
-      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
       wij += wsum;
     }
 
@@ -248,7 +248,7 @@ namespace espresso {
       
       // reduce over all CPUs
       Tensor *wsum = new Tensor[n];
-      boost::mpi::all_reduce(*mpiWorld, wlocal, n, wsum, std::plus<Tensor>());
+      boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, n, (double*)&wsum, std::plus<double>());
       
       for(int j=0; j<n; j++){
         wij[j] += wsum[j];

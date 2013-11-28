@@ -424,6 +424,11 @@ namespace espresso {
         
         Tensor virialTensor(0.0);
         mpi::all_reduce( communic, node_virialTensor, virialTensor, plus<Tensor>());
+
+        // using boost::mpi::all_reduce or reduce is very slow for <Tensor>
+        // as a suggestion, one could try the line below:
+        // mpi::all_reduce( communic, (double*)&node_virialTensor, 6, (double*)&virialTensor, plus<double>());
+
         return virialTensor;
       }
       

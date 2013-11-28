@@ -78,7 +78,7 @@ namespace espresso {
           }
         }
         Tensor vv(0.0);
-        boost::mpi::all_reduce(*mpiWorld, vvlocal, vv, std::plus<Tensor>());
+        boost::mpi::all_reduce(*mpiWorld, (double*)&vvlocal,6, (double*)&vv, std::plus<double>());
 
         vv = vv / V;
 

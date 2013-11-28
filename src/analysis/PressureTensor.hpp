@@ -42,7 +42,7 @@ namespace espresso {
           vvLocal += mass * Tensor(vel, vel);
         }
 
-        boost::mpi::all_reduce(*mpiWorld, vvLocal, vv, std::plus<Tensor>());
+        boost::mpi::all_reduce(*mpiWorld, (double*)&vvLocal,6, (double*)&vv, std::plus<double>());
 
         // compute the short-range nonbonded contribution
         Tensor wij(0.0);
