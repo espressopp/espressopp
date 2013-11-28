@@ -163,7 +163,7 @@ def readxyzr(filename):
 
 # Livia's modified writexyz to fastwritexyz with velocities
 
-def fastwritexyz(filename, system, velocities = True, append = False, scale=1.0):
+def fastwritexyz(filename, system, velocities = True, unfolded = True, append = False, scale=1.0):
 
   if append:
     file = open(filename,'a')
@@ -171,6 +171,7 @@ def fastwritexyz(filename, system, velocities = True, append = False, scale=1.0)
     file = open(filename,'w')
 
   configurations = espresso.analysis.ConfigurationsExt(system)
+  configurations.unfolded = unfolded
   configurations.gather()
   configuration = configurations[0]
 
