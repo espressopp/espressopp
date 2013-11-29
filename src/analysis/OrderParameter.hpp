@@ -504,10 +504,20 @@ namespace espresso {
         }
         
       }
+
+
+
+
+
+
+
+
+
       
       void cluster_analysis(){
         local_cluster_search();
 
+        /*
         CellList cells = getSystem()->storage->getRealCells();
         for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
           Particle& p = *cit;
@@ -517,75 +527,133 @@ namespace espresso {
             cout<< "cpu:  " << getSystem()->comm->rank() << "  pid: "<< pid<< "  label:"<< opp_i.getLabel() << endl;
           }
         }
+        */
         
         global_cluster_analysis();
         
-        for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
-          Particle& p = *cit;
-          int pid = p.id();
-          OrderParticleProps &opp_i = (opp_map.find( pid ))->second;
-          if ( opp_i.getLabel() > -1){
-            cout<< "AFTER cpu:  " << getSystem()->comm->rank() << "  pid: "<< pid<< "  label:"<< opp_i.getLabel() << endl;
-          }
-        }
-        
         biggest_cluster();
       }
+
       void global_cluster_analysis(){
         
-        // TODO use only one vector without the map
-        vector<communicate_label> send_label_info;
-        for(unordered_map<int, communicate_label>::iterator map_it = outside_id.begin(); 
-                map_it!=outside_id.end(); ++map_it ){
-          //cout<< "  cpu: "<< getSystem()->comm->rank() << "Id: "<< (*map_it).first<< "  label: "<< (*map_it).second<<endl;
-          send_label_info.push_back( (*map_it).second );
-        }
-        
-        vector<int> sendSizes;
-        int ss  = send_label_info.size();
-        mpi::all_gather( *getSystem()->comm, ss, sendSizes);
-        int maxSize = *max_element(sendSizes.begin(), sendSizes.end());
-        
-        communicate_label cccc;
-        cccc.pid = -1; cccc.label = -1; cccc.cpu = -1;
-        while(send_label_info.size()<maxSize) send_label_info.push_back( cccc );
-        
-        //cout<< "cpu: "<< getSystem()->comm->rank() << "   max size "<< maxSize << " totSize: "<< send_label_info.size() <<endl;
-        //exit(0);
-        
+        // ***************** communicate outside_id
+        int locSize = outside_id.size(); int maxSize=0;
+        mpi::all_reduce(*getSystem()->comm, locSize, maxSize, mpi::maximum<int>());
+
+        communicate_label cccc; cccc.pid = -1; cccc.label = -1; cccc.cpu = -1;
+        while(outside_id.size()<maxSize) outside_id.push_back( cccc );
+
         int numProc = getSystem()->comm->size();
         vector<communicate_label> tot_label_info = vector<communicate_label>( numProc * maxSize, cccc );
 
-        mpi::all_gather( *getSystem()->comm, &send_label_info[0], maxSize, tot_label_info);
-        
+        mpi::all_gather( *getSystem()->comm, &outside_id[0], maxSize, tot_label_info);
+        // ***************** communicate outside_id. END
+     
         for(vector<communicate_label>::iterator it = tot_label_info.begin(); it!=tot_label_info.end(); ++it){
           communicate_label &cur_lab = *it;
-          
-          if( cur_lab.cpu != -1 ){
-            if( getSystem()->storage->lookupRealParticle( cur_lab.pid ) ){
+
+          if( cur_lab.cpu != -1 && getSystem()->storage->lookupRealParticle( cur_lab.pid ) ){
               OrderParticleProps &opp = (opp_map.find( cur_lab.pid ))->second;
               int labll = opp.getLabel();
-              
-              if(labll==cur_lab.label)
-                cout<< "same labels"<<endl;
 
-              // TODO remove this if
-              if ( opp.getSolid() || opp.getSurface() ){
+              if ( (opp.getSolid() || opp.getSurface() ) ){
                 int min_lab=0, max_lab=0;
                 if ( labll == -1){
-                  min_lab = cur_lab.label;
+                  cout<<"!!!WRONG global_cluster_analysis!!!  cpu: "<< getSystem()->comm->rank() <<
+                        " particle: "<< opp.getPID()<< 
+                        " is "<<  opp.getSolid() << "  " << opp.getSurface() <<
+                        " and has label:  "<< opp.getLabel() << endl;
                 }
-                else{
+                else if(labll != cur_lab.label){
                   // TODO add action if meet another label
                   min_lab = min(labll, cur_lab.label);
                   max_lab = max(labll, cur_lab.label);
-                  relab(min_lab, max_lab);
-                }
+                  //relab(min_lab, max_lab);
 
-                cluster_walk( cur_lab.pid, min_lab, opp);
+                  relab11(min_lab, max_lab);
+                }
+                /*
+                else{
+                  cout<<"  cpu: "<< getSystem()->comm->rank() << "   same labels"<< endl;
+                }
+                 */
               }
+          }
+        }
+        
+        vector<int> wl, cl; // wrong and correct labels
+        for(unordered_map<int, int>::iterator it = wrong_label_local.begin(); 
+                it!=wrong_label_local.end(); ++it ){
+          wl.push_back( (*it).first );
+          cl.push_back( (*it).second );
+        }
+        
+        // ******* collect all wrong labels to 0 cpu
+        locSize = wl.size(); maxSize=0;
+        mpi::all_reduce(*getSystem()->comm, locSize, maxSize, mpi::maximum<int>());
+        while(wl.size()<maxSize){ wl.push_back( -1 ); cl.push_back( -1 ); }
+
+        numProc = getSystem()->comm->size();
+        vector<int> totWL = vector<int>( numProc * maxSize, -1 );
+        vector<int> totCL = vector<int>( numProc * maxSize, -1 );
+        mpi::gather( *getSystem()->comm, &wl[0], maxSize, totWL, 0);
+        mpi::gather( *getSystem()->comm, &cl[0], maxSize, totCL, 0);
+
+        wrong_label_local0.clear();
+        wl.clear(); cl.clear();
+        
+        vector<int> wl0, cl0; // wrong and correct labels
+        
+        
+        if( getSystem()->comm->rank()==0 ){
+          for(int i=0; i<totWL.size(); i++){
+            if( totWL[i]>-1 && totCL[i]>-1 ){
+              relab22(totCL[i], totWL[i]);
             }
           }
+          
+          for(unordered_map<int, int>::iterator it = wrong_label_local0.begin(); 
+                  it!=wrong_label_local0.end(); ++it ){
+            wl0.push_back( (*it).first );
+            cl0.push_back( (*it).second );
+          }
+        }
+        
+        int vec_size;
+        if( getSystem()->comm->rank()==0 ){
+          vec_size=wl0.size();
+        }
+        mpi::broadcast( *getSystem()->comm, vec_size, 0);
+        if( getSystem()->comm->rank()!=0 ){
+          wl0 = vector<int>(vec_size, -1);
+          cl0 = vector<int>(vec_size, -1);
+        }
+        
+        mpi::broadcast( *getSystem()->comm, &wl0[0], wl0.size(), 0);
+        mpi::broadcast( *getSystem()->comm, &cl0[0], cl0.size(), 0);
+        
+        wrong_label_local.clear();
+        for(int i=0; i<wl0.size(); i++){
+          wrong_label_local.insert( make_pair(wl0[i], cl0[i]) );
+        }
+        
+        relabel_particles();
+        
+      }
+      
+      unordered_map< int, int > wrong_label_local0;
+      
+      void relab22(int new_lab, int old_lab){
+        if( wrong_label_local0.find( old_lab ) == wrong_label_local0.end() ){
+          wrong_label_local0.insert( make_pair(old_lab, new_lab) );
+        }
+        else if( ( wrong_label_local0.find( old_lab ) )->second != new_lab ){
+          int correct_old = ( wrong_label_local0.find( old_lab ) )->second;
+          
+          int mmin = min(correct_old, new_lab);
+          int mmax = max(correct_old, new_lab);
+          
+          relab22(mmin, mmax);
         }
       }
 
@@ -597,6 +665,7 @@ namespace espresso {
         int i_label_local = 0; // local increment
         int cur_label = loc_proc + i_label_local * num_proc; // unique label for each cpu
         
+        outside_id.clear();
         CellList cells = getSystem()->storage->getRealCells();
         for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
           Particle& p = *cit;
@@ -609,6 +678,8 @@ namespace espresso {
             cur_label=loc_proc + i_label_local * num_proc;
           }
         }
+        
+        relabel_particles();
       }
       
 // ***************************************************************************************
@@ -625,7 +696,10 @@ namespace espresso {
         }        
       };
       
-      unordered_map< int, communicate_label > outside_id;
+      vector< communicate_label > outside_id;
+      
+      unordered_map< int, int > wrong_label_local;
+      
 // ***************************************************************************************
       
       void cluster_walk(int pid, int cur_lab, OrderParticleProps &opp){
@@ -636,22 +710,11 @@ namespace espresso {
           int pid_neib = opp.getNN(j);
           
           if( !getSystem()->storage->lookupRealParticle( pid_neib ) ){
-            //cout<<"  cpu: "<< getSystem()->comm->rank() <<  " ghost particle: "<< pid_neib << endl;
-            if( outside_id.find( pid_neib ) == outside_id.end() ){
-              communicate_label cl;
-              cl.pid = pid_neib;
-              cl.label = cur_lab;
-              cl.cpu = getSystem()->comm->rank();
-              
-              outside_id.insert( make_pair(pid_neib, cl) );
-            }
-            else{
-              int ex_lab = (( outside_id.find( pid_neib ) )->second).label;
-              int min_lab = min(ex_lab, cur_lab);
-              int max_lab = max(ex_lab, cur_lab);
-              relab(min_lab, max_lab);
-              (( outside_id.find( pid_neib ) )->second).label = min_lab;
-            }
+            communicate_label cc;
+            cc.pid = pid_neib;
+            cc.label = cur_lab;
+            cc.cpu = getSystem()->comm->rank();
+            outside_id.push_back( cc );
           }
           else{
             OrderParticleProps &opp_neib = (opp_map.find( pid_neib ))->second;
@@ -667,7 +730,7 @@ namespace espresso {
               else{
                 min_lab = min(lab_neib, cur_lab);
                 max_lab = max(lab_neib, cur_lab);
-                relab(min_lab, max_lab);
+                relab11(min_lab, max_lab);
               }
 
               cluster_walk(pid_neib, min_lab, opp_neib);
@@ -686,10 +749,49 @@ namespace espresso {
         }
       }
 
+      void relab11(int new_lab, int old_lab){
+        if( wrong_label_local.find( old_lab ) == wrong_label_local.end() ){
+          wrong_label_local.insert( make_pair(old_lab, new_lab) );
+        }
+        else if( ( wrong_label_local.find( old_lab ) )->second != new_lab ){
+          int correct_old = ( wrong_label_local.find( old_lab ) )->second;
+          
+          int mmin = min(correct_old, new_lab);
+          int mmax = max(correct_old, new_lab);
+          
+          relab11(mmin, mmax);
+        }
+      }
+
+      int getCorrectLabel(int current_label){
+        if( wrong_label_local.find(  current_label ) == wrong_label_local.end() ){
+          return current_label;
+        }
+        else{
+          return getCorrectLabel( (wrong_label_local.find( current_label ))->second );
+        }
+      }
+      
+      void relabel_particles(){
+        for(boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin(); opm!=opp_map.end(); ++opm){
+          OrderParticleProps &opp = (*opm).second;
+          if( opp.getSolid() ||  opp.getSurface() ){
+            if( opp.getLabel()<0 ){
+              cout<<"!!!relabel_particles!!!  cpu: "<< getSystem()->comm->rank() <<
+                      " particle: "<< opp.getPID()<< 
+                      " is "<<  opp.getSolid() << "  " << opp.getSurface() <<
+                      " and has label:  "<< opp.getLabel() << endl;
+            }
+            else{
+              opp.setLabel(  getCorrectLabel( opp.getLabel() ) );
+            }
+          }
+        }
+      }
+      
+      
       void biggest_cluster(){
         vector< vector<int> > clusters;
-        
-        
         
         
         CellList cells = getSystem()->storage->getRealCells();
@@ -729,8 +831,6 @@ namespace espresso {
           }
           
           
-        }
-        
         
         
         
@@ -747,20 +847,35 @@ namespace espresso {
         }
         */
 
-        int max_pos = -1;
-        int max_size = 0;
-        for (vector< vector<int> >::iterator it = clusters.begin() ; it != clusters.end(); ++it){
-          if( max_size != max(max_size, (int)( (*it).size() ) ) ){
-            max_pos = it - clusters.begin();
+          int max_pos = -1;
+          int max_size = 0;
+          int empty = 0;
+          for (vector< vector<int> >::iterator it = clusters.begin() ; it != clusters.end(); ++it){
+            if( max_size != max(max_size, (int)( (*it).size() ) ) ){
+              max_pos = it - clusters.begin();
+            }
+            max_size = max(max_size, (int)( (*it).size() ) );
+            
+            if( (int)( (*it).size() )==0 ){
+              empty++;
+              //cout<<"  cpu: "<< getSystem()->comm->rank() <<   " label: "<< (it - clusters.begin()) << "  is empty" << endl;
+            }
           }
-          max_size = max(max_size, (int)( (*it).size() ) );
+
+          /*
+          cout<<"  cpu: "<< getSystem()->comm->rank() <<  " max pos: "<< max_pos << endl;
+          int count=0;
+          for (vector<int>::iterator it = clusters[max_pos].begin() ; it != clusters[max_pos].end(); ++it){
+            cout<<count<<"  BIGGEST CL  cpu: "<< getSystem()->comm->rank() <<  " id: "<< *it << endl;
+            count++;
+          }
+          */
+        
+          int num_clusters = clusters.size();
+          setNum_of_Cl(num_clusters-empty);
+          setMax_Cl(max_size);
         }
         
-        cout<<"  cpu: "<< getSystem()->comm->rank() <<  " max pos: "<< max_pos << endl;
-        
-        int num_clusters = clusters.size();
-        setNum_of_Cl(num_clusters);
-        setMax_Cl(max_size);
       }
 
 
