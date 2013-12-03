@@ -1,7 +1,7 @@
 """
-***************************************************************
+********************************************************************
 **LBInit** - abstract base class for LatticeBoltzmann initialization
-***************************************************************
+********************************************************************
 
 This abstract base class provides the interface and some basic
 functionality for classes that (re)initialize populations and handle external forces

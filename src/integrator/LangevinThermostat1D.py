@@ -1,3 +1,9 @@
+"""
+********************************************
+**espresso.integrator.LangevinThermostat1D**
+********************************************
+
+"""
 from espresso.esutil import cxxinit
 from espresso import pmi
 

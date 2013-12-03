@@ -1,3 +1,9 @@
+"""
+************************************
+**espresso.interaction.Interaction**
+************************************
+
+"""
 from espresso import pmi
 from _espresso import interaction_Interaction
 

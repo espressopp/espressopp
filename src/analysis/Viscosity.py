@@ -1,3 +1,9 @@
+"""
+*******************************
+**espresso.analysis.Viscosity**
+*******************************
+
+"""
 from espresso import pmi
 from espresso.esutil import cxxinit
 

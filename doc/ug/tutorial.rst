@@ -8,5 +8,5 @@ ESPResSo++ Tutorial
    tutorial.LennardJones.rst
    tutorial.LennardJones2.rst
    tutorial.PolymerMelt.rst
-..   tutorial.AdResS.rst
+   tutorial.AdResS.rst
 

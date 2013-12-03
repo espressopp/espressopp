@@ -1,3 +1,9 @@
+"""
+*********************************
+**espresso.esutil.NormalVariate**
+*********************************
+
+"""
 from espresso import pmi
 
 from _espresso import esutil_NormalVariate

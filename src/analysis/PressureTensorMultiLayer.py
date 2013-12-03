@@ -1,7 +1,7 @@
 """
-************************************
+***************************************
 **PressureTensorMultiLayer** - Analysis
-************************************
+***************************************
 
 This class computes the pressure tensor of the system in `n` layers.
 Layers are perpendicular to Z direction and are equidistant(distance is Lz/n).

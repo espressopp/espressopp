@@ -1,3 +1,9 @@
+"""
+************************************
+**espresso.standard_system.Minimal**
+************************************
+
+"""
 import espresso
 import MPI
 

@@ -1,3 +1,9 @@
+"""
+*****************************************
+**espresso.standard_system.LennardJones**
+*****************************************
+
+"""
 import espresso
 import MPI
 

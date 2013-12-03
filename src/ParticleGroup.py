@@ -1,3 +1,9 @@
+"""
+**************************
+**espresso.ParticleGroup**
+**************************
+
+"""
 import _espresso
 import esutil
 import pmi

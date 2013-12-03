@@ -1,7 +1,7 @@
 """
-*****************************************
+*****************************************************
 **BerendsenThermostat** - Berendsen thermostat Object
-*****************************************
+*****************************************************
 
 This is the Berendsen thermostat implementation according to the original paper [Berendsen84]_.
 If Berendsen thermostat is defined (as a property of integrator) then at the each run the system size
@@ -72,10 +72,6 @@ Canceling the thermostat:
   Connecting the thermostat back after the disconnection
   
     >>> berendsen.connect()
-
-References:
-
-.. [Berendsen84] Berendsen et al., *J. Chem. Phys.*, 81, **1984**, p. 3684
 
 """
 

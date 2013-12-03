@@ -1,7 +1,7 @@
 """
-******************************************************
+***********************************************************************************
 **CoulombKSpaceEwald** - Coulomb potential and interaction Objects (`K` space part)
-******************************************************
+***********************************************************************************
 
 This is the `K` space part of potential of Coulomb long range interaction according to the Ewald
 summation technique. Good explanation of Ewald summation could be found here [Allen89]_,

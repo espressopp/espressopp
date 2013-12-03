@@ -1,3 +1,9 @@
+"""
+********************************
+**espresso.integrator.ExtForce**
+********************************
+
+"""
 from espresso.esutil import cxxinit
 from espresso import pmi
 from espresso.integrator.Extension import *

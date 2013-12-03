@@ -1,7 +1,7 @@
 """
-******************************************************
+*********************************************************************************
 **CoulombKSpaceP3M** - Coulomb potential and interaction Objects (`K` space part)
-******************************************************
+*********************************************************************************
 
 This is the `K` space part of potential of Coulomb long range interaction according to the P3M
 summation technique. Good explanation of P3M summation could be found here [Allen89]_,
@@ -61,12 +61,6 @@ Adding the interaction to the system:
     
     >>> system.addInteraction(ewaldK_int)
     
-References:
-
-.. [Allen89] M.P.Allen, D.J.Tildesley, `Computer simulation of liquids`, *Clarendon Press*, **1989** 385 p.
-
-.. [Deserno98] M.Deserno and C.Holm, *J. Chem. Phys.*, 109(18), **1998**, p.7678
-
 """
 
 

@@ -1,3 +1,9 @@
+"""
+*******************************
+**espresso.esutil.collectives**
+*******************************
+
+"""
 import _espresso
 from espresso import pmi
 

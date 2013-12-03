@@ -1,3 +1,9 @@
+"""
+***************************************************
+**espresso.integrator.StochasticVelocityRescaling**
+***************************************************
+
+"""
 from espresso.esutil import cxxinit
 from espresso import pmi
 

@@ -1,3 +1,9 @@
+"""
+**************************************************
+**espresso.interaction.DihedralHarmonicUniqueCos**
+**************************************************
+
+"""
 from espresso import pmi
 from espresso.esutil import *
 

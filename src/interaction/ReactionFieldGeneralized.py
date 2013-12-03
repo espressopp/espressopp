@@ -1,3 +1,9 @@
+"""
+*************************************************
+**espresso.interaction.ReactionFieldGeneralized**
+*************************************************
+
+"""
 from espresso import pmi, infinity
 from espresso.esutil import *
 

@@ -1,3 +1,9 @@
+"""
+************************************
+**espresso.interaction.VSphereSelf**
+************************************
+
+"""
 from espresso import pmi, infinity
 from espresso.esutil import *
 

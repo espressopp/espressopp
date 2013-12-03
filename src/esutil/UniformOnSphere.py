@@ -1,3 +1,9 @@
+"""
+***********************************
+**espresso.esutil.UniformOnSphere**
+***********************************
+
+"""
 from espresso import pmi
 
 from _espresso import esutil_UniformOnSphere

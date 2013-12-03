@@ -1,3 +1,9 @@
+"""
+*******************
+**espresso.Tensor**
+*******************
+
+"""
 from _espresso import Tensor
 from espresso import esutil
 

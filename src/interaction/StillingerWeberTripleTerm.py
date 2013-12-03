@@ -1,3 +1,9 @@
+"""
+**************************************************
+**espresso.interaction.StillingerWeberTripleTerm**
+**************************************************
+
+"""
 from espresso import pmi, infinity
 from espresso.esutil import *
 

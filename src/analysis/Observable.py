@@ -1,3 +1,9 @@
+"""
+********************************
+**espresso.analysis.Observable**
+********************************
+
+"""
 from espresso import pmi
 from _espresso import analysis_Observable
 

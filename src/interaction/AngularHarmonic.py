@@ -1,3 +1,9 @@
+"""
+****************************************
+**espresso.interaction.AngularHarmonic**
+****************************************
+
+"""
 from espresso import pmi
 from espresso.esutil import *
 

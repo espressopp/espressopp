@@ -1,3 +1,9 @@
+"""
+**************************************
+**espresso.analysis.IntraChainDistSq**
+**************************************
+
+"""
 from espresso.esutil import cxxinit
 from espresso import pmi
 

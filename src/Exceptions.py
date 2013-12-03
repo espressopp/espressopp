@@ -1,3 +1,9 @@
+"""
+***********************
+**espresso.Exceptions**
+***********************
+
+"""
 import sys, traceback
 
 class Error(Exception):

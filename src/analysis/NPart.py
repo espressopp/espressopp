@@ -1,3 +1,9 @@
+"""
+***************************
+**espresso.analysis.NPart**
+***************************
+
+"""
 from espresso.esutil import cxxinit
 from espresso import pmi
 

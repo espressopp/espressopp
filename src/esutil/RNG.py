@@ -1,3 +1,9 @@
+"""
+***********************
+**espresso.esutil.RNG**
+***********************
+
+"""
 from espresso import pmi
 
 from _espresso import esutil_RNG

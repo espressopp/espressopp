@@ -1,3 +1,9 @@
+"""
+******************
+**espresso.Int3D**
+******************
+
+"""
 from _espresso import Int3D
 from espresso import esutil
 

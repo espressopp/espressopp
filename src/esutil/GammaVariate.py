@@ -1,3 +1,9 @@
+"""
+********************************
+**espresso.esutil.GammaVariate**
+********************************
+
+"""
 from espresso import pmi
 
 from _espresso import esutil_GammaVariate

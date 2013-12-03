@@ -1,3 +1,9 @@
+"""
+**********************************
+**espresso.interaction.Tabulated**
+**********************************
+
+"""
 # -*- coding: iso-8859-1 -*-
 from espresso import pmi, infinity
 from espresso.esutil import *

@@ -1,3 +1,9 @@
+"""
+***************************************************
+**espresso.storage.DomainDecompositionNonBlocking**
+***************************************************
+
+"""
 from espresso import pmi
 from espresso.esutil import cxxinit
 from _espresso import storage_DomainDecomposition

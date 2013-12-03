@@ -1,3 +1,9 @@
+"""
+**************************************
+**espresso.integrator.VelocityVerlet**
+**************************************
+
+"""
 from espresso.esutil import cxxinit
 from espresso import pmi
 

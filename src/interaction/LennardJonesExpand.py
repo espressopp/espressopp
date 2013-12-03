@@ -1,3 +1,9 @@
+"""
+*******************************************
+**espresso.interaction.LennardJonesExpand**
+*******************************************
+
+"""
 from espresso import pmi, infinity
 from espresso.esutil import *
 

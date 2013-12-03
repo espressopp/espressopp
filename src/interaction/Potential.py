@@ -1,3 +1,9 @@
+"""
+**********************************
+**espresso.interaction.Potential**
+**********************************
+
+"""
 from espresso import pmi
 from espresso import toReal3DFromVector
 

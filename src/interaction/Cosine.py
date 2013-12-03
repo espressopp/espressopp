@@ -1,3 +1,9 @@
+"""
+*******************************
+**espresso.interaction.Cosine**
+*******************************
+
+"""
 from espresso import pmi
 from espresso.esutil import *
 

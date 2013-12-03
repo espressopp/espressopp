@@ -1,3 +1,9 @@
+"""
+****************************
+**espresso.analysis.Energy**
+****************************
+
+"""
 import espresso
 
 class EnergyPot():

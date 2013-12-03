@@ -58,7 +58,7 @@ the particles can be found:
 >>> mass     = 1.0  
 >>> chain    = []
 
-|espp| provides a function that will return position and bond information of a random walk.
+ESPResSo++ provides a function that will return position and bond information of a random walk.
 You have to provide a start ID (particle id) and a starting position which we will get from the
 random position generator of the boundary condition object:
 
@@ -110,7 +110,7 @@ Try to warmup and equilibrate a dense polymer melt (density=0.85) by using the w
 that you have learned in the Lennard Jones tutorial.
 
 Hint:
-----
+-----
 During warmup you can slowly switch on the excluded volume interaction by starting with a small
 epsilon and increasing it during integration:
 You can do this by continuously overwriting the interaction potential after some time interval.

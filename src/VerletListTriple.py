@@ -1,3 +1,9 @@
+"""
+*****************************
+**espresso.VerletListTriple**
+*****************************
+
+"""
 from espresso import pmi
 import _espresso 
 import espresso
@@ -42,10 +48,10 @@ class VerletListTripleLocal(_espresso.VerletListTriple):
         """
         Each processor takes the broadcasted exclusion list
         and adds it to its list.
-        if pmi.workerIsActive():
-          print 'Warning! Exclusion list is not yet implemented to the triple verlet \
-                list. Nothing happend'
         """
+        #if pmi.workerIsActive():
+        #  print 'Warning! Exclusion list is not yet implemented to the triple verlet \
+        #        list. Nothing happend'
         for pid in exclusionlist:
             self.cxxclass.exclude(self, pid)
         # rebuild list with exclusions

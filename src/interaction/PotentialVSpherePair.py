@@ -1,3 +1,9 @@
+"""
+*********************************************
+**espresso.interaction.PotentialVSpherePair**
+*********************************************
+
+"""
 from espresso import pmi
 from espresso import toReal3DFromVector
 

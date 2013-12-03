@@ -1,7 +1,7 @@
 """
-************************************
+*************************************
 **ExtAnalyze** - Integrator Extension
-************************************
+*************************************
 
 This class can be used to execute nearly all analysis objects
 within the main integration loop which allows to automatically

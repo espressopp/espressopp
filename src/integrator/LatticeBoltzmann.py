@@ -1,3 +1,9 @@
+"""
+****************************************
+**espresso.integrator.LatticeBoltzmann**
+****************************************
+
+"""
 from espresso.esutil import cxxinit
 from espresso import pmi
 from espresso import Real3D

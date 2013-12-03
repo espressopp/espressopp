@@ -1,3 +1,9 @@
+"""
+****************************************
+**espresso.standard_system.PolymerMelt**
+****************************************
+
+"""
 import espresso
 import MPI
 import sys

@@ -1,3 +1,9 @@
+"""
+************************************
+**espresso.integrator.FixPositions**
+************************************
+
+"""
 from espresso.esutil import cxxinit
 from espresso import pmi
 from espresso.integrator.Extension import *

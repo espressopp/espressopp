@@ -1,7 +1,7 @@
 """
-******************************************************
+******************************************************************************
 **CoulombRSpace** - Coulomb potential and interaction Objects (`R` space part)
-******************************************************
+******************************************************************************
 
 This is the `R` space part of potential of Coulomb long range interaction according to the Ewald
 summation technique. Good explanation of Ewald summation could be found here [Allen89]_,
@@ -68,12 +68,6 @@ Adding the interaction to the system:
     
     >>> system.addInteraction(coulombR_int)
     
-References:
-
-.. [Allen89] M.P.Allen, D.J.Tildesley, `Computer simulation of liquids`, *Clarendon Press*, **1989** 385 p.
-
-.. [Deserno98] M.Deserno and C.Holm, *J. Chem. Phys.*, 109(18), **1998**, p.7678
-
 """
 
 from espresso import pmi, infinity

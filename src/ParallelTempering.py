@@ -1,3 +1,9 @@
+"""
+******************************
+**espresso.ParallelTempering**
+******************************
+
+"""
 from espresso import MultiSystem
 from espresso import pmi
 import random

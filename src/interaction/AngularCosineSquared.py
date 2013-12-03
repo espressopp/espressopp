@@ -1,3 +1,9 @@
+"""
+*********************************************
+**espresso.interaction.AngularCosineSquared**
+*********************************************
+
+"""
 from espresso import pmi
 from espresso.esutil import *
 

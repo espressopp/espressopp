@@ -1,3 +1,9 @@
+"""
+************************************
+**espresso.analysis.AllParticlePos**
+************************************
+
+"""
 from espresso import pmi
 from _espresso import analysis_AllParticlePos
 

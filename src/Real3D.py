@@ -1,3 +1,9 @@
+"""
+*******************
+**espresso.Real3D**
+*******************
+
+"""
 from _espresso import Real3D
 from espresso import esutil
 

@@ -1,7 +1,7 @@
 """
-*****************************************
+************************************************************
 **BerendsenBarostatAnisotropic** - Berendsen barostat Object
-*****************************************
+************************************************************
 
 #TODO fix these comments 
 This is the Berendsen barostat implementation according to the original paper [Berendsen84]_.
@@ -81,10 +81,6 @@ Canceling the barostat:
   Connecting the barostat back after the disconnection
   
     >>> berendsen.connect()
-
-References:
-
-.. [Berendsen84] Berendsen et al., *J. Chem. Phys.*, 81, **1984**, p. 3684
 
 """
 

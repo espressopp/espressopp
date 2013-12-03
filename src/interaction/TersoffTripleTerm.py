@@ -1,3 +1,9 @@
+"""
+******************************************
+**espresso.interaction.TersoffTripleTerm**
+******************************************
+
+"""
 from espresso import pmi, infinity
 from espresso.esutil import *
 

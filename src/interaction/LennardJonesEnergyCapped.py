@@ -1,3 +1,9 @@
+"""
+*************************************************
+**espresso.interaction.LennardJonesEnergyCapped**
+*************************************************
+
+"""
 from espresso import pmi, infinity
 from espresso.esutil import *
 

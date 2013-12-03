@@ -1,3 +1,9 @@
+"""
+************************************
+**espresso.analysis.LBOutputScreen**
+************************************
+
+"""
 from espresso.esutil import cxxinit
 from espresso import pmi
 

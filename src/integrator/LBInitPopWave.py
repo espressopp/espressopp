@@ -1,7 +1,7 @@
 """
-***************************************************************
+******************************************************************************************
 **LBInitPopWave** - creates initial populations with uniform density and harmonic velocity
-***************************************************************
+******************************************************************************************
 
 This class creates initial populations with uniform density and harmonic velocity:
 v_x = 0, v_y = 0, v_z = Amp * sin (2 * \pi * i / N_x)

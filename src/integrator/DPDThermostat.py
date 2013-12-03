@@ -1,3 +1,9 @@
+"""
+*************************************
+**espresso.integrator.DPDThermostat**
+*************************************
+
+"""
 from espresso.esutil import cxxinit
 from espresso import pmi
 

@@ -1,3 +1,9 @@
+"""
+*****************************************
+**espresso.interaction.TabulatedAngular**
+*****************************************
+
+"""
 # -*- coding: iso-8859-1 -*-
 from espresso import pmi
 from espresso.esutil import *

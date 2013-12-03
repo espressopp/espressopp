@@ -1,3 +1,9 @@
+"""
+************************
+**espresso.esutil.Grid**
+************************
+
+"""
 from espresso import pmi
 from _espresso import esutil_Grid
 

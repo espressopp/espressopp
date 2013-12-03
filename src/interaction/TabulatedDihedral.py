@@ -1,3 +1,9 @@
+"""
+******************************************
+**espresso.interaction.TabulatedDihedral**
+******************************************
+
+"""
 # -*- coding: iso-8859-1 -*-
 # -*- coding: iso-8859-1 -*-
 from espresso import pmi

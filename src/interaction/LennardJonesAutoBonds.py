@@ -1,3 +1,9 @@
+"""
+**********************************************
+**espresso.interaction.LennardJonesAutoBonds**
+**********************************************
+
+"""
 from espresso import pmi, infinity
 from espresso.esutil import *
 from espresso.Exceptions import MissingFixedPairList
