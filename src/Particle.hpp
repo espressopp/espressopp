@@ -46,6 +46,7 @@ namespace espresso {
     real q;
     real lambda;
     real lambdaDeriv;
+    int state;
   private:
     friend class boost::serialization::access;
     template< class Archive >
@@ -57,6 +58,7 @@ namespace espresso {
       ar & q;
       ar & lambda;
       ar & lambdaDeriv;
+      ar & state;
     }
   };
 
@@ -190,6 +192,7 @@ namespace espresso {
       l.ghost        = false;
       p.lambda       = 0.0;      
       p.lambdaDeriv  = 0.0;      
+      p.state        = 0;
     }
 
     // getter and setter used for export in Python
@@ -283,6 +286,12 @@ namespace espresso {
     const real& lambdaDeriv() const { return p.lambdaDeriv; }
     real getLambdaDeriv() const { return p.lambdaDeriv; }
     void setLambdaDeriv(const real& _lambdaDeriv) { p.lambdaDeriv = _lambdaDeriv; }
+
+    // state (used in AssociationReaction)
+    int& state() { return p.state; }
+    const int& state() const { return p.state; }
+    int getState() const { return p.state; }
+    void setState(const int& _state) { p.state = _state; }
 
     static void registerPython();
   

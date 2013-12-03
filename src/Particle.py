@@ -144,6 +144,11 @@ class ParticleLocal(object):
     def lambda_adrd(self): return self.__getTmp().lambda_adrd
     @isGhost.setter
     def lambda_adrd(self, val): self.__getTmp().lambda_adrd = val
+
+    @property
+    def state(self): return self.__getTmp().state
+    @state.setter
+    def state(self, val): self.__getTmp().state = val
     
     def getLocalData(self, key):
         tmp = self.storage.lookupRealParticle(self.pid)
