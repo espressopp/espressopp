@@ -558,11 +558,16 @@ namespace espresso {
 
               if ( (opp.getSolid() || opp.getSurface() ) ){
                 int min_lab=0, max_lab=0;
-                if ( labll == -1){
-                  cout<<"!!!WRONG global_cluster_analysis!!!  cpu: "<< getSystem()->comm->rank() <<
-                        " particle: "<< opp.getPID()<< 
-                        " is "<<  opp.getSolid() << "  " << opp.getSurface() <<
-                        " and has label:  "<< opp.getLabel() << endl;
+                if ( labll == -1 && opp.getSurface()){
+                  opp.setLabel( cur_lab.label );
+                }
+                else if(labll != -1 && opp.getSurface() ){
+                  // TODO add action if meet another label
+                  //min_lab = min(labll, cur_lab.label);
+                  //max_lab = max(labll, cur_lab.label);
+                  //relab(min_lab, max_lab);
+
+                  //relab11(min_lab, max_lab);
                 }
                 else if(labll != cur_lab.label){
                   // TODO add action if meet another label
@@ -574,9 +579,12 @@ namespace espresso {
                 }
                 /*
                 else{
-                  cout<<"  cpu: "<< getSystem()->comm->rank() << "   same labels"<< endl;
+                  cout<<"!!!WRONG global_cluster_analysis!!!  cpu: "<< getSystem()->comm->rank() <<
+                        " particle: "<< opp.getPID()<< 
+                        " is "<<  opp.getSolid() << "  " << opp.getSurface() <<
+                        " and has label:  "<< opp.getLabel() << endl;
                 }
-                 */
+                */
               }
           }
         }
@@ -671,7 +679,8 @@ namespace espresso {
           Particle& p = *cit;
           int pid = p.id();
           OrderParticleProps &opp_i = (opp_map.find( pid ))->second;
-          if ( opp_i.getLabel() == -1 && (opp_i.getSolid() || opp_i.getSurface()) ){
+          if ( opp_i.getLabel() == -1 && opp_i.getSolid() && !(opp_i.getSurface()) ){
+//          if ( opp_i.getLabel() == -1 && (opp_i.getSolid() || opp_i.getSurface()) ){
             cluster_walk(pid, cur_label, opp_i);
             
             i_label_local++;
@@ -721,7 +730,11 @@ namespace espresso {
             int lab_neib = opp_neib.getLabel();
 
             if ( lab_neib != cur_lab && pid_neib!=pid &&
+                    opp_neib.getSolid() && !(opp_neib.getSurface()) ){
+/*
+            if ( lab_neib != cur_lab && pid_neib!=pid &&
                     (opp_neib.getSolid() || opp_neib.getSurface()) ){
+ */
 
               int min_lab=0, max_lab=0;
               if ( lab_neib == -1){
@@ -735,6 +748,11 @@ namespace espresso {
 
               cluster_walk(pid_neib, min_lab, opp_neib);
             }
+            else if( opp_neib.getSurface() && lab_neib==-1){
+              opp_neib.setLabel(cur_lab);
+            }
+            
+            
           }
           
         }
@@ -764,7 +782,7 @@ namespace espresso {
       }
 
       int getCorrectLabel(int current_label){
-        if( wrong_label_local.find(  current_label ) == wrong_label_local.end() ){
+        if( wrong_label_local.find( current_label ) == wrong_label_local.end() ){
           return current_label;
         }
         else{
@@ -775,15 +793,15 @@ namespace espresso {
       void relabel_particles(){
         for(boost::unordered_multimap<int, OrderParticleProps>::iterator opm = opp_map.begin(); opm!=opp_map.end(); ++opm){
           OrderParticleProps &opp = (*opm).second;
-          if( opp.getSolid() ||  opp.getSurface() ){
-            if( opp.getLabel()<0 ){
+          if( opp.getSolid() || opp.getSurface() ){
+            if( opp.getLabel()<0 && opp.getSolid() ){
               cout<<"!!!relabel_particles!!!  cpu: "<< getSystem()->comm->rank() <<
                       " particle: "<< opp.getPID()<< 
                       " is "<<  opp.getSolid() << "  " << opp.getSurface() <<
                       " and has label:  "<< opp.getLabel() << endl;
             }
-            else{
-              opp.setLabel(  getCorrectLabel( opp.getLabel() ) );
+            else if(opp.getLabel()>=0){
+              opp.setLabel( getCorrectLabel( opp.getLabel() ) );
             }
           }
         }
