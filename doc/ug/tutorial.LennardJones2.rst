@@ -16,7 +16,7 @@ use for graphical output of some system parameters (e.g. temperature and energy)
 >>> plt.ion()
 
 We setup a standard Lennard-Jones system with 1000 particles and a density of 0.85
-in a cubic siomulation box. |espp| provides a "shortcut" to setup such a system:
+in a cubic siomulation box. ESPResSo++ provides a "shortcut" to setup such a system:
 
 >>> N   = 1000
 >>> rho = 0.85
