@@ -6,6 +6,8 @@ from espresso.analysis.AnalysisBase import *
 from espresso.analysis.Temperature import *
 from espresso.analysis.Pressure import *
 from espresso.analysis.PressureTensor import *
+from espresso.analysis.PressureTensorLayer import *
+from espresso.analysis.PressureTensorMultiLayer import *
 from espresso.analysis.Configurations import *
 from espresso.analysis.ConfigurationsExt import *
 from espresso.analysis.Velocities import *
@@ -16,6 +18,10 @@ from espresso.analysis.AllParticlePos import *
 from espresso.analysis.IntraChainDistSq import *
 from espresso.analysis.NeighborFluctuation import *
 from espresso.analysis.OrderParameter import *
+from espresso.analysis.LBOutput import *
+from espresso.analysis.LBOutputProfileVzOfX import *
+from espresso.analysis.LBOutputScreen import *
+from espresso.analysis.LBOutputVzInTime import *
 
 from espresso.analysis.ConfigsParticleDecomp import *
 from espresso.analysis.VelocityAutocorrelation import *
@@ -27,4 +33,6 @@ from espresso.analysis.RDFatomistic import *
 from espresso.analysis.Energy import *
 from espresso.analysis.Viscosity import *
 from espresso.analysis.XDensity import *
+from espresso.analysis.XPressure import *
 from espresso.analysis.Test import *
+from espresso.analysis.ParticleRadiusDistribution import *

@@ -4,6 +4,7 @@
 
 #include "ParticleAccess.hpp"
 #include "integrator/MDIntegrator.hpp"
+#include "io/FileBackup.hpp"
 
 #include "esutil/Error.hpp"
 
@@ -21,13 +22,17 @@ namespace espresso {
               std::string _file_name,
               bool _unfolded,
               real _length_factor,
-              std::string _length_unit) :
+              std::string _length_unit,
+              bool _append) :
                         ParticleAccess(system), 
                         integrator(_integrator),
                         file_name( _file_name ),
                         unfolded(_unfolded),
-                        length_factor(_length_factor){ 
+                        length_factor(_length_factor), 
+                        append(_append){ 
         setLengthUnit(_length_unit);
+        if (system->comm->rank() == 0  && !append)
+          FileBackup backup(file_name);
       }
       ~DumpXYZ() {}
 
@@ -41,6 +46,8 @@ namespace espresso {
       void setFilename(std::string v){file_name = v;}
       bool getUnfolded(){return unfolded;}
       void setUnfolded(bool v){unfolded = v;}
+      bool getAppend(){return append;}
+      void setAppend(bool v){append = v;}
 
       std::string getLengthUnit(){return length_unit;}
       void setLengthUnit(std::string v){
@@ -71,6 +78,7 @@ namespace espresso {
       std::string file_name;
       
       bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
+      bool append; //append to existing trajectory file or create a new one
       real length_factor;  // for example 
       std::string length_unit; // length unit: {could be LJ, nm, A} it is just for user info
     };

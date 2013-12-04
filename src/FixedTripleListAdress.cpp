@@ -42,8 +42,8 @@ namespace espresso {
     System& system = storage->getSystemRef();
     esutil::Error err(system.comm);
 
-    if (pid1 > pid2)
-      std::swap(pid1, pid2);
+    //if (pid1 > pid2)
+      //std::swap(pid1, pid2);
 
     // ADD THE LOCAL TRIPLES
     Particle *p1 = storage->lookupAdrATParticle(pid1);

@@ -2,91 +2,119 @@
 #ifndef _INTEGRATOR_LATTICEMODEL_HPP
 #define _INTEGRATOR_LATTICEMODEL_HPP
 
+#include "Real3D.hpp"
+
 namespace espresso {
   namespace integrator {
     class LBSite {
       /**
       * \brief Description of the properties of the Site class
       *
-      * This is a Site class for a Lattice Boltzmann method. It includes
-      * declaration of the populations, local and equilibrium moments (MRT model).
-      * The functions to calculate them are defined. Also, back-transformation
-      * functions are included.
+      * This is a Site class for the Lattice Boltzmann method. Everything that one does with popula-
+      * tions on the site is happenning here: calculation of local and equilibrium moments for MRT-
+      * model; relaxation of the moments to their equilibrium values with additional account for
+      * fluctuations (if desired); back-transformation from the mode- to the population-space.
       *
-      * In short, all the quantities and operations taking place at the lattice site
-      * are defined/listed/declared here.
+      * Please note that by default Espresso++ supports only D3Q19 model of the lattice. If you wish
+      * to use something different, you need to adapt the code for your own purposes!
       *
-      * This is a first try. Further extensions might be needed.
       */
       public:
 
-        LBSite (int _numVels, real _a, real _tau);
+        LBSite (shared_ptr<System> system, int _numVels, real _a, real _tau);
         ~LBSite ();
 
         /* SET AND GET DECLARATION */
-        void setF_i (int _i, real _f);	// set f_i population to _f
-        real getF_i (int _i);		// get f_i population
+        void setF_i (int _i, real _f);	        // set f_i population to _f
+        real getF_i (int _i);		              // get f_i population
 
-        void setM_i (int _i, real _m);	// set m_i moment to _m
-        real getM_i (int _i);		// get m_i moment
+        void setM_i (int _i, real _m);	        // set m_i moment to _m
+        real getM_i (int _i);		              // get m_i moment
 
-        void setMeq_i (int _i, real _meq);	// set meq_i moment to _meq
-        real getMeq_i (int _i);		// get meq_i moment
+        void setMeq_i (int _i, real _meq);    	// set meq_i moment to _meq
+        real getMeq_i (int _i);		            // get meq_i moment
 
-        void setInvB (int _i, real _b);  // set invLov_b value to _b
-        real getInvB (int _i);   // get invLoc_b value
+        void setInvBLoc (int _i, real _b);    // set invLov_b value to _b
+        real getInvBLoc (int _i);             // get invLoc_b value
 
-        void setEqWLoc (int _i, real _w);  // set eqWeightLoc value to _w
-        real getEqWLoc (int _i);   // get eqWeightLoc value
+        void setEqWLoc (int _i, real _w);     // set eqWeightLoc value to _w
+        real getEqWLoc (int _i);              // get eqWeightLoc value
 
-        void setGammaB (real _gamma_b); // set gamma for bulk
-        real getGammaB ();  // get gamma for bulk
+        void setALoc (real _a);               // set aLocal
+        real getALoc ();                       // get aLocal
 
-        void setGammaS (real _gamma_s); // set gamma for shear
-        real getGammaS ();  // get gamma for shear
+        void setTauLoc (real _tau);           // set tauLocal
+        real getTauLoc ();                    // get tauLocal
 
-        void setGammaOdd (real _gamma_odd); // set gamma odd
-        real getGammaOdd ();  // get gamma odd
+        void setPhiLoc (int _i, real _phi);  // set phi value to _phi
+        real getPhiLoc (int _i);              // get phi value
 
-        void setGammaEven (real _gamma_even); // set gamma even
-        real getGammaEven ();  // get gamma even
+        void setGammaBLoc (real _gamma_b);        // set gamma for bulk
+        real getGammaBLoc ();                     // get gamma for bulk
 
-        void setALocal (real _a); // set aLocal
-        real getALocal ();    // get aLocal
+        void setGammaSLoc (real _gamma_s);        // set gamma for shear
+        real getGammaSLoc ();                     // get gamma for shear
 
-        void setTauLocal (real _tau); // set tauLocal
-        real getTauLocal ();  // get tauLocal
+        void setGammaOddLoc (real _gamma_odd);    // set gamma odd
+        real getGammaOddLoc ();                   // get gamma odd
+
+        void setGammaEvenLoc (real _gamma_even);  // set gamma even
+        real getGammaEvenLoc ();                  // get gamma even
+
+        void setExtForceLoc (Real3D _extForceLoc);  // set local external force
+        Real3D getExtForceLoc ();                   // get local external force
+
         /* END OF SET AND GET DECLARATION */
 
-        void scaleF_i (int _i, real _value);  // scale f_i population by _value
-        void scaleM_i (int _i, real _value);  // scale m_i moment by _value
+        void scaleF_i (int _i, real _value);      // scale f_i population by _value
+        void scaleM_i (int _i, real _value);      // scale m_i moment by _value
+        void addM_i (int _i, real _value);        // add _value to m_i moment
 
         /* FUNCTIONS DECLARATION */
-        void calcLocalMoments ();	// calculate local moments
-        void calcEqMoments ();		// calculate equilibrium moments
-        void relaxMoments (int _numVels);		// relax loc. moments towards eq.values
-	      void btranMomToPop (int _numVels);		// back-transform moments to populations
+        void calcLocalMoments ();	                // calculate local moments
+        void calcEqMoments (int _extForceFlag);   // calculate equilibrium moments
+        void relaxMoments (int _numVels);		      // relax loc. moments towards eq.values
+        void thermalFluct (int _numVels);		      // introduce thermal fluctuations (if any)
+        void applyForces (int _numVels);          // apply external forces (if any)
+	      void btranMomToPop (int _numVels);		    // back-transform moments to populations
 
       private:
         std::vector<real> f;        // populations on a lattice site
         std::vector<real> m;        // moments on a site
         std::vector<real> meq;      // eq. moments on a site
+        Real3D extForceLoc;         // local external force
         static real aLocal;        // local variable for lattice spacing
         static real tauLocal;      // local variable for lattice time
-        static real gamma_b, gamma_s, gamma_odd, gamma_even;  // gammas
+        static real gamma_bLoc;    // gamma bulk
+        static real gamma_sLoc;    // gamma shear
+        static real gamma_oddLoc;  // gamma odd
+        static real gamma_evenLoc; // gamma even
+        static std::vector<real> phiLoc;      // local fluctuations amplitudes
         static std::vector<real> invLoc_b;    // local inverse coefficients b_i
         static std::vector<real> eqWeightLoc; // local eq. weights
+
+        shared_ptr< esutil::RNG > rng;         //!< random number generator used for fluctuations
     };
 
     class GhostLattice {
+      /**
+      * \brief Description of the properties of the GhostLattice class
+      *
+      * This is a GhostLattice class for storing of the populations from Site class while streaming.
+      * It is a handy yet not necessary procedure. There is a possibility that in the future we will
+      * dispose of this class and implement streaming with a sophisticated procedure. However, at
+      * the moment we aim at the code that can be well understood by a non-expert and this class is
+      * a must!
+      *
+      */
       public:
-        GhostLattice (int _numVels);
-        ~GhostLattice ();
+        GhostLattice (int _numVels);        // constructor of the ghost lattice
+        ~GhostLattice ();                   // destructor of the ghost lattice
 
         void setPop_i (int _i, real _pop);  // set f_i population to _f
         real getPop_i (int _i);             // get f_i population
       private:
-        std::vector<real> pop;
+        std::vector<real> pop;                // populations of the ghost lattice
     };
   }
 }

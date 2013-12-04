@@ -4,6 +4,8 @@
 #include "Temperature.hpp"
 #include "Pressure.hpp"
 #include "PressureTensor.hpp"
+#include "PressureTensorLayer.hpp"
+#include "PressureTensorMultiLayer.hpp"
 #include "Configuration.hpp"
 #include "ConfigurationExt.hpp"
 #include "Configurations.hpp"
@@ -23,12 +25,19 @@
 #include "RDFatomistic.hpp"
 #include "Viscosity.hpp"
 #include "XDensity.hpp"
+#include "XPressure.hpp"
 #include "Test.hpp"
+#include "ParticleRadiusDistribution.hpp"
 
 #include "IntraChainDistSq.hpp"
 #include "NeighborFluctuation.hpp"
 
 #include "OrderParameter.hpp"
+
+#include "LBOutput.hpp"
+#include "LBOutputProfileVzOfX.hpp"
+#include "LBOutputScreen.hpp"
+#include "LBOutputVzInTime.hpp"
 
 namespace espresso {
   namespace analysis {
@@ -38,6 +47,8 @@ namespace espresso {
       Temperature::registerPython();
       Pressure::registerPython();
       PressureTensor::registerPython();
+      PressureTensorLayer::registerPython();
+      PressureTensorMultiLayer::registerPython();
       Configuration::registerPython();
       Configurations::registerPython();
       ConfigurationExt::registerPython();
@@ -58,10 +69,17 @@ namespace espresso {
       StaticStructF::registerPython();
       RDFatomistic::registerPython();
       XDensity::registerPython();
+      XPressure::registerPython();
       Test::registerPython();
+      ParticleRadiusDistribution::registerPython();
       
       Autocorrelation::registerPython();
       Viscosity::registerPython();
+
+      LBOutput::registerPython();
+      LBOutputProfileVzOfX::registerPython();
+      LBOutputScreen::registerPython();
+      LBOutputVzInTime::registerPython();
     }
   }
 }

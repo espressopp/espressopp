@@ -40,9 +40,8 @@ namespace espresso {
 
             class_<VerletListReactionFieldGeneralized, bases<Interaction> >
                 ("interaction_VerletListReactionFieldGeneralized", init< shared_ptr<VerletList> >())
-                .def("setPotential", &VerletListReactionFieldGeneralized::setPotential, return_value_policy< reference_existing_object >())
-                .def("getPotential", &VerletListReactionFieldGeneralized::getPotential, return_value_policy< reference_existing_object >())
-                .def("clonePotential", &VerletListReactionFieldGeneralized::clonePotential)
+                .def("setPotential", &VerletListReactionFieldGeneralized::setPotential)
+                .def("getPotential", &VerletListReactionFieldGeneralized::getPotentialPtr)
                 .def("getVerletList", &VerletListReactionFieldGeneralized::getVerletList)
                 .def("setVerletList", &VerletListReactionFieldGeneralized::setVerletList)
             ;
@@ -56,7 +55,7 @@ namespace espresso {
 
             class_<VerletListHadressReactionFieldGeneralized, bases<Interaction> >
                 ("interaction_VerletListHadressReactionFieldGeneralized",
-                        init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+                        init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress>, bool >())
                 .def("setPotentialAT", &VerletListHadressReactionFieldGeneralized::setPotentialAT)
                 .def("setPotentialCG", &VerletListHadressReactionFieldGeneralized::setPotentialCG);
             ;

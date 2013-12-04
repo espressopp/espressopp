@@ -28,9 +28,7 @@ namespace espresso {
       VerletListInteractionTemplate
           (shared_ptr<VerletList> _verletList)
           : verletList(_verletList) {
-    	  potentialArray = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
-    	  // potentialArray = esutil::Array2D< shared_ptr<Potential>, esutil::enlarge>(0, 0, shared_ptr<Potential>());
-          
+    	  potentialArray    = esutil::Array2D<Potential, esutil::enlarge>(0, 0, Potential());
         ntypes = 0;
       }
 
@@ -47,29 +45,30 @@ namespace espresso {
 
       void
       setPotential(int type1, int type2, const Potential &potential) {
-       //setPotential(int type1, int type2, shared_ptr<Potential> potential) {
         // typeX+1 because i<ntypes
         ntypes = std::max(ntypes, std::max(type1+1, type2+1));
-        
         potentialArray.at(type1, type2) = potential;
         if (type1 != type2) { // add potential in the other direction
            potentialArray.at(type2, type1) = potential;
         }
       }
 
+      // this is used in the innermost force-loop
       Potential &getPotential(int type1, int type2) {
-      // shared_ptr<Potential> getPotential(int type1, int type2) {
         return potentialArray.at(type1, type2);
       }
 
-      shared_ptr<Potential> clonePotential(int type1, int type2) {
-      // shared_ptr<Potential> getPotential(int type1, int type2) {
-        //return potentialArray.at(type1, type2);
-    	return make_shared<Potential>(potentialArray.at(type1, type2));
+      // this is mainly used to access the potential from Python (e.g. to change parameters of the potential)
+      shared_ptr<Potential> getPotentialPtr(int type1, int type2) {
+    	return  make_shared<Potential>(potentialArray.at(type1, type2));
       }
+
 
       virtual void addForces();
       virtual real computeEnergy();
+      virtual real computeEnergyAA();
+      virtual real computeEnergyCG();      
+      virtual void computeVirialX(std::vector<real> &p_xx_total, int bins); 
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& w);
       virtual void computeVirialTensor(Tensor& w, real z);
@@ -81,7 +80,7 @@ namespace espresso {
       int ntypes;
       shared_ptr<VerletList> verletList;
       esutil::Array2D<Potential, esutil::enlarge> potentialArray;
-      //esutil::Array2D<shared_ptr<Potential>, esutil::enlarge> potentialArray;
+      esutil::Array2D<shared_ptr<Potential>, esutil::enlarge> potentialArrayPtr;
     };
 
     //////////////////////////////////////////////////
@@ -135,6 +134,27 @@ namespace espresso {
       real esum;
       boost::mpi::all_reduce(*getVerletList()->getSystem()->comm, es, esum, std::plus<real>());
       return esum;
+    }
+
+    template < typename _Potential > inline real
+    VerletListInteractionTemplate < _Potential >::
+    computeEnergyAA() {
+      std::cout << "Warning! At the moment computeEnergyAA() in VerletListInteractionTemplate does not work." << std::endl;
+      return 0.0;
+    }
+    
+    template < typename _Potential > inline real
+    VerletListInteractionTemplate < _Potential >::
+    computeEnergyCG() {
+      std::cout << "Warning! At the moment computeEnergyCG() in VerletListInteractionTemplate does not work." << std::endl;
+      return 0.0;
+    }
+    
+    template < typename _Potential >
+    inline void
+    VerletListInteractionTemplate < _Potential >::
+    computeVirialX(std::vector<real> &p_xx_total, int bins) {
+        std::cout << "Warning! At the moment computeVirialX in VerletListInteractionTemplate does not work." << std::endl << "Therefore, the corresponding interactions won't be included in calculation." << std::endl;
     }
 
     template < typename _Potential > inline real

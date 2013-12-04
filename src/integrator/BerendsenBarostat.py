@@ -106,5 +106,5 @@ if pmi.isController:
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
       cls =  'espresso.integrator.BerendsenBarostatLocal',
-      pmiproperty = [ 'tau', 'pressure' ]
+      pmiproperty = [ 'tau', 'pressure', 'fixed' ]
     )

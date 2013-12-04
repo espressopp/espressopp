@@ -17,7 +17,7 @@
 
 using namespace std;
 
-typedef complex<double> dcomplex;
+typedef complex<espresso::real> dcomplex;
 
 // the following two constants are not defined everywhere (e.g. not in Mac OS X)
 #ifndef M_PIl

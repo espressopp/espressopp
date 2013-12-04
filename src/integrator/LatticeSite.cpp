@@ -5,20 +5,23 @@
 #include "System.hpp"
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
+#include "esutil/RNG.hpp"
 
 namespace espresso {
 
   using namespace iterator;
   namespace integrator {
     /* site Constructor */
-    LBSite::LBSite (int _numVels, real _a, real _tau) {
+    LBSite::LBSite (shared_ptr<System> system, int _numVels, real _a, real _tau) {
       f   = std::vector<real>(_numVels, 0.);
       m   = std::vector<real>(_numVels, 0.);
       meq = std::vector<real>(_numVels, 0.);
-      setALocal(_a);
-      setTauLocal(_tau);
-      setGammaB(1.); setGammaS(1.);
-      setGammaOdd(1.); setGammaEven(1.);
+      setALoc(_a);
+      setTauLoc(_tau);
+      if (!system->rng) {
+        throw std::runtime_error("system has no RNG");
+      }
+      rng = system->rng;
     }
 
     /* SET AND GET PART */
@@ -32,44 +35,52 @@ namespace espresso {
     real LBSite::getMeq_i (int _i) { return meq[_i];}
 
     /* set and get static variables */
-    void LBSite::setALocal (real _a) {aLocal = _a;}
-    real LBSite::getALocal () {return aLocal;}
+    void LBSite::setALoc (real _a) {aLocal = _a;}
+    real LBSite::getALoc () {return aLocal;}
 
-    void LBSite::setTauLocal (real _tau) {tauLocal = _tau;}
-    real LBSite::getTauLocal () {return tauLocal;}
+    void LBSite::setTauLoc (real _tau) {tauLocal = _tau;}
+    real LBSite::getTauLoc () {return tauLocal;}
 
-    void LBSite::setInvB (int _i, real _b) { invLoc_b[_i] = _b;}
-    real LBSite::getInvB (int _i) { return invLoc_b[_i];}
+    void LBSite::setInvBLoc (int _i, real _b) { invLoc_b[_i] = _b;}
+    real LBSite::getInvBLoc (int _i) { return invLoc_b[_i];}
 
     void LBSite::setEqWLoc (int _i, real _w) { eqWeightLoc[_i] = _w;}
     real LBSite::getEqWLoc (int _i) { return eqWeightLoc[_i];}
 
-    void LBSite::setGammaB (real _gamma_b) {gamma_b = _gamma_b;}
-    real LBSite::getGammaB () { return gamma_b;}
+    void LBSite::setPhiLoc (int _i, real _phi) { phiLoc[_i] = _phi;}
+    real LBSite::getPhiLoc (int _i) { return phiLoc[_i];}
 
-    void LBSite::setGammaS (real _gamma_s) {gamma_s = _gamma_s;}
-    real LBSite::getGammaS () { return gamma_s;}
+    void LBSite::setGammaBLoc (real _gamma_b) {gamma_bLoc = _gamma_b;}
+    real LBSite::getGammaBLoc () { return gamma_bLoc;}
 
-    void LBSite::setGammaOdd (real _gamma_odd) {gamma_odd = _gamma_odd;}
-    real LBSite::getGammaOdd () { return gamma_odd;}
+    void LBSite::setGammaSLoc (real _gamma_s) {gamma_sLoc = _gamma_s;}
+    real LBSite::getGammaSLoc () { return gamma_sLoc;}
 
-    void LBSite::setGammaEven (real _gamma_even) {gamma_even = _gamma_even;}
-    real LBSite::getGammaEven () { return gamma_even;}
+    void LBSite::setGammaOddLoc (real _gamma_odd) {gamma_oddLoc = _gamma_odd;}
+    real LBSite::getGammaOddLoc () { return gamma_oddLoc;}
+
+    void LBSite::setGammaEvenLoc (real _gamma_even) {gamma_evenLoc = _gamma_even;}
+    real LBSite::getGammaEvenLoc () { return gamma_evenLoc;}
+
+    void LBSite::setExtForceLoc (Real3D _extForceLoc) {extForceLoc = _extForceLoc;}
+    Real3D LBSite::getExtForceLoc () {return extForceLoc;}
 
     /* OTHER HELPFUL OPERATIONS */
     void LBSite::scaleF_i (int _i, real _value) { f[_i] *= _value;}
     void LBSite::scaleM_i (int _i, real _value) { m[_i] *= _value;}
+    void LBSite::addM_i (int _i, real _value) { m[_i] += _value;}
 
     /* MANAGING STATIC VARIABLES */
     /* create storage for static variables */
     real LBSite::aLocal   = 0.;
     real LBSite::tauLocal = 0.;
+    std::vector<real> LBSite::phiLoc(19, 0.);
     std::vector<real> LBSite::invLoc_b(19, 0.);
     std::vector<real> LBSite::eqWeightLoc(19, 0.);
-    real LBSite::gamma_b = 0.;
-    real LBSite::gamma_s = 0.;
-    real LBSite::gamma_odd = 0.;
-    real LBSite::gamma_even = 0.;
+    real LBSite::gamma_bLoc = 0.;
+    real LBSite::gamma_sLoc = 0.;
+    real LBSite::gamma_oddLoc = 0.;
+    real LBSite::gamma_evenLoc = 0.;
 
 /*----------------------------------------------------------------------------*/
 
@@ -126,7 +137,7 @@ namespace espresso {
     }
 
     /* CALCULATION OF THE EQUILIBRIUM MOMENTS */
-    void LBSite::calcEqMoments() {
+    void LBSite::calcEqMoments(int _extForceFlag) {
       // IF ONE USES DEFAULT D3Q19 MODEL
 
       // density on the site
@@ -136,13 +147,12 @@ namespace espresso {
       Real3D jLoc(getM_i(1), getM_i(2), getM_i(3));
       jLoc *= (aLocal / tauLocal);
 
-      // eq. mass mode (conserved)
-      setMeq_i (0, getM_i(0));
-
-      // eq. momentum modes (conserved)
-      setMeq_i (1, getM_i(1));
-      setMeq_i (2, getM_i(2));
-      setMeq_i (3, getM_i(3));
+      // if we have external forces then modify the eq.fluxes
+      if (_extForceFlag == 1) {
+        jLoc[0] += 0.5*getExtForceLoc().getItem(0);
+        jLoc[1] += 0.5*getExtForceLoc().getItem(1);
+        jLoc[2] += 0.5*getExtForceLoc().getItem(2);
+      }
 
       // eq. stress modes
       setMeq_i (4, jLoc.sqr() / rhoLoc);
@@ -162,18 +172,15 @@ namespace espresso {
 
     void LBSite::relaxMoments (int _numVels) {
       real pi_eq[6];
-      // moments on the site
-      Real3D jLoc(getM_i(1), getM_i(2), getM_i(3));
-      jLoc *= (aLocal / tauLocal);
 
       pi_eq[0] =  getMeq_i(4); pi_eq[1] =  getMeq_i(5); pi_eq[2] =  getMeq_i(6);
       pi_eq[3] =  getMeq_i(7); pi_eq[4] =  getMeq_i(8); pi_eq[5] =  getMeq_i(9);
 
       real _gamma_b, _gamma_s, _gamma_odd, _gamma_even;
-      _gamma_b = getGammaB();
-      _gamma_s = getGammaS();
-      _gamma_odd = getGammaOdd();
-      _gamma_even = getGammaEven();
+      _gamma_b = getGammaBLoc();
+      _gamma_s = getGammaSLoc();
+      _gamma_odd = getGammaOddLoc();
+      _gamma_even = getGammaEvenLoc();
 
       // relax bulk mode
       setM_i (4, pi_eq[0] + _gamma_b * (getM_i(4) - pi_eq[0]));
@@ -191,6 +198,67 @@ namespace espresso {
 
       // relax even modes
       scaleM_i (16, _gamma_even); scaleM_i (17, _gamma_even); scaleM_i (18, _gamma_even);
+    }
+
+    void LBSite::thermalFluct(int _numVels) {
+    	/* set phi values */
+        // rooted density on the site
+        real rootRhoLoc = sqrt(getM_i(0));    // factor 12. comes from the fact that one uses
+                                                  // not gaussian but uniformly distributed rand.
+        real _valueToAdd;
+
+        for (int l = 4; l < _numVels; l++) {
+        	_valueToAdd = rootRhoLoc*getPhiLoc(l)*((*rng).normal() - 0.5);
+/*      	    std::cout << "PhiLoc[" << l << "] = " << getPhiLoc (l);
+        	if (l == 4) {
+//        		std::cout << "_valueToAdd is " << _valueToAdd;
+        	} else if (l > 4) {
+//        		std::cout << " " << _valueToAdd;
+        	}
+
+        	if (l == _numVels - 1) {
+//        		std::cout << "\n";
+        	} else {
+        	}
+*/        	addM_i(l, _valueToAdd);
+        }
+    }
+
+    void LBSite::applyForces(int _numVels) {
+      Real3D _f;
+      _f = getExtForceLoc();
+
+      // set velocity _u
+      Real3D _u (getM_i(1) + 0.5*_f[0], getM_i(2) + 0.5*_f[1], getM_i(3) + 0.5*_f[2]);
+      _u /= getM_i(0);
+
+      /* update momentum modes */
+      addM_i(1, _f[0]);
+      addM_i(2, _f[1]);
+      addM_i(3, _f[2]);
+
+      /* update stress modes */
+      // See def. of _sigma (Eq.198) in B.Dünweg & A.J.C.Ladd in Adv.Poly.Sci. 221, 89-166 (2009)
+      real _sigma[6];
+      real _gamma_b, _gamma_s;
+      real _scalp;
+      _gamma_b = getGammaBLoc();
+      _gamma_s = getGammaSLoc();
+
+      _scalp = _u*_f;
+      _sigma[0] = (1. + _gamma_s)*_u[0]*_f[0] + 1./3.*(_gamma_b - _gamma_s)*_scalp;
+      _sigma[1] = (1. + _gamma_s)*_u[1]*_f[1] + 1./3.*(_gamma_b - _gamma_s)*_scalp;
+      _sigma[2] = (1. + _gamma_s)*_u[2]*_f[2] + 1./3.*(_gamma_b - _gamma_s)*_scalp;
+      _sigma[3] = 1./2.*(1. + _gamma_s)*(_u[0]*_f[1]+_u[1]*_f[0]);
+      _sigma[4] = 1./2.*(1. + _gamma_s)*(_u[0]*_f[2]+_u[2]*_f[0]);
+      _sigma[5] = 1./2.*(1. + _gamma_s)*(_u[1]*_f[2]+_u[2]*_f[1]);
+
+      addM_i(4, _sigma[0]+_sigma[1]+_sigma[2]);
+      addM_i(5, 2*_sigma[0]-_sigma[1]-_sigma[2]);
+      addM_i(6, _sigma[1]-_sigma[2]);
+      addM_i(7, _sigma[3]);
+      addM_i(8, _sigma[4]);
+      addM_i(9, _sigma[5]);
     }
 
     void LBSite::btranMomToPop (int _numVels) {
@@ -219,13 +287,13 @@ namespace espresso {
       setF_i(6,_M[0] -_M[3] -_M[5] -_M[6] + 2.* (_M[12] -_M[16]) +_M[17] +_M[18]);
 
       setF_i(7,_M[0] +_M[1] +_M[2] +_M[4] +_M[5] +_M[6] +_M[7] +_M[10] +_M[11]
-              +_M[13] -_M[14] +_M[17] +_M[18]);
+              +_M[13] -_M[14] +_M[16] +_M[17] +_M[18]);
       setF_i(8,_M[0] -_M[1] -_M[2] +_M[4] +_M[5] +_M[6] +_M[7] -_M[10] -_M[11]
-              -_M[13] +_M[14] +_M[17] +_M[18]);
+              -_M[13] +_M[14] +_M[16] +_M[17] +_M[18]);
       setF_i(9,_M[0] +_M[1] -_M[2] +_M[4] +_M[5] +_M[6] -_M[7] +_M[10] -_M[11]
-              +_M[13] +_M[14] +_M[17] +_M[18]);
+              +_M[13] +_M[14] +_M[16] +_M[17] +_M[18]);
       setF_i(10,_M[0] -_M[1] +_M[2] +_M[4] +_M[5] +_M[6] -_M[7] -_M[10] +_M[11]
-               -_M[13] -_M[14] +_M[17] +_M[18]);
+               -_M[13] -_M[14] +_M[16] +_M[17] +_M[18]);
 
       setF_i(11,_M[0] +_M[1] +_M[3] +_M[4] +_M[5] -_M[6] +_M[8] +_M[10] +_M[12]
                -_M[13] +_M[15] +_M[16] +_M[17] -_M[18]);

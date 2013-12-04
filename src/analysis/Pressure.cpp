@@ -29,10 +29,39 @@ namespace espresso {
       real v2 = 0.0;
 
       CellList realCells = system.storage->getRealCells();
-      for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-        const Particle& p = *cit;
-        v2 = v2 + p.mass() * (p.velocity() * p.velocity());
+      
+      if (system.storage->getFixedTuples()){ // AdResS - hence, need to distinguish between CG and AT particles.     
+          
+          shared_ptr<FixedTupleListAdress> fixedtupleList=system.storage->getFixedTuples();
+          for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+                Particle &vp = *cit;
+                FixedTupleListAdress::iterator it2;
+                it2 = fixedtupleList->find(&vp);  
+
+                if (it2 != fixedtupleList->end()) {  // Are there atomistic particles for given CG particle? If yes, use those for calculation.
+                      std::vector<Particle*> atList;
+                      atList = it2->second;
+                      for (std::vector<Particle*>::iterator it3 = atList.begin();
+                                           it3 != atList.end(); ++it3) {
+                          Particle &at = **it3;
+                          v2 += at.mass() * (at.velocity() * at.velocity());
+                      }  
+                }
+
+                else{   // If not, use CG particle itself for calculation.
+                      v2 += vp.mass() * (vp.velocity() * vp.velocity());
+                }                                
+          }
+          
       }
+      else{
+          
+          for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+            const Particle& p = *cit;
+            v2 += p.mass() * (p.velocity() * p.velocity());
+          }
+          
+      }      
       boost::mpi::all_reduce( communic, v2, v2sum, std::plus<real>());
       p_kinetic = v2sum;
       

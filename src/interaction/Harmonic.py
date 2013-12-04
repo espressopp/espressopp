@@ -22,9 +22,9 @@ class FixedPairListHarmonicLocal(InteractionLocal, interaction_FixedPairListHarm
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListHarmonic, system, vl, potential)
 
-    def setPotential(self, type1, type2, potential):
+    def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.setPotential(self, type1, type2, potential)
+            self.cxxclass.setPotential(self, potential)
 
     def setFixedPairList(self, fixedpairlist):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

@@ -263,6 +263,8 @@ namespace espresso {
 				  const RealND &v) {
     for (int i = 0; i < v.getDimension(); i++)
       out << v[i] << ' ';
+//    for (RealND::iterator ii = v.begin(); ii != v.end(); ii++)
+//      out << *ii << ' '; //FIXME some issue with the const-ness of v
     return out;
   }
 

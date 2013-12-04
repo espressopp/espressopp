@@ -44,9 +44,8 @@ namespace espresso {
       class_< VerletListLennardJones, bases< Interaction > > 
         ("interaction_VerletListLennardJones", init< shared_ptr<VerletList> >())
         .def("getVerletList", &VerletListLennardJones::getVerletList)
-        .def("setPotential", &VerletListLennardJones::setPotential, return_value_policy< reference_existing_object >())
-        .def("getPotential", &VerletListLennardJones::getPotential, return_value_policy< reference_existing_object >())
-        .def("clonePotential", &VerletListLennardJones::clonePotential)
+        .def("setPotential", &VerletListLennardJones::setPotential)
+        .def("getPotential", &VerletListLennardJones::getPotentialPtr)
         .def("setVerletList", &VerletListLennardJones::setVerletList)
       ;
 
@@ -69,7 +68,7 @@ namespace espresso {
       class_< VerletListHadressLennardJones, bases< Interaction > >
         ("interaction_VerletListHadressLennardJones",
            init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress> >())
+                  shared_ptr<FixedTupleListAdress>, bool >())
         .def("setPotentialAT", &VerletListHadressLennardJones::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressLennardJones::setPotentialCG);
       ;
@@ -77,7 +76,7 @@ namespace espresso {
       class_< VerletListHadressLennardJones2, bases< Interaction > >
         ("interaction_VerletListHadressLennardJones2",
            init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress> >())
+                  shared_ptr<FixedTupleListAdress>, bool >())
         .def("setPotentialAT", &VerletListHadressLennardJones2::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressLennardJones2::setPotentialCG);
       ;

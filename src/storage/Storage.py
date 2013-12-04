@@ -61,8 +61,11 @@ All derived classes implement at least the following methods:
    Example: 
    
    >>> modifyParticle(pid, 'pos', Real3D(new_x, new_y, new_z))
+   
+* `removeAllParticles()`:
 
-
+   This routine removes all particles from the storage.
+   
 * 'system':
 
   The property 'system' returns the System object of the storage.
@@ -101,6 +104,11 @@ class StorageLocal(object):
       'remove a particle, will return if particle exists on this worker 0 else'
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         return self.cxxclass.removeParticle(self, pid)
+      
+    def removeAllParticles(self):
+      'remove all particles'
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        return self.cxxclass.removeAllParticles(self)
             
     def addAdrATParticle(self, pid, *args):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -119,17 +127,19 @@ class StorageLocal(object):
     def addParticles(self, particleList, *properties):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 
-            index_id      = -1
-            index_pos     = -1
-            index_v       = -1
-            index_f       = -1
-            index_q       = -1
-            index_radius  = -1
-            index_fradius = -1
-            index_vradius = -1
-            index_type    = -1
-            index_mass    = -1
-            index_adrAT   = -1 # adress AT particle if 1
+            index_id          = -1
+            index_pos         = -1
+            index_v           = -1
+            index_f           = -1
+            index_q           = -1
+            index_radius      = -1
+            index_fradius     = -1
+            index_vradius     = -1
+            index_type        = -1
+            index_mass        = -1            
+            index_adrAT       = -1 # adress AT particle if 1
+            index_lambda_adr  = -1
+            index_lambda_adrd = -1
             
             last_pos = toReal3DFromVector([-99,-99,-99])
 
@@ -152,6 +162,8 @@ class StorageLocal(object):
                     elif val.lower() == "fradius": index_fradius = nindex
                     elif val.lower() == "vradius": index_vradius = nindex
                     elif val.lower() == "adrat": index_adrAT = nindex
+                    elif val.lower() == "lambda_adr": index_lambda_adr = nindex
+                    elif val.lower() == "lambda_adrd": index_lambda_adrd = nindex
                     else: raise SyntaxError("unknown particle property: %s"%val)
                     nindex += 1
 
@@ -193,7 +205,7 @@ class StorageLocal(object):
                     
                 if storedParticle != None:
                     self.logger.debug("Processor %d stores particle id = %d"%(pmi.rank, id))
-                    self.logger.debug("particle property indexes: id=%i pos=%i type=%i mass=%i v=%i f=%i q=%i radius=%i"%(index_id,index_pos,index_type,index_mass,index_v,index_f,index_q,index_radius))
+                    self.logger.debug("particle property indexes: id=%i pos=%i type=%i mass=%i v=%i f=%i q=%i radius=%i lambda_adr=%i lambda_adrd=%i"%(index_id,index_pos,index_type,index_mass,index_v,index_f,index_q,index_radius,index_lambda_adr,index_lambda_adrd))
 
                     # only the owner processor writes other properties
 
@@ -221,6 +233,12 @@ class StorageLocal(object):
                     if index_mass >= 0:
                         storedParticle.mass = particle[index_mass]
  
+                    if index_lambda_adr >= 0:
+                        storedParticle.lambda_adr = particle[index_lambda_adr]
+                        
+                    if index_lambda_adrd >= 0:
+                        storedParticle.lambda_adrd = particle[index_lambda_adrd]
+ 
     def modifyParticle(self, pid, property, value):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
           
@@ -242,6 +260,8 @@ class StorageLocal(object):
                   elif property.lower() == "radius" : particle.radius = value
                   elif property.lower() == "fradius" : particle.fradius = value
                   elif property.lower() == "vradius" : particle.vradius = value
+                  elif property.lower() == "lambda_adr" : particle.lambda_adr = value
+                  elif property.lower() == "lambda_adrd" : particle.lambda_adrd = value
                   else: raise SyntaxError( 'unknown particle property: %s' % property) # UnknownParticleProperty exception is not implemented
               #except ParticleDoesNotExistHere:
                # self.logger.debug("ParticleDoesNotExistHere pid=% rank=%i" % (pid, pmi.rank))
@@ -268,7 +288,7 @@ if pmi.isController:
     class Storage(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress"],
+            pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress", "removeAllParticles"],
             pmiproperty = [ "system" ]
             )
 

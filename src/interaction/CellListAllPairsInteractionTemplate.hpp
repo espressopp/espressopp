@@ -44,6 +44,9 @@ namespace espresso {
 
       virtual void addForces();
       virtual real computeEnergy();
+      virtual real computeEnergyAA();
+      virtual real computeEnergyCG();      
+      virtual void computeVirialX(std::vector<real> &p_xx_total, int bins); 
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& wij);
       virtual void computeVirialTensor(Tensor& w, real z);
@@ -96,6 +99,27 @@ namespace espresso {
       boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
       return esum;
     }
+    
+    template < typename _Potential > inline real
+    CellListAllPairsInteractionTemplate < _Potential >::
+    computeEnergyAA() {
+      std::cout << "Warning! At the moment computeEnergyAA() in CellListAllPairsInteractionTemplate does not work." << std::endl;
+      return 0.0;
+    }
+    
+    template < typename _Potential > inline real
+    CellListAllPairsInteractionTemplate < _Potential >::
+    computeEnergyCG() {
+      std::cout << "Warning! At the moment computeEnergyCG() in CellListAllPairsInteractionTemplate does not work." << std::endl;
+      return 0.0;
+    }
+    
+    template < typename _Potential >
+    inline void
+    CellListAllPairsInteractionTemplate < _Potential >::
+    computeVirialX(std::vector<real> &p_xx_total, int bins) {
+        std::cout << "Warning! At the moment computeVirialX in CellListAllPairsInteractionTemplate does not work." << std::endl << "Therefore, the corresponding interactions won't be included in calculation." << std::endl;
+    }   
 
     template < typename _Potential > inline real 
     CellListAllPairsInteractionTemplate < _Potential >::

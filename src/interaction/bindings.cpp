@@ -19,6 +19,8 @@
 #include "Harmonic.hpp"
 #include "HarmonicUnique.hpp"
 #include "Quartic.hpp"
+#include "VSphereSelf.hpp"
+#include "VSpherePair.hpp"
 
 #include "Tabulated.hpp"
 #include "TabulatedAngular.hpp"
@@ -42,15 +44,19 @@
 #include "StillingerWeberPairTerm.hpp"
 #include "StillingerWeberTripleTerm.hpp"
 #include "StillingerWeberPairTermCapped.hpp"
+#include "TersoffPairTerm.hpp"
+#include "TersoffTripleTerm.hpp"
 
 #include "CoulombKSpaceP3M.hpp"
 #include "Potential.hpp"
+#include "PotentialVSpherePair.hpp"
 
 namespace espresso {
   namespace interaction {
     void registerPython() {
       Interaction::registerPython();
       Potential::registerPython();
+      PotentialVSpherePair::registerPython();
       PotentialUniqueDist::registerPython();
       Zero::registerPython();
       LennardJones::registerPython();
@@ -71,6 +77,8 @@ namespace espresso {
       Harmonic::registerPython();
       HarmonicUnique::registerPython();
       Quartic::registerPython();
+      VSphereSelf::registerPython();
+      VSpherePair::registerPython();
       
       AngularPotential::registerPython();
       AngularUniquePotential::registerPython();
@@ -93,6 +101,8 @@ namespace espresso {
       StillingerWeberPairTerm::registerPython();
       StillingerWeberTripleTerm::registerPython();
       StillingerWeberPairTermCapped::registerPython();
+      TersoffPairTerm::registerPython();
+      TersoffTripleTerm::registerPython();
       
       CoulombKSpaceP3M::registerPython();
     }

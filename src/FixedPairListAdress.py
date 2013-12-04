@@ -34,6 +34,11 @@ class FixedPairListAdressLocal(_espresso.FixedPairListAdress):
         'add pair to fixed pair list'
         if pmi.workerIsActive():
             return self.cxxclass.add(self, pid1, pid2)
+    def getBonds(self):
+        'return the bonds of the GlobalPairList'
+        if pmi.workerIsActive():
+          bonds=self.cxxclass.getBonds(self)
+          return bonds
 
     def addBonds(self, bondlist):
         """
@@ -53,5 +58,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espresso.FixedPairListAdressLocal',
             localcall = [ "add" ],
-            pmicall = [ "addBonds" ]
+            pmicall = [ "addBonds" ],
+			pmiinvoke = ['getBonds']
             )

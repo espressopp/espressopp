@@ -62,6 +62,9 @@ namespace espresso {
 
       virtual void addForces();
       virtual real computeEnergy();
+      virtual real computeEnergyAA();
+      virtual real computeEnergyCG();      
+      virtual void computeVirialX(std::vector<real> &p_xx_total, int bins); 
       virtual real computeVirial();
       virtual void computeVirialTensor(Tensor& w);
       virtual void computeVirialTensor(Tensor& w, real z);
@@ -124,7 +127,111 @@ namespace espresso {
       boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
       return esum;
     }
+    
+    template < typename _Potential > inline real
+    FixedPairListInteractionTemplate < _Potential >::
+    computeEnergyAA() {
+      std::cout << "Warning! At the moment computeEnergyAA() in FixedPairListInteractionTemplate does not work." << std::endl;
+      return 0.0;
+    }
+    
+    template < typename _Potential > inline real
+    FixedPairListInteractionTemplate < _Potential >::
+    computeEnergyCG() {
+      std::cout << "Warning! At the moment computeEnergyCG() in FixedPairListInteractionTemplate does not work." << std::endl;
+      return 0.0;
+    }   
+    
+    template < typename _Potential >
+    inline void
+    FixedPairListInteractionTemplate < _Potential >::
+    computeVirialX(std::vector<real> &p_xx_total, int bins) {
+              LOG4ESPP_INFO(theLogger, "compute virial p_xx of the pressure tensor slabwise");
+              //std::cout << "Warning! At the moment computeVirialX in FixedPairListInteractionTemplate does not work." << std::endl << "Therefore, the corresponding interactions won't be included in calculation." << std::endl;
 
+       /*int i = 0;
+       int bin1 = 0;
+       int bin2 = 0;
+       
+       const bc::BC& bc = *getSystemRef().bc;
+       Real3D Li = bc.getBoxL();
+       real Delta_x = Li[0] / (real)bins;
+       real Volume = Li[1] * Li[2] * Delta_x;
+ 
+       size_t size = bins;
+       std::vector <real> p_xx_local(size);
+       for (i = 0; i < bins; ++i)
+       {
+          p_xx_local.at(i) = 0.0;
+       }      
+       
+       for (FixedPairList::PairList::Iterator it(*fixedpairList);
+           it.isValid(); ++it) {                                         
+         const Particle &p1 = *it->first;                                       
+         const Particle &p2 = *it->second;           
+         Real3D dist(0.0,0.0,0.0);
+         Real3D force(0.0,0.0,0.0);
+         if(potential->_computeForce(force, p1, p2)) {
+             Real3D dist = p1.position() - p2.position();
+             real vir_temp = 0.5 * dist[0] * force[0];
+         
+             if (p1.position()[0] > Li[0])
+             {
+                  real p1_wrap = p1.position()[0] - Li[0];
+                  bin1 = floor (p1_wrap / Delta_x);    
+             }         
+             else if (p1.position()[0] < 0.0)
+             {
+                  real p1_wrap = p1.position()[0] + Li[0];
+                  bin1 = floor (p1_wrap / Delta_x);    
+             }
+             else
+             {
+                  bin1 = floor (p1.position()[0] / Delta_x);          
+             }
+
+             if (p2.position()[0] > Li[0])
+             {
+                  real p2_wrap = p2.position()[0] - Li[0];
+                  bin2 = floor (p2_wrap / Delta_x);     
+             }         
+             else if (p2.position()[0] < 0.0)
+             {
+                  real p2_wrap = p2.position()[0] + Li[0];
+                  bin2 = floor (p2_wrap / Delta_x);     
+             }
+             else
+             {
+                  bin2 = floor (p2.position()[0] / Delta_x);          
+             }
+
+             if (bin1 >= p_xx_local.size() || bin2 >= p_xx_local.size()){
+                  std::cout << "p_xx_local.size() " << p_xx_local.size() << "\n";
+                  std::cout << "bin1 " << bin1 << " bin2 " << bin2 << "\n";
+                  std::cout << "p1.position()[0] " << p1.position()[0] << " p2.position()[0]" << p2.position()[0] << "\n";
+                  std::cout << "FATAL ERROR: computeVirialX error" << "\n";
+                  exit(0);
+             }         
+             p_xx_local.at(bin1) += vir_temp;
+             p_xx_local.at(bin2) += vir_temp;
+         }
+       }
+         
+       std::vector <real> p_xx_sum(size);
+       for (i = 0; i < bins; ++i)
+       {
+           p_xx_sum.at(i) = 0.0;         
+           boost::mpi::all_reduce(*mpiWorld, p_xx_local.at(i), p_xx_sum.at(i), std::plus<real>());
+       }
+   
+       std::transform(p_xx_sum.begin(), p_xx_sum.end(), p_xx_sum.begin(),std::bind2nd(std::divides<real>(),Volume));     
+       for (i = 0; i < bins; ++i)
+       {
+          p_xx_total.at(i) += p_xx_sum.at(i);         // TO EXCLUDE THEM
+       }*/       
+    }
+
+       
     template < typename _Potential > inline real
     FixedPairListInteractionTemplate < _Potential >::
     computeVirial() {

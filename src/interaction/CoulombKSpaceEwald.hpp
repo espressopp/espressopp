@@ -22,7 +22,7 @@
 
 using namespace std;
 
-typedef complex<double> dcomplex;
+typedef complex<espresso::real> dcomplex;
 
 // the following two constants are not defined everywhere (e.g. not in Mac OS X)
 #ifndef M_PIl
@@ -103,7 +103,7 @@ namespace espresso {
         Ly = Li[1];
         Lz = Li[2];
        
-        int skmax = kmax / min(Lx, min(Ly,Lz)); 
+        real skmax = kmax / min(Lx, min(Ly,Lz)); 
         real skmaxsq = skmax * skmax ; // we choose the biggest cutoff 
         
         rclx = M_2PI / Lx;
@@ -180,6 +180,7 @@ namespace espresso {
           }
         }
         
+ //cout <<"node:  "<< system->comm->rank() <<  " kVectorLength: "<< kVectorLength<< "   kmax: "<< skmax  <<endl;
         if(sum != NULL){
           delete [] sum;
           sum = NULL;
@@ -192,6 +193,7 @@ namespace espresso {
         totsum = new dcomplex[kVectorLength];
         
         getParticleNumber();
+        
       }
       
       // here we get the current particle number on the current node
@@ -314,7 +316,9 @@ namespace espresso {
           else
             fact=2.0;
           node_energy += fact * kvector[k] * norm( totsum[k] );
-        }
+        } 
+          //cout <<"node:  "<< this_node << "  node energy: "<< node_energy << "  fact: "<< fact<< " kmax: "<< kVectorLength <<endl;
+//exit(0);
         real energy = 0;
         mpi::all_reduce( communic, node_energy, energy, plus<real>() );
         

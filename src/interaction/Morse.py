@@ -37,16 +37,12 @@ class VerletListMorseLocal(InteractionLocal, interaction_VerletListMorse):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
         
-    def clonePotential(self, type1, type2):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.clonePotential(self, type1, type2)
     def getVerletListLocal(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getVerletList(self)
 	def setVerletList(self, vl):
 		if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 		  return self.cxxclass.setVerletList(self, vl)
-
 class VerletListAdressMorseLocal(InteractionLocal, interaction_VerletListAdressMorse):
     'The (local) Morse interaction using Verlet lists.'
     def __init__(self, vl, fixedtupleList):
@@ -63,9 +59,9 @@ class VerletListAdressMorseLocal(InteractionLocal, interaction_VerletListAdressM
             
 class VerletListHadressMorseLocal(InteractionLocal, interaction_VerletListHadressMorse):
     'The (local) Morse interaction using Verlet lists.'
-    def __init__(self, vl, fixedtupleList):
+    def __init__(self, vl, fixedtupleList, KTI = False):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListHadressMorse, vl, fixedtupleList)
+            cxxinit(self, interaction_VerletListHadressMorse, vl, fixedtupleList, KTI)
 
     def setPotentialAT(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -107,7 +103,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.VerletListMorseLocal',
-            pmicall = ['setPotential','getPotential', 'clonePotential']
+            pmicall = ['setPotential','getPotential']
             )
 
     class VerletListAdressMorse(Interaction):

@@ -21,10 +21,10 @@ from espresso.tools import timers
 # Output of gromacs energies and esp energies should be the same
 
 # simulation parameters (nvt = False is nve)
-steps = 500
-check = steps/10
+steps = 1000 
+check = steps/100
 rc    = 0.9  # Verlet list cutoff
-skin  = 0.02
+skin  = 0.03 
 timestep = 0.0005
 # parameters to convert GROMACS tabulated potential file
 sigma = 1.0
@@ -50,6 +50,7 @@ num_particles = len(x)
 
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
+print size
 
 sys.stdout.write('Setting up simulation ...\n')
 system = espresso.System()
@@ -85,7 +86,7 @@ angleinteractions=gromacs.setAngleInteractions(system, angletypes, angletypepara
 
 # set up coulomb interactions according to the parameters read from the .top file
 # !! Warning: this only works for reaction-field now!
-qq_interactions=gromacs.setCoulombInteractions(system, verletlist, rc, types, epsilon1=1, epsilon2=2, kappa=0)
+qq_interactions=gromacs.setCoulombInteractions(system, verletlist, rc, types, epsilon1=1, epsilon2=80, kappa=0)
 
 # set up bonded interactions according to the parameters read from the .top file
 bondedinteractions=gromacs.setBondedInteractions(system, bondtypes, bondtypeparams)
@@ -94,11 +95,11 @@ bondedinteractions=gromacs.setBondedInteractions(system, bondtypes, bondtypepara
 verletlist.exclude(exclusions)
 
 # langevin thermostat
-#langevin = espresso.integrator.LangevinThermostat(system)
-#langevin.gamma = 2.0
-#langevin.temperature = 2.4942 # kT in gromacs units
+langevin = espresso.integrator.LangevinThermostat(system)
+langevin.gamma = 2.0
+langevin.temperature = 2.4942 # kT in gromacs units
 integrator = espresso.integrator.VelocityVerlet(system)
-#integrator.addExtension(langevin)
+integrator.addExtension(langevin)
 integrator.dt = timestep
 
 # print simulation parameters
@@ -123,7 +124,7 @@ pressureTensor = espresso.analysis.PressureTensor(system)
 
 print "i*timestep,Eb, EAng, ELj, EQQ, Ek, Etotal"
 fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8g %15.8f\n'
-
+outfile = open("esp.dat", "w")
 start_time = time.clock()
 
 for i in range(check):
@@ -138,12 +139,13 @@ for i in range(check):
     T = temperature.compute()
     Ek = 0.5 * T * (3 * num_particles)
     Etotal = Ek+Eb+EAng+EQQ+ELj
-    
-    print (fmt%(i*timestep,Eb, EAng, ELj, EQQ, Ek, Etotal))
+    outfile.write(fmt%(i*steps/check*timestep,Eb, EAng, ELj, EQQ, Ek, Etotal))
+    print (fmt%(i*steps/check*timestep,Eb, EAng, ELj, EQQ, Ek, Etotal))
     
     #espresso.tools.pdb.pdbwrite("traj.pdb", system, append=True)
     integrator.run(steps/check) # print out every steps/check steps
-
+    #system.storage.decompose()
+    
 # print timings and neighbor list information
 end_time = time.clock()
 timers.show(integrator.getTimers(), precision=2)

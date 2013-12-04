@@ -24,11 +24,12 @@ namespace espresso {
 
 
         enum ExtensionType {
+        	all=0,
             Thermostat=1,
             Barostat=2,
             Constraint=3,
             Adress=4,
-            TDforce=5,
+            FreeEnergyCompensation=5,
             ExtForce=6,
             ExtAnalysis=7,
             ExtVirtualParticles=8

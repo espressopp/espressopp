@@ -3,6 +3,7 @@
 #define _PARTICLE_HPP
 
 #include "types.hpp"
+#include "Single.hpp"
 #include "Triple.hpp"
 #include "Quadruple.hpp"
 //#include <vector>
@@ -21,6 +22,8 @@ namespace espresso {
     size_t type;
     real mass;
     real q;
+    real lambda;
+    real lambdaDeriv;
   private:
     friend class boost::serialization::access;
     template< class Archive >
@@ -30,6 +33,8 @@ namespace espresso {
       ar & type;
       ar & mass;
       ar & q;
+      ar & lambda;
+      ar & lambdaDeriv;
     }
   };
 
@@ -154,13 +159,15 @@ namespace espresso {
 
     void init() {
       m.v[0] = m.v[1] = m.v[2] = 0.0;
-      p.type    = 0;
-      p.mass    = 1.0;
-      p.q       = 0.0;
-      r.radius  = 1.0;
-      f.fradius = 0.0;
-      m.vradius = 0.0;
-      l.ghost   = false;
+      p.type         = 0;
+      p.mass         = 1.0;
+      p.q            = 0.0;
+      r.radius       = 1.0;
+      f.fradius      = 0.0;
+      m.vradius      = 0.0;
+      l.ghost        = false;
+      p.lambda       = 0.0;      
+      p.lambdaDeriv  = 0.0;      
     }
 
     // getter and setter used for export in Python
@@ -225,7 +232,7 @@ namespace espresso {
     Real3D getV() const { return m.v; }
     void setV(const Real3D& velocity) { m.v = velocity; }
 
-    real vradius() { return m.vradius; }
+    real& vradius() { return m.vradius; }
     const real& vradius() const { return m.vradius; }
 
     real getVRadius() const { return m.vradius; }
@@ -243,6 +250,18 @@ namespace espresso {
     bool getGhostStatus() const { return l.ghost; }
     void setGhostStatus(const bool& gs) { l.ghost = gs; }
     
+    // weight/lambda (used in H-Adress)
+    real& lambda() { return p.lambda; }
+    const real& lambda() const { return p.lambda; }
+    real getLambda() const { return p.lambda; }
+    void setLambda(const real& _lambda) { p.lambda = _lambda; }
+    
+    // weight/lambda derivative (used in H-Adress)
+    real& lambdaDeriv() { return p.lambdaDeriv; }
+    const real& lambdaDeriv() const { return p.lambdaDeriv; }
+    real getLambdaDeriv() const { return p.lambdaDeriv; }
+    void setLambdaDeriv(const real& _lambdaDeriv) { p.lambdaDeriv = _lambdaDeriv; }
+
     static void registerPython();
   
     void copyAsGhost(const Particle& src, int extradata, const Real3D& shift) {
@@ -278,6 +297,34 @@ namespace espresso {
   struct ParticleList 
     : public esutil::ESPPContainer < std::vector< Particle > > 
   {};
+
+  // singles
+  class ParticleSingle
+    : public Single< class Particle* >
+  {
+  private:
+    typedef Single< class Particle* > Super;
+  public:
+    ParticleSingle() : Super() {}
+    ParticleSingle(Particle *p) : Super(p) {}
+    ParticleSingle(Particle &p) : Super(&p) {}
+  };
+
+  struct SingleList
+    : public esutil::ESPPContainer< std::vector< ParticleSingle > >
+  {
+    void add(Particle *p) {
+    	this->push_back(ParticleSingle(p));
+    }
+
+    void add(Particle &p) {
+    	this->add(&p);
+    }
+
+    void add(std::vector<Particle*> particles) {
+    	this->add(particles.at(0));
+    }
+  };
 
   // pairs
   class ParticlePair 

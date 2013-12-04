@@ -53,9 +53,8 @@ namespace espresso {
      
       class_ <VerletListTabulated, bases <Interaction> > 
         ("interaction_VerletListTabulated", init <shared_ptr<VerletList> >())
-            .def("setPotential", &VerletListTabulated::setPotential, return_value_policy< reference_existing_object >())
-            .def("getPotential", &VerletListTabulated::getPotential, return_value_policy< reference_existing_object >())
-            .def("clonePotential", &VerletListTabulated::clonePotential)
+            .def("setPotential", &VerletListTabulated::setPotential)
+            .def("getPotential", &VerletListTabulated::getPotentialPtr)
             .def("getVerletList", &VerletListTabulated::getVerletList)
             .def("setVerletList", &VerletListTabulated::setVerletList)
         ;
@@ -72,7 +71,7 @@ namespace espresso {
       class_ <VerletListHadressTabulated, bases <Interaction> >
         ("interaction_VerletListHadressTabulated",
            init <shared_ptr<VerletListAdress>,
-                 shared_ptr<FixedTupleListAdress> >()
+                 shared_ptr<FixedTupleListAdress>, bool >()
                 )
             .def("setPotentialAT", &VerletListHadressTabulated::setPotentialAT)
             .def("setPotentialCG", &VerletListHadressTabulated::setPotentialCG);

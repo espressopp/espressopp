@@ -51,9 +51,9 @@ class VerletListAdressZeroLocal(InteractionLocal, interaction_VerletListAdressZe
             self.cxxclass.setFixedTupleList(self, ftpl)
             
 class VerletListHadressZeroLocal(InteractionLocal, interaction_VerletListHadressZero):
-    def __init__(self, vl):
+    def __init__(self, vl, fixedtupleList, KTI = False):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListHadressZero, vl)
+            cxxinit(self, interaction_VerletListHadressZero, vl, fixedtupleList, KTI)
 
     def setPotentialAT(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

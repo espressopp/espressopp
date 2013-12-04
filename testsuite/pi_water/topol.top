@@ -1,0 +1,21 @@
+; SPC/E Water
+
+#define FLEXIBLE
+
+[ defaults ]
+; nbfunc   comb-rule    gen-pairs       fudgeLJ fudgeQQ
+  1        1            no              1.0     1.0
+
+[ atomtypes ]
+;name  mass        charge    ptype  C6             C12
+ OW     15.99940     -0.0        A       0	       1
+ HW      2      0.0        A       0.00000e+00  1.00000e+00
+
+
+#include "spcefmatch_tabbond.itp"
+
+[ system ]
+PI_SPCE
+
+[ molecules ]
+SOL     324 

@@ -9,7 +9,7 @@
 namespace espresso {
   namespace interaction {
 
-    enum bondTypes {unused, Nonbonded, Pair, Angular, Dihedral};
+    enum bondTypes {unused, Nonbonded, Single, Pair, Angular, Dihedral};
 
     /** Interaction base class. */
 
@@ -19,9 +19,11 @@ namespace espresso {
       virtual ~Interaction() {};
       virtual void addForces() = 0;
       virtual real computeEnergy() = 0;
+      virtual real computeEnergyAA() = 0;
+      virtual real computeEnergyCG() = 0;
       virtual real computeVirial() = 0;
-      virtual void computeVirialTensor(Tensor& w) = 0;
-
+      virtual void computeVirialTensor(Tensor& w) = 0;      
+      virtual void computeVirialX(std::vector<real> &p_xx_total, int bins) = 0; 
       // this should compute the virial locally around a surface which crosses the box at
       // z (according to the method of Irving and Kirkwood)
       virtual void computeVirialTensor(Tensor& w, real z) = 0;

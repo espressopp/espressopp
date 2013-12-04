@@ -5,17 +5,46 @@ from espresso.analysis.Observable import *
 from _espresso import analysis_StaticStructF
 
 class StaticStructFLocal(ObservableLocal, analysis_StaticStructF):
-  'The (local) compute the radial distr function.'
+  'The (local) compute the static structure function.'
   def __init__(self, system):
     cxxinit(self, analysis_StaticStructF, system)
     
-  def compute(self, rdfN):
-    return self.cxxclass.compute(self, rdfN)
-    
-if pmi.isController :
+  def compute(self, nqx, nqy, nqz, bin_factor, ofile = None):
+    if ofile is None:
+      return self.cxxclass.compute(self, nqx, nqy, nqz, bin_factor)
+    else:    
+      #run compute on each CPU
+      result = self.cxxclass.compute(self, nqx, nqy, nqz, bin_factor)
+      #create the outfile only on CPU 0
+      if pmi.isController:
+        myofile = 'qsq_' + str(ofile) + '.txt'
+        outfile = open (myofile, 'w')
+        for i in range (len(result)):
+          line = str(result[i][0]) + "\t" + str(result[i][1]) + "\n"
+          outfile.write(line)
+        outfile.close()
+      return result  
+
+  def computeSingleChain(self, nqx, nqy, nqz, bin_factor, chainlength, ofile = None):
+    if ofile is None:
+      return self.cxxclass.computeSingleChain(self, nqx, nqy, nqz, bin_factor, chainlength)
+    else:
+      #run computeSingleChain on each CPU
+      result = self.cxxclass.computeSingleChain(self, nqx, nqy, nqz, bin_factor, chainlength)
+      #create the outfile only on CPU 0
+      if pmi.isController:
+        myofile = 'qsq_singleChain' + str(ofile) + '.txt'
+        outfile = open (myofile, 'w')
+        for i in range (len(result)):
+          line = str(result[i][0]) + "\t" + str(result[i][1]) + "\n"
+          outfile.write(line)
+        outfile.close()
+      return result
+   
+if pmi.isController:
   class StaticStructF(Observable):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      pmicall = [ "compute" ],
+      pmicall = [ "compute", "computeSingleChain" ],
       cls = 'espresso.analysis.StaticStructFLocal'
     )

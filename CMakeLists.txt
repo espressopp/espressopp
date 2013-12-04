@@ -29,6 +29,9 @@ option(EXTERNAL_BOOST "Use external boost" OFF)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 option(BUILD_STANDALONE "Builds pypresso an standalone binary" OFF)
 option(BUILD_PYTHON_MODULE "Builds epresso as python module" ON)
+if (NOT DEFINED LIB)
+  set(LIB "lib")
+endif(NOT DEFINED LIB)
 
 if(NOT BUILD_STANDALONE AND NOT BUILD_PYTHON_MODULE)
   message(FATAL_ERROR "You need to enable pypresso or the python module")
@@ -73,7 +76,7 @@ include_directories(${FFTW3_INCLUDE_PATH})
 #Process Python settings
 ########################################################################
 
-find_package(PythonInterp REQUIRED)
+find_package(PythonInterp 2 REQUIRED)
 
 execute_process(COMMAND ${PYTHON_EXECUTABLE}
                 -c "import distutils.sysconfig as cg; print cg.get_python_inc()"

@@ -38,9 +38,8 @@ namespace espresso {
 
       class_< VerletListMorse, bases< Interaction > > 
         ("interaction_VerletListMorse", init< shared_ptr<VerletList> >())
-        .def("setPotential", &VerletListMorse::setPotential, return_value_policy< reference_existing_object >())
-        .def("getPotential", &VerletListMorse::getPotential, return_value_policy< reference_existing_object >())
-        .def("clonePotential", &VerletListMorse::clonePotential)
+        .def("setPotential", &VerletListMorse::setPotential)
+        .def("getPotential", &VerletListMorse::getPotentialPtr)
         .def("getVerletList", &VerletListMorse::getVerletList)
         .def("setVerletList", &VerletListMorse::setVerletList)
       ;
@@ -54,7 +53,7 @@ namespace espresso {
         
       class_< VerletListHadressMorse, bases< Interaction > >
         ("interaction_VerletListHadressMorse",
-                init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
+                init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress>, bool >())
         .def("setPotentialAT", &VerletListHadressMorse::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressMorse::setPotentialCG);
         ;

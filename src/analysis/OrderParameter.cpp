@@ -34,26 +34,19 @@ namespace espresso {
         phi = 0.0;
       }
       
-      dcomplex res = boost::math::spherical_harmonic(l, m, theta, phi);
-      
-      //std::cout << " boost gets: l=" << l << "  m="<<m<<"  theta="<<theta<<"  phi="<<phi << std::endl;
-      //std::cout << " SphHarm returns: " << res << std::endl;
-      return res;
+      return boost::math::spherical_harmonic(l, m, theta, phi);
     }
     
     void OrderParameter::registerPython() {
       using namespace espresso::python;
       class_<OrderParameter, bases< AnalysisBase > >
-        ("analysis_OrderParameter", init< shared_ptr<System>, real, int, real >())
+        ("analysis_OrderParameter", init< shared_ptr<System>, real, int, bool, bool, real, real>())
         .add_property("l", 
               &OrderParameter::getAngularMomentum,
               &OrderParameter::setAngularMomentum)
         .add_property("cutoff", 
               &OrderParameter::getCutoff,
               &OrderParameter::setCutoff)
-        .add_property("threshold", 
-              &OrderParameter::getThreshold,
-              &OrderParameter::setThreshold)
       ;
     }
   }

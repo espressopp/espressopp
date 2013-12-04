@@ -11,7 +11,7 @@ Epot = espresso.analysis.EnergyPot(system)
 print 'Epot = ',Epot.compute()
 
 intLJ = system.getInteraction(0)
-pot00 = intLJ.clonePotential(0,0)
+pot00 = intLJ.getPotential(0,0)
 intLJ.setPotential(1,1,pot00)
 intLJ.setPotential(1,0,pot00)
 intLJ.setPotential(0,1,pot00)

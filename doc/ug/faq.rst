@@ -87,7 +87,7 @@ Compilation and installation of |espp| is due to the many shared
 libraries and loadable modules rather complex and so we use a build
 system to make our job and maintainability easier.
 
-Currently we support building the system with autotools.
+Currently we support building the system with cmake.
 
 .. rubric:: What means extendability?
 

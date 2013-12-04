@@ -31,11 +31,6 @@ endforeach(FILENAME)
 
 add_custom_target(hgversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_MODULE_PATH}/hgversion.cmake)
 
-#remove this two lines if autotools are gone
-add_custom_command(TARGET scripts COMMAND ${CMAKE_COMMAND} -E touch 
-  ${CMAKE_CURRENT_BINARY_DIR}/main/_setupPath.py)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/main/_setupPath.py DESTINATION ${PYTHON_INSTDIR}/espresso/main)
-
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
@@ -70,11 +65,11 @@ endif(EXTERNAL_BOOST)
 add_library(espresso_common ${ESPRESSO_SOURCES})
 target_link_libraries(espresso_common pylogger ${BOOST} ${PYTHON_LIBRARIES}
                                       ${VAMPIRTRACE_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES})
-install(TARGETS espresso_common LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
+install(TARGETS espresso_common LIBRARY DESTINATION ${LIB} ARCHIVE DESTINATION lib)
 
 add_library(pylogger esutil/PyLogger.cpp)
 target_link_libraries(pylogger ${BOOST})
-install(TARGETS pylogger LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
+install(TARGETS pylogger LIBRARY DESTINATION ${LIB} ARCHIVE DESTINATION lib)
 
 if(BUILD_STANDALONE)
   add_executable(pypresso main/pypresso.cpp)
