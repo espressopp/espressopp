@@ -108,7 +108,7 @@ namespace espresso {
 
     Real3D d = pt1.position() - pt2.position();
     real distsq = d.sqr();
-    const bc::BC& bc = *system.bc;  // boundary conditions
+    //const bc::BC& bc = system->bc;  // boundary conditions
 
 
     LOG4ESPP_TRACE(theLogger, "p1: " << pt1.id()
