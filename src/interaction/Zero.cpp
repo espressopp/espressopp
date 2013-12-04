@@ -52,7 +52,7 @@ namespace espresso {
       class_< VerletListHadressZero, bases< Interaction > >
         ("interaction_VerletListHadressZero",
            init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress>, bool >())
+                  shared_ptr<FixedTupleListAdress> >())
         .def("setFixedTupleList", &VerletListHadressZero::setFixedTupleList)
         .def("setPotentialAT", &VerletListHadressZero::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressZero::setPotentialCG);

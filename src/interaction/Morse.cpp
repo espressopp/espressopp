@@ -51,7 +51,7 @@ namespace espresso {
         
       class_< VerletListHadressMorse, bases< Interaction > >
         ("interaction_VerletListHadressMorse",
-                init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress>, bool >())
+                init< shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListHadressMorse::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressMorse::setPotentialCG);
         ;
