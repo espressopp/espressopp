@@ -17,7 +17,8 @@ body {
 /*    letter-spacing: -0.01em;    */
 /*    line-height: 150%;   */
     text-align: center; 
-    background-color: #DACAA6;
+/*    background-color: #DACAA6; */
+    background-color: white;
     color: black; 
 /*    padding: 0;   */
 /*    border: 1px solid #aaa;  */
@@ -37,12 +38,14 @@ text-align: left;
 }
 
 div.header{
-width: 960px;
-height: 120px;
+/* width: 960px; */
+/* height: 120px; */
+width: 800px;
+height: 256px;
 top:0px;
-left:0px;
+left:5px;
 margin-left: 5px;
-background-image:url(top_logo.png)
+background-image:url(espp_logo.png)
 }
 
 div.menu{
@@ -65,12 +68,11 @@ margin-top:10px;
 
 div.menu a{
 text-decoration: none;
-color: #247B69;
+  color: #A64B00;
 }
 
 div.menu a:hover{
-text-decoration: none;
-color: white;
+text-decoration: underline;
 }
 
 ul.nav{
@@ -79,7 +81,7 @@ text-indent: -2.5em;
 }
 
 div.document {
-    background-color: #DACAA6;
+    background-color: white;
     text-align: left;
     background-image: url(contents.png);
     background-repeat: repeat-x;
@@ -123,11 +125,13 @@ div.related ul li a {
     margin: 0;
     padding: 0 5px 0 5px;
 /*    line-height: 1.75em;   */
-    color: #247B68;
+/*    color: #247B68; */
+    color: #A64B00;
 }
 
 div.related ul li a:hover {
-    color: white;
+   /* color: white;  */
+  text-decoration: underline;
 }
 
 div.sphinxsidebarwrapper {
@@ -190,18 +194,18 @@ p {
 
 a {
 /*     color: #CA7900;  */
-    color: #247B68;
+    color: #A64B00;
     text-decoration: none;
 }
 
 a:hover {
-/*    color: #2491CF;    */
-    color: white;
+/*    color: white; */
+     text-decoration: underline;
 
 }
 
-div.body a {
-    text-decoration: underline;
+div.body hover {
+    text-decoration: underline; 
 }
 
 h1 {

@@ -1,3 +1,25 @@
+/*
+  Copyright (C) 2012,2013
+      Max Planck Institute for Polymer Research
+  Copyright (C) 2008,2009,2010,2011
+      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  
+  This file is part of ESPResSo++.
+  
+  ESPResSo++ is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+  
+  ESPResSo++ is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
+
 // ESPP_CLASS
 #ifndef _INTERACTION_COULOMBKSPACEEWALD_HPP
 #define _INTERACTION_COULOMBKSPACEEWALD_HPP
@@ -424,6 +446,11 @@ namespace espresso {
         
         Tensor virialTensor(0.0);
         mpi::all_reduce( communic, node_virialTensor, virialTensor, plus<Tensor>());
+
+        // using boost::mpi::all_reduce or reduce is very slow for <Tensor>
+        // as a suggestion, one could try the line below:
+        // mpi::all_reduce( communic, (double*)&node_virialTensor, 6, (double*)&virialTensor, plus<double>());
+
         return virialTensor;
       }
       
