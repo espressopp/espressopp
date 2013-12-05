@@ -347,8 +347,8 @@ cout << "case1 part3 "<< inSelfLoop <<endl;
       
       
       LOG4ESPP_TRACE(theLogger,
-             "current triple: (" << current.first->p.id <<
-             ", " << current.second->p.id << ", " << current.third->p.id << ")"
+             "current triple: (" << current.first->id() <<
+             ", " << current.second->id() << ", " << current.third->id() << ")"
              );
       return *this;
     }
