@@ -537,6 +537,10 @@ namespace espresso {
 
       
       void cluster_analysis(){
+        wrong_label_local0.clear();
+        outside_id.clear();
+        wrong_label_local.clear();
+        
         local_cluster_search();
 
         /*
@@ -612,6 +616,7 @@ namespace espresso {
         }
         
         vector<int> wl, cl; // wrong and correct labels
+        
         for(unordered_map<int, int>::iterator it = wrong_label_local.begin(); 
                 it!=wrong_label_local.end(); ++it ){
           wl.push_back( (*it).first );
