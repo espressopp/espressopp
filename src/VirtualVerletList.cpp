@@ -76,8 +76,6 @@ namespace espresso {
     CellList &cl = (*cellList);
     LOG4ESPP_DEBUG(theLogger, "local cell list size = " << cl.size());
 
-    Particle *p = system.storage->lookupLocalParticle(63);
-    if (p) std::cout << "PPP "<< system.comm->rank() << " " << p->getId()  << " "<< p->position() << " " << p->ghost() << std::endl;
 
     /* clear pairs in the mappedVL */
     for (int x=0; x<vlArray.size_x(); x++){
@@ -122,7 +120,7 @@ namespace espresso {
     if (exList.count(std::make_pair(pt1.id(), pt2.id())) == 1) return;
     if (exList.count(std::make_pair(pt2.id(), pt1.id())) == 1) return;
 
-    std::cout << "VVV" << pt1.getId() << pt2.getId() <<  " " <<pt1.position() << " " << pt2.position() << std::endl;
+    //std::cout << "VVV" << pt1.getId() << pt2.getId() <<  " " <<pt1.position() << " " << pt2.position() << std::endl;
     FixedTupleList::iterator it;
 
     // Find the particles corresponding to each virtual particle
