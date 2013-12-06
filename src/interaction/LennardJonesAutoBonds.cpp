@@ -76,7 +76,7 @@ namespace espresso {
       class_< VerletListHadressLennardJonesAutoBonds, bases< Interaction > >
         ("interaction_VerletListHadressLennardJonesAutoBonds",
            init< shared_ptr<VerletListAdress>,
-                  shared_ptr<FixedTupleListAdress>, bool >())
+                  shared_ptr<FixedTupleListAdress> >())
         .def("setPotentialAT", &VerletListHadressLennardJonesAutoBonds::setPotentialAT)
         .def("setPotentialCG", &VerletListHadressLennardJonesAutoBonds::setPotentialCG);
       ;

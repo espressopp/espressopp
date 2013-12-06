@@ -53,10 +53,10 @@ from _espresso import integrator_Adress
 class AdressLocal(ExtensionLocal, integrator_Adress):
     'The (local) AdResS'
 
-    def __init__(self, system):
+    def __init__(self, _system, _verletlist, _fixedtuplelist, KTI = False):
         'Local construction of a verlet list for AdResS'
         if pmi.workerIsActive():
-            cxxinit(self, integrator_Adress, system)
+            cxxinit(self, integrator_Adress, _system, _verletlist, _fixedtuplelist, KTI)
 
 if pmi.isController:
     class Adress(Extension):

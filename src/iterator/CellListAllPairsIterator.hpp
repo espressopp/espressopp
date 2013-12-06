@@ -131,8 +131,8 @@ namespace espresso {
       current.second = &*npit;
 
       LOG4ESPP_TRACE(theLogger,
-             "current pair: (" << current.first->p.id <<
-             ", " << current.second->p.id << ")"
+             "current pair: (" << current.first->id() <<
+             ", " << current.second->id() << ")"
              );
       return *this;
     }

@@ -62,9 +62,9 @@ class VerletListAdressTabulatedLocal(InteractionLocal, interaction_VerletListAdr
             
 class VerletListHadressTabulatedLocal(InteractionLocal, interaction_VerletListHadressTabulated):
     'The (local) tabulated interaction using Verlet lists.'
-    def __init__(self, vl, fixedtupleList, KTI = False):
+    def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListHadressTabulated, vl, fixedtupleList, KTI)
+            cxxinit(self, interaction_VerletListHadressTabulated, vl, fixedtupleList)
 
     def setPotentialAT(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
