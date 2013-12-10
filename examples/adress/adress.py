@@ -26,7 +26,7 @@ skin = 0.4
 gamma = 0.5
 temp = 1.0
 
-ex_size = 120.5
+ex_size = 12.5
 hy_size = 5.0
 
 # writes the tabulated file
