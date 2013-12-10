@@ -187,7 +187,7 @@ integrator = espresso.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
 # add AdResS extension
-adress = espresso.integrator.Adress(system)
+adress = espresso.integrator.Adress(system, vl,ftpl, False)
 integrator.addExtension(adress)
 
 # add Langevin thermostat extension

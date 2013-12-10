@@ -181,7 +181,7 @@ integrator = espresso.integrator.VelocityVerlet(system)
 integrator.addExtension(langevin)
 integrator.dt = timestep
 
-adress = espresso.integrator.Adress(system)
+adress = espresso.integrator.Adress(system, vl, ftpl, False)
 integrator.addExtension(adress)
 
 # distribute atoms and CG molecules according to AdResS domain decomposition, place CG molecules in the center of mass 
