@@ -21,7 +21,7 @@ from espresso.tools import timers
 # Output of gromacs energies and esp energies should be the same
 
 # simulation parameters (nvt = False is nve)
-steps = 1000 
+steps = 10000 
 check = steps/100
 rc    = 0.9  # Verlet list cutoff
 skin  = 0.03 

@@ -47,7 +47,7 @@ def AdressSetCG(apm, pidCG, allParticlesAT):
     return cmp
 
 def AdressDecomp(system, integrator):
-    #espresso.system.storage.decompose()
+    system.storage.decompose()
     integrator.run(0)
     system.storage.decompose()
     integrator.run(0)

@@ -146,7 +146,7 @@ namespace espresso {
     addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
       std::set<Particle*> cgZone = verletList->getCGZone();
-      for (std::set<Particle*>::iterator it=cgZone.begin();
+      /*for (std::set<Particle*>::iterator it=cgZone.begin();
               it != cgZone.end(); ++it) {
 
           Particle &vp = **it;
@@ -192,7 +192,7 @@ namespace espresso {
               exit(1);
               return;
           }
-      }     
+      }*/     
       
       
       // Pairs not inside the AdResS Zone (CG region)
@@ -263,7 +263,7 @@ namespace espresso {
       }*/
       
       std::set<Particle*> adrZone = verletList->getAdrZone();
-      for (std::set<Particle*>::iterator it=adrZone.begin();
+      /*for (std::set<Particle*>::iterator it=adrZone.begin();
               it != adrZone.end(); ++it) {
 
           Particle &vp = **it;
@@ -343,7 +343,7 @@ namespace espresso {
               exit(1);
               return;
           }
-      }
+      }*/
 
 
       // Compute forces (AT and VP) of Pairs inside AdResS zone
@@ -450,12 +450,12 @@ namespace espresso {
                 std::vector<Particle*> atList1;
                 atList1 = it3->second;
 
-                Real3D vpfm = vp.force() / vp.getMass();
+                //Real3D vpfm = vp.force() / vp.getMass();
                 for (std::vector<Particle*>::iterator itv = atList1.begin();
                         itv != atList1.end(); ++itv) {
                     Particle &at = **itv;
                     at.velocity() = vp.velocity(); // Overwrite velocity - Note (Karsten): See comment above.
-                    at.force() += at.mass() * vpfm;
+                    //at.force() += at.mass() * vpfm;
                 }
 
             }
@@ -468,7 +468,7 @@ namespace espresso {
       
       
       // distribute forces from VP to AT (HY and AT region)
-      for (std::set<Particle*>::iterator it=adrZone.begin();
+      /*for (std::set<Particle*>::iterator it=adrZone.begin();
                 it != adrZone.end(); ++it) {
 
         Particle &vp = **it;
@@ -495,7 +495,7 @@ namespace espresso {
             exit(1);
             return;
         }
-      }
+      }*/
     }
       
     template < typename _PotentialAT, typename _PotentialCG >

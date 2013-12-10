@@ -65,7 +65,6 @@ allParticlesAT = []
 allParticles = []
 tuples = []
 for pidAT in range(num_particles):#logging.getLogger("StorageAdress").setLevel(logging.DEBUG)
-#logging.getLogger("CellListAllPairsIterator").setLevel(logging.DEBUG)
     allParticlesAT.append([pidAT, # add here these particles just temporarily
                          Real3D(x[pidAT], y[pidAT], z[pidAT]), # position
                          Real3D(vx[pidAT], vy[pidAT], vz[pidAT]), # velocity
@@ -147,7 +146,7 @@ integrator = espresso.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
 # add AdResS extension
-adress = espresso.integrator.Adress(system, vl, ftpl, False)
+adress = espresso.integrator.Adress(system, vl, ftpl)
 integrator.addExtension(adress)
 
 # add Langevin thermostat extension

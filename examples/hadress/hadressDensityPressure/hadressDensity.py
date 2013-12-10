@@ -14,7 +14,7 @@ from espresso.tools import decomp
 from espresso.tools import timers
 
 # integration steps, cutoff, skin, AdResS specifications
-steps = 100000
+steps = 1000
 timestep = 0.0005
 intervals = 100
 
@@ -146,7 +146,7 @@ integrator = espresso.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
 # add AdResS extension
-adress = espresso.integrator.Adress(system, vl, ftpl, False)
+adress = espresso.integrator.Adress(system, vl, ftpl)
 integrator.addExtension(adress)
 
 # add Langevin thermostat extension

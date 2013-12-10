@@ -14,9 +14,9 @@ from espresso.tools import decomp
 from espresso.tools import timers
 
 # integration steps, cutoff, skin, AdResS specifications
-steps = 1000
+steps = 10000
 timestep = 0.0005
-intervals = 100
+intervals = 1000
 
 rc = 4.5 # cutoff coarse-grained potential
 rca = 1.122462048309373 # cutoff atomistic potential (cutoff (2^(1/6)), WCA)
@@ -146,7 +146,7 @@ integrator = espresso.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
 # add AdResS extension
-adress = espresso.integrator.Adress(system, vl, ftpl, False)
+adress = espresso.integrator.Adress(system, vl, ftpl)
 integrator.addExtension(adress)
 
 # add Langevin thermostat extension
