@@ -64,7 +64,7 @@ namespace espresso {
 
       private:
 
-        boost::signals2::connection _SetPosVel, _initForces, _integrate1, _integrate2, _aftCalcF;
+        boost::signals2::connection _SetPosVel, _initForces, _integrate1, _integrate2, _recalc2, _befIntV;  //_aftCalcF;
         
         void integrate1(real&);
         void initForces();

@@ -142,10 +142,10 @@ namespace espresso {
       System& system = getSystemRef();
 
       // thermalize CG particles
-      CellList cells = system.storage->getRealCells();
+      /*CellList cells = system.storage->getRealCells();
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
         frictionThermo(*cit);
-      }
+      }*/
 
       // TODO: It doesn't make that much sense to thermalize both CG and AT particles, since CG particles get velocities of AT particles anyway.
       

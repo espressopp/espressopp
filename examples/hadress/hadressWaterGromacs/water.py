@@ -68,7 +68,14 @@ size = (Lx, Ly, Lz)
 
 sys.stdout.write('Setting up simulation ...\n')
 system = espresso.System()
-system.rng = espresso.esutil.RNG()
+
+# Random Number Generator
+xs = time.time()
+seed = int(xs % int(xs) * 10000000000)
+rng = espresso.esutil.RNG()
+rng.seed(seed)
+system.rng = rng
+
 system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 
@@ -176,14 +183,18 @@ bondedinteractions=gromacs.setBondedInteractions(system, bondtypes, bondtypepara
 # exlusions, i.e. pairs of atoms not considered for the non-bonded part. Those are defined either by bonds which automatically generate an exclusion. Or by the nregxcl variable
 verletlist.exclude(exclusions)
 
-# langevin thermostat
-#langevin = espresso.integrator.LangevinThermostat(system)
-#langevin.gamma = 2.0
-#langevin.temperature = 2.4942 # kT in gromacs units
+# add VelocityVerlet Integrator
 integrator = espresso.integrator.VelocityVerlet(system)
-#integrator.addExtension(langevin)
 integrator.dt = timestep
 
+# add Langevin Thermostat
+langevin = espresso.integrator.LangevinThermostat(system)
+langevin.gamma = 2.0
+langevin.temperature = 2.4942 # kT in gromacs units
+langevin.adress = True
+integrator.addExtension(langevin)
+
+# add AdResS
 adress = espresso.integrator.Adress(system,verletlist,ftpl)
 integrator.addExtension(adress)
 

@@ -64,7 +64,9 @@ namespace espresso {
         _initForces.disconnect();
         _integrate1.disconnect();
         _integrate2.disconnect();
-        _aftCalcF.disconnect();
+        //_aftCalcF.disconnect();
+        _recalc2.disconnect();
+        _befIntV.disconnect();
     }
 
     void Adress::connect() {
@@ -85,8 +87,18 @@ namespace espresso {
         _integrate2 = integrator->aftIntV.connect(
                 boost::bind(&Adress::integrate2, this));
         
+        // Note: Both this extension as well as Langevin Thermostat access singal aftCalcF. This might lead to undefined behavior.
+        // Therefore, we use other signals here, to make sure the Thermostat would be always called first, before force distributions take place.
         // connection to after _aftCalcF()
-        _aftCalcF = integrator->aftCalcF.connect(
+        //_aftCalcF = integrator->aftCalcF.connect(
+        //        boost::bind(&Adress::aftCalcF, this));        
+        
+        // connection to after _recalc2()
+        _recalc2 = integrator->recalc2.connect(
+                boost::bind(&Adress::aftCalcF, this));
+        
+        // connection to after _befIntV()
+        _befIntV = integrator->befIntV.connect(
                 boost::bind(&Adress::aftCalcF, this));
     }
 
