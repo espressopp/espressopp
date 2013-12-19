@@ -20,6 +20,7 @@ namespace espresso {
   namespace integrator {
 
     const int AR_COMM_TAG = 0xac;
+    using namespace storage;
 
     /** Reaction scheme for polymer growth and curing/crosslinking */
 
@@ -27,7 +28,7 @@ namespace espresso {
 
       public:
 
-      AssociationReaction(shared_ptr<System> system, shared_ptr<VerletList> _verletList, shared_ptr<FixedPairList> _fixedPairList);
+      AssociationReaction(shared_ptr<System> system, shared_ptr<VerletList> _verletList, shared_ptr<FixedPairList> _fixedPairList, shared_ptr<DomainDecomposition> _domdec);
       ~AssociationReaction();
 
       void setRate(real rate);
@@ -50,7 +51,7 @@ namespace espresso {
       /** Actual reaction step */
       void react();
 
-      void sendMultiMap(boost::unordered_multimap<int, int> &mm);
+      void sendMultiMap(boost::unordered_multimap<longint, longint> &mm);
       void sortAndPickB();
       void applyAR();
 
@@ -82,12 +83,13 @@ namespace espresso {
       shared_ptr<VerletList> verletList;
       shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
       shared_ptr<FixedPairList> fpl;
+      shared_ptr<DomainDecomposition> domdec;
 
       /** container for (A,B) potential partners */
-      boost::unordered_multimap<int, int> Alist;
+      boost::unordered_multimap<longint, longint> Alist;
       /** container for (A,B) effective partners */
-      boost::unordered_multimap<int, int> partners;
-
+      boost::unordered_multimap<longint, longint> partners;
+      static LOG4ESPP_DECL_LOGGER(thelogger);
     };
   }
 }

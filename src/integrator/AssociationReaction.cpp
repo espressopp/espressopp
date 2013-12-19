@@ -6,18 +6,25 @@
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
+#include "bc/BC.hpp"
+#include "storage/NodeGrid.hpp"
+#include "storage/DomainDecomposition.hpp"
 
 namespace espresso {
 
   namespace integrator {
 
     //using namespace espresso::iterator;
+    using namespace storage;
+
+    LOG4ESPP_LOGGER(AssociationReaction::thelogger, "DomainDecomposition");
 
     AssociationReaction::AssociationReaction(
 					     shared_ptr<System> system,
 					     shared_ptr<VerletList> _verletList,
-					     shared_ptr<FixedPairList> _fpl)
-      :Extension(system), verletList(_verletList), fpl(_fpl) {
+					     shared_ptr<FixedPairList> _fpl,
+					     shared_ptr<DomainDecomposition> _domdec)
+      :Extension(system), verletList(_verletList), fpl(_fpl), domdec(_domdec) {
 
       type = Extension::Reaction;
 
@@ -176,10 +183,12 @@ namespace espresso {
 	neighbours. The parallel scheme is taken from
 	DomainDecomposition::doGhostCommunication
     */
-    void AssociationReaction::sendMultiMap(boost::unordered_multimap<int, int> &mm) {
+    void AssociationReaction::sendMultiMap(boost::unordered_multimap<longint, longint> &mm) {
 
-      InBuffer inBuffer(getSystem()->comm);
-      OutBuffer outBuffer(getSystem()->comm);
+      InBuffer inBuffer(*getSystem()->comm);
+      OutBuffer outBuffer(*getSystem()->comm);
+      System& system = getSystemRef();
+      const NodeGrid& nodeGrid = domdec->getNodeGrid();
 
       /* direction loop: x, y, z.
 	 Here we could in principle build in a one sided ghost
@@ -193,7 +202,8 @@ namespace espresso {
 	   particle.
 	*/
 
-	real curCoordBoxL = getSystem()->bc->getBoxL()[coord];
+	System& system = getSystemRef();
+	real curCoordBoxL = system.bc->getBoxL()[coord];
     
 	// lr loop: left right
 	for (int lr = 0; lr < 2; ++lr) {
@@ -201,7 +211,7 @@ namespace espresso {
 	  int oppositeDir = 2 * coord + (1 - lr);
 
 	  if (nodeGrid.getGridSize(coord) == 1) {
-	    LOG4ESPP_DEBUG(logger, "no communication");
+	    LOG4ESPP_DEBUG(thelogger, "no communication");
 	  }
 	  else {
 	    // prepare send and receive buffers
@@ -211,10 +221,13 @@ namespace espresso {
 	    sender = nodeGrid.getNodeNeighborIndex(oppositeDir);
 
 	    // fill outBuffer from mm
-	    outBuffer.write(mm.size());
-	    for (reaclist::iterator it=mm.begin(); it!=mm.end(); it++) {
-	      outBuffer.write(it->first);
-	      outBuffer.write(it->second);
+	    int tmp = mm.size();
+	    outBuffer.write(tmp);
+	    for (boost::unordered_multimap<longint, longint>::iterator it=mm.begin(); it!=mm.end(); it++) {
+	      tmp = it->first;
+	      outBuffer.write(tmp);
+	      tmp = it->second;
+	      outBuffer.write(tmp);
 	    }
 
 	    // exchange particles, odd-even rule
@@ -229,10 +242,10 @@ namespace espresso {
 	    // unpack received data
 	    // add content of inBuffer to mm
 	    int lengthA, Aidx, Bidx;
-	    inBuffer.read(&lengthA);
-	    for (int i=0; i<lengthA; i++) {
-	      inBuffer.read(&Aidx);
-	      inBuffer.read(&Bidx);
+	    inBuffer.read(lengthA);
+	    for (longint i=0; i<lengthA; i++) {
+	      inBuffer.read(Aidx);
+	      inBuffer.read(Bidx);
 	      mm.insert(std::make_pair(Aidx, Bidx));
 	    }
 	  }
@@ -247,35 +260,37 @@ namespace espresso {
     void AssociationReaction::sortAndPickB() {
 
       // Collect reaction by B
-      boost::unordered_multimap<int, int> Blist;
-      boost::unordered_set<int> Bset;
-      int A, B;
+      boost::unordered_multimap<longint, longint> Blist;
+      boost::unordered_set<longint> Bset;
+      longint A, B;
 
       // Create Blist, containing (B,A) pairs
       // Create Bset, containing each active B particle only once.
-      for (reaclist::iterator it=Alist.begin(); it!=Alist.end(); it++) {
+      for (
+	   boost::unordered_multimap<longint, longint>::iterator it=Alist.begin();
+	   it!=Alist.end(); it++) {
 	A = it->first;
 	B = it->second;
 	Blist.insert(std::make_pair(B, A));
-	Bset.append(B);
+	Bset.insert(B);
       }
 
-      partners.erase();
+      partners.clear();
       // For each active B, pick a partner
-      for (boost::unordered_set<int>::iterator it=Bset.begin(); it!=Bset.end(); it++) {
+      for (boost::unordered_set<longint>::iterator it=Bset.begin(); it!=Bset.end(); it++) {
 	B = *it;
 	int Bsize = Blist.count(B);
 	if (Bsize>0) {
 	  int pick = (*rng)(Bsize);
-	  std::pair<boost::unordered_multimap<int, int>::iterator,boost::unordered_multimap<int, int>::iterator> candidates;
+	  std::pair<boost::unordered_multimap<longint, longint>::iterator,boost::unordered_multimap<longint, longint>::iterator> candidates;
 	  candidates = Blist.equal_range(B);
 	  int i=0;
-	  for (boost::unordered_multimap<int, int>::iterator jt=candidates.first; jt!=candidates.second; jt++) {
+	  for (boost::unordered_multimap<longint, longint>::iterator jt=candidates.first; jt!=candidates.second; jt++) {
 	    if (i==pick) {
-	      partners.add(jt->first, jt->second);
+	      partners.insert(std::make_pair(jt->first, jt->second));
 	      i++;
-	      break
-		}
+	      break;
+	    }
 	  }
 	}
       }
@@ -285,17 +300,19 @@ namespace espresso {
 	particles accordingly.
     */
     void AssociationReaction::applyAR() {
-      int A, B;
-      for (boost::unordered_multimap<int, int>::iterator it=partners.begin(); it!=partners.end(); it++) {
+      longint A, B;
+      System& system = getSystemRef();
+
+      for (boost::unordered_multimap<longint, longint>::iterator it=partners.begin(); it!=partners.end(); it++) {
 	A = it->first;
 	B = it->second;
 	// Add a bond
 	fpl->add(A, B);
 	// Change the state of A and B.
-	Particle &pA = lookupLocalParticle(A);
-	Particle &pB = lookupLocalParticle(B);
-	AAA->state() -= 1;
-	BBB->state() += 1;
+	Particle* pA = system.storage->lookupLocalParticle(A);
+	Particle* pB = system.storage->lookupLocalParticle(B);
+	pA->state() -= 1;
+	pB->state() += 1;
       }
 
     }
@@ -307,7 +324,7 @@ namespace espresso {
     void AssociationReaction::registerPython() {
       using namespace espresso::python;
       class_<AssociationReaction, shared_ptr<AssociationReaction>, bases<Extension> >
-        ("integrator_AssociationReaction", init<shared_ptr<System>, shared_ptr<VerletList>, shared_ptr<FixedPairList> >())
+        ("integrator_AssociationReaction", init<shared_ptr<System>, shared_ptr<VerletList>, shared_ptr<FixedPairList>, shared_ptr<DomainDecomposition> >())
         .def("connect", &AssociationReaction::connect)
         .def("disconnect", &AssociationReaction::disconnect)
         .add_property("rate", &AssociationReaction::getRate, &AssociationReaction::setRate)
