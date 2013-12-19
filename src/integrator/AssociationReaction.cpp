@@ -266,7 +266,7 @@ namespace espresso {
 	B = *it;
 	int Bsize = Blist.count(B);
 	if (Bsize>0) {
-	  int pick = uni(Bsize);
+	  int pick = (*rng)(Bsize);
 	  std::pair<boost::unordered_multimap<int, int>::iterator,boost::unordered_multimap<int, int>::iterator> candidates;
 	  candidates = Blist.equal_range(B);
 	  int i=0;

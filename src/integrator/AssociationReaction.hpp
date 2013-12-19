@@ -83,10 +83,6 @@ namespace espresso {
       shared_ptr< esutil::RNG > rng;  //!< random number generator used for friction term
       shared_ptr<FixedPairList> fpl;
 
-      boost::mt19937 rng; // replace by espresso rng
-      boost::uniform_int<> uni_dist(0,1);
-      boost::variate_generator< boost::mt19937, boost::uniform_int<> > uni(rng,uni_dist);
-
       /** container for (A,B) potential partners */
       boost::unordered_multimap<int, int> Alist;
       /** container for (A,B) effective partners */
