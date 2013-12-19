@@ -51,5 +51,5 @@ from espresso.integrator.CapForce import *
 from espresso.integrator.ExtAnalyze import *
 from espresso.integrator.Settle import *
 from espresso.integrator.VelocityVerletOnRadius import *
-
+from espresso.integrator.AssociationReaction import *
 from espresso.integrator.EmptyExtension import *

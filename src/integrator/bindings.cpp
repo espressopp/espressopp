@@ -51,6 +51,7 @@
 #include "ExtAnalyze.hpp"
 #include "Settle.hpp"
 #include "VelocityVerletOnRadius.hpp"
+#include "AssociationReaction.hpp"
 
 #include "EmptyExtension.hpp"
 
@@ -85,6 +86,7 @@ namespace espresso {
       ExtAnalyze::registerPython();
       Settle::registerPython();
       VelocityVerletOnRadius::registerPython();
+      AssociationReaction::registerPython();
 
       EmptyExtension::registerPython();
     }

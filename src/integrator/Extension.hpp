@@ -53,7 +53,8 @@ namespace espresso {
             Adress=4,
             FreeEnergyCompensation=5,
             ExtForce=6,
-            ExtAnalysis=7
+            ExtAnalysis=7,
+            ExtReaction=8
         };
 
 
