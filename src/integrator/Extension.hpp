@@ -54,7 +54,7 @@ namespace espresso {
             FreeEnergyCompensation=5,
             ExtForce=6,
             ExtAnalysis=7,
-            ExtReaction=8
+            Reaction=8
         };
 
 
