@@ -153,6 +153,10 @@ namespace espresso {
 
 	reactPair(p1, p2);
       }
+      sendMultiMap(Alist);
+      sortAndPickB();
+      sendMultiMap(partners);
+      applyAR();
     }
 
     /** For a given pair of particles, check if they meet the condition the
@@ -308,6 +312,7 @@ namespace espresso {
 	B = it->second;
 	// Add a bond
 	fpl->add(A, B);
+	std::cout << "fpl->add " << A << " " << B << std::endl;
 	// Change the state of A and B.
 	Particle* pA = system.storage->lookupLocalParticle(A);
 	Particle* pB = system.storage->lookupLocalParticle(B);
