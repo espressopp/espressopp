@@ -143,8 +143,6 @@ namespace espresso {
      */
     void AssociationReaction::react() {
       LOG4ESPP_INFO(theLogger, "Perform AssociationReaction");
-      //System& system = getSystemRef();
-      //system.storage->updateGhostsV();
 
       Alist.clear();
       // loop over VL pairs
