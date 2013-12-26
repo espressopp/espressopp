@@ -146,16 +146,24 @@ namespace espresso {
       //System& system = getSystemRef();
       //system.storage->updateGhostsV();
 
+      Alist.clear();
       // loop over VL pairs
       for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
 	Particle &p1 = *it->first;
 	Particle &p2 = *it->second;
-
+	// If criteria for reaction match, add the indices to Alist
 	reactPair(p1, p2);
       }
       sendMultiMap(Alist);
-      sortAndPickB();
-      sendMultiMap(partners);
+      // Here, reduce number of partners to each A to 1
+      // Also, keep only non-ghost A
+      uniqueA(Alist);
+      sendMultiMap(Alist);
+      // Here, reduce number of partners to each B to 1
+      // Also, keep only non-ghost B
+      uniqueB(Alist, Blist);
+      sendMultiMap(Blist);
+      // Use Blist to apply the reaction.
       applyAR();
     }
 
@@ -257,47 +265,108 @@ namespace espresso {
       }
     }
 
-    /** Collects, for each candidate B particle, all candidate A partners. Then
-	picks a single A, deciding of the effective partners that are then stored in
-	"partners".
+    /** Given a multimap mm with several pairs (id1,id2), keep only one pair for
+	each id1 and return it in place. In addition, only pairs for which
+	id1 is local are kept.
     */
-    void AssociationReaction::sortAndPickB() {
+    void AssociationReaction::uniqueA(boost::unordered_multimap<longint, longint> &mm) {
 
-      // Collect reaction by B
-      boost::unordered_multimap<longint, longint> Blist;
-      boost::unordered_set<longint> Bset;
-      longint A, B;
+      // Collect indices
+      boost::unordered_set<longint> idxSet;
+      boost::unordered_multimap<longint, longint> idxList;
+      longint idx1, idx2;
+      System& system = getSystemRef();
+      boost::unordered_multimap<longint, longint> uniqueList;
 
-      // Create Blist, containing (B,A) pairs
-      // Create Bset, containing each active B particle only once.
-      for (
-	   boost::unordered_multimap<longint, longint>::iterator it=Alist.begin();
-	   it!=Alist.end(); it++) {
-	A = it->first;
-	B = it->second;
-	Blist.insert(std::make_pair(B, A));
-	Bset.insert(B);
+      idxSet.clear();
+      idxList.clear();
+      // Create idxList, containing (idx1, idx2) pairs
+      // Create idxSet, containing each idx1 only once
+      for (boost::unordered_multimap<longint, longint>::iterator it=mm.begin();
+	   it!=mm.end(); it++) {
+	idx1 = it->first;
+	idx2 = it->second;
+	idxList.insert(std::make_pair(idx1, idx2));
+	idxSet.insert(idx1);
       }
 
-      partners.clear();
-      // For each active B, pick a partner
-      for (boost::unordered_set<longint>::iterator it=Bset.begin(); it!=Bset.end(); it++) {
-	B = *it;
-	int Bsize = Blist.count(B);
-	if (Bsize>0) {
-	  int pick = (*rng)(Bsize);
+      uniqueList.clear();
+      // For each active idx1, pick a partner
+      for (boost::unordered_set<longint>::iterator it=idxSet.begin(); it!=idxSet.end(); it++) {
+	idx1 = *it;
+	Particle* p = system.storage->lookupLocalParticle(idx1);
+	if (p->ghost()) continue;
+	int size = idxList.count(idx1);
+	if (size>0) {
+	  int pick = (*rng)(size);
 	  std::pair<boost::unordered_multimap<longint, longint>::iterator,boost::unordered_multimap<longint, longint>::iterator> candidates;
-	  candidates = Blist.equal_range(B);
+	  candidates = idxList.equal_range(idx1);
 	  int i=0;
-	  for (boost::unordered_multimap<longint, longint>::iterator jt=candidates.first; jt!=candidates.second; jt++) {
+	  for (boost::unordered_multimap<longint, longint>::iterator jt=candidates.first; jt!=candidates.second; jt++, i++) {
 	    if (i==pick) {
-	      partners.insert(std::make_pair(jt->first, jt->second));
-	      i++;
+	      uniqueList.insert(std::make_pair(jt->first, jt->second));
 	      break;
 	    }
 	  }
 	}
       }
+      for (boost::unordered_multimap<longint, longint>::iterator it=uniqueList.begin(); it!=uniqueList.end(); it++) {
+	std::cout << "uniqueA " << it->first << " " << it->second << std::endl;
+      }
+      mm = uniqueList;
+      uniqueList.clear();
+    }
+
+    /** Given a multimap mm with several pairs (id1,id2), keep only one pair for
+	each id2 and return it in place. In addition, only pairs for which
+	id2 is local are kept.
+    */
+    void AssociationReaction::uniqueB(boost::unordered_multimap<longint, longint> &mm, boost::unordered_multimap<longint, longint> &nn) {
+
+      // Collect indices
+      boost::unordered_set<longint> idxSet;
+      boost::unordered_multimap<longint, longint> idxList;
+      longint idx1, idx2;
+      System& system = getSystemRef();
+      boost::unordered_multimap<longint, longint> uniqueList;
+
+      idxSet.clear();
+      idxList.clear();
+      // Create idxList, containing (idx2, idx1) pairs
+      // Create idxSet, containing each idx2 only once
+      for (boost::unordered_multimap<longint, longint>::iterator it=mm.begin();
+	   it!=mm.end(); it++) {
+	idx1 = it->first;
+	idx2 = it->second;
+	idxList.insert(std::make_pair(idx2, idx1));
+	idxSet.insert(idx2);
+      }
+
+      uniqueList.clear();
+      // For each active idx1, pick a partner
+      for (boost::unordered_set<longint>::iterator it=idxSet.begin(); it!=idxSet.end(); it++) {
+	idx2 = *it;
+	Particle* p = system.storage->lookupLocalParticle(idx2);
+	if (p->ghost()) continue;
+	int size = idxList.count(idx2);
+	if (size>0) {
+	  int pick = (*rng)(size);
+	  std::pair<boost::unordered_multimap<longint, longint>::iterator,boost::unordered_multimap<longint, longint>::iterator> candidates;
+	  candidates = idxList.equal_range(idx2);
+	  int i=0;
+	  for (boost::unordered_multimap<longint, longint>::iterator jt=candidates.first; jt!=candidates.second; jt++, i++) {
+	    if (i==pick) {
+	      uniqueList.insert(std::make_pair(jt->first, jt->second));
+	      break;
+	    }
+	  }
+	}
+      }
+      for (boost::unordered_multimap<longint, longint>::iterator it=uniqueList.begin(); it!=uniqueList.end(); it++) {
+	std::cout << "uniqueB " << it->first << " " << it->second << std::endl;
+      }
+      nn = uniqueList;
+      uniqueList.clear();
     }
 
     /** Use the (A,B) list "partners" to add bonds and change the state of the
@@ -307,17 +376,17 @@ namespace espresso {
       longint A, B;
       System& system = getSystemRef();
 
-      for (boost::unordered_multimap<longint, longint>::iterator it=partners.begin(); it!=partners.end(); it++) {
-	A = it->first;
-	B = it->second;
+      for (boost::unordered_multimap<longint, longint>::iterator it=Blist.begin(); it!=Blist.end(); it++) {
+	A = it->second;
+	B = it->first;
 	// Add a bond
 	fpl->add(A, B);
 	std::cout << "fpl->add " << A << " " << B << std::endl;
 	// Change the state of A and B.
 	Particle* pA = system.storage->lookupLocalParticle(A);
 	Particle* pB = system.storage->lookupLocalParticle(B);
-	pA->state() -= 1;
-	pB->state() += 1;
+	pA->setState(pA->getState()+deltaA);
+	pB->setState(pB->getState()+deltaB);
       }
 
     }

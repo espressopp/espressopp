@@ -52,9 +52,9 @@ namespace espresso {
       void react();
 
       void sendMultiMap(boost::unordered_multimap<longint, longint> &mm);
-      void sortAndPickB();
+      void uniqueA(boost::unordered_multimap<longint, longint> &mm);
+      void uniqueB(boost::unordered_multimap<longint, longint> &mm, boost::unordered_multimap<longint, longint> &nn);
       void applyAR();
-
 
       /** Register this class so it can be used from Python. */
       static void registerPython();
@@ -88,7 +88,7 @@ namespace espresso {
       /** container for (A,B) potential partners */
       boost::unordered_multimap<longint, longint> Alist;
       /** container for (A,B) effective partners */
-      boost::unordered_multimap<longint, longint> partners;
+      boost::unordered_multimap<longint, longint> Blist;
       static LOG4ESPP_DECL_LOGGER(thelogger);
     };
   }
