@@ -119,6 +119,16 @@ namespace espresso {
       return stateAMin;
     }
 
+    void AssociationReaction::setInterval(int _interval)
+    {
+      interval = _interval;
+    }
+
+    int AssociationReaction::getInterval()
+    {
+      return interval;
+    }
+
     AssociationReaction::~AssociationReaction() {
       disconnect();
     }
@@ -143,6 +153,9 @@ namespace espresso {
      */
     void AssociationReaction::react() {
       LOG4ESPP_INFO(theLogger, "Perform AssociationReaction");
+
+      //std::cout << "getStep " << integrator->getStep() << " interval " <<  interval << " % " << (integrator->getStep() % interval) << std::endl;
+      if (integrator->getStep() % interval != 0) return;
 
       Alist.clear();
       // loop over VL pairs
@@ -406,6 +419,7 @@ namespace espresso {
         .add_property("deltaA", &AssociationReaction::getDeltaA, &AssociationReaction::setDeltaA)
         .add_property("deltaB", &AssociationReaction::getDeltaB, &AssociationReaction::setDeltaB)
         .add_property("stateAMin", &AssociationReaction::getStateAMin, &AssociationReaction::setStateAMin)
+        .add_property("interval", &AssociationReaction::getInterval, &AssociationReaction::setInterval)
         ;
     }
   }

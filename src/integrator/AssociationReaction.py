@@ -15,5 +15,5 @@ if pmi.isController :
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.integrator.AssociationReactionLocal',
-            pmiproperty = [ 'rate', 'cutoff', 'typeA', 'typeB', 'deltaA', 'deltaB', 'stateAMin' ]
+            pmiproperty = [ 'rate', 'cutoff', 'typeA', 'typeB', 'deltaA', 'deltaB', 'stateAMin', 'interval' ]
             )

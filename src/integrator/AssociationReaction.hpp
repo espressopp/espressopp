@@ -45,6 +45,8 @@ namespace espresso {
       int getDeltaB();
       void setStateAMin(int stateAMin);
       int getStateAMin();
+      void setInterval(int interval);
+      int getInterval();
 
       void initialize();
 
@@ -76,6 +78,7 @@ namespace espresso {
       int deltaA; //!< state change for reactant A
       int deltaB; //!< state change for reactant B
       int stateAMin; //!< minimum state of reactant A
+      int interval; //!< number of steps between reaction loops
       shared_ptr<espresso::interaction::Potential> potential;
 
       real current_cutoff;
