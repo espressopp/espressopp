@@ -232,8 +232,11 @@ namespace espresso {
 	for (int lr = 0; lr < 2; ++lr) {
 	  int dir         = 2 * coord + lr;
 	  int oppositeDir = 2 * coord + (1 - lr);
+	  int dirSize = nodeGrid.getGridSize(coord);
+	  // Avoids double communication for size 2 directions.
+	  if ( (dirSize==2) && (lr==1) ) continue;
 
-	  if (nodeGrid.getGridSize(coord) == 1) {
+	  if (dirSize == 1) {
 	    LOG4ESPP_DEBUG(thelogger, "no communication");
 	  }
 	  else {
@@ -303,20 +306,23 @@ namespace espresso {
 
       uniqueList.clear();
       // For each active idx1, pick a partner
-      for (boost::unordered_set<longint>::iterator it=idxSet.begin(); it!=idxSet.end(); it++) {
-	idx1 = *it;
-	Particle* p = system.storage->lookupLocalParticle(idx1);
-	if (p->ghost()) continue;
-	int size = idxList.count(idx1);
-	if (size>0) {
-	  int pick = (*rng)(size);
-	  std::pair<boost::unordered_multimap<longint, longint>::iterator,boost::unordered_multimap<longint, longint>::iterator> candidates;
-	  candidates = idxList.equal_range(idx1);
-	  int i=0;
-	  for (boost::unordered_multimap<longint, longint>::iterator jt=candidates.first; jt!=candidates.second; jt++, i++) {
-	    if (i==pick) {
-	      uniqueList.insert(std::make_pair(jt->first, jt->second));
-	      break;
+      if (idxSet.size()>0) {
+	for (boost::unordered_set<longint>::iterator it=idxSet.begin(); it!=idxSet.end(); it++) {
+	  idx1 = *it;
+	  Particle* p = system.storage->lookupLocalParticle(idx1);
+	  if (p==NULL) continue;
+	  if (p->ghost()) continue;
+	  int size = idxList.count(idx1);
+	  if (size>0) {
+	    int pick = (*rng)(size);
+	    std::pair<boost::unordered_multimap<longint, longint>::iterator,boost::unordered_multimap<longint, longint>::iterator> candidates;
+	    candidates = idxList.equal_range(idx1);
+	    int i=0;
+	    for (boost::unordered_multimap<longint, longint>::iterator jt=candidates.first; jt!=candidates.second; jt++, i++) {
+	      if (i==pick) {
+		uniqueList.insert(std::make_pair(jt->first, jt->second));
+		break;
+	      }
 	    }
 	  }
 	}
@@ -354,21 +360,24 @@ namespace espresso {
       }
 
       uniqueList.clear();
-      // For each active idx1, pick a partner
-      for (boost::unordered_set<longint>::iterator it=idxSet.begin(); it!=idxSet.end(); it++) {
-	idx2 = *it;
-	Particle* p = system.storage->lookupLocalParticle(idx2);
-	if (p->ghost()) continue;
-	int size = idxList.count(idx2);
-	if (size>0) {
-	  int pick = (*rng)(size);
-	  std::pair<boost::unordered_multimap<longint, longint>::iterator,boost::unordered_multimap<longint, longint>::iterator> candidates;
-	  candidates = idxList.equal_range(idx2);
-	  int i=0;
-	  for (boost::unordered_multimap<longint, longint>::iterator jt=candidates.first; jt!=candidates.second; jt++, i++) {
-	    if (i==pick) {
-	      uniqueList.insert(std::make_pair(jt->first, jt->second));
-	      break;
+      if (idxSet.size()>0) {
+	// For each active idx1, pick a partner
+	for (boost::unordered_set<longint>::iterator it=idxSet.begin(); it!=idxSet.end(); it++) {
+	  idx2 = *it;
+	  Particle* p = system.storage->lookupLocalParticle(idx2);
+	  if (p==NULL) continue;
+	  if (p->ghost()) continue;
+	  int size = idxList.count(idx2);
+	  if (size>0) {
+	    int pick = (*rng)(size);
+	    std::pair<boost::unordered_multimap<longint, longint>::iterator,boost::unordered_multimap<longint, longint>::iterator> candidates;
+	    candidates = idxList.equal_range(idx2);
+	    int i=0;
+	    for (boost::unordered_multimap<longint, longint>::iterator jt=candidates.first; jt!=candidates.second; jt++, i++) {
+	      if (i==pick) {
+		uniqueList.insert(std::make_pair(jt->first, jt->second));
+		break;
+	      }
 	    }
 	  }
 	}
@@ -392,12 +401,17 @@ namespace espresso {
 	B = it->first;
 	// Add a bond
 	fpl->add(A, B);
-	std::cout << "fpl->add " << A << " " << B << std::endl;
 	// Change the state of A and B.
 	Particle* pA = system.storage->lookupLocalParticle(A);
 	Particle* pB = system.storage->lookupLocalParticle(B);
-	pA->setState(pA->getState()+deltaA);
-	pB->setState(pB->getState()+deltaB);
+	if (pA==NULL) {
+	} else {
+	  pA->setState(pA->getState()+deltaA);
+	}
+	if (pB==NULL) {
+	} else {
+	  pB->setState(pB->getState()+deltaB);
+	}
       }
 
     }
