@@ -1,3 +1,24 @@
+#  Copyright (C) 2012,2013
+#      Max Planck Institute for Polymer Research
+#  Copyright (C) 2008,2009,2010,2011
+#      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+#  
+#  This file is part of ESPResSo++.
+#  
+#  ESPResSo++ is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#  
+#  ESPResSo++ is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+
+
 # -*- coding: utf-8 -*-
 
 import espresso
@@ -130,6 +151,236 @@ def read(fin):
     return bonds, angles, x, y, z, Lx, Ly, Lz
   else:
     return bonds, angles, dihedrals, x, y, z, Lx, Ly, Lz
+
+def read_charmm(fin):
+
+  f = open(fin)
+  line = f.readline() # comment line
+  while not 'atoms' in line: #skip possible blank line
+    line = f.readline()
+  num_particles = int(line.split()[0])
+  num_bonds = int(f.readline().split()[0])
+  num_angles = int(f.readline().split()[0])
+  num_dihedrals = int(f.readline().split()[0])
+  num_impropers = int(f.readline().split()[0])
+  
+  line = f.readline() # blank line
+  
+  line = f.readline() # atom types 
+  num_types = int(line.split()[0])
+  line = f.readline() # bond types 
+  num_bond_types = int(line.split()[0])
+  line = f.readline() # angle types 
+  num_angle_types = int(line.split()[0])
+  line = f.readline() # dihedral types 
+  num_dihedral_types = int(line.split()[0])
+  line = f.readline() # impropers types 
+  num_improper_types = int(line.split()[0])
+
+  velocities = True if 'velocities' in line else False #TODO fix this? why should there be the velocity keyword?
+ 
+  # find and store size of box
+  line = ''
+  while not 'xlo' in line:
+    line = f.readline()
+  xmin, xmax = map(float, line.split()[0:2])
+  ymin, ymax = map(float, f.readline().split()[0:2])
+  zmin, zmax = map(float, f.readline().split()[0:2])
+  Lx = xmax - xmin
+  Ly = ymax - ymin
+  Lz = zmax - zmin
+
+  #find and store masses
+  line = ''
+  while not 'Masses' in line:
+    line = f.readline()
+  line = f.readline()
+  masses = []
+  dumm = 0.0
+  masses.append(dumm)
+  for i in range(num_types):
+      rmass = float(f.readline().split()[1])
+      masses.append(rmass) 
+
+#find and store LJ param
+  line = ''
+  while not 'Pair Coeffs' in line:
+    line = f.readline()
+  line = f.readline()
+  epsilon = []
+  sigma = []
+  dumm = 0.0
+  epsilon.append(dumm)
+  sigma.append(dumm)
+  for i in range(num_types):
+      repsilon, rsigma = map(float, f.readline().split()[1:3])
+      epsilon.append(repsilon) 
+      sigma.append(rsigma)
+      
+
+  # find and store coordinates
+  line = ''
+  while not 'Atoms' in line:
+    line = f.readline()
+  line = f.readline()
+
+  if(num_types == 1):
+    rstart = 3
+    if(num_bonds == 0): rstart = 2
+    
+    p_type = []
+    q = []
+    x = []
+    y = []
+    z = []
+    for i in range(num_particles):
+      rx, ry, rz = map(float,f.readline().split()[rstart:])
+      x.append(rx)
+      y.append(ry)
+      z.append(rz)
+  else:
+    p_type = []
+    q = []
+    x = []
+    y = []
+    z = []
+    for i in range(num_particles):
+      k, rq, rx, ry, rz = map(float, f.readline().split()[2:])
+      p_type.append(int(k))
+      q.append(rq)
+      x.append(rx)
+      y.append(ry)
+      z.append(rz)
+
+  if(num_bonds != 0):
+    # find and store bond coeff
+    line = ''
+    while not 'Bond Coeffs' in line:
+      line = f.readline()
+    line = f.readline()
+    K = []
+    r0 = []
+    dumm = 0.0
+    K.append(dumm)
+    r0.append(dumm)
+    for i in range(num_bond_types):
+        rK, rr0 = map(float, f.readline().split()[1:3])
+        K.append(rK) 
+        r0.append(rr0)
+
+
+
+  if(num_bonds != 0):
+    # find and store bonds
+    line = ''
+    while not 'Bonds' in line:
+      line = f.readline()
+    line = f.readline()
+    bonds = []
+    bonds_type_arr = []
+    for i in range(num_bonds):
+      bond_id, bond_type, pid1, pid2 = map(int, f.readline().split())
+      bonds.append((pid1, pid2))
+      bonds_type_arr.append(bond_type)
+
+  if(num_angles != 0):
+    # find and store angle coeff
+    line = ''
+    while not 'Angle Coeffs' in line:
+      line = f.readline()
+    line = f.readline()
+    Kt = []
+    t0 = []
+    dumm = 0.0
+    Kt.append(dumm)
+    t0.append(dumm)
+    for i in range(num_bond_types):
+        rKt, rt0 = map(float, f.readline().split()[1:3])
+        Kt.append(rKt) 
+        t0.append(rt0)
+
+  if(num_angles != 0):
+    # find and store angles
+    line = ''
+    while not 'Angles' in line:
+      line = f.readline()
+    line = f.readline()
+    angles = []
+    angles_type_arr = []
+    for i in range(num_angles):
+      angle_id, angle_type, pid1, pid2, pid3 = map(int, f.readline().split())
+      angles.append((pid1, pid2, pid3))
+      angles_type_arr.append(angle_type)
+
+  if(num_dihedrals != 0):
+  # find and store dihedrals coeff
+    line = ''
+    while not 'Dihedral Coeffs' in line:
+      line = f.readline()
+    line = f.readline()
+    Kdh = []
+    ndh = []
+    ph0 = []
+    dumm = 0.0
+    Kdh.append(dumm)
+    ndh.append(dumm)
+    ph0.append(dumm)
+    for i in range(num_bond_types):
+        rKdh, rndh, rph0 = map(float, f.readline().split()[1:4])
+        Kdh.append(rKdh) 
+        ndh.append(rndh)
+        ph0.append(rph0)
+
+  if(num_dihedrals != 0):
+    # find and store dihedrals
+    line = ''
+    while not 'Dihedrals' in line:
+      line = f.readline()
+    line = f.readline()
+    dihedrals = []
+    dihedrals_type_arr = []
+    for i in range(num_dihedrals):
+      dihedral_id, dihedral_type, pid1, pid2, pid3, pid4 = map(int, f.readline().split())
+      dihedrals.append((pid1, pid2, pid3, pid4))
+      dihedrals_type_arr.append(dihedral_type)
+
+  if(velocities):
+    # find and store velocities
+    line = ''
+    while not 'Velocities' in line:
+      line = f.readline()
+    line = f.readline() # blank line
+    vx = []
+    vy = []
+    vz = []
+    for i in range(num_particles):
+      vx_, vy_, vz_ = map(float, f.readline().split()[1:])
+      vx.append(vx_)
+      vy.append(vy_)
+      vz.append(vz_)
+
+
+  f.close()
+
+
+
+
+  if(num_bonds == 0 and num_angles == 0 and num_dihedrals == 0 and not velocities):
+    return p_type, masses, epsilon, sigma, q, x, y, z, Lx, Ly, Lz
+  if(num_bonds == 0 and num_angles == 0 and num_dihedrals == 0 and velocities):
+    return p_type, masses, epsilon, sigma, q, x, y, z, Lx, Ly, Lz, vx, vy, vz
+  if(num_bonds != 0 and num_angles == 0 and num_dihedrals == 0 and not velocities):
+    return p_type, masses, epsilon, sigma, K, r0, bonds, bonds_type_arr, q, x, y, z, Lx, Ly, Lz
+  if(num_bonds != 0 and num_angles == 0 and num_dihedrals == 0 and velocities):
+    return p_type, masses, epsilon, sigma, K, r0, bonds, bonds_type_arr, q, x, y, z, Lx, Ly, Lz, vx, vy, vz
+  if(num_bonds != 0 and num_angles != 0 and num_dihedrals == 0 and not velocities):
+    return p_type, masses, epsilon, sigma, K, r0, bonds, bonds_type_arr, Kt, t0, angles, angles_type_arr, q, x, y, z, Lx, Ly, Lz
+  if(num_bonds != 0 and num_angles != 0 and num_dihedrals == 0 and velocities):
+    return p_type, masses, epsilon, sigma, K, r0, bonds, bonds_type_arr, Kt, t0, angles, angles_type_arr, q, x, y, z, Lx, Ly, Lz, vx, vy, vz
+  if(num_bonds != 0 and num_angles != 0 and num_dihedrals != 0 and not velocities):
+    return p_type, masses, epsilon, sigma, K, r0, bonds, bonds_type_arr, Kt, t0, angles, angles_type_arr, Kdh, ndh, ph0, dihedrals, dihedrals_type_arr, q, x, y, z, Lx, Ly, Lz
+  if(num_bonds != 0 and num_angles != 0 and num_dihedrals != 0 and velocities):
+    return p_type, masses, epsilon, sigma, K, r0, bonds, bonds_type_arr, Kt, t0, angles, angles_type_arr, Kdh, ndh, ph0, dihedrals, dihedrals_type_arr, q, x, y, z, Lx, Ly, Lz, vx, vy, vz
 
 def write(fout, system, writeVelocities=False):  
     

@@ -15,9 +15,9 @@ from espresso.tools import timers
 #logging.getLogger("BC").setLevel(logging.DEBUG)
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
-steps = 310
-timestep = 0.001
-intervals = 31
+steps = 5000
+timestep = 0.0001
+intervals = 500
 
 rc = 2.31 # CG cutoff, Morse
 rca = 1.122462048309373 # AT cutoff (2^(1/6)), WCA
@@ -26,8 +26,8 @@ skin = 0.4
 gamma = 0.5
 temp = 1.0
 
-ex_size = 12.0
-hy_size = 2.5
+ex_size = 12.5
+hy_size = 5.0
 
 # writes the tabulated file
 def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
@@ -187,7 +187,7 @@ integrator = espresso.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
 # add AdResS extension
-adress = espresso.integrator.Adress(system)
+adress = espresso.integrator.Adress(system, vl,ftpl)
 integrator.addExtension(adress)
 
 # add Langevin thermostat extension
@@ -229,7 +229,7 @@ P = pressure.compute()
 Pij = pressureTensor.compute()
 Ek = 0.5 * T * (3 * num_particles)
 Ep = interNB.computeEnergy()
-Eb = 0#interFENE.computeEnergy()
+Eb = interFENE.computeEnergy()
 sys.stdout.write(' step     T          P        Pxy       etotal     epotential      ebonded     ekinetic\n')
 sys.stdout.write(fmt % (0, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
 
@@ -243,12 +243,12 @@ for s in range(1, intervals + 1):
   Pij = pressureTensor.compute()
   Ek = 0.5 * T * (3 * num_particles)
   Ep = interNB.computeEnergy()
-  Eb = 0#interFENE.computeEnergy()
+  Eb = interFENE.computeEnergy()
   sys.stdout.write(fmt % (step, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
   system.storage.decompose()
 
-  filename = "adress_tetra_liquid.pdb"
-  espresso.tools.pdbwrite(filename, system, molsize=num_particles+num_particlesCG, append=True)
+  #filename = "adress_tetra_liquid.pdb"
+  #espresso.tools.pdbwrite(filename, system, molsize=num_particles+num_particlesCG, append=True)
 
 end_time = time.clock()
 

@@ -1,3 +1,24 @@
+#  Copyright (C) 2012,2013
+#      Max Planck Institute for Polymer Research
+#  Copyright (C) 2008,2009,2010,2011
+#      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+#  
+#  This file is part of ESPResSo++.
+#  
+#  ESPResSo++ is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#  
+#  ESPResSo++ is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+
+
 import espresso
 from math import sqrt
 from espresso import Real3D
@@ -35,7 +56,7 @@ def pdbwrite(filename, system, molsize=4, append=False, typenames=None):
 	  name=typenames[type]
       #st = "ATOM %6d  FE  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d\n"%(pid, mol, xpos, ypos, zpos, type)
       #following http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
-      st = "%-6s%5d %-4s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f     T%04d%2s%2s\n"%('ATOM  ',pid+addToPid,name,'','UNX','F',mol%10000,'',xpos,ypos,zpos,0,0,mol%10000,'','')#the additional 'T' in the string is needed to be recognized as string,%10000 to obey the fixed-width format
+      st = "%-6s%5d %-4s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f     T%04d%2s%2s\n"%('ATOM  ',(pid+addToPid)%100000,name,'','UNX','F',mol%10000,'',xpos,ypos,zpos,0,0,mol%10000,'','')#the additional 'T' in the string is needed to be recognized as string,%10000 to obey the fixed-width format
       file.write(st)
       pid    += 1
       molcnt += 1
@@ -118,7 +139,7 @@ def pqrwrite(filename, system, molsize=4, append=False):
       radius = particle.radius
       #st = "ATOM %6d  FE  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d\n"%(pid, mol, xpos, ypos, zpos, type)
       #following http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
-      st = "%-6s%5d %-4s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%8.3f%8.3f\n"%('ATOM  ',pid+addToPid,'FE','','UNX','F',mol%10000,'',xpos,ypos,zpos,q,radius)
+      st = "%-6s%5d %-4s%1s%3s %1s%4d%1s   %8.3f%8.3f%8.3f%8.3f%8.3f\n"%('ATOM  ',(pid+addToPid)%100000,'FE','','UNX','F',mol%10000,'',xpos,ypos,zpos,q,radius)
   
       # ATOM      1  N   ALA     1      46.457  12.189  21.556  0.1414 1.8240
   

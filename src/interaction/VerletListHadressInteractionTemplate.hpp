@@ -1,3 +1,25 @@
+/*
+  Copyright (C) 2012,2013
+      Max Planck Institute for Polymer Research
+  Copyright (C) 2008,2009,2010,2011
+      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  
+  This file is part of ESPResSo++.
+  
+  ESPResSo++ is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+  
+  ESPResSo++ is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
+
 // ESPP_CLASS 
 #ifndef _INTERACTION_VERLETLISTHADRESSINTERACTIONTEMPLATE_HPP
 #define _INTERACTION_VERLETLISTHADRESSINTERACTIONTEMPLATE_HPP
@@ -27,8 +49,8 @@ namespace espresso {
     
     public:
       VerletListHadressInteractionTemplate
-      (shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI = false)
-                : verletList(_verletList), fixedtupleList(_fixedtupleList), KTI(_KTI) {
+      (shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList)
+                : verletList(_verletList), fixedtupleList(_fixedtupleList) {
 
           potentialArrayAT = esutil::Array2D<PotentialAT, esutil::enlarge>(0, 0, PotentialAT());
           potentialArrayCG = esutil::Array2D<PotentialCG, esutil::enlarge>(0, 0, PotentialCG());
@@ -100,8 +122,7 @@ namespace espresso {
       virtual real getMaxCutoff();
       virtual int bondType() { return Nonbonded; }
       
-    protected:
-      bool KTI;  
+    protected: 
       int ntypes;
       shared_ptr<VerletListAdress> verletList;
       shared_ptr<FixedTupleListAdress> fixedtupleList;
@@ -118,9 +139,10 @@ namespace espresso {
       //std::map<Particle*, real> weights;
       std::map<Particle*, real> energydiff;  // Energydifference V_AA - V_CG map for particles in hybrid region for drift term calculation in H-AdResS
       std::set<Particle*> adrZone;  // Virtual particles in AdResS zone (HY and AT region)
+      std::set<Particle*> cgZone;
 
       // AdResS Weighting function
-      real weight(real distanceSqr){
+      /*real weight(real distanceSqr){
           if (dex2 > distanceSqr) return 1.0;
           else if (dexdhy2 < distanceSqr) return 0.0;
           else {
@@ -133,11 +155,11 @@ namespace espresso {
           real argument = distance - dex;
           return -(30.0/(pow(dhy, 5.0)))*(pow(argument, 4.0)-2.0*dhy*pow(argument, 3.0)+argument*argument*dhy*dhy);
           //return -pidhy2 * 2.0 * cos(pidhy2*argument) * sin(pidhy2*argument); // for cosine squared weighting function
-      }
+      }*/
 
       // Compute center of mass and set the weights for virtual particles in AdResS zone (HY and AT region).
-      void makeWeights(){
-          
+      //void makeWeights(){
+      /*    
           std::set<Particle*> cgZone = verletList->getCGZone();
           for (std::set<Particle*>::iterator it=cgZone.begin();
               it != cgZone.end(); ++it) {
@@ -201,7 +223,7 @@ namespace espresso {
                   real w = weight(min1sq);                  
                   vp.lambda() = w;  
                   
-                  if(w!=0.0) std::cout << "lambda in CG region not equal to 0.0" ;
+                  if(w!=0.0) std::cout << "lambda in CG region not equal to 0.0. ID: " << vp.id() << " Position: " << vp.position() << "\n";
                   //weights.insert(std::make_pair(&vp, w));
                   
                   real wDeriv = weightderivative(sqrt(min1sq));
@@ -293,8 +315,8 @@ namespace espresso {
                   exit(1);
                   return;
               }
-          }
-        }
+          }*/
+        //}
       
     };
 
@@ -314,7 +336,7 @@ namespace espresso {
       // conservation anyway. In Force-AdResS we calculate CG forces/velocities and distribute them to AT particles. 
       // In contrast, in H-AdResS, we calculate AT forces from intra-molecular interactions and inter-molecular center-of-mass interactions and just update the positions
       // of the center-of-mass CG particles.
-      std::set<Particle*> cgZone = verletList->getCGZone();
+      /*std::set<Particle*> cgZone = verletList->getCGZone();
       for (std::set<Particle*>::iterator it=cgZone.begin();
               it != cgZone.end(); ++it) {
 
@@ -330,7 +352,7 @@ namespace espresso {
 
               // compute center of mass
               Real3D cmp(0.0, 0.0, 0.0); // center of mass position
-              //Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
+              Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
               //real M = vp.getMass(); // sum of mass of AT particles
               for (std::vector<Particle*>::iterator it2 = atList.begin();
                                    it2 != atList.end(); ++it2) {
@@ -341,17 +363,17 @@ namespace espresso {
                   //cmp += at.mass() * d1;
 
                   cmp += at->mass() * at->position();
-                  //cmv += at.mass() * at.velocity();
+                  cmv += at->mass() * at->velocity();
               }
               cmp /= vp.getMass();
-              //cmv /= vp.getMass();
+              cmv /= vp.getMass();
               //cmp += vp.position(); // cmp is a relative position
               //std::cout << " cmp M: "  << M << "\n\n";
               //std::cout << "  moving VP to " << cmp << ", velocitiy is " << cmv << "\n";
 
               // update (overwrite) the position and velocity of the VP
               vp.position() = cmp;
-              //vp.velocity() = cmv;
+              vp.velocity() = cmv;
 
           }
           else { // this should not happen
@@ -362,7 +384,6 @@ namespace espresso {
           }
       }
       
-
       std::set<Particle*> adrZone = verletList->getAdrZone();
       for (std::set<Particle*>::iterator it=adrZone.begin();
               it != adrZone.end(); ++it) {
@@ -379,7 +400,7 @@ namespace espresso {
 
               // compute center of mass
               Real3D cmp(0.0, 0.0, 0.0); // center of mass position
-              //Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
+              Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
               //real M = vp.getMass(); // sum of mass of AT particles
               for (std::vector<Particle*>::iterator it2 = atList.begin();
                                    it2 != atList.end(); ++it2) {
@@ -390,17 +411,17 @@ namespace espresso {
                   //cmp += at.mass() * d1;
 
                   cmp += at.mass() * at.position();
-                  //cmv += at.mass() * at.velocity();
+                  cmv += at.mass() * at.velocity();
               }
               cmp /= vp.getMass();
-              //cmv /= vp.getMass();
+              cmv /= vp.getMass();
               //cmp += vp.position(); // cmp is a relative position
               //std::cout << " cmp M: "  << M << "\n\n";
               //std::cout << "  moving VP to " << cmp << ", velocitiy is " << cmv << "\n";
 
               // update (overwrite) the position and velocity of the VP
               vp.position() = cmp;
-              //vp.velocity() = cmv;
+              vp.velocity() = cmv;
 
           }
           else { // this should not happen
@@ -409,8 +430,10 @@ namespace espresso {
               exit(1);
               return;
           }
-      }
+      }*/
       
+      std::set<Particle*> cgZone = verletList->getCGZone();
+      std::set<Particle*> adrZone = verletList->getAdrZone();
 
       for (std::set<Particle*>::iterator it=adrZone.begin();
                     it != adrZone.end(); ++it) {
@@ -441,9 +464,9 @@ namespace espresso {
 
       // Compute center of mass and weights for virtual particles in Adress zone (HY and AT region).
       
-      if (KTI == false) {
-      makeWeights();
-      }
+      //if (KTI == false) {
+      //makeWeights();
+      //}
       
       // Compute forces (AT and VP) of Pairs inside AdResS zone
       for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it) {
@@ -596,9 +619,11 @@ namespace espresso {
       energydiff.clear();  // clear the energy difference map
       
       //weights.clear();
-
+      
       // distribute forces from VP to AT (HY and AT region)
-      for (std::set<Particle*>::iterator it=adrZone.begin();
+      
+      //int atomcount = 0;
+      /*for (std::set<Particle*>::iterator it=adrZone.begin();
                 it != adrZone.end(); ++it) {
 
         Particle &vp = **it;
@@ -616,6 +641,9 @@ namespace espresso {
             for (std::vector<Particle*>::iterator it2 = atList.begin();
                                  it2 != atList.end(); ++it2) {
                 Particle &at = **it2;
+
+                //vp.force() +=  (vp.getMass() * at.force()) / (3.0 * at.mass());
+                
                 at.force() += at.mass() * vpfm;
                 //std::cout << "Force of atomistic particle (AdResS sim.) with id " << at.id() << " is: " << at.force() << "\n";
             }
@@ -645,6 +673,9 @@ namespace espresso {
                 for (std::vector<Particle*>::iterator itv = atList1.begin();
                         itv != atList1.end(); ++itv) {
                     Particle &at = **itv;
+                    
+                    //vp.force() +=  (vp.getMass() * at.force()) / (3.0 * at.mass());
+                    
                     // at.velocity() = vp.velocity(); // overwrite velocity
                     at.force() += at.mass() * vpfm;
                     //std::cout << "f" << at.mass() * vpfm << " m " << at.mass() << " M "<<  vp.getMass() << " id " << at.id() << std::endl;
@@ -656,7 +687,7 @@ namespace espresso {
                 exit(1);
                 return;
             }
-      }
+      }*/
       
     }
     
@@ -678,9 +709,9 @@ namespace espresso {
           e += potential._computeEnergy(p1, p2);
       }
 
-      if (KTI == false) {
-      makeWeights();
-      }
+      //if (KTI == false) {
+      //makeWeights();
+      //}
 
       for (PairList::Iterator it(verletList->getAdrPairs()); 
            it.isValid(); ++it) {
@@ -1013,9 +1044,9 @@ namespace espresso {
         }
       }
       
-      if (KTI == false) {
-      makeWeights();
-      }
+      //if (KTI == false) {
+      //makeWeights();
+      //}
       
       for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it) {
          real w1, w2;
@@ -1258,9 +1289,9 @@ namespace espresso {
         }
       }
       
-      if (KTI == false) {
-      makeWeights();
-      }
+      //if (KTI == false) {
+      //makeWeights();
+      //}
       
       for (PairList::Iterator it(verletList->getAdrPairs()); it.isValid(); ++it) {
          real w1, w2;
@@ -1408,7 +1439,7 @@ namespace espresso {
       }
 
       Tensor wsum(0.0);
-      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
       w += wsum;
     }
  
@@ -1469,7 +1500,7 @@ namespace espresso {
       }
 
       Tensor wsum(0.0);
-      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
       w += wsum;
        */
     }

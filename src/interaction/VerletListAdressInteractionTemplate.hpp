@@ -1,3 +1,25 @@
+/*
+  Copyright (C) 2012,2013
+      Max Planck Institute for Polymer Research
+  Copyright (C) 2008,2009,2010,2011
+      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  
+  This file is part of ESPResSo++.
+  
+  ESPResSo++ is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+  
+  ESPResSo++ is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+*/
+
 // ESPP_CLASS 
 #ifndef _INTERACTION_VERLETLISTADRESSINTERACTIONTEMPLATE_HPP
 #define _INTERACTION_VERLETLISTADRESSINTERACTIONTEMPLATE_HPP
@@ -124,7 +146,7 @@ namespace espresso {
     addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
       std::set<Particle*> cgZone = verletList->getCGZone();
-      for (std::set<Particle*>::iterator it=cgZone.begin();
+      /*for (std::set<Particle*>::iterator it=cgZone.begin();
               it != cgZone.end(); ++it) {
 
           Particle &vp = **it;
@@ -170,7 +192,7 @@ namespace espresso {
               exit(1);
               return;
           }
-      }     
+      }*/     
       
       
       // Pairs not inside the AdResS Zone (CG region)
@@ -241,7 +263,7 @@ namespace espresso {
       }*/
       
       std::set<Particle*> adrZone = verletList->getAdrZone();
-      for (std::set<Particle*>::iterator it=adrZone.begin();
+      /*for (std::set<Particle*>::iterator it=adrZone.begin();
               it != adrZone.end(); ++it) {
 
           Particle &vp = **it;
@@ -321,7 +343,7 @@ namespace espresso {
               exit(1);
               return;
           }
-      }
+      }*/
 
 
       // Compute forces (AT and VP) of Pairs inside AdResS zone
@@ -428,12 +450,12 @@ namespace espresso {
                 std::vector<Particle*> atList1;
                 atList1 = it3->second;
 
-                Real3D vpfm = vp.force() / vp.getMass();
+                //Real3D vpfm = vp.force() / vp.getMass();
                 for (std::vector<Particle*>::iterator itv = atList1.begin();
                         itv != atList1.end(); ++itv) {
                     Particle &at = **itv;
                     at.velocity() = vp.velocity(); // Overwrite velocity - Note (Karsten): See comment above.
-                    at.force() += at.mass() * vpfm;
+                    //at.force() += at.mass() * vpfm;
                 }
 
             }
@@ -446,7 +468,7 @@ namespace espresso {
       
       
       // distribute forces from VP to AT (HY and AT region)
-      for (std::set<Particle*>::iterator it=adrZone.begin();
+      /*for (std::set<Particle*>::iterator it=adrZone.begin();
                 it != adrZone.end(); ++it) {
 
         Particle &vp = **it;
@@ -473,7 +495,7 @@ namespace espresso {
             exit(1);
             return;
         }
-      }
+      }*/
     }
       
     template < typename _PotentialAT, typename _PotentialCG >
@@ -1021,7 +1043,7 @@ namespace espresso {
       }
 
       Tensor wsum(0.0);
-      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
       w += wsum;
     }
     
@@ -1082,7 +1104,7 @@ namespace espresso {
       }
 
       Tensor wsum(0.0);
-      boost::mpi::all_reduce(*mpiWorld, wlocal, wsum, std::plus<Tensor>());
+      boost::mpi::all_reduce(*mpiWorld, (double*)&wlocal, 6, (double*)&wsum, std::plus<double>());
       w += wsum;
        */
     }

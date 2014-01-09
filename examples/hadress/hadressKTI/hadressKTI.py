@@ -125,7 +125,7 @@ vl = espresso.VerletListAdress(system, cutoff=rc, adrcut=rc,
 
 # non-bonded potentials
 # LJ Capped WCA between AT and tabulated potential between CG particles
-interNB = espresso.interaction.VerletListHadressLennardJones(vl, ftpl, KTI = True)  # Switch on KTI here!
+interNB = espresso.interaction.VerletListHadressLennardJones(vl, ftpl)  # Switch on KTI here!
 potWCA  = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift='auto', cutoff=rca)
 potCG = espresso.interaction.Tabulated(itype=3, filename=tabCG, cutoff=rc) # CG
 interNB.setPotentialAT(type1=1, type2=1, potential=potWCA) # AT
@@ -143,7 +143,7 @@ integrator = espresso.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
 # add AdResS extension
-adress = espresso.integrator.Adress(system)
+adress = espresso.integrator.Adress(system, vl, ftpl, KTI = True)
 integrator.addExtension(adress)
 
 # add Langevin thermostat extension
@@ -222,7 +222,7 @@ print ''
 
 ### KIRKWOOD TI ###
 # TI parameters
-bins = 1000
+bins = 100
 steps = 100
 stepsequi = 50
 intervals = 10

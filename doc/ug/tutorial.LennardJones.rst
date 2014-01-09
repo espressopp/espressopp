@@ -85,8 +85,8 @@ can deal with. A typical error message you get could look like this:
 In order to prevent this, systems that are setup in a random way and thus have strong overlaps between particels
 have to be "warmed up" before they can be equilibrated. 
 
-In |espp| there are several possible ways of warming up a system. As a first approach one could simply constrain
-the forces in the integrator. For this purpose |espp| provides an integrator Extension
+In ESPResSo++ there are several possible ways of warming up a system. As a first approach one could simply constrain
+the forces in the integrator. For this purpose ESPResSo++ provides an integrator Extension
 named CapForces. The two parameters of this Extension are the system and the maximum force that
 a particle can get. The following python code shows how CapForces can be used. Add it to your
 Lennard-Jones example just after adding the Langevin Extension:
