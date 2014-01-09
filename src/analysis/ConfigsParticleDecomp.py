@@ -36,6 +36,8 @@ class ConfigsParticleDecompLocal(analysis_ConfigsParticleDecomp):
       cxxinit(self, analysis_ConfigsParticleDecomp, system)
     def gather(self):
       return self.cxxclass.gather(self)
+    def gatherFromFile(self, filename):
+      return self.cxxclass.gatherFromFile(self, filename)
     def clear(self):
       return self.cxxclass.clear(self)
     def __iter__(self):
@@ -50,7 +52,7 @@ if pmi.isController:
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
       #cls =  'espresso.analysis.ConfigsParticleDecompLocal',
-      pmicall = [ "gather", "clear", "compute" ],
+      pmicall = [ "gather", "gatherFromFile", "clear", "compute" ],
       localcall = ["__getitem__", "all"],
       pmiproperty = ["size"]
     )

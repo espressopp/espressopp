@@ -146,6 +146,9 @@ namespace espresso {
       // Take a snapshot of property (all current particle velocities at the moment)
       void gather();
 
+      // Read in a snapshot from a xyz-file
+      void gatherFromFile(string filename);
+
       // Get a configuration from ConfigurationList
       ConfigurationPtr getConf(int position) const;
 
