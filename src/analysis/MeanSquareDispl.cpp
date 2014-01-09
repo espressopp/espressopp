@@ -8,7 +8,9 @@ namespace espresso {
 
     //using namespace iterator;
     
-    /*
+    /* 
+     * calculates the mean square displacement of the particles/monomers in the COM of the whole system
+     * 
      * calc <r^2> the output is the average mean sq. displacement over 3 directions.
      * !! Important!! For D calculation factor 1/6 is already taken into account.
      * !! all confs should contain the same number of particles
@@ -16,8 +18,8 @@ namespace espresso {
     
     python::list MeanSquareDispl::compute() const{
       
-      int M = getListSize();
-      real* totZ;
+      int M = getListSize(); //number of snapshots/configurations
+      real* totZ; //will store the mean squared displacement
       totZ = new real[M];
       real* Z;
       Z = new real[M];
@@ -51,7 +53,7 @@ namespace espresso {
         centerOfMassList.push_back( posCOM_sum / mass_sum );
       }
       
-      vector<longint> localIDs;
+      vector<longint> localIDs; //for each CPU this will store particle IDs of particles calculated by CPU
       for (map<size_t,int>::const_iterator itr=idToCpu.begin(); itr!=idToCpu.end(); ++itr) {
         size_t i = itr->first;
         int whichCPU = itr->second;
@@ -86,7 +88,7 @@ namespace espresso {
       }
       if(system.comm->rank()==0)
         cout<<"calculation progress (mean square displacement): 100%"<<endl;
-      
+      //summation of results from different CPUs
       boost::mpi::all_reduce( *system.comm, Z, M, totZ, plus<real>() );
       
       for(int m=0; m<M; m++){

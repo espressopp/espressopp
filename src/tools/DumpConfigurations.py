@@ -201,7 +201,37 @@ def fastwritexyz(filename, system, velocities = True, append = False, scale=1.0)
         #pid   += 1
   
   file.close()
-
+# Franziska's modified readxyz to fastreadxyz without velocities
+def fastreadxyz(filename):
+  file = open(filename)
+  line = file.readline()
+  num_particles = int(line.split()[0])
+  line = file.readline().split()
+  if len(line) == 3:
+    Lx = float(line[0])
+    Ly = float(line[1])
+    Lz = float(line[2])
+  else:
+    Lx = float(line[0])
+    Ly = float(line[4])
+    Lz = float(line[8])
+    
+  pid  = []
+  type = []
+  xpos = []
+  ypos = []
+  zpos = []
+  for i in range(num_particles):
+    line = file.readline().split()
+    if len(line) == 7 or len(line)==4:
+      line.insert(1,'0')
+    pid.append(int(line[0]))
+    type.append(int(line[1]))
+    xpos.append(float(line[2]))
+    ypos.append(float(line[3]))
+    zpos.append(float(line[4]))
+  return pid, type, xpos, ypos, zpos, Lx, Ly, Lz
+  file.close()
 
 '''
   Fast write standard xyz file. Generally standard xyz file is

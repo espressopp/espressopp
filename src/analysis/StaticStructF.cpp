@@ -11,6 +11,7 @@
 #include <math.h>       // cos and ceil and sqrt
 #include <algorithm>    // std::min
 #include <functional>   // std::plus
+#include <time.h>       // time_t
 
 #ifndef M_PIl
 #define M_PIl 3.1415926535897932384626433832795029L
@@ -37,6 +38,9 @@ namespace espresso {
 
         python::list StaticStructF::computeArray(int nqx, int nqy, int nqz,
                 real bin_factor) const {
+            time_t start;
+            time(&start);
+            cout << "collective calc starts " << ctime(&start) << "\n";
             //fist the system coords are saved at each CPU
             System& system = getSystemRef();
             esutil::Error err(system.comm);
@@ -44,6 +48,10 @@ namespace espresso {
 
             int nprocs = system.comm->size(); // number of CPUs
             int myrank = system.comm->rank(); // current CPU's number
+
+            if (myrank == 0) {
+                cout << "collective calc starts " << ctime(&start) << "\n";
+            }
 
             int num_part = 0;
             ConfigurationPtr config = make_shared<Configuration > ();
@@ -67,6 +75,13 @@ namespace espresso {
                     //config->set(num_part, p[0], p[1], p[2]);
                     num_part++;
                 }
+            }
+            if (myrank == 0) {
+                time_t distributed;
+                time(&distributed);
+                cout << "particles on all CPUs " << ctime(&distributed) << "\n";
+                cout << "distribution to CPUs took "
+                        << difftime(distributed, start) << " seconds \n";
             }
             // now all CPUs have all particle coords and num_part is the total number
             // of particles
@@ -157,7 +172,7 @@ namespace espresso {
             }
             //creates the python list with the results            
             if (myrank == 0) {
-                 //starting with bin_i = 1 will leave out the value for q=0, otherwise start with bin_i=0
+                //starting with bin_i = 1 will leave out the value for q=0, otherwise start with bin_i=0
                 for (int bin_i = 1; bin_i < num_bins; bin_i++) {
                     real c = (count_bin[bin_i]) ? 1 / (real) count_bin[bin_i] : 0;
                     sq_bin[bin_i] = n_reci * sq_bin[bin_i] * c;
@@ -307,12 +322,12 @@ namespace espresso {
 
 
                         if (myrank != 0) {
-                            boost::mpi::reduce(*system.comm, singleChain_localSum, plus<real > (), 0);                            
+                            boost::mpi::reduce(*system.comm, singleChain_localSum, plus<real > (), 0);
                         }
 
                         if (myrank == 0) {
                             real singleChainSum = 0;
-                            boost::mpi::reduce(*system.comm, singleChain_localSum, singleChainSum, plus<real > (), 0);                         
+                            boost::mpi::reduce(*system.comm, singleChain_localSum, singleChainSum, plus<real > (), 0);
                             sq_bin[bin_i] += singleChainSum;
                         }
                     }

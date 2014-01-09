@@ -8,10 +8,10 @@ namespace espresso {
   namespace analysis {
 
     /*
-     * Class derives from ConfigsParticleDecomp.
+     * Class derived from ConfigsParticleDecomp.
      * 
      * This implementation of mean square displacement calculation does not take into
-     * account particle masses. It is correct if all the particles has equal masses only.
+     * account particle masses. It is correct if all the particles have equal masses only.
      * Otherwise it should be modified.
     */
 
