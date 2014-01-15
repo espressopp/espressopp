@@ -43,6 +43,7 @@
 #include "Quartic.hpp"
 #include "VSphereSelf.hpp"
 #include "VSpherePair.hpp"
+#include "MirrorLennardJones.hpp"
 
 #include "Tabulated.hpp"
 #include "TabulatedAngular.hpp"
@@ -101,6 +102,7 @@ namespace espresso {
       Quartic::registerPython();
       VSphereSelf::registerPython();
       VSpherePair::registerPython();
+      MirrorLennardJones::registerPython();
       
       AngularPotential::registerPython();
       AngularUniquePotential::registerPython();
