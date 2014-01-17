@@ -178,7 +178,6 @@ namespace espresso {
     void AssociationReaction::react() {
       LOG4ESPP_INFO(theLogger, "Perform AssociationReaction");
 
-      //std::cout << "getStep " << integrator->getStep() << " interval " <<  interval << " % " << (integrator->getStep() % interval) << std::endl;
       if (integrator->getStep() % interval != 0) return;
 
       Alist.clear();
