@@ -350,9 +350,6 @@ namespace espresso {
 	  }
 	}
       }
-      for (boost::unordered_multimap<longint, longint>::iterator it=uniqueList.begin(); it!=uniqueList.end(); it++) {
-	std::cout << "uniqueA " << it->first << " " << it->second << std::endl;
-      }
       mm = uniqueList;
       uniqueList.clear();
     }
@@ -404,9 +401,6 @@ namespace espresso {
 	    }
 	  }
 	}
-      }
-      for (boost::unordered_multimap<longint, longint>::iterator it=uniqueList.begin(); it!=uniqueList.end(); it++) {
-	std::cout << "uniqueB " << it->first << " " << it->second << std::endl;
       }
       nn = uniqueList;
       uniqueList.clear();
