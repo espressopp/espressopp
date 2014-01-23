@@ -18,7 +18,7 @@
   
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
-*/
+ */
 
 // ESPP_CLASS
 #ifndef _ANALYSIS_MEANSQUAREDISPL_HPP
@@ -27,40 +27,51 @@
 #include "ConfigsParticleDecomp.hpp"
 
 namespace espresso {
-  namespace analysis {
+    namespace analysis {
 
-    /*
-     * Class derived from ConfigsParticleDecomp.
-     * 
-     * This implementation of mean square displacement calculation does not take into
-     * account particle masses. It is correct if all the particles have equal masses only.
-     * Otherwise it should be modified.
-    */
+        /*
+         * Class derived from ConfigsParticleDecomp.
+         * 
+         * This implementation of mean square displacement calculation does not take into
+         * account particle masses. It is correct if all the particles have equal masses only.
+         * Otherwise it should be modified.
+         */
 
-    class MeanSquareDispl : public ConfigsParticleDecomp {
+        class MeanSquareDispl : public ConfigsParticleDecomp {
+        public:
 
-    public:
-      
-      MeanSquareDispl(shared_ptr<System> system): ConfigsParticleDecomp (system){
-        // by default 
-        setPrint_progress(true);
-        
-        key = "unfolded";
-      }
-      ~MeanSquareDispl() {}
-      
-      virtual python::list compute() const;
+            MeanSquareDispl(shared_ptr<System> system) : ConfigsParticleDecomp(system) {
+                // by default 
+                setPrint_progress(true);
+                key = "unfolded";
+            }
 
-      void setPrint_progress(bool _print_progress){
-        print_progress = _print_progress;
-      }
-      bool getPrint_progress(){return print_progress;}
-      
-      static void registerPython();
-    private:
-      bool print_progress;
-    };
-  }
+            MeanSquareDispl(shared_ptr<System> system, int chainlength) :
+                                ConfigsParticleDecomp(system, chainlength) {
+                // by default 
+                setPrint_progress(true);
+                key = "unfolded";
+            }
+
+            ~MeanSquareDispl() {
+            }
+
+            virtual python::list compute() const;
+            python::list computeG2() const;
+
+            void setPrint_progress(bool _print_progress) {
+                print_progress = _print_progress;
+            }
+
+            bool getPrint_progress() {
+                return print_progress;
+            }
+
+            static void registerPython();
+        private:
+            bool print_progress;
+        };
+    }
 }
 
 #endif

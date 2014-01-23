@@ -138,7 +138,84 @@ namespace espresso {
             cout << "Exception: " << e.what() << "\n";
         }
       }
+      
+       /*
+       * Constructor, allow for unlimited snapshots. It defines how many particles
+       * correspond to different cpu without breaking chains. So the monomers of
+       * one chain correspond to one CPU only.
+        * 
+        * !! currently only works for particles numbered like 0, 1, 2,... !!
+        * !! with each chain consisting particles with subsequent ids     !!
+       */
+      ConfigsParticleDecomp(shared_ptr<System> system, int _chainlength): SystemAccess (system){
+        // by default key = "position", it will store the particle positions
+        // (option: "velocity" or "unfolded")
+        esutil::Error err(system->comm);
+        
+        key = "position";
+        chainlength = _chainlength;
+        
+        int localN = system -> storage -> getNRealParticles();
+        boost::mpi::all_reduce(*system->comm, localN, num_of_part, std::plus<int>());
+        
+        int n_nodes = system -> comm -> size();
+        int this_node = system -> comm -> rank();
+              
+        //for monodisperse chains
+        int num_chains = num_of_part / chainlength;
+        int local_num_chains = (int) ceil( (double)num_chains / n_nodes );
+        int local_num_part = local_num_chains * chainlength;
+        
+        //in case the chainlength does not match the total number of particles
+        if(num_of_part % chainlength != 0){
+            cout << "chainlength does not match total number of particles\n"
+                    << "chainlength: " << chainlength
+                    << "\n num_of_part " << num_of_part << "\n\n"; 
+        }
+        
+        //CPU0 will use particles 0, 1, 2, ... local_num_particles-1.
+        //CPU1 will use particles local_num_particles, local_num_particles+1,...        
+        int nodeNum = -1;
+        for(int id = 0; id < num_of_part ;id++){
+            if(id % local_num_part == 0) ++nodeNum;
+            idToCpu[id] = nodeNum;
+            //intId++   //...if loop was with iterator
+            //if(intId %)local_num_part == 0) nodeNum++;            
+        }
+        //output if the assignment failed
+        if (nodeNum >= n_nodes) {
+            if(this_node == 0){
+                cout << "assignment went wrong. Particles were assigned to proc "
+                        << nodeNum << "\n";
+                cout << "highest process number should be " << n_nodes - 1 <<"\n";
+                cout << "check if total number of particles matches with chainlength\n";
+            }
+        }
+         //output for testing
+        if(this_node == 0){
+            for(map<size_t, int>::iterator itr=idToCpu.begin(); itr != idToCpu.end(); itr++){
+            size_t key = itr -> first;
+            int mapped = itr -> second;
+            //cout << key << "\t" << mapped << "\n";
+        }
+    }
+        
+        try{
+          if(num_chains < n_nodes){
+            stringstream msg;
+            msg<<"Warning. Number of chains less then the number of nodes.\n";
+            msg<<"It might be a problem. NChains="<<num_chains<<" NNodes="<<n_nodes;
+            err.setException( msg.str() );
+            err.checkException();
+          }
+        }
+        catch(std::exception const& e){
+          if(this_node==0)
+            cout << "Exception: " << e.what() << "\n";
+        }
+      }
       ~ConfigsParticleDecomp() {}
+      
 
       // get number of available snapshots. Returns the size of Configurationlist
       int getListSize() const;
@@ -170,7 +247,7 @@ namespace espresso {
 
       // all cpus handle defined number of particles
       int num_of_part;
-      
+      int chainlength; //for calculations with chains (instead of monomers)
       map< size_t, int > idToCpu; // binds cpu and particle id
       
       string key; // it can be "position", "velocity" or "unfolded"

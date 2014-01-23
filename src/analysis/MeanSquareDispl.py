@@ -33,8 +33,14 @@ from _espresso import analysis_MeanSquareDispl
 
 class MeanSquareDisplLocal(ConfigsParticleDecompLocal, analysis_MeanSquareDispl):
     'The (local) compute autocorrelation f.'
-    def __init__(self, system):
-      cxxinit(self, analysis_MeanSquareDispl, system)
+    def __init__(self, system, chainlength = None):
+      if chainlength is None:
+        cxxinit(self, analysis_MeanSquareDispl, system)
+      else:
+        cxxinit(self, analysis_MeanSquareDispl, system, chainlength)
+
+    def computeG2(self):
+      return self.cxxclass.computeG2(self)
     
     def strange(self):
       print 1
@@ -46,5 +52,5 @@ if pmi.isController:
     pmiproxydefs = dict(
       cls =  'espresso.analysis.MeanSquareDisplLocal',
       pmiproperty = [ 'print_progress' ],
-      pmicall = ['strange']
+      pmicall = ["computeG2", 'strange']
     )
