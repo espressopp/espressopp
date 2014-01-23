@@ -176,9 +176,11 @@ namespace espresso {
     /** Performs all steps of the reactive scheme.
      */
     void AssociationReaction::react() {
-      LOG4ESPP_INFO(theLogger, "Perform AssociationReaction");
-
       if (integrator->getStep() % interval != 0) return;
+
+      System& system = getSystemRef();
+
+      LOG4ESPP_INFO(theLogger, "Perform AssociationReaction");
 
       Alist.clear();
       // loop over VL pairs
@@ -231,7 +233,10 @@ namespace espresso {
     */
     void AssociationReaction::sendMultiMap(boost::unordered_multimap<longint, longint> &mm) {
 
-      InBuffer inBuffer(*getSystem()->comm);
+      LOG4ESPP_INFO(theLogger, "Entering sendMultiMap");
+
+      InBuffer inBuffer0(*getSystem()->comm);
+      InBuffer inBuffer1(*getSystem()->comm);
       OutBuffer outBuffer(*getSystem()->comm);
       System& system = getSystemRef();
       const NodeGrid& nodeGrid = domdec->getNodeGrid();
@@ -248,8 +253,18 @@ namespace espresso {
 	   particle.
 	*/
 
-	System& system = getSystemRef();
 	real curCoordBoxL = system.bc->getBoxL()[coord];
+
+	outBuffer.reset();
+	// fill outBuffer from mm
+	int tmp = mm.size();
+	outBuffer.write(tmp);
+	for (boost::unordered_multimap<longint, longint>::iterator it=mm.begin(); it!=mm.end(); it++) {
+	  tmp = it->first;
+	  outBuffer.write(tmp);
+	  tmp = it->second;
+	  outBuffer.write(tmp);
+	}
     
 	// lr loop: left right
 	for (int lr = 0; lr < 2; ++lr) {
@@ -265,41 +280,61 @@ namespace espresso {
 	  else {
 	    // prepare send and receive buffers
 	    longint receiver, sender;
-	    outBuffer.reset();
 	    receiver = nodeGrid.getNodeNeighborIndex(dir);
 	    sender = nodeGrid.getNodeNeighborIndex(oppositeDir);
-
-	    // fill outBuffer from mm
-	    int tmp = mm.size();
-	    outBuffer.write(tmp);
-	    for (boost::unordered_multimap<longint, longint>::iterator it=mm.begin(); it!=mm.end(); it++) {
-	      tmp = it->first;
-	      outBuffer.write(tmp);
-	      tmp = it->second;
-	      outBuffer.write(tmp);
-	    }
 
 	    // exchange particles, odd-even rule
 	    if (nodeGrid.getNodePosition(coord) % 2 == 0) {
 	      outBuffer.send(receiver, AR_COMM_TAG);
-	      inBuffer.recv(sender, AR_COMM_TAG);
+	      if (lr==0) {
+		inBuffer0.recv(sender, AR_COMM_TAG);
+	      } else {
+		inBuffer1.recv(sender, AR_COMM_TAG);
+	      }
 	    } else {
-	      inBuffer.recv(sender, AR_COMM_TAG);
+	      if (lr==0) {
+		inBuffer0.recv(sender, AR_COMM_TAG);
+	      } else {
+		inBuffer1.recv(sender, AR_COMM_TAG);
+	      }
 	      outBuffer.send(receiver, AR_COMM_TAG);
 	    }
-
-	    // unpack received data
-	    // add content of inBuffer to mm
-	    int lengthA, Aidx, Bidx;
-	    inBuffer.read(lengthA);
+	  }
+	}
+	LOG4ESPP_DEBUG(theLogger, "Entering unpack");
+	// unpack received data
+	// add content of inBuffer to mm
+	int lengthA, Aidx, Bidx;
+	for (int lr = 0; lr < 2; ++lr) {
+	  int dir         = 2 * coord + lr;
+	  int oppositeDir = 2 * coord + (1 - lr);
+	  int dirSize = nodeGrid.getGridSize(coord);
+	  if (dirSize == 1) {
+	  } else {
+	    // Avoids double communication for size 2 directions.
+	    if ( (dirSize==2) && (lr==1) ) continue;
+	    if (lr==0) {
+	      inBuffer0.read(lengthA);
+	    } else {
+	      inBuffer1.read(lengthA);
+	    }
 	    for (longint i=0; i<lengthA; i++) {
-	      inBuffer.read(Aidx);
-	      inBuffer.read(Bidx);
+	      if (lr==0) {
+		inBuffer0.read(Aidx);
+		inBuffer0.read(Bidx);
+	      } else {
+		inBuffer1.read(Aidx);
+		inBuffer1.read(Bidx);
+	      }
 	      mm.insert(std::make_pair(Aidx, Bidx));
 	    }
 	  }
 	}
+	LOG4ESPP_DEBUG(theLogger, "Leaving unpack");
       }
+
+      LOG4ESPP_INFO(theLogger, "Leaving sendMultiMap");
+
     }
 
     /** Given a multimap mm with several pairs (id1,id2), keep only one pair for
@@ -413,11 +448,11 @@ namespace espresso {
       longint A, B;
       System& system = getSystemRef();
 
+      LOG4ESPP_INFO(theLogger, "Entering applyAR");
+
       for (boost::unordered_multimap<longint, longint>::iterator it=Blist.begin(); it!=Blist.end(); it++) {
 	A = it->second;
 	B = it->first;
-	// Add a bond
-	fpl->add(A, B);
 	// Change the state of A and B.
 	Particle* pA = system.storage->lookupLocalParticle(A);
 	Particle* pB = system.storage->lookupLocalParticle(B);
@@ -429,7 +464,11 @@ namespace espresso {
 	} else {
 	  pB->setState(pB->getState()+deltaB);
 	}
+	// Add a bond
+	fpl->add(A, B);
       }
+
+      LOG4ESPP_INFO(theLogger, "Leaving applyAR");
 
     }
 
