@@ -41,7 +41,7 @@ namespace espresso {
     //using namespace espresso::iterator;
     using namespace storage;
 
-    LOG4ESPP_LOGGER(AssociationReaction::thelogger, "DomainDecomposition");
+    LOG4ESPP_LOGGER(AssociationReaction::theLogger, "AssociationReaction");
 
     AssociationReaction::AssociationReaction(
 					     shared_ptr<System> system,
@@ -260,7 +260,7 @@ namespace espresso {
 	  if ( (dirSize==2) && (lr==1) ) continue;
 
 	  if (dirSize == 1) {
-	    LOG4ESPP_DEBUG(thelogger, "no communication");
+	    LOG4ESPP_DEBUG(theLogger, "no communication");
 	  }
 	  else {
 	    // prepare send and receive buffers

@@ -116,7 +116,7 @@ namespace espresso {
       boost::unordered_multimap<longint, longint> Alist;
       /** container for (A,B) effective partners */
       boost::unordered_multimap<longint, longint> Blist;
-      static LOG4ESPP_DECL_LOGGER(thelogger);
+      static LOG4ESPP_DECL_LOGGER(theLogger);
     };
   }
 }
