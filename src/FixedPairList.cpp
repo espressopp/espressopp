@@ -99,7 +99,6 @@ namespace espresso {
       std::swap(pid1, pid2);
 
     System& system = storage->getSystemRef();
-    esutil::Error err(system.comm);
     
     // ADD THE LOCAL PAIR
     Particle *p1 = storage->lookupRealParticle(pid1);
@@ -111,13 +110,9 @@ namespace espresso {
     }
     else{
       if (!p2) {
-        std::stringstream msg;
-        msg << "Adding error. Fixed Pair List particle p2 " << pid2 << " does not exists here and cannot be added";
-        err.setException( msg.str() );
-        //std::runtime_error(err.str());
+	LOG4ESPP_DEBUG(theLogger, "Particle p2 " << pid2 << " not found");
       }
     }
-    err.checkException();
     
     if(returnVal){
       // add the pair locally
@@ -144,6 +139,7 @@ namespace espresso {
       }
       LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
     }
+    LOG4ESPP_DEBUG(theLogger, "Leaving add with returnVal " << returnVal);
     return returnVal;
   }
 
