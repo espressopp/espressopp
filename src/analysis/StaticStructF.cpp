@@ -45,7 +45,7 @@ using namespace std;
 
 namespace espresso {
     namespace analysis {
-        //currently only works for particles numbered like 0, 1, 2,...
+        // currently only works for particles numbered like 0, 1, 2,...
 
         // nqx is a number which corresponds to the different x-values of the
         // diffraction vector q. greater nqx produces more different x-values  

@@ -176,7 +176,7 @@ namespace espresso {
         //CPU0 will use particles 0, 1, 2, ... local_num_particles-1.
         //CPU1 will use particles local_num_particles, local_num_particles+1,...        
         int nodeNum = -1;
-        for(int id = 0; id < num_of_part ;id++){
+        for(long unsigned int id = 0; id < num_of_part ;id++){
             if(id % local_num_part == 0) ++nodeNum;
             idToCpu[id] = nodeNum;
             //intId++   //...if loop was with iterator

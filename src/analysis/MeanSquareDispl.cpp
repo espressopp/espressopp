@@ -21,7 +21,7 @@
 */
 
 #include "MeanSquareDispl.hpp"
-
+//#include <algorithm> //for std::sort
 using namespace std;
 //using namespace espresso;
 
@@ -131,6 +131,9 @@ namespace espresso {
     
     /* 
      * calculates mean square displacement of monomers in COM of their chains
+     *         
+     * !! currently only works for particles numbered like 0, 1, 2,... !!
+     * !! with each chain consisting particles with subsequent ids     !!
      * 
      * calc <r^2> the output is the average mean sq. displacement over 3 directions.
      * !! Important!! For D calculation factor 1/6 is already taken into account.
@@ -153,21 +156,26 @@ namespace espresso {
       for (map<size_t,int>::const_iterator itr=idToCpu.begin(); itr!=idToCpu.end(); ++itr) {
         size_t i = itr->first; //particle ID
         int whichCPU = itr->second; //CPU number
-        //printf("id %u  CPU %i \n", i, whichCPU);
+        printf("id %u  CPU %i \n", i, whichCPU);
         if(system.comm->rank()==whichCPU){
           localIDs.push_back(i);
         }
-      }     
-      
+      }
+      sort(localIDs.begin(), localIDs.end()); //sorts entries from low to high
+      //should not be necessary as long as the above iterator 
+      //iterates in ascending order according to the keys 
+           
       // COM calculation      
       Real3D posCOM = Real3D(0.0,0.0,0.0);
       real mass = 0.0;
       int count = 0; //counts number of particles of one chain
       vector< vector<Real3D> > local_chainCOMlist; //will store COM of conf n and chain cid as chainCOMlist[n][cid]
       for(int m=0; m<M; m++){  
-        vector<Real3D> innerList; //will store the local chains' COM of one conf/snapshot        
-        for (vector<longint>::iterator itr=localIDs.begin(); itr!=localIDs.end(); ++itr){ 
-            size_t i = *itr;                   
+        vector<Real3D> innerList; //will store the local chains' COM of one conf/snapshot
+
+        //loop over local particles
+        for(int entry = 0; entry < localIDs.size(); entry++){           
+            longint i = localIDs[entry]; //pid
             Real3D pos = getConf(m)->getCoordinates(i);
             posCOM += pos;
             mass += 1;
@@ -192,10 +200,10 @@ namespace espresso {
         Z[m] = 0.0;
         for(int n=0; n<M-m; n++){
           int part_count = 0;
-          int local_cid = 0; //local chainID. each CPU starts with chain local_cid = 0, so it is not a global id         
-          for (vector<longint>::iterator itr=localIDs.begin(); itr!=localIDs.end(); ++itr) {
-            size_t i = *itr;
-            //part_count++;
+          int local_cid = 0; //local chainID. each CPU starts with chain local_cid = 0, so it is not a global id
+          //loop over local particles
+          for(int entry = 0; entry < localIDs.size(); entry++){           
+            longint i = localIDs[entry]; //pid   
             if(part_count == chainlength){
                 ++local_cid;
                 part_count = 0;
