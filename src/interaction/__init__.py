@@ -49,6 +49,7 @@ from espresso.interaction.Harmonic import *
 from espresso.interaction.Quartic import *
 from espresso.interaction.VSphereSelf import *
 from espresso.interaction.VSpherePair import *
+from espresso.interaction.MirrorLennardJones import *
 
 from espresso.interaction.HarmonicUnique import *
 
