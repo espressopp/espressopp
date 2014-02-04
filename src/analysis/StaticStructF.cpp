@@ -33,7 +33,7 @@
 #include <math.h>       // cos and ceil and sqrt
 #include <algorithm>    // std::min
 #include <functional>   // std::plus
-#include <time.h>       // time_t
+#include <time.h>       // time_t, for particle-distribution-to-cpu time
 
 #ifndef M_PIl
 #define M_PIl 3.1415926535897932384626433832795029L
@@ -151,9 +151,12 @@ namespace espresso {
             python::list pyli;
 
             //loop over different q values
+            //starting from zero because combinations with negative components 
+            //will give the same result in S(q). so S(q) is the same for
+            //the 8 vectors q=(x,y,z),(-x,y,z), (x,-y,z),(x,y,-z),(-x,-y,z),...
             for (int hx = -nqx; hx <= nqx; hx++) {
                 for (int hy = -nqy; hy <= nqy; hy++) {
-                    for (int hz = -nqz; hz <= nqz; hz++) {
+                    for (int hz = 0; hz <= nqz; hz++) {
 
                         //values of q-vector
                         q[0] = hx * dqs[0];
@@ -305,9 +308,12 @@ namespace espresso {
 
 
             //loop over different q values
+            //starting from zero because combinations with negative components 
+            //will give the same result in S(q). so S(q) is the same for
+            //the 8 vectors q=(x,y,z),(-x,y,z), (x,-y,z),(x,y,-z),(-x,-y,z),...
             for (int hx = -nqx; hx <= nqx; hx++) {
                 for (int hy = -nqy; hy <= nqy; hy++) {
-                    for (int hz = -nqz; hz <= nqz; hz++) {
+                    for (int hz = 0; hz <= nqz; hz++) {
 
                         //values of q-vector
                         q[0] = hx * dqs[0];
