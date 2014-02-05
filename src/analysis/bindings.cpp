@@ -41,6 +41,7 @@
 #include "ConfigsParticleDecomp.hpp"
 #include "VelocityAutocorrelation.hpp"
 #include "MeanSquareDispl.hpp"
+#include "MeanSquareInternalDist.hpp"
 #include "Autocorrelation.hpp"
 #include "RadialDistrF.hpp"
 #include "StaticStructF.hpp"
@@ -87,6 +88,7 @@ namespace espresso {
       ConfigsParticleDecomp::registerPython();
       VelocityAutocorrelation::registerPython();
       MeanSquareDispl::registerPython();
+      MeanSquareInternalDist::registerPython();
       RadialDistrF::registerPython();
       StaticStructF::registerPython();
       RDFatomistic::registerPython();
