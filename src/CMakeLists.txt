@@ -57,7 +57,7 @@ install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/ESPRC DESTINATION bin)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 if (EXTERNAL_BOOST)
-  set (BOOST ${Boost_MPI_LIBRARY} ${Boost_PYTHON_LIBRARY} ${Boost_SERIALIZATION_LIBRARY} )
+  set (BOOST ${Boost_LIBRARIES} )
 else(EXTERNAL_BOOST)
   set (BOOST espresso_boost)
 endif(EXTERNAL_BOOST)

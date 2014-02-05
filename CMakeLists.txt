@@ -127,7 +127,7 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 # add_definitions( -DHAVE_CONFIG_H )
 
 if (EXTERNAL_BOOST)
-  find_package(Boost 1.42.0 REQUIRED COMPONENTS mpi python serialization )
+  find_package(Boost 1.42.0 REQUIRED COMPONENTS mpi python serialization filesystem)
   include_directories(${Boost_INCLUDE_DIRS})
 else(EXTERNAL_BOOST)
   include_directories(${CMAKE_SOURCE_DIR}/contrib/boost)
