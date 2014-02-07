@@ -28,7 +28,7 @@ import espresso.integrator
 import espresso.interaction
 import espresso.analysis
 import espresso.bc
-import MPI
+import mpi4py.MPI as MPI
 import math
 import logging
 

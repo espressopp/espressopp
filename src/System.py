@@ -57,7 +57,7 @@ from espresso.esutil import cxxinit
 from espresso.Exceptions import Error
 
 import _espresso
-import MPI
+import mpi4py.MPI as MPI
 
 
 class SystemLocal(_espresso.System):

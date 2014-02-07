@@ -26,7 +26,7 @@
 
 """
 import espresso
-import MPI
+import mpi4py.MPI as MPI
 
 def Minimal(num_particles, box, rc=1.12246, skin=0.3, dt=0.005, temperature=None):
   '''return minimal system and integrator whithout any interactions defined:

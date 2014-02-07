@@ -22,7 +22,7 @@
 import unittest
 from espresso import pmi
 from espresso.esutil import collectives
-import MPI
+import mpi4py.MPI as MPI
 
 class TestCollectives(unittest.TestCase):
     def testLocate(self):

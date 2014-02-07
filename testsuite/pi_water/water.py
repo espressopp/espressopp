@@ -10,7 +10,7 @@
 import sys
 import time
 import espresso
-import MPI
+import mpi4py.MPI as MPI
 import logging
 import copy
 import math

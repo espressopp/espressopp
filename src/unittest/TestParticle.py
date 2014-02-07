@@ -21,7 +21,7 @@
 
 from espresso import *
 from espresso import unittest
-import MPI
+import mpi4py.MPI as MPI
 
 class TestParticleLocal(unittest.TestCase) :
     def test0get(self):

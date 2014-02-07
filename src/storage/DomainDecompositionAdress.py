@@ -40,7 +40,7 @@ from espresso import pmi
 from espresso.esutil import cxxinit
 from _espresso import storage_DomainDecompositionAdress
 from espresso import Int3D, toInt3DFromVector
-import MPI
+import mpi4py.MPI as MPI
 
 from espresso.storage.Storage import *
 

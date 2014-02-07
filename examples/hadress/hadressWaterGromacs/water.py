@@ -13,7 +13,7 @@ import math
 import sys
 import time
 import espresso
-import MPI
+import mpi4py.MPI as MPI
 import logging
 from espresso import Real3D, Int3D
 from espresso.tools.convert import gromacs

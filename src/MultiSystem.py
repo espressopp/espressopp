@@ -27,7 +27,7 @@
 """
 from espresso.esutil import cxxinit
 from espresso import pmi
-import MPI
+import mpi4py.MPI as MPI
 
 class MultiSystemLocal(object):
     """Local MultiSystem to simulate and analyze several systems in parallel."""

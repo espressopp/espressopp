@@ -12,7 +12,7 @@ import sys
 import time
 import os
 import espresso
-import MPI
+import mpi4py.MPI as MPI
 import math
 import logging
 from espresso import Real3D, Int3D

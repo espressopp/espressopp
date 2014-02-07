@@ -26,7 +26,7 @@
 
 """
 import espresso
-import MPI
+import mpi4py.MPI as MPI
 
 def LennardJones(num_particles, box=(0,0,0), rc=1.12246, skin=0.3, dt=0.005, epsilon=1.0, sigma=1.0, shift='auto', temperature=None, xyzfilename=None, xyzrfilename=None):
   '''return random Lennard Jones system and integrator:

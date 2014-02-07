@@ -18,7 +18,7 @@ import sys
 import time
 import math
 import espresso
-import MPI
+import mpi4py.MPI as MPI
 from espresso import Real3D
 from espresso.tools import decomp
 

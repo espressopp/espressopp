@@ -22,7 +22,7 @@
 '''
 
 # The script itself
-import MPI
+import mpi4py.MPI as MPI
 import espresso
 from espresso import Real3D
 

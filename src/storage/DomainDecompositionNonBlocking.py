@@ -30,7 +30,7 @@ from espresso.esutil import cxxinit
 from _espresso import storage_DomainDecomposition
 from _espresso import storage_DomainDecompositionNonBlocking
 from espresso import Int3D, toInt3DFromVector
-import MPI
+import mpi4py.MPI as MPI
 
 #from espresso.storage.Storage import *
 from espresso.storage.DomainDecomposition import *

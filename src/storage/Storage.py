@@ -101,7 +101,7 @@ Examples:
 
 from espresso import pmi
 from espresso import Int3D
-import MPI
+import mpi4py.MPI as MPI
 import logging
 from espresso import toReal3DFromVector, ParticleLocal, Particle
 from espresso.Exceptions import ParticleDoesNotExistHere

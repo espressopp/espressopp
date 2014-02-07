@@ -5,7 +5,7 @@
 """
 
 import espresso
-import MPI
+import mpi4py.MPI as MPI
 
 # skin for Verlet list
 skin = 0.3

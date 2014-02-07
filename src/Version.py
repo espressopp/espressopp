@@ -48,7 +48,7 @@ from espresso import pmi
 from espresso.esutil import cxxinit
 
 import _espresso
-import MPI
+import mpi4py.MPI as MPI
 
 
 class VersionLocal(_espresso.Version):

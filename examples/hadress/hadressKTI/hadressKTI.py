@@ -5,7 +5,7 @@
 import sys
 import time
 import espresso
-import MPI
+import mpi4py.MPI as MPI
 
 import Tetracryst # Preparation of tetrahedral crystal and constuctions of bonds in tetrahedral liquid
 
