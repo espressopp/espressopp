@@ -170,14 +170,16 @@ namespace espresso {
         if(num_of_part % chainlength != 0){
             cout << "chainlength does not match total number of particles\n"
                     << "chainlength: " << chainlength
-                    << "\n num_of_part " << num_of_part << "\n\n"; 
+                    << "\n num_of_part " << num_of_part << "\n\n";             
         }
         
+        cout << "\n idToCpu \n"; //starts next... 
+        //assignment particles to cpus (= filling of map idToCpu)
         //CPU0 will use particles 0, 1, 2, ... local_num_particles-1.
         //CPU1 will use particles local_num_particles, local_num_particles+1,...        
         int nodeNum = -1;
         for(long unsigned int id = 0; id < num_of_part ;id++){
-            if(id % local_num_part == 0) ++nodeNum;
+            if(id % local_num_part == 0){ ++nodeNum;}
             idToCpu[id] = nodeNum;
             //intId++   //...if loop was with iterator
             //if(intId %)local_num_part == 0) nodeNum++;            
@@ -194,11 +196,75 @@ namespace espresso {
          //output for testing
         if(this_node == 0){
             for(map<size_t, int>::iterator itr=idToCpu.begin(); itr != idToCpu.end(); itr++){
+                size_t key = itr -> first;
+                int mapped = itr -> second;
+                printf("id %u -> cpu %i \n", key, mapped);
+                //cout << key << "\t" << mapped << "\n";            
+            }
+            cout << "\n idToCid \n"; //starts next...
+        }
+                
+        //connecting particle ids with their chain ids (= filling of map idToCid)
+        //chain 0 consists of particles 0, 1, 2, ... chainlength -1
+        //chain1 consists of particles chainlength, chainlength+1,...        
+        int cid = -1;
+        for(long unsigned int id = 0; id < num_of_part ;id++){
+            if(id % chainlength == 0){ ++cid;}
+            idToCid[id] = cid;           
+        }
+        //output if the assignment failed
+        if (cid >= num_chains) {
+            if(this_node == 0){
+                cout << "assignment of chain ids went wrong."
+                     << "Particles were assigned to chain "
+                        << cid << "\n";
+                cout << "highest chain id should be " << num_chains - 1 <<"\n";
+                cout << "check if total number of particles matches with chainlength\n";
+            }
+        }
+         //output for testing
+        if(this_node == 0){
+            for(map<size_t, int>::iterator itr=idToCid.begin(); itr != idToCid.end(); itr++){
+                size_t key = itr -> first;
+                int mapped = itr -> second;
+                printf("pid %u -> cid %i \n", key, mapped);
+                //cout << key << "\t" << mapped << "\n";
+            }
+            cout << "\n cidToCpu \n"; //starts next...
+        }        
+        
+        //assignment chains to cpus (= filling of map cidToCpu)
+        //CPU0 will use particles 0, 1, 2, ... local_num_particles-1.
+        //CPU1 will use particles local_num_particles, local_num_particles+1,...        
+        nodeNum = -1;
+        //using k instead of cid to avoid conflicts with global cid
+        for(long unsigned int k = 0; k < num_chains ;k++){
+            if(k % local_num_chains == 0){ ++nodeNum;}
+            cidToCpu[k] = nodeNum;
+            //intId++   //...if loop was with iterator
+            //if(intId %)local_num_part == 0) nodeNum++;            
+        }
+        //output if the assignment failed
+        if (nodeNum >= n_nodes) {
+            if(this_node == 0){
+                cout << "assignment went wrong. Chains were assigned to proc "
+                        << nodeNum << "\n";
+                cout << "highest process number should be " << n_nodes - 1 <<"\n";
+                cout << "check if total number of particles matches with chainlength\n";
+            }
+        }
+         //output for testing
+        if(this_node == 0){
+            for(map<size_t, int>::iterator itr=cidToCpu.begin(); itr != cidToCpu.end(); itr++){
             size_t key = itr -> first;
             int mapped = itr -> second;
+            printf("cid %u -> cpu %i \n", key, mapped);
             //cout << key << "\t" << mapped << "\n";
+            }
         }
-    }
+        
+      
+        
         
         try{
           if(num_chains < n_nodes){
@@ -249,6 +315,8 @@ namespace espresso {
       int num_of_part;
       int chainlength; //for calculations with chains (instead of monomers)
       map< size_t, int > idToCpu; // binds cpu and particle id
+      map< size_t, int > cidToCpu; // binds cpu and chain id
+      map< size_t, int > idToCid; // binds cpu and particle id
       
       string key; // it can be "position", "velocity" or "unfolded"
       

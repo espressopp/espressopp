@@ -58,6 +58,7 @@ namespace espresso {
 
             virtual python::list compute() const;
             python::list computeG2() const;
+            python::list computeG3() const;
 
             void setPrint_progress(bool _print_progress) {
                 print_progress = _print_progress;
@@ -70,6 +71,12 @@ namespace espresso {
             static void registerPython();
         private:
             bool print_progress;
+            void printReal3D(Real3D v) const {
+//                real x, y, z;
+//                x = v.getItem(0); y = v.getItem(1); z = v.getItem(2);
+//                printf("(%10.4f,%10.4f,%f10.4)", x, y, z);
+                printf("(%10.4f,%10.4f,%f10.4)", v.getItem(0), v.getItem(1), v.getItem(2));
+            };
         };
     }
 }

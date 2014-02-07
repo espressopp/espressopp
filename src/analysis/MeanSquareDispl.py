@@ -41,6 +41,9 @@ class MeanSquareDisplLocal(ConfigsParticleDecompLocal, analysis_MeanSquareDispl)
 
     def computeG2(self):
       return self.cxxclass.computeG2(self)
+
+    def computeG3(self):
+      return self.cxxclass.computeG3(self)
     
     def strange(self):
       print 1
