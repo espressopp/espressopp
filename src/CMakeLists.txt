@@ -76,7 +76,7 @@ install(TARGETS pylogger LIBRARY DESTINATION ${LIB} ARCHIVE DESTINATION lib)
 
 if(BUILD_STANDALONE)
   add_executable(pypresso main/pypresso.cpp)
-  target_link_libraries(pypresso espresso_common MPI)
+  target_link_libraries(pypresso espresso_common ${MPI4PY_LIBRARIES})
   add_dependencies(pypresso scripts)
   install(TARGETS pypresso RUNTIME DESTINATION bin)
 endif(BUILD_STANDALONE)

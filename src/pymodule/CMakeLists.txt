@@ -1,6 +1,6 @@
 if (BUILD_PYTHON_MODULE)
   add_library(_espresso ../main/_espresso.cpp)
-  # target_link_libraries(_espresso espresso_common ${VAMPIRTRACE_LIBARIES} pylogger MPI)
+  # target_link_libraries(_espresso espresso_common ${VAMPIRTRACE_LIBARIES} pylogger)
   target_link_libraries(_espresso espresso_common pylogger )
   add_dependencies(_espresso scripts)
   #python libs have not prefix (default would be 'lib')

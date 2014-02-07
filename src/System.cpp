@@ -31,7 +31,7 @@
 
 #include <limits>
 
-#include "../contrib/mpi4py/mpi4py-1.3/src/include/mpi4py/mpi4py.h"
+#include <mpi4py/mpi4py.h>
 
 #ifdef VTRACE
 #include "vampirtrace/vt_user.h"
