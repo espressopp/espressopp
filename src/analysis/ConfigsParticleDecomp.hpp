@@ -171,9 +171,8 @@ namespace espresso {
             cout << "chainlength does not match total number of particles\n"
                     << "chainlength: " << chainlength
                     << "\n num_of_part " << num_of_part << "\n\n";             
-        }
+        }        
         
-        cout << "\n idToCpu \n"; //starts next... 
         //assignment particles to cpus (= filling of map idToCpu)
         //CPU0 will use particles 0, 1, 2, ... local_num_particles-1.
         //CPU1 will use particles local_num_particles, local_num_particles+1,...        
@@ -193,16 +192,7 @@ namespace espresso {
                 cout << "check if total number of particles matches with chainlength\n";
             }
         }
-         //output for testing
-        if(this_node == 0){
-            for(map<size_t, int>::iterator itr=idToCpu.begin(); itr != idToCpu.end(); itr++){
-                size_t key = itr -> first;
-                int mapped = itr -> second;
-                printf("id %u -> cpu %i \n", key, mapped);
-                //cout << key << "\t" << mapped << "\n";            
-            }
-            cout << "\n idToCid \n"; //starts next...
-        }
+        
                 
         //connecting particle ids with their chain ids (= filling of map idToCid)
         //chain 0 consists of particles 0, 1, 2, ... chainlength -1
@@ -222,16 +212,7 @@ namespace espresso {
                 cout << "check if total number of particles matches with chainlength\n";
             }
         }
-         //output for testing
-        if(this_node == 0){
-            for(map<size_t, int>::iterator itr=idToCid.begin(); itr != idToCid.end(); itr++){
-                size_t key = itr -> first;
-                int mapped = itr -> second;
-                printf("pid %u -> cid %i \n", key, mapped);
-                //cout << key << "\t" << mapped << "\n";
-            }
-            cout << "\n cidToCpu \n"; //starts next...
-        }        
+      
         
         //assignment chains to cpus (= filling of map cidToCpu)
         //CPU0 will use particles 0, 1, 2, ... local_num_particles-1.
@@ -252,19 +233,7 @@ namespace espresso {
                 cout << "highest process number should be " << n_nodes - 1 <<"\n";
                 cout << "check if total number of particles matches with chainlength\n";
             }
-        }
-         //output for testing
-        if(this_node == 0){
-            for(map<size_t, int>::iterator itr=cidToCpu.begin(); itr != cidToCpu.end(); itr++){
-            size_t key = itr -> first;
-            int mapped = itr -> second;
-            printf("cid %u -> cpu %i \n", key, mapped);
-            //cout << key << "\t" << mapped << "\n";
-            }
-        }
-        
-      
-        
+        } 
         
         try{
           if(num_chains < n_nodes){
