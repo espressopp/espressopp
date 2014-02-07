@@ -38,7 +38,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
 
 #build ESPRC
 #CMAKE_BINARY_DIR for espresso, CMAKE_CURRENT_BINARY_DIR for for _espressos.so and contrib for MPI.so
-set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_CURRENT_BINARY_DIR}/pymodule:${CMAKE_BINARY_DIR}/contrib/mpi4py")
+set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_CURRENT_BINARY_DIR}/pymodule:${CMAKE_BINARY_DIR}/contrib")
 #CMAKE_CURRENT_BINARY_DIR for pypresso
 set (BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 #CMAKE_CURRENT_BINARY_DIR for libespresso_common.so and contib for libespresso_boost

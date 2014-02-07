@@ -26,7 +26,7 @@
 
 """
 import espresso
-import MPI
+import mpi4py.MPI as MPI
 import sys
 
 def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.12246, skin=0.3, dt=0.005, epsilon=1.0, sigma=1.0, shift='auto', temperature=None, xyzfilename=None, xyzrfilename=None):

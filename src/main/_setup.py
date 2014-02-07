@@ -21,7 +21,7 @@
 
 # now load the fundamental modules
 # load mpi4py (must be loaded before _espresso)
-import MPI
+import mpi4py.MPI as MPI
 # load the ES++-C++ module
 import _espresso
 

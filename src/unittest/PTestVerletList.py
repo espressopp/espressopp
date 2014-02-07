@@ -21,7 +21,7 @@
 
 import espresso
 from espresso import unittest
-import MPI
+import mpi4py.MPI as MPI
 import math
 
 from espresso import Real3D

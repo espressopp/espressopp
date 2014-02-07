@@ -28,7 +28,8 @@
 import _espresso
 import esutil
 import pmi
-from espresso import toReal3DFromVector, toInt3DFromVector, MPI
+from espresso import toReal3DFromVector, toInt3DFromVector
+import mpi4py.MPI as MPI
 from espresso.Exceptions import ParticleDoesNotExistHere
 
 # Controller Particle:

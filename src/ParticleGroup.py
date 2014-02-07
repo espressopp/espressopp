@@ -28,7 +28,6 @@
 import _espresso
 import esutil
 import pmi
-#from espresso import toReal3DFromVector, MPI
 from espresso.esutil import cxxinit
 
 class ParticleGroupLocal(_espresso.ParticleGroup):

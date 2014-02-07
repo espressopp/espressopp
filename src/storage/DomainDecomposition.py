@@ -31,7 +31,7 @@ from _espresso import storage_DomainDecomposition
 from espresso import Int3D, toInt3DFromVector
 from espresso.tools import decomp
 from espresso import check
-import MPI
+import mpi4py.MPI as MPI
 
 from espresso.storage.Storage import *
 
