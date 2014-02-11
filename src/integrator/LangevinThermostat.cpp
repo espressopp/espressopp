@@ -43,6 +43,8 @@ namespace espresso {
 
       gamma  = 0.0;
       temperature = 0.0;
+      
+      adress = false;
 
       if (!system->rng) {
         throw std::runtime_error("system has no RNG");
