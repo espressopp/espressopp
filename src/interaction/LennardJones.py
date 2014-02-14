@@ -145,6 +145,14 @@ class FixedPairListLennardJonesLocal(InteractionLocal, interaction_FixedPairList
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
+
+    def getPotential(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self)
+
+    def getPotential(self, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self, potential)
             
     def setFixedPairList(self, fixedpairlist):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -209,5 +217,5 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espresso.interaction.FixedPairListLennardJonesLocal',
-            pmicall = ['setPotential', 'setFixedPairList','getFixedPairList' ]
+            pmicall = ['getPotential', 'setPotential', 'setFixedPairList','getFixedPairList' ]
         )

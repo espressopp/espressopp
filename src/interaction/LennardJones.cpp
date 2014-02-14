@@ -112,6 +112,7 @@ namespace espresso {
           init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<LennardJones> >())
           .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LennardJones> >())
           .def("setPotential", &FixedPairListLennardJones::setPotential)
+          .def("getPotential", &FixedPairListLennardJones::getPotential)
           .def("setFixedPairList", &FixedPairListLennardJones::setFixedPairList)
           .def("getFixedPairList", &FixedPairListLennardJones::getFixedPairList)
       ;
