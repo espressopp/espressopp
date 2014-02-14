@@ -150,10 +150,6 @@ class FixedPairListLennardJonesLocal(InteractionLocal, interaction_FixedPairList
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self)
 
-    def getPotential(self, potential):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.getPotential(self, potential)
-            
     def setFixedPairList(self, fixedpairlist):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setFixedPairList(self, fixedpairlist)
