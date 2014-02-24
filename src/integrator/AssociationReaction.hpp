@@ -103,6 +103,7 @@ namespace espresso {
       int deltaB; //!< state change for reactant B
       int stateAMin; //!< minimum state of reactant A
       int interval; //!< number of steps between reaction loops
+      real dt; //!< timestep from the integrator
       shared_ptr<espresso::interaction::Potential> potential;
 
       real current_cutoff;

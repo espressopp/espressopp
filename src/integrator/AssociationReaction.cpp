@@ -182,6 +182,8 @@ namespace espresso {
 
       LOG4ESPP_INFO(theLogger, "Perform AssociationReaction");
 
+      dt = integrator->getTimeStep();
+
       Alist.clear();
       // loop over VL pairs
       for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
@@ -211,7 +213,7 @@ namespace espresso {
       real dist2 = r.sqr();
       bool found;
       found=false;
-      if(dist2 < cutoff_sqr){
+      if ((dist2 < cutoff_sqr) && ((*rng)() < rate*dt*interval)){
 	if ((p1.type()==typeA) && (p2.type()==typeB) && (p1.state() >= stateAMin) && (p2.state()==0)) {
 	  Alist.insert(std::make_pair(p1.id(), p2.id()));
 	}
