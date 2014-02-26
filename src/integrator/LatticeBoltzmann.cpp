@@ -110,8 +110,8 @@ namespace espresso {
 
       initLatticeModel();				// initialize all the global weights and coefficients
 
-      printf("Constructor has finished!!!\n");
-      std::cout << "-------------------------------------\n";
+//      printf("Constructor has finished!!!\n");
+//      std::cout << "-------------------------------------\n";
     }
 
     void LatticeBoltzmann::disconnect() {
@@ -383,12 +383,7 @@ namespace espresso {
     void LatticeBoltzmann::makeLBStep () {
       /* printing out info about the LB step */
       setStepNum(integrator->getStep());
-/*
-      if (getStepNum() % 100 == 0) {
-        printf ("starting %d LB step!\n", getStepNum());
-      } else {
-      }
-*/
+
       /* PUSH-scheme (first collide then stream) */
       collideStream ();
     }
@@ -436,7 +431,6 @@ namespace espresso {
           }
         }
       }
-//      printf("\n");
     }
 
     /* STREAMING ALONG THE VELOCITY VECTORS */

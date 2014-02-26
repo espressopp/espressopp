@@ -200,6 +200,7 @@ namespace espresso {
 
       real _gamma_b, _gamma_s, _gamma_odd, _gamma_even;
       _gamma_b = getGammaBLoc();
+//      printf ("gamma_b is %8.4f\n", getGammaBLoc());
       _gamma_s = getGammaSLoc();
       _gamma_odd = getGammaOddLoc();
       _gamma_even = getGammaEvenLoc();
@@ -225,12 +226,12 @@ namespace espresso {
     void LBSite::thermalFluct(int _numVels) {
     	/* set phi values */
         // rooted density on the site
-        real rootRhoLoc = sqrt(getM_i(0));    // factor 12. comes from the fact that one uses
+        real rootRhoLoc = sqrt(12.*getM_i(0));    // factor 12. comes from the fact that one uses
                                                   // not gaussian but uniformly distributed rand.
         real _valueToAdd;
 
         for (int l = 4; l < _numVels; l++) {
-        	_valueToAdd = rootRhoLoc*getPhiLoc(l)*((*rng).normal() - 0.5);
+        	_valueToAdd = rootRhoLoc*getPhiLoc(l)*((*rng)() - 0.5);
 /*      	    std::cout << "PhiLoc[" << l << "] = " << getPhiLoc (l);
         	if (l == 4) {
 //        		std::cout << "_valueToAdd is " << _valueToAdd;

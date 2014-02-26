@@ -43,11 +43,6 @@ namespace espresso {
       virtual void createDenVel (real _rho0, Real3D _u0) = 0;
 
       /* PART FOR HANDLING EXTERNAL FORCES */
-      /* set external forces (all existing external forces will be destroyed) */
-//      virtual void setExtForce () = 0;
-      /* add external forces (all existing external forces will be preserved) */
-//      virtual void addExtForce () = 0;
-
       virtual void setForce (Real3D _force) = 0;
       virtual void addForce (Real3D _force) = 0;
 

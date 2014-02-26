@@ -36,11 +36,9 @@ namespace espresso {
 
     void LBInitConstForce::setForce(Real3D _force)
     {
+      int _id = 0;
       Int3D _Ni;
       _Ni = latticeboltzmann->getNi();
-      // that is to account for the situation when after some time external forces are canceled!
-
-      printf ("constant force z-comp is %8.4f\n", _force.getItem(2));
 
       /* add external forces loop */
       for (int i = 0; i < _Ni.getItem(0); i++) {
@@ -50,37 +48,22 @@ namespace espresso {
             if (_force != Real3D(0.,0.,0.)) {
               latticeboltzmann->setExtForceFlag(1);
               latticeboltzmann->setForceLoc(Int3D(i,j,k),_force);
+              _id = 1;
             } else {
-              latticeboltzmann->setForceLoc(Int3D(i,j,k),Real3D(0.,0.,0.));
               latticeboltzmann->setExtForceFlag(0);
+              latticeboltzmann->setForceLoc(Int3D(i,j,k),Real3D(0.,0.,0.));
             }
           }
         }
       }
-
-      // print for control getNi().getItem(0) * 0.25
-      using std::setprecision;
-      using std::fixed;
-      using std::setw;
-
-      std::cout << "-------------------------------------\n";
-      std::cout << "External force has been changed. It is a constant force:\n" ;
-      std::cout << " extForce.x is "
-          << latticeboltzmann->getForceLoc(Int3D(_Ni.getItem(0) * 0.25,0,0)).getItem(0) << "\n";
-      std::cout << " extForce.y is "
-          << latticeboltzmann->getForceLoc(Int3D(_Ni.getItem(0) * 0.25,0,0)).getItem(1) << "\n";
-      std::cout << " extForce.z is "
-          << latticeboltzmann->getForceLoc(Int3D(_Ni.getItem(0) * 0.25,0,0)).getItem(2) << "\n";
-      std::cout << "-------------------------------------\n";
+      printForce(_force, _id);
     }
 
     void LBInitConstForce::addForce(Real3D _force)
     {
+      int _id = 0;
       Int3D _Ni;
       _Ni = latticeboltzmann->getNi();
-      // that is to account for the situation when after some time external forces are canceled!
-
-      printf ("constant force z-comp is %8.4f\n", _force.getItem(2));
 
       Real3D existingforce;
 
@@ -93,29 +76,42 @@ namespace espresso {
             if (existingforce + _force != Real3D(0.,0.,0.)) {
               latticeboltzmann->setExtForceFlag(1);
               latticeboltzmann->setForceLoc(Int3D(i,j,k),existingforce + _force);
+              _id = 2;
             } else {
-              latticeboltzmann->setForceLoc(Int3D(i,j,k),Real3D(0.,0.,0.));
               latticeboltzmann->setExtForceFlag(0);
+              latticeboltzmann->setForceLoc(Int3D(i,j,k),Real3D(0.,0.,0.));
             }
           }
         }
       }
+      printForce(_force, _id);
+    }
 
-      // print for control getNi().getItem(0) * 0.25
+    void LBInitConstForce::printForce(Real3D _force, int _id)
+    {
+      // print constant force
       using std::setprecision;
       using std::fixed;
       using std::setw;
 
+      std::cout << setprecision(5);
       std::cout << "-------------------------------------\n";
-      std::cout << "External force has been changed. At site (" <<
-          (int)(_Ni.getItem(0) * 0.25) << ", 0, 0) it is:\n" ;
-      std::cout << " extForce.x is "
-          << latticeboltzmann->getForceLoc(Int3D(_Ni.getItem(0) * 0.25,0,0)).getItem(0) << "\n";
-      std::cout << " extForce.y is "
-          << latticeboltzmann->getForceLoc(Int3D(_Ni.getItem(0) * 0.25,0,0)).getItem(1) << "\n";
-      std::cout << " extForce.z is "
-          << latticeboltzmann->getForceLoc(Int3D(_Ni.getItem(0) * 0.25,0,0)).getItem(2) << "\n";
-      std::cout << "-------------------------------------\n";
+
+      if (_id == 0) {
+        std::cout << "External force has been cancelled. It is now zero.\n" ;
+      } else if (_id == 1) {
+        std::cout << "External force has been set. It is a constant force:\n" ;
+      } else if (_id == 2) {
+        std::cout << "External force has been added. It is a constant force:\n" ;
+      } else {
+      }
+
+      if (_id != 0) {
+        std::cout << " extForce.x is " << _force.getItem(0) << "\n";
+        std::cout << " extForce.y is " << _force.getItem(1) << "\n";
+        std::cout << " extForce.z is " << _force.getItem(2) << "\n";
+        std::cout << "-------------------------------------\n";
+      }
     }
 
     void LBInitConstForce::registerPython() {

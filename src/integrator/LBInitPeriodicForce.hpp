@@ -37,8 +37,10 @@ namespace espresso {
 */
         void createDenVel (real _rho0, Real3D _u0);
 
-        void setForce(Real3D _force);
-        void addForce(Real3D _force);
+        void setForce (Real3D _force);
+        void addForce (Real3D _force);
+
+        void printForce (Real3D _force, int _id);
 
         static void registerPython();
     };

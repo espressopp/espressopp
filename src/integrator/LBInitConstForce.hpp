@@ -40,6 +40,8 @@ namespace espresso {
         void setForce (Real3D _force);
         void addForce (Real3D _force);
 
+        void printForce (Real3D _force, int _id);
+
         void applyExtForce();
 
         static void registerPython();

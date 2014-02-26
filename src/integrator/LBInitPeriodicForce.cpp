@@ -36,6 +36,7 @@ namespace espresso {
 
     void LBInitPeriodicForce::setForce(Real3D _force)
     {
+      int _id = 0;
       Int3D _Ni;
       _Ni = latticeboltzmann->getNi();
       // that is to account for the situation when after some time external forces are canceled!
@@ -48,7 +49,6 @@ namespace espresso {
         periodicforce = Real3D (_force.getItem(0),
                                 _force.getItem(1),
                                 _force.getItem(2) * sin (2 * M_PI * i / _Ni.getItem(0)));
-        printf ("periodic force z-comp is %8.4f\n", periodicforce.getItem(2));
 
         for (int j = 0; j < _Ni.getItem(1); j++) {
           for (int k = 0; k < _Ni.getItem(2); k++) {
@@ -56,33 +56,20 @@ namespace espresso {
             if (periodicforce != Real3D(0.,0.,0.)) {
               latticeboltzmann->setExtForceFlag(1);
               latticeboltzmann->setForceLoc(Int3D(i,j,k),periodicforce);
+              _id = 1;
             } else {
-              latticeboltzmann->setForceLoc(Int3D(i,j,k),Real3D(0.,0.,0.));
               latticeboltzmann->setExtForceFlag(0);
+              latticeboltzmann->setForceLoc(Int3D(i,j,k),Real3D(0.,0.,0.));
             }
           }
         }
       }
-
-      // print for control getNi().getItem(0) * 0.25
-      using std::setprecision;
-      using std::fixed;
-      using std::setw;
-
-      std::cout << "-------------------------------------\n";
-      std::cout << "External force has been changed. At site ("
-          << (int)(_Ni.getItem(0) * 0.25) << ",0,0) it is:\n" ;
-      std::cout << " extForce.x is "
-          << latticeboltzmann->getForceLoc(Int3D(_Ni.getItem(0) * 0.25,0,0)).getItem(0) << "\n";
-      std::cout << " extForce.y is "
-          << latticeboltzmann->getForceLoc(Int3D(_Ni.getItem(0) * 0.25,0,0)).getItem(1) << "\n";
-      std::cout << " extForce.z is "
-          << latticeboltzmann->getForceLoc(Int3D(_Ni.getItem(0) * 0.25,0,0)).getItem(2) << "\n";
-      std::cout << "-------------------------------------\n";
+      printForce(_force, _id);
     }
 
     void LBInitPeriodicForce::addForce(Real3D _force)
     {
+      int _id = 0;
       Int3D _Ni;
       _Ni = latticeboltzmann->getNi();
       // that is to account for the situation when after some time external forces are canceled!
@@ -96,36 +83,50 @@ namespace espresso {
         periodicforce = Real3D (_force.getItem(0),
                                 _force.getItem(1),
                                 _force.getItem(2) * sin (2 * M_PI * i / _Ni.getItem(0)));
-        printf ("periodic force z-comp is %8.4f\n", periodicforce.getItem(2));
 
         for (int j = 0; j < _Ni.getItem(1); j++) {
           for (int k = 0; k < _Ni.getItem(2); k++) {
             existingforce = latticeboltzmann->getForceLoc(Int3D(i,j,k));
             // set local forces and general flag
-            // there is no check of zero force because is seems to me being very artificial
-            // to cancel an existing periodic force by a superposition. I would expect the
-            // user will simply set an external force to zero in this case
-            latticeboltzmann->setExtForceFlag(1);
-            latticeboltzmann->setForceLoc(Int3D(i,j,k),existingforce + periodicforce);
+            if (existingforce + periodicforce != Real3D(0.,0.,0.)) {
+              latticeboltzmann->setExtForceFlag(1);
+              latticeboltzmann->setForceLoc(Int3D(i,j,k),existingforce + periodicforce);
+              _id = 2;
+            } else {
+              latticeboltzmann->setExtForceFlag(0);
+              latticeboltzmann->setForceLoc(Int3D(i,j,k),Real3D(0.,0.,0.));
+            }
           }
         }
       }
+      printForce(_force, _id);
+    }
 
-      // print for control getNi().getItem(0) * 0.25
+    void LBInitPeriodicForce::printForce(Real3D _force, int _id)
+    {
+      // print constant force
       using std::setprecision;
       using std::fixed;
       using std::setw;
 
+      std::cout << setprecision(5);
       std::cout << "-------------------------------------\n";
-      std::cout << "External force has been changed. At site (" <<
-          (int)(_Ni.getItem(0) * 0.25) << ", 0, 0) it is:\n" ;
-      std::cout << " extForce.x is "
-          << latticeboltzmann->getForceLoc(Int3D(_Ni.getItem(0) * 0.25,0,0)).getItem(0) << "\n";
-      std::cout << " extForce.y is "
-          << latticeboltzmann->getForceLoc(Int3D(_Ni.getItem(0) * 0.25,0,0)).getItem(1) << "\n";
-      std::cout << " extForce.z is "
-          << latticeboltzmann->getForceLoc(Int3D(_Ni.getItem(0) * 0.25,0,0)).getItem(2) << "\n";
-      std::cout << "-------------------------------------\n";
+
+      if (_id == 0) {
+        std::cout << "External force has been cancelled. It is now zero.\n" ;
+      } else if (_id == 1) {
+        std::cout << "External force has been set. It is a harmonic force with amplitude:\n" ;
+      } else if (_id == 2) {
+        std::cout << "External force has been added. It is a harmonic force with amplitude:\n" ;
+      } else {
+      }
+
+      if (_id != 0) {
+        std::cout << " extForce.x is " << _force.getItem(0) << "\n";
+        std::cout << " extForce.y is " << _force.getItem(1) << "\n";
+        std::cout << " extForce.z is " << _force.getItem(2) << "\n";
+        std::cout << "-------------------------------------\n";
+      }
     }
 
     void LBInitPeriodicForce::registerPython() {

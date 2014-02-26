@@ -24,17 +24,17 @@
 **LBInit** - abstract base class for LatticeBoltzmann initialization
 ********************************************************************
 
-This abstract base class provides the interface and some basic
-functionality for classes that (re)initialize populations and handle external forces
+This abstract class provides the interface for derived classes that 
+(re)initialize populations and handle external forces.
   
 It provides the following methods:
 
 * createDenVel(rho0,u0)
     sets initial density and velocity 
 * setForce()
-    sets external force to a specific values
-* setForce()
-    adds a specific value to the existing forces
+    sets external force
+* addForce()
+    adds a new force to the existing one
 """
 
 from espresso.esutil import cxxinit
@@ -44,7 +44,7 @@ from espresso.integrator.LatticeBoltzmann import *
 from _espresso import integrator_LBInit
 
 class LBInitLocal(integrator_LBInit):
-    """Abstract local base class for LBInit."""
+    'Abstract local base class for LBInit.'
     def createDenVel(self,rho0,u0):
         """createDenVel helps to create initial populations with desired density and
         velocity. By default either a uniform conformation is created by function LBInitPopUniform or 
