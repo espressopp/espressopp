@@ -26,17 +26,19 @@
 
 #include <boost/bind.hpp>
 #include "storage/Storage.hpp"
+#include "iterator/CellListIterator.hpp"
 #include "System.hpp"
 
 
 namespace espresso {
+  using namespace iterator;
+  namespace integrator {
 
     LOG4ESPP_LOGGER(Settle::theLogger, "Settle");
 
-    Settle::Settle(shared_ptr<storage::Storage> _storage,
-    		shared_ptr<integrator::VelocityVerlet> _integrator,
-    		real _mO, real _mH, real _distHH, real _distOH)
-    : storage(_storage), integrator(_integrator),
+    Settle::Settle(shared_ptr<System> _system, shared_ptr<FixedTupleList> _fixedTupleList,
+      real _mO, real _mH, real _distHH, real _distOH)
+    : Extension(_system), fixedTupleList(_fixedTupleList),
       mO(_mO), mH(_mH), distHH(_distHH), distOH(_distOH){
 
         LOG4ESPP_INFO(theLogger, "construct Settle");
@@ -59,8 +61,6 @@ namespace espresso {
 		rb = t1 * ra;
 		rra = 1.0 / ra;
 
-		fixedtupleList = storage->getFixedTuples();
-
     }
 
     Settle::~Settle() {
@@ -71,12 +71,22 @@ namespace espresso {
         */
     }
 
+    void Settle::disconnect(){
+      _befIntP.disconnect();
+      _aftIntP.disconnect();
+    }
+
+    void Settle::connect(){
+      // connection to initialisation
+      _befIntP  = integrator->befIntP.connect( boost::bind(&Settle::saveOldPos, this));
+      _aftIntP  = integrator->aftIntP.connect( boost::bind(&Settle::applyConstraints, this));
+    }
 
     void Settle::saveOldPos() {
         oldPos.clear();
-
+        System& system = getSystemRef();
     	// loop over all local molecules
-        CellList realCells = storage->getRealCells();
+        CellList realCells = system.storage->getRealCells();
         for(iterator::CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 
             // check if molecule is HHO
@@ -84,7 +94,7 @@ namespace espresso {
 
                 // lookup cit in tuples, and save AT positions
                 FixedTupleListAdress::iterator it;
-                it = fixedtupleList->find(&(*cit));
+                it = fixedTupleList->find(&(*cit));
 
                 oldPos.insert(std::make_pair(cit->id(),
                         Triple<Real3D,Real3D,Real3D>(
@@ -116,6 +126,8 @@ namespace espresso {
      */
     void Settle::settlep(longint molID){
 
+    	System& system = getSystemRef();
+
     	//std::cout << "\nsettling " << molID << "\n";
 
     	// positions in previous time step
@@ -127,9 +139,9 @@ namespace espresso {
 
 
     	// retrieve particles from tuples
-    	Particle* vp = storage->lookupRealParticle(molID);
+    	Particle* vp = system.storage->lookupRealParticle(molID);
     	FixedTupleListAdress::iterator it;
-    	it = fixedtupleList->find(&(*vp));
+    	it = fixedTupleList->find(&(*vp));
 
     	Particle* O  = it->second.at(0);
     	Particle* H1 = it->second.at(1);
@@ -252,13 +264,10 @@ namespace espresso {
 
       void (Settle::*pyAdd)(longint pid) = &Settle::add;
 
-      class_<Settle, shared_ptr<Settle> >
-        ("Settle", init<
-        		shared_ptr<storage::Storage>,
-        		shared_ptr<integrator::VelocityVerlet>,
-        		real, real, real, real>())
+      class_<Settle, shared_ptr<Settle>, bases<Extension> >
+        ("integrator_Settle", init<shared_ptr<System>, shared_ptr<FixedTupleList>, real, real, real, real>())
         .def("add", pyAdd)
         ;
     }
-
+  }
 }

@@ -49,6 +49,7 @@
 #include "ExtForce.hpp"
 #include "CapForce.hpp"
 #include "ExtAnalyze.hpp"
+#include "Settle.hpp"
 #include "VelocityVerletOnRadius.hpp"
 
 #include "EmptyExtension.hpp"
@@ -82,6 +83,7 @@ namespace espresso {
       ExtForce::registerPython();
       CapForce::registerPython();
       ExtAnalyze::registerPython();
+      Settle::registerPython();
       VelocityVerletOnRadius::registerPython();
 
       EmptyExtension::registerPython();

@@ -25,32 +25,31 @@
 *******************
 
 """
-from espresso import pmi
-import _espresso 
-import espresso
 from espresso.esutil import cxxinit
+from espresso import pmi
+from espresso.integrator.Extension import *
+from _espresso import integrator_Settle
 
-class SettleLocal(_espresso.Settle):
+class SettleLocal(ExtensionLocal, integrator_Settle):
     'The (local) settle.'
 
-    def __init__(self, storage, integrator, mO=16.0, mH=1.0, distHH=1.58, distOH=1.0):
+    def __init__(self, system, fixedtuplelist, mO=16.0, mH=1.0, distHH=1.58, distOH=1.0):
         'Local construction of a settle class'
-        if pmi.workerIsActive():
-            cxxinit(self, _espresso.Settle, storage, integrator, mO, mH, distHH, distOH)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+                cxxinit(self, integrator_Settle, system, fixedtuplelist, mO, mH, distHH, distOH)
 
     def addMolecules(self, moleculelist):
         """
         Each processor takes the broadcasted list.
         """
-        if pmi.workerIsActive():
-            for pid in moleculelist: 
-                self.cxxclass.add(self, pid)
-
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+          for pid in moleculelist: 
+            self.cxxclass.add(self, pid)
 
 if pmi.isController:
-    class Settle(object):
+    class Settle(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.SettleLocal',
+            cls = 'espresso.integrator.SettleLocal',
             pmicall = [ "addMolecules" ]
             )

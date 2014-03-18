@@ -24,24 +24,24 @@
 #ifndef _SETTLE_HPP
 #define _SETTLE_HPP
 
-#include "log4espp.hpp"
-
-#include "iterator/CellListIterator.hpp"
+#include "types.hpp"
+#include "logging.hpp"
+#include "Extension.hpp"
+//#include "iterator/CellListIterator.hpp"
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
-//#include "integrator/VelocityVerletAdress.hpp"
-#include "integrator/VelocityVerlet.hpp"
-#include "Triple.hpp"
-#include "FixedTupleListAdress.hpp"
+//#include "integrator/VelocityVerlet.hpp"
+//#include "Triple.hpp"
+#include "FixedTupleList.hpp"
+#include "boost/signals2.hpp"
 
 namespace espresso {
-    class Settle  {
+  namespace integrator {
+    class Settle : public Extension {
 
         public:
-            Settle(shared_ptr<storage::Storage> _storage,
-            		shared_ptr<integrator::VelocityVerlet> _integrator,
-            		real mO, real mH,
-            		real distHH, real distOH);
+            Settle(shared_ptr<System> _system, shared_ptr<FixedTupleList> _fixedTupleList,
+            		real mO, real mH, real distHH, real distOH);
             ~Settle();
 
             void add(longint pid) { molIDs.insert(pid); } // add molecule id (called from python)
@@ -52,6 +52,7 @@ namespace espresso {
             static void registerPython();
 
         private:
+            boost::signals2::connection _befIntP, _aftIntP;
             std::set<longint> molIDs; // IDs of water molecules
 
             real mO, mH, distHH, distOH;
@@ -63,14 +64,12 @@ namespace espresso {
     		// key is molecule ID (VP particle ID), value is OHH coordinates
     		typedef boost::unordered_map<longint, Triple<Real3D, Real3D, Real3D> > OldPos;
     		OldPos oldPos;
-
-            boost::signals2::connection con1, con2;
-			shared_ptr<storage::Storage> storage;
-			shared_ptr<integrator::VelocityVerlet> integrator; // this is needed for signal connection
-			shared_ptr<FixedTupleListAdress> fixedtupleList;
-
+			shared_ptr<FixedTupleList> fixedTupleList;
+			void connect();
+	        void disconnect();
             static LOG4ESPP_DECL_LOGGER(theLogger);
     };
+  }
 }
 
 #endif
