@@ -46,7 +46,24 @@ namespace espresso {
     const int AR_COMM_TAG = 0xac;
     using namespace storage;
 
-    /** Reaction scheme for polymer growth and curing/crosslinking */
+    /** Reaction scheme for polymer growth and curing/crosslinking
+
+	This extension enables the rate-controlled stochastic curing of polymer
+	systems, either for chain growth of step growth, depending on the
+	parameters.
+
+	The variables typeA, typeB, stateAMin control the particles that enter
+	the curing reaction
+	\f[ A^a + B^0 -> A^{a+deltaA}-B^{deltaB} \f]
+	where A and B may possess additional bonds not shown. An extra bond is
+	added between A and B upon reaction.
+
+	The reaction proceeds by testing for all possible (A,B) pairs and
+	selects them only at a given rate. It works in parallel, by gathering
+	first the successful pairs between neigboring CPUs and ensuring that
+	each particle enters only in one new bond per reaction step.
+
+    */
 
     class AssociationReaction : public Extension {
 
