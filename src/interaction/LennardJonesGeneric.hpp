@@ -30,7 +30,7 @@
 namespace espresso {
   namespace interaction {
     /** This class provides methods to compute forces and energies of
-	the generic Lennard Jones potential.
+	the a generic Lennard Jones potential with arbitrary integers a and b.
 
 	\f[ V(r) = 4 \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{a} -
 	\left( \frac{\sigma}{r} \right)^{b} \right]
@@ -43,7 +43,6 @@ namespace espresso {
       real sigma;
       int a, b;
       real ff1, ff2;
-      real ef1, ef2;
 
     public:
       static void registerPython();
@@ -75,14 +74,8 @@ namespace espresso {
       virtual ~LennardJonesGeneric() {};
 
       void preset() {
-        real sigA = sigma;
-        real sigB = sigma;
-        for (int i=1; i<a; i++) sigA *= sigma;
-        for (int i=1; i<b; i++) sigB *= sigma;
-        ff1 = 48.0 * epsilon * sigA;
-        ff2 = 24.0 * epsilon * sigB;
-        ef1 =  4.0 * epsilon * sigA;
-        ef2 =  4.0 * epsilon * sigB;
+        ff1 = a*pow(sigma, a);
+        ff2 = b*pow(sigma, b);
       }
 
       // Setter and getter
@@ -116,23 +109,20 @@ namespace espresso {
         int getB() const { return b; }
         
       real _computeEnergySqrRaw(real distSqr) const {
-        real sig_over_r = sqrt(sigma / distSqr);
-        real ffA = sig_over_r;
-        real ffB = sig_over_r;
-        for (int i=0; i<a; i++) ffA *= sig_over_r;
-        for (int i=0; i<b; i++) ffB *= sig_over_r;
+    	real dist = sqrt(distSqr);
+        real sig_over_r = sigma / dist;
+        real ffA = pow(sig_over_r, a);
+        real ffB = pow(sig_over_r, b);
         real energy = 4.0 * epsilon * (ffA - ffB);
         return energy;
       }
 
-      bool _computeForceRaw(Real3D& force,
-                            const Real3D& dist,
-                            real distSqr) const {
-
-        real frac2 = 1.0 / distSqr;
-        real frac6 = frac2 * frac2 * frac2;
-        real ffactor = frac6 * (ff1 * frac6 - ff2) * frac2;
-        force = dist * ffactor;
+      bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const {
+    	real invdist = 1.0 / sqrt(distSqr);
+        real ffA     = pow(invdist, a+2);
+        real ffB     = pow(invdist, b+2);
+    	real ffactor = 4.0 * epsilon * (ff1*ffA - ff2*ffB);
+    	force = dist * ffactor;
         return true;
       }
     };
