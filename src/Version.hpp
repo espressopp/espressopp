@@ -27,8 +27,8 @@
 #include "boost/version.hpp"
 
 #define MAJORVERSION 1
-#define MINORVERSION 7
-#define PATCHLEVEL   2
+#define MINORVERSION 8
+#define PATCHLEVEL   0
 #include "hgversion.hpp"
 
 namespace espresso {
