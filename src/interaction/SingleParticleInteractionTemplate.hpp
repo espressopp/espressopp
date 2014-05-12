@@ -188,6 +188,13 @@ namespace espresso {
       std::cout << "Warning! At the moment computeVirialTensor() in SingleParticleInteractionTemplate does not work." << std::endl;
     }
 
+    template < typename _Potential >
+    inline real
+    SingleParticleInteractionTemplate< _Potential >::
+    getMaxCutoff() {
+      return potential->getMaxCutoff();
+    }
+
   }
 }
 #endif
