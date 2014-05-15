@@ -141,14 +141,15 @@ namespace espresso {
     template < typename _Potential > inline real
     SingleParticleInteractionTemplate < _Potential >::
     computeEnergyAA() {
-      std::cout << "Warning! At the moment computeEnergyAA() in SingleParticleInteractionTemplate does not work." << std::endl;
+      LOG4ESPP_INFO(theLogger, "compute force of the VSphere Self potential");
+      LOG4ESPP_INFO(theLogger, "Warning! At the moment computeEnergyAA() in SingleParticleInteractionTemplate does not work.");
       return 0.0;
     }
 
     template < typename _Potential > inline real
     SingleParticleInteractionTemplate < _Potential >::
     computeEnergyCG() {
-      std::cout << "Warning! At the moment computeEnergyCG() in SingleParticleInteractionTemplate does not work." << std::endl;
+      LOG4ESPP_INFO(theLogger, "Warning! At the moment computeEnergyCG() in SingleParticleInteractionTemplate does not work.");
       return 0.0;
     }
 
@@ -157,35 +158,35 @@ namespace espresso {
     SingleParticleInteractionTemplate < _Potential >::
     computeVirialX(std::vector<real> &p_xx_total, int bins) {
               LOG4ESPP_INFO(theLogger, "compute virial p_xx of the pressure tensor slabwise");
-              std::cout << "Warning! At the moment computeVirialX() in SingleParticleInteractionTemplate does not work." << std::endl;
+              LOG4ESPP_INFO(theLogger, "Warning! At the moment computeVirialX() in SingleParticleInteractionTemplate does not work.");
     }
 
     template < typename _Potential > inline real
     SingleParticleInteractionTemplate < _Potential >::
     computeVirial() {
       LOG4ESPP_INFO(theLogger, "compute the virial for all particles");
-      std::cout << "Warning! At the moment computeVirialX() in SingleParticleInteractionTemplate does not work." << std::endl;
+      LOG4ESPP_INFO(theLogger, "Warning! At the moment computeVirialX() in SingleParticleInteractionTemplate does not work.");
       return 0.0;
     }
 
     template < typename _Potential > inline void
     SingleParticleInteractionTemplate < _Potential >::computeVirialTensor(Tensor& w){
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for all particles");
-      std::cout << "Warning! At the moment computeVirialTensor() in SingleParticleInteractionTemplate does not work." << std::endl;
+      LOG4ESPP_INFO(theLogger, "Warning! At the moment computeVirialTensor() in SingleParticleInteractionTemplate does not work.");
     }
 
     template < typename _Potential > inline void
     SingleParticleInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor& w, real z){
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for all particles");
-      std::cout << "Warning! At the moment computeVirialTensor() in SingleParticleInteractionTemplate does not work." << std::endl;
+      LOG4ESPP_INFO(theLogger, "Warning! At the moment computeVirialTensor() in SingleParticleInteractionTemplate does not work.");
     }
 
     template < typename _Potential > inline void
     SingleParticleInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor *w, int n){
       LOG4ESPP_INFO(theLogger, "compute the virial tensor for all particles");
-      std::cout << "Warning! At the moment computeVirialTensor() in SingleParticleInteractionTemplate does not work." << std::endl;
+      LOG4ESPP_INFO(theLogger, "Warning! At the moment computeVirialTensor() in SingleParticleInteractionTemplate does not work.");
     }
 
     template < typename _Potential >
