@@ -45,6 +45,7 @@
 #include "VSphereSelf.hpp"
 #include "VSpherePair.hpp"
 #include "HarmonicTrap.hpp"
+#include "LennardJones93Wall.hpp"
 #include "MirrorLennardJones.hpp"
 
 #include "Tabulated.hpp"
@@ -108,6 +109,7 @@ namespace espresso {
       VSphereSelf::registerPython();
       VSpherePair::registerPython();
       HarmonicTrap::registerPython();
+      LennardJones93Wall::registerPython();
       MirrorLennardJones::registerPython();
       
       AngularPotential::registerPython();
