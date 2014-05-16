@@ -43,6 +43,8 @@ namespace espresso {
     using namespace iterator;
     using namespace esutil;
 
+    LOG4ESPP_LOGGER(VelocityVerlet::theLogger, "VelocityVerlet");
+
     VelocityVerlet::VelocityVerlet(shared_ptr< System > system) : MDIntegrator(system)
     {
       LOG4ESPP_INFO(theLogger, "construct VelocityVerlet");
@@ -83,7 +85,7 @@ namespace espresso {
       bool recalcForces = true;  // TODO: more intelligent
 
       if (recalcForces) {
-        LOG4ESPP_INFO(theLogger, "recalc Forces");
+        LOG4ESPP_INFO(theLogger, "recalc forces before starting main integration loop");
 
         // signal
         recalc1();
@@ -97,7 +99,7 @@ namespace espresso {
         recalc2();
       }
 
-      LOG4ESPP_INFO(theLogger, "run " << nsteps << " iterations");
+      LOG4ESPP_INFO(theLogger, "starting main integration loop (nsteps=" << nsteps << ")");
   
       for (int i = 0; i < nsteps; i++) {
         LOG4ESPP_INFO(theLogger, "Next step " << i << " of " << nsteps << " starts");
@@ -108,6 +110,7 @@ namespace espresso {
         befIntP();
 
         time = timeIntegrate.getElapsedTime();
+        LOG4ESPP_INFO(theLogger, "updating positions and velocities")
         maxDist += integrate1();
         timeInt1 += timeIntegrate.getElapsedTime() - time;
 
@@ -136,6 +139,7 @@ namespace espresso {
             timeResort += timeIntegrate.getElapsedTime() - time;
         }
 
+        LOG4ESPP_INFO(theLogger, "updating forces")
         updateForces();
 
         // signal
@@ -235,7 +239,7 @@ namespace espresso {
       real maxSqDist = 0.0; // maximal square distance a particle moves
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         real sqDist = 0.0;
-
+        LOG4ESPP_INFO(theLogger, "updating first half step of velocities and full step of positions")
         LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() << 
                 ", pos = " << cit->position() <<
                 ", v = " << cit->velocity() << 
@@ -280,6 +284,7 @@ namespace espresso {
 
     void VelocityVerlet::integrate2()
     {
+      LOG4ESPP_INFO(theLogger, "updating second half step of velocities")
       System& system = getSystemRef();
       CellList realCells = system.storage->getRealCells();
 
@@ -319,6 +324,7 @@ namespace espresso {
 
     void VelocityVerlet::updateForces()
     {
+      LOG4ESPP_INFO(theLogger, "update ghosts, calculate forces and collect ghost forces")
       real time;
       storage::Storage& storage = *getSystemRef().storage;
       time = timeIntegrate.getElapsedTime();

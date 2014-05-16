@@ -49,26 +49,29 @@ namespace espresso {
 
       LennardJonesGeneric()
 	: epsilon(0.0), sigma(0.0), a(0), b(0) {
+        LOG4ESPP_INFO(theLogger, "we are in constructor LennardJones()");
         setShift(0.0);
         setCutoff(infinity);
         preset();
       }
 
       LennardJonesGeneric(real _epsilon, real _sigma, int _a, int _b,
-		   real _cutoff, real _shift) 
-	: epsilon(_epsilon), sigma(_sigma), a(_a), b(_b) {
-        setShift(_shift);
-        setCutoff(_cutoff);
-        preset();
-      }
-
-      LennardJonesGeneric(real _epsilon, real _sigma, int _a, int _b,
 		   real _cutoff)
 	: epsilon(_epsilon), sigma(_sigma), a(_a), b(_b) {
+        LOG4ESPP_INFO(theLogger, "we are in constructor LennardJones(eps, sig, a, b, rc)");
         autoShift = false;
         setCutoff(_cutoff);
         preset();
-        setAutoShift(); 
+        setAutoShift();
+      }
+
+      LennardJonesGeneric(real _epsilon, real _sigma, int _a, int _b,
+		   real _cutoff, real _shift)
+	: epsilon(_epsilon), sigma(_sigma), a(_a), b(_b) {
+        LOG4ESPP_INFO(theLogger, "we are in constructor LennardJones(eps, sig, a, b, rc, sh)");
+        setShift(_shift);
+        setCutoff(_cutoff);
+        preset();
       }
 
       virtual ~LennardJonesGeneric() {};
@@ -81,6 +84,7 @@ namespace espresso {
       // Setter and getter
       void setEpsilon(real _epsilon) {
         epsilon = _epsilon;
+        LOG4ESPP_INFO(theLogger, "epsilon=" << epsilon);
         updateAutoShift();
         preset();
       }
@@ -89,6 +93,7 @@ namespace espresso {
 
         void setSigma(real _sigma) {
             sigma = _sigma;
+            LOG4ESPP_INFO(theLogger, "sigma=" << sigma);
             updateAutoShift();
             preset();
         }
@@ -96,6 +101,7 @@ namespace espresso {
         
         void setA(int _a) {
             a = _a;
+            LOG4ESPP_INFO(theLogger, "a=" << a);
             updateAutoShift();
             preset();
         }
@@ -103,6 +109,7 @@ namespace espresso {
         
         void setB(int _b) {
             b = _b;
+            LOG4ESPP_INFO(theLogger, "b=" << b);
             updateAutoShift();
             preset();
         }
@@ -125,6 +132,8 @@ namespace espresso {
     	force = dist * ffactor;
         return true;
       }
+
+      static LOG4ESPP_DECL_LOGGER(theLogger);
     };
 
     // provide pickle support
@@ -144,11 +153,11 @@ namespace espresso {
           sig=pot.getSigma();
           rc =pot.getCutoff();
           sh =pot.getShift();
+          a  =pot.getA();
+          b  =pot.getB();
           return boost::python::make_tuple(eps, sig, a, b, rc, sh);
       }
     };
-
-
   }
 }
 

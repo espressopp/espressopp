@@ -46,7 +46,7 @@ namespace espresso {
         CellListLennardJonesGeneric;
     typedef class FixedPairListInteractionTemplate <LennardJonesGeneric> 
         FixedPairListLennardJonesGeneric;
-
+    LOG4ESPP_LOGGER(LennardJonesGeneric::theLogger, "LennardJonesGeneric");
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
@@ -55,8 +55,8 @@ namespace espresso {
       using namespace espresso::python;
 
       class_< LennardJonesGeneric, bases< Potential > >
-    	("interaction_LennardJonesGeneric", init< real, real, int, int, real >())
-	    .def(init< real, real, int, int, real, real >())
+    	("interaction_LennardJonesGeneric", init< real, real, int, int, real, real >())
+	    .def(init< real, real, int, int, real >())
     	.add_property("sigma", &LennardJonesGeneric::getSigma, &LennardJonesGeneric::setSigma)
     	.add_property("epsilon", &LennardJonesGeneric::getEpsilon, &LennardJonesGeneric::setEpsilon)
     	.add_property("a", &LennardJonesGeneric::getA, &LennardJonesGeneric::setA)

@@ -85,6 +85,7 @@ namespace espresso {
       // Setter and getter
       void setEpsilon(real _epsilon) {
         epsilon = _epsilon;
+        LOG4ESPP_INFO(theLogger, "epsilon=" << epsilon);
         updateAutoShift();
         preset();
       }
@@ -93,6 +94,7 @@ namespace espresso {
 
       void setSigma(real _sigma) { 
         sigma = _sigma; 
+        LOG4ESPP_INFO(theLogger, "sigma=" << sigma);
         updateAutoShift();
         preset();
       }
@@ -115,6 +117,7 @@ namespace espresso {
         force = dist * ffactor;
         return true;
       }
+      static LOG4ESPP_DECL_LOGGER(theLogger);
     };
 
     // provide pickle support
