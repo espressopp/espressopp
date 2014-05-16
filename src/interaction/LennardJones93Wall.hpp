@@ -53,7 +53,7 @@ namespace espresso {
     public:
       static void registerPython();
 
-      LennardJones93Wall() : epsilon(1.0), sigma(1.0), sigma3(1.0), dir(2) {
+      LennardJones93Wall() : epsilon(1.0), sigma(1.0), sigma3(1.0), dir(0) {
       }
 
       ~LennardJones93Wall() {};
