@@ -109,10 +109,8 @@ namespace espresso {
       const bc::BC& bc = *system.bc;
 
       for(iterator::CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-        // replaced position with velocity
         Real3D force;
-        const Real3D& position = cit->position();
-        if(potential->_computeForce(force, position, bc)) {
+        if(potential->_computeForce(force, *cit, bc)) {
           cit->force() += force;
         }
       }
@@ -129,8 +127,7 @@ namespace espresso {
 
       real e=0.0;
       for(iterator::CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-        Real3D& position = cit->position();
-        e += potential->_computeEnergy(position, bc);
+        e += potential->_computeEnergy(*cit, bc);
       }
 
       real esum;

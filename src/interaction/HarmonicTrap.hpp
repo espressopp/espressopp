@@ -62,18 +62,20 @@ namespace espresso {
       Real3D getCenter() const { return center; }
       void setCenter(const Real3D& _center) { center = _center; }
 
-      real _computeEnergyRaw(const Real3D& position, const bc::BC& bc) const {
+      real _computeEnergyRaw(const Particle& p, const bc::BC& bc) const {
         real distSqr;
-        Real3D dist;
+        Real3D dist, position;
+        position = p.position();
         bc.getMinimumImageVectorBox(dist, center, position);
         distSqr = dist.sqr();
         return k*distSqr/2.;
       }
 
       bool _computeForceRaw(Real3D& force,
-                            const Real3D& position,
+                            const Particle& p,
                             const bc::BC& bc) const {
-        Real3D dist;
+        Real3D dist, position;
+	position = p.position();
         bc.getMinimumImageVectorBox(dist, position, center);
 
         force = -k*dist;

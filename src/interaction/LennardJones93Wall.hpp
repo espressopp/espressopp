@@ -87,10 +87,12 @@ namespace espresso {
 	return shift;
       }
 
-      real _computeEnergyRaw(const Real3D& position, const bc::BC& bc) const {
+      real _computeEnergyRaw(const Particle& p, const bc::BC& bc) const {
         real dist, dist3, se3;
 
-	real boxL = bc.getBoxL()[dir];
+        real boxL = bc.getBoxL()[dir];
+        Real3D position;
+        position = p.position();
 
 	if (position[dir]<sigmaCutoff) {
 	  dist = position[dir];
@@ -107,12 +109,14 @@ namespace espresso {
       }
 
       bool _computeForceRaw(Real3D& force,
-                            const Real3D& position,
+                            const Particle& p,
                             const bc::BC& bc) const {
 	real dist, dist3, se3;
         real boxL = bc.getBoxL()[dir];
 	bool opposite;
 	opposite = false;
+        Real3D position;
+        position = p.position();
 
 	if (position[dir]<sigmaCutoff) {
 	  dist = position[dir];

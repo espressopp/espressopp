@@ -38,10 +38,10 @@ namespace espresso {
     void SingleParticlePotential::registerPython() {
         using namespace espresso::python;
 
-        real (SingleParticlePotential::*computeEnergy)(const Real3D& position, const bc::BC& bc) const =
+        real (SingleParticlePotential::*computeEnergy)(const Particle& p, const bc::BC& bc) const =
           &SingleParticlePotential::computeEnergy;
 
-        Real3D (SingleParticlePotential::*computeForce)(const Real3D& position, const bc::BC& bc) const =
+        Real3D (SingleParticlePotential::*computeForce)(const Particle& p, const bc::BC& bc) const =
           &SingleParticlePotential::computeForce;
 
         class_< SingleParticlePotential, boost::noncopyable >

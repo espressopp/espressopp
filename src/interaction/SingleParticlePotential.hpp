@@ -39,8 +39,8 @@ namespace espresso {
      */
     class SingleParticlePotential {
     public:
-      virtual real computeEnergy(const Real3D& position, const bc::BC& bc) const = 0;
-      virtual Real3D computeForce(const Real3D& position, const bc::BC& bc) const = 0;
+      virtual real computeEnergy(const Particle& p, const bc::BC& bc) const = 0;
+      virtual Real3D computeForce(const Particle& p, const bc::BC& bc) const = 0;
       virtual real getMaxCutoff() = 0;
 
       static void registerPython();
@@ -58,13 +58,13 @@ namespace espresso {
       virtual ~SingleParticlePotentialTemplate() {};
 
       // Implements the SingleParticlePotential virtual interface
-      virtual real computeEnergy(const Real3D& position, const bc::BC& bc) const;
-      virtual Real3D computeForce(const Real3D& position, const bc::BC& bc) const;
+      virtual real computeEnergy(const Particle& p, const bc::BC& bc) const;
+      virtual Real3D computeForce(const Particle& p, const bc::BC& bc) const;
 
       // Implements the non-virtual interface
       // (used by e.g. the Interaction templates)
-      real _computeEnergy(const Real3D& position, const bc::BC& bc) const;
-      bool _computeForce(Real3D& force, const Real3D& position, const bc::BC& bc) const;
+      real _computeEnergy(const Particle& p, const bc::BC& bc) const;
+      bool _computeForce(Real3D& force, const Particle& p, const bc::BC& bc) const;
 
     protected:
       Derived* derived_this() {
@@ -88,24 +88,24 @@ namespace espresso {
     template < class Derived >
     inline real
     SingleParticlePotentialTemplate< Derived >::
-    computeEnergy(const Real3D& position, const bc::BC& bc) const {
-        return _computeEnergy(position, bc);
+    computeEnergy(const Particle& p, const bc::BC& bc) const {
+        return _computeEnergy(p, bc);
       }
 
     template < class Derived >
     inline real
     SingleParticlePotentialTemplate< Derived >::
-    _computeEnergy(const Real3D& position, const bc::BC& bc) const {
-      return derived_this()->_computeEnergyRaw(position, bc);
+    _computeEnergy(const Particle& p, const bc::BC& bc) const {
+      return derived_this()->_computeEnergyRaw(p, bc);
     }
 
     // Force computation
     template < class Derived >
     inline Real3D
     SingleParticlePotentialTemplate< Derived >::
-    computeForce(const Real3D& position, const bc::BC& bc) const {
+    computeForce(const Particle& p, const bc::BC& bc) const {
       Real3D force;
-      if(!_computeForce(force, position, bc)) {
+      if(!_computeForce(force, p, bc)) {
         force = 0.0;
       }
       return force;
@@ -114,8 +114,8 @@ namespace espresso {
     template < class Derived >
     inline bool
     SingleParticlePotentialTemplate< Derived >::
-    _computeForce(Real3D& force, const Real3D &position, const bc::BC& bc) const {
-      return derived_this()->_computeForceRaw(force, position, bc);
+    _computeForce(Real3D& force, const Particle& p, const bc::BC& bc) const {
+      return derived_this()->_computeForceRaw(force, p, bc);
     }
 
   }
