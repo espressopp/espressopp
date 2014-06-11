@@ -46,6 +46,8 @@ namespace espresso {
         CellListLennardJones;
     typedef class FixedPairListInteractionTemplate <LennardJones> 
         FixedPairListLennardJones;
+    LOG4ESPP_LOGGER(LennardJones::theLogger, "LennardJones");
+    // LOG4ESPP_LOGGER(VerletListLennardJones::theLogger, "VerletListLennardJones");
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON

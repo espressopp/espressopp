@@ -1,4 +1,5 @@
 /*
+  Copyright (C) 2014 Pierre de Buyl
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -21,33 +22,47 @@
 */
 
 // ESPP_CLASS
-#ifndef _VERSION_HPP
-#define _VERSION_HPP
-#include <string>
-#include "boost/version.hpp"
+#ifndef _ANALYSIS_TOTAL_VELOCITY_HPP
+#define _ANALYSIS_TOTAL_VELOCITY_HPP
 
-#define MAJORVERSION 1
-#define MINORVERSION 8
-#define PATCHLEVEL   0
-#include "hgversion.hpp"
+#include "types.hpp"
+#include "Real3D.hpp"
+#include "SystemAccess.hpp"
 
 namespace espresso {
+  namespace analysis {
 
-  class Version {
-  public:
-    Version();
-    std::string info();
-    static void registerPython();
+    /** Class to compute the total velocity of a system. TotalVelocity provides
+	a facility to reset the total velocity of the system.
+    */
 
-  private:
-    int major;
-    int minor;
-    int patchlevel;
-    std::string name;
-    std::string hgrevision;
-    std::string boostversion;
-    std::string date;
-    std::string time;
-  };
+    class TotalVelocity : public SystemAccess {
+
+    public:
+
+      TotalVelocity(shared_ptr<System> system) : SystemAccess (system) {}
+
+      ~TotalVelocity() {}
+
+      /** Compute the total velocity of the system*/
+      void compute();
+
+      /** Reset the total velocity of the system*/
+      void reset();
+
+      Real3D getV() const { return v; }
+
+      static void registerPython();
+
+    protected:
+
+      static LOG4ESPP_DECL_LOGGER(logger);
+
+    private:
+
+      Real3D v;
+    };
+  }
 }
+
 #endif

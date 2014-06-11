@@ -157,6 +157,7 @@ namespace espresso {
     PotentialTemplate< Derived >::setCutoff(real _cutoff) {
       cutoff = _cutoff;
       cutoffSqr = cutoff*cutoff;
+      LOG4ESPP_INFO(Derived::theLogger, " cutoff=" << cutoff);
       updateAutoShift();
     }
 
@@ -171,6 +172,7 @@ namespace espresso {
     PotentialTemplate< Derived >::setShift(real _shift) { 
       autoShift = false; 
       shift = _shift; 
+      LOG4ESPP_INFO(Derived::theLogger, " (manual) shift=" << shift);
     }
 
     template < class Derived > 
@@ -188,6 +190,7 @@ namespace espresso {
 	    shift = 0.0;
       else 
 	    shift = derived_this()->_computeEnergySqrRaw(cutoffSqr);
+      LOG4ESPP_INFO(Derived::theLogger, " (auto) shift=" << shift);
       return shift;
     }
 

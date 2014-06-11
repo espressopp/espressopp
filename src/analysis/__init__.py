@@ -43,6 +43,7 @@ from espresso.analysis.LBOutput import *
 from espresso.analysis.LBOutputProfileVzOfX import *
 from espresso.analysis.LBOutputScreen import *
 from espresso.analysis.LBOutputVzInTime import *
+from espresso.analysis.TotalVelocity import *
 
 from espresso.analysis.ConfigsParticleDecomp import *
 from espresso.analysis.VelocityAutocorrelation import *

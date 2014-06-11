@@ -70,7 +70,7 @@ include_directories(${MPI_INCLUDE_PATH})
 ########################################################################
 
 find_package(FFTW3 REQUIRED)
-include_directories(${FFTW3_INCLUDE_PATH})
+include_directories(${FFTW3_INCLUDES})
 
 ########################################################################
 #Process Python settings
@@ -129,7 +129,7 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 if (EXTERNAL_BOOST)
   find_package(Boost 1.45.0 COMPONENTS mpi python serialization filesystem)
   if(NOT Boost_FOUND)
-    message(FATAL_ERROR "Boost not found, make sure you have also installed boost and it's dev packageior use our internal replacement set -DEXTERNAL_BOOST=OFF")
+    message(FATAL_ERROR "Boost not found, make sure you have installed boost and it's dev packages. To hint cmake to your Boost installation, use the option -DBOOST_ROOT=/path/to/boost. As last resort you can use our internal replacement with -DEXTERNAL_BOOST=OFF")
   endif(NOT Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 else(EXTERNAL_BOOST)

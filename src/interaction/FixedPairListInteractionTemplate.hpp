@@ -105,7 +105,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     template < typename _Potential > inline void
     FixedPairListInteractionTemplate < _Potential >::addForces() {
-      LOG4ESPP_INFO(theLogger, "add forces computed by the FixedPair List");
+      LOG4ESPP_INFO(_Potential::theLogger, "adding forces of FixedPairList");
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
       real ltMaxBondSqr = fixedpairList->getLongtimeMaxBondSqr();
       for (FixedPairList::PairList::Iterator it(*fixedpairList); it.isValid(); ++it) {
@@ -122,9 +122,10 @@ namespace espresso {
         if(potential->_computeForce(force, dist)) {
           p1.force() += force;
           p2.force() -= force;
-
-          //std::cout << "force between " << p1.id() << "-" << p2.id() << " (" << sqrt(dist*dist) << ") is " << force << "";
-          //std::cout << " (" << p1.position() << ") (" << p2.position() << ")\n";
+          LOG4ESPP_DEBUG(_Potential::theLogger, "p" << p1.id() << "(" << p1.position()[0] << "," << p1.position()[1] << "," << p1.position()[2] << ") "
+        		                             << "p" << p2.id() << "(" << p2.position()[0] << "," << p2.position()[1] << "," << p2.position()[2] << ") "
+        		                             << "dist=" << sqrt(dist*dist) << " "
+        		                             << "force=(" << force[0] << "," << force[1] << "," << force[2] << ")" );
         }
       }
     }
@@ -133,7 +134,7 @@ namespace espresso {
     FixedPairListInteractionTemplate < _Potential >::
     computeEnergy() {
 
-      LOG4ESPP_INFO(theLogger, "compute energy of the FixedPair list pairs");
+      LOG4ESPP_INFO(theLogger, "compute energy of the FixedPairList pairs");
 
       real e = 0.0;
       const bc::BC& bc = *getSystemRef().bc;  // boundary conditions

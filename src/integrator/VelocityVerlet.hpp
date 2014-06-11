@@ -158,6 +158,8 @@ namespace espresso {
         real timeInt1;
         real timeInt2;
         real timeResort;
+
+        static LOG4ESPP_DECL_LOGGER(theLogger);
     };
   }
 }

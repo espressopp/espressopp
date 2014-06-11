@@ -46,9 +46,11 @@ class LennardJonesGenericLocal(PotentialLocal, interaction_LennardJonesGeneric):
         """Initialize the local generic Lennard Jones object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
+                print "here without shift"
                 cxxinit(self, interaction_LennardJonesGeneric, 
                         epsilon, sigma, a, b, cutoff)
             else:
+                print "here with shift"
                 cxxinit(self, interaction_LennardJonesGeneric, 
                         epsilon, sigma, a, b, cutoff, shift)
 
@@ -161,7 +163,7 @@ class FixedPairListLennardJonesGenericLocal(InteractionLocal, interaction_FixedP
 
 if pmi.isController:
     class LennardJonesGeneric(Potential):
-        'The Lennard-Jones potential.'
+        'The generic Lennard-Jones potential.'
         pmiproxydefs = dict(
             cls = 'espresso.interaction.LennardJonesGenericLocal',
             pmiproperty = ['epsilon', 'sigma', 'a', 'b']

@@ -52,6 +52,7 @@ from espresso.FixedTupleListAdress import *
 from espresso.MultiSystem import *
 from espresso.ParallelTempering import *
 from espresso.Version import *
+from espresso.PLogger import *
 
 
 infinity=float("inf")

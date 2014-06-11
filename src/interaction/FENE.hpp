@@ -42,7 +42,6 @@ namespace espresso {
       real K;
       real r0;
       real rMax;
-
     public:
       static void registerPython();
 
@@ -109,6 +108,8 @@ namespace espresso {
         force = dist * ffactor;
         return true;
       }
+
+      static LOG4ESPP_DECL_LOGGER(theLogger);
     };
   }
 }
