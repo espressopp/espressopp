@@ -41,9 +41,8 @@ namespace espresso {
 
       class_< LennardJones93Wall, bases< SingleParticlePotential > >
         ("interaction_LennardJones93Wall", init<>())
-        .add_property("epsilon", &LennardJones93Wall::getEpsilon, &LennardJones93Wall::setEpsilon)
-        .add_property("sigma", &LennardJones93Wall::getSigma, &LennardJones93Wall::setSigma)
-        .add_property("sigmaCutoff", &LennardJones93Wall::getSigmaCutoff, &LennardJones93Wall::setSigmaCutoff)
+        .def("setParams", &LennardJones93Wall::setParams)
+        .def("getParams", &LennardJones93Wall::getParams)
         ;
 
       class_< SingleParticleLennardJones93Wall, bases< Interaction > >

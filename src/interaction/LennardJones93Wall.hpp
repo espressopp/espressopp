@@ -35,6 +35,14 @@
 namespace espresso {
   namespace interaction {
 
+    struct LJ93WParams {
+      real epsilon;
+      real sigma;
+      real sigma3;
+      real sigmaCutoff;
+      real shift;
+    };
+
     /** This class provides methods to compute forces and energies for an
         Lennard-Jones 9-3 wall, in the direction dir.
 
@@ -43,48 +51,48 @@ namespace espresso {
     */
     class LennardJones93Wall : public SingleParticlePotentialTemplate<LennardJones93Wall> {
     private:
-      real epsilon;
-      real sigma;
-      real sigma3;
-      real sigmaCutoff;
-      real shift;
+      std::vector<LJ93WParams> params_list;
       int dir;
 
     public:
       static void registerPython();
 
-      LennardJones93Wall() : epsilon(1.0), sigma(1.0), sigma3(1.0), dir(0) {
+      LennardJones93Wall() : dir(0) {
+	params_list.resize(1);
+	LJ93WParams *pl = &params_list.at(0);
+	pl->epsilon = 1.0;
+	pl->sigma = 1.0;
+	pl->sigma3 = 1.0;
       }
 
       ~LennardJones93Wall() {};
 
       int bondType() { return Single; }
       real getMaxCutoff() { return 0.; }
-      // Setter and getter
-      void setEpsilon(real _epsilon) {
-        epsilon = _epsilon;
-	setAutoShift();
-      }
-      real getEpsilon() const { return epsilon; }
 
-      void setSigma(real _sigma) {
-        sigma = _sigma;
-	sigma3 = sigma*sigma*sigma;
-	setAutoShift();
+      void setParams(int type, real _epsilon, real _sigma, real _sigmaCutoff) {
+	if (params_list.size()<(type+1)) {
+	  params_list.resize(type+1);
+	}
+	params_list.at(type).epsilon = _epsilon;
+	params_list.at(type).sigma = _sigma;
+	params_list.at(type).sigma3 = _sigma*_sigma*_sigma;
+	params_list.at(type).sigmaCutoff = _sigmaCutoff;
+	setAutoShift(type);
       }
-      real getSigma() const { return sigma; }
 
-      void setSigmaCutoff(real _sigmaCutoff) {
-        sigmaCutoff = _sigmaCutoff;
-	setAutoShift();
+      python::tuple getParams(int type) {
+	LJ93WParams &params = params_list.at(type);
+	return python::make_tuple(params.epsilon, params.sigma, params.sigmaCutoff);
       }
-      real getSigmaCutoff() const { return sigmaCutoff; }
 
-      real setAutoShift() {
-	real dist3 = sigmaCutoff*sigmaCutoff*sigmaCutoff;
-	real se3 = sigma3 / dist3;
-	shift = epsilon * (se3*se3*se3 - se3);
-	return shift;
+      real setAutoShift(int type) {
+	LJ93WParams &params = params_list.at(type);
+
+	real dist3 = params.sigmaCutoff*params.sigmaCutoff*params.sigmaCutoff;
+	real se3 = params.sigma3 / dist3;
+	params.shift = params.epsilon * (se3*se3*se3 - se3);
+	return params.shift;
       }
 
       real _computeEnergyRaw(const Particle& p, const bc::BC& bc) const {
@@ -94,18 +102,20 @@ namespace espresso {
         Real3D position;
         position = p.position();
 
-	if (position[dir]<sigmaCutoff) {
+	const LJ93WParams &params = params_list.at(p.type());
+
+	if (position[dir]<params.sigmaCutoff) {
 	  dist = position[dir];
 	}
-	else if (position[dir]>(boxL-sigmaCutoff)) {
+	else if (position[dir]>(boxL-params.sigmaCutoff)) {
 	  dist = boxL - position[dir];
 	}
 	else {return 0.;}
 
 	dist3 = dist*dist*dist;
-	se3 = sigma3 / dist3;
+	se3 = params.sigma3 / dist3;
 
-        return epsilon * (se3*se3*se3 - se3) - shift;
+        return params.epsilon * (se3*se3*se3 - se3) - params.shift;
       }
 
       bool _computeForceRaw(Real3D& force,
@@ -117,11 +127,12 @@ namespace espresso {
 	opposite = false;
         Real3D position;
         position = p.position();
+	const LJ93WParams &params = params_list.at(p.type());
 
-	if (position[dir]<sigmaCutoff) {
+	if (position[dir]<params.sigmaCutoff) {
 	  dist = position[dir];
 	}
-	else if (position[dir]>(boxL-sigmaCutoff)) {
+	else if (position[dir]>(boxL-params.sigmaCutoff)) {
 	  dist = boxL - position[dir];
 	  opposite=true;
 	}
@@ -130,9 +141,9 @@ namespace espresso {
 	force = 0.;
 
 	dist3 = dist*dist*dist;
-	se3 = sigma3 / dist3;
+	se3 = params.sigma3 / dist3;
 
-	force[dir] = epsilon * ( 9*se3*se3*se3 - 3*se3 ) / dist;
+	force[dir] = params.epsilon * ( 9*se3*se3*se3 - 3*se3 ) / dist;
 	if (opposite) {
 	  force[dir] *= -1;
 	}

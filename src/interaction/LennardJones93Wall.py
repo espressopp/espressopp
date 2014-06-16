@@ -52,12 +52,16 @@ class SingleParticleLennardJones93WallLocal(InteractionLocal, interaction_Single
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
+    def getParams(self, type_var):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getParams(self, type)
+
 if pmi.isController:
     class LennardJones93Wall(SingleParticlePotential):
         'The LennardJones93Wall potential.'
         pmiproxydefs = dict(
             cls = 'espresso.interaction.LennardJones93WallLocal',
-            pmiproperty = ['epsilon', 'sigma', 'sigmaCutoff']
+            pmicall = ['setParams', 'getParams']
             )
 
     class SingleParticleLennardJones93Wall(Interaction):
