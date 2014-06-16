@@ -51,3 +51,4 @@ interaction
    espresso.interaction.VSpherePair.rst
    espresso.interaction.VSphereSelf.rst
    espresso.interaction.Zero.rst
+   espresso.interaction.LennardJones93.rst

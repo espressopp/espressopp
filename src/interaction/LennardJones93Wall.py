@@ -25,6 +25,20 @@
 **espresso.interaction.LennardJones93Wall**
 *******************************************
 
+This class defines a Lennard-Jones 9-3 SingleParticlePotential in the direction x.
+
+.. math:: V(r) = \\epsilon \\left( \\left(\\frac{\sigma}{r}\\right)^9 - \\left(\\frac{\sigma}{r}\\right)^3 \\right)
+
+where :math:`r` is the distance from the lower or upper wall in the x
+direction. :math:`V(r)=0` after a distance `sigmaCutoff`.
+
+Example:
+
+    >>> LJ93 = espresso.interaction.LennardJones93Wall()
+    >>> LJ93.setParams(0, 6., 1., wall_cutoff)
+    >>> SPLJ93 = espresso.interaction.SingleParticleLennardJones93Wall(system, LJ93)
+    >>> system.addInteraction(SPLJ93)
+
 """
 from espresso import pmi
 from espresso.esutil import *
@@ -40,7 +54,16 @@ class LennardJones93WallLocal(SingleParticlePotentialLocal, interaction_LennardJ
         """Initialize the local LennardJones93Wall object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_LennardJones93Wall)
+    def getParams(self, type_var):
+        """Return the epsilon, sigma and sigmaCutoff parameters for particles of type `type_var`.
+        """
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getParams(self, type_var)
 
+    def setParams(self, type_var, epsilon, sigma, sigmaCutoff):
+        """Set the epsilon, sigma and sigmaCutoff parameters for particles of type `type_var`.
+        """
+        self.cxxclass.setParams(self, type_var, epsilon, sigma, sigmaCutoff)
 
 class SingleParticleLennardJones93WallLocal(InteractionLocal, interaction_SingleParticleLennardJones93Wall):
     'The (local) LennardJones93Wall interaction.'
@@ -51,10 +74,6 @@ class SingleParticleLennardJones93WallLocal(InteractionLocal, interaction_Single
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
-
-    def getParams(self, type_var):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            return self.cxxclass.getParams(self, type)
 
 if pmi.isController:
     class LennardJones93Wall(SingleParticlePotential):
