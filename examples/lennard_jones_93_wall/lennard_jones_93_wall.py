@@ -109,6 +109,8 @@ for k in range(args.warmup_loops):
     integrator.run(args.warmup_steps)
     espresso.tools.analyse.info(system, integrator, per_atom=True)
 
+# Remove LJ93 interaction (to preserve later the ordering of energies)
+system.removeInteraction(1)
 # Remove LJ Capped potential
 system.removeInteraction(0)
 
@@ -116,6 +118,9 @@ system.removeInteraction(0)
 LJ = espresso.interaction.VerletListLennardJones(verletList)
 LJ.setPotential(0, 0, espresso.interaction.LennardJones(epsilon, sigma, rc))
 system.addInteraction(LJ)
+
+# Re-introduce LJ93
+system.addInteraction(SPLJ93)
 
 # Run system with non-capped potentials, thermostat and fixed LJ epsilon
 for k in range(args.warmup_loops):
