@@ -32,6 +32,9 @@ This class defines a Lennard-Jones 9-3 SingleParticlePotential in the direction 
 where :math:`r` is the distance from the lower or upper wall in the x
 direction. :math:`V(r)=0` after a distance `sigmaCutoff`.
 
+The parameters have to be defined for every species present in the system with
+`setParams` and can be retrieved with `getParams`.
+
 Example:
 
     >>> LJ93 = espresso.interaction.LennardJones93Wall()

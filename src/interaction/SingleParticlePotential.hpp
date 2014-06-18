@@ -36,6 +36,9 @@ namespace espresso {
 
     /** This class is used to define single-particle interactions, typically
         used for external forces on the system.
+
+	The potential may depend on any of the particle properties (type, mass,
+	etc.).
      */
     class SingleParticlePotential {
     public:
