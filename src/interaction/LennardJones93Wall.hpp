@@ -41,6 +41,7 @@ namespace espresso {
       real sigma3;
       real sigmaCutoff;
       real shift;
+      real r0;
     };
 
     /** This class provides methods to compute forces and energies for an
@@ -63,6 +64,7 @@ namespace espresso {
 	pl->epsilon = 1.0;
 	pl->sigma = 1.0;
 	pl->sigma3 = 1.0;
+	pl->r0 = 0.;
       }
 
       ~LennardJones93Wall() {};
@@ -70,7 +72,7 @@ namespace espresso {
       int bondType() { return Single; }
       real getMaxCutoff() { return 0.; }
 
-      void setParams(int type, real _epsilon, real _sigma, real _sigmaCutoff) {
+      void setParams(int type, real _epsilon, real _sigma, real _sigmaCutoff, real _r0) {
 	if (params_list.size()<(type+1)) {
 	  params_list.resize(type+1);
 	}
@@ -78,12 +80,13 @@ namespace espresso {
 	params_list.at(type).sigma = _sigma;
 	params_list.at(type).sigma3 = _sigma*_sigma*_sigma;
 	params_list.at(type).sigmaCutoff = _sigmaCutoff;
+	params_list.at(type).r0 = _r0;
 	setAutoShift(type);
       }
 
       python::tuple getParams(int type) {
 	LJ93WParams &params = params_list.at(type);
-	return python::make_tuple(params.epsilon, params.sigma, params.sigmaCutoff);
+	return python::make_tuple(params.epsilon, params.sigma, params.sigmaCutoff, params.r0);
       }
 
       real setAutoShift(int type) {
@@ -104,11 +107,11 @@ namespace espresso {
 
 	const LJ93WParams &params = params_list.at(p.type());
 
-	if (position[dir]<params.sigmaCutoff) {
-	  dist = position[dir];
+	if (position[dir]<params.sigmaCutoff+params.r0) {
+	  dist = position[dir]-params.r0;
 	}
-	else if (position[dir]>(boxL-params.sigmaCutoff)) {
-	  dist = boxL - position[dir];
+	else if (position[dir]>(boxL-params.sigmaCutoff-params.r0)) {
+	  dist = boxL - position[dir] - params.r0;
 	}
 	else {return 0.;}
 
@@ -129,11 +132,11 @@ namespace espresso {
         position = p.position();
 	const LJ93WParams &params = params_list.at(p.type());
 
-	if (position[dir]<params.sigmaCutoff) {
-	  dist = position[dir];
+	if (position[dir]<params.sigmaCutoff+params.r0) {
+	  dist = position[dir]-params.r0;
 	}
-	else if (position[dir]>(boxL-params.sigmaCutoff)) {
-	  dist = boxL - position[dir];
+	else if (position[dir]>(boxL-params.sigmaCutoff-params.r0)) {
+	  dist = boxL - position[dir] - params.r0;
 	  opposite=true;
 	}
 	else {return false;};

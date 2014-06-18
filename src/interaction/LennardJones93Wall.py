@@ -58,15 +58,15 @@ class LennardJones93WallLocal(SingleParticlePotentialLocal, interaction_LennardJ
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_LennardJones93Wall)
     def getParams(self, type_var):
-        """Return the epsilon, sigma and sigmaCutoff parameters for particles of type `type_var`.
+        """Return the epsilon, sigma, sigmaCutoff and r0 parameters for particles of type `type_var`.
         """
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getParams(self, type_var)
 
-    def setParams(self, type_var, epsilon, sigma, sigmaCutoff):
-        """Set the epsilon, sigma and sigmaCutoff parameters for particles of type `type_var`.
+    def setParams(self, type_var, epsilon, sigma, sigmaCutoff, r0):
+        """Set the epsilon, sigma, sigmaCutoff and r0 parameters for particles of type `type_var`.
         """
-        self.cxxclass.setParams(self, type_var, epsilon, sigma, sigmaCutoff)
+        self.cxxclass.setParams(self, type_var, epsilon, sigma, sigmaCutoff, r0)
 
 class SingleParticleLennardJones93WallLocal(InteractionLocal, interaction_SingleParticleLennardJones93Wall):
     'The (local) LennardJones93Wall interaction.'

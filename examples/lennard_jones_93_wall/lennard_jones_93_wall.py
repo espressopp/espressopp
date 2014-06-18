@@ -55,10 +55,11 @@ skin = 0.3
 # Wall settings
 wall_sigma = 4.
 wall_cutoff = wall_sigma*3.**(1./6.)
+wall_r0  = 2.
 
 # Box definition
 L = pow(args.num/args.density, 1./3.)
-box = (L, L, L)
+box = (L+2*wall_r0, L, L)
 
 # Initialize the espresso system
 system         = espresso.System()
@@ -74,7 +75,7 @@ particles_list = []
 for i in range(args.num):
     pos = system.bc.getRandomPos()
     # Restrict box size for particles in dimension 0
-    pos[0] = wall_sigma+pos[0]/L*(L-2.*wall_sigma)
+    pos[0] = (wall_sigma+wall_r0)+pos[0]/L*(L-2.*(wall_sigma+wall_r0))
     particles_list.append([i, pos])
 system.storage.addParticles(particles_list, 'id', 'pos')
 
@@ -95,7 +96,7 @@ system.storage.decompose()
 integrator.dt = args.dt
 
 LJ93 = espresso.interaction.LennardJones93Wall()
-LJ93.setParams(0, 6., 1., wall_cutoff)
+LJ93.setParams(0, 6., 1., wall_cutoff, wall_r0)
 SPLJ93 = espresso.interaction.SingleParticleLennardJones93Wall(system, LJ93)
 system.addInteraction(SPLJ93)
 
