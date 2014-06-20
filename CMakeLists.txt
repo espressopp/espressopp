@@ -25,7 +25,7 @@ include(CheckCXXCompilerFlag)
 ########################################################################
 # User input options                                                   #
 ########################################################################
-option(EXTERNAL_BOOST "Use external boost" OFF)
+option(EXTERNAL_BOOST "Use external boost" ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 option(BUILD_STANDALONE "Builds pypresso an standalone binary" OFF)
 option(BUILD_PYTHON_MODULE "Builds epresso as python module" ON)
