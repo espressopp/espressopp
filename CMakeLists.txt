@@ -137,7 +137,7 @@ else(EXTERNAL_BOOST)
 endif(EXTERNAL_BOOST)
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
-option(EXTERNAL_MPI4PY "Use external mpi4py" OFF)
+option(EXTERNAL_MPI4PY "Use external mpi4py" ON)
 
 if(EXTERNAL_MPI4PY)
   find_package(MPI4PY REQUIRED)
