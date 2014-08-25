@@ -3,13 +3,9 @@ cmake_minimum_required(VERSION 2.6)
 project(espressopp)
 
 set(PROJECT_VERSION "0.9.0-dev")
-SET(CPACK_PACKAGE_VERSION_MAJOR "0")
-SET(CPACK_PACKAGE_VERSION_MINOR "9")
-SET(CPACK_PACKAGE_VERSION_PATCH "0")
 
 # Cmake modules/macros are in a subdirectory to keep this file cleaner
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-
 
 enable_language(C)
 enable_language(CXX)
