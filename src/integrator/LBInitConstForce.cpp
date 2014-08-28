@@ -21,6 +21,7 @@
 */
 
 #include "python.hpp"
+#include <iomanip>
 #include "LBInitConstForce.hpp"
 
 namespace espresso {

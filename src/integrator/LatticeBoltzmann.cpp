@@ -22,6 +22,7 @@
 
 #include "python.hpp"
 #include "LatticeBoltzmann.hpp"
+#include <iomanip>
 #include "boost/serialization/vector.hpp"
 
 #include "types.hpp"

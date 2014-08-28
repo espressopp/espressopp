@@ -21,6 +21,7 @@
 */
 
 #include "python.hpp"
+#include <iomanip>
 #include "LBInitPeriodicForce.hpp"
 
 namespace espresso {

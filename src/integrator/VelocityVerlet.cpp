@@ -23,6 +23,7 @@
 //#include <iomanip>
 #include "python.hpp"
 #include "VelocityVerlet.hpp"
+#include <iomanip>
 #include "iterator/CellListIterator.hpp"
 #include "interaction/Interaction.hpp"
 #include "interaction/Potential.hpp"

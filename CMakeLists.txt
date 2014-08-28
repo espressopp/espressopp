@@ -21,7 +21,7 @@ include(CheckCXXCompilerFlag)
 ########################################################################
 # User input options                                                   #
 ########################################################################
-option(EXTERNAL_BOOST "Use external boost" ON)
+option(EXTERNAL_BOOST "Use external boost" OFF)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 option(BUILD_STANDALONE "Builds pypresso an standalone binary" OFF)
 option(BUILD_PYTHON_MODULE "Builds epresso as python module" ON)
@@ -133,7 +133,7 @@ else(EXTERNAL_BOOST)
 endif(EXTERNAL_BOOST)
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
-option(EXTERNAL_MPI4PY "Use external mpi4py" ON)
+option(EXTERNAL_MPI4PY "Use external mpi4py" OFF)
 
 if(EXTERNAL_MPI4PY)
   find_package(MPI4PY REQUIRED)
