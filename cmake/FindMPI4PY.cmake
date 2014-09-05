@@ -14,22 +14,16 @@ if(PYTHON_EXECUTABLE)
   execute_process(COMMAND ${PYTHON_EXECUTABLE} 
                 -c "import distutils.sysconfig as cg; print cg.get_python_lib(1,0)"
 		OUTPUT_VARIABLE PYTHON_SITEDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
-endif(PYTHON_EXECUTABLE)
 
-if(PYTHON_EXECUTABLE)
   execute_process(COMMAND "${PYTHON_EXECUTABLE}" 
                 -c "import sys, mpi4py; sys.stdout.write(mpi4py.__version__)"
                     OUTPUT_VARIABLE MPI4PY_VERSION
                     RESULT_VARIABLE _MPI4PY_VERSION_RESULT
                     ERROR_QUIET)
   if(NOT _MPI4PY_VERSION_RESULT)
-        message("-- mpi4py version: " ${MPI4PY_VERSION})
-        if (${MPI4PY_FIND_VERSION} VERSION_LESS ${MPI4PY_VERSION})
-          set(MPI4PY_VERSION_OK TRUE)
-        endif()
-        if(NOT MPI4PY_VERSION_OK)
-          message("     ESPResSo++ requires at least mpi4py version 1.3")
-        endif()
+    message("-- mpi4py version: " ${MPI4PY_VERSION})
+  else()
+    set(MPI4PY_VERSION 0.0)
   endif()
 endif(PYTHON_EXECUTABLE)
 
@@ -43,6 +37,6 @@ find_file (MPI4PY_LIBRARIES MPI.so HINTS ${PYTHON_SITEDIR}/mpi4py)
 # handle the QUIETLY and REQUIRED arguments and set MPI4PY_FOUND to TRUE if
 # all listed variables are TRUE
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (MPI4PY DEFAULT_MSG MPI4PY_LIBRARIES MPI4PY_INCLUDES MPI4PY_VERSION_OK)
+find_package_handle_standard_args(MPI4PY FOUND_VAR MPI4PY_FOUND REQUIRED_VARS MPI4PY_LIBRARIES MPI4PY_INCLUDES VERSION_VAR MPI4PY_VERSION)
 
 mark_as_advanced (MPI4PY_LIBRARIES MPI4PY_INCLUDES)
