@@ -136,7 +136,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 option(EXTERNAL_MPI4PY "Use external mpi4py" ON)
 
 if(EXTERNAL_MPI4PY)
-  find_package(MPI4PY REQUIRED)
+  find_package(MPI4PY 1.3 REQUIRED)
   include_directories(${MPI4PY_INCLUDES})
 else(EXTERNAL_MPI4PY)
   include_directories(${CMAKE_SOURCE_DIR}/contrib/mpi4py/mpi4py-1.3/src/include)
