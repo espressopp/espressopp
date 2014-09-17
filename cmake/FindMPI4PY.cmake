@@ -37,6 +37,6 @@ find_file (MPI4PY_LIBRARIES MPI.so HINTS ${PYTHON_SITEDIR}/mpi4py)
 # handle the QUIETLY and REQUIRED arguments and set MPI4PY_FOUND to TRUE if
 # all listed variables are TRUE
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args(MPI4PY FOUND_VAR MPI4PY_FOUND REQUIRED_VARS MPI4PY_LIBRARIES MPI4PY_INCLUDES VERSION_VAR MPI4PY_VERSION)
+find_package_handle_standard_args(MPI4PY REQUIRED_VARS MPI4PY_LIBRARIES MPI4PY_INCLUDES VERSION_VAR MPI4PY_VERSION)
 
 mark_as_advanced (MPI4PY_LIBRARIES MPI4PY_INCLUDES)
