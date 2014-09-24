@@ -31,6 +31,7 @@ from espresso.analysis.PressureTensorLayer import *
 from espresso.analysis.PressureTensorMultiLayer import *
 from espresso.analysis.Configurations import *
 from espresso.analysis.ConfigurationsExt import *
+from espresso.analysis.ConfigurationsExtAdress import *
 from espresso.analysis.Velocities import *
 from espresso.analysis.CenterOfMass import *
 from espresso.analysis.NPart import *
@@ -56,6 +57,7 @@ from espresso.analysis.RDFatomistic import *
 from espresso.analysis.Energy import *
 from espresso.analysis.Viscosity import *
 from espresso.analysis.XDensity import *
+from espresso.analysis.XTemperature import *
 from espresso.analysis.XPressure import *
 from espresso.analysis.Test import *
 from espresso.analysis.ParticleRadiusDistribution import *

@@ -189,8 +189,8 @@ start_time = time.clock()
 nsteps = steps / intervals
 
 # write the start configuration to trajectory pdb-file
-#filename = "hadress.pdb"
-#espresso.tools.pdbwrite(filename, system, molsize=num_particles+num_particlesCG, append=True)
+dump_conf_gro = espresso.io.DumpGRO(system, integrator, filename='trajCG.gro')
+dump_conf_gro_adr = espresso.io.DumpGROAdress(system, ftpl, integrator, filename='trajAT.gro')
 
 # integration and on the fly analysis
 for s in range(1, intervals + 1):
@@ -201,7 +201,9 @@ for s in range(1, intervals + 1):
   Ep = interNB.computeEnergy()
   Eb = interQuartic.computeEnergy()
   sys.stdout.write(fmt % (step, T, Ek + Ep + Eb, Ep, Eb, Ek))
-  #espresso.tools.pdbwrite(filename, system, molsize=num_particles+num_particlesCG, append=True)
+  dump_conf_gro.dump()
+  dump_conf_gro_adr.dump()
+
 
 
 

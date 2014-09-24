@@ -32,6 +32,7 @@
 #include "ConfigurationExt.hpp"
 #include "Configurations.hpp"
 #include "ConfigurationsExt.hpp"
+#include "ConfigurationsExtAdress.hpp"
 #include "Velocities.hpp"
 #include "CenterOfMass.hpp"
 #include "NPart.hpp"
@@ -49,6 +50,7 @@
 #include "RDFatomistic.hpp"
 #include "Viscosity.hpp"
 #include "XDensity.hpp"
+#include "XTemperature.hpp"
 #include "XPressure.hpp"
 #include "Test.hpp"
 #include "ParticleRadiusDistribution.hpp"
@@ -77,6 +79,7 @@ namespace espresso {
       Configurations::registerPython();
       ConfigurationExt::registerPython();
       ConfigurationsExt::registerPython();
+      ConfigurationsExtAdress::registerPython();
       Velocities::registerPython();
       CenterOfMass::registerPython();
       NPart::registerPython();
@@ -95,6 +98,7 @@ namespace espresso {
       StaticStructF::registerPython();
       RDFatomistic::registerPython();
       XDensity::registerPython();
+      XTemperature::registerPython();
       XPressure::registerPython();
       Test::registerPython();
       ParticleRadiusDistribution::registerPython();

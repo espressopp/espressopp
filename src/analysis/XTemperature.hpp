@@ -20,18 +20,28 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
-#include "bindings.hpp"
-#include "DumpXYZ.hpp"
-#include "DumpGRO.hpp"
-#include "DumpGROAdress.hpp"
-#include "FileBackup.hpp"
+// ESPP_CLASS
+#ifndef _ANALYSIS_XTEMPERATURE_HPP
+#define _ANALYSIS_XTEMPERATURE_HPP
+
+#include "types.hpp"
+#include "Observable.hpp"
+
+#include "python.hpp"
 
 namespace espresso {
-  namespace io{
-    void registerPython() {
-      DumpXYZ::registerPython();
-      DumpGRO::registerPython();
-      DumpGROAdress::registerPython();
-    }
+  namespace analysis {
+    // Class to compute the pressure profile along slabs in the x-direction of the system.
+    class XTemperature : public Observable {
+    public:
+      XTemperature(shared_ptr< System > system) : Observable(system) {}
+      ~XTemperature() {}
+      virtual real compute() const;
+      virtual python::list computeArray(int) const;
+
+      static void registerPython();
+    };
   }
 }
+
+#endif

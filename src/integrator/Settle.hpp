@@ -33,6 +33,7 @@
 //#include "integrator/VelocityVerlet.hpp"
 //#include "Triple.hpp"
 #include "FixedTupleList.hpp"
+#include "FixedTupleListAdress.hpp"
 #include "boost/signals2.hpp"
 
 namespace espresso {
@@ -40,33 +41,38 @@ namespace espresso {
     class Settle : public Extension {
 
         public:
-            Settle(shared_ptr<System> _system, shared_ptr<FixedTupleList> _fixedTupleList,
+            Settle(shared_ptr<System> _system, shared_ptr<FixedTupleListAdress> _fixedTupleList,
             		real mO, real mH, real distHH, real distOH);
             ~Settle();
 
             void add(longint pid) { molIDs.insert(pid); } // add molecule id (called from python)
             void saveOldPos();
             void applyConstraints();
+            void correctVelocities();
             void settlep(longint molID);
+            void settlev(longint molID);
 
             static void registerPython();
 
         private:
-            boost::signals2::connection _befIntP, _aftIntP;
+            boost::signals2::connection _befIntP, _aftIntP, _aftIntV;
             std::set<longint> molIDs; // IDs of water molecules
 
             real mO, mH, distHH, distOH;
-    		real mOrmT, mHrmT;
-    		real rc, ra, rb;
-    		real rra; // inverse ra
+    	    real mOrmT, mHrmT;
+    	    real rc, ra, rb;
+    	    real rra; // inverse ra
+            real mOmH, mOmH2;
+            real twicemO,twicemH,mH2;
 
-    		// positions in previous timestep
-    		// key is molecule ID (VP particle ID), value is OHH coordinates
-    		typedef boost::unordered_map<longint, Triple<Real3D, Real3D, Real3D> > OldPos;
-    		OldPos oldPos;
-			shared_ptr<FixedTupleList> fixedTupleList;
-			void connect();
-	        void disconnect();
+    	    // positions in previous timestep
+    	    // key is molecule ID (first member of fixedtuplelist), value is OHH coordinates
+    	    typedef boost::unordered_map<longint, Triple<Real3D, Real3D, Real3D> > OldPos;
+    	    OldPos oldPos;
+
+	    shared_ptr<FixedTupleListAdress> fixedTupleList;
+	    void connect();
+	    void disconnect();
             static LOG4ESPP_DECL_LOGGER(theLogger);
     };
   }

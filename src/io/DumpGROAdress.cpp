@@ -22,13 +22,14 @@
 
 #include <fstream>
 
-#include "DumpGRO.hpp"
+#include "DumpGROAdress.hpp"
 #include "storage/Storage.hpp"
 
 #include "bc/BC.hpp"
 
 #include "analysis/ConfigurationExt.hpp"
 #include "analysis/ConfigurationsExt.hpp"
+#include "analysis/ConfigurationsExtAdress.hpp"
 
 using namespace espresso;
 using namespace espresso::analysis;
@@ -37,10 +38,10 @@ using namespace std;
 namespace espresso {
   namespace io {
       
-    void DumpGRO::dump(){
+    void DumpGROAdress::dump(){
       
       shared_ptr<System> system = getSystem();
-      ConfigurationsExt conf( system );
+      ConfigurationsExtAdress conf( system,fixedTupleList );
       conf.setUnfolded(unfolded);
       conf.gather();
       
@@ -82,13 +83,23 @@ namespace espresso {
           ConfigurationExtIterator cei = conf_real-> getIterator();
           RealND::iterator ii;
           short ind;
+          size_t atomnumber;
           for(size_t i=0; i<num_of_particles; i++){
-            myfile << setw(5) << i+1;    //FIXME this should be the molecule number, not atom number
-            myfile << setiosflags(ios::left) << setw(1) << "T" << setw(4) <<   particleIDToType.find(i+1)->second <<resetiosflags(ios::left);  // pid starts at 1 // set(1)+set(4) makes in total 5, as required by the fixed format, should be resname not atomtype
-            stringstream ss;
-            ss << particleIDToType.find(i+1)->second;
-            myfile << setiosflags(ios::right) << setw(5) << (string("T") + ss.str()) << resetiosflags(ios::right);
-            myfile << setw(5) << i+1;    //NOTE this is the actual atom number - wrapped at 99999
+          // "%5d%-5s%5s%5d%8.3f%8.3f%8.3f%8.4f%8.4f%8.4f"
+            //myfile << setw(5) << i+1;    //FIXME this should be the molecule number, not atom number
+            myfile << setw(5) << 10000;
+            //myfile << setiosflags(ios::left) << setw(1) << "T" << setw(4) <<   particleIDToType.find(i+1)->second <<resetiosflags(ios::left);  // pid starts at 1 // set(1)+set(4) makes in total 5, as required by the fixed format, should be resname not atomtype
+            //stringstream ss;
+            //ss << particleIDToType.find(i+1)->second;
+            //myfile << setiosflags(ios::right) << setw(5) << (string("T") + ss.str()) << resetiosflags(ios::right);
+            myfile << setiosflags(ios::left) << setw(5) << "TTT" <<resetiosflags(ios::left);  // pid starts at 1 
+            myfile << setiosflags(ios::right) << setw(5) << (string("TTT")) << resetiosflags(ios::right);
+            if ((i+1)<100000) {
+              atomnumber=i+1;
+            } else {
+              atomnumber=i-99999;
+            }
+            myfile << setw(5) << atomnumber;    //NOTE this is the actual atom number - wrapped at 99999
             // while get token 
             // print with setw(8) << setprecision(3)
             // if more than 3
@@ -122,29 +133,29 @@ namespace espresso {
     }
       
     // Python wrapping
-    void DumpGRO::registerPython() {
+    void DumpGROAdress::registerPython() {
 
       using namespace espresso::python;
 
-      class_<DumpGRO, bases<ParticleAccess>, boost::noncopyable >
-      ("io_DumpGRO", init< shared_ptr< System >, 
+      class_<DumpGROAdress, bases<ParticleAccess>, boost::noncopyable >
+      ("io_DumpGROAdress", init< shared_ptr< System >, shared_ptr<FixedTupleListAdress>,
                            shared_ptr< integrator::MDIntegrator >, 
                            std::string, 
                            bool,
                            real,
                            std::string,
                            bool>())
-        .add_property("filename", &DumpGRO::getFilename, 
-                                  &DumpGRO::setFilename)
-        .add_property("unfolded", &DumpGRO::getUnfolded, 
-                                  &DumpGRO::setUnfolded)
-        .add_property("append", &DumpGRO::getAppend, 
-                                  &DumpGRO::setAppend)
-        .add_property("length_factor", &DumpGRO::getLengthFactor, 
-                                       &DumpGRO::setLengthFactor)
-        .add_property("length_unit", &DumpGRO::getLengthUnit, 
-                                     &DumpGRO::setLengthUnit)
-        .def("dump", &DumpGRO::dump)
+        .add_property("filename", &DumpGROAdress::getFilename, 
+                                  &DumpGROAdress::setFilename)
+        .add_property("unfolded", &DumpGROAdress::getUnfolded, 
+                                  &DumpGROAdress::setUnfolded)
+        .add_property("append", &DumpGROAdress::getAppend, 
+                                  &DumpGROAdress::setAppend)
+        .add_property("length_factor", &DumpGROAdress::getLengthFactor, 
+                                       &DumpGROAdress::setLengthFactor)
+        .add_property("length_unit", &DumpGROAdress::getLengthUnit, 
+                                     &DumpGROAdress::setLengthUnit)
+        .def("dump", &DumpGROAdress::dump)
       ;
     }
   }

@@ -19,9 +19,30 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-from espresso.esutil import pmiimport
-pmiimport('espresso.io')
+"""
+**********************************
+**espresso.analysis.XTemperature**
+**********************************
 
-from espresso.io.DumpXYZ import *
-from espresso.io.DumpGRO import *
-from espresso.io.DumpGROAdress import *
+"""
+from espresso.esutil import cxxinit
+from espresso import pmi
+
+from espresso.analysis.Observable import *
+from _espresso import analysis_XTemperature
+
+class XTemperatureLocal(ObservableLocal, analysis_XTemperature):
+  'The (local) compute the temperature profile in x direction.'
+  def __init__(self, system):
+    cxxinit(self, analysis_XTemperature, system)
+    
+  def compute(self, N):
+    return self.cxxclass.compute(self, N)
+    
+if pmi.isController :
+  class XTemperature(Observable):
+    __metaclass__ = pmi.Proxy
+    pmiproxydefs = dict(
+      pmicall = [ "compute" ],
+      cls = 'espresso.analysis.XTemperatureLocal'
+    )

@@ -179,7 +179,7 @@ start_time = time.clock()
 for i in range(num_particles + num_particlesCG):
  system.storage.modifyParticle(i, 'lambda_adrd', 0.0)
  system.storage.modifyParticle(i, 'lambda_adr', 0.0)
-
+system.storage.decompose()
 ### EQUILIBRATION ###
 # Equilibration parameters
 EQsteps = 1000
@@ -268,7 +268,7 @@ for i in range(bins+1):
  print 'Lambda: %f' %(lambdastep*i)
  for p in range(num_particles + num_particlesCG):
    system.storage.modifyParticle(p, 'lambda_adr', lambdastep*i)
-
+ system.storage.decompose()
  # Equilibration
  integrator.run(stepsequi)
  step = i * (steps+stepsequi) + stepsequi
