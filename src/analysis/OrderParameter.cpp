@@ -56,7 +56,9 @@ namespace espresso {
         phi = 0.0;
       }
       
-      return boost::math::spherical_harmonic(l, m, theta, phi);
+      // return boost::math::spherical_harmonic(l, m, theta, phi);
+#warning: OrderParameter::SphHarm is broken (used for coupled cluster analysis only)
+      return dcomplex(0);
     }
     
     void OrderParameter::registerPython() {
