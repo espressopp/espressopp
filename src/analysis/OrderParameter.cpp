@@ -57,7 +57,7 @@ namespace espresso {
       }
       
       // return boost::math::spherical_harmonic(l, m, theta, phi);
-#warning: OrderParameter::SphHarm is broken (used for coupled cluster analysis only)
+      throw std::runtime_error("OrderParameter::SphHarm is broken (used for coupled cluster analysis only");
       return dcomplex(0);
     }
     
