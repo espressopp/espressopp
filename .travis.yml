@@ -6,7 +6,7 @@ before_install:
  - sudo apt-get install cmake libfftw3-dev libopenmpi-dev 
  - if [[ $EXTERNAL = ON ]]; then sudo apt-get install libboost1.48-all-dev python-mpi4py; fi
 
-env:
+env: #maybe add mpich later
   - EXTERNAL=ON
   - EXTERNAL=OFF
 
@@ -17,5 +17,5 @@ script:
     sudo make install
 
 compiler:
-  - clang
+  - clang #mostly broken
   - gcc
