@@ -32,16 +32,16 @@ namespace espresso {
     : LBInit(system, latticeboltzmann) {
     }
 
-    /* do nothing with initial populations */
+    /* do nothing with initial populations, as we deal here only with forces */
     void LBInitConstForce::createDenVel (real _rho0, Real3D u0) {}
 
+		/* SET BODY FORCE */
     void LBInitConstForce::setForce(Real3D _force)
     {
-      int _id = 0;
-      Int3D _Ni;
-      _Ni = latticeboltzmann->getNi();
+      int _id = 0;		// _id shows whether force had been cancelled, set or added
+      Int3D _Ni = latticeboltzmann->getNi();
 
-      /* add external forces loop */
+      /* external forces loop */
       for (int i = 0; i < _Ni.getItem(0); i++) {
         for (int j = 0; j < _Ni.getItem(1); j++) {
           for (int k = 0; k < _Ni.getItem(2); k++) {
@@ -60,15 +60,15 @@ namespace espresso {
       printForce(_force, _id);
     }
 
+		/* ADD BODY FORCE TO EXISTING FORCES (IF ANY) */
     void LBInitConstForce::addForce(Real3D _force)
     {
       int _id = 0;
-      Int3D _Ni;
-      _Ni = latticeboltzmann->getNi();
+      Int3D _Ni = latticeboltzmann->getNi();
 
       Real3D existingforce;
 
-      /* add external forces loop */
+      /* external forces loop */
       for (int i = 0; i < _Ni.getItem(0); i++) {
         for (int j = 0; j < _Ni.getItem(1); j++) {
           for (int k = 0; k < _Ni.getItem(2); k++) {

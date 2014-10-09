@@ -49,6 +49,7 @@ integrator.run(500)
 # add a periodic force with a specified amplitude to the existing body force
 lbforce2 = espresso.integrator.LBInitPeriodicForce(system,lb)
 lbforce2.addForce(Real3D(0.,0.,0.0005))
+lb.lbTemp = 0.0000005
 # run 500 steps with it
 integrator.run(500)
 #

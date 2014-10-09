@@ -21,7 +21,7 @@
 */
 
 #include "python.hpp"
-#include "LatticeSite.hpp"
+#include "LGLatticeSite.hpp"
 
 #include "types.hpp"
 #include "System.hpp"
@@ -34,7 +34,7 @@ namespace espresso {
   using namespace iterator;
   namespace integrator {
     /* SITE CONSTRUCTOR */
-    LBSite::LBSite (shared_ptr<System> system, int _numVels, real _a, real _tau) {
+    LGSite::LGSite (shared_ptr<System> system, int _numVels, real _a, real _tau) {
 			/* initialization of populations, moments and equilibrium moments */
       f   = std::vector<real>(_numVels, 0.);
       m   = std::vector<real>(_numVels, 0.);
@@ -53,68 +53,72 @@ namespace espresso {
 
     /* SET AND GET PART */
 		/* for populations, moments and equilibrium moments */
-    void LBSite::setF_i (int _i, real _f) { f[_i] = _f;}
-    real LBSite::getF_i (int _i) { return f[_i];}
+    void LGSite::setF_i (int _i, real _f) { f[_i] = _f;}
+    real LGSite::getF_i (int _i) { return f[_i];}
 
-    void LBSite::setM_i (int _i, real _m) { m[_i] = _m;}
-    real LBSite::getM_i (int _i) { return m[_i];}
+    void LGSite::setM_i (int _i, real _m) { m[_i] = _m;}
+    real LGSite::getM_i (int _i) { return m[_i];}
 
-    void LBSite::setMeq_i (int _i, real _meq) { meq[_i] = _meq;}
-    real LBSite::getMeq_i (int _i) { return meq[_i];}
+    void LGSite::setMeq_i (int _i, real _meq) { meq[_i] = _meq;}
+    real LGSite::getMeq_i (int _i) { return meq[_i];}
 
     /* for static variables */
-    void LBSite::setALoc (real _a) {aLocal = _a;}
-    real LBSite::getALoc () {return aLocal;}
+    void LGSite::setALoc (real _a) {aLocal = _a;}
+    real LGSite::getALoc () {return aLocal;}
 
-    void LBSite::setTauLoc (real _tau) {tauLocal = _tau;}
-    real LBSite::getTauLoc () {return tauLocal;}
+    void LGSite::setTauLoc (real _tau) {tauLocal = _tau;}
+    real LGSite::getTauLoc () {return tauLocal;}
 
-    void LBSite::setInvBLoc (int _i, real _b) { invLoc_b[_i] = _b;}
-    real LBSite::getInvBLoc (int _i) { return invLoc_b[_i];}
+    void LGSite::setInvBLoc (int _i, real _b) { invLoc_b[_i] = _b;}
+    real LGSite::getInvBLoc (int _i) { return invLoc_b[_i];}
 
-    void LBSite::setEqWLoc (int _i, real _w) { eqWeightLoc[_i] = _w;}
-    real LBSite::getEqWLoc (int _i) { return eqWeightLoc[_i];}
+    void LGSite::setEqWLoc (int _i, real _w) { eqWeightLoc[_i] = _w;}
+    real LGSite::getEqWLoc (int _i) { return eqWeightLoc[_i];}
 
-    void LBSite::setPhiLoc (int _i, real _phi) { phiLoc[_i] = _phi;}
-    real LBSite::getPhiLoc (int _i) { return phiLoc[_i];}
+    void LGSite::setPhiLoc (int _i, real _phi) { phiLoc[_i] = _phi;}
+    real LGSite::getPhiLoc (int _i) { return phiLoc[_i];}
 
-    void LBSite::setGammaBLoc (real _gamma_b) {gamma_bLoc = _gamma_b;}
-    real LBSite::getGammaBLoc () { return gamma_bLoc;}
+    void LGSite::setGammaBLoc (real _gamma_b) {gamma_bLoc = _gamma_b;}
+    real LGSite::getGammaBLoc () { return gamma_bLoc;}
 
-    void LBSite::setGammaSLoc (real _gamma_s) {gamma_sLoc = _gamma_s;}
-    real LBSite::getGammaSLoc () { return gamma_sLoc;}
+    void LGSite::setGammaSLoc (real _gamma_s) {gamma_sLoc = _gamma_s;}
+    real LGSite::getGammaSLoc () { return gamma_sLoc;}
 
-    void LBSite::setGammaOddLoc (real _gamma_odd) {gamma_oddLoc = _gamma_odd;}
-    real LBSite::getGammaOddLoc () { return gamma_oddLoc;}
+    void LGSite::setGammaOddLoc (real _gamma_odd) {gamma_oddLoc = _gamma_odd;}
+    real LGSite::getGammaOddLoc () { return gamma_oddLoc;}
 
-    void LBSite::setGammaEvenLoc (real _gamma_even) {gamma_evenLoc = _gamma_even;}
-    real LBSite::getGammaEvenLoc () { return gamma_evenLoc;}
+    void LGSite::setGammaEvenLoc (real _gamma_even) {gamma_evenLoc = _gamma_even;}
+    real LGSite::getGammaEvenLoc () { return gamma_evenLoc;}
 
 		/* for local forces */
-    void LBSite::setExtForceLoc (Real3D _extForceLoc) {extForceLoc = _extForceLoc;}
-    Real3D LBSite::getExtForceLoc () {return extForceLoc;}
+    void LGSite::setExtForceLoc (Real3D _extForceLoc) {extForceLoc = _extForceLoc;}
+    Real3D LGSite::getExtForceLoc () {return extForceLoc;}
 
+		/* multiflow part */
+		void LGSite::setRhoLoc (real _rhoLoc) {rhoLoc = _rhoLoc;}
+		real LGSite::getRhoLoc () {return rhoLoc;}
+		
     /* OTHER HELPFUL OPERATIONS */
-    void LBSite::scaleF_i (int _i, real _value) { f[_i] *= _value;}
-    void LBSite::scaleM_i (int _i, real _value) { m[_i] *= _value;}
-    void LBSite::addM_i (int _i, real _value) { m[_i] += _value;}
+    void LGSite::scaleF_i (int _i, real _value) { f[_i] *= _value;}
+    void LGSite::scaleM_i (int _i, real _value) { m[_i] *= _value;}
+    void LGSite::addM_i (int _i, real _value) { m[_i] += _value;}
 
     /* MANAGING STATIC VARIABLES */
     /* create storage for static variables */
-    real LBSite::aLocal   = 0.;
-    real LBSite::tauLocal = 0.;
-    std::vector<real> LBSite::phiLoc(19, 0.);
-    std::vector<real> LBSite::invLoc_b(19, 0.);
-    std::vector<real> LBSite::eqWeightLoc(19, 0.);
-    real LBSite::gamma_bLoc = 0.;
-    real LBSite::gamma_sLoc = 0.;
-    real LBSite::gamma_oddLoc = 0.;
-    real LBSite::gamma_evenLoc = 0.;
+    real LGSite::aLocal   = 0.;
+    real LGSite::tauLocal = 0.;
+    std::vector<real> LGSite::phiLoc(19, 0.);
+    std::vector<real> LGSite::invLoc_b(19, 0.);
+    std::vector<real> LGSite::eqWeightLoc(19, 0.);
+    real LGSite::gamma_bLoc = 0.;
+    real LGSite::gamma_sLoc = 0.;
+    real LGSite::gamma_oddLoc = 0.;
+    real LGSite::gamma_evenLoc = 0.;
 
 /*----------------------------------------------------------------------------*/
 
     /* CALCULATION OF THE LOCAL MOMENTS */
-    void LBSite::calcLocalMoments() {
+    void LGSite::calcLocalMoments() {
       // IF ONE USES DEFAULT D3Q19 MODEL
       real f0,
         f1p2, f1m2, f3p4, f3m4, f5p6, f5m6, f7p8, f7m8, f9p10, f9m10,
@@ -166,7 +170,7 @@ namespace espresso {
     }
 
     /* CALCULATION OF THE EQUILIBRIUM MOMENTS */
-    void LBSite::calcEqMoments(int _extForceFlag) {
+    void LGSite::calcEqMoments(int _extForceFlag) {
       // IF ONE USES DEFAULT D3Q19 MODEL
 
       /* density on the site */
@@ -200,7 +204,7 @@ namespace espresso {
     }
 
 		/* RELAXATION OF THE MOMENTS TO THEIR EQUILIBRIUM VALUES */
-    void LBSite::relaxMoments (int _numVels) {
+    void LGSite::relaxMoments (int _numVels) {
       real pi_eq[6];
 
       pi_eq[0] =  getMeq_i(4); pi_eq[1] =  getMeq_i(5); pi_eq[2] =  getMeq_i(6);
@@ -231,7 +235,7 @@ namespace espresso {
     }
 
 		/* ADDING THERMAL FLUCTUATIONS */
-    void LBSite::thermalFluct(int _numVels) {
+    void LGSite::thermalFluct(int _numVels) {
 			/* values of PhiLoc were already set in LatticeBoltzmann.cpp */
 			/* here we just use them */
 
@@ -243,13 +247,9 @@ namespace espresso {
 			for (int l = 4; l < _numVels; l++) {
 				addM_i(l, rootRhoLoc*getPhiLoc(l)*((*rng)() - 0.5));
 			}
-			/*	if one rather wants to use random numbers distributed normally, change
-					in the previous lines sqrt(12.*getM_i(0)) -> sqrt(getM_i(0)) and
-					rootRhoLoc*getPhiLoc(l)*((*rng)() - 0.5)) -> rootRhoLoc*getPhiLoc(l)*normal())
-			*/
     }
 
-    void LBSite::applyForces(int _numVels) {
+    void LGSite::applyForces(int _numVels) {
       Real3D _f;
       _f = getExtForceLoc();
 
@@ -286,7 +286,7 @@ namespace espresso {
       addM_i(9, _sigma[5]);
     }
 
-    void LBSite::btranMomToPop (int _numVels) {
+    void LGSite::btranMomToPop (int _numVels) {
       // scale modes with inversed coefficients
       for (int i = 0; i < _numVels; i++) {
         scaleM_i (i, invLoc_b[i]);
@@ -344,18 +344,36 @@ namespace espresso {
       }
     }
 
-    LBSite::~LBSite() {
+		void LGSite::calcRhoJ0Loc (int _numVels) {
+			// create temporary variables
+			real _rhoLoc, _j0Loc;
+			_rhoLoc = 0.;
+			_j0Loc = 0.;
+			
+			// sum values over all directions
+			for (int i = 0; i < _numVels; i++) {
+        _rhoLoc += getF_i(i);
+//				_j0Loc += getF_i(i) *
+      }
+			
+			// assign the result to rhoLoc through set-interface
+			setRhoLoc(_rhoLoc);
+		}
+		
+		
+		
+    LGSite::~LGSite() {
     }
 
-    GhostLattice::GhostLattice (int _numVels) {
+    GhostLatticeLG::GhostLatticeLG (int _numVels) {
       pop = std::vector<real>(_numVels, 0.);
     }
 
     /* SET AND GET PART */
-    void GhostLattice::setPop_i (int _i, real _pop) { pop[_i] = _pop;}
-    real GhostLattice::getPop_i (int _i) { return pop[_i];}
+    void GhostLatticeLG::setPop_i (int _i, real _pop) { pop[_i] = _pop;}
+    real GhostLatticeLG::getPop_i (int _i) { return pop[_i];}
 
-    GhostLattice::~GhostLattice() {
+    GhostLatticeLG::~GhostLatticeLG() {
     }
   }
 }

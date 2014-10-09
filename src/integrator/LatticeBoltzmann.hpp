@@ -37,89 +37,90 @@ namespace espresso {
 
     class LatticeBoltzmann : public Extension {
       /*
-      *  Three Constructors may be used: expecting 9, 7 or 3 parameters.
-      *  Obligatory parameters are the lattice size in 3D. Without further specifications,
-      *  the D3Q19 model will be used with both lattice spacing and time set to 1.
-      *  Furthermore, for the initialization the density of 1.0 and velocity (0.,0.,0.) at
-      *  each lattice site will be set.
-      *  In a more advanced constructor, user specifies lattice spacing and time AND
-      *  initial density and velocity explicitly.
-      *  The most advanced constructor takes also the lattice model as parameters. For this,
-      *  user has to specify number of dimensions and velocities. Note that all the realisations
-      *  in the current version of the code are aimed at D3Q19 model and if you want to use
-      *  something else, please, add the corresponded code parts.
-      *
-      *  Originally, we planned this module to operate in 3D only, so if you need 2D version,
-      *  a bit more tuning is needed. On the other hand, adding different 3D lattice models
-      *  (such as D3Q15 or D3Q27) should be straightforward.
-      *
-      */
+			 * LatticeBoltzmann constructor expects 5 parameters (and a system pointer).
+			 * These are: lattice size in 3D Ni, lattice spacing a, lattice timestep tau,
+			 * number of dimensions and number of velocity vectors on a lattice site.
+			 * The lattice size, Ni, is an obligatory parameter and must be set at the
+			 * beginning of the simulation. 
+			 *
+			 * The default lattice model is D3Q19 and both lattice spacing and timestep
+			 * are set to 1.
+			 *
+			 * Note that at the present stage of development we aim at D3Q19 model. 
+			 * If you want to use something else, please, feel free to modify the code.
+			 *
+			 * Originally, we had planned this module to operate in 3D only, so if you 
+			 * need a 2D version, there is a bit more tuning involved. On the other hand,
+			 * adding different 3D lattice models (such as D3Q15 or D3Q27) is rather 
+			 * straightforward.
+			 *
+			 */
       public:
         LatticeBoltzmann (shared_ptr< System > _system, Int3D _Ni,
             real _a, real _tau, int _numDims, int _numVels);
         ~LatticeBoltzmann ();
 
         /* SET AND GET DECLARATION */
-        void setNi(Int3D _Ni);         	  // set lattice size in x,y and z-directions
-        Int3D getNi();              	      // get lattice size in x,y and z-directions
+        void setNi(Int3D _Ni);			// set lattice size in x,y and z-directions
+        Int3D getNi();							// get lattice size in x,y and z-directions
 
-        void setA (real _a);             // set lattice spacing
-        real getA ();                    // get lattice spacing
+        void setA (real _a);				// set lattice spacing
+        real getA ();								// get lattice spacing
 
-        void setTau (real _tau);         // set lattice timestep
-        real getTau ();                  // get lattice timestep
+        void setTau (real _tau);		// set lattice timestep
+        real getTau ();							// get lattice timestep
 
         void setGammaB (real _gamma_b); // set gamma for bulk
-        real getGammaB ();  			// get gamma for bulk
+        real getGammaB ();							// get gamma for bulk
 
         void setGammaS (real _gamma_s); // set gamma for shear
-        real getGammaS ();  			// get gamma for shear
+        real getGammaS ();							// get gamma for shear
 
         void setGammaOdd (real _gamma_odd); // set gamma odd
-        real getGammaOdd ();  				// get gamma odd
+        real getGammaOdd ();								// get gamma odd
 
-        void setGammaEven (real _gamma_even); 	// set gamma even
-        real getGammaEven ();  					// get gamma even
+        void setGammaEven (real _gamma_even); // set gamma even
+        real getGammaEven ();									// get gamma even
 
         void setExtForceFlag (int _extForceFlag); // set a flag for external force
         int getExtForceFlag ();                   // get a flag for external force
 
         void setNumDims (int _numDims);	// set number of dimensions
-        int getNumDims ();		            // get number of dimensions
+        int getNumDims ();							// get number of dimensions
 
         void setNumVels (int _numVels);	// set number of velocities
-        int getNumVels ();              // get number of velocities
+        int getNumVels ();							// get number of velocities
 
-        void setStepNum (int _step);			// set current step number
-        int getStepNum ();				// get current step number
+        void setStepNum (int _step);		// set current step number
+        int getStepNum ();							// get current step number
 
-        void setNBins (int _nBins);      // set number of bins
-        int getNBins ();        // get number of bins
+        void setNBins (int _nBins);			// set number of bins
+        int getNBins ();								// get number of bins
 
         void setDistr (int _i, real _distr); // set distribution
-        real getDistr (int _i);      // get distribution
-        void incDistr (int _i);     // increment distribution
+        real getDistr (int _i);					// get distribution
+        void incDistr (int _i);					// increment distribution
 
-        void setLBTemp (real _lbTemp); // set LB-temperature
-        real getLBTemp ();      // get LB-temperature
+        void setLBTemp (real _lbTemp);	// set LB-temperature
+        real getLBTemp ();							// get LB-temperature
 
         void setLBTempFlag (int _lbTempFlag);   // set a flag for fluctuations
         int getLBTempFlag ();                   // get a flag for fluctuations
 
         void setEqWeight (int _l, real _value); // set eq.weights
-        real getEqWeight (int _l);      // get eq.weights
+        real getEqWeight (int _l);							// get eq.weights
 
-        void setCi (int _l, Real3D _vec); // set c_i's
-        Real3D getCi (int _l);           // get c_i's
+        void setCi (int _l, Real3D _vec);				// set c_i's
+        Real3D getCi (int _l);									// get c_i's
 
-        void setCs2 (real _cs2);		// set cs2
-        real getCs2 ();					// get cs2
+        void setCs2 (real _cs2);								// set cs2
+        real getCs2 ();													// get cs2
 
         void setInvBi (int _l, real _value);    // set inverse b_i's
-        real getInvBi (int _l);         // get inverse b_i's
+        real getInvBi (int _l);									// get inverse b_i's
 
-        void setPhi (int _l, real _value); 	// set phi for fluctuations
-        real getPhi (int _l);  				// get phi for fluctuations
+        void setPhi (int _l, real _value);			// set phi for fluctuations
+        real getPhi (int _l);										// get phi for fluctuations
 
         void setLBFluid (Int3D _Ni, int _l, real _value);
         real getLBFluid (Int3D _Ni, int _l);
@@ -131,13 +132,13 @@ namespace espresso {
         /* END OF SET AND GET DECLARATION */
 
         /* FUNCTIONS DECLARATION */
-        void initLatticeModel ();   // initialize lattice model (weights, cis)
+        void initLatticeModel ();				// initialize lattice model (weights, cis)
         void initGammas (int _idGamma); // (re)initialize gammas
-        void initFluctuations ();   // (re)initialize fluctuation parameters
-        void makeLBStep ();          // perform one step of LB
-        void addPolyLBForces();     // add to polymers forces due to LBsites
+        void initFluctuations ();				// (re)initialize fluctuation parameters
+        void makeLBStep ();							// perform one step of LB
+        void addPolyLBForces();					// add to polymers forces due to LBsites
 
-        void collideStream ();      // use collide-stream scheme
+        void collideStream ();					// use collide-stream scheme
 
         void streaming (int _i, int _j, int _k);  // streaming along the velocity vectors
 
@@ -162,13 +163,13 @@ namespace espresso {
         real gamma_even;
         real lbTemp;
         int lbTempFlag;
-        int stepNum;				// step number
+        int stepNum;								// step number
         std::vector<real> eqWeight; // lattice weights
         std::vector<Real3D> c_i;    // velocity vectors
         std::vector<real> inv_b_i;  // back-transformation weights
-        std::vector<real> phi;		// amplitudes of fluctuations
+        std::vector<real> phi;			// amplitudes of fluctuations
         int extForceFlag;           // flag for external force
-        Int3D Ni;              		    // lattice lengths in 3D
+        Int3D Ni;              		  // lattice lengths in 3D
         int idX, idY, idZ, index;	  // indexes in 3D and aligned 1D index
 
         /* two lattices. lbfluid has f,m and meq. ghostlat has f only.

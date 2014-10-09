@@ -46,6 +46,7 @@ from espresso.integrator.LBInitConstForce import *
 from espresso.integrator.LBInitPeriodicForce import *
 from espresso.integrator.LBInitPopUniform import *
 from espresso.integrator.LBInitPopWave import *
+from espresso.integrator.LiquidGasLB import *
 from espresso.integrator.ExtForce import *
 from espresso.integrator.CapForce import *
 from espresso.integrator.ExtAnalyze import *

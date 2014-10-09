@@ -39,14 +39,15 @@ namespace espresso {
       /* Destructor for the class */
       virtual ~LBInit () {}
 
-      /* PART FOR HANDLING INITIAL DENSITIES AND VELOCITIES */
+      /* HANDLING INITIAL DENSITIES AND VELOCITIES */
       virtual void createDenVel (real _rho0, Real3D _u0) = 0;
 
-      /* PART FOR HANDLING EXTERNAL FORCES */
+      /* HANDLING EXTERNAL FORCES */
       virtual void setForce (Real3D _force) = 0;
       virtual void addForce (Real3D _force) = 0;
 
       static void registerPython();
+			
     protected:
       shared_ptr<LatticeBoltzmann> latticeboltzmann;
       real rho0;

@@ -49,7 +49,7 @@ namespace espresso {
         // (re)set values of periodic force
         periodicforce = Real3D (_force.getItem(0),
                                 _force.getItem(1),
-                                _force.getItem(2) * sin (2 * M_PI * i / _Ni.getItem(0)));
+                                _force.getItem(2) * sin (2. * M_PI * i / _Ni.getItem(0)));
 
         for (int j = 0; j < _Ni.getItem(1); j++) {
           for (int k = 0; k < _Ni.getItem(2); k++) {
@@ -83,7 +83,7 @@ namespace espresso {
         // (re)set values of periodic force
         periodicforce = Real3D (_force.getItem(0),
                                 _force.getItem(1),
-                                _force.getItem(2) * sin (2 * M_PI * i / _Ni.getItem(0)));
+                                _force.getItem(2) * sin (2. * M_PI * i / _Ni.getItem(0)));
 
         for (int j = 0; j < _Ni.getItem(1); j++) {
           for (int k = 0; k < _Ni.getItem(2); k++) {
