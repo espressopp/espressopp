@@ -38,9 +38,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
 #build ESPRC
 #CMAKE_BINARY_DIR for espresso, CMAKE_CURRENT_BINARY_DIR for for _espressos.so and contrib for MPI.so
 if (EXTERNAL_MPI4PY)
-  set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_CURRENT_BINARY_DIR}/pymodule")
+  set (PYTHON_DIR "${CMAKE_BINARY_DIR}")
 else (EXTERNAL_MPI4PY)
-  set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_CURRENT_BINARY_DIR}/pymodule:${CMAKE_BINARY_DIR}/contrib")
+  set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib")
 endif (EXTERNAL_MPI4PY)
 #CMAKE_CURRENT_BINARY_DIR for pypresso
 set (BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}")
@@ -56,9 +56,9 @@ set (LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
   ${CMAKE_CURRENT_BINARY_DIR}/ESPRC @ONLY)
 option(WITH_RC_FILES "Install Espresso rc file, no need when installing under /usr" ON)
-if (WITH_RC_FILES AND BUILD_PYTHON_MODULE)
+if (WITH_RC_FILES)
   install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/ESPRC DESTINATION bin)
-endif (WITH_RC_FILES AND BUILD_PYTHON_MODULE)
+endif (WITH_RC_FILES)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
@@ -77,8 +77,12 @@ add_library(pylogger esutil/PyLogger.cpp)
 target_link_libraries(pylogger ${BOOST})
 install(TARGETS pylogger LIBRARY DESTINATION ${LIB} ARCHIVE DESTINATION lib)
 
-#we have to build _espresso in a subdir to avoid endless recursion in python
-add_subdirectory(pymodule)
-
+add_library(_espresso main/_espresso.cpp)
+# target_link_libraries(_espresso espresso_common ${VAMPIRTRACE_LIBARIES} pylogger)
+target_link_libraries(_espresso espresso_common pylogger )
+add_dependencies(_espresso scripts)
+#python libs have not prefix (default would be 'lib')
+set_target_properties(_espresso PROPERTIES PREFIX "" SUFFIX ".so" LIBRARY_OUTPUT_DIRECTORY ..)
+install(TARGETS _espresso LIBRARY DESTINATION ${PYTHON_INSTDIR} ARCHIVE DESTINATION ${LIB})
 
 add_dependencies(espresso_common hgversion)

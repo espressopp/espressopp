@@ -23,7 +23,6 @@ include(CheckCXXCompilerFlag)
 ########################################################################
 option(EXTERNAL_BOOST "Use external boost" ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
-option(BUILD_PYTHON_MODULE "Builds epresso as python module" ON)
 if (NOT DEFINED LIB)
   set(LIB "lib")
 endif(NOT DEFINED LIB)
