@@ -10,6 +10,11 @@ env: #maybe add mpich later
   - EXTERNAL=ON
   - EXTERNAL=OFF
 
+matrix:
+  exclude:
+    - compiler: clang
+      env: EXTERNAL=ON #boost-1.48 is too old for clang
+
 script:
   - mkdir build && cd build && 
     cmake -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL .. && 
@@ -17,5 +22,5 @@ script:
     sudo make install
 
 compiler:
-  - clang #mostly broken
+  - clang
   - gcc
