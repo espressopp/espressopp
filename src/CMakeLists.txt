@@ -1,8 +1,6 @@
 file(GLOB_RECURSE ESPRESSO_SOURCES *.cpp)
 file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
-  main/_espresso.cpp
   esutil/GenLogger.cpp
-  esutil/PyLogger.cpp
   iterator/unittest/*.cpp
   interaction/unittest/*.cpp
   unittest/*.cpp
@@ -49,7 +47,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
 
 #after install ESPRC
 set (PYTHON_DIR "${CMAKE_INSTALL_PREFIX}/${PYTHON_INSTDIR}")
-set (LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+set (LIB_DIR "${CMAKE_INSTALL_PREFIX}/${LIB}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
   ${CMAKE_CURRENT_BINARY_DIR}/ESPRC @ONLY)
 option(WITH_RC_FILES "Install Espresso rc file, no need when installing under /usr" ON)
@@ -65,21 +63,11 @@ else(EXTERNAL_BOOST)
   set (BOOST espresso_boost)
 endif(EXTERNAL_BOOST)
 
-add_library(espresso_common ${ESPRESSO_SOURCES})
-target_link_libraries(espresso_common pylogger ${BOOST} ${PYTHON_LIBRARIES}
-                                      ${VAMPIRTRACE_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES})
-install(TARGETS espresso_common LIBRARY DESTINATION ${LIB} ARCHIVE DESTINATION lib)
-
-add_library(pylogger esutil/PyLogger.cpp)
-target_link_libraries(pylogger ${BOOST})
-install(TARGETS pylogger LIBRARY DESTINATION ${LIB} ARCHIVE DESTINATION lib)
-
-add_library(_espresso main/_espresso.cpp)
-# target_link_libraries(_espresso espresso_common ${VAMPIRTRACE_LIBARIES} pylogger)
-target_link_libraries(_espresso espresso_common pylogger )
+add_library(_espresso ${ESPRESSO_SOURCES})
+target_link_libraries(_espresso ${BOOST} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
 add_dependencies(_espresso scripts)
 #python libs have not prefix (default would be 'lib')
 set_target_properties(_espresso PROPERTIES PREFIX "" SUFFIX ".so" LIBRARY_OUTPUT_DIRECTORY ..)
-install(TARGETS _espresso LIBRARY DESTINATION ${PYTHON_INSTDIR} ARCHIVE DESTINATION ${LIB})
+install(TARGETS _espresso LIBRARY DESTINATION ${PYTHON_INSTDIR})
 
-add_dependencies(espresso_common hgversion)
+add_dependencies(_espresso hgversion)
