@@ -44,6 +44,8 @@
 #include "Quartic.hpp"
 #include "VSphereSelf.hpp"
 #include "VSpherePair.hpp"
+#include "HarmonicTrap.hpp"
+#include "LennardJones93Wall.hpp"
 #include "MirrorLennardJones.hpp"
 
 #include "Tabulated.hpp"
@@ -74,6 +76,7 @@
 #include "CoulombKSpaceP3M.hpp"
 #include "Potential.hpp"
 #include "PotentialVSpherePair.hpp"
+#include "SingleParticlePotential.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -82,6 +85,7 @@ namespace espresso {
       Potential::registerPython();
       PotentialVSpherePair::registerPython();
       PotentialUniqueDist::registerPython();
+      SingleParticlePotential::registerPython();
       Zero::registerPython();
       LennardJones::registerPython();
       LJcos::registerPython();
@@ -104,6 +108,8 @@ namespace espresso {
       Quartic::registerPython();
       VSphereSelf::registerPython();
       VSpherePair::registerPython();
+      HarmonicTrap::registerPython();
+      LennardJones93Wall::registerPython();
       MirrorLennardJones::registerPython();
       
       AngularPotential::registerPython();

@@ -24,3 +24,4 @@ pmiimport('espresso.bc')
 
 from espresso.bc.BC import *
 from espresso.bc.OrthorhombicBC import *
+from espresso.bc.SlabBC import *

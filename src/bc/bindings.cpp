@@ -23,12 +23,14 @@
 #include "bindings.hpp"
 #include "BC.hpp"
 #include "OrthorhombicBC.hpp"
+#include "SlabBC.hpp"
 
 namespace espresso {
   namespace bc {
     void registerPython() {
       BC::registerPython();
       OrthorhombicBC::registerPython();
+      SlabBC::registerPython();
     }
   }
 }
