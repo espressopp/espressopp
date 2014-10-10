@@ -1,7 +1,6 @@
 file(GLOB_RECURSE ESPRESSO_SOURCES *.cpp)
 file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
   main/_espresso.cpp
-  main/pypresso.cpp
   esutil/GenLogger.cpp
   esutil/PyLogger.cpp
   iterator/unittest/*.cpp
@@ -77,13 +76,6 @@ install(TARGETS espresso_common LIBRARY DESTINATION ${LIB} ARCHIVE DESTINATION l
 add_library(pylogger esutil/PyLogger.cpp)
 target_link_libraries(pylogger ${BOOST})
 install(TARGETS pylogger LIBRARY DESTINATION ${LIB} ARCHIVE DESTINATION lib)
-
-if(BUILD_STANDALONE)
-  add_executable(pypresso main/pypresso.cpp)
-  target_link_libraries(pypresso espresso_common ${MPI4PY_LIBRARIES})
-  add_dependencies(pypresso scripts)
-  install(TARGETS pypresso RUNTIME DESTINATION bin)
-endif(BUILD_STANDALONE)
 
 #we have to build _espresso in a subdir to avoid endless recursion in python
 add_subdirectory(pymodule)

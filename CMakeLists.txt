@@ -23,15 +23,10 @@ include(CheckCXXCompilerFlag)
 ########################################################################
 option(EXTERNAL_BOOST "Use external boost" ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
-option(BUILD_STANDALONE "Builds pypresso an standalone binary" OFF)
 option(BUILD_PYTHON_MODULE "Builds epresso as python module" ON)
 if (NOT DEFINED LIB)
   set(LIB "lib")
 endif(NOT DEFINED LIB)
-
-if(NOT BUILD_STANDALONE AND NOT BUILD_PYTHON_MODULE)
-  message(FATAL_ERROR "You need to enable pypresso or the python module")
-endif(NOT BUILD_STANDALONE AND NOT BUILD_PYTHON_MODULE)
 
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release CACHE STRING
@@ -160,7 +155,7 @@ add_subdirectory(contrib)
 
 add_custom_target(symlink ALL COMMENT "Creating symlink")
 add_custom_command(TARGET symlink COMMAND ${CMAKE_COMMAND} -E create_symlink
-  ${CMAKE_BINARY_DIR}/src espresso)
+  src espresso)
 
 ######################################
 # System documentation (Doxygen)     # 
