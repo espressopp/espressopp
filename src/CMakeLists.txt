@@ -9,7 +9,6 @@ file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
   storage/unittest/*.cpp
   bc/unittest/*.cpp
   integrator/unittest/*.cpp
-  thermostat.cpp
 )
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
 
