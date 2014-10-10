@@ -42,8 +42,6 @@ if (EXTERNAL_MPI4PY)
 else (EXTERNAL_MPI4PY)
   set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib")
 endif (EXTERNAL_MPI4PY)
-#CMAKE_CURRENT_BINARY_DIR for pypresso
-set (BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 #CMAKE_CURRENT_BINARY_DIR for libespresso_common.so and contib for libespresso_boost
 set (LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
@@ -51,7 +49,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
 
 #after install ESPRC
 set (PYTHON_DIR "${CMAKE_INSTALL_PREFIX}/${PYTHON_INSTDIR}")
-set (BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin")
 set (LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
   ${CMAKE_CURRENT_BINARY_DIR}/ESPRC @ONLY)
