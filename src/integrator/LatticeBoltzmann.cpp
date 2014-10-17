@@ -213,6 +213,13 @@ namespace espresso {
       ghostlat[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setPop_i(_l, _value);
     }
 
+		void LatticeBoltzmann::setFOnPart (Real3D _fOnPart) {fOnPart = _fOnPart;}
+		Real3D LatticeBoltzmann::getFOnPart () {return fOnPart;}
+		
+		void LatticeBoltzmann::setInterpVel (Real3D _interpVel) {interpVel = _interpVel;}
+		Real3D LatticeBoltzmann::getInterpVel() {return interpVel;}
+		void LatticeBoltzmann::addInterpVel (int _dir, real _value) {interpVel[_dir] += _value;}
+		
     /* Initialization of the lattice model: eq.weights, ci's, ... */
     void LatticeBoltzmann::initLatticeModel () {
       using std::setprecision;
@@ -527,14 +534,80 @@ namespace espresso {
     /* Read in MD polymer coordinates and rescale them into LB units */
     /* Add forces acting on polymers due to LB sites */
     void LatticeBoltzmann::addPolyLBForces() {
-//			//calcFluctForce();		// calculate fluctuating random force exerted by the fluid onto a particle
-//			//calcInterVel();			// calculate interpolated velocity of the fluid at monomer's position
-//			//calcViscForce();		// calculate viscous drag force exerted by the fluid onto a particle
-//			//passForceToPart();	// pass calculated total force back onto the particle
-//			//convForceToMom();		// convert total force into momentum (for the lattice update)
-//			//extrapMomToNodes();	// extrapolate momentum transfer to the neighboring nodes
+			System& system = getSystemRef();
+			
+			CellList realCells = system.storage->getRealCells();
+
+			real fricCoeff = 0.1;												// to be set from python
+			real temperature = 1.2;											// temperature to be passed from the thermostat
+			real timestep = integrator->getTimeStep();	// timestep of MD
+			
+			// loop over all particles in the current CPU
+			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+				calcFluctForce(fricCoeff, temperature, timestep);// calculate fluctuating random force exerted by the fluid onto a particle
+				calcInterVel(*cit);									// calculate interpolated velocity of the fluid at monomer's position
+				//			//calcViscForce();		// calculate viscous drag force exerted by the fluid onto a particle
+				//			//passForceToPart();	// pass calculated total force back onto the particle
+				//			//convForceToMom();		// convert total force into momentum (for the lattice update)
+				//			//extrapMomToNodes();	// extrapolate momentum transfer to the neighboring nodes
+			}
     }
 
+		void LatticeBoltzmann::calcFluctForce (real _fricCoeff, real _temperature, real _timestep) {
+			
+			real prefactor = sqrt(24. * _fricCoeff * _temperature / _timestep); // amplitude of the noise
+			Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5); // noise itself in 3d
+			setFOnPart (prefactor * ranval);		// set force on a particle to the force from the random noise
+			
+			// for parallel version, random numbers created for ghost particles should be communicated!
+		}
+		
+		void LatticeBoltzmann::calcInterVel (Particle& p) {
+			Real3D Li = system.bc -> getBoxL();
+			
+			Int3D bin;
+			bin[0] = floor (getNi().getItem(0) * p.position()[0] / Li[0]);
+			bin[1] = floor (getNi().getItem(1) * p.position()[1] / Li[1]);
+			bin[2] = floor (getNi().getItem(2) * p.position()[2] / Li[2]);
+			
+			delta = std::vector<real>(6, 0.);
+			delta[0] = p.position()[0] - bin[0] * getA();
+			delta[1] = p.position()[1] - bin[1] * getA();
+			delta[2] = p.position()[2] - bin[2] * getA();
+			delta[3] = getA() - delta[0];
+			delta[4] = getA() - delta[1];
+			delta[5] = getA() - delta[2];
+			
+			setInterpVel (Real3D(0.,0.,0.));
+			// loop over neighboring LB nodes
+			for (int _i = 0; _i < 2; _i++) {
+				for (int _j = 0; _j < 2; _j++) {
+					for (int _k = 0; _k < 2; _k++) {
+						//calculate density and flux on the node
+						real denLoc = 0.;
+						Real3D jLoc = Real3D(0.,0.,0.);
+						
+						// what happens if chain crosses PBC???
+						for (int l = 0; l < getNumVels(); l++) {
+							denLoc += lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getF_i(l);
+							jLoc[0] += lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getF_i(l) * getCi(l).getItem(0);
+							jLoc[1] += lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getF_i(l) * getCi(l).getItem(1);
+							jLoc[2] += lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getF_i(l) * getCi(l).getItem(2);
+						}
+						// instead, one can probably access mode values and it will be faster
+						//denLoc = lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getM_i(0);
+						//jLoc[0] = lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getM_i(1);
+						//jLoc[1] = lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getM_i(2);
+						//jLoc[2] = lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getM_i(3);
+						
+						addInterpVel (0, delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * jLoc[0] / denLoc);
+						addInterpVel (1, delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * jLoc[1] / denLoc);
+						addInterpVel (2, delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * jLoc[2] / denLoc);
+					}
+				}
+			}
+		}
+		
     /* Destructor of the LB */
     LatticeBoltzmann::~LatticeBoltzmann() {
     }
