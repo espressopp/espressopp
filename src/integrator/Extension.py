@@ -58,7 +58,7 @@ if pmi.isController :
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             #cls =  'espresso.integrator.Extension',
-            #pmiproperty = [ 'itype', 'filename'],
+            pmiproperty = [ 'type'],
             #pmicall = ['addForce']
             pmicall = [ 'connect', 'disconnect' ]
         )

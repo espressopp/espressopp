@@ -119,7 +119,7 @@ namespace espresso {
         Tensor *w = new Tensor[n];
         const InteractionList& srIL = system.shortRangeInteractions;
         for (size_t j = 0; j < srIL.size(); j++) {
-          srIL[j]->computeVirialTensor(w, n);
+          // srIL[j]->computeVirialTensor(w, n);
         }
 
         vector<Tensor> pijarr;
@@ -129,6 +129,10 @@ namespace espresso {
 
           pijarr.push_back(vv[i] + w[i]);
         }
+
+        delete[] w;
+        delete[] vv;
+        delete[] vvlocal;
 
 //        vector<Tensor> pijarr;
         return pijarr;

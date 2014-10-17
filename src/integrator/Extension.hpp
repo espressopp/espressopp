@@ -64,6 +64,9 @@ namespace espresso {
         /** Register this class so it can be used from Python. */
         static void registerPython();
 
+        ExtensionType getType() {return type;}
+        int setType(ExtensionType k) {type=k;}
+
       protected:
 
         shared_ptr<MDIntegrator> integrator; // this is needed for signal connection

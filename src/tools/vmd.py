@@ -41,7 +41,9 @@ IMD_TRATE,      \
 IMD_IOERROR = range(10)
 
 def handshake(initsock):
+  print "before"
   (sock, sock_port) = initsock.accept()
+  print "after"
   header = struct.Struct('!II')
   msg    = header.pack(IMD_HANDSHAKE, IMDVERSION)
   sock.send(msg)
@@ -126,7 +128,7 @@ def connect(system, molsize=10, pqrfile=None):
   vmdfile.write("imd transfer 1\n")
   vmdfile.write("imd keep 1\n")
   vmdfile.close()
-  subprocess.Popen(['vmd', '-e', 'vmd.tcl'])
+  subprocess.Popen(['/Users/stuehn/software/bin/vmd', '-e', 'vmd.tcl'])
 
   sock = handshake(initsock)
   if (sock != 0):

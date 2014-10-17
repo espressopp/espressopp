@@ -75,6 +75,10 @@ namespace espresso {
 
         void addExtension(shared_ptr<integrator::Extension> extension);
 
+        shared_ptr<integrator::Extension> getExtension(int k);
+
+        int getNumberOfExtensions();
+
         // signals to extend the integrator
         boost::signals2::signal0 <void> runInit; // initialization of run()
         boost::signals2::signal0 <void> recalc1; // inside recalc, before updateForces()

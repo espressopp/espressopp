@@ -42,8 +42,14 @@ class MDIntegratorLocal(object):
             extension.cxxclass.connect(extension)
             
             return self.cxxclass.addExtension(self, extension)
+        
+    def getExtension(self, k):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getExtension(self, k)
 
-    
+    def getNumberOfExtensions(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getNumberOfExtensions(self)
 
 if pmi.isController :
     class MDIntegrator(object):
@@ -51,5 +57,5 @@ if pmi.isController :
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             pmiproperty = [ 'dt', 'step' ],
-            pmicall = [ 'run', 'addExtension' ]
+            pmicall = [ 'run', 'addExtension', 'getExtension', 'getNumberOfExtensions' ]
             )
