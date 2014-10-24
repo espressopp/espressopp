@@ -30,6 +30,7 @@
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
+#include "bc/BC.hpp"
 
 namespace espresso {
 
@@ -59,7 +60,7 @@ namespace espresso {
 
       rng = system->rng;
 
-      setNBins(100);
+      setNBins(20);
       distr = std::vector<real>(getNBins(), 0.);
 
       /* check random number generator */
@@ -116,16 +117,16 @@ namespace espresso {
     }
 
     void LatticeBoltzmann::disconnect() {
-      _befIntP.disconnect();
-      _befIntV.disconnect();
+//      _befIntP.disconnect();
+      _aftCalcF.disconnect();
     }
 
     void LatticeBoltzmann::connect() {
       printf("starting connection... \n");
       // connection to pass polymer chain coordinates to LB
-      _befIntP = integrator->befIntP.connect( boost::bind(&LatticeBoltzmann::makeLBStep, this));
+//      _befIntP = integrator->befIntP.connect( boost::bind(&LatticeBoltzmann::makeLBStep, this));
       // connection to add forces between polymers and LB sites
-      _befIntV = integrator->befIntV.connect( boost::bind(&LatticeBoltzmann::addPolyLBForces, this));
+      _aftCalcF = integrator->aftCalcF.connect( boost::bind(&LatticeBoltzmann::makeLBStep, this));
     }
 
     /* Setter and getter for the lattice model */
@@ -209,12 +210,17 @@ namespace espresso {
       return lbfluid[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].getExtForceLoc();
     }
 
+		void LatticeBoltzmann::addForceLoc (Int3D _Ni, Real3D _extForceLoc) {
+			return lbfluid[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].addExtForceLoc(_extForceLoc);
+		}
+		
     void LatticeBoltzmann::setGhostFluid (Int3D _Ni, int _l, real _value) {
       ghostlat[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setPop_i(_l, _value);
     }
 
 		void LatticeBoltzmann::setFOnPart (Real3D _fOnPart) {fOnPart = _fOnPart;}
 		Real3D LatticeBoltzmann::getFOnPart () {return fOnPart;}
+		void LatticeBoltzmann::addFOnPart (int _dir, real _value) {fOnPart[_dir] += _value;}
 		
 		void LatticeBoltzmann::setInterpVel (Real3D _interpVel) {interpVel = _interpVel;}
 		Real3D LatticeBoltzmann::getInterpVel() {return interpVel;}
@@ -392,6 +398,8 @@ namespace espresso {
       /* printing out info about the LB step */
       setStepNum(integrator->getStep());
 
+			coupleLBtoMD ();
+			
       /* PUSH-scheme (first collide then stream) */
       collideStream ();
     }
@@ -533,20 +541,23 @@ namespace espresso {
 
     /* Read in MD polymer coordinates and rescale them into LB units */
     /* Add forces acting on polymers due to LB sites */
-    void LatticeBoltzmann::addPolyLBForces() {
+    void LatticeBoltzmann::coupleLBtoMD() {
+//			printf("I'm in addPolyLBForces... \n");
+			setExtForceFlag(1);
+			
 			System& system = getSystemRef();
 			
 			CellList realCells = system.storage->getRealCells();
 
-			real fricCoeff = 0.1;												// to be set from python
+			real fricCoeff = 20.;												// to be set from python
 			real temperature = 1.2;											// temperature to be passed from the thermostat
 			real timestep = integrator->getTimeStep();	// timestep of MD
 			
 			// loop over all particles in the current CPU
 			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 				calcFluctForce(fricCoeff, temperature, timestep);// calculate fluctuating random force exerted by the fluid onto a particle
-				calcInterVel(*cit);									// calculate interpolated velocity of the fluid at monomer's position
-				//			//calcViscForce();		// calculate viscous drag force exerted by the fluid onto a particle
+//				calcInterVel(*cit);									// calculate interpolated velocity of the fluid at monomer's position
+				calcViscForce(*cit, fricCoeff, timestep);		// calculate viscous drag force exerted by the fluid onto a particle
 				//			//passForceToPart();	// pass calculated total force back onto the particle
 				//			//convForceToMom();		// convert total force into momentum (for the lattice update)
 				//			//extrapMomToNodes();	// extrapolate momentum transfer to the neighboring nodes
@@ -558,28 +569,47 @@ namespace espresso {
 			real prefactor = sqrt(24. * _fricCoeff * _temperature / _timestep); // amplitude of the noise
 			Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5); // noise itself in 3d
 			setFOnPart (prefactor * ranval);		// set force on a particle to the force from the random noise
-			
+	
+//			printf("rand force to add onto a particle is %8.4f %8.4f %8.4f\n", getFOnPart().getItem(0), getFOnPart().getItem(1), getFOnPart().getItem(2));
 			// for parallel version, random numbers created for ghost particles should be communicated!
 		}
 		
-		void LatticeBoltzmann::calcInterVel (Particle& p) {
-			Real3D Li = system.bc -> getBoxL();
+		void LatticeBoltzmann::calcViscForce (Particle& p, real _fricCoeff, real _timestep) {
+			Real3D Li = getSystem()->bc->getBoxL();
+			
+//			printf("positions are %8.4f %8.4f %8.4f\n", p.position()[0], p.position()[1], p.position()[2]);
+//			printf("md velocity %8.4f %8.4f %8.4f\n", p.velocity()[0], p.velocity()[1], p.velocity()[2]);
+
+			// account for particle's positions that are going to be outside the box (and will
+			// be subject to PBC in MD part after integration step)
+			Real3D _pos = p.position();
+			for (int _dir = 0; _dir < 3; _dir++){
+				if (_pos[_dir] < 0.) _pos[_dir] += Li[_dir];
+				if (_pos[_dir] > Li[_dir]) _pos[_dir] -= Li[_dir];
+			}
+			
+			Real3D _posLB = _pos / getA();
 			
 			Int3D bin;
-			bin[0] = floor (getNi().getItem(0) * p.position()[0] / Li[0]);
-			bin[1] = floor (getNi().getItem(1) * p.position()[1] / Li[1]);
-			bin[2] = floor (getNi().getItem(2) * p.position()[2] / Li[2]);
+			bin[0] = floor (_posLB[0]); bin[1] = floor (_posLB[1]); bin[2] = floor (_posLB[2]);
 			
-			delta = std::vector<real>(6, 0.);
-			delta[0] = p.position()[0] - bin[0] * getA();
-			delta[1] = p.position()[1] - bin[1] * getA();
-			delta[2] = p.position()[2] - bin[2] * getA();
-			delta[3] = getA() - delta[0];
-			delta[4] = getA() - delta[1];
-			delta[5] = getA() - delta[2];
+			// weight factors, dimensionless
+			std::vector<real> delta = std::vector<real>(6, 0.);
+			delta[0] = _posLB[0] - bin[0];
+			delta[1] = _posLB[1] - bin[1]; 
+			delta[2] = _posLB[2] - bin[2];
+			delta[3] = 1. - delta[0];
+			delta[4] = 1. - delta[1];
+			delta[5] = 1. - delta[2];
+
+//			printf("bin[0][1][2] = %d %d %d\n", bin[0], bin[1], bin[2]);
+//			printf ("deltas %8.4f %8.4f %8.4f %8.4f %8.4f %8.4f \n",
+//							delta[0], delta[1], delta[2], delta[3], delta[4], delta[5]);
 			
 			setInterpVel (Real3D(0.,0.,0.));
+			
 			// loop over neighboring LB nodes
+			int _ip, _jp, _kp;
 			for (int _i = 0; _i < 2; _i++) {
 				for (int _j = 0; _j < 2; _j++) {
 					for (int _k = 0; _k < 2; _k++) {
@@ -587,25 +617,96 @@ namespace espresso {
 						real denLoc = 0.;
 						Real3D jLoc = Real3D(0.,0.,0.);
 						
-						// what happens if chain crosses PBC???
+						/* periodic boundaries */
+						// assign iterations
+						_ip = bin[0] + _i; _jp = bin[1] + _j; _kp = bin[2] + _k;
+						
+						// handle iterations if the site is on the "left" border of the domain
+						if (_ip == getNi().getItem(0)) _ip = 0;
+						if (_jp == getNi().getItem(1)) _jp = 0;
+						if (_kp == getNi().getItem(2)) _kp = 0;
+						
+						// calculation of density and momentum flux on the lattice site
 						for (int l = 0; l < getNumVels(); l++) {
-							denLoc += lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getF_i(l);
-							jLoc[0] += lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getF_i(l) * getCi(l).getItem(0);
-							jLoc[1] += lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getF_i(l) * getCi(l).getItem(1);
-							jLoc[2] += lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getF_i(l) * getCi(l).getItem(2);
+							denLoc += lbfluid[_ip][_jp][_kp].getF_i(l);
+							jLoc[0] += lbfluid[_ip][_jp][_kp].getF_i(l) * getCi(l).getItem(0);
+							jLoc[1] += lbfluid[_ip][_jp][_kp].getF_i(l) * getCi(l).getItem(1);
+							jLoc[2] += lbfluid[_ip][_jp][_kp].getF_i(l) * getCi(l).getItem(2);
 						}
+						
 						// instead, one can probably access mode values and it will be faster
 						//denLoc = lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getM_i(0);
 						//jLoc[0] = lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getM_i(1);
 						//jLoc[1] = lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getM_i(2);
 						//jLoc[2] = lbfluid[bin[0] + _i][bin[1] + _j][bin[2] + _k].getM_i(3);
 						
-						addInterpVel (0, delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * jLoc[0] / denLoc);
-						addInterpVel (1, delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * jLoc[1] / denLoc);
-						addInterpVel (2, delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * jLoc[2] / denLoc);
+						Real3D _u = Real3D(0.,0.,0.);
+						int Nmd_steps = 1;
+						
+						// rho_LB = 1. = rho_LJ
+						_u = jLoc / (denLoc * Nmd_steps * _timestep) * getA();
+						
+						addInterpVel (0, delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * _u[0]);
+						addInterpVel (1, delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * _u[1]);
+						addInterpVel (2, delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * _u[2]);
+						// * _timestep comes from velocity conversion from LB to MD units:
+						// \sigma / t = (Lx / Nx) * a / Nmd_steps * _timestep * \tau
+						// Nmd_steps is the number of MD steps needed to be done before 1 LB step is done
 					}
 				}
 			}
+//			printf ("timestep is %8.4f \n", _timestep);
+//			printf("adding viscous part... \n");
+			// viscous force onto a particle
+//			printf("visc force to add onto a particle is %8.4f %8.4f %8.4f\n", -_fricCoeff * (p.velocity()[0] - getInterpVel().getItem(0)), -_fricCoeff * (p.velocity()[1] - getInterpVel().getItem(1)), -_fricCoeff * (p.velocity()[2] - getInterpVel().getItem(2)));
+//			printf("interp lb velocity %8.4f %8.4f %8.4f\n",getInterpVel().getItem(0), getInterpVel().getItem(1), getInterpVel().getItem(2));
+			
+			addFOnPart(0, -_fricCoeff * (p.velocity()[0] - getInterpVel().getItem(0)));
+			addFOnPart(1, -_fricCoeff * (p.velocity()[1] - getInterpVel().getItem(1)));
+			addFOnPart(2, -_fricCoeff * (p.velocity()[2] - getInterpVel().getItem(2)));
+			
+			// add LB forces acting onto particle p to the MD scheme (for further integration)
+			addPolyLBForces(p);
+			
+			// convert force to momentum on a lattice
+			Real3D deltaJLoc = Real3D(0.,0.,0.);
+			deltaJLoc[0] = -getFOnPart().getItem(0) * _timestep * getTau() * _timestep * getTau() / getA();
+			deltaJLoc[1] = -getFOnPart().getItem(1) * _timestep * getTau() * _timestep * getTau() / getA();
+			deltaJLoc[2] = -getFOnPart().getItem(2) * _timestep * getTau() * _timestep * getTau() / getA();
+			
+			// extrap momentum to the nodes through external forces
+			// loop over neighboring LB nodes
+			Real3D _fLoc = Real3D(0.,0.,0.);
+			
+			for (int _i = 0; _i < 2; _i++) {
+				for (int _j = 0; _j < 2; _j++) {
+					for (int _k = 0; _k < 2; _k++) {
+						/* periodic boundaries */
+						// assign iterations
+						_ip = bin[0] + _i; _jp = bin[1] + _j; _kp = bin[2] + _k;
+						
+						// handle iterations if the site is on the "left" border of the domain
+						if (_ip == getNi().getItem(0)) _ip = 0;
+						if (_jp == getNi().getItem(1)) _jp = 0;
+						if (_kp == getNi().getItem(2)) _kp = 0;
+						
+						lbfluid[_ip][_jp][_kp].setExtForceLoc(Real3D(
+						delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * deltaJLoc[0],
+						delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * deltaJLoc[1],
+						delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * deltaJLoc[2]));
+					}
+				}
+			}
+//			printf("finished for particle... \n ---------------------\n");
+		}
+		
+		void LatticeBoltzmann::addPolyLBForces (Particle& p) {
+//			printf("force to add onto a particle is %8.4f %8.4f %8.4f\n", getFOnPart().getItem(0), getFOnPart().getItem(1), getFOnPart().getItem(2));
+			//			printf("return viscous force to MD... \n");
+			// return viscous force to MD
+			p.force()[0] += getFOnPart().getItem(0);
+			p.force()[1] += getFOnPart().getItem(1);
+			p.force()[2] += getFOnPart().getItem(2);
 		}
 		
     /* Destructor of the LB */

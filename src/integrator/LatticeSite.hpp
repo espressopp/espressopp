@@ -90,7 +90,8 @@ namespace espresso {
 
         void setExtForceLoc (Real3D _extForceLoc);// set local external force
         Real3D getExtForceLoc ();                 // get local external force
-
+				void addExtForceLoc (Real3D _extForceLoc);// add local external force
+			
         /* END OF SET AND GET DECLARATION */
 
         void scaleF_i (int _i, real _value);      // scale f_i population by _value

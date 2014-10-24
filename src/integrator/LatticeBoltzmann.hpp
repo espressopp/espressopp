@@ -127,6 +127,7 @@ namespace espresso {
 
 			void setForceLoc (Int3D _Ni, Real3D _extForceLoc);
 			Real3D getForceLoc (Int3D _Ni);
+			void addForceLoc (Int3D _Ni, Real3D _extForceLoc);
 
 			void setGhostFluid (Int3D _Ni, int _l, real _value);
 			/* END OF SET AND GET DECLARATION */
@@ -138,16 +139,19 @@ namespace espresso {
 			void makeLBStep ();							// perform one step of LB
 
 			/* COUPLING TO THE MD */
-			void addPolyLBForces();					// add to polymers forces due to LBsites
+			void coupleLBtoMD();
 			void calcFluctForce(real _fricCoeff, real _temperature, real _timestep);
-			void calcInterVel(class Particle&);
-
+			void addPolyLBForces(class Particle&);		// add to polymers forces due to LBsites
+//			void calcInterVel(class Particle&);
+			void calcViscForce(class Particle&, real _fricCoeff, real _timestep);
+			
 			void setFOnPart (Real3D _fOnPart);
-			Real3D getFOnPart();
+			Real3D getFOnPart ();
+			void addFOnPart (int _dir, real _value);
 			
 			void setInterpVel (Real3D _interpVel);
-			Real3D getInterpVel();
-			void addInterpVel(int _dir, real _value);
+			Real3D getInterpVel ();
+			void addInterpVel (int _dir, real _value);
 //			void setParticleGroup(shared_ptr< ParticleGroup > _particleGroup);
 //			shared_ptr< ParticleGroup > getParticleGroup();
 			
@@ -199,7 +203,8 @@ namespace espresso {
 			// COUPLING
 			Real3D fOnPart;							// force acting onto an MD particle
 			Real3D interpVel;						// interpolated fluid vel at the MD particle position
-			boost::signals2::connection _befIntP, _befIntV;
+//			boost::signals2::connection _befIntP;
+			boost::signals2::connection _aftCalcF;
 			void connect();
 			void disconnect();
 
