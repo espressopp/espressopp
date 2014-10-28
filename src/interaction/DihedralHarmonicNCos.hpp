@@ -151,9 +151,9 @@ namespace espresso {
         /// where the \f$U(\phi) = K*[1+cos(n*\phi - \phi_0)]\f$
         /// The n is multiplicity.
         ///
-        /// The derivative of \f$U(phi)\f$ is \f$K*n*sin(n*phi - phi0)\f$
+        /// The derivative of \f$U(phi)\f$ is \f$K*n*sin(\phi_0 - n*\phi)\f$
         ///
-        real coef1 = (1.0/sin(_phi))*(K*multiplicity*sin(multiplicity*_phi - phi0));
+        real coef1 = (1.0/sin(_phi))*(K*multiplicity*sin(phi0 - multiplicity*_phi));
 
         real A1 = inv_rijjk * inv_rjkkn;
         real A2 = inv_rijjk * inv_rijjk;
@@ -194,7 +194,7 @@ namespace espresso {
 
       /*
        * Compute raw force for the tabulated potential, depend only on the phi value
-       * \f$F(\phi) = -grad V = -grad [ K*(1+cos(n*\phi - \phi_0)) ] = -K*n*sin(\phi_0 - n*\phi) \f$
+       * \f$F(\phi) = -grad V = -grad [ K*(1+cos(n*\phi - \phi_0)) ] = K*n*sin(\phi_0 - n*\phi) \f$
        * where n is a multiplicity and \f$phi_0\f$ is the reference angle
        *
        * @param[in] phi Degree in radians
@@ -202,7 +202,7 @@ namespace espresso {
        * @return The value of the force
        */
       real _computeForceRaw(real phi) const {
-        return -K * multiplicity * sin(phi0 - multiplicity*phi);
+        return K * multiplicity * sin(phi0 - multiplicity*phi);
       }
 
     }; // class
