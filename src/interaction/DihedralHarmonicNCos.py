@@ -85,7 +85,7 @@ if pmi.isController:
     'The DihedralHarmonicNCos potential.'
     pmiproxydefs = dict(
       cls='espresso.interaction.DihedralHarmonicNCosLocal',
-      pmiproperty=['K', 'phi', 'multiplicity']
+      pmiproperty=['K', 'phi0', 'multiplicity']
     )
 
   class FixedQuadrupleListDihedralHarmonicNCos(Interaction):
