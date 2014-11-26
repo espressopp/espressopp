@@ -139,11 +139,22 @@ namespace espresso {
 			void makeLBStep ();							// perform one step of LB
 
 			/* COUPLING TO THE MD */
+			void setStart(int _start);			// set start indicator for coupling
+			int getStart();									// get start indicator
+			
+			Real3D findCMVel();									// find velocity of the center of mass and num of part
+			void galileanTransf(Real3D _cmVel);	// make galilean transform to by amount of _momPerPart
+			void subtractMom (class Particle&, Real3D);
+			void testMomCons ();
+			
 			void coupleLBtoMD();
 			void calcFluctForce(real _fricCoeff, real _temperature, real _timestep);
 			void addPolyLBForces(class Particle&);		// add to polymers forces due to LBsites
 //			void calcInterVel(class Particle&);
 			void calcViscForce(class Particle&, real _fricCoeff, real _timestep);
+			
+			void setFricCoeff (real _fricCoeff);// set friction coefficient of MD to LB coupling
+			real getFricCoeff ();								// get friction coefficient of MD to LB coupling
 			
 			void setFOnPart (Real3D _fOnPart);
 			Real3D getFOnPart ();
@@ -179,6 +190,8 @@ namespace espresso {
 			real gamma_odd;
 			real gamma_even;
 			real lbTemp;
+			real fricCoeff;
+			int start;
 			int lbTempFlag;
 			int stepNum;								// step number
 			std::vector<real> eqWeight; // lattice weights
@@ -203,8 +216,9 @@ namespace espresso {
 			// COUPLING
 			Real3D fOnPart;							// force acting onto an MD particle
 			Real3D interpVel;						// interpolated fluid vel at the MD particle position
-//			boost::signals2::connection _befIntP;
-			boost::signals2::connection _aftCalcF;
+			boost::signals2::connection _aftInitF;
+			boost::signals2::connection _befIntP;
+			
 			void connect();
 			void disconnect();
 

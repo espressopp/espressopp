@@ -182,16 +182,13 @@ namespace espresso {
 
       /* if we have external forces then modify the eq.fluxes */
 			// ADD LB TO MD COUPLING??
-      if (_extForceFlag == 1) {
-        jLoc[0] += 0.5*getExtForceLoc().getItem(0);
-        jLoc[1] += 0.5*getExtForceLoc().getItem(1);
-        jLoc[2] += 0.5*getExtForceLoc().getItem(2);
-      }
+			if (_extForceFlag == 0) printf ("extForceFlag is %d\n",_extForceFlag);
+			if (_extForceFlag == 1) jLoc += 0.5*getExtForceLoc();
 
       /* eq. stress modes */
       setMeq_i (4, jLoc.sqr() / rhoLoc);
       setMeq_i (5, (jLoc[0]*jLoc[0] - jLoc[1]*jLoc[1]) / rhoLoc);
-      setMeq_i (6, (3*jLoc[0]*jLoc[0] - jLoc.sqr()) / rhoLoc);
+      setMeq_i (6, (3.*jLoc[0]*jLoc[0] - jLoc.sqr()) / rhoLoc);
       setMeq_i (7, jLoc[0]*jLoc[1] / rhoLoc);
       setMeq_i (8, jLoc[0]*jLoc[2] / rhoLoc);
       setMeq_i (9, jLoc[1]*jLoc[2] / rhoLoc);
@@ -264,9 +261,9 @@ namespace espresso {
       _u /= getM_i(0);
 
       /* update momentum modes */
-      addM_i(1, _f[0]);
-      addM_i(2, _f[1]);
-      addM_i(3, _f[2]);
+      addM_i(1, .5 * _f[0]);
+      addM_i(2, .5 * _f[1]);
+      addM_i(3, .5 * _f[2]);
 
       /* update stress modes */
       // See def. of _sigma (Eq.198) in B.Dünweg & A.J.C.Ladd in Adv.Poly.Sci. 221, 89-166 (2009)

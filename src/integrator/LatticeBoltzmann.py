@@ -104,5 +104,5 @@ if pmi.isController :
         pmiproxydefs = dict(
             cls =  'espresso.integrator.LatticeBoltzmannLocal',
             pmiproperty = [ 'Ni', 'a', 'tau', 'numDims', 'numVels', 
-                           'gamma_b', 'gamma_s', 'gamma_odd', 'gamma_even', 'lbTemp']
+                           'gamma_b', 'gamma_s', 'gamma_odd', 'gamma_even', 'lbTemp', 'fricCoeff']
             )
