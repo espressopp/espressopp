@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 plt.ion()
 
 # create default Lennard Jones (WCA) system with 0 particles and cubic box (L=40)
-num_chains		= 328
-#num_chains		= 1
+#num_chains		= 328
+num_chains		= 1
 monomers_per_chain	= 10
 L			= 16
 box			= (L, L, L)
@@ -21,7 +21,7 @@ skin			= 0.3
 dt			= 0.000001
 epsilon			= 0.
 sigma			= 1.
-temperature		= 1.2
+temperature		= 1.0
 print "Initial values"
 
 system         = espresso.System()
@@ -107,6 +107,7 @@ for k in range(10):
 
 thermostat.gamma  = 0.0
 thermostat.temperature = 0.0
+thermostat.disconnect()
 
 # define a LB grid
 lb = espresso.integrator.LatticeBoltzmann(system, Ni=Int3D(16, 16, 16))
@@ -146,59 +147,45 @@ print integrator.dt
 print thermostat.gamma
 print thermostat.temperature
 print lb.fricCoeff
-# set external constant (gravity-like) force
-#lbforce = espresso.integrator.LBInitConstForce(system,lb)
-#lbforce.setForce(Real3D(0.,0.,0.0001))
-# run 500 steps with it
-#integrator.run(500)
-#integrator.run(100000)
 
-# add a periodic force with a specified amplitude to the existing body force
-#lbforce2 = espresso.integrator.LBInitPeriodicForce(system,lb)
-#lbforce2.addForce(Real3D(0.,0.,0.0005))
-#lb.lbTemp = 0.0000005
-## run 500 steps with it
-#integrator.run(500)
-##
-plt.figure()
+#plt.figure()
 T   = espresso.analysis.Temperature(system)
-x   = []
-yT  = []
-yTmin = 0.2
-#x.append(integrator.dt * integrator.step)
-#yT.append(T.compute())
-yTmax = 1.8
+#x   = []
+#yT  = []
+#yTmin = 0.2
+#yTmax = 1.8
 
-plt.subplot(211)
-gT, = plt.plot(x, yT, 'ro')
+#plt.subplot(211)
+#gT, = plt.plot(x, yT, 'ro')
 
 # write output to a datafile
-f = open('temp_lb1.0_c1.0_L16_N328_G20_2.dat', 'a')
+f = open('temperature.dat', 'a')
 
-#integrator.run(50)
+#integrator.run(5)
 #print "new"
-#integrator.run(50)
-for k in range(100):
-	integrator.run(100)
-	x.append(integrator.dt * integrator.step)
+#integrator.run(5)
+for k in range(2):
+	integrator.run(5)
 	currT = T.compute()
-	yT.append(currT)
 	s = str(integrator.step)
 	f.write(s+'\t')
 	s = str(currT)
 	f.write(s+'\n')
-#	yTmax = max(yT)
-	plt.subplot(211)
-	plt.axis([x[0], x[-1], yTmin, yTmax ])
-	gT.set_ydata(yT)
-	gT.set_xdata(x)
-	plt.draw()
-
-
-plt.savefig('lb1.0_c1.0_L16_N328_G20_2.pdf')
+	print "new"
+#	integrator.run(100)
+#	x.append(integrator.dt * integrator.step)
+#	currT = T.compute()
+#	yT.append(currT)
+#	s = str(integrator.step)
+#	f.write(s+'\t')
+#	s = str(currT)
+#	f.write(s+'\n')
+#	plt.subplot(211)
+#	plt.axis([x[0], x[-1], yTmin, yTmax ])
+#	gT.set_ydata(yT)
+#	gT.set_xdata(x)
+#	plt.draw()
+#
+#
+#plt.savefig('lb1.0_c1.0_L16_N328_G20_2.pdf')
 f.close()
-
-## add some profiling statistics for the run
-##cProfile.run("integrator.run(10000)",'profiler_stats')
-##p = pstats.Stats('profiler_stats')
-##p.strip_dirs().sort_stats("time").print_stats(10)

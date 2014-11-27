@@ -261,9 +261,9 @@ namespace espresso {
       _u /= getM_i(0);
 
       /* update momentum modes */
-      addM_i(1, .5 * _f[0]);
-      addM_i(2, .5 * _f[1]);
-      addM_i(3, .5 * _f[2]);
+      addM_i(1, _f[0]);
+      addM_i(2, _f[1]);
+      addM_i(3, _f[2]);
 
       /* update stress modes */
       // See def. of _sigma (Eq.198) in B.Dünweg & A.J.C.Ladd in Adv.Poly.Sci. 221, 89-166 (2009)

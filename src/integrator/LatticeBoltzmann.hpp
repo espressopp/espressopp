@@ -143,6 +143,8 @@ namespace espresso {
 			int getStart();									// get start indicator
 			
 			Real3D findCMVel();									// find velocity of the center of mass and num of part
+			void testCMVel();									// test velocity of the center of mass and num of part
+			void zeroMDCMVel();
 			void galileanTransf(Real3D _cmVel);	// make galilean transform to by amount of _momPerPart
 			void subtractMom (class Particle&, Real3D);
 			void testMomCons ();
@@ -216,8 +218,10 @@ namespace espresso {
 			// COUPLING
 			Real3D fOnPart;							// force acting onto an MD particle
 			Real3D interpVel;						// interpolated fluid vel at the MD particle position
-			boost::signals2::connection _aftInitF;
+			boost::signals2::connection _befIntV;
 			boost::signals2::connection _befIntP;
+			boost::signals2::connection _aftIntV;
+			boost::signals2::connection _recalc2;
 			
 			void connect();
 			void disconnect();

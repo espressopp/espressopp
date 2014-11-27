@@ -116,15 +116,19 @@ namespace espresso {
 		}
 
 		void LatticeBoltzmann::disconnect() {
-			_befIntP.disconnect();
-//			_aftInitF.disconnect();
+//			_befIntP.disconnect();
+			_befIntV.disconnect();
+			_aftIntV.disconnect();
+			_recalc2.disconnect();
 		}
 
 		void LatticeBoltzmann::connect() {
 			// connection to add forces between polymers and LB sites
 			printf("starting connection... \n");
-			_befIntP = integrator->befIntP.connect( boost::bind(&LatticeBoltzmann::makeLBStep, this));
-//			_aftInitF = integrator->aftInitF.connect ( boost::bind(&LatticeBoltzmann::, this));
+//			_befIntP = integrator->befIntP.connect( boost::bind(&LatticeBoltzmann::makeLBStep, this));
+			_recalc2 = integrator->recalc2.connect ( boost::bind(&LatticeBoltzmann::zeroMDCMVel, this));
+			_befIntV = integrator->befIntV.connect ( boost::bind(&LatticeBoltzmann::makeLBStep, this));
+			_aftIntV = integrator->aftIntV.connect ( boost::bind(&LatticeBoltzmann::testCMVel, this));
 			printf("connection is over. \n");
 		}
 
@@ -409,38 +413,25 @@ namespace espresso {
 				}
 			}
 			
-			// set CM velocity of the MD to zero at the start of coupling
-			if (getStart() == 0) {
-				Real3D cmVel = findCMVel();
-				printf("cm velocity is %8.4f %8.4f %8.4f \n",
-							 cmVel.getItem(0), cmVel.getItem(1), cmVel.getItem(2));
-				galileanTransf(cmVel);
-
-				cmVel = findCMVel();
-				printf("cm velocity is %8.4f %8.4f %8.4f \n",
-							 cmVel.getItem(0), cmVel.getItem(1), cmVel.getItem(2));
-
-				setStart(1);
-			}
-
 			// GET RID OF GET AND SET STEP NUM!
 			setStepNum(integrator->getStep());
-
-			//			if (getStepNum() % 100 == 0) {
-			printf ("step %d \n", getStepNum());
-			testMomCons ();
-			//			}
 			
 			coupleLBtoMD ();
 
 			/* PUSH-scheme (first collide then stream) */
 			collideStream ();
+			
+			//			if (getStepNum() % 100 == 0) {
+			//				printf ("step %d \n", getStepNum());
+			testMomCons ();
+			//			}
+			printf ("ended lb part. step %d \n", getStepNum());
 		}
 
 		void LatticeBoltzmann::testMomCons () {
 			// velocities from MD
 			Real3D cmVel = findCMVel();
-			printf("cm velocity of LJ system is %18.14f %18.14f %18.14f \n",
+			printf("testMomCo: cmV(t+ 1/2dt) of LJ system is %18.14f %18.14f %18.14f \n",
 						 cmVel.getItem(0), cmVel.getItem(1), cmVel.getItem(2));
 
 			// velocities from LB
@@ -484,8 +475,45 @@ namespace espresso {
 				Real3D& vel = cit->velocity();
 				velCM += vel;
 			}
-			
+
+//			printf("findCMVel: cmV(t+ 1/2dt) of LJ system is %18.14f %18.14f %18.14f \n",
+//						 velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
+
 			return velCM;
+		}
+
+		void LatticeBoltzmann::testCMVel () {
+			System& system = getSystemRef();
+			
+			CellList realCells = system.storage->getRealCells();
+			
+			Real3D velCM = Real3D(0.,0.,0.);
+			
+			// loop over all particles in the current CPU
+			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+				Real3D& vel = cit->velocity();
+				velCM += vel;
+			}
+			
+			printf("testCMVel: cmV(t + dt) of LJ system is   %18.14f %18.14f %18.14f \n",
+						 velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
+			printf("-------------------------------------------------------------------\n");
+		}
+		
+		void LatticeBoltzmann::zeroMDCMVel () {
+		// set CM velocity of the MD to zero at the start of coupling
+			if (getStart() == 0) {
+				Real3D cmVel = findCMVel();
+				printf("cm velocity is %8.4f %8.4f %8.4f \n",
+							 cmVel.getItem(0), cmVel.getItem(1), cmVel.getItem(2));
+				galileanTransf(cmVel);
+		 
+				cmVel = findCMVel();
+				printf("cm velocity is %8.4f %8.4f %8.4f \n",
+							 cmVel.getItem(0), cmVel.getItem(1), cmVel.getItem(2));
+		 
+				setStart(1);
+			}
 		}
 		
 		void LatticeBoltzmann::galileanTransf (Real3D _cmVel) {
