@@ -16,6 +16,7 @@ interaction
    espresso.interaction.CoulombRSpace.rst
    espresso.interaction.CoulombTruncated.rst
    espresso.interaction.DihedralHarmonicCos.rst
+   espresso.interaction.DihedralHarmonicNCos.rst
    espresso.interaction.DihedralHarmonicUniqueCos.rst
    espresso.interaction.DihedralPotential.rst
    espresso.interaction.DihedralUniquePotential.rst
@@ -51,3 +52,4 @@ interaction
    espresso.interaction.VSpherePair.rst
    espresso.interaction.VSphereSelf.rst
    espresso.interaction.Zero.rst
+   espresso.interaction.LennardJones93.rst

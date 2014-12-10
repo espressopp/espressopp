@@ -1,9 +1,6 @@
 file(GLOB_RECURSE ESPRESSO_SOURCES *.cpp)
 file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
-  main/_espresso.cpp
-  main/pypresso.cpp
   esutil/GenLogger.cpp
-  esutil/PyLogger.cpp
   iterator/unittest/*.cpp
   interaction/unittest/*.cpp
   unittest/*.cpp
@@ -12,7 +9,6 @@ file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
   storage/unittest/*.cpp
   bc/unittest/*.cpp
   integrator/unittest/*.cpp
-  thermostat.cpp
 )
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
 
@@ -39,12 +35,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
 #build ESPRC
 #CMAKE_BINARY_DIR for espresso, CMAKE_CURRENT_BINARY_DIR for for _espressos.so and contrib for MPI.so
 if (EXTERNAL_MPI4PY)
-  set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_CURRENT_BINARY_DIR}/pymodule")
+  set (PYTHON_DIR "${CMAKE_BINARY_DIR}")
 else (EXTERNAL_MPI4PY)
-  set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_CURRENT_BINARY_DIR}/pymodule:${CMAKE_BINARY_DIR}/contrib")
+  set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib")
 endif (EXTERNAL_MPI4PY)
-#CMAKE_CURRENT_BINARY_DIR for pypresso
-set (BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 #CMAKE_CURRENT_BINARY_DIR for libespresso_common.so and contib for libespresso_boost
 set (LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
@@ -52,14 +46,13 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
 
 #after install ESPRC
 set (PYTHON_DIR "${CMAKE_INSTALL_PREFIX}/${PYTHON_INSTDIR}")
-set (BIN_DIR "${CMAKE_INSTALL_PREFIX}/bin")
-set (LIB_DIR "${CMAKE_INSTALL_PREFIX}/lib")
+set (LIB_DIR "${CMAKE_INSTALL_PREFIX}/${LIB}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
   ${CMAKE_CURRENT_BINARY_DIR}/ESPRC @ONLY)
 option(WITH_RC_FILES "Install Espresso rc file, no need when installing under /usr" ON)
-if (WITH_RC_FILES AND BUILD_PYTHON_MODULE)
+if (WITH_RC_FILES)
   install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/ESPRC DESTINATION bin)
-endif (WITH_RC_FILES AND BUILD_PYTHON_MODULE)
+endif (WITH_RC_FILES)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
@@ -69,24 +62,11 @@ else(EXTERNAL_BOOST)
   set (BOOST espresso_boost)
 endif(EXTERNAL_BOOST)
 
-add_library(espresso_common ${ESPRESSO_SOURCES})
-target_link_libraries(espresso_common pylogger ${BOOST} ${PYTHON_LIBRARIES}
-                                      ${VAMPIRTRACE_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES})
-install(TARGETS espresso_common LIBRARY DESTINATION ${LIB} ARCHIVE DESTINATION lib)
+add_library(_espresso ${ESPRESSO_SOURCES})
+target_link_libraries(_espresso ${BOOST} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
+add_dependencies(_espresso scripts)
+#python libs have not prefix (default would be 'lib')
+set_target_properties(_espresso PROPERTIES PREFIX "" SUFFIX ".so" LIBRARY_OUTPUT_DIRECTORY ..)
+install(TARGETS _espresso LIBRARY DESTINATION ${PYTHON_INSTDIR})
 
-add_library(pylogger esutil/PyLogger.cpp)
-target_link_libraries(pylogger ${BOOST})
-install(TARGETS pylogger LIBRARY DESTINATION ${LIB} ARCHIVE DESTINATION lib)
-
-if(BUILD_STANDALONE)
-  add_executable(pypresso main/pypresso.cpp)
-  target_link_libraries(pypresso espresso_common ${MPI4PY_LIBRARIES})
-  add_dependencies(pypresso scripts)
-  install(TARGETS pypresso RUNTIME DESTINATION bin)
-endif(BUILD_STANDALONE)
-
-#we have to build _espresso in a subdir to avoid endless recursion in python
-add_subdirectory(pymodule)
-
-
-add_dependencies(espresso_common hgversion)
+add_dependencies(_espresso hgversion)

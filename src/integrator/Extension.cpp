@@ -59,6 +59,7 @@ namespace espresso {
 
       class_< Extension, boost::noncopyable >
         ("integrator_Extension", no_init)
+        .add_property("type",&Extension::getType, &Extension::setType)
         .def("setIntegrator", &Extension::setIntegrator)
         .def("connect", &Extension::connect)
         .def("disconnect", &Extension::disconnect)

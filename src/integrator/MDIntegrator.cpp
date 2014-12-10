@@ -85,6 +85,13 @@ namespace espresso {
        exList.push_back(extension);
     }
 
+    int MDIntegrator::getNumberOfExtensions() {
+    	return exList.size();
+    }
+
+    shared_ptr<integrator::Extension> MDIntegrator::getExtension(int k) {
+    	return exList[k];
+    }
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
@@ -102,6 +109,8 @@ namespace espresso {
         .add_property("system", &SystemAccess::getSystem)
         .def("run", &MDIntegrator::run)
         .def("addExtension", &MDIntegrator::addExtension)
+        .def("getNumberOfExtensions", &MDIntegrator::getNumberOfExtensions)
+        .def("getExtension", &MDIntegrator::getExtension)
         ;
     }
   }

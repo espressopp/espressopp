@@ -6,8 +6,7 @@ set is_csh = 123
 test "$is_csh" = 123 && goto CSH
 
 export PYTHONPATH="@PYTHON_DIR@${PYTHONPATH:+:}${PYTHONPATH}"
-export PATH="@BIN_DIR@${PATH:+:}${PATH}"
-export LD_LIBRARY_PATH="@LIB_DIR@:@PYTHON_DIR@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH="@LIB_DIR@${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH}"
 return
 
 CSH:
@@ -16,13 +15,8 @@ if ($?PYTHONPATH) then
 else
   setenv PYTHONPATH "@PYTHON_DIR@"
 endif
-if ($?PATH) then
-  setenv PATH "@BIN_DIR@:$PATH"
-else
-  setenv PATH "@BIN_DIR@"
-endif
 if ($?LD_LIBRARY_PATH) then
-  setenv LD_LIBRARY_PATH "@LIB_DIR@:@PYTHON_DIR@:$LD_LIBRARY_PATH"
+  setenv LD_LIBRARY_PATH "@LIB_DIR@:$LD_LIBRARY_PATH"
 else
-  setenv LD_LIBRARY_PATH "@LIB_DIR@:@PYTHON_DIR@"
+  setenv LD_LIBRARY_PATH "@LIB_DIR@"
 endif

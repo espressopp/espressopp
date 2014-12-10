@@ -44,6 +44,8 @@
 #include "Quartic.hpp"
 #include "VSphereSelf.hpp"
 #include "VSpherePair.hpp"
+#include "HarmonicTrap.hpp"
+#include "LennardJones93Wall.hpp"
 #include "MirrorLennardJones.hpp"
 
 #include "Tabulated.hpp"
@@ -63,6 +65,7 @@
 #include "OPLS.hpp"
 #include "DihedralHarmonicCos.hpp"
 #include "DihedralHarmonicUniqueCos.hpp"
+#include "DihedralHarmonicNCos.hpp"
 #include "CoulombKSpaceEwald.hpp"
 #include "CoulombRSpace.hpp"
 #include "StillingerWeberPairTerm.hpp"
@@ -74,6 +77,7 @@
 #include "CoulombKSpaceP3M.hpp"
 #include "Potential.hpp"
 #include "PotentialVSpherePair.hpp"
+#include "SingleParticlePotential.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -82,6 +86,7 @@ namespace espresso {
       Potential::registerPython();
       PotentialVSpherePair::registerPython();
       PotentialUniqueDist::registerPython();
+      SingleParticlePotential::registerPython();
       Zero::registerPython();
       LennardJones::registerPython();
       LJcos::registerPython();
@@ -104,6 +109,8 @@ namespace espresso {
       Quartic::registerPython();
       VSphereSelf::registerPython();
       VSpherePair::registerPython();
+      HarmonicTrap::registerPython();
+      LennardJones93Wall::registerPython();
       MirrorLennardJones::registerPython();
       
       AngularPotential::registerPython();
@@ -121,6 +128,7 @@ namespace espresso {
       OPLS::registerPython();
       DihedralHarmonicCos::registerPython();
       DihedralHarmonicUniqueCos::registerPython();
+      DihedralHarmonicNCos::registerPython();
       
       CoulombKSpaceEwald::registerPython();
       CoulombRSpace::registerPython();

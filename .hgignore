@@ -11,7 +11,6 @@ ESPRC
 espresso
 src/acconfig.hpp
 src/hgversion.hpp
-src/pypresso
 build
 CMakeFiles/*
 cmake_install.cmake

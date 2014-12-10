@@ -68,6 +68,7 @@ from espresso.interaction.DihedralUniquePotential import *
 from espresso.interaction.TabulatedDihedral import *
 from espresso.interaction.OPLS import *
 from espresso.interaction.DihedralHarmonicCos import *
+from espresso.interaction.DihedralHarmonicNCos import *
 from espresso.interaction.DihedralHarmonicUniqueCos import *
 
 from espresso.interaction.CoulombKSpaceEwald import *
@@ -79,3 +80,7 @@ from espresso.interaction.TersoffPairTerm import *
 from espresso.interaction.TersoffTripleTerm import *
 
 from espresso.interaction.CoulombKSpaceP3M import *
+
+from espresso.interaction.SingleParticlePotential import *
+from espresso.interaction.HarmonicTrap import *
+from espresso.interaction.LennardJones93Wall import *

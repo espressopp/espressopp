@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 import subprocess
@@ -41,7 +41,9 @@ IMD_TRATE,      \
 IMD_IOERROR = range(10)
 
 def handshake(initsock):
+  print "before"
   (sock, sock_port) = initsock.accept()
+  print "after"
   header = struct.Struct('!II')
   msg    = header.pack(IMD_HANDSHAKE, IMDVERSION)
   sock.send(msg)
@@ -74,7 +76,20 @@ def drain_socket(sock):
     res = select.select([sock],[],[],0)[0]
   return
 
-def connect(system, molsize=10, pqrfile=None):
+def connect(system, molsize=10, pqrfile=False, vmd_path='vmd'):
+  """Connects to the VMD.
+
+  Args:
+    system: The system object.
+    molsize: The optional size of the molecule.
+    pqrfile: If set to True then the pqr vmd.pqr file will be used otherwise (default)
+      the vmd.pdb file will be used.
+    vmd_path: The path to the executable of vmd, by default it is set to 'vmd'.
+
+  Returns:
+    The socket to the VMD.
+
+  """
   espresso.tools.psfwrite("vmd.psf", system, molsize=molsize, maxdist=system.bc.boxL[0]/2)
   if pqrfile==True:
     espresso.tools.pqrwrite("vmd.pqr", system, molsize=molsize)
@@ -106,33 +121,33 @@ def connect(system, molsize=10, pqrfile=None):
   vmdfile.write("mol modstyle 0 0 VDW 0.4 20\n")
   vmdfile.write("mol modcolor 0 0 SegName\n")
   vmdfile.write("color Segname {T000} 3\n")
-  
+
   #vmdfile.write("mol delrep 0 top\n")
   #vmdfile.write("mol representation CPK 0.500000 0.500000 8.000000 6.000000\n")
   #vmdfile.write("mol color SegName\n")
   #vmdfile.write("mol selection {segname T000}\n")
-  #vmdfile.write("mol material Opaque\n")    
-  #vmdfile.write("mol addrep top\n")    
-  #vmdfile.write("mol selupdate 0 top 0\n")    
-  #vmdfile.write("mol colupdate 0 top 0\n")    
-  #vmdfile.write("mol scaleminmax top 0 0.000000 0.000000\n")    
-  #vmdfile.write("mol smoothrep top 0 0\n")    
-  #vmdfile.write("mol drawframes top 0 {now}\n")    
+  #vmdfile.write("mol material Opaque\n")
+  #vmdfile.write("mol addrep top\n")
+  #vmdfile.write("mol selupdate 0 top 0\n")
+  #vmdfile.write("mol colupdate 0 top 0\n")
+  #vmdfile.write("mol scaleminmax top 0 0.000000 0.000000\n")
+  #vmdfile.write("mol smoothrep top 0 0\n")
+  #vmdfile.write("mol drawframes top 0 {now}\n")
   #vmdfile.write("color Segname {T000} red\n")
   #vmdfile.write("color Display {Background} silver\n")
-  
+
   st = "imd connect %s %i\n" % (hostname, port)
   vmdfile.write(st)
   vmdfile.write("imd transfer 1\n")
   vmdfile.write("imd keep 1\n")
   vmdfile.close()
-  subprocess.Popen(['vmd', '-e', 'vmd.tcl'])
+  subprocess.Popen([vmd_path, '-e', 'vmd.tcl'])
 
   sock = handshake(initsock)
   if (sock != 0):
       time.sleep(0.25)
       drain_socket(sock)
-  
+
   return sock
 
 def imd_positions(system, sock, folded=True):

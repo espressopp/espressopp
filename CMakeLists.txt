@@ -23,15 +23,9 @@ include(CheckCXXCompilerFlag)
 ########################################################################
 option(EXTERNAL_BOOST "Use external boost" ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
-option(BUILD_STANDALONE "Builds pypresso an standalone binary" OFF)
-option(BUILD_PYTHON_MODULE "Builds epresso as python module" ON)
 if (NOT DEFINED LIB)
   set(LIB "lib")
 endif(NOT DEFINED LIB)
-
-if(NOT BUILD_STANDALONE AND NOT BUILD_PYTHON_MODULE)
-  message(FATAL_ERROR "You need to enable pypresso or the python module")
-endif(NOT BUILD_STANDALONE AND NOT BUILD_PYTHON_MODULE)
 
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release CACHE STRING
@@ -123,7 +117,7 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 # add_definitions( -DHAVE_CONFIG_H )
 
 if (EXTERNAL_BOOST)
-  find_package(Boost 1.47.0 COMPONENTS mpi python serialization filesystem)
+  find_package(Boost 1.55.0 COMPONENTS mpi python serialization filesystem)
   if(NOT Boost_FOUND)
     message(FATAL_ERROR "Boost not found, make sure you have installed boost and it's dev packages. To hint cmake to your Boost installation, use the option -DBOOST_ROOT=/path/to/boost. As last resort you can use our internal replacement with -DEXTERNAL_BOOST=OFF")
   endif(NOT Boost_FOUND)
@@ -160,7 +154,7 @@ add_subdirectory(contrib)
 
 add_custom_target(symlink ALL COMMENT "Creating symlink")
 add_custom_command(TARGET symlink COMMAND ${CMAKE_COMMAND} -E create_symlink
-  ${CMAKE_BINARY_DIR}/src espresso)
+  src espresso)
 
 ######################################
 # System documentation (Doxygen)     # 

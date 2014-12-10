@@ -92,8 +92,8 @@ namespace espresso {
           for (vector<longint>::iterator itr=localIDs.begin(); itr!=localIDs.end(); ++itr) {
             size_t i = *itr;
             
-            Real3D pos1 = getConf(n + m)->getCoordinates(i) - centerOfMassList[n+m];
-            Real3D pos2 = getConf(n)->getCoordinates(i)     - centerOfMassList[n];
+            Real3D pos1 = getConf(n + m)->getCoordinates(i); // - centerOfMassList[n+m];
+            Real3D pos2 = getConf(n)->getCoordinates(i); //     - centerOfMassList[n];
             Real3D delta = pos2 - pos1;
             Z[m] += delta.sqr();
           }
