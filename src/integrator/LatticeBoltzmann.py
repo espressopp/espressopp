@@ -99,10 +99,11 @@ class LatticeBoltzmannLocal(ExtensionLocal, integrator_LatticeBoltzmann):
 	      cxxinit(self, integrator_LatticeBoltzmann, system, Ni, a, tau, numDims, numVels)
 
 if pmi.isController :
-    class LatticeBoltzmann(Extension):
-        __metaclass__ = pmi.Proxy
-        pmiproxydefs = dict(
-            cls =  'espresso.integrator.LatticeBoltzmannLocal',
-            pmiproperty = [ 'Ni', 'a', 'tau', 'numDims', 'numVels', 
-                           'gamma_b', 'gamma_s', 'gamma_odd', 'gamma_even', 'lbTemp', 'fricCoeff']
+	class LatticeBoltzmann(Extension):
+		__metaclass__ = pmi.Proxy
+		pmiproxydefs = dict(
+												cls =  'espresso.integrator.LatticeBoltzmannLocal',
+												pmiproperty = [ 'Ni', 'a', 'tau', 'numDims', 'numVels',
+                           'gamma_b', 'gamma_s', 'gamma_odd', 'gamma_even', 'lbTemp', 'fricCoeff', 'nSteps'],
+												pmicall = ["readCouplForces","saveCouplForces"]
             )

@@ -94,6 +94,10 @@ namespace espresso {
     void LBSite::setExtForceLoc (Real3D _extForceLoc) {extForceLoc = _extForceLoc;}
     Real3D LBSite::getExtForceLoc () {return extForceLoc;}
 		void LBSite::addExtForceLoc (Real3D _extForceLoc) {extForceLoc += _extForceLoc;}
+
+		void LBSite::setCouplForceLoc (Real3D _couplForceLoc) {couplForceLoc = _couplForceLoc;}
+		Real3D LBSite::getCouplForceLoc () {return couplForceLoc;}
+		void LBSite::addCouplForceLoc (Real3D _couplForceLoc) {couplForceLoc += _couplForceLoc;}
 		
 		/* for LB to MD coupling forces */
 //		Real3D LBSite::getMDForceLoc() {return MDForceLoc;}
@@ -183,7 +187,7 @@ namespace espresso {
       /* if we have external forces then modify the eq.fluxes */
 			// ADD LB TO MD COUPLING??
 			if (_extForceFlag == 0) printf ("extForceFlag is %d\n",_extForceFlag);
-			if (_extForceFlag == 1) jLoc += 0.5*getExtForceLoc();
+			if (_extForceFlag == 1) jLoc += 0.5*(getExtForceLoc() + getCouplForceLoc()); // when doing coupling, the flag is set to 1!
 
       /* eq. stress modes */
       setMeq_i (4, jLoc.sqr() / rhoLoc);
@@ -254,8 +258,8 @@ namespace espresso {
     void LBSite::applyForces(int _numVels) {
       Real3D _f = Real3D(0.,0.,0.);
 			
-			_f = getExtForceLoc();
-
+			_f = getExtForceLoc() + getCouplForceLoc();
+			
       // set velocity _u
       Real3D _u (getM_i(1) + 0.5*_f[0], getM_i(2) + 0.5*_f[1], getM_i(3) + 0.5*_f[2]);
       _u /= getM_i(0);

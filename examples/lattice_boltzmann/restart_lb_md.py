@@ -9,19 +9,20 @@ matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 plt.ion()
 
-# create default Lennard Jones (WCA) system with 0 particles and cubic box (L=40)
+#read in the restart configuration
+pid, type, x, y, z, vx, vy, vz, Lx, Ly, Lz = espresso.tools.readxyz('dump.86500.xyz')
+num_particles 		= len(pid)
+box			= (Lx, Ly, Lz)
 num_chains		= 328
-#num_chains		= 100
 monomers_per_chain	= 10
-L			= 16
-box			= (L, L, L)
-bondlen			= 0.97
 rc 			= 2 * pow(2, 1./6.)
 skin			= 0.3
-dt			= 0.0000001
-epsilon			= 0.
+epsilon			= 1.
 sigma			= 1.
 temperature		= 1.0
+dt			= 0.005
+
+# create default Lennard Jones (WCA) system with 0 particles and cubic box (L=40)
 print "Initial values"
 
 system         = espresso.System()
@@ -38,35 +39,33 @@ system.addInteraction(interaction)
 
 integrator     = espresso.integrator.VelocityVerlet(system)
 integrator.dt  = dt
-thermostat     = espresso.integrator.LangevinThermostat(system)
-thermostat.gamma  = 1.0
-thermostat.temperature = temperature
-integrator.addExtension(thermostat)
+#thermostat     = espresso.integrator.LangevinThermostat(system)
+#thermostat.gamma  = 1.0
+#thermostat.temperature = temperature
+#integrator.addExtension(thermostat)
 
-print integrator.dt
-print thermostat.gamma
-print thermostat.temperature
+print 'timestep is ', integrator.dt
+#print 'gamma of the thermostat is ', thermostat.gamma
+#print 'temperature of the thermostat is ', thermostat.temperature
 
+# redefine bonds
 props    = ['id', 'type', 'mass', 'pos', 'v']
-vel_zero = espresso.Real3D(0.0, 0.0, 0.0)
-
 bondlist = espresso.FixedPairList(system.storage)
-pid      = 1
-type     = 0
-mass     = 1.0
-chain    = []
+mass = 1.0
 
 for i in range(num_chains):
-	startpos = system.bc.getRandomPos()
-	positions, bonds = espresso.tools.topology.polymerRW(pid, startpos, monomers_per_chain, bondlen)
+	chain = []
+	bonds = []
 	for k in range(monomers_per_chain):
-		part = [pid + k, type, mass, positions[k], vel_zero]
-		chain.append(part)
-	pid += monomers_per_chain
-	type += 1
+		partid = i * monomers_per_chain + k + 1
+		pos = Real3D(x[partid-1], y[partid-1], z[partid-1])
+		v = Real3D(vx[partid-1], vy[partid-1], vz[partid-1])
+		particle = [partid, type[partid-1], mass, pos, v]
+		chain.append(particle)
+		if partid % monomers_per_chain != 0:
+			bonds.append((partid,partid + 1))
 	system.storage.addParticles(chain, *props)
 	system.storage.decompose()
-	chain = []
 	bondlist.addBonds(bonds)
 
 system.storage.decompose()
@@ -75,49 +74,20 @@ potFENE   = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
 interFENE = espresso.interaction.FixedPairListFENE(system, bondlist, potFENE)
 system.addInteraction(interFENE)
 
-force_capping = espresso.integrator.CapForce(system, 1000.0)
-integrator.addExtension(force_capping)
-espresso.tools.analyse.info(system, integrator)
-
-print "First phase of the warm up. Epsilon will be increased from 0. to 1.0 and timestep to 0.001"
-new_epsilon = 0.
-new_force_cap = 1000.
-for l in range(4):
-	new_dt = integrator.dt
-#	print "new_dt is" 
-#	print new_dt
-	for k in range(1000):
-		integrator.run(10)
-		espresso.tools.analyse.info(system, integrator)
-		new_epsilon += 0.00025
-		potLJ = espresso.interaction.LennardJones(new_epsilon, sigma, rc)
-		interaction.setPotential(type1=0, type2=0, potential=potLJ)
-#	espresso.tools.analyse.info(system, integrator)
-#	print "new epsilon value is " 
-#	print new_epsilon
-	for k in range(9):
-		integrator.run(1000)
-		integrator.dt += new_dt
-		espresso.tools.analyse.info(system, integrator)
-		new_force_cap += 100
-		force_capping.setAbsCapForce(new_force_cap)
-		print new_force_cap
-	print integrator.dt
-
-force_capping.disconnect()
-
-print "Second phase of the warm up with a production timestep. Force capping is turned off."
-integrator.dt = 0.005
-for k in range(10):
-	integrator.run(1000)
+for k in range(5):
 	espresso.tools.analyse.info(system, integrator)
+	cmvel = Real3D(0.,0.,0.)
+	for i in range(1,num_particles+1):
+		particle = system.storage.getParticle(i)
+		cmvel += particle.v
+	print "centre of mass velocity is ", cmvel
+	integrator.run(100)
 
-thermostat.disconnect() # disconnect md-thermostat as we want to run lb-md coupled system
+#thermostat.disconnect() # disconnect md-thermostat as we want to run lb-md coupled system
 
 # define a LB grid
 lb = espresso.integrator.LatticeBoltzmann(system, Ni=Int3D(16, 16, 16))
 initPop = espresso.integrator.LBInitPopUniform(system,lb)
-#initPop = espresso.integrator.LBInitPopWave(system,lb)
 initPop.createDenVel(1.0, Real3D(0.,0.,0.0))
 
 # declare gammas responsible for viscosities (if they differ from 0)
@@ -125,30 +95,11 @@ lb.gamma_b = 0.5
 lb.gamma_s = 0.5
 
 # specify desired temperature (set the fluctuations if any)
-#lb.lbTemp = 0.0
 lb.lbTemp = 0.000025
 lb.fricCoeff = 20.
-#lb.fricCoeff = 0.
 
 # add extension to the integrator
 integrator.addExtension(lb)
-
-# output velocity profile vz (x)
-#lboutputVzOfX = espresso.analysis.LBOutputProfileVzOfX(system,lb)
-#OUT1=espresso.integrator.ExtAnalyze(lboutputVzOfX,100)
-#integrator.addExtension(OUT1)
-
-# output velocity vz at a certain lattice site as a function of time
-#lboutputVzInTime = espresso.analysis.LBOutputVzInTime(system,lb)
-#OUT2=espresso.integrator.ExtAnalyze(lboutputVzInTime,100)
-#integrator.addExtension(OUT2)
-
-# output onto the screen
-#lboutputScreen = espresso.analysis.LBOutputScreen(system,lb)
-#OUT3=espresso.integrator.ExtAnalyze(lboutputScreen,2)
-#integrator.addExtension(OUT3)
-
-integrator.step = 0
 
 print integrator.dt
 print integrator.step

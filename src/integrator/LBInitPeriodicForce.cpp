@@ -56,11 +56,11 @@ namespace espresso {
             // set local forces and general flag
             if (periodicforce != Real3D(0.,0.,0.)) {
               latticeboltzmann->setExtForceFlag(1);
-              latticeboltzmann->setForceLoc(Int3D(i,j,k),periodicforce);
+              latticeboltzmann->setExtForceLoc(Int3D(i,j,k),periodicforce);
               _id = 1;
             } else {
               latticeboltzmann->setExtForceFlag(0);
-              latticeboltzmann->setForceLoc(Int3D(i,j,k),Real3D(0.,0.,0.));
+              latticeboltzmann->setExtForceLoc(Int3D(i,j,k),Real3D(0.,0.,0.));
             }
           }
         }
@@ -87,15 +87,15 @@ namespace espresso {
 
         for (int j = 0; j < _Ni.getItem(1); j++) {
           for (int k = 0; k < _Ni.getItem(2); k++) {
-            existingforce = latticeboltzmann->getForceLoc(Int3D(i,j,k));
+            existingforce = latticeboltzmann->getExtForceLoc(Int3D(i,j,k));
             // set local forces and general flag
             if (existingforce + periodicforce != Real3D(0.,0.,0.)) {
               latticeboltzmann->setExtForceFlag(1);
-              latticeboltzmann->setForceLoc(Int3D(i,j,k),existingforce + periodicforce);
+              latticeboltzmann->setExtForceLoc(Int3D(i,j,k),existingforce + periodicforce);
               _id = 2;
             } else {
               latticeboltzmann->setExtForceFlag(0);
-              latticeboltzmann->setForceLoc(Int3D(i,j,k),Real3D(0.,0.,0.));
+              latticeboltzmann->setExtForceLoc(Int3D(i,j,k),Real3D(0.,0.,0.));
             }
           }
         }

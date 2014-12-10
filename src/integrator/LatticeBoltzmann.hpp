@@ -125,10 +125,16 @@ namespace espresso {
 			void setLBFluid (Int3D _Ni, int _l, real _value);
 			real getLBFluid (Int3D _Ni, int _l);
 
-			void setForceLoc (Int3D _Ni, Real3D _extForceLoc);
-			Real3D getForceLoc (Int3D _Ni);
-			void addForceLoc (Int3D _Ni, Real3D _extForceLoc);
+			void setExtForceLoc (Int3D _Ni, Real3D _extForceLoc);
+			Real3D getExtForceLoc (Int3D _Ni);
+			void addExtForceLoc (Int3D _Ni, Real3D _extForceLoc);
 
+			void setCouplForceFlag (int _couplForceFlag); // set a flag for a coupling force
+			int getCouplForceFlag ();											// get a flag for a coupling force
+			
+			void readCouplForces ();								// reades coupling forces acting on MD particles at restart
+			void saveCouplForces ();								// writes coupling forces acting on MD particles for restart
+			
 			void setGhostFluid (Int3D _Ni, int _l, real _value);
 			/* END OF SET AND GET DECLARATION */
 
@@ -142,29 +148,41 @@ namespace espresso {
 			void setStart(int _start);			// set start indicator for coupling
 			int getStart();									// get start indicator
 			
-			Real3D findCMVel();									// find velocity of the center of mass and num of part
-			void testCMVel();									// test velocity of the center of mass and num of part
+			void setRestart(int _restart);			// set restart indicator for coupling
+			int getRestart();									// get restart indicator
+			
+			void setCheckMDMom(int _checkMD);			// set an indicator to check MD momentum
+			int getCheckMDMom();									// get an indicator to check MD momentum
+			
+			Real3D findCMVelMD();									// find velocity of the center of mass and num of part
+			void testMDMom(int _id);							// test velocity of the center of mass and num of part
+			void testMDMom2();										// function to connect to the boost signal
 			void zeroMDCMVel();
 			void galileanTransf(Real3D _cmVel);	// make galilean transform to by amount of _momPerPart
 			void subtractMom (class Particle&, Real3D);
-			void testMomCons ();
+			void testLBMom ();
 			
 			void coupleLBtoMD();
-			void calcFluctForce(real _fricCoeff, real _temperature, real _timestep);
+			void calcRandForce(class Particle&, real _fricCoeff, real _temperature, real _timestep);
 			void addPolyLBForces(class Particle&);		// add to polymers forces due to LBsites
+			void restorePolyLBForces();// add the same forces before integrating velocity in MD
 //			void calcInterVel(class Particle&);
 			void calcViscForce(class Particle&, real _fricCoeff, real _timestep);
+			void extrapMomToNodes(class Particle&, real _timestep);
 			
 			void setFricCoeff (real _fricCoeff);// set friction coefficient of MD to LB coupling
 			real getFricCoeff ();								// get friction coefficient of MD to LB coupling
 			
-			void setFOnPart (Real3D _fOnPart);
-			Real3D getFOnPart ();
-			void addFOnPart (int _dir, real _value);
+			void setNSteps (int _nSteps);			// set number of md steps between 1 lb
+			int getNSteps ();									// get number of md steps between 1 lb
+			
+			void setFOnPart (int _id, Real3D _fOnPart);
+			Real3D getFOnPart (int _id);
+			void addFOnPart (int _id, Real3D _fOnPart);
 			
 			void setInterpVel (Real3D _interpVel);
 			Real3D getInterpVel ();
-			void addInterpVel (int _dir, real _value);
+			void addInterpVel (Real3D _interpVel);
 //			void setParticleGroup(shared_ptr< ParticleGroup > _particleGroup);
 //			shared_ptr< ParticleGroup > getParticleGroup();
 			
@@ -194,15 +212,22 @@ namespace espresso {
 			real lbTemp;
 			real fricCoeff;
 			int start;
+			int restart;
+			int checkMD;
 			int lbTempFlag;
-			int stepNum;								// step number
-			std::vector<real> eqWeight; // lattice weights
-			std::vector<Real3D> c_i;    // velocity vectors
-			std::vector<real> inv_b_i;  // back-transformation weights
-			std::vector<real> phi;			// amplitudes of fluctuations
-			int extForceFlag;           // flag for external force
-			Int3D Ni;              		  // lattice lengths in 3D
-			int idX, idY, idZ, index;	  // indexes in 3D and aligned 1D index
+			int stepNum;									// step number
+			int nSteps;
+			std::vector<real> eqWeight;		// lattice weights
+			std::vector<Real3D> c_i;			// velocity vectors
+			std::vector<real> inv_b_i;		// back-transformation weights
+			std::vector<real> phi;				// amplitudes of fluctuations
+			
+			Int3D partBin;								// bins where the MD particle is
+			int extForceFlag;							// flag for an external force
+			int couplForceFlag;						// flag for a coupling force
+			std::vector<Real3D> fOnPart;	// force acting onto an MD particle
+			Int3D Ni;											// lattice lengths in 3D
+			int idX, idY, idZ, index;			// indexes in 3D and aligned 1D index
 			
 			/*	two lattices. lbfluid has f,m and meq. ghostlat has f only.
 			*		the latter one used for sake of simplicity during streaming
@@ -216,11 +241,10 @@ namespace espresso {
 			shared_ptr< esutil::RNG > rng;  //!< random number generator used for fluctuations
 
 			// COUPLING
-			Real3D fOnPart;							// force acting onto an MD particle
 			Real3D interpVel;						// interpolated fluid vel at the MD particle position
-			boost::signals2::connection _befIntV;
-			boost::signals2::connection _befIntP;
+
 			boost::signals2::connection _aftIntV;
+			boost::signals2::connection _befIntV;
 			boost::signals2::connection _recalc2;
 			
 			void connect();
