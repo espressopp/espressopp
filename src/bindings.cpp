@@ -39,6 +39,7 @@
 #include <FixedTripleAngleList.hpp>
 #include <FixedTripleListAdress.hpp>
 #include <FixedQuadrupleList.hpp>
+#include <FixedQuadrupleListAdress.hpp>
 #include <FixedQuadrupleAngleList.hpp>
 #include <FixedTupleList.hpp>
 #include <FixedTupleListAdress.hpp>
@@ -73,6 +74,7 @@ void espresso::registerPython() {
   espresso::FixedTripleAngleList::registerPython();
   espresso::FixedTripleListAdress::registerPython();
   espresso::FixedQuadrupleList::registerPython();
+  espresso::FixedQuadrupleListAdress::registerPython();
   espresso::FixedQuadrupleAngleList::registerPython();
   espresso::FixedTupleList::registerPython();
   espresso::FixedTupleListAdress::registerPython();

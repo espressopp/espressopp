@@ -36,7 +36,7 @@
 namespace espresso {
   class FixedTripleList : public TripleList {
       protected:
-		boost::signals2::connection con1, con2, con3;
+		boost::signals2::connection sigAfterRecv, sigOnParticleChanged, sigBeforeSend;
 		shared_ptr<storage::Storage> storage;
 		typedef boost::unordered_multimap <longint,std::pair <longint, longint> > GlobalTriples;
 		GlobalTriples globalTriples;

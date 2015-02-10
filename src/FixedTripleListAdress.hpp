@@ -63,7 +63,7 @@ namespace espresso {
 
 	  protected:
 		// fixedtuple list connects to this and triggers beforeSendATParticles()
-		boost::signals2::connection con;
+		boost::signals2::connection sigBeforeSendAT, sigAfterRecvAT;
 
 	  private:
 		shared_ptr<FixedTupleListAdress> fixedtupleList;

@@ -46,39 +46,21 @@ namespace espresso {
 
         LOG4ESPP_INFO(theLogger, "construct FixedTupleListAdress");
 
-        con1 = storage->beforeSendParticles.connect
-          (boost::bind(&FixedTupleListAdress::beforeSendParticles, this, _1, _2));
-        con2 = storage->afterRecvParticles.connect
-          (boost::bind(&FixedTupleListAdress::afterRecvParticles, this, _1, _2));
-        /*con3 = storage->onParticlesChanged.connect
-          (boost::bind(&FixedTupleListAdress::onParticlesChanged, this));*/
-        con4 = storage->onTuplesChanged.connect
-          (boost::bind(&FixedTupleListAdress::onParticlesChanged, this));
-
-        //storage->setFixedTuples(this);
-
+        sigBeforeSend = storage->beforeSendParticles.connect
+           (boost::bind(&FixedTupleListAdress::beforeSendParticles, this, _1, _2));
+        sigAfterRecv = storage->afterRecvParticles.connect
+           (boost::bind(&FixedTupleListAdress::afterRecvParticles, this, _1, _2));
+        sigOnTupleChanged = storage->onTuplesChanged.connect
+           (boost::bind(&FixedTupleListAdress::onParticlesChanged, this));
     }
 
     FixedTupleListAdress::~FixedTupleListAdress() {
 
         LOG4ESPP_INFO(theLogger, "~FixedTupleListAdress");
-
-        con1.disconnect();
-        con2.disconnect();
-        //con3.disconnect();
-        con4.disconnect();
+        sigBeforeSend.disconnect();
+        sigAfterRecv.disconnect();
+        sigOnTupleChanged.disconnect();
     }
-
-    /* -- not used anymore
-    int FixedTupleListAdress::getNumPart(longint pid) {
-        //std::cout << "looking up pid " << pid << "\n";
-        int size = 0;
-        GlobalTuples::const_iterator it = globalTuples.find(pid);
-        if (it != globalTuples.end()) {
-            size = it->second.size();
-        }
-        return size;
-    }*/
 
     bool FixedTupleListAdress::addT(tuple pids) {
         bool returnVal = true;
@@ -304,7 +286,7 @@ namespace espresso {
             it = globalTuples.insert(it, std::make_pair(pidK, pids));
             pids.clear();
 		}
-
+        afterRecvATParticles(pl, buf);
     }
 
     void FixedTupleListAdress::onParticlesChanged() {
