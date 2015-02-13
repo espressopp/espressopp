@@ -30,6 +30,7 @@
 #include "Tensor.hpp"
 #include "Particle.hpp"
 #include "FixedQuadrupleList.hpp"
+#include "FixedQuadrupleListAdress.hpp"
 #include "esutil/Array2D.hpp"
 #include "bc/BC.hpp"
 #include "SystemAccess.hpp"
