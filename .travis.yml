@@ -2,18 +2,14 @@ language: cpp
 
 before_install:
  - sudo add-apt-repository -y ppa:brad-froehle/backports #newer mpi4py
+ - sudo add-apt-repository -y ppa:boost-latest/ppa  # boost 1.55
  - sudo apt-get update
  - sudo apt-get install cmake libfftw3-dev libopenmpi-dev 
- - if [[ $EXTERNAL = ON ]]; then sudo apt-get install libboost1.48-all-dev python-mpi4py; fi
+ - if [[ $EXTERNAL = ON ]]; then sudo apt-get install libboost1.55-all-dev python-mpi4py; fi
 
 env: #maybe add mpich later
   - EXTERNAL=ON
   - EXTERNAL=OFF
-
-matrix:
-  exclude:
-    - compiler: clang
-      env: EXTERNAL=ON #boost-1.48 is too old for clang
 
 script:
   - mkdir build && cd build && 
