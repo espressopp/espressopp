@@ -42,6 +42,7 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "Force capping for all particles constructed");
       allParticles = true;
       absCapping   = false;
+      adress = false;
     }
 
     CapForce::CapForce(shared_ptr<System> system, real _absCapForce)
@@ -50,6 +51,7 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "Force capping for all particles constructed");
       allParticles = true;
       absCapping   = true;
+      adress = false;
     }
 
     CapForce::CapForce(shared_ptr<System> system, const Real3D& _capForce, shared_ptr< ParticleGroup > _particleGroup)
@@ -58,6 +60,7 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "Force capping for particle group constructed");
       allParticles = false;
       absCapping   = false;
+      adress = false;
     }
 
     CapForce::CapForce(shared_ptr<System> system, real _absCapForce, shared_ptr< ParticleGroup > _particleGroup)
@@ -66,6 +69,7 @@ namespace espresso {
       LOG4ESPP_INFO(theLogger, "Force capping for particle group constructed");
       allParticles = false;
       absCapping   = true;
+      adress = false;
     }
 
     void CapForce::disconnect(){
@@ -75,9 +79,9 @@ namespace espresso {
     void CapForce::connect(){
       // connection to initialisation
       if (!allParticles) {
-        _aftCalcF  = integrator->aftCalcF.connect( boost::bind(&CapForce::applyForceCappingToGroup, this));
+        _aftCalcF  = integrator->aftCalcF.connect( boost::bind(&CapForce::applyForceCappingToGroup, this), boost::signals2::at_back);
       } else {
-    	_aftCalcF  = integrator->aftCalcF.connect( boost::bind(&CapForce::applyForceCappingToAll, this));
+    	_aftCalcF  = integrator->aftCalcF.connect( boost::bind(&CapForce::applyForceCappingToAll, this), boost::signals2::at_back);
       }
     }
 
@@ -95,6 +99,14 @@ namespace espresso {
 
     real CapForce::getAbsCapForce() {
     	return absCapForce;
+    }
+    
+    void CapForce::setAdress(bool _adress){
+        adress = _adress;
+    }
+
+    bool CapForce::getAdress(){
+        return adress;
     }
 
     void CapForce::setParticleGroup(shared_ptr< ParticleGroup > _particleGroup) {
@@ -157,6 +169,7 @@ namespace espresso {
              real scaling = sqrt(capfsq / fsq);
              Real3D& f=cit->force();
       	     for (int dir=0; dir<3; dir++) f[dir] *= scaling;
+             //std::cout << "Force Capping applied on particle " << cit->getId() << "\n";
            }
          }
        } else {
@@ -172,6 +185,21 @@ namespace espresso {
       	     }
            }
        }
+       
+       if (adress && absCapping){
+         real capfsq2 = absCapForce * absCapForce;
+         ParticleList& adrATparticles = system.storage->getAdrATParticles();
+         for (std::vector<Particle>::iterator it = adrATparticles.begin();
+                     it != adrATparticles.end(); it++) {             
+             real fsq2 = it->force().sqr();
+             if (fsq2 > capfsq2) {
+                real scaling2 = sqrt(capfsq2 / fsq2);
+                Real3D& f2=it->force();
+                for (int dir=0; dir<3; dir++) f2[dir] *= scaling2;
+                //std::cout << "AdResS Force Capping applied on particle " << it->getId() << "\n";
+             }                     
+         }
+       }       
      }
 
     /****************************************************
@@ -189,6 +217,7 @@ namespace espresso {
         .def(init< shared_ptr< System >, const Real3D&, shared_ptr< ParticleGroup > >())
         .def(init< shared_ptr< System >, real, shared_ptr< ParticleGroup > >())
         .add_property("particleGroup", &CapForce::getParticleGroup, &CapForce::setParticleGroup)
+        .add_property("adress", &CapForce::getAdress, &CapForce::setAdress)
         .def("getCapForce", &CapForce::getCapForce, return_value_policy< reference_existing_object >())
         .def("getAbsCapForce", &CapForce::getAbsCapForce)
         .def("setCapForce", &CapForce::setCapForce )

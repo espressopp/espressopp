@@ -20,44 +20,44 @@
 
 
 """
-**********************************************
-**espresso.integrator.FreeEnergyCompensation**
-**********************************************
+*****************************************************
+**espresso.integrator.GeneralizedLangevinThermostat**
+*****************************************************
 
 """
+
+# NOTE: This Generalized Langevin Thermostat uses the extended variable scheme
+# and only applies the memory-based friction term, no noise is applied.
+
 from espresso.esutil import cxxinit
 from espresso import pmi
 
 from espresso.integrator.Extension import *
-from _espresso import integrator_FreeEnergyCompensation 
+from _espresso import integrator_GeneralizedLangevinThermostat 
 
-class FreeEnergyCompensationLocal(ExtensionLocal, integrator_FreeEnergyCompensation):
+class GeneralizedLangevinThermostatLocal(ExtensionLocal, integrator_GeneralizedLangevinThermostat):
     'The (local) Velocity Verlet Integrator.'
-    def __init__(self, system, center=[]):
+    def __init__(self, system):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_FreeEnergyCompensation, system)
-            
-            # set center of FreeEnergyCompensation force
-            if (center != []):
-                self.cxxclass.setCenter(self, center[0], center[1], center[2])
+            cxxinit(self, integrator_GeneralizedLangevinThermostat, system)
 
-    def addForce(self, itype, filename, type):
+
+    def addCoeffs(self, itype, filename, type):
             """
             Each processor takes the broadcasted interpolation type,
             filename and particle type
             """
             if pmi.workerIsActive():
-                self.cxxclass.addForce(self, itype, filename, type)
-                
-    def computeCompEnergy(self):
-            if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-              return self.cxxclass.computeCompEnergy(self)
+                self.cxxclass.addCoeffs(self, itype, filename, type)
+    #def enableAdress(self):
+    #    if pmi.workerIsActive():
+    #        self.cxxclass.enableAdress(self);
 
 if pmi.isController :
-    class FreeEnergyCompensation(Extension):
+    class GeneralizedLangevinThermostat(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.FreeEnergyCompensationLocal',
+            cls =  'espresso.integrator.GeneralizedLangevinThermostatLocal',
             pmiproperty = [ 'itype', 'filename'],
-            pmicall = ['addForce' , 'computeCompEnergy']
+            pmicall = ['addCoeffs' ]
             )

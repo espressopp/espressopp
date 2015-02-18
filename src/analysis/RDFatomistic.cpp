@@ -23,7 +23,7 @@
 #include "python.hpp"
 #include "storage/DomainDecomposition.hpp"
 #include "iterator/CellListIterator.hpp"
-#include "Configuration.hpp"
+//#include "Configuration.hpp"
 #include "RDFatomistic.hpp"
 #include "esutil/Error.hpp"
 #include "bc/BC.hpp"
@@ -58,11 +58,18 @@ namespace espresso {
           
       real dr = Li_half[1] / (real)rdfN; // If you work with nonuniform Lx, Ly, Lz, you
                                          // should use for Li_half[XXX] the shortest side length   
+      /*struct data{
+          Real3D pos;
+          int type;
+          int molecule;
+      };*/
       
       int num_part = 0;
-      ConfigurationPtr config = make_shared<Configuration> ();
+      //ConfigurationPtr config = make_shared<Configuration> ();
+      map< size_t, data > config;
       for (int rank_i=0; rank_i<nprocs; rank_i++) {
-        map< size_t, Real3D > conf;
+        //map< size_t, Real3D > conf;
+        map< size_t, data > conf;
         if (rank_i == myrank) {
           shared_ptr<FixedTupleListAdress> fixedtupleList = system.storage->getFixedTuples();
           CellList realCells = system.storage->getRealCells();
@@ -79,13 +86,17 @@ namespace espresso {
                                            it3 != atList.end(); ++it3) {
                           Particle &at = **it3;
                           int id = at.id();
-                          conf[id] = at.position();
+                          //conf[id] = at.position();
+                          data tmp = { at.position(), at.type(), vp.id() };
+                          conf[id] = tmp;
                       }  
                 }
 
                 else{   // If not, use CG particle itself for calculation.
-                      int id = cit->id();
-                      conf[id] = cit->position();
+                    std::cout << "WARNING! In RDFatomistic, no atomistic AdResS particle found!\n";
+                    exit(1);
+                      //int id = cit->id();
+                      //conf[id] = cit->position();
                 }
   
           }
@@ -94,13 +105,18 @@ namespace espresso {
         boost::mpi::broadcast(*system.comm, conf, rank_i);
 
         // for simplicity we will number the particles from 0
-        for (map<size_t,Real3D>::iterator itr=conf.begin(); itr != conf.end(); ++itr) {
+        //for (map<size_t,Real3D>::iterator itr=conf.begin(); itr != conf.end(); ++itr) {
+        for (map<size_t,data>::iterator itr=conf.begin(); itr != conf.end(); ++itr) {
           //size_t id = itr->first;
-          Real3D p = itr->second;
-          config->set(num_part, p[0], p[1], p[2]);
+          //Real3D p = itr->second;
+          //config->set(num_part, p[0], p[1], p[2]);
+          data p = itr->second;
+          config[num_part] = p;
           num_part ++;
         }
       }
+      
+      int num_pairs = 0;
       // now all CPUs have all particle coords and num_part is the total number of particles
       
       // use all cpus
@@ -113,23 +129,41 @@ namespace espresso {
       
       int perc=0, perc1=0;
       for(int i = mini; i<maxi; i++){
-        Real3D coordP1 = config->getCoordinates(i);
-        for(int j = i+1; j<num_part; j++){
-          Real3D coordP2 = config->getCoordinates(j);
-          Real3D distVector = coordP1 - coordP2;
-          
-          // minimize the distance in simulation box
-          for(int ii=0; ii<3; ii++){
-            if( distVector[ii] < -Li_half[ii] ) distVector[ii] += Li[ii];
-            if( distVector[ii] >  Li_half[ii] ) distVector[ii] -= Li[ii];
-          }
-          
-          int bin = (int)( distVector.abs() / dr );
-          if( bin < rdfN){
-            histogram[bin] += 1.0;
-          }
-          
+        //Real3D coordP1 = config->getCoordinates(i);
+        Real3D coordP1 = config[i].pos;
+        int typeP1 = config[i].type;
+        int molP1 = config[i].molecule; 
+        
+        if((coordP1[0] < Li_half[0]+span) && (coordP1[0] > Li_half[0]-span) ){
+            for(int j = i+1; j<num_part; j++){
+              //Real3D coordP2 = config->getCoordinates(j);
+              Real3D coordP2 = config[j].pos;
+              int typeP2 = config[j].type;
+              int molP2 = config[j].molecule;
+
+              if (molP1 != molP2){
+
+                  if( ( (typeP1 == target1) && (typeP2 == target2) ) || ( (typeP1 == target2) && (typeP2 == target1) ) ){
+
+                      Real3D distVector = coordP1 - coordP2;
+
+                      // minimize the distance in simulation box
+                      for(int ii=0; ii<3; ii++){
+                        if( distVector[ii] < -Li_half[ii] ) distVector[ii] += Li[ii];
+                        if( distVector[ii] >  Li_half[ii] ) distVector[ii] -= Li[ii];
+                      }
+
+                      int bin = (int)( distVector.abs() / dr );
+                      if( bin < rdfN){
+                        histogram[bin] += 1.0;
+                      }
+                      num_pairs += 1;                  
+
+                  }            
+              }
+            }
         }
+        
         /*if(system.comm->rank()==0){
           perc = (int)(100*(real)(i-mini)/(real)(maxi-mini));
           if(perc>perc1){
@@ -143,12 +177,17 @@ namespace espresso {
 
       real totHistogram[rdfN];
       boost::mpi::all_reduce(*system.comm, histogram, rdfN, totHistogram, plus<real>());
-      
+    
+      int tot_num_pairs = 0;
+      boost::mpi::all_reduce(*system.comm, num_pairs, tot_num_pairs, plus<int>());
+      //std::cout << tot_num_pairs << "\n";
       // normalizing
       int nconfigs = 1; //config - 1
       //avg_part = part_total / float(nconfigs)
-      real rho = (real)num_part / (Li[0]*Li[1]*Li[2]);
-      real factor = 2.0 * M_PIl * dr * rho * (real)nconfigs * (real)num_part;
+      //real rho = (real)num_part / (Li[0]*Li[1]*Li[2]);
+      real rho = (real)1.0 / (Li[0]*Li[1]*Li[2]);
+      //real factor = 2.0 * M_PIl * dr * rho * (real)nconfigs * (real)num_part;
+      real factor = 4.0 * M_PIl * dr * rho * (real)nconfigs * (real)tot_num_pairs;
       
       for(int i=0; i < rdfN; i++){
         real radius = (i + 0.5) * dr;
@@ -170,7 +209,7 @@ namespace espresso {
     void RDFatomistic::registerPython() {
       using namespace espresso::python;
       class_<RDFatomistic, bases< Observable > >
-        ("analysis_RDFatomistic", init< shared_ptr< System > >())
+        ("analysis_RDFatomistic", init< shared_ptr< System >, int, int, real >())
         .def("compute", &RDFatomistic::computeArray)
       ;
     }

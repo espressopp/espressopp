@@ -56,6 +56,9 @@ namespace espresso {
         Real3D& getCapForce();
         real getAbsCapForce();
 
+        void setAdress(bool _adress);
+        bool getAdress();
+        
         void setParticleGroup(shared_ptr< ParticleGroup > _particleGroup);
 
         shared_ptr< ParticleGroup > getParticleGroup();
@@ -73,6 +76,7 @@ namespace espresso {
         shared_ptr< ParticleGroup > particleGroup;
         bool allParticles;
         bool absCapping;
+        bool adress;
         Real3D capForce;
         real absCapForce;
         void connect();

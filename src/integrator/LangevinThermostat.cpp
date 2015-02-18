@@ -155,7 +155,18 @@ namespace espresso {
       ParticleList& adrATparticles = system.storage->getAdrATParticles();
       for (std::vector<Particle>::iterator it = adrATparticles.begin();
               it != adrATparticles.end(); it++) {
-        frictionThermo(*it);
+            frictionThermo(*it);
+            
+        // Only in hybrid region!          
+        /*Particle &at = *it;
+        real w = at.lambda();  
+        if(w!=1.0 && w!=0.0) {
+            //std::cout << "w: " << w << std::endl;
+            //std::cout << "pos_x: " << at.position()[0] << std::endl;
+            
+            frictionThermo(*it);
+        }*/           
+            
       }
       
     }

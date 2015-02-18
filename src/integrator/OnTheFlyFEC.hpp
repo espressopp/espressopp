@@ -21,8 +21,8 @@
 */
 
 // ESPP_CLASS
-#ifndef _INTEGRATOR_FREEENERGYCOMPENSATION_HPP
-#define _INTEGRATOR_FREEENERGYCOMPENSATION_HPP
+#ifndef _INTEGRATOR_ONTHEFLYFEC_HPP
+#define _INTEGRATOR_ONTHEFLYFEC_HPP
 
 #include "types.hpp"
 #include "logging.hpp"
@@ -31,7 +31,8 @@
 #include "interaction/Interpolation.hpp"
 #include <map>
 
-
+#include "python.hpp"
+#include "types.hpp"
 #include "Extension.hpp"
 #include "VelocityVerlet.hpp"
 
@@ -41,36 +42,53 @@
 namespace espresso {
   namespace integrator {
 
-    class FreeEnergyCompensation : public Extension {
+    class OnTheFlyFEC : public Extension {
 
       public:
-        FreeEnergyCompensation(shared_ptr<System> system);
-        virtual ~FreeEnergyCompensation();
+        OnTheFlyFEC(shared_ptr<System> system);
+        virtual ~OnTheFlyFEC();
 
-        /** Setter for the filename, will read in the table. */
-        void addForce(int itype, const char* _filename, int type);
-        const char* getFilename() const { return filename.c_str(); }
-
-        void applyForce();
+        void setBins(int bins);
+        int getBins();
         
-        real computeCompEnergy();
+        void setGap(int gap);
+        int getGap();
+        
+        void setSteps(int steps);
+        int getSteps();
+        
+        python::list writeFEC();
+        
+        void makeArrays();
+        
+        void resetCounter();
 
         void setCenter(real x, real y, real z);
-
+        
         static void registerPython();
 
       private:
 
-        boost::signals2::connection _applyForce;
+        boost::signals2::connection _gatherStats;
 
+        int bins;
+        int gap;
+        int steps;
+   
+        int counter;
+        int gapcounter;
+        
+        //std::vector<int> NumbersAtoms;
+        //std::vector<real> EnergyDiff;
+        real * EnergyDiff = 0;
+        int * NumbersAtoms = 0;
+        
+        void gatherStats();
+        
         void connect();
         void disconnect();
 
         Real3D center;
-        std::string filename;
-        typedef shared_ptr <interaction::Interpolation> Table;
-        std::map<int, Table> forces; // map type to force
-
         static LOG4ESPP_DECL_LOGGER(theLogger);
     };
   }

@@ -102,6 +102,10 @@ namespace espresso {
       // the derivatives of energy are known by the forces
       real yp1 = -force[0];
       real ypN = -force[N-1];
+      
+      // the derivatives of energies are approximated (if one uses tables not for energy/force tables)
+      //real yp1 = (energy[1] - energy[0]) / (radius[1] - radius[0]);
+      //real ypN = (energy[N-1] -energy [N-2]) / (radius[N-1] - radius[N-2]);
 
       spline(radius, energy, N, yp1, ypN, energy2);
 

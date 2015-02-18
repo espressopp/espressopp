@@ -141,9 +141,19 @@ class ParticleLocal(object):
     def lambda_adr(self, val): self.__getTmp().lambda_adr = val
     
     @property
+    def drift_f(self): return self.__getTmp().drift_f
+    @isGhost.setter
+    def drift_f(self, val): self.__getTmp().drift_f = val       
+    
+    @property
     def lambda_adrd(self): return self.__getTmp().lambda_adrd
     @isGhost.setter
     def lambda_adrd(self, val): self.__getTmp().lambda_adrd = val
+
+    @property
+    def extVar(self): return self.__getTmp().extVar
+    @radius.setter
+    def extVar(self, val): self.__getTmp().extVar = val
 
     @property
     def state(self): return self.__getTmp().state

@@ -359,6 +359,7 @@ namespace espresso {
 
       for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
         cit->force() = 0.0;
+        cit->drift() = 0.0;   // Can in principle be commented, when drift is not used.
       }
     }
 

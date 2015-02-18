@@ -139,8 +139,26 @@ namespace espresso {
                          See the original paper Tironi et al J.Chem.Phys 102, 13, 1995
                          for details*/
 
+                    
+                    
                     real energy = prefactor*qq * (1.0 / sqrt(distSqr) - B1_half*distSqr -crf);     
                     return energy;
+
+                    // FORCE CAPPING HACK (was temporarily used for some ideal gas test simulations)
+                    /*real caprad = 0.1;
+                    real capradSqr = caprad * caprad;
+                    
+                    if (distSqr > capradSqr) {
+                        real energy = prefactor*qq * (1.0 / sqrt(distSqr) - B1_half*distSqr -crf);     
+                        return energy;                
+                    }
+                    else{
+                        real energy = prefactor*qq * (1.0 / sqrt(capradSqr) - B1_half*capradSqr -crf);
+                        real forcepart = prefactor*qq* (1.0/(caprad*capradSqr) + B1) *caprad;
+                        real out = energy + forcepart*(caprad-sqrt(distSqr));
+                        return out;                                        
+                    }*/
+             
                 }
 
 
@@ -155,11 +173,32 @@ namespace espresso {
                     Real3D dist = p1.position() - p2.position();
                     real r2 = dist.sqr();
                     if (r2>rc2) return true;
+                    
+                    
+                                      
                     real r = sqrt(r2);
                     real qq = p1.q()*p2.q();
                     real ffactor = prefactor*qq* (1.0/(r*r2) + B1);
                     force = dist * ffactor;
                     return true;
+                               
+                    // FORCE CAPPING HACK (was temporarily used for some ideal gas test simulations)
+                    /*real caprad = 0.1;
+                    real capradSqr = caprad * caprad;
+                    real r = sqrt(r2);
+                    real qq = p1.q()*p2.q();
+                    
+                    if (r2 > capradSqr) {
+                        real ffactor = prefactor*qq* (1.0/(r*r2) + B1);
+                        force = dist * ffactor;
+                        return true;                
+                    }
+                    else{
+                        real ffactor = prefactor*qq* (1.0/(caprad*capradSqr) + B1);
+                        force = dist * ffactor * (caprad/r);
+                        //std::cout << "ReactionField, capped Force: " << sqrt(dist.sqr()) * ffactor * (caprad/r) << "\n"; 0.1 LEADS TO 2492.93
+                        return true;                                         
+                    }*/
 
                 }
                 

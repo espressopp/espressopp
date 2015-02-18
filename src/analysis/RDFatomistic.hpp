@@ -34,12 +34,30 @@ namespace espresso {
     /** Class to compute the radial distribution function of the system. */
     class RDFatomistic : public Observable {
     public:
-      RDFatomistic(shared_ptr< System > system) : Observable(system) {}
+      RDFatomistic(shared_ptr< System > system, int type1, int type2, real _span) : Observable(system), target1(type1), target2(type2), span(_span) {}
       ~RDFatomistic() {}
       virtual real compute() const;
       virtual python::list computeArray(int) const;
 
       static void registerPython();
+      
+      class data {
+        public:
+        Real3D pos;
+        int type;
+        int molecule;
+        friend class boost::serialization::access;
+        template<class Archive> void serialize(Archive & ar, const unsigned int version) {
+          ar & pos;
+          ar & type;
+          ar & molecule;
+        }
+      };
+
+      int target1;
+      int target2;
+      real span;
+      
     };
   }
 }

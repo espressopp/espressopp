@@ -214,6 +214,7 @@ namespace espresso {
             for (ParticleList::iterator it2 = it->begin();
                     it2 != it->end(); ++it2) {
                 it2->force() = 0.0;
+                it2->drift() = 0.0;
             }
         }
     }
@@ -322,6 +323,14 @@ namespace espresso {
 
                       real wDeriv = weightderivative(sqrt(min1sq));
                       vp.lambdaDeriv() = wDeriv;
+                      
+                      // This loop is required when applying routines which use atomistic lambdas.
+                      /*for (std::vector<Particle*>::iterator it2 = atList.begin();
+                                       it2 != atList.end(); ++it2) {
+                          Particle &at = **it2;
+                          at.lambda() = vp.lambda();
+                          at.lambdaDeriv() = vp.lambdaDeriv();
+                      }*/
                   
                   }
                   

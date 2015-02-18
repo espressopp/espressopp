@@ -64,9 +64,9 @@ def nodeGrid(n):
 		for j in range(i,n+1):
 			for k in range(j,n+1):
 				if (i*j*k == n) and (i*i + j*j + k*k < ijkmax):
-					d1 = i
+					d1 = k
 					d2 = j
-					d3 = k
+					d3 = i
 					ijkmax = i*i + j*j + k*k
 	return Int3D(d1,d2,d3)
 

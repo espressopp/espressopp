@@ -37,6 +37,7 @@
 #include "VerletListAdress.hpp"
 #include "FixedTupleListAdress.hpp"
 #include "esutil/Array2D.hpp"
+#include "SystemAccess.hpp"
 
 namespace espresso {
   namespace interaction {
@@ -441,9 +442,13 @@ namespace espresso {
                   	// intitialize energy diff AA-CG
                   	energydiff[&p]=0.0;
       }
+      
 
-       
       // Pairs not inside the AdResS Zone (CG region)
+      
+      
+      
+      // REMOVE FOR IDEAL GAS
       for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
 
         Particle &p1 = *it->first;
@@ -461,7 +466,10 @@ namespace espresso {
           p2.force() -= force;
         }
       }
-
+      // REMOVE FOR IDEAL GAS
+      
+      
+      
       // Compute center of mass and weights for virtual particles in Adress zone (HY and AT region).
       
       //if (KTI == false) {
@@ -480,6 +488,9 @@ namespace espresso {
         
          real w12 = (w1 + w2)/2.0;  // H-AdResS
 
+                     
+         
+         // REMOVE FOR IDEAL GAS
          // force between VP particles
          int type1 = p1.type();
          int type2 = p2.type();
@@ -490,6 +501,14 @@ namespace espresso {
                         forcevp *= (1.0 - w12);
                         p1.force() += forcevp;
                         p2.force() -= forcevp;
+                        
+                        // TEST ITERATIVE PRESSURE FEC!
+                        //if (w12 != 0.0) {
+                            //p1.drift() += forcevp[0];
+                            //p2.drift() -= forcevp[0];
+                        //}
+                        // TEST ITERATIVE PRESSURE FEC!                        
+                        
                     }
 
                     // H-AdResS - Drift Term part 1
@@ -504,8 +523,11 @@ namespace espresso {
                         }
                     }
 
-            }
-
+                }
+         // REMOVE FOR IDEAL GAS
+         
+         
+         
          // force between AT particles
          if (w12 != 0.0) { // calculate AT force if both VP are outside CG region (HY-HY, HY-AT, AT-AT)
              FixedTupleListAdress::iterator it3;
@@ -538,6 +560,14 @@ namespace espresso {
                              force *= w12;
                              p3.force() += force;
                              p4.force() -= force;
+                             
+                            // TEST ITERATIVE PRESSURE FEC!
+                            //if (w12 != 1.0) {
+                                //p1.drift() += force[0];
+                                //p2.drift() -= force[0];
+                            //}
+                            // TEST ITERATIVE PRESSURE FEC!   
+                             
                          }
                          
                          // H-AdResS - Drift Term part 2
@@ -576,8 +606,8 @@ namespace espresso {
           real w = vp.lambda(); 
           //real w = weights.find(&vp)->second;
                   
-          if(w!=1.0 && w!=0.0){   //   only chose those in the hybrid region
-              
+          //if(w!=1.0 && w!=0.0){   //   only chose those in the hybrid region
+          if(w<0.9999999 && w>0.0000001){   //   only chose those in the hybrid region
               // calculate distance to nearest adress particle or center
               std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
               Real3D pa = **it2; // position of adress particle
@@ -604,14 +634,18 @@ namespace espresso {
               min1sq = sqrt(min1sq);   // distance to nearest adress particle or center
               real mindriftforceX = (1.0/min1sq)*mindriftforce[0];  // normalized driftforce vector
               //mindriftforce *= weightderivative(min1sq);  // multiplication with derivative of the weighting function
-              mindriftforceX *= vp.lambdaDeriv();  // multiplication with derivative of the weighting function
               mindriftforceX *= 0.5;
               mindriftforceX *= energydiff.find(&vp)->second;   // get the energy differences which were calculated previously and put in drift force
+                      
+              vp.drift() += mindriftforceX ;//* vp.lambdaDeriv();    // USE ONLY LIKE THAT, IF DOING ITERATIVE FEC INCLUDING ITERATIVE PRESSURE FEC               
+              
+              mindriftforceX *= vp.lambdaDeriv();  // multiplication with derivative of the weighting function
               //vp.force() += mindriftforce;   // add drift force to virtual particles                                                                    // X SPLIT VS SPHERE CHANGE
               Real3D driftforceadd(mindriftforceX,0.0,0.0);                                                                                            // X SPLIT VS SPHERE CHANGE
               //Real3D driftforceadd(0.0,0.0,0.0);   
-              //std::cout << "Driftforce: " << driftforceadd << std::endl;
-              vp.force() += driftforceadd;                                                                                                            // X SPLIT VS SPHERE CHANGE
+              vp.force() += driftforceadd;             // Goes in, if one wants to apply the "normal" drift force - also improve using [0] ...           // X SPLIT VS SPHERE CHANGE
+              //std::cout << "Added Drift Force: " << driftforceadd << " for particle at pos(x).: " << vp.position()[0] << "\n";
+              
           }
           
       }
@@ -697,7 +731,10 @@ namespace espresso {
     VerletListHadressInteractionTemplate < _PotentialAT, _PotentialCG >::
     computeEnergy() {
       LOG4ESPP_INFO(theLogger, "compute energy of the Verlet list pairs");
-      
+
+
+
+      // REMOVE FOR IDEAL GAS 
       real e = 0.0;        
       for (PairList::Iterator it(verletList->getPairs()); 
            it.isValid(); ++it) {
@@ -708,6 +745,9 @@ namespace espresso {
           const PotentialCG &potential = getPotentialCG(type1, type2);
           e += potential._computeEnergy(p1, p2);
       }
+      // REMOVE FOR IDEAL GAS
+      
+      
 
       //if (KTI == false) {
       //makeWeights();
@@ -722,10 +762,17 @@ namespace espresso {
           //real w1 = weights.find(&p1)->second;
           //real w2 = weights.find(&p2)->second;
           real w12 = (w1 + w2)/2.0;
+          
+          
+          
+          // REMOVE FOR IDEAL GAS
           int type1 = p1.type();
           int type2 = p2.type();
           const PotentialCG &potentialCG = getPotentialCG(type1, type2);
           e += (1.0-w12)*potentialCG._computeEnergy(p1, p2);
+          // REMOVE FOR IDEAL GAS
+          
+          
           
           FixedTupleListAdress::iterator it3;
           FixedTupleListAdress::iterator it4;
@@ -1176,7 +1223,7 @@ namespace espresso {
     computeVirial() {
       LOG4ESPP_INFO(theLogger, "compute the virial for the Verlet List");
       
-      std::set<Particle*> cgZone = verletList->getCGZone();
+      /*std::set<Particle*> cgZone = verletList->getCGZone();
       for (std::set<Particle*>::iterator it=cgZone.begin();
               it != cgZone.end(); ++it) {
 
@@ -1270,12 +1317,16 @@ namespace espresso {
               exit(1);
               return 0.0;
           }
-      }
+      }*/
+      //const bc::BC& bc = *getSystemRef().bc;
       
       real w = 0.0; 
  
       for (PairList::Iterator it(verletList->getPairs());                
-           it.isValid(); ++it) {                                         
+           it.isValid(); ++it) {
+        /*std::cout << "Should not happen!\n";
+        exit(1);
+        return 0.0;*/
         Particle &p1 = *it->first;                                       
         Particle &p2 = *it->second;                                      
         int type1 = p1.type();                                           
@@ -1284,7 +1335,10 @@ namespace espresso {
 
         Real3D force(0.0, 0.0, 0.0);
         if(potential._computeForce(force, p1, p2)) {
-          Real3D dist = p1.position() - p2.position();    
+          Real3D dist = p1.position() - p2.position();
+          //Real3D dist;
+          //bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
+          
           w += dist * force;
         }
       }
@@ -1309,9 +1363,14 @@ namespace espresso {
          const PotentialCG &potentialCG = getPotentialCG(type1, type2);
          Real3D forcevp(0.0, 0.0, 0.0);
                 if (w12 != 1.0) { // calculate VP force if both VP are outside AT region (CG-HY, HY-HY)
+                    /*std::cout << "Should not happen!\n";
+                    exit(1);
+                    return 0.0;*/
                     if (potentialCG._computeForce(forcevp, p1, p2)) {
                           forcevp *= (1.0 - w12);
-                          Real3D dist = p1.position() - p2.position();    
+                          Real3D dist = p1.position() - p2.position();
+                          //Real3D dist;
+                          //bc.getMinimumImageVectorBox(dist, p1.position(), p2.position());
                           w += dist * forcevp;  
 
                     }
@@ -1348,6 +1407,21 @@ namespace espresso {
                          if(potentialAT._computeForce(forceat, p3, p4)) {
                          forceat *= w12;
                          Real3D dist = p3.position() - p4.position();
+                         //Real3D dist;
+                         //bc.getMinimumImageVectorBox(dist, p3.position(), p3.position());
+                         /*if (dist * forceat > 400.0){
+                                std::cout << "IDs: id_p3=" << p3.id() << " and id_p4=" << p4.id() << "   #####   ";                             
+                                std::cout << "Types: type_p3=" << p3.type() << " and type_p4=" << p4.type() << "   #####   ";   
+                                std::cout << "dist: " << sqrt(dist*dist) << "   #####   ";
+                                std::cout << "force: " << forceat << "   #####   ";
+                                std::cout << "product: " << dist * forceat << "\n";
+                                if (sqrt(dist*dist) > 1.0){
+                                        std::cout << "DIST TOO BIG!\n";
+                                        exit(1);
+                                        return 0.0;
+                                }
+                         }*/
+                         
                          w += dist * forceat; 
                          }
                      }
@@ -1365,6 +1439,7 @@ namespace espresso {
       }      
       
       real wsum;
+      wsum = 0.0;
       boost::mpi::all_reduce(*mpiWorld, w, wsum, std::plus<real>());
       return wsum;      
       

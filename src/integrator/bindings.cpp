@@ -28,6 +28,7 @@
 #include "Extension.hpp"
 #include "TDforce.hpp"
 #include "FreeEnergyCompensation.hpp"
+#include "OnTheFlyFEC.hpp"
 #include "Adress.hpp"
 #include "BerendsenBarostat.hpp"
 #include "BerendsenBarostatAnisotropic.hpp"
@@ -36,6 +37,7 @@
 #include "StochasticVelocityRescaling.hpp"
 #include "LangevinThermostat.hpp"
 #include "LangevinThermostat1D.hpp"
+#include "GeneralizedLangevinThermostat.hpp"
 #include "DPDThermostat.hpp"
 #include "LangevinBarostat.hpp"
 #include "FixPositions.hpp"
@@ -73,8 +75,10 @@ namespace espresso {
       StochasticVelocityRescaling::registerPython();
       TDforce::registerPython();
       FreeEnergyCompensation::registerPython();
+      OnTheFlyFEC::registerPython();
       LangevinThermostat::registerPython();
       LangevinThermostat1D::registerPython();
+      GeneralizedLangevinThermostat::registerPython();
       DPDThermostat::registerPython();
       FixPositions::registerPython();
       LatticeBoltzmann::registerPython();
