@@ -21,6 +21,7 @@
 */
 
 #include "python.hpp"
+#include "mpi.hpp"
 #include "Adress.hpp"
 #include "Real3D.hpp"
 #include "Particle.hpp"
@@ -51,6 +52,8 @@ namespace espresso {
         dex2 = dex * dex;
         dexdhy = dex + verletList->getHy();
         dexdhy2 = dexdhy * dexdhy;
+
+        communicateAdrPositions();
     }
 
 
@@ -64,6 +67,7 @@ namespace espresso {
         _initForces.disconnect();
         _integrate1.disconnect();
         _integrate2.disconnect();
+        _inIntP.disconnect();
         //_aftCalcF.disconnect();
         _recalc2.disconnect();
         _befIntV.disconnect();
@@ -82,6 +86,10 @@ namespace espresso {
         // connection to inside of integrate1()
         _integrate1 = integrator->inIntP.connect(
                 boost::bind(&Adress::integrate1, this, _1), boost::signals2::at_front);
+
+        // connection to inside of integrate1()
+        _inIntP = integrator->inIntP.connect(
+                boost::bind(&Adress::communicateAdrPositions, this), boost::signals2::at_front);
 
         // connection to after integrate2()
         _integrate2 = integrator->aftIntV.connect(
@@ -111,7 +119,6 @@ namespace espresso {
         CellList localCells = system.storage->getLocalCells();
         for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
         
-            
               Particle &vp = *cit;
 
               FixedTupleListAdress::iterator it3;
@@ -148,27 +155,40 @@ namespace espresso {
                   vp.velocity() = cmv;
 
                   if (KTI == false) {
-                      
                       // calculate distance to nearest adress particle or center
                       std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
                       Real3D pa = **it2; // position of adress particle
                       Real3D d1(0.0, 0.0, 0.0);
                       //Real3D d1 = vp.position() - pa;                                                      // X SPLIT VS SPHERE CHANGE
                       verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
+                      real min1sq;
                       //real d1 = vp.position()[0] - pa[0];                                                // X SPLIT VS SPHERE CHANGE
                       //real min1sq = d1.sqr();  // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
                       //real min1sq = d1*d1;   // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
-                      real min1sq = d1[0]*d1[0];   // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
-                      ++it2;
-                      for (; it2 != verletList->getAdrPositions().end(); ++it2) {
-                           pa = **it2;
-                           //d1 = vp.position() - pa;                                                          // X SPLIT VS SPHERE CHANGE
-                           //d1 = vp.position()[0] - pa[0];
-                           verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);        // X SPLIT VS SPHERE CHANGE
-                           //real distsq1 = d1.sqr();                                                          // X SPLIT VS SPHERE CHANGE
-                           real distsq1 = d1[0]*d1[0];                                                           // X SPLIT VS SPHERE CHANGE
-                           //std::cout << pa << " " << sqrt(distsq1) << "\n";
-                           if (distsq1 < min1sq) min1sq = distsq1;
+                      if (verletList->getAdrRegionType()) { // spherical adress region
+                        min1sq = d1.sqr(); // set min1sq before loop
+                        ++it2;
+                        for (; it2 != verletList->getAdrPositions().end(); ++it2) {
+                             pa = **it2;
+                             verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
+                             real distsq1 = d1.sqr();
+                             if (distsq1 < min1sq) min1sq = distsq1;
+                        }
+                      }
+                      else { //slab-type adress region
+                        min1sq = d1[0]*d1[0];   // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
+                        ++it2;
+                        for (; it2 != verletList->getAdrPositions().end(); ++it2) {
+                             pa = **it2;
+                             //d1 = vp.position() - pa;                                                          // X SPLIT VS SPHERE CHANGE
+                             //d1 = vp.position()[0] - pa[0];
+                             verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);        // X SPLIT VS SPHERE CHANGE
+                             //real distsq1 = d1.sqr();                                                          // X SPLIT VS SPHERE CHANGE
+                             real distsq1 = d1[0]*d1[0];                                                           // X SPLIT VS SPHERE CHANGE
+                             //std::cout << pa << " " << sqrt(distsq1) << "\n";
+                             if (distsq1 < min1sq) min1sq = distsq1;
+                      
+                        }
                       }
 
                       real w = weight(min1sq);                  
@@ -299,23 +319,37 @@ namespace espresso {
                       std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
                       Real3D pa = **it2; // position of adress particle
                       Real3D d1(0.0, 0.0, 0.0);
+                      real min1sq;
                       //Real3D d1 = vp.position() - pa;                                                      // X SPLIT VS SPHERE CHANGE
                       verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
                       //real d1 = vp.position()[0] - pa[0];                                                // X SPLIT VS SPHERE CHANGE
                       //real min1sq = d1.sqr();  // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
                       //real min1sq = d1*d1;   // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
-                      real min1sq = d1[0]*d1[0];   // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
-                      ++it2;
-                      for (; it2 != verletList->getAdrPositions().end(); ++it2) {
-                           pa = **it2;
-                           //d1 = vp.position() - pa;                                                          // X SPLIT VS SPHERE CHANGE
-                           //d1 = vp.position()[0] - pa[0];
-                           verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);        // X SPLIT VS SPHERE CHANGE
-                           //real distsq1 = d1.sqr();                                                          // X SPLIT VS SPHERE CHANGE
-                           real distsq1 = d1[0]*d1[0];                                                           // X SPLIT VS SPHERE CHANGE
-                           //std::cout << pa << " " << sqrt(distsq1) << "\n";
-                           if (distsq1 < min1sq) min1sq = distsq1;
+                      if (verletList->getAdrRegionType()) { // spherical adress region
+                        min1sq = d1.sqr(); // set min1sq before loop
+                        ++it2;
+                        for (; it2 != verletList->getAdrPositions().end(); ++it2) {
+                             pa = **it2;
+                             verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
+                             real distsq1 = d1.sqr();
+                             if (distsq1 < min1sq) min1sq = distsq1;
+                        }
                       }
+                      else { //slab-type adress region
+                        min1sq = d1[0]*d1[0];   // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
+                        ++it2;
+                        for (; it2 != verletList->getAdrPositions().end(); ++it2) {
+                             pa = **it2;
+                             //d1 = vp.position() - pa;                                                          // X SPLIT VS SPHERE CHANGE
+                             //d1 = vp.position()[0] - pa[0];
+                             verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);        // X SPLIT VS SPHERE CHANGE
+                             //real distsq1 = d1.sqr();                                                          // X SPLIT VS SPHERE CHANGE
+                             real distsq1 = d1[0]*d1[0];                                                           // X SPLIT VS SPHERE CHANGE
+                             //std::cout << pa << " " << sqrt(distsq1) << "\n";
+                             if (distsq1 < min1sq) min1sq = distsq1;
+                        }
+                      }
+
 
                       real w = weight(min1sq);                  
                       vp.lambda() = w;                  
@@ -417,6 +451,29 @@ namespace espresso {
         
         
         
+    }
+
+    void Adress::communicateAdrPositions(){
+       //if adrCenter is not set, the center of adress zone moves along with some particles
+       //the coordinates of the center(s) (adrPositions) must be communicated to all nodes
+
+       // get local cells
+       CellList realcells = getSystem()->storage->getRealCells(); //should be realcells
+       int root,mayberoot,lroot;
+       lroot=0;
+       if (!(verletList->getAdrCenterSet())) {
+          verletList->adrPositions.clear(); // clear position pointers
+          for (CellListIterator it(realcells); it.isValid(); ++it) {
+              if (verletList->getAdrList().count(it->id()) == 1) {
+                  verletList->adrPositions.push_back(&(it->position()));
+                  lroot = getSystem()->comm->rank(); //for the moment only works when there's only one particle in adrPositions
+              }
+              //TODO if length(adrPositions) > 1 print warning
+          }
+          mayberoot = (lroot ? lroot : 0);
+          boost::mpi::all_reduce(*getSystem()->comm,mayberoot,root,boost::mpi::maximum<int>());
+          mpi::broadcast(*getSystem()->comm,verletList->adrPositions,root); // only necessary for moving adrCenter
+       }
     }
     
     
