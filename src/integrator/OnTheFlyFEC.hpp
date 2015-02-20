@@ -80,8 +80,8 @@ namespace espresso {
         
         //std::vector<int> NumbersAtoms;
         //std::vector<real> EnergyDiff;
-        real * EnergyDiff = 0;
-        int * NumbersAtoms = 0;
+        real * EnergyDiff;
+        int * NumbersAtoms;
         
         void gatherStats();
         

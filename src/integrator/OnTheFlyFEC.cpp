@@ -50,6 +50,9 @@ namespace espresso {
         
         counter = 0;
         gapcounter = 0;
+        
+        EnergyDiff = 0;
+        NumbersAtoms = 0;
 
         LOG4ESPP_INFO(theLogger, "OnTheFlyFEC constructed");
     }
