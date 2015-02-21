@@ -50,11 +50,11 @@ namespace espresso {
   {
     LOG4ESPP_INFO(theLogger, "construct FixedQuadrupleList");
 
-    con1 = storage->beforeSendParticles.connect
+    sigBeforeSend = storage->beforeSendParticles.connect
       (boost::bind(&FixedQuadrupleList::beforeSendParticles, this, _1, _2));
-    con2 = storage->afterRecvParticles.connect
+    sigAfterRecv = storage->afterRecvParticles.connect
       (boost::bind(&FixedQuadrupleList::afterRecvParticles, this, _1, _2));
-    con3 = storage->onParticlesChanged.connect
+    sigOnParticlesChanged = storage->onParticlesChanged.connect
       (boost::bind(&FixedQuadrupleList::onParticlesChanged, this));
   }
 
@@ -62,9 +62,9 @@ namespace espresso {
 
     LOG4ESPP_INFO(theLogger, "~FixedQuadrupleList");
 
-    con1.disconnect();
-    con2.disconnect();
-    con3.disconnect();
+    sigBeforeSend.disconnect();
+    sigAfterRecv.disconnect();
+    sigOnParticlesChanged.disconnect();
   }
 
 

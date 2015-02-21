@@ -41,7 +41,7 @@ namespace espresso {
      * pairs. It overrides some parent functions, to use AT particles.
      *
      */
-	class FixedPairListAdress : public FixedPairList{
+	class FixedPairListAdress : public FixedPairList {
 	  public:
 		FixedPairListAdress(shared_ptr<storage::Storage> _storage,
 		        shared_ptr<FixedTupleListAdress> _fixedtupleList);
@@ -63,7 +63,7 @@ namespace espresso {
 
 	  protected:
 		// fixedtuple list connects to this and triggers beforeSendATParticles()
-		boost::signals2::connection con;
+		boost::signals2::connection sigBeforeSendAT, sigAfterRecvAT;
 
 	  private:
 		shared_ptr<FixedTupleListAdress> fixedtupleList;

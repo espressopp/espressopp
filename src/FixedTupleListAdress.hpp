@@ -36,7 +36,7 @@
 namespace espresso {
     class FixedTupleListAdress: public TupleList  {
         protected:
-            boost::signals2::connection con1, con2, con3, con4;
+            boost::signals2::connection sigOnTupleChanged, sigAfterRecv, sigBeforeSend;
             shared_ptr<storage::Storage> storage;
             typedef std::vector<longint> tuple;
             typedef boost::unordered_map<longint, tuple> GlobalTuples;
@@ -55,10 +55,12 @@ namespace espresso {
             
             //int getNumPart(longint pid); // get number of particles in globalmap for given pid
 
-            // this signals the AT particles to rebuild AT fixed pair, triple, quadruple bonds
-            // Fixed{Pair|Triple}ListAdress connects to it (TODO: quadruple not yet implemented)
+            // This signals the AT particles to rebuild AT fixed pair, triple, quadruple bonds
+            // Fixed{Pair|Triple}ListAdress connects to it
             boost::signals2::signal2 <void, std::vector<longint>&, class OutBuffer&>
-                   beforeSendATParticles;
+                beforeSendATParticles;
+            boost::signals2::signal2 <void, ParticleList&, class InBuffer&>
+                afterRecvATParticles;
 
             static void registerPython();
 

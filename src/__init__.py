@@ -46,6 +46,7 @@ from espresso.FixedTripleList import *
 from espresso.FixedTripleAngleList import *
 from espresso.FixedTripleListAdress import *
 from espresso.FixedQuadrupleList import *
+from espresso.FixedQuadrupleListAdress import *
 from espresso.FixedQuadrupleAngleList import *
 from espresso.FixedTupleList import *
 from espresso.FixedTupleListAdress import *
