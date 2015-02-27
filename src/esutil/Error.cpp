@@ -30,7 +30,8 @@ using namespace boost;
 
 namespace espresso {
   namespace esutil {
-
+    
+   
     /********************************************************************/
     Error::Error(shared_ptr< mpi::communicator > _comm)
     {
