@@ -1,5 +1,3 @@
-syntax: glob
-
 *~
 Makefile
 *.o
@@ -10,9 +8,9 @@ INSTALL
 ESPRC
 espresso
 src/acconfig.hpp
-src/hgversion.hpp
+src/gitversion.hpp
 build
-CMakeFiles/*
+CMakeFiles
 cmake_install.cmake
 CMakeCache.txt
 CPack*.cmake

@@ -29,7 +29,7 @@
 #define MAJORVERSION 1
 #define MINORVERSION 9
 #define PATCHLEVEL   3
-#include "hgversion.hpp"
+#include "gitversion.hpp"
 
 namespace espresso {
 
@@ -44,7 +44,7 @@ namespace espresso {
     int minor;
     int patchlevel;
     std::string name;
-    std::string hgrevision;
+    std::string gitrevision;
     std::string boostversion;
     std::string date;
     std::string time;

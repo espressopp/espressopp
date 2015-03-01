@@ -25,7 +25,7 @@ foreach(FILENAME ${PYTHON_SCRIPTS})
   install(FILES ${DST} DESTINATION ${PYTHON_INSTDIR}/espresso/${DIR})
 endforeach(FILENAME)
 
-add_custom_target(hgversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_MODULE_PATH}/hgversion.cmake)
+add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_MODULE_PATH}/gitversion.cmake)
 
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
 
@@ -69,4 +69,4 @@ add_dependencies(_espresso scripts)
 set_target_properties(_espresso PROPERTIES PREFIX "" SUFFIX ".so" LIBRARY_OUTPUT_DIRECTORY ..)
 install(TARGETS _espresso LIBRARY DESTINATION ${PYTHON_INSTDIR})
 
-add_dependencies(_espresso hgversion)
+add_dependencies(_espresso gitversion)

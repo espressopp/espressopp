@@ -38,7 +38,7 @@ namespace espresso {
       major         = MAJORVERSION;
 	  minor         = MINORVERSION;
 	  patchlevel    = PATCHLEVEL;
-	  hgrevision    = hgversion;
+	  gitrevision    = gitversion;
       boostversion  = BOOST_LIB_VERSION;
 	  date          = __DATE__;
 	  time          = __TIME__;
@@ -48,8 +48,8 @@ namespace espresso {
 	  std::stringstream ss;
 	  ss << name << " v"  << major << "." << minor;
 	  ss << " patchlevel " << patchlevel;
-	  if (hgrevision != "")
-	    ss << ", Mercurial(hg) revision: " << hgrevision;
+	  if (gitrevision != "")
+	    ss << ", Git revision: " << gitrevision;
       ss << ", Boost Version: " << boostversion;
 	  ss << ", compiled on " << date << ", " << time;
 #ifdef VTRACE
@@ -69,7 +69,7 @@ namespace espresso {
       ("Version", init<>())
       .def_readonly("major", &Version::major)
       .def_readonly("minor", &Version::minor)
-      .def_readonly("hgrevision", &Version::hgrevision)
+      .def_readonly("gitrevision", &Version::gitrevision)
       .def_readonly("boostversion", &Version::boostversion)
       .def_readonly("patchlevel", &Version::patchlevel)
       .def_readonly("date", &Version::date)
