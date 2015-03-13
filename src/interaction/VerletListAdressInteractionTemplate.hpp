@@ -133,6 +133,7 @@ namespace espresso {
       real dexdhy; // dex + dhy
       real dexdhy2; // dexdhy^2
       real dex;
+      real dhy;
       real dex2; // dex^2
       //std::map<Particle*, real> weights;
 
@@ -327,8 +328,10 @@ namespace espresso {
               if (dex2 > min1sq) w = 1;
               else if (dexdhy2 < min1sq) w = 0;
               else {
-                   w = cos(pidhy2 * (sqrt(min1sq) - dex));
-                   w *= w;
+                   //w = cos(pidhy2 * (sqrt(min1sq) - dex));
+                   //w *= w;
+                   real argument = sqrt(min1sq) - dex; 
+                   w = 1.0-(30.0/(pow(dhy, 5.0)))*(1.0/5.0*pow(argument, 5.0)-dhy/2.0*pow(argument, 4.0)+1.0/3.0*pow(argument, 3.0)*dhy*dhy);
               }
 
               vp.lambda() = w;
@@ -577,8 +580,10 @@ namespace espresso {
               if (dex2 > min1sq) w = 1;
               else if (dexdhy2 < min1sq) w = 0;
               else {
-                   w = cos(pidhy2 * (sqrt(min1sq) - dex));
-                   w *= w;
+                   //w = cos(pidhy2 * (sqrt(min1sq) - dex));
+                   //w *= w;
+                   real argument = sqrt(min1sq) - dex;
+                   w = 1.0-(30.0/(pow(dhy, 5.0)))*(1.0/5.0*pow(argument, 5.0)-dhy/2.0*pow(argument, 4.0)+1.0/3.0*pow(argument, 3.0)*dhy*dhy);
               }
               vp.lambda() = w;
               //weights.insert(std::make_pair(&vp, w));
@@ -755,8 +760,10 @@ namespace espresso {
               if (dex2 > min1sq) w = 1;
               else if (dexdhy2 < min1sq) w = 0;
               else {
-                   w = cos(pidhy2 * (sqrt(min1sq) - dex));
-                   w *= w;
+                   //w = cos(pidhy2 * (sqrt(min1sq) - dex));
+                   //w *= w;
+                   real argument = sqrt(min1sq) - dex;
+                   w = 1.0-(30.0/(pow(dhy, 5.0)))*(1.0/5.0*pow(argument, 5.0)-dhy/2.0*pow(argument, 4.0)+1.0/3.0*pow(argument, 3.0)*dhy*dhy);
               }
 
               vp.lambda() = w;
