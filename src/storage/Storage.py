@@ -310,13 +310,24 @@ class StorageLocal(object):
     def clearSavedPositions(self):
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         self.cxxclass.clearSavedPositions(self)
+        
+    def getRealParticleIDs(self):
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        return self.cxxclass.getRealParticleIDs(self)
+    
+    def printRealParticles(self):
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        for pid in self.getRealParticleIDs():
+          p = ParticleLocal(pid,self)
+          print "CPU %-3i ID %-5i TYPE %-3i POS(%8.3f, %8.3f, %8.3f)" % (pmi._MPIcomm.rank, p.id, p.type, p.pos[0], p.pos[1], p.pos[2])        
             
 if pmi.isController:
     class Storage(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             pmicall = [ "decompose", "addParticles", "setFixedTuplesAdress", "removeAllParticles"],
-            pmiproperty = [ "system" ]
+            pmiproperty = [ "system" ],
+            pmiinvoke = ["getRealParticleIDs", "printRealParticles"]
             )
 
         def particleExists(self, pid):

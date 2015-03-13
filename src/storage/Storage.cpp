@@ -103,6 +103,14 @@ namespace espresso {
             return localAdrATParticles.size();
     }
 
+    python::list Storage::getRealParticleIDs() {
+      python::list pids;
+      for (CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+    	pids.append(cit->getId());
+      }
+      return pids;
+    }
+
     // TODO find out why python crashes if inlined
     //inline
     void Storage::removeFromLocalParticles(Particle *p, bool weak) {
@@ -742,44 +750,22 @@ namespace espresso {
     void
     Storage::registerPython() {
       using namespace espresso::python;
-
-
       class_< Storage, boost::noncopyable >("storage_Storage", no_init)
-
-	.def("clearSavedPositions", &Storage::clearSavedPositions)
-      
-	.def("savePosition", &Storage::savePosition)
-      
-	.def("restorePositions", &Storage::restorePositions)
-      
-	.def("addParticle", &Storage::addParticle, 
-	     return_value_policy< reference_existing_object >())
-
-	.def("removeParticle", &Storage::removeParticle)
-      
-	.def("removeAllParticles", &Storage::removeAllParticles)
-      
-    .def("addAdrATParticle", &Storage::addAdrATParticle,
-         return_value_policy< reference_existing_object >())
-
-    .def("setFixedTuplesAdress", &Storage::setFixedTuplesAdress)
-
-
-  //
-  //.def("addParticle", &Storage::addParticle,
-  //     return_value_policy< reference_existing_object >())
-
-	.def("lookupLocalParticle", &Storage::lookupLocalParticle,
-	     return_value_policy< reference_existing_object >())
-
-	.def("lookupRealParticle", &Storage::lookupRealParticle,
-	     return_value_policy< reference_existing_object >())
-
-	.def("decompose", &Storage::decompose)
+	    .def("clearSavedPositions", &Storage::clearSavedPositions)
+	    .def("savePosition", &Storage::savePosition)
+	    .def("restorePositions", &Storage::restorePositions)
+	    .def("addParticle", &Storage::addParticle, return_value_policy< reference_existing_object >())
+	    .def("removeParticle", &Storage::removeParticle)
+	    .def("removeAllParticles", &Storage::removeAllParticles)
+        .def("addAdrATParticle", &Storage::addAdrATParticle, return_value_policy< reference_existing_object >())
+        .def("setFixedTuplesAdress", &Storage::setFixedTuplesAdress)
+        //.def("addParticle", &Storage::addParticle, return_value_policy< reference_existing_object >())
+	    .def("lookupLocalParticle", &Storage::lookupLocalParticle, return_value_policy< reference_existing_object >())
+	    .def("lookupRealParticle", &Storage::lookupRealParticle, return_value_policy< reference_existing_object >())
+	    .def("decompose", &Storage::decompose)
+	    .def("getRealParticleIDs", &Storage::getRealParticleIDs)
         .add_property("system", &Storage::getSystem)
-	;
-
+	    ;
     }
-
   }
 }
