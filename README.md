@@ -13,12 +13,19 @@ is free, open-source software published under the GNU General Public License
 QUICKINSTALL:
 =============
 
+```
 # cd espressopp
-
 # cmake .
-
 # make
-
 # source ESPRC
+```
 
 go to the examples directory and have a look at the python scripts.
+
+ISSUES:
+=======
+
+Report bugs on the [github issues site](https://github.com/espressopp/espressopp/issues)
+
+
+[![Build Status](https://travis-ci.org/espressopp/espressopp.svg?branch=master)](https://travis-ci.org/espressopp/espressopp)
