@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.NPart
+.. automodule:: espressopp.analysis.NPart
    :members:

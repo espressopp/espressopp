@@ -1,2 +1,2 @@
-.. automodule:: espresso.ParallelTempering
+.. automodule:: espressopp.ParallelTempering
    :members:

@@ -1,2 +1,2 @@
-.. automodule:: espresso.System
+.. automodule:: espressopp.System
    :members:

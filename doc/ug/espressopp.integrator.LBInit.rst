@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.LBInit
+.. automodule:: espressopp.integrator.LBInit
    :members:

@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.Morse
+.. automodule:: espressopp.interaction.Morse
    :members:

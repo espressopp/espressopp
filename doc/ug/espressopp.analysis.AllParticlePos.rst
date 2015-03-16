@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.AllParticlePos
+.. automodule:: espressopp.analysis.AllParticlePos
    :members:

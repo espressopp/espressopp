@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.Tabulated
+.. automodule:: espressopp.interaction.Tabulated
    :members:

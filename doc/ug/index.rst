@@ -11,7 +11,7 @@ ESPResSo++ Documentation
 |espp| is an extensible, flexible, fast and parallel simulation software 
 for soft matter research.
 
-It is the successor of the `ESPResSo <http://espressomd.org>`_ simulation package.
+It is the successor of the `ESPResSo <http://espressoppmd.org>`_ simulation package.
 |espp| is a highly versatile software package for the scientific simulation 
 and analysis of coarse-grained atomistic or bead-spring models as
 used in soft matter research. It also supports charged systems. 

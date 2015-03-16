@@ -1,2 +1,2 @@
-.. automodule:: espresso.standard_system.PolymerMelt
+.. automodule:: espressopp.standard_system.PolymerMelt
    :members:

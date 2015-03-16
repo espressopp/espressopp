@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.OPLS
+.. automodule:: espressopp.interaction.OPLS
    :members:

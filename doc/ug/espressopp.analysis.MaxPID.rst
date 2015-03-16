@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.MaxPID
+.. automodule:: espressopp.analysis.MaxPID
    :members:

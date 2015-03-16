@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.FixPositions
+.. automodule:: espressopp.integrator.FixPositions
    :members:

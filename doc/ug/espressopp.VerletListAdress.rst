@@ -1,2 +1,2 @@
-.. automodule:: espresso.VerletListAdress
+.. automodule:: espressopp.VerletListAdress
    :members:

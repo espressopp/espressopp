@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.Quartic
+.. automodule:: espressopp.interaction.Quartic
    :members:

@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.VelocityVerlet
+.. automodule:: espressopp.integrator.VelocityVerlet
    :members:

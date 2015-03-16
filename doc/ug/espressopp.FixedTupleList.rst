@@ -1,2 +1,2 @@
-.. automodule:: espresso.FixedTupleList
+.. automodule:: espressopp.FixedTupleList
    :members:

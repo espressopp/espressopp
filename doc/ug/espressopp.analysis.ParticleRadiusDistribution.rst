@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.ParticleRadiusDistribution
+.. automodule:: espressopp.analysis.ParticleRadiusDistribution
    :members:

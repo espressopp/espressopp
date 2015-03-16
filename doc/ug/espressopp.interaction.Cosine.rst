@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.Cosine
+.. automodule:: espressopp.interaction.Cosine
    :members:

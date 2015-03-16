@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.LBInitPopUniform
+.. automodule:: espressopp.integrator.LBInitPopUniform
    :members:

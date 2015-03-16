@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.LangevinThermostat
+.. automodule:: espressopp.integrator.LangevinThermostat
    :members:

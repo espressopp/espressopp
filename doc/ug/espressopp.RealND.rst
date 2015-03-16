@@ -1,2 +1,2 @@
-.. automodule:: espresso.RealND
+.. automodule:: espressopp.RealND
    :members:

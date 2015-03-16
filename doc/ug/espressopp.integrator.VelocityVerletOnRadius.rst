@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.VelocityVerletOnRadius
+.. automodule:: espressopp.integrator.VelocityVerletOnRadius
    :members:

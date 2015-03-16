@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.OrderParameter
+.. automodule:: espressopp.analysis.OrderParameter
    :members:

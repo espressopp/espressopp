@@ -1,2 +1,2 @@
-.. automodule:: espresso.ParticleGroup
+.. automodule:: espressopp.ParticleGroup
    :members:

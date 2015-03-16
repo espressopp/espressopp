@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.FENECapped
+.. automodule:: espressopp.interaction.FENECapped
    :members:

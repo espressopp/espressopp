@@ -1,2 +1,2 @@
-.. automodule:: espresso.standard_system.LennardJones
+.. automodule:: espressopp.standard_system.LennardJones
    :members:

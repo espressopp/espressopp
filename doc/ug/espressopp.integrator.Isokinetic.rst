@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.Isokinetic
+.. automodule:: espressopp.integrator.Isokinetic
    :members:

@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.VelocityVerletOnGroup
+.. automodule:: espressopp.integrator.VelocityVerletOnGroup
    :members:

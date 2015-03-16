@@ -1,2 +1,2 @@
-.. automodule:: espresso.ParticleAccess
+.. automodule:: espressopp.ParticleAccess
    :members:

@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.DPDThermostat
+.. automodule:: espressopp.integrator.DPDThermostat
    :members:

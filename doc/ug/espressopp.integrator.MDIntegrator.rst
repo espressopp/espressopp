@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.MDIntegrator
+.. automodule:: espressopp.integrator.MDIntegrator
    :members:

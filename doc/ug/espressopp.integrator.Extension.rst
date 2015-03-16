@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.Extension
+.. automodule:: espressopp.integrator.Extension
    :members:

@@ -3,9 +3,9 @@ Advanced Lennard Jones System
 
 This tutorial needs the matplotlib.pyplot and numpy libraries and also VMD to be installed.
 
->>> import espresso
+>>> import espressopp
 
-After importing espresso we import several other Python packages that we want to
+After importing espressopp we import several other Python packages that we want to
 use for graphical output of some system parameters (e.g. temperature and energy)
 
 >>> import math 
@@ -21,23 +21,23 @@ in a cubic siomulation box. ESPResSo++ provides a "shortcut" to setup such a sys
 >>> N   = 1000
 >>> rho = 0.85
 >>> L   = pow(N/rho, 1.0/3)
->>> system, integrator = espresso.standard_system.LennardJones(N,(L, L, L), dt=0.0001)
+>>> system, integrator = espressopp.standard_system.LennardJones(N,(L, L, L), dt=0.0001)
 
 We also add a Langevin thermostat:
 
->>> langevin = espresso.integrator.LangevinThermostat(system)
+>>> langevin = espressopp.integrator.LangevinThermostat(system)
 >>> langevin.gamma       = 1.0
 >>> langevin.temperature = 1.0
 >>> integrator.addExtension(langevin)
 
 We do a very short warmup in the beginning to get rid of "extremely" high forces
 
->>> force_capping   = espresso.integrator.CapForce(system, 1000000.0)
+>>> force_capping   = espressopp.integrator.CapForce(system, 1000000.0)
 >>> integrator.addExtension(force_capping)
->>> espresso.tools.analyse.info(system, integrator)
+>>> espressopp.tools.analyse.info(system, integrator)
 >>> for k in range(10):
 >>>   integrator.run(100)
->>>   espresso.tools.analyse.info(system, integrator)
+>>>   espressopp.tools.analyse.info(system, integrator)
 
 Now let's initialize a graph. So that we can have a realtime-view on what is happening
 in the simulation:
@@ -46,8 +46,8 @@ in the simulation:
 
 We want to observe temperature and energy of the system:
 
->>> T   = espresso.analysis.Temperature(system)
->>> E   = espresso.analysis.EnergyPot(system, per_atom=True)
+>>> T   = espressopp.analysis.Temperature(system)
+>>> E   = espressopp.analysis.EnergyPot(system, per_atom=True)
 
 x will be the x-axixs of the graph containg the time. yT and yE will be temperature
 and energy as y-axes in 2 plots:
@@ -73,10 +73,10 @@ Initialize the two graphs ('ro' means red circles, 'go' means green cirlces, see
 We also want to observe the configuration with VMD. So we have to connect to vmd. This command
 will automatically start vmd (vmd has to be found in your PATH environment for this to work)
 
->>> sock = espresso.tools.vmd.connect(system)
+>>> sock = espressopp.tools.vmd.connect(system)
 >>> for k in range(200):
 >>>   integrator.run(1000)
->>>   espresso.tools.vmd.imd_positions(system, sock)
+>>>   espressopp.tools.vmd.imd_positions(system, sock)
 
 Update the x-, and y-axes:
 

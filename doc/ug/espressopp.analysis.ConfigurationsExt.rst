@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.ConfigurationsExt
+.. automodule:: espressopp.analysis.ConfigurationsExt
    :members:

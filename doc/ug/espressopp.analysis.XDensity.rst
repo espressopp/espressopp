@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.XDensity
+.. automodule:: espressopp.analysis.XDensity
    :members:

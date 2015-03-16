@@ -1,2 +1,2 @@
-.. automodule:: espresso.storage.DomainDecompositionAdress
+.. automodule:: espressopp.storage.DomainDecompositionAdress
    :members:

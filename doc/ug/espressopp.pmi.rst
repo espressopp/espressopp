@@ -1,2 +1,2 @@
-.. automodule:: espresso.pmi
+.. automodule:: espressopp.pmi
    :members:

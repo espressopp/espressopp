@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.RadialDistrF
+.. automodule:: espressopp.analysis.RadialDistrF
    :members:

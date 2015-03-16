@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.LennardJones
+.. automodule:: espressopp.interaction.LennardJones
    :members:

@@ -1,2 +1,2 @@
-.. automodule:: espresso.VerletListTriple
+.. automodule:: espressopp.VerletListTriple
    :members:

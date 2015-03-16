@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.CoulombKSpaceEwald
+.. automodule:: espressopp.interaction.CoulombKSpaceEwald
    :members:

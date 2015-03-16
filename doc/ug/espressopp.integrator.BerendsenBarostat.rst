@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.BerendsenBarostat
+.. automodule:: espressopp.integrator.BerendsenBarostat
    :members:

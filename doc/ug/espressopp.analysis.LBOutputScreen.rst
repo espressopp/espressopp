@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.LBOutputScreen
+.. automodule:: espressopp.analysis.LBOutputScreen
    :members:

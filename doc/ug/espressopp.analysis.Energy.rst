@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.Energy
+.. automodule:: espressopp.analysis.Energy
    :members:

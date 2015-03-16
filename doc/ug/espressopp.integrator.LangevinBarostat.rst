@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.LangevinBarostat
+.. automodule:: espressopp.integrator.LangevinBarostat
    :members:

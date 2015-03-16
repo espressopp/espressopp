@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.PotentialVSpherePair
+.. automodule:: espressopp.interaction.PotentialVSpherePair
    :members:

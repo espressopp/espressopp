@@ -1,2 +1,2 @@
-.. automodule:: espresso.Version
+.. automodule:: espressopp.Version
    :members:

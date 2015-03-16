@@ -1,2 +1,2 @@
-.. automodule:: espresso.standard_system.KGMelt
+.. automodule:: espressopp.standard_system.KGMelt
    :members:

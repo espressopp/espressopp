@@ -1,2 +1,2 @@
-.. automodule:: espresso.esutil.GammaVariate
+.. automodule:: espressopp.esutil.GammaVariate
    :members:

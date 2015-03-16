@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.ExtForce
+.. automodule:: espressopp.integrator.ExtForce
    :members:

@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.AngularCosineSquared
+.. automodule:: espressopp.interaction.AngularCosineSquared
    :members:

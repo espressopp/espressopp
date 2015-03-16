@@ -1,2 +1,2 @@
-.. automodule:: espresso.Real3D
+.. automodule:: espressopp.Real3D
    :members:

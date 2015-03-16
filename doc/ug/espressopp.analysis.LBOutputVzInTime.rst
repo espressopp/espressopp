@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.LBOutputVzInTime
+.. automodule:: espressopp.analysis.LBOutputVzInTime
    :members:

@@ -1,2 +1,2 @@
-.. automodule:: espresso.Int3D
+.. automodule:: espressopp.Int3D
    :members:

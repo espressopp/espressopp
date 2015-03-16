@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.PotentialUniqueDist
+.. automodule:: espressopp.interaction.PotentialUniqueDist
    :members:

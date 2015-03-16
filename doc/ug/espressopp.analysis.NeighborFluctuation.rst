@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.NeighborFluctuation
+.. automodule:: espressopp.analysis.NeighborFluctuation
    :members:

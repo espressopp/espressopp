@@ -1,3 +1,3 @@
-.. automodule:: espresso.tools.decomp
+.. automodule:: espressopp.tools.decomp
    :members:
 

@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.Velocities
+.. automodule:: espressopp.analysis.Velocities
    :members:

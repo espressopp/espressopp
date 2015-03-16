@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.GravityTruncated
+.. automodule:: espressopp.interaction.GravityTruncated
    :members:

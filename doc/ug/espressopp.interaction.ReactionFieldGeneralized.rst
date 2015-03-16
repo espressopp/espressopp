@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.ReactionFieldGeneralized
+.. automodule:: espressopp.interaction.ReactionFieldGeneralized
    :members:

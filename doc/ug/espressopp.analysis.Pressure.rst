@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.Pressure
+.. automodule:: espressopp.analysis.Pressure
    :members:

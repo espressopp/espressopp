@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.StillingerWeberTripleTerm
+.. automodule:: espressopp.interaction.StillingerWeberTripleTerm
    :members:

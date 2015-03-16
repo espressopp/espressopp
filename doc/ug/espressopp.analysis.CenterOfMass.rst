@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.CenterOfMass
+.. automodule:: espressopp.analysis.CenterOfMass
    :members:

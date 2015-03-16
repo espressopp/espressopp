@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.Autocorrelation
+.. automodule:: espressopp.analysis.Autocorrelation
    :members:

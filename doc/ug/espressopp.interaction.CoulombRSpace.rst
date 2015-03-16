@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.CoulombRSpace
+.. automodule:: espressopp.interaction.CoulombRSpace
    :members:

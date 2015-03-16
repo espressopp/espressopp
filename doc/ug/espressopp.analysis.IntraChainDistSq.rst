@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.IntraChainDistSq
+.. automodule:: espressopp.analysis.IntraChainDistSq
    :members:

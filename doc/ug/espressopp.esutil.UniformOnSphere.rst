@@ -1,2 +1,2 @@
-.. automodule:: espresso.esutil.UniformOnSphere
+.. automodule:: espressopp.esutil.UniformOnSphere
    :members:

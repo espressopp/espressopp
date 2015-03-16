@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.ConfigsParticleDecomp
+.. automodule:: espressopp.analysis.ConfigsParticleDecomp
    :members:

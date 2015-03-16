@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.PressureTensorLayer
+.. automodule:: espressopp.analysis.PressureTensorLayer
    :members:

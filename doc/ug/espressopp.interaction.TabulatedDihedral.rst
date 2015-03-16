@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.TabulatedDihedral
+.. automodule:: espressopp.interaction.TabulatedDihedral
    :members:

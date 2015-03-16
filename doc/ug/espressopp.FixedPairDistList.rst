@@ -1,2 +1,2 @@
-.. automodule:: espresso.FixedPairDistList
+.. automodule:: espressopp.FixedPairDistList
    :members:

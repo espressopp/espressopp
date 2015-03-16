@@ -1,2 +1,2 @@
-.. automodule:: espresso.FixedSingleList
+.. automodule:: espressopp.FixedSingleList
    :members:

@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.LennardJones93Wall
+.. automodule:: espressopp.interaction.LennardJones93Wall
    :members:

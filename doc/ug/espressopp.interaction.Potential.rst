@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.Potential
+.. automodule:: espressopp.interaction.Potential
    :members:

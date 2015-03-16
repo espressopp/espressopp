@@ -1,2 +1,2 @@
-.. automodule:: espresso.io.DumpGRO
+.. automodule:: espressopp.io.DumpGRO
    :members:

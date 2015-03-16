@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.LennardJonesEnergyCapped
+.. automodule:: espressopp.interaction.LennardJonesEnergyCapped
    :members:

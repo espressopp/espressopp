@@ -1,2 +1,2 @@
-.. automodule:: espresso.bc.BC
+.. automodule:: espressopp.bc.BC
    :members:

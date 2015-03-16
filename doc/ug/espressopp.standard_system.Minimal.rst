@@ -1,2 +1,2 @@
-.. automodule:: espresso.standard_system.Minimal
+.. automodule:: espressopp.standard_system.Minimal
    :members:

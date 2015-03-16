@@ -1,2 +1,2 @@
-.. automodule:: espresso.Tensor
+.. automodule:: espressopp.Tensor
    :members:

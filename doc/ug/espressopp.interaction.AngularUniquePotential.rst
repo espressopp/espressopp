@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.AngularUniquePotential
+.. automodule:: espressopp.interaction.AngularUniquePotential
    :members:

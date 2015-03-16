@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.Temperature
+.. automodule:: espressopp.analysis.Temperature
    :members:

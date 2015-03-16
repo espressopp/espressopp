@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.AnalysisBase
+.. automodule:: espressopp.analysis.AnalysisBase
    :members:

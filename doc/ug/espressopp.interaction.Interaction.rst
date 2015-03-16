@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.Interaction
+.. automodule:: espressopp.interaction.Interaction
    :members:

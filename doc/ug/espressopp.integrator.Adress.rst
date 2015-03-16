@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.Adress
+.. automodule:: espressopp.integrator.Adress
    :members:

@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.AngularUniqueHarmonic
+.. automodule:: espressopp.interaction.AngularUniqueHarmonic
    :members:

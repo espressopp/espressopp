@@ -1,2 +1,2 @@
-.. automodule:: espresso.esutil.collectives
+.. automodule:: espressopp.esutil.collectives
    :members:

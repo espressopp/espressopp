@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.ExtAnalyze
+.. automodule:: espressopp.integrator.ExtAnalyze
    :members:

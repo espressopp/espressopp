@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.TersoffPairTerm
+.. automodule:: espressopp.interaction.TersoffPairTerm
    :members:

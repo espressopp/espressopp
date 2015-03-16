@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.Observable
+.. automodule:: espressopp.analysis.Observable
    :members:

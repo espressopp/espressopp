@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.StillingerWeberPairTerm
+.. automodule:: espressopp.interaction.StillingerWeberPairTerm
    :members:

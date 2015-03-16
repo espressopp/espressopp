@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.FENE
+.. automodule:: espressopp.interaction.FENE
    :members:

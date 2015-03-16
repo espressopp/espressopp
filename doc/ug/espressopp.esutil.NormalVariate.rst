@@ -1,2 +1,2 @@
-.. automodule:: espresso.esutil.NormalVariate
+.. automodule:: espressopp.esutil.NormalVariate
    :members:

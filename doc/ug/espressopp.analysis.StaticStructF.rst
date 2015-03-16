@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.StaticStructF
+.. automodule:: espressopp.analysis.StaticStructF
    :members:

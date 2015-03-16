@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.Test
+.. automodule:: espressopp.analysis.Test
    :members:

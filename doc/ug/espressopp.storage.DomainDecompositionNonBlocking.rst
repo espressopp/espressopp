@@ -1,2 +1,2 @@
-.. automodule:: espresso.storage.DomainDecompositionNonBlocking
+.. automodule:: espressopp.storage.DomainDecompositionNonBlocking
    :members:

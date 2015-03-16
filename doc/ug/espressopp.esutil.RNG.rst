@@ -1,2 +1,2 @@
-.. automodule:: espresso.esutil.RNG
+.. automodule:: espressopp.esutil.RNG
    :members:

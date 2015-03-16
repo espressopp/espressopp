@@ -1,2 +1,2 @@
-.. automodule:: espresso.esutil.Grid
+.. automodule:: espressopp.esutil.Grid
    :members:

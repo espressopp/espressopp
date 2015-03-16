@@ -1,2 +1,2 @@
-.. automodule:: espresso.io.DumpXYZ
+.. automodule:: espressopp.io.DumpXYZ
    :members:

@@ -1,2 +1,2 @@
-.. automodule:: espresso.FixedQuadrupleList
+.. automodule:: espressopp.FixedQuadrupleList
    :members:

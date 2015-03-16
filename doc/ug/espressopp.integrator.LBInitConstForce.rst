@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.LBInitConstForce
+.. automodule:: espressopp.integrator.LBInitConstForce
    :members:

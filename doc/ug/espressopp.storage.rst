@@ -1,3 +1,3 @@
-.. automodule:: espresso.storage.Storage
+.. automodule:: espressopp.storage.Storage
    :members:
 

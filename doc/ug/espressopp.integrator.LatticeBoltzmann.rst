@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.LatticeBoltzmann
+.. automodule:: espressopp.integrator.LatticeBoltzmann
    :members:

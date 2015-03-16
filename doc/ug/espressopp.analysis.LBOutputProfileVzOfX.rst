@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.LBOutputProfileVzOfX
+.. automodule:: espressopp.analysis.LBOutputProfileVzOfX
    :members:

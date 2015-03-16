@@ -4,5 +4,5 @@ io
 .. toctree::
    :maxdepth: 2
    
-   espresso.io.DumpGRO.rst
-   espresso.io.DumpXYZ.rst
+   espressopp.io.DumpGRO.rst
+   espressopp.io.DumpXYZ.rst

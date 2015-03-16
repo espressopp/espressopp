@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.LBInitPeriodicForce
+.. automodule:: espressopp.integrator.LBInitPeriodicForce
    :members:

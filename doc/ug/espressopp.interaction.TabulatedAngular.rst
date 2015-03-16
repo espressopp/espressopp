@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.TabulatedAngular
+.. automodule:: espressopp.interaction.TabulatedAngular
    :members:

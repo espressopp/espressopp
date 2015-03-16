@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.LJcos
+.. automodule:: espressopp.interaction.LJcos
    :members:

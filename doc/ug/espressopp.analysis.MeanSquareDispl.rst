@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.MeanSquareDispl
+.. automodule:: espressopp.analysis.MeanSquareDispl
    :members:

@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.FreeEnergyCompensation
+.. automodule:: espressopp.integrator.FreeEnergyCompensation
    :members:

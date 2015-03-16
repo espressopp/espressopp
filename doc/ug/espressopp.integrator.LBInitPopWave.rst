@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.LBInitPopWave
+.. automodule:: espressopp.integrator.LBInitPopWave
    :members:

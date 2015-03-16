@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.CoulombKSpaceP3M
+.. automodule:: espressopp.interaction.CoulombKSpaceP3M
    :members:

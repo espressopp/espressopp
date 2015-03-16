@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.VSphereSelf
+.. automodule:: espressopp.interaction.VSphereSelf
    :members:

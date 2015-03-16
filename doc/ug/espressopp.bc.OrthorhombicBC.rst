@@ -1,2 +1,2 @@
-.. automodule:: espresso.bc.OrthorhombicBC
+.. automodule:: espressopp.bc.OrthorhombicBC
    :members:

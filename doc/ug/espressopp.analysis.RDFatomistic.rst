@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.RDFatomistic
+.. automodule:: espressopp.analysis.RDFatomistic
    :members:

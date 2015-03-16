@@ -1,2 +1,2 @@
-.. automodule:: espresso.FixedQuadrupleAngleList
+.. automodule:: espressopp.FixedQuadrupleAngleList
    :members:

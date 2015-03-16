@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.BerendsenThermostat
+.. automodule:: espressopp.integrator.BerendsenThermostat
    :members:

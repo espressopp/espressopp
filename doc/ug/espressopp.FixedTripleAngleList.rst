@@ -1,2 +1,2 @@
-.. automodule:: espresso.FixedTripleAngleList
+.. automodule:: espressopp.FixedTripleAngleList
    :members:

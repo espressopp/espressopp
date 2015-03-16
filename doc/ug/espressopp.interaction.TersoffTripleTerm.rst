@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.TersoffTripleTerm
+.. automodule:: espressopp.interaction.TersoffTripleTerm
    :members:

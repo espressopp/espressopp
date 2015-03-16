@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.DihedralHarmonicUniqueCos
+.. automodule:: espressopp.interaction.DihedralHarmonicUniqueCos
    :members:

@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.TDforce
+.. automodule:: espressopp.integrator.TDforce
    :members:

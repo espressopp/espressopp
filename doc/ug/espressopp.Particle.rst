@@ -1,2 +1,2 @@
-.. automodule:: espresso.Particle
+.. automodule:: espressopp.Particle
    :members:

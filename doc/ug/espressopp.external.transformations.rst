@@ -1,2 +1,2 @@
-.. automodule:: espresso.external.transformations
+.. automodule:: espressopp.external.transformations
    :members:

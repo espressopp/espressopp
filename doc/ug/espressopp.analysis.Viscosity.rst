@@ -1,2 +1,2 @@
-.. automodule:: espresso.analysis.Viscosity
+.. automodule:: espressopp.analysis.Viscosity
    :members:

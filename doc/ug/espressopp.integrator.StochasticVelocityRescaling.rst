@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.StochasticVelocityRescaling
+.. automodule:: espressopp.integrator.StochasticVelocityRescaling
    :members:

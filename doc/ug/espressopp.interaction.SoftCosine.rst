@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.SoftCosine
+.. automodule:: espressopp.interaction.SoftCosine
    :members:

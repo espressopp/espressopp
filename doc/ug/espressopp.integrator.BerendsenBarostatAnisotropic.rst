@@ -1,2 +1,2 @@
-.. automodule:: espresso.integrator.BerendsenBarostatAnisotropic
+.. automodule:: espressopp.integrator.BerendsenBarostatAnisotropic
    :members:

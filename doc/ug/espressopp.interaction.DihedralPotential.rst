@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.DihedralPotential
+.. automodule:: espressopp.interaction.DihedralPotential
    :members:

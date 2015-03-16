@@ -1,2 +1,2 @@
-.. automodule:: espresso.FixedTripleList
+.. automodule:: espressopp.FixedTripleList
    :members:

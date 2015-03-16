@@ -1,2 +1,2 @@
-.. automodule:: espresso.interaction.CoulombTruncated
+.. automodule:: espressopp.interaction.CoulombTruncated
    :members:

@@ -1,2 +1,2 @@
-.. automodule:: espresso.FixedPairList
+.. automodule:: espressopp.FixedPairList
    :members:
