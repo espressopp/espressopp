@@ -23,7 +23,7 @@
 
 """
 ************************************************
-**espresso.interaction.SingleParticlePotential**
+**espressopp.interaction.SingleParticlePotential**
 ************************************************
 
 This class is used to define single-particle interactions, typically used for
@@ -33,9 +33,9 @@ The potential may depend on any of the particle properties (type, mass, etc.).
 
 """
 
-from espresso import pmi
-from espresso import toReal3DFromVector
-from _espresso import interaction_SingleParticlePotential
+from espressopp import pmi
+from espressopp import toReal3DFromVector
+from _espressopp import interaction_SingleParticlePotential
 
 
 # Python base class for angular potentials

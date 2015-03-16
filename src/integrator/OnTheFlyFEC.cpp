@@ -31,7 +31,7 @@
 #include "interaction/InterpolationCubic.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   using namespace iterator;
 
   namespace integrator {
@@ -273,7 +273,7 @@ namespace espresso {
 
     void OnTheFlyFEC::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
 
       class_<OnTheFlyFEC, shared_ptr<OnTheFlyFEC>, bases<Extension> >

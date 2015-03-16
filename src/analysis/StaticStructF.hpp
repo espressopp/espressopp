@@ -28,7 +28,7 @@
 #include "Observable.hpp"
 #include "python.hpp"
 
-namespace espresso {
+namespace espressopp {
     namespace analysis {
 
         /** Class to compute the static structure function of the system. */

@@ -19,8 +19,8 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-import espresso
-from espresso import Real3D
+import espressopp
+from espressopp import Real3D
 
 def camera():
   camera = "camera {\n\
@@ -81,7 +81,7 @@ def povwrite(system, integrator, filename, append=False, box=True):
   boxsizex = system.bc.boxL[0]/2  
   boxsizey = system.bc.boxL[1]/2
   boxsizez = system.bc.boxL[2]/2
-  maxParticleID = int(espresso.analysis.MaxPID(system).compute())
+  maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
 
   f = 0.7 #size
   pid = 0

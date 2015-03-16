@@ -41,9 +41,9 @@
 using namespace std;
 
 using namespace boost;
-using namespace espresso::iterator;
+using namespace espressopp::iterator;
 
-namespace espresso {
+namespace espressopp {
  
   namespace storage {
     LOG4ESPP_LOGGER(Storage::logger, "Storage");
@@ -749,7 +749,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void
     Storage::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_< Storage, boost::noncopyable >("storage_Storage", no_init)
 	    .def("clearSavedPositions", &Storage::clearSavedPositions)
 	    .def("savePosition", &Storage::savePosition)

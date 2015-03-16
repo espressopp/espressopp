@@ -21,15 +21,15 @@
 
 """
 ******************************
-**espresso.analysis.XDensity**
+**espressopp.analysis.XDensity**
 ******************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.Observable import *
-from _espresso import analysis_XDensity
+from espressopp.analysis.Observable import *
+from _espressopp import analysis_XDensity
 
 class XDensityLocal(ObservableLocal, analysis_XDensity):
   'The (local) compute the density profile in x direction.'
@@ -44,5 +44,5 @@ if pmi.isController :
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
       pmicall = [ "compute" ],
-      cls = 'espresso.analysis.XDensityLocal'
+      cls = 'espressopp.analysis.XDensityLocal'
     )

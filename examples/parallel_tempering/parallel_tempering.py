@@ -1,7 +1,7 @@
-import espresso
-from espresso import Int3D, Real3D
-from espresso.tools import decomp
-from espresso.tools.init_cfg import lattice
+import espressopp
+from espressopp import Int3D, Real3D
+from espressopp.tools import decomp
+from espressopp.tools.init_cfg import lattice
 import random
 import sys
 
@@ -26,35 +26,35 @@ temperature  = 1.0
 ptrng=random
 ptrng.seed(335977)
 
-if espresso.MPI.COMM_WORLD.size != 4:
+if espressopp.MPI.COMM_WORLD.size != 4:
   print "currently this example can only be run with 4 CPUs"
   sys.exit(0)
 
 # Parallel Tempering (replica exchange) integrator
 ptthermostats=[] 
-pt = espresso.ParallelTempering(NumberOfSystems = 4, RNG = ptrng)
+pt = espressopp.ParallelTempering(NumberOfSystems = 4, RNG = ptrng)
 for i in range(0, pt.getNumberOfSystems()):
     pt.startDefiningSystem(i)
-    pid, type, x, y, z, vx, vy, vz, Lx, Ly, Lz = espresso.tools.readxyz('parallel_tempering.xyz')
+    pid, type, x, y, z, vx, vy, vz, Lx, Ly, Lz = espressopp.tools.readxyz('parallel_tempering.xyz')
     num_particles        = len(pid)
     boxsize              = (Lx, Ly, Lz)
     rho                  = num_particles / (Lx * Ly * Lz)
-    system               = espresso.System()
-    rng                  = espresso.esutil.RNG()
-    bc                   = espresso.bc.OrthorhombicBC(rng, boxsize)
+    system               = espressopp.System()
+    rng                  = espressopp.esutil.RNG()
+    bc                   = espressopp.bc.OrthorhombicBC(rng, boxsize)
     system.bc            = bc
     system.rng           = rng
     system.skin          = skin
-    nodeGrid             = espresso.tools.decomp.nodeGrid(pt.getNumberOfCPUsPerSystem())
-    cellGrid             = espresso.tools.decomp.cellGrid(boxsize,nodeGrid,rc,skin)
-    storage              = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid, nocheck=True)
+    nodeGrid             = espressopp.tools.decomp.nodeGrid(pt.getNumberOfCPUsPerSystem())
+    cellGrid             = espressopp.tools.decomp.cellGrid(boxsize,nodeGrid,rc,skin)
+    storage              = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid, nocheck=True)
     system.storage       = storage
-    vl                   = espresso.VerletList(system,cutoff=rc)
-    potLJ                = espresso.interaction.LennardJones(epsilon, sigma, rc, shift)
-    interLJ              = espresso.interaction.VerletListLennardJones(vl)
-    integrator           = espresso.integrator.VelocityVerlet(system)
+    vl                   = espressopp.VerletList(system,cutoff=rc)
+    potLJ                = espressopp.interaction.LennardJones(epsilon, sigma, rc, shift)
+    interLJ              = espressopp.interaction.VerletListLennardJones(vl)
+    integrator           = espressopp.integrator.VelocityVerlet(system)
     integrator.dt        = dt
-    langevin             = espresso.integrator.LangevinThermostat(system)
+    langevin             = espressopp.integrator.LangevinThermostat(system)
     langevin.gamma       = gamma
     langevin.temperature = temperature*i/20 + 0.2
     integrator.addExtension(langevin)
@@ -66,8 +66,8 @@ for i in range(0, pt.getNumberOfSystems()):
 
     pt.setIntegrator(integrator, langevin)
     pt.setAnalysisE(interLJ)
-    pt.setAnalysisT(espresso.analysis.Temperature(system))
-    pt.setAnalysisNPart(espresso.analysis.NPart(system))
+    pt.setAnalysisT(espressopp.analysis.Temperature(system))
+    pt.setAnalysisNPart(espressopp.analysis.NPart(system))
     pt.endDefiningSystem(i)
 
 # let each system reach its temperature

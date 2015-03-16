@@ -31,11 +31,11 @@
 #include "interaction/InterpolationCubic.hpp"
 
 
-namespace espresso {
+namespace espressopp {
 
   namespace integrator {
 
-    using namespace espresso::iterator;
+    using namespace espressopp::iterator;
 
 
     GeneralizedLangevinThermostat::GeneralizedLangevinThermostat(shared_ptr<System> system)
@@ -180,7 +180,7 @@ namespace espresso {
     void GeneralizedLangevinThermostat::registerPython() {
 
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
 
       class_<GeneralizedLangevinThermostat, shared_ptr<GeneralizedLangevinThermostat>, bases<Extension> >

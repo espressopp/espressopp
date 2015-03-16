@@ -22,16 +22,16 @@
 
 """
 *************************************
-**espresso.interaction.HarmonicTrap**
+**espressopp.interaction.HarmonicTrap**
 *************************************
 
 """
-from espresso import pmi
-from espresso.esutil import *
+from espressopp import pmi
+from espressopp.esutil import *
 
-from espresso.interaction.SingleParticlePotential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_HarmonicTrap, interaction_SingleParticleHarmonicTrap
+from espressopp.interaction.SingleParticlePotential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_HarmonicTrap, interaction_SingleParticleHarmonicTrap
 
 
 class HarmonicTrapLocal(SingleParticlePotentialLocal, interaction_HarmonicTrap):
@@ -56,13 +56,13 @@ if pmi.isController:
     class HarmonicTrap(SingleParticlePotential):
         'The HarmonicTrap potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.HarmonicTrapLocal',
+            cls = 'espressopp.interaction.HarmonicTrapLocal',
             pmiproperty = ['k', 'center']
             )
 
     class SingleParticleHarmonicTrap(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.SingleParticleHarmonicTrapLocal',
+            cls = 'espressopp.interaction.SingleParticleHarmonicTrapLocal',
             pmicall = ['setPotential']
             )

@@ -21,14 +21,14 @@
 
 """
 **********************************
-**espresso.interaction.Potential**
+**espressopp.interaction.Potential**
 **********************************
 
 """
-from espresso import pmi
-from espresso import toReal3DFromVector
+from espressopp import pmi
+from espressopp import toReal3DFromVector
 
-from _espresso import interaction_Potential
+from _espressopp import interaction_Potential
 
 # Python base class for potentials
 class PotentialLocal(object):

@@ -33,7 +33,7 @@
 #include <boost/signals2.hpp>
 //#include "FixedListComm.hpp"
 
-namespace espresso {
+namespace espressopp {
   class FixedTripleList : public TripleList {
       protected:
 		boost::signals2::connection sigAfterRecv, sigOnParticleChanged, sigBeforeSend;

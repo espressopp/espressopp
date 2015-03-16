@@ -26,8 +26,8 @@
 
 """
 
-from espresso import pmi
-from _espresso import ParticleAccess
+from espressopp import pmi
+from _espressopp import ParticleAccess
 
 class ParticleAccessLocal(ParticleAccess):
     """Abstract local base class"""

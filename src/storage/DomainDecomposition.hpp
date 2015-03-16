@@ -29,7 +29,7 @@
 #include "NodeGrid.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   namespace storage {
     class NodeGridMismatch: public std::invalid_argument
     {

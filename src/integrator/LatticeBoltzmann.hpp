@@ -32,7 +32,7 @@
 #include "Int3D.hpp"
 #include "LatticeSite.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     class LatticeBoltzmann : public Extension {

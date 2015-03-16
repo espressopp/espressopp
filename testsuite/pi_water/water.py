@@ -9,23 +9,23 @@
 
 import sys
 import time
-import espresso
+import espressopp
 import mpi4py.MPI as MPI
 import logging
 import copy
 import math
-from espresso import Real3D, Int3D
-from espresso.tools.convert import gromacs
-from espresso.tools import decomp
-from espresso.tools import timers
+from espressopp import Real3D, Int3D
+from espressopp.tools.convert import gromacs
+from espressopp.tools import decomp
+from espressopp.tools import timers
 import pathintegral
 
 def genTabPotentials(tabfilesnb):
     potentials = {}
     for fg in tabfilesnb:
-        fe = fg.split(".")[0]+".tab" # name of espresso file
+        fe = fg.split(".")[0]+".tab" # name of espressopp file
         gromacs.convertTable(fg, fe, sigma, epsilon, c6, c12)
-        pot = espresso.interaction.Tabulated(itype=3, filename=fe, cutoff=rc)
+        pot = espressopp.interaction.Tabulated(itype=3, filename=fe, cutoff=rc)
         t1, t2 = fg[6], fg[8] # type 1, type 2
         potentials.update({t1+"_"+t2: pot})
         print "created", t1, t2, fe
@@ -66,20 +66,20 @@ density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 
 sys.stdout.write('Setting up simulation ...\n')
-system = espresso.System()
-system.rng = espresso.esutil.RNG()
-system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
+system = espressopp.System()
+system.rng = espressopp.esutil.RNG()
+system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
-system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # setting up GROMACS interaction stuff
 # create a force capped Lennard-Jones interaction that uses a verlet list
-verletlist  = espresso.VerletList(system, rc)
-#interaction = espresso.interaction.VerletListLennardJonesGromacs(verletlist)
+verletlist  = espressopp.VerletList(system, rc)
+#interaction = espressopp.interaction.VerletListLennardJonesGromacs(verletlist)
 
 # add particles to the system and then decompose
 props = ['id', 'pos', 'v', 'type', 'mass', 'q']
@@ -97,7 +97,7 @@ system.storage.addParticles(allParticles, *props)
 ########## tabulated nb interactions ############
 tabfilesnb = ["table_O_O.xvg", "table_H_O.xvg", "table_H_H.xvg"]
 potentials = genTabPotentials(tabfilesnb)
-tabulatedinteraction = espresso.interaction.VerletListTabulated(verletlist)
+tabulatedinteraction = espressopp.interaction.VerletListTabulated(verletlist)
 tabulatedinteraction.setPotential(0, 0, potentials["O_O"])
 tabulatedinteraction.setPotential(0, 1, potentials["H_O"])
 tabulatedinteraction.setPotential(1, 1, potentials["H_H"])
@@ -113,10 +113,10 @@ bondedinteractions=gromacs.setBondedInteractions(system, bondtypes, bondtypepara
 verletlist.exclude(exclusions)
 
 # langevin thermostat
-langevin = espresso.integrator.LangevinThermostat(system)
+langevin = espressopp.integrator.LangevinThermostat(system)
 langevin.gamma = 10
 langevin.temperature = 2.4942 # kT in gromacs units
-integrator = espresso.integrator.VelocityVerlet(system)
+integrator = espressopp.integrator.VelocityVerlet(system)
 integrator.addExtension(langevin)
 integrator.dt = timestep
 
@@ -124,7 +124,7 @@ print "POT", potentials
 pathintegral.createPathintegralSystem(allParticles, props, types, system, langevin, potentials, P=16)
 
 system.storage.decompose()
-num_particles  = int(espresso.analysis.NPart(system).compute())
+num_particles  = int(espressopp.analysis.NPart(system).compute())
 
 # print simulation parameters
 print ''
@@ -139,11 +139,11 @@ print 'CellGrid = %s' % (cellGrid,)
 print ''
 
 # analysis
-configurations = espresso.analysis.Configurations(system)
+configurations = espressopp.analysis.Configurations(system)
 configurations.gather()
-temperature = espresso.analysis.Temperature(system)
-pressure = espresso.analysis.Pressure(system)
-pressureTensor = espresso.analysis.PressureTensor(system)
+temperature = espressopp.analysis.Temperature(system)
+pressure = espressopp.analysis.Pressure(system)
+pressureTensor = espressopp.analysis.PressureTensor(system)
 
 print "i*timestep,Eb, EAng, ETab, Ek, Etotal T"
 fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8f %15.8f\n'
@@ -151,13 +151,13 @@ outfile = open("esp.dat", "w")
 
 start_time = time.clock()
 
-espresso.tools.psfwrite("system.psf", system)
+espressopp.tools.psfwrite("system.psf", system)
 
 
-#espresso.tools.decomp.tuneSkin(system, integrator)
-#espresso.tools.analyse.info(system, integrator)
+#espressopp.tools.decomp.tuneSkin(system, integrator)
+#espressopp.tools.analyse.info(system, integrator)
 
-espresso.tools.fastwritexyz("traj.xyz", system, append=False, scale=10)
+espressopp.tools.fastwritexyz("traj.xyz", system, append=False, scale=10)
 for i in range(check):
     T = temperature.compute()
     P = pressure.compute()
@@ -175,15 +175,15 @@ for i in range(check):
     
     print (fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
     outfile.write(fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
-    #espresso.tools.pdb.pdbfastwrite("traj.pdb", system, append=True)
-    espresso.tools.fastwritexyz("traj.xyz", system, append=True, scale=10)
+    #espressopp.tools.pdb.pdbfastwrite("traj.pdb", system, append=True)
+    espressopp.tools.fastwritexyz("traj.xyz", system, append=True, scale=10)
     integrator.run(steps/check) # print out every steps/check steps
-    #espresso.tools.vmd.imd_positions(system, sock)
+    #espressopp.tools.vmd.imd_positions(system, sock)
 
 # print timings and neighbor list information
 end_time = time.clock()
 timers.show(integrator.getTimers(), precision=2)
-espresso.tools.analyse.final_info(system, integrator, verletlist, start_time, end_time)
+espressopp.tools.analyse.final_info(system, integrator, verletlist, start_time, end_time)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))
 

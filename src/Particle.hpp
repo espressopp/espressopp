@@ -37,7 +37,7 @@
 #include "Int3D.hpp"
 #include <map>
 
-namespace espresso {
+namespace espressopp {
 
   struct ParticleProperties {
     size_t id;
@@ -475,18 +475,18 @@ namespace espresso {
 }
 
 
-BOOST_IS_MPI_DATATYPE(espresso::ParticleProperties)
-BOOST_IS_MPI_DATATYPE(espresso::ParticlePosition)
-BOOST_IS_MPI_DATATYPE(espresso::ParticleForce)
-BOOST_IS_MPI_DATATYPE(espresso::ParticleMomentum)
-BOOST_IS_MPI_DATATYPE(espresso::ParticleLocal)
-BOOST_IS_MPI_DATATYPE(espresso::Particle)
+BOOST_IS_MPI_DATATYPE(espressopp::ParticleProperties)
+BOOST_IS_MPI_DATATYPE(espressopp::ParticlePosition)
+BOOST_IS_MPI_DATATYPE(espressopp::ParticleForce)
+BOOST_IS_MPI_DATATYPE(espressopp::ParticleMomentum)
+BOOST_IS_MPI_DATATYPE(espressopp::ParticleLocal)
+BOOST_IS_MPI_DATATYPE(espressopp::Particle)
 
-BOOST_CLASS_TRACKING(espresso::ParticleProperties,track_never)
-BOOST_CLASS_TRACKING(espresso::ParticlePosition,track_never)
-BOOST_CLASS_TRACKING(espresso::ParticleForce,track_never)
-BOOST_CLASS_TRACKING(espresso::ParticleMomentum,track_never)
-BOOST_CLASS_TRACKING(espresso::ParticleLocal,track_never)
-BOOST_CLASS_TRACKING(espresso::Particle,track_never)
+BOOST_CLASS_TRACKING(espressopp::ParticleProperties,track_never)
+BOOST_CLASS_TRACKING(espressopp::ParticlePosition,track_never)
+BOOST_CLASS_TRACKING(espressopp::ParticleForce,track_never)
+BOOST_CLASS_TRACKING(espressopp::ParticleMomentum,track_never)
+BOOST_CLASS_TRACKING(espressopp::ParticleLocal,track_never)
+BOOST_CLASS_TRACKING(espressopp::Particle,track_never)
 
 #endif

@@ -28,7 +28,7 @@
 #include "bc/BC.hpp"
 #include "esutil/Error.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   LOG4ESPP_LOGGER(FixedPairDistList::theLogger, "FixedPairDistList");
 
@@ -262,7 +262,7 @@ namespace espresso {
 
   void FixedPairDistList::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (FixedPairDistList::*pyAdd)(longint pid1, longint pid2)
       = &FixedPairDistList::add;

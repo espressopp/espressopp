@@ -27,7 +27,7 @@
 #include "Potential.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     /** This class provides methods to compute forces and energies of
 	the SoftCosine potential.

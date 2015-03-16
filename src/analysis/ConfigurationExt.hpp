@@ -29,7 +29,7 @@
 #include "RealND.hpp"
 #include <map>
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     typedef shared_ptr<class ConfigurationExt> ConfigurationExtPtr;

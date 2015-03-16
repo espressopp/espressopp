@@ -34,7 +34,7 @@
 #include "boost/signals2.hpp"
 #include "Int3D.hpp"
 
-namespace espresso {
+namespace espressopp {
   
   using namespace analysis;
 

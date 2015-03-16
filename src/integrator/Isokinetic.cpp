@@ -28,7 +28,7 @@
 #include "esutil/RNG.hpp"
 #include "Isokinetic.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   using namespace iterator;
 
@@ -133,7 +133,7 @@ namespace espresso {
 
     void Isokinetic::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<Isokinetic, shared_ptr<Isokinetic>, bases<Extension> >
 

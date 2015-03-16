@@ -21,17 +21,17 @@
 
 """
 *****************************************
-**espresso.interaction.TabulatedAngular**
+**espressopp.interaction.TabulatedAngular**
 *****************************************
 
 """
 # -*- coding: iso-8859-1 -*-
-from espresso import pmi
-from espresso.esutil import *
+from espressopp import pmi
+from espressopp.esutil import *
 
-from espresso.interaction.AngularPotential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_TabulatedAngular, \
+from espressopp.interaction.AngularPotential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_TabulatedAngular, \
                       interaction_FixedTripleListTabulatedAngular
 
 
@@ -56,13 +56,13 @@ if pmi.isController:
     class TabulatedAngular(AngularPotential):
         'The TabulatedAngular potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.TabulatedAngularLocal',
+            cls = 'espressopp.interaction.TabulatedAngularLocal',
             pmiproperty = ['itype', 'filename']
             )
 
     class FixedTripleListTabulatedAngular(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedTripleListTabulatedAngularLocal',
+            cls =  'espressopp.interaction.FixedTripleListTabulatedAngularLocal',
             pmicall = ['setPotential', 'getFixedTripleList']
             )

@@ -21,12 +21,12 @@
 
 """
 ************************
-**espresso.MultiSystem**
+**espressopp.MultiSystem**
 ************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 import mpi4py.MPI as MPI
 
 class MultiSystemLocal(object):
@@ -82,7 +82,7 @@ if pmi.isController :
         """MultiSystemIntegrator to simulate and analyze several systems in parallel."""
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.MultiSystemLocal',
+            cls =  'espressopp.MultiSystemLocal',
             pmicall = [ 'setIntegrator', 'runIntegrator', 'setAnalysisTemperature', 'beginSystemDefinition',
                         'setAnalysisPotential','setAnalysisNPart'],
             pmiinvoke = [ 'runAnalysisTemperature', 'runAnalysisPotential','runAnalysisNPart' ]

@@ -30,15 +30,15 @@ summation technique. Good explanation of Ewald summation could be found here [Al
 
 Example:
 
-    >>> vl = espresso.VerletList(system, rspacecutoff+skin)
-    >>> coulombR_pot = espresso.interaction.CoulombRSpace(coulomb_prefactor, alpha, rspacecutoff)
-    >>> coulombR_int = espresso.interaction.VerletListCoulombRSpace(vl)
+    >>> vl = espressopp.VerletList(system, rspacecutoff+skin)
+    >>> coulombR_pot = espressopp.interaction.CoulombRSpace(coulomb_prefactor, alpha, rspacecutoff)
+    >>> coulombR_int = espressopp.interaction.VerletListCoulombRSpace(vl)
     >>> coulombR_int.setPotential(type1=0, type2=0, potential = coulombR_pot)
     >>> system.addInteraction(coulombR_int)
 
 **!IMPORTANT** Coulomb interaction needs k-space part as well EwaldKSpace_.
 
-.. _EwaldKSpace: espresso.interaction.EwaldKSpace.html
+.. _EwaldKSpace: espressopp.interaction.EwaldKSpace.html
 
 Definition:
 
@@ -47,7 +47,7 @@ Definition:
     The *potential* is based on parameters: Coulomb prefactor (coulomb_prefactor), Ewald parameter
     (alpha), and the cutoff in R space (rspacecutoff).
     
-    >>> coulombR_pot = espresso.interaction.CoulombRSpace(coulomb_prefactor, alpha, rspacecutoff)
+    >>> coulombR_pot = espressopp.interaction.CoulombRSpace(coulomb_prefactor, alpha, rspacecutoff)
 
     Potential Properties:
 
@@ -65,8 +65,8 @@ Definition:
         
     The *interaction* is based on the Verlet list (VerletList_)
     
-    >>> vl = espresso.VerletList(system, rspacecutoff+skin)
-    >>> coulombR_int = espresso.interaction.VerletListCoulombRSpace(vl)
+    >>> vl = espressopp.VerletList(system, rspacecutoff+skin)
+    >>> coulombR_int = espressopp.interaction.VerletListCoulombRSpace(vl)
 
 .. _VerletList:
 
@@ -91,12 +91,12 @@ Adding the interaction to the system:
     
 """
 
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_CoulombRSpace, \
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_CoulombRSpace, \
                       interaction_VerletListCoulombRSpace
 
 class CoulombRSpaceLocal(PotentialLocal, interaction_CoulombRSpace):
@@ -132,9 +132,9 @@ class VerletListCoulombRSpaceLocal(InteractionLocal, interaction_VerletListCoulo
 if pmi.isController:
   
   class CoulombRSpace(Potential):
-    pmiproxydefs = dict( cls = 'espresso.interaction.CoulombRSpaceLocal', pmiproperty = [ 'prefactor', 'alpha'] )
+    pmiproxydefs = dict( cls = 'espressopp.interaction.CoulombRSpaceLocal', pmiproperty = [ 'prefactor', 'alpha'] )
 
   class VerletListCoulombRSpace(Interaction):
     __metaclass__ = pmi.Proxy
-    pmiproxydefs = dict( cls = 'espresso.interaction.VerletListCoulombRSpaceLocal',
+    pmiproxydefs = dict( cls = 'espressopp.interaction.VerletListCoulombRSpaceLocal',
     pmicall      = ['setPotential', 'getPotential', 'getVerletList'] )

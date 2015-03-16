@@ -25,7 +25,7 @@
 #include "interaction/FENE.hpp"
 #include "Real3D.hpp"
 
-using namespace espresso;
+using namespace espressopp;
 using namespace interaction;
 
 BOOST_AUTO_TEST_CASE(FENE_noCutoff)

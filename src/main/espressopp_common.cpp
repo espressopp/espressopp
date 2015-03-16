@@ -20,7 +20,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
-#include "espresso_common.hpp"
+#include "espressopp_common.hpp"
 
 #include "mpi.hpp"
 #include "types.hpp"

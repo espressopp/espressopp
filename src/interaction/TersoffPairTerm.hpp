@@ -37,7 +37,7 @@
 #define M_PIl 3.1415926535897932384626433832795029L
 #endif
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     /** This class provides methods to compute forces and energies of
 	2 body term of Tersoff potential.

@@ -27,11 +27,11 @@
 This class sets and adds an external constant (gravity-like) forces to a liquid
   
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.LBInit import *
-from _espresso import integrator_LBInit_ConstForce
+from espressopp.integrator.LBInit import *
+from _espressopp import integrator_LBInit_ConstForce
 
 class LBInitConstForceLocal(LBInitLocal, integrator_LBInit_ConstForce):
     """The (local) compute of LBInitConstForce."""
@@ -43,7 +43,7 @@ if pmi.isController :
     class LBInitConstForce(LBInit):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.LBInitConstForceLocal',
+            cls =  'espressopp.integrator.LBInitConstForceLocal',
             pmicall = [
                        "setForce",
                        "addForce"]

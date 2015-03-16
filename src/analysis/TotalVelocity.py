@@ -22,15 +22,15 @@
 
 """
 ***********************************
-**espresso.analysis.TotalVelocity**
+**espressopp.analysis.TotalVelocity**
 ***********************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.Observable import *
-from _espresso import analysis_TotalVelocity
+from espressopp.analysis.Observable import *
+from _espressopp import analysis_TotalVelocity
 
 class TotalVelocityLocal(ObservableLocal, analysis_TotalVelocity):
     'The (local) TotalVelocity.'
@@ -45,7 +45,7 @@ if pmi.isController :
     class TotalVelocity(Observable):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.TotalVelocityLocal',
+            cls =  'espressopp.analysis.TotalVelocityLocal',
             pmicall = [ "compute", "reset" ],
             pmiproperty = ["v"]
             )

@@ -26,12 +26,12 @@
 #include <stdexcept>
 #include "Real3D.hpp"
 
-using namespace espresso;
+using namespace espressopp;
 using namespace boost::python;
 
 #define DEFAULT_TAG 71
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     Configuration::Configuration(bool _pos, bool _vel, bool _force, bool _radius)
@@ -180,7 +180,7 @@ namespace espresso {
 */
 
     void Configuration::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 /*
       class_<ConfigurationIterator>("ConfigurationIterator", no_init)
       .def("next", &ConfigurationIterator::nextId)

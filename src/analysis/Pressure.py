@@ -21,15 +21,15 @@
 
 """
 ******************************
-**espresso.analysis.Pressure**
+**espressopp.analysis.Pressure**
 ******************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.Observable import *
-from _espresso import analysis_Pressure
+from espressopp.analysis.Observable import *
+from _espressopp import analysis_Pressure
 
 class PressureLocal(ObservableLocal, analysis_Pressure):
     'The (local) compute of pressure.'
@@ -40,5 +40,5 @@ if pmi.isController :
     class Pressure(Observable):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.PressureLocal'
+            cls =  'espressopp.analysis.PressureLocal'
             )

@@ -20,67 +20,67 @@
 
 
 # -*- coding: iso-8859-1 -*-
-from espresso.esutil import pmiimport
-pmiimport('espresso.interaction')
+from espressopp.esutil import pmiimport
+pmiimport('espressopp.interaction')
 
-from espresso.interaction.Interaction import *
+from espressopp.interaction.Interaction import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.PotentialVSpherePair import *
-from espresso.interaction.PotentialUniqueDist import *
+from espressopp.interaction.Potential import *
+from espressopp.interaction.PotentialVSpherePair import *
+from espressopp.interaction.PotentialUniqueDist import *
 
-from espresso.interaction.Zero import *
-from espresso.interaction.LennardJones import *
-from espresso.interaction.LennardJonesAutoBonds import *
-from espresso.interaction.LennardJonesCapped import *
-from espresso.interaction.LennardJonesEnergyCapped import *
-from espresso.interaction.LennardJonesExpand import *
-from espresso.interaction.LennardJonesGromacs import *
-from espresso.interaction.LennardJonesGeneric import *
-from espresso.interaction.LJcos import *
-from espresso.interaction.Morse import *
-from espresso.interaction.CoulombTruncated import *
-from espresso.interaction.GravityTruncated import *
-from espresso.interaction.ReactionFieldGeneralized import *
-from espresso.interaction.SoftCosine import *
-from espresso.interaction.Tabulated import *
-from espresso.interaction.FENE import *
-from espresso.interaction.FENECapped import *
-from espresso.interaction.Harmonic import *
-from espresso.interaction.Quartic import *
-from espresso.interaction.VSphereSelf import *
-from espresso.interaction.VSpherePair import *
-from espresso.interaction.MirrorLennardJones import *
+from espressopp.interaction.Zero import *
+from espressopp.interaction.LennardJones import *
+from espressopp.interaction.LennardJonesAutoBonds import *
+from espressopp.interaction.LennardJonesCapped import *
+from espressopp.interaction.LennardJonesEnergyCapped import *
+from espressopp.interaction.LennardJonesExpand import *
+from espressopp.interaction.LennardJonesGromacs import *
+from espressopp.interaction.LennardJonesGeneric import *
+from espressopp.interaction.LJcos import *
+from espressopp.interaction.Morse import *
+from espressopp.interaction.CoulombTruncated import *
+from espressopp.interaction.GravityTruncated import *
+from espressopp.interaction.ReactionFieldGeneralized import *
+from espressopp.interaction.SoftCosine import *
+from espressopp.interaction.Tabulated import *
+from espressopp.interaction.FENE import *
+from espressopp.interaction.FENECapped import *
+from espressopp.interaction.Harmonic import *
+from espressopp.interaction.Quartic import *
+from espressopp.interaction.VSphereSelf import *
+from espressopp.interaction.VSpherePair import *
+from espressopp.interaction.MirrorLennardJones import *
 
-from espresso.interaction.HarmonicUnique import *
+from espressopp.interaction.HarmonicUnique import *
 
-from espresso.interaction.AngularPotential import *
-from espresso.interaction.AngularUniquePotential import *
-from espresso.interaction.Cosine import *
-from espresso.interaction.TabulatedAngular import *
-from espresso.interaction.AngularHarmonic import *
-from espresso.interaction.AngularUniqueHarmonic import *
-from espresso.interaction.AngularCosineSquared import *
-from espresso.interaction.AngularUniqueCosineSquared import *
+from espressopp.interaction.AngularPotential import *
+from espressopp.interaction.AngularUniquePotential import *
+from espressopp.interaction.Cosine import *
+from espressopp.interaction.TabulatedAngular import *
+from espressopp.interaction.AngularHarmonic import *
+from espressopp.interaction.AngularUniqueHarmonic import *
+from espressopp.interaction.AngularCosineSquared import *
+from espressopp.interaction.AngularUniqueCosineSquared import *
 
-from espresso.interaction.DihedralPotential import *
-from espresso.interaction.DihedralUniquePotential import *
-from espresso.interaction.TabulatedDihedral import *
-from espresso.interaction.OPLS import *
-from espresso.interaction.DihedralHarmonicCos import *
-from espresso.interaction.DihedralHarmonicNCos import *
-from espresso.interaction.DihedralHarmonicUniqueCos import *
+from espressopp.interaction.DihedralPotential import *
+from espressopp.interaction.DihedralUniquePotential import *
+from espressopp.interaction.TabulatedDihedral import *
+from espressopp.interaction.OPLS import *
+from espressopp.interaction.DihedralHarmonicCos import *
+from espressopp.interaction.DihedralHarmonicNCos import *
+from espressopp.interaction.DihedralHarmonicUniqueCos import *
 
-from espresso.interaction.CoulombKSpaceEwald import *
-from espresso.interaction.CoulombRSpace import *
-from espresso.interaction.StillingerWeberPairTerm import *
-from espresso.interaction.StillingerWeberTripleTerm import *
-from espresso.interaction.StillingerWeberPairTermCapped import *
-from espresso.interaction.TersoffPairTerm import *
-from espresso.interaction.TersoffTripleTerm import *
+from espressopp.interaction.CoulombKSpaceEwald import *
+from espressopp.interaction.CoulombRSpace import *
+from espressopp.interaction.StillingerWeberPairTerm import *
+from espressopp.interaction.StillingerWeberTripleTerm import *
+from espressopp.interaction.StillingerWeberPairTermCapped import *
+from espressopp.interaction.TersoffPairTerm import *
+from espressopp.interaction.TersoffTripleTerm import *
 
-from espresso.interaction.CoulombKSpaceP3M import *
+from espressopp.interaction.CoulombKSpaceP3M import *
 
-from espresso.interaction.SingleParticlePotential import *
-from espresso.interaction.HarmonicTrap import *
-from espresso.interaction.LennardJones93Wall import *
+from espressopp.interaction.SingleParticlePotential import *
+from espressopp.interaction.HarmonicTrap import *
+from espressopp.interaction.LennardJones93Wall import *

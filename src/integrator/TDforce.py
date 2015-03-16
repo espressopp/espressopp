@@ -21,21 +21,21 @@
 
 """
 *******************************
-**espresso.integrator.TDforce**
+**espressopp.integrator.TDforce**
 *******************************
 
 Example - how to turn on thermodynamic force
 
 >>> fthd="tabletf.xvg"
->>> thdforce = espresso.integrator.TDforce(system,verletlist) #info about centre and shape of adress region come from the verletlist. info about size of adress region not needed, tabulated file tabletf.xvg should be appropriate for the region size
+>>> thdforce = espressopp.integrator.TDforce(system,verletlist) #info about centre and shape of adress region come from the verletlist. info about size of adress region not needed, tabulated file tabletf.xvg should be appropriate for the region size
 >>> thdforce.addForce(itype=3,filename="tabletf.xvg",type=typeCG)
 >>> integrator.addExtension(thdforce)
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from _espresso import integrator_TDforce 
+from _espressopp import integrator_TDforce 
 
 class TDforceLocal(integrator_TDforce):
     'The (local) Velocity Verlet Integrator.'
@@ -69,7 +69,7 @@ if pmi.isController :
     class TDforce(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.TDforceLocal',
+            cls =  'espressopp.integrator.TDforceLocal',
             pmiproperty = [ 'itype', 'filename'],
             pmicall = ['addForce']
             )

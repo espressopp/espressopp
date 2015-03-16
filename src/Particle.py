@@ -21,16 +21,16 @@
 
 """
 *********************
-**espresso.Particle**
+**espressopp.Particle**
 *********************
 
 """
-import _espresso
+import _espressopp
 import esutil
 import pmi
-from espresso import toReal3DFromVector, toInt3DFromVector
+from espressopp import toReal3DFromVector, toInt3DFromVector
 import mpi4py.MPI as MPI
-from espresso.Exceptions import ParticleDoesNotExistHere
+from espressopp.Exceptions import ParticleDoesNotExistHere
 
 # Controller Particle:
 # * requests are directly forwarded
@@ -175,7 +175,7 @@ if pmi.isController:
     class Particle(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.ParticleLocal',
+            cls = 'espressopp.ParticleLocal',
             pmiproperty = [ "id", "storage" ]
             )
 

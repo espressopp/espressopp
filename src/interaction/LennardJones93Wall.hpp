@@ -32,7 +32,7 @@
 #include "bc/BC.hpp"
 #include <cmath>
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     struct LJ93WParams {

@@ -21,16 +21,16 @@
 
 """
 ***********************
-**espresso.VerletList**
+**espressopp.VerletList**
 ***********************
 
 """
-from espresso import pmi
-import _espresso 
-import espresso
-from espresso.esutil import cxxinit
+from espressopp import pmi
+import _espressopp 
+import espressopp
+from espressopp.esutil import cxxinit
 
-class VerletListLocal(_espresso.VerletList):
+class VerletListLocal(_espressopp.VerletList):
     'The (local) verlet list.'
 
     def __init__(self, system, cutoff, exclusionlist=[]):
@@ -38,10 +38,10 @@ class VerletListLocal(_espresso.VerletList):
         if pmi.workerIsActive():
             if (exclusionlist == []):
                 # rebuild list in constructor
-                cxxinit(self, _espresso.VerletList, system, cutoff, True)
+                cxxinit(self, _espressopp.VerletList, system, cutoff, True)
             else:
                 # do not rebuild list in constructor
-                cxxinit(self, _espresso.VerletList, system, cutoff, False)
+                cxxinit(self, _espressopp.VerletList, system, cutoff, False)
                 # add exclusions
                 for pair in exclusionlist:
                     pid1, pid2 = pair
@@ -87,7 +87,7 @@ if pmi.isController:
   class VerletList(object):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls = 'espresso.VerletListLocal',
+      cls = 'espressopp.VerletListLocal',
       pmiproperty = [ 'builds' ],
       pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff' ],
       pmiinvoke = [ 'getAllPairs' ]

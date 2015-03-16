@@ -29,7 +29,7 @@
 #include "Real3D.hpp"
 #include "SystemAccess.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     /** Class to compute the total velocity of a system. TotalVelocity provides

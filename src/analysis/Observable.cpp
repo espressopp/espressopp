@@ -24,7 +24,7 @@
 #include "Observable.hpp"
 #include "boost/foreach.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     LOG4ESPP_LOGGER(Observable::logger, "Observable");
@@ -48,7 +48,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void
     Observable::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
     
       class_< Observable, boost::noncopyable >("analysis_Observable", no_init)
 		.def("compute", &Observable::compute)

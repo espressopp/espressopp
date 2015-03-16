@@ -23,7 +23,7 @@
 #include <python.hpp>
 #include "Particle.hpp"
 
-namespace espresso {
+namespace espressopp {
   void 
   Particle::
   registerPython() {

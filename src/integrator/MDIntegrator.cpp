@@ -25,7 +25,7 @@
 #include "System.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     LOG4ESPP_LOGGER(MDIntegrator::theLogger, "MDIntegrator");
@@ -99,7 +99,7 @@ namespace espresso {
 
     void MDIntegrator::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       // Note: use noncopyable and no_init for abstract classes
       class_<MDIntegrator, boost::noncopyable>

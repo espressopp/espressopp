@@ -29,7 +29,7 @@
 #include <ostream>
 #include <boost/mpi/timer.hpp>
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
     /** simple timer for obtaining typically microsecond precision
         timings.  The time is measured in seconds from the point of

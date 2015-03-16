@@ -30,7 +30,7 @@
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     using namespace iterator;
     /** Abstract base class for arbitrary output from LB simulations. */

@@ -24,7 +24,7 @@
 #include <iomanip>
 #include "LBInitPeriodicForce.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 //    LOG4ESPP_LOGGER(LBInitPeriodicForce::theLogger, "LBInitPeriodicForce");
     LBInitPeriodicForce::LBInitPeriodicForce(shared_ptr<System> system,
@@ -131,7 +131,7 @@ namespace espresso {
     }
 
     void LBInitPeriodicForce::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<LBInitPeriodicForce, bases< LBInit > >
           ("integrator_LBInit_PeriodicForce", init< shared_ptr< System >,

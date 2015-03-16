@@ -30,7 +30,7 @@
 
 #include "MDIntegrator.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
       class MDIntegrator; //fwd declaration

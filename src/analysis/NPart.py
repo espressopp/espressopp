@@ -21,15 +21,15 @@
 
 """
 ***************************
-**espresso.analysis.NPart**
+**espressopp.analysis.NPart**
 ***************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.Observable import *
-from _espresso import analysis_NPart
+from espressopp.analysis.Observable import *
+from _espressopp import analysis_NPart
 
 class NPartLocal(ObservableLocal, analysis_NPart):
     'The (local) compute of the number of particles of the system.'
@@ -41,5 +41,5 @@ if pmi.isController :
     class NPart(Observable):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.NPartLocal'
+            cls =  'espressopp.analysis.NPartLocal'
         )

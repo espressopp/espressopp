@@ -9,13 +9,13 @@
 
 import sys
 import time
-import espresso
+import espressopp
 import mpi4py.MPI as MPI
 import logging
-from espresso import Real3D, Int3D
-from espresso.tools.convert import gromacs
-from espresso.tools import decomp
-from espresso.tools import timers
+from espressopp import Real3D, Int3D
+from espressopp.tools.convert import gromacs
+from espressopp.tools import decomp
+from espressopp.tools import timers
 
 # This example reads in a gromacs water system (SPC/Fw) treated with reaction field. See the corresponding gromacs grompp.mdp paramter file. 
 # Output of gromacs energies and esp energies should be the same
@@ -53,20 +53,20 @@ size = (Lx, Ly, Lz)
 print size
 
 sys.stdout.write('Setting up simulation ...\n')
-system = espresso.System()
-system.rng = espresso.esutil.RNG()
-system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
+system = espressopp.System()
+system.rng = espressopp.esutil.RNG()
+system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
-system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # setting up GROMACS interaction stuff
 # create a force capped Lennard-Jones interaction that uses a verlet list
-verletlist  = espresso.VerletList(system, rc)
-interaction = espresso.interaction.VerletListLennardJonesGromacs(verletlist)
+verletlist  = espressopp.VerletList(system, rc)
+interaction = espressopp.interaction.VerletListLennardJonesGromacs(verletlist)
 
 # add particles to the system and then decompose
 props = ['id', 'pos', 'v', 'type', 'mass', 'q']
@@ -95,10 +95,10 @@ bondedinteractions=gromacs.setBondedInteractions(system, bondtypes, bondtypepara
 verletlist.exclude(exclusions)
 
 # langevin thermostat
-langevin = espresso.integrator.LangevinThermostat(system)
+langevin = espressopp.integrator.LangevinThermostat(system)
 langevin.gamma = 2.0
 langevin.temperature = 2.4942 # kT in gromacs units
-integrator = espresso.integrator.VelocityVerlet(system)
+integrator = espressopp.integrator.VelocityVerlet(system)
 integrator.addExtension(langevin)
 integrator.dt = timestep
 
@@ -116,11 +116,11 @@ print ''
 
 
 # analysis
-configurations = espresso.analysis.Configurations(system)
+configurations = espressopp.analysis.Configurations(system)
 configurations.gather()
-temperature = espresso.analysis.Temperature(system)
-pressure = espresso.analysis.Pressure(system)
-pressureTensor = espresso.analysis.PressureTensor(system)
+temperature = espressopp.analysis.Temperature(system)
+pressure = espressopp.analysis.Pressure(system)
+pressureTensor = espressopp.analysis.PressureTensor(system)
 
 print "i*timestep,Eb, EAng, ELj, EQQ, Ek, Etotal"
 fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8g %15.8f\n'
@@ -142,7 +142,7 @@ for i in range(check):
     outfile.write(fmt%(i*steps/check*timestep,Eb, EAng, ELj, EQQ, Ek, Etotal))
     print (fmt%(i*steps/check*timestep,Eb, EAng, ELj, EQQ, Ek, Etotal))
     
-    #espresso.tools.pdb.pdbwrite("traj.pdb", system, append=True)
+    #espressopp.tools.pdb.pdbwrite("traj.pdb", system, append=True)
     integrator.run(steps/check) # print out every steps/check steps
     #system.storage.decompose()
     

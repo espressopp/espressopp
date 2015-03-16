@@ -24,9 +24,9 @@
 #include <boost/serialization/map.hpp>
 
 using namespace std;
-//using namespace espresso;
+//using namespace espressopp;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     //using namespace iterator;
@@ -36,7 +36,7 @@ namespace espresso {
      * 
      * example of how to call it from python:
      * 
-     * msid = espresso.analysis.MeanSquareInternalDist(system,chainlength)
+     * msid = espressopp.analysis.MeanSquareInternalDist(system,chainlength)
      * msid.gather()            # one can use gatherFromFile instead
      * result = msid.compute()  # computes the msid of the last snapshot added
      *
@@ -103,7 +103,7 @@ namespace espresso {
           
     // Python wrapping
     void MeanSquareInternalDist::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<MeanSquareInternalDist, bases<ConfigsParticleDecomp> >
       ("analysis_MeanSquareInternalDist", init< shared_ptr< System >, int >() )

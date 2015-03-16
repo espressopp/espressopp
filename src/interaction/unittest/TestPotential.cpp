@@ -25,7 +25,7 @@
 
 #include "interaction/Potential.hpp"
 
-using namespace espresso;
+using namespace espressopp;
 using namespace interaction;
 
 class AbsoluteDistanceDependentPotential

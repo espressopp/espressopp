@@ -38,7 +38,7 @@
 
 #include "storage/Storage.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     template < typename _Potential >
     class VerletListInteractionTemplate: public Interaction {

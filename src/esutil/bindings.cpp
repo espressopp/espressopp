@@ -29,7 +29,7 @@
 
 #include "Grid.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
     void registerPython() {
       Collectives::registerPython();

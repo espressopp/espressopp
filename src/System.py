@@ -44,32 +44,32 @@ In detail the System class holds pointers to:
 
 Example (not complete):
 
->>> LJSystem      = espresso.System()
->>> LJSystem.bc   = espresso.bc.OrthorhombicBC(rng, boxsize)
+>>> LJSystem      = espressopp.System()
+>>> LJSystem.bc   = espressopp.bc.OrthorhombicBC(rng, boxsize)
 >>> LJSystem.rng
 >>> LJSystem.skin = 0.4
 >>> LJSystem.addInteraction(interLJ)
 
 """
 
-from espresso import pmi, Real3D, toReal3DFromVector
-from espresso.esutil import cxxinit
-from espresso.Exceptions import Error
+from espressopp import pmi, Real3D, toReal3DFromVector
+from espressopp.esutil import cxxinit
+from espressopp.Exceptions import Error
 
-import _espresso
+import _espressopp
 import mpi4py.MPI as MPI
 
 
-class SystemLocal(_espresso.System):
+class SystemLocal(_espressopp.System):
     def __init__(self):
         'Local construction of a System'
         if pmi._PMIComm and pmi._PMIComm.isActive():
             if pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-                cxxinit(self, _espresso.System, pmi._PMIComm.getMPIsubcomm())
+                cxxinit(self, _espressopp.System, pmi._PMIComm.getMPIsubcomm())
             else :
                 pass
         else :
-            cxxinit(self, _espresso.System, pmi._MPIcomm)
+            cxxinit(self, _espressopp.System, pmi._MPIcomm)
 
     def addInteraction(self, interaction):
         'add a short range list interaction'
@@ -133,7 +133,7 @@ if pmi.isController:
   class System(object):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls = 'espresso.SystemLocal',
+      cls = 'espressopp.SystemLocal',
       pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff'],
       pmicall = ['addInteraction','removeInteraction','getInteraction',
             'getNumberOfInteractions','scaleVolume', 'setTrace']

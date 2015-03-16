@@ -28,9 +28,9 @@
 #include "bc/BC.hpp"
 #include "iterator/CellListAllTriplesIterator.hpp"
 
-namespace espresso {
+namespace espressopp {
 
-  using namespace espresso::iterator;
+  using namespace espressopp::iterator;
 
   LOG4ESPP_LOGGER(VerletListTriple::theLogger, "VerletListTriple");
 
@@ -172,7 +172,7 @@ namespace espresso {
   ****************************************************/
   
   void VerletListTriple::registerPython() {
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (VerletListTriple::*pyExclude)(longint pid) = &VerletListTriple::exclude;
 

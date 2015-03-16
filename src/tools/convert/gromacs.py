@@ -21,7 +21,7 @@
 
 # -*- coding: utf-8 -*-
 import math
-import espresso
+import espressopp
 from topology_helper import *
 from operator import itemgetter # for sorting a dict
 
@@ -135,7 +135,7 @@ def read(gro_file, top_file="", doRegularExcl=True):
                     else: 
                         defaults={"nbtype":fields[0], "combinationrule":fields[1]} 
             
-            if 'atomtypes' in line: # map atom types (espresso++ uses ints)
+            if 'atomtypes' in line: # map atom types (espressopp++ uses ints)
                 readattypes = True
                 print "Reading atomtypes (GROMACS: ESPResSo++): "
                 continue
@@ -628,7 +628,7 @@ def setBondedInteractions(system, bonds, bondtypeparams, fpl=None):
     list={}
     bc=0
     for id, bondlist in bonds.iteritems():
-        if (not fpl): fpl = espresso.FixedPairList(system.storage)
+        if (not fpl): fpl = espressopp.FixedPairList(system.storage)
         fpl.addBonds(bondlist)
         bc+=len(bondlist) 
         bdinteraction=bondtypeparams[id].createEspressoInteraction(system, fpl)
@@ -641,7 +641,7 @@ def setAngleInteractions(system, angles, angletypeparams, fpl=None):
     list={}
     
     for id, anglelist in angles.iteritems():
-        if (not fpl):fpl = espresso.FixedTripleList(system.storage)
+        if (not fpl):fpl = espressopp.FixedTripleList(system.storage)
         fpl.addTriples(anglelist)
         angleinteraction=angletypeparams[id].createEspressoInteraction(system, fpl)
         if angleinteraction:
@@ -653,7 +653,7 @@ def setDihedralInteractions(system, dihedrals, dihedraltypeparams, fpl=None):
     list={}
     
     for id, dihedrallist in dihedrals.iteritems():
-        if (not fpl):fpl = espresso.FixedQuadrupleList(system.storage)
+        if (not fpl):fpl = espressopp.FixedQuadrupleList(system.storage)
         fpl.addQuadruples(dihedrallist)
         dihedralinteraction=dihedraltypeparams[id].createEspressoInteraction(system, fpl)
         if dihedralinteraction:
@@ -664,10 +664,10 @@ def setDihedralInteractions(system, dihedrals, dihedraltypeparams, fpl=None):
 def setLennardJonesInteractions(system, defaults, atomtypeparams, verletlist, cutoff, hadress=False, ftpl=None):
     """ Set lennard jones interactions which were read from gromacs based on the atomypes"""
     if not hadress:
-	interaction = espresso.interaction.VerletListLennardJones(verletlist)
+	interaction = espressopp.interaction.VerletListLennardJones(verletlist)
     else:
-	interaction=espresso.interaction.VerletListHadressLennardJones(verletlist, ftpl)
-    #interaction = espresso.interaction.VerletListLennardJonesGromacs(verletlist)
+	interaction=espressopp.interaction.VerletListHadressLennardJones(verletlist, ftpl)
+    #interaction = espressopp.interaction.VerletListLennardJonesGromacs(verletlist)
     
     print "Setting up Lennard-Jones interactions"
     if defaults:
@@ -694,7 +694,7 @@ def setLennardJonesInteractions(system, defaults, atomtypeparams, verletlist, cu
                 eps=float(pi['eps'])
             if (sig>0 and eps >0):
                 #print "Setting LJ interaction for", i, j, "to sig ", sig, "eps", eps, "cutoff", cutoff
-                ljpot= espresso.interaction.LennardJones(epsilon=eps, sigma=sig, shift='auto', cutoff=cutoff)
+                ljpot= espressopp.interaction.LennardJones(epsilon=eps, sigma=sig, shift='auto', cutoff=cutoff)
                 if not hadress:
 		    interaction.setPotential(type1=i, type2=j, potential=ljpot)
 		else:
@@ -707,13 +707,13 @@ def setCoulombInteractions(system, verletlist, rc, types, epsilon1, epsilon2,kap
 
     pref=138.935485 # we want gromacs units, so this is 1/(4 pi eps_0) ins units of kJ mol^-1 e^-2
     
-    pot = espresso.interaction.ReactionFieldGeneralized(prefactor=pref, kappa=kappa, epsilon1=epsilon1, epsilon2=epsilon2, cutoff=rc)
-    #pot = espresso.interaction.CoulombTruncated(qq=0.6724, cutoff=rc, shift=0)
+    pot = espressopp.interaction.ReactionFieldGeneralized(prefactor=pref, kappa=kappa, epsilon1=epsilon1, epsilon2=epsilon2, cutoff=rc)
+    #pot = espressopp.interaction.CoulombTruncated(qq=0.6724, cutoff=rc, shift=0)
     if (not hadress):	
-	interaction=espresso.interaction.VerletListReactionFieldGeneralized(verletlist)
+	interaction=espressopp.interaction.VerletListReactionFieldGeneralized(verletlist)
     else: 
-	interaction=espresso.interaction.VerletListHadressReactionFieldGeneralized(verletlist, ftpl)
-   # interaction=espresso.interaction.VerletListCoulombTruncated(verletlist)
+	interaction=espressopp.interaction.VerletListHadressReactionFieldGeneralized(verletlist, ftpl)
+   # interaction=espressopp.interaction.VerletListCoulombTruncated(verletlist)
             
     for i in range(max(types)+1):
         for k in range(i, max(types)+1):

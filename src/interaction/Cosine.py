@@ -21,16 +21,16 @@
 
 """
 *******************************
-**espresso.interaction.Cosine**
+**espressopp.interaction.Cosine**
 *******************************
 
 """
-from espresso import pmi
-from espresso.esutil import *
+from espressopp import pmi
+from espressopp.esutil import *
 
-from espresso.interaction.AngularPotential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_Cosine, interaction_FixedTripleListCosine
+from espressopp.interaction.AngularPotential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_Cosine, interaction_FixedTripleListCosine
 
 class CosineLocal(AngularPotentialLocal, interaction_Cosine):
     'The (local) Cosine potential.'
@@ -57,13 +57,13 @@ if pmi.isController:
     class Cosine(AngularPotential):
         'The Cosine potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.CosineLocal',
+            cls = 'espressopp.interaction.CosineLocal',
             pmiproperty = ['K', 'theta0']
             )
 
     class FixedTripleListCosine(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedTripleListCosineLocal',
+            cls =  'espressopp.interaction.FixedTripleListCosineLocal',
             pmicall = ['setPotential','getFixedTripleList']
             )

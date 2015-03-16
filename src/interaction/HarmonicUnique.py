@@ -21,16 +21,16 @@
 
 """
 ***************************************
-**espresso.interaction.HarmonicUnique**
+**espressopp.interaction.HarmonicUnique**
 ***************************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.PotentialUniqueDist import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_HarmonicUnique, \
+from espressopp.interaction.PotentialUniqueDist import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_HarmonicUnique, \
                       interaction_FixedPairDistListHarmonicUnique
 
 class HarmonicUniqueLocal(PotentialUniqueDistLocal, interaction_HarmonicUnique):
@@ -63,13 +63,13 @@ if pmi.isController:
     class HarmonicUnique(PotentialUniqueDist):
         'The HarmonicUnique potential.'
         pmiproxydefs = dict(
-          cls = 'espresso.interaction.HarmonicUniqueLocal',
+          cls = 'espressopp.interaction.HarmonicUniqueLocal',
           pmiproperty = ['K']
         )
 
     class FixedPairDistListHarmonicUnique(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-          cls =  'espresso.interaction.FixedPairDistListHarmonicUniqueLocal',
+          cls =  'espressopp.interaction.FixedPairDistListHarmonicUniqueLocal',
           pmicall = ['setPotential','setFixedPairList','getFixedPairList']
         )

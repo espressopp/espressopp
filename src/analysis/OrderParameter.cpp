@@ -25,7 +25,7 @@
 
 #include "boost/math/special_functions/spherical_harmonic.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
 
@@ -64,7 +64,7 @@ namespace espresso {
     }
     
     void OrderParameter::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<OrderParameter, bases< AnalysisBase > >
         ("analysis_OrderParameter", init< shared_ptr<System>, real, int, bool, bool, real, real>())
         .add_property("l", 

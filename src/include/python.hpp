@@ -27,7 +27,7 @@
 #include <boost/python.hpp>
 #include "types.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace python {
     using namespace boost::python;
 

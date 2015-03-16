@@ -34,7 +34,7 @@
 #include <boost/signals2.hpp>
 //#include "FixedListComm.hpp"
 
-namespace espresso {
+namespace espressopp {
   class FixedQuadrupleList : public QuadrupleList {
   protected:
     boost::signals2::connection sigBeforeSend, sigAfterRecv, sigOnParticlesChanged;

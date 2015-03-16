@@ -30,7 +30,7 @@
 #include "iterator/CellListAllPairsIterator.hpp"
 #include <vector>
 
-using namespace espresso;
+using namespace espressopp;
 using namespace iterator;
 using namespace std;
 

@@ -34,7 +34,7 @@
 #include "esutil/Grid.hpp"
 #include "Real3D.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace storage {
     class NodeGridIllegal: public std::invalid_argument
     {

@@ -21,14 +21,14 @@
 
 """
 ************************************
-**espresso.analysis.OrderParameter**
+**espressopp.analysis.OrderParameter**
 ************************************
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.AnalysisBase import *
-from _espresso import analysis_OrderParameter
+from espressopp.analysis.AnalysisBase import *
+from _espressopp import analysis_OrderParameter
 
 class OrderParameterLocal(AnalysisBaseLocal, analysis_OrderParameter):
     'The (local) compute of temperature.'
@@ -44,18 +44,18 @@ if pmi.isController :
     class OrderParameter(AnalysisBase):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-          cls =  'espresso.analysis.OrderParameterLocal',
+          cls =  'espressopp.analysis.OrderParameterLocal',
           pmiproperty = [ 'cutoff', 'l' ]
         )
 
 
 """
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.AnalysisBase import *
-from _espresso import analysis_OrderParameter
+from espressopp.analysis.AnalysisBase import *
+from _espressopp import analysis_OrderParameter
 
 class OrderParameterLocal(AnalysisBaseLocal, analysis_OrderParameter):
     'coupled cluster analysis'
@@ -72,6 +72,6 @@ if pmi.isController :
     class OrderParameter(AnalysisBase):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-          cls =  'espresso.analysis.OrderParameterLocal'
+          cls =  'espressopp.analysis.OrderParameterLocal'
         )
 

@@ -21,14 +21,14 @@
 
 """
 *******************
-**espresso.Settle**
+**espressopp.Settle**
 *******************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
-from espresso.integrator.Extension import *
-from _espresso import integrator_Settle
+from espressopp.esutil import cxxinit
+from espressopp import pmi
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_Settle
 
 class SettleLocal(ExtensionLocal, integrator_Settle):
     'The (local) settle.'
@@ -50,6 +50,6 @@ if pmi.isController:
     class Settle(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.integrator.SettleLocal',
+            cls = 'espressopp.integrator.SettleLocal',
             pmicall = [ "addMolecules" ]
             )

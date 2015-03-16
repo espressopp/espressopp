@@ -21,15 +21,15 @@
 
 """
 ******************************************
-**espresso.analysis.LBOutputProfileVzOfX**
+**espressopp.analysis.LBOutputProfileVzOfX**
 ******************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.LBOutput import *
-from _espresso import analysis_LBOutputProfile_VzOfX
+from espressopp.analysis.LBOutput import *
+from _espressopp import analysis_LBOutputProfile_VzOfX
 
 class LBOutputProfileVzOfXLocal(LBOutputLocal, analysis_LBOutputProfile_VzOfX):
     'The (local) compute of LBOutputProfileVzOfX.'
@@ -41,6 +41,6 @@ if pmi.isController :
     class LBOutputProfileVzOfX(LBOutput):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.LBOutputProfileVzOfXLocal',
+            cls =  'espressopp.analysis.LBOutputProfileVzOfXLocal',
             pmicall = ["writeOutput"]
             )

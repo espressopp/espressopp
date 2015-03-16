@@ -21,8 +21,8 @@
 
 from math import sqrt, pi, cos, sin
 import random
-from espresso import Real3D
-from espresso.Exceptions import Error
+from espressopp import Real3D
+from espressopp.Exceptions import Error
 
 def polymerRW(pid, startpos, numberOfMonomers, bondlength, return_angles=False, return_dihedrals=False, mindist=None, rng=None):
 	x         = startpos[0]

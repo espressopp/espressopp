@@ -26,7 +26,7 @@
 #include "FixedPairList.hpp"
 #include "storage/Storage.hpp"
 
-using namespace espresso;
+using namespace espressopp;
 
 
 // a storage that contains two fixed particles

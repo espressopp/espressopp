@@ -24,7 +24,7 @@
 #include "Potential.hpp"
 #include "logging.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     LOG4ESPP_LOGGER(Potential::theLogger, "Potential");
@@ -33,7 +33,7 @@ namespace espresso {
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void Potential::registerPython() {
-        using namespace espresso::python;
+        using namespace espressopp::python;
         
         real (Potential::*computeEnergy1)(const Real3D& dist) const =
             &Potential::computeEnergy;
@@ -63,7 +63,7 @@ namespace espresso {
 
 
 //     class PythonPotential 
-//       : public espresso::python::wrapper< Potential >,
+//       : public espressopp::python::wrapper< Potential >,
 // 	public PotentialBase< PythonPotential > {
 //     public:
 //       real _getCutoffSqr() const {
@@ -81,9 +81,9 @@ namespace espresso {
 
 //     void
 //     Potential::registerPython() {
-//       using namespace espresso::python;
+//       using namespace espressopp::python;
       
-//       class_< espresso::potential::PythonPotential, boost::noncopyable >
+//       class_< espressopp::potential::PythonPotential, boost::noncopyable >
 // 	("interaction_PythonPotential")
 // 	.def("getCutoffSqr", pure_virtual(&Potential::getCutoffSqr))
 // 	.def("computeEnergy", pure_virtual(&Potential::computeEnergy))

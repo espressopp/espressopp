@@ -23,7 +23,7 @@
 #include "python.hpp"
 #include "LBOutputProfileVzOfX.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 //    LOG4ESPP_LOGGER(LBOutputProfileVzOfX::theLogger, "LBOutputProfileVzOfX");
     LBOutputProfileVzOfX::LBOutputProfileVzOfX(shared_ptr<System> system,
@@ -91,7 +91,7 @@ namespace espresso {
     }
 
     void LBOutputProfileVzOfX::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<LBOutputProfileVzOfX, bases< LBOutput > >
           ("analysis_LBOutputProfile_VzOfX", init< shared_ptr< System >,

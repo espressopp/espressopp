@@ -34,7 +34,7 @@
 #ifdef PARALLEL_TEST_MODULE
 
 #include "mpi.hpp"
-#include "main/espresso_common.hpp"
+#include "main/espressopp_common.hpp"
 
 struct MPIFixture {  
   MPIFixture() { 

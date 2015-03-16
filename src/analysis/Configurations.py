@@ -46,7 +46,7 @@ usage:
 
 storing trajectory
 
->>> configurations = espresso.Configurations(system)
+>>> configurations = espressopp.Configurations(system)
 >>> configurations.gather()
 >>> for k in range(100):
 >>>   integrator.run(100)
@@ -69,11 +69,11 @@ access particle with id <pid> of stored configuration <n>:
 >>> print "particle coord: ",configurations[n][pid]
 """
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.Observable import *
-from _espresso import analysis_Configurations
+from espressopp.analysis.Observable import *
+from _espressopp import analysis_Configurations
 
 class ConfigurationsLocal(ObservableLocal, analysis_Configurations):
     'The (local) storage of configurations.'
@@ -92,7 +92,7 @@ if pmi.isController :
     class Configurations(Observable):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.ConfigurationsLocal',
+            cls =  'espressopp.analysis.ConfigurationsLocal',
             pmicall = [ "gather", "clear", "back" ],
             localcall = ["__getitem__", "__iter__"],
             pmiproperty = ["capacity", "size"]

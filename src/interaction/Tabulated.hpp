@@ -28,7 +28,7 @@
 #include "Potential.hpp"
 #include "Interpolation.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   namespace interaction {
 

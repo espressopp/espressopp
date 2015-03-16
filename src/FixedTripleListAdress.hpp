@@ -35,7 +35,7 @@
 #include <boost/signals2.hpp>
 
 
-namespace espresso {
+namespace espressopp {
 
     /**
      * This is a subclass of FixedTripleList. It should be used for AdResS fixed

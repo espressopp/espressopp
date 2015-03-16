@@ -26,7 +26,7 @@
 #include "python.hpp"
 #include "SystemAccess.hpp"
 
-namespace espresso {
+namespace espressopp {
   class ParticleAccess : public SystemAccess {
   public:
     ParticleAccess(shared_ptr< System > system) : SystemAccess(system) {}

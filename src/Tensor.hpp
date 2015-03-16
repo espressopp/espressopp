@@ -27,7 +27,7 @@
 #include "types.hpp"
 #include "Real3D.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   /** The class Tensor stands for a symmetric 3x3 matrix. */
 

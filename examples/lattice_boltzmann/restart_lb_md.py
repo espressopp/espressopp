@@ -1,16 +1,16 @@
 # DEMONSTRATION OF THE LATTICE-BOLTZMANN SIMULATION
 #
-import espresso
+import espressopp
 import cProfile, pstats
-from espresso import Int3D
-from espresso import Real3D
+from espressopp import Int3D
+from espressopp import Real3D
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 plt.ion()
 
 #read in the restart configuration
-pid, type, x, y, z, vx, vy, vz, Lx, Ly, Lz = espresso.tools.readxyz('dump.86500.xyz')
+pid, type, x, y, z, vx, vy, vz, Lx, Ly, Lz = espressopp.tools.readxyz('dump.86500.xyz')
 num_particles 		= len(pid)
 box			= (Lx, Ly, Lz)
 num_chains		= 328
@@ -25,21 +25,21 @@ dt			= 0.005
 # create default Lennard Jones (WCA) system with 0 particles and cubic box (L=40)
 print "Initial values"
 
-system         = espresso.System()
-system.rng     = espresso.esutil.RNG()
-system.bc      = espresso.bc.OrthorhombicBC(system.rng, box)
+system         = espressopp.System()
+system.rng     = espressopp.esutil.RNG()
+system.bc      = espressopp.bc.OrthorhombicBC(system.rng, box)
 system.skin    = skin
-nodeGrid       = espresso.tools.decomp.nodeGrid(espresso.MPI.COMM_WORLD.size)
-cellGrid       = espresso.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
-system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
-interaction    = espresso.interaction.VerletListLennardJones(espresso.VerletList(system, cutoff=rc))
-potLJ          = espresso.interaction.LennardJones(epsilon, sigma, rc)
+nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
+system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+interaction    = espressopp.interaction.VerletListLennardJones(espressopp.VerletList(system, cutoff=rc))
+potLJ          = espressopp.interaction.LennardJones(epsilon, sigma, rc)
 interaction.setPotential(type1=0, type2=0, potential=potLJ)
 system.addInteraction(interaction)
 
-integrator     = espresso.integrator.VelocityVerlet(system)
+integrator     = espressopp.integrator.VelocityVerlet(system)
 integrator.dt  = dt
-#thermostat     = espresso.integrator.LangevinThermostat(system)
+#thermostat     = espressopp.integrator.LangevinThermostat(system)
 #thermostat.gamma  = 1.0
 #thermostat.temperature = temperature
 #integrator.addExtension(thermostat)
@@ -50,7 +50,7 @@ print 'timestep is ', integrator.dt
 
 # redefine bonds
 props    = ['id', 'type', 'mass', 'pos', 'v']
-bondlist = espresso.FixedPairList(system.storage)
+bondlist = espressopp.FixedPairList(system.storage)
 mass = 1.0
 
 for i in range(num_chains):
@@ -70,12 +70,12 @@ for i in range(num_chains):
 
 system.storage.decompose()
 
-potFENE   = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
-interFENE = espresso.interaction.FixedPairListFENE(system, bondlist, potFENE)
+potFENE   = espressopp.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
+interFENE = espressopp.interaction.FixedPairListFENE(system, bondlist, potFENE)
 system.addInteraction(interFENE)
 
 for k in range(5):
-	espresso.tools.analyse.info(system, integrator)
+	espressopp.tools.analyse.info(system, integrator)
 	cmvel = Real3D(0.,0.,0.)
 	for i in range(1,num_particles+1):
 		particle = system.storage.getParticle(i)
@@ -86,8 +86,8 @@ for k in range(5):
 #thermostat.disconnect() # disconnect md-thermostat as we want to run lb-md coupled system
 
 # define a LB grid
-lb = espresso.integrator.LatticeBoltzmann(system, Ni=Int3D(16, 16, 16))
-initPop = espresso.integrator.LBInitPopUniform(system,lb)
+lb = espressopp.integrator.LatticeBoltzmann(system, Ni=Int3D(16, 16, 16))
+initPop = espressopp.integrator.LBInitPopUniform(system,lb)
 initPop.createDenVel(1.0, Real3D(0.,0.,0.0))
 
 # declare gammas responsible for viscosities (if they differ from 0)
@@ -108,7 +108,7 @@ print thermostat.temperature
 print lb.fricCoeff
 
 #plt.figure()
-T   = espresso.analysis.Temperature(system)
+T   = espressopp.analysis.Temperature(system)
 #x   = []
 #yT  = []
 #yTmin = 0.2
@@ -132,7 +132,7 @@ for k in range(500):
 	s = str(currT)
 	f.write(s+'\n')
 	lb.saveCouplForces()
-	espresso.tools.writexyz(mdoutput, system)
+	espressopp.tools.writexyz(mdoutput, system)
 #	x.append(integrator.dt * integrator.step)
 #	currT = T.compute()
 #	yT.append(currT)

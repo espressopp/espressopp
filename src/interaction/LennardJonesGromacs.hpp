@@ -27,7 +27,7 @@
 #include "FixedPairListInteractionTemplate.hpp"
 #include "Potential.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     class LennardJonesGromacs : public PotentialTemplate< LennardJonesGromacs > {
     private:

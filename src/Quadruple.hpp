@@ -25,7 +25,7 @@
 
 #include "types.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   template <class T1, class T2, class T3, class T4> struct Quadruple {
 

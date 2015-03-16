@@ -35,11 +35,11 @@
 
 //#include "Tensor.hpp"
 
-using namespace espresso;
+using namespace espressopp;
 using namespace iterator;
 using namespace interaction;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     // It will calculate the molecular local virial pressure in 'n' layers along X axis, works only for AdResS simulations. 
@@ -217,7 +217,7 @@ namespace espresso {
     using namespace boost::python;
 
     void XTemperature::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<XTemperature, bases< Observable > >
         ("analysis_XTemperature", init< shared_ptr< System > >())
         .def("compute", &XTemperature::computeArray)

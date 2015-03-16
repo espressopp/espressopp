@@ -25,17 +25,17 @@
  interpreter version of ESPResSo. 
 */
 #include "acconfig.hpp"
-#include "espresso_common.hpp"
+#include "espressopp_common.hpp"
 #include "python.hpp"
 
 static void finalize();
 
-BOOST_PYTHON_MODULE(_espresso)
+BOOST_PYTHON_MODULE(_espressopp)
 {
   initMPIEnv();
 
   // register all classes with python 
-  espresso::registerPython();
+  espressopp::registerPython();
 
   Py_AtExit(&finalize);
 }

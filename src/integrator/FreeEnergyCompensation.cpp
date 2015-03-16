@@ -31,7 +31,7 @@
 #include "interaction/InterpolationCubic.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   using namespace iterator;
 
   namespace integrator {
@@ -202,7 +202,7 @@ namespace espresso {
 
     void FreeEnergyCompensation::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       //void (FreeEnergyCompensation::*pySetCenter)(real x, real y, real z)
       //                  = &FreeEnergyCompensation::setCenter;

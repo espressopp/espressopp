@@ -21,15 +21,15 @@
 
 """
 ************************************************
-**espresso.analysis.ParticleRadiusDistribution**
+**espressopp.analysis.ParticleRadiusDistribution**
 ************************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.AnalysisBase import *
-from _espresso import analysis_ParticleRadiusDistribution
+from espressopp.analysis.AnalysisBase import *
+from _espressopp import analysis_ParticleRadiusDistribution
 
 class ParticleRadiusDistributionLocal(AnalysisBaseLocal, analysis_ParticleRadiusDistribution):
     'The (local) compute of the particle radius distribution.'
@@ -41,5 +41,5 @@ if pmi.isController :
     class ParticleRadiusDistribution(AnalysisBase):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.ParticleRadiusDistributionLocal'
+            cls =  'espressopp.analysis.ParticleRadiusDistributionLocal'
             )

@@ -9,13 +9,13 @@
 
 import sys
 import time
-import espresso
+import espressopp
 import mpi4py.MPI as MPI
 import logging
-from espresso import Real3D, Int3D
-from espresso.tools.convert import gromacs
-from espresso.tools import decomp
-from espresso.tools import timers
+from espressopp import Real3D, Int3D
+from espressopp.tools.convert import gromacs
+from espressopp.tools import decomp
+from espressopp.tools import timers
 
 
 # simulation parameters (nvt = False is nve)
@@ -66,15 +66,15 @@ density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 
 sys.stdout.write('Setting up simulation ...\n')
-system = espresso.System()
-system.rng = espresso.esutil.RNG()
-system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
+system = espressopp.System()
+system.rng = espressopp.esutil.RNG()
+system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
-system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 
 # add particles to the system and then decompose
@@ -84,7 +84,7 @@ for pid in range(num_particles):
 system.storage.decompose()
 
 
-# convert gromacs tabulated files to espresso++ format
+# convert gromacs tabulated files to espressopp++ format
 gromacs.convertTable(tabAAg, tabAA, sigma, epsilon, c6, c12)
 gromacs.convertTable(tabABg, tabAB, sigma, epsilon, c6, c12)
 gromacs.convertTable(tabBBg, tabBB, sigma, epsilon, c6, c12)
@@ -95,21 +95,21 @@ gromacs.convertTable(tab3bg, tab3b, sigma, epsilon, c6, c12)
 
 # non-bonded interactions, B is type 0, A is type 1
 # Verlet list
-vl = espresso.VerletList(system, cutoff = rc + system.skin)
+vl = espressopp.VerletList(system, cutoff = rc + system.skin)
 # note: in the previous version of this example, exclusions were treated
 # incorrectly. Here the nrexcl=3 parameter is taken into account 
 # which excludes all neighbors up to 3 bonds away
 vl.exclude(exclusions)
 
-internb = espresso.interaction.VerletListTabulated(vl)
+internb = espressopp.interaction.VerletListTabulated(vl)
 # A-A with Verlet list      
-potTab = espresso.interaction.Tabulated(itype=spline, filename=tabAA, cutoff=rcaa)
+potTab = espressopp.interaction.Tabulated(itype=spline, filename=tabAA, cutoff=rcaa)
 internb.setPotential(type1 = 1, type2 = 1, potential = potTab)
 # A-B with Verlet list      
-potTab = espresso.interaction.Tabulated(itype=spline, filename=tabAB, cutoff=rcab)
+potTab = espressopp.interaction.Tabulated(itype=spline, filename=tabAB, cutoff=rcab)
 internb.setPotential(type1 = 1, type2 = 0, potential = potTab)
 # B-B with Verlet list      
-potTab = espresso.interaction.Tabulated(itype=spline, filename=tabBB, cutoff=rcbb)
+potTab = espressopp.interaction.Tabulated(itype=spline, filename=tabBB, cutoff=rcbb)
 internb.setPotential(type1 = 0, type2 = 0, potential = potTab)
 system.addInteraction(internb)
 
@@ -118,29 +118,29 @@ system.addInteraction(internb)
 # 2-body bonded interactions
 bondedinteractions=gromacs.setBondedInteractions(system, bondtypes, bondtypeparams)
 #This could also be done manually:
-#fpl = espresso.FixedPairList(system.storage)
+#fpl = espressopp.FixedPairList(system.storage)
 #fpl.addBonds(bonds['1'])
-#potTab = espresso.interaction.Tabulated(itype=spline, filename=tab2b)
-#interb = espresso.interaction.FixedPairListTabulated(system, fpl, potTab)
+#potTab = espressopp.interaction.Tabulated(itype=spline, filename=tab2b)
+#interb = espressopp.interaction.FixedPairListTabulated(system, fpl, potTab)
 #system.addInteraction(interb)
 
 # 3-body bonded interactions
 angleinteractions=gromacs.setAngleInteractions(system, angletypes, angletypeparams)
 
 #This could also be done manually:
-#ftl = espresso.FixedTripleList(system.storage)
+#ftl = espressopp.FixedTripleList(system.storage)
 #ftl.addTriples(angles['1'])
-#potTab = espresso.interaction.TabulatedAngular(itype=spline, filename = tab3b)
-#intera = espresso.interaction.FixedTripleListTabulatedAngular(system, ftl, potTab)
+#potTab = espressopp.interaction.TabulatedAngular(itype=spline, filename = tab3b)
+#intera = espressopp.interaction.FixedTripleListTabulatedAngular(system, ftl, potTab)
 #system.addInteraction(intera)
 
 
 
 # langevin thermostat
-langevin = espresso.integrator.LangevinThermostat(system)
+langevin = espressopp.integrator.LangevinThermostat(system)
 langevin.gamma = 1.0
 langevin.temperature = 1.0
-integrator = espresso.integrator.VelocityVerlet(system)
+integrator = espressopp.integrator.VelocityVerlet(system)
 integrator.addExtension(langevin)
 integrator.dt = timestep
 
@@ -163,11 +163,11 @@ print ''
 
 
 # analysis
-configurations = espresso.analysis.Configurations(system)
+configurations = espressopp.analysis.Configurations(system)
 configurations.gather()
-temperature = espresso.analysis.Temperature(system)
-pressure = espresso.analysis.Pressure(system)
-pressureTensor = espresso.analysis.PressureTensor(system)
+temperature = espressopp.analysis.Temperature(system)
+pressure = espressopp.analysis.Pressure(system)
+pressureTensor = espressopp.analysis.PressureTensor(system)
 
 fmt = '%5d %8.4f %11.4f %11.4f %12.3f %12.3f %12.3f %12.3f %12.3f\n'
 

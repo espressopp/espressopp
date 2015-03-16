@@ -31,7 +31,7 @@
 //#include "analysis/AnalysisBase.hpp"
 #include "ParticleAccess.hpp"
 
-namespace espresso {
+namespace espressopp {
   //using namespace analysis;
   namespace integrator {
 

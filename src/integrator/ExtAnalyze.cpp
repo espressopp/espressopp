@@ -27,7 +27,7 @@
 //#include "analysis/AnalysisBase.hpp"
 #include "ParticleAccess.hpp"
 
-namespace espresso {
+namespace espressopp {
   //using namespace analysis;
   namespace integrator {
 
@@ -64,7 +64,7 @@ namespace espresso {
     ** REGISTRATION WITH PYTHON
     ****************************************************/
     void ExtAnalyze::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<ExtAnalyze, shared_ptr<ExtAnalyze>, bases<Extension> >
         ("integrator_ExtAnalyze", init< shared_ptr< ParticleAccess > , int >())
         .def("connect", &ExtAnalyze::connect)

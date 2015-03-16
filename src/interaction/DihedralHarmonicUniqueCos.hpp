@@ -27,7 +27,7 @@
 #include "DihedralUniquePotential.hpp"
 #include <cmath>
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     /** This class provides methods to compute forces and energies of
         the DihedralHarmonicUniqueCos dihedral potential.

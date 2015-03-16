@@ -34,11 +34,11 @@
 #include "iterator/CellListIterator.hpp"
 #include <iomanip>
 
-namespace espresso {
+namespace espressopp {
 
   namespace integrator {
 
-    using namespace espresso::iterator;
+    using namespace espressopp::iterator;
 
     Adress::Adress(shared_ptr<System> _system, shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI /*= false*/)
         : Extension(_system), verletList(_verletList), fixedtupleList(_fixedtupleList), KTI(_KTI){
@@ -574,7 +574,7 @@ namespace espresso {
     ****************************************************/
 
     void Adress::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<Adress, shared_ptr<Adress>, bases<Extension> >
         ("integrator_Adress", init<shared_ptr<System>, shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress>, bool >())

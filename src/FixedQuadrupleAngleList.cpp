@@ -29,7 +29,7 @@
 #include "Buffer.hpp"
 #include "esutil/Error.hpp"
 
-namespace espresso {
+namespace espressopp {
   
   /* We assume that the particle with pid2 is a real one, others can be ghosts.
    * It is in order to minimize the cize of the cell, because otherwise user should 
@@ -333,7 +333,7 @@ namespace espresso {
 
   void FixedQuadrupleAngleList::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (FixedQuadrupleAngleList::*pyAdd)(longint pid1, longint pid2,
            longint pid3, longint pid4) = &FixedQuadrupleAngleList::add;

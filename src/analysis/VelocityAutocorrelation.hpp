@@ -26,7 +26,7 @@
 
 #include "ConfigsParticleDecomp.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     /*

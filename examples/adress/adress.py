@@ -3,13 +3,13 @@
 
 import sys
 import time
-import espresso
+import espressopp
 import mpi4py.MPI as MPI
 import logging
-from espresso import Real3D, Int3D
-from espresso.tools.convert import espresso_old
-from espresso.tools import decomp
-from espresso.tools import timers
+from espressopp import Real3D, Int3D
+from espressopp.tools.convert import espresso_old
+from espressopp.tools import decomp
+from espressopp.tools import timers
 
 #logging.getLogger("StorageAdress").setLevel(logging.DEBUG)
 #logging.getLogger("BC").setLevel(logging.DEBUG)
@@ -49,23 +49,23 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
 
 # capped LJ - uncomment to plot
 #tabWCA = "pot-wca.txt"
-#potLJ  = espresso.interaction.LennardJonesCapped(epsilon=1.0, sigma=1.0, shift=True, caprad=0.27, cutoff=rca)
+#potLJ  = espressopp.interaction.LennardJonesCapped(epsilon=1.0, sigma=1.0, shift=True, caprad=0.27, cutoff=rca)
 #writeTabFile(potLJ, tabWCA, N=512, low=0.005, high=rca)
 
 # FENE - uncomment to plot
 #tabFENE = "pot-fene.txt"
-#potFENE  = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
+#potFENE  = espressopp.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
 #writeTabFile(potFENE, tabFENE, N=512, low=0.005, high=2.0)
 
 # tabulated morse potential used for CG interactions
 tabMorse = "pot-morse.txt"
-potMorse = espresso.interaction.Morse(epsilon=0.105, alpha=2.4, rMin=rc, cutoff=rc, shift="auto")
+potMorse = espressopp.interaction.Morse(epsilon=0.105, alpha=2.4, rMin=rc, cutoff=rc, shift="auto")
 writeTabFile(potMorse, tabMorse, N=512, low=0.005, high=4.5)
 
 
 
 # read ESPResSo configuration file 
-Lx, Ly, Lz, x, y, z, type, q, vx, vy, vz, fx, fy, fz, bonds = espresso_old.read("adress.espresso")
+Lx, Ly, Lz, x, y, z, type, q, vx, vy, vz, fx, fy, fz, bonds = espresso_old.read("adress.espressopp")
 num_particlesCG = 5001 # number of VP/CG particles
 #num_particles = len(x) - num_particlesCG  # 20004 = 25005 - 5001 
 num_particles = len(x) # 20004
@@ -76,9 +76,9 @@ sys.stdout.write('Setting up simulation ...\n')
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 
-system = espresso.System()
-system.rng = espresso.esutil.RNG()
-system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
+system = espressopp.System()
+system.rng = espressopp.esutil.RNG()
+system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 
 comm = MPI.COMM_WORLD
@@ -86,7 +86,7 @@ nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 
 # AdResS domain decomposition
-system.storage = espresso.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
+system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
 
 
 # prepare AT particles
@@ -143,12 +143,12 @@ system.storage.addParticles(allParticles, "id", "pos", "v", "f", "type", "mass",
 
 
 # add tuples
-ftpl = espresso.FixedTupleListAdress(system.storage)
+ftpl = espressopp.FixedTupleListAdress(system.storage)
 ftpl.addTuples(tuples)
 system.storage.setFixedTuplesAdress(ftpl)
 
 # add bonds between AT particles
-fpl = espresso.FixedPairListAdress(system.storage, ftpl)
+fpl = espressopp.FixedPairListAdress(system.storage, ftpl)
 fpl.addBonds(bonds)
 
 # decompose after adding tuples and bonds
@@ -158,47 +158,47 @@ system.storage.decompose()
 print "done decomposing"
 
 # AdResS Verlet list
-vl = espresso.VerletListAdress(system, cutoff=rc+skin, adrcut=rc+skin,
+vl = espressopp.VerletListAdress(system, cutoff=rc+skin, adrcut=rc+skin,
                                 dEx=ex_size, dHy=hy_size,
                                 adrCenter=[18.42225, 18.42225, 18.42225])
 
 # non-bonded potentials
 # LJ Capped WCA between AT and tabulated Morse between CG particles
-interNB = espresso.interaction.VerletListAdressLennardJonesCapped(vl, ftpl)
-potWCA  = espresso.interaction.LennardJonesCapped(epsilon=1.0, sigma=1.0, shift=True, caprad=0.27, cutoff=rca)
-potMorse = espresso.interaction.Tabulated(itype=2, filename=tabMorse, cutoff=rc) # CG
+interNB = espressopp.interaction.VerletListAdressLennardJonesCapped(vl, ftpl)
+potWCA  = espressopp.interaction.LennardJonesCapped(epsilon=1.0, sigma=1.0, shift=True, caprad=0.27, cutoff=rca)
+potMorse = espressopp.interaction.Tabulated(itype=2, filename=tabMorse, cutoff=rc) # CG
 interNB.setPotentialAT(type1=1, type2=1, potential=potWCA) # AT
 interNB.setPotentialCG(type1=0, type2=0, potential=potMorse) # CG
 system.addInteraction(interNB)
 
 # bonded potentials
 # FENE and LJ potential between AT particles
-potFENE = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
-potLJ = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift=True, cutoff=rca)
-interFENE = espresso.interaction.FixedPairListFENE(system, fpl, potFENE)
-interLJ = espresso.interaction.FixedPairListLennardJones(system, fpl, potLJ)
+potFENE = espressopp.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
+potLJ = espressopp.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift=True, cutoff=rca)
+interFENE = espressopp.interaction.FixedPairListFENE(system, fpl, potFENE)
+interLJ = espressopp.interaction.FixedPairListLennardJones(system, fpl, potLJ)
 system.addInteraction(interFENE)
 system.addInteraction(interLJ)
 
 
 
 # VV integrator
-integrator = espresso.integrator.VelocityVerlet(system)
+integrator = espressopp.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
 # add AdResS extension
-adress = espresso.integrator.Adress(system, vl,ftpl)
+adress = espressopp.integrator.Adress(system, vl,ftpl)
 integrator.addExtension(adress)
 
 # add Langevin thermostat extension
-langevin = espresso.integrator.LangevinThermostat(system)
+langevin = espressopp.integrator.LangevinThermostat(system)
 langevin.gamma = gamma
 langevin.temperature = temp
 langevin.adress = True # enable AdResS!
 integrator.addExtension(langevin)
 
 # add TDF (dummy, just testing)
-#tdf = espresso.integrator.TDforce(system, center=[18.42225, 18.42225, 18.42225])
+#tdf = espressopp.integrator.TDforce(system, center=[18.42225, 18.42225, 18.42225])
 #tdf.addForce(itype=2, filename=tabMorse, type=0)
 #integrator.addExtension(tdf)
 
@@ -218,9 +218,9 @@ print 'CellGrid = %s' % (cellGrid,)
 print ''
 
 # analysis
-temperature = espresso.analysis.Temperature(system)
-pressure = espresso.analysis.Pressure(system)
-pressureTensor = espresso.analysis.PressureTensor(system)
+temperature = espressopp.analysis.Temperature(system)
+pressure = espressopp.analysis.Pressure(system)
+pressureTensor = espressopp.analysis.PressureTensor(system)
 
 fmt = '%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f %12.3f\n'
 
@@ -248,7 +248,7 @@ for s in range(1, intervals + 1):
   system.storage.decompose()
 
   #filename = "adress_tetra_liquid.pdb"
-  #espresso.tools.pdbwrite(filename, system, molsize=num_particles+num_particlesCG, append=True)
+  #espressopp.tools.pdbwrite(filename, system, molsize=num_particles+num_particlesCG, append=True)
 
 end_time = time.clock()
 

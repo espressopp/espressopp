@@ -44,7 +44,7 @@
 
 using namespace std;
 
-typedef complex<espresso::real> dcomplex;
+typedef complex<espressopp::real> dcomplex;
 
 // the following two constants are not defined everywhere (e.g. not in Mac OS X)
 #ifndef M_PIl
@@ -59,7 +59,7 @@ typedef complex<espresso::real> dcomplex;
 
 #define M_1_SQRTPI (M_2_SQRTPIl * 0.5) /* 2/sqrt(pi)/2 = 1/sqrt(pi) */
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     /** This class provides methods to compute forces and energies of the
      *  CoulombKSpaceEwald part. Currently it works with cubes and rectangular cuboids.

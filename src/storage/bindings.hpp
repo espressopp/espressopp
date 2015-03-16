@@ -22,7 +22,7 @@
 
 #ifndef _STORAGE_BINDINGS_HPP
 #define _STORAGE_BINDINGS_HPP
-namespace espresso {
+namespace espressopp {
   namespace storage {
     void registerPython();
   }

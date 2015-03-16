@@ -35,7 +35,7 @@
 #include "SystemAccess.hpp"
 #include "types.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     template < typename _DihedralPotential >
     class FixedQuadrupleAngleListInteractionTemplate : public Interaction, SystemAccess {

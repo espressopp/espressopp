@@ -72,7 +72,7 @@ def createCubic(N, rho, perfect=True, RNG=None):
 
 # TODO implement checking for a wrong number of particles, lightly nonideal lattice etc.
 def createDiamond(N, rho, perfect=True, RNG=None):
-  from espresso import Real3D
+  from espressopp import Real3D
   
   #L = (N / 8.0 / rho)**(1.0/3.0)
   L = (N / rho)**(1.0/3.0)

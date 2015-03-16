@@ -32,13 +32,13 @@ in combination with the integrator extension ExtAnalyze.
 Standalone Usage:
 -----------------
 
->>> pt = espresso.analysis.PressureTensorMultiLayer(system, n, dh)
+>>> pt = espressopp.analysis.PressureTensorMultiLayer(system, n, dh)
 >>> for i in range(n):
 >>>     print "pressure tensor in layer %d: %s" % ( i, pt.compute())
 
 or 
 
->>> pt = espresso.analysis.PressureTensorMultiLayer(system, n, dh)
+>>> pt = espressopp.analysis.PressureTensorMultiLayer(system, n, dh)
 >>> for k in range(100):
 >>>     integrator.run(100)
 >>>     pt.performMeasurement()
@@ -48,8 +48,8 @@ or
 Usage in integrator with ExtAnalyze:
 ------------------------------------
 
->>> pt           = espresso.analysis.PressureTensorMultiLayer(system, n, dh)
->>> extension_pt = espresso.integrator.ExtAnalyze(pt , interval=100)
+>>> pt           = espressopp.analysis.PressureTensorMultiLayer(system, n, dh)
+>>> extension_pt = espressopp.integrator.ExtAnalyze(pt , interval=100)
 >>> integrator.addExtension(extension_pt)
 >>> integrator.run(10000)
 >>> pt_ave = pt.getAverageValue()
@@ -74,11 +74,11 @@ The following methods are supported:
     does _not_ include measurements that have been done using "compute()"
 """
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.AnalysisBase import *
-from _espresso import analysis_PressureTensorMultiLayer
+from espressopp.analysis.AnalysisBase import *
+from _espressopp import analysis_PressureTensorMultiLayer
 
 class PressureTensorMultiLayerLocal(AnalysisBaseLocal, analysis_PressureTensorMultiLayer):
     'The (local) compute of pressure tensor.'
@@ -90,6 +90,6 @@ if pmi.isController:
     class PressureTensorMultiLayer(AnalysisBase):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.PressureTensorMultiLayerLocal',
+            cls =  'espressopp.analysis.PressureTensorMultiLayerLocal',
             pmiproperty = [ 'n', 'dh' ]
         )

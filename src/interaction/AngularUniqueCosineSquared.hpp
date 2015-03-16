@@ -28,7 +28,7 @@
 #include "FixedTripleAngleListInteractionTemplate.hpp"
 #include <cmath>
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     /** This class provides methods to compute forces and energies of
         the AngularUniqueCosineSquared angular potential. To create a new angular potential

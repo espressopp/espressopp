@@ -38,7 +38,7 @@
 #include "FixedTupleListAdress.hpp"
 #include "esutil/Array2D.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     template < typename _PotentialAT, typename _PotentialCG >
     class VerletListAdressInteractionTemplate: public Interaction {

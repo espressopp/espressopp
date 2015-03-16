@@ -29,7 +29,7 @@
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     typedef class VerletListInteractionTemplate <LennardJonesCapped>
@@ -48,7 +48,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void 
     LennardJonesCapped::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< LennardJonesCapped, bases< Potential > >
     	("interaction_LennardJonesCapped", init< real, real, real, real >())

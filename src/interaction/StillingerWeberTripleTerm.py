@@ -21,16 +21,16 @@
 
 """
 **************************************************
-**espresso.interaction.StillingerWeberTripleTerm**
+**espressopp.interaction.StillingerWeberTripleTerm**
 **************************************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.AngularPotential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_StillingerWeberTripleTerm, \
+from espressopp.interaction.AngularPotential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_StillingerWeberTripleTerm, \
                       interaction_VerletListStillingerWeberTripleTerm, \
                       interaction_FixedTripleListStillingerWeberTripleTerm
 
@@ -85,7 +85,7 @@ if pmi.isController:
   class StillingerWeberTripleTerm(AngularPotential):
     'The StillingerWeberTripleTerm potential.'
     pmiproxydefs = dict(
-      cls = 'espresso.interaction.StillingerWeberTripleTermLocal',
+      cls = 'espressopp.interaction.StillingerWeberTripleTermLocal',
       pmiproperty = [ 'gamma1', 'gamma2', 'theta0',
                       'lambda', 'epsilon', 'sigma1',
                       'sigma2', 'cutoff1', 'cutoff2']
@@ -94,13 +94,13 @@ if pmi.isController:
   class VerletListStillingerWeberTripleTerm(Interaction):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls =  'espresso.interaction.VerletListStillingerWeberTripleTermLocal',
+      cls =  'espressopp.interaction.VerletListStillingerWeberTripleTermLocal',
       pmicall = ['setPotential', 'getPotential','getVerletListTriple']
     )
     
   class FixedTripleListStillingerWeberTripleTerm(Interaction):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls =  'espresso.interaction.FixedTripleListStillingerWeberTripleTermLocal',
+      cls =  'espressopp.interaction.FixedTripleListStillingerWeberTripleTermLocal',
       pmicall = ['setPotential','getFixedTripleList']
     )

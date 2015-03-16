@@ -38,7 +38,7 @@
 #include "interaction/VerletListInteractionTemplate.hpp"
 #include "Real3D.hpp"
 
-using namespace espresso;
+using namespace espressopp;
 using namespace storage;
 using namespace iterator;
 using namespace integrator;

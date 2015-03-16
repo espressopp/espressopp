@@ -21,16 +21,16 @@
 
 """
 ************************************
-**espresso.interaction.VSphereSelf**
+**espressopp.interaction.VSphereSelf**
 ************************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_VSphereSelf, interaction_SelfVSphere
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_VSphereSelf, interaction_SelfVSphere
 
 class VSphereSelfLocal(PotentialLocal, interaction_VSphereSelf):
     'The (local) VSphereSelf potential.'
@@ -61,13 +61,13 @@ if pmi.isController:
     class VSphereSelf(Potential):
         'The VSphereSelf potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.VSphereSelfLocal',
+            cls = 'espressopp.interaction.VSphereSelfLocal',
             pmiproperty = ['e1', 'a1', 'a2', 'Nb']
             )
 
     class SelfVSphere(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.SelfVSphereLocal',
+            cls =  'espressopp.interaction.SelfVSphereLocal',
             pmicall = ['setPotential','getPotential']
             )

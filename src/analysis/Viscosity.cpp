@@ -27,7 +27,7 @@
 
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     void Viscosity::gather() {
@@ -108,7 +108,7 @@ namespace espresso {
     
     // Python wrapping
     void Viscosity::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<Viscosity>( "analysis_Viscosity", init< shared_ptr< System > >() )
       .def("gather", &Viscosity::gather)

@@ -26,7 +26,7 @@
 
 using namespace boost;
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
     GammaVariate::GammaVariate(shared_ptr< RNG > _rng,
 				 const int alpha,
@@ -39,7 +39,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void
     GammaVariate::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       real (GammaVariate::*pyCall)()
       	= &GammaVariate::operator();

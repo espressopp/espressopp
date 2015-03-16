@@ -19,41 +19,41 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-# set up espresso basics
-from espresso.main._setup import *
+# set up espressopp basics
+from espressopp.main._setup import *
 
-# load espresso into PMI
-pmiimport('espresso')
+# load espressopp into PMI
+pmiimport('espressopp')
 
-import _espresso
-from espresso.Exceptions import *
-from espresso.Real3D import *
-from espresso.RealND import *
+import _espressopp
+from espressopp.Exceptions import *
+from espressopp.Real3D import *
+from espressopp.RealND import *
 
-from espresso.Tensor import *
-from espresso.Int3D import *
-from espresso.Particle import *
-from espresso.ParticleGroup import *
-from espresso.System import *
-from espresso.VerletList import *
-from espresso.VerletListTriple import *
-from espresso.VerletListAdress import *
-from espresso.FixedSingleList import *
-from espresso.FixedPairList import *
-from espresso.FixedPairDistList import *
-from espresso.FixedPairListAdress import *
-from espresso.FixedTripleList import *
-from espresso.FixedTripleAngleList import *
-from espresso.FixedTripleListAdress import *
-from espresso.FixedQuadrupleList import *
-from espresso.FixedQuadrupleListAdress import *
-from espresso.FixedQuadrupleAngleList import *
-from espresso.FixedTupleList import *
-from espresso.FixedTupleListAdress import *
-from espresso.MultiSystem import *
-from espresso.ParallelTempering import *
-from espresso.Version import *
-from espresso.PLogger import *
+from espressopp.Tensor import *
+from espressopp.Int3D import *
+from espressopp.Particle import *
+from espressopp.ParticleGroup import *
+from espressopp.System import *
+from espressopp.VerletList import *
+from espressopp.VerletListTriple import *
+from espressopp.VerletListAdress import *
+from espressopp.FixedSingleList import *
+from espressopp.FixedPairList import *
+from espressopp.FixedPairDistList import *
+from espressopp.FixedPairListAdress import *
+from espressopp.FixedTripleList import *
+from espressopp.FixedTripleAngleList import *
+from espressopp.FixedTripleListAdress import *
+from espressopp.FixedQuadrupleList import *
+from espressopp.FixedQuadrupleListAdress import *
+from espressopp.FixedQuadrupleAngleList import *
+from espressopp.FixedTupleList import *
+from espressopp.FixedTupleListAdress import *
+from espressopp.MultiSystem import *
+from espressopp.ParallelTempering import *
+from espressopp.Version import *
+from espressopp.PLogger import *
 
 
 infinity=float("inf")
@@ -61,7 +61,7 @@ nan=float("nan")
 auto='auto'
 
 # fetch the different subpackages
-from espresso import esutil, bc, storage, integrator, interaction, analysis, tools, standard_system, external, check, io
+from espressopp import esutil, bc, storage, integrator, interaction, analysis, tools, standard_system, external, check, io
 
 if pmi.isController :
     # make sure that the workers exit when the script ends

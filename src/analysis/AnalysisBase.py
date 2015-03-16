@@ -43,10 +43,10 @@ It provides the following methods:
     does _not_ include measurements that have been done using "compute()"
 """
 
-from espresso import pmi
+from espressopp import pmi
 
-from espresso.ParticleAccess import *
-from _espresso import analysis_AnalysisBase
+from espressopp.ParticleAccess import *
+from _espressopp import analysis_AnalysisBase
 
 class AnalysisBaseLocal(ParticleAccessLocal, analysis_AnalysisBase):
     """Abstract local base class for observables."""

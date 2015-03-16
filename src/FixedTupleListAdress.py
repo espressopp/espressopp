@@ -35,24 +35,24 @@ following numbers are the particle ids of the corresponding atomistic particles.
 
 Example - creating the FixedTupleListAdress:
 
->>> ftpl = espresso.FixedTupleListAdress(system.storage)
+>>> ftpl = espressopp.FixedTupleListAdress(system.storage)
 >>> ftpl.addTuples(tuples)
 >>> system.storage.setFixedTuples(ftpl)
 
 """
 
-from espresso import pmi
-import _espresso 
-import espresso
-from espresso.esutil import cxxinit
+from espressopp import pmi
+import _espressopp 
+import espressopp
+from espressopp.esutil import cxxinit
 
-class FixedTupleListAdressLocal(_espresso.FixedTupleListAdress):
+class FixedTupleListAdressLocal(_espressopp.FixedTupleListAdress):
     'The (local) fixed touple list.'
 
     def __init__(self, storage):
         'Local construction of a fixed touple list'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.FixedTupleListAdress, storage)
+            cxxinit(self, _espressopp.FixedTupleListAdress, storage)
 
     def addTuples(self, tuplelist):
         """
@@ -71,6 +71,6 @@ if pmi.isController:
     class FixedTupleListAdress(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.FixedTupleListAdressLocal',
+            cls = 'espressopp.FixedTupleListAdressLocal',
             pmicall = [ "addTuples" ]
             )

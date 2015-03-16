@@ -29,7 +29,7 @@
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     typedef class VerletListInteractionTemplate <LJcos>
@@ -48,7 +48,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void 
     LJcos::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< LJcos, bases< Potential > >
         ("interaction_LJcos", init< real >())

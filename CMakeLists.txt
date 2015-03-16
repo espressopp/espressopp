@@ -154,7 +154,7 @@ add_subdirectory(contrib)
 
 add_custom_target(symlink ALL COMMENT "Creating symlink")
 add_custom_command(TARGET symlink COMMAND ${CMAKE_COMMAND} -E create_symlink
-  src espresso)
+  src espressopp)
 
 ######################################
 # System documentation (Doxygen)     # 

@@ -39,11 +39,11 @@
 #define M_PIl 3.1415926535897932384626433832795029L
 #endif
 
-using namespace espresso;
-using namespace espresso::iterator;
+using namespace espressopp;
+using namespace espressopp::iterator;
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
     namespace analysis {
         // currently only works for particles numbered like 0, 1, 2,...
 
@@ -386,7 +386,7 @@ namespace espresso {
         }
 
         void StaticStructF::registerPython() {
-            using namespace espresso::python;
+            using namespace espressopp::python;
             class_<StaticStructF, bases< Observable > >
                     ("analysis_StaticStructF", init< shared_ptr< System > >())
                     .def("compute", &StaticStructF::computeArray)

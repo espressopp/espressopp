@@ -25,7 +25,7 @@
 
 #include "LBOutput.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     class LBOutputVzInTime : public LBOutput {
       public:

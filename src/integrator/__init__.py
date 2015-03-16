@@ -19,40 +19,40 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-from espresso.esutil import pmiimport
-pmiimport('espresso.integrator')
+from espressopp.esutil import pmiimport
+pmiimport('espressopp.integrator')
 
-from espresso.integrator.MDIntegrator import *
-from espresso.integrator.VelocityVerlet import *
-from espresso.integrator.VelocityVerletOnGroup import *
-from espresso.integrator.Isokinetic import *
-from espresso.integrator.StochasticVelocityRescaling import *
-from espresso.integrator.TDforce import *
-from espresso.integrator.FreeEnergyCompensation import *
-from espresso.integrator.OnTheFlyFEC import *
+from espressopp.integrator.MDIntegrator import *
+from espressopp.integrator.VelocityVerlet import *
+from espressopp.integrator.VelocityVerletOnGroup import *
+from espressopp.integrator.Isokinetic import *
+from espressopp.integrator.StochasticVelocityRescaling import *
+from espressopp.integrator.TDforce import *
+from espressopp.integrator.FreeEnergyCompensation import *
+from espressopp.integrator.OnTheFlyFEC import *
 
-from espresso.integrator.Extension import *
-from espresso.integrator.Adress import *
-from espresso.integrator.BerendsenBarostat import *
-from espresso.integrator.BerendsenBarostatAnisotropic import *
-from espresso.integrator.BerendsenThermostat import *
-from espresso.integrator.LangevinThermostat import *
-from espresso.integrator.LangevinThermostat1D import *
-from espresso.integrator.GeneralizedLangevinThermostat import *
-from espresso.integrator.DPDThermostat import *
-from espresso.integrator.LangevinBarostat import *
-from espresso.integrator.FixPositions import *
-from espresso.integrator.LatticeBoltzmann import *
-from espresso.integrator.LBInit import *
-from espresso.integrator.LBInitConstForce import *
-from espresso.integrator.LBInitPeriodicForce import *
-from espresso.integrator.LBInitPopUniform import *
-from espresso.integrator.LBInitPopWave import *
-from espresso.integrator.LiquidGasLB import *
-from espresso.integrator.ExtForce import *
-from espresso.integrator.CapForce import *
-from espresso.integrator.ExtAnalyze import *
-from espresso.integrator.Settle import *
-from espresso.integrator.VelocityVerletOnRadius import *
-from espresso.integrator.AssociationReaction import *
-from espresso.integrator.EmptyExtension import *
+from espressopp.integrator.Extension import *
+from espressopp.integrator.Adress import *
+from espressopp.integrator.BerendsenBarostat import *
+from espressopp.integrator.BerendsenBarostatAnisotropic import *
+from espressopp.integrator.BerendsenThermostat import *
+from espressopp.integrator.LangevinThermostat import *
+from espressopp.integrator.LangevinThermostat1D import *
+from espressopp.integrator.GeneralizedLangevinThermostat import *
+from espressopp.integrator.DPDThermostat import *
+from espressopp.integrator.LangevinBarostat import *
+from espressopp.integrator.FixPositions import *
+from espressopp.integrator.LatticeBoltzmann import *
+from espressopp.integrator.LBInit import *
+from espressopp.integrator.LBInitConstForce import *
+from espressopp.integrator.LBInitPeriodicForce import *
+from espressopp.integrator.LBInitPopUniform import *
+from espressopp.integrator.LBInitPopWave import *
+from espressopp.integrator.LiquidGasLB import *
+from espressopp.integrator.ExtForce import *
+from espressopp.integrator.CapForce import *
+from espressopp.integrator.ExtAnalyze import *
+from espressopp.integrator.Settle import *
+from espressopp.integrator.VelocityVerletOnRadius import *
+from espressopp.integrator.AssociationReaction import *
+from espressopp.integrator.EmptyExtension import *

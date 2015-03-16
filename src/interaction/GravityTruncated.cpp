@@ -24,7 +24,7 @@
 #include "GravityTruncated.hpp"
 #include "VerletListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     typedef class VerletListInteractionTemplate <GravityTruncated> VerletListGravityTruncated;
@@ -33,7 +33,7 @@ namespace espresso {
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void GravityTruncated::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< GravityTruncated, bases< Potential > >
         ("interaction_GravityTruncated", init< >())

@@ -30,7 +30,7 @@
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     using namespace iterator;
     /** Class to compute the temperature. */

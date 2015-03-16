@@ -53,22 +53,22 @@ dumps coordinates of atomistic particles instead of coarse-grained particles in 
   
 usage:
 
->>> ftpl = espresso.FixedTupleListAdress(system.storage)
+>>> ftpl = espressopp.FixedTupleListAdress(system.storage)
 >>> ftpl.addTuples(tuples)
 >>> system.storage.setFixedTuplesAdress(ftpl)
 >>> system.storage.decompose()
 
 writing down trajectory
 
->>> dump_conf_gro = espresso.io.DumpGROAdress(system, ftpl, integrator, filename='trajectory.gro')
+>>> dump_conf_gro = espressopp.io.DumpGROAdress(system, ftpl, integrator, filename='trajectory.gro')
 >>> for i in range (200):
 >>>   integrator.run(10)
 >>>   dump_conf_gro.dump()
 
 writing down trajectory using ExtAnalyze extension
 
->>> dump_conf_gro = espresso.io.DumpGROAdress(system, ftpl, integrator, filename='trajectory.gro')
->>> ext_analyze = espresso.integrator.ExtAnalyze(dump_conf_gro, 10)
+>>> dump_conf_gro = espressopp.io.DumpGROAdress(system, ftpl, integrator, filename='trajectory.gro')
+>>> ext_analyze = espressopp.integrator.ExtAnalyze(dump_conf_gro, 10)
 >>> integrator.addExtension(ext_analyze)
 >>> integrator.run(2000)
 
@@ -78,16 +78,16 @@ setting up length scale
 
 For example, the Lennard-Jones model for liquid argon with :math:`\sigma=0.34 [nm]` 
 
->>> dump_conf_gro = espresso.io.DumpGROAdress(system, ftpl, integrator, filename='trj.gro', unfolded=False, length_factor=0.34, length_unit='nm', append=True)
+>>> dump_conf_gro = espressopp.io.DumpGROAdress(system, ftpl, integrator, filename='trj.gro', unfolded=False, length_factor=0.34, length_unit='nm', append=True)
 
 will produce trj.gro with in nanometers
 """
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.ParticleAccess import *
-from _espresso import io_DumpGROAdress
+from espressopp.ParticleAccess import *
+from _espressopp import io_DumpGROAdress
 
 class DumpGROAdressLocal(ParticleAccessLocal, io_DumpGROAdress):
   'The (local) storage of configurations.'
@@ -103,7 +103,7 @@ if pmi.isController :
   class DumpGROAdress(ParticleAccess):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls =  'espresso.io.DumpGROAdressLocal',
+      cls =  'espressopp.io.DumpGROAdressLocal',
       pmicall = [ 'dump' ],
       pmiproperty = ['filename', 'unfolded', 'length_factor', 'length_unit', 'append']
     )

@@ -21,14 +21,14 @@
 
 """
 *************************************
-**espresso.analysis.Autocorrelation**
+**espressopp.analysis.Autocorrelation**
 *************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from _espresso import analysis_Autocorrelation
+from _espressopp import analysis_Autocorrelation
 
 class AutocorrelationLocal(analysis_Autocorrelation):
     'The (local) storage of configurations.'
@@ -47,7 +47,7 @@ if pmi.isController:
     """Class for parallel analysis"""
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls =  'espresso.analysis.AutocorrelationLocal',
+      cls =  'espressopp.analysis.AutocorrelationLocal',
       pmicall = [ "gather", "clear", "compute" ],
       localcall = ["__getitem__", "all"],
       pmiproperty = ["size"]

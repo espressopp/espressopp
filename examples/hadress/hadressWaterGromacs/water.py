@@ -12,13 +12,13 @@
 import math
 import sys
 import time
-import espresso
+import espressopp
 import mpi4py.MPI as MPI
 import logging
-from espresso import Real3D, Int3D
-from espresso.tools.convert import gromacs
-from espresso.tools import decomp
-from espresso.tools import timers
+from espressopp import Real3D, Int3D
+from espressopp.tools.convert import gromacs
+from espressopp.tools import decomp
+from espressopp.tools import timers
 
 # This example reads in a gromacs water system (SPC/Fw) treated with reaction field. See the corresponding gromacs grompp.mdp paramter file. 
 # Output of gromacs energies and esp energies should be the same
@@ -55,7 +55,7 @@ topfile = "topol.top"
 defaults, types, masses, charges, atomtypeparameters, bondtypes, bondtypeparams, angletypes, angletypeparams, exclusions, x, y, z, vx, vy, vz, Lx, Ly, Lz = gromacs.read(grofile,topfile)
 
 # This is an equilibrated configuration!
-dummy1, dummy2, x, y, z, vx, vy, vz, dummy3, dummy4, dummy5 = espresso.tools.readxyz("equilibrated_conf.xyz")
+dummy1, dummy2, x, y, z, vx, vy, vz, dummy3, dummy4, dummy5 = espressopp.tools.readxyz("equilibrated_conf.xyz")
 
 ######################################################################
 ##  IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE  ##
@@ -67,26 +67,26 @@ density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 
 sys.stdout.write('Setting up simulation ...\n')
-system = espresso.System()
+system = espressopp.System()
 
 # Random Number Generator
 xs = time.time()
 seed = int(xs % int(xs) * 10000000000)
-rng = espresso.esutil.RNG()
+rng = espressopp.esutil.RNG()
 rng.seed(seed)
 system.rng = rng
 
-system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
+system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
-system.storage = espresso.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
+system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
 
 # setting up GROMACS interaction stuff
 # create a force capped Lennard-Jones interaction that uses a verlet list
-verletlist = espresso.VerletListAdress(system, cutoff=rc, adrcut=rc,
+verletlist = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc,
                                 dEx=ex_size, dHy=hy_size,
                                 adrCenter=[Lx/2, Ly/2, Lz/2])
                                 
@@ -107,7 +107,7 @@ typeCG=0
 # create CG particles
 for pidCG in range(num_particlesCG):
     # we put CG molecule in first atom, later CG molecules will be positioned in the center
-    #cmp = espresso.tools.AdressSetCG(3, pidCG, allParticlesAT)
+    #cmp = espressopp.tools.AdressSetCG(3, pidCG, allParticlesAT)
     
     # Preparation of tuples (tuples define, which atoms belong to which CG molecules)
     tmptuple = [pidCG+num_particles+1]
@@ -142,7 +142,7 @@ system.storage.addParticles(allParticles, *props)
  
 
 # create FixedTupleList object
-ftpl = espresso.FixedTupleListAdress(system.storage)
+ftpl = espressopp.FixedTupleListAdress(system.storage)
 # and add the tuples
 ftpl.addTuples(tuples)
 system.storage.setFixedTuplesAdress(ftpl)
@@ -154,7 +154,7 @@ ljinteraction=gromacs.setLennardJonesInteractions(system, defaults, atomtypepara
 
 # set up angle interactions according to the parameters read from the .top file
 
-fpl = espresso.FixedTripleListAdress(system.storage, ftpl)
+fpl = espressopp.FixedTripleListAdress(system.storage, ftpl)
 angleinteractions=gromacs.setAngleInteractions(system, angletypes, angletypeparams, fpl)
 
 # set up coulomb interactions according to the parameters read from the .top file
@@ -164,18 +164,18 @@ qq_interactions=gromacs.setCoulombInteractions(system, verletlist, rca, types, e
 # load CG interaction from table
 fe="table_CG_CG.tab"
 gromacs.convertTable("table_CG_CG.xvg", fe, 1, 1, 1, 1)
-potCG = espresso.interaction.Tabulated(itype=3, filename=fe, cutoff=rca) # CG
+potCG = espressopp.interaction.Tabulated(itype=3, filename=fe, cutoff=rca) # CG
 
 
 # set the CG potential. There are two non-bonded interactions, we pick only the first one 
 for n in range(system.getNumberOfInteractions()):
     interaction=system.getInteraction(n)
-    if interaction.bondType() == espresso.interaction.Nonbonded:
+    if interaction.bondType() == espressopp.interaction.Nonbonded:
 	print "Setting CG interaction", typeCG
 	interaction.setPotentialCG(type1=typeCG, type2=typeCG, potential=potCG)
 	break
 
-fpl = espresso.FixedPairListAdress(system.storage, ftpl)
+fpl = espressopp.FixedPairListAdress(system.storage, ftpl)
 bondedinteractions=gromacs.setBondedInteractions(system, bondtypes, bondtypeparams, fpl)
 
 
@@ -184,22 +184,22 @@ bondedinteractions=gromacs.setBondedInteractions(system, bondtypes, bondtypepara
 verletlist.exclude(exclusions)
 
 # add VelocityVerlet Integrator
-integrator = espresso.integrator.VelocityVerlet(system)
+integrator = espressopp.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
 # add Langevin Thermostat
-langevin = espresso.integrator.LangevinThermostat(system)
+langevin = espressopp.integrator.LangevinThermostat(system)
 langevin.gamma = 2.0
 langevin.temperature = 2.4942 # kT in gromacs units
 langevin.adress = True
 integrator.addExtension(langevin)
 
 # add AdResS
-adress = espresso.integrator.Adress(system,verletlist,ftpl)
+adress = espressopp.integrator.Adress(system,verletlist,ftpl)
 integrator.addExtension(adress)
 
 # distribute atoms and CG molecules according to AdResS domain decomposition, place CG molecules in the center of mass 
-espresso.tools.AdressDecomp(system, integrator)
+espressopp.tools.AdressDecomp(system, integrator)
 
 # print simulation parameters
 print ''
@@ -215,11 +215,11 @@ print ''
 
 
 # analysis
-configurations = espresso.analysis.Configurations(system)
+configurations = espressopp.analysis.Configurations(system)
 configurations.gather()
-temperature = espresso.analysis.Temperature(system)
-pressure = espresso.analysis.Pressure(system)
-pressureTensor = espresso.analysis.PressureTensor(system)
+temperature = espressopp.analysis.Temperature(system)
+pressure = espressopp.analysis.Pressure(system)
+pressureTensor = espressopp.analysis.PressureTensor(system)
 
 print "i*timestep, T, Eb, EAng, ELj, EQQ, Ek, Etotal"
 fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8f\n'
@@ -227,8 +227,8 @@ fmt='%5.5f %15.8g %15.8g %15.8g %15.8g %15.8g %15.8g %15.8f\n'
 start_time = time.clock()
 outfile = open("esp.dat", "w")
 
-#espresso.tools.psfwrite("system.psf", system, typenames={0:'H', 1:'O', 2:'CG'})
-#espresso.tools.pdbwrite("traj.pdb", system, append=False, typenames={0:'H', 1:'O', 2:'CG'})
+#espressopp.tools.psfwrite("system.psf", system, typenames={0:'H', 1:'O', 2:'CG'})
+#espressopp.tools.pdbwrite("traj.pdb", system, append=False, typenames={0:'H', 1:'O', 2:'CG'})
 
 
 # Density profile preparation
@@ -253,10 +253,10 @@ for i in range(check):
     
     integrator.run(steps/check) # print out every steps/check steps
     
-    #espresso.tools.pdbwrite("traj.pdb", system, append=True)
+    #espressopp.tools.pdbwrite("traj.pdb", system, append=True)
      # calculate density profile
     '''if i > 10:
-        densityprofile = espresso.analysis.XDensity(system)
+        densityprofile = espressopp.analysis.XDensity(system)
         density_array = densityprofile.compute(densityprofilegrid)
         for i in range(len(density_array)):
                 if(i>=len(density_array_total)):

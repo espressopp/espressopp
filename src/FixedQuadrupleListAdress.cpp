@@ -33,7 +33,7 @@
 #include "esutil/Error.hpp"
 
 
-namespace espresso {
+namespace espressopp {
 LOG4ESPP_LOGGER(FixedQuadrupleListAdress::theLogger, "FixedQuadrupleListAdress");
 
 FixedQuadrupleListAdress::FixedQuadrupleListAdress(
@@ -214,7 +214,7 @@ void FixedQuadrupleListAdress::onParticlesChanged() {
 ** REGISTRATION WITH PYTHON
 ****************************************************/
 void FixedQuadrupleListAdress::registerPython() {
-  using namespace espresso::python;
+  using namespace espressopp::python;
 
   bool (FixedQuadrupleListAdress::*pyAdd)(longint pid1, longint pid2,
          longint pid3, longint pid4) = &FixedQuadrupleListAdress::add;
@@ -227,4 +227,4 @@ void FixedQuadrupleListAdress::registerPython() {
     .def("getQuadruples",  &FixedQuadrupleListAdress::getQuadruples)
    ;
 }
-}  // end namespace espresso
+}  // end namespace espressopp

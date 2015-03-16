@@ -23,9 +23,9 @@
 #include "MeanSquareDispl.hpp"
 //#include <algorithm> //for std::sort
 using namespace std;
-//using namespace espresso;
+//using namespace espressopp;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     //using namespace iterator;
@@ -434,7 +434,7 @@ namespace espresso {
     
     // Python wrapping
     void MeanSquareDispl::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<MeanSquareDispl, bases<ConfigsParticleDecomp> >
       ("analysis_MeanSquareDispl", init< shared_ptr< System > >() )

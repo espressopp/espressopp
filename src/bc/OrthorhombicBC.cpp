@@ -27,7 +27,7 @@
 #include "Int3D.hpp"
 #include "esutil/RNG.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace bc {
     /* Constructor */
     OrthorhombicBC::
@@ -174,7 +174,7 @@ namespace espresso {
     void 
     OrthorhombicBC::
     registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<OrthorhombicBC, bases< BC >, boost::noncopyable >
 	("bc_OrthorhombicBC", init< shared_ptr< esutil::RNG >, Real3D& >())
 	.add_property("boxL", &OrthorhombicBC::getBoxL, &OrthorhombicBC::setBoxL)

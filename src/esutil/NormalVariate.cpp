@@ -26,7 +26,7 @@
 
 using namespace boost;
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
     NormalVariate::NormalVariate(shared_ptr< RNG > _rng,
 				 const real mean, 
@@ -39,7 +39,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void
     NormalVariate::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       real (NormalVariate::*pyCall)() 
       	= &NormalVariate::operator();

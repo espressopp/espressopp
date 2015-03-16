@@ -37,7 +37,7 @@
 #include "Interaction.hpp"
 #include "types.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     template < typename _Potential >
     class FixedPairListInteractionTemplate: public Interaction, SystemAccess {
