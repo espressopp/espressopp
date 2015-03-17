@@ -14,17 +14,6 @@ list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
 
 file(GLOB_RECURSE PYTHON_SCRIPTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.py)
 
-add_custom_target(scripts ALL COMMENT "Copying scripts to builddir: *.py")
-foreach(FILENAME ${PYTHON_SCRIPTS})
-  set(SRC "${CMAKE_CURRENT_SOURCE_DIR}/${FILENAME}")
-  set(DST "${CMAKE_CURRENT_BINARY_DIR}/${FILENAME}")
-  string(REGEX MATCH .*/ DIR "${FILENAME}")
-  if (NOT ${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-    add_custom_command(TARGET scripts COMMAND ${CMAKE_COMMAND} -E copy ${SRC} ${DST})
-  endif(NOT ${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-  install(FILES ${DST} DESTINATION ${PYTHON_INSTDIR}/espressopp/${DIR})
-endforeach(FILENAME)
-
 add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_MODULE_PATH}/gitversion.cmake)
 
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
@@ -62,7 +51,6 @@ endif(EXTERNAL_BOOST)
 
 add_library(_espressopp ${ESPRESSO_SOURCES})
 target_link_libraries(_espressopp ${BOOST} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
-add_dependencies(_espressopp scripts)
 #python libs have not prefix (default would be 'lib')
 set_target_properties(_espressopp PROPERTIES PREFIX "" SUFFIX ".so" LIBRARY_OUTPUT_DIRECTORY ..)
 install(TARGETS _espressopp LIBRARY DESTINATION ${PYTHON_INSTDIR})
