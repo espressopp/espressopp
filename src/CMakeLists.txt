@@ -40,13 +40,11 @@ else (EXTERNAL_MPI4PY)
   set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib")
 endif (EXTERNAL_MPI4PY)
 #CMAKE_CURRENT_BINARY_DIR for libespressopp_common.so and contib for libespressopp_boost
-set (LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
   ${CMAKE_BINARY_DIR}/ESPRC @ONLY)
 
 #after install ESPRC
 set (PYTHON_DIR "${CMAKE_INSTALL_PREFIX}/${PYTHON_INSTDIR}")
-set (LIB_DIR "${CMAKE_INSTALL_PREFIX}/${LIB}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
   ${CMAKE_CURRENT_BINARY_DIR}/ESPRC @ONLY)
 option(WITH_RC_FILES "Install Espresso rc file, no need when installing under /usr" ON)
