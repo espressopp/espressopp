@@ -21,12 +21,12 @@
 
 """
 ********************************
-**espresso.analysis.Observable**
+**espressopp.analysis.Observable**
 ********************************
 
 """
-from espresso import pmi
-from _espresso import analysis_Observable
+from espressopp import pmi
+from _espressopp import analysis_Observable
 
 class result_types:
     none, real_scalar, int_scalar, real_vector, int_vector = range(5)

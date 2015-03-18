@@ -17,7 +17,7 @@
 #include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
 
-namespace espresso {
+namespace espressopp {
 	
   using namespace iterator;
   namespace integrator {
@@ -522,7 +522,7 @@ namespace espresso {
 		
     void LiquidGasLB::registerPython() {
 			
-      using namespace espresso::python;
+      using namespace espressopp::python;
 			
       class_<LiquidGasLB, shared_ptr<LiquidGasLB>, bases<Extension> >
 			

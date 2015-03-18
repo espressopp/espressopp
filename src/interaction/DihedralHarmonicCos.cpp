@@ -24,14 +24,14 @@
 #include "DihedralHarmonicCos.hpp"
 #include "FixedQuadrupleListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void 
     DihedralHarmonicCos::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_ <DihedralHarmonicCos, bases <DihedralPotential> >
     	("interaction_DihedralHarmonicCos", init< real, real >())

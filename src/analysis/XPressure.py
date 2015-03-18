@@ -21,15 +21,15 @@
 
 """
 *******************************
-**espresso.analysis.XPressure**
+**espressopp.analysis.XPressure**
 *******************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.Observable import *
-from _espresso import analysis_XPressure
+from espressopp.analysis.Observable import *
+from _espressopp import analysis_XPressure
 
 class XPressureLocal(ObservableLocal, analysis_XPressure):
   'The (local) compute the pressure profile in x direction.'
@@ -44,5 +44,5 @@ if pmi.isController :
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
       pmicall = [ "compute" ],
-      cls = 'espresso.analysis.XPressureLocal'
+      cls = 'espressopp.analysis.XPressureLocal'
     )

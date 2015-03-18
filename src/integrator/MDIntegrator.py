@@ -21,12 +21,12 @@
 
 """
 ************************************
-**espresso.integrator.MDIntegrator**
+**espressopp.integrator.MDIntegrator**
 ************************************
 
 """
-from espresso import pmi
-from _espresso import integrator_MDIntegrator
+from espressopp import pmi
+from _espressopp import integrator_MDIntegrator
 
 class MDIntegratorLocal(object):
     """Abstract local base class for molecular dynamics integrator."""

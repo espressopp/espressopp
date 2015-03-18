@@ -27,7 +27,7 @@
 #include "types.hpp"
 #include "Real3D.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
     using namespace boost;
     /** This class generates random vectors that are uniformly

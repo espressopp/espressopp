@@ -26,7 +26,7 @@
 
 #include "Cell.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace iterator {
     /**
        Iterates all Particles in a list of cells.

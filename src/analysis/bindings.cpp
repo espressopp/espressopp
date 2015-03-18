@@ -65,7 +65,7 @@
 #include "LBOutputScreen.hpp"
 #include "LBOutputVzInTime.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     void registerPython() {
       Observable::registerPython();

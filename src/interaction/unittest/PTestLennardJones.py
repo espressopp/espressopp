@@ -20,11 +20,11 @@
 
 
 import unittest
-from espresso import Real3D, infinity
-import espresso.unittest
-from espresso.interaction.LennardJones import *
+from espressopp import Real3D, infinity
+import espressopp.unittest
+from espressopp.interaction.LennardJones import *
 
-class TestLennardJones(espresso.unittest.TestCase):
+class TestLennardJones(espressopp.unittest.TestCase):
     def testDefaults(self):
         lj=LennardJones()
         self.assertEqual(lj.epsilon, 1.0)

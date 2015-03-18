@@ -31,7 +31,7 @@
 # define VT_OFF()
 #endif
 
-namespace espresso {
+namespace espressopp {
 
   Version::Version() {
 	  name          = "ESPResSo++";
@@ -63,7 +63,7 @@ namespace espresso {
   //////////////////////////////////////////////////
   void
   Version::registerPython() {
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     class_< Version >
       ("Version", init<>())

@@ -21,14 +21,14 @@
 
 """
 ********************************
-**espresso.integrator.EmptyExtension**
+**espressopp.integrator.EmptyExtension**
 ********************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
-from espresso.integrator.Extension import *
-from _espresso import integrator_EmptyExtension 
+from espressopp.esutil import cxxinit
+from espressopp import pmi
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_EmptyExtension 
 
 class EmptyExtensionLocal(ExtensionLocal, integrator_EmptyExtension):
     'The (local) external force part.'
@@ -40,5 +40,5 @@ if pmi.isController :
     class EmptyExtension(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.EmptyExtensionLocal'
+            cls =  'espressopp.integrator.EmptyExtensionLocal'
             )

@@ -28,7 +28,7 @@
 #include "SystemAccess.hpp"
 #include "ConfigurationExt.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     /** Class that stores particle positions for later analysis.

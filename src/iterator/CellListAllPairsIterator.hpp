@@ -29,7 +29,7 @@
 #include "iterator/CellListIterator.hpp"
 //#include "iterator/NeighborCellListIterator.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace iterator {
     class CellListAllPairsIterator {
     public:

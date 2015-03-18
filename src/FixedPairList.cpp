@@ -33,7 +33,7 @@
 
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
 
   /*
   FixedPairList::FixedPairList(shared_ptr< storage::Storage > _storage)
@@ -263,7 +263,7 @@ namespace espresso {
 
   void FixedPairList::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (FixedPairList::*pyAdd)(longint pid1, longint pid2)
       = &FixedPairList::add;

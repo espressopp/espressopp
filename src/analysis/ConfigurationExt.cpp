@@ -26,12 +26,12 @@
 #include <stdexcept>
 #include "Real3D.hpp"
 
-using namespace espresso;
+using namespace espressopp;
 using namespace boost::python;
 
 #define DEFAULT_TAG 71
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     ConfigurationExt::ConfigurationExt()  //int nParticles
@@ -132,7 +132,7 @@ namespace espresso {
     inline object pass_through(object const& o) { return o; }
 
     void ConfigurationExt::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<ConfigurationExtIterator>("ConfigurationExtIterator", no_init)
       .def("next", &ConfigurationExtIterator::nextId)

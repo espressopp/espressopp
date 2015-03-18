@@ -27,7 +27,7 @@
 
 // currently just Verlet list
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     typedef class VerletListInteractionTemplate <CoulombRSpace> VerletListCoulombRSpace;
@@ -36,7 +36,7 @@ namespace espresso {
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void CoulombRSpace::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< CoulombRSpace, bases< Potential > >
         ("interaction_CoulombRSpace", init< >())

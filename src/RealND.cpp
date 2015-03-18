@@ -24,7 +24,7 @@
 #include "python.hpp"
 #include "RealND.hpp"
 
-namespace espresso {
+namespace espressopp {
   struct real3D_pickle_suite : boost::python::pickle_suite {
     static
     python::tuple

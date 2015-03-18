@@ -34,11 +34,11 @@
 #define M_PIl 3.1415926535897932384626433832795029L
 #endif
 
-using namespace espresso;
+using namespace espressopp;
 using namespace iterator;
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     
     // TODO currently works correctly for Lx = Ly = Lz
@@ -207,7 +207,7 @@ namespace espresso {
     }
 
     void RDFatomistic::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<RDFatomistic, bases< Observable > >
         ("analysis_RDFatomistic", init< shared_ptr< System >, int, int, real >())
         .def("compute", &RDFatomistic::computeArray)

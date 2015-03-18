@@ -23,7 +23,7 @@
 #include "python.hpp"
 #include "LBInitPopUniform.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 //    LOG4ESPP_LOGGER(LBInitPopUniform::theLogger, "LBInitPopUniform");
     LBInitPopUniform::LBInitPopUniform(shared_ptr<System> system,
@@ -64,7 +64,7 @@ namespace espresso {
     void LBInitPopUniform::addForce (Real3D _force) {}
 
     void LBInitPopUniform::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<LBInitPopUniform, bases< LBInit > >
           ("integrator_LBInit_PopUniform", init< shared_ptr< System >,

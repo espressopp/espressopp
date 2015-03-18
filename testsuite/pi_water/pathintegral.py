@@ -1,6 +1,6 @@
 import copy
 import math
-import espresso
+import espressopp
 
 def createPathintegralSystem(allParticles,
 props,
@@ -26,7 +26,7 @@ hbar=0.063507807 # hbar in gromacs units [kJ/mol ps]
 
     ####
     #claParticles=[]
-    #maxParticleID = int(espresso.analysis.MaxPID(system).compute())
+    #maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
     #for pid in range(maxParticleID+1):
 	#if system.storage.particleExists(pid):
 	    #claParticles.append(system.storage.getParticle(pid))
@@ -68,7 +68,7 @@ hbar=0.063507807 # hbar in gromacs units [kJ/mol ps]
     for n in range(numInteraction):
 	interaction=system.getInteraction(n)
 	print "expanding interaction", interaction
-	if interaction.bondType() == espresso.interaction.Nonbonded:
+	if interaction.bondType() == espressopp.interaction.Nonbonded:
 	    for i in range(P):	
 		for j in range(numtypes):
 		    for k in range(numtypes):
@@ -77,7 +77,7 @@ hbar=0.063507807 # hbar in gromacs units [kJ/mol ps]
 
 
 
-	if interaction.bondType() == espresso.interaction.Pair:
+	if interaction.bondType() == espressopp.interaction.Pair:
 	    bond_fpl=interaction.getFixedPairList()
 	    cla_bonds=bond_fpl.getBonds()[0]
 	    for i in range(1, P):
@@ -85,7 +85,7 @@ hbar=0.063507807 # hbar in gromacs units [kJ/mol ps]
 		    # create additional bonds for this imag time
 		    bond_fpl.add(b[0]+num_cla_part*i, b[1]+num_cla_part*i)
 		    
-	if interaction.bondType() == espresso.interaction.Angular:
+	if interaction.bondType() == espressopp.interaction.Angular:
 	    angle_ftl=interaction.getFixedTripleList()
 	    cla_angles=angle_ftl.getTriples()[0]
 	    for i in range(1, P):
@@ -93,7 +93,7 @@ hbar=0.063507807 # hbar in gromacs units [kJ/mol ps]
 		    # create additional angles for this imag time
 		    angle_ftl.add(a[0]+num_cla_part*i, 
 		    a[1]+num_cla_part*i, a[2]+num_cla_part*i)
-	if interaction.bondType() == espresso.interaction.Dihedral:
+	if interaction.bondType() == espressopp.interaction.Dihedral:
 	    dihedral_fql=interaction.getFixedQuadrupleList()
 	    cla_dihedrals=dihedral_fql.getQuadruples()[0]
 	    for i in range(1, P):
@@ -111,10 +111,10 @@ hbar=0.063507807 # hbar in gromacs units [kJ/mol ps]
 
     kineticTermInteractions={} # key: mass value: corresponding harmonic spring interaction
     for m in unique_masses:
-	fpl=espresso.FixedPairList(system.storage)
+	fpl=espressopp.FixedPairList(system.storage)
 	k=m*P*P*langevin.temperature*langevin.temperature/(hbar*hbar)
-	pot=espresso.interaction.Harmonic(k,0.0)
-	interb = espresso.interaction.FixedPairListHarmonic(system, fpl, pot)
+	pot=espressopp.interaction.Harmonic(k,0.0)
+	interb = espressopp.interaction.FixedPairListHarmonic(system, fpl, pot)
 	system.addInteraction(interb)
 	kineticTermInteractions.update({m:interb})
 

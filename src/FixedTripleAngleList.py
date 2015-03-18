@@ -21,23 +21,23 @@
 
 """
 *********************************
-**espresso.FixedTripleAngleList**
+**espressopp.FixedTripleAngleList**
 *********************************
 
 """
-from espresso import pmi
-import _espresso
-#import espresso
-from espresso.esutil import cxxinit
+from espressopp import pmi
+import _espressopp
+#import espressopp
+from espressopp.esutil import cxxinit
 
-class FixedTripleAngleListLocal(_espresso.FixedTripleAngleList):
+class FixedTripleAngleListLocal(_espressopp.FixedTripleAngleList):
     'The (local) fixed triple list.'
 
     def __init__(self, storage):
         'Local construction of a fixed triple list'
         #if pmi.workerIsActive():
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, _espresso.FixedTripleAngleList, storage)
+            cxxinit(self, _espressopp.FixedTripleAngleList, storage)
 
     def add(self, pid1, pid2, pid3):
         'add triple to fixed triple list'
@@ -81,7 +81,7 @@ if pmi.isController:
   class FixedTripleAngleList(object):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-        cls = 'espresso.FixedTripleAngleListLocal',
+        cls = 'espressopp.FixedTripleAngleListLocal',
         localcall = [ "add" ],
         pmicall = [ "addTriples" ],
         pmiinvoke = ["getTriples", "getTriplesAngles", "size"]

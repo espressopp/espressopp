@@ -24,8 +24,8 @@
 #include "Collectives.hpp"
 
 using namespace boost::mpi;
-using namespace espresso::python;
-using namespace espresso::esutil::Collectives;
+using namespace espressopp::python;
+using namespace espressopp::esutil::Collectives;
 
 
 DuplicateError::DuplicateError():
@@ -55,7 +55,7 @@ struct UniqueReduce: public std::binary_function< int, int, int > {
 };
 
  
-int espresso::esutil::Collectives::locateItem(bool here, int controller, communicator world) {
+int espressopp::esutil::Collectives::locateItem(bool here, int controller, communicator world) {
   int node = here ? world.rank() : UniqueReduce::NotHere;
 
   if (world.rank() != controller) {
@@ -81,7 +81,7 @@ namespace boost { namespace mpi {
   struct is_commutative< UniqueReduce, int >: mpl::true_ { };
 } } 
 
-void espresso::esutil::Collectives::registerPython() {
+void espressopp::esutil::Collectives::registerPython() {
   def("esutil_Collectives_locateItem", pyLocateItem);
   scope().attr("esutil_Collectives_ResultNone") = None;
 }

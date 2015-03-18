@@ -24,7 +24,7 @@
 #include "PotentialVSpherePair.hpp"
 #include "logging.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     LOG4ESPP_LOGGER(PotentialVSpherePair::theLogger, "PotentialVSpherePair");
@@ -33,7 +33,7 @@ namespace espresso {
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void PotentialVSpherePair::registerPython() {
-        using namespace espresso::python;
+        using namespace espressopp::python;
         
         real (PotentialVSpherePair::*computeEnergy1)(const Real3D& dist, real& sigmaij) const =
             &PotentialVSpherePair::computeEnergy;

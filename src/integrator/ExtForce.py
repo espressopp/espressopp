@@ -21,14 +21,14 @@
 
 """
 ********************************
-**espresso.integrator.ExtForce**
+**espressopp.integrator.ExtForce**
 ********************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
-from espresso.integrator.Extension import *
-from _espresso import integrator_ExtForce 
+from espressopp.esutil import cxxinit
+from espressopp import pmi
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_ExtForce 
 
 class ExtForceLocal(ExtensionLocal, integrator_ExtForce):
     'The (local) external force part.'
@@ -43,7 +43,7 @@ if pmi.isController :
     class ExtForce(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.ExtForceLocal',
+            cls =  'espressopp.integrator.ExtForceLocal',
             pmicall = ['setExtForce', 'getExtForce'],
             pmiproperty = [ 'particleGroup' ]
             )

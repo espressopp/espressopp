@@ -23,11 +23,11 @@
 #include "python.hpp"
 #include "Test.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     void Test::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_< Test, bases< AnalysisBase > >
         ("analysis_Test", init< shared_ptr< System > >())
       ;

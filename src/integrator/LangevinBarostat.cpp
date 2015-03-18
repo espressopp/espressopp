@@ -36,7 +36,7 @@
 
 #include "mpi.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   using namespace std;
   
@@ -286,7 +286,7 @@ namespace espresso {
     ****************************************************/
 
     void LangevinBarostat::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<LangevinBarostat, shared_ptr<LangevinBarostat>, bases<Extension> >
 

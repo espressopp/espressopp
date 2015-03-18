@@ -28,11 +28,11 @@ This class creates initial populations with uniform density and velocity
   
 """
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.LBInit import *
-from _espresso import integrator_LBInit_PopUniform
+from espressopp.integrator.LBInit import *
+from _espressopp import integrator_LBInit_PopUniform
 
 class LBInitPopUniformLocal(LBInitLocal, integrator_LBInit_PopUniform):
     """The (local) compute of LBInitPopUniform."""
@@ -44,7 +44,7 @@ if pmi.isController :
     class LBInitPopUniform(LBInit):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.LBInitPopUniformLocal',
+            cls =  'espressopp.integrator.LBInitPopUniformLocal',
             pmicall = [
                        "createDenVel"]
             )

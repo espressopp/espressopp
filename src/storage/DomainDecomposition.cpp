@@ -43,7 +43,7 @@
 using namespace boost;
 using namespace std;
 
-namespace espresso { 
+namespace espressopp { 
   namespace storage {
 
 
@@ -771,7 +771,7 @@ namespace espresso {
   // REGISTRATION WITH PYTHON
   //////////////////////////////////////////////////
   void DomainDecomposition::registerPython() {
-    using namespace espresso::python;
+    using namespace espressopp::python;
     class_< DomainDecomposition, bases< Storage >, boost::noncopyable >
     ("storage_DomainDecomposition", init< shared_ptr< System >, const Int3D&, const Int3D& >())
     .def("mapPositionToNodeClipped", &DomainDecomposition::mapPositionToNodeClipped)

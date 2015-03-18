@@ -31,7 +31,7 @@
 #include "esutil/Array2D.hpp"
 #include "iterator/CellListAllPairsIterator.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     template < typename _Potential >
     class CellListAllPairsInteractionTemplate

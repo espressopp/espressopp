@@ -21,14 +21,14 @@
 
 """
 ***********************
-**espresso.Exceptions**
+**espressopp.Exceptions**
 ***********************
 
 """
 import sys, traceback
 
 class Error(Exception):
-    """Raised to show unrecoverable espresso errors.
+    """Raised to show unrecoverable espressopp errors.
     """
     def __init__(self, msg):
         try:

@@ -21,14 +21,14 @@
 
 """
 ******************************************
-**espresso.interaction.DihedralPotential**
+**espressopp.interaction.DihedralPotential**
 ******************************************
 
 """
 # -*- coding: iso-8859-1 -*-
-from espresso import pmi
-from espresso import toReal3DFromVector
-from _espresso import interaction_DihedralPotential
+from espressopp import pmi
+from espressopp import toReal3DFromVector
+from _espressopp import interaction_DihedralPotential
 
 # Python base class for dihedral potentials
 class DihedralPotentialLocal(object):

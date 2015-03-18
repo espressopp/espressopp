@@ -21,19 +21,19 @@
 
 """
 ***************************************************
-**espresso.storage.DomainDecompositionNonBlocking**
+**espressopp.storage.DomainDecompositionNonBlocking**
 ***************************************************
 
 """
-from espresso import pmi
-from espresso.esutil import cxxinit
-from _espresso import storage_DomainDecomposition
-from _espresso import storage_DomainDecompositionNonBlocking
-from espresso import Int3D, toInt3DFromVector
+from espressopp import pmi
+from espressopp.esutil import cxxinit
+from _espressopp import storage_DomainDecomposition
+from _espressopp import storage_DomainDecompositionNonBlocking
+from espressopp import Int3D, toInt3DFromVector
 import mpi4py.MPI as MPI
 
-#from espresso.storage.Storage import *
-from espresso.storage.DomainDecomposition import *
+#from espressopp.storage.Storage import *
+from espressopp.storage.DomainDecomposition import *
 
 class DomainDecompositionNonBlockingLocal(DomainDecompositionLocal, storage_DomainDecompositionNonBlocking):
     'The (local) DomainDecompositionNonBlocking.'
@@ -44,7 +44,7 @@ class DomainDecompositionNonBlockingLocal(DomainDecompositionLocal, storage_Doma
 if pmi.isController:
     class DomainDecompositionNonBlocking(DomainDecomposition):
         pmiproxydefs = dict(
-          cls = 'espresso.storage.DomainDecompositionNonBlockingLocal'  
+          cls = 'espressopp.storage.DomainDecompositionNonBlockingLocal'  
         )
         def __init__(self, system, 
                      nodeGrid='auto', 

@@ -30,7 +30,7 @@
 #include "FixedPairList.hpp"
 #include "AllParticlePos.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     /** calculate mean squared intra-chain-distances

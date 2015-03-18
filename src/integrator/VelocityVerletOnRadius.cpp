@@ -28,7 +28,7 @@
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   using namespace iterator;
 
@@ -105,7 +105,7 @@ namespace espresso {
 
     void VelocityVerletOnRadius::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<VelocityVerletOnRadius, shared_ptr<VelocityVerletOnRadius>, bases<Extension> >
         ("integrator_VelocityVerletOnRadius", init< shared_ptr< System >, real >())

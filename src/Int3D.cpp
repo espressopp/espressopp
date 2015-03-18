@@ -24,7 +24,7 @@
 #include "Int3D.hpp"
 #include <boost/python/implicit.hpp>
 
-namespace espresso {
+namespace espressopp {
   struct int3D_pickle_suite : boost::python::pickle_suite {
     static
     python::tuple

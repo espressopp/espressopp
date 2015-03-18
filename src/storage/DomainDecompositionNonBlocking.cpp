@@ -38,7 +38,7 @@
 using namespace boost;
 using namespace std;
 
-namespace espresso { 
+namespace espressopp { 
   namespace storage {
 
 
@@ -409,7 +409,7 @@ namespace espresso {
   // REGISTRATION WITH PYTHON
   //////////////////////////////////////////////////
   void DomainDecompositionNonBlocking::registerPython() {
-    using namespace espresso::python;
+    using namespace espressopp::python;
     class_< DomainDecompositionNonBlocking, bases< DomainDecomposition >, boost::noncopyable >
     ("storage_DomainDecompositionNonBlocking", init< shared_ptr< System >, const Int3D&, const Int3D& >())
     ;

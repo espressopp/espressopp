@@ -30,14 +30,14 @@ The method needs the following parameters:
 
 * system, integrator
     ESPResSo system which schoul be warmed up and the correspondig integrator e.g.:
-    >>>system, integrator = espresso.standard_system.LennardJones(100,(10,10,10))
+    >>>system, integrator = espressopp.standard_system.LennardJones(100,(10,10,10))
 *number
     number of steps of the warm up
   =80
     for a system with a desnsity of 0.85, if it explodes try a higher number
 """
-import espresso
-from espresso import Real3D
+import espressopp
+from espressopp import Real3D
 
 def warmup(system, integrator, number=80):
 
@@ -50,7 +50,7 @@ def warmup(system, integrator, number=80):
   N = 50
 
   integrator.dt = 0.0001
-  force_capping = espresso.integrator.CapForce(system, 0.0)
+  force_capping = espressopp.integrator.CapForce(system, 0.0)
   integrator.addExtension(force_capping)
 
   for k in range(11,number):
@@ -58,7 +58,7 @@ def warmup(system, integrator, number=80):
     pot.sigma = final_sigma/number*k
     pot.epsilon = final_epsilon/number*k
     system.getInteraction(0).setPotential(0,0,pot)
-    espresso.tools.analyse.info(system, integrator)
+    espressopp.tools.analyse.info(system, integrator)
     integrator.run(N)
 
   integrator.dt = org_dt
@@ -68,7 +68,7 @@ def warmup(system, integrator, number=80):
   
   for k in range(11):
     integrator.run(70)
-    espresso.tools.analyse.info(system, integrator)
+    espressopp.tools.analyse.info(system, integrator)
 
   integrator.step = 0
 

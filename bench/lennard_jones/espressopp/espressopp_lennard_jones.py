@@ -34,15 +34,15 @@ openmpi_workaround()
 
 import sys
 import time
-import _espresso
-import espresso
+import _espressopp
+import espressopp
 import mpi4py.MPI as MPI
 import logging
-from espresso import Real3D, Int3D
-from espresso.tools.convert import lammps
-from espresso.tools import decomp
-from espresso.tools.init_cfg import lattice
-from espresso.tools import timers
+from espressopp import Real3D, Int3D
+from espressopp.tools.convert import lammps
+from espressopp.tools import decomp
+from espressopp.tools.init_cfg import lattice
+from espressopp.tools import timers
 
 # logging.getLogger("Storage").setLevel(logging.INFO)
 
@@ -58,18 +58,18 @@ timestep = 0.005
 ### IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE ###
 ######################################################################
 sys.stdout.write('Setting up simulation ...\n')
-x, y, z, Lx, Ly, Lz, vx, vy, vz = lammps.read('espressopp_lennard_jones.start')
+x, y, z, Lx, Ly, Lz, vx, vy, vz = lammps.read('espressopppp_lennard_jones.start')
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
-system = espresso.System()
-system.rng = espresso.esutil.RNG()
-system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
+system = espressopp.System()
+system.rng = espressopp.esutil.RNG()
+system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
-system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # add particles to the system and then decompose
 props = ['id', 'type', 'mass', 'pos', 'v']
@@ -81,12 +81,12 @@ system.storage.addParticles(new_particles, *props)
 system.storage.decompose()
 
 # all particles interact via a LJ interaction (use Verlet lists)
-vl = espresso.VerletList(system, cutoff=rc+system.skin)
-#potLJ = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=False)
-#interLJ = espresso.interaction.VerletListLennardJones(vl)
-potLJ = espresso.interaction.LennardJonesGromacs(epsilon=1.0, sigma=1.0, r1=2.0, cutoff=rc, shift=False)
-potLJX = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=False)
-interLJ = espresso.interaction.VerletListLennardJonesGromacs(vl)
+vl = espressopp.VerletList(system, cutoff=rc+system.skin)
+#potLJ = espressopp.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=False)
+#interLJ = espressopp.interaction.VerletListLennardJones(vl)
+potLJ = espressopp.interaction.LennardJonesGromacs(epsilon=1.0, sigma=1.0, r1=2.0, cutoff=rc, shift=False)
+potLJX = espressopp.interaction.LennardJones(epsilon=1.0, sigma=1.0, cutoff=rc, shift=False)
+interLJ = espressopp.interaction.VerletListLennardJonesGromacs(vl)
 interLJ.setPotential(type1=0, type2=0, potential=potLJ)
 system.addInteraction(interLJ)
 
@@ -95,11 +95,11 @@ for i in range(2,101):
   print r, potLJ.computeEnergy(r), potLJX.computeEnergy(r),  potLJX.computeForce(Real3D(r, 0, 0))
 
 # setup integrator
-integrator = espresso.integrator.VelocityVerlet(system)
+integrator = espressopp.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
 if(nvt):
-  langevin = espresso.integrator.LangevinThermostat(system)
+  langevin = espressopp.integrator.LangevinThermostat(system)
   langevin.gamma = 1.0
   langevin.temperature = 1.0
   integrator.addExtension(langevin)
@@ -117,9 +117,9 @@ print 'CellGrid = %s' % (cellGrid,)
 print ''
 
 # analysis
-temperature = espresso.analysis.Temperature(system)
-pressure = espresso.analysis.Pressure(system)
-pressureTensor = espresso.analysis.PressureTensor(system)
+temperature = espressopp.analysis.Temperature(system)
+pressure = espressopp.analysis.Pressure(system)
+pressureTensor = espressopp.analysis.PressureTensor(system)
 
 fmt = '%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f\n'
 

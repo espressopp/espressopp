@@ -31,12 +31,12 @@ in combination with the integrator extension ExtAnalyze.
 Standalone Usage:
 -----------------
 
->>> pt = espresso.analysis.PressureTensor(system)
+>>> pt = espressopp.analysis.PressureTensor(system)
 >>> print "pressure tensor of current configuration = ", pt.compute()
 
 or 
 
->>> pt = espresso.analysis.PressureTensor(system)
+>>> pt = espressopp.analysis.PressureTensor(system)
 >>> for k in range(100):
 >>>     integrator.run(100)
 >>>     pt.performMeasurement()
@@ -45,8 +45,8 @@ or
 Usage in integrator with ExtAnalyze:
 ------------------------------------
 
->>> pt           = espresso.analysis.PressureTensor(system)
->>> extension_pt = espresso.integrator.ExtAnalyze(pt , interval=100)
+>>> pt           = espressopp.analysis.PressureTensor(system)
+>>> extension_pt = espressopp.integrator.ExtAnalyze(pt , interval=100)
 >>> integrator.addExtension(extension_pt)
 >>> integrator.run(10000)
 >>> pt_ave = pt.getAverageValue()
@@ -70,11 +70,11 @@ The following methods are supported:
     does _not_ include measurements that have been done using "compute()"
 """
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.AnalysisBase import *
-from _espresso import analysis_PressureTensor
+from espressopp.analysis.AnalysisBase import *
+from _espressopp import analysis_PressureTensor
 
 class PressureTensorLocal(AnalysisBaseLocal, analysis_PressureTensor):
     'The (local) compute of pressure tensor.'
@@ -86,5 +86,5 @@ if pmi.isController:
     class PressureTensor(AnalysisBase):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.PressureTensorLocal',
+            cls =  'espressopp.analysis.PressureTensorLocal',
             )

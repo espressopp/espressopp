@@ -24,7 +24,7 @@
 #include "TersoffPairTerm.hpp"
 #include "Tabulated.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     typedef class VerletListInteractionTemplate <TersoffPairTerm>
@@ -41,7 +41,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void 
     TersoffPairTerm::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< TersoffPairTerm, bases< Potential > >
     	("interaction_TersoffPairTerm", init< real, real, real, real, real >())

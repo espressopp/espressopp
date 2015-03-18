@@ -31,7 +31,7 @@
 #include "boost/signals2.hpp"
 #include "Real3D.hpp"
 #include "Particle.hpp"
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     class VelocityVerletOnRadius : public Extension {

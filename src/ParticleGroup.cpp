@@ -25,7 +25,7 @@
 #include "ParticleGroup.hpp"
 #include "storage/Storage.hpp"
 
-namespace espresso {
+namespace espressopp {
 
     ParticleGroup::ParticleGroup(shared_ptr <storage::Storage> _storage)
     : storage(_storage) {
@@ -125,7 +125,7 @@ namespace espresso {
 
     void ParticleGroup::registerPython() {
 
-        using namespace espresso::python;
+        using namespace espressopp::python;
 
         class_< ParticleGroup, shared_ptr <ParticleGroup> >
                 ("ParticleGroup", init <shared_ptr <storage::Storage> >())

@@ -21,15 +21,15 @@
 
 """
 **************************************
-**espresso.analysis.LBOutputVzInTime**
+**espressopp.analysis.LBOutputVzInTime**
 **************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.LBOutput import *
-from _espresso import analysis_LBOutput_VzInTime
+from espressopp.analysis.LBOutput import *
+from _espressopp import analysis_LBOutput_VzInTime
 
 class LBOutputVzInTimeLocal(LBOutputLocal, analysis_LBOutput_VzInTime):
     'The (local) compute of LBOutputVzInTime.'
@@ -41,6 +41,6 @@ if pmi.isController :
     class LBOutputVzInTime(LBOutput):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.LBOutputVzInTimeLocal',
+            cls =  'espressopp.analysis.LBOutputVzInTimeLocal',
             pmicall = ["writeOutput"]
             )

@@ -35,7 +35,7 @@
 
 //using namespace std;
 
-namespace espresso {
+namespace espressopp {
 
   /*
   FixedQuadrupleList::FixedQuadrupleList(shared_ptr< storage::Storage > _storage)
@@ -284,7 +284,7 @@ namespace espresso {
 
   void FixedQuadrupleList::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (FixedQuadrupleList::*pyAdd)(longint pid1, longint pid2,
            longint pid3, longint pid4) = &FixedQuadrupleList::add;

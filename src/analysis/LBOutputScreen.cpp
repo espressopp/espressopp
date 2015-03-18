@@ -23,7 +23,7 @@
 #include "python.hpp"
 #include "LBOutputScreen.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 //    LOG4ESPP_LOGGER(LBOutputScreen::theLogger, "LBOutputScreen");
     LBOutputScreen::LBOutputScreen(shared_ptr<System> system,
@@ -67,7 +67,7 @@ namespace espresso {
     }
 
     void LBOutputScreen::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<LBOutputScreen, bases< LBOutput > >
           ("analysis_LBOutput_Screen", init< shared_ptr< System >,

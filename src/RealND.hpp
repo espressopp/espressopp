@@ -27,7 +27,7 @@
 #include "types.hpp"
 #include <sstream>
 
-namespace espresso {
+namespace espressopp {
 
   //////////////////////////////////////////////////
   // RealND

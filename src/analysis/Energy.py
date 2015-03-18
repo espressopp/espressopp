@@ -21,11 +21,11 @@
 
 """
 ****************************
-**espresso.analysis.Energy**
+**espressopp.analysis.Energy**
 ****************************
 
 """
-import espresso
+import espressopp
 
 class EnergyPot():
     'Potential energy of the system.'
@@ -38,7 +38,7 @@ class EnergyPot():
         for k in range(self.system.getNumberOfInteractions()):
           EPot += self.system.getInteraction(k).computeEnergy()
         if self.per_atom:
-          NPart  = espresso.analysis.NPart(self.system).compute()
+          NPart  = espressopp.analysis.NPart(self.system).compute()
           return EPot / NPart
         else:
           return EPot
@@ -50,8 +50,8 @@ class EnergyKin():
         self.per_atom = per_atom
         
     def compute(self):
-      NPart  = espresso.analysis.NPart(self.system).compute()
-      T      = espresso.analysis.Temperature(self.system).compute()
+      NPart  = espressopp.analysis.NPart(self.system).compute()
+      T      = espressopp.analysis.Temperature(self.system).compute()
       EKin   = (3.0/2.0) * NPart * T
       if self.per_atom:
           return EKin / NPart
@@ -65,8 +65,8 @@ class EnergyTot():
         self.per_atom = per_atom
         
     def compute(self):
-      NPart  = espresso.analysis.NPart(self.system).compute()
-      T      = espresso.analysis.Temperature(self.system).compute()
+      NPart  = espressopp.analysis.NPart(self.system).compute()
+      T      = espressopp.analysis.Temperature(self.system).compute()
       EKin   = (3.0/2.0) * NPart * T
       EPot   = 0.0
       for k in range(self.system.getNumberOfInteractions()):

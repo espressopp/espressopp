@@ -21,16 +21,16 @@
 
 """
 ********************************************
-**espresso.interaction.DihedralHarmonicCos**
+**espressopp.interaction.DihedralHarmonicCos**
 ********************************************
 
 """
-from espresso import pmi
-from espresso.esutil import *
+from espressopp import pmi
+from espressopp.esutil import *
 
-from espresso.interaction.DihedralPotential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_DihedralHarmonicCos, interaction_FixedQuadrupleListDihedralHarmonicCos
+from espressopp.interaction.DihedralPotential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_DihedralHarmonicCos, interaction_FixedQuadrupleListDihedralHarmonicCos
 
 class DihedralHarmonicCosLocal(DihedralPotentialLocal, interaction_DihedralHarmonicCos):
   'The (local) DihedralHarmonicCos potential.'
@@ -58,13 +58,13 @@ if pmi.isController:
   class DihedralHarmonicCos(DihedralPotential):
     'The DihedralHarmonicCos potential.'
     pmiproxydefs = dict(
-      cls = 'espresso.interaction.DihedralHarmonicCosLocal',
+      cls = 'espressopp.interaction.DihedralHarmonicCosLocal',
       pmiproperty = ['K', 'phi']
     )
 
   class FixedQuadrupleListDihedralHarmonicCos(Interaction):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls =  'espresso.interaction.FixedQuadrupleListDihedralHarmonicCosLocal',
+      cls =  'espressopp.interaction.FixedQuadrupleListDihedralHarmonicCosLocal',
       pmicall = ['setPotential', 'getFixedQuadrupleList']
     )

@@ -20,8 +20,8 @@
 
 
 import unittest
-from espresso import pmi
-from espresso.esutil import collectives
+from espressopp import pmi
+from espressopp.esutil import collectives
 import mpi4py.MPI as MPI
 
 class TestCollectives(unittest.TestCase):

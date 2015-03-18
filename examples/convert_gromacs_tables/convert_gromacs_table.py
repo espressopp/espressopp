@@ -12,13 +12,13 @@
 import sys
 import time
 import os
-import espresso
+import espressopp
 import mpi4py.MPI as MPI
 import math
 import logging
 import os
-from espresso import Real3D, Int3D
-from espresso.tools.convert import gromacs
+from espressopp import Real3D, Int3D
+from espressopp.tools.convert import gromacs
 
 
 # Input values for system
@@ -68,13 +68,13 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
      
     outfile.close()
 
-# write the espresso++ tabulated file for a LJ potential
+# write the espressopp++ tabulated file for a LJ potential
 print 'Generating potential file ... (%2s)' % tabfile
-potLJ = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift=0.0, cutoff=cutoff)
+potLJ = espressopp.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift=0.0, cutoff=cutoff)
 writeTabFile(potLJ, tabfile, N=1500, low=0.01, high=potLJ.cutoff)
 
 
-# convert gromacs tabulated file to espresso++ format
+# convert gromacs tabulated file to espressopp++ format
 print 'Converting GROMACS file to ESPResSo++ file ... (%2s -> %2s)' % (filein, fileout)
 gromacs.convertTable(filein, fileout, sigma, epsilon, c6, c12)
 
@@ -95,9 +95,9 @@ for potfile in files:
     print '\nUsing file: %0s'% potfile
         
     # set up system
-    system = espresso.System()
-    system.rng  = espresso.esutil.RNG()
-    system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
+    system = espressopp.System()
+    system.rng  = espressopp.esutil.RNG()
+    system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
     system.skin = skin
         
     comm = MPI.COMM_WORLD
@@ -108,7 +108,7 @@ for potfile in files:
         calcNumberCells(size[1], nodeGrid[1], cutoff),
         calcNumberCells(size[2], nodeGrid[2], cutoff)
         )
-    system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+    system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
         
     pid = 0
         
@@ -134,23 +134,23 @@ for potfile in files:
     system.storage.decompose()
         
     # integrator
-    integrator = espresso.integrator.VelocityVerlet(system)
+    integrator = espressopp.integrator.VelocityVerlet(system)
     integrator.dt = 0.005
         
     # now build Verlet List
     # ATTENTION: you must not add the skin explicitly here
     logging.getLogger("Interpolation").setLevel(logging.INFO)
-    vl = espresso.VerletList(system, cutoff = cutoff + system.skin)
+    vl = espressopp.VerletList(system, cutoff = cutoff + system.skin)
         
-    potTab = espresso.interaction.Tabulated(itype=spline, filename=potfile, cutoff=cutoff)
+    potTab = espressopp.interaction.Tabulated(itype=spline, filename=potfile, cutoff=cutoff)
     # ATTENTION: auto shift was enabled
-    interTab = espresso.interaction.VerletListTabulated(vl)
+    interTab = espressopp.interaction.VerletListTabulated(vl)
     interTab.setPotential(type1=0, type2=0, potential=potTab)
     system.addInteraction(interTab)
         
         
-    temp = espresso.analysis.Temperature(system)
-    press = espresso.analysis.Pressure(system)
+    temp = espressopp.analysis.Temperature(system)
+    press = espressopp.analysis.Pressure(system)
         
     temperature = temp.compute()
     p = press.compute()
@@ -162,7 +162,7 @@ for potfile in files:
         % ("", Ek + Ep, Ep, Ek, temperature, p)
         
     # langevin thermostat
-    langevin = espresso.integrator.LangevinThermostat(system)
+    langevin = espressopp.integrator.LangevinThermostat(system)
     integrator.addExtension(langevin)
     langevin.gamma = 1.0
     langevin.temperature = 1.0

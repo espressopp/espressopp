@@ -11,7 +11,7 @@ The density is saved in the file 'lj_93wall_density.txt'
 
 """
 
-import espresso
+import espressopp
 import mpi4py.MPI as MPI
 import argparse
 import numpy as np
@@ -27,8 +27,8 @@ parser.add_argument('--density', type=float, help='Number density.', default=0.8
 args = parser.parse_args()
 
 def get_velocity(system, n):
-    """Obtain total velocity of a espresso system."""
-    total_v = espresso.Real3D(0.)
+    """Obtain total velocity of a espressopp system."""
+    total_v = espressopp.Real3D(0.)
     total_m = 0.
     for i in range(n):
         p = system.storage.getParticle(i)
@@ -37,7 +37,7 @@ def get_velocity(system, n):
     return total_v/total_m
 
 def reset_velocity(system, n):
-    """Reset the total velocity of a espresso system."""
+    """Reset the total velocity of a espressopp system."""
     excess_v = get_velocity(system, n)
     for i in range(n):
         v = system.storage.getParticle(i).v
@@ -61,14 +61,14 @@ wall_r0  = 2.
 L = pow(args.num/args.density, 1./3.)
 box = (L+2*wall_r0, L, L)
 
-# Initialize the espresso system
-system         = espresso.System()
-system.rng     = espresso.esutil.RNG()
-system.bc      = espresso.bc.SlabBC(system.rng, box)
+# Initialize the espressopp system
+system         = espressopp.System()
+system.rng     = espressopp.esutil.RNG()
+system.bc      = espressopp.bc.SlabBC(system.rng, box)
 system.skin    = skin
-nodeGrid       = espresso.tools.decomp.nodeGrid(MPI.COMM_WORLD.size)
-cellGrid       = espresso.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
-system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+nodeGrid       = espressopp.tools.decomp.nodeGrid(MPI.COMM_WORLD.size)
+cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
+system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # Initialize particles
 particles_list = []
@@ -80,14 +80,14 @@ for i in range(args.num):
 system.storage.addParticles(particles_list, 'id', 'pos')
 
 # Define capped LJ potential
-verletList = espresso.VerletList(system, cutoff=rc)
-LJCapped    = espresso.interaction.VerletListLennardJonesCapped(verletList)
-LJCapped.setPotential(type1=0, type2=0, potential=espresso.interaction.LennardJonesCapped(epsilon=epsilon, sigma=sigma, cutoff=rc, caprad=caprad_LJ))
+verletList = espressopp.VerletList(system, cutoff=rc)
+LJCapped    = espressopp.interaction.VerletListLennardJonesCapped(verletList)
+LJCapped.setPotential(type1=0, type2=0, potential=espressopp.interaction.LennardJonesCapped(epsilon=epsilon, sigma=sigma, cutoff=rc, caprad=caprad_LJ))
 system.addInteraction(LJCapped)
 
 # Define integrator and StochasticVelocityRescaling thermostat
-integrator     = espresso.integrator.VelocityVerlet(system)
-thermostat = espresso.integrator.StochasticVelocityRescaling(system)
+integrator     = espressopp.integrator.VelocityVerlet(system)
+thermostat = espressopp.integrator.StochasticVelocityRescaling(system)
 thermostat.temperature = 1.0
 integrator.addExtension(thermostat)
 
@@ -95,20 +95,20 @@ system.storage.decompose()
 
 integrator.dt = args.dt
 
-LJ93 = espresso.interaction.LennardJones93Wall()
+LJ93 = espressopp.interaction.LennardJones93Wall()
 LJ93.setParams(0, 6., 1., wall_cutoff, wall_r0)
-SPLJ93 = espresso.interaction.SingleParticleLennardJones93Wall(system, LJ93)
+SPLJ93 = espressopp.interaction.SingleParticleLennardJones93Wall(system, LJ93)
 system.addInteraction(SPLJ93)
 
-espresso.tools.analyse.info(system, integrator, per_atom=True)
+espressopp.tools.analyse.info(system, integrator, per_atom=True)
 
 # initial value of epsilon for capped warmup
 epsilon_start = 0.1
 # Run system with capped potentials, thermostat and increasing LJ epsilon
 for k in range(args.warmup_loops):
-    LJCapped.setPotential(0,0,espresso.interaction.LennardJonesCapped(epsilon_start + (epsilon-epsilon_start)*k*1.0/(args.warmup_loops-1), sigma, rc, caprad=caprad_LJ))
+    LJCapped.setPotential(0,0,espressopp.interaction.LennardJonesCapped(epsilon_start + (epsilon-epsilon_start)*k*1.0/(args.warmup_loops-1), sigma, rc, caprad=caprad_LJ))
     integrator.run(args.warmup_steps)
-    espresso.tools.analyse.info(system, integrator, per_atom=True)
+    espressopp.tools.analyse.info(system, integrator, per_atom=True)
 
 # Remove LJ93 interaction (to preserve later the ordering of energies)
 system.removeInteraction(1)
@@ -116,8 +116,8 @@ system.removeInteraction(1)
 system.removeInteraction(0)
 
 # Add non-capped LJ potential
-LJ = espresso.interaction.VerletListLennardJones(verletList)
-LJ.setPotential(0, 0, espresso.interaction.LennardJones(epsilon, sigma, rc))
+LJ = espressopp.interaction.VerletListLennardJones(verletList)
+LJ.setPotential(0, 0, espressopp.interaction.LennardJones(epsilon, sigma, rc))
 system.addInteraction(LJ)
 
 # Re-introduce LJ93
@@ -126,19 +126,19 @@ system.addInteraction(SPLJ93)
 # Run system with non-capped potentials, thermostat and fixed LJ epsilon
 for k in range(args.warmup_loops):
     integrator.run(args.warmup_steps)
-    espresso.tools.analyse.info(system, integrator, per_atom=True)
+    espressopp.tools.analyse.info(system, integrator, per_atom=True)
 
 # Disconnect the thermostat
 thermostat.disconnect()
 # Reset the total velocity of the system
 reset_velocity(system, args.num)
 
-xd = espresso.analysis.XDensity(system)
+xd = espressopp.analysis.XDensity(system)
 xd_data = []
 # Run system with non-capped potentials, no thermostat, fixed LJ epsilon
 for k in range(args.loops):
     integrator.run(args.steps)
-    espresso.tools.analyse.info(system, integrator, per_atom=True)
+    espressopp.tools.analyse.info(system, integrator, per_atom=True)
     xd_data.append(xd.compute(100))
 
 xd_data = np.array(xd_data)

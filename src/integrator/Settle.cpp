@@ -31,7 +31,7 @@
 #include "bc/BC.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   using namespace iterator;
   namespace integrator {
 
@@ -379,7 +379,7 @@ namespace espresso {
 
     void Settle::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       void (Settle::*pyAdd)(longint pid) = &Settle::add;
 

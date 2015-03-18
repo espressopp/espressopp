@@ -21,15 +21,15 @@
 
 """
 ******************************************
-**espresso.integrator.LangevinThermostat**
+**espressopp.integrator.LangevinThermostat**
 ******************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.Extension import *
-from _espresso import integrator_LangevinThermostat 
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_LangevinThermostat 
 
 class LangevinThermostatLocal(ExtensionLocal, integrator_LangevinThermostat):
     'The (local) Velocity Verlet Integrator.'
@@ -45,6 +45,6 @@ if pmi.isController :
     class LangevinThermostat(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.LangevinThermostatLocal',
+            cls =  'espressopp.integrator.LangevinThermostatLocal',
             pmiproperty = [ 'gamma', 'temperature', 'adress' ]
             )

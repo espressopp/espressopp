@@ -29,7 +29,7 @@
 
 #include "python.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     /** Class to compute the radial distribution function of the system. */
     class RadialDistrF : public Observable {

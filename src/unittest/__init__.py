@@ -21,7 +21,7 @@
 
 import unittest
 from unittest import *
-from espresso import Real3D, toReal3D
+from espressopp import Real3D, toReal3D
 
 class TestCase(unittest.TestCase):
     def failUnlessAlmostEqualReal3D(self, first, second, places=7, msg=None):

@@ -27,7 +27,7 @@
 #include "bc/BC.hpp"
 #include "logging.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     LOG4ESPP_LOGGER(SingleParticlePotential::theLogger, "SingleParticlePotential");
@@ -36,7 +36,7 @@ namespace espresso {
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void SingleParticlePotential::registerPython() {
-        using namespace espresso::python;
+        using namespace espressopp::python;
 
         real (SingleParticlePotential::*computeEnergy)(const Particle& p, const bc::BC& bc) const =
           &SingleParticlePotential::computeEnergy;

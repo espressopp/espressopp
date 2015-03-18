@@ -4,14 +4,14 @@
 # relevant imports
 import sys
 import time
-import espresso
+import espressopp
 import mpi4py.MPI as MPI
 
 import Tetracryst # Preparation of tetrahedral crystal and constuctions of bonds in tetrahedral liquid
 
-from espresso import Real3D, Int3D
-from espresso.tools import decomp
-from espresso.tools import timers
+from espressopp import Real3D, Int3D
+from espressopp.tools import decomp
+from espressopp.tools import timers
 
 # timestep, cutoff, skin, AdResS specifications
 timestep = 0.0005
@@ -31,7 +31,7 @@ ex_size = 500.0  # By choosing some random but large value here we make sure, th
 hy_size = 10.0
 
 # prepare tetrahedral liquid in crystal 
-pid, type, x, y, z, vx, vy, vz, Lx, Ly, Lz = espresso.tools.readxyz("equilibrated_confKTI.xyz")
+pid, type, x, y, z, vx, vy, vz, Lx, Ly, Lz = espressopp.tools.readxyz("equilibrated_confKTI.xyz")
 
 # Table for coarse-grained potential
 tabCG = "table_potential.dat"
@@ -47,9 +47,9 @@ sys.stdout.write('Setting up simulation ...\n')
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 
-system = espresso.System()
-system.rng = espresso.esutil.RNG()
-system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
+system = espressopp.System()
+system.rng = espressopp.esutil.RNG()
+system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 
 comm = MPI.COMM_WORLD
@@ -57,7 +57,7 @@ nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
 
 # (H-)AdResS domain decomposition
-system.storage = espresso.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
+system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
 
 # prepare AT particles
 allParticlesAT = []
@@ -73,7 +73,7 @@ for pidAT in range(num_particles):
 # create CG particles
 for pidCG in range(num_particlesCG):
     # we put CG molecule in first atom, later CG molecules will be positioned in the center
-    cmp = espresso.tools.AdressSetCG(4, pidCG, allParticlesAT)
+    cmp = espressopp.tools.AdressSetCG(4, pidCG, allParticlesAT)
     # Preparation of tuples (tuples define, which atoms belong to which CG molecules)
     tmptuple = [pidCG+num_particles]
     for pidAT2 in range(4):
@@ -104,12 +104,12 @@ for pidCG in range(num_particlesCG):
 system.storage.addParticles(allParticles, "id", "pos", "v", "f", "type", "mass", "adrat")
 
 # add tuples to system
-ftpl = espresso.FixedTupleListAdress(system.storage)
+ftpl = espressopp.FixedTupleListAdress(system.storage)
 ftpl.addTuples(tuples)
 system.storage.setFixedTuplesAdress(ftpl)
 
 # add bonds between AT particles
-fpl = espresso.FixedPairListAdress(system.storage, ftpl)
+fpl = espressopp.FixedPairListAdress(system.storage, ftpl)
 bonds = Tetracryst.makebonds(len(x))
 fpl.addBonds(bonds)
 
@@ -119,42 +119,42 @@ system.storage.decompose()
 print "done decomposing"
 
 # AdResS Verlet list
-vl = espresso.VerletListAdress(system, cutoff=rc, adrcut=rc,
+vl = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc,
                                 dEx=ex_size, dHy=hy_size,
                                 adrCenter=[Lx/2, Ly/2, Lz/2])
 
 # non-bonded potentials
 # LJ Capped WCA between AT and tabulated potential between CG particles
-interNB = espresso.interaction.VerletListHadressLennardJones(vl, ftpl)  # Switch on KTI here!
-potWCA  = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift='auto', cutoff=rca)
-potCG = espresso.interaction.Tabulated(itype=3, filename=tabCG, cutoff=rc) # CG
+interNB = espressopp.interaction.VerletListHadressLennardJones(vl, ftpl)  # Switch on KTI here!
+potWCA  = espressopp.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift='auto', cutoff=rca)
+potCG = espressopp.interaction.Tabulated(itype=3, filename=tabCG, cutoff=rc) # CG
 interNB.setPotentialAT(type1=1, type2=1, potential=potWCA) # AT
 interNB.setPotentialCG(type1=0, type2=0, potential=potCG) # CG
 system.addInteraction(interNB)
 
 # bonded potentials
 # Quartic potential between AT particles
-potQuartic = espresso.interaction.Quartic(K=75.0, r0=1.0)
-interQuartic = espresso.interaction.FixedPairListQuartic(system, fpl, potQuartic)
+potQuartic = espressopp.interaction.Quartic(K=75.0, r0=1.0)
+interQuartic = espressopp.interaction.FixedPairListQuartic(system, fpl, potQuartic)
 system.addInteraction(interQuartic)
 
 # VelocityVerlet integrator
-integrator = espresso.integrator.VelocityVerlet(system)
+integrator = espressopp.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
 # add AdResS extension
-adress = espresso.integrator.Adress(system, vl, ftpl, KTI = True)
+adress = espressopp.integrator.Adress(system, vl, ftpl, KTI = True)
 integrator.addExtension(adress)
 
 # add Langevin thermostat extension
-langevin = espresso.integrator.LangevinThermostat(system)
+langevin = espressopp.integrator.LangevinThermostat(system)
 langevin.gamma = gamma
 langevin.temperature = temp
 langevin.adress = True # enable AdResS!
 integrator.addExtension(langevin)
 
 # distribute atoms and CGmolecules according to AdResS domain decomposition 
-espresso.tools.AdressDecomp(system, integrator)
+espressopp.tools.AdressDecomp(system, integrator)
 
 # system information
 print ''
@@ -169,8 +169,8 @@ print 'CellGrid = %s' % (cellGrid,)
 print ''
 
 # analysis
-temperature = espresso.analysis.Temperature(system)
-pressure = espresso.analysis.Pressure(system)
+temperature = espressopp.analysis.Temperature(system)
+pressure = espressopp.analysis.Pressure(system)
 
 # Timer, Steps
 start_time = time.clock()

@@ -23,11 +23,11 @@
 #include "python.hpp"
 #include "ParticleRadiusDistribution.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     void ParticleRadiusDistribution::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<ParticleRadiusDistribution, bases< AnalysisBase > >
         ("analysis_ParticleRadiusDistribution", init< shared_ptr< System > >())
       ;

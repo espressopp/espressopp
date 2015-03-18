@@ -34,7 +34,7 @@
 #include "storage/DomainDecomposition.hpp"
 #include "storage/CellGrid.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     /** Class to get the number of particles in the system. */
     class NeighborFluctuation : public Observable {

@@ -21,7 +21,7 @@
 
 """
 ***********************************
-**espresso.integrator.OnTheFlyFEC**
+**espressopp.integrator.OnTheFlyFEC**
 ***********************************
 
 """
@@ -30,11 +30,11 @@
 # It is supposed to be the iterative on-the-fly FEC scheme proposed by 
 # Espanol et. al.
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.Extension import *
-from _espresso import integrator_OnTheFlyFEC 
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_OnTheFlyFEC 
 
 class OnTheFlyFECLocal(ExtensionLocal, integrator_OnTheFlyFEC):
     'The (local) Velocity Verlet Integrator.'
@@ -74,7 +74,7 @@ if pmi.isController :
     class OnTheFlyFEC(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.OnTheFlyFECLocal',
+            cls =  'espressopp.integrator.OnTheFlyFECLocal',
             pmiproperty = [ 'gap', 'steps', 'bins'],
             pmicall = ['writeFEC', 'makeArrays', 'resetCounter', 'getBins', 'getSteps', 'getGap']
             )

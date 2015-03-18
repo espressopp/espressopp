@@ -36,7 +36,7 @@ where :math:`\Delta t` - integration timestep, :math:`\\tau_{T}` - time paramete
 
 Example:
 
-    >>> berendsenT = espresso.integrator.BerendsenThermostat(system)
+    >>> berendsenT = espressopp.integrator.BerendsenThermostat(system)
     >>> berendsenT.tau = 1.0
     >>> berendsenT.temperature = 1.0
     >>> integrator.addExtension(berendsenT)
@@ -46,11 +46,11 @@ Definition:
 
     In order to define the Berendsen thermostat
     
-    >>> berendsenT = espresso.integrator.BerendsenThermostat(system)
+    >>> berendsenT = espressopp.integrator.BerendsenThermostat(system)
     
     one should have the System_ defined.
 
-.. _System: espresso.System.html
+.. _System: espressopp.System.html
 
 Properties:
 
@@ -70,7 +70,7 @@ Setting the integration property:
     
 One more example:
 
-    >>> berendsen_thermostat = espresso.integrator.BerendsenThermostat(system)
+    >>> berendsen_thermostat = espressopp.integrator.BerendsenThermostat(system)
     >>> berendsen_thermostat.tau = 0.1
     >>> berendsen_thermostat.temperature = 3.2
     >>> integrator.addExtension(berendsen_thermostat)
@@ -79,7 +79,7 @@ One more example:
 Canceling the thermostat:
     
     >>> # define thermostat with parameters
-    >>> berendsen = espresso.integrator.BerendsenThermostat(system)
+    >>> berendsen = espressopp.integrator.BerendsenThermostat(system)
     >>> berendsen.tau = 2.0
     >>> berendsen.temperature = 5.0
     >>> integrator.addExtension(berendsen)
@@ -97,11 +97,11 @@ Canceling the thermostat:
 """
 
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.Extension import *
-from _espresso import integrator_BerendsenThermostat
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_BerendsenThermostat
 
 class BerendsenThermostatLocal(ExtensionLocal, integrator_BerendsenThermostat):
   def __init__(self, system):
@@ -114,6 +114,6 @@ if pmi.isController:
   class BerendsenThermostat(Extension):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls =  'espresso.integrator.BerendsenThermostatLocal',
+      cls =  'espressopp.integrator.BerendsenThermostatLocal',
       pmiproperty = [ 'tau', 'temperature' ]
     )

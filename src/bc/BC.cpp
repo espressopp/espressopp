@@ -28,7 +28,7 @@
 #include "Int3D.hpp"
 #include "esutil/RNG.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace bc {
 
     LOG4ESPP_LOGGER(BC::logger, "BC");
@@ -97,7 +97,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void
     BC::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
     
       // also register the abstract class BC to make virtual functions available
       // be careful: boost::noncopyable must be used for abstract classes with pure routines

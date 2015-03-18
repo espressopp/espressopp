@@ -31,7 +31,7 @@
 #include "boost/signals2.hpp"
 #include "boost/unordered_set.hpp"
 
-namespace espresso {
+namespace espressopp {
 
 /** Class that builds and stores verlet lists.
 

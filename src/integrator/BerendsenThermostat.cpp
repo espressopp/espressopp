@@ -28,7 +28,7 @@
 #include "esutil/Error.hpp"
 #include "BerendsenThermostat.hpp"
 
-namespace espresso {
+namespace espressopp {
   
   using namespace analysis;
   using namespace iterator;
@@ -126,7 +126,7 @@ namespace espresso {
 
     void BerendsenThermostat::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<BerendsenThermostat, shared_ptr<BerendsenThermostat>, bases<Extension> >
 

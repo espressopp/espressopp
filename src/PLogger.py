@@ -26,7 +26,7 @@
 This module defines the parallel logger PLogger.
 It can be used to switch on logging on all CPUs.
 
-   espresso.PLogger.set(LoggerName, LoggerLevel)
+   espressopp.PLogger.set(LoggerName, LoggerLevel)
    
 LoggerName  : the name of the logger, if LoggerName='' than all loggers are set
 LoggerLevel : possible values are 'FATAL', 'ERROR', 'WARN', 'INFO', 'TRACE', 'DEBUG'
@@ -35,16 +35,16 @@ LoggerLevel : possible values are 'FATAL', 'ERROR', 'WARN', 'INFO', 'TRACE', 'DE
 
 Example:
 
->>> espresso.PLogger.set('LennardJonesGeneric', 'INFO')
->>> pot = espresso.interaction.LennardJonesGeneric(1.0, 1.0, 12, 6, 1.12246)
+>>> espressopp.PLogger.set('LennardJonesGeneric', 'INFO')
+>>> pot = espressopp.interaction.LennardJonesGeneric(1.0, 1.0, 12, 6, 1.12246)
 >>> print pot.computeEnergy(1.0)
->>> espresso.PLogger.set('LennardJonesGeneric', 'ERROR')
+>>> espressopp.PLogger.set('LennardJonesGeneric', 'ERROR')
 
 """
 
-import espresso
+import espressopp
 
 def set(thelogger,level):
-  hw = espresso.pmi.create('logging.getLogger',thelogger)
-  espresso.pmi.call(hw,'setLevel',level)
+  hw = espressopp.pmi.create('logging.getLogger',thelogger)
+  espressopp.pmi.call(hw,'setLevel',level)
 

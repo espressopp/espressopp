@@ -48,12 +48,12 @@
 	
 	Example
 	
-	>>> lb = espresso.integrator.LiquidGasLB(system, Ni=Int3D(20, 20, 20))
+	>>> lb = espressopp.integrator.LiquidGasLB(system, Ni=Int3D(20, 20, 20))
 	>>> # creates a cubic box of 20^3 nodes with default spacing parameters in D3Q19 model.
 	
 	Example
 	
-	>>> lb = espresso.integrator.LiquidGasLB(system, Ni=Int3D(30, 20, 20), a = 0.5, tau = 0.5)
+	>>> lb = espressopp.integrator.LiquidGasLB(system, Ni=Int3D(30, 20, 20), a = 0.5, tau = 0.5)
 	>>> # creates a box of 30*20*20 nodes with lattice spacing of 0.5 and timestep of 0.5.
 	>>> # The model of the lattice is D3Q19.
 	
@@ -72,26 +72,26 @@
 	
 	Example
 	
-	>>> lb = espresso.integrator.LiquidGasLB(system, Ni=Int3D(20, 20, 20))
+	>>> lb = espressopp.integrator.LiquidGasLB(system, Ni=Int3D(20, 20, 20))
 	>>> lb.lbTemp = 0.0000005
 	>>> # creates a box of 20^3 nodes with lattice spacing of 1. and timestep of 1. D3Q19 model.
 	>>> # then the fluctuations with the temperature of 0.0000005 are initialized.
 	
 	Example
 	
-	>>> lb = espresso.integrator.LiquidGasLB(system, Ni=Int3D(20, 20, 20))
+	>>> lb = espressopp.integrator.LiquidGasLB(system, Ni=Int3D(20, 20, 20))
 	>>> lb.gamma_b = 0.5
 	>>> lb.gamma_s = 0.5
 	>>> # creates a box of 20^3 nodes with lattice spacing of 1. and timestep of 1. D3Q19 model.
 	>>> # then the bulk and shear gammas are set to 0.5
 	
 	"""
-from espresso.esutil import cxxinit
-from espresso import pmi
-from espresso import Real3D
-from espresso import Int3D
-from espresso.integrator.Extension import *
-from _espresso import integrator_LiquidGasLB
+from espressopp.esutil import cxxinit
+from espressopp import pmi
+from espressopp import Real3D
+from espressopp import Int3D
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_LiquidGasLB
 
 class LiquidGasLBLocal(ExtensionLocal, integrator_LiquidGasLB):
 	def __init__(self, system, Ni , a = 1., tau = 1., numDims = 3, numVels = 19):
@@ -102,7 +102,7 @@ if pmi.isController :
 	class LiquidGasLB(Extension):
 		__metaclass__ = pmi.Proxy
 		pmiproxydefs = dict(
-												cls =  'espresso.integrator.LiquidGasLBLocal',
+												cls =  'espressopp.integrator.LiquidGasLBLocal',
 												pmiproperty = [ 'Ni', 'a', 'tau', 'numDims', 'numVels',
 																			 'gamma_b', 'gamma_s', 'gamma_odd', 'gamma_even', 'lbTemp']
 												)

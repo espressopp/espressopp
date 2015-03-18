@@ -29,7 +29,7 @@
 #include "CellListAllPairsInteractionTemplate.hpp"
 //#include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
     namespace interaction {
 
         typedef class VerletListInteractionTemplate<ReactionFieldGeneralized>
@@ -51,7 +51,7 @@ namespace espresso {
         // REGISTRATION WITH PYTHON
         //////////////////////////////////////////////////
         void ReactionFieldGeneralized::registerPython() {
-            using namespace espresso::python;
+            using namespace espressopp::python;
 
             class_<ReactionFieldGeneralized, bases<Potential> >
                 ("interaction_ReactionFieldGeneralized", init< real, real, real, real, real>())

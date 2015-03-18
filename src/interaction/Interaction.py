@@ -21,12 +21,12 @@
 
 """
 ************************************
-**espresso.interaction.Interaction**
+**espressopp.interaction.Interaction**
 ************************************
 
 """
-from espresso import pmi
-from _espresso import interaction_Interaction
+from espressopp import pmi
+from _espressopp import interaction_Interaction
 
 
 unused, Nonbonded, Single, Pair, Angular, Dihedral = range(6)

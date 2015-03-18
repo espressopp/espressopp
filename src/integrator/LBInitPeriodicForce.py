@@ -27,11 +27,11 @@
 This class sets and adds an external periodic forces to a liquid
   
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.LBInit import *
-from _espresso import integrator_LBInit_PeriodicForce
+from espressopp.integrator.LBInit import *
+from _espressopp import integrator_LBInit_PeriodicForce
 
 class LBInitPeriodicForceLocal(LBInitLocal, integrator_LBInit_PeriodicForce):
     """The (local) compute of LBInitPeriodicForce."""
@@ -43,7 +43,7 @@ if pmi.isController :
     class LBInitPeriodicForce(LBInit):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.LBInitPeriodicForceLocal',
+            cls =  'espressopp.integrator.LBInitPeriodicForceLocal',
             pmicall = [
                        "setForce", 
                        "addForce"]

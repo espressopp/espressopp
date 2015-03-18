@@ -30,9 +30,9 @@
 #include "bc/BC.hpp"
 #include "iterator/CellListAllPairsIterator.hpp"
 
-namespace espresso {
+namespace espressopp {
 
-  using namespace espresso::iterator;
+  using namespace espressopp::iterator;
 
   LOG4ESPP_LOGGER(VerletList::theLogger, "VerletList");
 
@@ -177,7 +177,7 @@ namespace espresso {
   ****************************************************/
   
   void VerletList::registerPython() {
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (VerletList::*pyExclude)(longint pid1, longint pid2)
           = &VerletList::exclude;

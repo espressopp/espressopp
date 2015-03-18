@@ -21,7 +21,7 @@
 
 """
 *****************************************************
-**espresso.integrator.GeneralizedLangevinThermostat**
+**espressopp.integrator.GeneralizedLangevinThermostat**
 *****************************************************
 
 """
@@ -29,11 +29,11 @@
 # NOTE: This Generalized Langevin Thermostat uses the extended variable scheme
 # and only applies the memory-based friction term, no noise is applied.
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.Extension import *
-from _espresso import integrator_GeneralizedLangevinThermostat 
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_GeneralizedLangevinThermostat 
 
 class GeneralizedLangevinThermostatLocal(ExtensionLocal, integrator_GeneralizedLangevinThermostat):
     'The (local) Velocity Verlet Integrator.'
@@ -57,7 +57,7 @@ if pmi.isController :
     class GeneralizedLangevinThermostat(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.GeneralizedLangevinThermostatLocal',
+            cls =  'espressopp.integrator.GeneralizedLangevinThermostatLocal',
             pmiproperty = [ 'itype', 'filename'],
             pmicall = ['addCoeffs' ]
             )

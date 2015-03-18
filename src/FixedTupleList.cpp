@@ -34,7 +34,7 @@
 #include "esutil/Error.hpp"
 
 
-namespace espresso {
+namespace espressopp {
 
   LOG4ESPP_LOGGER(FixedTupleList::theLogger, "FixedTupleList");
 
@@ -230,7 +230,7 @@ namespace espresso {
 
   void FixedTupleList::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     //bool (FixedTupleList::*pyAdd)(tuple pids)
      // = &FixedTupleList::addTuple;

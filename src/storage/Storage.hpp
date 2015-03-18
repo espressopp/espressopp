@@ -36,7 +36,7 @@
 #include "Buffer.hpp"
 #include "types.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   namespace storage {
     /** represents the particle storage of one system. */

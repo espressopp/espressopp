@@ -25,7 +25,7 @@
 #include "Tabulated.hpp"
 #include "VerletListVSphereInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     typedef class VerletListVSphereInteractionTemplate <VSpherePair>
@@ -36,7 +36,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void 
     VSpherePair::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< VSpherePair, bases< Potential > >
     	("interaction_VSpherePair", init< real, real >())

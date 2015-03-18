@@ -1,9 +1,9 @@
 # DEMONSTRATION OF THE LATTICE-BOLTZMANN SIMULATION
 #
-import espresso
+import espressopp
 import cProfile, pstats
-from espresso import Int3D
-from espresso import Real3D
+from espressopp import Int3D
+from espressopp import Real3D
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
@@ -24,21 +24,21 @@ sigma			= 1.
 temperature		= 1.2
 print "Initial values"
 
-system         = espresso.System()
-system.rng     = espresso.esutil.RNG()
-system.bc      = espresso.bc.OrthorhombicBC(system.rng, box)
+system         = espressopp.System()
+system.rng     = espressopp.esutil.RNG()
+system.bc      = espressopp.bc.OrthorhombicBC(system.rng, box)
 system.skin    = skin
-nodeGrid       = espresso.tools.decomp.nodeGrid(espresso.MPI.COMM_WORLD.size)
-cellGrid       = espresso.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
-system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
-interaction    = espresso.interaction.VerletListLennardJones(espresso.VerletList(system, cutoff=rc))
-potLJ          = espresso.interaction.LennardJones(epsilon, sigma, rc)
+nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rc, skin)
+system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+interaction    = espressopp.interaction.VerletListLennardJones(espressopp.VerletList(system, cutoff=rc))
+potLJ          = espressopp.interaction.LennardJones(epsilon, sigma, rc)
 interaction.setPotential(type1=0, type2=0, potential=potLJ)
 system.addInteraction(interaction)
 
-integrator     = espresso.integrator.VelocityVerlet(system)
+integrator     = espressopp.integrator.VelocityVerlet(system)
 integrator.dt  = dt
-thermostat     = espresso.integrator.LangevinThermostat(system)
+thermostat     = espressopp.integrator.LangevinThermostat(system)
 thermostat.gamma  = 1.0
 thermostat.temperature = temperature
 integrator.addExtension(thermostat)
@@ -48,9 +48,9 @@ print thermostat.gamma
 print thermostat.temperature
 
 props    = ['id', 'type', 'mass', 'pos', 'v']
-vel_zero = espresso.Real3D(0.0, 0.0, 0.0)
+vel_zero = espressopp.Real3D(0.0, 0.0, 0.0)
 
-bondlist = espresso.FixedPairList(system.storage)
+bondlist = espressopp.FixedPairList(system.storage)
 pid      = 1
 type     = 0
 mass     = 1.0
@@ -58,7 +58,7 @@ chain    = []
 
 for i in range(num_chains):
 	startpos = system.bc.getRandomPos()
-	positions, bonds = espresso.tools.topology.polymerRW(pid, startpos, monomers_per_chain, bondlen)
+	positions, bonds = espressopp.tools.topology.polymerRW(pid, startpos, monomers_per_chain, bondlen)
 	for k in range(monomers_per_chain):
 		part = [pid + k, type, mass, positions[k], vel_zero]
 		chain.append(part)
@@ -71,21 +71,21 @@ for i in range(num_chains):
 
 system.storage.decompose()
 
-potFENE   = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
-interFENE = espresso.interaction.FixedPairListFENE(system, bondlist, potFENE)
+potFENE   = espressopp.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
+interFENE = espressopp.interaction.FixedPairListFENE(system, bondlist, potFENE)
 system.addInteraction(interFENE)
 
-#force_capping   = espresso.integrator.CapForce(system, 500.0)
+#force_capping   = espressopp.integrator.CapForce(system, 500.0)
 #integrator.addExtension(force_capping)
-espresso.tools.analyse.info(system, integrator)
+espressopp.tools.analyse.info(system, integrator)
 
 print "First phase of the warm up. Epsilon will be increased from 0. to 0.25"
 new_epsilon = 0.
 for k in range(10):
 	integrator.run(1000)
-	espresso.tools.analyse.info(system, integrator)
+	espressopp.tools.analyse.info(system, integrator)
 	new_epsilon += 0.025
-	potLJ = espresso.interaction.LennardJones(new_epsilon, sigma, rc)
+	potLJ = espressopp.interaction.LennardJones(new_epsilon, sigma, rc)
 	interaction.setPotential(type1=0, type2=0, potential=potLJ)
 
 print "Second phase of the warm up with timestep 0.0001. Epsilon will be increased from to 1."
@@ -93,9 +93,9 @@ print new_epsilon
 integrator.dt = 0.00005
 for k in range(10):
 	integrator.run(1000)
-	espresso.tools.analyse.info(system, integrator)
+	espressopp.tools.analyse.info(system, integrator)
 	new_epsilon += 0.075
-	potLJ = espresso.interaction.LennardJones(new_epsilon, sigma, rc)
+	potLJ = espressopp.interaction.LennardJones(new_epsilon, sigma, rc)
 	interaction.setPotential(type1=0, type2=0, potential=potLJ)
 
 print "Third phase of the warm up with timestep 0.005. Epsilon is 1."
@@ -103,15 +103,15 @@ print new_epsilon
 integrator.dt = 0.005
 for k in range(10):
 	integrator.run(1000)
-	espresso.tools.analyse.info(system, integrator)
+	espressopp.tools.analyse.info(system, integrator)
 
 thermostat.gamma  = 0.0
 thermostat.temperature = 0.0
 
 # define a LB grid
-lb = espresso.integrator.LatticeBoltzmann(system, Ni=Int3D(16, 16, 16))
-initPop = espresso.integrator.LBInitPopUniform(system,lb)
-#initPop = espresso.integrator.LBInitPopWave(system,lb)
+lb = espressopp.integrator.LatticeBoltzmann(system, Ni=Int3D(16, 16, 16))
+initPop = espressopp.integrator.LBInitPopUniform(system,lb)
+#initPop = espressopp.integrator.LBInitPopWave(system,lb)
 initPop.createDenVel(1.0, Real3D(0.,0.,0.0))
 
 # declare gammas responsible for viscosities (if they differ from 0)
@@ -128,18 +128,18 @@ lb.fricCoeff = 20.
 integrator.addExtension(lb)
 
 # output velocity profile vz (x)
-#lboutputVzOfX = espresso.analysis.LBOutputProfileVzOfX(system,lb)
-#OUT1=espresso.integrator.ExtAnalyze(lboutputVzOfX,100)
+#lboutputVzOfX = espressopp.analysis.LBOutputProfileVzOfX(system,lb)
+#OUT1=espressopp.integrator.ExtAnalyze(lboutputVzOfX,100)
 #integrator.addExtension(OUT1)
 
 # output velocity vz at a certain lattice site as a function of time
-#lboutputVzInTime = espresso.analysis.LBOutputVzInTime(system,lb)
-#OUT2=espresso.integrator.ExtAnalyze(lboutputVzInTime,100)
+#lboutputVzInTime = espressopp.analysis.LBOutputVzInTime(system,lb)
+#OUT2=espressopp.integrator.ExtAnalyze(lboutputVzInTime,100)
 #integrator.addExtension(OUT2)
 
 # output onto the screen
-#lboutputScreen = espresso.analysis.LBOutputScreen(system,lb)
-#OUT3=espresso.integrator.ExtAnalyze(lboutputScreen,100)
+#lboutputScreen = espressopp.analysis.LBOutputScreen(system,lb)
+#OUT3=espressopp.integrator.ExtAnalyze(lboutputScreen,100)
 #integrator.addExtension(OUT3)
 
 print integrator.dt
@@ -148,7 +148,7 @@ print thermostat.temperature
 print lb.fricCoeff
 
 #plt.figure()
-#T   = espresso.analysis.Temperature(system)
+#T   = espressopp.analysis.Temperature(system)
 #x   = []
 #yT  = []
 #yTmin = 0.2

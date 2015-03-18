@@ -39,7 +39,7 @@
 #include "SingleParticlePotential.hpp"
 #include "iterator/CellListIterator.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     /** This class provides a template for a single-particle interaction,

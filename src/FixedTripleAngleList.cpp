@@ -31,7 +31,7 @@
 
 #include <cmath>
 
-namespace espresso {
+namespace espressopp {
 
   LOG4ESPP_LOGGER(FixedTripleAngleList::theLogger, "FixedTripleAngleList");
 
@@ -279,7 +279,7 @@ namespace espresso {
 
   void FixedTripleAngleList::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (FixedTripleAngleList::*pyAdd)(longint pid1, longint pid2, longint pid3)
       = &FixedTripleAngleList::add;

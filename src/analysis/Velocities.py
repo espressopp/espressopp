@@ -21,15 +21,15 @@
 
 """
 ********************************
-**espresso.analysis.Velocities**
+**espressopp.analysis.Velocities**
 ********************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.Observable import *
-from _espresso import analysis_Velocities
+from espressopp.analysis.Observable import *
+from _espressopp import analysis_Velocities
 
 class VelocitiesLocal(ObservableLocal, analysis_Velocities):
     'The (local) storage of configurations.'
@@ -46,7 +46,7 @@ if pmi.isController :
     class Velocities(Observable):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.VelocitiesLocal',
+            cls =  'espressopp.analysis.VelocitiesLocal',
             pmicall = [ "gather", "clear" ],
             localcall = ["getNParticles", "getCoordinates", 
                          "__getitem__", "__iter__", "all"],

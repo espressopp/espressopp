@@ -1,0 +1,2 @@
+.. automodule:: espressopp.Exceptions
+   :members:

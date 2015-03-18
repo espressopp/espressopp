@@ -24,7 +24,7 @@
 #include <iomanip>
 #include "LBInitConstForce.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 //    LOG4ESPP_LOGGER(LBInitConstForce::theLogger, "LBInitConstForce");
     LBInitConstForce::LBInitConstForce(shared_ptr<System> system,
@@ -116,7 +116,7 @@ namespace espresso {
     }
 
     void LBInitConstForce::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<LBInitConstForce, bases< LBInit > >
           ("integrator_LBInit_ConstForce", init< shared_ptr< System >,

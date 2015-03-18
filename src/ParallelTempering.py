@@ -21,12 +21,12 @@
 
 """
 ******************************
-**espresso.ParallelTempering**
+**espressopp.ParallelTempering**
 ******************************
 
 """
-from espresso import MultiSystem
-from espresso import pmi
+from espressopp import MultiSystem
+from espressopp import pmi
 import random
 from math import exp
 

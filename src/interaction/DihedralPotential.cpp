@@ -24,7 +24,7 @@
 #include "DihedralPotential.hpp"
 #include "logging.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     LOG4ESPP_LOGGER(DihedralPotential::theLogger, "DihedralPotential");
@@ -34,7 +34,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void
     DihedralPotential::registerPython() {
-        using namespace espresso::python;
+        using namespace espressopp::python;
         
         real (DihedralPotential::*computeEnergy1)
             (const Real3D& dist21, const Real3D& dist32, const Real3D& dist43) const =

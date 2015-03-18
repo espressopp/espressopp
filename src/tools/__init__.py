@@ -19,20 +19,20 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-from espresso.tools.decomp import *
-from espresso.tools.timers import *
-from espresso.tools.replicate import *
-from espresso.tools.pdb import *
-from espresso.tools.init_cfg import *
-from espresso.tools.topology import *
-from espresso.tools.vmd import *
-from espresso.tools.info import *
-from espresso.tools.DumpConfigurations import *
-from espresso.tools.convert import *
-from espresso.tools.analyse import *
-from espresso.tools.tabulated import *
-from espresso.tools.prepareAdress import *
-from espresso.tools.warmup import *
-from espresso.tools.lammpsfilewrite import *
-from espresso.tools.povwrite import *
-from espresso.tools.pathintegral import *
+from espressopp.tools.decomp import *
+from espressopp.tools.timers import *
+from espressopp.tools.replicate import *
+from espressopp.tools.pdb import *
+from espressopp.tools.init_cfg import *
+from espressopp.tools.topology import *
+from espressopp.tools.vmd import *
+from espressopp.tools.info import *
+from espressopp.tools.DumpConfigurations import *
+from espressopp.tools.convert import *
+from espressopp.tools.analyse import *
+from espressopp.tools.tabulated import *
+from espressopp.tools.prepareAdress import *
+from espressopp.tools.warmup import *
+from espressopp.tools.lammpsfilewrite import *
+from espressopp.tools.povwrite import *
+from espressopp.tools.pathintegral import *

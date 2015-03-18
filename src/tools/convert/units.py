@@ -48,7 +48,7 @@ Example:
 
 '''
 
-import espresso
+import espressopp
 import math
 
 kB  = 1.3806488 * pow(10,-23) # m^2 * kg * s^-2 * K^-1

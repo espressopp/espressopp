@@ -38,7 +38,7 @@
 
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     using namespace iterator;

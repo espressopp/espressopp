@@ -21,22 +21,22 @@
 
 """
 ***************************
-**espresso.FixedTupleList**
+**espressopp.FixedTupleList**
 ***************************
 
 """
-from espresso import pmi
-import _espresso
-import espresso
-from espresso.esutil import cxxinit
+from espressopp import pmi
+import _espressopp
+import espressopp
+from espressopp.esutil import cxxinit
 
-class FixedTupleListLocal(_espresso.FixedTupleList):
+class FixedTupleListLocal(_espressopp.FixedTupleList):
     'The (local) fixed tuple list.'
 
     def __init__(self, storage):
         'Local construction of a fixed tuple list'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.FixedTupleList, storage)
+            cxxinit(self, _espressopp.FixedTupleList, storage)
 
     """def addTuples(self, tuplelist):
         'add tuple to fixed tuple list'
@@ -55,7 +55,7 @@ if pmi.isController:
     class FixedTupleList(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.FixedTupleListLocal',
+            cls = 'espressopp.FixedTupleListLocal',
             #localcall = [ "add" ],
             pmicall = [ "addTuple", "getTuples" ],
             pmiinvoke = ["size"]

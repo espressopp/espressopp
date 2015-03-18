@@ -21,16 +21,16 @@
 
 """
 ******************************************
-**espresso.interaction.TersoffTripleTerm**
+**espressopp.interaction.TersoffTripleTerm**
 ******************************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.AngularPotential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_TersoffTripleTerm, \
+from espressopp.interaction.AngularPotential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_TersoffTripleTerm, \
                       interaction_VerletListTersoffTripleTerm, \
                       interaction_FixedTripleListTersoffTripleTerm
 
@@ -91,7 +91,7 @@ if pmi.isController:
   class TersoffTripleTerm(AngularPotential):
     'The TersoffTripleTerm potential.'
     pmiproxydefs = dict(
-      cls = 'espresso.interaction.TersoffTripleTermLocal',
+      cls = 'espressopp.interaction.TersoffTripleTermLocal',
 ##      pmiproperty = [ 'gamma1', 'gamma2', 'theta0',
 ##                      'lambda', 'epsilon', 'sigma1',
 ##                      'sigma2', 'cutoff1', 'cutoff2']
@@ -103,13 +103,13 @@ if pmi.isController:
   class VerletListTersoffTripleTerm(Interaction):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls =  'espresso.interaction.VerletListTersoffTripleTermLocal',
+      cls =  'espressopp.interaction.VerletListTersoffTripleTermLocal',
       pmicall = ['setPotential', 'getPotential','getVerletListTriple']
     )
     
   class FixedTripleListTersoffTripleTerm(Interaction):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls =  'espresso.interaction.FixedTripleListTersoffTripleTermLocal',
+      cls =  'espressopp.interaction.FixedTripleListTersoffTripleTermLocal',
       pmicall = ['setPotential','getFixedTripleList']
     )

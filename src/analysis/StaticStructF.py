@@ -21,15 +21,15 @@
 
 """
 ***********************************
-**espresso.analysis.StaticStructF**
+**espressopp.analysis.StaticStructF**
 ***********************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.Observable import *
-from _espresso import analysis_StaticStructF
+from espressopp.analysis.Observable import *
+from _espressopp import analysis_StaticStructF
 
 class StaticStructFLocal(ObservableLocal, analysis_StaticStructF):
   'The (local) compute the static structure function.'
@@ -74,5 +74,5 @@ if pmi.isController:
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
       pmicall = [ "compute", "computeSingleChain" ],
-      cls = 'espresso.analysis.StaticStructFLocal'
+      cls = 'espressopp.analysis.StaticStructFLocal'
     )

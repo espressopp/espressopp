@@ -21,15 +21,15 @@
 
 """
 **************************************
-**espresso.integrator.VelocityVerlet**
+**espressopp.integrator.VelocityVerlet**
 **************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.MDIntegrator import *
-from _espresso import integrator_VelocityVerlet 
+from espressopp.integrator.MDIntegrator import *
+from _espressopp import integrator_VelocityVerlet 
 
 class VelocityVerletLocal(MDIntegratorLocal, integrator_VelocityVerlet):
     'The (local) Velocity Verlet Integrator.'
@@ -41,7 +41,7 @@ if pmi.isController :
     class VelocityVerlet(MDIntegrator):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-          cls =  'espresso.integrator.VelocityVerletLocal',
+          cls =  'espressopp.integrator.VelocityVerletLocal',
           pmicall = ['resetTimers'],
           pmiinvoke = ['getTimers']
         )

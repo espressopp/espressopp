@@ -21,23 +21,23 @@
 
 """
 **************************
-**espresso.FixedPairList**
+**espressopp.FixedPairList**
 **************************
 
 """
-from espresso import pmi
-import _espresso 
-import espresso
-from espresso.esutil import cxxinit
+from espressopp import pmi
+import _espressopp 
+import espressopp
+from espressopp.esutil import cxxinit
 from math import sqrt
 
-class FixedPairListLocal(_espresso.FixedPairList):
+class FixedPairListLocal(_espressopp.FixedPairList):
     'The (local) fixed pair list.'
 
     def __init__(self, storage):
         'Local construction of a fixed pair list'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.FixedPairList, storage)
+            cxxinit(self, _espressopp.FixedPairList, storage)
 
     def add(self, pid1, pid2):
         'add pair to fixed pair list'
@@ -82,7 +82,7 @@ if pmi.isController:
     class FixedPairList(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.FixedPairListLocal',
+            cls = 'espressopp.FixedPairListLocal',
             #localcall = [ 'add' ],
             pmicall = [ 'add', 'addBonds', 'resetLongtimeMaxBond' ],
             pmiinvoke = ['getBonds', 'size', 'getLongtimeMaxBondLocal']

@@ -29,7 +29,7 @@
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     typedef class VerletListInteractionTemplate< Morse >
     VerletListMorse;
@@ -47,7 +47,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void 
     Morse::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< Morse, bases< Potential > >
     	("interaction_Morse", init< real, real, real, real >())

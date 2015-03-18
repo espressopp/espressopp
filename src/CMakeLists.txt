@@ -22,7 +22,7 @@ foreach(FILENAME ${PYTHON_SCRIPTS})
   if (NOT ${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
     add_custom_command(TARGET scripts COMMAND ${CMAKE_COMMAND} -E copy ${SRC} ${DST})
   endif(NOT ${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
-  install(FILES ${DST} DESTINATION ${PYTHON_INSTDIR}/espresso/${DIR})
+  install(FILES ${DST} DESTINATION ${PYTHON_INSTDIR}/espressopp/${DIR})
 endforeach(FILENAME)
 
 add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_MODULE_PATH}/gitversion.cmake)
@@ -33,13 +33,13 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/acconfig.hpp.cmakein
   ${CMAKE_CURRENT_BINARY_DIR}/acconfig.hpp)
 
 #build ESPRC
-#CMAKE_BINARY_DIR for espresso, CMAKE_CURRENT_BINARY_DIR for for _espressos.so and contrib for MPI.so
+#CMAKE_BINARY_DIR for espressopp, CMAKE_CURRENT_BINARY_DIR for for _espressopps.so and contrib for MPI.so
 if (EXTERNAL_MPI4PY)
   set (PYTHON_DIR "${CMAKE_BINARY_DIR}")
 else (EXTERNAL_MPI4PY)
   set (PYTHON_DIR "${CMAKE_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib")
 endif (EXTERNAL_MPI4PY)
-#CMAKE_CURRENT_BINARY_DIR for libespresso_common.so and contib for libespresso_boost
+#CMAKE_CURRENT_BINARY_DIR for libespressopp_common.so and contib for libespressopp_boost
 set (LIB_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ESPRC.cmakein
   ${CMAKE_BINARY_DIR}/ESPRC @ONLY)
@@ -59,14 +59,14 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 if (EXTERNAL_BOOST)
   set (BOOST ${Boost_LIBRARIES} )
 else(EXTERNAL_BOOST)
-  set (BOOST espresso_boost)
+  set (BOOST espressopp_boost)
 endif(EXTERNAL_BOOST)
 
-add_library(_espresso ${ESPRESSO_SOURCES})
-target_link_libraries(_espresso ${BOOST} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
-add_dependencies(_espresso scripts)
+add_library(_espressopp ${ESPRESSO_SOURCES})
+target_link_libraries(_espressopp ${BOOST} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
+add_dependencies(_espressopp scripts)
 #python libs have not prefix (default would be 'lib')
-set_target_properties(_espresso PROPERTIES PREFIX "" SUFFIX ".so" LIBRARY_OUTPUT_DIRECTORY ..)
-install(TARGETS _espresso LIBRARY DESTINATION ${PYTHON_INSTDIR})
+set_target_properties(_espressopp PROPERTIES PREFIX "" SUFFIX ".so" LIBRARY_OUTPUT_DIRECTORY ..)
+install(TARGETS _espressopp LIBRARY DESTINATION ${PYTHON_INSTDIR})
 
-add_dependencies(_espresso gitversion)
+add_dependencies(_espressopp gitversion)

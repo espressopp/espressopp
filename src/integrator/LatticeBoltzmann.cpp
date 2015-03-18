@@ -32,7 +32,7 @@
 #include "esutil/RNG.hpp"
 #include "bc/BC.hpp"
 
-namespace espresso {
+namespace espressopp {
 
 	using namespace iterator;
 	namespace integrator {
@@ -955,7 +955,7 @@ namespace espresso {
 
 		void LatticeBoltzmann::registerPython() {
 
-			using namespace espresso::python;
+			using namespace espressopp::python;
 			class_<LatticeBoltzmann, shared_ptr<LatticeBoltzmann>, bases<Extension> >
 
 			("integrator_LatticeBoltzmann", init< shared_ptr< System >, Int3D,

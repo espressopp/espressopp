@@ -40,7 +40,7 @@
 #include "boost/signals2.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     const int AR_COMM_TAG = 0xac;
@@ -121,7 +121,7 @@ namespace espresso {
       int stateAMin; //!< minimum state of reactant A
       int interval; //!< number of steps between reaction loops
       real dt; //!< timestep from the integrator
-      shared_ptr<espresso::interaction::Potential> potential;
+      shared_ptr<espressopp::interaction::Potential> potential;
 
       real current_cutoff;
       real current_cutoff_sqr;

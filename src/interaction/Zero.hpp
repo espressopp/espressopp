@@ -26,7 +26,7 @@
 
 #include "Potential.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     /** This class provides methods for a zero potential
      * no interactions between particles, mainly used for debugging and testing

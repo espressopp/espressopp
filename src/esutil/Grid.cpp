@@ -23,7 +23,7 @@
 #include "python.hpp"
 #include "Grid.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
     
     //BOOST_PYTHON_FUNCTION_OVERLOADS( testMethod1, Grid::testMethod, 1, 1)
@@ -37,7 +37,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void Grid::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< Grid >("esutil_Grid", init<>())
         .def(init< int, int, int>())

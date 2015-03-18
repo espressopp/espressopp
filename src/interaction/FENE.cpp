@@ -24,7 +24,7 @@
 #include "FENE.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     typedef class FixedPairListInteractionTemplate< FENE > FixedPairListFENE;
     LOG4ESPP_LOGGER(FENE::theLogger, "FENE");
@@ -33,7 +33,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void 
     FENE::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_< FENE, bases< Potential > >
       ("interaction_FENE", init< real, real, real, real >())
 	  .def(init< real, real, real, real, real >())

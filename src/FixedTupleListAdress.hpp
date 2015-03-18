@@ -33,7 +33,7 @@
 #include <boost/signals2.hpp>
 //#include "FixedListComm.hpp"
 
-namespace espresso {
+namespace espressopp {
     class FixedTupleListAdress: public TupleList  {
         protected:
             boost::signals2::connection sigOnTupleChanged, sigAfterRecv, sigBeforeSend;

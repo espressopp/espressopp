@@ -24,7 +24,7 @@
 #include "PotentialUniqueDist.hpp"
 #include "logging.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     LOG4ESPP_LOGGER(PotentialUniqueDist::theLogger, "PotentialUniqueDist");
@@ -33,7 +33,7 @@ namespace espresso {
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void PotentialUniqueDist::registerPython() {
-        using namespace espresso::python;
+        using namespace espressopp::python;
         
         real (PotentialUniqueDist::*computeEnergy1)(const Real3D& dist, const real curDist) const =
             &PotentialUniqueDist::computeEnergy;
@@ -63,7 +63,7 @@ namespace espresso {
 
 
 //     class PythonPotentialUniqueDist 
-//       : public espresso::python::wrapper< PotentialUniqueDist >,
+//       : public espressopp::python::wrapper< PotentialUniqueDist >,
 // 	public PotentialUniqueDistBase< PythonPotentialUniqueDist > {
 //     public:
 //       real _getCutoffSqr() const {
@@ -81,9 +81,9 @@ namespace espresso {
 
 //     void
 //     PotentialUniqueDist::registerPython() {
-//       using namespace espresso::python;
+//       using namespace espressopp::python;
       
-//       class_< espresso::PotentialUniqueDist::PythonPotentialUniqueDist, boost::noncopyable >
+//       class_< espressopp::PotentialUniqueDist::PythonPotentialUniqueDist, boost::noncopyable >
 // 	("interaction_PythonPotentialUniqueDist")
 // 	.def("getCutoffSqr", pure_virtual(&PotentialUniqueDist::getCutoffSqr))
 // 	.def("computeEnergy", pure_virtual(&PotentialUniqueDist::computeEnergy))

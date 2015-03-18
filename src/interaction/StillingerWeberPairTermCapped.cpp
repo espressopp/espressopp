@@ -24,7 +24,7 @@
 #include "StillingerWeberPairTermCapped.hpp"
 #include "Tabulated.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     typedef class VerletListInteractionTemplate <StillingerWeberPairTermCapped>
@@ -43,7 +43,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void 
     StillingerWeberPairTermCapped::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< StillingerWeberPairTermCapped, bases< Potential > >
     	("interaction_StillingerWeberPairTermCapped",

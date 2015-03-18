@@ -39,9 +39,9 @@ the following methods:
 """
 
 
-from espresso import pmi
-from espresso import toReal3D, toReal3DFromVector, toInt3D, toInt3DFromVector
-from _espresso import bc_BC 
+from espressopp import pmi
+from espressopp import toReal3D, toReal3DFromVector, toInt3D, toInt3DFromVector
+from _espressopp import bc_BC 
 
 class BCLocal(object):
     def getMinimumImageVector(self, pos1, pos2):

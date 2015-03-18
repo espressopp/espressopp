@@ -25,7 +25,7 @@
 #include <vector>
 #include <stdexcept>
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
     typedef enum { exception, enlarge } OutlierMode;
 

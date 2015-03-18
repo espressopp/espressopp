@@ -21,22 +21,22 @@
 
 """
 ************************************
-**espresso.FixedQuadrupleAngleList**
+**espressopp.FixedQuadrupleAngleList**
 ************************************
 
 """
-from espresso import pmi
-import _espresso
-import espresso
-from espresso.esutil import cxxinit
+from espressopp import pmi
+import _espressopp
+import espressopp
+from espressopp.esutil import cxxinit
 
-class FixedQuadrupleAngleListLocal(_espresso.FixedQuadrupleAngleList):
+class FixedQuadrupleAngleListLocal(_espressopp.FixedQuadrupleAngleList):
     'The (local) fixed quadruple list.'
 
     def __init__(self, storage):
         'Local construction of a fixed quadruple list'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.FixedQuadrupleAngleList, storage)
+            cxxinit(self, _espressopp.FixedQuadrupleAngleList, storage)
 
     def add(self, pid1, pid2, pid3, pid4):
         'add quadruple to fixed quadruple list'
@@ -81,7 +81,7 @@ if pmi.isController:
   class FixedQuadrupleAngleList(object):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-        cls = 'espresso.FixedQuadrupleAngleListLocal',
+        cls = 'espressopp.FixedQuadrupleAngleListLocal',
         localcall = [ "add" ],
         pmicall = [ "addQuadruples" ],
         pmiinvoke = ["getQuadruples", "getQuadruplesAngles", "size"]

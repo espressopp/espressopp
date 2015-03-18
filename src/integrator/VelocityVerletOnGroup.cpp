@@ -33,7 +33,7 @@
 #include "storage/Storage.hpp"
 #include "mpi.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     using namespace interaction;
@@ -41,7 +41,7 @@ namespace espresso {
     using namespace esutil;
 
     VelocityVerletOnGroup::VelocityVerletOnGroup(shared_ptr< System > system,
-            shared_ptr<class espresso::ParticleGroup> group_) : MDIntegrator(system), group(group_)
+            shared_ptr<class espressopp::ParticleGroup> group_) : MDIntegrator(system), group(group_)
     {
       LOG4ESPP_INFO(theLogger, "construct VelocityVerletOnGroup");
 
@@ -393,7 +393,7 @@ namespace espresso {
 
     void VelocityVerletOnGroup::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       // Note: use noncopyable and no_init for abstract classes
 

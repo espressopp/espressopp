@@ -27,7 +27,7 @@
 
 using namespace boost;
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
 
     RNG::RNG(long _seed): boostRNG(make_shared< RNGType >(_seed + mpiWorld->rank())),
@@ -76,7 +76,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void
     RNG::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       real (RNG::*pyCall1)() = &RNG::operator();
       int (RNG::*pyCall2)(int) = &RNG::operator();

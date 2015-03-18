@@ -32,7 +32,7 @@
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
 
-namespace espresso {
+namespace espressopp {
   class FixedTupleList : public TupleList {
       protected:
 		boost::signals2::connection con1, con2, con3;

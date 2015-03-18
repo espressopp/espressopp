@@ -37,7 +37,7 @@
 #define VT_TRACER( name)
 #endif
 
-namespace espresso {
+namespace espressopp {
   using namespace std;
   namespace integrator {
     using namespace interaction;
@@ -409,7 +409,7 @@ namespace espresso {
 
     void VelocityVerlet::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       // Note: use noncopyable and no_init for abstract classes
       class_<VelocityVerlet, bases<MDIntegrator>, boost::noncopyable >

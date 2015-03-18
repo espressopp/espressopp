@@ -39,7 +39,7 @@
 #include "esutil/Array2D.hpp"
 #include "SystemAccess.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     template < typename _PotentialAT, typename _PotentialCG >
     class VerletListHadressInteractionTemplate: public Interaction {

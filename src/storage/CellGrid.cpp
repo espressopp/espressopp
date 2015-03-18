@@ -29,7 +29,7 @@
 #include "Real3D.hpp"
 
 using namespace std;
-using namespace espresso;
+using namespace espressopp;
 
 LOG4ESPP_LOGGER(CellGrid::logger, "DomainDecomposition.CellGrid");
 

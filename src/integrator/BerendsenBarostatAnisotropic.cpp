@@ -25,7 +25,7 @@
 #include "System.hpp"
 #include "esutil/Error.hpp"
 
-namespace espresso {
+namespace espressopp {
   
   using namespace analysis;
   using namespace esutil;
@@ -119,7 +119,7 @@ namespace espresso {
 
     void BerendsenBarostatAnisotropic::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<BerendsenBarostatAnisotropic, shared_ptr<BerendsenBarostatAnisotropic>, bases<Extension> >
 

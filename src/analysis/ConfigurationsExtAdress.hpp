@@ -29,7 +29,7 @@
 #include "ConfigurationExt.hpp"
 #include "FixedTupleListAdress.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     /** Class that stores atomistic particle positions for later analysis.

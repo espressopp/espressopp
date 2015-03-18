@@ -29,7 +29,7 @@
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     typedef class VerletListInteractionTemplate <LennardJonesAutoBonds>
@@ -48,7 +48,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void 
     LennardJonesAutoBonds::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< LennardJonesAutoBonds, bases< Potential > >
     	("interaction_LennardJonesAutoBonds", init< real, real, real, shared_ptr<FixedPairList>, int >())

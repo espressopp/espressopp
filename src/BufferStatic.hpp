@@ -31,7 +31,7 @@
 
 #define BUFFER_SIZE 2 * 1024 * 1024
 
-namespace espresso {
+namespace espressopp {
 
   /** Communication buffer.  */
 

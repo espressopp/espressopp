@@ -27,12 +27,12 @@
 This is an implementation of a truncated (cutoff) Gravity Potential
 """
 
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_GravityTruncated, \
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_GravityTruncated, \
                       interaction_VerletListGravityTruncated
 
 class GravityTruncatedLocal(PotentialLocal, interaction_GravityTruncated):
@@ -68,9 +68,9 @@ class VerletListGravityTruncatedLocal(InteractionLocal, interaction_VerletListGr
 if pmi.isController:
   
   class GravityTruncated(Potential):
-    pmiproxydefs = dict( cls = 'espresso.interaction.GravityTruncatedLocal', pmiproperty = [ 'prefactor' ] )
+    pmiproxydefs = dict( cls = 'espressopp.interaction.GravityTruncatedLocal', pmiproperty = [ 'prefactor' ] )
 
   class VerletListGravityTruncated(Interaction):
     __metaclass__ = pmi.Proxy
-    pmiproxydefs = dict( cls = 'espresso.interaction.VerletListGravityTruncatedLocal',
+    pmiproxydefs = dict( cls = 'espressopp.interaction.VerletListGravityTruncatedLocal',
     pmicall      = ['setPotential', 'getPotential', 'getVerletList'] )

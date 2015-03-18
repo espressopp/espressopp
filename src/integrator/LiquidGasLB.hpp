@@ -19,7 +19,7 @@
 #include "Int3D.hpp"
 #include "LGLatticeSite.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 		
     class LiquidGasLB : public Extension {

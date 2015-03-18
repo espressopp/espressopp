@@ -21,15 +21,15 @@
 
 """
 ****************************
-**espresso.analysis.MaxPID**
+**espressopp.analysis.MaxPID**
 ****************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.Observable import *
-from _espresso import analysis_MaxPID
+from espressopp.analysis.Observable import *
+from _espressopp import analysis_MaxPID
 
 class MaxPIDLocal(ObservableLocal, analysis_MaxPID):
     'The (local) compute of the maximum pid number of the system.'
@@ -41,5 +41,5 @@ if pmi.isController :
     class MaxPID(Observable):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.MaxPIDLocal'
+            cls =  'espressopp.analysis.MaxPIDLocal'
             )

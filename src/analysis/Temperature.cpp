@@ -23,11 +23,11 @@
 #include "python.hpp"
 #include "Temperature.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     void Temperature::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<Temperature, bases< AnalysisBase > >
         ("analysis_Temperature", init< shared_ptr< System > >())
       ;

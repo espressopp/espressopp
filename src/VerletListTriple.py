@@ -21,23 +21,23 @@
 
 """
 *****************************
-**espresso.VerletListTriple**
+**espressopp.VerletListTriple**
 *****************************
 
 """
-from espresso import pmi
-import _espresso 
-import espresso
-from espresso.esutil import cxxinit
+from espressopp import pmi
+import _espressopp 
+import espressopp
+from espressopp.esutil import cxxinit
 
-class VerletListTripleLocal(_espresso.VerletListTriple):
+class VerletListTripleLocal(_espressopp.VerletListTriple):
     'The (local) verlet triple list'
 
     def __init__(self, system, cutoff, exclusionlist=[]):
         'Local construction of a verlet triple list'
         if pmi.workerIsActive():
           '''
-          cxxinit(self, _espresso.VerletListTriple, system, cutoff, True)
+          cxxinit(self, _espressopp.VerletListTriple, system, cutoff, True)
           if (exclusionlist != []):
             print 'Warning! Exclusion list is not yet implemented to the triple verlet \
                   list. Nothing happend to exclusion list'
@@ -45,10 +45,10 @@ class VerletListTripleLocal(_espresso.VerletListTriple):
 
           if (exclusionlist == []):
             # rebuild list in constructor
-            cxxinit(self, _espresso.VerletListTriple, system, cutoff, True)
+            cxxinit(self, _espressopp.VerletListTriple, system, cutoff, True)
           else:
             # do not rebuild list in constructor
-            cxxinit(self, _espresso.VerletListTriple, system, cutoff, False)
+            cxxinit(self, _espressopp.VerletListTriple, system, cutoff, False)
             # add exclusions
             for pid in exclusionlist:
                 self.cxxclass.exclude(self, pid)
@@ -93,7 +93,7 @@ if pmi.isController:
   class VerletListTriple(object):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls = 'espresso.VerletListTripleLocal',
+      cls = 'espressopp.VerletListTripleLocal',
       pmiproperty = [ 'builds' ],
       pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff' ],
       pmiinvoke = [ 'getAllTriples' ]

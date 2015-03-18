@@ -34,7 +34,7 @@
 
 #include "boost/signals2.hpp"
 
-namespace espresso {
+namespace espressopp {
   
   using namespace analysis;
 

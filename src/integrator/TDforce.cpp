@@ -32,7 +32,7 @@
 #include "interaction/InterpolationCubic.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   using namespace iterator;
 
   namespace integrator {
@@ -169,7 +169,7 @@ namespace espresso {
 
     void TDforce::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       //void (TDforce::*pySetCenter)(real x, real y, real z)
       //                  = &TDforce::setCenter;

@@ -21,13 +21,13 @@
 
 """
 *********************************
-**espresso.esutil.NormalVariate**
+**espressopp.esutil.NormalVariate**
 *********************************
 
 """
-from espresso import pmi
+from espressopp import pmi
 
-from _espresso import esutil_NormalVariate
+from _espressopp import esutil_NormalVariate
 
 class NormalVariateLocal(esutil_NormalVariate):
     def __init__(self, mean=0.0, sigma=1.0):
@@ -38,7 +38,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         """A random normal variate."""
         pmiproxydefs = dict(
-            cls = 'espresso.esutil.NormalVariateLocal',
+            cls = 'espressopp.esutil.NormalVariateLocal',
             localcall = [ '__call__' ],
             )
 

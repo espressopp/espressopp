@@ -29,7 +29,7 @@
 #include "logging.hpp"
 #include "mpi.hpp"
 
-namespace espresso {
+namespace espressopp {
     namespace interaction {
         
         class Interpolation {
@@ -89,7 +89,7 @@ namespace espresso {
         
         
     }//ns interaction
-} //ns espresso
+} //ns espressopp
 
 
 #endif

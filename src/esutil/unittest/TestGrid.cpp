@@ -26,7 +26,7 @@
 #include <boost/test/floating_point_comparison.hpp>
 
 #include "../Grid.hpp"
-using namespace espresso;
+using namespace espressopp;
 using namespace esutil;
 
 BOOST_AUTO_TEST_CASE(testGrid) {

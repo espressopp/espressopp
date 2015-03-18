@@ -23,16 +23,16 @@
 
 """
 *****************************
-**espresso.interaction.MirrorLennardJones**
+**espressopp.interaction.MirrorLennardJones**
 *****************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_MirrorLennardJones, interaction_FixedPairListMirrorLennardJones
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_MirrorLennardJones, interaction_FixedPairListMirrorLennardJones
 
 class MirrorLennardJonesLocal(PotentialLocal, interaction_MirrorLennardJones):
     'The (local) MirrorLennardJones potential.'
@@ -67,13 +67,13 @@ if pmi.isController:
     class MirrorLennardJones(Potential):
         'The MirrorLennardJones potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.MirrorLennardJonesLocal',
+            cls = 'espressopp.interaction.MirrorLennardJonesLocal',
             pmiproperty = ['epsilon', 'sigma']
             )
 
     class FixedPairListMirrorLennardJones(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedPairListMirrorLennardJonesLocal',
+            cls =  'espressopp.interaction.FixedPairListMirrorLennardJonesLocal',
             pmicall = ['setPotential','getPotential','setFixedPairList', 'getFixedPairList']
             )

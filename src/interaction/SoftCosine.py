@@ -21,16 +21,16 @@
 
 """
 ***********************************
-**espresso.interaction.SoftCosine**
+**espressopp.interaction.SoftCosine**
 ***********************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_SoftCosine, \
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_SoftCosine, \
                       interaction_VerletListSoftCosine, \
                       interaction_CellListSoftCosine, \
                       interaction_FixedPairListSoftCosine
@@ -93,24 +93,24 @@ if pmi.isController:
     class SoftCosine(Potential):
         'The SoftCosine potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.SoftCosineLocal',
+            cls = 'espressopp.interaction.SoftCosineLocal',
             pmiproperty = ['A']
             )
     class VerletListSoftCosine(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListSoftCosineLocal',
+            cls =  'espressopp.interaction.VerletListSoftCosineLocal',
             pmicall = ['setPotential','getPotential']
             )
     class CellListSoftCosine(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.CellListSoftCosineLocal',
+            cls =  'espressopp.interaction.CellListSoftCosineLocal',
             pmicall = ['setPotential']
             )
     class FixedPairListSoftCosine(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedPairListSoftCosineLocal',
+            cls =  'espressopp.interaction.FixedPairListSoftCosineLocal',
             pmicall = ['setPotential']
             )

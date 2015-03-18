@@ -26,7 +26,7 @@
 #include "DumpGROAdress.hpp"
 #include "FileBackup.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace io{
     void registerPython() {
       DumpXYZ::registerPython();

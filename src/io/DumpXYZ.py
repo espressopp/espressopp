@@ -50,15 +50,15 @@ usage:
 
 writing down trajectory
 
->>> dump_conf_xyz = espresso.io.DumpXYZ(system, integrator, filename='trajectory.xyz')
+>>> dump_conf_xyz = espressopp.io.DumpXYZ(system, integrator, filename='trajectory.xyz')
 >>> for i in range (200):
 >>>   integrator.run(10)
 >>>   xyz.dump()
 
 writing down trajectory using ExtAnalyze extension
 
->>> dump_conf_xyz = espresso.io.DumpXYZ(system, integrator, filename='trajectory.xyz')
->>> ext_analyze = espresso.integrator.ExtAnalyze(dump_conf_xyz, 10)
+>>> dump_conf_xyz = espressopp.io.DumpXYZ(system, integrator, filename='trajectory.xyz')
+>>> ext_analyze = espressopp.integrator.ExtAnalyze(dump_conf_xyz, 10)
 >>> integrator.addExtension(ext_analyze)
 >>> integrator.run(2000)
 
@@ -68,16 +68,16 @@ setting up length scale
 
 For example, the Lennard-Jones model for liquid argon with :math:`\sigma=0.34 [nm]` 
 
->>> dump_conf_xyz = espresso.io.DumpXYZ(system, integrator, filename='trj.xyz', unfolded=False, length_factor=0.34, length_unit='nm', append=True)
+>>> dump_conf_xyz = espressopp.io.DumpXYZ(system, integrator, filename='trj.xyz', unfolded=False, length_factor=0.34, length_unit='nm', append=True)
 
 will produce trj.xyz with in nanometers
 """
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.ParticleAccess import *
-from _espresso import io_DumpXYZ
+from espressopp.ParticleAccess import *
+from _espressopp import io_DumpXYZ
 
 class DumpXYZLocal(ParticleAccessLocal, io_DumpXYZ):
   'The (local) storage of configurations.'
@@ -93,7 +93,7 @@ if pmi.isController :
   class DumpXYZ(ParticleAccess):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls =  'espresso.io.DumpXYZLocal',
+      cls =  'espressopp.io.DumpXYZLocal',
       pmicall = [ 'dump' ],
       pmiproperty = ['filename', 'unfolded', 'length_factor', 'length_unit', 'append']
     )

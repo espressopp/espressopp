@@ -9,15 +9,15 @@
 
 import sys
 import time
-import espresso
+import espressopp
 import mpi4py.MPI as MPI
 import math
 import logging
 import os
-from espresso import Real3D, Int3D
-from espresso.tools.convert import lammps, gromacs
-from espresso.tools import decomp
-from espresso.tools import timers
+from espressopp import Real3D, Int3D
+from espressopp.tools.convert import lammps, gromacs
+from espressopp.tools import decomp
+from espressopp.tools import timers
 
 # simulation parameters (nvt = False is nve)
 steps = 100
@@ -76,18 +76,18 @@ def calcNumberCells(size, nodes, cutoff):
 
 
 # write the tabulated potential files
-potLJ  = espresso.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift=False, cutoff=rc)
-potFENE = espresso.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
-potCosine = espresso.interaction.Cosine(K=1.5, theta0=3.1415926)
+potLJ  = espressopp.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift=False, cutoff=rc)
+potFENE = espressopp.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
+potCosine = espressopp.interaction.Cosine(K=1.5, theta0=3.1415926)
 
 print 'Generating potential files ... (%2s, %2s, %2s)\n' % (tabfileLJ, tabfileFENE, tabfileCosine)
 writeTabFile(potLJ, tabfileLJ, N=257, low=0.01, high=potLJ.cutoff)
 writeTabFile(potFENE, tabfileFENE, N=257, low=0.0001, high=1.49)
 writeTabFile(potCosine, tabfileCosine, N=257, low=0.0001, high=3.14, body=3)
 
-potTabLJ = espresso.interaction.Tabulated(itype=spline, filename=tabfileLJ, cutoff=rc)
-potTabFENE = espresso.interaction.Tabulated(itype=spline, filename=tabfileFENE)
-potTabCosine = espresso.interaction.TabulatedAngular(itype=spline, filename = tabfileCosine)
+potTabLJ = espressopp.interaction.Tabulated(itype=spline, filename=tabfileLJ, cutoff=rc)
+potTabFENE = espressopp.interaction.Tabulated(itype=spline, filename=tabfileFENE)
+potTabCosine = espressopp.interaction.TabulatedAngular(itype=spline, filename = tabfileCosine)
 
 # repeat simulation twice, with and without tabulated potential
 for tabulation in [True, False]:
@@ -96,9 +96,9 @@ for tabulation in [True, False]:
     print 'Running simulation with%0s tabulated potentials' % w
         
     print 'Setting up ...'
-    system = espresso.System()
-    system.rng = espresso.esutil.RNG(54321)
-    system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
+    system = espressopp.System()
+    system.rng = espressopp.esutil.RNG(54321)
+    system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
     system.skin = skin
         
     comm = MPI.COMM_WORLD
@@ -111,7 +111,7 @@ for tabulation in [True, False]:
         #calcNumberCells(size[1], nodeGrid[1], rc),
         #calcNumberCells(size[2], nodeGrid[2], rc)
         #)
-    system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+    system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
         
     # add particles to the system and then decompose
     for pid in range(num_particles):
@@ -120,58 +120,58 @@ for tabulation in [True, False]:
         
         
     # Lennard-Jones with Verlet list
-    vl = espresso.VerletList(system, cutoff = rc + system.skin)
+    vl = espressopp.VerletList(system, cutoff = rc + system.skin)
     if tabulation:
-        interLJ = espresso.interaction.VerletListTabulated(vl)
+        interLJ = espressopp.interaction.VerletListTabulated(vl)
         interLJ.setPotential(type1=0, type2=0, potential=potTabLJ)
     else:
-        interLJ = espresso.interaction.VerletListLennardJones(vl)
+        interLJ = espressopp.interaction.VerletListLennardJones(vl)
         interLJ.setPotential(type1=0, type2=0, potential=potLJ)
     system.addInteraction(interLJ)
         
         
     # FENE bonds with Fixed Pair List
-    fpl = espresso.FixedPairList(system.storage)
+    fpl = espressopp.FixedPairList(system.storage)
     fpl.addBonds(bonds)
     if tabulation:
-        interFENE = espresso.interaction.FixedPairListTabulated(system, fpl, potTabFENE)
+        interFENE = espressopp.interaction.FixedPairListTabulated(system, fpl, potTabFENE)
         #interFENE.setPotential(type1=0, type2=0, potential=potTabFENE) # no longer needed
     else:
-        interFENE = espresso.interaction.FixedPairListFENE(system, fpl, potFENE)
+        interFENE = espressopp.interaction.FixedPairListFENE(system, fpl, potFENE)
         #interFENE.setPotential(type1=0, type2=0, potential=potFENE)
     system.addInteraction(interFENE)
         
         
     # Cosine with Fixed Triple List
-    ftl = espresso.FixedTripleList(system.storage)
+    ftl = espressopp.FixedTripleList(system.storage)
     ftl.addTriples(angles)
     if tabulation:
-        interCosine = espresso.interaction.FixedTripleListTabulatedAngular(system, ftl, potTabCosine)
+        interCosine = espressopp.interaction.FixedTripleListTabulatedAngular(system, ftl, potTabCosine)
         #interCosine.setPotential(type1=0, type2=0, potential=potTabCosine)
     else:
-        interCosine = espresso.interaction.FixedTripleListCosine(system, ftl, potCosine)
+        interCosine = espressopp.interaction.FixedTripleListCosine(system, ftl, potCosine)
         #interCosine.setPotential(type1=0, type2=0, potential=potCosine)
     system.addInteraction(interCosine)
         
         
         
     # integrator
-    integrator = espresso.integrator.VelocityVerlet(system)
+    integrator = espressopp.integrator.VelocityVerlet(system)
     integrator.dt = timestep
         
     if(nvt):
-        langevin = espresso.integrator.LangevinThermostat(system)
+        langevin = espressopp.integrator.LangevinThermostat(system)
         langevin.gamma = 1.0
         langevin.temperature = 1.0
         integrator.addExtension(langevin)
         
         
     # analysis
-    configurations = espresso.analysis.Configurations(system)
+    configurations = espressopp.analysis.Configurations(system)
     configurations.gather()
-    temperature = espresso.analysis.Temperature(system)
-    pressure = espresso.analysis.Pressure(system)
-    pressureTensor = espresso.analysis.PressureTensor(system)
+    temperature = espressopp.analysis.Temperature(system)
+    pressure = espressopp.analysis.Pressure(system)
+    pressureTensor = espressopp.analysis.PressureTensor(system)
         
     fmt = '%5d %8.4f %10.5f %8.5f %12.3f %12.3f %12.3f %12.3f %12.3f\n'
         

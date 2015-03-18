@@ -21,23 +21,23 @@
 
 """
 ****************************
-**espresso.FixedSingleList**
+**espressopp.FixedSingleList**
 ****************************
 
 """
-from espresso import pmi
-import _espresso 
-import espresso
-from espresso.esutil import cxxinit
+from espressopp import pmi
+import _espressopp 
+import espressopp
+from espressopp.esutil import cxxinit
 from math import sqrt
 
-class FixedSingleListLocal(_espresso.FixedSingleList):
+class FixedSingleListLocal(_espressopp.FixedSingleList):
     'The (local) fixed single list.'
 
     def __init__(self, storage):
         'Local construction of a fixed single list'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.FixedSingleList, storage)
+            cxxinit(self, _espressopp.FixedSingleList, storage)
 
     def add(self, pid1):
         'add particle to fixed single list'
@@ -69,7 +69,7 @@ if pmi.isController:
     class FixedSingleList(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.FixedSingleListLocal',
+            cls = 'espressopp.FixedSingleListLocal',
             #localcall = [ 'add' ],
             pmicall = [ 'add', 'addSingles' ],
             pmiinvoke = ['getSingles', 'size']

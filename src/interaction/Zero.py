@@ -21,16 +21,16 @@
 
 """
 *****************************
-**espresso.interaction.Zero**
+**espressopp.interaction.Zero**
 *****************************
 
 """
-from espresso import pmi
-from espresso.esutil import *
+from espressopp import pmi
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_Zero, \
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_Zero, \
                       interaction_VerletListZero, \
                       interaction_VerletListAdressZero, \
                       interaction_VerletListHadressZero, \
@@ -116,40 +116,40 @@ if pmi.isController:
     class Zero(Potential):
         'The Zero potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.ZeroLocal'
+            cls = 'espressopp.interaction.ZeroLocal'
             )
 
     class VerletListZero(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListZeroLocal',
+            cls =  'espressopp.interaction.VerletListZeroLocal',
             pmicall = ['setPotential', 'getPotential', 'setFixedTupleList']
             )
 
     class VerletListAdressZero(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListAdressZeroLocal',
+            cls =  'espressopp.interaction.VerletListAdressZeroLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
             
     class VerletListHadressZero(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListHadressZeroLocal',
+            cls =  'espressopp.interaction.VerletListHadressZeroLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
     class CellListZero(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.CellListZeroLocal',
+            cls =  'espressopp.interaction.CellListZeroLocal',
             pmicall = ['setPotential']
             )
         
     class FixedPairListZero(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedPairListZeroLocal',
+            cls =  'espressopp.interaction.FixedPairListZeroLocal',
             pmicall = ['setPotential']
             )

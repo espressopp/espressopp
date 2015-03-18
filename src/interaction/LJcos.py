@@ -21,16 +21,16 @@
 
 """
 ******************************
-**espresso.interaction.LJcos**
+**espressopp.interaction.LJcos**
 ******************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_LJcos, \
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_LJcos, \
                       interaction_VerletListLJcos, \
                       interaction_VerletListAdressLJcos, \
                       interaction_VerletListHadressLJcos, \
@@ -123,41 +123,41 @@ if pmi.isController:
     class LJcos(Potential):
         'The Lennard-Jones potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.LJcosLocal',
+            cls = 'espressopp.interaction.LJcosLocal',
             pmiproperty = ['phi']
         )
 
     class VerletListLJcos(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListLJcosLocal',
+            cls =  'espressopp.interaction.VerletListLJcosLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
 
     class VerletListAdressLJcos(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListAdressLJcosLocal',
+            cls =  'espressopp.interaction.VerletListAdressLJcosLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
             
     class VerletListHadressLJcos(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListHadressLJcosLocal',
+            cls =  'espressopp.interaction.VerletListHadressLJcosLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
     class CellListLJcos(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.CellListLJcosLocal',
+            cls =  'espressopp.interaction.CellListLJcosLocal',
             pmicall = ['setPotential']
             )
         
     class FixedPairListLJcos(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedPairListLJcosLocal',
+            cls =  'espressopp.interaction.FixedPairListLJcosLocal',
             pmicall = ['setPotential', 'setFixedPairList','getFixedPairList' ]
         )

@@ -93,18 +93,18 @@ All derived classes implement at least the following methods:
 
 Examples:
 
->>> s.storage.addParticles([[1, espresso.Real3D(3,3,3)], [2, espresso.Real3D(4,4,4)]],'id','pos')
+>>> s.storage.addParticles([[1, espressopp.Real3D(3,3,3)], [2, espressopp.Real3D(4,4,4)]],'id','pos')
 >>> s.storage.decompose()
 >>> s.storage.modifyParticle(15, 'pos', Real3D(new_x, new_y, new_z))
 
 """
 
-from espresso import pmi
-from espresso import Int3D
+from espressopp import pmi
+from espressopp import Int3D
 import mpi4py.MPI as MPI
 import logging
-from espresso import toReal3DFromVector, ParticleLocal, Particle
-from espresso.Exceptions import ParticleDoesNotExistHere
+from espressopp import toReal3DFromVector, ParticleLocal, Particle
+from espressopp.Exceptions import ParticleDoesNotExistHere
 
 class StorageLocal(object):
 

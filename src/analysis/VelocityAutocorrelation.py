@@ -21,15 +21,15 @@
 
 """
 *********************************************
-**espresso.analysis.VelocityAutocorrelation**
+**espressopp.analysis.VelocityAutocorrelation**
 *********************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.ConfigsParticleDecomp import *
-from _espresso import analysis_VelocityAutocorrelation
+from espressopp.analysis.ConfigsParticleDecomp import *
+from _espressopp import analysis_VelocityAutocorrelation
 
 class VelocityAutocorrelationLocal(ConfigsParticleDecompLocal, analysis_VelocityAutocorrelation):
     'The (local) compute autocorrelation f.'
@@ -41,5 +41,5 @@ if pmi.isController:
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
       pmiproperty = [ 'print_progress' ],
-      cls =  'espresso.analysis.VelocityAutocorrelationLocal'
+      cls =  'espressopp.analysis.VelocityAutocorrelationLocal'
     )

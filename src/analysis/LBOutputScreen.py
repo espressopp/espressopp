@@ -21,15 +21,15 @@
 
 """
 ************************************
-**espresso.analysis.LBOutputScreen**
+**espressopp.analysis.LBOutputScreen**
 ************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.LBOutput import *
-from _espresso import analysis_LBOutput_Screen
+from espressopp.analysis.LBOutput import *
+from _espressopp import analysis_LBOutput_Screen
 
 class LBOutputScreenLocal(LBOutputLocal, analysis_LBOutput_Screen):
     'The (local) compute of LBOutputScreen.'
@@ -41,6 +41,6 @@ if pmi.isController :
     class LBOutputScreen(LBOutput):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.LBOutputScreenLocal',
+            cls =  'espressopp.analysis.LBOutputScreenLocal',
             pmicall = ["writeOutput"]
             )

@@ -21,16 +21,16 @@
 
 """
 *****************************
-**espresso.interaction.FENE**
+**espressopp.interaction.FENE**
 *****************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_FENE, interaction_FixedPairListFENE
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_FENE, interaction_FixedPairListFENE
 
 class FENELocal(PotentialLocal, interaction_FENE):
     'The (local) FENE potential.'
@@ -69,13 +69,13 @@ if pmi.isController:
     class FENE(Potential):
         'The FENE potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.FENELocal',
+            cls = 'espressopp.interaction.FENELocal',
             pmiproperty = ['K', 'r0', 'rMax']
             )
 
     class FixedPairListFENE(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedPairListFENELocal',
+            cls =  'espressopp.interaction.FixedPairListFENELocal',
             pmicall = ['setPotential','getPotential','setFixedPairList', 'getFixedPairList']
             )

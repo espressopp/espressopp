@@ -36,9 +36,9 @@
 #include "Buffer.hpp"
 
 using namespace boost;
-using namespace espresso::iterator;
+using namespace espressopp::iterator;
 
-namespace espresso { 
+namespace espressopp { 
   namespace storage {
 
 
@@ -1179,7 +1179,7 @@ namespace espresso {
   //////////////////////////////////////////////////
   void DomainDecompositionAdress::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
     class_< PyDomainDecompositionAdress, bases< Storage >, boost::noncopyable >
   ("storage_DomainDecompositionAdress",
    init< shared_ptr< System >,

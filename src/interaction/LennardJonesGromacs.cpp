@@ -26,7 +26,7 @@
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     typedef class VerletListInteractionTemplate< LennardJonesGromacs >
     VerletListLennardJonesGromacs;
@@ -40,7 +40,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void 
     LennardJonesGromacs::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< LennardJonesGromacs, bases< Potential > >
     	("interaction_LennardJonesGromacs", init< real, real, real, real >())

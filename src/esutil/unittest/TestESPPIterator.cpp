@@ -27,7 +27,7 @@
 #include <vector>
 #include "esutil/ESPPIterator.hpp"
 
-using namespace espresso::esutil;
+using namespace espressopp::esutil;
 
 BOOST_AUTO_TEST_CASE(DefaultConstructor) {
   ESPPIterator< std::vector< int > > esppit;

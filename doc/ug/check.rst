@@ -4,4 +4,4 @@ check
 .. toctree::
    :maxdepth: 2
    
-   espresso.check.System.rst
+   espressopp.check.System.rst

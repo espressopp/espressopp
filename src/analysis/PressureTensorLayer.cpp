@@ -23,11 +23,11 @@
 #include "python.hpp"
 #include "PressureTensorLayer.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     void PressureTensorLayer::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<PressureTensorLayer, bases< AnalysisBase > >
         ("analysis_PressureTensorLayer", init< shared_ptr< System >, real, real >())
         .add_property("h0",

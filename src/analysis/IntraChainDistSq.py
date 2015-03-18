@@ -21,15 +21,15 @@
 
 """
 **************************************
-**espresso.analysis.IntraChainDistSq**
+**espressopp.analysis.IntraChainDistSq**
 **************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.AllParticlePos import *
-from _espresso import analysis_IntraChainDistSq
+from espressopp.analysis.AllParticlePos import *
+from _espressopp import analysis_IntraChainDistSq
 
 class IntraChainDistSqLocal(AllParticlePosLocal, analysis_IntraChainDistSq):
     'The (local) IntraChainDistSq object'
@@ -43,6 +43,6 @@ if pmi.isController :
     class IntraChainDistSq(AllParticlePos):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.IntraChainDistSqLocal',
+            cls =  'espressopp.analysis.IntraChainDistSqLocal',
             pmicall = [ "compute" ]
             )

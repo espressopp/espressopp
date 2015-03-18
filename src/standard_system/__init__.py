@@ -19,9 +19,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-from espresso.standard_system.LennardJones import *
-from espresso.standard_system.PolymerMelt import *
-from espresso.standard_system.Minimal import *
-from espresso.standard_system.Default import *
-from espresso.standard_system.KGMelt import *
+from espressopp.standard_system.LennardJones import *
+from espressopp.standard_system.PolymerMelt import *
+from espressopp.standard_system.Minimal import *
+from espressopp.standard_system.Default import *
+from espressopp.standard_system.KGMelt import *
 

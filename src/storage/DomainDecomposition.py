@@ -21,19 +21,19 @@
 
 """
 ****************************************
-**espresso.storage.DomainDecomposition**
+**espressopp.storage.DomainDecomposition**
 ****************************************
 
 """
-from espresso import pmi
-from espresso.esutil import cxxinit
-from _espresso import storage_DomainDecomposition
-from espresso import Int3D, toInt3DFromVector
-from espresso.tools import decomp
-from espresso import check
+from espressopp import pmi
+from espressopp.esutil import cxxinit
+from _espressopp import storage_DomainDecomposition
+from espressopp import Int3D, toInt3DFromVector
+from espressopp.tools import decomp
+from espressopp import check
 import mpi4py.MPI as MPI
 
-from espresso.storage.Storage import *
+from espressopp.storage.Storage import *
 
 class DomainDecompositionLocal(StorageLocal, storage_DomainDecomposition):
     'The (local) DomainDecomposition.'
@@ -52,7 +52,7 @@ class DomainDecompositionLocal(StorageLocal, storage_DomainDecomposition):
 if pmi.isController:
     class DomainDecomposition(Storage):
         pmiproxydefs = dict(
-          cls = 'espresso.storage.DomainDecompositionLocal',  
+          cls = 'espressopp.storage.DomainDecompositionLocal',  
           pmicall = ['getCellGrid', 'getNodeGrid', 'cellAdjust']
         )
         def __init__(self, system, 

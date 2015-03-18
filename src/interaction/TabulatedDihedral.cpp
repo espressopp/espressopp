@@ -28,7 +28,7 @@
 #include "FixedTripleListInteractionTemplate.hpp"
 #include "FixedQuadrupleListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
     namespace interaction {
         
         void TabulatedDihedral::setFilename(int itype, const char* _filename) {
@@ -59,7 +59,7 @@ namespace espresso {
         // REGISTRATION WITH PYTHON
         //////////////////////////////////////////////////
         void TabulatedDihedral::registerPython() {
-            using namespace espresso::python;
+            using namespace espressopp::python;
             
             class_ <TabulatedDihedral, bases <DihedralPotential> >
                 ("interaction_TabulatedDihedral", init <int, const char*>())
@@ -75,4 +75,4 @@ namespace espresso {
         }
         
     } // ns interaction
-} // ns espresso
+} // ns espressopp

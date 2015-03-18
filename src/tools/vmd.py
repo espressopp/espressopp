@@ -24,7 +24,7 @@ import time
 import socket
 import select
 import struct
-import espresso
+import espressopp
 
 IMD_HANDSHAKE = 4
 IMDVERSION    = 2
@@ -90,11 +90,11 @@ def connect(system, molsize=10, pqrfile=False, vmd_path='vmd'):
     The socket to the VMD.
 
   """
-  espresso.tools.psfwrite("vmd.psf", system, molsize=molsize, maxdist=system.bc.boxL[0]/2)
+  espressopp.tools.psfwrite("vmd.psf", system, molsize=molsize, maxdist=system.bc.boxL[0]/2)
   if pqrfile==True:
-    espresso.tools.pqrwrite("vmd.pqr", system, molsize=molsize)
+    espressopp.tools.pqrwrite("vmd.pqr", system, molsize=molsize)
   else:
-    espresso.tools.pdbwrite("vmd.pdb", system, molsize=molsize)
+    espressopp.tools.pdbwrite("vmd.pdb", system, molsize=molsize)
   initsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM, 0)
   hostname = socket.gethostname()
   port     = 10000
@@ -151,7 +151,7 @@ def connect(system, molsize=10, pqrfile=False, vmd_path='vmd'):
   return sock
 
 def imd_positions(system, sock, folded=True):
-  maxParticleID = int(espresso.analysis.MaxPID(system).compute())
+  maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
   count  = 0
   pid    = 0
   coords = struct.pack('')
