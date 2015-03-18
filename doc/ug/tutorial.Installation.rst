@@ -4,17 +4,17 @@ Installation of ESPResSo++
 The first step in the installation of ESPResSo++ is to download it from the
 following location:
 
-     https://www.espressopp-pp.de/Download/espressopppp_1_3_1.tgz
+     https://www.espressopp-pp.de/Download/espressopp_1_3_1.tgz
 
 On the command line type:
 
-# tar -xzf espressopppp_1_3_1.tgz
+# tar -xzf espressopp_1_3_1.tgz
 
-This will create a subdirectory espressopppp-1.3.1
+This will create a subdirectory espressopp-1.3.1
 
 Enter this subdirectory
 
-# cd espressopppp-1.3.1
+# cd espressopp-1.3.1
 
 Create the Makefiles using the cmake command. If you don't have it yet, you have to
 install it first. It is available for all major Linux distributions and also for Mac OS X.

@@ -58,7 +58,7 @@ timestep = 0.005
 ### IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE ###
 ######################################################################
 sys.stdout.write('Setting up simulation ...\n')
-x, y, z, Lx, Ly, Lz, vx, vy, vz = lammps.read('espressopppp_lennard_jones.start')
+x, y, z, Lx, Ly, Lz, vx, vy, vz = lammps.read('espressopp_lennard_jones.start')
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
