@@ -15,6 +15,7 @@ script:
   - mkdir build && cd build && 
     cmake -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL .. && 
     make -j4 &&
+    make test ARGS="-V" &&
     sudo make install
 
 compiler:

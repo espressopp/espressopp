@@ -1,1 +1,4 @@
 add_subdirectory(ewald)
+add_subdirectory(pickle_potential)
+add_subdirectory(pi_water)
+add_subdirectory(tabulated)
