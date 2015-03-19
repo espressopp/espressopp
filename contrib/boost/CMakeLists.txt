@@ -24,6 +24,5 @@ file(GLOB_RECURSE NOT_BOOST_SOURCES
 
 list(REMOVE_ITEM BOOST_SOURCES ${NOT_BOOST_SOURCES})
 
-add_library(espressopp_boost ${BOOST_SOURCES})
+add_library(espressopp_boost STATIC ${BOOST_SOURCES})
 target_link_libraries(espressopp_boost ${PYTHON_LIBRARIES} ${VAMPIRTRACE_LIBRARIES} ${MPI_LIBRARIES} ${RT_LIBRARIES})
-install(TARGETS espressopp_boost LIBRARY DESTINATION ${LIB})

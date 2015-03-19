@@ -23,9 +23,6 @@ include(CheckCXXCompilerFlag)
 ########################################################################
 option(EXTERNAL_BOOST "Use external boost" ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
-if (NOT DEFINED LIB)
-  set(LIB "lib")
-endif(NOT DEFINED LIB)
 
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release CACHE STRING
