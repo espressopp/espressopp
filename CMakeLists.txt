@@ -124,6 +124,7 @@ if (EXTERNAL_BOOST)
   include_directories(${Boost_INCLUDE_DIRS})
 else(EXTERNAL_BOOST)
   include_directories(${CMAKE_SOURCE_DIR}/contrib/boost)
+  set(Boost_LIBRARIES espressopp_boost)
 endif(EXTERNAL_BOOST)
 include_directories(${CMAKE_SOURCE_DIR}/src)
 

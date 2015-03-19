@@ -43,14 +43,8 @@ endif (WITH_RC_FILES)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-if (EXTERNAL_BOOST)
-  set (BOOST ${Boost_LIBRARIES} )
-else(EXTERNAL_BOOST)
-  set (BOOST espressopp_boost)
-endif(EXTERNAL_BOOST)
-
 add_library(_espressopp ${ESPRESSO_SOURCES})
-target_link_libraries(_espressopp ${BOOST} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
+target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
 #python libs have not prefix (default would be 'lib')
 set_target_properties(_espressopp PROPERTIES PREFIX "" SUFFIX ".so" LIBRARY_OUTPUT_DIRECTORY ..)
 install(TARGETS _espressopp LIBRARY DESTINATION ${PYTHON_INSTDIR})
