@@ -21,22 +21,22 @@
 
 """
 *******************************
-**espresso.FixedQuadrupleList**
+**espressopp.FixedQuadrupleList**
 *******************************
 
 """
-from espresso import pmi
-import _espresso
-import espresso
-from espresso.esutil import cxxinit
+from espressopp import pmi
+import _espressopp
+import espressopp
+from espressopp.esutil import cxxinit
 
-class FixedQuadrupleListLocal(_espresso.FixedQuadrupleList):
+class FixedQuadrupleListLocal(_espressopp.FixedQuadrupleList):
     'The (local) fixed quadruple list.'
 
     def __init__(self, storage):
         'Local construction of a fixed quadruple list'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.FixedQuadrupleList, storage)
+            cxxinit(self, _espressopp.FixedQuadrupleList, storage)
 
     def add(self, pid1, pid2, pid3, pid4):
         'add quadruple to fixed quadruple list'
@@ -70,7 +70,7 @@ if pmi.isController:
     class FixedQuadrupleList(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.FixedQuadrupleListLocal',
+            cls = 'espressopp.FixedQuadrupleListLocal',
             localcall = [ "add" ],
             pmicall = [ "addQuadruples" ],
             pmiinvoke = ["getQuadruples", "size"]

@@ -26,7 +26,7 @@
 
 #include "types.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   template <class T1> struct Single {
 

@@ -36,7 +36,7 @@
 #include "boost/signals2.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     /** Langevin thermostat */

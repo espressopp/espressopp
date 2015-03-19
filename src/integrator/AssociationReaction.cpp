@@ -34,11 +34,11 @@
 #include "storage/NodeGrid.hpp"
 #include "storage/DomainDecomposition.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   namespace integrator {
 
-    //using namespace espresso::iterator;
+    //using namespace espressopp::iterator;
     using namespace storage;
 
     LOG4ESPP_LOGGER(AssociationReaction::theLogger, "AssociationReaction");
@@ -479,7 +479,7 @@ namespace espresso {
      ****************************************************/
 
     void AssociationReaction::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<AssociationReaction, shared_ptr<AssociationReaction>, bases<Extension> >
         ("integrator_AssociationReaction", init<shared_ptr<System>, shared_ptr<VerletList>, shared_ptr<FixedPairList>, shared_ptr<DomainDecomposition> >())
         .def("connect", &AssociationReaction::connect)

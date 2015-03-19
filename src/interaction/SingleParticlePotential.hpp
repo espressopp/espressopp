@@ -31,7 +31,7 @@
 #include "Particle.hpp"
 #include "logging.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     /** This class is used to define single-particle interactions, typically

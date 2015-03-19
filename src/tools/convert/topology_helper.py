@@ -21,7 +21,7 @@
 
 # Some helper classes usefull when parsing the gromacs topology
 
-import espresso
+import espressopp
 import math
 import gromacs
 
@@ -96,8 +96,8 @@ class HarmonicBondedInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
         # interaction specific stuff here
         # spring constant kb is half the gromacs spring constant
-        pot = espresso.interaction.Harmonic(self.parameters['kb']/2.0, self.parameters['b0'])
-        interb = espresso.interaction.FixedPairListHarmonic(system, fpl, pot)
+        pot = espressopp.interaction.Harmonic(self.parameters['kb']/2.0, self.parameters['b0'])
+        interb = espressopp.interaction.FixedPairListHarmonic(system, fpl, pot)
         return interb
     def automaticExclusion(self):
         return True
@@ -105,8 +105,8 @@ class HarmonicBondedInteractionType(InteractionType):
 class MorseBondedInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
         # interaction specific stuff here
-        pot = espresso.interaction.Morse(self.parameters['D'], self.parameters['beta'], self.parameters['rmin'])
-        interb = espresso.interaction.FixedPairListMorse(system, fpl, pot)
+        pot = espressopp.interaction.Morse(self.parameters['D'], self.parameters['beta'], self.parameters['rmin'])
+        interb = espressopp.interaction.FixedPairListMorse(system, fpl, pot)
         return interb
     def automaticExclusion(self):
         return True
@@ -115,8 +115,8 @@ class FENEBondedInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
         # interaction specific stuff here
         # spring constant kb is half the gromacs spring constant
-        pot = espresso.interaction.Fene(self.parameters['kb']/2.0, self.parameters['b0'])
-        interb = espresso.interaction.FixedPairListFene(system, fpl, pot)
+        pot = espressopp.interaction.Fene(self.parameters['kb']/2.0, self.parameters['b0'])
+        interb = espressopp.interaction.FixedPairListFene(system, fpl, pot)
         return interb
     def automaticExclusion(self):
         return True
@@ -125,8 +125,8 @@ class HarmonicAngleInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
         # interaction specific stuff here
         # spring constant kb is half the gromacs spring constant. Also convert deg to rad
-        pot = espresso.interaction.AngularHarmonic(self.parameters['k']/2.0, self.parameters['theta']*2*math.pi/360)
-        interb = espresso.interaction.FixedTripleListAngularHarmonic(system, fpl, pot)
+        pot = espressopp.interaction.AngularHarmonic(self.parameters['k']/2.0, self.parameters['theta']*2*math.pi/360)
+        interb = espressopp.interaction.FixedTripleListAngularHarmonic(system, fpl, pot)
         return interb     
     
 
@@ -134,10 +134,10 @@ class TabulatedBondInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
         spline = 3
         fg = "table_b"+str(self.parameters['tablenr'])+".xvg"
-        fe = fg.split(".")[0]+".tab" # name of espresso file
+        fe = fg.split(".")[0]+".tab" # name of espressopp file
         gromacs.convertTable(fg, fe)
-        potTab = espresso.interaction.Tabulated(itype=spline, filename=fe)
-        interb = espresso.interaction.FixedPairListTabulated(system, fpl, potTab)
+        potTab = espressopp.interaction.Tabulated(itype=spline, filename=fe)
+        interb = espressopp.interaction.FixedPairListTabulated(system, fpl, potTab)
         return interb
     def automaticExclusion(self):
         return self.parameters['excl']
@@ -146,19 +146,19 @@ class TabulatedAngleInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
         spline = 3
         fg = "table_a"+str(self.parameters['tablenr'])+".xvg"
-        fe = fg.split(".")[0]+".tab" # name of espresso file
+        fe = fg.split(".")[0]+".tab" # name of espressopp file
         gromacs.convertTable(fg, fe)
-        potTab = espresso.interaction.TabulatedAngular(itype=spline, filename=fe)
-        interb = espresso.interaction.FixedTripleListTabulatedAngular(system, fpl, potTab)
+        potTab = espressopp.interaction.TabulatedAngular(itype=spline, filename=fe)
+        interb = espressopp.interaction.FixedTripleListTabulatedAngular(system, fpl, potTab)
         return interb  
 class TabulatedDihedralInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
         spline = 3
         fg = "table_d"+str(self.parameters['tablenr'])+".xvg"
-        fe = fg.split(".")[0]+".tab" # name of espresso file
+        fe = fg.split(".")[0]+".tab" # name of espressopp file
         gromacs.convertTable(fg, fe)
-        potTab = espresso.interaction.TabulatedDihedral(itype=spline, filename=fe)
-        interb = espresso.interaction.FixedQuadrupleListTabulatedDihedral(system, fpl, potTab)
+        potTab = espressopp.interaction.TabulatedDihedral(itype=spline, filename=fe)
+        interb = espressopp.interaction.FixedQuadrupleListTabulatedDihedral(system, fpl, potTab)
         return interb       
     
 """class HarmonicDihedralInteractionType(InteractionType):
@@ -167,8 +167,8 @@ class TabulatedDihedralInteractionType(InteractionType):
         # interaction specific stuff here
         # spring constant kb is half the gromacs spring constant. Also convert deg to rad
         print "setting up dihedral ", self.parameters
-        pot = espresso.interaction.DihedralHarmonicCos(K=self.parameters['k']/2.0, phi0=self.parameters['phi']*2*math.pi/360)
-        interb = espresso.interaction.FixedQuadrupleListDihedralHarmonicCos(system, fpl, pot)
+        pot = espressopp.interaction.DihedralHarmonicCos(K=self.parameters['k']/2.0, phi0=self.parameters['phi']*2*math.pi/360)
+        interb = espressopp.interaction.FixedQuadrupleListDihedralHarmonicCos(system, fpl, pot)
         return interb          """
     
 def ParseBondTypeParam(line):

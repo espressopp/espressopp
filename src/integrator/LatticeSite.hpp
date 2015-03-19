@@ -26,7 +26,7 @@
 
 #include "Real3D.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 		class LBSite {
 			/**

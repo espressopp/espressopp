@@ -25,7 +25,7 @@
 
 //#include "ParticleAccess.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     LOG4ESPP_LOGGER(AnalysisBase::logger, "AnalysisBase");
@@ -35,7 +35,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void
     AnalysisBase::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
     
       //class_< AnalysisBase, boost::noncopyable >("analysis_AnalysisBase", no_init)
       class_< AnalysisBase, bases<ParticleAccess>, boost::noncopyable >("analysis_AnalysisBase", no_init)

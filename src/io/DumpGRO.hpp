@@ -38,7 +38,7 @@
 
 #include <string>
 
-namespace espresso {
+namespace espressopp {
   namespace io{
 
     class DumpGRO : public ParticleAccess {

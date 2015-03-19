@@ -21,16 +21,16 @@
 
 """
 ****************************************
-**espresso.interaction.TersoffPairTerm**
+**espressopp.interaction.TersoffPairTerm**
 ****************************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_TersoffPairTerm, \
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_TersoffPairTerm, \
                       interaction_VerletListTersoffPairTerm, \
                       interaction_CellListTersoffPairTerm, \
                       interaction_FixedPairListTersoffPairTerm
@@ -84,27 +84,27 @@ if pmi.isController:
     class TersoffPairTerm(Potential):
         'The Lennard-Jones potential.'
         pmiproxydefs = dict(
-          cls = 'espresso.interaction.TersoffPairTermLocal',
+          cls = 'espressopp.interaction.TersoffPairTermLocal',
           pmiproperty = ['A', 'lambda1', 'R', 'D']
         )
 
     class VerletListTersoffPairTerm(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-          cls =  'espresso.interaction.VerletListTersoffPairTermLocal',
+          cls =  'espressopp.interaction.VerletListTersoffPairTermLocal',
           pmicall = ['setPotential', 'getPotential', 'getVerletList']
         )
 
     class CellListTersoffPairTerm(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-          cls =  'espresso.interaction.CellListTersoffPairTermLocal',
+          cls =  'espressopp.interaction.CellListTersoffPairTermLocal',
           pmicall = ['setPotential']
         )
         
     class FixedPairListTersoffPairTerm(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-          cls =  'espresso.interaction.FixedPairListTersoffPairTermLocal',
+          cls =  'espressopp.interaction.FixedPairListTersoffPairTermLocal',
           pmicall = ['setPotential']
         )

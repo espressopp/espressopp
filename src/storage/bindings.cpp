@@ -26,7 +26,7 @@
 #include "Storage.hpp"
 #include "bindings.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace storage {
     void registerPython() {
       Storage::registerPython();

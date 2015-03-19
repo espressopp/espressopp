@@ -24,14 +24,14 @@
 #include "HarmonicUnique.hpp"
 #include "FixedPairDistListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void 
     HarmonicUnique::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< HarmonicUnique, bases< PotentialUniqueDist > >
     	("interaction_HarmonicUnique", init< real >())

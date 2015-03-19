@@ -19,12 +19,12 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-import espresso
-from espresso import unittest
+import espressopp
+from espressopp import unittest
 import mpi4py.MPI as MPI
 import math
 
-from espresso import Real3D
+from espressopp import Real3D
 
 def calcNumberCells(size, nodes, cutoff):
 
@@ -38,14 +38,14 @@ def calcNumberCells(size, nodes, cutoff):
 class TestVerletList(unittest.TestCase) :
 
     def test0Lattice(self) :
-       system = espresso.System()
+       system = espressopp.System()
 
-       rng  = espresso.esutil.RNG()
+       rng  = espressopp.esutil.RNG()
 
        N    = 6
        SIZE = float(N)
        box  = Real3D(SIZE)
-       bc   = espresso.bc.OrthorhombicBC(None, box)
+       bc   = espressopp.bc.OrthorhombicBC(None, box)
 
        system.bc = bc
 
@@ -55,7 +55,7 @@ class TestVerletList(unittest.TestCase) :
 
        cutoff = 1.733
 
-       comm = espresso.MPI.COMM_WORLD
+       comm = espressopp.MPI.COMM_WORLD
 
        nodeGrid = (1, 1, comm.size)
        cellGrid = [1, 1, 1]
@@ -66,7 +66,7 @@ class TestVerletList(unittest.TestCase) :
        print 'NodeGrid = %s'%(nodeGrid,)
        print 'CellGrid = %s'%cellGrid
 
-       system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+       system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
        pid = 0
 
        for i in range(N):
@@ -86,11 +86,11 @@ class TestVerletList(unittest.TestCase) :
 
        # now build Verlet List
 
-       vl = espresso.VerletList(system, 0.0)
+       vl = espressopp.VerletList(system, 0.0)
 
        self.assertEqual(vl.totalSize(), 0)
 
-       vl = espresso.VerletList(system, 1.0)
+       vl = espressopp.VerletList(system, 1.0)
 
        # there are N * N * N * 6 / 2 pairs in cutoff 1.0
 
@@ -98,11 +98,11 @@ class TestVerletList(unittest.TestCase) :
 
        # there are N * N * N * 18 / 2 pairs in cutoff  sqrt(2.0)
 
-       vl = espresso.VerletList(system, math.sqrt(2.0))
+       vl = espressopp.VerletList(system, math.sqrt(2.0))
 
        self.assertEqual(vl.totalSize(), N * N * N * 9);
 
-       vl = espresso.VerletList(system, math.sqrt(3.0))
+       vl = espressopp.VerletList(system, math.sqrt(3.0))
 
        # there are N * N * N * 26 / 2 pairs in cutoff
 

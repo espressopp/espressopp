@@ -24,7 +24,7 @@
 #include "AngularUniquePotential.hpp"
 #include "logging.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     LOG4ESPP_LOGGER(AngularUniquePotential::theLogger, "AngularUniquePotential");
@@ -33,7 +33,7 @@ namespace espresso {
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void AngularUniquePotential::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       real (AngularUniquePotential::*computeEnergy1)
           (const Real3D& r12, const Real3D& r32, real theta0) const =

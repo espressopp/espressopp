@@ -21,14 +21,14 @@
 
 """
 ********************************************
-**espresso.interaction.PotentialUniqueDist**
+**espressopp.interaction.PotentialUniqueDist**
 ********************************************
 
 """
-from espresso import pmi
-from espresso import toReal3DFromVector
+from espressopp import pmi
+from espressopp import toReal3DFromVector
 
-from _espresso import interaction_PotentialUniqueDist
+from _espressopp import interaction_PotentialUniqueDist
 
 # Python base class for PotentialUniqueDists
 class PotentialUniqueDistLocal(object):

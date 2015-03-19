@@ -29,7 +29,7 @@
 #include "esutil/Timer.hpp"
 #include "../ParticleGroup.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   namespace integrator {
 
@@ -39,7 +39,7 @@ namespace espresso {
 
       public:
 
-        VelocityVerletOnGroup(shared_ptr<class espresso::System> system, shared_ptr<class espresso::ParticleGroup> group_);
+        VelocityVerletOnGroup(shared_ptr<class espressopp::System> system, shared_ptr<class espressopp::ParticleGroup> group_);
 
         virtual ~VelocityVerletOnGroup();
 
@@ -61,7 +61,7 @@ namespace espresso {
         real maxCut;
 
         shared_ptr< class LangevinThermostat > langevin;  //!< Langevin thermostat if available
-        shared_ptr<class espresso::ParticleGroup> group;
+        shared_ptr<class espressopp::ParticleGroup> group;
 
         /** Method updates particle positions and velocities.
 

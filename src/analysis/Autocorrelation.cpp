@@ -27,7 +27,7 @@
 
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     using namespace iterator;
@@ -165,7 +165,7 @@ namespace espresso {
     
     // Python wrapping
     void Autocorrelation::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<Autocorrelation>(
         "analysis_Autocorrelation",

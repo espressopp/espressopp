@@ -36,7 +36,7 @@
 #include <boost/signals2.hpp>
 //#include "FixedListComm.hpp"
 
-namespace espresso {
+namespace espressopp {
 class FixedQuadrupleListAdress : public FixedQuadrupleList {
  public:
   FixedQuadrupleListAdress(shared_ptr< storage::Storage > _storage,

@@ -24,7 +24,7 @@
 
 #define MAXLINE 1024
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     LOG4ESPP_LOGGER(InterpolationCubic::theLogger, "InterpolationCubic");
@@ -211,4 +211,4 @@ namespace espresso {
 
 
   }//ns interaction
-}//ns espresso
+}//ns espressopp

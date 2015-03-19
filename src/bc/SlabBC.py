@@ -37,16 +37,16 @@ x-direction).
 Example:
 
 >>> boxsize = (Lx, Ly, Lz)
->>> bc = espresso.bc.SlabBC(rng, boxsize)
+>>> bc = espressopp.bc.SlabBC(rng, boxsize)
 
 """
 
-from espresso.esutil import cxxinit
-from espresso import pmi
-from espresso import toReal3D
+from espressopp.esutil import cxxinit
+from espressopp import pmi
+from espressopp import toReal3D
 
-from espresso.bc.BC import *
-from _espresso import bc_SlabBC
+from espressopp.bc.BC import *
+from _espressopp import bc_SlabBC
 
 class SlabBCLocal(BCLocal, bc_SlabBC):
     def __init__(self, rng, boxL=1.0):
@@ -63,6 +63,6 @@ class SlabBCLocal(BCLocal, bc_SlabBC):
 if pmi.isController :
     class SlabBC(BC):
         pmiproxydefs = dict(
-            cls =  'espresso.bc.SlabBCLocal',
+            cls =  'espressopp.bc.SlabBCLocal',
             pmiproperty = [ 'boxL' ]
             )

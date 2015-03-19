@@ -21,15 +21,15 @@
 
 """
 *****************************************
-**espresso.analysis.NeighborFluctuation**
+**espressopp.analysis.NeighborFluctuation**
 *****************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.Observable import *
-from _espresso import analysis_NeighborFluctuation
+from espressopp.analysis.Observable import *
+from _espressopp import analysis_NeighborFluctuation
 
 class NeighborFluctuationLocal(ObservableLocal, analysis_NeighborFluctuation):
     'The (local) compute of the neighbor fluctuations (<n^2>-<n>^2) in the number of particles found in a sphere of radius d around particle i.'
@@ -41,5 +41,5 @@ if pmi.isController :
     class NeighborFluctuation(Observable):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.NeighborFluctuationLocal'
+            cls =  'espressopp.analysis.NeighborFluctuationLocal'
             )

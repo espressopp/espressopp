@@ -32,7 +32,7 @@
 #include "esutil/Error.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     /** Abstract base class for Molecular Dynamics Integrator. 

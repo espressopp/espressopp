@@ -32,7 +32,7 @@
 #include "iterator/CellListIterator.hpp"
 #include "interaction/Interaction.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     using namespace iterator;

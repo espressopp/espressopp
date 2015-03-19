@@ -22,7 +22,7 @@
 
 """
 *******************************************
-**espresso.interaction.LennardJones93Wall**
+**espressopp.interaction.LennardJones93Wall**
 *******************************************
 
 This class defines a Lennard-Jones 9-3 SingleParticlePotential in the direction x.
@@ -37,18 +37,18 @@ The parameters have to be defined for every species present in the system with
 
 Example:
 
-    >>> LJ93 = espresso.interaction.LennardJones93Wall()
+    >>> LJ93 = espressopp.interaction.LennardJones93Wall()
     >>> LJ93.setParams(0, 6., 1., wall_cutoff)
-    >>> SPLJ93 = espresso.interaction.SingleParticleLennardJones93Wall(system, LJ93)
+    >>> SPLJ93 = espressopp.interaction.SingleParticleLennardJones93Wall(system, LJ93)
     >>> system.addInteraction(SPLJ93)
 
 """
-from espresso import pmi
-from espresso.esutil import *
+from espressopp import pmi
+from espressopp.esutil import *
 
-from espresso.interaction.SingleParticlePotential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_LennardJones93Wall, interaction_SingleParticleLennardJones93Wall
+from espressopp.interaction.SingleParticlePotential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_LennardJones93Wall, interaction_SingleParticleLennardJones93Wall
 
 
 class LennardJones93WallLocal(SingleParticlePotentialLocal, interaction_LennardJones93Wall):
@@ -82,13 +82,13 @@ if pmi.isController:
     class LennardJones93Wall(SingleParticlePotential):
         'The LennardJones93Wall potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.LennardJones93WallLocal',
+            cls = 'espressopp.interaction.LennardJones93WallLocal',
             pmicall = ['setParams', 'getParams']
             )
 
     class SingleParticleLennardJones93Wall(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.SingleParticleLennardJones93WallLocal',
+            cls = 'espressopp.interaction.SingleParticleLennardJones93WallLocal',
             pmicall = ['setPotential']
             )

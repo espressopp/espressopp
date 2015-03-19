@@ -26,7 +26,7 @@
 
 #include "../Timer.hpp"
 
-using namespace espresso::esutil;
+using namespace espressopp::esutil;
 
 int doSomething()
 {

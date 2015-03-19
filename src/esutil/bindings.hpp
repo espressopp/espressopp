@@ -22,7 +22,7 @@
 
 #ifndef _ESUTIL_BINDINGS_HPP
 #define _ESUTIL_BINDINGS_HPP
-namespace espresso {
+namespace espressopp {
   namespace esutil {
     void registerPython();
   }

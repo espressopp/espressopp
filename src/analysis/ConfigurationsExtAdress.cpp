@@ -29,11 +29,11 @@
 #include "mpi.h"
 #include <cmath>
 
-using namespace espresso;
+using namespace espressopp;
 
 #define DEFAULT_TAG 71
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     using namespace iterator;
@@ -330,7 +330,7 @@ namespace espresso {
 
     void ConfigurationsExtAdress::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
 //      class_<ConfigurationExtList> ("_ConfigurationExtList", no_init)
 //      .def("__iter__", boost::python::iterator<ConfigurationExtList>())

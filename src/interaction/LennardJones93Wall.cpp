@@ -26,7 +26,7 @@
 #include "LennardJones93Wall.hpp"
 #include "Real3D.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     typedef class SingleParticleInteractionTemplate <LennardJones93Wall>
@@ -37,7 +37,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void
     LennardJones93Wall::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< LennardJones93Wall, bases< SingleParticlePotential > >
         ("interaction_LennardJones93Wall", init<>())

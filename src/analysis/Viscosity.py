@@ -21,16 +21,16 @@
 
 """
 *******************************
-**espresso.analysis.Viscosity**
+**espressopp.analysis.Viscosity**
 *******************************
 
 """
-from espresso import pmi
-from espresso.esutil import cxxinit
+from espressopp import pmi
+from espressopp.esutil import cxxinit
 
-from _espresso import analysis_Viscosity
+from _espressopp import analysis_Viscosity
 
-from espresso.analysis.Autocorrelation import *
+from espressopp.analysis.Autocorrelation import *
 
 class ViscosityLocal(AutocorrelationLocal, analysis_Viscosity):  
     'The (local) storage of configurations.'
@@ -51,7 +51,7 @@ if pmi.isController:
     """Class for parallel analysis"""
     #__metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls =  'espresso.analysis.ViscosityLocal',
+      cls =  'espressopp.analysis.ViscosityLocal',
       pmicall = [ 'gather', 'compute' ]
     )
     def __init__(self, system):

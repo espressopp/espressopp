@@ -32,7 +32,7 @@
 #include "Real3D.hpp"
 #include "Particle.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     /** Langevin */

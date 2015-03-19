@@ -34,10 +34,10 @@
 #include "Buffer.hpp"
 #include <iostream>
 
-using namespace espresso;
-using namespace espresso::esutil;
-using namespace espresso::storage;
-using namespace espresso::iterator;
+using namespace espressopp;
+using namespace espressopp::esutil;
+using namespace espressopp::storage;
+using namespace espressopp::iterator;
 
 struct LoggingFixture {  
   LoggingFixture() { 

@@ -20,11 +20,11 @@
 
 
 import unittest
-from espresso import Real3D, infinity
-import espresso.unittest
-from espresso.interaction.SoftCosine import *
+from espressopp import Real3D, infinity
+import espressopp.unittest
+from espressopp.interaction.SoftCosine import *
 
-class TestSoftCosine(espresso.unittest.TestCase):
+class TestSoftCosine(espressopp.unittest.TestCase):
     def testDefaults(self):
         sc=SoftCosine()
         self.assertEqual(sc.A, 1.0)

@@ -31,9 +31,9 @@
 #include <boost/serialization/map.hpp>
 
 using namespace std;
-using namespace espresso;
+using namespace espressopp;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     using namespace iterator;
@@ -188,7 +188,7 @@ namespace espresso {
 
     // Python wrapping
     void ConfigsParticleDecomp::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<ConfigsParticleDecomp, boost::noncopyable >(
         "analysis_ConfigsParticleDecomp", no_init

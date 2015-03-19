@@ -26,7 +26,7 @@
 
 #include "LatticeBoltzmann.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
     /** Abstract base class for arbitrary Init for LB simulations. */
     class LBInit {

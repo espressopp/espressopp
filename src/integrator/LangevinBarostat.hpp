@@ -32,7 +32,7 @@
 
 #include "boost/signals2.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     /** Barostat. In a couple with Langevin thermostat it performs Langevin dynamics in 

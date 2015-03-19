@@ -37,7 +37,7 @@
 #include "Interaction.hpp"
 #include "types.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
   using namespace iterator;
     template < typename _Potential >

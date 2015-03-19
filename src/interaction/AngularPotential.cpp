@@ -24,7 +24,7 @@
 #include "AngularPotential.hpp"
 #include "logging.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     LOG4ESPP_LOGGER(AngularPotential::theLogger, "AngularPotential");
@@ -33,7 +33,7 @@ namespace espresso {
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void AngularPotential::registerPython() {
-        using namespace espresso::python;
+        using namespace espressopp::python;
         
         real (AngularPotential::*computeEnergy1)
             (const Real3D& dist12, const Real3D& dist32) const =

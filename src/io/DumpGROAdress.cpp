@@ -31,11 +31,11 @@
 #include "analysis/ConfigurationsExt.hpp"
 #include "analysis/ConfigurationsExtAdress.hpp"
 
-using namespace espresso;
-using namespace espresso::analysis;
+using namespace espressopp;
+using namespace espressopp::analysis;
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
   namespace io {
       
     void DumpGROAdress::dump(){
@@ -135,7 +135,7 @@ namespace espresso {
     // Python wrapping
     void DumpGROAdress::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<DumpGROAdress, bases<ParticleAccess>, boost::noncopyable >
       ("io_DumpGROAdress", init< shared_ptr< System >, shared_ptr<FixedTupleListAdress>,

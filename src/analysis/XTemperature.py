@@ -21,15 +21,15 @@
 
 """
 **********************************
-**espresso.analysis.XTemperature**
+**espressopp.analysis.XTemperature**
 **********************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.Observable import *
-from _espresso import analysis_XTemperature
+from espressopp.analysis.Observable import *
+from _espressopp import analysis_XTemperature
 
 class XTemperatureLocal(ObservableLocal, analysis_XTemperature):
   'The (local) compute the temperature profile in x direction.'
@@ -44,5 +44,5 @@ if pmi.isController :
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
       pmicall = [ "compute" ],
-      cls = 'espresso.analysis.XTemperatureLocal'
+      cls = 'espressopp.analysis.XTemperatureLocal'
     )

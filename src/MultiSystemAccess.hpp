@@ -26,7 +26,7 @@
 #include "types.hpp"
 #include "System.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   /** Common base class for all classes that need access to multiple systems.
 

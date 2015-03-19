@@ -31,9 +31,9 @@
 #include "iterator/CellListAllPairsIterator.hpp"
 #include "iterator/CellListIterator.hpp"
 
-namespace espresso {
+namespace espressopp {
 
-  using namespace espresso::iterator;
+  using namespace espressopp::iterator;
 
   LOG4ESPP_LOGGER(VerletListAdress::theLogger, "VerletList");
 
@@ -420,7 +420,7 @@ namespace espresso {
     ****************************************************/
 
     void VerletListAdress::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       bool (VerletListAdress::*pyExclude)(longint pid1, longint pid2)
             = &VerletListAdress::exclude;

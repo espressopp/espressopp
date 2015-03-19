@@ -28,7 +28,7 @@
 #include "logging.hpp"
 #include "esutil/ESPPIterator.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     enum bondTypes {unused, Nonbonded, Single, Pair, Angular, Dihedral};

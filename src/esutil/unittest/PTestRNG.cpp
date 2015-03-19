@@ -27,8 +27,8 @@
 #include <vector>
 #include "../RNG.hpp"
 
-using namespace espresso;
-using namespace espresso::esutil;
+using namespace espressopp;
+using namespace espressopp::esutil;
 
 // Check that a random real is between 0 and 1
 BOOST_AUTO_TEST_CASE(real_in_interval) 

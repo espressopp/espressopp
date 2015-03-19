@@ -29,7 +29,7 @@
 #include "BC.hpp"
 #include "Real3D.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace bc {
     class SlabBC : public BC {
     private:

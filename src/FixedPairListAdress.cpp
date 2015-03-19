@@ -28,7 +28,7 @@
 
 //using namespace std;
 
-namespace espresso {
+namespace espressopp {
 
   LOG4ESPP_LOGGER(FixedPairListAdress::theLogger, "FixedPairListAdress");
 
@@ -229,7 +229,7 @@ namespace espresso {
 
   void FixedPairListAdress::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (FixedPairListAdress::*pyAdd)(longint pid1, longint pid2)
       = &FixedPairListAdress::add;

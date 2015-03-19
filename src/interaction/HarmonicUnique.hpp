@@ -28,7 +28,7 @@
 //#include "FixedPairDistListInteractionTemplate.hpp"
 #include <cmath>
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     /* This class provides methods to compute forces and energies of
         the HarmonicUnique potential.

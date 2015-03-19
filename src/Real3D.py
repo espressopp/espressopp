@@ -21,12 +21,12 @@
 
 """
 *******************
-**espresso.Real3D**
+**espressopp.Real3D**
 *******************
 
 """
-from _espresso import Real3D
-from espresso import esutil
+from _espressopp import Real3D
+from espressopp import esutil
 
 # This injects additional methods into the Real3D class and pulls it
 # into this module 

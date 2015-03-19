@@ -22,7 +22,7 @@
 
 #ifndef _INTEGRATOR_BINDINGS_HPP
 #define _INTEGRATOR_BINDINGS_HPP
-namespace espresso {
+namespace espressopp {
   namespace integrator {
     void registerPython();
   }

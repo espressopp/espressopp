@@ -30,11 +30,11 @@
 #include "interaction/Potential.hpp"
 #include "VerletList.hpp"
 
-using namespace espresso;
+using namespace espressopp;
 using namespace iterator;
 using namespace interaction;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     real Pressure::compute() const {
 
@@ -113,7 +113,7 @@ namespace espresso {
     }
 
     void Pressure::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<Pressure, bases< Observable > >
         ("analysis_Pressure", init< shared_ptr< System > >())
       ;

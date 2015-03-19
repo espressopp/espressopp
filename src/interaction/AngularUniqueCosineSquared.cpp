@@ -24,14 +24,14 @@
 #include "AngularUniqueCosineSquared.hpp"
 #include "FixedTripleAngleListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void 
     AngularUniqueCosineSquared::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< AngularUniqueCosineSquared, bases< AngularUniquePotential > >
     	("interaction_AngularUniqueCosineSquared", init< real >())

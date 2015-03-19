@@ -21,15 +21,15 @@
 
 """
 **********************************
-**espresso.analysis.RadialDistrF**
+**espressopp.analysis.RadialDistrF**
 **********************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.Observable import *
-from _espresso import analysis_RadialDistrF
+from espressopp.analysis.Observable import *
+from _espressopp import analysis_RadialDistrF
 
 class RadialDistrFLocal(ObservableLocal, analysis_RadialDistrF):
   'The (local) compute the radial distr function.'
@@ -45,5 +45,5 @@ if pmi.isController :
     pmiproxydefs = dict(
       pmiproperty = [ 'print_progress' ],
       pmicall = [ "compute" ],
-      cls = 'espresso.analysis.RadialDistrFLocal'
+      cls = 'espressopp.analysis.RadialDistrFLocal'
     )

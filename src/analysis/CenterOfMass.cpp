@@ -26,10 +26,10 @@
 #include "storage/DomainDecomposition.hpp"
 #include "iterator/CellListIterator.hpp"
 
-using namespace espresso;
+using namespace espressopp;
 using namespace iterator;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     
     // ! it's folded COM
@@ -72,7 +72,7 @@ namespace espresso {
     }
 
     void CenterOfMass::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<CenterOfMass, bases< Observable > >
         ("analysis_CenterOfMass", init< shared_ptr< System > >())
         .def("compute", &CenterOfMass::computeVector)

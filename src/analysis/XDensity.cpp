@@ -31,11 +31,11 @@
 
 #include <boost/serialization/map.hpp>
 
-using namespace espresso;
+using namespace espressopp;
 using namespace iterator;
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     
     // splitN is a level of discretisation of density profile (how many elements it contains)
@@ -265,7 +265,7 @@ namespace espresso {
     using namespace boost::python;
 
     void XDensity::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<XDensity, bases< Observable > >
         ("analysis_XDensity", init< shared_ptr< System > >())
         .def("compute", &XDensity::computeArray)

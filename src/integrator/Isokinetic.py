@@ -21,15 +21,15 @@
 
 """
 **********************************
-**espresso.integrator.Isokinetic**
+**espressopp.integrator.Isokinetic**
 **********************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.Extension import *
-from _espresso import integrator_Isokinetic 
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_Isokinetic 
 
 class IsokineticLocal(ExtensionLocal, integrator_Isokinetic):
     'The (local) Isokinetic Thermostat.'
@@ -41,6 +41,6 @@ if pmi.isController :
     class Isokinetic(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-          cls =  'espresso.integrator.IsokineticLocal',
+          cls =  'espressopp.integrator.IsokineticLocal',
           pmiproperty = [ 'temperature', 'coupling' ]
         )

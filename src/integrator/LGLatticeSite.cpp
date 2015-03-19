@@ -29,7 +29,7 @@
 #include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   using namespace iterator;
   namespace integrator {

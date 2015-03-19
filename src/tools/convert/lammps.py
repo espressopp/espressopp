@@ -21,7 +21,7 @@
 
 # -*- coding: utf-8 -*-
 
-import espresso
+import espressopp
 
 """This Python module allows one to use a LAMMPS data file as the
    input to an ESPResSo++ simulation."""
@@ -385,7 +385,7 @@ def read_charmm(fin):
 def write(fout, system, writeVelocities=False):  
     
   # first collect all the information that we need to write into the file
-  numParticles  = int(espresso.analysis.NPart(system).compute())
+  numParticles  = int(espressopp.analysis.NPart(system).compute())
   box_x = system.bc.boxL[0]
   box_y = system.bc.boxL[1]
   box_z = system.bc.boxL[2]
@@ -400,21 +400,21 @@ def write(fout, system, writeVelocities=False):
   nInteractions = system.getNumberOfInteractions()
   for i in range(nInteractions):
       bT = system.getInteraction(i).bondType()
-      if   bT == espresso.interaction.Pair:
+      if   bT == espressopp.interaction.Pair:
              nbondtypes += 1
              bl  = system.getInteraction(i).getFixedPairList().getBonds()
              bln = []
              for j in range(len(bl)):
                bln.extend(bl[j])
              bonds.append(bln)
-      elif bT == espresso.interaction.Angular:
+      elif bT == espressopp.interaction.Angular:
              nangletypes += 1
              an  = system.getInteraction(i).getFixedTripleList().getTriples()
              ann = []
              for j in range(len(an)):
                ann.extend(an[j]) 
              angles.append(ann)
-      elif bT == espresso.interaction.Dihedral:
+      elif bT == espressopp.interaction.Dihedral:
              ndihedraltypes += 1
              di  = system.getInteraction(i).getFixedQuadrupleList().getQuadruples()
              din = []
@@ -433,7 +433,7 @@ def write(fout, system, writeVelocities=False):
       ndihedrals += len(dihedrals[i])
       
   atomtypes = []
-  maxParticleID = int(espresso.analysis.MaxPID(system).compute())
+  maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
   pid   = 0
   while pid <= maxParticleID:
     if system.storage.particleExists(pid):

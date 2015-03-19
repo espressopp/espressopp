@@ -24,7 +24,7 @@
 #include "ut.hpp"
 #include "interaction/LennardJones.hpp"
 
-using namespace espresso;
+using namespace espressopp;
 using namespace interaction;
 
 BOOST_AUTO_TEST_CASE(LJNoCutoff)

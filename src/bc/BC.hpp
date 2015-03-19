@@ -30,7 +30,7 @@
 #include "log4espp.hpp"
 #include "SystemAccess.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace bc {
     /** Abstract base class for boundary conditions. */
     class BC {

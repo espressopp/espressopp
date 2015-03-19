@@ -26,7 +26,7 @@
 #include "VerletListTripleInteractionTemplate.hpp"
 #include "FixedTripleListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
@@ -38,7 +38,7 @@ namespace espresso {
     
     void 
     TersoffTripleTerm::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< TersoffTripleTerm, bases< AngularPotential > >(
             "interaction_TersoffTripleTerm",

@@ -26,7 +26,7 @@
 #include "types.hpp"
 #include "Int3D.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
 
     /** regular grid decomposition of a box, outside view. */

@@ -27,13 +27,13 @@
 #include "Cell.hpp"
 #include "map"
 
-using namespace espresso;
+using namespace espressopp;
 
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
-    using namespace espresso::iterator;
+    using namespace espressopp::iterator;
 
     
     // 
@@ -120,7 +120,7 @@ namespace espresso {
     }
 
     void NeighborFluctuation::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<NeighborFluctuation, bases< Observable > >
         ("analysis_NeighborFluctuation", init< shared_ptr< System > , real >())
         .def("compute", &NeighborFluctuation::computeValues) 

@@ -29,7 +29,7 @@
 #include "Particle.hpp"
 #include <vector>
 
-namespace espresso {
+namespace espressopp {
 
   class Buffer {
 

@@ -59,7 +59,7 @@
 
 #include "EmptyExtension.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
     void registerPython() {
       MDIntegrator::registerPython();

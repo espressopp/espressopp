@@ -36,7 +36,7 @@
 #include "SystemAccess.hpp"
 #include "types.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     template < typename _AngularPotential >
     class FixedTripleListInteractionTemplate : public Interaction, SystemAccess {
@@ -187,7 +187,7 @@ namespace espresso {
         const Particle &p2 = *it->second;
         const Particle &p3 = *it->third;
         //const Potential &potential = getPotential(p1.type(), p2.type());
-        const espresso::bc::BC& bc = *getSystemRef().bc;
+        const espressopp::bc::BC& bc = *getSystemRef().bc;
         Real3D dist12, dist32;
         bc.getMinimumImageVectorBox(dist12, p1.position(), p2.position());
         bc.getMinimumImageVectorBox(dist32, p3.position(), p2.position());

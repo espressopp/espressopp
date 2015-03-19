@@ -21,18 +21,18 @@
 
 """
 ******************************************
-**espresso.interaction.TabulatedDihedral**
+**espressopp.interaction.TabulatedDihedral**
 ******************************************
 
 """
 # -*- coding: iso-8859-1 -*-
 # -*- coding: iso-8859-1 -*-
-from espresso import pmi
-from espresso.esutil import *
+from espressopp import pmi
+from espressopp.esutil import *
 
-from espresso.interaction.DihedralPotential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_TabulatedDihedral, \
+from espressopp.interaction.DihedralPotential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_TabulatedDihedral, \
                       interaction_FixedQuadrupleListTabulatedDihedral
 
 
@@ -57,13 +57,13 @@ if pmi.isController:
     class TabulatedDihedral(DihedralPotential):
         'The TabulatedDihedral potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.TabulatedDihedralLocal',
+            cls = 'espressopp.interaction.TabulatedDihedralLocal',
             pmiproperty = ['itype', 'filename']
             )
 
     class FixedQuadrupleListTabulatedDihedral(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedQuadrupleListTabulatedDihedralLocal',
+            cls =  'espressopp.interaction.FixedQuadrupleListTabulatedDihedralLocal',
             pmicall = ['setPotential', 'getFixedQuadrupleList']
             )

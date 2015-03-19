@@ -25,7 +25,7 @@
 
 #include "types.hpp"
 
-namespace espresso { 
+namespace espressopp { 
   namespace esutil {
     
     /** Returns the distance between two positions squared and stores the

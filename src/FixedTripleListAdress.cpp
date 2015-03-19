@@ -35,7 +35,7 @@
 
 //using namespace std;
 
-namespace espresso {
+namespace espressopp {
 
   LOG4ESPP_LOGGER(FixedTripleListAdress::theLogger, "FixedTripleListAdress");
 
@@ -232,7 +232,7 @@ FixedTripleListAdress::~FixedTripleListAdress() {
 
   void FixedTripleListAdress::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (FixedTripleListAdress::*pyAdd)(longint pid1, longint pid2, longint pid3)
       = &FixedTripleListAdress::add;

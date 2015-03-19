@@ -24,14 +24,14 @@
 #include "AngularHarmonic.hpp"
 #include "FixedTripleListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void 
     AngularHarmonic::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< AngularHarmonic, bases< AngularPotential > >
     	("interaction_AngularHarmonic", init< real, real >())

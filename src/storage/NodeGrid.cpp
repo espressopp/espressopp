@@ -26,7 +26,7 @@
 #include "Int3D.hpp"
 #include "NodeGrid.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace storage {
     LOG4ESPP_LOGGER(NodeGrid::logger, "DomainDecomposition.NodeGrid");
   

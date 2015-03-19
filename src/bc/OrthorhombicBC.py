@@ -34,16 +34,16 @@ Currently only periodic boundary conditions are supported.
 Example: 
 
 >>> boxsize = (Lx, Ly, Lz)
->>> bc = espresso.bc.OrthorhombicBC(rng, boxsize) 
+>>> bc = espressopp.bc.OrthorhombicBC(rng, boxsize) 
 
 """
 
-from espresso.esutil import cxxinit
-from espresso import pmi
-from espresso import toReal3D
+from espressopp.esutil import cxxinit
+from espressopp import pmi
+from espressopp import toReal3D
 
-from espresso.bc.BC import *
-from _espresso import bc_OrthorhombicBC 
+from espressopp.bc.BC import *
+from _espressopp import bc_OrthorhombicBC 
 
 class OrthorhombicBCLocal(BCLocal, bc_OrthorhombicBC):
     def __init__(self, rng, boxL=1.0):
@@ -60,6 +60,6 @@ class OrthorhombicBCLocal(BCLocal, bc_OrthorhombicBC):
 if pmi.isController :
     class OrthorhombicBC(BC):
         pmiproxydefs = dict(
-            cls =  'espresso.bc.OrthorhombicBCLocal',
+            cls =  'espressopp.bc.OrthorhombicBCLocal',
             pmiproperty = [ 'boxL' ]
             )

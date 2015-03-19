@@ -6,13 +6,13 @@ Basic System Setup
 |espp| is implemented as a python module that has to be imported at the beginning
 of every script:
 
->>> import espresso
+>>> import espressopp
 
 |espp| uses an object called *System* to store some global variables and
 is also used to keep the connection between some other important modules.
 We create it with:
 
->>> system         = espresso.System()
+>>> system         = espressopp.System()
 
 Starting a new simulation with |espp| we should have an idea about
 what we want to simulate. E.g. how big should the simulation box be or
@@ -27,11 +27,11 @@ In many cases you will need a random number generator (e.G. to couple to a tempe
 or to randomly position particles in the simulation box). |espp| provides its own random number
 generator (for the experts: see boost/random.hpp) so let's use it:
 
->>> rng            = espresso.esutil.RNG()
+>>> rng            = espressopp.esutil.RNG()
 
 Our simulation box needs some boundary conditions. We want to use periodic boundary conditions:
 
->>> bc             = espresso.bc.OrthorhombicBC(rng, box)
+>>> bc             = espressopp.bc.OrthorhombicBC(rng, box)
 
 We tell our system object about this:
 
@@ -65,12 +65,12 @@ In the most simple case, if you want to use only one CPU, the *nodeGrid* and the
 In general you don't need to take care of that yourself. Just use the corresponding |espp| routines to
 calculate a reasonable  *nodeGrid* and *cellGrid*:
 
->>> nodeGrid       = espresso.tools.decomp.nodeGrid(espresso.MPI.COMM_WORLD.size)
->>> cellGrid       = espresso.tools.decomp.cellGrid(box, nodeGrid, maxcutoff, skin)
+>>> nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+>>> cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, maxcutoff, skin)
 
 Now we have all the ingredients we need for the *domain decomposition* storage of our system:
 
->>> ddstorage      = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+>>> ddstorage      = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 We initialized the DomainDecomposition object with a pointer to our system. We also have to inform the
 system about the DomainDecomposition storage:
@@ -80,7 +80,7 @@ system about the DomainDecomposition storage:
 The next module we need is the *integrator*. This object will do the actual work of integrating Newtons
 equations of motion. |espp| implements the well known *velocity Verlet* algorithm (see for example Frenkel&Smit):
 
->>>  integrator     = espresso.integrator.VelocityVerlet(system)
+>>>  integrator     = espressopp.integrator.VelocityVerlet(system)
 
 We have to tell the integrator about the basic time step:
 
@@ -94,8 +94,8 @@ Let's do some math in between:
    which simplifies handling and arithmetic operations with vectors. 3D coordinates would typically
    be defined like this:
 
-   >>> a = espresso.Real3D(2.0, 5.0, 6.0)
-   >>> b = espresso.Real3D(0.1, 0.0, 0.5)
+   >>> a = espressopp.Real3D(2.0, 5.0, 6.0)
+   >>> b = espressopp.Real3D(0.1, 0.0, 0.5)
 
    Now you could do things like:
 
@@ -107,7 +107,7 @@ Let's do some math in between:
 
    In order to make defining vectors even more simple include the line
 
-   >>> from espresso import Real3D
+   >>> from espressopp import Real3D
 
    just at the beginning of your script. This allows to define vectors as:
 
@@ -120,7 +120,7 @@ without any external forces. So let's simply add one particle to the storage of 
 Every particle in |espp| has a unique particle id and a position (this is obligatory).
 
 >>> pid = 1
->>> pos = Real3D(2.0, 4.0, 6.0)    # remember to add "from espresso import Real3D"
+>>> pos = Real3D(2.0, 4.0, 6.0)    # remember to add "from espressopp import Real3D"
 >>>                                # at the beginning of your script
 >>> system.storage.addParticle(pid, pos)
 
@@ -165,11 +165,11 @@ The easiest way to get a nice picture is by writing out a PDB file and
 looking at the configuration with some visualization programm (e.g. VMD):
 
 >>> filename = "myconf.pdb"
->>> espresso.tools.pdb.pdbwrite(filename, system)
+>>> espressopp.tools.pdb.pdbwrite(filename, system)
 
 or (if *vmd* is in your search PATH) you could directly connect to VMD by:
 
->>> espresso.tools.vmd.connect(system)
+>>> espressopp.tools.vmd.connect(system)
 
 or you could print all particle information to the screen:
 

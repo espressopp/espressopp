@@ -39,7 +39,7 @@
 #include "boost/signals2.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     class OnTheFlyFEC : public Extension {

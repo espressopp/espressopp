@@ -21,15 +21,15 @@
 
 """
 **************************
-**espresso.analysis.Test**
+**espressopp.analysis.Test**
 **************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.AnalysisBase import *
-from _espresso import analysis_Test
+from espressopp.analysis.AnalysisBase import *
+from _espressopp import analysis_Test
 
 class TestLocal(AnalysisBaseLocal, analysis_Test):
     'The (local) test of analysis.'
@@ -41,5 +41,5 @@ if pmi.isController :
     class Test(AnalysisBase):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.TestLocal'
+            cls =  'espressopp.analysis.TestLocal'
             )

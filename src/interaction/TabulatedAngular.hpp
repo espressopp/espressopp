@@ -27,7 +27,7 @@
 #include "AngularPotential.hpp"
 #include "Interpolation.hpp"
 
-namespace espresso {
+namespace espressopp {
     namespace interaction {
      
         class TabulatedAngular: public AngularPotentialTemplate <TabulatedAngular> {
@@ -101,6 +101,6 @@ namespace espresso {
      
     } // ns interaction
 
-} //ns espresso
+} //ns espressopp
 
 #endif

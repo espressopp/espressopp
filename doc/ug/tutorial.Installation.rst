@@ -4,7 +4,7 @@ Installation of ESPResSo++
 The first step in the installation of ESPResSo++ is to download it from the
 following location:
 
-     https://www.espresso-pp.de/Download/espressopp_1_3_1.tgz
+     https://www.espressopp-pp.de/Download/espressopp_1_3_1.tgz
 
 On the command line type:
 

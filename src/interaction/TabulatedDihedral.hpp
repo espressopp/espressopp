@@ -27,7 +27,7 @@
 #include "DihedralPotential.hpp"
 #include "Interpolation.hpp"
 
-namespace espresso {
+namespace espressopp {
     namespace interaction {
      
         class TabulatedDihedral: public DihedralPotentialTemplate <TabulatedDihedral> {
@@ -168,6 +168,6 @@ namespace espresso {
      
     } // ns interaction
 
-} //ns espresso
+} //ns espressopp
 
 #endif

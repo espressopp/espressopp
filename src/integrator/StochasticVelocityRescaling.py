@@ -21,15 +21,15 @@
 
 """
 ***************************************************
-**espresso.integrator.StochasticVelocityRescaling**
+**espressopp.integrator.StochasticVelocityRescaling**
 ***************************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.Extension import *
-from _espresso import integrator_StochasticVelocityRescaling 
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_StochasticVelocityRescaling 
 
 class StochasticVelocityRescalingLocal(ExtensionLocal, integrator_StochasticVelocityRescaling):
     'The (local) StochasticVelocityRescaling Thermostat.'
@@ -41,6 +41,6 @@ if pmi.isController :
     class StochasticVelocityRescaling(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.StochasticVelocityRescalingLocal',
+            cls =  'espressopp.integrator.StochasticVelocityRescalingLocal',
             pmiproperty = [ 'temperature', 'coupling' ]
         )

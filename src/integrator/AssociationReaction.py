@@ -1,8 +1,8 @@
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.Extension import *
-from _espresso import integrator_AssociationReaction
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_AssociationReaction
 
 class AssociationReactionLocal(ExtensionLocal, integrator_AssociationReaction):
     """Association Reaction scheme."""
@@ -14,6 +14,6 @@ if pmi.isController :
     class AssociationReaction(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.AssociationReactionLocal',
+            cls =  'espressopp.integrator.AssociationReactionLocal',
             pmiproperty = [ 'rate', 'cutoff', 'typeA', 'typeB', 'deltaA', 'deltaB', 'stateAMin', 'interval' ]
             )

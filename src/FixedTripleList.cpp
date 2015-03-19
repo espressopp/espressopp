@@ -34,7 +34,7 @@
 #include "esutil/Error.hpp"
 
 
-namespace espresso {
+namespace espressopp {
 
   /*
   FixedTripleList::FixedTripleList(shared_ptr< storage::Storage > _storage)
@@ -286,7 +286,7 @@ namespace espresso {
 
   void FixedTripleList::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (FixedTripleList::*pyAdd)(longint pid1, longint pid2, longint pid3)
       = &FixedTripleList::add;

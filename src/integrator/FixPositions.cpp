@@ -28,7 +28,7 @@
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   using namespace iterator;
 
@@ -99,7 +99,7 @@ namespace espresso {
 
     void FixPositions::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<FixPositions, shared_ptr<FixPositions>, bases<Extension> >
 

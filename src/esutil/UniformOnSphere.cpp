@@ -26,7 +26,7 @@
 
 using namespace boost;
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
     UniformOnSphere::UniformOnSphere(shared_ptr< RNG > _rng)
       : Super(*(_rng->getBoostRNG()), DistType(3)), rng(_rng)
@@ -37,7 +37,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void
     UniformOnSphere::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       Real3D (UniformOnSphere::*pyCall)() 
       	= &UniformOnSphere::operator();

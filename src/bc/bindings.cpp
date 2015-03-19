@@ -25,7 +25,7 @@
 #include "OrthorhombicBC.hpp"
 #include "SlabBC.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace bc {
     void registerPython() {
       BC::registerPython();

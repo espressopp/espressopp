@@ -29,7 +29,7 @@
 
 #include "python.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     // Class to compute the pressure profile along slabs in the x-direction of the system.
     class XTemperature : public Observable {

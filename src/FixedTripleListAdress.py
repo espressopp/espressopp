@@ -21,22 +21,22 @@
 
 """
 **********************************
-**espresso.FixedTripleListAdress**
+**espressopp.FixedTripleListAdress**
 **********************************
 
 """
-from espresso import pmi
-import _espresso 
-import espresso
-from espresso.esutil import cxxinit
+from espressopp import pmi
+import _espressopp 
+import espressopp
+from espressopp.esutil import cxxinit
 
-class FixedTripleListAdressLocal(_espresso.FixedTripleListAdress):
+class FixedTripleListAdressLocal(_espressopp.FixedTripleListAdress):
     'The (local) fixed triple list.'
 
     def __init__(self, storage, fixedtupleList):
         'Local construction of a fixed pair list'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.FixedTripleListAdress, storage, fixedtupleList)
+            cxxinit(self, _espressopp.FixedTripleListAdress, storage, fixedtupleList)
 
     def add(self, pid1, pid2):
         'add pair to fixed triple list'
@@ -59,7 +59,7 @@ if pmi.isController:
     class FixedTripleListAdress(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.FixedTripleListAdressLocal',
+            cls = 'espressopp.FixedTripleListAdressLocal',
             localcall = [ "add" ],
             pmicall = [ "addTriples" ]
             )

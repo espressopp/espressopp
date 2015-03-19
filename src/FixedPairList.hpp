@@ -34,7 +34,7 @@
 
 //#include "FixedListComm.hpp"
 
-namespace espresso {
+namespace espressopp {
 	class FixedPairList : public PairList {
 	  public:
 	    typedef boost::unordered_multimap<longint, longint> GlobalPairs;

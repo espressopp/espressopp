@@ -24,6 +24,8 @@ file(GLOB_RECURSE NOT_BOOST_SOURCES
 
 list(REMOVE_ITEM BOOST_SOURCES ${NOT_BOOST_SOURCES})
 
-add_library(espresso_boost ${BOOST_SOURCES})
-target_link_libraries(espresso_boost ${PYTHON_LIBRARIES} ${VAMPIRTRACE_LIBRARIES} ${MPI_LIBRARIES} ${RT_LIBRARIES})
-install(TARGETS espresso_boost LIBRARY DESTINATION ${LIB})
+add_library(espressopp_boost STATIC ${BOOST_SOURCES})
+target_link_libraries(espressopp_boost ${PYTHON_LIBRARIES} ${VAMPIRTRACE_LIBRARIES} ${MPI_LIBRARIES} ${RT_LIBRARIES})
+if( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )
+  set_target_properties(espressopp_boost PROPERTIES COMPILE_FLAGS "-fPIC")
+endif( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )

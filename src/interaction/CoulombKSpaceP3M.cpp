@@ -25,7 +25,7 @@
 #include "CoulombKSpaceP3M.hpp"
 #include "CellListAllParticlesInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     typedef class CellListAllParticlesInteractionTemplate <CoulombKSpaceP3M>
@@ -228,7 +228,7 @@ namespace espresso {
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void CoulombKSpaceP3M::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< CoulombKSpaceP3M, bases< Potential > >
       ("interaction_CoulombKSpaceP3M", 

@@ -29,7 +29,7 @@
 
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     /* This class provides methods to compute forces and energies of a truncated gravity potential.
      * one over r pair potential multiplied by the masses of the two particles

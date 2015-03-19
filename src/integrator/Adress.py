@@ -39,16 +39,16 @@ In detail the AdResS extension makes sure:
 
 Example - how to turn on the AdResS integrator extension:
 
->>> adress      = espresso.integrator.Adress(system)
+>>> adress      = espressopp.integrator.Adress(system)
 >>> integrator.addExtension(adress)
 
 """
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.Extension import *
-from _espresso import integrator_Adress
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_Adress
 
 class AdressLocal(ExtensionLocal, integrator_Adress):
     'The (local) AdResS'
@@ -62,7 +62,7 @@ if pmi.isController:
     class Adress(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.integrator.AdressLocal' #,
+            cls = 'espressopp.integrator.AdressLocal' #,
             #pmiproperty = [ 'builds' ],
             #pmicall = [ 'totalSize', 'exclude', 'addAdrParticles', 'rebuild' ]
             )

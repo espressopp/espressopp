@@ -31,7 +31,7 @@
 #define M_PIl 3.1415926535897932384626433832795029L
 #endif
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
   #define M_4PI (4.0*(M_PIl))

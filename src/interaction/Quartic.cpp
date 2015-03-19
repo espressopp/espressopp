@@ -24,14 +24,14 @@
 #include "Quartic.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void 
     Quartic::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< Quartic, bases< Potential > >
     	("interaction_Quartic", init< real, real, real >())

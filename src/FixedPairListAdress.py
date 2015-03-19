@@ -32,24 +32,24 @@ defines a bond between the particles with the given particle ids.
 
 Example - creating the FixedPairListAdress and adding bonds:
 
->>> ftpl = espresso.FixedTupleList(system.storage)
->>> fpl = espresso.FixedPairListAdress(system.storage, ftpl)
+>>> ftpl = espressopp.FixedTupleList(system.storage)
+>>> fpl = espressopp.FixedPairListAdress(system.storage, ftpl)
 >>> fpl.addBonds(bonds)
 
 """
 
-from espresso import pmi
-import _espresso 
-import espresso
-from espresso.esutil import cxxinit
+from espressopp import pmi
+import _espressopp 
+import espressopp
+from espressopp.esutil import cxxinit
 
-class FixedPairListAdressLocal(_espresso.FixedPairListAdress):
+class FixedPairListAdressLocal(_espressopp.FixedPairListAdress):
     'The (local) fixed pair list.'
 
     def __init__(self, storage, fixedtupleList):
         'Local construction of a fixed pair list'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.FixedPairListAdress, storage, fixedtupleList)
+            cxxinit(self, _espressopp.FixedPairListAdress, storage, fixedtupleList)
 
     def add(self, pid1, pid2):
         'add pair to fixed pair list'
@@ -77,7 +77,7 @@ if pmi.isController:
     class FixedPairListAdress(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.FixedPairListAdressLocal',
+            cls = 'espressopp.FixedPairListAdressLocal',
             localcall = [ "add" ],
             pmicall = [ "addBonds" ],
 			pmiinvoke = ['getBonds']

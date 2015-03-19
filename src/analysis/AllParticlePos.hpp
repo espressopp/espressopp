@@ -28,7 +28,7 @@
 #include "SystemAccess.hpp"
 #include <map>
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     /** Class provides pid and position information of all particles on all cpus

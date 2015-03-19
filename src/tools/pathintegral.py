@@ -20,8 +20,8 @@
 
 import copy
 import math
-import espresso
-from espresso import Real3D, Int3D
+import espressopp
+from espressopp import Real3D, Int3D
 
 """
 ***************************************************
@@ -87,11 +87,11 @@ disableVVL=False
     vptuples=[]
     
     if not disableVVL:
-	vcl=espresso.CellList()
+	vcl=espressopp.CellList()
 
-	ftpl = espresso.FixedTupleList(system.storage)
-	#vvl=espresso.VirtualVerletList(system, rcut, ftpl)
-	vvl=espresso.VirtualVerletList(system, rcut, ftpl)
+	ftpl = espressopp.FixedTupleList(system.storage)
+	#vvl=espressopp.VirtualVerletList(system, rcut, ftpl)
+	vvl=espressopp.VirtualVerletList(system, rcut, ftpl)
 	# create a cell list which will store the virtual particles after domain decomposition
 	vvl.setCellList(vcl)
 	
@@ -123,7 +123,7 @@ disableVVL=False
     if not disableVVL:
 	iVerletLists={}
 	for i in range(1,P+1):
-	    iVerletLists.update({i:espresso.VerletList(system, 0, rebuild=False)})
+	    iVerletLists.update({i:espressopp.VerletList(system, 0, rebuild=False)})
 	    iVerletLists[i].disconnect()
     ## map types to sub-verlet lists using the VirtualVerletList classical
     ## classical types are in types
@@ -169,7 +169,7 @@ disableVVL=False
 	system.storage.decompose()
 	for t in vptuples:	
 	    ftpl.addTuple(t)	
-	extVP = espresso.integrator.ExtVirtualParticles(system, vcl)
+	extVP = espressopp.integrator.ExtVirtualParticles(system, vcl)
 	extVP.addVirtualParticleTypes([vptype])
 	extVP.setFixedTupleList(ftpl)
 	integrator.addExtension(extVP)
@@ -183,7 +183,7 @@ disableVVL=False
 	## TODO: in case of VVL: clone interaction, add potential!
 	
 	print "expanding interaction", interaction
-	if interaction.bondType() == espresso.interaction.Nonbonded:
+	if interaction.bondType() == espressopp.interaction.Nonbonded:
 	    for i in range(P):	
 		for j in range(numtypes):
 		    for k in range(numtypes):
@@ -196,7 +196,7 @@ disableVVL=False
 		vl.disconnect()
 		interaction.setVerletList(iVerletLists[1])
 
-	if interaction.bondType() == espresso.interaction.Pair:
+	if interaction.bondType() == espressopp.interaction.Pair:
 	    bond_fpl=interaction.getFixedPairList()
 	    cla_bonds=[]
 	    # loop over bond lists returned by each cpu
@@ -212,7 +212,7 @@ disableVVL=False
 		#print "trying to add", tmp, "bonds"
 		#print "i=", i, " PI BONDS", bond_fpl.size()
 		    
-	if interaction.bondType() == espresso.interaction.Angular:
+	if interaction.bondType() == espressopp.interaction.Angular:
 	    angle_ftl=interaction.getFixedTripleList()
 	    
 	    # loop over triple lists returned by each cpu
@@ -226,7 +226,7 @@ disableVVL=False
 		    angle_ftl.add(a[0]+num_cla_part*i, 
 		    a[1]+num_cla_part*i, a[2]+num_cla_part*i)
 		    
-	if interaction.bondType() == espresso.interaction.Dihedral:
+	if interaction.bondType() == espressopp.interaction.Dihedral:
 	    dihedral_fql=interaction.getFixedQuadrupleList()
 	    cla_dihedrals=[]
 	    for l in dihedral_fql.getQuadruples():
@@ -255,10 +255,10 @@ disableVVL=False
 
     kineticTermInteractions={} # key: mass value: corresponding harmonic spring interaction
     for m in unique_masses:
-	fpl=espresso.FixedPairList(system.storage)
+	fpl=espressopp.FixedPairList(system.storage)
 	k=m*P*P*langevin.temperature*langevin.temperature/(hbar*hbar)
-	pot=espresso.interaction.Harmonic(k,0.0)
-	interb = espresso.interaction.FixedPairListHarmonic(system, fpl, pot)
+	pot=espressopp.interaction.Harmonic(k,0.0)
+	interb = espressopp.interaction.FixedPairListHarmonic(system, fpl, pot)
 	system.addInteraction(interb)
 	kineticTermInteractions.update({m:interb})
 

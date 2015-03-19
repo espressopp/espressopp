@@ -29,11 +29,11 @@
 #include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   namespace integrator {
 
-    using namespace espresso::iterator;
+    using namespace espressopp::iterator;
 
     DPDThermostat::DPDThermostat(
     		shared_ptr<System> system,
@@ -246,7 +246,7 @@ namespace espresso {
     ****************************************************/
 
     void DPDThermostat::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<DPDThermostat, shared_ptr<DPDThermostat>, bases<Extension> >
         ("integrator_DPDThermostat", init<shared_ptr<System>, shared_ptr<VerletList> >())
         .def("connect", &DPDThermostat::connect)

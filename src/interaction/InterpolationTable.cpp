@@ -24,7 +24,7 @@
 
 #define MAXLINE 1024
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     LOG4ESPP_LOGGER(InterpolationTable::theLogger, "InterpolationTable");

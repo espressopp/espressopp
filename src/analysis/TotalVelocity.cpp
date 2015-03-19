@@ -28,11 +28,11 @@
 #include "iterator/CellListIterator.hpp"
 #include "mpi.h"
 
-using namespace espresso;
+using namespace espressopp;
 
 #define DEFAULT_TAG 71
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     using namespace iterator;
@@ -92,7 +92,7 @@ namespace espresso {
 
     void TotalVelocity::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<TotalVelocity>
         ("analysis_TotalVelocity", init< shared_ptr< System > >())

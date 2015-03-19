@@ -33,11 +33,11 @@
 #include "Real3D.hpp"
 #include "iterator/CellListIterator.hpp"
 
-using namespace espresso;
+using namespace espressopp;
 using namespace storage;
 using namespace bc;
 using namespace esutil;
-using namespace espresso::iterator;
+using namespace espressopp::iterator;
 
 /***********************************************************************************
 *                                                                                  *

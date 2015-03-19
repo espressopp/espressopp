@@ -21,22 +21,22 @@
 
 """
 ******************************
-**espresso.FixedPairDistList**
+**espressopp.FixedPairDistList**
 ******************************
 
 """
-from espresso import pmi
-import _espresso 
-import espresso
-from espresso.esutil import cxxinit
+from espressopp import pmi
+import _espressopp 
+import espressopp
+from espressopp.esutil import cxxinit
 
-class FixedPairDistListLocal(_espresso.FixedPairDistList):
+class FixedPairDistListLocal(_espressopp.FixedPairDistList):
     'The (local) fixed pair list.'
 
     def __init__(self, storage):
         'Local construction of a fixed pair list'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.FixedPairDistList, storage)
+            cxxinit(self, _espressopp.FixedPairDistList, storage)
 
     def add(self, pid1, pid2):
         'add pair to fixed pair list'
@@ -80,7 +80,7 @@ if pmi.isController:
   class FixedPairDistList(object):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-        cls = 'espresso.FixedPairDistListLocal',
+        cls = 'espressopp.FixedPairDistListLocal',
         localcall = [ "add" ],
         pmicall = [ "addPairs" ],
         pmiinvoke = ['getPairs', 'getPairsDist', 'size']

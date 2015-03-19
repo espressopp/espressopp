@@ -24,9 +24,9 @@
 #include "NPart.hpp"
 #include "storage/DomainDecomposition.hpp"
 
-using namespace espresso;
+using namespace espressopp;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     real NPart::compute_real() const {
 
@@ -40,7 +40,7 @@ namespace espresso {
     }
 
     void NPart::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<NPart, bases< Observable > >
         ("analysis_NPart", init< shared_ptr< System > >())
       ;

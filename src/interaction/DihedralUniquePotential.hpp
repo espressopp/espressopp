@@ -30,7 +30,7 @@
 #include <cmath>
 #include "logging.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     class DihedralUniquePotential {
     public:

@@ -21,11 +21,11 @@
 
 """
 ***********************************
-**espresso.standard_system.KGMelt**
+**espressopp.standard_system.KGMelt**
 ***********************************
 
 """
-import espresso
+import espressopp
 
 class KGMelt:
   def __init__(self, num_chains, chain_len):
@@ -35,6 +35,6 @@ class KGMelt:
     self._density       = 0.8449
     self._L             = pow(self._num_particles / self._density, 1.0/3.0)
     self._box           = (self._L, self._L, self._L)
-    self._system        = espresso.System()
+    self._system        = espressopp.System()
 
   

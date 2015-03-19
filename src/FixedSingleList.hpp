@@ -33,7 +33,7 @@
 #include <boost/signals2.hpp>
 
 
-namespace espresso {
+namespace espressopp {
 	class FixedSingleList : public SingleList{
 	  public:
 	    typedef std::set<longint> GlobalSingles;

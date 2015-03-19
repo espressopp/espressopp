@@ -28,7 +28,7 @@
 #include "SystemAccess.hpp"
 #include <vector>
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     /** All quantities to be measured derive from this abstract base class. */
     class Observable : public SystemAccess {

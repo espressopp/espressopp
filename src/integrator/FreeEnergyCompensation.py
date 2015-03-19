@@ -21,15 +21,15 @@
 
 """
 **********************************************
-**espresso.integrator.FreeEnergyCompensation**
+**espressopp.integrator.FreeEnergyCompensation**
 **********************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.Extension import *
-from _espresso import integrator_FreeEnergyCompensation 
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_FreeEnergyCompensation 
 
 class FreeEnergyCompensationLocal(ExtensionLocal, integrator_FreeEnergyCompensation):
     'The (local) Velocity Verlet Integrator.'
@@ -57,7 +57,7 @@ if pmi.isController :
     class FreeEnergyCompensation(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.FreeEnergyCompensationLocal',
+            cls =  'espressopp.integrator.FreeEnergyCompensationLocal',
             pmiproperty = [ 'itype', 'filename'],
             pmicall = ['addForce' , 'computeCompEnergy']
             )

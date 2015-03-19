@@ -27,7 +27,7 @@
 #include "InterpolationCubic.hpp"
 #include "FixedTripleListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
     namespace interaction {
         
         void TabulatedAngular::setFilename(int itype, const char* _filename) {
@@ -57,7 +57,7 @@ namespace espresso {
         // REGISTRATION WITH PYTHON
         //////////////////////////////////////////////////
         void TabulatedAngular::registerPython() {
-            using namespace espresso::python;
+            using namespace espressopp::python;
             
             class_ <TabulatedAngular, bases <AngularPotential> >
                 ("interaction_TabulatedAngular", init <int, const char*>())
@@ -73,4 +73,4 @@ namespace espresso {
         }
         
     } // ns interaction
-} // ns espresso
+} // ns espressopp

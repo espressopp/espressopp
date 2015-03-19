@@ -21,16 +21,16 @@
 
 """
 *****************************************
-**espresso.interaction.CoulombTruncated**
+**espressopp.interaction.CoulombTruncated**
 *****************************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_CoulombTruncated, \
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_CoulombTruncated, \
                       interaction_VerletListCoulombTruncated, \
                       interaction_CellListCoulombTruncated, \
                       interaction_FixedPairListCoulombTruncated
@@ -87,24 +87,24 @@ if pmi.isController:
     class CoulombTruncated(Potential):
         'The CoulombTruncated potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.CoulombTruncatedLocal',
+            cls = 'espressopp.interaction.CoulombTruncatedLocal',
             pmiproperty = ['qq']
             )
     class VerletListCoulombTruncated(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListCoulombTruncatedLocal',
+            cls =  'espressopp.interaction.VerletListCoulombTruncatedLocal',
             pmicall = ['setPotential','getPotential']
             )
     class CellListCoulombTruncated(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.CellListCoulombTruncatedLocal',
+            cls =  'espressopp.interaction.CellListCoulombTruncatedLocal',
             pmicall = ['setPotential']
             )
     class FixedPairListCoulombTruncated(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedPairListCoulombTruncatedLocal',
+            cls =  'espressopp.interaction.FixedPairListCoulombTruncatedLocal',
             pmicall = ['setPotential']
             )

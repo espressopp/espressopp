@@ -31,7 +31,7 @@
 #define PATCHLEVEL   3
 #include "gitversion.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   class Version {
   public:

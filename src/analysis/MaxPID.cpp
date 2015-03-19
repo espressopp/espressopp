@@ -25,10 +25,10 @@
 #include "storage/DomainDecomposition.hpp"
 #include "iterator/CellListIterator.hpp"
 
-using namespace espresso;
+using namespace espressopp;
 using namespace iterator;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     real MaxPID::compute() const {
 
@@ -52,7 +52,7 @@ namespace espresso {
     }
 
     void MaxPID::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<MaxPID, bases< Observable > >
         ("analysis_MaxPID", init< shared_ptr< System > >())
       ;

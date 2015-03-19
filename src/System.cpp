@@ -40,7 +40,7 @@
 # define VT_OFF()
 #endif
 
-namespace espresso {
+namespace espressopp {
 
   System::System() {
     comm = mpiWorld;
@@ -192,7 +192,7 @@ namespace espresso {
   //////////////////////////////////////////////////
   void
   System::registerPython() {
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     class_< System > ("System", init<>())
       .add_property("skin", &System::getSkin, &System::setSkin)

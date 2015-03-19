@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include "mpi.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
 
      /** Print Stack*/

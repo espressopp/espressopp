@@ -57,8 +57,8 @@ defined.
 
 Example:
 
-    >>> rng = espresso.esutil.RNG()
-    >>> langevinP = espresso.integrator.LangevinBarostat(system, rng, desiredTemperature)
+    >>> rng = espressopp.esutil.RNG()
+    >>> langevinP = espressopp.integrator.LangevinBarostat(system, rng, desiredTemperature)
     >>> langevinP.gammaP = 0.05
     >>> langevinP.pressure = 1.0
     >>> langevinP.mass = pow(10.0, 4)
@@ -72,11 +72,11 @@ Definition:
 
     In order to define the Langevin-Hoover barostat
     
-    >>> langevinP = espresso.integrator.LangevinBarostat(system, rng, desiredTemperature)
+    >>> langevinP = espressopp.integrator.LangevinBarostat(system, rng, desiredTemperature)
     
     one should have the System_ and RNG_ defined and know the desired temperature.
 
-.. _System: espresso.System.html
+.. _System: espressopp.System.html
 .. _RNG:
 
 Properties:
@@ -115,8 +115,8 @@ Adding to the integration:
     
 One more example:
 
-    >>> rngBaro = espresso.esutil.RNG()
-    >>> lP = espresso.integrator.LangevinBarostat(system, rngBaro, desiredTemperature)
+    >>> rngBaro = espressopp.esutil.RNG()
+    >>> lP = espressopp.integrator.LangevinBarostat(system, rngBaro, desiredTemperature)
     >>> lP.gammaP = .5
     >>> lP.pressure = 1.0
     >>> lP.mass = pow(10.0, 5)
@@ -128,8 +128,8 @@ Canceling the barostat:
     the ensamble or whatever :)
 
     >>> # define barostat with parameters
-    >>> rngBaro = espresso.esutil.RNG()
-    >>> lP = espresso.integrator.LangevinBarostat(system, rngBaro, desiredTemperature)
+    >>> rngBaro = espressopp.esutil.RNG()
+    >>> lP = espressopp.integrator.LangevinBarostat(system, rngBaro, desiredTemperature)
     >>> lP.gammaP = .5
     >>> lP.pressure = 1.0
     >>> lP.mass = pow(10.0, 5)
@@ -155,11 +155,11 @@ References:
 """
 
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.Extension import *
-from _espresso import integrator_LangevinBarostat
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_LangevinBarostat
 
 class LangevinBarostatLocal(ExtensionLocal, integrator_LangevinBarostat):
   def __init__(self, system, rng, temperature):
@@ -171,7 +171,7 @@ if pmi.isController :
   class LangevinBarostat(Extension):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls =  'espresso.integrator.LangevinBarostatLocal',
+      cls =  'espressopp.integrator.LangevinBarostatLocal',
       pmiproperty = [ 'gammaP', 'pressure', 'mass' ],
       pmicall = [ "setMassByFrequency" ]
     )

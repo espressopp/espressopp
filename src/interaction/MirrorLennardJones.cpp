@@ -26,7 +26,7 @@
 #include "MirrorLennardJones.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
       typedef class FixedPairListInteractionTemplate< MirrorLennardJones >
       FixedPairListMirrorLennardJones;
@@ -36,7 +36,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void 
     MirrorLennardJones::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< MirrorLennardJones, bases< Potential > >
     	("interaction_MirrorLennardJones", init< real, real >())

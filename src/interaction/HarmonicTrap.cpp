@@ -26,7 +26,7 @@
 #include "HarmonicTrap.hpp"
 #include "Real3D.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     typedef class SingleParticleInteractionTemplate <HarmonicTrap>
@@ -37,7 +37,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void
     HarmonicTrap::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< HarmonicTrap, bases< SingleParticlePotential > >
         ("interaction_HarmonicTrap", init<>())

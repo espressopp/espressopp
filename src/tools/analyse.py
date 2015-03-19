@@ -20,13 +20,13 @@
 
 
 import sys
-import espresso
+import espressopp
 
 def info(system, integrator, per_atom=False):
-  NPart  = espresso.analysis.NPart(system).compute()
-  T      = espresso.analysis.Temperature(system).compute()
-  P      = espresso.analysis.Pressure(system).compute()
-  Pij    = espresso.analysis.PressureTensor(system).compute()
+  NPart  = espressopp.analysis.NPart(system).compute()
+  T      = espressopp.analysis.Temperature(system).compute()
+  P      = espressopp.analysis.Pressure(system).compute()
+  Pij    = espressopp.analysis.PressureTensor(system).compute()
   step   = integrator.step
   Ek     = (3.0/2.0) * NPart * T
   Epot   = []
@@ -62,11 +62,11 @@ def info(system, integrator, per_atom=False):
   sys.stdout.write(tot)
 
 def final_info(system, integrator, vl, start_time, end_time):
-  NPart  = espresso.analysis.NPart(system).compute()
-  espresso.tools.timers.show(integrator.getTimers(), precision=3)
+  NPart  = espressopp.analysis.NPart(system).compute()
+  espressopp.tools.timers.show(integrator.getTimers(), precision=3)
   sys.stdout.write('Total # of neighbors = %d\n' % vl.totalSize())
   sys.stdout.write('Ave neighs/atom = %.1f\n' % (vl.totalSize() / float(NPart)))
   sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
   sys.stdout.write('Integration steps = %d\n' % integrator.step)
-  sys.stdout.write('CPUs = %i CPU time per CPU = %.5f\n' % (espresso.MPI.COMM_WORLD.size, end_time - start_time))
+  sys.stdout.write('CPUs = %i CPU time per CPU = %.5f\n' % (espressopp.MPI.COMM_WORLD.size, end_time - start_time))
 

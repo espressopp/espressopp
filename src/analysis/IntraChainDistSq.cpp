@@ -28,9 +28,9 @@
 #include "mpi.h"
 #include <map>
 
-using namespace espresso;
+using namespace espressopp;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     using namespace iterator;
@@ -57,7 +57,7 @@ namespace espresso {
     }
 
     void IntraChainDistSq::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<IntraChainDistSq, bases< AllParticlePos > >
         ("analysis_IntraChainDistSq", init< shared_ptr< System >, shared_ptr< FixedPairList > >())

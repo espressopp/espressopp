@@ -21,15 +21,15 @@
 
 """
 **********************************
-**espresso.analysis.CenterOfMass**
+**espressopp.analysis.CenterOfMass**
 **********************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.Observable import *
-from _espresso import analysis_CenterOfMass
+from espressopp.analysis.Observable import *
+from _espressopp import analysis_CenterOfMass
 
 class CenterOfMassLocal(ObservableLocal, analysis_CenterOfMass):
     'The (local) compute of center-of-mass.'
@@ -40,5 +40,5 @@ if pmi.isController :
     class CenterOfMass(Observable):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.analysis.CenterOfMassLocal'
+            cls = 'espressopp.analysis.CenterOfMassLocal'
         )

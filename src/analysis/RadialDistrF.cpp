@@ -34,11 +34,11 @@
 #define M_PIl 3.1415926535897932384626433832795029L
 #endif
 
-using namespace espresso;
+using namespace espressopp;
 using namespace iterator;
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     
     // TODO currently works correctly for Lx = Ly = Lz
@@ -153,7 +153,7 @@ namespace espresso {
     }
 
     void RadialDistrF::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<RadialDistrF, bases< Observable > >
         ("analysis_RadialDistrF", init< shared_ptr< System > >())
         .add_property("print_progress", &RadialDistrF::getPrint_progress, &RadialDistrF::setPrint_progress)

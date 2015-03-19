@@ -26,7 +26,7 @@
 #include "DomainDecomposition.hpp"
 // #include "types.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace storage {
     class DomainDecompositionNonBlocking: public DomainDecomposition {
     public:

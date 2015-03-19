@@ -43,7 +43,7 @@
 
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
   class FixedTripleAngleList: public TripleList{
       protected:
 		boost::signals2::connection con1, con2, con3;

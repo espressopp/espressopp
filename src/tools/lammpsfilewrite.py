@@ -32,23 +32,23 @@ The method needs the following parameters:
     name of the file where the table schould be saved in
 * system
     ESPResSo system which creates the data e.g.:
-    >>>system, integrator = espresso.standard_system.LennardJones(100,(10,10,10))
+    >>>system, integrator = espressopp.standard_system.LennardJones(100,(10,10,10))
 * append
     =False
       the data in the file will be overwritten
     =True
       the data will be appended
 """
-import espresso
+import espressopp
 from math import sqrt
-from espresso import Real3D
+from espressopp import Real3D
 
 def lammpsfilewrite(filename, system, append=False):
   if append:
     file = open(filename, 'a')
   else:    
     file = open(filename,'w')
-  maxParticleID = int(espresso.analysis.MaxPID(system).compute())
+  maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
   pid = 0
   atomtype = []
   typeA = []

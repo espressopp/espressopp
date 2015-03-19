@@ -17,10 +17,10 @@
 import sys
 import time
 import math
-import espresso
+import espressopp
 import mpi4py.MPI as MPI
-from espresso import Real3D
-from espresso.tools import decomp
+from espressopp import Real3D
+from espressopp.tools import decomp
 
 from time import gmtime, strftime, localtime
 
@@ -77,16 +77,16 @@ box     = (Lx, Ly, Lz)
 
 ######################################################################
 sys.stdout.write('Setting up simulation ...\n')
-system = espresso.System()
-system.rng = espresso.esutil.RNG()
-system.bc = espresso.bc.OrthorhombicBC(system.rng, box)
+system = espressopp.System()
+system.rng = espressopp.esutil.RNG()
+system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
 system.skin = skin
 
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(box, nodeGrid, rc, skin)
 
-system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 ######################################################################
 
 # add particles to the system and then decompose
@@ -112,16 +112,16 @@ print 'CellGrid = %s' % (cellGrid,)
 print ''
 
 # Stillinger Weber pair potential (similar to other short range pair nonbonded interactions)
-vl = espresso.VerletList(system, cutoff=rc)
-potSWpair = espresso.interaction.StillingerWeberPairTerm(A=_A, B=_B, p=_p, q=_q, epsilon=_eps, sigma=_sig, cutoff=rc)
-interSWpair = espresso.interaction.VerletListStillingerWeberPairTerm(vl)
+vl = espressopp.VerletList(system, cutoff=rc)
+potSWpair = espressopp.interaction.StillingerWeberPairTerm(A=_A, B=_B, p=_p, q=_q, epsilon=_eps, sigma=_sig, cutoff=rc)
+interSWpair = espressopp.interaction.VerletListStillingerWeberPairTerm(vl)
 interSWpair.setPotential(type1=0, type2=0, potential=potSWpair)
 system.addInteraction(interSWpair)
 
 # Stillinger Weber triple potential (3-body nonbonded interaction)
-vl3 = espresso.VerletListTriple(system, cutoff=rc)
-potSWtriple = espresso.interaction.StillingerWeberTripleTerm(gamma=_gamma, theta0=_theta, lmbd=_lambda, epsilon=_eps, sigma=_sig, cutoff=rc)
-interSWtriple = espresso.interaction.VerletListStillingerWeberTripleTerm(system, vl3)
+vl3 = espressopp.VerletListTriple(system, cutoff=rc)
+potSWtriple = espressopp.interaction.StillingerWeberTripleTerm(gamma=_gamma, theta0=_theta, lmbd=_lambda, epsilon=_eps, sigma=_sig, cutoff=rc)
+interSWtriple = espressopp.interaction.VerletListStillingerWeberTripleTerm(system, vl3)
 interSWtriple.setPotential(type1=0, type2=0, type3=0, potential=potSWtriple)
 system.addInteraction(interSWtriple)
 
@@ -165,21 +165,21 @@ system.addInteraction(interSWtriple)
 #######################################################################
 
 # setup integrator
-integrator = espresso.integrator.VelocityVerlet(system)
+integrator = espressopp.integrator.VelocityVerlet(system)
 integrator.dt = timestep
 
 # Langevin thermostat
-lT             = espresso.integrator.LangevinThermostat(system)
+lT             = espressopp.integrator.LangevinThermostat(system)
 lT.gamma       = 1.0
 lT.temperature = desiredT
 integrator.addExtension(lT)
 
 print 'Equilibration.'
 in_time = time.time()
-espresso.tools.analyse.info(system, integrator)
+espressopp.tools.analyse.info(system, integrator)
 for i in range (10):
   integrator.run(1000)
-  espresso.tools.info(system, integrator)
+  espressopp.tools.info(system, integrator)
 
 ##############################################
 # calculate the radial distribution function #
@@ -199,7 +199,7 @@ for i in range (nprints):
     
     # calculate radial distribution function
     distance_step = 800
-    rdf = espresso.analysis.RadialDistrF(system)
+    rdf = espressopp.analysis.RadialDistrF(system)
     rdf_array = rdf.compute(distance_step);
     
     for i in range( len(rdf_array) ):
@@ -208,7 +208,7 @@ for i in range (nprints):
       else:
         rdf_array_total[i] += rdf_array[i]
     
-  espresso.tools.info(system, integrator)
+  espressopp.tools.info(system, integrator)
 
 fin_time = time.time()
 print '\ngeneral running time: ', (fin_time-in_time)

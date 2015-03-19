@@ -23,7 +23,7 @@
 #include <python.hpp>
 #include "ParticleAccess.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   //LOG4ESPP_LOGGER(AnalysisBase::logger, "AnalysisBase");
 
@@ -32,7 +32,7 @@ namespace espresso {
   //////////////////////////////////////////////////
   void
   ParticleAccess::registerPython() {
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     class_< ParticleAccess, boost::noncopyable >("ParticleAccess", no_init)
       .def("perform_action", pure_virtual(&ParticleAccess::perform_action))

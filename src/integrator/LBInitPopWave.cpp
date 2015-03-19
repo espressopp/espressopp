@@ -23,7 +23,7 @@
 #include "python.hpp"
 #include "LBInitPopWave.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 //    LOG4ESPP_LOGGER(LBInitPopWave::theLogger, "LBInitPopWave");
     LBInitPopWave::LBInitPopWave(shared_ptr<System> system,
@@ -68,7 +68,7 @@ namespace espresso {
     void LBInitPopWave::addForce (Real3D _force) {}
 
     void LBInitPopWave::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<LBInitPopWave, bases< LBInit > >
           ("integrator_LBInit_PopWave", init< shared_ptr< System >,

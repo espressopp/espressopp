@@ -29,7 +29,7 @@
 #include "esutil/Timer.hpp"
 #include <boost/signals2.hpp>
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     /** Velocity Verlet Integrator */
@@ -37,7 +37,7 @@ namespace espresso {
 
       public:
 
-        VelocityVerlet(shared_ptr<class espresso::System> system);
+        VelocityVerlet(shared_ptr<class espressopp::System> system);
 
         virtual ~VelocityVerlet();
 

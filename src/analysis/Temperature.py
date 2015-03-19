@@ -21,15 +21,15 @@
 
 """
 *********************************
-**espresso.analysis.Temperature**
+**espressopp.analysis.Temperature**
 *********************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.AnalysisBase import *
-from _espresso import analysis_Temperature
+from espressopp.analysis.AnalysisBase import *
+from _espressopp import analysis_Temperature
 
 class TemperatureLocal(AnalysisBaseLocal, analysis_Temperature):
     'The (local) compute of temperature.'
@@ -41,5 +41,5 @@ if pmi.isController :
     class Temperature(AnalysisBase):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.analysis.TemperatureLocal'
+            cls =  'espressopp.analysis.TemperatureLocal'
             )
