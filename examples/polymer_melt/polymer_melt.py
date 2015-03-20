@@ -1,5 +1,5 @@
-#!/usr/bin/env python                                                               
-# -*- coding: iso-8859-1 -*-                                                        
+#!/usr/bin/env python
+# -*- coding: iso-8859-1 -*-
 
 ###########################################################################
 #                                                                         #
@@ -81,6 +81,9 @@ print 'CellGrid            = ', system.storage.getCellGrid()
 print ''
 
 # espressopp.tools.decomp.tuneSkin(system, integrator)
+print 'Interactions: '
+system.printInteractionLabels()
+print ''
 
 espressopp.tools.analyse.info(system, integrator)
 start_time = time.clock()
