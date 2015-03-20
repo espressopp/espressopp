@@ -10,6 +10,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 enable_language(C)
 enable_language(CXX)
 
+enable_testing()
+
 ######################################################################
 # compiler tests
 # these need ot be done early (before further tests).
@@ -149,6 +151,7 @@ endif()
 ######################################
 add_subdirectory(src)
 add_subdirectory(contrib)
+add_subdirectory(testsuite)
 
 add_custom_target(symlink ALL COMMENT "Creating symlink")
 add_custom_command(TARGET symlink COMMAND ${CMAKE_COMMAND} -E create_symlink

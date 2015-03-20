@@ -14,3 +14,7 @@ set_target_properties(dl PROPERTIES PREFIX "" SUFFIX ".so")
 
 install(TARGETS MPI LIBRARY DESTINATION ${PYTHON_INSTDIR}/mpi4py)
 install(FILES __init__.py DESTINATION ${PYTHON_INSTDIR}/mpi4py)
+if (NOT ${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_BINARY_DIR})
+  add_custom_command(TARGET MPI COMMAND ${CMAKE_COMMAND} -E create_symlink
+    ${CMAKE_CURRENT_SOURCE_DIR}/__init__.py ${CMAKE_CURRENT_BINARY_DIR}/__init__.py)
+endif()
