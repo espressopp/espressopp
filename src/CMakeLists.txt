@@ -10,7 +10,10 @@ file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
   bc/unittest/*.cpp
   integrator/unittest/*.cpp
 )
-list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
+
+file(GLOB H5MD_SOURCES io/DumpH5MD.cpp)
+
+list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES} ${H5MD_SOURCES})
 
 file(GLOB_RECURSE PYTHON_SCRIPTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *.py)
 
@@ -43,7 +46,22 @@ endif (WITH_RC_FILES)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_library(_espressopp ${ESPRESSO_SOURCES})
+if (EXTERNAL_BOOST)
+  set (BOOST ${Boost_LIBRARIES} )
+else(EXTERNAL_BOOST)
+  set (BOOST espresso_boost)
+endif(EXTERNAL_BOOST)
+
+if(WITH_H5MD)
+  find_package(HDF5 REQUIRED COMPONENTS "CXX")
+  add_definitions(-DWITH_H5MD)
+  include_directories (${HDF5_INCLUDE_DIRS})
+else(WITH_H5MD)
+  set(H5MD_SOURCES)
+  set(HDF5_LIBRARIES)
+endif(WITH_H5MD)
+
+add_library(_espressopp ${ESPRESSO_SOURCES} ${H5MD_SOURCES})
 target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
 #python libs have not prefix (default would be 'lib')
 set_target_properties(_espressopp PROPERTIES PREFIX "" SUFFIX ".so" LIBRARY_OUTPUT_DIRECTORY ..)
