@@ -7,6 +7,7 @@
  */
 
 #include "hdf5.h"
+#include "mpi.h"
 #include "ch5md.hpp"
 #include <string.h>
 #include <stdlib.h>
@@ -68,6 +69,8 @@ h5md_file h5md_create_file (const char *filename, const char *author, const char
   status = H5Aclose(a);
   status = H5Tclose(t);
   status = H5Gclose(g1);
+
+  status = H5Gclose(g);
 
   file.particles = H5Gcreate(file.id, "particles", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   file.observables = H5Gcreate(file.id, "observables", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -132,7 +135,7 @@ hid_t h5md_open_file (const char *filename)
 h5md_particles_group h5md_create_particles_group(h5md_file file, const char *name)
 {
   h5md_particles_group group;
-  
+
   group.group = H5Gcreate(file.particles, name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   return group;
@@ -167,7 +170,7 @@ h5md_element h5md_create_time_data(hid_t loc, const char *name, int rank, int in
 
   td.group = H5Gcreate(loc, name, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-  if (NULL==link) {
+  if (NULL == link) {
     spc = H5Screate_simple( 1 , dims, max_dims);
     plist = H5Pcreate(H5P_DATASET_CREATE);
     status = H5Pset_chunk(plist, 1, chunks);
@@ -202,7 +205,7 @@ int h5md_close_time_data(h5md_element e)
 
   if (!e.is_time) return 0;
 
-  if (e.link==NULL) {
+  if (e.link == NULL) {
     status = H5Dclose(e.step);
     status = H5Dclose(e.time);
   }
@@ -210,12 +213,10 @@ int h5md_close_time_data(h5md_element e)
   status = H5Gclose(e.group);
 
   return 0;
-  
 }
 
 h5md_element h5md_create_fixed_data_simple(hid_t loc, const char *name, int rank, int int_dims[], hid_t datatype, void *data)
 {
-
   h5md_element fd;
 
   hid_t spc;
@@ -236,7 +237,6 @@ h5md_element h5md_create_fixed_data_simple(hid_t loc, const char *name, int rank
   fd.is_time = false;
 
   return fd;
-
 }
 
 h5md_element h5md_create_fixed_data_scalar(hid_t loc, const char *name, hid_t datatype, void *data)
@@ -282,18 +282,19 @@ int h5md_extend_by_one(hid_t dset, hsize_t *dims) {
 
 }
 
-int h5md_append(h5md_element e, void *data, int step, double time, int offset, hid_t plist_id, int data_length, int proc_rank) {
+int h5md_append(h5md_element e, void *data, int step, double time, int offset, hid_t plist_id, int data_length) {
 
   hid_t mem_space, file_space;
   int i, rank;
   hsize_t dims[H5S_MAX_RANK];
+  hsize_t maxdims[H5S_MAX_RANK];
   hsize_t start[H5S_MAX_RANK], count[H5S_MAX_RANK];
 
   // If not a time-dependent H5MD element, do nothing
   if (!e.is_time) return 0;
-  
+
   // Updates step and time datasets. Only on rank==0.
-  if (NULL==e.link && proc_rank == 0) {
+  if (NULL==e.link) {
     h5md_extend_by_one(e.step, dims);
 
     // Define hyperslab selection
@@ -312,10 +313,10 @@ int h5md_append(h5md_element e, void *data, int step, double time, int offset, h
       count[i] = dims[i];
     }
     H5Sselect_hyperslab(file_space, H5S_SELECT_SET, start, NULL, count, NULL);
-    H5Dwrite(e.step, H5T_NATIVE_INT, mem_space, file_space, H5P_DEFAULT, (void *)&step);
+    H5Dwrite(e.step, H5T_NATIVE_INT, mem_space, file_space, plist_id, (void *)&step);
     H5Sclose(file_space);
     H5Sclose(mem_space);
-    
+
     /// Updates time dataset.
     h5md_extend_by_one(e.time, dims);
 
@@ -335,7 +336,7 @@ int h5md_append(h5md_element e, void *data, int step, double time, int offset, h
       count[i] = dims[i];
     }
     H5Sselect_hyperslab(file_space, H5S_SELECT_SET, start, NULL, count, NULL);
-    H5Dwrite(e.time, H5T_NATIVE_DOUBLE, mem_space, file_space, H5P_DEFAULT, (void *)&time);
+    H5Dwrite(e.time, H5T_NATIVE_DOUBLE, mem_space, file_space, plist_id, (void *)&time);
     H5Sclose(file_space);
     H5Sclose(mem_space);
   }
@@ -343,12 +344,14 @@ int h5md_append(h5md_element e, void *data, int step, double time, int offset, h
   /// Updates value.
   h5md_extend_by_one(e.value, dims);
 
+  dims[1] = data_length;
+
   // Select the hyperslab
   file_space = H5Dget_space(e.value);
   rank = H5Sget_simple_extent_ndims(file_space);
   mem_space = H5Screate_simple(rank-1, dims+1, NULL);
 
-  // Define hyperslab selection
+  /// Define hyperslab selection
   start[0] = dims[0]-1;
   count[0] = 1;
   for (i=1 ; i<rank ; i++) {
@@ -359,6 +362,7 @@ int h5md_append(h5md_element e, void *data, int step, double time, int offset, h
   count[1] = data_length;
 
   H5Sselect_hyperslab(file_space, H5S_SELECT_SET, start, NULL, count, NULL);
+
   H5Dwrite(e.value, e.datatype, mem_space, file_space, plist_id, data);
   H5Sclose(file_space);
   H5Sclose(mem_space);

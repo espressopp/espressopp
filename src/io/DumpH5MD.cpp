@@ -49,33 +49,35 @@ DumpH5MD::DumpH5MD(
     std::string file_name,
     std::string h5md_group_name,
     bool unfolded,
-    std::string author):
+    std::string author,
+    std::string email):
         ParticleAccess(system),
         system_(system),
         integrator_(integrator),
         file_name_(file_name),
         h5md_group_(h5md_group_name),
-        unfolded_(unfolded),
-        author_(author) {
+        unfolded_(unfolded) {
+  /// Backups the file.
   if (system->comm->rank() == 0) {
     FileBackup backup(file_name);
   }
 
   int myN = system_->storage->getNRealParticles();
-  boost::mpi::all_reduce(*system_->comm, myN, nparticles_, std::plus<int>());
+  int nparticles = 0;
+  boost::mpi::all_reduce(*system_->comm, myN, nparticles, std::plus<int>());
 
   hid_t plist_id = H5Pcreate(H5P_FILE_ACCESS);
   MPI_Info info = MPI_INFO_NULL;;
   H5Pset_fapl_mpio(plist_id, *system->comm, info);
 
   Version version;
-  file_ = h5md_create_file(file_name.c_str(), author.c_str(), "xxx", version.name().c_str(),
+  file_ = h5md_create_file(file_name.c_str(), author.c_str(), email.c_str(), version.name().c_str(),
       version.version().c_str(), plist_id);
   H5Pclose(plist_id);
   particles_ = h5md_create_particles_group(file_, h5md_group_name.c_str());
 
-  int dims[2], species[nparticles_], id_dims[2];
-  dims[0] = nparticles_;
+  int dims[2], species[nparticles], id_dims[2];
+  dims[0] = nparticles;
   dims[1] = 3;
   particles_.position = h5md_create_time_data(particles_.group, "position", 2, dims,
       H5T_NATIVE_DOUBLE, NULL);
@@ -92,6 +94,8 @@ DumpH5MD::DumpH5MD(
   edges[1] = box[1];
   edges[2] = box[2];
   h5md_create_box(&particles_, 3, boundary, false, edges, NULL);
+
+  closed_ = false;
 }
 
 void DumpH5MD::dump() {
@@ -101,9 +105,9 @@ void DumpH5MD::dump() {
   std::vector<int> all_N(system_->comm->size(), 0);;
   boost::mpi::all_gather(*system_->comm, myN, all_N);
 
-  double r[myN][3];  // buffer for coordinates;
-  int kSp[myN];  // buffer for species;
-  int kIdd[myN];  // buffer for integer;
+  double *r = new double[myN*3];  // buffer for coordinates;
+  int *kSp = new int[myN];  // buffer for species;
+  int *kIdd = new int[myN];  // buffer for integer;
 
   /// Fill values with local data;
   CellList realCells = system_->storage->getRealCells();
@@ -115,9 +119,9 @@ void DumpH5MD::dump() {
       kSp[i] = cit->type();
       Real3D &pos = cit->position();
       Int3D &img = cit->image();
-      r[i][0] = pos[0] + img[0] * box[0];
-      r[i][1] = pos[1] + img[1] * box[1];
-      r[i][2] = pos[2] + img[2] * box[2];
+      r[i*3] = pos[0] + img[0] * box[0];
+      r[i*3 + 1] = pos[1] + img[1] * box[1];
+      r[i*3 + 2] = pos[2] + img[2] * box[2];
       i++;
     }
   } else {
@@ -126,9 +130,9 @@ void DumpH5MD::dump() {
       kIdd[i] = cit->id();
       kSp[i] = cit->type();
       Real3D &pos = cit->position();
-      r[i][0] = pos[0];
-      r[i][1] = pos[1];
-      r[i][2] = pos[2];
+      r[i*3] = pos[0];
+      r[i*3 + 1] = pos[1];
+      r[i*3 + 2] = pos[2];
       i++;
     }
   }
@@ -137,25 +141,33 @@ void DumpH5MD::dump() {
   int offset = 0;
   for (int i_rank = 0; i_rank < system_->comm->rank(); i_rank++)
     offset += all_N[i_rank];
+
   hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
   H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
-  h5md_append(particles_.position, r, step, time, offset, plist_id, myN, system_->comm->rank());
+
+  h5md_append(particles_.position, r, step, time, offset, plist_id, myN);
+  h5md_append(particles_.species, kSp, step, time, offset, plist_id, myN);
+  h5md_append(particles_.id, kIdd, step, time, offset, plist_id, myN);
   H5Pclose(plist_id);
+
+  delete[] r;
+  delete[] kSp;
+  delete[] kIdd;
 }
 
-
 void DumpH5MD::close() {
-  std::cout << "H5MD deconstructor" << std::endl;
-  if (system_->comm->rank() == 0) {
-    h5md_close_time_data(particles_.position);
-    h5md_close_time_data(particles_.id);
-    h5md_close_time_data(particles_.species);
-    h5md_close_file(file_);
-  }
+  h5md_close_time_data(particles_.position);
+  h5md_close_time_data(particles_.id);
+  h5md_close_time_data(particles_.species);
+  H5Gclose(particles_.group);
+  h5md_close_file(file_);
+  closed_ = true;
 }
 
 DumpH5MD::~DumpH5MD() {
-  close();
+  std::cout << "H5MD deconstructor" << std::endl;
+  if (!closed_)
+    close();
 }
 
 void DumpH5MD::registerPython() {
@@ -167,6 +179,7 @@ void DumpH5MD::registerPython() {
                        std::string,
                        std::string,
                        bool,
+                       std::string,
                        std::string>())
     .add_property("file_id", &DumpH5MD::file_id)
     .def("dump", &DumpH5MD::dump)

@@ -55,7 +55,8 @@ class DumpH5MD : public ParticleAccess {
            std::string file_name,
            std::string h5md_group_name,
            bool unfolded,
-           std::string author);
+           std::string author,
+           std::string email);
 
   ~DumpH5MD();
 
@@ -76,11 +77,8 @@ class DumpH5MD : public ParticleAccess {
   /// If set to true the the coordinates are unfolded. By default it is folded.
   bool unfolded_;
 
-  /// Name of the author of file.
-  std::string author_;
-
-  /// Number of particles;
-  int nparticles_;
+  /// File is closed;
+  bool closed_;
 
   /// H5MD
   h5md_file file_;

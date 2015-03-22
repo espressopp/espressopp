@@ -10,7 +10,7 @@
 import time
 import espressopp
 
-nsteps      = 4
+nsteps      = 2
 isteps      = 100
 rc          = pow(2.0, 1.0/6.0)
 skin        = 0.4
@@ -86,12 +86,14 @@ system.printInteractionLabels()
 print ''
 
 h5md_dump = espressopp.io.DumpH5MD(system, integrator, "out.h5", "atoms", True, "XXX")
+ext_analyze = espressopp.integrator.ExtAnalyze(h5md_dump, 10)
+integrator.addExtension(ext_analyze)
 
 espressopp.tools.analyse.info(system, integrator)
 start_time = time.clock()
 for k in range(nsteps):
   integrator.run(isteps)
-  h5md_dump.dump()
+  #h5md_dump.dump()
   espressopp.tools.analyse.info(system, integrator)
 end_time = time.clock()
 espressopp.tools.analyse.info(system, integrator)

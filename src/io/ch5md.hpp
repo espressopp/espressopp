@@ -4,6 +4,10 @@
  *
  * This software may be modified and distributed under the terms
  * of the BSD license. See the LICENSE file for details.
+ *
+ * Github project:
+ * https://github.com/pdebuyl/ch5md
+ *
  */
 
 #ifndef CH5MD_H
@@ -14,6 +18,7 @@ extern "C" {
 #endif
 
 #include "hdf5.h"
+#include "mpi.h"
 #include <stdbool.h>
 
 #define CH5MD_RANK_ERROR -10
@@ -61,7 +66,7 @@ h5md_element h5md_create_time_data(hid_t loc, const char *name, int rank, int in
 int h5md_close_time_data(h5md_element e);
 h5md_element h5md_create_fixed_data_simple(hid_t loc, const char *name, int rank, int int_dims[], hid_t datatype, void *data);
 h5md_element h5md_create_fixed_data_scalar(hid_t loc, const char *name, hid_t datatype, void *data);
-int h5md_append(h5md_element e, void *data, int step, double time, int offset, hid_t plist_id, int data_length, int proc_rank);
+int h5md_append(h5md_element e, void *data, int step, double time, int offset, hid_t plist_id, int data_length);
 int h5md_create_box(h5md_particles_group *group, int dim, const char *boundary[], bool is_time, double value[], h5md_element *link);
 
 #ifdef __cplusplus
