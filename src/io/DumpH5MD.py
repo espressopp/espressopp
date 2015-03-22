@@ -25,18 +25,19 @@
 *******************************************
 """
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.ParticleAccess import *
-from _espresso import io_DumpH5MD
+from espressopp.ParticleAccess import *
+from _espressopp import io_DumpH5MD
 
 class DumpH5MDLocal(ParticleAccessLocal, io_DumpH5MD):
   'The (local) storage of configurations.'
   def __init__(self, system, integrator, filename='out.gro',
-               h5md_group, unfolded=False, length_unit='LJ', author='XXX'):
-    cxxinit(self, io_DumpH5MD, system, integrator, filename, h5md_group,
-            unfolded, length_unit, author)
+               h5md_group='atoms', unfolded=False, author='XXX'):
+      if pmi.workerIsActive():
+          cxxinit(self, io_DumpH5MD, system, integrator, filename, h5md_group,
+              unfolded, author)
 
   def dump(self):
     if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -47,6 +48,6 @@ if pmi.isController :
     class DumpH5MD(ParticleAccess):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.io.DumpH5MDLocal',
-            pmicall = ['dump']
+            cls =  'espressopp.io.DumpH5MDLocal',
+            pmicall = ['dump', 'close']
             )

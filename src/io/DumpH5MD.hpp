@@ -36,10 +36,16 @@
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 
+#include "analysis/ConfigurationExt.hpp"
+#include "analysis/ConfigurationsExt.hpp"
+
 #include "esutil/Error.hpp"
 
+#include "io/ch5md.hpp"
 
-namespace espresso {
+using namespace espressopp::analysis;  // NOLINT
+
+namespace espressopp {
 namespace io {
 
 class DumpH5MD : public ParticleAccess {
@@ -49,49 +55,38 @@ class DumpH5MD : public ParticleAccess {
            std::string file_name,
            std::string h5md_group_name,
            bool unfolded,
-           std::string length_unit
-           std::string author):
-               ParticleAccess(system),
-               integrator_(integrator),
-               file_name_(file_name),
-               h5md_group_(h5md_group_name),
-               unfolded_(unfolded),
-               length_unit_(length_unit),
-               author_(author) {
-    if (system->comm->rank() == 0) {
-      FileBackup backup(file_name);
-    }
+           std::string author);
 
-    /** Prepare the file. */
-    file_id_ = H5Fcreate(file_name, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-  }
-
-  ~DumpH5MD() { }
+  ~DumpH5MD();
 
   void perform_action() { dump(); }
+  hid_t file_id() { return file_.id; }
   void dump();
+  void close();
   static void registerPython();
 
  private:
   // integrator we need to know an integration step
-  shared_ptr<integrator::MDIntegrator> integrator;
+  shared_ptr<integrator::MDIntegrator> integrator_;
+  shared_ptr<System> system_;
 
   std::string file_name_;
   std::string h5md_group_;
 
   /// If set to true the the coordinates are unfolded. By default it is folded.
   bool unfolded_;
-  /// Attributes with length units.
-  std::string length_unit_;
 
   /// Name of the author of file.
   std::string author_;
 
+  /// Number of particles;
+  int nparticles_;
+
   /// H5MD
-  hid_t file_id_;
-  hid_t particles_;
+  h5md_file file_;
+  h5md_particles_group particles_;
 };
 
 }  // end namespace io
-}  // end namespace espresso
+}  // end namespace espressopp
 #endif
