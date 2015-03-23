@@ -76,7 +76,7 @@ DumpH5MD::DumpH5MD(
   H5Pclose(plist_id);
   particles_ = h5md_create_particles_group(file_, h5md_group_name.c_str());
 
-  int dims[2], species[nparticles], id_dims[2];
+  int dims[2];
   dims[0] = nparticles;
   dims[1] = 3;
   particles_.position = h5md_create_time_data(particles_.group, "position", 2, dims,
@@ -107,7 +107,7 @@ void DumpH5MD::dump() {
 
   double *r = new double[myN*3];  // buffer for coordinates;
   int *kSp = new int[myN];  // buffer for species;
-  int *kIdd = new int[myN];  // buffer for integer;
+  int *kIdd = new int[myN];  // buffer for ids;
 
   /// Fill values with local data;
   CellList realCells = system_->storage->getRealCells();
