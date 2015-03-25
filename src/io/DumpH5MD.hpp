@@ -25,7 +25,6 @@
 #define _IO_DumpH5MD_HPP
 
 #include <hdf5.h>
-#include <boost/serialization/map.hpp>
 #include <string>
 #include "mpi.hpp"
 #include "types.hpp"
@@ -56,7 +55,9 @@ class DumpH5MD : public ParticleAccess {
            std::string h5md_group_name,
            bool unfolded,
            std::string author,
-           std::string email);
+           std::string email,
+           bool save_force,
+           bool save_vel);
 
   ~DumpH5MD();
 
@@ -74,15 +75,22 @@ class DumpH5MD : public ParticleAccess {
   std::string file_name_;
   std::string h5md_group_;
 
-  /// If set to true the the coordinates are unfolded. By default it is folded.
+  /// If set to true the coordinates are unfolded. By default it is folded.
   bool unfolded_;
 
-  /// File is closed;
+  /// Is file closed.
   bool closed_;
+
+  /// Flags
+  bool save_force_;
+  bool save_vel_;
 
   /// H5MD
   h5md_file file_;
   h5md_particles_group particles_;
+
+  /// The logger.
+  static LOG4ESPP_DECL_LOGGER(theLogger);
 };
 
 }  // end namespace io

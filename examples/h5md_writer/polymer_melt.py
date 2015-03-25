@@ -85,7 +85,9 @@ print 'Interactions: '
 system.printInteractionLabels()
 print ''
 
-h5md_dump = espressopp.io.DumpH5MD(system, integrator, "out.h5", "atoms", True, "XXX")
+h5md_dump = espressopp.io.DumpH5MD(system, integrator, "out.h5", "atoms",
+                                   author="John Lenon", email="john@lenon",
+                                   save_force=True, save_velocity=True)
 ext_analyze = espressopp.integrator.ExtAnalyze(h5md_dump, 10)
 integrator.addExtension(ext_analyze)
 

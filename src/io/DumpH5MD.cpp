@@ -43,6 +43,8 @@ using namespace espressopp::analysis;  //NOLINT
 namespace espressopp {
 namespace io {
 
+LOG4ESPP_LOGGER(DumpH5MD::theLogger, "DumpH5MD");
+
 DumpH5MD::DumpH5MD(
     shared_ptr<System> system,
     shared_ptr<integrator::MDIntegrator> integrator,
@@ -50,13 +52,17 @@ DumpH5MD::DumpH5MD(
     std::string h5md_group_name,
     bool unfolded,
     std::string author,
-    std::string email):
+    std::string email,
+    bool save_force = false,
+    bool save_vel = false):
         ParticleAccess(system),
         system_(system),
         integrator_(integrator),
         file_name_(file_name),
         h5md_group_(h5md_group_name),
-        unfolded_(unfolded) {
+        unfolded_(unfolded),
+        save_force_(save_force),
+        save_vel_(save_vel) {
   /// Backups the file.
   if (system->comm->rank() == 0) {
     FileBackup backup(file_name);
@@ -81,12 +87,23 @@ DumpH5MD::DumpH5MD(
   dims[1] = 3;
   particles_.position = h5md_create_time_data(particles_.group, "position", 2, dims,
       H5T_NATIVE_DOUBLE, NULL);
+  if (save_vel_) {
+    LOG4ESPP_DEBUG(theLogger, "Enabling velocity storage.");
+    particles_.velocity = h5md_create_time_data(particles_.group, "velocity", 2, dims,
+        H5T_NATIVE_DOUBLE, NULL);
+  }
+  if (save_force_) {
+    LOG4ESPP_DEBUG(theLogger, "Enabling force storage.");
+    particles_.force = h5md_create_time_data(particles_.group, "force", 2, dims,
+        H5T_NATIVE_DOUBLE, NULL);
+  }
   dims[1] = 1;
   particles_.id = h5md_create_time_data(particles_.group, "id", 2, dims, H5T_NATIVE_INT, NULL);
   particles_.species = h5md_create_time_data(particles_.group, "species", 2, dims, H5T_NATIVE_INT,
       NULL);
   dims[1] = 3;
 
+  /// TODO(jakub): Handle also other cases when the box is not periodic.
   const char *boundary[] = {"periodic", "periodic", "periodic"};
   Real3D box = system->bc->getBoxL();
   double edges[3];
@@ -105,6 +122,13 @@ void DumpH5MD::dump() {
   std::vector<int> all_N(system_->comm->size(), 0);;
   boost::mpi::all_gather(*system_->comm, myN, all_N);
 
+  double *vel = NULL;
+  double *force = NULL;
+  if (save_force_)
+    force = new double[myN*3];
+  if (save_vel_)
+    vel = new double[myN*3];
+
   double *r = new double[myN*3];  // buffer for coordinates;
   int *kSp = new int[myN];  // buffer for species;
   int *kIdd = new int[myN];  // buffer for ids;
@@ -112,7 +136,7 @@ void DumpH5MD::dump() {
   /// Fill values with local data;
   CellList realCells = system_->storage->getRealCells();
   int i = 0;
-  if (unfolded_) {
+  if (unfolded_) {   // TODO(jakub): Perhaps that could be simplified.
     Real3D box = system_->bc->getBoxL();
     for (iterator::CellListIterator cit(realCells); !cit.isDone(); ++cit) {
       kIdd[i] = cit->id();
@@ -122,6 +146,18 @@ void DumpH5MD::dump() {
       r[i*3] = pos[0] + img[0] * box[0];
       r[i*3 + 1] = pos[1] + img[1] * box[1];
       r[i*3 + 2] = pos[2] + img[2] * box[2];
+      if (save_force_) {
+        Real3D &f = cit->force();
+        force[i*3] = f[0];
+        force[i*3 + 1] = f[1];
+        force[i*3 + 2] = f[2];
+      }
+      if (save_vel_) {
+        Real3D &v = cit->velocity();
+        vel[i*3] = v[0];
+        vel[i*3 + 1] = v[1];
+        vel[i*3 + 2] = v[2];
+      }
       i++;
     }
   } else {
@@ -133,39 +169,68 @@ void DumpH5MD::dump() {
       r[i*3] = pos[0];
       r[i*3 + 1] = pos[1];
       r[i*3 + 2] = pos[2];
+      if (save_force_) {
+        Real3D &f = cit->force();
+        force[i*3] = f[0];
+        force[i*3 + 1] = f[1];
+        force[i*3 + 2] = f[2];
+      }
+      if (save_vel_) {
+        Real3D &v = cit->velocity();
+        vel[i*3] = v[0];
+        vel[i*3 + 1] = v[1];
+        vel[i*3 + 2] = v[2];
+      }
       i++;
     }
   }
   int step = integrator_->getStep();
   double time = integrator_->getTimeStep() * step;
+
+  /// Prepare offset for storing data in parallel
   int offset = 0;
   for (int i_rank = 0; i_rank < system_->comm->rank(); i_rank++)
     offset += all_N[i_rank];
 
+  /// Enabling mpi
   hid_t plist_id = H5Pcreate(H5P_DATASET_XFER);
   H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
   h5md_append(particles_.position, r, step, time, offset, plist_id, myN);
   h5md_append(particles_.species, kSp, step, time, offset, plist_id, myN);
   h5md_append(particles_.id, kIdd, step, time, offset, plist_id, myN);
+  if (save_vel_)
+    h5md_append(particles_.velocity, vel, step, time, offset, plist_id, myN);
+  if (save_force_)
+    h5md_append(particles_.force, force, step, time, offset, plist_id, myN);
+
   H5Pclose(plist_id);
 
   delete[] r;
   delete[] kSp;
   delete[] kIdd;
+  if (save_force_)
+    delete[] force;
+  if (save_vel_)
+    delete[] vel;
 }
 
 void DumpH5MD::close() {
+  LOG4ESPP_DEBUG(theLogger, "Closing file.");
   h5md_close_time_data(particles_.position);
   h5md_close_time_data(particles_.id);
   h5md_close_time_data(particles_.species);
+  if (save_force_)
+    h5md_close_time_data(particles_.force);
+  if  (save_vel_)
+    h5md_close_time_data(particles_.velocity);
   H5Gclose(particles_.group);
   h5md_close_file(file_);
   closed_ = true;
 }
 
 DumpH5MD::~DumpH5MD() {
-  std::cout << "H5MD deconstructor" << std::endl;
+  LOG4ESPP_DEBUG(theLogger, "Running ~DumpH5MD.");
   if (!closed_)
     close();
 }
@@ -180,7 +245,9 @@ void DumpH5MD::registerPython() {
                        std::string,
                        bool,
                        std::string,
-                       std::string>())
+                       std::string,
+                       bool,
+                       bool>())
     .add_property("file_id", &DumpH5MD::file_id)
     .def("dump", &DumpH5MD::dump)
     .def("close", &DumpH5MD::close);
