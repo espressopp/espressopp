@@ -104,6 +104,6 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls='espressopp.io.DumpH5MDLocal',
-            pmicall=['dump', 'close'],
+            pmicall=['dump', 'close', 'flush'],
             pmiproperty=['file_id']
             )

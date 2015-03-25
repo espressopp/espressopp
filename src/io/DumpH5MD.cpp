@@ -235,6 +235,11 @@ DumpH5MD::~DumpH5MD() {
     close();
 }
 
+void DumpH5MD::flush() {
+  LOG4ESPP_DEBUG(theLogger, "Flush content to storage.");
+  H5Fflush(file_.id, H5F_SCOPE_GLOBAL);
+}
+
 void DumpH5MD::registerPython() {
   using namespace espressopp::python;  //NOLINT
 
@@ -250,7 +255,8 @@ void DumpH5MD::registerPython() {
                        bool>())
     .add_property("file_id", &DumpH5MD::file_id)
     .def("dump", &DumpH5MD::dump)
-    .def("close", &DumpH5MD::close);
+    .def("close", &DumpH5MD::close)
+    .def("flush", &DumpH5MD::flush);
 }
 }  // end namespace io
 }  // end namespace espressopp

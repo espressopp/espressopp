@@ -10,7 +10,7 @@
 import time
 import espressopp
 
-nsteps      = 2
+nsteps      = 4
 isteps      = 100
 rc          = pow(2.0, 1.0/6.0)
 skin        = 0.4
@@ -81,9 +81,6 @@ print 'CellGrid            = ', system.storage.getCellGrid()
 print ''
 
 # espressopp.tools.decomp.tuneSkin(system, integrator)
-print 'Interactions: '
-system.printInteractionLabels()
-print ''
 
 h5md_dump = espressopp.io.DumpH5MD(system, integrator, "out.h5", "atoms",
                                    author="John Lenon", email="john@lenon",
@@ -95,7 +92,7 @@ espressopp.tools.analyse.info(system, integrator)
 start_time = time.clock()
 for k in range(nsteps):
   integrator.run(isteps)
-  #h5md_dump.dump()
+  h5md_dump.flush()
   espressopp.tools.analyse.info(system, integrator)
 end_time = time.clock()
 espressopp.tools.analyse.info(system, integrator)

@@ -10,8 +10,8 @@
 import time
 import espressopp
 
-nsteps      = 10
-isteps      = 100
+nsteps      = 500
+isteps      = 10
 rc          = pow(2.0, 1.0/6.0)
 skin        = 0.4
 timestep    = 0.005
@@ -81,9 +81,6 @@ print 'CellGrid            = ', system.storage.getCellGrid()
 print ''
 
 # espressopp.tools.decomp.tuneSkin(system, integrator)
-print 'Interactions: '
-system.printInteractionLabels()
-print ''
 
 espressopp.tools.analyse.info(system, integrator)
 start_time = time.clock()

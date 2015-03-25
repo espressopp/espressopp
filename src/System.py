@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#
+#  
 #  This file is part of ESPResSo++.
-#
+#  
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#
+#  
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#
+#  
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
 """
@@ -48,7 +48,7 @@ Example (not complete):
 >>> LJSystem.bc   = espressopp.bc.OrthorhombicBC(rng, boxsize)
 >>> LJSystem.rng
 >>> LJSystem.skin = 0.4
->>> LJSystem.addInteraction(interLJ, 'lj')
+>>> LJSystem.addInteraction(interLJ)
 
 """
 
@@ -62,7 +62,7 @@ import mpi4py.MPI as MPI
 
 class SystemLocal(_espressopp.System):
     def __init__(self):
-        """Local construction of a System"""
+        'Local construction of a System'
         if pmi._PMIComm and pmi._PMIComm.isActive():
             if pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
                 cxxinit(self, _espressopp.System, pmi._PMIComm.getMPIsubcomm())
@@ -71,52 +71,15 @@ class SystemLocal(_espressopp.System):
         else :
             cxxinit(self, _espressopp.System, pmi._MPIcomm)
 
-        self._interaction_id = 0
-        self._interaction_label_id = {}
-
-    def addInteraction(self, interaction, label=None):
-        """Adds a short range list interaction"""
+    def addInteraction(self, interaction):
+        'add a short range list interaction'
         if pmi.workerIsActive():
-            ret_val = self.cxxclass.addInteraction(self, interaction)
-            if label is None:
-                lbl = 'e%04d' % self._interaction_id
-            else:
-                lbl = label
-            if lbl in self._interaction_label_id:
-                raise ValueError('Interaction with label {} exists'.format(lbl))
-            self._interaction_label_id[lbl] = self._interaction_id
-            self._interaction_id += 1
-            return ret_val
+            return self.cxxclass.addInteraction(self, interaction)
 
     def removeInteraction(self, number):
-        """Removes an interaction.
-
-        Args:
-            number: The interaction id
-        """
+        'remove a short range interaction, number is the number of the interaction in the short range interaction list'
         if pmi.workerIsActive():
             self.cxxclass.removeInteraction(self, number)
-            # Find the key based on number
-            if self._interaction_label_id:
-                interaction_key = [
-                    k for k, v in self._interaction_label_id.iteritems() if v == number
-                ][0]
-                # Renumerate
-                del self._interaction_label_id[interaction_key]
-                self._interaction_label_id = {
-                    k: v if v < number else v-1 for k, v in self._interaction_label_id.iteritems()
-                }
-                self._interaction_id -= 1
-
-    def removeInteractionByLabel(self, label):
-        """Removes an interaction.
-
-        Args:
-            label: The label that define interaction.
-        """
-        if pmi.workerIsActive():
-            interaction_id = self._interaction_label_id[label]
-            self.removeInteraction(interaction_id)
 
     def getNumberOfInteractions(self):
         'get number of interactions of the system'
@@ -124,36 +87,17 @@ class SystemLocal(_espressopp.System):
             return self.cxxclass.getNumberOfInteractions(self)
 
     def getInteraction(self, number):
-        'get python object of the one single interaction number i'
+        'get python object of the one single interaction number i' 
         if pmi.workerIsActive():
             ni = self.getNumberOfInteractions()
             if ni > 0:
-                if number >=0 and number < ni:
+                if number >=0 and number < ni: 
                     return self.cxxclass.getInteraction(self, number)
                 else:
                     raise Error("Interaction number %i does not exist" % number)
             else:
                 raise Error("interaction list of system is empty")
-
-    def getInteractionByLabel(self, label):
-        """Gets interaction by identifying it via label
-
-        Args:
-            label: The label that defines interaction.
-        """
-        if pmi.workerIsActive():
-            interaction_id = self._interaction_label_id[label]
-            return self.getInteraction(interaction_id)
-
-    def getInteractionMap(self):
-        """Returns the dictionary with interaction label and corresponding id."""
-        return self._interaction_label_id
-
-    def printInteractionLabels(self):
-        """Prints the list of interactions registerd in the system."""
-        for k, v in self._interaction_label_id.iteritems():
-            print('e{} -> {}'.format(v, k))
-
+            
     def scaleVolume(self, *args):
         'scale the Volume of the system, which means in detail: scale all particle coordinates, scale box length, scale cellgrid (if it exists)'
         if pmi.workerIsActive():
@@ -164,7 +108,7 @@ class SystemLocal(_espressopp.System):
               self.cxxclass.scaleVolume( arg0 )
             elif hasattr(arg0, '__iter__'):
               if len(arg0) == 3:
-                #print args, " has iterator and length 2"
+                #print args, " has iterator and length 3"
                 self.cxxclass.scaleVolume(self, toReal3DFromVector(arg0) )
               elif len(arg0) == 1:
                 #print args, " has iterator and length 1"
@@ -174,12 +118,12 @@ class SystemLocal(_espressopp.System):
             else:
               #print args, " is scalar"
               self.cxxclass.scaleVolume(self, toReal3DFromVector( [arg0, arg0, arg0] ) )
-          elif len(args) == 3:
+          elif len(args) == 3:          
             #print args, " is 3 numbers"
             self.cxxclass.scaleVolume(self, toReal3DFromVector(*args) )
           else:
             print args, " is invalid"
-
+          
     def setTrace(self, switch):
         'switch on or off VampirTrace'
         if pmi.workerIsActive():
@@ -191,16 +135,7 @@ if pmi.isController:
     pmiproxydefs = dict(
       cls = 'espressopp.SystemLocal',
       pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff'],
-      pmicall = [
-          'addInteraction',
-          'removeInteraction',
-          'removeInteractioByLabel',
-          'getInteraction',
-          'getInteractionMap',
-          'getNumberOfInteractions',
-          'scaleVolume',
-          'setTrace',
-          'printInteractionLabels'
-      ]
+      pmicall = ['addInteraction','removeInteraction','getInteraction',
+            'getNumberOfInteractions','scaleVolume', 'setTrace']
     )
 

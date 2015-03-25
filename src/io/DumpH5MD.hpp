@@ -63,8 +63,15 @@ class DumpH5MD : public ParticleAccess {
 
   void perform_action() { dump(); }
   hid_t file_id() { return file_.id; }
+
+  // Dumps the position, velocity and forces (optional) to the HDF5 storage.
   void dump();
   void close();
+
+  // Flushes the content of the HDF5 file to the storage. Useful to do
+  // as if the simulation crash then at least some data will be saved.
+  void flush();
+
   static void registerPython();
 
  private:
