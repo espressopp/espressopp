@@ -11,7 +11,7 @@ file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
   integrator/unittest/*.cpp
 )
 
-file(GLOB H5MD_SOURCES io/DumpH5MD.cpp)
+file(GLOB H5MD_SOURCES io/DumpH5MD.cpp io/ch5md.cpp)
 
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES} ${H5MD_SOURCES})
 
