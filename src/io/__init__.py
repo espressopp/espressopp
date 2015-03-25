@@ -28,4 +28,4 @@ from espressopp.io.DumpGROAdress import *
 try:
     from espressopp.io.DumpH5MD import *
 except ImportError:
-    pass
+    pass  ## This is because H5MD is an optional component. Not found better way.

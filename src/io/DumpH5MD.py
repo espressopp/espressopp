@@ -72,13 +72,7 @@ from espressopp.esutil import cxxinit
 from espressopp import pmi
 
 from espressopp.ParticleAccess import *  #NOQA
-try:
-    from _espressopp import io_DumpH5MD
-except ImportError as ex:
-    print('The H5MD support is not enabled. Please compile with flag -DWITH_H5MD=On')
-    print('Exception: {}'.format(ex))
-    import sys
-    sys.exit(1)
+from _espressopp import io_DumpH5MD
 
 
 class DumpH5MDLocal(ParticleAccessLocal, io_DumpH5MD):
