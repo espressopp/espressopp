@@ -8,6 +8,7 @@ import os
 import espressopp
 import mpi4py.MPI as MPI
 from espressopp.tools import decomp
+from espressopp.io.DumpH5MD import *
 
 box = (10.0, 10.0, 10.0)
 rc = 2.5
@@ -43,8 +44,8 @@ h5md_email = 'john@lenon'
 h5md_file = 'out.h5'
 if os.path.exists(h5md_file):
     os.unlink(h5md_file)
-with espressopp.io.DumpH5MD(system, integrator, filename=h5md_file, h5md_group=h5md_group,
-                            author=h5md_author, email=h5md_email) as h5md:
+with DumpH5MD(system, integrator, filename=h5md_file, h5md_group=h5md_group,
+              author=h5md_author, email=h5md_email) as h5md:
     h5md.dump()
 
 # Checks if the positions in h5md file are correct

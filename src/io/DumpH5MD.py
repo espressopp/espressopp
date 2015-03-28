@@ -1,9 +1,5 @@
 #  Copyright (C) 2015
 #      Jakub Krajniak (jkrajniak at gmail.com)
-#  Copyright (C) 2012,2013
-#      Max Planck Institute for Polymer Research
-#  Copyright (C) 2008,2009,2010,2011
-#      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 #
 #  This file is part of ESPResSo++.
 #
@@ -49,6 +45,9 @@ Methods:
 * `close()`
     Closes the H5MD file.
 
+* `flush()`
+    Flush buffers to the storage.
+
 Properties:
 * `file_id`
     The id of the H5MD file that could be used in h5py module to process file in Python
@@ -66,6 +65,15 @@ The trajectory can also be written with ExtAnalyze extension
 >>> ext_analyze = espressopp.integrator.ExtAnalyze(dump_h5md, 10)
 >>> integrator.addExtension(ext_analyze)
 >>> integrator.run(2000)
+>>> dump_h5md.close()
+
+Beware, you have to close the file at the end of the script. The other option is to
+use context manager.
+
+>>> with espressopp.io.DumpH5MD(system, integrator, filename='out.h5', h5md_group='atoms',
+>>>                             author='John Lenon', email='john@lenon') as h5md:
+>>>     ext_analyze = espressopp.integrator.ExtAnalyze(dump_h5md, 10)
+>>>     integrator.run(100)
 """
 
 from espressopp.esutil import cxxinit
@@ -92,12 +100,17 @@ class DumpH5MDLocal(ParticleAccessLocal, io_DumpH5MD):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.close(self)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.close()
 
 if pmi.isController:
     class DumpH5MD(ParticleAccess):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls='espressopp.io.DumpH5MDLocal',
-            pmicall=['dump', 'close', 'flush'],
+            pmicall=['dump', 'close', 'flush', '__enter__', '__exit__'],
             pmiproperty=['file_id']
             )

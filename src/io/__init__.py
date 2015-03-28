@@ -25,7 +25,10 @@ pmiimport('espressopp.io')
 from espressopp.io.DumpXYZ import *
 from espressopp.io.DumpGRO import *
 from espressopp.io.DumpGROAdress import *
+
+# Awful solution but when WITH_H5MD=Off then importing espressopp
+# will cause import error because of missing io_DumpH5MD module.
 try:
     from espressopp.io.DumpH5MD import *
 except ImportError:
-    pass  ## This is because H5MD is an optional component. Not found better way.
+    pass

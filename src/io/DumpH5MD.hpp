@@ -1,8 +1,6 @@
 /*
-  Copyright (C) 2012,2013
-      Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
-      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2015
+      Jakub Krajniak (jkrajniak at gmail.com)
 
   This file is part of ESPResSo++.
 
@@ -20,7 +18,6 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// ESPP_CLASS
 #ifndef _IO_DumpH5MD_HPP
 #define _IO_DumpH5MD_HPP
 
@@ -64,7 +61,7 @@ class DumpH5MD : public ParticleAccess {
   void perform_action() { dump(); }
   hid_t file_id() { return file_.id; }
 
-  // Dumps the position, velocity and forces (optional) to the HDF5 storage.
+  // Dumps the position and optional velocities and forces to the HDF5 storage.
   void dump();
   void close();
 
@@ -82,21 +79,20 @@ class DumpH5MD : public ParticleAccess {
   std::string file_name_;
   std::string h5md_group_;
 
-  /// If set to true the coordinates are unfolded. By default it is folded.
+  // If set to true the coordinates are unfolded. By default it is folded.
   bool unfolded_;
 
-  /// Is file closed.
+  // Is file closed.
   bool closed_;
 
-  /// Flags
+  // Flags
   bool save_force_;
   bool save_vel_;
 
-  /// H5MD
   h5md_file file_;
   h5md_particles_group particles_;
 
-  /// The logger.
+  // The logger.
   static LOG4ESPP_DECL_LOGGER(theLogger);
 };
 
