@@ -6,14 +6,17 @@ before_install:
  - sudo apt-get update
  - sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin
  - if [[ $EXTERNAL = ON ]]; then sudo apt-get install libboost1.55-all-dev python-mpi4py; fi
+ - if [[ $H5MD = ON ]]; then sudo apt-get install libhdf5-openmpi-7 python-h5py; fi
 
 env: #maybe add mpich later
   - EXTERNAL=ON
   - EXTERNAL=OFF
+  - H5MD=ON
+  - H5MD=OFF 
 
 script:
   - mkdir build && cd build && 
-    cmake -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL .. && 
+    cmake -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL -DWITH_H5MD=$H5MD .. && 
     make -j4 &&
     make test ARGS="-V" &&
     sudo make install
