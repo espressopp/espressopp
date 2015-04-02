@@ -10,6 +10,10 @@ development is independent and they are different software packages. ESPResSo++
 is free, open-source software published under the GNU General Public License
 (GPL).
 
+[H5MD](http://nongnu.org/h5md/) writer is build on top of 
+[ch5md](https://github.com/pdebuyl/ch5md) library developed
+by Pierre de Buyl and published uder the Revised BSD License.
+
 QUICKINSTALL:
 =============
 
