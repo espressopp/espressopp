@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: iso-8859-1 -*-
+#!/usr/bin/env python                                                               
+# -*- coding: iso-8859-1 -*-                                                        
 
 ###########################################################################
 #                                                                         #
@@ -10,8 +10,8 @@
 import time
 import espressopp
 
-nsteps      = 500
-isteps      = 10
+nsteps      = 10
+isteps      = 100
 rc          = pow(2.0, 1.0/6.0)
 skin        = 0.4
 timestep    = 0.005
