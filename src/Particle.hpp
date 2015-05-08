@@ -42,9 +42,11 @@ namespace espressopp {
   struct ParticleProperties {
     size_t id;
     size_t type;
+    size_t pib;
     real mass;
     real q;
     real lambda;
+    real varmass;
     real drift;
     real lambdaDeriv;
     int state;
@@ -55,9 +57,11 @@ namespace espressopp {
     {
       ar & id;
       ar & type;
+      ar & pib;
       ar & mass;
       ar & q;
       ar & lambda;
+      ar & varmass;
       ar & drift;
       ar & lambdaDeriv;
       ar & state;
@@ -74,6 +78,7 @@ namespace espressopp {
   struct ParticlePosition {
 
     Real3D p;
+    Real3D modepos;
     real radius;
     real extVar;
 
@@ -86,6 +91,8 @@ namespace espressopp {
     void serialize(Archive &ar, const unsigned int version) {
       for (int i = 0; i < 3; ++i)
         ar & p[i];
+      for (int i = 0; i < 3; ++i)
+        ar & modepos[i];
       ar & radius;
       ar & extVar;
     }
@@ -195,6 +202,7 @@ namespace espressopp {
       m.vradius      = 0.0;
       l.ghost        = false;
       p.lambda       = 0.0;
+      p.varmass       = 0.0;
       p.drift        = 0.0;      
       p.lambdaDeriv  = 0.0;
       r.extVar       = 0.0;      
@@ -213,6 +221,12 @@ namespace espressopp {
     const size_t& type() const { return p.type; }
     int getType() const { return p.type; }
     void setType(int type) { p.type = type; }
+    
+    // Path Integral bead number (used for adaptive Path Integrals)
+    size_t& pib() { return p.pib; }
+    const size_t& pib() const { return p.pib; }
+    int getPib() const { return p.pib; }
+    void setPib(int pib) { p.pib = pib; }
 
     real& mass() { return p.mass; }
     const real& mass() const { return p.mass; }
@@ -242,6 +256,12 @@ namespace espressopp {
     const Real3D& position() const { return r.p; }
     Real3D getPos() const { return r.p; }
     void setPos(const Real3D& pos) { r.p = pos; }
+    
+    // Position in Modespace (used for adaptive Path Integrals)
+    Real3D& modepos() { return r.modepos; }
+    const Real3D& modepos() const { return r.modepos; }
+    Real3D getModepos() const { return r.modepos; }
+    void setModepos(const Real3D& mp) { r.modepos = mp; }
 
     // All Forces
 
@@ -292,6 +312,12 @@ namespace espressopp {
     const real& lambda() const { return p.lambda; }
     real getLambda() const { return p.lambda; }
     void setLambda(const real& _lambda) { p.lambda = _lambda; }
+    
+    // variable mass (used for adaptive Path Integrals)    
+    real& varmass() { return p.varmass; }
+    const real& varmass() const { return p.varmass; }
+    real getVarmass() const { return p.varmass; }
+    void setVarmass(const real& _varmass) { p.varmass = _varmass; }
     
     // drift (used in H-Adress)
     real& drift() { return p.drift; }
