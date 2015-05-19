@@ -3,12 +3,21 @@ language: cpp
 before_install:
  - sudo add-apt-repository -y ppa:brad-froehle/backports #newer mpi4py
  - sudo add-apt-repository -y ppa:boost-latest/ppa  # boost 1.55
+ - sudo add-apt-repository -y 'deb http://ppa.launchpad.net/ubuntu-toolchain-r/test/ubuntu precise main'
  - sudo apt-get update
  - sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin
  - if [[ $EXTERNAL = ON ]]; then sudo apt-get install libboost1.55-all-dev python-mpi4py; fi
+ - if [[ $GCC_VERSION ]]; then
+     sudo apt-get install g++-${GCC_VERSION} && 
+     export CXX=g++-${GCC_VERSION};
+   fi
 
 env: #maybe add mpich later
   - EXTERNAL=ON
+  - EXTERNAL=ON GCC_VERSION=4.7
+  - EXTERNAL=ON GCC_VERSION=4.8
+  - EXTERNAL=ON GCC_VERSION=4.9
+  - EXTERNAL=ON GCC_VERSION=5
   - EXTERNAL=OFF
 
 script:
@@ -17,6 +26,17 @@ script:
     make -j4 &&
     make test ARGS="-V" &&
     sudo make install
+
+matrix:
+  exclude:
+    - compiler: clang
+      env: EXTERNAL=ON GCC_VERSION=4.7
+    - compiler: clang
+      env: EXTERNAL=ON GCC_VERSION=4.8
+    - compiler: clang
+      env: EXTERNAL=ON GCC_VERSION=4.9
+    - compiler: clang
+      env: EXTERNAL=ON GCC_VERSION=5
 
 compiler:
   - clang
