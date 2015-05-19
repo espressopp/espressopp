@@ -7,6 +7,7 @@ addons:
     sources:
       - boost-latest
       - george-edison55-precise-backports
+      - ubuntu-toolchain-r-test
     packages:
       - ccache
       - libfftw3-dev
@@ -19,8 +20,17 @@ addons:
       - libboost1.55-all-dev
       - python-matplotlib
       - texlive-latex-base
+      - gcc-4.7
+      - g++-4.7
+      - gcc-4.8
+      - g++-4.8
+      - gcc-4.9
+      - g++-4.9
+      - gcc-5
+      - g++-5
 
 before_install:
+ - if [[ ${GVER} ]]; then export CC=gcc-${GVER}; export CXX=g++-${GVER}; fi
  - if [[ ${BUILD_UG} ]]; then git clone https://github.com/espressopp/espressopp.github.io.git doc/ug/_build/html && pip install --user sphinx; fi
  - mkdir -p "$HOME/bin"
  - ln -s /usr/bin/ccache "$HOME/bin/clang++"
@@ -35,16 +45,28 @@ env: #maybe add mpich later
     - EXTERNAL=ON BUILD_UG=ON
     - EXTERNAL=ON COVERAGE=ON
     - EXTERNAL=OFF
+    - GVER=4.7 EXTERNAL=ON
+    - GVER=4.8 EXTERNAL=ON
+    - GVER=4.9 EXTERNAL=ON
+#    - GVER=5   EXTERNAL=ON #needs a newer boost version
 
 matrix:
   exclude:
     - compiler: clang
       env: EXTERNAL=ON COVERAGE=ON #clang has no coverage support 
+    - compiler: clang
+      env: GVER=4.7 EXTERNAL=ON
+    - compiler: clang
+      env: GVER=4.8 EXTERNAL=ON
+    - compiler: clang
+      env: GVER=4.9 EXTERNAL=ON
+    - compiler: clang
+      env: GVER=5   EXTERNAL=ON
 
 script:
   - mkdir build && cd build && 
     PATH="$HOME/bin:/usr/lib/ccache:$PATH" cmake -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL ${COVERAGE:+-DUSE_GCOV=ON} .. && 
-    make -j4 all ${BUILD_UG:+ug doc} &&
+    make -j2 all ${BUILD_UG:+ug doc} &&
     make test ARGS='-V' &&
     make install DESTDIR="${HOME}"
 
