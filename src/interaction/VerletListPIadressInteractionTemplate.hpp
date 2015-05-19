@@ -80,6 +80,11 @@ namespace espressopp {
       setFixedTupleList(shared_ptr<FixedTupleListAdress> _fixedtupleList) {
           fixedtupleList = _fixedtupleList;
       }
+      
+      void
+      setNTrotter(int _ntrotter) {
+          ntrotter = _ntrotter;
+      }
 
       void
       setPotentialQM(int type1, int type2, const PotentialQM &potential) {
@@ -387,8 +392,8 @@ namespace espressopp {
     computeEnergy() {
       LOG4ESPP_INFO(theLogger, "compute energy of the Verlet list pairs");
 
-// GO ON HERE !!!
-
+      // Pairs not inside the QM/Hybrid Zone (i.e. CL region)
+      
       // REMOVE FOR IDEAL GAS 
       real e = 0.0;        
       for (PairList::Iterator it(verletList->getPairs()); 
@@ -402,7 +407,8 @@ namespace espressopp {
       }
       // REMOVE FOR IDEAL GAS
            
-
+      
+      // Pairs inside the QM/Hybrid Zone
       for (PairList::Iterator it(verletList->getAdrPairs()); 
            it.isValid(); ++it) {
          Particle &p1 = *it->first;
@@ -489,7 +495,6 @@ namespace espressopp {
          }
 
       }
-       
       real esum;
       boost::mpi::all_reduce(*getVerletList()->getSystem()->comm, e, esum, std::plus<real>());
       return esum;      
