@@ -16,3 +16,4 @@ CMakeCache.txt
 CPack*.cmake
 install_manifest.txt
 doc/dg/html/
+CTestTestfile.cmake

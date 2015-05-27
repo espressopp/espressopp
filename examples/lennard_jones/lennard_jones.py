@@ -39,7 +39,7 @@ import espressopp
 ########################################################################
 
 # number of particles
-Npart              = 64
+Npart              = 32768
 # density of particles
 rho                = 0.8442
 # length of simulation box
@@ -166,10 +166,6 @@ for pid in range(Npart):
   system.storage.addParticle(pid, pos)
 # distribute the particles to parallel CPUs 
 system.storage.decompose()
-
-print system.storage.printRealParticles()
-
-exit()
 
 ########################################################################
 # 5. setting up interaction potential for the warmup                   #
