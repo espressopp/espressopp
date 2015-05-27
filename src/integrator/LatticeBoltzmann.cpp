@@ -54,7 +54,7 @@ namespace espressopp {
 			setExtForceFlag(0);				// there are no external forces by default
 			setCouplForceFlag(0);     // there is no coupling to MD by default
 			setStart(0);							// set indicator of coupling start to zero
-			setRestart(0);						// set indicator of coupling start to zero
+			setRestart(0);						// set indicator of restart to zero
 			setCheckMDMom(0);
 			setNSteps(1);
 
@@ -66,6 +66,7 @@ namespace espressopp {
 			int _Npart = system->storage->getNRealParticles();
 			if (_Npart != 0) {		// if MD system has particles
 				setCouplForceFlag(1);
+				setFricCoeff(5.);
 			}
 			fOnPart = std::vector<Real3D>(_Npart + 1, 0.);	// +1 since particle's id start with 1, not 0
 			printf("_Npart is %d\n", _Npart);
