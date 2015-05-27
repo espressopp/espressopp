@@ -20,10 +20,10 @@
 
 
 """
-******************************************
+********************************************
 **espressopp.analysis.LBOutputProfileVzOfX**
-******************************************
-
+********************************************
+Child class derived from the abstract class 'LBOutput()'. For more information and examples of usage, please, refer to this class.
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +32,7 @@ from espressopp.analysis.LBOutput import *
 from _espressopp import analysis_LBOutputProfile_VzOfX
 
 class LBOutputProfileVzOfXLocal(LBOutputLocal, analysis_LBOutputProfile_VzOfX):
-    'The (local) compute of LBOutputProfileVzOfX.'
+	#    'The (local) compute of LBOutputProfileVzOfX.'
     def __init__(self, system, latticeboltzmann):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_LBOutputProfile_VzOfX, system, latticeboltzmann)

@@ -25,10 +25,13 @@
 ******************************************************************************************
 
 This class creates initial populations with uniform density and harmonic velocity:
-v_x = 0, v_y = 0, v_z = Amp * sin (2 * \pi * i / N_x)
+:math:`v_x = 0`, 
+:math:`v_y = 0`,
+:math:`v_z(i) = A * sin (2 * \pi * i / N_x)`,
 
-This may be used to test the system: total moment is zero and the liquid tends to equilibrium,
-i.e. relaxes to uniform zero velocity.
+where :math:`A` is the amplitude of the velocity wave, :math:`N_x` is the number of lattice nodes in :math:`x`-direction and :math:`i` is the node index that the velocity is calculated for.
+
+This may be used to test the system: total moment is zero and the liquid tends to equilibrium, i.e. relaxes to a uniform zero velocity.
   
 """
 

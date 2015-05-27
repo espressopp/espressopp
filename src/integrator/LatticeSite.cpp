@@ -22,6 +22,7 @@
 
 #include "python.hpp"
 #include "LatticeSite.hpp"
+#include <iomanip>
 
 #include "types.hpp"
 #include "System.hpp"
@@ -62,18 +63,18 @@ namespace espressopp {
     void LBSite::setMeq_i (int _i, real _meq) { meq[_i] = _meq;}
     real LBSite::getMeq_i (int _i) { return meq[_i];}
 
-    /* for static variables */
+    /* for SELDOM-CHANGABLE variables */
     void LBSite::setALoc (real _a) {aLocal = _a;}
     real LBSite::getALoc () {return aLocal;}
 
     void LBSite::setTauLoc (real _tau) {tauLocal = _tau;}
     real LBSite::getTauLoc () {return tauLocal;}
 
-    void LBSite::setInvBLoc (int _i, real _b) { invLoc_b[_i] = _b;}
-    real LBSite::getInvBLoc (int _i) { return invLoc_b[_i];}
+    void LBSite::setInvBLoc (int _i, real _b) { inv_bLoc[_i] = _b;}
+    real LBSite::getInvBLoc (int _i) { return inv_bLoc[_i];}
 
-    void LBSite::setEqWLoc (int _i, real _w) { eqWeightLoc[_i] = _w;}
-    real LBSite::getEqWLoc (int _i) { return eqWeightLoc[_i];}
+    void LBSite::setEqWeightLoc (int _i, real _w) { eqWeightLoc[_i] = _w;}
+    real LBSite::getEqWeightLoc (int _i) { return eqWeightLoc[_i];}
 
     void LBSite::setPhiLoc (int _i, real _phi) { phiLoc[_i] = _phi;}
     real LBSite::getPhiLoc (int _i) { return phiLoc[_i];}
@@ -90,19 +91,17 @@ namespace espressopp {
     void LBSite::setGammaEvenLoc (real _gamma_even) {gamma_evenLoc = _gamma_even;}
     real LBSite::getGammaEvenLoc () { return gamma_evenLoc;}
 
-		/* for local forces */
+		/* MANAGING LOCAL FORCES (GRAVITY-LIKE) */
     void LBSite::setExtForceLoc (Real3D _extForceLoc) {extForceLoc = _extForceLoc;}
     Real3D LBSite::getExtForceLoc () {return extForceLoc;}
 		void LBSite::addExtForceLoc (Real3D _extForceLoc) {extForceLoc += _extForceLoc;}
 
+		/* MANAGING COUPLING FORCES BETWEEN LB AND MD */
 		void LBSite::setCouplForceLoc (Real3D _couplForceLoc) {couplForceLoc = _couplForceLoc;}
 		Real3D LBSite::getCouplForceLoc () {return couplForceLoc;}
 		void LBSite::addCouplForceLoc (Real3D _couplForceLoc) {couplForceLoc += _couplForceLoc;}
-		
-		/* for LB to MD coupling forces */
-//		Real3D LBSite::getMDForceLoc() {return MDForceLoc;}
 
-    /* OTHER HELPFUL OPERATIONS */
+    /* HELPFUL OPERATIONS WITH POPULATIONS AND MOMENTS */
     void LBSite::scaleF_i (int _i, real _value) { f[_i] *= _value;}
     void LBSite::scaleM_i (int _i, real _value) { m[_i] *= _value;}
     void LBSite::addM_i (int _i, real _value) { m[_i] += _value;}
@@ -112,14 +111,37 @@ namespace espressopp {
     real LBSite::aLocal   = 0.;
     real LBSite::tauLocal = 0.;
     std::vector<real> LBSite::phiLoc(19, 0.);
-    std::vector<real> LBSite::invLoc_b(19, 0.);
+    std::vector<real> LBSite::inv_bLoc(19, 0.);
     std::vector<real> LBSite::eqWeightLoc(19, 0.);
     real LBSite::gamma_bLoc = 0.;
     real LBSite::gamma_sLoc = 0.;
     real LBSite::gamma_oddLoc = 0.;
     real LBSite::gamma_evenLoc = 0.;
 
-/*----------------------------------------------------------------------------*/
+		/* INITIALISATION OF THE LATTICE MODEL: EQ.WEIGHTS, INVERSED COEFFICIENTS */
+		void LBSite::initLatticeModelLoc () {
+			using std::setprecision;
+			using std::fixed;
+			using std::setw;
+			
+			// default D3Q19 model
+			setEqWeightLoc(0, 1./3.);
+			setEqWeightLoc(1, 1./18.);   setEqWeightLoc(2, 1./18.);   setEqWeightLoc(3, 1./18.);
+			setEqWeightLoc(4, 1./18.);   setEqWeightLoc(5, 1./18.);   setEqWeightLoc(6, 1./18.);
+			setEqWeightLoc(7, 1./36.);   setEqWeightLoc(8, 1./36.);   setEqWeightLoc(9, 1./36.);
+			setEqWeightLoc(10, 1./36.);  setEqWeightLoc(11, 1./36.);  setEqWeightLoc(12, 1./36.);
+			setEqWeightLoc(13, 1./36.);  setEqWeightLoc(14, 1./36.);  setEqWeightLoc(15, 1./36.);
+			setEqWeightLoc(16, 1./36.);  setEqWeightLoc(17, 1./36.);  setEqWeightLoc(18, 1./36.);
+			
+			setInvBLoc(0, 1.);
+			setInvBLoc(1, 3.);      setInvBLoc(2, 3.);      setInvBLoc(3, 3.);
+			setInvBLoc(4, 3./2.);   setInvBLoc(5, 3./4.);   setInvBLoc(6, 9./4.);
+			setInvBLoc(7, 9.);      setInvBLoc(8, 9.);      setInvBLoc(9, 9.);
+			setInvBLoc(10, 3./2.);  setInvBLoc(11, 3./2.);  setInvBLoc(12, 3./2.);
+			setInvBLoc(13, 9./2.);  setInvBLoc(14, 9./2.);  setInvBLoc(15, 9./2.);
+			// In PRE 76, 036704 (2007) the 17th and 18th Bi are swapped in comp. to Ulf's thesis. Here we use the latter one
+			setInvBLoc(16, 1./2.);  setInvBLoc(17, 3./4.);  setInvBLoc(18, 9./4.);
+		}
 
     /* CALCULATION OF THE LOCAL MOMENTS */
     void LBSite::calcLocalMoments() {
@@ -296,7 +318,7 @@ namespace espressopp {
     void LBSite::btranMomToPop (int _numVels) {
       // scale modes with inversed coefficients
       for (int i = 0; i < _numVels; i++) {
-        scaleM_i (i, invLoc_b[i]);
+        scaleM_i (i, inv_bLoc[i]);
       }
 
       /* Calculate by hand the populations. Hints: lb.c : line 2055
@@ -347,7 +369,7 @@ namespace espressopp {
 
       /* scale populations with weights */
       for (int i = 0; i < _numVels; i++) {
-        scaleF_i (i, eqWeightLoc[i]);
+        scaleF_i (i, getEqWeightLoc(i));
       }
     }
 

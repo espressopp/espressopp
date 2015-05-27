@@ -119,8 +119,8 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<LBInitConstForce, bases< LBInit > >
-          ("integrator_LBInit_ConstForce", init< shared_ptr< System >,
-                                             shared_ptr< LatticeBoltzmann > >())
+          ("integrator_LBInit_ConstForce", init<	shared_ptr< System >,
+																							shared_ptr< LatticeBoltzmann > >())
           .def("setForce", &LBInitConstForce::setForce)
           .def("addForce", &LBInitConstForce::addForce)
       ;

@@ -27,7 +27,7 @@ namespace espressopp {
   namespace integrator {
 //    LOG4ESPP_LOGGER(LBInitPopWave::theLogger, "LBInitPopWave");
     LBInitPopWave::LBInitPopWave(shared_ptr<System> system,
-                                       shared_ptr< LatticeBoltzmann > latticeboltzmann)
+																 shared_ptr< LatticeBoltzmann > latticeboltzmann)
     : LBInit(system, latticeboltzmann) {
     }
 
@@ -72,7 +72,7 @@ namespace espressopp {
 
       class_<LBInitPopWave, bases< LBInit > >
           ("integrator_LBInit_PopWave", init< shared_ptr< System >,
-                                             shared_ptr< LatticeBoltzmann > >())
+																						shared_ptr< LatticeBoltzmann > >())
           .def("createDenVel", &LBInitPopWave::createDenVel)
       ;
     }
