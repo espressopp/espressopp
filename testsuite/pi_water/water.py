@@ -54,7 +54,7 @@ topfile = "topol.top"
 # this calls the gromacs parser for processing the top file (and included files) and the conf file
 # The variables at the beginning defaults, types, etc... can be found by calling
 # gromacs.read(grofile,topfile) without return values. It then prints out the variables to be unpacked
-defaults, types, masses, charges, atomtypeparameters, bondtypes, bondtypeparams, angletypes, angletypeparams, exclusions, x, y, z, Lx, Ly, Lz= gromacs.read(grofile,topfile)
+defaults, types, atomtypes, masses, charges, atomtypeparameters, bondtypes, bondtypeparams, angletypes, angletypeparams, exclusions, x, y, z, resname, resid, Lx, Ly, Lz= gromacs.read(grofile,topfile)
 
 ######################################################################
 ##  IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE  ##

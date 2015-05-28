@@ -170,6 +170,16 @@ class TabulatedDihedralInteractionType(InteractionType):
         pot = espressopp.interaction.DihedralHarmonicCos(K=self.parameters['k']/2.0, phi0=self.parameters['phi']*2*math.pi/360)
         interb = espressopp.interaction.FixedQuadrupleListDihedralHarmonicCos(system, fpl, pot)
         return interb          """
+
+class PeriodicDihedralInteractionType(InteractionType):
+    def createEspressoInteraction(self, system, fpl):
+        # DihedralPeriodic coded such that k = gromacs spring constant. Convert degrees to rad
+        pot = espressopp.interaction.DihedralPeriodic(self.parameters['k'], self.parameters['n'], self.parameters['phase']*2*math.pi/360)
+        interb = espressopp.interaction.FixedQuadrupleListDihedralPeriodic(system, fpl, pot)
+        return interb
+    def automaticExclusion(self):
+        return True
+
     
 def ParseBondTypeParam(line):
     tmp = line.split() 
@@ -211,13 +221,24 @@ def ParseDihedralTypeParam(line):
     type= int(tmp[4])
     if type == 8:
         p=TabulatedDihedralInteractionType({"tablenr":int(tmp[5]), "k":float(tmp[6])})
+    elif (type == 1) or (type == 9): 
+        p=PeriodicDihedralInteractionType({"phase":float(tmp[5]), "k":float(tmp[6]), "n":float(tmp[7])})
     else:
         print "Unsupported dihedral type", type, "in line:"
         print line
         exit()
     return p    
 
-
+def ParseImproperTypeParam(line):
+    tmp = line.split()
+    type= int(tmp[4])
+    if type == 4:
+        p=PeriodicDihedralInteractionType({"phase":float(tmp[5]), "k":float(tmp[6]), "n":float(tmp[7])})
+    else:
+        print "Unsupported improper type", type, "in line:"
+        print line
+        exit()
+    return p
 
 # Usefull code for generating the regular exclusions
 
