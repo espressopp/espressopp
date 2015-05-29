@@ -1,5 +1,5 @@
 espressopp
-========
+==========
 
 .. toctree::
    :maxdepth: 2
@@ -25,7 +25,6 @@ espressopp
    espressopp.ParticleGroup.rst
    espressopp.Real3D.rst
    espressopp.RealND.rst
-   espressopp.Settle.rst
    espressopp.Tensor.rst
    espressopp.VerletList.rst
    espressopp.VerletListAdress.rst

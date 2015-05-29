@@ -20,9 +20,9 @@
 
 
 """
-*******************
-**espressopp.Settle**
-*******************
+********************************
+**espressopp.integrator.Settle**
+********************************
 
 """
 from espressopp.esutil import cxxinit

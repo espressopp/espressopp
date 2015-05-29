@@ -24,7 +24,7 @@
 **LBInitPopWave** - creates initial populations with uniform density and harmonic velocity
 ******************************************************************************************
 
-This class creates initial populations with uniform density and harmonic velocity:
+This class creates LB-fluid with uniform density and harmonic velocity:
 :math:`v_x = 0`, 
 :math:`v_y = 0`,
 :math:`v_z(i) = A * sin (2 * \pi * i / N_x)`,
@@ -33,6 +33,12 @@ where :math:`A` is the amplitude of the velocity wave, :math:`N_x` is the number
 
 This may be used to test the system: total moment is zero and the liquid tends to equilibrium, i.e. relaxes to a uniform zero velocity.
   
+	Example:
+	
+	>>> initPop = espressopp.integrator.LBInitPopWave(system,lb)
+	>>> initPop.createDenVel(1.0, Real3D(0.,0.,0.0005))
+	>>> # the Real3D vector in this case includes amplitudes of the velocities
+	
 """
 
 from espressopp.esutil import cxxinit
@@ -42,7 +48,6 @@ from espressopp.integrator.LBInit import *
 from _espressopp import integrator_LBInit_PopWave
 
 class LBInitPopWaveLocal(LBInitLocal, integrator_LBInit_PopWave):
-    """The (local) compute of LBInitPopWave."""
     def __init__(self, system, latticeboltzmann):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_LBInit_PopWave, system, latticeboltzmann)

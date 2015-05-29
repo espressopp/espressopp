@@ -61,7 +61,7 @@ Typical MD simulations scale rather well.
 No. The Python scripts are executed only by the first processor which
 will broadcast the |espp| commands to the other processors
 automatically using the PMI interface (Parallel Method
-Invocation). For you, it will look a serial script. But the particles
+Invocation). For you, it will look like a serial script. But the particles
 of the simulation are distributed among the available processors and
 the commands issued for |espp| will be executed by each processor.
 

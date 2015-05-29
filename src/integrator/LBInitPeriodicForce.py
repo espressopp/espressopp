@@ -24,8 +24,25 @@
 **LBInitPeriodicForce** - handles external periodic forces
 ***************************************************************
 
-This class sets and adds an external periodic forces to a liquid
-  
+This class sets or adds an external periodic forces to the LB-fluid. At first, one has to create an instance. Only after it one may set or add this force to the system. 
+
+  .. note::
+
+    Please note, that you have to specify the amplitude of the force. Its particular values at every lattice site will be calculated automatically.
+
+  Example to set an external force:
+
+  >>> lbforce1 = espressopp.integrator.LBInitPeriodicForce(system,lb)
+  >>> lbforce1.setForce(Real3D(0.,0.,0.0005))
+  >>> # a vector sets the external body force amplitude
+
+  Example to add an external force with the amplitude :math:`(0.0001, 0., 0.)`:
+
+  >>> lbforce2 = espressopp.integrator.LBInitPeriodicForce(system,lb)
+  >>> lbforce2.addForce(Real3D(0.0001,0.,0.))
+  >>> # a vector adds the external body force with a Real3D amplitude
+
+
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -34,7 +51,6 @@ from espressopp.integrator.LBInit import *
 from _espressopp import integrator_LBInit_PeriodicForce
 
 class LBInitPeriodicForceLocal(LBInitLocal, integrator_LBInit_PeriodicForce):
-    """The (local) compute of LBInitPeriodicForce."""
     def __init__(self, system, latticeboltzmann):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_LBInit_PeriodicForce, system, latticeboltzmann)
