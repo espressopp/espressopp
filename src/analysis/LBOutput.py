@@ -24,6 +24,17 @@
 **espressopp.analysis.LBOutput**
 ******************************
 
+Abstract base class for arbitrary output from LB simulations. At the moment, the implemented realisations are:
+* `LBOutputProfileVzOfX()`
+	Computes and outputs a local density and vz component of the velocity as a function of the coordinate x. This happens in the plane where y and z are equal to zero (index j=k=0). The output takes place into the file vz_of_x.`step`.dat
+	
+	
+* `LBOutputScreen()`
+	Outputs useful information onto the screen.
+	
+* `LBOutputVzInTime()`
+	Computes and outputs a vz component of the velocity as a function of time.
+
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +43,7 @@ from espressopp.analysis.AnalysisBase import *
 from _espressopp import analysis_LBOutput
 
 class LBOutputLocal(AnalysisBaseLocal, analysis_LBOutput):
-    'The (local) compute of LBOutput.'
+	#    'The (local) compute of LBOutput.'
     def writeOutput(self):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.writeOutput(self)

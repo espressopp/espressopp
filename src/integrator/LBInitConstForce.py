@@ -20,13 +20,25 @@
 
 
 """
-**********************************************************************
-**LBInitConstForce** - handles external constant (gravity-like) forces
-**********************************************************************
+*********************************************************************
+**LBInitConstForce** - handles constant (gravity-like) external force
+*********************************************************************
 
-This class sets and adds an external constant (gravity-like) forces to a liquid
-  
+This class sets or adds a constant (gravity-like) external force to the LB-fluid. At first, one has to create an instance. Only after it one may set or add this force to the system.
+
+	Example to set the extenal force to :math:`(0., 0., 0.0005)`:
+	
+	>>> lbforce1 = espressopp.integrator.LBInitConstForce(system,lb)
+	>>> lbforce1.setForce(Real3D(0.,0.,0.0005))
+	>>> # a vector sets the external body force directly in lb-units
+
+	Example to add an extenal force of :math:`(0.0001, 0., 0.)` to the existing forces:
+
+	>>> lbforce2 = espressopp.integrator.LBInitConstForce(system,lb)
+	>>> lbforce2.addForce(Real3D(0.0001,0.,0.))
+	>>> # a vector sets the external body force directly in lb-units
 """
+
 from espressopp.esutil import cxxinit
 from espressopp import pmi
 
@@ -34,7 +46,6 @@ from espressopp.integrator.LBInit import *
 from _espressopp import integrator_LBInit_ConstForce
 
 class LBInitConstForceLocal(LBInitLocal, integrator_LBInit_ConstForce):
-    """The (local) compute of LBInitConstForce."""
     def __init__(self, system, latticeboltzmann):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_LBInit_ConstForce, system, latticeboltzmann)

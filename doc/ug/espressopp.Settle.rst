@@ -1,2 +1,0 @@
-.. automodule:: espressopp.Settle
-   :members:

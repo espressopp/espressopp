@@ -11,6 +11,7 @@ Current developers:
     Karsten Kreis (Max Planck Institute for Polymer Research, Germany)
     Sebastian Fritsch (Max Planck Institute for Polymer Research, Germany)
     Stas Bevc (National Institute of Chemistry, Slovenia) 
+    Nikita Tretyakov (Max Planck Institute for Polymer Research, Germany)
 
 Former developers:
 

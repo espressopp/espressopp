@@ -1,8 +1,6 @@
 /*
-  Copyright (C) 2012,2013
-      Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
-      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2012-2015 Max Planck Institute for Polymer Research
+  Copyright (C) 2008-2011 Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
   
   This file is part of ESPResSo++.
   
@@ -39,35 +37,36 @@ namespace espressopp {
 		LOG4ESPP_LOGGER(LatticeBoltzmann::theLogger, "LatticeBoltzmann");
 
 		/* LB Constructor; expects 3 reals, 1 vector and 5 integers */
-		LatticeBoltzmann::LatticeBoltzmann(shared_ptr<System> system, Int3D _Ni, real _a,
+		LatticeBoltzmann::LatticeBoltzmann(shared_ptr<System> _system, Int3D _Ni, real _a,
 																			 real _tau, int _numDims, int _numVels)
-		: Extension(system), Ni(_Ni), a(_a), tau(_tau), numDims(_numDims), numVels(_numVels)
+		: Extension(_system), Ni(_Ni), a(_a), tau(_tau), numDims(_numDims), numVels(_numVels)
 		{
 			/* create storage for variables equivalent at all the nodes */
 			setCs2(1. / 3. * getA() * getA() / (getTau() * getTau()));
 
-			eqWeight = std::vector<real>(_numVels, 0.);
 			c_i	= std::vector<Real3D>(_numVels, Real3D(0.,0.,0.));
-			inv_b_i = std::vector<real>(_numVels, 0.);
+			eqWeight = std::vector<real>(_numVels, 0.);
+			inv_b = std::vector<real>(_numVels, 0.);
 			phi = std::vector<real>(_numVels, 0.);
 			setLBTempFlag(0);					// there are no fluctuations by default
 			setExtForceFlag(0);				// there are no external forces by default
 			setCouplForceFlag(0);     // there is no coupling to MD by default
-			setStart(0);							// set indicator of coupling start to zero
-			setRestart(0);						// set indicator of coupling start to zero
-			setCheckMDMom(0);
-			setNSteps(1);
+			setStart(0);								// set indicator of coupling start to zero
+			setRestart(0);							// set indicator of restart to zero
+			setCheckMDMom(0);					// set indicator to check the total momentun of MD particles
+			setNSteps(1);							// set number of MD steps to be done between two LB steps
 
-			if (!system->rng) {
+			if (!_system->rng) {
 				throw std::runtime_error("system has no RNG");
 			}
-			rng = system->rng;
+			rng = _system->rng;
 
-			int _Npart = system->storage->getNRealParticles();
-			if (_Npart != 0) {		// if MD system has particles
-				setCouplForceFlag(1);
+			int _Npart = _system->storage->getNRealParticles();
+			if (_Npart != 0) {				// if MD system has particles
+				setCouplForceFlag(1);		// set an indicator for LB to MD coupling to 1
+				setFricCoeff(5.);				// set the friction coefficient of the LB to MD coupling
 			}
-			fOnPart = std::vector<Real3D>(_Npart + 1, 0.);	// +1 since particle's id start with 1, not 0
+			fOnPart = std::vector<Real3D>(_Npart + 1, 0.);	// +1 since particle's id starts with 1, not 0
 			printf("_Npart is %d\n", _Npart);
 			
 			setNBins(20);
@@ -95,21 +94,18 @@ namespace espressopp {
       }
       fclose (rngFile);
 */
-// 1D   std::vector<LBSite> lbfluid(_x , LBSite(_numVels));
-// 2D   std::vector< std::vector<LBSite> > lbfluid(_x , std::vector<LBSite>(_y , LBSite(_numVels)));
-// 3D   std::vector< std::vector< std::vector<LBSite> > > lbfluid(_x , std::vector< std::vector<LBSite> > (_y, std::vector<LBSite>(_z , LBSite(19,1.,1.))));
-//      std::vector< std::vector< std::vector< std::vector<LBSite> > > > lbfluid(2, std::vector< std::vector< std::vector<LBSite> > > (_x , std::vector< std::vector<LBSite> > (_y, std::vector<LBSite>(_z , LBSite(getNumVels(),getA(),getTau())))));
-			lbfluid.resize(getNi().getItem(0));
-			ghostlat.resize(getNi().getItem(0));
+			lbfluid.resize(getNi().getItem(0));							// resize x-dimension of the lbfluid array
+			ghostlat.resize(getNi().getItem(0));							// resize x-dimension of the ghostlat array
 			for (int i = 0; i < getNi().getItem(0); i++) {
-				lbfluid[i].resize(getNi().getItem(1));
-				ghostlat[i].resize(getNi().getItem(1));
+				lbfluid[i].resize(getNi().getItem(1));					// resize y-dimension of the lbfluid array
+				ghostlat[i].resize(getNi().getItem(1));				// resize y-dimension of the ghostlat array
 				for (int j = 0; j < getNi().getItem(1); j++) {
-					lbfluid[i][j].resize(getNi().getItem(2), LBSite(system,getNumVels(),getA(),getTau()));
+					lbfluid[i][j].resize(getNi().getItem(2), LBSite(_system, getNumVels(), getA(), getTau()));
 					ghostlat[i][j].resize(getNi().getItem(2), GhostLattice(getNumVels()));
 				}
 			}
 
+			/* checking dimensions of the LBSite */
 			std::cout << "LBSite Constructor has finished\n" ;
 			std::cout << "Check fluid creation... Its size is ";
 			std::cout << lbfluid.size() << " x " ;
@@ -120,22 +116,18 @@ namespace espressopp {
 			std::cout << ghostlat[0][0].size() << "\n";
 			std::cout << "-------------------------------------\n";
 
-			initLatticeModel();				// initialize all the global weights and coefficients
+			initLatticeModel();				// initialize all the global weights and coefficients from the local ones
 
-//      printf("Constructor has finished!!!\n");
-//      std::cout << "-------------------------------------\n";
 		}
 
 		void LatticeBoltzmann::disconnect() {
 			_recalc2.disconnect();
-//			_aftIntV.disconnect();
 			_befIntV.disconnect();
 		}
 
 		void LatticeBoltzmann::connect() {
 			_recalc2 = integrator->recalc2.connect ( boost::bind(&LatticeBoltzmann::zeroMDCMVel, this));
 			_befIntV = integrator->befIntV.connect ( boost::bind(&LatticeBoltzmann::makeLBStep, this));
-//			_aftIntV = integrator->aftIntV.connect ( boost::bind(&LatticeBoltzmann::testMDMom2, this));
 		}
 
 		/* Setter and getter for the lattice model */
@@ -183,8 +175,8 @@ namespace espressopp {
 		void LatticeBoltzmann::setCs2 (real _cs2) { cs2 = _cs2;}
 		real LatticeBoltzmann::getCs2 () { return cs2;}
 
-		void LatticeBoltzmann::setInvBi (int _l, real _value) {inv_b_i[_l] = _value;}
-		real LatticeBoltzmann::getInvBi (int _l) {return inv_b_i[_l];}
+		void LatticeBoltzmann::setInvB (int _l, real _value) {inv_b[_l] = _value;}
+		real LatticeBoltzmann::getInvB (int _l) {return inv_b[_l];}
 
 		void LatticeBoltzmann::setPhi (int _l, real _value) {phi[_l] = _value;}
 		real LatticeBoltzmann::getPhi (int _l) {return phi[_l];}
@@ -251,23 +243,7 @@ namespace espressopp {
 			using std::fixed;
 			using std::setw;
 
-			// default D3Q19 model
-			setEqWeight(0, 1./3.);
-			setEqWeight(1, 1./18.);   setEqWeight(2, 1./18.);   setEqWeight(3, 1./18.);
-			setEqWeight(4, 1./18.);   setEqWeight(5, 1./18.);   setEqWeight(6, 1./18.);
-			setEqWeight(7, 1./36.);   setEqWeight(8, 1./36.);   setEqWeight(9, 1./36.);
-			setEqWeight(10, 1./36.);  setEqWeight(11, 1./36.);  setEqWeight(12, 1./36.);
-			setEqWeight(13, 1./36.);  setEqWeight(14, 1./36.);  setEqWeight(15, 1./36.);
-			setEqWeight(16, 1./36.);  setEqWeight(17, 1./36.);  setEqWeight(18, 1./36.);
 			std::cout << setprecision(4); std::cout << fixed;
-			std::cout << "Equilibrium weights are initialized as:\n  " << getEqWeight(0) << "\n  ";
-			std::cout << getEqWeight(1) << "  " << getEqWeight(2) << "  " << getEqWeight(3) << "\n  ";
-			std::cout << getEqWeight(4) << "  " << getEqWeight(5) << "  " << getEqWeight(6) << "\n  ";
-			std::cout << getEqWeight(7) << "  " << getEqWeight(8) << "  " << getEqWeight(9) << "\n  ";
-			std::cout << getEqWeight(10) << "  " << getEqWeight(11) << "  " << getEqWeight(12) << "\n  ";
-			std::cout << getEqWeight(13) << "  " << getEqWeight(14) << "  " << getEqWeight(15) << "\n  ";
-			std::cout << getEqWeight(16) << "  " << getEqWeight(17) << "  " << getEqWeight(18) << "\n";
-			std::cout << "-------------------------------------\n";
 
 			setCi( 0, Real3D(0.,  0.,  0.));
 			setCi( 1, Real3D(1.,  0.,  0.)); setCi( 2, Real3D(-1.,  0.,  0.));
@@ -288,44 +264,25 @@ namespace espressopp {
 				<< " " << std::setw(5) << getCi(l).getItem(2) << "\n";
 			}
 			std::cout << "-------------------------------------\n";
-
-			setInvBi(0, 1.);
-			setInvBi(1, 3.);      setInvBi(2, 3.);      setInvBi(3, 3.);
-			setInvBi(4, 3./2.);   setInvBi(5, 3./4.);   setInvBi(6, 9./4.);
-			setInvBi(7, 9.);      setInvBi(8, 9.);      setInvBi(9, 9.);
-			setInvBi(10, 3./2.);  setInvBi(11, 3./2.);  setInvBi(12, 3./2.);
-			setInvBi(13, 9./2.);  setInvBi(14, 9./2.);  setInvBi(15, 9./2.);
-			// Paper from PRE 76, 036704 (2007) has swapped 17th and 18th Bi in comp. to Ulf's thesis
-			//setInvBi(16, 1./2.); setInvBi(17, 9./4.); setInvBi(18, 3./4.);
-			setInvBi(16, 1./2.);  setInvBi(17, 3./4.);  setInvBi(18, 9./4.);
-			std::cout << setprecision(4);
-			std::cout << "Inverse coefficients b_i are initialized as:\n  ";
-			std::cout << getInvBi(0)  << "\n  ";
-			std::cout << getInvBi(1)  << "  " << getInvBi(2)  << "  " << getInvBi(3)  << "\n  ";
-			std::cout << getInvBi(4)  << "  " << getInvBi(5)  << "  " << getInvBi(6)  << "\n  ";
-			std::cout << getInvBi(7)  << "  " << getInvBi(8)  << "  " << getInvBi(9)  << "\n  ";
-			std::cout << getInvBi(10) << "  " << getInvBi(11) << "  " << getInvBi(12) << "\n  ";
-			std::cout << getInvBi(13) << "  " << getInvBi(14) << "  " << getInvBi(15) << "\n  ";
-			std::cout << getInvBi(16) << "  " << getInvBi(17) << "  " << getInvBi(18) << "\n";
-			std::cout << "-------------------------------------\n";
-
-			std::cout << "initialized the model of the lattice \n";
-			std::cout << "-------------------------------------\n";
-
+			
+			// check sound speed
+			printf ("cs2 and invCs2 are %8.4f %8.4f \n", getCs2(), 1./getCs2());
+			printf("-------------------------------------\n");
+			
 			for (int i = 0; i < getNi().getItem(0); i++) {
 				for (int j = 0; j < getNi().getItem(1); j++) {
 					for (int k = 0; k < getNi().getItem(2); k++) {
 						for (int l = 0; l < getNumVels(); l++) {
-							ghostlat[i][j][k].setPop_i(l,0.0);            // set initial populations for ghost lattice
-							lbfluid[i][j][k].setInvBLoc(l,getInvBi(l));   // set local inverse b_i to the global ones
-							lbfluid[i][j][k].setEqWLoc(l,getEqWeight(l)); // set local eqWeights to the global ones
+							lbfluid[i][j][k].initLatticeModelLoc();
+							// pass local eq. weights and inversed coeff. to the global ones
+							if (i == 0 && j == 0 && k == 0) {
+								setEqWeight(l, lbfluid[0][0][0].getEqWeightLoc(l));
+								setInvB(l, lbfluid[0][0][0].getInvBLoc(l));
+							}
 						}
 					}
 				}
 			}
-			// check sound speed
-			printf ("cs2 and invCs2 are %8.4f %8.4f \n", getCs2(), 1./getCs2());
-			printf("-------------------------------------\n");
 		}
 
     /* (Re)initialization of gammas */
@@ -385,12 +342,12 @@ namespace espressopp {
 
         setPhi(0, 0.);
         setPhi(1, 0.); setPhi(2, 0.); setPhi(3, 0.);
-        setPhi(4, sqrt(mu / getInvBi(4) * (1. - getGammaB() * getGammaB())));
+        setPhi(4, sqrt(mu / getInvB(4) * (1. - getGammaB() * getGammaB())));
         for (int l = 5; l < 10; l++) {
-          setPhi(l, sqrt(mu / getInvBi(l) * (1. - getGammaS() * getGammaS())));
+          setPhi(l, sqrt(mu / getInvB(l) * (1. - getGammaS() * getGammaS())));
         }
         for (int l = 10; l < getNumVels(); l++) {
-          setPhi(l, sqrt(mu / getInvBi(l)));
+          setPhi(l, sqrt(mu / getInvB(l)));
         }
 
         for (int i = 0; i < getNi().getItem(0); i++) {
@@ -935,9 +892,6 @@ namespace espressopp {
 					}
 				}
 			}
-//			printf ("lbfluid[5][5][5].getCouplForceLoc()[0] is %20.14f\n", lbfluid[11][7][6].getCouplForceLoc().getItem(0));
-//			printf ("lbfluid[5][5][5].getCouplForceLoc()[1] is %20.14f\n", lbfluid[11][7][6].getCouplForceLoc().getItem(1));
-//			printf ("lbfluid[5][5][5].getCouplForceLoc()[2] is %20.14f\n", lbfluid[11][7][6].getCouplForceLoc().getItem(2));
 			
 			fclose (couplForcesFile);
 			
@@ -958,8 +912,8 @@ namespace espressopp {
 			using namespace espressopp::python;
 			class_<LatticeBoltzmann, shared_ptr<LatticeBoltzmann>, bases<Extension> >
 
-			("integrator_LatticeBoltzmann", init< shared_ptr< System >, Int3D,
-			 real, real, int, int >())
+			("integrator_LatticeBoltzmann", init<	shared_ptr< System >,
+																					Int3D, real, real, int, int >())
 			.add_property("Ni", &LatticeBoltzmann::getNi, &LatticeBoltzmann::setNi)
 			.add_property("a", &LatticeBoltzmann::getA, &LatticeBoltzmann::setA)
 			.add_property("tau", &LatticeBoltzmann::getTau, &LatticeBoltzmann::setTau)

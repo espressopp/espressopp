@@ -30,7 +30,7 @@ namespace espressopp {
     class LBInitConstForce : public LBInit {
       public:
       LBInitConstForce(shared_ptr<System> _system,
-                          shared_ptr< LatticeBoltzmann > _latticeboltzmann);
+											 shared_ptr< LatticeBoltzmann > _latticeboltzmann);
 
         /** Destructor for output. */
 /*        ~LBInitConstForce ();

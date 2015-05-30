@@ -1,12 +1,16 @@
 # DEMONSTRATION OF THE LATTICE-BOLTZMANN SIMULATION
 #
 import espressopp
-import cProfile, pstats
+import cProfile, pstats, StringIO
 from espressopp import Int3D
 from espressopp import Real3D
 
 # create default Lennard Jones (WCA) system with 0 particles and cubic box (L=40)
-system, integrator = espressopp.standard_system.LennardJones(100, box=(20, 20, 20), temperature=1.2)
+system, integrator = espresso.standard_system.LennardJones(100, box=(20, 20, 20), temperature=1.)
+
+# system's integrator
+integrator     = espresso.integrator.VelocityVerlet(system)
+integrator.dt  = 0.005
 
 #integrator.dt = 0.000001
 #integrator.run(10000)
@@ -26,6 +30,7 @@ lb.gamma_s = 0.5
 # specify desired temperature (set the fluctuations if any)
 #lb.lbTemp = 0.0
 lb.lbTemp = 0.000025
+lb.fricCoeff = 5.
 
 # add extension to the integrator
 integrator.addExtension(lb)
@@ -59,7 +64,11 @@ integrator.addExtension(OUT3)
 ## run 500 steps with it
 #integrator.run(500)
 ##
+
 ## add some profiling statistics for the run
-cProfile.run("integrator.run(10000)",'profiler_stats')
-p = pstats.Stats('profiler_stats')
-p.strip_dirs().sort_stats("time").print_stats(10)
+pr = cProfile.Profile()
+pr.enable()
+for k in range (2):
+		integrator.run(1000)
+		pr.disable()
+		ps = pstats.Stats(pr).dump_stats('prof.bin')

@@ -67,8 +67,8 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<LBInitPopUniform, bases< LBInit > >
-          ("integrator_LBInit_PopUniform", init< shared_ptr< System >,
-                                             shared_ptr< LatticeBoltzmann > >())
+          ("integrator_LBInit_PopUniform",		init< shared_ptr< System >,
+																					shared_ptr< LatticeBoltzmann > >())
           .def("createDenVel", &LBInitPopUniform::createDenVel)
       ;
     }

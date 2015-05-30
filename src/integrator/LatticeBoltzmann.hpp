@@ -56,8 +56,8 @@ namespace espressopp {
 			 *
 			 */
       public:
-			LatticeBoltzmann (shared_ptr< System > _system, Int3D _Ni,
-            real _a, real _tau, int _numDims, int _numVels);
+			LatticeBoltzmann (shared_ptr< System > _system,
+												Int3D _Ni, real _a, real _tau, int _numDims, int _numVels);
       ~LatticeBoltzmann ();
 
       /* SET AND GET DECLARATION */
@@ -116,8 +116,8 @@ namespace espressopp {
 			void setCs2 (real _cs2);								// set cs2
 			real getCs2 ();													// get cs2
 
-			void setInvBi (int _l, real _value);    // set inverse b_i's
-			real getInvBi (int _l);									// get inverse b_i's
+			void setInvB (int _l, real _value);    // set inverse b_i's
+			real getInvB (int _l);									// get inverse b_i's
 
 			void setPhi (int _l, real _value);			// set phi for fluctuations
 			real getPhi (int _l);										// get phi for fluctuations
@@ -183,8 +183,6 @@ namespace espressopp {
 			void setInterpVel (Real3D _interpVel);
 			Real3D getInterpVel ();
 			void addInterpVel (Real3D _interpVel);
-//			void setParticleGroup(shared_ptr< ParticleGroup > _particleGroup);
-//			shared_ptr< ParticleGroup > getParticleGroup();
 			
 			void collideStream ();					// use collide-stream scheme
 
@@ -217,9 +215,9 @@ namespace espressopp {
 			int lbTempFlag;
 			int stepNum;									// step number
 			int nSteps;
-			std::vector<real> eqWeight;		// lattice weights
 			std::vector<Real3D> c_i;			// velocity vectors
-			std::vector<real> inv_b_i;		// back-transformation weights
+			std::vector<real> eqWeight;		// equilibrium weights
+			std::vector<real> inv_b;		// back-transformation weights
 			std::vector<real> phi;				// amplitudes of fluctuations
 			
 			Int3D partBin;								// bins where the MD particle is
@@ -239,11 +237,10 @@ namespace espressopp {
 			std::vector<real> distr;
 
 			shared_ptr< esutil::RNG > rng;  //!< random number generator used for fluctuations
-
+			
 			// COUPLING
 			Real3D interpVel;						// interpolated fluid vel at the MD particle position
 
-			boost::signals2::connection _aftIntV;
 			boost::signals2::connection _befIntV;
 			boost::signals2::connection _recalc2;
 			
