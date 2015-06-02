@@ -41,20 +41,22 @@ namespace espressopp {
 																			 real _tau, int _numDims, int _numVels)
 		: Extension(_system), Ni(_Ni), a(_a), tau(_tau), numDims(_numDims), numVels(_numVels)
 		{
-			/* create storage for variables equivalent at all the nodes */
-			setCs2(1. / 3. * getA() * getA() / (getTau() * getTau()));
-
+			/* create storage for variables that are static (not changing on the run) and live on a lattice node */
 			c_i	= std::vector<Real3D>(_numVels, Real3D(0.,0.,0.));
 			eqWeight = std::vector<real>(_numVels, 0.);
 			inv_b = std::vector<real>(_numVels, 0.);
 			phi = std::vector<real>(_numVels, 0.);
+			
+			/* set flags for extended simulations to their defaults */
 			setLBTempFlag(0);					// there are no fluctuations by default
 			setExtForceFlag(0);				// there are no external forces by default
 			setCouplForceFlag(0);     // there is no coupling to MD by default
-			setStart(0);								// set indicator of coupling start to zero
-			setRestart(0);							// set indicator of restart to zero
+
+			setStart(0);							// set indicator of coupling start to zero
+			setRestart(0);						// set indicator of restart to zero
 			setCheckMDMom(0);					// set indicator to check the total momentun of MD particles
 			setNSteps(1);							// set number of MD steps to be done between two LB steps
+			setCs2(1. / 3. * getA() * getA() / (getTau() * getTau()));
 
 			if (!_system->rng) {
 				throw std::runtime_error("system has no RNG");
@@ -152,6 +154,12 @@ namespace espressopp {
 
 		void LatticeBoltzmann::setStepNum (int _step) { stepNum = _step;}
 		int LatticeBoltzmann::getStepNum () { return stepNum;}
+		
+		void LatticeBoltzmann::setDenLoc (real _denLoc) { denLoc = _denLoc;}
+		real LatticeBoltzmann::getDenLoc ()	{ return denLoc;}
+
+		void LatticeBoltzmann::setMomLoc (Real3D _jLoc) { jLoc = _jLoc;}
+		Real3D LatticeBoltzmann::getMomLoc ()	{ return jLoc;}
 		
 		void LatticeBoltzmann::setNBins (int _nBins) { nBins = _nBins;}
 		int LatticeBoltzmann::getNBins () { return nBins;}
@@ -370,7 +378,7 @@ namespace espressopp {
 			setStepNum(integrator->getStep());
 			
 			if (getCheckMDMom() == 1) {
-				testMDMom(1);
+				findCMVelMD(1);
 				setCheckMDMom(0);
 			}
 			
@@ -387,10 +395,6 @@ namespace espressopp {
 					setCheckMDMom(1);
 				}
 			}
-		}
-
-		void LatticeBoltzmann::testMDMom2 () {
-			testMDMom(2);
 		}
 		
 		/* TEST MOMENTUM OF LB FLUID */
@@ -415,11 +419,12 @@ namespace espressopp {
 				}
 			}
 			_u *= getA() / (integrator->getTimeStep());
-			printf("lb velocity in LJ units is  %18.14f %18.14f %18.14f \n",
+			printf("LB-fluid vel after streaming (LJ units) is %18.14f %18.14f %18.14f \n",
 						 _u.getItem(0), _u.getItem(1), _u.getItem(2));
 		}
 		
-		Real3D LatticeBoltzmann::findCMVelMD () {
+		/* FIND AND OUTPUT CENTER-OF-MASS VELOCITY OF MD-PARTICLES */
+		Real3D LatticeBoltzmann::findCMVelMD (int _id) {
 			System& system = getSystemRef();
 			
 			CellList realCells = system.storage->getRealCells();
@@ -432,67 +437,67 @@ namespace espressopp {
 				velCM += vel;
 			}
 
-			return velCM;
-		}
-
-		void LatticeBoltzmann::testMDMom (int _id) {
-			System& system = getSystemRef();
-			
-			CellList realCells = system.storage->getRealCells();
-			
-			Real3D velCM = Real3D(0.,0.,0.);
-			
-			// loop over all particles in the current CPU
-			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-				Real3D& vel = cit->velocity();
-				velCM += vel;
-			}
-			
+			// output if needed
 			if (_id == 1) {
-				printf("testMDMom: cmV(t+ 1/2dt) of LJ system is %18.14f %18.14f %18.14f \n",
+				printf("findCMVelMD: cmV(t+ 1/2dt) of LJ system is %18.14f %18.14f %18.14f \n",
 							 velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
 			} else if (_id == 2) {
-				printf("testMDMom: cmV(t + dt) of LJ system is   %18.14f %18.14f %18.14f \n",
+				printf("findCMVelMD: cmV(t + dt) of LJ system is   %18.14f %18.14f %18.14f \n",
 							 velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
 			} else {
 			}
 			printf("-------------------------------------------------------------------\n");
+			
+			return velCM;
 		}
 		
 		void LatticeBoltzmann::zeroMDCMVel () {
 		// set CM velocity of the MD to zero at the start of coupling
 			if (getStart() == 0 && getRestart() == 0) {
-				Real3D cmVel = findCMVelMD();
+				Real3D cmVel = findCMVelMD(0);
 				printf("cm velocity is %8.4f %8.4f %8.4f \n",
 							 cmVel.getItem(0), cmVel.getItem(1), cmVel.getItem(2));
 				galileanTransf(cmVel);
 		 
-				cmVel = findCMVelMD();
-				printf("cm velocity is %8.4f %8.4f %8.4f \n",
+				cmVel = findCMVelMD(0);
+				printf("cm velocity after Galilean transformation is %8.4f %8.4f %8.4f \n",
 							 cmVel.getItem(0), cmVel.getItem(1), cmVel.getItem(2));
+								
+				/* testing */
+				System& system = getSystemRef();
 				
-				restorePolyLBForces();
+				CellList realCells = system.storage->getRealCells();
+				
+				Real3D fTotal = Real3D(0.,0.,0.);
+				
+				// loop over 10 first particles in the current CPU
+				for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+					if (cit->id() < 11) {
+						Real3D fT = getFOnPart(cit->id());
+						fTotal += fT;
+					}
+				}
+				printf("getForce on particle is %8.4f %8.4f %8.4f \n",
+							 fTotal.getItem(0), fTotal.getItem(1), fTotal.getItem(2));
+				/* finished testing */
 				
 				setStart(1);
 			} else if (getRestart() == 1) {
-				restorePolyLBForces();
+				restoreLBForces();
 				setRestart(0);
 			} else {
 			}
 		}
 		
+		/* PERFORM GALILEAN TRANSFORMATION */
 		void LatticeBoltzmann::galileanTransf (Real3D _cmVel) {
 			System& system = getSystemRef();
 			
 			CellList realCells = system.storage->getRealCells();
 			
 			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-				subtractMom(*cit, _cmVel / system.storage->getNRealParticles());
+				cit->velocity() -= _cmVel / system.storage->getNRealParticles();
 			}
-		}
-		
-		void LatticeBoltzmann::subtractMom (Particle& p, Real3D _momPerPart) {
-			p.velocity() -= _momPerPart;
 		}
 		
     void LatticeBoltzmann::collideStream () {
@@ -539,7 +544,7 @@ namespace espressopp {
 						int _step = integrator->getStep();
             /* checking density of the system */
             if (_step % 50 == 0 || _step == 1) {
-              computeDensity (i, j, k, getNumVels(), _step);
+              computeDensity (i, j, k);
             } else {
             }
           }
@@ -600,17 +605,16 @@ namespace espressopp {
     }
 
 		/* CALCULATION OF DENSITIES ON LATTICE SITES */
-    void LatticeBoltzmann::computeDensity (int _i, int _j, int _k, int _numVels, int _step) {
-      real denLoc = 0.;
-      real jzLoc = 0.;
+    void LatticeBoltzmann::computeDensity (int _i, int _j, int _k) {
+			setDenLoc(0.);
 
-      for (int l = 0; l < _numVels; l++) {
+      for (int l = 0; l < getNumVels(); l++) {
         denLoc += lbfluid[_i][_j][_k].getF_i(l);
-        jzLoc += lbfluid[_i][_j][_k].getF_i(l) * getCi(l).getItem(2);
+//        jzLoc += lbfluid[_i][_j][_k].getF_i(l) * getCi(l).getItem(2);
       }
 
       /* check velocity fluctuations at the lattice sites */
-      if (integrator->getStep() >= 500) {
+/*      if (integrator->getStep() >= 500) {
         int _nBins = getNBins();              // number of histogram bins
         real _velRange = 0.4;                 // range of velocities fluctuations around eq.value
         real _deltaV = _velRange / _nBins;    // the histogram step
@@ -633,7 +637,20 @@ namespace espressopp {
         } else {
         }
       }
+*/
     }
+		
+		/* CALCULATION OF MOMENTUM ON LATTICE SITES */
+		void LatticeBoltzmann::computeMomentum (int _i, int _j, int _k) {
+			Real3D jLoc = Real3D(0.,0.,0.);
+			
+			for (int l = 0; l < getNumVels(); l++) {
+				jLoc += lbfluid[_i][_j][_k].getF_i(l) * getCi(l);
+//				jLoc[1] += lbfluid[_ip][_jp][_kp].getF_i(l) * getCi(l).getItem(1);
+//				jLoc[2] += lbfluid[_ip][_jp][_kp].getF_i(l) * getCi(l).getItem(2);
+			}
+			
+		}
 
     /* SCHEME OF MD TO LB COUPLING */
     void LatticeBoltzmann::coupleLBtoMD() {
@@ -697,20 +714,18 @@ namespace espressopp {
 			for (int _i = 0; _i < 2; _i++) {
 				for (int _j = 0; _j < 2; _j++) {
 					for (int _k = 0; _k < 2; _k++) {
-						//calculate density and flux on the node
-						real denLoc = 0.;
-						Real3D jLoc = Real3D(0.,0.,0.);
-						
 						/* periodic boundaries */
 						// assign iterations
 						_ip = bin[0] + _i; _jp = bin[1] + _j; _kp = bin[2] + _k;
 						
-						// handle iterations if the site is on the "left" border of the domain
+						// handle iterations if the site is on the "right" border of the domain
 						if (_ip == getNi().getItem(0)) _ip = 0;
 						if (_jp == getNi().getItem(1)) _jp = 0;
 						if (_kp == getNi().getItem(2)) _kp = 0;
 						
 						// calculation of density and momentum flux on the lattice site
+						real denLoc = 0.;
+						Real3D jLoc = Real3D(0.,0.,0.);
 						for (int l = 0; l < getNumVels(); l++) {
 							denLoc += lbfluid[_ip][_jp][_kp].getF_i(l);
 							jLoc[0] += lbfluid[_ip][_jp][_kp].getF_i(l) * getCi(l).getItem(0);
@@ -718,7 +733,7 @@ namespace espressopp {
 							jLoc[2] += lbfluid[_ip][_jp][_kp].getF_i(l) * getCi(l).getItem(2);
 						}
 
-						/*	instead, one can probably access mode values and it will be faster.
+						/*	NOTE: WRITE INTERFACE TO ACCESS MODE VALUES DIRECTLY
 						 *	The problem is that when coupling is made, the values of the modes
 						 *	are still from a previous timestep. Need to think a bit more to handle it.
 						 */
@@ -742,10 +757,10 @@ namespace espressopp {
 				}
 			}
 
-			// add viscous force to the one acting onto particle p.id()
+			// add viscous force to the buffered random force acting onto particle p.id()
 			addFOnPart(p.id(), -_fricCoeff * (p.velocity() - getInterpVel()));
 			
-			// apply random and viscous force to MD the particle p.id()
+			// apply buffered force to the MD-particle p.id()
 			p.force() += getFOnPart(p.id());
 			
 			// convert coupling force (LJ units) to the momentum change on a lattice (LB units)
@@ -780,12 +795,12 @@ namespace espressopp {
 
 		}
 		
-		void LatticeBoltzmann::addPolyLBForces (Particle& p) {
-			// apply random and viscous force to MD the particle p.id()
-			p.force() += getFOnPart(p.id());
-		}
+//		void LatticeBoltzmann::addLBForces (Particle& p) {
+//			// apply random and viscous force to MD the particle p.id()
+//			p.force() += getFOnPart(p.id());
+//		}
 		
-		void LatticeBoltzmann::restorePolyLBForces () {
+		void LatticeBoltzmann::restoreLBForces () {
 			System& system = getSystemRef();
 			
 			CellList realCells = system.storage->getRealCells();
@@ -870,7 +885,7 @@ namespace espressopp {
 			int _Npart = system.storage->getNRealParticles();
 
 			/* opening the file to write coupling forces to */
-			couplForcesFile = fopen(filename.c_str(),"a");
+			couplForcesFile = fopen(filename.c_str(),"w");
 			
 			// loop over all particles in the current CPU
 			for(int _id = 1; _id <= _Npart; _id++) {
@@ -903,9 +918,9 @@ namespace espressopp {
 			disconnect();
     }
 
-    /****************************************************
-    ** REGISTRATION WITH PYTHON
-    ****************************************************/
+		/******************************
+		 ** REGISTRATION WITH PYTHON **
+		 ******************************/
 
 		void LatticeBoltzmann::registerPython() {
 

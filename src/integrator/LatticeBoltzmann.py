@@ -24,7 +24,14 @@
 **LatticeBoltzmann** - class for lattice Boltzmann methods
 **********************************************************
 
-The LatticeBoltzmann class is an extension to the integrator class of ESPResSo++.
+The LatticeBoltzmann (LB) class is an extension to the integrator class of ESPResSo++. The main purpose of the LB-fluid in our simulation package is NOT in fluid dynamics applications or investigation of fluid-solid interfacial phenomena. We aim at complex soft matter systems, where the LB-fluid is a bulk solvent and therefore one has rather use some MD particles as solutes. Examples of such systems range from colloids (point-like MD-particles) to polymer chains (point-like MD-particles connected into chains) dissolved in some solvent (LB-fluid) with specific static and dynamic properties.
+
+It is therefore done ON PURPOSE that the user specifies parameters for LB-fluid in Lennard-Jones (LJ) units. In the kernel of the C++ code we transform these into LB-units, if neccessary. Such strategy helps users coming from MD-background to think of the LB-fluid as if it has particle-based structure: to mimic the solvent one only has to specify such parameters as liquid density, :math:`rho`, temperature, :math:`T`, and viscosity, :math:`\eta`. For a standard LJ-fluid one has: :math:`rho \sim 1 [\sigma^{-3}]`, :math:`T \sim 1 [\epsilon]`, and :math:`\eta \sim 5 [units]`.
+
+.. note::
+
+  Experienced LB-users may find our approach unusual. However, we kindly ask them for a feedback, as for us it is also quite novel. Particularly, we are interested in suggestions on expansion of the LB-possibilities and would like at first get an overview of "what do the people need?". Being it either BGK-scheme, implementation of boundary conditions or something else.
+
 It creates a simulation box with specified dimensions and allocates necessary 
 memory for a lattice Boltzmann simulation. By default we use D3Q19 lattice model 
 (in three dimensions and with 19-velocities on the node model).
