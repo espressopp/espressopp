@@ -52,7 +52,7 @@ topfile = "topol.top"
 # The variables at the beginning defaults, types, etc... can be found by calling
 # gromacs.read(grofile,topfile) without return values. It then prints out the variables to be unpacked
 
-defaults, types, masses, charges, atomtypeparameters, bondtypes, bondtypeparams, angletypes, angletypeparams, exclusions, x, y, z, vx, vy, vz, Lx, Ly, Lz = gromacs.read(grofile,topfile)
+defaults, types, atomtypes, masses, charges, atomtypeparameters, bondtypes, bondtypeparams, angletypes, angletypeparams, exclusions, x, y, z, vx, vy, vz, resname, resid, Lx, Ly, Lz =gromacs.read(grofile,topfile)
 
 # This is an equilibrated configuration!
 dummy1, dummy2, x, y, z, vx, vy, vz, dummy3, dummy4, dummy5 = espressopp.tools.readxyz("equilibrated_conf.xyz")
@@ -61,6 +61,7 @@ dummy1, dummy2, x, y, z, vx, vy, vz, dummy3, dummy4, dummy5 = espressopp.tools.r
 ##  IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE  ##
 ######################################################################
 #types, bonds, angles, dihedrals, x, y, z, vx, vy, vz, Lx, Ly, Lz = gromacs.read(grofile,topfile)
+#defaults, types, masses, charges, atomtypeparameters, bondtypes, bondtypeparams, angletypes, angletypeparams, exclusions, x, y, z, vx, vy, vz, Lx, Ly, Lz = gromacs.read(grofile,topfile)
 num_particles = len(x)
 
 density = num_particles / (Lx * Ly * Lz)
@@ -154,8 +155,8 @@ ljinteraction=gromacs.setLennardJonesInteractions(system, defaults, atomtypepara
 
 # set up angle interactions according to the parameters read from the .top file
 
-fpl = espressopp.FixedTripleListAdress(system.storage, ftpl)
-angleinteractions=gromacs.setAngleInteractions(system, angletypes, angletypeparams, fpl)
+#fpl = espressopp.FixedTripleListAdress(system.storage, ftpl)
+angleinteractions=gromacs.setAngleInteractionsAdress(system, angletypes, angletypeparams, ftpl)
 
 # set up coulomb interactions according to the parameters read from the .top file
 # !! Warning: this only works for reaction-field now!
@@ -175,8 +176,8 @@ for n in range(system.getNumberOfInteractions()):
 	interaction.setPotentialCG(type1=typeCG, type2=typeCG, potential=potCG)
 	break
 
-fpl = espressopp.FixedPairListAdress(system.storage, ftpl)
-bondedinteractions=gromacs.setBondedInteractions(system, bondtypes, bondtypeparams, fpl)
+#fpl = espressopp.FixedPairListAdress(system.storage, ftpl)
+bondedinteractions=gromacs.setBondedInteractionsAdress(system, bondtypes, bondtypeparams, ftpl)
 
 
 

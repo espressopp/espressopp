@@ -248,9 +248,10 @@ def read(gro_file, top_file="", doRegularExcl=True):
                 if (nextline[4]=='4'): 
                     readimptypes = True
                     readdhtypes = False
-                elif (nextline[4]=='9'):
+                elif ((nextline[4]=='9') or (nextline[4]=='1') or (nextline[4]=='8')):
                     readdhtypes = True
                     readimptypes = False
+                    if (nextline[4]=='8'): print 'Warning: Assuming dihedraltypes of function type 8 are dihedrals, not impropers'
                 else:
                     print 'Problem determining meaning of dihedraltypes keyword in topology file'
                     quit()
@@ -734,7 +735,7 @@ def storeDihedrals(f, types, dihedraltypes, dihedraltypeparams, dihedrals, num_a
             ic=molstartindex+pid3 + (i * num_atoms_molecule) # index of copy atom k
             id=molstartindex+pid4 + (i * num_atoms_molecule) # index of copy atom l
             if dihtypeid in dihedrals:
-                dihedrals[dihtypeid].append((ia, ib, ic, id)) # ###what happens now that it's a tuple? this hasn't been tested for the case of more than one molecule containing dihedrals
+                dihedrals[dihtypeid].append((ia, ib, ic, id)) # ###what happens now that it's a tuple? this has only been briefly tested for the case of more than one molecule containing dihedrals
             else:
                 dihedrals.update({dihtypeid:[(ia, ib, ic, id)]})
     return dihedrals
