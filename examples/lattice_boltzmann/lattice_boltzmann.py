@@ -6,19 +6,26 @@ from espressopp import Int3D
 from espressopp import Real3D
 
 # create default Lennard Jones (WCA) system with 0 particles and cubic box (L=40)
-system, integrator = espresso.standard_system.LennardJones(100, box=(20, 20, 20), temperature=1.)
+system, integrator = espressopp.standard_system.LennardJones(100, box=(20, 20, 20), temperature=1.)
 
 # system's integrator
-integrator     = espresso.integrator.VelocityVerlet(system)
+integrator     = espressopp.integrator.VelocityVerlet(system)
 integrator.dt  = 0.005
 
+thermostat     = espressopp.integrator.LangevinThermostat(system)
+thermostat.gamma  = 1.0
+thermostat.temperature = 1.0
+integrator.addExtension(thermostat)
 #integrator.dt = 0.000001
 #integrator.run(10000)
 #print "Finished with warming up"
 #integrator.dt = 0.005
+thermostat.disconnect()
 
 # define a LB grid
-lb = espressopp.integrator.LatticeBoltzmann(system, Ni=Int3D(20, 20, 20))
+lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid=espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size), Ni=Int3D(20, 20, 20))
+# add extension to the integrator
+integrator.addExtension(lb)
 initPop = espressopp.integrator.LBInitPopUniform(system,lb)
 #initPop = espressopp.integrator.LBInitPopWave(system,lb)
 initPop.createDenVel(1.0, Real3D(0.,0.,0.0))
@@ -27,13 +34,14 @@ initPop.createDenVel(1.0, Real3D(0.,0.,0.0))
 lb.gamma_b = 0.5
 lb.gamma_s = 0.5
 
+
 # specify desired temperature (set the fluctuations if any)
 #lb.lbTemp = 0.0
-lb.lbTemp = 0.000025
+lb.lbTemp = 1.
 lb.fricCoeff = 5.
+lb.nSteps=1
 
-# add extension to the integrator
-integrator.addExtension(lb)
+print "integrator.dt", integrator.dt 
 
 # output velocity profile vz (x)
 lboutputVzOfX = espressopp.analysis.LBOutputProfileVzOfX(system,lb)
@@ -69,6 +77,8 @@ integrator.addExtension(OUT3)
 pr = cProfile.Profile()
 pr.enable()
 for k in range (2):
+#		lb.readCouplForces()
 		integrator.run(1000)
+		lb.saveCouplForces()
 		pr.disable()
 		ps = pstats.Stats(pr).dump_stats('prof.bin')

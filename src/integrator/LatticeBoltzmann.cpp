@@ -75,7 +75,7 @@ namespace espressopp {
 			fOnPart = std::vector<Real3D>(_Npart + 1, 0.);	// +1 since particle's id starts with 1, not 0
 			printf("_Npart is %d\n", _Npart);
 
-//11			findMyNeighbours();
+			findMyNeighbours();
 			
 			setNBins(20);
 			distr = std::vector<real>(getNBins(), 0.);
@@ -102,13 +102,13 @@ namespace espressopp {
       }
       fclose (rngFile);
 */
-/*111			longint _myRank = getSystem()->comm->rank();
+			longint _myRank = getSystem()->comm->rank();
 			Int3D _numSites = Int3D(0,0,0);
 			for (int _dim = 0; _dim < 3; ++_dim) {
 				_numSites[_dim] = floor((getMyPosition().getItem(_dim)+1)*getSystem()->bc->getBoxL().getItem(_dim)/getNodeGrid().getItem(_dim)) - floor(getMyPosition().getItem(_dim)*getSystem()->bc->getBoxL().getItem(_dim)/getNodeGrid().getItem(_dim));
 			}
 			printf ("_myRank is %d. _myPosition is %d %d %d. _numSites I should be responsible for is %d %d %d\n", _myRank, getMyPosition().getItem(0), getMyPosition().getItem(1), getMyPosition().getItem(2), _numSites[0], _numSites[1], _numSites[2]);
-*/
+
 			lbfluid.resize(getNi().getItem(0));								// resize x-dimension of the lbfluid array
 			ghostlat.resize(getNi().getItem(0));							// resize x-dimension of the ghostlat array
 			for (int i = 0; i < getNi().getItem(0); i++) {
