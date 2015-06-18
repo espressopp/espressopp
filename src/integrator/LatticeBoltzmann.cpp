@@ -28,7 +28,9 @@
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
+#include "esutil/Grid.hpp"
 #include "bc/BC.hpp"
+#include "mpi.hpp"
 
 namespace espressopp {
 
@@ -37,24 +39,26 @@ namespace espressopp {
 		LOG4ESPP_LOGGER(LatticeBoltzmann::theLogger, "LatticeBoltzmann");
 
 		/* LB Constructor; expects 3 reals, 1 vector and 5 integers */
-		LatticeBoltzmann::LatticeBoltzmann(shared_ptr<System> _system, Int3D _Ni, real _a,
-																			 real _tau, int _numDims, int _numVels)
-		: Extension(_system), Ni(_Ni), a(_a), tau(_tau), numDims(_numDims), numVels(_numVels)
+		LatticeBoltzmann::LatticeBoltzmann(shared_ptr<System> _system,
+																			 Int3D _nodeGrid, Int3D _Ni,
+																			 real _a, real _tau,
+																			 int _numDims, int _numVels)
+		: Extension(_system), nodeGrid(_nodeGrid), Ni(_Ni), a(_a), tau(_tau), numDims(_numDims), numVels(_numVels)
 		{
 			/* create storage for variables that are static (not changing on the run) and live on a lattice node */
 			c_i	= std::vector<Real3D>(_numVels, Real3D(0.,0.,0.));
 			eqWeight = std::vector<real>(_numVels, 0.);
 			inv_b = std::vector<real>(_numVels, 0.);
 			phi = std::vector<real>(_numVels, 0.);
-			
+			myNeighbour = std::vector<int>(6, 0);
+
 			/* set flags for extended simulations to their defaults */
 			setLBTempFlag(0);					// there are no fluctuations by default
 			setExtForceFlag(0);				// there are no external forces by default
 			setCouplForceFlag(0);     // there is no coupling to MD by default
 
 			setStart(0);							// set indicator of coupling start to zero
-			setRestart(0);						// set indicator of restart to zero
-			setCheckMDMom(0);					// set indicator to check the total momentun of MD particles
+			setStepNum(0);						// set step number to zero at the start of simulation
 			setNSteps(1);							// set number of MD steps to be done between two LB steps
 			setCs2(1. / 3. * getA() * getA() / (getTau() * getTau()));
 
@@ -70,6 +74,8 @@ namespace espressopp {
 			}
 			fOnPart = std::vector<Real3D>(_Npart + 1, 0.);	// +1 since particle's id starts with 1, not 0
 			printf("_Npart is %d\n", _Npart);
+
+//11			findMyNeighbours();
 			
 			setNBins(20);
 			distr = std::vector<real>(getNBins(), 0.);
@@ -96,11 +102,18 @@ namespace espressopp {
       }
       fclose (rngFile);
 */
-			lbfluid.resize(getNi().getItem(0));							// resize x-dimension of the lbfluid array
+/*111			longint _myRank = getSystem()->comm->rank();
+			Int3D _numSites = Int3D(0,0,0);
+			for (int _dim = 0; _dim < 3; ++_dim) {
+				_numSites[_dim] = floor((getMyPosition().getItem(_dim)+1)*getSystem()->bc->getBoxL().getItem(_dim)/getNodeGrid().getItem(_dim)) - floor(getMyPosition().getItem(_dim)*getSystem()->bc->getBoxL().getItem(_dim)/getNodeGrid().getItem(_dim));
+			}
+			printf ("_myRank is %d. _myPosition is %d %d %d. _numSites I should be responsible for is %d %d %d\n", _myRank, getMyPosition().getItem(0), getMyPosition().getItem(1), getMyPosition().getItem(2), _numSites[0], _numSites[1], _numSites[2]);
+*/
+			lbfluid.resize(getNi().getItem(0));								// resize x-dimension of the lbfluid array
 			ghostlat.resize(getNi().getItem(0));							// resize x-dimension of the ghostlat array
 			for (int i = 0; i < getNi().getItem(0); i++) {
 				lbfluid[i].resize(getNi().getItem(1));					// resize y-dimension of the lbfluid array
-				ghostlat[i].resize(getNi().getItem(1));				// resize y-dimension of the ghostlat array
+				ghostlat[i].resize(getNi().getItem(1));					// resize y-dimension of the ghostlat array
 				for (int j = 0; j < getNi().getItem(1); j++) {
 					lbfluid[i][j].resize(getNi().getItem(2), LBSite(_system, getNumVels(), getA(), getTau()));
 					ghostlat[i][j].resize(getNi().getItem(2), GhostLattice(getNumVels()));
@@ -131,8 +144,77 @@ namespace espressopp {
 			_recalc2 = integrator->recalc2.connect ( boost::bind(&LatticeBoltzmann::zeroMDCMVel, this));
 			_befIntV = integrator->befIntV.connect ( boost::bind(&LatticeBoltzmann::makeLBStep, this));
 		}
+		
+		void LatticeBoltzmann::findMyNeighbours () {
+			printf ("Started neighbours allocation \n");
 
+//			int _nodes = mpiWorld->size();
+//			printf ("we have %d nodes\n", _nodes);
+	
+			/* calculate dimensionality of the processors grid arrangement */
+			int nodeGridDim = 0;
+			Int3D _nodeGrid = getNodeGrid();
+			for (int i = 0; i < 3; ++i) {
+				if (_nodeGrid[i] != 1) {
+					++nodeGridDim;
+				}
+			}
+			printf("nodeGridDim is %d\n", nodeGridDim);
+
+			/* define myRank and myPosition in the nodeGrid */
+			longint _myRank = getSystem()->comm->rank();
+			Int3D _myPosition = Int3D(0,0,0);
+			
+			esutil::Grid grid(_nodeGrid);
+			grid.mapIndexToPosition(_myPosition, _myRank);
+			setMyPosition(_myPosition);
+			
+			/* calculate ranks of neighbouring processors in every direction */
+			Int3D _myNeighbourPos = Int3D(0,0,0);
+			for (int _dir = 0; _dir < nodeGridDim; ++_dir) {
+				for (int _j = 0; _j < 3; ++_j) {
+					_myNeighbourPos[_j] = _myPosition[_j];
+				}
+
+				// left neighbor in direction _dir (x, y or z)
+				_myNeighbourPos[_dir] = _myPosition[_dir] - 1;
+				if (_myNeighbourPos[_dir] < 0) {
+					_myNeighbourPos[_dir] += _nodeGrid[_dir];
+				}
+				setMyNeighbour(2*_dir, grid.mapPositionToIndex(_myNeighbourPos));
+				
+				// right neighbor in direction _dir (x, y or z)
+				_myNeighbourPos[_dir] = _myPosition[_dir] + 1;
+				if (_myNeighbourPos[_dir] >= _nodeGrid[_dir]) {
+					_myNeighbourPos[_dir] -= _nodeGrid[_dir];
+				}
+				setMyNeighbour(2*_dir + 1, grid.mapPositionToIndex(_myNeighbourPos));
+				printf ("MPI_Rank is %d of %d. My nodeGrid position is %d %d %d. \nMy neighbour in dir %d is %d \nMy neighbour in dir %d is %d \n",
+								_myRank, mpiWorld->size(), _myPosition.getItem(0), _myPosition.getItem(1), _myPosition.getItem(2),
+								2*_dir, getMyNeighbour(2*_dir),
+								2*_dir+1, getMyNeighbour(2*_dir+1));
+				printf ("grid.getGridSize(_dir %d) is %d \n", _dir, _nodeGrid[_dir]);
+			}
+			
+			printf ("Finished neighbours allocation \n");
+		}
+		
+		void LatticeBoltzmann::setMyNeighbour (int _dir, int _rank) { myNeighbour[_dir] = _rank;}
+		int LatticeBoltzmann::getMyNeighbour (int _dir) { return myNeighbour[_dir];}
+
+		void LatticeBoltzmann::setMyLeft (Int3D _ranks) { myLeft = _ranks;}
+		Int3D LatticeBoltzmann::getMyLeft (int _rank) { return myLeft;}
+		
+		void LatticeBoltzmann::setMyRight (Int3D _ranks) { myRight = _ranks;}
+		Int3D LatticeBoltzmann::getMyRight (int _rank) { return myRight;}
+		
+		void LatticeBoltzmann::setMyPosition (Int3D _myPosition) { myPosition = _myPosition;}
+		Int3D LatticeBoltzmann::getMyPosition () { return myPosition;}
+		
 		/* Setter and getter for the lattice model */
+		void LatticeBoltzmann::setNodeGrid (Int3D _nodeGrid) { nodeGrid = _nodeGrid;}
+		Int3D LatticeBoltzmann::getNodeGrid () {return nodeGrid;}
+		
 		void LatticeBoltzmann::setNi (Int3D _Ni) { Ni = _Ni;}
 		Int3D LatticeBoltzmann::getNi () {return Ni;}
 
@@ -225,12 +307,6 @@ namespace espressopp {
 		void LatticeBoltzmann::setStart (int _start) { start = _start;}
 		int LatticeBoltzmann::getStart () { return start;}
 		
-		void LatticeBoltzmann::setRestart (int _restart) { restart = _restart;}
-		int LatticeBoltzmann::getRestart () { return restart;}
-		
-		void LatticeBoltzmann::setCheckMDMom (int _checkMD) { checkMD = _checkMD;}
-		int LatticeBoltzmann::getCheckMDMom () { return checkMD;}
-		
 		void LatticeBoltzmann::setFricCoeff (real _fricCoeff) { fricCoeff = _fricCoeff;}
 		real LatticeBoltzmann::getFricCoeff () { return fricCoeff;}
 		
@@ -244,6 +320,11 @@ namespace espressopp {
 		void LatticeBoltzmann::setInterpVel (Real3D _interpVel) {interpVel = _interpVel;}
 		Real3D LatticeBoltzmann::getInterpVel() {return interpVel;}
 		void LatticeBoltzmann::addInterpVel (Real3D _interpVel) {interpVel += _interpVel;}
+		
+		real LatticeBoltzmann::convMassMDtoLB() {return 1.;}
+		real LatticeBoltzmann::convTimeMDtoLB() {return 1. / (0.005 * getTau());}
+		real LatticeBoltzmann::convLenMDtoLB() {
+			return getNi().getItem(0) / (getSystem()->bc->getBoxL().getItem(0) * getA());}
 		
 		/* Initialization of the lattice model: eq.weights, ci's, ... */
 		void LatticeBoltzmann::initLatticeModel () {
@@ -331,14 +412,20 @@ namespace espressopp {
       real _lbTemp;
       real mu, a3;
 
-      _lbTemp = getLBTemp();
+			std::cout << "Mass " << convMassMDtoLB() << "\n";
+			std::cout << "Len " << convLenMDtoLB() << "\n";
+			std::cout << "getTau() " << getTau() << "\n";
+//			std::cout << "integrator->getTimeStep() " << integrator->getTimeStep() << "\n";
+			std::cout << "Time " << convTimeMDtoLB() << "\n";
+			
+			_lbTemp = getLBTemp() * convMassMDtoLB() * pow(convLenMDtoLB() / convTimeMDtoLB(), 2.);
       a3 = getA() * getA() * getA();    // a^3
       mu = _lbTemp / (getCs2() * a3);   // thermal mass density
 
       if (_lbTemp == 0.) {
         // account for fluctuations being turned off
         setLBTempFlag(0);
-        std::cout << "The fluctuations are turned off!\n";
+        std::cout << "The temperature of the LB-fluid is 0. The fluctuations are turned off!\n";
       } else {
         // account for fluctuations being turned on!
         setLBTempFlag(1);
@@ -377,11 +464,6 @@ namespace espressopp {
 			// GET RID OF GET AND SET STEP NUM!
 			setStepNum(integrator->getStep());
 			
-			if (getCheckMDMom() == 1) {
-				findCMVelMD(1);
-				setCheckMDMom(0);
-			}
-			
 			if (getCouplForceFlag() == 1) {
 				coupleLBtoMD ();
 			}
@@ -389,40 +471,9 @@ namespace espressopp {
 			if (getStepNum() % getNSteps() == 0) {
 				/* PUSH-scheme (first collide then stream) */
 				collideStream ();
-				if (getStepNum() % 100 == 0) {
-					printf ("finished lb collision and streaming. step %d \n", getStepNum());
-					testLBMom ();
-					setCheckMDMom(1);
-				}
 			}
 		}
-		
-		/* TEST MOMENTUM OF LB FLUID */
-		void LatticeBoltzmann::testLBMom () {
-			Real3D _u = Real3D(0.,0.,0.);
-
-			for (int i = 0; i < getNi().getItem(0); i++) {
-				for (int j = 0; j < getNi().getItem(1); j++) {
-					for (int k = 0; k < getNi().getItem(2); k++) {
-
-						Real3D jLoc = 0.;
-			
-						// calculation of density and momentum flux on the lattice site
-						for (int l = 0; l < getNumVels(); l++) {
-							jLoc[0] += lbfluid[i][j][k].getF_i(l) * getCi(l).getItem(0);
-							jLoc[1] += lbfluid[i][j][k].getF_i(l) * getCi(l).getItem(1);
-							jLoc[2] += lbfluid[i][j][k].getF_i(l) * getCi(l).getItem(2);
-						}
-			
-						_u += jLoc;
-					}
-				}
-			}
-			_u *= getA() / (integrator->getTimeStep());
-			printf("LB-fluid vel after streaming (LJ units) is %18.14f %18.14f %18.14f \n",
-						 _u.getItem(0), _u.getItem(1), _u.getItem(2));
-		}
-		
+				
 		/* FIND AND OUTPUT CENTER-OF-MASS VELOCITY OF MD-PARTICLES */
 		Real3D LatticeBoltzmann::findCMVelMD (int _id) {
 			System& system = getSystemRef();
@@ -446,14 +497,18 @@ namespace espressopp {
 							 velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
 			} else {
 			}
-			printf("-------------------------------------------------------------------\n");
-			
+
+			//printf("id was 0. velCM is  %18.14f %18.14f %18.14f \n", velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
 			return velCM;
 		}
 		
 		void LatticeBoltzmann::zeroMDCMVel () {
-		// set CM velocity of the MD to zero at the start of coupling
-			if (getStart() == 0 && getRestart() == 0) {
+			printf("zero md cm vel \n");
+			readCouplForces();
+			restoreLBForces();
+			
+			// set CM velocity of the MD to zero at the start of coupling
+			if (getStart() == 0) {
 				Real3D cmVel = findCMVelMD(0);
 				printf("cm velocity is %8.4f %8.4f %8.4f \n",
 							 cmVel.getItem(0), cmVel.getItem(1), cmVel.getItem(2));
@@ -482,10 +537,6 @@ namespace espressopp {
 				/* finished testing */
 				
 				setStart(1);
-			} else if (getRestart() == 1) {
-				restoreLBForces();
-				setRestart(0);
-			} else {
 			}
 		}
 		
@@ -501,7 +552,6 @@ namespace espressopp {
 		}
 		
     void LatticeBoltzmann::collideStream () {
-//			printf("collide-stream for step %llu\n", integrator->getStep());
       for (int i = 0; i < getNi().getItem(0); i++) {
         for (int j = 0; j < getNi().getItem(1); j++) {
           for (int k = 0; k < getNi().getItem(2); k++) {
@@ -661,14 +711,14 @@ namespace espressopp {
 			CellList realCells = system.storage->getRealCells();
 
 			real _fricCoeff = getFricCoeff();
-			real temperature = 1.;											// temperature to be passed from the thermostat
-			real timestep = integrator->getTimeStep();	// timestep of MD
+			real _temperature = getLBTemp();
+			real _timestep = integrator->getTimeStep();	// timestep of MD
 			
 			// loop over all particles in the current CPU
 			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-				calcRandForce(*cit, _fricCoeff, temperature, timestep);// fluctuating random force exerted by the fluid onto a particle
-//				calcInterVel(*cit);									// calculate interpolated velocity of the fluid at monomer's position
-				calcViscForce(*cit, _fricCoeff, timestep);		// calculate viscous drag force exerted by the fluid onto a particle
+				calcRandForce(*cit, _fricCoeff, _temperature, _timestep); // calculate random force exerted by the fluid onto a particle
+//				calcInterVel(*cit);									// interpolate velocity of the fluid to monomer's position
+				calcViscForce(*cit, _fricCoeff, _timestep);		// calculate viscous drag force exerted by the fluid onto a particle
 				//			//passForceToPart();	// pass calculated total force back onto the particle
 				//			//convForceToMom();		// convert total force into momentum (for the lattice update)
 //				extrapMomToNodes(*cit, timestep);	// extrapolate momentum transfer to the neighboring nodes
@@ -677,7 +727,7 @@ namespace espressopp {
 
 		void LatticeBoltzmann::calcRandForce (Particle& p, real _fricCoeff, real _temperature, real _timestep) {
 			// for || version, random numbers created for ghost particles should be communicated!
-			real prefactor = sqrt(24. * _fricCoeff * _temperature / _timestep);		// amplitude of the noise
+			real prefactor = sqrt(24. * _fricCoeff * getLBTemp() / _timestep);		// amplitude of the noise
 			Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);				// 3d random number
 			setFOnPart (p.id(), prefactor * ranval);	// set force on a particle to the random one
 		}
@@ -747,12 +797,14 @@ namespace espressopp {
 						Real3D _u = Real3D(0.,0.,0.);
 						
 						// rho_LB = 1. = rho_LJ
-						_u = jLoc * getA() / (denLoc * _timestep);
+/* CLARIFY IF IT IS MASS FLUX OR DENSITY FLUX */
+						_u = jLoc * convTimeMDtoLB() / (convLenMDtoLB() * denLoc);
+//						getA() / (denLoc * _timestep);
 
 						addInterpVel (delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * _u);
 
 						// * _timestep comes from velocity conversion from LB to MD units:
-						// \sigma / t = (Lx / Nx) * a / _timestep * \tau
+						// \sigma / t = (Lx / Nx) * a / (_timestep * \tau)
 					}
 				}
 			}
@@ -765,7 +817,7 @@ namespace espressopp {
 			
 			// convert coupling force (LJ units) to the momentum change on a lattice (LB units)
 			Real3D deltaJLoc = Real3D(0.,0.,0.);
-			deltaJLoc -= getFOnPart(p.id()) * _timestep * getTau() * _timestep * getTau() / getA();
+			deltaJLoc -= getFOnPart(p.id()) * convMassMDtoLB() * convLenMDtoLB() / pow(convTimeMDtoLB(), 2.);
 			
 			/* extrapolate momentum change to the nodes through local LB coupling forces */
 			Real3D _fLoc = Real3D(0.,0.,0.);
@@ -819,6 +871,7 @@ namespace espressopp {
 			std::string filename;
 			std::ostringstream convert;
 			
+			printf ("getStepNum() is %d \n", getStepNum());
 			convert << getStepNum();
 			filename = "couplForces.";
 			filename.append(convert.str());
@@ -860,11 +913,9 @@ namespace espressopp {
 					}
 				}
 			}
-//			printf ("lbfluid[5][5][5].getCouplForceLoc()[0] now %20.14f\n", lbfluid[11][7][6].getCouplForceLoc().getItem(0));
-//			printf ("lbfluid[5][5][5].getCouplForceLoc()[1] now %20.14f\n", lbfluid[11][7][6].getCouplForceLoc().getItem(1));
-//			printf ("lbfluid[5][5][5].getCouplForceLoc()[2] now %20.14f\n", lbfluid[11][7][6].getCouplForceLoc().getItem(2));
-
+			
 			fclose (couplForcesFile);
+			
 		}
 		
 		void LatticeBoltzmann::saveCouplForces () {
@@ -889,9 +940,6 @@ namespace espressopp {
 			
 			// loop over all particles in the current CPU
 			for(int _id = 1; _id <= _Npart; _id++) {
-				if (_id == 1) {
-//					fprintf (couplForcesFile, "# part_id  couplForce to add onto MD particle\n");
-				}
 				fprintf (couplForcesFile, "%9d %20.14f %20.14f %20.14f  \n", _id,
 								 getFOnPart(_id).getItem(0), getFOnPart(_id).getItem(1), getFOnPart(_id).getItem(2));
 			}
@@ -909,8 +957,6 @@ namespace espressopp {
 			}
 			
 			fclose (couplForcesFile);
-			
-			setRestart(1);
 		}
 		
     /* Destructor of the LB */
@@ -928,7 +974,8 @@ namespace espressopp {
 			class_<LatticeBoltzmann, shared_ptr<LatticeBoltzmann>, bases<Extension> >
 
 			("integrator_LatticeBoltzmann", init<	shared_ptr< System >,
-																					Int3D, real, real, int, int >())
+																					Int3D, Int3D, real, real, int, int >())
+			.add_property("nodeGrid", &LatticeBoltzmann::getNodeGrid, &LatticeBoltzmann::setNodeGrid)
 			.add_property("Ni", &LatticeBoltzmann::getNi, &LatticeBoltzmann::setNi)
 			.add_property("a", &LatticeBoltzmann::getA, &LatticeBoltzmann::setA)
 			.add_property("tau", &LatticeBoltzmann::getTau, &LatticeBoltzmann::setTau)

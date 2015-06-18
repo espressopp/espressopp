@@ -29,15 +29,16 @@ namespace espressopp {
   namespace analysis {
     class LBOutputScreen : public LBOutput {
       public:
-      LBOutputScreen(shared_ptr<System> _system,
+			LBOutputScreen(shared_ptr<System> _system,
                           shared_ptr< integrator::LatticeBoltzmann > _latticeboltzmann);
 
         /** Destructor for output. */
 /*        ~LBOutputScreen ();
 */
-        void writeOutput();
-
-        static void registerPython();
+			void writeOutput();
+			void findLBMom();
+			
+			static void registerPython();
     };
   }
 }
