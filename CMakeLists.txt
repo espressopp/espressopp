@@ -25,6 +25,7 @@ include(CheckCXXCompilerFlag)
 ########################################################################
 option(EXTERNAL_BOOST "Use external boost" ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
+option(WITH_H5MD "Build with support for H5MD" OFF)
 
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release CACHE STRING

@@ -7,13 +7,19 @@ before_install:
  - sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin
  - if [[ $EXTERNAL = ON ]]; then sudo apt-get install libboost1.55-all-dev python-mpi4py; fi
 
+# This is a nightmare. Only because ubuntu 12.04 has hdf5 packages that does not support new API.
+ - if [[ $H5MD = ON ]]; then sudo apt-get install python-mpi4py python-numpy python-pip && pip install --user cython && wget http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.14.tar && tar -xf hdf5-1.8.14.tar && cd hdf5-1.8.14 && export CPPFLAGS="-I/usr/include/openmpi" && export CFLAGS="-I/usr/include/openmpi" && ./configure --enable-parallel --enable-shared --prefix=$HOME/.local/hdf-1.8.14 && make && make install && export HDF5_ROOT=$HOME/.local/hdf-1.8.14 && export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:${HDF5_ROOT}/lib" && cd .. && wget https://pypi.python.org/packages/source/h/h5py/h5py-2.4.0.tar.gz && tar -xzvf h5py-2.4.0.tar.gz && cd h5py-2.4.0 && python setup.py configure --hdf5=$HOME/.local/hdf-1.8.14 --mpi --reset && python setup.py  install --user && export PYTHONPATH="$HOME/.local/lib/python2.7/site-packages/:$PYTHONPATH" && cd ..; fi
+
+
 env: #maybe add mpich later
   - EXTERNAL=ON
   - EXTERNAL=OFF
+  - H5MD=ON
+  - H5MD=OFF 
 
 script:
   - mkdir build && cd build && 
-    cmake -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL .. && 
+    cmake -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL -DWITH_H5MD=$H5MD .. && 
     make -j4 &&
     make test ARGS="-V" &&
     sudo make install

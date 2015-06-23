@@ -33,21 +33,23 @@
 
 namespace espressopp {
 
-  class Version {
-  public:
-    Version();
-    std::string info();
-    static void registerPython();
+class Version {
+ public:
+  Version();
+  std::string info();
+  std::string name() { return name_; }
+  std::string version();
+  static void registerPython();
 
-  private:
-    int major;
-    int minor;
-    int patchlevel;
-    std::string name;
-    std::string gitrevision;
-    std::string boostversion;
-    std::string date;
-    std::string time;
-  };
-}
+ private:
+  int major_;
+  int minor_;
+  int patchlevel_;
+  std::string name_;
+  std::string gitrevision_;
+  std::string boostversion_;
+  std::string date_;
+  std::string time_;
+};
+}  // end namespace espressopp
 #endif

@@ -20,9 +20,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
+#include <string>
+#include <sstream>
 #include "python.hpp"
 #include "Version.hpp"
-#include <sstream>
 
 #ifdef VTRACE
 #include "vampirtrace/vt_user.h"
@@ -34,28 +35,36 @@
 namespace espressopp {
 
   Version::Version() {
-	  name          = "ESPResSo++";
-      major         = MAJORVERSION;
-	  minor         = MINORVERSION;
-	  patchlevel    = PATCHLEVEL;
-	  gitrevision    = gitversion;
-      boostversion  = BOOST_LIB_VERSION;
-	  date          = __DATE__;
-	  time          = __TIME__;
+    name_          = "ESPResSo++";
+    major_         = MAJORVERSION;
+    minor_         = MINORVERSION;
+    patchlevel_    = PATCHLEVEL;
+    gitrevision_    = gitversion;
+    boostversion_  = BOOST_LIB_VERSION;
+    date_          = __DATE__;
+    time_          = __TIME__;
   }
 
   std::string Version::info() {
-	  std::stringstream ss;
-	  ss << name << " v"  << major << "." << minor;
-	  ss << " patchlevel " << patchlevel;
-	  if (gitrevision != "")
-	    ss << ", Git revision: " << gitrevision;
-      ss << ", Boost Version: " << boostversion;
-	  ss << ", compiled on " << date << ", " << time;
+    std::stringstream ss;
+    ss << name_;
+    ss << version();
+    ss << " Boost Version: " << boostversion_;
+    ss << ", compiled on " << date_ << ", " << time_;
 #ifdef VTRACE
-	  ss << ", VampirTrace mode";
+    ss << ", VampirTrace mode";
 #endif
-	  return ss.str();
+    return ss.str();
+  }
+
+  std::string Version::version() {
+    std::stringstream ss;
+    ss << major_ << "." << minor_;
+    ss << " (patchlevel " << patchlevel_;
+    if (gitrevision_ != "")
+      ss << ", revision: " << gitrevision_;
+    ss << ")";
+    return ss.str();
   }
 
   //////////////////////////////////////////////////
@@ -63,18 +72,18 @@ namespace espressopp {
   //////////////////////////////////////////////////
   void
   Version::registerPython() {
-    using namespace espressopp::python;
+    using namespace espressopp::python;  //NOLINT
 
     class_< Version >
       ("Version", init<>())
-      .def_readonly("major", &Version::major)
-      .def_readonly("minor", &Version::minor)
-      .def_readonly("gitrevision", &Version::gitrevision)
-      .def_readonly("boostversion", &Version::boostversion)
-      .def_readonly("patchlevel", &Version::patchlevel)
-      .def_readonly("date", &Version::date)
-      .def_readonly("time", &Version::time)
-      .def_readonly("name", &Version::name)
+      .def_readonly("major", &Version::major_)
+      .def_readonly("minor", &Version::minor_)
+      .def_readonly("gitrevision", &Version::gitrevision_)
+      .def_readonly("boostversion", &Version::boostversion_)
+      .def_readonly("patchlevel", &Version::patchlevel_)
+      .def_readonly("date", &Version::date_)
+      .def_readonly("time", &Version::time_)
+      .def_readonly("name", &Version::name_)
       .def("info", &Version::info);
   }
-}
+}  // end namespace espressopp
