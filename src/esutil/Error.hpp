@@ -24,11 +24,30 @@
 #ifndef _ESUTIL_ERROR_HPP
 #define _ESUTIL_ERROR_HPP
 
+#include <execinfo.h>
 #include <stdio.h>
 #include "mpi.hpp"
 
 namespace espressopp {
   namespace esutil {
+
+     /** Print Stack*/
+    static inline void printStackTrace(std::stringstream &msg, unsigned int max_frames) {
+
+      void *addrlist[max_frames+1];
+      int addrlen = backtrace(addrlist, sizeof(addrlist) / sizeof(void *));
+      if (addrlen == 0) {
+        return;
+      }
+      msg << "Stack trace:" << std::endl;
+
+      char **symbollist = backtrace_symbols(addrlist, addrlen);
+      for(int i = 4; i < addrlen; i++) {
+        msg << symbollist[i] << std::endl;
+      }
+      free(symbollist);
+    }
+
     /** This class supports exception handling for MPI processors.
 
         The problem of MPI is that it is not possible to throw

@@ -20,6 +20,7 @@ interaction
    espressopp.interaction.DihedralHarmonicUniqueCos.rst
    espressopp.interaction.DihedralPotential.rst
    espressopp.interaction.DihedralUniquePotential.rst
+   espressopp.interaction.DihedralRB.rst
    espressopp.interaction.FENE.rst
    espressopp.interaction.FENECapped.rst
    espressopp.interaction.GravityTruncated.rst
