@@ -27,8 +27,8 @@
 
 namespace espressopp {
   namespace analysis {
-    class LBOutputScreen : public LBOutput {
-      public:
+		class LBOutputScreen : public LBOutput {
+		public:
 			LBOutputScreen(shared_ptr<System> _system,
                           shared_ptr< integrator::LatticeBoltzmann > _latticeboltzmann);
 
@@ -38,7 +38,16 @@ namespace espressopp {
 			void writeOutput();
 			void findLBMom();
 			
+			void setTimerOld(time_t _value);
+			time_t getTimerOld();
+
+			void setTimerNew(time_t _value);
+			time_t getTimerNew();
+			
 			static void registerPython();
+			
+		private:
+			time_t timer_old, timer_new;
     };
   }
 }

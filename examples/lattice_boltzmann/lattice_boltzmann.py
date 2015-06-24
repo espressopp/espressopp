@@ -6,7 +6,7 @@ from espressopp import Int3D
 from espressopp import Real3D
 
 # create default Lennard Jones (WCA) system with 0 particles and cubic box (L=40)
-system, integrator = espressopp.standard_system.LennardJones(100, box=(20, 20, 20), temperature=1.)
+system, integrator = espressopp.standard_system.LennardJones(0, box=(20, 20, 20), temperature=1.)
 
 # system's integrator
 integrator     = espressopp.integrator.VelocityVerlet(system)
@@ -28,7 +28,7 @@ lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid=espressopp.tools.de
 integrator.addExtension(lb)
 initPop = espressopp.integrator.LBInitPopUniform(system,lb)
 #initPop = espressopp.integrator.LBInitPopWave(system,lb)
-initPop.createDenVel(1.0, Real3D(0.,0.,0.0))
+initPop.createDenVel(1.0, Real3D(0.00,0.,0.0))
 
 # declare gammas responsible for viscosities (if they differ from 0)
 lb.gamma_b = 0.5
@@ -37,16 +37,16 @@ lb.gamma_s = 0.5
 
 # specify desired temperature (set the fluctuations if any)
 #lb.lbTemp = 0.0
-lb.lbTemp = 1.
-lb.fricCoeff = 5.
-lb.nSteps=1
+#lb.lbTemp = 1.
+#lb.fricCoeff = 5.
+#lb.nSteps=1
 
 print "integrator.dt", integrator.dt 
 
 # output velocity profile vz (x)
-lboutputVzOfX = espressopp.analysis.LBOutputProfileVzOfX(system,lb)
-OUT1=espressopp.integrator.ExtAnalyze(lboutputVzOfX,100)
-integrator.addExtension(OUT1)
+#lboutputVzOfX = espressopp.analysis.LBOutputProfileVzOfX(system,lb)
+#OUT1=espressopp.integrator.ExtAnalyze(lboutputVzOfX,100)
+#integrator.addExtension(OUT1)
 
 # output velocity vz at a certain lattice site as a function of time
 #lboutputVzInTime = espressopp.analysis.LBOutputVzInTime(system,lb)
@@ -55,7 +55,7 @@ integrator.addExtension(OUT1)
 
 # output onto the screen
 lboutputScreen = espressopp.analysis.LBOutputScreen(system,lb)
-OUT3=espressopp.integrator.ExtAnalyze(lboutputScreen,100)
+OUT3=espressopp.integrator.ExtAnalyze(lboutputScreen,200)
 integrator.addExtension(OUT3)
 
 # set external constant (gravity-like) force
@@ -79,6 +79,6 @@ pr.enable()
 for k in range (2):
 #		lb.readCouplForces()
 		integrator.run(1000)
-		lb.saveCouplForces()
+#		lb.saveCouplForces()
 		pr.disable()
 		ps = pstats.Stats(pr).dump_stats('prof.bin')

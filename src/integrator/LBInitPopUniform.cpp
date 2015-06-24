@@ -40,8 +40,9 @@ namespace espressopp {
 
       real invCs4 = invCs2*invCs2;
       real scalp, value;
-      Int3D _Ni = latticeboltzmann->getNi();
-
+			int _offset = latticeboltzmann->getHaloSkin();
+			Int3D _Ni = latticeboltzmann->getMyNi();
+			
       // set initial velocity of the populations from Maxwell's distribution
       for (int i = 0; i < _Ni.getItem(0); i++) {
       // test the damping of a sin-like initial velocities:

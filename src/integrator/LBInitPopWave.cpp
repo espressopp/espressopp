@@ -41,17 +41,18 @@ namespace espressopp {
 
       real invCs4 = invCs2*invCs2;
       real scalp, value;
-      Int3D _Ni = latticeboltzmann->getNi();
+			int _offset = latticeboltzmann->getHaloSkin();
+			Int3D _Ni = latticeboltzmann->getMyNi();
 
       Real3D vel = _u0;
 
       // set initial velocity of the populations from Maxwell's distribution
-      for (int i = 0; i < _Ni.getItem(0); i++) {
+      for (int i = _offset; i < _Ni.getItem(0); i++) {
       // test the damping of a sin-like initial velocities:
         _u0 = Real3D(vel.getItem(0),vel.getItem(1),vel.getItem(2) * sin (2. * M_PI * i / _Ni.getItem(0)));
         real trace = _u0*_u0*invCs2;
-        for (int j = 0; j < _Ni.getItem(1); j++) {
-          for (int k = 0; k < _Ni.getItem(2); k++) {
+        for (int j = _offset; j < _Ni.getItem(1); j++) {
+          for (int k = _offset; k < _Ni.getItem(2); k++) {
             for (int l = 0; l < latticeboltzmann->getNumVels(); l++) {
               scalp = _u0 * latticeboltzmann->getCi(l);
               value = 0.5 * latticeboltzmann->getEqWeight(l) * _rho0 * (2. + 2. * scalp * invCs2 + scalp * scalp * invCs4 - trace);

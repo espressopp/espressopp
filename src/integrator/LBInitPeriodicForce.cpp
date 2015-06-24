@@ -38,21 +38,21 @@ namespace espressopp {
     void LBInitPeriodicForce::setForce(Real3D _force)
     {
       int _id = 0;
-      Int3D _Ni;
-      _Ni = latticeboltzmann->getNi();
+			int _offset = latticeboltzmann->getHaloSkin();
+			Int3D _Ni = latticeboltzmann->getMyNi();
       // that is to account for the situation when after some time external forces are canceled!
 
       Real3D periodicforce;
 
       /* add external forces loop */
-      for (int i = 0; i < _Ni.getItem(0); i++) {
+      for (int i = _offset; i < _Ni.getItem(0)-_offset; i++) {
         // (re)set values of periodic force
         periodicforce = Real3D (_force.getItem(0),
                                 _force.getItem(1),
                                 _force.getItem(2) * sin (2. * M_PI * i / _Ni.getItem(0)));
 
-        for (int j = 0; j < _Ni.getItem(1); j++) {
-          for (int k = 0; k < _Ni.getItem(2); k++) {
+        for (int j = _offset; j < _Ni.getItem(1)-_offset; j++) {
+          for (int k = _offset; k < _Ni.getItem(2)-_offset; k++) {
             // set local forces and general flag
             if (periodicforce != Real3D(0.,0.,0.)) {
               latticeboltzmann->setExtForceFlag(1);
@@ -71,22 +71,22 @@ namespace espressopp {
     void LBInitPeriodicForce::addForce(Real3D _force)
     {
       int _id = 0;
-      Int3D _Ni;
-      _Ni = latticeboltzmann->getNi();
+			int _offset = latticeboltzmann->getHaloSkin();
+			Int3D _Ni = latticeboltzmann->getMyNi();
       // that is to account for the situation when after some time external forces are canceled!
 
       Real3D periodicforce;
       Real3D existingforce;
 
       /* add external forces loop */
-      for (int i = 0; i < _Ni.getItem(0); i++) {
+      for (int i = _offset; i < _Ni.getItem(0)-_offset; i++) {
         // (re)set values of periodic force
         periodicforce = Real3D (_force.getItem(0),
                                 _force.getItem(1),
                                 _force.getItem(2) * sin (2. * M_PI * i / _Ni.getItem(0)));
 
-        for (int j = 0; j < _Ni.getItem(1); j++) {
-          for (int k = 0; k < _Ni.getItem(2); k++) {
+        for (int j = _offset; j < _Ni.getItem(1)-_offset; j++) {
+          for (int k = _offset; k < _Ni.getItem(2)-_offset; k++) {
             existingforce = latticeboltzmann->getExtForceLoc(Int3D(i,j,k));
             // set local forces and general flag
             if (existingforce + periodicforce != Real3D(0.,0.,0.)) {

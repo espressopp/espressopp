@@ -190,6 +190,7 @@ namespace espressopp {
 			void collideStream ();					// use collide-stream scheme
 
 			void streaming (int _i, int _j, int _k);  // streaming along the velocity vectors
+			void streamingMPI ();  // streaming along the velocity vectors, MPI-version
 
 			/* MPI FUNCTIONS */
 			void findMyNeighbours ();
@@ -197,11 +198,17 @@ namespace espressopp {
 			void setMyNeighbour (int _dir, int _rank);
 			int getMyNeighbour (int _dir);
 
-			void setMyLeft (Int3D _ranks);
+/*			void setMyLeft (Int3D _ranks);
 			Int3D getMyLeft (int _rank);
 			void setMyRight (Int3D _ranks);
 			Int3D getMyRight (int _rank);
+*/
+			void setHaloSkin (int _haloSkin);
+			int getHaloSkin ();
 
+			void setMyNi(Int3D _myNi);	// set lattice size of current cpu + halo in 3 dimensions
+			Int3D getMyNi();						// get lattice size of current cpu + halo in 3 dimensions
+			
 			void setMyPosition(Int3D _myPosition);
 			Int3D getMyPosition();
 			
@@ -241,6 +248,7 @@ namespace espressopp {
 			std::vector<Real3D> fOnPart;	// force acting onto an MD particle
 			Int3D nodeGrid;								// 3D-array of processors
 			Int3D Ni;											// lattice lengths in 3D
+			
 			int idX, idY, idZ, index;			// indexes in 3D and aligned 1D index
 			
 			/*	two lattices. lbfluid has f,m and meq. ghostlat has f only.
@@ -260,9 +268,11 @@ namespace espressopp {
 
 			// MPI THINGS
 			std::vector<int> myNeighbour;
-			Int3D myLeft;
-			Int3D myRight;
+//			Int3D myLeft;
+//			Int3D myRight;
 			Int3D myPosition;
+			int haloSkin;
+			Int3D myNi;
 			
 			// ON-THE-FLY-CALCULATIONS
 			real denLoc;

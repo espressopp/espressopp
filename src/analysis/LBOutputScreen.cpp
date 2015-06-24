@@ -22,6 +22,7 @@
 
 #include "python.hpp"
 #include "LBOutputScreen.hpp"
+#include "time.h"
 
 namespace espressopp {
   namespace analysis {
@@ -68,7 +69,6 @@ namespace espressopp {
 //			Real3D _velCM = latticeboltzmann->findCMVelMD(0);
 			
 //			latticeboltzmann->testLBMom ();
-			findLBMom();
 			
 			/* GET VELOCITIES FROM PREVIOUS HALF-TIMESTEP */
 			/* be careful, it is a bit "dirty" way. The idea is that the Output onto the Screen
@@ -89,25 +89,45 @@ namespace espressopp {
 				Real3D& force = cit->force();
 				_velCM += vel + 0.0025 * force;
 			}
-			
-			printf("_velCM : cmV(t+ 1/2dt) of LJ system is     %18.14f %18.14f %18.14f \n",
-						 _velCM[0], _velCM[1], _velCM[2]);
 
-			int _step = latticeboltzmann->getStepNum();
-			printf ("completed %d LB step!\n", _step);
-			printf("-------------------------------------------------------------------\n");
+			findLBMom();
+	
+			if (getSystem()->comm->rank() == 0) {
+				
+				printf("_velCM : cmV(t+ 1/2dt) of LJ system is     %18.14f %18.14f %18.14f \n",
+							 _velCM[0], _velCM[1], _velCM[2]);
+				
+				int _step = latticeboltzmann->getStepNum();
+				printf ("completed %d LB step!\n", _step);
+				printf("-------------------------------------------------------------------\n");
+			
+				// calculate time performance
+				time_t _timer_new, _timer_old;
+				double seconds;
+				
+				time(&_timer_new);  /* get current time; same as: timer = time(NULL)  */
+				setTimerNew(_timer_new);
+				
+				seconds = difftime(getTimerNew(),getTimerOld());
+				
+				time(&_timer_old);  /* get current time; same as: timer = time(NULL)  */
+				setTimerOld(_timer_old);
+				printf ("seconds from last control point: %.f\n", seconds);
+			}
     }
 		
 		void LBOutputScreen::findLBMom () {
 			real _fi = 0.;
-			Real3D _u = Real3D(0.,0.,0.);
+			Real3D result = Real3D(0.,0.,0.);
+			Real3D _myU = Real3D(0.,0.,0.);
 			Real3D _ci = Real3D(0.,0.,0.);
-			Int3D _Ni = latticeboltzmann->getNi();
+			Int3D _Ni = latticeboltzmann->getMyNi();
+			int _offset = latticeboltzmann->getHaloSkin();
 			int _numVels = latticeboltzmann->getNumVels();
 			
-			for (int i = 0; i < _Ni[0]; i++) {
-				for (int j = 0; j < _Ni[1]; j++) {
-					for (int k = 0; k < _Ni[2]; k++) {
+			for (int i = _offset; i < _Ni[0] - _offset; i++) {
+				for (int j = _offset; j < _Ni[1] - _offset; j++) {
+					for (int k = _offset; k < _Ni[2] - _offset; k++) {
 							
 						Real3D jLoc = 0.;
 							
@@ -118,16 +138,29 @@ namespace espressopp {
 							jLoc += _fi * _ci;
 						}
 							
-						_u += jLoc;
+						_myU += jLoc;
 					}
 				}
 			}
-			_u *= latticeboltzmann->convTimeMDtoLB() / latticeboltzmann->getA();
+			_myU *= latticeboltzmann->convTimeMDtoLB() / latticeboltzmann->getA();
+			
+			printf("from Rank %d result is %8.4f %8.4f %8.4f\n", getSystem()->comm->rank(), _myU[0], _myU[1], _myU[2]);
+			
+			MPI_Reduce (&_myU[0], &result[0], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+			MPI_Reduce (&_myU[1], &result[1], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+			MPI_Reduce (&_myU[2], &result[2], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
-			printf("LB-fluid vel after streaming (LJ units) is %18.14f %18.14f %18.14f \n",
-						 _u.getItem(0), _u.getItem(1), _u.getItem(2));
+			if (getSystem()->comm->rank() == 0) {
+				printf("LB-fluid vel after streaming (LJ units) is %18.14f %18.14f %18.14f \n",
+							 result.getItem(0), result.getItem(1), result.getItem(2));
+			}
 		}
 		
+		void LBOutputScreen::setTimerOld (time_t _value) {timer_old = _value;}
+		time_t LBOutputScreen::getTimerOld() {return timer_old;}
+		
+		void LBOutputScreen::setTimerNew (time_t _value) {timer_new = _value;}
+		time_t LBOutputScreen::getTimerNew() {return timer_new;}
 		
     void LBOutputScreen::registerPython() {
       using namespace espressopp::python;

@@ -208,7 +208,7 @@ namespace espressopp {
 
       /* if we have external forces then modify the eq.fluxes */
 			// ADD LB TO MD COUPLING??
-			if (_extForceFlag == 0) printf ("extForceFlag is %d\n",_extForceFlag);
+//			if (_extForceFlag == 0) printf ("extForceFlag is %d\n",_extForceFlag);
 			if (_extForceFlag == 1) jLoc += 0.5*(getExtForceLoc() + getCouplForceLoc()); // when doing coupling, the flag is set to 1!
 
       /* eq. stress modes */

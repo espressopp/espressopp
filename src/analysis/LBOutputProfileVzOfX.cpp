@@ -36,7 +36,7 @@ namespace espressopp {
       int _numVels;
       int _step;
 
-      _Ni = latticeboltzmann->getNi();
+      _Ni = latticeboltzmann->getMyNi();
       _numVels = latticeboltzmann->getNumVels();
       _step = latticeboltzmann->getStepNum();
 
@@ -61,6 +61,7 @@ namespace espressopp {
        */
       int _j = 0;
       int _k = 0;
+			int _offset = latticeboltzmann->getHaloSkin();
 
       /* interface to create filename for the output profile */
       using std::string;
@@ -77,7 +78,7 @@ namespace espressopp {
       velProfFile = fopen(filename.c_str(),"a");
 
       // creating a profile based on the current populations
-      for (int i = 0; i < _Ni.getItem(0); i++) {
+      for (int i = _offset; i < _Ni.getItem(0) - _offset; i++) {
         for (int l = 0; l < _numVels; l++) {
           _denLoc[i] += latticeboltzmann->getLBFluid(Int3D(i,_j,_k),l);
 //        _jxLoc[i] += latticeboltzmann->getLBFluid(Int3D(i,_j,_k),l) * latticeboltzmann->getCi(l).getItem(0);
