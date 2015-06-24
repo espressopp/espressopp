@@ -520,44 +520,56 @@ namespace espressopp {
 			
 			CellList realCells = system.storage->getRealCells();
 			
+			int totPart = 0;
+			int myPart = 0;
 			Real3D velCM = Real3D(0.,0.,0.);
+			Real3D myVelCM = Real3D(0.,0.,0.);
+			Real3D specVelCM = Real3D(0.,0.,0.);
 			
 			// loop over all particles in the current CPU
 			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 				Real3D& vel = cit->velocity();
-				velCM += vel;
+				myVelCM += vel;
+				++myPart;
 			}
 
-			// output if needed
-			if (_id == 1) {
-				printf("findCMVelMD: cmV(t+ 1/2dt) of LJ system is %18.14f %18.14f %18.14f \n",
-							 velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
-			} else if (_id == 2) {
-				printf("findCMVelMD: cmV(t + dt) of LJ system is   %18.14f %18.14f %18.14f \n",
-							 velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
-			} else {
+			mpi::all_reduce(*getSystem()->comm, myPart, totPart, std::plus<int>());
+			mpi::all_reduce(*getSystem()->comm, myVelCM, velCM, std::plus<Real3D>());
+			
+			if (getSystem()->comm->rank() == 0) {
+				// output of if needed
+				if (_id == 1) {
+					printf("findCMVelMD: cmV(t+ 1/2dt) of LJ system is %18.14f %18.14f %18.14f \n",
+								 velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
+				} else if (_id == 2) {
+					printf("findCMVelMD: cmV(t + dt) of LJ system is   %18.14f %18.14f %18.14f \n",
+								 velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
+				} else {
+				}
 			}
-
-			//printf("id was 0. velCM is  %18.14f %18.14f %18.14f \n", velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
-			return velCM;
+			
+			// calculate specific center of mass to be subtracted from particle's velocities to fulfill zero momentum
+			specVelCM = velCM / totPart;
+			
+			return specVelCM;
 		}
 		
 		void LatticeBoltzmann::zeroMDCMVel () {
 			printf("zero md cm vel \n");
 			//!!! ATTENTION!!! NEED TO TURN ON FOR NORMAL LB-to-MD COUPLING!!!
-//			readCouplForces();
-//			restoreLBForces();
+			readCouplForces();
+			restoreLBForces();
 			
 			// set CM velocity of the MD to zero at the start of coupling
 			if (getStart() == 0 && getCouplForceFlag() != 0) {
-				Real3D cmVel = findCMVelMD(0);
-				printf("cm velocity is %8.4f %8.4f %8.4f \n",
-							 cmVel.getItem(0), cmVel.getItem(1), cmVel.getItem(2));
-				galileanTransf(cmVel);
+				Real3D specCmVel = findCMVelMD(0);
+				printf("cm velocity per particle is %18.14f %18.14f %18.14f \n",
+							 specCmVel.getItem(0), specCmVel.getItem(1), specCmVel.getItem(2));
+				galileanTransf(specCmVel);
 		 
-				cmVel = findCMVelMD(0);
-				printf("cm velocity after Galilean transformation is %8.4f %8.4f %8.4f \n",
-							 cmVel.getItem(0), cmVel.getItem(1), cmVel.getItem(2));
+				specCmVel = findCMVelMD(0);
+				printf("cm velocity per particle after Galilean transformation is %18.14f %18.14f %18.14f \n",
+							 specCmVel.getItem(0), specCmVel.getItem(1), specCmVel.getItem(2));
 								
 				/* testing */
 				System& system = getSystemRef();
@@ -582,13 +594,13 @@ namespace espressopp {
 		}
 		
 		/* PERFORM GALILEAN TRANSFORMATION */
-		void LatticeBoltzmann::galileanTransf (Real3D _cmVel) {
+		void LatticeBoltzmann::galileanTransf (Real3D _specCmVel) {
 			System& system = getSystemRef();
 			
 			CellList realCells = system.storage->getRealCells();
 			
 			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-				cit->velocity() -= _cmVel / system.storage->getNRealParticles();
+				cit->velocity() -= _specCmVel;
 			}
 		}
 		
@@ -601,14 +613,13 @@ namespace espressopp {
 						lbfluid[i][j][k].calcLocalMoments ();
 						lbfluid[i][j][k].calcEqMoments (getExtForceFlag());
 						lbfluid[i][j][k].relaxMoments (numVels);
-						///!!! ATTENTION!!! UNCOMMENT AFTER TESTING PARALLEL IMPLEMENTATION
-/*						if (getLBTempFlag() == 1) {
+						if (getLBTempFlag() == 1) {
 							lbfluid[i][j][k].thermalFluct (numVels);
 						}
 						if (getExtForceFlag() == 1 || getCouplForceFlag() == 1) {
 							lbfluid[i][j][k].applyForces (numVels);
 						}
-*/						lbfluid[i][j][k].btranMomToPop (numVels);
+						lbfluid[i][j][k].btranMomToPop (numVels);
 
 						/* streaming phase */
 //						if (getMyNi().getItem(0) > 1 && getMyNi().getItem(1) > 1 && getMyNi().getItem(2) > 1) {
@@ -616,18 +627,15 @@ namespace espressopp {
 //						}
 						
 						/* set to zero coupling forces if the coupling exists */
-						///!!! ATTENTION!!! UNCOMMENT AFTER TESTING PARALLEL IMPLEMENTATION
-/*						if (getCouplForceFlag() == 1) {
+						if (getCouplForceFlag() == 1) {
 							lbfluid[i][j][k].setCouplForceLoc(Real3D(0.,0.,0.));
 						}
-*/          }
+          }
         }
       }
 
 			if (mpiWorld->size() > 1) {
-				MPI_Comm start_streamingMPI;
-				MPI_Barrier(start_streamingMPI);
-				streamingMPI();
+				commHalo();
 			}
 
       /* swap pointers for two lattices */
@@ -660,419 +668,311 @@ namespace espressopp {
       }
     }
 
-		/* STREAMING ALONG THE VELOCITY VECTORS. PARALLEL */
-		void LatticeBoltzmann::streamingMPI() {
-			printf("Started streamingMPI\n");
-			int i, j, k;
-			int numPopTransf = 5;		// number of populations to transfer
-			int numDataTransf;			// number of data to transfer
-			int rnode, snode;
-			int index;
-			std::vector<real> sbuf, rbuf, buffer;
-			Int3D _myPosition;
-			_myPosition = getMyPosition();
-			
-//			real *buffer=NULL, *rbuf=NULL;
-			MPI_Status status;
-			MPI_Comm comm_cart;
+		/* COMMUNICATE POPULATIONS IN HALO REGIONS TO THE NEIGHBOURING CPUs */
+		void LatticeBoltzmann::commHalo() {
+			int i, j, k, index;											// running indices and index of the node to be copied
+			int numPopTransf = 5;										// number of populations to transfer
+			int numDataTransf;											// number of data to transfer
+			int rnode, snode;												// rank of the node to receive from and to send to
+			std::vector<real> bufToSend, bufToRecv;	// buffers used to send and to receive the data
+//			Int3D _myPosition = getMyPosition();
 			
 			mpi::environment env;
 			mpi::communicator world;
-			
-			// control point
-			printf("Started streamingMPI x-direction\n");
+
 			//////////////////////
-			// X-direction //
+			//// X-direction /////
 			//////////////////////
 			numDataTransf = numPopTransf * getMyNi().getItem(1) * getMyNi().getItem(2);
-			sbuf.resize(numDataTransf);								// resize sbuf
-			rbuf.resize(numDataTransf);								// resize rbuf
-			buffer.resize(numDataTransf);							// resize buffer
+			bufToSend.resize(numDataTransf);				// resize bufToSend
+			bufToRecv.resize(numDataTransf);				// resize bufToRecv
 			
-//			printf("Resized buffers\n");
-			//				sbuf = (real*) malloc(numDataTransf*sizeof(real));
-			//				rbuf = (real*) malloc(numDataTransf*sizeof(real));
-			
-			// send to right, recv from left i = 1, 7, 9, 11, 13 //
+			/* send to right, recv from left i = 1, 7, 9, 11, 13 */
 			snode = getMyNeighbour(1);
 			rnode = getMyNeighbour(0);
 
 			// prepare message for sending
-			buffer = sbuf;
 			i = getMyNi().getItem(0) - getHaloSkin();
 			for (k=0; k<getMyNi().getItem(2); k++) {
 				for (j=0; j<getMyNi().getItem(1); j++) {
 					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
 					
-					buffer[index] = ghostlat[i][j][k].getPop_i(1);
-					buffer[index+1] = ghostlat[i][j][k].getPop_i(7);
-					buffer[index+2] = ghostlat[i][j][k].getPop_i(9);
-					buffer[index+3] = ghostlat[i][j][k].getPop_i(11);
-					buffer[index+4] = ghostlat[i][j][k].getPop_i(13);
-//					buffer +=5;
+					bufToSend[index] = ghostlat[i][j][k].getPop_i(1);
+					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(7);
+					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(9);
+					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(11);
+					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(13);
 				}
 			}
 
 			// send and receive data or use memcpy if number of CPU in x-dir is 1
 			if (getNodeGrid().getItem(0) > 1) {
 				if (getMyPosition().getItem(0) % 2 == 0) {
-					world.send(snode, COMM_DIR_0, buffer);
-					world.recv(rnode, COMM_DIR_0, rbuf);
+					world.send(snode, COMM_DIR_0, bufToSend);
+					world.recv(rnode, COMM_DIR_0, bufToRecv);
 				} else {
-					world.recv(rnode, COMM_DIR_0, rbuf);
-					world.send(snode, COMM_DIR_0, buffer);
+					world.recv(rnode, COMM_DIR_0, bufToRecv);
+					world.send(snode, COMM_DIR_0, bufToSend);
 				}
-//				world.send(snode, COMM_DIR_0, buffer);
-//				world.recv(rnode, COMM_DIR_0, rbuf);
-				//					MPI_Sendrecv(sbuf, numDataTransf, MPI_DOUBLE, snode, REQ_HALO_SPREAD,
-				//											 rbuf, numDataTransf, MPI_DOUBLE, rnode, REQ_HALO_SPREAD,
-				//											 comm_cart, &status);
 			} else {
-//				std::copy (buffer[0], buffer[numDataTransf], rbuf);
-				memcpy(&rbuf,&sbuf,numDataTransf*sizeof(real));
-//				memcpy(rbuf,sbuf,numDataTransf*sizeof(real));
+				bufToRecv = bufToSend;
 			}
 
 			// unpack message
-			buffer = rbuf;
 			i = getHaloSkin();
 			for (k=0; k<getMyNi().getItem(2); k++) {
 				for (j=0; j<getMyNi().getItem(1); j++) {
 					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
 					
-					ghostlat[i][j][k].setPop_i(1, buffer[index]);
-					ghostlat[i][j][k].setPop_i(7, buffer[index+1]);
-					ghostlat[i][j][k].setPop_i(9, buffer[index+2]);
-					ghostlat[i][j][k].setPop_i(11, buffer[index+3]);
-					ghostlat[i][j][k].setPop_i(13, buffer[index+4]);
-//					buffer +=5;
+					ghostlat[i][j][k].setPop_i(1, bufToRecv[index]);
+					ghostlat[i][j][k].setPop_i(7, bufToRecv[index+1]);
+					ghostlat[i][j][k].setPop_i(9, bufToRecv[index+2]);
+					ghostlat[i][j][k].setPop_i(11, bufToRecv[index+3]);
+					ghostlat[i][j][k].setPop_i(13, bufToRecv[index+4]);
 				}
 			}
 			
-			// send to left, recv from right i = 2, 8, 10, 12, 14 //
+			/* send to left, recv from right i = 2, 8, 10, 12, 14 */
 			snode = getMyNeighbour(0);
 			rnode = getMyNeighbour(1);
 			
 			// prepare message for sending
-			buffer = sbuf;
 			i = 0;
 			for (k=0; k<getMyNi().getItem(2); k++) {
 				for (j=0; j<getMyNi().getItem(1); j++) {
 					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
 					
-					buffer[index] = ghostlat[i][j][k].getPop_i(2);
-					buffer[index+1] = ghostlat[i][j][k].getPop_i(8);
-					buffer[index+2] = ghostlat[i][j][k].getPop_i(10);
-					buffer[index+3] = ghostlat[i][j][k].getPop_i(12);
-					buffer[index+4] = ghostlat[i][j][k].getPop_i(14);
-//					buffer +=5;
+					bufToSend[index] = ghostlat[i][j][k].getPop_i(2);
+					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(8);
+					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(10);
+					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(12);
+					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(14);
 				}
 			}
 			
 			// send and receive data or use memcpy if number of CPU in x-dir is 1
 			if (getNodeGrid().getItem(0) > 1) {
 				if (getMyPosition().getItem(0) % 2 == 0) {
-					world.send(snode, COMM_DIR_1, buffer);
-					world.recv(rnode, COMM_DIR_1, rbuf);
+					world.send(snode, COMM_DIR_1, bufToSend);
+					world.recv(rnode, COMM_DIR_1, bufToRecv);
 				} else {
-					world.recv(rnode, COMM_DIR_1, rbuf);
-					world.send(snode, COMM_DIR_1, buffer);
+					world.recv(rnode, COMM_DIR_1, bufToRecv);
+					world.send(snode, COMM_DIR_1, bufToSend);
 				}
-//				world.send(snode, COMM_DIR_1, buffer);
-//				world.recv(rnode, COMM_DIR_1, rbuf);
-				//					MPI_Sendrecv(sbuf, numDataTransf, MPI_DOUBLE, snode, REQ_HALO_SPREAD,
-				//											 rbuf, numDataTransf, MPI_DOUBLE, rnode, REQ_HALO_SPREAD,
-				//											 comm_cart, &status);
 			} else {
-//				std::copy (buffer[0], buffer[numDataTransf], rbuf);
-				memcpy(&rbuf,&sbuf,numDataTransf*sizeof(real));
-//				memcpy(rbuf,sbuf,numDataTransf*sizeof(real));
+				bufToRecv = bufToSend;
 			}
 			
 			// unpack message
-			buffer = rbuf;
 			i = getMyNi().getItem(0) - 2 * getHaloSkin();
 			for (k=0; k<getMyNi().getItem(2); k++) {
 				for (j=0; j<getMyNi().getItem(1); j++) {
 					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
 					
-					ghostlat[i][j][k].setPop_i(2, buffer[index+0]);
-					ghostlat[i][j][k].setPop_i(8, buffer[index+1]);
-					ghostlat[i][j][k].setPop_i(10, buffer[index+2]);
-					ghostlat[i][j][k].setPop_i(12, buffer[index+3]);
-					ghostlat[i][j][k].setPop_i(14, buffer[index+4]);
-//					buffer +=5;
+					ghostlat[i][j][k].setPop_i(2, bufToRecv[index+0]);
+					ghostlat[i][j][k].setPop_i(8, bufToRecv[index+1]);
+					ghostlat[i][j][k].setPop_i(10, bufToRecv[index+2]);
+					ghostlat[i][j][k].setPop_i(12, bufToRecv[index+3]);
+					ghostlat[i][j][k].setPop_i(14, bufToRecv[index+4]);
 				}
 			}
 			
-			printf("Started streamingMPI y-direction\n");
 			//////////////////////
-			// Y-direction //
+			//// Y-direction /////
 			//////////////////////
 			numDataTransf = numPopTransf * getMyNi().getItem(0) * getMyNi().getItem(2);
-			sbuf.resize(numDataTransf);								// resize sbuf
-			rbuf.resize(numDataTransf);								// resize rbuf
-			buffer.resize(numDataTransf);							// resize buffer
-			
-//			printf("Resized buffers\n");
+			bufToSend.resize(numDataTransf);				// resize bufToSend
+			bufToRecv.resize(numDataTransf);				// resize bufToRecv
 
-			// send to right, recv from left i = 3, 7, 10, 15, 17 //
+			/* send to right, recv from left i = 3, 7, 10, 15, 17 */
 			snode = getMyNeighbour(3);
 			rnode = getMyNeighbour(2);
 			
 			// prepare message for sending
-			buffer = sbuf;
 			j = getMyNi().getItem(1) - getHaloSkin();
 			for (k=0; k<getMyNi().getItem(2); k++) {
 				for (i=0; i<getMyNi().getItem(0); i++) {
 					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
 
-					buffer[index+0] = ghostlat[i][j][k].getPop_i(3);
-					buffer[index+1] = ghostlat[i][j][k].getPop_i(7);
-					buffer[index+2] = ghostlat[i][j][k].getPop_i(10);
-					buffer[index+3] = ghostlat[i][j][k].getPop_i(15);
-					buffer[index+4] = ghostlat[i][j][k].getPop_i(17);
-//					buffer +=5;
+					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(3);
+					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(7);
+					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(10);
+					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(15);
+					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(17);
 				}
 			}
 			
 			// send and receive data or use memcpy if number of CPU in y-dir is 1
 			if (getNodeGrid().getItem(1) > 1) {
 				if (getMyPosition().getItem(1) % 2 == 0) {
-					world.send(snode, COMM_DIR_2, buffer);
-					world.recv(rnode, COMM_DIR_2, rbuf);
+					world.send(snode, COMM_DIR_2, bufToSend);
+					world.recv(rnode, COMM_DIR_2, bufToRecv);
 				} else {
-					world.recv(rnode, COMM_DIR_2, rbuf);
-					world.send(snode, COMM_DIR_2, buffer);
+					world.recv(rnode, COMM_DIR_2, bufToRecv);
+					world.send(snode, COMM_DIR_2, bufToSend);
 				}
-//				world.send(snode, COMM_DIR_2, buffer);
-//				world.recv(rnode, COMM_DIR_2, rbuf);
-				//					MPI_Sendrecv(sbuf, numDataTransf, MPI_DOUBLE, snode, REQ_HALO_SPREAD,
-				//											 rbuf, numDataTransf, MPI_DOUBLE, rnode, REQ_HALO_SPREAD,
-				//											 comm_cart, &status);
 			} else {
-//				std::copy (buffer[0], buffer[numDataTransf], rbuf);
-				memcpy(&rbuf,&sbuf,numDataTransf*sizeof(real));
-//				memcpy(rbuf,sbuf,numDataTransf*sizeof(real));
+				bufToRecv = bufToSend;
 			}
 			
 			// unpack message
-			buffer = rbuf;
 			j = getHaloSkin();
 			for (k=0; k<getMyNi().getItem(2); k++) {
 				for (i=0; i<getMyNi().getItem(0); i++) {
 					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
 
-					ghostlat[i][j][k].setPop_i(3, buffer[index+0]);
-					ghostlat[i][j][k].setPop_i(7, buffer[index+1]);
-					ghostlat[i][j][k].setPop_i(10, buffer[index+2]);
-					ghostlat[i][j][k].setPop_i(15, buffer[index+3]);
-					ghostlat[i][j][k].setPop_i(17, buffer[index+4]);
-//					buffer +=5;
+					ghostlat[i][j][k].setPop_i(3, bufToRecv[index+0]);
+					ghostlat[i][j][k].setPop_i(7, bufToRecv[index+1]);
+					ghostlat[i][j][k].setPop_i(10, bufToRecv[index+2]);
+					ghostlat[i][j][k].setPop_i(15, bufToRecv[index+3]);
+					ghostlat[i][j][k].setPop_i(17, bufToRecv[index+4]);
 				}
 			}
 
-			// send to left, recv from right i = 4, 8, 9, 16, 18 //
+			/* send to left, recv from right i = 4, 8, 9, 16, 18 */
 			snode = getMyNeighbour(2);
 			rnode = getMyNeighbour(3);
 			
 			// prepare message for sending
-			buffer = sbuf;
 			j = 0;
 			for (k=0; k<getMyNi().getItem(2); k++) {
 				for (i=0; i<getMyNi().getItem(0); i++) {
 					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
 
-					buffer[index+0] = ghostlat[i][j][k].getPop_i(4);
-					buffer[index+1] = ghostlat[i][j][k].getPop_i(8);
-					buffer[index+2] = ghostlat[i][j][k].getPop_i(9);
-					buffer[index+3] = ghostlat[i][j][k].getPop_i(16);
-					buffer[index+4] = ghostlat[i][j][k].getPop_i(18);
-//					buffer +=5;
+					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(4);
+					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(8);
+					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(9);
+					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(16);
+					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(18);
 				}
 			}
 			
 			// send and receive data or use memcpy if number of CPU in y-dir is 1
 			if (getNodeGrid().getItem(1) > 1) {
 				if (getMyPosition().getItem(1) % 2 == 0) {
-					world.send(snode, COMM_DIR_3, buffer);
-					world.recv(rnode, COMM_DIR_3, rbuf);
+					world.send(snode, COMM_DIR_3, bufToSend);
+					world.recv(rnode, COMM_DIR_3, bufToRecv);
 				} else {
-					world.recv(rnode, COMM_DIR_3, rbuf);
-					world.send(snode, COMM_DIR_3, buffer);
+					world.recv(rnode, COMM_DIR_3, bufToRecv);
+					world.send(snode, COMM_DIR_3, bufToSend);
 				}
-//				world.send(snode, COMM_DIR_3, buffer);
-//				world.recv(rnode, COMM_DIR_3, rbuf);
-				//					MPI_Sendrecv(sbuf, numDataTransf, MPI_DOUBLE, snode, REQ_HALO_SPREAD,
-				//											 rbuf, numDataTransf, MPI_DOUBLE, rnode, REQ_HALO_SPREAD,
-				//											 comm_cart, &status);
 			} else {
-//				std::copy (buffer[0], buffer[numDataTransf], rbuf);
-				memcpy(&rbuf,&sbuf,numDataTransf*sizeof(real));
-//				memcpy(rbuf,sbuf,numDataTransf*sizeof(real));
+				bufToRecv = bufToSend;
 			}
 			
 			// unpack message
-			buffer = rbuf;
 			j = getMyNi().getItem(1) - 2 * getHaloSkin();
 			for (k=0; k<getMyNi().getItem(2); k++) {
 				for (i=0; i<getMyNi().getItem(0); i++) {
 					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
 
-					ghostlat[i][j][k].setPop_i(4, buffer[index+0]);
-					ghostlat[i][j][k].setPop_i(8, buffer[index+1]);
-					ghostlat[i][j][k].setPop_i(9, buffer[index+2]);
-					ghostlat[i][j][k].setPop_i(16, buffer[index+3]);
-					ghostlat[i][j][k].setPop_i(18, buffer[index+4]);
-//					buffer +=5;
+					ghostlat[i][j][k].setPop_i(4, bufToRecv[index+0]);
+					ghostlat[i][j][k].setPop_i(8, bufToRecv[index+1]);
+					ghostlat[i][j][k].setPop_i(9, bufToRecv[index+2]);
+					ghostlat[i][j][k].setPop_i(16, bufToRecv[index+3]);
+					ghostlat[i][j][k].setPop_i(18, bufToRecv[index+4]);
 				}
 			}
 
-			printf("Started streamingMPI z-direction\n");	// control point
 			//////////////////////
 			//// Z-direction /////
 			//////////////////////
 			numDataTransf = numPopTransf * getMyNi().getItem(0) * getMyNi().getItem(1);
-			sbuf.resize(numDataTransf);								// resize sbuf
-			rbuf.resize(numDataTransf);								// resize rbuf
-			buffer.resize(numDataTransf);							// resize buffer
-
-			printf("Proc %d: Resized buffers to fit %d elements\n", getSystem()->comm->rank(), numDataTransf);	// control point
+			bufToSend.resize(numDataTransf);				// resize bufToSend
+			bufToRecv.resize(numDataTransf);				// resize bufToRecv
 		
 			/* send to right, recv from left i = 5, 11, 14, 15, 18 */
 			snode = getMyNeighbour(5);
 			rnode = getMyNeighbour(4);
 			
 			// prepare message for sending
-			buffer = sbuf;
 			k = getMyNi().getItem(2) - getHaloSkin();
 			for (j=0; j<getMyNi().getItem(1); j++) {
 				for (i=0; i<getMyNi().getItem(0); i++) {
 					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
 
-					buffer[index+0] = ghostlat[i][j][k].getPop_i(5);
-					buffer[index+1] = ghostlat[i][j][k].getPop_i(11);
-					buffer[index+2] = ghostlat[i][j][k].getPop_i(14);
-					buffer[index+3] = ghostlat[i][j][k].getPop_i(15);
-					buffer[index+4] = ghostlat[i][j][k].getPop_i(18);
-//					buffer +=5;
+					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(5);
+					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(11);
+					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(14);
+					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(15);
+					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(18);
 				}
 			}
-			printf("Proc %d: Copied data from sbuf to buffer\n", getSystem()->comm->rank());	// control point
 			
 			// send and receive data or use memcpy if number of CPU in z-dir is 1
 			if (getNodeGrid().getItem(2) > 1) {
 				if (getMyPosition().getItem(2) % 2 == 0) {
-					world.send(snode, COMM_DIR_4, buffer);
-					world.recv(rnode, COMM_DIR_4, rbuf);
+					world.send(snode, COMM_DIR_4, bufToSend);
+					world.recv(rnode, COMM_DIR_4, bufToRecv);
 				} else {
-					world.recv(rnode, COMM_DIR_4, rbuf);
-					world.send(snode, COMM_DIR_4, buffer);
+					world.recv(rnode, COMM_DIR_4, bufToRecv);
+					world.send(snode, COMM_DIR_4, bufToSend);
 				}
-//				world.send(snode, COMM_DIR_4, buffer);
-//				world.recv(rnode, COMM_DIR_4, rbuf);
-//				MPI_Sendrecv(sbuf, numDataTransf, MPI_DOUBLE, snode, REQ_HALO_SPREAD,
-//											 rbuf, numDataTransf, MPI_DOUBLE, rnode, REQ_HALO_SPREAD,
-//											 comm_cart, &status);
 			} else {
-//				std::copy (buffer[0], buffer[numDataTransf], rbuf);
-//				memcpy(rbuf,sbuf,numDataTransf*sizeof(real));
-				memcpy(&rbuf,&sbuf,numDataTransf*sizeof(real));
+				bufToRecv = bufToSend;
 			}
-			printf("Proc %d: Made send and recv\n", getSystem()->comm->rank());		// control point
 			
 			// unpack message
-			buffer = rbuf;
 			k = getHaloSkin();
 			for (j=0; j<getMyNi().getItem(1); j++) {
 				for (i=0; i<getMyNi().getItem(0); i++) {
 					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
 
-					ghostlat[i][j][k].setPop_i(5, buffer[index+0]);
-					ghostlat[i][j][k].setPop_i(11, buffer[index+1]);
-					ghostlat[i][j][k].setPop_i(14, buffer[index+2]);
-					ghostlat[i][j][k].setPop_i(15, buffer[index+3]);
-					ghostlat[i][j][k].setPop_i(18, buffer[index+4]);
-//					buffer +=5;
+					ghostlat[i][j][k].setPop_i(5, bufToRecv[index+0]);
+					ghostlat[i][j][k].setPop_i(11, bufToRecv[index+1]);
+					ghostlat[i][j][k].setPop_i(14, bufToRecv[index+2]);
+					ghostlat[i][j][k].setPop_i(15, bufToRecv[index+3]);
+					ghostlat[i][j][k].setPop_i(18, bufToRecv[index+4]);
 				}
 			}
-			printf("Proc %d: Set ghosts to buffer1\n", getSystem()->comm->rank());	// control point
 			
 			/* send to left, recv from right i = 6, 12, 13, 16, 17 */
 			snode = getMyNeighbour(4);
 			rnode = getMyNeighbour(5);
-			printf ("Proc %d: snode is %d, rnode is %d\n", getSystem()->comm->rank(), snode,rnode);		// control point
 
 			// prepare message for sending
-			buffer = sbuf;
-			printf ("Proc %d: made buffer = sbuf\n", getSystem()->comm->rank());		// control point
 			k = 0;
-			printf ("Proc %d: made k = 0\n", getSystem()->comm->rank());					// control point
 			for (j=0; j<getMyNi().getItem(1); j++) {
-				printf ("\nj is %d, i is ", i);																			// control point
 				for (i=0; i<getMyNi().getItem(0); i++) {
-					printf ("%d\n",i);																								// control point
-
 					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
 
-					buffer[index+0] = ghostlat[i][j][k].getPop_i(6);
-					buffer[index+1] = ghostlat[i][j][k].getPop_i(12);
-					buffer[index+2] = ghostlat[i][j][k].getPop_i(13);
-					buffer[index+3] = ghostlat[i][j][k].getPop_i(16);
-					buffer[index+4] = ghostlat[i][j][k].getPop_i(17);
-//					buffer +=5;
+					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(6);
+					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(12);
+					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(13);
+					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(16);
+					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(17);
 				}
 			}
-			printf("Proc %d: Copied data from sbuf to buffer2\n", getSystem()->comm->rank());	// control point
 
 			// send and receive data or use memcpy if number of CPU in z-dir is 1
 			if (getNodeGrid().getItem(2) > 1) {
 				if (getMyPosition().getItem(2) % 2 == 0) {
-					world.send(snode, COMM_DIR_5, buffer);
-					world.recv(rnode, COMM_DIR_5, rbuf);
+					world.send(snode, COMM_DIR_5, bufToSend);
+					world.recv(rnode, COMM_DIR_5, bufToRecv);
 				} else {
-					world.recv(rnode, COMM_DIR_5, rbuf);
-					world.send(snode, COMM_DIR_5, buffer);
+					world.recv(rnode, COMM_DIR_5, bufToRecv);
+					world.send(snode, COMM_DIR_5, bufToSend);
 				}
-//				world.send(snode, COMM_DIR_5, buffer);
-//				world.recv(rnode, COMM_DIR_5, rbuf);
-//				MPI_Sendrecv(sbuf, numDataTransf, MPI_DOUBLE, snode, REQ_HALO_SPREAD,
-//											 rbuf, numDataTransf, MPI_DOUBLE, rnode, REQ_HALO_SPREAD,
-//											 comm_cart, &status);
 			} else {
-//			std::copy (buffer[0], buffer[numDataTransf], rbuf);
-//			memcpy(rbuf,sbuf,numDataTransf*sizeof(real));
-				memcpy(&rbuf,&sbuf,numDataTransf*sizeof(real));
+				bufToRecv = bufToSend;
 			}
-			printf("Made send and recv2\n");																			// control point
 			
 			// unpack message
-			buffer = rbuf;
 			k = getMyNi().getItem(2) - 2 * getHaloSkin();
 			for (j=0; j<getMyNi().getItem(1); j++) {
 				for (i=0; i<getMyNi().getItem(0); i++) {
 					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
 
-					ghostlat[i][j][k].setPop_i(6, buffer[index+0]);
-					ghostlat[i][j][k].setPop_i(12, buffer[index+1]);
-					ghostlat[i][j][k].setPop_i(13, buffer[index+2]);
-					ghostlat[i][j][k].setPop_i(16, buffer[index+3]);
-					ghostlat[i][j][k].setPop_i(17, buffer[index+4]);
-//					buffer +=5;
+					ghostlat[i][j][k].setPop_i(6, bufToRecv[index+0]);
+					ghostlat[i][j][k].setPop_i(12, bufToRecv[index+1]);
+					ghostlat[i][j][k].setPop_i(13, bufToRecv[index+2]);
+					ghostlat[i][j][k].setPop_i(16, bufToRecv[index+3]);
+					ghostlat[i][j][k].setPop_i(17, bufToRecv[index+4]);
 				}
 			}
-			printf("Set ghosts to buffer2\n");																			// control point
 
-//				mpi::all_reduce(*getSystem()->comm, finished, allFinished, std::logical_and<bool>());
-//	    } while (!allFinished);
-//			free(rbuf);
-//			free(sbuf);
-			sbuf.resize(0);
-			rbuf.resize(0);
-			buffer.resize(0);
-
-			// control point
-			printf("Finished streamingMPI\n");
+			bufToSend.resize(0);
+			bufToRecv.resize(0);
 		}
 		
     /* STREAMING ALONG THE VELOCITY VECTORS. SERIAL */

@@ -157,7 +157,7 @@ namespace espressopp {
 			/* FIND AND MANIPULATE CENTER-OF-MASS VELOCITY OF MD AND LB */
 			Real3D findCMVelMD(int _id);						// find velocity of center of mass of MD particles
 			void zeroMDCMVel();									// kill drift velocity of the center of mass
-			void galileanTransf(Real3D _cmVel);				// galilean transform by amount of _momPerPart
+			void galileanTransf(Real3D _specCmVel);				// galilean transform by amount of _momPerPart
 			
 			/* COUPLING TO MD PARTICLES */
 			void coupleLBtoMD();
@@ -190,7 +190,7 @@ namespace espressopp {
 			void collideStream ();					// use collide-stream scheme
 
 			void streaming (int _i, int _j, int _k);  // streaming along the velocity vectors
-			void streamingMPI ();  // streaming along the velocity vectors, MPI-version
+			void commHalo ();													// communicate populations in halo regions to the neighbouring CPUs
 
 			/* MPI FUNCTIONS */
 			void findMyNeighbours ();

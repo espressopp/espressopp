@@ -28,7 +28,7 @@ lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid=espressopp.tools.de
 integrator.addExtension(lb)
 initPop = espressopp.integrator.LBInitPopUniform(system,lb)
 #initPop = espressopp.integrator.LBInitPopWave(system,lb)
-initPop.createDenVel(1.0, Real3D(0.00,0.,0.0))
+initPop.createDenVel(1.0, Real3D(0.0,0.,0.0))
 
 # declare gammas responsible for viscosities (if they differ from 0)
 lb.gamma_b = 0.5
@@ -78,7 +78,7 @@ pr = cProfile.Profile()
 pr.enable()
 for k in range (2):
 #		lb.readCouplForces()
-		integrator.run(1000)
+		integrator.run(200000)
 #		lb.saveCouplForces()
 		pr.disable()
 		ps = pstats.Stats(pr).dump_stats('prof.bin')

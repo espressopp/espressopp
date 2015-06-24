@@ -129,7 +129,7 @@ namespace espressopp {
 				for (int j = _offset; j < _Ni[1] - _offset; j++) {
 					for (int k = _offset; k < _Ni[2] - _offset; k++) {
 							
-						Real3D jLoc = 0.;
+						Real3D jLoc = Real3D(0.,0.,0.);
 							
 						// calculation of density and momentum flux on the lattice site
 						for (int l = 0; l < _numVels; l++) {
@@ -146,9 +146,7 @@ namespace espressopp {
 			
 			printf("from Rank %d result is %8.4f %8.4f %8.4f\n", getSystem()->comm->rank(), _myU[0], _myU[1], _myU[2]);
 			
-			MPI_Reduce (&_myU[0], &result[0], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-			MPI_Reduce (&_myU[1], &result[1], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-			MPI_Reduce (&_myU[2], &result[2], 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+			mpi::all_reduce(*getSystem()->comm, _myU, result, std::plus<Real3D>());
 
 			if (getSystem()->comm->rank() == 0) {
 				printf("LB-fluid vel after streaming (LJ units) is %18.14f %18.14f %18.14f \n",
