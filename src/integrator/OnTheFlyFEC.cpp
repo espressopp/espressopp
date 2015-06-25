@@ -128,7 +128,8 @@ namespace espressopp {
           gapcounter += 1;
 
           // Only go in after gap steps
-          if (gapcounter = gap){
+					// Nikita: just changed the '=' to '==' as I think it was initially meant
+          if (gapcounter == gap){
           
               // Only go in if counter below steps
               if (counter < (steps/gap)){
