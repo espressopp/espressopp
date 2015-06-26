@@ -92,29 +92,33 @@ namespace espressopp {
 
     void LBInitConstForce::printForce(Real3D _force, int _id)
     {
-      // print constant force
-      using std::setprecision;
-      using std::fixed;
-      using std::setw;
-
-      std::cout << setprecision(5);
-      std::cout << "-------------------------------------\n";
-
-      if (_id == 0) {
-        std::cout << "External force has been cancelled. It is now zero.\n" ;
-      } else if (_id == 1) {
-        std::cout << "External force has been set. It is a constant force:\n" ;
-      } else if (_id == 2) {
-        std::cout << "External force has been added. It is a constant force:\n" ;
-      } else {
-      }
-
-      if (_id != 0) {
-        std::cout << " extForce.x is " << _force.getItem(0) << "\n";
-        std::cout << " extForce.y is " << _force.getItem(1) << "\n";
-        std::cout << " extForce.z is " << _force.getItem(2) << "\n";
-        std::cout << "-------------------------------------\n";
-      }
+			if (mpiWorld->rank()==0) {
+				// print constant force
+				using std::setprecision;
+				using std::fixed;
+				using std::setw;
+				
+				std::cout << setprecision(5);
+				std::cout << "-------------------------------------\n";
+				
+				if (_id == 0) {
+					std::cout << "External force has been cancelled. It is now zero.\n" ;
+				} else if (_id == 1) {
+					std::cout << "External force has been set. It is a constant force:\n" ;
+				} else if (_id == 2) {
+					std::cout << "External force has been added. It is a constant force:\n" ;
+				} else {
+				}
+				
+				if (_id != 0) {
+					std::cout << " extForce.x is " << _force.getItem(0) << "\n";
+					std::cout << " extForce.y is " << _force.getItem(1) << "\n";
+					std::cout << " extForce.z is " << _force.getItem(2) << "\n";
+					std::cout << "-------------------------------------\n";
+				}
+			} else {
+				// do nothing
+			}
     }
 
     void LBInitConstForce::registerPython() {

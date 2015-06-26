@@ -32,10 +32,14 @@ namespace espressopp {
     }
 
     void LBInitPopUniform::createDenVel (real _rho0, Real3D _u0) {
-      printf("Creating an initial configuration with uniform density %f and \nvelocity %f, %f, %f\n",
-          _rho0, _u0.getItem(0), _u0.getItem(1), _u0.getItem(2));
-      printf("-------------------------------------\n");
-
+			if (mpiWorld->rank()==0) {
+				printf("Creating an initial configuration with uniform density %f and \nvelocity %f, %f, %f\n",
+							 _rho0, _u0.getItem(0), _u0.getItem(1), _u0.getItem(2));
+				printf("-------------------------------------\n");
+			} else {
+				// do nothing
+			}
+			
       real invCs2 = 1. / latticeboltzmann->getCs2();
 
       real invCs4 = invCs2*invCs2;

@@ -39,20 +39,32 @@ namespace espressopp {
     {
       int _id = 0;
 			int _offset = latticeboltzmann->getHaloSkin();
-			Int3D _Ni = latticeboltzmann->getMyNi();
+			Int3D _myPosition = latticeboltzmann->getMyPosition();
+			Int3D _nodeGrid = latticeboltzmann->getNodeGrid();
+			Int3D _Ni = latticeboltzmann->getNi();				// system size in lattice node
+			Int3D _myNi = latticeboltzmann->getMyNi();		// my local nodes
+			Int3D _globalNi = Int3D(0,0,0);								// index of the first real node in cpu in the global lattice
+			
+			for (int _dim = 0; _dim < 3; _dim++) {
+				_globalNi[_dim] = floor(_myPosition[_dim] * _Ni[_dim] / _nodeGrid[_dim]);
+			}
+			
+//			printf("my Rank is %d. myNi in x dim start from %d in a global sense; Ni is %d; nodeGrid is %d\n",
+//						 mpiWorld->rank(), _globalNi[0], _Ni[0], _nodeGrid[0]);
+			
       // that is to account for the situation when after some time external forces are canceled!
 
       Real3D periodicforce;
 
       /* add external forces loop */
-      for (int i = _offset; i < _Ni.getItem(0)-_offset; i++) {
+      for (int i = _offset; i < _myNi.getItem(0)-_offset; i++) {
         // (re)set values of periodic force
         periodicforce = Real3D (_force.getItem(0),
                                 _force.getItem(1),
-                                _force.getItem(2) * sin (2. * M_PI * i / _Ni.getItem(0)));
+																_force.getItem(2) * sin (2. * M_PI * (_globalNi[0] + i - _offset) / _Ni[0]));
 
-        for (int j = _offset; j < _Ni.getItem(1)-_offset; j++) {
-          for (int k = _offset; k < _Ni.getItem(2)-_offset; k++) {
+        for (int j = _offset; j < _myNi.getItem(1)-_offset; j++) {
+          for (int k = _offset; k < _myNi.getItem(2)-_offset; k++) {
             // set local forces and general flag
             if (periodicforce != Real3D(0.,0.,0.)) {
               latticeboltzmann->setExtForceFlag(1);
@@ -72,21 +84,33 @@ namespace espressopp {
     {
       int _id = 0;
 			int _offset = latticeboltzmann->getHaloSkin();
-			Int3D _Ni = latticeboltzmann->getMyNi();
-      // that is to account for the situation when after some time external forces are canceled!
+			Int3D _myPosition = latticeboltzmann->getMyPosition();
+			Int3D _nodeGrid = latticeboltzmann->getNodeGrid();
+			Int3D _Ni = latticeboltzmann->getNi();				// system size in lattice node
+			Int3D _myNi = latticeboltzmann->getMyNi();		// my local nodes
+			Int3D _globalNi = Int3D(0,0,0);								// index of the first real node in cpu in the global lattice
+			
+			for (int _dim = 0; _dim < 3; _dim++) {
+				_globalNi[_dim] = floor(_myPosition[_dim] * _Ni[_dim] / _nodeGrid[_dim]);
+			}
+			
+//			printf("my Rank is %d. myNi in x dim start from %d in a global sense; Ni is %d; nodeGrid is %d\n",
+//						 mpiWorld->rank(), _globalNi[0], _Ni[0], _nodeGrid[0]);
+			
+			// that is to account for the situation when after some time external forces are canceled!
 
       Real3D periodicforce;
       Real3D existingforce;
 
       /* add external forces loop */
-      for (int i = _offset; i < _Ni.getItem(0)-_offset; i++) {
+      for (int i = _offset; i < _myNi.getItem(0)-_offset; i++) {
         // (re)set values of periodic force
         periodicforce = Real3D (_force.getItem(0),
                                 _force.getItem(1),
-                                _force.getItem(2) * sin (2. * M_PI * i / _Ni.getItem(0)));
+                                _force.getItem(2) * sin (2. * M_PI * (_globalNi[0] + i - _offset) / _Ni[0]));
 
-        for (int j = _offset; j < _Ni.getItem(1)-_offset; j++) {
-          for (int k = _offset; k < _Ni.getItem(2)-_offset; k++) {
+        for (int j = _offset; j < _myNi.getItem(1)-_offset; j++) {
+          for (int k = _offset; k < _myNi.getItem(2)-_offset; k++) {
             existingforce = latticeboltzmann->getExtForceLoc(Int3D(i,j,k));
             // set local forces and general flag
             if (existingforce + periodicforce != Real3D(0.,0.,0.)) {
@@ -105,29 +129,33 @@ namespace espressopp {
 
     void LBInitPeriodicForce::printForce(Real3D _force, int _id)
     {
-      // print constant force
-      using std::setprecision;
-      using std::fixed;
-      using std::setw;
-
-      std::cout << setprecision(5);
-      std::cout << "-------------------------------------\n";
-
-      if (_id == 0) {
-        std::cout << "External force has been cancelled. It is now zero.\n" ;
-      } else if (_id == 1) {
-        std::cout << "External force has been set. It is a harmonic force with amplitude:\n" ;
-      } else if (_id == 2) {
-        std::cout << "External force has been added. It is a harmonic force with amplitude:\n" ;
-      } else {
-      }
-
-      if (_id != 0) {
-        std::cout << " extForce.x is " << _force.getItem(0) << "\n";
-        std::cout << " extForce.y is " << _force.getItem(1) << "\n";
-        std::cout << " extForce.z is " << _force.getItem(2) << "\n";
-        std::cout << "-------------------------------------\n";
-      }
+			if (mpiWorld->rank()==0) {
+				// print constant force
+				using std::setprecision;
+				using std::fixed;
+				using std::setw;
+				
+				std::cout << setprecision(5);
+				std::cout << "-------------------------------------\n";
+				
+				if (_id == 0) {
+					std::cout << "External force has been cancelled. It is now zero.\n" ;
+				} else if (_id == 1) {
+					std::cout << "External force has been set. It is a harmonic force with amplitude:\n" ;
+				} else if (_id == 2) {
+					std::cout << "External force has been added. It is a harmonic force with amplitude:\n" ;
+				} else {
+				}
+				
+				if (_id != 0) {
+					std::cout << " extForce.x is " << _force.getItem(0) << "\n";
+					std::cout << " extForce.y is " << _force.getItem(1) << "\n";
+					std::cout << " extForce.z is " << _force.getItem(2) << "\n";
+					std::cout << "-------------------------------------\n";
+				}
+			} else {
+				// do nothing
+			}
     }
 
     void LBInitPeriodicForce::registerPython() {

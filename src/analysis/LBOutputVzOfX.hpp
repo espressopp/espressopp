@@ -20,20 +20,20 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
-#ifndef _LBOUTPUT_PROFILE_VZOFX_HPP
-#define _LBOUTPUT_PROFILE_VZOFX_HPP
+#ifndef _LBOUTPUT_VZOFX_HPP
+#define _LBOUTPUT_VZOFX_HPP
 
 #include "LBOutput.hpp"
 
 namespace espressopp {
   namespace analysis {
-    class LBOutputProfileVzOfX : public LBOutput {
+    class LBOutputVzOfX : public LBOutput {
       public:
-        LBOutputProfileVzOfX(shared_ptr<System> _system,
+        LBOutputVzOfX(shared_ptr<System> _system,
                           shared_ptr< integrator::LatticeBoltzmann > _latticeboltzmann);
 
         /** Destructor for output. */
-/*        ~LBOutputProfileVzOfX ();
+/*        ~LBOutputVzOfX ();
 */
         void writeOutput();
 

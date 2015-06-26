@@ -144,7 +144,7 @@ namespace espressopp {
 			}
 			_myU *= latticeboltzmann->convTimeMDtoLB() / latticeboltzmann->getA();
 			
-			printf("from Rank %d result is %8.4f %8.4f %8.4f\n", getSystem()->comm->rank(), _myU[0], _myU[1], _myU[2]);
+			printf("from Rank %d result is %18.14f %18.14f %18.14f\n", getSystem()->comm->rank(), _myU[0], _myU[1], _myU[2]);
 			
 			mpi::all_reduce(*getSystem()->comm, _myU, result, std::plus<Real3D>());
 

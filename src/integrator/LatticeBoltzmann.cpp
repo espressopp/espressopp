@@ -85,7 +85,7 @@ namespace espressopp {
 			fOnPart = std::vector<Real3D>(_Npart + 1, 0.);	// +1 since particle's id starts with 1, not 0
 			printf("_Npart is %d\n", _Npart);
 
-			if (mpiWorld->size() > 1) {
+//			if (mpiWorld->size() > 1) {
 				setHaloSkin(1);
 				printf("1 halo Skin is %d\n", getHaloSkin());
 				findMyNeighbours();
@@ -97,11 +97,11 @@ namespace espressopp {
 				}
 				setMyNi (_numSites);
 				printf ("_myRank is %d. _myPosition is %d %d %d. _numSites I should be responsible for is %d %d %d\n", _myRank, getMyPosition().getItem(0), getMyPosition().getItem(1), getMyPosition().getItem(2), getMyNi().getItem(0), getMyNi().getItem(1), getMyNi()[2]);
-			} else {
-				setHaloSkin(0);
-				printf("2 halo Skin is %d\n", getHaloSkin());
-				setMyNi(getNi());
-			}
+//			} else {
+//				setHaloSkin(0);
+//				printf("2 halo Skin is %d\n", getHaloSkin());
+//				setMyNi(getNi());
+//			}
 			
 			setNBins(20);
 			distr = std::vector<real>(getNBins(), 0.);
@@ -165,74 +165,9 @@ namespace espressopp {
 			_befIntV = integrator->befIntV.connect ( boost::bind(&LatticeBoltzmann::makeLBStep, this));
 		}
 		
-		void LatticeBoltzmann::findMyNeighbours () {
-			printf ("Started neighbours allocation \n");
-	
-			/* calculate dimensionality of the processors grid arrangement */
-			int nodeGridDim = 0;
-			Int3D _nodeGrid = getNodeGrid();
-			for (int i = 0; i < 3; ++i) {
-				if (_nodeGrid[i] != 1) {
-					++nodeGridDim;
-				}
-			}
-			printf("nodeGridDim is %d\n", nodeGridDim);
-
-			/* define myRank and myPosition in the nodeGrid */
-			longint _myRank = getSystem()->comm->rank();
-			Int3D _myPosition = Int3D(0,0,0);
-			
-			esutil::Grid grid(_nodeGrid);
-			grid.mapIndexToPosition(_myPosition, _myRank);
-			setMyPosition(_myPosition);
-			
-			/* calculate ranks of neighbouring processors in every direction */
-			Int3D _myNeighbourPos = Int3D(0,0,0);
-			for (int _dir = 0; _dir < nodeGridDim; ++_dir) {
-				for (int _j = 0; _j < 3; ++_j) {
-					_myNeighbourPos[_j] = _myPosition[_j];
-				}
-
-				// left neighbor in direction _dir (x, y or z)
-				_myNeighbourPos[_dir] = _myPosition[_dir] - 1;
-				if (_myNeighbourPos[_dir] < 0) {
-					_myNeighbourPos[_dir] += _nodeGrid[_dir];
-				}
-				setMyNeighbour(2*_dir, grid.mapPositionToIndex(_myNeighbourPos));
-				
-				// right neighbor in direction _dir (x, y or z)
-				_myNeighbourPos[_dir] = _myPosition[_dir] + 1;
-				if (_myNeighbourPos[_dir] >= _nodeGrid[_dir]) {
-					_myNeighbourPos[_dir] -= _nodeGrid[_dir];
-				}
-				setMyNeighbour(2*_dir + 1, grid.mapPositionToIndex(_myNeighbourPos));
-				printf ("MPI_Rank is %d of %d. My nodeGrid position is %d %d %d. \nMy neighbour in dir %d is %d \nMy neighbour in dir %d is %d \n",
-								_myRank, mpiWorld->size(), _myPosition.getItem(0), _myPosition.getItem(1), _myPosition.getItem(2),
-								2*_dir, getMyNeighbour(2*_dir),
-								2*_dir+1, getMyNeighbour(2*_dir+1));
-				printf ("grid.getGridSize(_dir %d) is %d \n", _dir, _nodeGrid[_dir]);
-			}
-			
-			for (int _dir = nodeGridDim; _dir < 3; ++_dir) {
-//				for (int _j = 0; _j < 3; ++_j) {
-//					_myNeighbourPos[_j] = _myPosition[_j];
-//				}
-				setMyNeighbour(2*_dir, grid.mapPositionToIndex(_myPosition));
-				setMyNeighbour(2*_dir+1, grid.mapPositionToIndex(_myPosition));
-			}
-
-			printf ("Finished neighbours allocation \n");
-		}
-		
 		void LatticeBoltzmann::setMyNeighbour (int _dir, int _rank) { myNeighbour[_dir] = _rank;}
 		int LatticeBoltzmann::getMyNeighbour (int _dir) { return myNeighbour[_dir];}
 
-/*		void LatticeBoltzmann::setMyLeft (Int3D _ranks) { myLeft = _ranks;}
-		Int3D LatticeBoltzmann::getMyLeft (int _rank) { return myLeft;}
-		
-		void LatticeBoltzmann::setMyRight (Int3D _ranks) { myRight = _ranks;}
-		Int3D LatticeBoltzmann::getMyRight (int _rank) { return myRight;}
-*/
 		void LatticeBoltzmann::setMyPosition (Int3D _myPosition) { myPosition = _myPosition;}
 		Int3D LatticeBoltzmann::getMyPosition () { return myPosition;}
 		
@@ -634,9 +569,9 @@ namespace espressopp {
         }
       }
 
-			if (mpiWorld->size() > 1) {
+//			if (mpiWorld->size() > 1) {
 				commHalo();
-			}
+//			}
 
       /* swap pointers for two lattices */
       for (int i = 0; i < getMyNi().getItem(0); i++) {
@@ -667,317 +602,9 @@ namespace espressopp {
         }
       }
     }
-
-		/* COMMUNICATE POPULATIONS IN HALO REGIONS TO THE NEIGHBOURING CPUs */
-		void LatticeBoltzmann::commHalo() {
-			int i, j, k, index;											// running indices and index of the node to be copied
-			int numPopTransf = 5;										// number of populations to transfer
-			int numDataTransf;											// number of data to transfer
-			int rnode, snode;												// rank of the node to receive from and to send to
-			std::vector<real> bufToSend, bufToRecv;	// buffers used to send and to receive the data
-//			Int3D _myPosition = getMyPosition();
-			
-			mpi::environment env;
-			mpi::communicator world;
-
-			//////////////////////
-			//// X-direction /////
-			//////////////////////
-			numDataTransf = numPopTransf * getMyNi().getItem(1) * getMyNi().getItem(2);
-			bufToSend.resize(numDataTransf);				// resize bufToSend
-			bufToRecv.resize(numDataTransf);				// resize bufToRecv
-			
-			/* send to right, recv from left i = 1, 7, 9, 11, 13 */
-			snode = getMyNeighbour(1);
-			rnode = getMyNeighbour(0);
-
-			// prepare message for sending
-			i = getMyNi().getItem(0) - getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
-					
-					bufToSend[index] = ghostlat[i][j][k].getPop_i(1);
-					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(7);
-					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(9);
-					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(11);
-					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(13);
-				}
-			}
-
-			// send and receive data or use memcpy if number of CPU in x-dir is 1
-			if (getNodeGrid().getItem(0) > 1) {
-				if (getMyPosition().getItem(0) % 2 == 0) {
-					world.send(snode, COMM_DIR_0, bufToSend);
-					world.recv(rnode, COMM_DIR_0, bufToRecv);
-				} else {
-					world.recv(rnode, COMM_DIR_0, bufToRecv);
-					world.send(snode, COMM_DIR_0, bufToSend);
-				}
-			} else {
-				bufToRecv = bufToSend;
-			}
-
-			// unpack message
-			i = getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
-					
-					ghostlat[i][j][k].setPop_i(1, bufToRecv[index]);
-					ghostlat[i][j][k].setPop_i(7, bufToRecv[index+1]);
-					ghostlat[i][j][k].setPop_i(9, bufToRecv[index+2]);
-					ghostlat[i][j][k].setPop_i(11, bufToRecv[index+3]);
-					ghostlat[i][j][k].setPop_i(13, bufToRecv[index+4]);
-				}
-			}
-			
-			/* send to left, recv from right i = 2, 8, 10, 12, 14 */
-			snode = getMyNeighbour(0);
-			rnode = getMyNeighbour(1);
-			
-			// prepare message for sending
-			i = 0;
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
-					
-					bufToSend[index] = ghostlat[i][j][k].getPop_i(2);
-					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(8);
-					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(10);
-					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(12);
-					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(14);
-				}
-			}
-			
-			// send and receive data or use memcpy if number of CPU in x-dir is 1
-			if (getNodeGrid().getItem(0) > 1) {
-				if (getMyPosition().getItem(0) % 2 == 0) {
-					world.send(snode, COMM_DIR_1, bufToSend);
-					world.recv(rnode, COMM_DIR_1, bufToRecv);
-				} else {
-					world.recv(rnode, COMM_DIR_1, bufToRecv);
-					world.send(snode, COMM_DIR_1, bufToSend);
-				}
-			} else {
-				bufToRecv = bufToSend;
-			}
-			
-			// unpack message
-			i = getMyNi().getItem(0) - 2 * getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
-					
-					ghostlat[i][j][k].setPop_i(2, bufToRecv[index+0]);
-					ghostlat[i][j][k].setPop_i(8, bufToRecv[index+1]);
-					ghostlat[i][j][k].setPop_i(10, bufToRecv[index+2]);
-					ghostlat[i][j][k].setPop_i(12, bufToRecv[index+3]);
-					ghostlat[i][j][k].setPop_i(14, bufToRecv[index+4]);
-				}
-			}
-			
-			//////////////////////
-			//// Y-direction /////
-			//////////////////////
-			numDataTransf = numPopTransf * getMyNi().getItem(0) * getMyNi().getItem(2);
-			bufToSend.resize(numDataTransf);				// resize bufToSend
-			bufToRecv.resize(numDataTransf);				// resize bufToRecv
-
-			/* send to right, recv from left i = 3, 7, 10, 15, 17 */
-			snode = getMyNeighbour(3);
-			rnode = getMyNeighbour(2);
-			
-			// prepare message for sending
-			j = getMyNi().getItem(1) - getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
-
-					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(3);
-					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(7);
-					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(10);
-					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(15);
-					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(17);
-				}
-			}
-			
-			// send and receive data or use memcpy if number of CPU in y-dir is 1
-			if (getNodeGrid().getItem(1) > 1) {
-				if (getMyPosition().getItem(1) % 2 == 0) {
-					world.send(snode, COMM_DIR_2, bufToSend);
-					world.recv(rnode, COMM_DIR_2, bufToRecv);
-				} else {
-					world.recv(rnode, COMM_DIR_2, bufToRecv);
-					world.send(snode, COMM_DIR_2, bufToSend);
-				}
-			} else {
-				bufToRecv = bufToSend;
-			}
-			
-			// unpack message
-			j = getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
-
-					ghostlat[i][j][k].setPop_i(3, bufToRecv[index+0]);
-					ghostlat[i][j][k].setPop_i(7, bufToRecv[index+1]);
-					ghostlat[i][j][k].setPop_i(10, bufToRecv[index+2]);
-					ghostlat[i][j][k].setPop_i(15, bufToRecv[index+3]);
-					ghostlat[i][j][k].setPop_i(17, bufToRecv[index+4]);
-				}
-			}
-
-			/* send to left, recv from right i = 4, 8, 9, 16, 18 */
-			snode = getMyNeighbour(2);
-			rnode = getMyNeighbour(3);
-			
-			// prepare message for sending
-			j = 0;
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
-
-					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(4);
-					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(8);
-					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(9);
-					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(16);
-					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(18);
-				}
-			}
-			
-			// send and receive data or use memcpy if number of CPU in y-dir is 1
-			if (getNodeGrid().getItem(1) > 1) {
-				if (getMyPosition().getItem(1) % 2 == 0) {
-					world.send(snode, COMM_DIR_3, bufToSend);
-					world.recv(rnode, COMM_DIR_3, bufToRecv);
-				} else {
-					world.recv(rnode, COMM_DIR_3, bufToRecv);
-					world.send(snode, COMM_DIR_3, bufToSend);
-				}
-			} else {
-				bufToRecv = bufToSend;
-			}
-			
-			// unpack message
-			j = getMyNi().getItem(1) - 2 * getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
-
-					ghostlat[i][j][k].setPop_i(4, bufToRecv[index+0]);
-					ghostlat[i][j][k].setPop_i(8, bufToRecv[index+1]);
-					ghostlat[i][j][k].setPop_i(9, bufToRecv[index+2]);
-					ghostlat[i][j][k].setPop_i(16, bufToRecv[index+3]);
-					ghostlat[i][j][k].setPop_i(18, bufToRecv[index+4]);
-				}
-			}
-
-			//////////////////////
-			//// Z-direction /////
-			//////////////////////
-			numDataTransf = numPopTransf * getMyNi().getItem(0) * getMyNi().getItem(1);
-			bufToSend.resize(numDataTransf);				// resize bufToSend
-			bufToRecv.resize(numDataTransf);				// resize bufToRecv
-		
-			/* send to right, recv from left i = 5, 11, 14, 15, 18 */
-			snode = getMyNeighbour(5);
-			rnode = getMyNeighbour(4);
-			
-			// prepare message for sending
-			k = getMyNi().getItem(2) - getHaloSkin();
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
-
-					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(5);
-					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(11);
-					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(14);
-					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(15);
-					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(18);
-				}
-			}
-			
-			// send and receive data or use memcpy if number of CPU in z-dir is 1
-			if (getNodeGrid().getItem(2) > 1) {
-				if (getMyPosition().getItem(2) % 2 == 0) {
-					world.send(snode, COMM_DIR_4, bufToSend);
-					world.recv(rnode, COMM_DIR_4, bufToRecv);
-				} else {
-					world.recv(rnode, COMM_DIR_4, bufToRecv);
-					world.send(snode, COMM_DIR_4, bufToSend);
-				}
-			} else {
-				bufToRecv = bufToSend;
-			}
-			
-			// unpack message
-			k = getHaloSkin();
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
-
-					ghostlat[i][j][k].setPop_i(5, bufToRecv[index+0]);
-					ghostlat[i][j][k].setPop_i(11, bufToRecv[index+1]);
-					ghostlat[i][j][k].setPop_i(14, bufToRecv[index+2]);
-					ghostlat[i][j][k].setPop_i(15, bufToRecv[index+3]);
-					ghostlat[i][j][k].setPop_i(18, bufToRecv[index+4]);
-				}
-			}
-			
-			/* send to left, recv from right i = 6, 12, 13, 16, 17 */
-			snode = getMyNeighbour(4);
-			rnode = getMyNeighbour(5);
-
-			// prepare message for sending
-			k = 0;
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
-
-					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(6);
-					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(12);
-					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(13);
-					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(16);
-					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(17);
-				}
-			}
-
-			// send and receive data or use memcpy if number of CPU in z-dir is 1
-			if (getNodeGrid().getItem(2) > 1) {
-				if (getMyPosition().getItem(2) % 2 == 0) {
-					world.send(snode, COMM_DIR_5, bufToSend);
-					world.recv(rnode, COMM_DIR_5, bufToRecv);
-				} else {
-					world.recv(rnode, COMM_DIR_5, bufToRecv);
-					world.send(snode, COMM_DIR_5, bufToSend);
-				}
-			} else {
-				bufToRecv = bufToSend;
-			}
-			
-			// unpack message
-			k = getMyNi().getItem(2) - 2 * getHaloSkin();
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
-
-					ghostlat[i][j][k].setPop_i(6, bufToRecv[index+0]);
-					ghostlat[i][j][k].setPop_i(12, bufToRecv[index+1]);
-					ghostlat[i][j][k].setPop_i(13, bufToRecv[index+2]);
-					ghostlat[i][j][k].setPop_i(16, bufToRecv[index+3]);
-					ghostlat[i][j][k].setPop_i(17, bufToRecv[index+4]);
-				}
-			}
-
-			bufToSend.resize(0);
-			bufToRecv.resize(0);
-		}
 		
     /* STREAMING ALONG THE VELOCITY VECTORS. SERIAL */
     void LatticeBoltzmann::streaming(int _i, int _j, int _k) {
-//			printf("Started streaming\n");
       int _numVels;
       int _ip, _im, _jp, _jm, _kp, _km;
       int dir = 0;
@@ -989,18 +616,6 @@ namespace espressopp {
       _ip = _i + 1; _im = _i - 1;
       _jp = _j + 1; _jm = _j - 1;
       _kp = _k + 1; _km = _k - 1;
-
-			if (mpiWorld->size() == 1) {
-				// handle iterations if the site is on the "left" border of the domain
-				if (_i == 0) _im = getNi().getItem(0) - 1;
-				if (_j == 0) _jm = getNi().getItem(1) - 1;
-				if (_k == 0) _km = getNi().getItem(2) - 1;
-
-				// handle iterations if the site is on the "right" border of the domain
-				if (_i == getNi().getItem(0) - 1) _ip = 0;
-				if (_j == getNi().getItem(1) - 1) _jp = 0;
-				if (_k == getNi().getItem(2) - 1) _kp = 0;
-			}
 
       // streaming itself //
       // do not move the staying populations
@@ -1027,7 +642,6 @@ namespace espressopp {
       ghostlat[_i][_jm][_km].setPop_i(16,lbfluid[_i][_j][_k].getF_i(16));
       ghostlat[_i][_jp][_km].setPop_i(17,lbfluid[_i][_j][_k].getF_i(17));
       ghostlat[_i][_jm][_kp].setPop_i(18,lbfluid[_i][_j][_k].getF_i(18));
-//			printf("Finished streaming\n");
     }
 
 		/* CALCULATION OF DENSITIES ON LATTICE SITES */
@@ -1246,6 +860,10 @@ namespace espressopp {
 			}
 		}
 		
+		/////////////////////////////
+		/* HANDLING RESTARTS */
+		/////////////////////////////
+		
 		void LatticeBoltzmann::readCouplForces () {
 			/* interface to read filename for the input profile */
 			FILE * couplForcesFile;
@@ -1345,6 +963,373 @@ namespace espressopp {
 			fclose (couplForcesFile);
 		}
 		
+		///////////////////////////
+		/* PARALLELISATION */
+		///////////////////////////
+		
+		/* FIND RANKS OF NEIGHBOURUNG CPU IN 6 DIRECTIONS */
+		void LatticeBoltzmann::findMyNeighbours () {
+			printf ("Started neighbours allocation \n");
+			
+			/* calculate dimensionality of the processors grid arrangement */
+			int nodeGridDim = 0;
+			Int3D _nodeGrid = getNodeGrid();
+			for (int i = 0; i < 3; ++i) {
+				if (_nodeGrid[i] != 1) {
+					++nodeGridDim;
+				}
+			}
+			printf("nodeGridDim is %d\n", nodeGridDim);
+			
+			/* define myRank and myPosition in the nodeGrid */
+			longint _myRank = getSystem()->comm->rank();
+			Int3D _myPosition = Int3D(0,0,0);
+			
+			esutil::Grid grid(_nodeGrid);
+			grid.mapIndexToPosition(_myPosition, _myRank);
+			setMyPosition(_myPosition);
+			
+			/* calculate ranks of neighbouring processors in every direction */
+			Int3D _myNeighbourPos = Int3D(0,0,0);
+			for (int _dim = 0; _dim < nodeGridDim; ++_dim) {
+				for (int _j = 0; _j < 3; ++_j) {
+					_myNeighbourPos[_j] = _myPosition[_j];
+				}
+				
+				// left neighbor in direction _dim (x, y or z)
+				_myNeighbourPos[_dim] = _myPosition[_dim] - 1;
+				if (_myNeighbourPos[_dim] < 0) {
+					_myNeighbourPos[_dim] += _nodeGrid[_dim];
+				}
+				setMyNeighbour(2*_dim, grid.mapPositionToIndex(_myNeighbourPos));
+				
+				// right neighbor in direction _dim (x, y or z)
+				_myNeighbourPos[_dim] = _myPosition[_dim] + 1;
+				if (_myNeighbourPos[_dim] >= _nodeGrid[_dim]) {
+					_myNeighbourPos[_dim] -= _nodeGrid[_dim];
+				}
+				setMyNeighbour(2*_dim + 1, grid.mapPositionToIndex(_myNeighbourPos));
+				printf ("MPI_Rank is %d of %d. My nodeGrid position is %d %d %d. \nMy neighbour in dir %d is %d \nMy neighbour in dir %d is %d \n",
+								_myRank, mpiWorld->size(), _myPosition.getItem(0), _myPosition.getItem(1), _myPosition.getItem(2),
+								2*_dim, getMyNeighbour(2*_dim),
+								2*_dim+1, getMyNeighbour(2*_dim+1));
+				printf ("grid.getGridSize(_dim %d) is %d \n", _dim, _nodeGrid[_dim]);
+			}
+			
+			for (int _dim = nodeGridDim; _dim < 3; ++_dim) {
+				setMyNeighbour(2*_dim, grid.mapPositionToIndex(_myPosition));
+				setMyNeighbour(2*_dim+1, grid.mapPositionToIndex(_myPosition));
+			}
+			
+			printf ("Finished neighbours allocation \n");
+		}
+		
+		/* COMMUNICATE POPULATIONS IN HALO REGIONS TO THE NEIGHBOURING CPUs */
+		void LatticeBoltzmann::commHalo() {
+			int i, j, k, index;											// running indices and index of the node to be copied
+			int numPopTransf = 5;										// number of populations to transfer
+			int numDataTransf;											// number of data to transfer
+			int rnode, snode;												// rank of the node to receive from and to send to
+			std::vector<real> bufToSend, bufToRecv;	// buffers used to send and to receive the data
+			
+			mpi::environment env;
+			mpi::communicator world;
+			
+			//////////////////////
+			//// X-direction /////
+			//////////////////////
+			numDataTransf = numPopTransf * getMyNi().getItem(1) * getMyNi().getItem(2);
+			bufToSend.resize(numDataTransf);				// resize bufToSend
+			bufToRecv.resize(numDataTransf);				// resize bufToRecv
+			
+			/* send to right, recv from left i = 1, 7, 9, 11, 13 */
+			snode = getMyNeighbour(1);
+			rnode = getMyNeighbour(0);
+			
+			// prepare message for sending
+			i = getMyNi().getItem(0) - getHaloSkin();
+			for (k=0; k<getMyNi().getItem(2); k++) {
+				for (j=0; j<getMyNi().getItem(1); j++) {
+					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
+					
+					bufToSend[index] = ghostlat[i][j][k].getPop_i(1);
+					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(7);
+					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(9);
+					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(11);
+					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(13);
+				}
+			}
+			
+			// send and receive data or use memcpy if number of CPU in x-dir is 1
+			if (getNodeGrid().getItem(0) > 1) {
+				if (getMyPosition().getItem(0) % 2 == 0) {
+					world.send(snode, COMM_DIR_0, bufToSend);
+					world.recv(rnode, COMM_DIR_0, bufToRecv);
+				} else {
+					world.recv(rnode, COMM_DIR_0, bufToRecv);
+					world.send(snode, COMM_DIR_0, bufToSend);
+				}
+			} else {
+				bufToRecv = bufToSend;
+			}
+			
+			// unpack message
+			i = getHaloSkin();
+			for (k=0; k<getMyNi().getItem(2); k++) {
+				for (j=0; j<getMyNi().getItem(1); j++) {
+					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
+					
+					ghostlat[i][j][k].setPop_i(1, bufToRecv[index]);
+					ghostlat[i][j][k].setPop_i(7, bufToRecv[index+1]);
+					ghostlat[i][j][k].setPop_i(9, bufToRecv[index+2]);
+					ghostlat[i][j][k].setPop_i(11, bufToRecv[index+3]);
+					ghostlat[i][j][k].setPop_i(13, bufToRecv[index+4]);
+				}
+			}
+			
+			/* send to left, recv from right i = 2, 8, 10, 12, 14 */
+			snode = getMyNeighbour(0);
+			rnode = getMyNeighbour(1);
+			
+			// prepare message for sending
+			i = 0;
+			for (k=0; k<getMyNi().getItem(2); k++) {
+				for (j=0; j<getMyNi().getItem(1); j++) {
+					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
+					
+					bufToSend[index] = ghostlat[i][j][k].getPop_i(2);
+					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(8);
+					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(10);
+					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(12);
+					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(14);
+				}
+			}
+			
+			// send and receive data or use memcpy if number of CPU in x-dir is 1
+			if (getNodeGrid().getItem(0) > 1) {
+				if (getMyPosition().getItem(0) % 2 == 0) {
+					world.send(snode, COMM_DIR_1, bufToSend);
+					world.recv(rnode, COMM_DIR_1, bufToRecv);
+				} else {
+					world.recv(rnode, COMM_DIR_1, bufToRecv);
+					world.send(snode, COMM_DIR_1, bufToSend);
+				}
+			} else {
+				bufToRecv = bufToSend;
+			}
+			
+			// unpack message
+			i = getMyNi().getItem(0) - 2 * getHaloSkin();
+			for (k=0; k<getMyNi().getItem(2); k++) {
+				for (j=0; j<getMyNi().getItem(1); j++) {
+					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
+					
+					ghostlat[i][j][k].setPop_i(2, bufToRecv[index+0]);
+					ghostlat[i][j][k].setPop_i(8, bufToRecv[index+1]);
+					ghostlat[i][j][k].setPop_i(10, bufToRecv[index+2]);
+					ghostlat[i][j][k].setPop_i(12, bufToRecv[index+3]);
+					ghostlat[i][j][k].setPop_i(14, bufToRecv[index+4]);
+				}
+			}
+			
+			//////////////////////
+			//// Y-direction /////
+			//////////////////////
+			numDataTransf = numPopTransf * getMyNi().getItem(0) * getMyNi().getItem(2);
+			bufToSend.resize(numDataTransf);				// resize bufToSend
+			bufToRecv.resize(numDataTransf);				// resize bufToRecv
+			
+			/* send to right, recv from left i = 3, 7, 10, 15, 17 */
+			snode = getMyNeighbour(3);
+			rnode = getMyNeighbour(2);
+			
+			// prepare message for sending
+			j = getMyNi().getItem(1) - getHaloSkin();
+			for (k=0; k<getMyNi().getItem(2); k++) {
+				for (i=0; i<getMyNi().getItem(0); i++) {
+					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
+					
+					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(3);
+					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(7);
+					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(10);
+					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(15);
+					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(17);
+				}
+			}
+			
+			// send and receive data or use memcpy if number of CPU in y-dir is 1
+			if (getNodeGrid().getItem(1) > 1) {
+				if (getMyPosition().getItem(1) % 2 == 0) {
+					world.send(snode, COMM_DIR_2, bufToSend);
+					world.recv(rnode, COMM_DIR_2, bufToRecv);
+				} else {
+					world.recv(rnode, COMM_DIR_2, bufToRecv);
+					world.send(snode, COMM_DIR_2, bufToSend);
+				}
+			} else {
+				bufToRecv = bufToSend;
+			}
+			
+			// unpack message
+			j = getHaloSkin();
+			for (k=0; k<getMyNi().getItem(2); k++) {
+				for (i=0; i<getMyNi().getItem(0); i++) {
+					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
+					
+					ghostlat[i][j][k].setPop_i(3, bufToRecv[index+0]);
+					ghostlat[i][j][k].setPop_i(7, bufToRecv[index+1]);
+					ghostlat[i][j][k].setPop_i(10, bufToRecv[index+2]);
+					ghostlat[i][j][k].setPop_i(15, bufToRecv[index+3]);
+					ghostlat[i][j][k].setPop_i(17, bufToRecv[index+4]);
+				}
+			}
+			
+			/* send to left, recv from right i = 4, 8, 9, 16, 18 */
+			snode = getMyNeighbour(2);
+			rnode = getMyNeighbour(3);
+			
+			// prepare message for sending
+			j = 0;
+			for (k=0; k<getMyNi().getItem(2); k++) {
+				for (i=0; i<getMyNi().getItem(0); i++) {
+					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
+					
+					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(4);
+					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(8);
+					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(9);
+					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(16);
+					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(18);
+				}
+			}
+			
+			// send and receive data or use memcpy if number of CPU in y-dir is 1
+			if (getNodeGrid().getItem(1) > 1) {
+				if (getMyPosition().getItem(1) % 2 == 0) {
+					world.send(snode, COMM_DIR_3, bufToSend);
+					world.recv(rnode, COMM_DIR_3, bufToRecv);
+				} else {
+					world.recv(rnode, COMM_DIR_3, bufToRecv);
+					world.send(snode, COMM_DIR_3, bufToSend);
+				}
+			} else {
+				bufToRecv = bufToSend;
+			}
+			
+			// unpack message
+			j = getMyNi().getItem(1) - 2 * getHaloSkin();
+			for (k=0; k<getMyNi().getItem(2); k++) {
+				for (i=0; i<getMyNi().getItem(0); i++) {
+					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
+					
+					ghostlat[i][j][k].setPop_i(4, bufToRecv[index+0]);
+					ghostlat[i][j][k].setPop_i(8, bufToRecv[index+1]);
+					ghostlat[i][j][k].setPop_i(9, bufToRecv[index+2]);
+					ghostlat[i][j][k].setPop_i(16, bufToRecv[index+3]);
+					ghostlat[i][j][k].setPop_i(18, bufToRecv[index+4]);
+				}
+			}
+			
+			//////////////////////
+			//// Z-direction /////
+			//////////////////////
+			numDataTransf = numPopTransf * getMyNi().getItem(0) * getMyNi().getItem(1);
+			bufToSend.resize(numDataTransf);				// resize bufToSend
+			bufToRecv.resize(numDataTransf);				// resize bufToRecv
+			
+			/* send to right, recv from left i = 5, 11, 14, 15, 18 */
+			snode = getMyNeighbour(5);
+			rnode = getMyNeighbour(4);
+			
+			// prepare message for sending
+			k = getMyNi().getItem(2) - getHaloSkin();
+			for (j=0; j<getMyNi().getItem(1); j++) {
+				for (i=0; i<getMyNi().getItem(0); i++) {
+					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
+					
+					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(5);
+					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(11);
+					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(14);
+					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(15);
+					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(18);
+				}
+			}
+			
+			// send and receive data or use memcpy if number of CPU in z-dir is 1
+			if (getNodeGrid().getItem(2) > 1) {
+				if (getMyPosition().getItem(2) % 2 == 0) {
+					world.send(snode, COMM_DIR_4, bufToSend);
+					world.recv(rnode, COMM_DIR_4, bufToRecv);
+				} else {
+					world.recv(rnode, COMM_DIR_4, bufToRecv);
+					world.send(snode, COMM_DIR_4, bufToSend);
+				}
+			} else {
+				bufToRecv = bufToSend;
+			}
+			
+			// unpack message
+			k = getHaloSkin();
+			for (j=0; j<getMyNi().getItem(1); j++) {
+				for (i=0; i<getMyNi().getItem(0); i++) {
+					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
+					
+					ghostlat[i][j][k].setPop_i(5, bufToRecv[index+0]);
+					ghostlat[i][j][k].setPop_i(11, bufToRecv[index+1]);
+					ghostlat[i][j][k].setPop_i(14, bufToRecv[index+2]);
+					ghostlat[i][j][k].setPop_i(15, bufToRecv[index+3]);
+					ghostlat[i][j][k].setPop_i(18, bufToRecv[index+4]);
+				}
+			}
+			
+			/* send to left, recv from right i = 6, 12, 13, 16, 17 */
+			snode = getMyNeighbour(4);
+			rnode = getMyNeighbour(5);
+			
+			// prepare message for sending
+			k = 0;
+			for (j=0; j<getMyNi().getItem(1); j++) {
+				for (i=0; i<getMyNi().getItem(0); i++) {
+					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
+					
+					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(6);
+					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(12);
+					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(13);
+					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(16);
+					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(17);
+				}
+			}
+			
+			// send and receive data or use memcpy if number of CPU in z-dir is 1
+			if (getNodeGrid().getItem(2) > 1) {
+				if (getMyPosition().getItem(2) % 2 == 0) {
+					world.send(snode, COMM_DIR_5, bufToSend);
+					world.recv(rnode, COMM_DIR_5, bufToRecv);
+				} else {
+					world.recv(rnode, COMM_DIR_5, bufToRecv);
+					world.send(snode, COMM_DIR_5, bufToSend);
+				}
+			} else {
+				bufToRecv = bufToSend;
+			}
+			
+			// unpack message
+			k = getMyNi().getItem(2) - 2 * getHaloSkin();
+			for (j=0; j<getMyNi().getItem(1); j++) {
+				for (i=0; i<getMyNi().getItem(0); i++) {
+					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
+					
+					ghostlat[i][j][k].setPop_i(6, bufToRecv[index+0]);
+					ghostlat[i][j][k].setPop_i(12, bufToRecv[index+1]);
+					ghostlat[i][j][k].setPop_i(13, bufToRecv[index+2]);
+					ghostlat[i][j][k].setPop_i(16, bufToRecv[index+3]);
+					ghostlat[i][j][k].setPop_i(17, bufToRecv[index+4]);
+				}
+			}
+			
+			bufToSend.resize(0);
+			bufToRecv.resize(0);
+		}
+
     /* Destructor of the LB */
     LatticeBoltzmann::~LatticeBoltzmann() {
 			disconnect();

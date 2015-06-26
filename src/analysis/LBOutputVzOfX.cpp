@@ -21,16 +21,16 @@
 */
 
 #include "python.hpp"
-#include "LBOutputProfileVzOfX.hpp"
+#include "LBOutputVzOfX.hpp"
 
 namespace espressopp {
   namespace analysis {
-//    LOG4ESPP_LOGGER(LBOutputProfileVzOfX::theLogger, "LBOutputProfileVzOfX");
-    LBOutputProfileVzOfX::LBOutputProfileVzOfX(shared_ptr<System> system,
+//    LOG4ESPP_LOGGER(LBOutputVzOfX::theLogger, "LBOutputVzOfX");
+    LBOutputVzOfX::LBOutputVzOfX(shared_ptr<System> system,
                                        shared_ptr< integrator::LatticeBoltzmann > latticeboltzmann)
     : LBOutput(system, latticeboltzmann) {}
 
-    void LBOutputProfileVzOfX::writeOutput()
+    void LBOutputVzOfX::writeOutput()
     {
       Int3D _Ni;
       int _numVels;
@@ -42,7 +42,7 @@ namespace espressopp {
 
       // test output in a console
       if (_step == 0)
-      printf("LBOutputProfileVzOfX: Making velocity profile v_z (x)\n\n");
+      printf("LBOutputVzOfX: Making velocity profile v_z (x)\n\n");
 
       std::vector<real> _denLoc;
 //      std::vector<real> _jxLoc;
@@ -91,14 +91,14 @@ namespace espressopp {
       fclose (velProfFile);
     }
 
-    void LBOutputProfileVzOfX::registerPython() {
+    void LBOutputVzOfX::registerPython() {
       using namespace espressopp::python;
 
-      class_<LBOutputProfileVzOfX, bases< LBOutput > >
-          ("analysis_LBOutputProfile_VzOfX", init< shared_ptr< System >,
+      class_<LBOutputVzOfX, bases< LBOutput > >
+          ("analysis_LBOutput_VzOfX", init< shared_ptr< System >,
                                              shared_ptr< integrator::LatticeBoltzmann > >())
 
-        .def("writeOutput", &LBOutputProfileVzOfX::writeOutput)
+        .def("writeOutput", &LBOutputVzOfX::writeOutput)
       ;
     }
   }

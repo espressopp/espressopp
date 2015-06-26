@@ -32,10 +32,13 @@ modified. The volume of system :math:`V` is introduced as a dynamical variable:
 
 .. math:: \\boldsymbol{\dot{r}}_{i} = \\frac{\\boldsymbol{p}_{i}}{m_{i}} +
           \\frac{p_{\epsilon}}{W}\\boldsymbol{r}_{i}
+					
 .. math:: \\boldsymbol{\dot{p}}_{i} = -\\bigtriangledown_{\\boldsymbol{r}_{i}}\Phi -
           (1+\\frac{n}{N_{f}})\\frac{p_{\epsilon}}{W}\\boldsymbol{p}_{i} - 
           \gamma\\boldsymbol{p}_{i} + \\boldsymbol{R}_{i}
+					
 .. math:: \\dot{V} = dVp_{\epsilon}/W
+
 .. math:: \\dot{p}_{\epsilon} = nV(X-P_{ext})+
           \\frac{n}{N_{f}}\sum^{N}_{i=1}\\frac{\\boldsymbol{p}_{i}^{2}}{m_{i}} -
           \gamma_{p}p_{\epsilon} + R_{p}

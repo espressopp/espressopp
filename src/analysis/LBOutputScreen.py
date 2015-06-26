@@ -20,10 +20,37 @@
 
 
 """
-**************************************
-**espressopp.analysis.LBOutputScreen**
-**************************************
-Child class derived from the abstract class 'LBOutput()'. For more information and examples of usage, please, refer to this class.
+*************************************************************
+**LBOutputScreen** - controls screen output in LB-simulations
+*************************************************************
+Child class derived from the abstract class :class:`espressopp.analysis.LBOutput`.
+It computes and outputs to the screen the simulation progress (finished step) and 
+controls mass flux conservation when using MD-to-LB coupling. Ideally, the sum of mass
+fluxes should be zero, i.e. :math:`j_{LB} + j_{MD} = 0`.
+
+.. function:: espressopp.analysis.LBOutputScreen(system,latticeboltzmann)
+
+	:param system: system object defined earlier in the python-script
+	:param latticeboltzmann: lattice boltzmann object defined earlier in the python-script
+
+.. note::
+
+	this class should be called from external analysis class :class:`espressopp.integrator.ExtAnalyze`
+	with specified periodicity of invokation and after this added to the integrator. See an example for details.
+
+Example to call the profiler:
+
+>>> # initialise profiler (for example with the name outputScreen) with system and
+>>> # lattice boltzmann objects as parameters:
+>>> outputScreen = espressopp.analysis.LBOutputScreen(system,lb)
+>>>
+>>> # initialise external analysis object (for example extAnalysisNum1) with
+>>> # previously created profiler and periodicity of invocation in steps:
+>>> extAnalysisNum1=espressopp.integrator.ExtAnalyze(outputScreen,100)
+>>>
+>>> # add the external analysis object as an extension to the integrator
+>>> integrator.addExtension(extAnalysisNum1)
+
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +59,6 @@ from espressopp.analysis.LBOutput import *
 from _espressopp import analysis_LBOutput_Screen
 
 class LBOutputScreenLocal(LBOutputLocal, analysis_LBOutput_Screen):
-	#    'The (local) compute of LBOutputScreen.'
     def __init__(self, system, latticeboltzmann):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_LBOutput_Screen, system, latticeboltzmann)
