@@ -47,6 +47,7 @@ target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_L
 set_target_properties(_espressopp PROPERTIES PREFIX "" SUFFIX ".so" LIBRARY_OUTPUT_DIRECTORY ..)
 install(TARGETS _espressopp LIBRARY DESTINATION ${PYTHON_INSTDIR})
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${PYTHON_INSTDIR}/espressopp
-	FILES_MATCHING PATTERN "*.py")
+	FILES_MATCHING PATTERN "*.py"
+    PATTERN "CMakeFiles" EXCLUDE)
 
 add_dependencies(_espressopp gitversion)
