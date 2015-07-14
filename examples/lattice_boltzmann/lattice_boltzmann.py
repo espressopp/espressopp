@@ -23,17 +23,17 @@ integrator.addExtension(thermostat)
 thermostat.disconnect()
 
 # define a LB grid
-lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid=espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size), Ni=Int3D(20, 20, 20))
+nodeGrid=espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
+lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid, Ni=Int3D(20, 20, 20))
 # add extension to the integrator
 integrator.addExtension(lb)
-#initPop = espressopp.integrator.LBInitPopUniform(system,lb)
-initPop = espressopp.integrator.LBInitPopWave(system,lb)
+initPop = espressopp.integrator.LBInitPopUniform(system,lb)
+#initPop = espressopp.integrator.LBInitPopWave(system,lb)
 initPop.createDenVel(1.0, Real3D(0.0,0.,1.))
 
 # declare gammas responsible for viscosities (if they differ from 0)
 lb.gamma_b = 0.5
 lb.gamma_s = 0.5
-
 
 # specify desired temperature (set the fluctuations if any)
 #lb.lbTemp = 0.0

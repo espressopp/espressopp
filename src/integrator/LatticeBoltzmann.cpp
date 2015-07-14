@@ -85,23 +85,17 @@ namespace espressopp {
 			fOnPart = std::vector<Real3D>(_Npart + 1, 0.);	// +1 since particle's id starts with 1, not 0
 			printf("_Npart is %d\n", _Npart);
 
-//			if (mpiWorld->size() > 1) {
-				setHaloSkin(1);
-				printf("1 halo Skin is %d\n", getHaloSkin());
-				findMyNeighbours();
-				
-				longint _myRank = getSystem()->comm->rank();
-				Int3D _numSites = Int3D(0,0,0);
-				for (int _dim = 0; _dim < 3; ++_dim) {
-					_numSites[_dim] = floor((getMyPosition().getItem(_dim)+1)*getSystem()->bc->getBoxL().getItem(_dim)/getNodeGrid().getItem(_dim)) - floor(getMyPosition().getItem(_dim)*getSystem()->bc->getBoxL().getItem(_dim)/getNodeGrid().getItem(_dim)) + 2 * getHaloSkin();
-				}
-				setMyNi (_numSites);
-				printf ("_myRank is %d. _myPosition is %d %d %d. _numSites I should be responsible for is %d %d %d\n", _myRank, getMyPosition().getItem(0), getMyPosition().getItem(1), getMyPosition().getItem(2), getMyNi().getItem(0), getMyNi().getItem(1), getMyNi()[2]);
-//			} else {
-//				setHaloSkin(0);
-//				printf("2 halo Skin is %d\n", getHaloSkin());
-//				setMyNi(getNi());
-//			}
+			setHaloSkin(1);
+			printf("1 halo Skin is %d\n", getHaloSkin());
+			findMyNeighbours();
+			
+			longint _myRank = getSystem()->comm->rank();
+			Int3D _numSites = Int3D(0,0,0);
+			for (int _dim = 0; _dim < 3; ++_dim) {
+				_numSites[_dim] = floor((getMyPosition().getItem(_dim)+1)*getSystem()->bc->getBoxL().getItem(_dim)/getNodeGrid().getItem(_dim)) - floor(getMyPosition().getItem(_dim)*getSystem()->bc->getBoxL().getItem(_dim)/getNodeGrid().getItem(_dim)) + 2 * getHaloSkin();
+			}
+			setMyNi (_numSites);
+			printf ("_myRank is %d. _myPosition is %d %d %d. _numSites I should be responsible for is %d %d %d\n", _myRank, getMyPosition().getItem(0), getMyPosition().getItem(1), getMyPosition().getItem(2), getMyNi().getItem(0), getMyNi().getItem(1), getMyNi()[2]);
 			
 			setNBins(20);
 			distr = std::vector<real>(getNBins(), 0.);
@@ -288,7 +282,8 @@ namespace espressopp {
 		void LatticeBoltzmann::addInterpVel (Real3D _interpVel) {interpVel += _interpVel;}
 		
 		real LatticeBoltzmann::convMassMDtoLB() {return 1.;}
-		real LatticeBoltzmann::convTimeMDtoLB() {return 1. / (0.005 * getTau());}
+#warning: need a foolproof in case there is no access to the integrator (and getTimeStep) yet
+		real LatticeBoltzmann::convTimeMDtoLB() {return 1. / (integrator->getTimeStep() * getTau());}
 		real LatticeBoltzmann::convLenMDtoLB() {
 			return getNi().getItem(0) / (getSystem()->bc->getBoxL().getItem(0) * getA());}
 		
@@ -557,9 +552,7 @@ namespace espressopp {
 						lbfluid[i][j][k].btranMomToPop (numVels);
 
 						/* streaming phase */
-//						if (getMyNi().getItem(0) > 1 && getMyNi().getItem(1) > 1 && getMyNi().getItem(2) > 1) {
-							streaming (i,j,k);
-//						}
+						streaming (i,j,k);
 						
 						/* set to zero coupling forces if the coupling exists */
 						if (getCouplForceFlag() == 1) {
@@ -569,9 +562,7 @@ namespace espressopp {
         }
       }
 
-//			if (mpiWorld->size() > 1) {
-				commHalo();
-//			}
+			commHalo();
 
       /* swap pointers for two lattices */
       for (int i = 0; i < getMyNi().getItem(0); i++) {
@@ -591,13 +582,6 @@ namespace espressopp {
 							}
               ghostlat[i][j][k].setPop_i(l, tmp);
             }
-
-//						int _step = integrator->getStep();
-//            /* checking density of the system */
-//            if (_step % 50 == 0 || _step == 1) {
-//              computeDensity (i, j, k);
-//            } else {
-//            }
           }
         }
       }
@@ -650,7 +634,6 @@ namespace espressopp {
 
       for (int l = 0; l < getNumVels(); l++) {
         denLoc += lbfluid[_i][_j][_k].getF_i(l);
-//        jzLoc += lbfluid[_i][_j][_k].getF_i(l) * getCi(l).getItem(2);
       }
 
       /* check velocity fluctuations at the lattice sites */
@@ -686,8 +669,6 @@ namespace espressopp {
 			
 			for (int l = 0; l < getNumVels(); l++) {
 				jLoc += lbfluid[_i][_j][_k].getF_i(l) * getCi(l);
-//				jLoc[1] += lbfluid[_ip][_jp][_kp].getF_i(l) * getCi(l).getItem(1);
-//				jLoc[2] += lbfluid[_ip][_jp][_kp].getF_i(l) * getCi(l).getItem(2);
 			}
 			
 		}
@@ -749,7 +730,6 @@ namespace espressopp {
 			
 			setInterpVel (Real3D(0.,0.,0.));
 			
-//			printf ("I am here after initialising interpolating velocity!\n");
 			// loop over neighboring LB nodes
 			int _ip, _jp, _kp;
 			for (int _i = 0; _i < 2; _i++) {
@@ -800,7 +780,6 @@ namespace espressopp {
 					}
 				}
 			}
-//			printf ("made a loop over LB nodes!\n");
 
 			// add viscous force to the buffered random force acting onto particle p.id()
 			addFOnPart(p.id(), -_fricCoeff * (p.velocity() - getInterpVel()));
@@ -815,7 +794,6 @@ namespace espressopp {
 			/* extrapolate momentum change to the nodes through local LB coupling forces */
 			Real3D _fLoc = Real3D(0.,0.,0.);
 			
-//			printf ("entering other loop!\n");
 			// loop over neighboring LB nodes
 			for (int _i = 0; _i < 2; _i++) {
 				for (int _j = 0; _j < 2; _j++) {
@@ -836,7 +814,6 @@ namespace espressopp {
 					}
 				}
 			}
-//			printf ("finished other loop!\n");
 		}
 		
 		/* EXTRAPOLATE MOMENTUM TO THE NEIGHBORING NODES */

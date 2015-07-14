@@ -198,11 +198,6 @@ namespace espressopp {
 			void setMyNeighbour (int _dir, int _rank);
 			int getMyNeighbour (int _dir);
 
-/*			void setMyLeft (Int3D _ranks);
-			Int3D getMyLeft (int _rank);
-			void setMyRight (Int3D _ranks);
-			Int3D getMyRight (int _rank);
-*/
 			void setHaloSkin (int _haloSkin);
 			int getHaloSkin ();
 
@@ -261,15 +256,12 @@ namespace espressopp {
 			std::vector<real> distr;
 
 			shared_ptr< esutil::RNG > rng;  //!< random number generator used for fluctuations
-//			shared_ptr< storage::DomainDecomposition > domdec;
 			
 			// COUPLING
 			Real3D interpVel;						// interpolated fluid vel at the MD particle position
 
 			// MPI THINGS
 			std::vector<int> myNeighbour;
-//			Int3D myLeft;
-//			Int3D myRight;
 			Int3D myPosition;
 			int haloSkin;
 			Int3D myNi;
