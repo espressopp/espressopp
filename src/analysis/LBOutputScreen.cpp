@@ -82,24 +82,25 @@ namespace espressopp {
 			CellList realCells = system.storage->getRealCells();
 			
 			Real3D _velCM = Real3D(0.,0.,0.);
-			
+			Real3D _totVelCM = Real3D(0.,0.,0.);
 			// loop over all particles in the current CPU
 			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 				Real3D& vel = cit->velocity();
 				Real3D& force = cit->force();
 				_velCM += vel + 0.0025 * force;
 			}
-
+			
+			mpi::all_reduce(*getSystem()->comm, _velCM, _totVelCM, std::plus<Real3D>());
+			
 			findLBMom();
 	
 			if (getSystem()->comm->rank() == 0) {
 				
 				printf("_velCM : cmV(t+ 1/2dt) of LJ system is     %18.14f %18.14f %18.14f \n",
-							 _velCM[0], _velCM[1], _velCM[2]);
+							 _totVelCM[0], _totVelCM[1], _totVelCM[2]);
 				
 				int _step = latticeboltzmann->getStepNum();
 				printf ("completed %d LB step!\n", _step);
-				printf("-------------------------------------------------------------------\n");
 			
 				// calculate time performance
 				time_t _timer_new, _timer_old;
@@ -113,6 +114,7 @@ namespace espressopp {
 				time(&_timer_old);  /* get current time; same as: timer = time(NULL)  */
 				setTimerOld(_timer_old);
 				printf ("seconds from last control point: %.f\n", seconds);
+				printf("-------------------------------------------------------------------\n");
 			}
     }
 		
@@ -142,14 +144,14 @@ namespace espressopp {
 					}
 				}
 			}
-			_myU *= latticeboltzmann->convTimeMDtoLB() / latticeboltzmann->getA();
-			
+			_myU *= (latticeboltzmann->convTimeMDtoLB());
+			_myU /= (latticeboltzmann->getA());
 			printf("from Rank %d result is %18.14f %18.14f %18.14f\n", getSystem()->comm->rank(), _myU[0], _myU[1], _myU[2]);
 			
-			mpi::all_reduce(*getSystem()->comm, _myU, result, std::plus<Real3D>());
+			boost::mpi::all_reduce(*getSystem()->comm, _myU, result, std::plus<Real3D>());
 
 			if (getSystem()->comm->rank() == 0) {
-				printf("LB-fluid vel after streaming (LJ units) is %18.14f %18.14f %18.14f \n",
+				printf("LB-fluid mom after streaming (LJ units) is %18.14f %18.14f %18.14f \n",
 							 result.getItem(0), result.getItem(1), result.getItem(2));
 			}
 		}

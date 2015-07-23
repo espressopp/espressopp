@@ -6,8 +6,8 @@ from espressopp import Int3D
 from espressopp import Real3D
 
 # create default Lennard Jones (WCA) system with 0 particles and cubic box (L=40)
-system, integrator = espressopp.standard_system.LennardJones(0, box=(20, 20, 20), temperature=1.)
-
+system, integrator = espressopp.standard_system.LennardJones(10, box=(20, 20, 20), temperature=1.)
+system.rng.seed = 123456
 # system's integrator
 integrator     = espressopp.integrator.VelocityVerlet(system)
 integrator.dt  = 0.005
@@ -29,15 +29,18 @@ lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid, Ni=Int3D(20, 20, 2
 integrator.addExtension(lb)
 initPop = espressopp.integrator.LBInitPopUniform(system,lb)
 #initPop = espressopp.integrator.LBInitPopWave(system,lb)
-initPop.createDenVel(1.0, Real3D(0.0,0.,1.))
+initPop.createDenVel(1.0, Real3D(0.,0.,0.))
 
+lboutputScreen = espressopp.analysis.LBOutputScreen(system,lb)
+OUT3=espressopp.integrator.ExtAnalyze(lboutputScreen,200)
+integrator.addExtension(OUT3)
 # declare gammas responsible for viscosities (if they differ from 0)
 lb.gamma_b = 0.5
 lb.gamma_s = 0.5
 
 # specify desired temperature (set the fluctuations if any)
 #lb.lbTemp = 0.0
-#lb.lbTemp = 1.
+lb.lbTemp = 1.
 #lb.fricCoeff = 5.
 #lb.nSteps=1
 
@@ -54,9 +57,9 @@ print "integrator.dt", integrator.dt
 #integrator.addExtension(OUT2)
 
 # output onto the screen
-lboutputScreen = espressopp.analysis.LBOutputScreen(system,lb)
-OUT3=espressopp.integrator.ExtAnalyze(lboutputScreen,200)
-integrator.addExtension(OUT3)
+#lboutputScreen = espressopp.analysis.LBOutputScreen(system,lb)
+#OUT3=espressopp.integrator.ExtAnalyze(lboutputScreen,200)
+#integrator.addExtension(OUT3)
 
 # set external constant (gravity-like) force
 #lbforce = espressopp.integrator.LBInitConstForce(system,lb)

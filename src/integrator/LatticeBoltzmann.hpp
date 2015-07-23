@@ -161,10 +161,10 @@ namespace espressopp {
 			
 			/* COUPLING TO MD PARTICLES */
 			void coupleLBtoMD();
-			void calcRandForce(class Particle&, real _fricCoeff, real _temperature, real _timestep);
+			void calcRandForce(class Particle&);
 			void restoreLBForces();								// restore LB-forces from previous timestep to act onto MD particles
 //		void calcInterVel(class Particle&);
-			void calcViscForce(class Particle&, real _fricCoeff, real _timestep);
+			void calcViscForce(class Particle&);
 			void extrapMomToNodes(class Particle&, real _timestep);
 			real convMDtoLB (int _opCode);
 			
@@ -173,6 +173,9 @@ namespace espressopp {
 			
 			void setNSteps (int _nSteps);						// set number of md steps between 1 lb
 			int getNSteps ();										// get number of md steps between 1 lb
+
+			void setTotNPart (int _totNPart);			// set total number of md particles in the whole system (sum over CPUs)
+			int getTotNPart ();										// get total number of md particles in the whole system (sum over CPUs)
 			
 			void setFOnPart (int _id, Real3D _fOnPart);
 			Real3D getFOnPart (int _id);
@@ -206,6 +209,9 @@ namespace espressopp {
 			
 			void setMyPosition(Int3D _myPosition);
 			Int3D getMyPosition();
+      
+			void setMyLeft(Real3D _myLeft);	// set left border of a physical ("real") domain of a CPU
+			Real3D getMyLeft();							// get left border of a physical ("real") domain of a CPU
 			
 			/* control functions */
 			void computeDensity (int _i, int _j, int _k);
@@ -236,12 +242,12 @@ namespace espressopp {
 			std::vector<real> eqWeight;		// equilibrium weights
 			std::vector<real> inv_b;		// back-transformation weights
 			std::vector<real> phi;				// amplitudes of fluctuations
+			int totNPart;									// total number of MD particles
 			
 			Int3D partBin;								// bins where the MD particle is
 			int extForceFlag;							// flag for an external force
 			int couplForceFlag;						// flag for a coupling force
 			std::vector<Real3D> fOnPart;	// force acting onto an MD particle
-			Int3D nodeGrid;								// 3D-array of processors
 			Int3D Ni;											// lattice lengths in 3D
 			
 			int idX, idY, idZ, index;			// indexes in 3D and aligned 1D index
@@ -265,6 +271,8 @@ namespace espressopp {
 			Int3D myPosition;
 			int haloSkin;
 			Int3D myNi;
+			Int3D nodeGrid;								// 3D-array of processors
+			Real3D myLeft;								// left border of a physical ("real") domain for a CPU
 			
 			// ON-THE-FLY-CALCULATIONS
 			real denLoc;

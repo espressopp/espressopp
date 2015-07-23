@@ -37,7 +37,7 @@ namespace espressopp {
     /* SITE CONSTRUCTOR */
     LBSite::LBSite (shared_ptr<System> system, int _numVels, real _a, real _tau) {
 			/* initialization of populations, moments and equilibrium moments */
-      f   = std::vector<real>(_numVels, 0.);
+      f   = std::vector<real>(_numVels+4, 0.);
       m   = std::vector<real>(_numVels, 0.);
       meq = std::vector<real>(_numVels, 0.);
 			
