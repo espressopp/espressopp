@@ -46,22 +46,31 @@ namespace espressopp {
       real scalp, value;
 			int _offset = latticeboltzmann->getHaloSkin();
 			Int3D _Ni = latticeboltzmann->getMyNi();
+			int _numVels = latticeboltzmann->getNumVels();	// number of velocities in the model
 			
       // set initial velocity of the populations from Maxwell's distribution
-      for (int i = 0; i < _Ni.getItem(0); i++) {
+#warning: check if taking care of OFFSET AT INITIALISATION () is needed
+			for (int i = 0; i < _Ni.getItem(0); i++) {
       // test the damping of a sin-like initial velocities:
         real trace = _u0*_u0*invCs2;
         for (int j = 0; j < _Ni.getItem(1); j++) {
           for (int k = 0; k < _Ni.getItem(2); k++) {
-            for (int l = 0; l < latticeboltzmann->getNumVels(); l++) {
+            for (int l = 0; l < _numVels; l++) {
               scalp = _u0 * latticeboltzmann->getCi(l);
               value = 0.5 * latticeboltzmann->getEqWeight(l) * _rho0 * (2. + 2. * scalp * invCs2 + scalp * scalp * invCs4 - trace);
               latticeboltzmann->setLBFluid(Int3D(i,j,k),l,value);
               latticeboltzmann->setGhostFluid(Int3D(i,j,k),l,0.0);
             }
+						
+						/* fill in den and j values for real and halo regions */
+						latticeboltzmann->setLBFluid(Int3D(i,j,k),_numVels,_rho0);
+						latticeboltzmann->setLBFluid(Int3D(i,j,k),_numVels+1,_u0[0]*_rho0);
+						latticeboltzmann->setLBFluid(Int3D(i,j,k),_numVels+2,_u0[1]*_rho0);
+						latticeboltzmann->setLBFluid(Int3D(i,j,k),_numVels+3,_u0[2]*_rho0);
           }
         }
       }
+//			latticeboltzmann->copyDenMomToHalo();
     }
 
     /* do nothing with external forces */

@@ -51,6 +51,7 @@ namespace espressopp {
 			Int3D _Ni = latticeboltzmann->getNi();				// system size in lattice node
 			Int3D _myNi = latticeboltzmann->getMyNi();		// my local nodes
 			Int3D _globalNi = Int3D(0,0,0);								// index of the first real node in cpu in the global lattice
+			int _numVels = latticeboltzmann->getNumVels();// number of velocities in the model
 			
 			for (int _dim = 0; _dim < 3; _dim++) {
 				_globalNi[_dim] = floor(_myPosition[_dim] * _Ni[_dim] / _nodeGrid[_dim]);
@@ -65,15 +66,22 @@ namespace espressopp {
         real trace = _u0*_u0*invCs2;
         for (int j = _offset; j < _myNi.getItem(1) - _offset; j++) {
           for (int k = _offset; k < _myNi.getItem(2) - _offset; k++) {
-            for (int l = 0; l < latticeboltzmann->getNumVels(); l++) {
+            for (int l = 0; l < _numVels; l++) {
               scalp = _u0 * latticeboltzmann->getCi(l);
               value = 0.5 * latticeboltzmann->getEqWeight(l) * _rho0 * (2. + 2. * scalp * invCs2 + scalp * scalp * invCs4 - trace);
               latticeboltzmann->setLBFluid(Int3D(i,j,k),l,value);
               latticeboltzmann->setGhostFluid(Int3D(i,j,k),l,0.0);
             }
+						
+						/* fill in den and j values for real and halo regions */
+						latticeboltzmann->setLBFluid(Int3D(i,j,k),_numVels,_rho0);
+						latticeboltzmann->setLBFluid(Int3D(i,j,k),_numVels+1,_u0[0]*_rho0);
+						latticeboltzmann->setLBFluid(Int3D(i,j,k),_numVels+2,_u0[1]*_rho0);
+						latticeboltzmann->setLBFluid(Int3D(i,j,k),_numVels+3,_u0[2]*_rho0);
           }
         }
       }
+			latticeboltzmann->copyDenMomToHalo();
     }
 
     /* do nothing with external forces */

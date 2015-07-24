@@ -24,6 +24,7 @@
 #define _LBOUTPUT_SCREEN_HPP
 
 #include "LBOutput.hpp"
+#include "esutil/Timer.hpp"
 
 namespace espressopp {
   namespace analysis {
@@ -43,11 +44,19 @@ namespace espressopp {
 
 			void setTimerNew(time_t _value);
 			time_t getTimerNew();
+
+			void setLBTimerOld(real _lbTime_old);
+			real getLBTimerOld();
+			
+			void setLBTimerNew(real _lbTime_new);
+			real getLBTimerNew();
 			
 			static void registerPython();
 			
 		private:
 			time_t timer_old, timer_new;
+			real	lbTime_old, lbTime_new;
+			esutil::WallTimer timeLBtoMD;  //!< used for timing
     };
   }
 }

@@ -77,6 +77,7 @@ namespace espressopp {
 			 conservation for LB+MD, it is necessary to go forward in time by 1/2dt in MD-part.
 			 This is done by using the same forces as for integrate1() but withont actually 
 			 altering velocities of MD-particles. */
+			
 			System& system = getSystemRef();
 			
 			CellList realCells = system.storage->getRealCells();
@@ -95,6 +96,8 @@ namespace espressopp {
 			findLBMom();
 	
 			if (getSystem()->comm->rank() == 0) {
+				Int3D _Ni = latticeboltzmann->getNi();
+				int lbVolume = _Ni[0]*_Ni[1]*_Ni[2];
 				
 				printf("_velCM : cmV(t+ 1/2dt) of LJ system is     %18.14f %18.14f %18.14f \n",
 							 _totVelCM[0], _totVelCM[1], _totVelCM[2]);
@@ -103,6 +106,8 @@ namespace espressopp {
 				printf ("completed %d LB step!\n", _step);
 			
 				// calculate time performance
+//				real timelb;
+//				timeLBtoMD.reset();
 				time_t _timer_new, _timer_old;
 				double seconds;
 				
@@ -115,6 +120,10 @@ namespace espressopp {
 				setTimerOld(_timer_old);
 				printf ("seconds from last control point: %.f\n", seconds);
 				printf("-------------------------------------------------------------------\n");
+//				setLBTimerNew(timeLBtoMD.getElapsedTime());
+//				timelb = getLBTimerNew() - getLBTimerOld();
+//				setLBTimerOld(getLBTimerNew());
+//				printf ("time spent on LB+MD is %f sec, MLUPS: %f \n", timelb, lbVolume * 1e-6 / timelb);
 			}
     }
 		
@@ -146,7 +155,7 @@ namespace espressopp {
 			}
 			_myU *= (latticeboltzmann->convTimeMDtoLB());
 			_myU /= (latticeboltzmann->getA());
-			printf("from Rank %d result is %18.14f %18.14f %18.14f\n", getSystem()->comm->rank(), _myU[0], _myU[1], _myU[2]);
+//			printf("from Rank %d result is %18.14f %18.14f %18.14f\n", getSystem()->comm->rank(), _myU[0], _myU[1], _myU[2]);
 			
 			boost::mpi::all_reduce(*getSystem()->comm, _myU, result, std::plus<Real3D>());
 
@@ -161,6 +170,12 @@ namespace espressopp {
 		
 		void LBOutputScreen::setTimerNew (time_t _value) {timer_new = _value;}
 		time_t LBOutputScreen::getTimerNew() {return timer_new;}
+		
+		void LBOutputScreen::setLBTimerOld (real _lbTime_old) {lbTime_old = _lbTime_old;}
+		real LBOutputScreen::getLBTimerOld() {return lbTime_old;}
+		
+		void LBOutputScreen::setLBTimerNew(real _lbTime_new) {lbTime_new = _lbTime_new;}
+		real LBOutputScreen::getLBTimerNew() {return lbTime_new;}
 		
     void LBOutputScreen::registerPython() {
       using namespace espressopp::python;

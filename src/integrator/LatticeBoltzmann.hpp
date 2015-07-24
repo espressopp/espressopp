@@ -28,6 +28,7 @@
 #include "logging.hpp"
 #include "Extension.hpp"
 #include "boost/signals2.hpp"
+#include "esutil/Timer.hpp"
 #include "Real3D.hpp"
 #include "Int3D.hpp"
 #include "LatticeSite.hpp"
@@ -62,71 +63,71 @@ namespace espressopp {
 			Int3D getNodeGrid();									// get nodeGrid
 			
       void setNi(Int3D _Ni);								// set lattice size in x,y and z-directions
-      Int3D getNi();											// get lattice size in x,y and z-directions
+      Int3D getNi();												// get lattice size in x,y and z-directions
 
 			void setA (real _a);									// set lattice spacing
-			real getA ();											// get lattice spacing
+			real getA ();													// get lattice spacing
 
 			void setTau (real _tau);							// set lattice timestep
-      real getTau ();										// get lattice timestep
+      real getTau ();												// get lattice timestep
 
-			void setGammaB (real _gamma_b);					// set gamma for bulk
-			real getGammaB ();									// get gamma for bulk
+			void setGammaB (real _gamma_b);				// set gamma for bulk
+			real getGammaB ();										// get gamma for bulk
 
-			void setGammaS (real _gamma_s);					// set gamma for shear
-			real getGammaS ();									// get gamma for shear
+			void setGammaS (real _gamma_s);				// set gamma for shear
+			real getGammaS ();										// get gamma for shear
 
-			void setGammaOdd (real _gamma_odd);				// set gamma odd
+			void setGammaOdd (real _gamma_odd);		// set gamma odd
 			real getGammaOdd ();									// get gamma odd
 
-			void setGammaEven (real _gamma_even);			// set gamma even
-			real getGammaEven ();								// get gamma even
+			void setGammaEven (real _gamma_even);	// set gamma even
+			real getGammaEven ();									// get gamma even
 
-			void setExtForceFlag (int _extForceFlag);		// set a flag for external force
+			void setExtForceFlag (int _extForceFlag);	// set a flag for external force
 			int getExtForceFlag ();								// get a flag for external force
 
-			void setNumDims (int _numDims);					// set number of dimensions
-			int getNumDims ();									// get number of dimensions
+			void setNumDims (int _numDims);				// set number of dimensions
+			int getNumDims ();										// get number of dimensions
 
-			void setNumVels (int _numVels);					// set number of velocities
-			int getNumVels ();									// get number of velocities
+			void setNumVels (int _numVels);				// set number of velocities
+			int getNumVels ();										// get number of velocities
 
-			void setStepNum (int _step);						// set current step number
-			int getStepNum ();									// get current step number
+			void setStepNum (int _step);					// set current step number
+			int getStepNum ();										// get current step number
 
-			void setDenLoc (real _denLoc);					// set local density
-			real getDenLoc ();									// get local density
+			void setDenLoc (real _denLoc);				// set local density
+			real getDenLoc ();										// get local density
 
-			void setMomLoc (Real3D _jLoc);					// set local momentum
+			void setMomLoc (Real3D _jLoc);				// set local momentum
 			Real3D getMomLoc ();									// get local momentum
 			
 			void setNBins (int _nBins);						// set number of bins
-			int getNBins ();										// get number of bins
+			int getNBins ();											// get number of bins
 
-			void setDistr (int _i, real _distr);			// set distribution
+			void setDistr (int _i, real _distr);	// set distribution
 			real getDistr (int _i);								// get distribution
 			void incDistr (int _i);								// increment distribution
 
-			void setLBTemp (real _lbTemp);					// set LB-temperature
-			real getLBTemp ();									// get LB-temperature
+			void setLBTemp (real _lbTemp);				// set LB-temperature
+			real getLBTemp ();										// get LB-temperature
 
-			void setLBTempFlag (int _lbTempFlag);			// set a flag for fluctuations
-			int getLBTempFlag ();								// get a flag for fluctuations
+			void setLBTempFlag (int _lbTempFlag);	// set a flag for fluctuations
+			int getLBTempFlag ();									// get a flag for fluctuations
 
-			void setEqWeight (int _l, real _value);		// set eq.weights
-			real getEqWeight (int _l);							// get eq.weights
+			void setEqWeight (int _l, real _value);	// set eq.weights
+			real getEqWeight (int _l);						// get eq.weights
 
-			void setCi (int _l, Real3D _vec);				// set c_i's
+			void setCi (int _l, Real3D _vec);			// set c_i's
 			Real3D getCi (int _l);								// get c_i's
 
 			void setCs2 (real _cs2);							// set cs2
-			real getCs2 ();										// get cs2
+			real getCs2 ();												// get cs2
 
-			void setInvB (int _l, real _value);				// set inverse b_i's
+			void setInvB (int _l, real _value);		// set inverse b_i's
 			real getInvB (int _l);								// get inverse b_i's
 
-			void setPhi (int _l, real _value);				// set phi for fluctuations
-			real getPhi (int _l);								// get phi for fluctuations
+			void setPhi (int _l, real _value);		// set phi for fluctuations
+			real getPhi (int _l);									// get phi for fluctuations
 
 			void setLBFluid (Int3D _Ni, int _l, real _value);
 			real getLBFluid (Int3D _Ni, int _l);
@@ -145,37 +146,38 @@ namespace espressopp {
 			/* END OF SET AND GET DECLARATION */
 
 			/* FUNCTIONS DECLARATION */
-			void initLatticeModel ();							// initialize lattice model (weights, cis)
+			void initLatticeModel ();								// initialize lattice model (weights, cis)
 			void initGammas (int _idGamma);					// (re)initialize gammas
-			void initFluctuations ();							// (re)initialize fluctuation parameters
-			void makeLBStep ();									// perform one step of LB
+			void initFluctuations ();								// (re)initialize fluctuation parameters
+			void makeLBStep ();											// perform one step of LB
 			
 			/* COUPLING TO THE MD */
 			void setStart(int _start);							// set start indicator for coupling
-			int getStart();										// get start indicator
+			int getStart();													// get start indicator
 
 			/* FIND AND MANIPULATE CENTER-OF-MASS VELOCITY OF MD AND LB */
 			Real3D findCMVelMD(int _id);						// find velocity of center of mass of MD particles
-			void zeroMDCMVel();									// kill drift velocity of the center of mass
-			void galileanTransf(Real3D _specCmVel);				// galilean transform by amount of _momPerPart
+			void zeroMDCMVel();											// kill drift velocity of the center of mass
+			void galileanTransf(Real3D _specCmVel);	// galilean transform by amount of _momPerPart
 			
 			/* COUPLING TO MD PARTICLES */
 			void coupleLBtoMD();
 			void calcRandForce(class Particle&);
-			void restoreLBForces();								// restore LB-forces from previous timestep to act onto MD particles
+			void restoreLBForces();									// restore LB-forces from previous timestep to act onto MD particles
 //		void calcInterVel(class Particle&);
 			void calcViscForce(class Particle&);
-			void extrapMomToNodes(class Particle&, real _timestep);
+//		void extrapMomToNodes(class Particle&, real _timestep);
+			void calcDenMom ();
 			real convMDtoLB (int _opCode);
 			
-			void setFricCoeff (real _fricCoeff);			// set friction coefficient of MD to LB coupling
-			real getFricCoeff ();								// get friction coefficient of MD to LB coupling
+			void setFricCoeff (real _fricCoeff);		// set friction coefficient of MD to LB coupling
+			real getFricCoeff ();										// get friction coefficient of MD to LB coupling
 			
 			void setNSteps (int _nSteps);						// set number of md steps between 1 lb
-			int getNSteps ();										// get number of md steps between 1 lb
+			int getNSteps ();												// get number of md steps between 1 lb
 
-			void setTotNPart (int _totNPart);			// set total number of md particles in the whole system (sum over CPUs)
-			int getTotNPart ();										// get total number of md particles in the whole system (sum over CPUs)
+			void setTotNPart (int _totNPart);				// set total number of md particles in the whole system (sum over CPUs)
+			int getTotNPart ();											// get total number of md particles in the whole system (sum over CPUs)
 			
 			void setFOnPart (int _id, Real3D _fOnPart);
 			Real3D getFOnPart (int _id);
@@ -190,13 +192,16 @@ namespace espressopp {
 			real convTimeMDtoLB();
 			real convLenMDtoLB();
 			
-			void collideStream ();					// use collide-stream scheme
+			void collideStream ();									// use collide-stream scheme
 
-			void streaming (int _i, int _j, int _k);  // streaming along the velocity vectors
-			void commHalo ();													// communicate populations in halo regions to the neighbouring CPUs
+			void streaming (int _i, int _j, int _k); // streaming along the velocity vectors
 
 			/* MPI FUNCTIONS */
 			void findMyNeighbours ();
+			void commHalo ();							// communicate populations in halo regions to the neighbouring CPUs
+			void copyForcesFromHalo ();		// copy coupling forces from halo regions to the real lattice sites
+			void copyDenMomToHalo ();			// copy den and j from real lattice sites to halo
+			void makeDecompose ();				// decompose storage to put escaped real particles into neighbouring CPU
 			
 			void setMyNeighbour (int _dir, int _rank);
 			int getMyNeighbour (int _dir);
@@ -204,14 +209,14 @@ namespace espressopp {
 			void setHaloSkin (int _haloSkin);
 			int getHaloSkin ();
 
-			void setMyNi(Int3D _myNi);	// set lattice size of current cpu + halo in 3 dimensions
-			Int3D getMyNi();						// get lattice size of current cpu + halo in 3 dimensions
+			void setMyNi(Int3D _myNi);		// set lattice size of current cpu + halo in 3 dimensions
+			Int3D getMyNi();							// get lattice size of current cpu + halo in 3 dimensions
 			
 			void setMyPosition(Int3D _myPosition);
 			Int3D getMyPosition();
       
 			void setMyLeft(Real3D _myLeft);	// set left border of a physical ("real") domain of a CPU
-			Real3D getMyLeft();							// get left border of a physical ("real") domain of a CPU
+			Real3D getMyLeft();						// get left border of a physical ("real") domain of a CPU
 			
 			/* control functions */
 			void computeDensity (int _i, int _j, int _k);
@@ -222,12 +227,12 @@ namespace espressopp {
 			static void registerPython();
 
 		private:
-			int numDims;          		  // number of dimensions
-			int numVels;          		  // number of velocities
-			real cs2;             		  // squared speed of sound
-			real invCs2;          		  // inverse square of speed of sound
-			real a;                     // lattice spacing
-			real tau;                   // lattice timestep
+			int numDims;									// number of dimensions
+			int numVels;									// number of velocities
+			real cs2;											// squared speed of sound
+			real invCs2;									// inverse square of speed of sound
+			real a;												// lattice spacing
+			real tau;											// lattice timestep
 			real gamma_b;
 			real gamma_s;
 			real gamma_odd;
@@ -240,7 +245,7 @@ namespace espressopp {
 			int nSteps;
 			std::vector<Real3D> c_i;			// velocity vectors
 			std::vector<real> eqWeight;		// equilibrium weights
-			std::vector<real> inv_b;		// back-transformation weights
+			std::vector<real> inv_b;			// back-transformation weights
 			std::vector<real> phi;				// amplitudes of fluctuations
 			int totNPart;									// total number of MD particles
 			
@@ -264,7 +269,7 @@ namespace espressopp {
 			shared_ptr< esutil::RNG > rng;  //!< random number generator used for fluctuations
 			
 			// COUPLING
-			Real3D interpVel;						// interpolated fluid vel at the MD particle position
+			Real3D interpVel;							// interpolated fluid vel at the MD particle position
 
 			// MPI THINGS
 			std::vector<int> myNeighbour;
@@ -273,6 +278,7 @@ namespace espressopp {
 			Int3D myNi;
 			Int3D nodeGrid;								// 3D-array of processors
 			Real3D myLeft;								// left border of a physical ("real") domain for a CPU
+			real tempSkin;
 			
 			// ON-THE-FLY-CALCULATIONS
 			real denLoc;
@@ -282,6 +288,11 @@ namespace espressopp {
 			boost::signals2::connection _befIntV;
 			boost::signals2::connection _recalc2;
 			
+			// TIMERS
+			esutil::WallTimer timeCollStream;  //!< used for timing
+//			esutil::WallTimer timeComm;  //!< used for timing
+			esutil::WallTimer timeCouple;  //!< used for timing
+
 			void connect();
 			void disconnect();
 
