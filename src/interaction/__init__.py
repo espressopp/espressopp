@@ -70,6 +70,7 @@ from espressopp.interaction.OPLS import *
 from espressopp.interaction.DihedralHarmonicCos import *
 from espressopp.interaction.DihedralHarmonicNCos import *
 from espressopp.interaction.DihedralHarmonicUniqueCos import *
+from espressopp.interaction.DihedralRB import *
 
 from espressopp.interaction.CoulombKSpaceEwald import *
 from espressopp.interaction.CoulombRSpace import *
