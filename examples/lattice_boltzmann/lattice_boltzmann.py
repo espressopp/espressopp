@@ -5,7 +5,7 @@ import cProfile, pstats, StringIO
 from espressopp import Int3D
 from espressopp import Real3D
 # create default Lennard Jones (WCA) system with 0 particles and cubic box (L=40)
-system, integrator = espressopp.standard_system.LennardJones(100, box=(200, 200, 200), temperature=1.)
+system, integrator = espressopp.standard_system.LennardJones(100, box=(20, 20, 20), temperature=1.)
 system.rng.seed = 123456
 #system.skin = 1.
 # system's integrator
@@ -24,7 +24,7 @@ thermostat.disconnect()
 
 # define a LB grid
 nodeGrid=espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
-lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid, Ni=Int3D(200,200,200))
+lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid, Ni=Int3D(20,20,20))
 # add extension to the integrator
 integrator.addExtension(lb)
 initPop = espressopp.integrator.LBInitPopUniform(system,lb)
@@ -43,7 +43,7 @@ lb.gamma_s = 0.5
 #lb.lbTemp = 0.0
 lb.lbTemp = 1.
 #lb.fricCoeff = 5.
-lb.nSteps=5
+lb.nSteps=1
 
 print "integrator.dt", integrator.dt 
 
