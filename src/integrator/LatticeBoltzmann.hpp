@@ -154,6 +154,9 @@ namespace espressopp {
 			/* COUPLING TO THE MD */
 			void setStart(int _start);							// set start indicator for coupling
 			int getStart();													// get start indicator
+			
+			void setCopyTimestep(real _copyTimestep);// set timestep (just a copy of MD timestep)
+			real getCopyTimestep();													// get timestep
 
 			/* FIND AND MANIPULATE CENTER-OF-MASS VELOCITY OF MD AND LB */
 			Real3D findCMVelMD(int _id);						// find velocity of center of mass of MD particles
@@ -248,6 +251,7 @@ namespace espressopp {
 			std::vector<real> inv_b;			// back-transformation weights
 			std::vector<real> phi;				// amplitudes of fluctuations
 			int totNPart;									// total number of MD particles
+			real copyTimestep;							// copy of the MD timestep
 			
 			Int3D partBin;								// bins where the MD particle is
 			int extForceFlag;							// flag for an external force

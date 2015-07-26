@@ -78,8 +78,8 @@ namespace espressopp {
 			setLBTempFlag(0);					// there are no fluctuations by default
 
 			/* setup simulation parameters */
-			setStart(0);							// set indicator of coupling start to zero
-			setStepNum(0);						// set step number to zero at the start of simulation
+			setStart(0);								// set indicator of coupling start to zero
+			setStepNum(0);							// set step number to zero at the start of simulation
 
 			/* setup random numbers generator */
 			if (!_system->rng) {
@@ -230,6 +230,9 @@ namespace espressopp {
 		/* Setter and getter for simulation parameters */
 		void LatticeBoltzmann::setStepNum (int _step) { stepNum = _step;}
 		int LatticeBoltzmann::getStepNum () { return stepNum;}
+
+		void LatticeBoltzmann::setCopyTimestep (real _copyTimestep) { copyTimestep = _copyTimestep;}
+		real LatticeBoltzmann::getCopyTimestep () { return copyTimestep;}
 		
 		void LatticeBoltzmann::setStart (int _start) { start = _start;}
 		int LatticeBoltzmann::getStart () { return start;}
@@ -423,28 +426,36 @@ namespace espressopp {
       real _lbTemp;
       real mu, a3;
 
-			std::cout << "Mass " << convMassMDtoLB() << "\n";
-			std::cout << "Len " << convLenMDtoLB() << "\n";
-			std::cout << "getTau() " << getTau() << "\n";
-			std::cout << "Time " << convTimeMDtoLB() << "\n";
+			longint _myRank = getSystem()->comm->rank();
+
+			if (_myRank == 0) {
+				std::cout << "Mass " << convMassMDtoLB() << "\n";
+				std::cout << "Len " << convLenMDtoLB() << "\n";
+				std::cout << "getTau() " << getTau() << "\n";
+				std::cout << "Time " << convTimeMDtoLB() << "\n";
+			}
 			
 			_lbTemp = getLBTemp() * convMassMDtoLB() * pow(convLenMDtoLB() / convTimeMDtoLB(), 2.);
       a3 = getA() * getA() * getA();    // a^3
       mu = _lbTemp / (getCs2() * a3);   // thermal mass density
 
-      if (_lbTemp == 0.) {
+			if (_lbTemp == 0.) {
         // account for fluctuations being turned off
         setLBTempFlag(0);
-        std::cout << "The temperature of the LB-fluid is 0. The fluctuations are turned off!\n";
+				if (_myRank == 0) {
+					std::cout << "The temperature of the LB-fluid is 0. The fluctuations are turned off!\n";
+				}
       } else {
         // account for fluctuations being turned on!
         setLBTempFlag(1);
 
-        std::cout << setprecision(8);
-        std::cout << fixed;   // some output tricks
-        std::cout << "The fluctuations have been introduced into the system:\n";
-        std::cout << "lbTemp = " << getLBTemp() << "\n";
-
+				if (_myRank == 0) {
+					std::cout << setprecision(8);
+					std::cout << fixed;   // some output tricks
+					std::cout << "The fluctuations have been introduced into the system:\n";
+					std::cout << "lbTemp = " << getLBTemp() << "\n";
+				}
+				
         setPhi(0, 0.);
         setPhi(1, 0.); setPhi(2, 0.); setPhi(3, 0.);
         setPhi(4, sqrt(mu / getInvB(4) * (1. - getGammaB() * getGammaB())));
@@ -464,8 +475,11 @@ namespace espressopp {
             }
           }
         }
-        std::cout << "The amplitudes phi_i of the fluctuations have been redefined.\n";
-        std::cout << "-------------------------------------\n";
+				
+				if (_myRank == 0) {
+					std::cout << "The amplitudes phi_i of the fluctuations have been redefined.\n";
+					std::cout << "-------------------------------------\n";
+				}
       }
     }
 		
@@ -538,6 +552,8 @@ namespace espressopp {
 		
 		/* FIND AND OUTPUT CENTER-OF-MASS VELOCITY OF MD-PARTICLES */
 		Real3D LatticeBoltzmann::findCMVelMD (int _id) {
+			setCopyTimestep(integrator->getTimeStep());	// set a copy of a timestep to the real MD timestep
+
 			System& system = getSystemRef();
 			
 			CellList realCells = system.storage->getRealCells();

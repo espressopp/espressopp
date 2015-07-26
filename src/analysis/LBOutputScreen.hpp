@@ -51,12 +51,16 @@ namespace espressopp {
 			void setLBTimerNew(real _lbTime_new);
 			real getLBTimerNew();
 			
+			void setOldStepNum(int _oldStepNum);
+			int getOldStepNum();
+			
 			static void registerPython();
 			
 		private:
 			time_t timer_old, timer_new;
 			real	lbTime_old, lbTime_new;
 			esutil::WallTimer timeLBtoMD;  //!< used for timing
+			int oldStepNum;
     };
   }
 }

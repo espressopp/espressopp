@@ -77,6 +77,7 @@ namespace espressopp {
 			 conservation for LB+MD, it is necessary to go forward in time by 1/2dt in MD-part.
 			 This is done by using the same forces as for integrate1() but withont actually 
 			 altering velocities of MD-particles. */
+			real _timestep = latticeboltzmann->getCopyTimestep();
 			
 			System& system = getSystemRef();
 			
@@ -88,7 +89,7 @@ namespace espressopp {
 			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 				Real3D& vel = cit->velocity();
 				Real3D& force = cit->force();
-				_velCM += vel + 0.0025 * force;
+				_velCM += vel + 0.5 * _timestep * force;
 			}
 			
 			mpi::all_reduce(*getSystem()->comm, _velCM, _totVelCM, std::plus<Real3D>());
@@ -103,27 +104,23 @@ namespace espressopp {
 							 _totVelCM[0], _totVelCM[1], _totVelCM[2]);
 				
 				int _step = latticeboltzmann->getStepNum();
-				printf ("completed %d LB step!\n", _step);
-			
+				
 				// calculate time performance
-//				real timelb;
-//				timeLBtoMD.reset();
-				time_t _timer_new, _timer_old;
-				double seconds;
-				
-				time(&_timer_new);  /* get current time; same as: timer = time(NULL)  */
-				setTimerNew(_timer_new);
-				
-				seconds = difftime(getTimerNew(),getTimerOld());
-				
-				time(&_timer_old);  /* get current time; same as: timer = time(NULL)  */
-				setTimerOld(_timer_old);
-				printf ("seconds from last control point: %.f\n", seconds);
+				real timelb;
+				setLBTimerNew(timeLBtoMD.getElapsedTime());
+				if (_step == 0) {
+					setLBTimerOld(0.);
+				}
+				timelb = getLBTimerNew() - getLBTimerOld();
+				setLBTimerOld(getLBTimerNew());
+
+				printf ("time spent on %d LB+MD steps is %f sec, relative MLUPS: %f \n",
+								_step-getOldStepNum(), timelb,
+								(_step-getOldStepNum())*lbVolume*1e-6 / timelb);
+
+				setOldStepNum(_step);
+
 				printf("-------------------------------------------------------------------\n");
-//				setLBTimerNew(timeLBtoMD.getElapsedTime());
-//				timelb = getLBTimerNew() - getLBTimerOld();
-//				setLBTimerOld(getLBTimerNew());
-//				printf ("time spent on LB+MD is %f sec, MLUPS: %f \n", timelb, lbVolume * 1e-6 / timelb);
 			}
     }
 		
@@ -139,17 +136,20 @@ namespace espressopp {
 			for (int i = _offset; i < _Ni[0] - _offset; i++) {
 				for (int j = _offset; j < _Ni[1] - _offset; j++) {
 					for (int k = _offset; k < _Ni[2] - _offset; k++) {
-							
-						Real3D jLoc = Real3D(0.,0.,0.);
-							
+						Real3D _jLoc = Real3D(0.,0.,0.);
+
 						// calculation of density and momentum flux on the lattice site
 						for (int l = 0; l < _numVels; l++) {
 							_fi = latticeboltzmann->getLBFluid(Int3D(i,j,k),l);
 							_ci = latticeboltzmann->getCi(l);
-							jLoc += _fi * _ci;
+							_jLoc += _fi * _ci;
 						}
-							
-						_myU += jLoc;
+/*
+						_jLoc[0] = latticeboltzmann->getLBFluid(Int3D(i,j,k),_numVels+1);
+						_jLoc[1] = latticeboltzmann->getLBFluid(Int3D(i,j,k),_numVels+2);
+						_jLoc[2] = latticeboltzmann->getLBFluid(Int3D(i,j,k),_numVels+3);
+*/
+						_myU += _jLoc;
 					}
 				}
 			}
@@ -160,6 +160,9 @@ namespace espressopp {
 			boost::mpi::all_reduce(*getSystem()->comm, _myU, result, std::plus<Real3D>());
 
 			if (getSystem()->comm->rank() == 0) {
+				int _step = latticeboltzmann->getStepNum();
+				printf ("statistics for step %d:\n", _step);
+				
 				printf("LB-fluid mom after streaming (LJ units) is %18.14f %18.14f %18.14f \n",
 							 result.getItem(0), result.getItem(1), result.getItem(2));
 			}
@@ -176,6 +179,9 @@ namespace espressopp {
 		
 		void LBOutputScreen::setLBTimerNew(real _lbTime_new) {lbTime_new = _lbTime_new;}
 		real LBOutputScreen::getLBTimerNew() {return lbTime_new;}
+
+		void LBOutputScreen::setOldStepNum(int _oldStepNum) {oldStepNum = _oldStepNum;}
+		int LBOutputScreen::getOldStepNum() {return oldStepNum;}
 		
     void LBOutputScreen::registerPython() {
       using namespace espressopp::python;

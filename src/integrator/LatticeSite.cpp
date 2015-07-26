@@ -204,11 +204,10 @@ namespace espressopp {
 
       /* moments on the site */
       Real3D jLoc(getM_i(1), getM_i(2), getM_i(3));
-      jLoc *= (aLocal / tauLocal);
+      jLoc *= (getALoc() / getTauLoc());
 
       /* if we have external forces then modify the eq.fluxes */
 			// ADD LB TO MD COUPLING??
-//			if (_extForceFlag == 0) printf ("extForceFlag is %d\n",_extForceFlag);
 			if (_extForceFlag == 1) jLoc += 0.5*(getExtForceLoc() + getCouplForceLoc()); // when doing coupling, the flag is set to 1!
 
       /* eq. stress modes */
