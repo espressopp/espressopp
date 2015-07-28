@@ -105,18 +105,22 @@ namespace espressopp {
 				
 				int _step = latticeboltzmann->getStepNum();
 				
-				// calculate time performance
-				real timelb;
-				setLBTimerNew(timeLBtoMD.getElapsedTime());
-				if (_step == 0) {
-					setLBTimerOld(0.);
-				}
-				timelb = getLBTimerNew() - getLBTimerOld();
-				setLBTimerOld(getLBTimerNew());
+				if (_step != 0) {
+					// calculate time performance
+					real timelb;
+					setLBTimerNew(timeLBtoMD.getElapsedTime());
+					timelb = getLBTimerNew() - getLBTimerOld();
+					setLBTimerOld(getLBTimerNew());
+					
+					printf ("time spent on %d LB+MD steps is %f sec, relative MLUPS: %f \n",
+									_step-getOldStepNum(), timelb,
+									(_step-getOldStepNum())*lbVolume*1e-6 / timelb);
 
-				printf ("time spent on %d LB+MD steps is %f sec, relative MLUPS: %f \n",
-								_step-getOldStepNum(), timelb,
-								(_step-getOldStepNum())*lbVolume*1e-6 / timelb);
+				} else {
+					timeLBtoMD.reset();
+					setLBTimerOld(0.);
+					printf ("Initialisation of the LB(+MD) system has finished\n");
+				}
 
 				setOldStepNum(_step);
 
@@ -155,9 +159,8 @@ namespace espressopp {
 			}
 			_myU *= (latticeboltzmann->convTimeMDtoLB());
 			_myU /= (latticeboltzmann->getA());
-//			printf("from Rank %d result is %18.14f %18.14f %18.14f\n", getSystem()->comm->rank(), _myU[0], _myU[1], _myU[2]);
 			
-			boost::mpi::all_reduce(*getSystem()->comm, _myU, result, std::plus<Real3D>());
+			boost::mpi::reduce(*getSystem()->comm, _myU, result, std::plus<Real3D>(), 0);
 
 			if (getSystem()->comm->rank() == 0) {
 				int _step = latticeboltzmann->getStepNum();

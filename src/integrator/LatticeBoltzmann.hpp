@@ -82,7 +82,13 @@ namespace espressopp {
 
 			void setGammaEven (real _gamma_even);	// set gamma even
 			real getGammaEven ();									// get gamma even
-
+			
+			void setViscB (real _visc_b);				// set bulk viscosity
+			real getViscB ();										// get bulk viscosity
+			
+			void setViscS (real _visc_s);				// set shear viscosity
+			real getViscS ();										// get shear viscosity
+			
 			void setExtForceFlag (int _extForceFlag);	// set a flag for external force
 			int getExtForceFlag ();								// get a flag for external force
 
@@ -94,12 +100,6 @@ namespace espressopp {
 
 			void setStepNum (int _step);					// set current step number
 			int getStepNum ();										// get current step number
-
-			void setDenLoc (real _denLoc);				// set local density
-			real getDenLoc ();										// get local density
-
-			void setMomLoc (Real3D _jLoc);				// set local momentum
-			Real3D getMomLoc ();									// get local momentum
 			
 			void setNBins (int _nBins);						// set number of bins
 			int getNBins ();											// get number of bins
@@ -107,6 +107,8 @@ namespace espressopp {
 			void setDistr (int _i, real _distr);	// set distribution
 			real getDistr (int _i);								// get distribution
 			void incDistr (int _i);								// increment distribution
+			
+//			void calcHistogram (int _i, int _j, int _k);// calculate the histogram
 
 			void setLBTemp (real _lbTemp);				// set LB-temperature
 			real getLBTemp ();										// get LB-temperature
@@ -240,6 +242,7 @@ namespace espressopp {
 			real gamma_s;
 			real gamma_odd;
 			real gamma_even;
+			real visc_b, visc_s;
 			real lbTemp;
 			real fricCoeff;
 			int start;

@@ -111,6 +111,7 @@ if pmi.isController :
 		pmiproxydefs = dict(
 												cls =  'espressopp.integrator.LatticeBoltzmannLocal',
 												pmiproperty = ['nodeGrid', 'Ni', 'a', 'tau', 'numDims', 'numVels',
-                           'gamma_b', 'gamma_s', 'gamma_odd', 'gamma_even', 'lbTemp', 'fricCoeff', 'nSteps'],
+																			 'visc_b','visc_s','gamma_b', 'gamma_s', 'gamma_odd', 'gamma_even',
+																			 'lbTemp', 'fricCoeff', 'nSteps'],
 												pmicall = ["readCouplForces","saveCouplForces"]
             )

@@ -237,13 +237,6 @@ namespace espressopp {
 		void LatticeBoltzmann::setStart (int _start) { start = _start;}
 		int LatticeBoltzmann::getStart () { return start;}
 		
-		/* Setter and getter for hydrodynamic moments (den, mass flux, pressure tensor) */
-		void LatticeBoltzmann::setDenLoc (real _denLoc) { denLoc = _denLoc;}
-		real LatticeBoltzmann::getDenLoc ()	{ return denLoc;}
-
-		void LatticeBoltzmann::setMomLoc (Real3D _jLoc) { jLoc = _jLoc;}
-		Real3D LatticeBoltzmann::getMomLoc ()	{ return jLoc;}
-		
 		/* Setter and getter for histograms (if needed) */
 		void LatticeBoltzmann::setNBins (int _nBins) { nBins = _nBins;}
 		int LatticeBoltzmann::getNBins () { return nBins;}
@@ -251,6 +244,8 @@ namespace espressopp {
 		void LatticeBoltzmann::setDistr (int _i, real _distr) { distr[_i] = _distr;}
 		real LatticeBoltzmann::getDistr (int _i) {return distr[_i];}
 		void LatticeBoltzmann::incDistr (int _i) { distr[_i] += 1.;}
+
+		//		void LatticeBoltzmann::calcHistogram (int _i, int _j, int _k);
 
 		/* Setter and getter for LB temperature things */
 		void LatticeBoltzmann::setLBTemp (real _lbTemp) { lbTemp = _lbTemp; initFluctuations();}
@@ -263,6 +258,14 @@ namespace espressopp {
 		real LatticeBoltzmann::getPhi (int _l) {return phi[_l];}
 
 		/* Setter and getting for LB viscosity control */
+		void LatticeBoltzmann::setViscB (real _visc_b) {visc_b = _visc_b;
+			setGammaB((getNumDims()*_visc_b-getCs2()*getTau()*convTimeMDtoLB()*convLenMDtoLB()/convMassMDtoLB())/(getNumDims()*_visc_b+getCs2()*getTau()*convTimeMDtoLB()*convLenMDtoLB()/convMassMDtoLB()));}
+		real LatticeBoltzmann::getViscB () { return visc_b;}
+		
+		void LatticeBoltzmann::setViscS (real _visc_s) {visc_s = _visc_s;
+			setGammaS((2.*_visc_s-getCs2()*getTau()*convTimeMDtoLB()*convLenMDtoLB()/convMassMDtoLB())/(2.*_visc_s+getCs2()*getTau()*convTimeMDtoLB()*convLenMDtoLB()/convMassMDtoLB()));}
+		real LatticeBoltzmann::getViscS () { return visc_s;}
+		
 		void LatticeBoltzmann::setGammaB (real _gamma_b) {gamma_b = _gamma_b; initGammas(0);}
 		real LatticeBoltzmann::getGammaB () { return gamma_b;}
 
@@ -405,6 +408,7 @@ namespace espressopp {
       // print for control
 			longint _myRank = getSystem()->comm->rank();
 			if (_myRank == 0) {
+				std::cout << setprecision(8);
 				std::cout << "One of the gamma's controlling viscosities has been changed:\n";
 				if (_idGamma == 0) std::cout << "  gammaB is " << lbfluid[0][0][0].getGammaBLoc() << "\n";
 				if (_idGamma == 1) std::cout << "  gammaS is " << lbfluid[0][0][0].getGammaSLoc() << "\n";
@@ -591,22 +595,32 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 		
+		/* SET CM VELOCITY OF THE MD TO ZERO AT THE START OF COUPLING */
 		void LatticeBoltzmann::zeroMDCMVel () {
-			printf("zero md cm vel \n");
+			int _myRank = getSystem()->comm->rank();
 
 			readCouplForces();
 			restoreLBForces();
-			
-			// set CM velocity of the MD to zero at the start of coupling
+
 			if (getStart() == 0 && getCouplForceFlag() != 0) {
 				Real3D specCmVel = findCMVelMD(0);
-				printf("cm velocity per particle is %18.14f %18.14f %18.14f \n",
-							 specCmVel.getItem(0), specCmVel.getItem(1), specCmVel.getItem(2));
+				// output reporting on subtraction of drift's vel
+				if (_myRank == 0) {
+					printf("-------------------------------------\n");
+					printf("subtracting drift velocity from MD's center of mass (if any)\n");
+					printf("cm velocity per particle is %18.14f %18.14f %18.14f \n",
+								 specCmVel[0], specCmVel[1], specCmVel[2]);
+				}
+				
 				galileanTransf(specCmVel);
 		 
 				specCmVel = findCMVelMD(0);
-				printf("cm velocity per particle after Galilean transformation is %18.14f %18.14f %18.14f \n",
-							 specCmVel.getItem(0), specCmVel.getItem(1), specCmVel.getItem(2));
+				// check if everything worked correctly
+				if (_myRank == 0) {
+					printf("cm velocity per particle after Galilean transformation is %18.14f %18.14f %18.14f \n",
+								 specCmVel[0], specCmVel[1], specCmVel[2]);
+					printf("-------------------------------------\n");
+				}
 
 				setStart(1);
 			}
@@ -686,6 +700,7 @@ namespace espressopp {
       }
 			
 			/* calculate den and j at the lattice sites in real region and copy them to halo */
+#warning: should one cancel this condition if pure lb is in use?
 			if (getCouplForceFlag() == 1) {
 				
 				/* calculate den and j at the lattice sites in real region */
@@ -757,15 +772,8 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 		
-		/* CALCULATION OF DENSITIES ON LATTICE SITES */
-    void LatticeBoltzmann::computeDensity (int _i, int _j, int _k) {
-#warning: why do you need setDenLoc and then denLoc? Delete one of them or merge?
-			setDenLoc(0.);
-
-      for (int l = 0; l < getNumVels(); l++) {
-        denLoc += lbfluid[_i][_j][_k].getF_i(l);
-      }
-
+		/* CALCULATE THE HISTOGRAM */
+//    void LatticeBoltzmann::calcHistogram (int _i, int _j, int _k) {
       /* check velocity fluctuations at the lattice sites */
 /*      if (integrator->getStep() >= 500) {
         int _nBins = getNBins();              // number of histogram bins
@@ -790,21 +798,8 @@ namespace espressopp {
         } else {
         }
       }
+   }
 */
-    }
-		
-/*******************************************************************************************/
-		
-		/* CALCULATION OF MOMENTUM ON LATTICE SITES */
-		void LatticeBoltzmann::computeMomentum (int _i, int _j, int _k) {
-			Real3D jLoc = Real3D(0.,0.,0.);
-			
-			for (int l = 0; l < getNumVels(); l++) {
-				jLoc += lbfluid[_i][_j][_k].getF_i(l) * getCi(l);
-			}
-			
-		}
-		
 /*******************************************************************************************/
 		
     /* SCHEME OF MD TO LB COUPLING */
@@ -813,18 +808,15 @@ namespace espressopp {
 
 			System& system = getSystemRef();
 
-//			int partInDom = 0;
 			CellList realCells = system.storage->getRealCells();
 
 			// loop over all real particles in the current CPU
 			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-//			++partInDom;
 				calcRandForce(*cit);				// calculate random force exerted by the fluid onto a particle
 //				calcInterVel(*cit);									// interpolate velocity of the fluid to monomer's position
 				calcViscForce(*cit);			// calculate viscous drag force exerted by the fluid onto a particle
 //				extrapMomToNodes(*cit, timestep);	// extrapolate momentum transfer to the neighboring nodes
 			}
-//			printf("CPU %d: have %d real particles\n", getSystem()->comm->rank(), partInDom);
     }
 		
 /*******************************************************************************************/
@@ -835,22 +827,22 @@ namespace espressopp {
 			real _tempLB = getLBTemp();
 			
 			real prefactor = sqrt(24. * _fricCoeff * _tempLB / _timestep);		// amplitude of the noise
-			Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);				// 3d random number
+			Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);		// 3d random number
 			setFOnPart (p.id(), prefactor * ranval);			// set force on a particle to the random one
 		}
 		
 /*******************************************************************************************/
 		
 		void LatticeBoltzmann::calcViscForce (Particle& p) {
+			int _offset = getHaloSkin();
+			real _a = getA();
 			real _fricCoeff = getFricCoeff();
 			Real3D Li = getSystem()->bc->getBoxL();
 
 			// account for particle's positions with respect to CPU's left border
 			Real3D _pos = p.position() - getMyLeft();
 
-			Real3D _posLB = _pos;
-			_posLB += getHaloSkin();
-			_posLB /= getA();
+			Real3D _posLB = (_pos + (double)_offset)/ _a;
 			
 			Int3D bin;
 			bin[0] = floor (_posLB[0]); bin[1] = floor (_posLB[1]); bin[2] = floor (_posLB[2]);
@@ -860,10 +852,9 @@ namespace espressopp {
 			delta[0] = _posLB[0] - bin[0];
 			delta[1] = _posLB[1] - bin[1]; 
 			delta[2] = _posLB[2] - bin[2];
-			delta[3] = getA() - delta[0];
-			delta[4] = getA() - delta[1];
-			delta[5] = getA() - delta[2];
-			
+			delta[3] = _a - delta[0];
+			delta[4] = _a - delta[1];
+			delta[5] = _a - delta[2];
 			
 			setInterpVel (Real3D(0.,0.,0.));
 			// loop over neighboring LB nodes
@@ -871,7 +862,6 @@ namespace espressopp {
 			for (int _i = 0; _i < 2; _i++) {
 				for (int _j = 0; _j < 2; _j++) {
 					for (int _k = 0; _k < 2; _k++) {
-						/* periodic boundaries */
 						// assign iterations
 						_ip = bin[0] + _i; _jp = bin[1] + _j; _kp = bin[2] + _k;
 						
@@ -883,7 +873,6 @@ namespace espressopp {
 						Real3D _u = jLoc * convTimeMDtoLB() / (convLenMDtoLB() * denLoc);
 
 						addInterpVel (delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * _u);
-
 					}
 				}
 			}
@@ -927,6 +916,7 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 		
+		/* RESTORING FORCES ACTING FROM LB FLUID ONTO MD PARTICLES */
 		void LatticeBoltzmann::restoreLBForces () {
 			System& system = getSystemRef();
 			
@@ -953,9 +943,7 @@ namespace espressopp {
 						Real3D jLoc = Real3D(0.);
 						for (int l = 0; l < _numVels; l++) {
 							denLoc += lbfluid[i][j][k].getF_i(l);
-							jLoc[0] += lbfluid[i][j][k].getF_i(l) * getCi(l).getItem(0);
-							jLoc[1] += lbfluid[i][j][k].getF_i(l) * getCi(l).getItem(1);
-							jLoc[2] += lbfluid[i][j][k].getF_i(l) * getCi(l).getItem(2);
+							jLoc += lbfluid[i][j][k].getF_i(l)*getCi(l);
 						}
 						lbfluid[i][j][k].setF_i(_numVels,denLoc);
 						lbfluid[i][j][k].setF_i(_numVels+1,jLoc[0]);
@@ -984,7 +972,7 @@ namespace espressopp {
 			
 			int _offset = getHaloSkin();
 			
-			printf ("getStepNum() is %d \n", getStepNum());
+//			printf ("getStepNum() is %d \n", getStepNum());
 			convert << getStepNum();
 			filename = "couplForces.";
 			filename.append(convert.str());
@@ -2035,6 +2023,8 @@ namespace espressopp {
 			.add_property("tau", &LatticeBoltzmann::getTau, &LatticeBoltzmann::setTau)
 			.add_property("numDims", &LatticeBoltzmann::getNumDims, &LatticeBoltzmann::setNumDims)
 			.add_property("numVels", &LatticeBoltzmann::getNumVels, &LatticeBoltzmann::setNumVels)
+			.add_property("visc_b", &LatticeBoltzmann::getViscB, &LatticeBoltzmann::setViscB)
+			.add_property("visc_s", &LatticeBoltzmann::getViscS, &LatticeBoltzmann::setViscS)
 			.add_property("gamma_b", &LatticeBoltzmann::getGammaB, &LatticeBoltzmann::setGammaB)
 			.add_property("gamma_s", &LatticeBoltzmann::getGammaS, &LatticeBoltzmann::setGammaS)
 			.add_property("gamma_odd", &LatticeBoltzmann::getGammaOdd, &LatticeBoltzmann::setGammaOdd)
