@@ -49,6 +49,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.esutil.RNGLocal',
             localcall = [ '__call__', 'normal', 'gamma', 'uniformOnSphere' ],
-            pmicall = [ 'seed' ]
+            pmicall = [ 'seed', 'get_seed' ]
             )
     

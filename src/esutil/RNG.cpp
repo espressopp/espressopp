@@ -32,13 +32,19 @@ namespace espressopp {
 
     RNG::RNG(long _seed): boostRNG(make_shared< RNGType >(_seed + mpiWorld->rank())),
             normalVariate(*boostRNG, normal_distribution< real >(0.0, 1.0)),
-            uniformOnSphereVariate(*boostRNG, uniform_on_sphere< real, Real3D >(3))
+            uniformOnSphereVariate(*boostRNG, uniform_on_sphere< real, Real3D >(3)),
+            seed_(_seed)
     		//gammaVariate(*boostRNG, gamma_distribution< real >(1, 1.0)), //TODO this line is nonsense: alpha=1 is trivial
     {}
 
     void RNG::seed(long _seed) {
       // Seed the RNG for the given CPU
       boostRNG->seed(_seed + mpiWorld->rank());
+      seed_ = _seed;
+    }
+
+    long RNG::get_seed() {
+      return seed_;
     }
 
     real RNG::operator()() { 
@@ -89,7 +95,8 @@ namespace espressopp {
         .def("normal", &RNG::normal)
         .def("gamma", &RNG::gammaOf1)
         .def("gamma", &RNG::gamma)
-        .def("uniformOnSphere", &RNG::uniformOnSphere);
+        .def("uniformOnSphere", &RNG::uniformOnSphere)
+        .def("get_seed", &RNG::get_seed);
     }
   }
 }
