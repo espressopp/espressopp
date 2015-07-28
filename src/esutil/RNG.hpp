@@ -45,6 +45,9 @@ namespace espressopp {
 
       /** Seed the RNG. */
       void seed(long _seed);
+
+      /** Gets RNG seed. */
+      long get_seed();
     
       /** returns a uniformly distributed random number between 0 and
 	  1. */
@@ -73,6 +76,8 @@ namespace espressopp {
       static void registerPython();
 
     private:
+      long seed_;
+
       typedef 
       variate_generator< RNGType&, normal_distribution< real > >
       NormalVariate;
