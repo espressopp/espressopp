@@ -51,8 +51,8 @@ namespace espressopp {
 			void setLBTimerNew(real _lbTime_new);
 			real getLBTimerNew();
 			
-			void setOldStepNum(int _oldStepNum);
-			int getOldStepNum();
+			void setOldStepNum(long int _oldStepNum);
+			long int getOldStepNum();
 			
 			static void registerPython();
 			

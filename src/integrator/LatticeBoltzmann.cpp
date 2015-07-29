@@ -107,7 +107,6 @@ namespace espressopp {
 
 			/* setup domain decompositions for LB */
 			setHaloSkin(1);
-			printf("halo Skin is %d\n", getHaloSkin());
 			findMyNeighbours();
 			
 			longint _myRank = getSystem()->comm->rank();
@@ -121,11 +120,11 @@ namespace espressopp {
 			}
 			setMyNi (_numSites);
 			setMyLeft (_myLeft);
-			printf ("_myRank is %d. _myPosition is %d %d %d. _numSites I should be responsible for is %d %d %d. My left borders are %f %f %f\n", _myRank, getMyPosition().getItem(0), getMyPosition().getItem(1), getMyPosition().getItem(2), getMyNi().getItem(0), getMyNi().getItem(1), getMyNi()[2], getMyLeft()[0], getMyLeft()[1], getMyLeft()[2]);
+//			printf ("_myRank is %d. _myPosition is %d %d %d. _numSites I should be responsible for is %d %d %d. My left borders are %f %f %f\n", _myRank, getMyPosition().getItem(0), getMyPosition().getItem(1), getMyPosition().getItem(2), getMyNi().getItem(0), getMyNi().getItem(1), getMyNi()[2], getMyLeft()[0], getMyLeft()[1], getMyLeft()[2]);
  
 			/* setup histogram variables */
-			setNBins(20);
-			distr = std::vector<real>(getNBins(), 0.);
+//			setNBins(20);
+//			distr = std::vector<real>(getNBins(), 0.);
 
       /* check random number generator */
 /*    real _rand;
@@ -238,13 +237,13 @@ namespace espressopp {
 		int LatticeBoltzmann::getStart () { return start;}
 		
 		/* Setter and getter for histograms (if needed) */
-		void LatticeBoltzmann::setNBins (int _nBins) { nBins = _nBins;}
+/*		void LatticeBoltzmann::setNBins (int _nBins) { nBins = _nBins;}
 		int LatticeBoltzmann::getNBins () { return nBins;}
 
 		void LatticeBoltzmann::setDistr (int _i, real _distr) { distr[_i] = _distr;}
 		real LatticeBoltzmann::getDistr (int _i) {return distr[_i];}
 		void LatticeBoltzmann::incDistr (int _i) { distr[_i] += 1.;}
-
+*/
 		//		void LatticeBoltzmann::calcHistogram (int _i, int _j, int _k);
 
 		/* Setter and getter for LB temperature things */
@@ -493,8 +492,10 @@ namespace espressopp {
     void LatticeBoltzmann::makeLBStep () {
 #warning: get rid of get and set step num!
 			setStepNum(integrator->getStep());
+			int _stepNum = getStepNum();
+			int _nSteps = getNSteps();
 //			real time, timeCoup, timeCS;											// timers for performance measurement
-			int lbVolume = getNi()[0]*getNi()[1]*getNi()[2];
+//			int lbVolume = getNi()[0]*getNi()[1]*getNi()[2];
 			
 //			timeCouple.reset();
 //			timeCollStream.reset();
@@ -509,7 +510,7 @@ namespace espressopp {
 //				printf ("time spent on coupling is %f sec\n", timeCoup);
 			}
 			
-			if (getStepNum() % getNSteps() == 0) {
+			if (_stepNum % _nSteps == 0) {
 //				time = timeCollStream.getElapsedTime();
 				
 				/* PUSH-scheme (first collide then stream) */
@@ -599,9 +600,6 @@ namespace espressopp {
 		void LatticeBoltzmann::zeroMDCMVel () {
 			int _myRank = getSystem()->comm->rank();
 
-			readCouplForces();
-			restoreLBForces();
-
 			if (getStart() == 0 && getCouplForceFlag() != 0) {
 				Real3D specCmVel = findCMVelMD(0);
 				// output reporting on subtraction of drift's vel
@@ -623,6 +621,9 @@ namespace espressopp {
 				}
 
 				setStart(1);
+			} else {
+//				readCouplForces();
+//				restoreLBForces();
 			}
 		}
 		
@@ -643,6 +644,7 @@ namespace espressopp {
 		
     void LatticeBoltzmann::collideStream () {
 			int _offset = getHaloSkin();
+			Int3D _myNi = getMyNi();
 			
 			/* copy forces from halo region to the real one */
 			if (getCouplForceFlag() == 1) {

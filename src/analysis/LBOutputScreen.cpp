@@ -98,12 +98,12 @@ namespace espressopp {
 	
 			if (getSystem()->comm->rank() == 0) {
 				Int3D _Ni = latticeboltzmann->getNi();
-				int lbVolume = _Ni[0]*_Ni[1]*_Ni[2];
+				long int lbVolume = _Ni[0]*_Ni[1]*_Ni[2];
 				
 				printf("_velCM : cmV(t+ 1/2dt) of LJ system is     %18.14f %18.14f %18.14f \n",
 							 _totVelCM[0], _totVelCM[1], _totVelCM[2]);
 				
-				int _step = latticeboltzmann->getStepNum();
+				long int _step = latticeboltzmann->getStepNum();
 				
 				if (_step != 0) {
 					// calculate time performance
@@ -111,8 +111,8 @@ namespace espressopp {
 					setLBTimerNew(timeLBtoMD.getElapsedTime());
 					timelb = getLBTimerNew() - getLBTimerOld();
 					setLBTimerOld(getLBTimerNew());
-					
-					printf ("time spent on %d LB+MD steps is %f sec, relative MLUPS: %f \n",
+					printf ("_step is %ld, getOldStepNum() is %d, lbVolume is %d\n", _step, getOldStepNum(), lbVolume);
+					printf ("time spent on %ld LB(+MD) steps is %f sec, relative MLUPS: %f \n",
 									_step-getOldStepNum(), timelb,
 									(_step-getOldStepNum())*lbVolume*1e-6 / timelb);
 
@@ -183,8 +183,8 @@ namespace espressopp {
 		void LBOutputScreen::setLBTimerNew(real _lbTime_new) {lbTime_new = _lbTime_new;}
 		real LBOutputScreen::getLBTimerNew() {return lbTime_new;}
 
-		void LBOutputScreen::setOldStepNum(int _oldStepNum) {oldStepNum = _oldStepNum;}
-		int LBOutputScreen::getOldStepNum() {return oldStepNum;}
+		void LBOutputScreen::setOldStepNum(long int _oldStepNum) {oldStepNum = _oldStepNum;}
+		long int LBOutputScreen::getOldStepNum() {return oldStepNum;}
 		
     void LBOutputScreen::registerPython() {
       using namespace espressopp::python;
