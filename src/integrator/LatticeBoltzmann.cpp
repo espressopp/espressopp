@@ -95,7 +95,7 @@ namespace espressopp {
 			int _Npart = _system->storage->getNRealParticles();
 			int _totNPart = 0;
 			mpi::all_reduce(*getSystem()->comm, _Npart, _totNPart, std::plus<int>());
-			printf("_Npart is %d, totNPart is %d\n", _Npart, _totNPart);
+//			printf("_Npart is %d, totNPart is %d\n", _Npart, _totNPart);
 
 			setTotNPart(_totNPart);
 			fOnPart = std::vector<Real3D>(_totNPart + 1, Real3D(0.,0.,0.));	// +1 since particle's id starts with 1, not 0
@@ -350,20 +350,12 @@ namespace espressopp {
 
 			longint _myRank = getSystem()->comm->rank();
 			if (_myRank == 0) {
-				std::cout << setprecision(2);
-				std::cout << "Velocities on the lattice are initialized as:" << std::endl;
-				for (int l = 0; l < getNumVels(); l++){
-					std::cout << "  c[" << l << "] is"
-					<< " " << std::setw(5) << getCi(l).getItem(0)
-					<< " " << std::setw(5) << getCi(l).getItem(1)
-					<< " " << std::setw(5) << getCi(l).getItem(2) << "\n";
-				}
 				std::cout << "-------------------------------------\n";
-			
-			// check sound speed
-			printf ("cs2 and invCs2 are %8.4f %8.4f \n", getCs2(), 1./getCs2());
-			printf("-------------------------------------\n");
-				
+				std::cout << "Lattice Boltzmann lattice model D3Q19" << std::endl;
+				std::cout << "-------------------------------------\n";
+				// check sound speed
+				printf ("cs2 and invCs2 are %8.4f %8.4f \n", getCs2(), 1./getCs2());
+				printf("-------------------------------------\n");
 			}
 			
 			for (int i = 0; i < getMyNi().getItem(0); i++) {
@@ -527,6 +519,11 @@ namespace espressopp {
 		///* it is needed as we couple LB to MD at half-timestep and, most importantly, because real particles can still
 		/// leave the real regions and reside in ghost layer. Tricky. Have to understand it better. */
 		void LatticeBoltzmann::makeDecompose() {
+			int _offset = getHaloSkin();
+			real _a = getA();
+			Int3D _myNi = getMyNi();
+			Real3D _myLeft = getMyLeft();
+			
 			System& system = getSystemRef();
 
 			CellList realCells = system.storage->getRealCells();
@@ -534,12 +531,12 @@ namespace espressopp {
 			int makeDecompose = 0;
 			int totalDecompose = 0;
 			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-				if (cit->position().getItem(0)< getMyLeft().getItem(0) ||
-						cit->position().getItem(1)< getMyLeft().getItem(1) ||
-						cit->position().getItem(2)< getMyLeft().getItem(2) ||
-						cit->position().getItem(0) + 2 * getHaloSkin() > getMyLeft().getItem(0) + getMyNi().getItem(0)*getA() ||
-						cit->position().getItem(1) + 2 * getHaloSkin() > getMyLeft().getItem(1) + getMyNi().getItem(1)*getA() ||
-						cit->position().getItem(2) + 2 * getHaloSkin() > getMyLeft().getItem(2) + getMyNi().getItem(2)*getA()) {
+				if (cit->position().getItem(0)< _myLeft[0] ||
+						cit->position().getItem(1)< _myLeft[1] ||
+						cit->position().getItem(2)< _myLeft[2] ||
+						cit->position().getItem(0) + 2 * _offset > _myLeft[0] + _myNi[0]*_a ||
+						cit->position().getItem(1) + 2 * _offset > _myLeft[1] + _myNi[1]*_a ||
+						cit->position().getItem(2) + 2 * _offset > _myLeft[2] + _myNi[2]*_a) {
 					makeDecompose = 1;
 				}
 			}
@@ -644,6 +641,8 @@ namespace espressopp {
 		
     void LatticeBoltzmann::collideStream () {
 			int _offset = getHaloSkin();
+			int _extForceFlag = getExtForceFlag();
+			int _numVels = getNumVels();
 			Int3D _myNi = getMyNi();
 			
 			/* copy forces from halo region to the real one */
@@ -651,20 +650,20 @@ namespace espressopp {
 				copyForcesFromHalo();
 			}
 			
-      for (int i = _offset; i < getMyNi().getItem(0)-_offset; i++) {
-        for (int j = _offset; j < getMyNi().getItem(1)-_offset; j++) {
-          for (int k = _offset; k < getMyNi().getItem(2)-_offset; k++) {
+      for (int i = _offset; i < _myNi[0]-_offset; i++) {
+        for (int j = _offset; j < _myNi[1]-_offset; j++) {
+          for (int k = _offset; k < _myNi[2]-_offset; k++) {
 						/* collision phase */
 						lbfluid[i][j][k].calcLocalMoments ();
-						lbfluid[i][j][k].calcEqMoments (getExtForceFlag());
-						lbfluid[i][j][k].relaxMoments (numVels);
+						lbfluid[i][j][k].calcEqMoments (_extForceFlag);
+						lbfluid[i][j][k].relaxMoments (_numVels);
 						if (getLBTempFlag() == 1) {
-							lbfluid[i][j][k].thermalFluct (numVels);
+							lbfluid[i][j][k].thermalFluct (_numVels);
 						}
-						if (getExtForceFlag() == 1 || getCouplForceFlag() == 1) {
-							lbfluid[i][j][k].applyForces (numVels);
+						if (_extForceFlag == 1 || getCouplForceFlag() == 1) {
+							lbfluid[i][j][k].applyForces (_numVels);
 						}
-						lbfluid[i][j][k].btranMomToPop (numVels);
+						lbfluid[i][j][k].btranMomToPop (_numVels);
 
 						/* streaming phase */
 						streaming (i,j,k);
@@ -674,16 +673,16 @@ namespace espressopp {
 	
 			commHalo();
 
-      for (int i = 0; i < getMyNi().getItem(0); i++) {
-        for (int j = 0; j < getMyNi().getItem(1); j++) {
-          for (int k = 0; k < getMyNi().getItem(2); k++) {
+      for (int i = 0; i < _myNi[0]; i++) {
+        for (int j = 0; j < _myNi[1]; j++) {
+          for (int k = 0; k < _myNi[2]; k++) {
 						/* set to zero coupling forces if the coupling exists */
 						if (getCouplForceFlag() == 1) {
 							lbfluid[i][j][k].setCouplForceLoc(Real3D(0.0));
 						}
 						
 						/* swap pointers for two lattices */
-           for (int l = 0; l < numVels; l++) {
+           for (int l = 0; l < _numVels; l++) {
               real tmp;
               tmp = lbfluid[i][j][k].getF_i(l);
 							if (tmp != tmp) {
@@ -732,11 +731,8 @@ namespace espressopp {
 		
     /* STREAMING ALONG THE VELOCITY VECTORS. SERIAL */
     void LatticeBoltzmann::streaming(int _i, int _j, int _k) {
-      int _numVels;
-      int _ip, _im, _jp, _jm, _kp, _km;
+      static int _ip, _im, _jp, _jm, _kp, _km;
       int dir = 0;
-
-      _numVels = getNumVels();
 
       // periodic boundaries are handled separately in commHalo() //
 			
@@ -858,6 +854,13 @@ namespace espressopp {
 			delta[4] = _a - delta[1];
 			delta[5] = _a - delta[2];
 			
+			int _numVels = getNumVels();
+			real _convTimeMDtoLB = convTimeMDtoLB();
+			real _convLenMDtoLB = convLenMDtoLB();
+			real _convMassMDtoLB = convMassMDtoLB();
+			real _denLoc;
+			Real3D _jLoc;
+			
 			setInterpVel (Real3D(0.,0.,0.));
 			// loop over neighboring LB nodes
 			int _ip, _jp, _kp;
@@ -867,12 +870,12 @@ namespace espressopp {
 						// assign iterations
 						_ip = bin[0] + _i; _jp = bin[1] + _j; _kp = bin[2] + _k;
 						
-						denLoc = lbfluid[_ip][_jp][_kp].getF_i(getNumVels());
-						jLoc[0] = lbfluid[_ip][_jp][_kp].getF_i(getNumVels()+1);
-						jLoc[1] = lbfluid[_ip][_jp][_kp].getF_i(getNumVels()+2);
-						jLoc[2] = lbfluid[_ip][_jp][_kp].getF_i(getNumVels()+3);
+						_denLoc = lbfluid[_ip][_jp][_kp].getF_i(_numVels);
+						_jLoc[0] = lbfluid[_ip][_jp][_kp].getF_i(_numVels+1);
+						_jLoc[1] = lbfluid[_ip][_jp][_kp].getF_i(_numVels+2);
+						_jLoc[2] = lbfluid[_ip][_jp][_kp].getF_i(_numVels+3);
 						
-						Real3D _u = jLoc * convTimeMDtoLB() / (convLenMDtoLB() * denLoc);
+						Real3D _u = _jLoc * _convTimeMDtoLB / (_convLenMDtoLB * _denLoc);
 
 						addInterpVel (delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * _u);
 					}
@@ -887,7 +890,7 @@ namespace espressopp {
 
 			// convert coupling force (LJ units) to the momentum change on a lattice (LB units)
 			Real3D deltaJLoc = Real3D(0.,0.,0.);
-			deltaJLoc -= getFOnPart(p.id()) * convMassMDtoLB() * convLenMDtoLB() / (convTimeMDtoLB() * convTimeMDtoLB());
+			deltaJLoc -= getFOnPart(p.id()) * _convMassMDtoLB * _convLenMDtoLB / (_convTimeMDtoLB * _convTimeMDtoLB);
 			
 			/* extrapolate momentum change to the nodes through local LB coupling forces */
 			Real3D _fLoc = Real3D(0.,0.,0.);
@@ -973,6 +976,7 @@ namespace espressopp {
 			std::ostringstream convert;
 			
 			int _offset = getHaloSkin();
+			Int3D _myNi = getMyNi();
 			
 //			printf ("getStepNum() is %d \n", getStepNum());
 			convert << getStepNum();
@@ -1014,9 +1018,9 @@ namespace espressopp {
 					setFOnPart(cit->id(), Real3D(_fx,_fy,_fz));
 				}
 				
-				for (int _i = _offset; _i < getMyNi().getItem(0) - _offset; _i++) {
-					for (int _j = _offset; _j < getMyNi().getItem(1) - _offset; _j++) {
-						for (int _k = _offset; _k < getMyNi().getItem(2) - _offset; _k++) {
+				for (int _i = _offset; _i < _myNi[0] - _offset; _i++) {
+					for (int _j = _offset; _j < _myNi[1] - _offset; _j++) {
+						for (int _k = _offset; _k < _myNi[2] - _offset; _k++) {
 							fscanf (couplForcesFile, "%d %d %d %lf %lf %lf\n",
 											&_it, &_jt, &_kt, &_fx, &_fy, &_fz);
 							lbfluid[_it][_jt][_kt].setCouplForceLoc(Real3D(_fx,_fy,_fz));
@@ -1038,7 +1042,9 @@ namespace espressopp {
 			std::string number;
 			std::string filename;
 			std::ostringstream convert;
+
 			int _offset = getHaloSkin();
+			Int3D _myNi = getMyNi();
 			
 			convert << getStepNum();
 			filename = "couplForces.";
@@ -1063,9 +1069,9 @@ namespace espressopp {
 								 getFOnPart(cit->id()).getItem(0), getFOnPart(cit->id()).getItem(1), getFOnPart(cit->id()).getItem(2));
 			}
 			
-			for (int _i = _offset; _i < getMyNi().getItem(0) - _offset; _i++) {
-				for (int _j = _offset; _j < getMyNi().getItem(1) - _offset; _j++) {
-					for (int _k = _offset; _k < getMyNi().getItem(2) - _offset; _k++) {
+			for (int _i = _offset; _i < _myNi[0] - _offset; _i++) {
+				for (int _j = _offset; _j < _myNi[1] - _offset; _j++) {
+					for (int _k = _offset; _k < _myNi[2] - _offset; _k++) {
 						fprintf (couplForcesFile, "%5d %5d %5d %20.14f %20.14f %20.14f  \n",
 										 _i, _j, _k,
 										 lbfluid[_i][_j][_k].getCouplForceLoc().getItem(0),
@@ -1088,7 +1094,6 @@ namespace espressopp {
 		
 		/* FIND RANKS OF NEIGHBOURUNG CPU IN 6 DIRECTIONS */
 		void LatticeBoltzmann::findMyNeighbours () {
-			printf ("Started neighbours allocation \n");
 			
 			/* calculate dimensionality of the processors grid arrangement */
 			int nodeGridDim = 0;
@@ -1098,7 +1103,6 @@ namespace espressopp {
 					++nodeGridDim;
 				}
 			}
-			printf("nodeGridDim is %d\n", nodeGridDim);
 			
 			/* define myRank and myPosition in the nodeGrid */
 			longint _myRank = getSystem()->comm->rank();
@@ -1128,11 +1132,10 @@ namespace espressopp {
 					_myNeighbourPos[_dim] -= _nodeGrid[_dim];
 				}
 				setMyNeighbour(2*_dim + 1, grid.mapPositionToIndex(_myNeighbourPos));
-				printf ("MPI_Rank is %d of %d. My nodeGrid position is %d %d %d. \nMy neighbour in dir %d is %d \nMy neighbour in dir %d is %d \n",
-								_myRank, mpiWorld->size(), _myPosition.getItem(0), _myPosition.getItem(1), _myPosition.getItem(2),
-								2*_dim, getMyNeighbour(2*_dim),
-								2*_dim+1, getMyNeighbour(2*_dim+1));
-				printf ("grid.getGridSize(_dim %d) is %d \n", _dim, _nodeGrid[_dim]);
+			}
+			
+			if (_myRank == 0) {
+				printf ("Number of CPUs in use is %d\n", mpiWorld->size());
 			}
 			
 			for (int _dim = nodeGridDim; _dim < 3; ++_dim) {
@@ -1140,7 +1143,6 @@ namespace espressopp {
 				setMyNeighbour(2*_dim+1, grid.mapPositionToIndex(_myPosition));
 			}
 			
-			printf ("Finished neighbours allocation \n");
 		}
 		
 /*******************************************************************************************/
@@ -1153,13 +1155,16 @@ namespace espressopp {
 			int rnode, snode;												// rank of the node to receive from and to send to
 			std::vector<real> bufToSend, bufToRecv;	// buffers used to send and to receive the data
 			
+			int _offset = getHaloSkin();
+			Int3D _myNi = getMyNi();
+			
 			mpi::environment env;
 			mpi::communicator world;
 			
 			//////////////////////
 			//// X-direction /////
 			//////////////////////
-			numDataTransf = numPopTransf * getMyNi().getItem(1) * getMyNi().getItem(2);
+			numDataTransf = numPopTransf * _myNi[1] * _myNi[2];
 			bufToSend.resize(numDataTransf);				// resize bufToSend
 			bufToRecv.resize(numDataTransf);				// resize bufToRecv
 			
@@ -1168,10 +1173,10 @@ namespace espressopp {
 			rnode = getMyNeighbour(0);
 			
 			// prepare message for sending
-			i = getMyNi().getItem(0) - getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
+			i = _myNi[0] - _offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (j=0; j<_myNi[1]; j++) {
+					index = numPopTransf*_myNi[1]*k + j*numPopTransf;
 					
 					bufToSend[index] = ghostlat[i][j][k].getPop_i(1);
 					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(7);
@@ -1195,10 +1200,10 @@ namespace espressopp {
 			}
 			
 			// unpack message
-			i = getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
+			i = _offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (j=0; j<_myNi[1]; j++) {
+					index = numPopTransf*_myNi[1]*k + j*numPopTransf;
 					
 					ghostlat[i][j][k].setPop_i(1, bufToRecv[index]);
 					ghostlat[i][j][k].setPop_i(7, bufToRecv[index+1]);
@@ -1214,9 +1219,9 @@ namespace espressopp {
 			
 			// prepare message for sending
 			i = 0;
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
+			for (k=0; k<_myNi[2]; k++) {
+				for (j=0; j<_myNi[1]; j++) {
+					index = numPopTransf*_myNi[1]*k + j*numPopTransf;
 					
 					bufToSend[index] = ghostlat[i][j][k].getPop_i(2);
 					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(8);
@@ -1240,10 +1245,10 @@ namespace espressopp {
 			}
 			
 			// unpack message
-			i = getMyNi().getItem(0) - 2 * getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
+			i = _myNi[0] - 2 * _offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (j=0; j<_myNi[1]; j++) {
+					index = numPopTransf*_myNi[1]*k + j*numPopTransf;
 					
 					ghostlat[i][j][k].setPop_i(2, bufToRecv[index+0]);
 					ghostlat[i][j][k].setPop_i(8, bufToRecv[index+1]);
@@ -1256,7 +1261,7 @@ namespace espressopp {
 			//////////////////////
 			//// Y-direction /////
 			//////////////////////
-			numDataTransf = numPopTransf * getMyNi().getItem(0) * getMyNi().getItem(2);
+			numDataTransf = numPopTransf * _myNi[0] * _myNi[2];
 			bufToSend.resize(numDataTransf);				// resize bufToSend
 			bufToRecv.resize(numDataTransf);				// resize bufToRecv
 			
@@ -1265,10 +1270,10 @@ namespace espressopp {
 			rnode = getMyNeighbour(2);
 			
 			// prepare message for sending
-			j = getMyNi().getItem(1) - getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
+			j = _myNi[1] - _offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*k + i*numPopTransf;
 					
 					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(3);
 					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(7);
@@ -1292,10 +1297,10 @@ namespace espressopp {
 			}
 			
 			// unpack message
-			j = getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
+			j = _offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*k + i*numPopTransf;
 					
 					ghostlat[i][j][k].setPop_i(3, bufToRecv[index+0]);
 					ghostlat[i][j][k].setPop_i(7, bufToRecv[index+1]);
@@ -1311,9 +1316,9 @@ namespace espressopp {
 			
 			// prepare message for sending
 			j = 0;
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
+			for (k=0; k<_myNi[2]; k++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*k + i*numPopTransf;
 					
 					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(4);
 					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(8);
@@ -1337,10 +1342,10 @@ namespace espressopp {
 			}
 			
 			// unpack message
-			j = getMyNi().getItem(1) - 2 * getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
+			j = _myNi[1] - 2 * _offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*k + i*numPopTransf;
 					
 					ghostlat[i][j][k].setPop_i(4, bufToRecv[index+0]);
 					ghostlat[i][j][k].setPop_i(8, bufToRecv[index+1]);
@@ -1353,7 +1358,7 @@ namespace espressopp {
 			//////////////////////
 			//// Z-direction /////
 			//////////////////////
-			numDataTransf = numPopTransf * getMyNi().getItem(0) * getMyNi().getItem(1);
+			numDataTransf = numPopTransf * _myNi[0] * _myNi[1];
 			bufToSend.resize(numDataTransf);				// resize bufToSend
 			bufToRecv.resize(numDataTransf);				// resize bufToRecv
 			
@@ -1362,10 +1367,10 @@ namespace espressopp {
 			rnode = getMyNeighbour(4);
 			
 			// prepare message for sending
-			k = getMyNi().getItem(2) - getHaloSkin();
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
+			k = _myNi[2] - _offset;
+			for (j=0; j<_myNi[1]; j++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*j + i*numPopTransf;
 					
 					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(5);
 					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(11);
@@ -1389,10 +1394,10 @@ namespace espressopp {
 			}
 			
 			// unpack message
-			k = getHaloSkin();
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
+			k = _offset;
+			for (j=0; j<_myNi[1]; j++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*j + i*numPopTransf;
 					
 					ghostlat[i][j][k].setPop_i(5, bufToRecv[index+0]);
 					ghostlat[i][j][k].setPop_i(11, bufToRecv[index+1]);
@@ -1408,9 +1413,9 @@ namespace espressopp {
 			
 			// prepare message for sending
 			k = 0;
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
+			for (j=0; j<_myNi[1]; j++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*j + i*numPopTransf;
 					
 					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(6);
 					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(12);
@@ -1434,10 +1439,10 @@ namespace espressopp {
 			}
 			
 			// unpack message
-			k = getMyNi().getItem(2) - 2 * getHaloSkin();
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
+			k = _myNi[2] - 2 * _offset;
+			for (j=0; j<_myNi[1]; j++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*j + i*numPopTransf;
 					
 					ghostlat[i][j][k].setPop_i(6, bufToRecv[index+0]);
 					ghostlat[i][j][k].setPop_i(12, bufToRecv[index+1]);
@@ -1462,13 +1467,16 @@ namespace espressopp {
 			std::vector<real> bufToSend, bufToRecv;	// buffers used to send and to receive the data
 			Real3D _addForce;
 			
+			int _offset = getHaloSkin();
+			Int3D _myNi = getMyNi();
+			
 			mpi::environment env;
 			mpi::communicator world;
 			
 			//////////////////////
 			//// X-direction /////
 			//////////////////////
-			numDataTransf = numForceComp * getMyNi().getItem(1) * getMyNi().getItem(2);
+			numDataTransf = numForceComp * _myNi[1] * _myNi[2];
 			bufToSend.resize(numDataTransf);				// resize bufToSend
 			bufToRecv.resize(numDataTransf);				// resize bufToRecv
 			
@@ -1477,10 +1485,10 @@ namespace espressopp {
 			rnode = getMyNeighbour(0);
 			
 			// prepare message for sending
-			i = getMyNi().getItem(0) - getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numForceComp*getMyNi().getItem(1)*k + j*numForceComp;
+			i = _myNi[0] - _offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (j=0; j<_myNi[1]; j++) {
+					index = numForceComp*_myNi[1]*k + j*numForceComp;
 					
 					bufToSend[index] = lbfluid[i][j][k].getCouplForceLoc().getItem(0);
 					bufToSend[index+1] = lbfluid[i][j][k].getCouplForceLoc().getItem(1);
@@ -1502,10 +1510,10 @@ namespace espressopp {
 			}
 			
 			// unpack message
-			i = getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numForceComp*getMyNi().getItem(1)*k + j*numForceComp;
+			i = _offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (j=0; j<_myNi[1]; j++) {
+					index = numForceComp*_myNi[1]*k + j*numForceComp;
 					_addForce = Real3D(bufToRecv[index], bufToRecv[index+1], bufToRecv[index+2]);
 					lbfluid[i][j][k].addCouplForceLoc(_addForce);
 				}
@@ -1517,9 +1525,9 @@ namespace espressopp {
 			
 			// prepare message for sending
 			i = 0;
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numForceComp*getMyNi().getItem(1)*k + j*numForceComp;
+			for (k=0; k<_myNi[2]; k++) {
+				for (j=0; j<_myNi[1]; j++) {
+					index = numForceComp*_myNi[1]*k + j*numForceComp;
 					
 					bufToSend[index] = lbfluid[i][j][k].getCouplForceLoc().getItem(0);
 					bufToSend[index+1] = lbfluid[i][j][k].getCouplForceLoc().getItem(1);
@@ -1541,10 +1549,10 @@ namespace espressopp {
 			}
 			
 			// unpack message
-			i = getMyNi().getItem(0) - 2 * getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numForceComp*getMyNi().getItem(1)*k + j*numForceComp;
+			i = _myNi[0] - 2 * _offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (j=0; j<_myNi[1]; j++) {
+					index = numForceComp*_myNi[1]*k + j*numForceComp;
 					_addForce = Real3D(bufToRecv[index], bufToRecv[index+1], bufToRecv[index+2]);
 					lbfluid[i][j][k].addCouplForceLoc(_addForce);
 				}
@@ -1553,7 +1561,7 @@ namespace espressopp {
 			//////////////////////
 			//// Y-direction /////
 			//////////////////////
-			numDataTransf = numForceComp * getMyNi().getItem(0) * getMyNi().getItem(2);
+			numDataTransf = numForceComp * _myNi[0] * _myNi[2];
 			bufToSend.resize(numDataTransf);				// resize bufToSend
 			bufToRecv.resize(numDataTransf);				// resize bufToRecv
 			
@@ -1562,10 +1570,10 @@ namespace espressopp {
 			rnode = getMyNeighbour(2);
 			
 			// prepare message for sending
-			j = getMyNi().getItem(1) - getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numForceComp*getMyNi().getItem(0)*k + i*numForceComp;
+			j = _myNi[1] - _offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numForceComp*_myNi[0]*k + i*numForceComp;
 					
 					bufToSend[index] = lbfluid[i][j][k].getCouplForceLoc().getItem(0);
 					bufToSend[index+1] = lbfluid[i][j][k].getCouplForceLoc().getItem(1);
@@ -1587,10 +1595,10 @@ namespace espressopp {
 			}
 			
 			// unpack message
-			j = getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numForceComp*getMyNi().getItem(0)*k + i*numForceComp;
+			j = _offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numForceComp*_myNi[0]*k + i*numForceComp;
 					_addForce = Real3D(bufToRecv[index], bufToRecv[index+1], bufToRecv[index+2]);
 					lbfluid[i][j][k].addCouplForceLoc(_addForce);
 				}
@@ -1602,9 +1610,9 @@ namespace espressopp {
 			
 			// prepare message for sending
 			j = 0;
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numForceComp*getMyNi().getItem(0)*k + i*numForceComp;
+			for (k=0; k<_myNi[2]; k++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numForceComp*_myNi[0]*k + i*numForceComp;
 					
 					bufToSend[index] = lbfluid[i][j][k].getCouplForceLoc().getItem(0);
 					bufToSend[index+1] = lbfluid[i][j][k].getCouplForceLoc().getItem(1);
@@ -1626,10 +1634,10 @@ namespace espressopp {
 			}
 			
 			// unpack message
-			j = getMyNi().getItem(1) - 2 * getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numForceComp*getMyNi().getItem(0)*k + i*numForceComp;
+			j = _myNi[1] - 2 * _offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numForceComp*_myNi[0]*k + i*numForceComp;
 					_addForce = Real3D(bufToRecv[index], bufToRecv[index+1], bufToRecv[index+2]);
 					lbfluid[i][j][k].addCouplForceLoc(_addForce);
 				}
@@ -1638,7 +1646,7 @@ namespace espressopp {
 			//////////////////////
 			//// Z-direction /////
 			//////////////////////
-			numDataTransf = numForceComp * getMyNi().getItem(0) * getMyNi().getItem(1);
+			numDataTransf = numForceComp * _myNi[0] * _myNi[1];
 			bufToSend.resize(numDataTransf);				// resize bufToSend
 			bufToRecv.resize(numDataTransf);				// resize bufToRecv
 			
@@ -1647,10 +1655,10 @@ namespace espressopp {
 			rnode = getMyNeighbour(4);
 			
 			// prepare message for sending
-			k = getMyNi().getItem(2) - getHaloSkin();
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numForceComp*getMyNi().getItem(0)*j + i*numForceComp;
+			k = _myNi[2] - _offset;
+			for (j=0; j<_myNi[1]; j++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numForceComp*_myNi[0]*j + i*numForceComp;
 					
 					bufToSend[index] = lbfluid[i][j][k].getCouplForceLoc().getItem(0);
 					bufToSend[index+1] = lbfluid[i][j][k].getCouplForceLoc().getItem(1);
@@ -1672,10 +1680,10 @@ namespace espressopp {
 			}
 			
 			// unpack message
-			k = getHaloSkin();
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numForceComp*getMyNi().getItem(0)*j + i*numForceComp;
+			k = _offset;
+			for (j=0; j<_myNi[1]; j++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numForceComp*_myNi[0]*j + i*numForceComp;
 					_addForce = Real3D(bufToRecv[index], bufToRecv[index+1], bufToRecv[index+2]);
 					lbfluid[i][j][k].addCouplForceLoc(_addForce);
 				}
@@ -1687,9 +1695,9 @@ namespace espressopp {
 			
 			// prepare message for sending
 			k = 0;
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numForceComp*getMyNi().getItem(0)*j + i*numForceComp;
+			for (j=0; j<_myNi[1]; j++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numForceComp*_myNi[0]*j + i*numForceComp;
 					
 					bufToSend[index] = lbfluid[i][j][k].getCouplForceLoc().getItem(0);
 					bufToSend[index+1] = lbfluid[i][j][k].getCouplForceLoc().getItem(1);
@@ -1711,10 +1719,10 @@ namespace espressopp {
 			}
 			
 			// unpack message
-			k = getMyNi().getItem(2) - 2 * getHaloSkin();
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numForceComp*getMyNi().getItem(0)*j + i*numForceComp;
+			k = _myNi[2] - 2 * _offset;
+			for (j=0; j<_myNi[1]; j++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numForceComp*_myNi[0]*j + i*numForceComp;
 					_addForce = Real3D(bufToRecv[index], bufToRecv[index+1], bufToRecv[index+2]);
 					lbfluid[i][j][k].addCouplForceLoc(_addForce);
 				}
@@ -1735,13 +1743,16 @@ namespace espressopp {
 			int _numVels = getNumVels();
 			std::vector<real> bufToSend, bufToRecv;	// buffers used to send and to receive the data
 			
+			int _offset = getHaloSkin();
+			Int3D _myNi = getMyNi();
+			
 			mpi::environment env;
 			mpi::communicator world;
 			
 			//////////////////////
 			//// X-direction /////
 			//////////////////////
-			numDataTransf = numPopTransf * getMyNi().getItem(1) * getMyNi().getItem(2);
+			numDataTransf = numPopTransf * _myNi[1] * _myNi[2];
 			bufToSend.resize(numDataTransf);				// resize bufToSend
 			bufToRecv.resize(numDataTransf);				// resize bufToRecv
 			
@@ -1750,10 +1761,10 @@ namespace espressopp {
 			rnode = getMyNeighbour(0);
 			
 			// prepare message for sending
-			i = getMyNi().getItem(0) - 2*getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
+			i = _myNi[0] - 2*_offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (j=0; j<_myNi[1]; j++) {
+					index = numPopTransf*_myNi[1]*k + j*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
 						bufToSend[index+l] = lbfluid[i][j][k].getF_i(_numVels+l);
 					}
@@ -1775,9 +1786,9 @@ namespace espressopp {
 			
 			// unpack message
 			i = 0;
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
+			for (k=0; k<_myNi[2]; k++) {
+				for (j=0; j<_myNi[1]; j++) {
+					index = numPopTransf*_myNi[1]*k + j*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
 						lbfluid[i][j][k].setF_i(_numVels+l, bufToRecv[index+l]);
 					}
@@ -1789,10 +1800,10 @@ namespace espressopp {
 			rnode = getMyNeighbour(1);
 			
 			// prepare message for sending
-			i = getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
+			i = _offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (j=0; j<_myNi[1]; j++) {
+					index = numPopTransf*_myNi[1]*k + j*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
 						bufToSend[index+l] = lbfluid[i][j][k].getF_i(_numVels+l);
 					}
@@ -1813,10 +1824,10 @@ namespace espressopp {
 			}
 			
 			// unpack message
-			i = getMyNi().getItem(0)-getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (j=0; j<getMyNi().getItem(1); j++) {
-					index = numPopTransf*getMyNi().getItem(1)*k + j*numPopTransf;
+			i = _myNi[0]-_offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (j=0; j<_myNi[1]; j++) {
+					index = numPopTransf*_myNi[1]*k + j*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
 						lbfluid[i][j][k].setF_i(_numVels+l, bufToRecv[index+l]);
 					}
@@ -1826,7 +1837,7 @@ namespace espressopp {
 			//////////////////////
 			//// Y-direction /////
 			//////////////////////
-			numDataTransf = numPopTransf * getMyNi().getItem(0) * getMyNi().getItem(2);
+			numDataTransf = numPopTransf * _myNi[0] * _myNi[2];
 			bufToSend.resize(numDataTransf);				// resize bufToSend
 			bufToRecv.resize(numDataTransf);				// resize bufToRecv
 			
@@ -1835,10 +1846,10 @@ namespace espressopp {
 			rnode = getMyNeighbour(2);
 			
 			// prepare message for sending
-			j = getMyNi().getItem(1) - 2*getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
+			j = _myNi[1] - 2*_offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*k + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
 						bufToSend[index+l] = lbfluid[i][j][k].getF_i(_numVels+l);
 					}
@@ -1860,9 +1871,9 @@ namespace espressopp {
 			
 			// unpack message
 			j = 0;
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
+			for (k=0; k<_myNi[2]; k++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*k + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
 						lbfluid[i][j][k].setF_i(_numVels+l, bufToRecv[index+l]);
 					}
@@ -1874,10 +1885,10 @@ namespace espressopp {
 			rnode = getMyNeighbour(3);
 			
 			// prepare message for sending
-			j = getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
+			j = _offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*k + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
 						bufToSend[index+l] = lbfluid[i][j][k].getF_i(_numVels+l);
 					}
@@ -1898,10 +1909,10 @@ namespace espressopp {
 			}
 			
 			// unpack message
-			j = getMyNi().getItem(1) - getHaloSkin();
-			for (k=0; k<getMyNi().getItem(2); k++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*k + i*numPopTransf;
+			j = _myNi[1] - _offset;
+			for (k=0; k<_myNi[2]; k++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*k + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
 						lbfluid[i][j][k].setF_i(_numVels+l, bufToRecv[index+l]);
 					}
@@ -1911,7 +1922,7 @@ namespace espressopp {
 			//////////////////////
 			//// Z-direction /////
 			//////////////////////
-			numDataTransf = numPopTransf * getMyNi().getItem(0) * getMyNi().getItem(1);
+			numDataTransf = numPopTransf * _myNi[0] * _myNi[1];
 			bufToSend.resize(numDataTransf);				// resize bufToSend
 			bufToRecv.resize(numDataTransf);				// resize bufToRecv
 			
@@ -1920,10 +1931,10 @@ namespace espressopp {
 			rnode = getMyNeighbour(4);
 			
 			// prepare message for sending
-			k = getMyNi().getItem(2) - 2 * getHaloSkin();
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
+			k = _myNi[2] - 2 * _offset;
+			for (j=0; j<_myNi[1]; j++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*j + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
 						bufToSend[index+l] = lbfluid[i][j][k].getF_i(_numVels+l);
 					}
@@ -1945,9 +1956,9 @@ namespace espressopp {
 			
 			// unpack message
 			k = 0;
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
+			for (j=0; j<_myNi[1]; j++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*j + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
 						lbfluid[i][j][k].setF_i(_numVels+l, bufToRecv[index+l]);
 					}
@@ -1959,10 +1970,10 @@ namespace espressopp {
 			rnode = getMyNeighbour(5);
 			
 			// prepare message for sending
-			k = getHaloSkin();
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
+			k = _offset;
+			for (j=0; j<_myNi[1]; j++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*j + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
 						bufToSend[index+l] = lbfluid[i][j][k].getF_i(_numVels+l);
 					}
@@ -1983,10 +1994,10 @@ namespace espressopp {
 			}
 			
 			// unpack message
-			k = getMyNi().getItem(2) - getHaloSkin();
-			for (j=0; j<getMyNi().getItem(1); j++) {
-				for (i=0; i<getMyNi().getItem(0); i++) {
-					index = numPopTransf*getMyNi().getItem(0)*j + i*numPopTransf;
+			k = _myNi[2] - _offset;
+			for (j=0; j<_myNi[1]; j++) {
+				for (i=0; i<_myNi[0]; i++) {
+					index = numPopTransf*_myNi[0]*j + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
 						lbfluid[i][j][k].setF_i(_numVels+l, bufToRecv[index+l]);
 					}

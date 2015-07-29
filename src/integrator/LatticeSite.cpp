@@ -302,12 +302,12 @@ namespace espressopp {
       _sigma[0] = (1. + _gamma_s)*_u[0]*_f[0] + 1./3.*(_gamma_b - _gamma_s)*_scalp;
       _sigma[1] = (1. + _gamma_s)*_u[1]*_f[1] + 1./3.*(_gamma_b - _gamma_s)*_scalp;
       _sigma[2] = (1. + _gamma_s)*_u[2]*_f[2] + 1./3.*(_gamma_b - _gamma_s)*_scalp;
-      _sigma[3] = 1./2.*(1. + _gamma_s)*(_u[0]*_f[1]+_u[1]*_f[0]);
-      _sigma[4] = 1./2.*(1. + _gamma_s)*(_u[0]*_f[2]+_u[2]*_f[0]);
-      _sigma[5] = 1./2.*(1. + _gamma_s)*(_u[1]*_f[2]+_u[2]*_f[1]);
+      _sigma[3] = .5*(1. + _gamma_s)*(_u[0]*_f[1]+_u[1]*_f[0]);
+      _sigma[4] = .5*(1. + _gamma_s)*(_u[0]*_f[2]+_u[2]*_f[0]);
+      _sigma[5] = .5*(1. + _gamma_s)*(_u[1]*_f[2]+_u[2]*_f[1]);
 
       addM_i(4, _sigma[0]+_sigma[1]+_sigma[2]);
-      addM_i(5, 2*_sigma[0]-_sigma[1]-_sigma[2]);
+      addM_i(5, 2.*_sigma[0]-_sigma[1]-_sigma[2]);
       addM_i(6, _sigma[1]-_sigma[2]);
       addM_i(7, _sigma[3]);
       addM_i(8, _sigma[4]);
@@ -315,21 +315,20 @@ namespace espressopp {
     }
 
     void LBSite::btranMomToPop (int _numVels) {
-      // scale modes with inversed coefficients
+			real _M[19];
+			real _eqWeightLoc[19];
+			
+			// scale modes with inversed coefficients
       for (int i = 0; i < _numVels; i++) {
         scaleM_i (i, inv_bLoc[i]);
-      }
 
-      /* Calculate by hand the populations. Hints: lb.c : line 2055
-       * or Schiller p.25 Eq. 2.66 */
-      real _M[19];
-      _M[0] = getM_i(0);
-      _M[1] = getM_i(1); _M[2] = getM_i(2); _M[3] = getM_i(3);
-      _M[4] = getM_i(4); _M[5] = getM_i(5); _M[6] = getM_i(6);
-      _M[7] = getM_i(7); _M[8] = getM_i(8); _M[9] = getM_i(9);
-      _M[10] = getM_i(10); _M[11] = getM_i(11); _M[12] = getM_i(12);
-      _M[13] = getM_i(13); _M[14] = getM_i(14); _M[15] = getM_i(15);
-      _M[16] = getM_i(16); _M[17] = getM_i(17); _M[18] = getM_i(18);
+				/* Calculate by hand the populations. Hints: lb.c : line 2055
+				 * or Schiller p.25 Eq. 2.66 */
+				_M[i] = getM_i(i);
+				
+				/* fill in local eq weights */
+				_eqWeightLoc[i] = getEqWeightLoc(i);
+      }
 
       setF_i(0,_M[0] -_M[4] +_M[16]);
       setF_i(1,_M[0] +_M[1] + 2.* (_M[5] -_M[10] -_M[16] -_M[17]));
@@ -368,7 +367,7 @@ namespace espressopp {
 
       /* scale populations with weights */
       for (int i = 0; i < _numVels; i++) {
-        scaleF_i (i, getEqWeightLoc(i));
+        scaleF_i (i, _eqWeightLoc[i]);
       }
     }
 

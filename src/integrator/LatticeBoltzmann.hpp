@@ -285,20 +285,19 @@ namespace espressopp {
 			Int3D myNi;
 			Int3D nodeGrid;								// 3D-array of processors
 			Real3D myLeft;								// left border of a physical ("real") domain for a CPU
-			real tempSkin;
 			
 			// ON-THE-FLY-CALCULATIONS
-			real denLoc;
-			Real3D jLoc;
+//			real denLoc;
+//			Real3D jLoc;
 			
 			// SIGNALS
 			boost::signals2::connection _befIntV;
 			boost::signals2::connection _recalc2;
 			
 			// TIMERS
-			esutil::WallTimer timeCollStream;  //!< used for timing
+//			esutil::WallTimer timeCollStream;  //!< used for timing
 //			esutil::WallTimer timeComm;  //!< used for timing
-			esutil::WallTimer timeCouple;  //!< used for timing
+//			esutil::WallTimer timeCouple;  //!< used for timing
 
 			void connect();
 			void disconnect();
