@@ -92,7 +92,7 @@ namespace espressopp {
 				_velCM += vel + 0.5 * _timestep * force;
 			}
 			
-			mpi::all_reduce(*getSystem()->comm, _velCM, _totVelCM, std::plus<Real3D>());
+			boost::mpi::reduce(*getSystem()->comm, _velCM, _totVelCM, std::plus<Real3D>(), 0);
 			
 			findLBMom();
 	

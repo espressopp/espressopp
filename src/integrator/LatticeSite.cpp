@@ -197,26 +197,23 @@ namespace espressopp {
 
     /* CALCULATION OF THE EQUILIBRIUM MOMENTS */
     void LBSite::calcEqMoments(int _extForceFlag) {
-      // IF ONE USES DEFAULT D3Q19 MODEL
-
-      /* density on the site */
-      real rhoLoc = getM_i(0);
-
-      /* moments on the site */
+			/* moments on the site */
+			real _invTauLoc = 1. / getTauLoc();
       Real3D jLoc(getM_i(1), getM_i(2), getM_i(3));
-      jLoc *= (getALoc() / getTauLoc());
+			jLoc *= getALoc();
+			jLoc *= _invTauLoc;
 
       /* if we have external forces then modify the eq.fluxes */
-			// ADD LB TO MD COUPLING??
 			if (_extForceFlag == 1) jLoc += 0.5*(getExtForceLoc() + getCouplForceLoc()); // when doing coupling, the flag is set to 1!
 
+			real _invRhoLoc = 1. / getM_i(0);
       /* eq. stress modes */
-      setMeq_i (4, jLoc.sqr() / rhoLoc);
-      setMeq_i (5, (jLoc[0]*jLoc[0] - jLoc[1]*jLoc[1]) / rhoLoc);
-      setMeq_i (6, (3.*jLoc[0]*jLoc[0] - jLoc.sqr()) / rhoLoc);
-      setMeq_i (7, jLoc[0]*jLoc[1] / rhoLoc);
-      setMeq_i (8, jLoc[0]*jLoc[2] / rhoLoc);
-      setMeq_i (9, jLoc[1]*jLoc[2] / rhoLoc);
+      setMeq_i (4, jLoc.sqr()*_invRhoLoc);
+      setMeq_i (5, (jLoc[0]*jLoc[0] - jLoc[1]*jLoc[1])*_invRhoLoc);
+      setMeq_i (6, (3.*jLoc[0]*jLoc[0] - jLoc.sqr())*_invRhoLoc);
+      setMeq_i (7, jLoc[0]*jLoc[1]*_invRhoLoc);
+      setMeq_i (8, jLoc[0]*jLoc[2]*_invRhoLoc);
+      setMeq_i (9, jLoc[1]*jLoc[2]*_invRhoLoc);
 
       /* kinetic (ghost) modes */
       setMeq_i (10, 0.); setMeq_i (11, 0.);
@@ -227,17 +224,16 @@ namespace espressopp {
     }
 
 		/* RELAXATION OF THE MOMENTS TO THEIR EQUILIBRIUM VALUES */
-    void LBSite::relaxMoments (int _numVels) {
+    void LBSite::relaxMoments () {
       real pi_eq[6];
 
       pi_eq[0] =  getMeq_i(4); pi_eq[1] =  getMeq_i(5); pi_eq[2] =  getMeq_i(6);
       pi_eq[3] =  getMeq_i(7); pi_eq[4] =  getMeq_i(8); pi_eq[5] =  getMeq_i(9);
 
-      real _gamma_b, _gamma_s, _gamma_odd, _gamma_even;
-      _gamma_b = getGammaBLoc();
-      _gamma_s = getGammaSLoc();
-      _gamma_odd = getGammaOddLoc();
-      _gamma_even = getGammaEvenLoc();
+      real _gamma_b = getGammaBLoc();
+			real _gamma_s = getGammaSLoc();
+			real _gamma_odd = getGammaOddLoc();
+			real _gamma_even = getGammaEvenLoc();
 
       /* relax bulk mode */
       setM_i (4, pi_eq[0] + _gamma_b * (getM_i(4) - pi_eq[0]));
@@ -276,13 +272,13 @@ namespace espressopp {
 			*/
     }
 
-    void LBSite::applyForces(int _numVels) {
-      Real3D _f = Real3D(0.,0.,0.);
-			
-			_f = getExtForceLoc() + getCouplForceLoc();
+    void LBSite::applyForces() {
+      Real3D _f = getExtForceLoc() + getCouplForceLoc();
 			
       // set velocity _u
-      Real3D _u (getM_i(1) + 0.5*_f[0], getM_i(2) + 0.5*_f[1], getM_i(3) + 0.5*_f[2]);
+			Real3D _u = _f;
+			_u *= 0.5;
+			_u[0] += getM_i(1); 	_u[1] += getM_i(2); _u[2] += getM_i(3);
       _u /= getM_i(0);
 
       /* update momentum modes */
@@ -293,18 +289,20 @@ namespace espressopp {
       /* update stress modes */
       // See def. of _sigma (Eq.198) in B.Dünweg & A.J.C.Ladd in Adv.Poly.Sci. 221, 89-166 (2009)
       real _sigma[6];
-      real _gamma_b, _gamma_s;
-      real _scalp;
-      _gamma_b = getGammaBLoc();
-      _gamma_s = getGammaSLoc();
-
-      _scalp = _u*_f;
-      _sigma[0] = (1. + _gamma_s)*_u[0]*_f[0] + 1./3.*(_gamma_b - _gamma_s)*_scalp;
-      _sigma[1] = (1. + _gamma_s)*_u[1]*_f[1] + 1./3.*(_gamma_b - _gamma_s)*_scalp;
-      _sigma[2] = (1. + _gamma_s)*_u[2]*_f[2] + 1./3.*(_gamma_b - _gamma_s)*_scalp;
-      _sigma[3] = .5*(1. + _gamma_s)*(_u[0]*_f[1]+_u[1]*_f[0]);
-      _sigma[4] = .5*(1. + _gamma_s)*(_u[0]*_f[2]+_u[2]*_f[0]);
-      _sigma[5] = .5*(1. + _gamma_s)*(_u[1]*_f[2]+_u[2]*_f[1]);
+      real _gamma_b = getGammaBLoc();
+			real _gamma_s = getGammaSLoc();
+			real _gamma_sp = _gamma_s + 1.;
+			real _gamma_sph = 0.5 * _gamma_sp;
+			
+			real _scalp = _u*_f;
+			real _secTerm = (1./3.)*(_gamma_b - _gamma_s)*_scalp;
+			
+			_sigma[0] = _gamma_sp*_u[0]*_f[0] + _secTerm;
+      _sigma[1] = _gamma_sp*_u[1]*_f[1] + _secTerm;
+      _sigma[2] = _gamma_sp*_u[2]*_f[2] + _secTerm;
+      _sigma[3] = _gamma_sph*(_u[0]*_f[1]+_u[1]*_f[0]);
+      _sigma[4] = _gamma_sph*(_u[0]*_f[2]+_u[2]*_f[0]);
+      _sigma[5] = _gamma_sph*(_u[1]*_f[2]+_u[2]*_f[1]);
 
       addM_i(4, _sigma[0]+_sigma[1]+_sigma[2]);
       addM_i(5, 2.*_sigma[0]-_sigma[1]-_sigma[2]);
@@ -315,8 +313,8 @@ namespace espressopp {
     }
 
     void LBSite::btranMomToPop (int _numVels) {
-			real _M[19];
-			real _eqWeightLoc[19];
+			real _M[_numVels];
+			real _eqWeightLoc[_numVels];
 			
 			// scale modes with inversed coefficients
       for (int i = 0; i < _numVels; i++) {

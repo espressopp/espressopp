@@ -106,9 +106,9 @@ namespace espressopp {
 			/* FUNCTIONS DECLARATION */
 			void calcLocalMoments ();									// calculate local moments
 			void calcEqMoments (int _extForceFlag);		// calculate equilibrium moments
-			void relaxMoments (int _numVels);					// relax loc. moments towards eq.values
+			void relaxMoments ();					// relax loc. moments towards eq.values
 			void thermalFluct (int _numVels);					// introduce thermal fluctuations (if any)
-			void applyForces (int _numVels);					// apply external forces (if any)
+			void applyForces ();					// apply external forces (if any)
 			void btranMomToPop (int _numVels);				// back-transform moments to populations
 
       private:
