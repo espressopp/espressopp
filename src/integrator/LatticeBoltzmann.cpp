@@ -21,7 +21,6 @@
 #include "python.hpp"
 #include "LatticeBoltzmann.hpp"
 #include <iomanip>
-#include <algorithm>
 #include "boost/serialization/vector.hpp"
 
 #include "types.hpp"
@@ -674,37 +673,43 @@ namespace espressopp {
 	
 			commHalo();
 
+/*			long int lbVolume = _myNi[0] * _myNi[1] * _myNi[2];
+			std::vector<real> tmp = std::vector<real>(lbVolume, 0.);
+			printf ("sizeof(ghostlat) is %ld \n", sizeof(real));
+			memcpy(&tmp,&lbfluid,lbVolume * _numVels * sizeof(real));
+			memcpy(&lbfluid,&ghostlat,lbVolume * _numVels * sizeof(real));
+			memcpy(&ghostlat,&tmp,lbVolume * _numVels * sizeof(real));
+*/
 			for (int i = 0; i < _myNi[0]; i++) {
 				for (int j = 0; j < _myNi[1]; j++) {
 					for (int k = 0; k < _myNi[2]; k++) {
-						/* set to zero coupling forces if the coupling exists */
-						if (getCouplForceFlag() == 1) {
-							lbfluid[i][j][k].setCouplForceLoc(Real3D(0.0));
-						}
-						
+/*						std::vector<real> tmp = std::vector<real>(_numVels, 0.);
+						memcpy(&tmp,&lbfluid[i][j][k], _numVels * sizeof(real));
+						memcpy(&lbfluid[i][j][k],&ghostlat[i][j][k], _numVels * sizeof(real));
+						memcpy(&ghostlat[i][j][k],&tmp, _numVels * sizeof(real));
+*/
 						/* swap pointers for two lattices */
 						for (int l = 0; l < _numVels; l++) {
 							real tmp;
 							tmp = lbfluid[i][j][k].getF_i(l);
-							if (tmp != tmp) {
-								printf ("population %d is NAN\n", l);
-							}
 							lbfluid[i][j][k].setF_i(l, ghostlat[i][j][k].getPop_i(l));
-							real _tmp;
-							_tmp = ghostlat[i][j][k].getPop_i(l);
-							if (_tmp != _tmp) {
-								printf ("_population %d is NAN\n", l);
-							}
 							ghostlat[i][j][k].setPop_i(l, tmp);
 						}
 					}
 				}
 			}
-//			std::swap(lbfluid,ghostlat);
 
 			/* calculate den and j at the lattice sites in real region and copy them to halo */
 #warning: should one cancel this condition if pure lb is in use?
 			if (getCouplForceFlag() == 1) {
+				/* set to zero coupling forces if the coupling exists */
+				for (int i = 0; i < _myNi[0]; i++) {
+					for (int j = 0; j < _myNi[1]; j++) {
+						for (int k = 0; k < _myNi[2]; k++) {
+							lbfluid[i][j][k].setCouplForceLoc(Real3D(0.0));
+						}
+					}
+				}
 				
 				/* calculate den and j at the lattice sites in real region */
 				calcDenMom();
