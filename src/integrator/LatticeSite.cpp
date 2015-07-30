@@ -35,21 +35,10 @@ namespace espressopp {
   using namespace iterator;
   namespace integrator {
     /* SITE CONSTRUCTOR */
-    LBSite::LBSite (shared_ptr<System> system, int _numVels, real _a, real _tau) {
+    LBSite::LBSite (int _numVels) {
 			/* initialization of populations, moments and equilibrium moments */
       f   = std::vector<real>(_numVels+4, 0.);
       m   = std::vector<real>(_numVels, 0.);
-      meq = std::vector<real>(_numVels, 0.);
-			
-			/* set lattice and time constants */
-      setALoc(_a);
-      setTauLoc(_tau);
-			
-			/* declare RNG */
-      if (!system->rng) {
-        throw std::runtime_error("system has no RNG");
-      }
-      rng = system->rng;
     }
 
     /* SET AND GET PART */
@@ -60,16 +49,7 @@ namespace espressopp {
     void LBSite::setM_i (int _i, real _m) { m[_i] = _m;}
     real LBSite::getM_i (int _i) { return m[_i];}
 
-    void LBSite::setMeq_i (int _i, real _meq) { meq[_i] = _meq;}
-    real LBSite::getMeq_i (int _i) { return meq[_i];}
-
-    /* for SELDOM-CHANGABLE variables */
-    void LBSite::setALoc (real _a) {aLocal = _a;}
-    real LBSite::getALoc () {return aLocal;}
-
-    void LBSite::setTauLoc (real _tau) {tauLocal = _tau;}
-    real LBSite::getTauLoc () {return tauLocal;}
-
+		/* for SELDOM-CHANGABLE variables */
     void LBSite::setInvBLoc (int _i, real _b) { inv_bLoc[_i] = _b;}
     real LBSite::getInvBLoc (int _i) { return inv_bLoc[_i];}
 
@@ -108,8 +88,6 @@ namespace espressopp {
 
     /* MANAGING STATIC VARIABLES */
     /* create storage for static variables */
-    real LBSite::aLocal   = 0.;
-    real LBSite::tauLocal = 0.;
     std::vector<real> LBSite::phiLoc(19, 0.);
     std::vector<real> LBSite::inv_bLoc(19, 0.);
     std::vector<real> LBSite::eqWeightLoc(19, 0.);
@@ -195,40 +173,26 @@ namespace espressopp {
       //
     }
 
-    /* CALCULATION OF THE EQUILIBRIUM MOMENTS */
-    void LBSite::calcEqMoments(int _extForceFlag) {
-			/* moments on the site */
-			real _invTauLoc = 1. / getTauLoc();
-      Real3D jLoc(getM_i(1), getM_i(2), getM_i(3));
-			jLoc *= getALoc();
-			jLoc *= _invTauLoc;
-
-      /* if we have external forces then modify the eq.fluxes */
-			if (_extForceFlag == 1) jLoc += 0.5*(getExtForceLoc() + getCouplForceLoc()); // when doing coupling, the flag is set to 1!
-
-			real _invRhoLoc = 1. / getM_i(0);
-      /* eq. stress modes */
-      setMeq_i (4, jLoc.sqr()*_invRhoLoc);
-      setMeq_i (5, (jLoc[0]*jLoc[0] - jLoc[1]*jLoc[1])*_invRhoLoc);
-      setMeq_i (6, (3.*jLoc[0]*jLoc[0] - jLoc.sqr())*_invRhoLoc);
-      setMeq_i (7, jLoc[0]*jLoc[1]*_invRhoLoc);
-      setMeq_i (8, jLoc[0]*jLoc[2]*_invRhoLoc);
-      setMeq_i (9, jLoc[1]*jLoc[2]*_invRhoLoc);
-
-      /* kinetic (ghost) modes */
-      setMeq_i (10, 0.); setMeq_i (11, 0.);
-      setMeq_i (12, 0.); setMeq_i (13, 0.);
-      setMeq_i (14, 0.); setMeq_i (15, 0.);
-      setMeq_i (16, 0.); setMeq_i (17, 0.);
-      setMeq_i (18, 0.);
-    }
-
 		/* RELAXATION OF THE MOMENTS TO THEIR EQUILIBRIUM VALUES */
-    void LBSite::relaxMoments () {
+    void LBSite::relaxMoments (int _extForceFlag) {
+			// moments on the site //
+			real _invTauLoc = 1. / LatticePar::getTauLoc();
+			Real3D jLoc(getM_i(1), getM_i(2), getM_i(3));
+			jLoc *= LatticePar::getALoc();
+			jLoc *= _invTauLoc;
+			
+			// if we have external forces then modify the eq.fluxes //
+			if (_extForceFlag == 1) jLoc += 0.5*(getExtForceLoc() + getCouplForceLoc()); // when doing coupling, the flag is set to 1!
+			
+			real _invRhoLoc = 1. / getM_i(0);
       real pi_eq[6];
 
-      pi_eq[0] =  getMeq_i(4); pi_eq[1] =  getMeq_i(5); pi_eq[2] =  getMeq_i(6);
-      pi_eq[3] =  getMeq_i(7); pi_eq[4] =  getMeq_i(8); pi_eq[5] =  getMeq_i(9);
+      pi_eq[0] =  jLoc.sqr()*_invRhoLoc;
+			pi_eq[1] =  (jLoc[0]*jLoc[0] - jLoc[1]*jLoc[1])*_invRhoLoc;
+			pi_eq[2] =  (3.*jLoc[0]*jLoc[0] - jLoc.sqr())*_invRhoLoc;
+			pi_eq[3] =  jLoc[0]*jLoc[1]*_invRhoLoc;
+			pi_eq[4] =  jLoc[0]*jLoc[2]*_invRhoLoc;
+			pi_eq[5] =  jLoc[1]*jLoc[2]*_invRhoLoc;
 
       real _gamma_b = getGammaBLoc();
 			real _gamma_s = getGammaSLoc();
@@ -264,11 +228,11 @@ namespace espressopp {
 			// not gaussian but uniformly distributed random numbers
 
 			for (int l = 4; l < _numVels; l++) {
-				addM_i(l, rootRhoLoc*getPhiLoc(l)*((*rng)() - 0.5));
+				addM_i(l, rootRhoLoc*getPhiLoc(l)*((*LatticePar::rng)() - 0.5));
 			}
 			/*	if one rather wants to use random numbers distributed normally, change
 					in the previous lines sqrt(12.*getM_i(0)) -> sqrt(getM_i(0)) and
-					rootRhoLoc*getPhiLoc(l)*((*rng)() - 0.5)) -> rootRhoLoc*getPhiLoc(l)*normal())
+					rootRhoLoc*getPhiLoc(l)*((*LatticePar::rng)() - 0.5)) -> rootRhoLoc*getPhiLoc(l)*normal())
 			*/
     }
 
@@ -375,12 +339,35 @@ namespace espressopp {
     GhostLattice::GhostLattice (int _numVels) {
       pop = std::vector<real>(_numVels, 0.);
     }
-
+//    std::vector<real> GhostLattice::pop(19, 0.);
     /* SET AND GET PART */
     void GhostLattice::setPop_i (int _i, real _pop) { pop[_i] = _pop;}
     real GhostLattice::getPop_i (int _i) { return pop[_i];}
 
     GhostLattice::~GhostLattice() {
     }
+		
+		LatticePar::LatticePar (shared_ptr<System> system, real _a, real _tau) {
+			setALoc(_a);
+			setTauLoc(_tau);
+			
+			/* declare RNG */
+			if (!system->rng) {
+				throw std::runtime_error("system has no RNG");
+			}
+			rng = system->rng;
+		}
+		
+		shared_ptr< esutil::RNG > LatticePar::rng;		// initializer
+		real LatticePar::aLoc = 0.;										// initializer
+		real LatticePar::tauLoc = 0.;									// initializer
+
+		void LatticePar::setALoc (real _a) {aLoc = _a;}
+		real LatticePar::getALoc () {return aLoc;}
+		void LatticePar::setTauLoc (real _tau) {tauLoc = _tau;}
+		real LatticePar::getTauLoc () {return tauLoc;}
+		
+		LatticePar::~LatticePar() {
+		}
   }
 }

@@ -267,6 +267,7 @@ namespace espressopp {
 			/*	two lattices. lbfluid has f,m and meq. ghostlat has f only.
 			*		the latter one used for sake of simplicity during streaming
 			*/
+//			std::vector< std::vector< std::vector<LBPop> > > lbpop;
 			std::vector< std::vector< std::vector<LBSite> > > lbfluid;
 			std::vector< std::vector< std::vector<GhostLattice> > > ghostlat;
 
@@ -286,10 +287,6 @@ namespace espressopp {
 			Int3D nodeGrid;								// 3D-array of processors
 			Real3D myLeft;								// left border of a physical ("real") domain for a CPU
 			
-			// ON-THE-FLY-CALCULATIONS
-//			real denLoc;
-//			Real3D jLoc;
-			
 			// SIGNALS
 			boost::signals2::connection _befIntV;
 			boost::signals2::connection _recalc2;
@@ -298,7 +295,9 @@ namespace espressopp {
 //			esutil::WallTimer timeCollStream;  //!< used for timing
 //			esutil::WallTimer timeComm;  //!< used for timing
 //			esutil::WallTimer timeCouple;  //!< used for timing
-
+			esutil::WallTimer swapping, colstream;
+			real time_sw, time_colstr;
+			
 			void connect();
 			void disconnect();
 

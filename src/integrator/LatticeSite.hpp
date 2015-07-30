@@ -48,7 +48,7 @@ namespace espressopp {
       public:
 			/* LBSite constructor. It needs a system pointer, number of vels,
 				 lattice and time constants */
-			LBSite (shared_ptr<System> system, int _numVels, real _a, real _tau);
+			LBSite (int _numVels);
 			~LBSite ();
 
 			/* SET AND GET DECLARATION */
@@ -66,12 +66,6 @@ namespace espressopp {
 
 			void setEqWeightLoc (int _i, real _w);			// set eqWeightLoc value to _w
 			real getEqWeightLoc (int _i);								// get eqWeightLoc value
-
-			void setALoc (real _a);											// set aLocal
-			real getALoc ();														// get aLocal
-
-			void setTauLoc (real _tau);									// set tauLocal
-			real getTauLoc ();													// get tauLocal
 
 			void setPhiLoc (int _i, real _phi);					// set phi value to _phi
 			real getPhiLoc (int _i);										// get phi value
@@ -105,8 +99,7 @@ namespace espressopp {
 			
 			/* FUNCTIONS DECLARATION */
 			void calcLocalMoments ();									// calculate local moments
-			void calcEqMoments (int _extForceFlag);		// calculate equilibrium moments
-			void relaxMoments ();					// relax loc. moments towards eq.values
+			void relaxMoments (int _extForceFlag);					// relax loc. moments towards eq.values
 			void thermalFluct (int _numVels);					// introduce thermal fluctuations (if any)
 			void applyForces ();					// apply external forces (if any)
 			void btranMomToPop (int _numVels);				// back-transform moments to populations
@@ -114,11 +107,8 @@ namespace espressopp {
       private:
 			std::vector<real> f;											// populations on a lattice site
 			std::vector<real> m;											// moments on a site
-			std::vector<real> meq;										// eq. moments on a site
 			Real3D extForceLoc;												// local external force
 			Real3D couplForceLoc;											// local coupling force
-			static real aLocal;												// local variable for lattice spacing
-			static real tauLocal;											// local variable for lattice time
 			static real gamma_bLoc;										// gamma bulk
 			static real gamma_sLoc;										// gamma shear
 			static real gamma_oddLoc;									// gamma odd
@@ -126,8 +116,6 @@ namespace espressopp {
 			static std::vector<real> eqWeightLoc;			// local eq. weights
 			static std::vector<real> inv_bLoc;				// local inverse coefficients b_i
 			static std::vector<real> phiLoc;					// local fluctuations amplitudes
-
-			shared_ptr< esutil::RNG > rng;						//!< RNG for fluctuations
     };
 
     class GhostLattice {
@@ -151,6 +139,22 @@ namespace espressopp {
 			private:
 			std::vector<real> pop;										// populations of the ghost lattice
     };
+		
+		class LatticePar {
+		public:
+			LatticePar (shared_ptr<System> system, real _a, real _tau);
+			~LatticePar ();
+			
+			static void setTauLoc (real _tau);									// set tauLocal
+			static real getTauLoc ();														// get tauLocal
+			static void setALoc (real _a);											// set aLocal
+			static real getALoc ();															// get aLocal
+
+			static shared_ptr< esutil::RNG > rng;						//!< RNG for fluctuations
+		private:
+			static real aLoc;
+			static real tauLoc;
+		};
   }
 }
 

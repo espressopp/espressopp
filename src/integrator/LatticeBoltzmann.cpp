@@ -150,20 +150,23 @@ namespace espressopp {
 */
 			/* setup lattices by resizing them in 3 dimensions */
 			lbfluid.resize(getMyNi().getItem(0));								// resize x-dimension of the lbfluid array
-			ghostlat.resize(getMyNi().getItem(0));							// resize x-dimension of the ghostlat array
+			ghostlat.resize(getMyNi().getItem(0));								// resize x-dimension of the ghostlat array
 			for (int i = 0; i < getMyNi().getItem(0); i++) {
-				lbfluid[i].resize(getMyNi().getItem(1));					// resize y-dimension of the lbfluid array
+				lbfluid[i].resize(getMyNi().getItem(1));						// resize y-dimension of the lbfluid array
 				ghostlat[i].resize(getMyNi().getItem(1));					// resize y-dimension of the ghostlat array
 				for (int j = 0; j < getMyNi().getItem(1); j++) {
-					lbfluid[i][j].resize(getMyNi().getItem(2), LBSite(_system, getNumVels(), getA(), getTau()));
+					lbfluid[i][j].resize(getMyNi().getItem(2), LBSite(getNumVels()));
 					ghostlat[i][j].resize(getMyNi().getItem(2), GhostLattice(getNumVels()));
 				}
 			}
 
-			initLatticeModel();				// initialize all the global weights and coefficients from the local ones
+			LatticePar(_system,getA(),getTau());	// pass system, a and tau to the local sites
+			initLatticeModel();										// initialize all the global weights and coefficients from the local ones
 
 		}
-
+		
+/*******************************************************************************************/
+		
 		void LatticeBoltzmann::disconnect() {
 			_recalc2.disconnect();
 			_befIntV.disconnect();
@@ -174,7 +177,9 @@ namespace espressopp {
 			_recalc2 = integrator->recalc2.connect ( boost::bind(&LatticeBoltzmann::zeroMDCMVel, this));
 			_befIntV = integrator->befIntV.connect ( boost::bind(&LatticeBoltzmann::makeLBStep, this));
 		}
-
+		
+/*******************************************************************************************/
+		
 		/* Setter and getter for the parallelisation things */
 		void LatticeBoltzmann::setMyNeighbour (int _dir, int _rank) { myNeighbour[_dir] = _rank;}
 		int LatticeBoltzmann::getMyNeighbour (int _dir) { return myNeighbour[_dir];}
@@ -323,7 +328,6 @@ namespace espressopp {
 		real LatticeBoltzmann::convTimeMDtoLB() {return 1. / (integrator->getTimeStep() * getTau());}
 		real LatticeBoltzmann::convLenMDtoLB() {
 			return getNi().getItem(0) / (getSystem()->bc->getBoxL().getItem(0) * getA());}
-
 		
 /*******************************************************************************************/
 
@@ -502,6 +506,15 @@ namespace espressopp {
 //				printf ("time spent on coupling is %f sec\n", timeCoup);
 			}
 			
+			if (_stepNum % 500 == 0) {
+				printf ("colstr takes %f sec, swapping %f\n",time_colstr,time_sw);
+
+				time_colstr = 0.;
+				time_sw = 0.;
+				colstream.reset();
+				swapping.reset();
+			}
+			
 			if (_stepNum % _nSteps == 0) {
 //				time = timeCollStream.getElapsedTime();
 				
@@ -644,19 +657,20 @@ namespace espressopp {
 			int _extForceFlag = getExtForceFlag();
 			int _numVels = getNumVels();
 			Int3D _myNi = getMyNi();
+			real time;
 			
 			/* copy forces from halo region to the real one */
 			if (getCouplForceFlag() == 1) {
 				copyForcesFromHalo();
 			}
 			
-      for (int i = _offset; i < _myNi[0]-_offset; i++) {
+			time = colstream.getElapsedTime();
+			for (int i = _offset; i < _myNi[0]-_offset; i++) {
         for (int j = _offset; j < _myNi[1]-_offset; j++) {
           for (int k = _offset; k < _myNi[2]-_offset; k++) {
 						/* collision phase */
 						lbfluid[i][j][k].calcLocalMoments ();
-						lbfluid[i][j][k].calcEqMoments (_extForceFlag);
-						lbfluid[i][j][k].relaxMoments ();
+						lbfluid[i][j][k].relaxMoments (_extForceFlag);
 						if (getLBTempFlag() == 1) {
 							lbfluid[i][j][k].thermalFluct (_numVels);
 						}
@@ -670,6 +684,7 @@ namespace espressopp {
 					}
         }
       }
+			time_colstr += (colstream.getElapsedTime()-time);
 	
 			commHalo();
 
@@ -680,6 +695,7 @@ namespace espressopp {
 			memcpy(&lbfluid,&ghostlat,lbVolume * _numVels * sizeof(real));
 			memcpy(&ghostlat,&tmp,lbVolume * _numVels * sizeof(real));
 */
+			time = swapping.getElapsedTime();
 			for (int i = 0; i < _myNi[0]; i++) {
 				for (int j = 0; j < _myNi[1]; j++) {
 					for (int k = 0; k < _myNi[2]; k++) {
@@ -690,17 +706,17 @@ namespace espressopp {
 */
 						/* swap pointers for two lattices */
 						for (int l = 0; l < _numVels; l++) {
-							real tmp;
-							tmp = lbfluid[i][j][k].getF_i(l);
+							real tmp = lbfluid[i][j][k].getF_i(l);
 							lbfluid[i][j][k].setF_i(l, ghostlat[i][j][k].getPop_i(l));
 							ghostlat[i][j][k].setPop_i(l, tmp);
 						}
 					}
 				}
 			}
+			time_sw += (swapping.getElapsedTime()-time);
 
 			/* calculate den and j at the lattice sites in real region and copy them to halo */
-#warning: should one cancel this condition if pure lb is in use?
+#warning: should one cancel this condition if pure lb is in use? or move setCouplForceLoc into the collision loop?
 			if (getCouplForceFlag() == 1) {
 				/* set to zero coupling forces if the coupling exists */
 				for (int i = 0; i < _myNi[0]; i++) {
@@ -1189,15 +1205,15 @@ namespace espressopp {
 			// prepare message for sending
 			toTransf = numPopTransf*_myNi[1];
 			i = _myNi[0] - _offset;
+			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (j=0; j<_myNi[1]; j++) {
-					index = toTransf*k + j*numPopTransf;
-					
 					bufToSend[index] = ghostlat[i][j][k].getPop_i(1);
 					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(7);
 					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(9);
 					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(11);
 					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(13);
+					index += numPopTransf;
 				}
 			}
 			
@@ -1216,15 +1232,15 @@ namespace espressopp {
 			
 			// unpack message
 			i = _offset;
+			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (j=0; j<_myNi[1]; j++) {
-					index = toTransf*k + j*numPopTransf;
-					
 					ghostlat[i][j][k].setPop_i(1, bufToRecv[index]);
 					ghostlat[i][j][k].setPop_i(7, bufToRecv[index+1]);
 					ghostlat[i][j][k].setPop_i(9, bufToRecv[index+2]);
 					ghostlat[i][j][k].setPop_i(11, bufToRecv[index+3]);
 					ghostlat[i][j][k].setPop_i(13, bufToRecv[index+4]);
+					index += numPopTransf;
 				}
 			}
 			
@@ -1234,15 +1250,15 @@ namespace espressopp {
 			
 			// prepare message for sending
 			i = 0;
+			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (j=0; j<_myNi[1]; j++) {
-					index = toTransf*k + j*numPopTransf;
-					
 					bufToSend[index] = ghostlat[i][j][k].getPop_i(2);
 					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(8);
 					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(10);
 					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(12);
 					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(14);
+					index += numPopTransf;
 				}
 			}
 			
@@ -1261,15 +1277,15 @@ namespace espressopp {
 			
 			// unpack message
 			i = _myNi[0] - 2 * _offset;
+			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (j=0; j<_myNi[1]; j++) {
-					index = toTransf*k + j*numPopTransf;
-					
 					ghostlat[i][j][k].setPop_i(2, bufToRecv[index+0]);
 					ghostlat[i][j][k].setPop_i(8, bufToRecv[index+1]);
 					ghostlat[i][j][k].setPop_i(10, bufToRecv[index+2]);
 					ghostlat[i][j][k].setPop_i(12, bufToRecv[index+3]);
 					ghostlat[i][j][k].setPop_i(14, bufToRecv[index+4]);
+					index += numPopTransf;
 				}
 			}
 			
@@ -1287,15 +1303,15 @@ namespace espressopp {
 			// prepare message for sending
 			toTransf = numPopTransf*_myNi[0];
 			j = _myNi[1] - _offset;
+			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (i=0; i<_myNi[0]; i++) {
-					index = toTransf*k + i*numPopTransf;
-					
 					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(3);
 					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(7);
 					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(10);
 					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(15);
 					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(17);
+					index += numPopTransf;
 				}
 			}
 			
@@ -1314,15 +1330,15 @@ namespace espressopp {
 			
 			// unpack message
 			j = _offset;
+			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (i=0; i<_myNi[0]; i++) {
-					index = toTransf*k + i*numPopTransf;
-					
 					ghostlat[i][j][k].setPop_i(3, bufToRecv[index+0]);
 					ghostlat[i][j][k].setPop_i(7, bufToRecv[index+1]);
 					ghostlat[i][j][k].setPop_i(10, bufToRecv[index+2]);
 					ghostlat[i][j][k].setPop_i(15, bufToRecv[index+3]);
 					ghostlat[i][j][k].setPop_i(17, bufToRecv[index+4]);
+					index += numPopTransf;
 				}
 			}
 			
@@ -1332,15 +1348,15 @@ namespace espressopp {
 			
 			// prepare message for sending
 			j = 0;
+			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (i=0; i<_myNi[0]; i++) {
-					index = toTransf*k + i*numPopTransf;
-					
 					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(4);
 					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(8);
 					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(9);
 					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(16);
 					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(18);
+					index += numPopTransf;
 				}
 			}
 			
@@ -1359,15 +1375,15 @@ namespace espressopp {
 			
 			// unpack message
 			j = _myNi[1] - 2 * _offset;
+			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (i=0; i<_myNi[0]; i++) {
-					index = toTransf*k + i*numPopTransf;
-					
 					ghostlat[i][j][k].setPop_i(4, bufToRecv[index+0]);
 					ghostlat[i][j][k].setPop_i(8, bufToRecv[index+1]);
 					ghostlat[i][j][k].setPop_i(9, bufToRecv[index+2]);
 					ghostlat[i][j][k].setPop_i(16, bufToRecv[index+3]);
 					ghostlat[i][j][k].setPop_i(18, bufToRecv[index+4]);
+					index += numPopTransf;
 				}
 			}
 			
@@ -1384,15 +1400,15 @@ namespace espressopp {
 			
 			// prepare message for sending
 			k = _myNi[2] - _offset;
+			index = 0;
 			for (j=0; j<_myNi[1]; j++) {
 				for (i=0; i<_myNi[0]; i++) {
-					index = toTransf*j + i*numPopTransf;
-					
 					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(5);
 					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(11);
 					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(14);
 					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(15);
 					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(18);
+					index += numPopTransf;
 				}
 			}
 			
@@ -1411,15 +1427,15 @@ namespace espressopp {
 			
 			// unpack message
 			k = _offset;
+			index = 0;
 			for (j=0; j<_myNi[1]; j++) {
 				for (i=0; i<_myNi[0]; i++) {
-					index = toTransf*j + i*numPopTransf;
-					
 					ghostlat[i][j][k].setPop_i(5, bufToRecv[index+0]);
 					ghostlat[i][j][k].setPop_i(11, bufToRecv[index+1]);
 					ghostlat[i][j][k].setPop_i(14, bufToRecv[index+2]);
 					ghostlat[i][j][k].setPop_i(15, bufToRecv[index+3]);
 					ghostlat[i][j][k].setPop_i(18, bufToRecv[index+4]);
+					index += numPopTransf;
 				}
 			}
 			
@@ -1429,15 +1445,15 @@ namespace espressopp {
 			
 			// prepare message for sending
 			k = 0;
+			index = 0;
 			for (j=0; j<_myNi[1]; j++) {
 				for (i=0; i<_myNi[0]; i++) {
-					index = toTransf*j + i*numPopTransf;
-					
 					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(6);
 					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(12);
 					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(13);
 					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(16);
 					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(17);
+					index += numPopTransf;
 				}
 			}
 			
@@ -1456,15 +1472,15 @@ namespace espressopp {
 			
 			// unpack message
 			k = _myNi[2] - 2 * _offset;
+			index = 0;
 			for (j=0; j<_myNi[1]; j++) {
 				for (i=0; i<_myNi[0]; i++) {
-					index = toTransf*j + i*numPopTransf;
-					
 					ghostlat[i][j][k].setPop_i(6, bufToRecv[index+0]);
 					ghostlat[i][j][k].setPop_i(12, bufToRecv[index+1]);
 					ghostlat[i][j][k].setPop_i(13, bufToRecv[index+2]);
 					ghostlat[i][j][k].setPop_i(16, bufToRecv[index+3]);
 					ghostlat[i][j][k].setPop_i(17, bufToRecv[index+4]);
+					index += numPopTransf;
 				}
 			}
 			
