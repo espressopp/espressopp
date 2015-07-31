@@ -95,7 +95,6 @@ namespace espressopp {
 			int _Npart = _system->storage->getNRealParticles();
 			int _totNPart = 0;
 			mpi::all_reduce(*getSystem()->comm, _Npart, _totNPart, std::plus<int>());
-//			printf("_Npart is %d, totNPart is %d\n", _Npart, _totNPart);
 
 			setTotNPart(_totNPart);
 			fOnPart = std::vector<Real3D>(_totNPart + 1, Real3D(0.,0.,0.));	// +1 since particle's id starts with 1, not 0
@@ -148,6 +147,8 @@ namespace espressopp {
       }
       fclose (rngFile);
 */
+			LatticePar(_system, getNumVels(),getA(),getTau());	// pass system, a and tau to the local sites
+
 			/* setup lattices by resizing them in 3 dimensions */
 			lbfluid.resize(getMyNi().getItem(0));								// resize x-dimension of the lbfluid array
 			ghostlat.resize(getMyNi().getItem(0));								// resize x-dimension of the ghostlat array
@@ -155,12 +156,11 @@ namespace espressopp {
 				lbfluid[i].resize(getMyNi().getItem(1));						// resize y-dimension of the lbfluid array
 				ghostlat[i].resize(getMyNi().getItem(1));					// resize y-dimension of the ghostlat array
 				for (int j = 0; j < getMyNi().getItem(1); j++) {
-					lbfluid[i][j].resize(getMyNi().getItem(2), LBSite(getNumVels()));
-					ghostlat[i][j].resize(getMyNi().getItem(2), GhostLattice(getNumVels()));
+					lbfluid[i][j].resize(getMyNi().getItem(2), LBSite());
+					ghostlat[i][j].resize(getMyNi().getItem(2), GhostLattice());
 				}
 			}
 
-			LatticePar(_system,getA(),getTau());	// pass system, a and tau to the local sites
 			initLatticeModel();										// initialize all the global weights and coefficients from the local ones
 
 		}
@@ -367,14 +367,15 @@ namespace espressopp {
 					for (int k = 0; k < getMyNi().getItem(2); k++) {
 						for (int l = 0; l < getNumVels(); l++) {
 							lbfluid[i][j][k].initLatticeModelLoc();
-							// pass local eq. weights and inversed coeff. to the global ones
-							if (i == 0 && j == 0 && k == 0) {
-								setEqWeight(l, lbfluid[0][0][0].getEqWeightLoc(l));
-								setInvB(l, lbfluid[0][0][0].getInvBLoc(l));
-							}
 						}
 					}
 				}
+			}
+
+			// pass local eq. weights and inversed coeff. to the global ones
+			for (int l = 0; l < getNumVels(); l++) {
+				setEqWeight(l, lbfluid[0][0][0].getEqWeightLoc(l));
+				setInvB(l, lbfluid[0][0][0].getInvBLoc(l));
 			}
 		}
 
@@ -428,10 +429,10 @@ namespace espressopp {
 			longint _myRank = getSystem()->comm->rank();
 
 			if (_myRank == 0) {
-				std::cout << "Mass " << convMassMDtoLB() << "\n";
-				std::cout << "Len " << convLenMDtoLB() << "\n";
-				std::cout << "getTau() " << getTau() << "\n";
-				std::cout << "Time " << convTimeMDtoLB() << "\n";
+				std::cout << "Mass conversion coeff. MD->LB: " << convMassMDtoLB() << "\n";
+				std::cout << "Length conversion coeff. MD->LB: " << convLenMDtoLB() << "\n";
+				std::cout << "Time conversion coeff. MD->LB: " << convTimeMDtoLB() << "\n";
+				std::cout << "-------------------------------------\n";
 			}
 			
 			_lbTemp = getLBTemp() * convMassMDtoLB() * pow(convLenMDtoLB() / convTimeMDtoLB(), 2.);
@@ -506,7 +507,7 @@ namespace espressopp {
 //				printf ("time spent on coupling is %f sec\n", timeCoup);
 			}
 			
-			if (_stepNum % 500 == 0) {
+			if (_stepNum % 50 == 0) {
 				printf ("colstr takes %f sec, swapping %f\n",time_colstr,time_sw);
 
 				time_colstr = 0.;
@@ -557,7 +558,6 @@ namespace espressopp {
 			boost::mpi::all_reduce(*getSystem()->comm, makeDecompose, totalDecompose, std::plus<int>());
 			
 			if (totalDecompose != 0) {
-//				 printf ("NEED TO DECOMPOSE!!!\n");
 				system.storage->decompose();
 			}
 			
@@ -655,54 +655,40 @@ namespace espressopp {
     void LatticeBoltzmann::collideStream () {
 			int _offset = getHaloSkin();
 			int _extForceFlag = getExtForceFlag();
-			int _numVels = getNumVels();
+			int _couplForceFlag = getCouplForceFlag();
+			int _lbTempFlag = getLBTempFlag();
 			Int3D _myNi = getMyNi();
-			real time;
 			
 			/* copy forces from halo region to the real one */
 			if (getCouplForceFlag() == 1) {
 				copyForcesFromHalo();
 			}
 			
-			time = colstream.getElapsedTime();
+			real time1 = colstream.getElapsedTime();
 			for (int i = _offset; i < _myNi[0]-_offset; i++) {
         for (int j = _offset; j < _myNi[1]-_offset; j++) {
           for (int k = _offset; k < _myNi[2]-_offset; k++) {
-						/* collision phase */
-						lbfluid[i][j][k].calcLocalMoments ();
-						lbfluid[i][j][k].relaxMoments (_extForceFlag);
-						if (getLBTempFlag() == 1) {
-							lbfluid[i][j][k].thermalFluct (_numVels);
-						}
-						if (_extForceFlag == 1 || getCouplForceFlag() == 1) {
-							lbfluid[i][j][k].applyForces ();
-						}
-						lbfluid[i][j][k].btranMomToPop (_numVels);
 
-						/* streaming phase */
+						lbfluid[i][j][k].collision(_lbTempFlag, _extForceFlag, _couplForceFlag);
+
 						streaming (i,j,k);
 					}
         }
       }
-			time_colstr += (colstream.getElapsedTime()-time);
+			time_colstr += (colstream.getElapsedTime()-time1);
 	
 			commHalo();
 
-/*			long int lbVolume = _myNi[0] * _myNi[1] * _myNi[2];
-			std::vector<real> tmp = std::vector<real>(lbVolume, 0.);
-			printf ("sizeof(ghostlat) is %ld \n", sizeof(real));
-			memcpy(&tmp,&lbfluid,lbVolume * _numVels * sizeof(real));
-			memcpy(&lbfluid,&ghostlat,lbVolume * _numVels * sizeof(real));
-			memcpy(&ghostlat,&tmp,lbVolume * _numVels * sizeof(real));
-*/
-			time = swapping.getElapsedTime();
+			int _numVels = getNumVels();
+			real time2 = swapping.getElapsedTime();
 			for (int i = 0; i < _myNi[0]; i++) {
 				for (int j = 0; j < _myNi[1]; j++) {
 					for (int k = 0; k < _myNi[2]; k++) {
-/*						std::vector<real> tmp = std::vector<real>(_numVels, 0.);
-						memcpy(&tmp,&lbfluid[i][j][k], _numVels * sizeof(real));
-						memcpy(&lbfluid[i][j][k],&ghostlat[i][j][k], _numVels * sizeof(real));
-						memcpy(&ghostlat[i][j][k],&tmp, _numVels * sizeof(real));
+/*//						std::swap(ghostlat[i][j][k],lbfluid[i][j][k]);
+						real tmp[_numVels] = std::vector<real>(_numVels, 0.);
+						memcpy(&tmp,&lbfluid[i][j][k], sizeof(tmp));
+						memcpy(&lbfluid[i][j][k],&ghostlat[i][j][k], sizeof(tmp));
+						memcpy(&ghostlat[i][j][k],&tmp, sizeof(tmp));
 */
 						/* swap pointers for two lattices */
 						for (int l = 0; l < _numVels; l++) {
@@ -713,7 +699,7 @@ namespace espressopp {
 					}
 				}
 			}
-			time_sw += (swapping.getElapsedTime()-time);
+			time_sw += (swapping.getElapsedTime()-time2);
 
 			/* calculate den and j at the lattice sites in real region and copy them to halo */
 #warning: should one cancel this condition if pure lb is in use? or move setCouplForceLoc into the collision loop?
@@ -732,21 +718,7 @@ namespace espressopp {
 				
 				/* copy den and j from a real region to halo nodes */
 				copyDenMomToHalo();
-				
-/*				Int3D _myNi = getMyNi();
-				int _numVels = getNumVels();
-				int _offset = 0;
-				real totDen = 0.;
-				
-				for (int i = _offset; i<_myNi[0]-_offset; ++i) {
-					for (int j = _offset; j<_myNi[1]-_offset; ++j) {
-						for (int k = _offset; k<_myNi[2]-_offset; ++k) {
-							totDen += lbfluid[i][j][k].getF_i(_numVels);
-						}
-					}
-				}
-				printf ("total density (with halo) is %f \n", totDen);
-*/
+
 			}
     }
 		
@@ -1007,7 +979,6 @@ namespace espressopp {
 			int _offset = getHaloSkin();
 			Int3D _myNi = getMyNi();
 			
-//			printf ("getStepNum() is %d \n", getStepNum());
 			convert << getStepNum();
 			filename = "couplForces.";
 			filename.append(convert.str());
