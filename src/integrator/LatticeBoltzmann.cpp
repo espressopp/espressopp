@@ -146,22 +146,9 @@ namespace espressopp {
 					(*lbmom)[i][j].resize(getMyNi().getItem(2));
 				}
 			}
-			
-			/* initialise coupling forces as zeros */
-			for (int _i = 0; _i < getMyNi().getItem(0); _i++) {
-				for (int _j = 0; _j < getMyNi().getItem(1); _j++) {
-					for (int _k = 0; _k < getMyNi().getItem(2); _k++) {
-						(*lbfluid)[_i][_j][_k].setExtForceLoc(Real3D(0.));
-						(*ghostlat)[_i][_j][_k].setExtForceLoc(Real3D(0.));
-						if (_totNPart != 0) {				// if MD system has particles
-							(*lbfluid)[_i][_j][_k].setCouplForceLoc(Real3D(0.));
-							(*ghostlat)[_i][_j][_k].setCouplForceLoc(Real3D(0.));
-						}
-					}
-				}
-			}
-			
-			initLatticeModel();										// initialize all the global weights and coefficients from the local ones
+
+			/* initialise global weights and coefficients from the local ones */
+			initLatticeModel();
 
 		}
 		
@@ -244,16 +231,6 @@ namespace espressopp {
 		
 		void LatticeBoltzmann::setStart (int _start) { start = _start;}
 		int LatticeBoltzmann::getStart () { return start;}
-		
-		/* Setter and getter for histograms (if needed) */
-/*		void LatticeBoltzmann::setNBins (int _nBins) { nBins = _nBins;}
-		int LatticeBoltzmann::getNBins () { return nBins;}
-
-		void LatticeBoltzmann::setDistr (int _i, real _distr) { distr[_i] = _distr;}
-		real LatticeBoltzmann::getDistr (int _i) {return distr[_i];}
-		void LatticeBoltzmann::incDistr (int _i) { distr[_i] += 1.;}
-*/
-		//		void LatticeBoltzmann::calcHistogram (int _i, int _j, int _k);
 
 		/* Setter and getter for LB temperature things */
 		void LatticeBoltzmann::setLBTemp (real _lbTemp) { lbTemp = _lbTemp; initFluctuations();}
@@ -496,7 +473,6 @@ namespace espressopp {
 		
     /* Make one LB step. Push-pull scheme is used */
     void LatticeBoltzmann::makeLBStep () {
-#warning: get rid of get and set step num!
 			setStepNum(integrator->getStep());
 			int _stepNum = getStepNum();
 			int _nSteps = getNSteps();
@@ -506,7 +482,7 @@ namespace espressopp {
 				coupleLBtoMD ();
 			}
 			
-			if (_stepNum % 50 == 0) {
+			if (_stepNum % 5000 == 0) {
 				printf ("colstr takes %f sec, swapping %f\n",time_colstr,time_sw);
 
 				time_colstr = 0.;
@@ -687,7 +663,6 @@ namespace espressopp {
 					for (int j = 0; j < _myNi[1]; j++) {
 						for (int k = 0; k < _myNi[2]; k++) {
 							(*lbfluid)[i][j][k].setCouplForceLoc(Real3D(0.0));
-							(*ghostlat)[i][j][k].setCouplForceLoc(Real3D(0.0));
 						}
 					}
 				}
@@ -741,37 +716,7 @@ namespace espressopp {
       (*ghostlat)[_i][_jp][_km].setF_i(17,(*lbfluid)[_i][_j][_k].getF_i(17));
       (*ghostlat)[_i][_jm][_kp].setF_i(18,(*lbfluid)[_i][_j][_k].getF_i(18));
     }
-		
-/*******************************************************************************************/
-		
-		/* CALCULATE THE HISTOGRAM */
-//    void LatticeBoltzmann::calcHistogram (int _i, int _j, int _k) {
-      /* check velocity fluctuations at the lattice sites */
-/*      if (integrator->getStep() >= 500) {
-        int _nBins = getNBins();              // number of histogram bins
-        real _velRange = 0.4;                 // range of velocities fluctuations around eq.value
-        real _deltaV = _velRange / _nBins;    // the histogram step
-        real _velZ;                           // z-comp of the velocity shifted into positive side
-        _velZ = jzLoc / denLoc + 0.5 * _velRange;
-        distr[(int)(_velZ / _deltaV)] += 1.;
 
-        if (_step == 1000 && (_i + _j + _k) == (getNi().getItem(0) + getNi().getItem(1) + getNi().getItem(2) - 3)) {
-          real histSum = 0.;
-          for (int i = 0; i < _nBins; i++) histSum += distr[i];
-          for (int i = 0; i < _nBins; i++) distr[i] /= (histSum * _deltaV);
-          FILE * rngFile;
-          rngFile = fopen ("vel_dist.dat","a");
-          for (int i = 0; i < _nBins; i++) {
-            fprintf (rngFile, "%8.4f %8.4f \n", (i + 0.5) * _deltaV - 0.5 * _velRange, distr[i]);
-            // "+ 0.5" shifts the value of the distribution into the middle of the bin.
-            // Otherwise, the distribution values are plotted at where the bin starts!
-          }
-          fclose (rngFile);
-        } else {
-        }
-      }
-   }
-*/
 /*******************************************************************************************/
 		
     /* SCHEME OF MD TO LB COUPLING */
@@ -847,7 +792,6 @@ namespace espressopp {
 						_ip = bin[0] + _i; _jp = bin[1] + _j; _kp = bin[2] + _k;
 
  						_invDenLoc = 1. / (*lbmom)[_ip][_jp][_kp].getMom_i(0);
-						if (_invDenLoc != _invDenLoc) printf ("_invDenLoc[%d][%d][%d] is %8.4f. It comes from the density %8.4f\n", _ip,_jp,_kp,_invDenLoc, (*lbmom)[_ip][_jp][_kp].getMom_i(0));
 						_jLoc[0] = (*lbmom)[_ip][_jp][_kp].getMom_i(1);
 						_jLoc[1] = (*lbmom)[_ip][_jp][_kp].getMom_i(2);
 						_jLoc[2] = (*lbmom)[_ip][_jp][_kp].getMom_i(3);

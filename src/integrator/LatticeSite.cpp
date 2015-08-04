@@ -36,6 +36,8 @@ namespace espressopp {
   namespace integrator {
     LBSite::LBSite () {
 			f   = std::vector<real>(LatticePar::getNumVelsLoc(), 0.);
+			extForceLoc = Real3D(0.);
+			couplForceLoc = Real3D(0.);
     }
 		
 /*******************************************************************************************/
