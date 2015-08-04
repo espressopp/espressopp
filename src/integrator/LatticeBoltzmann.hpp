@@ -33,6 +33,9 @@
 #include "Int3D.hpp"
 #include "LatticeSite.hpp"
 
+typedef std::vector< std::vector< std::vector<espressopp::integrator::LBSite> > > lblattice;
+typedef std::vector< std::vector< std::vector<espressopp::integrator::LBMom> > > lbmoments;
+
 namespace espressopp {
 	namespace integrator {
 		class LatticeBoltzmann : public Extension {
@@ -83,11 +86,11 @@ namespace espressopp {
 			void setGammaEven (real _gamma_even);	// set gamma even
 			real getGammaEven ();									// get gamma even
 			
-			void setViscB (real _visc_b);				// set bulk viscosity
-			real getViscB ();										// get bulk viscosity
+			void setViscB (real _visc_b);					// set bulk viscosity
+			real getViscB ();											// get bulk viscosity
 			
-			void setViscS (real _visc_s);				// set shear viscosity
-			real getViscS ();										// get shear viscosity
+			void setViscS (real _visc_s);					// set shear viscosity
+			real getViscS ();											// get shear viscosity
 			
 			void setExtForceFlag (int _extForceFlag);	// set a flag for external force
 			int getExtForceFlag ();								// get a flag for external force
@@ -133,7 +136,10 @@ namespace espressopp {
 
 			void setLBFluid (Int3D _Ni, int _l, real _value);
 			real getLBFluid (Int3D _Ni, int _l);
-
+			
+			void setLBMom (Int3D _Ni, int _l, real _value);
+			real getLBMom (Int3D _Ni, int _l);
+			
 			void setExtForceLoc (Int3D _Ni, Real3D _extForceLoc);
 			Real3D getExtForceLoc (Int3D _Ni);
 			void addExtForceLoc (Int3D _Ni, Real3D _extForceLoc);
@@ -169,9 +175,7 @@ namespace espressopp {
 			void coupleLBtoMD();
 			void calcRandForce(class Particle&);
 			void restoreLBForces();									// restore LB-forces from previous timestep to act onto MD particles
-//		void calcInterVel(class Particle&);
 			void calcViscForce(class Particle&);
-//		void extrapMomToNodes(class Particle&, real _timestep);
 			void calcDenMom ();
 			real convMDtoLB (int _opCode);
 			
@@ -267,10 +271,11 @@ namespace espressopp {
 			/*	two lattices. lbfluid has f,m and meq. ghostlat has f only.
 			*		the latter one used for sake of simplicity during streaming
 			*/
-//			std::vector< std::vector< std::vector<LBPop> > > lbpop;
-			std::vector< std::vector< std::vector<LBSite> > > lbfluid;
-			std::vector< std::vector< std::vector<GhostLattice> > > ghostlat;
 
+			lblattice *lbfluid;
+			lblattice *ghostlat;
+			lbmoments *lbmom;
+			
 			int nBins;
 			std::vector<real> distr;
 
@@ -292,9 +297,6 @@ namespace espressopp {
 			boost::signals2::connection _recalc2;
 			
 			// TIMERS
-//			esutil::WallTimer timeCollStream;  //!< used for timing
-//			esutil::WallTimer timeComm;  //!< used for timing
-//			esutil::WallTimer timeCouple;  //!< used for timing
 			esutil::WallTimer swapping, colstream;
 			real time_sw, time_colstr;
 			

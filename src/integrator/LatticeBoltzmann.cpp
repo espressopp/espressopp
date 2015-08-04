@@ -119,48 +119,30 @@ namespace espressopp {
 			}
 			setMyNi (_numSites);
 			setMyLeft (_myLeft);
-//			printf ("_myRank is %d. _myPosition is %d %d %d. _numSites I should be responsible for is %d %d %d. My left borders are %f %f %f\n", _myRank, getMyPosition().getItem(0), getMyPosition().getItem(1), getMyPosition().getItem(2), getMyNi().getItem(0), getMyNi().getItem(1), getMyNi()[2], getMyLeft()[0], getMyLeft()[1], getMyLeft()[2]);
- 
-			/* setup histogram variables */
-//			setNBins(20);
-//			distr = std::vector<real>(getNBins(), 0.);
 
-      /* check random number generator */
-/*    real _rand;
-      int nBins = 50;
-      int fails = 0;
-      std::vector<int> distr;
-      distr = std::vector<int>(nBins, 0);
-      for (int i = 0; i < 100000; i++) {
-        _rand = (*rng)();
-        if (_rand != 1.) {
-          distr[(int)(_rand * nBins)] += 1;
-        } else {
-          fails += 1;
-        }
-      }
-
-      FILE * rngFile;
-      rngFile = fopen ("rng_dist.dat","a");
-      for (int i = 0; i < nBins; i++) {
-        fprintf (rngFile, "%9d %9d \n", i, distr[i]);
-      }
-      fclose (rngFile);
-*/
-			LatticePar(_system, getNumVels(),getA(),getTau());	// pass system, a and tau to the local sites
+			/* initialise lattice parameters */
+			LatticePar(_system, getNumVels(),getA(),getTau());		// pass system, a and tau to the local sites
 
 			/* setup lattices by resizing them in 3 dimensions */
-			lbfluid.resize(getMyNi().getItem(0));								// resize x-dimension of the lbfluid array
-			ghostlat.resize(getMyNi().getItem(0));								// resize x-dimension of the ghostlat array
+			lbfluid = new lblattice;
+			ghostlat = new lblattice;
+			lbmom = new lbmoments;
+			
+			(*lbfluid).resize(getMyNi().getItem(0));									// resize x-dimension of the lbfluid array
+			(*ghostlat).resize(getMyNi().getItem(0));								// resize x-dimension of the ghostlat array
+			(*lbmom).resize(getMyNi().getItem(0));										// resize x-dimension of lbmom array
+
 			for (int i = 0; i < getMyNi().getItem(0); i++) {
-				lbfluid[i].resize(getMyNi().getItem(1));						// resize y-dimension of the lbfluid array
-				ghostlat[i].resize(getMyNi().getItem(1));					// resize y-dimension of the ghostlat array
+				(*lbfluid)[i].resize(getMyNi().getItem(1));						// resize y-dimension of the lbfluid array
+				(*ghostlat)[i].resize(getMyNi().getItem(1));						// resize y-dimension of the ghostlat array
+				(*lbmom)[i].resize(getMyNi().getItem(1));						// resize y-dimension of lbmom array
 				for (int j = 0; j < getMyNi().getItem(1); j++) {
-					lbfluid[i][j].resize(getMyNi().getItem(2), LBSite());
-					ghostlat[i][j].resize(getMyNi().getItem(2), GhostLattice());
+					(*lbfluid)[i][j].resize(getMyNi().getItem(2));
+					(*ghostlat)[i][j].resize(getMyNi().getItem(2));
+					(*lbmom)[i][j].resize(getMyNi().getItem(2));
 				}
 			}
-
+			
 			initLatticeModel();										// initialize all the global weights and coefficients from the local ones
 
 		}
@@ -170,6 +152,10 @@ namespace espressopp {
 		void LatticeBoltzmann::disconnect() {
 			_recalc2.disconnect();
 			_befIntV.disconnect();
+			
+			delete (lbfluid);
+			delete (ghostlat);
+			delete (lbmom);
 		}
 
 		void LatticeBoltzmann::connect() {
@@ -290,11 +276,11 @@ namespace espressopp {
 		int LatticeBoltzmann::getCouplForceFlag () {return couplForceFlag;}
 
 		void LatticeBoltzmann::setExtForceLoc (Int3D _Ni, Real3D _extForceLoc) {
-			return lbfluid[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setExtForceLoc(_extForceLoc);	}
+			return (*lbfluid)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setExtForceLoc(_extForceLoc);	}
 		Real3D LatticeBoltzmann::getExtForceLoc (Int3D _Ni) {
-			return lbfluid[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].getExtForceLoc();	}
+			return (*lbfluid)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].getExtForceLoc();	}
 		void LatticeBoltzmann::addExtForceLoc (Int3D _Ni, Real3D _extForceLoc) {
-			return lbfluid[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].addExtForceLoc(_extForceLoc);	}
+			return (*lbfluid)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].addExtForceLoc(_extForceLoc);	}
 
 		void LatticeBoltzmann::setFricCoeff (real _fricCoeff) { fricCoeff = _fricCoeff;}
 		real LatticeBoltzmann::getFricCoeff () { return fricCoeff;}
@@ -315,12 +301,17 @@ namespace espressopp {
 		
 		/* Setter and getter for access to population values */
 		void LatticeBoltzmann::setLBFluid (Int3D _Ni, int _l, real _value) {
-			lbfluid[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setF_i(_l, _value);	}
+			(*lbfluid)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setF_i(_l, _value);	}
 		real LatticeBoltzmann::getLBFluid (Int3D _Ni, int _l) {
-			return lbfluid[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].getF_i(_l);	}
+			return (*lbfluid)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].getF_i(_l);	}
 		
 		void LatticeBoltzmann::setGhostFluid (Int3D _Ni, int _l, real _value) {
-			ghostlat[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setPop_i(_l, _value);	}
+			(*ghostlat)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setF_i(_l, _value);	}
+	
+		void LatticeBoltzmann::setLBMom (Int3D _Ni, int _l, real _value) {
+			(*lbmom)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setMom_i(_l, _value);	}
+		real LatticeBoltzmann::getLBMom (Int3D _Ni, int _l) {
+			return (*lbmom)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].getMom_i(_l);	}
 		
 		/* Helpers for MD to LB (and vice versa) unit conversion */
 		real LatticeBoltzmann::convMassMDtoLB() {return 1.;}
@@ -366,7 +357,7 @@ namespace espressopp {
 				for (int j = 0; j < getMyNi().getItem(1); j++) {
 					for (int k = 0; k < getMyNi().getItem(2); k++) {
 						for (int l = 0; l < getNumVels(); l++) {
-							lbfluid[i][j][k].initLatticeModelLoc();
+							(*lbfluid)[i][j][k].initLatticeModelLoc();
 						}
 					}
 				}
@@ -374,8 +365,8 @@ namespace espressopp {
 
 			// pass local eq. weights and inversed coeff. to the global ones
 			for (int l = 0; l < getNumVels(); l++) {
-				setEqWeight(l, lbfluid[0][0][0].getEqWeightLoc(l));
-				setInvB(l, lbfluid[0][0][0].getInvBLoc(l));
+				setEqWeight(l, (*lbfluid)[0][0][0].getEqWeightLoc(l));
+				setInvB(l, (*lbfluid)[0][0][0].getInvBLoc(l));
 			}
 		}
 
@@ -392,10 +383,10 @@ namespace espressopp {
         for (int j = 0; j < getMyNi().getItem(1); j++) {
           for (int k = 0; k < getMyNi().getItem(2); k++) {
             for (int l = 0; l < getNumVels(); l++) {		// ich glaube die Schleife ist überflüssig hier
-              if (_idGamma == 0) lbfluid[i][j][k].setGammaBLoc(getGammaB());
-              if (_idGamma == 1) lbfluid[i][j][k].setGammaSLoc(getGammaS());
-              if (_idGamma == 2) lbfluid[i][j][k].setGammaOddLoc(getGammaOdd());
-              if (_idGamma == 3) lbfluid[i][j][k].setGammaEvenLoc(getGammaEven());
+              if (_idGamma == 0) (*lbfluid)[i][j][k].setGammaBLoc(getGammaB());
+              if (_idGamma == 1) (*lbfluid)[i][j][k].setGammaSLoc(getGammaS());
+              if (_idGamma == 2) (*lbfluid)[i][j][k].setGammaOddLoc(getGammaOdd());
+              if (_idGamma == 3) (*lbfluid)[i][j][k].setGammaEvenLoc(getGammaEven());
             }
           }
         }
@@ -406,10 +397,10 @@ namespace espressopp {
 			if (_myRank == 0) {
 				std::cout << setprecision(8);
 				std::cout << "One of the gamma's controlling viscosities has been changed:\n";
-				if (_idGamma == 0) std::cout << "  gammaB is " << lbfluid[0][0][0].getGammaBLoc() << "\n";
-				if (_idGamma == 1) std::cout << "  gammaS is " << lbfluid[0][0][0].getGammaSLoc() << "\n";
-				if (_idGamma == 2) std::cout << ", gammaOdd is " << lbfluid[0][0][0].getGammaOddLoc() << "\n";
-				if (_idGamma == 3) std::cout << ", gammaEven is " << lbfluid[0][0][0].getGammaEvenLoc() << "\n";
+				if (_idGamma == 0) std::cout << "  gammaB is " << (*lbfluid)[0][0][0].getGammaBLoc() << "\n";
+				if (_idGamma == 1) std::cout << "  gammaS is " << (*lbfluid)[0][0][0].getGammaSLoc() << "\n";
+				if (_idGamma == 2) std::cout << ", gammaOdd is " << (*lbfluid)[0][0][0].getGammaOddLoc() << "\n";
+				if (_idGamma == 3) std::cout << ", gammaEven is " << (*lbfluid)[0][0][0].getGammaEvenLoc() << "\n";
 				std::cout << "-------------------------------------\n";
 			}
     }
@@ -470,7 +461,7 @@ namespace espressopp {
           for (int j = 0; j < getMyNi().getItem(1); j++) {
             for (int k = 0; k < getMyNi().getItem(2); k++) {
               for (int l = 0; l < getNumVels(); l++) {
-                lbfluid[i][j][k].setPhiLoc(l,getPhi(l));    // set amplitudes of local fluctuations
+                (*lbfluid)[i][j][k].setPhiLoc(l,getPhi(l));    // set amplitudes of local fluctuations
               }
             }
           }
@@ -491,20 +482,10 @@ namespace espressopp {
 			setStepNum(integrator->getStep());
 			int _stepNum = getStepNum();
 			int _nSteps = getNSteps();
-//			real time, timeCoup, timeCS;											// timers for performance measurement
-//			int lbVolume = getNi()[0]*getNi()[1]*getNi()[2];
-			
-//			timeCouple.reset();
-//			timeCollStream.reset();
 			
 			if (getCouplForceFlag() == 1) {
-//				time = timeCouple.getElapsedTime();
-				
 				makeDecompose();
 				coupleLBtoMD ();
-				
-//				timeCoup = timeCouple.getElapsedTime() - time;
-//				printf ("time spent on coupling is %f sec\n", timeCoup);
 			}
 			
 			if (_stepNum % 50 == 0) {
@@ -517,13 +498,8 @@ namespace espressopp {
 			}
 			
 			if (_stepNum % _nSteps == 0) {
-//				time = timeCollStream.getElapsedTime();
-				
 				/* PUSH-scheme (first collide then stream) */
 				collideStream ();
-				
-//				timeCS = timeCollStream.getElapsedTime() - time;
-//				printf ("time spent on collision and streaming is %f sec, MLUPS: %f \n", timeCS, lbVolume * 1e-6 / timeCS);
 			}
 		}
 		
@@ -669,7 +645,7 @@ namespace espressopp {
         for (int j = _offset; j < _myNi[1]-_offset; j++) {
           for (int k = _offset; k < _myNi[2]-_offset; k++) {
 
-						lbfluid[i][j][k].collision(_lbTempFlag, _extForceFlag, _couplForceFlag);
+						(*lbfluid)[i][j][k].collision(_lbTempFlag, _extForceFlag, _couplForceFlag);
 
 						streaming (i,j,k);
 					}
@@ -679,26 +655,11 @@ namespace espressopp {
 	
 			commHalo();
 
-			int _numVels = getNumVels();
 			real time2 = swapping.getElapsedTime();
-			for (int i = 0; i < _myNi[0]; i++) {
-				for (int j = 0; j < _myNi[1]; j++) {
-					for (int k = 0; k < _myNi[2]; k++) {
-/*//						std::swap(ghostlat[i][j][k],lbfluid[i][j][k]);
-						real tmp[_numVels] = std::vector<real>(_numVels, 0.);
-						memcpy(&tmp,&lbfluid[i][j][k], sizeof(tmp));
-						memcpy(&lbfluid[i][j][k],&ghostlat[i][j][k], sizeof(tmp));
-						memcpy(&ghostlat[i][j][k],&tmp, sizeof(tmp));
-*/
-						/* swap pointers for two lattices */
-						for (int l = 0; l < _numVels; l++) {
-							real tmp = lbfluid[i][j][k].getF_i(l);
-							lbfluid[i][j][k].setF_i(l, ghostlat[i][j][k].getPop_i(l));
-							ghostlat[i][j][k].setPop_i(l, tmp);
-						}
-					}
-				}
-			}
+			lblattice *tmp = lbfluid;
+			lbfluid = ghostlat;
+			ghostlat =tmp;
+
 			time_sw += (swapping.getElapsedTime()-time2);
 
 			/* calculate den and j at the lattice sites in real region and copy them to halo */
@@ -708,7 +669,7 @@ namespace espressopp {
 				for (int i = 0; i < _myNi[0]; i++) {
 					for (int j = 0; j < _myNi[1]; j++) {
 						for (int k = 0; k < _myNi[2]; k++) {
-							lbfluid[i][j][k].setCouplForceLoc(Real3D(0.0));
+							(*lbfluid)[i][j][k].setCouplForceLoc(Real3D(0.0));
 						}
 					}
 				}
@@ -718,7 +679,7 @@ namespace espressopp {
 				
 				/* copy den and j from a real region to halo nodes */
 				copyDenMomToHalo();
-
+				
 			}
     }
 		
@@ -738,29 +699,29 @@ namespace espressopp {
 
       // streaming itself //
       // do not move the staying populations
-      ghostlat[_i][_j][_k].setPop_i(0,lbfluid[_i][_j][_k].getF_i(0));
+      (*ghostlat)[_i][_j][_k].setF_i(0,(*lbfluid)[_i][_j][_k].getF_i(0));
 
       // move populations to the nearest neighbors
-      ghostlat[_ip][_j][_k].setPop_i(1,lbfluid[_i][_j][_k].getF_i(1));
-      ghostlat[_im][_j][_k].setPop_i(2,lbfluid[_i][_j][_k].getF_i(2));
-      ghostlat[_i][_jp][_k].setPop_i(3,lbfluid[_i][_j][_k].getF_i(3));
-      ghostlat[_i][_jm][_k].setPop_i(4,lbfluid[_i][_j][_k].getF_i(4));
-      ghostlat[_i][_j][_kp].setPop_i(5,lbfluid[_i][_j][_k].getF_i(5));
-      ghostlat[_i][_j][_km].setPop_i(6,lbfluid[_i][_j][_k].getF_i(6));
+      (*ghostlat)[_ip][_j][_k].setF_i(1,(*lbfluid)[_i][_j][_k].getF_i(1));
+      (*ghostlat)[_im][_j][_k].setF_i(2,(*lbfluid)[_i][_j][_k].getF_i(2));
+      (*ghostlat)[_i][_jp][_k].setF_i(3,(*lbfluid)[_i][_j][_k].getF_i(3));
+      (*ghostlat)[_i][_jm][_k].setF_i(4,(*lbfluid)[_i][_j][_k].getF_i(4));
+      (*ghostlat)[_i][_j][_kp].setF_i(5,(*lbfluid)[_i][_j][_k].getF_i(5));
+      (*ghostlat)[_i][_j][_km].setF_i(6,(*lbfluid)[_i][_j][_k].getF_i(6));
 
       // move populations to the next-to-the-nearest neighbors
-      ghostlat[_ip][_jp][_k].setPop_i(7,lbfluid[_i][_j][_k].getF_i(7));
-      ghostlat[_im][_jm][_k].setPop_i(8,lbfluid[_i][_j][_k].getF_i(8));
-      ghostlat[_ip][_jm][_k].setPop_i(9,lbfluid[_i][_j][_k].getF_i(9));
-      ghostlat[_im][_jp][_k].setPop_i(10,lbfluid[_i][_j][_k].getF_i(10));
-      ghostlat[_ip][_j][_kp].setPop_i(11,lbfluid[_i][_j][_k].getF_i(11));
-      ghostlat[_im][_j][_km].setPop_i(12,lbfluid[_i][_j][_k].getF_i(12));
-      ghostlat[_ip][_j][_km].setPop_i(13,lbfluid[_i][_j][_k].getF_i(13));
-      ghostlat[_im][_j][_kp].setPop_i(14,lbfluid[_i][_j][_k].getF_i(14));
-      ghostlat[_i][_jp][_kp].setPop_i(15,lbfluid[_i][_j][_k].getF_i(15));
-      ghostlat[_i][_jm][_km].setPop_i(16,lbfluid[_i][_j][_k].getF_i(16));
-      ghostlat[_i][_jp][_km].setPop_i(17,lbfluid[_i][_j][_k].getF_i(17));
-      ghostlat[_i][_jm][_kp].setPop_i(18,lbfluid[_i][_j][_k].getF_i(18));
+      (*ghostlat)[_ip][_jp][_k].setF_i(7,(*lbfluid)[_i][_j][_k].getF_i(7));
+      (*ghostlat)[_im][_jm][_k].setF_i(8,(*lbfluid)[_i][_j][_k].getF_i(8));
+      (*ghostlat)[_ip][_jm][_k].setF_i(9,(*lbfluid)[_i][_j][_k].getF_i(9));
+      (*ghostlat)[_im][_jp][_k].setF_i(10,(*lbfluid)[_i][_j][_k].getF_i(10));
+      (*ghostlat)[_ip][_j][_kp].setF_i(11,(*lbfluid)[_i][_j][_k].getF_i(11));
+      (*ghostlat)[_im][_j][_km].setF_i(12,(*lbfluid)[_i][_j][_k].getF_i(12));
+      (*ghostlat)[_ip][_j][_km].setF_i(13,(*lbfluid)[_i][_j][_k].getF_i(13));
+      (*ghostlat)[_im][_j][_kp].setF_i(14,(*lbfluid)[_i][_j][_k].getF_i(14));
+      (*ghostlat)[_i][_jp][_kp].setF_i(15,(*lbfluid)[_i][_j][_k].getF_i(15));
+      (*ghostlat)[_i][_jm][_km].setF_i(16,(*lbfluid)[_i][_j][_k].getF_i(16));
+      (*ghostlat)[_i][_jp][_km].setF_i(17,(*lbfluid)[_i][_j][_k].getF_i(17));
+      (*ghostlat)[_i][_jm][_kp].setF_i(18,(*lbfluid)[_i][_j][_k].getF_i(18));
     }
 		
 /*******************************************************************************************/
@@ -806,9 +767,7 @@ namespace espressopp {
 			// loop over all real particles in the current CPU
 			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 				calcRandForce(*cit);				// calculate random force exerted by the fluid onto a particle
-//				calcInterVel(*cit);									// interpolate velocity of the fluid to monomer's position
 				calcViscForce(*cit);			// calculate viscous drag force exerted by the fluid onto a particle
-//				extrapMomToNodes(*cit, timestep);	// extrapolate momentum transfer to the neighboring nodes
 			}
     }
 		
@@ -844,7 +803,7 @@ namespace espressopp {
 			bin[0] = floor (_posLB[0]); bin[1] = floor (_posLB[1]); bin[2] = floor (_posLB[2]);
 
 			// weight factors, dimensionless
-			static std::vector<real> delta = std::vector<real>(6, 0.);
+			std::vector<real> delta = std::vector<real>(6, 0.);
 			delta[0] = _posLB[0] - bin[0];
 			delta[1] = _posLB[1] - bin[1]; 
 			delta[2] = _posLB[2] - bin[2];
@@ -852,13 +811,13 @@ namespace espressopp {
 			delta[4] = _a - delta[1];
 			delta[5] = _a - delta[2];
 			
-			int _numVels = getNumVels();
 			real _convTimeMDtoLB = convTimeMDtoLB();
 			real _convLenMDtoLB = convLenMDtoLB();
 			real _convMassMDtoLB = convMassMDtoLB();
-			static real _invDenLoc;
-			static Real3D _jLoc;
-			static Real3D _u;
+			int _numVels = getNumVels();
+			real _invDenLoc;
+			Real3D _jLoc;
+			Real3D _u;
 			
 			setInterpVel (Real3D(0.,0.,0.));
 			// loop over neighboring LB nodes
@@ -868,13 +827,13 @@ namespace espressopp {
 					for (int _k = 0; _k < 2; _k++) {
 						// assign iterations
 						_ip = bin[0] + _i; _jp = bin[1] + _j; _kp = bin[2] + _k;
-						
-						_invDenLoc = 1. / lbfluid[_ip][_jp][_kp].getF_i(_numVels);
 
-						_jLoc[0] = lbfluid[_ip][_jp][_kp].getF_i(_numVels+1);
-						_jLoc[1] = lbfluid[_ip][_jp][_kp].getF_i(_numVels+2);
-						_jLoc[2] = lbfluid[_ip][_jp][_kp].getF_i(_numVels+3);
-						
+ 						_invDenLoc = 1. / (*lbmom)[_ip][_jp][_kp].getMom_i(0);
+						printf ("_invDenLoc is %8.4f\n", _invDenLoc);
+						_jLoc[0] = (*lbmom)[_ip][_jp][_kp].getMom_i(1);
+						_jLoc[1] = (*lbmom)[_ip][_jp][_kp].getMom_i(2);
+						_jLoc[2] = (*lbmom)[_ip][_jp][_kp].getMom_i(3);
+
 						_u = _jLoc;
 						_u *= _convTimeMDtoLB;
 						_u *= _invDenLoc;
@@ -907,7 +866,7 @@ namespace espressopp {
 						_fLoc *= delta[3*_i]; _fLoc *= delta[3*_j+1]; _fLoc *= delta[3*_k+2];
 						
 						// add coupling force to the correspondent lattice cite
-						lbfluid[_ip][_jp][_kp].addCouplForceLoc(_fLoc);
+						(*lbfluid)[_ip][_jp][_kp].addCouplForceLoc(_fLoc);
 					}
 				}
 			}
@@ -948,13 +907,13 @@ namespace espressopp {
 						real denLoc = 0.;
 						Real3D jLoc = Real3D(0.);
 						for (int l = 0; l < _numVels; l++) {
-							denLoc += lbfluid[i][j][k].getF_i(l);
-							jLoc += lbfluid[i][j][k].getF_i(l)*getCi(l);
+							denLoc += (*lbfluid)[i][j][k].getF_i(l);
+							jLoc += (*lbfluid)[i][j][k].getF_i(l)*getCi(l);
 						}
-						lbfluid[i][j][k].setF_i(_numVels,denLoc);
-						lbfluid[i][j][k].setF_i(_numVels+1,jLoc[0]);
-						lbfluid[i][j][k].setF_i(_numVels+2,jLoc[1]);
-						lbfluid[i][j][k].setF_i(_numVels+3,jLoc[2]);
+						(*lbmom)[i][j][k].setMom_i(0,denLoc);
+						(*lbmom)[i][j][k].setMom_i(1,jLoc[0]);
+						(*lbmom)[i][j][k].setMom_i(2,jLoc[1]);
+						(*lbmom)[i][j][k].setMom_i(3,jLoc[2]);
 					}
 				}
 			}
@@ -1023,7 +982,7 @@ namespace espressopp {
 						for (int _k = _offset; _k < _myNi[2] - _offset; _k++) {
 							fscanf (couplForcesFile, "%d %d %d %lf %lf %lf\n",
 											&_it, &_jt, &_kt, &_fx, &_fy, &_fz);
-							lbfluid[_it][_jt][_kt].setCouplForceLoc(Real3D(_fx,_fy,_fz));
+							(*lbfluid)[_it][_jt][_kt].setCouplForceLoc(Real3D(_fx,_fy,_fz));
 						}
 					}
 				}
@@ -1074,9 +1033,9 @@ namespace espressopp {
 					for (int _k = _offset; _k < _myNi[2] - _offset; _k++) {
 						fprintf (couplForcesFile, "%5d %5d %5d %20.14f %20.14f %20.14f  \n",
 										 _i, _j, _k,
-										 lbfluid[_i][_j][_k].getCouplForceLoc().getItem(0),
-										 lbfluid[_i][_j][_k].getCouplForceLoc().getItem(1),
-										 lbfluid[_i][_j][_k].getCouplForceLoc().getItem(2));
+										 (*lbfluid)[_i][_j][_k].getCouplForceLoc().getItem(0),
+										 (*lbfluid)[_i][_j][_k].getCouplForceLoc().getItem(1),
+										 (*lbfluid)[_i][_j][_k].getCouplForceLoc().getItem(2));
 					}
 				}
 			}
@@ -1179,11 +1138,11 @@ namespace espressopp {
 			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (j=0; j<_myNi[1]; j++) {
-					bufToSend[index] = ghostlat[i][j][k].getPop_i(1);
-					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(7);
-					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(9);
-					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(11);
-					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(13);
+					bufToSend[index] = (*ghostlat)[i][j][k].getF_i(1);
+					bufToSend[index+1] = (*ghostlat)[i][j][k].getF_i(7);
+					bufToSend[index+2] = (*ghostlat)[i][j][k].getF_i(9);
+					bufToSend[index+3] = (*ghostlat)[i][j][k].getF_i(11);
+					bufToSend[index+4] = (*ghostlat)[i][j][k].getF_i(13);
 					index += numPopTransf;
 				}
 			}
@@ -1206,11 +1165,11 @@ namespace espressopp {
 			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (j=0; j<_myNi[1]; j++) {
-					ghostlat[i][j][k].setPop_i(1, bufToRecv[index]);
-					ghostlat[i][j][k].setPop_i(7, bufToRecv[index+1]);
-					ghostlat[i][j][k].setPop_i(9, bufToRecv[index+2]);
-					ghostlat[i][j][k].setPop_i(11, bufToRecv[index+3]);
-					ghostlat[i][j][k].setPop_i(13, bufToRecv[index+4]);
+					(*ghostlat)[i][j][k].setF_i(1, bufToRecv[index]);
+					(*ghostlat)[i][j][k].setF_i(7, bufToRecv[index+1]);
+					(*ghostlat)[i][j][k].setF_i(9, bufToRecv[index+2]);
+					(*ghostlat)[i][j][k].setF_i(11, bufToRecv[index+3]);
+					(*ghostlat)[i][j][k].setF_i(13, bufToRecv[index+4]);
 					index += numPopTransf;
 				}
 			}
@@ -1224,11 +1183,11 @@ namespace espressopp {
 			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (j=0; j<_myNi[1]; j++) {
-					bufToSend[index] = ghostlat[i][j][k].getPop_i(2);
-					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(8);
-					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(10);
-					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(12);
-					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(14);
+					bufToSend[index] = (*ghostlat)[i][j][k].getF_i(2);
+					bufToSend[index+1] = (*ghostlat)[i][j][k].getF_i(8);
+					bufToSend[index+2] = (*ghostlat)[i][j][k].getF_i(10);
+					bufToSend[index+3] = (*ghostlat)[i][j][k].getF_i(12);
+					bufToSend[index+4] = (*ghostlat)[i][j][k].getF_i(14);
 					index += numPopTransf;
 				}
 			}
@@ -1251,11 +1210,11 @@ namespace espressopp {
 			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (j=0; j<_myNi[1]; j++) {
-					ghostlat[i][j][k].setPop_i(2, bufToRecv[index+0]);
-					ghostlat[i][j][k].setPop_i(8, bufToRecv[index+1]);
-					ghostlat[i][j][k].setPop_i(10, bufToRecv[index+2]);
-					ghostlat[i][j][k].setPop_i(12, bufToRecv[index+3]);
-					ghostlat[i][j][k].setPop_i(14, bufToRecv[index+4]);
+					(*ghostlat)[i][j][k].setF_i(2, bufToRecv[index+0]);
+					(*ghostlat)[i][j][k].setF_i(8, bufToRecv[index+1]);
+					(*ghostlat)[i][j][k].setF_i(10, bufToRecv[index+2]);
+					(*ghostlat)[i][j][k].setF_i(12, bufToRecv[index+3]);
+					(*ghostlat)[i][j][k].setF_i(14, bufToRecv[index+4]);
 					index += numPopTransf;
 				}
 			}
@@ -1277,11 +1236,11 @@ namespace espressopp {
 			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (i=0; i<_myNi[0]; i++) {
-					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(3);
-					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(7);
-					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(10);
-					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(15);
-					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(17);
+					bufToSend[index+0] = (*ghostlat)[i][j][k].getF_i(3);
+					bufToSend[index+1] = (*ghostlat)[i][j][k].getF_i(7);
+					bufToSend[index+2] = (*ghostlat)[i][j][k].getF_i(10);
+					bufToSend[index+3] = (*ghostlat)[i][j][k].getF_i(15);
+					bufToSend[index+4] = (*ghostlat)[i][j][k].getF_i(17);
 					index += numPopTransf;
 				}
 			}
@@ -1304,11 +1263,11 @@ namespace espressopp {
 			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (i=0; i<_myNi[0]; i++) {
-					ghostlat[i][j][k].setPop_i(3, bufToRecv[index+0]);
-					ghostlat[i][j][k].setPop_i(7, bufToRecv[index+1]);
-					ghostlat[i][j][k].setPop_i(10, bufToRecv[index+2]);
-					ghostlat[i][j][k].setPop_i(15, bufToRecv[index+3]);
-					ghostlat[i][j][k].setPop_i(17, bufToRecv[index+4]);
+					(*ghostlat)[i][j][k].setF_i(3, bufToRecv[index+0]);
+					(*ghostlat)[i][j][k].setF_i(7, bufToRecv[index+1]);
+					(*ghostlat)[i][j][k].setF_i(10, bufToRecv[index+2]);
+					(*ghostlat)[i][j][k].setF_i(15, bufToRecv[index+3]);
+					(*ghostlat)[i][j][k].setF_i(17, bufToRecv[index+4]);
 					index += numPopTransf;
 				}
 			}
@@ -1322,11 +1281,11 @@ namespace espressopp {
 			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (i=0; i<_myNi[0]; i++) {
-					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(4);
-					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(8);
-					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(9);
-					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(16);
-					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(18);
+					bufToSend[index+0] = (*ghostlat)[i][j][k].getF_i(4);
+					bufToSend[index+1] = (*ghostlat)[i][j][k].getF_i(8);
+					bufToSend[index+2] = (*ghostlat)[i][j][k].getF_i(9);
+					bufToSend[index+3] = (*ghostlat)[i][j][k].getF_i(16);
+					bufToSend[index+4] = (*ghostlat)[i][j][k].getF_i(18);
 					index += numPopTransf;
 				}
 			}
@@ -1349,11 +1308,11 @@ namespace espressopp {
 			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (i=0; i<_myNi[0]; i++) {
-					ghostlat[i][j][k].setPop_i(4, bufToRecv[index+0]);
-					ghostlat[i][j][k].setPop_i(8, bufToRecv[index+1]);
-					ghostlat[i][j][k].setPop_i(9, bufToRecv[index+2]);
-					ghostlat[i][j][k].setPop_i(16, bufToRecv[index+3]);
-					ghostlat[i][j][k].setPop_i(18, bufToRecv[index+4]);
+					(*ghostlat)[i][j][k].setF_i(4, bufToRecv[index+0]);
+					(*ghostlat)[i][j][k].setF_i(8, bufToRecv[index+1]);
+					(*ghostlat)[i][j][k].setF_i(9, bufToRecv[index+2]);
+					(*ghostlat)[i][j][k].setF_i(16, bufToRecv[index+3]);
+					(*ghostlat)[i][j][k].setF_i(18, bufToRecv[index+4]);
 					index += numPopTransf;
 				}
 			}
@@ -1374,11 +1333,11 @@ namespace espressopp {
 			index = 0;
 			for (j=0; j<_myNi[1]; j++) {
 				for (i=0; i<_myNi[0]; i++) {
-					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(5);
-					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(11);
-					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(14);
-					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(15);
-					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(18);
+					bufToSend[index+0] = (*ghostlat)[i][j][k].getF_i(5);
+					bufToSend[index+1] = (*ghostlat)[i][j][k].getF_i(11);
+					bufToSend[index+2] = (*ghostlat)[i][j][k].getF_i(14);
+					bufToSend[index+3] = (*ghostlat)[i][j][k].getF_i(15);
+					bufToSend[index+4] = (*ghostlat)[i][j][k].getF_i(18);
 					index += numPopTransf;
 				}
 			}
@@ -1401,11 +1360,11 @@ namespace espressopp {
 			index = 0;
 			for (j=0; j<_myNi[1]; j++) {
 				for (i=0; i<_myNi[0]; i++) {
-					ghostlat[i][j][k].setPop_i(5, bufToRecv[index+0]);
-					ghostlat[i][j][k].setPop_i(11, bufToRecv[index+1]);
-					ghostlat[i][j][k].setPop_i(14, bufToRecv[index+2]);
-					ghostlat[i][j][k].setPop_i(15, bufToRecv[index+3]);
-					ghostlat[i][j][k].setPop_i(18, bufToRecv[index+4]);
+					(*ghostlat)[i][j][k].setF_i(5, bufToRecv[index+0]);
+					(*ghostlat)[i][j][k].setF_i(11, bufToRecv[index+1]);
+					(*ghostlat)[i][j][k].setF_i(14, bufToRecv[index+2]);
+					(*ghostlat)[i][j][k].setF_i(15, bufToRecv[index+3]);
+					(*ghostlat)[i][j][k].setF_i(18, bufToRecv[index+4]);
 					index += numPopTransf;
 				}
 			}
@@ -1419,11 +1378,11 @@ namespace espressopp {
 			index = 0;
 			for (j=0; j<_myNi[1]; j++) {
 				for (i=0; i<_myNi[0]; i++) {
-					bufToSend[index+0] = ghostlat[i][j][k].getPop_i(6);
-					bufToSend[index+1] = ghostlat[i][j][k].getPop_i(12);
-					bufToSend[index+2] = ghostlat[i][j][k].getPop_i(13);
-					bufToSend[index+3] = ghostlat[i][j][k].getPop_i(16);
-					bufToSend[index+4] = ghostlat[i][j][k].getPop_i(17);
+					bufToSend[index+0] = (*ghostlat)[i][j][k].getF_i(6);
+					bufToSend[index+1] = (*ghostlat)[i][j][k].getF_i(12);
+					bufToSend[index+2] = (*ghostlat)[i][j][k].getF_i(13);
+					bufToSend[index+3] = (*ghostlat)[i][j][k].getF_i(16);
+					bufToSend[index+4] = (*ghostlat)[i][j][k].getF_i(17);
 					index += numPopTransf;
 				}
 			}
@@ -1446,11 +1405,11 @@ namespace espressopp {
 			index = 0;
 			for (j=0; j<_myNi[1]; j++) {
 				for (i=0; i<_myNi[0]; i++) {
-					ghostlat[i][j][k].setPop_i(6, bufToRecv[index+0]);
-					ghostlat[i][j][k].setPop_i(12, bufToRecv[index+1]);
-					ghostlat[i][j][k].setPop_i(13, bufToRecv[index+2]);
-					ghostlat[i][j][k].setPop_i(16, bufToRecv[index+3]);
-					ghostlat[i][j][k].setPop_i(17, bufToRecv[index+4]);
+					(*ghostlat)[i][j][k].setF_i(6, bufToRecv[index+0]);
+					(*ghostlat)[i][j][k].setF_i(12, bufToRecv[index+1]);
+					(*ghostlat)[i][j][k].setF_i(13, bufToRecv[index+2]);
+					(*ghostlat)[i][j][k].setF_i(16, bufToRecv[index+3]);
+					(*ghostlat)[i][j][k].setF_i(17, bufToRecv[index+4]);
 					index += numPopTransf;
 				}
 			}
@@ -1493,9 +1452,9 @@ namespace espressopp {
 				for (j=0; j<_myNi[1]; j++) {
 					index = numForceComp*_myNi[1]*k + j*numForceComp;
 					
-					bufToSend[index] = lbfluid[i][j][k].getCouplForceLoc().getItem(0);
-					bufToSend[index+1] = lbfluid[i][j][k].getCouplForceLoc().getItem(1);
-					bufToSend[index+2] = lbfluid[i][j][k].getCouplForceLoc().getItem(2);
+					bufToSend[index] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(0);
+					bufToSend[index+1] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(1);
+					bufToSend[index+2] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(2);
 				}
 			}
 			
@@ -1518,7 +1477,7 @@ namespace espressopp {
 				for (j=0; j<_myNi[1]; j++) {
 					index = numForceComp*_myNi[1]*k + j*numForceComp;
 					_addForce = Real3D(bufToRecv[index], bufToRecv[index+1], bufToRecv[index+2]);
-					lbfluid[i][j][k].addCouplForceLoc(_addForce);
+					(*lbfluid)[i][j][k].addCouplForceLoc(_addForce);
 				}
 			}
 			
@@ -1532,9 +1491,9 @@ namespace espressopp {
 				for (j=0; j<_myNi[1]; j++) {
 					index = numForceComp*_myNi[1]*k + j*numForceComp;
 					
-					bufToSend[index] = lbfluid[i][j][k].getCouplForceLoc().getItem(0);
-					bufToSend[index+1] = lbfluid[i][j][k].getCouplForceLoc().getItem(1);
-					bufToSend[index+2] = lbfluid[i][j][k].getCouplForceLoc().getItem(2);
+					bufToSend[index] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(0);
+					bufToSend[index+1] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(1);
+					bufToSend[index+2] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(2);
 				}
 			}
 			
@@ -1557,7 +1516,7 @@ namespace espressopp {
 				for (j=0; j<_myNi[1]; j++) {
 					index = numForceComp*_myNi[1]*k + j*numForceComp;
 					_addForce = Real3D(bufToRecv[index], bufToRecv[index+1], bufToRecv[index+2]);
-					lbfluid[i][j][k].addCouplForceLoc(_addForce);
+					(*lbfluid)[i][j][k].addCouplForceLoc(_addForce);
 				}
 			}
 
@@ -1578,9 +1537,9 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numForceComp*_myNi[0]*k + i*numForceComp;
 					
-					bufToSend[index] = lbfluid[i][j][k].getCouplForceLoc().getItem(0);
-					bufToSend[index+1] = lbfluid[i][j][k].getCouplForceLoc().getItem(1);
-					bufToSend[index+2] = lbfluid[i][j][k].getCouplForceLoc().getItem(2);
+					bufToSend[index] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(0);
+					bufToSend[index+1] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(1);
+					bufToSend[index+2] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(2);
 				}
 			}
 			
@@ -1603,7 +1562,7 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numForceComp*_myNi[0]*k + i*numForceComp;
 					_addForce = Real3D(bufToRecv[index], bufToRecv[index+1], bufToRecv[index+2]);
-					lbfluid[i][j][k].addCouplForceLoc(_addForce);
+					(*lbfluid)[i][j][k].addCouplForceLoc(_addForce);
 				}
 			}
 			
@@ -1617,9 +1576,9 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numForceComp*_myNi[0]*k + i*numForceComp;
 					
-					bufToSend[index] = lbfluid[i][j][k].getCouplForceLoc().getItem(0);
-					bufToSend[index+1] = lbfluid[i][j][k].getCouplForceLoc().getItem(1);
-					bufToSend[index+2] = lbfluid[i][j][k].getCouplForceLoc().getItem(2);
+					bufToSend[index] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(0);
+					bufToSend[index+1] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(1);
+					bufToSend[index+2] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(2);
 				}
 			}
 			
@@ -1642,7 +1601,7 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numForceComp*_myNi[0]*k + i*numForceComp;
 					_addForce = Real3D(bufToRecv[index], bufToRecv[index+1], bufToRecv[index+2]);
-					lbfluid[i][j][k].addCouplForceLoc(_addForce);
+					(*lbfluid)[i][j][k].addCouplForceLoc(_addForce);
 				}
 			}
 			
@@ -1663,9 +1622,9 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numForceComp*_myNi[0]*j + i*numForceComp;
 					
-					bufToSend[index] = lbfluid[i][j][k].getCouplForceLoc().getItem(0);
-					bufToSend[index+1] = lbfluid[i][j][k].getCouplForceLoc().getItem(1);
-					bufToSend[index+2] = lbfluid[i][j][k].getCouplForceLoc().getItem(2);
+					bufToSend[index] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(0);
+					bufToSend[index+1] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(1);
+					bufToSend[index+2] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(2);
 				}
 			}
 			
@@ -1688,7 +1647,7 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numForceComp*_myNi[0]*j + i*numForceComp;
 					_addForce = Real3D(bufToRecv[index], bufToRecv[index+1], bufToRecv[index+2]);
-					lbfluid[i][j][k].addCouplForceLoc(_addForce);
+					(*lbfluid)[i][j][k].addCouplForceLoc(_addForce);
 				}
 			}
 			
@@ -1702,9 +1661,9 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numForceComp*_myNi[0]*j + i*numForceComp;
 					
-					bufToSend[index] = lbfluid[i][j][k].getCouplForceLoc().getItem(0);
-					bufToSend[index+1] = lbfluid[i][j][k].getCouplForceLoc().getItem(1);
-					bufToSend[index+2] = lbfluid[i][j][k].getCouplForceLoc().getItem(2);
+					bufToSend[index] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(0);
+					bufToSend[index+1] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(1);
+					bufToSend[index+2] = (*lbfluid)[i][j][k].getCouplForceLoc().getItem(2);
 				}
 			}
 			
@@ -1727,7 +1686,7 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numForceComp*_myNi[0]*j + i*numForceComp;
 					_addForce = Real3D(bufToRecv[index], bufToRecv[index+1], bufToRecv[index+2]);
-					lbfluid[i][j][k].addCouplForceLoc(_addForce);
+					(*lbfluid)[i][j][k].addCouplForceLoc(_addForce);
 				}
 			}
 			
@@ -1769,7 +1728,7 @@ namespace espressopp {
 				for (j=0; j<_myNi[1]; j++) {
 					index = numPopTransf*_myNi[1]*k + j*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
-						bufToSend[index+l] = lbfluid[i][j][k].getF_i(_numVels+l);
+						bufToSend[index+l] = (*lbmom)[i][j][k].getMom_i(l);
 					}
 				}
 			}
@@ -1793,7 +1752,7 @@ namespace espressopp {
 				for (j=0; j<_myNi[1]; j++) {
 					index = numPopTransf*_myNi[1]*k + j*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
-						lbfluid[i][j][k].setF_i(_numVels+l, bufToRecv[index+l]);
+						(*lbmom)[i][j][k].setMom_i(l, bufToRecv[index+l]);
 					}
 				}
 			}
@@ -1808,7 +1767,7 @@ namespace espressopp {
 				for (j=0; j<_myNi[1]; j++) {
 					index = numPopTransf*_myNi[1]*k + j*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
-						bufToSend[index+l] = lbfluid[i][j][k].getF_i(_numVels+l);
+						bufToSend[index+l] = (*lbmom)[i][j][k].getMom_i(l);
 					}
 				}
 			}
@@ -1832,7 +1791,7 @@ namespace espressopp {
 				for (j=0; j<_myNi[1]; j++) {
 					index = numPopTransf*_myNi[1]*k + j*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
-						lbfluid[i][j][k].setF_i(_numVels+l, bufToRecv[index+l]);
+						(*lbmom)[i][j][k].setMom_i(l, bufToRecv[index+l]);
 					}
 				}
 			}
@@ -1854,7 +1813,7 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numPopTransf*_myNi[0]*k + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
-						bufToSend[index+l] = lbfluid[i][j][k].getF_i(_numVels+l);
+						bufToSend[index+l] = (*lbmom)[i][j][k].getMom_i(l);
 					}
 				}
 			}
@@ -1878,7 +1837,7 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numPopTransf*_myNi[0]*k + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
-						lbfluid[i][j][k].setF_i(_numVels+l, bufToRecv[index+l]);
+						(*lbmom)[i][j][k].setMom_i(l, bufToRecv[index+l]);
 					}
 				}
 			}
@@ -1893,7 +1852,7 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numPopTransf*_myNi[0]*k + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
-						bufToSend[index+l] = lbfluid[i][j][k].getF_i(_numVels+l);
+						bufToSend[index+l] = (*lbmom)[i][j][k].getMom_i(l);
 					}
 				}
 			}
@@ -1917,7 +1876,7 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numPopTransf*_myNi[0]*k + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
-						lbfluid[i][j][k].setF_i(_numVels+l, bufToRecv[index+l]);
+						(*lbmom)[i][j][k].setMom_i(l, bufToRecv[index+l]);
 					}
 				}
 			}
@@ -1939,7 +1898,7 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numPopTransf*_myNi[0]*j + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
-						bufToSend[index+l] = lbfluid[i][j][k].getF_i(_numVels+l);
+						bufToSend[index+l] = (*lbmom)[i][j][k].getMom_i(l);
 					}
 				}
 			}
@@ -1963,7 +1922,7 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numPopTransf*_myNi[0]*j + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
-						lbfluid[i][j][k].setF_i(_numVels+l, bufToRecv[index+l]);
+						(*lbmom)[i][j][k].setMom_i(l, bufToRecv[index+l]);
 					}
 				}
 			}
@@ -1978,7 +1937,7 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numPopTransf*_myNi[0]*j + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
-						bufToSend[index+l] = lbfluid[i][j][k].getF_i(_numVels+l);
+						bufToSend[index+l] = (*lbmom)[i][j][k].getMom_i(l);
 					}
 				}
 			}
@@ -2002,7 +1961,7 @@ namespace espressopp {
 				for (i=0; i<_myNi[0]; i++) {
 					index = numPopTransf*_myNi[0]*j + i*numPopTransf;
 					for (int l = 0; l<numPopTransf; ++l) {
-						lbfluid[i][j][k].setF_i(_numVels+l, bufToRecv[index+l]);
+						(*lbmom)[i][j][k].setMom_i(l, bufToRecv[index+l]);
 					}
 				}
 			}
