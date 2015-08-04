@@ -98,10 +98,14 @@ namespace espressopp {
 
 			setTotNPart(_totNPart);
 			fOnPart = std::vector<Real3D>(_totNPart + 1, Real3D(0.,0.,0.));	// +1 since particle's id starts with 1, not 0
-			
+
 			if (_totNPart != 0) {				// if MD system has particles
 				setCouplForceFlag(1);		// set an indicator for LB to MD coupling to 1
 				setFricCoeff(5.);				// set the friction coefficient of the LB to MD coupling
+				
+				for(int _id = 0; _id <= _totNPart; _id++) {
+					setFOnPart(_id, Real3D(0.,0.,0.));
+				}
 			}
 
 			/* setup domain decompositions for LB */
@@ -119,7 +123,7 @@ namespace espressopp {
 			}
 			setMyNi (_numSites);
 			setMyLeft (_myLeft);
-
+			
 			/* initialise lattice parameters */
 			LatticePar(_system, getNumVels(),getA(),getTau());		// pass system, a and tau to the local sites
 
@@ -140,6 +144,20 @@ namespace espressopp {
 					(*lbfluid)[i][j].resize(getMyNi().getItem(2));
 					(*ghostlat)[i][j].resize(getMyNi().getItem(2));
 					(*lbmom)[i][j].resize(getMyNi().getItem(2));
+				}
+			}
+			
+			/* initialise coupling forces as zeros */
+			for (int _i = 0; _i < getMyNi().getItem(0); _i++) {
+				for (int _j = 0; _j < getMyNi().getItem(1); _j++) {
+					for (int _k = 0; _k < getMyNi().getItem(2); _k++) {
+						(*lbfluid)[_i][_j][_k].setExtForceLoc(Real3D(0.));
+						(*ghostlat)[_i][_j][_k].setExtForceLoc(Real3D(0.));
+						if (_totNPart != 0) {				// if MD system has particles
+							(*lbfluid)[_i][_j][_k].setCouplForceLoc(Real3D(0.));
+							(*ghostlat)[_i][_j][_k].setCouplForceLoc(Real3D(0.));
+						}
+					}
 				}
 			}
 			
@@ -654,14 +672,13 @@ namespace espressopp {
 			time_colstr += (colstream.getElapsedTime()-time1);
 	
 			commHalo();
-
+			
 			real time2 = swapping.getElapsedTime();
 			lblattice *tmp = lbfluid;
 			lbfluid = ghostlat;
-			ghostlat =tmp;
-
+			ghostlat = tmp;
 			time_sw += (swapping.getElapsedTime()-time2);
-
+			
 			/* calculate den and j at the lattice sites in real region and copy them to halo */
 #warning: should one cancel this condition if pure lb is in use? or move setCouplForceLoc into the collision loop?
 			if (getCouplForceFlag() == 1) {
@@ -670,6 +687,7 @@ namespace espressopp {
 					for (int j = 0; j < _myNi[1]; j++) {
 						for (int k = 0; k < _myNi[2]; k++) {
 							(*lbfluid)[i][j][k].setCouplForceLoc(Real3D(0.0));
+							(*ghostlat)[i][j][k].setCouplForceLoc(Real3D(0.0));
 						}
 					}
 				}
@@ -829,7 +847,7 @@ namespace espressopp {
 						_ip = bin[0] + _i; _jp = bin[1] + _j; _kp = bin[2] + _k;
 
  						_invDenLoc = 1. / (*lbmom)[_ip][_jp][_kp].getMom_i(0);
-						printf ("_invDenLoc is %8.4f\n", _invDenLoc);
+						if (_invDenLoc != _invDenLoc) printf ("_invDenLoc[%d][%d][%d] is %8.4f. It comes from the density %8.4f\n", _ip,_jp,_kp,_invDenLoc, (*lbmom)[_ip][_jp][_kp].getMom_i(0));
 						_jLoc[0] = (*lbmom)[_ip][_jp][_kp].getMom_i(1);
 						_jLoc[1] = (*lbmom)[_ip][_jp][_kp].getMom_i(2);
 						_jLoc[2] = (*lbmom)[_ip][_jp][_kp].getMom_i(3);

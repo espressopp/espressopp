@@ -145,7 +145,10 @@ namespace espressopp {
 						// calculation of density and momentum flux on the lattice site
 						for (int l = 0; l < _numVels; l++) {
 							_fi = latticeboltzmann->getLBFluid(Int3D(i,j,k),l);
-							_ci = latticeboltzmann->getCi(l);
+/*							if (_fi != _fi) {
+								printf("CPU%d: %d-th population is NOT A NUMBER! at %d %d %d. density there is %8.4f\n", getSystem()->comm->rank(), l, i, j, k, latticeboltzmann->getLBMom(Int3D(i,j,k),l));
+							}
+*/							_ci = latticeboltzmann->getCi(l);
 							_jLoc += _fi * _ci;
 						}
 /*
