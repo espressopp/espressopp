@@ -143,16 +143,16 @@ namespace espressopp {
 						Real3D _jLoc = Real3D(0.,0.,0.);
 
 						// calculation of density and momentum flux on the lattice site
-/*						for (int l = 0; l < _numVels; l++) {
+						for (int l = 0; l < _numVels; l++) {
 							_fi = latticeboltzmann->getLBFluid(Int3D(i,j,k),l);
 							_ci = latticeboltzmann->getCi(l);
 							_jLoc += _fi * _ci;
 						}
-*/
-						_jLoc[0] = latticeboltzmann->getLBMom(Int3D(i,j,k),1);
+
+/*					_jLoc[0] = latticeboltzmann->getLBMom(Int3D(i,j,k),1);
 						_jLoc[1] = latticeboltzmann->getLBMom(Int3D(i,j,k),2);
 						_jLoc[2] = latticeboltzmann->getLBMom(Int3D(i,j,k),3);
-
+*/
 						_myU += _jLoc;
 					}
 				}
