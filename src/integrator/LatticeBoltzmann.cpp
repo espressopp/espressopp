@@ -21,8 +21,10 @@
 #include "python.hpp"
 #include "LatticeBoltzmann.hpp"
 #include <iomanip>
-#include "boost/serialization/vector.hpp"
+#include <iostream>
+#include <fstream>
 
+#include "boost/serialization/vector.hpp"
 #include "types.hpp"
 #include "System.hpp"
 #include "storage/Storage.hpp"
@@ -72,14 +74,14 @@ namespace espressopp {
 			eqWeight = std::vector<real>(_numVels, 0.);
 			inv_b = std::vector<real>(_numVels, 0.);
 			phi = std::vector<real>(_numVels, 0.);
-			myNeighbour = std::vector<int>(6, 0);
+			myNeighbour = std::vector<int>(2*_numDims, 0);
 
 			/* set flags for extended simulations to their defaults */
-			setLBTempFlag(0);					// there are no fluctuations by default
+			setLBTempFlag(0);																// no fluctuations
 
 			/* setup simulation parameters */
-			setStart(0);								// set indicator of coupling start to zero
-			setStepNum(0);							// set step number to zero at the start of simulation
+			setStart(0);																			// set coupling start flag to 0
+			setStepNum(0);																		// set step number to 0
 
 			/* setup random numbers generator */
 			if (!_system->rng) {
@@ -87,24 +89,25 @@ namespace espressopp {
 			}
 			rng = _system->rng;
 
-			/* setup external (and coupling) forces parameters */
-			setExtForceFlag(0);				// there are no external forces by default
-			setCouplForceFlag(0);     // there is no coupling to MD by default
-			setNSteps(1);							// set number of MD steps to be done between two LB steps
+			/* setup default external (and coupling) forces parameters */
+			setExtForceFlag(0);															// no external forces
+			setCouplForceFlag(0);														// no LB to MD coupling
+			setNSteps(1);																		// # MD steps between LB update
 			
 			int _Npart = _system->storage->getNRealParticles();
 			int _totNPart = 0;
 			mpi::all_reduce(*getSystem()->comm, _Npart, _totNPart, std::plus<int>());
-
 			setTotNPart(_totNPart);
-			fOnPart = std::vector<Real3D>(_totNPart + 1, Real3D(0.,0.,0.));	// +1 since particle's id starts with 1, not 0
+			
+			fOnPart = std::vector<Real3D>(_totNPart+1,Real3D(0.));	// +1 as id starts with 1
 
-			if (_totNPart != 0) {				// if MD system has particles
-				setCouplForceFlag(1);		// set an indicator for LB to MD coupling to 1
-				setFricCoeff(5.);				// set the friction coefficient of the LB to MD coupling
+			/* if coupling is present initialise related flags, coefficients and arrays */
+			if (_totNPart != 0) {
+				setCouplForceFlag(1);													// make LB to MD coupling
+				setFricCoeff(5.);															// friction coeffitient
 				
 				for(int _id = 0; _id <= _totNPart; _id++) {
-					setFOnPart(_id, Real3D(0.,0.,0.));
+					setFOnPart(_id, Real3D(0.));
 				}
 			}
 
@@ -112,38 +115,44 @@ namespace espressopp {
 			setHaloSkin(1);
 			findMyNeighbours();
 			
-			longint _myRank = getSystem()->comm->rank();
 			Int3D _numSites = Int3D(0,0,0);
 			Real3D _myLeft = Real3D(0.,0.,0.);
 			real _L = 0.;
+			
+			longint _myRank = getSystem()->comm->rank();
+			Int3D _myPosition = getMyPosition();
+
 			for (int _dim = 0; _dim < 3; ++_dim) {
 				_L = getSystem()->bc->getBoxL().getItem(_dim);
-				_numSites[_dim] = floor((getMyPosition().getItem(_dim)+1)*_L/getNodeGrid().getItem(_dim)) - floor(getMyPosition().getItem(_dim)*_L/getNodeGrid().getItem(_dim)) + 2 * getHaloSkin();
-				_myLeft[_dim] = floor(getMyPosition().getItem(_dim)*_L/getNodeGrid().getItem(_dim))*getA();
+				_numSites[_dim] = floor((_myPosition[_dim]+1)*_L/(_nodeGrid[_dim]*getA())) -
+													floor(_myPosition[_dim]*_L/(_nodeGrid[_dim]*getA())) +
+													2 * getHaloSkin();
+				_myLeft[_dim] = floor(_myPosition[_dim]*_L/_nodeGrid[_dim]);
 			}
+//			setNi(_L / getA());
 			setMyNi (_numSites);
 			setMyLeft (_myLeft);
 			
-			/* initialise lattice parameters */
-			LatticePar(_system, getNumVels(),getA(),getTau());		// pass system, a and tau to the local sites
+			/* initialise general lattice parameters on a site */
+			LatticePar(_system, getNumVels(),getA(),getTau());
 
-			/* setup lattices by resizing them in 3 dimensions */
+			/* stretch lattices resizing them in 3 dimensions */
 			lbfluid = new lblattice;
 			ghostlat = new lblattice;
 			lbmom = new lbmoments;
-			
-			(*lbfluid).resize(getMyNi().getItem(0));									// resize x-dimension of the lbfluid array
-			(*ghostlat).resize(getMyNi().getItem(0));								// resize x-dimension of the ghostlat array
-			(*lbmom).resize(getMyNi().getItem(0));										// resize x-dimension of lbmom array
 
-			for (int i = 0; i < getMyNi().getItem(0); i++) {
-				(*lbfluid)[i].resize(getMyNi().getItem(1));						// resize y-dimension of the lbfluid array
-				(*ghostlat)[i].resize(getMyNi().getItem(1));						// resize y-dimension of the ghostlat array
-				(*lbmom)[i].resize(getMyNi().getItem(1));						// resize y-dimension of lbmom array
-				for (int j = 0; j < getMyNi().getItem(1); j++) {
-					(*lbfluid)[i][j].resize(getMyNi().getItem(2));
-					(*ghostlat)[i][j].resize(getMyNi().getItem(2));
-					(*lbmom)[i][j].resize(getMyNi().getItem(2));
+			(*lbfluid).resize(_numSites[0]);
+			(*ghostlat).resize(_numSites[0]);
+			(*lbmom).resize(_numSites[0]);
+			
+			for (int i = 0; i < _numSites[0]; i++) {
+				(*lbfluid)[i].resize(_numSites[1]);
+				(*ghostlat)[i].resize(_numSites[1]);
+				(*lbmom)[i].resize(_numSites[1]);
+				for (int j = 0; j < _numSites[1]; j++) {
+					(*lbfluid)[i][j].resize(_numSites[2]);
+					(*ghostlat)[i][j].resize(_numSites[2]);
+					(*lbmom)[i][j].resize(_numSites[2]);
 				}
 			}
 
@@ -290,10 +299,6 @@ namespace espressopp {
 		Real3D LatticeBoltzmann::getFOnPart (int _id) {return fOnPart[_id];}
 		void LatticeBoltzmann::addFOnPart (int _id, Real3D _fOnPart) {fOnPart[_id] += _fOnPart;}
 		
-		void LatticeBoltzmann::setInterpVel (Real3D _interpVel) {interpVel = _interpVel;}
-		Real3D LatticeBoltzmann::getInterpVel() {return interpVel;}
-		void LatticeBoltzmann::addInterpVel (Real3D _interpVel) {interpVel += _interpVel;}
-		
 		/* Setter and getter for access to population values */
 		void LatticeBoltzmann::setLBFluid (Int3D _Ni, int _l, real _value) {
 			(*lbfluid)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setF_i(_l, _value);	}
@@ -317,7 +322,7 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 
-		/* Initialization of the lattice model: eq.weights, ci's, ... */
+		/* INITIALIZATION OF THE LATTICE MODEL: EQ.WEIGHTS, CI'S, ... */
 		void LatticeBoltzmann::initLatticeModel () {
 			using std::setprecision;
 			using std::fixed;
@@ -337,27 +342,30 @@ namespace espressopp {
 			setCi(13, Real3D(1.,  0., -1.)); setCi(14, Real3D(-1.,  0.,  1.));
 			setCi(15, Real3D(0.,  1.,  1.)); setCi(16, Real3D( 0., -1., -1.));
 			setCi(17, Real3D(0.,  1., -1.)); setCi(18, Real3D( 0., -1.,  1.));
-
-			longint _myRank = getSystem()->comm->rank();
-			if (_myRank == 0) {
-				std::cout << "-------------------------------------\n";
-				std::cout << "Lattice Boltzmann lattice model D3Q19" << std::endl;
-				std::cout << "-------------------------------------\n";
-				// check sound speed
-				printf ("cs2 and invCs2 are %8.4f %8.4f \n", getCs2(), 1./getCs2());
-				printf("-------------------------------------\n");
-			}
 			
-			for (int i = 0; i < getMyNi().getItem(0); i++) {
-				for (int j = 0; j < getMyNi().getItem(1); j++) {
-					for (int k = 0; k < getMyNi().getItem(2); k++) {
-						for (int l = 0; l < getNumVels(); l++) {
+			Int3D _myNi = getMyNi();
+			int _numVels = getNumVels();
+			for (int i = 0; i < _myNi[0]; i++) {
+				for (int j = 0; j < _myNi[1]; j++) {
+					for (int k = 0; k < _myNi[2]; k++) {
+						for (int l = 0; l < _numVels; l++) {
 							(*lbfluid)[i][j][k].initLatticeModelLoc();
 						}
 					}
 				}
 			}
-
+			
+			longint _myRank = getSystem()->comm->rank();
+			if (_myRank == 0) {
+				std::cout << "-------------------------------------" << std::endl;
+				std::cout << "Lattice Boltzmann lattice model D3Q19" << std::endl;
+				std::cout << "-------------------------------------" << std::endl;
+				std::cout << "Lattice of " << getNi().getItem(0);
+				std::cout << " x " << getNi().getItem(1);
+				std::cout << " x " << getNi().getItem(2) << " size " << std::endl;
+				std::cout << "-------------------------------------" << std::endl;
+			}
+			
 			// pass local eq. weights and inversed coeff. to the global ones
 			for (int l = 0; l < getNumVels(); l++) {
 				setEqWeight(l, (*lbfluid)[0][0][0].getEqWeightLoc(l));
@@ -367,7 +375,7 @@ namespace espressopp {
 
 /*******************************************************************************************/
 		
-    /* (Re)initialization of gammas */
+    /* (RE)INITIALIZATION OF GAMMAS */
     void LatticeBoltzmann::initGammas (int _idGamma) {
       using std::setprecision;
       using std::fixed;
@@ -402,7 +410,7 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 		
-    /* (Re)initialization of thermal fluctuations */
+    /* (RE)INITIALIZATION OF THERMAL FLUCTUATIONS */
     void LatticeBoltzmann::initFluctuations () {
       using std::setprecision;
       using std::fixed;
@@ -471,7 +479,7 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 		
-    /* Make one LB step. Push-pull scheme is used */
+    /* MAKE ONE LB STEP. PUSH-PULL SCHEME IS USED */
     void LatticeBoltzmann::makeLBStep () {
 			setStepNum(integrator->getStep());
 			int _stepNum = getStepNum();
@@ -482,13 +490,16 @@ namespace espressopp {
 				coupleLBtoMD ();
 			}
 			
-			if (_stepNum % 5000 == 0) {
-				printf ("colstr takes %f sec, swapping %f\n",time_colstr,time_sw);
+			if (_stepNum % 5000 == 0 && _stepNum!=0) {
+				printf ("colstr takes %f sec, comm % f, swapping %f\n",
+								time_colstr, time_comm, time_sw);
 
-				time_colstr = 0.;
-				time_sw = 0.;
 				colstream.reset();
+				comm.reset();
 				swapping.reset();
+				time_colstr = 0.;
+				time_comm = 0.;
+				time_sw = 0.;
 			}
 			
 			if (_stepNum % _nSteps == 0) {
@@ -499,7 +510,7 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 
-		/* TAKES CARE OF REAL MD-PARTICLES DECOMPOSITION IF THEY MOVED TO THE GHOST REGION */
+		/* REAL MD-PARTICLES DECOMPOSITION IF THEY MOVED TO THE GHOST REGION */
 		///* it is needed as we couple LB to MD at half-timestep and, most importantly, because real particles can still
 		/// leave the real regions and reside in ghost layer. Tricky. Have to understand it better. */
 		void LatticeBoltzmann::makeDecompose() {
@@ -537,8 +548,6 @@ namespace espressopp {
 		
 		/* FIND AND OUTPUT CENTER-OF-MASS VELOCITY OF MD-PARTICLES */
 		Real3D LatticeBoltzmann::findCMVelMD (int _id) {
-			setCopyTimestep(integrator->getTimeStep());	// set a copy of a timestep to the real MD timestep
-
 			System& system = getSystemRef();
 			
 			CellList realCells = system.storage->getRealCells();
@@ -568,7 +577,7 @@ namespace espressopp {
 				}
 			}
 			
-			// calculate specific center of mass to be subtracted from particle's velocities to fulfill zero momentum
+			// calculate specific center of mass to be subtracted from particle's velocities
 			specVelCM = velCM / _totPart;
 			
 			return specVelCM;
@@ -579,12 +588,15 @@ namespace espressopp {
 		/* SET CM VELOCITY OF THE MD TO ZERO AT THE START OF COUPLING */
 		void LatticeBoltzmann::zeroMDCMVel () {
 			int _myRank = getSystem()->comm->rank();
+			setCopyTimestep(integrator->getTimeStep());	// set a copy of a timestep to the real MD timestep
 
+			setStepNum(integrator->getStep());
+			if (getStepNum()!=0) setStart(1);
+			
 			if (getStart() == 0 && getCouplForceFlag() != 0) {
 				Real3D specCmVel = findCMVelMD(0);
 				// output reporting on subtraction of drift's vel
 				if (_myRank == 0) {
-					printf("-------------------------------------\n");
 					printf("subtracting drift velocity from MD's center of mass (if any)\n");
 					printf("cm velocity per particle is %18.14f %18.14f %18.14f \n",
 								 specCmVel[0], specCmVel[1], specCmVel[2]);
@@ -602,8 +614,8 @@ namespace espressopp {
 
 				setStart(1);
 			} else {
-//				readCouplForces();
-//				restoreLBForces();
+				readCouplForces();
+				restoreLBForces();
 			}
 		}
 		
@@ -622,6 +634,7 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 		
+		/* COLLIDE-STREAM STEP */
     void LatticeBoltzmann::collideStream () {
 			int _offset = getHaloSkin();
 			int _extForceFlag = getExtForceFlag();
@@ -647,13 +660,15 @@ namespace espressopp {
       }
 			time_colstr += (colstream.getElapsedTime()-time1);
 	
+			real time2 = comm.getElapsedTime();
 			commHalo();
+			time_comm += (comm.getElapsedTime()-time2);
 			
-			real time2 = swapping.getElapsedTime();
+			real time3 = swapping.getElapsedTime();
 			lblattice *tmp = lbfluid;
 			lbfluid = ghostlat;
 			ghostlat = tmp;
-			time_sw += (swapping.getElapsedTime()-time2);
+			time_sw += (swapping.getElapsedTime()-time3);
 			
 			/* calculate den and j at the lattice sites in real region and copy them to halo */
 #warning: should one cancel this condition if pure lb is in use? or move setCouplForceLoc into the collision loop?
@@ -662,7 +677,7 @@ namespace espressopp {
 				for (int i = 0; i < _myNi[0]; i++) {
 					for (int j = 0; j < _myNi[1]; j++) {
 						for (int k = 0; k < _myNi[2]; k++) {
-							(*lbfluid)[i][j][k].setCouplForceLoc(Real3D(0.0));
+							(*ghostlat)[i][j][k].setCouplForceLoc(Real3D(0.0));
 						}
 					}
 				}
@@ -782,7 +797,8 @@ namespace espressopp {
 			Real3D _jLoc;
 			Real3D _u;
 			
-			setInterpVel (Real3D(0.,0.,0.));
+			Real3D interpVel = Real3D (0.);
+			real _convCoeff = _convTimeMDtoLB / _convLenMDtoLB;
 			// loop over neighboring LB nodes
 			int _ip, _jp, _kp;
 			for (int _i = 0; _i < 2; _i++) {
@@ -797,24 +813,23 @@ namespace espressopp {
 						_jLoc[2] = (*lbmom)[_ip][_jp][_kp].getMom_i(3);
 
 						_u = _jLoc;
-						_u *= _convTimeMDtoLB;
 						_u *= _invDenLoc;
-						_u /= _convLenMDtoLB;
+						_u *= _convCoeff;
 
-						addInterpVel (delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2] * _u);
+						interpVel += _u * delta[3 * _i] * delta[3 * _j + 1] * delta[3 * _k + 2];
 					}
 				}
 			}
 
 			// add viscous force to the buffered random force acting onto particle p.id()
-			addFOnPart(p.id(), -_fricCoeff * (p.velocity() - getInterpVel()));
+			addFOnPart(p.id(), -_fricCoeff * (p.velocity() - interpVel));
 			
 			// apply buffered force to the MD-particle p.id()
 			p.force() += getFOnPart(p.id());
 
 			// convert coupling force (LJ units) to the momentum change on a lattice (LB units)
-			Real3D deltaJLoc = Real3D(0.,0.,0.);
-			deltaJLoc -= getFOnPart(p.id()) * _convMassMDtoLB * _convLenMDtoLB / (_convTimeMDtoLB * _convTimeMDtoLB);
+			Real3D deltaJLoc = Real3D(0.);
+			deltaJLoc -= getFOnPart(p.id()) * _convMassMDtoLB / (_convCoeff * _convTimeMDtoLB);
 			
 			// loop over neighboring LB nodes
 			for (int _i = 0; _i < 2; _i++) {
@@ -890,119 +905,131 @@ namespace espressopp {
 /*******************************************************************************************/
 		
 		void LatticeBoltzmann::readCouplForces () {
-			/* interface to read filename for the input profile */
-			FILE * couplForcesFile;
-			using std::string;
-			std::string number;
+			timeRead.reset();
+			real timeStart = timeRead.getElapsedTime();
+			
+			/* fill in the coupling forces acting on MD-particles with zeros */
+			int _totNPart = getTotNPart();
+			for(int _id = 0; _id <= _totNPart; _id++) {
+				setFOnPart(_id, Real3D(0.));
+			}
+			
+			/* create filename for the input file */
 			std::string filename;
 			std::ostringstream convert;
-			
-			int _offset = getHaloSkin();
-			Int3D _myNi = getMyNi();
+			std::ostringstream _myRank;
 			
 			convert << getStepNum();
-			filename = "couplForces.";
+			_myRank << getSystem()->comm->rank();
+			
+			filename = "couplForces";
 			filename.append(convert.str());
+			filename.append(".");
+			filename.append(_myRank.str());
 			filename.append(".dat");
 			
-			/* interface to access particles' data */
-			System& system = getSystemRef();
-
-			CellList realCells = system.storage->getRealCells();
-
-			int _id;
-			int _it, _jt, _kt;
+			/* access particles' data and open a file to read coupling forces from */
+			long int _id;
 			real _fx, _fy, _fz;
 			
-			/* opening the file to read coupling forces from */
-			couplForcesFile = fopen(filename.c_str(),"r");
+			System& system = getSystemRef();
+			CellList realCells = system.storage->getRealCells();
+			FILE * couplForcesFile = fopen(filename.c_str(),"r");
 			
 			if (couplForcesFile == NULL) {
-				std::cout << "!!! Attention !!! no file with coupling forces acting onto MD particles \
-								found for step " << convert.str() << "\n";
-				// if the file does not exist, set coupling forces to zero
-//				for(int _id = 0; _id <= _Npart; _id++) {
-//					setFOnPart(_id, Real3D(0.,0.,0.));
-//				}
-				for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-					setFOnPart(cit->id(), Real3D(0.,0.,0.));
+				if (getStepNum() != 0) {
+					std::cout << "!!! Attention !!! no file with coupling forces acting onto MD particles \
+					found for step " << convert.str() << "\n";
 				}
 			} else {
-				// if the file exists, read in coupling forces and store them into fOnPart array
-//				for(int _id = 0; _id <= _Npart; _id++) {
-//					fscanf (couplForcesFile, "%d %lf %lf %lf\n", &_id, &_fx, &_fy, &_fz);
-//					setFOnPart(_id, Real3D(_fx,_fy,_fz));
-//				}
-#warning: have to check the following loop when IO is done
+				/* read forces acting onto MD-particles */
 				for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-					fscanf (couplForcesFile, "%d %lf %lf %lf\n", &_id, &_fx, &_fy, &_fz);
-					setFOnPart(cit->id(), Real3D(_fx,_fy,_fz));
+					fscanf (couplForcesFile, "%ld %lf %lf %lf \n", &_id, &_fx, &_fy, &_fz);
+					setFOnPart(_id, Real3D(_fx,_fy,_fz));
 				}
-				
-				for (int _i = _offset; _i < _myNi[0] - _offset; _i++) {
-					for (int _j = _offset; _j < _myNi[1] - _offset; _j++) {
-						for (int _k = _offset; _k < _myNi[2] - _offset; _k++) {
-							fscanf (couplForcesFile, "%d %d %d %lf %lf %lf\n",
-											&_it, &_jt, &_kt, &_fx, &_fy, &_fz);
-							(*lbfluid)[_it][_jt][_kt].setCouplForceLoc(Real3D(_fx,_fy,_fz));
+				/* read forces acting onto LB-sites */
+				int _it, _jt, _kt;
+				Int3D _myNi = getMyNi();
+
+				for (int _i = 0; _i < _myNi[0]; _i++) {
+					for (int _j = 0; _j < _myNi[1]; _j++) {
+						for (int _k = 0; _k < _myNi[2]; _k++) {
+//							printf("CPU %d: (*lbfluid)[_i][_j][_k].getCouplForceLoc() is %20.14f\n", getSystem()->comm->rank(), (*lbfluid)[_i][_j][_k].getCouplForceLoc().getItem(2));
+						(*lbfluid)[_i][_j][_k].setCouplForceLoc(Real3D(0.));
 						}
 					}
 				}
+
+				while (fscanf (couplForcesFile, "%d %d %d %lf %lf %lf \n", &_it, &_jt, &_kt, &_fx, &_fy, &_fz) == 6) {
+					(*lbfluid)[_it][_jt][_kt].setCouplForceLoc(Real3D(_fx,_fy,_fz));
+				}
+				
 			}
-			
 			fclose (couplForcesFile);
 			
+			real timeEnd = timeRead.getElapsedTime() - timeStart;
+			printf("CPU %d: read LB-to-MD coupling forces in %8.4f seconds\n",
+						 getSystem()->comm->rank(), timeEnd);
 		}
 		
 /*******************************************************************************************/
 		
 		void LatticeBoltzmann::saveCouplForces () {
-			/* interface to create filename for the output profile */
-			FILE * couplForcesFile;
-			using std::string;
-			std::string number;
+			timeSave.reset();
+			real timeStart = timeSave.getElapsedTime();
+			
+			/* create filename for the output file */
 			std::string filename;
 			std::ostringstream convert;
-
-			int _offset = getHaloSkin();
-			Int3D _myNi = getMyNi();
+			std::ostringstream _myRank;
 			
-			convert << getStepNum();
-			filename = "couplForces.";
+			convert << integrator->getStep();
+			_myRank << getSystem()->comm->rank();
+
+			filename = "couplForces";
 			filename.append(convert.str());
+			filename.append(".");
+			filename.append(_myRank.str());
 			filename.append(".dat");
 			
-			/* interface to access particles' data */
+			/* access particles' data and open a file to write coupling forces to */
 			System& system = getSystemRef();
 			CellList realCells = system.storage->getRealCells();
 
-			/* opening the file to write coupling forces to */
-			couplForcesFile = fopen(filename.c_str(),"w");
-			
-			// loop over all particles in the current CPU
-//			for(int _id = 1; _id <= _Npart; _id++) {
-//				fprintf (couplForcesFile, "%9d %20.14f %20.14f %20.14f  \n", _id,
-//								 getFOnPart(_id).getItem(0), getFOnPart(_id).getItem(1), getFOnPart(_id).getItem(2));
-//			}
-#warning: have to check the following loop when IO is done
+			/* write forces acting onto MD-particles */
+			FILE * couplForcesFile = fopen(filename.c_str(),"w");
+
 			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-				fprintf (couplForcesFile, "%9ld %20.14f %20.14f %20.14f  \n", cit->id(),
-								 getFOnPart(cit->id()).getItem(0), getFOnPart(cit->id()).getItem(1), getFOnPart(cit->id()).getItem(2));
+				long int _id = cit->id();
+				fprintf (couplForcesFile, "%9ld %20.16lf %20.16lf %20.16lf \n", _id,
+								 getFOnPart(_id).getItem(0),
+								 getFOnPart(_id).getItem(1),
+								 getFOnPart(_id).getItem(2));
 			}
+
+			/* write forces acting onto LB-sites */
+			real threshold = 1e-30;													// threshold for output forces
+			Int3D _myNi = getMyNi();
 			
-			for (int _i = _offset; _i < _myNi[0] - _offset; _i++) {
-				for (int _j = _offset; _j < _myNi[1] - _offset; _j++) {
-					for (int _k = _offset; _k < _myNi[2] - _offset; _k++) {
-						fprintf (couplForcesFile, "%5d %5d %5d %20.14f %20.14f %20.14f  \n",
-										 _i, _j, _k,
-										 (*lbfluid)[_i][_j][_k].getCouplForceLoc().getItem(0),
-										 (*lbfluid)[_i][_j][_k].getCouplForceLoc().getItem(1),
-										 (*lbfluid)[_i][_j][_k].getCouplForceLoc().getItem(2));
+			for (int _i = 0; _i < _myNi[0]; _i++) {
+				for (int _j = 0; _j < _myNi[1]; _j++) {
+					for (int _k = 0; _k < _myNi[2]; _k++) {
+						Real3D _couplForceLoc = (*lbfluid)[_i][_j][_k].getCouplForceLoc();
+						if (_couplForceLoc.sqr() < threshold) {
+							// do not output zero-like forces
+						} else {
+							fprintf (couplForcesFile, "%5d %5d %5d %20.16f %20.16f %20.16f \n",
+											 _i, _j, _k, _couplForceLoc[0],
+											 _couplForceLoc[1], _couplForceLoc[2]);
+						}
 					}
 				}
 			}
-			
 			fclose (couplForcesFile);
+			
+			real timeEnd = timeSave.getElapsedTime() - timeStart;
+			printf("CPU %d: saved LB-to-MD coupling forces in %8.4f seconds\n",
+						 getSystem()->comm->rank(), timeEnd);
 		}
 		
 /*******************************************************************************************/
