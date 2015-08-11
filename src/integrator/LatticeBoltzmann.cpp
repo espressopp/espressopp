@@ -159,6 +159,13 @@ namespace espressopp {
 			/* initialise global weights and coefficients from the local ones */
 			initLatticeModel();
 
+			// reset timers
+			colstream.reset();
+			comm.reset();
+			swapping.reset();
+			time_colstr = 0.;
+			time_comm = 0.;
+			time_sw = 0.;
 		}
 		
 /*******************************************************************************************/
@@ -491,8 +498,8 @@ namespace espressopp {
 			}
 			
 			if (_stepNum % 5000 == 0 && _stepNum!=0) {
-				printf ("colstr takes %f sec, comm % f, swapping %f\n",
-								time_colstr, time_comm, time_sw);
+				printf ("CPU %d: colstr takes %f sec, comm % f, swapping %f\n",
+								getSystem()->comm->rank(), time_colstr, time_comm, time_sw);
 
 				colstream.reset();
 				comm.reset();
@@ -696,17 +703,13 @@ namespace espressopp {
 		
     /* STREAMING ALONG THE VELOCITY VECTORS. SERIAL */
     void LatticeBoltzmann::streaming(int _i, int _j, int _k) {
-      static int _ip, _im, _jp, _jm, _kp, _km;
-      int dir = 0;
-
       // periodic boundaries are handled separately in commHalo() //
 			
       // assign iterations
-      _ip = _i + 1; _im = _i - 1;
-      _jp = _j + 1; _jm = _j - 1;
-      _kp = _k + 1; _km = _k - 1;
+      int _ip = _i + 1; int _im = _i - 1;
+      int _jp = _j + 1; int _jm = _j - 1;
+      int _kp = _k + 1; int _km = _k - 1;
 
-      // streaming itself //
       // do not move the staying populations
       (*ghostlat)[_i][_j][_k].setF_i(0,(*lbfluid)[_i][_j][_k].getF_i(0));
 
@@ -1099,14 +1102,13 @@ namespace espressopp {
 		/* COMMUNICATE POPULATIONS IN HALO REGIONS TO THE NEIGHBOURING CPUs */
 		void LatticeBoltzmann::commHalo() {
 			int i, j, k, index;											// running indices and index of the node to be copied
-			int numPopTransf = 5;										// number of populations and hydrod. moments to transfer
-			int numDataTransf;											// number of data to transfer
+			static int numPopTransf = 5;										// number of populations and hydrod. moments to transfer
 			int rnode, snode;												// rank of the node to receive from and to send to
-			int toTransf;
 			std::vector<real> bufToSend, bufToRecv;	// buffers used to send and to receive the data
 			
 			int _offset = getHaloSkin();
 			Int3D _myNi = getMyNi();
+			Int3D _myPosition = getMyPosition();
 			
 			mpi::environment env;
 			mpi::communicator world;
@@ -1114,7 +1116,9 @@ namespace espressopp {
 			//////////////////////
 			//// X-direction /////
 			//////////////////////
-			numDataTransf = numPopTransf * _myNi[1] * _myNi[2];
+			// number of reals to transfer
+			int numDataTransf = numPopTransf * _myNi[1] * _myNi[2];
+
 			bufToSend.resize(numDataTransf);				// resize bufToSend
 			bufToRecv.resize(numDataTransf);				// resize bufToRecv
 			
@@ -1123,7 +1127,6 @@ namespace espressopp {
 			rnode = getMyNeighbour(0);
 			
 			// prepare message for sending
-			toTransf = numPopTransf*_myNi[1];
 			i = _myNi[0] - _offset;
 			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
@@ -1139,7 +1142,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in x-dir is 1
 			if (getNodeGrid().getItem(0) > 1) {
-				if (getMyPosition().getItem(0) % 2 == 0) {
+				if (_myPosition[0] % 2 == 0) {
 					world.send(snode, COMM_DIR_0, bufToSend);
 					world.recv(rnode, COMM_DIR_0, bufToRecv);
 				} else {
@@ -1184,7 +1187,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in x-dir is 1
 			if (getNodeGrid().getItem(0) > 1) {
-				if (getMyPosition().getItem(0) % 2 == 0) {
+				if (_myPosition[0] % 2 == 0) {
 					world.send(snode, COMM_DIR_1, bufToSend);
 					world.recv(rnode, COMM_DIR_1, bufToRecv);
 				} else {
@@ -1200,7 +1203,7 @@ namespace espressopp {
 			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (j=0; j<_myNi[1]; j++) {
-					(*ghostlat)[i][j][k].setF_i(2, bufToRecv[index+0]);
+					(*ghostlat)[i][j][k].setF_i(2, bufToRecv[index]);
 					(*ghostlat)[i][j][k].setF_i(8, bufToRecv[index+1]);
 					(*ghostlat)[i][j][k].setF_i(10, bufToRecv[index+2]);
 					(*ghostlat)[i][j][k].setF_i(12, bufToRecv[index+3]);
@@ -1221,12 +1224,11 @@ namespace espressopp {
 			rnode = getMyNeighbour(2);
 			
 			// prepare message for sending
-			toTransf = numPopTransf*_myNi[0];
 			j = _myNi[1] - _offset;
 			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (i=0; i<_myNi[0]; i++) {
-					bufToSend[index+0] = (*ghostlat)[i][j][k].getF_i(3);
+					bufToSend[index] = (*ghostlat)[i][j][k].getF_i(3);
 					bufToSend[index+1] = (*ghostlat)[i][j][k].getF_i(7);
 					bufToSend[index+2] = (*ghostlat)[i][j][k].getF_i(10);
 					bufToSend[index+3] = (*ghostlat)[i][j][k].getF_i(15);
@@ -1237,7 +1239,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in y-dir is 1
 			if (getNodeGrid().getItem(1) > 1) {
-				if (getMyPosition().getItem(1) % 2 == 0) {
+				if (_myPosition[1] % 2 == 0) {
 					world.send(snode, COMM_DIR_2, bufToSend);
 					world.recv(rnode, COMM_DIR_2, bufToRecv);
 				} else {
@@ -1253,7 +1255,7 @@ namespace espressopp {
 			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (i=0; i<_myNi[0]; i++) {
-					(*ghostlat)[i][j][k].setF_i(3, bufToRecv[index+0]);
+					(*ghostlat)[i][j][k].setF_i(3, bufToRecv[index]);
 					(*ghostlat)[i][j][k].setF_i(7, bufToRecv[index+1]);
 					(*ghostlat)[i][j][k].setF_i(10, bufToRecv[index+2]);
 					(*ghostlat)[i][j][k].setF_i(15, bufToRecv[index+3]);
@@ -1271,7 +1273,7 @@ namespace espressopp {
 			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (i=0; i<_myNi[0]; i++) {
-					bufToSend[index+0] = (*ghostlat)[i][j][k].getF_i(4);
+					bufToSend[index] = (*ghostlat)[i][j][k].getF_i(4);
 					bufToSend[index+1] = (*ghostlat)[i][j][k].getF_i(8);
 					bufToSend[index+2] = (*ghostlat)[i][j][k].getF_i(9);
 					bufToSend[index+3] = (*ghostlat)[i][j][k].getF_i(16);
@@ -1282,7 +1284,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in y-dir is 1
 			if (getNodeGrid().getItem(1) > 1) {
-				if (getMyPosition().getItem(1) % 2 == 0) {
+				if (_myPosition[1] % 2 == 0) {
 					world.send(snode, COMM_DIR_3, bufToSend);
 					world.recv(rnode, COMM_DIR_3, bufToRecv);
 				} else {
@@ -1298,7 +1300,7 @@ namespace espressopp {
 			index = 0;
 			for (k=0; k<_myNi[2]; k++) {
 				for (i=0; i<_myNi[0]; i++) {
-					(*ghostlat)[i][j][k].setF_i(4, bufToRecv[index+0]);
+					(*ghostlat)[i][j][k].setF_i(4, bufToRecv[index]);
 					(*ghostlat)[i][j][k].setF_i(8, bufToRecv[index+1]);
 					(*ghostlat)[i][j][k].setF_i(9, bufToRecv[index+2]);
 					(*ghostlat)[i][j][k].setF_i(16, bufToRecv[index+3]);
@@ -1323,7 +1325,7 @@ namespace espressopp {
 			index = 0;
 			for (j=0; j<_myNi[1]; j++) {
 				for (i=0; i<_myNi[0]; i++) {
-					bufToSend[index+0] = (*ghostlat)[i][j][k].getF_i(5);
+					bufToSend[index] = (*ghostlat)[i][j][k].getF_i(5);
 					bufToSend[index+1] = (*ghostlat)[i][j][k].getF_i(11);
 					bufToSend[index+2] = (*ghostlat)[i][j][k].getF_i(14);
 					bufToSend[index+3] = (*ghostlat)[i][j][k].getF_i(15);
@@ -1334,7 +1336,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in z-dir is 1
 			if (getNodeGrid().getItem(2) > 1) {
-				if (getMyPosition().getItem(2) % 2 == 0) {
+				if (_myPosition[2] % 2 == 0) {
 					world.send(snode, COMM_DIR_4, bufToSend);
 					world.recv(rnode, COMM_DIR_4, bufToRecv);
 				} else {
@@ -1350,7 +1352,7 @@ namespace espressopp {
 			index = 0;
 			for (j=0; j<_myNi[1]; j++) {
 				for (i=0; i<_myNi[0]; i++) {
-					(*ghostlat)[i][j][k].setF_i(5, bufToRecv[index+0]);
+					(*ghostlat)[i][j][k].setF_i(5, bufToRecv[index]);
 					(*ghostlat)[i][j][k].setF_i(11, bufToRecv[index+1]);
 					(*ghostlat)[i][j][k].setF_i(14, bufToRecv[index+2]);
 					(*ghostlat)[i][j][k].setF_i(15, bufToRecv[index+3]);
@@ -1368,7 +1370,7 @@ namespace espressopp {
 			index = 0;
 			for (j=0; j<_myNi[1]; j++) {
 				for (i=0; i<_myNi[0]; i++) {
-					bufToSend[index+0] = (*ghostlat)[i][j][k].getF_i(6);
+					bufToSend[index] = (*ghostlat)[i][j][k].getF_i(6);
 					bufToSend[index+1] = (*ghostlat)[i][j][k].getF_i(12);
 					bufToSend[index+2] = (*ghostlat)[i][j][k].getF_i(13);
 					bufToSend[index+3] = (*ghostlat)[i][j][k].getF_i(16);
@@ -1379,7 +1381,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in z-dir is 1
 			if (getNodeGrid().getItem(2) > 1) {
-				if (getMyPosition().getItem(2) % 2 == 0) {
+				if (_myPosition[2] % 2 == 0) {
 					world.send(snode, COMM_DIR_5, bufToSend);
 					world.recv(rnode, COMM_DIR_5, bufToRecv);
 				} else {
@@ -1395,7 +1397,7 @@ namespace espressopp {
 			index = 0;
 			for (j=0; j<_myNi[1]; j++) {
 				for (i=0; i<_myNi[0]; i++) {
-					(*ghostlat)[i][j][k].setF_i(6, bufToRecv[index+0]);
+					(*ghostlat)[i][j][k].setF_i(6, bufToRecv[index]);
 					(*ghostlat)[i][j][k].setF_i(12, bufToRecv[index+1]);
 					(*ghostlat)[i][j][k].setF_i(13, bufToRecv[index+2]);
 					(*ghostlat)[i][j][k].setF_i(16, bufToRecv[index+3]);
@@ -1421,6 +1423,7 @@ namespace espressopp {
 			
 			int _offset = getHaloSkin();
 			Int3D _myNi = getMyNi();
+			Int3D _myPosition = getMyPosition();
 			
 			mpi::environment env;
 			mpi::communicator world;
@@ -1450,7 +1453,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in x-dir is 1
 			if (getNodeGrid().getItem(0) > 1) {
-				if (getMyPosition().getItem(0) % 2 == 0) {
+				if (_myPosition[0] % 2 == 0) {
 					world.send(snode, COMM_FORCE_0, bufToSend);
 					world.recv(rnode, COMM_FORCE_0, bufToRecv);
 				} else {
@@ -1489,7 +1492,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in x-dir is 1
 			if (getNodeGrid().getItem(0) > 1) {
-				if (getMyPosition().getItem(0) % 2 == 0) {
+				if (_myPosition[0] % 2 == 0) {
 					world.send(snode, COMM_FORCE_1, bufToSend);
 					world.recv(rnode, COMM_FORCE_1, bufToRecv);
 				} else {
@@ -1535,7 +1538,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in y-dir is 1
 			if (getNodeGrid().getItem(1) > 1) {
-				if (getMyPosition().getItem(1) % 2 == 0) {
+				if (_myPosition[1] % 2 == 0) {
 					world.send(snode, COMM_FORCE_2, bufToSend);
 					world.recv(rnode, COMM_FORCE_2, bufToRecv);
 				} else {
@@ -1574,7 +1577,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in y-dir is 1
 			if (getNodeGrid().getItem(1) > 1) {
-				if (getMyPosition().getItem(1) % 2 == 0) {
+				if (_myPosition[1] % 2 == 0) {
 					world.send(snode, COMM_FORCE_3, bufToSend);
 					world.recv(rnode, COMM_FORCE_3, bufToRecv);
 				} else {
@@ -1620,7 +1623,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in z-dir is 1
 			if (getNodeGrid().getItem(2) > 1) {
-				if (getMyPosition().getItem(2) % 2 == 0) {
+				if (_myPosition[2] % 2 == 0) {
 					world.send(snode, COMM_FORCE_4, bufToSend);
 					world.recv(rnode, COMM_FORCE_4, bufToRecv);
 				} else {
@@ -1659,7 +1662,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in z-dir is 1
 			if (getNodeGrid().getItem(2) > 1) {
-				if (getMyPosition().getItem(2) % 2 == 0) {
+				if (_myPosition[2] % 2 == 0) {
 					world.send(snode, COMM_FORCE_5, bufToSend);
 					world.recv(rnode, COMM_FORCE_5, bufToRecv);
 				} else {
@@ -1694,9 +1697,10 @@ namespace espressopp {
 			int rnode, snode;												// rank of the node to receive from and to send to
 			int _numVels = getNumVels();
 			std::vector<real> bufToSend, bufToRecv;	// buffers used to send and to receive the data
-			
+
 			int _offset = getHaloSkin();
 			Int3D _myNi = getMyNi();
+			Int3D _myPosition = getMyPosition();
 			
 			mpi::environment env;
 			mpi::communicator world;
@@ -1725,7 +1729,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in x-dir is 1
 			if (getNodeGrid().getItem(0) > 1) {
-				if (getMyPosition().getItem(0) % 2 == 0) {
+				if (_myPosition[0] % 2 == 0) {
 					world.send(snode, COMM_DEN_0, bufToSend);
 					world.recv(rnode, COMM_DEN_0, bufToRecv);
 				} else {
@@ -1764,7 +1768,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in x-dir is 1
 			if (getNodeGrid().getItem(0) > 1) {
-				if (getMyPosition().getItem(0) % 2 == 0) {
+				if (_myPosition[0] % 2 == 0) {
 					world.send(snode, COMM_DEN_1, bufToSend);
 					world.recv(rnode, COMM_DEN_1, bufToRecv);
 				} else {
@@ -1810,7 +1814,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in y-dir is 1
 			if (getNodeGrid().getItem(1) > 1) {
-				if (getMyPosition().getItem(1) % 2 == 0) {
+				if (_myPosition[1] % 2 == 0) {
 					world.send(snode, COMM_DEN_2, bufToSend);
 					world.recv(rnode, COMM_DEN_2, bufToRecv);
 				} else {
@@ -1849,7 +1853,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in y-dir is 1
 			if (getNodeGrid().getItem(1) > 1) {
-				if (getMyPosition().getItem(1) % 2 == 0) {
+				if (_myPosition[1] % 2 == 0) {
 					world.send(snode, COMM_DEN_3, bufToSend);
 					world.recv(rnode, COMM_DEN_3, bufToRecv);
 				} else {
@@ -1895,7 +1899,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in z-dir is 1
 			if (getNodeGrid().getItem(2) > 1) {
-				if (getMyPosition().getItem(2) % 2 == 0) {
+				if (_myPosition[2] % 2 == 0) {
 					world.send(snode, COMM_DEN_4, bufToSend);
 					world.recv(rnode, COMM_DEN_4, bufToRecv);
 				} else {
@@ -1934,7 +1938,7 @@ namespace espressopp {
 			
 			// send and receive data or use memcpy if number of CPU in z-dir is 1
 			if (getNodeGrid().getItem(2) > 1) {
-				if (getMyPosition().getItem(2) % 2 == 0) {
+				if (_myPosition[2] % 2 == 0) {
 					world.send(snode, COMM_DEN_5, bufToSend);
 					world.recv(rnode, COMM_DEN_5, bufToRecv);
 				} else {
