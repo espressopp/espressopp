@@ -613,9 +613,10 @@ namespace espressopp {
 				}
 
 				setStart(1);
-			} else {
+			} else if (getStart() == 1 && getCouplForceFlag() != 0) {
 				readCouplForces();
 				restoreLBForces();
+			} else {
 			}
 		}
 		
