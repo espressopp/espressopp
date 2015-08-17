@@ -32,6 +32,7 @@ sys.path.append('../..')
 # absolute, like shown here.
 
 sys.path.append(os.path.abspath('sphinxext'))
+#sys.path.append(os.path.abspath('/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/matplotlib/sphinxext'))
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
@@ -197,7 +198,7 @@ htmlhelp_basename = 'ESPResSodoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'ESPResSo.tex', u'ESPResSo++ Documentation',
+  ('index', 'ESPResSo++.tex', u'ESPResSo++ Documentation',
    u'Torsten Stuehn', 'manual'),
 ]
 
