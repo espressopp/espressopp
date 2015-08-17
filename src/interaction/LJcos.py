@@ -19,11 +19,146 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-******************************
+r"""
+********************************
 **espressopp.interaction.LJcos**
-******************************
+********************************
 
+if :math:`r^2 \leq border_{pot}`, then:
+
+.. math::
+	U = 4(\frac{1}{r^{12}} - \frac{1}{r^6}) + 1 - \phi
+
+else:
+	
+.. math::     
+	U = \frac{1}{2}\phi (cos(\alpha r^2+\beta) - 1)
+
+
+
+
+
+
+
+.. function:: espressopp.interaction.LJcos(phi)
+
+		:param phi: (default: 1.0)
+		:type phi: real
+
+.. function:: espressopp.interaction.VerletListLJcos(vl)
+
+		:param vl: 
+		:type vl: 
+
+.. function:: espressopp.interaction.VerletListLJcos.getPotential(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListLJcos.getVerletListLocal()
+
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListLJcos.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListAdressLJcos(vl, fixedtupleList)
+
+		:param vl: 
+		:param fixedtupleList: 
+		:type vl: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.interaction.VerletListAdressLJcos.setPotentialAT(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListAdressLJcos.setPotentialCG(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListHadressLJcos(vl, fixedtupleList)
+
+		:param vl: 
+		:param fixedtupleList: 
+		:type vl: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.interaction.VerletListHadressLJcos.setPotentialAT(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListHadressLJcos.setPotentialCG(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.CellListLJcos(stor)
+
+		:param stor: 
+		:type stor: 
+
+.. function:: espressopp.interaction.CellListLJcos.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListLJcos(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListLJcos.getFixedPairList()
+
+		:rtype: FixedPairList
+
+.. function:: espressopp.interaction.FixedPairListLJcos.setFixedPairList(fixedpairlist)
+
+		:param fixedpairlist: 
+		:type fixedpairlist: 
+
+.. function:: espressopp.interaction.FixedPairListLJcos.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -38,14 +173,13 @@ from _espressopp import interaction_LJcos, \
                       interaction_FixedPairListLJcos
 
 class LJcosLocal(PotentialLocal, interaction_LJcos):
-    'The (local) Lennard-Jones potential.'
+
     def __init__(self, phi=1.0):
-      """Initialize the local Lennard Jones object."""
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         cxxinit(self, interaction_LJcos, phi)
 
 class VerletListLJcosLocal(InteractionLocal, interaction_VerletListLJcos):
-    'The (local) Lennard Jones interaction using Verlet lists.'
+
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListLJcos, vl)
@@ -63,7 +197,7 @@ class VerletListLJcosLocal(InteractionLocal, interaction_VerletListLJcos):
             return self.cxxclass.getVerletList(self)
 
 class VerletListAdressLJcosLocal(InteractionLocal, interaction_VerletListAdressLJcos):
-    'The (local) Lennard Jones interaction using Verlet lists.'
+
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListAdressLJcos, vl, fixedtupleList)
@@ -77,7 +211,7 @@ class VerletListAdressLJcosLocal(InteractionLocal, interaction_VerletListAdressL
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
             
 class VerletListHadressLJcosLocal(InteractionLocal, interaction_VerletListHadressLJcos):
-    'The (local) Lennard Jones interaction using Verlet lists.'
+
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListHadressLJcos, vl, fixedtupleList)
@@ -91,7 +225,7 @@ class VerletListHadressLJcosLocal(InteractionLocal, interaction_VerletListHadres
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
 
 class CellListLJcosLocal(InteractionLocal, interaction_CellListLJcos):
-    'The (local) Lennard Jones interaction using cell lists.'
+
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListLJcos, stor)
@@ -101,7 +235,7 @@ class CellListLJcosLocal(InteractionLocal, interaction_CellListLJcos):
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 class FixedPairListLJcosLocal(InteractionLocal, interaction_FixedPairListLJcos):
-    'The (local) Lennard-Jones interaction using FixedPair lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListLJcos, system, vl, potential)
@@ -121,7 +255,7 @@ class FixedPairListLJcosLocal(InteractionLocal, interaction_FixedPairListLJcos):
 
 if pmi.isController:
     class LJcos(Potential):
-        'The Lennard-Jones potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.LJcosLocal',
             pmiproperty = ['phi']

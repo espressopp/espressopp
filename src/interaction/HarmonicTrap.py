@@ -20,11 +20,29 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""
-*************************************
+r"""
+***************************************
 **espressopp.interaction.HarmonicTrap**
-*************************************
+***************************************
+.. math::
+	U = K \frac{1}{2}d^2
 
+
+.. function:: espressopp.interaction.HarmonicTrap()
+
+
+.. function:: espressopp.interaction.SingleParticleHarmonicTrap(system, potential)
+
+		:param system: 
+		:param potential: 
+		:type system: 
+		:type potential: 
+
+.. function:: espressopp.interaction.SingleParticleHarmonicTrap.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
+		:rtype:
 """
 from espressopp import pmi
 from espressopp.esutil import *
@@ -35,15 +53,15 @@ from _espressopp import interaction_HarmonicTrap, interaction_SingleParticleHarm
 
 
 class HarmonicTrapLocal(SingleParticlePotentialLocal, interaction_HarmonicTrap):
-    'The (local) HarmonicTrap potential.'
+
     def __init__(self):
-        """Initialize the local HarmonicTrap object."""
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_HarmonicTrap)
 
 
 class SingleParticleHarmonicTrapLocal(InteractionLocal, interaction_SingleParticleHarmonicTrap):
-    'The (local) HarmonicTrap interaction.'
+
     def __init__(self, system, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_SingleParticleHarmonicTrap, system, potential)
@@ -54,7 +72,7 @@ class SingleParticleHarmonicTrapLocal(InteractionLocal, interaction_SinglePartic
 
 if pmi.isController:
     class HarmonicTrap(SingleParticlePotential):
-        'The HarmonicTrap potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.HarmonicTrapLocal',
             pmiproperty = ['k', 'center']

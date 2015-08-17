@@ -19,10 +19,59 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***********************************
+r"""
+*************************************
 **espressopp.interaction.FENECapped**
-***********************************
+*************************************
+
+.. math::
+	U = -\frac{1}{2}r_{max}^2  K \cdot
+ 				 log\left(1 - \frac{D - r_{0}}{r_{max}}^2\right)
+
+where :math:`D = dist` if :math:`{cap_{rad}}^2>dist` and :math:`D = cap_{rad}` else.
+
+.. function:: espressopp.interaction.FENECapped(K, r0, rMax, cutoff, caprad, shift)
+
+		:param K: (default: 1.0)
+		:param r0: (default: 0.0)
+		:param rMax: (default: 1.0)
+		:param cutoff: (default: infinity)
+		:param caprad: (default: 1.0)
+		:param shift: (default: 0.0)
+		:type K: real
+		:type r0: real
+		:type rMax: real
+		:type cutoff: 
+		:type caprad: real
+		:type shift: real
+
+.. function:: espressopp.interaction.FixedPairListFENECapped(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListFENECapped.getFixedPairList()
+
+		:rtype: FixedPairList
+
+.. function:: espressopp.interaction.FixedPairListFENECapped.getPotential()
+
+		:rtype:
+
+.. function:: espressopp.interaction.FixedPairListFENECapped.setFixedPairList(fixedpairlist)
+
+		:param fixedpairlist: 
+		:type fixedpairlist: FixedPairList
+
+
+.. function:: espressopp.interaction.FixedPairListFENECapped.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 
 """
 from espressopp import pmi, infinity
@@ -33,10 +82,9 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_FENECapped, interaction_FixedPairListFENECapped
 
 class FENECappedLocal(PotentialLocal, interaction_FENECapped):
-    'The (local) FENECapped potential.'
+
     def __init__(self, K=1.0, r0=0.0, rMax=1.0, 
                  cutoff=infinity, caprad=1.0, shift=0.0):
-        """Initialize the local FENE object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
                 cxxinit(self, interaction_FENECapped, K, r0, rMax, cutoff, caprad)
@@ -44,7 +92,7 @@ class FENECappedLocal(PotentialLocal, interaction_FENECapped):
                 cxxinit(self, interaction_FENECapped, K, r0, rMax, cutoff, caprad, shift)
 
 class FixedPairListFENECappedLocal(InteractionLocal, interaction_FixedPairListFENECapped):
-    'The (local) FENECapped interaction using FixedPair lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListFENECapped, system, vl, potential)
@@ -67,7 +115,7 @@ class FixedPairListFENECappedLocal(InteractionLocal, interaction_FixedPairListFE
 
 if pmi.isController:
     class FENECapped(Potential):
-        'The FENECapped potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.FENECappedLocal',
             pmiproperty = ['K', 'r0', 'rMax', 'caprad']

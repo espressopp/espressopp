@@ -37,12 +37,24 @@
       <div class="documentwrapper">
 	<div class="bodywrapper">
 	  <div class="body">
+            {%if prev %}
+             <a href="{{ prev.link|e }}">previous</a>
+            {% endif %}
+            {%if next %}
+             <a style="float:right;"  href="{{ next.link|e }}">next</a>
+            {% endif %}
 	    {% block body %} {% endblock %}
-	  </div>
-	</div>
-      </div>
+            {%if prev %}
+             <a href="{{ prev.link|e }}">previous</a>
+            {% endif %}    
+            {%if next %}
+             <a style="float:right;"  href="{{ next.link|e }}">next</a>
+            {% endif %}
+          </div>
+        </div>
+     </div>
     {%- endblock %} 
-  </div>
+ </div>
 
 {%- endblock %}
 

@@ -19,11 +19,133 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-******************************
+r"""
+********************************
 **espressopp.interaction.Morse**
-******************************
+********************************
+This class provides methods to compute forces and energies of
+the Morse potential.
 
+.. math::
+	U = \varepsilon  \left(e^{-2 \alpha (r - r_{min})} - 2 e^{-\alpha (r - r_{min})}\right)
+
+
+
+
+
+
+.. function:: espressopp.interaction.Morse(epsilon, alpha, rMin, cutoff, shift)
+
+		:param epsilon: (default: 1.0)
+		:param alpha: (default: 1.0)
+		:param rMin: (default: 0.0)
+		:param cutoff: (default: infinity)
+		:param shift: (default: "auto")
+		:type epsilon: real
+		:type alpha: real
+		:type rMin: real
+		:type cutoff: int
+		:type shift: 
+
+.. function:: espressopp.interaction.VerletListMorse(vl)
+
+		:param vl: 
+		:type vl: 
+
+.. function:: espressopp.interaction.VerletListMorse.getPotential(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListMorse.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListAdressMorse(vl, fixedtupleList)
+
+		:param vl: 
+		:param fixedtupleList: 
+		:type vl: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.interaction.VerletListAdressMorse.setPotentialAT(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListAdressMorse.setPotentialCG(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListHadressMorse(vl, fixedtupleList)
+
+		:param vl: 
+		:param fixedtupleList: 
+		:type vl: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.interaction.VerletListHadressMorse.setPotentialAT(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListHadressMorse.setPotentialCG(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.CellListMorse(stor)
+
+		:param stor: 
+		:type stor: 
+
+.. function:: espressopp.interaction.CellListMorse.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListMorse(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListMorse.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -38,10 +160,9 @@ from _espressopp import interaction_Morse, \
                       interaction_FixedPairListMorse
 
 class MorseLocal(PotentialLocal, interaction_Morse):
-    'The (local) Morse potential.'
+
     def __init__(self, epsilon=1.0, alpha=1.0, rMin=0.0, 
                  cutoff=infinity, shift="auto"):
-        """Initialize the local Morse object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
                 cxxinit(self, interaction_Morse, 
@@ -51,7 +172,7 @@ class MorseLocal(PotentialLocal, interaction_Morse):
                         epsilon, alpha, rMin, cutoff, shift)
 
 class VerletListMorseLocal(InteractionLocal, interaction_VerletListMorse):
-    'The (local) Morse interaction using Verlet lists.'
+
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListMorse, vl)
@@ -65,7 +186,7 @@ class VerletListMorseLocal(InteractionLocal, interaction_VerletListMorse):
             return self.cxxclass.getPotential(self, type1, type2)
         
 class VerletListAdressMorseLocal(InteractionLocal, interaction_VerletListAdressMorse):
-    'The (local) Morse interaction using Verlet lists.'
+
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListAdressMorse, vl, fixedtupleList)
@@ -79,7 +200,7 @@ class VerletListAdressMorseLocal(InteractionLocal, interaction_VerletListAdressM
             self.cxxclass.setPotentialAT(self, type1, type2, potential)
             
 class VerletListHadressMorseLocal(InteractionLocal, interaction_VerletListHadressMorse):
-    'The (local) Morse interaction using Verlet lists.'
+
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListHadressMorse, vl, fixedtupleList)
@@ -93,7 +214,7 @@ class VerletListHadressMorseLocal(InteractionLocal, interaction_VerletListHadres
             self.cxxclass.setPotentialAT(self, type1, type2, potential)
 
 class CellListMorseLocal(InteractionLocal, interaction_CellListMorse):
-    'The (local) Morse interaction using cell lists.'
+
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListMorse, stor)
@@ -103,7 +224,7 @@ class CellListMorseLocal(InteractionLocal, interaction_CellListMorse):
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 class FixedPairListMorseLocal(InteractionLocal, interaction_FixedPairListMorse):
-    'The (local) Morse interaction using FixedPair lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListMorse, system, vl, potential)
@@ -114,7 +235,7 @@ class FixedPairListMorseLocal(InteractionLocal, interaction_FixedPairListMorse):
 
 if pmi.isController:
     class Morse(Potential):
-        'The Morse potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.MorseLocal',
             pmiproperty = ['epsilon', 'alpha', 'rMin']

@@ -19,10 +19,40 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*******************************
+r"""
+*********************************
 **espressopp.interaction.Cosine**
-*******************************
+*********************************
+
+Calculates the Cosine Interaction
+
+.. math::
+	U = K  (1 - cos(\theta - \theta_0))
+
+.. function:: espressopp.interaction.Cosine(K, theta0)
+
+		:param K: (default: 1.0)
+		:param theta0: (default: 0.0) An angle in radians.
+		:type K: real
+		:type theta0: real 
+
+.. function:: espressopp.interaction.FixedTripleListCosine(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedTripleListCosine.getFixedTripleList()
+
+		:rtype: FixedTriplelist
+
+.. function:: espressopp.interaction.FixedTripleListCosine.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 
 """
 from espressopp import pmi
@@ -33,14 +63,13 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_Cosine, interaction_FixedTripleListCosine
 
 class CosineLocal(AngularPotentialLocal, interaction_Cosine):
-    'The (local) Cosine potential.'
+
     def __init__(self, K=1.0, theta0=0.0):
-        """Initialize the local Cosine object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_Cosine, K, theta0)
 
 class FixedTripleListCosineLocal(InteractionLocal, interaction_FixedTripleListCosine):
-    'The (local) Cosine interaction using FixedTriple lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedTripleListCosine, system, vl, potential)
@@ -55,7 +84,7 @@ class FixedTripleListCosineLocal(InteractionLocal, interaction_FixedTripleListCo
 
 if pmi.isController:
     class Cosine(AngularPotential):
-        'The Cosine potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.CosineLocal',
             pmiproperty = ['K', 'theta0']

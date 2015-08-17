@@ -19,11 +19,82 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*******************************************
+r"""
+*********************************************
 **espressopp.interaction.LennardJonesExpand**
-*******************************************
+*********************************************
+.. math::
+	V(r) = 4 \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} -
+	\left( \frac{\sigma}{r} \right)^{6} \right]
 
+
+
+
+
+
+.. function:: espressopp.interaction.LennardJonesExpand(epsilon, sigma, delta, cutoff, shift)
+
+		:param epsilon: (default: 1.0)
+		:param sigma: (default: 1.0)
+		:param delta: (default: 0.0)
+		:param cutoff: (default: infinity)
+		:param shift: (default: "auto")
+		:type epsilon: real
+		:type sigma: real
+		:type delta: real
+		:type cutoff: int
+		:type shift: 
+
+.. function:: espressopp.interaction.VerletListLennardJonesExpand(vl)
+
+		:param vl: 
+		:type vl: 
+
+.. function:: espressopp.interaction.VerletListLennardJonesExpand.getPotential(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListLennardJonesExpand.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+		
+.. function:: espressopp.interaction.CellListLennardJonesExpand(stor)
+
+		:param stor: 
+		:type stor: 
+
+.. function:: espressopp.interaction.CellListLennardJonesExpand.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+		:rtype:
+
+.. function:: espressopp.interaction.FixedPairListLennardJonesExpand(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListLennardJonesExpand.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -36,10 +107,9 @@ from _espressopp import interaction_LennardJonesExpand, \
                       interaction_FixedPairListLennardJonesExpand
 
 class LennardJonesExpandLocal(PotentialLocal, interaction_LennardJonesExpand):
-    'The (local) LennardJonesExpand potential.'
+
     def __init__(self, epsilon=1.0, sigma=1.0, delta=0.0,
                  cutoff=infinity, shift="auto"):
-        """Initialize the local LennardJonesExpand object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
                 cxxinit(self, interaction_LennardJonesExpand,
@@ -49,7 +119,7 @@ class LennardJonesExpandLocal(PotentialLocal, interaction_LennardJonesExpand):
                         epsilon, sigma, delta, cutoff, shift)
 
 class VerletListLennardJonesExpandLocal(InteractionLocal, interaction_VerletListLennardJonesExpand):
-    'The (local) LennardJonesExpand interaction using Verlet lists.'
+
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListLennardJonesExpand, vl)
@@ -63,7 +133,7 @@ class VerletListLennardJonesExpandLocal(InteractionLocal, interaction_VerletList
             return self.cxxclass.getPotential(self, type1, type2)
 
 class CellListLennardJonesExpandLocal(InteractionLocal, interaction_CellListLennardJonesExpand):
-    'The (local) LennardJonesExpand interaction using cell lists.'
+
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListLennardJonesExpand, stor)
@@ -73,7 +143,7 @@ class CellListLennardJonesExpandLocal(InteractionLocal, interaction_CellListLenn
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 class FixedPairListLennardJonesExpandLocal(InteractionLocal, interaction_FixedPairListLennardJonesExpand):
-    'The (local) LennardJonesExpand interaction using FixedPair lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListLennardJonesExpand, system, vl, potential)
@@ -84,7 +154,7 @@ class FixedPairListLennardJonesExpandLocal(InteractionLocal, interaction_FixedPa
 
 if pmi.isController:
     class LennardJonesExpand(Potential):
-        'The LennardJonesExpand potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.LennardJonesExpandLocal',
             pmiproperty = ['epsilon', 'sigma', 'delta']

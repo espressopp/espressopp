@@ -19,10 +19,71 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*****************************************
+r"""
+*******************************************
 **espressopp.interaction.CoulombTruncated**
-*****************************************
+*******************************************
+.. math::
+	U = \frac{Q}{d}
+
+.. function:: espressopp.interaction.CoulombTruncated(qq, cutoff, shift)
+
+		:param qq: (default: 1.0)
+		:param cutoff: (default: infinity)
+		:param shift: (default: "auto")
+		:type qq: real
+		:type cutoff: 
+		:type shift: 
+
+.. function:: espressopp.interaction.VerletListCoulombTruncated(vl)
+
+		:param vl: 
+		:type vl: 
+
+.. function:: espressopp.interaction.VerletListCoulombTruncated.getPotential(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListCoulombTruncated.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.CellListCoulombTruncated(stor)
+
+		:param stor: 
+		:type stor: 
+
+.. function:: espressopp.interaction.CellListCoulombTruncated.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListCoulombTruncated(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListCoulombTruncated.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 
 """
 from espressopp import pmi, infinity
@@ -36,10 +97,9 @@ from _espressopp import interaction_CoulombTruncated, \
                       interaction_FixedPairListCoulombTruncated
 
 class CoulombTruncatedLocal(PotentialLocal, interaction_CoulombTruncated):
-    'The (local) CoulombTruncated potential.'
+
     def __init__(self, qq=1.0,
                  cutoff=infinity, shift="auto"):
-        """Initialize the local CoulombTruncated object."""
         if shift =="auto":
             if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
                 cxxinit(self, interaction_CoulombTruncated, 
@@ -50,7 +110,7 @@ class CoulombTruncatedLocal(PotentialLocal, interaction_CoulombTruncated):
                         qq, cutoff, shift)
 
 class VerletListCoulombTruncatedLocal(InteractionLocal, interaction_VerletListCoulombTruncated):
-    'The (local) CoulombTruncated interaction using Verlet lists.'
+
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListCoulombTruncated, vl)
@@ -64,7 +124,7 @@ class VerletListCoulombTruncatedLocal(InteractionLocal, interaction_VerletListCo
             return self.cxxclass.getPotential(self, type1, type2)
 
 class CellListCoulombTruncatedLocal(InteractionLocal, interaction_CellListCoulombTruncated):
-    'The (local) CoulombTruncated interaction using cell lists.'
+
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListCoulombTruncated, stor)
@@ -74,7 +134,7 @@ class CellListCoulombTruncatedLocal(InteractionLocal, interaction_CellListCoulom
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 class FixedPairListCoulombTruncatedLocal(InteractionLocal, interaction_FixedPairListCoulombTruncated):
-    'The (local) CoulombTruncated interaction using FixedPair lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListCoulombTruncated, system, vl, potential)
@@ -85,7 +145,7 @@ class FixedPairListCoulombTruncatedLocal(InteractionLocal, interaction_FixedPair
 
 if pmi.isController:
     class CoulombTruncated(Potential):
-        'The CoulombTruncated potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.CoulombTruncatedLocal',
             pmiproperty = ['qq']

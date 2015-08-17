@@ -19,11 +19,48 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***************************************
+r"""
+*****************************************
 **espressopp.interaction.HarmonicUnique**
-***************************************
+*****************************************
 
+.. math::
+        U = K  (d - d_{cur})^2;
+
+
+
+
+
+
+.. function:: espressopp.interaction.HarmonicUnique(K)
+
+		:param K: (default: 1.0)
+		:type K: real
+
+.. function:: espressopp.interaction.FixedPairDistListHarmonicUnique(system, fpl, potential)
+
+		:param system: 
+		:param fpl: 
+		:param potential: 
+		:type system: 
+		:type fpl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairDistListHarmonicUnique.getFixedPairList()
+
+		:rtype:
+
+.. function:: espressopp.interaction.FixedPairDistListHarmonicUnique.setFixedPairList(fixedpairlist)
+
+		:param fixedpairlist: 
+		:type fixedpairlist: FixedPairlList
+		:rtype:
+
+.. function:: espressopp.interaction.FixedPairDistListHarmonicUnique.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
+		:rtype:
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -34,14 +71,14 @@ from _espressopp import interaction_HarmonicUnique, \
                       interaction_FixedPairDistListHarmonicUnique
 
 class HarmonicUniqueLocal(PotentialUniqueDistLocal, interaction_HarmonicUnique):
-    'The (local) HarmonicUnique potential.'
+
     def __init__(self, K=1.0):
-        """Initialize the local HarmonicUnique object."""
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
           cxxinit(self, interaction_HarmonicUnique, K)
 
 class FixedPairDistListHarmonicUniqueLocal(InteractionLocal, interaction_FixedPairDistListHarmonicUnique):
-    'The (local) HarmonicUnique interaction using FixedPair lists.'
+
     def __init__(self, system, fpl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairDistListHarmonicUnique, system, fpl, potential)
@@ -61,7 +98,7 @@ class FixedPairDistListHarmonicUniqueLocal(InteractionLocal, interaction_FixedPa
 
 if pmi.isController:
     class HarmonicUnique(PotentialUniqueDist):
-        'The HarmonicUnique potential.'
+
         pmiproxydefs = dict(
           cls = 'espressopp.interaction.HarmonicUniqueLocal',
           pmiproperty = ['K']

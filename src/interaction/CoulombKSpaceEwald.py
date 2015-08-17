@@ -19,11 +19,18 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
+r"""
 ***********************************************************************************
 **CoulombKSpaceEwald** - Coulomb potential and interaction Objects (`K` space part)
 ***********************************************************************************
 
+.. math::
+	\frac{1}{2\pi V} 
+	\sum_{m\in \mathbb{Z}^3 \atop 0<|m|<k_{max}} 
+	\frac{exp(-\frac{\pi^2}{\alpha^2}m^{\prime 2})}{m^{\prime 2}}
+	\left\lvert\sum_{i=1}^{N}
+	 q_{i}\cdot exp(2\pi i r_{i}\cdot m^{\prime})\right\rvert^{2}
+	
 This is the `K` space part of potential of Coulomb long range interaction according to the Ewald
 summation technique. Good explanation of Ewald summation could be found here [Allen89]_,
 [Deserno98]_.
@@ -88,6 +95,33 @@ References:
 
 .. [Deserno98] M.Deserno and C.Holm, *J. Chem. Phys.*, 109(18), **1998**, p.7678
 
+
+
+.. function:: espressopp.interaction.CoulombKSpaceEwald(system, prefactor, alpha, kmax)
+
+		:param system: 
+		:param prefactor: 
+		:param alpha: 
+		:param kmax: 
+		:type system: 
+		:type prefactor: real
+		:type alpha: real
+		:type kmax: int
+
+.. function:: espressopp.interaction.CellListCoulombKSpaceEwald(storage, potential)
+
+		:param storage: 
+		:param potential: 
+		:type storage: 
+		:type potential: 
+
+.. function:: espressopp.interaction.CellListCoulombKSpaceEwald.getFixedPairList()
+
+		:rtype:FixedPairList
+
+.. function:: espressopp.interaction.CellListCoulombKSpaceEwald.getPotential()
+
+		:rtype:
 """
 
 
@@ -101,14 +135,11 @@ from _espressopp import interaction_CoulombKSpaceEwald, \
 
 class CoulombKSpaceEwaldLocal(PotentialLocal, interaction_CoulombKSpaceEwald):
     def __init__(self, system, prefactor, alpha, kmax):
-      'The (local) CoulombKSpaceEwald potential.'
-      """Initialize the local CoulombKSpaceEwald object."""
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         cxxinit(self, interaction_CoulombKSpaceEwald, system, prefactor, alpha, kmax)
 
 class CellListCoulombKSpaceEwaldLocal(InteractionLocal, interaction_CellListCoulombKSpaceEwald):
     def __init__(self, storage, potential):
-      'The (local) CoulombKSpaceEwald interaction using CellListAllParticles.'
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         cxxinit(self, interaction_CellListCoulombKSpaceEwald, storage, potential)
 

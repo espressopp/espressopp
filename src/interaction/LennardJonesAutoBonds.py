@@ -19,11 +19,118 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**********************************************
+r"""
+************************************************
 **espressopp.interaction.LennardJonesAutoBonds**
-**********************************************
+************************************************
 
+.. math::
+	V(r) = 4 \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} -
+	\left( \frac{\sigma}{r} \right)^{6} \right]
+
+
+
+
+
+
+.. function:: espressopp.interaction.LennardJonesAutoBonds(epsilon, sigma, cutoff, bondlist, maxcrosslinks)
+
+		:param epsilon: (default: 1.0)
+		:param sigma: (default: 1.0)
+		:param cutoff: (default: infinity)
+		:param bondlist: (default: None)
+		:param maxcrosslinks: (default: 2)
+		:type epsilon: real
+		:type sigma: real
+		:type cutoff: int
+		:type bondlist: 
+		:type maxcrosslinks: int 
+
+.. function:: espressopp.interaction.VerletListLennardJonesAutoBonds(vl)
+
+		:param vl: 
+		:type vl: 
+
+.. function:: espressopp.interaction.VerletListLennardJonesAutoBonds.getPotential(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListLennardJonesAutoBonds.getVerletListLocal()
+
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListLennardJonesAutoBonds.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListAdressLennardJonesAutoBonds(vl, fixedtupleList)
+
+		:param vl: 
+		:param fixedtupleList: 
+		:type vl: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.interaction.VerletListAdressLennardJonesAutoBonds.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListHadressLennardJonesAutoBonds(vl, fixedtupleList)
+
+		:param vl: 
+		:param fixedtupleList: 
+		:type vl: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.interaction.VerletListHadressLennardJonesAutoBonds.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.CellListLennardJonesAutoBonds(stor)
+
+		:param stor: 
+		:type stor: 
+
+.. function:: espressopp.interaction.CellListLennardJonesAutoBonds.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListLennardJonesAutoBonds(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListLennardJonesAutoBonds.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -39,17 +146,16 @@ from _espressopp import interaction_LennardJonesAutoBonds, \
                       interaction_FixedPairListLennardJonesAutoBonds
 
 class LennardJonesAutoBondsLocal(PotentialLocal, interaction_LennardJonesAutoBonds):
-    'The (local) Lennard-Jones auto bond potential.'
+
     def __init__(self, epsilon=1.0, sigma=1.0, 
                  cutoff=infinity, bondlist=None, maxcrosslinks=2):
-        """Initialize the local Lennard Jones auto bonds object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if bondlist == None:
               raise MissingFixedPairList('LennardsJonesAutoBonds needs a FixedPairList to be able to create new bonds')                                         
             cxxinit(self, interaction_LennardJonesAutoBonds, epsilon, sigma, cutoff, bondlist, maxcrosslinks)                
 
 class VerletListLennardJonesAutoBondsLocal(InteractionLocal, interaction_VerletListLennardJonesAutoBonds):
-    'The (local) Lennard Jones auto bonds interaction using Verlet lists.'
+
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListLennardJonesAutoBonds, vl)
@@ -67,7 +173,7 @@ class VerletListLennardJonesAutoBondsLocal(InteractionLocal, interaction_VerletL
             return self.cxxclass.getVerletList(self)
 
 class VerletListAdressLennardJonesAutoBondsLocal(InteractionLocal, interaction_VerletListAdressLennardJonesAutoBonds):
-    'The (local) Lennard Jones auto bonds interaction using Verlet lists.'
+
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListAdressLennardJonesAutoBonds, vl, fixedtupleList)
@@ -77,7 +183,7 @@ class VerletListAdressLennardJonesAutoBondsLocal(InteractionLocal, interaction_V
             self.cxxclass.setPotential(self, type1, type2, potential)
             
 class VerletListHadressLennardJonesAutoBondsLocal(InteractionLocal, interaction_VerletListHadressLennardJonesAutoBonds):
-    'The (local) Lennard Jones auto bonds interaction using Verlet lists.'
+
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListHadressLennardJonesAutoBonds, vl, fixedtupleList)
@@ -87,7 +193,7 @@ class VerletListHadressLennardJonesAutoBondsLocal(InteractionLocal, interaction_
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 class CellListLennardJonesAutoBondsLocal(InteractionLocal, interaction_CellListLennardJonesAutoBonds):
-    'The (local) Lennard Jones auto bonds interaction using cell lists.'
+
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListLennardJonesAutoBonds, stor)
@@ -97,7 +203,7 @@ class CellListLennardJonesAutoBondsLocal(InteractionLocal, interaction_CellListL
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 class FixedPairListLennardJonesAutoBondsLocal(InteractionLocal, interaction_FixedPairListLennardJonesAutoBonds):
-    'The (local) Lennard-Jones auto bonds interaction using FixedPair lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListLennardJonesAutoBonds, system, vl, potential)
@@ -108,7 +214,7 @@ class FixedPairListLennardJonesAutoBondsLocal(InteractionLocal, interaction_Fixe
 
 if pmi.isController:
     class LennardJonesAutoBonds(Potential):
-        'The Lennard-Jones auto bonds potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.LennardJonesAutoBondsLocal',
             pmiproperty = ['epsilon', 'sigma']

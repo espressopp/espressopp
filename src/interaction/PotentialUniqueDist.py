@@ -20,9 +20,10 @@
 
 
 """
-********************************************
+**********************************************
 **espressopp.interaction.PotentialUniqueDist**
-********************************************
+**********************************************
+This is an abstract class, only needed to be inherited from.
 
 """
 from espressopp import pmi

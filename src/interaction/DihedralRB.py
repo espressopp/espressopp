@@ -17,23 +17,68 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-"""
-*****************************
+r"""
+*************************************
 **espressopp.interaction.DihedralRB**
-*****************************
+*************************************
 
 The proper dihedral with Ryckaert-Bellemans form.
 
 .. math::
 
-    U_{rb}(\phi_{ijkl}) = \sum_{n=0}^{5} K_n (cos(\\theta))^n
+    U_{rb}(\phi_{ijkl}) = \sum_{n=0}^{5} K_n (cos(\theta))^n
 
-where the :math:`\\theta = \phi - 180^\circ` and :math:`K_{0\dotso5}` are the coefficients.
+where the :math:`\theta = \phi - 180^\circ` and :math:`K_{0\dotso5}` are the coefficients.
 
-By default the IUPAC confention is used, where :math:`\phi` is the angle between planes
+By default the IUPAC convention is used, where :math:`\phi` is the angle between planes
 :math:`ijk` and :math:`jkl`. The :math:`0^\circ` corresponds to the *cis* configuration.
 
 Reference: http://www.gromacs.org/Documentation/Manual
+
+
+
+
+
+
+.. function:: espressopp.interaction.DihedralRB(K0, K1, K2, K3, K4, K5, iupac)
+
+		:param K0: (default: 0.0)
+		:param K1: (default: 0.0)
+		:param K2: (default: 0.0)
+		:param K3: (default: 0.0)
+		:param K4: (default: 0.0)
+		:param K5: (default: 0.0)
+		:param iupac: (default: True) If set to true then IUPAC convention for dihedrals is used (by default).
+		:type K0: real
+		:type K1: real
+		:type K2: real
+		:type K3: real
+		:type K4: real
+		:type K5: real
+		:type iupac: Boolean 
+
+.. function:: espressopp.interaction.FixedQuadrupleListDihedralRB(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedQuadrupleListDihedralRB.getFixedQuadrupleList()
+
+		:rtype: FixedQuadrupleList
+
+.. function:: espressopp.interaction.FixedQuadrupleListDihedralRB.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
 """
 
 from espressopp import pmi
@@ -46,9 +91,8 @@ from _espressopp import interaction_FixedQuadrupleListDihedralRB
 
 
 class DihedralRBLocal(DihedralPotentialLocal, interaction_DihedralRB):
-    """The (local) DihedralRB potential."""
+
     def __init__(self, K0=0.0, K1=0.0, K2=0.0, K3=0.0, K4=0.0, K5=0.0, iupac=True):
-        """Initialize the local DihedralRB object."""
         if (not (pmi._PMIComm and pmi._PMIComm.isActive())
                 or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
             if iupac:
@@ -58,7 +102,7 @@ class DihedralRBLocal(DihedralPotentialLocal, interaction_DihedralRB):
 
 
 class FixedQuadrupleListDihedralRBLocal(InteractionLocal, interaction_FixedQuadrupleListDihedralRB):
-    """The (local) DihedralRB interaction using FixedQuadruple lists."""
+
     def __init__(self, system, vl, potential):
         if (not (pmi._PMIComm and pmi._PMIComm.isActive())
                 or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
@@ -76,12 +120,6 @@ class FixedQuadrupleListDihedralRBLocal(InteractionLocal, interaction_FixedQuadr
 
 if pmi.isController:
     class DihedralRB(DihedralPotential):
-        """The  Ryckaert-Bellemans function for proper dihedrals.
-
-        Args:
-            K0, K1, K2, K3, K4, K5: The parameters for potential.
-            iupac: If set to true then IUPAC convention for dihedrals is used (by default).
-        """
         pmiproxydefs = dict(
             cls='espressopp.interaction.DihedralRBLocal'
             )

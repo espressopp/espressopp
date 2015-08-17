@@ -19,11 +19,58 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-********************************
+r"""
+**********************************
 **espressopp.interaction.Quartic**
-********************************
+**********************************
+This class provides methods to compute forces and energies of
+the Quartic potential.
 
+.. math::
+	U=\frac{K}{4} \left(d^2 - r_0^2 \right)^2
+
+
+
+
+
+
+.. function:: espressopp.interaction.Quartic(K, r0, cutoff, shift)
+
+		:param K: (default: 1.0)
+		:param r0: (default: 0.0)
+		:param cutoff: (default: infinity)
+		:param shift: (default: 0.0)
+		:type K: real
+		:type r0: real
+		:type cutoff: int
+		:type shift: real
+
+.. function:: espressopp.interaction.FixedPairListQuartic(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListQuartic.getFixedPairList()
+
+		:rtype:
+
+.. function:: espressopp.interaction.FixedPairListQuartic.setFixedPairList(fixedpairlist)
+
+		:param fixedpairlist: 
+		:type fixedpairlist: 
+
+.. function:: espressopp.interaction.FixedPairListQuartic.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -33,10 +80,9 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_Quartic, interaction_FixedPairListQuartic
 
 class QuarticLocal(PotentialLocal, interaction_Quartic):
-    'The (local) Quartic potential.'
+
     def __init__(self, K=1.0, r0=0.0, 
                  cutoff=infinity, shift=0.0):
-        """Initialize the local Quartic object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
                 cxxinit(self, interaction_Quartic, K, r0, cutoff)
@@ -44,7 +90,7 @@ class QuarticLocal(PotentialLocal, interaction_Quartic):
                 cxxinit(self, interaction_Quartic, K, r0, cutoff, shift)
 
 class FixedPairListQuarticLocal(InteractionLocal, interaction_FixedPairListQuartic):
-    'The (local) Quartic interaction using FixedPair lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListQuartic, system, vl, potential)
@@ -64,7 +110,7 @@ class FixedPairListQuarticLocal(InteractionLocal, interaction_FixedPairListQuart
 
 if pmi.isController:
     class Quartic(Potential):
-        'The Quartic potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.QuarticLocal',
             pmiproperty = ['K', 'r0']

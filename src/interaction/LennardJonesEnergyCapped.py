@@ -19,11 +19,178 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*************************************************
+r"""
+***************************************************
 **espressopp.interaction.LennardJonesEnergyCapped**
-*************************************************
+***************************************************
 
+.. math::
+	V(r) = 4 \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} -
+	\left( \frac{\sigma}{r} \right)^{6} \right]
+where `r` is either the distance or the capped distance, depending on which is
+greater.
+
+
+
+
+
+
+.. function:: espressopp.interaction.LennardJonesEnergyCapped(epsilon, sigma, cutoff, caprad, shift)
+
+		:param epsilon: (default: 1.0)
+		:param sigma: (default: 1.0)
+		:param cutoff: (default: infinity)
+		:param caprad: (default: 0.0)
+		:param shift: (default: "auto")
+		:type epsilon: real
+		:type sigma: real
+		:type cutoff: int
+		:type caprad: real
+		:type shift: 
+
+.. function:: espressopp.interaction.VerletListLennardJonesEnergyCapped(vl)
+
+		:param vl: 
+		:type vl: 
+
+.. function:: espressopp.interaction.VerletListLennardJonesEnergyCapped.getPotential(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListLennardJonesEnergyCapped.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListAdressLennardJonesEnergyCapped(vl, fixedtupleList)
+
+		:param vl: 
+		:param fixedtupleList: 
+		:type vl: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.interaction.VerletListAdressLennardJonesEnergyCapped.getPotentialAT(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListAdressLennardJonesEnergyCapped.getPotentialCG(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListAdressLennardJonesEnergyCapped.setPotentialAT(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListAdressLennardJonesEnergyCapped.setPotentialCG(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListHadressLennardJonesEnergyCapped(vl, fixedtupleList)
+
+		:param vl: 
+		:param fixedtupleList: 
+		:type vl: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.interaction.VerletListHadressLennardJonesEnergyCapped.getPotentialAT(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListHadressLennardJonesEnergyCapped.getPotentialCG(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListHadressLennardJonesEnergyCapped.setPotentialAT(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListHadressLennardJonesEnergyCapped.setPotentialCG(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.CellListLennardJonesEnergyCapped(stor)
+
+		:param stor: 
+		:type stor: 
+
+.. function:: espressopp.interaction.CellListLennardJonesEnergyCapped.getPotential(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype:
+
+.. function:: espressopp.interaction.CellListLennardJonesEnergyCapped.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListLennardJonesEnergyCapped(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListLennardJonesEnergyCapped.getPotential()
+
+		:rtype:
+
+.. function:: espressopp.interaction.FixedPairListLennardJonesEnergyCapped.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -38,10 +205,9 @@ from _espressopp import interaction_LennardJonesEnergyCapped, \
                       interaction_FixedPairListLennardJonesEnergyCapped
 
 class LennardJonesEnergyCappedLocal(PotentialLocal, interaction_LennardJonesEnergyCapped):
-    'The (local) Lennard-Jones potential with energy capping.'
+
     def __init__(self, epsilon=1.0, sigma=1.0, 
                  cutoff=infinity, caprad=0.0 ,shift="auto"):
-        """Initialize the local Lennard Jones object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
                 cxxinit(self, interaction_LennardJonesEnergyCapped, 
@@ -51,7 +217,7 @@ class LennardJonesEnergyCappedLocal(PotentialLocal, interaction_LennardJonesEner
                         epsilon, sigma, cutoff, caprad, shift)
 
 class VerletListLennardJonesEnergyCappedLocal(InteractionLocal, interaction_VerletListLennardJonesEnergyCapped):
-    'The (local) Lennard Jones interaction using Verlet lists.'
+
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListLennardJonesEnergyCapped, vl)
@@ -65,7 +231,7 @@ class VerletListLennardJonesEnergyCappedLocal(InteractionLocal, interaction_Verl
             return self.cxxclass.getPotential(self, type1, type2)
 
 class VerletListAdressLennardJonesEnergyCappedLocal(InteractionLocal, interaction_VerletListAdressLennardJonesEnergyCapped):
-    'The (local) Lennard Jones interaction using Verlet lists.'
+
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListAdressLennardJonesEnergyCapped, vl, fixedtupleList)
@@ -87,7 +253,7 @@ class VerletListAdressLennardJonesEnergyCappedLocal(InteractionLocal, interactio
             return self.cxxclass.getPotentialCG(self, type1, type2)
         
 class VerletListHadressLennardJonesEnergyCappedLocal(InteractionLocal, interaction_VerletListHadressLennardJonesEnergyCapped):
-    'The (local) Lennard Jones interaction using Verlet lists.'
+
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListHadressLennardJonesEnergyCapped, vl, fixedtupleList)
@@ -109,7 +275,7 @@ class VerletListHadressLennardJonesEnergyCappedLocal(InteractionLocal, interacti
             return self.cxxclass.getPotentialCG(self, type1, type2)
 
 class CellListLennardJonesEnergyCappedLocal(InteractionLocal, interaction_CellListLennardJonesEnergyCapped):
-    'The (local) Lennard Jones interaction using cell lists.'
+
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListLennardJonesEnergyCapped, stor)
@@ -123,7 +289,7 @@ class CellListLennardJonesEnergyCappedLocal(InteractionLocal, interaction_CellLi
             return self.cxxclass.getPotential(self, type1, type2)
 
 class FixedPairListLennardJonesEnergyCappedLocal(InteractionLocal, interaction_FixedPairListLennardJonesEnergyCapped):
-    'The (local) Lennard-Jones interaction using FixedPair lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListLennardJonesEnergyCapped, system, vl, potential)
@@ -138,7 +304,7 @@ class FixedPairListLennardJonesEnergyCappedLocal(InteractionLocal, interaction_F
 
 if pmi.isController:
     class LennardJonesEnergyCapped(Potential):
-        'The Lennard-Jones potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.LennardJonesEnergyCappedLocal',
             pmiproperty = ['epsilon', 'sigma', 'cutoff', 'caprad']

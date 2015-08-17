@@ -19,12 +19,53 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
+r"""
 ********************
 **GravityTruncated**
 ********************
 
 This is an implementation of a truncated (cutoff) Gravity Potential
+
+.. math::
+	U = P \cdot \frac{m_1 \cdot m_2}{ \lvert p_1 - p_2\rvert}
+
+where :math:`m_i` is the mass of the `i` th particle, :math:`p_i` its position and `P` a prefactor.
+
+
+
+.. function:: espressopp.interaction.GravityTruncated(prefactor, cutoff)
+
+		:param prefactor: (default: 1.0)
+		:param cutoff: (default: infinity)
+		:type prefactor: real
+		:type cutoff: 
+
+.. function:: espressopp.interaction.VerletListGravityTruncated(vl)
+
+		:param vl: 
+		:type vl: 
+
+.. function:: espressopp.interaction.VerletListGravityTruncated.getPotential(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListGravityTruncated.getVerletListLocal()
+
+		:rtype: VerletList
+
+.. function:: espressopp.interaction.VerletListGravityTruncated.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+		:rtype:
 """
 
 from espressopp import pmi, infinity
@@ -38,20 +79,16 @@ from _espressopp import interaction_GravityTruncated, \
 class GravityTruncatedLocal(PotentialLocal, interaction_GravityTruncated):
   
   def __init__(self, prefactor=1.0, cutoff=infinity):
-    'The (local) gravity potential'
-    """Initialize the local gravity space object."""
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_GravityTruncated, prefactor, cutoff)
 
 class VerletListGravityTruncatedLocal(InteractionLocal, interaction_VerletListGravityTruncated):
   
   def __init__(self, vl):
-    'The (local) Gravity interaction using Verlet lists.'
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_VerletListGravityTruncated, vl)
       
   def setPotential(self, type1, type2, potential):
-    'The method sets the potential for the particles of `type1` and `type2` from the interaction'
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       self.cxxclass.setPotential(self, type1, type2, potential)
 
@@ -60,7 +97,6 @@ class VerletListGravityTruncatedLocal(InteractionLocal, interaction_VerletListGr
       return self.cxxclass.getPotential(self, type1, type2)
 
   def getVerletListLocal(self):
-    'The method gets the VerletList from the interaction'
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       return self.cxxclass.getVerletList(self)
 

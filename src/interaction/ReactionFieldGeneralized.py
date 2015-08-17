@@ -19,11 +19,127 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*************************************************
+r"""
+***************************************************
 **espressopp.interaction.ReactionFieldGeneralized**
-*************************************************
+***************************************************
+This class provides methods to compute forces and energies of
+the generalized reaction field.
 
+.. math::
+	U = PQ\left(
+	\frac{1}{d} 
+	- \frac{\left(1 + \frac{(\varepsilon_1 - 4 \varepsilon_2)(1 + \kappa r_c) - 2 \varepsilon_2  \kappa {r_c}^2}
+	{(\varepsilon_1 + 2 \varepsilon_2)(1 + \kappa r_c) + \varepsilon_2  \kappa {r_c}^2}\right)}{r_c^3 2}
+	\cdot d^2 -  \frac{3 \varepsilon_2}{r_c(2 \varepsilon_2 + 1)}\right)
+	
+where `P` is a prefactor, `Q` is the product of the charges of the two particles, `d` is their distance from each other, and :math:`r_c` the cutoff-radius.
+
+
+
+
+
+
+.. function:: espressopp.interaction.ReactionFieldGeneralized(prefactor, kappa, epsilon1, epsilon2, cutoff, shift)
+
+		:param prefactor: (default: 1.0)
+		:param kappa: (default: 0.0)
+		:param epsilon1: (default: 1.0)
+		:param epsilon2: (default: 80.0)
+		:param cutoff: (default: infinity)
+		:param shift: (default: "auto")
+		:type prefactor: real
+		:type kappa: real
+		:type epsilon1: real
+		:type epsilon2: real
+		:type cutoff: int
+		:type shift: 
+
+.. function:: espressopp.interaction.VerletListReactionFieldGeneralized(vl)
+
+		:param vl: 
+		:type vl: 
+
+.. function:: espressopp.interaction.VerletListReactionFieldGeneralized.getPotential(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListReactionFieldGeneralized.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListAdressReactionFieldGeneralized(vl, fixedtupleList)
+
+		:param vl: 
+		:param fixedtupleList: 
+		:type vl: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.interaction.VerletListAdressReactionFieldGeneralized.setPotentialAT(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListAdressReactionFieldGeneralized.setPotentialCG(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListHadressReactionFieldGeneralized(vl, fixedtupleList)
+
+		:param vl: 
+		:param fixedtupleList: 
+		:type vl: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.interaction.VerletListHadressReactionFieldGeneralized.setPotentialAT(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListHadressReactionFieldGeneralized.setPotentialCG(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.CellListReactionFieldGeneralized(stor)
+
+		:param stor: 
+		:type stor: 
+
+.. function:: espressopp.interaction.CellListReactionFieldGeneralized.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -38,9 +154,8 @@ from _espressopp import interaction_ReactionFieldGeneralized, \
                       #interaction_FixedPairListReactionFieldGeneralized
 
 class ReactionFieldGeneralizedLocal(PotentialLocal, interaction_ReactionFieldGeneralized):
-    'The (local) ReactionFieldGeneralized potential.'
+
     def __init__(self, prefactor=1.0, kappa=0.0, epsilon1=1.0, epsilon2=80.0, cutoff=infinity, shift="auto"):
-        """Initialize the local ReactionFieldGeneralized object."""
         if shift =="auto":
             if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
                 cxxinit(self, interaction_ReactionFieldGeneralized, prefactor, kappa, epsilon1, epsilon2, cutoff)
@@ -49,7 +164,7 @@ class ReactionFieldGeneralizedLocal(PotentialLocal, interaction_ReactionFieldGen
                 cxxinit(self, interaction_ReactionFieldGeneralized, prefactor, kappa, epsilon1, epsilon2, cutoff, shift)
 
 class VerletListReactionFieldGeneralizedLocal(InteractionLocal, interaction_VerletListReactionFieldGeneralized):
-    'The (local) ReactionFieldGeneralized interaction using Verlet lists.'
+
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListReactionFieldGeneralized, vl)
@@ -63,7 +178,7 @@ class VerletListReactionFieldGeneralizedLocal(InteractionLocal, interaction_Verl
             return self.cxxclass.getPotential(self, type1, type2)
     
 class VerletListAdressReactionFieldGeneralizedLocal(InteractionLocal, interaction_VerletListAdressReactionFieldGeneralized):
-    'The (local) ReactionFieldGeneralized interaction using Verlet lists.'
+
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListAdressReactionFieldGeneralized, vl, fixedtupleList)
@@ -77,7 +192,7 @@ class VerletListAdressReactionFieldGeneralizedLocal(InteractionLocal, interactio
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
             
 class VerletListHadressReactionFieldGeneralizedLocal(InteractionLocal, interaction_VerletListHadressReactionFieldGeneralized):
-    'The (local) ReactionFieldGeneralized interaction using Verlet lists.'
+
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListHadressReactionFieldGeneralized, vl, fixedtupleList)
@@ -92,7 +207,7 @@ class VerletListHadressReactionFieldGeneralizedLocal(InteractionLocal, interacti
             
 
 class CellListReactionFieldGeneralizedLocal(InteractionLocal, interaction_CellListReactionFieldGeneralized):
-    'The (local) ReactionFieldGeneralized interaction using cell lists.'
+
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListReactionFieldGeneralized, stor)
@@ -114,7 +229,7 @@ class CellListReactionFieldGeneralizedLocal(InteractionLocal, interaction_CellLi
 
 if pmi.isController:
     class ReactionFieldGeneralized(Potential):
-        'The ReactionFieldGeneralized potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.ReactionFieldGeneralizedLocal',
             pmiproperty = ['prefactor']#['qq']

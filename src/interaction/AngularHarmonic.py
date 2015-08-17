@@ -19,10 +19,40 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-****************************************
+r"""
+******************************************
 **espressopp.interaction.AngularHarmonic**
-****************************************
+******************************************
+
+Calculates the Angular Harmonic interaction
+
+.. math::
+	U = K (\theta - \theta_0)^2
+
+.. function:: espressopp.interaction.AngularHarmonic(K, theta0)
+
+		:param K: (default: 1.0)
+		:param theta0: (default: 0.0) An angle in radians.
+		:type K: real
+		:type theta0:real 
+
+.. function:: espressopp.interaction.FixedTripleListAngularHarmonic(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedTripleListAngularHarmonic.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
 
 """
 from espressopp import pmi
@@ -33,14 +63,13 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_AngularHarmonic, interaction_FixedTripleListAngularHarmonic
 
 class AngularHarmonicLocal(AngularPotentialLocal, interaction_AngularHarmonic):
-    'The (local) AngularHarmonic potential.'
+
     def __init__(self, K=1.0, theta0=0.0):
-        """Initialize the local AngularHarmonic object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_AngularHarmonic, K, theta0)
 
 class FixedTripleListAngularHarmonicLocal(InteractionLocal, interaction_FixedTripleListAngularHarmonic):
-    'The (local) AngularHarmonic interaction using FixedTriple lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedTripleListAngularHarmonic, system, vl, potential)
@@ -51,7 +80,7 @@ class FixedTripleListAngularHarmonicLocal(InteractionLocal, interaction_FixedTri
 
 if pmi.isController:
     class AngularHarmonic(AngularPotential):
-        'The AngularHarmonic potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.AngularHarmonicLocal',
             pmiproperty = ['K', 'theta0']

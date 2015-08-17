@@ -20,14 +20,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""
-*******************************************
+r"""
+*********************************************
 **espressopp.interaction.LennardJones93Wall**
-*******************************************
+*********************************************
 
 This class defines a Lennard-Jones 9-3 SingleParticlePotential in the direction x.
 
-.. math:: V(r) = \\epsilon \\left( \\left(\\frac{\sigma}{r}\\right)^9 - \\left(\\frac{\sigma}{r}\\right)^3 \\right)
+.. math:: V(r) = \epsilon \left( \left(\frac{\sigma}{r}\right)^9 - \left(\frac{\sigma}{r}\right)^3 \right)
 
 where :math:`r` is the distance from the lower or upper wall in the x
 direction. :math:`V(r)=0` after a distance `sigmaCutoff`.
@@ -42,6 +42,45 @@ Example:
     >>> SPLJ93 = espressopp.interaction.SingleParticleLennardJones93Wall(system, LJ93)
     >>> system.addInteraction(SPLJ93)
 
+
+
+
+
+
+
+.. function:: espressopp.interaction.LennardJones93Wall()
+
+
+.. function:: espressopp.interaction.LennardJones93Wall.getParams(type_var)
+
+		:param type_var: 
+		:type type_var: 
+		:rtype:
+
+.. function:: espressopp.interaction.LennardJones93Wall.setParams(type_var, epsilon, sigma, sigmaCutoff, r0)
+
+		:param type_var: 
+		:param epsilon: 
+		:param sigma: 
+		:param sigmaCutoff: 
+		:param r0: 
+		:type type_var: 
+		:type epsilon: 
+		:type sigma: 
+		:type sigmaCutoff: 
+		:type r0: 
+
+.. function:: espressopp.interaction.SingleParticleLennardJones93Wall(system, potential)
+
+		:param system: 
+		:param potential: 
+		:type system: 
+		:type potential: 
+
+.. function:: espressopp.interaction.SingleParticleLennardJones93Wall.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 """
 from espressopp import pmi
 from espressopp.esutil import *
@@ -52,24 +91,19 @@ from _espressopp import interaction_LennardJones93Wall, interaction_SinglePartic
 
 
 class LennardJones93WallLocal(SingleParticlePotentialLocal, interaction_LennardJones93Wall):
-    'The (local) LennardJones93Wall potential.'
+
     def __init__(self):
-        """Initialize the local LennardJones93Wall object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_LennardJones93Wall)
     def getParams(self, type_var):
-        """Return the epsilon, sigma, sigmaCutoff and r0 parameters for particles of type `type_var`.
-        """
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getParams(self, type_var)
 
     def setParams(self, type_var, epsilon, sigma, sigmaCutoff, r0):
-        """Set the epsilon, sigma, sigmaCutoff and r0 parameters for particles of type `type_var`.
-        """
         self.cxxclass.setParams(self, type_var, epsilon, sigma, sigmaCutoff, r0)
 
 class SingleParticleLennardJones93WallLocal(InteractionLocal, interaction_SingleParticleLennardJones93Wall):
-    'The (local) LennardJones93Wall interaction.'
+
     def __init__(self, system, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_SingleParticleLennardJones93Wall, system, potential)
@@ -80,7 +114,7 @@ class SingleParticleLennardJones93WallLocal(InteractionLocal, interaction_Single
 
 if pmi.isController:
     class LennardJones93Wall(SingleParticlePotential):
-        'The LennardJones93Wall potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.LennardJones93WallLocal',
             pmicall = ['setParams', 'getParams']

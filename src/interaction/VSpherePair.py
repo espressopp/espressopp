@@ -19,11 +19,60 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+**************************************
 **espressopp.interaction.VSpherePair**
-************************************
+**************************************
+This class provides methods to compute forces and energies of
+the VSpherePair potential.
 
+.. math::
+.. math::
+         V(r_ij, \sigma_ij) = \frac{\varepsilon}{\beta} \left( \frac{2 \pi}{3} \right)
+                              \sigma_ij^{- \frac{3}{2}} e^{- \frac{3}{2} \frac{r_ij}{\sigma_ij}} ,
+                              r_ij = \left| \vec{r_i} - \vec{r_j} \right| ,
+                              \sigma_ij = \sigma_i^2 + \sigma_j^2
+
+
+
+
+
+
+
+.. function:: espressopp.interaction.VSpherePair(epsilon, cutoff, shift)
+
+		:param epsilon: (default: 1.0)
+		:param cutoff: (default: infinity)
+		:param shift: (default: "auto")
+		:type epsilon: 
+		:type cutoff: 
+		:type shift: 
+
+.. function:: espressopp.interaction.VerletListVSpherePair(vl)
+
+		:param vl: 
+		:type vl: 
+
+.. function:: espressopp.interaction.VerletListVSpherePair.getPotential(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListVSpherePair.getVerletList()
+
+		:rtype:
+
+.. function:: espressopp.interaction.VerletListVSpherePair.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -33,9 +82,8 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_VSpherePair, interaction_VerletListVSpherePair
 
 class VSpherePairLocal(PotentialLocal, interaction_VSpherePair):
-    'The (local) Lennard-Jones potential.'
+
     def __init__(self, epsilon=1.0, cutoff=infinity, shift="auto"):
-        """Initialize the local Lennard Jones object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
                 cxxinit(self, interaction_VSpherePair, 
@@ -45,7 +93,7 @@ class VSpherePairLocal(PotentialLocal, interaction_VSpherePair):
                         epsilon, cutoff, shift)
 
 class VerletListVSpherePairLocal(InteractionLocal, interaction_VerletListVSpherePair):
-    'The (local) Lennard Jones interaction using Verlet lists.'
+
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListVSpherePair, vl)
@@ -65,7 +113,7 @@ class VerletListVSpherePairLocal(InteractionLocal, interaction_VerletListVSphere
 
 if pmi.isController:
     class VSpherePair(Potential):
-        'The Lennard-Jones potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.VSpherePairLocal',
             pmiproperty = ['epsilon']

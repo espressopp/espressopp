@@ -19,10 +19,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-******************************************
+r"""
+********************************************
 **espressopp.interaction.DihedralPotential**
-******************************************
+********************************************
+This is an abstract class, only needed to be inherited from.
 
 """
 # -*- coding: iso-8859-1 -*-

@@ -19,10 +19,62 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*****************************
+r"""
+*******************************
 **espressopp.interaction.FENE**
-*****************************
+*******************************
+
+
+.. math::
+	 U = -\frac{1}{2}r_{max}^2  K \cdot
+ 				 log(1 - \frac{\sqrt{dist_{sqr}} - r_{0}}{r_{max}}^2);
+
+
+
+
+
+
+
+.. function:: espressopp.interaction.FENE(K, r0, rMax, cutoff, shift)
+
+		:param K: (default: 1.0)
+		:param r0: (default: 0.0)
+		:param rMax: (default: 1.0)
+		:param cutoff: (default: infinity)
+		:param shift: (default: 0.0)
+		:type K: real
+		:type r0: real
+		:type rMax: real
+		:type cutoff: 
+		:type shift: real
+
+.. function:: espressopp.interaction.FixedPairListFENE(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListFENE.getFixedPairList()
+
+		:rtype: FixedPairList
+
+.. function:: espressopp.interaction.FixedPairListFENE.getPotential()
+
+		:rtype:
+
+.. function:: espressopp.interaction.FixedPairListFENE.setFixedPairList(fixedpairlist)
+
+		:param fixedpairlist: 
+		:type fixedpairlist: FixedPairList
+
+
+.. function:: espressopp.interaction.FixedPairListFENE.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 
 """
 from espressopp import pmi, infinity
@@ -33,10 +85,9 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_FENE, interaction_FixedPairListFENE
 
 class FENELocal(PotentialLocal, interaction_FENE):
-    'The (local) FENE potential.'
+
     def __init__(self, K=1.0, r0=0.0, rMax=1.0, 
                  cutoff=infinity, shift=0.0):
-        """Initialize the local FENE object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
                 cxxinit(self, interaction_FENE, K, r0, rMax, cutoff)
@@ -44,7 +95,7 @@ class FENELocal(PotentialLocal, interaction_FENE):
                 cxxinit(self, interaction_FENE, K, r0, rMax, cutoff, shift)
 
 class FixedPairListFENELocal(InteractionLocal, interaction_FixedPairListFENE):
-    'The (local) FENE interaction using FixedPair lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListFENE, system, vl, potential)
@@ -67,7 +118,7 @@ class FixedPairListFENELocal(InteractionLocal, interaction_FixedPairListFENE):
 
 if pmi.isController:
     class FENE(Potential):
-        'The FENE potential.'
+
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.FENELocal',
             pmiproperty = ['K', 'r0', 'rMax']
