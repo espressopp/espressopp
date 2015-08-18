@@ -19,7 +19,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
+r"""
 ********************************************
 **espressopp.interaction.LennardJonesGenericCapped**
 ********************************************
@@ -38,10 +38,8 @@ from _espressopp import interaction_LennardJonesGenericCapped, \
                       interaction_FixedPairListLennardJonesGenericCapped
 
 class LennardJonesGenericCappedLocal(PotentialLocal, interaction_LennardJonesGenericCapped):
-    'The (local) generic Lennard-Jones potential with force capping.'
     def __init__(self, epsilon=1.0, sigma=1.0, a=12, b=6,
                  cutoff=infinity, caprad=0.0, shift="auto"):
-        """Initialize the local generic Lennard Jones object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
                 print "here without shift"
@@ -53,7 +51,6 @@ class LennardJonesGenericCappedLocal(PotentialLocal, interaction_LennardJonesGen
                         epsilon, sigma, a, b, cutoff, caprad, shift)
 
 class VerletListLennardJonesGenericCappedLocal(InteractionLocal, interaction_VerletListLennardJonesGenericCapped):
-    'The (local) Lennard Jones interaction using Verlet lists.'
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListLennardJonesGenericCapped, vl)
@@ -71,7 +68,6 @@ class VerletListLennardJonesGenericCappedLocal(InteractionLocal, interaction_Ver
             return self.cxxclass.getVerletList(self)
 
 class VerletListAdressLennardJonesGenericCappedLocal(InteractionLocal, interaction_VerletListAdressLennardJonesGenericCapped):
-    'The (local) Lennard Jones interaction using Verlet lists.'
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListAdressLennardJonesGenericCapped, vl, fixedtupleList)
@@ -85,7 +81,6 @@ class VerletListAdressLennardJonesGenericCappedLocal(InteractionLocal, interacti
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
             
 class VerletListHadressLennardJonesGenericCappedLocal(InteractionLocal, interaction_VerletListHadressLennardJonesGenericCapped):
-    'The (local) Lennard Jones interaction using Verlet lists.'
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListHadressLennardJonesGenericCapped, vl, fixedtupleList)
@@ -99,7 +94,6 @@ class VerletListHadressLennardJonesGenericCappedLocal(InteractionLocal, interact
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
             
 class CellListLennardJonesGenericCappedLocal(InteractionLocal, interaction_CellListLennardJonesGenericCapped):
-    'The (local) Lennard Jones interaction using cell lists.'
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListLennardJonesGenericCapped, stor)
@@ -109,7 +103,6 @@ class CellListLennardJonesGenericCappedLocal(InteractionLocal, interaction_CellL
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 class FixedPairListLennardJonesGenericCappedLocal(InteractionLocal, interaction_FixedPairListLennardJonesGenericCapped):
-    'The (local) Lennard-Jones interaction using FixedPair lists.'
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListLennardJonesGenericCapped, system, vl, potential)
@@ -133,7 +126,6 @@ class FixedPairListLennardJonesGenericCappedLocal(InteractionLocal, interaction_
 
 if pmi.isController:
     class LennardJonesGenericCapped(Potential):
-        'The generic Lennard-Jones potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.LennardJonesGenericCappedLocal',
             pmiproperty = ['epsilon', 'sigma', 'a', 'b', 'cutoff', 'caprad']

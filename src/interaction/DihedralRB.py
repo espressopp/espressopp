@@ -68,7 +68,7 @@ Reference: http://www.gromacs.org/Documentation/Manual
 
 .. function:: espressopp.interaction.FixedQuadrupleListDihedralRB.getFixedQuadrupleList()
 
-		:rtype: FixedQuadrupleList
+		:rtype: FixedQuadrupleList (A python list of lists, *not* tuples)
 
 .. function:: espressopp.interaction.FixedQuadrupleListDihedralRB.setPotential(type1, type2, potential)
 

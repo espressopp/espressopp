@@ -29,12 +29,6 @@ Calculates the Angular Cosine Squared interaction
 .. math::
 	U =  K (cos(\theta) - cos(\theta_{0}))^2
 
-
-
-
-
-
-
 .. function:: espressopp.interaction.AngularCosineSquared(K, theta0)
 
 		:param K: (default: 1.0)
@@ -53,7 +47,7 @@ Calculates the Angular Cosine Squared interaction
 
 .. function:: espressopp.interaction.FixedTripleListAngularCosineSquared.getFixedTripleList()
 
-		:rtype: FixedTripleList
+		:rtype: FixedTripleList (A python list of lists, *not* tuples)
 
 .. function:: espressopp.interaction.FixedTripleListAngularCosineSquared.setPotential(type1, type2, potential)
 

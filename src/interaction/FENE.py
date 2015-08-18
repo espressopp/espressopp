@@ -59,7 +59,7 @@ r"""
 
 .. function:: espressopp.interaction.FixedPairListFENE.getFixedPairList()
 
-		:rtype: FixedPairList
+		:rtype: FixedPairList (A python list of lists, *not* tuples)
 
 .. function:: espressopp.interaction.FixedPairListFENE.getPotential()
 

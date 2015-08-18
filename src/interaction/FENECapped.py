@@ -56,7 +56,7 @@ where :math:`D = dist` if :math:`{cap_{rad}}^2>dist` and :math:`D = cap_{rad}` e
 
 .. function:: espressopp.interaction.FixedPairListFENECapped.getFixedPairList()
 
-		:rtype: FixedPairList
+		:rtype: FixedPairList (A python list of lists, *not* tuples)
 
 .. function:: espressopp.interaction.FixedPairListFENECapped.getPotential()
 

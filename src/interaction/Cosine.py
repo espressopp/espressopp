@@ -47,7 +47,7 @@ Calculates the Cosine Interaction
 
 .. function:: espressopp.interaction.FixedTripleListCosine.getFixedTripleList()
 
-		:rtype: FixedTriplelist
+		:rtype: FixedTriplelist (A python list of lists, *not* tuples)
 
 .. function:: espressopp.interaction.FixedTripleListCosine.setPotential(potential)
 

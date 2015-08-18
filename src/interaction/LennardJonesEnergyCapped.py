@@ -30,11 +30,6 @@ r"""
 where `r` is either the distance or the capped distance, depending on which is
 greater.
 
-
-
-
-
-
 .. function:: espressopp.interaction.LennardJonesEnergyCapped(epsilon, sigma, cutoff, caprad, shift)
 
 		:param epsilon: (default: 1.0)

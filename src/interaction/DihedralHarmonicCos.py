@@ -46,7 +46,7 @@ r"""
 
 .. function:: espressopp.interaction.FixedQuadrupleListDihedralHarmonicCos.getFixedQuadrupleList()
 
-		:rtype: FixedQuadrupelList
+		:rtype: FixedQuadrupelList (A python list of lists, *not* tuples)
 
 .. function:: espressopp.interaction.FixedQuadrupleListDihedralHarmonicCos.setPotential(potential)
 

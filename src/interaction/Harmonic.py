@@ -50,7 +50,7 @@ r"""
 
 .. function:: espressopp.interaction.FixedPairListHarmonic.getFixedPairList()
 
-		:rtype: FixedPairList
+		:rtype: FixedPairList (A python list of lists, *not* tuples)
 
 .. function:: espressopp.interaction.FixedPairListHarmonic.setFixedPairList(fixedpairlist)
 

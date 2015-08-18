@@ -205,7 +205,8 @@ r"""
 .. function:: espressopp.interaction.FixedPairListLennardJones.setFixedPairList(fixedpairlist)
 
 		:param fixedpairlist: 
-		:type fixedpairlist: 
+		:type fixedpairlist:
+
 
 .. function:: espressopp.interaction.FixedPairListLennardJones.setPotential(potential)
 

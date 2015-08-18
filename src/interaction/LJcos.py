@@ -148,12 +148,12 @@ else:
 
 .. function:: espressopp.interaction.FixedPairListLJcos.getFixedPairList()
 
-		:rtype: FixedPairList
+		:rtype: FixedPairList (A python list of lists, *not* tuples)
 
 .. function:: espressopp.interaction.FixedPairListLJcos.setFixedPairList(fixedpairlist)
 
 		:param fixedpairlist: 
-		:type fixedpairlist: 
+		:type fixedpairlist:  FixedPairList (A python list of lists, *not* tuples)
 
 .. function:: espressopp.interaction.FixedPairListLJcos.setPotential(potential)
 
