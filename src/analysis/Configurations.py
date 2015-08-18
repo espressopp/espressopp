@@ -19,19 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*******************************************
+r"""
+*********************************************
 **Configurations** - Configurations Object
-*******************************************
-
-* `gather()`
-  add configuration to trajectory
-
-* `clear()`
-  clear trajectory
-  
-* `back()`
-  get last configuration of trajectory
+*********************************************
 
 * `capacity`
   maximum number of configurations in trajectory
@@ -41,8 +32,27 @@
 
 * `size`
   number of stored configurations
+.. function:: espressopp.analysis.Configurations(system)
 
-usage:
+		:param system: 
+		:type system: 
+
+.. function:: espressopp.analysis.Configurations.back()
+
+	Get last configuration of trajectory
+		:rtype:
+
+.. function:: espressopp.analysis.Configurations.clear()
+
+  Clear trajectory
+		:rtype:
+
+.. function:: espressopp.analysis.Configurations.gather()
+	
+	Add configuration to trajectory
+
+
+**Example of usage**
 
 storing trajectory
 
@@ -67,6 +77,8 @@ iterate over all particles stored in configuration:
 access particle with id <pid> of stored configuration <n>:
 
 >>> print "particle coord: ",configurations[n][pid]
+
+
 """
 
 from espressopp.esutil import cxxinit
@@ -76,7 +88,7 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_Configurations
 
 class ConfigurationsLocal(ObservableLocal, analysis_Configurations):
-    'The (local) storage of configurations.'
+
     def __init__(self, system):
         cxxinit(self, analysis_Configurations, system)
     def gather(self):

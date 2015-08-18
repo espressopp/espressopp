@@ -19,11 +19,28 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**********************************
+r"""
+************************************
 **espressopp.analysis.RDFatomistic**
-**********************************
+************************************
 
+
+.. function:: espressopp.analysis.RDFatomistic(system, type1, type2, _span)
+
+		:param system: 
+		:param type1: 
+		:param type2: 
+		:param _span: 
+		:type system: 
+		:type type1: 
+		:type type2: 
+		:type _span: 
+
+.. function:: espressopp.analysis.RDFatomistic.compute(rdfN)
+
+		:param rdfN: 
+		:type rdfN: 
+		:rtype:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +49,7 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_RDFatomistic
 
 class RDFatomisticLocal(ObservableLocal, analysis_RDFatomistic):
-  'The (local) compute the radial distr function.'
+
   def __init__(self, system, type1, type2, _span):
     cxxinit(self, analysis_RDFatomistic, system, type1, type2, _span)
     

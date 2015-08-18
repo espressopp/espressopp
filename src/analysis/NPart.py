@@ -19,11 +19,16 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***************************
+r"""
+*****************************
 **espressopp.analysis.NPart**
-***************************
+*****************************
 
+
+.. function:: espressopp.analysis.NPart(system)
+
+		:param system: 
+		:type system: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +37,7 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_NPart
 
 class NPartLocal(ObservableLocal, analysis_NPart):
-    'The (local) compute of the number of particles of the system.'
+
     def __init__(self, system):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_NPart, system)

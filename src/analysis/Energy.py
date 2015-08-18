@@ -19,16 +19,49 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-****************************
+r"""
+******************************
 **espressopp.analysis.Energy**
-****************************
+******************************
 
+
+.. function:: espressopp.analysis.EnergyPot(system, per_atom)
+
+		:param system: 
+		:param per_atom: (default: False)
+		:type system: 
+		:type per_atom: 
+
+.. function:: espressopp.analysis.EnergyPot.compute()
+
+		:rtype:
+
+.. function:: espressopp.analysis.EnergyKin(system, per_atom)
+
+		:param system: 
+		:param per_atom: (default: False)
+		:type system: 
+		:type per_atom: 
+
+.. function:: espressopp.analysis.EnergyKin.compute()
+
+		:rtype:
+
+.. function:: espressopp.analysis.EnergyTot(system, per_atom)
+
+		:param system: 
+		:param per_atom: (default: False)
+		:type system: 
+		:type per_atom: 
+
+.. function:: espressopp.analysis.EnergyTot.compute()
+
+		:rtype:
 """
 import espressopp
 
 class EnergyPot():
-    'Potential energy of the system.'
+
     def __init__(self, system, per_atom=False):
         self.system   = system
         self.per_atom = per_atom
@@ -44,7 +77,7 @@ class EnergyPot():
           return EPot
 
 class EnergyKin():
-    'Kinetic energy of the system.'
+
     def __init__(self, system, per_atom=False):
         self.system   = system
         self.per_atom = per_atom
@@ -59,7 +92,7 @@ class EnergyKin():
           return EKin
 
 class EnergyTot():
-    'Total energy (EKin + EPot) of the system.'
+
     def __init__(self, system, per_atom=False):
         self.system   = system
         self.per_atom = per_atom

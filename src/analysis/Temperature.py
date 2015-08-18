@@ -19,11 +19,16 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*********************************
+r"""
+***********************************
 **espressopp.analysis.Temperature**
-*********************************
+***********************************
 
+
+.. function:: espressopp.analysis.Temperature(system)
+
+		:param system: 
+		:type system: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +37,7 @@ from espressopp.analysis.AnalysisBase import *
 from _espressopp import analysis_Temperature
 
 class TemperatureLocal(AnalysisBaseLocal, analysis_Temperature):
-    'The (local) compute of temperature.'
+
     def __init__(self, system):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_Temperature, system)

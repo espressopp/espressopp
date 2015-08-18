@@ -19,11 +19,16 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-******************************
+r"""
+********************************
 **espressopp.analysis.Pressure**
-******************************
+********************************
 
+
+.. function:: espressopp.analysis.Pressure(system)
+
+		:param system: 
+		:type system: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +37,7 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_Pressure
 
 class PressureLocal(ObservableLocal, analysis_Pressure):
-    'The (local) compute of pressure.'
+
     def __init__(self, system):
         cxxinit(self, analysis_Pressure, system)
 

@@ -19,20 +19,22 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*************************************************************
+r"""
+***************************************************************
 **LBOutputScreen** - controls screen output in LB-simulations
-*************************************************************
+***************************************************************
 Child class derived from the abstract class :class:`espressopp.analysis.LBOutput`.
 It computes and outputs to the screen the simulation progress (finished step) and 
 controls mass flux conservation when using MD-to-LB coupling. Ideally, the sum of mass
 fluxes should be zero, i.e. :math:`j_{LB} + j_{MD} = 0`.
 
-.. function:: espressopp.analysis.LBOutputScreen(system,latticeboltzmann)
+.. function:: espressopp.analysis.LBOutputScreen(system, latticeboltzmann)
 
-	:param system: system object defined earlier in the python-script
-	:param latticeboltzmann: lattice boltzmann object defined earlier in the python-script
-
+		:param system: system object defined earlier in the python-script
+		:param latticeboltzmann: lattice boltzmann object defined earlier in the python-script
+		:type system: 
+		:type latticeboltzmann: 
+		
 .. note::
 
 	this class should be called from external analysis class :class:`espressopp.integrator.ExtAnalyze`
@@ -50,6 +52,8 @@ Example to call the profiler:
 >>>
 >>> # add the external analysis object as an extension to the integrator
 >>> integrator.addExtension(extAnalysisNum1)
+
+
 
 """
 from espressopp.esutil import cxxinit

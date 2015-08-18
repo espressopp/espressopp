@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**************************************************************************
+r"""
+****************************************************************************
 **LBOutput** - abstract base class for analysis / output in LB simulations
-**************************************************************************
+****************************************************************************
 
 Abstract base class for arbitrary output from LB simulations. At the moment, the implemented realisations are:
 
@@ -44,6 +44,9 @@ Abstract base class for arbitrary output from LB simulations. At the moment, the
 
 	* `LBOutputVzInTime()`
 	Computes and outputs a vz component of the velocity as a function of time.
+
+
+.. function:: espressopp.analysis.LBOutput()
 
 """
 from espressopp.esutil import cxxinit

@@ -19,18 +19,20 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*********************************************************************
+r"""
+***********************************************************************
 **LBOutputVzOfX** - controls output of the velocity component profile
-*********************************************************************
+***********************************************************************
 Child class derived from the abstract class :class:`espressopp.analysis.LBOutput`. 
 It computes and outputs simulation progress (finished step) and controls flux 
 conservation when using MD to LB coupling.
 
-.. function:: espressopp.analysis.LBOutputVzOfX(system,latticeboltzmann)
+.. function:: espressopp.analysis.LBOutputVzOfX(system, latticeboltzmann)
 
-	:param system: system object defined earlier in the python-script
-	:param latticeboltzmann: lattice boltzmann object defined earlier in the python-script
+		:param system: system object defined earlier in the python-script
+		:param latticeboltzmann: lattice boltzmann object defined earlier in the python-script
+		:type system: 
+		:type latticeboltzmann: 
 	
 .. Note::
  

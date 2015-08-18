@@ -19,11 +19,16 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**********************************
+r"""
+************************************
 **espressopp.analysis.CenterOfMass**
-**********************************
+************************************
 
+
+.. function:: espressopp.analysis.CenterOfMass(system)
+
+		:param system: 
+		:type system: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +37,7 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_CenterOfMass
 
 class CenterOfMassLocal(ObservableLocal, analysis_CenterOfMass):
-    'The (local) compute of center-of-mass.'
+
     def __init__(self, system):
         cxxinit(self, analysis_CenterOfMass, system)
 

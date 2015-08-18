@@ -19,11 +19,30 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*******************************
+r"""
+*********************************
 **espressopp.analysis.Viscosity**
-*******************************
+*********************************
 
+
+.. function:: espressopp.analysis.Viscosity(system)
+
+		:param system: 
+		:type system: 
+
+.. function:: espressopp.analysis.Viscosity.compute(t0, dt, T)
+
+		:param t0: 
+		:param dt: 
+		:param T: 
+		:type t0: 
+		:type dt: 
+		:type T: 
+		:rtype:
+
+.. function:: espressopp.analysis.Viscosity.gather()
+
+		:rtype:
 """
 from espressopp import pmi
 from espressopp.esutil import cxxinit
@@ -33,7 +52,7 @@ from _espressopp import analysis_Viscosity
 from espressopp.analysis.Autocorrelation import *
 
 class ViscosityLocal(AutocorrelationLocal, analysis_Viscosity):  
-    'The (local) storage of configurations.'
+
     def __init__(self, system):
       if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         cxxinit(self, analysis_Viscosity, system)
@@ -48,7 +67,7 @@ class ViscosityLocal(AutocorrelationLocal, analysis_Viscosity):
     
 if pmi.isController:
   class Viscosity(Autocorrelation):
-    """Class for parallel analysis"""
+
     #__metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
       cls =  'espressopp.analysis.ViscosityLocal',

@@ -19,11 +19,24 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-********************************
+r"""
+**********************************
 **espressopp.analysis.Velocities**
-********************************
+**********************************
 
+
+.. function:: espressopp.analysis.Velocities(system)
+
+		:param system: 
+		:type system: 
+
+.. function:: espressopp.analysis.Velocities.clear()
+
+		:rtype:
+
+.. function:: espressopp.analysis.Velocities.gather()
+
+		:rtype:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +45,7 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_Velocities
 
 class VelocitiesLocal(ObservableLocal, analysis_Velocities):
-    'The (local) storage of configurations.'
+
     def __init__(self, system):
         cxxinit(self, analysis_Velocities, system)
     def gather(self):

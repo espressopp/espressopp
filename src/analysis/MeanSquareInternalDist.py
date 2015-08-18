@@ -19,10 +19,21 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-********************************************
+r"""
+**********************************************
 **espressopp.analysis.MeanSquareInternalDist**
-********************************************
+**********************************************
+
+.. function:: espressopp.analysis.MeanSquareInternalDist(system, chainlength)
+
+		:param system: 
+		:param chainlength: 
+		:type system: 
+		:type chainlength: 
+
+.. function:: espressopp.analysis.MeanSquareInternalDist.strange()
+
+		:rtype:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

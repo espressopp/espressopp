@@ -19,11 +19,46 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***********************************
+r"""
+*************************************
 **espressopp.analysis.StaticStructF**
-***********************************
+*************************************
 
+
+.. function:: espressopp.analysis.StaticStructF(system)
+
+		:param system: 
+		:type system: 
+
+.. function:: espressopp.analysis.StaticStructF.compute(nqx, nqy, nqz, bin_factor, ofile)
+
+		:param nqx: 
+		:param nqy: 
+		:param nqz: 
+		:param bin_factor: 
+		:param ofile: (default: None)
+		:type nqx: 
+		:type nqy: 
+		:type nqz: 
+		:type bin_factor: 
+		:type ofile: 
+		:rtype:
+
+.. function:: espressopp.analysis.StaticStructF.computeSingleChain(nqx, nqy, nqz, bin_factor, chainlength, ofile)
+
+		:param nqx: 
+		:param nqy: 
+		:param nqz: 
+		:param bin_factor: 
+		:param chainlength: 
+		:param ofile: (default: None)
+		:type nqx: 
+		:type nqy: 
+		:type nqz: 
+		:type bin_factor: 
+		:type chainlength: 
+		:type ofile: 
+		:rtype:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +67,7 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_StaticStructF
 
 class StaticStructFLocal(ObservableLocal, analysis_StaticStructF):
-  'The (local) compute the static structure function.'
+
   def __init__(self, system):
     cxxinit(self, analysis_StaticStructF, system)
     

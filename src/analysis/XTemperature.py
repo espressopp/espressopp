@@ -19,11 +19,22 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**********************************
+r"""
+************************************
 **espressopp.analysis.XTemperature**
-**********************************
+************************************
 
+
+.. function:: espressopp.analysis.XTemperature(system)
+
+		:param system: 
+		:type system: 
+
+.. function:: espressopp.analysis.XTemperature.compute(N)
+
+		:param N: 
+		:type N: 
+		:rtype:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +43,7 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_XTemperature
 
 class XTemperatureLocal(ObservableLocal, analysis_XTemperature):
-  'The (local) compute the temperature profile in x direction.'
+
   def __init__(self, system):
     cxxinit(self, analysis_XTemperature, system)
     

@@ -19,28 +19,44 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***************************************************************
+r"""
+*****************************************************************
 **AnalysisBase** - abstract base class for analysis/measurement
-***************************************************************
+*****************************************************************
 
 This abstract base class provides the interface and some basic
 functionality for classes that do analysis or observable measurements
   
-It provides the following methods:
 
-* performMeasurement()
-    computes the observable and updates average and standard deviation
-* reset()
-    resets average and standard deviation
-* compute()
-    computes the instant value of the observable, return value is a python list or a scalar
-* getAverageValue()
-    returns the average value for the observable and the standard deviation,
-    return value is a python list
-* getNumberOfMeasurements()
-    counts the number of measurements that have been performed (standalone or in integrator)
-    does _not_ include measurements that have been done using "compute()"
+
+.. function:: espressopp.analysis.AnalysisBase()
+
+
+.. function:: espressopp.analysis.AnalysisBase.compute()
+
+	Computes the instant value of the observable
+		:rtype: Python list or a scalar
+
+.. function:: espressopp.analysis.AnalysisBase.getAverageValue()
+	
+	Returns the average value for the observable and the standard deviation
+		:rtype: Python List
+
+.. function:: espressopp.analysis.AnalysisBase.getNumberOfMeasurements()
+
+	Counts the number of measurements that have been performed (standalone or in integrator)
+   does *not* include measurements that have been done using "compute()"
+		:rtype: int
+
+.. function:: espressopp.analysis.AnalysisBase.performMeasurement()
+	
+	Computes the observable and updates average and standard deviation
+
+
+.. function:: espressopp.analysis.AnalysisBase.reset()
+	
+	Resets average and standard deviation
+
 """
 
 from espressopp import pmi
@@ -49,7 +65,7 @@ from espressopp.ParticleAccess import *
 from _espressopp import analysis_AnalysisBase
 
 class AnalysisBaseLocal(ParticleAccessLocal, analysis_AnalysisBase):
-    """Abstract local base class for observables."""
+
     def performMeasurement(self):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.performMeasurement(self)
@@ -76,7 +92,7 @@ class AnalysisBaseLocal(ParticleAccessLocal, analysis_AnalysisBase):
 
 if pmi.isController :
     class AnalysisBase(ParticleAccess):
-        """Abstract base class for observable."""
+
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             pmicall = [ "performMeasurement", "reset", "compute", "getAverageValue", "getNumberOfMeasurements" ]

@@ -19,11 +19,30 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*************************************
+r"""
+***************************************
 **espressopp.analysis.MeanSquareDispl**
-*************************************
+***************************************
 
+
+.. function:: espressopp.analysis.MeanSquareDispl(system, chainlength)
+
+		:param system: 
+		:param chainlength: (default: None)
+		:type system: 
+		:type chainlength: 
+
+.. function:: espressopp.analysis.MeanSquareDispl.computeG2()
+
+		:rtype:
+
+.. function:: espressopp.analysis.MeanSquareDispl.computeG3()
+
+		:rtype:
+
+.. function:: espressopp.analysis.MeanSquareDispl.strange()
+
+		:rtype:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +51,7 @@ from espressopp.analysis.ConfigsParticleDecomp import *
 from _espressopp import analysis_MeanSquareDispl
 
 class MeanSquareDisplLocal(ConfigsParticleDecompLocal, analysis_MeanSquareDispl):
-    'The (local) compute autocorrelation f.'
+
     def __init__(self, system, chainlength = None):
       if chainlength is None:
         cxxinit(self, analysis_MeanSquareDispl, system)
