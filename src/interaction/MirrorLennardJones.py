@@ -22,9 +22,9 @@
 
 
 r"""
-*********************************************
+*******************************************************
 **espressopp.interaction.MirrorLennardJones**
-*********************************************
+*******************************************************
 This class provides methods to compute forces and energies of
 the Mirror Lennard-Jones potential.
 
@@ -59,11 +59,11 @@ the Mirror Lennard-Jones potential.
 
 .. function:: espressopp.interaction.FixedPairListMirrorLennardJones.getFixedPairList()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedPairListMirrorLennardJones.getPotential()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.FixedPairListMirrorLennardJones.setFixedPairList(fixedpairlist)
 
@@ -85,6 +85,7 @@ from _espressopp import interaction_MirrorLennardJones, interaction_FixedPairLis
 class MirrorLennardJonesLocal(PotentialLocal, interaction_MirrorLennardJones):
 
     def __init__(self, epsilon=1.0, sigma=0.0):
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_MirrorLennardJones, epsilon, sigma)
 
@@ -112,7 +113,7 @@ class FixedPairListMirrorLennardJonesLocal(InteractionLocal, interaction_FixedPa
 
 if pmi.isController:
     class MirrorLennardJones(Potential):
-
+        'The MirrorLennardJones potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.MirrorLennardJonesLocal',
             pmiproperty = ['epsilon', 'sigma']

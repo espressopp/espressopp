@@ -20,9 +20,9 @@
 
 
 r"""
-********************************************
+******************************************************
 **espressopp.interaction.TersoffTripleTerm**
-********************************************
+******************************************************
 This class provides methods to compute forces and energies of
 the Tersoff Triple Term potential.
 
@@ -35,7 +35,9 @@ the Tersoff Triple Term potential.
 
 
 
-.. function:: espressopp.interaction.TersoffTripleTerm()
+
+
+
 
 
 .. function:: espressopp.interaction.VerletListTersoffTripleTerm(system, vl3)
@@ -53,11 +55,11 @@ the Tersoff Triple Term potential.
 		:type type1: 
 		:type type2: 
 		:type type3: 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.VerletListTersoffTripleTerm.getVerletListTriple()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.VerletListTersoffTripleTerm.setPotential(type1, type2, type3, potential)
 
@@ -81,7 +83,7 @@ the Tersoff Triple Term potential.
 
 .. function:: espressopp.interaction.FixedTripleListTersoffTripleTerm.getFixedTripleList()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedTripleListTersoffTripleTerm.setPotential(type1, type2, type3, potential)
 
@@ -110,7 +112,7 @@ class TersoffTripleTermLocal(AngularPotentialLocal, interaction_TersoffTripleTer
   def __init__(self, B=0.0, lambda2=0.0, R=0.0, D=0.0,
                n=1.0, beta=1.0, m=1.0, lambda3=1.0, gamma=0.0,
                c=1.0, d=1.0, theta0=0.0, cutoff1=infinity, cutoff2=infinity):
-
+    """Initialize the local TersoffTripleTerm object."""
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
 ##      cxxinit(self, interaction_TersoffTripleTerm, gamma1, gamma2, 
 ##              theta0, lmbd, epsilon, sigma1, sigma2, cutoff1, cutoff2)

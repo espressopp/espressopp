@@ -19,11 +19,18 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*********************************
+r"""
+***********************************
 **espressopp.esutil.NormalVariate**
-*********************************
+***********************************
 
+
+.. function:: espressopp.esutil.NormalVariate(mean, sigma)
+
+		:param mean: (default: 0.0)
+		:param sigma: (default: 1.0)
+		:type mean: real
+		:type sigma: real
 """
 from espressopp import pmi
 

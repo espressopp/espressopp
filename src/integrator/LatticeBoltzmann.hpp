@@ -24,6 +24,7 @@
 #ifndef _INTEGRATOR_LATTICEBOLTZMANN_HPP
 #define _INTEGRATOR_LATTICEBOLTZMANN_HPP
 
+//#include "boost/serialization/vector.hpp"
 #include "logging.hpp"
 #include "Extension.hpp"
 #include "boost/signals2.hpp"
@@ -31,9 +32,6 @@
 #include "Real3D.hpp"
 #include "Int3D.hpp"
 #include "LatticeSite.hpp"
-
-typedef std::vector< std::vector< std::vector<espressopp::integrator::LBSite> > > lblattice;
-typedef std::vector< std::vector< std::vector<espressopp::integrator::LBMom> > > lbmoments;
 
 namespace espressopp {
 	namespace integrator {
@@ -85,11 +83,11 @@ namespace espressopp {
 			void setGammaEven (real _gamma_even);	// set gamma even
 			real getGammaEven ();									// get gamma even
 			
-			void setViscB (real _visc_b);					// set bulk viscosity
-			real getViscB ();											// get bulk viscosity
+			void setViscB (real _visc_b);				// set bulk viscosity
+			real getViscB ();										// get bulk viscosity
 			
-			void setViscS (real _visc_s);					// set shear viscosity
-			real getViscS ();											// get shear viscosity
+			void setViscS (real _visc_s);				// set shear viscosity
+			real getViscS ();										// get shear viscosity
 			
 			void setExtForceFlag (int _extForceFlag);	// set a flag for external force
 			int getExtForceFlag ();								// get a flag for external force
@@ -110,6 +108,8 @@ namespace espressopp {
 			real getDistr (int _i);								// get distribution
 			void incDistr (int _i);								// increment distribution
 			
+//			void calcHistogram (int _i, int _j, int _k);// calculate the histogram
+
 			void setLBTemp (real _lbTemp);				// set LB-temperature
 			real getLBTemp ();										// get LB-temperature
 
@@ -133,10 +133,7 @@ namespace espressopp {
 
 			void setLBFluid (Int3D _Ni, int _l, real _value);
 			real getLBFluid (Int3D _Ni, int _l);
-			
-			void setLBMom (Int3D _Ni, int _l, real _value);
-			real getLBMom (Int3D _Ni, int _l);
-			
+
 			void setExtForceLoc (Int3D _Ni, Real3D _extForceLoc);
 			Real3D getExtForceLoc (Int3D _Ni);
 			void addExtForceLoc (Int3D _Ni, Real3D _extForceLoc);
@@ -172,7 +169,9 @@ namespace espressopp {
 			void coupleLBtoMD();
 			void calcRandForce(class Particle&);
 			void restoreLBForces();									// restore LB-forces from previous timestep to act onto MD particles
+//		void calcInterVel(class Particle&);
 			void calcViscForce(class Particle&);
+//		void extrapMomToNodes(class Particle&, real _timestep);
 			void calcDenMom ();
 			real convMDtoLB (int _opCode);
 			
@@ -188,6 +187,10 @@ namespace espressopp {
 			void setFOnPart (int _id, Real3D _fOnPart);
 			Real3D getFOnPart (int _id);
 			void addFOnPart (int _id, Real3D _fOnPart);
+			
+			void setInterpVel (Real3D _interpVel);
+			Real3D getInterpVel ();
+			void addInterpVel (Real3D _interpVel);
 			
 			/* UNIT CONVERSION */
 			real convMassMDtoLB();
@@ -211,8 +214,8 @@ namespace espressopp {
 			void setHaloSkin (int _haloSkin);
 			int getHaloSkin ();
 
-			void setMyNi(Int3D _myNi);		// set lattice size of current cpu + halo
-			Int3D getMyNi();							// get lattice size of current cpu + halo
+			void setMyNi(Int3D _myNi);		// set lattice size of current cpu + halo in 3 dimensions
+			Int3D getMyNi();							// get lattice size of current cpu + halo in 3 dimensions
 			
 			void setMyPosition(Int3D _myPosition);
 			Int3D getMyPosition();
@@ -231,43 +234,50 @@ namespace espressopp {
 		private:
 			int numDims;									// number of dimensions
 			int numVels;									// number of velocities
-			real a, tau;									// lattice spacing and timestep
-			real cs2, invCs2;							// squared sound speed and its inversed
+			real cs2;											// squared speed of sound
+			real invCs2;									// inverse square of speed of sound
+			real a;												// lattice spacing
+			real tau;											// lattice timestep
+			real gamma_b;
+			real gamma_s;
+			real gamma_odd;
+			real gamma_even;
+			real visc_b, visc_s;
+			real lbTemp;
+			real fricCoeff;
+			int start;
+			int lbTempFlag;
+			int stepNum;									// step number
+			int nSteps;
 			std::vector<Real3D> c_i;			// velocity vectors
 			std::vector<real> eqWeight;		// equilibrium weights
 			std::vector<real> inv_b;			// back-transformation weights
-			Int3D Ni;											// lattice size in 3D
-
-			// VISCOSITIES
-			real visc_b, visc_s;					// bulk and shear viscosities (LJ-units)
-			real gamma_b, gamma_s;				// bulk and shear gammas
-			real gamma_even, gamma_odd;		// even and odd gammas
-
-			// TEMPERATURE
-			int lbTempFlag;								// flag of non-zero temperature
-			real lbTemp;									// lb temperature (LJ-units)
 			std::vector<real> phi;				// amplitudes of fluctuations
-
-			// GENERAL SYSTEM
-			int start;
-			int stepNum;									// step number
-			real copyTimestep;						// copy of the integrator timestep
-			shared_ptr< esutil::RNG > rng;  //!< random number generator used for fluctuations
-
-			// EXTERNAL FORCES
-			int extForceFlag;							// flag for an external force
+			int totNPart;									// total number of MD particles
+			real copyTimestep;							// copy of the MD timestep
 			
-			// LATTICES
-			lblattice *lbfluid;
-			lblattice *ghostlat;
-			lbmoments *lbmom;
+			Int3D partBin;								// bins where the MD particle is
+			int extForceFlag;							// flag for an external force
+			int couplForceFlag;						// flag for a coupling force
+			std::vector<Real3D> fOnPart;	// force acting onto an MD particle
+			Int3D Ni;											// lattice lengths in 3D
+			
+			int idX, idY, idZ, index;			// indexes in 3D and aligned 1D index
+			
+			/*	two lattices. lbfluid has f,m and meq. ghostlat has f only.
+			*		the latter one used for sake of simplicity during streaming
+			*/
+//			std::vector< std::vector< std::vector<LBPop> > > lbpop;
+			std::vector< std::vector< std::vector<LBSite> > > lbfluid;
+			std::vector< std::vector< std::vector<GhostLattice> > > ghostlat;
+
+			int nBins;
+			std::vector<real> distr;
+
+			shared_ptr< esutil::RNG > rng;  //!< random number generator used for fluctuations
 			
 			// COUPLING
-			int couplForceFlag;						// flag for a coupling force
-			int nSteps;										// # of MD steps between LB update
-			int totNPart;									// total number of MD particles
-			real fricCoeff;								// friction in LB-MD coupling (LJ-units)
-			std::vector<Real3D> fOnPart;	// force acting onto an MD particle
+			Real3D interpVel;							// interpolated fluid vel at the MD particle position
 
 			// MPI THINGS
 			std::vector<int> myNeighbour;
@@ -282,9 +292,11 @@ namespace espressopp {
 			boost::signals2::connection _recalc2;
 			
 			// TIMERS
-			esutil::WallTimer swapping, colstream, comm;
-			esutil::WallTimer timeRead, timeSave;
-			real time_sw, time_colstr, time_comm;
+//			esutil::WallTimer timeCollStream;  //!< used for timing
+//			esutil::WallTimer timeComm;  //!< used for timing
+//			esutil::WallTimer timeCouple;  //!< used for timing
+			esutil::WallTimer swapping, colstream;
+			real time_sw, time_colstr;
 			
 			void connect();
 			void disconnect();

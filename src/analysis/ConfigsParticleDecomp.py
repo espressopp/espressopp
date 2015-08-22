@@ -32,21 +32,21 @@ r"""
 
 .. function:: espressopp.analysis.ConfigsParticleDecomp.clear()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.analysis.ConfigsParticleDecomp.compute()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.analysis.ConfigsParticleDecomp.gather()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.analysis.ConfigsParticleDecomp.gatherFromFile(filename)
 
 		:param filename: 
 		:type filename: 
-		:rtype:
+		:rtype: 
 """
 #from espressopp.esutil import cxxinit
 from espressopp import pmi

@@ -21,9 +21,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 r"""
-*********************************************
+*******************************************************
 **espressopp.interaction.LennardJones93Wall**
-*********************************************
+*******************************************************
 
 This class defines a Lennard-Jones 9-3 SingleParticlePotential in the direction x.
 
@@ -55,7 +55,7 @@ Example:
 
 		:param type_var: 
 		:type type_var: 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.LennardJones93Wall.setParams(type_var, epsilon, sigma, sigmaCutoff, r0)
 
@@ -93,13 +93,18 @@ from _espressopp import interaction_LennardJones93Wall, interaction_SinglePartic
 class LennardJones93WallLocal(SingleParticlePotentialLocal, interaction_LennardJones93Wall):
 
     def __init__(self):
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_LennardJones93Wall)
     def getParams(self, type_var):
+
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getParams(self, type_var)
 
     def setParams(self, type_var, epsilon, sigma, sigmaCutoff, r0):
+
+
         self.cxxclass.setParams(self, type_var, epsilon, sigma, sigmaCutoff, r0)
 
 class SingleParticleLennardJones93WallLocal(InteractionLocal, interaction_SingleParticleLennardJones93Wall):
@@ -114,7 +119,7 @@ class SingleParticleLennardJones93WallLocal(InteractionLocal, interaction_Single
 
 if pmi.isController:
     class LennardJones93Wall(SingleParticlePotential):
-
+        'The LennardJones93Wall potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.LennardJones93WallLocal',
             pmicall = ['setParams', 'getParams']

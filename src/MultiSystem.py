@@ -19,18 +19,63 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************
+r"""
+**************************
 **espressopp.MultiSystem**
-************************
+**************************
 
+
+.. function:: espressopp.MultiSystem()
+
+
+.. function:: espressopp.MultiSystem.beginSystemDefinition()
+
+		:rtype: 
+
+.. function:: espressopp.MultiSystem.runAnalysisNPart()
+
+		:rtype: 
+
+.. function:: espressopp.MultiSystem.runAnalysisPotential()
+
+		:rtype: 
+
+.. function:: espressopp.MultiSystem.runAnalysisTemperature()
+
+		:rtype: 
+
+.. function:: espressopp.MultiSystem.runIntegrator(niter)
+
+		:param niter: 
+		:type niter: 
+		:rtype: 
+
+.. function:: espressopp.MultiSystem.setAnalysisNPart(npart)
+
+		:param npart: 
+		:type npart: 
+
+.. function:: espressopp.MultiSystem.setAnalysisPotential(potential)
+
+		:param potential: 
+		:type potential: 
+
+.. function:: espressopp.MultiSystem.setAnalysisTemperature(temperature)
+
+		:param temperature: 
+		:type temperature: 
+
+.. function:: espressopp.MultiSystem.setIntegrator(integrator)
+
+		:param integrator: 
+		:type integrator: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
 import mpi4py.MPI as MPI
 
 class MultiSystemLocal(object):
-    """Local MultiSystem to simulate and analyze several systems in parallel."""
+
     
     def __init__(self):
         pass
@@ -79,7 +124,7 @@ class MultiSystemLocal(object):
 
 if pmi.isController :
     class MultiSystem(object):
-        """MultiSystemIntegrator to simulate and analyze several systems in parallel."""
+
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.MultiSystemLocal',

@@ -20,9 +20,9 @@
 
 
 r"""
-***************************************************
+*************************************************************
 **espressopp.interaction.ReactionFieldGeneralized**
-***************************************************
+*************************************************************
 This class provides methods to compute forces and energies of
 the generalized reaction field.
 
@@ -52,7 +52,7 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
 		:type kappa: real
 		:type epsilon1: real
 		:type epsilon2: real
-		:type cutoff: int
+		:type cutoff: 
 		:type shift: 
 
 .. function:: espressopp.interaction.VerletListReactionFieldGeneralized(vl)
@@ -66,7 +66,7 @@ where `P` is a prefactor, `Q` is the product of the charges of the two particles
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.VerletListReactionFieldGeneralized.setPotential(type1, type2, potential)
 
@@ -156,6 +156,7 @@ from _espressopp import interaction_ReactionFieldGeneralized, \
 class ReactionFieldGeneralizedLocal(PotentialLocal, interaction_ReactionFieldGeneralized):
 
     def __init__(self, prefactor=1.0, kappa=0.0, epsilon1=1.0, epsilon2=80.0, cutoff=infinity, shift="auto"):
+
         if shift =="auto":
             if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
                 cxxinit(self, interaction_ReactionFieldGeneralized, prefactor, kappa, epsilon1, epsilon2, cutoff)
@@ -229,7 +230,7 @@ class CellListReactionFieldGeneralizedLocal(InteractionLocal, interaction_CellLi
 
 if pmi.isController:
     class ReactionFieldGeneralized(Potential):
-
+        'The ReactionFieldGeneralized potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.ReactionFieldGeneralizedLocal',
             pmiproperty = ['prefactor']#['qq']

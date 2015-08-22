@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***************************************************************
+r"""
+*****************************************************************
 **LBInitPeriodicForce** - handles external periodic forces
-***************************************************************
+*****************************************************************
 
 This class sets or adds an external periodic forces to the LB-fluid. At first, one has to create an instance. Only after it one may set or add this force to the system. 
 
@@ -43,6 +43,13 @@ This class sets or adds an external periodic forces to the LB-fluid. At first, o
   >>> # a vector adds the external body force with a Real3D amplitude
 
 
+
+.. function:: espressopp.integrator.LBInitPeriodicForce(system, latticeboltzmann)
+
+		:param system: 
+		:param latticeboltzmann: 
+		:type system: 
+		:type latticeboltzmann: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

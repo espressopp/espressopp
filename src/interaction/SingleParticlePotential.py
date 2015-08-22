@@ -21,10 +21,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-"""
-**************************************************
+r"""
+************************************************************
 **espressopp.interaction.SingleParticlePotential**
-**************************************************
+************************************************************
 
 This class is used to define single-particle interactions, typically used for
 external forces on the system.
@@ -37,7 +37,9 @@ The potential may depend on any of the particle properties (type, mass, etc.).
 
 
 
-.. function:: espressopp.interaction.SingleParticlePotential()
+
+
+
 
 
 .. function:: espressopp.interaction.SingleParticlePotential.computeEnergy(position, bc)
@@ -46,7 +48,7 @@ The potential may depend on any of the particle properties (type, mass, etc.).
 		:param bc: 
 		:type position: 
 		:type bc: 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.SingleParticlePotential.computeForce(position, bc)
 
@@ -54,7 +56,7 @@ The potential may depend on any of the particle properties (type, mass, etc.).
 		:param bc: 
 		:type position: 
 		:type bc: 
-		:rtype:
+		:rtype: 
 """
 
 from espressopp import pmi

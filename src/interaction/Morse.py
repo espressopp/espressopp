@@ -20,9 +20,9 @@
 
 
 r"""
-********************************
+******************************************
 **espressopp.interaction.Morse**
-********************************
+******************************************
 This class provides methods to compute forces and energies of
 the Morse potential.
 
@@ -44,7 +44,7 @@ the Morse potential.
 		:type epsilon: real
 		:type alpha: real
 		:type rMin: real
-		:type cutoff: int
+		:type cutoff: 
 		:type shift: 
 
 .. function:: espressopp.interaction.VerletListMorse(vl)
@@ -58,7 +58,7 @@ the Morse potential.
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.VerletListMorse.setPotential(type1, type2, potential)
 
@@ -163,6 +163,7 @@ class MorseLocal(PotentialLocal, interaction_Morse):
 
     def __init__(self, epsilon=1.0, alpha=1.0, rMin=0.0, 
                  cutoff=infinity, shift="auto"):
+        """Initialize the local Morse object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
                 cxxinit(self, interaction_Morse, 
@@ -235,7 +236,7 @@ class FixedPairListMorseLocal(InteractionLocal, interaction_FixedPairListMorse):
 
 if pmi.isController:
     class Morse(Potential):
-
+        'The Morse potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.MorseLocal',
             pmiproperty = ['epsilon', 'alpha', 'rMin']

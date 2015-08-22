@@ -19,11 +19,54 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*********************************
+r"""
+***********************************
 **espressopp.FixedTripleAngleList**
-*********************************
+***********************************
 
+
+.. function:: espressopp.FixedTripleAngleList(storage)
+
+		:param storage: 
+		:type storage: 
+
+.. function:: espressopp.FixedTripleAngleList.add(pid1, pid2, pid3)
+
+		:param pid1: 
+		:param pid2: 
+		:param pid3: 
+		:type pid1: 
+		:type pid2: 
+		:type pid3: 
+		:rtype: 
+
+.. function:: espressopp.FixedTripleAngleList.addTriples(triplelist)
+
+		:param triplelist: 
+		:type triplelist: 
+		:rtype: 
+
+.. function:: espressopp.FixedTripleAngleList.getAngle(pid1, pid2, pid3)
+
+		:param pid1: 
+		:param pid2: 
+		:param pid3: 
+		:type pid1: 
+		:type pid2: 
+		:type pid3: 
+		:rtype: 
+
+.. function:: espressopp.FixedTripleAngleList.getTriples()
+
+		:rtype: 
+
+.. function:: espressopp.FixedTripleAngleList.getTriplesAngles()
+
+		:rtype: 
+
+.. function:: espressopp.FixedTripleAngleList.size()
+
+		:rtype: 
 """
 from espressopp import pmi
 import _espressopp
@@ -31,16 +74,16 @@ import _espressopp
 from espressopp.esutil import cxxinit
 
 class FixedTripleAngleListLocal(_espressopp.FixedTripleAngleList):
-    'The (local) fixed triple list.'
+
 
     def __init__(self, storage):
-        'Local construction of a fixed triple list'
+
         #if pmi.workerIsActive():
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, _espressopp.FixedTripleAngleList, storage)
 
     def add(self, pid1, pid2, pid3):
-        'add triple to fixed triple list'
+
         if pmi.workerIsActive():
             return self.cxxclass.add(self, pid1, pid2, pid3)
 
@@ -56,19 +99,19 @@ class FixedTripleAngleListLocal(_espressopp.FixedTripleAngleList):
                 self.cxxclass.add(self, pid1, pid2, pid3)
 
     def size(self):
-        'count number of Triples in GlobalTripleList, involves global reduction'
+
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 
     def getTriples(self):
-        'return the triples of the GlobalTripleList'
+
         if pmi.workerIsActive():
           triples = self.cxxclass.getTriples(self)
           return triples
         
     'returns the list of (pid1, pid2, pid3, angle(123))'
     def getTriplesAngles(self):
-        'return the triples of the GlobalTripleList'
+
         if pmi.workerIsActive():
           triples_angles = self.cxxclass.getTriplesAngles(self)
           return triples_angles

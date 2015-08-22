@@ -19,11 +19,26 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*****************************************************
+r"""
+*******************************************************
 **espressopp.integrator.GeneralizedLangevinThermostat**
-*****************************************************
+*******************************************************
 
+
+.. function:: espressopp.integrator.GeneralizedLangevinThermostat(system)
+
+		:param system: 
+		:type system: 
+
+.. function:: espressopp.integrator.GeneralizedLangevinThermostat.addCoeffs(itype, filename, type)
+
+		:param itype: 
+		:param filename: 
+		:param type: 
+		:type itype: 
+		:type filename: 
+		:type type: 
+		:rtype: 
 """
 
 # NOTE: This Generalized Langevin Thermostat uses the extended variable scheme
@@ -36,7 +51,7 @@ from espressopp.integrator.Extension import *
 from _espressopp import integrator_GeneralizedLangevinThermostat 
 
 class GeneralizedLangevinThermostatLocal(ExtensionLocal, integrator_GeneralizedLangevinThermostat):
-    'The (local) Velocity Verlet Integrator.'
+
     def __init__(self, system):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_GeneralizedLangevinThermostat, system)

@@ -19,11 +19,18 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*********************************************
+r"""
+***********************************************
 **espressopp.integrator.VelocityVerletOnGroup**
-*********************************************
+***********************************************
 
+
+.. function:: espressopp.integrator.VelocityVerletOnGroup(system, group)
+
+		:param system: 
+		:param group: 
+		:type system: 
+		:type group: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +39,7 @@ from espressopp.integrator.MDIntegrator import *
 from _espressopp import integrator_VelocityVerletOnGroup
 
 class VelocityVerletOnGroupLocal(MDIntegratorLocal, integrator_VelocityVerletOnGroup):
-    'The (local) Velocity Verlet Integrator.'
+
     def __init__(self, system, group):
         cxxinit(self, integrator_VelocityVerletOnGroup, system, group)
 

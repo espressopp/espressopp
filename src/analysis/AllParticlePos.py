@@ -25,12 +25,10 @@ r"""
 **************************************
 
 
-.. function:: espressopp.analysis.AllParticlePos()
-
 
 .. function:: espressopp.analysis.AllParticlePos.gatherAllPositions()
 
-		:rtype:
+		:rtype: 
 """
 from espressopp import pmi
 from _espressopp import analysis_AllParticlePos

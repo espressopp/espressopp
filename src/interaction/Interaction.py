@@ -19,12 +19,41 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**************************************
+r"""
+************************************************
 **espressopp.interaction.Interaction**
-**************************************
+************************************************
 This is an abstract class, only needed to be inherited from.
 
+
+
+
+
+
+
+
+
+
+
+.. function:: espressopp.interaction.Interaction.bondType()
+
+		:rtype: 
+
+.. function:: espressopp.interaction.Interaction.computeEnergy()
+
+		:rtype: 
+
+.. function:: espressopp.interaction.Interaction.computeEnergyAA()
+
+		:rtype: 
+
+.. function:: espressopp.interaction.Interaction.computeEnergyCG()
+
+		:rtype: 
+
+.. function:: espressopp.interaction.Interaction.computeVirial()
+
+		:rtype: 
 """
 from espressopp import pmi
 from _espressopp import interaction_Interaction

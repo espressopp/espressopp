@@ -20,9 +20,9 @@
 
 
 r"""
-******************************************
+****************************************************
 **espressopp.interaction.TersoffPairTerm**
-******************************************
+****************************************************
 This class provides methods to compute forces and energies of
 2 body term of Tersoff potential.
 
@@ -71,11 +71,11 @@ else
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
-.. function:: espressopp.interaction.VerletListTersoffPairTerm.getVerletListLocal()
+.. function:: espressopp.interaction.VerletListTersoffPairTerm.getVerletList()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.VerletListTersoffPairTerm.setPotential(type1, type2, potential)
 
@@ -127,6 +127,7 @@ from _espressopp import interaction_TersoffPairTerm, \
 class TersoffPairTermLocal(PotentialLocal, interaction_TersoffPairTerm):
 
   def __init__(self, A, lambda1, R, D, cutoff=infinity):
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_TersoffPairTerm, A, lambda1, R, D, cutoff)
 
@@ -170,7 +171,7 @@ class FixedPairListTersoffPairTermLocal(InteractionLocal, interaction_FixedPairL
 
 if pmi.isController:
     class TersoffPairTerm(Potential):
-
+        'The Lennard-Jones potential.'
         pmiproxydefs = dict(
           cls = 'espressopp.interaction.TersoffPairTermLocal',
           pmiproperty = ['A', 'lambda1', 'R', 'D']

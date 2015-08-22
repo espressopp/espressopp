@@ -18,9 +18,9 @@
 
 
 r"""
-*************************************
+***********************************************
 **espressopp.interaction.DihedralRB**
-*************************************
+***********************************************
 
 The proper dihedral with Ryckaert-Bellemans form.
 
@@ -48,14 +48,14 @@ Reference: http://www.gromacs.org/Documentation/Manual
 		:param K3: (default: 0.0)
 		:param K4: (default: 0.0)
 		:param K5: (default: 0.0)
-		:param iupac: (default: True) If set to true then IUPAC convention for dihedrals is used (by default).
+		:param iupac: (default: True)
 		:type K0: real
 		:type K1: real
 		:type K2: real
 		:type K3: real
 		:type K4: real
 		:type K5: real
-		:type iupac: Boolean 
+		:type iupac: 
 
 .. function:: espressopp.interaction.FixedQuadrupleListDihedralRB(system, vl, potential)
 
@@ -68,7 +68,7 @@ Reference: http://www.gromacs.org/Documentation/Manual
 
 .. function:: espressopp.interaction.FixedQuadrupleListDihedralRB.getFixedQuadrupleList()
 
-		:rtype: FixedQuadrupleList (A python list of lists, *not* tuples)
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedQuadrupleListDihedralRB.setPotential(type1, type2, potential)
 
@@ -78,7 +78,6 @@ Reference: http://www.gromacs.org/Documentation/Manual
 		:type type1: 
 		:type type2: 
 		:type potential: 
-
 """
 
 from espressopp import pmi
@@ -93,6 +92,7 @@ from _espressopp import interaction_FixedQuadrupleListDihedralRB
 class DihedralRBLocal(DihedralPotentialLocal, interaction_DihedralRB):
 
     def __init__(self, K0=0.0, K1=0.0, K2=0.0, K3=0.0, K4=0.0, K5=0.0, iupac=True):
+
         if (not (pmi._PMIComm and pmi._PMIComm.isActive())
                 or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
             if iupac:
@@ -120,6 +120,12 @@ class FixedQuadrupleListDihedralRBLocal(InteractionLocal, interaction_FixedQuadr
 
 if pmi.isController:
     class DihedralRB(DihedralPotential):
+        """The  Ryckaert-Bellemans function for proper dihedrals.
+
+        Args:
+            K0, K1, K2, K3, K4, K5: The parameters for potential.
+            iupac: If set to true then IUPAC convention for dihedrals is used (by default).
+        """
         pmiproxydefs = dict(
             cls='espressopp.interaction.DihedralRBLocal'
             )

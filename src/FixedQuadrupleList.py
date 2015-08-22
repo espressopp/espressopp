@@ -19,11 +19,42 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*******************************
+r"""
+*********************************
 **espressopp.FixedQuadrupleList**
-*******************************
+*********************************
 
+
+.. function:: espressopp.FixedQuadrupleList(storage)
+
+		:param storage: 
+		:type storage: 
+
+.. function:: espressopp.FixedQuadrupleList.add(pid1, pid2, pid3, pid4)
+
+		:param pid1: 
+		:param pid2: 
+		:param pid3: 
+		:param pid4: 
+		:type pid1: 
+		:type pid2: 
+		:type pid3: 
+		:type pid4: 
+		:rtype: 
+
+.. function:: espressopp.FixedQuadrupleList.addQuadruples(quadruplelist)
+
+		:param quadruplelist: 
+		:type quadruplelist: 
+		:rtype: 
+
+.. function:: espressopp.FixedQuadrupleList.getQuadruples()
+
+		:rtype: 
+
+.. function:: espressopp.FixedQuadrupleList.size()
+
+		:rtype: 
 """
 from espressopp import pmi
 import _espressopp
@@ -31,20 +62,20 @@ import espressopp
 from espressopp.esutil import cxxinit
 
 class FixedQuadrupleListLocal(_espressopp.FixedQuadrupleList):
-    'The (local) fixed quadruple list.'
+
 
     def __init__(self, storage):
-        'Local construction of a fixed quadruple list'
+
         if pmi.workerIsActive():
             cxxinit(self, _espressopp.FixedQuadrupleList, storage)
 
     def add(self, pid1, pid2, pid3, pid4):
-        'add quadruple to fixed quadruple list'
+
         if pmi.workerIsActive():
             return self.cxxclass.add(self, pid1, pid2, pid3, pid4)
 
     def size(self):
-        'count number of Quadruples in GlobalQuadrupleList, involves global reduction'
+
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 
@@ -61,7 +92,7 @@ class FixedQuadrupleListLocal(_espressopp.FixedQuadrupleList):
                 self.cxxclass.add(self, pid1, pid2, pid3, pid4)
 
     def getQuadruples(self):
-        'return the quadruples of the GlobalQuadrupleList'
+
         if pmi.workerIsActive():
           quadruple = self.cxxclass.getQuadruples(self)
           return quadruple 

@@ -34,7 +34,7 @@ r"""
 
 		:param rdfN: 
 		:type rdfN: 
-		:rtype:
+		:rtype: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-******************************************************************************************
+r"""
+********************************************************************************************
 **LBInitPopWave** - creates initial populations with uniform density and harmonic velocity
-******************************************************************************************
+********************************************************************************************
 
 This class creates LB-fluid with uniform density and harmonic velocity:
 :math:`v_x = 0`, 
@@ -39,6 +39,13 @@ This may be used to test the system: total moment is zero and the liquid tends t
 	>>> initPop.createDenVel(1.0, Real3D(0.,0.,0.0005))
 	>>> # the Real3D vector in this case includes amplitudes of the velocities
 	
+
+.. function:: espressopp.integrator.LBInitPopWave(system, latticeboltzmann)
+
+		:param system: 
+		:param latticeboltzmann: 
+		:type system: 
+		:type latticeboltzmann: 
 """
 
 from espressopp.esutil import cxxinit

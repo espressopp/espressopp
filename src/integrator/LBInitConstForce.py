@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*********************************************************************
+r"""
+***********************************************************************
 **LBInitConstForce** - handles constant (gravity-like) external force
-*********************************************************************
+***********************************************************************
 
 This class sets or adds a constant (gravity-like) external force to the LB-fluid. At first, one has to create an instance. Only after it one may set or add this force to the system.
 
@@ -37,6 +37,13 @@ This class sets or adds a constant (gravity-like) external force to the LB-fluid
 	>>> lbforce2 = espressopp.integrator.LBInitConstForce(system,lb)
 	>>> lbforce2.addForce(Real3D(0.0001,0.,0.))
 	>>> # a vector sets the external body force directly in lb-units
+
+.. function:: espressopp.integrator.LBInitConstForce(system, latticeboltzmann)
+
+		:param system: 
+		:param latticeboltzmann: 
+		:type system: 
+		:type latticeboltzmann: 
 """
 
 from espressopp.esutil import cxxinit

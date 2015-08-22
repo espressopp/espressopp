@@ -19,11 +19,32 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-********************************
+r"""
+**********************************
 **espressopp.integrator.Settle**
-********************************
+**********************************
 
+
+.. function:: espressopp.integrator.Settle(system, fixedtuplelist, mO, mH, distHH, distOH)
+
+		:param system: 
+		:param fixedtuplelist: 
+		:param mO: (default: 16.0)
+		:param mH: (default: 1.0)
+		:param distHH: (default: 1.58)
+		:param distOH: (default: 1.0)
+		:type system: 
+		:type fixedtuplelist: 
+		:type mO: real
+		:type mH: real
+		:type distHH: real
+		:type distOH: real
+
+.. function:: espressopp.integrator.Settle.addMolecules(moleculelist)
+
+		:param moleculelist: 
+		:type moleculelist: 
+		:rtype: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -31,10 +52,10 @@ from espressopp.integrator.Extension import *
 from _espressopp import integrator_Settle
 
 class SettleLocal(ExtensionLocal, integrator_Settle):
-    'The (local) settle.'
+
 
     def __init__(self, system, fixedtuplelist, mO=16.0, mH=1.0, distHH=1.58, distOH=1.0):
-        'Local construction of a settle class'
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
                 cxxinit(self, integrator_Settle, system, fixedtuplelist, mO, mH, distHH, distOH)
 

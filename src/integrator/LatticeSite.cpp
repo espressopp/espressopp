@@ -35,9 +35,7 @@ namespace espressopp {
   using namespace iterator;
   namespace integrator {
     LBSite::LBSite () {
-			f   = std::vector<real>(LatticePar::getNumVelsLoc(), 0.);
-			extForceLoc = Real3D(0.);
-			couplForceLoc = Real3D(0.);
+			f   = std::vector<real>(LatticePar::getNumVelsLoc()+4, 0.);
     }
 		
 /*******************************************************************************************/
@@ -352,15 +350,15 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 		
-    LBMom::LBMom () {
-      mom = std::vector<real>(4, 0.);
+    GhostLattice::GhostLattice () {
+      pop = std::vector<real>(LatticePar::getNumVelsLoc(), 0.);
     }
 
 		/* SET AND GET PART */
-    void LBMom::setMom_i (int _i, real _mom) { mom[_i] = _mom;}
-    real LBMom::getMom_i (int _i) { return mom[_i];}
+    void GhostLattice::setPop_i (int _i, real _pop) { pop[_i] = _pop;}
+    real GhostLattice::getPop_i (int _i) { return pop[_i];}
 
-    LBMom::~LBMom() {
+    GhostLattice::~GhostLattice() {
     }
 		
 /*******************************************************************************************/

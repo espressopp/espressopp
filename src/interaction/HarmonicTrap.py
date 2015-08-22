@@ -21,11 +21,15 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 r"""
-***************************************
+*************************************************
 **espressopp.interaction.HarmonicTrap**
-***************************************
+*************************************************
 .. math::
 	U = K \frac{1}{2}d^2
+
+
+
+
 
 
 .. function:: espressopp.interaction.HarmonicTrap()
@@ -42,7 +46,6 @@ r"""
 
 		:param potential: 
 		:type potential: 
-		:rtype:
 """
 from espressopp import pmi
 from espressopp.esutil import *
@@ -72,7 +75,7 @@ class SingleParticleHarmonicTrapLocal(InteractionLocal, interaction_SinglePartic
 
 if pmi.isController:
     class HarmonicTrap(SingleParticlePotential):
-
+        'The HarmonicTrap potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.HarmonicTrapLocal',
             pmiproperty = ['k', 'center']

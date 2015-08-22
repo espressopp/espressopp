@@ -24,6 +24,15 @@ r"""
 **Configurations** - Configurations Object
 *********************************************
 
+* `gather()`
+  add configuration to trajectory
+
+* `clear()`
+  clear trajectory
+  
+* `back()`
+  get last configuration of trajectory
+
 * `capacity`
   maximum number of configurations in trajectory
   further adding (`gather()`) configurations results
@@ -32,27 +41,8 @@ r"""
 
 * `size`
   number of stored configurations
-.. function:: espressopp.analysis.Configurations(system)
 
-		:param system: 
-		:type system: 
-
-.. function:: espressopp.analysis.Configurations.back()
-
-	Get last configuration of trajectory
-		:rtype:
-
-.. function:: espressopp.analysis.Configurations.clear()
-
-  Clear trajectory
-		:rtype:
-
-.. function:: espressopp.analysis.Configurations.gather()
-	
-	Add configuration to trajectory
-
-
-**Example of usage**
+usage:
 
 storing trajectory
 
@@ -78,7 +68,22 @@ access particle with id <pid> of stored configuration <n>:
 
 >>> print "particle coord: ",configurations[n][pid]
 
+.. function:: espressopp.analysis.Configurations(system)
 
+		:param system: 
+		:type system: 
+
+.. function:: espressopp.analysis.Configurations.back()
+
+		:rtype: 
+
+.. function:: espressopp.analysis.Configurations.clear()
+
+		:rtype: 
+
+.. function:: espressopp.analysis.Configurations.gather()
+
+		:rtype: 
 """
 
 from espressopp.esutil import cxxinit

@@ -110,22 +110,25 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 		
-    class LBMom {
+    class GhostLattice {
 			/**
-			 * \brief Description of the properties of the LBMom class
+			 * \brief Description of the properties of the GhostLattice class
 			 *
-			 * This is a LBMom class for storing of the hydrodynamic moments on the lattice site. 
-			 * These include density and 3-comp. mass flux.
+			 * This is a GhostLattice class for storing of the populations from Site class while 
+			 * streaming. It is a handy yet not necessary procedure. There is a possibility that 
+			 * in the future we will dispose of this class and implement streaming with memory 
+			 * moves. However, at the moment we aim at the code that can be well understood by a 
+			 * non-expert and this class is a must!
 			 */
 		public:
-			LBMom ();																// constr of the ghost lattice
-			~LBMom ();																// destr of the ghost lattice
+			GhostLattice ();																// constr of the ghost lattice
+			~GhostLattice ();																// destr of the ghost lattice
 
-			void setMom_i (int _i, real _mom);							// set f_i population to _f
-			real getMom_i (int _i);													// get f_i population
+			void setPop_i (int _i, real _pop);							// set f_i population to _f
+			real getPop_i (int _i);													// get f_i population
 			
 		private:
-			std::vector<real> mom;													// pops on the ghost lattice
+			std::vector<real> pop;													// pops on the ghost lattice
     };
 		
 /*******************************************************************************************/

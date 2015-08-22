@@ -19,21 +19,49 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-****************************************
+r"""
+******************************************
 **espressopp.standard_system.PolymerMelt**
-****************************************
+******************************************
 
+
+.. function:: espressopp.standard_system.PolymerMelt(num_chains, monomers_per_chain, box, bondlen, rc, skin, dt, epsilon, sigma, shift, temperature, xyzfilename, xyzrfilename)
+
+		:param num_chains: 
+		:param monomers_per_chain: 
+		:param box: (default: (000))
+		:param bondlen: (default: 0.97)
+		:param rc: (default: 1.12246)
+		:param skin: (default: 0.3)
+		:param dt: (default: 0.005)
+		:param epsilon: (default: 1.0)
+		:param sigma: (default: 1.0)
+		:param shift: (default: 'auto')
+		:param temperature: (default: None)
+		:param xyzfilename: (default: None)
+		:param xyzrfilename: (default: None)
+		:type num_chains: 
+		:type monomers_per_chain: 
+		:type box: 
+		:type bondlen: real
+		:type rc: real
+		:type skin: real
+		:type dt: real
+		:type epsilon: real
+		:type sigma: real
+		:type shift: 
+		:type temperature: 
+		:type xyzfilename: 
+		:type xyzrfilename: 
+		
+		returns random walk polymer melt system and integrator:
+		if tempearture is != None then Langevin thermostat is set to temperature (gamma is 1.0)
 """
 import espressopp
 import mpi4py.MPI as MPI
 import sys
 
 def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.12246, skin=0.3, dt=0.005, epsilon=1.0, sigma=1.0, shift='auto', temperature=None, xyzfilename=None, xyzrfilename=None):
-  '''
-  returns random walk polymer melt system and integrator:
-  if tempearture is != None then Langevin thermostat is set to temperature (gamma is 1.0)
-  '''
 
   if xyzfilename and xyzrfilename:
      print "ERROR: only one of xyzfilename (only xyz data) or xyzrfilename (additional particle radius data) can be provided."

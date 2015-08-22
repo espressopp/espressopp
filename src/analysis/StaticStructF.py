@@ -42,7 +42,7 @@ r"""
 		:type nqz: 
 		:type bin_factor: 
 		:type ofile: 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.analysis.StaticStructF.computeSingleChain(nqx, nqy, nqz, bin_factor, chainlength, ofile)
 
@@ -58,7 +58,7 @@ r"""
 		:type bin_factor: 
 		:type chainlength: 
 		:type ofile: 
-		:rtype:
+		:rtype: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

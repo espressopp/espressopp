@@ -20,9 +20,9 @@
 
 
 r"""
-********************
+******************************
 **GravityTruncated**
-********************
+******************************
 
 This is an implementation of a truncated (cutoff) Gravity Potential
 
@@ -30,6 +30,9 @@ This is an implementation of a truncated (cutoff) Gravity Potential
 	U = P \cdot \frac{m_1 \cdot m_2}{ \lvert p_1 - p_2\rvert}
 
 where :math:`m_i` is the mass of the `i` th particle, :math:`p_i` its position and `P` a prefactor.
+
+
+
 
 
 
@@ -51,11 +54,11 @@ where :math:`m_i` is the mass of the `i` th particle, :math:`p_i` its position a
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
-.. function:: espressopp.interaction.VerletListGravityTruncated.getVerletListLocal()
+.. function:: espressopp.interaction.VerletListGravityTruncated.getVerletList()
 
-		:rtype: VerletList
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.VerletListGravityTruncated.setPotential(type1, type2, potential)
 
@@ -65,7 +68,6 @@ where :math:`m_i` is the mass of the `i` th particle, :math:`p_i` its position a
 		:type type1: 
 		:type type2: 
 		:type potential: 
-		:rtype:
 """
 
 from espressopp import pmi, infinity
@@ -79,16 +81,20 @@ from _espressopp import interaction_GravityTruncated, \
 class GravityTruncatedLocal(PotentialLocal, interaction_GravityTruncated):
   
   def __init__(self, prefactor=1.0, cutoff=infinity):
+
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_GravityTruncated, prefactor, cutoff)
 
 class VerletListGravityTruncatedLocal(InteractionLocal, interaction_VerletListGravityTruncated):
   
   def __init__(self, vl):
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_VerletListGravityTruncated, vl)
       
   def setPotential(self, type1, type2, potential):
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       self.cxxclass.setPotential(self, type1, type2, potential)
 
@@ -97,6 +103,7 @@ class VerletListGravityTruncatedLocal(InteractionLocal, interaction_VerletListGr
       return self.cxxclass.getPotential(self, type1, type2)
 
   def getVerletListLocal(self):
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       return self.cxxclass.getVerletList(self)
 

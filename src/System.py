@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+**************************************
 **System** - Object
-************************************
+**************************************
 
 The main purpose of this class is to store pointers to some
 important other classes and thus make them available to C++.
@@ -50,6 +50,42 @@ Example (not complete):
 >>> LJSystem.skin = 0.4
 >>> LJSystem.addInteraction(interLJ)
 
+
+.. function:: espressopp.System()
+
+
+.. function:: espressopp.System.addInteraction(interaction)
+
+		:param interaction: 
+		:type interaction: 
+		:rtype: 
+
+.. function:: espressopp.System.getInteraction(number)
+
+		:param number: 
+		:type number: 
+		:rtype: 
+
+.. function:: espressopp.System.getNumberOfInteractions()
+
+		:rtype: 
+
+.. function:: espressopp.System.removeInteraction(number)
+
+		:param number: 
+		:type number: 
+		:rtype: 
+
+.. function:: espressopp.System.scaleVolume(\*args)
+
+		:param \*args: 
+		:type \*args: 
+		:rtype: 
+
+.. function:: espressopp.System.setTrace(switch)
+
+		:param switch: 
+		:type switch: 
 """
 
 from espressopp import pmi, Real3D, toReal3DFromVector
@@ -62,7 +98,7 @@ import mpi4py.MPI as MPI
 
 class SystemLocal(_espressopp.System):
     def __init__(self):
-        'Local construction of a System'
+
         if pmi._PMIComm and pmi._PMIComm.isActive():
             if pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
                 cxxinit(self, _espressopp.System, pmi._PMIComm.getMPIsubcomm())
@@ -72,22 +108,22 @@ class SystemLocal(_espressopp.System):
             cxxinit(self, _espressopp.System, pmi._MPIcomm)
 
     def addInteraction(self, interaction):
-        'add a short range list interaction'
+
         if pmi.workerIsActive():
             return self.cxxclass.addInteraction(self, interaction)
 
     def removeInteraction(self, number):
-        'remove a short range interaction, number is the number of the interaction in the short range interaction list'
+
         if pmi.workerIsActive():
             self.cxxclass.removeInteraction(self, number)
 
     def getNumberOfInteractions(self):
-        'get number of interactions of the system'
+
         if pmi.workerIsActive():
             return self.cxxclass.getNumberOfInteractions(self)
 
     def getInteraction(self, number):
-        'get python object of the one single interaction number i' 
+
         if pmi.workerIsActive():
             ni = self.getNumberOfInteractions()
             if ni > 0:
@@ -99,7 +135,7 @@ class SystemLocal(_espressopp.System):
                 raise Error("interaction list of system is empty")
             
     def scaleVolume(self, *args):
-        'scale the Volume of the system, which means in detail: scale all particle coordinates, scale box length, scale cellgrid (if it exists)'
+
         if pmi.workerIsActive():
           if len(args) == 1:
             arg0 = args[0]
@@ -125,7 +161,7 @@ class SystemLocal(_espressopp.System):
             print args, " is invalid"
           
     def setTrace(self, switch):
-        'switch on or off VampirTrace'
+
         if pmi.workerIsActive():
             self.cxxclass.setTrace(self, switch)
 

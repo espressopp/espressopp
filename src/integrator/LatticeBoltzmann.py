@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**********************************************************
+r"""
+************************************************************
 **LatticeBoltzmann** - class for lattice Boltzmann methods
-**********************************************************
+************************************************************
 
 The LatticeBoltzmann (LB) class is an extension to the integrator class of ESPResSo++. The main purpose of the LB-fluid in our simulation package is NOT in fluid dynamics applications or investigation of fluid-solid interfacial phenomena. We aim at complex soft matter systems, where the LB-fluid is a bulk solvent and therefore one has rather use some MD particles as solutes. Examples of such systems range from colloids (point-like MD-particles) to polymer chains (point-like MD-particles connected into chains) dissolved in some solvent (LB-fluid) with specific static and dynamic properties.
 
@@ -92,6 +92,23 @@ Example
 >>> # creates a box of 20^3 nodes with lattice spacing of 1. and timestep of 1. D3Q19 model.
 >>> # then the bulk and shear gammas are set to 0.5
 
+
+.. function:: espressopp.integrator.LatticeBoltzmann(system, nodeGrid, Ni, a, tau, numDims, numVels)
+
+		:param system: 
+		:param nodeGrid: 
+		:param Ni: 
+		:param a: (default: 1.)
+		:param tau: (default: 1.)
+		:param numDims: (default: 3)
+		:param numVels: (default: 19)
+		:type system: 
+		:type nodeGrid: 
+		:type Ni: 
+		:type a: 
+		:type tau: 
+		:type numDims: int
+		:type numVels: int
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

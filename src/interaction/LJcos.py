@@ -20,9 +20,9 @@
 
 
 r"""
-********************************
+******************************************
 **espressopp.interaction.LJcos**
-********************************
+******************************************
 
 if :math:`r^2 \leq border_{pot}`, then:
 
@@ -56,11 +56,11 @@ else:
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
-.. function:: espressopp.interaction.VerletListLJcos.getVerletListLocal()
+.. function:: espressopp.interaction.VerletListLJcos.getVerletList()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.VerletListLJcos.setPotential(type1, type2, potential)
 
@@ -86,7 +86,6 @@ else:
 		:type type1: 
 		:type type2: 
 		:type potential: 
-		:rtype:
 
 .. function:: espressopp.interaction.VerletListAdressLJcos.setPotentialCG(type1, type2, potential)
 
@@ -96,7 +95,6 @@ else:
 		:type type1: 
 		:type type2: 
 		:type potential: 
-		:rtype:
 
 .. function:: espressopp.interaction.VerletListHadressLJcos(vl, fixedtupleList)
 
@@ -148,12 +146,12 @@ else:
 
 .. function:: espressopp.interaction.FixedPairListLJcos.getFixedPairList()
 
-		:rtype: FixedPairList (A python list of lists, *not* tuples)
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedPairListLJcos.setFixedPairList(fixedpairlist)
 
 		:param fixedpairlist: 
-		:type fixedpairlist:  FixedPairList (A python list of lists, *not* tuples)
+		:type fixedpairlist: 
 
 .. function:: espressopp.interaction.FixedPairListLJcos.setPotential(potential)
 
@@ -175,6 +173,7 @@ from _espressopp import interaction_LJcos, \
 class LJcosLocal(PotentialLocal, interaction_LJcos):
 
     def __init__(self, phi=1.0):
+
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         cxxinit(self, interaction_LJcos, phi)
 
@@ -255,7 +254,7 @@ class FixedPairListLJcosLocal(InteractionLocal, interaction_FixedPairListLJcos):
 
 if pmi.isController:
     class LJcos(Potential):
-
+        'The Lennard-Jones potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.LJcosLocal',
             pmiproperty = ['phi']

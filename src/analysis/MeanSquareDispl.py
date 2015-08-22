@@ -34,15 +34,15 @@ r"""
 
 .. function:: espressopp.analysis.MeanSquareDispl.computeG2()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.analysis.MeanSquareDispl.computeG3()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.analysis.MeanSquareDispl.strange()
 
-		:rtype:
+		:rtype: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

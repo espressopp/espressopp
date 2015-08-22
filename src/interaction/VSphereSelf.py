@@ -20,9 +20,9 @@
 
 
 r"""
-**************************************
+************************************************
 **espressopp.interaction.VSphereSelf**
-**************************************
+************************************************
 
 This class provides methods to compute forces and energies of
 the VSphereSelf potential.
@@ -36,7 +36,6 @@ the VSphereSelf potential.
 
 
 
-
 .. function:: espressopp.interaction.VSphereSelf(e1, a1, a2, Nb, cutoff, shift)
 
 		:param e1: (default: 0.0)
@@ -45,12 +44,12 @@ the VSphereSelf potential.
 		:param Nb: (default: 1)
 		:param cutoff: (default: infinity)
 		:param shift: (default: 0.0)
-		:type e1: 
-		:type a1: 
-		:type a2: 
-		:type Nb: 
+		:type e1: real
+		:type a1: real
+		:type a2: real
+		:type Nb: int
 		:type cutoff: 
-		:type shift: 
+		:type shift: real
 
 .. function:: espressopp.interaction.SelfVSphere(system, potential)
 
@@ -61,7 +60,7 @@ the VSphereSelf potential.
 
 .. function:: espressopp.interaction.SelfVSphere.getPotential()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.SelfVSphere.setPotential(potential)
 
@@ -79,6 +78,7 @@ class VSphereSelfLocal(PotentialLocal, interaction_VSphereSelf):
 
     def __init__(self, e1=0.0, a1=1.0, a2=0.0, Nb=1, 
                  cutoff=infinity, shift=0.0):
+        """Initialize the local VSphere object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
                 cxxinit(self, interaction_VSphereSelf, e1, a1, a2, Nb, cutoff)
@@ -101,7 +101,7 @@ class SelfVSphereLocal(InteractionLocal, interaction_SelfVSphere):
 
 if pmi.isController:
     class VSphereSelf(Potential):
-
+        'The VSphereSelf potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.VSphereSelfLocal',
             pmiproperty = ['e1', 'a1', 'a2', 'Nb']

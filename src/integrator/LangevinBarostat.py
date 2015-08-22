@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-******************************************************
+r"""
+********************************************************
 **LangevinBarostat** - Langevin-Hoover barostat Object
-******************************************************
+********************************************************
 
 This is the barostat implementation to perform Langevin dynamics in a Hoover style extended system
 according to the paper [Quigley04]_. It includes corrections of Hoover approach which were introduced
@@ -30,17 +30,17 @@ by Martyna et al [Martyna94]_.
 If LangevinBarostat is defined (as a property of integrator) the integration equations will be 
 modified. The volume of system :math:`V` is introduced as a dynamical variable:
 
-.. math:: \\boldsymbol{\dot{r}}_{i} = \\frac{\\boldsymbol{p}_{i}}{m_{i}} +
-          \\frac{p_{\epsilon}}{W}\\boldsymbol{r}_{i}
+.. math:: \boldsymbol{\dot{r}}_{i} = \frac{\boldsymbol{p}_{i}}{m_{i}} +
+          \frac{p_{\epsilon}}{W}\boldsymbol{r}_{i}
 					
-.. math:: \\boldsymbol{\dot{p}}_{i} = -\\bigtriangledown_{\\boldsymbol{r}_{i}}\Phi -
-          (1+\\frac{n}{N_{f}})\\frac{p_{\epsilon}}{W}\\boldsymbol{p}_{i} - 
-          \gamma\\boldsymbol{p}_{i} + \\boldsymbol{R}_{i}
+.. math:: \boldsymbol{\dot{p}}_{i} = -\bigtriangledown_{\boldsymbol{r}_{i}}\Phi -
+          (1+\frac{n}{N_{f}})\frac{p_{\epsilon}}{W}\boldsymbol{p}_{i} - 
+          \gamma\boldsymbol{p}_{i} + \boldsymbol{R}_{i}
 					
-.. math:: \\dot{V} = dVp_{\epsilon}/W
+.. math:: \dot{V} = dVp_{\epsilon}/W
 
-.. math:: \\dot{p}_{\epsilon} = nV(X-P_{ext})+
-          \\frac{n}{N_{f}}\sum^{N}_{i=1}\\frac{\\boldsymbol{p}_{i}^{2}}{m_{i}} -
+.. math:: \dot{p}_{\epsilon} = nV(X-P_{ext})+
+          \frac{n}{N_{f}}\sum^{N}_{i=1}\frac{\boldsymbol{p}_{i}^{2}}{m_{i}} -
           \gamma_{p}p_{\epsilon} + R_{p}
 
 
@@ -52,9 +52,9 @@ are no constrains and :math:`N` is the number of particles in system :math:`N_{f
 :math:`R_{p}` - values which are drawn from Gaussian distribution of zero mean and unit variance
 scaled by
 
-.. math:: \sqrt{\\frac{2k_{B}TW\gamma_{p}}{\Delta t}}
+.. math:: \sqrt{\frac{2k_{B}TW\gamma_{p}}{\Delta t}}
 
-**!IMPORTANT** Terms :math:`- \gamma\\boldsymbol{p}_{i} + \\boldsymbol{R}_{i}` correspond to the 
+**!IMPORTANT** Terms :math:`- \gamma\boldsymbol{p}_{i} + \boldsymbol{R}_{i}` correspond to the 
 termostat. They are not included here and will not be calculated if the Langevin Thermostat is not
 defined.
 
@@ -155,6 +155,15 @@ References:
 
 .. [Martyna94] G. Martyna, D. Tobias, M. Klein, *J. Chem. Phys.*, 101, **1994**, p. 4177
 
+
+.. function:: espressopp.integrator.LangevinBarostat(system, rng, temperature)
+
+		:param system: 
+		:param rng: 
+		:param temperature: 
+		:type system: 
+		:type rng: 
+		:type temperature: 
 """
 
 
@@ -166,7 +175,7 @@ from _espressopp import integrator_LangevinBarostat
 
 class LangevinBarostatLocal(ExtensionLocal, integrator_LangevinBarostat):
   def __init__(self, system, rng, temperature):
-    'The (local) Velocity Verlet Integrator.'
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, integrator_LangevinBarostat, system, rng, temperature)
 

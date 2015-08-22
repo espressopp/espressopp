@@ -18,10 +18,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
-"""
-************************************
+r"""
+**************************************
 **PLogger** - Object
-************************************
+**************************************
 
 This module defines the parallel logger PLogger.
 It can be used to switch on logging on all CPUs.
@@ -40,6 +40,13 @@ Example:
 >>> print pot.computeEnergy(1.0)
 >>> espressopp.PLogger.set('LennardJonesGeneric', 'ERROR')
 
+
+.. function:: espressopp.set(thelogger, level)
+
+		:param thelogger: 
+		:param level: 
+		:type thelogger: 
+		:type level: 
 """
 
 import espressopp

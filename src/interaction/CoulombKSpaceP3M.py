@@ -20,9 +20,9 @@
 
 
 r"""
-*********************************************************************************
+*******************************************************************************************
 **CoulombKSpaceP3M** - Coulomb potential and interaction Objects (`K` space part)
-*********************************************************************************
+*******************************************************************************************
 
 
 This is the `K` space part of potential of Coulomb long range interaction according to the P3M
@@ -84,6 +84,11 @@ Adding the interaction to the system:
     >>> system.addInteraction(ewaldK_int)
     
 
+
+
+
+
+
 .. function:: espressopp.interaction.CoulombKSpaceP3M(system, C_pref, alpha, M, P, rcut, interpolation)
 
 		:param system: 
@@ -94,11 +99,11 @@ Adding the interaction to the system:
 		:param rcut: 
 		:param interpolation: (default: 200192)
 		:type system: 
-		:type C_pref: real
-		:type alpha: real
-		:type M: Int3D
-		:type P: int
-		:type rcut: real
+		:type C_pref: 
+		:type alpha: 
+		:type M: 
+		:type P: 
+		:type rcut: 
 		:type interpolation: int
 
 .. function:: espressopp.interaction.CellListCoulombKSpaceP3M(storage, potential)
@@ -110,7 +115,7 @@ Adding the interaction to the system:
 
 .. function:: espressopp.interaction.CellListCoulombKSpaceP3M.getPotential()
 
-		:rtype:
+		:rtype: 
 """
 
 
@@ -124,11 +129,14 @@ from _espressopp import interaction_CoulombKSpaceP3M, \
 
 class CoulombKSpaceP3MLocal(PotentialLocal, interaction_CoulombKSpaceP3M):
     def __init__(self, system, C_pref, alpha, M, P, rcut, interpolation = 200192):
+
+
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         cxxinit(self, interaction_CoulombKSpaceP3M, system, C_pref, alpha, M, P, rcut, interpolation)
 
 class CellListCoulombKSpaceP3MLocal(InteractionLocal, interaction_CellListCoulombKSpaceP3M):
     def __init__(self, storage, potential):
+
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         cxxinit(self, interaction_CellListCoulombKSpaceP3M, storage, potential)
 

@@ -19,17 +19,37 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***********************
+r"""
+*************************
 **espressopp.Exceptions**
-***********************
+*************************
 
+
+.. function:: espressopp.Error(msg)
+
+		:param msg: 
+		:type msg: 
+
+.. function:: espressopp.ParticleDoesNotExistHere(msg)
+
+		:param msg: 
+		:type msg: 
+
+.. function:: espressopp.UnknownParticleProperty(msg)
+
+		:param msg: 
+		:type msg: 
+
+.. function:: espressopp.MissingFixedPairList(msg)
+
+		:param msg: 
+		:type msg: 
 """
 import sys, traceback
 
 class Error(Exception):
-    """Raised to show unrecoverable espressopp errors.
-    """
+
+
     def __init__(self, msg):
         try:
             raise Exception
@@ -42,8 +62,8 @@ class Error(Exception):
         return str(self)
 
 class ParticleDoesNotExistHere(Exception):
-    """ Raised to indicate, that a certain Particle does not exist on a CPU
-    """
+
+
     def __init__(self, msg):
         try:
             raise Exception
@@ -55,8 +75,8 @@ class ParticleDoesNotExistHere(Exception):
         return str(self)
 
 class UnknownParticleProperty(Exception):
-    """ Raised to indicate, that a certain Particle property does not exists 
-    """
+
+
     def __init__(self, msg):
         try:
             raise Exception
@@ -68,8 +88,8 @@ class UnknownParticleProperty(Exception):
         return str(self)
 
 class MissingFixedPairList(Exception):
-    """ Raised to indicate, that a FixedPairList object is missing
-    """
+
+
     def __init__(self, msg):
         try:
             raise Exception

@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-"""
-	**********************************************************
+r"""
+	************************************************************
 	**LiquidGasLB** - class for lattice Boltzmann methods
-	**********************************************************
+	************************************************************
 	
 	The LiquidGasLB class is an extension to the integrator class of ESPResSo++.
 	It creates a simulation box with specified dimensions and allocates necessary
@@ -106,3 +106,4 @@ if pmi.isController :
 												pmiproperty = [ 'Ni', 'a', 'tau', 'numDims', 'numVels',
 																			 'gamma_b', 'gamma_s', 'gamma_odd', 'gamma_even', 'lbTemp']
 												)
+

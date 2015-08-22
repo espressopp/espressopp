@@ -46,8 +46,6 @@ Abstract base class for arbitrary output from LB simulations. At the moment, the
 	Computes and outputs a vz component of the velocity as a function of time.
 
 
-.. function:: espressopp.analysis.LBOutput()
-
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

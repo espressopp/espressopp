@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-********************************************
+r"""
+******************************************************
 **espressopp.interaction.TabulatedDihedral**
-********************************************
+******************************************************
 
 
 
@@ -69,6 +69,7 @@ from _espressopp import interaction_TabulatedDihedral, \
 class TabulatedDihedralLocal(DihedralPotentialLocal, interaction_TabulatedDihedral):
 
     def __init__(self, itype, filename):
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_TabulatedDihedral, itype, filename)
 
@@ -84,7 +85,7 @@ class FixedQuadrupleListTabulatedDihedralLocal(InteractionLocal, interaction_Fix
 
 if pmi.isController:
     class TabulatedDihedral(DihedralPotential):
-
+        'The TabulatedDihedral potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.TabulatedDihedralLocal',
             pmiproperty = ['itype', 'filename']

@@ -20,9 +20,9 @@
 
 
 r"""
-**********************************
+********************************************
 **espressopp.interaction.Quartic**
-**********************************
+********************************************
 This class provides methods to compute forces and energies of
 the Quartic potential.
 
@@ -42,7 +42,7 @@ the Quartic potential.
 		:param shift: (default: 0.0)
 		:type K: real
 		:type r0: real
-		:type cutoff: int
+		:type cutoff: 
 		:type shift: real
 
 .. function:: espressopp.interaction.FixedPairListQuartic(system, vl, potential)
@@ -56,7 +56,7 @@ the Quartic potential.
 
 .. function:: espressopp.interaction.FixedPairListQuartic.getFixedPairList()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedPairListQuartic.setFixedPairList(fixedpairlist)
 
@@ -83,6 +83,7 @@ class QuarticLocal(PotentialLocal, interaction_Quartic):
 
     def __init__(self, K=1.0, r0=0.0, 
                  cutoff=infinity, shift=0.0):
+        """Initialize the local Quartic object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
                 cxxinit(self, interaction_Quartic, K, r0, cutoff)
@@ -110,7 +111,7 @@ class FixedPairListQuarticLocal(InteractionLocal, interaction_FixedPairListQuart
 
 if pmi.isController:
     class Quartic(Potential):
-
+        'The Quartic potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.QuarticLocal',
             pmiproperty = ['K', 'r0']

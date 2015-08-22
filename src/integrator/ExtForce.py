@@ -19,11 +19,20 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-********************************
+r"""
+**********************************
 **espressopp.integrator.ExtForce**
-********************************
+**********************************
 
+
+.. function:: espressopp.integrator.ExtForce(system, extForce, particleGroup)
+
+		:param system: 
+		:param extForce: 
+		:param particleGroup: (default: None)
+		:type system: 
+		:type extForce: 
+		:type particleGroup: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -31,7 +40,7 @@ from espressopp.integrator.Extension import *
 from _espressopp import integrator_ExtForce 
 
 class ExtForceLocal(ExtensionLocal, integrator_ExtForce):
-    'The (local) external force part.'
+
     def __init__(self, system, extForce, particleGroup = None):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if (particleGroup == None) or (particleGroup.size() == 0):

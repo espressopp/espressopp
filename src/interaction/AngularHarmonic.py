@@ -20,21 +20,29 @@
 
 
 r"""
-******************************************
+************************************************************
 **espressopp.interaction.AngularHarmonic**
-******************************************
+************************************************************
 
 Calculates the Angular Harmonic interaction
 
 .. math::
 	U = K (\theta - \theta_0)^2
 
+
+
+
+
+
+
+
+
 .. function:: espressopp.interaction.AngularHarmonic(K, theta0)
 
 		:param K: (default: 1.0)
-		:param theta0: (default: 0.0) An angle in radians.
+		:param theta0: (default: 0.0)
 		:type K: real
-		:type theta0:real 
+		:type theta0: real
 
 .. function:: espressopp.interaction.FixedTripleListAngularHarmonic(system, vl, potential)
 
@@ -53,7 +61,6 @@ Calculates the Angular Harmonic interaction
 		:type type1: 
 		:type type2: 
 		:type potential: 
-
 """
 from espressopp import pmi
 from espressopp.esutil import *
@@ -65,6 +72,7 @@ from _espressopp import interaction_AngularHarmonic, interaction_FixedTripleList
 class AngularHarmonicLocal(AngularPotentialLocal, interaction_AngularHarmonic):
 
     def __init__(self, K=1.0, theta0=0.0):
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_AngularHarmonic, K, theta0)
 
@@ -80,7 +88,7 @@ class FixedTripleListAngularHarmonicLocal(InteractionLocal, interaction_FixedTri
 
 if pmi.isController:
     class AngularHarmonic(AngularPotential):
-
+        'The AngularHarmonic potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.AngularHarmonicLocal',
             pmiproperty = ['K', 'theta0']

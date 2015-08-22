@@ -19,11 +19,20 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+**************************************
 **espressopp.integrator.FixPositions**
-************************************
+**************************************
 
+
+.. function:: espressopp.integrator.FixPositions(system, particleGroup, fixMask)
+
+		:param system: 
+		:param particleGroup: 
+		:param fixMask: 
+		:type system: 
+		:type particleGroup: 
+		:type fixMask: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -31,7 +40,7 @@ from espressopp.integrator.Extension import *
 from _espressopp import integrator_FixPositions 
 
 class FixPositionsLocal(ExtensionLocal, integrator_FixPositions):
-    'The (local) Fix Positions part.'
+
     def __init__(self, system, particleGroup, fixMask):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_FixPositions, system, particleGroup, fixMask)

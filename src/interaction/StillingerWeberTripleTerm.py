@@ -20,9 +20,9 @@
 
 
 r"""
-****************************************************
+**************************************************************
 **espressopp.interaction.StillingerWeberTripleTerm**
-****************************************************
+**************************************************************
 This class provides methods to compute forces and energies of
 the Stillinger Weber Triple Term potential.
 
@@ -57,7 +57,7 @@ else
 		:type lmbd: real
 		:type epsilon: real
 		:type sigma: real
-		:type cutoff: int
+		:type cutoff: 
 
 .. function:: espressopp.interaction.VerletListStillingerWeberTripleTerm(system, vl3)
 
@@ -74,11 +74,11 @@ else
 		:type type1: 
 		:type type2: 
 		:type type3: 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.VerletListStillingerWeberTripleTerm.getVerletListTriple()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.VerletListStillingerWeberTripleTerm.setPotential(type1, type2, type3, potential)
 
@@ -102,7 +102,7 @@ else
 
 .. function:: espressopp.interaction.FixedTripleListStillingerWeberTripleTerm.getFixedTripleList()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedTripleListStillingerWeberTripleTerm.setPotential(type1, type2, type3, potential)
 
@@ -128,11 +128,13 @@ class StillingerWeberTripleTermLocal(AngularPotentialLocal, interaction_Stilling
 
   def __init__(self, gamma1=0.0, gamma2=0.0, theta0=0.0, lmbd=0.0,
                epsilon=1.0, sigma1=1.0, sigma2=1.0, cutoff1=infinity, cutoff2=infinity):
+    """Initialize the local StillingerWeberTripleTerm object."""
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_StillingerWeberTripleTerm, gamma1, gamma2, 
               theta0, lmbd, epsilon, sigma1, sigma2, cutoff1, cutoff2)
       
   def __init__(self, gamma=0.0, theta0=0.0, lmbd=0.0, epsilon=1.0, sigma=1.0, cutoff=infinity):
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_StillingerWeberTripleTerm, gamma, gamma, 
               theta0, lmbd, epsilon, sigma, sigma, cutoff, cutoff)
@@ -171,7 +173,7 @@ class FixedTripleListStillingerWeberTripleTermLocal(InteractionLocal, interactio
 
 if pmi.isController:
   class StillingerWeberTripleTerm(AngularPotential):
-
+    'The StillingerWeberTripleTerm potential.'
     pmiproxydefs = dict(
       cls = 'espressopp.interaction.StillingerWeberTripleTermLocal',
       pmiproperty = [ 'gamma1', 'gamma2', 'theta0',

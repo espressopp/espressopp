@@ -19,19 +19,19 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*************************************************
+r"""
+***************************************************
 **BerendsenBarostat** - Berendsen barostat Object
-*************************************************
+***************************************************
 
 This is the Berendsen barostat implementation according to the original paper [Berendsen84]_.
 If Berendsen barostat is defined (as a property of integrator) then at the each run the system size
 and the particle coordinates will be scaled by scaling parameter :math:`\mu` according to
 the formula:
 
-.. math::   \mu = [1 - \Delta t/\\tau (P_{0} - P)]^{1/3}
+.. math::   \mu = [1 - \Delta t/\tau (P_{0} - P)]^{1/3}
 
-where :math:`\Delta t` - integration timestep, :math:`\\tau` - time parameter (coupling parameter),
+where :math:`\Delta t` - integration timestep, :math:`\tau` - time parameter (coupling parameter),
 :math:`P_{0}` - external pressure and :math:`P` - instantaneous pressure. 
 
 Example:
@@ -60,7 +60,7 @@ Properties:
 
 *   *berendsenP.tau*
 
-    The property 'tau' defines the time parameter :math:`\\tau`.
+    The property 'tau' defines the time parameter :math:`\tau`.
 
 *   *berendsenP.pressure*
     
@@ -106,6 +106,11 @@ References:
 
 .. [Berendsen84] Berendsen et al., *J. Chem. Phys.*, 81, **1984**, p. 3684
 
+
+.. function:: espressopp.integrator.BerendsenBarostat(system)
+
+		:param system: 
+		:type system: 
 """
 
 
@@ -117,7 +122,7 @@ from _espressopp import integrator_BerendsenBarostat
 
 class BerendsenBarostatLocal(ExtensionLocal, integrator_BerendsenBarostat):
   def __init__(self, system):
-    'The (local) Velocity Verlet Integrator.'
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or \
             pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, integrator_BerendsenBarostat, system)

@@ -20,9 +20,9 @@
 
 
 r"""
-********************************************************
+******************************************************************
 **espressopp.interaction.StillingerWeberPairTermCapped**
-********************************************************
+******************************************************************
 This class provides methods to compute forces and energies of
 2 body term of Stillinger-Weber potential.
 
@@ -54,7 +54,7 @@ where :math:`r_c` is the cutoff-radius.
 		:type q: 
 		:type epsilon: real
 		:type sigma: real
-		:type cutoff: int
+		:type cutoff: 
 		:type caprad: real
 
 .. function:: espressopp.interaction.VerletListStillingerWeberPairTermCapped(vl)
@@ -64,7 +64,7 @@ where :math:`r_c` is the cutoff-radius.
 
 .. function:: espressopp.interaction.VerletListStillingerWeberPairTermCapped.getCaprad()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.VerletListStillingerWeberPairTermCapped.getPotential(type1, type2)
 
@@ -72,11 +72,11 @@ where :math:`r_c` is the cutoff-radius.
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
-.. function:: espressopp.interaction.VerletListStillingerWeberPairTermCapped.getVerletListLocal()
+.. function:: espressopp.interaction.VerletListStillingerWeberPairTermCapped.getVerletList()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.VerletListStillingerWeberPairTermCapped.setPotential(type1, type2, potential)
 
@@ -126,7 +126,7 @@ where :math:`r_c` is the cutoff-radius.
 		:param potential: 
 		:type type1: 
 		:type type2: 
-		:type potential:
+		:type potential: 
 
 .. function:: espressopp.interaction.VerletListHadressStillingerWeberPairTermCapped.setPotentialCG(type1, type2, potential)
 
@@ -180,6 +180,7 @@ from _espressopp import interaction_StillingerWeberPairTermCapped, \
 class StillingerWeberPairTermCappedLocal(PotentialLocal, interaction_StillingerWeberPairTermCapped):
 
   def __init__(self, A, B, p, q, epsilon=1.0, sigma=1.0, cutoff=infinity, caprad = 0.0):
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_StillingerWeberPairTermCapped, A, B, p, q, epsilon, sigma, cutoff, caprad)
 
@@ -255,7 +256,7 @@ class FixedPairListStillingerWeberPairTermCappedLocal(InteractionLocal, interact
 
 if pmi.isController:
     class StillingerWeberPairTermCapped(Potential):
-
+        'The Lennard-Jones potential.'
         pmiproxydefs = dict(
           cls = 'espressopp.interaction.StillingerWeberPairTermCappedLocal',
           pmiproperty = ['A', 'B', 'p', 'q', 'epsilon', 'sigma', 'caprad'],

@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*************************************
+r"""
+***************************************
 **ExtAnalyze** - Integrator Extension
-*************************************
+***************************************
 
 This class can be used to execute nearly all analysis objects
 within the main integration loop which allows to automatically
@@ -40,6 +40,13 @@ Example Usage:
 >>> print "average Pressure Tensor = ", pt_ave[:6]
 >>> print "          std deviation = ", pt_ave[6:]
 >>> print "number of measurements  = ", pt.getNumberOfMeasurements()
+
+.. function:: espressopp.integrator.ExtAnalyze(action_obj, interval)
+
+		:param action_obj: 
+		:param interval: (default: 1)
+		:type action_obj: 
+		:type interval: int
 """
 
 from espressopp.esutil import cxxinit
@@ -48,7 +55,7 @@ from espressopp.integrator.Extension import *
 from _espressopp import integrator_ExtAnalyze 
 
 class ExtAnalyzeLocal(ExtensionLocal, integrator_ExtAnalyze):
-    'The (local) extension analyze.'
+
     def __init__(self, action_obj, interval=1):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
            cxxinit(self, integrator_ExtAnalyze, action_obj, interval)

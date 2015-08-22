@@ -20,18 +20,24 @@
 
 
 r"""
-*****************************************************
+***************************************************************
 **espressopp.interaction.AngularUniqueCosineSquared**
-*****************************************************
+***************************************************************
 
 Calculates the angular unique cosine squared interaction.
 
 .. math::
 	U =  K (cos(\theta) - cos(\theta_{0}))^2
 
+
+
+
+
+
+
 .. function:: espressopp.interaction.AngularUniqueCosineSquared(K)
 
-		:param K: (default: 1.0) 
+		:param K: (default: 1.0)
 		:type K: real
 
 .. function:: espressopp.interaction.FixedTripleAngleListAngularUniqueCosineSquared(system, ftcl, potential)
@@ -45,13 +51,12 @@ Calculates the angular unique cosine squared interaction.
 
 .. function:: espressopp.interaction.FixedTripleAngleListAngularUniqueCosineSquared.getFixedTripleList()
 
-		:rtype: FixedTripleLIst
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedTripleAngleListAngularUniqueCosineSquared.setPotential(potential)
 
 		:param potential: 
 		:type potential: 
-
 """
 from espressopp import pmi
 from espressopp.esutil import *
@@ -64,6 +69,7 @@ from _espressopp import interaction_AngularUniqueCosineSquared, \
 class AngularUniqueCosineSquaredLocal(AngularUniquePotentialLocal, interaction_AngularUniqueCosineSquared):
 
     def __init__(self, K=1.0):
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
           cxxinit(self, interaction_AngularUniqueCosineSquared, K)
 
@@ -83,7 +89,7 @@ class FixedTripleAngleListAngularUniqueCosineSquaredLocal(InteractionLocal, inte
     
 if pmi.isController:
     class AngularUniqueCosineSquared(AngularUniquePotential):
-
+      'The AngularUniqueCosineSquared potential.'
       pmiproxydefs = dict(
         cls = 'espressopp.interaction.AngularUniqueCosineSquaredLocal',
         pmiproperty = ['K']

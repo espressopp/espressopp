@@ -20,12 +20,11 @@
 
 
 r"""
-*******************************
+***************************************
 **espressopp.interaction.Zero**
-*******************************
+***************************************
 This class provides methods for a zero potential
 no interactions between particles, mainly used for debugging and testing
-
 
 
 
@@ -45,13 +44,12 @@ no interactions between particles, mainly used for debugging and testing
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.VerletListZero.setFixedTupleList(ftpl)
 
 		:param ftpl: 
 		:type ftpl: 
-		:rtype:
 
 .. function:: espressopp.interaction.VerletListZero.setPotential(type1, type2, potential)
 
@@ -162,6 +160,7 @@ from _espressopp import interaction_Zero, \
 
 class ZeroLocal(PotentialLocal, interaction_Zero):
     def __init__(self):
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_Zero)
 
@@ -236,7 +235,7 @@ class FixedPairListZeroLocal(InteractionLocal, interaction_FixedPairListZero):
 
 if pmi.isController:
     class Zero(Potential):
-
+        'The Zero potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.ZeroLocal'
             )

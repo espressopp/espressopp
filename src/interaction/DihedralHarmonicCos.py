@@ -20,12 +20,16 @@
 
 
 r"""
-**********************************************
+********************************************************
 **espressopp.interaction.DihedralHarmonicCos**
-**********************************************
+********************************************************
 
 .. math::
 	U = K (cos(\phi) - cos(\phi_0))^2
+
+
+
+
 
 
 .. function:: espressopp.interaction.DihedralHarmonicCos(K, phi0)
@@ -46,7 +50,7 @@ r"""
 
 .. function:: espressopp.interaction.FixedQuadrupleListDihedralHarmonicCos.getFixedQuadrupleList()
 
-		:rtype: FixedQuadrupelList (A python list of lists, *not* tuples)
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedQuadrupleListDihedralHarmonicCos.setPotential(potential)
 
@@ -63,6 +67,7 @@ from _espressopp import interaction_DihedralHarmonicCos, interaction_FixedQuadru
 class DihedralHarmonicCosLocal(DihedralPotentialLocal, interaction_DihedralHarmonicCos):
 
   def __init__(self, K=0.0, phi0=0.0):
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_DihedralHarmonicCos, K, phi0)
 
@@ -83,7 +88,7 @@ class FixedQuadrupleListDihedralHarmonicCosLocal(InteractionLocal, interaction_F
 
 if pmi.isController:
   class DihedralHarmonicCos(DihedralPotential):
-
+    'The DihedralHarmonicCos potential.'
     pmiproxydefs = dict(
       cls = 'espressopp.interaction.DihedralHarmonicCosLocal',
       pmiproperty = ['K', 'phi']

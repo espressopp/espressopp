@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*******************************************
+r"""
+*****************************************************
 **espressopp.interaction.TabulatedAngular**
-*******************************************
+*****************************************************
 
 
 
@@ -68,6 +68,7 @@ from _espressopp import interaction_TabulatedAngular, \
 class TabulatedAngularLocal(AngularPotentialLocal, interaction_TabulatedAngular):
 
     def __init__(self, itype, filename):
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_TabulatedAngular, itype, filename)
 
@@ -83,7 +84,7 @@ class FixedTripleListTabulatedAngularLocal(InteractionLocal, interaction_FixedTr
 
 if pmi.isController:
     class TabulatedAngular(AngularPotential):
-
+        'The TabulatedAngular potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.TabulatedAngularLocal',
             pmiproperty = ['itype', 'filename']

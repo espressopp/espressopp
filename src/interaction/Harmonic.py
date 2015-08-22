@@ -20,12 +20,16 @@
 
 
 r"""
-***********************************
+*********************************************
 **espressopp.interaction.Harmonic**
-***********************************
+*********************************************
 
 .. math::
 	U = K (d - r_0)^2
+
+
+
+
 
 
 .. function:: espressopp.interaction.Harmonic(K, r0, cutoff, shift)
@@ -50,19 +54,17 @@ r"""
 
 .. function:: espressopp.interaction.FixedPairListHarmonic.getFixedPairList()
 
-		:rtype: FixedPairList (A python list of lists, *not* tuples)
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedPairListHarmonic.setFixedPairList(fixedpairlist)
 
 		:param fixedpairlist: 
-		:type fixedpairlist: FixedPairList
-
+		:type fixedpairlist: 
 
 .. function:: espressopp.interaction.FixedPairListHarmonic.setPotential(potential)
 
 		:param potential: 
 		:type potential: 
-
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -75,6 +77,7 @@ class HarmonicLocal(PotentialLocal, interaction_Harmonic):
 
     def __init__(self, K=1.0, r0=0.0, 
                  cutoff=infinity, shift=0.0):
+        """Initialize the local Harmonic object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
                 cxxinit(self, interaction_Harmonic, K, r0, cutoff)
@@ -102,7 +105,7 @@ class FixedPairListHarmonicLocal(InteractionLocal, interaction_FixedPairListHarm
 
 if pmi.isController:
     class Harmonic(Potential):
-
+        'The Harmonic potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.HarmonicLocal',
             pmiproperty = ['K', 'r0']

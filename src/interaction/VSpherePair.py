@@ -20,9 +20,9 @@
 
 
 r"""
-**************************************
+************************************************
 **espressopp.interaction.VSpherePair**
-**************************************
+************************************************
 This class provides methods to compute forces and energies of
 the VSpherePair potential.
 
@@ -44,7 +44,7 @@ the VSpherePair potential.
 		:param epsilon: (default: 1.0)
 		:param cutoff: (default: infinity)
 		:param shift: (default: "auto")
-		:type epsilon: 
+		:type epsilon: real
 		:type cutoff: 
 		:type shift: 
 
@@ -59,11 +59,11 @@ the VSpherePair potential.
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.VerletListVSpherePair.getVerletList()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.VerletListVSpherePair.setPotential(type1, type2, potential)
 
@@ -84,6 +84,7 @@ from _espressopp import interaction_VSpherePair, interaction_VerletListVSpherePa
 class VSpherePairLocal(PotentialLocal, interaction_VSpherePair):
 
     def __init__(self, epsilon=1.0, cutoff=infinity, shift="auto"):
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
                 cxxinit(self, interaction_VSpherePair, 
@@ -113,7 +114,7 @@ class VerletListVSpherePairLocal(InteractionLocal, interaction_VerletListVSphere
 
 if pmi.isController:
     class VSpherePair(Potential):
-
+        'The Lennard-Jones potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.VSpherePairLocal',
             pmiproperty = ['epsilon']

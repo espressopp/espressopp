@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*******************************************
+r"""
+*********************************************
 **DumpGRO** - IO Object
-*******************************************
+*********************************************
 
 * `dump()`
   write configuration to trajectory GRO file. By default filename is "out.gro", 
@@ -71,6 +71,27 @@ For example, the Lennard-Jones model for liquid argon with :math:`\sigma=0.34 [n
 >>> dump_conf_gro = espressopp.io.DumpGRO(system, integrator, filename='trj.gro', unfolded=False, length_factor=0.34, length_unit='nm', append=True)
 
 will produce trj.gro with in nanometers
+
+.. function:: espressopp.io.DumpGRO(system, integrator, filename, unfolded, length_factor, length_unit, append)
+
+		:param system: 
+		:param integrator: 
+		:param filename: (default: 'out.gro')
+		:param unfolded: (default: False)
+		:param length_factor: (default: 1.0)
+		:param length_unit: (default: 'LJ')
+		:param append: (default: True)
+		:type system: 
+		:type integrator: 
+		:type filename: 
+		:type unfolded: 
+		:type length_factor: real
+		:type length_unit: 
+		:type append: 
+
+.. function:: espressopp.io.DumpGRO.dump()
+
+		:rtype: 
 """
 
 from espressopp.esutil import cxxinit
@@ -80,7 +101,7 @@ from espressopp.ParticleAccess import *
 from _espressopp import io_DumpGRO
 
 class DumpGROLocal(ParticleAccessLocal, io_DumpGRO):
-  'The (local) storage of configurations.'
+
   def __init__(self, system, integrator, filename='out.gro', unfolded=False, length_factor=1.0, length_unit='LJ', append=True):
     cxxinit(self, io_DumpGRO, system, integrator, filename, unfolded, length_factor, length_unit, append)
   

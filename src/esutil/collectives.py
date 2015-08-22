@@ -19,11 +19,16 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*******************************
+r"""
+*********************************
 **espressopp.esutil.collectives**
-*******************************
+*********************************
 
+
+.. function:: espressopp.esutil.locateItem(here)
+
+		:param here: 
+		:type here: 
 """
 import _espressopp
 from espressopp import pmi

@@ -20,9 +20,9 @@
 
 
 r"""
-*********************************************
+*******************************************************
 **espressopp.interaction.LennardJonesExpand**
-*********************************************
+*******************************************************
 .. math::
 	V(r) = 4 \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} -
 	\left( \frac{\sigma}{r} \right)^{6} \right]
@@ -42,7 +42,7 @@ r"""
 		:type epsilon: real
 		:type sigma: real
 		:type delta: real
-		:type cutoff: int
+		:type cutoff: 
 		:type shift: 
 
 .. function:: espressopp.interaction.VerletListLennardJonesExpand(vl)
@@ -56,7 +56,7 @@ r"""
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.VerletListLennardJonesExpand.setPotential(type1, type2, potential)
 
@@ -66,7 +66,7 @@ r"""
 		:type type1: 
 		:type type2: 
 		:type potential: 
-		
+
 .. function:: espressopp.interaction.CellListLennardJonesExpand(stor)
 
 		:param stor: 
@@ -80,7 +80,6 @@ r"""
 		:type type1: 
 		:type type2: 
 		:type potential: 
-		:rtype:
 
 .. function:: espressopp.interaction.FixedPairListLennardJonesExpand(system, vl, potential)
 
@@ -110,6 +109,7 @@ class LennardJonesExpandLocal(PotentialLocal, interaction_LennardJonesExpand):
 
     def __init__(self, epsilon=1.0, sigma=1.0, delta=0.0,
                  cutoff=infinity, shift="auto"):
+        """Initialize the local LennardJonesExpand object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
                 cxxinit(self, interaction_LennardJonesExpand,
@@ -154,7 +154,7 @@ class FixedPairListLennardJonesExpandLocal(InteractionLocal, interaction_FixedPa
 
 if pmi.isController:
     class LennardJonesExpand(Potential):
-
+        'The LennardJonesExpand potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.LennardJonesExpandLocal',
             pmiproperty = ['epsilon', 'sigma', 'delta']

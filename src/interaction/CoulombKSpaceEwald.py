@@ -20,9 +20,9 @@
 
 
 r"""
-***********************************************************************************
+*********************************************************************************************
 **CoulombKSpaceEwald** - Coulomb potential and interaction Objects (`K` space part)
-***********************************************************************************
+*********************************************************************************************
 
 .. math::
 	\frac{1}{2\pi V} 
@@ -97,6 +97,10 @@ References:
 
 
 
+
+
+
+
 .. function:: espressopp.interaction.CoulombKSpaceEwald(system, prefactor, alpha, kmax)
 
 		:param system: 
@@ -104,9 +108,9 @@ References:
 		:param alpha: 
 		:param kmax: 
 		:type system: 
-		:type prefactor: real
-		:type alpha: real
-		:type kmax: int
+		:type prefactor: 
+		:type alpha: 
+		:type kmax: 
 
 .. function:: espressopp.interaction.CellListCoulombKSpaceEwald(storage, potential)
 
@@ -117,11 +121,11 @@ References:
 
 .. function:: espressopp.interaction.CellListCoulombKSpaceEwald.getFixedPairList()
 
-		:rtype:FixedPairList
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.CellListCoulombKSpaceEwald.getPotential()
 
-		:rtype:
+		:rtype: 
 """
 
 
@@ -135,11 +139,14 @@ from _espressopp import interaction_CoulombKSpaceEwald, \
 
 class CoulombKSpaceEwaldLocal(PotentialLocal, interaction_CoulombKSpaceEwald):
     def __init__(self, system, prefactor, alpha, kmax):
+
+
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         cxxinit(self, interaction_CoulombKSpaceEwald, system, prefactor, alpha, kmax)
 
 class CellListCoulombKSpaceEwaldLocal(InteractionLocal, interaction_CellListCoulombKSpaceEwald):
     def __init__(self, storage, potential):
+
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         cxxinit(self, interaction_CellListCoulombKSpaceEwald, storage, potential)
 

@@ -20,9 +20,9 @@
 
 
 r"""
-*******************************
+*****************************************
 **espressopp.interaction.OPLS**
-*******************************
+*****************************************
 This class provides methods to compute forces and energies of
 the OPLS dihedral potential. To create a new dihedral potential.
 
@@ -74,6 +74,7 @@ from _espressopp import interaction_OPLS, interaction_FixedQuadrupleListOPLS
 class OPLSLocal(DihedralPotentialLocal, interaction_OPLS):
 
     def __init__(self, K1=1.0, K2=0.0, K3=0.0, K4=0.0):
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_OPLS, K1, K2, K3, K4)
 
@@ -89,7 +90,7 @@ class FixedQuadrupleListOPLSLocal(InteractionLocal, interaction_FixedQuadrupleLi
 
 if pmi.isController:
     class OPLS(DihedralPotential):
-
+        'The OPLS potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.OPLSLocal',
             pmiproperty = ['K1', 'K2', 'K3', 'K4']

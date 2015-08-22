@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+**************************************
 **CapForce** - Integrator Extension
-************************************
+**************************************
 
 This class can be used to forcecap all particles or a group of particles.
 Force capping means that the force vector of a particle is rescaled
@@ -42,6 +42,15 @@ CapForce can also be used to forcecap only a group of particles:
 
 
 
+
+.. function:: espressopp.integrator.CapForce(system, capForce, particleGroup)
+
+		:param system: 
+		:param capForce: 
+		:param particleGroup: (default: None)
+		:type system: 
+		:type capForce: 
+		:type particleGroup: 
 """
 
 from espressopp.esutil import cxxinit
@@ -50,7 +59,7 @@ from espressopp.integrator.Extension import *
 from _espressopp import integrator_CapForce 
 
 class CapForceLocal(ExtensionLocal, integrator_CapForce):
-    'The (local) force capping part.'
+
     def __init__(self, system, capForce, particleGroup = None):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if (particleGroup == None) or (particleGroup.size() == 0):

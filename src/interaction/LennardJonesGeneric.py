@@ -20,9 +20,9 @@
 
 
 r"""
-**********************************************
+********************************************************
 **espressopp.interaction.LennardJonesGeneric**
-**********************************************
+********************************************************
 This class provides methods to compute forces and energies of
 a generic Lennard Jones potential with arbitrary integers a and b.
 
@@ -47,7 +47,7 @@ a generic Lennard Jones potential with arbitrary integers a and b.
 		:type sigma: real
 		:type a: int
 		:type b: int
-		:type cutoff: int 
+		:type cutoff: 
 		:type shift: 
 
 .. function:: espressopp.interaction.VerletListLennardJonesGeneric(vl)
@@ -61,11 +61,11 @@ a generic Lennard Jones potential with arbitrary integers a and b.
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
-.. function:: espressopp.interaction.VerletListLennardJonesGeneric.getVerletListLocal()
+.. function:: espressopp.interaction.VerletListLennardJonesGeneric.getVerletList()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.VerletListLennardJonesGeneric.setPotential(type1, type2, potential)
 
@@ -203,11 +203,11 @@ a generic Lennard Jones potential with arbitrary integers a and b.
 
 .. function:: espressopp.interaction.FixedPairListLennardJonesGeneric.getFixedPairList()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedPairListLennardJonesGeneric.getPotential()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.FixedPairListLennardJonesGeneric.setFixedPairList(fixedpairlist)
 
@@ -237,6 +237,7 @@ class LennardJonesGenericLocal(PotentialLocal, interaction_LennardJonesGeneric):
 
     def __init__(self, epsilon=1.0, sigma=1.0, a=12, b=6,
                  cutoff=infinity, shift="auto"):
+        """Initialize the local generic Lennard Jones object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
                 print "here without shift"
@@ -356,7 +357,7 @@ class FixedPairListLennardJonesGenericLocal(InteractionLocal, interaction_FixedP
 
 if pmi.isController:
     class LennardJonesGeneric(Potential):
-
+        'The generic Lennard-Jones potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.LennardJonesGenericLocal',
             pmiproperty = ['epsilon', 'sigma', 'a', 'b']

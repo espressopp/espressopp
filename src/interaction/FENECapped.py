@@ -20,15 +20,25 @@
 
 
 r"""
-*************************************
+***********************************************
 **espressopp.interaction.FENECapped**
-*************************************
+***********************************************
 
 .. math::
 	U = -\frac{1}{2}r_{max}^2  K \cdot
  				 log\left(1 - \frac{D - r_{0}}{r_{max}}^2\right)
 
-where :math:`D = dist` if :math:`{cap_{rad}}^2>dist` and :math:`D = cap_{rad}` else.
+where :math:`D = dist` if 
+
+:math:`{cap_{rad}}^2>dist` 
+
+and :math:`D = cap_{rad}` else.
+
+
+
+
+
+
 
 .. function:: espressopp.interaction.FENECapped(K, r0, rMax, cutoff, caprad, shift)
 
@@ -56,23 +66,21 @@ where :math:`D = dist` if :math:`{cap_{rad}}^2>dist` and :math:`D = cap_{rad}` e
 
 .. function:: espressopp.interaction.FixedPairListFENECapped.getFixedPairList()
 
-		:rtype: FixedPairList (A python list of lists, *not* tuples)
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedPairListFENECapped.getPotential()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.FixedPairListFENECapped.setFixedPairList(fixedpairlist)
 
 		:param fixedpairlist: 
-		:type fixedpairlist: FixedPairList
-
+		:type fixedpairlist: 
 
 .. function:: espressopp.interaction.FixedPairListFENECapped.setPotential(potential)
 
 		:param potential: 
 		:type potential: 
-
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -85,6 +93,7 @@ class FENECappedLocal(PotentialLocal, interaction_FENECapped):
 
     def __init__(self, K=1.0, r0=0.0, rMax=1.0, 
                  cutoff=infinity, caprad=1.0, shift=0.0):
+        """Initialize the local FENE object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
                 cxxinit(self, interaction_FENECapped, K, r0, rMax, cutoff, caprad)
@@ -115,7 +124,7 @@ class FixedPairListFENECappedLocal(InteractionLocal, interaction_FixedPairListFE
 
 if pmi.isController:
     class FENECapped(Potential):
-
+        'The FENECapped potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.FENECappedLocal',
             pmiproperty = ['K', 'r0', 'rMax', 'caprad']

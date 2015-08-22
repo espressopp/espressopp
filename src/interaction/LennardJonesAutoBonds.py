@@ -20,9 +20,9 @@
 
 
 r"""
-************************************************
+**********************************************************
 **espressopp.interaction.LennardJonesAutoBonds**
-************************************************
+**********************************************************
 
 .. math::
 	V(r) = 4 \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} -
@@ -42,9 +42,9 @@ r"""
 		:param maxcrosslinks: (default: 2)
 		:type epsilon: real
 		:type sigma: real
-		:type cutoff: int
+		:type cutoff: 
 		:type bondlist: 
-		:type maxcrosslinks: int 
+		:type maxcrosslinks: int
 
 .. function:: espressopp.interaction.VerletListLennardJonesAutoBonds(vl)
 
@@ -57,11 +57,11 @@ r"""
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
-.. function:: espressopp.interaction.VerletListLennardJonesAutoBonds.getVerletListLocal()
+.. function:: espressopp.interaction.VerletListLennardJonesAutoBonds.getVerletList()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.VerletListLennardJonesAutoBonds.setPotential(type1, type2, potential)
 
@@ -149,6 +149,7 @@ class LennardJonesAutoBondsLocal(PotentialLocal, interaction_LennardJonesAutoBon
 
     def __init__(self, epsilon=1.0, sigma=1.0, 
                  cutoff=infinity, bondlist=None, maxcrosslinks=2):
+        """Initialize the local Lennard Jones auto bonds object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if bondlist == None:
               raise MissingFixedPairList('LennardsJonesAutoBonds needs a FixedPairList to be able to create new bonds')                                         
@@ -214,7 +215,7 @@ class FixedPairListLennardJonesAutoBondsLocal(InteractionLocal, interaction_Fixe
 
 if pmi.isController:
     class LennardJonesAutoBonds(Potential):
-
+        'The Lennard-Jones auto bonds potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.LennardJonesAutoBondsLocal',
             pmiproperty = ['epsilon', 'sigma']

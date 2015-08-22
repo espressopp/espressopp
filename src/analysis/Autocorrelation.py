@@ -32,17 +32,17 @@ r"""
 
 .. function:: espressopp.analysis.Autocorrelation.clear()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.analysis.Autocorrelation.compute()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.analysis.Autocorrelation.gather(value)
 
 		:param value: 
 		:type value: 
-		:rtype:
+		:rtype: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

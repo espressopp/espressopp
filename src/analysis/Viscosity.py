@@ -38,11 +38,11 @@ r"""
 		:type t0: 
 		:type dt: 
 		:type T: 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.analysis.Viscosity.gather()
 
-		:rtype:
+		:rtype: 
 """
 from espressopp import pmi
 from espressopp.esutil import cxxinit

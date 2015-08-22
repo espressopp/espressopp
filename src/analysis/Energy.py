@@ -34,7 +34,7 @@ r"""
 
 .. function:: espressopp.analysis.EnergyPot.compute()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.analysis.EnergyKin(system, per_atom)
 
@@ -45,7 +45,7 @@ r"""
 
 .. function:: espressopp.analysis.EnergyKin.compute()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.analysis.EnergyTot(system, per_atom)
 
@@ -56,7 +56,7 @@ r"""
 
 .. function:: espressopp.analysis.EnergyTot.compute()
 
-		:rtype:
+		:rtype: 
 """
 import espressopp
 

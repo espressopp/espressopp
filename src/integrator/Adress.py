@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+**************************************
 **AdResS** - Object
-************************************
+**************************************
 
 The AdResS object is an extension to the integrator. It makes sure that the
 integrator also processes the atomistic particles and not only the CG particles.
@@ -42,6 +42,17 @@ Example - how to turn on the AdResS integrator extension:
 >>> adress      = espressopp.integrator.Adress(system)
 >>> integrator.addExtension(adress)
 
+
+.. function:: espressopp.integrator.Adress(_system, _verletlist, _fixedtuplelist, KTI)
+
+		:param _system: 
+		:param _verletlist: 
+		:param _fixedtuplelist: 
+		:param KTI: (default: False)
+		:type _system: 
+		:type _verletlist: 
+		:type _fixedtuplelist: 
+		:type KTI: 
 """
 
 from espressopp.esutil import cxxinit
@@ -51,10 +62,10 @@ from espressopp.integrator.Extension import *
 from _espressopp import integrator_Adress
 
 class AdressLocal(ExtensionLocal, integrator_Adress):
-    'The (local) AdResS'
+
 
     def __init__(self, _system, _verletlist, _fixedtuplelist, KTI = False):
-        'Local construction of a verlet list for AdResS'
+
         if pmi.workerIsActive():
             cxxinit(self, integrator_Adress, _system, _verletlist, _fixedtuplelist, KTI)
 

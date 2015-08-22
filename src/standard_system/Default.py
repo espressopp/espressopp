@@ -19,20 +19,33 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+********************************************
 **espressopp.standard_system.Default**
-************************************
+********************************************
 
+
+.. function:: espressopp.standard_system.Default(box, rc, skin, dt, temperature)
+
+		:param box: 
+		:param rc: (default: 1.12246)
+		:param skin: (default: 0.3)
+		:param dt: (default: 0.005)
+		:param temperature: (default: None)
+		:type box: 
+		:type rc: real
+		:type skin: real
+		:type dt: real
+		:type temperature: 
+		 
+		Return default system and integrator, no interactions, no particles are set
+		if tempearture is != None then Langevin thermostat is set to temperature (gamma is 1.0)
 """
 import espressopp
 import mpi4py.MPI as MPI
 
 def Default(box, rc=1.12246, skin=0.3, dt=0.005, temperature=None):
-  '''
-  return default system and integrator, no interactions, no particles are set
-  if tempearture is != None then Langevin thermostat is set to temperature (gamma is 1.0)
-  '''    
+
   system         = espressopp.System()
   system.rng     = espressopp.esutil.RNG()
   system.bc      = espressopp.bc.OrthorhombicBC(system.rng, box)

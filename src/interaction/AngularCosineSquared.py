@@ -20,21 +20,30 @@
 
 
 r"""
-***********************************************
+***************************************************************************
 **espressopp.interaction.AngularCosineSquared**
-***********************************************
+***************************************************************************
 
 Calculates the Angular Cosine Squared interaction
 
 .. math::
 	U =  K (cos(\theta) - cos(\theta_{0}))^2
 
+
+
+
+
+
+
+
+
+
 .. function:: espressopp.interaction.AngularCosineSquared(K, theta0)
 
 		:param K: (default: 1.0)
-		:param theta0: (default: 0.0) An angle in radians.
+		:param theta0: (default: 0.0)
 		:type K: real
-		:type theta0: real 
+		:type theta0: real
 
 .. function:: espressopp.interaction.FixedTripleListAngularCosineSquared(system, vl, potential)
 
@@ -47,7 +56,7 @@ Calculates the Angular Cosine Squared interaction
 
 .. function:: espressopp.interaction.FixedTripleListAngularCosineSquared.getFixedTripleList()
 
-		:rtype: FixedTripleList (A python list of lists, *not* tuples)
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedTripleListAngularCosineSquared.setPotential(type1, type2, potential)
 
@@ -57,7 +66,6 @@ Calculates the Angular Cosine Squared interaction
 		:type type1: 
 		:type type2: 
 		:type potential: 
-
 """
 from espressopp import pmi
 from espressopp.esutil import *
@@ -70,6 +78,7 @@ from _espressopp import interaction_AngularCosineSquared, \
 class AngularCosineSquaredLocal(AngularPotentialLocal, interaction_AngularCosineSquared):
 
     def __init__(self, K=1.0, theta0=0.0):
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_AngularCosineSquared, K, theta0)
 
@@ -89,7 +98,7 @@ class FixedTripleListAngularCosineSquaredLocal(InteractionLocal, interaction_Fix
 
 if pmi.isController:
     class AngularCosineSquared(AngularPotential):
-
+        'The AngularCosineSquared potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.AngularCosineSquaredLocal',
             pmiproperty = ['K', 'theta0']

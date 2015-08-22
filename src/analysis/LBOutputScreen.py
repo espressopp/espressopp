@@ -28,13 +28,11 @@ It computes and outputs to the screen the simulation progress (finished step) an
 controls mass flux conservation when using MD-to-LB coupling. Ideally, the sum of mass
 fluxes should be zero, i.e. :math:`j_{LB} + j_{MD} = 0`.
 
-.. function:: espressopp.analysis.LBOutputScreen(system, latticeboltzmann)
+.. function:: espressopp.analysis.LBOutputScreen(system,latticeboltzmann)
 
-		:param system: system object defined earlier in the python-script
-		:param latticeboltzmann: lattice boltzmann object defined earlier in the python-script
-		:type system: 
-		:type latticeboltzmann: 
-		
+	:param system: system object defined earlier in the python-script
+	:param latticeboltzmann: lattice boltzmann object defined earlier in the python-script
+
 .. note::
 
 	this class should be called from external analysis class :class:`espressopp.integrator.ExtAnalyze`
@@ -54,7 +52,12 @@ Example to call the profiler:
 >>> integrator.addExtension(extAnalysisNum1)
 
 
+.. function:: espressopp.analysis.LBOutputScreen(system, latticeboltzmann)
 
+		:param system: 
+		:param latticeboltzmann: 
+		:type system: 
+		:type latticeboltzmann: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

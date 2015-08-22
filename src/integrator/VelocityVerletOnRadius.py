@@ -19,11 +19,18 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**********************************************
+r"""
+************************************************
 **espressopp.integrator.VelocityVerletOnRadius**
-**********************************************
+************************************************
 
+
+.. function:: espressopp.integrator.VelocityVerletOnRadius(system, dampingmass)
+
+		:param system: 
+		:param dampingmass: 
+		:type system: 
+		:type dampingmass: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -31,7 +38,7 @@ from espressopp.integrator.Extension import *
 from _espressopp import integrator_VelocityVerletOnRadius 
 
 class VelocityVerletOnRadiusLocal(ExtensionLocal, integrator_VelocityVerletOnRadius):
-    'The (local) VelocityVerletOnRadius.'
+
     def __init__(self, system, dampingmass):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_VelocityVerletOnRadius, system, dampingmass)

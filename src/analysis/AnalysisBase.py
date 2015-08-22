@@ -27,36 +27,38 @@ r"""
 This abstract base class provides the interface and some basic
 functionality for classes that do analysis or observable measurements
   
-
-
-.. function:: espressopp.analysis.AnalysisBase()
-
+It provides the following methods:
 
 .. function:: espressopp.analysis.AnalysisBase.compute()
 
-	Computes the instant value of the observable
-		:rtype: Python list or a scalar
+		Computes the instant value of the observable. 
+		
+		:rtype: a python list or a scalar
 
 .. function:: espressopp.analysis.AnalysisBase.getAverageValue()
-	
-	Returns the average value for the observable and the standard deviation
-		:rtype: Python List
+
+		Returns the average value for the observable and the standard deviation.
+		
+		:rtype: a python list
 
 .. function:: espressopp.analysis.AnalysisBase.getNumberOfMeasurements()
-
-	Counts the number of measurements that have been performed (standalone or in integrator)
-   does *not* include measurements that have been done using "compute()"
-		:rtype: int
+		
+		counts the number of measurements that have been performed (standalone or in integrator)
+		does _not_ include measurements that have been done using "compute()"
+		
+		:rtype: 
 
 .. function:: espressopp.analysis.AnalysisBase.performMeasurement()
-	
-	Computes the observable and updates average and standard deviation
-
+		
+		Computes the observable and updates average and standard deviation
+		
+		:rtype: 
 
 .. function:: espressopp.analysis.AnalysisBase.reset()
-	
-	Resets average and standard deviation
-
+		
+		Resets average and standard deviation
+		
+		:rtype: 
 """
 
 from espressopp import pmi

@@ -29,15 +29,6 @@ Layers are perpendicular to Z direction and are equidistant(distance is Lz/n).
 It can be used as standalone class in python as well as
 in combination with the integrator extension ExtAnalyze.
 
-.. function:: espressopp.analysis.PressureTensorMultiLayer(system, n, dh)
-
-		:param system: 
-		:param n: 
-		:param dh: 
-		:type system: 
-		:type n: 
-		:type dh: 
-
 Standalone Usage:
 -----------------
 
@@ -82,7 +73,14 @@ The following methods are supported:
     counts the number of measurements that have been computed (standalone or in integrator)
     does _not_ include measurements that have been done using "compute()"
 
+.. function:: espressopp.analysis.PressureTensorMultiLayer(system, n, dh)
 
+		:param system: 
+		:param n: 
+		:param dh: 
+		:type system: 
+		:type n: 
+		:type dh: 
 """
 
 from espressopp.esutil import cxxinit

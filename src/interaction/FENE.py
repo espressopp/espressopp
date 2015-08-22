@@ -20,9 +20,9 @@
 
 
 r"""
-*******************************
+*****************************************
 **espressopp.interaction.FENE**
-*******************************
+*****************************************
 
 
 .. math::
@@ -59,23 +59,21 @@ r"""
 
 .. function:: espressopp.interaction.FixedPairListFENE.getFixedPairList()
 
-		:rtype: FixedPairList (A python list of lists, *not* tuples)
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedPairListFENE.getPotential()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.FixedPairListFENE.setFixedPairList(fixedpairlist)
 
 		:param fixedpairlist: 
-		:type fixedpairlist: FixedPairList
-
+		:type fixedpairlist: 
 
 .. function:: espressopp.interaction.FixedPairListFENE.setPotential(potential)
 
 		:param potential: 
 		:type potential: 
-
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -88,6 +86,7 @@ class FENELocal(PotentialLocal, interaction_FENE):
 
     def __init__(self, K=1.0, r0=0.0, rMax=1.0, 
                  cutoff=infinity, shift=0.0):
+        """Initialize the local FENE object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
                 cxxinit(self, interaction_FENE, K, r0, rMax, cutoff)
@@ -118,7 +117,7 @@ class FixedPairListFENELocal(InteractionLocal, interaction_FixedPairListFENE):
 
 if pmi.isController:
     class FENE(Potential):
-
+        'The FENE potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.FENELocal',
             pmiproperty = ['K', 'r0', 'rMax']

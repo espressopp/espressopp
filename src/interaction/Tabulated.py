@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+**********************************************
 **espressopp.interaction.Tabulated**
-************************************
+**********************************************
 
 
 
@@ -100,7 +100,7 @@
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.VerletListTabulated.setPotential(type1, type2, potential)
 
@@ -156,6 +156,7 @@ from _espressopp import interaction_Tabulated, \
 class TabulatedLocal(PotentialLocal, interaction_Tabulated):
 
     def __init__(self, itype, filename, cutoff=infinity):
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_Tabulated, itype, filename, cutoff)
 
@@ -225,7 +226,7 @@ class FixedPairListTabulatedLocal(InteractionLocal, interaction_FixedPairListTab
 
 if pmi.isController:
     class Tabulated(Potential):
-
+        'The Tabulated potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.TabulatedLocal',
             pmiproperty = ['itype', 'filename', 'cutoff']

@@ -20,11 +20,32 @@
 
 
 r"""
-********************************************
+******************************************************
 **espressopp.interaction.DihedralPotential**
-********************************************
+******************************************************
 This is an abstract class, only needed to be inherited from.
 
+
+
+
+
+
+
+
+
+
+
+.. function:: espressopp.interaction.DihedralPotential.computeEnergy(\*args)
+
+		:param \*args: 
+		:type \*args: 
+		:rtype: 
+
+.. function:: espressopp.interaction.DihedralPotential.computeForce(\*args)
+
+		:param \*args: 
+		:type \*args: 
+		:rtype: 
 """
 # -*- coding: iso-8859-1 -*-
 from espressopp import pmi

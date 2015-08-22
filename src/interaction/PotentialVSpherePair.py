@@ -19,12 +19,33 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***********************************************
+r"""
+*********************************************************
 **espressopp.interaction.PotentialVSpherePair**
-***********************************************
+*********************************************************
 This is an abstract class, only needed to be inherited from.
 
+
+
+
+
+
+
+
+
+
+
+.. function:: espressopp.interaction.PotentialVSpherePair.computeEnergy(\*args)
+
+		:param \*args: 
+		:type \*args: 
+		:rtype: 
+
+.. function:: espressopp.interaction.PotentialVSpherePair.computeForce(\*args)
+
+		:param \*args: 
+		:type \*args: 
+		:rtype: 
 """
 from espressopp import pmi
 from espressopp import toReal3DFromVector

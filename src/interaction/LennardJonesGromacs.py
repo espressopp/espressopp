@@ -21,9 +21,9 @@
 
 
 r"""
-**********************************************
+********************************************************
 **espressopp.interaction.LennardJonesGromacs**
-**********************************************
+********************************************************
          
 if :math:`d^2 > r_1^2`
 
@@ -50,7 +50,7 @@ else
 		:type epsilon: real
 		:type sigma: real
 		:type r1: real
-		:type cutoff: int
+		:type cutoff: 
 		:type shift: 
 
 .. function:: espressopp.interaction.VerletListLennardJonesGromacs(vl)
@@ -64,7 +64,7 @@ else
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.VerletListLennardJonesGromacs.setPotential(type1, type2, potential)
 
@@ -155,6 +155,7 @@ class LennardJonesGromacsLocal(PotentialLocal, interaction_LennardJonesGromacs):
 
     def __init__(self, epsilon=1.0, sigma=1.0, r1=0.0,
                  cutoff=infinity, shift="auto"):
+        """Initialize the local LennardJonesGromacs object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
                 cxxinit(self, interaction_LennardJonesGromacs,
@@ -199,7 +200,7 @@ class FixedPairListLennardJonesGromacsLocal(InteractionLocal, interaction_FixedP
 
 if pmi.isController:
     class LennardJonesGromacs(Potential):
-
+        'The LennardJonesGromacs potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.LennardJonesGromacsLocal',
             pmiproperty = ['epsilon', 'sigma', 'r1']

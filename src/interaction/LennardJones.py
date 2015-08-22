@@ -20,9 +20,9 @@
 
 
 r"""
-***************************************
+*************************************************
 **espressopp.interaction.LennardJones**
-***************************************
+*************************************************
 .. math::
 	V(r) = 4 \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} -
 	\left( \frac{\sigma}{r} \right)^{6} \right]
@@ -40,7 +40,7 @@ r"""
 		:param shift: (default: "auto")
 		:type epsilon: real
 		:type sigma: real
-		:type cutoff: int
+		:type cutoff: 
 		:type shift: 
 
 .. function:: espressopp.interaction.VerletListLennardJones(vl)
@@ -54,11 +54,11 @@ r"""
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
-.. function:: espressopp.interaction.VerletListLennardJones.getVerletListLocal()
+.. function:: espressopp.interaction.VerletListLennardJones.getVerletList()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.VerletListLennardJones.setPotential(type1, type2, potential)
 
@@ -196,17 +196,16 @@ r"""
 
 .. function:: espressopp.interaction.FixedPairListLennardJones.getFixedPairList()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedPairListLennardJones.getPotential()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.FixedPairListLennardJones.setFixedPairList(fixedpairlist)
 
 		:param fixedpairlist: 
-		:type fixedpairlist:
-
+		:type fixedpairlist: 
 
 .. function:: espressopp.interaction.FixedPairListLennardJones.setPotential(potential)
 
@@ -231,6 +230,7 @@ class LennardJonesLocal(PotentialLocal, interaction_LennardJones):
 
     def __init__(self, epsilon=1.0, sigma=1.0, 
                  cutoff=infinity, shift="auto"):
+        """Initialize the local Lennard Jones object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
                 cxxinit(self, interaction_LennardJones, 
@@ -348,7 +348,7 @@ class FixedPairListLennardJonesLocal(InteractionLocal, interaction_FixedPairList
 
 if pmi.isController:
     class LennardJones(Potential):
-
+        'The Lennard-Jones potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.LennardJonesLocal',
             pmiproperty = ['epsilon', 'sigma']

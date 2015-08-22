@@ -19,11 +19,32 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**********************************
+r"""
+************************************
 **espressopp.FixedTripleListAdress**
-**********************************
+************************************
 
+
+.. function:: espressopp.FixedTripleListAdress(storage, fixedtupleList)
+
+		:param storage: 
+		:param fixedtupleList: 
+		:type storage: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.FixedTripleListAdress.add(pid1, pid2)
+
+		:param pid1: 
+		:param pid2: 
+		:type pid1: 
+		:type pid2: 
+		:rtype: 
+
+.. function:: espressopp.FixedTripleListAdress.addTriples(triplelist)
+
+		:param triplelist: 
+		:type triplelist: 
+		:rtype: 
 """
 from espressopp import pmi
 import _espressopp 
@@ -31,15 +52,15 @@ import espressopp
 from espressopp.esutil import cxxinit
 
 class FixedTripleListAdressLocal(_espressopp.FixedTripleListAdress):
-    'The (local) fixed triple list.'
+
 
     def __init__(self, storage, fixedtupleList):
-        'Local construction of a fixed pair list'
+
         if pmi.workerIsActive():
             cxxinit(self, _espressopp.FixedTripleListAdress, storage, fixedtupleList)
 
     def add(self, pid1, pid2):
-        'add pair to fixed triple list'
+
         if pmi.workerIsActive():
             return self.cxxclass.add(self, pid1, pid2, pid3)
 

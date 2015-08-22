@@ -19,18 +19,27 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*********************************
+r"""
+***********************************
 **espressopp.integrator.Extension**
-*********************************
+***********************************
 
+
+
+.. function:: espressopp.integrator.Extension.connect()
+
+		:rtype: 
+
+.. function:: espressopp.integrator.Extension.disconnect()
+
+		:rtype: 
 """
 #from espressopp.esutil import cxxinit
 from espressopp import pmi
 from _espressopp import integrator_Extension 
 
 class ExtensionLocal(object):
-    'The (local) Extension abstract base class.'
+
     
     #def __init__(self, integrator):
     #    if pmi.workerIsActive():    

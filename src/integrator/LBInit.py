@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*********************************************************************************************
+r"""
+***********************************************************************************************
 **LBInit** - abstract class for LatticeBoltzmann initialization and external force management
-*********************************************************************************************
+***********************************************************************************************
 
 This abstract class provides the interface to (re-)initialize populations and handle external forces.
 
@@ -57,6 +57,26 @@ Two main external force types are implemented:
 - :class:`espressopp.integrator.LBInitConstForce` to manage constant (gravity-like) force acting on every lattice site and
 - :class:`espressopp.integrator.LBInitPeriodicForce` to manage harmonic (position-dependent) force
 
+
+
+.. function:: espressopp.integrator.LBInit.addForce(force)
+
+		:param force: 
+		:type force: 
+		:rtype: 
+
+.. function:: espressopp.integrator.LBInit.createDenVel(rho0, u0)
+
+		:param rho0: 
+		:param u0: 
+		:type rho0: 
+		:type u0: 
+		:rtype: 
+
+.. function:: espressopp.integrator.LBInit.setForce(force)
+
+		:param force: 
+		:type force: 
 """
 
 from espressopp.esutil import cxxinit

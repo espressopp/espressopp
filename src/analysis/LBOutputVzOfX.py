@@ -27,12 +27,10 @@ Child class derived from the abstract class :class:`espressopp.analysis.LBOutput
 It computes and outputs simulation progress (finished step) and controls flux 
 conservation when using MD to LB coupling.
 
-.. function:: espressopp.analysis.LBOutputVzOfX(system, latticeboltzmann)
+.. function:: espressopp.analysis.LBOutputVzOfX(system,latticeboltzmann)
 
-		:param system: system object defined earlier in the python-script
-		:param latticeboltzmann: lattice boltzmann object defined earlier in the python-script
-		:type system: 
-		:type latticeboltzmann: 
+	:param system: system object defined earlier in the python-script
+	:param latticeboltzmann: lattice boltzmann object defined earlier in the python-script
 	
 .. Note::
  
@@ -52,6 +50,13 @@ Example to call the profiler:
 >>> # add the external analysis object as an extension to the integrator
 >>> integrator.addExtension(extAnalysisNum3)
 
+
+.. function:: espressopp.analysis.LBOutputVzOfX(system, latticeboltzmann)
+
+		:param system: 
+		:param latticeboltzmann: 
+		:type system: 
+		:type latticeboltzmann: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

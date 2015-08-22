@@ -20,14 +20,18 @@
 
 
 r"""
-************************************************
+**********************************************************
 **espressopp.interaction.AngularUniqueHarmonic**
-************************************************
+**********************************************************
 
 Calculates the Angular Unique Harmonic interaction
 
 .. math::
 	U = K (\theta - \theta_0)^2
+
+
+
+
 
 
 .. function:: espressopp.interaction.AngularUniqueHarmonic(K)
@@ -48,7 +52,6 @@ Calculates the Angular Unique Harmonic interaction
 
 		:param potential: 
 		:type potential: 
-
 """
 from espressopp import pmi
 from espressopp.esutil import *
@@ -61,6 +64,7 @@ from _espressopp import interaction_AngularUniqueHarmonic, \
 class AngularUniqueHarmonicLocal(AngularUniquePotentialLocal, interaction_AngularUniqueHarmonic):
 
     def __init__(self, K=1.0):
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_AngularUniqueHarmonic, K)
 
@@ -76,7 +80,6 @@ class FixedTripleAngleListAngularUniqueHarmonicLocal(InteractionLocal, interacti
 
 if pmi.isController:
     class AngularUniqueHarmonic(AngularUniquePotential):
-
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.AngularUniqueHarmonicLocal',
             pmiproperty = ['K']

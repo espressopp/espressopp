@@ -20,11 +20,18 @@
 
 
 r"""
-*******************************************
+*****************************************************
 **espressopp.interaction.CoulombTruncated**
-*******************************************
+*****************************************************
 .. math::
 	U = \frac{Q}{d}
+
+where `Q` is the product of the charges of the two particles and `d` is their distance from each other.
+
+
+
+
+
 
 .. function:: espressopp.interaction.CoulombTruncated(qq, cutoff, shift)
 
@@ -46,7 +53,7 @@ r"""
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.interaction.VerletListCoulombTruncated.setPotential(type1, type2, potential)
 
@@ -84,7 +91,6 @@ r"""
 
 		:param potential: 
 		:type potential: 
-
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -100,6 +106,7 @@ class CoulombTruncatedLocal(PotentialLocal, interaction_CoulombTruncated):
 
     def __init__(self, qq=1.0,
                  cutoff=infinity, shift="auto"):
+        """Initialize the local CoulombTruncated object."""
         if shift =="auto":
             if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
                 cxxinit(self, interaction_CoulombTruncated, 
@@ -145,7 +152,7 @@ class FixedPairListCoulombTruncatedLocal(InteractionLocal, interaction_FixedPair
 
 if pmi.isController:
     class CoulombTruncated(Potential):
-
+        'The CoulombTruncated potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.CoulombTruncatedLocal',
             pmiproperty = ['qq']

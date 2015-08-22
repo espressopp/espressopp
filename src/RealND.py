@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*******************************************
+r"""
+*********************************************
 **RealND** - 
-*******************************************
+*********************************************
 
 This is the object which represents N-dimensional vector. It is an extended Real3D,
 basicly, it hase the same functionallity but in N-dimetions.
@@ -32,6 +32,21 @@ Description
 
 ...
 
+
+.. function:: espressopp.__RealND(\*args)
+
+		:param \*args: 
+		:type \*args: 
+
+.. function:: espressopp.toRealNDFromVector(\*args)
+
+		:param \*args: 
+		:type \*args: 
+
+.. function:: espressopp.toRealND(\*args)
+
+		:param \*args: 
+		:type \*args: 
 """
 
 from _espressopp import RealND
@@ -40,8 +55,8 @@ from espressopp import esutil
 # This injects additional methods into the RealND class and pulls it
 # into this module 
 class __RealND(RealND) :
-    """Basic N-D floating point vector as used by ESPResSo++.
-    """
+
+
     __metaclass__ = esutil.ExtendBaseClass
     
     '''

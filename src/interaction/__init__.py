@@ -37,7 +37,6 @@ from espressopp.interaction.LennardJonesEnergyCapped import *
 from espressopp.interaction.LennardJonesExpand import *
 from espressopp.interaction.LennardJonesGromacs import *
 from espressopp.interaction.LennardJonesGeneric import *
-from espressopp.interaction.LennardJonesGenericCapped import *
 from espressopp.interaction.LJcos import *
 from espressopp.interaction.Morse import *
 from espressopp.interaction.CoulombTruncated import *

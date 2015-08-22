@@ -32,11 +32,11 @@ r"""
 
 .. function:: espressopp.analysis.Velocities.clear()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.analysis.Velocities.gather()
 
-		:rtype:
+		:rtype: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

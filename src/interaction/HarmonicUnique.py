@@ -20,9 +20,9 @@
 
 
 r"""
-*****************************************
+***************************************************
 **espressopp.interaction.HarmonicUnique**
-*****************************************
+***************************************************
 
 .. math::
         U = K  (d - d_{cur})^2;
@@ -48,19 +48,17 @@ r"""
 
 .. function:: espressopp.interaction.FixedPairDistListHarmonicUnique.getFixedPairList()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedPairDistListHarmonicUnique.setFixedPairList(fixedpairlist)
 
 		:param fixedpairlist: 
-		:type fixedpairlist: FixedPairlList
-		:rtype:
+		:type fixedpairlist: 
 
 .. function:: espressopp.interaction.FixedPairDistListHarmonicUnique.setPotential(potential)
 
 		:param potential: 
 		:type potential: 
-		:rtype:
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -98,7 +96,7 @@ class FixedPairDistListHarmonicUniqueLocal(InteractionLocal, interaction_FixedPa
 
 if pmi.isController:
     class HarmonicUnique(PotentialUniqueDist):
-
+        'The HarmonicUnique potential.'
         pmiproxydefs = dict(
           cls = 'espressopp.interaction.HarmonicUniqueLocal',
           pmiproperty = ['K']

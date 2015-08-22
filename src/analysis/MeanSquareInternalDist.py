@@ -33,7 +33,7 @@ r"""
 
 .. function:: espressopp.analysis.MeanSquareInternalDist.strange()
 
-		:rtype:
+		:rtype: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

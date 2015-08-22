@@ -34,7 +34,7 @@ r"""
 
 		:param N: 
 		:type N: 
-		:rtype:
+		:rtype: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

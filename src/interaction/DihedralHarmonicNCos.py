@@ -22,9 +22,9 @@
 
 
 r"""
-***********************************************
+*********************************************************
 **espressopp.interaction.DihedralHarmonicNCos**
-***********************************************
+*********************************************************
 
 The dihedral harmonic potential
 
@@ -36,6 +36,10 @@ where the `K` is a constant, the angles should be provided in radians.
 The `N` is a multiplicity.
 
 Reference: http://www.uark.edu/ua/fengwang/DLPOLY2/node49.html
+
+
+
+
 
 
 .. function:: espressopp.interaction.DihedralHarmonicNCos(K, phi0, multiplicity)
@@ -58,7 +62,7 @@ Reference: http://www.uark.edu/ua/fengwang/DLPOLY2/node49.html
 
 .. function:: espressopp.interaction.FixedQuadrupleListDihedralHarmonicNCos.getFixedQuadrupleList()
 
-		:rtype:FixedQuadrupelList
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.FixedQuadrupleListDihedralHarmonicNCos.setPotential(potential)
 
@@ -81,6 +85,7 @@ from _espressopp import interaction_FixedQuadrupleListDihedralHarmonicNCos
 class DihedralHarmonicNCosLocal(DihedralPotentialLocal, interaction_DihedralHarmonicNCos):
 
   def __init__(self, K=0.0, phi0=0.0, multiplicity=1):
+
     # pylint: disable=W0212
     if (not (pmi._PMIComm and pmi._PMIComm.isActive())
         or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
@@ -90,6 +95,7 @@ class DihedralHarmonicNCosLocal(DihedralPotentialLocal, interaction_DihedralHarm
 class FixedQuadrupleListDihedralHarmonicNCosLocal(
     InteractionLocal,
     interaction_FixedQuadrupleListDihedralHarmonicNCos):
+  'The (local) DihedralHarmonicNCos interaction using FixedQuadruple lists.'
   def __init__(self, system, fql, potential):
     if (not (pmi._PMIComm and pmi._PMIComm.isActive())
         or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
@@ -108,7 +114,7 @@ class FixedQuadrupleListDihedralHarmonicNCosLocal(
 
 if pmi.isController:
   class DihedralHarmonicNCos(DihedralPotential):
-
+    'The DihedralHarmonicNCos potential.'
     pmiproxydefs = dict(
       cls='espressopp.interaction.DihedralHarmonicNCosLocal',
       pmiproperty=['K', 'phi0', 'multiplicity']

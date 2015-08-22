@@ -25,15 +25,11 @@ r"""
 **********************************
 
 
-.. function:: espressopp.analysis.result_types()
-
-
-.. function:: espressopp.analysis.Observable()
 
 
 .. function:: espressopp.analysis.Observable.compute()
 
-		:rtype:
+		:rtype: 
 """
 from espressopp import pmi
 from _espressopp import analysis_Observable

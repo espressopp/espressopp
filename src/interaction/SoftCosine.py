@@ -20,9 +20,9 @@
 
 
 r"""
-*************************************
+***********************************************
 **espressopp.interaction.SoftCosine**
-*************************************
+***********************************************
 This class provides methods to compute forces and energies ofthe SoftCosine potential.
 
 .. math..
@@ -40,7 +40,7 @@ This class provides methods to compute forces and energies ofthe SoftCosine pote
 		:param cutoff: (default: infinity)
 		:param shift: (default: "auto")
 		:type A: real
-		:type cutoff: int 
+		:type cutoff: 
 		:type shift: 
 
 .. function:: espressopp.interaction.VerletListSoftCosine(stor)
@@ -84,7 +84,6 @@ This class provides methods to compute forces and energies ofthe SoftCosine pote
 
 		:param potential: 
 		:type potential: 
-
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -99,7 +98,7 @@ from _espressopp import interaction_SoftCosine, \
 class SoftCosineLocal(PotentialLocal, interaction_SoftCosine):
 
     def __init__(self, A=1.0, cutoff=infinity, shift="auto"):
-        """Initialize the local SoftCosine object."""
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
                 cxxinit(self, interaction_SoftCosine, A, cutoff)
@@ -152,7 +151,7 @@ class FixedPairListSoftCosineLocal(InteractionLocal, interaction_FixedPairListSo
 
 if pmi.isController:
     class SoftCosine(Potential):
-
+        'The SoftCosine potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.SoftCosineLocal',
             pmiproperty = ['A']

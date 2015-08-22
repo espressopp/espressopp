@@ -20,9 +20,9 @@
 
 
 r"""
-**************************************************
+************************************************************
 **espressopp.interaction.StillingerWeberPairTerm**
-**************************************************
+************************************************************
 This class provides methods to compute forces and energies of
 2 body term of Stillinger-Weber potential.
 
@@ -51,7 +51,7 @@ where :math:`r_c` is the cutoff-radius.
 		:type q: 
 		:type epsilon: real
 		:type sigma: real
-		:type cutoff: int
+		:type cutoff: 
 
 .. function:: espressopp.interaction.VerletListStillingerWeberPairTerm(vl)
 
@@ -64,11 +64,11 @@ where :math:`r_c` is the cutoff-radius.
 		:param type2: 
 		:type type1: 
 		:type type2: 
-		:rtype:
+		:rtype: 
 
-.. function:: espressopp.interaction.VerletListStillingerWeberPairTerm.getVerletListLocal()
+.. function:: espressopp.interaction.VerletListStillingerWeberPairTerm.getVerletList()
 
-		:rtype:
+		:rtype: A Python list of lists.
 
 .. function:: espressopp.interaction.VerletListStillingerWeberPairTerm.setPotential(type1, type2, potential)
 
@@ -172,6 +172,7 @@ from _espressopp import interaction_StillingerWeberPairTerm, \
 class StillingerWeberPairTermLocal(PotentialLocal, interaction_StillingerWeberPairTerm):
 
   def __init__(self, A, B, p, q, epsilon=1.0, sigma=1.0, cutoff=infinity):
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_StillingerWeberPairTerm, A, B, p, q, epsilon, sigma, cutoff)
 
@@ -243,7 +244,7 @@ class FixedPairListStillingerWeberPairTermLocal(InteractionLocal, interaction_Fi
 
 if pmi.isController:
     class StillingerWeberPairTerm(Potential):
-
+        'The Lennard-Jones potential.'
         pmiproxydefs = dict(
           cls = 'espressopp.interaction.StillingerWeberPairTermLocal',
           pmiproperty = ['A', 'B', 'p', 'q', 'epsilon', 'sigma']

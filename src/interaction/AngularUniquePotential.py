@@ -19,13 +19,34 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*************************************************
+r"""
+***********************************************************
 **espressopp.interaction.AngularUniquePotential**
-*************************************************
+***********************************************************
 
 This is an abstract class, only needed to be inherited from.
 
+
+
+
+
+
+
+
+
+
+
+.. function:: espressopp.interaction.AngularUniquePotential.computeEnergy(\*args)
+
+		:param \*args: 
+		:type \*args: 
+		:rtype: 
+
+.. function:: espressopp.interaction.AngularUniquePotential.computeForce(\*args)
+
+		:param \*args: 
+		:type \*args: 
+		:rtype: 
 """
 # -*- coding: iso-8859-1 -*-
 from espressopp import pmi

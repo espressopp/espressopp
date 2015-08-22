@@ -19,11 +19,18 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-********************************
+r"""
+**********************************
 **espressopp.esutil.GammaVariate**
-********************************
+**********************************
 
+
+.. function:: espressopp.esutil.GammaVariate(alpha, beta)
+
+		:param alpha: 
+		:param beta: 
+		:type alpha: 
+		:type beta: 
 """
 from espressopp import pmi
 

@@ -79,15 +79,15 @@ access particle with id <pid> of stored configuration <n>:
 
 .. function:: espressopp.analysis.ConfigurationsExtAdress.back()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.analysis.ConfigurationsExtAdress.clear()
 
-		:rtype:
+		:rtype: 
 
 .. function:: espressopp.analysis.ConfigurationsExtAdress.gather()
 
-		:rtype:
+		:rtype: 
 """
 
 from espressopp.esutil import cxxinit

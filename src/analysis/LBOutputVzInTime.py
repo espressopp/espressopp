@@ -27,13 +27,11 @@ Child class derived from the abstract class :class:`espressopp.analysis.LBOutput
 It computes and outputs the velocity component :math:`v_z` in time on a specific
 lattice site (the value used at the moment is :math:`{0.25*N_i, 0, 0}`).
 
-.. function:: espressopp.analysis.LBOutputVzInTime(system, latticeboltzmann)
+.. function:: espressopp.analysis.LBOutputVzInTime(system,latticeboltzmann)
 
-		:param system: system object defined earlier in the python-script
-		:param latticeboltzmann: lattice boltzmann object defined earlier in the python-script
-		:type system: 
-		:type latticeboltzmann: 
-		
+	:param system: system object defined earlier in the python-script
+	:param latticeboltzmann: lattice boltzmann object defined earlier in the python-script
+
 .. Note::
 
 	this class should be called from external analysis class :class:`espressopp.integrator.ExtAnalyze`
@@ -52,6 +50,13 @@ Example to call the profiler:
 >>> # add the external analysis object as an extension to the integrator
 >>> integrator.addExtension(extAnalysisNum2)
 
+
+.. function:: espressopp.analysis.LBOutputVzInTime(system, latticeboltzmann)
+
+		:param system: 
+		:param latticeboltzmann: 
+		:type system: 
+		:type latticeboltzmann: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
