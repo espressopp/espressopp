@@ -19,11 +19,20 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***************************************************
+r"""
+*****************************************************
 **espressopp.storage.DomainDecompositionNonBlocking**
-***************************************************
+*****************************************************
 
+
+.. function:: espressopp.storage.DomainDecompositionNonBlocking(system, nodeGrid, cellGrid)
+
+		:param system: 
+		:param nodeGrid: 
+		:param cellGrid: 
+		:type system: 
+		:type nodeGrid: 
+		:type cellGrid: 
 """
 from espressopp import pmi
 from espressopp.esutil import cxxinit
@@ -36,7 +45,7 @@ import mpi4py.MPI as MPI
 from espressopp.storage.DomainDecomposition import *
 
 class DomainDecompositionNonBlockingLocal(DomainDecompositionLocal, storage_DomainDecompositionNonBlocking):
-    'The (local) DomainDecompositionNonBlocking.'
+
     def __init__(self, system, nodeGrid, cellGrid):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, storage_DomainDecompositionNonBlocking, system, nodeGrid, cellGrid)

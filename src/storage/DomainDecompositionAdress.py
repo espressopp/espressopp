@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**************************************
+r"""
+****************************************
 **DomainDecompositionAdress** - Object
-**************************************
+****************************************
 
 The DomainDecompositionAdress is the Domain Decomposition for AdResS and H-
 AdResS simulations. It makes sure that tuples (i.e. a coarse-grained particle
@@ -34,6 +34,15 @@ Example - setting DomainDecompositionAdress:
 
 >>> system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
 
+
+.. function:: espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
+
+		:param system: 
+		:param nodeGrid: 
+		:param cellGrid: 
+		:type system: 
+		:type nodeGrid: 
+		:type cellGrid: 
 """
 
 from espressopp import pmi
@@ -46,7 +55,7 @@ from espressopp.storage.Storage import *
 
 class DomainDecompositionAdressLocal(StorageLocal, 
                                storage_DomainDecompositionAdress):
-    'The (local) DomainDecomposition.'
+
     def __init__(self, system, nodeGrid, cellGrid):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, storage_DomainDecompositionAdress, system, nodeGrid, cellGrid)

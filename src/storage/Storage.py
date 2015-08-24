@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+**************************************
 **Storage** - Storage Object
-************************************
+**************************************
 
 This is the base class for all storage objects.
 All derived classes implement at least the following methods:
@@ -97,6 +97,90 @@ Examples:
 >>> s.storage.decompose()
 >>> s.storage.modifyParticle(15, 'pos', Real3D(new_x, new_y, new_z))
 
+
+
+.. function:: espressopp.storage.Storage.addAdrATParticle(pid, \*args)
+
+		:param pid: 
+		:param \*args: 
+		:type pid: 
+		:type \*args: 
+		:rtype: 
+
+.. function:: espressopp.storage.Storage.addParticle(pid, pos)
+
+		:param pid: 
+		:param pos: 
+		:type pid: 
+		:type pos: 
+		:rtype: 
+
+.. function:: espressopp.storage.Storage.addParticles(particleList, \*properties)
+
+		:param particleList: 
+		:param \*properties: 
+		:type particleList: 
+		:type \*properties: 
+		:rtype: 
+
+.. function:: espressopp.storage.Storage.clearSavedPositions()
+
+		:rtype: 
+
+.. function:: espressopp.storage.Storage.getParticle(pid)
+
+		:param pid: 
+		:type pid: 
+		:rtype: 
+
+.. function:: espressopp.storage.Storage.getRealParticleIDs()
+
+		:rtype: 
+
+.. function:: espressopp.storage.Storage.modifyParticle(pid, property, value)
+
+		:param pid: 
+		:param property: 
+		:param value: 
+		:type pid: 
+		:type property: 
+		:type value: 
+		:rtype: 
+
+.. function:: espressopp.storage.Storage.particleExists(pid)
+
+		:param pid: 
+		:type pid: 
+		:rtype: 
+
+.. function:: espressopp.storage.Storage.printRealParticles()
+
+		:rtype: 
+
+.. function:: espressopp.storage.Storage.removeAllParticles()
+
+		:rtype: 
+
+.. function:: espressopp.storage.Storage.removeParticle(pid)
+
+		:param pid: 
+		:type pid: 
+		:rtype: 
+
+.. function:: espressopp.storage.Storage.restorePositions()
+
+		:rtype: 
+
+.. function:: espressopp.storage.Storage.savePositions(idList)
+
+		:param idList: 
+		:type idList: 
+		:rtype: 
+
+.. function:: espressopp.storage.Storage.setFixedTuplesAdress(fixedtuples)
+
+		:param fixedtuples: 
+		:type fixedtuples: 
 """
 
 from espressopp import pmi
@@ -122,12 +206,12 @@ class StorageLocal(object):
         self.cxxclass.addParticle(self, pid, toReal3DFromVector(pos))
                 
     def removeParticle(self, pid):
-      'remove a particle, will return if particle exists on this worker 0 else'
+
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         return self.cxxclass.removeParticle(self, pid)
       
     def removeAllParticles(self):
-      'remove all particles'
+
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         return self.cxxclass.removeAllParticles(self)
             
@@ -298,7 +382,7 @@ class StorageLocal(object):
             
 
     def savePositions(self, idList):
-      'it is responsibility of user to save existing particles, otherwise nothing will be saved'
+
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         for pid in idList:
           self.cxxclass.savePosition(self, pid)
