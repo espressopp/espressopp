@@ -23,46 +23,6 @@ r"""
 *********************
 **espressopp.Tensor**
 *********************
-
-
-.. function:: espressopp.__Tensor(\*args)
-
-		:param \*args: 
-		:type \*args: 
-
-.. function:: espressopp.__Tensor.xx(v, [0)
-
-		:param v: 
-		:param [0: 
-		:type v: 
-		:type [0: 
-		:rtype: 
-
-.. function:: espressopp.__Tensor.yy(v, [1)
-
-		:param v: 
-		:param [1: 
-		:type v: 
-		:type [1: 
-		:rtype: 
-
-.. function:: espressopp.__Tensor.zz(v, [2)
-
-		:param v: 
-		:param [2: 
-		:type v: 
-		:type [2: 
-		:rtype: 
-
-.. function:: espressopp.toTensorFromVector(\*args)
-
-		:param \*args: 
-		:type \*args: 
-
-.. function:: espressopp.toTensor(\*args)
-
-		:param \*args: 
-		:type \*args: 
 """
 from _espressopp import Tensor
 from espressopp import esutil
