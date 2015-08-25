@@ -108,12 +108,14 @@ namespace espressopp {
       if (!p1) {
           std::stringstream msg;
           msg << "adding error: triple particle p1 " << pid1 << " does not exists here and cannot be added";
+          msg << " triplet: " << pid1 << "-" << pid2 << "-" << pid3;
           //std::runtime_error(err.str());
           err.setException( msg.str() );
       }
       if (!p3) {
           std::stringstream msg;
-          msg << "adding error: triple particle p3 " << pid1 << " does not exists here and cannot be added";
+          msg << "adding error: triple particle p3 " << pid3 << " does not exists here and cannot be added";
+          msg << " triplet: " << pid1 << "-" << pid2 << "-" << pid3;
           //std::runtime_error(err.str());
           err.setException( msg.str() );
       }
