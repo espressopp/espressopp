@@ -93,8 +93,9 @@ if pmi.isController:
                 # minimum image convention check:
                 for k in range(3):
                   if nodeGrid[k]*cellGrid[k] == 1 :
+                    print(("Warning! cellGrid[{}] has been "
+                           "adjusted to 2 (was={})".format(k, cellGrid[k])))
                     cellGrid[k] = 2
-                    print 'cellGrid[%i] has been adjusted to 2'                  
                 self.next_id = 0
                 self.pmiinit(system, nodeGrid, cellGrid)
               else:

@@ -48,8 +48,9 @@ Example - setting DomainDecompositionAdress:
 from espressopp import pmi
 from espressopp.esutil import cxxinit
 from _espressopp import storage_DomainDecompositionAdress
-from espressopp import Int3D, toInt3DFromVector
-import mpi4py.MPI as MPI
+from espressopp import toInt3DFromVector
+from espressopp.tools import decomp
+from espressopp import check
 
 from espressopp.storage.Storage import *
 
@@ -60,25 +61,34 @@ class DomainDecompositionAdressLocal(StorageLocal,
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, storage_DomainDecompositionAdress, system, nodeGrid, cellGrid)
 
+
 if pmi.isController:
     class DomainDecompositionAdress(Storage):
         pmiproxydefs = dict(
             cls = 'espressopp.storage.DomainDecompositionAdressLocal',
             pmicall = ['getCellGrid', 'cellAdjust']
             )
-        def __init__(self, system, 
-                     nodeGrid='auto', 
-                     cellGrid='auto'):
-            if nodeGrid == 'auto':
-                nodeGrid = Int3D(system.comm.rank, 1, 1)
+        def __init__(self, system, nodeGrid='auto', cellGrid='auto', nocheck=False):
+            if nocheck:
+                self.next_id = 0
+                self.pmiinit(system, nodeGrid, cellGrid)
             else:
-                nodeGrid = toInt3DFromVector(nodeGrid)
+                if check.System(system, 'bc'):
+                    if nodeGrid == 'auto':
+                        nodeGrid = decomp.nodeGrid(system.comm.rank)
+                    else:
+                        nodeGrid = toInt3DFromVector(nodeGrid)
+                    if cellGrid == 'auto':
+                        raise Exception('Automatic cell size calculation not yet implemented')
+                    else:
+                        cellGrid = toInt3DFromVector(cellGrid)
 
-            if cellGrid == 'auto':
-                # TODO: Implement
-                raise 'Automatic cell size calculation not yet implemented'
-            else:
-                cellGrid = toInt3DFromVector(cellGrid)
-
-            self.next_id = 0
-            self.pmiinit(system, nodeGrid, cellGrid)
+                    for k in range(3):
+                        if nodeGrid[k]*cellGrid[k] == 1:
+                            print(("Warning! cellGrid[{}] has been "
+                                   "adjusted to 2 (was={})".format(k, cellGrid[k])))
+                            cellGrid[k] = 2
+                    self.next_id = 0
+                    self.pmiinit(system, nodeGrid, cellGrid)
+                else:
+                    raise Exception('Error: could not create DomainDecomposition object')
