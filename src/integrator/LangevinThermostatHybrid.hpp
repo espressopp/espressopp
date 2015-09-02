@@ -64,14 +64,10 @@ namespace espressopp {
         void setTemperature(real temperature);
         real getTemperature();
 
-        void setAdress(bool _adress);
-        bool getAdress();
-
         void initialize();
 
         /** update of forces to thermalize the system */
-        void thermalize();
-        void thermalizeAdr(); // same as above, for AdResS
+        void thermalizeAdr(); 
 
         /** very nasty: if we recalculate force when leaving/reentering the integrator,
             a(t) and a((t-dt)+dt) are NOT equal in the vv algorithm. The random
@@ -91,13 +87,11 @@ namespace espressopp {
       private:
 
         boost::signals2::connection _initialize, _heatUp, _coolDown,
-                                       _thermalize, _thermalizeAdr;
+                                       _thermalizeAdr;
 
         void frictionThermo(class Particle&, real);
 
         // this connects thermalizeAdr
-        void enableAdress();
-        bool adress;
 
         void connect();
         void disconnect();

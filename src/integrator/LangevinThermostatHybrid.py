@@ -48,8 +48,9 @@ As LangevinThermostat, but for use in AdResS systems, to allow the application o
   >>> thermostat.temperature = kBT
   # kBT is a float with the value of temperature in reduced units, i.e. temperature * Boltzmann's constant in appropriate units
 
-  # switch on thermostat for adres
+  # no need to include the line
   >>> thermostat.adress = True
+  # as is necessary in the case of the basic LangevinThermostat, because LangevinThermostatHybrid is always only used in AdResS systems
 
 """
 from espressopp.esutil import cxxinit
@@ -64,14 +65,11 @@ class LangevinThermostatHybridLocal(ExtensionLocal, integrator_LangevinThermosta
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_LangevinThermostatHybrid, system,fixedtuplelist)
 
-    #def enableAdress(self):
-    #    if pmi.workerIsActive():
-    #        self.cxxclass.enableAdress(self);
 
 if pmi.isController :
     class LangevinThermostatHybrid(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.LangevinThermostatHybridLocal',
-            pmiproperty = [ 'gamma', 'gammahy','gammacg','temperature', 'adress' ]
+            pmiproperty = [ 'gamma', 'gammahy','gammacg','temperature' ]
             )

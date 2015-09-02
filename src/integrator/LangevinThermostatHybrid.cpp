@@ -46,8 +46,6 @@ namespace espressopp {
       gammacg  = 0.0;
       temperature = 0.0;
       
-      adress = true; //only for use in system with values of lambda for each particle, i.e. in AdResS system
-
       if (!system->rng) {
         throw std::runtime_error("system has no RNG");
       }
@@ -89,14 +87,6 @@ namespace espressopp {
       return gammacg;
     }
 
-    void LangevinThermostatHybrid::setAdress(bool _adress){
-        adress = _adress;
-    }
-
-    bool LangevinThermostatHybrid::getAdress(){
-        return adress;
-    }
-
     void LangevinThermostatHybrid::setTemperature(real _temperature)
     {
       temperature = _temperature;
@@ -117,7 +107,6 @@ namespace espressopp {
         _initialize.disconnect();
         _heatUp.disconnect();
         _coolDown.disconnect();
-        _thermalize.disconnect();
         _thermalizeAdr.disconnect();
 
     }
@@ -134,35 +123,13 @@ namespace espressopp {
         _coolDown = integrator->recalc2.connect(
                 boost::bind(&LangevinThermostatHybrid::coolDown, this));
 
-        if (adress) {
-            _thermalizeAdr = integrator->aftCalcF.connect(
+        _thermalizeAdr = integrator->aftCalcF.connect(
                 boost::bind(&LangevinThermostatHybrid::thermalizeAdr, this));
-        }
-        else {
-            _thermalize = integrator->aftCalcF.connect(
-                boost::bind(&LangevinThermostatHybrid::thermalize, this));
-        }
     }
 
-
-    void LangevinThermostatHybrid::thermalize()
-    //not used, since this class is only meant for use with Adress systems, only thermalizeAdr is used
-    {
-      LOG4ESPP_DEBUG(theLogger, "thermalize");
-
-      System& system = getSystemRef();
-      
-      CellList cells = system.storage->getRealCells();
-
-      for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
-        //frictionThermo(*cit); 
-      }
-    }
-
-    // for AdResS
     void LangevinThermostatHybrid::thermalizeAdr()
     {
-      LOG4ESPP_DEBUG(theLogger, "thermalize");
+      LOG4ESPP_DEBUG(theLogger, "thermalizeAdr");
 
       System& system = getSystemRef();
 
@@ -286,7 +253,6 @@ namespace espressopp {
         ("integrator_LangevinThermostatHybrid", init<shared_ptr<System>,shared_ptr<FixedTupleListAdress> >())
         .def("connect", &LangevinThermostatHybrid::connect)
         .def("disconnect", &LangevinThermostatHybrid::disconnect)
-        .add_property("adress", &LangevinThermostatHybrid::getAdress, &LangevinThermostatHybrid::setAdress)
         .add_property("gamma", &LangevinThermostatHybrid::getGamma, &LangevinThermostatHybrid::setGamma)
         .add_property("gammahy", &LangevinThermostatHybrid::getGammaHybrid, &LangevinThermostatHybrid::setGammaHybrid)
         .add_property("gammacg", &LangevinThermostatHybrid::getGammaCG, &LangevinThermostatHybrid::setGammaCG)
