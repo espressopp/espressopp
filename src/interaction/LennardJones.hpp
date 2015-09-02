@@ -25,6 +25,7 @@
 #define _INTERACTION_LENNARDJONES_HPP
 
 #include "FixedPairListInteractionTemplate.hpp"
+#include "FixedPairListTypesInteractionTemplate.hpp"
 #include "Potential.hpp"
 
 namespace espressopp {

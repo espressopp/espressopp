@@ -28,6 +28,7 @@
 #include "VerletListHadressInteractionTemplate.hpp"
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
+#include "FixedPairListTypesInteractionTemplate.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -46,6 +47,8 @@ namespace espressopp {
         CellListLennardJones;
     typedef class FixedPairListInteractionTemplate <LennardJones> 
         FixedPairListLennardJones;
+    typedef class FixedPairListTypesInteractionTemplate <LennardJones> 
+        FixedPairListTypesLennardJones;
     LOG4ESPP_LOGGER(LennardJones::theLogger, "LennardJones");
     // LOG4ESPP_LOGGER(VerletListLennardJones::theLogger, "VerletListLennardJones");
 
@@ -117,6 +120,15 @@ namespace espressopp {
           .def("getPotential", &FixedPairListLennardJones::getPotential)
           .def("setFixedPairList", &FixedPairListLennardJones::setFixedPairList)
           .def("getFixedPairList", &FixedPairListLennardJones::getFixedPairList)
+      ;
+
+      class_< FixedPairListTypesLennardJones, bases< Interaction > >
+        ("interaction_FixedPairListTypesLennardJones", init< shared_ptr<System>, shared_ptr<FixedPairList> >())
+         .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress> >())
+         .def("setFixedPairList", &FixedPairListTypesLennardJones::setFixedPairList)
+         .def("getFixedPairList", &FixedPairListTypesLennardJones::getFixedPairList)
+         .def("setPotential", &FixedPairListTypesLennardJones::setPotential)
+         .def("getPotential", &FixedPairListTypesLennardJones::getPotentialPtr)
       ;
     }
     
