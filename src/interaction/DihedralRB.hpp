@@ -92,6 +92,11 @@ class DihedralRB : public DihedralPotentialTemplate< DihedralRB > {
     real rijjk_abs = sqrt(rijjk_sqr);
     real rjkkn_abs = sqrt(rjkkn_sqr);
 
+    // If vectors are collinear then return, it is not
+    // possible to create a plane and define an angle.
+    if (rijjk_abs < 0.00000001 || rjkkn_abs < 0.00000001)
+      return;
+
     real inv_rijjk = 1.0 / rijjk_abs;
     real inv_rjkkn = 1.0 / rjkkn_abs;
 
