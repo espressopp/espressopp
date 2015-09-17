@@ -144,7 +144,7 @@ namespace espressopp {
           _phi = 1e-10; //not 0.0, because 1.0/sin(_phi) would cause a singularity
         } else if (cos_phi < -1.0) {
           cos_phi = -1.0;
-          _phi = M_PI;
+          _phi = M_PI-1e-10;
         }
 
         /// The part of the formula. 1/sin(phi) * d/dphi U(phi)
