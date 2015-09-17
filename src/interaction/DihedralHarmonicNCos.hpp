@@ -141,7 +141,7 @@ namespace espressopp {
         real _phi = acos(cos_phi);
         if (cos_phi > 1.0) {
           cos_phi = 1.0;
-          _phi = 0.0;
+          _phi = 1e-10; //not 0.0, because 1.0/sin(_phi) would cause a singularity
         } else if (cos_phi < -1.0) {
           cos_phi = -1.0;
           _phi = M_PI;
