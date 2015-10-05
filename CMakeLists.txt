@@ -116,7 +116,11 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 # add_definitions( -DHAVE_CONFIG_H )
 
 if (EXTERNAL_BOOST)
-  find_package(Boost 1.55.0 COMPONENTS mpi python serialization filesystem)
+  set(Boost_VERSION 1.55.0)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "5")
+    set(Boost_VERSION 1.58.0) #issue #8
+  endif()
+  find_package(Boost ${Boost_VERSION} COMPONENTS mpi python serialization filesystem)
   if(NOT Boost_FOUND)
     message(FATAL_ERROR "Boost not found, make sure you have installed boost and it's dev packages. To hint cmake to your Boost installation, use the option -DBOOST_ROOT=/path/to/boost. As last resort you can use our internal replacement with -DEXTERNAL_BOOST=OFF")
   endif(NOT Boost_FOUND)
