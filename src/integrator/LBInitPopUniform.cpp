@@ -63,10 +63,10 @@ namespace espressopp {
             }
 						
 						/* fill in den and j values for real and halo regions */
-						latticeboltzmann->setLBFluid(Int3D(i,j,k),_numVels,_rho0);
-						latticeboltzmann->setLBFluid(Int3D(i,j,k),_numVels+1,_u0[0]*_rho0);
-						latticeboltzmann->setLBFluid(Int3D(i,j,k),_numVels+2,_u0[1]*_rho0);
-						latticeboltzmann->setLBFluid(Int3D(i,j,k),_numVels+3,_u0[2]*_rho0);
+						latticeboltzmann->setLBMom(Int3D(i,j,k),0,_rho0);
+						latticeboltzmann->setLBMom(Int3D(i,j,k),1,_u0[0]*_rho0);
+						latticeboltzmann->setLBMom(Int3D(i,j,k),2,_u0[1]*_rho0);
+						latticeboltzmann->setLBMom(Int3D(i,j,k),3,_u0[2]*_rho0);
           }
         }
       }

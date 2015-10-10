@@ -148,10 +148,10 @@ namespace espressopp {
 							_ci = latticeboltzmann->getCi(l);
 							_jLoc += _fi * _ci;
 						}
-/*
-						_jLoc[0] = latticeboltzmann->getLBFluid(Int3D(i,j,k),_numVels+1);
-						_jLoc[1] = latticeboltzmann->getLBFluid(Int3D(i,j,k),_numVels+2);
-						_jLoc[2] = latticeboltzmann->getLBFluid(Int3D(i,j,k),_numVels+3);
+
+/*					_jLoc[0] = latticeboltzmann->getLBMom(Int3D(i,j,k),1);
+						_jLoc[1] = latticeboltzmann->getLBMom(Int3D(i,j,k),2);
+						_jLoc[2] = latticeboltzmann->getLBMom(Int3D(i,j,k),3);
 */
 						_myU += _jLoc;
 					}

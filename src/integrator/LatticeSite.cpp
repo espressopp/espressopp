@@ -35,7 +35,7 @@ namespace espressopp {
   using namespace iterator;
   namespace integrator {
     LBSite::LBSite () {
-			f   = std::vector<real>(LatticePar::getNumVelsLoc()+4, 0.);
+			f   = std::vector<real>(LatticePar::getNumVelsLoc(), 0.);
     }
 		
 /*******************************************************************************************/
@@ -43,12 +43,6 @@ namespace espressopp {
 		/* SET AND GET PART */
     void LBSite::setF_i (int _i, real _f) { f[_i] = _f;}
     real LBSite::getF_i (int _i) { return f[_i];}
-
-    void LBSite::setInvBLoc (int _i, real _b) { inv_bLoc[_i] = _b;}
-    real LBSite::getInvBLoc (int _i) { return inv_bLoc[_i];}
-
-    void LBSite::setEqWeightLoc (int _i, real _w) { eqWeightLoc[_i] = _w;}
-    real LBSite::getEqWeightLoc (int _i) { return eqWeightLoc[_i];}
 
     void LBSite::setPhiLoc (int _i, real _phi) { phiLoc[_i] = _phi;}
     real LBSite::getPhiLoc (int _i) { return phiLoc[_i];}
@@ -65,26 +59,16 @@ namespace espressopp {
     void LBSite::setGammaEvenLoc (real _gamma_even) {gamma_evenLoc = _gamma_even;}
     real LBSite::getGammaEvenLoc () { return gamma_evenLoc;}
 
-    void LBSite::setExtForceLoc (Real3D _extForceLoc) {extForceLoc = _extForceLoc;}
-    Real3D LBSite::getExtForceLoc () {return extForceLoc;}
-
-		void LBSite::setCouplForceLoc (Real3D _couplForceLoc) {couplForceLoc = _couplForceLoc;}
-		Real3D LBSite::getCouplForceLoc () {return couplForceLoc;}
-		
 /*******************************************************************************************/
 		
     /* HELPFUL OPERATIONS WITH POPULATIONS AND MOMENTS */
     void LBSite::scaleF_i (int _i, real _value) { f[_i] *= _value;}
-		void LBSite::addExtForceLoc (Real3D _extForceLoc) {extForceLoc += _extForceLoc;}
-		void LBSite::addCouplForceLoc (Real3D _couplForceLoc) {couplForceLoc += _couplForceLoc;}
 		
 /*******************************************************************************************/
 
     /* MANAGING STATIC VARIABLES */
     /* create storage for static variables */
     std::vector<real> LBSite::phiLoc(19, 0.);
-    std::vector<real> LBSite::inv_bLoc(19, 0.);
-    std::vector<real> LBSite::eqWeightLoc(19, 0.);
     real LBSite::gamma_bLoc = 0.;
     real LBSite::gamma_sLoc = 0.;
     real LBSite::gamma_oddLoc = 0.;
@@ -92,41 +76,17 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 		
-		/* INITIALISATION OF THE LATTICE MODEL: EQ.WEIGHTS, INVERSED COEFFICIENTS */
-		void LBSite::initLatticeModelLoc () {
-			
-			// default D3Q19 model
-			setEqWeightLoc(0, 1./3.);
-			setEqWeightLoc(1, 1./18.);  setEqWeightLoc(2, 1./18.);  setEqWeightLoc(3, 1./18.);
-			setEqWeightLoc(4, 1./18.);  setEqWeightLoc(5, 1./18.);  setEqWeightLoc(6, 1./18.);
-			setEqWeightLoc(7, 1./36.);  setEqWeightLoc(8, 1./36.);  setEqWeightLoc(9, 1./36.);
-			setEqWeightLoc(10, 1./36.); setEqWeightLoc(11, 1./36.); setEqWeightLoc(12, 1./36.);
-			setEqWeightLoc(13, 1./36.); setEqWeightLoc(14, 1./36.); setEqWeightLoc(15, 1./36.);
-			setEqWeightLoc(16, 1./36.); setEqWeightLoc(17, 1./36.); setEqWeightLoc(18, 1./36.);
-			
-			setInvBLoc(0, 1.);
-			setInvBLoc(1, 3.);				setInvBLoc(2, 3.);				setInvBLoc(3, 3.);
-			setInvBLoc(4, 3./2.);		setInvBLoc(5, 3./4.);		setInvBLoc(6, 9./4.);
-			setInvBLoc(7, 9.);				setInvBLoc(8, 9.);				setInvBLoc(9, 9.);
-			setInvBLoc(10, 3./2.);		setInvBLoc(11, 3./2.);		setInvBLoc(12, 3./2.);
-			setInvBLoc(13, 9./2.);		setInvBLoc(14, 9./2.);		setInvBLoc(15, 9./2.);
-			// In PRE 76, 036704 (2007) the 17th and 18th Bi are swapped in comp. to Ulf's thesis. Here we use the latter one
-			setInvBLoc(16, 1./2.);		setInvBLoc(17, 3./4.);		setInvBLoc(18, 9./4.);
-		}
-		
-/*******************************************************************************************/
-		
-		void LBSite::collision(int _lbTempFlag, int _extForceFlag, int _couplForceFlag) {
+		void LBSite::collision(int _lbTempFlag, int _extForceFlag, int _couplForceFlag, Real3D _f) {
 			real m[19];
 
 			calcLocalMoments(m);
 			
-			relaxMoments(m, _extForceFlag);
+			relaxMoments(m, _extForceFlag, _f);
 
 			if (_lbTempFlag == 1) thermalFluct(m);
 			
 			if (_extForceFlag == 1 || _couplForceFlag == 1) {
-				applyForces(m);
+				applyForces(m, _f);
 			}
 			
 			btranMomToPop(m);
@@ -185,7 +145,7 @@ namespace espressopp {
 /*******************************************************************************************/
 		
 		/* RELAXATION OF THE MOMENTS TO THEIR EQUILIBRIUM VALUES */
-		void LBSite::relaxMoments (real *m, int _extForceFlag) {
+		void LBSite::relaxMoments (real *m, int _extForceFlag, Real3D _f) {
 			// moments on the site //
 			real _invTauLoc = 1. / LatticePar::getTauLoc();
 			Real3D jLoc(m[1], m[2], m[3]);
@@ -193,7 +153,7 @@ namespace espressopp {
 			jLoc *= _invTauLoc;
 			
 			// if we have external forces then modify the eq.fluxes //
-			if (_extForceFlag == 1) jLoc += 0.5*(getExtForceLoc() + getCouplForceLoc()); // when doing coupling, the flag is set to 1!
+			if (_extForceFlag == 1) jLoc += 0.5 * _f; // when doing coupling, the flag is set to 1!
 			
 			real _invRhoLoc = 1. / m[0];
 			real pi_eq[6];
@@ -249,8 +209,8 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 		
-		void LBSite::applyForces (real *m) {
-			Real3D _f = getExtForceLoc() + getCouplForceLoc();
+		void LBSite::applyForces (real *m, Real3D _f) {
+//			Real3D _f = LBForce().getExtForceLoc() + LBForce().getCouplForceLoc();
 			
 			// set velocity _u
 			Real3D _u = _f;
@@ -293,13 +253,13 @@ namespace espressopp {
 		
 		void LBSite::btranMomToPop (real *m) {
 			int _numVelsLoc = LatticePar::getNumVelsLoc();
-			real _eqWeightLoc[_numVelsLoc];
+//			real _eqWeightLoc[_numVelsLoc];
 			
 			// scale modes with inversed coefficients
 			for (int i = 0; i < _numVelsLoc; i++) {
-				m[i] *= getInvBLoc(i);
+				m[i] *= LatticePar::getInvBLoc(i);
 				/* fill in local eq weights */
-				_eqWeightLoc[i] = getEqWeightLoc(i);
+//				_eqWeightLoc[i] = LatticePar::getEqWeightLoc(i);
 			}
 			
 			setF_i(0,m[0] -m[4] +m[16]);
@@ -339,7 +299,7 @@ namespace espressopp {
 			
 			/* scale populations with weights */
 			for (int i = 0; i < _numVelsLoc; i++) {
-				scaleF_i (i, _eqWeightLoc[i]);
+				scaleF_i (i, LatticePar::getEqWeightLoc(i));
 			}
 		}
 		
@@ -350,15 +310,15 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 		
-    GhostLattice::GhostLattice () {
-      pop = std::vector<real>(LatticePar::getNumVelsLoc(), 0.);
+    LBMom::LBMom () {
+      mom = std::vector<real>(4, 0.);
     }
 
 		/* SET AND GET PART */
-    void GhostLattice::setPop_i (int _i, real _pop) { pop[_i] = _pop;}
-    real GhostLattice::getPop_i (int _i) { return pop[_i];}
+    void LBMom::setMom_i (int _i, real _mom) { mom[_i] = _mom;}
+    real LBMom::getMom_i (int _i) { return mom[_i];}
 
-    GhostLattice::~GhostLattice() {
+    LBMom::~LBMom() {
     }
 		
 /*******************************************************************************************/
@@ -368,12 +328,17 @@ namespace espressopp {
 			setALoc(_a);
 			setTauLoc(_tau);
 			
+			initEqWeights();
+			initInvBLoc();
+			
 			/* declare RNG */
 			if (!system->rng) {
 				throw std::runtime_error("system has no RNG");
 			}
 			rng = system->rng;
 		}
+		
+/*******************************************************************************************/
 		
 		void LatticePar::setNumVelsLoc (int _numVelsLoc) {numVelsLoc = _numVelsLoc;}
 		int LatticePar::getNumVelsLoc () {return numVelsLoc;}
@@ -382,15 +347,72 @@ namespace espressopp {
 		void LatticePar::setTauLoc (real _tau) {tauLoc = _tau;}
 		real LatticePar::getTauLoc () {return tauLoc;}
 
-		shared_ptr< esutil::RNG > LatticePar::rng;		// initializer
-		int LatticePar::numVelsLoc = 0;								// initializer
-		real LatticePar::aLoc = 0.;										// initializer
-		real LatticePar::tauLoc = 0.;									// initializer
-
-		LatticePar::~LatticePar() {
+		void LatticePar::setInvBLoc (int _i, real _b) { inv_bLoc[_i] = _b;}
+		real LatticePar::getInvBLoc (int _i) { return inv_bLoc[_i];}
+		
+		void LatticePar::setEqWeightLoc (int _i, real _w) { eqWeightLoc[_i] = _w;}
+		real LatticePar::getEqWeightLoc (int _i) { return eqWeightLoc[_i];}
+		
+/*******************************************************************************************/
+		
+		void LatticePar::initEqWeights () {
+			real _sh1 = 1./18.;
+			real _sh2 = 1./36.;
+			
+			// default D3Q19 model
+			setEqWeightLoc(0, 1./3.);
+			setEqWeightLoc(1, _sh1);  setEqWeightLoc(2, _sh1);  setEqWeightLoc(3, _sh1);
+			setEqWeightLoc(4, _sh1);  setEqWeightLoc(5, _sh1);  setEqWeightLoc(6, _sh1);
+			setEqWeightLoc(7, _sh2);  setEqWeightLoc(8, _sh2);  setEqWeightLoc(9, _sh2);
+			setEqWeightLoc(10, _sh2); setEqWeightLoc(11, _sh2); setEqWeightLoc(12, _sh2);
+			setEqWeightLoc(13, _sh2); setEqWeightLoc(14, _sh2); setEqWeightLoc(15, _sh2);
+			setEqWeightLoc(16, _sh2); setEqWeightLoc(17, _sh2); setEqWeightLoc(18, _sh2);
 		}
 		
 /*******************************************************************************************/
 		
+		/* INITIALISATION OF THE LATTICE MODEL: EQ.WEIGHTS, INVERSED COEFFICIENTS */
+		void LatticePar::initInvBLoc () {
+			setInvBLoc(0, 1.);
+			setInvBLoc(1, 3.);				setInvBLoc(2, 3.);				setInvBLoc(3, 3.);
+			setInvBLoc(4, 3./2.);			setInvBLoc(5, 3./4.);			setInvBLoc(6, 9./4.);
+			setInvBLoc(7, 9.);				setInvBLoc(8, 9.);				setInvBLoc(9, 9.);
+			setInvBLoc(10, 3./2.);		setInvBLoc(11, 3./2.);		setInvBLoc(12, 3./2.);
+			setInvBLoc(13, 9./2.);		setInvBLoc(14, 9./2.);		setInvBLoc(15, 9./2.);
+			// In PRE 76, 036704 (2007) the 17th and 18th Bi are swapped in comp. to Ulf's thesis. Here we use the latter one
+			setInvBLoc(16, 1./2.);		setInvBLoc(17, 3./4.);		setInvBLoc(18, 9./4.);
+		}
+		
+/*******************************************************************************************/
+		
+		shared_ptr< esutil::RNG > LatticePar::rng;		// initializer
+		int LatticePar::numVelsLoc = 0;								// initializer
+		real LatticePar::aLoc = 0.;										// initializer
+		real LatticePar::tauLoc = 0.;									// initializer
+		std::vector<real> LatticePar::eqWeightLoc(19, 0.);
+		std::vector<real> LatticePar::inv_bLoc(19, 0.);
+		
+/*******************************************************************************************/
+		
+		LatticePar::~LatticePar() {
+		}
+		
+/*******************************************************************************************/
+		LBForce::LBForce () {
+			extForceLoc = Real3D(0.);
+			couplForceLoc = Real3D(0.);
+		}
+		
+		void LBForce::setExtForceLoc (Real3D _extForceLoc) {extForceLoc = _extForceLoc;}
+		Real3D LBForce::getExtForceLoc () {return extForceLoc;}
+		
+		void LBForce::setCouplForceLoc (Real3D _couplForceLoc) {couplForceLoc = _couplForceLoc;}
+		Real3D LBForce::getCouplForceLoc () {return couplForceLoc;}
+		
+		void LBForce::addExtForceLoc (Real3D _extForceLoc) {extForceLoc += _extForceLoc;}
+		void LBForce::addCouplForceLoc (Real3D _couplForceLoc) {couplForceLoc += _couplForceLoc;}
+
+		LBForce::~LBForce() {
+		}
 	}
 }
