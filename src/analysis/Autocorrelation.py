@@ -53,7 +53,7 @@ class AutocorrelationLocal(analysis_Autocorrelation):
 
     def __init__(self, system):
       if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      cxxinit(self, analysis_Autocorrelation, system)
+        cxxinit(self, analysis_Autocorrelation, system)
     def gather(self, value):
       return self.cxxclass.gather(self, value)
     def clear(self):
