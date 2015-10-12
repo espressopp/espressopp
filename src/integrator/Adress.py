@@ -65,9 +65,9 @@ class AdressLocal(ExtensionLocal, integrator_Adress):
 
 
     def __init__(self, _system, _verletlist, _fixedtuplelist, KTI = False):
-
-        if pmi.workerIsActive():
-            cxxinit(self, integrator_Adress, _system, _verletlist, _fixedtuplelist, KTI)
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup(): 
+        	if pmi.workerIsActive():
+            		cxxinit(self, integrator_Adress, _system, _verletlist, _fixedtuplelist, KTI)
 
 if pmi.isController:
     class Adress(Extension):
