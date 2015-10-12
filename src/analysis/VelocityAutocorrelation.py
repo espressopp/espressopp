@@ -39,7 +39,8 @@ from _espressopp import analysis_VelocityAutocorrelation
 class VelocityAutocorrelationLocal(ConfigsParticleDecompLocal, analysis_VelocityAutocorrelation):
 
     def __init__(self, system):
-      cxxinit(self, analysis_VelocityAutocorrelation, system)
+      if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():	
+        cxxinit(self, analysis_VelocityAutocorrelation, system)
       
 if pmi.isController:
   class VelocityAutocorrelation(ConfigsParticleDecomp):
