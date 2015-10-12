@@ -25,6 +25,9 @@ include(CheckCXXCompilerFlag)
 ########################################################################
 option(EXTERNAL_BOOST "Use external boost" ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
+if(NOT BUILD_SHARED_LIBS)
+  message(WARNING "Building static libraries might lead to problems with python modules - you are on your own!")
+endif()
 
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release CACHE STRING
