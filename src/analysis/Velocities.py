@@ -47,7 +47,8 @@ from _espressopp import analysis_Velocities
 class VelocitiesLocal(ObservableLocal, analysis_Velocities):
 
     def __init__(self, system):
-        cxxinit(self, analysis_Velocities, system)
+    	if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+          cxxinit(self, analysis_Velocities, system)
     def gather(self):
         return self.cxxclass.gather(self)
     def clear(self):
