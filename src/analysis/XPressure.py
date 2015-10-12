@@ -45,7 +45,8 @@ from _espressopp import analysis_XPressure
 class XPressureLocal(ObservableLocal, analysis_XPressure):
 
   def __init__(self, system):
-    cxxinit(self, analysis_XPressure, system)
+    if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():	
+      cxxinit(self, analysis_XPressure, system)
     
   def compute(self, N):
     return self.cxxclass.compute(self, N)
