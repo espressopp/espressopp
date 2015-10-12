@@ -48,7 +48,8 @@ from _espressopp import analysis_TotalVelocity
 class TotalVelocityLocal(ObservableLocal, analysis_TotalVelocity):
 
     def __init__(self, system):
-        cxxinit(self, analysis_TotalVelocity, system)
+    	if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+          cxxinit(self, analysis_TotalVelocity, system)
     def compute(self):
         return self.cxxclass.compute(self)
     def reset(self):
