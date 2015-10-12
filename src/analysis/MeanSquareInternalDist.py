@@ -44,7 +44,8 @@ from _espressopp import analysis_MeanSquareInternalDist
 class MeanSquareInternalDistLocal(ConfigsParticleDecompLocal, analysis_MeanSquareInternalDist):
     
     def __init__(self, system, chainlength):
-        cxxinit(self, analysis_MeanSquareInternalDist, system, chainlength)   
+    	if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+          cxxinit(self, analysis_MeanSquareInternalDist, system, chainlength)   
         
     def strange(self):
       print 1
