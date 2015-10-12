@@ -95,7 +95,8 @@ from _espressopp import analysis_ConfigurationsExt
 class ConfigurationsExtLocal(ObservableLocal, analysis_ConfigurationsExt):
 
     def __init__(self, system):
-        cxxinit(self, analysis_ConfigurationsExt, system)
+    	if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+          cxxinit(self, analysis_ConfigurationsExt, system)
     def gather(self):
         return self.cxxclass.gather(self)
     def clear(self):
