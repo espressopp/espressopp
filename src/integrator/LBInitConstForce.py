@@ -54,7 +54,7 @@ from _espressopp import integrator_LBInit_ConstForce
 
 class LBInitConstForceLocal(LBInitLocal, integrator_LBInit_ConstForce):
     def __init__(self, system, latticeboltzmann):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_LBInit_ConstForce, system, latticeboltzmann)
 
 if pmi.isController :
