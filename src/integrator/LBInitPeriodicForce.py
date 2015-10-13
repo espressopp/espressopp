@@ -59,7 +59,7 @@ from _espressopp import integrator_LBInit_PeriodicForce
 
 class LBInitPeriodicForceLocal(LBInitLocal, integrator_LBInit_PeriodicForce):
     def __init__(self, system, latticeboltzmann):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_LBInit_PeriodicForce, system, latticeboltzmann)
 
 if pmi.isController :
