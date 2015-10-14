@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-**************************************
+"""
+************************************
 **VerletListAdress** - Object
-**************************************
+************************************
 
 The VerletListAdress is the Verlet List to be used for AdResS or H-AdResS
 simulations. When creating the VerletListAdress one has to provide the system 
@@ -64,49 +64,6 @@ Example - creating the VerletListAdress for a spherical adress region centered o
 Example - creating the VerletListAdress for a spherical adress region centered on a particle and moving with the particle
 
 >>> vl      = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, pids=[adrCenterPID], sphereAdr=True)
-
-.. function:: espressopp.VerletListAdress(system, cutoff, adrcut, dEx, dHy, adrCenter, pids, exclusionlist, sphereAdr)
-
-		:param system: 
-		:param cutoff: 
-		:param adrcut: 
-		:param dEx: 
-		:param dHy: 
-		:param adrCenter: (default: [])
-		:param pids: (default: [])
-		:param exclusionlist: (default: [])
-		:param sphereAdr: (default: False)
-		:type system: 
-		:type cutoff: 
-		:type adrcut: 
-		:type dEx: 
-		:type dHy: 
-		:type adrCenter: 
-		:type pids: 
-		:type exclusionlist: 
-		:type sphereAdr: 
-
-.. function:: espressopp.VerletListAdress.addAdrParticles(pids, rebuild)
-
-		:param pids: 
-		:param rebuild: (default: True)
-		:type pids: 
-		:type rebuild: 
-		:rtype: 
-
-.. function:: espressopp.VerletListAdress.exclude(exclusionlist)
-
-		:param exclusionlist: 
-		:type exclusionlist: 
-		:rtype: 
-
-.. function:: espressopp.VerletListAdress.rebuild()
-
-		:rtype: 
-
-.. function:: espressopp.VerletListAdress.totalSize()
-
-		:rtype: 
 """
 
 from espressopp import pmi
@@ -115,35 +72,34 @@ import espressopp
 from espressopp.esutil import cxxinit
 
 class VerletListAdressLocal(_espressopp.VerletListAdress):
-
+    'The (local) verlet list AdResS'
 
     def __init__(self, system, cutoff, adrcut, dEx, dHy, adrCenter=[], pids=[], exclusionlist=[], sphereAdr=False):
-
-        if pmi.workerIsActive():
-            cxxinit(self, _espressopp.VerletListAdress, system, cutoff, adrcut, False, dEx, dHy)
-            #self.cxxclass.setAtType(self, atType)
-            # check for exclusions
-            if (exclusionlist != []):
-                # add exclusions
-                for pair in exclusionlist:
-                    pid1, pid2 = pair
-                    self.cxxclass.exclude(self, pid1, pid2)
-            # add adress particles
-            if (pids != []):
-                for pid in pids:
-                    self.cxxclass.addAdrParticle(self, pid)
-            # set adress center
-            if (adrCenter != []):
-                self.cxxclass.setAdrCenter(self, adrCenter[0], adrCenter[1], adrCenter[2])
-            # set adress region type (slab or spherical)
-            self.cxxclass.setAdrRegionType(self,sphereAdr)
-            
-            # rebuild list now
-            self.cxxclass.rebuild(self)
-                
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():        
+            'Local construction of a verlet list for AdResS'
+            if pmi.workerIsActive():
+                cxxinit(self, _espressopp.VerletListAdress, system, cutoff, adrcut, False, dEx, dHy)
+                #self.cxxclass.setAtType(self, atType)
+                # check for exclusions
+                if (exclusionlist != []):
+                    # add exclusions
+                    for pair in exclusionlist:
+                        pid1, pid2 = pair
+                        self.cxxclass.exclude(self, pid1, pid2)
+                # add adress particles
+                if (pids != []):
+                    for pid in pids:
+                        self.cxxclass.addAdrParticle(self, pid)
+                        # set adress center
+                if (adrCenter != []):
+                    self.cxxclass.setAdrCenter(self, adrCenter[0], adrCenter[1], adrCenter[2])
+                # set adress region type (slab or spherical)
+                self.cxxclass.setAdrRegionType(self,sphereAdr)
+                # rebuild list now
+                self.cxxclass.rebuild(self)
             
     def totalSize(self):
-
+        'count number of pairs in VerletList, involves global reduction'
         if pmi.workerIsActive():
             return self.cxxclass.totalSize(self)
 

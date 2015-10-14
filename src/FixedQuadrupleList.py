@@ -65,9 +65,9 @@ class FixedQuadrupleListLocal(_espressopp.FixedQuadrupleList):
 
 
     def __init__(self, storage):
-
-        if pmi.workerIsActive():
-            cxxinit(self, _espressopp.FixedQuadrupleList, storage)
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+          if pmi.workerIsActive():
+              cxxinit(self, _espressopp.FixedQuadrupleList, storage)
 
     def add(self, pid1, pid2, pid3, pid4):
 

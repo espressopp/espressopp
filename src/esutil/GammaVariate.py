@@ -38,7 +38,8 @@ from _espressopp import esutil_GammaVariate
 
 class GammaVariateLocal(esutil_GammaVariate):
     def __init__(self, alpha, beta):
-        cxxinit(self, esutil_GammaVariate, alpha, beta)
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, esutil_GammaVariate, alpha, beta)
 
 if pmi.isController:
     class GammaVariate(object):

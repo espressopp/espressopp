@@ -69,7 +69,7 @@ from _espressopp import analysis_StaticStructF
 class StaticStructFLocal(ObservableLocal, analysis_StaticStructF):
 
   def __init__(self, system):
-    if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():	
+    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, analysis_StaticStructF, system)
     
   def compute(self, nqx, nqy, nqz, bin_factor, ofile = None):

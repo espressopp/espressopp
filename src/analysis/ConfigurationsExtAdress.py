@@ -99,7 +99,7 @@ from _espressopp import analysis_ConfigurationsExtAdress
 class ConfigurationsExtAdressLocal(ObservableLocal, analysis_ConfigurationsExtAdress):
 
     def __init__(self, system, fixedtuplelist):
-    	if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup(): 
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
           cxxinit(self, analysis_ConfigurationsExtAdress, system, fixedtuplelist)
     def gather(self):
         return self.cxxclass.gather(self)

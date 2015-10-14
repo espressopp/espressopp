@@ -51,7 +51,7 @@ from _espressopp import analysis_RDFatomistic
 class RDFatomisticLocal(ObservableLocal, analysis_RDFatomistic):
 
   def __init__(self, system, type1, type2, _span):
-    if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup(): 	
+    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, analysis_RDFatomistic, system, type1, type2, _span)
     
   def compute(self, rdfN):

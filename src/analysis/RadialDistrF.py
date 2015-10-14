@@ -45,7 +45,7 @@ from _espressopp import analysis_RadialDistrF
 class RadialDistrFLocal(ObservableLocal, analysis_RadialDistrF):
 
   def __init__(self, system):
-    if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():	
+    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, analysis_RadialDistrF, system)
     
   def compute(self, rdfN):

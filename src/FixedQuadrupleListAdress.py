@@ -66,12 +66,12 @@ import espressopp
 from espressopp.esutil import cxxinit
 
 class FixedQuadrupleListAdressLocal(_espressopp.FixedQuadrupleListAdress):
-
+	
 
     def __init__(self, storage, fixedtupleList):
-
-        if pmi.workerIsActive():
-            cxxinit(self, _espressopp.FixedQuadrupleListAdress, storage, fixedtupleList)
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            if pmi.workerIsActive():
+                cxxinit(self, _espressopp.FixedQuadrupleListAdress, storage, fixedtupleList)
 
     def add(self, pid1, pid2, pid3, pid4):
 

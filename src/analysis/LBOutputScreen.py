@@ -67,7 +67,7 @@ from _espressopp import analysis_LBOutput_Screen
 
 class LBOutputScreenLocal(LBOutputLocal, analysis_LBOutput_Screen):
     def __init__(self, system, latticeboltzmann):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_LBOutput_Screen, system, latticeboltzmann)
 
 if pmi.isController :

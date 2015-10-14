@@ -53,7 +53,7 @@ from _espressopp import analysis_MeanSquareDispl
 class MeanSquareDisplLocal(ConfigsParticleDecompLocal, analysis_MeanSquareDispl):
 
     def __init__(self, system, chainlength = None):
-      if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         if chainlength is None:
           cxxinit(self, analysis_MeanSquareDispl, system)
         else:

@@ -39,7 +39,7 @@ from _espressopp import analysis_Pressure
 class PressureLocal(ObservableLocal, analysis_Pressure):
 
     def __init__(self, system):
-    	if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
           cxxinit(self, analysis_Pressure, system)
 
 if pmi.isController :

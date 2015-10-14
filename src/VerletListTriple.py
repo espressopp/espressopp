@@ -61,26 +61,26 @@ class VerletListTripleLocal(_espressopp.VerletListTriple):
 
 
     def __init__(self, system, cutoff, exclusionlist=[]):
-
-        if pmi.workerIsActive():
-          '''
-          cxxinit(self, _espressopp.VerletListTriple, system, cutoff, True)
-          if (exclusionlist != []):
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+          if pmi.workerIsActive():
+            '''
+            cxxinit(self, _espressopp.VerletListTriple, system, cutoff, True)
+            if (exclusionlist != []):
             print 'Warning! Exclusion list is not yet implemented to the triple verlet \
                   list. Nothing happend to exclusion list'
-          '''
+            '''
 
-          if (exclusionlist == []):
-            # rebuild list in constructor
-            cxxinit(self, _espressopp.VerletListTriple, system, cutoff, True)
-          else:
-            # do not rebuild list in constructor
-            cxxinit(self, _espressopp.VerletListTriple, system, cutoff, False)
-            # add exclusions
-            for pid in exclusionlist:
-                self.cxxclass.exclude(self, pid)
-            # now rebuild list with exclusions
-            self.cxxclass.rebuild(self)
+            if (exclusionlist == []):
+              # rebuild list in constructor
+              cxxinit(self, _espressopp.VerletListTriple, system, cutoff, True)
+            else:
+              # do not rebuild list in constructor
+              cxxinit(self, _espressopp.VerletListTriple, system, cutoff, False)
+              # add exclusions
+              for pid in exclusionlist:
+                  self.cxxclass.exclude(self, pid)
+              # now rebuild list with exclusions
+              self.cxxclass.rebuild(self)
             
     def totalSize(self):
 

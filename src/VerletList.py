@@ -61,20 +61,20 @@ class VerletListLocal(_espressopp.VerletList):
 
 
     def __init__(self, system, cutoff, exclusionlist=[]):
-
-        if pmi.workerIsActive():
-            if (exclusionlist == []):
-                # rebuild list in constructor
-                cxxinit(self, _espressopp.VerletList, system, cutoff, True)
-            else:
-                # do not rebuild list in constructor
-                cxxinit(self, _espressopp.VerletList, system, cutoff, False)
-                # add exclusions
-                for pair in exclusionlist:
-                    pid1, pid2 = pair
-                    self.cxxclass.exclude(self, pid1, pid2)
-                # now rebuild list with exclusions
-                self.cxxclass.rebuild(self)
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            if pmi.workerIsActive():
+                if (exclusionlist == []):
+                    # rebuild list in constructor
+                    cxxinit(self, _espressopp.VerletList, system, cutoff, True)
+                else:
+                    # do not rebuild list in constructor
+                    cxxinit(self, _espressopp.VerletList, system, cutoff, False)
+                    # add exclusions
+                    for pair in exclusionlist:
+                        pid1, pid2 = pair
+                        self.cxxclass.exclude(self, pid1, pid2)
+                    # now rebuild list with exclusions
+                    self.cxxclass.rebuild(self)
                 
             
     def totalSize(self):
