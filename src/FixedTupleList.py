@@ -19,20 +19,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-*****************************
+"""
+***************************
 **espressopp.FixedTupleList**
-*****************************
+***************************
 
-
-.. function:: espressopp.FixedTupleList(storage)
-
-		:param storage: 
-		:type storage: 
-
-.. function:: espressopp.FixedTupleList.size()
-
-		:rtype: 
 """
 from espressopp import pmi
 import _espressopp
@@ -40,12 +31,12 @@ import espressopp
 from espressopp.esutil import cxxinit
 
 class FixedTupleListLocal(_espressopp.FixedTupleList):
-
+    'The (local) fixed tuple list.'
 
     def __init__(self, storage):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          if pmi.workerIsActive():
-             cxxinit(self, _espressopp.FixedTupleList, storage)
+        'Local construction of a fixed tuple list'
+        if pmi.workerIsActive():
+            cxxinit(self, _espressopp.FixedTupleList, storage)
 
     """def addTuples(self, tuplelist):
         'add tuple to fixed tuple list'
@@ -54,7 +45,7 @@ class FixedTupleListLocal(_espressopp.FixedTupleList):
 
 
     def size(self):
-
+        'count number of Tuple in GlobalTupleList, involves global reduction'
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 

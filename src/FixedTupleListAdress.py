@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-**************************************
+"""
+************************************
 **FixedTupleListAdress** - Object
-**************************************
+************************************
 
 The FixedTupleListAdress is important for AdResS and H-AdResS simulations. It is the
 connection between the atomistic and coarse-grained particles. It defines which
@@ -39,17 +39,6 @@ Example - creating the FixedTupleListAdress:
 >>> ftpl.addTuples(tuples)
 >>> system.storage.setFixedTuples(ftpl)
 
-
-.. function:: espressopp.FixedTupleListAdress(storage)
-
-		:param storage: 
-		:type storage: 
-
-.. function:: espressopp.FixedTupleListAdress.addTuples(tuplelist)
-
-		:param tuplelist: 
-		:type tuplelist: 
-		:rtype: 
 """
 
 from espressopp import pmi
@@ -58,12 +47,12 @@ import espressopp
 from espressopp.esutil import cxxinit
 
 class FixedTupleListAdressLocal(_espressopp.FixedTupleListAdress):
-
+    'The (local) fixed touple list.'
 
     def __init__(self, storage):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            if pmi.workerIsActive():
-                cxxinit(self, _espressopp.FixedTupleListAdress, storage)
+        'Local construction of a fixed touple list'
+        if pmi.workerIsActive():
+            cxxinit(self, _espressopp.FixedTupleListAdress, storage)
 
     def addTuples(self, tuplelist):
         """

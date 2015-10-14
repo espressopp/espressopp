@@ -19,50 +19,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-********************************
+"""
+******************************
 **espressopp.FixedPairDistList**
-********************************
+******************************
 
-
-.. function:: espressopp.FixedPairDistList(storage)
-
-		:param storage: 
-		:type storage: 
-
-.. function:: espressopp.FixedPairDistList.add(pid1, pid2)
-
-		:param pid1: 
-		:param pid2: 
-		:type pid1: 
-		:type pid2: 
-		:rtype: 
-
-.. function:: espressopp.FixedPairDistList.addPairs(bondlist)
-
-		:param bondlist: 
-		:type bondlist: 
-		:rtype: 
-
-.. function:: espressopp.FixedPairDistList.getDist(pid1, pid2)
-
-		:param pid1: 
-		:param pid2: 
-		:type pid1: 
-		:type pid2: 
-		:rtype: 
-
-.. function:: espressopp.FixedPairDistList.getPairs()
-
-		:rtype: 
-
-.. function:: espressopp.FixedPairDistList.getPairsDist()
-
-		:rtype: 
-
-.. function:: espressopp.FixedPairDistList.size()
-
-		:rtype: 
 """
 from espressopp import pmi
 import _espressopp 
@@ -70,20 +31,20 @@ import espressopp
 from espressopp.esutil import cxxinit
 
 class FixedPairDistListLocal(_espressopp.FixedPairDistList):
-
+    'The (local) fixed pair list.'
 
     def __init__(self, storage):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            if pmi.workerIsActive():
-                cxxinit(self, _espressopp.FixedPairDistList, storage)
+        'Local construction of a fixed pair list'
+        if pmi.workerIsActive():
+            cxxinit(self, _espressopp.FixedPairDistList, storage)
 
     def add(self, pid1, pid2):
-
+        'add pair to fixed pair list'
         if pmi.workerIsActive():
             return self.cxxclass.add(self, pid1, pid2)
 
     def size(self):
-
+        'count number of bonds in GlobalPairList, involves global reduction'
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 
@@ -100,13 +61,13 @@ class FixedPairDistListLocal(_espressopp.FixedPairDistList):
                 self.cxxclass.add(self, pid1, pid2)
 
     def getPairs(self):
-
+        'return the bonds of the GlobalPairList'
         if pmi.workerIsActive():
           bonds=self.cxxclass.getPairs(self)
           return bonds 
 
     def getPairsDist(self):
-
+        'return the bonds of the GlobalPairList'
         if pmi.workerIsActive():
           bonds=self.cxxclass.getPairsDist(self)
           return bonds 

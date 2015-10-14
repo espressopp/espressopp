@@ -19,38 +19,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-*******************************
+"""
+*****************************
 **espressopp.VerletListTriple**
-*******************************
+*****************************
 
-
-.. function:: espressopp.VerletListTriple(system, cutoff, exclusionlist)
-
-		:param system: 
-		:param cutoff: 
-		:param exclusionlist: (default: [])
-		:type system: 
-		:type cutoff: 
-		:type exclusionlist: 
-
-.. function:: espressopp.VerletListTriple.exclude(exclusionlist)
-
-		:param exclusionlist: 
-		:type exclusionlist: 
-		:rtype: 
-
-.. function:: espressopp.VerletListTriple.getAllTriples()
-
-		:rtype: 
-
-.. function:: espressopp.VerletListTriple.localSize()
-
-		:rtype: 
-
-.. function:: espressopp.VerletListTriple.totalSize()
-
-		:rtype: 
 """
 from espressopp import pmi
 import _espressopp 
@@ -58,37 +31,37 @@ import espressopp
 from espressopp.esutil import cxxinit
 
 class VerletListTripleLocal(_espressopp.VerletListTriple):
-
+    'The (local) verlet triple list'
 
     def __init__(self, system, cutoff, exclusionlist=[]):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          if pmi.workerIsActive():
-            '''
-            cxxinit(self, _espressopp.VerletListTriple, system, cutoff, True)
-            if (exclusionlist != []):
+        'Local construction of a verlet triple list'
+        if pmi.workerIsActive():
+          '''
+          cxxinit(self, _espressopp.VerletListTriple, system, cutoff, True)
+          if (exclusionlist != []):
             print 'Warning! Exclusion list is not yet implemented to the triple verlet \
                   list. Nothing happend to exclusion list'
-            '''
+          '''
 
-            if (exclusionlist == []):
-              # rebuild list in constructor
-              cxxinit(self, _espressopp.VerletListTriple, system, cutoff, True)
-            else:
-              # do not rebuild list in constructor
-              cxxinit(self, _espressopp.VerletListTriple, system, cutoff, False)
-              # add exclusions
-              for pid in exclusionlist:
-                  self.cxxclass.exclude(self, pid)
-              # now rebuild list with exclusions
-              self.cxxclass.rebuild(self)
+          if (exclusionlist == []):
+            # rebuild list in constructor
+            cxxinit(self, _espressopp.VerletListTriple, system, cutoff, True)
+          else:
+            # do not rebuild list in constructor
+            cxxinit(self, _espressopp.VerletListTriple, system, cutoff, False)
+            # add exclusions
+            for pid in exclusionlist:
+                self.cxxclass.exclude(self, pid)
+            # now rebuild list with exclusions
+            self.cxxclass.rebuild(self)
             
     def totalSize(self):
-
+        'count number of triples in VerletListTriple, involves global reduction'
         if pmi.workerIsActive():
             return self.cxxclass.totalSize(self)
         
     def localSize(self):
-
+        'count number of triples in local VerletListTriple'
         if pmi.workerIsActive():
             return self.cxxclass.localSize(self)
         
@@ -106,7 +79,7 @@ class VerletListTripleLocal(_espressopp.VerletListTriple):
         self.cxxclass.rebuild(self)
             
     def getAllTriples(self):
-
+        'return the triples of the local verlet list'
         if pmi.workerIsActive():
             triples=[]
             ntriples=self.localSize()

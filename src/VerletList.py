@@ -19,38 +19,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-*************************
+"""
+***********************
 **espressopp.VerletList**
-*************************
+***********************
 
-
-.. function:: espressopp.VerletList(system, cutoff, exclusionlist)
-
-		:param system: 
-		:param cutoff: 
-		:param exclusionlist: (default: [])
-		:type system: 
-		:type cutoff: 
-		:type exclusionlist: 
-
-.. function:: espressopp.VerletList.exclude(exclusionlist)
-
-		:param exclusionlist: 
-		:type exclusionlist: 
-		:rtype: 
-
-.. function:: espressopp.VerletList.getAllPairs()
-
-		:rtype: 
-
-.. function:: espressopp.VerletList.localSize()
-
-		:rtype: 
-
-.. function:: espressopp.VerletList.totalSize()
-
-		:rtype: 
 """
 from espressopp import pmi
 import _espressopp 
@@ -58,32 +31,32 @@ import espressopp
 from espressopp.esutil import cxxinit
 
 class VerletListLocal(_espressopp.VerletList):
-
+    'The (local) verlet list.'
 
     def __init__(self, system, cutoff, exclusionlist=[]):
-        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            if pmi.workerIsActive():
-                if (exclusionlist == []):
-                    # rebuild list in constructor
-                    cxxinit(self, _espressopp.VerletList, system, cutoff, True)
-                else:
-                    # do not rebuild list in constructor
-                    cxxinit(self, _espressopp.VerletList, system, cutoff, False)
-                    # add exclusions
-                    for pair in exclusionlist:
-                        pid1, pid2 = pair
-                        self.cxxclass.exclude(self, pid1, pid2)
-                    # now rebuild list with exclusions
-                    self.cxxclass.rebuild(self)
+        'Local construction of a verlet list'
+        if pmi.workerIsActive():
+            if (exclusionlist == []):
+                # rebuild list in constructor
+                cxxinit(self, _espressopp.VerletList, system, cutoff, True)
+            else:
+                # do not rebuild list in constructor
+                cxxinit(self, _espressopp.VerletList, system, cutoff, False)
+                # add exclusions
+                for pair in exclusionlist:
+                    pid1, pid2 = pair
+                    self.cxxclass.exclude(self, pid1, pid2)
+                # now rebuild list with exclusions
+                self.cxxclass.rebuild(self)
                 
             
     def totalSize(self):
-
+        'count number of pairs in VerletList, involves global reduction'
         if pmi.workerIsActive():
             return self.cxxclass.totalSize(self)
         
     def localSize(self):
-
+        'count number of pairs in local VerletList'
         if pmi.workerIsActive():
             return self.cxxclass.localSize(self)
         
@@ -100,7 +73,7 @@ class VerletListLocal(_espressopp.VerletList):
             self.cxxclass.rebuild(self)
             
     def getAllPairs(self):
-
+        'return the pairs of the local verlet list'
         if pmi.workerIsActive():
             pairs=[]
             npairs=self.localSize()

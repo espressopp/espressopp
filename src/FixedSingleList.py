@@ -19,36 +19,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-******************************
+"""
+****************************
 **espressopp.FixedSingleList**
-******************************
+****************************
 
-
-.. function:: espressopp.FixedSingleList(storage)
-
-		:param storage: 
-		:type storage: 
-
-.. function:: espressopp.FixedSingleList.add(pid1)
-
-		:param pid1: 
-		:type pid1: 
-		:rtype: 
-
-.. function:: espressopp.FixedSingleList.addSingles(singlelist)
-
-		:param singlelist: 
-		:type singlelist: 
-		:rtype: 
-
-.. function:: espressopp.FixedSingleList.getSingles()
-
-		:rtype: 
-
-.. function:: espressopp.FixedSingleList.size()
-
-		:rtype: 
 """
 from espressopp import pmi
 import _espressopp 
@@ -57,20 +32,20 @@ from espressopp.esutil import cxxinit
 from math import sqrt
 
 class FixedSingleListLocal(_espressopp.FixedSingleList):
-
+    'The (local) fixed single list.'
 
     def __init__(self, storage):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            if pmi.workerIsActive():
-                cxxinit(self, _espressopp.FixedSingleList, storage)
+        'Local construction of a fixed single list'
+        if pmi.workerIsActive():
+            cxxinit(self, _espressopp.FixedSingleList, storage)
 
     def add(self, pid1):
-
+        'add particle to fixed single list'
         if pmi.workerIsActive():
             return self.cxxclass.add(self, pid1)
 
     def size(self):
-
+        'count number of particles in GlobalSingleList, involves global reduction'
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 
@@ -85,7 +60,7 @@ class FixedSingleListLocal(_espressopp.FixedSingleList):
                 self.cxxclass.add(self, pid)
 
     def getSingles(self):
-
+        'return the singles of the GlobalSingleList'
         if pmi.workerIsActive():
           singles=self.cxxclass.getSingles(self)
           return singles

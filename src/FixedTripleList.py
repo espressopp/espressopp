@@ -19,40 +19,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-******************************
+"""
+****************************
 **espressopp.FixedTripleList**
-******************************
+****************************
 
-
-.. function:: espressopp.FixedTripleList(storage)
-
-		:param storage: 
-		:type storage: 
-
-.. function:: espressopp.FixedTripleList.add(pid1, pid2, pid3)
-
-		:param pid1: 
-		:param pid2: 
-		:param pid3: 
-		:type pid1: 
-		:type pid2: 
-		:type pid3: 
-		:rtype: 
-
-.. function:: espressopp.FixedTripleList.addTriples(triplelist)
-
-		:param triplelist: 
-		:type triplelist: 
-		:rtype: 
-
-.. function:: espressopp.FixedTripleList.getTriples()
-
-		:rtype: 
-
-.. function:: espressopp.FixedTripleList.size()
-
-		:rtype: 
 """
 from espressopp import pmi
 import _espressopp
@@ -60,15 +31,15 @@ import espressopp
 from espressopp.esutil import cxxinit
 
 class FixedTripleListLocal(_espressopp.FixedTripleList):
-
+    'The (local) fixed triple list.'
 
     def __init__(self, storage):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            if pmi.workerIsActive():
-                cxxinit(self, _espressopp.FixedTripleList, storage)
+        'Local construction of a fixed triple list'
+        if pmi.workerIsActive():
+            cxxinit(self, _espressopp.FixedTripleList, storage)
 
     def add(self, pid1, pid2, pid3):
-
+        'add triple to fixed triple list'
         if pmi.workerIsActive():
             return self.cxxclass.add(self, pid1, pid2, pid3)
 
@@ -84,7 +55,7 @@ class FixedTripleListLocal(_espressopp.FixedTripleList):
                 self.cxxclass.add(self, pid1, pid2, pid3)
 
     def size(self):
-
+        'count number of Triples in GlobalTripleList, involves global reduction'
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 
@@ -103,7 +74,7 @@ class FixedTripleListLocal(_espressopp.FixedTripleList):
     '''
 
     def getTriples(self):
-
+        'return the triples of the GlobalTripleList'
         if pmi.workerIsActive():
           triples = self.cxxclass.getTriples(self)
           return triples 
