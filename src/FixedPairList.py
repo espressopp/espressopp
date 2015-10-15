@@ -19,11 +19,46 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**************************
+r"""
+****************************
 **espressopp.FixedPairList**
-**************************
+****************************
 
+
+.. function:: espressopp.FixedPairList(storage)
+
+		:param storage: 
+		:type storage: 
+
+.. function:: espressopp.FixedPairList.add(pid1, pid2)
+
+		:param pid1: 
+		:param pid2: 
+		:type pid1: 
+		:type pid2: 
+		:rtype: 
+
+.. function:: espressopp.FixedPairList.addBonds(bondlist)
+
+		:param bondlist: 
+		:type bondlist: 
+		:rtype: 
+
+.. function:: espressopp.FixedPairList.getBonds()
+
+		:rtype: 
+
+.. function:: espressopp.FixedPairList.getLongtimeMaxBond()
+
+		:rtype: 
+
+.. function:: espressopp.FixedPairList.resetLongtimeMaxBond()
+
+		:rtype: 
+
+.. function:: espressopp.FixedPairList.size()
+
+		:rtype: 
 """
 from espressopp import pmi
 import _espressopp 
@@ -32,20 +67,20 @@ from espressopp.esutil import cxxinit
 from math import sqrt
 
 class FixedPairListLocal(_espressopp.FixedPairList):
-    'The (local) fixed pair list.'
+
 
     def __init__(self, storage):
-        'Local construction of a fixed pair list'
+
         if pmi.workerIsActive():
             cxxinit(self, _espressopp.FixedPairList, storage)
 
     def add(self, pid1, pid2):
-        'add pair to fixed pair list'
+
         if pmi.workerIsActive():
             return self.cxxclass.add(self, pid1, pid2)
 
     def size(self):
-        'count number of bonds in GlobalPairList, involves global reduction'
+
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 
@@ -62,18 +97,18 @@ class FixedPairListLocal(_espressopp.FixedPairList):
                 self.cxxclass.add(self, pid1, pid2)
 
     def getBonds(self):
-        'return the bonds of the GlobalPairList'
+
         if pmi.workerIsActive():
           bonds=self.cxxclass.getBonds(self)
           return bonds
       
     def resetLongtimeMaxBond(self):
-        'reset long time maximum bond to 0.0' 
+
         if pmi.workerIsActive():
           self.cxxclass.resetLongtimeMaxBondSqr(self)
           
     def getLongtimeMaxBondLocal(self):
-        'return the maximum bond length this pairlist ever had (since reset or construction)'
+
         if pmi.workerIsActive(): 
             mxsqr = self.cxxclass.getLongtimeMaxBondSqr(self)
             return sqrt(mxsqr)
