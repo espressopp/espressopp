@@ -39,7 +39,6 @@
 #include "NPart.hpp"
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
-#include "io/FileBackup.hpp"
 
 namespace espressopp {
 namespace analysis {
@@ -48,19 +47,26 @@ namespace analysis {
 class SystemMonitorOutput {
  public:
   virtual void write() = 0;
+  void setKeys(shared_ptr<std::vector<std::string> > keys) {
+    keys_ = keys;
+  }
+
+ protected:
+  shared_ptr<std::vector<std::string> > keys_;
+  shared_ptr<System> system_;
+  bool header_written_;
 }
 
 class SystemMonitorOutputCSV: public SystemMonitorOutput {
  public:
-  SystemMonitorOutputCSV(std::string file_name, std::string delimiter) :
-      file_name_(file_name), delimiter_(delimiter) {
+  SystemMonitorOutputCSV(std::string file_name, std::string delimiter, shared_ptr<System> system) :
+      file_name_(file_name), delimiter_(delimiter), system_(system) {
     header_written_ = false;
   }
   void write();
 
   static void registerPython();
  private:
-  bool header_written_;
   std::string file_name_;
   std::string delimiter_;
 };
@@ -89,22 +95,23 @@ class SystemMonitor : public ParticleAccess {
       visible_observables_.push_back(1);
       visible_observables_.push_back(1);
       visible_observables_.push_back(1);
+      output_->setKeys(header_);
     }
   }
 
   ~SystemMonitor() {
   }
-  void perform_action();
+  void performAction();
   void info();
 
   static void registerPython();
 
  private:
   void write();
-  void compute_observables();
-  void compute_kinetic_energy();
+  void computeObservables();
+  void computeKineticEnergy();
 
-  void add_observable(std::string name, shared_ptr<Observable> obs, bool is_visible);
+  void addObservable(std::string name, shared_ptr<Observable> obs, bool is_visible);
 
   int current_step_;
   bool header_written_;

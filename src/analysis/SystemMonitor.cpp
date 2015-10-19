@@ -25,7 +25,7 @@
 #include "SystemMonitor.hpp"
 #include "integrator/MDIntegrator.hpp"
 
-namespace espressopp{
+namespace espressopp {
 namespace analysis {
 
 void SystemMonitor::perform_action() {
@@ -71,7 +71,7 @@ void SystemMonitor::write() {
     } else {
       output_file.open(file_name_.c_str(), std::ofstream::out | std::ofstream::app);
     }
-    
+
     for (std::vector<real>::iterator it = values_.begin(); it != values_.end(); ++it) {
       ss << *it;
       if (it != values_.end()-1)
@@ -114,7 +114,7 @@ void SystemMonitor::info() {
   }
 }
 
-void SystemMonitor::add_observable(std::string name, shared_ptr<Observable> obs, 
+void SystemMonitor::add_observable(std::string name, shared_ptr<Observable> obs,
     bool is_visible) {
   observables_.push_back(std::make_pair(name, obs));
   header_.push_back(name);
@@ -141,8 +141,21 @@ void SystemMonitor::registerPython() {
 /** Implementation of SystemMonitorOutputs. **/
 
 SystemMonitorOutputCSV::write() {
-
+  if (system_->comm->rank() == 0) {
+    std::ofstream output_file;
+    std::stringstream ss;
+    if (!header_written_) {  // First run, write header;
+      output_file.open(file_name_.c_str(), std::fstream::out);
+      for (std::vector<std::string>::iterator it = keys_->begin(); it != keys_->end(); ++it) {
+        ss << **it;
+        if (it != keys_->end()-1)
+            ss << delimiter_;
+      }
+      ss << std::endl;;
+      header_written_ = true;
+    }
+  }
 }
 
 }  // end namespace analysis
-}  // end namespace espresso
+}  // end namespace espressopp
