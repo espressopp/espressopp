@@ -44,31 +44,28 @@ namespace espressopp {
 namespace analysis {
 
 
-class SystemMonitorOutput {
+class SystemMonitorOutputCSV {
+  friend class SystemMonitor;
  public:
-  virtual void write() = 0;
-  void setKeys(shared_ptr<std::vector<std::string> > keys) {
-    keys_ = keys;
-  }
-
- protected:
-  shared_ptr<std::vector<std::string> > keys_;
-  shared_ptr<System> system_;
-  bool header_written_;
-}
-
-class SystemMonitorOutputCSV: public SystemMonitorOutput {
- public:
-  SystemMonitorOutputCSV(std::string file_name, std::string delimiter, shared_ptr<System> system) :
-      file_name_(file_name), delimiter_(delimiter), system_(system) {
+  SystemMonitorOutputCSV(std::string file_name, std::string delimiter) :
+      file_name_(file_name), delimiter_(delimiter) {
     header_written_ = false;
   }
   void write();
 
+  void setSystem(shared_ptr<System> system) {
+    system_ = system;
+  }
+
   static void registerPython();
+
  private:
+  shared_ptr<std::vector<std::string> > keys_;
+  shared_ptr<std::vector<real> > values_;
   std::string file_name_;
+  shared_ptr<System> system_;
   std::string delimiter_;
+  bool header_written_;
 };
 
 
@@ -77,31 +74,38 @@ class SystemMonitor : public ParticleAccess {
   typedef std::vector<std::pair<std::string, shared_ptr<Observable> > > ObservableList;
   SystemMonitor(shared_ptr< System > system,
                 shared_ptr<integrator::MDIntegrator> integrator,
-                shared_ptr<SystemMonitorOutput> output):
+                shared_ptr<SystemMonitorOutputCSV> output):
         ParticleAccess(system),
         system_(system),
         integrator_(integrator),
         output_(output) {
+
+    header_ = make_shared<std::vector<std::string> >();
+    values_ = make_shared<std::vector<real> >();
+
     temp_ = shared_ptr<Temperature>(new Temperature(system));
     npart_ = shared_ptr<NPart>(new NPart(system));
 
+    output_->system_ = system;
+    output_->keys_ = header_;
+    output_->values_ = values_;
+
     header_shown_ = false;
     if (system->comm->rank() == 0) {
-      header_.push_back("step");
-      header_.push_back("time");
-      header_.push_back("T");
-      header_.push_back("Ekin");
+      header_->push_back("step");
+      header_->push_back("time");
+      header_->push_back("T");
+      header_->push_back("Ekin");
       visible_observables_.push_back(1);
       visible_observables_.push_back(1);
       visible_observables_.push_back(1);
       visible_observables_.push_back(1);
-      output_->setKeys(header_);
     }
   }
 
   ~SystemMonitor() {
   }
-  void performAction();
+  void perform_action();
   void info();
 
   static void registerPython();
@@ -116,15 +120,15 @@ class SystemMonitor : public ParticleAccess {
   int current_step_;
   bool header_written_;
   bool header_shown_;
-  std::vector<real> values_;
-  std::vector<std::string> header_;
+  shared_ptr<std::vector<real> > values_;
+  shared_ptr<std::vector<std::string> > header_;
   std::vector<int> visible_observables_;
   shared_ptr<System> system_;
   shared_ptr<integrator::MDIntegrator> integrator_;
   shared_ptr<Temperature> temp_;
   shared_ptr<NPart> npart_;
 
-  shared_ptr<SystemMonitorOutput> output_;
+  shared_ptr<SystemMonitorOutputCSV> output_;
   ObservableList observables_;
 };
 

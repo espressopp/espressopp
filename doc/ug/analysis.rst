@@ -31,6 +31,7 @@ analysis
    espressopp.analysis.RDFatomistic.rst
    espressopp.analysis.RadialDistrF.rst
    espressopp.analysis.StaticStructF.rst
+   espressopp.analysis.SystemMonitor.rst
    espressopp.analysis.Temperature.rst
    espressopp.analysis.Test.rst
    espressopp.analysis.Velocities.rst

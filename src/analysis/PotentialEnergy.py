@@ -39,7 +39,7 @@ class PotentialEnergyLocal(ObservableLocal, analysis_PotentialEnergy):
             if set to 'AA' then compute only atomistic part of potential energy.
     """
     def __init__(self, system, potential, compute_method=None):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if pmi.workerIsActive():
             if compute_method is None:
                 compute_method = 'ALL'
             if compute_method not in ['AA', 'CG', 'ALL']:

@@ -114,6 +114,7 @@ namespace espressopp {
       LBOutputVzInTime::registerPython();
 			LBOutputVzOfX::registerPython();
 
+      SystemMonitorOutputCSV::registerPython();
       SystemMonitor::registerPython();
       PotentialEnergy::registerPython();
     }
