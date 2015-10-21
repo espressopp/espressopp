@@ -26,13 +26,14 @@
 #include "Observable.hpp"
 #include "interaction/Interaction.hpp"
 
-namespace espressopp{
+namespace espressopp {
 namespace analysis {
 
 class PotentialEnergy : public Observable {
  public:
-  PotentialEnergy(shared_ptr<System> system, shared_ptr<interaction::Interaction> interaction, bool compute_at)
-      : Observable(system), interaction_(interaction), compute_at_(compute_at) {
+  PotentialEnergy(shared_ptr<System> system, shared_ptr<interaction::Interaction> interaction,
+                  bool compute_at):
+      Observable(system), interaction_(interaction), compute_at_(compute_at) {
     result_type = real_scalar;
     compute_global_ = false;
   }
@@ -51,6 +52,6 @@ class PotentialEnergy : public Observable {
   bool compute_global_;
 };
 }  // end namespace analysis
-}  // end namespace espresso
+}  // end namespace espressopp
 
 #endif

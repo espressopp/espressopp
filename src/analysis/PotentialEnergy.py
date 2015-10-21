@@ -16,44 +16,51 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 """
-***************************
+***************************************
 **espressopp.analysis.PotentialEnergy**
-***************************
+***************************************
+
+The object that computes potential energy of different interactions.
+
+.. function:: espressopp.analysis.PotentialEnergy(system, potential, compute_method=None)
+
+            :param system: The system object
+            :type system: espressopp.System
+            :param interaction: The interaction object.
+            :type interaction: espressopp.interaction.Interaction
+            :param compute_method: If set to `ALL` (default) then compute total potential energies,
+                if set to `CG` then compute only coarse-grained part (if feasible),
+                if set to `AT` then compute only atomitic part of potential energy.
+            :type compute_method: str
 
 """
+
 from espressopp.esutil import cxxinit
 from espressopp import pmi
 
-from espressopp.analysis.Observable import *
+from espressopp.analysis.Observable import *  # NOQA
 from _espressopp import analysis_PotentialEnergy
 
+
 class PotentialEnergyLocal(ObservableLocal, analysis_PotentialEnergy):
-    """The (local) compute of potential energy.
-    Args:
-        system: The system object.
-        potential: The potential object.
-        compute_method: If set to 'ALL' (default) then compute all potential energies,
-            if set to 'CG' then compute only coarse-grained part (if feasible),
-            if set to 'AA' then compute only atomistic part of potential energy.
-    """
-    def __init__(self, system, potential, compute_method=None):
+    """The (local) compute of potential energy."""
+    def __init__(self, system, interaction, compute_method=None):
         if pmi.workerIsActive():
             if compute_method is None:
                 compute_method = 'ALL'
-            if compute_method not in ['AA', 'CG', 'ALL']:
-                raise ValueError('Wrong compute_method, should be ALL, AA or CG')
+            if compute_method not in ['AT', 'CG', 'ALL']:
+                raise ValueError('Wrong compute_method, should be ALL, AT or CG')
 
             if compute_method == 'ALL':
-                cxxinit(self, analysis_PotentialEnergy, system, potential)
+                cxxinit(self, analysis_PotentialEnergy, system, interaction)
             else:
-                cxxinit(self, analysis_PotentialEnergy, system, potential, compute_method == 'AA')
+                cxxinit(self, analysis_PotentialEnergy, system, interaction, compute_method == 'AT')
 
-if pmi.isController :
+if pmi.isController:
     class PotentialEnergy(Observable):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espressopp.analysis.PotentialEnergyLocal',
-            pmiproperty = ['value']
+            cls='espressopp.analysis.PotentialEnergyLocal',
+            pmiproperty=['value']
         )
