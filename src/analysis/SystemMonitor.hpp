@@ -1,10 +1,6 @@
 /*
   Copyright (c) 2015
       Jakub Krajniak (jkrajniak at gmail.com)
-  Copyright (C) 2012,2013
-      Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
-      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 
   This file is part of ESPResSo++.
 
@@ -79,7 +75,6 @@ class SystemMonitor : public ParticleAccess {
         system_(system),
         integrator_(integrator),
         output_(output) {
-
     header_ = make_shared<std::vector<std::string> >();
     values_ = make_shared<std::vector<real> >();
 
