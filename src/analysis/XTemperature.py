@@ -45,8 +45,8 @@ from _espressopp import analysis_XTemperature
 class XTemperatureLocal(ObservableLocal, analysis_XTemperature):
 
   def __init__(self, system):
-    if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():	
-      cxxinit(self, analysis_XTemperature, system)
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        cxxinit(self, analysis_XTemperature, system)
     
   def compute(self, N):
     return self.cxxclass.compute(self, N)

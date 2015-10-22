@@ -118,7 +118,7 @@ class DumpGROAdressLocal(ParticleAccessLocal, io_DumpGROAdress):
     cxxinit(self, io_DumpGROAdress, system, fixedtuplelist, integrator, filename, unfolded, length_factor, length_unit, append)
   
   def dump(self):
-    if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+    if not (pmi._PMIComm and pmi._PMIComm.isActive() ) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       self.cxxclass.dump(self)
   
   

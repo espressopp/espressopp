@@ -56,7 +56,7 @@ from _espressopp import analysis_ConfigsParticleDecomp
 class ConfigsParticleDecompLocal(analysis_ConfigsParticleDecomp):
 
     def __init__(self, system):
-      if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         cxxinit(self, analysis_ConfigsParticleDecomp, system)
     def gather(self):
       return self.cxxclass.gather(self)

@@ -39,7 +39,7 @@ from _espressopp import analysis_NPart
 class NPartLocal(ObservableLocal, analysis_NPart):
 
     def __init__(self, system):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_NPart, system)
 
 if pmi.isController :
