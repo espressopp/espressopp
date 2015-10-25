@@ -61,3 +61,6 @@ from espressopp.analysis.XTemperature import *
 from espressopp.analysis.XPressure import *
 from espressopp.analysis.Test import *
 from espressopp.analysis.ParticleRadiusDistribution import *
+
+from espressopp.analysis.SystemMonitor import *
+from espressopp.analysis.PotentialEnergy import *
