@@ -34,6 +34,7 @@
 #include "LJcos.hpp"
 #include "Morse.hpp"
 #include "CoulombTruncatedUniqueCharge.hpp"
+#include "CoulombTruncated.hpp"
 #include "GravityTruncated.hpp"
 #include "ReactionFieldGeneralized.hpp"
 #include "SoftCosine.hpp"
@@ -99,6 +100,7 @@ namespace espressopp {
       LennardJonesGeneric::registerPython();
       Morse::registerPython();
       CoulombTruncatedUniqueCharge::registerPython();
+      CoulombTruncated::registerPython();
       GravityTruncated::registerPython();
       ReactionFieldGeneralized::registerPython();
       SoftCosine::registerPython();
