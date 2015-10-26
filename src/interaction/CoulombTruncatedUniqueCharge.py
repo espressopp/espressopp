@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2015
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -20,20 +20,17 @@
 
 
 r"""
-*****************************************************
-**espressopp.interaction.CoulombTruncated**
-*****************************************************
+*******************************************************
+**espressopp.interaction.CoulombTruncatedUniqueCharge**
+*******************************************************
 .. math::
 	U = \frac{Q}{d}
 
 where `Q` is the product of the charges of the two particles and `d` is their distance from each other.
 
+In this interaction potential, a unique `Q = q_iq_j` value is specified per potential. For a more flexible truncated Coulomb interaction potential where each individual particle has its own charge `q_i`, see CoulombTruncated.
 
-
-
-
-
-.. function:: espressopp.interaction.CoulombTruncated(qq, cutoff, shift)
+.. function:: espressopp.interaction.CoulombTruncatedUniqueCharge(qq, cutoff, shift)
 
 		:param qq: (default: 1.0)
 		:param cutoff: (default: infinity)
@@ -42,12 +39,12 @@ where `Q` is the product of the charges of the two particles and `d` is their di
 		:type cutoff: 
 		:type shift: 
 
-.. function:: espressopp.interaction.VerletListCoulombTruncated(vl)
+.. function:: espressopp.interaction.VerletListCoulombTruncatedUniqueCharge(vl)
 
 		:param vl: 
 		:type vl: 
 
-.. function:: espressopp.interaction.VerletListCoulombTruncated.getPotential(type1, type2)
+.. function:: espressopp.interaction.VerletListCoulombTruncatedUniqueCharge.getPotential(type1, type2)
 
 		:param type1: 
 		:param type2: 
@@ -55,7 +52,7 @@ where `Q` is the product of the charges of the two particles and `d` is their di
 		:type type2: 
 		:rtype: 
 
-.. function:: espressopp.interaction.VerletListCoulombTruncated.setPotential(type1, type2, potential)
+.. function:: espressopp.interaction.VerletListCoulombTruncatedUniqueCharge.setPotential(type1, type2, potential)
 
 		:param type1: 
 		:param type2: 
@@ -64,12 +61,12 @@ where `Q` is the product of the charges of the two particles and `d` is their di
 		:type type2: 
 		:type potential: 
 
-.. function:: espressopp.interaction.CellListCoulombTruncated(stor)
+.. function:: espressopp.interaction.CellListCoulombTruncatedUniqueCharge(stor)
 
 		:param stor: 
 		:type stor: 
 
-.. function:: espressopp.interaction.CellListCoulombTruncated.setPotential(type1, type2, potential)
+.. function:: espressopp.interaction.CellListCoulombTruncatedUniqueCharge.setPotential(type1, type2, potential)
 
 		:param type1: 
 		:param type2: 
@@ -78,7 +75,7 @@ where `Q` is the product of the charges of the two particles and `d` is their di
 		:type type2: 
 		:type potential: 
 
-.. function:: espressopp.interaction.FixedPairListCoulombTruncated(system, vl, potential)
+.. function:: espressopp.interaction.FixedPairListCoulombTruncatedUniqueCharge(system, vl, potential)
 
 		:param system: 
 		:param vl: 
@@ -87,7 +84,7 @@ where `Q` is the product of the charges of the two particles and `d` is their di
 		:type vl: 
 		:type potential: 
 
-.. function:: espressopp.interaction.FixedPairListCoulombTruncated.setPotential(potential)
+.. function:: espressopp.interaction.FixedPairListCoulombTruncatedUniqueCharge.setPotential(potential)
 
 		:param potential: 
 		:type potential: 
@@ -97,30 +94,30 @@ from espressopp.esutil import *
 
 from espressopp.interaction.Potential import *
 from espressopp.interaction.Interaction import *
-from _espressopp import interaction_CoulombTruncated, \
-                      interaction_VerletListCoulombTruncated, \
-                      interaction_CellListCoulombTruncated, \
-                      interaction_FixedPairListCoulombTruncated
+from _espressopp import interaction_CoulombTruncatedUniqueCharge, \
+                      interaction_VerletListCoulombTruncatedUniqueCharge, \
+                      interaction_CellListCoulombTruncatedUniqueCharge, \
+                      interaction_FixedPairListCoulombTruncatedUniqueCharge
 
-class CoulombTruncatedLocal(PotentialLocal, interaction_CoulombTruncated):
+class CoulombTruncatedUniqueChargeLocal(PotentialLocal, interaction_CoulombTruncatedUniqueCharge):
 
     def __init__(self, qq=1.0,
                  cutoff=infinity, shift="auto"):
-        """Initialize the local CoulombTruncated object."""
+        """Initialize the local CoulombTruncatedUniqueCharge object."""
         if shift =="auto":
             if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-                cxxinit(self, interaction_CoulombTruncated, 
+                cxxinit(self, interaction_CoulombTruncatedUniqueCharge, 
                         qq, cutoff)
         else:
             if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-                cxxinit(self, interaction_CoulombTruncated, 
+                cxxinit(self, interaction_CoulombTruncatedUniqueCharge, 
                         qq, cutoff, shift)
 
-class VerletListCoulombTruncatedLocal(InteractionLocal, interaction_VerletListCoulombTruncated):
+class VerletListCoulombTruncatedUniqueChargeLocal(InteractionLocal, interaction_VerletListCoulombTruncatedUniqueCharge):
 
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_VerletListCoulombTruncated, vl)
+            cxxinit(self, interaction_VerletListCoulombTruncatedUniqueCharge, vl)
 
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -130,48 +127,48 @@ class VerletListCoulombTruncatedLocal(InteractionLocal, interaction_VerletListCo
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
 
-class CellListCoulombTruncatedLocal(InteractionLocal, interaction_CellListCoulombTruncated):
+class CellListCoulombTruncatedUniqueChargeLocal(InteractionLocal, interaction_CellListCoulombTruncatedUniqueCharge):
 
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_CellListCoulombTruncated, stor)
+            cxxinit(self, interaction_CellListCoulombTruncatedUniqueCharge, stor)
         
     def setPotential(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, type1, type2, potential)
 
-class FixedPairListCoulombTruncatedLocal(InteractionLocal, interaction_FixedPairListCoulombTruncated):
+class FixedPairListCoulombTruncatedUniqueChargeLocal(InteractionLocal, interaction_FixedPairListCoulombTruncatedUniqueCharge):
 
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedPairListCoulombTruncated, system, vl, potential)
+            cxxinit(self, interaction_FixedPairListCoulombTruncatedUniqueCharge, system, vl, potential)
 
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
 if pmi.isController:
-    class CoulombTruncated(Potential):
-        'The CoulombTruncated potential.'
+    class CoulombTruncatedUniqueCharge(Potential):
+        'The CoulombTruncatedUniqueCharge potential.'
         pmiproxydefs = dict(
-            cls = 'espressopp.interaction.CoulombTruncatedLocal',
+            cls = 'espressopp.interaction.CoulombTruncatedUniqueChargeLocal',
             pmiproperty = ['qq']
             )
-    class VerletListCoulombTruncated(Interaction):
+    class VerletListCoulombTruncatedUniqueCharge(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.VerletListCoulombTruncatedLocal',
+            cls =  'espressopp.interaction.VerletListCoulombTruncatedUniqueChargeLocal',
             pmicall = ['setPotential','getPotential']
             )
-    class CellListCoulombTruncated(Interaction):
+    class CellListCoulombTruncatedUniqueCharge(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.CellListCoulombTruncatedLocal',
+            cls =  'espressopp.interaction.CellListCoulombTruncatedUniqueChargeLocal',
             pmicall = ['setPotential']
             )
-    class FixedPairListCoulombTruncated(Interaction):
+    class FixedPairListCoulombTruncatedUniqueCharge(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espressopp.interaction.FixedPairListCoulombTruncatedLocal',
+            cls =  'espressopp.interaction.FixedPairListCoulombTruncatedUniqueChargeLocal',
             pmicall = ['setPotential']
             )

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2015
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -32,27 +32,27 @@ namespace espressopp {
     /* This class provides methods to compute forces and energies of
 	the truncated Coulomb potential.
     */
-    class CoulombTruncated : public PotentialTemplate< CoulombTruncated > {
+    class CoulombTruncatedUniqueCharge : public PotentialTemplate< CoulombTruncatedUniqueCharge > {
     private:
       real qq;
 
     public:
       static void registerPython();
 
-      CoulombTruncated()
+      CoulombTruncatedUniqueCharge()
 	: qq(0.0) {
 	setShift(0.0);
 	setCutoff(infinity);
       }
 
-      CoulombTruncated(real _qq,
+      CoulombTruncatedUniqueCharge(real _qq,
 		   real _cutoff, real _shift)
 	: qq(_qq) {
 	setShift(_shift);
 	setCutoff(_cutoff);
       }
 
-      CoulombTruncated(real _qq,
+      CoulombTruncatedUniqueCharge(real _qq,
 		   real _cutoff)
 	: qq(_qq)
       {
@@ -85,11 +85,11 @@ namespace espressopp {
 
     };
     // provide pickle support
-    struct CoulombTruncated_pickle : boost::python::pickle_suite
+    struct CoulombTruncatedUniqueCharge_pickle : boost::python::pickle_suite
     {
       static
       boost::python::tuple
-      getinitargs(CoulombTruncated const& pot)
+      getinitargs(CoulombTruncatedUniqueCharge const& pot)
       {
     	  real q2;
           real rc;
