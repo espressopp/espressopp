@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2015
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -23,49 +23,47 @@
 #include "python.hpp"
 #include "CoulombTruncated.hpp"
 #include "VerletListInteractionTemplate.hpp"
-#include "CellListAllPairsInteractionTemplate.hpp"
-#include "FixedPairListInteractionTemplate.hpp"
+#include "FixedPairListTypesInteractionTemplate.hpp"
+
+//For a Coulombic FixedPairList interaction, it's necessary to use FixedPairListTypesInteractionTemplate.hpp instead of FixedPairListInteractionTemplate.hpp
+//so that we can use _computeForce and _computeEnergy which take both particles and distance vector as arguments
+//because the Coulomb interaction needs access to both the charges (via the particles) and the minimum image distance (via the boundary conditions in the interaction template)
 
 namespace espressopp {
   namespace interaction {
-    typedef class VerletListInteractionTemplate< CoulombTruncated > 
+    typedef class VerletListInteractionTemplate< CoulombTruncated >
     VerletListCoulombTruncated;
-    typedef class CellListAllPairsInteractionTemplate< CoulombTruncated > 
-    CellListCoulombTruncated;
-    typedef class FixedPairListInteractionTemplate< CoulombTruncated >
-    FixedPairListCoulombTruncated;
+    typedef class FixedPairListTypesInteractionTemplate< CoulombTruncated >
+    FixedPairListTypesCoulombTruncated;
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
-    void 
+    void
     CoulombTruncated::registerPython() {
       using namespace espressopp::python;
 
       class_< CoulombTruncated, bases< Potential > >
-    	("interaction_CoulombTruncated", init< real, real >())
-	    .def(init< real, real, real>())
-    	.add_property("qq", &CoulombTruncated::getQQ, &CoulombTruncated::setQQ)
-    	.def_pickle(CoulombTruncated_pickle())
-    	;
+        ("interaction_CoulombTruncated", init< >())
+        .def(init< real, real >())
+        .add_property("prefactor", &CoulombTruncated::getPrefactor, &CoulombTruncated::setPrefactor)
+      ;
 
-      class_< VerletListCoulombTruncated, bases< Interaction > > 
+      class_< VerletListCoulombTruncated, bases< Interaction > >
         ("interaction_VerletListCoulombTruncated", init< shared_ptr<VerletList> >())
         .def("setPotential", &VerletListCoulombTruncated::setPotential)
         .def("getPotential", &VerletListCoulombTruncated::getPotentialPtr)
         ;
 
-      class_< CellListCoulombTruncated, bases< Interaction > > 
-        ("interaction_CellListCoulombTruncated", init< shared_ptr< storage::Storage > >())
-        .def("setPotential", &CellListCoulombTruncated::setPotential)
-	;
-
-      class_< FixedPairListCoulombTruncated, bases< Interaction > >
-        ("interaction_FixedPairListCoulombTruncated",
-          init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<CoulombTruncated> >())
-        .def("setPotential", &FixedPairListCoulombTruncated::setPotential)
+      class_< FixedPairListTypesCoulombTruncated, bases< Interaction > >
+        ("interaction_FixedPairListTypesCoulombTruncated",
+          init< shared_ptr<System>, shared_ptr<FixedPairList> >())
+        .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress> >())
+        .def("setPotential", &FixedPairListTypesCoulombTruncated::setPotential)
         ;
     }
-    
+
   }
 }
+
+
