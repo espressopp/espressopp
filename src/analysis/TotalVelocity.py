@@ -28,16 +28,37 @@ r"""
 
 .. function:: espressopp.analysis.TotalVelocity(system)
 
-		:param system: 
-		:type system: 
+		:param system: The system object.
+		:type system: espressopp.System
 
 .. function:: espressopp.analysis.TotalVelocity.compute()
 
-		:rtype: 
+        Compute the total velocity of the system.
+
+		:rtype: float
 
 .. function:: espressopp.analysis.TotalVelocity.reset()
 
-		:rtype: 
+        Subtract the total velocity of the system from every particle.
+
+Examples
+---------
+
+Reset the velocity
++++++++++++++++++
+
+>>> total_velocity = espressopp.analysis.TotalVelocity(system)
+>>> total_velocity.reset()
+
+Extension to integrator
+++++++++++++++++++++++++++++++++++++++++++++
+
+This extension can also be attached to integrator and run `reset()` every `n-th` steps.
+
+>>> total_velocity = espressopp.analysis.TotalVelocity(system)
+>>> ext_remove_com = espressopp.analysis.ExtAnalyze(total_velocity, 10)
+>>> integrator.addExtension(ext_remove_com)
+
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

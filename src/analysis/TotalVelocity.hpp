@@ -27,7 +27,7 @@
 
 #include "types.hpp"
 #include "Real3D.hpp"
-#include "SystemAccess.hpp"
+#include "ParticleAccess.hpp"
 
 namespace espressopp {
   namespace analysis {
@@ -36,11 +36,11 @@ namespace espressopp {
 	a facility to reset the total velocity of the system.
     */
 
-    class TotalVelocity : public SystemAccess {
+    class TotalVelocity : public ParticleAccess {
 
     public:
 
-      TotalVelocity(shared_ptr<System> system) : SystemAccess (system) {}
+      TotalVelocity(shared_ptr<System> system) : ParticleAccess (system) {}
 
       ~TotalVelocity() {}
 
@@ -49,6 +49,8 @@ namespace espressopp {
 
       /** Reset the total velocity of the system*/
       void reset();
+
+      void perform_action() { reset(); }
 
       Real3D getV() const { return v; }
 

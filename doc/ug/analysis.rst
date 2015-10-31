@@ -35,6 +35,7 @@ analysis
    espressopp.analysis.SystemMonitor.rst
    espressopp.analysis.Temperature.rst
    espressopp.analysis.Test.rst
+   espressopp.analysis.TotalVelocity.rst
    espressopp.analysis.Velocities.rst
    espressopp.analysis.VelocityAutocorrelation.rst
    espressopp.analysis.Viscosity.rst
