@@ -182,13 +182,10 @@ class HarmonicNCosDihedralInteractionType(InteractionType):
         return True
     
 class RyckaertBellemansDihedralInteractionType(InteractionType):
-    def createEspressoInteraction(self, system, fpl, is_cg=None):
+    def createEspressoInteraction(self, system, fpl):
         print('RyckaertBellemans: {}'.format(self.parameters))
         pot = espressopp.interaction.DihedralRB(**{k: v for k, v in self.parameters.iteritems()})
-        if is_cg is not None:
-            return espressopp.interaction.FixedQuadrupleListAdressDihedralRB(system, fpl, pot, is_cg)
-        else:
-            return espressopp.interaction.FixedQuadrupleListDihedralRB(system, fpl, pot)
+        return espressopp.interaction.FixedQuadrupleListDihedralRB(system, fpl, pot)
 
 def ParseBondTypeParam(line):
     tmp = line.split() 
