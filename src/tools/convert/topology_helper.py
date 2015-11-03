@@ -181,6 +181,12 @@ class HarmonicNCosDihedralInteractionType(InteractionType):
     def automaticExclusion(self):
         return True
     
+class RyckaertBellemansDihedralInteractionType(InteractionType):
+    def createEspressoInteraction(self, system, fpl):
+        print('RyckaertBellemans: {}'.format(self.parameters))
+        pot = espressopp.interaction.DihedralRB(**{k: v for k, v in self.parameters.iteritems()})
+        return espressopp.interaction.FixedQuadrupleListDihedralRB(system, fpl, pot)
+
 def ParseBondTypeParam(line):
     tmp = line.split() 
     btype= tmp[2]
@@ -221,6 +227,11 @@ def ParseDihedralTypeParam(line):
     type= int(tmp[4])
     if type == 8:
         p=TabulatedDihedralInteractionType({"tablenr":int(tmp[5]), "k":float(tmp[6])})
+    elif type == 3:
+        tmp[5:11] = map(float, tmp[5:11])
+        p = RyckaertBellemansDihedralInteractionType(
+            {'K0': tmp[5], 'K1': tmp[6], 'K2': tmp[7], 'K3': tmp[8], 'K4': tmp[9], 'K5': tmp[10]}
+        )
     elif (type == 1) or (type == 9): 
         p=HarmonicNCosDihedralInteractionType({"K":float(tmp[6]), "phi0":float(tmp[5]), "multiplicity":int(tmp[7])})
     else:
