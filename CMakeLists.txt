@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 2.8)
 
 project(espressopp)
 
-set(PROJECT_VERSION "0.9.0-dev")
-
 # Cmake modules/macros are in a subdirectory to keep this file cleaner
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
