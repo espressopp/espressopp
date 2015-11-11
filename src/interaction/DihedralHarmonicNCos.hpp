@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2015 (H)
+      Max Planck Institute for Polymer Research
   Copyright (C) 2014
       Jakub Krajniak
   Copyright (C) 2012,2013
@@ -202,7 +204,7 @@ namespace espressopp {
        * @return The value of the force
        */
       real _computeForceRaw(real phi) const {
-        return -1.0*K * multiplicity * sin(phi0 - multiplicity*phi);
+        return -1.0*(1.0/sin(_phi))*K * multiplicity * sin(phi0 - multiplicity*phi);
       }
 
     }; // class

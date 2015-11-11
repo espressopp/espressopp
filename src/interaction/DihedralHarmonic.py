@@ -1,6 +1,4 @@
-#  Copyright (C) 2015
-#      H V Guzman
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2015(H)
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -33,7 +31,6 @@ The dihedral harmonic potential
    U(\phi_{ijkl}) = 0.5K[\phi_{ijkl} - \phi_0)]^2
 
 where the `K` is a constant, the angles should be provided in radians.
-The `N` is a multiplicity.
 
 Reference: Gromacs Manual 4.6.1, section 4.2.11 (page 79-80), equation 4.60
 
