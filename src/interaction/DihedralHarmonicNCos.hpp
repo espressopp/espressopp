@@ -204,8 +204,7 @@ namespace espressopp {
        * @return The value of the force
        */
       real _computeForceRaw(real phi) const {
-	real sin_phi = sin(phi);
-        return -1.0*(1.0/sin_phi)*K * multiplicity * sin(phi0 - multiplicity*phi);
+        return -1.0*(1.0/sin(phi))*K * multiplicity * sin(phi0 - multiplicity*phi);
       }
 
     }; // class
