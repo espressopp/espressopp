@@ -138,7 +138,7 @@ namespace espressopp {
         /// The part of the formula. 1/sin(phi) * d/dphi U(phi)
         /// where the \f$U(\phi) = 0.5 K (\phi_{ijkn} - \phi_0)^2]\f$
         ///
-        /// The derivative of \f$U(phi)\f$ is \f$K*n*sin(\phi_0 - n*\phi)\f$
+        /// The derivative of \f$U(phi)\f$ is \f$K*sin(\phi_0 - \phi)\f$
         ///
         real coef1 = (1.0/sin(_phi)) * (K * (_phi - phi0));
 
@@ -189,6 +189,7 @@ namespace espressopp {
        * @return The value of the force
        */
       real _computeForceRaw(real phi) const {
+	real sin_phi = sin(phi);
 	real coef1 = (1.0/sin(phi)) * K * (phi - phi0);
         return -1.0 * coef1;
       }
