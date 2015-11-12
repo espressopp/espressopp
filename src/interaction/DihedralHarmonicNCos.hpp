@@ -204,6 +204,11 @@ namespace espressopp {
        * @return The value of the force
        */
       real _computeForceRaw(real phi) const {
+	real sin_phi = sin(phi);
+        if (fabs(sin_phi) < 1e-9) {
+          if (sin_phi>0.0) sin_phi = 1e-9;
+	  else sin_phi = -1e-9;  	
+	}
         return -1.0*(1.0/sin(phi))*K * multiplicity * sin(phi0 - multiplicity*phi);
       }
 

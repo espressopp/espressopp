@@ -330,7 +330,7 @@ def read(gro_file, top_file="", doRegularExcl=True):
                 if ((nextline[4]=='4') or (nextline[4]=='2')): 
                     readimptypes = True
                     readdhtypes = False
-                elif ((nextline[4]=='9') or (nextline[4]=='1') or (nextline[4]=='8') or (nextline[4]=='3')):
+		elif int(nextline[4]) in [1, 3, 8, 9]:
                     readdhtypes = True
                     readimptypes = False
                     if (nextline[4]=='8'): print 'Warning: Assuming dihedraltypes of function type 8 are dihedrals, not impropers'
