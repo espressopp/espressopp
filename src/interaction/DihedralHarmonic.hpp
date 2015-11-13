@@ -1,9 +1,5 @@
 /*
-  Copyright (C) 2015 (H)
-      Max Planck Institute for Polymer Research
-  Copyright (C) 2014
-      Jakub Krajniak
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2015 (H)
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -25,8 +21,8 @@
 */
 
 // ESPP_CLASS
-#ifndef _INTERACTION_DIHEDRALHARMONICNCOS_HPP
-#define _INTERACTION_DIHEDRALHARMONICNCOS_HPP
+#ifndef _INTERACTION_DIHEDRALHARMONIC_HPP
+#define _INTERACTION_DIHEDRALHARMONIC_HPP
 
 #include "DihedralPotential.hpp"
 #include <cmath>
@@ -35,52 +31,41 @@ namespace espressopp {
   namespace interaction {
     /**
      * This class provides methods to compute forces and energies of
-     * the DihedralHarmonicNCos dihedral potential.
+     * the DihedralHarmonic dihedral potential.
      *
      * The reference potential is as follow:
-     * \f$U(\phi_{ijkn}) = K\cdot[1+cos(n\cdot\phi_{ijkn} - \phi_0)]\f$
+     * \f$U(\phi_{ijkn}) = 0.5 K (\phi_{ijkn} - \phi_0)^2]\f$
      *
      * where the K is a constant. The angles \f$\phi\f$ and \f$\phi_0\f$ should be
      * provided in radians.
      *
      * The reference documentation:
-     * http://www.uark.edu/ua/fengwang/DLPOLY2/node49.html
+     * Gromacs Manual 4.6.1, section 4.2.11 (page 79-80), equation 4.60
      *
      */
-    class DihedralHarmonicNCos : public DihedralPotentialTemplate< DihedralHarmonicNCos > {
+    class DihedralHarmonic : public DihedralPotentialTemplate< DihedralHarmonic > {
     private:
       real K;
       real phi0;
-      int multiplicity;
 
-      real cos_phi0;
     public:
       static void registerPython();
 
-      DihedralHarmonicNCos(): K(0.0), phi0(0.0), multiplicity(1) { }
-      DihedralHarmonicNCos(real _K, real _phi0, int _multiplicity):
-        K(_K),
-        phi0(_phi0),
-        multiplicity(_multiplicity) {
-
-        cos_phi0 = cos(phi0);
-        if(cos_phi0 < -1.0) cos_phi0 = -1.0;
-        else if(cos_phi0 >  1.0) cos_phi0 =  1.0;
-      }
+      DihedralHarmonic(): K(0.0), phi0(0.0) { }
+      DihedralHarmonic(real _K, real _phi0):
+        K(_K), phi0(_phi0){ }
+      
 
       void setK(real _K) { K = _K; }
       real getK() const { return K; }
 
       void setPhi0(real _phi0) {
         phi0 = _phi0;
-        cos_phi0 = cos(phi0);
-        if(cos_phi0 < -1.0) cos_phi0 = -1.0;
-        else if(cos_phi0 >  1.0) cos_phi0 =  1.0;
+        //cos_phi0 = cos(phi0);
+        //if(cos_phi0 < -1.0) cos_phi0 = -1.0;
+        //else if(cos_phi0 >  1.0) cos_phi0 =  1.0;
       }
       real getPhi0() const { return phi0; }
-
-      void setMultiplicity(real _multiplicity) { multiplicity = _multiplicity; }
-      int getMultiplicity() const { return multiplicity; }
 
       // Kroneker delta function
       real d(int i, int j) const {
@@ -107,7 +92,7 @@ namespace espressopp {
          @return The energy value.
        */
       real _computeEnergyRaw(real _phi) const {
-        real energy = K * (1 + cos(multiplicity*_phi - phi0));
+        real energy = 0.5 * K * (_phi - phi0) * (_phi - phi0);
         return energy;
       }
 
@@ -150,12 +135,11 @@ namespace espressopp {
         }
 
         /// The part of the formula. 1/sin(phi) * d/dphi U(phi)
-        /// where the \f$U(\phi) = K*[1+cos(n*\phi - \phi_0)]\f$
-        /// The n is multiplicity.
+        /// where the \f$U(\phi) = 0.5 K (\phi_{ijkn} - \phi_0)^2]\f$
         ///
-        /// The derivative of \f$U(phi)\f$ is \f$K*n*sin(\phi_0 - n*\phi)\f$
+        /// The derivative of \f$U(phi)\f$ is \f$K*(\phi_0 - \phi)\f$
         ///
-        real coef1 = (1.0/sin(_phi))*(K*multiplicity*sin(phi0 - multiplicity*_phi));
+        real coef1 = (1.0/sin(_phi)) * (K * (_phi - phi0));
 
         real A1 = inv_rijjk * inv_rjkkn;
         real A2 = inv_rijjk * inv_rijjk;
@@ -196,8 +180,8 @@ namespace espressopp {
 
       /*
        * Compute raw force for the tabulated potential, depend only on the phi value
-       * \f$F(\phi) = -grad V = -grad [ K*(1+cos(n*\phi - \phi_0)) ] = K*n*sin(\phi_0 - n*\phi) \f$
-       * where n is a multiplicity and \f$phi_0\f$ is the reference angle
+       * \f$F(\phi) = -grad V = -grad [ 0.5 (\phi_{ijkn} - \phi_0)^2] ]  \f$
+       * where \f$phi_0\f$ is the reference angle
        *
        * @param[in] phi Degree in radians
        *
@@ -209,7 +193,8 @@ namespace espressopp {
           if (sin_phi>0.0) sin_phi = 1e-9;
 	  else sin_phi = -1e-9;  	
 	}
-        return -1.0*(1.0/sin(phi))*K * multiplicity * sin(phi0 - multiplicity*phi);
+	real coef1 = (1.0/sin(phi)) * K * (phi - phi0);
+        return -1.0 * coef1;
       }
 
     }; // class

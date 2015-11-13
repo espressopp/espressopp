@@ -70,6 +70,7 @@ from espressopp.interaction.TabulatedDihedral import *
 from espressopp.interaction.OPLS import *
 from espressopp.interaction.DihedralHarmonicCos import *
 from espressopp.interaction.DihedralHarmonicNCos import *
+from espressopp.interaction.DihedralHarmonic import *
 from espressopp.interaction.DihedralHarmonicUniqueCos import *
 from espressopp.interaction.DihedralRB import *
 
