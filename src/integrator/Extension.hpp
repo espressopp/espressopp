@@ -54,8 +54,8 @@ namespace espressopp {
             FreeEnergyCompensation=5,
             ExtForce=6,
             ExtAnalysis=7,
-            ExtVirtualParticles=8
-            Reaction=8
+            ExtVirtualParticles=8,
+            Reaction=9
         };
 
 
