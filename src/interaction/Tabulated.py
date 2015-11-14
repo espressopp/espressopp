@@ -149,8 +149,10 @@ from _espressopp import interaction_Tabulated, \
                       interaction_VerletListTabulated, \
                       interaction_VerletListAdressTabulated, \
                       interaction_VerletListHadressTabulated, \
+                      interaction_VerletListPIadressTabulated, \
                       interaction_CellListTabulated, \
-                      interaction_FixedPairListTabulated
+                      interaction_FixedPairListTabulated, \
+                      interaction_FixedPairListPIadressTabulated
                       #interaction_FixedTripleListTabulated
 
 class TabulatedLocal(PotentialLocal, interaction_Tabulated):
@@ -187,6 +189,20 @@ class VerletListHadressTabulatedLocal(InteractionLocal, interaction_VerletListHa
     def setPotentialCG(self, type1, type2, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
+            
+class VerletListPIadressTabulatedLocal(InteractionLocal, interaction_VerletListPIadressTabulated):
+    'The (local) tabulated interaction using Verlet lists.'
+    def __init__(self, vl, fixedtupleList, ntrotter):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_VerletListPIadressTabulated, vl, fixedtupleList, ntrotter)
+
+    def setPotentialQM(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialQM(self, type1, type2, potential)        
+            
+    def setPotentialCL(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotentialCL(self, type1, type2, potential)
 
 class VerletListTabulatedLocal(InteractionLocal, interaction_VerletListTabulated):
 
@@ -223,6 +239,16 @@ class FixedPairListTabulatedLocal(InteractionLocal, interaction_FixedPairListTab
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
 
+class FixedPairListPIadressTabulatedLocal(InteractionLocal, interaction_FixedPairListPIadressTabulated):
+    'The (local) tabulated interaction using FixedPair PI lists.'
+    def __init__(self, system, vl, fixedtupleList, potential, ntrotter):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_FixedPairListPIadressTabulated, system, vl, fixedtupleList, potential, ntrotter)
+
+    def setPotential(self, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, potential)
+
 
 if pmi.isController:
     class Tabulated(Potential):
@@ -244,6 +270,13 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListHadressTabulatedLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
+            )
+            
+    class VerletListPIadressTabulated(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.VerletListPIadressTabulatedLocal',
+            pmicall = ['setPotentialQM', 'setPotentialCL']
             )
         
     class VerletListTabulated(Interaction):
@@ -267,3 +300,9 @@ if pmi.isController:
             pmicall = ['setPotential', 'setFixedPairList', 'getFixedPairList']
             )
         
+    class FixedPairListPIadressTabulated(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.FixedPairListPIadressTabulatedLocal',
+            pmicall = ['setPotential', 'setFixedPairList', 'getFixedPairList']
+            )

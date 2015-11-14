@@ -103,14 +103,29 @@ class ParticleLocal(object):
     def pos(self, val): self.__getTmp().pos = toReal3DFromVector(val)
     
     @property
+    def modepos(self): return self.__getTmp().modepos
+    @pos.setter
+    def modepos(self, val): self.__getTmp().modepos = toReal3DFromVector(val)
+    
+    @property
     def type(self): return self.__getTmp().type
     @type.setter
     def type(self, val): self.__getTmp().type = val
     
     @property
+    def pib(self): return self.__getTmp().pib
+    @type.setter
+    def pib(self, val): self.__getTmp().pib = val
+    
+    @property
     def mass(self): return self.__getTmp().mass
     @mass.setter
     def mass(self, val): self.__getTmp().mass = val
+    
+    @property
+    def varmass(self): return self.__getTmp().varmass
+    @mass.setter
+    def varmass(self, val): self.__getTmp().varmass = val
     
     @property
     def q(self): return self.__getTmp().q
