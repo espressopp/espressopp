@@ -19,11 +19,32 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**********************************************
+r"""
+************************************************
 **espressopp.integrator.FreeEnergyCompensation**
-**********************************************
+************************************************
 
+
+.. function:: espressopp.integrator.FreeEnergyCompensation(system, center)
+
+		:param system: 
+		:param center: (default: [])
+		:type system: 
+		:type center: 
+
+.. function:: espressopp.integrator.FreeEnergyCompensation.addForce(itype, filename, type)
+
+		:param itype: 
+		:param filename: 
+		:param type: 
+		:type itype: 
+		:type filename: 
+		:type type: 
+		:rtype: 
+
+.. function:: espressopp.integrator.FreeEnergyCompensation.computeCompEnergy()
+
+		:rtype: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +53,7 @@ from espressopp.integrator.Extension import *
 from _espressopp import integrator_FreeEnergyCompensation 
 
 class FreeEnergyCompensationLocal(ExtensionLocal, integrator_FreeEnergyCompensation):
-    'The (local) Velocity Verlet Integrator.'
+
     def __init__(self, system, center=[]):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_FreeEnergyCompensation, system)

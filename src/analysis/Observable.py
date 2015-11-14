@@ -19,11 +19,17 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-********************************
+r"""
+**********************************
 **espressopp.analysis.Observable**
-********************************
+**********************************
 
+
+
+
+.. function:: espressopp.analysis.Observable.compute()
+
+		:rtype: 
 """
 from espressopp import pmi
 from _espressopp import analysis_Observable
@@ -32,7 +38,7 @@ class result_types:
     none, real_scalar, int_scalar, real_vector, int_vector = range(5)
 
 class ObservableLocal(object):
-    """Abstract local base class for observables."""
+
     def compute(self):
         res_type = self.cxxclass.getResultType(self)
         if res_type == result_types.none:
@@ -50,7 +56,7 @@ class ObservableLocal(object):
 
 if pmi.isController :
     class Observable(object):
-        """Abstract base class for observable."""
+
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             pmicall = [ "compute" ]

@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************************************
+r"""
+**************************************************************
 **BerendsenBarostatAnisotropic** - Berendsen barostat Object
-************************************************************
+**************************************************************
 
 #TODO fix these comments 
 This is the Berendsen barostat implementation according to the original paper [Berendsen84]_.
@@ -30,9 +30,9 @@ If Berendsen barostat is defined (as a property of integrator) then at the each 
 and the particle coordinates will be scaled by scaling parameter :math:`\mu` according to
 the formula:
 
-.. math::   \mu = [1 - \Delta t/\\tau (P_{0} - P)]^{1/3}
+.. math::   \mu = [1 - \Delta t/\tau (P_{0} - P)]^{1/3}
 
-where :math:`\Delta t` - integration timestep, :math:`\\tau` - time parameter (coupling parameter),
+where :math:`\Delta t` - integration timestep, :math:`\tau` - time parameter (coupling parameter),
 :math:`P_{0}` - external pressure and :math:`P` - instantaneous pressure. 
 
 Example:
@@ -61,7 +61,7 @@ Properties:
 
 *   *berendsenP.tau*
 
-    The property 'tau' defines the time parameter :math:`\\tau`.
+    The property 'tau' defines the time parameter :math:`\tau`.
 
 *   *berendsenP.pressure*
     
@@ -103,6 +103,11 @@ Canceling the barostat:
   
     >>> berendsen.connect()
 
+
+.. function:: espressopp.integrator.BerendsenBarostatAnisotropic(system)
+
+		:param system: 
+		:type system: 
 """
 
 
@@ -114,7 +119,7 @@ from _espressopp import integrator_BerendsenBarostatAnisotropic
 
 class BerendsenBarostatAnisotropicLocal(ExtensionLocal, integrator_BerendsenBarostatAnisotropic):
   def __init__(self, system):
-    'The (local) Velocity Verlet Integrator.'
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or \
             pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, integrator_BerendsenBarostatAnisotropic, system)

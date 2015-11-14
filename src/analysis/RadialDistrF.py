@@ -19,11 +19,22 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**********************************
+r"""
+************************************
 **espressopp.analysis.RadialDistrF**
-**********************************
+************************************
 
+
+.. function:: espressopp.analysis.RadialDistrF(system)
+
+		:param system: 
+		:type system: 
+
+.. function:: espressopp.analysis.RadialDistrF.compute(rdfN)
+
+		:param rdfN: 
+		:type rdfN: 
+		:rtype: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,9 +43,10 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_RadialDistrF
 
 class RadialDistrFLocal(ObservableLocal, analysis_RadialDistrF):
-  'The (local) compute the radial distr function.'
+
   def __init__(self, system):
-    cxxinit(self, analysis_RadialDistrF, system)
+    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+      cxxinit(self, analysis_RadialDistrF, system)
     
   def compute(self, rdfN):
     return self.cxxclass.compute(self, rdfN)

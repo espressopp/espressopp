@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2015
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -19,11 +19,20 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***************************
+r"""
+*****************************
 **espressopp.FixedTupleList**
-***************************
+*****************************
 
+
+.. function:: espressopp.FixedTupleList(storage)
+
+		:param storage: 
+		:type storage: 
+
+.. function:: espressopp.FixedTupleList.size()
+
+		:rtype: 
 """
 from espressopp import pmi
 import _espressopp
@@ -31,10 +40,10 @@ import espressopp
 from espressopp.esutil import cxxinit
 
 class FixedTupleListLocal(_espressopp.FixedTupleList):
-    'The (local) fixed tuple list.'
+
 
     def __init__(self, storage):
-        'Local construction of a fixed tuple list'
+
         if pmi.workerIsActive():
             cxxinit(self, _espressopp.FixedTupleList, storage)
 
@@ -45,7 +54,7 @@ class FixedTupleListLocal(_espressopp.FixedTupleList):
 
 
     def size(self):
-        'count number of Tuple in GlobalTupleList, involves global reduction'
+
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 

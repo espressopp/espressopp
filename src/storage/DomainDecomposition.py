@@ -19,11 +19,28 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-****************************************
+r"""
+******************************************
 **espressopp.storage.DomainDecomposition**
-****************************************
+******************************************
 
+
+.. function:: espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+
+		:param system: 
+		:param nodeGrid: 
+		:param cellGrid: 
+		:type system: 
+		:type nodeGrid: 
+		:type cellGrid: 
+
+.. function:: espressopp.storage.DomainDecomposition.getCellGrid()
+
+		:rtype: 
+
+.. function:: espressopp.storage.DomainDecomposition.getNodeGrid()
+
+		:rtype: 
 """
 from espressopp import pmi
 from espressopp.esutil import cxxinit
@@ -36,7 +53,7 @@ import mpi4py.MPI as MPI
 from espressopp.storage.Storage import *
 
 class DomainDecompositionLocal(StorageLocal, storage_DomainDecomposition):
-    'The (local) DomainDecomposition.'
+
     def __init__(self, system, nodeGrid, cellGrid):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, storage_DomainDecomposition, system, nodeGrid, cellGrid)
@@ -76,8 +93,9 @@ if pmi.isController:
                 # minimum image convention check:
                 for k in range(3):
                   if nodeGrid[k]*cellGrid[k] == 1 :
+                    print(("Warning! cellGrid[{}] has been "
+                           "adjusted to 2 (was={})".format(k, cellGrid[k])))
                     cellGrid[k] = 2
-                    print 'cellGrid[%i] has been adjusted to 2'                  
                 self.next_id = 0
                 self.pmiinit(system, nodeGrid, cellGrid)
               else:

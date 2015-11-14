@@ -20,10 +20,44 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***********************************
+r"""
+*************************************
 **espressopp.analysis.TotalVelocity**
-***********************************
+*************************************
+
+
+.. function:: espressopp.analysis.TotalVelocity(system)
+
+		:param system: The system object.
+		:type system: espressopp.System
+
+.. function:: espressopp.analysis.TotalVelocity.compute()
+
+        Compute the total velocity of the system.
+
+		:rtype: float
+
+.. function:: espressopp.analysis.TotalVelocity.reset()
+
+        Subtract the total velocity of the system from every particle.
+
+Examples
+---------
+
+Reset the velocity
++++++++++++++++++
+
+>>> total_velocity = espressopp.analysis.TotalVelocity(system)
+>>> total_velocity.reset()
+
+Extension to integrator
+++++++++++++++++++++++++++++++++++++++++++++
+
+This extension can also be attached to integrator and run `reset()` every `n-th` steps.
+
+>>> total_velocity = espressopp.analysis.TotalVelocity(system)
+>>> ext_remove_com = espressopp.analysis.ExtAnalyze(total_velocity, 10)
+>>> integrator.addExtension(ext_remove_com)
 
 """
 from espressopp.esutil import cxxinit
@@ -33,9 +67,10 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_TotalVelocity
 
 class TotalVelocityLocal(ObservableLocal, analysis_TotalVelocity):
-    'The (local) TotalVelocity.'
+
     def __init__(self, system):
-        cxxinit(self, analysis_TotalVelocity, system)
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+          cxxinit(self, analysis_TotalVelocity, system)
     def compute(self):
         return self.cxxclass.compute(self)
     def reset(self):

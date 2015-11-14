@@ -59,7 +59,8 @@ namespace espressopp {
           pidhy2 = M_PI/(verletList->getHy() * 2);
           dex = verletList->getEx();
           dex2 = dex * dex;
-          dexdhy = dex + verletList->getHy();
+          dhy = verletList->getHy();
+          dexdhy = dex + dhy;
           dexdhy2 = dexdhy * dexdhy;
           
           ntypes = 0;

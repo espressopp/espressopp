@@ -22,6 +22,7 @@
 
 #include "python.hpp"
 #include "LatticeSite.hpp"
+#include <iomanip>
 
 #include "types.hpp"
 #include "System.hpp"
@@ -33,47 +34,15 @@ namespace espressopp {
 
   using namespace iterator;
   namespace integrator {
-    /* SITE CONSTRUCTOR */
-    LBSite::LBSite (shared_ptr<System> system, int _numVels, real _a, real _tau) {
-			/* initialization of populations, moments and equilibrium moments */
-      f   = std::vector<real>(_numVels, 0.);
-      m   = std::vector<real>(_numVels, 0.);
-      meq = std::vector<real>(_numVels, 0.);
-			
-			/* set lattice and time constants */
-      setALoc(_a);
-      setTauLoc(_tau);
-			
-			/* declare RNG */
-      if (!system->rng) {
-        throw std::runtime_error("system has no RNG");
-      }
-      rng = system->rng;
+    LBSite::LBSite () {
+			f   = std::vector<real>(LatticePar::getNumVelsLoc(), 0.);
     }
+		
+/*******************************************************************************************/
 
-    /* SET AND GET PART */
-		/* for populations, moments and equilibrium moments */
+		/* SET AND GET PART */
     void LBSite::setF_i (int _i, real _f) { f[_i] = _f;}
     real LBSite::getF_i (int _i) { return f[_i];}
-
-    void LBSite::setM_i (int _i, real _m) { m[_i] = _m;}
-    real LBSite::getM_i (int _i) { return m[_i];}
-
-    void LBSite::setMeq_i (int _i, real _meq) { meq[_i] = _meq;}
-    real LBSite::getMeq_i (int _i) { return meq[_i];}
-
-    /* for static variables */
-    void LBSite::setALoc (real _a) {aLocal = _a;}
-    real LBSite::getALoc () {return aLocal;}
-
-    void LBSite::setTauLoc (real _tau) {tauLocal = _tau;}
-    real LBSite::getTauLoc () {return tauLocal;}
-
-    void LBSite::setInvBLoc (int _i, real _b) { invLoc_b[_i] = _b;}
-    real LBSite::getInvBLoc (int _i) { return invLoc_b[_i];}
-
-    void LBSite::setEqWLoc (int _i, real _w) { eqWeightLoc[_i] = _w;}
-    real LBSite::getEqWLoc (int _i) { return eqWeightLoc[_i];}
 
     void LBSite::setPhiLoc (int _i, real _phi) { phiLoc[_i] = _phi;}
     real LBSite::getPhiLoc (int _i) { return phiLoc[_i];}
@@ -90,279 +59,360 @@ namespace espressopp {
     void LBSite::setGammaEvenLoc (real _gamma_even) {gamma_evenLoc = _gamma_even;}
     real LBSite::getGammaEvenLoc () { return gamma_evenLoc;}
 
-		/* for local forces */
-    void LBSite::setExtForceLoc (Real3D _extForceLoc) {extForceLoc = _extForceLoc;}
-    Real3D LBSite::getExtForceLoc () {return extForceLoc;}
-		void LBSite::addExtForceLoc (Real3D _extForceLoc) {extForceLoc += _extForceLoc;}
-
-		void LBSite::setCouplForceLoc (Real3D _couplForceLoc) {couplForceLoc = _couplForceLoc;}
-		Real3D LBSite::getCouplForceLoc () {return couplForceLoc;}
-		void LBSite::addCouplForceLoc (Real3D _couplForceLoc) {couplForceLoc += _couplForceLoc;}
+/*******************************************************************************************/
 		
-		/* for LB to MD coupling forces */
-//		Real3D LBSite::getMDForceLoc() {return MDForceLoc;}
-
-    /* OTHER HELPFUL OPERATIONS */
+    /* HELPFUL OPERATIONS WITH POPULATIONS AND MOMENTS */
     void LBSite::scaleF_i (int _i, real _value) { f[_i] *= _value;}
-    void LBSite::scaleM_i (int _i, real _value) { m[_i] *= _value;}
-    void LBSite::addM_i (int _i, real _value) { m[_i] += _value;}
+		
+/*******************************************************************************************/
 
     /* MANAGING STATIC VARIABLES */
     /* create storage for static variables */
-    real LBSite::aLocal   = 0.;
-    real LBSite::tauLocal = 0.;
     std::vector<real> LBSite::phiLoc(19, 0.);
-    std::vector<real> LBSite::invLoc_b(19, 0.);
-    std::vector<real> LBSite::eqWeightLoc(19, 0.);
     real LBSite::gamma_bLoc = 0.;
     real LBSite::gamma_sLoc = 0.;
     real LBSite::gamma_oddLoc = 0.;
     real LBSite::gamma_evenLoc = 0.;
+		
+/*******************************************************************************************/
+		
+		void LBSite::collision(int _lbTempFlag, int _extForceFlag, int _couplForceFlag, Real3D _f) {
+			real m[19];
 
-/*----------------------------------------------------------------------------*/
+			calcLocalMoments(m);
+			
+			relaxMoments(m, _extForceFlag, _f);
 
-    /* CALCULATION OF THE LOCAL MOMENTS */
-    void LBSite::calcLocalMoments() {
-      // IF ONE USES DEFAULT D3Q19 MODEL
-      real f0,
-        f1p2, f1m2, f3p4, f3m4, f5p6, f5m6, f7p8, f7m8, f9p10, f9m10,
-        f11p12, f11m12, f13p14, f13m14, f15p16, f15m16, f17p18, f17m18;
-      /* shorthand functions for "simplified" notation */
-      f0     =  getF_i(0);
-      f1p2   =  getF_i(1) +  getF_i(2);    f1m2 =  getF_i(1) -  getF_i(2);
-      f3p4   =  getF_i(3) +  getF_i(4);    f3m4 =  getF_i(3) -  getF_i(4);
-      f5p6   =  getF_i(5) +  getF_i(6);    f5m6 =  getF_i(5) -  getF_i(6);
-      f7p8   =  getF_i(7) +  getF_i(8);    f7m8 =  getF_i(7) -  getF_i(8);
-      f9p10  =  getF_i(9) + getF_i(10);   f9m10 =  getF_i(9) - getF_i(10);
-      f11p12 = getF_i(11) + getF_i(12);  f11m12 = getF_i(11) - getF_i(12);
-      f13p14 = getF_i(13) + getF_i(14);  f13m14 = getF_i(13) - getF_i(14);
-      f15p16 = getF_i(15) + getF_i(16);  f15m16 = getF_i(15) - getF_i(16);
-      f17p18 = getF_i(17) + getF_i(18);  f17m18 = getF_i(17) - getF_i(18);
-
-      /* mass mode */
-      setM_i (0, f0 + f1p2 + f3p4 + f5p6 + f7p8 + f9p10 + f11p12 + f13p14 + f15p16 + f17p18);
-
-      /* momentum modes */
-      setM_i (1, f1m2 +   f7m8 +  f9m10 + f11m12 + f13m14);
-      setM_i (2, f3m4 +   f7m8 -  f9m10 + f15m16 + f17m18);
-      setM_i (3, f5m6 + f11m12 - f13m14 + f15m16 - f17m18);
-
-      /* stress modes */
-      setM_i (4, -f0 +   f7p8 + f9p10 + f11p12 + f13p14 + f15p16 + f17p18);
-      setM_i (5, 2.*f1p2 -   f3p4 -  f5p6 +   f7p8 +  f9p10 + f11p12 + f13p14 - 2.* (f15p16 + f17p18));
-      setM_i (6, f3p4 -   f5p6 +  f7p8 +  f9p10 - f11p12 - f13p14);
-      setM_i (7, f7p8 -  f9p10);
-      setM_i (8, f11p12 - f13p14);
-      setM_i (9, f15p16 - f17p18);
-
-      /* kinetic (ghost) modes */
-      setM_i (10, -2.* f1m2 +   f7m8 +  f9m10 + f11m12 + f13m14);
-      setM_i (11, -2.* f3m4 +   f7m8 -  f9m10 + f15m16 + f17m18);
-      setM_i (12, -2.* f5m6 + f11m12 - f13m14 + f15m16 - f17m18);
-      setM_i (13, f7m8 +  f9m10 - f11m12 - f13m14);
-      setM_i (14, -f7m8 +  f9m10 + f15m16 + f17m18);
-      setM_i (15, f11m12 - f13m14 - f15m16 + f17m18);
-      setM_i (16, f0 - 2.* (f1p2 + f3p4 + f5p6) +   f7p8 +  f9p10
-					  + f11p12 + f13p14 + f15p16 + f17p18);
-      setM_i (17, -2.* f1p2 +   f3p4 +   f5p6 +   f7p8 +  f9p10 + f11p12
-					  + f13p14 -    2.* (f15p16 + f17p18));
-      setM_i (18, -f3p4 +   f5p6 +   f7p8 +  f9p10 - f11p12 - f13p14);
-
-      // IF NOT THE DEFAULT MODEL, PLEASE WRITE YOUR OWN FUNCTIONS HERE!!!
-      //
-      //
-    }
-
-    /* CALCULATION OF THE EQUILIBRIUM MOMENTS */
-    void LBSite::calcEqMoments(int _extForceFlag) {
-      // IF ONE USES DEFAULT D3Q19 MODEL
-
-      /* density on the site */
-      real rhoLoc = getM_i(0);
-
-      /* moments on the site */
-      Real3D jLoc(getM_i(1), getM_i(2), getM_i(3));
-      jLoc *= (aLocal / tauLocal);
-
-      /* if we have external forces then modify the eq.fluxes */
-			// ADD LB TO MD COUPLING??
-			if (_extForceFlag == 0) printf ("extForceFlag is %d\n",_extForceFlag);
-			if (_extForceFlag == 1) jLoc += 0.5*(getExtForceLoc() + getCouplForceLoc()); // when doing coupling, the flag is set to 1!
-
-      /* eq. stress modes */
-      setMeq_i (4, jLoc.sqr() / rhoLoc);
-      setMeq_i (5, (jLoc[0]*jLoc[0] - jLoc[1]*jLoc[1]) / rhoLoc);
-      setMeq_i (6, (3.*jLoc[0]*jLoc[0] - jLoc.sqr()) / rhoLoc);
-      setMeq_i (7, jLoc[0]*jLoc[1] / rhoLoc);
-      setMeq_i (8, jLoc[0]*jLoc[2] / rhoLoc);
-      setMeq_i (9, jLoc[1]*jLoc[2] / rhoLoc);
-
-      /* kinetic (ghost) modes */
-      setMeq_i (10, 0.); setMeq_i (11, 0.);
-      setMeq_i (12, 0.); setMeq_i (13, 0.);
-      setMeq_i (14, 0.); setMeq_i (15, 0.);
-      setMeq_i (16, 0.); setMeq_i (17, 0.);
-      setMeq_i (18, 0.);
-    }
-
-		/* RELAXATION OF THE MOMENTS TO THEIR EQUILIBRIUM VALUES */
-    void LBSite::relaxMoments (int _numVels) {
-      real pi_eq[6];
-
-      pi_eq[0] =  getMeq_i(4); pi_eq[1] =  getMeq_i(5); pi_eq[2] =  getMeq_i(6);
-      pi_eq[3] =  getMeq_i(7); pi_eq[4] =  getMeq_i(8); pi_eq[5] =  getMeq_i(9);
-
-      real _gamma_b, _gamma_s, _gamma_odd, _gamma_even;
-      _gamma_b = getGammaBLoc();
-      _gamma_s = getGammaSLoc();
-      _gamma_odd = getGammaOddLoc();
-      _gamma_even = getGammaEvenLoc();
-
-      /* relax bulk mode */
-      setM_i (4, pi_eq[0] + _gamma_b * (getM_i(4) - pi_eq[0]));
-
-      /* relax shear modes */
-      setM_i (5, pi_eq[1] + _gamma_s * (getM_i(5) - pi_eq[1]));
-      setM_i (6, pi_eq[2] + _gamma_s * (getM_i(6) - pi_eq[2]));
-      setM_i (7, pi_eq[3] + _gamma_s * (getM_i(7) - pi_eq[3]));
-      setM_i (8, pi_eq[4] + _gamma_s * (getM_i(8) - pi_eq[4]));
-      setM_i (9, pi_eq[5] + _gamma_s * (getM_i(9) - pi_eq[5]));
-
-      /* relax odd modes */
-      scaleM_i (10, _gamma_odd); scaleM_i (11, _gamma_odd); scaleM_i (12, _gamma_odd);
-      scaleM_i (13, _gamma_odd); scaleM_i (14, _gamma_odd); scaleM_i (15, _gamma_odd);
-
-      /* relax even modes */
-      scaleM_i (16, _gamma_even); scaleM_i (17, _gamma_even); scaleM_i (18, _gamma_even);
-    }
-
-		/* ADDING THERMAL FLUCTUATIONS */
-    void LBSite::thermalFluct(int _numVels) {
-			/* values of PhiLoc were already set in LatticeBoltzmann.cpp */
-			/* here we just use them */
-
-			// ADD CONDITION ON DIFFERENT TYPES OF RANDOM NUMBERS!
-			/* squared density on the site */
-			real rootRhoLoc = sqrt(12.*getM_i(0)); // factor 12. comes from usage of
-			// not gaussian but uniformly distributed random numbers
-
-			for (int l = 4; l < _numVels; l++) {
-				addM_i(l, rootRhoLoc*getPhiLoc(l)*((*rng)() - 0.5));
+			if (_lbTempFlag == 1) thermalFluct(m);
+			
+			if (_extForceFlag == 1 || _couplForceFlag == 1) {
+				applyForces(m, _f);
 			}
-			/*	if one rather wants to use random numbers distributed normally, change
-					in the previous lines sqrt(12.*getM_i(0)) -> sqrt(getM_i(0)) and
-					rootRhoLoc*getPhiLoc(l)*((*rng)() - 0.5)) -> rootRhoLoc*getPhiLoc(l)*normal())
-			*/
-    }
-
-    void LBSite::applyForces(int _numVels) {
-      Real3D _f = Real3D(0.,0.,0.);
 			
-			_f = getExtForceLoc() + getCouplForceLoc();
+			btranMomToPop(m);
+		}
+		
+/*******************************************************************************************/
+		
+		/* CALCULATION OF THE LOCAL MOMENTS */
+		void LBSite::calcLocalMoments (real *m) {
+			real f0,
+			f1p2, f1m2, f3p4, f3m4, f5p6, f5m6, f7p8, f7m8, f9p10, f9m10,
+			f11p12, f11m12, f13p14, f13m14, f15p16, f15m16, f17p18, f17m18;
 			
-      // set velocity _u
-      Real3D _u (getM_i(1) + 0.5*_f[0], getM_i(2) + 0.5*_f[1], getM_i(3) + 0.5*_f[2]);
-      _u /= getM_i(0);
-
-      /* update momentum modes */
-      addM_i(1, _f[0]);
-      addM_i(2, _f[1]);
-      addM_i(3, _f[2]);
-
-      /* update stress modes */
-      // See def. of _sigma (Eq.198) in B.Dünweg & A.J.C.Ladd in Adv.Poly.Sci. 221, 89-166 (2009)
-      real _sigma[6];
-      real _gamma_b, _gamma_s;
-      real _scalp;
-      _gamma_b = getGammaBLoc();
-      _gamma_s = getGammaSLoc();
-
-      _scalp = _u*_f;
-      _sigma[0] = (1. + _gamma_s)*_u[0]*_f[0] + 1./3.*(_gamma_b - _gamma_s)*_scalp;
-      _sigma[1] = (1. + _gamma_s)*_u[1]*_f[1] + 1./3.*(_gamma_b - _gamma_s)*_scalp;
-      _sigma[2] = (1. + _gamma_s)*_u[2]*_f[2] + 1./3.*(_gamma_b - _gamma_s)*_scalp;
-      _sigma[3] = 1./2.*(1. + _gamma_s)*(_u[0]*_f[1]+_u[1]*_f[0]);
-      _sigma[4] = 1./2.*(1. + _gamma_s)*(_u[0]*_f[2]+_u[2]*_f[0]);
-      _sigma[5] = 1./2.*(1. + _gamma_s)*(_u[1]*_f[2]+_u[2]*_f[1]);
-
-      addM_i(4, _sigma[0]+_sigma[1]+_sigma[2]);
-      addM_i(5, 2*_sigma[0]-_sigma[1]-_sigma[2]);
-      addM_i(6, _sigma[1]-_sigma[2]);
-      addM_i(7, _sigma[3]);
-      addM_i(8, _sigma[4]);
-      addM_i(9, _sigma[5]);
-    }
-
-    void LBSite::btranMomToPop (int _numVels) {
-      // scale modes with inversed coefficients
-      for (int i = 0; i < _numVels; i++) {
-        scaleM_i (i, invLoc_b[i]);
-      }
-
-      /* Calculate by hand the populations. Hints: lb.c : line 2055
-       * or Schiller p.25 Eq. 2.66 */
-      real _M[19];
-      _M[0] = getM_i(0);
-      _M[1] = getM_i(1); _M[2] = getM_i(2); _M[3] = getM_i(3);
-      _M[4] = getM_i(4); _M[5] = getM_i(5); _M[6] = getM_i(6);
-      _M[7] = getM_i(7); _M[8] = getM_i(8); _M[9] = getM_i(9);
-      _M[10] = getM_i(10); _M[11] = getM_i(11); _M[12] = getM_i(12);
-      _M[13] = getM_i(13); _M[14] = getM_i(14); _M[15] = getM_i(15);
-      _M[16] = getM_i(16); _M[17] = getM_i(17); _M[18] = getM_i(18);
-
-      setF_i(0,_M[0] -_M[4] +_M[16]);
-      setF_i(1,_M[0] +_M[1] + 2.* (_M[5] -_M[10] -_M[16] -_M[17]));
-      setF_i(2,_M[0] -_M[1] + 2.* (_M[5] +_M[10] -_M[16] -_M[17]));
-      setF_i(3,_M[0] +_M[2] -_M[5] +_M[6] - 2.* (_M[11] +_M[16]) +_M[17] -_M[18]);
-      setF_i(4,_M[0] -_M[2] -_M[5] +_M[6] + 2.* (_M[11] -_M[16]) +_M[17] -_M[18]);
-      setF_i(5,_M[0] +_M[3] -_M[5] -_M[6] - 2.* (_M[12] +_M[16]) +_M[17] +_M[18]);
-      setF_i(6,_M[0] -_M[3] -_M[5] -_M[6] + 2.* (_M[12] -_M[16]) +_M[17] +_M[18]);
-
-      setF_i(7,_M[0] +_M[1] +_M[2] +_M[4] +_M[5] +_M[6] +_M[7] +_M[10] +_M[11]
-              +_M[13] -_M[14] +_M[16] +_M[17] +_M[18]);
-      setF_i(8,_M[0] -_M[1] -_M[2] +_M[4] +_M[5] +_M[6] +_M[7] -_M[10] -_M[11]
-              -_M[13] +_M[14] +_M[16] +_M[17] +_M[18]);
-      setF_i(9,_M[0] +_M[1] -_M[2] +_M[4] +_M[5] +_M[6] -_M[7] +_M[10] -_M[11]
-              +_M[13] +_M[14] +_M[16] +_M[17] +_M[18]);
-      setF_i(10,_M[0] -_M[1] +_M[2] +_M[4] +_M[5] +_M[6] -_M[7] -_M[10] +_M[11]
-               -_M[13] -_M[14] +_M[16] +_M[17] +_M[18]);
-
-      setF_i(11,_M[0] +_M[1] +_M[3] +_M[4] +_M[5] -_M[6] +_M[8] +_M[10] +_M[12]
-               -_M[13] +_M[15] +_M[16] +_M[17] -_M[18]);
-      setF_i(12,_M[0] -_M[1] -_M[3] +_M[4] +_M[5] -_M[6] +_M[8] -_M[10] -_M[12]
-               +_M[13] -_M[15] +_M[16] +_M[17] -_M[18]);
-      setF_i(13,_M[0] +_M[1] -_M[3] +_M[4] +_M[5] -_M[6] -_M[8] +_M[10] -_M[12]
-               -_M[13] -_M[15] +_M[16] +_M[17] -_M[18]);
-      setF_i(14,_M[0] -_M[1] +_M[3] +_M[4] +_M[5] -_M[6] -_M[8] -_M[10] +_M[12]
-               +_M[13] +_M[15] +_M[16] +_M[17] -_M[18]);
-
-      setF_i(15,_M[0] +_M[2] +_M[3] +_M[4] - 2.*_M[5] +_M[9] +_M[11] +_M[12]
-               +_M[14] -_M[15] +_M[16] - 2.*_M[17]);
-      setF_i(16,_M[0] -_M[2] -_M[3] +_M[4] - 2.*_M[5] +_M[9] -_M[11] -_M[12]
-               -_M[14] +_M[15] +_M[16] - 2.*_M[17]);
-      setF_i(17,_M[0] +_M[2] -_M[3] +_M[4] - 2.*_M[5] -_M[9] +_M[11] -_M[12]
-               +_M[14] +_M[15] +_M[16] - 2.*_M[17]);
-      setF_i(18,_M[0] -_M[2] +_M[3] +_M[4] - 2.*_M[5] -_M[9] -_M[11] +_M[12]
-               -_M[14] -_M[15] +_M[16] - 2.*_M[17]);
-
-      /* scale populations with weights */
-      for (int i = 0; i < _numVels; i++) {
-        scaleF_i (i, eqWeightLoc[i]);
-      }
-    }
-
+			/* shorthand functions for "simplified" notation */
+			f0     =  getF_i(0);
+			f1p2   =  getF_i(1) +  getF_i(2);    f1m2 =  getF_i(1) -  getF_i(2);
+			f3p4   =  getF_i(3) +  getF_i(4);    f3m4 =  getF_i(3) -  getF_i(4);
+			f5p6   =  getF_i(5) +  getF_i(6);    f5m6 =  getF_i(5) -  getF_i(6);
+			f7p8   =  getF_i(7) +  getF_i(8);    f7m8 =  getF_i(7) -  getF_i(8);
+			f9p10  =  getF_i(9) + getF_i(10);   f9m10 =  getF_i(9) - getF_i(10);
+			f11p12 = getF_i(11) + getF_i(12);  f11m12 = getF_i(11) - getF_i(12);
+			f13p14 = getF_i(13) + getF_i(14);  f13m14 = getF_i(13) - getF_i(14);
+			f15p16 = getF_i(15) + getF_i(16);  f15m16 = getF_i(15) - getF_i(16);
+			f17p18 = getF_i(17) + getF_i(18);  f17m18 = getF_i(17) - getF_i(18);
+			
+			/* mass mode */
+			m[0] = f0 + f1p2 + f3p4 + f5p6 + f7p8 + f9p10 + f11p12 + f13p14 + f15p16 + f17p18;
+			
+			/* momentum modes */
+			m[1] = f1m2 +   f7m8 +  f9m10 + f11m12 + f13m14;
+			m[2] = f3m4 +   f7m8 -  f9m10 + f15m16 + f17m18;
+			m[3] = f5m6 + f11m12 - f13m14 + f15m16 - f17m18;
+			
+			/* stress modes */
+			m[4] = -f0 +   f7p8 + f9p10 + f11p12 + f13p14 + f15p16 + f17p18;
+			m[5] = 2.*f1p2 -   f3p4 -  f5p6 +   f7p8 +  f9p10 + f11p12 + f13p14 - 2.* (f15p16 + f17p18);
+			m[6] = f3p4 -   f5p6 +  f7p8 +  f9p10 - f11p12 - f13p14;
+			m[7] = f7p8 -  f9p10;
+			m[8] = f11p12 - f13p14;
+			m[9] = f15p16 - f17p18;
+			
+			/* kinetic (ghost) modes */
+			m[10] = -2.* f1m2 +   f7m8 +  f9m10 + f11m12 + f13m14;
+			m[11] = -2.* f3m4 +   f7m8 -  f9m10 + f15m16 + f17m18;
+			m[12] = -2.* f5m6 + f11m12 - f13m14 + f15m16 - f17m18;
+			m[13] = f7m8 +  f9m10 - f11m12 - f13m14;
+			m[14] = -f7m8 +  f9m10 + f15m16 + f17m18;
+			m[15] = f11m12 - f13m14 - f15m16 + f17m18;
+			m[16] = f0 - 2.* (f1p2 + f3p4 + f5p6) +   f7p8 +  f9p10
+			+ f11p12 + f13p14 + f15p16 + f17p18;
+			m[17] = -2.* f1p2 +   f3p4 +   f5p6 +   f7p8 +  f9p10 + f11p12
+			+ f13p14 -    2.* (f15p16 + f17p18);
+			m[18] = -f3p4 +   f5p6 +   f7p8 +  f9p10 - f11p12 - f13p14;
+		}
+		
+/*******************************************************************************************/
+		
+		/* RELAXATION OF THE MOMENTS TO THEIR EQUILIBRIUM VALUES */
+		void LBSite::relaxMoments (real *m, int _extForceFlag, Real3D _f) {
+			// moments on the site //
+			real _invTauLoc = 1. / LatticePar::getTauLoc();
+			Real3D jLoc(m[1], m[2], m[3]);
+			jLoc *= LatticePar::getALoc();
+			jLoc *= _invTauLoc;
+			
+			// if we have external forces then modify the eq.fluxes //
+			if (_extForceFlag == 1) jLoc += 0.5 * _f; // when doing coupling, the flag is set to 1!
+			
+			real _invRhoLoc = 1. / m[0];
+			real pi_eq[6];
+			
+			pi_eq[0] =  jLoc.sqr()*_invRhoLoc;
+			pi_eq[1] =  (jLoc[0]*jLoc[0] - jLoc[1]*jLoc[1])*_invRhoLoc;
+			pi_eq[2] =  (3.*jLoc[0]*jLoc[0] - jLoc.sqr())*_invRhoLoc;
+			pi_eq[3] =  jLoc[0]*jLoc[1]*_invRhoLoc;
+			pi_eq[4] =  jLoc[0]*jLoc[2]*_invRhoLoc;
+			pi_eq[5] =  jLoc[1]*jLoc[2]*_invRhoLoc;
+			
+			real _gamma_b = getGammaBLoc();
+			real _gamma_s = getGammaSLoc();
+			real _gamma_odd = getGammaOddLoc();
+			real _gamma_even = getGammaEvenLoc();
+			
+			/* relax bulk mode */
+			m[4] = pi_eq[0] + _gamma_b * (m[4] - pi_eq[0]);
+			
+			/* relax shear modes */
+			m[5] = pi_eq[1] + _gamma_s * (m[5] - pi_eq[1]);
+			m[6] = pi_eq[2] + _gamma_s * (m[6] - pi_eq[2]);
+			m[7] = pi_eq[3] + _gamma_s * (m[7] - pi_eq[3]);
+			m[8] = pi_eq[4] + _gamma_s * (m[8] - pi_eq[4]);
+			m[9] = pi_eq[5] + _gamma_s * (m[9] - pi_eq[5]);
+			
+			/* relax odd modes */
+			m[10] *= _gamma_odd; m[11] *= _gamma_odd; 	m[12] *= _gamma_odd;
+			m[13] *= _gamma_odd; m[14] *= _gamma_odd; 	m[15] *= _gamma_odd;
+			
+			/* relax even modes */
+			m[16] *= _gamma_even; m[17] *= _gamma_even; m[18] *= _gamma_even;
+		}
+		
+/*******************************************************************************************/
+		
+		/* ADDING THERMAL FLUCTUATIONS */
+		void LBSite::thermalFluct (real *m) {
+			/* values of PhiLoc were already set in LatticeBoltzmann.cpp */
+			int _numVelsLoc = LatticePar::getNumVelsLoc();
+			real rootRhoLoc = sqrt(12.*m[0]); // factor 12. comes from usage of
+			// not gaussian but uniformly distributed random numbers
+			
+			for (int l = 4; l < _numVelsLoc; l++) {
+				m[l] += rootRhoLoc*getPhiLoc(l)*((*LatticePar::rng)() - 0.5);
+			}
+			/*	for normally distributed random numbers change
+			 in the previous lines sqrt(12.*getM_i(0)) -> sqrt(getM_i(0)) and
+			 rootRhoLoc*getPhiLoc(l)*((*LatticePar::rng)() - 0.5)) -> 
+			 rootRhoLoc*getPhiLoc(l)*(*LatticePar::normal())
+			 */
+		}
+		
+/*******************************************************************************************/
+		
+		void LBSite::applyForces (real *m, Real3D _f) {
+//			Real3D _f = LBForce().getExtForceLoc() + LBForce().getCouplForceLoc();
+			
+			// set velocity _u
+			Real3D _u = _f;
+			_u *= 0.5;
+			_u[0] += m[1]; 	_u[1] += m[2]; _u[2] += m[3];
+			_u /= m[0];
+			
+			/* update momentum modes */
+			m[1] += _f[0];
+			m[2] += _f[1];
+			m[3] += _f[2];
+			
+			/* update stress modes */
+			// See def. of _sigma (Eq.198) in B.Dünweg & A.J.C.Ladd in Adv.Poly.Sci. 221, 89-166 (2009)
+			real _sigma[6];
+			real _gamma_b = getGammaBLoc();
+			real _gamma_s = getGammaSLoc();
+			real _gamma_sp = _gamma_s + 1.;
+			real _gamma_sph = 0.5 * _gamma_sp;
+			
+			real _scalp = _u*_f;
+			real _secTerm = (1./3.)*(_gamma_b - _gamma_s)*_scalp;
+			
+			_sigma[0] = _gamma_sp*_u[0]*_f[0] + _secTerm;
+			_sigma[1] = _gamma_sp*_u[1]*_f[1] + _secTerm;
+			_sigma[2] = _gamma_sp*_u[2]*_f[2] + _secTerm;
+			_sigma[3] = _gamma_sph*(_u[0]*_f[1]+_u[1]*_f[0]);
+			_sigma[4] = _gamma_sph*(_u[0]*_f[2]+_u[2]*_f[0]);
+			_sigma[5] = _gamma_sph*(_u[1]*_f[2]+_u[2]*_f[1]);
+			
+			m[4] += _sigma[0]+_sigma[1]+_sigma[2];
+			m[5] += 2.*_sigma[0]-_sigma[1]-_sigma[2];
+			m[6] += _sigma[1]-_sigma[2];
+			m[7] += _sigma[3];
+			m[8] += _sigma[4];
+			m[9] += _sigma[5];
+		}
+		
+/*******************************************************************************************/
+		
+		void LBSite::btranMomToPop (real *m) {
+			int _numVelsLoc = LatticePar::getNumVelsLoc();
+//			real _eqWeightLoc[_numVelsLoc];
+			
+			// scale modes with inversed coefficients
+			for (int i = 0; i < _numVelsLoc; i++) {
+				m[i] *= LatticePar::getInvBLoc(i);
+				/* fill in local eq weights */
+//				_eqWeightLoc[i] = LatticePar::getEqWeightLoc(i);
+			}
+			
+			setF_i(0,m[0] -m[4] +m[16]);
+			setF_i(1,m[0] +m[1] + 2.* (m[5] -m[10] -m[16] -m[17]));
+			setF_i(2,m[0] -m[1] + 2.* (m[5] +m[10] -m[16] -m[17]));
+			setF_i(3,m[0] +m[2] -m[5] +m[6] - 2.* (m[11] +m[16]) +m[17] -m[18]);
+			setF_i(4,m[0] -m[2] -m[5] +m[6] + 2.* (m[11] -m[16]) +m[17] -m[18]);
+			setF_i(5,m[0] +m[3] -m[5] -m[6] - 2.* (m[12] +m[16]) +m[17] +m[18]);
+			setF_i(6,m[0] -m[3] -m[5] -m[6] + 2.* (m[12] -m[16]) +m[17] +m[18]);
+			
+			setF_i(7,m[0] +m[1] +m[2] +m[4] +m[5] +m[6] +m[7] +m[10] +m[11]
+						 +m[13] -m[14] +m[16] +m[17] +m[18]);
+			setF_i(8,m[0] -m[1] -m[2] +m[4] +m[5] +m[6] +m[7] -m[10] -m[11]
+						 -m[13] +m[14] +m[16] +m[17] +m[18]);
+			setF_i(9,m[0] +m[1] -m[2] +m[4] +m[5] +m[6] -m[7] +m[10] -m[11]
+						 +m[13] +m[14] +m[16] +m[17] +m[18]);
+			setF_i(10,m[0] -m[1] +m[2] +m[4] +m[5] +m[6] -m[7] -m[10] +m[11]
+						 -m[13] -m[14] +m[16] +m[17] +m[18]);
+			
+			setF_i(11,m[0] +m[1] +m[3] +m[4] +m[5] -m[6] +m[8] +m[10] +m[12]
+						 -m[13] +m[15] +m[16] +m[17] -m[18]);
+			setF_i(12,m[0] -m[1] -m[3] +m[4] +m[5] -m[6] +m[8] -m[10] -m[12]
+						 +m[13] -m[15] +m[16] +m[17] -m[18]);
+			setF_i(13,m[0] +m[1] -m[3] +m[4] +m[5] -m[6] -m[8] +m[10] -m[12]
+						 -m[13] -m[15] +m[16] +m[17] -m[18]);
+			setF_i(14,m[0] -m[1] +m[3] +m[4] +m[5] -m[6] -m[8] -m[10] +m[12]
+						 +m[13] +m[15] +m[16] +m[17] -m[18]);
+			
+			setF_i(15,m[0] +m[2] +m[3] +m[4] - 2.*m[5] +m[9] +m[11] +m[12]
+						 +m[14] -m[15] +m[16] - 2.*m[17]);
+			setF_i(16,m[0] -m[2] -m[3] +m[4] - 2.*m[5] +m[9] -m[11] -m[12]
+						 -m[14] +m[15] +m[16] - 2.*m[17]);
+			setF_i(17,m[0] +m[2] -m[3] +m[4] - 2.*m[5] -m[9] +m[11] -m[12]
+						 +m[14] +m[15] +m[16] - 2.*m[17]);
+			setF_i(18,m[0] -m[2] +m[3] +m[4] - 2.*m[5] -m[9] -m[11] +m[12]
+						 -m[14] -m[15] +m[16] - 2.*m[17]);
+			
+			/* scale populations with weights */
+			for (int i = 0; i < _numVelsLoc; i++) {
+				scaleF_i (i, LatticePar::getEqWeightLoc(i));
+			}
+		}
+		
+/*******************************************************************************************/
+		
     LBSite::~LBSite() {
     }
-
-    GhostLattice::GhostLattice (int _numVels) {
-      pop = std::vector<real>(_numVels, 0.);
+		
+/*******************************************************************************************/
+		
+    LBMom::LBMom () {
+      mom = std::vector<real>(4, 0.);
     }
 
-    /* SET AND GET PART */
-    void GhostLattice::setPop_i (int _i, real _pop) { pop[_i] = _pop;}
-    real GhostLattice::getPop_i (int _i) { return pop[_i];}
+		/* SET AND GET PART */
+    void LBMom::setMom_i (int _i, real _mom) { mom[_i] = _mom;}
+    real LBMom::getMom_i (int _i) { return mom[_i];}
 
-    GhostLattice::~GhostLattice() {
+    LBMom::~LBMom() {
     }
-  }
+		
+/*******************************************************************************************/
+		
+		LatticePar::LatticePar (shared_ptr<System> system, int _numVelsLoc, real _a, real _tau) {
+			setNumVelsLoc(_numVelsLoc);
+			setALoc(_a);
+			setTauLoc(_tau);
+			
+			initEqWeights();
+			initInvBLoc();
+			
+			/* declare RNG */
+			if (!system->rng) {
+				throw std::runtime_error("system has no RNG");
+			}
+			rng = system->rng;
+		}
+		
+/*******************************************************************************************/
+		
+		void LatticePar::setNumVelsLoc (int _numVelsLoc) {numVelsLoc = _numVelsLoc;}
+		int LatticePar::getNumVelsLoc () {return numVelsLoc;}
+		void LatticePar::setALoc (real _a) {aLoc = _a;}
+		real LatticePar::getALoc () {return aLoc;}
+		void LatticePar::setTauLoc (real _tau) {tauLoc = _tau;}
+		real LatticePar::getTauLoc () {return tauLoc;}
+
+		void LatticePar::setInvBLoc (int _i, real _b) { inv_bLoc[_i] = _b;}
+		real LatticePar::getInvBLoc (int _i) { return inv_bLoc[_i];}
+		
+		void LatticePar::setEqWeightLoc (int _i, real _w) { eqWeightLoc[_i] = _w;}
+		real LatticePar::getEqWeightLoc (int _i) { return eqWeightLoc[_i];}
+		
+/*******************************************************************************************/
+		
+		void LatticePar::initEqWeights () {
+			real _sh1 = 1./18.;
+			real _sh2 = 1./36.;
+			
+			// default D3Q19 model
+			setEqWeightLoc(0, 1./3.);
+			setEqWeightLoc(1, _sh1);  setEqWeightLoc(2, _sh1);  setEqWeightLoc(3, _sh1);
+			setEqWeightLoc(4, _sh1);  setEqWeightLoc(5, _sh1);  setEqWeightLoc(6, _sh1);
+			setEqWeightLoc(7, _sh2);  setEqWeightLoc(8, _sh2);  setEqWeightLoc(9, _sh2);
+			setEqWeightLoc(10, _sh2); setEqWeightLoc(11, _sh2); setEqWeightLoc(12, _sh2);
+			setEqWeightLoc(13, _sh2); setEqWeightLoc(14, _sh2); setEqWeightLoc(15, _sh2);
+			setEqWeightLoc(16, _sh2); setEqWeightLoc(17, _sh2); setEqWeightLoc(18, _sh2);
+		}
+		
+/*******************************************************************************************/
+		
+		/* INITIALISATION OF THE LATTICE MODEL: EQ.WEIGHTS, INVERSED COEFFICIENTS */
+		void LatticePar::initInvBLoc () {
+			setInvBLoc(0, 1.);
+			setInvBLoc(1, 3.);				setInvBLoc(2, 3.);				setInvBLoc(3, 3.);
+			setInvBLoc(4, 3./2.);			setInvBLoc(5, 3./4.);			setInvBLoc(6, 9./4.);
+			setInvBLoc(7, 9.);				setInvBLoc(8, 9.);				setInvBLoc(9, 9.);
+			setInvBLoc(10, 3./2.);		setInvBLoc(11, 3./2.);		setInvBLoc(12, 3./2.);
+			setInvBLoc(13, 9./2.);		setInvBLoc(14, 9./2.);		setInvBLoc(15, 9./2.);
+			// In PRE 76, 036704 (2007) the 17th and 18th Bi are swapped in comp. to Ulf's thesis. Here we use the latter one
+			setInvBLoc(16, 1./2.);		setInvBLoc(17, 3./4.);		setInvBLoc(18, 9./4.);
+		}
+		
+/*******************************************************************************************/
+		
+		shared_ptr< esutil::RNG > LatticePar::rng;		// initializer
+		int LatticePar::numVelsLoc = 0;								// initializer
+		real LatticePar::aLoc = 0.;										// initializer
+		real LatticePar::tauLoc = 0.;									// initializer
+		std::vector<real> LatticePar::eqWeightLoc(19, 0.);
+		std::vector<real> LatticePar::inv_bLoc(19, 0.);
+		
+/*******************************************************************************************/
+		
+		LatticePar::~LatticePar() {
+		}
+		
+/*******************************************************************************************/
+		LBForce::LBForce () {
+			extForceLoc = Real3D(0.);
+			couplForceLoc = Real3D(0.);
+		}
+		
+		void LBForce::setExtForceLoc (Real3D _extForceLoc) {extForceLoc = _extForceLoc;}
+		Real3D LBForce::getExtForceLoc () {return extForceLoc;}
+		
+		void LBForce::setCouplForceLoc (Real3D _couplForceLoc) {couplForceLoc = _couplForceLoc;}
+		Real3D LBForce::getCouplForceLoc () {return couplForceLoc;}
+		
+		void LBForce::addExtForceLoc (Real3D _extForceLoc) {extForceLoc += _extForceLoc;}
+		void LBForce::addCouplForceLoc (Real3D _couplForceLoc) {couplForceLoc += _couplForceLoc;}
+
+		LBForce::~LBForce() {
+		}
+	}
 }

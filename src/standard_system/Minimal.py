@@ -19,20 +19,36 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+**************************************
 **espressopp.standard_system.Minimal**
-************************************
+**************************************
 
+
+.. function:: espressopp.standard_system.Minimal(num_particles, box, rc, skin, dt, temperature)
+
+		:param num_particles: 
+		:param box: 
+		:param rc: (default: 1.12246)
+		:param skin: (default: 0.3)
+		:param dt: (default: 0.005)
+		:param temperature: (default: None)
+		:type num_particles: 
+		:type box: 
+		:type rc: real
+		:type skin: real
+		:type dt: real
+		:type temperature: 
+		
+		Return minimal system and integrator whithout any interactions defined:
+		particles have random positions in box
+		if tempearture is != None then Langevin thermostat is set to temperature (gamma is 1.0)
 """
 import espressopp
 import mpi4py.MPI as MPI
 
 def Minimal(num_particles, box, rc=1.12246, skin=0.3, dt=0.005, temperature=None):
-  '''return minimal system and integrator whithout any interactions defined:
-  particles have random positions in box
-  if tempearture is != None then Langevin thermostat is set to temperature (gamma is 1.0)
-  '''
+
   system         = espressopp.System()
   system.rng     = espressopp.esutil.RNG()
   system.bc      = espressopp.bc.OrthorhombicBC(system.rng, box)

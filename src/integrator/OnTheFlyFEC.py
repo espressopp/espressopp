@@ -19,11 +19,42 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***********************************
+r"""
+*************************************
 **espressopp.integrator.OnTheFlyFEC**
-***********************************
+*************************************
 
+
+.. function:: espressopp.integrator.OnTheFlyFEC(system, center)
+
+		:param system: 
+		:param center: (default: [])
+		:type system: 
+		:type center: 
+
+.. function:: espressopp.integrator.OnTheFlyFEC.getBins()
+
+		:rtype: 
+
+.. function:: espressopp.integrator.OnTheFlyFEC.getGap()
+
+		:rtype: 
+
+.. function:: espressopp.integrator.OnTheFlyFEC.getSteps()
+
+		:rtype: 
+
+.. function:: espressopp.integrator.OnTheFlyFEC.makeArrays()
+
+		:rtype: 
+
+.. function:: espressopp.integrator.OnTheFlyFEC.resetCounter()
+
+		:rtype: 
+
+.. function:: espressopp.integrator.OnTheFlyFEC.writeFEC()
+
+		:rtype: 
 """
 
 # NOTE: This scheme is experimental and does currently not properly work.
@@ -37,7 +68,7 @@ from espressopp.integrator.Extension import *
 from _espressopp import integrator_OnTheFlyFEC 
 
 class OnTheFlyFECLocal(ExtensionLocal, integrator_OnTheFlyFEC):
-    'The (local) Velocity Verlet Integrator.'
+
     def __init__(self, system, center=[]):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_OnTheFlyFEC, system)

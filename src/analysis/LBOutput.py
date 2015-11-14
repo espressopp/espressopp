@@ -19,10 +19,32 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-******************************
-**espressopp.analysis.LBOutput**
-******************************
+r"""
+****************************************************************************
+**LBOutput** - abstract base class for analysis / output in LB simulations
+****************************************************************************
+
+Abstract base class for arbitrary output from LB simulations. At the moment, the implemented realisations are:
+
+* :class:`espressopp.analysis.LBOutputScreen` to output local density :math:`rho` and :math:`v_z` component of the velocity as a function of the coordinate :math:`x`.
+* :class:`espressopp.analysis.LBOutputVzInTime` to output velocity component :math:`v_z` of a specific lattice site (the value used at the moment is :math:`{0.25*N_i, 0, 0}`) in time.
+* :class:`espressopp.analysis.LBOutputVzOfX` to output simulation progress and control flux conservation when using MD to LB coupling.
+
+.. note::
+
+	Other types of output classes are possible. It is a subject of user requests.
+
+..
+	This happens in the plane where y and z are equal to zero (index j=k=0). The output takes place into the file vz_of_x.`step`.dat
+
+	Computes and outputs
+
+	* `LBOutputScreen()`
+	Outputs useful information onto the screen.
+
+	* `LBOutputVzInTime()`
+	Computes and outputs a vz component of the velocity as a function of time.
+
 
 """
 from espressopp.esutil import cxxinit
@@ -32,7 +54,7 @@ from espressopp.analysis.AnalysisBase import *
 from _espressopp import analysis_LBOutput
 
 class LBOutputLocal(AnalysisBaseLocal, analysis_LBOutput):
-    'The (local) compute of LBOutput.'
+	#    'The (local) compute of LBOutput.'
     def writeOutput(self):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.writeOutput(self)

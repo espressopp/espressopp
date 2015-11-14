@@ -21,28 +21,28 @@
 */
 
 #include "python.hpp"
-#include "LBOutputProfileVzOfX.hpp"
+#include "LBOutputVzOfX.hpp"
 
 namespace espressopp {
   namespace analysis {
-//    LOG4ESPP_LOGGER(LBOutputProfileVzOfX::theLogger, "LBOutputProfileVzOfX");
-    LBOutputProfileVzOfX::LBOutputProfileVzOfX(shared_ptr<System> system,
+//    LOG4ESPP_LOGGER(LBOutputVzOfX::theLogger, "LBOutputVzOfX");
+    LBOutputVzOfX::LBOutputVzOfX(shared_ptr<System> system,
                                        shared_ptr< integrator::LatticeBoltzmann > latticeboltzmann)
     : LBOutput(system, latticeboltzmann) {}
 
-    void LBOutputProfileVzOfX::writeOutput()
+    void LBOutputVzOfX::writeOutput()
     {
       Int3D _Ni;
       int _numVels;
       int _step;
 
-      _Ni = latticeboltzmann->getNi();
+      _Ni = latticeboltzmann->getMyNi();
       _numVels = latticeboltzmann->getNumVels();
       _step = latticeboltzmann->getStepNum();
 
       // test output in a console
       if (_step == 0)
-      printf("LBOutputProfileVzOfX: Making velocity profile v_z (x)\n\n");
+      printf("LBOutputVzOfX: Making velocity profile v_z (x)\n\n");
 
       std::vector<real> _denLoc;
 //      std::vector<real> _jxLoc;
@@ -61,6 +61,7 @@ namespace espressopp {
        */
       int _j = 0;
       int _k = 0;
+			int _offset = latticeboltzmann->getHaloSkin();
 
       /* interface to create filename for the output profile */
       using std::string;
@@ -77,7 +78,7 @@ namespace espressopp {
       velProfFile = fopen(filename.c_str(),"a");
 
       // creating a profile based on the current populations
-      for (int i = 0; i < _Ni.getItem(0); i++) {
+      for (int i = _offset; i < _Ni.getItem(0) - _offset; i++) {
         for (int l = 0; l < _numVels; l++) {
           _denLoc[i] += latticeboltzmann->getLBFluid(Int3D(i,_j,_k),l);
 //        _jxLoc[i] += latticeboltzmann->getLBFluid(Int3D(i,_j,_k),l) * latticeboltzmann->getCi(l).getItem(0);
@@ -90,14 +91,14 @@ namespace espressopp {
       fclose (velProfFile);
     }
 
-    void LBOutputProfileVzOfX::registerPython() {
+    void LBOutputVzOfX::registerPython() {
       using namespace espressopp::python;
 
-      class_<LBOutputProfileVzOfX, bases< LBOutput > >
-          ("analysis_LBOutputProfile_VzOfX", init< shared_ptr< System >,
+      class_<LBOutputVzOfX, bases< LBOutput > >
+          ("analysis_LBOutput_VzOfX", init< shared_ptr< System >,
                                              shared_ptr< integrator::LatticeBoltzmann > >())
 
-        .def("writeOutput", &LBOutputProfileVzOfX::writeOutput)
+        .def("writeOutput", &LBOutputVzOfX::writeOutput)
       ;
     }
   }

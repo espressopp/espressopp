@@ -19,13 +19,26 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************************************************************
+r"""
+**************************************************************************************
 **LBInitPopUniform** - creates initial populations with uniform density and velocity
-************************************************************************************
+**************************************************************************************
 
-This class creates initial populations with uniform density and velocity
-  
+This class creates LB-fluid with uniform density rho0 and velocity u0. You have only to specify the corresponding parameters.
+
+	Example:
+	
+	>>> initPop = espressopp.integrator.LBInitPopUniform(system,lb)
+	>>> initPop.createDenVel(1.0, Real3D(0.,0.,0.0))
+	>>> # first number is the density, second number is a vector of velocity
+	
+
+.. function:: espressopp.integrator.LBInitPopUniform(system, latticeboltzmann)
+
+		:param system: 
+		:param latticeboltzmann: 
+		:type system: 
+		:type latticeboltzmann: 
 """
 
 from espressopp.esutil import cxxinit
@@ -35,9 +48,8 @@ from espressopp.integrator.LBInit import *
 from _espressopp import integrator_LBInit_PopUniform
 
 class LBInitPopUniformLocal(LBInitLocal, integrator_LBInit_PopUniform):
-    """The (local) compute of LBInitPopUniform."""
     def __init__(self, system, latticeboltzmann):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_LBInit_PopUniform, system, latticeboltzmann)
 
 if pmi.isController :

@@ -19,10 +19,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***********************
+r"""
+*************************
 **espressopp.esutil.RNG**
-***********************
+*************************
+
 
 """
 from espressopp import pmi
@@ -49,6 +50,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.esutil.RNGLocal',
             localcall = [ '__call__', 'normal', 'gamma', 'uniformOnSphere' ],
-            pmicall = [ 'seed' ]
+            pmicall = [ 'seed', 'get_seed' ]
             )
     

@@ -19,11 +19,16 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*********************************************
+r"""
+***********************************************
 **espressopp.analysis.VelocityAutocorrelation**
-*********************************************
+***********************************************
 
+
+.. function:: espressopp.analysis.VelocityAutocorrelation(system)
+
+		:param system: 
+		:type system: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,9 +37,10 @@ from espressopp.analysis.ConfigsParticleDecomp import *
 from _espressopp import analysis_VelocityAutocorrelation
 
 class VelocityAutocorrelationLocal(ConfigsParticleDecompLocal, analysis_VelocityAutocorrelation):
-    'The (local) compute autocorrelation f.'
+
     def __init__(self, system):
-      cxxinit(self, analysis_VelocityAutocorrelation, system)
+      if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        cxxinit(self, analysis_VelocityAutocorrelation, system)
       
 if pmi.isController:
   class VelocityAutocorrelation(ConfigsParticleDecomp):

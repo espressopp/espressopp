@@ -86,12 +86,14 @@ FixedTripleListAdress::~FixedTripleListAdress() {
       if (!p1) {
           std::stringstream msg;
           msg << "atomistic triple particle p1 " << pid1 << " does not exists here and cannot be added";
+          msg << " triplet: " << pid1 << "-" << pid2 << "-" << pid3;
           err.setException( msg.str() );
       }
 
       if (!p3) {
           std::stringstream msg;
-          msg << "atomistic triple particle p3 " << pid1 << " does not exists here and cannot be added";
+          msg << "atomistic triple particle p3 " << pid3 << " does not exists here and cannot be added";
+          msg << " triplet: " << pid1 << "-" << pid2 << "-" << pid3;
           err.setException( msg.str() );
       }
     }

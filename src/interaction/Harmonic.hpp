@@ -26,6 +26,7 @@
 
 #include "Potential.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
+#include "FixedPairListTypesInteractionTemplate.hpp"
 #include <cmath>
 
 namespace espressopp {

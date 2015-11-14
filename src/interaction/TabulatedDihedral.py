@@ -19,11 +19,41 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-******************************************
+r"""
+******************************************************
 **espressopp.interaction.TabulatedDihedral**
-******************************************
+******************************************************
 
+
+
+
+
+
+
+.. function:: espressopp.interaction.TabulatedDihedral(itype, filename)
+
+		:param itype: 
+		:param filename: 
+		:type itype: 
+		:type filename: 
+
+.. function:: espressopp.interaction.FixedQuadrupleListTabulatedDihedral(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedQuadrupleListTabulatedDihedral.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
 """
 # -*- coding: iso-8859-1 -*-
 # -*- coding: iso-8859-1 -*-
@@ -37,14 +67,14 @@ from _espressopp import interaction_TabulatedDihedral, \
 
 
 class TabulatedDihedralLocal(DihedralPotentialLocal, interaction_TabulatedDihedral):
-    'The (local) tabulated dihedral potential.'
+
     def __init__(self, itype, filename):
-        """Initialize the local TabulatedDihedralLocal object."""
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_TabulatedDihedral, itype, filename)
 
 class FixedQuadrupleListTabulatedDihedralLocal(InteractionLocal, interaction_FixedQuadrupleListTabulatedDihedral):
-    'The (local) tanulated dihedral interaction using FixedQuadruple lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedQuadrupleListTabulatedDihedral, system, vl, potential)

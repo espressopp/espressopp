@@ -19,11 +19,132 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*****************************
+r"""
+***************************************
 **espressopp.interaction.Zero**
-*****************************
+***************************************
+This class provides methods for a zero potential
+no interactions between particles, mainly used for debugging and testing
 
+
+
+
+
+.. function:: espressopp.interaction.Zero()
+
+
+.. function:: espressopp.interaction.VerletListZero(vl)
+
+		:param vl: 
+		:type vl: 
+
+.. function:: espressopp.interaction.VerletListZero.getPotential(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype: 
+
+.. function:: espressopp.interaction.VerletListZero.setFixedTupleList(ftpl)
+
+		:param ftpl: 
+		:type ftpl: 
+
+.. function:: espressopp.interaction.VerletListZero.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListAdressZero(vl)
+
+		:param vl: 
+		:type vl: 
+
+.. function:: espressopp.interaction.VerletListAdressZero.setFixedTupleList(ftpl)
+
+		:param ftpl: 
+		:type ftpl: 
+
+.. function:: espressopp.interaction.VerletListAdressZero.setPotentialAT(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListAdressZero.setPotentialCG(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListHadressZero(vl, fixedtupleList)
+
+		:param vl: 
+		:param fixedtupleList: 
+		:type vl: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.interaction.VerletListHadressZero.setFixedTupleList(ftpl)
+
+		:param ftpl: 
+		:type ftpl: 
+
+.. function:: espressopp.interaction.VerletListHadressZero.setPotentialAT(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListHadressZero.setPotentialCG(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.CellListZero(stor)
+
+		:param stor: 
+		:type stor: 
+
+.. function:: espressopp.interaction.CellListZero.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListZero(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListZero.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 """
 from espressopp import pmi
 from espressopp.esutil import *
@@ -39,7 +160,7 @@ from _espressopp import interaction_Zero, \
 
 class ZeroLocal(PotentialLocal, interaction_Zero):
     def __init__(self):
-        """Initialize the local Zero object."""
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_Zero)
 

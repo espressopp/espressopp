@@ -33,8 +33,8 @@ namespace espressopp {
     public:
       /* Constructor for the class */
       LBInit(shared_ptr< System > _system,
-          shared_ptr< LatticeBoltzmann > _latticeboltzmann) {
-        latticeboltzmann = _latticeboltzmann;
+						 shared_ptr< LatticeBoltzmann > _latticeboltzmann) {
+							latticeboltzmann = _latticeboltzmann;
       }
       /* Destructor for the class */
       virtual ~LBInit () {}

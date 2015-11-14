@@ -1,6 +1,6 @@
 #  Copyright (C) 2014
 #      Jakub Krajniak
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2015
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -21,11 +21,44 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*************************************
+r"""
+***************************************
 **espressopp.FixedQuadrupleListAdress**
-*************************************
+***************************************
 
+
+.. function:: espressopp.FixedQuadrupleListAdress(storage, fixedtupleList)
+
+		:param storage: 
+		:param fixedtupleList: 
+		:type storage: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.FixedQuadrupleListAdress.add(pid1, pid2, pid3, pid4)
+
+		:param pid1: 
+		:param pid2: 
+		:param pid3: 
+		:param pid4: 
+		:type pid1: 
+		:type pid2: 
+		:type pid3: 
+		:type pid4: 
+		:rtype: 
+
+.. function:: espressopp.FixedQuadrupleListAdress.addQuadruples(quadruplelist)
+
+		:param quadruplelist: 
+		:type quadruplelist: 
+		:rtype: 
+
+.. function:: espressopp.FixedQuadrupleListAdress.getQuadruples()
+
+		:rtype: 
+
+.. function:: espressopp.FixedQuadrupleListAdress.size()
+
+		:rtype: 
 """
 from espressopp import pmi
 import _espressopp
@@ -33,20 +66,20 @@ import espressopp
 from espressopp.esutil import cxxinit
 
 class FixedQuadrupleListAdressLocal(_espressopp.FixedQuadrupleListAdress):
-    'The (local) fixed quadruple list.'
+
 
     def __init__(self, storage, fixedtupleList):
-        'Local construction of a fixed quadruple list'
+
         if pmi.workerIsActive():
             cxxinit(self, _espressopp.FixedQuadrupleListAdress, storage, fixedtupleList)
 
     def add(self, pid1, pid2, pid3, pid4):
-        'add quadruple to fixed quadruple list'
+
         if pmi.workerIsActive():
             return self.cxxclass.add(self, pid1, pid2, pid3, pid4)
 
     def size(self):
-        'count number of Quadruples in GlobalQuadrupleList, involves global reduction'
+
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 
@@ -63,7 +96,7 @@ class FixedQuadrupleListAdressLocal(_espressopp.FixedQuadrupleListAdress):
                 self.cxxclass.add(self, pid1, pid2, pid3, pid4)
 
     def getQuadruples(self):
-        'return the quadruples of the GlobalQuadrupleList'
+
         if pmi.workerIsActive():
           quadruple = self.cxxclass.getQuadruples(self)
           return quadruple 

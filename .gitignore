@@ -16,3 +16,5 @@ CMakeCache.txt
 CPack*.cmake
 install_manifest.txt
 doc/dg/html/
+CTestTestfile.cmake
+contrib/boost/libespressopp_boost.a

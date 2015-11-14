@@ -21,21 +21,53 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-"""
-*********************************************
+r"""
+*********************************************************
 **espressopp.interaction.DihedralHarmonicNCos**
-*********************************************
+*********************************************************
 
 The dihedral harmonic potential
 
 .. math::
 
-   U(\phi_{ijkl}) = K\cdot[1+cos(N\cdot\phi_{ijkl} - \phi_0)]
+   U(\phi_{ijkl}) = K[1+cos(N\cdot\phi_{ijkl} - \phi_0)]
 
 where the `K` is a constant, the angles should be provided in radians.
 The `N` is a multiplicity.
 
 Reference: http://www.uark.edu/ua/fengwang/DLPOLY2/node49.html
+
+
+
+
+
+
+.. function:: espressopp.interaction.DihedralHarmonicNCos(K, phi0, multiplicity)
+
+		:param K: (default: 0.0)
+		:param phi0: (default: 0.0)
+		:param multiplicity: (default: 1)
+		:type K: real
+		:type phi0: real
+		:type multiplicity: int
+
+.. function:: espressopp.interaction.FixedQuadrupleListDihedralHarmonicNCos(system, fql, potential)
+
+		:param system: 
+		:param fql: 
+		:param potential: 
+		:type system: 
+		:type fql: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedQuadrupleListDihedralHarmonicNCos.getFixedQuadrupleList()
+
+		:rtype: A Python list of lists.
+
+.. function:: espressopp.interaction.FixedQuadrupleListDihedralHarmonicNCos.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 """
 
 
@@ -51,9 +83,9 @@ from _espressopp import interaction_FixedQuadrupleListDihedralHarmonicNCos
 
 
 class DihedralHarmonicNCosLocal(DihedralPotentialLocal, interaction_DihedralHarmonicNCos):
-  'The (local) DihedralHarmoniNCos potential.'
+
   def __init__(self, K=0.0, phi0=0.0, multiplicity=1):
-    """Initialize the local DihedralHarmonicNCos object."""
+
     # pylint: disable=W0212
     if (not (pmi._PMIComm and pmi._PMIComm.isActive())
         or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):

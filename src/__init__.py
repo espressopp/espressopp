@@ -28,6 +28,7 @@ pmiimport('espressopp')
 import _espressopp
 from espressopp.Exceptions import *
 from espressopp.Real3D import *
+from espressopp.Quaternion import *
 from espressopp.RealND import *
 
 from espressopp.Tensor import *

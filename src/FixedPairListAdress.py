@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2015
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+**************************************
 **FixedPairListAdress** - Object
-************************************
+**************************************
 
 The FixedPairListAdress is the Fixed Pair List to be used for AdResS or H-AdResS
 simulations. When creating the FixedPairListAdress one has to provide the storage
@@ -36,6 +36,31 @@ Example - creating the FixedPairListAdress and adding bonds:
 >>> fpl = espressopp.FixedPairListAdress(system.storage, ftpl)
 >>> fpl.addBonds(bonds)
 
+
+.. function:: espressopp.FixedPairListAdress(storage, fixedtupleList)
+
+		:param storage: 
+		:param fixedtupleList: 
+		:type storage: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.FixedPairListAdress.add(pid1, pid2)
+
+		:param pid1: 
+		:param pid2: 
+		:type pid1: 
+		:type pid2: 
+		:rtype: 
+
+.. function:: espressopp.FixedPairListAdress.addBonds(bondlist)
+
+		:param bondlist: 
+		:type bondlist: 
+		:rtype: 
+
+.. function:: espressopp.FixedPairListAdress.getBonds()
+
+		:rtype: 
 """
 
 from espressopp import pmi
@@ -44,19 +69,19 @@ import espressopp
 from espressopp.esutil import cxxinit
 
 class FixedPairListAdressLocal(_espressopp.FixedPairListAdress):
-    'The (local) fixed pair list.'
+
 
     def __init__(self, storage, fixedtupleList):
-        'Local construction of a fixed pair list'
+
         if pmi.workerIsActive():
             cxxinit(self, _espressopp.FixedPairListAdress, storage, fixedtupleList)
 
     def add(self, pid1, pid2):
-        'add pair to fixed pair list'
+
         if pmi.workerIsActive():
             return self.cxxclass.add(self, pid1, pid2)
     def getBonds(self):
-        'return the bonds of the GlobalPairList'
+
         if pmi.workerIsActive():
           bonds=self.cxxclass.getBonds(self)
           return bonds

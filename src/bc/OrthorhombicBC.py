@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+**************************************
 **OrthorhombicBC** - Object
-************************************
+**************************************
 
 Like all boundary condition objects, this class implements
 all the methods of the base class **BC** , which are described in detail
@@ -36,6 +36,18 @@ Example:
 >>> boxsize = (Lx, Ly, Lz)
 >>> bc = espressopp.bc.OrthorhombicBC(rng, boxsize) 
 
+
+.. function:: espressopp.bc.OrthorhombicBC(rng, boxL)
+
+		:param rng: 
+		:param boxL: (default: 1.0)
+		:type rng: 
+		:type boxL: real
+
+.. function:: espressopp.bc.OrthorhombicBC.setBoxL(boxL)
+
+		:param boxL: 
+		:type boxL: 
 """
 
 from espressopp.esutil import cxxinit

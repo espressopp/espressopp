@@ -19,11 +19,18 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***********************************
+r"""
+*************************************
 **espressopp.standard_system.KGMelt**
-***********************************
+*************************************
 
+
+.. function:: espressopp.standard_system.KGMelt(num_chains, chain_len)
+
+		:param num_chains: 
+		:param chain_len: 
+		:type num_chains: 
+		:type chain_len: 
 """
 import espressopp
 

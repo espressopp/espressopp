@@ -19,11 +19,16 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-****************************
+r"""
+******************************
 **espressopp.analysis.MaxPID**
-****************************
+******************************
 
+
+.. function:: espressopp.analysis.MaxPID(system)
+
+		:param system: 
+		:type system: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,9 +37,9 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_MaxPID
 
 class MaxPIDLocal(ObservableLocal, analysis_MaxPID):
-    'The (local) compute of the maximum pid number of the system.'
+
     def __init__(self, system):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_MaxPID, system)
 
 if pmi.isController :

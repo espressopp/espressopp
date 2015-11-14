@@ -19,11 +19,143 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************************
+r"""
+************************************************************
 **espressopp.interaction.StillingerWeberPairTerm**
-************************************************
+************************************************************
+This class provides methods to compute forces and energies of
+2 body term of Stillinger-Weber potential.
 
+.. math::
+	U = \varepsilon A  \left[ {\frac{d}{\sigma}}^{-p} (B  - 1 )\right] exp\left(\frac{1}{\frac{d}{\sigma} - r_c}\right)
+
+where :math:`r_c` is the cutoff-radius.
+
+
+
+
+
+
+.. function:: espressopp.interaction.StillingerWeberPairTerm(A, B, p, q, epsilon, sigma, cutoff)
+
+		:param A: 
+		:param B: 
+		:param p: 
+		:param q: 
+		:param epsilon: (default: 1.0)
+		:param sigma: (default: 1.0)
+		:param cutoff: (default: infinity)
+		:type A: 
+		:type B: 
+		:type p: 
+		:type q: 
+		:type epsilon: real
+		:type sigma: real
+		:type cutoff: 
+
+.. function:: espressopp.interaction.VerletListStillingerWeberPairTerm(vl)
+
+		:param vl: 
+		:type vl: 
+
+.. function:: espressopp.interaction.VerletListStillingerWeberPairTerm.getPotential(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype: 
+
+.. function:: espressopp.interaction.VerletListStillingerWeberPairTerm.getVerletList()
+
+		:rtype: A Python list of lists.
+
+.. function:: espressopp.interaction.VerletListStillingerWeberPairTerm.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListAdressStillingerWeberPairTerm(vl, fixedtupleList)
+
+		:param vl: 
+		:param fixedtupleList: 
+		:type vl: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.interaction.VerletListAdressStillingerWeberPairTerm.setPotentialAT(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListAdressStillingerWeberPairTerm.setPotentialCG(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListHadressStillingerWeberPairTerm(vl, fixedtupleList)
+
+		:param vl: 
+		:param fixedtupleList: 
+		:type vl: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.interaction.VerletListHadressStillingerWeberPairTerm.setPotentialAT(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListHadressStillingerWeberPairTerm.setPotentialCG(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.CellListStillingerWeberPairTerm(stor)
+
+		:param stor: 
+		:type stor: 
+
+.. function:: espressopp.interaction.CellListStillingerWeberPairTerm.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListStillingerWeberPairTerm(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListStillingerWeberPairTerm.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -38,14 +170,14 @@ from _espressopp import interaction_StillingerWeberPairTerm, \
                       interaction_FixedPairListStillingerWeberPairTerm
 
 class StillingerWeberPairTermLocal(PotentialLocal, interaction_StillingerWeberPairTerm):
-  'The (local) Lennard-Jones potential.'
+
   def __init__(self, A, B, p, q, epsilon=1.0, sigma=1.0, cutoff=infinity):
-    """Initialize the local Lennard Jones object."""
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_StillingerWeberPairTerm, A, B, p, q, epsilon, sigma, cutoff)
 
 class VerletListStillingerWeberPairTermLocal(InteractionLocal, interaction_VerletListStillingerWeberPairTerm):
-  'The (local) Lennard Jones interaction using Verlet lists.'
+
   def __init__(self, vl):
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_VerletListStillingerWeberPairTerm, vl)
@@ -63,7 +195,7 @@ class VerletListStillingerWeberPairTermLocal(InteractionLocal, interaction_Verle
       return self.cxxclass.getVerletList(self)
 
 class VerletListAdressStillingerWeberPairTermLocal(InteractionLocal, interaction_VerletListAdressStillingerWeberPairTerm):
-  'The (local) Lennard Jones interaction using Verlet lists.'
+
   def __init__(self, vl, fixedtupleList):
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_VerletListAdressStillingerWeberPairTerm, vl, fixedtupleList)
@@ -77,7 +209,7 @@ class VerletListAdressStillingerWeberPairTermLocal(InteractionLocal, interaction
       self.cxxclass.setPotentialCG(self, type1, type2, potential)
       
 class VerletListHadressStillingerWeberPairTermLocal(InteractionLocal, interaction_VerletListHadressStillingerWeberPairTerm):
-  'The (local) Lennard Jones interaction using Verlet lists.'
+
   def __init__(self, vl, fixedtupleList):
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_VerletListHadressStillingerWeberPairTerm, vl, fixedtupleList)
@@ -91,7 +223,7 @@ class VerletListHadressStillingerWeberPairTermLocal(InteractionLocal, interactio
       self.cxxclass.setPotentialCG(self, type1, type2, potential)
       
 class CellListStillingerWeberPairTermLocal(InteractionLocal, interaction_CellListStillingerWeberPairTerm):
-  'The (local) Lennard Jones interaction using cell lists.'
+
   def __init__(self, stor):
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_CellListStillingerWeberPairTerm, stor)
@@ -101,7 +233,7 @@ class CellListStillingerWeberPairTermLocal(InteractionLocal, interaction_CellLis
       self.cxxclass.setPotential(self, type1, type2, potential)
 
 class FixedPairListStillingerWeberPairTermLocal(InteractionLocal, interaction_FixedPairListStillingerWeberPairTerm):
-  'The (local) Lennard-Jones interaction using FixedPair lists.'
+
   def __init__(self, system, vl, potential):
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_FixedPairListStillingerWeberPairTerm, system, vl, potential)

@@ -19,11 +19,53 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+************************************************
 **espressopp.interaction.VSphereSelf**
-************************************
+************************************************
 
+This class provides methods to compute forces and energies of
+the VSphereSelf potential.
+
+.. math::
+        U  =   e_1\left(\frac{4}{3}\pi \sigma_2\right)^{\frac{3}{2}}
+                  + \frac{a_1 {N_b}^3}{{\sigma_2}^3}
+                  + \frac{2a_2}{N_b} \sigma_2
+
+
+
+
+
+.. function:: espressopp.interaction.VSphereSelf(e1, a1, a2, Nb, cutoff, shift)
+
+		:param e1: (default: 0.0)
+		:param a1: (default: 1.0)
+		:param a2: (default: 0.0)
+		:param Nb: (default: 1)
+		:param cutoff: (default: infinity)
+		:param shift: (default: 0.0)
+		:type e1: real
+		:type a1: real
+		:type a2: real
+		:type Nb: int
+		:type cutoff: 
+		:type shift: real
+
+.. function:: espressopp.interaction.SelfVSphere(system, potential)
+
+		:param system: 
+		:param potential: 
+		:type system: 
+		:type potential: 
+
+.. function:: espressopp.interaction.SelfVSphere.getPotential()
+
+		:rtype: 
+
+.. function:: espressopp.interaction.SelfVSphere.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -33,7 +75,7 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_VSphereSelf, interaction_SelfVSphere
 
 class VSphereSelfLocal(PotentialLocal, interaction_VSphereSelf):
-    'The (local) VSphereSelf potential.'
+
     def __init__(self, e1=0.0, a1=1.0, a2=0.0, Nb=1, 
                  cutoff=infinity, shift=0.0):
         """Initialize the local VSphere object."""
@@ -44,7 +86,7 @@ class VSphereSelfLocal(PotentialLocal, interaction_VSphereSelf):
                 cxxinit(self, interaction_VSphereSelf, e1, a1, a2, Nb, cutoff, shift)
 
 class SelfVSphereLocal(InteractionLocal, interaction_SelfVSphere):
-    'The (local) VSphere interaction using Cell List lists.'
+
     def __init__(self, system, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_SelfVSphere, system, potential)

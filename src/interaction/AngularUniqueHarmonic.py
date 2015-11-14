@@ -19,11 +19,39 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**********************************************
+r"""
+**********************************************************
 **espressopp.interaction.AngularUniqueHarmonic**
-**********************************************
+**********************************************************
 
+Calculates the Angular Unique Harmonic interaction
+
+.. math::
+	U = K (\theta - \theta_0)^2
+
+
+
+
+
+
+.. function:: espressopp.interaction.AngularUniqueHarmonic(K)
+
+		:param K: (default: 1.0)
+		:type K: real
+
+.. function:: espressopp.interaction.FixedTripleAngleListAngularUniqueHarmonic(system, ftal, potential)
+
+		:param system: 
+		:param ftal: 
+		:param potential: 
+		:type system: 
+		:type ftal: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedTripleAngleListAngularUniqueHarmonic.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 """
 from espressopp import pmi
 from espressopp.esutil import *
@@ -34,14 +62,14 @@ from _espressopp import interaction_AngularUniqueHarmonic, \
                       interaction_FixedTripleAngleListAngularUniqueHarmonic
 
 class AngularUniqueHarmonicLocal(AngularUniquePotentialLocal, interaction_AngularUniqueHarmonic):
-    'The (local) AngularUniqueHarmonic potential.'
+
     def __init__(self, K=1.0):
-        """Initialize the local AngularUniqueHarmonic object."""
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_AngularUniqueHarmonic, K)
 
 class FixedTripleAngleListAngularUniqueHarmonicLocal(InteractionLocal, interaction_FixedTripleAngleListAngularUniqueHarmonic):
-    'The (local) AngularUniqueHarmonic interaction using FixedTriple lists.'
+
     def __init__(self, system, ftal, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedTripleAngleListAngularUniqueHarmonic, system, ftal, potential)
@@ -52,7 +80,6 @@ class FixedTripleAngleListAngularUniqueHarmonicLocal(InteractionLocal, interacti
 
 if pmi.isController:
     class AngularUniqueHarmonic(AngularUniquePotential):
-        'The AngularUniqueHarmonic potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.AngularUniqueHarmonicLocal',
             pmiproperty = ['K']

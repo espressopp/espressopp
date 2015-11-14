@@ -19,11 +19,125 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**********************************
+r"""
+**********************************************
 **espressopp.interaction.Tabulated**
-**********************************
+**********************************************
 
+
+
+
+
+
+
+.. function:: espressopp.interaction.Tabulated(itype, filename, cutoff)
+
+		:param itype: 
+		:param filename: 
+		:param cutoff: (default: infinity)
+		:type itype: 
+		:type filename: 
+		:type cutoff: 
+
+.. function:: espressopp.interaction.VerletListAdressTabulated(vl, fixedtupleList)
+
+		:param vl: 
+		:param fixedtupleList: 
+		:type vl: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.interaction.VerletListAdressTabulated.setPotentialAT(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListAdressTabulated.setPotentialCG(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListHadressTabulated(vl, fixedtupleList)
+
+		:param vl: 
+		:param fixedtupleList: 
+		:type vl: 
+		:type fixedtupleList: 
+
+.. function:: espressopp.interaction.VerletListHadressTabulated.setPotentialAT(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListHadressTabulated.setPotentialCG(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.VerletListTabulated(vl)
+
+		:param vl: 
+		:type vl: 
+
+.. function:: espressopp.interaction.VerletListTabulated.getPotential(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype: 
+
+.. function:: espressopp.interaction.VerletListTabulated.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.CellListTabulated(stor)
+
+		:param stor: 
+		:type stor: 
+
+.. function:: espressopp.interaction.CellListTabulated.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListTabulated(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListTabulated.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 """
 # -*- coding: iso-8859-1 -*-
 from espressopp import pmi, infinity
@@ -40,14 +154,14 @@ from _espressopp import interaction_Tabulated, \
                       #interaction_FixedTripleListTabulated
 
 class TabulatedLocal(PotentialLocal, interaction_Tabulated):
-    'The (local) tabulated potential.'
+
     def __init__(self, itype, filename, cutoff=infinity):
-        """Initialize the local Tabulated object."""
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_Tabulated, itype, filename, cutoff)
 
 class VerletListAdressTabulatedLocal(InteractionLocal, interaction_VerletListAdressTabulated):
-    'The (local) tabulated interaction using Verlet lists.'
+
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListAdressTabulated, vl, fixedtupleList)
@@ -61,7 +175,7 @@ class VerletListAdressTabulatedLocal(InteractionLocal, interaction_VerletListAdr
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
             
 class VerletListHadressTabulatedLocal(InteractionLocal, interaction_VerletListHadressTabulated):
-    'The (local) tabulated interaction using Verlet lists.'
+
     def __init__(self, vl, fixedtupleList):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListHadressTabulated, vl, fixedtupleList)
@@ -75,7 +189,7 @@ class VerletListHadressTabulatedLocal(InteractionLocal, interaction_VerletListHa
             self.cxxclass.setPotentialCG(self, type1, type2, potential)
 
 class VerletListTabulatedLocal(InteractionLocal, interaction_VerletListTabulated):
-    'The (local) tabulated interaction using Verlet lists.'
+
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListTabulated, vl)
@@ -95,7 +209,7 @@ class VerletListTabulatedLocal(InteractionLocal, interaction_VerletListTabulated
 		  return self.cxxclass.setVerletList(self, vl)
 
 class CellListTabulatedLocal(InteractionLocal, interaction_CellListTabulated):
-    'The (local) tabulated interaction using cell lists.'
+
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListTabulated, stor)
@@ -106,7 +220,7 @@ class CellListTabulatedLocal(InteractionLocal, interaction_CellListTabulated):
 
 
 class FixedPairListTabulatedLocal(InteractionLocal, interaction_FixedPairListTabulated):
-    'The (local) tabulated interaction using FixedPair lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListTabulated, system, vl, potential)

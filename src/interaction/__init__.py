@@ -39,6 +39,7 @@ from espressopp.interaction.LennardJonesGromacs import *
 from espressopp.interaction.LennardJonesGeneric import *
 from espressopp.interaction.LJcos import *
 from espressopp.interaction.Morse import *
+from espressopp.interaction.CoulombTruncatedUniqueCharge import *
 from espressopp.interaction.CoulombTruncated import *
 from espressopp.interaction.GravityTruncated import *
 from espressopp.interaction.ReactionFieldGeneralized import *
@@ -70,6 +71,7 @@ from espressopp.interaction.OPLS import *
 from espressopp.interaction.DihedralHarmonicCos import *
 from espressopp.interaction.DihedralHarmonicNCos import *
 from espressopp.interaction.DihedralHarmonicUniqueCos import *
+from espressopp.interaction.DihedralRB import *
 
 from espressopp.interaction.CoulombKSpaceEwald import *
 from espressopp.interaction.CoulombRSpace import *

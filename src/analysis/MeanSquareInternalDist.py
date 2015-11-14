@@ -19,10 +19,21 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-********************************************
+r"""
+**********************************************
 **espressopp.analysis.MeanSquareInternalDist**
-********************************************
+**********************************************
+
+.. function:: espressopp.analysis.MeanSquareInternalDist(system, chainlength)
+
+		:param system: 
+		:param chainlength: 
+		:type system: 
+		:type chainlength: 
+
+.. function:: espressopp.analysis.MeanSquareInternalDist.strange()
+
+		:rtype: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -33,7 +44,8 @@ from _espressopp import analysis_MeanSquareInternalDist
 class MeanSquareInternalDistLocal(ConfigsParticleDecompLocal, analysis_MeanSquareInternalDist):
     
     def __init__(self, system, chainlength):
-        cxxinit(self, analysis_MeanSquareInternalDist, system, chainlength)   
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+          cxxinit(self, analysis_MeanSquareInternalDist, system, chainlength)   
         
     def strange(self):
       print 1

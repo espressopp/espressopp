@@ -19,11 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*******************
+r"""
+*********************
 **espressopp.Tensor**
-*******************
-
+*********************
 """
 from _espressopp import Tensor
 from espressopp import esutil
@@ -31,8 +30,8 @@ from espressopp import esutil
 # This injects additional methods into the Tensor class and pulls it
 # into this module 
 class __Tensor(Tensor) :
-    """Basic tensor vector as used by ESPResSo++.
-    """
+
+
     __metaclass__ = esutil.ExtendBaseClass
 
     __originit = Tensor.__init__

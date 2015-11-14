@@ -19,11 +19,43 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-********************************************
+r"""
+********************************************************
 **espressopp.interaction.DihedralHarmonicCos**
-********************************************
+********************************************************
 
+.. math::
+	U = K (cos(\phi) - cos(\phi_0))^2
+
+
+
+
+
+
+.. function:: espressopp.interaction.DihedralHarmonicCos(K, phi0)
+
+		:param K: (default: 0.0)
+		:param phi0: (default: 0.0)
+		:type K: real
+		:type phi0: real
+
+.. function:: espressopp.interaction.FixedQuadrupleListDihedralHarmonicCos(system, fql, potential)
+
+		:param system: 
+		:param fql: 
+		:param potential: 
+		:type system: 
+		:type fql: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedQuadrupleListDihedralHarmonicCos.getFixedQuadrupleList()
+
+		:rtype: A Python list of lists.
+
+.. function:: espressopp.interaction.FixedQuadrupleListDihedralHarmonicCos.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 """
 from espressopp import pmi
 from espressopp.esutil import *
@@ -33,14 +65,14 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_DihedralHarmonicCos, interaction_FixedQuadrupleListDihedralHarmonicCos
 
 class DihedralHarmonicCosLocal(DihedralPotentialLocal, interaction_DihedralHarmonicCos):
-  'The (local) DihedralHarmonicCos potential.'
+
   def __init__(self, K=0.0, phi0=0.0):
-    """Initialize the local DihedralHarmonicCos object."""
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_DihedralHarmonicCos, K, phi0)
 
 class FixedQuadrupleListDihedralHarmonicCosLocal(InteractionLocal, interaction_FixedQuadrupleListDihedralHarmonicCos):
-  'The (local) DihedralHarmonicCos interaction using FixedQuadruple lists.'
+
   def __init__(self, system, fql, potential):
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_FixedQuadrupleListDihedralHarmonicCos, system, fql, potential)

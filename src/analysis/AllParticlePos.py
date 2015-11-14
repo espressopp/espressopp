@@ -19,17 +19,22 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+**************************************
 **espressopp.analysis.AllParticlePos**
-************************************
+**************************************
 
+
+
+.. function:: espressopp.analysis.AllParticlePos.gatherAllPositions()
+
+		:rtype: 
 """
 from espressopp import pmi
 from _espressopp import analysis_AllParticlePos
 
 class AllParticlePosLocal(object):
-    """Abstract local base class for observables."""
+
     def gatherAllPositions(self):
       return self.cxxclass.gatherAllPositions(self)
 

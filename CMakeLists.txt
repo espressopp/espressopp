@@ -10,6 +10,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 enable_language(C)
 enable_language(CXX)
 
+enable_testing()
+
 ######################################################################
 # compiler tests
 # these need ot be done early (before further tests).
@@ -23,9 +25,9 @@ include(CheckCXXCompilerFlag)
 ########################################################################
 option(EXTERNAL_BOOST "Use external boost" ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
-if (NOT DEFINED LIB)
-  set(LIB "lib")
-endif(NOT DEFINED LIB)
+if(NOT BUILD_SHARED_LIBS)
+  message(WARNING "Building static libraries might lead to problems with python modules - you are on your own!")
+endif()
 
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release CACHE STRING
@@ -117,13 +119,18 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 # add_definitions( -DHAVE_CONFIG_H )
 
 if (EXTERNAL_BOOST)
-  find_package(Boost 1.55.0 COMPONENTS mpi python serialization filesystem)
+  set(Boost_VERSION 1.55.0)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "5")
+    set(Boost_VERSION 1.58.0) #issue #8
+  endif()
+  find_package(Boost ${Boost_VERSION} COMPONENTS mpi python serialization filesystem)
   if(NOT Boost_FOUND)
     message(FATAL_ERROR "Boost not found, make sure you have installed boost and it's dev packages. To hint cmake to your Boost installation, use the option -DBOOST_ROOT=/path/to/boost. As last resort you can use our internal replacement with -DEXTERNAL_BOOST=OFF")
   endif(NOT Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 else(EXTERNAL_BOOST)
   include_directories(${CMAKE_SOURCE_DIR}/contrib/boost)
+  set(Boost_LIBRARIES espressopp_boost)
 endif(EXTERNAL_BOOST)
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
@@ -151,10 +158,11 @@ endif()
 ######################################
 add_subdirectory(src)
 add_subdirectory(contrib)
+add_subdirectory(testsuite)
 
 add_custom_target(symlink ALL COMMENT "Creating symlink")
 add_custom_command(TARGET symlink COMMAND ${CMAKE_COMMAND} -E create_symlink
-  src espressopp)
+  ${CMAKE_SOURCE_DIR}/src espressopp)
 
 ######################################
 # System documentation (Doxygen)     # 

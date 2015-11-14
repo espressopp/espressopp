@@ -89,12 +89,15 @@ namespace espressopp {
       real _computeEnergy(const Particle &p1, const Particle &p2) const;
       real _computeEnergy(const Real3D& dist) const;
       real _computeEnergy(real dist) const;
+      real _computeEnergy(const Particle &p1, const Particle &p2, const Real3D& dist) const;
       real _computeEnergySqr(real distSqr) const;
 
       bool _computeForce(Real3D& force, 
 			 const Particle &p1, const Particle &p2) const;
       bool _computeForce(Real3D& force, 
 			 const Real3D& dist) const;
+      bool _computeForce(Real3D& force,
+                         const Particle &p1, const Particle &p2, const Real3D& dist) const;
       
       //bool _computeForce(CellList realcells) const;
       
@@ -239,6 +242,13 @@ namespace espressopp {
       return _computeEnergy(dist);
     }
 
+    template < class Derived >
+    inline real
+    PotentialTemplate< Derived >::
+    _computeEnergy(const Particle& p1, const Particle& p2, const Real3D& dist) const {
+      return _computeEnergy(dist);
+    }
+
     template < class Derived > 
     inline real 
     PotentialTemplate< Derived >::
@@ -290,6 +300,13 @@ namespace espressopp {
     PotentialTemplate< Derived >::
     _computeForce(Real3D& force, const Particle &p1, const Particle &p2) const {
       Real3D dist = p1.position() - p2.position();
+      return _computeForce(force, dist);
+    }
+
+    template < class Derived >
+    inline bool
+    PotentialTemplate< Derived >::
+    _computeForce(Real3D& force, const Particle& p1, const Particle& p2, const Real3D& dist) const {
       return _computeForce(force, dist);
     }
 

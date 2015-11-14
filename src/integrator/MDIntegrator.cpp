@@ -57,7 +57,7 @@ namespace espressopp {
         System& system = getSystemRef();
         esutil::Error err(system.comm);
         std::stringstream msg;
-        msg << "Ttimestep  'dt' must be non-zero!";
+        msg << "Timestep 'dt' must be non-zero!";
         err.setException(msg.str());
       }
 

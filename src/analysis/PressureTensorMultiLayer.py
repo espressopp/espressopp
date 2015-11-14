@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***************************************
+r"""
+*****************************************
 **PressureTensorMultiLayer** - Analysis
-***************************************
+*****************************************
 
 This class computes the pressure tensor of the system in `n` layers.
 Layers are perpendicular to Z direction and are equidistant(distance is Lz/n).
@@ -72,6 +72,15 @@ The following methods are supported:
 * getNumberOfMeasurements()
     counts the number of measurements that have been computed (standalone or in integrator)
     does _not_ include measurements that have been done using "compute()"
+
+.. function:: espressopp.analysis.PressureTensorMultiLayer(system, n, dh)
+
+		:param system: 
+		:param n: 
+		:param dh: 
+		:type system: 
+		:type n: 
+		:type dh: 
 """
 
 from espressopp.esutil import cxxinit
@@ -81,9 +90,9 @@ from espressopp.analysis.AnalysisBase import *
 from _espressopp import analysis_PressureTensorMultiLayer
 
 class PressureTensorMultiLayerLocal(AnalysisBaseLocal, analysis_PressureTensorMultiLayer):
-    'The (local) compute of pressure tensor.'
+
     def __init__(self, system, n, dh):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_PressureTensorMultiLayer, system, n, dh)
 
 if pmi.isController:

@@ -19,11 +19,18 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*****************************************
+r"""
+*******************************************
 **espressopp.analysis.NeighborFluctuation**
-*****************************************
+*******************************************
 
+
+.. function:: espressopp.analysis.NeighborFluctuation(system, radius)
+
+		:param system: 
+		:param radius: 
+		:type system: 
+		:type radius: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,9 +39,9 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_NeighborFluctuation
 
 class NeighborFluctuationLocal(ObservableLocal, analysis_NeighborFluctuation):
-    'The (local) compute of the neighbor fluctuations (<n^2>-<n>^2) in the number of particles found in a sphere of radius d around particle i.'
+
     def __init__(self, system, radius):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_NeighborFluctuation, system, radius)
 
 if pmi.isController :

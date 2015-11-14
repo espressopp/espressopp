@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*******************************************
+r"""
+*********************************************
 **Configurations** - Configurations Object
-*******************************************
+*********************************************
 
 * `gather()`
   add configuration to trajectory
@@ -67,6 +67,23 @@ iterate over all particles stored in configuration:
 access particle with id <pid> of stored configuration <n>:
 
 >>> print "particle coord: ",configurations[n][pid]
+
+.. function:: espressopp.analysis.Configurations(system)
+
+		:param system: 
+		:type system: 
+
+.. function:: espressopp.analysis.Configurations.back()
+
+		:rtype: 
+
+.. function:: espressopp.analysis.Configurations.clear()
+
+		:rtype: 
+
+.. function:: espressopp.analysis.Configurations.gather()
+
+		:rtype: 
 """
 
 from espressopp.esutil import cxxinit
@@ -76,9 +93,10 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_Configurations
 
 class ConfigurationsLocal(ObservableLocal, analysis_Configurations):
-    'The (local) storage of configurations.'
+
     def __init__(self, system):
-        cxxinit(self, analysis_Configurations, system)
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+          cxxinit(self, analysis_Configurations, system)
     def gather(self):
         return self.cxxclass.gather(self)
     def clear(self):

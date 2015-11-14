@@ -19,17 +19,40 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+**************************************
 **espressopp.integrator.MDIntegrator**
-************************************
+**************************************
 
+
+
+.. function:: espressopp.integrator.MDIntegrator.addExtension(extension)
+
+		:param extension: 
+		:type extension: 
+		:rtype: 
+
+.. function:: espressopp.integrator.MDIntegrator.getExtension(k)
+
+		:param k: 
+		:type k: 
+		:rtype: 
+
+.. function:: espressopp.integrator.MDIntegrator.getNumberOfExtensions()
+
+		:rtype: 
+
+.. function:: espressopp.integrator.MDIntegrator.run(niter)
+
+		:param niter: 
+		:type niter: 
+		:rtype: 
 """
 from espressopp import pmi
 from _espressopp import integrator_MDIntegrator
 
 class MDIntegratorLocal(object):
-    """Abstract local base class for molecular dynamics integrator."""
+
     def run(self, niter):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.run(self, niter)
@@ -53,7 +76,7 @@ class MDIntegratorLocal(object):
 
 if pmi.isController :
     class MDIntegrator(object):
-        """Abstract base class for molecular dynamics integrator."""
+
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             pmiproperty = [ 'dt', 'step' ],

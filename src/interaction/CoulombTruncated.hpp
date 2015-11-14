@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2015
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -25,80 +25,84 @@
 #define _INTERACTION_COULOMBTRUNCATED_HPP
 
 #include "Potential.hpp"
-#include "FixedPairListInteractionTemplate.hpp"
+#include "FixedPairListTypesInteractionTemplate.hpp"
+
+using namespace std;
 
 namespace espressopp {
   namespace interaction {
     /* This class provides methods to compute forces and energies of
-	the truncated Coulomb potential.
+        the truncated Coulomb potential.
     */
     class CoulombTruncated : public PotentialTemplate< CoulombTruncated > {
     private:
-      real qq;
+      real prefactor; 
 
     public:
       static void registerPython();
 
-      CoulombTruncated()
-	: qq(0.0) {
-	setShift(0.0);
-	setCutoff(infinity);
-      }
+      CoulombTruncated(): prefactor(1.0) {
+        setShift(0.0);
+        setCutoff(infinity);
+        autoShift = false;
+      } 
 
-      CoulombTruncated(real _qq,
-		   real _cutoff, real _shift)
-	: qq(_qq) {
-	setShift(_shift);
-	setCutoff(_cutoff);
-      }
-
-      CoulombTruncated(real _qq,
-		   real _cutoff)
-	: qq(_qq)
+      CoulombTruncated(real _prefactor,
+                   real _cutoff)
+        : prefactor(_prefactor)
       {
-	autoShift = false;
-	setCutoff(_cutoff);
-	setAutoShift();
+        autoShift = false;
+        setCutoff(_cutoff);
+        setShift(0.0);
       }
 
-      // Setter and getter
-      void setQQ(real _qq) {
-	qq = _qq;
-	updateAutoShift();
-      }
-      real getQQ() const { return qq; }
-
-      real _computeEnergySqrRaw(real distSqr) const {
-	real energy = qq / sqrt(distSqr);
-	return energy;
+      void setPrefactor(real _prefactor) {
+        prefactor = _prefactor;
       }
 
-      bool _computeForceRaw(Real3D& force,
-                            const Real3D& dist,
-                            real distSqr) const {
+      real getPrefactor() const { return prefactor; }
 
-        real ffactor;
-	ffactor = qq / pow(sqrt(distSqr), 3);
-        force = dist * ffactor;
+      // force and energy
+
+      real _computeEnergy(const Particle& p1, const Particle& p2) const {
+        Real3D dist = p1.position() - p2.position();
+        real abs_dist = dist.abs();
+        return ( prefactor * p1.q() * p2.q() / abs_dist );
+      }
+
+      real _computeEnergy(const Particle& p1, const Particle& p2, Real3D& dist) const {
+        real abs_dist = dist.abs();
+        return ( prefactor * p1.q() * p2.q() / abs_dist );
+      }
+
+      bool _computeForce(Real3D& force, const Particle &p1, const Particle &p2) const {
+        Real3D dist = p1.position() - p2.position();
+        real abs_dist = dist.abs();
+        real sqr_dist = dist.sqr();
+
+        real forceFactor = prefactor * p1.q() * p2.q() / ( abs_dist * sqr_dist);
+        force = dist * forceFactor;
         return true;
       }
 
-    };
-    // provide pickle support
-    struct CoulombTruncated_pickle : boost::python::pickle_suite
-    {
-      static
-      boost::python::tuple
-      getinitargs(CoulombTruncated const& pot)
-      {
-    	  real q2;
-          real rc;
-          real sh;
-          q2 =pot.getQQ();
-          rc =pot.getCutoff();
-          sh =pot.getShift();
-          return boost::python::make_tuple(q2, rc, sh);
+      bool _computeForce(Real3D& force, const Particle &p1, const Particle &p2, Real3D& dist) const {
+        real abs_dist = dist.abs();
+        real sqr_dist = dist.sqr();
+      
+        real forceFactor = prefactor * p1.q() * p2.q() / ( abs_dist * sqr_dist);
+        force = dist * forceFactor;
+        return true;
       }
+
+      real _computeEnergySqrRaw(real distSqr) const {
+        cout << "This function currently doesn't work (_computeEnergySqrRaw(real distSqr) in CoulombTruncated.hpp)" << endl;
+        return 0.0;
+      }
+      bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const {
+        cout << "This function currently doesn't work (_computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) in CoulombTruncated.hpp)" << endl;
+        return false;
+      }
+
     };
   }
 }

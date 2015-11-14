@@ -41,9 +41,9 @@ from espressopp.analysis.IntraChainDistSq import *
 from espressopp.analysis.NeighborFluctuation import *
 from espressopp.analysis.OrderParameter import *
 from espressopp.analysis.LBOutput import *
-from espressopp.analysis.LBOutputProfileVzOfX import *
 from espressopp.analysis.LBOutputScreen import *
 from espressopp.analysis.LBOutputVzInTime import *
+from espressopp.analysis.LBOutputVzOfX import *
 from espressopp.analysis.TotalVelocity import *
 
 from espressopp.analysis.ConfigsParticleDecomp import *
@@ -61,3 +61,6 @@ from espressopp.analysis.XTemperature import *
 from espressopp.analysis.XPressure import *
 from espressopp.analysis.Test import *
 from espressopp.analysis.ParticleRadiusDistribution import *
+
+from espressopp.analysis.SystemMonitor import *
+from espressopp.analysis.PotentialEnergy import *

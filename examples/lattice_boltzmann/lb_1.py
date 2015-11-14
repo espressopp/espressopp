@@ -7,6 +7,7 @@ from espressopp import Real3D
 system, integrator = espressopp.standard_system.Default(box=(20, 20, 20))
 
 # LATTICE BOLTZMANN INITIALIZATION
+#lbsite = espressopp.integrator.LBSite(system, 19, 1.0, 1.0)
 # define grid and connect to the integrator
 lb = espressopp.integrator.LatticeBoltzmann(system, Ni=Int3D(20, 20, 20))
 integrator.addExtension(lb)

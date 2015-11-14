@@ -9,13 +9,13 @@
 
 import sys
 import time
-import espresso
+import espressopp
 import mpi4py.MPI as MPI
 import logging
-from espresso import Real3D, Int3D
-from espresso.tools.convert import gromacs
-from espresso.tools import decomp
-from espresso.tools import timers
+from espressopp import Real3D, Int3D
+from espressopp.tools.convert import gromacs
+from espressopp.tools import decomp
+from espressopp.tools import timers
 
 
 # simulation parameters (nvt = False is nve)
@@ -74,9 +74,9 @@ topfile = "topol.top"
 def genTabPotentials(tabfilesnb):
     potentials = {}
     for fg in tabfilesnb:
-        fe = fg.split(".")[0]+".tab" # name of espresso file
+        fe = fg.split(".")[0]+".tab" # name of espressopp file
         gromacs.convertTable(fg, fe, sigma, epsilon, c6, c12)
-        pot = espresso.interaction.Tabulated(itype=spline, filename=fe, cutoff=rc)
+        pot = espressopp.interaction.Tabulated(itype=spline, filename=fe, cutoff=rc)
         t1, t2 = fg[6], fg[8] # type 1, type 2
         potentials.update({t1+"_"+t2: pot})
     return potentials
@@ -89,21 +89,22 @@ potentials = genTabPotentials(tabfilesnb)
 ######################################################################
 ##  IT SHOULD BE UNNECESSARY TO MAKE MODIFICATIONS BELOW THIS LINE  ##
 ######################################################################
-defaults, types, masses, charges, atomtypeparameters, bondtypes, bondtypeparams, angletypes, angletypeparams, dihedraltypes, dihedraltypeparams, exclusions, x, y, z, vx, vy, vz, Lx, Ly, Lz = gromacs.read(grofile, topfile)
+defaults, types, atomtypes, masses, charges, atomtypeparameters, bondtypes, bondtypeparams, angletypes, angletypeparams, dihedraltypes, dihedraltypeparams, exclusions, x, y, z, vx, vy, vz, resname, resid, Lx, Ly, Lz =gromacs.read(grofile, topfile)
+#defaults, types, masses, charges, atomtypeparameters, bondtypes, bondtypeparams, angletypes, angletypeparams, dihedraltypes, dihedraltypeparams, exclusions, x, y, z, vx, vy, vz, Lx, Ly, Lz = gromacs.read(grofile, topfile)
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)
 size = (Lx, Ly, Lz)
 
 sys.stdout.write('Setting up simulation ...\n')
-system = espresso.System()
-system.rng = espresso.esutil.RNG()
-system.bc = espresso.bc.OrthorhombicBC(system.rng, size)
+system = espressopp.System()
+system.rng = espressopp.esutil.RNG()
+system.bc = espressopp.bc.OrthorhombicBC(system.rng, size)
 system.skin = skin
 
 comm = MPI.COMM_WORLD
 nodeGrid = decomp.nodeGrid(comm.size)
 cellGrid = decomp.cellGrid(size, nodeGrid, rc, skin)
-system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # add particles to the system and then decompose
 props = ['id', 'pos', 'v', 'type']
@@ -118,8 +119,8 @@ system.storage.decompose()
 
 
 # Tabulated Verlet list for non-bonded interactions
-vl = espresso.VerletList(system, cutoff = rc + system.skin)
-internb = espresso.interaction.VerletListTabulated(vl)
+vl = espressopp.VerletList(system, cutoff = rc + system.skin)
+internb = espressopp.interaction.VerletListTabulated(vl)
 gromacs.setTabulatedInteractions(potentials, particleTypes, system, internb)
 
 vl.exclude(exclusions)
@@ -129,13 +130,13 @@ vl.exclude(exclusions)
 bondedinteractions=gromacs.setBondedInteractions(system, bondtypes, bondtypeparams)
 # alternative, manual way for setting up bonded interactions
 #for k, v in bonds.iteritems(): # k is number of potential table, v is bondlist
-#    fpl = espresso.FixedPairList(system.storage)
+#    fpl = espressopp.FixedPairList(system.storage)
 #    fpl.addBonds(v)
 #    fg = "table_b"+k+".xvg"
-#    fe = fg.split(".")[0]+".tab" # name of espresso file
+#    fe = fg.split(".")[0]+".tab" # name of espressopp file
 #    gromacs.convertTable(fg, fe, sigma, epsilon, c6, c12)
-#    potTab = espresso.interaction.Tabulated(itype=spline, filename=fe)
-#    interb = espresso.interaction.FixedPairListTabulated(system, fpl, potTab)
+#    potTab = espressopp.interaction.Tabulated(itype=spline, filename=fe)
+#    interb = espressopp.interaction.FixedPairListTabulated(system, fpl, potTab)
 #    system.addInteraction(interb)
 
 
@@ -143,13 +144,13 @@ bondedinteractions=gromacs.setBondedInteractions(system, bondtypes, bondtypepara
 angleinteractions=gromacs.setAngleInteractions(system, angletypes, angletypeparams)
 # alternative, manual way for setting up angular interactions
 #for k, v in angles.iteritems(): # k is number of potential table, v is anglelist
-#    ftl = espresso.FixedTripleList(system.storage)
+#    ftl = espressopp.FixedTripleList(system.storage)
 #    ftl.addTriples(v)
 #    fg = "table_a"+k+".xvg"
-#    fe = fg.split(".")[0]+".tab" # name of espresso file
+#    fe = fg.split(".")[0]+".tab" # name of espressopp file
 #    gromacs.convertTable(fg, fe, sigma, epsilon, c6, c12)
-#    potTab = espresso.interaction.TabulatedAngular(itype=spline, filename=fe)
-#    intera = espresso.interaction.FixedTripleListTabulatedAngular(system, ftl, potTab)
+#    potTab = espressopp.interaction.TabulatedAngular(itype=spline, filename=fe)
+#    intera = espressopp.interaction.FixedTripleListTabulatedAngular(system, ftl, potTab)
 #    system.addInteraction(intera)
     
 
@@ -157,13 +158,13 @@ angleinteractions=gromacs.setAngleInteractions(system, angletypes, angletypepara
 dihedralinteractions=gromacs.setDihedralInteractions(system, dihedraltypes, dihedraltypeparams)
 # alternative, manual way for setting up dihedral interactions:
 #for k, v in dihedrals.iteritems(): # k is number of potential table, v is anglelist
-#    fql = espresso.FixedQuadrupleList(system.storage)
+#    fql = espressopp.FixedQuadrupleList(system.storage)
 #    fql.addQuadruples(v)
 #    fg = "table_d"+k+".xvg"
-#    fe = fg.split(".")[0]+".tab" # name of espresso file
+#    fe = fg.split(".")[0]+".tab" # name of espressopp file
 #    gromacs.convertTable(fg, fe, sigma, epsilon, c6, c12)
-#    potTab = espresso.interaction.TabulatedDihedral(itype=spline, filename=fe)
-#    interd = espresso.interaction.FixedQuadrupleListTabulatedDihedral(system, fql, potTab)
+#    potTab = espressopp.interaction.TabulatedDihedral(itype=spline, filename=fe)
+#    interd = espressopp.interaction.FixedQuadrupleListTabulatedDihedral(system, fql, potTab)
 #    system.addInteraction(interd)
 
 
@@ -173,10 +174,10 @@ dihedralinteractions=gromacs.setDihedralInteractions(system, dihedraltypes, dihe
 
 
 # langevin thermostat
-langevin = espresso.integrator.LangevinThermostat(system)
+langevin = espressopp.integrator.LangevinThermostat(system)
 langevin.gamma = 1.0
 langevin.temperature = 1.0
-integrator = espresso.integrator.VelocityVerlet(system)
+integrator = espressopp.integrator.VelocityVerlet(system)
 integrator.addExtension(langevin)
 integrator.dt = timestep
 
@@ -199,11 +200,11 @@ print ''
 
 
 # analysis
-configurations = espresso.analysis.Configurations(system)
+configurations = espressopp.analysis.Configurations(system)
 configurations.gather()
-temperature = espresso.analysis.Temperature(system)
-pressure = espresso.analysis.Pressure(system)
-pressureTensor = espresso.analysis.PressureTensor(system)
+temperature = espressopp.analysis.Temperature(system)
+pressure = espressopp.analysis.Pressure(system)
+pressureTensor = espressopp.analysis.PressureTensor(system)
 
 fmt = '%5d %8.4f %11.4f %11.4f %12.3f %12.3f %12.3f %12.3f %12.3f %12.3f\n'
 
@@ -225,7 +226,7 @@ sys.stdout.write(fmt % (0, T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea, Ed))
 
 start_time = time.clock()
 
-espresso.tools.pdb.pdbwrite("traj.pdb", system, append=False)
+espressopp.tools.pdb.pdbwrite("traj.pdb", system, append=False)
 
 for i in range(check):
 
@@ -242,7 +243,7 @@ for i in range(check):
     for dih in dihedralinteractions.values(): Ed+=dih.computeEnergy()
     Etotal = Ek + Ep + Eb + Ea + Ed
     sys.stdout.write(fmt % ((i+1)*(steps/check), T, P, Pij[3], Etotal, Ek, Ep, Eb, Ea, Ed))
-    #espresso.tools.pdb.pdbwrite("traj.pdb", system, append=True)
+    #espressopp.tools.pdb.pdbwrite("traj.pdb", system, append=True)
     #sys.stdout.write('\n')
 
 # print timings and neighbor list information

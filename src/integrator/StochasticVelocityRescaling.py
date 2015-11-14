@@ -19,11 +19,16 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***************************************************
+r"""
+*****************************************************
 **espressopp.integrator.StochasticVelocityRescaling**
-***************************************************
+*****************************************************
 
+
+.. function:: espressopp.integrator.StochasticVelocityRescaling(system)
+
+		:param system: 
+		:type system: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +37,7 @@ from espressopp.integrator.Extension import *
 from _espressopp import integrator_StochasticVelocityRescaling 
 
 class StochasticVelocityRescalingLocal(ExtensionLocal, integrator_StochasticVelocityRescaling):
-    'The (local) StochasticVelocityRescaling Thermostat.'
+
     def __init__(self, system):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_StochasticVelocityRescaling, system)

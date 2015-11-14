@@ -19,11 +19,44 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-**************************************
-**espressopp.analysis.LBOutputVzInTime**
-**************************************
+r"""
+************************************************************************************
+**LBOutputVzInTime** - controls output of the velocity component on a site in time
+************************************************************************************
+Child class derived from the abstract class :class:`espressopp.analysis.LBOutput`. 
+It computes and outputs the velocity component :math:`v_z` in time on a specific
+lattice site (the value used at the moment is :math:`{0.25*N_i, 0, 0}`).
 
+.. function:: espressopp.analysis.LBOutputVzInTime(system,latticeboltzmann)
+
+	:param system: system object defined earlier in the python-script
+	:param latticeboltzmann: lattice boltzmann object defined earlier in the python-script
+
+.. Note::
+
+	this class should be called from external analysis class :class:`espressopp.integrator.ExtAnalyze`
+	with specified periodicity of invokation and after this added to the integrator. See an example for details.
+
+Example to call the profiler:
+
+>>> # initialise profiler (for example with the name outputVzInTime) with system and
+>>> # lattice boltzmann objects as parameters:
+>>> outputVzInTime = espressopp.analysis.LBOutputVzInTime(system,lb)
+>>>
+>>> # initialise external analysis object (for example extAnalysisNum2) with
+>>> # previously created profiler and periodicity of invocation in steps:
+>>> extAnalysisNum2=espressopp.integrator.ExtAnalyze(outputVzInTime,100)
+>>>
+>>> # add the external analysis object as an extension to the integrator
+>>> integrator.addExtension(extAnalysisNum2)
+
+
+.. function:: espressopp.analysis.LBOutputVzInTime(system, latticeboltzmann)
+
+		:param system: 
+		:param latticeboltzmann: 
+		:type system: 
+		:type latticeboltzmann: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,9 +65,8 @@ from espressopp.analysis.LBOutput import *
 from _espressopp import analysis_LBOutput_VzInTime
 
 class LBOutputVzInTimeLocal(LBOutputLocal, analysis_LBOutput_VzInTime):
-    'The (local) compute of LBOutputVzInTime.'
     def __init__(self, system, latticeboltzmann):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_LBOutput_VzInTime, system, latticeboltzmann)
 
 if pmi.isController :

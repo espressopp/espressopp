@@ -19,19 +19,45 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*****************************************
+r"""
+*******************************************
 **espressopp.standard_system.LennardJones**
-*****************************************
+*******************************************
 
+
+.. function:: espressopp.standard_system.LennardJones(num_particles, box, rc, skin, dt, epsilon, sigma, shift, temperature, xyzfilename, xyzrfilename)
+
+		:param num_particles: 
+		:param box: (default: (000))
+		:param rc: (default: 1.12246)
+		:param skin: (default: 0.3)
+		:param dt: (default: 0.005)
+		:param epsilon: (default: 1.0)
+		:param sigma: (default: 1.0)
+		:param shift: (default: 'auto')
+		:param temperature: (default: None)
+		:param xyzfilename: (default: None)
+		:param xyzrfilename: (default: None)
+		:type num_particles: 
+		:type box: 
+		:type rc: real
+		:type skin: real
+		:type dt: real
+		:type epsilon: real
+		:type sigma: real
+		:type shift: 
+		:type temperature: 
+		:type xyzfilename: 
+		:type xyzrfilename: 
+		
+		return random Lennard Jones system and integrator:
+		if tempearture is != None then Langevin thermostat is set to temperature (gamma is 1.0)
 """
 import espressopp
 import mpi4py.MPI as MPI
 
 def LennardJones(num_particles, box=(0,0,0), rc=1.12246, skin=0.3, dt=0.005, epsilon=1.0, sigma=1.0, shift='auto', temperature=None, xyzfilename=None, xyzrfilename=None):
-  '''return random Lennard Jones system and integrator:
-  if tempearture is != None then Langevin thermostat is set to temperature (gamma is 1.0)
-  '''
+
     
   if xyzfilename and xyzrfilename:
      print "ERROR: only one of xyzfilename (only xyz data) or xyzrfilename (additional particle radius data) can be provided."

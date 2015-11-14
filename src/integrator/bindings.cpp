@@ -37,6 +37,7 @@
 #include "StochasticVelocityRescaling.hpp"
 #include "LangevinThermostat.hpp"
 #include "LangevinThermostat1D.hpp"
+#include "LangevinThermostatHybrid.hpp"
 #include "GeneralizedLangevinThermostat.hpp"
 #include "DPDThermostat.hpp"
 #include "LangevinBarostat.hpp"
@@ -80,6 +81,7 @@ namespace espressopp {
       OnTheFlyFEC::registerPython();
       LangevinThermostat::registerPython();
       LangevinThermostat1D::registerPython();
+      LangevinThermostatHybrid::registerPython();
       GeneralizedLangevinThermostat::registerPython();
       DPDThermostat::registerPython();
       FixPositions::registerPython();

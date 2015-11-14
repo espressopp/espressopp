@@ -39,12 +39,13 @@ namespace espressopp {
     void LBInitConstForce::setForce(Real3D _force)
     {
       int _id = 0;		// _id shows whether force had been cancelled, set or added
-      Int3D _Ni = latticeboltzmann->getNi();
+			int _offset = latticeboltzmann->getHaloSkin();
+      Int3D _Ni = latticeboltzmann->getMyNi();
 
       /* external forces loop */
-      for (int i = 0; i < _Ni.getItem(0); i++) {
-        for (int j = 0; j < _Ni.getItem(1); j++) {
-          for (int k = 0; k < _Ni.getItem(2); k++) {
+      for (int i = _offset; i < _Ni.getItem(0)-_offset; i++) {
+        for (int j = _offset; j < _Ni.getItem(1)-_offset; j++) {
+          for (int k = _offset; k < _Ni.getItem(2)-_offset; k++) {
             // set local forces and general flag
             if (_force != Real3D(0.,0.,0.)) {
               latticeboltzmann->setExtForceFlag(1);
@@ -64,14 +65,15 @@ namespace espressopp {
     void LBInitConstForce::addForce(Real3D _force)
     {
       int _id = 0;
-      Int3D _Ni = latticeboltzmann->getNi();
+			int _offset = latticeboltzmann->getHaloSkin();
+			Int3D _Ni = latticeboltzmann->getMyNi();
 
       Real3D existingforce;
 
       /* external forces loop */
-      for (int i = 0; i < _Ni.getItem(0); i++) {
-        for (int j = 0; j < _Ni.getItem(1); j++) {
-          for (int k = 0; k < _Ni.getItem(2); k++) {
+			for (int i = _offset; i < _Ni.getItem(0)-_offset; i++) {
+				for (int j = _offset; j < _Ni.getItem(1)-_offset; j++) {
+					for (int k = _offset; k < _Ni.getItem(2)-_offset; k++) {
             existingforce = latticeboltzmann->getExtForceLoc(Int3D(i,j,k));
             // set local forces and general flag
             if (existingforce + _force != Real3D(0.,0.,0.)) {
@@ -90,37 +92,41 @@ namespace espressopp {
 
     void LBInitConstForce::printForce(Real3D _force, int _id)
     {
-      // print constant force
-      using std::setprecision;
-      using std::fixed;
-      using std::setw;
-
-      std::cout << setprecision(5);
-      std::cout << "-------------------------------------\n";
-
-      if (_id == 0) {
-        std::cout << "External force has been cancelled. It is now zero.\n" ;
-      } else if (_id == 1) {
-        std::cout << "External force has been set. It is a constant force:\n" ;
-      } else if (_id == 2) {
-        std::cout << "External force has been added. It is a constant force:\n" ;
-      } else {
-      }
-
-      if (_id != 0) {
-        std::cout << " extForce.x is " << _force.getItem(0) << "\n";
-        std::cout << " extForce.y is " << _force.getItem(1) << "\n";
-        std::cout << " extForce.z is " << _force.getItem(2) << "\n";
-        std::cout << "-------------------------------------\n";
-      }
+			if (mpiWorld->rank()==0) {
+				// print constant force
+				using std::setprecision;
+				using std::fixed;
+				using std::setw;
+				
+				std::cout << setprecision(5);
+				std::cout << "-------------------------------------\n";
+				
+				if (_id == 0) {
+					std::cout << "External force has been cancelled. It is now zero.\n" ;
+				} else if (_id == 1) {
+					std::cout << "External force has been set. It is a constant force:\n" ;
+				} else if (_id == 2) {
+					std::cout << "External force has been added. It is a constant force:\n" ;
+				} else {
+				}
+				
+				if (_id != 0) {
+					std::cout << " extForce.x is " << _force.getItem(0) << "\n";
+					std::cout << " extForce.y is " << _force.getItem(1) << "\n";
+					std::cout << " extForce.z is " << _force.getItem(2) << "\n";
+					std::cout << "-------------------------------------\n";
+				}
+			} else {
+				// do nothing
+			}
     }
 
     void LBInitConstForce::registerPython() {
       using namespace espressopp::python;
 
       class_<LBInitConstForce, bases< LBInit > >
-          ("integrator_LBInit_ConstForce", init< shared_ptr< System >,
-                                             shared_ptr< LatticeBoltzmann > >())
+          ("integrator_LBInit_ConstForce", init<	shared_ptr< System >,
+																							shared_ptr< LatticeBoltzmann > >())
           .def("setForce", &LBInitConstForce::setForce)
           .def("addForce", &LBInitConstForce::addForce)
       ;

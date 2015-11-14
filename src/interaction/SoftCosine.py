@@ -19,11 +19,71 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***********************************
+r"""
+***********************************************
 **espressopp.interaction.SoftCosine**
-***********************************
+***********************************************
+This class provides methods to compute forces and energies ofthe SoftCosine potential.
 
+.. math..
+	V(r) = A \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} -
+	\left( \frac{\sigma}{r} \right)^{6} \right]
+
+
+
+
+
+
+.. function:: espressopp.interaction.SoftCosine(A, cutoff, shift)
+
+		:param A: (default: 1.0)
+		:param cutoff: (default: infinity)
+		:param shift: (default: "auto")
+		:type A: real
+		:type cutoff: 
+		:type shift: 
+
+.. function:: espressopp.interaction.VerletListSoftCosine(stor)
+
+		:param stor: 
+		:type stor: 
+
+.. function:: espressopp.interaction.VerletListSoftCosine.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.CellListSoftCosine(stor)
+
+		:param stor: 
+		:type stor: 
+
+.. function:: espressopp.interaction.CellListSoftCosine.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListSoftCosine(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedPairListSoftCosine.setPotential(potential)
+
+		:param potential: 
+		:type potential: 
 """
 from espressopp import pmi, infinity
 from espressopp.esutil import *
@@ -36,9 +96,9 @@ from _espressopp import interaction_SoftCosine, \
                       interaction_FixedPairListSoftCosine
 
 class SoftCosineLocal(PotentialLocal, interaction_SoftCosine):
-    'The (local) SoftCosine potential.'
+
     def __init__(self, A=1.0, cutoff=infinity, shift="auto"):
-        """Initialize the local SoftCosine object."""
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift =="auto":
                 cxxinit(self, interaction_SoftCosine, A, cutoff)
@@ -60,7 +120,7 @@ class VerletListSoftCosineLocal(InteractionLocal, interaction_VerletListSoftCosi
             return self.cxxclass.getPotential(self, type1, type2)
 
 class VerletListSoftCosineLocal(InteractionLocal, interaction_VerletListSoftCosine):
-    'The (local) SoftCosine interaction using cell lists.'
+
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListSoftCosine, stor)
@@ -70,7 +130,7 @@ class VerletListSoftCosineLocal(InteractionLocal, interaction_VerletListSoftCosi
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 class CellListSoftCosineLocal(InteractionLocal, interaction_CellListSoftCosine):
-    'The (local) SoftCosine interaction using cell lists.'
+
     def __init__(self, stor):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_CellListSoftCosine, stor)
@@ -80,7 +140,7 @@ class CellListSoftCosineLocal(InteractionLocal, interaction_CellListSoftCosine):
             self.cxxclass.setPotential(self, type1, type2, potential)
 
 class FixedPairListSoftCosineLocal(InteractionLocal, interaction_FixedPairListSoftCosine):
-    'The (local) SoftCosine interaction using FixedPair lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListSoftCosine, system, vl, potential)

@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+**************************************
 **PressureTensor** - Analysis
-************************************
+**************************************
 
 This class computes the pressure tensor of the system.
 It can be used as standalone class in python as well as
@@ -68,6 +68,11 @@ The following methods are supported:
 * getNumberOfMeasurements()
     counts the number of measurements that have been computed (standalone or in integrator)
     does _not_ include measurements that have been done using "compute()"
+
+.. function:: espressopp.analysis.PressureTensor(system)
+
+		:param system: 
+		:type system: 
 """
 
 from espressopp.esutil import cxxinit
@@ -77,9 +82,9 @@ from espressopp.analysis.AnalysisBase import *
 from _espressopp import analysis_PressureTensor
 
 class PressureTensorLocal(AnalysisBaseLocal, analysis_PressureTensor):
-    'The (local) compute of pressure tensor.'
+
     def __init__(self, system):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_PressureTensor, system)
 
 if pmi.isController:

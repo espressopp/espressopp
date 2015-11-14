@@ -19,11 +19,50 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*****************************
+r"""
+*****************************************
 **espressopp.interaction.OPLS**
-*****************************
+*****************************************
+This class provides methods to compute forces and energies of
+the OPLS dihedral potential. To create a new dihedral potential.
 
+
+.. math::
+	U = \sum^4_{j=1} K_j  (1 + cos(j \phi))
+
+
+
+
+
+
+.. function:: espressopp.interaction.OPLS(K1, K2, K3, K4)
+
+		:param K1: (default: 1.0)
+		:param K2: (default: 0.0)
+		:param K3: (default: 0.0)
+		:param K4: (default: 0.0)
+		:type K1: real
+		:type K2: real
+		:type K3: real
+		:type K4: real
+
+.. function:: espressopp.interaction.FixedQuadrupleListOPLS(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedQuadrupleListOPLS.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
 """
 from espressopp import pmi
 from espressopp.esutil import *
@@ -33,14 +72,14 @@ from espressopp.interaction.Interaction import *
 from _espressopp import interaction_OPLS, interaction_FixedQuadrupleListOPLS
 
 class OPLSLocal(DihedralPotentialLocal, interaction_OPLS):
-    'The (local) OPLS potential.'
+
     def __init__(self, K1=1.0, K2=0.0, K3=0.0, K4=0.0):
-        """Initialize the local OPLS object."""
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_OPLS, K1, K2, K3, K4)
 
 class FixedQuadrupleListOPLSLocal(InteractionLocal, interaction_FixedQuadrupleListOPLS):
-    'The (local) OPLS interaction using FixedQuadruple lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedQuadrupleListOPLS, system, vl, potential)

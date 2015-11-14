@@ -19,11 +19,50 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-******************
+r"""
+********************
 **espressopp.Int3D**
-******************
+********************
 
+
+.. function:: espressopp.__Int3D(\*args)
+
+		:param \*args: 
+		:type \*args: 
+
+.. function:: espressopp.__Int3D.x(v, [0)
+
+		:param v: 
+		:param [0: 
+		:type v: 
+		:type [0: 
+		:rtype: 
+
+.. function:: espressopp.__Int3D.y(v, [1)
+
+		:param v: 
+		:param [1: 
+		:type v: 
+		:type [1: 
+		:rtype: 
+
+.. function:: espressopp.__Int3D.z(v, [2)
+
+		:param v: 
+		:param [2: 
+		:type v: 
+		:type [2: 
+		:rtype: 
+
+.. function:: espressopp.toInt3DFromVector(\*args)
+
+		:param \*args: 
+		:type \*args: 
+
+.. function:: espressopp.toInt3D(\*args)
+
+		:param \*args: 
+		:type \*args: 
 """
 from _espressopp import Int3D
 from espressopp import esutil
@@ -31,8 +70,8 @@ from espressopp import esutil
 # This injects additional methods into the Int3D class and pulls it
 # into this module 
 class __Int3D(Int3D) :
-    """Basic 3D integer point vector as used by ESPResSo++.
-    """
+
+
     __metaclass__ = esutil.ExtendBaseClass
 
     __originit = Int3D.__init__

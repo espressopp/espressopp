@@ -66,7 +66,7 @@ namespace espressopp {
         static void registerPython();
 
         ExtensionType getType() {return type;}
-        int setType(ExtensionType k) {type=k;}
+        void setType(ExtensionType k) {type=k;}
 
       protected:
 

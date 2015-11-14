@@ -19,19 +19,19 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*****************************************************
+r"""
+*******************************************************
 **BerendsenThermostat** - Berendsen thermostat Object
-*****************************************************
+*******************************************************
 
 This is the Berendsen thermostat implementation according to the original paper [Berendsen84]_.
 If Berendsen thermostat is defined (as a property of integrator) then at the each run the system size
 and the particle coordinates will be scaled by scaling parameter :math:`\lambda` according to
 the formula:
 
-.. math::   \lambda = [1 + \Delta t/\\tau_{T} (T_{0}/T - 1)]^{1/2}
+.. math::   \lambda = [1 + \Delta t/\tau_{T} (T_{0}/T - 1)]^{1/2}
 
-where :math:`\Delta t` - integration timestep, :math:`\\tau_{T}` - time parameter (coupling parameter),
+where :math:`\Delta t` - integration timestep, :math:`\tau_{T}` - time parameter (coupling parameter),
 :math:`T_{0}` - external temperature and :math:`T` - instantaneous temperature. 
 
 Example:
@@ -56,7 +56,7 @@ Properties:
 
 *   *berendsenT.tau*
 
-    The property 'tau' defines the time parameter :math:`\\tau_{T}`.
+    The property 'tau' defines the time parameter :math:`\tau_{T}`.
 
 *   *berendsenT.temperature*
     
@@ -94,6 +94,11 @@ Canceling the thermostat:
   
     >>> berendsen.connect()
 
+
+.. function:: espressopp.integrator.BerendsenThermostat(system)
+
+		:param system: 
+		:type system: 
 """
 
 
@@ -105,7 +110,7 @@ from _espressopp import integrator_BerendsenThermostat
 
 class BerendsenThermostatLocal(ExtensionLocal, integrator_BerendsenThermostat):
   def __init__(self, system):
-    'The (local) Velocity Verlet Integrator.'
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or \
             pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, integrator_BerendsenThermostat, system)

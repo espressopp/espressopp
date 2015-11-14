@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************************
+r"""
+**************************************************
 **ConfigurationsExtAdress** - ConfigurationsExtAdress Object
-************************************************
+**************************************************
 
 for gathering atomistic particles instead of coarsegrained particles
 
@@ -69,6 +69,25 @@ iterate over all particles stored in configuration:
 access particle with id <pid> of stored configuration <n>:
 
 >>> print "particle coord: ",configurations[n][pid]
+
+.. function:: espressopp.analysis.ConfigurationsExtAdress(system, fixedtuplelist)
+
+		:param system: 
+		:param fixedtuplelist: 
+		:type system: 
+		:type fixedtuplelist: 
+
+.. function:: espressopp.analysis.ConfigurationsExtAdress.back()
+
+		:rtype: 
+
+.. function:: espressopp.analysis.ConfigurationsExtAdress.clear()
+
+		:rtype: 
+
+.. function:: espressopp.analysis.ConfigurationsExtAdress.gather()
+
+		:rtype: 
 """
 
 from espressopp.esutil import cxxinit
@@ -78,9 +97,10 @@ from espressopp.analysis.Observable import *
 from _espressopp import analysis_ConfigurationsExtAdress
 
 class ConfigurationsExtAdressLocal(ObservableLocal, analysis_ConfigurationsExtAdress):
-    'The (local) storage of configurations.'
+
     def __init__(self, system, fixedtuplelist):
-        cxxinit(self, analysis_ConfigurationsExtAdress, system, fixedtuplelist)
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+          cxxinit(self, analysis_ConfigurationsExtAdress, system, fixedtuplelist)
     def gather(self):
         return self.cxxclass.gather(self)
     def clear(self):

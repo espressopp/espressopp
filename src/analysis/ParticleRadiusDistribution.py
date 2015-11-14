@@ -19,11 +19,16 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************************
+r"""
+**************************************************
 **espressopp.analysis.ParticleRadiusDistribution**
-************************************************
+**************************************************
 
+
+.. function:: espressopp.analysis.ParticleRadiusDistribution(system)
+
+		:param system: 
+		:type system: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,9 +37,9 @@ from espressopp.analysis.AnalysisBase import *
 from _espressopp import analysis_ParticleRadiusDistribution
 
 class ParticleRadiusDistributionLocal(AnalysisBaseLocal, analysis_ParticleRadiusDistribution):
-    'The (local) compute of the particle radius distribution.'
+
     def __init__(self, system):
-        if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_ParticleRadiusDistribution, system)
 
 if pmi.isController :

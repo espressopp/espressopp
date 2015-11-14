@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+**************************************
 **Version** - Object
-************************************
+**************************************
 
 Return version information of espressopp module 
 
@@ -42,6 +42,9 @@ to print a full version info string:
 
 >>> print version.info()
 
+
+.. function:: espressopp.Version()
+
 """
 
 from espressopp import pmi
@@ -53,7 +56,7 @@ import mpi4py.MPI as MPI
 
 class VersionLocal(_espressopp.Version):
     def __init__(self):
-        'Local Version object'
+
         if pmi._PMIComm and pmi._PMIComm.isActive():
             if pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
                 cxxinit(self, _espressopp.Version)

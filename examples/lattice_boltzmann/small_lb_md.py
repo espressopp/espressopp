@@ -11,7 +11,7 @@ plt.ion()
 
 # create default Lennard Jones (WCA) system with 0 particles and cubic box (L=40)
 #num_chains		= 328
-num_chains		= 1
+num_chains		= 5
 monomers_per_chain	= 10
 L			= 16
 box			= (L, L, L)
@@ -19,8 +19,8 @@ bondlen			= 0.97
 rc 			= 2 * pow(2, 1./6.)
 skin			= 0.3
 dt			= 0.000001
-epsilon			= 0.
-sigma			= 1.
+epsilon			= 1.
+sigma			= 0.
 temperature		= 1.2
 print "Initial values"
 
@@ -80,26 +80,26 @@ system.addInteraction(interFENE)
 espressopp.tools.analyse.info(system, integrator)
 
 print "First phase of the warm up. Epsilon will be increased from 0. to 0.25"
-new_epsilon = 0.
+new_sigma = 0.
 for k in range(10):
 	integrator.run(1000)
 	espressopp.tools.analyse.info(system, integrator)
-	new_epsilon += 0.025
-	potLJ = espressopp.interaction.LennardJones(new_epsilon, sigma, rc)
+	new_sigma += 0.025
+	potLJ = espressopp.interaction.LennardJones(epsilon, new_sigma, rc)
 	interaction.setPotential(type1=0, type2=0, potential=potLJ)
 
-print "Second phase of the warm up with timestep 0.0001. Epsilon will be increased from to 1."
-print new_epsilon
+print "Second phase of the warm up with timestep 0.0001. Sigma will be increased from to 1."
+print new_sigma
 integrator.dt = 0.00005
 for k in range(10):
 	integrator.run(1000)
 	espressopp.tools.analyse.info(system, integrator)
-	new_epsilon += 0.075
-	potLJ = espressopp.interaction.LennardJones(new_epsilon, sigma, rc)
+	new_sigma += 0.075
+	potLJ = espressopp.interaction.LennardJones(epsilon, new_sigma, rc)
 	interaction.setPotential(type1=0, type2=0, potential=potLJ)
 
-print "Third phase of the warm up with timestep 0.005. Epsilon is 1."
-print new_epsilon
+print "Third phase of the warm up with timestep 0.005. Sigma is 1."
+print new_sigma
 integrator.dt = 0.005
 for k in range(10):
 	integrator.run(1000)
@@ -142,10 +142,10 @@ integrator.addExtension(lb)
 #OUT3=espressopp.integrator.ExtAnalyze(lboutputScreen,100)
 #integrator.addExtension(OUT3)
 
-print integrator.dt
-print thermostat.gamma
-print thermostat.temperature
-print lb.fricCoeff
+print "dt", integrator.dt
+print "thermostat friction", thermostat.gamma
+print "thermostat temperature", thermostat.temperature
+print "lbCouplFric", lb.fricCoeff
 
 #plt.figure()
 #T   = espressopp.analysis.Temperature(system)
@@ -160,9 +160,11 @@ print lb.fricCoeff
 # write output to a datafile
 #f = open('temp_lb1.0_c1.0_L16_N328_G20_2.dat', 'a')
 
-integrator.run(5)
+integrator.run(10000)
+lb.saveCouplForces()
 print "new"
-integrator.run(5)
+lb.readCouplForces()
+integrator.run(50000)
 #for k in range(100):
 #	integrator.run(100)
 #	x.append(integrator.dt * integrator.step)

@@ -19,11 +19,18 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*********************************
+r"""
+***********************************
 **espressopp.esutil.NormalVariate**
-*********************************
+***********************************
 
+
+.. function:: espressopp.esutil.NormalVariate(mean, sigma)
+
+		:param mean: (default: 0.0)
+		:param sigma: (default: 1.0)
+		:type mean: real
+		:type sigma: real
 """
 from espressopp import pmi
 
@@ -31,7 +38,8 @@ from _espressopp import esutil_NormalVariate
 
 class NormalVariateLocal(esutil_NormalVariate):
     def __init__(self, mean=0.0, sigma=1.0):
-        cxxinit(self, esutil_NormalVariate, mean, sigma)
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, esutil_NormalVariate, mean, sigma)
 
 if pmi.isController:
     class NormalVariate(object):

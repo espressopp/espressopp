@@ -19,11 +19,18 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*************************************
+r"""
+***************************************
 **espressopp.integrator.DPDThermostat**
-*************************************
+***************************************
 
+
+.. function:: espressopp.integrator.DPDThermostat(system, vl)
+
+		:param system: 
+		:param vl: 
+		:type system: 
+		:type vl: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -32,7 +39,7 @@ from espressopp.integrator.Extension import *
 from _espressopp import integrator_DPDThermostat 
 
 class DPDThermostatLocal(ExtensionLocal, integrator_DPDThermostat):
-    'The (local) Velocity Verlet Integrator.'
+
     def __init__(self, system, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_DPDThermostat, system, vl)

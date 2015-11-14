@@ -19,10 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-************************************
+r"""
+**************************************
 **BC** - Boundary Condition Object
-************************************
+**************************************
 
 This is the abstract base class for all boundary condition objects.
 It cannot be used directly. All derived classes implement at least
@@ -36,6 +36,35 @@ the following methods:
 `pos`, `pos1` and `pos2` are particle coordinates ( type: (`float`, `float`, `float`) ).
 `imageBox` ( type: (`int`, `int`, `int`) ) specifies the   
 
+
+
+.. function:: espressopp.bc.BC.getFoldedPosition(pos, imageBox)
+
+		:param pos: 
+		:param imageBox: (default: None)
+		:type pos: 
+		:type imageBox: 
+		:rtype: 
+
+.. function:: espressopp.bc.BC.getMinimumImageVector(pos1, pos2)
+
+		:param pos1: 
+		:param pos2: 
+		:type pos1: 
+		:type pos2: 
+		:rtype: 
+
+.. function:: espressopp.bc.BC.getRandomPos()
+
+		:rtype: 
+
+.. function:: espressopp.bc.BC.getUnfoldedPosition(pos, imageBox)
+
+		:param pos: 
+		:param imageBox: 
+		:type pos: 
+		:type imageBox: 
+		:rtype: 
 """
 
 

@@ -24,20 +24,43 @@
 #define _LBOUTPUT_SCREEN_HPP
 
 #include "LBOutput.hpp"
+#include "esutil/Timer.hpp"
 
 namespace espressopp {
   namespace analysis {
-    class LBOutputScreen : public LBOutput {
-      public:
-      LBOutputScreen(shared_ptr<System> _system,
+		class LBOutputScreen : public LBOutput {
+		public:
+			LBOutputScreen(shared_ptr<System> _system,
                           shared_ptr< integrator::LatticeBoltzmann > _latticeboltzmann);
 
         /** Destructor for output. */
 /*        ~LBOutputScreen ();
 */
-        void writeOutput();
+			void writeOutput();
+			void findLBMom();
+			
+			void setTimerOld(time_t _value);
+			time_t getTimerOld();
 
-        static void registerPython();
+			void setTimerNew(time_t _value);
+			time_t getTimerNew();
+
+			void setLBTimerOld(real _lbTime_old);
+			real getLBTimerOld();
+			
+			void setLBTimerNew(real _lbTime_new);
+			real getLBTimerNew();
+			
+			void setOldStepNum(long int _oldStepNum);
+			long int getOldStepNum();
+			
+			static void registerPython();
+			
+		private:
+			time_t timer_old, timer_new;
+			real	lbTime_old, lbTime_new;
+			esutil::WallTimer timeLBtoMD;  //!< used for timing
+			int oldStepNum;
     };
   }
 }

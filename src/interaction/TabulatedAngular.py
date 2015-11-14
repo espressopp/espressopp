@@ -19,11 +19,41 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-*****************************************
+r"""
+*****************************************************
 **espressopp.interaction.TabulatedAngular**
-*****************************************
+*****************************************************
 
+
+
+
+
+
+
+.. function:: espressopp.interaction.TabulatedAngular(itype, filename)
+
+		:param itype: 
+		:param filename: 
+		:type itype: 
+		:type filename: 
+
+.. function:: espressopp.interaction.FixedTripleListTabulatedAngular(system, vl, potential)
+
+		:param system: 
+		:param vl: 
+		:param potential: 
+		:type system: 
+		:type vl: 
+		:type potential: 
+
+.. function:: espressopp.interaction.FixedTripleListTabulatedAngular.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
 """
 # -*- coding: iso-8859-1 -*-
 from espressopp import pmi
@@ -36,14 +66,14 @@ from _espressopp import interaction_TabulatedAngular, \
 
 
 class TabulatedAngularLocal(AngularPotentialLocal, interaction_TabulatedAngular):
-    'The (local) tabulated angular potential.'
+
     def __init__(self, itype, filename):
-        """Initialize the local TabulatedAngularLocal object."""
+
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_TabulatedAngular, itype, filename)
 
 class FixedTripleListTabulatedAngularLocal(InteractionLocal, interaction_FixedTripleListTabulatedAngular):
-    'The (local) tanulated angular interaction using FixedTriple lists.'
+
     def __init__(self, system, vl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedTripleListTabulatedAngular, system, vl, potential)

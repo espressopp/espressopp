@@ -19,10 +19,18 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-******************************************************************************
+r"""
+****************************************************************************************
 **CoulombRSpace** - Coulomb potential and interaction Objects (`R` space part)
-******************************************************************************
+****************************************************************************************
+.. math::
+	\sum^{N}_{i=1}
+	\sum_{j>i \atop r_{ij}<k_{max}}
+	\frac{q_{i}q_{j}}{r_{ij}}
+	erfc(\alpha r_{ij})
+	- \frac{\alpha}{\sqrt{\pi}}
+	\sum^{N}_{i=1}
+	q_{i}^2
 
 This is the `R` space part of potential of Coulomb long range interaction according to the Ewald
 summation technique. Good explanation of Ewald summation could be found here [Allen89]_,
@@ -89,6 +97,46 @@ Adding the interaction to the system:
     
     >>> system.addInteraction(coulombR_int)
     
+
+
+
+
+
+
+.. function:: espressopp.interaction.CoulombRSpace(prefactor, alpha, cutoff)
+
+		:param prefactor: (default: 1.0)
+		:param alpha: (default: 1.0)
+		:param cutoff: (default: infinity)
+		:type prefactor: real
+		:type alpha: real
+		:type cutoff: 
+
+.. function:: espressopp.interaction.VerletListCoulombRSpace(vl)
+
+		:param vl: 
+		:type vl: 
+
+.. function:: espressopp.interaction.VerletListCoulombRSpace.getPotential(type1, type2)
+
+		:param type1: 
+		:param type2: 
+		:type type1: 
+		:type type2: 
+		:rtype: 
+
+.. function:: espressopp.interaction.VerletListCoulombRSpace.getVerletList()
+
+		:rtype: A Python list of lists.
+
+.. function:: espressopp.interaction.VerletListCoulombRSpace.setPotential(type1, type2, potential)
+
+		:param type1: 
+		:param type2: 
+		:param potential: 
+		:type type1: 
+		:type type2: 
+		:type potential: 
 """
 
 from espressopp import pmi, infinity
@@ -102,20 +150,20 @@ from _espressopp import interaction_CoulombRSpace, \
 class CoulombRSpaceLocal(PotentialLocal, interaction_CoulombRSpace):
   
   def __init__(self, prefactor=1.0, alpha=1.0, cutoff=infinity):
-    'The (local) Coulomb R space potential.'
-    """Initialize the local Coulomb R space object."""
+
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_CoulombRSpace, prefactor, alpha, cutoff)
 
 class VerletListCoulombRSpaceLocal(InteractionLocal, interaction_VerletListCoulombRSpace):
   
   def __init__(self, vl):
-    'The (local) Coulomb R Space interaction using Verlet lists.'
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       cxxinit(self, interaction_VerletListCoulombRSpace, vl)
       
   def setPotential(self, type1, type2, potential):
-    'The method sets the potential for the particles of `type1` and `type2` from the interaction'
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       self.cxxclass.setPotential(self, type1, type2, potential)
 
@@ -124,7 +172,7 @@ class VerletListCoulombRSpaceLocal(InteractionLocal, interaction_VerletListCoulo
       return self.cxxclass.getPotential(self, type1, type2)
 
   def getVerletListLocal(self):
-    'The method gets the VerletList from the interaction'
+
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       return self.cxxclass.getVerletList(self)
 
