@@ -21,16 +21,16 @@
 
 """
 ************************************
-**espresso.interaction.VSpherePair**
+**espressopp.interaction.VSpherePair**
 ************************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_VSpherePair, interaction_VerletListVSpherePair
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_VSpherePair, interaction_VerletListVSpherePair
 
 class VSpherePairLocal(PotentialLocal, interaction_VSpherePair):
     'The (local) Lennard-Jones potential.'
@@ -67,14 +67,14 @@ if pmi.isController:
     class VSpherePair(Potential):
         'The Lennard-Jones potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.VSpherePairLocal',
+            cls = 'espressopp.interaction.VSpherePairLocal',
             pmiproperty = ['epsilon']
             )
 
     class VerletListVSpherePair(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListVSpherePairLocal',
+            cls =  'espressopp.interaction.VerletListVSpherePairLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
 

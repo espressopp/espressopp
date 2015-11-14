@@ -30,7 +30,7 @@
 #include "iterator/CellListIterator.hpp"
 #include <vector>
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     using namespace iterator;
     /** Class to compute the particle radius distribution. */

@@ -28,9 +28,10 @@
 #include "log4espp.hpp"
 #include "types.hpp"
 //#include <list>
+#include <set>
 #include <boost/signals2.hpp>
 
-namespace espresso {
+namespace espressopp {
 
     /**
      * \brief group of particles

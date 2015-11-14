@@ -26,7 +26,7 @@
 
 #include "LatticeBoltzmann.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
     /** Abstract base class for arbitrary Init for LB simulations. */
     class LBInit {
@@ -39,19 +39,15 @@ namespace espresso {
       /* Destructor for the class */
       virtual ~LBInit () {}
 
-      /* PART FOR HANDLING INITIAL DENSITIES AND VELOCITIES */
+      /* HANDLING INITIAL DENSITIES AND VELOCITIES */
       virtual void createDenVel (real _rho0, Real3D _u0) = 0;
 
-      /* PART FOR HANDLING EXTERNAL FORCES */
-      /* set external forces (all existing external forces will be destroyed) */
-//      virtual void setExtForce () = 0;
-      /* add external forces (all existing external forces will be preserved) */
-//      virtual void addExtForce () = 0;
-
+      /* HANDLING EXTERNAL FORCES */
       virtual void setForce (Real3D _force) = 0;
       virtual void addForce (Real3D _force) = 0;
 
       static void registerPython();
+			
     protected:
       shared_ptr<LatticeBoltzmann> latticeboltzmann;
       real rho0;

@@ -23,6 +23,7 @@
 //#include <iomanip>
 #include "python.hpp"
 #include "VelocityVerlet.hpp"
+#include <iomanip>
 #include "iterator/CellListIterator.hpp"
 #include "interaction/Interaction.hpp"
 #include "interaction/Potential.hpp"
@@ -36,12 +37,14 @@
 #define VT_TRACER( name)
 #endif
 
-namespace espresso {
+namespace espressopp {
   using namespace std;
   namespace integrator {
     using namespace interaction;
     using namespace iterator;
     using namespace esutil;
+
+    LOG4ESPP_LOGGER(VelocityVerlet::theLogger, "VelocityVerlet");
 
     VelocityVerlet::VelocityVerlet(shared_ptr< System > system) : MDIntegrator(system)
     {
@@ -83,7 +86,7 @@ namespace espresso {
       bool recalcForces = true;  // TODO: more intelligent
 
       if (recalcForces) {
-        LOG4ESPP_INFO(theLogger, "recalc Forces");
+        LOG4ESPP_INFO(theLogger, "recalc forces before starting main integration loop");
 
         // signal
         recalc1();
@@ -97,7 +100,7 @@ namespace espresso {
         recalc2();
       }
 
-      LOG4ESPP_INFO(theLogger, "run " << nsteps << " iterations");
+      LOG4ESPP_INFO(theLogger, "starting main integration loop (nsteps=" << nsteps << ")");
   
       for (int i = 0; i < nsteps; i++) {
         LOG4ESPP_INFO(theLogger, "Next step " << i << " of " << nsteps << " starts");
@@ -108,6 +111,7 @@ namespace espresso {
         befIntP();
 
         time = timeIntegrate.getElapsedTime();
+        LOG4ESPP_INFO(theLogger, "updating positions and velocities")
         maxDist += integrate1();
         timeInt1 += timeIntegrate.getElapsedTime() - time;
 
@@ -136,6 +140,7 @@ namespace espresso {
             timeResort += timeIntegrate.getElapsedTime() - time;
         }
 
+        LOG4ESPP_INFO(theLogger, "updating forces")
         updateForces();
 
         // signal
@@ -237,6 +242,7 @@ namespace espresso {
         real sqDist = 0.0;
         if (cit->mass() < ROUND_ERROR_PREC) continue;
 
+        LOG4ESPP_INFO(theLogger, "updating first half step of velocities and full step of positions")
         LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() << 
                 ", pos = " << cit->position() <<
                 ", v = " << cit->velocity() << 
@@ -281,6 +287,7 @@ namespace espresso {
 
     void VelocityVerlet::integrate2()
     {
+      LOG4ESPP_INFO(theLogger, "updating second half step of velocities")
       System& system = getSystemRef();
       CellList realCells = system.storage->getRealCells();
 
@@ -322,6 +329,7 @@ namespace espresso {
 
     void VelocityVerlet::updateForces()
     {
+      LOG4ESPP_INFO(theLogger, "update ghosts, calculate forces and collect ghost forces")
       real time;
       storage::Storage& storage = *getSystemRef().storage;
       time = timeIntegrate.getElapsedTime();
@@ -357,6 +365,7 @@ namespace espresso {
 
       for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
         cit->force() = 0.0;
+        cit->drift() = 0.0;   // Can in principle be commented, when drift is not used.
       }
     }
 
@@ -406,7 +415,7 @@ namespace espresso {
 
     void VelocityVerlet::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       // Note: use noncopyable and no_init for abstract classes
       class_<VelocityVerlet, bases<MDIntegrator>, boost::noncopyable >

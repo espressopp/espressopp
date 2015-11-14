@@ -24,35 +24,32 @@
 #include "FENE.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
-      typedef class FixedPairListInteractionTemplate< FENE >
-      FixedPairListFENE;
-
+    typedef class FixedPairListInteractionTemplate< FENE > FixedPairListFENE;
+    LOG4ESPP_LOGGER(FENE::theLogger, "FENE");
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void 
     FENE::registerPython() {
-      using namespace espresso::python;
-
+      using namespace espressopp::python;
       class_< FENE, bases< Potential > >
-    	("interaction_FENE", init< real, real, real, real >())
-	.def(init< real, real, real, real, real >())
-	.add_property("K", &FENE::getK, &FENE::setK)
-	.add_property("r0", &FENE::getR0, &FENE::setR0)
-	.add_property("rMax", &FENE::getRMax, &FENE::setRMax)
-    	;
+      ("interaction_FENE", init< real, real, real, real >())
+	  .def(init< real, real, real, real, real >())
+	  .add_property("K", &FENE::getK, &FENE::setK)
+	  .add_property("r0", &FENE::getR0, &FENE::setR0)
+	  .add_property("rMax", &FENE::getRMax, &FENE::setRMax)
+	  ;
 
       class_< FixedPairListFENE, bases< Interaction > >
-      ("interaction_FixedPairListFENE",
-        init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<FENE> >())
-       .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<FENE> >())
-       .def("setPotential", &FixedPairListFENE::setPotential)
-       .def("getPotential", &FixedPairListFENE::getPotential)
-       .def("setFixedPairList", &FixedPairListFENE::setFixedPairList)
-       .def("getFixedPairList", &FixedPairListFENE::getFixedPairList)
-       ;
+      ("interaction_FixedPairListFENE", init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<FENE> >())
+      .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<FENE> >())
+      .def("setPotential", &FixedPairListFENE::setPotential)
+      .def("getPotential", &FixedPairListFENE::getPotential)
+      .def("setFixedPairList", &FixedPairListFENE::setFixedPairList)
+      .def("getFixedPairList", &FixedPairListFENE::getFixedPairList)
+      ;
     }
 
   }

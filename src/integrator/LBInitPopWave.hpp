@@ -25,7 +25,7 @@
 
 #include "LBInit.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
     class LBInitPopWave : public LBInit {
       public:

@@ -24,7 +24,7 @@
 #include "FENECapped.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
       typedef class FixedPairListInteractionTemplate< FENECapped >
       FixedPairListFENECapped;
@@ -34,7 +34,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void 
     FENECapped::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< FENECapped, bases< Potential > >
     	("interaction_FENECapped", init< real, real, real, real, real >())

@@ -25,7 +25,7 @@
 #include "System.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     LOG4ESPP_LOGGER(MDIntegrator::theLogger, "MDIntegrator");
@@ -85,6 +85,13 @@ namespace espresso {
        exList.push_back(extension);
     }
 
+    int MDIntegrator::getNumberOfExtensions() {
+    	return exList.size();
+    }
+
+    shared_ptr<integrator::Extension> MDIntegrator::getExtension(int k) {
+    	return exList[k];
+    }
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
@@ -92,7 +99,7 @@ namespace espresso {
 
     void MDIntegrator::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       // Note: use noncopyable and no_init for abstract classes
       class_<MDIntegrator, boost::noncopyable>
@@ -102,6 +109,8 @@ namespace espresso {
         .add_property("system", &SystemAccess::getSystem)
         .def("run", &MDIntegrator::run)
         .def("addExtension", &MDIntegrator::addExtension)
+        .def("getNumberOfExtensions", &MDIntegrator::getNumberOfExtensions)
+        .def("getExtension", &MDIntegrator::getExtension)
         ;
     }
   }

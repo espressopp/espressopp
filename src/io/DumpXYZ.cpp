@@ -30,11 +30,11 @@
 #include "analysis/ConfigurationExt.hpp"
 #include "analysis/ConfigurationsExt.hpp"
 
-using namespace espresso;
-using namespace espresso::analysis;
+using namespace espressopp;
+using namespace espressopp::analysis;
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
   namespace io {
       
     void DumpXYZ::dump(){
@@ -89,7 +89,7 @@ namespace espresso {
     // Python wrapping
     void DumpXYZ::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<DumpXYZ, bases<ParticleAccess>, boost::noncopyable >
       ("io_DumpXYZ", init< shared_ptr< System >, 

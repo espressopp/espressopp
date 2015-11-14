@@ -29,11 +29,11 @@
 #include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   namespace integrator {
 
-    using namespace espresso::iterator;
+    using namespace espressopp::iterator;
 
 
     LangevinThermostat::LangevinThermostat(shared_ptr<System> system)
@@ -43,6 +43,8 @@ namespace espresso {
 
       gamma  = 0.0;
       temperature = 0.0;
+      
+      adress = false;
 
       if (!system->rng) {
         throw std::runtime_error("system has no RNG");
@@ -142,10 +144,10 @@ namespace espresso {
       System& system = getSystemRef();
 
       // thermalize CG particles
-      CellList cells = system.storage->getRealCells();
+      /*CellList cells = system.storage->getRealCells();
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
         frictionThermo(*cit);
-      }
+      }*/
 
       // TODO: It doesn't make that much sense to thermalize both CG and AT particles, since CG particles get velocities of AT particles anyway.
       
@@ -153,7 +155,18 @@ namespace espresso {
       ParticleList& adrATparticles = system.storage->getAdrATParticles();
       for (std::vector<Particle>::iterator it = adrATparticles.begin();
               it != adrATparticles.end(); it++) {
-        frictionThermo(*it);
+            frictionThermo(*it);
+            
+        // Only in hybrid region!          
+        /*Particle &at = *it;
+        real w = at.lambda();  
+        if(w!=1.0 && w!=0.0) {
+            //std::cout << "w: " << w << std::endl;
+            //std::cout << "pos_x: " << at.position()[0] << std::endl;
+            
+            frictionThermo(*it);
+        }*/           
+            
       }
       
     }
@@ -218,7 +231,7 @@ namespace espresso {
     void LangevinThermostat::registerPython() {
 
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
 
       class_<LangevinThermostat, shared_ptr<LangevinThermostat>, bases<Extension> >

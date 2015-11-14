@@ -32,7 +32,7 @@
 #include "types.hpp"
 #include "Real3D.hpp"
 
-namespace espresso {
+namespace espressopp {
   class CellGridIllegal: public std::runtime_error
   {
   public:

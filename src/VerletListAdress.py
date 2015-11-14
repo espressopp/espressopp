@@ -49,24 +49,35 @@ Bascially the VerListAdress provides 4 lists:
 * vlPairs: A list which holds all pairs which have both particles in the cgZone,
   i.e. in the coarse-grained region
 
-Example - creating the VerletListAdress:
+Example - creating the VerletListAdress for a slab-type adress region fixed in space (only the x value of adrCenter is used):
 
->>> vl      = espresso.VerletListAdress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, adrCenter=[Lx/2, Ly/2, Lz/2])
+>>> vl      = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, adrCenter=[Lx/2, Ly/2, Lz/2])
 
+or
+
+>>> vl      = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, adrCenter=[Lx/2, Ly/2, Lz/2], sphereAdr=False)
+
+Example - creating the VerletListAdress for a spherical adress region centered on adrCenter and fixed in space:
+
+>>> vl      = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, adrCenter=[Lx/2, Ly/2, Lz/2], sphereAdr=True)
+
+Example - creating the VerletListAdress for a spherical adress region centered on a particle and moving with the particle
+
+>>> vl      = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, pids=[adrCenterPID], sphereAdr=True)
 """
 
-from espresso import pmi
-import _espresso 
-import espresso
-from espresso.esutil import cxxinit
+from espressopp import pmi
+import _espressopp 
+import espressopp
+from espressopp.esutil import cxxinit
 
-class VerletListAdressLocal(_espresso.VerletListAdress):
+class VerletListAdressLocal(_espressopp.VerletListAdress):
     'The (local) verlet list AdResS'
 
-    def __init__(self, system, cutoff, adrcut, dEx, dHy, adrCenter=[], pids=[], exclusionlist=[]):
+    def __init__(self, system, cutoff, adrcut, dEx, dHy, adrCenter=[], pids=[], exclusionlist=[], sphereAdr=False):
         'Local construction of a verlet list for AdResS'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.VerletListAdress, system, cutoff, adrcut, False, dEx, dHy)
+            cxxinit(self, _espressopp.VerletListAdress, system, cutoff, adrcut, False, dEx, dHy)
             #self.cxxclass.setAtType(self, atType)
             # check for exclusions
             if (exclusionlist != []):
@@ -81,6 +92,8 @@ class VerletListAdressLocal(_espresso.VerletListAdress):
             # set adress center
             if (adrCenter != []):
                 self.cxxclass.setAdrCenter(self, adrCenter[0], adrCenter[1], adrCenter[2])
+            # set adress region type (slab or spherical)
+            self.cxxclass.setAdrRegionType(self,sphereAdr)
             
             # rebuild list now
             self.cxxclass.rebuild(self)
@@ -125,7 +138,7 @@ if pmi.isController:
     class VerletListAdress(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.VerletListAdressLocal',
+            cls = 'espressopp.VerletListAdressLocal',
             pmiproperty = [ 'builds' ],
             pmicall = [ 'totalSize', 'exclude', 'addAdrParticles', 'rebuild' ]
             )

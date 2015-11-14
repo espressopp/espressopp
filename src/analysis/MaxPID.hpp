@@ -27,7 +27,7 @@
 #include "types.hpp"
 #include "Observable.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     /** Class to get the number of particles in the system. */
     class MaxPID : public Observable {

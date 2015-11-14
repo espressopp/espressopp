@@ -38,14 +38,14 @@
 #include "boost/signals2.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     class FreeEnergyCompensation : public Extension {
 
       public:
         FreeEnergyCompensation(shared_ptr<System> system);
-        ~FreeEnergyCompensation();
+        virtual ~FreeEnergyCompensation();
 
         /** Setter for the filename, will read in the table. */
         void addForce(int itype, const char* _filename, int type);

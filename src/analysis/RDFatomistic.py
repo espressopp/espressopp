@@ -21,20 +21,20 @@
 
 """
 **********************************
-**espresso.analysis.RDFatomistic**
+**espressopp.analysis.RDFatomistic**
 **********************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.Observable import *
-from _espresso import analysis_RDFatomistic
+from espressopp.analysis.Observable import *
+from _espressopp import analysis_RDFatomistic
 
 class RDFatomisticLocal(ObservableLocal, analysis_RDFatomistic):
   'The (local) compute the radial distr function.'
-  def __init__(self, system):
-    cxxinit(self, analysis_RDFatomistic, system)
+  def __init__(self, system, type1, type2, _span):
+    cxxinit(self, analysis_RDFatomistic, system, type1, type2, _span)
     
   def compute(self, rdfN):
     return self.cxxclass.compute(self, rdfN)
@@ -44,5 +44,5 @@ if pmi.isController :
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
       pmicall = [ "compute" ],
-      cls = 'espresso.analysis.RDFatomisticLocal'
+      cls = 'espressopp.analysis.RDFatomisticLocal'
     )

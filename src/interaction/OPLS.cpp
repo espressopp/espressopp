@@ -25,14 +25,14 @@
 #include "FixedTripleListInteractionTemplate.hpp"
 #include "FixedQuadrupleListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void 
     OPLS::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_ <OPLS, bases <DihedralPotential> >
     	("interaction_OPLS", init< real, real, real, real >())

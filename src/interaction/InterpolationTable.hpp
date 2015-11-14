@@ -29,7 +29,7 @@
 #include "logging.hpp"
 #include "mpi.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     /** This class defines an interpolation table that can be used for

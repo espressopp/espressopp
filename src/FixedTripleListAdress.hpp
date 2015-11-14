@@ -35,7 +35,7 @@
 #include <boost/signals2.hpp>
 
 
-namespace espresso {
+namespace espressopp {
 
     /**
      * This is a subclass of FixedTripleList. It should be used for AdResS fixed
@@ -63,7 +63,7 @@ namespace espresso {
 
 	  protected:
 		// fixedtuple list connects to this and triggers beforeSendATParticles()
-		boost::signals2::connection con;
+		boost::signals2::connection sigBeforeSendAT, sigAfterRecvAT;
 
 	  private:
 		shared_ptr<FixedTupleListAdress> fixedtupleList;

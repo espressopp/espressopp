@@ -31,7 +31,7 @@
 #include "boost/signals2.hpp"
 #include "boost/unordered_set.hpp"
 
-namespace espresso {
+namespace espressopp {
 
 /** Class that builds and stores verlet lists.
 
@@ -70,10 +70,15 @@ namespace espresso {
     void addAdrParticle(longint pid);
     // set the center of AdResS zone
     void setAdrCenter(real x, real y, real z);
+    bool getAdrCenterSet() { return adrCenterSet; } // tells if adrCenter is set
+    // set whether adress zone is spherical (true) or slab (false)
+    void setAdrRegionType(bool _sphereAdr);
+    bool getAdrRegionType();
     /** Define the lowest atomistic type number */
     //void setAtType(size_t type);
 
 
+    std::vector<Real3D*> adrPositions; // positions of centres of adress zone (either from adrCenter in VerletListAdress.cpp or at each step from adrList in integrator/Adress.cpp
     void rebuild();
 
     /** Get the total number of pairs for the Verlet list */
@@ -94,16 +99,16 @@ namespace espresso {
   private:
 
     // AdResS stuff
-    std::set<longint> adrList;   // pids of particles defined as adress particles
-    std::vector<Real3D*> adrPositions; // positions of adress particles
+    std::set<longint> adrList;   // pids of particles defining center of adress zone, if set
     std::set<Particle*> adrZone; // particles that are in the AdResS zone
     std::set<Particle*> cgZone; // particles not in adress zone (same as in vlPairs)
     PairList adrPairs;           // pairs that are in AdResS zone
     real dEx, dHy; // size of the expicit and hybrid zone
     real adrsq, adrcutsq, adrCutverlet, cutverlet;
     real skin;
-    Real3D adrCenter; // center of adress zone, if set
+    Real3D adrCenter; // center of adress zone, if set (either adrCenter or adrList should be set)
     bool adrCenterSet; // tells if adrCenter is set
+    bool sphereAdr; // true: adress region is spherical centered on point x,y,z or particle pid; false: adress region is slab centered on point x or particle pid
 
     //size_t atType; // types above this number are considered atomistic
     //void isPairInAdrZone(Particle &pt1, Particle &pt2); // not used anymore

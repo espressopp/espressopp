@@ -21,12 +21,12 @@
 
 """
 *******************
-**espresso.Tensor**
+**espressopp.Tensor**
 *******************
 
 """
-from _espresso import Tensor
-from espresso import esutil
+from _espressopp import Tensor
+from espressopp import esutil
 
 # This injects additional methods into the Tensor class and pulls it
 # into this module 

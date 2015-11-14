@@ -26,7 +26,7 @@
 
 This is the object which represents N-dimensional vector. It is an extended Real3D,
 basicly, it hase the same functionallity but in N-dimetions.
-First of all it is usefull for classes in 'espresso.analysis'.
+First of all it is usefull for classes in 'espressopp.analysis'.
 
 Description
 
@@ -34,8 +34,8 @@ Description
 
 """
 
-from _espresso import RealND
-from espresso import esutil
+from _espressopp import RealND
+from espressopp import esutil
 
 # This injects additional methods into the RealND class and pulls it
 # into this module 

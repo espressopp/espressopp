@@ -33,7 +33,7 @@
 #include "boost/unordered_set.hpp"
 #include "VirtualVerletList.hpp"
 
-namespace espresso {
+namespace espressopp {
 
 /** Class that builds and stores verlet lists.
 

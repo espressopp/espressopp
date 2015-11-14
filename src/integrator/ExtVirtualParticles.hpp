@@ -21,7 +21,7 @@
 #include "FixedTupleList.hpp"
 
 
-namespace espresso {
+namespace espressopp {
 
   namespace integrator {
 

@@ -21,7 +21,7 @@
 
 # -*- coding: utf-8 -*-
 
-import espresso
+import espressopp
 
 """
   This Python module allows one to read and write configurational files.
@@ -51,7 +51,7 @@ import espresso
 def write(fileName, system, folded=True, writeVelocities=False):
     
   # first collect all the information that we need to write into the file
-  numParticles  = int(espresso.analysis.NPart(system).compute())
+  numParticles  = int(espressopp.analysis.NPart(system).compute())
   box_x = system.bc.boxL[0]
   box_y = system.bc.boxL[1]
   box_z = system.bc.boxL[2]
@@ -66,21 +66,21 @@ def write(fileName, system, folded=True, writeVelocities=False):
   nInteractions = system.getNumberOfInteractions()
   for i in range(nInteractions):
       bT = system.getInteraction(i).bondType()
-      if   bT == espresso.interaction.Pair:
+      if   bT == espressopp.interaction.Pair:
              nbondtypes += 1
              bl  = system.getInteraction(i).getFixedPairList().getBonds()
              bln = []
              for j in range(len(bl)):
                bln.extend(bl[j])
              bonds.append(bln)
-      elif bT == espresso.interaction.Angular:
+      elif bT == espressopp.interaction.Angular:
              nangletypes += 1
              an  = system.getInteraction(i).getFixedTripleList().getTriples()
              ann = []
              for j in range(len(an)):
                ann.extend(an[j]) 
              angles.append(ann)
-      elif bT == espresso.interaction.Dihedral:
+      elif bT == espressopp.interaction.Dihedral:
              ndihedraltypes += 1
              di  = system.getInteraction(i).getFixedQuadrupleList().getQuadruples()
              din = []
@@ -99,7 +99,7 @@ def write(fileName, system, folded=True, writeVelocities=False):
       ndihedrals += len(dihedrals[i])
       
   atomtypes = []
-  maxParticleID = int(espresso.analysis.MaxPID(system).compute())
+  maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
   pid   = 0
   while pid <= maxParticleID:
     if system.storage.particleExists(pid):
@@ -228,7 +228,7 @@ def read(fileName, readVelocities=False):
     k, kk, rx, ry, rz = map(float, f.readline().split()[0:])
     p_ids.append(int(k))
     p_types.append(int(kk))
-    poss.append(espresso.Real3D(rx, ry, rz))
+    poss.append(espressopp.Real3D(rx, ry, rz))
 
   vels = []
   if(readVelocities):
@@ -239,7 +239,7 @@ def read(fileName, readVelocities=False):
     line = f.readline() # blank line
     for i in range(num_particles):
       vx_, vy_, vz_ = map(float, f.readline().split()[0:])
-      vels.append(espresso.Real3D(vx_, vy_, vz_))
+      vels.append(espressopp.Real3D(vx_, vy_, vz_))
 
   bonds = []
   if(num_bonds != 0):

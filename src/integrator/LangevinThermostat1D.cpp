@@ -29,11 +29,11 @@
 #include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   namespace integrator {
 
-    using namespace espresso::iterator;
+    using namespace espressopp::iterator;
 
 
     LangevinThermostat1D::LangevinThermostat1D(shared_ptr<System> system)
@@ -226,7 +226,7 @@ namespace espresso {
     void LangevinThermostat1D::registerPython() {
 
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
 
       class_<LangevinThermostat1D, shared_ptr<LangevinThermostat1D>, bases<Extension> >

@@ -20,11 +20,11 @@
 
 
 import unittest
-import espresso.unittest
-from espresso.interaction.FENE import *
-from espresso import Real3D, infinity
+import espressopp.unittest
+from espressopp.interaction.FENE import *
+from espressopp import Real3D, infinity
 
-class Test0FENE(espresso.unittest.TestCase) :
+class Test0FENE(espressopp.unittest.TestCase) :
     def test0Energy(self) :
         fene=FENE(K=1.0, r0=1.0, rMax=0.5)
         # root = minimum

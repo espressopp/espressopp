@@ -34,13 +34,13 @@
 
 //#include "FixedListComm.hpp"
 
-namespace espresso {
-	class FixedPairList : public PairList{
+namespace espressopp {
+	class FixedPairList : public PairList {
 	  public:
 	    typedef boost::unordered_multimap<longint, longint> GlobalPairs;
 
 	  protected:
-		boost::signals2::connection con1, con2, con3;
+		boost::signals2::connection sigBeforeSend, sigOnParticlesChanged, sigAfterRecv;
 		shared_ptr <storage::Storage> storage;
 		GlobalPairs globalPairs;
 		using PairList::add;
@@ -76,7 +76,7 @@ namespace espresso {
 	    static void registerPython();
 
 	  private:
-		static LOG4ESPP_DECL_LOGGER(theLogger);
+		  static LOG4ESPP_DECL_LOGGER(theLogger);
 	};
 }
 

@@ -23,7 +23,7 @@
 #include "python.hpp"
 #include "LBOutputVzInTime.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 //    LOG4ESPP_LOGGER(LBOutputVzInTime::theLogger, "LBOutputVzInTime");
     LBOutputVzInTime::LBOutputVzInTime(shared_ptr<System> system,
@@ -69,7 +69,7 @@ namespace espresso {
     }
 
     void LBOutputVzInTime::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<LBOutputVzInTime, bases< LBOutput > >
           ("analysis_LBOutput_VzInTime", init< shared_ptr< System >,

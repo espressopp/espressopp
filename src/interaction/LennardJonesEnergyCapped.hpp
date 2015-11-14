@@ -27,7 +27,7 @@
 #include "FixedPairListInteractionTemplate.hpp"
 #include "Potential.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     /** This class provides methods to compute forces and energies of
 	the Lennard Jones potential with capped energy.

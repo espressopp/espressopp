@@ -21,16 +21,16 @@
 
 """
 ***********************************
-**espresso.interaction.FENECapped**
+**espressopp.interaction.FENECapped**
 ***********************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_FENECapped, interaction_FixedPairListFENECapped
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_FENECapped, interaction_FixedPairListFENECapped
 
 class FENECappedLocal(PotentialLocal, interaction_FENECapped):
     'The (local) FENECapped potential.'
@@ -69,14 +69,14 @@ if pmi.isController:
     class FENECapped(Potential):
         'The FENECapped potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.FENECappedLocal',
+            cls = 'espressopp.interaction.FENECappedLocal',
             pmiproperty = ['K', 'r0', 'rMax', 'caprad']
             )
 
     class FixedPairListFENECapped(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedPairListFENECappedLocal',
+            cls =  'espressopp.interaction.FixedPairListFENECappedLocal',
             pmicall = ['setPotential','getPotential','setFixedPairList', 'getFixedPairList']
             )
 

@@ -32,17 +32,17 @@ the nodegrid and the cellgrid.
 
 Example - setting DomainDecompositionAdress:
 
->>> system.storage = espresso.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
+>>> system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
 
 """
 
-from espresso import pmi
-from espresso.esutil import cxxinit
-from _espresso import storage_DomainDecompositionAdress
-from espresso import Int3D, toInt3DFromVector
-import MPI
+from espressopp import pmi
+from espressopp.esutil import cxxinit
+from _espressopp import storage_DomainDecompositionAdress
+from espressopp import Int3D, toInt3DFromVector
+import mpi4py.MPI as MPI
 
-from espresso.storage.Storage import *
+from espressopp.storage.Storage import *
 
 class DomainDecompositionAdressLocal(StorageLocal, 
                                storage_DomainDecompositionAdress):
@@ -54,7 +54,7 @@ class DomainDecompositionAdressLocal(StorageLocal,
 if pmi.isController:
     class DomainDecompositionAdress(Storage):
         pmiproxydefs = dict(
-            cls = 'espresso.storage.DomainDecompositionAdressLocal',
+            cls = 'espressopp.storage.DomainDecompositionAdressLocal',
             pmicall = ['getCellGrid', 'cellAdjust']
             )
         def __init__(self, system, 

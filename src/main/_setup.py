@@ -20,13 +20,13 @@
 
 
 # now load the fundamental modules
-# load mpi4py (must be loaded before _espresso)
-import MPI
+# load mpi4py (must be loaded before _espressopp)
+import mpi4py.MPI as MPI
 # load the ES++-C++ module
-import _espresso
+import _espressopp
 
-# load PMI explicitly from espresso
-from espresso import pmi
+# load PMI explicitly from espressopp
+from espressopp import pmi
 
 # define pmiimport
 if pmi.isController :
@@ -40,7 +40,7 @@ else:
 def _setupLogging():
     import logging, os, math
 
-    logConfigFile="espresso_log.conf"
+    logConfigFile="espressopp_log.conf"
     if os.path.exists(logConfigFile) :
         import logging.config
         logging.config.fileConfig(logConfigFile)
@@ -57,13 +57,13 @@ def _setupLogging():
 
         def __my_setLevel(self, level):
             __orig_setLevel(self, level)
-            _espresso.setLogger(self)
+            _espressopp.setLogger(self)
 
         __orig_setLevel = logging.Logger.setLevel
         logging.Logger.setLevel = __my_setLevel
         logging.TRACE = int((logging.NOTSET + logging.DEBUG)/2.0)
         logging.addLevelName('TRACE', logging.TRACE)
-        _espresso.setLogger()
+        _espressopp.setLogger()
 
 # execute the function
 

@@ -26,7 +26,7 @@
 
 #include "types.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   //////////////////////////////////////////////////
   // Real3D

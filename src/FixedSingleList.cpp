@@ -31,7 +31,7 @@
 
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
 
   LOG4ESPP_LOGGER(FixedSingleList::theLogger, "FixedSingleList");
 
@@ -149,7 +149,7 @@ namespace espresso {
 
   void FixedSingleList::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (FixedSingleList::*pyAdd)(longint pid1) = &FixedSingleList::add;
 

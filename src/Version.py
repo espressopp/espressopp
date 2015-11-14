@@ -24,15 +24,15 @@
 **Version** - Object
 ************************************
 
-Return version information of espresso module 
+Return version information of espressopp module 
 
 Example:
 
->>> version     = espresso.Version()
+>>> version     = espressopp.Version()
 >>> print "Name                   = ", version.name
 >>> print "Major version number   = ", version.major
 >>> print "Minor version number   = ", version.minor
->>> print "Mercurial(hg) revision = ", version.hgrevision
+>>> print "Git revision = ", version.gitrevision
 >>> print "boost version          = ", version.boostversion
 >>> print "Patchlevel             = ", version.patchlevel
 >>> print "Compilation date       = ", version.date
@@ -44,30 +44,30 @@ to print a full version info string:
 
 """
 
-from espresso import pmi
-from espresso.esutil import cxxinit
+from espressopp import pmi
+from espressopp.esutil import cxxinit
 
-import _espresso
-import MPI
+import _espressopp
+import mpi4py.MPI as MPI
 
 
-class VersionLocal(_espresso.Version):
+class VersionLocal(_espressopp.Version):
     def __init__(self):
         'Local Version object'
         if pmi._PMIComm and pmi._PMIComm.isActive():
             if pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-                cxxinit(self, _espresso.Version)
+                cxxinit(self, _espressopp.Version)
             else :
                 pass
         else :
-            cxxinit(self, _espresso.Version)
+            cxxinit(self, _espressopp.Version)
 
 if pmi.isController:
     class Version(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.VersionLocal',
-            pmiproperty = ['major', 'minor', 'hgrevision', 'boostversion', 'patchlevel', 'date', 'time', 'name'],
+            cls = 'espressopp.VersionLocal',
+            pmiproperty = ['major', 'minor', 'gitrevision', 'boostversion', 'patchlevel', 'date', 'time', 'name'],
             pmicall = ['info']
             )
 

@@ -27,11 +27,11 @@
 #include "boost/version.hpp"
 
 #define MAJORVERSION 1
-#define MINORVERSION 7
-#define PATCHLEVEL   0
-#include "hgversion.hpp"
+#define MINORVERSION 9
+#define PATCHLEVEL   3
+#include "gitversion.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   class Version {
   public:
@@ -44,7 +44,7 @@ namespace espresso {
     int minor;
     int patchlevel;
     std::string name;
-    std::string hgrevision;
+    std::string gitrevision;
     std::string boostversion;
     std::string date;
     std::string time;

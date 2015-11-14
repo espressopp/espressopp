@@ -21,13 +21,13 @@
 
 """
 *********************************
-**espresso.integrator.Extension**
+**espressopp.integrator.Extension**
 *********************************
 
 """
-#from espresso.esutil import cxxinit
-from espresso import pmi
-from _espresso import integrator_Extension 
+#from espressopp.esutil import cxxinit
+from espressopp import pmi
+from _espressopp import integrator_Extension 
 
 class ExtensionLocal(object):
     'The (local) Extension abstract base class.'
@@ -57,8 +57,8 @@ if pmi.isController :
     class Extension(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            #cls =  'espresso.integrator.Extension',
-            #pmiproperty = [ 'itype', 'filename'],
+            #cls =  'espressopp.integrator.Extension',
+            pmiproperty = [ 'type'],
             #pmicall = ['addForce']
             pmicall = [ 'connect', 'disconnect' ]
         )

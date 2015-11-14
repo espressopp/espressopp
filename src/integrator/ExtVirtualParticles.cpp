@@ -11,11 +11,11 @@
 
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
 
   namespace integrator {
 
-    using namespace espresso::iterator;
+    using namespace espressopp::iterator;
 
     ExtVirtualParticles::ExtVirtualParticles(shared_ptr<System> system, shared_ptr<CellList> _cl)
         :Extension(system){
@@ -240,7 +240,7 @@ void ExtVirtualParticles::rebuildVCellLists() {
     ****************************************************/
 
     void ExtVirtualParticles::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<ExtVirtualParticles, shared_ptr<ExtVirtualParticles>, bases<Extension> >
         ("integrator_ExtVirtualParticles", init<shared_ptr<System>, shared_ptr<CellList>  >())

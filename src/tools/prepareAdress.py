@@ -37,7 +37,7 @@ Then the molecules will be put together properly afterwards when calling AdressD
 
 """
 
-import espresso
+import espressopp
 
 def AdressSetCG(apm, pidCG, allParticlesAT):
     cmp = [0,0,0]
@@ -47,7 +47,7 @@ def AdressSetCG(apm, pidCG, allParticlesAT):
     return cmp
 
 def AdressDecomp(system, integrator):
-    #espresso.system.storage.decompose()
+    system.storage.decompose()
     integrator.run(0)
     system.storage.decompose()
     integrator.run(0)

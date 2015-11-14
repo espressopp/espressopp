@@ -21,22 +21,21 @@
 
 """
 **************************
-**espresso.ParticleGroup**
+**espressopp.ParticleGroup**
 **************************
 
 """
-import _espresso
+import _espressopp
 import esutil
 import pmi
-#from espresso import toReal3DFromVector, MPI
-from espresso.esutil import cxxinit
+from espressopp.esutil import cxxinit
 
-class ParticleGroupLocal(_espresso.ParticleGroup):
+class ParticleGroupLocal(_espressopp.ParticleGroup):
     """The local particle group."""
 
     def __init__(self, storage):
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.ParticleGroup, storage)
+            cxxinit(self, _espressopp.ParticleGroup, storage)
 
     def add(self, pid):
         if pmi.workerIsActive():
@@ -58,7 +57,7 @@ if pmi.isController:
     class ParticleGroup(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.ParticleGroupLocal',
+            cls = 'espressopp.ParticleGroupLocal',
             pmicall = [ "add", "show", "has", "size" ]
             )
 

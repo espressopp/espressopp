@@ -21,10 +21,10 @@
 
 from math import sqrt, pi, cos, sin
 import random
-from espresso import Real3D
-from espresso.Exceptions import Error
+from espressopp import Real3D
+from espressopp.Exceptions import Error
 
-def polymerRW(pid, startpos, numberOfMonomers, bondlength, return_angles=False, return_dihedrals=False, mindist=None):
+def polymerRW(pid, startpos, numberOfMonomers, bondlength, return_angles=False, return_dihedrals=False, mindist=None, rng=None):
 	x         = startpos[0]
 	y         = startpos[1]
 	z         = startpos[2]
@@ -38,9 +38,13 @@ def polymerRW(pid, startpos, numberOfMonomers, bondlength, return_angles=False, 
 	for i in range(numberOfMonomers-1):
 	  if mindist and i > 0:
 		while True:
-		  nextZ = (2.0*random.uniform(0,1)-1.0)*bondlength;
+		  if rng==None:
+		    nextZ = (2.0*random.uniform(0,1)-1.0)*bondlength;
+  		    phi   = 2.0*pi*random.uniform(0,1);
+		  else:
+		    nextZ = (2.0*rng()-1.0)*bondlength;
+  		    phi   = 2.0*pi*rng();
 		  rr    = sqrt(bondlength*bondlength-nextZ*nextZ);
-		  phi   = 2.0*pi*random.uniform(0,1);
 		  nextX = rr*cos(phi);
 		  nextY = rr*sin(phi);				
 		 
@@ -68,9 +72,13 @@ def polymerRW(pid, startpos, numberOfMonomers, bondlength, return_angles=False, 
 		  
 		  	
 	  else:
-		nextZ = (2.0*random.uniform(0,1)-1.0)*bondlength;
+		if rng==None:
+		  nextZ = (2.0*random.uniform(0,1)-1.0)*bondlength;
+  		  phi   = 2.0*pi*random.uniform(0,1);
+		else:
+		  nextZ = (2.0*rng()-1.0)*bondlength;
+  		  phi   = 2.0*pi*rng();
 		rr    = sqrt(bondlength*bondlength-nextZ*nextZ);
-		phi   = 2.0*pi*random.uniform(0,1);
 		nextX = rr*cos(phi);
 		nextY = rr*sin(phi);				
 

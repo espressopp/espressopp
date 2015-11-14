@@ -22,7 +22,7 @@
 
 #include "CellListAllPairsIterator.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace iterator {
     LOG4ESPP_LOGGER(CellListAllPairsIterator::theLogger, "CellListAllPairsIterator");
   }

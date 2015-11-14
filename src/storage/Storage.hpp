@@ -23,6 +23,7 @@
 // ESPP_CLASS
 #ifndef _STORAGE_STORAGE_HPP
 #define _STORAGE_STORAGE_HPP
+#include "python.hpp"
 #include "SystemAccess.hpp"
 #include "mpi.hpp"
 //#include <vector>
@@ -35,7 +36,7 @@
 #include "Buffer.hpp"
 #include "types.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   namespace storage {
     /** represents the particle storage of one system. */
@@ -166,6 +167,8 @@ namespace espresso {
       CellList &getLocalCells() { return localCells; }
       CellList &getRealCells()  { return realCells;  }
       CellList &getGhostCells() { return ghostCells; }
+
+      python::list getRealParticleIDs();
 
       const Cell* getFirstCell() const { return &(cells[0]); }
 

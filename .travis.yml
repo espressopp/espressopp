@@ -1,0 +1,22 @@
+language: cpp
+
+before_install:
+ - sudo add-apt-repository -y ppa:brad-froehle/backports #newer mpi4py
+ - sudo add-apt-repository -y ppa:boost-latest/ppa  # boost 1.55
+ - sudo apt-get update
+ - sudo apt-get install cmake libfftw3-dev libopenmpi-dev 
+ - if [[ $EXTERNAL = ON ]]; then sudo apt-get install libboost1.55-all-dev python-mpi4py; fi
+
+env: #maybe add mpich later
+  - EXTERNAL=ON
+  - EXTERNAL=OFF
+
+script:
+  - mkdir build && cd build && 
+    cmake -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL .. && 
+    make -j4 &&
+    sudo make install
+
+compiler:
+  - clang
+  - gcc

@@ -28,6 +28,7 @@
 #include "logging.hpp"
 #include "Real3D.hpp"
 #include "SystemAccess.hpp"
+#include "VerletListAdress.hpp"
 #include "interaction/Interpolation.hpp"
 #include <map>
 
@@ -38,13 +39,15 @@
 #include "boost/signals2.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     class TDforce : public Extension {
 
       public:
-        TDforce(shared_ptr<System> system);
+        shared_ptr<VerletListAdress> verletList;
+        TDforce(shared_ptr<System> system,shared_ptr<VerletListAdress> _verletList);
+
         ~TDforce();
 
         /** Setter for the filename, will read in the table. */
@@ -53,7 +56,13 @@ namespace espresso {
 
         void applyForce();
 
-        void setCenter(real x, real y, real z);
+        // should use centre from verletlistadress instead of setting the following info here in TDforce
+        //void setCenter(real x, real y, real z); 
+        //void setAdrRegionType(bool _sphereAdr); 
+        //bool getAdrRegionType();
+        //void addAdrParticle(longint pid); //used for defining the AdResS centre instead of setCenter
+        //std::vector<Real3D*> adrPositions; // positions that define centres of adress zone (either from setCenter or at each step from tfList)
+
 
         static void registerPython();
 
@@ -64,7 +73,8 @@ namespace espresso {
         void connect();
         void disconnect();
 
-        Real3D center;
+        Real3D center; // center of adress zone, from verletlistadress (assumes only one point as center)
+        bool sphereAdr; // true: adress region is spherical centered on point x,y,z or particle pid; false: adress region is slab centered on point x or particle pid, from verletlistadres
         std::string filename;
         typedef shared_ptr <interaction::Interpolation> Table;
         std::map<int, Table> forces; // map type to force

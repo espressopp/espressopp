@@ -2,16 +2,16 @@
 """
 Example - how to turn on the integrator extension:
 
->>> adress      = espresso.integrator.ExtVirtualParticles(system)
+>>> adress      = espressopp.integrator.ExtVirtualParticles(system)
 >>> integrator.addExtension(adress)
 
 """
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.Extension import *
-from _espresso import integrator_ExtVirtualParticles
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_ExtVirtualParticles
 
 class ExtVirtualParticlesLocal(ExtensionLocal, integrator_ExtVirtualParticles):
     'The (local) AdResS'
@@ -39,7 +39,7 @@ if pmi.isController:
     class ExtVirtualParticles(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.integrator.ExtVirtualParticlesLocal',
+            cls = 'espressopp.integrator.ExtVirtualParticlesLocal',
             #pmiproperty = [ 'builds' ],
             pmicall = [ 'addVirtualParticleTypes', 'setFixedTupleList' ]
             )

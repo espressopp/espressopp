@@ -31,7 +31,7 @@
 #include "interaction/InterpolationCubic.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   using namespace iterator;
 
   namespace integrator {
@@ -122,8 +122,13 @@ namespace espresso {
                                 for (std::vector<Particle*>::iterator it3 = atList.begin();
                                                      it3 != atList.end(); ++it3) {
                                     Particle &at = **it3;
-                                    at.force()[0] += vp.lambdaDeriv() * at.mass() * fforce / vp.mass();
-                                }  
+                                    //std::cout << "FEC Force: " << vp.lambdaDeriv() * at.mass() * fforce / vp.mass() << "\n";
+                                    
+                                    at.force()[0] += vp.lambdaDeriv() * at.mass() * fforce / vp.mass();  // USE NORMALLY!                                   
+                                    //at.force()[0] += at.mass() * fforce / vp.mass();                   // USE IF USING ITERATIVE FEC INCLUDING ITERATIVE PRESSURE FEC!
+                                    
+                                }
+                                //vp.drift() += vp.lambdaDeriv() * fforce;
                           }
                           else{   // If not, use CG particle itself for calculation.
                                      std::cout << "Particle " << vp.id() << " not found in tuples!" << std::endl << "It's unclear how FEC work when combining particles, which do change resolution with particles that don't." << std::endl;
@@ -197,7 +202,7 @@ namespace espresso {
 
     void FreeEnergyCompensation::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       //void (FreeEnergyCompensation::*pySetCenter)(real x, real y, real z)
       //                  = &FreeEnergyCompensation::setCenter;

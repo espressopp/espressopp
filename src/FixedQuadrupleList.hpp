@@ -34,10 +34,10 @@
 #include <boost/signals2.hpp>
 //#include "FixedListComm.hpp"
 
-namespace espresso {
+namespace espressopp {
   class FixedQuadrupleList : public QuadrupleList {
   protected:
-    boost::signals2::connection con1, con2, con3;
+    boost::signals2::connection sigBeforeSend, sigAfterRecv, sigOnParticlesChanged;
     shared_ptr< storage::Storage > storage;
     typedef boost::unordered_multimap< longint,
             Triple < longint, longint, longint > > GlobalQuadruples;
@@ -58,7 +58,7 @@ namespace espresso {
     bool add(longint pid1, longint pid2, longint pid3, longint pid4);
     void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
     void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
-    void onParticlesChanged();
+    virtual void onParticlesChanged();
 
     python::list getQuadruples();
 

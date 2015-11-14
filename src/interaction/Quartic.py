@@ -21,16 +21,16 @@
 
 """
 ********************************
-**espresso.interaction.Quartic**
+**espressopp.interaction.Quartic**
 ********************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_Quartic, interaction_FixedPairListQuartic
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_Quartic, interaction_FixedPairListQuartic
 
 class QuarticLocal(PotentialLocal, interaction_Quartic):
     'The (local) Quartic potential.'
@@ -66,13 +66,13 @@ if pmi.isController:
     class Quartic(Potential):
         'The Quartic potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.QuarticLocal',
+            cls = 'espressopp.interaction.QuarticLocal',
             pmiproperty = ['K', 'r0']
             )
 
     class FixedPairListQuartic(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedPairListQuarticLocal',
+            cls =  'espressopp.interaction.FixedPairListQuarticLocal',
             pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']
             )

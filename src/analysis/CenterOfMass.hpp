@@ -28,7 +28,7 @@
 #include "Observable.hpp"
 #include "Real3D.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     /** Class to compute the center-of-mass of the system. */
     class CenterOfMass : public Observable {

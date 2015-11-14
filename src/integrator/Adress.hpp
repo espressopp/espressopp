@@ -37,7 +37,7 @@
 #include "boost/signals2.hpp"
 
 
-namespace espresso {
+namespace espressopp {
 
   namespace integrator {
 
@@ -64,13 +64,14 @@ namespace espresso {
 
       private:
 
-        boost::signals2::connection _SetPosVel, _initForces, _integrate1, _integrate2, _aftCalcF;
+        boost::signals2::connection _SetPosVel, _initForces, _integrate1, _inIntP, _integrate2, _recalc2, _befIntV;  //_aftCalcF;
         
         void integrate1(real&);
         void initForces();
         void SetPosVel();
         void integrate2();
         void aftCalcF();
+        void communicateAdrPositions();
 
         void connect();
         void disconnect();

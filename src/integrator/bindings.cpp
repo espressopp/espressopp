@@ -28,6 +28,7 @@
 #include "Extension.hpp"
 #include "TDforce.hpp"
 #include "FreeEnergyCompensation.hpp"
+#include "OnTheFlyFEC.hpp"
 #include "Adress.hpp"
 #include "BerendsenBarostat.hpp"
 #include "BerendsenBarostatAnisotropic.hpp"
@@ -36,6 +37,7 @@
 #include "StochasticVelocityRescaling.hpp"
 #include "LangevinThermostat.hpp"
 #include "LangevinThermostat1D.hpp"
+#include "GeneralizedLangevinThermostat.hpp"
 #include "DPDThermostat.hpp"
 #include "LangevinBarostat.hpp"
 #include "FixPositions.hpp"
@@ -46,13 +48,19 @@
 #include "LBInitPeriodicForce.hpp"
 #include "LBInitPopUniform.hpp"
 #include "LBInitPopWave.hpp"
+#include "LiquidGasLB.hpp"
+#include "LGLatticeSite.hpp"
 #include "ExtForce.hpp"
 #include "CapForce.hpp"
 #include "ExtAnalyze.hpp"
+#include "Settle.hpp"
 #include "VelocityVerletOnRadius.hpp"
 #include "ExtVirtualParticles.hpp"
+#include "AssociationReaction.hpp"
 
-namespace espresso {
+#include "EmptyExtension.hpp"
+
+namespace espressopp {
   namespace integrator {
     void registerPython() {
       MDIntegrator::registerPython();
@@ -69,8 +77,10 @@ namespace espresso {
       StochasticVelocityRescaling::registerPython();
       TDforce::registerPython();
       FreeEnergyCompensation::registerPython();
+      OnTheFlyFEC::registerPython();
       LangevinThermostat::registerPython();
       LangevinThermostat1D::registerPython();
+      GeneralizedLangevinThermostat::registerPython();
       DPDThermostat::registerPython();
       FixPositions::registerPython();
       LatticeBoltzmann::registerPython();
@@ -79,10 +89,15 @@ namespace espresso {
       LBInitPeriodicForce::registerPython();
       LBInitPopUniform::registerPython();
       LBInitPopWave::registerPython();
+			LiquidGasLB::registerPython();
       ExtForce::registerPython();
       CapForce::registerPython();
       ExtAnalyze::registerPython();
+      Settle::registerPython();
       VelocityVerletOnRadius::registerPython();
+      AssociationReaction::registerPython();
+
+      EmptyExtension::registerPython();
     }
   }
 }

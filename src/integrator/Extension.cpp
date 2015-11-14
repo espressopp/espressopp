@@ -25,7 +25,7 @@
 #include "System.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     LOG4ESPP_LOGGER(Extension::theLogger, "Extension");
@@ -55,10 +55,11 @@ namespace espresso {
     ****************************************************/
 
     void Extension::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< Extension, boost::noncopyable >
         ("integrator_Extension", no_init)
+        .add_property("type",&Extension::getType, &Extension::setType)
         .def("setIntegrator", &Extension::setIntegrator)
         .def("connect", &Extension::connect)
         .def("disconnect", &Extension::disconnect)

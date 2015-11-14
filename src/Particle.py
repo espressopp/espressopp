@@ -21,15 +21,16 @@
 
 """
 *********************
-**espresso.Particle**
+**espressopp.Particle**
 *********************
 
 """
-import _espresso
+import _espressopp
 import esutil
 import pmi
-from espresso import toReal3DFromVector, toInt3DFromVector, MPI
-from espresso.Exceptions import ParticleDoesNotExistHere
+from espressopp import toReal3DFromVector, toInt3DFromVector
+import mpi4py.MPI as MPI
+from espressopp.Exceptions import ParticleDoesNotExistHere
 
 # Controller Particle:
 # * requests are directly forwarded
@@ -140,9 +141,24 @@ class ParticleLocal(object):
     def lambda_adr(self, val): self.__getTmp().lambda_adr = val
     
     @property
+    def drift_f(self): return self.__getTmp().drift_f
+    @isGhost.setter
+    def drift_f(self, val): self.__getTmp().drift_f = val       
+    
+    @property
     def lambda_adrd(self): return self.__getTmp().lambda_adrd
     @isGhost.setter
     def lambda_adrd(self, val): self.__getTmp().lambda_adrd = val
+
+    @property
+    def extVar(self): return self.__getTmp().extVar
+    @radius.setter
+    def extVar(self, val): self.__getTmp().extVar = val
+
+    @property
+    def state(self): return self.__getTmp().state
+    @state.setter
+    def state(self, val): self.__getTmp().state = val
     
     def getLocalData(self, key):
         tmp = self.storage.lookupRealParticle(self.pid)
@@ -159,7 +175,7 @@ if pmi.isController:
     class Particle(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.ParticleLocal',
+            cls = 'espressopp.ParticleLocal',
             pmiproperty = [ "id", "storage" ]
             )
 

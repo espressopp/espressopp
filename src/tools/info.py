@@ -19,12 +19,12 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-import espresso
+import espressopp
 
 def getAllParticles(system, *properties):
   'returns a list of all particle properties of all particles of the system (currently no atomistic AdResS particles are included)'
   allParticles = []
-  maxParticleID = int(espresso.analysis.MaxPID(system).compute())
+  maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
   pid   = 0
   while pid <= maxParticleID:
     particle = system.storage.getParticle(pid)

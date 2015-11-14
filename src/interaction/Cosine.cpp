@@ -24,14 +24,14 @@
 #include "Cosine.hpp"
 #include "FixedTripleListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void 
     Cosine::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< Cosine, bases< AngularPotential > >
     	("interaction_Cosine", init< real, real >())

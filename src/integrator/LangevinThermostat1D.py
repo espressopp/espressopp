@@ -21,15 +21,15 @@
 
 """
 ********************************************
-**espresso.integrator.LangevinThermostat1D**
+**espressopp.integrator.LangevinThermostat1D**
 ********************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.Extension import *
-from _espresso import integrator_LangevinThermostat1D 
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_LangevinThermostat1D 
 
 class LangevinThermostat1DLocal(ExtensionLocal, integrator_LangevinThermostat1D):
     'The (local) Langevin Thermostat (1D).'
@@ -45,6 +45,6 @@ if pmi.isController :
     class LangevinThermostat1D(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.LangevinThermostat1DLocal',
+            cls =  'espressopp.integrator.LangevinThermostat1DLocal',
             pmiproperty = [ 'gamma', 'temperature', 'adress', 'direction' ]
             )

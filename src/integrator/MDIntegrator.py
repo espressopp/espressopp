@@ -21,12 +21,12 @@
 
 """
 ************************************
-**espresso.integrator.MDIntegrator**
+**espressopp.integrator.MDIntegrator**
 ************************************
 
 """
-from espresso import pmi
-from _espresso import integrator_MDIntegrator
+from espressopp import pmi
+from _espressopp import integrator_MDIntegrator
 
 class MDIntegratorLocal(object):
     """Abstract local base class for molecular dynamics integrator."""
@@ -42,8 +42,14 @@ class MDIntegratorLocal(object):
             extension.cxxclass.connect(extension)
             
             return self.cxxclass.addExtension(self, extension)
+        
+    def getExtension(self, k):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getExtension(self, k)
 
-    
+    def getNumberOfExtensions(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getNumberOfExtensions(self)
 
 if pmi.isController :
     class MDIntegrator(object):
@@ -51,5 +57,5 @@ if pmi.isController :
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             pmiproperty = [ 'dt', 'step' ],
-            pmicall = [ 'run', 'addExtension' ]
+            pmicall = [ 'run', 'addExtension', 'getExtension', 'getNumberOfExtensions' ]
             )

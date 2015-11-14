@@ -21,20 +21,29 @@
 
 """
 *************************************
-**espresso.analysis.MeanSquareDispl**
+**espressopp.analysis.MeanSquareDispl**
 *************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.ConfigsParticleDecomp import *
-from _espresso import analysis_MeanSquareDispl
+from espressopp.analysis.ConfigsParticleDecomp import *
+from _espressopp import analysis_MeanSquareDispl
 
 class MeanSquareDisplLocal(ConfigsParticleDecompLocal, analysis_MeanSquareDispl):
     'The (local) compute autocorrelation f.'
-    def __init__(self, system):
-      cxxinit(self, analysis_MeanSquareDispl, system)
+    def __init__(self, system, chainlength = None):
+      if chainlength is None:
+        cxxinit(self, analysis_MeanSquareDispl, system)
+      else:
+        cxxinit(self, analysis_MeanSquareDispl, system, chainlength)
+
+    def computeG2(self):
+      return self.cxxclass.computeG2(self)
+
+    def computeG3(self):
+      return self.cxxclass.computeG3(self)
     
     def strange(self):
       print 1
@@ -44,7 +53,7 @@ if pmi.isController:
   class MeanSquareDispl(ConfigsParticleDecomp):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls =  'espresso.analysis.MeanSquareDisplLocal',
+      cls =  'espressopp.analysis.MeanSquareDisplLocal',
       pmiproperty = [ 'print_progress' ],
-      pmicall = ['strange']
+      pmicall = ["computeG2", 'strange']
     )

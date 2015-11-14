@@ -21,14 +21,14 @@
 
 """
 *******************************************
-**espresso.analysis.ConfigsParticleDecomp**
+**espressopp.analysis.ConfigsParticleDecomp**
 *******************************************
 
 """
-#from espresso.esutil import cxxinit
-from espresso import pmi
+#from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from _espresso import analysis_ConfigsParticleDecomp
+from _espressopp import analysis_ConfigsParticleDecomp
 
 class ConfigsParticleDecompLocal(analysis_ConfigsParticleDecomp):
     'The (local) storage of configurations.'
@@ -36,6 +36,8 @@ class ConfigsParticleDecompLocal(analysis_ConfigsParticleDecomp):
       cxxinit(self, analysis_ConfigsParticleDecomp, system)
     def gather(self):
       return self.cxxclass.gather(self)
+    def gatherFromFile(self, filename):
+      return self.cxxclass.gatherFromFile(self, filename)
     def clear(self):
       return self.cxxclass.clear(self)
     def __iter__(self):
@@ -49,8 +51,8 @@ if pmi.isController:
     """Abstract base class for parallel analysis based on particle decomposition."""
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      #cls =  'espresso.analysis.ConfigsParticleDecompLocal',
-      pmicall = [ "gather", "clear", "compute" ],
+      #cls =  'espressopp.analysis.ConfigsParticleDecompLocal',
+      pmicall = [ "gather", "gatherFromFile", "clear", "compute" ],
       localcall = ["__getitem__", "all"],
       pmiproperty = ["size"]
     )

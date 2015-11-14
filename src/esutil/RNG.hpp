@@ -30,7 +30,7 @@
 
 #include "types.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
     /** A class that allows to choose between different RNGs, but that
 	provides a uniform interface for these.

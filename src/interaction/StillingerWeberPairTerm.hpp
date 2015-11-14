@@ -34,7 +34,7 @@
 
 #include <cmath>
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     /** This class provides methods to compute forces and energies of
 	2 body term of Stillinger-Weber potential.

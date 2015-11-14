@@ -10,9 +10,9 @@
 #include "esutil/Error.hpp"
 
 
-namespace espresso {
+namespace espressopp {
 
-  using namespace espresso::iterator;
+  using namespace espressopp::iterator;
 
   LOG4ESPP_LOGGER(VirtualVerletList::theLogger, "VirtualVerletList");
 
@@ -201,7 +201,7 @@ namespace espresso {
   ****************************************************/
   
   void VirtualVerletList::registerPython() {
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (VirtualVerletList::*pyExclude)(longint pid1, longint pid2)
           = &VirtualVerletList::exclude;

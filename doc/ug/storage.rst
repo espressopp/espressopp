@@ -4,7 +4,7 @@ storage
 .. toctree::
    :maxdepth: 2
    
-   espresso.storage.DomainDecomposition.rst
-   espresso.storage.DomainDecompositionAdress.rst
-   espresso.storage.DomainDecompositionNonBlocking.rst
-   espresso.storage.Storage.rst
+   espressopp.storage.DomainDecomposition.rst
+   espressopp.storage.DomainDecompositionAdress.rst
+   espressopp.storage.DomainDecompositionNonBlocking.rst
+   espressopp.storage.Storage.rst

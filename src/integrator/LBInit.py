@@ -24,27 +24,27 @@
 **LBInit** - abstract base class for LatticeBoltzmann initialization
 ********************************************************************
 
-This abstract base class provides the interface and some basic
-functionality for classes that (re)initialize populations and handle external forces
+This abstract class provides the interface for derived classes that 
+(re)initialize populations and handle external forces.
   
 It provides the following methods:
 
 * createDenVel(rho0,u0)
     sets initial density and velocity 
 * setForce()
-    sets external force to a specific values
-* setForce()
-    adds a specific value to the existing forces
+    sets external force
+* addForce()
+    adds a new force to the existing one
 """
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.LatticeBoltzmann import *
-from _espresso import integrator_LBInit
+from espressopp.integrator.LatticeBoltzmann import *
+from _espressopp import integrator_LBInit
 
 class LBInitLocal(integrator_LBInit):
-    """Abstract local base class for LBInit."""
+    'Abstract local base class for LBInit.'
     def createDenVel(self,rho0,u0):
         """createDenVel helps to create initial populations with desired density and
         velocity. By default either a uniform conformation is created by function LBInitPopUniform or 
@@ -53,13 +53,13 @@ class LBInitLocal(integrator_LBInit):
         
         Example:
     
-        >>> initPop = espresso.integrator.LBInitPopUniform(system,lb)
+        >>> initPop = espressopp.integrator.LBInitPopUniform(system,lb)
         >>> initPop.createDenVel(1.0, Real3D(0.,0.,0.0))
         >>> # first number is the density, second number is a vector of velocity
     
         Example:
         
-        >>> initPop = espresso.integrator.LBInitPopWave(system,lb)
+        >>> initPop = espressopp.integrator.LBInitPopWave(system,lb)
         >>> initPop.createDenVel(1.0, Real3D(0.,0.,0.0005))
         >>> # the Real3D vector in this case includes amplitudes of the velocities
         
@@ -73,13 +73,13 @@ class LBInitLocal(integrator_LBInit):
         
         Example:
     
-        >>> lbforce = espresso.integrator.LBInitConstForce(system,lb)
+        >>> lbforce = espressopp.integrator.LBInitConstForce(system,lb)
         >>> lbforce.setForce(Real3D(0.,0.,0.0005))
         >>> # a vector sets the external body force directly in lb-units
     
         Example:
         
-        >>> lbforce = espresso.integrator.LBInitPeriodicForce(system,lb)
+        >>> lbforce = espressopp.integrator.LBInitPeriodicForce(system,lb)
         >>> lbforce.setForce(Real3D(0.,0.,0.0005))
         >>> # a vector sets the external body force amplitude
         
@@ -94,13 +94,13 @@ class LBInitLocal(integrator_LBInit):
         
         Example:
     
-        >>> lbforce = espresso.integrator.LBInitConstForce(system,lb)
+        >>> lbforce = espressopp.integrator.LBInitConstForce(system,lb)
         >>> lbforce.addForce(Real3D(0.,0.,0.0005))
         >>> # a vector adds the external body force directly in lb-units
     
         Example:
         
-        >>> lbforce = espresso.integrator.LBInitPeriodicForce(system,lb)
+        >>> lbforce = espressopp.integrator.LBInitPeriodicForce(system,lb)
         >>> lbforce.addForce(Real3D(0.,0.,0.0005))
         >>> # a vector adds the external body force with a Real3D amplitude
         

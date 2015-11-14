@@ -27,7 +27,7 @@
 
 //using namespace std;
 
-namespace espresso {
+namespace espressopp {
 
     LOG4ESPP_LOGGER(FixedListComm::theLogger, "FixedListComm");
 
@@ -234,4 +234,4 @@ namespace espresso {
     }
 
 
-} // ns espresso
+} // ns espressopp

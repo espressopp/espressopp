@@ -24,7 +24,7 @@
 #ifndef _ESUTIL_ESPPITERATOR_HPP
 #define _ESUTIL_ESPPITERATOR_HPP
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
     template < class STLContainer > 
     class ESPPIterator {

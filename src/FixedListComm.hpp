@@ -32,7 +32,7 @@
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
 
-namespace espresso {
+namespace espressopp {
     class FixedListComm: public PairList, public TripleList, public QuadrupleList {
         protected:
         boost::signals2::connection con1, con2, con3;
@@ -57,6 +57,6 @@ namespace espresso {
         private:
         static LOG4ESPP_DECL_LOGGER(theLogger);
     }; // class
-} //ns espresso
+} //ns espressopp
 
 #endif

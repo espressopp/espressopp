@@ -34,7 +34,7 @@
 #include <map>
 #include <boost/signals2.hpp>
 
-namespace espresso {
+namespace espressopp {
   class FixedQuadrupleAngleList : public QuadrupleList{
   protected:
     boost::signals2::connection con1, con2, con3;

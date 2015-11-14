@@ -35,7 +35,7 @@
 
 #include "analysis/Temperature.hpp"
 
-using namespace espresso;
+using namespace espressopp;
 using namespace storage;
 using namespace interaction;
 using namespace iterator;

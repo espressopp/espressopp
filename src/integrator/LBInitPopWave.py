@@ -32,11 +32,11 @@ i.e. relaxes to uniform zero velocity.
   
 """
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.LBInit import *
-from _espresso import integrator_LBInit_PopWave
+from espressopp.integrator.LBInit import *
+from _espressopp import integrator_LBInit_PopWave
 
 class LBInitPopWaveLocal(LBInitLocal, integrator_LBInit_PopWave):
     """The (local) compute of LBInitPopWave."""
@@ -48,7 +48,7 @@ if pmi.isController :
     class LBInitPopWave(LBInit):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.LBInitPopWaveLocal',
+            cls =  'espressopp.integrator.LBInitPopWaveLocal',
             pmicall = [
                        "createDenVel"]
             )

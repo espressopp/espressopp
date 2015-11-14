@@ -21,14 +21,14 @@
 
 """
 ***********************************************
-**espresso.interaction.AngularUniquePotential**
+**espressopp.interaction.AngularUniquePotential**
 ***********************************************
 
 """
 # -*- coding: iso-8859-1 -*-
-from espresso import pmi
-from espresso import toReal3DFromVector
-from _espresso import interaction_AngularUniquePotential
+from espressopp import pmi
+from espressopp import toReal3DFromVector
+from _espressopp import interaction_AngularUniquePotential
 
 # Python base class for angular potentials
 class AngularUniquePotentialLocal(object):

@@ -29,7 +29,7 @@
 #include "ParticleAccess.hpp"
 #include <limits>
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     /** All quantities to be measured derive from this abstract base class and the

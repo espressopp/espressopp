@@ -21,24 +21,41 @@
 
 """
 *******************************
-**espresso.integrator.TDforce**
+**espressopp.integrator.TDforce**
 *******************************
 
-"""
-from espresso.esutil import cxxinit
-from espresso import pmi
+Example - how to turn on thermodynamic force
 
-from _espresso import integrator_TDforce 
+>>> fthd="tabletf.xvg"
+>>> thdforce = espressopp.integrator.TDforce(system,verletlist) #info about centre and shape of adress region come from the verletlist. info about size of adress region not needed, tabulated file tabletf.xvg should be appropriate for the region size
+>>> thdforce.addForce(itype=3,filename="tabletf.xvg",type=typeCG)
+>>> integrator.addExtension(thdforce)
+
+"""
+from espressopp.esutil import cxxinit
+from espressopp import pmi
+
+from _espressopp import integrator_TDforce 
 
 class TDforceLocal(integrator_TDforce):
     'The (local) Velocity Verlet Integrator.'
-    def __init__(self, system, center=[]):
+    #def __init__(self, system, verletlist, center=[], pids=[], sphereAdr=False):
+    def __init__(self, system, verletlist):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_TDforce, system)
-            
-            # set center of TD force
-            if (center != []):
-                self.cxxclass.setCenter(self, center[0], center[1], center[2])
+            cxxinit(self, integrator_TDforce, system, verletlist)
+           
+# all the below info should come from VerletListAdress 
+#            # set center of TD force
+#            if (center != []):
+#                self.cxxclass.setCenter(self, center[0], center[1], center[2])
+#
+#            # set adress particle to be center of TD force (only center OR pids should be specified
+#            if (pids != []):
+#                for pid in pids:
+#                    self.cxxclass.addAdrParticle(self, pid)
+#
+#            # set adress region type (slab or spherical)
+#            self.cxxclass.setAdrRegionType(self,sphereAdr)
 
     def addForce(self, itype, filename, type):
             """
@@ -52,7 +69,7 @@ if pmi.isController :
     class TDforce(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.TDforceLocal',
+            cls =  'espressopp.integrator.TDforceLocal',
             pmiproperty = [ 'itype', 'filename'],
             pmicall = ['addForce']
             )

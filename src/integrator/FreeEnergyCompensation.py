@@ -21,16 +21,17 @@
 
 """
 **********************************************
-**espresso.integrator.FreeEnergyCompensation**
+**espressopp.integrator.FreeEnergyCompensation**
 **********************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from _espresso import integrator_FreeEnergyCompensation 
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_FreeEnergyCompensation 
 
-class FreeEnergyCompensationLocal(integrator_FreeEnergyCompensation):
+class FreeEnergyCompensationLocal(ExtensionLocal, integrator_FreeEnergyCompensation):
     'The (local) Velocity Verlet Integrator.'
     def __init__(self, system, center=[]):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -53,10 +54,10 @@ class FreeEnergyCompensationLocal(integrator_FreeEnergyCompensation):
               return self.cxxclass.computeCompEnergy(self)
 
 if pmi.isController :
-    class FreeEnergyCompensation(object):
+    class FreeEnergyCompensation(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.FreeEnergyCompensationLocal',
+            cls =  'espressopp.integrator.FreeEnergyCompensationLocal',
             pmiproperty = [ 'itype', 'filename'],
             pmicall = ['addForce' , 'computeCompEnergy']
             )

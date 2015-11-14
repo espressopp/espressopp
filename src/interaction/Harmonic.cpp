@@ -24,14 +24,14 @@
 #include "Harmonic.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void 
     Harmonic::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< Harmonic, bases< Potential > >
     	("interaction_Harmonic", init< real, real, real >())

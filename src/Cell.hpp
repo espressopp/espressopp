@@ -28,7 +28,7 @@
 #include <esutil/ESPPIterator.hpp>
 #include "python.hpp"
 
-namespace espresso {
+namespace espressopp {
   /** A cell is a structure that manages a list of particles and a
       list of other cells that are active geometric neighbor cells.
 
@@ -70,7 +70,7 @@ namespace espresso {
     : public esutil::ESPPContainer < std::vector< Cell* > > 
   {
 	  static void registerPython() {
-	    using namespace espresso::python;
+	    using namespace espressopp::python;
 
 	  class_< CellList > ("CellList", init<>());
 	  }

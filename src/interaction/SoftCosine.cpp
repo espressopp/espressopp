@@ -26,7 +26,7 @@
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     typedef class VerletListInteractionTemplate< SoftCosine > 
     VerletListSoftCosine;
@@ -40,7 +40,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void 
     SoftCosine::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< SoftCosine, bases< Potential > >
     	("interaction_SoftCosine", init< real, real >())

@@ -44,13 +44,13 @@ def readingDesernoForcesFile():
 
 # The script itself
 import sys
-import MPI
-import espresso
+import mpi4py.MPI as MPI
+import espressopp
 
-from espresso import Real3D
-from espresso.tools.convert import espresso_old
+from espressopp import Real3D
+from espressopp.tools.convert import espresso_old
 
-# reading the particle coordinates, charges and box size from old espresso data file
+# reading the particle coordinates, charges and box size from old espressopp data file
 # file 'ini_struct_deserno.dat' contains the data we need
 print "Reading system data:"
 Lx, Ly, Lz, x, y, z, type, q, vx,vy,vz,fx,fy,fz,bondpairs = espresso_old.read('ini_struct_deserno.dat')
@@ -83,13 +83,13 @@ bjerrumlength  = 1.0
 temperature    = 1.0
 coulomb_prefactor = bjerrumlength * temperature
 
-nodeGrid       = espresso.tools.decomp.nodeGrid(MPI.COMM_WORLD.size)
-cellGrid       = espresso.tools.decomp.cellGrid(box, nodeGrid, rspacecutoff, skin)
-system         = espresso.System()
-system.rng     = espresso.esutil.RNG()
-system.bc      = espresso.bc.OrthorhombicBC(system.rng, box)
+nodeGrid       = espressopp.tools.decomp.nodeGrid(MPI.COMM_WORLD.size)
+cellGrid       = espressopp.tools.decomp.cellGrid(box, nodeGrid, rspacecutoff, skin)
+system         = espressopp.System()
+system.rng     = espressopp.esutil.RNG()
+system.bc      = espressopp.bc.OrthorhombicBC(system.rng, box)
 system.skin    = skin
-system.storage = espresso.storage.DomainDecomposition(system, nodeGrid, cellGrid)
+system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
 
 # Adding the particles
 props = ['id', 'pos', 'type', 'q']
@@ -103,7 +103,7 @@ system.storage.decompose()
 ## potential and interaction ##
 
 # setting the Verlet list
-vl = espresso.VerletList(system, rspacecutoff+skin)
+vl = espressopp.VerletList(system, rspacecutoff+skin)
 
 # the R space part of electrostatic interaction according to the Ewald method
 '''
@@ -112,9 +112,9 @@ vl = espresso.VerletList(system, rspacecutoff+skin)
   It is based on the Coulomb prefactor (coulomb_prefactor), Ewald parameter (alpha),
   and the cutoff in R space (rspacecutoff)
 '''
-coulombR_pot = espresso.interaction.CoulombRSpace(coulomb_prefactor, alpha, rspacecutoff)
+coulombR_pot = espressopp.interaction.CoulombRSpace(coulomb_prefactor, alpha, rspacecutoff)
 # creating the interaction based on the Verlet list
-coulombR_int = espresso.interaction.VerletListCoulombRSpace(vl)
+coulombR_int = espressopp.interaction.VerletListCoulombRSpace(vl)
 # setting the potential for the interaction between particles of type 0 and 0
 coulombR_int.setPotential(type1=0, type2=0, potential = coulombR_pot)
 # adding the interaction to the system
@@ -127,14 +127,14 @@ system.addInteraction(coulombR_int)
   It is based on the system information (system), Coulomb prefactor (coulomb_prefactor),
   Ewald parameter (alpha), and the cutoff in K space (kspacecutoff)
 '''
-ewaldK_pot = espresso.interaction.CoulombKSpaceEwald(system, coulomb_prefactor, alpha, kspacecutoff)
+ewaldK_pot = espressopp.interaction.CoulombKSpaceEwald(system, coulomb_prefactor, alpha, kspacecutoff)
 # creating the interaction based on the Cell list for all particle interaction and potential in K space
-ewaldK_int = espresso.interaction.CellListCoulombKSpaceEwald(system.storage, ewaldK_pot)
+ewaldK_int = espressopp.interaction.CellListCoulombKSpaceEwald(system.storage, ewaldK_pot)
 # adding the interaction to the system
 system.addInteraction(ewaldK_int)
 
 # creating the integrator which based on the Verlet algorithm
-integrator    = espresso.integrator.VelocityVerlet(system)
+integrator    = espressopp.integrator.VelocityVerlet(system)
 # seting the time step (it is not important here)
 integrator.dt = 0.0001
 

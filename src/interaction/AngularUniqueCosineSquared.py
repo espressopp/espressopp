@@ -21,16 +21,16 @@
 
 """
 ***************************************************
-**espresso.interaction.AngularUniqueCosineSquared**
+**espressopp.interaction.AngularUniqueCosineSquared**
 ***************************************************
 
 """
-from espresso import pmi
-from espresso.esutil import *
+from espressopp import pmi
+from espressopp.esutil import *
 
-from espresso.interaction.AngularUniquePotential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_AngularUniqueCosineSquared, \
+from espressopp.interaction.AngularUniquePotential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_AngularUniqueCosineSquared, \
                       interaction_FixedTripleAngleListAngularUniqueCosineSquared
 
 class AngularUniqueCosineSquaredLocal(AngularUniquePotentialLocal, interaction_AngularUniqueCosineSquared):
@@ -58,13 +58,13 @@ if pmi.isController:
     class AngularUniqueCosineSquared(AngularUniquePotential):
       'The AngularUniqueCosineSquared potential.'
       pmiproxydefs = dict(
-        cls = 'espresso.interaction.AngularUniqueCosineSquaredLocal',
+        cls = 'espressopp.interaction.AngularUniqueCosineSquaredLocal',
         pmiproperty = ['K']
       )
 
     class FixedTripleAngleListAngularUniqueCosineSquared(Interaction):
       __metaclass__ = pmi.Proxy
       pmiproxydefs = dict(
-        cls =  'espresso.interaction.FixedTripleAngleListAngularUniqueCosineSquaredLocal',
+        cls =  'espressopp.interaction.FixedTripleAngleListAngularUniqueCosineSquaredLocal',
         pmicall = ['setPotential','getFixedTripleList']
       )

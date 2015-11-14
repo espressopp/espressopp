@@ -26,12 +26,12 @@
 #include <boost/random.hpp>
 #include "types.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
     using namespace boost;
       /** This class generates normal distributed random
 	  variates. The class also keeps a shared pointer to the boost
-	  RNG object, so that it is not destroyed if the espresso RNG
+	  RNG object, so that it is not destroyed if the espressopp RNG
 	  object dies. */
     class NormalVariate 
       : variate_generator< RNGType&, normal_distribution< real > > 

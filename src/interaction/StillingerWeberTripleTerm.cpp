@@ -26,7 +26,7 @@
 #include "VerletListTripleInteractionTemplate.hpp"
 #include "FixedTripleListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
@@ -38,7 +38,7 @@ namespace espresso {
     
     void 
     StillingerWeberTripleTerm::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< StillingerWeberTripleTerm, bases< AngularPotential > >(
             "interaction_StillingerWeberTripleTerm",

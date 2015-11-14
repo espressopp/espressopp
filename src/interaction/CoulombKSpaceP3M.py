@@ -30,13 +30,13 @@ summation technique. Good explanation of P3M summation could be found here [Alle
 
 Example:
 
-    >>> ewaldK_pot = espresso.interaction.CoulombKSpaceP3M(system, coulomb_prefactor, alpha, kspacecutoff)
-    >>> ewaldK_int = espresso.interaction.CellListCoulombKSpaceP3M(system.storage, ewaldK_pot)
+    >>> ewaldK_pot = espressopp.interaction.CoulombKSpaceP3M(system, coulomb_prefactor, alpha, kspacecutoff)
+    >>> ewaldK_int = espressopp.interaction.CellListCoulombKSpaceP3M(system.storage, ewaldK_pot)
     >>> system.addInteraction(ewaldK_int)
 
 **!IMPORTANT** Coulomb interaction needs `R` space part as well CoulombRSpace_.
 
-.. _CoulombRSpace: espresso.interaction.CoulombRSpace.html
+.. _CoulombRSpace: espressopp.interaction.CoulombRSpace.html
 
 Definition:
 
@@ -47,9 +47,9 @@ Definition:
     Coulomb prefactor (coulomb_prefactor), P3M parameter (alpha),
     and the cutoff in K space (kspacecutoff).
     
-.. _System: espresso.System.html    
+.. _System: espressopp.System.html    
     
-    >>> ewaldK_pot = espresso.interaction.CoulombKSpaceP3M(system, coulomb_prefactor, alpha, kspacecutoff)
+    >>> ewaldK_pot = espressopp.interaction.CoulombKSpaceP3M(system, coulomb_prefactor, alpha, kspacecutoff)
 
     Potential Properties:
 
@@ -68,9 +68,9 @@ Definition:
     The *interaction* is based on the all particles list. It needs the information from Storage_
     and `K` space part of potential.
     
-.. _Storage: espresso.storage.Storage.html    
+.. _Storage: espressopp.storage.Storage.html    
 
-    >>> ewaldK_int = espresso.interaction.CellListCoulombKSpaceP3M(system.storage, ewaldK_pot)
+    >>> ewaldK_int = espressopp.interaction.CellListCoulombKSpaceP3M(system.storage, ewaldK_pot)
     
     Interaction Methods:
 
@@ -85,12 +85,12 @@ Adding the interaction to the system:
 """
 
 
-from espresso import pmi
-from espresso.esutil import *
+from espressopp import pmi
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_CoulombKSpaceP3M, \
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_CoulombKSpaceP3M, \
                       interaction_CellListCoulombKSpaceP3M
 
 class CoulombKSpaceP3MLocal(PotentialLocal, interaction_CoulombKSpaceP3M):
@@ -113,13 +113,13 @@ class CellListCoulombKSpaceP3MLocal(InteractionLocal, interaction_CellListCoulom
 if pmi.isController:
   class CoulombKSpaceP3M(Potential):
     pmiproxydefs = dict(
-      cls = 'espresso.interaction.CoulombKSpaceP3MLocal',
+      cls = 'espressopp.interaction.CoulombKSpaceP3MLocal',
       pmiproperty = ['prefactor']  #, 'alpha', 'kmax'
     )
 
   class CellListCoulombKSpaceP3M(Interaction):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls =  'espresso.interaction.CellListCoulombKSpaceP3MLocal',
+      cls =  'espressopp.interaction.CellListCoulombKSpaceP3MLocal',
       pmicall = ['getPotential']
     )

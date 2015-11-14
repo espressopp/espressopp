@@ -21,15 +21,15 @@
 
 """
 ***********************************
-**espresso.analysis.StaticStructF**
+**espressopp.analysis.StaticStructF**
 ***********************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.analysis.Observable import *
-from _espresso import analysis_StaticStructF
+from espressopp.analysis.Observable import *
+from _espressopp import analysis_StaticStructF
 
 class StaticStructFLocal(ObservableLocal, analysis_StaticStructF):
   'The (local) compute the static structure function.'
@@ -58,6 +58,7 @@ class StaticStructFLocal(ObservableLocal, analysis_StaticStructF):
     else:
       #run computeSingleChain on each CPU
       result = self.cxxclass.computeSingleChain(self, nqx, nqy, nqz, bin_factor, chainlength)
+      print result #this line is in case the outfile causes problems
       #create the outfile only on CPU 0
       if pmi.isController:
         myofile = 'qsq_singleChain' + str(ofile) + '.txt'
@@ -73,5 +74,5 @@ if pmi.isController:
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
       pmicall = [ "compute", "computeSingleChain" ],
-      cls = 'espresso.analysis.StaticStructFLocal'
+      cls = 'espressopp.analysis.StaticStructFLocal'
     )

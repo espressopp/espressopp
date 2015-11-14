@@ -21,16 +21,16 @@
 
 """
 *****************************
-**espresso.interaction.OPLS**
+**espressopp.interaction.OPLS**
 *****************************
 
 """
-from espresso import pmi
-from espresso.esutil import *
+from espressopp import pmi
+from espressopp.esutil import *
 
-from espresso.interaction.DihedralPotential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_OPLS, interaction_FixedQuadrupleListOPLS
+from espressopp.interaction.DihedralPotential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_OPLS, interaction_FixedQuadrupleListOPLS
 
 class OPLSLocal(DihedralPotentialLocal, interaction_OPLS):
     'The (local) OPLS potential.'
@@ -53,13 +53,13 @@ if pmi.isController:
     class OPLS(DihedralPotential):
         'The OPLS potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.OPLSLocal',
+            cls = 'espressopp.interaction.OPLSLocal',
             pmiproperty = ['K1', 'K2', 'K3', 'K4']
             )
 
     class FixedQuadrupleListOPLS(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedQuadrupleListOPLSLocal',
+            cls =  'espressopp.interaction.FixedQuadrupleListOPLSLocal',
             pmicall = ['setPotential']
             )

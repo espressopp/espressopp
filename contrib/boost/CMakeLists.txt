@@ -14,11 +14,16 @@ file(GLOB_RECURSE NOT_BOOST_SOURCES
   "libs/serialization/src/codecvt_null.cpp"
   "libs/serialization/src/binary_wiarchive.cpp"
   "libs/serialization/src/binary_woarchive.cpp"
+  "libs/serialization/src/shared_ptr_helper.cpp"
   "libs/detail/utf8_codecvt_facet.cpp"
+  "libs/atomic/src/lockpool.cpp"
+  "libs/thread/src/pthread/once_atomic.cpp"
+  "libs/thread/src/pthread/once.cpp"
+  "libs/thread/src/pthread/thread.cpp"
 )
 
 list(REMOVE_ITEM BOOST_SOURCES ${NOT_BOOST_SOURCES})
 
-add_library(espresso_boost ${BOOST_SOURCES})
-target_link_libraries(espresso_boost ${PYTHON_LIBRARIES} ${VAMPIRTRACE_LIBRARIES} ${MPI_LIBRARIES} ${RT_LIBRARIES})
-install(TARGETS espresso_boost LIBRARY DESTINATION ${LIB} ARCHIVE DESTINATION lib)
+add_library(espressopp_boost ${BOOST_SOURCES})
+target_link_libraries(espressopp_boost ${PYTHON_LIBRARIES} ${VAMPIRTRACE_LIBRARIES} ${MPI_LIBRARIES} ${RT_LIBRARIES})
+install(TARGETS espressopp_boost LIBRARY DESTINATION ${LIB})

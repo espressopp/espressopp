@@ -30,7 +30,7 @@
 
 #include "MDIntegrator.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
       class MDIntegrator; //fwd declaration
@@ -55,6 +55,7 @@ namespace espresso {
             ExtForce=6,
             ExtAnalysis=7,
             ExtVirtualParticles=8
+            Reaction=8
         };
 
 
@@ -63,6 +64,9 @@ namespace espresso {
 
         /** Register this class so it can be used from Python. */
         static void registerPython();
+
+        ExtensionType getType() {return type;}
+        int setType(ExtensionType k) {type=k;}
 
       protected:
 

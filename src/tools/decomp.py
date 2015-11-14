@@ -46,10 +46,10 @@
 
 
 import sys
-import espresso
+import espressopp
 
-from espresso import Int3D
-from espresso.Exceptions import Error
+from espressopp import Int3D
+from espressopp.Exceptions import Error
 
 import math
 import time
@@ -64,9 +64,9 @@ def nodeGrid(n):
 		for j in range(i,n+1):
 			for k in range(j,n+1):
 				if (i*j*k == n) and (i*i + j*j + k*k < ijkmax):
-					d1 = i
+					d1 = k
 					d2 = j
-					d3 = k
+					d3 = i
 					ijkmax = i*i + j*j + k*k
 	return Int3D(d1,d2,d3)
 
@@ -97,10 +97,10 @@ def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.5, precision=0.001, pri
   
   fi = (1.0+math.sqrt(5.0))/2.0 # golden ratio
   
-  npart = espresso.analysis.NPart(system).compute()
+  npart = espressopp.analysis.NPart(system).compute()
   
   # this is an empirical formula in order to get the appropriate number of steps
-  nsteps = int( espresso.MPI.COMM_WORLD.size * 1000000.0 / float(npart) )
+  nsteps = int( espressopp.MPI.COMM_WORLD.size * 1000000.0 / float(npart) )
   
   if printInfo:
     print 'CellGrid before tuning: ', system.storage.getCellGrid()
@@ -148,9 +148,9 @@ def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.5, precision=0.001, pri
   return (maxSkin+minSkin)/2.0
 
 def printTimeVsSkin(system, integrator, minSkin=0.01, maxSkin=1.5, skinStep = 0.005):
-  npart = espresso.analysis.NPart(system).compute()
+  npart = espressopp.analysis.NPart(system).compute()
   # this is an empirical formula in order to get the appropriate number of steps
-  nsteps = int( espresso.MPI.COMM_WORLD.size * 20000000.0 / float(npart) )
+  nsteps = int( espressopp.MPI.COMM_WORLD.size * 20000000.0 / float(npart) )
   
   print '      Calculations is started. It will print out the dependece of time of \n\
       running of %d steps on the skin size into the file \'timeVSskin.dat\'.\n\

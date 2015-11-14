@@ -20,19 +20,19 @@
 
 
 import unittest
-import espresso
-import espresso.esutil
-import espresso.unittest
-import espresso.storage
-import espresso.integrator
-import espresso.interaction
-import espresso.analysis
-import espresso.bc
-import MPI
+import espressopp
+import espressopp.esutil
+import espressopp.unittest
+import espressopp.storage
+import espressopp.integrator
+import espressopp.interaction
+import espressopp.analysis
+import espressopp.bc
+import mpi4py.MPI as MPI
 import math
 import logging
 
-from espresso import Real3D
+from espressopp import Real3D
 
 # Input values for system
 
@@ -49,23 +49,23 @@ def calcNumberCells(size, nodes, cutoff):
 
     return ncells - 1
 
-class TestVerletList(espresso.unittest.TestCase) :
+class TestVerletList(espressopp.unittest.TestCase) :
 
     def test0Build(self) :
 
-       system = espresso.System()
+       system = espressopp.System()
 
-       rng  = espresso.esutil.RNG()
+       rng  = espressopp.esutil.RNG()
 
        SIZE = float(N)
        box  = Real3D(SIZE)
-       bc   = espresso.bc.OrthorhombicBC(None, box)
+       bc   = espressopp.bc.OrthorhombicBC(None, box)
 
        system.bc = bc
        system.rng = rng 
        system.skin = skin
 
-       comm = espresso.MPI.COMM_WORLD
+       comm = espressopp.MPI.COMM_WORLD
 
        nodeGrid = (1, 1, comm.size)
        cellGrid = [1, 1, 1]
@@ -76,7 +76,7 @@ class TestVerletList(espresso.unittest.TestCase) :
        print 'NodeGrid = %s'%(nodeGrid,)
        print 'CellGrid = %s'%cellGrid
 
-       dd = espresso.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
+       dd = espressopp.storage.DomainDecomposition(system, comm, nodeGrid, cellGrid)
 
        system.storage = dd
 
@@ -100,7 +100,7 @@ class TestVerletList(espresso.unittest.TestCase) :
 
        dd.decompose()
 
-       integrator = espresso.integrator.VelocityVerlet(system)
+       integrator = espressopp.integrator.VelocityVerlet(system)
 
        print 'integrator.dt = %g, will be set to 0.005'%integrator.dt
 
@@ -111,15 +111,15 @@ class TestVerletList(espresso.unittest.TestCase) :
        # now build Verlet List
        # ATTENTION: you have to add the skin explicitly here
 
-       vl = espresso.VerletList(system, cutoff = cutoff + system.skin)
+       vl = espressopp.VerletList(system, cutoff = cutoff + system.skin)
 
-       potLJ = espresso.interaction.LennardJones(1.0, 1.0, cutoff = cutoff)
+       potLJ = espressopp.interaction.LennardJones(1.0, 1.0, cutoff = cutoff)
 
        # ATTENTION: auto shift was enabled
 
        print "potLJ, shift = %g"%potLJ.shift
 
-       interLJ = espresso.interaction.VerletListLennardJones(vl)
+       interLJ = espressopp.interaction.VerletListLennardJones(vl)
 
        interLJ.setPotential(type1 = 0, type2 = 0, potential = potLJ)
 
@@ -127,7 +127,7 @@ class TestVerletList(espresso.unittest.TestCase) :
 
        system.addInteraction(interLJ)
 
-       temp = espresso.analysis.Temperature(system)
+       temp = espressopp.analysis.Temperature(system)
 
        temperature = temp.compute()
        kineticEnergy = 0.5 * temperature * (3 * N * N * N)

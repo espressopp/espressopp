@@ -23,7 +23,9 @@
 #include "python.hpp"
 #include "OrderParameter.hpp"
 
-namespace espresso {
+#include "boost/math/special_functions/spherical_harmonic.hpp"
+
+namespace espressopp {
   namespace analysis {
 
 
@@ -57,10 +59,12 @@ namespace espresso {
       }
       
       return boost::math::spherical_harmonic(l, m, theta, phi);
+      //throw std::runtime_error("OrderParameter::SphHarm is broken (used for coupled cluster analysis only");
+      //return dcomplex(0);
     }
     
     void OrderParameter::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
       class_<OrderParameter, bases< AnalysisBase > >
         ("analysis_OrderParameter", init< shared_ptr<System>, real, int, bool, bool, real, real>())
         .add_property("l", 

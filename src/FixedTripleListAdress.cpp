@@ -35,27 +35,32 @@
 
 //using namespace std;
 
-namespace espresso {
+namespace espressopp {
 
   LOG4ESPP_LOGGER(FixedTripleListAdress::theLogger, "FixedTripleListAdress");
 
+FixedTripleListAdress::FixedTripleListAdress(shared_ptr< storage::Storage > _storage,
+    shared_ptr<FixedTupleListAdress> _fixedtupleList)
+    : FixedTripleList(_storage), fixedtupleList(_fixedtupleList) {
+  LOG4ESPP_INFO(theLogger, "construct FixedTripleListAdress");
 
-  FixedTripleListAdress::
-  FixedTripleListAdress(shared_ptr< storage::Storage > _storage,
-          shared_ptr<FixedTupleListAdress> _fixedtupleList)
-          : FixedTripleList(_storage), fixedtupleList(_fixedtupleList) {
-    LOG4ESPP_INFO(theLogger, "construct FixedTripleListAdress");
+  sigBeforeSendAT = fixedtupleList->beforeSendATParticles.connect
+        (boost::bind(&FixedTripleListAdress::beforeSendATParticles, this, _1, _2));
 
-    con = fixedtupleList->beforeSendATParticles.connect
-          (boost::bind(&FixedTripleListAdress::beforeSendATParticles, this, _1, _2));
-  }
+  sigAfterRecvAT = fixedtupleList->afterRecvATParticles.connect
+    (boost::bind(&FixedTripleListAdress::afterRecvParticles, this, _1, _2));
 
-  FixedTripleListAdress::~FixedTripleListAdress() {
+  // We do not need those signals.
+  sigBeforeSend.disconnect();
+  sigAfterRecv.disconnect();
+}
 
-    LOG4ESPP_INFO(theLogger, "~FixedTripleListAdress");
+FixedTripleListAdress::~FixedTripleListAdress() {
+  LOG4ESPP_INFO(theLogger, "~FixedTripleListAdress");
 
-    con.disconnect();
-  }
+  sigBeforeSendAT.disconnect();
+  sigAfterRecvAT.disconnect();
+}
 
 
   // override parent function (use lookupAdrATParticle)
@@ -227,7 +232,7 @@ namespace espresso {
 
   void FixedTripleListAdress::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (FixedTripleListAdress::*pyAdd)(longint pid1, longint pid2, longint pid3)
       = &FixedTripleListAdress::add;

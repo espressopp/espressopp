@@ -1,9 +1,9 @@
-from espresso import pmi
-import _espresso 
-import espresso
-from espresso.esutil import cxxinit
+from espressopp import pmi
+import _espressopp 
+import espressopp
+from espressopp.esutil import cxxinit
 
-class VirtualVerletListLocal(_espresso.VirtualVerletList):
+class VirtualVerletListLocal(_espressopp.VirtualVerletList):
     'The (local) verlet list.'
 
     def __init__(self, system, cutoff, ftpl, exclusionlist=[]):
@@ -11,10 +11,10 @@ class VirtualVerletListLocal(_espresso.VirtualVerletList):
         if pmi.workerIsActive():
             if (exclusionlist == []):
                 # rebuild list in constructor
-                cxxinit(self, _espresso.VirtualVerletList, system, cutoff, ftpl, True )
+                cxxinit(self, _espressopp.VirtualVerletList, system, cutoff, ftpl, True )
             else:
                 # do not rebuild list in constructor
-                cxxinit(self, _espresso.VirtualVerletList, system, cutoff, ftpl, False)
+                cxxinit(self, _espressopp.VirtualVerletList, system, cutoff, ftpl, False)
                 # add exclusions
                 for pair in exclusionlist:
                     pid1, pid2 = pair
@@ -71,7 +71,7 @@ if pmi.isController:
   class VirtualVerletList(object):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls = 'espresso.VirtualVerletListLocal',
+      cls = 'espressopp.VirtualVerletListLocal',
       pmiproperty = [ 'builds' ],
       pmicall = [ 'totalSize', 'exclude', 'connect', 'disconnect', 'getVerletCutoff', 'setCellList','mapTypeToVerletList'],
       pmiinvoke = [ 'getAllPairs' ]

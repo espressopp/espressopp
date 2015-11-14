@@ -21,12 +21,12 @@
 
 """
 ******************
-**espresso.Int3D**
+**espressopp.Int3D**
 ******************
 
 """
-from _espresso import Int3D
-from espresso import esutil
+from _espressopp import Int3D
+from espressopp import esutil
 
 # This injects additional methods into the Int3D class and pulls it
 # into this module 

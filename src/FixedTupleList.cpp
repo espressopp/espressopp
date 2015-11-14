@@ -35,7 +35,7 @@
 
 
 
-namespace espresso {
+namespace espressopp {
 
   LOG4ESPP_LOGGER(FixedTupleList::theLogger, "FixedTupleList");
 
@@ -360,7 +360,7 @@ namespace espresso {
 
   void FixedTupleList::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     class_< FixedTupleList, shared_ptr< FixedTupleList > >
       ("FixedTupleList", init< shared_ptr< storage::Storage > >())

@@ -34,7 +34,7 @@
 #include "esutil/Error.hpp"
 
 
-namespace espresso {
+namespace espressopp {
 
   /*
   FixedTripleList::FixedTripleList(shared_ptr< storage::Storage > _storage)
@@ -49,11 +49,11 @@ namespace espresso {
   {
     LOG4ESPP_INFO(theLogger, "construct FixedTripleList");
 
-    con1 = storage->beforeSendParticles.connect
+    sigBeforeSend = storage->beforeSendParticles.connect
       (boost::bind(&FixedTripleList::beforeSendParticles, this, _1, _2));
-    con2 = storage->afterRecvParticles.connect
+    sigAfterRecv = storage->afterRecvParticles.connect
       (boost::bind(&FixedTripleList::afterRecvParticles, this, _1, _2));
-    con3 = storage->onParticlesChanged.connect
+    sigOnParticleChanged = storage->onParticlesChanged.connect
       (boost::bind(&FixedTripleList::onParticlesChanged, this));
   }
 
@@ -61,9 +61,9 @@ namespace espresso {
 
     LOG4ESPP_INFO(theLogger, "~FixedTripleList");
 
-    con1.disconnect();
-    con2.disconnect();
-    con3.disconnect();
+    sigBeforeSend.disconnect();
+    sigAfterRecv.disconnect();
+    sigOnParticleChanged.disconnect();
   }
 
   /*
@@ -286,7 +286,7 @@ namespace espresso {
 
   void FixedTripleList::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (FixedTripleList::*pyAdd)(longint pid1, longint pid2, longint pid3)
       = &FixedTripleList::add;

@@ -31,9 +31,9 @@
 #include "iterator/CellListAllPairsIterator.hpp"
 #include "iterator/CellListIterator.hpp"
 
-namespace espresso {
+namespace espressopp {
 
-  using namespace espresso::iterator;
+  using namespace espressopp::iterator;
 
   LOG4ESPP_LOGGER(VerletListAdress::theLogger, "VerletList");
 
@@ -69,9 +69,28 @@ namespace espresso {
       // make a connection to System to invoke rebuild on resort
       connectionResort = system->storage->onParticlesChanged.connect(
           boost::bind(&VerletListAdress::rebuild, this));
+
+      //_inIntP = integrator->inIntP.connect(
+      //    boost::bind(&VerletListAdress::communicateAdrPositions, this));
     }
 
     /*-------------------------------------------------------------*/
+
+    /*void Adress::communicateAdrPostions(){
+       //if adrCenter is not set, the center of adress zone moves along with some particles
+       //the coordinates of the center(s) (adrPositions) must be communicated to all nodes
+       if (!adrCenterSet) {
+          adrPositions.clear(); // clear position pointers
+          for (CellListIterator it(localcells); it.isValid(); ++it) {
+              if (adrList.count(it->id()) == 1) {
+                  adrPositions.push_back(&(it->position()));
+                  int root = *getSystem()->comm->rank(); //for the moment only works when there's only one atom in adrPositions
+              }
+              //TODO if length(adrPositions) > 1 print warning
+          }
+          boost::mpi::broadcast(*getSystem()->comm,adrPositions,root) // only necessary for moving adrCenter
+       }
+    }*/
 
     void VerletListAdress::rebuild()
     {
@@ -79,6 +98,7 @@ namespace espresso {
       adrZone.clear(); // particles in adress zone
       cgZone.clear(); // particles in CG zone
       adrPairs.clear(); // pairs in adress zone
+      const bc::BC& bc = *getSystemRef().bc;
 
 
       //std::cout << getSystem()->comm->rank() << ": " << "-- VL Rebuild --\n";
@@ -101,28 +121,32 @@ namespace espresso {
       CellList localcells = getSystem()->storage->getLocalCells();
 
       // if adrCenter is not set, the center of adress zone moves along with some particles
-      if (!adrCenterSet) { // NOT WORKING CURRENTLY - ONLY ADR ZONE DONE HERE, NO CG ZONE
+      if (!adrCenterSet) { // maybe now working
           // loop over all VP particles (reals and ghosts) on node
           //std::cout << "particles of all local cells:\n";
           //int count = 0;
           //Cell* cellp;
-          adrPositions.clear(); // clear position pointers
-          for (CellListIterator it(localcells); it.isValid(); ++it) {
+
+          // adrPositions stuff transferred to integrator/Adress.cpp because info must be communicated to all nodes and adrPositions must be updated every time, not just when rebuild() is called
+          //adrPositions.clear(); // clear position pointers   
+          //for (CellListIterator it(localcells); it.isValid(); ++it) {
 
               /*cellp = getSystem()->storage->mapPositionToCell(it->position());
               ++count;
               std::cout << it->id() << "-" << it->ghost() << " " << it->position()
                       << " in cell " << cellp - (getSystem()->storage->getFirstCell()) << "\n";*/
 
-              if (adrList.count(it->id()) == 1) {
-                  //std::cout << getSystem()->comm->rank() << ": " << " adding particle position (" << it->position() << ") to adrPositions and adrZone\n";
-                  adrPositions.push_back(&(it->position()));
-                  adrZone.insert(&(*it));
-              }
-          }
+
+          //    if (adrList.count(it->id()) == 1) {
+          //        //std::cout << getSystem()->comm->rank() << ": " << " adding particle position (" << it->position() << ") to adrPositions and adrZone\n";
+          //        adrPositions.push_back(&(it->position()));
+          //        adrZone.insert(&(*it));
+          //    }
+          //}
           //std::cout << "(" << count <<" particles)\n";
 
           // again, loop over all VP particles and check if they are close enough to adrPositions and add to adrZone
+          // otherwise add to cgZone
           //std::cout << "\nAdding particles to adrZone ...\n";
           for (CellListIterator it(localcells); it.isValid(); ++it) {
 
@@ -132,16 +156,28 @@ namespace espresso {
 
                 // loop over positions
                 for (std::vector<Real3D*>::iterator it2 = adrPositions.begin(); it2 != adrPositions.end(); ++it2){
-                    Real3D dist = it->getPos() - **it2;
-                    real distsq = dist.sqr();
+                    Real3D dist;
+                    real distsq;
+                    bc.getMinimumImageVectorBox(dist, it->getPos(), **it2);
+
+                    if (getAdrRegionType()){ // spherical adress region
+                       distsq=dist.sqr();
+                    }
+                    else {  // slab-type adress region
+                       distsq=dist[0]*dist[0];
+                    }
 
                     //std::cout << "distance " << sqrt(distsq) << "\n";
-                    if (distsq < adrsq) {
+                    if (distsq <= adrsq) {
                         adrZone.insert(&(*it));
                         //std::cout << " added " << it->getId() << "-" << it->ghost() <<  "\n";
                         //std::cout << " adding particle " << it->getId() << "-" << it->ghost() << " to adrZone\n";
                         break; // do not need to loop further
                     }
+                }
+                // if not near enough to any adrPositions, put in cgZone
+                if (adrZone.count(&(*it)) == 0) {
+                    cgZone.insert(&(*it)); 
                 }
           }
           //std::cout  << "rebuild:!!!! adrZone count: " << adrZone.size() << std::endl;
@@ -149,11 +185,19 @@ namespace espresso {
       // center of adress zone is fixed
       else {
           for (CellListIterator it(localcells); it.isValid(); ++it) {
-              // TODO: USE PBC!
+              Real3D dist;
+              real distsq;
+              bc.getMinimumImageVectorBox(dist, it->getPos(), adrCenter);
               //Real3D dist = it->getPos() - adrCenter;                                   					        // CHANGE FOR X SPLIT VS SPHERE
-              real dist = it->getPos()[0] - adrCenter[0];                                  					        // CHANGE FOR X SPLIT VS SPHERE
+              //real dist = it->getPos()[0] - adrCenter[0];                                  					        // CHANGE FOR X SPLIT VS SPHERE
               //real distsq = dist.sqr();                                                                                                 // CHANGE FOR X SPLIT VS SPHERE
-              real distsq = dist*dist;                                                                                                // CHANGE FOR X SPLIT VS SPHERE
+              //real distsq = dist*dist;                                                                                                // CHANGE FOR X SPLIT VS SPHERE
+              if (getAdrRegionType()){ // spherical adress region
+                distsq=dist.sqr();
+              }
+              else {  // slab-type adress region
+                distsq=dist[0]*dist[0];
+              }
               //std::cout << "distance " << sqrt(distsq) << "\n";
               if (distsq <= adrsq) {
                   adrZone.insert(&(*it));
@@ -161,12 +205,11 @@ namespace espresso {
                   //std::cout << " adding particle " << it->getId() << "-" << it->ghost() << " to adrZone\n";
               }
               else {
-              cgZone.insert(&(*it));
+                  cgZone.insert(&(*it));
               }
           }
           //std::cout << "rebuild: adrZone count: " << adrZone.size() << std::endl;
       }
-
 
       // add particles to adress pairs and VL
       CellList cl = getSystem()->storage->getRealCells();
@@ -332,6 +375,8 @@ namespace espresso {
     }
 
     void VerletListAdress::addAdrParticle(longint pid) {
+          std::cout<<"Warning! Moving adres region only works with VerletListAdressInteractionTemplate.hpp"<<std::endl;
+          std::cout<<"VerletListHadressInteractionTemplate.hpp would need to be modified too"<<std::endl;
           adrList.insert(pid);
     }
 
@@ -339,6 +384,18 @@ namespace espresso {
         adrCenter = Real3D(x, y, z);
         adrCenterSet = true;
         adrPositions.push_back(&adrCenter);
+    }
+
+    void VerletListAdress::setAdrRegionType(bool _sphereAdr){
+        sphereAdr = _sphereAdr;
+        if (sphereAdr) {
+          std::cout<<"Warning! Spherical adres region only works with VerletListAdressInteractionTemplate.hpp"<<std::endl;
+          std::cout<<"VerletListHadressInteractionTemplate.hpp would need to be modified too"<<std::endl;
+        }
+    }
+
+    bool VerletListAdress::getAdrRegionType(){
+        return sphereAdr;
     }
 
     /* not used anymore
@@ -363,7 +420,7 @@ namespace espresso {
     ****************************************************/
 
     void VerletListAdress::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       bool (VerletListAdress::*pyExclude)(longint pid1, longint pid2)
             = &VerletListAdress::exclude;
@@ -373,6 +430,9 @@ namespace espresso {
 
       void (VerletListAdress::*pySetAdrCenter)(real x, real y, real z)
                   = &VerletListAdress::setAdrCenter;
+
+      void (VerletListAdress::*pySetAdrRegionType)(bool _sphereAdr)
+            = &VerletListAdress::setAdrRegionType;
 
       /*void (VerletListAdress::*pySetAtType)(size_t type)
             = &VerletListAdress::setAtType;*/
@@ -385,6 +445,7 @@ namespace espresso {
         .def("exclude", pyExclude)
         .def("addAdrParticle", pyAddAdrParticle)
         .def("setAdrCenter", pySetAdrCenter)
+        .def("setAdrRegionType", pySetAdrRegionType)
         .def("rebuild", &VerletListAdress::rebuild)
         //.def("setAtType", pySetAtType)
         ;

@@ -37,7 +37,7 @@
 #include "boost/signals2.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     /** DPD thermostat */

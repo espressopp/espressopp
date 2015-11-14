@@ -37,7 +37,7 @@ where :math:`\Delta t` - integration timestep, :math:`\\tau` - time parameter (c
 
 Example:
 
-    >>> berendsenP = espresso.integrator.BerendsenBarostatAnisotropic(system)
+    >>> berendsenP = espressopp.integrator.BerendsenBarostatAnisotropic(system)
     >>> berendsenP.tau = 0.1
     >>> berendsenP.pressure = 1.0
     >>> integrator.addExtension(berendsenP)
@@ -45,17 +45,17 @@ Example:
 **!IMPORTANT** In order to run *npt* simulation one should separately define thermostat as well 
 (e.g. BerendsenThermostat_).
 
-.. _BerendsenThermostat: espresso.integrator.BerendsenThermostat.html
+.. _BerendsenThermostat: espressopp.integrator.BerendsenThermostat.html
 
 Definition:
 
     In order to define the Berendsen barostat
     
-    >>> berendsenP = espresso.integrator.BerendsenBarostatAnisotropic(system)
+    >>> berendsenP = espressopp.integrator.BerendsenBarostatAnisotropic(system)
     
     one should have the System_ defined.
 
-.. _System: espresso.System.html
+.. _System: espressopp.System.html
 
 Properties:
 
@@ -75,7 +75,7 @@ Setting the integration property:
     
 One more example:
 
-    >>> berendsen_barostat = espresso.integrator.BerendsenBarostatAnisotropic(system)
+    >>> berendsen_barostat = espressopp.integrator.BerendsenBarostatAnisotropic(system)
     >>> berendsen_barostat.tau = 10.0
     >>> berendsen_barostat.pressure = 3.5
     >>> integrator.addExtension(berendsen_barostat)
@@ -87,7 +87,7 @@ Canceling the barostat:
     the ensamble or whatever :)
 
     >>> # define barostat with parameters
-    >>> berendsen = espresso.integrator.BerendsenBarostatAnisotropic(system)
+    >>> berendsen = espressopp.integrator.BerendsenBarostatAnisotropic(system)
     >>> berendsen.tau = 0.8
     >>> berendsen.pressure = 15.0
     >>> integrator.addExtension(berendsen)
@@ -106,11 +106,11 @@ Canceling the barostat:
 """
 
 
-from espresso.esutil import cxxinit
-from espresso import pmi
+from espressopp.esutil import cxxinit
+from espressopp import pmi
 
-from espresso.integrator.Extension import *
-from _espresso import integrator_BerendsenBarostatAnisotropic
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_BerendsenBarostatAnisotropic
 
 class BerendsenBarostatAnisotropicLocal(ExtensionLocal, integrator_BerendsenBarostatAnisotropic):
   def __init__(self, system):
@@ -123,6 +123,6 @@ if pmi.isController:
   class BerendsenBarostatAnisotropic(Extension):
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
-      cls =  'espresso.integrator.BerendsenBarostatAnisotropicLocal',
+      cls =  'espressopp.integrator.BerendsenBarostatAnisotropicLocal',
       pmiproperty = [ 'tau', 'pressure' ]
     )

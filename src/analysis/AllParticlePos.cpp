@@ -29,9 +29,9 @@
 #include <map>
 #include <boost/serialization/map.hpp>
 
-using namespace espresso;
+using namespace espressopp;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     using namespace iterator;
@@ -80,7 +80,7 @@ namespace espresso {
     
 
     void AllParticlePos::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<AllParticlePos, boost::noncopyable>("analysis_AllParticlePos", no_init)
       

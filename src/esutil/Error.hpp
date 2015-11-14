@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include "mpi.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
     /** This class supports exception handling for MPI processors.
 

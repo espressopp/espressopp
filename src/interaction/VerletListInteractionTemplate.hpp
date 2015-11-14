@@ -38,7 +38,7 @@
 
 #include "storage/Storage.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     template < typename _Potential >
     class VerletListInteractionTemplate: public Interaction {
@@ -70,8 +70,10 @@ namespace espresso {
         // typeX+1 because i<ntypes
         ntypes = std::max(ntypes, std::max(type1+1, type2+1));
         potentialArray.at(type1, type2) = potential;
+        LOG4ESPP_INFO(_Potential::theLogger, "added potential for type1=" << type1 << " type2=" << type2);
         if (type1 != type2) { // add potential in the other direction
            potentialArray.at(type2, type1) = potential;
+           LOG4ESPP_INFO(_Potential::theLogger, "automatically added the same potential for type1=" << type2 << " type2=" << type1);
         }
       }
 
@@ -102,7 +104,7 @@ namespace espresso {
       int ntypes;
       shared_ptr<VerletList> verletList;
       esutil::Array2D<Potential, esutil::enlarge> potentialArray;
-      esutil::Array2D<shared_ptr<Potential>, esutil::enlarge> potentialArrayPtr;
+      // not needed esutil::Array2D<shared_ptr<Potential>, esutil::enlarge> potentialArrayPtr;
     };
 
     //////////////////////////////////////////////////
@@ -111,7 +113,7 @@ namespace espresso {
     template < typename _Potential > inline void
     VerletListInteractionTemplate < _Potential >::
     addForces() {
-      LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
+      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and add forces");
 
       for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
         Particle &p1 = *it->first;
@@ -126,7 +128,7 @@ namespace espresso {
         //if(potential->_computeForce(force, p1, p2)) {
           p1.force() += force;
           p2.force() -= force;
-          LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" << force);
+          LOG4ESPP_TRACE(_Potential::theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" << force);
         }
       }
     }
@@ -135,7 +137,7 @@ namespace espresso {
     inline real
     VerletListInteractionTemplate < _Potential >::
     computeEnergy() {
-      LOG4ESPP_INFO(theLogger, "compute energy of the Verlet list pairs");
+      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up potential energies");
 
       real e = 0.0;
       real es = 0.0;
@@ -149,7 +151,7 @@ namespace espresso {
         e   = potential._computeEnergy(p1, p2);
         // e   = potential->_computeEnergy(p1, p2);
         es += e;
-        LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
+        LOG4ESPP_TRACE(_Potential::theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " potential energy=" << e);
       }
 
       // reduce over all CPUs
@@ -161,14 +163,14 @@ namespace espresso {
     template < typename _Potential > inline real
     VerletListInteractionTemplate < _Potential >::
     computeEnergyAA() {
-      std::cout << "Warning! At the moment computeEnergyAA() in VerletListInteractionTemplate does not work." << std::endl;
+      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergyAA() is not yet implemented.");
       return 0.0;
     }
     
     template < typename _Potential > inline real
     VerletListInteractionTemplate < _Potential >::
     computeEnergyCG() {
-      std::cout << "Warning! At the moment computeEnergyCG() in VerletListInteractionTemplate does not work." << std::endl;
+      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeEnergyCG() is not yet implemented.");
       return 0.0;
     }
     
@@ -176,13 +178,13 @@ namespace espresso {
     inline void
     VerletListInteractionTemplate < _Potential >::
     computeVirialX(std::vector<real> &p_xx_total, int bins) {
-        std::cout << "Warning! At the moment computeVirialX in VerletListInteractionTemplate does not work." << std::endl << "Therefore, the corresponding interactions won't be included in calculation." << std::endl;
+      LOG4ESPP_WARN(_Potential::theLogger, "Warning! computeVirialX() is not yet implemented.");
     }
 
     template < typename _Potential > inline real
     VerletListInteractionTemplate < _Potential >::
     computeVirial() {
-      LOG4ESPP_INFO(theLogger, "compute the virial for the Verlet List");
+      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up virial");
       
       real w = 0.0;
       for (PairList::Iterator it(verletList->getPairs());                
@@ -211,7 +213,7 @@ namespace espresso {
     template < typename _Potential > inline void
     VerletListInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor& w) {
-      LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
+      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up virial tensor");
 
       Tensor wlocal(0.0);
       for (PairList::Iterator it(verletList->getPairs());
@@ -241,7 +243,7 @@ namespace espresso {
     template < typename _Potential > inline void
     VerletListInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor& w, real z) {
-      LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
+      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up virial tensor over one z-layer");
 
       System& system = verletList->getSystemRef();
       Real3D Li = system.bc->getBoxL();
@@ -298,7 +300,7 @@ namespace espresso {
     template < typename _Potential > inline void
     VerletListInteractionTemplate < _Potential >::
     computeVirialTensor(Tensor *w, int n) {
-      LOG4ESPP_INFO(theLogger, "compute the virial tensor for the Verlet List");
+      LOG4ESPP_DEBUG(_Potential::theLogger, "loop over verlet list pairs and sum up virial tensor in bins along z-direction");
 
       System& system = verletList->getSystemRef();
       Real3D Li = system.bc->getBoxL();

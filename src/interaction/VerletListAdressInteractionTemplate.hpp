@@ -38,7 +38,7 @@
 #include "FixedTupleListAdress.hpp"
 #include "esutil/Array2D.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     template < typename _PotentialAT, typename _PotentialCG >
     class VerletListAdressInteractionTemplate: public Interaction {
@@ -133,6 +133,7 @@ namespace espresso {
       real dexdhy; // dex + dhy
       real dexdhy2; // dexdhy^2
       real dex;
+      real dhy;
       real dex2; // dex^2
       //std::map<Particle*, real> weights;
 
@@ -146,7 +147,7 @@ namespace espresso {
     addForces() {
       LOG4ESPP_INFO(theLogger, "add forces computed by the Verlet List");
       std::set<Particle*> cgZone = verletList->getCGZone();
-      for (std::set<Particle*>::iterator it=cgZone.begin();
+      /*for (std::set<Particle*>::iterator it=cgZone.begin();
               it != cgZone.end(); ++it) {
 
           Particle &vp = **it;
@@ -192,7 +193,7 @@ namespace espresso {
               exit(1);
               return;
           }
-      }     
+      }*/     
       
       
       // Pairs not inside the AdResS Zone (CG region)
@@ -263,7 +264,7 @@ namespace espresso {
       }*/
       
       std::set<Particle*> adrZone = verletList->getAdrZone();
-      for (std::set<Particle*>::iterator it=adrZone.begin();
+      /*for (std::set<Particle*>::iterator it=adrZone.begin();
               it != adrZone.end(); ++it) {
 
           Particle &vp = **it;
@@ -327,8 +328,10 @@ namespace espresso {
               if (dex2 > min1sq) w = 1;
               else if (dexdhy2 < min1sq) w = 0;
               else {
-                   w = cos(pidhy2 * (sqrt(min1sq) - dex));
-                   w *= w;
+                   //w = cos(pidhy2 * (sqrt(min1sq) - dex));
+                   //w *= w;
+                   real argument = sqrt(min1sq) - dex; 
+                   w = 1.0-(30.0/(pow(dhy, 5.0)))*(1.0/5.0*pow(argument, 5.0)-dhy/2.0*pow(argument, 4.0)+1.0/3.0*pow(argument, 3.0)*dhy*dhy);
               }
 
               vp.lambda() = w;
@@ -343,7 +346,7 @@ namespace espresso {
               exit(1);
               return;
           }
-      }
+      }*/
 
 
       // Compute forces (AT and VP) of Pairs inside AdResS zone
@@ -450,12 +453,12 @@ namespace espresso {
                 std::vector<Particle*> atList1;
                 atList1 = it3->second;
 
-                Real3D vpfm = vp.force() / vp.getMass();
+                //Real3D vpfm = vp.force() / vp.getMass();
                 for (std::vector<Particle*>::iterator itv = atList1.begin();
                         itv != atList1.end(); ++itv) {
                     Particle &at = **itv;
                     at.velocity() = vp.velocity(); // Overwrite velocity - Note (Karsten): See comment above.
-                    at.force() += at.mass() * vpfm;
+                    //at.force() += at.mass() * vpfm;
                 }
 
             }
@@ -468,7 +471,7 @@ namespace espresso {
       
       
       // distribute forces from VP to AT (HY and AT region)
-      for (std::set<Particle*>::iterator it=adrZone.begin();
+      /*for (std::set<Particle*>::iterator it=adrZone.begin();
                 it != adrZone.end(); ++it) {
 
         Particle &vp = **it;
@@ -495,7 +498,7 @@ namespace espresso {
             exit(1);
             return;
         }
-      }
+      }*/
     }
       
     template < typename _PotentialAT, typename _PotentialCG >
@@ -577,8 +580,10 @@ namespace espresso {
               if (dex2 > min1sq) w = 1;
               else if (dexdhy2 < min1sq) w = 0;
               else {
-                   w = cos(pidhy2 * (sqrt(min1sq) - dex));
-                   w *= w;
+                   //w = cos(pidhy2 * (sqrt(min1sq) - dex));
+                   //w *= w;
+                   real argument = sqrt(min1sq) - dex;
+                   w = 1.0-(30.0/(pow(dhy, 5.0)))*(1.0/5.0*pow(argument, 5.0)-dhy/2.0*pow(argument, 4.0)+1.0/3.0*pow(argument, 3.0)*dhy*dhy);
               }
               vp.lambda() = w;
               //weights.insert(std::make_pair(&vp, w));
@@ -755,8 +760,10 @@ namespace espresso {
               if (dex2 > min1sq) w = 1;
               else if (dexdhy2 < min1sq) w = 0;
               else {
-                   w = cos(pidhy2 * (sqrt(min1sq) - dex));
-                   w *= w;
+                   //w = cos(pidhy2 * (sqrt(min1sq) - dex));
+                   //w *= w;
+                   real argument = sqrt(min1sq) - dex;
+                   w = 1.0-(30.0/(pow(dhy, 5.0)))*(1.0/5.0*pow(argument, 5.0)-dhy/2.0*pow(argument, 4.0)+1.0/3.0*pow(argument, 3.0)*dhy*dhy);
               }
 
               vp.lambda() = w;

@@ -33,7 +33,7 @@
 
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
   namespace iterator {
     class CellListAllTriplesIterator {
     public:

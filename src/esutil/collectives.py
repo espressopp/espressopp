@@ -21,14 +21,14 @@
 
 """
 *******************************
-**espresso.esutil.collectives**
+**espressopp.esutil.collectives**
 *******************************
 
 """
-import _espresso
-from espresso import pmi
+import _espressopp
+from espressopp import pmi
 
-ResultNone = _espresso.esutil_Collectives_ResultNone
+ResultNone = _espressopp.esutil_Collectives_ResultNone
 
 def locateItem(here):
     """locate the node with here=True (e.g. indicating that data of a
@@ -40,7 +40,7 @@ def locateItem(here):
     here=True, or an KeyError exception if no node had the item,
     i.e. had here=True.
     """
-    res = _espresso.esutil_Collectives_locateItem(here, pmi.CONTROLLER)
+    res = _espressopp.esutil_Collectives_locateItem(here, pmi.CONTROLLER)
     if pmi.isController:
         if res == ResultNone:
             raise IndexError("collectives.locateItem could not find anything")

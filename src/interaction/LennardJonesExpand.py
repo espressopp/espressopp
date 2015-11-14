@@ -21,16 +21,16 @@
 
 """
 *******************************************
-**espresso.interaction.LennardJonesExpand**
+**espressopp.interaction.LennardJonesExpand**
 *******************************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_LennardJonesExpand, \
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_LennardJonesExpand, \
                       interaction_VerletListLennardJonesExpand, \
                       interaction_CellListLennardJonesExpand, \
                       interaction_FixedPairListLennardJonesExpand
@@ -86,25 +86,25 @@ if pmi.isController:
     class LennardJonesExpand(Potential):
         'The LennardJonesExpand potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.LennardJonesExpandLocal',
+            cls = 'espressopp.interaction.LennardJonesExpandLocal',
             pmiproperty = ['epsilon', 'sigma', 'delta']
             )
 
     class VerletListLennardJonesExpand(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListLennardJonesExpandLocal',
+            cls =  'espressopp.interaction.VerletListLennardJonesExpandLocal',
             pmicall = ['setPotential','getPotential']
             )
     class CellListLennardJonesExpand(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.CellListLennardJonesExpandLocal',
+            cls =  'espressopp.interaction.CellListLennardJonesExpandLocal',
             pmicall = ['setPotential']
             )
     class FixedPairListLennardJonesExpand(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedPairListLennardJonesExpandLocal',
+            cls =  'espressopp.interaction.FixedPairListLennardJonesExpandLocal',
             pmicall = ['setPotential']
             )

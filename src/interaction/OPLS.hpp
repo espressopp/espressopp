@@ -27,7 +27,7 @@
 #include "DihedralPotential.hpp"
 #include <cmath>
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     /** This class provides methods to compute forces and energies of
         the OPLS dihedral potential. To create a new dihedral potential

@@ -41,14 +41,14 @@
 #include "boost/serialization/vector.hpp"
 #include "boost/serialization/complex.hpp"
 
-#include <boost/math/special_functions/spherical_harmonic.hpp>
+// #include <boost/math/special_functions/spherical_harmonic.hpp>
 
 #include <algorithm>
 
 using namespace std;
 using namespace boost;
 
-typedef complex<espresso::real> dcomplex;
+typedef complex<espressopp::real> dcomplex;
 
 // the following constant is not defined everywhere (e.g. not in Mac OS X)
 #ifndef M_PIl
@@ -58,7 +58,7 @@ typedef complex<espresso::real> dcomplex;
 
 // TODO create the total map: cpu <-> pid
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     
     using namespace iterator;

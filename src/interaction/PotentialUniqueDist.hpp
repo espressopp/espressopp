@@ -29,7 +29,7 @@
 #include "Particle.hpp"
 #include "logging.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     class PotentialUniqueDist {
     public:

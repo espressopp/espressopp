@@ -31,7 +31,7 @@
 #include <math.h>
 
 #define BOLTZMANN 1.0 //in reduced units
-namespace espresso {
+namespace espressopp {
 
 using namespace iterator;
 
@@ -256,7 +256,7 @@ real GammaDistributionNR3rd::drawNumber(const unsigned int ia) {
 
 void StochasticVelocityRescaling::registerPython() {
 
-	using namespace espresso::python;
+	using namespace espressopp::python;
 
 	class_<StochasticVelocityRescaling, shared_ptr<StochasticVelocityRescaling>, bases<Extension> >
 

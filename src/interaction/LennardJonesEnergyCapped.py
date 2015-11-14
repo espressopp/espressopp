@@ -21,16 +21,16 @@
 
 """
 *************************************************
-**espresso.interaction.LennardJonesEnergyCapped**
+**espressopp.interaction.LennardJonesEnergyCapped**
 *************************************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_LennardJonesEnergyCapped, \
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_LennardJonesEnergyCapped, \
                       interaction_VerletListLennardJonesEnergyCapped, \
                       interaction_VerletListAdressLennardJonesEnergyCapped, \
                       interaction_VerletListHadressLennardJonesEnergyCapped, \
@@ -140,41 +140,41 @@ if pmi.isController:
     class LennardJonesEnergyCapped(Potential):
         'The Lennard-Jones potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.LennardJonesEnergyCappedLocal',
+            cls = 'espressopp.interaction.LennardJonesEnergyCappedLocal',
             pmiproperty = ['epsilon', 'sigma', 'cutoff', 'caprad']
             )
 
     class VerletListLennardJonesEnergyCapped(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListLennardJonesEnergyCappedLocal',
+            cls =  'espressopp.interaction.VerletListLennardJonesEnergyCappedLocal',
             pmicall = ['setPotential', 'getPotential']
             )
 
     class VerletListAdressLennardJonesEnergyCapped(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListAdressLennardJonesEnergyCappedLocal',
+            cls =  'espressopp.interaction.VerletListAdressLennardJonesEnergyCappedLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG', 'getPotentialAT', 'getPotentialCG']
             )
             
     class VerletListHadressLennardJonesEnergyCapped(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListHadressLennardJonesEnergyCappedLocal',
+            cls =  'espressopp.interaction.VerletListHadressLennardJonesEnergyCappedLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG', 'getPotentialAT', 'getPotentialCG']
             )
 
     class CellListLennardJonesEnergyCapped(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.CellListLennardJonesEnergyCappedLocal',
+            cls =  'espressopp.interaction.CellListLennardJonesEnergyCappedLocal',
             pmicall = ['setPotential', 'getPotential']
             )
         
     class FixedPairListLennardJonesEnergyCapped(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedPairListLennardJonesEnergyCappedLocal',
+            cls =  'espressopp.interaction.FixedPairListLennardJonesEnergyCappedLocal',
             pmicall = ['setPotential']
             )

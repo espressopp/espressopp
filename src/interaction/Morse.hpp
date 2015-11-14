@@ -27,14 +27,10 @@
 #include "FixedPairListInteractionTemplate.hpp"
 #include "Potential.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     /** This class provides methods to compute forces and energies of
 	the Morse potential.
-
-	\f[ V(r) = 4 \varepsilon \left[ \left( \frac{\alpha}{r} \right)^{12} -
-	\left( \frac{\alpha}{r} \right)^{6} \right]
-	\f]
 
     */
     // This class might benefit from a present routine like for Lennard-Jones

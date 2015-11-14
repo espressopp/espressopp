@@ -19,14 +19,14 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-import espresso
-from espresso import Real3D
+import espressopp
+from espressopp import Real3D
 
 def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
     """
     writeTabFile can be used to create a table for any potential
     Parameters are:
-    * pot     : this is any espresso.interaction potential
+    * pot     : this is any espressopp.interaction potential
     * name    : filename
     * N       : number of line to write
     * low     : lowest r (default is 0.0)

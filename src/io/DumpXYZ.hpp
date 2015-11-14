@@ -32,7 +32,7 @@
 
 #include <string>
 
-namespace espresso {
+namespace espressopp {
   namespace io{
 
     class DumpXYZ : public ParticleAccess {

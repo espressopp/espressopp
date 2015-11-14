@@ -28,7 +28,7 @@
 
 using namespace boost;
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
 
     /********************************************************************/

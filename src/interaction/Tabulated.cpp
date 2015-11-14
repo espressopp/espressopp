@@ -31,7 +31,7 @@
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
 
@@ -65,7 +65,7 @@ namespace espresso {
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void Tabulated::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
      
       class_ <Tabulated, bases <Potential> >
         ("interaction_Tabulated", init <int, const char*, real>())

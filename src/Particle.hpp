@@ -37,7 +37,7 @@
 #include "Int3D.hpp"
 #include <map>
 
-namespace espresso {
+namespace espressopp {
 
   struct ParticleProperties {
     size_t id;
@@ -45,7 +45,9 @@ namespace espresso {
     real mass;
     real q;
     real lambda;
+    real drift;
     real lambdaDeriv;
+    int state;
   private:
     friend class boost::serialization::access;
     template< class Archive >
@@ -56,7 +58,9 @@ namespace espresso {
       ar & mass;
       ar & q;
       ar & lambda;
+      ar & drift;
       ar & lambdaDeriv;
+      ar & state;
     }
   };
 
@@ -71,6 +75,7 @@ namespace espresso {
 
     Real3D p;
     real radius;
+    real extVar;
 
     void copyShifted(ParticlePosition& dst, const Real3D& shift) const {
       dst.p = p + shift;
@@ -82,6 +87,7 @@ namespace espresso {
       for (int i = 0; i < 3; ++i)
         ar & p[i];
       ar & radius;
+      ar & extVar;
     }
   };
 
@@ -188,8 +194,11 @@ namespace espresso {
       f.fradius      = 0.0;
       m.vradius      = 0.0;
       l.ghost        = false;
-      p.lambda       = 0.0;      
-      p.lambdaDeriv  = 0.0;      
+      p.lambda       = 0.0;
+      p.drift        = 0.0;      
+      p.lambdaDeriv  = 0.0;
+      r.extVar       = 0.0;      
+      p.state        = 0;
     }
 
     // getter and setter used for export in Python
@@ -220,6 +229,12 @@ namespace espresso {
     const real& radius() const { return r.radius; }
     real getRadius() const { return r.radius; }
     void setRadius(real q) { r.radius = q; }
+    
+    // Extended Variable for Generalized Langevin Friction
+    real& extVar() { return r.extVar; }
+    const real& extVar() const { return r.extVar; }
+    real getExtVar() const { return r.extVar; }
+    void setExtVar(real q) { r.extVar = q; }
 
     // Position
 
@@ -278,11 +293,23 @@ namespace espresso {
     real getLambda() const { return p.lambda; }
     void setLambda(const real& _lambda) { p.lambda = _lambda; }
     
+    // drift (used in H-Adress)
+    real& drift() { return p.drift; }
+    const real& drift() const { return p.drift; }
+    real getDrift() const { return p.drift; }
+    void setDrift(const real& _drift) { p.drift = _drift; }
+    
     // weight/lambda derivative (used in H-Adress)
     real& lambdaDeriv() { return p.lambdaDeriv; }
     const real& lambdaDeriv() const { return p.lambdaDeriv; }
     real getLambdaDeriv() const { return p.lambdaDeriv; }
     void setLambdaDeriv(const real& _lambdaDeriv) { p.lambdaDeriv = _lambdaDeriv; }
+
+    // state (used in AssociationReaction)
+    int& state() { return p.state; }
+    const int& state() const { return p.state; }
+    int getState() const { return p.state; }
+    void setState(const int& _state) { p.state = _state; }
 
     static void registerPython();
   
@@ -448,18 +475,18 @@ namespace espresso {
 }
 
 
-BOOST_IS_MPI_DATATYPE(espresso::ParticleProperties)
-BOOST_IS_MPI_DATATYPE(espresso::ParticlePosition)
-BOOST_IS_MPI_DATATYPE(espresso::ParticleForce)
-BOOST_IS_MPI_DATATYPE(espresso::ParticleMomentum)
-BOOST_IS_MPI_DATATYPE(espresso::ParticleLocal)
-BOOST_IS_MPI_DATATYPE(espresso::Particle)
+BOOST_IS_MPI_DATATYPE(espressopp::ParticleProperties)
+BOOST_IS_MPI_DATATYPE(espressopp::ParticlePosition)
+BOOST_IS_MPI_DATATYPE(espressopp::ParticleForce)
+BOOST_IS_MPI_DATATYPE(espressopp::ParticleMomentum)
+BOOST_IS_MPI_DATATYPE(espressopp::ParticleLocal)
+BOOST_IS_MPI_DATATYPE(espressopp::Particle)
 
-BOOST_CLASS_TRACKING(espresso::ParticleProperties,track_never)
-BOOST_CLASS_TRACKING(espresso::ParticlePosition,track_never)
-BOOST_CLASS_TRACKING(espresso::ParticleForce,track_never)
-BOOST_CLASS_TRACKING(espresso::ParticleMomentum,track_never)
-BOOST_CLASS_TRACKING(espresso::ParticleLocal,track_never)
-BOOST_CLASS_TRACKING(espresso::Particle,track_never)
+BOOST_CLASS_TRACKING(espressopp::ParticleProperties,track_never)
+BOOST_CLASS_TRACKING(espressopp::ParticlePosition,track_never)
+BOOST_CLASS_TRACKING(espressopp::ParticleForce,track_never)
+BOOST_CLASS_TRACKING(espressopp::ParticleMomentum,track_never)
+BOOST_CLASS_TRACKING(espressopp::ParticleLocal,track_never)
+BOOST_CLASS_TRACKING(espressopp::Particle,track_never)
 
 #endif

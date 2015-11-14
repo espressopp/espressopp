@@ -21,16 +21,16 @@
 
 """
 ****************************************
-**espresso.interaction.AngularHarmonic**
+**espressopp.interaction.AngularHarmonic**
 ****************************************
 
 """
-from espresso import pmi
-from espresso.esutil import *
+from espressopp import pmi
+from espressopp.esutil import *
 
-from espresso.interaction.AngularPotential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_AngularHarmonic, interaction_FixedTripleListAngularHarmonic
+from espressopp.interaction.AngularPotential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_AngularHarmonic, interaction_FixedTripleListAngularHarmonic
 
 class AngularHarmonicLocal(AngularPotentialLocal, interaction_AngularHarmonic):
     'The (local) AngularHarmonic potential.'
@@ -53,13 +53,13 @@ if pmi.isController:
     class AngularHarmonic(AngularPotential):
         'The AngularHarmonic potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.AngularHarmonicLocal',
+            cls = 'espressopp.interaction.AngularHarmonicLocal',
             pmiproperty = ['K', 'theta0']
             )
 
     class FixedTripleListAngularHarmonic(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedTripleListAngularHarmonicLocal',
+            cls =  'espressopp.interaction.FixedTripleListAngularHarmonicLocal',
             pmicall = ['setPotential', 'getFixedTripleList']
             )

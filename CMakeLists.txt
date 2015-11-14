@@ -1,15 +1,11 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 
 project(espressopp)
 
 set(PROJECT_VERSION "0.9.0-dev")
-SET(CPACK_PACKAGE_VERSION_MAJOR "0")
-SET(CPACK_PACKAGE_VERSION_MINOR "9")
-SET(CPACK_PACKAGE_VERSION_PATCH "0")
 
 # Cmake modules/macros are in a subdirectory to keep this file cleaner
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-
 
 enable_language(C)
 enable_language(CXX)
@@ -25,17 +21,11 @@ include(CheckCXXCompilerFlag)
 ########################################################################
 # User input options                                                   #
 ########################################################################
-option(EXTERNAL_BOOST "Use external boost" OFF)
+option(EXTERNAL_BOOST "Use external boost" ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
-option(BUILD_STANDALONE "Builds pypresso an standalone binary" OFF)
-option(BUILD_PYTHON_MODULE "Builds epresso as python module" ON)
 if (NOT DEFINED LIB)
   set(LIB "lib")
 endif(NOT DEFINED LIB)
-
-if(NOT BUILD_STANDALONE AND NOT BUILD_PYTHON_MODULE)
-  message(FATAL_ERROR "You need to enable pypresso or the python module")
-endif(NOT BUILD_STANDALONE AND NOT BUILD_PYTHON_MODULE)
 
 IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE Release CACHE STRING
@@ -70,7 +60,7 @@ include_directories(${MPI_INCLUDE_PATH})
 ########################################################################
 
 find_package(FFTW3 REQUIRED)
-include_directories(${FFTW3_INCLUDE_PATH})
+include_directories(${FFTW3_INCLUDES})
 
 ########################################################################
 #Process Python settings
@@ -127,12 +117,25 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 # add_definitions( -DHAVE_CONFIG_H )
 
 if (EXTERNAL_BOOST)
-  find_package(Boost 1.42.0 REQUIRED COMPONENTS mpi python serialization )
+  find_package(Boost 1.55.0 COMPONENTS mpi python serialization filesystem)
+  if(NOT Boost_FOUND)
+    message(FATAL_ERROR "Boost not found, make sure you have installed boost and it's dev packages. To hint cmake to your Boost installation, use the option -DBOOST_ROOT=/path/to/boost. As last resort you can use our internal replacement with -DEXTERNAL_BOOST=OFF")
+  endif(NOT Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 else(EXTERNAL_BOOST)
   include_directories(${CMAKE_SOURCE_DIR}/contrib/boost)
 endif(EXTERNAL_BOOST)
 include_directories(${CMAKE_SOURCE_DIR}/src)
+
+option(EXTERNAL_MPI4PY "Use external mpi4py" ON)
+
+if(EXTERNAL_MPI4PY)
+  find_package(MPI4PY 1.3 REQUIRED)
+  include_directories(${MPI4PY_INCLUDES})
+else(EXTERNAL_MPI4PY)
+  include_directories(${CMAKE_SOURCE_DIR}/contrib/mpi4py/mpi4py-1.3/src/include)
+  set(MPI4PY_LIBRARIES MPI)
+endif(EXTERNAL_MPI4PY)
 
 # Required for acconfig.h
 include_directories(${CMAKE_BINARY_DIR}/src)
@@ -151,7 +154,7 @@ add_subdirectory(contrib)
 
 add_custom_target(symlink ALL COMMENT "Creating symlink")
 add_custom_command(TARGET symlink COMMAND ${CMAKE_COMMAND} -E create_symlink
-  ${CMAKE_BINARY_DIR}/src espresso)
+  src espressopp)
 
 ######################################
 # System documentation (Doxygen)     # 

@@ -26,7 +26,7 @@
 #include <stdexcept>
 #include "Array2D.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace esutil {
     /** \brief A three-dimensional array (i.e. a matrix).
      * Prticulary we need it for 3-body potential tables

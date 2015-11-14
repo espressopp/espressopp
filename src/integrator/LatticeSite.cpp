@@ -29,17 +29,22 @@
 #include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   using namespace iterator;
   namespace integrator {
-    /* site Constructor */
+    /* SITE CONSTRUCTOR */
     LBSite::LBSite (shared_ptr<System> system, int _numVels, real _a, real _tau) {
+			/* initialization of populations, moments and equilibrium moments */
       f   = std::vector<real>(_numVels, 0.);
       m   = std::vector<real>(_numVels, 0.);
       meq = std::vector<real>(_numVels, 0.);
+			
+			/* set lattice and time constants */
       setALoc(_a);
       setTauLoc(_tau);
+			
+			/* declare RNG */
       if (!system->rng) {
         throw std::runtime_error("system has no RNG");
       }
@@ -47,6 +52,7 @@ namespace espresso {
     }
 
     /* SET AND GET PART */
+		/* for populations, moments and equilibrium moments */
     void LBSite::setF_i (int _i, real _f) { f[_i] = _f;}
     real LBSite::getF_i (int _i) { return f[_i];}
 
@@ -56,7 +62,7 @@ namespace espresso {
     void LBSite::setMeq_i (int _i, real _meq) { meq[_i] = _meq;}
     real LBSite::getMeq_i (int _i) { return meq[_i];}
 
-    /* set and get static variables */
+    /* for static variables */
     void LBSite::setALoc (real _a) {aLocal = _a;}
     real LBSite::getALoc () {return aLocal;}
 
@@ -84,8 +90,17 @@ namespace espresso {
     void LBSite::setGammaEvenLoc (real _gamma_even) {gamma_evenLoc = _gamma_even;}
     real LBSite::getGammaEvenLoc () { return gamma_evenLoc;}
 
+		/* for local forces */
     void LBSite::setExtForceLoc (Real3D _extForceLoc) {extForceLoc = _extForceLoc;}
     Real3D LBSite::getExtForceLoc () {return extForceLoc;}
+		void LBSite::addExtForceLoc (Real3D _extForceLoc) {extForceLoc += _extForceLoc;}
+
+		void LBSite::setCouplForceLoc (Real3D _couplForceLoc) {couplForceLoc = _couplForceLoc;}
+		Real3D LBSite::getCouplForceLoc () {return couplForceLoc;}
+		void LBSite::addCouplForceLoc (Real3D _couplForceLoc) {couplForceLoc += _couplForceLoc;}
+		
+		/* for LB to MD coupling forces */
+//		Real3D LBSite::getMDForceLoc() {return MDForceLoc;}
 
     /* OTHER HELPFUL OPERATIONS */
     void LBSite::scaleF_i (int _i, real _value) { f[_i] *= _value;}
@@ -112,7 +127,7 @@ namespace espresso {
       real f0,
         f1p2, f1m2, f3p4, f3m4, f5p6, f5m6, f7p8, f7m8, f9p10, f9m10,
         f11p12, f11m12, f13p14, f13m14, f15p16, f15m16, f17p18, f17m18;
-      // shorthand functions for "simplified" notation
+      /* shorthand functions for "simplified" notation */
       f0     =  getF_i(0);
       f1p2   =  getF_i(1) +  getF_i(2);    f1m2 =  getF_i(1) -  getF_i(2);
       f3p4   =  getF_i(3) +  getF_i(4);    f3m4 =  getF_i(3) -  getF_i(4);
@@ -124,15 +139,15 @@ namespace espresso {
       f15p16 = getF_i(15) + getF_i(16);  f15m16 = getF_i(15) - getF_i(16);
       f17p18 = getF_i(17) + getF_i(18);  f17m18 = getF_i(17) - getF_i(18);
 
-      // mass mode
+      /* mass mode */
       setM_i (0, f0 + f1p2 + f3p4 + f5p6 + f7p8 + f9p10 + f11p12 + f13p14 + f15p16 + f17p18);
 
-      // momentum modes
+      /* momentum modes */
       setM_i (1, f1m2 +   f7m8 +  f9m10 + f11m12 + f13m14);
       setM_i (2, f3m4 +   f7m8 -  f9m10 + f15m16 + f17m18);
       setM_i (3, f5m6 + f11m12 - f13m14 + f15m16 - f17m18);
 
-      // stress modes
+      /* stress modes */
       setM_i (4, -f0 +   f7p8 + f9p10 + f11p12 + f13p14 + f15p16 + f17p18);
       setM_i (5, 2.*f1p2 -   f3p4 -  f5p6 +   f7p8 +  f9p10 + f11p12 + f13p14 - 2.* (f15p16 + f17p18));
       setM_i (6, f3p4 -   f5p6 +  f7p8 +  f9p10 - f11p12 - f13p14);
@@ -140,7 +155,7 @@ namespace espresso {
       setM_i (8, f11p12 - f13p14);
       setM_i (9, f15p16 - f17p18);
 
-      // kinetic (ghost) modes
+      /* kinetic (ghost) modes */
       setM_i (10, -2.* f1m2 +   f7m8 +  f9m10 + f11m12 + f13m14);
       setM_i (11, -2.* f3m4 +   f7m8 -  f9m10 + f15m16 + f17m18);
       setM_i (12, -2.* f5m6 + f11m12 - f13m14 + f15m16 - f17m18);
@@ -162,29 +177,27 @@ namespace espresso {
     void LBSite::calcEqMoments(int _extForceFlag) {
       // IF ONE USES DEFAULT D3Q19 MODEL
 
-      // density on the site
+      /* density on the site */
       real rhoLoc = getM_i(0);
 
-      // moments on the site
+      /* moments on the site */
       Real3D jLoc(getM_i(1), getM_i(2), getM_i(3));
       jLoc *= (aLocal / tauLocal);
 
-      // if we have external forces then modify the eq.fluxes
-      if (_extForceFlag == 1) {
-        jLoc[0] += 0.5*getExtForceLoc().getItem(0);
-        jLoc[1] += 0.5*getExtForceLoc().getItem(1);
-        jLoc[2] += 0.5*getExtForceLoc().getItem(2);
-      }
+      /* if we have external forces then modify the eq.fluxes */
+			// ADD LB TO MD COUPLING??
+			if (_extForceFlag == 0) printf ("extForceFlag is %d\n",_extForceFlag);
+			if (_extForceFlag == 1) jLoc += 0.5*(getExtForceLoc() + getCouplForceLoc()); // when doing coupling, the flag is set to 1!
 
-      // eq. stress modes
+      /* eq. stress modes */
       setMeq_i (4, jLoc.sqr() / rhoLoc);
       setMeq_i (5, (jLoc[0]*jLoc[0] - jLoc[1]*jLoc[1]) / rhoLoc);
-      setMeq_i (6, (3*jLoc[0]*jLoc[0] - jLoc.sqr()) / rhoLoc);
+      setMeq_i (6, (3.*jLoc[0]*jLoc[0] - jLoc.sqr()) / rhoLoc);
       setMeq_i (7, jLoc[0]*jLoc[1] / rhoLoc);
       setMeq_i (8, jLoc[0]*jLoc[2] / rhoLoc);
       setMeq_i (9, jLoc[1]*jLoc[2] / rhoLoc);
 
-      // kinetic (ghost) modes
+      /* kinetic (ghost) modes */
       setMeq_i (10, 0.); setMeq_i (11, 0.);
       setMeq_i (12, 0.); setMeq_i (13, 0.);
       setMeq_i (14, 0.); setMeq_i (15, 0.);
@@ -192,6 +205,7 @@ namespace espresso {
       setMeq_i (18, 0.);
     }
 
+		/* RELAXATION OF THE MOMENTS TO THEIR EQUILIBRIUM VALUES */
     void LBSite::relaxMoments (int _numVels) {
       real pi_eq[6];
 
@@ -204,52 +218,48 @@ namespace espresso {
       _gamma_odd = getGammaOddLoc();
       _gamma_even = getGammaEvenLoc();
 
-      // relax bulk mode
+      /* relax bulk mode */
       setM_i (4, pi_eq[0] + _gamma_b * (getM_i(4) - pi_eq[0]));
 
-      // relax shear modes
+      /* relax shear modes */
       setM_i (5, pi_eq[1] + _gamma_s * (getM_i(5) - pi_eq[1]));
       setM_i (6, pi_eq[2] + _gamma_s * (getM_i(6) - pi_eq[2]));
       setM_i (7, pi_eq[3] + _gamma_s * (getM_i(7) - pi_eq[3]));
       setM_i (8, pi_eq[4] + _gamma_s * (getM_i(8) - pi_eq[4]));
       setM_i (9, pi_eq[5] + _gamma_s * (getM_i(9) - pi_eq[5]));
 
-      // relax odd modes
+      /* relax odd modes */
       scaleM_i (10, _gamma_odd); scaleM_i (11, _gamma_odd); scaleM_i (12, _gamma_odd);
       scaleM_i (13, _gamma_odd); scaleM_i (14, _gamma_odd); scaleM_i (15, _gamma_odd);
 
-      // relax even modes
+      /* relax even modes */
       scaleM_i (16, _gamma_even); scaleM_i (17, _gamma_even); scaleM_i (18, _gamma_even);
     }
 
+		/* ADDING THERMAL FLUCTUATIONS */
     void LBSite::thermalFluct(int _numVels) {
-    	/* set phi values */
-        // rooted density on the site
-        real rootRhoLoc = sqrt(getM_i(0));    // factor 12. comes from the fact that one uses
-                                                  // not gaussian but uniformly distributed rand.
-        real _valueToAdd;
+			/* values of PhiLoc were already set in LatticeBoltzmann.cpp */
+			/* here we just use them */
 
-        for (int l = 4; l < _numVels; l++) {
-        	_valueToAdd = rootRhoLoc*getPhiLoc(l)*((*rng).normal() - 0.5);
-/*      	    std::cout << "PhiLoc[" << l << "] = " << getPhiLoc (l);
-        	if (l == 4) {
-//        		std::cout << "_valueToAdd is " << _valueToAdd;
-        	} else if (l > 4) {
-//        		std::cout << " " << _valueToAdd;
-        	}
+			// ADD CONDITION ON DIFFERENT TYPES OF RANDOM NUMBERS!
+			/* squared density on the site */
+			real rootRhoLoc = sqrt(12.*getM_i(0)); // factor 12. comes from usage of
+			// not gaussian but uniformly distributed random numbers
 
-        	if (l == _numVels - 1) {
-//        		std::cout << "\n";
-        	} else {
-        	}
-*/        	addM_i(l, _valueToAdd);
-        }
+			for (int l = 4; l < _numVels; l++) {
+				addM_i(l, rootRhoLoc*getPhiLoc(l)*((*rng)() - 0.5));
+			}
+			/*	if one rather wants to use random numbers distributed normally, change
+					in the previous lines sqrt(12.*getM_i(0)) -> sqrt(getM_i(0)) and
+					rootRhoLoc*getPhiLoc(l)*((*rng)() - 0.5)) -> rootRhoLoc*getPhiLoc(l)*normal())
+			*/
     }
 
     void LBSite::applyForces(int _numVels) {
-      Real3D _f;
-      _f = getExtForceLoc();
-
+      Real3D _f = Real3D(0.,0.,0.);
+			
+			_f = getExtForceLoc() + getCouplForceLoc();
+			
       // set velocity _u
       Real3D _u (getM_i(1) + 0.5*_f[0], getM_i(2) + 0.5*_f[1], getM_i(3) + 0.5*_f[2]);
       _u /= getM_i(0);
@@ -335,7 +345,7 @@ namespace espresso {
       setF_i(18,_M[0] -_M[2] +_M[3] +_M[4] - 2.*_M[5] -_M[9] -_M[11] +_M[12]
                -_M[14] -_M[15] +_M[16] - 2.*_M[17]);
 
-      // scale populations with weights
+      /* scale populations with weights */
       for (int i = 0; i < _numVels; i++) {
         scaleF_i (i, eqWeightLoc[i]);
       }

@@ -28,7 +28,7 @@
 
 //using namespace std;
 
-namespace espresso {
+namespace espressopp {
 
   LOG4ESPP_LOGGER(FixedPairListAdress::theLogger, "FixedPairListAdress");
 
@@ -39,15 +39,23 @@ namespace espresso {
           : FixedPairList(_storage), fixedtupleList(_fixedtupleList) {
     LOG4ESPP_INFO(theLogger, "construct FixedPairListAdress");
     
-    con = fixedtupleList->beforeSendATParticles.connect
+    sigBeforeSendAT = fixedtupleList->beforeSendATParticles.connect
           (boost::bind(&FixedPairListAdress::beforeSendATParticles, this, _1, _2));
+
+    sigAfterRecvAT = fixedtupleList->afterRecvATParticles.connect
+      (boost::bind(&FixedPairListAdress::afterRecvParticles, this, _1, _2));
+
+    // We do not need those signals here.
+    sigBeforeSend.disconnect();
+    sigAfterRecv.disconnect();
   }
 
   FixedPairListAdress::~FixedPairListAdress() {
 
     LOG4ESPP_INFO(theLogger, "~FixedPairListAdress");
 
-    con.disconnect();
+    sigBeforeSendAT.disconnect();
+    sigAfterRecvAT.disconnect();
   }
 
 
@@ -71,8 +79,9 @@ namespace espresso {
     else{
       if (!p2) {
         std::stringstream msg;
-        msg << "atomistic bond particle p2 " << pid2 << " does not exists here and cannot be added";
-        //std::runtime_error(err.str());
+        msg << "Atomistic bond particle p2 (id=" << pid2 << ") does not exists here "
+            << "and cannot be added. "
+            << " The pair " << pid1 << " - " << pid2 << " could not be created.";
         err.setException( msg.str() );
       }
     }
@@ -155,9 +164,7 @@ namespace espresso {
 
 
   // override parent function, this one should be empty
-  void FixedPairListAdress::beforeSendParticles(ParticleList& pl,
-                                                    OutBuffer& buf) {
-        //std::cout << storage->getSystem()->comm->rank() << ": beforeSendParticles() fixed pl (size " << pl.size() << ")\n";
+  void FixedPairListAdress::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
   }
 
 
@@ -181,8 +188,8 @@ namespace espresso {
             p1 = storage->lookupAdrATParticle(it->first);
             if (p1 == NULL) {
                 std::stringstream msg;
-                msg << "atomistic bond particle p1 " << it->first << " does not exists here";
-                //std::runtime_error(err.str());
+                msg << "FixedPairListAdress ";
+                msg << "Atomistic bond particle p1 (id=" << it->first << ") does not exists here.";
                 err.setException( msg.str() );
             }
             lastpid1 = it->first;
@@ -191,8 +198,8 @@ namespace espresso {
         p2 = storage->lookupAdrATParticle(it->second);
         if (p2 == NULL) {
             std::stringstream msg;
-            msg << "atomistic bond particle p2 " << it->second << " does not exists here";
-            //std::runtime_error(err.str());
+            msg << "FixedPairListAdress ";
+            msg << "Atomistic bond particle p2 (id=" << it->second << ") does not exists here.";
             err.setException( msg.str() );
         }
 
@@ -201,7 +208,7 @@ namespace espresso {
     }
     err.checkException();
     
-    LOG4ESPP_INFO(theLogger, "regenerated local fixed pair list from global list");
+    LOG4ESPP_INFO(theLogger, "Regenerated local fixed pair list from global list");
   }
 
   python::list FixedPairListAdress::getBonds()
@@ -222,7 +229,7 @@ namespace espresso {
 
   void FixedPairListAdress::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (FixedPairListAdress::*pyAdd)(longint pid1, longint pid2)
       = &FixedPairListAdress::add;

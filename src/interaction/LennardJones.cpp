@@ -29,7 +29,7 @@
 #include "CellListAllPairsInteractionTemplate.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
 
     typedef class VerletListInteractionTemplate <LennardJones>
@@ -46,13 +46,15 @@ namespace espresso {
         CellListLennardJones;
     typedef class FixedPairListInteractionTemplate <LennardJones> 
         FixedPairListLennardJones;
+    LOG4ESPP_LOGGER(LennardJones::theLogger, "LennardJones");
+    // LOG4ESPP_LOGGER(VerletListLennardJones::theLogger, "VerletListLennardJones");
 
     //////////////////////////////////////////////////
     // REGISTRATION WITH PYTHON
     //////////////////////////////////////////////////
     void 
     LennardJones::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< LennardJones, bases< Potential > >
     	("interaction_LennardJones", init< real, real, real >())
@@ -113,6 +115,7 @@ namespace espresso {
           init< shared_ptr<System>, shared_ptr<FixedPairList>, shared_ptr<LennardJones> >())
           .def(init< shared_ptr<System>, shared_ptr<FixedPairListAdress>, shared_ptr<LennardJones> >())
           .def("setPotential", &FixedPairListLennardJones::setPotential)
+          .def("getPotential", &FixedPairListLennardJones::getPotential)
           .def("setFixedPairList", &FixedPairListLennardJones::setFixedPairList)
           .def("getFixedPairList", &FixedPairListLennardJones::getFixedPairList)
       ;

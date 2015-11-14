@@ -21,14 +21,14 @@
 
 """
 **********************************************
-**espresso.integrator.VelocityVerletOnRadius**
+**espressopp.integrator.VelocityVerletOnRadius**
 **********************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
-from espresso.integrator.Extension import *
-from _espresso import integrator_VelocityVerletOnRadius 
+from espressopp.esutil import cxxinit
+from espressopp import pmi
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_VelocityVerletOnRadius 
 
 class VelocityVerletOnRadiusLocal(ExtensionLocal, integrator_VelocityVerletOnRadius):
     'The (local) VelocityVerletOnRadius.'
@@ -40,6 +40,6 @@ if pmi.isController :
     class VelocityVerletOnRadius(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.VelocityVerletOnRadiusLocal',
+            cls =  'espressopp.integrator.VelocityVerletOnRadiusLocal',
             pmiproperty = [ 'radialDampingMass' ]
             )

@@ -33,7 +33,7 @@
 
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
 
   /*
   FixedPairList::FixedPairList(shared_ptr< storage::Storage > _storage)
@@ -53,21 +53,20 @@ namespace espresso {
   {
     LOG4ESPP_INFO(theLogger, "construct FixedPairList");
 
-    con1 = storage->beforeSendParticles.connect
+    sigBeforeSend = storage->beforeSendParticles.connect
       (boost::bind(&FixedPairList::beforeSendParticles, this, _1, _2));
-    con2 = storage->afterRecvParticles.connect
+    sigAfterRecv = storage->afterRecvParticles.connect
       (boost::bind(&FixedPairList::afterRecvParticles, this, _1, _2));
-    con3 = storage->onParticlesChanged.connect
+    sigOnParticlesChanged = storage->onParticlesChanged.connect
       (boost::bind(&FixedPairList::onParticlesChanged, this));
   }
 
   FixedPairList::~FixedPairList() {
 
     LOG4ESPP_INFO(theLogger, "~FixedPairList");
-
-    con1.disconnect();
-    con2.disconnect();
-    con3.disconnect();
+    sigBeforeSend.disconnect();
+    sigAfterRecv.disconnect();
+    sigOnParticlesChanged.disconnect();
   }
 
 
@@ -99,7 +98,6 @@ namespace espresso {
       std::swap(pid1, pid2);
 
     System& system = storage->getSystemRef();
-    esutil::Error err(system.comm);
     
     // ADD THE LOCAL PAIR
     Particle *p1 = storage->lookupRealParticle(pid1);
@@ -111,13 +109,9 @@ namespace espresso {
     }
     else{
       if (!p2) {
-        std::stringstream msg;
-        msg << "Adding error. Fixed Pair List particle p2 " << pid2 << " does not exists here and cannot be added";
-        err.setException( msg.str() );
-        //std::runtime_error(err.str());
+	LOG4ESPP_DEBUG(theLogger, "Particle p2 " << pid2 << " not found");
       }
     }
-    err.checkException();
     
     if(returnVal){
       // add the pair locally
@@ -144,6 +138,7 @@ namespace espresso {
       }
       LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
     }
+    LOG4ESPP_DEBUG(theLogger, "Leaving add with returnVal " << returnVal);
     return returnVal;
   }
 
@@ -159,9 +154,7 @@ namespace espresso {
 	return bonds;
   }
 
-  void FixedPairList::
-  beforeSendParticles(ParticleList& pl, 
-		      OutBuffer& buf) {
+  void FixedPairList::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
     std::vector< longint > toSend;
     // loop over the particle list
     for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
@@ -201,9 +194,7 @@ namespace espresso {
     LOG4ESPP_INFO(theLogger, "prepared fixed pair list before send particles");
   }
 
-  void FixedPairList::
-  afterRecvParticles(ParticleList &pl, 
-		     InBuffer& buf) {
+  void FixedPairList::afterRecvParticles(ParticleList &pl, InBuffer& buf) {
     std::vector< longint > received;
     int n;
     longint pid1, pid2;
@@ -231,8 +222,7 @@ namespace espresso {
     LOG4ESPP_INFO(theLogger, "received fixed pair list after receive particles");
   }
 
-  void FixedPairList::
-  onParticlesChanged() {
+  void FixedPairList::onParticlesChanged() {
     LOG4ESPP_INFO(theLogger, "rebuild local bond list from global\n");
 
     System& system = storage->getSystemRef();
@@ -242,8 +232,7 @@ namespace espresso {
     longint lastpid1 = -1;
     Particle *p1;
     Particle *p2;
-    for (GlobalPairs::const_iterator it = globalPairs.begin();
-	 it != globalPairs.end(); ++it) {
+    for (GlobalPairs::const_iterator it = globalPairs.begin(); it != globalPairs.end(); ++it) {
       if (it->first != lastpid1) {
 	    p1 = storage->lookupRealParticle(it->first);
         if (p1 == NULL) {
@@ -274,7 +263,7 @@ namespace espresso {
 
   void FixedPairList::registerPython() {
 
-    using namespace espresso::python;
+    using namespace espressopp::python;
 
     bool (FixedPairList::*pyAdd)(longint pid1, longint pid2)
       = &FixedPairList::add;

@@ -23,13 +23,15 @@
 #include "bindings.hpp"
 #include "DumpXYZ.hpp"
 #include "DumpGRO.hpp"
+#include "DumpGROAdress.hpp"
 #include "FileBackup.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace io{
     void registerPython() {
       DumpXYZ::registerPython();
       DumpGRO::registerPython();
+      DumpGROAdress::registerPython();
     }
   }
 }

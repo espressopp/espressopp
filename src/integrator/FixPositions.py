@@ -21,14 +21,14 @@
 
 """
 ************************************
-**espresso.integrator.FixPositions**
+**espressopp.integrator.FixPositions**
 ************************************
 
 """
-from espresso.esutil import cxxinit
-from espresso import pmi
-from espresso.integrator.Extension import *
-from _espresso import integrator_FixPositions 
+from espressopp.esutil import cxxinit
+from espressopp import pmi
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_FixPositions 
 
 class FixPositionsLocal(ExtensionLocal, integrator_FixPositions):
     'The (local) Fix Positions part.'
@@ -40,7 +40,7 @@ if pmi.isController :
     class FixPositions(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.FixPositionsLocal',
+            cls =  'espressopp.integrator.FixPositionsLocal',
             pmicall = ['setFixMask', 'getFixMask'],
             pmiproperty = [ 'particleGroup' ]
             )

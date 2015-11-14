@@ -21,7 +21,7 @@
 */
 
 #include <fstream>
-
+#include <iomanip>
 #include "DumpGRO.hpp"
 #include "storage/Storage.hpp"
 
@@ -30,11 +30,11 @@
 #include "analysis/ConfigurationExt.hpp"
 #include "analysis/ConfigurationsExt.hpp"
 
-using namespace espresso;
-using namespace espresso::analysis;
+using namespace espressopp;
+using namespace espressopp::analysis;
 using namespace std;
 
-namespace espresso {
+namespace espressopp {
   namespace io {
       
     void DumpGRO::dump(){
@@ -84,8 +84,10 @@ namespace espresso {
           short ind;
           for(size_t i=0; i<num_of_particles; i++){
             myfile << setw(5) << i+1;    //FIXME this should be the molecule number, not atom number
-            myfile << setiosflags(ios::left) << setw(1) << "T" << setw(4) <<   particleIDToType.find(i+1)->second <<resetiosflags(ios::left);  // pid starts at 1 // set(1)+set(4) makes in total 5, as required by the fixed format 
-            myfile << setw(4) << setiosflags(ios::right) << "T" << setw(1)<<particleIDToType.find(i+1)->second << resetiosflags(ios::right);
+            myfile << setiosflags(ios::left) << setw(1) << "T" << setw(4) <<   particleIDToType.find(i+1)->second <<resetiosflags(ios::left);  // pid starts at 1 // set(1)+set(4) makes in total 5, as required by the fixed format, should be resname not atomtype
+            stringstream ss;
+            ss << particleIDToType.find(i+1)->second;
+            myfile << setiosflags(ios::right) << setw(5) << (string("T") + ss.str()) << resetiosflags(ios::right);
             myfile << setw(5) << i+1;    //NOTE this is the actual atom number - wrapped at 99999
             // while get token 
             // print with setw(8) << setprecision(3)
@@ -122,7 +124,7 @@ namespace espresso {
     // Python wrapping
     void DumpGRO::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<DumpGRO, bases<ParticleAccess>, boost::noncopyable >
       ("io_DumpGRO", init< shared_ptr< System >, 

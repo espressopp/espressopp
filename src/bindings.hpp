@@ -22,7 +22,7 @@
 
 #ifndef _BINDINGS_HPP
 #define _BINDINGS_HPP
-namespace espresso {
+namespace espressopp {
   void registerPython();
 }
 #endif

@@ -32,7 +32,7 @@
 #include "esutil/Error.hpp"
 
 
-namespace espresso {
+namespace espressopp {
   namespace integrator {
 
     /** Abstract base class for Molecular Dynamics Integrator. 
@@ -74,6 +74,10 @@ namespace espresso {
         virtual void run(int nsteps) = 0;
 
         void addExtension(shared_ptr<integrator::Extension> extension);
+
+        shared_ptr<integrator::Extension> getExtension(int k);
+
+        int getNumberOfExtensions();
 
         // signals to extend the integrator
         boost::signals2::signal0 <void> runInit; // initialization of run()

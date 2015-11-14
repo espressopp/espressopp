@@ -28,7 +28,7 @@
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   using namespace iterator;
 
@@ -108,7 +108,7 @@ namespace espresso {
 
     void ExtForce::registerPython() {
 
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<ExtForce, shared_ptr<ExtForce>, bases<Extension> >
 

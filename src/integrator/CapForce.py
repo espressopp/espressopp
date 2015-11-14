@@ -31,23 +31,23 @@ so that the length of the force vector is <= capforce
 Example Usage:
 -----------------
 
->>> capforce     = espresso.integrator.CapForce(system, 1000.0)
+>>> capforce     = espressopp.integrator.CapForce(system, 1000.0)
 >>> integrator.addExtension(capForce)
 
 CapForce can also be used to forcecap only a group of particles:
 
 >>> particle_group = [45, 67, 89, 103]
->>> capforce       = espresso.integrator.CapForce(system, 1000.0, particle_group)
+>>> capforce       = espressopp.integrator.CapForce(system, 1000.0, particle_group)
 >>> integrator.addExtension(capForce)
 
 
 
 """
 
-from espresso.esutil import cxxinit
-from espresso import pmi
-from espresso.integrator.Extension import *
-from _espresso import integrator_CapForce 
+from espressopp.esutil import cxxinit
+from espressopp import pmi
+from espressopp.integrator.Extension import *
+from _espressopp import integrator_CapForce 
 
 class CapForceLocal(ExtensionLocal, integrator_CapForce):
     'The (local) force capping part.'
@@ -62,7 +62,7 @@ if pmi.isController :
     class CapForce(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.integrator.CapForceLocal',
+            cls =  'espressopp.integrator.CapForceLocal',
             pmicall = ['setCapForce', 'setAbsCapForce', 'getCapForce', 'getAbsCapForce'],
-            pmiproperty = [ 'particleGroup' ]
+            pmiproperty = [ 'particleGroup', 'adress' ]
             )

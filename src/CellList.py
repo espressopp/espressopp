@@ -1,20 +1,20 @@
-from espresso import pmi
-import _espresso 
-import espresso
-from espresso.esutil import cxxinit
+from espressopp import pmi
+import _espressopp 
+import espressopp
+from espressopp.esutil import cxxinit
 from math import sqrt
 
-class CellListLocal(_espresso.CellList):
+class CellListLocal(_espressopp.CellList):
     def __init__(self):
         'Local construction of a fixed pair list'
         if pmi.workerIsActive():
-            cxxinit(self, _espresso.CellList)
+            cxxinit(self, _espressopp.CellList)
 
 if pmi.isController:
     class CellList(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls = 'espresso.CellListLocal',
+            cls = 'espressopp.CellListLocal',
             #localcall = [ 'add' ],
             pmicall = [],
             pmiinvoke = []

@@ -32,7 +32,7 @@
 #include "iterator/CellListIterator.hpp"
 #include "interaction/Interaction.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     using namespace iterator;
@@ -56,6 +56,7 @@ namespace espresso {
        * the first layer has coordinate Lz/n the last - Lz.
        */
       vector<Tensor> computeRaw() {
+
         System& system = getSystemRef();
         system.storage->decompose();
 
@@ -67,7 +68,7 @@ namespace espresso {
         // n * lZ is always Lz
         real lZ = Li[2] / (double)n;
 
-        Tensor vvlocal[n];
+        Tensor *vvlocal = new Tensor[n];
         for(int i=0; i<n; i++) vvlocal[i] = Tensor(0.0);
         // compute the kinetic contribution (2/3 \sum 1/2mv^2)
         CellList realCells = system.storage->getRealCells();
@@ -111,14 +112,14 @@ namespace espresso {
 
         }
 
-        Tensor vv[n];
+        Tensor *vv = new Tensor[n];
         mpi::all_reduce(*mpiWorld, (double*)&vvlocal, n, (double*)&vv, std::plus<double>());
 
         // compute the short-range nonbonded contribution
-        Tensor w[n];
+        Tensor *w = new Tensor[n];
         const InteractionList& srIL = system.shortRangeInteractions;
         for (size_t j = 0; j < srIL.size(); j++) {
-          srIL[j]->computeVirialTensor(w, n);
+          // srIL[j]->computeVirialTensor(w, n);
         }
 
         vector<Tensor> pijarr;
@@ -129,6 +130,11 @@ namespace espresso {
           pijarr.push_back(vv[i] + w[i]);
         }
 
+        delete[] w;
+        delete[] vv;
+        delete[] vvlocal;
+
+//        vector<Tensor> pijarr;
         return pijarr;
       }
       

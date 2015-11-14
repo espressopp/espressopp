@@ -30,7 +30,7 @@
 #include "interaction/Interaction.hpp"
 #include "types.hpp"
 
-namespace espresso {
+namespace espressopp {
 
   namespace esutil { 
     class RNG;

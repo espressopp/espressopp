@@ -30,7 +30,7 @@
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     using namespace iterator;
     /** Class to compute the temperature. */
@@ -95,7 +95,8 @@ namespace espresso {
         
       //std::cout << "Count in Temperature calculation: " << systemN << std::endl;
       //std::cout << "sumT in Temperature calculation: " << sumT << std::endl;
-      return sumT / (3.0 * systemN); 
+      return sumT / (3.0 * systemN); //NO CONSTRAINTS, SETTLE BELOW 
+      //return sumT / (2.0 * systemN);  // SETTLE CONSTAINTS
       }
 
 

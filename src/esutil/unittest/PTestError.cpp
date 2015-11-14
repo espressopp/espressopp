@@ -26,8 +26,8 @@
 #include "mpi.hpp"
 #include "../Error.hpp"
 
-using namespace espresso;
-using namespace espresso::esutil;
+using namespace espressopp;
+using namespace espressopp::esutil;
 
 // Check constructor and no execption at start
 

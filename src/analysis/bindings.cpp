@@ -32,21 +32,25 @@
 #include "ConfigurationExt.hpp"
 #include "Configurations.hpp"
 #include "ConfigurationsExt.hpp"
+#include "ConfigurationsExtAdress.hpp"
 #include "Velocities.hpp"
 #include "CenterOfMass.hpp"
 #include "NPart.hpp"
 #include "MaxPID.hpp"
 #include "AllParticlePos.hpp"
+#include "TotalVelocity.hpp"
 
 #include "ConfigsParticleDecomp.hpp"
 #include "VelocityAutocorrelation.hpp"
 #include "MeanSquareDispl.hpp"
+#include "MeanSquareInternalDist.hpp"
 #include "Autocorrelation.hpp"
 #include "RadialDistrF.hpp"
 #include "StaticStructF.hpp"
 #include "RDFatomistic.hpp"
 #include "Viscosity.hpp"
 #include "XDensity.hpp"
+#include "XTemperature.hpp"
 #include "XPressure.hpp"
 #include "Test.hpp"
 #include "ParticleRadiusDistribution.hpp"
@@ -61,7 +65,7 @@
 #include "LBOutputScreen.hpp"
 #include "LBOutputVzInTime.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     void registerPython() {
       Observable::registerPython();
@@ -75,6 +79,7 @@ namespace espresso {
       Configurations::registerPython();
       ConfigurationExt::registerPython();
       ConfigurationsExt::registerPython();
+      ConfigurationsExtAdress::registerPython();
       Velocities::registerPython();
       CenterOfMass::registerPython();
       NPart::registerPython();
@@ -83,14 +88,17 @@ namespace espresso {
       IntraChainDistSq::registerPython();
       NeighborFluctuation::registerPython();
       OrderParameter::registerPython();
+      TotalVelocity::registerPython();
 
       ConfigsParticleDecomp::registerPython();
       VelocityAutocorrelation::registerPython();
       MeanSquareDispl::registerPython();
+      MeanSquareInternalDist::registerPython();
       RadialDistrF::registerPython();
       StaticStructF::registerPython();
       RDFatomistic::registerPython();
       XDensity::registerPython();
+      XTemperature::registerPython();
       XPressure::registerPython();
       Test::registerPython();
       ParticleRadiusDistribution::registerPython();

@@ -19,16 +19,16 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-from espresso import *
-from espresso import unittest
-import MPI
+from espressopp import *
+from espressopp import unittest
+import mpi4py.MPI as MPI
 
 class TestParticleLocal(unittest.TestCase) :
     def test0get(self):
         system = System()
         system.rng = esutil.RNG()
         system.bc = bc.OrthorhombicBC(system.rng, (10.0, 10.0, 10.0))
-        system.storage = espresso.storage.DomainDecomposition(
+        system.storage = espressopp.storage.DomainDecomposition(
             system=system,
             nodeGrid=(1,1,1), cellGrid=(1,1,1))
         p = system.storage.addParticle(0, (1.0, 1.0, 1.0))

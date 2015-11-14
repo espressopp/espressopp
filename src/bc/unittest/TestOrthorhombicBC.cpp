@@ -30,7 +30,7 @@
 #include "esutil/RNG.hpp"
 #include "bc/OrthorhombicBC.hpp"
 
-using namespace espresso;
+using namespace espressopp;
 
 struct LoggingFixture {  
   LoggingFixture() { 

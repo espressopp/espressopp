@@ -27,7 +27,7 @@
 #include "FixedPairListInteractionTemplate.hpp"
 #include "Potential.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
     /** This class provides methods to compute forces and energies of
 	the Lennard Jones potential.
@@ -85,6 +85,7 @@ namespace espresso {
       // Setter and getter
       void setEpsilon(real _epsilon) {
         epsilon = _epsilon;
+        LOG4ESPP_INFO(theLogger, "epsilon=" << epsilon);
         updateAutoShift();
         preset();
       }
@@ -93,6 +94,7 @@ namespace espresso {
 
       void setSigma(real _sigma) { 
         sigma = _sigma; 
+        LOG4ESPP_INFO(theLogger, "sigma=" << sigma);
         updateAutoShift();
         preset();
       }
@@ -103,6 +105,27 @@ namespace espresso {
         real frac6 = frac2 * frac2 * frac2;
         real energy = 4.0 * epsilon * (frac6 * frac6 - frac6);
         return energy;
+        
+        // FORCE CAPPING HACK (was temporarily used for some ideal gas test simulations)
+          /*real caprad = 0.1;          
+          real capradSqr = caprad * caprad;
+
+          if (distSqr > capradSqr) {
+              real frac2 = sigma*sigma / distSqr;
+              real frac6 = frac2 * frac2 * frac2;
+              real energy = 4.0 * epsilon * (frac6 * frac6 - frac6);
+              return energy;
+          }
+          else { // capped
+              real frac2 = sigma*sigma / capradSqr;
+              real frac6 = frac2 * frac2 * frac2;
+              real energy = 4.0 * epsilon * (frac6 * frac6 - frac6);
+              real forcepart = 48.0 * epsilon * frac6 * (frac6-0.5) / (caprad);
+              real out = energy + forcepart*(caprad-sqrt(distSqr));
+              return out;
+              
+          }*/
+        
       }
 
       bool _computeForceRaw(Real3D& force,
@@ -114,7 +137,36 @@ namespace espresso {
         real ffactor = frac6 * (ff1 * frac6 - ff2) * frac2;
         force = dist * ffactor;
         return true;
+        
+        // FORCE CAPPING HACK (was temporarily used for some ideal gas test simulations)
+          /*real caprad = 0.1;
+          real capradSqr = caprad * caprad;
+
+          if (distSqr > capradSqr) {
+              real frac2 = 1.0 / distSqr;
+              real frac6 = frac2 * frac2 * frac2;
+              real ffactor = frac6 * (ff1 * frac6 - ff2) * frac2;
+              force = dist * ffactor;
+              return true;
+          }
+          else { // capped part
+              
+             real frac2 = 1.0 / capradSqr;
+             real frac6 = frac2 * frac2 * frac2;
+             real ffactor = frac6 * (ff1 * frac6 - ff2) * frac2;
+             force = dist * ffactor * (caprad/sqrt(distSqr));
+             //std::cout << "LennardJones, capped Force: " << sqrt(distSqr) * ffactor * (caprad/sqrt(distSqr)) << "\n"; 0.1 LEADS TO 3.15815e+08
+             return true;
+              
+             /*real frac2 = (sigma/caprad)*(sigma/caprad);
+             real frac6 = frac2 * frac2 * frac2;
+             real ffactor = 48.0 * epsilon * frac6 * (frac6-0.5) / (caprad*sqrt(distSqr));
+             force = dist * ffactor;
+             return true;       
+          
+          }*/
       }
+      static LOG4ESPP_DECL_LOGGER(theLogger);
     };
 
     // provide pickle support

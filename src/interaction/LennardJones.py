@@ -21,16 +21,16 @@
 
 """
 *************************************
-**espresso.interaction.LennardJones**
+**espressopp.interaction.LennardJones**
 *************************************
 
 """
-from espresso import pmi, infinity
-from espresso.esutil import *
+from espressopp import pmi, infinity
+from espressopp.esutil import *
 
-from espresso.interaction.Potential import *
-from espresso.interaction.Interaction import *
-from _espresso import interaction_LennardJones, \
+from espressopp.interaction.Potential import *
+from espressopp.interaction.Interaction import *
+from _espressopp import interaction_LennardJones, \
                       interaction_VerletListLennardJones, \
                       interaction_VerletListAdressLennardJones, \
                       interaction_VerletListAdressLennardJones2, \
@@ -148,7 +148,11 @@ class FixedPairListLennardJonesLocal(InteractionLocal, interaction_FixedPairList
     def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setPotential(self, potential)
-            
+
+    def getPotential(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self)
+
     def setFixedPairList(self, fixedpairlist):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.setFixedPairList(self, fixedpairlist)
@@ -162,55 +166,55 @@ if pmi.isController:
     class LennardJones(Potential):
         'The Lennard-Jones potential.'
         pmiproxydefs = dict(
-            cls = 'espresso.interaction.LennardJonesLocal',
+            cls = 'espressopp.interaction.LennardJonesLocal',
             pmiproperty = ['epsilon', 'sigma']
             )
 
     class VerletListLennardJones(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListLennardJonesLocal',
+            cls =  'espressopp.interaction.VerletListLennardJonesLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
 
     class VerletListAdressLennardJones(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListAdressLennardJonesLocal',
+            cls =  'espressopp.interaction.VerletListAdressLennardJonesLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
             
     class VerletListAdressLennardJones2(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListAdressLennardJones2Local',
+            cls =  'espressopp.interaction.VerletListAdressLennardJones2Local',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
             
     class VerletListHadressLennardJones(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListHadressLennardJonesLocal',
+            cls =  'espressopp.interaction.VerletListHadressLennardJonesLocal',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
             
     class VerletListHadressLennardJones2(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.VerletListHadressLennardJones2Local',
+            cls =  'espressopp.interaction.VerletListHadressLennardJones2Local',
             pmicall = ['setPotentialAT', 'setPotentialCG']
             )
 
     class CellListLennardJones(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.CellListLennardJonesLocal',
+            cls =  'espressopp.interaction.CellListLennardJonesLocal',
             pmicall = ['setPotential']
             )
         
     class FixedPairListLennardJones(Interaction):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espresso.interaction.FixedPairListLennardJonesLocal',
-            pmicall = ['setPotential', 'setFixedPairList','getFixedPairList' ]
+            cls =  'espressopp.interaction.FixedPairListLennardJonesLocal',
+            pmicall = ['getPotential', 'setPotential', 'setFixedPairList','getFixedPairList' ]
         )

@@ -34,7 +34,7 @@
 #include "Real3D.hpp"
 
 
-namespace espresso {
+namespace espressopp {
 	/* A list of particles, where the first particle is a dependent (virtual) particle.
 	 *  All particles reside on the same node of the first particle.
 	 */

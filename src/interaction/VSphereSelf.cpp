@@ -24,7 +24,7 @@
 #include "VSphereSelf.hpp"
 #include "VSphereSelfInteractionTemplate.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace interaction {
       typedef class VSphereSelfInteractionTemplate< VSphereSelf >
       SelfVSphere;
@@ -34,7 +34,7 @@ namespace espresso {
     //////////////////////////////////////////////////
     void 
     VSphereSelf::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_< VSphereSelf, bases< Potential > >("interaction_VSphereSelf",
       init< real, real, real, int, real >())

@@ -14,7 +14,7 @@
 #include "esutil/Array2D.hpp"
 #include "FixedTupleList.hpp"
 
-namespace espresso {
+namespace espressopp {
 
 /** Class that builds and stores verlet lists.
 

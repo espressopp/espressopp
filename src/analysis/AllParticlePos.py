@@ -21,12 +21,12 @@
 
 """
 ************************************
-**espresso.analysis.AllParticlePos**
+**espressopp.analysis.AllParticlePos**
 ************************************
 
 """
-from espresso import pmi
-from _espresso import analysis_AllParticlePos
+from espressopp import pmi
+from _espressopp import analysis_AllParticlePos
 
 class AllParticlePosLocal(object):
     """Abstract local base class for observables."""

@@ -35,7 +35,7 @@
 
 //#include "FixedListComm.hpp"
 
-namespace espresso {
+namespace espressopp {
 	class FixedPairDistList : public PairList{
 	  protected:
 	    typedef std::multimap<longint, std::pair<longint, real> > PairsDist;

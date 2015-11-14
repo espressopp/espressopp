@@ -26,7 +26,7 @@
 #include <stdexcept>
 #include "mpi.hpp"
 
-namespace espresso { 
+namespace espressopp { 
   namespace esutil { 
     namespace Collectives {
       const int None = -1;

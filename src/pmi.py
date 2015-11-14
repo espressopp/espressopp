@@ -1206,8 +1206,8 @@ inWorkerLoop = False
 ##################################################
 ## MPI SETUP
 ##################################################
-import MPI
-from MPI import OP_NULL, MAX, MIN, SUM, PROD, LAND, BAND, LOR, BOR, LXOR, BXOR, MAXLOC, MINLOC, REPLACE
+import mpi4py.MPI as MPI
+from mpi4py.MPI import OP_NULL, MAX, MIN, SUM, PROD, LAND, BAND, LOR, BOR, LXOR, BXOR, MAXLOC, MINLOC, REPLACE
 
 def _MPIInit(comm=MPI.COMM_WORLD):
     # The communicator used by PMI

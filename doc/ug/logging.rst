@@ -20,7 +20,7 @@ Logging can be switched on in your python script with the following command:
 
 Example:
 
->>> import espresso
+>>> import espressopp
 >>> import logging
 >>> logging.getLogger("Storage").setLevel(logging.ERROR)
 

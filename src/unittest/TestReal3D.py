@@ -20,7 +20,7 @@
 
 
 import unittest
-from espresso import *
+from espressopp import *
 
 class Test0Real3D(unittest.TestCase) :
     def test0Create(self) :

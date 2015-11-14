@@ -26,7 +26,7 @@
 
 #include <sys/resource.h>
 
-using namespace espresso::esutil;
+using namespace espressopp::esutil;
 
 float UserTimer::getCurrentTime() const {
   struct rusage rus;

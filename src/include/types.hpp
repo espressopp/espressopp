@@ -32,7 +32,7 @@
 #include "esconfig.hpp"
 #include "types.hpp"
 
-namespace espresso {
+namespace espressopp {
   using boost::shared_ptr;
   using boost::weak_ptr;
   using boost::make_shared;

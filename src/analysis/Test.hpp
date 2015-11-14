@@ -27,7 +27,7 @@
 #include "types.hpp"
 #include "AnalysisBase.hpp"
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
     /** Class to test AnalysisBase */
     class Test : public AnalysisBaseTemplate< int > {

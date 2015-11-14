@@ -23,9 +23,9 @@
 #include "VelocityAutocorrelation.hpp"
 
 using namespace std;
-//using namespace espresso;
+//using namespace espressopp;
 
-namespace espresso {
+namespace espressopp {
   namespace analysis {
 
     using namespace iterator;
@@ -102,7 +102,7 @@ namespace espresso {
     
     // Python wrapping
     void VelocityAutocorrelation::registerPython() {
-      using namespace espresso::python;
+      using namespace espressopp::python;
 
       class_<VelocityAutocorrelation, bases<ConfigsParticleDecomp> >
       ("analysis_VelocityAutocorrelation",init< shared_ptr< System > >() )
