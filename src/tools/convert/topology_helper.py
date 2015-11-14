@@ -161,16 +161,6 @@ class TabulatedDihedralInteractionType(InteractionType):
         potTab = espressopp.interaction.TabulatedDihedral(itype=spline, filename=fe)
         interb = espressopp.interaction.FixedQuadrupleListTabulatedDihedral(system, fpl, potTab)
         return interb       
-    
-"""class HarmonicDihedralInteractionType(InteractionType):
-# Not implemented yet in Esp++
-    def createEspressoInteraction(self, system, fpl):
-        # interaction specific stuff here
-        # spring constant kb is half the gromacs spring constant. Also convert deg to rad
-        print "setting up dihedral ", self.parameters
-        pot = espressopp.interaction.DihedralHarmonicCos(K=self.parameters['k']/2.0, phi0=self.parameters['phi']*2*math.pi/360)
-        interb = espressopp.interaction.FixedQuadrupleListDihedralHarmonicCos(system, fpl, pot)
-        return interb          """
 
 class HarmonicNCosDihedralInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
@@ -186,6 +176,12 @@ class RyckaertBellemansDihedralInteractionType(InteractionType):
         print('RyckaertBellemans: {}'.format(self.parameters))
         pot = espressopp.interaction.DihedralRB(**{k: v for k, v in self.parameters.iteritems()})
         return espressopp.interaction.FixedQuadrupleListDihedralRB(system, fpl, pot)
+
+class HarmonicDihedralInteractionType(InteractionType):
+    def createEspressoInteraction(self, system, fpl):
+        #print('RyckaertBellemans: {}'.format(self.parameters))
+        pot = espressopp.interaction.DihedralHarmonic(self.parameters['K'], self.parameters['phi0']*2*math.pi/360)
+        return espressopp.interaction.FixedQuadrupleListDihedralHarmonic(system, fpl, pot)
 
 def ParseBondTypeParam(line):
     tmp = line.split() 
@@ -245,6 +241,8 @@ def ParseImproperTypeParam(line):
     type= int(tmp[4])
     if type == 4:
         p=HarmonicNCosDihedralInteractionType({"K":float(tmp[6]), "phi0":float(tmp[5]), "multiplicity":int(tmp[7])})
+    elif type == 2:
+        p=HarmonicDihedralInteractionType({"K":float(tmp[6]), "phi0":float(tmp[5])})
     else:
         print "Unsupported improper type", type, "in line:"
         print line

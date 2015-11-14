@@ -260,7 +260,6 @@ def read(gro_file, top_file="", doRegularExcl=True):
                         "charge":float(fields[2]), "particletype":fields[3],
                         "sig":float(fields[4]), "eps":float(fields[5])}
                 
-                    
                 if attypename not in atomtypes:
                     atomtypes.update({attypename:a}) # atomtypes is used when reading the "atoms" section
                     atomtypeparams.update({a:tmpprop})
@@ -328,10 +327,10 @@ def read(gro_file, top_file="", doRegularExcl=True):
                 #is it really the dihedral (function type = 9) or is it actually the impropers (also labelled 'dihedraltypes' in gromacs but with function type = 4)
                 nextline = f.lines[lineindex + 2] #assumes one comment line between [ dihedraltypes ] and first parameters entry
                 nextline = nextline.split()
-                if (nextline[4]=='4'): 
+                if ((nextline[4]=='4') or (nextline[4]=='2')): 
                     readimptypes = True
                     readdhtypes = False
-                elif ((nextline[4]=='9') or (nextline[4]=='1') or (nextline[4]=='8')):
+		elif int(nextline[4]) in [1, 3, 8, 9]:
                     readdhtypes = True
                     readimptypes = False
                     if (nextline[4]=='8'): print 'Warning: Assuming dihedraltypes of function type 8 are dihedrals, not impropers'
@@ -559,6 +558,7 @@ def read(gro_file, top_file="", doRegularExcl=True):
         s+=str(unpackvars[i])
         if (i< len(unpackvars)-1): s+=", "
     print s, "=gromacs.read( ... )"
+    print "DONE parsing"
     
     return tuple(params)
 
@@ -681,6 +681,7 @@ def storeBonds(f, types, bondtypes, bondtypeparams, bonds, num_atoms_molecule,\
         print "Warning: this doesn't work for systems containing (1,5)-bonds, i.e. additional bonds between"
         print "particles which are 4 bonds apart along a chain, e.g. some CG polymer models (see gromacs.py for solution)"
         #for systems with (1,5) bonds, use local_exclusions=GenerateRegularExclusions(local_exclusions, nregxcl,local_exclusions)
+        #local_exclusions=GenerateRegularExclusions(local_exclusions, nregxcl,local_exclusions)        
         local_exclusions=GenerateRegularExclusions(exclusions_bonds, nregxcl,local_exclusions)
     # extend bonds to copies of this molecule
     bonds_per_mol = len(bonds_tmp)
