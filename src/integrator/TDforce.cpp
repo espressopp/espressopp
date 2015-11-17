@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "python.hpp"
@@ -39,14 +39,16 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(TDforce::theLogger, "TDforce");
 
-    TDforce::TDforce(shared_ptr<System> system, shared_ptr<VerletListAdress> _verletList)
-    :Extension(system),verletList(_verletList) {
+    TDforce::TDforce(shared_ptr<System> system, shared_ptr<VerletListAdress> _verletList, real _startdist, real _enddist)
+    :Extension(system), verletList(_verletList), startdist(_startdist), enddist(_enddist) {
+
+        // startdist & enddist are the distances between which the TD force actually acts.
+        // This is usually more or less the thickness of the hybrid region. However, the TD force sometimes is applied in a slighty wider area.
 
         type = Extension::FreeEnergyCompensation;
 
         if (verletList->getAdrCenterSet()) { //adress region centre is fixed in space
-          //center=**(verletList->adrPositions.begin()); 
-          center=**(verletList->getAdrPositions().begin()); 
+          center=**(verletList->getAdrPositions().begin());
         }
         else
         {
@@ -118,42 +120,151 @@ namespace espressopp {
               if (forces.find(cit->getType())!=forces.end()) { //because there may be CG particles to which TD force is not applied
                 table = forces.find(cit->getType())->second; //TODO shouldn't do find twice
               }
-          
+
               if (table) {
 
 
-                  if (!(verletList->getAdrCenterSet())) { //moving adress region
-//TODO if length(adrPositions) > 1 print warning (for the moment only works when there's only one particle in adrPositions)
-                    center=**(verletList->adrPositions.begin());
+
+
+//                   if (!(verletList->getAdrCenterSet())) { //moving adress region
+// //TODO if length(adrPositions) > 1 print warning (for the moment only works when there's only one particle in adrPositions)
+//                     center=**(verletList->adrPositions.begin());
+//                   }
+
+//                   if (sphereAdr){ // spherical adress region
+//                      // calculate distance from reference point
+//                      Real3D dist3D;
+//                      bc.getMinimumImageVectorBox(dist3D,cit->getPos(),center); //pos - center
+//                      real dist = sqrt(dist3D.sqr());
+
+//                      if (dist>0.0) {
+//                        // read fforce from table
+//                        real fforce = table->getForce(dist);
+//                        fforce /= dist;
+
+//                        // substract td force
+//                        cit->force() += (dist3D * fforce);
+//                      }
+//                   } else {
+//                      // use this if you need 1-dir force only!
+//                      real d1 = cit->getPos()[0] - center[0];
+//                      real d1abs = fabs(d1);
+//                      real force = table->getForce(d1abs);
+// //std::cout<<cit->id()<<" "<<cit->force()<<" "<<cit->getPos()[0]<<" "<<center[0]<<" "<<d1<<" "<<d1abs<<" "<<force<<std::endl;
+//                      if (d1>0.0) {
+//                        cit->force()[0] += force;
+//                      } else {
+//                        cit->force()[0] -= force;
+//                      }
+// //std::cout<<cit->id()<<" "<<cit->force()<<std::endl;
+//                   }
+
+
+
+                  if (!(verletList->getAdrCenterSet())) { //moving adress regions
+
+                    if (sphereAdr){
+
+                      real width = abs(enddist - startdist);  // width of region where TD force acts
+                      std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();   // get positions
+                      Real3D pa = **it2;
+                      Real3D dist3D;
+                      bc.getMinimumImageVectorBox(dist3D,cit->getPos(), pa); // calculate vector between particle and first center
+
+                      Real3D mindist3D = dist3D; // set mindist3D before loop
+
+                      real dist3Dabs = sqrt(dist3D.sqr()); // calculate absolute distance
+
+                      real weight = 0.0;  // initialize weight
+
+                      // weighting scheme: only particles that are in a hybrid region contribute
+                      if ((dist3Dabs <= enddist) && (dist3Dabs >= startdist)){
+                        weight = 1.0 - (dist3Dabs-startdist) / width; // 0 at edge to CG region, 1 at edge to atomistic region
+                      }
+                      else{
+                        weight = 0.0; // particle outside of hybrid region
+                      }
+                      real norm = weight; // normalization constant
+                      Real3D direction = dist3D*weight/dist3Dabs; // normalized but weighted direction vector
+
+                      // Loop over all other centers
+                      ++it2;
+                      for (; it2 != verletList->getAdrPositions().end(); ++it2) {
+                            pa = **it2;
+                            verletList->getSystem()->bc->getMinimumImageVector(dist3D, cit->getPos(), pa); // calculate vector between particle and other centers
+                            if (dist3D.sqr() < mindist3D.sqr()) mindist3D = dist3D; // make it the minimum if shortest length so far
+
+                            dist3Dabs = sqrt(dist3D.sqr()); // calculate absolute distance
+
+                            // calculate weights again, as above
+                            if ((dist3Dabs <= enddist) && (dist3Dabs >= startdist)){
+                              real weight = 1.0 - (dist3Dabs-startdist) / width;
+                            }
+                            else{
+                              real weight = 0.0;
+                            }
+                            norm += weight; // add to normalization constant
+                            direction += dist3D*weight/dist3Dabs; // add to direction vector
+                      }
+
+                      real mindist3Dabs = sqrt(mindist3D.sqr()); // calculate overall smallest absolute distance
+
+                      if (mindist3Dabs>0.0) {
+                         // read fforce from table for overall smallest distance (should give zero, if particle is inside a full atomistic area!)
+                         real fforce = table->getForce(mindist3Dabs);
+                         fforce /= norm; // normalize with norm
+
+                         // substract td force
+                         cit->force() += (direction * fforce); // and apply into the weighted direction
+                       }
+
+                    }
+                    else{
+                      std::cout << "In TDforce: Trying to use moving AdResS region with adaptive region slab geometry. This is not implemented and doesn't make much sense anyhow.\n";
+                      exit(1);
+                      return;
+                    }
+
+                  }
+                  else{
+
+                    if (sphereAdr){ // spherical adress region
+                       // calculate distance from reference point
+                       Real3D dist3D;
+                       bc.getMinimumImageVectorBox(dist3D,cit->getPos(),center); //pos - center
+                       real dist = sqrt(dist3D.sqr());
+
+                       if (dist>0.0) {
+                         // read fforce from table
+                         real fforce = table->getForce(dist);
+                         fforce /= dist;
+
+                         // substract td force
+                         cit->force() += (dist3D * fforce);
+                       }
+                    } else {
+                       // use this if you need 1-dir force only!
+                       real d1 = cit->getPos()[0] - center[0];
+                       real d1abs = fabs(d1);
+                       real force = table->getForce(d1abs);
+                      //std::cout<<cit->id()<<" "<<cit->force()<<" "<<cit->getPos()[0]<<" "<<center[0]<<" "<<d1<<" "<<d1abs<<" "<<force<<std::endl;
+                       if (d1>0.0) {
+                         cit->force()[0] += force;
+                       } else {
+                         cit->force()[0] -= force;
+                       }
+                      //std::cout<<cit->id()<<" "<<cit->force()<<std::endl;
+                    }
+
                   }
 
-                  if (sphereAdr){ // spherical adress region
-                     // calculate distance from reference point
-                     Real3D dist3D;
-                     bc.getMinimumImageVectorBox(dist3D,cit->getPos(),center); //pos - center
-                     real dist = sqrt(dist3D.sqr());
 
-                     if (dist>0.0) {
-                       // read fforce from table
-                       real fforce = table->getForce(dist);
-                       fforce /= dist;
 
-                       // substract td force
-                       cit->force() += (dist3D * fforce);
-                     }
-                  } else {
-                     // use this if you need 1-dir force only!
-                     real d1 = cit->getPos()[0] - center[0];
-                     real d1abs = fabs(d1);
-                     real force = table->getForce(d1abs);
-//std::cout<<cit->id()<<" "<<cit->force()<<" "<<cit->getPos()[0]<<" "<<center[0]<<" "<<d1<<" "<<d1abs<<" "<<force<<std::endl;
-                     if (d1>0.0) {
-                       cit->force()[0] += force;
-                     } else {
-                       cit->force()[0] -= force;
-                     }
-//std::cout<<cit->id()<<" "<<cit->force()<<std::endl;
-                  }
+
+
+
+
+
               }
           }
     }
