@@ -25,3 +25,8 @@ pmiimport('espressopp.io')
 from espressopp.io.DumpXYZ import *
 from espressopp.io.DumpGRO import *
 from espressopp.io.DumpGROAdress import *
+try:
+    from espressopp.io.DumpH5MD import *
+except ImportError as ex:
+    import warnings
+    warnings.warn('H5MD format not supported ({})'.format(ex))

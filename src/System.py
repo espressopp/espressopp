@@ -56,13 +56,11 @@ Example (not complete):
 .. function:: espressopp.System()
 
 
-.. function:: espressopp.System.addInteraction(interaction, name)
+.. function:: espressopp.System.addInteraction(interaction)
 
 		:param interaction: 
 		:type interaction: 
-		:param name: The optional name of the interaction.
-		:type name: string
-		:rtype: bool
+		:rtype: 
 
 .. function:: espressopp.System.getInteraction(number)
 
