@@ -47,6 +47,11 @@ namespace espressopp {
 
       int nextId();
       const RealND nextProperties();
+      /* increment particle iterator, get pid, get properties (pos,v)   */
+      void nextParticle();
+      size_t Id();
+      const RealND Properties();
+      
       //Real3D nextCoordinates();
       //Real3D nextVelocities();
 

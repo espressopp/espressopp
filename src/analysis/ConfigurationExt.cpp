@@ -90,7 +90,42 @@ namespace espressopp {
       //it = coordinates.begin();
       //end = coordinates.end();
     }
+    
 
+    size_t ConfigurationExtIterator::Id()
+    {
+      if (it == end) {
+        PyErr_SetString(PyExc_StopIteration, "No more data.");
+        boost::python::throw_error_already_set();
+      }
+
+      size_t id = (*it).first;
+      return id;
+    }
+    
+    //bad performance - or the compiler is smart
+    const RealND ConfigurationExtIterator::Properties()
+    {
+      if (it == end) {
+        PyErr_SetString(PyExc_StopIteration, "No more data.");
+        boost::python::throw_error_already_set();
+      }
+
+      RealND props = (*it).second;
+      return props;
+    }
+    
+    
+    void ConfigurationExtIterator::nextParticle()
+    {
+      if (it == end) {
+        PyErr_SetString(PyExc_StopIteration, "No more data.");
+        boost::python::throw_error_already_set();
+      }
+
+      it++;
+    }
+    
     int ConfigurationExtIterator::nextId()
     {
       if (it == end) {
@@ -111,7 +146,7 @@ namespace espressopp {
         boost::python::throw_error_already_set();
       }
 
-     RealND props = (*it).second;
+      RealND props = (*it).second;
       it++;
       return props;
     }

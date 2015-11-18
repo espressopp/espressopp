@@ -49,11 +49,11 @@ namespace espressopp {
                         ParticleAccess(system), 
                         integrator(_integrator),
                         file_name( _file_name ),
-                        unfolded(_unfolded),
+                        unfolded(_unfolded),  // default should be unfolded right? where is this?
                         length_factor(_length_factor), 
                         append(_append){ 
         setLengthUnit(_length_unit);
-        if (system->comm->rank() == 0  && !append)
+        if (system->comm->rank() == 0  && !append) // why when is not append?
           FileBackup backup(file_name);
       }
       ~DumpXYZ() {}
