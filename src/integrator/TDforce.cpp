@@ -161,7 +161,7 @@ namespace espressopp {
 
 
 
-                  if (!(verletList->getAdrCenterSet())) { //moving adress regions
+                  if (!(verletList->getAdrCenterSet())) { // adress regions defined based on particles
 
                     if (sphereAdr){
 

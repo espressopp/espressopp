@@ -457,6 +457,7 @@ namespace espressopp {
        //if adrCenter is not set, the center of adress zone moves along with some particles
        //the coordinates of the center(s) (adrPositions) must be communicated to all nodes
 
+       // Old Version
        // get local cells
        // CellList realcells = getSystem()->storage->getRealCells(); //should be realcells
        // int root,mayberoot,lroot;
@@ -475,12 +476,15 @@ namespace espressopp {
        //    mpi::broadcast(*getSystem()->comm,verletList->adrPositions,root); // only necessary for moving adrCenter
        // }
 
+
       if (!(verletList->getAdrCenterSet())) {
 
         System& system = getSystemRef();
         std::vector<Real3D*> procAdrPositions;
         CellList realcells = getSystem()->storage->getRealCells();
 
+
+        // Version 1
         int nprocs = system.comm->size();
         int myrank = system.comm->rank();
 
@@ -498,15 +502,36 @@ namespace espressopp {
                     }
 
                 }
-            }
+                boost::mpi::broadcast(*system.comm, procAdrPositions, rank_i);
 
-            boost::mpi::broadcast(*system.comm, procAdrPositions, rank_i);
+            }
 
             for (std::vector<Real3D*>::iterator itr=procAdrPositions.begin(); itr != procAdrPositions.end(); ++itr) {
               verletList->adrPositions.push_back(*itr);
             }
 
         }
+
+
+        // Version 2 (most likely does not work, as boost's all_gather apparently does not work for inputs of different lengths)
+        // verletList->adrPositions.clear();
+        // for (CellListIterator it(realcells); it.isValid(); ++it) {
+
+        //     if (verletList->getAdrList().count(it->id()) == 1) {
+        //         procAdrPositions.push_back(&(it->position()));
+        //     }
+
+        // }
+
+        // std::vector<std::vector<Real3D*> > procAdrPositionsAll;
+        // boost::mpi::all_gather(*system.comm, procAdrPositions, procAdrPositionsAll);
+
+        // for (std::vector<std::vector<Real3D*> >::iterator itr=procAdrPositionsAll.begin(); itr != procAdrPositionsAll.end(); ++itr) {
+        //     for (std::vector<Real3D*>::iterator itr2=(*itr).begin(); itr2 != (*itr).end(); ++itr2){
+        //       verletList->adrPositions.push_back(*itr2);
+        //     }
+        // }
+
 
       }
 
