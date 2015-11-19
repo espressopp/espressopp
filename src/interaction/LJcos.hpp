@@ -33,17 +33,25 @@
 namespace espressopp {
   namespace interaction {
     /** This class provides methods to compute forces and energies of
-	the modified Lennard Jones potential. It has cutoff 1.5 LJ units
+		 the modified Lennard Jones potential (WCA) combined with the cos-contribution that 
+		 smoothly reaches zero. It has cutoff 1.5 LJ units. There are two main application 
+		 possibilities:
+		 1. Controlling the depth of the resulted potential mimic solvents of various qualities;
+		 2. With some modification cos->cos^2 model biomembranes.
+		 
+		 The approach 1. can be followes in detail in M. Steinhauser, JCP, 2005 (Eq. 8)
+		 The approach 2. is the paper of Markus Deserno in Nature from 2007
 
     */
     class LJcos : public PotentialTemplate< LJcos > {
     private:
       real phi;
       
-      real pot_border, sqr_pot_border;
-      real one_phi, half_phi, phi_alpha;
-      real alpha, beta;
-      real sqrcutoff;
+      real pot_border, sqr_pot_border;		// border of the WCA (repulsive LJ) potential
+			real epsilon = 1.;
+			real alpha, beta, gamma;
+      real one_phi, half_phi, alpha_phi, gamma_phi;
+      real sqr_cutoff;
 
       real auxCoef; // This is temporary solution for empty potential. This problem
                     // appears when there is a potential for, for example,  00 and
@@ -54,34 +62,47 @@ namespace espressopp {
     public:
       static void registerPython();
 
-      LJcos(): phi(0.0){
+			// constructor without the cos-part
+			LJcos(): phi(0.0){
         setShift(0.0);
         autoShift = false;
         setCutoff(1.5);
+//				setEpsilon(1.0);
         preset();
         auxCoef = 0.0;
       }
 
+			// constructor with arbitrary phi
       LJcos(real _phi): phi(_phi){	
         setShift(0.0);
         autoShift = false;
         setCutoff(1.5);
+//				setEpsilon(1.0);
         preset();
         auxCoef = 1.0;
       }
 
       virtual ~LJcos() {};
 
+//			void setEpsilon(real _epsilon) {
+//				epsilon = _epsilon;
+//			}
+			
+//			real getEpsilon() const { return epsilon; }
+			
       void preset() {
-        sqrcutoff = 1.5 * 1.5;
         pot_border = pow(2.0, 1.0/6.0);
         sqr_pot_border = pot_border * pot_border;
-        alpha = M_PIl / (2.25 - sqr_pot_border);
+				sqr_cutoff = getCutoff() * getCutoff();
+        alpha = M_PIl / (sqr_cutoff - sqr_pot_border);
         beta = M_PIl - sqr_pot_border*alpha;
-        
-        one_phi = 1.0 - phi;
-        half_phi = 0.5 * phi;
-        phi_alpha = phi * alpha;
+				gamma = -0.5;
+
+				real _epsilon = 1.;
+        one_phi = (1.0 - phi) * _epsilon;
+        half_phi = 0.5 * phi * _epsilon;
+				gamma_phi = gamma * phi * _epsilon;
+        alpha_phi = alpha * phi * _epsilon;
       }
       
       // Setter and getter phi
@@ -99,7 +120,7 @@ namespace espressopp {
           energy = 4.0 * (frac6 * frac6 - frac6) + one_phi;
         }
         else{
-          energy = half_phi * cos(alpha*distSqr+beta) - half_phi;
+          energy = half_phi * cos(alpha*distSqr+beta) + gamma_phi;
         }
         
         return energy;
@@ -115,7 +136,7 @@ namespace espressopp {
           ffactor = frac6 * ( 48.0 * frac6 - 24.0 ) * frac2;
         }
         else{
-          ffactor = phi_alpha * sin( alpha * distSqr + beta );
+          ffactor = alpha_phi * sin( alpha * distSqr + beta );
         }
         force = r21 * ffactor;
         return true;
