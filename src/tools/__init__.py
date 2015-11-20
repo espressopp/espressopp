@@ -33,6 +33,5 @@ from espressopp.tools.analyse import *
 from espressopp.tools.tabulated import *
 from espressopp.tools.prepareAdress import *
 from espressopp.tools.warmup import *
-from espressopp.tools.lammpsfilewrite import *
 from espressopp.tools.povwrite import *
 from espressopp.tools.pathintegral import *
