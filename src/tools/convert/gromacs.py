@@ -1030,7 +1030,7 @@ def setLennardJonesInteractions(system, defaults, atomtypeparams, verletlist, cu
     
     print "# Setting up Lennard-Jones interactions"
     if defaults:
-        if int(defaults['combinationrule'])!=2:
+        if int(defaults['combinationrule'])!=2 and int(defaults['combinationrule'])!=3:
             for atnr, at in atomtypeparams.iteritems():
                 c6=float(at['sig'])
                 c12=float(at['eps'])
