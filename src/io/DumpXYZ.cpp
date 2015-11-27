@@ -20,15 +20,13 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
+#include "python.hpp"
 #include <fstream>
-
-#include "DumpXYZ.hpp"
-#include "storage/Storage.hpp"
-
-#include "bc/BC.hpp"
-
 #include "analysis/ConfigurationExt.hpp"
 #include "analysis/ConfigurationsExt.hpp"
+#include "DumpXYZ.hpp"
+#include "storage/Storage.hpp"
+#include "bc/BC.hpp"
 
 using namespace espressopp;
 using namespace espressopp::analysis;

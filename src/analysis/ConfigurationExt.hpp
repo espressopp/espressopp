@@ -24,7 +24,6 @@
 #ifndef _ANALYSIS_CONFIGURATIONEXT_HPP
 #define _ANALYSIS_CONFIGURATIONEXT_HPP
 
-#include "types.hpp"
 #include "SystemAccess.hpp"
 #include "RealND.hpp"
 #include <map>

@@ -24,13 +24,13 @@
 #ifndef _IO_DUMPXYZ_HPP
 #define _IO_DUMPXYZ_HPP
 
-#include "ParticleAccess.hpp"
 #include "integrator/MDIntegrator.hpp"
 #include "io/FileBackup.hpp"
 
 #include "esutil/Error.hpp"
 
 #include <string>
+#include "ParticleAccess.hpp"
 
 namespace espressopp {
   namespace io{

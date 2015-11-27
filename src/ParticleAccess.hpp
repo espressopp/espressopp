@@ -22,7 +22,6 @@
 
 #ifndef _PARTICLEACCESS_HPP
 #define	_PARTICLEACCESS_HPP
-#include "types.hpp"
 #include "python.hpp"
 #include "SystemAccess.hpp"
 

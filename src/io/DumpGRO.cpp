@@ -20,6 +20,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
+#include "python.hpp"
 #include <fstream>
 #include <iomanip>
 #include "DumpGRO.hpp"

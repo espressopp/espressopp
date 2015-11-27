@@ -6,8 +6,8 @@
 //  Copyright (c) 2014 niktre. All rights reserved.
 //
 
-#include "LiquidGasLB.hpp"
 #include "python.hpp"
+#include "LiquidGasLB.hpp"
 #include <iomanip>
 #include "boost/serialization/vector.hpp"
 
