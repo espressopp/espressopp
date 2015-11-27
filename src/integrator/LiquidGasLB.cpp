@@ -3,7 +3,7 @@
 //  ESPResSo++
 //
 //  Created by niktre on 08.05.14.
-//  Copyright (c) 2014 niktre. All rights reserved.
+//  Copyright (c) 2014,2015 niktre. All rights reserved.
 //
 
 #include "python.hpp"
