@@ -330,7 +330,7 @@ namespace espressopp {
 		/* Helpers for MD to LB (and vice versa) unit conversion */
 		real LatticeBoltzmann::convMassMDtoLB() {return 1.;}
 #warning: need a foolproof in case there is no access to the integrator (and getTimeStep) yet
-		real LatticeBoltzmann::convTimeMDtoLB() {return 1. / (integrator->getTimeStep() * getTau());}
+		real LatticeBoltzmann::convTimeMDtoLB() {return 1. / (integrator->getTimeStep() * getNSteps() * getTau());}
 		real LatticeBoltzmann::convLenMDtoLB() {
 			return getNi().getItem(0) / (getSystem()->bc->getBoxL().getItem(0) * getA());}
 		
