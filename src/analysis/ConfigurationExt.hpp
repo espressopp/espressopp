@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012-2015
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -24,7 +24,6 @@
 #ifndef _ANALYSIS_CONFIGURATIONEXT_HPP
 #define _ANALYSIS_CONFIGURATIONEXT_HPP
 
-#include "types.hpp"
 #include "SystemAccess.hpp"
 #include "RealND.hpp"
 #include <map>

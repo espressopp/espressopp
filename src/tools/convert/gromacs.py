@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2015(H)
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -1030,7 +1030,7 @@ def setLennardJonesInteractions(system, defaults, atomtypeparams, verletlist, cu
     
     print "# Setting up Lennard-Jones interactions"
     if defaults:
-        if int(defaults['combinationrule'])!=2:
+        if int(defaults['combinationrule'])==1:
             for atnr, at in atomtypeparams.iteritems():
                 c6=float(at['sig'])
                 c12=float(at['eps'])

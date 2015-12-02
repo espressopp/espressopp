@@ -18,10 +18,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "python.hpp"
 #include <string>
 #include <utility>
 #include <vector>
-#include "python.hpp"
 #include "SystemMonitor.hpp"
 #include "integrator/MDIntegrator.hpp"
 
