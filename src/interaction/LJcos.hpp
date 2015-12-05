@@ -48,7 +48,7 @@ namespace espressopp {
       real phi;
       
       real pot_border, sqr_pot_border;		// border of the WCA (repulsive LJ) potential
-			real epsilon = 1.;
+			real epsilon;
 			real alpha, beta, gamma;
       real one_phi, half_phi, alpha_phi, gamma_phi;
       real sqr_cutoff;
@@ -67,7 +67,7 @@ namespace espressopp {
         setShift(0.0);
         autoShift = false;
         setCutoff(1.5);
-//				setEpsilon(1.0);
+				setEpsilon(1.0);
         preset();
         auxCoef = 0.0;
       }
@@ -77,18 +77,18 @@ namespace espressopp {
         setShift(0.0);
         autoShift = false;
         setCutoff(1.5);
-//				setEpsilon(1.0);
+				setEpsilon(1.0);
         preset();
         auxCoef = 1.0;
       }
 
       virtual ~LJcos() {};
 
-//			void setEpsilon(real _epsilon) {
-//				epsilon = _epsilon;
-//			}
-			
-//			real getEpsilon() const { return epsilon; }
+			void setEpsilon(real _epsilon) {
+				epsilon = _epsilon;
+			}
+		
+			real getEpsilon() { return epsilon; }
 			
       void preset() {
         pot_border = pow(2.0, 1.0/6.0);
@@ -98,7 +98,7 @@ namespace espressopp {
         beta = M_PIl - sqr_pot_border*alpha;
 				gamma = -0.5;
 
-				real _epsilon = 1.;
+				real _epsilon = getEpsilon();
         one_phi = (1.0 - phi) * _epsilon;
         half_phi = 0.5 * phi * _epsilon;
 				gamma_phi = gamma * phi * _epsilon;
