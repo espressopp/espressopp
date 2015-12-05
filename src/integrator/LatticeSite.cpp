@@ -47,18 +47,6 @@ namespace espressopp {
     void LBSite::setPhiLoc (int _i, real _phi) { phiLoc[_i] = _phi;}
     real LBSite::getPhiLoc (int _i) { return phiLoc[_i];}
 
-    void LBSite::setGammaBLoc (real _gamma_b) {gamma_bLoc = _gamma_b;}
-    real LBSite::getGammaBLoc () { return gamma_bLoc;}
-
-    void LBSite::setGammaSLoc (real _gamma_s) {gamma_sLoc = _gamma_s;}
-    real LBSite::getGammaSLoc () { return gamma_sLoc;}
-
-    void LBSite::setGammaOddLoc (real _gamma_odd) {gamma_oddLoc = _gamma_odd;}
-    real LBSite::getGammaOddLoc () { return gamma_oddLoc;}
-
-    void LBSite::setGammaEvenLoc (real _gamma_even) {gamma_evenLoc = _gamma_even;}
-    real LBSite::getGammaEvenLoc () { return gamma_evenLoc;}
-
 /*******************************************************************************************/
 		
     /* HELPFUL OPERATIONS WITH POPULATIONS AND MOMENTS */
@@ -69,24 +57,21 @@ namespace espressopp {
     /* MANAGING STATIC VARIABLES */
     /* create storage for static variables */
     std::vector<real> LBSite::phiLoc(19, 0.);
-    real LBSite::gamma_bLoc = 0.;
-    real LBSite::gamma_sLoc = 0.;
-    real LBSite::gamma_oddLoc = 0.;
-    real LBSite::gamma_evenLoc = 0.;
-		
+
 /*******************************************************************************************/
 		
-		void LBSite::collision(int _lbTempFlag, int _extForceFlag, int _couplForceFlag, Real3D _f) {
+		void LBSite::collision(int _lbTempFlag, int _extForceFlag,
+													 int _couplForceFlag, Real3D _force, real *_gamma) {
 			real m[19];
 
 			calcLocalMoments(m);
 			
-			relaxMoments(m, _extForceFlag, _f);
+			relaxMoments(m, _extForceFlag, _force, _gamma);
 
 			if (_lbTempFlag == 1) thermalFluct(m);
 			
 			if (_extForceFlag == 1 || _couplForceFlag == 1) {
-				applyForces(m, _f);
+				applyForces(m, _force, _gamma);
 			}
 			
 			btranMomToPop(m);
@@ -145,7 +130,7 @@ namespace espressopp {
 /*******************************************************************************************/
 		
 		/* RELAXATION OF THE MOMENTS TO THEIR EQUILIBRIUM VALUES */
-		void LBSite::relaxMoments (real *m, int _extForceFlag, Real3D _f) {
+		void LBSite::relaxMoments (real *m, int _extForceFlag, Real3D _f, real *_gamma) {
 			// moments on the site //
 			real _invTauLoc = 1. / LatticePar::getTauLoc();
 			Real3D jLoc(m[1], m[2], m[3]);
@@ -164,12 +149,12 @@ namespace espressopp {
 			pi_eq[3] =  jLoc[0]*jLoc[1]*_invRhoLoc;
 			pi_eq[4] =  jLoc[0]*jLoc[2]*_invRhoLoc;
 			pi_eq[5] =  jLoc[1]*jLoc[2]*_invRhoLoc;
-			
-			real _gamma_b = getGammaBLoc();
-			real _gamma_s = getGammaSLoc();
-			real _gamma_odd = getGammaOddLoc();
-			real _gamma_even = getGammaEvenLoc();
-			
+
+			real _gamma_b = _gamma[0];
+			real _gamma_s = _gamma[1];
+			real _gamma_odd = _gamma[2];
+			real _gamma_even = _gamma[3];
+
 			/* relax bulk mode */
 			m[4] = pi_eq[0] + _gamma_b * (m[4] - pi_eq[0]);
 			
@@ -209,12 +194,9 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 		
-		void LBSite::applyForces (real *m, Real3D _f) {
-//			Real3D _f = LBForce().getExtForceLoc() + LBForce().getCouplForceLoc();
-			
+		void LBSite::applyForces (real *m, Real3D _f, real *_gamma) {
 			// set velocity _u
-			Real3D _u = _f;
-			_u *= 0.5;
+			Real3D _u = 0.5 * _f;
 			_u[0] += m[1]; 	_u[1] += m[2]; _u[2] += m[3];
 			_u /= m[0];
 			
@@ -226,8 +208,8 @@ namespace espressopp {
 			/* update stress modes */
 			// See def. of _sigma (Eq.198) in B.Dünweg & A.J.C.Ladd in Adv.Poly.Sci. 221, 89-166 (2009)
 			real _sigma[6];
-			real _gamma_b = getGammaBLoc();
-			real _gamma_s = getGammaSLoc();
+			real _gamma_b = _gamma[0];
+			real _gamma_s = _gamma[1];
 			real _gamma_sp = _gamma_s + 1.;
 			real _gamma_sph = 0.5 * _gamma_sp;
 			
@@ -253,13 +235,10 @@ namespace espressopp {
 		
 		void LBSite::btranMomToPop (real *m) {
 			int _numVelsLoc = LatticePar::getNumVelsLoc();
-//			real _eqWeightLoc[_numVelsLoc];
 			
 			// scale modes with inversed coefficients
 			for (int i = 0; i < _numVelsLoc; i++) {
 				m[i] *= LatticePar::getInvBLoc(i);
-				/* fill in local eq weights */
-//				_eqWeightLoc[i] = LatticePar::getEqWeightLoc(i);
 			}
 			
 			setF_i(0,m[0] -m[4] +m[16]);

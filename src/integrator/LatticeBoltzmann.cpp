@@ -62,12 +62,12 @@ namespace espressopp {
 	namespace integrator {
 		LOG4ESPP_LOGGER(LatticeBoltzmann::theLogger, "LatticeBoltzmann");
 
-		/* LB Constructor; expects 3 reals, 1 vector and 5 integers */
+		/* LB Constructor; expects 1 Int3D, 2 reals and 2 integers */
 		LatticeBoltzmann::LatticeBoltzmann(shared_ptr<System> _system,
-																			 Int3D _nodeGrid, Int3D _Ni,
+																			 Int3D _nodeGrid,
 																			 real _a, real _tau,
 																			 int _numDims, int _numVels)
-		: Extension(_system), nodeGrid(_nodeGrid), Ni(_Ni), a(_a), tau(_tau), numDims(_numDims), numVels(_numVels)
+		: Extension(_system), nodeGrid(_nodeGrid), a(_a), tau(_tau), numDims(_numDims), numVels(_numVels)
 		{
 			/* create storage for variables that are static (not changing on the run) and live on a lattice node */
 			c_i	= std::vector<Real3D>(_numVels, Real3D(0.,0.,0.));
@@ -129,14 +129,13 @@ namespace espressopp {
 													2 * getHaloSkin();
 				_myLeft[_dim] = floor(_myPosition[_dim]*_L/_nodeGrid[_dim]);
 			}
-#warning: probably one needs to eliminate Ni as input parameter and calculate it through Li and a
-//			setNi(_L / getA());
+
+			setNi((Int3D) (_L / getA()));
 			setMyNi (_numSites);
 			setMyLeft (_myLeft);
 			
 			/* initialise general lattice parameters on a site */
 			LatticePar(_system, getNumVels(),getA(),getTau());
-//			LatticePar::initEqWeights();
 			
 			/* stretch lattices resizing them in 3 dimensions */
 			lbfluid = new lblattice;
@@ -162,6 +161,8 @@ namespace espressopp {
 				}
 			}
 
+			gamma = new real [4];
+			
 			/* initialise global weights and coefficients from the local ones */
 			initLatticeModel();
 
@@ -184,6 +185,7 @@ namespace espressopp {
 			delete (ghostlat);
 			delete (lbmom);
 			delete (lbfor);
+			delete (gamma);
 		}
 
 		void LatticeBoltzmann::connect() {
@@ -274,16 +276,19 @@ namespace espressopp {
 			setGammaS((2.*_visc_s-getCs2()*getTau()*convTimeMDtoLB()*convLenMDtoLB()/convMassMDtoLB())/(2.*_visc_s+getCs2()*getTau()*convTimeMDtoLB()*convLenMDtoLB()/convMassMDtoLB()));}
 		real LatticeBoltzmann::getViscS () { return visc_s;}
 		
-		void LatticeBoltzmann::setGammaB (real _gamma_b) {gamma_b = _gamma_b; initGammas(0);}
+		void LatticeBoltzmann::setGamma (int _i, real _gamma) {gamma[_i] = _gamma;}
+		real LatticeBoltzmann::getGamma (int _i) { return gamma[_i];}
+		
+		void LatticeBoltzmann::setGammaB (real _gamma_b) {setGamma(0, _gamma_b);}
 		real LatticeBoltzmann::getGammaB () { return gamma_b;}
 
-		void LatticeBoltzmann::setGammaS (real _gamma_s) {gamma_s = _gamma_s; initGammas(1);}
+		void LatticeBoltzmann::setGammaS (real _gamma_s) {setGamma(1, _gamma_s);}
 		real LatticeBoltzmann::getGammaS () { return gamma_s;}
 
-		void LatticeBoltzmann::setGammaOdd (real _gamma_odd) {gamma_odd = _gamma_odd; initGammas(2);}
+		void LatticeBoltzmann::setGammaOdd (real _gamma_odd) {setGamma(2, _gamma_odd);}
 		real LatticeBoltzmann::getGammaOdd () { return gamma_odd;}
 
-		void LatticeBoltzmann::setGammaEven (real _gamma_even) {gamma_even = _gamma_even; initGammas(3);}
+		void LatticeBoltzmann::setGammaEven (real _gamma_even) {setGamma(3, _gamma_even);}
 		real LatticeBoltzmann::getGammaEven () { return gamma_even;}
 
 		/* Setter and getter for external and coupling force control */
@@ -361,18 +366,6 @@ namespace espressopp {
 			setCi(15, Real3D(0.,  1.,  1.)); setCi(16, Real3D( 0., -1., -1.));
 			setCi(17, Real3D(0.,  1., -1.)); setCi(18, Real3D( 0., -1.,  1.));
 			
-/*			Int3D _myNi = getMyNi();
-			int _numVels = getNumVels();
-			for (int i = 0; i < _myNi[0]; i++) {
-				for (int j = 0; j < _myNi[1]; j++) {
-					for (int k = 0; k < _myNi[2]; k++) {
-						for (int l = 0; l < _numVels; l++) {
-							(*lbfluid)[i][j][k].initLatticeModelLoc();
-						}
-					}
-				}
-			}
-*/
 			longint _myRank = getSystem()->comm->rank();
 			if (_myRank == 0) {
 				std::cout << "-------------------------------------" << std::endl;
@@ -390,41 +383,6 @@ namespace espressopp {
 				setInvB(l, LatticePar::getInvBLoc(l));
 			}
 		}
-
-/*******************************************************************************************/
-		
-    /* (RE)INITIALIZATION OF GAMMAS */
-    void LatticeBoltzmann::initGammas (int _idGamma) {
-      using std::setprecision;
-      using std::fixed;
-      using std::setw;
-
-      // (re)set values of gammas depending on the id of the gamma that was changed
-      for (int i = 0; i < getMyNi().getItem(0); i++) {
-        for (int j = 0; j < getMyNi().getItem(1); j++) {
-          for (int k = 0; k < getMyNi().getItem(2); k++) {
-            for (int l = 0; l < getNumVels(); l++) {		// ich glaube die Schleife ist überflüssig hier
-              if (_idGamma == 0) (*lbfluid)[i][j][k].setGammaBLoc(getGammaB());
-              if (_idGamma == 1) (*lbfluid)[i][j][k].setGammaSLoc(getGammaS());
-              if (_idGamma == 2) (*lbfluid)[i][j][k].setGammaOddLoc(getGammaOdd());
-              if (_idGamma == 3) (*lbfluid)[i][j][k].setGammaEvenLoc(getGammaEven());
-            }
-          }
-        }
-      }
-			
-      // print for control
-			longint _myRank = getSystem()->comm->rank();
-			if (_myRank == 0) {
-				std::cout << setprecision(8);
-				std::cout << "One of the gamma's controlling viscosities has been changed:\n";
-				if (_idGamma == 0) std::cout << "  gammaB is " << (*lbfluid)[0][0][0].getGammaBLoc() << "\n";
-				if (_idGamma == 1) std::cout << "  gammaS is " << (*lbfluid)[0][0][0].getGammaSLoc() << "\n";
-				if (_idGamma == 2) std::cout << ", gammaOdd is " << (*lbfluid)[0][0][0].getGammaOddLoc() << "\n";
-				if (_idGamma == 3) std::cout << ", gammaEven is " << (*lbfluid)[0][0][0].getGammaEvenLoc() << "\n";
-				std::cout << "-------------------------------------\n";
-			}
-    }
 		
 /*******************************************************************************************/
 		
@@ -470,9 +428,9 @@ namespace espressopp {
 				
         setPhi(0, 0.);
         setPhi(1, 0.); setPhi(2, 0.); setPhi(3, 0.);
-        setPhi(4, sqrt(mu / getInvB(4) * (1. - getGammaB() * getGammaB())));
+        setPhi(4, sqrt(mu / getInvB(4) * (1. - getGamma(0) * getGamma(0))));
         for (int l = 5; l < 10; l++) {
-          setPhi(l, sqrt(mu / getInvB(l) * (1. - getGammaS() * getGammaS())));
+          setPhi(l, sqrt(mu / getInvB(l) * (1. - getGamma(1) * getGamma(1))));
         }
         for (int l = 10; l < getNumVels(); l++) {
           setPhi(l, sqrt(mu / getInvB(l)));
@@ -585,7 +543,7 @@ namespace espressopp {
 			mpi::all_reduce(*getSystem()->comm, myVelCM, velCM, std::plus<Real3D>());
 			
 			if (getSystem()->comm->rank() == 0) {
-				// output of if needed
+				// output of CMVel if needed
 				if (_id == 1) {
 					printf("findCMVelMD: cmV(t+ 1/2dt) of LJ system is %18.14f %18.14f %18.14f \n",
 								 velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
@@ -673,7 +631,7 @@ namespace espressopp {
         for (int j = _offset; j < _myNi[1]-_offset; j++) {
           for (int k = _offset; k < _myNi[2]-_offset; k++) {
 						Real3D _f = (*lbfor)[i][j][k].getExtForceLoc() + (*lbfor)[i][j][k].getCouplForceLoc();
-						(*lbfluid)[i][j][k].collision(_lbTempFlag, _extForceFlag, _couplForceFlag, _f);
+						(*lbfluid)[i][j][k].collision(_lbTempFlag, _extForceFlag, _couplForceFlag, _f, gamma);
 
 						streaming (i,j,k);
 					}
@@ -870,13 +828,6 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 		
-//		void LatticeBoltzmann::addLBForces (Particle& p) {
-//			// apply random and viscous force to MD the particle p.id()
-//			p.force() += getFOnPart(p.id());
-//		}
-		
-/*******************************************************************************************/
-		
 		/* RESTORING FORCES ACTING FROM LB FLUID ONTO MD PARTICLES */
 		void LatticeBoltzmann::restoreLBForces () {
 			System& system = getSystemRef();
@@ -973,8 +924,7 @@ namespace espressopp {
 				for (int _i = 0; _i < _myNi[0]; _i++) {
 					for (int _j = 0; _j < _myNi[1]; _j++) {
 						for (int _k = 0; _k < _myNi[2]; _k++) {
-//							printf("CPU %d: (*lbfluid)[_i][_j][_k].getCouplForceLoc() is %20.14f\n", getSystem()->comm->rank(), (*lbfluid)[_i][_j][_k].getCouplForceLoc().getItem(2));
-						(*lbfor)[_i][_j][_k].setCouplForceLoc(Real3D(0.));
+							(*lbfor)[_i][_j][_k].setCouplForceLoc(Real3D(0.));
 						}
 					}
 				}
@@ -2000,9 +1950,8 @@ namespace espressopp {
 			class_<LatticeBoltzmann, shared_ptr<LatticeBoltzmann>, bases<Extension> >
 
 			("integrator_LatticeBoltzmann", init<	shared_ptr< System >,
-																					Int3D, Int3D, real, real, int, int >())
+																					Int3D, real, real, int, int >())
 			.add_property("nodeGrid", &LatticeBoltzmann::getNodeGrid, &LatticeBoltzmann::setNodeGrid)
-			.add_property("Ni", &LatticeBoltzmann::getNi, &LatticeBoltzmann::setNi)
 			.add_property("a", &LatticeBoltzmann::getA, &LatticeBoltzmann::setA)
 			.add_property("tau", &LatticeBoltzmann::getTau, &LatticeBoltzmann::setTau)
 			.add_property("numDims", &LatticeBoltzmann::getNumDims, &LatticeBoltzmann::setNumDims)

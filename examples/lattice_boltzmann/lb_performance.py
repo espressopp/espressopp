@@ -12,13 +12,13 @@ integrator.dt  = 0.01
 
 # define a LB grid
 nodeGrid=espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
-lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid, Ni=Int3D(s,s,s))
+lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid)
 # add extension to the integrator
 integrator.addExtension(lb)
 
+lb.nSteps = 10
 lb.visc_b = 3.
 lb.visc_s = 3.
-
 lb.profStep = 5000
 
 #initPop = espressopp.integrator.LBInitPopUniform(system,lb)

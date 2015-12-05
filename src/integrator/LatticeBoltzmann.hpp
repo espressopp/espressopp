@@ -40,10 +40,10 @@ namespace espressopp {
 	namespace integrator {
 		class LatticeBoltzmann : public Extension {
       /* LatticeBoltzmann constructor expects 5 parameters (and a system pointer).
-			These are: lattice size in 3D Ni, lattice spacing a, lattice timestep tau,
+			These are: cpu node layout (Int3D), lattice spacing a, lattice timestep tau,
 			number of dimensions and number of velocity vectors on a lattice site.
-			The lattice size, Ni, is an obligatory parameter and must be set at the
-			beginning of the simulation.
+			The lattice size, Ni, is calculated via Li of the box (should be defined in 
+			the python script earlier) and the lattice spacing a.
 
 			The default lattice model is D3Q19 and both lattice spacing and timestep
 			are set to 1.
@@ -58,7 +58,7 @@ namespace espressopp {
 		*/
 		public:
 			LatticeBoltzmann (shared_ptr< System > _system,
-												Int3D _nodeGrid, Int3D _Ni, real _a, real _tau, int _numDims, int _numVels);
+												Int3D _nodeGrid, real _a, real _tau, int _numDims, int _numVels);
       ~LatticeBoltzmann ();
 
       /* SET AND GET DECLARATION */
@@ -74,6 +74,8 @@ namespace espressopp {
 			void setTau (real _tau);							// set lattice timestep
       real getTau ();												// get lattice timestep
 
+			void setGamma (int _i, real _gamma);
+			real getGamma (int _i);
 			void setGammaB (real _gamma_b);				// set gamma for bulk
 			real getGammaB ();										// get gamma for bulk
 
@@ -146,7 +148,6 @@ namespace espressopp {
 
 			/* FUNCTIONS DECLARATION */
 			void initLatticeModel ();								// initialize lattice model (weights, cis)
-			void initGammas (int _idGamma);					// (re)initialize gammas
 			void initFluctuations ();								// (re)initialize fluctuation parameters
 			void makeLBStep ();											// perform one step of LB
 			
@@ -238,6 +239,7 @@ namespace espressopp {
 
 			// VISCOSITIES
 			real visc_b, visc_s;					// bulk and shear viscosities (LJ-units)
+			real *gamma;
 			real gamma_b, gamma_s;				// bulk and shear gammas
 			real gamma_even, gamma_odd;		// even and odd gammas
 

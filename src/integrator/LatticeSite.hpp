@@ -50,38 +50,23 @@ namespace espressopp {
 			void setPhiLoc (int _i, real _phi);							// set phi value to _phi
 			real getPhiLoc (int _i);												// get phi value
 
-			void setGammaBLoc (real _gamma_b);							// set gamma for bulk
-			real getGammaBLoc ();														// get gamma for bulk
-
-			void setGammaSLoc (real _gamma_s);							// set gamma for shear
-			real getGammaSLoc ();														// get gamma for shear
-
-			void setGammaOddLoc (real _gamma_odd);					// set gamma odd
-			real getGammaOddLoc ();													// get gamma odd
-
-			void setGammaEvenLoc (real _gamma_even);				// set gamma even
-			real getGammaEvenLoc ();												// get gamma even
-
 			/* HELPFUL OPERATIONS WITH POPULATIONS AND MOMENTS */
 			void scaleF_i (int _i, real _value);						// scale population i by _value
 
 			/* FUNCTIONS DECLARATION */
-//			void initLatticeModelLoc ();										// local eq weights
 			void collision (int _lbTempFlag, int _extForceFlag,
-											int _couplForceFlag, Real3D _f);						// perform collision step
+											int _couplForceFlag, Real3D _f,
+											real *_gamma);									// perform collision step
 			void calcLocalMoments (real *m);								// calculate local moments
-			void relaxMoments (real *m,
-												 int _extForceFlag, Real3D _f);					// relax local moms to eq moms
+			void relaxMoments (real *m, int _extForceFlag,
+												 Real3D _f, real *_gamma);		// relax local moms to eq moms
 			void thermalFluct (real *m);										// apply thermal fluctuations
-			void applyForces (real *m, Real3D _f);											// apply ext and coupl forces
+			void applyForces (real *m, Real3D _f,
+												real *_gamma);								// apply ext and coupl forces
 			void btranMomToPop (real *m);										// back-transform moms to pops
 
 		private:
 			std::vector<real> f;														// populations on a site
-			static real gamma_bLoc;													// gamma bulk
-			static real gamma_sLoc;													// gamma shear
-			static real gamma_oddLoc;												// gamma odd
-			static real gamma_evenLoc;											// gamma even
 			static std::vector<real> phiLoc;								// local fluct amplitudes
     };
 		
@@ -95,8 +80,8 @@ namespace espressopp {
 			 * These include density and 3-comp. mass flux.
 			 */
 		public:
-			LBMom ();																// constr of the ghost lattice
-			~LBMom ();																// destr of the ghost lattice
+			LBMom ();																				// constr of the ghost lattice
+			~LBMom ();																			// destr of the ghost lattice
 
 			void setMom_i (int _i, real _mom);							// set f_i population to _f
 			real getMom_i (int _i);													// get f_i population
@@ -137,6 +122,8 @@ namespace espressopp {
 			static std::vector<real> eqWeightLoc;						// local eq. weights
 			static std::vector<real> inv_bLoc;							// local inverse coeff b_i
 		};
+
+/*******************************************************************************************/
 		
 		class LBForce {
 		public:
