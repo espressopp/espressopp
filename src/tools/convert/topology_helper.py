@@ -174,7 +174,7 @@ class HarmonicNCosDihedralInteractionType(InteractionType):
 class RyckaertBellemansDihedralInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
         print('RyckaertBellemans: {}'.format(self.parameters))
-        pot = espressopp.interaction.DihedralRB(**{k: v for k, v in self.parameters.iteritems()})
+        pot = espressopp.interaction.DihedralRB(**self.parameters)
         return espressopp.interaction.FixedQuadrupleListDihedralRB(system, fpl, pot)
 
 class HarmonicDihedralInteractionType(InteractionType):
