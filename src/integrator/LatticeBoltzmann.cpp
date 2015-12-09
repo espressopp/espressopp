@@ -269,11 +269,19 @@ namespace espressopp {
 
 		/* Setter and getting for LB viscosity control */
 		void LatticeBoltzmann::setViscB (real _visc_b) {visc_b = _visc_b;
-			setGammaB((getNumDims()*_visc_b-getCs2()*getTau()*convTimeMDtoLB()*convLenMDtoLB()/convMassMDtoLB())/(getNumDims()*_visc_b+getCs2()*getTau()*convTimeMDtoLB()*convLenMDtoLB()/convMassMDtoLB()));}
+			setGammaB((getNumDims()*_visc_b-getCs2()*getTau()*(convTimeMDtoLB()/getNSteps())*convLenMDtoLB()/convMassMDtoLB())/(getNumDims()*_visc_b+getCs2()*getTau()*(convTimeMDtoLB()/getNSteps())*convLenMDtoLB()/convMassMDtoLB()));
+			printf ("myRank is %d: \n", getSystem()->comm->rank());
+			printf ("getNumDims() is %d \n", getNumDims());
+			printf ("getCs2() is %8.5f \n", getCs2());
+			printf ("getTau() is %8.5f \n", getTau());
+			printf ("convTimeMDtoLB is %8.5f \n", convTimeMDtoLB());
+			printf ("convLenMDtoLB is %8.5f \n", convLenMDtoLB());
+			printf ("convMassMDtoLB is %8.5f \n", convMassMDtoLB());
+			printf ("gamma_B is %8.5f, gamma[0] is %8.5f \n", getGammaB(), getGamma(0));}
 		real LatticeBoltzmann::getViscB () { return visc_b;}
 		
 		void LatticeBoltzmann::setViscS (real _visc_s) {visc_s = _visc_s;
-			setGammaS((2.*_visc_s-getCs2()*getTau()*convTimeMDtoLB()*convLenMDtoLB()/convMassMDtoLB())/(2.*_visc_s+getCs2()*getTau()*convTimeMDtoLB()*convLenMDtoLB()/convMassMDtoLB()));}
+			setGammaS((2.*_visc_s-getCs2()*getTau()*(convTimeMDtoLB()/getNSteps())*convLenMDtoLB()/convMassMDtoLB())/(2.*_visc_s+getCs2()*getTau()*(convTimeMDtoLB()/getNSteps())*convLenMDtoLB()/convMassMDtoLB()));}
 		real LatticeBoltzmann::getViscS () { return visc_s;}
 		
 		void LatticeBoltzmann::setGamma (int _i, real _gamma) {gamma[_i] = _gamma;}
@@ -308,7 +316,7 @@ namespace espressopp {
 		void LatticeBoltzmann::setFricCoeff (real _fricCoeff) { fricCoeff = _fricCoeff;}
 		real LatticeBoltzmann::getFricCoeff () { return fricCoeff;}
 		
-		void LatticeBoltzmann::setNSteps (int _nSteps) { nSteps = _nSteps;}
+		void LatticeBoltzmann::setNSteps (int _nSteps) { nSteps = _nSteps; printf("nSteps is set to %d \n",_nSteps);}
 		int LatticeBoltzmann::getNSteps () { return nSteps;}
 
 		void LatticeBoltzmann::setTotNPart (int _totNPart) { totNPart = _totNPart;}
@@ -335,7 +343,7 @@ namespace espressopp {
 		/* Helpers for MD to LB (and vice versa) unit conversion */
 		real LatticeBoltzmann::convMassMDtoLB() {return 1.;}
 #warning: need a foolproof in case there is no access to the integrator (and getTimeStep) yet
-		real LatticeBoltzmann::convTimeMDtoLB() {return 1. / (integrator->getTimeStep() * getNSteps() * getTau());}
+		real LatticeBoltzmann::convTimeMDtoLB() {return 1. / (integrator->getTimeStep() * getTau());}
 		real LatticeBoltzmann::convLenMDtoLB() {
 			return getNi().getItem(0) / (getSystem()->bc->getBoxL().getItem(0) * getA());}
 		

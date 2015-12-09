@@ -16,10 +16,16 @@ lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid)
 # add extension to the integrator
 integrator.addExtension(lb)
 
-lb.nSteps = 10
+lb.nSteps = 1
 lb.visc_b = 3.
 lb.visc_s = 3.
+lb.gamma_odd = 0.
+lb.gamma_even = 0.
 lb.profStep = 5000
+
+# specify desired temperature (set the fluctuations if any)
+lb.lbTemp = 1.
+#lb.nSteps = 1
 
 #initPop = espressopp.integrator.LBInitPopUniform(system,lb)
 initPop = espressopp.integrator.LBInitPopWave(system,lb)
@@ -30,9 +36,6 @@ lboutputScreen = espressopp.analysis.LBOutputScreen(system,lb)
 OUT3=espressopp.integrator.ExtAnalyze(lboutputScreen,5000)
 integrator.addExtension(OUT3)
 
-# specify desired temperature (set the fluctuations if any)
-lb.lbTemp = 1.
-lb.nSteps = 1
 ## add some profiling statistics for the run
 for k in range (3):
 #	lb.readCouplForces()
