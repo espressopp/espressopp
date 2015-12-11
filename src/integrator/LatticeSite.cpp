@@ -61,7 +61,7 @@ namespace espressopp {
 /*******************************************************************************************/
 		
 		void LBSite::collision(int _lbTempFlag, int _extForceFlag,
-													 int _couplForceFlag, Real3D _force, real *_gamma) {
+													 int _couplForceFlag, Real3D _force, std::vector<real> &_gamma) {
 			real m[19];
 
 			calcLocalMoments(m);
@@ -130,7 +130,7 @@ namespace espressopp {
 /*******************************************************************************************/
 		
 		/* RELAXATION OF THE MOMENTS TO THEIR EQUILIBRIUM VALUES */
-		void LBSite::relaxMoments (real *m, int _extForceFlag, Real3D _f, real *_gamma) {
+		void LBSite::relaxMoments (real *m, int _extForceFlag, Real3D _f, std::vector<real> &_gamma) {
 			// moments on the site //
 			real _invTauLoc = 1. / LatticePar::getTauLoc();
 			Real3D jLoc(m[1], m[2], m[3]);
@@ -150,27 +150,22 @@ namespace espressopp {
 			pi_eq[4] =  jLoc[0]*jLoc[2]*_invRhoLoc;
 			pi_eq[5] =  jLoc[1]*jLoc[2]*_invRhoLoc;
 
-			real _gamma_b = _gamma[0];
-			real _gamma_s = _gamma[1];
-			real _gamma_odd = _gamma[2];
-			real _gamma_even = _gamma[3];
-
 			/* relax bulk mode */
-			m[4] = pi_eq[0] + _gamma_b * (m[4] - pi_eq[0]);
+			m[4] = pi_eq[0] + _gamma[0] * (m[4] - pi_eq[0]);
 			
 			/* relax shear modes */
-			m[5] = pi_eq[1] + _gamma_s * (m[5] - pi_eq[1]);
-			m[6] = pi_eq[2] + _gamma_s * (m[6] - pi_eq[2]);
-			m[7] = pi_eq[3] + _gamma_s * (m[7] - pi_eq[3]);
-			m[8] = pi_eq[4] + _gamma_s * (m[8] - pi_eq[4]);
-			m[9] = pi_eq[5] + _gamma_s * (m[9] - pi_eq[5]);
+			m[5] = pi_eq[1] + _gamma[1] * (m[5] - pi_eq[1]);
+			m[6] = pi_eq[2] + _gamma[1] * (m[6] - pi_eq[2]);
+			m[7] = pi_eq[3] + _gamma[1] * (m[7] - pi_eq[3]);
+			m[8] = pi_eq[4] + _gamma[1] * (m[8] - pi_eq[4]);
+			m[9] = pi_eq[5] + _gamma[1] * (m[9] - pi_eq[5]);
 			
 			/* relax odd modes */
-			m[10] *= _gamma_odd; m[11] *= _gamma_odd; 	m[12] *= _gamma_odd;
-			m[13] *= _gamma_odd; m[14] *= _gamma_odd; 	m[15] *= _gamma_odd;
+			m[10] *= _gamma[2]; m[11] *= _gamma[2]; 	m[12] *= _gamma[2];
+			m[13] *= _gamma[2]; m[14] *= _gamma[2]; 	m[15] *= _gamma[2];
 			
 			/* relax even modes */
-			m[16] *= _gamma_even; m[17] *= _gamma_even; m[18] *= _gamma_even;
+			m[16] *= _gamma[3]; m[17] *= _gamma[3]; m[18] *= _gamma[3];
 		}
 		
 /*******************************************************************************************/
@@ -194,7 +189,7 @@ namespace espressopp {
 		
 /*******************************************************************************************/
 		
-		void LBSite::applyForces (real *m, Real3D _f, real *_gamma) {
+		void LBSite::applyForces (real *m, Real3D _f, std::vector<real> &_gamma) {
 			// set velocity _u
 			Real3D _u = 0.5 * _f;
 			_u[0] += m[1]; 	_u[1] += m[2]; _u[2] += m[3];
@@ -208,13 +203,11 @@ namespace espressopp {
 			/* update stress modes */
 			// See def. of _sigma (Eq.198) in B.Dünweg & A.J.C.Ladd in Adv.Poly.Sci. 221, 89-166 (2009)
 			real _sigma[6];
-			real _gamma_b = _gamma[0];
-			real _gamma_s = _gamma[1];
-			real _gamma_sp = _gamma_s + 1.;
+			real _gamma_sp = _gamma[1] + 1.;
 			real _gamma_sph = 0.5 * _gamma_sp;
 			
 			real _scalp = _u*_f;
-			real _secTerm = (1./3.)*(_gamma_b - _gamma_s)*_scalp;
+			real _secTerm = (1./3.)*(_gamma[0] - _gamma[1])*_scalp;
 			
 			_sigma[0] = _gamma_sp*_u[0]*_f[0] + _secTerm;
 			_sigma[1] = _gamma_sp*_u[1]*_f[1] + _secTerm;

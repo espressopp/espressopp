@@ -76,6 +76,7 @@ namespace espressopp {
 
 			void setGamma (int _i, real _gamma);
 			real getGamma (int _i);
+			
 			void setGammaB (real _gamma_b);				// set gamma for bulk
 			real getGammaB ();										// get gamma for bulk
 
@@ -239,9 +240,7 @@ namespace espressopp {
 
 			// VISCOSITIES
 			real visc_b, visc_s;					// bulk and shear viscosities (LJ-units)
-			real *gamma;
-			real gamma_b, gamma_s;				// bulk and shear gammas
-			real gamma_even, gamma_odd;		// even and odd gammas
+			std::vector<real> gamma;			// array of gammas (bulk, shear, odd, even)
 
 			// TEMPERATURE
 			int lbTempFlag;								// flag of non-zero temperature

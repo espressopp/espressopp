@@ -93,6 +93,7 @@ namespace espressopp {
 			setExtForceFlag(0);															// no external forces
 			setCouplForceFlag(0);														// no LB to MD coupling
 			setNSteps(1);																		// # MD steps between LB update
+			setProfStep(10000);															// set default time profiling step
 			
 			int _Npart = _system->storage->getNRealParticles();
 			int _totNPart = 0;
@@ -161,7 +162,8 @@ namespace espressopp {
 				}
 			}
 
-			gamma = new real [4];
+			/* set initial values for gammas */
+			gamma = std::vector<real>(4, 0.);
 			
 			/* initialise global weights and coefficients from the local ones */
 			initLatticeModel();
@@ -180,12 +182,11 @@ namespace espressopp {
 		void LatticeBoltzmann::disconnect() {
 			_recalc2.disconnect();
 			_befIntV.disconnect();
-			
+
 			delete (lbfluid);
 			delete (ghostlat);
 			delete (lbmom);
 			delete (lbfor);
-			delete (gamma);
 		}
 
 		void LatticeBoltzmann::connect() {
@@ -269,35 +270,29 @@ namespace espressopp {
 
 		/* Setter and getting for LB viscosity control */
 		void LatticeBoltzmann::setViscB (real _visc_b) {visc_b = _visc_b;
-			setGammaB((getNumDims()*_visc_b-getCs2()*getTau()*(convTimeMDtoLB()/getNSteps())*convLenMDtoLB()/convMassMDtoLB())/(getNumDims()*_visc_b+getCs2()*getTau()*(convTimeMDtoLB()/getNSteps())*convLenMDtoLB()/convMassMDtoLB()));
-			printf ("myRank is %d: \n", getSystem()->comm->rank());
-			printf ("getNumDims() is %d \n", getNumDims());
-			printf ("getCs2() is %8.5f \n", getCs2());
-			printf ("getTau() is %8.5f \n", getTau());
-			printf ("convTimeMDtoLB is %8.5f \n", convTimeMDtoLB());
-			printf ("convLenMDtoLB is %8.5f \n", convLenMDtoLB());
-			printf ("convMassMDtoLB is %8.5f \n", convMassMDtoLB());
-			printf ("gamma_B is %8.5f, gamma[0] is %8.5f \n", getGammaB(), getGamma(0));}
+			setGamma(0, (getNumDims()*_visc_b - getCs2()*getTau() * (convTimeMDtoLB()/getNSteps()) * convLenMDtoLB() / convMassMDtoLB()) / \
+									(getNumDims()*_visc_b + getCs2()*getTau() * (convTimeMDtoLB()/getNSteps()) * convLenMDtoLB() / convMassMDtoLB()));}
 		real LatticeBoltzmann::getViscB () { return visc_b;}
 		
 		void LatticeBoltzmann::setViscS (real _visc_s) {visc_s = _visc_s;
-			setGammaS((2.*_visc_s-getCs2()*getTau()*(convTimeMDtoLB()/getNSteps())*convLenMDtoLB()/convMassMDtoLB())/(2.*_visc_s+getCs2()*getTau()*(convTimeMDtoLB()/getNSteps())*convLenMDtoLB()/convMassMDtoLB()));}
+			setGamma(1, (2.*_visc_s - getCs2()*getTau() * (convTimeMDtoLB()/getNSteps()) * convLenMDtoLB() / convMassMDtoLB()) / \
+									(2.*_visc_s + getCs2()*getTau() * (convTimeMDtoLB()/getNSteps()) * convLenMDtoLB() / convMassMDtoLB()));}
 		real LatticeBoltzmann::getViscS () { return visc_s;}
 		
 		void LatticeBoltzmann::setGamma (int _i, real _gamma) {gamma[_i] = _gamma;}
 		real LatticeBoltzmann::getGamma (int _i) { return gamma[_i];}
 		
-		void LatticeBoltzmann::setGammaB (real _gamma_b) {setGamma(0, _gamma_b);}
-		real LatticeBoltzmann::getGammaB () { return gamma_b;}
+		void LatticeBoltzmann::setGammaB (real _gamma_b) {setGamma(0, _gamma_b); initFluctuations();}
+		real LatticeBoltzmann::getGammaB () { return getGamma(0);}
 
-		void LatticeBoltzmann::setGammaS (real _gamma_s) {setGamma(1, _gamma_s);}
-		real LatticeBoltzmann::getGammaS () { return gamma_s;}
+		void LatticeBoltzmann::setGammaS (real _gamma_s) {setGamma(1, _gamma_s); initFluctuations();}
+		real LatticeBoltzmann::getGammaS () { return getGamma(1);}
 
 		void LatticeBoltzmann::setGammaOdd (real _gamma_odd) {setGamma(2, _gamma_odd);}
-		real LatticeBoltzmann::getGammaOdd () { return gamma_odd;}
+		real LatticeBoltzmann::getGammaOdd () { return getGamma(2);}
 
 		void LatticeBoltzmann::setGammaEven (real _gamma_even) {setGamma(3, _gamma_even);}
-		real LatticeBoltzmann::getGammaEven () { return gamma_even;}
+		real LatticeBoltzmann::getGammaEven () { return getGamma(3);}
 
 		/* Setter and getter for external and coupling force control */
 		void LatticeBoltzmann::setExtForceFlag (int _extForceFlag) {extForceFlag = _extForceFlag;}
@@ -316,7 +311,7 @@ namespace espressopp {
 		void LatticeBoltzmann::setFricCoeff (real _fricCoeff) { fricCoeff = _fricCoeff;}
 		real LatticeBoltzmann::getFricCoeff () { return fricCoeff;}
 		
-		void LatticeBoltzmann::setNSteps (int _nSteps) { nSteps = _nSteps; printf("nSteps is set to %d \n",_nSteps);}
+		void LatticeBoltzmann::setNSteps (int _nSteps) { nSteps = _nSteps;}
 		int LatticeBoltzmann::getNSteps () { return nSteps;}
 
 		void LatticeBoltzmann::setTotNPart (int _totNPart) { totNPart = _totNPart;}
@@ -407,13 +402,15 @@ namespace espressopp {
 			longint _myRank = getSystem()->comm->rank();
 
 			if (_myRank == 0) {
-				std::cout << "Mass conversion coeff. MD->LB: " << convMassMDtoLB() << "\n";
-				std::cout << "Length conversion coeff. MD->LB: " << convLenMDtoLB() << "\n";
-				std::cout << "Time conversion coeff. MD->LB: " << convTimeMDtoLB() << "\n";
+				std::cout << "Conversion coefficients from MD to LB:\n";
+				std::cout << "Mass: " << convMassMDtoLB() << "\n";
+				std::cout << "Length: " << convLenMDtoLB() << "\n";
+				std::cout << "Time: " << convTimeMDtoLB() << "\n";
+				std::cout << "MD steps between LB-update: " << getNSteps() << "\n";
 				std::cout << "-------------------------------------\n";
 			}
 			
-			_lbTemp = getLBTemp() * convMassMDtoLB() * pow(convLenMDtoLB() / convTimeMDtoLB(), 2.);
+			_lbTemp = getLBTemp() * convMassMDtoLB() * pow(convLenMDtoLB() * (getNSteps()/convTimeMDtoLB()), 2.);
       a3 = getA() * getA() * getA();    // a^3
       mu = _lbTemp / (getCs2() * a3);   // thermal mass density
 
@@ -421,7 +418,7 @@ namespace espressopp {
         // account for fluctuations being turned off
         setLBTempFlag(0);
 				if (_myRank == 0) {
-					std::cout << "The temperature of the LB-fluid is 0. The fluctuations are turned off!\n";
+					std::cout << "Atermal LB-fluid. The fluctuations are turned off!\n";
 				}
       } else {
         // account for fluctuations being turned on!
@@ -431,7 +428,7 @@ namespace espressopp {
 					std::cout << setprecision(8);
 					std::cout << fixed;   // some output tricks
 					std::cout << "The fluctuations have been introduced into the system:\n";
-					std::cout << "lbTemp = " << getLBTemp() << "\n";
+					std::cout << "lbTemp = " << getLBTemp() << " in LJ-units or " << _lbTemp << " in lattice units" << "\n";
 				}
 				
         setPhi(0, 0.);

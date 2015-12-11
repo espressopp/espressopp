@@ -56,13 +56,19 @@ namespace espressopp {
 			/* FUNCTIONS DECLARATION */
 			void collision (int _lbTempFlag, int _extForceFlag,
 											int _couplForceFlag, Real3D _f,
-											real *_gamma);									// perform collision step
+											std::vector<real> &_gamma);		  // perform collision step
+			
 			void calcLocalMoments (real *m);								// calculate local moments
+			
 			void relaxMoments (real *m, int _extForceFlag,
-												 Real3D _f, real *_gamma);		// relax local moms to eq moms
+												 Real3D _f,
+												 std::vector<real> &_gamma);		// relax local moms to eq moms
+			
 			void thermalFluct (real *m);										// apply thermal fluctuations
+			
 			void applyForces (real *m, Real3D _f,
-												real *_gamma);								// apply ext and coupl forces
+												std::vector<real> &_gamma);		// apply ext and coupl forces
+			
 			void btranMomToPop (real *m);										// back-transform moms to pops
 
 		private:

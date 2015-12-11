@@ -33,43 +33,6 @@ namespace espressopp {
 
     void LBOutputScreen::writeOutput()
     {
-/*    Int3D _Ni;
-      int _numVels;
-      int _step;
-
-      _Ni = latticeboltzmann->getNi();
-      _numVels = latticeboltzmann->getNumVels();
-      _step = latticeboltzmann->getStepNum();
-*/
-      // test output into console
-/*		if (_step == 0)
-			printf("LBOutputScreen: Making Screen output\n\n");
-
-      real _denLoc = 0.;
-      real _jzLoc = 0.;
-*/
-      /* define lattice site to output its density and velocity onto the screen.
-       * here we use a site situated at a quater of the simulation box length Nx,
-       * while y=0 and z=0 (i = 0.25*Nx and indexes _j and _k are set to zero).
-       */
-/*		int _i = (int) _Ni.getItem(0) * 0.25;
-      int _j = 0;
-      int _k = 0;
-*/
-      // creating a profile based on the current populations
-/*      for (int l = 0; l < _numVels; l++) {
-        _denLoc += latticeboltzmann->getLBFluid(Int3D(_i,_j,_k),l);
-        _jzLoc += latticeboltzmann->getLBFluid(Int3D(_i,_j,_k),l) * latticeboltzmann->getCi(l).getItem(2);
-      }
-      printf ("site (%2d,%2d,%2d) = den %5.3f   v_z %5.3f  \n", _i, _j, _k, _denLoc, _jzLoc/_denLoc);
-*/
-//			int _step = latticeboltzmann->getStepNum();
-//			printf ("completed %d LB step!\n\n", _step);
-			
-//			Real3D _velCM = latticeboltzmann->findCMVelMD(0);
-			
-//			latticeboltzmann->testLBMom ();
-			
 			/* GET VELOCITIES FROM PREVIOUS HALF-TIMESTEP */
 			/* be careful, it is a bit "dirty" way. The idea is that the Output onto the Screen
 			 takes place when the timestep is already finished, i.e. at (t+dt). However, the LB
@@ -111,7 +74,7 @@ namespace espressopp {
 					setLBTimerNew(timeLBtoMD.getElapsedTime());
 					timelb = getLBTimerNew() - getLBTimerOld();
 					setLBTimerOld(getLBTimerNew());
-					printf ("_step is %ld, getOldStepNum() is %d, lbVolume is %d\n", _step, getOldStepNum(), lbVolume);
+					printf ("_step is %ld, getOldStepNum() is %ld, lbVolume is %d\n", _step, getOldStepNum(), lbVolume);
 					printf ("time spent on %ld LB(+MD) steps is %f sec, relative MLUPS: %f \n",
 									_step-getOldStepNum(), timelb,
 									(_step-getOldStepNum())*lbVolume*1e-6 / timelb);
