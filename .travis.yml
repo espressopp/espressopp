@@ -7,18 +7,19 @@ before_install:
  - sudo apt-get update
  - sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin
  - if [[ $EXTERNAL = ON ]]; then sudo apt-get install libboost1.55-all-dev python-mpi4py; fi
+ - if [[ $EXTERNAL_BOOST159 = ON ]]; then sudo apt-get install libboost1.59-all-dev python-mpi4py; fi
  - if [[ $GCC_VERSION ]]; then
      sudo apt-get install g++-${GCC_VERSION} && 
      export CXX=g++-${GCC_VERSION};
    fi
 
 env: #maybe add mpich later
-  - EXTERNAL=ON
-  - EXTERNAL=ON GCC_VERSION=4.7
-  - EXTERNAL=ON GCC_VERSION=4.8
-  - EXTERNAL=ON GCC_VERSION=4.9
-  - EXTERNAL=ON GCC_VERSION=5
-  - EXTERNAL=OFF
+  - EXTERNAL=ON EXTERNAL_BOOST159=OFF
+  - EXTERNAL=ON EXTERNAL_BOOST159=OFF GCC_VERSION=4.7
+  - EXTERNAL=ON EXTERNAL_BOOST159=OFF GCC_VERSION=4.8
+  - EXTERNAL=ON EXTERNAL_BOOST159=OFF GCC_VERSION=4.9
+  - EXTERNAL=OFF EXTERNAL_BOOST159=ON GCC_VERSION=5
+  - EXTERNAL=OFF EXTERNAL_BOOST159=OFF
 
 script:
   - mkdir build && cd build && 
@@ -30,13 +31,13 @@ script:
 matrix:
   exclude:
     - compiler: clang
-      env: EXTERNAL=ON GCC_VERSION=4.7
+      env: EXTERNAL=ON EXTERNAL_BOOST159=OFF GCC_VERSION=4.7
     - compiler: clang
-      env: EXTERNAL=ON GCC_VERSION=4.8
+      env: EXTERNAL=ON EXTERNAL_BOOST159=OFF GCC_VERSION=4.8
     - compiler: clang
-      env: EXTERNAL=ON GCC_VERSION=4.9
+      env: EXTERNAL=ON EXTERNAL_BOOST159=OFF GCC_VERSION=4.9
     - compiler: clang
-      env: EXTERNAL=ON GCC_VERSION=5
+      env: EXTERNAL=ON EXTERNAL_BOOST159=OFF GCC_VERSION=5
 
 compiler:
   - clang
