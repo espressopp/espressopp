@@ -410,7 +410,7 @@ namespace espressopp {
 				std::cout << "-------------------------------------\n";
 			}
 			
-			_lbTemp = getLBTemp() * convMassMDtoLB() * pow(convLenMDtoLB() * (getNSteps()/convTimeMDtoLB()), 2.);
+			_lbTemp = getLBTemp() * convMassMDtoLB() * pow(convLenMDtoLB() /convTimeMDtoLB(), 2.);
       a3 = getA() * getA() * getA();    // a^3
       mu = _lbTemp / (getCs2() * a3);   // thermal mass density
 
