@@ -165,7 +165,8 @@ namespace espressopp {
 
                     if (sphereAdr){
 
-                      real width = abs(enddist - startdist);  // width of region where TD force acts
+                      real buffer = 0.01;
+                      real width = abs(enddist - startdist + 2.0*buffer);  // width of region where TD force acts
                       std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();   // get positions
                       Real3D pa = **it2;
                       Real3D dist3D;
@@ -178,13 +179,13 @@ namespace espressopp {
                       real weight = 0.0;  // initialize weight
 
                       // weighting scheme: only particles that are in a hybrid region contribute
-                      if ((dist3Dabs <= enddist) && (dist3Dabs >= startdist)){
-                        weight = 1.0 - (dist3Dabs-startdist) / width; // 0 at edge to CG region, 1 at edge to atomistic region
+                      if ((dist3Dabs < enddist + buffer) && (dist3Dabs > startdist - buffer)){
+                        weight = 1.0 - (dist3Dabs - startdist - buffer) / width; // 0 at edge to CG region, 1 at edge to atomistic region
                       }
                       else{
                         weight = 0.0; // particle outside of hybrid region
                       }
-                      real norm = weight; // normalization constant
+                      //real norm = weight; // normalization constant
                       Real3D direction = dist3D*weight/dist3Dabs; // normalized but weighted direction vector
 
                       // Loop over all other centers
@@ -197,26 +198,33 @@ namespace espressopp {
                             dist3Dabs = sqrt(dist3D.sqr()); // calculate absolute distance
 
                             // calculate weights again, as above
-                            if ((dist3Dabs <= enddist) && (dist3Dabs >= startdist)){
-                              real weight = 1.0 - (dist3Dabs-startdist) / width;
+                            if ((dist3Dabs < enddist + buffer) && (dist3Dabs > startdist - buffer)){
+                              real weight = 1.0 - (dist3Dabs - startdist - buffer) / width;
                             }
                             else{
                               real weight = 0.0;
                             }
-                            norm += weight; // add to normalization constant
+                            //norm += weight; // add to normalization constant
                             direction += dist3D*weight/dist3Dabs; // add to direction vector
                       }
 
                       real mindist3Dabs = sqrt(mindist3D.sqr()); // calculate overall smallest absolute distance
 
-                      if (mindist3Dabs>0.0) {
+                      //if (mindist3Dabs>0.0) {
                          // read fforce from table for overall smallest distance (should give zero, if particle is inside a full atomistic area!)
-                         real fforce = table->getForce(mindist3Dabs);
-                         fforce /= norm; // normalize with norm
+                         //real fforce = table->getForce(mindist3Dabs);
+
+                         // if (norm > 0.0){
+                         //   fforce /= norm; // normalize with norm
+                         // }
 
                          // substract td force
-                         cit->force() += (direction * fforce); // and apply into the weighted direction
+                       if ( (mindist3Dabs > startdist) && (mindist3Dabs < enddist) && (direction.sqr() > 0.0) ) {
+                          real fforce = table->getForce(mindist3Dabs);
+                          fforce /= sqrt(direction.sqr());
+                          cit->force() += (direction * fforce); // and apply into the weighted direction
                        }
+                       //}
 
                     }
                     else{
@@ -293,7 +301,7 @@ namespace espressopp {
 
 
       class_<TDforce, shared_ptr<TDforce>, bases<Extension> >
-        ("integrator_TDforce", init< shared_ptr<System>, shared_ptr<VerletListAdress> >())
+        ("integrator_TDforce", init< shared_ptr<System>, shared_ptr<VerletListAdress>, real, real >())
         .add_property("filename", &TDforce::getFilename)
         .def("connect", &TDforce::connect)
         .def("disconnect", &TDforce::disconnect)

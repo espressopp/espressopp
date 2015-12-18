@@ -485,52 +485,67 @@ namespace espressopp {
 
 
         // Version 1
-        int nprocs = system.comm->size();
-        int myrank = system.comm->rank();
+        // int nprocs = system.comm->size();
+        // int myrank = system.comm->rank();
 
+        // verletList->adrPositions.clear();
+
+        // for (int rank_i=0; rank_i<nprocs; rank_i++) {
+        //     procAdrPositions.clear();
+        //     boost::mpi::request request[1];
+
+        //     if (rank_i == myrank) {
+
+        //         for (CellListIterator it(realcells); it.isValid(); ++it) {
+
+        //             if (verletList->getAdrList().count(it->id()) == 1) {
+        //                 procAdrPositions.push_back(&(it->position()));
+        //             }
+
+        //         }
+
+        //         std::cout << "Before Broadcast\n";
+
+        //         request[0] = boost::mpi::broadcast(*system.comm, procAdrPositions, rank_i);
+
+        //         std::cout << "After Broadcast\n\n";
+
+        //     }
+
+        //     boost::mpi::wait_all(request, request + 1);
+
+        //     for (std::vector<Real3D*>::iterator itr=procAdrPositions.begin(); itr != procAdrPositions.end(); ++itr) {
+        //       verletList->adrPositions.push_back(*itr);
+        //     }
+
+        // }
+
+
+        //Version 2 (most likely does not work, as boost's all_gather apparently does not work for inputs of different lengths)
         verletList->adrPositions.clear();
+        for (CellListIterator it(realcells); it.isValid(); ++it) {
 
-        for (int rank_i=0; rank_i<nprocs; rank_i++) {
-            procAdrPositions.clear();
-
-            if (rank_i == myrank) {
-
-                for (CellListIterator it(realcells); it.isValid(); ++it) {
-
-                    if (verletList->getAdrList().count(it->id()) == 1) {
-                        procAdrPositions.push_back(&(it->position()));
-                    }
-
-                }
-                boost::mpi::broadcast(*system.comm, procAdrPositions, rank_i);
-
-            }
-
-            for (std::vector<Real3D*>::iterator itr=procAdrPositions.begin(); itr != procAdrPositions.end(); ++itr) {
-              verletList->adrPositions.push_back(*itr);
+            if (verletList->getAdrList().count(it->id()) == 1) {
+                procAdrPositions.push_back(&(it->position()));
             }
 
         }
 
+        std::vector<std::vector<Real3D*> > procAdrPositionsAll;
+        boost::mpi::all_gather(*system.comm, procAdrPositions, procAdrPositionsAll);
 
-        // Version 2 (most likely does not work, as boost's all_gather apparently does not work for inputs of different lengths)
-        // verletList->adrPositions.clear();
-        // for (CellListIterator it(realcells); it.isValid(); ++it) {
+        for (std::vector<std::vector<Real3D*> >::iterator itr=procAdrPositionsAll.begin(); itr != procAdrPositionsAll.end(); ++itr) {
+            for (std::vector<Real3D*>::iterator itr2=(*itr).begin(); itr2 != (*itr).end(); ++itr2){
+              verletList->adrPositions.push_back(*itr2);
+            }
+        }
 
-        //     if (verletList->getAdrList().count(it->id()) == 1) {
-        //         procAdrPositions.push_back(&(it->position()));
-        //     }
 
+        // for (std::vector<Real3D*>::iterator it2 = verletList->adrPositions.begin(); it2 != verletList->adrPositions.end(); ++it2)
+        // {
+        //   std::cout << "**it2: " << **it2 << "\n";
         // }
-
-        // std::vector<std::vector<Real3D*> > procAdrPositionsAll;
-        // boost::mpi::all_gather(*system.comm, procAdrPositions, procAdrPositionsAll);
-
-        // for (std::vector<std::vector<Real3D*> >::iterator itr=procAdrPositionsAll.begin(); itr != procAdrPositionsAll.end(); ++itr) {
-        //     for (std::vector<Real3D*>::iterator itr2=(*itr).begin(); itr2 != (*itr).end(); ++itr2){
-        //       verletList->adrPositions.push_back(*itr2);
-        //     }
-        // }
+        // std::cout << "\n";
 
 
       }

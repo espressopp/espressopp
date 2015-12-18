@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "python.hpp"
@@ -43,8 +43,9 @@ namespace espressopp {
 
       gamma  = 0.0;
       temperature = 0.0;
-      
+
       adress = false;
+      exclusions.clear();
 
       if (!system->rng) {
         throw std::runtime_error("system has no RNG");
@@ -128,7 +129,7 @@ namespace espressopp {
       LOG4ESPP_DEBUG(theLogger, "thermalize");
 
       System& system = getSystemRef();
-      
+
       CellList cells = system.storage->getRealCells();
 
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
@@ -150,25 +151,30 @@ namespace espressopp {
       }*/
 
       // TODO: It doesn't make that much sense to thermalize both CG and AT particles, since CG particles get velocities of AT particles anyway.
-      
+
       // thermalize AT particles
       ParticleList& adrATparticles = system.storage->getAdrATParticles();
       for (std::vector<Particle>::iterator it = adrATparticles.begin();
               it != adrATparticles.end(); it++) {
-            frictionThermo(*it);
-            
-        // Only in hybrid region!          
+
+        //Particle &at = *it;
+        if(exclusions.count((*it).id()) == 0)
+        {
+          frictionThermo(*it);
+        }
+
+        // Only in hybrid region!
         /*Particle &at = *it;
-        real w = at.lambda();  
+        real w = at.lambda();
         if(w!=1.0 && w!=0.0) {
             //std::cout << "w: " << w << std::endl;
             //std::cout << "pos_x: " << at.position()[0] << std::endl;
-            
+
             frictionThermo(*it);
-        }*/           
-            
+        }*/
+
       }
-      
+
     }
 
     void LangevinThermostat::frictionThermo(Particle& p)
@@ -191,7 +197,7 @@ namespace espressopp {
         real timestep = integrator->getTimeStep();
 
       LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
-		    ", gamma = " << gamma << 
+		    ", gamma = " << gamma <<
 		    ", temperature = " << temperature);
 
       pref1 = -gamma;
@@ -238,6 +244,7 @@ namespace espressopp {
         ("integrator_LangevinThermostat", init<shared_ptr<System> >())
         .def("connect", &LangevinThermostat::connect)
         .def("disconnect", &LangevinThermostat::disconnect)
+        .def("addExclpid", &LangevinThermostat::addExclpid)
         .add_property("adress", &LangevinThermostat::getAdress, &LangevinThermostat::setAdress)
         .add_property("gamma", &LangevinThermostat::getGamma, &LangevinThermostat::setGamma)
         .add_property("temperature", &LangevinThermostat::getTemperature, &LangevinThermostat::setTemperature)
