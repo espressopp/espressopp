@@ -176,15 +176,13 @@ namespace espressopp {
 			int _numVelsLoc = LatticePar::getNumVelsLoc();
 			real rootRhoLoc = sqrt(12.*m[0]); // factor 12. comes from usage of
 			// not gaussian but uniformly distributed random numbers
-			
+
+//			real rootRhoLoc = sqrt(m[0]); // Gaussian version
+
 			for (int l = 4; l < _numVelsLoc; l++) {
 				m[l] += rootRhoLoc*getPhiLoc(l)*((*LatticePar::rng)() - 0.5);
+//				m[l] += rootRhoLoc*getPhiLoc(l)*((LatticePar::rng)->normal()); //Gaussian
 			}
-			/*	for normally distributed random numbers change
-			 in the previous lines sqrt(12.*getM_i(0)) -> sqrt(getM_i(0)) and
-			 rootRhoLoc*getPhiLoc(l)*((*LatticePar::rng)() - 0.5)) -> 
-			 rootRhoLoc*getPhiLoc(l)*(*LatticePar::normal())
-			 */
 		}
 		
 /*******************************************************************************************/

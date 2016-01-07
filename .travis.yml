@@ -7,7 +7,9 @@ before_install:
  - sudo apt-get update
  - sudo apt-get install cmake libfftw3-dev libopenmpi-dev openmpi-bin
  - if [[ $EXTERNAL = ON ]]; then sudo apt-get install libboost1.55-all-dev python-mpi4py; fi
- - if [[ $EXTERNAL_BOOST159 = ON ]]; then sudo apt-get install libboost1.59-all-dev python-mpi4py; fi
+ - if [[ $EXTERNAL_BOOST159 = ON ]]; then BOOST_URL="http://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.gz"; fi
+ - if [[ $EXTERNAL_BOOST159 = ON ]]; then mkdir boost && travis_retry wget --quiet -O - ${BOOST_URL} | tar --strip-components=1 -xz -C boost; fi 
+ - if [[ $EXTERNAL_BOOST159 = ON ]]; then sudo apt-get install python-mpi4py; fi
  - if [[ $GCC_VERSION ]]; then
      sudo apt-get install g++-${GCC_VERSION} && 
      export CXX=g++-${GCC_VERSION};

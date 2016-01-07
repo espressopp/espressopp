@@ -148,6 +148,7 @@ namespace espressopp {
 			/* END OF SET AND GET DECLARATION */
 
 			/* FUNCTIONS DECLARATION */
+			void initLatticeSize ();
 			void initLatticeModel ();								// initialize lattice model (weights, cis)
 			void initFluctuations ();								// (re)initialize fluctuation parameters
 			void makeLBStep ();											// perform one step of LB
@@ -196,6 +197,7 @@ namespace espressopp {
 
 			/* MPI FUNCTIONS */
 			void findMyNeighbours ();
+			void assignMyLattice ();
 			void commHalo ();							// communicate populations in halo regions to the neighbouring CPUs
 			void copyForcesFromHalo ();		// copy coupling forces from halo regions to the real lattice sites
 			void copyDenMomToHalo ();			// copy den and j from real lattice sites to halo
