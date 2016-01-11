@@ -39,8 +39,8 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(TDforce::theLogger, "TDforce");
 
-    TDforce::TDforce(shared_ptr<System> system, shared_ptr<VerletListAdress> _verletList, real _startdist, real _enddist)
-    :Extension(system), verletList(_verletList), startdist(_startdist), enddist(_enddist) {
+    TDforce::TDforce(shared_ptr<System> system, shared_ptr<VerletListAdress> _verletList, real _startdist, real _enddist, int _edgeweightmultiplier)
+    :Extension(system), verletList(_verletList), startdist(_startdist), enddist(_enddist), edgeweightmultiplier(_edgeweightmultiplier) {
 
         // startdist & enddist are the distances between which the TD force actually acts.
         // This is usually more or less the thickness of the hybrid region. However, the TD force sometimes is applied in a slighty wider area.
@@ -186,8 +186,8 @@ namespace espressopp {
                       if ((dist3Dabs < enddist + buffer) && (dist3Dabs > startdist - buffer)){
                         weight = 1.0 - (dist3Dabs - startdist - buffer) / width; // 0 at edge to CG region, 1 at edge to atomistic region
 
-                        // Direction modification at the edges (TEST)
-                        //weight = pow(weight, 5.0);
+                        // Direction modification at the edges
+                        weight = pow(weight, edgeweightmultiplier);
 
                         // std::cout << "dist3Dabs1: " << dist3Dabs << "\n";
                         // std::cout << "width1: " << width << "\n";
@@ -234,7 +234,7 @@ namespace espressopp {
                               // std::cout << "(dist3Dabs - startdist - buffer)2: " << (dist3Dabs - startdist - buffer) << "\n\n";
 
                               // Direction modification at the edges (TEST)
-                              //weight = pow(weight, 5.0);
+                              weight = pow(weight, edgeweightmultiplier);
 
                             }
                             else{
@@ -359,7 +359,7 @@ namespace espressopp {
 
 
       class_<TDforce, shared_ptr<TDforce>, bases<Extension> >
-        ("integrator_TDforce", init< shared_ptr<System>, shared_ptr<VerletListAdress>, real, real >())
+        ("integrator_TDforce", init< shared_ptr<System>, shared_ptr<VerletListAdress>, real, real, int >())
         .add_property("filename", &TDforce::getFilename)
         .def("connect", &TDforce::connect)
         .def("disconnect", &TDforce::disconnect)

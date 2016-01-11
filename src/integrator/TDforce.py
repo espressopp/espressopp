@@ -47,9 +47,9 @@ from _espressopp import integrator_TDforce
 class TDforceLocal(integrator_TDforce):
 
     #def __init__(self, system, verletlist, center=[], pids=[], sphereAdr=False):
-    def __init__(self, system, verletlist, startdist = 0.0, enddist = 0.0):
+    def __init__(self, system, verletlist, startdist = 0.0, enddist = 0.0, edgeweightmultiplier = 1):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_TDforce, system, verletlist, startdist, enddist)
+            cxxinit(self, integrator_TDforce, system, verletlist, startdist, enddist, edgeweightmultiplier)
 
 # all the below info should come from VerletListAdress
 #            # set center of TD force
