@@ -156,6 +156,11 @@ endif()
 ######################################
 add_subdirectory(src)
 add_subdirectory(contrib)
+if (EXTERNAL_MPI4PY)
+  set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:$ENV{PYTHONPATH}")
+else (EXTERNAL_MPI4PY)
+  set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib:$ENV{PYTHONPATH}")
+endif (EXTERNAL_MPI4PY)
 add_subdirectory(testsuite)
 
 add_custom_target(symlink ALL COMMENT "Creating symlink")
@@ -211,9 +216,9 @@ if ( SPHINX_EXECUTABLE )
    set ( SPHINX_BUILD_ROOT "${CMAKE_SOURCE_DIR}/doc/ug" )
 
    add_custom_target(ug
-      COMMAND ${SPHINX_EXECUTABLE} -b html . _build/html
+      COMMAND ${CMAKE_COMMAND} -E env "${TEST_ENV}" "${SPHINX_EXECUTABLE}" -b html . _build/html
       COMMENT "HTML ug documentation available at ${SPHINX_BUILD_ROOT}/_build/html"
-      DEPENDS ${SPHINX_BUILD_ROOT}/conf.py
+      DEPENDS ${SPHINX_BUILD_ROOT}/conf.py _espressopp
       WORKING_DIRECTORY ${SPHINX_BUILD_ROOT}
    )
 

@@ -1,8 +1,3 @@
-if (EXTERNAL_MPI4PY)
-  set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:$ENV{PYTHONPATH}")
-else (EXTERNAL_MPI4PY)
-  set (TEST_ENV "PYTHONPATH=${CMAKE_BINARY_DIR}:${CMAKE_BINARY_DIR}/contrib:$ENV{PYTHONPATH}")
-endif (EXTERNAL_MPI4PY)
 add_subdirectory(ewald)
 add_subdirectory(pickle_potential)
 add_subdirectory(pi_water)
