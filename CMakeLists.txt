@@ -197,3 +197,27 @@ else ( DOXYGEN_FOUND )
     message ( WARNING "Not building system documentation because Doxygen not found.")
 endif ( DOXYGEN_FOUND )
 
+######################################
+# User documentation (Sphinx)     # 
+######################################
+
+find_program(SPHINX_EXECUTABLE
+  NAMES sphinx-build
+  DOC "Sphinx documentation generation tool (http://www.sphinx-doc.org/)"
+)
+
+if ( SPHINX_EXECUTABLE )
+
+   set ( SPHINX_BUILD_ROOT "${CMAKE_SOURCE_DIR}/doc/ug" )
+
+   add_custom_target(ug
+      COMMAND ${SPHINX_EXECUTABLE} -b html . _build/html
+      COMMENT "HTML ug documentation available at ${SPHINX_BUILD_ROOT}/_build/html"
+      DEPENDS ${SPHINX_BUILD_ROOT}/conf.py
+      WORKING_DIRECTORY ${SPHINX_BUILD_ROOT}
+   )
+
+   message ( STATUS "Generate user documentation via ${SPHINX_EXECUTABLE}: make ug") 
+else ( SPHINX_EXECUTABLE )
+    message ( WARNING "Not building user documentation because Doxygen not found.")
+endif ( SPHINX_EXECUTABLE )
