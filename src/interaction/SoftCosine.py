@@ -20,18 +20,14 @@
 
 
 r"""
-***********************************************
+*************************************
 **espressopp.interaction.SoftCosine**
-***********************************************
+*************************************
 This class provides methods to compute forces and energies ofthe SoftCosine potential.
 
-.. math..
-	V(r) = A \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} -
-	\left( \frac{\sigma}{r} \right)^{6} \right]
+.. math::
 
-
-
-
+   V(r) = A \left[ 1.0 + cos \left( \frac{\pi r}{r_c} \right) \right]
 
 
 .. function:: espressopp.interaction.SoftCosine(A, cutoff, shift)
