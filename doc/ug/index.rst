@@ -34,6 +34,7 @@ Contents:
    overview.rst
    team.rst
    faq.rst
+   instalation.rst
    tutorial.rst
    classdescription.rst
    bib.rst
