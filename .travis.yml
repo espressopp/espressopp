@@ -23,7 +23,7 @@ script:
 after_success:
   - if [[ ${BUILD_UG} = ON && ${TRAVIS_JOB_NUMBER} = *.1 ]]; then
       cd ../doc/ug/_build/html/;
-      if [[ ${TRAVIS_BRANCH} = master && ${TRAVIS_REPO_SLUG} = espressopp/espressopp && ${TRAVIS_PULL_REQUEST} == false ]] && ! git diff --quiet; then
+      if [[ ${TRAVIS_BRANCH} = master && ${encrypted_194b3d1e9306_key} && ${encrypted_194b3d1e9306_iv} && ${TRAVIS_PULL_REQUEST} == false ]]; then
         git config --global user.name "Automatic Deployment (Travis CI)";
         git config --global user.email "espp-devel@listserv.mpip-mainz.mpg.de";
         git add --all && git commit -m "Documentation Update";
