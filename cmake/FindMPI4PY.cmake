@@ -25,14 +25,20 @@ if(PYTHON_EXECUTABLE)
   else()
     set(MPI4PY_VERSION 0.0)
   endif()
+
+  execute_process(COMMAND
+      "${PYTHON_EXECUTABLE}" "-c" "import mpi4py; print mpi4py.get_include()"
+      OUTPUT_VARIABLE MPI4PY_INCLUDE_DIR
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+  
 endif(PYTHON_EXECUTABLE)
 
-find_path (MPI4PY_INCLUDES mpi4py/mpi4py.h HINTS ${PYTHON_SITEDIR}/mpi4py/include )
+find_path (MPI4PY_INCLUDES mpi4py/mpi4py.h HINTS ${MPI4PY_INCLUDE_DIR} ${PYTHON_SITEDIR}/mpi4py/include )
 if(NOT MPI4PY_INCLUDES)
   message("     mpi4py.h not found. Please make sure you have installed the developer version of mpi4py")
 endif()
 
-find_file (MPI4PY_LIBRARIES MPI.so HINTS ${PYTHON_SITEDIR}/mpi4py)
+find_file (MPI4PY_LIBRARIES MPI.so HINTS ${MPI4PY_INCLUDE_DIR}/.. ${PYTHON_SITEDIR}/mpi4py)
 
 # handle the QUIETLY and REQUIRED arguments and set MPI4PY_FOUND to TRUE if
 # all listed variables are TRUE
