@@ -38,3 +38,7 @@ after_success:
 compiler:
   - clang
   - gcc
+
+addons:
+  code_climate:
+   repo_token: 74ff64a9c455ce02fc2b30eac0a40b86c331585185742d1045f40299260f032c
