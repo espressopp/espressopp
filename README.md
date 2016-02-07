@@ -28,4 +28,4 @@ ISSUES:
 Report bugs on the [github issues site](https://github.com/espressopp/espressopp/issues)
 
 
-[![Build Status](https://travis-ci.org/espressopp/espressopp.svg?branch=master)](https://travis-ci.org/espressopp/espressopp)
+[![Build Status](https://travis-ci.org/espressopp/espressopp.svg?branch=master)](https://travis-ci.org/espressopp/espressopp) [![Code Climate](https://codeclimate.com/github/espressopp/espressopp/badges/gpa.svg)](https://codeclimate.com/github/espressopp/espressopp)
