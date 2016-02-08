@@ -59,7 +59,7 @@ extensions = ['sphinx.ext.pngmath',
 # Not yet: numpydoc
 
 # Add any paths that contain templates here, relative to this directory.
-# templates_path = ['_templates']
+templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -68,7 +68,7 @@ source_suffix = '.rst'
 #source_encoding = 'utf-8'
 
 # The master toctree document.
-master_doc = 'index'
+#master_doc = 'index'
 
 # General information about the project.
 project = u'ESPResSo++'
@@ -126,7 +126,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = 'classic'
+#html_theme = 'basic'
 #html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -146,7 +146,7 @@ html_title = '{} v{}'.format(project, version)
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = 'Logo.png'
+#html_logo = 'Logo.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -158,6 +158,8 @@ html_favicon = "_static/favicon.ico"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+html_style = 'default.css'
+
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 #html_last_updated_fmt = '%b %d, %Y'
@@ -167,7 +169,8 @@ html_static_path = ['_static']
 #html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'], }
+html_sidebars = { 
+    '**': ['globaltoc.html', 'custom_links_sidebar.html', 'searchbox.html'], }
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.

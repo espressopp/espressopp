@@ -30,12 +30,6 @@ r"""
 where `r` is either the distance or the capped distance, depending on which is
 greater.
 
-
-
-
-
-
-
 .. function:: espressopp.interaction.LennardJonesCapped(epsilon, sigma, cutoff, caprad, shift)
 
 		:param epsilon: (default: 1.0)
@@ -192,7 +186,9 @@ greater.
 
 		:param potential: 
 		:type potential: 
+
 """
+
 from espressopp import pmi, infinity
 from espressopp.esutil import *
 

@@ -19,9 +19,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 """
-*****************************************
+*******************************************
 **espressopp.interaction.CoulombTruncated**
-*****************************************
+*******************************************
 .. math::
 	U = k\frac{q_iq_j}{d_{ij}}
 
@@ -30,6 +30,7 @@ where `k` is the user-supplied prefactor, `q_i` is the charge of particle `i`, a
 In this interaction potential, a different charge can be associated with each particle. For a truncated Coulomb interaction potential where only one `q_iq_j` value is specified for all interactions, see CoulombTruncatedUniqueCharge.
 
 .. function:: espressopppp.interaction.CoulombTruncated(prefactor, cutoff)
+
 		:param prefactor: (default: 1.0)
 		:param cutoff: (default: infinity)
 		:type prefactor: real
