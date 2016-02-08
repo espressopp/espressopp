@@ -1,9 +1,8 @@
-# Copyright (c) 2015,2016
-#     Jakub Krajniak (jkrajniak at gmail.com)
-#
 # Copyright (c) 2015
 #     Pierre de Buyl
 #
+# Copyright (c) 2015-2016
+#     Jakub Krajniak (jkrajniak at gmail.com)
 #
 #  This file is part of ESPResSo++.
 #
@@ -281,24 +280,19 @@ class DumpH5MDLocal(io_DumpH5MD):
             self.cxxclass.update(self)
 
     def clear_buffers(self):
-        if pmi.workerIsActive():
-            self.cxxclass.clear_buffers(self)
+        self.cxxclass.clear_buffers(self)
 
     def getPosition(self):
-        if pmi.workerIsActive():
-            return self.cxxclass.getPosition(self)
+        return self.cxxclass.getPosition(self)
 
     def getImage(self):
-        if pmi.workerIsActive():
-            return self.cxxclass.getImage(self)
+        return self.cxxclass.getImage(self)
 
     def getVelocity(self):
-        if pmi.workerIsActive():
-            return self.cxxclass.getVelocity(self)
+        return self.cxxclass.getVelocity(self)
 
     def getForce(self):
-        if pmi.workerIsActive():
-            return self.cxxclass.getForce(self)
+        return self.cxxclass.getForce(self)
 
     def getId(self):
         if pmi.workerIsActive():

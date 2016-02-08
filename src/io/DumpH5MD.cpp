@@ -2,7 +2,7 @@
   Copyright (c) 2015
       Pierre de Buyl
 
-  Copyright (c) 2015
+  Copyright (c) 2015-2016
       Jakub Krajniak (jkrajniak at gmail.com)
 
   This file is part of ESPResSo++.
@@ -293,41 +293,3 @@ PyObject* DumpH5MD::getLambda() {
   Py_INCREF(Py_None);
   return Py_None;
 }
-
-PyObject* DumpH5MD::getResId() {
-  if (store_res_id && res_id.len)
-    return PyMemoryView_FromBuffer(&res_id);
-  Py_INCREF(Py_None);
-  return Py_None;
-}
-
-void DumpH5MD::registerPython() {
-  using namespace espressopp::python;  // NOLINT
-
-  class_<DumpH5MD>
-    ("io_DumpH5MD", init< shared_ptr< System >, bool >())
-    .def("update", &DumpH5MD::update)
-    .def("clear_buffers", &DumpH5MD::clear_buffers)
-    .def("getPosition", &DumpH5MD::getPosition)
-    .def("getImage", &DumpH5MD::getImage)
-    .def("getId", &DumpH5MD::getId)
-    .def("getSpecies", &DumpH5MD::getSpecies)
-    .def("getState", &DumpH5MD::getState)
-    .def("getVelocity", &DumpH5MD::getVelocity)
-    .def("getForce", &DumpH5MD::getForce)
-    .def("getMass", &DumpH5MD::getMass)
-    .def("getCharge", &DumpH5MD::getCharge)
-    .def("getLambda", &DumpH5MD::getLambda)
-    .def("getResId", &DumpH5MD::getResId)
-    .add_property("NLocal", &DumpH5MD::get_NLocal)
-    .add_property("store_position", &DumpH5MD::get_store_position, &DumpH5MD::set_store_position)
-    .add_property("store_species", &DumpH5MD::get_store_species, &DumpH5MD::set_store_species)
-    .add_property("store_state", &DumpH5MD::get_store_state, &DumpH5MD::set_store_state)
-    .add_property("store_velocity", &DumpH5MD::get_store_velocity, &DumpH5MD::set_store_velocity)
-    .add_property("store_force", &DumpH5MD::get_store_force, &DumpH5MD::set_store_force)
-    .add_property("store_charge", &DumpH5MD::get_store_charge, &DumpH5MD::set_store_charge)
-    .add_property("store_lambda", &DumpH5MD::get_store_lambda, &DumpH5MD::set_store_lambda)
-    .add_property("store_res_id", &DumpH5MD::get_store_res_id, &DumpH5MD::set_store_res_id);
-}
-}  // namespace io
-}  // namespace espressopp
