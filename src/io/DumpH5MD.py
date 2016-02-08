@@ -1,7 +1,7 @@
 # Copyright (c) 2015
 #     Pierre de Buyl
 #
-# Copyright (c) 2015
+# Copyright (c) 2015-2016
 #     Jakub Krajniak (jkrajniak at gmail.com)
 #
 #  This file is part of ESPResSo++.
@@ -32,8 +32,52 @@ This module provides a writer for H5MD_ file format.
     :type system: espressopp.System
     :param filename: The file name.
     :type filename: str
+    :param group_name: The name of particle group.
+    :type group_name: str
+    :param is_adress: If positive then store position of AdResS particles
+    :type is_adress: bool
+    :param author: The name of author of this file
+    :type author: str
+    :param email: The e-mail address to the author.
+    :type email: str
+    :param chunk_size:
+    :type chunk_size: int
+    :param store_*: The flags to decide what is store in the file.
+    :type store_*: bool
+    :param static_box: box size written as time-independent variable
+    :type static_box: bool
 
     :rtype: The DumpH5MD writer.
+
+Flags
+++++++++++++++++++
+
+- store_position: saves position of particles.
+- store_species: saves the type of particles.
+- store_state: saves chemical state of particles.
+- store_velocity: saves velocity
+- store_force: saves force
+- store_charge: saves charge
+- store_lambda: saves the value of lambda parameter (useful in AdResS simulations)
+- store_res_id: saves residue id
+
+Example
++++++++
+
+>>> traj_file = espressopp.io.DumpH5MD(
+        system, output_file,
+        group_name='atoms',
+        static_box=False,
+        author='xxx',
+        email='xxx@xxx',
+        store_species=True,
+        store_velocity=True,
+        store_state=True,
+        store_lambda=True)
+
+>>> for s in range(steps):
+        integrator.run(int_steps)
+        traj_file.dump(s*int_steps, s*int_steps*integrator.dt)
 
 .. _H5MD: http://nongnu.org/h5md/
 
@@ -160,7 +204,7 @@ class DumpH5MDLocal(io_DumpH5MD):
 
     def _system_data(self):
         """Stores specific information about simulation."""
-        # Creates /system group 
+        # Creates /system group
         parameters = {
             'software-id': 'espressopp',
             'rng-seed': self.system.rng.get_seed(),
@@ -169,13 +213,13 @@ class DumpH5MDLocal(io_DumpH5MD):
         if self.system.integrator is not None:
             parameters['dt'] = self.system.integrator.dt
         self.set_parameters(parameters)
-    
+
     def set_parameters(self, paramters):
         if 'parameters' not in self.file.f:
             self.file.f.create_group('parameters')
         g_params = self.file.f['parameters']
         for k, v in paramters.iteritems():
-            g_params.attrs[k] = v 
+            g_params.attrs[k] = v
 
     def get_file(self):
         return self.file.f

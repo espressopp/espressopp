@@ -19,7 +19,7 @@
 
 r"""
 *********************************************
-**espressopp.io.DumpTopology**
+**DumpTopology** - IO object
 *********************************************
 
 .. function:: espressopp.io.DumpTopology(system, integrator, h5md_file)
@@ -29,6 +29,7 @@ r"""
    :param integrator: The integrator object.
    :type integrator: espressopp.integrator.MDIntegrator
    :param h5md_file: The H5MD file object.
+   :type h5md_file: espressopp.io.DumpH5MD
 
 .. function:: espressopp.io.DumpTopology.dump()
 

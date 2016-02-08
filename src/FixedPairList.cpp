@@ -302,6 +302,14 @@ namespace espressopp {
       sigOnParticlesChanged.disconnect();
   }
 
+  int FixedPairList::totalSize() {
+    int local_size = globalPairs.size();
+    int global_size;
+    System& system = storage->getSystemRef();
+    mpi::all_reduce(*system.comm, local_size, global_size, std::plus<int>());
+    return global_size;
+  }
+
   /****************************************************
   ** REGISTRATION WITH PYTHON
   ****************************************************/
