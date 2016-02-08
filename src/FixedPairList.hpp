@@ -76,7 +76,7 @@ namespace espressopp {
 	    	return globalPairs.size();
 	    }
 
-      int virtual totalSize();
+      int totalSize();
 
 	    static void registerPython();
 
