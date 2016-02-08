@@ -1,4 +1,4 @@
-#  Copyright (c) 2015
+#  Copyright (c) 2015-2016
 #      Jakub Krajniak (jkrajniak at gmail.com)
 #
 #  This file is part of ESPResSo++.
@@ -19,15 +19,57 @@
 
 r"""
 *********************************************
-**DumpPairs** - IO Object
+**espressopp.io.DumpTopology**
 *********************************************
 
-* `dump()`
+.. function:: espressopp.io.DumpTopology(system, integrator, h5md_file)
 
-  Properties
+   :param system: The ESPP System object.
+   :type system: espressopp.System
+   :param integrator: The integrator object.
+   :type integrator: espressopp.integrator.MDIntegrator
+   :param h5md_file: The H5MD file object.
 
-* `h5md_file`
-  HDF5 file object.
+.. function:: espressopp.io.DumpTopology.dump()
+
+   Store data from tuple into memory.
+
+.. function:: espressopp.io.DumpTopology.observe_tuple(fpl, name, particle_group)
+
+   :param fpl: The FixedPairList object.
+   :type fpl: espressopp.FixedPairList
+   :param name: The name of the tuple to store in H5MD file.
+   :type name: str
+   :param particle_group: The particle group to referee to.
+   :type particle_group: str
+
+.. function:: espressopp.io.DumpTopology.update()
+
+   Update H5MD file.
+
+Example
++++++++
+
+The code belows dump topology every 10 time steps and stores pairs from
+FixedPairList `fpl`.
+
+>>> traj_file = espressopp.io.DumpH5MD(
+        system, output_file,
+        group_name='atoms',
+        static_box=False,
+        author='xxx',
+        email='xxx@xxx',
+        store_species=True,
+        store_velocity=True,
+        store_state=True,
+        store_lambda=True)
+
+>>> dump_topol = espressopp.io.DumpTopology(system, integrator, traj_file)
+>>> dump_topol.observe_tuple(fpl_a_a, 'fpl')
+>>> dump_topol.dump()
+>>> dump_topol.update()
+>>> ext_dump = espressopp.integrator.ExtAnalyze(dump_topol, 10)
+>>> integrator.addExtension(ext_dump)
 """
 
 from espressopp.esutil import cxxinit
