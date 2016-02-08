@@ -48,6 +48,21 @@ namespace espressopp {
     real drift;
     real lambdaDeriv;
     int state;
+    int res_id;
+
+    static void registerPython();
+
+    void init() {
+      id = 0;
+      type = 0;
+      mass = 1.0;
+      q = 0.0;
+      lambda = 0.0;
+      lambdaDeriv = 0.0;
+      state = 0;
+      res_id = 0;
+    }
+
   private:
     friend class boost::serialization::access;
     template< class Archive >
@@ -61,6 +76,7 @@ namespace espressopp {
       ar & drift;
       ar & lambdaDeriv;
       ar & state;
+      ar & res_id;
     }
   };
 
@@ -199,6 +215,7 @@ namespace espressopp {
       p.lambdaDeriv  = 0.0;
       r.extVar       = 0.0;      
       p.state        = 0;
+      p.res_id       = 0;
     }
 
     // getter and setter used for export in Python
@@ -310,6 +327,12 @@ namespace espressopp {
     const int& state() const { return p.state; }
     int getState() const { return p.state; }
     void setState(const int& _state) { p.state = _state; }
+
+    // res_id (eg. define the id of the polymer chain)
+    int& res_id() { return p.res_id; }
+    const int& res_id() const { return p.res_id; }
+    int getResId() const { return p.res_id; }
+    void setResId(const int& _res_id) { p.res_id = _res_id; }
 
     static void registerPython();
   

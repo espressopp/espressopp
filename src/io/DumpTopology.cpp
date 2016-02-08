@@ -19,8 +19,8 @@
 */
 
 #include "python.hpp"
-#include <vector>
 #include "DumpTopology.hpp"
+#include <vector>
 
 
 namespace espressopp {
@@ -65,7 +65,7 @@ python::list DumpTopology::GetData() {
 
 // Python wrapping
 void DumpTopology::registerPython() {
-  using namespace espressopp::python;
+  using namespace espressopp::python;  //NOLINT
 
   class_<DumpTopology, bases<ParticleAccess>, boost::noncopyable>
       ("io_DumpTopology", init<shared_ptr<System>, shared_ptr<integrator::MDIntegrator> >())
@@ -75,5 +75,5 @@ void DumpTopology::registerPython() {
       .def("observe_tuple", &DumpTopology::ObserveTuple);
 }
 
-}
-}
+}  // namespace io
+}  // namespace espressopp

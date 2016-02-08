@@ -25,6 +25,7 @@
 #include "DumpGRO.hpp"
 #include "DumpGROAdress.hpp"
 #include "DumpH5MD.hpp"
+#include "DumpTopology.hpp"
 #include "FileBackup.hpp"
 
 namespace espressopp {
@@ -34,6 +35,7 @@ namespace espressopp {
       DumpGRO::registerPython();
       DumpGROAdress::registerPython();
       DumpH5MD::registerPython();
+      DumpTopology::registerPython();
     }
   }
 }

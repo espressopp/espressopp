@@ -57,6 +57,7 @@ class DumpH5MDLocal(io_DumpH5MD):
                  store_force=False,
                  store_charge=False,
                  store_lambda=False,
+                 store_res_id=False,
                  static_box=True,
                  is_adress=False,
                  author='xxx',
@@ -74,6 +75,7 @@ class DumpH5MDLocal(io_DumpH5MD):
             store_force: If set to True then force will be stored. (default: False)
             store_charge: If set to True then charge will be stored. (default: False)
             store_lambda: If set to True then lambda (AdResS) will be stored. (default: False)
+            store_res_id: If set to True then store res_id. (default: False)
             static_box: If set to True then box is static (like in NVT ensemble) (default: True)
             is_adress: If set to True then AdResS particles will be save instead of
                 coarse-grained.
@@ -93,6 +95,7 @@ class DumpH5MDLocal(io_DumpH5MD):
         self.store_force = store_force
         self.store_charge = store_charge
         self.store_lambda = store_lambda
+        self.store_res_id = store_res_id
         self.static_box = static_box
         self.chunk_size = chunk_size
 
@@ -148,16 +151,34 @@ class DumpH5MDLocal(io_DumpH5MD):
             self.lambda_adr = part.trajectory(
                 'lambda_adr', (self.chunk_size,), np.float64,
                 chunks=(1, self.chunk_size), fillvalue=-1)
+        if self.store_res_id:
+            self.res_id = part.trajectory(
+                'res_id', (self.chunk_size, ), np.int,
+                chunks=(1, self.chunk_size), fillvalue=-1)
+
+        self._system_data()
 
     def _system_data(self):
         """Stores specific information about simulation."""
-        # Creates /system group
-        sys_group = self.file.f.create_group('parameters')
-        sys_group.attrs['software-id'] = 'espressopp'
-        sys_group.attrs['rng-seed'] = self.system.rng.get_seed()
-        sys_group.attrs['skin'] = self.system.skin
+        # Creates /system group 
+        parameters = {
+            'software-id': 'espressopp',
+            'rng-seed': self.system.rng.get_seed(),
+            'skin': self.system.skin,
+        }
         if self.system.integrator is not None:
-            sys_group.attrs['dt'] = self.system.integrator.dt
+            parameters['dt'] = self.system.integrator.dt
+        self.set_parameters(parameters)
+    
+    def set_parameters(self, paramters):
+        if 'parameters' not in self.file.f:
+            self.file.f.create_group('parameters')
+        g_params = self.file.f['parameters']
+        for k, v in paramters.iteritems():
+            g_params.attrs[k] = v 
+
+    def get_file(self):
+        return self.file.f
 
     def update(self):
         if pmi.workerIsActive():
@@ -196,6 +217,9 @@ class DumpH5MDLocal(io_DumpH5MD):
     def getLambdaAdr(self):
         return self.cxxclass.getLambda(self)
 
+    def getResId(self):
+        return self.cxxclass.getResId(self)
+
     def dump(self, step, time):
         if not pmi.workerIsActive():
             return
@@ -208,7 +232,7 @@ class DumpH5MDLocal(io_DumpH5MD):
         idx_0 = MPI.COMM_WORLD.rank*cpu_size
         idx_1 = idx_0+NLocal
 
-        # Store ids.
+        # Store ids. Always!
         id_ar = np.asarray(self.getId())
         if total_size > self.id_e.value.shape[1]:
             self.id_e.value.resize(total_size, axis=1)
@@ -276,14 +300,21 @@ class DumpH5MDLocal(io_DumpH5MD):
                 self.lambda_adr.value.resize(total_size, axis=1)
             self.lambda_adr.append(lambda_adr, step, time, region=(idx_0, idx_1))
 
-    def close_file(self):
-        self.file.close()
+        # Store res_id
+        if self.store_res_id:
+            res_id = np.asarray(self.getResId())
+            if total_size > self.res_id.value.shape[1]:
+                self.res_id.value.resize(total_size, axis=1)
+            self.res_id.append(res_id, step, time, region=(idx_0, idx_1))
 
     def close(self):
-        self.file.close()
+        if pmi.workerIsActive():
+            self.file.f.close()
 
     def flush(self):
-        self.file.flush()
+        if pmi.workerIsActive():
+            self.file.flush()
+
 
 if pmi.isController:
     class DumpH5MD(object):
@@ -291,8 +322,7 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls='espressopp.io.DumpH5MDLocal',
             pmicall=['update', 'getPosition', 'getId', 'getSpecies', 'getState', 'getImage',
-                     'getVelocity', 'getMass', 'getCharge',
-                     'close_file', 'dump', 'clear_buffers', 'flush', 'close'],
+                     'getVelocity', 'getMass', 'getCharge', 'getResId',
+                     'dump', 'clear_buffers', 'flush', 'get_file', 'close', 'set_parameters'],
             pmiproperty=['store_position', 'store_species', 'store_state', 'store_velocity',
-                         'store_charge']
-        )
+                         'store_charge', 'store_res_id', 'store_lambda'])

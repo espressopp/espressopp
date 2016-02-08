@@ -27,6 +27,7 @@ from espressopp.io.DumpGRO import *
 from espressopp.io.DumpGROAdress import *
 try:
     from espressopp.io.DumpH5MD import *
+    from espressopp.io.DumpTopology import *
 except ImportError as ex:
     import warnings
     warnings.warn('H5MD format not supported ({})'.format(ex))
