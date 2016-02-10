@@ -23,19 +23,26 @@ before_install:
  - ln -s /usr/bin/ccache "$HOME/bin/clang++"
  - ln -s /usr/bin/ccache "$HOME/bin/clang"
  - if [[ ${EXTERNAL} = ON ]]; then pip install --user mpi4py==1.3.1; fi 
+ - if [[ ${COVERAGE}  ]]; then pip install --user codecov; fi 
 
 env: #maybe add mpich later
   global:
     - CCACHE_CPP2=yes
   matrix:
     - EXTERNAL=ON BUILD_UG=ON CMAKE_VERSION=3.1.3-Linux-x86_64
+    - EXTERNAL=ON COVERAGE=ON
     - EXTERNAL=OFF
+
+matrix:
+  exclude:
+    - compiler: clang
+      env: EXTERNAL=ON COVERAGE=ON #clang has no coverage support 
 
 script:
   - mkdir build && cd build && 
-    PATH="$HOME/bin:/usr/lib/ccache:$PATH" cmake -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL .. && 
+    PATH="$HOME/bin:/usr/lib/ccache:$PATH" cmake -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL ${COVERAGE:+-DUSE_GCOV=ON} .. && 
     make -j4 all ${BUILD_UG:+ug} &&
-    make test ARGS="-V" &&
+    make test ARGS="-V ${COVERAGE:+ -E pi_water}" &&
     make install DESTDIR="${HOME}"
 
 after_success:
@@ -52,6 +59,7 @@ after_success:
         git diff --no-color;
       fi;
     fi
+  - if [[ ${COVERAGE} ]]; then PATH=/usr/bin find . -type f -name "*.gcno" -execdir gcov {} + &>/dev/null && cd .. && codecov; fi
 
 cache:
   directories:
@@ -60,7 +68,3 @@ cache:
 compiler:
   - clang
   - gcc
-
-addons:
-  code_climate:
-   repo_token: 74ff64a9c455ce02fc2b30eac0a40b86c331585185742d1045f40299260f032c
