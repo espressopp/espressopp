@@ -57,7 +57,7 @@ after_success:
         chmod 600 ~/.ssh/id_rsa;
         git push git@github.com:espressopp/espressopp.github.io.git master;
       else
-        git diff --no-color;
+        git diff --no-color | head -n 500;
       fi;
     fi
   - if [[ ${COVERAGE} ]]; then PATH=/usr/bin find . -type f -name "*.gcno" -execdir gcov {} + &>/dev/null && cd .. && codecov; fi
