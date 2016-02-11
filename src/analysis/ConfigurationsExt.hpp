@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2016
+      Max Planck Institute for Polymer Research & Johannes Gutenberg-Universität Mainz
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -65,7 +67,7 @@ namespace espressopp {
       bool getUnfolded(){return unfolded;}
       void setUnfolded(bool v){unfolded = v;}
 
-      /** Gake a snapshot of all current particle positions. */
+      /** Take a snapshot of all current particle positions. */
 
       void gather();
 

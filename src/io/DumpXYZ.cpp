@@ -1,5 +1,7 @@
 /*
-  Copyright (C) 2012-2015
+  Copyright (C) 2016
+      Max Planck Institute for Polymer Research & Johannes Gutenberg-Universität Mainz
+  Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -20,14 +22,16 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
-#include "python.hpp"
 #include <fstream>
-#include "analysis/ConfigurationExt.hpp"
-#include "analysis/ConfigurationsExt.hpp"
+
 #include "DumpXYZ.hpp"
 #include "storage/Storage.hpp"
 #include "Particle.hpp"
+
 #include "bc/BC.hpp"
+
+#include "analysis/ConfigurationExt.hpp"
+#include "analysis/ConfigurationsExt.hpp"
 
 using namespace espressopp;
 using namespace espressopp::analysis;
@@ -40,15 +44,12 @@ namespace espressopp {
       shared_ptr<System> system = getSystem();
       ConfigurationsExt conf( system );
       conf.setUnfolded(unfolded);
-      //conf.gather();
       conf.gather_modified();
       if( system->comm->rank()==0 ){
         ConfigurationExtPtr conf_real = conf.back();
         
         size_t num_of_particles = conf_real->getSize();
 
-        //size_t num_of_particles = system->storage->getNRealParticles();
-        
         char *ch_f_name = new char[file_name.length() + 1];
         strcpy(ch_f_name, file_name.c_str());
         ofstream myfile (ch_f_name, ios::out | ios::app);
@@ -75,44 +76,12 @@ namespace espressopp {
           ConfigurationExtIterator cei = conf_real-> getIterator();
           
           for (size_t i = 0; i < num_of_particles; i++) {
-          
-            //myfile << cei.Id() << " " << length_factor * cei.Properties() << endl;
-
-        	  size_t idi = cei.Id();
+          	  size_t idi = cei.Id();
         	  size_t tipolo = conf_real->getType(idi);// better without querying pid. don't care now
-            //myfile << idi << " " << tipolo << " " << length_factor * cei.Properties() << endl;
-            myfile << tipolo << " " << length_factor * cei.Properties() << endl; // strictly XYZ/V: type XYZ VXVYVZ
-            // now trying to drop velocities...
-
-            cei.nextParticle();
-        	  //Particle* part = system->storage->lookupRealParticle(pids_part[i]);
-
+        	  myfile << tipolo << " " << length_factor * cei.Properties() << endl; // strictly XYZ/V: type XYZ VXVYVZ
+        	  cei.nextParticle();
           }
-          //  previous code with if branch but fixed pids below.
-          //  TODO: Keep if else or bring just one loop?
-          //  Probably can just remove below as the resulting configs from the two versions
-          //  (above for loop and below for loop ) give no diffs.
-         
-          /*  
-          if(length_factor == 1.0){
-            for(size_t i=0; i<num_of_particles; i++){
-              // in repo
-              //myfile << "  0  " << cei.nextProperties() << endl;
-              
-              // apply fix
-              
-              myfile << cei.Id() << " " << cei.Properties() << endl;
-              cei.nextParticle();
-              
-            }
-          }
-          else{
-            for(size_t i=0; i<num_of_particles; i++){
-              //myfile << "  0  " << length_factor * cei.nextProperties() << endl;
-              myfile << cei.Id() << " " << length_factor * cei.Properties() << endl;
-              cei.nextParticle();
-            }
-          } */
+
           myfile.close();
         }
         else cout << "Unable to open file: "<< file_name <<endl;

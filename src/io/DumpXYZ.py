@@ -1,3 +1,6 @@
+#  Copyright (C) 2016
+#      Max Planck Institute for Polymer Research & Johannes
+#      Gutenberg-Universitaet Mainz
 #  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
@@ -70,7 +73,7 @@ For example, the Lennard-Jones model for liquid argon with :math:`\sigma=0.34 [n
 
 >>> dump_conf_xyz = espressopp.io.DumpXYZ(system, integrator, filename='trj.xyz', unfolded=False, length_factor=0.34, length_unit='nm', append=True)
 
-will produce trj.xyz with in nanometers
+will produce trj.xyz with  in nanometers // Federico P. comment: what in nanometers? It's clear coordinate but please don't leave sentence hanging!
 
 .. function:: espressopp.io.DumpXYZ(system, integrator, filename, unfolded, length_factor, length_unit, append)
 
@@ -106,7 +109,7 @@ class DumpXYZLocal(ParticleAccessLocal, io_DumpXYZ):
     cxxinit(self, io_DumpXYZ, system, integrator, filename, unfolded, length_factor, length_unit, append)
   
   def dump(self):
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+    if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       self.cxxclass.dump(self)
   
   

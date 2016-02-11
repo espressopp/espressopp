@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2016
+      Max Planck Institute for Polymer Research & Johannes Gutenberg-Universität Mainz
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -60,8 +62,7 @@ namespace espressopp {
           particleProperties[index].setDimension(vec.getDimension());
           particleProperties[index] = vec;
           particleType[index] = typ;
-          //coordinates[index] = Real3D(x, y, z);
-          //velocities[index] = Real3D(vx, vy, vz);
+
         }
 
 
@@ -86,7 +87,7 @@ namespace espressopp {
     }
     */
 
-    // F.Padua: temp fix for better DumpXYZ support
+    // get particle's type given the PID
     size_t ConfigurationExt::getType(size_t index)
         {
           return particleType[index];

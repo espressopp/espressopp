@@ -1,5 +1,7 @@
 /*
-  Copyright (C) 2012-2015
+  Copyright (C) 2016
+      Max Planck Institute for Polymer Research & Johannes Gutenberg-Universität Mainz
+  Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -24,13 +26,13 @@
 #ifndef _IO_DUMPXYZ_HPP
 #define _IO_DUMPXYZ_HPP
 
+#include "ParticleAccess.hpp"
 #include "integrator/MDIntegrator.hpp"
 #include "io/FileBackup.hpp"
 
 #include "esutil/Error.hpp"
 
 #include <string>
-#include "ParticleAccess.hpp"
 
 namespace espressopp {
   namespace io{
@@ -49,11 +51,11 @@ namespace espressopp {
                         ParticleAccess(system), 
                         integrator(_integrator),
                         file_name( _file_name ),
-                        unfolded(_unfolded),  // default should be unfolded right? where is this?
+                        unfolded(_unfolded),
                         length_factor(_length_factor), 
                         append(_append){ 
         setLengthUnit(_length_unit);
-        if (system->comm->rank() == 0  && !append) // why when is not append?
+        if (system->comm->rank() == 0  && !append)
           FileBackup backup(file_name);
       }
       ~DumpXYZ() {}
