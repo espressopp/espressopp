@@ -1,3 +1,5 @@
+#  Copyright (C) 2015
+#      Jakub Krajniak (jkrajniak at gmail.com)
 #  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
@@ -54,11 +56,13 @@ Example (not complete):
 .. function:: espressopp.System()
 
 
-.. function:: espressopp.System.addInteraction(interaction)
+.. function:: espressopp.System.addInteraction(interaction, name)
 
 		:param interaction: 
 		:type interaction: 
-		:rtype: 
+		:param name: The optional name of the interaction.
+		:type name: string
+		:rtype: bool
 
 .. function:: espressopp.System.getInteraction(number)
 
@@ -75,6 +79,14 @@ Example (not complete):
 		:param number: 
 		:type number: 
 		:rtype: 
+
+.. function:: espressopp.System.removeInteractionByName(self, name)
+
+		:param name: The name of the interaction to remove.
+		:type name: str
+
+.. function:: espressopp.System.getAllInteractions()
+		:rtype: The dictionary with name as a key and Interaction object.
 
 .. function:: espressopp.System.scaleVolume(\*args)
 
@@ -107,15 +119,49 @@ class SystemLocal(_espressopp.System):
         else :
             cxxinit(self, _espressopp.System, pmi._MPIcomm)
 
-    def addInteraction(self, interaction):
+        self._integrator = None
+        self._interaction2id = {}
+        self._interaction_pid = 0
+
+    @property
+    def integrator(self):
+        return self._integrator
+
+    @integrator.setter
+    def integrator(self, _integrator):
+        self._integrator = _integrator
+
+    def addInteraction(self, interaction, name=None):
 
         if pmi.workerIsActive():
-            return self.cxxclass.addInteraction(self, interaction)
+            ret_val = self.cxxclass.addInteraction(self, interaction)
+            if name is not None:
+                if name in self._interaction2id:
+                    raise RuntimeError('Interaction with name {} already defined.'.format(name))
+                self._interaction2id[name] = self._interaction_pid
+            self._interaction_pid += 1
+            return ret_val
 
     def removeInteraction(self, number):
 
         if pmi.workerIsActive():
             self.cxxclass.removeInteraction(self, number)
+
+    def removeInteractionByName(self, name):
+        if pmi.workerIsActive():
+            if name not in self._interaction2id:
+                raise RuntimeError('Interaction {} not found'.format(name))
+            interaction_id = self._interaction2id[name]
+            self.cxxclass.removeInteraction(self, interaction_id)
+            self._interaction2id = {
+                k: v if v < interaction_id else v - 1
+                for k, v in self._interaction2id.iteritems()
+                }
+            self._interaction_pid = max(self._interaction2id.values()) + 1
+
+    def getAllInteractions(self):
+        if pmi.workerIsActive():
+            return {k: self.getInteraction(v) for k, v in self._interaction2id.items()}
 
     def getNumberOfInteractions(self):
 
@@ -133,6 +179,10 @@ class SystemLocal(_espressopp.System):
                     raise Error("Interaction number %i does not exist" % number)
             else:
                 raise Error("interaction list of system is empty")
+
+    def getInteractionByName(self, name):
+        if pmi.workerIsActive():
+            return self.getInteraction(self._interaction2id[name])
             
     def scaleVolume(self, *args):
 
@@ -170,8 +220,9 @@ if pmi.isController:
     __metaclass__ = pmi.Proxy
     pmiproxydefs = dict(
       cls = 'espressopp.SystemLocal',
-      pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff'],
-      pmicall = ['addInteraction','removeInteraction','getInteraction',
-            'getNumberOfInteractions','scaleVolume', 'setTrace']
+      pmiproperty = ['storage', 'bc', 'rng', 'skin', 'maxCutoff', 'integrator'],
+      pmicall = ['addInteraction','removeInteraction', 'removeInteractionByName',
+            'getInteraction', 'getNumberOfInteractions','scaleVolume', 'setTrace',
+            'getAllInteractions', 'getInteractionByName']
     )
 

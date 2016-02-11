@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012-2015
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -20,16 +20,14 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
+#include "python.hpp"
 #include <fstream>
-
+#include "analysis/ConfigurationExt.hpp"
+#include "analysis/ConfigurationsExt.hpp"
 #include "DumpXYZ.hpp"
 #include "storage/Storage.hpp"
 #include "Particle.hpp"
-
 #include "bc/BC.hpp"
-
-#include "analysis/ConfigurationExt.hpp"
-#include "analysis/ConfigurationsExt.hpp"
 
 using namespace espressopp;
 using namespace espressopp::analysis;
