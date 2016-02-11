@@ -3,39 +3,26 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-ESPResSo++ Documentation
+ESPResSo++
 ========================
 
 .. |espp| replace:: ESPResSo++
 
-|espp| is an extensible, flexible, fast and parallel simulation software 
-for soft matter research.
+**Welcome to the homepage of the ESPResSo++ project**
 
-It is the successor of the `ESPResSo <http://espressoppmd.org>`_ simulation package.
-|espp| is a highly versatile software package for the scientific simulation 
-and analysis of coarse-grained atomistic or bead-spring models as
-used in soft matter research. It also supports charged systems. 
+|espp| is an extensible, flexible, fast and parallel simulation software for soft matter research.
+It is a highly versatile software package for the scientific simulation and analysis
+of coarse-grained atomistic or bead-spring models as they are used in soft matter research.
 
-Contents:
+`ESPResSo <http://espressomd.org>`_ and |espp| have common roots and share parts of
+the developer/user community. However their development is independent and they 
+are different software packages. 
 
-.. toctree::
-   :maxdepth: 2
+|espp| is free, open-source software published under the GNU General Public License (GPL).
 
-   overview.rst
-   team.rst
-   faq.rst
-   tutorial.rst
-   classdescription.rst
-   logging.rst
-   bib.rst
+**Please cite this, if you used ESPResSo++ in your research**
+    J. D. Halverson, T. Brandes, O. Lenz, A. Arnold, S. Bevc, V. Starchenko, K. Kremer, T. Stuehn, D. Reith, "ESPResSo++: A Modern Multiscale Simulation Package for Soft Matter Systems", Computer Physics Communications, 184 (2013), pp. 1129-1149
+    DOI: 10.1016/j.cpc.2012.12.004
+    Online access: http://dx.doi.org/10.1016/j.cpc.2012.12.004
 
-.. toctree::
-   :maxdepth: 2
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+`Recent publications where ESPResSo++ was used <https://scholar.google.com/scholar?cites=16263384330356203698&as_sdt=2005&sciodt=0,5&hl=pl>`_

@@ -1,65 +1,39 @@
-<div id="outer">
-
-{% extends "basic/layout.html" %}
+{% extends "!layout.html" %}
 
 {% block header %}
+  <div id="outer">
   <div class="header"></div>
 {% endblock %}
+
 {% block relbar1 %}{% endblock %}
 
 {%- block content %}
-
-  {% block sidebar1 %}
-    <div class="menu">
-      <ul class="nav">
-	<li><a href="../index.html">Home</a></li>
-	<li><a href="../Features.html">Features</a></li>
-	<li><a href="../Download.html">Download</a></li>
-	<li><a href="index.html">Documentation</a></li>
-	<li><a href="../Developer_Team.html">Developer Team</a></li>
-	<li><a href="../Getting_Help.html">Getting Help</a></li>
-	<li id="impressum"><a href="../Impressum.html">Impressum</a></li>
-      </ul>
-      <div id="searchbox" style="display: none">
-	<form class="search" action="{{ pathto('search') }}" method="get">
-	  <input type="text" name="q" size="12" />
-	  <input type="submit" value="{{ _('Search') }}" />
-	  <input type="hidden" name="check_keywords" value="yes" />
-	  <input type="hidden" name="area" value="default" />
-	</form>
-      </div>
-      <script type="text/javascript">$('#searchbox').show(0);</script>
-    </div>
-  {% endblock %} 
-
-  <div class="document">
+{% block sidebar1 %}
+{{ sidebar() }}
+{% endblock %} 
     {%- block document %}
-      <div class="documentwrapper">
+  <div class="document">
+    <div class="documentwrapper">
 	<div class="bodywrapper">
 	  <div class="body">
-            {%if prev %}
-             <a href="{{ prev.link|e }}">previous</a>
-            {% endif %}
-            {%if next %}
-             <a style="float:right;"  href="{{ next.link|e }}">next</a>
-            {% endif %}
 	    {% block body %} {% endblock %}
-            {%if prev %}
-             <a href="{{ prev.link|e }}">previous</a>
-            {% endif %}    
-            {%if next %}
-             <a style="float:right;"  href="{{ next.link|e }}">next</a>
-            {% endif %}
-          </div>
-        </div>
+      </div>
+     </div>
      </div>
     {%- endblock %} 
- </div>
+  </div>
 
 {%- endblock %}
 
 {% block relbar2 %}{% endblock %}
 {% block sidebar2 %}{% endblock %}
-{% block footer %}{% endblock %}
+{% block footer %}
+{{ super() }}
+  <div class="footer">
+      <a href="http://www.mpip-mainz.mpg.de"><img src="static/mpip_logo.png" id="mpip_logo"></a>
+      <a href="http://www.scai.fraunhofer.de"><img src="static/scai_logo.png" id="scai_logo"></a>
+  </div>
+  </div>
+{% endblock %}
 
 </div>
