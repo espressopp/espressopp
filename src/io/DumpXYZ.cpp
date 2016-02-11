@@ -24,6 +24,7 @@
 
 #include "DumpXYZ.hpp"
 #include "storage/Storage.hpp"
+#include "Particle.hpp"
 
 #include "bc/BC.hpp"
 
@@ -41,11 +42,14 @@ namespace espressopp {
       shared_ptr<System> system = getSystem();
       ConfigurationsExt conf( system );
       conf.setUnfolded(unfolded);
-      conf.gather();
+      //conf.gather();
+      conf.gather_modified();
       if( system->comm->rank()==0 ){
         ConfigurationExtPtr conf_real = conf.back();
         
         size_t num_of_particles = conf_real->getSize();
+
+        //size_t num_of_particles = system->storage->getNRealParticles();
         
         char *ch_f_name = new char[file_name.length() + 1];
         strcpy(ch_f_name, file_name.c_str());
@@ -56,6 +60,9 @@ namespace espressopp {
           
           Real3D Li = system->bc->getBoxL();
           
+
+          //python::list pids_part = system->storage->getRealParticleIDs();
+
           // for noncubic simulation boxes
           //TODO: let's decide if you want these hanging 0.0s as in the default repo version or get rid!
           myfile << Li[0] * length_factor << "  0.0  0.0  0.0  "<< 
@@ -71,8 +78,17 @@ namespace espressopp {
           
           for (size_t i = 0; i < num_of_particles; i++) {
           
-            myfile << cei.Id() << " " << length_factor * cei.Properties() << endl;
+            //myfile << cei.Id() << " " << length_factor * cei.Properties() << endl;
+
+        	  size_t idi = cei.Id();
+        	  size_t tipolo = conf_real->getType(idi);// better without querying pid. don't care now
+            //myfile << idi << " " << tipolo << " " << length_factor * cei.Properties() << endl;
+            myfile << tipolo << " " << length_factor * cei.Properties() << endl; // strictly XYZ/V: type XYZ VXVYVZ
+            // now trying to drop velocities...
+
             cei.nextParticle();
+        	  //Particle* part = system->storage->lookupRealParticle(pids_part[i]);
+
           }
           //  previous code with if branch but fixed pids below.
           //  TODO: Keep if else or bring just one loop?

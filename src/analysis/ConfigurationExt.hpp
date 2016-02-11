@@ -76,11 +76,13 @@ namespace espressopp {
       RealND getProperties(size_t id);
       //Real3D getCoordinates(size_t id);
       //Real3D getVelocities(size_t id);
+      size_t getType(size_t id);
 
       inline size_t getSize(){return particleProperties.size();}
       //size_t getSize();
 
       void set(size_t id, RealND vec) ;
+      void set_id_vec_type(size_t id, RealND vec, size_t typ) ;
       //void set(size_t id, real x, real y, real z, real vx, real vy, real vz);
 
       //int nParticles;     // number of particles of the configuration
@@ -92,6 +94,7 @@ namespace espressopp {
      private:
 
       std::map<size_t, RealND > particleProperties;
+      std::map<size_t, size_t > particleType;
 //      std::map<size_t, Real3D> coordinates;
 //      std::map<size_t, Real3D> velocities;
     };

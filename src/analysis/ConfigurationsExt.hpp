@@ -69,6 +69,8 @@ namespace espressopp {
 
       void gather();
 
+      void gather_modified();
+
       ConfigurationExtPtr get(int stackpos);
 
       ConfigurationExtPtr back();

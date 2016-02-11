@@ -55,6 +55,16 @@ namespace espressopp {
       //velocities[index] = Real3D(vx, vy, vz);
     }
 
+    void ConfigurationExt::set_id_vec_type(size_t index, RealND vec, size_t typ)
+        {
+          particleProperties[index].setDimension(vec.getDimension());
+          particleProperties[index] = vec;
+          particleType[index] = typ;
+          //coordinates[index] = Real3D(x, y, z);
+          //velocities[index] = Real3D(vx, vy, vz);
+        }
+
+
     RealND ConfigurationExt::getProperties(size_t index)
     {
       return particleProperties[index];
@@ -75,6 +85,13 @@ namespace espressopp {
       return coordinates.size();
     }
     */
+
+    // F.Padua: temp fix for better DumpXYZ support
+    size_t ConfigurationExt::getType(size_t index)
+        {
+          return particleType[index];
+        }
+
 
     ConfigurationExtIterator ConfigurationExt::getIterator()
     {
@@ -103,6 +120,7 @@ namespace espressopp {
       return id;
     }
     
+
     //bad performance - or the compiler is smart
     const RealND ConfigurationExtIterator::Properties()
     {
@@ -116,6 +134,22 @@ namespace espressopp {
     }
     
     
+    /*
+        Real3D ConfigurationExtIterator::nextCoordinates()
+        {
+          if (it == end) {
+            PyErr_SetString(PyExc_StopIteration, "No more data.");
+            boost::python::throw_error_already_set();
+          }
+
+          Real3D coords = (*it).second;
+          it++;
+          return coords;
+        }
+        */
+
+
+
     void ConfigurationExtIterator::nextParticle()
     {
       if (it == end) {
