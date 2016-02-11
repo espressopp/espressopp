@@ -173,7 +173,7 @@ for i in range(check):
     Ek = 0.5 * T * (3 * num_particles)
     Etotal = Ek+Eb+EAng+ETab
     
-    print (fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
+    sys.stdout.write(fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
     outfile.write(fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
     #espressopp.tools.pdb.pdbfastwrite("traj.pdb", system, append=True)
     espressopp.tools.fastwritexyz("traj.xyz", system, append=True, scale=10)
