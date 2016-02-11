@@ -15,6 +15,7 @@ addons:
       - libboost1.55-all-dev
       - python-sphinx
       - python-matplotlib
+      - texlive-latex-base
 
 before_install:
  - if [[ ${BUILD_UG} ]]; then git clone https://github.com/espressopp/espressopp.github.io.git doc/ug/_build/html; fi
