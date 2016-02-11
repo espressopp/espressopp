@@ -48,19 +48,6 @@ margin-left: 5px;
 background-image:url(espp_logo.png)
 }
 
-div.menu{
-    top: 120px;
-    left: 0px;
-    font-size: 90%;
-    width: 120px;
-    height: 100%
-    margin-right:10px;
-    margin-left: 5px;
-    padding-right: 10px;
-    float: left;
-    text-align:left;
-}
-
 div.menu li{
 color:#963;
 margin-top:10px;
@@ -86,10 +73,10 @@ div.document {
     background-image: url(contents.png);
     background-repeat: repeat-x;
     width: 960px;
+    margin: 10px 0 0 240px;
 }
 
 div.bodywrapper {
-    margin: 10px 0 0 160px;
 /*    border-left: 1px solid #b85;   */
 }
 
@@ -135,13 +122,22 @@ div.related ul li a:hover {
 }
 
 div.sphinxsidebarwrapper {
-    padding: 0;
+    top: 120px;
+    left: 0px;
+    font-size: 90%;
+    width: 200px;
+    height: 100%
+    margin-right:10px;
+    margin-left: 5px;
+    padding-right: 10px;
+    float: left;
+    text-align:left;
 }
 
 div.sphinxsidebar {
     margin: 0;
     padding: 0.5em 15px 15px 0;
-    width: 210px;
+    width: 200px;
     float: left;
     font-size: 1em;
     text-align: left;
@@ -172,18 +168,19 @@ div.sphinxsidebar ul ul {
 }
 
 div.footer {
-    background-color: #DACAA6;
-    color: #86989B;
+    /*background-color: #DACAA6;
+    color: #86989B;*/
     padding: 3px 8px 3px 0;
+    border-top: 1px solid black;
     clear: both;
     font-size: 0.8em;
-    text-align: right;
+    text-align: center;
 }
 
 div.footer a {
-    color: white; 
-/*    color: #86989B; */
+    color: #86989B; 
     text-decoration: underline;
+    border-bottom: 1px solid black;
 }
 
 /* -- body styles ----------------------------------------------------------- */
@@ -384,4 +381,40 @@ div.versioninfo {
     padding: 8px;
     line-height: 1.3em;
     font-size: 0.9em;
+}
+
+div.sphinxsidebar #searchbox input[type="text"] {
+    width: 120px;
+}
+
+div.sphinxsidebar #searchbox input[type="submit"] {
+    width: 60px;
+}
+
+/** publications block */
+div.publication {
+    margin-top: 20px;
+    padding: 6px;
+    /* background-color: #FFB273; */
+    background-color: #FBB16A;
+    color: black;
+    font-size: 80%;
+}
+
+div.publication a {
+    color: #A64B00;
+}
+
+div.publicationusedespp{
+    margin-top: 20px;
+    padding: 6px;
+    /* background-color: #FFB273; */
+    /* background-color: #FBB16A; */
+    background-color: #FBD4AF;
+    color: black;
+    font-size: 80%;
+}
+
+div.publicationusedespp a {
+    color: #A64B00;
 }
