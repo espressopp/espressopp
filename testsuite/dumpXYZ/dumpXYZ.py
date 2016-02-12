@@ -19,7 +19,7 @@
 
 import espressopp
 import difflib
-#import unittest
+import unittest
 import sys
 
 def check_output_type(file_expected, file_generated):
@@ -41,7 +41,7 @@ def check_output_type(file_expected, file_generated):
 
     return lista_no_diff_final, lista_diff_final
 
-"""
+
 class TestDiffs(unittest.TestCase):
     def test_EmptyDiffList(self):
         file_xyz = "test_dumpXYZ_type_not_hardcoded.xyz"
@@ -59,7 +59,6 @@ class TestDiffs(unittest.TestCase):
         list_no_diff, list_diff = check_output_type(f_2, f_3)
         list_expected = ['- 10  0.0  0.0  0.0  10  0.0  0.0  0.0  10  currentStep 4322  lengthUnit LJ\n', '+ 10  0.0  0.0  0.0  10  0.0  0.0  0.0  10  currentStep 0  lengthUnit LJ\n']
         self.assertEqual(list_expected, list_diff)
-"""
 
 
 # create basic system with particles of different types to check writing types works in XYZ format
@@ -107,7 +106,7 @@ else:
     sys.exit(1)
 
 print("We are done! If you made it to here we are fine!")
+print("Now run small unit tests! Redundant to the previous test!")
+unittest.main()
 sys.exit()
-#checks above are enough for this test, just testing unittest
-#unittest.main()
 
