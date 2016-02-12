@@ -1,25 +1,25 @@
 /*
-  Copyright (C) 2016
+  Copyright (C) 2014,2015,2016
       Max Planck Institute for Polymer Research & Johannes Gutenberg-Universität Mainz
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "python.hpp"
@@ -108,7 +108,7 @@ namespace espressopp {
       //it = coordinates.begin();
       //end = coordinates.end();
     }
-    
+
 
     size_t ConfigurationExtIterator::Id()
     {
@@ -120,7 +120,7 @@ namespace espressopp {
       size_t id = (*it).first;
       return id;
     }
-    
+
 
     //bad performance - or the compiler is smart
     const RealND ConfigurationExtIterator::Properties()
@@ -133,8 +133,8 @@ namespace espressopp {
       RealND props = (*it).second;
       return props;
     }
-    
-    
+
+
     /*
         Real3D ConfigurationExtIterator::nextCoordinates()
         {
@@ -160,7 +160,7 @@ namespace espressopp {
 
       it++;
     }
-    
+
     int ConfigurationExtIterator::nextId()
     {
       if (it == end) {
@@ -172,7 +172,7 @@ namespace espressopp {
       it++;
       return id;
     }
-    
+
     //bad performance - or the compiler is smart
     const RealND ConfigurationExtIterator::nextProperties()
     {
@@ -212,7 +212,7 @@ namespace espressopp {
       class_<ConfigurationExt>
         ("analysis_ConfigurationExt", no_init)
       .add_property("size", &ConfigurationExt::getSize)
-      .def("__getitem__", &ConfigurationExt::getProperties) 
+      .def("__getitem__", &ConfigurationExt::getProperties)
       //.def("__getitem__", &ConfigurationExt::getCoordinates)
       .def("__iter__", &ConfigurationExt::getIterator)
       ;
