@@ -10,7 +10,7 @@ following location:
 
 On the command line type:
 
-.. code-block:: bash
+.. parsed-literal::
 
    tar -xzf espressopp-|version|.tgz
 
@@ -18,7 +18,7 @@ This will create a subdirectory espressopp-|version|
 
 Enter this subdirectory
 
-.. code-block:: bash
+.. parsed-literal::
 
    cd espressopp-|version|
 
