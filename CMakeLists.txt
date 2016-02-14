@@ -22,6 +22,7 @@ include(CheckCXXCompilerFlag)
 # User input options                                                   #
 ########################################################################
 option(EXTERNAL_BOOST "Use external boost" ON)
+option(ENABLE_HDF5 "Enable HDF5 support" ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 if(NOT BUILD_SHARED_LIBS)
   message(WARNING "Building static libraries might lead to problems with python modules - you are on your own!")
@@ -164,27 +165,70 @@ endif()
 #HDF5 settings
 ########################################################################
 
-#find_package(HDF5 NAMES hdf5 COMPONENTS Cpp dynamic)
-#include_directories(${HDF5_INCLUDE_PATH})
 
-#set(HDF5_ROOT /usr)
-#include_directories(${HDF5_ROOT}/include)
+if(ENABLE_HDF5)
+    find_package(HDF5)
+    if(HDF5_FOUND)
+        include_directories(${HDF5_INCLUDE_DIR})
+        set(_hdf5_libs hdf5 )
+        add_definitions( -DHDF5_LAYER )
+    else()
+        # we did not find it so we fetch it from the web, configure, compile, and link
+        include(ExternalProject)
+        set(ExternalProjectCMakeArgs        
+            -DBUILD_SHARED_LIBS=ON
+            -DHDF5_BUILD_HL_LIB=ON
+            -DHDF5_BUILD_TOOLS=ON
+            -DHDF5_ENABLE_PARALLEL=ON
+            )
+        set(_hdf5_version "1.8.15-patch1")
+        file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/src)
+        ExternalProject_Add(hdf5_local
+            DOWNLOAD_COMMAND curl http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-${_hdf5_version}.tar.gz | tar xvz -C ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/src
+            CMAKE_ARGS ${ExternalProjectCMakeArgs}
+            SOURCE_DIR ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/src/hdf5-${_hdf5_version}
+            BINARY_DIR ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/build
+            STAMP_DIR  ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/stamp
+            TMP_DIR    ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/tmp
+            INSTALL_COMMAND ""
+            )
+        include_directories(
+            ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/src/hdf5-${_hdf5_version}/src
+            #${CMAKE_SOURCE_DIR}/contrib/hdf5_local/src/hdf5-${_hdf5_version}/c++/src
+            ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/build/include
+            )
+        set(_hdf5_libs
+            ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/build/lib/libhdf5_hl.so
+            ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/build/lib/libhdf5.so
+            -ldl
+            )
+    endif()
+endif()
 
-set(HDF5 True)
 
-if(HDF5)
 
-#set(HDF5_ROOT /usr)
-set(HDF5_ROOT /usr/lib64/mpi/gcc/openmpi)  # parallel hdf5
-#set(HDF5_LIBRARIES ${HDF5_ROOT}/lib64/libhdf5_cpp.so ${HDF5_ROOT}/lib64/libhdf5_hl_cpp.so)
 
-set(HDF5_LIBRARIES ${HDF5_ROOT}/lib64/libhdf5.so ${HDF5_ROOT}/lib64/libhdf5_hl.so)
+##find_package(HDF5 NAMES hdf5 COMPONENTS Cpp dynamic)
+##include_directories(${HDF5_INCLUDE_PATH})
+
+##set(HDF5_ROOT /usr)
+##include_directories(${HDF5_ROOT}/include)
+
+#set(HDF5 True)
+
+#if(HDF5)
+
+##set(HDF5_ROOT /usr)
+#set(HDF5_ROOT /usr/lib64/mpi/gcc/openmpi)  # parallel hdf5
+##set(HDF5_LIBRARIES ${HDF5_ROOT}/lib64/libhdf5_cpp.so ${HDF5_ROOT}/lib64/libhdf5_hl_cpp.so)
+
+#set(HDF5_LIBRARIES ${HDF5_ROOT}/lib64/libhdf5.so ${HDF5_ROOT}/lib64/libhdf5_hl.so)
 
    
-include_directories(${HDF5_ROOT}/include)
-add_definitions( -DHDF5_LAYER )
-#list(APPEND EXTRA_LIBRARIES ${HDF5_LIBRARIES})
-endif(HDF5)
+##include_directories(${HDF5_ROOT}/include)
+#add_definitions( -DHDF5_LAYER )
+##list(APPEND EXTRA_LIBRARIES ${HDF5_LIBRARIES})
+#endif(HDF5)
 
 ######################################
 # Include the following subdirectory # 

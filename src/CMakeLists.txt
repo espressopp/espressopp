@@ -12,6 +12,14 @@ file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
 )
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
 
+if(NOT ENABLE_HDF5)
+    file(GLOB_RECURSE HDF5_SOURCES
+      io/HDF5File.cpp
+      io/HDF5File.hpp
+    )
+    list(REMOVE_ITEM ESPRESSO_SOURCES ${HDF5_SOURCES})
+endif()
+
 add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_MODULE_PATH}/gitversion.cmake)
 
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
@@ -42,7 +50,13 @@ endif (WITH_RC_FILES)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_library(_espressopp ${ESPRESSO_SOURCES})
-target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${HDF5_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
+
+if(NOT ENABLE_HDF5)
+    target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
+else()
+    target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${HDF5_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
+endif()
+
 #python libs have not prefix (default would be 'lib')
 set_target_properties(_espressopp PROPERTIES PREFIX "" SUFFIX ".so" LIBRARY_OUTPUT_DIRECTORY ..)
 install(TARGETS _espressopp LIBRARY DESTINATION ${PYTHON_INSTDIR} ARCHIVE DESTINATION ${PYTHON_INSTDIR})

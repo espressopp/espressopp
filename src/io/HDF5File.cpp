@@ -31,16 +31,16 @@
 #include "iterator/CellListIterator.hpp"
 
 #include "boost/mpi.hpp"
-#include "/usr/lib64/mpi/gcc/openmpi/include/mpi.h"
 #include "boost/mpi/communicator.hpp"
+#include "mpi.h"
 
 #include <fstream>
 #include <sstream>
 
-//#ifdef HDF5_LAYER
-#include "/usr/lib64/mpi/gcc/openmpi/include/hdf5.h"
-#include "/usr/lib64/mpi/gcc/openmpi/include/hdf5_hl.h"
-//#endif
+#ifdef HDF5_LAYER
+    #include "hdf5.h"
+    #include "hdf5_hl.h"
+#endif
 //#include "H5Cpp.h"
 
 using namespace espressopp;
