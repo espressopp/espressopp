@@ -160,6 +160,32 @@ else()
   set ( RT_LIBRARIES rt )
 endif()
 
+########################################################################
+#HDF5 settings
+########################################################################
+
+#find_package(HDF5 NAMES hdf5 COMPONENTS Cpp dynamic)
+#include_directories(${HDF5_INCLUDE_PATH})
+
+#set(HDF5_ROOT /usr)
+#include_directories(${HDF5_ROOT}/include)
+
+set(HDF5 True)
+
+if(HDF5)
+
+#set(HDF5_ROOT /usr)
+set(HDF5_ROOT /usr/lib64/mpi/gcc/openmpi)  # parallel hdf5
+#set(HDF5_LIBRARIES ${HDF5_ROOT}/lib64/libhdf5_cpp.so ${HDF5_ROOT}/lib64/libhdf5_hl_cpp.so)
+
+set(HDF5_LIBRARIES ${HDF5_ROOT}/lib64/libhdf5.so ${HDF5_ROOT}/lib64/libhdf5_hl.so)
+
+   
+include_directories(${HDF5_ROOT}/include)
+add_definitions( -DHDF5_LAYER )
+#list(APPEND EXTRA_LIBRARIES ${HDF5_LIBRARIES})
+endif(HDF5)
+
 ######################################
 # Include the following subdirectory # 
 ######################################

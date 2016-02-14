@@ -24,6 +24,7 @@
 #include "DumpXYZ.hpp"
 #include "DumpGRO.hpp"
 #include "DumpGROAdress.hpp"
+#include "HDF5File.hpp"
 #include "FileBackup.hpp"
 
 namespace espressopp {
@@ -32,6 +33,7 @@ namespace espressopp {
       DumpXYZ::registerPython();
       DumpGRO::registerPython();
       DumpGROAdress::registerPython();
+      HDF5File::registerPython();
     }
   }
 }
