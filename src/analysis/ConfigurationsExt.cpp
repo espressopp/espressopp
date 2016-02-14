@@ -1,23 +1,25 @@
 /*
+  Copyright (C) 2014,2015,2016
+      Max Planck Institute for Polymer Research & Johannes Gutenberg-Universität Mainz
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "python.hpp"
@@ -40,7 +42,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(ConfigurationsExt::logger, "ConfigurationsExt");
 
-    void ConfigurationsExt::setCapacity(int max) 
+    void ConfigurationsExt::setCapacity(int max)
     {
       if (max < 0) {
          LOG4ESPP_ERROR(logger, "number for maximal configurations must be positive");
@@ -57,13 +59,13 @@ namespace espressopp {
 
          int diff = nconfigs - maxConfigs;
 
-         LOG4ESPP_INFO(logger, "delete " << diff << 
+         LOG4ESPP_INFO(logger, "delete " << diff <<
               " configurations due to restricted capacity");
 
          configurationsExt.erase(configurationsExt.begin(),
                               configurationsExt.begin() + diff);
       }
-      
+
       unfolded = true; // by default it writes unfolded coordinates
     }
 
@@ -77,7 +79,7 @@ namespace espressopp {
       return configurationsExt.size();
     }
 
-   
+
     ConfigurationExtList ConfigurationsExt::all()
     {
       return configurationsExt;
@@ -120,15 +122,15 @@ namespace espressopp {
     void ConfigurationsExt::gather() {
 
       System& system = getSystemRef();
-  
+
       // determine number of local particles and total particles
 
       int myN = system.storage->getNRealParticles();
       int maxN;   // maximal number of particles one processor has
-      int totalN; // totlal number of particles all processors have
+      int totalN; // total number of particles all processors have
 
       boost::mpi::all_reduce(*system.comm, myN, maxN, boost::mpi::maximum<int>());
-      boost::mpi::all_reduce(*system.comm, myN, totalN, std::plus<int>());
+      boost::mpi::all_reduce(*system.comm, myN, totalN, std::plus<int>());  // probably there is an equivalent in boost:mpi?DN
 
       LOG4ESPP_INFO(logger, "#Partices: me = " << myN << ", max = " << maxN
                             << ", totalN = " << totalN);
@@ -141,7 +143,7 @@ namespace espressopp {
 
       CellList realCells = system.storage->getRealCells();
 
-      int i = 0; 
+      int i = 0;
 
       if( unfolded ){
         for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
@@ -203,7 +205,7 @@ namespace espressopp {
            int nother;
 
            if (iproc) {
-   
+
               int nIds, nCoords, nVelocs;   // number of received values
               //int tmp;
 
@@ -221,11 +223,11 @@ namespace espressopp {
               system.comm->send(iproc, DEFAULT_TAG, 0);
               stat = req.wait();
               nCoords = *stat.count<real>();
-  
+
               // make sure to have 3 coordinate values for each id
 
               if (nCoords != 3 * nIds) {
-                LOG4ESPP_ERROR(logger, "serious error collecting data, got " << 
+                LOG4ESPP_ERROR(logger, "serious error collecting data, got " <<
                               nIds << " ids, but " << nCoords << " coordinates");
               }
 
@@ -238,7 +240,7 @@ namespace espressopp {
               // make sure to have 3 velocities values for each id
 
               if (nVelocs != 3 * nIds) {
-                LOG4ESPP_ERROR(logger, "serious error collecting data, got " << 
+                LOG4ESPP_ERROR(logger, "serious error collecting data, got " <<
                               nIds << " ids, but " << nVelocs << " velocities");
               }
 
@@ -248,7 +250,7 @@ namespace espressopp {
            } else {
              nother = myN;
            }
-   
+
 
            LOG4ESPP_INFO(logger, "add " << nother << " coordinates of proc " << iproc);
 
@@ -257,7 +259,7 @@ namespace espressopp {
              int index = ids[i];
 
              LOG4ESPP_INFO(logger, "set coordianates of particle with id = " << index <<
-                                   ": " << coordinates[3*i] << " " <<  coordinates[3*i+1] << " " << coordinates[3*i+2] << 
+                                   ": " << coordinates[3*i] << " " <<  coordinates[3*i+1] << " " << coordinates[3*i+2] <<
                                    "and velocities: " <<  velocities[3*i] << " " <<  velocities[3*i+1] << " " << velocities[3*i+2]);
 
 
@@ -277,7 +279,7 @@ namespace espressopp {
 
       } else {
 
-       LOG4ESPP_INFO(logger, "proc " << system.comm->rank() << " sends data " 
+       LOG4ESPP_INFO(logger, "proc " << system.comm->rank() << " sends data "
                       << " of " << myN << " particles");
 
        // not master process, send data to master process
@@ -304,6 +306,209 @@ namespace espressopp {
       delete [] ids;
     }
 
+    void ConfigurationsExt::gather_modified() {
+
+          System& system = getSystemRef();
+
+          // determine number of local particles and total particles
+
+          int myN = system.storage->getNRealParticles();
+          int maxN;   // maximal number of particles one processor has
+          int totalN; // total number of particles all processors have
+
+          boost::mpi::all_reduce(*system.comm, myN, maxN, boost::mpi::maximum<int>());
+          boost::mpi::all_reduce(*system.comm, myN, totalN, std::plus<int>());  // probably there is an equivalent in boost:mpi?DN
+
+          LOG4ESPP_INFO(logger, "#Partices: me = " << myN << ", max = " << maxN
+                                << ", totalN = " << totalN);
+
+          real* coordinates = new real [3 * maxN];  // buffer for gather
+          real* velocities  = new real [3 * maxN];  // buffer for gather
+          int*  ids         = new int [maxN];  // buffer for gather
+
+          // add types
+          size_t* types = new size_t [maxN];  // buffer for gather
+
+          // fill the buffer with my values
+
+          CellList realCells = system.storage->getRealCells();
+
+          int i = 0;
+
+          if( unfolded ){
+            for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+
+              ids[i] = cit->id();
+              types[i] = cit->type(); // type of particle added
+
+              Real3D& pos = cit->position();
+              Real3D& vel = cit->velocity();
+              Int3D& img = cit->image();
+              Real3D L = system.bc->getBoxL();
+
+              coordinates[3*i]   = pos[0] + img[0] * L[0];
+              coordinates[3*i+1] = pos[1] + img[1] * L[1];
+              coordinates[3*i+2] = pos[2] + img[2] * L[2];
+
+              velocities[3*i]   = vel[0];
+              velocities[3*i+1] = vel[1];
+              velocities[3*i+2] = vel[2];
+
+              i++;
+            }
+          }
+          else{
+            for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+
+              ids[i] = cit->id();
+              types[i] = cit->type(); // type of particle added
+
+              Real3D& pos = cit->position();
+              Real3D& vel = cit->velocity();
+
+              coordinates[3*i]   = pos[0];
+              coordinates[3*i+1] = pos[1];
+              coordinates[3*i+2] = pos[2];
+
+              velocities[3*i]   = vel[0];
+              velocities[3*i+1] = vel[1];
+              velocities[3*i+2] = vel[2];
+
+              i++;
+            }
+          }
+
+          if (i != myN) {
+            LOG4ESPP_ERROR(logger, "mismatch for number of local particles");
+          }
+
+          // each proc sends its data to master process
+
+          if (system.comm->rank() == 0) {
+
+             ConfigurationExtPtr config = make_shared<ConfigurationExt> (); //totalN
+
+             // root process collects data from all processors and sets it
+
+             int nproc = system.comm->size();
+
+             for (int iproc = 0; iproc < nproc; iproc++) {
+
+               int nother;
+
+               if (iproc) {
+
+                  int nIds, nCoords, nVelocs;   // number of received values
+                  //int tmp;
+                  size_t nTypes;
+
+                  boost::mpi::request req;
+                  boost::mpi::status  stat;
+
+                  LOG4ESPP_DEBUG(logger, "receive tags from " << iproc);
+
+                  req = system.comm->irecv<int>(iproc, DEFAULT_TAG, ids, maxN);
+                  system.comm->send(iproc, DEFAULT_TAG, 0);
+                  stat = req.wait();
+                  nIds = *stat.count<int>();
+
+                  req = system.comm->irecv<size_t>(iproc, DEFAULT_TAG, types, maxN);
+                  system.comm->send(iproc, DEFAULT_TAG, 0);
+                  stat = req.wait();
+                  nTypes = *stat.count<size_t>();
+
+                  req = system.comm->irecv<real>(iproc, DEFAULT_TAG, coordinates, 3*maxN);
+                  system.comm->send(iproc, DEFAULT_TAG, 0);
+                  stat = req.wait();
+                  nCoords = *stat.count<real>();
+
+                  // make sure to have 3 coordinate values for each id
+
+                  if (nCoords != 3 * nIds) {
+                    LOG4ESPP_ERROR(logger, "serious error collecting data, got " <<
+                                  nIds << " ids, but " << nCoords << " coordinates");
+                  }
+
+
+                  req = system.comm->irecv<real>(iproc, DEFAULT_TAG, velocities, 3*maxN);
+                  system.comm->send(iproc, DEFAULT_TAG, 0);
+                  stat = req.wait();
+                  nVelocs = *stat.count<real>();
+
+                  // make sure to have 3 velocities values for each id
+
+                  if (nVelocs != 3 * nIds) {
+                    LOG4ESPP_ERROR(logger, "serious error collecting data, got " <<
+                                  nIds << " ids, but " << nVelocs << " velocities");
+                  }
+
+
+                  nother = nIds;
+
+               } else {
+                 nother = myN;
+               }
+
+
+               LOG4ESPP_INFO(logger, "add " << nother << " coordinates of proc " << iproc);
+
+               for (int i = 0; i < nother; i++) {
+
+                 int index = ids[i];
+                 size_t tipo = types[i];
+
+                 LOG4ESPP_INFO(logger, "set coordianates of particle with id " << index << " and type " << tipo <<
+                                       ": " << coordinates[3*i] << " " <<  coordinates[3*i+1] << " " << coordinates[3*i+2] <<
+                                       "and velocities: " <<  velocities[3*i] << " " <<  velocities[3*i+1] << " " << velocities[3*i+2]);
+
+
+                 RealND _vec(6);
+                 for (int k=0; k<3; k++)
+                   _vec.setItem(k, coordinates[3*i + k]);
+
+                 for (int k=0; k<3; k++)
+                   _vec.setItem(k+3, velocities[3*i + k]);
+                 //config->set(index, _vec);
+                 config->set_id_vec_type(index, _vec, tipo);
+               }
+            }
+
+            LOG4ESPP_INFO(logger, "save the latest configuration");
+
+            pushConfig(config);
+
+          } else {
+
+           LOG4ESPP_INFO(logger, "proc " << system.comm->rank() << " sends data "
+                          << " of " << myN << " particles");
+
+           // not master process, send data to master process
+
+           int tmp;
+
+           boost::mpi::status stat;
+
+           // wait for a signal (empty message) before sending
+
+           system.comm->irecv<int>(0, DEFAULT_TAG, tmp);
+           system.comm->send<int>(0, DEFAULT_TAG, ids, myN);
+           system.comm->irecv<int>(0, DEFAULT_TAG, tmp);
+           system.comm->send<size_t>(0, DEFAULT_TAG, types, myN);
+           system.comm->send<real>(0, DEFAULT_TAG, coordinates, 3*myN);
+           system.comm->send<real>(0, DEFAULT_TAG, velocities, 3*myN);
+          }
+
+          // ToDo: remove first configuration if capacity is exhausted
+
+          // master process saves the configuration
+
+          delete [] coordinates;
+          delete [] velocities;
+          delete [] types;
+          delete [] ids;
+        }
+
+
     // Python wrapping
 
     void ConfigurationsExt::registerPython() {
@@ -317,11 +522,12 @@ namespace espressopp {
       class_<ConfigurationsExt>
         ("analysis_ConfigurationsExt", init< shared_ptr< System > >())
       .add_property("size", &ConfigurationsExt::getSize)
-      .add_property("capacity", &ConfigurationsExt::getCapacity, 
+      .add_property("capacity", &ConfigurationsExt::getCapacity,
                                 &ConfigurationsExt::setCapacity)
-      .add_property("unfolded", &ConfigurationsExt::getUnfolded, 
+      .add_property("unfolded", &ConfigurationsExt::getUnfolded,
                                 &ConfigurationsExt::setUnfolded)
       .def("gather", &ConfigurationsExt::gather)
+	  .def("gather_modified", &ConfigurationsExt::gather_modified)
       .def("__getitem__", &ConfigurationsExt::get)
       .def("back", &ConfigurationsExt::back)
       .def("all", &ConfigurationsExt::all)

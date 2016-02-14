@@ -1,22 +1,24 @@
+#  Copyright (C) 2014,2015,2016
+#      Max Planck Institute for Polymer Research & Johannes Gutenberg-Universitaet Mainz
 #  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -25,7 +27,7 @@ r"""
 *********************************************
 
 * `dump()`
-  write configuration to trajectory XYZ file. By default filename is "out.xyz", 
+  write configuration to trajectory XYZ file. By default filename is "out.xyz",
   coordinates are folded.
 
   Properties
@@ -35,7 +37,7 @@ r"""
 
 * `unfolded`
   False if coordinates are folded, True if unfolded. By default - False
-  
+
 * `append`
   True if new trajectory data is appended to existing trajectory file. By default - True
 
@@ -45,7 +47,7 @@ r"""
 
 * `length_unit`
   It is length unit. Can be LJ, nm or A. By default - LJ
-  
+
 usage:
 
 writing down trajectory
@@ -53,7 +55,7 @@ writing down trajectory
 >>> dump_conf_xyz = espressopp.io.DumpXYZ(system, integrator, filename='trajectory.xyz')
 >>> for i in range (200):
 >>>   integrator.run(10)
->>>   xyz.dump()
+>>>   dump_conf_xyz.dump()
 
 writing down trajectory using ExtAnalyze extension
 
@@ -66,32 +68,32 @@ Both exapmles will give the same result: 200 configurations in trajectory .xyz f
 
 setting up length scale
 
-For example, the Lennard-Jones model for liquid argon with :math:`\sigma=0.34 [nm]` 
+For example, the Lennard-Jones model for liquid argon with :math:`\sigma=0.34 [nm]`
 
 >>> dump_conf_xyz = espressopp.io.DumpXYZ(system, integrator, filename='trj.xyz', unfolded=False, length_factor=0.34, length_unit='nm', append=True)
 
-will produce trj.xyz with in nanometers
+will produce trj.xyz with  in nanometers
 
 .. function:: espressopp.io.DumpXYZ(system, integrator, filename, unfolded, length_factor, length_unit, append)
 
-		:param system: 
-		:param integrator: 
+		:param system:
+		:param integrator:
 		:param filename: (default: 'out.xyz')
 		:param unfolded: (default: False)
 		:param length_factor: (default: 1.0)
 		:param length_unit: (default: 'LJ')
 		:param append: (default: True)
-		:type system: 
-		:type integrator: 
-		:type filename: 
-		:type unfolded: 
+		:type system:
+		:type integrator:
+		:type filename:
+		:type unfolded:
 		:type length_factor: real
-		:type length_unit: 
-		:type append: 
+		:type length_unit:
+		:type append:
 
 .. function:: espressopp.io.DumpXYZ.dump()
 
-		:rtype: 
+		:rtype:
 """
 
 from espressopp.esutil import cxxinit
@@ -104,12 +106,12 @@ class DumpXYZLocal(ParticleAccessLocal, io_DumpXYZ):
 
   def __init__(self, system, integrator, filename='out.xyz', unfolded=False, length_factor=1.0, length_unit='LJ', append=True):
     cxxinit(self, io_DumpXYZ, system, integrator, filename, unfolded, length_factor, length_unit, append)
-  
+
   def dump(self):
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+    if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       self.cxxclass.dump(self)
-  
-  
+
+
 if pmi.isController :
   class DumpXYZ(ParticleAccess):
     __metaclass__ = pmi.Proxy

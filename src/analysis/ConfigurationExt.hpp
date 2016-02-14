@@ -1,29 +1,32 @@
 /*
-  Copyright (C) 2012-2015
+  Copyright (C) 2014,2015,2016
+      Max Planck Institute for Polymer Research & Johannes Gutenberg-Universität Mainz
+  Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
 #ifndef _ANALYSIS_CONFIGURATIONEXT_HPP
 #define _ANALYSIS_CONFIGURATIONEXT_HPP
 
+#include "types.hpp"
 #include "SystemAccess.hpp"
 #include "RealND.hpp"
 #include <map>
@@ -46,6 +49,11 @@ namespace espressopp {
 
       int nextId();
       const RealND nextProperties();
+      /* increment particle iterator, get pid, get properties (pos,v)   */
+      void nextParticle();
+      size_t Id();
+      const RealND Properties();
+
       //Real3D nextCoordinates();
       //Real3D nextVelocities();
 
@@ -70,11 +78,13 @@ namespace espressopp {
       RealND getProperties(size_t id);
       //Real3D getCoordinates(size_t id);
       //Real3D getVelocities(size_t id);
+      size_t getType(size_t id);
 
       inline size_t getSize(){return particleProperties.size();}
       //size_t getSize();
 
       void set(size_t id, RealND vec) ;
+      void set_id_vec_type(size_t id, RealND vec, size_t typ) ;
       //void set(size_t id, real x, real y, real z, real vx, real vy, real vz);
 
       //int nParticles;     // number of particles of the configuration
@@ -86,6 +96,7 @@ namespace espressopp {
      private:
 
       std::map<size_t, RealND > particleProperties;
+      std::map<size_t, size_t > particleType;
 //      std::map<size_t, Real3D> coordinates;
 //      std::map<size_t, Real3D> velocities;
     };

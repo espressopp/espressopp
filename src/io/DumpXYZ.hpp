@@ -1,5 +1,7 @@
 /*
-  Copyright (C) 2012-2015
+  Copyright (C) 2016
+      Max Planck Institute for Polymer Research & Johannes Gutenberg-Universität Mainz
+  Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -24,13 +26,13 @@
 #ifndef _IO_DUMPXYZ_HPP
 #define _IO_DUMPXYZ_HPP
 
+#include "ParticleAccess.hpp"
 #include "integrator/MDIntegrator.hpp"
 #include "io/FileBackup.hpp"
 
 #include "esutil/Error.hpp"
 
 #include <string>
-#include "ParticleAccess.hpp"
 
 namespace espressopp {
   namespace io{

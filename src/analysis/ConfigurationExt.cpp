@@ -1,23 +1,25 @@
 /*
+  Copyright (C) 2014,2015,2016
+      Max Planck Institute for Polymer Research & Johannes Gutenberg-Universität Mainz
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "python.hpp"
@@ -55,6 +57,15 @@ namespace espressopp {
       //velocities[index] = Real3D(vx, vy, vz);
     }
 
+    void ConfigurationExt::set_id_vec_type(size_t index, RealND vec, size_t typ)
+        {
+          particleProperties[index].setDimension(vec.getDimension());
+          particleProperties[index] = vec;
+          particleType[index] = typ;
+
+        }
+
+
     RealND ConfigurationExt::getProperties(size_t index)
     {
       return particleProperties[index];
@@ -76,6 +87,13 @@ namespace espressopp {
     }
     */
 
+    // get particle's type given the PID
+    size_t ConfigurationExt::getType(size_t index)
+        {
+          return particleType[index];
+        }
+
+
     ConfigurationExtIterator ConfigurationExt::getIterator()
     {
       return ConfigurationExtIterator(particleProperties);
@@ -91,6 +109,58 @@ namespace espressopp {
       //end = coordinates.end();
     }
 
+
+    size_t ConfigurationExtIterator::Id()
+    {
+      if (it == end) {
+        PyErr_SetString(PyExc_StopIteration, "No more data.");
+        boost::python::throw_error_already_set();
+      }
+
+      size_t id = (*it).first;
+      return id;
+    }
+
+
+    //bad performance - or the compiler is smart
+    const RealND ConfigurationExtIterator::Properties()
+    {
+      if (it == end) {
+        PyErr_SetString(PyExc_StopIteration, "No more data.");
+        boost::python::throw_error_already_set();
+      }
+
+      RealND props = (*it).second;
+      return props;
+    }
+
+
+    /*
+        Real3D ConfigurationExtIterator::nextCoordinates()
+        {
+          if (it == end) {
+            PyErr_SetString(PyExc_StopIteration, "No more data.");
+            boost::python::throw_error_already_set();
+          }
+
+          Real3D coords = (*it).second;
+          it++;
+          return coords;
+        }
+        */
+
+
+
+    void ConfigurationExtIterator::nextParticle()
+    {
+      if (it == end) {
+        PyErr_SetString(PyExc_StopIteration, "No more data.");
+        boost::python::throw_error_already_set();
+      }
+
+      it++;
+    }
+
     int ConfigurationExtIterator::nextId()
     {
       if (it == end) {
@@ -102,7 +172,7 @@ namespace espressopp {
       it++;
       return id;
     }
-    
+
     //bad performance - or the compiler is smart
     const RealND ConfigurationExtIterator::nextProperties()
     {
@@ -111,7 +181,7 @@ namespace espressopp {
         boost::python::throw_error_already_set();
       }
 
-     RealND props = (*it).second;
+      RealND props = (*it).second;
       it++;
       return props;
     }
@@ -142,7 +212,7 @@ namespace espressopp {
       class_<ConfigurationExt>
         ("analysis_ConfigurationExt", no_init)
       .add_property("size", &ConfigurationExt::getSize)
-      .def("__getitem__", &ConfigurationExt::getProperties) 
+      .def("__getitem__", &ConfigurationExt::getProperties)
       //.def("__getitem__", &ConfigurationExt::getCoordinates)
       .def("__iter__", &ConfigurationExt::getIterator)
       ;
