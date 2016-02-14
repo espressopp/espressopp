@@ -1,4 +1,4 @@
-#Copyright (C) 2016
+#  Copyright (C) 2016
 #      Max Planck Institute for Polymer Research & Johannes Gutenberg-Universitaet Mainz
 #
 #  This file is part of ESPResSo++.

@@ -29,6 +29,7 @@
 #include "analysis/ConfigurationExt.hpp"
 #include "analysis/ConfigurationsExt.hpp"
 #include "iterator/CellListIterator.hpp"
+
 #include "boost/mpi.hpp"
 #include "/usr/lib64/mpi/gcc/openmpi/include/mpi.h"
 #include "boost/mpi/communicator.hpp"
@@ -119,7 +120,7 @@ namespace espressopp {
 		//MPI_Info_set(info, "file", "jack");
 
 		// create type for array-like objects, like coordinates, vel and force
-		hsize_t     dimearr[1] = {3};
+		hsize_t dimearr[1] = {3};
 		hid_t loctype = H5Tarray_create1(H5T_NATIVE_DOUBLE, 1, dimearr, NULL);
 
 
@@ -435,7 +436,7 @@ namespace espressopp {
 
 		//double* coordinates = new real [3 * myN];  // buffer for gather
 		//double* velocities  = new real [3 * myN];  // buffer for gather
-		int*  ids         = new int [myN];  // buffer for gather
+		//int*  ids         = new int [myN];  // buffer for gather
 
 
 		//double coord[count_memspace[0]][count_memspace[1]];
@@ -702,7 +703,7 @@ namespace espressopp {
 		//delete [] coordinates;
 		//delete [] velocities;
 		delete [] particles_u;
-		delete [] ids;
+		//delete [] ids;
 
       }
 
