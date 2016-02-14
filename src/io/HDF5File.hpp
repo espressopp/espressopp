@@ -28,7 +28,6 @@
 #include "integrator/MDIntegrator.hpp"
 #include "io/FileBackup.hpp"
 #include "esutil/Error.hpp"
-
 #include <string>
 
 namespace espressopp {

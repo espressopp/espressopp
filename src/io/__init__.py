@@ -1,3 +1,6 @@
+#  Copyright (C) 2014,2015,2016
+#      Max Planck Institute for Polymer Research & Johannes
+#      Gutenberg-Universitaet Mainz
 #  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011

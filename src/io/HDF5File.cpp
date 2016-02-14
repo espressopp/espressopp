@@ -29,7 +29,6 @@
 #include "analysis/ConfigurationExt.hpp"
 #include "analysis/ConfigurationsExt.hpp"
 #include "iterator/CellListIterator.hpp"
-
 #include "boost/mpi.hpp"
 #include "/usr/lib64/mpi/gcc/openmpi/include/mpi.h"
 #include "boost/mpi/communicator.hpp"
