@@ -114,11 +114,14 @@ namespace espressopp {
 		} particle_info;
 
 		CellList realCells = system->storage->getRealCells();
-		//MPI_Info info;
-		MPI_Info info  = MPI_INFO_NULL;
-		//MPI_Info_create(&info);
-		//MPI_Info_set(info, "file", "jack");
-
+		//MPI_Info info  = MPI_INFO_NULL;  // if on normal laptop
+        // if on GPFS mogon
+        MPI_Info info;
+        MPI_Info_create(&info);
+        const char* hint_stripe = "striping_unit";
+        const char* stripe_value = "4194304";
+        //MPI_Info_set(info, "striping_unit", "4194304"); // 4MB stripe.
+        MPI_Info_set(info, (char*)hint_stripe, (char*)stripe_value); // 4MB stripe. cast to avoid spurious warnings
 		// create type for array-like objects, like coordinates, vel and force
 		hsize_t dimearr[1] = {3};
 		hid_t loctype = H5Tarray_create1(H5T_NATIVE_DOUBLE, 1, dimearr, NULL);
