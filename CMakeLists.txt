@@ -232,6 +232,16 @@ if ( SPHINX_EXECUTABLE )
    )
 
    message ( STATUS "Generate user documentation via ${SPHINX_EXECUTABLE}: make ug") 
+
+   add_custom_target(ug-pdf
+      COMMAND ${CMAKE_COMMAND} -E env "${TEST_ENV}" "${SPHINX_EXECUTABLE}" -b latex . _build/latex
+      COMMAND make -C "${SPHINX_BUILD_ROOT}/_build/latex" all-pdf
+      COMMENT "TeX ug documentation available at ${SPHINX_BUILD_ROOT}/_build/latex"
+      DEPENDS ${SPHINX_BUILD_ROOT}/conf.py _espressopp
+      WORKING_DIRECTORY ${SPHINX_BUILD_ROOT}
+   )
+
+   message ( STATUS "Generate LaTeX manual via ${SPHINX_EXECUTABLE}: make ug-pdf")
 else ( SPHINX_EXECUTABLE )
     message ( WARNING "Not building user documentation because Doxygen not found.")
 endif ( SPHINX_EXECUTABLE )

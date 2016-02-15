@@ -20,6 +20,9 @@ addons:
       - libboost1.55-all-dev
       - python-matplotlib
       - texlive-latex-base
+      - texlive-latex-recommended
+      - texlive-latex-extra
+      - texlive-fonts-recommended
       - gcc-4.7
       - g++-4.7
       - gcc-4.8
@@ -31,7 +34,12 @@ addons:
 
 before_install:
  - if [[ ${GVER} ]]; then export CC=gcc-${GVER}; export CXX=g++-${GVER}; fi
- - if [[ ${BUILD_UG} ]]; then git clone https://github.com/espressopp/espressopp.github.io.git doc/ug/_build/html && pip install --user sphinx; fi
+ - if [[ ${BUILD_UG} ]]; then
+     git clone https://github.com/espressopp/espressopp.github.io.git doc/ug/_build/html;
+     pip install --user sphinx;
+     mkdir -p doc/ug/_build/latex;
+     wget -O doc/ug/_build/latex/newfloat.sty https://raw.githubusercontent.com/onlinecity/gatewayapi-docs/master/docs/newfloat.sty;
+   fi
  - mkdir -p "$HOME/bin"
  - ln -s /usr/bin/ccache "$HOME/bin/clang++"
  - ln -s /usr/bin/ccache "$HOME/bin/clang"
@@ -66,7 +74,7 @@ matrix:
 script:
   - mkdir build && cd build && 
     PATH="$HOME/bin:/usr/lib/ccache:$PATH" cmake -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL ${COVERAGE:+-DUSE_GCOV=ON} .. && 
-    make -j2 all ${BUILD_UG:+ug doc} &&
+    make -j2 all ${BUILD_UG:+ug doc ug-pdf} &&
     make test ARGS='-V' &&
     make install DESTDIR="${HOME}"
 
@@ -74,6 +82,7 @@ after_success:
   - if [[ ${BUILD_UG} = ON && ${TRAVIS_JOB_NUMBER} = *.1 ]]; then
       mkdir -p ../doc/ug/_build/html/doxygen;
       cp -r ../doc/dg/html/* ../doc/ug/_build/html/doxygen;
+      cp ../doc/ug/_build/latex/ESPResSo++.pdf ../doc/ug/_build/html;
       cd ../doc/ug/_build/html/;
       if [[ ${TRAVIS_BRANCH} = master && ${encrypted_194b3d1e9306_key} && ${encrypted_194b3d1e9306_iv} && ${TRAVIS_PULL_REQUEST} == false ]]; then
         git config --global user.name "Automatic Deployment (Travis CI)";
