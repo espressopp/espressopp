@@ -83,17 +83,8 @@ namespace espressopp {
       void write_n_to_1();
       void write_n_to_n();
 
-      //void read_n_to_1();
-      //void read_n_to_n();
 
       void write();
-//      void read() {
-//    	  if (iomode == 1 || iomode == 0) {
-//    		  read_n_to_1();
-//    	  } else if (iomode == 2) {
-//    		  read_n_to_n();
-//    	  }
-//      }
 
       std::string getFilename(){return file_name;}
       void setFilename(std::string v){file_name = v;}
