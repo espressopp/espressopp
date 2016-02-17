@@ -172,7 +172,7 @@ if(ENABLE_HDF5)
         include_directories(${HDF5_INCLUDE_DIR})
         set(_hdf5_libs hdf5 )
         add_definitions( -DHDF5_LAYER )
-    else()
+    else()  ## probably won't work this part, haven't tested!
         # we did not find it so we fetch it from the web, configure, compile, and link
         include(ExternalProject)
         set(ExternalProjectCMakeArgs        
@@ -202,6 +202,7 @@ if(ENABLE_HDF5)
             ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/build/lib/libhdf5.so
             -ldl
             )
+        add_definitions( -DHDF5_LAYER )
     endif()
 endif()
 
