@@ -170,39 +170,40 @@ if(ENABLE_HDF5)
     find_package(HDF5)
     if(HDF5_FOUND)
         include_directories(${HDF5_INCLUDE_DIR})
-        set(_hdf5_libs hdf5 )
+        #set(_hdf5_libs hdf5 )
         add_definitions( -DHDF5_LAYER )
     else()  ## probably won't work this part, haven't tested!
         # we did not find it so we fetch it from the web, configure, compile, and link
-        include(ExternalProject)
-        set(ExternalProjectCMakeArgs        
-            -DBUILD_SHARED_LIBS=ON
-            -DHDF5_BUILD_HL_LIB=ON
-            -DHDF5_BUILD_TOOLS=ON
-            -DHDF5_ENABLE_PARALLEL=ON
-            )
-        set(_hdf5_version "1.8.15-patch1")
-        file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/src)
-        ExternalProject_Add(hdf5_local
-            DOWNLOAD_COMMAND curl http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-${_hdf5_version}.tar.gz | tar xvz -C ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/src
-            CMAKE_ARGS ${ExternalProjectCMakeArgs}
-            SOURCE_DIR ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/src/hdf5-${_hdf5_version}
-            BINARY_DIR ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/build
-            STAMP_DIR  ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/stamp
-            TMP_DIR    ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/tmp
-            INSTALL_COMMAND ""
-            )
-        include_directories(
-            ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/src/hdf5-${_hdf5_version}/src
-            #${CMAKE_SOURCE_DIR}/contrib/hdf5_local/src/hdf5-${_hdf5_version}/c++/src
-            ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/build/include
-            )
-        set(_hdf5_libs
-            ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/build/lib/libhdf5_hl.so
-            ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/build/lib/libhdf5.so
-            -ldl
-            )
-        add_definitions( -DHDF5_LAYER )
+        #include(ExternalProject)
+        #set(ExternalProjectCMakeArgs        
+        #    -DBUILD_SHARED_LIBS=ON
+        #    -DHDF5_BUILD_HL_LIB=ON
+        #    -DHDF5_BUILD_TOOLS=ON
+        #    -DHDF5_ENABLE_PARALLEL=ON
+        #    )
+        #set(_hdf5_version "1.8.15-patch1")
+        #file(MAKE_DIRECTORY ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/src)
+        #ExternalProject_Add(hdf5_local
+        #    DOWNLOAD_COMMAND curl http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-${_hdf5_version}.tar.gz | tar xvz -C ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/src
+        #    CMAKE_ARGS ${ExternalProjectCMakeArgs}
+        #    SOURCE_DIR ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/src/hdf5-${_hdf5_version}
+        #    BINARY_DIR ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/build
+        #    STAMP_DIR  ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/stamp
+        #    TMP_DIR    ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/tmp
+        #    INSTALL_COMMAND ""
+        #    )
+        #include_directories(
+        #    ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/src/hdf5-${_hdf5_version}/src
+        #    #${CMAKE_SOURCE_DIR}/contrib/hdf5_local/src/hdf5-${_hdf5_version}/c++/src
+        #    ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/build/include
+        #    )
+        #set(_hdf5_libs
+        #    ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/build/lib/libhdf5_hl.so
+        #    ${CMAKE_SOURCE_DIR}/contrib/hdf5_local/build/lib/libhdf5.so
+        #    -ldl
+        #    )
+        set(HDF5_LIBRARIES)
+        #add_definitions( -DHDF5_LAYER )
     endif()
 endif()
 
