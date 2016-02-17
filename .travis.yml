@@ -10,6 +10,7 @@ addons:
       - libfftw3-dev
       - cmake
       - doxygen
+      - graphviz
       - libopenmpi-dev
       - openmpi-bin
       - libboost1.55-all-dev
@@ -48,7 +49,8 @@ script:
 
 after_success:
   - if [[ ${BUILD_UG} = ON && ${TRAVIS_JOB_NUMBER} = *.1 ]]; then
-      mv ../doc/dg/html ../doc/ug/_build/html/doxygen;
+      mkdir -p ../doc/ug/_build/html/doxygen;
+      cp -r ../doc/dg/html/* ../doc/ug/_build/html/doxygen;
       cd ../doc/ug/_build/html/;
       if [[ ${TRAVIS_BRANCH} = master && ${encrypted_194b3d1e9306_key} && ${encrypted_194b3d1e9306_iv} && ${TRAVIS_PULL_REQUEST} == false ]]; then
         git config --global user.name "Automatic Deployment (Travis CI)";
