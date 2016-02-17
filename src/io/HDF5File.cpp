@@ -425,12 +425,12 @@ namespace espressopp {
 		double attr_data_timestep = timestep;
 		long long attr_data_step = step;
 
-
-		attribute_id = H5Acreate(dset, "timestep", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Awrite(attribute_id, H5T_NATIVE_DOUBLE, &attr_data_timestep);
-		attribute_id = H5Acreate(dset, "step", H5T_NATIVE_INT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
-		status = H5Awrite(attribute_id, H5T_NATIVE_INT, &attr_data_step);
-		H5Aclose(attribute_id);
+        //disabling momentarily
+        //attribute_id = H5Acreate(dset, "timestep", H5T_NATIVE_DOUBLE, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
+		//status = H5Awrite(attribute_id, H5T_NATIVE_DOUBLE, &attr_data_timestep);
+		//attribute_id = H5Acreate(dset, "step", H5T_NATIVE_INT, dataspace_id, H5P_DEFAULT, H5P_DEFAULT);
+		//status = H5Awrite(attribute_id, H5T_NATIVE_INT, &attr_data_step);
+		//H5Aclose(attribute_id);
 		H5Sclose(dataspace);
 		H5Dclose(dset);
 
