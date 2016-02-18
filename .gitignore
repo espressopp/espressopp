@@ -18,3 +18,9 @@ install_manifest.txt
 doc/dg/html/
 CTestTestfile.cmake
 contrib/boost/libespressopp_boost.a
+Testing/
+testsuite/pi_water/esp.dat
+testsuite/pi_water/traj.xyz
+testsuite/tabulated/pot-cosine.txt
+testsuite/tabulated/pot-fene.txt
+testsuite/tabulated/pot-lj.txt
