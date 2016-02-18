@@ -35,8 +35,8 @@ def genTabPotentials(tabfilesnb):
 # Output of gromacs energies and esp energies should be the same
 
 # simulation parameters (nvt = False is nve)
-steps = 100
-check = steps/10
+steps = 1 #100
+check = 1 #steps/10
 rc    = 0.9  # Verlet list cutoff
 skin  = 0.14
 timestep = 0.0002
