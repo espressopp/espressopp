@@ -49,6 +49,7 @@
               << now.date().day()
               << now.time_of_day().hours()
               << now.time_of_day().minutes()
+              << now.time_of_day().seconds() // needed for some tests
               << "_" << file_name; // this is a bit ugly since there are no leading zeros
             std::string new_file_name(ssnew_file_name.str()); 
             std::cout << "Note: file " << file_name << " exists already. Moving " << file_name << " to " << new_file_name << std::endl;
