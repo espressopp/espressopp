@@ -31,4 +31,5 @@ Report bugs on the [github issues site](https://github.com/espressopp/espressopp
 [![Build Status](https://travis-ci.org/espressopp/espressopp.svg?branch=master)](https://travis-ci.org/espressopp/espressopp)
 [![Code Climate](https://codeclimate.com/github/espressopp/espressopp/badges/gpa.svg)](https://codeclimate.com/github/espressopp/espressopp)
 [![codecov.io](https://codecov.io/github/espressopp/espressopp/coverage.svg?branch=master)](https://codecov.io/github/codecov/codecov-ruby?branch=master)
+[![Analysis Status](https://scan.coverity.com/projects/8143/badge.svg?flat=1)](https://scan.coverity.com/projects/espressopp-espressopp)
 
