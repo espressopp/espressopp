@@ -37,7 +37,7 @@ addons:
       description: "Build submitted via Travis CI"
     notification_email: espp-devel@listserv.mpip-mainz.mpg.de
     build_command_prepend: "mkdir cov_build && cd cov_build && cmake -DEXTERNAL_BOOST=ON -DEXTERNAL_MPI4PY=ON .."
-    build_command: "make -j2"
+    build_command: "true" #actual build with "make -j4" takes too long
     branch_pattern: master
 
 before_install:
