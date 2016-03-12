@@ -35,8 +35,8 @@ def genTabPotentials(tabfilesnb):
 # Output of gromacs energies and esp energies should be the same
 
 # simulation parameters (nvt = False is nve)
-steps = 100
-check = steps/10
+steps = 1 #100
+check = 1 #steps/10
 rc    = 0.9  # Verlet list cutoff
 skin  = 0.14
 timestep = 0.0002
@@ -173,7 +173,7 @@ for i in range(check):
     Ek = 0.5 * T * (3 * num_particles)
     Etotal = Ek+Eb+EAng+ETab
     
-    print (fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
+    sys.stdout.write(fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
     outfile.write(fmt%(i*timestep,Eb, EAng, ETab, Ek, Etotal, T))
     #espressopp.tools.pdb.pdbfastwrite("traj.pdb", system, append=True)
     espressopp.tools.fastwritexyz("traj.xyz", system, append=True, scale=10)

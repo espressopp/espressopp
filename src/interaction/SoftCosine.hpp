@@ -32,8 +32,8 @@ namespace espressopp {
     /** This class provides methods to compute forces and energies of
 	the SoftCosine potential.
 
-	\f[ V(r) = A \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} -
-	\left( \frac{\sigma}{r} \right)^{6} \right]
+	\f[
+  V(r) = A \left[ 1.0 + cos \left( \frac{\pi r}{r_c} \right) \right]
 	\f]
     */
     class SoftCosine : public PotentialTemplate< SoftCosine > {
