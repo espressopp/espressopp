@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2012-2015 Max Planck Institute for Polymer Research
+ Copyright (C) 2012-2016 Max Planck Institute for Polymer Research
  Copyright (C) 2008-2011 Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
  
  This file is part of ESPResSo++.
@@ -37,22 +37,12 @@
 #define REQ_HALO_SPREAD 501
 #define COMM_DIR_0 700
 #define COMM_DIR_1 701
-#define COMM_DIR_2 702
-#define COMM_DIR_3 703
-#define COMM_DIR_4 704
-#define COMM_DIR_5 705
-#define COMM_FORCE_0 706
-#define COMM_FORCE_1 707
-#define COMM_FORCE_2 708
-#define COMM_FORCE_3 709
-#define COMM_FORCE_4 710
-#define COMM_FORCE_5 711
-#define COMM_DEN_0 712
-#define COMM_DEN_1 713
-#define COMM_DEN_2 714
-#define COMM_DEN_3 715
-#define COMM_DEN_4 716
-#define COMM_DEN_5 717
+
+#define COMM_FORCE_0 702
+#define COMM_FORCE_1 703
+
+#define COMM_DEN_0 704
+#define COMM_DEN_1 705
 
 using namespace boost;
 
@@ -225,13 +215,13 @@ namespace espressopp {
       
       /* Setter and getting for LB viscosity control */
       void LatticeBoltzmann::setViscB (real _visc_b) {visc_b = _visc_b;
-         setGamma(0, (getNumDims()*_visc_b - getCs2()*getTau() * (convTimeMDtoLB()) * convLenMDtoLB() / convMassMDtoLB()) / \
-                  (getNumDims()*_visc_b + getCs2()*getTau() * (convTimeMDtoLB()) * convLenMDtoLB() / convMassMDtoLB()));}
+         setGamma(0, (getNumDims()*_visc_b - getCs2()*getTau()*convTimeMDtoLB()/getNSteps()*convLenMDtoLB()/convMassMDtoLB()) / \
+                     (getNumDims()*_visc_b + getCs2()*getTau()*convTimeMDtoLB()/getNSteps()*convLenMDtoLB()/convMassMDtoLB()));}
       real LatticeBoltzmann::getViscB () { return visc_b;}
       
       void LatticeBoltzmann::setViscS (real _visc_s) {visc_s = _visc_s;
-         setGamma(1, (2.*_visc_s - getCs2()*getTau() * (convTimeMDtoLB()) * convLenMDtoLB() / convMassMDtoLB()) / \
-                  (2.*_visc_s + getCs2()*getTau() * (convTimeMDtoLB()) * convLenMDtoLB() / convMassMDtoLB()));}
+         setGamma(1, (2.*_visc_s - getCs2()*getTau()*convTimeMDtoLB()/getNSteps()*convLenMDtoLB()/convMassMDtoLB()) / \
+                     (2.*_visc_s + getCs2()*getTau()*convTimeMDtoLB()/getNSteps()*convLenMDtoLB()/convMassMDtoLB()));}
       real LatticeBoltzmann::getViscS () { return visc_s;}
       
       void LatticeBoltzmann::setGamma (int _i, real _gamma) {gamma[_i] = _gamma;}
@@ -257,11 +247,11 @@ namespace espressopp {
       int LatticeBoltzmann::getCouplForceFlag () {return couplForceFlag;}
       
       void LatticeBoltzmann::setExtForceLoc (Int3D _Ni, Real3D _extForceLoc) {
-         return (*lbfor)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setExtForceLoc(_extForceLoc);   }
+         return (*lbfor)[_Ni[0]][_Ni[1]][_Ni[2]].setExtForceLoc(_extForceLoc);   }
       Real3D LatticeBoltzmann::getExtForceLoc (Int3D _Ni) {
-         return (*lbfor)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].getExtForceLoc();   }
+         return (*lbfor)[_Ni[0]][_Ni[1]][_Ni[2]].getExtForceLoc();   }
       void LatticeBoltzmann::addExtForceLoc (Int3D _Ni, Real3D _extForceLoc) {
-         return (*lbfor)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].addExtForceLoc(_extForceLoc);   }
+         return (*lbfor)[_Ni[0]][_Ni[1]][_Ni[2]].addExtForceLoc(_extForceLoc);   }
       
       void LatticeBoltzmann::setFricCoeff (real _fricCoeff) { fricCoeff = _fricCoeff;}
       real LatticeBoltzmann::getFricCoeff () { return fricCoeff;}
@@ -278,22 +268,22 @@ namespace espressopp {
       
       /* Setter and getter for access to population values */
       void LatticeBoltzmann::setLBFluid (Int3D _Ni, int _l, real _value) {
-         (*lbfluid)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setF_i(_l, _value);   }
+         (*lbfluid)[_Ni[0]][_Ni[1]][_Ni[2]].setF_i(_l, _value);   }
       real LatticeBoltzmann::getLBFluid (Int3D _Ni, int _l) {
-         return (*lbfluid)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].getF_i(_l);   }
+         return (*lbfluid)[_Ni[0]][_Ni[1]][_Ni[2]].getF_i(_l);   }
       
       void LatticeBoltzmann::setGhostFluid (Int3D _Ni, int _l, real _value) {
-         (*ghostlat)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setF_i(_l, _value);   }
+         (*ghostlat)[_Ni[0]][_Ni[1]][_Ni[2]].setF_i(_l, _value);   }
       
       void LatticeBoltzmann::setLBMom (Int3D _Ni, int _l, real _value) {
-         (*lbmom)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].setMom_i(_l, _value);   }
+         (*lbmom)[_Ni[0]][_Ni[1]][_Ni[2]].setMom_i(_l, _value);   }
       real LatticeBoltzmann::getLBMom (Int3D _Ni, int _l) {
-         return (*lbmom)[_Ni.getItem(0)][_Ni.getItem(1)][_Ni.getItem(2)].getMom_i(_l);   }
+         return (*lbmom)[_Ni[0]][_Ni[1]][_Ni[2]].getMom_i(_l);   }
       
       /* Helpers for MD to LB (and vice versa) unit conversion */
       real LatticeBoltzmann::convMassMDtoLB() {return 1.;}
 #warning: need a foolproof in case there is no access to the integrator (and getTimeStep) yet
-      real LatticeBoltzmann::convTimeMDtoLB() {return 1. / (integrator->getTimeStep() * getNSteps() * getTau());}
+      real LatticeBoltzmann::convTimeMDtoLB() {return 1. / (integrator->getTimeStep() * getTau());}
       real LatticeBoltzmann::convLenMDtoLB() {
          return getNi().getItem(0) / (getSystem()->bc->getBoxL().getItem(0) * getA());}
       
@@ -514,95 +504,6 @@ namespace espressopp {
       
 /*******************************************************************************************/
       
-      /* FIND AND OUTPUT CENTER-OF-MASS VELOCITY OF MD-PARTICLES */
-      Real3D LatticeBoltzmann::findCMVelMD (int _id) {
-         System& system = getSystemRef();
-         
-         CellList realCells = system.storage->getRealCells();
-         
-         int _totPart = getTotNPart();
-         Real3D myVelCM = Real3D(0.,0.,0.);
-         Real3D specVelCM = Real3D(0.,0.,0.);
-         
-         // loop over all particles in the current CPU
-         for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-            Real3D& vel = cit->velocity();
-            myVelCM += vel;
-         }
-         
-         Real3D velCM = Real3D(0.,0.,0.);
-         mpi::all_reduce(*getSystem()->comm, myVelCM, velCM, std::plus<Real3D>());
-         
-         if (getSystem()->comm->rank() == 0) {
-            // output of CMVel if needed
-            if (_id == 1) {
-               printf("findCMVelMD: cmV(t+ 1/2dt) of LJ system is %18.14f %18.14f %18.14f \n",
-                      velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
-            } else if (_id == 2) {
-               printf("findCMVelMD: cmV(t + dt) of LJ system is   %18.14f %18.14f %18.14f \n",
-                      velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
-            } else {
-            }
-         }
-         
-         // calculate specific center of mass to be subtracted from particle's velocities
-         specVelCM = velCM / _totPart;
-         
-         return specVelCM;
-      }
-      
-/*******************************************************************************************/
-      
-      /* SET CM VELOCITY OF THE MD TO ZERO AT THE START OF COUPLING */
-      void LatticeBoltzmann::zeroMDCMVel () {
-         int _myRank = getSystem()->comm->rank();
-         setCopyTimestep(integrator->getTimeStep());   // set a copy of a timestep to the real MD timestep
-         
-         setStepNum(integrator->getStep());
-         if (getStepNum()!=0) setStart(1);
-         
-         if (getStart() == 0 && getCouplForceFlag() != 0) {
-            Real3D specCmVel = findCMVelMD(0);
-            // output reporting on subtraction of drift's vel
-            if (_myRank == 0) {
-               printf("subtracting drift velocity from MD's center of mass (if any)\n");
-               printf("cm velocity per particle is %18.14f %18.14f %18.14f \n",
-                      specCmVel[0], specCmVel[1], specCmVel[2]);
-            }
-            
-            galileanTransf(specCmVel);
-            
-            specCmVel = findCMVelMD(0);
-            // check if everything worked correctly
-            if (_myRank == 0) {
-               printf("cm velocity per particle after Galilean transformation is %18.14f %18.14f %18.14f \n",
-                      specCmVel[0], specCmVel[1], specCmVel[2]);
-               printf("-------------------------------------\n");
-            }
-            
-            setStart(1);
-         } else if (getStart() == 1 && getCouplForceFlag() != 0) {
-            readCouplForces();
-            restoreLBForces();
-         } else {
-         }
-      }
-      
-/*******************************************************************************************/
-      
-      /* PERFORM GALILEAN TRANSFORMATION */
-      void LatticeBoltzmann::galileanTransf (Real3D _specCmVel) {
-         System& system = getSystemRef();
-         
-         CellList realCells = system.storage->getRealCells();
-         
-         for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-            cit->velocity() -= _specCmVel;
-         }
-      }
-      
-/*******************************************************************************************/
-      
       /* COLLIDE-STREAM STEP */
       void LatticeBoltzmann::collideStream () {
          int _offset = getHaloSkin();
@@ -724,8 +625,9 @@ namespace espressopp {
          real _timestep = integrator->getTimeStep();      // timestep of MD
          real _tempLB = getLBTemp();
          
-         real prefactor = sqrt(2. * _fricCoeff * _tempLB / _timestep);      // amplitude of the noise
+         real prefactor = sqrt(24. * _fricCoeff * _tempLB / _timestep);      // amplitude of the noise
          Real3D ranval((*rng)() - .5, (*rng)() - .5, (*rng)() - .5);      // 3d random number
+         //         real prefactor = sqrt(2. * _fricCoeff * _tempLB / _timestep);      // amplitude of the noise
          //         Real3D ranval(rng->normal(), rng->normal(), rng->normal());      // 3d Gaussian
          setFOnPart (p.id(), prefactor * ranval);         // set force on a particle to the random one
       }
@@ -765,7 +667,8 @@ namespace espressopp {
          real _invDenLoc;
          Real3D _jLoc;
          Real3D _u;
-         
+         Real3D _f;
+       
          Real3D interpVel = Real3D (0.);
          real _convCoeff = _convTimeMDtoLB / _convLenMDtoLB;
          // loop over neighboring LB nodes
@@ -775,11 +678,14 @@ namespace espressopp {
                for (int _k = 0; _k < 2; _k++) {
                   // assign iterations
                   _ip = bin[0] + _i; _jp = bin[1] + _j; _kp = bin[2] + _k;
+
+                  // force acting onto the fluid node at the moment (midpoint scheme)
+                  _f = (*lbfor)[_ip][_jp][_kp].getExtForceLoc() + (*lbfor)[_ip][_jp][_kp].getCouplForceLoc();
                   
                   _invDenLoc = 1. / (*lbmom)[_ip][_jp][_kp].getMom_i(0);
-                  _jLoc[0] = (*lbmom)[_ip][_jp][_kp].getMom_i(1);
-                  _jLoc[1] = (*lbmom)[_ip][_jp][_kp].getMom_i(2);
-                  _jLoc[2] = (*lbmom)[_ip][_jp][_kp].getMom_i(3);
+                  _jLoc[0] = (*lbmom)[_ip][_jp][_kp].getMom_i(1) + _f[0];
+                  _jLoc[1] = (*lbmom)[_ip][_jp][_kp].getMom_i(2) + _f[1];
+                  _jLoc[2] = (*lbmom)[_ip][_jp][_kp].getMom_i(3) + _f[2];
                   
                   _u = _jLoc;
                   _u *= _invDenLoc;
@@ -798,7 +704,7 @@ namespace espressopp {
          
          // convert coupling force (LJ units) to the momentum change on a lattice (LB units)
          Real3D deltaJLoc = Real3D(0.);
-         deltaJLoc -= getFOnPart(p.id()) * _convMassMDtoLB / (_convCoeff * getNSteps() * _convTimeMDtoLB);
+         deltaJLoc -= getFOnPart(p.id()) * _convMassMDtoLB / (_convCoeff * _convTimeMDtoLB);
          
          // loop over neighboring LB nodes
          for (int _i = 0; _i < 2; _i++) {
@@ -855,6 +761,95 @@ namespace espressopp {
                   (*lbmom)[i][j][k].setMom_i(3,jLoc[2]);
                }
             }
+         }
+      }
+      
+/*******************************************************************************************/
+      
+      /* FIND AND OUTPUT CENTER-OF-MASS VELOCITY OF MD-PARTICLES */
+      Real3D LatticeBoltzmann::findCMVelMD (int _id) {
+         System& system = getSystemRef();
+         
+         CellList realCells = system.storage->getRealCells();
+         
+         int _totPart = getTotNPart();
+         Real3D myVelCM = Real3D(0.,0.,0.);
+         Real3D specVelCM = Real3D(0.,0.,0.);
+         
+         // loop over all particles in the current CPU
+         for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+            Real3D& vel = cit->velocity();
+            myVelCM += vel;
+         }
+         
+         Real3D velCM = Real3D(0.,0.,0.);
+         mpi::all_reduce(*getSystem()->comm, myVelCM, velCM, std::plus<Real3D>());
+         
+         if (getSystem()->comm->rank() == 0) {
+            // output of CMVel if needed
+            if (_id == 1) {
+               printf("findCMVelMD: cmV(t+ 1/2dt) of LJ system is %18.14f %18.14f %18.14f \n",
+                      velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
+            } else if (_id == 2) {
+               printf("findCMVelMD: cmV(t + dt) of LJ system is   %18.14f %18.14f %18.14f \n",
+                      velCM.getItem(0), velCM.getItem(1), velCM.getItem(2));
+            } else {
+            }
+         }
+         
+         // calculate specific center of mass to be subtracted from particle's velocities
+         specVelCM = velCM / _totPart;
+         
+         return specVelCM;
+      }
+      
+/*******************************************************************************************/
+      
+      /* SET CM VELOCITY OF THE MD TO ZERO AT THE START OF COUPLING */
+      void LatticeBoltzmann::zeroMDCMVel () {
+         int _myRank = getSystem()->comm->rank();
+         setCopyTimestep(integrator->getTimeStep());   // set a copy of a timestep to the real MD timestep
+         
+         setStepNum(integrator->getStep());
+         if (getStepNum()!=0) setStart(1);
+         
+         if (getStart() == 0 && getCouplForceFlag() != 0) {
+            Real3D specCmVel = findCMVelMD(0);
+            // output reporting on subtraction of drift's vel
+            if (_myRank == 0) {
+               printf("subtracting drift velocity from MD's center of mass (if any)\n");
+               printf("cm velocity per particle is %18.14f %18.14f %18.14f \n",
+                      specCmVel[0], specCmVel[1], specCmVel[2]);
+            }
+            
+            galileanTransf(specCmVel);
+            
+            specCmVel = findCMVelMD(0);
+            // check if everything worked correctly
+            if (_myRank == 0) {
+               printf("cm velocity per particle after Galilean transformation is %18.14f %18.14f %18.14f \n",
+                      specCmVel[0], specCmVel[1], specCmVel[2]);
+               printf("-------------------------------------\n");
+            }
+            
+            setStart(1);
+         } else if (getStart() == 1 && getCouplForceFlag() != 0) {
+            readCouplForces();
+            restoreLBForces();
+         } else {
+         }
+      }
+      
+/*******************************************************************************************/
+      
+      /* PERFORM GALILEAN TRANSFORMATION */
+      void LatticeBoltzmann::galileanTransf (Real3D _specCmVel) {
+         System& system = getSystemRef();
+         
+         CellList realCells = system.storage->getRealCells();
+         
+         for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+            cit->velocity() -= _specCmVel;
          }
       }
       
@@ -968,7 +963,7 @@ namespace espressopp {
                      getFOnPart(_id).getItem(2));
          }
          
-         /* write forces acting onto LB-sites */
+         /* write forces acting onto LB-sites (incl. ghost region) */
          real threshold = 1e-30;													// threshold for output forces
          Int3D _myNi = getMyNi();
          
@@ -991,6 +986,39 @@ namespace espressopp {
          real timeEnd = timeSave.getElapsedTime() - timeStart;
          printf("CPU %d: saved LB-to-MD coupling forces in %8.4f seconds\n",
                 getSystem()->comm->rank(), timeEnd);
+         
+         /* write down density and velocity of the fluid (excl. ghost region) */
+         int _offset = getHaloSkin();
+         Int3D _myPosition = getMyPosition();
+         
+         filename = "fluid";
+         filename.append(convert.str());
+         filename.append(".");
+         filename.append(_myRank.str());
+         filename.append(".dat");
+         
+         FILE * fluidFile = fopen(filename.c_str(),"w");
+
+         for (int _i = _offset; _i < _myNi[0]-_offset; _i++) {
+            for (int _j = _offset; _j < _myNi[1]-_offset; _j++) {
+               for (int _k = _offset; _k < _myNi[2]-_offset; _k++) {
+                  real _rho = (*lbmom)[_i][_j][_k].getMom_i(0);
+                  real _jx, _jy, _jz;
+                  _jx = (*lbmom)[_i][_j][_k].getMom_i(1);
+                  _jy = (*lbmom)[_i][_j][_k].getMom_i(2);
+                  _jz = (*lbmom)[_i][_j][_k].getMom_i(3);
+
+                  // -1 comes from the offset. we have to output the first real node as 0
+                  fprintf (fluidFile, "%5d %5d %5d %8.6f %8.6f %8.6f %8.6f\n",
+                           _myPosition[0]*(_myNi[0]-2*_offset) + _i - 1,
+                           _myPosition[1]*(_myNi[1]-2*_offset) + _j - 1,
+                           _myPosition[2]*(_myNi[2]-2*_offset) + _k - 1,
+                           _rho, _jx/_rho, _jy/_rho, _jz/_rho);
+               }
+            }
+         }
+         fclose (fluidFile);
+         
       }
       
 /*******************************************************************************************/
@@ -1051,7 +1079,6 @@ namespace espressopp {
             setMyNeighbour(2*_dim, grid.mapPositionToIndex(_myPosition));
             setMyNeighbour(2*_dim+1, grid.mapPositionToIndex(_myPosition));
          }
-         
       }
       
 /*******************************************************************************************/
@@ -1062,6 +1089,7 @@ namespace espressopp {
          Int3D _numSites = Int3D(0,0,0);
          Real3D _myLeft = Real3D(0.,0.,0.);
          real _L = 0.;
+         Int3D _Ni = Int3D(0,0,0);
          
          Int3D _nodeGrid = getNodeGrid();
          longint _myRank = getSystem()->comm->rank();
@@ -1073,9 +1101,9 @@ namespace espressopp {
             floor(_myPosition[_dim]*_L/(_nodeGrid[_dim]*getA())) +
             2 * getHaloSkin();
             _myLeft[_dim] = floor(_myPosition[_dim]*_L/_nodeGrid[_dim]);
+            _Ni[_dim] = (int)(_L / getA());
          }
-         
-         setNi((Int3D) (_L / getA()));
+         setNi(_Ni);
          setMyNi (_numSites);
          setMyLeft (_myLeft);
       }
@@ -1223,11 +1251,11 @@ namespace espressopp {
          // send and receive data or use memcpy if number of CPU in y-dir is 1
          if (getNodeGrid().getItem(1) > 1) {
             if (_myPosition[1] % 2 == 0) {
-               world.send(snode, COMM_DIR_2, bufToSend);
-               world.recv(rnode, COMM_DIR_2, bufToRecv);
+               world.send(snode, COMM_DIR_0, bufToSend);
+               world.recv(rnode, COMM_DIR_0, bufToRecv);
             } else {
-               world.recv(rnode, COMM_DIR_2, bufToRecv);
-               world.send(snode, COMM_DIR_2, bufToSend);
+               world.recv(rnode, COMM_DIR_0, bufToRecv);
+               world.send(snode, COMM_DIR_0, bufToSend);
             }
          } else {
             bufToRecv = bufToSend;
@@ -1268,11 +1296,11 @@ namespace espressopp {
          // send and receive data or use memcpy if number of CPU in y-dir is 1
          if (getNodeGrid().getItem(1) > 1) {
             if (_myPosition[1] % 2 == 0) {
-               world.send(snode, COMM_DIR_3, bufToSend);
-               world.recv(rnode, COMM_DIR_3, bufToRecv);
+               world.send(snode, COMM_DIR_1, bufToSend);
+               world.recv(rnode, COMM_DIR_1, bufToRecv);
             } else {
-               world.recv(rnode, COMM_DIR_3, bufToRecv);
-               world.send(snode, COMM_DIR_3, bufToSend);
+               world.recv(rnode, COMM_DIR_1, bufToRecv);
+               world.send(snode, COMM_DIR_1, bufToSend);
             }
          } else {
             bufToRecv = bufToSend;
@@ -1320,11 +1348,11 @@ namespace espressopp {
          // send and receive data or use memcpy if number of CPU in z-dir is 1
          if (getNodeGrid().getItem(2) > 1) {
             if (_myPosition[2] % 2 == 0) {
-               world.send(snode, COMM_DIR_4, bufToSend);
-               world.recv(rnode, COMM_DIR_4, bufToRecv);
+               world.send(snode, COMM_DIR_0, bufToSend);
+               world.recv(rnode, COMM_DIR_0, bufToRecv);
             } else {
-               world.recv(rnode, COMM_DIR_4, bufToRecv);
-               world.send(snode, COMM_DIR_4, bufToSend);
+               world.recv(rnode, COMM_DIR_0, bufToRecv);
+               world.send(snode, COMM_DIR_0, bufToSend);
             }
          } else {
             bufToRecv = bufToSend;
@@ -1365,11 +1393,11 @@ namespace espressopp {
          // send and receive data or use memcpy if number of CPU in z-dir is 1
          if (getNodeGrid().getItem(2) > 1) {
             if (_myPosition[2] % 2 == 0) {
-               world.send(snode, COMM_DIR_5, bufToSend);
-               world.recv(rnode, COMM_DIR_5, bufToRecv);
+               world.send(snode, COMM_DIR_1, bufToSend);
+               world.recv(rnode, COMM_DIR_1, bufToRecv);
             } else {
-               world.recv(rnode, COMM_DIR_5, bufToRecv);
-               world.send(snode, COMM_DIR_5, bufToSend);
+               world.recv(rnode, COMM_DIR_1, bufToRecv);
+               world.send(snode, COMM_DIR_1, bufToSend);
             }
          } else {
             bufToRecv = bufToSend;
@@ -1522,11 +1550,11 @@ namespace espressopp {
          // send and receive data or use memcpy if number of CPU in y-dir is 1
          if (getNodeGrid().getItem(1) > 1) {
             if (_myPosition[1] % 2 == 0) {
-               world.send(snode, COMM_FORCE_2, bufToSend);
-               world.recv(rnode, COMM_FORCE_2, bufToRecv);
+               world.send(snode, COMM_FORCE_0, bufToSend);
+               world.recv(rnode, COMM_FORCE_0, bufToRecv);
             } else {
-               world.recv(rnode, COMM_FORCE_2, bufToRecv);
-               world.send(snode, COMM_FORCE_2, bufToSend);
+               world.recv(rnode, COMM_FORCE_0, bufToRecv);
+               world.send(snode, COMM_FORCE_0, bufToSend);
             }
          } else {
             bufToRecv = bufToSend;
@@ -1561,11 +1589,11 @@ namespace espressopp {
          // send and receive data or use memcpy if number of CPU in y-dir is 1
          if (getNodeGrid().getItem(1) > 1) {
             if (_myPosition[1] % 2 == 0) {
-               world.send(snode, COMM_FORCE_3, bufToSend);
-               world.recv(rnode, COMM_FORCE_3, bufToRecv);
+               world.send(snode, COMM_FORCE_1, bufToSend);
+               world.recv(rnode, COMM_FORCE_1, bufToRecv);
             } else {
-               world.recv(rnode, COMM_FORCE_3, bufToRecv);
-               world.send(snode, COMM_FORCE_3, bufToSend);
+               world.recv(rnode, COMM_FORCE_1, bufToRecv);
+               world.send(snode, COMM_FORCE_1, bufToSend);
             }
          } else {
             bufToRecv = bufToSend;
@@ -1607,11 +1635,11 @@ namespace espressopp {
          // send and receive data or use memcpy if number of CPU in z-dir is 1
          if (getNodeGrid().getItem(2) > 1) {
             if (_myPosition[2] % 2 == 0) {
-               world.send(snode, COMM_FORCE_4, bufToSend);
-               world.recv(rnode, COMM_FORCE_4, bufToRecv);
+               world.send(snode, COMM_FORCE_0, bufToSend);
+               world.recv(rnode, COMM_FORCE_0, bufToRecv);
             } else {
-               world.recv(rnode, COMM_FORCE_4, bufToRecv);
-               world.send(snode, COMM_FORCE_4, bufToSend);
+               world.recv(rnode, COMM_FORCE_0, bufToRecv);
+               world.send(snode, COMM_FORCE_0, bufToSend);
             }
          } else {
             bufToRecv = bufToSend;
@@ -1646,11 +1674,11 @@ namespace espressopp {
          // send and receive data or use memcpy if number of CPU in z-dir is 1
          if (getNodeGrid().getItem(2) > 1) {
             if (_myPosition[2] % 2 == 0) {
-               world.send(snode, COMM_FORCE_5, bufToSend);
-               world.recv(rnode, COMM_FORCE_5, bufToRecv);
+               world.send(snode, COMM_FORCE_1, bufToSend);
+               world.recv(rnode, COMM_FORCE_1, bufToRecv);
             } else {
-               world.recv(rnode, COMM_FORCE_5, bufToRecv);
-               world.send(snode, COMM_FORCE_5, bufToSend);
+               world.recv(rnode, COMM_FORCE_1, bufToRecv);
+               world.send(snode, COMM_FORCE_1, bufToSend);
             }
          } else {
             bufToRecv = bufToSend;
@@ -1798,11 +1826,11 @@ namespace espressopp {
          // send and receive data or use memcpy if number of CPU in y-dir is 1
          if (getNodeGrid().getItem(1) > 1) {
             if (_myPosition[1] % 2 == 0) {
-               world.send(snode, COMM_DEN_2, bufToSend);
-               world.recv(rnode, COMM_DEN_2, bufToRecv);
+               world.send(snode, COMM_DEN_0, bufToSend);
+               world.recv(rnode, COMM_DEN_0, bufToRecv);
             } else {
-               world.recv(rnode, COMM_DEN_2, bufToRecv);
-               world.send(snode, COMM_DEN_2, bufToSend);
+               world.recv(rnode, COMM_DEN_0, bufToRecv);
+               world.send(snode, COMM_DEN_0, bufToSend);
             }
          } else {
             bufToRecv = bufToSend;
@@ -1837,11 +1865,11 @@ namespace espressopp {
          // send and receive data or use memcpy if number of CPU in y-dir is 1
          if (getNodeGrid().getItem(1) > 1) {
             if (_myPosition[1] % 2 == 0) {
-               world.send(snode, COMM_DEN_3, bufToSend);
-               world.recv(rnode, COMM_DEN_3, bufToRecv);
+               world.send(snode, COMM_DEN_1, bufToSend);
+               world.recv(rnode, COMM_DEN_1, bufToRecv);
             } else {
-               world.recv(rnode, COMM_DEN_3, bufToRecv);
-               world.send(snode, COMM_DEN_3, bufToSend);
+               world.recv(rnode, COMM_DEN_1, bufToRecv);
+               world.send(snode, COMM_DEN_1, bufToSend);
             }
          } else {
             bufToRecv = bufToSend;
@@ -1883,11 +1911,11 @@ namespace espressopp {
          // send and receive data or use memcpy if number of CPU in z-dir is 1
          if (getNodeGrid().getItem(2) > 1) {
             if (_myPosition[2] % 2 == 0) {
-               world.send(snode, COMM_DEN_4, bufToSend);
-               world.recv(rnode, COMM_DEN_4, bufToRecv);
+               world.send(snode, COMM_DEN_0, bufToSend);
+               world.recv(rnode, COMM_DEN_0, bufToRecv);
             } else {
-               world.recv(rnode, COMM_DEN_4, bufToRecv);
-               world.send(snode, COMM_DEN_4, bufToSend);
+               world.recv(rnode, COMM_DEN_0, bufToRecv);
+               world.send(snode, COMM_DEN_0, bufToSend);
             }
          } else {
             bufToRecv = bufToSend;
@@ -1922,11 +1950,11 @@ namespace espressopp {
          // send and receive data or use memcpy if number of CPU in z-dir is 1
          if (getNodeGrid().getItem(2) > 1) {
             if (_myPosition[2] % 2 == 0) {
-               world.send(snode, COMM_DEN_5, bufToSend);
-               world.recv(rnode, COMM_DEN_5, bufToRecv);
+               world.send(snode, COMM_DEN_1, bufToSend);
+               world.recv(rnode, COMM_DEN_1, bufToRecv);
             } else {
-               world.recv(rnode, COMM_DEN_5, bufToRecv);
-               world.send(snode, COMM_DEN_5, bufToSend);
+               world.recv(rnode, COMM_DEN_1, bufToRecv);
+               world.send(snode, COMM_DEN_1, bufToSend);
             }
          } else {
             bufToRecv = bufToSend;

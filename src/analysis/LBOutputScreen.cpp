@@ -1,23 +1,21 @@
 /*
-  Copyright (C) 2012,2013
-      Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
-      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+ Copyright (C) 2012-2016 Max Planck Institute for Polymer Research
+ Copyright (C) 2008-2011 Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+ 
+ This file is part of ESPResSo++.
   
-  This file is part of ESPResSo++.
+ ESPResSo++ is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
   
-  ESPResSo++ is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+ ESPResSo++ is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
   
-  ESPResSo++ is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "python.hpp"
@@ -48,7 +46,8 @@ namespace espressopp {
 			
 			Real3D _velCM = Real3D(0.,0.,0.);
 			Real3D _totVelCM = Real3D(0.,0.,0.);
-			// loop over all particles in the current CPU
+			
+			// loop over all particles in the curr CPU and interpolate CM's vel to moment t+dt
 			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 				Real3D& vel = cit->velocity();
 				Real3D& force = cit->force();
@@ -74,10 +73,12 @@ namespace espressopp {
 					setLBTimerNew(timeLBtoMD.getElapsedTime());
 					timelb = getLBTimerNew() - getLBTimerOld();
 					setLBTimerOld(getLBTimerNew());
-					printf ("_step is %ld, getOldStepNum() is %ld, lbVolume is %d\n", _step, getOldStepNum(), lbVolume);
+					printf ("_step is %ld, getOldStepNum() is %ld, lbVolume is %ld\n", _step, getOldStepNum(), lbVolume);
 					printf ("time spent on %ld LB(+MD) steps is %f sec, relative MLUPS: %f \n",
 									_step-getOldStepNum(), timelb,
 									(_step-getOldStepNum())*lbVolume*1e-6 / timelb);
+					printf ("Speed of simulation (in LJ units): %f tau per second\n",
+									(_step-getOldStepNum())*_timestep / timelb);
 
 				} else {
 					timeLBtoMD.reset();
