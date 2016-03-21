@@ -31,14 +31,6 @@ addons:
       - g++-4.9
       - gcc-5
       - g++-5
-  coverity_scan:
-    project:
-      name: "espressopp/espressopp"
-      description: "Build submitted via Travis CI"
-    notification_email: espp-devel@listserv.mpip-mainz.mpg.de
-    build_command_prepend: "mkdir cov_build && cd cov_build && cmake -DEXTERNAL_BOOST=ON -DEXTERNAL_MPI4PY=ON .."
-    build_command: "true" #actual build with "make -j4" takes too long
-    branch_pattern: master
 
 before_install:
  - if [[ ${GVER} ]]; then export CC=gcc-${GVER}; export CXX=g++-${GVER}; fi
@@ -57,9 +49,6 @@ before_install:
 env: #maybe add mpich later
   global:
     - CCACHE_CPP2=yes
-    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
-    #   via the "travis encrypt" command using the project repo's public key
-    - secure: "KC52fV+BPy8a2SXySTwP2jWA/fEd2w7oeEKpapjKKYdER1a0RpJzaKvAo4LAgLUyuT1XQvMCwqzfNiduA0e3K5qkOOohEnQT5bFjSmEBfeMmuZaDWELqmaPMC0s4L6U4a6Yu+tnwghKkGXz7hXGrxvxGyniOHv47GWhz1GnJxRI="
   matrix:
     - EXTERNAL=ON BUILD_UG=ON
     - EXTERNAL=ON COVERAGE=ON
