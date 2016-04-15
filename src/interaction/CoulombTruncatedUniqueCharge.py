@@ -26,9 +26,9 @@ r"""
 .. math::
 	U = \frac{Q}{d}
 
-where `Q` is the product of the charges of the two particles and `d` is their distance from each other.
+where :math:`Q` is the product of the charges of the two particles and :math:`d` is their distance from each other.
 
-In this interaction potential, a unique `Q = q_iq_j` value is specified per potential. For a more flexible truncated Coulomb interaction potential where each individual particle has its own charge `q_i`, see CoulombTruncated.
+In this interaction potential, a unique :math:`Q = q_iq_j` value is specified per potential. For a more flexible truncated Coulomb interaction potential where each individual particle has its own charge :math:`q_i`, see CoulombTruncated.
 
 .. function:: espressopp.interaction.CoulombTruncatedUniqueCharge(qq, cutoff, shift)
 
