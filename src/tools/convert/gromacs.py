@@ -825,6 +825,7 @@ def storeDihedrals(f, types, dihedraltypes, dihedraltypeparams, dihedrals, num_a
     return dihedrals
     
 def storeImpropers(f, types, impropertypes, impropertypeparams, impropers, num_atoms_molecule, num_molecule_copies, molstartindex, atomtype_wildcard):
+    print '#Warning! This parser of the improper angles section of gromacs-format forcefield files is for the Amber forcefield only. Other forcefields may have a different atom ordering.'
     line = ''                          
     impropers_tmp = []
     pos = f.tell()
@@ -843,6 +844,7 @@ def storeImpropers(f, types, impropertypes, impropertypeparams, impropers, num_a
         tmp = line.split()
         lookup=(len(tmp)<=5)
         pid1, pid2, pid3, pid4 = map(int, tmp[0:4])
+        #in gromacs format topol.top and forcefield files for the Amber forcefield, the centre atom in an improper is listed third. Atoms listed first and second can be wild types (X)
         if lookup:                                        
             t1, t2, t3, t4 = types[pid1-1], types[pid2-1], types[pid3-1], types[pid4-1] # get types of particles
             try:
