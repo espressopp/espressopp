@@ -156,17 +156,25 @@ def pqrwrite(filename, system, molsize=4, append=False):
   file.close()
 
 def psfwrite(filename, system, maxdist=None, molsize=4, typenames=None):
+  #if not all molecules have the same number of atoms, set molsize=0
   file = open(filename,'w')
   maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
   nParticles    = int(espressopp.analysis.NPart(system).compute())
   file.write("PSF CMAP\n")
+  file.write(" \n")
+  file.write("       1 !NTITLE\n")
+  file.write("  REMARK remark")
+  file.write(" \n")
   st = "\n%8d !NATOM\n" % nParticles
   file.write(st)
   
   pid    = 0
   addToPid = 0 # if pid begins from 0, then addToPid should be +1
-  mol    = 0
-  molcnt = 0
+  if (molsize>0):
+    mol    = 0
+    molcnt = 0
+  else: #not all molecules have same number of atoms
+    mol    = 1
   name='FE' # default name, overwritten when typenames map is given
   while pid <= maxParticleID:
     if system.storage.particleExists(pid):
@@ -177,15 +185,18 @@ def psfwrite(filename, system, maxdist=None, molsize=4, typenames=None):
       ypos   = particle.pos[1]
       zpos   = particle.pos[2]
       type   = particle.type
+      q      = particle.q
+      mass   = particle.mass
       if typenames:
 	  name=typenames[type]
-      st = "%8d T%03d %4d UNX  %2s   %2s                    \n" % (pid+addToPid, type, mol, name, name)
+      st = "%8d T%5d    UNX  %-4s %-4s  %9.6f%14.4f\n" % (pid+addToPid, mol, name, name, q, mass)
       file.write(st)
       pid    += 1
-      molcnt += 1
-      if molcnt == molsize:
-        mol   += 1
-        molcnt = 0
+      if (molsize>0):
+        molcnt += 1
+        if molcnt == molsize:
+          mol   += 1
+          molcnt = 0
     else:
       pid += 1
 
