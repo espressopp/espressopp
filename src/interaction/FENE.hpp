@@ -97,7 +97,7 @@ namespace espressopp {
 
         real ffactor;
         
-        if(r0 == 0) {
+        if(r0 != 0) {
           real r = sqrt(distSqr);
           ffactor = -K * (r - r0) / (1 - pow((r - r0) / rMax, 2)) / r;
         } else {
