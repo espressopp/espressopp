@@ -26,6 +26,7 @@ using namespace espressopp;  // NOLINT
 
 BOOST_AUTO_TEST_SUITE(Array4Dtest)
 
+/** Test helper class to mock an element of array. */
 class T {
  public:
   T() {
@@ -38,6 +39,7 @@ class T {
   int a_;
 };
 
+/** Initialized the test, mainly the setUp() method. */
 struct Fixture {
   Fixture() {
     a4 = esutil::Array4D<T, esutil::enlarge>(0, 0, 0, 0, T());
@@ -47,6 +49,7 @@ struct Fixture {
   esutil::Array4D<T, esutil::enlarge> a4;
 };
 
+/** Test 1: check if newly created array is empty. */
 BOOST_FIXTURE_TEST_CASE(test1, Fixture) {
   BOOST_CHECK_EQUAL(a4.size_n(), 0);
   BOOST_CHECK_EQUAL(a4.size_m(), 0);
@@ -55,18 +58,23 @@ BOOST_FIXTURE_TEST_CASE(test1, Fixture) {
   BOOST_CHECK(a4.empty());
 }
 
+/** Test 2: Check if array is enlarged and T object is created by
+    default constructor. */
 BOOST_FIXTURE_TEST_CASE(test2, Fixture) {
   T &t = a4.at(0, 0, 0, 0);
   BOOST_CHECK_EQUAL(t.a_, -1);
 }
 
+/** Test 3: Checks correctness of enlarging of the array. */
 BOOST_FIXTURE_TEST_CASE(test3, Fixture) {
+  // Put T object in different places of the array.
   a4.at(2, 0, 0, 0) = T(2);
   a4.at(2, 3, 0, 0) = T(3);
   a4.at(2, 3, 4, 0) = T(4);
   a4.at(2, 3, 4, 5) = T(5);
   a4.at(1, 1, 1, 1) = T(6);
 
+  // First check if objects at certain places are correct.
   T &t2 = a4.at(2, 0, 0, 0);
   BOOST_CHECK_EQUAL(t2.a_, 2);
   T &t3 = a4.at(2, 3, 0, 0);
@@ -78,11 +86,13 @@ BOOST_FIXTURE_TEST_CASE(test3, Fixture) {
   T &t6 = a4.at(1, 1, 1, 1);
   BOOST_CHECK_EQUAL(t6.a_, 6);
 
+  // Check the size of the array.
   BOOST_CHECK_EQUAL(a4.size_n(), 3);
   BOOST_CHECK_EQUAL(a4.size_m(), 4);
   BOOST_CHECK_EQUAL(a4.size_p(), 5);
   BOOST_CHECK_EQUAL(a4.size_q(), 6);
 
+  // Checks if in other places of array the T object has correct value.
   for (int i = 0; i < a4.size_n(); i++) {
     for (int j = 0; j < a4.size_m(); j++) {
       for (int p = 0; p < a4.size_p(); p++) {
