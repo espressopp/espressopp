@@ -1,0 +1,6 @@
+#find_package (Boost COMPONENTS system filesystem unit_test_framework REQUIRED)
+#include_directories(${Boost_INCLUDE_DIRS})
+add_definitions (-DBOOST_TEST_DYN_LINK)
+add_executable(Array4D Array4D.cpp)
+add_test(Array4D ${CMAKE_CURRENT_SOURCE_DIR}/Array4D)
+set_tests_properties(Array4D PROPERTIES ENVIRONMENT "${TEST_ENV}")
