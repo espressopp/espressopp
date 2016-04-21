@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2016
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -35,6 +37,7 @@ namespace espressopp {
             private:
                 std::string filename;
                 shared_ptr <Interpolation> table;
+                int interpolationType;
          
             public:
                 static void registerPython();
@@ -46,15 +49,21 @@ namespace espressopp {
              
                 TabulatedAngular(int itype, const char* filename) {
                     setFilename(itype, filename);
-                    std::cout << "using tabulated potential " << filename << "\n";
+                    setInterpolationType(itype);
                 }
              
                 TabulatedAngular(int itype, const char* filename, real cutoff) {
                     setFilename(itype, filename);
+                    setInterpolationType(itype);
                     setCutoff(cutoff);
                     std::cout << "using tabulated potential " << filename << "\n";
                 }
-             
+                /** Setter for the interpolation type */
+                void setInterpolationType(int itype) { interpolationType = itype; }
+
+                /** Getter for the interpolation type */
+                int getInterpolationType() const { return interpolationType; }
+
                 void setFilename(int itype, const char* _filename);
              
                 const char* getFilename() const {
@@ -98,6 +107,16 @@ namespace espressopp {
                 }
              
         }; // class
+
+        // provide pickle support
+        struct TabulatedAngular_pickle : boost::python::pickle_suite {
+          static boost::python::tuple getinitargs(TabulatedAngular const& pot) {
+            int itp = pot.getInterpolationType();
+            std::string fn = pot.getFilename();
+            real rc = pot.getCutoff();
+            return boost::python::make_tuple(itp, fn,rc);
+          }
+        };
      
     } // ns interaction
 

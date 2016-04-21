@@ -1,21 +1,21 @@
 /*
   Copyright (C) 2016
       Jakub Krajniak (jkrajniak at gmail.com)
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef _ESUTIL_ARRAY4D_H
@@ -134,7 +134,9 @@ class Array4D: private std::vector<T> {
   and \c pos[2] return the indices.
   \attention No range checking. */
   template<class Vector>
-  reference operator()(const Vector &pos) { return operator()(pos[0], pos[1], pos[2], pos[3]); }
+  reference operator()(const Vector &pos) {
+    return operator()(pos[0], pos[1], pos[2], pos[3]);
+  }
 
   /** \brief Returns the element at position \p pos.
 
@@ -142,7 +144,9 @@ class Array4D: private std::vector<T> {
   \c pos[2] return the indices.
   \attention No range checking. */
   template<class Vector>
-  const_reference operator()(const Vector &pos) const { return operator()(pos[0], pos[1], pos[2], pos[3]); }
+  const_reference operator()(const Vector &pos) const {
+    return operator()(pos[0], pos[1], pos[2], pos[3]);
+  }
 
   /** \brief Returns the element at position \p i x \p j x \p k.
   \exception out_of_range \p i is out of range of the Array4D */
@@ -277,7 +281,7 @@ class Array4D<T, enlarge>: public Array4D<T, exception> {
   using Super::size_q;
 
   /** \brief Default constructor. */
-  Array4D(const T &prototype = T()) {
+  explicit Array4D(const T &prototype = T()) {
     init(0, 0, 0, 0, prototype);
   }
 
@@ -374,6 +378,7 @@ class Array4D<T, enlarge>: public Array4D<T, exception> {
  private:
   value_type prototype;
 };
-}
-}
+
+}  // namespace esutil
+}  // namespace espressopp
 #endif

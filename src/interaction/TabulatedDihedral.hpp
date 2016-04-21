@@ -35,6 +35,7 @@ namespace espressopp {
             private:
                 std::string filename;
                 shared_ptr <Interpolation> table;
+                int interpolationType;
          
             public:
                 static void registerPython();
@@ -45,15 +46,21 @@ namespace espressopp {
              
                 TabulatedDihedral(int itype, const char* filename) {
                     setFilename(itype, filename);
-                    std::cout << "using tabulated potential " << filename << "\n";
+                    setInterpolationType(itype);
                 }
              
                 TabulatedDihedral(int itype, const char* filename, real cutoff) {
                     setFilename(itype, filename);
+                    setInterpolationType(itype);
                     setCutoff(cutoff);
                     std::cout << "using tabulated potential " << filename << "\n";
                 }
-             
+                /** Setter for the interpolation type */
+                void setInterpolationType(int itype) { interpolationType = itype; }
+
+                /** Getter for the interpolation type */
+                int getInterpolationType() const { return interpolationType; }
+
                 void setFilename(int itype, const char* _filename);
              
                 const char* getFilename() const {
@@ -165,7 +172,19 @@ namespace espressopp {
                 }
              
         }; // class
-     
+    // provide pickle support
+    struct TabulatedDihedral_pickle : boost::python::pickle_suite
+    {
+      static
+      boost::python::tuple
+      getinitargs(TabulatedDihedral const& pot)
+      {   int itp        = pot.getInterpolationType();
+          std::string fn = pot.getFilename();
+          real rc        = pot.getCutoff();
+          return boost::python::make_tuple(itp, fn,rc);
+      }
+    };
+
     } // ns interaction
 
 } //ns espressopp

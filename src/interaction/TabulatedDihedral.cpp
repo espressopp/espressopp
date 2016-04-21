@@ -27,6 +27,7 @@
 #include "InterpolationCubic.hpp"
 #include "FixedTripleListInteractionTemplate.hpp"
 #include "FixedQuadrupleListInteractionTemplate.hpp"
+#include "FixedQuadrupleListTypesInteractionTemplate.hpp"
 
 namespace espressopp {
     namespace interaction {
@@ -53,7 +54,10 @@ namespace espressopp {
         }
 
         typedef class FixedQuadrupleListInteractionTemplate <TabulatedDihedral>
-                FixedQuadrupleListTabulatedDihedral;
+            FixedQuadrupleListTabulatedDihedral;
+
+        typedef class FixedQuadrupleListTypesInteractionTemplate<TabulatedDihedral>
+            FixedQuadrupleListTypesTabulatedDihedral;
 
         //////////////////////////////////////////////////
         // REGISTRATION WITH PYTHON
@@ -63,15 +67,26 @@ namespace espressopp {
             
             class_ <TabulatedDihedral, bases <DihedralPotential> >
                 ("interaction_TabulatedDihedral", init <int, const char*>())
-                .add_property("filename", &TabulatedDihedral::getFilename, &TabulatedDihedral::setFilename);
+                .add_property("filename", &TabulatedDihedral::getFilename, &TabulatedDihedral::setFilename)
+                .def_pickle(TabulatedDihedral_pickle())
+                ;
             
-            class_ <FixedQuadrupleListTabulatedDihedral, bases <Interaction> > 
+            class_ <FixedQuadrupleListTabulatedDihedral, bases <Interaction> >
                 ("interaction_FixedQuadrupleListTabulatedDihedral",
                         init <shared_ptr<System>,
                               shared_ptr<FixedQuadrupleList>,
                               shared_ptr<TabulatedDihedral> >())
                 .def("setPotential", &FixedQuadrupleListTabulatedDihedral::setPotential)
                 .def("getFixedQuadrupleList", &FixedQuadrupleListTabulatedDihedral::getFixedQuadrupleList);
+
+            class_< FixedQuadrupleListTypesTabulatedDihedral, bases< Interaction > >
+                ("interaction_FixedQuadrupleListTypesTabulatedDihedral",
+                 init< shared_ptr<System>, shared_ptr<FixedQuadrupleList> >())
+                .def("setPotential", &FixedQuadrupleListTypesTabulatedDihedral::setPotential)
+                .def("getPotential", &FixedQuadrupleListTypesTabulatedDihedral::getPotentialPtr)
+                .def("setFixedQuadrupleList", &FixedQuadrupleListTypesTabulatedDihedral::setFixedQuadrupleList)
+                .def("getFixedQuadrupleList", &FixedQuadrupleListTypesTabulatedDihedral::getFixedQuadrupleList);
+
         }
         
     } // ns interaction
