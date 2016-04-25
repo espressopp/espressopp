@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013,2015(H)
+#  Copyright (C) 2012,2013,2015(H),2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -825,7 +825,7 @@ def storeDihedrals(f, types, dihedraltypes, dihedraltypeparams, dihedrals, num_a
     return dihedrals
     
 def storeImpropers(f, types, impropertypes, impropertypeparams, impropers, num_atoms_molecule, num_molecule_copies, molstartindex, atomtype_wildcard):
-    print '#Warning! This parser of the improper angles section of gromacs-format forcefield files is for the Amber forcefield only. Other forcefields may have a different atom ordering.'
+    print '#Warning! This parser of the improper angles section of gromacs-format forcefield files is for the Amber forcefield only. Other forcefields may have a different atom ordering. See storeImpropers in gromacs.py for further details.'
     line = ''                          
     impropers_tmp = []
     pos = f.tell()
