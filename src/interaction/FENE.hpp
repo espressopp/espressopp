@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012-2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -30,13 +30,7 @@
 
 namespace espressopp {
   namespace interaction {
-    /** This class provides methods to compute forces and energies of
-        the FENE potential.
 
-        \f[ V(r) = -\frac{1}{2} \Delta r_{max}^2 K \log \left[ 1 -
-        \left(\frac{r-r_0}{\Delta r_{max}} \right)^2 \right]
-        \f]
-    */
     class FENE : public PotentialTemplate< FENE > {
     private:
       real K;
@@ -104,7 +98,7 @@ namespace espressopp {
 
         real ffactor;
         
-        if(r0 != 0) {
+        if(r0 > ROUND_ERROR_PREC) {
           real r = sqrt(distSqr);
           ffactor = -K * (r - r0) / (r * (1 - ((r - r0)*(r - r0) / rMaxSqr)));
         } else {
