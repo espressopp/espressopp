@@ -33,47 +33,58 @@ In this interaction potential, a different charge can be associated with each pa
 
 .. function:: espressopppp.interaction.CoulombTruncated(prefactor, cutoff)
 
-		:param prefactor: (default: 1.0)
-		:param cutoff: (default: infinity)
+		:param prefactor: (default: 1.0) user-supplied prefactor `k`
+		:param cutoff: (default: infinity) user-supplied interaction cutoff
 		:type prefactor: real
 		:type cutoff: real
 
 .. function:: espressopppp.interaction.VerletListCoulombTruncated(vl)
 
-		:param vl: 
-		:type vl: 
+		:param vl: verlet list object defined earlier in python script
+		:type vl: VerletList
 
 .. function:: espressopppp.interaction.VerletListCoulombTruncated.getPotential(type1, type2)
 
-		:param type1: 
-		:param type2: 
-		:type type1: 
-		:type type2: 
+		:param type1: type of first atom in pair
+		:param type2: type of second atom in pair
+		:type type1: integer
+		:type type2: integer
 
 .. function:: espressopppp.interaction.VerletListCoulombTruncated.setPotential(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+		:param type1: type of first atom in pair
+		:param type2: type of second atom in pair
+		:param potential: potential object defined earlier in python script
+		:type type1: integer
+		:type type2: integer
+		:type potential: CoulombTruncated potential
 
-.. function:: espressopppp.interaction.FixedPairListTypesCoulombTruncated(system, vl, potential)
+.. function:: espressopppp.interaction.FixedPairListTypesCoulombTruncated(system, vl)
 
-		:param system: 
-		:param vl: 
-		:type system: 
-		:type vl: 
+		:param system: system object defined earlier in the python script
+		:param vl: fixedpairlist object defined earlier in the python script
+		:type system: System
+		:type vl: FixedPairList
 
 .. function:: espressopppp.interaction.FixedPairListTypesCoulombTruncated.setPotential(potential)
 
-		:param potential: 
-		:param type1: 
-		:param type2: 
-		:type potential: 
-		:type type1: 
-		:type type2: 
+		:param type1: type of first atom in pair
+		:param type2: type of second atom in pair
+		:param potential: potential object defined earlier in python script
+		:type type1: integer
+		:type type2: integer
+		:type potential: CoulombTruncated potential
+
+#Example:
+
+>>> pref = 138.935485
+>>> rc = 1.2
+>>> fixedpairlist = espresso.FixedPairList(system.storage)
+>>> fixedpairlist.addBonds([(1,2),(2,3)])
+>>> pot = espressopp.interaction.CoulombTruncated(prefactor=pref, cutoff=rc)
+>>> interaction=espressopp.interaction.FixedPairListTypesCoulombTruncated(system,fixedpairlist)
+>>> interaction.setPotential(type1=0, type2=1, potential=pot)
+>>> system.addInteraction(interaction)
 """
 
 from espressopp import pmi, infinity
