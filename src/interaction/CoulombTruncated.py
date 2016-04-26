@@ -25,7 +25,6 @@ r"""
 
 .. math::
 	U = k\frac{q_iq_j}{d_{ij}}
-;
 
 where :math:`k` is the user-supplied prefactor, :math:`q_i` is the charge of particle `i`, and :math:`d_{ij}` is interparticle distance
 
@@ -97,13 +96,11 @@ from _espressopp import interaction_CoulombTruncated, \
                       interaction_FixedPairListTypesCoulombTruncated
 
 class CoulombTruncatedLocal(PotentialLocal, interaction_CoulombTruncated):
-    'The (local) CoulombTruncated potential.'
     def __init__(self, prefactor=1.0, cutoff=infinity):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
              cxxinit(self, interaction_CoulombTruncated, prefactor, cutoff)
 
 class VerletListCoulombTruncatedLocal(InteractionLocal, interaction_VerletListCoulombTruncated):
-    'The (local) CoulombTruncated interaction using Verlet lists.'
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListCoulombTruncated, vl)
@@ -117,7 +114,6 @@ class VerletListCoulombTruncatedLocal(InteractionLocal, interaction_VerletListCo
             return self.cxxclass.getPotential(self, type1, type2)
 
 class FixedPairListTypesCoulombTruncatedLocal(InteractionLocal, interaction_FixedPairListTypesCoulombTruncated):
-    'The (local) CoulombTruncated interaction using FixedPair lists with types.'
     def __init__(self, system, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListTypesCoulombTruncated, system, vl)
