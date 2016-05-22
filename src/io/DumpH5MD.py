@@ -1,8 +1,9 @@
+# Copyright (c) 2015,2016
+#     Jakub Krajniak (jkrajniak at gmail.com)
+#
 # Copyright (c) 2015
 #     Pierre de Buyl
 #
-# Copyright (c) 2015-2016
-#     Jakub Krajniak (jkrajniak at gmail.com)
 #
 #  This file is part of ESPResSo++.
 #
@@ -89,7 +90,12 @@ from espressopp import pmi
 from _espressopp import io_DumpH5MD
 from mpi4py import MPI
 import numpy as np
-import pyh5md
+try:
+    import pyh5md
+except ImportError:
+    print 'missing pyh5md'
+
+import time as py_time
 
 
 class DumpH5MDLocal(io_DumpH5MD):
@@ -202,6 +208,10 @@ class DumpH5MDLocal(io_DumpH5MD):
 
         self._system_data()
 
+	self.commTimer = 0.0
+	self.updateTimer = 0.0
+	self.writeTimer = 0.0
+
     def _system_data(self):
         """Stores specific information about simulation."""
         # Creates /system group
@@ -214,60 +224,85 @@ class DumpH5MDLocal(io_DumpH5MD):
             parameters['dt'] = self.system.integrator.dt
         self.set_parameters(parameters)
 
+    def getTimers(self):
+        if pmi.workerIsActive():
+            return {'commTimer': self.commTimer,
+                    'updateTimer': self.updateTimer,
+                    'writeTimer': self.writeTimer
+                   }
+
     def set_parameters(self, paramters):
-        if 'parameters' not in self.file.f:
-            self.file.f.create_group('parameters')
-        g_params = self.file.f['parameters']
-        for k, v in paramters.iteritems():
-            g_params.attrs[k] = v
+        if pmi.workerIsActive():
+            if 'parameters' not in self.file.f:
+                self.file.f.create_group('parameters')
+            g_params = self.file.f['parameters']
+            for k, v in paramters.iteritems():
+                g_params.attrs[k] = v
 
     def get_file(self):
-        return self.file.f
+        if pmi.workerIsActive():
+            return self.file.f
 
     def update(self):
         if pmi.workerIsActive():
             self.cxxclass.update(self)
 
     def clear_buffers(self):
-        self.cxxclass.clear_buffers(self)
+        if pmi.workerIsActive():
+            self.cxxclass.clear_buffers(self)
 
     def getPosition(self):
-        return self.cxxclass.getPosition(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getPosition(self)
 
     def getImage(self):
-        return self.cxxclass.getImage(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getImage(self)
 
     def getVelocity(self):
-        return self.cxxclass.getVelocity(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getVelocity(self)
 
     def getForce(self):
-        return self.cxxclass.getForce(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getForce(self)
 
     def getId(self):
-        return self.cxxclass.getId(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getId(self)
 
     def getSpecies(self):
-        return self.cxxclass.getSpecies(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getSpecies(self)
 
     def getState(self):
-        return self.cxxclass.getState(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getState(self)
 
     def getCharge(self):
-        return self.cxxclass.getCharge(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getCharge(self)
 
     def getMass(self):
-        return self.cxxclass.getMass(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getMass(self)
 
     def getLambdaAdr(self):
-        return self.cxxclass.getLambda(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getLambda(self)
 
     def getResId(self):
-        return self.cxxclass.getResId(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getResId(self)
 
     def dump(self, step, time):
         if not pmi.workerIsActive():
             return
+        time0 = py_time.time()
         self.update()
+        self.updateTimer += (py_time.time() - time0)
+
+        time0 = py_time.time()
         NLocal = np.array(self.NLocal, 'i')
         NMaxLocal = np.array(0, 'i')
         MPI.COMM_WORLD.Allreduce(NLocal, NMaxLocal, op=MPI.MAX)
@@ -275,7 +310,9 @@ class DumpH5MDLocal(io_DumpH5MD):
         total_size = MPI.COMM_WORLD.size*cpu_size
         idx_0 = MPI.COMM_WORLD.rank*cpu_size
         idx_1 = idx_0+NLocal
+        self.commTimer += (py_time.time() - time0)
 
+        time0 = py_time.time()
         # Store ids. Always!
         id_ar = np.asarray(self.getId())
         if total_size > self.id_e.value.shape[1]:
@@ -350,6 +387,7 @@ class DumpH5MDLocal(io_DumpH5MD):
             if total_size > self.res_id.value.shape[1]:
                 self.res_id.value.resize(total_size, axis=1)
             self.res_id.append(res_id, step, time, region=(idx_0, idx_1))
+        self.writeTimer += (py_time.time() - time0)
 
     def close(self):
         if pmi.workerIsActive():
@@ -368,5 +406,6 @@ if pmi.isController:
             pmicall=['update', 'getPosition', 'getId', 'getSpecies', 'getState', 'getImage',
                      'getVelocity', 'getMass', 'getCharge', 'getResId',
                      'dump', 'clear_buffers', 'flush', 'get_file', 'close', 'set_parameters'],
+            pmiinvoke = ['getTimers'],
             pmiproperty=['store_position', 'store_species', 'store_state', 'store_velocity',
                          'store_charge', 'store_res_id', 'store_lambda'])

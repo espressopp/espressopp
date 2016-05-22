@@ -46,12 +46,23 @@ r"""
 
 .. function:: espressopp.io.DumpTopology.update()
 
-   Update H5MD file.
+   Update the H5MD file.
+
+.. function:: espressopp.io.DumpTopology.add_static_tuple(fpl, name, particle_group)
+
+   Write data from fixed pair list once, not updated whenever the tuple is changed.
+
+   :param fpl: The FixedPairList object.
+   :type fpl: espressopp.FixedPairList
+   :param name: The name of the tuple to store in H5MD file.
+   :type name: str
+   :param particle_group: The particle group to referee to.
+   :type particle_group: str
 
 Example
 +++++++
 
-The code belows dump topology every 10 time steps and stores pairs from
+The code bellows dump topology every 10 time steps and stores pairs from
 FixedPairList `fpl`.
 
 >>> traj_file = espressopp.io.DumpH5MD(
@@ -71,6 +82,11 @@ FixedPairList `fpl`.
 >>> dump_topol.update()
 >>> ext_dump = espressopp.integrator.ExtAnalyze(dump_topol, 10)
 >>> integrator.addExtension(ext_dump)
+
+Stores static data from FixedPairList `fpl_0`
+
+>>> dump_topol.add_static_tuple(fpl_0, 'fpl_0', 'atoms')
+
 """
 
 from espressopp.esutil import cxxinit
@@ -113,6 +129,28 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
             g.attrs['particle_group'] = particle_group
             self.tuple_data[self.tuple_index] = g
             self.tuple_index += 1
+
+    def add_static_tuple(self, fpl, name, particle_group='atoms'):
+        if pmi.workerIsActive():
+            bonds = fpl.getBonds()
+            NMaxLocal = np.array(len(bonds), 'i')
+            NMaxGlobal = np.array(0, 'i')
+            MPI.COMM_WORLD.Allreduce(NMaxLocal, NMaxGlobal, op=MPI.MAX)
+            size_per_cpu = ((NMaxGlobal // self.chunk_size)+1)*self.chunk_size
+            total_size = MPI.COMM_WORLD.size*size_per_cpu
+            # Prepares Dataset.
+            g = pyh5md.FixedData(
+                self.h5md_file.file.f['/connectivity'],
+                name,
+                shape=(total_size, 2),
+                dtype=np.int,
+                fillvalue=-1)
+            g.attrs['particle_group'] = particle_group
+            # Calculates index per cpu.
+            idx_0 = MPI.COMM_WORLD.rank*size_per_cpu
+            idx_1 = idx_0 + NMaxLocal
+            # Writes data.
+            g[idx_0:idx_1] = bonds
 
     def update(self):
         if pmi.workerIsActive():
@@ -161,7 +199,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls='espressopp.io.DumpTopologyLocal',
-            pmicall=['dump', 'clear_buffer', 'observe_tuple', 'update'],
+            pmicall=['dump', 'clear_buffer', 'observe_tuple', 'update', 'add_static_tuple'],
             pmiproperty=[],
             pmiinvoke=['get_data']
         )
