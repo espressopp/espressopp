@@ -43,7 +43,7 @@ namespace espressopp {
 
       gamma  = 0.0;
       temperature = 0.0;
-
+      
       adress = false;
       exclusions.clear();
 
@@ -129,7 +129,7 @@ namespace espressopp {
       LOG4ESPP_DEBUG(theLogger, "thermalize");
 
       System& system = getSystemRef();
-
+      
       CellList cells = system.storage->getRealCells();
 
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
