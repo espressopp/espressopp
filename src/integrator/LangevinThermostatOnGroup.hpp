@@ -84,12 +84,11 @@ class LangevinThermostatOnGroup: public Extension {
   real pref1;  //!< prefactor, reduces complexity of thermalize
   real pref2;  //!< prefactor, reduces complexity of thermalize
 
-  real pref2buffer; //!< temporary to save value between heatUp/coolDown
+  real pref2buffer;  //!< temporary to save value between heatUp/coolDown
 
   shared_ptr<esutil::RNG> rng;  //!< random number generator used for friction term
 
   shared_ptr<ParticleGroup> particle_group;
-
 };
 }  // end namespace integrator
 }  // end namespace espressopp

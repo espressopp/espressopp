@@ -1,21 +1,21 @@
 /*
   Copyright (C) 2016
       Jakub Krajniak (c) (jkrjaniak at gmail.com)
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "python.hpp"
@@ -32,8 +32,9 @@ namespace integrator {
 
 using namespace espressopp::iterator;
 
-LangevinThermostatOnGroup::LangevinThermostatOnGroup(shared_ptr<System> system, shared_ptr<ParticleGroup> _pg)
-    : Extension(system), particle_group(_pg) {
+LangevinThermostatOnGroup::LangevinThermostatOnGroup(
+    shared_ptr<System> system, shared_ptr<ParticleGroup> _pg)
+        : Extension(system), particle_group(_pg) {
   type = Extension::Thermostat;
 
   gamma = 0.0;
@@ -69,7 +70,6 @@ LangevinThermostatOnGroup::~LangevinThermostatOnGroup() {
 }
 
 void LangevinThermostatOnGroup::disconnect() {
-
   _initialize.disconnect();
   _initialize_onSetTimeStep.disconnect();
   _heatUp.disconnect();
@@ -78,7 +78,6 @@ void LangevinThermostatOnGroup::disconnect() {
 }
 
 void LangevinThermostatOnGroup::connect() {
-
   // connect to initialization inside run()
   _initialize = integrator->runInit.connect(
       boost::bind(&LangevinThermostatOnGroup::initialize, this));
@@ -119,8 +118,7 @@ void LangevinThermostatOnGroup::frictionThermo(Particle &p) {
   LOG4ESPP_TRACE(theLogger, "new force of p = " << p.force());
 }
 
-void LangevinThermostatOnGroup::initialize() { // calculate the prefactors
-
+void LangevinThermostatOnGroup::initialize() {  // calculate the prefactors
   real timestep = integrator->getTimeStep();
 
   pref1 = -gamma;
@@ -129,7 +127,6 @@ void LangevinThermostatOnGroup::initialize() { // calculate the prefactors
   LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
       ", gamma = " << gamma <<
       ", temperature = " << temperature << " pref2=" << pref2);
-
 }
 
 /** very nasty: if we recalculate force when leaving/reentering the integrator,
@@ -158,14 +155,16 @@ void LangevinThermostatOnGroup::coolDown() {
 ** REGISTRATION WITH PYTHON
 ****************************************************/
 void LangevinThermostatOnGroup::registerPython() {
-
   using namespace espressopp::python;
 
   class_<LangevinThermostatOnGroup, shared_ptr<LangevinThermostatOnGroup>, bases<Extension> >
-      ("integrator_LangevinThermostatOnGroup", init<shared_ptr<System>, shared_ptr<ParticleGroup> >())
+      ("integrator_LangevinThermostatOnGroup",
+           init<shared_ptr<System>, shared_ptr<ParticleGroup> >())
       .def("connect", &LangevinThermostatOnGroup::connect)
       .def("disconnect", &LangevinThermostatOnGroup::disconnect)
-      .add_property("gamma", &LangevinThermostatOnGroup::getGamma, &LangevinThermostatOnGroup::setGamma)
+      .add_property("gamma",
+                    &LangevinThermostatOnGroup::getGamma,
+                    &LangevinThermostatOnGroup::setGamma)
       .add_property("temperature",
                     &LangevinThermostatOnGroup::getTemperature,
                     &LangevinThermostatOnGroup::setTemperature);
@@ -173,4 +172,3 @@ void LangevinThermostatOnGroup::registerPython() {
 
 }  // end namespace integrator
 }  // end namespace espressopp
-

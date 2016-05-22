@@ -22,12 +22,13 @@ r"""
 **espressopp.integrator.LangevinThermostatOnGroup**
 ***************************************************
 
+Thermalize particles in the particle group only.
 
 .. function:: espressopp.integrator.LangevinThermostatOnGroup(system, particle_group)
 
-		:param system: 
-		:type system:
-		:param particle_group:
+		:param system: The system object.
+		:type system: espressopp.System
+		:param particle_group: The particle group.
 		:type particle_group: espressopp.ParticleGroup
 """
 from espressopp.esutil import cxxinit
