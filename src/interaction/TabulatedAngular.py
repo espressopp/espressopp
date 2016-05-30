@@ -26,38 +26,50 @@ r"""
 **espressopp.interaction.TabulatedAngular**
 *****************************************************
 
-
-
-
-
-
-
 .. function:: espressopp.interaction.TabulatedAngular(itype, filename)
 
-		:param itype: 
-		:param filename: 
-		:type itype: 
-		:type filename: 
+		:param itype: The interpolation type: 1 - linear, 2 - akima spline, 3 - cubic spline
+		:param filename: The tabulated potential filename.
+		:type itype: int
+		:type filename: str
 
-.. function:: espressopp.interaction.FixedTripleListTabulatedAngular(system, vl, potential)
+.. function:: espressopp.interaction.FixedTripleListTabulatedAngular(system, ftl, potential)
 
-		:param system: 
-		:param vl: 
-		:param potential: 
-		:type system: 
-		:type vl: 
-		:type potential: 
+		:param system: The Espresso++ system object.
+		:param ftl: The FixedTripleList.
+		:param potential: The potential.
+		:type system: espressopp.System
+		:type ftl: espressopp.FixedPairList
+		:type potential: espressopp.interaction.Potential
 
-.. function:: espressopp.interaction.FixedTripleListTabulatedAngular.setPotential(type1, type2, potential)
+.. function:: espressopp.interaction.FixedTripleListTabulatedAngular.setPotential(potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+		:param potential: The potential object.
+		:type potential: espressopp.interaction.Potential
+
+
+.. function:: espressopp.interaction.FixedTripleListTypesTabulatedAngular(system, ftl)
+
+        :param system: The Espresso++ system object.
+        :type system: espressopp.System
+        :param ftl: The FixedTriple list.
+        :type ftl: espressopp.FixedTripleList
+
+.. function:: espressopp.interaction.FixedTripleListTypesTabulatedAngular.setPotential(type1, type2, type3, potential)
+
+        Defines angular potential for interaction between particles of types type1-type2-type3.
+
+        :param type1: Type of particle 1.
+        :type type1: int
+        :param type2: Type of particle 2.
+        :type type2: int
+        :param type3: Type of particle 3.
+        :type type3: int
+        :param potential: The potential to set up.
+        :type potential: espressopp.interaction.AngularPotential
+
 """
-# -*- coding: iso-8859-1 -*-
+
 from espressopp import pmi
 from espressopp.esutil import *
 
@@ -69,27 +81,25 @@ from _espressopp import interaction_TabulatedAngular, \
 
 
 class TabulatedAngularLocal(AngularPotentialLocal, interaction_TabulatedAngular):
-
     def __init__(self, itype, filename):
-
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_TabulatedAngular, itype, filename)
 
 class FixedTripleListTabulatedAngularLocal(InteractionLocal, interaction_FixedTripleListTabulatedAngular):
 
-    def __init__(self, system, vl, potential):
+    def __init__(self, system, ftl, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, interaction_FixedTripleListTabulatedAngular, system, vl, potential)
+            cxxinit(self, interaction_FixedTripleListTabulatedAngular, system, ftl, potential)
 
-    def setPotential(self, type1, type2, potential):
+    def setPotential(self, potential):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            self.cxxclass.setPotential(self, type1, type2, potential)
+            self.cxxclass.setPotential(self, potential)
 
 
 class FixedTripleListTypesTabulatedAngularLocal(InteractionLocal, interaction_FixedTripleListTypesTabulatedAngular):
-    def __init__(self, system, vl):
+    def __init__(self, system, ftl):
         if pmi.workerIsActive():
-            cxxinit(self, interaction_FixedTripleListTypesTabulatedAngular, system, vl)
+            cxxinit(self, interaction_FixedTripleListTypesTabulatedAngular, system, ftl)
 
     def setPotential(self, type1, type2, type3, potential):
         if pmi.workerIsActive():
@@ -99,13 +109,13 @@ class FixedTripleListTypesTabulatedAngularLocal(InteractionLocal, interaction_Fi
         if pmi.workerIsActive():
             return self.cxxclass.getPotential(self, type1, type2, type3)
 
-    def setFixedPairList(self, fixedpairlist):
+    def setFixedTripleList(self, ftl):
         if pmi.workerIsActive():
-            self.cxxclass.setFixedPairList(self, fixedpairlist)
+            self.cxxclass.setFixedTripleList(self, ftl)
 
-    def getFixedPairList(self):
+    def getFixedTripleList(self):
         if pmi.workerIsActive():
-            return self.cxxclass.getFixedPairList(self)
+            return self.cxxclass.getFixedTripleList(self)
 
 
 if pmi.isController:
@@ -127,5 +137,5 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.FixedTripleListTypesTabulatedAngularLocal',
-            pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']
+            pmicall = ['setPotential','getPotential', 'setFixedTripleList', 'getFixedTripleList']
         )

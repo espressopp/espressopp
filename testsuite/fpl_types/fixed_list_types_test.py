@@ -31,6 +31,7 @@ class ESPPTestCase(ut.TestCase):
 
         self.part_prop = ('id', 'type', 'pos')
 
+
 class TestFixedPairListTypesTabulated(ESPPTestCase):
     @classmethod
     def setUpClass(cls):
@@ -191,7 +192,6 @@ class TestFixedQuadrupleListTypesTabulated(ESPPTestCase):
         self.interaction.setFixedQuadrupleList(fql)
         ret_fql = self.interaction.getFixedQuadrupleList()
         self.assertEqual(ret_fql.getQuadruples(), [[(1, 1, 1, 1)]])
-
 
 
 if __name__ == '__main__':

@@ -71,10 +71,12 @@ namespace espressopp {
                 }
              
                 real _computeEnergyRaw(real theta) const {
-                    if (table)
-                        return table->getEnergy(theta);
-                    else
-                        throw std::runtime_error("Tabulated angular potential table not available.");
+                    if (table) {
+                      return table->getEnergy(theta);
+                    } else {
+                      LOG4ESPP_DEBUG(theLogger, "Tabulate angular potential table not available.");
+                      return 0.0;
+                    }
                 }
              
                 bool _computeForceRaw(Real3D& force12, Real3D& force32,
@@ -97,7 +99,8 @@ namespace espressopp {
                         force32 = a22 * dist32 + a12 * dist12;
                     }
                     else {
-                        throw std::runtime_error("Tabulated angular potential table not available.");
+                        LOG4ESPP_DEBUG(theLogger, "Tabulate angular potential table not available.");
+                        return false;
                     }
                     return true;
                 }
