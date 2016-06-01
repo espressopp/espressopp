@@ -1,4 +1,4 @@
-#  Copyright (C) 2015
+#  Copyright (C) 2015, 2016
 #      Jakub Krajniak (jkrajniak at gmail.com)
 #
 #  This file is part of ESPResSo++.
@@ -87,6 +87,7 @@ from espressopp.interaction.DihedralPotential import *  # NOQA
 from espressopp.interaction.Interaction import *  # NOQA
 from _espressopp import interaction_DihedralRB
 from _espressopp import interaction_FixedQuadrupleListDihedralRB
+from _espressopp import interaction_FixedQuadrupleListTypesDihedralRB
 
 
 class DihedralRBLocal(DihedralPotentialLocal, interaction_DihedralRB):
@@ -118,6 +119,28 @@ class FixedQuadrupleListDihedralRBLocal(InteractionLocal, interaction_FixedQuadr
                 or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup()):
             return self.cxxclass.getFixedQuadrupleList(self)
 
+class FixedQuadrupleListTypesDihedralRBLocal(InteractionLocal, interaction_FixedQuadrupleListTypesDihedralRB):
+    def __init__(self, system, fql):
+        if pmi.workerIsActive():
+            cxxinit(self, interaction_FixedQuadrupleListTypesDihedralRB, system, fql)
+
+    def setPotential(self, type1, type2, type3, type4, potential):
+        if pmi.workerIsActive():
+            self.cxxclass.setPotential(self, type1, type2, type3, type4, potential)
+
+    def getPotential(self, type1, type2, type3, type4):
+        if pmi.workerIsActive():
+            return self.cxxclass.getPotential(self, type1, type2, type3, type4)
+
+    def setFixedQuadrupleList(self, fixedlist):
+        if pmi.workerIsActive():
+            self.cxxclass.setFixedQuadrupleList(self, fixedlist)
+
+    def getFixedQuadrupleList(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getFixedQuadrupleList(self)
+
+
 if pmi.isController:
     class DihedralRB(DihedralPotential):
         """The  Ryckaert-Bellemans function for proper dihedrals.
@@ -136,3 +159,10 @@ if pmi.isController:
             cls='espressopp.interaction.FixedQuadrupleListDihedralRBLocal',
             pmicall=['setPotential', 'getFixedQuadrupleList']
             )
+
+    class FixedQuadrupleListTypesDihedralRB(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.FixedQuadrupleListTypesDihedralRBLocal',
+            pmicall = ['setPotential','getPotential','setFixedQuadrupleList','getFixedQuadrupleList']
+        )

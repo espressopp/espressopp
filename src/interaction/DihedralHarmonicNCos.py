@@ -1,4 +1,4 @@
-#  Copyright (C) 2014
+#  Copyright (C) 2014,2016
 #      Jakub Krajniak
 #  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
@@ -80,6 +80,7 @@ from espressopp.interaction.Interaction import *
 # pylint: disable=F0401
 from _espressopp import interaction_DihedralHarmonicNCos
 from _espressopp import interaction_FixedQuadrupleListDihedralHarmonicNCos
+from _espressopp import interaction_FixedQuadrupleListTypesDihedralHarmonicNCos
 
 
 class DihedralHarmonicNCosLocal(DihedralPotentialLocal, interaction_DihedralHarmonicNCos):
@@ -112,6 +113,21 @@ class FixedQuadrupleListDihedralHarmonicNCosLocal(
       return self.cxxclass.getFixedQuadrupleList(self)
 
 
+class FixedQuadrupleListTypesDihedralHarmonicNCosLocal(InteractionLocal,
+                                                   interaction_FixedQuadrupleListTypesDihedralHarmonicNCos):
+  def __init__(self, system, fql):
+    if pmi.workerIsActive():
+      cxxinit(self, interaction_FixedQuadrupleListTypesDihedralHarmonicNCos, system, fql)
+
+  def setPotential(self, type1, type2, type3, type4, potential):
+    if pmi.workerIsActive():
+      self.cxxclass.setPotential(self, type1, type2, type3, type4, potential)
+
+  def getPotential(self, type1, type2, type3, type4):
+    if pmi.workerIsActive():
+      return self.cxxclass.getPotential(self, type1, type2, type3, type4)
+
+
 if pmi.isController:
   class DihedralHarmonicNCos(DihedralPotential):
     'The DihedralHarmonicNCos potential.'
@@ -125,4 +141,11 @@ if pmi.isController:
     pmiproxydefs = dict(
       cls='espressopp.interaction.FixedQuadrupleListDihedralHarmonicNCosLocal',
       pmicall=['setPotential', 'getFixedQuadrupleList']
+    )
+
+  class FixedQuadrupleListTypesDihedralHarmonicNCos(Interaction):
+    __metaclass__ = pmi.Proxy
+    pmiproxydefs = dict(
+      cls =  'espressopp.interaction.FixedQuadrupleListTypesDihedralHarmonicNCosLocal',
+      pmicall = ['setPotential','getPotential','setFixedQuadrupleList','getFixedQuadrupleList']
     )
