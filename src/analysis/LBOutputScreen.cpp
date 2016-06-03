@@ -18,9 +18,8 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "python.hpp"
 #include "LBOutputScreen.hpp"
-#include "time.h"
+#include "storage/Storage.hpp"
 
 namespace espressopp {
   namespace analysis {
@@ -66,6 +65,7 @@ namespace espressopp {
 							 _totVelCM[0], _totVelCM[1], _totVelCM[2]);
 				
 				long int _step = latticeboltzmann->getStepNum();
+            real _invNSteps = 1. / latticeboltzmann->getNSteps();
 				
 				if (_step != 0) {
 					// calculate time performance
@@ -74,16 +74,16 @@ namespace espressopp {
 					timelb = getLBTimerNew() - getLBTimerOld();
 					setLBTimerOld(getLBTimerNew());
 					printf ("_step is %ld, getOldStepNum() is %ld, lbVolume is %ld\n", _step, getOldStepNum(), lbVolume);
-					printf ("time spent on %ld LB(+MD) steps is %f sec, relative MLUPS: %f \n",
-									_step-getOldStepNum(), timelb,
-									(_step-getOldStepNum())*lbVolume*1e-6 / timelb);
+					printf ("time spent on %ld LB steps is %f sec, relative MLUPS: %f \n",
+									(long int)((_step-getOldStepNum())*_invNSteps), timelb,
+									(_step-getOldStepNum())*_invNSteps*lbVolume*1e-6 / timelb);
 					printf ("Speed of simulation (in LJ units): %f tau per second\n",
 									(_step-getOldStepNum())*_timestep / timelb);
 
 				} else {
 					timeLBtoMD.reset();
 					setLBTimerOld(0.);
-					printf ("Initialisation of the LB(+MD) system has finished\n");
+					printf ("Initialisation of the LB-MD system has finished\n");
 				}
 
 				setOldStepNum(_step);
@@ -112,11 +112,8 @@ namespace espressopp {
 							_ci = latticeboltzmann->getCi(l);
 							_jLoc += _fi * _ci;
 						}
-
-/*					_jLoc[0] = latticeboltzmann->getLBMom(Int3D(i,j,k),1);
-						_jLoc[1] = latticeboltzmann->getLBMom(Int3D(i,j,k),2);
-						_jLoc[2] = latticeboltzmann->getLBMom(Int3D(i,j,k),3);
-*/
+                  // idea: maybe access LBMom directly and not compute them?
+                  
 						_myU += _jLoc;
 					}
 				}
@@ -134,12 +131,6 @@ namespace espressopp {
 							 result.getItem(0), result.getItem(1), result.getItem(2));
 			}
 		}
-		
-		void LBOutputScreen::setTimerOld (time_t _value) {timer_old = _value;}
-		time_t LBOutputScreen::getTimerOld() {return timer_old;}
-		
-		void LBOutputScreen::setTimerNew (time_t _value) {timer_new = _value;}
-		time_t LBOutputScreen::getTimerNew() {return timer_new;}
 		
 		void LBOutputScreen::setLBTimerOld (real _lbTime_old) {lbTime_old = _lbTime_old;}
 		real LBOutputScreen::getLBTimerOld() {return lbTime_old;}

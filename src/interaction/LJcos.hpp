@@ -42,24 +42,6 @@ namespace espressopp {
        
        */
       class LJcos : public PotentialTemplate< LJcos > {
-      private:
-         real phi;
-         
-         real epsilon;
-         real sigma;
-         
-         real r_min, sqr_r_min;		// border of the WCA (repulsive LJ) potential
-         real alpha, beta, gamma;
-         real one_phi, half_phi, alpha_phi, gamma_phi;
-         real sqr_cutoff;
-         real ff1, ff2;
-         
-         real auxCoef; // This is temporary solution for empty potential. This problem
-         // appears when there is a potential for, for example, interactions 0-0 and
-         // 0-1, but no potential for 1-1. The loop in interaction
-         // template will call potential (1, 1) anyway if these particles are
-         // within the range. Thus one have to set coefficient to 0,
-         // in order to get zero forces.
       public:
          static void registerPython();
          
@@ -156,7 +138,26 @@ namespace espressopp {
             force = dist * ffactor;
             return true;
          }
+      private:
+         real phi;
+         
+         real epsilon;
+         real sigma;
+         
+         real r_min, sqr_r_min;		// border of the WCA (repulsive LJ) potential
+         real alpha, beta, gamma;
+         real one_phi, half_phi, alpha_phi, gamma_phi;
+         real sqr_cutoff;
+         real ff1, ff2;
+         
+         real auxCoef; // This is temporary solution for empty potential. This problem
+         // appears when there is a potential for, for example, interactions 0-0 and
+         // 0-1, but no potential for 1-1. The loop in interaction
+         // template will call potential (1, 1) anyway if these particles are
+         // within the range. Thus one have to set coefficient to 0,
+         // in order to get zero forces.
       };
+      
       // provide pickle support
       struct LJcos_pickle : boost::python::pickle_suite
       {

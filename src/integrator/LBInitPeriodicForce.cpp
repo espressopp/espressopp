@@ -39,14 +39,14 @@ namespace espressopp {
     {
       int _id = 0;
 			int _offset = latticeboltzmann->getHaloSkin();
-			Int3D _myPosition = latticeboltzmann->getMyPosition();
+			Int3D _myPos = latticeboltzmann->getMyPos();
 			Int3D _nodeGrid = latticeboltzmann->getNodeGrid();
 			Int3D _Ni = latticeboltzmann->getNi();				// system size in lattice node
 			Int3D _myNi = latticeboltzmann->getMyNi();		// my local nodes
 			Int3D _globalNi = Int3D(0,0,0);								// index of the first real node in cpu in the global lattice
 			
 			for (int _dim = 0; _dim < 3; _dim++) {
-				_globalNi[_dim] = floor(_myPosition[_dim] * _Ni[_dim] / _nodeGrid[_dim]);
+				_globalNi[_dim] = floor(_myPos[_dim] * _Ni[_dim] / _nodeGrid[_dim]);
 			}
 			
 //			printf("my Rank is %d. myNi in x dim start from %d in a global sense; Ni is %d; nodeGrid is %d\n",
@@ -84,14 +84,14 @@ namespace espressopp {
     {
       int _id = 0;
 			int _offset = latticeboltzmann->getHaloSkin();
-			Int3D _myPosition = latticeboltzmann->getMyPosition();
+			Int3D _myPos = latticeboltzmann->getMyPos();
 			Int3D _nodeGrid = latticeboltzmann->getNodeGrid();
 			Int3D _Ni = latticeboltzmann->getNi();				// system size in lattice node
 			Int3D _myNi = latticeboltzmann->getMyNi();		// my local nodes
 			Int3D _globalNi = Int3D(0,0,0);								// index of the first real node in cpu in the global lattice
 			
 			for (int _dim = 0; _dim < 3; _dim++) {
-				_globalNi[_dim] = floor(_myPosition[_dim] * _Ni[_dim] / _nodeGrid[_dim]);
+				_globalNi[_dim] = floor(_myPos[_dim] * _Ni[_dim] / _nodeGrid[_dim]);
 			}
 			
 //			printf("my Rank is %d. myNi in x dim start from %d in a global sense; Ni is %d; nodeGrid is %d\n",

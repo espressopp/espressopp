@@ -44,8 +44,7 @@ namespace espressopp {
 		//////////////////////////////////////////////////
 		// REGISTRATION WITH PYTHON
 		//////////////////////////////////////////////////
-		void
-		LJcos::registerPython() {
+		void LJcos::registerPython() {
 			using namespace espressopp::python;
 			
 			class_< LJcos, bases< Potential > >

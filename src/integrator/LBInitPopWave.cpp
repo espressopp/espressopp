@@ -46,7 +46,7 @@ namespace espressopp {
       real invCs4 = invCs2*invCs2;
       real scalp, value;
 			int _offset = latticeboltzmann->getHaloSkin();
-			Int3D _myPosition = latticeboltzmann->getMyPosition();
+			Int3D _myPos = latticeboltzmann->getMyPos();
 			Int3D _nodeGrid = latticeboltzmann->getNodeGrid();
 			Int3D _Ni = latticeboltzmann->getNi();				// system size in lattice node
 			Int3D _myNi = latticeboltzmann->getMyNi();		// my local nodes
@@ -54,7 +54,7 @@ namespace espressopp {
 			int _numVels = latticeboltzmann->getNumVels();// number of velocities in the model
 			
 			for (int _dim = 0; _dim < 3; _dim++) {
-				_globalNi[_dim] = floor(_myPosition[_dim] * _Ni[_dim] / _nodeGrid[_dim]);
+				_globalNi[_dim] = floor(_myPos[_dim] * _Ni[_dim] / _nodeGrid[_dim]);
 			}
 			
       Real3D vel = _u0;
