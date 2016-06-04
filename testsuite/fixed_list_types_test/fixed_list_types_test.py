@@ -24,6 +24,11 @@ import unittest as ut
 import espressopp
 
 
+def remove_file(file_name):
+    if os.path.exists(file_name):
+        os.unlink(file_name)
+
+
 class ESPPTestCase(ut.TestCase):
     def setUp(self):
         self.system, self.integrator = espressopp.standard_system.Minimal(
@@ -46,8 +51,8 @@ class TestFixedPairListTypesTabulated(ESPPTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        os.unlink('table_b1.pot')
-        os.unlink('table_b2.pot')
+        remove_file('table_b1.pot')
+        remove_file('table_b2.pot')
 
     def setUp(self):
         super(TestFixedPairListTypesTabulated, self).setUp()
@@ -110,8 +115,8 @@ class TestFixedTripleListTypesTabulated(ESPPTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        os.unlink('table_a1.pot')
-        os.unlink('table_a2.pot')
+        remove_file('table_a1.pot')
+        remove_file('table_a2.pot')
 
     def setUp(self):
         super(TestFixedTripleListTypesTabulated, self).setUp()
@@ -160,7 +165,7 @@ class TestFixedQuadrupleListTypesTabulated(ESPPTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        os.unlink('table_d1.pot')
+        remove_file('table_d1.pot')
 
     def setUp(self):
         super(TestFixedQuadrupleListTypesTabulated, self).setUp()
