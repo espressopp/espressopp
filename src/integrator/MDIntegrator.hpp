@@ -93,8 +93,6 @@ namespace espressopp {
         boost::signals2::signal0 <void> befIntV; // before integrate2()
         boost::signals2::signal0 <void> aftIntV; // after  integrate2()
 
-        boost::signals2::signal1 <void, real&> onSetTimeStep;
-
 
         /** Register this class so it can be used from Python. */
         static void registerPython();

@@ -22,7 +22,7 @@ r"""
 **espressopp.integrator.LangevinThermostatOnGroup**
 ***************************************************
 
-Thermalize particles in the particle group only.
+Thermalize particles in the ParticleGroup only.
 
 .. function:: espressopp.integrator.LangevinThermostatOnGroup(system, particle_group)
 

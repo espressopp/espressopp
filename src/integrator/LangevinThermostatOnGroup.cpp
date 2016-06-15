@@ -71,7 +71,6 @@ LangevinThermostatOnGroup::~LangevinThermostatOnGroup() {
 
 void LangevinThermostatOnGroup::disconnect() {
   _initialize.disconnect();
-  _initialize_onSetTimeStep.disconnect();
   _heatUp.disconnect();
   _coolDown.disconnect();
   _thermalize.disconnect();
@@ -80,8 +79,6 @@ void LangevinThermostatOnGroup::disconnect() {
 void LangevinThermostatOnGroup::connect() {
   // connect to initialization inside run()
   _initialize = integrator->runInit.connect(
-      boost::bind(&LangevinThermostatOnGroup::initialize, this));
-  _initialize_onSetTimeStep = integrator->onSetTimeStep.connect(
       boost::bind(&LangevinThermostatOnGroup::initialize, this));
 
   _heatUp = integrator->recalc1.connect(

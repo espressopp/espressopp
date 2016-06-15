@@ -71,7 +71,6 @@ class LangevinThermostatOnGroup: public Extension {
 
  private:
   boost::signals2::connection _initialize, _heatUp, _coolDown, _thermalize;
-  boost::signals2::connection _initialize_onSetTimeStep;
 
   void frictionThermo(class Particle &);
 

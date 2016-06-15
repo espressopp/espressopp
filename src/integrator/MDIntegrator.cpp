@@ -64,8 +64,6 @@ namespace espressopp {
       }
 
       dt = _dt;
-
-      onSetTimeStep(_dt);
     }
 
 
