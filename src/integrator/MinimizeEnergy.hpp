@@ -44,7 +44,7 @@ class MinimizeEnergy : public SystemAccess {
                  real max_displacement);
   virtual ~MinimizeEnergy();
 
-  void run(int max_steps, bool verbose);
+  bool run(int max_steps, bool verbose);
 
   /** Register this class so it can be used from Python. */
   static void registerPython();
@@ -52,16 +52,24 @@ class MinimizeEnergy : public SystemAccess {
   void steepestDescentStep();
   void updateForces();
 
+  // Getters
+  real getFMax() {
+    return sqrt(f_max_sqr_);
+  }
+
+  real getDpMax() {
+    return sqrt(dp_sqr_max_);
+  }
+
   // Params
   real gamma_;
   real max_displacement_;  // Maximum displacement on particle.
-  real ftol_;  // Force limit, when maximum force is lower then stop.
+  real ftol_sqr_;  // Force limit, when maximum force is lower then stop.
 
-  real f_max_;  // Maximum force on particles.
+  real f_max_sqr_;  // Maximum force on particles.
   real dp_sqr_max_;   // Maximum particle displacement.
 
   bool resort_flag_;  //!< true implies need for resort of particles
-  real max_dist_;
 
   longint nstep_;
 

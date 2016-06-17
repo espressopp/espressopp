@@ -22,7 +22,7 @@ r"""
 **espressopp.integrator.MinimizeEnergy**
 ****************************************
 
-This is a very simple approach to perform energy minimialization of the system. The module uses
+This is a very simple approach to perform energy minimization of the system. The module uses
 a `steepest descent method <https://en.wikipedia.org/wiki/Gradient_descent>`_. The position of particles is
 updated following the equation:
 
@@ -55,7 +55,7 @@ API
 		:type gamma: float
 		:param ftol: The force tolerance
 		:type ftol: float
-		:param max_displacement: The maximum displacemenet.
+		:param max_displacement: The maximum displacement.
 		:type max_displacement: float
 
 .. function:: espressopp.integrator.MinimizeEnergy.run(max_steps, verbose)
@@ -64,6 +64,8 @@ API
         :type max_steps: int
         :param verbose: If set to True then display information about maximum force during the iterations.
         :type verbose: bool
+        :return: The true if the maximum force in the system is lower than ftol otherwise false.
+        :rtype: bool
 
 .. py:data:: f_max
 
