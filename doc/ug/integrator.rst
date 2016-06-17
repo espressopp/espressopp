@@ -32,3 +32,4 @@ integrator
    espressopp.integrator.VelocityVerlet.rst
    espressopp.integrator.VelocityVerletOnGroup.rst
    espressopp.integrator.VelocityVerletOnRadius.rst
+   espressopp.integrator.MinimizeEnergy.rst

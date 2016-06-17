@@ -19,6 +19,7 @@
 */
 
 // ESPP_CLASS
+
 #ifndef _INTEGRATOR_MINIMIZEENERGY_HPP
 #define _INTEGRATOR_MINIMIZEENERGY_HPP
 
@@ -28,35 +29,46 @@
 #include "esutil/Timer.hpp"
 #include "Real3D.hpp"
 #include "Int3D.hpp"
+#include "iterator/CellListIterator.hpp"
+#include "System.hpp"
+#include "SystemAccess.hpp"
+#include "storage/Storage.hpp"
+#include "interaction/Interaction.hpp"
+#include "interaction/Potential.hpp"
 
 namespace espressopp {
 namespace integrator {
 
-class MinimizeEnergy : public MDIntegrator {
+// Adopted from espressomd: src/core/minimize_energy.cpp
+
+class MinimizeEnergy : public SystemAccess {
  public:
-  MinimizeEnergy(shared_ptr<class espressopp::System> system);
+  MinimizeEnergy(shared_ptr<class espressopp::System> system,
+                 real gamma,
+                 real max_force,
+                 real max_displacement);
   virtual ~MinimizeEnergy();
 
-  void run(int nsteps);
+  void run(int n);
 
   /** Register this class so it can be used from Python. */
   static void registerPython();
  private:
-  real steepestDescentStep();
-
+  void steepestDescentStep();
   void updateForces();
 
-  void calcForces();
-
-  // Getters and setters.
-
-  real f_max_;
+  // Params
   real gamma_;
-  longint max_steps_;
-  real max_displacement_;
+  real max_displacement_;  // Maximum displacement on particle.
+  real max_force_;  // Force limit, when maximum force is lower then stop.
+
+  real f_max_;  // Maximum force on particles.
+  real dp_sqr_max_;   // Maximum particle displacement.
 
   bool resort_flag_;  //!< true implies need for resort of particles
   real max_dist_;
+
+  longint nstep_;
 
   static LOG4ESPP_DECL_LOGGER(theLogger);
 };
@@ -64,3 +76,4 @@ class MinimizeEnergy : public MDIntegrator {
 
 }  // end namespace integrator
 }  // end namespace espressopp
+#endif
