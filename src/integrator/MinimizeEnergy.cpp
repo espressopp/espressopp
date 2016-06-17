@@ -33,25 +33,25 @@ LOG4ESPP_LOGGER(MinimizeEnergy::theLogger, "MinimizeEnergy");
 
 MinimizeEnergy::MinimizeEnergy(shared_ptr<System> system,
                                real gamma,
-                               real max_force,
+                               real ftol,
                                real max_displacement)
-    : SystemAccess(system), gamma_(gamma), max_force_(max_force),
+    : SystemAccess(system), gamma_(gamma), ftol_(ftol),
       max_displacement_(max_displacement) {
   LOG4ESPP_INFO(theLogger, "construct MinimizeEnergy");
 
   nstep_ = 0;
-  // Initial value of maximal force in the system.
-  f_max_ = std::numeric_limits<real>::max();
 }
 
 MinimizeEnergy::~MinimizeEnergy() {
   LOG4ESPP_INFO(theLogger, "free MinimizeEnergy");
 }
 
-void MinimizeEnergy::run(int max_steps) {
+void MinimizeEnergy::run(int max_steps, bool verbose) {
   System &system = getSystemRef();
   storage::Storage &storage = *system.storage;
   real skin_half = 0.5 * system.getSkin();
+  dp_sqr_max_ = 0.0;
+  f_max_ = std::numeric_limits<real>::max();
 
   // Before start make sure that particles are on the right processor
   if (resort_flag_) {
@@ -67,27 +67,40 @@ void MinimizeEnergy::run(int max_steps) {
   LOG4ESPP_INFO(theLogger,
                 "starting energy minimalization loop (iters=" << max_steps << ")");
 
-  for (int i = 0; i < max_steps && f_max_ > max_force_; i++) {
-    LOG4ESPP_INFO(theLogger, "Next step " << i << " of " << max_steps << " starts");
-
+  if (verbose) {
+    std::cout << "Minimize energy" << std::endl;
+    std::cout << "  current force_max = " << f_max_ << std::endl;
+    std::cout << "  f_tol = " << ftol_ << std::endl;
+    std::cout << "  max_steps = " << max_steps << std::endl;
+    std::cout << "  max displacement = " << max_displacement_ << std::endl;
+  }
+  int iters = 0;
+  for (; iters < max_steps && f_max_ > ftol_; iters++) {
     steepestDescentStep();
 
-    LOG4ESPP_DEBUG(theLogger, "step " << i << " max_force=" << f_max_
-        << " displacement=" << dp_sqr_max_);
-
-    LOG4ESPP_INFO(theLogger, "maxDist = " << max_dist_ << ", skin/2 = " << skin_half);
+    LOG4ESPP_DEBUG(theLogger, "step " << iters << " max_force=" << f_max_ << " displacement=" << dp_sqr_max_);
 
     resort_flag_ = sqrt(dp_sqr_max_) > skin_half;
 
     if (resort_flag_) {
-      LOG4ESPP_INFO(theLogger, "step " << i << ": resort particles");
       storage.decompose();
       max_dist_ = 0.0;
       resort_flag_ = false;
     }
 
     updateForces();
+
+    if (verbose)
+      std::cout << nstep_ << ": f_max=" << f_max_ << " max_dp=" << dp_sqr_max_ << std::endl;
+
     nstep_++;
+  }
+
+  if (verbose) {
+    std::cout << "Minimize energy finished" << std::endl;
+    std::cout << "  current force_max = " << f_max_ << std::endl;
+    std::cout << "  run for steps = " << iters << std::endl;
+    std::cout << "   max displacement = " << dp_sqr_max_ << std::endl;
   }
 
   LOG4ESPP_INFO(theLogger,
@@ -118,6 +131,14 @@ void MinimizeEnergy::updateForces() {
   }
   // Collect forces from ghost particles.
   system.storage->collectGhostForces();
+
+  // Get max force in the system.
+  real f_max = -std::numeric_limits<real>::max();
+  CellList realCells = system.storage->getRealCells();
+  for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+    f_max = std::max(f_max, cit->force().sqr());
+  }
+  mpi::all_reduce(*system.comm, f_max, f_max_, boost::mpi::maximum<real>());
 }
 
 template <typename T> int sgn(T val) {
@@ -129,8 +150,8 @@ void MinimizeEnergy::steepestDescentStep() {
   System& system = getSystemRef();
 
   real f_sqr, dp, dp_sqr;
-  real f_max = -std::numeric_limits<real>::max();
-  real dp_sqr_max = -std::numeric_limits<real>::max();
+  real f_max = std::numeric_limits<real>::min();
+  real dp_sqr_max = std::numeric_limits<real>::min();
 
   // Iterate over only real particles.
   CellList realCells = system.storage->getRealCells();
@@ -151,7 +172,6 @@ void MinimizeEnergy::steepestDescentStep() {
   }
 
   mpi::all_reduce(*system.comm, dp_sqr_max, dp_sqr_max_, boost::mpi::maximum<real>());
-  mpi::all_reduce(*system.comm, f_max, f_max_, boost::mpi::maximum<real>());
 }
 
 void MinimizeEnergy::registerPython() {

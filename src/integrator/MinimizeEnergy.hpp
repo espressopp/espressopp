@@ -45,11 +45,11 @@ class MinimizeEnergy : public SystemAccess {
  public:
   MinimizeEnergy(shared_ptr<class espressopp::System> system,
                  real gamma,
-                 real max_force,
+                 real ftol,
                  real max_displacement);
   virtual ~MinimizeEnergy();
 
-  void run(int n);
+  void run(int max_steps, bool verbose);
 
   /** Register this class so it can be used from Python. */
   static void registerPython();
@@ -60,7 +60,7 @@ class MinimizeEnergy : public SystemAccess {
   // Params
   real gamma_;
   real max_displacement_;  // Maximum displacement on particle.
-  real max_force_;  // Force limit, when maximum force is lower then stop.
+  real ftol_;  // Force limit, when maximum force is lower then stop.
 
   real f_max_;  // Maximum force on particles.
   real dp_sqr_max_;   // Maximum particle displacement.

@@ -38,14 +38,20 @@ The routine runs until the maximal force is bigger than :math:`f_{max}` or for a
 **Please note**
 This module does not support any integrator extensions.
 
-.. function:: espressopp.integrator.MinimizeEnergy(system, gamma, max_force, max_displacement)
+Example
+==========
+
+>>> em = espressopp.integrator.MinimizeEnergy(system, 0.001, 0.01, 0.0001)
+>>> em.run(10000)
+
+.. function:: espressopp.integrator.MinimizeEnergy(system, gamma, ftol, max_displacement)
 
 		:param system: The espressopp system object.
 		:type system: espressopp.System
 		:param gamma: The gamma value.
 		:type gamma: float
-		:param max_force: The maximum force threshold.
-		:type max_force: float
+		:param ftol: The force tolerance
+		:type ftol: float
 		:param max_displacement: The maximum displacemenet.
 		:type max_displacement: float
 
@@ -61,13 +67,13 @@ from espressopp import pmi
 from _espressopp import integrator_MinimizeEnergy
 
 class MinimizeEnergyLocal(integrator_MinimizeEnergy):
-    def __init__(self, system, gamma, max_force, max_displacement):
+    def __init__(self, system, gamma, ftol, max_displacement):
         if pmi.workerIsActive():
-            cxxinit(self, integrator_MinimizeEnergy, system, gamma, max_force, max_displacement)
+            cxxinit(self, integrator_MinimizeEnergy, system, gamma, ftol*ftol, max_displacement)
 
-    def run(self, niter):
+    def run(self, niter, verbose=False):
         if pmi.workerIsActive():
-            return self.cxxclass.run(self, niter)
+            return self.cxxclass.run(self, niter, verbose)
 
 if pmi.isController:
     class MinimizeEnergy:
