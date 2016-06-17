@@ -27,7 +27,6 @@ class TestMinimizeEnergy(unittest.TestCase):
         ]
         self.system.storage.addParticles(particle_list, 'id', 'pos', 'mass')
         self.system.storage.decompose()
-        # max_steps, gamma, max_force, max_displacement
         minimize_energy = espressopp.integrator.MinimizeEnergy(self.system, 0.001, 0.0, 0.001)
         minimize_energy.run(10)
         self.assertEqual(minimize_energy.f_max, 0.0);
@@ -40,7 +39,7 @@ class TestMinimizeEnergy(unittest.TestCase):
         self.system.storage.addParticles(particle_list, 'id', 'pos', 'mass')
         self.system.storage.decompose()
         minimize_energy = espressopp.integrator.MinimizeEnergy(
-            self.system, gamma=0.00001, max_force=1.0, max_displacement=0.001)
+            self.system, gamma=0.00001, ftol=1.0, max_displacement=0.001)
 
         vl = espressopp.VerletList(self.system, cutoff=2.5)
         lj = espressopp.interaction.LennardJones(sigma=1.0, epsilon=1.0, cutoff=2.5)
