@@ -33,7 +33,7 @@ updated following the equation:
 where :math:`p_{i+}` is a new position, :math:`p_i` is a position at current step with corresponding
 force :math:`F_i`. The parameters :math:`\gamma` and :math:`d_{max}` are set by user and control the relaxation
 of the energy and the maximum update of the coordinates per step.
-The routine runs until the maximal force is bigger than :math:`f_{max}` or for at most *n* steps.
+The routine runs until the maximum force is bigger than :math:`f_{max}` or for at most *n* steps.
 
 **Please note**
 This module does not support any integrator extensions.
@@ -41,8 +41,11 @@ This module does not support any integrator extensions.
 Example
 ==========
 
->>> em = espressopp.integrator.MinimizeEnergy(system, 0.001, 0.01, 0.0001)
+>>> em = espressopp.integrator.MinimizeEnergy(system, gamma=0.001, ftol=0.01, max_displacement=0.0001)
 >>> em.run(10000)
+
+API
+=======
 
 .. function:: espressopp.integrator.MinimizeEnergy(system, gamma, ftol, max_displacement)
 
@@ -55,10 +58,24 @@ Example
 		:param max_displacement: The maximum displacemenet.
 		:type max_displacement: float
 
-.. function:: espressopp.integrator.MinimizeEnergy.run(max_steps)
+.. function:: espressopp.integrator.MinimizeEnergy.run(max_steps, verbose)
 
         :param max_steps: The maximum number of steps to run.
         :type max_steps: int
+        :param verbose: If set to True then display information about maximum force during the iterations.
+        :type verbose: bool
+
+.. py:data:: f_max
+
+    The maximum force in the system.
+
+.. py:data:: displacement
+
+    The maximum displacement used during the run of MinimizeEnergy
+
+.. py:data:: step
+
+    The current iteration step.
 
 """
 from espressopp.esutil import cxxinit

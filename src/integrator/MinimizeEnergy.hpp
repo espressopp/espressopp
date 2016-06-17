@@ -24,13 +24,8 @@
 #define _INTEGRATOR_MINIMIZEENERGY_HPP
 
 #include "logging.hpp"
-#include "Extension.hpp"
-#include "boost/signals2.hpp"
-#include "esutil/Timer.hpp"
 #include "Real3D.hpp"
-#include "Int3D.hpp"
 #include "iterator/CellListIterator.hpp"
-#include "System.hpp"
 #include "SystemAccess.hpp"
 #include "storage/Storage.hpp"
 #include "interaction/Interaction.hpp"

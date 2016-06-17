@@ -20,7 +20,6 @@
 
 #include "python.hpp"
 #include "MinimizeEnergy.hpp"
-#include "storage/Storage.hpp"
 
 namespace espressopp {
 namespace integrator {
