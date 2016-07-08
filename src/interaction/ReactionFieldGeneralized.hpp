@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -69,7 +69,7 @@ namespace espressopp {
                 static void registerPython();
 
                 ReactionFieldGeneralized()
-                : prefactor(1), kappa(0.0),
+                : prefactor(0.0), kappa(0.0),
                  epsilon1(1.0), epsilon2(80.0),
                  rc(1.0){
                     setShift(0.0);
