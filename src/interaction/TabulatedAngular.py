@@ -39,7 +39,7 @@ r"""
 		:param ftl: The FixedTripleList.
 		:param potential: The potential.
 		:type system: espressopp.System
-		:type ftl: espressopp.FixedPairList
+		:type ftl: espressopp.FixedTripleList
 		:type potential: espressopp.interaction.Potential
 
 .. function:: espressopp.interaction.FixedTripleListTabulatedAngular.setPotential(potential)

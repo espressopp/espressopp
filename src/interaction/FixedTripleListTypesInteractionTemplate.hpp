@@ -92,7 +92,7 @@ class FixedTripleListTypesInteractionTemplate : public Interaction, SystemAccess
   virtual void computeVirialTensor(Tensor &w, real z);
   virtual void computeVirialTensor(Tensor *w, int n);
   virtual real getMaxCutoff();
-  virtual int bondType() { return Pair; }
+  virtual int bondType() { return Angular; }
 
  protected:
   int ntypes;
@@ -106,7 +106,7 @@ class FixedTripleListTypesInteractionTemplate : public Interaction, SystemAccess
 template<typename _Potential>
 inline void
 FixedTripleListTypesInteractionTemplate<_Potential>::addForces() {
-  LOG4ESPP_INFO(theLogger, "add forces computed by the FixedPair List");
+  LOG4ESPP_INFO(theLogger, "add forces computed by the FixedTriple List");
   const bc::BC &bc = *getSystemRef().bc;
 
   for (FixedTripleList::TripleList::Iterator it(*fixedtripleList); it.isValid(); ++it) {
@@ -133,7 +133,7 @@ template<typename _Potential>
 inline real
 FixedTripleListTypesInteractionTemplate<_Potential>::
 computeEnergy() {
-  LOG4ESPP_INFO(theLogger, "compute energy of the FixedPair list pairs");
+  LOG4ESPP_INFO(theLogger, "compute energy of the FixedTriple list pairs");
 
   real e = 0.0;
   const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
@@ -182,7 +182,7 @@ template<typename _Potential>
 inline real
 FixedTripleListTypesInteractionTemplate<_Potential>::
 computeVirial() {
-  LOG4ESPP_INFO(theLogger, "compute the virial for the Fixed Pair List with types");
+  LOG4ESPP_INFO(theLogger, "compute the virial for the FixedTriple List with types");
 
   real w = 0.0;
   const bc::BC &bc = *getSystemRef().bc;  // boundary conditions
@@ -212,7 +212,7 @@ computeVirial() {
 template<typename _Potential>
 inline void
 FixedTripleListTypesInteractionTemplate<_Potential>::computeVirialTensor(Tensor &w) {
-  LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
+  LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedTriple List");
 
   Tensor wlocal(0.0);
   const bc::BC& bc = *getSystemRef().bc;
@@ -249,7 +249,7 @@ template<typename _Potential>
 inline void
 FixedTripleListTypesInteractionTemplate<_Potential>::
 computeVirialTensor(Tensor *w, int n) {
-  LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedPair List");
+  LOG4ESPP_INFO(theLogger, "compute the virial tensor for the FixedTriple List");
 }
 
 template<typename _Potential>
