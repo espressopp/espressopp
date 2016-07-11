@@ -1,5 +1,7 @@
 add_subdirectory(ewald)
 add_subdirectory(pickle_potential)
 add_subdirectory(pi_water)
-add_subdirectory(tabulated)
 add_subdirectory(system_test)
+add_subdirectory(tabulated)
+add_subdirectory(Array4DTest)
+add_subdirectory(fixed_list_types_test)
