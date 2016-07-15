@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2014,2015,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -24,6 +24,8 @@ r"""
 **espressopp.integrator.TDforce**
 *********************************
 
+Thermodynamic force.
+
 Example - how to turn on thermodynamic force
 
 >>> fthd="tabletf.xvg"
@@ -32,12 +34,27 @@ Example - how to turn on thermodynamic force
 >>> integrator.addExtension(thdforce)
 
 
-.. function:: espressopp.integrator.TDforce(system, verletlist)
+.. function:: espressopp.integrator.TDforce(system, verletlist, startdist, enddist, edgeweightmultiplier)
 
-        :param system:
-        :param verletlist:
-        :type system:
-        :type verletlist:
+        :param system: system object
+        :param verletlist: verletlist object
+        :param startdist: (default: 0.0) starting distance from center at which the TD force is actually applied. Needs to be altered when using moving spherical regions
+        :param enddist: (default: 0.0) end distance from center up to which the TD force is actually applied. Needs to be altered when using moving spherical regions
+        :param edgeweightmultiplier: (default: 20) interpolation parameter for multiple overlapping spherical regions (see Kreis et al., JCTC doi: 10.1021/acs.jctc.6b00440), the default should be fine for most applications
+        :type system: shared_ptr<System>
+        :type verletlist: shared_ptr<VerletListAdress>
+        :type startdist: real
+        :type enddist: real
+        :type edgeweightmultiplier: int
+
+.. function:: espressopp.integrator.TDforce.addForce(itype, filename, type)
+
+        :param itype: interpolation type 1: linear, 2: Akima, 3: Cubic
+        :param filename: filename for TD force file
+        :param type: particle type on which the TD force needs to be applied
+        :type itype: int
+        :type filename: string
+        :type type: int
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -46,23 +63,9 @@ from _espressopp import integrator_TDforce
 
 class TDforceLocal(integrator_TDforce):
 
-    #def __init__(self, system, verletlist, center=[], pids=[], sphereAdr=False):
-    def __init__(self, system, verletlist, startdist = 0.0, enddist = 0.0, edgeweightmultiplier = 1):
+    def __init__(self, system, verletlist, startdist = 0.0, enddist = 0.0, edgeweightmultiplier = 20):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_TDforce, system, verletlist, startdist, enddist, edgeweightmultiplier)
-
-# all the below info should come from VerletListAdress
-#            # set center of TD force
-#            if (center != []):
-#                self.cxxclass.setCenter(self, center[0], center[1], center[2])
-#
-#            # set adress particle to be center of TD force (only center OR pids should be specified
-#            if (pids != []):
-#                for pid in pids:
-#                    self.cxxclass.addAdrParticle(self, pid)
-#
-#            # set adress region type (slab or spherical)
-#            self.cxxclass.setAdrRegionType(self,sphereAdr)
 
     def addForce(self, itype, filename, type):
             """

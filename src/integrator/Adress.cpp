@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2014,2015,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -40,8 +40,8 @@ namespace espressopp {
 
     using namespace espressopp::iterator;
 
-    Adress::Adress(shared_ptr<System> _system, shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI /*= false*/)
-        : Extension(_system), verletList(_verletList), fixedtupleList(_fixedtupleList), KTI(_KTI){
+    Adress::Adress(shared_ptr<System> _system, shared_ptr<VerletListAdress> _verletList, shared_ptr<FixedTupleListAdress> _fixedtupleList, bool _KTI, int _regionupdates)
+        : Extension(_system), verletList(_verletList), fixedtupleList(_fixedtupleList), KTI(_KTI), regionupdates(_regionupdates){
         LOG4ESPP_INFO(theLogger, "construct Adress");
         type = Extension::Adress;
 
@@ -52,8 +52,9 @@ namespace espressopp {
         dex2 = dex * dex;
         dexdhy = dex + verletList->getHy();
         dexdhy2 = dexdhy * dexdhy;
-
+        updatecount = 0;
         communicateAdrPositions();
+
     }
 
 
@@ -132,23 +133,14 @@ namespace espressopp {
                   // Compute center of mass
                   Real3D cmp(0.0, 0.0, 0.0); // center of mass position
                   Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
-                  //real M = vp.getMass(); // sum of mass of AT particles
                   for (std::vector<Particle*>::iterator it2 = atList.begin();
                                        it2 != atList.end(); ++it2) {
                       Particle &at = **it2;
-                      //Real3D d1 = at.position() - vp.position();
-                      //Real3D d1;
-                      //verletList->getSystem()->bc->getMinimumImageVectorBox(d1, at.position(), vp.position());
-                      //cmp += at.mass() * d1;
-
                       cmp += at.mass() * at.position();
                       cmv += at.mass() * at.velocity();
                   }
                   cmp /= vp.getMass();
                   cmv /= vp.getMass();
-                  //cmp += vp.position(); // cmp is a relative position
-                  //std::cout << " cmp M: "  << M << "\n\n";
-                  //std::cout << "  moving VP to " << cmp << ", velocitiy is " << cmv << "\n";
 
                   // update (overwrite) the position and velocity of the VP
                   vp.position() = cmp;
@@ -159,12 +151,8 @@ namespace espressopp {
                       std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
                       Real3D pa = **it2; // position of adress particle
                       Real3D d1(0.0, 0.0, 0.0);
-                      //Real3D d1 = vp.position() - pa;                                                      // X SPLIT VS SPHERE CHANGE
                       verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
                       real min1sq;
-                      //real d1 = vp.position()[0] - pa[0];                                                // X SPLIT VS SPHERE CHANGE
-                      //real min1sq = d1.sqr();  // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
-                      //real min1sq = d1*d1;   // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
                       if (verletList->getAdrRegionType()) { // spherical adress region
                         min1sq = d1.sqr(); // set min1sq before loop
                         ++it2;
@@ -176,16 +164,12 @@ namespace espressopp {
                         }
                       }
                       else { //slab-type adress region
-                        min1sq = d1[0]*d1[0];   // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
+                        min1sq = d1[0]*d1[0];   // set min1sq before loop
                         ++it2;
                         for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                              pa = **it2;
-                             //d1 = vp.position() - pa;                                                          // X SPLIT VS SPHERE CHANGE
-                             //d1 = vp.position()[0] - pa[0];
-                             verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);        // X SPLIT VS SPHERE CHANGE
-                             //real distsq1 = d1.sqr();                                                          // X SPLIT VS SPHERE CHANGE
-                             real distsq1 = d1[0]*d1[0];                                                           // X SPLIT VS SPHERE CHANGE
-                             //std::cout << pa << " " << sqrt(distsq1) << "\n";
+                             verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
+                             real distsq1 = d1[0]*d1[0];
                              if (distsq1 < min1sq) min1sq = distsq1;
 
                         }
@@ -193,9 +177,8 @@ namespace espressopp {
 
                       real w = weight(min1sq);
                       vp.lambda() = w;
-                      //weights.insert(std::make_pair(&vp, w));
 
-                      real wDeriv = weightderivative(sqrt(min1sq));
+                      real wDeriv = weightderivative(min1sq);
                       vp.lambdaDeriv() = wDeriv;
 
                   }
@@ -250,13 +233,6 @@ namespace espressopp {
         for (std::vector<Particle>::iterator it = adrATparticles.begin();
                 it != adrATparticles.end(); it++) {
 
-            //if(it->id()==2135){
-            //   std::cout << "Force of atomistic particle (AdResS. sim.) with id " << it->id() << " is: " << std::setprecision(15) << it->force() << "\n";  // FOR DEBUGGING
-            //}
-
-            //std::cout << "Force of atomistic particle (AdResS. sim.) with id " << it->id() << " is: " << std::setprecision(15) << it->force() << "\n";  // FOR DEBUGGING
-            //std::cout << "Position of atomistic particle (AdResS. sim.) with id " << it->id() << " is: " << std::setprecision(15) << it->position() << "\n";
-
             real sqDist = 0.0;
             real dtfm = 0.5 * dt / it->mass();
 
@@ -265,10 +241,8 @@ namespace espressopp {
 
             // Propagate positions (only NVT): p(t + dt) = p(t) + dt * v(t+0.5*dt)
             Real3D deltaP = dt * it->velocity();
-            //std::cout << it->id() << ": from (" << it->position() << ")";
             it->position() += deltaP;
             sqDist += deltaP * deltaP;
-            //std::cout << " to (" << it->position() << ") " << sqrt(sqDist) << "\n";
 
             maxSqDist = std::max(maxSqDist, sqDist);
         }
@@ -291,23 +265,14 @@ namespace espressopp {
                   // Compute center of mass
                   Real3D cmp(0.0, 0.0, 0.0); // center of mass position
                   Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
-                  //real M = vp.getMass(); // sum of mass of AT particles
                   for (std::vector<Particle*>::iterator it2 = atList.begin();
                                        it2 != atList.end(); ++it2) {
                       Particle &at = **it2;
-                      //Real3D d1 = at.position() - vp.position();
-                      //Real3D d1;
-                      //verletList->getSystem()->bc->getMinimumImageVectorBox(d1, at.position(), vp.position());
-                      //cmp += at.mass() * d1;
-
                       cmp += at.mass() * at.position();
                       cmv += at.mass() * at.velocity();
                   }
                   cmp /= vp.getMass();
                   cmv /= vp.getMass();
-                  //cmp += vp.position(); // cmp is a relative position
-                  //std::cout << " cmp M: "  << M << "\n\n";
-                  //std::cout << "  moving VP to " << cmp << ", velocitiy is " << cmv << "\n";
 
                   // update (overwrite) the position and velocity of the VP
                   vp.position() = cmp;
@@ -320,11 +285,7 @@ namespace espressopp {
                       Real3D pa = **it2; // position of adress particle
                       Real3D d1(0.0, 0.0, 0.0);
                       real min1sq;
-                      //Real3D d1 = vp.position() - pa;                                                      // X SPLIT VS SPHERE CHANGE
                       verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
-                      //real d1 = vp.position()[0] - pa[0];                                                // X SPLIT VS SPHERE CHANGE
-                      //real min1sq = d1.sqr();  // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
-                      //real min1sq = d1*d1;   // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
                       if (verletList->getAdrRegionType()) { // spherical adress region
                         min1sq = d1.sqr(); // set min1sq before loop
                         ++it2;
@@ -336,16 +297,12 @@ namespace espressopp {
                         }
                       }
                       else { //slab-type adress region
-                        min1sq = d1[0]*d1[0];   // set min1sq before loop                                   // X SPLIT VS SPHERE CHANGE
+                        min1sq = d1[0]*d1[0];   // set min1sq before loop
                         ++it2;
                         for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                              pa = **it2;
-                             //d1 = vp.position() - pa;                                                          // X SPLIT VS SPHERE CHANGE
-                             //d1 = vp.position()[0] - pa[0];
-                             verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);        // X SPLIT VS SPHERE CHANGE
-                             //real distsq1 = d1.sqr();                                                          // X SPLIT VS SPHERE CHANGE
-                             real distsq1 = d1[0]*d1[0];                                                           // X SPLIT VS SPHERE CHANGE
-                             //std::cout << pa << " " << sqrt(distsq1) << "\n";
+                             verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
+                             real distsq1 = d1[0]*d1[0];
                              if (distsq1 < min1sq) min1sq = distsq1;
                         }
                       }
@@ -353,9 +310,8 @@ namespace espressopp {
 
                       real w = weight(min1sq);
                       vp.lambda() = w;
-                      //weights.insert(std::make_pair(&vp, w));
 
-                      real wDeriv = weightderivative(sqrt(min1sq));
+                      real wDeriv = weightderivative(min1sq);
                       vp.lambdaDeriv() = wDeriv;
 
                       // This loop is required when applying routines which use atomistic lambdas.
@@ -379,7 +335,6 @@ namespace espressopp {
 
         }
 
-        //std::cout << " " << maxSqDist << "\n";
     }
 
 
@@ -413,29 +368,13 @@ namespace espressopp {
                   std::vector<Particle*> atList;
                   atList = it3->second;
 
-                  // Compute center of mass
-                  //Real3D cmp(0.0, 0.0, 0.0); // center of mass position
                   Real3D cmv(0.0, 0.0, 0.0); // center of mass velocity
-                  //real M = vp.getMass(); // sum of mass of AT particles
                   for (std::vector<Particle*>::iterator it2 = atList.begin();
                                        it2 != atList.end(); ++it2) {
                       Particle &at = **it2;
-                      //Real3D d1 = at.position() - vp        shared_ptr<VerletListAdress> verletList;
-                      //Real3D d1;
-                      //verletList->getSystem()->bc->getMinimumImageVectorBox(d1, at.position(), vp.position());
-                      //cmp += at.mass() * d1;
-
-                      //cmp += at.mass() * at.position();
                       cmv += at.mass() * at.velocity();
                   }
-                  //cmp /= vp.getMass();
                   cmv /= vp.getMass();
-                  //cmp += vp.position(); // cmp is a relative position
-                  //std::cout << " cmp M: "  << M << "\n\n";
-                  //std::cout << "  moving VP to " << cmp << ", velocitiy is " << cmv << "\n";
-
-                  // update (overwrite) the position and velocity of the VP
-                  //vp.position() = cmp;
                   vp.velocity() = cmv;
 
               }
@@ -457,96 +396,80 @@ namespace espressopp {
        //if adrCenter is not set, the center of adress zone moves along with some particles
        //the coordinates of the center(s) (adrPositions) must be communicated to all nodes
 
-       // Old Version
-       // get local cells
-       // CellList realcells = getSystem()->storage->getRealCells(); //should be realcells
-       // int root,mayberoot,lroot;
-       // lroot=0;
-       // if (!(verletList->getAdrCenterSet())) {
-       //    verletList->adrPositions.clear(); // clear position pointers
-       //    for (CellListIterator it(realcells); it.isValid(); ++it) {
-       //        if (verletList->getAdrList().count(it->id()) == 1) {
-       //            verletList->adrPositions.push_back(&(it->position()));
-       //            lroot = getSystem()->comm->rank(); //for the moment only works when there's only one particle in adrPositions
-       //        }
-       //        //TODO if length(adrPositions) > 1 print warning
-       //    }
-       //    mayberoot = (lroot ? lroot : 0);
-       //    boost::mpi::all_reduce(*getSystem()->comm,mayberoot,root,boost::mpi::maximum<int>());
-       //    mpi::broadcast(*getSystem()->comm,verletList->adrPositions,root); // only necessary for moving adrCenter
-       // }
-
+      // When upating only every other step, it's important to use and communicate not the pointer to the actual region defining particle's position, but to a copy of it. Otherwise, while the other CPUs would create new copies that don't move in between the communication, the pointer on the original CPU would still point to the original particle, which keeps moving. Hence, we create a new position and pointer here. It has to keep existing outside of this function, hence static.
+      static Real3D adrpos(0.0,0.0,0.0);
+      static Real3D *ptr;
 
       if (!(verletList->getAdrCenterSet())) {
 
-        System& system = getSystemRef();
-        std::vector<Real3D*> procAdrPositions;
-        CellList realcells = getSystem()->storage->getRealCells();
+        if(updatecount == 0){
 
+          if(verletList->getAdrList().size() == 1){
 
-        // Version 1
-        // int nprocs = system.comm->size();
-        // int myrank = system.comm->rank();
+            // Old Version (works only for single moving region but is faster than below)
+            CellList realcells = getSystem()->storage->getRealCells(); //should be realcells
+            int root,mayberoot,lroot;
+            lroot=0;
+            verletList->adrPositions.clear();
+                for (CellListIterator it(realcells); it.isValid(); ++it) {
+                    if (verletList->getAdrList().count(it->id()) == 1) {
 
-        // verletList->adrPositions.clear();
+                        // Update the copy and append to adrPositions
+                        adrpos = it->position();
+                        ptr = &adrpos;
+                        verletList->adrPositions.push_back(ptr);
 
-        // for (int rank_i=0; rank_i<nprocs; rank_i++) {
-        //     procAdrPositions.clear();
-        //     boost::mpi::request request[1];
-
-        //     if (rank_i == myrank) {
-
-        //         for (CellListIterator it(realcells); it.isValid(); ++it) {
-
-        //             if (verletList->getAdrList().count(it->id()) == 1) {
-        //                 procAdrPositions.push_back(&(it->position()));
-        //             }
-
-        //         }
-
-        //         std::cout << "Before Broadcast\n";
-
-        //         request[0] = boost::mpi::broadcast(*system.comm, procAdrPositions, rank_i);
-
-        //         std::cout << "After Broadcast\n\n";
-
-        //     }
-
-        //     boost::mpi::wait_all(request, request + 1);
-
-        //     for (std::vector<Real3D*>::iterator itr=procAdrPositions.begin(); itr != procAdrPositions.end(); ++itr) {
-        //       verletList->adrPositions.push_back(*itr);
-        //     }
-
-        // }
-
-
-        //Version 2 (most likely does not work, as boost's all_gather apparently does not work for inputs of different lengths)
-        verletList->adrPositions.clear();
-        for (CellListIterator it(realcells); it.isValid(); ++it) {
-
-            if (verletList->getAdrList().count(it->id()) == 1) {
-                procAdrPositions.push_back(&(it->position()));
+                        //verletList->adrPositions.push_back(&(it->position())); // without the additional copy
+                        lroot = getSystem()->comm->rank();
+                    }
             }
+            mayberoot = (lroot ? lroot : 0);
+            boost::mpi::all_reduce(*getSystem()->comm,mayberoot,root,boost::mpi::maximum<int>());
+            mpi::broadcast(*getSystem()->comm,verletList->adrPositions,root);
+
+          }
+          else if(verletList->getAdrList().size() > 1){
+
+            // New version (works also for many moving regions but is slower)
+            System& system = getSystemRef();
+            std::vector<Real3D*> procAdrPositions;
+            CellList realcells = getSystem()->storage->getRealCells();
+
+            verletList->adrPositions.clear();
+            for (CellListIterator it(realcells); it.isValid(); ++it) {
+
+                if (verletList->getAdrList().count(it->id()) == 1) {
+
+                   // Update the copy and append to adrPositions
+                   adrpos = it->position();
+		        ptr = &adrpos;
+		        procAdrPositions.push_back(ptr);
+
+		        //procAdrPositions.push_back(&(it->position())); // without the additional copy
+                }
+
+            }
+
+            std::vector<std::vector<Real3D*> > procAdrPositionsAll;
+            boost::mpi::all_gather(*system.comm, procAdrPositions, procAdrPositionsAll);
+
+            for (std::vector<std::vector<Real3D*> >::iterator itr=procAdrPositionsAll.begin(); itr != procAdrPositionsAll.end(); ++itr) {
+                for (std::vector<Real3D*>::iterator itr2=(*itr).begin(); itr2 != (*itr).end(); ++itr2){
+                  verletList->adrPositions.push_back(*itr2);
+                }
+            }
+
+          }
+          else{
+              std::cout << "When using moving AdResS regions there can be only either one or several of them. It seems like the list of PIDs of region defining particles is empty for some reason.\n";
+              exit(1);
+              return;
+          }
 
         }
 
-        std::vector<std::vector<Real3D*> > procAdrPositionsAll;
-        boost::mpi::all_gather(*system.comm, procAdrPositions, procAdrPositionsAll);
-
-        for (std::vector<std::vector<Real3D*> >::iterator itr=procAdrPositionsAll.begin(); itr != procAdrPositionsAll.end(); ++itr) {
-            for (std::vector<Real3D*>::iterator itr2=(*itr).begin(); itr2 != (*itr).end(); ++itr2){
-              verletList->adrPositions.push_back(*itr2);
-            }
-        }
-
-
-        // for (std::vector<Real3D*>::iterator it2 = verletList->adrPositions.begin(); it2 != verletList->adrPositions.end(); ++it2)
-        // {
-        //   std::cout << "**it2: " << **it2 << "\n";
-        // }
-        // std::cout << "\n";
-
+        updatecount += 1;
+        if(updatecount == regionupdates){updatecount = 0;}
 
       }
 
@@ -560,14 +483,18 @@ namespace espressopp {
         else if (dexdhy2 < distanceSqr) return 0.0;
         else {
             real argument = sqrt(distanceSqr) - dex;
-            return 1.0-(30.0/(pow(dhy, 5.0)))*(1.0/5.0*pow(argument, 5.0)-dhy/2.0*pow(argument, 4.0)+1.0/3.0*pow(argument, 3.0)*dhy*dhy);
-            //return pow(cos(pidhy2 * argument),2.0); // for cosine squared weighting function
+            //return 1.0-(30.0/(pow(dhy, 5.0)))*(1.0/5.0*pow(argument, 5.0)-dhy/2.0*pow(argument, 4.0)+1.0/3.0*pow(argument, 3.0)*dhy*dhy);
+            return pow(cos(pidhy2 * argument),2.0); // for cosine squared weighting function
         }
     }
-    real Adress::weightderivative(real distance){
-        real argument = distance - dex;
-        return -(30.0/(pow(dhy, 5.0)))*(pow(argument, 4.0)-2.0*dhy*pow(argument, 3.0)+argument*argument*dhy*dhy);
-        //return -pidhy2 * 2.0 * cos(pidhy2*argument) * sin(pidhy2*argument); // for cosine squared weighting function
+    real Adress::weightderivative(real distanceSqr){
+        if (dex2 > distanceSqr) return 0.0;
+        else if (dexdhy2 < distanceSqr) return 0.0;
+        else{
+          real argument = sqrt(distanceSqr) - dex;
+          //return -(30.0/(pow(dhy, 5.0)))*(pow(argument, 4.0)-2.0*dhy*pow(argument, 3.0)+argument*argument*dhy*dhy);
+          return -pidhy2 * 2.0 * cos(pidhy2*argument) * sin(pidhy2*argument); // for cosine squared weighting function
+        }
     }
 
 
@@ -576,8 +503,6 @@ namespace espressopp {
         System& system = getSystemRef();
         CellList localCells = system.storage->getLocalCells();
         for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
-        /*for (std::set<Particle*>::iterator it=adrZone.begin();
-                it != adrZone.end(); ++it) {*/
 
         Particle &vp = *cit;
 
@@ -595,10 +520,7 @@ namespace espressopp {
                                  it2 != atList.end(); ++it2) {
                 Particle &at = **it2;
 
-                //vp.force() +=  (vp.getMass() * at.force()) / (3.0 * at.mass());
-
                 at.force() += at.mass() * vpfm;
-                //std::cout << "Force of atomistic particle (AdResS sim.) with id " << at.id() << " is: " << at.force() << "\n";
             }
         }
         else { // this should not happen
@@ -609,38 +531,6 @@ namespace espressopp {
         }
       }
 
-      /*for (std::set<Particle*>::iterator it=cgZone.begin();
-                    it != cgZone.end(); ++it) {
-
-            Particle &vp = **it;
-
-            FixedTupleListAdress::iterator it3;
-            it3 = fixedtupleList->find(&vp);
-
-            if (it3 != fixedtupleList->end()) {
-
-                std::vector<Particle*> atList1;
-                atList1 = it3->second;
-
-                Real3D vpfm = vp.force() / vp.getMass();
-                for (std::vector<Particle*>::iterator itv = atList1.begin();
-                        itv != atList1.end(); ++itv) {
-                    Particle &at = **itv;
-
-                    //vp.force() +=  (vp.getMass() * at.force()) / (3.0 * at.mass());
-
-                    // at.velocity() = vp.velocity(); // overwrite velocity
-                    at.force() += at.mass() * vpfm;
-                    //std::cout << "f" << at.mass() * vpfm << " m " << at.mass() << " M "<<  vp.getMass() << " id " << at.id() << std::endl;
-                }
-
-            }
-            else { // this should not happen
-                std::cout << " VP particle not found in tuples: " << vp.id() << "-" << vp.ghost();
-                exit(1);
-                return;
-            }
-      }*/
     }
 
 
@@ -653,7 +543,7 @@ namespace espressopp {
       using namespace espressopp::python;
 
       class_<Adress, shared_ptr<Adress>, bases<Extension> >
-        ("integrator_Adress", init<shared_ptr<System>, shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress>, bool >())
+        ("integrator_Adress", init<shared_ptr<System>, shared_ptr<VerletListAdress>, shared_ptr<FixedTupleListAdress>, bool, int >())
         .def("connect", &Adress::connect)
         .def("disconnect", &Adress::disconnect)
         ;

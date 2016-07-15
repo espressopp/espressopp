@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2014,2015,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -93,7 +93,7 @@ namespace espressopp {
         void enableAdress();
         bool adress;
 
-        /** pid eclusion list (only in adress version used!!)*/
+        /** pid eclusion list */
         std::set<longint> exclusions;
 
         void connect();

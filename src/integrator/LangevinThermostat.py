@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2014,2015,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -24,11 +24,31 @@ r"""
 **espressopp.integrator.LangevinThermostat**
 ********************************************
 
+Langevin Thermostat
+
+Example:
+
+>>> langevin = espressopp.integrator.LangevinThermostat(system)
+>>> # set up the thermostat
+>>> langevin.gamma = gamma
+>>> # set friction coefficient gamma
+>>> langevin.temperature = temp
+>>> # set temperature
+>>> langevin.adress = True
+>>> # set adress (default is False)
+>>> integrator.addExtension(langevin)
+>>> # add extensions to a previously defined integrator
 
 .. function:: espressopp.integrator.LangevinThermostat(system)
 
-		:param system:
-		:type system:
+        :param system: system object
+        :type system: shared_ptr<System>
+
+.. function:: espressopp.integrator.LangevinThermostat.addExclusions(pidlist)
+
+        :param pidlist: list of particle ids to be excluded from thermostating
+        :type pidlist: list of ints
+
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -46,10 +66,6 @@ class LangevinThermostatLocal(ExtensionLocal, integrator_LangevinThermostat):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             for pid in pidlist:
                 self.cxxclass.addExclpid(self, pid)
-
-    #def enableAdress(self):
-    #    if pmi.workerIsActive():
-    #        self.cxxclass.enableAdress(self);
 
 if pmi.isController :
     class LangevinThermostat(Extension):

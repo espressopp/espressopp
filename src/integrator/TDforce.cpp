@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2014,2015,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -73,15 +73,6 @@ namespace espressopp {
         _applyForce.disconnect();
     }
 
-    //void TDforce::setAdrRegionType(bool _sphereAdr){
-    //    sphereAdr = _sphereAdr;
-    //}
-
-    //bool TDforce::getAdrRegionType(){
-    //    return sphereAdr;
-    //}
-
-
     void TDforce::addForce(int itype, const char* _filename, int type) {
         boost::mpi::communicator world;
         filename = _filename;
@@ -123,51 +114,15 @@ namespace espressopp {
 
               if (table) {
 
-
-
-
-//                   if (!(verletList->getAdrCenterSet())) { //moving adress region
-// //TODO if length(adrPositions) > 1 print warning (for the moment only works when there's only one particle in adrPositions)
-//                     center=**(verletList->adrPositions.begin());
-//                   }
-
-//                   if (sphereAdr){ // spherical adress region
-//                      // calculate distance from reference point
-//                      Real3D dist3D;
-//                      bc.getMinimumImageVectorBox(dist3D,cit->getPos(),center); //pos - center
-//                      real dist = sqrt(dist3D.sqr());
-
-//                      if (dist>0.0) {
-//                        // read fforce from table
-//                        real fforce = table->getForce(dist);
-//                        fforce /= dist;
-
-//                        // substract td force
-//                        cit->force() += (dist3D * fforce);
-//                      }
-//                   } else {
-//                      // use this if you need 1-dir force only!
-//                      real d1 = cit->getPos()[0] - center[0];
-//                      real d1abs = fabs(d1);
-//                      real force = table->getForce(d1abs);
-// //std::cout<<cit->id()<<" "<<cit->force()<<" "<<cit->getPos()[0]<<" "<<center[0]<<" "<<d1<<" "<<d1abs<<" "<<force<<std::endl;
-//                      if (d1>0.0) {
-//                        cit->force()[0] += force;
-//                      } else {
-//                        cit->force()[0] -= force;
-//                      }
-// //std::cout<<cit->id()<<" "<<cit->force()<<std::endl;
-//                   }
-
-
-
                   if (!(verletList->getAdrCenterSet())) { // adress regions defined based on particles
 
                     if (sphereAdr){
 
-                      // ONLY DEUGGING
-                      //int count = 1;
-                      // ONLY DEUGGING
+                      if ((startdist == 0.0) && (enddist == 0.0)){
+                        std::cout << "In TDforce: Trying to apply TD force with moving, particle-based spherical AdResS region. However, both startdist and enddist set to 0. This does not make sense.\n";
+                        exit(1);
+                        return;
+                      }
 
                       real buffer = 0.000001;
                       real width = fabs(enddist - startdist + 2.0*buffer);  // width of region where TD force acts
@@ -175,7 +130,7 @@ namespace espressopp {
                       Real3D pa = **it2;
                       Real3D dist3D;
                       bc.getMinimumImageVectorBox(dist3D,cit->getPos(), pa); // calculate vector between particle and first center
-                      //std::cout << "pa1: " << pa << "\n";
+
                       Real3D mindist3D = dist3D; // set mindist3D before loop
 
                       real dist3Dabs = sqrt(dist3D.sqr()); // calculate absolute distance
@@ -188,101 +143,44 @@ namespace espressopp {
 
                         // Direction modification at the edges
                         weight = pow(weight, edgeweightmultiplier);
-
-                        // std::cout << "dist3Dabs1: " << dist3Dabs << "\n";
-                        // std::cout << "width1: " << width << "\n";
-                        // std::cout << "buffer1: " << buffer << "\n";
-                        // std::cout << "startdist1: " << startdist << "\n";
-                        // std::cout << "enddist1: " << enddist << "\n";
-                        // std::cout << "(dist3Dabs - startdist - buffer)1: " << (dist3Dabs - startdist - buffer) << "\n\n";
                       }
                       else{
                         weight = 0.0; // particle outside of hybrid region
                       }
 
-                      // if ((cit->position()[0] < 1.50216) && (cit->position()[0] > 0.80216) && (cit->position()[1] > 2.5) && (cit->position()[1] < 3.5) && (cit->position()[2] > 2.5) && (cit->position()[2] < 3.5)){
-                      //         std::cout << "dist3Dabs1: " << dist3Dabs << "\n";
-                      //         std::cout << "weight1: " << weight << "\n";
-                      // }
-                      //real norm = weight; // normalization constant
                       Real3D direction = dist3D*weight/dist3Dabs; // normalized but weighted direction vector
 
                       // Loop over all other centers
                       ++it2;
                       for (; it2 != verletList->getAdrPositions().end(); ++it2) {
-
-                            // ONLY DEUGGING
-                            //count += 1;
-                            // ONLY DEUGGING
-
                             pa = **it2;
-                            //std::cout << "pa2: " << pa << "\n";
                             verletList->getSystem()->bc->getMinimumImageVector(dist3D, cit->getPos(), pa); // calculate vector between particle and other centers
                             if (dist3D.sqr() < mindist3D.sqr()) mindist3D = dist3D; // make it the minimum if shortest length so far
-
                             dist3Dabs = sqrt(dist3D.sqr()); // calculate absolute distance
 
                             // calculate weights again, as above
                             if ((dist3Dabs < enddist + buffer) && (dist3Dabs > startdist - buffer)){
                               weight = 1.0 - (dist3Dabs - startdist - buffer) / width;
 
-                              // std::cout << "dist3Dabs2: " << dist3Dabs << "\n";
-                              // std::cout << "width2: " << width << "\n";
-                              // std::cout << "buffer2: " << buffer << "\n";
-                              // std::cout << "startdist2: " << startdist << "\n";
-                              // std::cout << "enddist2: " << enddist << "\n";
-                              // std::cout << "(dist3Dabs - startdist - buffer)2: " << (dist3Dabs - startdist - buffer) << "\n\n";
-
-                              // Direction modification at the edges (TEST)
+                              // Direction modification at the edges
                               weight = pow(weight, edgeweightmultiplier);
-
                             }
                             else{
                               weight = 0.0;
                             }
 
-                            // if ((cit->position()[0] < 1.50216) && (cit->position()[0] > 0.80216) && (cit->position()[1] > 2.5) && (cit->position()[1] < 3.5) && (cit->position()[2] > 2.5) && (cit->position()[2] < 3.5)){
-                            //     std::cout << "dist3Dabs2: " << dist3Dabs << "\n";
-                            //     std::cout << "weight2: " << weight << "\n";
-                            // }
-
                             //norm += weight; // add to normalization constant
                             direction += dist3D*weight/dist3Dabs; // add to direction vector
                       }
 
-                      // ONLY DEUGGING
-                      // if (count != 2){
-                      //   std::cout << "FAIL, some center missing in TDforce.cpp - probably error in communication.\n";
-                      //   exit(1);
-                      //   return;
-                      // }
-                      // ONLY DEUGGING
-
-
                       real mindist3Dabs = sqrt(mindist3D.sqr()); // calculate overall smallest absolute distance
 
-                      // if ((direction.sqr() > 0.0) && (cit->position()[0] < 1.50216) && (cit->position()[0] > 0.80216) && (cit->position()[1] > 2.5) && (cit->position()[1] < 3.5) && (cit->position()[2] > 2.5) && (cit->position()[2] < 3.5)){
-                      //   std::cout << "cit->position(): " << cit->position() << "\n";
-                      //   std::cout << "mindist3Dabs: " << mindist3Dabs << "\n";
-                      //   std::cout << "sqrt(direction.sqr()): " << sqrt(direction.sqr()) << "\n";
-                      //   std::cout << "direction: " << direction << "\n\n";
-                      // }
-
-                      //if (mindist3Dabs>0.0) {
-                         // read fforce from table for overall smallest distance (should give zero, if particle is inside a full atomistic area!)
-                         //real fforce = table->getForce(mindist3Dabs);
-
-                         // if (norm > 0.0){
-                         //   fforce /= norm; // normalize with norm
-                         // }
-
-                         // substract td force
+                      // apply td force
                        if ( (mindist3Dabs > startdist) && (mindist3Dabs < enddist) && (direction.sqr() > 0.0) ) {
                           real fforce = table->getForce(mindist3Dabs);
                           fforce /= sqrt(direction.sqr());
-                          cit->force() += (direction * fforce); // and apply into the weighted direction
+                          cit->force() += (direction * fforce);
                        }
-                       //}
 
                     }
                     else{
@@ -313,32 +211,17 @@ namespace espressopp {
                        real d1 = cit->getPos()[0] - center[0];
                        real d1abs = fabs(d1);
                        real force = table->getForce(d1abs);
-                      //std::cout<<cit->id()<<" "<<cit->force()<<" "<<cit->getPos()[0]<<" "<<center[0]<<" "<<d1<<" "<<d1abs<<" "<<force<<std::endl;
                        if (d1>0.0) {
                          cit->force()[0] += force;
                        } else {
                          cit->force()[0] -= force;
                        }
-                      //std::cout<<cit->id()<<" "<<cit->force()<<std::endl;
                     }
 
                   }
-
-
-
-
-
-
-
-
               }
           }
     }
-
-
-    //void TDforce::setCenter(real x, real y, real z){
-    //        center = Real3D(x, y, z);
-    //}
 
     /****************************************************
     ** REGISTRATION WITH PYTHON
@@ -348,23 +231,14 @@ namespace espressopp {
 
       using namespace espressopp::python;
 
-      //void (TDforce::*pySetCenter)(real x, real y, real z)
-      //                  = &TDforce::setCenter;
-
       void (TDforce::*pyAddForce)(int itype, const char* filename, int type)
                         = &TDforce::addForce;
-
-      //void (TDforce::*pySetAdrRegionType)(bool _sphereAdr)
-      //      = &TDforce::setAdrRegionType;
-
 
       class_<TDforce, shared_ptr<TDforce>, bases<Extension> >
         ("integrator_TDforce", init< shared_ptr<System>, shared_ptr<VerletListAdress>, real, real, int >())
         .add_property("filename", &TDforce::getFilename)
         .def("connect", &TDforce::connect)
         .def("disconnect", &TDforce::disconnect)
-        //.def("setCenter", pySetCenter)
-        //.def("setAdrRegionType", pySetAdrRegionType)
         .def("addForce", pyAddForce)
         ;
     }

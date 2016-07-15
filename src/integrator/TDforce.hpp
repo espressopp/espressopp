@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2014,2015,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -58,14 +58,6 @@ namespace espressopp {
         const char* getFilename() const { return filename.c_str(); }
 
         void applyForce();
-
-        // should use centre from verletlistadress instead of setting the following info here in TDforce
-        //void setCenter(real x, real y, real z);
-        //void setAdrRegionType(bool _sphereAdr);
-        //bool getAdrRegionType();
-        //void addAdrParticle(longint pid); //used for defining the AdResS centre instead of setCenter
-        //std::vector<Real3D*> adrPositions; // positions that define centres of adress zone (either from setCenter or at each step from tfList)
-
 
         static void registerPython();
 

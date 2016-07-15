@@ -1,22 +1,22 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2014,2015,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -39,20 +39,23 @@ In detail the AdResS extension makes sure:
 
 Example - how to turn on the AdResS integrator extension:
 
->>> adress      = espressopp.integrator.Adress(system)
+>>> adress      = espressopp.integrator.Adress(system, verletlist, fixedtuplelist)
 >>> integrator.addExtension(adress)
 
+If KTI is set to True, then the resolution parameters are not updated. This can be used for example for Kirkwood thermodynamic integration, during which one manually sets the whole system on different resolution parameters. KTI = True then prevents overwriting these manually set values. Furthermore, when having moving AdResS regions based on particles, regionupdates specifies the update frequency of the AdResS region in number of steps.
 
-.. function:: espressopp.integrator.Adress(_system, _verletlist, _fixedtuplelist, KTI)
+.. function:: espressopp.integrator.Adress(_system, _verletlist, _fixedtuplelist, KTI, regionupdates)
 
-		:param _system: 
-		:param _verletlist: 
-		:param _fixedtuplelist: 
-		:param KTI: (default: False)
-		:type _system: 
-		:type _verletlist: 
-		:type _fixedtuplelist: 
-		:type KTI: 
+                :param _system: system object
+                :param _verletlist: verletlist object
+                :param _fixedtuplelist: fixedtuplelist object
+                :param KTI: (default: False) update resolution parameter? (Yes: set False, No: set True)
+                :param regionupdates: (default: 1) after how many steps does the AdResS region needs to be updated?
+                :type _system: shared_ptr<System>
+                :type _verletlist: shared_ptr<VerletListAdress>
+                :type _fixedtuplelist: shared_ptr<FixedTupleListAdress>
+                :type KTI: bool
+                :type regionupdates: int
 """
 
 from espressopp.esutil import cxxinit
@@ -64,10 +67,10 @@ from _espressopp import integrator_Adress
 class AdressLocal(ExtensionLocal, integrator_Adress):
 
 
-    def __init__(self, _system, _verletlist, _fixedtuplelist, KTI = False):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup(): 
+    def __init__(self, _system, _verletlist, _fixedtuplelist, KTI = False, regionupdates = 1):
+	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
         	if pmi.workerIsActive():
-            		cxxinit(self, integrator_Adress, _system, _verletlist, _fixedtuplelist, KTI)
+            		cxxinit(self, integrator_Adress, _system, _verletlist, _fixedtuplelist, KTI, regionupdates)
 
 if pmi.isController:
     class Adress(Extension):

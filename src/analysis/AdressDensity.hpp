@@ -21,46 +21,33 @@
 */
 
 // ESPP_CLASS
-#ifndef _ANALYSIS_RDFATOMISTIC_HPP
-#define _ANALYSIS_RDFATOMISTIC_HPP
+#ifndef _ANALYSIS_ADRESSDENSITY_HPP
+#define _ANALYSIS_ADRESSDENSITY_HPP
 
 #include "types.hpp"
 #include "Observable.hpp"
-
+#include "VerletListAdress.hpp"
 #include "python.hpp"
 
 namespace espressopp {
   namespace analysis {
-    /** Class to compute the radial distribution function of the system. */
-    class RDFatomistic : public Observable {
+    // Class to compute the density profile along slabs in the x-direction of the system.
+    class AdressDensity : public Observable {
     public:
-      RDFatomistic(shared_ptr< System > system, int type1, int type2, real _span = 1.0, bool _spanbased = true) : Observable(system), target1(type1), target2(type2), span(_span), spanbased(_spanbased) {}
-      ~RDFatomistic() {}
+      AdressDensity(shared_ptr< System > system, shared_ptr<VerletListAdress> _verletList) : Observable(system), verletList(_verletList) {}
+      ~AdressDensity() {}
+      shared_ptr<VerletListAdress> verletList;
       virtual real compute() const;
       virtual python::list computeArray(int) const;
 
+      /** Add pid to exclusionlist */
+      void addExclpid(int pid) { exclusions.insert(pid); }
+
       static void registerPython();
 
-      class data {
-        public:
-        Real3D pos;
-        int type;
-        int molecule;
-        real resolution;
-        friend class boost::serialization::access;
-        template<class Archive> void serialize(Archive & ar, const unsigned int version) {
-          ar & pos;
-          ar & type;
-          ar & molecule;
-          ar & resolution;
-        }
-      };
-
-      int target1;
-      int target2;
-      real span;
-      bool spanbased;
-
+    private:
+      /** pid exclusion list */
+      std::set<longint> exclusions;
     };
   }
 }

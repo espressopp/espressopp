@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2014,2015,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -133,7 +133,12 @@ namespace espressopp {
       CellList cells = system.storage->getRealCells();
 
       for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
-        frictionThermo(*cit);
+
+        if(exclusions.count((*cit).id()) == 0)
+        {
+          frictionThermo(*cit);
+        }
+
       }
     }
 
@@ -144,37 +149,17 @@ namespace espressopp {
 
       System& system = getSystemRef();
 
-      // thermalize CG particles
-      /*CellList cells = system.storage->getRealCells();
-      for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
-        frictionThermo(*cit);
-      }*/
-
-      // TODO: It doesn't make that much sense to thermalize both CG and AT particles, since CG particles get velocities of AT particles anyway.
-
       // thermalize AT particles
       ParticleList& adrATparticles = system.storage->getAdrATParticles();
       for (std::vector<Particle>::iterator it = adrATparticles.begin();
               it != adrATparticles.end(); it++) {
 
-        //Particle &at = *it;
         if(exclusions.count((*it).id()) == 0)
         {
           frictionThermo(*it);
         }
 
-        // Only in hybrid region!
-        /*Particle &at = *it;
-        real w = at.lambda();
-        if(w!=1.0 && w!=0.0) {
-            //std::cout << "w: " << w << std::endl;
-            //std::cout << "pos_x: " << at.position()[0] << std::endl;
-
-            frictionThermo(*it);
-        }*/
-
       }
-
     }
 
     void LangevinThermostat::frictionThermo(Particle& p)
@@ -182,7 +167,6 @@ namespace espressopp {
       real massf = sqrt(p.mass());
 
       // get a random value for each vector component
-
       Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);
 
       p.force() += pref1 * p.velocity() * p.mass() +
