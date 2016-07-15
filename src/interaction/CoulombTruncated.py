@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013,2015
+#  Copyright (C) 2012,2013,2015,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -18,59 +18,72 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
-"""
-*****************************************
+r"""
+*******************************************
 **espressopp.interaction.CoulombTruncated**
-*****************************************
+*******************************************
+
 .. math::
 	U = k\frac{q_iq_j}{d_{ij}}
 
-where `k` is the user-supplied prefactor, `q_i` is the charge of particle `i`, and `d_{ij}` is interparticle distance
+where :math:`k` is the user-supplied prefactor, :math:`q_i` is the charge of particle `i`, and :math:`d_{ij}` is interparticle distance
 
-In this interaction potential, a different charge can be associated with each particle. For a truncated Coulomb interaction potential where only one `q_iq_j` value is specified for all interactions, see CoulombTruncatedUniqueCharge.
+In this interaction potential, a different charge can be associated with each particle. For a truncated Coulomb interaction potential where only one :math:`q_iq_j` value is specified for all interactions, see CoulombTruncatedUniqueCharge.
 
 .. function:: espressopppp.interaction.CoulombTruncated(prefactor, cutoff)
-		:param prefactor: (default: 1.0)
-		:param cutoff: (default: infinity)
+
+		:param prefactor: (default: 1.0) user-supplied prefactor `k`
+		:param cutoff: (default: infinity) user-supplied interaction cutoff
 		:type prefactor: real
 		:type cutoff: real
 
 .. function:: espressopppp.interaction.VerletListCoulombTruncated(vl)
 
-		:param vl: 
-		:type vl: 
+		:param vl: verlet list object defined earlier in python script
+		:type vl: VerletList
 
 .. function:: espressopppp.interaction.VerletListCoulombTruncated.getPotential(type1, type2)
 
-		:param type1: 
-		:param type2: 
-		:type type1: 
-		:type type2: 
+		:param type1: type of first atom in pair
+		:param type2: type of second atom in pair
+		:type type1: integer
+		:type type2: integer
 
 .. function:: espressopppp.interaction.VerletListCoulombTruncated.setPotential(type1, type2, potential)
 
-		:param type1: 
-		:param type2: 
-		:param potential: 
-		:type type1: 
-		:type type2: 
-		:type potential: 
+		:param type1: type of first atom in pair
+		:param type2: type of second atom in pair
+		:param potential: potential object defined earlier in python script
+		:type type1: integer
+		:type type2: integer
+		:type potential: CoulombTruncated potential
 
-.. function:: espressopppp.interaction.FixedPairListTypesCoulombTruncated(system, vl, potential)
+.. function:: espressopppp.interaction.FixedPairListTypesCoulombTruncated(system, vl)
 
-		:param system: 
-		:param vl: 
-		:type system: 
-		:type vl: 
+		:param system: system object defined earlier in the python script
+		:param vl: fixedpairlist object defined earlier in the python script
+		:type system: System
+		:type vl: FixedPairList
 
 .. function:: espressopppp.interaction.FixedPairListTypesCoulombTruncated.setPotential(potential)
 
-		:param potential: 
-		:param type1: 
-		:param type2: 
-		:type potential: 
-		:type type1: 
-		:type type2: 
+		:param type1: type of first atom in pair
+		:param type2: type of second atom in pair
+		:param potential: potential object defined earlier in python script
+		:type type1: integer
+		:type type2: integer
+		:type potential: CoulombTruncated potential
+
+#Example:
+
+>>> pref = 138.935485
+>>> rc = 1.2
+>>> fixedpairlist = espresso.FixedPairList(system.storage)
+>>> fixedpairlist.addBonds([(1,2),(2,3)])
+>>> pot = espressopp.interaction.CoulombTruncated(prefactor=pref, cutoff=rc)
+>>> interaction=espressopp.interaction.FixedPairListTypesCoulombTruncated(system,fixedpairlist)
+>>> interaction.setPotential(type1=0, type2=1, potential=pot)
+>>> system.addInteraction(interaction)
 """
 
 from espressopp import pmi, infinity
@@ -83,13 +96,11 @@ from _espressopp import interaction_CoulombTruncated, \
                       interaction_FixedPairListTypesCoulombTruncated
 
 class CoulombTruncatedLocal(PotentialLocal, interaction_CoulombTruncated):
-    'The (local) CoulombTruncated potential.'
     def __init__(self, prefactor=1.0, cutoff=infinity):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
              cxxinit(self, interaction_CoulombTruncated, prefactor, cutoff)
 
 class VerletListCoulombTruncatedLocal(InteractionLocal, interaction_VerletListCoulombTruncated):
-    'The (local) CoulombTruncated interaction using Verlet lists.'
     def __init__(self, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_VerletListCoulombTruncated, vl)
@@ -103,7 +114,6 @@ class VerletListCoulombTruncatedLocal(InteractionLocal, interaction_VerletListCo
             return self.cxxclass.getPotential(self, type1, type2)
 
 class FixedPairListTypesCoulombTruncatedLocal(InteractionLocal, interaction_FixedPairListTypesCoulombTruncated):
-    'The (local) CoulombTruncated interaction using FixedPair lists with types.'
     def __init__(self, system, vl):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, interaction_FixedPairListTypesCoulombTruncated, system, vl)

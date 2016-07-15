@@ -64,7 +64,6 @@ Reference: Gromacs Manual 4.6.1, section 4.2.11 (page 79-80), equation 4.60
 
 
 # pylint: disable=W0401, W0614, W0212
-from espressopp import pmi
 from espressopp.esutil import *
 
 from espressopp.interaction.DihedralPotential import *
@@ -72,6 +71,7 @@ from espressopp.interaction.Interaction import *
 # pylint: disable=F0401
 from _espressopp import interaction_DihedralHarmonic
 from _espressopp import interaction_FixedQuadrupleListDihedralHarmonic
+from _espressopp import interaction_FixedQuadrupleListTypesDihedralHarmonic
 
 
 class DihedralHarmonicLocal(DihedralPotentialLocal, interaction_DihedralHarmonic):
@@ -104,6 +104,21 @@ class FixedQuadrupleListDihedralHarmonicLocal(
       return self.cxxclass.getFixedQuadrupleList(self)
 
 
+class FixedQuadrupleListTypesDihedralHarmonicLocal(InteractionLocal,
+                                                    interaction_FixedQuadrupleListTypesDihedralHarmonic):
+  def __init__(self, system, fql):
+    if pmi.workerIsActive():
+      cxxinit(self, interaction_FixedQuadrupleListTypesDihedralHarmonic, system, fql)
+
+  def setPotential(self, type1, type2, type3, type4, potential):
+    if pmi.workerIsActive():
+      self.cxxclass.setPotential(self, type1, type2, type3, type4, potential)
+
+  def getPotential(self, type1, type2, type3, type4):
+    if pmi.workerIsActive():
+      return self.cxxclass.getPotential(self, type1, type2, type3, type4)
+
+
 if pmi.isController:
   class DihedralHarmonic(DihedralPotential):
     'The DihedralHarmonic potential.'
@@ -117,4 +132,11 @@ if pmi.isController:
     pmiproxydefs = dict(
       cls='espressopp.interaction.FixedQuadrupleListDihedralHarmonicLocal',
       pmicall=['setPotential', 'getFixedQuadrupleList']
+    )
+
+  class FixedQuadrupleListTypesDihedralHarmonic(Interaction):
+    __metaclass__ = pmi.Proxy
+    pmiproxydefs = dict(
+      cls =  'espressopp.interaction.FixedQuadrupleListTypesDihedralHarmonicLocal',
+      pmicall = ['setPotential','getPotential','setFixedQuadrupleList','getFixedQuadrupleList']
     )

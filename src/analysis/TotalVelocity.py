@@ -45,7 +45,7 @@ Examples
 ---------
 
 Reset the velocity
-+++++++++++++++++
+++++++++++++++++++++
 
 >>> total_velocity = espressopp.analysis.TotalVelocity(system)
 >>> total_velocity.reset()

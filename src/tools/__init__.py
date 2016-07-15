@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2015,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -23,6 +23,7 @@ from espressopp.tools.decomp import *
 from espressopp.tools.timers import *
 from espressopp.tools.replicate import *
 from espressopp.tools.pdb import *
+from espressopp.tools.psf import *
 from espressopp.tools.init_cfg import *
 from espressopp.tools.topology import *
 from espressopp.tools.vmd import *
@@ -33,6 +34,5 @@ from espressopp.tools.analyse import *
 from espressopp.tools.tabulated import *
 from espressopp.tools.prepareAdress import *
 from espressopp.tools.warmup import *
-from espressopp.tools.lammpsfilewrite import *
 from espressopp.tools.povwrite import *
 from espressopp.tools.pathintegral import *

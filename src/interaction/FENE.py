@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012-2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -21,41 +21,32 @@
 
 r"""
 *****************************************
-**espressopp.interaction.FENE**
+**FENE interaction**
 *****************************************
 
+Implementation of the Finitely Extensible Non-linear Elastic potential:
 
-.. math::
-	 U = -\frac{1}{2}r_{max}^2  K \cdot
- 				 log(1 - \frac{\sqrt{dist_{sqr}} - r_{0}}{r_{max}}^2);
+.. math:: 
 
-
-
-
-
+        U(r) = -\frac{1}{2}r_{\mathrm{max}}^2  K \log\left[1 - \left(\frac{r - r_{0}}{r_{\mathrm{max}}}\right)^2\right]
 
 
 .. function:: espressopp.interaction.FENE(K, r0, rMax, cutoff, shift)
 
-		:param K: (default: 1.0)
-		:param r0: (default: 0.0)
+                :param real K: (default: 1.0)
+                :param real r0: (default: 0.0)
 		:param rMax: (default: 1.0)
 		:param cutoff: (default: infinity)
 		:param shift: (default: 0.0)
-		:type K: real
-		:type r0: real
 		:type rMax: real
-		:type cutoff: 
+                :type cutoff: real
 		:type shift: real
 
-.. function:: espressopp.interaction.FixedPairListFENE(system, vl, potential)
+.. function:: espressopp.interaction.FixedPairListFENE(system, pair_list, potential)
 
-		:param system: 
-		:param vl: 
-		:param potential: 
-		:type system: 
-		:type vl: 
-		:type potential: 
+                :param object system: your system :func:`espressopp.System`
+                :param object pair_list: list of bonds  :func:`espressopp.FixedPairList`
+                :param object potential: :func:`espressopp.interaction.FENE`
 
 .. function:: espressopp.interaction.FixedPairListFENE.getFixedPairList()
 
@@ -63,18 +54,35 @@ r"""
 
 .. function:: espressopp.interaction.FixedPairListFENE.getPotential()
 
-		:rtype: 
+                :rtype: object
 
-.. function:: espressopp.interaction.FixedPairListFENE.setFixedPairList(fixedpairlist)
+.. function:: espressopp.interaction.FixedPairListFENE.setFixedPairList(pair_list)
 
-		:param fixedpairlist: 
-		:type fixedpairlist: 
+                :param pair_list:
+                :type pair_list: fixedpairlist
 
 .. function:: espressopp.interaction.FixedPairListFENE.setPotential(potential)
 
 		:param potential: 
 		:type potential: 
+
+**Example of usage**
+
+>>> # The following example shows how to bond particle 1 to particles 0 and 2 by a FENE potential.
+>>> # We assume the particles are already in the storage of the system
+>>> # Initialize list of pairs that will be bonded by FENE
+>>> pair_list = espressopp.FixedPairList(system.storage)
+>>> # Set which pairs belong to the pair_list i.e. particle 0 is bonded to particles 1 and 2.
+>>> pair_list.addBonds([(0,1),(1,2)])
+>>> # Initialize the potential and set up the parameters.
+>>> potFENE   = espressopp.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
+>>> # Set which system, pair list and potential is the interaction associated with.
+>>> interFENE = espressopp.interaction.FixedPairListFENE(system, pair_list, potFENE)
+>>> # Add the interaction to the system.
+>>> system.addInteraction(interFENE)
+
 """
+
 from espressopp import pmi, infinity
 from espressopp.esutil import *
 
@@ -86,7 +94,6 @@ class FENELocal(PotentialLocal, interaction_FENE):
 
     def __init__(self, K=1.0, r0=0.0, rMax=1.0, 
                  cutoff=infinity, shift=0.0):
-        """Initialize the local FENE object."""
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             if shift == "auto":
                 cxxinit(self, interaction_FENE, K, r0, rMax, cutoff)
@@ -117,7 +124,6 @@ class FixedPairListFENELocal(InteractionLocal, interaction_FixedPairListFENE):
 
 if pmi.isController:
     class FENE(Potential):
-        'The FENE potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.FENELocal',
             pmiproperty = ['K', 'r0', 'rMax']

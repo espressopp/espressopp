@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2015
+  Copyright (C) 2015, 2016
       Jakub Krajniak (jkrajniak at gmail.com)
 
   This file is part of ESPResSo++.
@@ -22,6 +22,7 @@
 #include "DihedralRB.hpp"
 #include "FixedTripleListInteractionTemplate.hpp"
 #include "FixedQuadrupleListInteractionTemplate.hpp"
+#include "FixedQuadrupleListTypesInteractionTemplate.hpp"
 
 namespace espressopp {
 namespace interaction {
@@ -32,7 +33,6 @@ void DihedralRB::registerPython() {
       "interaction_DihedralRB", init< real, real, real, real, real, real >());
 
   typedef class FixedQuadrupleListInteractionTemplate<DihedralRB> FixedQuadrupleListDihedralRB;
-
   class_ <FixedQuadrupleListDihedralRB, bases <Interaction> >
       ("interaction_FixedQuadrupleListDihedralRB",
           init<shared_ptr<System>, shared_ptr<FixedQuadrupleList>, shared_ptr<DihedralRB> >())
@@ -40,6 +40,17 @@ void DihedralRB::registerPython() {
                 shared_ptr<DihedralRB> >())
       .def("setPotential", &FixedQuadrupleListDihedralRB::setPotential)
       .def("getFixedQuadrupleList", &FixedQuadrupleListDihedralRB::getFixedQuadrupleList);
+
+  typedef class FixedQuadrupleListTypesInteractionTemplate<DihedralRB>
+    FixedQuadrupleListTypesDihedralRB;
+  class_< FixedQuadrupleListTypesDihedralRB, bases< Interaction > >
+    ("interaction_FixedQuadrupleListTypesDihedralRB",
+       init< shared_ptr<System>, shared_ptr<FixedQuadrupleList> >())
+      .def("setPotential", &FixedQuadrupleListTypesDihedralRB::setPotential)
+      .def("getPotential", &FixedQuadrupleListTypesDihedralRB::getPotentialPtr)
+      .def("setFixedQuadrupleList", &FixedQuadrupleListTypesDihedralRB::setFixedQuadrupleList)
+      .def("getFixedQuadrupleList", &FixedQuadrupleListTypesDihedralRB::getFixedQuadrupleList);
+
 }
 
 }  // end namespace interaction

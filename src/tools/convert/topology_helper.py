@@ -1,3 +1,5 @@
+#  Copyright (C) 2015
+#      Jakub Krajniak (jkrajniak at gmail.com)
 #  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
@@ -174,7 +176,7 @@ class HarmonicNCosDihedralInteractionType(InteractionType):
 class RyckaertBellemansDihedralInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
         print('RyckaertBellemans: {}'.format(self.parameters))
-        pot = espressopp.interaction.DihedralRB(**{k: v for k, v in self.parameters.iteritems()})
+        pot = espressopp.interaction.DihedralRB(**self.parameters)
         return espressopp.interaction.FixedQuadrupleListDihedralRB(system, fpl, pot)
 
 class HarmonicDihedralInteractionType(InteractionType):
