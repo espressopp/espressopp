@@ -61,6 +61,7 @@ Flags
 - store_charge: saves charge
 - store_lambda: saves the value of lambda parameter (useful in AdResS simulations)
 - store_res_id: saves residue id
+- do_sort: sort the file (see :ref:`sorting-file-label`)
 
 Example
 +++++++
@@ -80,6 +81,20 @@ Example
         integrator.run(int_steps)
         traj_file.dump(s*int_steps, s*int_steps*integrator.dt)
 
+
+.. _sorting-file-label:
+
+Sorting file
+++++++++++++++
+
+The content of the `/particles/{}/` is not sorted with respect to the
+particle id. This is because of the way how the data are stored
+by multiple cores simultaneously.
+
+If the flag `do_sort` is True then during the close method, the data
+will be sorted.
+
+
 .. _H5MD: http://nongnu.org/h5md/
 
 """
@@ -91,6 +106,7 @@ from _espressopp import io_DumpH5MD
 from mpi4py import MPI
 import numpy as np
 try:
+    import h5py
     import pyh5md
 except ImportError:
     print 'missing pyh5md'
@@ -99,7 +115,7 @@ import time as py_time
 
 
 class DumpH5MDLocal(io_DumpH5MD):
-    def __init__(self, system, filename, group_name='all',
+    def __init__(self, system, filename, group_name='atoms',
                  store_position=True,
                  store_species=True,
                  store_state=False,
@@ -112,12 +128,13 @@ class DumpH5MDLocal(io_DumpH5MD):
                  is_adress=False,
                  author='xxx',
                  email='xxx',
-                 chunk_size=256):
+                 chunk_size=128,
+                 do_sort=True):
         """
         Args:
             system: The system object.
             filename: The name of hdf file name.
-            group_name: The name of atom groups. (default: 'all').
+            group_name: The name of atom groups. (default: 'atoms').
             store_position: If set to True then position will be stored. (default: True)
             store_species: If set to True then species will be stored. (default: True)
             store_state: If set to True then state will be stored. (default: False)
@@ -131,12 +148,14 @@ class DumpH5MDLocal(io_DumpH5MD):
                 coarse-grained.
             author: The name of author of the file. (default: xxx)
             email: The e-mail to author of that file. (default: xxx)
-            chunk_size: The size of data chunk. (default: 256)
+            chunk_size: The size of data chunk. (default: 128)
+            do_sort: If set to True then HDF5 will be sorted on close.
         """
         if not pmi.workerIsActive():
             return
         cxxinit(self, io_DumpH5MD, system, is_adress)
 
+        self.filename = filename
         self.group_name = group_name
         self.store_position = store_position
         self.store_species = store_species
@@ -148,6 +167,7 @@ class DumpH5MDLocal(io_DumpH5MD):
         self.store_res_id = store_res_id
         self.static_box = static_box
         self.chunk_size = chunk_size
+        self.do_sort = do_sort
 
         self.system = system
         self.file = pyh5md.H5MD_File(filename, 'w', driver='mpio', comm=MPI.COMM_WORLD,
@@ -205,12 +225,13 @@ class DumpH5MDLocal(io_DumpH5MD):
             self.res_id = part.trajectory(
                 'res_id', (self.chunk_size, ), np.int,
                 chunks=(1, self.chunk_size), fillvalue=-1)
-
         self._system_data()
 
-	self.commTimer = 0.0
-	self.updateTimer = 0.0
-	self.writeTimer = 0.0
+        self.commTimer = 0.0
+        self.updateTimer = 0.0
+        self.writeTimer = 0.0
+        self.flushTimer = 0.0
+        self.closeTimer = 0.0
 
     def _system_data(self):
         """Stores specific information about simulation."""
@@ -228,7 +249,9 @@ class DumpH5MDLocal(io_DumpH5MD):
         if pmi.workerIsActive():
             return {'commTimer': self.commTimer,
                     'updateTimer': self.updateTimer,
-                    'writeTimer': self.writeTimer
+                    'writeTimer': self.writeTimer,
+                    'flushTimer': self.flushTimer,
+                    'closeTimer': self.closeTimer
                    }
 
     def set_parameters(self, paramters):
@@ -391,21 +414,53 @@ class DumpH5MDLocal(io_DumpH5MD):
 
     def close(self):
         if pmi.workerIsActive():
+            time0 = py_time.time()
             self.file.f.close()
+            self.closeTimer += (py_time.time() - time0)
 
     def flush(self):
         if pmi.workerIsActive():
+            time0 = py_time.time()
             self.file.flush()
+            self.flushTimer += (py_time.time() - time0)
 
 
 if pmi.isController:
+    def sort_file(h5):
+        """Sort data file."""
+        atom_groups = [ag for ag in h5['/particles'] if 'id' in h5['/particles/{}/'.format(ag)]]
+        T = len(h5['/particles/{}/id/value'.format(atom_groups[0])])
+        # Iterate over time frames.
+        for t in xrange(T):
+            for ag in atom_groups:
+                ids = h5['/particles/{}/id/value'.format(ag)]
+                idd = [
+                    x[1] for x in sorted(
+                        [(p_id, col_id) for col_id, p_id in enumerate(ids[t])],
+                        key=lambda y: (True, y[0]) if y[0] == -1 else (False, y[0]))
+                    ]
+                for k in h5['/particles/{}/'.format(ag)].keys():
+                    if 'value' in h5['/particles/{}/{}'.format(ag, k)].keys():
+                        path = '/particles/{}/{}/value'.format(ag, k)
+                        h5[path][t] = h5[path][t][idd]
+
     class DumpH5MD(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls='espressopp.io.DumpH5MDLocal',
             pmicall=['update', 'getPosition', 'getId', 'getSpecies', 'getState', 'getImage',
                      'getVelocity', 'getMass', 'getCharge', 'getResId',
-                     'dump', 'clear_buffers', 'flush', 'get_file', 'close', 'set_parameters'],
-            pmiinvoke = ['getTimers'],
+                     'dump', 'clear_buffers', 'flush', 'get_file', 'set_parameters'],
+            pmiinvoke=['getTimers'],
             pmiproperty=['store_position', 'store_species', 'store_state', 'store_velocity',
                          'store_charge', 'store_res_id', 'store_lambda'])
+
+        def close(self):
+            pmi.call(self.pmiobject, "close")
+            # Sort file if flag is set to true.
+            if self.pmiobject.do_sort:
+                h5 = h5py.File(self.pmiobject.filename, 'r+')
+                print('Sorting file, please wait...')
+                sort_file(h5)
+                print('File sorted')
+                h5.close()
