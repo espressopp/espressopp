@@ -843,58 +843,54 @@ namespace espressopp {
          timeReadCouplF.reset();
          real timeStart = timeReadCouplF.getElapsedTime();
          
-         /* create filename for the input file */
+         // make filenames and streams //
          std::string filename = "couplForces";
          std::string dirRestart = "dump";
+         std::ostringstream convert, _myRank;
+         
+         // check if directory exists //
          if (getStepNum() != 0 && boost::filesystem::is_directory(dirRestart) == false) {
             std::cout << "Sorry, the restart directory is missing! Something is wrong!!!" << std::endl;
          }
          
-         std::ostringstream convert;
-         std::ostringstream _myRank;
+         // create filename for the input file //
          convert << getStepNum();
          _myRank << getSystem()->comm->rank();
-         
-         filename.insert(0,"/"); 
-         filename.insert(0,dirRestart);
+         filename.insert(0,"/"); filename.insert(0,dirRestart);
          filename.append(convert.str()); filename.append(".");
          filename.append(_myRank.str()); filename.append(".dat");
          
-         // testing
-         std::cout << filename.c_str() << std::endl;
-         
-         /* fill in the coupling forces acting on MD-particles with zeros */
+         // fill in the coupling forces acting on MD-particles with zeros //
          int _totNPart = getTotNPart();
-         for(int _id = 0; _id <= _totNPart; _id++) {
-            setFOnPart(_id, Real3D(0.));
+         for ( int _id = 0; _id <= _totNPart; _id++ ) {
+            setFOnPart( _id, Real3D(0.) );
          }
          
-         /* access particles' data and open a file to read coupling forces from */
+         // access particles' data and open a file to read coupling forces from //
          long int _id;
          real _fx, _fy, _fz;
          
          System& system = getSystemRef();
          CellList realCells = system.storage->getRealCells();
-         FILE * couplForcesFile = fopen(filename.c_str(),"r");
+
+         std::ifstream couplForcesFile;
+         couplForcesFile.open( filename.c_str(), std::ifstream::in );
          
-         if (couplForcesFile == NULL) {
-            if (getStepNum() != 0) {
-               std::cout << "!!! Attention !!! no file with coupling forces acting onto MD particles \
-               found for step " << convert.str() << "\n";
-            }
-         } else {
-            // forces acting onto MD-particles //
-            // loop over all particles in the current CPU//
+         if ( couplForcesFile.is_open() ) {
+            // MD-part //
             for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-               fscanf (couplForcesFile, "%ld %lf %lf %lf \n", &_id, &_fx, &_fy, &_fz);
+               // loop over all particles in the current CPU
+               couplForcesFile >> _id >> _fx >> _fy >> _fz;
+               
                setFOnPart(_id, Real3D(_fx,_fy,_fz));
                // add the forces to the integrator
                cit->force() += getFOnPart(cit->id());
             }
-
-            // forces acting onto LB-sites //
+            
+            // LB-part //
             Int3D _myNi = getMyNi();
             
+            // initialize with zeros //
             for (int _i = 0; _i < _myNi[0]; _i++) {
                for (int _j = 0; _j < _myNi[1]; _j++) {
                   for (int _k = 0; _k < _myNi[2]; _k++) {
@@ -903,15 +899,22 @@ namespace espressopp {
                }
             }
             
-            int _it, _jt, _kt;
-            while (fscanf (couplForcesFile, "%d %d %d %lf %lf %lf \n", &_it, &_jt, &_kt, &_fx, &_fy, &_fz) == 6) {
-               (*lbfor)[_it][_jt][_kt].setCouplForceLoc(Real3D(_fx,_fy,_fz));
+            int _i, _j, _k;
+            
+            while (couplForcesFile >> _i >> _j >> _k >> _fx >> _fy >> _fz) {
+               (*lbfor)[_i][_j][_k].setCouplForceLoc(Real3D(_fx,_fy,_fz));
             }
             
+            couplForcesFile.close();
+         } else {
+            if (getStepNum() != 0) {
+               std::cout << "!!! Attention !!! no file with coupling forces"
+                         << "acting onto MD particles found for step "
+                         << convert.str() << std::endl;
+            }
          }
-         fclose (couplForcesFile);
 
-         // timer
+         // timer //
          real timeEnd = timeReadCouplF.getElapsedTime() - timeStart;
          printf("CPU %d: read LB-to-MD coupling forces in %8.4f seconds\n",
                 getSystem()->comm->rank(), timeEnd);
@@ -949,6 +952,7 @@ namespace espressopp {
             int _numVels = getNumVels();
             int _i, _j, _k;
             real _fi[_numVels];
+            
             while (popsFile >> _i >> _j >> _k 
                             >> _fi[0]  >> _fi[1]  >> _fi[2]  >> _fi[3]  >> _fi[4]  >> _fi[5] 
                             >> _fi[6]  >> _fi[7]  >> _fi[8]  >> _fi[9]  >> _fi[10] >> _fi[11]
@@ -959,7 +963,8 @@ namespace espressopp {
                   (*lbfluid)[_i][_j][_k].setF_i(_l, _fi[_l]);
                }
             }
-            popsFile.close ();
+         
+            popsFile.close();
          } else {
             if (getStepNum() != 0) {
                std::cout << "!!! Attention !!! no file with "
