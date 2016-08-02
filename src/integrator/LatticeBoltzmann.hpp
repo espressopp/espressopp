@@ -155,6 +155,12 @@ namespace espressopp {
          
          void setNSteps (int _nSteps);                // 1 LB step = N md ones
          int getNSteps ();
+
+         void setPrevDumpStep (int saveStep);             // interval for saving couplForces
+         int getPrevDumpStep ();
+
+         void setPrevPopDumpStep (int savePopStep);             // interval for saving pops
+         int getPrevPopDumpStep ();
          
          void setTotNPart (int _totNPart);            // tot num of MD particles in the whole system (sum over CPUs)
          int getTotNPart ();
@@ -162,7 +168,9 @@ namespace espressopp {
          void setFOnPart (int _id, Real3D _fOnPart);  // force on particle
          Real3D getFOnPart (int _id);
          void addFOnPart (int _id, Real3D _fOnPart);
-         
+        
+         void keepLBDump (); 
+ 
          // populations accesss interface //
          void setLBFluid (Int3D _Ni, int _l, real _value);
          real getLBFluid (Int3D _Ni, int _l);
@@ -188,12 +196,13 @@ namespace espressopp {
          void setCopyTimestep(real _copyTimestep);    // copy of MD timestep
          real getCopyTimestep();
          
-         void setStart(int _start);                   // start coupling
-         int getStart();
          /* END OF SET AND GET DECLARATION */
 
          void readCouplForces ();                     // reads coupling forces
          void saveCouplForces ();                     // dumps coupling forces
+
+         void readPops ();                            // reads populations
+         void savePops ();                            // dumps populations
          
          /* FUNCTIONS DECLARATION */
          void initLatticeSize ();
@@ -268,11 +277,12 @@ namespace espressopp {
          lbforces *lbfor;
          
          // COUPLING
-         int couplForceFlag;                  // flag for a coupling force
-         int nSteps;                              // # of MD steps between LB update
-         int totNPart;                           // total number of MD particles
+         int couplForceFlag;                    // flag for a coupling force
+         int nSteps;                            // # of MD steps between LB update
+         int totNPart;                          // total number of MD particles
          real fricCoeff;                        // friction in LB-MD coupling (LJ-units)
-         std::vector<Real3D> fOnPart;   // force acting onto an MD particle
+         std::vector<Real3D> fOnPart;           // force acting onto an MD particle
+         int saveStep, savePopStep;             // step numbers of couplForces and Pops to save
          
          // MPI THINGS
          std::vector<int> myNeigh;
@@ -280,7 +290,7 @@ namespace espressopp {
          int haloSkin;
          Int3D myNi;
          Int3D nodeGrid;                        // 3D-array of processors
-         Real3D myLeft;                        // left border of a physical ("real") domain for a CPU
+         Real3D myLeft;                         // left border of a physical ("real") domain for a CPU
          
          // SIGNALS
          boost::signals2::connection _befIntV;
@@ -288,7 +298,8 @@ namespace espressopp {
          
          // TIMERS
          esutil::WallTimer swapping, colstream, comm;
-         esutil::WallTimer timeRead, timeSave;
+         esutil::WallTimer timeReadCouplF, timeSaveCouplF;
+         esutil::WallTimer timeReadPops, timeSavePops;
          real time_sw, time_colstr, time_comm;
          int profStep;                           // profiling interval
          

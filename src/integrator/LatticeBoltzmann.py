@@ -128,5 +128,5 @@ if pmi.isController :
 												pmiproperty = ['nodeGrid', 'a', 'tau', 'numDims', 'numVels',
 																			 'visc_b','visc_s','gamma_b', 'gamma_s', 'gamma_odd', 'gamma_even',
 																			 'lbTemp', 'fricCoeff', 'nSteps', 'profStep'],
-												pmicall = ["readCouplForces","saveCouplForces"]
+                                    pmicall = ["saveCouplForces","readPops","savePops","keepLBDump"]
             )

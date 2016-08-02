@@ -20,6 +20,7 @@
 
 #include "LatticeBoltzmann.hpp"
 #include <iomanip>                           // for setprecision output in std
+#include <boost/filesystem.hpp>
 
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
@@ -73,9 +74,10 @@ namespace espressopp {
          rng = _system->rng;
          
          /* setup default coupling parameters */
-         setStart(0);                                       // set coupling start flag to 0
          setCouplForceFlag(0);                              // no LB to MD coupling
          setNSteps(1);                                      // # MD steps between LB update
+         setPrevDumpStep(0);                                // interval between dumping coupl-files
+         setPrevPopDumpStep(0);                             // interval between dumping pop-files
          setProfStep(10000);                                // set default time profiling step
          
          /* find total number of MD particles*/
@@ -247,13 +249,22 @@ namespace espressopp {
       void LatticeBoltzmann::setNSteps (int _nSteps) { nSteps = _nSteps;}
       int LatticeBoltzmann::getNSteps () { return nSteps;}
       
+      void LatticeBoltzmann::setPrevDumpStep (int _saveStep) { saveStep = _saveStep;}
+      int LatticeBoltzmann::getPrevDumpStep () { return saveStep;}
+
+      void LatticeBoltzmann::setPrevPopDumpStep (int _savePopStep) { savePopStep = _savePopStep;}
+      int LatticeBoltzmann::getPrevPopDumpStep () { return savePopStep;}
+
       void LatticeBoltzmann::setTotNPart (int _totNPart) { totNPart = _totNPart;}
       int LatticeBoltzmann::getTotNPart () { return totNPart;}
       
       void LatticeBoltzmann::setFOnPart (int _id, Real3D _fOnPart) {fOnPart[_id] = _fOnPart;}
       Real3D LatticeBoltzmann::getFOnPart (int _id) {return fOnPart[_id];}
       void LatticeBoltzmann::addFOnPart (int _id, Real3D _fOnPart) {fOnPart[_id] += _fOnPart;}
-      
+     
+      void LatticeBoltzmann::keepLBDump () {                // keeeps the dumped LB configuration
+         setPrevDumpStep(0); setPrevPopDumpStep(0); }
+ 
       /* Setter and getter for access to population values */
       void LatticeBoltzmann::setLBFluid (Int3D _Ni, int _l, real _value) {
          (*lbfluid)[_Ni[0]][_Ni[1]][_Ni[2]].setF_i(_l, _value);   }
@@ -285,10 +296,7 @@ namespace espressopp {
       
       void LatticeBoltzmann::setCopyTimestep (real _copyTimestep) { copyTimestep = _copyTimestep;}
       real LatticeBoltzmann::getCopyTimestep () { return copyTimestep;}
-      
-      void LatticeBoltzmann::setStart (int _start) { start = _start;}
-      int LatticeBoltzmann::getStart () { return start;}
-      
+         
 /*******************************************************************************************/
       
       /* INITIALIZATION OF THE LATTICE */
@@ -780,11 +788,11 @@ namespace espressopp {
       void LatticeBoltzmann::zeroMDCMVel () {
          int _myRank = getSystem()->comm->rank();
          setCopyTimestep(integrator->getTimeStep());   // copy of the MD timestep
-         
+
          setStepNum(integrator->getStep());
-         if (getStepNum()!=0) setStart(1);
-         
-         if (getStart() == 0 && getCouplForceFlag() != 0) {
+
+         if (getStepNum() == 0 && getCouplForceFlag() != 0) {
+            // if we just start simulation from step 0
             Real3D specCmVel = findCMVelMD(0);
             // output reporting on subtraction of drift's vel
             if (_myRank == 0) {
@@ -802,9 +810,8 @@ namespace espressopp {
                       specCmVel[0], specCmVel[1], specCmVel[2]);
                printf("-------------------------------------\n");
             }
-            
-            setStart(1);
-         } else if (getStart() == 1 && getCouplForceFlag() != 0) {
+         } else if (getStepNum() != 0 && getCouplForceFlag() != 0) {
+            // if we continue simulation
             readCouplForces();
          } else {
          }
@@ -832,20 +839,29 @@ namespace espressopp {
 /*******************************************************************************************/
       
       void LatticeBoltzmann::readCouplForces () {
-         timeRead.reset();
-         real timeStart = timeRead.getElapsedTime();
+         timeReadCouplF.reset();
+         real timeStart = timeReadCouplF.getElapsedTime();
          
          /* create filename for the input file */
          std::string filename = "couplForces";
+         std::string dirRestart = "dump";
+         if (getStepNum() != 0 && boost::filesystem::is_directory(dirRestart) == false) {
+            std::cout << "Sorry, the restart directory is missing! Something is wrong!!!" << std::endl;
+         }
          
          std::ostringstream convert;
          std::ostringstream _myRank;
          convert << getStepNum();
          _myRank << getSystem()->comm->rank();
          
+         filename.insert(0,"/"); 
+         filename.insert(0,dirRestart);
          filename.append(convert.str()); filename.append(".");
          filename.append(_myRank.str()); filename.append(".dat");
-
+         
+         // testing
+         std::cout << filename.c_str() << std::endl;
+         
          /* fill in the coupling forces acting on MD-particles with zeros */
          int _totNPart = getTotNPart();
          for(int _id = 0; _id <= _totNPart; _id++) {
@@ -874,8 +890,8 @@ namespace espressopp {
                // add the forces to the integrator
                cit->force() += getFOnPart(cit->id());
             }
+
             // forces acting onto LB-sites //
-            int _it, _jt, _kt;
             Int3D _myNi = getMyNi();
             
             for (int _i = 0; _i < _myNi[0]; _i++) {
@@ -886,41 +902,112 @@ namespace espressopp {
                }
             }
             
+            int _it, _jt, _kt;
             while (fscanf (couplForcesFile, "%d %d %d %lf %lf %lf \n", &_it, &_jt, &_kt, &_fx, &_fy, &_fz) == 6) {
                (*lbfor)[_it][_jt][_kt].setCouplForceLoc(Real3D(_fx,_fy,_fz));
             }
             
          }
          fclose (couplForcesFile);
-       
+
          // timer
-         real timeEnd = timeRead.getElapsedTime() - timeStart;
+         real timeEnd = timeReadCouplF.getElapsedTime() - timeStart;
          printf("CPU %d: read LB-to-MD coupling forces in %8.4f seconds\n",
                 getSystem()->comm->rank(), timeEnd);
       }
-      
+
+/*******************************************************************************************/
+
+      void LatticeBoltzmann::readPops () {
+         timeReadPops.reset();
+         real timeStart = timeReadPops.getElapsedTime();
+
+         /* create filename for the input file */
+         std::string filename = "pops";
+         std::string dirRestart = "dump";
+         if (getStepNum() != 0 && boost::filesystem::is_directory(dirRestart) == false) {
+            std::cout << "Sorry, the restart directory is missing! Something is wrong!!!"
+                      << std::endl;
+         }
+
+         std::ostringstream convert, _myRank;
+         convert << getStepNum();
+         _myRank << getSystem()->comm->rank();
+
+         filename.insert(0,"/");
+         filename.insert(0,dirRestart);
+         filename.append(convert.str()); filename.append(".");
+         filename.append(_myRank.str()); filename.append(".dat");
+
+         // testing
+         std::cout << filename.c_str() << std::endl;
+
+         /* open a file to read populations from */
+         FILE * popsFile = fopen(filename.c_str(),"r");
+
+         if (popsFile == NULL) {
+            if (getStepNum() != 0) {
+               std::cout << "!!! Attention !!! no file with "
+                         << "LB populations found for step "
+                         << convert.str() << "\n";
+            }
+         } else {
+            // populations of the LB-sites //
+            int _numVels = getNumVels();
+            int _it, _jt, _kt;
+            real _pop[_numVels];
+            while (fscanf (popsFile, "%d %d %d %lf %lf %lf \n",
+                           &_it, &_jt, &_kt, &_pop[0], &_pop[1], &_pop[2],
+                           &_pop[3], &_pop[4], &_pop[5], &_pop[6], &_pop[7], &_pop[8],
+                           &_pop[9], &_pop[10], &_pop[11], &_pop[12], &_pop[13], &_pop[14],
+                           &_pop[15], &_pop[16], &_pop[17], &_pop[18] ) == 22) {
+               for ( int _l = 0; _l < _numVels; _l++ ) {
+                  (*lbfluid)[_it][_jt][_kt].setF_i(_l, _pop[_l]);
+               }
+            }
+         }
+         fclose (popsFile);
+
+         // timer
+         real timeEnd = timeReadPops.getElapsedTime() - timeStart;
+         printf("CPU %d: read LB-to-MD coupling forces in %8.4f seconds\n",
+                getSystem()->comm->rank(), timeEnd);
+      }
+
 /*******************************************************************************************/
       
       void LatticeBoltzmann::saveCouplForces () {
-         timeSave.reset();
-         real timeStart = timeSave.getElapsedTime();
+         // manage timers //
+         timeSaveCouplF.reset();
+         real timeStart = timeSaveCouplF.getElapsedTime();
          
-         /* create filename for the output file */
+         int currDumpStep = integrator->getStep();
+         
+         // check if folder exists, if not - create it //
+         std::string dirRestart = "dump";
+         if (boost::filesystem::is_directory(dirRestart) == false) {
+            boost::filesystem::create_directory(dirRestart);
+         }
+
+         // create filename for the output file //
          std::string filename = "couplForces";
-         
+         std::string delLBfilename = filename;                    // a filename for future deletion
+
          std::ostringstream convert;
          std::ostringstream _myRank;
-         convert << integrator->getStep();
+         convert << currDumpStep;
          _myRank << getSystem()->comm->rank();
-         
+
+         filename.insert(0,"/"); 
+         filename.insert(0,dirRestart);
          filename.append(convert.str()); filename.append(".");
          filename.append(_myRank.str()); filename.append(".dat");
-         
-         /* access particles' data and open a file to write coupling forces to */
+
+         // access particles' data and open a file to write coupling forces to //
          System& system = getSystemRef();
          CellList realCells = system.storage->getRealCells();
          
-         /* write forces acting onto MD-particles */
+         // write forces acting onto MD-particles //
          FILE * couplForcesFile = fopen(filename.c_str(),"w");
          
          for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
@@ -931,7 +1018,7 @@ namespace espressopp {
                      getFOnPart(_id).getItem(2));
          }
          
-         /* write forces acting onto LB-sites (incl. ghost region) */
+         // write forces acting onto LB-sites (incl. ghost region) //
          Int3D _myNi = getMyNi();
          
          for ( int _i = 0; _i < _myNi[0]; _i++ ) {
@@ -950,11 +1037,15 @@ namespace espressopp {
          }
          fclose( couplForcesFile );
          
-         /* write down density and velocity of the fluid (excl. ghost region) */
+         // write down density and velocity of the fluid (excl. ghost region) //
          int _offset = getHaloSkin();
          Int3D _myPos = getMyPos();
          
          filename = "fluid";
+         std::string delMDfilename = filename;                       // a filename for future deletion
+
+         filename.insert(0,"/"); 
+         filename.insert(0,dirRestart);
          filename.append( convert.str() ); filename.append( "." );
          filename.append( _myRank.str() ); filename.append( ".dat" );
          
@@ -979,14 +1070,99 @@ namespace espressopp {
             }
          }
          fclose (fluidFile);
-         
+
+         // delete previous dumps //
+         std::ostringstream convDel;
+         convDel << getPrevDumpStep();
+         if (getPrevDumpStep() != 0) {
+            // make filenames 
+            delLBfilename.insert(0,"/"); 
+            delLBfilename.insert(0,dirRestart);
+            delLBfilename.append(convDel.str()); delLBfilename.append(".");
+            delLBfilename.append(_myRank.str()); delLBfilename.append(".dat");
+
+            delMDfilename.insert(0,"/"); 
+            delMDfilename.insert(0,dirRestart);
+            delMDfilename.append(convDel.str()); delMDfilename.append(".");
+            delMDfilename.append(_myRank.str()); delMDfilename.append(".dat");
+
+            // remove files 
+            boost::filesystem::remove(delLBfilename);
+            boost::filesystem::remove(delMDfilename);
+         }
+
+         setPrevDumpStep(currDumpStep);
+        
          // timer //
-         real timeEnd = timeSave.getElapsedTime() - timeStart;
+         real timeEnd = timeSaveCouplF.getElapsedTime() - timeStart;
          printf("CPU %d: saved LB-to-MD coupling forces in %8.4f seconds\n",
                 getSystem()->comm->rank(), timeEnd);
          
       }
       
+      void LatticeBoltzmann::savePops () {
+         // manage timers //
+         timeSavePops.reset();
+         real timeStart = timeSavePops.getElapsedTime();
+
+         int currDumpStep = integrator->getStep();
+         int _numVels = getNumVels();
+
+         // create filename for the output file //
+         std::string dirRestart = "dump";
+         std::string filename = "pops";
+         std::string delLBfilename = filename;                    // a filename for future deletion
+
+         std::ostringstream convert, _myRank;
+         convert << currDumpStep;
+         _myRank << getSystem()->comm->rank();
+
+         filename.insert(0,"/");
+         filename.insert(0,dirRestart);
+         filename.append(convert.str()); filename.append(".");
+         filename.append(_myRank.str()); filename.append(".dat");
+
+         // write populations at LB-sites (incl. ghost region) //
+         FILE * popsFile = fopen( filename.c_str(), "w" );
+         Int3D _myNi = getMyNi();
+
+         for ( int _i = 0; _i < _myNi[0]; _i++ ) {
+            for ( int _j = 0; _j < _myNi[1]; _j++ ) {
+               for ( int _k = 0; _k < _myNi[2]; _k++ ) {
+                  fprintf ( popsFile, "%5d %5d %5d ", _i, _j, _k );
+                  for ( int _l = 0; _l < _numVels; _l++ ) {
+                     fprintf ( popsFile, "%8.6lf ",
+                              (*lbfluid)[_i][_j][_k].getF_i(_l) );
+                  }
+                  fprintf ( popsFile, "\n " );
+               }
+            }
+         }
+
+         fclose( popsFile );
+
+         // delete previous dumps //
+         std::ostringstream convDel;
+         convDel << getPrevPopDumpStep();
+         if (getPrevPopDumpStep() != 0) {
+            // make filenames
+            delLBfilename.insert(0,"/");
+            delLBfilename.insert(0,dirRestart);
+            delLBfilename.append(convDel.str()); delLBfilename.append(".");
+            delLBfilename.append(_myRank.str()); delLBfilename.append(".dat");
+
+            // remove files
+            boost::filesystem::remove(delLBfilename);
+         }
+
+         setPrevPopDumpStep(currDumpStep);
+
+         // timer //
+         real timeEnd = timeSavePops.getElapsedTime() - timeStart;
+         printf("CPU %d: saved LB populations in %8.4f seconds\n",
+                getSystem()->comm->rank(), timeEnd);
+      }
+
 /*******************************************************************************************/
       
       /////////////////////////////
@@ -1939,8 +2115,10 @@ namespace espressopp {
          .add_property("fricCoeff", &LatticeBoltzmann::getFricCoeff, &LatticeBoltzmann::setFricCoeff)
          .add_property("nSteps", &LatticeBoltzmann::getNSteps, &LatticeBoltzmann::setNSteps)
          .add_property("profStep", &LatticeBoltzmann::getProfStep, &LatticeBoltzmann::setProfStep)
-         .def("readCouplForces", &LatticeBoltzmann::readCouplForces)
          .def("saveCouplForces", &LatticeBoltzmann::saveCouplForces)
+         .def("readPops", &LatticeBoltzmann::readPops)
+         .def("savePops", &LatticeBoltzmann::savePops)
+         .def("keepLBDump", &LatticeBoltzmann::keepLBDump)
          .def("connect", &LatticeBoltzmann::connect)
          .def("disconnect", &LatticeBoltzmann::disconnect)
          ;

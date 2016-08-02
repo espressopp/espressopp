@@ -49,8 +49,8 @@ namespace espressopp {
 			// loop over all particles in the curr CPU and interpolate CM's vel to moment t+dt
 			for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
 				Real3D& vel = cit->velocity();
-				Real3D& force = cit->force();
-				_velCM += vel + 0.5 * _timestep * force;
+            Real3D& force = cit->force();
+            _velCM += vel + 0.5 * _timestep * force;
 			}
 			
 			boost::mpi::reduce(*getSystem()->comm, _velCM, _totVelCM, std::plus<Real3D>(), 0);
@@ -65,7 +65,7 @@ namespace espressopp {
 							 _totVelCM[0], _totVelCM[1], _totVelCM[2]);
 				
 				long int _step = latticeboltzmann->getStepNum();
-            real _invNSteps = 1. / latticeboltzmann->getNSteps();
+                real _invNSteps = 1. / latticeboltzmann->getNSteps();
 				
 				if (_step != 0) {
 					// calculate time performance
