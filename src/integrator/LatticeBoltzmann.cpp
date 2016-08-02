@@ -20,6 +20,7 @@
 
 #include "LatticeBoltzmann.hpp"
 #include <iomanip>                           // for setprecision output in std
+#include <fstream>
 #include <boost/filesystem.hpp>
 
 #include "storage/Storage.hpp"
@@ -922,53 +923,52 @@ namespace espressopp {
          timeReadPops.reset();
          real timeStart = timeReadPops.getElapsedTime();
 
-         /* create filename for the input file */
+         // make filenames and streams // 
          std::string filename = "pops";
          std::string dirRestart = "dump";
+         std::ostringstream convert, _myRank;
+
+         // check if directory exists //
          if (getStepNum() != 0 && boost::filesystem::is_directory(dirRestart) == false) {
             std::cout << "Sorry, the restart directory is missing! Something is wrong!!!"
                       << std::endl;
          }
 
-         std::ostringstream convert, _myRank;
+         // create filename for the input file //
          convert << getStepNum();
          _myRank << getSystem()->comm->rank();
-
-         filename.insert(0,"/");
-         filename.insert(0,dirRestart);
+         filename.insert(0,"/"); filename.insert(0,dirRestart);
          filename.append(convert.str()); filename.append(".");
          filename.append(_myRank.str()); filename.append(".dat");
 
-         // testing
-         std::cout << filename.c_str() << std::endl;
+         // open a file to read populations from //
+         std::ifstream popsFile;
+         popsFile.open( filename.c_str(), std::ifstream::in );
 
-         /* open a file to read populations from */
-         FILE * popsFile = fopen(filename.c_str(),"r");
-
-         if (popsFile == NULL) {
+         if ( popsFile.is_open() ) {
+            int _numVels = getNumVels();
+            int _i, _j, _k;
+            real _fi[_numVels];
+            while (popsFile >> _i >> _j >> _k 
+                            >> _fi[0]  >> _fi[1]  >> _fi[2]  >> _fi[3]  >> _fi[4]  >> _fi[5] 
+                            >> _fi[6]  >> _fi[7]  >> _fi[8]  >> _fi[9]  >> _fi[10] >> _fi[11]
+                            >> _fi[12] >> _fi[13] >> _fi[14] >> _fi[15] >> _fi[16] 
+                            >> _fi[17] >> _fi[18]) {
+               // read in the populations on the site _i, _j, _k
+               for ( int _l = 0; _l < _numVels; _l++ ) {
+                  (*lbfluid)[_i][_j][_k].setF_i(_l, _fi[_l]);
+               }
+            }
+            popsFile.close ();
+         } else {
             if (getStepNum() != 0) {
                std::cout << "!!! Attention !!! no file with "
                          << "LB populations found for step "
-                         << convert.str() << "\n";
-            }
-         } else {
-            // populations of the LB-sites //
-            int _numVels = getNumVels();
-            int _it, _jt, _kt;
-            real _pop[_numVels];
-            while (fscanf (popsFile, "%d %d %d %lf %lf %lf \n",
-                           &_it, &_jt, &_kt, &_pop[0], &_pop[1], &_pop[2],
-                           &_pop[3], &_pop[4], &_pop[5], &_pop[6], &_pop[7], &_pop[8],
-                           &_pop[9], &_pop[10], &_pop[11], &_pop[12], &_pop[13], &_pop[14],
-                           &_pop[15], &_pop[16], &_pop[17], &_pop[18] ) == 22) {
-               for ( int _l = 0; _l < _numVels; _l++ ) {
-                  (*lbfluid)[_it][_jt][_kt].setF_i(_l, _pop[_l]);
-               }
+                         << convert.str() << std::endl;
             }
          }
-         fclose (popsFile);
 
-         // timer
+         // timer //
          real timeEnd = timeReadPops.getElapsedTime() - timeStart;
          printf("CPU %d: read LB-to-MD coupling forces in %8.4f seconds\n",
                 getSystem()->comm->rank(), timeEnd);
