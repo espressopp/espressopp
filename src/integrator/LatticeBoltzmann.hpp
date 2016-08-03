@@ -172,8 +172,8 @@ namespace espressopp {
          void keepLBDump (); 
  
          // populations accesss interface //
-         void setLBFluid (Int3D _Ni, int _l, real _value);
-         real getLBFluid (Int3D _Ni, int _l);
+         void setPops (Int3D _Ni, int _l, real _value);
+         real getPops (Int3D _Ni, int _l);
          
          void setGhostFluid (Int3D _Ni, int _l, real _value);
 
@@ -196,9 +196,12 @@ namespace espressopp {
          void setCopyTimestep(real _copyTimestep);    // copy of MD timestep
          real getCopyTimestep();
          
+         void setRestartFlag (int _restartFlag);      // restart flag
+         int getRestartFlag ();
+         
          /* END OF SET AND GET DECLARATION */
 
-         void readCouplForces ();                     // reads coupling forces
+         void readCouplForces (int _mode);            // reads coupling forces
          void saveCouplForces ();                     // dumps coupling forces
 
          void readPops ();                            // reads populations
@@ -265,6 +268,7 @@ namespace espressopp {
          int start;
          int stepNum;                           // step number
          real copyTimestep;                  // copy of the integrator timestep
+         int restartFlag;
          shared_ptr< esutil::RNG > rng;  //!< random number generator used for fluctuations
          
          // EXTERNAL FORCES
@@ -299,6 +303,7 @@ namespace espressopp {
          // TIMERS
          esutil::WallTimer swapping, colstream, comm;
          esutil::WallTimer timeReadCouplF, timeSaveCouplF;
+         esutil::WallTimer timeReadFromBuf;
          esutil::WallTimer timeReadPops, timeSavePops;
          real time_sw, time_colstr, time_comm;
          int profStep;                           // profiling interval

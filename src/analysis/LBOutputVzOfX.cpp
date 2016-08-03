@@ -59,10 +59,10 @@ namespace espressopp {
          FILE * velProfFile = fopen(filename.c_str(),"a");
          for (int i = _offset; i < _Ni[0] - _offset; i++) {
             for (int l = 0; l < _numVels; l++) {
-               _denLoc[i] += latticeboltzmann->getLBFluid(Int3D(i,_j,_k),l);
+               _denLoc[i] += latticeboltzmann->getPops( Int3D(i,_j,_k), l );
 //             _jxLoc[i] += latticeboltzmann->getLBFluid(Int3D(i,_j,_k),l) * latticeboltzmann->getCi(l).getItem(0);
 //             _jyLoc[i] += latticeboltzmann->getLBFluid(Int3D(i,_j,_k),l) * latticeboltzmann->getCi(l).getItem(1);
-               _jzLoc[i] += latticeboltzmann->getLBFluid(Int3D(i,_j,_k),l) * latticeboltzmann->getCi(l).getItem(2);
+               _jzLoc[i] += latticeboltzmann->getPops( Int3D(i,_j,_k), l ) * latticeboltzmann->getCi(l).getItem(2);
             }
             fprintf (velProfFile, "%9d %9.6f %9.6f  \n", i, _denLoc[i], _jzLoc[i]/_denLoc[i]);
          }

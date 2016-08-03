@@ -69,8 +69,8 @@ namespace espressopp {
             for (int l = 0; l < _numVels; l++) {
               scalp = _u0 * latticeboltzmann->getCi(l);
               value = 0.5 * latticeboltzmann->getEqWeight(l) * _rho0 * (2. + 2. * scalp * invCs2 + scalp * scalp * invCs4 - trace);
-              latticeboltzmann->setLBFluid(Int3D(i,j,k),l,value);
-              latticeboltzmann->setGhostFluid(Int3D(i,j,k),l,0.0);
+              latticeboltzmann->setPops( Int3D(i,j,k), l, value );
+              latticeboltzmann->setGhostFluid( Int3D(i,j,k), l, 0.0);
             }
 						
 						/* fill in den and j values for real and halo regions */

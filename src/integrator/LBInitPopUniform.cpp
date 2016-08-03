@@ -49,7 +49,7 @@ namespace espressopp {
 			int _numVels = latticeboltzmann->getNumVels();	// number of velocities in the model
 			
       // set initial velocity of the populations from Maxwell's distribution
-#warning: check if taking care of OFFSET AT INITIALISATION () is needed
+      //#note: check if taking care of OFFSET AT INITIALISATION () is needed
 			for (int i = 0; i < _Ni.getItem(0); i++) {
       // test the damping of a sin-like initial velocities:
         real trace = _u0*_u0*invCs2;
@@ -58,8 +58,8 @@ namespace espressopp {
             for (int l = 0; l < _numVels; l++) {
               scalp = _u0 * latticeboltzmann->getCi(l);
               value = 0.5 * latticeboltzmann->getEqWeight(l) * _rho0 * (2. + 2. * scalp * invCs2 + scalp * scalp * invCs4 - trace);
-              latticeboltzmann->setLBFluid(Int3D(i,j,k),l,value);
-              latticeboltzmann->setGhostFluid(Int3D(i,j,k),l,0.0);
+              latticeboltzmann->setPops( Int3D(i,j,k), l, value );
+              latticeboltzmann->setGhostFluid( Int3D(i,j,k), l, 0.0 );
             }
 						
 						/* fill in den and j values for real and halo regions */

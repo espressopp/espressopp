@@ -51,8 +51,8 @@ namespace espressopp {
          
          // creating a profile based on the current populations
          for (int l = 0; l < _numVels; l++) {
-            _denLoc += latticeboltzmann->getLBFluid(Int3D(_i,_j,_k),l);
-            _jzLoc += latticeboltzmann->getLBFluid(Int3D(_i,_j,_k),l) * latticeboltzmann->getCi(l).getItem(2);
+            _denLoc += latticeboltzmann->getPops( Int3D(_i,_j,_k), l );
+            _jzLoc += latticeboltzmann->getPops( Int3D(_i,_j,_k), l ) * latticeboltzmann->getCi(l).getItem(2);
          }
          
          vzInTimeFile = fopen ("vz_in_time.dat","a");

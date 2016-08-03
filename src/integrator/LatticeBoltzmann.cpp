@@ -66,6 +66,7 @@ namespace espressopp {
          /* setup simulation parameters */
          setLBTempFlag(0);                                  // no fluctuations
          setStepNum(0);                                     // set step number to 0
+         setRestartFlag(1);                                 // restart flag
          setExtForceFlag(0);                                // no external forces
          
          /* setup random numbers generator */
@@ -134,7 +135,6 @@ namespace espressopp {
       }
       
       void LatticeBoltzmann::connect() {
-#warning: need to correct zeroMDCMVel if we not at the VERY start of the simulation. It zeros CM Vel EVERY time when integrator.run(X_steps) starts!!!
          _recalc2 = integrator->recalc2.connect ( boost::bind(&LatticeBoltzmann::zeroMDCMVel, this));
          _befIntV = integrator->befIntV.connect ( boost::bind(&LatticeBoltzmann::makeLBStep, this));
       }
@@ -267,9 +267,9 @@ namespace espressopp {
          setPrevDumpStep(0); setPrevPopDumpStep(0); }
  
       /* Setter and getter for access to population values */
-      void LatticeBoltzmann::setLBFluid (Int3D _Ni, int _l, real _value) {
+      void LatticeBoltzmann::setPops (Int3D _Ni, int _l, real _value) {
          (*lbfluid)[_Ni[0]][_Ni[1]][_Ni[2]].setF_i(_l, _value);   }
-      real LatticeBoltzmann::getLBFluid (Int3D _Ni, int _l) {
+      real LatticeBoltzmann::getPops (Int3D _Ni, int _l) {
          return (*lbfluid)[_Ni[0]][_Ni[1]][_Ni[2]].getF_i(_l);   }
       
       void LatticeBoltzmann::setGhostFluid (Int3D _Ni, int _l, real _value) {
@@ -282,7 +282,8 @@ namespace espressopp {
       
       /* Helpers for MD to LB (and vice versa) unit conversion */
       real LatticeBoltzmann::convMassMDtoLB() {return 1.;}
-#warning: need a foolproof in case there is no access to the integrator (and getTimeStep) yet
+
+      //#note: need a foolproof in case there is no access to the integrator (and getTimeStep) yet
       real LatticeBoltzmann::convTimeMDtoLB() {return 1. / (integrator->getTimeStep() * getTau());}
       real LatticeBoltzmann::convLenMDtoLB() {
          return getNi().getItem(0) / (getSystem()->bc->getBoxL().getItem(0) * getA());}
@@ -297,7 +298,10 @@ namespace espressopp {
       
       void LatticeBoltzmann::setCopyTimestep (real _copyTimestep) { copyTimestep = _copyTimestep;}
       real LatticeBoltzmann::getCopyTimestep () { return copyTimestep;}
-         
+      
+      void LatticeBoltzmann::setRestartFlag (int _restartFlag) { restartFlag = _restartFlag;}
+      int LatticeBoltzmann::getRestartFlag () { return restartFlag;}
+      
 /*******************************************************************************************/
       
       /* INITIALIZATION OF THE LATTICE */
@@ -551,7 +555,7 @@ namespace espressopp {
          time_sw += (swapping.getElapsedTime()-time3);
          
          /* calculate den and j at the lattice sites in real region and copy them to halo */
-#warning: should one cancel this condition if pure lb is in use? or move setCouplForceLoc into the collision loop?
+         //#note: should one cancel this condition if pure lb is in use? or move setCouplForceLoc into the collision loop?
          if (getCouplForceFlag() == 1) {
             /* set to zero coupling forces if the coupling exists */
             for (int i = 0; i < _myNi[0]; i++) {
@@ -792,7 +796,9 @@ namespace espressopp {
 
          setStepNum(integrator->getStep());
 
-         if (getStepNum() == 0 && getCouplForceFlag() != 0) {
+         if ( getStepNum() == 0 ) setRestartFlag(0);
+         
+         if (getStepNum() == 0 && getCouplForceFlag() != 0 && getRestartFlag() == 0) {
             // if we just start simulation from step 0
             Real3D specCmVel = findCMVelMD(0);
             // output reporting on subtraction of drift's vel
@@ -811,10 +817,13 @@ namespace espressopp {
                       specCmVel[0], specCmVel[1], specCmVel[2]);
                printf("-------------------------------------\n");
             }
-         } else if (getStepNum() != 0 && getCouplForceFlag() != 0) {
-            // if we continue simulation
-            readCouplForces();
+         } else if (getStepNum() != 0 && getCouplForceFlag() != 0 && getRestartFlag() == 1) {
+            // if it is a real restart
+            readCouplForces(1);
+            setRestartFlag(0);
          } else {
+            // if we just continue simulation
+            readCouplForces(0);
          }
       }
       
@@ -839,85 +848,104 @@ namespace espressopp {
       
 /*******************************************************************************************/
       
-      void LatticeBoltzmann::readCouplForces () {
-         timeReadCouplF.reset();
-         real timeStart = timeReadCouplF.getElapsedTime();
-         
-         // make filenames and streams //
-         std::string filename = "couplForces";
-         std::string dirRestart = "dump";
-         std::ostringstream convert, _myRank;
-         
-         // check if directory exists //
-         if (getStepNum() != 0 && boost::filesystem::is_directory(dirRestart) == false) {
-            std::cout << "Sorry, the restart directory is missing! Something is wrong!!!" << std::endl;
-         }
-         
-         // create filename for the input file //
-         convert << getStepNum();
-         _myRank << getSystem()->comm->rank();
-         filename.insert(0,"/"); filename.insert(0,dirRestart);
-         filename.append(convert.str()); filename.append(".");
-         filename.append(_myRank.str()); filename.append(".dat");
-         
-         // fill in the coupling forces acting on MD-particles with zeros //
-         int _totNPart = getTotNPart();
-         for ( int _id = 0; _id <= _totNPart; _id++ ) {
-            setFOnPart( _id, Real3D(0.) );
-         }
-         
-         // access particles' data and open a file to read coupling forces from //
-         long int _id;
-         real _fx, _fy, _fz;
-         
-         System& system = getSystemRef();
-         CellList realCells = system.storage->getRealCells();
+      void LatticeBoltzmann::readCouplForces (int _mode) {
+         if (_mode == 0) {
+            // timer //
+            timeReadFromBuf.reset();
+            real timeStart = timeReadFromBuf.getElapsedTime();
 
-         std::ifstream couplForcesFile;
-         couplForcesFile.open( filename.c_str(), std::ifstream::in );
-         
-         if ( couplForcesFile.is_open() ) {
-            // MD-part //
+            System& system = getSystemRef();
+            CellList realCells = system.storage->getRealCells();
+            
             for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-               // loop over all particles in the current CPU
-               couplForcesFile >> _id >> _fx >> _fy >> _fz;
-               
-               setFOnPart(_id, Real3D(_fx,_fy,_fz));
                // add the forces to the integrator
                cit->force() += getFOnPart(cit->id());
             }
             
-            // LB-part //
-            Int3D _myNi = getMyNi();
+            // timer //
+            real timeEnd = timeReadFromBuf.getElapsedTime() - timeStart;
+            printf("CPU %d: read LB-to-MD coupling forces from buffer in %8.4f seconds\n",
+                   getSystem()->comm->rank(), timeEnd);
+         } else {
+            timeReadCouplF.reset();
+            real timeStart = timeReadCouplF.getElapsedTime();
             
-            // initialize with zeros //
-            for (int _i = 0; _i < _myNi[0]; _i++) {
-               for (int _j = 0; _j < _myNi[1]; _j++) {
-                  for (int _k = 0; _k < _myNi[2]; _k++) {
-                     (*lbfor)[_i][_j][_k].setCouplForceLoc(Real3D(0.));
+            // make filenames and streams //
+            std::string filename = "couplForces";
+            std::string dirRestart = "dump";
+            std::ostringstream convert, _myRank;
+            
+            // check if directory exists //
+            if (getStepNum() != 0 && boost::filesystem::is_directory(dirRestart) == false) {
+               std::cout << "Sorry, the restart directory is missing! Something is wrong!!!" << std::endl;
+            }
+            
+            // create filename for the input file //
+            convert << getStepNum();
+            _myRank << getSystem()->comm->rank();
+            filename.insert(0,"/"); filename.insert(0,dirRestart);
+            filename.append(convert.str()); filename.append(".");
+            filename.append(_myRank.str()); filename.append(".dat");
+            
+            // fill in the coupling forces acting on MD-particles with zeros //
+            int _totNPart = getTotNPart();
+            for ( int _id = 0; _id <= _totNPart; _id++ ) {
+               setFOnPart( _id, Real3D(0.) );
+            }
+            
+            // access particles' data and open a file to read coupling forces from //
+            long int _id;
+            real _fx, _fy, _fz;
+            
+            System& system = getSystemRef();
+            CellList realCells = system.storage->getRealCells();
+            
+            std::ifstream couplForcesFile;
+            couplForcesFile.open( filename.c_str(), std::ifstream::in );
+            
+            if ( couplForcesFile.is_open() ) {
+               // MD-part //
+               for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+                  // loop over all particles in the current CPU
+                  couplForcesFile >> _id >> _fx >> _fy >> _fz;
+                  
+                  setFOnPart(_id, Real3D(_fx,_fy,_fz));
+                  // add the forces to the integrator
+                  cit->force() += getFOnPart(cit->id());
+               }
+               
+               // LB-part //
+               Int3D _myNi = getMyNi();
+               
+               // initialize with zeros //
+               for (int _i = 0; _i < _myNi[0]; _i++) {
+                  for (int _j = 0; _j < _myNi[1]; _j++) {
+                     for (int _k = 0; _k < _myNi[2]; _k++) {
+                        (*lbfor)[_i][_j][_k].setCouplForceLoc(Real3D(0.));
+                     }
                   }
+               }
+               
+               int _i, _j, _k;
+               
+               while (couplForcesFile >> _i >> _j >> _k >> _fx >> _fy >> _fz) {
+                  (*lbfor)[_i][_j][_k].setCouplForceLoc(Real3D(_fx,_fy,_fz));
+               }
+               
+               couplForcesFile.close();
+            } else {
+               if (getStepNum() != 0) {
+                  std::cout << "!!! Attention !!! no file with coupling forces"
+                  << "acting onto MD particles found for step "
+                  << convert.str() << std::endl;
                }
             }
             
-            int _i, _j, _k;
-            
-            while (couplForcesFile >> _i >> _j >> _k >> _fx >> _fy >> _fz) {
-               (*lbfor)[_i][_j][_k].setCouplForceLoc(Real3D(_fx,_fy,_fz));
-            }
-            
-            couplForcesFile.close();
-         } else {
-            if (getStepNum() != 0) {
-               std::cout << "!!! Attention !!! no file with coupling forces"
-                         << "acting onto MD particles found for step "
-                         << convert.str() << std::endl;
-            }
+            // timer //
+            real timeEnd = timeReadCouplF.getElapsedTime() - timeStart;
+            printf("CPU %d: read LB-to-MD coupling forces in %8.4f seconds\n",
+                   getSystem()->comm->rank(), timeEnd);
          }
-
-         // timer //
-         real timeEnd = timeReadCouplF.getElapsedTime() - timeStart;
-         printf("CPU %d: read LB-to-MD coupling forces in %8.4f seconds\n",
-                getSystem()->comm->rank(), timeEnd);
       }
 
 /*******************************************************************************************/
@@ -960,7 +988,7 @@ namespace espressopp {
                             >> _fi[17] >> _fi[18]) {
                // read in the populations on the site _i, _j, _k
                for ( int _l = 0; _l < _numVels; _l++ ) {
-                  (*lbfluid)[_i][_j][_k].setF_i(_l, _fi[_l]);
+                  setPops( Int3D(_i,_j,_k), _l, _fi[_l] );
                }
             }
          
@@ -1104,6 +1132,8 @@ namespace espressopp {
                 getSystem()->comm->rank(), timeEnd);
          
       }
+
+/*******************************************************************************************/
       
       void LatticeBoltzmann::savePops () {
          // manage timers //
@@ -1137,7 +1167,7 @@ namespace espressopp {
                   fprintf ( popsFile, "%5d %5d %5d ", _i, _j, _k );
                   for ( int _l = 0; _l < _numVels; _l++ ) {
                      fprintf ( popsFile, "%8.6lf ",
-                              (*lbfluid)[_i][_j][_k].getF_i(_l) );
+                              getPops( Int3D(_i,_j,_k), _l ) );
                   }
                   fprintf ( popsFile, "\n " );
                }

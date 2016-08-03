@@ -108,7 +108,7 @@ namespace espressopp {
 
 						// calculation of density and momentum flux on the lattice site
 						for (int l = 0; l < _numVels; l++) {
-							_fi = latticeboltzmann->getLBFluid(Int3D(i,j,k),l);
+							_fi = latticeboltzmann->getPops( Int3D(i,j,k), l );
 							_ci = latticeboltzmann->getCi(l);
 							_jLoc += _fi * _ci;
 						}
