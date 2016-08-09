@@ -67,11 +67,11 @@ namespace espressopp {
           for (int k = _offset; k < _myNi.getItem(2)-_offset; k++) {
             // set local forces and general flag
             if (periodicforce != Real3D(0.,0.,0.)) {
-              latticeboltzmann->setExtForceFlag(1);
+              latticeboltzmann->setDoExtForce(true);
               latticeboltzmann->setExtForceLoc(Int3D(i,j,k),periodicforce);
               _id = 1;
             } else {
-              latticeboltzmann->setExtForceFlag(0);
+              latticeboltzmann->setDoExtForce(false);
               latticeboltzmann->setExtForceLoc(Int3D(i,j,k),Real3D(0.,0.,0.));
             }
           }
@@ -114,11 +114,11 @@ namespace espressopp {
             existingforce = latticeboltzmann->getExtForceLoc(Int3D(i,j,k));
             // set local forces and general flag
             if (existingforce + periodicforce != Real3D(0.,0.,0.)) {
-              latticeboltzmann->setExtForceFlag(1);
+              latticeboltzmann->setDoExtForce(true);
               latticeboltzmann->setExtForceLoc(Int3D(i,j,k),existingforce + periodicforce);
               _id = 2;
             } else {
-              latticeboltzmann->setExtForceFlag(0);
+              latticeboltzmann->setDoExtForce(false);
               latticeboltzmann->setExtForceLoc(Int3D(i,j,k),Real3D(0.,0.,0.));
             }
           }

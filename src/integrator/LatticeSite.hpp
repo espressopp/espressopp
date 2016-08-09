@@ -52,13 +52,13 @@ namespace espressopp {
          void scaleF_i (int _i, real _value);                  // scale population i by _value
          
          /* FUNCTIONS DECLARATION */
-         void collision (int _lbTempFlag, int _extForceFlag,
-                         int _couplForceFlag, Real3D _f,
+         void collision (int _lbTempFlag, bool _extForce,
+                         bool _coupling, Real3D _f,
                          std::vector<real> &_gamma);		  // perform collision step
          
          void calcLocalMoments (real *m);								// calculate local moments
          
-         void relaxMoments (real *m, int _extForceFlag,
+         void relaxMoments (real *m, bool _extForce,
                             Real3D _f,
                             std::vector<real> &_gamma);		// relax local moms to eq moms
          

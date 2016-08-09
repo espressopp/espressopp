@@ -140,11 +140,11 @@ namespace espressopp {
          real getPhi (int _l);
 
          // external and coupling force control //
-         void setExtForceFlag (int _extForceFlag); // external force' flag
-         int getExtForceFlag ();
+         void setDoExtForce (bool _extForce);      // external force' flag
+         bool doExtForce ();
          
-         void setCouplForceFlag (int _couplForceFlag); // coupling force' flag
-         int getCouplForceFlag ();
+         void setDoCoupling (bool _coupling);      // coupling force' flag
+         bool doCoupling ();
          
          void setExtForceLoc (Int3D _Ni, Real3D _extForceLoc);
          Real3D getExtForceLoc (Int3D _Ni);
@@ -179,6 +179,9 @@ namespace espressopp {
 
          void setLBMom (Int3D _Ni, int _l, real _value);
          real getLBMom (Int3D _Ni, int _l);
+         
+         void setJLoc (Real3D _value);
+         Real3D getJLoc ();
 
          // unit conversion interface //
          real convMassMDtoLB();
@@ -196,8 +199,8 @@ namespace espressopp {
          void setCopyTimestep(real _copyTimestep);    // copy of MD timestep
          real getCopyTimestep();
          
-         void setRestartFlag (int _restartFlag);      // restart flag
-         int getRestartFlag ();
+         void setDoRestart (bool _restart);           // restart flag
+         bool doRestart ();
          
          /* END OF SET AND GET DECLARATION */
 
@@ -214,9 +217,9 @@ namespace espressopp {
          void makeLBStep ();                          // perform one LB-step
          
          /* FIND AND MANIPULATE CENTER-OF-MASS VELOCITY OF MD AND LB */
-         Real3D findCMVelMD(int _id);              // find CoM velocity of MD part
-         void zeroMDCMVel();                       // set CoM vel to zero
-         void galileanTransf(Real3D _specCmVel);   // galilean transform by amount of _momPerPart
+         Real3D findCMVelMD();                        // find CoM velocity of MD part
+         void zeroMDCMVel();                          // set CoM vel to zero
+         void galileanTransf(Real3D _specCmVel);      // galilean transform by amount of _momPerPart
          
          /* COUPLING TO MD PARTICLES */
          void coupleLBtoMD();                      //
@@ -268,11 +271,11 @@ namespace espressopp {
          int start;
          int stepNum;                           // step number
          real copyTimestep;                  // copy of the integrator timestep
-         int restartFlag;
+         bool restart;
          shared_ptr< esutil::RNG > rng;  //!< random number generator used for fluctuations
          
          // EXTERNAL FORCES
-         int extForceFlag;                     // flag for an external force
+         bool extForce;                         // flag for an external force
          
          // LATTICES
          lblattice *lbfluid;
@@ -281,7 +284,7 @@ namespace espressopp {
          lbforces *lbfor;
          
          // COUPLING
-         int couplForceFlag;                    // flag for a coupling force
+         bool coupling;                         // flag for a coupling force
          int nSteps;                            // # of MD steps between LB update
          int totNPart;                          // total number of MD particles
          real fricCoeff;                        // friction in LB-MD coupling (LJ-units)
@@ -303,7 +306,6 @@ namespace espressopp {
          // TIMERS
          esutil::WallTimer swapping, colstream, comm;
          esutil::WallTimer timeReadCouplF, timeSaveCouplF;
-         esutil::WallTimer timeReadFromBuf;
          esutil::WallTimer timeReadPops, timeSavePops;
          real time_sw, time_colstr, time_comm;
          int profStep;                           // profiling interval

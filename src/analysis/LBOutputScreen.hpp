@@ -35,12 +35,15 @@ namespace espressopp {
          //        ~LBOutputScreen ();
          
          void writeOutput();
-         void findLBMom();
+         void findLBMom(int _mode);
          
-         void setLBTimerOld(real _lbTime_old);
+         void setLBMom(Real3D _lbMom);
+         Real3D getLBMom();
+         
+         void setLBTimerOld(real _lbTimerOld);
          real getLBTimerOld();
          
-         void setLBTimerNew(real _lbTime_new);
+         void setLBTimerNew(real _lbTimerNew);
          real getLBTimerNew();
          
          void setOldStepNum(long int _oldStepNum);
@@ -49,9 +52,10 @@ namespace espressopp {
          static void registerPython();
          
       private:
-         real	lbTime_old, lbTime_new;
-         esutil::WallTimer timeLBtoMD;  //!< used for timing
          int oldStepNum;
+         real lbTimerOld, lbTimerNew;
+         Real3D lbMom;
+         esutil::WallTimer timeLBtoMD;  //!< used for timing
       };
    }
 }

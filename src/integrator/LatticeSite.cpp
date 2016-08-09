@@ -58,17 +58,17 @@ namespace espressopp {
 
 /*******************************************************************************************/
 		
-		void LBSite::collision(int _lbTempFlag, int _extForceFlag,
-													 int _couplForceFlag, Real3D _force, std::vector<real> &_gamma) {
+		void LBSite::collision(int _lbTempFlag, bool _extForce,
+													 bool _coupling, Real3D _force, std::vector<real> &_gamma) {
 			real m[19];
 
 			calcLocalMoments(m);
 			
-			relaxMoments(m, _extForceFlag, _force, _gamma);
+			relaxMoments(m, _extForce, _force, _gamma);
 
 			if (_lbTempFlag == 1) thermalFluct(m);
 			
-			if (_extForceFlag == 1 || _couplForceFlag == 1) {
+			if (_extForce) {        // coupling counts as an external force as well
 				applyForces(m, _force, _gamma);
 			}
 			
@@ -128,7 +128,7 @@ namespace espressopp {
 /*******************************************************************************************/
 		
 		/* RELAXATION OF THE MOMENTS TO THEIR EQUILIBRIUM VALUES */
-		void LBSite::relaxMoments (real *m, int _extForceFlag, Real3D _f, std::vector<real> &_gamma) {
+		void LBSite::relaxMoments (real *m, bool _extForce, Real3D _f, std::vector<real> &_gamma) {
 			// moments on the site //
 			real _invTauLoc = 1. / LatticePar::getTauLoc();
 			Real3D jLoc(m[1], m[2], m[3]);
@@ -136,7 +136,7 @@ namespace espressopp {
 			jLoc *= _invTauLoc;
 			
 			// if we have external forces then modify the eq.fluxes //
-			if (_extForceFlag == 1) jLoc += 0.5 * _f; // when doing coupling, the flag is set to 1!
+			if (_extForce) jLoc += 0.5 * _f; // when doing coupling, the flag is set to 1!
 			
 			real _invRhoLoc = 1. / m[0];
 			real pi_eq[6];
