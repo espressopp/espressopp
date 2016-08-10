@@ -64,7 +64,7 @@ namespace espressopp {
          myNeigh = std::vector<int>(2*_numDims, 0);
 
          /* setup simulation parameters */
-         setLBTempFlag(0);                                  // no fluctuations
+         setDoFluct(false);                                 // no fluctuations
          setDoRestart(true);                                // at first set true
          setDoExtForce(false);                              // no external forces
          
@@ -90,7 +90,7 @@ namespace espressopp {
          /* if coupling is present initialise related flags, coefficients and arrays */
          fOnPart = std::vector<Real3D>(_totNPart+1,Real3D(0.));   // +1 as id starts with 1
          if (_totNPart != 0) {
-            setDoCoupling(true);                           // make LB to MD coupling
+            setDoCoupling(true);                            // make LB to MD coupling
             setFricCoeff(5.);                               // friction coeffitient
             
             for(int _id = 0; _id <= _totNPart; _id++) {
@@ -223,8 +223,8 @@ namespace espressopp {
       void LatticeBoltzmann::setLBTemp (real _lbTemp) { lbTemp = _lbTemp; initFluctuations();}
       real LatticeBoltzmann::getLBTemp () { return lbTemp;}
       
-      void LatticeBoltzmann::setLBTempFlag (int _lbTempFlag) {lbTempFlag = _lbTempFlag;}
-      int LatticeBoltzmann::getLBTempFlag () {return lbTempFlag;}
+      void LatticeBoltzmann::setDoFluct (bool _fluct) {fluct = _fluct;}
+      bool LatticeBoltzmann::doFluct () {return fluct;}
       
       void LatticeBoltzmann::setPhi (int _l, real _value) {phi[_l] = _value;}
       real LatticeBoltzmann::getPhi (int _l) {return phi[_l];}
@@ -400,13 +400,13 @@ namespace espressopp {
          a3 = getA() * getA() * getA();    // a^3
          mu = _lbTemp / (getCs2() * a3);   // thermal mass density
          
-         if (_lbTemp == 0.) {
+         if (_lbTemp <= ROUND_ERROR_PREC) {
             // account for fluctuations being turned off
-            setLBTempFlag(0);
+            setDoFluct(false);
             if (_myRank == 0) std::cout << "Atermal LB-fluid. No fluctuations!" << std::endl;
          } else {
             // account for fluctuations being turned on!
-            setLBTempFlag(1);
+            setDoFluct(true);
             
             if (_myRank == 0) {
                std::cout << setprecision(8);
@@ -520,7 +520,7 @@ namespace espressopp {
       void LatticeBoltzmann::collideStream () {
          int _offset = getHaloSkin();
          bool _extForce = doExtForce();
-         int _lbTempFlag = getLBTempFlag();
+         bool _fluct = doFluct();
          bool _coupling = doCoupling();
          Int3D _myNi = getMyNi();
          
@@ -537,7 +537,7 @@ namespace espressopp {
                   Real3D _f = (*lbfor)[i][j][k].getExtForceLoc()
                             + (*lbfor)[i][j][k].getCouplForceLoc();
                   
-                  (*lbfluid)[i][j][k].collision(_lbTempFlag, _extForce,
+                  (*lbfluid)[i][j][k].collision(_fluct, _extForce,
                                                 _coupling, _f, gamma);
                   streaming (i,j,k);
                }
@@ -808,8 +808,7 @@ namespace espressopp {
             }
          } else if (_step != 0 && _coupling && _restart) {
             // if it is a real restart
-            readCouplForces(1);
-            readPops();
+            readLBConf(1);
             copyDenMomToHalo();
 
             // re-check
@@ -817,8 +816,7 @@ namespace espressopp {
             savePops();
          } else {
             // if we just continue simulation
-            readCouplForces(0);
-            // readPops should not be here because they are anyway in memory!
+            readLBConf(0);
          }
       }
       
@@ -842,7 +840,7 @@ namespace espressopp {
       
 /*******************************************************************************************/
       
-      void LatticeBoltzmann::readCouplForces (int _mode) {
+      void LatticeBoltzmann::readLBConf (int _mode) {
          if (_mode == 0) {
             // reloading values from memory
             System& system = getSystemRef();
@@ -854,25 +852,34 @@ namespace espressopp {
             }
 
          } else {
-            timeReadCouplF.reset();
-            real timeStart = timeReadCouplF.getElapsedTime();
+            timeReadLBConf.reset();
+            real timeStart = timeReadLBConf.getElapsedTime();
             
-            // make filenames and streams //
-            std::string filename = "couplForces";
+            // set restart folder and check its existence
             std::string dirRestart = "dump";
-            std::ostringstream convert, _myRank;
             
-            // check if directory exists //
-            if (getStepNum() != 0 && boost::filesystem::is_directory(dirRestart) == false) {
-               std::cout << "Sorry, the restart directory is missing! Something is wrong!!!" << std::endl;
+            if (getStepNum() != 0
+                && boost::filesystem::is_directory(dirRestart) == false) {
+               std::cout << "Sorry, the restart directory is missing! "
+                         << "Something is wrong!!!" << std::endl;
             }
             
-            // create filename for the input file //
+            // make prefix and suffix //
+            std::string prefix = dirRestart;
+            prefix.append("/");
+            
+            std::ostringstream convert, _myRank;
             convert << getStepNum();
             _myRank << getSystem()->comm->rank();
-            filename.insert(0,"/"); filename.insert(0,dirRestart);
-            filename.append(convert.str()); filename.append(".");
-            filename.append(_myRank.str()); filename.append(".dat");
+           
+            std::string suffix = ".dat";
+            suffix.insert(0,_myRank.str()); suffix.insert(0,".");
+            suffix.insert(0,convert.str());
+            
+            /*  COUPLING FORCES */
+            // create filenames for the input files //
+            std::string fileForces = "couplForces";
+            fileForces.insert(0,prefix); fileForces.append(suffix);
             
             // fill in the coupling forces acting on MD-particles with zeros //
             int _totNPart = getTotNPart();
@@ -880,23 +887,20 @@ namespace espressopp {
                setFOnPart( _id, Real3D(0.) );
             }
             
-            // access particles' data and open a file to read coupling forces from //
+            // access particles' data and open a file to read couplForces from //
             long int _id;
+            Int3D _myNi = getMyNi();
             real _fx, _fy, _fz;
             
             System& system = getSystemRef();
             CellList realCells = system.storage->getRealCells();
             
             std::ifstream couplForcesFile;
-            couplForcesFile.open( filename.c_str(), std::ifstream::in );
+            couplForcesFile.open( fileForces.c_str(), std::ifstream::in );
             
             if ( couplForcesFile.is_open() ) {
                // MD-part //
-               int _step;
-               couplForcesFile >> _step;
-               
                for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-                  // loop over all particles in the current CPU
                   couplForcesFile >> _id >> _fx >> _fy >> _fz;
                   
                   setFOnPart(_id, Real3D(_fx,_fy,_fz));
@@ -905,8 +909,6 @@ namespace espressopp {
                }
                
                // LB-part //
-               Int3D _myNi = getMyNi();
-               
                // initialize with zeros //
                for (int _i = 0; _i < _myNi[0]; _i++) {
                   for (int _j = 0; _j < _myNi[1]; _j++) {
@@ -926,28 +928,26 @@ namespace espressopp {
             } else {
                if (getStepNum() != 0) {
                   std::cout << "!!! Attention !!! no file with coupling forces"
-                  << "acting onto MD particles found for step "
-                  << convert.str() << std::endl;
+                            << "acting onto MD particles found for step "
+                            << convert.str() << std::endl;
                }
             }
             
+            /*  LB-FLUID MOMENTS */
+            // create filenames for the input files //
+            std::string fileFluid = "fluid";
+            fileFluid.insert(0,prefix); fileFluid.append(suffix);
+            
             // read density and velocity of the fluid (excl. ghost region) //
-            filename = "fluid";
-            Int3D _myNi = getMyNi();
             int _offset = getHaloSkin();
             Int3D _myPos = getMyPos();
             
-            filename.insert(0,"/"); filename.insert(0,dirRestart);
-            filename.append( convert.str() ); filename.append( "." );
-            filename.append( _myRank.str() ); filename.append( ".dat" );
-            
             std::ifstream fluidFile;
-            fluidFile.open( filename.c_str(), std::ifstream::in );
+            fluidFile.open( fileFluid.c_str(), std::ifstream::in );
             
             if ( fluidFile.is_open() ) {
                int _x, _y, _z, _i, _j, _k;
                real _rho, _vx, _vy, _vz;
-               Real3D _jLoc = Real3D(0.);
                
                while ( fluidFile >> _x >> _y >> _z >> _rho >> _vx >> _vy >> _vz ) {
                   _i = _x + 1 - _myPos[0]*(_myNi[0]-2*_offset);
@@ -958,79 +958,54 @@ namespace espressopp {
                   (*lbmom)[_i][_j][_k].setMom_i(1, _vx * _rho);
                   (*lbmom)[_i][_j][_k].setMom_i(2, _vy * _rho);
                   (*lbmom)[_i][_j][_k].setMom_i(3, _vz * _rho);
-                  
-                  _jLoc += Real3D(_vx * _rho, _vy * _rho, _vz * _rho);
                }
+               
                fluidFile.close();
+            } else {
+               if (getStepNum() != 0) {
+                  std::cout << "!!! Attention !!! no file with fluid moments "
+                            << "found for step " << convert.str() << std::endl;
+               }
+            }
+            
+            /*  POPULATIONS */
+            // create filenames for the input files //
+            std::string filePops = "pops";
+            filePops.insert(0,prefix); filePops.append(suffix);
+            
+            // open a file to read populations from //
+            std::ifstream popsFile;
+            popsFile.open( filePops.c_str(), std::ifstream::in );
+            
+            if ( popsFile.is_open() ) {
+               int _numVels = getNumVels();
+               int _i, _j, _k;
+               real _fi[_numVels];
+               
+               while (popsFile >> _i >> _j >> _k
+                      >> _fi[0]  >> _fi[1]  >> _fi[2]  >> _fi[3]  >> _fi[4]
+                      >> _fi[5]  >> _fi[6]  >> _fi[7]  >> _fi[8]  >> _fi[9]
+                      >> _fi[10] >> _fi[11] >> _fi[12] >> _fi[13] >> _fi[14]
+                      >> _fi[15] >> _fi[16] >> _fi[17] >> _fi[18]) {
+                  // read in the populations on the site _i, _j, _k
+                  for ( int _l = 0; _l < _numVels; _l++ ) {
+                     setPops( Int3D(_i,_j,_k), _l, _fi[_l] );
+                  }
+               }
+               
+               popsFile.close();
+            } else {
+               if (getStepNum() != 0) {
+                  std::cout << "!!! Attention !!! no file with LB populations "
+                            << "found for step " << convert.str() << std::endl;
+               }
             }
             
             // timer //
-            real timeEnd = timeReadCouplF.getElapsedTime() - timeStart;
+            real timeEnd = timeReadLBConf.getElapsedTime() - timeStart;
             printf("step %lld, CPU %d: read LB-to-MD coupling forces in %f seconds\n",
                    integrator->getStep(), getSystem()->comm->rank(), timeEnd);
          }
-      }
-
-/*******************************************************************************************/
-
-      void LatticeBoltzmann::readPops () {
-         timeReadPops.reset();
-         real timeStart = timeReadPops.getElapsedTime();
-
-         // make filenames and streams // 
-         std::string filename = "pops";
-         std::string dirRestart = "dump";
-         std::ostringstream convert, _myRank;
-
-         // check if directory exists //
-         if (getStepNum() != 0 && boost::filesystem::is_directory(dirRestart) == false) {
-            std::cout << "Sorry, the restart directory is missing! Something is wrong!!!"
-                      << std::endl;
-         }
-
-         // create filename for the input file //
-         convert << getStepNum();
-         _myRank << getSystem()->comm->rank();
-         filename.insert(0,"/"); filename.insert(0,dirRestart);
-         filename.append(convert.str()); filename.append(".");
-         filename.append(_myRank.str()); filename.append(".dat");
-
-         // open a file to read populations from //
-         std::ifstream popsFile;
-         popsFile.open( filename.c_str(), std::ifstream::in );
-
-         if ( popsFile.is_open() ) {
-            int _numVels = getNumVels();
-            int _i, _j, _k;
-            real _fi[_numVels];
-
-            int _step;
-            popsFile >> _step;
-            
-            while (popsFile >> _i >> _j >> _k
-                            >> _fi[0]  >> _fi[1]  >> _fi[2]  >> _fi[3]  >> _fi[4]
-                            >> _fi[5]  >> _fi[6]  >> _fi[7]  >> _fi[8]  >> _fi[9]
-                            >> _fi[10] >> _fi[11] >> _fi[12] >> _fi[13] >> _fi[14]
-                            >> _fi[15] >> _fi[16] >> _fi[17] >> _fi[18]) {
-               // read in the populations on the site _i, _j, _k
-               for ( int _l = 0; _l < _numVels; _l++ ) {
-                  setPops( Int3D(_i,_j,_k), _l, _fi[_l] );
-               }
-            }
-         
-            popsFile.close();
-         } else {
-            if (getStepNum() != 0) {
-               std::cout << "!!! Attention !!! no file with "
-                         << "LB populations found for step "
-                         << convert.str() << std::endl;
-            }
-         }
-
-         // timer //
-         real timeEnd = timeReadPops.getElapsedTime() - timeStart;
-         printf("step %lld, CPU %d: read LB-to-MD populations in %f seconds\n",
-                integrator->getStep(), getSystem()->comm->rank(), timeEnd);
       }
 
 /*******************************************************************************************/
@@ -1068,7 +1043,6 @@ namespace espressopp {
          
          // write forces acting onto MD-particles //
          FILE * couplForcesFile = fopen(filename.c_str(),"w");
-         fprintf (couplForcesFile, "%d \n", currDumpStep);
          
          for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
             long int _id = cit->id();
@@ -1186,7 +1160,6 @@ namespace espressopp {
 
          // write populations at LB-sites (incl. ghost region) //
          FILE * popsFile = fopen( filename.c_str(), "w" );
-         fprintf (popsFile, "%d \n", currDumpStep);
 
          Int3D _myNi = getMyNi();
 
@@ -2180,7 +2153,7 @@ namespace espressopp {
          .add_property("nSteps", &LatticeBoltzmann::getNSteps, &LatticeBoltzmann::setNSteps)
          .add_property("profStep", &LatticeBoltzmann::getProfStep, &LatticeBoltzmann::setProfStep)
          .def("saveCouplForces", &LatticeBoltzmann::saveCouplForces)
-         .def("readPops", &LatticeBoltzmann::readPops)
+         .def("readLBConf", &LatticeBoltzmann::readLBConf)
          .def("savePops", &LatticeBoltzmann::savePops)
          .def("keepLBDump", &LatticeBoltzmann::keepLBDump)
          .def("connect", &LatticeBoltzmann::connect)

@@ -58,7 +58,7 @@ namespace espressopp {
 
 /*******************************************************************************************/
 		
-		void LBSite::collision(int _lbTempFlag, bool _extForce,
+		void LBSite::collision(bool _fluct, bool _extForce,
 													 bool _coupling, Real3D _force, std::vector<real> &_gamma) {
 			real m[19];
 
@@ -66,11 +66,10 @@ namespace espressopp {
 			
 			relaxMoments(m, _extForce, _force, _gamma);
 
-			if (_lbTempFlag == 1) thermalFluct(m);
+			if (_fluct) thermalFluct(m);
 			
-			if (_extForce) {        // coupling counts as an external force as well
-				applyForces(m, _force, _gamma);
-			}
+			// coupling counts as an external force as well
+         if (_extForce) applyForces(m, _force, _gamma);
 			
 			btranMomToPop(m);
 		}

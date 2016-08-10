@@ -52,7 +52,7 @@ namespace espressopp {
          void scaleF_i (int _i, real _value);                  // scale population i by _value
          
          /* FUNCTIONS DECLARATION */
-         void collision (int _lbTempFlag, bool _extForce,
+         void collision (bool _fluct, bool _extForce,
                          bool _coupling, Real3D _f,
                          std::vector<real> &_gamma);		  // perform collision step
          

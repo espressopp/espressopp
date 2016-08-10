@@ -133,8 +133,8 @@ namespace espressopp {
          void setLBTemp (real _lbTemp);            // temperature (lu)
          real getLBTemp ();
          
-         void setLBTempFlag (int _lbTempFlag);     // flag for fluctuations
-         int getLBTempFlag ();
+         void setDoFluct (bool _fluct);     // flag for fluctuations
+         bool doFluct ();
          
          void setPhi (int _l, real _value);        // phi for fluctuations
          real getPhi (int _l);
@@ -204,10 +204,9 @@ namespace espressopp {
          
          /* END OF SET AND GET DECLARATION */
 
-         void readCouplForces (int _mode);            // reads coupling forces
+         void readLBConf (int _mode);                 // reads LB configuration from file
          void saveCouplForces ();                     // dumps coupling forces
 
-         void readPops ();                            // reads populations
          void savePops ();                            // dumps populations
          
          /* FUNCTIONS DECLARATION */
@@ -263,7 +262,7 @@ namespace espressopp {
          std::vector<real> gamma;         // array of gammas (bulk, shear, odd, even)
          
          // TEMPERATURE
-         int lbTempFlag;                        // flag of non-zero temperature
+         bool fluct;                        // flag of non-zero temperature
          real lbTemp;                           // lb temperature (LJ-units)
          std::vector<real> phi;            // amplitudes of fluctuations
          
@@ -305,8 +304,8 @@ namespace espressopp {
          
          // TIMERS
          esutil::WallTimer swapping, colstream, comm;
-         esutil::WallTimer timeReadCouplF, timeSaveCouplF;
-         esutil::WallTimer timeReadPops, timeSavePops;
+         esutil::WallTimer timeReadLBConf, timeSaveCouplF;
+         esutil::WallTimer timeSavePops;
          real time_sw, time_colstr, time_comm;
          int profStep;                           // profiling interval
          
