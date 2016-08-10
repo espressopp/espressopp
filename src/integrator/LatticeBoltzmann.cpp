@@ -78,7 +78,6 @@ namespace espressopp {
          setDoCoupling(false);                              // no LB to MD coupling
          setNSteps(1);                                      // # MD steps between LB update
          setPrevDumpStep(0);                                // interval between dumping coupl-files
-         setPrevPopDumpStep(0);                             // interval between dumping pop-files
          setProfStep(10000);                                // set default time profiling step
          
          /* find total number of MD particles*/
@@ -252,9 +251,6 @@ namespace espressopp {
       void LatticeBoltzmann::setPrevDumpStep (int _saveStep) { saveStep = _saveStep;}
       int LatticeBoltzmann::getPrevDumpStep () { return saveStep;}
 
-      void LatticeBoltzmann::setPrevPopDumpStep (int _savePopStep) { savePopStep = _savePopStep;}
-      int LatticeBoltzmann::getPrevPopDumpStep () { return savePopStep;}
-
       void LatticeBoltzmann::setTotNPart (int _totNPart) { totNPart = _totNPart;}
       int LatticeBoltzmann::getTotNPart () { return totNPart;}
       
@@ -262,8 +258,7 @@ namespace espressopp {
       Real3D LatticeBoltzmann::getFOnPart (int _id) {return fOnPart[_id];}
       void LatticeBoltzmann::addFOnPart (int _id, Real3D _fOnPart) {fOnPart[_id] += _fOnPart;}
      
-      void LatticeBoltzmann::keepLBDump () {                // keeeps the dumped LB configuration
-         setPrevDumpStep(0); setPrevPopDumpStep(0); }
+      void LatticeBoltzmann::keepLBDump () { setPrevDumpStep(0);}
  
       /* Setter and getter for access to population values */
       void LatticeBoltzmann::setPops (Int3D _Ni, int _l, real _value) {
@@ -812,8 +807,7 @@ namespace espressopp {
             copyDenMomToHalo();
 
             // re-check
-            saveCouplForces();
-            savePops();
+            saveLBConf();
          } else {
             // if we just continue simulation
             readLBConf(0);
@@ -878,8 +872,8 @@ namespace espressopp {
             
             /*  COUPLING FORCES */
             // create filenames for the input files //
-            std::string fileForces = "couplForces";
-            fileForces.insert(0,prefix); fileForces.append(suffix);
+            std::string filenameForces = "couplForces";
+            filenameForces.insert(0,prefix); filenameForces.append(suffix);
             
             // fill in the coupling forces acting on MD-particles with zeros //
             int _totNPart = getTotNPart();
@@ -896,7 +890,7 @@ namespace espressopp {
             CellList realCells = system.storage->getRealCells();
             
             std::ifstream couplForcesFile;
-            couplForcesFile.open( fileForces.c_str(), std::ifstream::in );
+            couplForcesFile.open( filenameForces.c_str(), std::ifstream::in );
             
             if ( couplForcesFile.is_open() ) {
                // MD-part //
@@ -935,15 +929,15 @@ namespace espressopp {
             
             /*  LB-FLUID MOMENTS */
             // create filenames for the input files //
-            std::string fileFluid = "fluid";
-            fileFluid.insert(0,prefix); fileFluid.append(suffix);
+            std::string filenameFluid = "fluid";
+            filenameFluid.insert(0,prefix); filenameFluid.append(suffix);
             
             // read density and velocity of the fluid (excl. ghost region) //
             int _offset = getHaloSkin();
             Int3D _myPos = getMyPos();
             
             std::ifstream fluidFile;
-            fluidFile.open( fileFluid.c_str(), std::ifstream::in );
+            fluidFile.open( filenameFluid.c_str(), std::ifstream::in );
             
             if ( fluidFile.is_open() ) {
                int _x, _y, _z, _i, _j, _k;
@@ -970,12 +964,12 @@ namespace espressopp {
             
             /*  POPULATIONS */
             // create filenames for the input files //
-            std::string filePops = "pops";
-            filePops.insert(0,prefix); filePops.append(suffix);
+            std::string filenamePops = "pops";
+            filenamePops.insert(0,prefix); filenamePops.append(suffix);
             
             // open a file to read populations from //
             std::ifstream popsFile;
-            popsFile.open( filePops.c_str(), std::ifstream::in );
+            popsFile.open( filenamePops.c_str(), std::ifstream::in );
             
             if ( popsFile.is_open() ) {
                int _numVels = getNumVels();
@@ -1003,19 +997,17 @@ namespace espressopp {
             
             // timer //
             real timeEnd = timeReadLBConf.getElapsedTime() - timeStart;
-            printf("step %lld, CPU %d: read LB-to-MD coupling forces in %f seconds\n",
+            printf("step %lld, CPU %d: read LB-conf and MD forces in %f seconds\n",
                    integrator->getStep(), getSystem()->comm->rank(), timeEnd);
          }
       }
 
 /*******************************************************************************************/
       
-      void LatticeBoltzmann::saveCouplForces () {
+      void LatticeBoltzmann::saveLBConf () {
          // manage timers //
-         timeSaveCouplF.reset();
-         real timeStart = timeSaveCouplF.getElapsedTime();
-         
-         int currDumpStep = integrator->getStep();
+         timeSaveLBConf.reset();
+         real timeStart = timeSaveLBConf.getElapsedTime();
          
          // check if folder exists, if not - create it //
          std::string dirRestart = "dump";
@@ -1023,26 +1015,40 @@ namespace espressopp {
             boost::filesystem::create_directory(dirRestart);
          }
 
-         // create filename for the output file //
-         std::string filename = "couplForces";
-         std::string delLBfilename = filename;                    // a filename for future deletion
+         int currDumpStep = getStepNum() + 1;
+         // or you should take it directly from the integrator
+         // reason: LB couples to the signal befIntV and when the integrator is
+         // done with the step it is incremented, while stepNum in LB is not.
 
-         std::ostringstream convert;
-         std::ostringstream _myRank;
+         // make prefix, suffix and suffix for deletion //
+         std::string prefix = dirRestart;
+         prefix.append("/");
+         
+         std::ostringstream convert, convDel, _myRank;
          convert << currDumpStep;
+         convDel << getPrevDumpStep();
          _myRank << getSystem()->comm->rank();
+         
+         std::string suffix = ".dat";
+         suffix.insert(0,_myRank.str()); suffix.insert(0,".");
+         std::string suffixDel = suffix;
+         suffix.insert(0,convert.str());
+         suffixDel.insert(0,convDel.str());
+         
+         /*  COUPLING FORCES */
+         // create filenames for the input and to be removed files //
+         std::string filenameForces = "couplForces";
+         std::string filenameForcesDel = filenameForces;
 
-         filename.insert(0,"/"); 
-         filename.insert(0,dirRestart);
-         filename.append(convert.str()); filename.append(".");
-         filename.append(_myRank.str()); filename.append(".dat");
+         filenameForces.insert(0,prefix); filenameForces.append(suffix);
+         filenameForcesDel.insert(0,prefix); filenameForcesDel.append(suffixDel);
 
          // access particles' data and open a file to write coupling forces to //
          System& system = getSystemRef();
          CellList realCells = system.storage->getRealCells();
          
          // write forces acting onto MD-particles //
-         FILE * couplForcesFile = fopen(filename.c_str(),"w");
+         FILE * couplForcesFile = fopen(filenameForces.c_str(),"w");
          
          for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
             long int _id = cit->id();
@@ -1059,6 +1065,7 @@ namespace espressopp {
             for ( int _j = 0; _j < _myNi[1]; _j++ ) {
                for ( int _k = 0; _k < _myNi[2]; _k++ ) {
                   Real3D _couplForceLoc = (*lbfor)[_i][_j][_k].getCouplForceLoc();
+                  // QUITE LONG, HA??
                   if ( _couplForceLoc.sqr() < ROUND_ERROR_PREC ) {
                   // see definition of ROUND ERROR in src/include/esconfig.hpp
                   } else {
@@ -1071,19 +1078,19 @@ namespace espressopp {
          }
          fclose( couplForcesFile );
          
+         /*  LB-FLUID MOMENTS */
+         // create filenames for the input and to be removed files //
+         std::string filenameFluid = "fluid";
+         std::string filenameFluidDel = filenameFluid;
+
+         filenameFluid.insert(0,prefix); filenameFluid.append(suffix);
+         filenameFluidDel.insert(0,prefix); filenameFluidDel.append(suffixDel);
+
          // write down density and velocity of the fluid (excl. ghost region) //
          int _offset = getHaloSkin();
          Int3D _myPos = getMyPos();
          
-         filename = "fluid";
-         std::string delMDfilename = filename;                       // a filename for future deletion
-
-         filename.insert(0,"/"); 
-         filename.insert(0,dirRestart);
-         filename.append( convert.str() ); filename.append( "." );
-         filename.append( _myRank.str() ); filename.append( ".dat" );
-         
-         FILE * fluidFile = fopen( filename.c_str(),"w" );
+         FILE * fluidFile = fopen( filenameFluid.c_str(),"w" );
 
          for ( int _i = _offset; _i < _myNi[0]-_offset; _i++ ) {
             for ( int _j = _offset; _j < _myNi[1]-_offset; _j++ ) {
@@ -1104,65 +1111,19 @@ namespace espressopp {
             }
          }
          fclose (fluidFile);
-
-         // delete previous dumps //
-         std::ostringstream convDel;
-         convDel << getPrevDumpStep();
-         if (getPrevDumpStep() != 0) {
-            // make filenames 
-            delLBfilename.insert(0,"/"); 
-            delLBfilename.insert(0,dirRestart);
-            delLBfilename.append(convDel.str()); delLBfilename.append(".");
-            delLBfilename.append(_myRank.str()); delLBfilename.append(".dat");
-
-            delMDfilename.insert(0,"/"); 
-            delMDfilename.insert(0,dirRestart);
-            delMDfilename.append(convDel.str()); delMDfilename.append(".");
-            delMDfilename.append(_myRank.str()); delMDfilename.append(".dat");
-
-            // remove files 
-            boost::filesystem::remove(delLBfilename);
-            boost::filesystem::remove(delMDfilename);
-         }
-
-         setPrevDumpStep(currDumpStep);
-        
-         // timer //
-         real timeEnd = timeSaveCouplF.getElapsedTime() - timeStart;
-         printf("step %lld, CPU %d: saved LB-to-MD coupling forces in %f seconds\n",
-               integrator->getStep(), system.comm->rank(), timeEnd);
          
-      }
-
-/*******************************************************************************************/
-      
-      void LatticeBoltzmann::savePops () {
-         // manage timers //
-         timeSavePops.reset();
-         real timeStart = timeSavePops.getElapsedTime();
-
-         int currDumpStep = integrator->getStep();
-         int _numVels = getNumVels();
-
-         // create filename for the output file //
-         std::string dirRestart = "dump";
-         std::string filename = "pops";
-         std::string delLBfilename = filename;                    // a filename for future deletion
-
-         std::ostringstream convert, _myRank;
-         convert << currDumpStep;
-         _myRank << getSystem()->comm->rank();
-
-         filename.insert(0,"/");
-         filename.insert(0,dirRestart);
-         filename.append(convert.str()); filename.append(".");
-         filename.append(_myRank.str()); filename.append(".dat");
-
+         /*  POPULATIONS */
+         // create filenames for the input and to be removed files //
+         std::string filenamePops = "pops";
+         std::string filenamePopsDel = filenamePops;
+         
+         filenamePops.insert(0,prefix); filenamePops.append(suffix);
+         filenamePopsDel.insert(0,prefix); filenamePopsDel.append(suffixDel);
+         
          // write populations at LB-sites (incl. ghost region) //
-         FILE * popsFile = fopen( filename.c_str(), "w" );
-
-         Int3D _myNi = getMyNi();
-
+         FILE * popsFile = fopen( filenamePops.c_str(), "w" );
+         
+         int _numVels = getNumVels();
          for ( int _i = 0; _i < _myNi[0]; _i++ ) {
             for ( int _j = 0; _j < _myNi[1]; _j++ ) {
                for ( int _k = 0; _k < _myNi[2]; _k++ ) {
@@ -1175,29 +1136,23 @@ namespace espressopp {
                }
             }
          }
-
+         
          fclose( popsFile );
-
+         
          // delete previous dumps //
-         std::ostringstream convDel;
-         convDel << getPrevPopDumpStep();
-         if (getPrevPopDumpStep() != 0) {
-            // make filenames
-            delLBfilename.insert(0,"/");
-            delLBfilename.insert(0,dirRestart);
-            delLBfilename.append(convDel.str()); delLBfilename.append(".");
-            delLBfilename.append(_myRank.str()); delLBfilename.append(".dat");
-
-            // remove files
-            boost::filesystem::remove(delLBfilename);
+         if (getPrevDumpStep() != 0) {
+            boost::filesystem::remove(filenameForcesDel);
+            boost::filesystem::remove(filenameFluidDel);
+            boost::filesystem::remove(filenamePopsDel);
          }
 
-         setPrevPopDumpStep(currDumpStep);
-
+         setPrevDumpStep(currDumpStep);
+        
          // timer //
-         real timeEnd = timeSavePops.getElapsedTime() - timeStart;
-         printf("step %lld, CPU %d: saved LB populations in %f seconds\n",
-                integrator->getStep(), getSystem()->comm->rank(), timeEnd);
+         real timeEnd = timeSaveLBConf.getElapsedTime() - timeStart;
+         printf("step %lld, CPU %d: saved LB-conf and MD forces in %f seconds\n",
+               integrator->getStep(), system.comm->rank(), timeEnd);
+         
       }
 
 /*******************************************************************************************/
@@ -2152,9 +2107,8 @@ namespace espressopp {
          .add_property("fricCoeff", &LatticeBoltzmann::getFricCoeff, &LatticeBoltzmann::setFricCoeff)
          .add_property("nSteps", &LatticeBoltzmann::getNSteps, &LatticeBoltzmann::setNSteps)
          .add_property("profStep", &LatticeBoltzmann::getProfStep, &LatticeBoltzmann::setProfStep)
-         .def("saveCouplForces", &LatticeBoltzmann::saveCouplForces)
+         .def("saveLBConf", &LatticeBoltzmann::saveLBConf)
          .def("readLBConf", &LatticeBoltzmann::readLBConf)
-         .def("savePops", &LatticeBoltzmann::savePops)
          .def("keepLBDump", &LatticeBoltzmann::keepLBDump)
          .def("connect", &LatticeBoltzmann::connect)
          .def("disconnect", &LatticeBoltzmann::disconnect)

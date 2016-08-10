@@ -158,9 +158,6 @@ namespace espressopp {
 
          void setPrevDumpStep (int saveStep);             // interval for saving couplForces
          int getPrevDumpStep ();
-
-         void setPrevPopDumpStep (int savePopStep);             // interval for saving pops
-         int getPrevPopDumpStep ();
          
          void setTotNPart (int _totNPart);            // tot num of MD particles in the whole system (sum over CPUs)
          int getTotNPart ();
@@ -205,9 +202,7 @@ namespace espressopp {
          /* END OF SET AND GET DECLARATION */
 
          void readLBConf (int _mode);                 // reads LB configuration from file
-         void saveCouplForces ();                     // dumps coupling forces
-
-         void savePops ();                            // dumps populations
+         void saveLBConf ();                          // dumps LB configuration
          
          /* FUNCTIONS DECLARATION */
          void initLatticeSize ();
@@ -288,7 +283,7 @@ namespace espressopp {
          int totNPart;                          // total number of MD particles
          real fricCoeff;                        // friction in LB-MD coupling (LJ-units)
          std::vector<Real3D> fOnPart;           // force acting onto an MD particle
-         int saveStep, savePopStep;             // step numbers of couplForces and Pops to save
+         int saveStep;                          // step numbers of LBConfs to save
          
          // MPI THINGS
          std::vector<int> myNeigh;
@@ -304,8 +299,7 @@ namespace espressopp {
          
          // TIMERS
          esutil::WallTimer swapping, colstream, comm;
-         esutil::WallTimer timeReadLBConf, timeSaveCouplF;
-         esutil::WallTimer timeSavePops;
+         esutil::WallTimer timeReadLBConf, timeSaveLBConf;
          real time_sw, time_colstr, time_comm;
          int profStep;                           // profiling interval
          
