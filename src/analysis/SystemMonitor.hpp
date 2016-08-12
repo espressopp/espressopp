@@ -78,9 +78,6 @@ class SystemMonitor : public ParticleAccess {
     header_ = make_shared<std::vector<std::string> >();
     values_ = make_shared<std::vector<real> >();
 
-    temp_ = shared_ptr<Temperature>(new Temperature(system));
-    npart_ = shared_ptr<NPart>(new NPart(system));
-
     output_->system_ = system;
     output_->keys_ = header_;
     output_->values_ = values_;
@@ -89,10 +86,6 @@ class SystemMonitor : public ParticleAccess {
     if (system->comm->rank() == 0) {
       header_->push_back("step");
       header_->push_back("time");
-      header_->push_back("T");
-      header_->push_back("Ekin");
-      visible_observables_.push_back(1);
-      visible_observables_.push_back(1);
       visible_observables_.push_back(1);
       visible_observables_.push_back(1);
     }
@@ -106,9 +99,7 @@ class SystemMonitor : public ParticleAccess {
   static void registerPython();
 
  private:
-  void write();
   void computeObservables();
-  void computeKineticEnergy();
 
   void addObservable(std::string name, shared_ptr<Observable> obs, bool is_visible);
 
@@ -120,8 +111,6 @@ class SystemMonitor : public ParticleAccess {
   std::vector<int> visible_observables_;
   shared_ptr<System> system_;
   shared_ptr<integrator::MDIntegrator> integrator_;
-  shared_ptr<Temperature> temp_;
-  shared_ptr<NPart> npart_;
 
   shared_ptr<SystemMonitorOutputCSV> output_;
   ObservableList observables_;
