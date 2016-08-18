@@ -31,6 +31,7 @@ addons:
       - g++-4.9
       - gcc-5
       - g++-5
+      - h5py
 
 before_install:
  - if [[ ${GVER} ]]; then export CC=gcc-${GVER}; export CXX=g++-${GVER}; fi
