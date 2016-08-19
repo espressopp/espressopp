@@ -26,15 +26,11 @@
 namespace espressopp {
 namespace io {
 
-void DumpTopology::ObserveTuple(shared_ptr<FixedPairList> fpl) {
+void DumpTopology::observeTuple(shared_ptr<FixedPairList> fpl) {
   fpls_.push_back(fpl);
 }
 
-void DumpTopology::perform_action() {
-  Dump();
-}
-
-void DumpTopology::Dump() {
+void DumpTopology::saveDataToBuffer() {
   // Format: <step1><pair_idx_0><size><pid1><pid2><pid3><pid4><pair_idx_1><size><pid...><step2>..
   int idx = 0;
   for (std::vector<shared_ptr<FixedPairList> >::iterator it = fpls_.begin();
@@ -51,11 +47,11 @@ void DumpTopology::Dump() {
   }
 }
 
-void DumpTopology::ClearBuffer() {
+void DumpTopology::clearBuffer() {
   fpl_buffer_.clear();
 }
 
-python::list DumpTopology::GetData() {
+python::list DumpTopology::getData() {
   python::list ret;
   for (FplBuffer::iterator it = fpl_buffer_.begin(); it != fpl_buffer_.end(); ++it) {
     ret.append(*it);
@@ -69,10 +65,10 @@ void DumpTopology::registerPython() {
 
   class_<DumpTopology, bases<ParticleAccess>, boost::noncopyable>
       ("io_DumpTopology", init<shared_ptr<System>, shared_ptr<integrator::MDIntegrator> >())
-      .def("clear_buffer", &DumpTopology::ClearBuffer)
-      .def("get_data", &DumpTopology::GetData)
-      .def("dump", &DumpTopology::Dump)
-      .def("observe_tuple", &DumpTopology::ObserveTuple);
+      .def("clear_buffer", &DumpTopology::clearBuffer)
+      .def("get_data", &DumpTopology::getData)
+      .def("dump", &DumpTopology::saveDataToBuffer)
+      .def("observe_tuple", &DumpTopology::observeTuple);
 }
 
 }  // namespace io

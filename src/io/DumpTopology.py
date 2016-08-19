@@ -62,7 +62,7 @@ r"""
 Example
 +++++++
 
-The code bellows dump topology every 10 time steps and stores pairs from
+The code belows dump topology every 10 time steps and stores pairs from
 FixedPairList `fpl`.
 
 >>> traj_file = espressopp.io.DumpH5MD(
@@ -83,7 +83,7 @@ FixedPairList `fpl`.
 >>> ext_dump = espressopp.integrator.ExtAnalyze(dump_topol, 10)
 >>> integrator.addExtension(ext_dump)
 
-Stores static data from FixedPairList `fpl_0`
+Stores static data from FixedPairList `fpl_0`, those are time-independent.
 
 >>> dump_topol.add_static_tuple(fpl_0, 'fpl_0', 'atoms')
 
@@ -114,6 +114,7 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
             self.dt = integrator.dt
 
     def dump(self):
+        """Dump data to the internal buffer."""
         if pmi.workerIsActive():
             self.cxxclass.dump(self)
 
@@ -153,6 +154,7 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
             g[idx_0:idx_1] = bonds
 
     def update(self):
+        """Load data from the buffer and store in the HDF5 file."""
         if pmi.workerIsActive():
             raw_data = self.cxxclass.get_data(self)
             step_data = collections.defaultdict(dict)

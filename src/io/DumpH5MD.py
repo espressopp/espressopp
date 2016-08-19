@@ -129,7 +129,8 @@ class DumpH5MDLocal(io_DumpH5MD):
                  author='xxx',
                  email='xxx',
                  chunk_size=128,
-                 do_sort=True):
+                 do_sort=True,
+                 integrator=None):
         """
         Args:
             system: The system object.
@@ -150,6 +151,7 @@ class DumpH5MDLocal(io_DumpH5MD):
             email: The e-mail to author of that file. (default: xxx)
             chunk_size: The size of data chunk. (default: 128)
             do_sort: If set to True then HDF5 will be sorted on close.
+            integrator: The integrator, if None then the value from system object is taken.
         """
         if not pmi.workerIsActive():
             return
@@ -170,6 +172,14 @@ class DumpH5MDLocal(io_DumpH5MD):
         self.do_sort = do_sort
 
         self.system = system
+        if integrator is not None:
+            self.integrator = integrator
+        else:
+            self.integrator = system.integrator
+
+        if self.integrator is None:
+            raise RuntimeError('Integrator is not set properly.')
+
         self.file = pyh5md.H5MD_File(filename, 'w', driver='mpio', comm=MPI.COMM_WORLD,
                                      creator='espressopp',
                                      creator_version=espressopp.VersionLocal().info(),
@@ -318,9 +328,15 @@ class DumpH5MDLocal(io_DumpH5MD):
         if pmi.workerIsActive():
             return self.cxxclass.getResId(self)
 
-    def dump(self, step, time):
+    def dump(self):
         if not pmi.workerIsActive():
             return
+
+        # Take it directly from integrator;
+        integrator = self.integrator
+        step = integrator.step
+        time = step*integrator.dt
+
         time0 = py_time.time()
         self.update()
         self.updateTimer += (py_time.time() - time0)
@@ -437,7 +453,8 @@ if pmi.isController:
                 idd = [
                     x[1] for x in sorted(
                         [(p_id, col_id) for col_id, p_id in enumerate(ids[t])],
-                        key=lambda y: (True, y[0]) if y[0] == -1 else (False, y[0]))
+                        key=lambda y: (True, y[0]) if y[0] == -1 else (False, y[0])
+                        )
                     ]
                 for k in h5['/particles/{}/'.format(ag)].keys():
                     if 'value' in h5['/particles/{}/{}'.format(ag, k)].keys():
