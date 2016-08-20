@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import espressopp
-import h5py
 import mpi4py.MPI as MPI
 import os
 import sys
@@ -62,4 +61,10 @@ class TestH5MD(ut.TestCase):
 
 
 if __name__ == '__main__':
-    ut.main()
+    try:
+        import h5py
+        ut.main()
+    except ImportError as ex:
+        if os.environ.get('TEST_H5MD'):  # For travis-ci tests
+            raise ex
+        print('Skip DumpH5MD testsuit, h5py module not found')

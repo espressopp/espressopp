@@ -31,7 +31,6 @@ addons:
       - g++-4.9
       - gcc-5
       - g++-5
-      - h5py
 
 before_install:
  - if [[ ${GVER} ]]; then export CC=gcc-${GVER}; export CXX=g++-${GVER}; fi
@@ -46,10 +45,25 @@ before_install:
  - ln -s /usr/bin/ccache "$HOME/bin/clang"
  - if [[ ${EXTERNAL} = ON ]]; then pip install --user mpi4py; fi 
  - if [[ ${COVERAGE}  ]]; then pip install --user codecov; fi
-
+ - if [[ ${TEST_H5MD} ]]; then
+     export CC="`which mpicc`" &&
+     wget -qO- https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-${HDF5_VERSION}/src/hdf5-${HDF5_VERSION}.tar.gz | tar -xz && cd hdf5-${HDF5_VERSION} && ./configure --prefix=$HOME/hdf5 --enable-parallel && make -j4 &> /dev/null && make install && cd .. &&
+     export CPATH="$CPATH:$HOME/hdf5/include" &&
+     export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$HOME/hdf5/lib" &&
+     git clone https://github.com/h5py/h5py.git &&
+     cd h5py &&
+     python setup.py configure --hdf5 $HOME/hdf5 --mpi &&
+     python setup.py install --user &&
+     cd .. &&
+     git clone https://github.com/pdebuyl/pyh5md.git &&
+     cd pyh5md &&
+     python setup.py install --user &&
+     cd ..;
+   fi
 env: #maybe add mpich later
   global:
     - CCACHE_CPP2=yes
+    - HDF5_VERSION=1.8.17
   matrix:
     - EXTERNAL=ON BUILD_UG=ON
     - EXTERNAL=ON COVERAGE=ON
@@ -57,6 +71,7 @@ env: #maybe add mpich later
     - GVER=4.7 EXTERNAL=ON
     - GVER=4.8 EXTERNAL=ON
     - GVER=4.9 EXTERNAL=ON
+    - TEST_H5MD=ON EXTERNAL=ON  # mpi4py is required to build h5py
 #    - GVER=5   EXTERNAL=ON #needs a newer boost version
 
 matrix:
