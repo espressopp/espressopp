@@ -558,20 +558,28 @@ namespace espressopp {
               // calculate distance to nearest adress particle or center
               std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
               Real3D pa = **it2; // position of adress particle
-              Real3D d1 = vp.position() - pa;
-              //real d1 = vp.position()[0] - pa[0];
-              real min1sq = d1.sqr(); // set min1sq before loop  // d1*d1;
+              Real3D d1;
+              verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
+              // set min1sq before loop
+              real min1sq;
+              if (verletList->getAdrRegionType()) { // spherical adress region 
+                min1sq = d1.sqr(); 
+              } else { //slab-type adress region
+                min1sq = d1[0]*d1[0];
+              }
               ++it2;
               for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                    pa = **it2;
-                   d1 = vp.position() - pa;
-                   //d1 = vp.position()[0] - pa[0];
-                   real distsq1 = d1.sqr(); // d1*d1;
-                   //std::cout << pa << " " << sqrt(distsq1) << "\n";
+                   verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
+                   real distsq1;
+                   if (verletList->getAdrRegionType()) { // spherical adress region 
+                     distsq1 = d1.sqr(); 
+                   } else { //slab-type adress region
+                     distsq1 = d1[0]*d1[0];
+                   }
                    if (distsq1 < min1sq) min1sq = distsq1;
               }
 
-              //real min1 = sqrt(min1sq);
               //std::cout << vp.id() << " min: " << min1 << "\n";
               //std::cout << vp.id() << " dex: " << dex << "\n";
               //std::cout << vp.id() << " dex+dhy: " << dexdhy << "\n";
