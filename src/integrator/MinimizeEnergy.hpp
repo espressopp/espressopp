@@ -41,7 +41,8 @@ class MinimizeEnergy : public SystemAccess {
   MinimizeEnergy(shared_ptr<class espressopp::System> system,
                  real gamma,
                  real ftol,
-                 real max_displacement);
+                 real max_displacement,
+		 bool variable_step_flag);
   virtual ~MinimizeEnergy();
 
   bool run(int max_steps, bool verbose);
@@ -68,6 +69,9 @@ class MinimizeEnergy : public SystemAccess {
 
   real f_max_sqr_;  // Maximum force on particles.
   real dp_sqr_max_;   // Maximum particle displacement.
+  real dp_MAX; // Summation of maximum particle displacement.
+
+  bool variable_step_flag_;  //!< true implies that gamma is adjusted to the force strength. 
 
   bool resort_flag_;  //!< true implies need for resort of particles
 

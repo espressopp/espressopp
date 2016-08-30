@@ -47,7 +47,7 @@ Example
 API
 =======
 
-.. function:: espressopp.integrator.MinimizeEnergy(system, gamma, ftol, max_displacement)
+.. function:: espressopp.integrator.MinimizeEnergy(system, gamma, ftol, max_displacement, variable_step_flag)
 
 		:param system: The espressopp system object.
 		:type system: espressopp.System
@@ -57,6 +57,8 @@ API
 		:type ftol: float
 		:param max_displacement: The maximum displacement.
 		:type max_displacement: float
+                :param variable_step_flag: The flag of adjusting gamma to the force strength.
+		:type variable_step_flag: bool
 
 .. function:: espressopp.integrator.MinimizeEnergy.run(max_steps, verbose)
 
@@ -86,9 +88,9 @@ from espressopp import pmi
 from _espressopp import integrator_MinimizeEnergy
 
 class MinimizeEnergyLocal(integrator_MinimizeEnergy):
-    def __init__(self, system, gamma, ftol, max_displacement):
+    def __init__(self, system, gamma, ftol, max_displacement, variable_step_flag=False):
         if pmi.workerIsActive():
-            cxxinit(self, integrator_MinimizeEnergy, system, gamma, ftol*ftol, max_displacement)
+            cxxinit(self, integrator_MinimizeEnergy, system, gamma, ftol*ftol, max_displacement, variable_step_flag)
 
     def run(self, niter, verbose=False):
         if pmi.workerIsActive():
