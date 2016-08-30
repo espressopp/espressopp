@@ -1,5 +1,7 @@
 /*
   Copyright (C) 2016
+      Max Planck Institute for Polymer Research
+  Copyright (C) 2016
       Jakub Krajniak (jkrajniak at gmail.com)
 
   This file is part of ESPResSo++.
