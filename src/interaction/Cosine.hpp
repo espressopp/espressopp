@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -38,26 +38,35 @@ namespace espressopp {
     private:
       real K;
       real theta0;
+      real Kcos_theta0;
+      real Ksin_theta0;
 
     public:
       static void registerPython();
 
-      Cosine() : K(0.0), theta0(0.0) { }
-      Cosine(real _K, real _theta0) : K(_K), theta0(_theta0) { }
-
-      void setK(real _K) { K = _K; }
+      Cosine() : K(0.0), theta0(0.0) {
+          preset();
+      }
+      Cosine(real _K, real _theta0) : K(_K), theta0(_theta0) {
+          preset();
+ }
+      void preset() {
+          Kcos_theta0 = K*cos(theta0);
+          Ksin_theta0 = K*sin(theta0);
+      }
+      void setK(real _K) { K = _K; preset(); }
       real getK() const { return K; }
 
-      void setTheta0(real _theta0) { theta0 = _theta0; }
+      void setTheta0(real _theta0) { theta0 = _theta0; preset();}
       real getTheta0() const { return theta0; }
 
       real _computeEnergyRaw(real _theta) const {
         // _theta and theta0 should be in radians
-        real energy = K * (1.0 - cos(_theta - theta0));
+        real energy = K * (1.0 + cos(_theta - theta0));
         return energy;
       }
 
-      // theta0 is ignored at the moment (TODO)
+      // note that for theta=0 the force is set to 0, while the energy as function of theta has a cusp
       bool _computeForceRaw(Real3D& force12,
                             Real3D& force32,
 			    const Real3D& dist12,
@@ -69,16 +78,25 @@ namespace espressopp {
         real dist32_magn = sqrt(dist32_sqr);
         real a11, a12, a22;
 
+        // theta is the angle between r_{12} and r_{32} 
+
         real cos_theta = dist12 * dist32 / (dist12_magn * dist32_magn);
         if(cos_theta < -1.0) cos_theta = -1.0;
         if(cos_theta >  1.0) cos_theta =  1.0;
 
-        a11 = K * cos_theta / dist12_sqr;
-        a12 = -K / (dist12_magn * dist32_magn);
-        a22 = K * cos_theta / dist32_sqr;
+        real sin_theta = sqrt(1.0 - cos_theta*cos_theta);
+ 
+        a11 = cos_theta / dist12_sqr;
+        a12 = -1.0 / (dist12_magn * dist32_magn);
+        a22 =  cos_theta / dist32_sqr;
 
-        force12 = a11 * dist12 + a12 * dist32;
-        force32 = a22 * dist32 + a12 * dist12;
+        if (sin_theta !=0 ) {
+          force12 = (Kcos_theta0-Ksin_theta0*cos_theta/sin_theta)*(a11 * dist12 + a12 * dist32);
+          force32 = (Kcos_theta0-Ksin_theta0*cos_theta/sin_theta)*(a22 * dist32 + a12 * dist12);}
+        else {
+          force12  = 0.0*dist12;
+          force32  = 0.0*dist32;}
+
         
         return true;
       }
@@ -95,7 +113,6 @@ namespace espressopp {
         return K * sin_theta;
         */
         return K;
-        
         
       }
       
