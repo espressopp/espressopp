@@ -72,6 +72,8 @@ namespace espressopp {
 			    const Real3D& dist12,
 			    const Real3D& dist32) const {
 
+      	const real SMALL_EPSILON = 1.0E-9;
+
         real dist12_sqr = dist12 * dist12;
         real dist32_sqr = dist32 * dist32;
         real dist12_magn = sqrt(dist12_sqr);
@@ -90,12 +92,13 @@ namespace espressopp {
         a12 = -1.0 / (dist12_magn * dist32_magn);
         a22 =  cos_theta / dist32_sqr;
 
-        if (sin_theta !=0 ) {
+        if (sin_theta > SMALL_EPSILON) { //sin_theta is always positive
           force12 = (Kcos_theta0-Ksin_theta0*cos_theta/sin_theta)*(a11 * dist12 + a12 * dist32);
           force32 = (Kcos_theta0-Ksin_theta0*cos_theta/sin_theta)*(a22 * dist32 + a12 * dist12);}
         else {
-          force12  = 0.0*dist12;
-          force32  = 0.0*dist32;}
+          force12  = Real3D(0.0,0.0,0.0);
+          force32  = Real3D(0.0,0.0,0.0);
+        }
 
         
         return true;
@@ -104,14 +107,6 @@ namespace espressopp {
       // used for generating tabular angular potential
       real _computeForceRaw(real theta) const {
 
-        /*
-        real cos_theta = cos(theta);
-        if(cos_theta < -1.0) cos_theta = -1.0;
-        else if(cos_theta >  1.0) cos_theta =  1.0;
-
-        real sin_theta = sqrt(1.0 - cos_theta * cos_theta);
-        return K * sin_theta;
-        */
         return K;
         
       }
