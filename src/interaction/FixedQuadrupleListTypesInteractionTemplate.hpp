@@ -85,6 +85,7 @@ class FixedQuadrupleListTypesInteractionTemplate: public Interaction, SystemAcce
 
   virtual void addForces();
   virtual real computeEnergy();
+  virtual real computeEnergyDeriv();
   virtual real computeEnergyAA();
   virtual real computeEnergyCG();
   virtual void computeVirialX(std::vector<real> &p_xx_total, int bins);
@@ -174,6 +175,13 @@ computeEnergy() {
   real esum;
   boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
   return esum;
+}
+
+template < typename _DihedralPotential > inline real
+FixedQuadrupleListTypesInteractionTemplate < _DihedralPotential >::
+computeEnergyDeriv() {
+  std::cout << "Warning! At the moment computeEnergyDeriv() in FixedQuadrupleListTypesInteractionTemplate does not work." << std::endl;
+  return 0.0;
 }
 
 template<typename _DihedralPotential>

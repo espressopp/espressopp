@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -38,6 +38,7 @@ namespace espressopp {
 
       class_< Interaction, boost::noncopyable >("interaction_Interaction", no_init)
         .def("computeEnergy", &Interaction::computeEnergy)
+        .def("computeEnergyDeriv", &Interaction::computeEnergyDeriv)
         .def("computeEnergyAA", &Interaction::computeEnergyAA)
         .def("computeEnergyCG", &Interaction::computeEnergyCG)
         .def("computeVirial", &Interaction::computeVirial)
