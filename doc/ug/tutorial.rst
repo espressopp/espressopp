@@ -9,4 +9,5 @@ Tutorial
    tutorial.PolymerMelt.rst
    tutorial.AddNewPotential.rst
    tutorial.AdResS.rst
+   tutorial.ThermodynamicIntegration.rst
 
