@@ -90,7 +90,7 @@ from operator import itemgetter # for sorting a dict
    Include modified spce file in topol.top, e.g. replace
    #include "amber03.ff/spce.itp"
    by
-   #include "amber03.ff/spce-for-espressopppp.itp"
+   #include "amber03.ff/spce-for-espressopp.itp"
    
    ----------------------------------------------------------------- 
    Tip 4. 
@@ -325,7 +325,14 @@ def read(gro_file, top_file="", doRegularExcl=True):
 
             if 'dihedraltypes' in line:
                 #is it really the dihedral (function type = 9) or is it actually the impropers (also labelled 'dihedraltypes' in gromacs but with function type = 4)
-                nextline = f.lines[lineindex + 2] #assumes one comment line between [ dihedraltypes ] and first parameters entry
+
+                #loop over any number of comment lines
+                ii = 1
+                nextline = f.lines[lineindex + ii]
+                while nextline[:1] == ';':
+                    ii += 1
+                    nextline = f.lines[lineindex + ii]
+
                 nextline = nextline.split()
                 if ((nextline[4]=='4') or (nextline[4]=='2')): 
                     readimptypes = True
