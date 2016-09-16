@@ -58,7 +58,12 @@ def FillFileBuffer(fname, filebuffer):
     for line in f:
 	if "include" in line and not line[0]==';':
 	    name=(line.split()[1]).strip('\"')
-	    FillFileBuffer(name, filebuffer)
+            try: 
+ 	        FillFileBuffer(name, filebuffer)
+            except IOError:
+                #need to use relative path
+                name = fname.split('/')[0] + '/' + name
+	        FillFileBuffer(name, filebuffer)
 	else:
             l=line.rstrip('\n')
 	    if l:
