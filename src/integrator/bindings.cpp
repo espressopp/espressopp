@@ -57,6 +57,7 @@
 #include "Settle.hpp"
 #include "VelocityVerletOnRadius.hpp"
 #include "AssociationReaction.hpp"
+#include "MinimizeEnergy.hpp"
 
 #include "EmptyExtension.hpp"
 
@@ -96,7 +97,7 @@ namespace espressopp {
       Settle::registerPython();
       VelocityVerletOnRadius::registerPython();
       AssociationReaction::registerPython();
-
+      MinimizeEnergy::registerPython();
       EmptyExtension::registerPython();
     }
   }
