@@ -334,8 +334,7 @@ namespace espressopp {
           int id = (*opm).first;
           if( !stor->lookupRealParticle(id) ){
             OrderParticleProps &op = (*opm).second;
-            //if( !op.getNumNN()==0 ) sendGhostInfo.push_back( (*opm).second );  //possible bug. Clang complains of comparison eval
-            if( !(op.getNumNN()==0 )) sendGhostInfo.push_back( (*opm).second );  //comparison eval first, then logical not applied
+            if( !(op.getNumNN()==0) ) sendGhostInfo.push_back( (*opm).second );
           }
         }
 
@@ -424,8 +423,7 @@ namespace espressopp {
           int id = (*opm).first;
           if( stor->lookupGhostParticle(id) ){
             OrderParticleProps &op = (*opm).second;
-            //if( !op.getNumNN()==0 ) sendGhostInfo.push_back( (*opm).second );
-            if( !(op.getNumNN()==0 )) sendGhostInfo.push_back( (*opm).second );
+            if( !(op.getNumNN()==0) ) sendGhostInfo.push_back( (*opm).second );
           }
         }
 
