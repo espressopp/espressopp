@@ -25,12 +25,12 @@ class TestThermoIntegration(unittest.TestCase):
     def test_potential_decoupling(self):
         #add particles
         particle_list = [
-            (1, 0,  1, espressopp.Real3D(2.0, 2.0, 2.0), 1.0, 1),
-            (2, 0, -1, espressopp.Real3D(2.3, 2.0, 2.0), 1.0, 1),
-            (3, 0, -1, espressopp.Real3D(2.6, 2.0, 2.0), 1.0, 1),
             (4, 1,  0, espressopp.Real3D(2.0, 2.0, 2.0), 1.0, 0),
             (5, 1,  0, espressopp.Real3D(2.3, 2.0, 2.0), 1.0, 0),
             (6, 1,  0, espressopp.Real3D(2.6, 2.0, 2.0), 1.0, 0),
+            (1, 0,  1, espressopp.Real3D(2.0, 2.0, 2.0), 1.0, 1),
+            (2, 0, -1, espressopp.Real3D(2.3, 2.0, 2.0), 1.0, 1),
+            (3, 0, -1, espressopp.Real3D(2.6, 2.0, 2.0), 1.0, 1),
         ]
         tuples = [(4,1),(5,2),(6,3)]
         self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat')
@@ -73,12 +73,12 @@ class TestThermoIntegration(unittest.TestCase):
     def test_potential_annihilation(self):
         #add particles
         particle_list = [
-            (1, 0,  1, espressopp.Real3D(2.0, 2.0, 2.0), 1.0, 1),
-            (2, 0, -1, espressopp.Real3D(2.3, 2.0, 2.0), 1.0, 1),
-            (3, 0, -1, espressopp.Real3D(2.6, 2.0, 2.0), 1.0, 1),
             (4, 1,  0, espressopp.Real3D(2.0, 2.0, 2.0), 1.0, 0),
             (5, 1,  0, espressopp.Real3D(2.3, 2.0, 2.0), 1.0, 0),
             (6, 1,  0, espressopp.Real3D(2.6, 2.0, 2.0), 1.0, 0),
+            (1, 0,  1, espressopp.Real3D(2.0, 2.0, 2.0), 1.0, 1),
+            (2, 0, -1, espressopp.Real3D(2.3, 2.0, 2.0), 1.0, 1),
+            (3, 0, -1, espressopp.Real3D(2.6, 2.0, 2.0), 1.0, 1),
         ]
         tuples = [(4,1),(5,2),(6,3)]
         self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat')
