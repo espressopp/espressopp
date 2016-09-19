@@ -46,7 +46,7 @@ Example:
 
 .. function:: espressopp.integrator.LangevinThermostat.addExclusions(pidlist)
 
-        :param pidlist: list of particle ids to be excluded from thermostating
+        :param pidlist: list of particle ids to be excluded from thermostating. In adaptive (AdResS) simulations, add ids of atomistic particles to be excluded (thermostats acts in this case on atomistic level). For normal simulations, add normal or coarse-grained particle ids.
         :type pidlist: list of ints
 
 """

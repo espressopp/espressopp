@@ -26,29 +26,33 @@ r"""
 
 Class to compute radial distribution functions in adaptive resolution simulations in subregions of the box.
 
-On the one hand, the RDF can be calculated in a cuboid region in the center of the box (periodic in y,z, limited in x). In this case, particle pairs are considered for which at least one of them is in the defined cuboid region (spanbase = True). This can be useful when the high resolution region has a slab geometry. No further normalization should be required. On the other hand, the routine can also calculate unnormalized RDFs using particle pairs with both particles being in the high resolution region. This can be useful when atomistic region has complicated or spherical geometries. In any case, only atoms belonging to different molecules (i.e. different coarse-grained entities) are considered.
+Option 1 (spanbased = True): the RDF can be calculated in a cuboid region in the center of the box (periodic in y,z, limited in x). In this case, particle pairs are considered for which at least one of them is in the defined cuboid region. This can be useful when the high resolution region has a slab geometry. No further normalization should be required.
+
+Option 2 (spanbased = False): the routine can also calculate unnormalized RDFs using particle pairs with both particles being in the high resolution region (based on the resolution value lambda, the span parameter is not used then). This can be useful when atomistic region has complicated or spherical geometries.
+
+In any case, only pairs of atomistic particles belonging to two different coarse-grained particles are considered. Furthermore, note that the routine uses L_y / half (L_y is the box length in y-direction) as the maximum distance for the RDF calculation, which is then binned according to rdfN during the computation. Hence, L_y should be the shortest box side (or, equally short as L_x and/or L_z).
 
 Examples:
 
->>> rdf_0_1 = espressopp.analysis.RDFatomistic(system = system, type1 = 0, type2 = 1, span = 1.5, spanbased = True)
+>>> rdf_0_1 = espressopp.analysis.RDFatomistic(system = system, type1 = 0, type2 = 1, spanbased = True, span = 1.5)
 >>> # creates the class for calculating the RDF between atomistic particles of type 1 and 0 between different molecules,
->>> # within plus/minus 1.5 from the center of the box in x-direction
+>>> # At least one of these particles has to be within plus/minus 1.5 from the center of the box in x-direction
 
 >>> rdf_0_1.compute(100)
 >>> # computes the rdf using 100 bins over a distance corresponding to L_y / 2.0
 
-.. function:: espressopp.analysis.RDFatomistic(system, type1, type2, span, spanbased)
+.. function:: espressopp.analysis.RDFatomistic(system, type1, type2, spanbased, span)
 
                 :param system: system object
                 :param type1: type of atom 1
                 :param type2: type of atom 2
-                :param span: (default: 1.0) radius of the cuboid region used for rdf calculation (if spanbased == True)
-                :param spanbased: (default: True) calculates rdfs in a cuboid region of radius span from the center (limited in x, periodic in y,z)
+                :param spanbased: (default: True) If True, calculates RDFs in a cuboid region of radius span from the center (limited in x, periodic in y,z). If False, calculates RDFs with both particles being in the high resolution region (using lambda resolution values and ignoring span parameter).
+                :param span: (default: 1.0) +/- distance from centre of box in x-direction of the cuboid region used for RDF calculation if spanbased == True. If spanbased == False, this parameter is not used.
                 :type system: shared_ptr<System>
                 :type type1: int
                 :type type2: int
+                :type spanbased: bool
                 :type span: real
-                :type spanbase: bool
 
 .. function:: espressopp.analysis.RDFatomistic.compute(rdfN)
 
@@ -64,9 +68,9 @@ from _espressopp import analysis_RDFatomistic
 
 class RDFatomisticLocal(ObservableLocal, analysis_RDFatomistic):
 
-  def __init__(self, system, type1, type2, span = 1.0, spanbased = True):
+  def __init__(self, system, type1, type2, spanbased = True, span = 1.0):
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      cxxinit(self, analysis_RDFatomistic, system, type1, type2, span, spanbased)
+      cxxinit(self, analysis_RDFatomistic, system, type1, type2, spanbased, span)
 
   def compute(self, rdfN):
     return self.cxxclass.compute(self, rdfN)

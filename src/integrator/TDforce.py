@@ -26,21 +26,27 @@ r"""
 
 Thermodynamic force.
 
-Example - how to turn on thermodynamic force
+Example - how to turn on thermodynamic force (except for multiple moving spherical regions)
 
 >>> fthd="tabletf.xvg"
->>> thdforce = espressopp.integrator.TDforce(system,verletlist) #info about centre and shape of adress region come from the verletlist. info about size of adress region not needed, tabulated file tabletf.xvg should be appropriate for the region size
+>>> thdforce = espressopp.integrator.TDforce(system,verletlist) #info about centre and shape of adress region come from the verletlist, info about size of adress region not needed, tabulated file tabletf.xvg should be appropriate for the region size
 >>> thdforce.addForce(itype=3,filename="tabletf.xvg",type=typeCG)
 >>> integrator.addExtension(thdforce)
 
+Example - how to turn on thermodynamic force for multiple moving spherical regions
+
+>>> fthd="tabletf.xvg"
+>>> thdforce = espressopp.integrator.TDforce(system, verletlist, startdist = 0.9, enddist = 2.1, edgeweightmultiplier = 20) #info about moving centres come from the verletlist. Info about size of adress region not needed, tabulated file tabletf.xvg should be appropriate for the region size (enddist - startdist)
+>>> thdforce.addForce(itype=3,filename="tabletf.xvg",type=typeCG)
+>>> integrator.addExtension(thdforce)
 
 .. function:: espressopp.integrator.TDforce(system, verletlist, startdist, enddist, edgeweightmultiplier)
 
         :param system: system object
         :param verletlist: verletlist object
-        :param startdist: (default: 0.0) starting distance from center at which the TD force is actually applied. Needs to be altered when using moving spherical regions
-        :param enddist: (default: 0.0) end distance from center up to which the TD force is actually applied. Needs to be altered when using moving spherical regions
-        :param edgeweightmultiplier: (default: 20) interpolation parameter for multiple overlapping spherical regions (see Kreis et al., JCTC doi: 10.1021/acs.jctc.6b00440), the default should be fine for most applications
+        :param startdist: (default: 0.0) starting distance from center at which the TD force is actually applied. Needs to be altered when using several moving spherical regions (not used for static or single moving region)
+        :param enddist: (default: 0.0) end distance from center up to which the TD force is actually applied. Needs to be altered when using several moving spherical regions (not used for static or single moving region)
+        :param edgeweightmultiplier: (default: 20) interpolation parameter for multiple overlapping spherical regions (see Kreis et al., JCTC doi: 10.1021/acs.jctc.6b00440), the default should be fine for most applications (not used for static or single moving region)
         :type system: shared_ptr<System>
         :type verletlist: shared_ptr<VerletListAdress>
         :type startdist: real

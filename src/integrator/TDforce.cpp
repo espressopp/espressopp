@@ -118,69 +118,89 @@ namespace espressopp {
 
                     if (sphereAdr){
 
-                      if ((startdist == 0.0) && (enddist == 0.0)){
-                        std::cout << "In TDforce: Trying to apply TD force with moving, particle-based spherical AdResS region. However, both startdist and enddist set to 0. This does not make sense.\n";
-                        exit(1);
-                        return;
-                      }
+                      if(verletList->getAdrList().size() != 1){
 
-                      real buffer = 0.000001;
-                      real width = fabs(enddist - startdist + 2.0*buffer);  // width of region where TD force acts
-                      std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();   // get positions
-                      Real3D pa = **it2;
-                      Real3D dist3D;
-                      bc.getMinimumImageVectorBox(dist3D,cit->getPos(), pa); // calculate vector between particle and first center
+                        if ((startdist == 0.0) && (enddist == 0.0)){
+                          std::cout << "In TDforce: Trying to apply TD force with moving, particle-based spherical AdResS region. However, both startdist and enddist set to 0. This does not make sense.\n";
+                          exit(1);
+                          return;
+                        }
 
-                      Real3D mindist3D = dist3D; // set mindist3D before loop
+                        real buffer = 0.000001;
+                        real width = fabs(enddist - startdist + 2.0*buffer);  // width of region where TD force acts
+                        std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();   // get positions
+                        Real3D pa = **it2;
+                        Real3D dist3D;
+                        bc.getMinimumImageVectorBox(dist3D,cit->getPos(), pa); // calculate vector between particle and first center
 
-                      real dist3Dabs = sqrt(dist3D.sqr()); // calculate absolute distance
+                        Real3D mindist3D = dist3D; // set mindist3D before loop
 
-                      real weight = 0.0;  // initialize weight
+                        real dist3Dabs = sqrt(dist3D.sqr()); // calculate absolute distance
 
-                      // weighting scheme: only particles that are in a hybrid region contribute
-                      if ((dist3Dabs < enddist + buffer) && (dist3Dabs > startdist - buffer)){
-                        weight = 1.0 - (dist3Dabs - startdist - buffer) / width; // 0 at edge to CG region, 1 at edge to atomistic region
+                        real weight = 0.0;  // initialize weight
 
-                        // Direction modification at the edges
-                        weight = pow(weight, edgeweightmultiplier);
+                        // weighting scheme: only particles that are in a hybrid region contribute
+                        if ((dist3Dabs < enddist + buffer) && (dist3Dabs > startdist - buffer)){
+                          weight = 1.0 - (dist3Dabs - startdist - buffer) / width; // 0 at edge to CG region, 1 at edge to atomistic region
+
+                          // Direction modification at the edges
+                          weight = pow(weight, edgeweightmultiplier);
+                        }
+                        else{
+                          weight = 0.0; // particle outside of hybrid region
+                        }
+
+                        Real3D direction = dist3D*weight/dist3Dabs; // normalized but weighted direction vector
+
+                        // Loop over all other centers
+                        ++it2;
+                        for (; it2 != verletList->getAdrPositions().end(); ++it2) {
+                              pa = **it2;
+                              verletList->getSystem()->bc->getMinimumImageVector(dist3D, cit->getPos(), pa); // calculate vector between particle and other centers
+                              if (dist3D.sqr() < mindist3D.sqr()) mindist3D = dist3D; // make it the minimum if shortest length so far
+                              dist3Dabs = sqrt(dist3D.sqr()); // calculate absolute distance
+
+                              // calculate weights again, as above
+                              if ((dist3Dabs < enddist + buffer) && (dist3Dabs > startdist - buffer)){
+                                weight = 1.0 - (dist3Dabs - startdist - buffer) / width;
+
+                                // Direction modification at the edges
+                                weight = pow(weight, edgeweightmultiplier);
+                              }
+                              else{
+                                weight = 0.0;
+                              }
+
+                              //norm += weight; // add to normalization constant
+                              direction += dist3D*weight/dist3Dabs; // add to direction vector
+                        }
+
+                        real mindist3Dabs = sqrt(mindist3D.sqr()); // calculate overall smallest absolute distance
+
+                        // apply td force
+                         if ( (mindist3Dabs > startdist) && (mindist3Dabs < enddist) && (direction.sqr() > 0.0) ) {
+                            real fforce = table->getForce(mindist3Dabs);
+                            fforce /= sqrt(direction.sqr());
+                            cit->force() += (direction * fforce);
+                         }
+
                       }
                       else{
-                        weight = 0.0; // particle outside of hybrid region
+                         // calculate distance from reference particle
+                         center=**(verletList->adrPositions.begin());
+                         Real3D dist3D;
+                         bc.getMinimumImageVectorBox(dist3D,cit->getPos(),center); //pos - center
+                         real dist = sqrt(dist3D.sqr());
+
+                         if (dist>0.0) {
+                           // read fforce from table
+                           real fforce = table->getForce(dist);
+                           fforce /= dist;
+
+                           // substract td force
+                           cit->force() += (dist3D * fforce);
+                         }
                       }
-
-                      Real3D direction = dist3D*weight/dist3Dabs; // normalized but weighted direction vector
-
-                      // Loop over all other centers
-                      ++it2;
-                      for (; it2 != verletList->getAdrPositions().end(); ++it2) {
-                            pa = **it2;
-                            verletList->getSystem()->bc->getMinimumImageVector(dist3D, cit->getPos(), pa); // calculate vector between particle and other centers
-                            if (dist3D.sqr() < mindist3D.sqr()) mindist3D = dist3D; // make it the minimum if shortest length so far
-                            dist3Dabs = sqrt(dist3D.sqr()); // calculate absolute distance
-
-                            // calculate weights again, as above
-                            if ((dist3Dabs < enddist + buffer) && (dist3Dabs > startdist - buffer)){
-                              weight = 1.0 - (dist3Dabs - startdist - buffer) / width;
-
-                              // Direction modification at the edges
-                              weight = pow(weight, edgeweightmultiplier);
-                            }
-                            else{
-                              weight = 0.0;
-                            }
-
-                            //norm += weight; // add to normalization constant
-                            direction += dist3D*weight/dist3Dabs; // add to direction vector
-                      }
-
-                      real mindist3Dabs = sqrt(mindist3D.sqr()); // calculate overall smallest absolute distance
-
-                      // apply td force
-                       if ( (mindist3Dabs > startdist) && (mindist3Dabs < enddist) && (direction.sqr() > 0.0) ) {
-                          real fforce = table->getForce(mindist3Dabs);
-                          fforce /= sqrt(direction.sqr());
-                          cit->force() += (direction * fforce);
-                       }
 
                     }
                     else{

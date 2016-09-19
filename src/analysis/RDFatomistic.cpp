@@ -41,7 +41,7 @@ using namespace std;
 namespace espressopp {
   namespace analysis {
 
-    // TODO currently works correctly if L_y is shortest side length (it's fine if L_x or L_z are equal)
+    // TODO currently works correctly if L_y is shortest side length (it's fine if L_x and/or L_z are equal to L_y)
     // rdfN is a level of discretisation of rdf (how many elements it contains)
     python::list RDFatomistic::computeArray(int rdfN) const {
 
@@ -131,14 +131,8 @@ namespace espressopp {
                 if (molP1 != molP2){
 
                     if( ( (typeP1 == target1) && (typeP2 == target2) ) || ( (typeP1 == target2) && (typeP2 == target1) ) ){
-
-                        Real3D distVector = coordP1 - coordP2;
-
-                        // minimize the distance in simulation box
-                        for(int ii=0; ii<3; ii++){
-                          if( distVector[ii] < -Li_half[ii] ) distVector[ii] += Li[ii];
-                          if( distVector[ii] >  Li_half[ii] ) distVector[ii] -= Li[ii];
-                        }
+                        Real3D distVector = (0.0, 0.0, 0.0);
+                        system.bc->getMinimumImageVector(distVector, coordP1, coordP2);
 
                         int bin = (int)( distVector.abs() / dr );
                         if( bin < rdfN){
@@ -166,13 +160,8 @@ namespace espressopp {
                         num_pairs += 1;
 
                         if( resolutionP2 == 1.0 ){
-                          Real3D distVector = coordP1 - coordP2;
-
-                          // minimize the distance in simulation box
-                          for(int ii=0; ii<3; ii++){
-                            if( distVector[ii] < -Li_half[ii] ) distVector[ii] += Li[ii];
-                            if( distVector[ii] >  Li_half[ii] ) distVector[ii] -= Li[ii];
-                          }
+                          Real3D distVector = (0.0, 0.0, 0.0);
+                          system.bc->getMinimumImageVector(distVector, coordP1, coordP2);
 
                           int bin = (int)( distVector.abs() / dr );
                           if( bin < rdfN){
@@ -216,7 +205,7 @@ namespace espressopp {
     void RDFatomistic::registerPython() {
       using namespace espressopp::python;
       class_<RDFatomistic, bases< Observable > >
-        ("analysis_RDFatomistic", init< shared_ptr< System >, int, int, real, bool >())
+        ("analysis_RDFatomistic", init< shared_ptr< System >, int, int, bool, real >())
         .def("compute", &RDFatomistic::computeArray)
       ;
     }
