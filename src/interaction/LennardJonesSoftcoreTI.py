@@ -147,6 +147,8 @@ from _espressopp import interaction_LennardJonesSoftcoreTI, \
                       #interaction_VerletListLennardJonesSoftcoreTI, \
                       #interaction_VerletListHadressLennardJonesSoftcoreTI
 
+#NOTE: to use LennardJonesSoftcoreTI with VerletList or VerletListHadress, uncomment and check the relevant code in this file and LennardJonesSoftcoreTI.cpp, and implement computeEnergyDeriv in the relevant interaction template
+
 class LennardJonesSoftcoreTILocal(PotentialLocal, interaction_LennardJonesSoftcoreTI):
     def __init__(self, epsilonA=1.0, sigmaA=1.0, epsilonB=0.0, sigmaB=1.0, alpha=1.0, power=1.0, 
                  cutoff=infinity, lambdaTI=0.0, annihilate=True):

@@ -50,7 +50,7 @@ namespace espressopp {
                  to the shift, which we cannot use because it depends on qq*/
                 real lambdaTI; //not to be confused with the lambda used in AdResS simulations
                 real complLambdaTI; //1-lambdaTI
-                std::vector<real> pidsTI; //PIDs of particles whose charge is zero in TI state B
+                std::vector<longint> pidsTI; //PIDs of particles whose charge is zero in TI state B
 
                 void initialize() {
                     real krc = kappa*rc;

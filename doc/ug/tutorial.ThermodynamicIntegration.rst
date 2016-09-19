@@ -6,7 +6,7 @@ Thermodynamic integration
 Theoretical explanation
 -----------------------
 
-Thermodynamic integration (TI) is a method used to calculate the free energy difference between two states A and B. For the theoretical background, see e.g. http://www.alchemistry.org. In this tutorial, we show how to perform TI calculations with ESPResSo++. We calculate the free energy of solvation of methanol in water. The complete python script is available in the ESPResSo+ source code under ``$ESPRESSOHOME/examples/thd_integration_solvation`` 
+Thermodynamic integration (TI) is a method used to calculate the free energy difference between two states A and B. For the theoretical background, see e.g. http://www.alchemistry.org. In this tutorial, we show how to perform TI calculations with ESPResSo++. We calculate the free energy of solvation of methanol in water. The complete python script is available in the ESPResSo+ source code under ``examples/thd_integration_solvation`` 
 
 To do TI, we define states A and B, with potentials :math:`U^A` and :math:`U^B`. We then construct a pathway of intermediate states between A and B by defining a parameter :math:`\lambda` that takes values between 0 and 1 and writing the system potential :math:`U` as a function of :math:`\lambda`, :math:`U^A` and :math:`U^B`. The free energy difference between the states A and B is then given by
 

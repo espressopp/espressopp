@@ -130,6 +130,8 @@ from _espressopp import interaction_ReactionFieldGeneralizedTI, \
                       #interaction_VerletListReactionFieldGeneralizedTI, \
                       #interaction_VerletListHadressReactionFieldGeneralizedTI
 
+#NOTE: to use ReactionFieldGeneralizedTI with VerletList or VerletListHadress, uncomment and check the relevant code in this file and ReactionFieldGeneralizedTI.cpp, and implement computeEnergyDeriv in the relevant interaction template
+
 class ReactionFieldGeneralizedTILocal(PotentialLocal, interaction_ReactionFieldGeneralizedTI):
     def __init__(self, prefactor=1.0, kappa=0.0, epsilon1=1.0, epsilon2=80.0, cutoff=infinity, lambdaTI=0.0, annihilate=True):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():

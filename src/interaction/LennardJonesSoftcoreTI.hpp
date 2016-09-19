@@ -40,7 +40,7 @@ namespace espressopp {
       real ff1A, ff2A;
       real ff1B, ff2B;
       bool annihilate; //if true, atoms in pidsTI are annihilated, otherwise they are decoupled
-      std::vector<real> pidsTI; //PIDs of particles whose LJ interaction is zero in TI state B
+      std::vector<longint> pidsTI; //PIDs of particles whose LJ interaction is zero in TI state B
       real lambdaTI;
       real complLambdaTI; //1-lambdaTI
       real alphaSC;

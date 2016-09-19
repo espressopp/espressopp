@@ -8,6 +8,7 @@ import mpi4py.MPI as MPI
 
 import unittest
 
+
 class TestThermoIntegration(unittest.TestCase):
     def setUp(self):
 
@@ -112,6 +113,7 @@ class TestThermoIntegration(unittest.TestCase):
         self.assertAlmostEqual(interactionLJ.computeEnergyDeriv(),0.655998,places=5)
         self.assertAlmostEqual(interactionQQ.computeEnergy(),-0.507652,places=5)
         self.assertAlmostEqual(interactionLJ.computeEnergy(),-0.447031,places=5)
+
 
 if __name__ == '__main__':
     unittest.main()
