@@ -5,7 +5,7 @@ import mpi4py.MPI as MPI
 
 import unittest
 
-class TestThermoIntegration(unittest.TestCase):
+class TestRDFatomistic(unittest.TestCase):
     def setUp(self):
         # set up system
         system = espressopp.System()

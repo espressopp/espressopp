@@ -5,7 +5,7 @@ import mpi4py.MPI as MPI
 
 import unittest
 
-class TestThermoIntegration(unittest.TestCase):
+class TestAdressDensity(unittest.TestCase):
     def setUp(self):
         # set up system
         system = espressopp.System()
