@@ -20,16 +20,18 @@ class TestThermoIntegration(unittest.TestCase):
 
         # add some particles
         particle_list = [
-            (1, 1, 0, espressopp.Real3D(5.0, 5.0, 5.0), 1.0, 0),
-            (2, 1, 0, espressopp.Real3D(6.0, 5.0, 5.0), 1.0, 0),
-            (3, 1, 0, espressopp.Real3D(6.5, 5.0, 5.0), 1.0, 0),
-            (4, 1, 0, espressopp.Real3D(6.5, 5.5, 5.0), 1.0, 0),
-            (5, 0, 0, espressopp.Real3D(5.0, 5.0, 5.0), 1.0, 1),
-            (6, 0, 0, espressopp.Real3D(6.0, 5.0, 5.0), 1.0, 1),
+            (1, 1, 0, espressopp.Real3D(5.5, 5.0, 5.0), 1.0, 0),
+            (2, 1, 0, espressopp.Real3D(6.5, 5.0, 5.0), 1.0, 0),
+            (3, 1, 0, espressopp.Real3D(7.5, 5.0, 5.0), 1.0, 0),
+            (4, 1, 0, espressopp.Real3D(8.5, 5.0, 5.0), 1.0, 0),
+            (5, 1, 0, espressopp.Real3D(9.5, 5.0, 5.0), 1.0, 0),
+            (6, 0, 0, espressopp.Real3D(5.5, 5.0, 5.0), 1.0, 1),
             (7, 0, 0, espressopp.Real3D(6.5, 5.0, 5.0), 1.0, 1),
-            (8, 0, 0, espressopp.Real3D(6.5, 5.5, 5.0), 1.0, 1),
+            (8, 0, 0, espressopp.Real3D(7.5, 5.0, 5.0), 1.0, 1),
+            (9, 0, 0, espressopp.Real3D(8.5, 5.0, 5.0), 1.0, 1),
+            (10, 0, 0, espressopp.Real3D(9.5, 5.0, 5.0), 1.0, 1),
         ]
-        tuples = [(1,5),(2,6),(3,7),(4,8)]
+        tuples = [(1,6),(2,7),(3,8),(4,9),(5,10)]
         self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat')
         ftpl = espressopp.FixedTupleListAdress(self.system.storage)
         ftpl.addTuples(tuples)
@@ -46,19 +48,16 @@ class TestThermoIntegration(unittest.TestCase):
         integrator.addExtension(adress)
         espressopp.tools.AdressDecomp(self.system, integrator)
 
-    def test_span_true(self):
-        # calculate rdfs
-        rdf_span = espressopp.analysis.RDFatomistic(system = self.system, type1 = 0, type2 = 0, spanbased = True, span = 1.0)
-        rdf_span_array = rdf_span.compute(10)
-        self.assertAlmostEqual(rdf_span_array[1], 0.0, places=5)
-        self.assertAlmostEqual(rdf_span_array[2], 33.506304, places=5)
-
-    def test_span_false(self):
-        # calculate rdfs
-        rdf_nospan = espressopp.analysis.RDFatomistic(system = self.system, type1 = 0, type2 = 0, spanbased = False)
-        rdf_nospan_array = rdf_nospan.compute(10)
-        self.assertAlmostEqual(rdf_nospan_array[1], 136.418523, places=5)
-        self.assertAlmostEqual(rdf_nospan_array[2], 16.753152, places=5)
+    def test_densitycalculation(self):
+        # calculate density profile
+        densityprofile = espressopp.analysis.AdressDensity(self.system, vl)
+        densityprofile.addExclusions([8])
+        density_array = densityprofile.compute(5)
+        self.assertAlmostEqual(density_array[0], 31.250000, places=5)
+        self.assertAlmostEqual(density_array[1], 4.464286, places=5)
+        self.assertAlmostEqual(density_array[2], 0.0, places=5)
+        self.assertAlmostEqual(density_array[3], 0.844595, places=5)
+        self.assertAlmostEqual(density_array[4], 0.512295, places=5)
 
 
 if __name__ == '__main__':
