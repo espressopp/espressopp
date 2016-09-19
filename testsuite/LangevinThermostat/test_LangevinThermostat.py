@@ -61,12 +61,12 @@ class TestLangevinThermostat(unittest.TestCase):
         self.assertEqual(before[0], after[0])
         self.assertEqual(before[1], after[1])
         self.assertEqual(before[2], after[2])
-        self.assertAlmostEqual(after[3], 6.488205, places=5)
-        self.assertAlmostEqual(after[4], 4.965654, places=5)
-        self.assertAlmostEqual(after[5], 4.971719, places=5)
-        self.assertAlmostEqual(after[6], 7.518687, places=5)
-        self.assertAlmostEqual(after[7], 5.007327, places=5)
-        self.assertAlmostEqual(after[8], 5.012831, places=5)
+        self.assertNotEqual(before[3], after[3])
+        self.assertNotEqual(before[4], after[4])
+        self.assertNotEqual(before[5], after[5])
+        self.assertNotEqual(before[6], after[6])
+        self.assertNotEqual(before[7], after[7])
+        self.assertNotEqual(before[8], after[8])
 
     def test_AdResS(self):
         # set up AdResS domain decomposition
@@ -121,12 +121,12 @@ class TestLangevinThermostat(unittest.TestCase):
         self.assertEqual(before[0], after[0])
         self.assertEqual(before[1], after[1])
         self.assertEqual(before[2], after[2])
-        self.assertAlmostEqual(after[3], 6.488205, places=5)
-        self.assertAlmostEqual(after[4], 4.965654, places=5)
-        self.assertAlmostEqual(after[5], 4.971719, places=5)
-        self.assertAlmostEqual(after[6], 7.518687, places=5)
-        self.assertAlmostEqual(after[7], 5.007327, places=5)
-        self.assertAlmostEqual(after[8], 5.012831, places=5)
+        self.assertNotEqual(before[3], after[3])
+        self.assertNotEqual(before[4], after[4])
+        self.assertNotEqual(before[5], after[5])
+        self.assertNotEqual(before[6], after[6])
+        self.assertNotEqual(before[7], after[7])
+        self.assertNotEqual(before[8], after[8])
 
 
 if __name__ == '__main__':
