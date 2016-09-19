@@ -27,6 +27,7 @@
 #include "FixedPairListInteractionTemplate.hpp"
 #include "FixedPairListTypesInteractionTemplate.hpp"
 #include "Potential.hpp"
+#include <set>
 
 namespace espressopp {
   namespace interaction {
@@ -40,7 +41,7 @@ namespace espressopp {
       real ff1A, ff2A;
       real ff1B, ff2B;
       bool annihilate; //if true, atoms in pidsTI are annihilated, otherwise they are decoupled
-      std::vector<longint> pidsTI; //PIDs of particles whose LJ interaction is zero in TI state B
+      std::set<longint> pidsTI; //PIDs of particles whose LJ interaction is zero in TI state B
       real lambdaTI;
       real complLambdaTI; //1-lambdaTI
       real alphaSC;
@@ -111,20 +112,20 @@ namespace espressopp {
       real getPowerSC() const { return powerSC; }
 
       void addPid(longint pid) {
-        pidsTI.push_back(pid);
+        pidsTI.insert(pid);
       }
 
       bool checkTIpair(size_t pid1, size_t pid2) const {
         if (annihilate) {
             //if at least one of pid1 and pid2 in pidsTI (OR)
-            if ((std::find(pidsTI.begin(), pidsTI.end(), pid1) != pidsTI.end()) or (std::find(pidsTI.begin(), pidsTI.end(), pid2) != pidsTI.end())) {
+            if ((pidsTI.find(pid1) != pidsTI.end()) or (pidsTI.find(pid2) != pidsTI.end())) {
               return true;
             } else {
               return false;
             }
         } else { //decouple
             //if pid1 or pid2 in pidsTI, but not both (XOR)
-            if ((std::find(pidsTI.begin(), pidsTI.end(), pid1) != pidsTI.end()) != (std::find(pidsTI.begin(), pidsTI.end(), pid2) != pidsTI.end())) {
+            if ((pidsTI.find(pid1) != pidsTI.end()) != (pidsTI.find(pid2) != pidsTI.end())) {
               return true;
             } else {
               return false;

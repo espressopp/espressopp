@@ -26,6 +26,7 @@
 
 #include "Potential.hpp"
 #include <algorithm>
+#include <set>
 
 using namespace std;
 
@@ -50,7 +51,7 @@ namespace espressopp {
                  to the shift, which we cannot use because it depends on qq*/
                 real lambdaTI; //not to be confused with the lambda used in AdResS simulations
                 real complLambdaTI; //1-lambdaTI
-                std::vector<longint> pidsTI; //PIDs of particles whose charge is zero in TI state B
+                std::set<longint> pidsTI; //PIDs of particles whose charge is zero in TI state B
 
                 void initialize() {
                     real krc = kappa*rc;
@@ -119,20 +120,20 @@ namespace espressopp {
                 real getPrefactor() const { return prefactor; }
 
                 void addPid(longint pid) {
-                  pidsTI.push_back(pid);
+                  pidsTI.insert(pid);
                 }
 
                 bool checkTIpair(size_t pid1, size_t pid2) const {
                   if (annihilate) {
                       //if at least one of pid1 and pid2 in pidsTI (OR)
-                      if ((std::find(pidsTI.begin(), pidsTI.end(), pid1) != pidsTI.end()) or (std::find(pidsTI.begin(), pidsTI.end(), pid2) != pidsTI.end())) {
+                      if ((pidsTI.find(pid1) != pidsTI.end()) or (pidsTI.find(pid2) != pidsTI.end())) {
                         return true;
                       } else {
                         return false;
                       }
                   } else { //decouple
                       //if pid1 or pid2 in pidsTI, but not both (XOR)
-                      if ((std::find(pidsTI.begin(), pidsTI.end(), pid1) != pidsTI.end()) != (std::find(pidsTI.begin(), pidsTI.end(), pid2) != pidsTI.end())) {
+                      if ((pidsTI.find(pid1) != pidsTI.end()) != (pidsTI.find(pid2) != pidsTI.end())) {
                         return true;
                       } else {
                         return false;
