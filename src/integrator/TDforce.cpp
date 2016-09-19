@@ -118,7 +118,7 @@ namespace espressopp {
 
                     if (sphereAdr){
 
-                      if(verletList->getAdrList().size() != 1){
+                      if(verletList->getAdrList().size() > 1){
 
                         if ((startdist == 0.0) && (enddist == 0.0)){
                           std::cout << "In TDforce: Trying to apply TD force with moving, particle-based spherical AdResS region. However, both startdist and enddist set to 0. This does not make sense.\n";

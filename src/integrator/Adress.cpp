@@ -443,9 +443,9 @@ namespace espressopp {
                    // Update the copy and append to adrPositions
                    adrpos = it->position();
 		        ptr = &adrpos;
-		        procAdrPositions.push_back(ptr);
+		        // procAdrPositions.push_back(ptr); FIX THIS!
 
-		        //procAdrPositions.push_back(&(it->position())); // without the additional copy
+		        procAdrPositions.push_back(&(it->position())); // without the additional copy FIX THIS!
                 }
 
             }
