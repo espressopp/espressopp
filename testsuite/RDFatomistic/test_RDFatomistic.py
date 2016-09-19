@@ -50,6 +50,8 @@ class TestThermoIntegration(unittest.TestCase):
         # calculate rdfs
         rdf_span = espressopp.analysis.RDFatomistic(system = self.system, type1 = 0, type2 = 0, spanbased = True, span = 1.0)
         rdf_span_array = rdf_span.compute(10)
+
+        # run checks
         self.assertAlmostEqual(rdf_span_array[1], 0.0, places=5)
         self.assertAlmostEqual(rdf_span_array[2], 33.506304, places=5)
 
@@ -57,6 +59,8 @@ class TestThermoIntegration(unittest.TestCase):
         # calculate rdfs
         rdf_nospan = espressopp.analysis.RDFatomistic(system = self.system, type1 = 0, type2 = 0, spanbased = False)
         rdf_nospan_array = rdf_nospan.compute(10)
+
+        # run checks
         self.assertAlmostEqual(rdf_nospan_array[1], 136.418523, places=5)
         self.assertAlmostEqual(rdf_nospan_array[2], 16.753152, places=5)
 

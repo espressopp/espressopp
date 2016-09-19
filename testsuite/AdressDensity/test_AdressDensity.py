@@ -18,6 +18,7 @@ class TestThermoIntegration(unittest.TestCase):
         system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
         self.system = system
 
+    def test_densitycalculation(self):
         # add some particles
         particle_list = [
             (1, 1, 0, espressopp.Real3D(5.5, 5.0, 5.0), 1.0, 0),
@@ -48,11 +49,12 @@ class TestThermoIntegration(unittest.TestCase):
         integrator.addExtension(adress)
         espressopp.tools.AdressDecomp(self.system, integrator)
 
-    def test_densitycalculation(self):
         # calculate density profile
         densityprofile = espressopp.analysis.AdressDensity(self.system, vl)
         densityprofile.addExclusions([8])
         density_array = densityprofile.compute(5)
+
+        # run checks
         self.assertAlmostEqual(density_array[0], 31.250000, places=5)
         self.assertAlmostEqual(density_array[1], 4.464286, places=5)
         self.assertAlmostEqual(density_array[2], 0.0, places=5)
