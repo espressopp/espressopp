@@ -1,0 +1,2 @@
+add_test(HAdResS ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_HAdResS.py)
+set_tests_properties(HAdResS PROPERTIES ENVIRONMENT "${TEST_ENV}")
