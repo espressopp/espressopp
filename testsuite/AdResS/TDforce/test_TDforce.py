@@ -230,6 +230,59 @@ class TestTDforce(unittest.TestCase):
         self.assertAlmostEqual(before[3], after[3], places=5)
         self.assertAlmostEqual(before[4], after[4], places=5)
 
+    def test_many_moving_spheres_fewupdates(self):
+        # add some particles
+        particle_list = [
+            (1, 1, 0, espressopp.Real3D(4.0, 5.0, 5.0), espressopp.Real3D(-1.0, 1.0, 0.0), 1.0, 0),
+            (2, 1, 0, espressopp.Real3D(6.0, 5.0, 5.0), espressopp.Real3D(1.0, 1.0, 0.0), 1.0, 0),
+            (3, 1, 0, espressopp.Real3D(5.0, 6.2, 5.0), espressopp.Real3D(0.0, 0.0, 0.0), 1.0, 0),
+            (4, 1, 0, espressopp.Real3D(3.0, 8.5, 5.0), espressopp.Real3D(0.0, 0.0, 0.0), 1.0, 0),
+            (5, 1, 0, espressopp.Real3D(7.0, 9.5, 5.0), espressopp.Real3D(0.0, 0.0, 0.0), 1.0, 0),
+            (6, 0, 0, espressopp.Real3D(4.0, 5.0, 5.0), espressopp.Real3D(-1.0, 1.0, 0.0), 1.0, 1),
+            (7, 0, 0, espressopp.Real3D(6.0, 5.0, 5.0), espressopp.Real3D(1.0, 1.0, 0.0), 1.0, 1),
+            (8, 0, 0, espressopp.Real3D(5.0, 6.2, 5.0), espressopp.Real3D(0.0, 0.0, 0.0), 1.0, 1),
+            (9, 0, 0, espressopp.Real3D(3.0, 8.5, 5.0), espressopp.Real3D(0.0, 0.0, 0.0), 1.0, 1),
+            (10, 0, 0, espressopp.Real3D(7.0, 9.5, 5.0), espressopp.Real3D(0.0, 0.0, 0.0), 1.0, 1),
+        ]
+        tuples = [(1,6),(2,7),(3,8),(4,9),(5,10)]
+        self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'v', 'mass','adrat')
+        ftpl = espressopp.FixedTupleListAdress(self.system.storage)
+        ftpl.addTuples(tuples)
+        self.system.storage.setFixedTuplesAdress(ftpl)
+        self.system.storage.decompose()
+
+        # generate a verlet list
+        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
+                                dEx=1.0, dHy=1.0, pids=[1,2], sphereAdr=True)
+
+        # initialize lambda values
+        integrator = espressopp.integrator.VelocityVerlet(self.system)
+        integrator.dt = 0.01
+        adress = espressopp.integrator.Adress(self.system,vl,ftpl,regionupdates = 5)
+        integrator.addExtension(adress)
+        espressopp.tools.AdressDecomp(self.system, integrator)
+
+        # set up TD force
+        thdforce = espressopp.integrator.TDforce(self.system, vl, startdist = 0.9, enddist = 2.1, edgeweightmultiplier = 20)
+        thdforce.addForce(itype=3,filename="table_tf.tab",type=1)
+        integrator.addExtension(thdforce)
+
+        # y coordinates of particles before integration
+        before = [self.system.storage.getParticle(i).pos[1] for i in range(1,6)]
+
+        # run ten steps
+        integrator.run(20)
+
+        # y coordinates of particles after integration
+        after = [self.system.storage.getParticle(i).pos[1] for i in range(1,6)]
+
+        # run checks
+        self.assertAlmostEqual(after[0], 5.200000, places=5)
+        self.assertAlmostEqual(after[1], 5.200000, places=5)
+        self.assertAlmostEqual(after[2], 6.393199, places=5)
+        self.assertAlmostEqual(before[3], after[3], places=5)
+        self.assertAlmostEqual(before[4], after[4], places=5)
+
 
 if __name__ == '__main__':
     unittest.main()
