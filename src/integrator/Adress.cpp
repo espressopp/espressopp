@@ -396,13 +396,22 @@ namespace espressopp {
        //if adrCenter is not set, the center of adress zone moves along with some particles
        //the coordinates of the center(s) (adrPositions) must be communicated to all nodes
 
-      // When upating only every other step, it's important to use and communicate not the pointer to the actual region defining particle's position, but to a copy of it. Otherwise, while the other CPUs would create new copies that don't move in between the communication, the pointer on the original CPU would still point to the original particle, which keeps moving. Hence, we create a new position and pointer here. It has to keep existing outside of this function, hence static.
-      static Real3D adrpos(0.0,0.0,0.0);
-      static Real3D *ptr;
+      //As this is a bit complicated: When upating only every other step, it's important to use and communicate not the pointer to the actual region defining particle's position, but to a copy of it. Otherwise, while the other CPUs would create new copies that don't move in between the communication, the pointer on the original CPU would still point to the original particle, which keeps moving. Hence, we create a totally new position vector to hold copies of the positions. It has to keep existing outside of this function, hence static. Furthermore, we want to reserve the memory once at the beginning, as soon as we know the what to reserve. Hence, the firstcall construct. The reservation is necessary, as the vector elements are not supposed to move in memory during push_back.
 
       if (!(verletList->getAdrCenterSet())) {
 
+        static bool firstcall = true;
+        static std::vector<Real3D> adrposlist;
+
+        if((firstcall) && (verletList->getAdrList().size() > 0)){
+          adrposlist.reserve(verletList->getAdrList().size());
+          firstcall = false;
+        }
+
         if(updatecount == 0){
+
+          // Clear the vector of copies
+          adrposlist.clear();
 
           if(verletList->getAdrList().size() == 1){
 
@@ -414,12 +423,11 @@ namespace espressopp {
                 for (CellListIterator it(realcells); it.isValid(); ++it) {
                     if (verletList->getAdrList().count(it->id()) == 1) {
 
-                        // Update the copy and append to adrPositions
-                        adrpos = it->position();
-                        ptr = &adrpos;
-                        verletList->adrPositions.push_back(ptr);
+                        // Update the copy and append address to adrPositions
+                        adrposlist.push_back(it->position());
+                        verletList->adrPositions.push_back(&(adrposlist.back()));
 
-                        //verletList->adrPositions.push_back(&(it->position())); // without the additional copy
+                        //verletList->adrPositions.push_back(&(it->position())); // without the additional copy, old version
                         lroot = getSystem()->comm->rank();
                     }
             }
@@ -440,12 +448,11 @@ namespace espressopp {
 
                 if (verletList->getAdrList().count(it->id()) == 1) {
 
-                   // Update the copy and append to adrPositions
-                   adrpos = it->position();
-		        ptr = &adrpos;
-		        // procAdrPositions.push_back(ptr); FIX THIS!
+                   // Update the copy and append address to adrPositions
+                   adrposlist.push_back(it->position());
+                   procAdrPositions.push_back(&(adrposlist.back()));
 
-		        procAdrPositions.push_back(&(it->position())); // without the additional copy FIX THIS!
+		        //procAdrPositions.push_back(&(it->position())); // without the additional copy, old version
                 }
 
             }
