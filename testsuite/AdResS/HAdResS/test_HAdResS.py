@@ -159,6 +159,9 @@ class TestHAdResS(unittest.TestCase):
         self.assertAlmostEqual(energy_before,0.921374, places=5)
         self.assertAlmostEqual(energy_after, -0.468436, places=5)
 
+        # Temporary test, supposed to fail!
+        self.assertAlmostEqual(energy_after, 0.0, places=5)
+
 
 if __name__ == '__main__':
     unittest.main()
