@@ -233,6 +233,7 @@ PyObject* DumpH5MD::getPosition() {
   Py_INCREF(Py_None);
   return Py_None;
 }
+
 PyObject* DumpH5MD::getImage() {
   if (store_position && position.len)
     return PyMemoryView_FromBuffer(&image);
