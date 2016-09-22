@@ -5,13 +5,11 @@ import sys
 import time
 import espressopp
 import mpi4py.MPI as MPI
-
 import unittest
 
 
 class TestThermoIntegration(unittest.TestCase):
     def setUp(self):
-
         system = espressopp.System()
         box = (10, 10, 10)
         system.bc = espressopp.bc.OrthorhombicBC(system.rng, box)
@@ -61,10 +59,6 @@ class TestThermoIntegration(unittest.TestCase):
         integrator.addExtension(adress)
         espressopp.tools.AdressDecomp(self.system, integrator)
 
-        #print 'deriv',interactionQQ.computeEnergyDeriv()
-        #print interactionLJ.computeEnergyDeriv()
-        #print 'energy',interactionQQ.computeEnergy()
-        #print interactionLJ.computeEnergy()
         self.assertAlmostEqual(interactionQQ.computeEnergyDeriv(),-1.627412,places=5)
         self.assertAlmostEqual(interactionLJ.computeEnergyDeriv(),0.330739,places=5)
         self.assertAlmostEqual(interactionQQ.computeEnergy(),-1.213441,places=5)
