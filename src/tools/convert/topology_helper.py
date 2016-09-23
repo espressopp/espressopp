@@ -26,6 +26,7 @@
 import espressopp
 import math
 import gromacs
+import os
 
 class FileBuffer():
     def __init__(self):
@@ -56,12 +57,17 @@ class FileBuffer():
 def FillFileBuffer(fname, filebuffer):
     f=open(fname, 'r')
     for line in f:
-	if "include" in line and not line[0]==';':
-	    name=(line.split()[1]).strip('\"')
-	    FillFileBuffer(name, filebuffer)
-	else:
+        if "include" in line and not line[0]==';':
+            name=(line.split()[1]).strip('\"')
+            try: 
+                FillFileBuffer(name, filebuffer)
+            except IOError:
+                #need to use relative path
+                name = os.path.join(os.path.dirname(fname), name)
+                FillFileBuffer(name, filebuffer)
+        else:
             l=line.rstrip('\n')
-	    if l:
+            if l:
                 filebuffer.appendline(l)
             
     f.close

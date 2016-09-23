@@ -90,7 +90,7 @@ from operator import itemgetter # for sorting a dict
    Include modified spce file in topol.top, e.g. replace
    #include "amber03.ff/spce.itp"
    by
-   #include "amber03.ff/spce-for-espressopppp.itp"
+   #include "amber03.ff/spce-for-espressopp.itp"
    
    ----------------------------------------------------------------- 
    Tip 4. 
@@ -325,7 +325,14 @@ def read(gro_file, top_file="", doRegularExcl=True):
 
             if 'dihedraltypes' in line:
                 #is it really the dihedral (function type = 9) or is it actually the impropers (also labelled 'dihedraltypes' in gromacs but with function type = 4)
-                nextline = f.lines[lineindex + 2] #assumes one comment line between [ dihedraltypes ] and first parameters entry
+
+                #loop over any number of comment lines
+                ii = 1
+                nextline = f.lines[lineindex + ii]
+                while nextline[:1] == ';':
+                    ii += 1
+                    nextline = f.lines[lineindex + ii]
+
                 nextline = nextline.split()
                 if ((nextline[4]=='4') or (nextline[4]=='2')): 
                     readimptypes = True
@@ -1065,6 +1072,55 @@ def setLennardJonesInteractions(system, defaults, atomtypeparams, verletlist, cu
     system.addInteraction(interaction)
     return interaction
 
+def setLennardJonesInteractionsTI(system, defaults, atomtypeparams, verletlist, cutoff, epsilonB, sigmaSC, alphaSC, powerSC, lambdaTI, pidlist, annihilate=True, hadress=False, adress=False, ftpl=None):
+    """ Set lennard jones interactions which were read from gromacs based on the atomypes"""
+    if (hadress and adress):
+      print "Error! In gromacs.setLennardJonesInteractionsTI, you cannot use adress and hadress at the same time"
+      return
+    if (hadress):
+        #interaction=espressopp.interaction.VerletListHadressLennardJonesSoftcoreTI(verletlist, ftpl)
+        print "Error! TI not implemented in VerletListHadressInteractionTemplate yet"
+        return
+    elif (adress):
+        interaction=espressopp.interaction.VerletListAdressLennardJonesSoftcoreTI(verletlist, ftpl)
+    else:
+        print "Error! TI not implemented in VerletListInteractionTemplate yet"
+        return
+        #interaction = espressopp.interaction.VerletListLennardJonesSoftcoreTI(verletlist)
+    
+    print "# Setting up Lennard-Jones interactions"
+    if defaults:
+        if int(defaults['combinationrule'])==1:
+            for atnr, at in atomtypeparams.iteritems():
+                c6=float(at['sig'])
+                c12=float(at['eps'])
+                if c6==0: continue
+                sig = pow(c12/c6,1.0/(6.0))
+                eps = 0.25*c6*pow(sig,-6.0)
+                at['sig']=sig
+                at['eps']=eps
+                print "WARNING: Converted atomtype number ", atnr, "to sigma, epsilon parameters", " sig= ", sig, " eps=", eps
+    
+    for i in atomtypeparams.keys():
+         for j in atomtypeparams.keys():
+            pi=atomtypeparams[i]
+            pj=atomtypeparams[j]
+            if pi!=pj:
+                sig=0.5*(float(pi['sig'])+float(pj['sig']))
+                eps=math.sqrt(float(pi['eps'])*float(pj['eps']))
+            else:
+                sig=float(pi['sig'])
+                eps=float(pi['eps'])
+            if (sig>0 and eps >0):
+                ljpot = espressopp.interaction.LennardJonesSoftcoreTI(epsilonA=eps, sigmaA=sig, epsilonB=epsilonB, sigmaB=sigmaSC, alpha=alphaSC, power=powerSC, cutoff=cutoff, lambdaTI=lambdaTI, annihilate=annihilate)
+                ljpot.addPids(pidlist)
+                if hadress or adress:
+		    interaction.setPotentialAT(type1=i, type2=j, potential=ljpot)
+		else:
+		    interaction.setPotential(type1=i, type2=j, potential=ljpot)
+    system.addInteraction(interaction)
+    return interaction
+
 def setLennardJones14Interactions(system, defaults, atomtypeparams, onefourlist, cutoff):
     """ Set lennard jones interactions which were read from gromacs based on the atomypes"""
     interaction = espressopp.interaction.FixedPairListTypesLennardJones(system,onefourlist)
@@ -1126,6 +1182,41 @@ def setCoulombInteractions(system, verletlist, rc, types, epsilon1, epsilon2,kap
     else: 
 	interaction=espressopp.interaction.VerletListReactionFieldGeneralized(verletlist)
    # interaction=espressopp.interaction.VerletListCoulombTruncated(verletlist)
+            
+    for i in range(max(types)+1):
+        for k in range(i, max(types)+1):
+	    if (hadress or adress):
+		interaction.setPotentialAT(type1=i, type2=k, potential=pot)
+	    else:
+		interaction.setPotential(type1=i, type2=k, potential=pot)
+
+    system.addInteraction(interaction)
+    return interaction
+
+def setCoulombInteractionsTI(system, verletlist, rc, types, epsilon1, epsilon2,kappa, lambdaTI, pidlist, annihilate=True, hadress=False, adress=False, ftpl=None):
+ 
+    print "# Setting up Coulomb reaction field interactions for TI simulation with lambda = ",lambdaTI
+
+    pref=138.935485 # we want gromacs units, so this is 1/(4 pi eps_0) ins units of kJ mol^-1 e^-2
+    
+    pot = espressopp.interaction.ReactionFieldGeneralizedTI(prefactor=pref, kappa=kappa, epsilon1=epsilon1, epsilon2=epsilon2, cutoff=rc, lambdaTI=lambdaTI, annihilate=annihilate)
+
+    #add list of pids of particles whose charge is 0 in TI state B
+    pot.addPids(pidlist)
+
+    if (hadress and adress):
+        print "Error! In gromacs.setCoulombInteractionsTI, you cannot use adress and hadress at the same time"
+        return
+    if (hadress):
+        print "Error! TI not implemented in VerletListHadressInteractionTemplate yet"
+        return
+        #interaction=espressopp.interaction.VerletListHadressReactionFieldGeneralized(verletlist, ftpl)
+    elif (adress):
+        interaction=espressopp.interaction.VerletListAdressReactionFieldGeneralizedTI(verletlist, ftpl)
+    else: 
+        print "Error! TI not implemented in VerletListInteractionTemplate yet"
+        return
+	#interaction=espressopp.interaction.VerletListReactionFieldGeneralized(verletlist)
             
     for i in range(max(types)+1):
         for k in range(i, max(types)+1):
