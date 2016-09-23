@@ -19,70 +19,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-********************************
+"""
+******************************
 **espressopp.ParallelTempering**
-********************************
+******************************
 
-
-.. function:: espressopp.ParallelTempering(NumberOfSystems, RNG)
-
-		:param NumberOfSystems: (default: 4)
-		:param RNG: (default: None)
-		:type NumberOfSystems: int
-		:type RNG: 
-
-.. function:: espressopp.ParallelTempering.endDefiningSystem(n)
-
-		:param n: 
-		:type n: 
-		:rtype: 
-
-.. function:: espressopp.ParallelTempering.exchange()
-
-		:rtype: 
-
-.. function:: espressopp.ParallelTempering.getNumberOfCPUsPerSystem()
-
-		:rtype: 
-
-.. function:: espressopp.ParallelTempering.getNumberOfSystems()
-
-		:rtype: 
-
-.. function:: espressopp.ParallelTempering.run(nsteps)
-
-		:param nsteps: 
-		:type nsteps: 
-		:rtype: 
-
-.. function:: espressopp.ParallelTempering.setAnalysisE(analysisE)
-
-		:param analysisE: 
-		:type analysisE: 
-
-.. function:: espressopp.ParallelTempering.setAnalysisNPart(analysisNPart)
-
-		:param analysisNPart: 
-		:type analysisNPart: 
-
-.. function:: espressopp.ParallelTempering.setAnalysisT(analysisT)
-
-		:param analysisT: 
-		:type analysisT: 
-
-.. function:: espressopp.ParallelTempering.setIntegrator(integrator, thermostat)
-
-		:param integrator: 
-		:param thermostat: 
-		:type integrator: 
-		:type thermostat: 
-
-.. function:: espressopp.ParallelTempering.startDefiningSystem(n)
-
-		:param n: 
-		:type n: 
-		:rtype: 
 """
 from espressopp import MultiSystem
 from espressopp import pmi
@@ -97,7 +38,7 @@ class ParallelTempering(object):
         print "+ Class is not available in the current version. This Class will be back soon.  +"
         print "+ Multisystem simulations are still possible but have to be setup manually.     +"
         print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        return 0 
+        #return 0 
         if (RNG == None):
             print "ERROR: ParallelTempering needs a random number generator"
         else: 
@@ -116,19 +57,19 @@ class ParallelTempering(object):
               if (self._ncpuspersystem * self._nsystems != self._ncpustotal):
                   print "ERROR: Number of Parallel Tempering systems times CPUs per system does not match total number of CPUs"
               else:
-                  for i in xrange(self._nsystems):
+                  for i in range(self._nsystems):
                       self._cpugroup.append( range(i * self._ncpuspersystem, (i+1) * self._ncpuspersystem) )
                       self._comm.append(pmi.Communicator(self._cpugroup[i]))
             
     def startDefiningSystem(self,n):
-        if not (n in xrange(0,self._nsystems)):
+        if not (n in range(0,self._nsystems)):
             print "ERROR: System number must be between 0 and ",self._nsystems
         else:
             pmi.activate(self._comm[n])
             self._multisystem.beginSystemDefinition()
 
     def endDefiningSystem(self,n):
-        if not (n in xrange(0,self._nsystems)):
+        if not (n in range(0,self._nsystems)):
             print "ERROR: System number must be between 0 and ",self._nsystems
         else:
             pmi.deactivate(self._comm[n])
@@ -151,7 +92,13 @@ class ParallelTempering(object):
         
     def setAnalysisNPart(self,analysisNPart):
         self._multisystem.setAnalysisNPart(analysisNPart)
-        
+
+    def setDumpConfXYZ(self, dumpconf):
+        self._multisystem.setDumpConfXYZ(dumpconf)
+
+    def runDumpConfXYZ(self):
+        self._multisystem.runDumpConfXYZ()
+
     def run(self, nsteps):
         self._multisystem.runIntegrator(nsteps)
 
@@ -165,7 +112,7 @@ class ParallelTempering(object):
         nparts       = self._multisystem.runAnalysisNPart()
         print "energies     = ", energies
         print "temperatures = ", temperatures
-        for i in xrange(len(energies)/2):
+        for i in range(len(energies)/2):
             m = 2 * i + self._oddeven
             n = m + 1
             if n<len(energies):
