@@ -24,7 +24,7 @@ class TestLangevinThermostat(unittest.TestCase):
         cellGrid = espressopp.tools.decomp.cellGrid((10, 10, 10), nodeGrid, 1.5, 0.3)
         self.system.storage = espressopp.storage.DomainDecomposition(self.system, nodeGrid, cellGrid)
 
-        # add some particles
+        # add some particles (normal, coarse-grained particles only)
         particle_list = [
             (1, 1, 0, espressopp.Real3D(5.5, 5.0, 5.0), 1.0, 0),
             (2, 1, 0, espressopp.Real3D(6.5, 5.0, 5.0), 1.0, 0),
@@ -57,7 +57,7 @@ class TestLangevinThermostat(unittest.TestCase):
         # coordinates of particles after integration
         after = [self.system.storage.getParticle(i).pos[j] for i in range(1,4) for j in range(3)]
 
-        # run checks
+        # run checks (first particle excluded, hence it should not move. The other should have moved, however, as they feel the thermostat)
         self.assertEqual(before[0], after[0])
         self.assertEqual(before[1], after[1])
         self.assertEqual(before[2], after[2])
@@ -74,7 +74,7 @@ class TestLangevinThermostat(unittest.TestCase):
         cellGrid = espressopp.tools.decomp.cellGrid((10, 10, 10), nodeGrid, 1.5, 0.3)
         self.system.storage = espressopp.storage.DomainDecompositionAdress(self.system, nodeGrid, cellGrid)
 
-        # add some particles
+        # add some particles (atomistic and coarse-grained particles now)
         particle_list = [
             (1, 1, 0, espressopp.Real3D(5.5, 5.0, 5.0), 1.0, 0),
             (2, 1, 0, espressopp.Real3D(6.5, 5.0, 5.0), 1.0, 0),
@@ -117,7 +117,7 @@ class TestLangevinThermostat(unittest.TestCase):
         # coordinates of particles after integration
         after = [self.system.storage.getParticle(i).pos[j] for i in range(1,4) for j in range(3)]
 
-        # run checks
+        # run checks (same as test before)
         self.assertEqual(before[0], after[0])
         self.assertEqual(before[1], after[1])
         self.assertEqual(before[2], after[2])

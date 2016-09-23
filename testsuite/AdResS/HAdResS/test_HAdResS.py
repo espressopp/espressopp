@@ -69,7 +69,7 @@ class TestHAdResS(unittest.TestCase):
         after = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
         energy_after = interNB.computeEnergy()
 
-        # run checks
+        # run checks (only particles in atomistic, hybrid and first part of coarse-grained region should move, i.e. the first 4 particles - as the WCA's epsilon is 0.0 in the coarse-grained region. Furthermore they should move along the x-axis only given their setup. Additionally, check energies)
         self.assertAlmostEqual(after[0], 5.413650, places=5)
         self.assertEqual(before[1], after[1])
         self.assertEqual(before[2], after[2])
@@ -140,7 +140,7 @@ class TestHAdResS(unittest.TestCase):
         after = [self.system.storage.getParticle(i).pos[j] for i in range(1,6) for j in range(3)]
         energy_after = interNB.computeEnergy()
 
-        # run checks
+        # run checks (as before, just that particles should now move along the y-axis only, given their setup and the spherical adaptive resolution geometry)
         self.assertEqual(before[0], after[0])
         self.assertAlmostEqual(after[1], 5.413650, places=5)
         self.assertEqual(before[2], after[2])

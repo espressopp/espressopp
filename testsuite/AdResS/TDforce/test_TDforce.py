@@ -64,12 +64,12 @@ class TestTDforce(unittest.TestCase):
         # x coordinates of particles after integration
         after = [self.system.storage.getParticle(i).pos[0] for i in range(1,6)]
 
-        # run checks
-        self.assertAlmostEqual(before[0], after[0], places=5)
+        # run checks (only one particle is in hybrid region, should feel the thermodynamic force, and should hence move along the x direction)
+        self.assertEqual(before[0], after[0])
         self.assertAlmostEqual(after[1], 6.596913, places=5)
-        self.assertAlmostEqual(before[2], after[2], places=5)
-        self.assertAlmostEqual(before[3], after[3], places=5)
-        self.assertAlmostEqual(before[4], after[4], places=5)
+        self.assertEqual(before[2], after[2])
+        self.assertEqual(before[3], after[3])
+        self.assertEqual(before[4], after[4])
 
     def test_fixed_sphere(self):
         # add some particles
@@ -117,12 +117,12 @@ class TestTDforce(unittest.TestCase):
         # y coordinates of particles after integration
         after = [self.system.storage.getParticle(i).pos[1] for i in range(1,6)]
 
-        # run checks
-        self.assertAlmostEqual(before[0], after[0], places=5)
+        # run checks (as test before, just that particles should move in y-direction given the new setup and the spherical adaptive resolution geometry)
+        self.assertEqual(before[0], after[0])
         self.assertAlmostEqual(after[1], 6.596913, places=5)
-        self.assertAlmostEqual(before[2], after[2], places=5)
-        self.assertAlmostEqual(before[3], after[3], places=5)
-        self.assertAlmostEqual(before[4], after[4], places=5)
+        self.assertEqual(before[2], after[2])
+        self.assertEqual(before[3], after[3])
+        self.assertEqual(before[4], after[4])
 
     def test_single_moving_sphere(self):
         # add some particles
@@ -170,12 +170,12 @@ class TestTDforce(unittest.TestCase):
         # y coordinates of particles after integration
         after = [self.system.storage.getParticle(i).pos[1] for i in range(1,6)]
 
-        # run checks
+        # run checks (first particle moves and defines the AdResS region, second particle is in the corresponding hybrid region, others are in coarse-grained region)
         self.assertAlmostEqual(after[0], 5.100000, places=5)
         self.assertAlmostEqual(after[1], 6.618377, places=5)
-        self.assertAlmostEqual(before[2], after[2], places=5)
-        self.assertAlmostEqual(before[3], after[3], places=5)
-        self.assertAlmostEqual(before[4], after[4], places=5)
+        self.assertEqual(before[2], after[2])
+        self.assertEqual(before[3], after[3])
+        self.assertEqual(before[4], after[4])
 
     def test_many_moving_spheres(self):
         # add some particles
@@ -223,12 +223,12 @@ class TestTDforce(unittest.TestCase):
         # y coordinates of particles after integration
         after = [self.system.storage.getParticle(i).pos[1] for i in range(1,6)]
 
-        # run checks
+        # run checks (first two particles move and together define the AdResS region, third particle is in the corresponding hybrid region, others are in coarse-grained region)
         self.assertAlmostEqual(after[0], 5.100000, places=5)
         self.assertAlmostEqual(after[1], 5.100000, places=5)
         self.assertAlmostEqual(after[2], 6.260323, places=5)
-        self.assertAlmostEqual(before[3], after[3], places=5)
-        self.assertAlmostEqual(before[4], after[4], places=5)
+        self.assertEqual(before[3], after[3])
+        self.assertEqual(before[4], after[4])
 
     def test_many_moving_spheres_fewupdates(self):
         # add some particles
@@ -273,15 +273,15 @@ class TestTDforce(unittest.TestCase):
         # run ten steps
         integrator.run(20)
 
-        # y coordinates of particles after integration
+        # y coordinates of particles after integration (as test before, but more integration steps and the AdResS region is updated only every 5 steps)
         after = [self.system.storage.getParticle(i).pos[1] for i in range(1,6)]
 
         # run checks
         self.assertAlmostEqual(after[0], 5.200000, places=5)
         self.assertAlmostEqual(after[1], 5.200000, places=5)
         self.assertAlmostEqual(after[2], 6.393199, places=5)
-        self.assertAlmostEqual(before[3], after[3], places=5)
-        self.assertAlmostEqual(before[4], after[4], places=5)
+        self.assertEqual(before[3], after[3])
+        self.assertEqual(before[4], after[4])
 
 
 if __name__ == '__main__':

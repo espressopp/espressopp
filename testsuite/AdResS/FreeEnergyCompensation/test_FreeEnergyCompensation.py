@@ -65,12 +65,12 @@ class TestFreeEnergyCompensation(unittest.TestCase):
         # x coordinates of particles after integration
         after = [self.system.storage.getParticle(i).pos[0] for i in range(1,6)]
 
-        # run checks
-        self.assertAlmostEqual(before[0], after[0], places=5)
-        self.assertAlmostEqual(before[1], after[1], places=5)
+        # run checks (only one particle is in hybrid region and should feel the FEC. Also check that its FEC energy is correct)
+        self.assertEqual(before[0], after[0])
+        self.assertEqual(before[1], after[1])
         self.assertAlmostEqual(after[2], 7.598165, places=5)
-        self.assertAlmostEqual(before[3], after[3], places=5)
-        self.assertAlmostEqual(before[4], after[4], places=5)
+        self.assertEqual(before[3], after[3])
+        self.assertEqual(before[4], after[4])
         self.assertAlmostEqual(energy, 6.790157, places=5)
 
     def test_sphere(self):
@@ -120,12 +120,12 @@ class TestFreeEnergyCompensation(unittest.TestCase):
         # y coordinates of particles after integration
         after = [self.system.storage.getParticle(i).pos[1] for i in range(1,6)]
 
-        # run checks
-        self.assertAlmostEqual(before[0], after[0], places=5)
-        self.assertAlmostEqual(before[1], after[1], places=5)
+        # run checks (as for test with slab-geometry, but check y-coordinates this time. Given the now spherical setup, particles should move as before but along the y-axis).
+        self.assertEqual(before[0], after[0])
+        self.assertEqual(before[1], after[1])
         self.assertAlmostEqual(after[2], 7.598165, places=5)
-        self.assertAlmostEqual(before[3], after[3], places=5)
-        self.assertAlmostEqual(before[4], after[4], places=5)
+        self.assertEqual(before[3], after[3])
+        self.assertEqual(before[4], after[4])
         self.assertAlmostEqual(energy, 6.790157, places=5)
 
 
