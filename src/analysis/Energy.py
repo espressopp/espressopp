@@ -68,7 +68,7 @@ class EnergyPot():
         
     def compute(self):
         EPot = 0.0
-        for k in range(self.system.getNumberOfInteractions()):
+        for k in xrange(self.system.getNumberOfInteractions()):
           EPot += self.system.getInteraction(k).computeEnergy()
         if self.per_atom:
           NPart  = espressopp.analysis.NPart(self.system).compute()
@@ -102,7 +102,7 @@ class EnergyTot():
       T      = espressopp.analysis.Temperature(self.system).compute()
       EKin   = (3.0/2.0) * NPart * T
       EPot   = 0.0
-      for k in range(self.system.getNumberOfInteractions()):
+      for k in xrange(self.system.getNumberOfInteractions()):
         EPot += self.system.getInteraction(k).computeEnergy()
       if self.per_atom:
         return (EPot + EKin) / NPart

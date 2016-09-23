@@ -116,19 +116,19 @@ class ParallelTempering(object):
               if (self._ncpuspersystem * self._nsystems != self._ncpustotal):
                   print "ERROR: Number of Parallel Tempering systems times CPUs per system does not match total number of CPUs"
               else:
-                  for i in range(self._nsystems):
+                  for i in xrange(self._nsystems):
                       self._cpugroup.append( range(i * self._ncpuspersystem, (i+1) * self._ncpuspersystem) )
                       self._comm.append(pmi.Communicator(self._cpugroup[i]))
             
     def startDefiningSystem(self,n):
-        if not (n in range(0,self._nsystems)):
+        if not (n in xrange(0,self._nsystems)):
             print "ERROR: System number must be between 0 and ",self._nsystems
         else:
             pmi.activate(self._comm[n])
             self._multisystem.beginSystemDefinition()
 
     def endDefiningSystem(self,n):
-        if not (n in range(0,self._nsystems)):
+        if not (n in xrange(0,self._nsystems)):
             print "ERROR: System number must be between 0 and ",self._nsystems
         else:
             pmi.deactivate(self._comm[n])
@@ -165,7 +165,7 @@ class ParallelTempering(object):
         nparts       = self._multisystem.runAnalysisNPart()
         print "energies     = ", energies
         print "temperatures = ", temperatures
-        for i in range(len(energies)/2):
+        for i in xrange(len(energies)/2):
             m = 2 * i + self._oddeven
             n = m + 1
             if n<len(energies):

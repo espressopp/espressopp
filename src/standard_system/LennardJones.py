@@ -97,7 +97,7 @@ def LennardJones(num_particles, box=(0,0,0), rc=1.12246, skin=0.3, dt=0.005, eps
   if xyzrfilename: 
     new_particles = []
     props     = ['id', 'type', 'mass', 'pos', 'v', 'radius']
-    for idx in range(num_particles):
+    for idx in xrange(num_particles):
       part = [ pidf[idx], typef[idx], mass,
                espressopp.Real3D(xposf[idx],yposf[idx],zposf[idx]),
                espressopp.Real3D(xvelf[idx],yvelf[idx],zvelf[idx]),
@@ -112,7 +112,7 @@ def LennardJones(num_particles, box=(0,0,0), rc=1.12246, skin=0.3, dt=0.005, eps
   elif xyzfilename: 
     new_particles = []
     props     = ['id', 'type', 'mass', 'pos', 'v']
-    for idx in range(num_particles):
+    for idx in xrange(num_particles):
       part = [ pidf[idx], typef[idx], mass,
                espressopp.Real3D(xposf[idx],yposf[idx],zposf[idx]),
                espressopp.Real3D(xvelf[idx],yvelf[idx],zvelf[idx])]
