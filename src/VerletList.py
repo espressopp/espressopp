@@ -104,7 +104,7 @@ class VerletListLocal(_espressopp.VerletList):
         if pmi.workerIsActive():
             pairs=[]
             npairs=self.localSize()
-            for i in range(npairs):
+            for i in xrange(npairs):
               pair=self.cxxclass.getPair(self, i+1)
               pairs.append(pair)
             return pairs 

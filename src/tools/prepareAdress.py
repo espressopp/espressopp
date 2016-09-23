@@ -42,7 +42,7 @@ import espressopp
 def AdressSetCG(apm, pidCG, allParticlesAT):
     cmp = [0,0,0]
     pos = (allParticlesAT[pidCG*apm])[1]
-    for i in range(3):
+    for i in xrange(3):
 	cmp[i] += pos[i]
     return cmp
 

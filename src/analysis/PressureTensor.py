@@ -37,7 +37,7 @@ Standalone Usage:
 or 
 
 >>> pt = espressopp.analysis.PressureTensor(system)
->>> for k in range(100):
+>>> for k in xrange(100):
 >>>     integrator.run(100)
 >>>     pt.performMeasurement()
 >>> print "average pressure tensor = ", pt.getAverageValue()

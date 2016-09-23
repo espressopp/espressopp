@@ -50,7 +50,7 @@ storing trajectory
 
 >>> configurations = espressopp.ConfigurationsExtAdress(system,ftpl)
 >>> configurations.gather()
->>> for k in range(100):
+>>> for k in xrange(100):
 >>>   integrator.run(100)
 >>>   configurations.gather()
 

@@ -88,7 +88,7 @@ class __RealND(RealND) :
     # string conversion
     def __str__(self) :
       arr = []
-      for i in range(self.dimension):
+      for i in xrange(self.dimension):
         arr.append(self[i])
       return str(arr)
 

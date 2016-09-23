@@ -32,7 +32,7 @@ def gaussian(T, N, zero_momentum=True, seed=7654321):
   vx = []
   vy = []
   vz = []
-  for i in range(N):
+  for i in xrange(N):
     vx.append(sqrtT * random.gauss(0.0, 1.0))
     vy.append(sqrtT * random.gauss(0.0, 1.0))
     vz.append(sqrtT * random.gauss(0.0, 1.0))
@@ -49,7 +49,7 @@ def gaussian(T, N, zero_momentum=True, seed=7654321):
     sumvx = sumvx / N
     sumvy = sumvy / N
     sumvz = sumvz / N
-    for i in range(N):
+    for i in xrange(N):
       vx[i] = vx[i] - sumvx
       vy[i] = vy[i] - sumvy
       vz[i] = vz[i] - sumvz

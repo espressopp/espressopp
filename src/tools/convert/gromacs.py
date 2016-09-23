@@ -136,7 +136,7 @@ def read(gro_file, top_file="", doRegularExcl=True):
         vx, vy, vz = [], [], []
         resid = []
         resname = []
-        for i in range(total_num_particles):
+        for i in xrange(total_num_particles):
             line = f.readline()
             s = line[20:69]
             resname.append(line[5:8])
@@ -561,7 +561,7 @@ def read(gro_file, top_file="", doRegularExcl=True):
     
     print "USAGE: unpack as"
     s=""
-    for i in range(len(unpackvars)):
+    for i in xrange(len(unpackvars)):
         s+=str(unpackvars[i])
         if (i< len(unpackvars)-1): s+=", "
     print s, "=gromacs.read( ... )"
@@ -624,7 +624,7 @@ def storeAtoms(f, types, atomtypes, atomtypeparams, masses, charges, num_molecul
     
     # extend copies of this molecule
     num_atoms_molecule = len(types_tmp)
-    for i in range(num_molecule_copies):
+    for i in xrange(num_molecule_copies):
         types.extend(types_tmp)
         charges.extend(charge_tmp)
         masses.extend(mass_tmp)
@@ -692,8 +692,8 @@ def storeBonds(f, types, bondtypes, bondtypeparams, bonds, num_atoms_molecule,\
         local_exclusions=GenerateRegularExclusions(exclusions_bonds, nregxcl,local_exclusions)
     # extend bonds to copies of this molecule
     bonds_per_mol = len(bonds_tmp)
-    for i in range(num_molecule_copies):
-        for j in range(bonds_per_mol):
+    for i in xrange(num_molecule_copies):
+        for j in xrange(bonds_per_mol):
             pid1, pid2, bdtypeid = bonds_tmp[j][0:3]
             ia=molstartindex+pid1 + (i * num_atoms_molecule) # index of copy atom i
             ib=molstartindex+pid2 + (i * num_atoms_molecule) # index of copy atom j
@@ -705,7 +705,7 @@ def storeBonds(f, types, bondtypes, bondtypeparams, bonds, num_atoms_molecule,\
                 
                 
     # now, extend also the regular exclusions
-    for i in range(num_molecule_copies):
+    for i in xrange(num_molecule_copies):
         for exclpair in local_exclusions:
             pid1, pid2 = exclpair[0:2]
             ia=molstartindex+pid1 + (i * num_atoms_molecule) # index of copy atom i
@@ -754,8 +754,8 @@ def storeAngles(f, types, angletypes, angletypeparams, angles, num_atoms_molecul
         
     # extend angles to copies of this molecule
     angles_per_mol = len(angles_tmp)
-    for i in range(num_molecule_copies):
-        for j in range(angles_per_mol):
+    for i in xrange(num_molecule_copies):
+        for j in xrange(angles_per_mol):
             pid1, pid2, pid3, antypeid = angles_tmp[j][0:4]
             ia=molstartindex+pid1 + (i * num_atoms_molecule) # index of copy atom i
             ib=molstartindex+pid2 + (i * num_atoms_molecule) # index of copy atom j
@@ -818,8 +818,8 @@ def storeDihedrals(f, types, dihedraltypes, dihedraltypeparams, dihedrals, num_a
         
     # extend angles to copies of this molecule
     dihedrals_per_mol = len(dihedrals_tmp)
-    for i in range(num_molecule_copies):
-        for j in range(dihedrals_per_mol):
+    for i in xrange(num_molecule_copies):
+        for j in xrange(dihedrals_per_mol):
             pid1, pid2, pid3, pid4, dihtypeid = dihedrals_tmp[j][0:5]
             ia=molstartindex+pid1 + (i * num_atoms_molecule) # index of copy atom i
             ib=molstartindex+pid2 + (i * num_atoms_molecule) # index of copy atom j
@@ -900,8 +900,8 @@ def storeImpropers(f, types, impropertypes, impropertypeparams, impropers, num_a
 
     # extend angles to copies of this molecule
     impropers_per_mol = len(impropers_tmp)
-    for i in range(num_molecule_copies):
-        for j in range(impropers_per_mol):
+    for i in xrange(num_molecule_copies):
+        for j in xrange(impropers_per_mol):
             pid1, pid2, pid3, pid4, dihtypeid = impropers_tmp[j][0:5]
             ia=molstartindex+pid1 + (i * num_atoms_molecule) # index of copy atom i
             ib=molstartindex+pid2 + (i * num_atoms_molecule) # index of copy atom j
@@ -945,7 +945,7 @@ def setDihedralInteractions(system, dihedrals, dihedraltypeparams):
     for idlist, dihedrallist in dihedrals.iteritems():
         fpl = espressopp.FixedQuadrupleList(system.storage)
         fpl.addQuadruples(dihedrallist)
-        for i in range(len(idlist)):
+        for i in xrange(len(idlist)):
           id=idlist[i]
           dihedralinteraction=dihedraltypeparams[id].createEspressoInteraction(system, fpl)
           if dihedralinteraction:
@@ -960,7 +960,7 @@ def setImproperInteractions(system, impropers, impropertypeparams):
     for idlist, improperlist in impropers.iteritems():
         fpl = espressopp.FixedQuadrupleList(system.storage)
         fpl.addQuadruples(improperlist)
-        for i in range(len(idlist)):
+        for i in xrange(len(idlist)):
           id=idlist[i]
           improperinteraction=impropertypeparams[id].createEspressoInteraction(system, fpl)
           if improperinteraction:
@@ -1000,7 +1000,7 @@ def setDihedralInteractionsAdress(system, dihedrals, dihedraltypeparams,ftpl):
     for idlist, dihedrallist in dihedrals.iteritems():
         fpl = espressopp.FixedQuadrupleListAdress(system.storage,ftpl)
         fpl.addQuadruples(dihedrallist)
-        for i in range(len(idlist)):
+        for i in xrange(len(idlist)):
           id=idlist[i]
           dihedralinteraction=dihedraltypeparams[id].createEspressoInteraction(system, fpl)
           if dihedralinteraction:
@@ -1015,7 +1015,7 @@ def setImproperInteractionsAdress(system, impropers, impropertypeparams,ftpl):
     for idlist, improperlist in impropers.iteritems():
         fpl = espressopp.FixedQuadrupleListAdress(system.storage,ftpl)
         fpl.addQuadruples(improperlist)
-        for i in range(len(idlist)):
+        for i in xrange(len(idlist)):
           id=idlist[i]
           improperinteraction=impropertypeparams[id].createEspressoInteraction(system, fpl)
           if improperinteraction:
@@ -1050,8 +1050,8 @@ def setLennardJonesInteractions(system, defaults, atomtypeparams, verletlist, cu
                 at['eps']=eps
                 print "WARNING: Converted atomtype number ", atnr, "to sigma, epsilon parameters", " sig= ", sig, " eps=", eps
     
-    #for i in range(len(atomtypeparams)):
-    #    for j in range(i, len(atomtypeparams)):
+    #for i in xrange(len(atomtypeparams)):
+    #    for j in xrange(i, len(atomtypeparams)):
     for i in atomtypeparams.keys():
          for j in atomtypeparams.keys():
             pi=atomtypeparams[i]
@@ -1143,8 +1143,8 @@ def setLennardJones14Interactions(system, defaults, atomtypeparams, onefourlist,
     else:
         print "Problem with 1-4 interactions. LJ 1-4 fudge factor not defined."
     
-    #for i in range(len(atomtypeparams)):
-    #    for j in range(i, len(atomtypeparams)):
+    #for i in xrange(len(atomtypeparams)):
+    #    for j in xrange(i, len(atomtypeparams)):
     for i in atomtypeparams.keys():
          for j in atomtypeparams.keys():
             pi=atomtypeparams[i]
@@ -1183,8 +1183,8 @@ def setCoulombInteractions(system, verletlist, rc, types, epsilon1, epsilon2,kap
 	interaction=espressopp.interaction.VerletListReactionFieldGeneralized(verletlist)
    # interaction=espressopp.interaction.VerletListCoulombTruncated(verletlist)
             
-    for i in range(max(types)+1):
-        for k in range(i, max(types)+1):
+    for i in xrange(max(types)+1):
+        for k in xrange(i, max(types)+1):
 	    if (hadress or adress):
 		interaction.setPotentialAT(type1=i, type2=k, potential=pot)
 	    else:
@@ -1218,8 +1218,8 @@ def setCoulombInteractionsTI(system, verletlist, rc, types, epsilon1, epsilon2,k
         return
 	#interaction=espressopp.interaction.VerletListReactionFieldGeneralized(verletlist)
             
-    for i in range(max(types)+1):
-        for k in range(i, max(types)+1):
+    for i in xrange(max(types)+1):
+        for k in xrange(i, max(types)+1):
 	    if (hadress or adress):
 		interaction.setPotentialAT(type1=i, type2=k, potential=pot)
 	    else:
@@ -1249,8 +1249,8 @@ def setCoulombInteractionsProtein(system, verletlist, rc, types, epsilon1, epsil
 	interaction=espressopp.interaction.VerletListReactionFieldGeneralized(verletlist)
    # interaction=espressopp.interaction.VerletListCoulombTruncated(verletlist)
             
-    for i in range(max(types)+1):
-        for k in range(i, max(types)+1):
+    for i in xrange(max(types)+1):
+        for k in xrange(i, max(types)+1):
             if (i==otype or i==htype or k==otype or k==htype):
 	        if (hadress or adress):
 	            interaction.setPotentialAT(type1=i, type2=k, potential=potwat)
@@ -1282,8 +1282,8 @@ def setCoulomb14Interactions(system, defaults, onefourlist, rc, types):
     #interaction=espressopp.interaction.FixedPairListTypesCoulombRSpace(system,onefourlist)
     interaction=espressopp.interaction.FixedPairListTypesCoulombTruncated(system,onefourlist)
 
-    for i in range(max(types)+1):
-        for k in range(i, max(types)+1):
+    for i in xrange(max(types)+1):
+        for k in xrange(i, max(types)+1):
             interaction.setPotential(type1=i, type2=k, potential=pot)
 
     system.addInteraction(interaction)
@@ -1309,8 +1309,8 @@ def setTabulatedInteractions(potentials, particleTypes, system, interaction):
         for i in v:
             allparticles.append((i,k)) # create tuples: (particle, type)
     
-    for i in range(len(allparticles)):
-        for j in range(i, len(allparticles)):
+    for i in xrange(len(allparticles)):
+        for j in xrange(i, len(allparticles)):
             type1 = allparticles[i][1]
             type2 = allparticles[j][1]
             key = type1+"_"+type2

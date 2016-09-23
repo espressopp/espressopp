@@ -41,7 +41,7 @@ namespace espressopp {
      * result = msid.compute()  # computes the msid of the last snapshot added
      *
      * file = open("msid.dat","w")
-     *   for i in range(chainlength-1):
+     *   for i in xrange(chainlength-1):
      *   line = "%d %f %f\n" % (i+1,result[i],result[i]/(i+1)) # n, <r^2>, <r^2>/n
      *   file.write(line)
      * file.close()

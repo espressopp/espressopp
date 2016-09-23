@@ -29,9 +29,9 @@ def show(alltimers, precision=1):
   fmt2 = '%.' + str(precision) + 'f (%.'+ str(precision) + 'f)\n'
   t=[]
   nprocs = len(alltimers)
-  for ntimer in range(10):
+  for ntimer in xrange(10):
     t.append(0.0)
-    for k in range(nprocs):
+    for k in xrange(nprocs):
       t[ntimer] += alltimers[k][ntimer]
     t[ntimer] /= nprocs          
           

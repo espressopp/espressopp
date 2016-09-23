@@ -110,7 +110,7 @@ class VerletListTripleLocal(_espressopp.VerletListTriple):
         if pmi.workerIsActive():
             triples=[]
             ntriples=self.localSize()
-            for i in range(ntriples):
+            for i in xrange(ntriples):
               triple=self.cxxclass.getTriple(self, i+1)
               triples.append(triple)
             return triples
