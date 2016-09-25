@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -47,6 +47,7 @@ namespace espressopp {
 
       virtual void addForces();
       virtual real computeEnergy();
+      virtual real computeEnergyDeriv();
       virtual real computeEnergyAA();
       virtual real computeEnergyCG();
       virtual void computeVirialX(std::vector<real> &p_xx_total, int bins); 
@@ -82,6 +83,13 @@ namespace espressopp {
       
       // for the long range interaction the energy is already reduced in _computeEnergy
       return potential->_computeEnergy(storage->getRealCells());
+    }
+
+    template < typename _Potential > inline real
+    CellListAllParticlesInteractionTemplate < _Potential >::
+    computeEnergyDeriv() {
+      std::cout << "Warning! At the moment computeEnergyDeriv() in CellListAllParticlesInteractionTemplate does not work." << std::endl;
+      return 0.0;
     }
 
     template < typename _Potential > inline real

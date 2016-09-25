@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -37,23 +37,27 @@ This is an abstract class, only needed to be inherited from.
 
 .. function:: espressopp.interaction.Interaction.bondType()
 
-		:rtype: 
+		:rtype: int
 
 .. function:: espressopp.interaction.Interaction.computeEnergy()
 
-		:rtype: 
+		:rtype: real
 
 .. function:: espressopp.interaction.Interaction.computeEnergyAA()
 
-		:rtype: 
+		:rtype: real
+
+.. function:: espressopp.interaction.Interaction.computeEnergyDeriv()
+
+		:rtype: real
 
 .. function:: espressopp.interaction.Interaction.computeEnergyCG()
 
-		:rtype: 
+		:rtype: real
 
 .. function:: espressopp.interaction.Interaction.computeVirial()
 
-		:rtype: 
+		:rtype: real
 """
 from espressopp import pmi
 from _espressopp import interaction_Interaction
@@ -75,6 +79,10 @@ class InteractionLocal(object):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.computeEnergyCG(self)
 
+    def computeEnergyDeriv(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.computeEnergyDeriv(self)
+
     def computeVirial(self):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.computeVirial(self)
@@ -88,5 +96,5 @@ if pmi.isController :
 
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            pmicall = [ "computeEnergy", "computeEnergyAA", "computeEnergyCG", "computeVirial", "bondType" ]
+            pmicall = [ "computeEnergy", "computeEnergyDeriv", "computeEnergyAA", "computeEnergyCG", "computeVirial", "bondType" ]
             )
