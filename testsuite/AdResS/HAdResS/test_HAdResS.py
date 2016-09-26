@@ -48,7 +48,7 @@ class TestHAdResS(unittest.TestCase):
         potWCA1  = espressopp.interaction.LennardJones(epsilon=1.0, sigma=1.0, shift='auto', cutoff=1.4)
         potWCA2 = espressopp.interaction.LennardJones(epsilon=0.0, sigma=1.0, shift='auto', cutoff=1.4)
         interNB.setPotentialAT(type1=0, type2=0, potential=potWCA1) # AT
-        interNB.setPotentialCG(type1=0, type2=0, potential=potWCA2) # CG
+        interNB.setPotentialCG(type1=1, type2=1, potential=potWCA2) # CG
         self.system.addInteraction(interNB)
 
         # initialize lambda values
