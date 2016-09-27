@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -36,6 +36,7 @@ from espressopp.interaction.LennardJonesCapped import *
 from espressopp.interaction.LennardJonesEnergyCapped import *
 from espressopp.interaction.LennardJonesExpand import *
 from espressopp.interaction.LennardJonesGromacs import *
+from espressopp.interaction.LennardJonesSoftcoreTI import *
 from espressopp.interaction.LennardJonesGeneric import *
 from espressopp.interaction.LJcos import *
 from espressopp.interaction.Morse import *
@@ -43,6 +44,7 @@ from espressopp.interaction.CoulombTruncatedUniqueCharge import *
 from espressopp.interaction.CoulombTruncated import *
 from espressopp.interaction.GravityTruncated import *
 from espressopp.interaction.ReactionFieldGeneralized import *
+from espressopp.interaction.ReactionFieldGeneralizedTI import *
 from espressopp.interaction.SoftCosine import *
 from espressopp.interaction.Tabulated import *
 from espressopp.interaction.FENE import *

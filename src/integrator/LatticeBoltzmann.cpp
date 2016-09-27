@@ -62,7 +62,7 @@ namespace espressopp {
          inv_b = std::vector<real>(_numVels, 0.);
          phi   = std::vector<real>(_numVels, 0.);
          myNeigh = std::vector<int>(2*_numDims, 0);
-
+         
          /* setup simulation parameters */
          setDoFluct(false);                                 // no fluctuations
          setDoRestart(true);                                // at first set true
@@ -104,7 +104,7 @@ namespace espressopp {
          
          /* initialise general lattice parameters on a site */
          LatticePar(_system, getNumVels(),getA(),getTau());
-
+         
          /* initialize lattice sizes */
          initLatticeSize();
          
@@ -119,26 +119,26 @@ namespace espressopp {
          time_comm = 0.;
          time_sw = 0.;
       }
-      
+			
 /*******************************************************************************************/
-      
+			
       void LatticeBoltzmann::disconnect() {
          _recalc2.disconnect();
          _befIntV.disconnect();
-         
+				
          delete (lbfluid);
          delete (ghostlat);
          delete (lbmom);
          delete (lbfor);
       }
-      
+			
       void LatticeBoltzmann::connect() {
          _recalc2 = integrator->recalc2.connect ( boost::bind(&LatticeBoltzmann::zeroMDCMVel, this));
          _befIntV = integrator->befIntV.connect ( boost::bind(&LatticeBoltzmann::makeLBStep, this));
       }
-      
+			
 /*******************************************************************************************/
-      
+			
       /* Setter and getter for the parallelisation things */
       void LatticeBoltzmann::setMyNeigh (int _dir, int _rank) { myNeigh[_dir] = _rank;}
       int LatticeBoltzmann::getMyNeigh (int _dir) { return myNeigh[_dir];}

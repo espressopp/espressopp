@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013,2015
+  Copyright (C) 2012,2013,2015,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -41,7 +41,7 @@ namespace espressopp {
     public:
       static void registerPython();
 
-      CoulombTruncated(): prefactor(1.0) {
+      CoulombTruncated(): prefactor(0.0) {
         setShift(0.0);
         setCutoff(infinity);
         autoShift = false;

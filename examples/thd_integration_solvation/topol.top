@@ -1,0 +1,22 @@
+;
+;	File 'topol.top' was generated
+;	By user: fogarty (2099)
+;	On host: pckr142
+;	At date: Wed Mar 18 13:23:28 2015
+;
+;	This is a standalone topology file
+;
+
+; Include forcefield parameters
+#include "forcefield.itp"
+#include "methanol-fe.itp"
+#include "tip3p-for-espressopp.itp"
+
+[ system ]
+; Name
+methanol in water
+
+[ molecules ]
+; Compound        #mols
+methanol     1
+SOL              693

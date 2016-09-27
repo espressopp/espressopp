@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -150,7 +150,7 @@ def tuneSkin(system, integrator, minSkin=0.01, maxSkin=1.5, precision=0.001, pri
 def printTimeVsSkin(system, integrator, minSkin=0.01, maxSkin=1.5, skinStep = 0.005):
   npart = espressopp.analysis.NPart(system).compute()
   # this is an empirical formula in order to get the appropriate number of steps
-  nsteps = int( espressopp.MPI.COMM_WORLD.size * 20000000.0 / float(npart) )
+  nsteps = int( espressopp.MPI.COMM_WORLD.size * 10000000.0 / float(npart) )
   
   print '      Calculations is started. It will print out the dependece of time of \n\
       running of %d steps on the skin size into the file \'timeVSskin.dat\'.\n\

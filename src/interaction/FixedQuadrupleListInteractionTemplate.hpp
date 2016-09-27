@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -82,6 +82,7 @@ namespace espressopp {
 
       virtual void addForces();
       virtual real computeEnergy();
+      virtual real computeEnergyDeriv();
       virtual real computeEnergyAA();
       virtual real computeEnergyCG();      
       virtual void computeVirialX(std::vector<real> &p_xx_total, int bins); 
@@ -157,6 +158,13 @@ namespace espressopp {
       real esum;
       boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
       return esum;
+    }
+    
+    template < typename _DihedralPotential > inline real
+    FixedQuadrupleListInteractionTemplate < _DihedralPotential >::
+    computeEnergyDeriv() {
+      std::cout << "Warning! At the moment computeEnergyDeriv() in FixedQuadrupleListInteractionTemplate does not work." << std::endl;
+      return 0.0;
     }
     
     template < typename _DihedralPotential > inline real

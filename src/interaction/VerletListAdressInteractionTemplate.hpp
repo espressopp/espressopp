@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -112,6 +112,7 @@ namespace espressopp {
 
       virtual void addForces();
       virtual real computeEnergy();
+      virtual real computeEnergyDeriv();
       virtual real computeEnergyAA();
       virtual real computeEnergyCG();      
       virtual void computeVirialX(std::vector<real> &p_xx_total, int bins); 
@@ -558,20 +559,28 @@ namespace espressopp {
               // calculate distance to nearest adress particle or center
               std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
               Real3D pa = **it2; // position of adress particle
-              Real3D d1 = vp.position() - pa;
-              //real d1 = vp.position()[0] - pa[0];
-              real min1sq = d1.sqr(); // set min1sq before loop  // d1*d1;
+              Real3D d1;
+              verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
+              // set min1sq before loop
+              real min1sq;
+              if (verletList->getAdrRegionType()) { // spherical adress region 
+                min1sq = d1.sqr(); 
+              } else { //slab-type adress region
+                min1sq = d1[0]*d1[0];
+              }
               ++it2;
               for (; it2 != verletList->getAdrPositions().end(); ++it2) {
                    pa = **it2;
-                   d1 = vp.position() - pa;
-                   //d1 = vp.position()[0] - pa[0];
-                   real distsq1 = d1.sqr(); // d1*d1;
-                   //std::cout << pa << " " << sqrt(distsq1) << "\n";
+                   verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
+                   real distsq1;
+                   if (verletList->getAdrRegionType()) { // spherical adress region 
+                     distsq1 = d1.sqr(); 
+                   } else { //slab-type adress region
+                     distsq1 = d1[0]*d1[0];
+                   }
                    if (distsq1 < min1sq) min1sq = distsq1;
               }
 
-              //real min1 = sqrt(min1sq);
               //std::cout << vp.id() << " min: " << min1 << "\n";
               //std::cout << vp.id() << " dex: " << dex << "\n";
               //std::cout << vp.id() << " dex+dhy: " << dexdhy << "\n";
@@ -667,6 +676,59 @@ namespace espressopp {
       return esum;      
     }
     
+    template < typename _PotentialAT, typename _PotentialCG >
+    inline real
+    VerletListAdressInteractionTemplate < _PotentialAT, _PotentialCG >::
+    computeEnergyDeriv() {
+
+      //for use with TI versions of potentials
+      //for the moment, it assumes all particles which differ between states A and B are in the atomistic region, because _computeEnergyDeriv not defined for other potentials 
+      //assumes lambda for each particle is up-to-date, e.g. computeEnergy or a routine from Adress extension has been called
+        
+      LOG4ESPP_INFO(theLogger, "compute energy derivative of the Verlet list pairs, in the atomistic region");
+      
+      real ederiv = 0.0;        
+      for (PairList::Iterator it(verletList->getAdrPairs()); 
+           it.isValid(); ++it) {
+          Particle &p1 = *it->first;
+          Particle &p2 = *it->second; 
+          real w1 = p1.lambda();
+          real w2 = p2.lambda();
+          real w12 = w1 * w2;
+          int type1 = p1.type();
+          int type2 = p2.type();
+          
+          FixedTupleListAdress::iterator it3;
+          FixedTupleListAdress::iterator it4;
+          it3 = fixedtupleList->find(&p1);
+          it4 = fixedtupleList->find(&p2);
+
+          if (it3 != fixedtupleList->end() && it4 != fixedtupleList->end()) {
+              std::vector<Particle*> atList1;
+              std::vector<Particle*> atList2;
+              atList1 = it3->second;
+              atList2 = it4->second;
+
+              for (std::vector<Particle*>::iterator itv = atList1.begin();
+                      itv != atList1.end(); ++itv) {
+
+                  Particle &p3 = **itv;
+                  for (std::vector<Particle*>::iterator itv2 = atList2.begin();
+                                       itv2 != atList2.end(); ++itv2) {
+                      Particle &p4 = **itv2;
+
+                      // AT energies
+                      const PotentialAT &potentialAT = getPotentialAT(p3.type(), p4.type());
+                      ederiv += w12*potentialAT._computeEnergyDeriv(p3, p4);
+                  }                  
+              }              
+          }          
+      }
+      real edsum;
+      boost::mpi::all_reduce(*getVerletList()->getSystem()->comm, ederiv, edsum, std::plus<real>());
+      return edsum;      
+    }
+
     template < typename _PotentialAT, typename _PotentialCG > inline real
     VerletListAdressInteractionTemplate < _PotentialAT, _PotentialCG >::
     computeEnergyAA() {

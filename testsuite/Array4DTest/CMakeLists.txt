@@ -1,0 +1,6 @@
+#find_package (Boost COMPONENTS system filesystem unit_test_framework REQUIRED)
+#include_directories(${Boost_INCLUDE_DIRS})
+add_definitions (-DBOOST_TEST_DYN_LINK)
+add_executable(Array4DTest Array4DTest.cpp)
+add_test(Array4DTest ${CMAKE_CURRENT_BINARY_DIR}/Array4DTest)
+set_tests_properties(Array4DTest PROPERTIES ENVIRONMENT "${TEST_ENV}")
