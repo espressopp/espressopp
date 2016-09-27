@@ -88,9 +88,9 @@ namespace espressopp {
         _integrate1 = integrator->inIntP.connect(
                 boost::bind(&Adress::integrate1, this, _1), boost::signals2::at_front);
 
-        // connection to inside of integrate1()
-        _inIntP = integrator->inIntP.connect(
-                boost::bind(&Adress::communicateAdrPositions, this), boost::signals2::at_front);
+        // // connection to inside of integrate1()
+        // _inIntP = integrator->inIntP.connect(
+        //         boost::bind(&Adress::communicateAdrPositions, this), boost::signals2::at_front);
 
         // connection to after integrate2()
         _integrate2 = integrator->aftIntV.connect(
@@ -247,7 +247,7 @@ namespace espressopp {
             maxSqDist = std::max(maxSqDist, sqDist);
         }
 
-        // Set the positions and velocity of CG particles & update weights.
+        // Set the positions and velocity of CG particles
         CellList localCells = system.storage->getLocalCells();
         for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
 
@@ -278,52 +278,6 @@ namespace espressopp {
                   vp.position() = cmp;
                   vp.velocity() = cmv;
 
-                  if (KTI == false) {
-
-                      // calculate distance to nearest adress particle or center
-                      std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
-                      Real3D pa = **it2; // position of adress particle
-                      Real3D d1(0.0, 0.0, 0.0);
-                      real min1sq;
-                      verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
-                      if (verletList->getAdrRegionType()) { // spherical adress region
-                        min1sq = d1.sqr(); // set min1sq before loop
-                        ++it2;
-                        for (; it2 != verletList->getAdrPositions().end(); ++it2) {
-                             pa = **it2;
-                             verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
-                             real distsq1 = d1.sqr();
-                             if (distsq1 < min1sq) min1sq = distsq1;
-                        }
-                      }
-                      else { //slab-type adress region
-                        min1sq = d1[0]*d1[0];   // set min1sq before loop
-                        ++it2;
-                        for (; it2 != verletList->getAdrPositions().end(); ++it2) {
-                             pa = **it2;
-                             verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
-                             real distsq1 = d1[0]*d1[0];
-                             if (distsq1 < min1sq) min1sq = distsq1;
-                        }
-                      }
-
-
-                      real w = weight(min1sq);
-                      vp.lambda() = w;
-
-                      real wDeriv = weightderivative(min1sq);
-                      vp.lambdaDeriv() = wDeriv;
-
-                      // This loop is required when applying routines which use atomistic lambdas.
-                      /*for (std::vector<Particle*>::iterator it2 = atList.begin();
-                                       it2 != atList.end(); ++it2) {
-                          Particle &at = **it2;
-                          at.lambda() = vp.lambda();
-                          at.lambdaDeriv() = vp.lambdaDeriv();
-                      }*/
-
-                  }
-
               }
               else { // this should not happen
                   std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
@@ -331,7 +285,76 @@ namespace espressopp {
                   exit(1);
                   return;
               }
+        }
 
+        // Communicate new position of region defining particles
+        communicateAdrPositions();
+
+        // Update resolution values if KTI == false
+        if (KTI == false) {
+
+          CellList localCells2 = system.storage->getLocalCells();
+          for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
+
+
+                Particle &vp = *cit;
+
+                FixedTupleListAdress::iterator it3;
+                it3 = fixedtupleList->find(&vp);
+
+                if (it3 != fixedtupleList->end()) {
+
+                        // calculate distance to nearest adress particle or center
+                        std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
+                        Real3D pa = **it2; // position of adress particle
+                        Real3D d1(0.0, 0.0, 0.0);
+                        real min1sq;
+                        verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
+                        if (verletList->getAdrRegionType()) { // spherical adress region
+                          min1sq = d1.sqr(); // set min1sq before loop
+                          ++it2;
+                          for (; it2 != verletList->getAdrPositions().end(); ++it2) {
+                               pa = **it2;
+                               verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
+                               real distsq1 = d1.sqr();
+                               if (distsq1 < min1sq) min1sq = distsq1;
+                          }
+                        }
+                        else { //slab-type adress region
+                          min1sq = d1[0]*d1[0];   // set min1sq before loop
+                          ++it2;
+                          for (; it2 != verletList->getAdrPositions().end(); ++it2) {
+                               pa = **it2;
+                               verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
+                               real distsq1 = d1[0]*d1[0];
+                               if (distsq1 < min1sq) min1sq = distsq1;
+                          }
+                        }
+
+
+                        real w = weight(min1sq);
+                        vp.lambda() = w;
+
+                        real wDeriv = weightderivative(min1sq);
+                        vp.lambdaDeriv() = wDeriv;
+
+                        // This loop is required when applying routines which use atomistic lambdas.
+                        /*for (std::vector<Particle*>::iterator it2 = atList.begin();
+                                         it2 != atList.end(); ++it2) {
+                            Particle &at = **it2;
+                            at.lambda() = vp.lambda();
+                            at.lambdaDeriv() = vp.lambdaDeriv();
+                        }*/
+
+                }
+                else { // this should not happen
+                    std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";
+                    std::cout << " (" << vp.position() << ")\n";
+                    exit(1);
+                    return;
+                }
+
+          }
 
         }
 
