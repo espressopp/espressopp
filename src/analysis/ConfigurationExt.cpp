@@ -1,4 +1,6 @@
 /*
+   Copyright (C) 2016
+      Max Planck Institute for Polymer Research & JGU Mainz
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -115,12 +117,6 @@ namespace espressopp {
 
     void ConfigurationExtIterator::incrementIterator()
     {
-      /*
-      if (it == end) {
-        PyErr_SetString(PyExc_StopIteration, "No more data.");
-        boost::python::throw_error_already_set();
-      }
-      */
       it++;
     }
 

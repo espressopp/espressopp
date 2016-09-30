@@ -44,6 +44,7 @@ r"""
 * `length_factor`
   If length dimension in current system is nm, and unit is 0.23 nm, for example, then
   length_factor should be 0.23
+  Default: 1.0
 
 * `length_unit`
   It is length unit. Can be LJ, nm or A. By default - LJ

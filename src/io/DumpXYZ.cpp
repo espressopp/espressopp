@@ -67,123 +67,28 @@ namespace espressopp {
 
           ConfigurationExtIterator cei = conf_real-> getIterator();
           std::streamsize p = myfile.precision();
-          if(length_factor == 1.0){ // probably can remove this cond branch and
-            // just keep the second one where len_fact != 1.0
-            /*
-            for(size_t i=0; i<num_of_particles; i++){
-            	//myfile << "bla" << endl;
-              myfile << "  0  " << cei.nextProperties() << endl;
-              //myfile << currentId() << " " << cei.nextProperties() << endl;
-              //myfile << "  0  " << cei.nextCoordinates() << endl;
-            }
-            */
+          for (size_t i=0; i<num_of_particles; i++) {
 
-            for (size_t i=0; i<num_of_particles; i++) {
-
-              // // print as fastwritexyz in Py, given number (10) of double digits
-
-
-              if (getStorePids()) {
-
-                // resemble fastwritexyz() which stores or not the pids
-                // (non XYZ standard, but fastwritexyz does that)
-                // precision for doubles set as the fastwritexyz() python func
-                if (getStoreVelocities() == false) {
-                  myfile << cei.currentId() << " " << cei.currentProperties()[0] <<
-                  " " << fixed << setprecision(10) << cei.currentProperties()[1] << " " << cei.currentProperties()[2] <<
-                  " " << cei.currentProperties()[3] << endl;
-                  myfile.unsetf(ios_base::fixed);
-                  myfile << setprecision(p);
-                } else {
-
-                  myfile << cei.currentId() << " " << cei.currentProperties()[0] <<
-                  " " << fixed << setprecision(10) << cei.currentProperties()[1] << " " << cei.currentProperties()[2] <<
-                  " " << cei.currentProperties()[3] << " " << cei.currentProperties()[4] << " " << cei.currentProperties()[5] <<
-                  " " << cei.currentProperties()[6] << endl;
-                  myfile.unsetf(ios_base::fixed);
-                  myfile << setprecision(p);
-
+                if (getStorePids())  {
+                    myfile << cei.currentId() << " ";
                 }
 
-              } else { // standard XYZ, no PID at the beginning of the line
-                if (getStoreVelocities() == false) {
-                  myfile << cei.currentProperties()[0] <<
-                  " " << fixed << setprecision(10) << cei.currentProperties()[1] << " " << cei.currentProperties()[2] <<
-                  " " << cei.currentProperties()[3] << endl;
-                  myfile.unsetf(ios_base::fixed);
-                  myfile << setprecision(p);
+                myfile << cei.currentProperties()[0] <<
+                       " " << fixed << setprecision(10) << length_factor * cei.currentProperties()[1] << " "
+                       << length_factor * cei.currentProperties()[2] <<
+                       " " << length_factor * cei.currentProperties()[3];
 
-                } else {
-
-                  myfile << cei.currentProperties()[0] <<
-                  " " << fixed << setprecision(10) << cei.currentProperties()[1] << " " << cei.currentProperties()[2] <<
-                  " " << cei.currentProperties()[3] << " " << cei.currentProperties()[4] << " " << cei.currentProperties()[5] <<
-                  " " << cei.currentProperties()[6] << endl;
-                  myfile.unsetf(ios_base::fixed);
-                  myfile << setprecision(p);
-
+                if (getStoreVelocities()) {
+                  myfile << " " << length_factor * cei.currentProperties()[4] << " " << length_factor * cei.currentProperties()[5] <<
+                  " " << length_factor * cei.currentProperties()[6];
                 }
-              }
-              cei.incrementIterator();
-            }
+                myfile << endl;
+                myfile.unsetf(ios_base::fixed);
+                myfile << setprecision(p);
 
+                cei.incrementIterator();
           }
-          else{
-            /*
-            for(size_t i=0; i<num_of_particles; i++){
-            	//myfile << "bla" << endl;
-              myfile << "  0  " << length_factor * cei.nextProperties() << endl;
-              //myfile << "  0  " << length_factor * cei.nextCoordinates() << endl;
-            }
-            */
 
-            for (size_t i=0; i<num_of_particles; i++) {
-
-
-              if (getStorePids()) {
-                // resemble fastwritexyz() which stores or not the pids
-                // (non XYZ standard, but fastwritexyz does that)
-                if (getStoreVelocities() == false) {
-                  myfile << cei.currentId() << " " << cei.currentProperties()[0] <<
-                  " " << fixed << setprecision(10) << length_factor * cei.currentProperties()[1] << " " << length_factor * cei.currentProperties()[2] <<
-                  " " << length_factor * cei.currentProperties()[3] << endl;
-                  myfile.unsetf(ios_base::fixed);
-                  myfile << setprecision(p);
-                } else {
-
-                  myfile << cei.currentId() << " " << cei.currentProperties()[0] <<
-                  " " << fixed << setprecision(10) << length_factor * cei.currentProperties()[1] << " " << length_factor * cei.currentProperties()[2] <<
-                  " " << length_factor * cei.currentProperties()[3] << " " << length_factor * cei.currentProperties()[4] << " " << length_factor * cei.currentProperties()[5] <<
-                  " " << length_factor * cei.currentProperties()[6] << endl;
-                  myfile.unsetf(ios_base::fixed);
-                  myfile << setprecision(p);
-
-                }
-
-
-              } else { // standard XYZ, no PID at the beginning of the line
-                if (getStoreVelocities() == false) {
-                  myfile << cei.currentProperties()[0] <<
-                  " " << fixed << setprecision(10) << length_factor * cei.currentProperties()[1] << " " << length_factor * cei.currentProperties()[2] <<
-                  " " << length_factor * cei.currentProperties()[3] << endl;
-                  myfile.unsetf(ios_base::fixed);
-                  myfile << setprecision(p);
-
-                } else {
-
-                  myfile << cei.currentProperties()[0] <<
-                  " " << fixed << setprecision(10) << length_factor * cei.currentProperties()[1] << " " << length_factor * cei.currentProperties()[2] <<
-                  " " << length_factor * cei.currentProperties()[3] << " " << length_factor * cei.currentProperties()[4] << " " << length_factor * cei.currentProperties()[5] <<
-                  " " << length_factor * cei.currentProperties()[6] << endl;
-                  myfile.unsetf(ios_base::fixed);
-                  myfile << setprecision(p);
-
-                }
-              }
-              cei.incrementIterator();
-            }
-
-          }
           myfile.close();
         }
         else cout << "Unable to open file: "<< file_name <<endl;
