@@ -38,7 +38,8 @@ import _espressopp
 import esutil
 import pmi
 from espressopp import toReal3DFromVector, toInt3DFromVector
-import mpi4py.MPI as MPI
+import mpi4py
+#import mpi4py.MPI as MPI
 from espressopp.Exceptions import ParticleDoesNotExistHere
 
 # Controller Particle:
@@ -190,9 +191,15 @@ if pmi.isController:
 
         @property
         def node(self):
-            node = pmi.reduce(pmi.MAXLOC, self, 'locateParticle')
+            if "2.0.0" in mpi4py.__version__:
+                node = pmi.reduce(pmi.MAXLOC, self, 'locateParticle')
+            else:
+                value, node = pmi.reduce(pmi.MAXLOC, self, 'locateParticle')
             return node
 
         def __getattr__(self, key):
-            value = pmi.reduce(pmi.MAXLOC, self, 'getLocalData', key)
+            if "2.0.0" in mpi4py.__version__:
+                value = pmi.reduce(pmi.MAXLOC, self, 'getLocalData', key)
+            else:
+                value, node = pmi.reduce(pmi.MAXLOC, self, 'getLocalData', key)
             return value
