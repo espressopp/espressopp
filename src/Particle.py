@@ -42,6 +42,9 @@ import mpi4py
 #import mpi4py.MPI as MPI
 from espressopp.Exceptions import ParticleDoesNotExistHere
 
+
+mpi4py_version = mpi4py.__version__.startswith('2')
+
 # Controller Particle:
 # * requests are directly forwarded
 
@@ -191,14 +194,14 @@ if pmi.isController:
 
         @property
         def node(self):
-            if "2.0.0" in mpi4py.__version__:
+            if mpi4py_version:
                 node = pmi.reduce(pmi.MAXLOC, self, 'locateParticle')
             else:
                 value, node = pmi.reduce(pmi.MAXLOC, self, 'locateParticle')
             return node
 
         def __getattr__(self, key):
-            if "2.0.0" in mpi4py.__version__:
+            if mpi4py_version:
                 value = pmi.reduce(pmi.MAXLOC, self, 'getLocalData', key)
             else:
                 value, node = pmi.reduce(pmi.MAXLOC, self, 'getLocalData', key)
