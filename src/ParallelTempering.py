@@ -19,11 +19,53 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-******************************
+r"""
+********************************
 **espressopp.ParallelTempering**
-******************************
-
+********************************
+.. function:: espressopp.ParallelTempering(NumberOfSystems, RNG)
+		:param NumberOfSystems: (default: 4)
+		:param RNG: (default: None)
+		:type NumberOfSystems: int
+		:type RNG: 
+.. function:: espressopp.ParallelTempering.endDefiningSystem(n)
+		:param n: 
+		:type n: 
+		:rtype: 
+.. function:: espressopp.ParallelTempering.exchange()
+		:rtype: 
+.. function:: espressopp.ParallelTempering.getNumberOfCPUsPerSystem()
+		:rtype: 
+.. function:: espressopp.ParallelTempering.getNumberOfSystems()
+		:rtype: 
+.. function:: espressopp.ParallelTempering.run(nsteps)
+		:param nsteps: 
+		:type nsteps: 
+		:rtype: 
+.. function:: espressopp.ParallelTempering.setAnalysisE(analysisE)
+		:param analysisE: 
+		:type analysisE: 
+.. function:: espressopp.ParallelTempering.setAnalysisNPart(analysisNPart)
+		:param analysisNPart: 
+		:type analysisNPart: 
+.. function:: espressopp.ParallelTempering.setAnalysisT(analysisT)
+		:param analysisT: 
+		:type analysisT: 
+.. function:: espressopp.ParallelTempering.setIntegrator(integrator, thermostat)
+		:param integrator: 
+		:param thermostat: 
+		:type integrator: 
+		:type thermostat: 
+.. function:: espressopp.ParallelTempering.startDefiningSystem(n)
+		:param n: 
+		:type n: 
+		:rtype:
+.. function:: espressopp.ParallelTempering.setDumpConfXYZ(dumpconf)
+		:param dumpconf:  
+		:rtype:
+        
+.. function:: espressopp.ParallelTempering.runDumpConfXYZ()  
+		:rtype:        
 """
 from espressopp import MultiSystem
 from espressopp import pmi
@@ -34,11 +76,9 @@ class ParallelTempering(object):
     
     def __init__(self, NumberOfSystems = 4, RNG = None):
         print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        print "+ Due to a recent change in the design of ESPResSo++ the Parallel Tempering     +"
-        print "+ Class is not available in the current version. This Class will be back soon.  +"
+        print "+ Parallel Tempering Class is available in the current version of ESPResSo++.   +"
         print "+ Multisystem simulations are still possible but have to be setup manually.     +"
         print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        #return 0 
         if (RNG == None):
             print "ERROR: ParallelTempering needs a random number generator"
         else: 
