@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -23,59 +23,43 @@ r"""
 **************************
 **espressopp.MultiSystem**
 **************************
-
-
 .. function:: espressopp.MultiSystem()
-
-
 .. function:: espressopp.MultiSystem.beginSystemDefinition()
-
 		:rtype: 
-
 .. function:: espressopp.MultiSystem.runAnalysisNPart()
-
 		:rtype: 
-
 .. function:: espressopp.MultiSystem.runAnalysisPotential()
-
 		:rtype: 
-
 .. function:: espressopp.MultiSystem.runAnalysisTemperature()
-
 		:rtype: 
-
 .. function:: espressopp.MultiSystem.runIntegrator(niter)
-
 		:param niter: 
 		:type niter: 
 		:rtype: 
-
+.. function:: espressopp.MultiSystem.runDumpConfXYZ()
+		:rtype: 
 .. function:: espressopp.MultiSystem.setAnalysisNPart(npart)
-
 		:param npart: 
 		:type npart: 
-
 .. function:: espressopp.MultiSystem.setAnalysisPotential(potential)
-
 		:param potential: 
 		:type potential: 
-
 .. function:: espressopp.MultiSystem.setAnalysisTemperature(temperature)
-
 		:param temperature: 
 		:type temperature: 
-
 .. function:: espressopp.MultiSystem.setIntegrator(integrator)
-
 		:param integrator: 
 		:type integrator: 
+.. function:: espressopp.MultiSystem.setDumpConfXYZ(dumpconf)
+        :param dumpconf: 
+		:rtype:         
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
 import mpi4py.MPI as MPI
 
 class MultiSystemLocal(object):
-
+    """Local MultiSystem to simulate and analyze several systems in parallel."""
     
     def __init__(self):
         pass
@@ -101,6 +85,9 @@ class MultiSystemLocal(object):
     def setAnalysisNPart(self, npart):
         self.analysisNPart = npart
 
+    def setDumpConfXYZ(self, dumpconf):
+        self.dumpConfXYZ = dumpconf
+
     def runIntegrator(self, niter):
         self.integrator.cxxclass.run(self.integrator, niter)
 
@@ -122,13 +109,19 @@ class MultiSystemLocal(object):
         else :
             self.analysisNPart.cxxclass.compute(self.analysisNPart)
 
+    def runDumpConfXYZ(self):
+        if self.groupRank == 0:
+            return self.dumpConfXYZ.cxxclass.dump(self.dumpConfXYZ)
+        else :
+            self.dumpConfXYZ.cxxclass.dump(self.dumpConfXYZ)
+
 if pmi.isController :
     class MultiSystem(object):
-
+        """MultiSystemIntegrator to simulate and analyze several systems in parallel."""
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.MultiSystemLocal',
             pmicall = [ 'setIntegrator', 'runIntegrator', 'setAnalysisTemperature', 'beginSystemDefinition',
-                        'setAnalysisPotential','setAnalysisNPart'],
-            pmiinvoke = [ 'runAnalysisTemperature', 'runAnalysisPotential','runAnalysisNPart' ]
+                        'setAnalysisPotential','setAnalysisNPart', 'setDumpConfXYZ'],
+            pmiinvoke = [ 'runAnalysisTemperature', 'runAnalysisPotential','runAnalysisNPart','runDumpConfXYZ' ]
             )

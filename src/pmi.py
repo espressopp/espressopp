@@ -1192,7 +1192,7 @@ _CMD = [
 _MAXCMD = len(_CMD)
 
 # define the numerical constants to be used
-for i in range(len(_CMD)) :
+for i in xrange(len(_CMD)) :
     exec('_%s=%s' % (_CMD[i][0],i), globals())
 del i
 

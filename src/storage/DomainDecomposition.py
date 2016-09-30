@@ -91,7 +91,7 @@ if pmi.isController:
                 else:
                   cellGrid = toInt3DFromVector(cellGrid)
                 # minimum image convention check:
-                for k in range(3):
+                for k in xrange(3):
                   if nodeGrid[k]*cellGrid[k] == 1 :
                     print(("Warning! cellGrid[{}] has been "
                            "adjusted to 2 (was={})".format(k, cellGrid[k])))
