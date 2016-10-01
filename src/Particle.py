@@ -194,15 +194,9 @@ if pmi.isController:
 
         @property
         def node(self):
-            if mpi4py_version:
-                node = pmi.reduce(pmi.MAXLOC, self, 'locateParticle')
-            else:
-                value, node = pmi.reduce(pmi.MAXLOC, self, 'locateParticle')
+            value, node = pmi.reduce(pmi.MAXLOC, self, 'locateParticle')
             return node
 
         def __getattr__(self, key):
-            if mpi4py_version:
-                value = pmi.reduce(pmi.MAXLOC, self, 'getLocalData', key)
-            else:
-                value, node = pmi.reduce(pmi.MAXLOC, self, 'getLocalData', key)
+            value = pmi.reduce(pmi.MAX, self, 'getLocalData', key)
             return value
