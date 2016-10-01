@@ -38,12 +38,9 @@ import _espressopp
 import esutil
 import pmi
 from espressopp import toReal3DFromVector, toInt3DFromVector
-import mpi4py
-#import mpi4py.MPI as MPI
+import mpi4py.MPI as MPI
 from espressopp.Exceptions import ParticleDoesNotExistHere
 
-
-#mpi4py_version = mpi4py.__version__.startswith('2')
 
 # Controller Particle:
 # * requests are directly forwarded
