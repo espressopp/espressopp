@@ -279,9 +279,7 @@ namespace espressopp {
                                    "and velocities: " <<  velocities[3*i] << " " <<  velocities[3*i+1] << " " << velocities[3*i+2] <<
                                    "and types: " <<  types[i]);
 
-
-             //RealND _vec(6);
-             RealND _vec(7);  // p[0].p[1].p[2].v[0].v[1].v[2].type
+             RealND _vec(7);  // .type.p[0].p[1].p[2].v[0].v[1].v[2]
 
              _vec.setItem(0, types[i]);
 
