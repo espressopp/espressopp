@@ -64,7 +64,7 @@ writing down trajectory
 >>> dump_conf_xyz = espressopp.io.DumpXYZ(system, integrator, filename='trajectory.xyz')
 >>> for i in range (200):
 >>>   integrator.run(10)
->>>   xyz.dump()
+>>>   dump_conf_xyz.dump()
 
 writing down trajectory using ExtAnalyze extension
 
