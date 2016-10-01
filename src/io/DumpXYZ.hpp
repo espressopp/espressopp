@@ -1,23 +1,25 @@
 /*
+  Copyright (C) 2016
+      Max Planck Institute for Polymer Research & JGU Mainz
   Copyright (C) 2012-2015
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // ESPP_CLASS
@@ -39,19 +41,23 @@ namespace espressopp {
 
     public:
 
-      DumpXYZ(shared_ptr<System> system, 
+      DumpXYZ(shared_ptr<System> system,
               shared_ptr<integrator::MDIntegrator> _integrator,
               std::string _file_name,
               bool _unfolded,
               real _length_factor,
               std::string _length_unit,
+              bool _store_pids,
+              bool _store_velocities,
               bool _append) :
-                        ParticleAccess(system), 
+                        ParticleAccess(system),
                         integrator(_integrator),
                         file_name( _file_name ),
                         unfolded(_unfolded),
-                        length_factor(_length_factor), 
-                        append(_append){ 
+                        length_factor(_length_factor),
+                        store_pids(_store_pids),
+                        store_velocities(_store_velocities),
+                        append(_append){
         setLengthUnit(_length_unit);
         if (system->comm->rank() == 0  && !append)
           FileBackup backup(file_name);
@@ -61,13 +67,17 @@ namespace espressopp {
       void perform_action(){
         dump();
       }
-      
+
       void dump();
-      
+
       std::string getFilename(){return file_name;}
       void setFilename(std::string v){file_name = v;}
       bool getUnfolded(){return unfolded;}
       void setUnfolded(bool v){unfolded = v;}
+      bool getStorePids(){return store_pids;}
+      void setStorePids(bool v){store_pids = v;}
+      bool getStoreVelocities(){return store_velocities;}
+      void setStoreVelocities(bool v){store_velocities = v;}
       bool getAppend(){return append;}
       void setAppend(bool v){append = v;}
 
@@ -80,28 +90,30 @@ namespace espressopp {
           err.setException( msg.str() );
           err.checkException();
         }
-        
+
         length_unit = v;
       }
       real getLengthFactor(){return length_factor;}
       void setLengthFactor(real v){length_factor = v;}
-      
+
       static void registerPython();
-    
+
     protected:
 
       //static LOG4ESPP_DECL_LOGGER(logger);
 
     private:
-      
+
       // integrator we need to know an integration step
       shared_ptr<integrator::MDIntegrator> integrator;
-      
+
       std::string file_name;
-      
+
       bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
       bool append; //append to existing trajectory file or create a new one
-      real length_factor;  // for example 
+      bool store_pids;
+      bool store_velocities;
+      real length_factor;
       std::string length_unit; // length unit: {could be LJ, nm, A} it is just for user info
     };
   }
