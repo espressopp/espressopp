@@ -43,7 +43,7 @@ import mpi4py
 from espressopp.Exceptions import ParticleDoesNotExistHere
 
 
-mpi4py_version = mpi4py.__version__.startswith('2')
+#mpi4py_version = mpi4py.__version__.startswith('2')
 
 # Controller Particle:
 # * requests are directly forwarded
