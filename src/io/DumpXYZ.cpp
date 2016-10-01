@@ -1,6 +1,6 @@
 /*
-#  Copyright (C) 2016
-#      Max Planck Institute for Polymer Research & JGU Mainz
+  Copyright (C) 2016
+      Max Planck Institute for Polymer Research & JGU Mainz
   Copyright (C) 2012-2015
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -69,7 +69,7 @@ namespace espressopp {
           std::streamsize p = myfile.precision();
           for (size_t i=0; i<num_of_particles; i++) {
 
-                if (getStorePids())  {
+                if (store_pids)  {
                     myfile << cei.currentId() << " ";
                 }
 
@@ -78,7 +78,7 @@ namespace espressopp {
                        << length_factor * cei.currentProperties()[2] <<
                        " " << length_factor * cei.currentProperties()[3];
 
-                if (getStoreVelocities()) {
+                if (store_velocities) {
                   myfile << " " << length_factor * cei.currentProperties()[4] << " " << length_factor * cei.currentProperties()[5] <<
                   " " << length_factor * cei.currentProperties()[6];
                 }

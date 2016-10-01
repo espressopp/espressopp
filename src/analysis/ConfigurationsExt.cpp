@@ -1,6 +1,6 @@
 /*
-#  Copyright (C) 2016
-#      Max Planck Institute for Polymer Research & JGU Mainz
+  Copyright (C) 2016
+      Max Planck Institute for Polymer Research & JGU Mainz
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -283,17 +283,13 @@ namespace espressopp {
              //RealND _vec(6);
              RealND _vec(7);  // p[0].p[1].p[2].v[0].v[1].v[2].type
 
-             for (int k=0; k<1; k++)
-               _vec.setItem(k, types[i]);
+             _vec.setItem(0, types[i]);
 
              for (int k=0; k<3; k++)
                _vec.setItem(k+1, coordinates[3*i + k]);
 
              for (int k=0; k<3; k++)
                _vec.setItem(k+4, velocities[3*i + k]);
-
-             //for (int k=0; k<1; k++)
-               //_vec.setItem(k+6, types[i]);
 
              config->set(index, _vec);
            }

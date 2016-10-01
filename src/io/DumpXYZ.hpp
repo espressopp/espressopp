@@ -1,6 +1,6 @@
 /*
-#  Copyright (C) 2016
-#      Max Planck Institute for Polymer Research & JGU Mainz
+  Copyright (C) 2016
+      Max Planck Institute for Polymer Research & JGU Mainz
   Copyright (C) 2012-2015
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -113,7 +113,7 @@ namespace espressopp {
       bool append; //append to existing trajectory file or create a new one
       bool store_pids;
       bool store_velocities;
-      real length_factor;  // for example
+      real length_factor;
       std::string length_unit; // length unit: {could be LJ, nm, A} it is just for user info
     };
   }
