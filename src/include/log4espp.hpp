@@ -421,9 +421,9 @@ class LogClass {
   *   LOG4ESPP_LOGGER(logger,name)                       *
   *******************************************************/
 
-#define LOG4ESPP_ROOTLOGGER(aLogger) LogClass aLogger;
-#define LOG4ESPP_LOGGER(aLogger,name) LogClass aLogger;
-#define LOG4ESPP_DECL_LOGGER(aLogger) LogClass aLogger;
+#define LOG4ESPP_ROOTLOGGER(aLogger) LogClass aLogger
+#define LOG4ESPP_LOGGER(aLogger,name) LogClass aLogger
+#define LOG4ESPP_DECL_LOGGER(aLogger) LogClass aLogger
 
 #define LOG4ESPP_TRACE_ON(logger) (0)
 #define LOG4ESPP_DEBUG_ON(logger) (0)
