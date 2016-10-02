@@ -95,7 +95,7 @@ namespace espressopp {
           FileBackup backup(file_name); //backup trajectory if it already exists
         }
       }
-      ~DumpGRO() {std::cout << "DumpGRO destructor" << std::endl;} // never called, right?
+      ~DumpGRO() { }
 
       void perform_action(){
         dump();
