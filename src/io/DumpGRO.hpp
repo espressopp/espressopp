@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2016
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -95,7 +97,7 @@ namespace espressopp {
           FileBackup backup(file_name); //backup trajectory if it already exists
         }
       }
-      ~DumpGRO() {std::cout << "DumpGRO destructor" << std::endl;} // never called, right?
+      ~DumpGRO() { }
 
       void perform_action(){
         dump();
