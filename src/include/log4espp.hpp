@@ -1,23 +1,25 @@
 /*
+  Copyright (C) 2016
+      Max Planck Institute for Polymer Research & JGU Mainz
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /****************************************************************************
@@ -184,7 +186,7 @@
 
 #define LOG4ESPP_ROOTLOGGER(aLogger) log4cpp::Category& aLogger = log4cpp::Category::getRoot()
 
-#define LOG4ESPP_DECL_LOGGER(aLogger) log4cpp::Category& aLogger;
+#define LOG4ESPP_DECL_LOGGER(aLogger) log4cpp::Category& aLogger
 #define LOG4ESPP_LOGGER(aLogger,name) log4cpp::Category& aLogger = log4cpp::Category::getInstance(std::string(name))
 
   /*******************************************************
@@ -205,7 +207,7 @@
 #ifdef LOG4ESPP_TRACE_ENABLED
 #define LOG4ESPP_TRACE(logger,msg) { if (logger.isPriorityEnabled(log4cpp::Priority::DEBUG)) \
                  { std::ostringstream omsg; omsg << msg; logger.debug(omsg.str()); }}
-#else 
+#else
 #define LOG4ESPP_TRACE(logger,msg)
 #endif
 
@@ -216,7 +218,7 @@
 #ifdef LOG4ESPP_DEBUG_ENABLED
 #define LOG4ESPP_DEBUG(logger,msg) { if (logger.isPriorityEnabled(log4cpp::Priority::DEBUG)) \
                  { std::ostringstream omsg; omsg << msg; logger.debug(omsg.str()); }}
-#else 
+#else
 #define LOG4ESPP_DEBUG(logger,msg)
 #endif
 
@@ -227,7 +229,7 @@
 #ifdef LOG4ESPP_INFO_ENABLED
 #define LOG4ESPP_INFO(logger,msg) { if (logger.isPriorityEnabled(log4cpp::Priority::INFO)) \
                  { std::ostringstream omsg; omsg << msg; logger.info(omsg.str()); }}
-#else 
+#else
 #define LOG4ESPP_INFO(logger,msg)
 #endif
 
@@ -238,7 +240,7 @@
 #ifdef LOG4ESPP_WARN_ENABLED
 #define LOG4ESPP_WARN(logger,msg) { if (logger.isPriorityEnabled(log4cpp::Priority::WARN)) \
                  { std::ostringstream omsg; omsg << msg; logger.warn(omsg.str()); }}
-#else 
+#else
 #define LOG4ESPP_WARN(logger,msg)
 #endif
 
@@ -249,7 +251,7 @@
 #ifdef LOG4ESPP_ERROR_ENABLED
 #define LOG4ESPP_ERROR(logger,msg) { if (logger.isPriorityEnabled(log4cpp::Priority::ERROR)) \
                  { std::ostringstream omsg; omsg << msg; logger.error(omsg.str()); }}
-#else 
+#else
 #define LOG4ESPP_ERROR(logger,msg)
 #endif
 
@@ -260,7 +262,7 @@
 #ifdef LOG4ESPP_FATAL_ENABLED
 #define LOG4ESPP_FATAL(logger,msg) { if (logger.isPriorityEnabled(log4cpp::Priority::FATAL)) \
                  { std::ostringstream omsg; omsg << msg; logger.fatal(omsg.str()); }}
-#else 
+#else
 #define LOG4ESPP_FATAL(logger,msg)
 #endif
 
@@ -456,7 +458,7 @@ class LogClass {
 
 #define LOG4ESPP_ROOTLOGGER(aLogger) log4espp::Logger& aLogger = log4espp::Logger::getRoot()
 
-#define LOG4ESPP_DECL_LOGGER(aLogger) log4espp::Logger& aLogger;
+#define LOG4ESPP_DECL_LOGGER(aLogger) log4espp::Logger& aLogger
 #define LOG4ESPP_LOGGER(aLogger,name) log4espp::Logger& aLogger = log4espp::Logger::getInstance(std::string(name))
 
   /*******************************************************
@@ -477,7 +479,7 @@ class LogClass {
 #ifdef LOG4ESPP_TRACE_ENABLED
 #define LOG4ESPP_TRACE(logger,msg) { if (logger.isTraceEnabled()) \
         { std::ostringstream omsg; omsg << msg; logger.trace(LOG4ESPP_LOCATION, omsg.str()); } }
-#else 
+#else
 #define LOG4ESPP_TRACE(logger,msg)
 #endif
 
@@ -488,7 +490,7 @@ class LogClass {
 #ifdef LOG4ESPP_DEBUG_ENABLED
 #define LOG4ESPP_DEBUG(logger,msg) { if (logger.isDebugEnabled()) \
         { std::ostringstream omsg; omsg << msg; logger.debug(LOG4ESPP_LOCATION, omsg.str()); } }
-#else 
+#else
 #define LOG4ESPP_DEBUG(logger,msg)
 #endif
 
@@ -499,7 +501,7 @@ class LogClass {
 #ifdef LOG4ESPP_INFO_ENABLED
 #define LOG4ESPP_INFO(logger,msg) { if (logger.isInfoEnabled()) \
         { std::ostringstream omsg; omsg << msg; logger.info(LOG4ESPP_LOCATION, omsg.str()); } }
-#else 
+#else
 #define LOG4ESPP_INFO(logger,msg)
 #endif
 
@@ -510,7 +512,7 @@ class LogClass {
 #ifdef LOG4ESPP_WARN_ENABLED
 #define LOG4ESPP_WARN(logger,msg) { if (logger.isWarnEnabled()) \
         { std::ostringstream omsg; omsg << msg; logger.warn(LOG4ESPP_LOCATION, omsg.str()); } }
-#else 
+#else
 #define LOG4ESPP_WARN(logger,msg)
 #endif
 
@@ -521,7 +523,7 @@ class LogClass {
 #ifdef LOG4ESPP_ERROR_ENABLED
 #define LOG4ESPP_ERROR(logger,msg) { if (logger.isErrorEnabled()) \
         { std::ostringstream omsg; omsg << msg; logger.error(LOG4ESPP_LOCATION, omsg.str()); } }
-#else 
+#else
 #define LOG4ESPP_ERROR(logger,msg)
 #endif
 
@@ -532,7 +534,7 @@ class LogClass {
 #ifdef LOG4ESPP_FATAL_ENABLED
 #define LOG4ESPP_FATAL(logger,msg) { if (logger.isFatalEnabled()) \
         { std::ostringstream omsg; omsg << msg; logger.fatal(LOG4ESPP_LOCATION, omsg.str()); } }
-#else 
+#else
 #define LOG4ESPP_FATAL(logger,msg)
 #endif
 
