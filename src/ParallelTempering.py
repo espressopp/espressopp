@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013,2016
+#  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -59,14 +59,9 @@ r"""
 .. function:: espressopp.ParallelTempering.startDefiningSystem(n)
 		:param n: 
 		:type n: 
-		:rtype:
-.. function:: espressopp.ParallelTempering.setDumpConfXYZ(dumpconf)
-		:param dumpconf:  
-		:rtype:
-        
-.. function:: espressopp.ParallelTempering.runDumpConfXYZ()  
-		:rtype:        
+		:rtype: 
 """
+
 from espressopp import MultiSystem
 from espressopp import pmi
 import random
@@ -76,9 +71,11 @@ class ParallelTempering(object):
     
     def __init__(self, NumberOfSystems = 4, RNG = None):
         print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        print "+ Parallel Tempering Class is available in the current version of ESPResSo++.   +"
+        print "+ Due to a recent change in the design of ESPResSo++ the Parallel Tempering     +"
+        print "+ Class is available in the current version.                                    +"
         print "+ Multisystem simulations are still possible but have to be setup manually.     +"
         print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        #return 0 
         if (RNG == None):
             print "ERROR: ParallelTempering needs a random number generator"
         else: 
