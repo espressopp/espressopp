@@ -21,14 +21,14 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-"""
-*******************************************
+r"""
+*********************************************
 **DumpXYZ** - IO Object
-*******************************************
+*********************************************
 
 * `dump()`
   write configuration to trajectory XYZ file. By default filename is "out.xyz",
-  coordinates are folded.
+  coordinates are folded. DumpXYZ works also for Multiple communicators.
 
   Properties
 
@@ -85,7 +85,6 @@ For example, the Lennard-Jones model for liquid argon with :math:`\sigma=0.34 [n
                                           store_velocities = True, append=True)
 
 will produce trj.xyz with in nanometers
-<<<<<<< b8cd70adfd2106c1fae9bd966f421291399a7522
 
 .. function:: espressopp.io.DumpXYZ(system, integrator, filename, unfolded,
                                     length_factor, length_unit, store_pids,
@@ -113,8 +112,6 @@ will produce trj.xyz with in nanometers
 .. function:: espressopp.io.DumpXYZ.dump()
 
 		:rtype:
-=======
->>>>>>> multiple communicators and parallel dumps
 """
 
 from espressopp.esutil import cxxinit
@@ -124,18 +121,10 @@ from espressopp.ParticleAccess import *
 from _espressopp import io_DumpXYZ
 
 class DumpXYZLocal(ParticleAccessLocal, io_DumpXYZ):
-<<<<<<< b8cd70adfd2106c1fae9bd966f421291399a7522
 
   def __init__(self, system, integrator, filename='out.xyz', unfolded=False, length_factor=1.0, length_unit='LJ', store_pids=False, store_velocities=False, append=True):
     cxxinit(self, io_DumpXYZ, system, integrator, filename, unfolded, length_factor, length_unit, store_pids, store_velocities, append)
 
-=======
-  'The (local) storage of configurations.'
-  def __init__(self, system, integrator, filename='out.xyz', unfolded=False, length_factor=1.0, length_unit='LJ', append=True):
-    if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-      cxxinit(self, io_DumpXYZ, system, integrator, filename, unfolded, length_factor, length_unit, append)
-  
->>>>>>> multiple communicators and parallel dumps
   def dump(self):
     if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
       self.cxxclass.dump(self)
@@ -149,3 +138,4 @@ if pmi.isController :
       pmicall = [ 'dump' ],
       pmiproperty = ['filename', 'unfolded', 'length_factor', 'length_unit', 'store_pids', 'store_velocities', 'append']
     )
+
