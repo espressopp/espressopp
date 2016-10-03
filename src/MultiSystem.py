@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013,2016
+#  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -18,7 +18,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
-
 r"""
 **************************
 **espressopp.MultiSystem**
@@ -36,8 +35,6 @@ r"""
 		:param niter: 
 		:type niter: 
 		:rtype: 
-.. function:: espressopp.MultiSystem.runDumpConfXYZ()
-		:rtype: 
 .. function:: espressopp.MultiSystem.setAnalysisNPart(npart)
 		:param npart: 
 		:type npart: 
@@ -50,10 +47,8 @@ r"""
 .. function:: espressopp.MultiSystem.setIntegrator(integrator)
 		:param integrator: 
 		:type integrator: 
-.. function:: espressopp.MultiSystem.setDumpConfXYZ(dumpconf)
-        :param dumpconf: 
-		:rtype:         
 """
+
 from espressopp.esutil import cxxinit
 from espressopp import pmi
 import mpi4py.MPI as MPI
