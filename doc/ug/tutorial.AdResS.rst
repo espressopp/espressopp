@@ -124,6 +124,14 @@ Finally, we have to set up the AdResS integrator extension:
 
 It takes as arguments the Verlet list and the fixed tuple list. Additionally, for the case of a moving and/or deforming AdResS region based on one or more particles, the parameter ``regionupdates`` specifies how regularly we want to update the shape of the AdResS region in number of steps. This is to avoid as much as possible of the additional communication required to inform different processors of the change of the AdResS region. The parameter defaults to 1 and is not used at all for static AdResS regions.
 
+Having set up the AdResS extension, we can distribute all particles in the box and place the CG molecules in the centers of mass of the atoms which they belong to. This can be done conveniently via
+
+.. code-block:: python
+
+  # distribute atoms and CG molecules according to AdResS domain decomposition,
+  # place CG molecules in the center of mass
+  espressopp.tools.AdressDecomp(system, integrator)
+
 Free Energy Compensation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When using H-AdResS, we probably want to also employ a FEC. This can be done as follows:
