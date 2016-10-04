@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013,2015
+#  Copyright (C) 2012,2013,2015,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -110,7 +110,7 @@ class VerletListTripleLocal(_espressopp.VerletListTriple):
         if pmi.workerIsActive():
             triples=[]
             ntriples=self.localSize()
-            for i in range(ntriples):
+            for i in xrange(ntriples):
               triple=self.cxxclass.getTriple(self, i+1)
               triples.append(triple)
             return triples

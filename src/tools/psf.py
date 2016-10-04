@@ -69,7 +69,7 @@ def psfwrite(filename, system, maxdist=None, molsize=4, typenames=None):
 
   bond = []
   nInteractions = system.getNumberOfInteractions()
-  for i in range(nInteractions):
+  for i in xrange(nInteractions):
       if system.getInteraction(i).bondType() == espressopp.interaction.Pair:
         try:
            
@@ -127,19 +127,19 @@ def psfwrite(filename, system, maxdist=None, molsize=4, typenames=None):
   angles    = []
   dihedrals = [] 
   nInteractions = system.getNumberOfInteractions()
-  for i in range(nInteractions):
+  for i in xrange(nInteractions):
       bT = system.getInteraction.bondType
       if   bT == espressopp.interaction.Pair:
              bl = system.getInteraction(i).getFixedPairList().getBonds
-             for j in range(len(bl)):
+             for j in xrange(len(bl)):
                bonds.extend(bl[j])
       elif bT == espressopp.interaction.Angle:
              an = system.getInteraction(i).getFixedTripleList().getTriples
-             for j in range(len(an)):
+             for j in xrange(len(an)):
                angles.extend(an[j])
       elif bT == espressopp.interaction.Dihedral:
              di = system.getInteraction(i).getFixedQuadrupleList().getQuadruples
-             for j in range(len(di)):
+             for j in xrange(len(di)):
                dihedrals.extend(di[j])
   
   nbonds     = len(bonds)

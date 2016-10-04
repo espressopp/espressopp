@@ -140,7 +140,7 @@ def read(file):
 
           if len(tmp) > 2:
             first = int(tmp[0])
-            for idx in range(2, len(tmp), 2):
+            for idx in xrange(2, len(tmp), 2):
               bondpairs.append((first, int(tmp[idx])))
               
       f.close()
