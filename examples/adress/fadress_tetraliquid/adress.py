@@ -1,5 +1,22 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python2
+
+#  Copyright (C) 2016
+#      Max Planck Institute for Polymer Research
+#
+#  This file is part of ESPResSo++.
+#
+#  ESPResSo++ is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  ESPResSo++ is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
 import time
@@ -10,9 +27,6 @@ from espressopp import Real3D, Int3D
 from espressopp.tools.convert import espresso_old
 from espressopp.tools import decomp
 from espressopp.tools import timers
-
-#logging.getLogger("StorageAdress").setLevel(logging.DEBUG)
-#logging.getLogger("BC").setLevel(logging.DEBUG)
 
 # integration steps, cutoff, skin and thermostat flag (nvt = False is nve)
 steps = 5000
@@ -33,7 +47,7 @@ hy_size = 5.0
 def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
     outfile = open(name, "w")
     delta = (high - low) / (N - 1)
-     
+
     for i in range(N):
         r = low + i * delta
         energy = pot.computeEnergy(r)
@@ -43,34 +57,18 @@ def writeTabFile(pot, name, N, low=0.0, high=2.5, body=2):
         else: # this is for 3- and 4-body potentials
             force = pot.computeForce(r)
         outfile.write("%15.8g %15.8g %15.8g\n"%(r, energy, force))
-     
+
     outfile.close()
-
-
-# capped LJ - uncomment to plot
-#tabWCA = "pot-wca.txt"
-#potLJ  = espressopp.interaction.LennardJonesCapped(epsilon=1.0, sigma=1.0, shift=True, caprad=0.27, cutoff=rca)
-#writeTabFile(potLJ, tabWCA, N=512, low=0.005, high=rca)
-
-# FENE - uncomment to plot
-#tabFENE = "pot-fene.txt"
-#potFENE  = espressopp.interaction.FENE(K=30.0, r0=0.0, rMax=1.5)
-#writeTabFile(potFENE, tabFENE, N=512, low=0.005, high=2.0)
 
 # tabulated morse potential used for CG interactions
 tabMorse = "pot-morse.txt"
 potMorse = espressopp.interaction.Morse(epsilon=0.105, alpha=2.4, rMin=rc, cutoff=rc, shift="auto")
 writeTabFile(potMorse, tabMorse, N=512, low=0.005, high=4.5)
 
-
-
-# read ESPResSo configuration file 
+# read ESPResSo configuration file
 Lx, Ly, Lz, x, y, z, type, q, vx, vy, vz, fx, fy, fz, bonds = espresso_old.read("adress.espressopp")
 num_particlesCG = 5001 # number of VP/CG particles
-#num_particles = len(x) - num_particlesCG  # 20004 = 25005 - 5001 
 num_particles = len(x) # 20004
-
-#Lx, Ly, Lz = 45, 45, 45
 
 sys.stdout.write('Setting up simulation ...\n')
 density = num_particles / (Lx * Ly * Lz)
@@ -94,8 +92,7 @@ allParticlesAT = []
 allParticles = []
 tuples = []
 for pidAT in range(num_particles):
-    #print pidAT,
-    allParticlesAT.append([pidAT, # add here these particles just temporarly! 
+    allParticlesAT.append([pidAT, # add here these particles just temporarly!
                          Real3D(x[pidAT], y[pidAT], z[pidAT]),
                          Real3D(vx[pidAT], vy[pidAT], vz[pidAT]),
                          Real3D(fx[pidAT], fy[pidAT], fz[pidAT]),
@@ -118,14 +115,14 @@ for pidCG in range(num_particlesCG):
     for i in range(3):
         cmp[i] /= 4.0 # 4.0 is the mass of molecule
         cmv[i] /= 4.0
-        
+
     allParticles.append([pidCG+num_particles, # CG particle has to bo added first!
                          Real3D(cmp[0], cmp[1], cmp[2]), # pos
                          Real3D(cmv[0], cmv[1], cmv[2]), # vel
                          Real3D(0, 0, 0), # f
                          0, 4.0, 0]) # type, mass, is not AT particle
-    
-    for pidAT in range(4): 
+
+    for pidAT in range(4):
         pid = pidCG*4+pidAT
         allParticles.append([pid, # now the AT particles can be added
                             (allParticlesAT[pid])[1], # pos
@@ -133,14 +130,12 @@ for pidCG in range(num_particlesCG):
                             (allParticlesAT[pid])[3], # f
                             (allParticlesAT[pid])[4], # type
                             (allParticlesAT[pid])[5], # mass
-                            (allParticlesAT[pid])[6]]) # is AT particle 
-        
+                            (allParticlesAT[pid])[6]]) # is AT particle
+
     tuples.append(tmptuple)
-    
 
 # add particles
 system.storage.addParticles(allParticles, "id", "pos", "v", "f", "type", "mass", "adrat")
-
 
 # add tuples
 ftpl = espressopp.FixedTupleListAdress(system.storage)
@@ -152,7 +147,7 @@ fpl = espressopp.FixedPairListAdress(system.storage, ftpl)
 fpl.addBonds(bonds)
 
 # decompose after adding tuples and bonds
-print "Added tuples and bonds, decomposing now ..." 
+print "Added tuples and bonds, decomposing now ..."
 system.storage.decompose()
 
 print "done decomposing"
@@ -180,8 +175,6 @@ interLJ = espressopp.interaction.FixedPairListLennardJones(system, fpl, potLJ)
 system.addInteraction(interFENE)
 system.addInteraction(interLJ)
 
-
-
 # VV integrator
 integrator = espressopp.integrator.VelocityVerlet(system)
 integrator.dt = timestep
@@ -196,13 +189,6 @@ langevin.gamma = gamma
 langevin.temperature = temp
 langevin.adress = True # enable AdResS!
 integrator.addExtension(langevin)
-
-# add TDF (dummy, just testing)
-#tdf = espressopp.integrator.TDforce(system, center=[18.42225, 18.42225, 18.42225])
-#tdf.addForce(itype=2, filename=tabMorse, type=0)
-#integrator.addExtension(tdf)
-
-
 
 
 print ''
@@ -247,14 +233,10 @@ for s in range(1, intervals + 1):
   sys.stdout.write(fmt % (step, T, P, Pij[3], Ek + Ep + Eb, Ep, Eb, Ek))
   system.storage.decompose()
 
-  #filename = "adress_tetra_liquid.pdb"
-  #espressopp.tools.pdbwrite(filename, system, molsize=num_particles+num_particlesCG, append=True)
-
 end_time = time.clock()
 
-timers.show(integrator.getTimers(), precision=3)
-sys.stdout.write('Total # of neighbors = %d\n' % vl.totalSize())
-sys.stdout.write('Ave neighs/atom = %.1f\n' % (vl.totalSize() / float(num_particles)))
+# simulation information
+end_time = time.clock()
 sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))
