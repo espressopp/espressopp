@@ -64,38 +64,38 @@ def write(fileName, system, folded=True, writeVelocities=False):
   ndihedraltypes = 0
   
   nInteractions = system.getNumberOfInteractions()
-  for i in range(nInteractions):
+  for i in xrange(nInteractions):
       bT = system.getInteraction(i).bondType()
       if   bT == espressopp.interaction.Pair:
              nbondtypes += 1
              bl  = system.getInteraction(i).getFixedPairList().getBonds()
              bln = []
-             for j in range(len(bl)):
+             for j in xrange(len(bl)):
                bln.extend(bl[j])
              bonds.append(bln)
       elif bT == espressopp.interaction.Angular:
              nangletypes += 1
              an  = system.getInteraction(i).getFixedTripleList().getTriples()
              ann = []
-             for j in range(len(an)):
+             for j in xrange(len(an)):
                ann.extend(an[j]) 
              angles.append(ann)
       elif bT == espressopp.interaction.Dihedral:
              ndihedraltypes += 1
              di  = system.getInteraction(i).getFixedQuadrupleList().getQuadruples()
              din = []
-             for j in range(len(di)):
+             for j in xrange(len(di)):
                din.extend(di[j])   
              dihedrals.append(din)
   
   nbonds = 0
-  for i in range(len(bonds)):
+  for i in xrange(len(bonds)):
       nbonds += len(bonds[i])
   nangles = 0
-  for i in range(len(angles)):
+  for i in xrange(len(angles)):
       nangles += len(angles[i])
   ndihedrals = 0
-  for i in range(len(dihedrals)):
+  for i in xrange(len(dihedrals)):
       ndihedrals += len(dihedrals[i])
       
   atomtypes = []
@@ -169,24 +169,24 @@ def write(fileName, system, folded=True, writeVelocities=False):
   if nbonds > 0:
     file.write('\nBonds\n\n')
     bn = 0
-    for i in range(len(bonds)):
-      for j in range(len(bonds[i])):
+    for i in xrange(len(bonds)):
+      for j in xrange(len(bonds[i])):
         file.write('%d %d %d %d\n' % (bn, i, bonds[i][j][0], bonds[i][j][1]))
         bn += 1
 
   if nangles > 0:
     file.write('\nAngles\n\n')
     an = 0
-    for i in range(len(angles)):
-      for j in range(len(angles[i])):
+    for i in xrange(len(angles)):
+      for j in xrange(len(angles[i])):
         file.write('%d %d %d %d %d\n' % (an, i, angles[i][j][1], angles[i][j][0], angles[i][j][2]))
         an += 1
 
   if ndihedrals > 0:
     file.write('\nDihedrals\n\n')
     dn = 0
-    for i in range(len(dihedrals)):
-      for j in range(len(dihedrals[i])):
+    for i in xrange(len(dihedrals)):
+      for j in xrange(len(dihedrals[i])):
         file.write('%d %d %d %d %d %d\n' % (dn, i, dihedrals[i][j][0], dihedrals[i][j][1], dihedrals[i][j][2], dihedrals[i][j][3]))
         dn += 1
   
@@ -224,7 +224,7 @@ def read(fileName, readVelocities=False):
   p_ids = []
   p_types = []
   poss = []
-  for i in range(num_particles):
+  for i in xrange(num_particles):
     k, kk, rx, ry, rz = map(float, f.readline().split()[0:])
     p_ids.append(int(k))
     p_types.append(int(kk))
@@ -237,7 +237,7 @@ def read(fileName, readVelocities=False):
     while not 'Velocities' in line:
       line = f.readline()
     line = f.readline() # blank line
-    for i in range(num_particles):
+    for i in xrange(num_particles):
       vx_, vy_, vz_ = map(float, f.readline().split()[0:])
       vels.append(espressopp.Real3D(vx_, vy_, vz_))
 
@@ -248,7 +248,7 @@ def read(fileName, readVelocities=False):
     while not 'Bonds' in line:
       line = f.readline()
     line = f.readline()
-    for i in range(num_bonds):
+    for i in xrange(num_bonds):
       bond_id, bond_type, pid1, pid2 = map(int, f.readline().split())
       bonds.append([bond_type, (pid1, pid2)])
 
@@ -259,7 +259,7 @@ def read(fileName, readVelocities=False):
     while not 'Angles' in line:
       line = f.readline()
     line = f.readline()
-    for i in range(num_angles):
+    for i in xrange(num_angles):
       angle_id, angle_type, pid1, pid2, pid3 = map(int, f.readline().split())
       angles.append([angle_type, (pid1, pid2, pid3)])
 
@@ -271,7 +271,7 @@ def read(fileName, readVelocities=False):
     while not 'Dihedrals' in line:
       line = f.readline()
     line = f.readline()
-    for i in range(num_dihedrals):
+    for i in xrange(num_dihedrals):
       dihedral_id, dihedral_type, pid1, pid2, pid3, pid4 = map(int, f.readline().split())
       dihedrals.append([dihedral_type, (pid1, pid2, pid3, pid4)])
 

@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -26,7 +26,7 @@ import mpi4py.MPI as MPI
 
 class TestCollectives(unittest.TestCase):
     def testLocate(self):
-        for owner in range(MPI.COMM_WORLD.size - 1):
+        for owner in xrange(MPI.COMM_WORLD.size - 1):
             if pmi.isController:        
                 res = collectives.locateItem((owner == MPI.COMM_WORLD.rank))
                 self.assertEqual(res, owner)
