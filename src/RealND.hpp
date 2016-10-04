@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2016
+      Max Planck Institute for Polymer Research & JGU Mainz
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -135,7 +137,7 @@ namespace espressopp {
       data[i] = v[i];
   }
   
-  inline RealND::RealND(const int _dim, const real v[3]) {
+  inline RealND::RealND(const int _dim, const real v[]) {
     setDimension(_dim);
     for (int i = 0; i < _dim; i++)
       data[i] = v[i];
