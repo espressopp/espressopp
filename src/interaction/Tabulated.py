@@ -1,3 +1,5 @@
+#  Copyright (C) 2016
+#      Jakub Krajniak (jkrajniak at gmail.com)
 #  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
@@ -23,11 +25,6 @@ r"""
 **********************************************
 **espressopp.interaction.Tabulated**
 **********************************************
-
-
-
-
-
 
 
 .. function:: espressopp.interaction.Tabulated(itype, filename, cutoff)
@@ -137,7 +134,25 @@ r"""
 .. function:: espressopp.interaction.FixedPairListTabulated.setPotential(potential)
 
 		:param potential: 
-		:type potential: 
+		:type potential:
+
+.. function:: espressopp.interaction.FixedPairListTypesTabulated(system, ftl)
+
+        :param system: The Espresso++ system object.
+        :type system: espressopp.System
+        :param ftl: The FixedPair list.
+        :type ftl: espressopp.FixedPairList
+
+.. function:: espressopp.interaction.FixedPairListTypesTabulated.setPotential(type1, type2, potential)
+
+        Defines bond potential for interaction between particles of types type1-type2-type3.
+
+        :param type1: Type of particle 1.
+        :type type1: int
+        :param type2: Type of particle 2.
+        :type type2: int
+        :param potential: The potential to set up.
+        :type potential: espressopp.interaction.Potential
 """
 # -*- coding: iso-8859-1 -*-
 from espressopp import pmi, infinity
@@ -150,8 +165,8 @@ from _espressopp import interaction_Tabulated, \
                       interaction_VerletListAdressTabulated, \
                       interaction_VerletListHadressTabulated, \
                       interaction_CellListTabulated, \
-                      interaction_FixedPairListTabulated
-                      #interaction_FixedTripleListTabulated
+                      interaction_FixedPairListTabulated, \
+                      interaction_FixedPairListTypesTabulated
 
 class TabulatedLocal(PotentialLocal, interaction_Tabulated):
 
@@ -230,6 +245,28 @@ class FixedPairListTabulatedLocal(InteractionLocal, interaction_FixedPairListTab
             self.cxxclass.setPotential(self, potential)
 
 
+class FixedPairListTypesTabulatedLocal(InteractionLocal, interaction_FixedPairListTypesTabulated):
+    def __init__(self, system, vl):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            cxxinit(self, interaction_FixedPairListTypesTabulated, system, vl)
+
+    def setPotential(self, type1, type2, potential):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setPotential(self, type1, type2, potential)
+
+    def getPotential(self, type1, type2):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getPotential(self, type1, type2)
+
+    def setFixedPairList(self, fixedpairlist):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            self.cxxclass.setFixedPairList(self, fixedpairlist)
+
+    def getFixedPairList(self):
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+            return self.cxxclass.getFixedPairList(self)
+
+
 if pmi.isController:
     class Tabulated(Potential):
         'The Tabulated potential.'
@@ -272,4 +309,10 @@ if pmi.isController:
             cls =  'espressopp.interaction.FixedPairListTabulatedLocal',
             pmicall = ['setPotential', 'setFixedPairList', 'getFixedPairList']
             )
-        
+
+    class FixedPairListTypesTabulated(Interaction):
+        __metaclass__ = pmi.Proxy
+        pmiproxydefs = dict(
+            cls =  'espressopp.interaction.FixedPairListTypesTabulatedLocal',
+            pmicall = ['setPotential','getPotential','setFixedPairList','getFixedPairList']
+        )

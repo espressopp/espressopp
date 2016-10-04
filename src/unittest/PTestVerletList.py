@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -60,7 +60,7 @@ class TestVerletList(unittest.TestCase) :
        nodeGrid = (1, 1, comm.size)
        cellGrid = [1, 1, 1]
 
-       for i in range(3):
+       for i in xrange(3):
           cellGrid[i] = calcNumberCells(SIZE, nodeGrid[i], cutoff)
 
        print 'NodeGrid = %s'%(nodeGrid,)
@@ -69,9 +69,9 @@ class TestVerletList(unittest.TestCase) :
        system.storage = espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)
        pid = 0
 
-       for i in range(N):
-         for j in range(N):
-           for k in range(N):
+       for i in xrange(N):
+         for j in xrange(N):
+           for k in xrange(N):
  
              r = 0.5
              x = (i + r) / N * SIZE

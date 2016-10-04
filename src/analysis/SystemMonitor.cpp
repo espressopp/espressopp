@@ -18,10 +18,10 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include "python.hpp"
 #include <string>
 #include <utility>
 #include <vector>
-#include "python.hpp"
 #include "SystemMonitor.hpp"
 #include "integrator/MDIntegrator.hpp"
 
@@ -29,36 +29,20 @@ namespace espressopp {
 namespace analysis {
 
 void SystemMonitor::perform_action() {
+  current_step_ = integrator_->getStep();
+  values_->clear();
+  values_->push_back(current_step_);
+  values_->push_back(current_step_ * integrator_->getTimeStep());
+
+  computeObservables();
   if (system_->comm->rank() == 0) {
-    current_step_ = integrator_->getStep();
-    values_->clear();
-    values_->push_back(current_step_);
-    values_->push_back(current_step_ * integrator_->getTimeStep());
-
-    computeKineticEnergy();
-    computeObservables();
-
-    write();
+    output_->write();
   }
 }
 
 void SystemMonitor::computeObservables() {
   for (ObservableList::iterator it = observables_.begin(); it != observables_.end(); ++it) {
     values_->push_back(it->second->compute_real());
-  }
-}
-
-void SystemMonitor::computeKineticEnergy() {
-  real T = temp_->computeRaw();
-  real ekin = (3.0/2.0) * npart_->compute_real() * T;
-  values_->push_back(T);
-  values_->push_back(ekin);
-}
-
-void SystemMonitor::write() {
-  // That's a text file, let's only write on one node.
-  if (system_->comm->rank() == 0) {
-    output_->write();
   }
 }
 
@@ -93,14 +77,12 @@ void SystemMonitor::info() {
 
 void SystemMonitor::addObservable(std::string name, shared_ptr<Observable> obs,
     bool is_visible) {
-  if (system_->comm->rank() == 0) {
-    observables_.push_back(std::make_pair(name, obs));
-    header_->push_back(name);
-    if (is_visible)
-      visible_observables_.push_back(1);
-    else
-      visible_observables_.push_back(0);
-  }
+  observables_.push_back(std::make_pair(name, obs));
+  header_->push_back(name);
+  if (is_visible)
+    visible_observables_.push_back(1);
+  else
+    visible_observables_.push_back(0);
 }
 
 void SystemMonitor::registerPython() {

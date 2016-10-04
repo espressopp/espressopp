@@ -1,3 +1,5 @@
+#  Copyright (C) 2015
+#      Jakub Krajniak (jkrajniak at gmail.com)
 #  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
@@ -24,6 +26,7 @@
 import espressopp
 import math
 import gromacs
+import os
 
 class FileBuffer():
     def __init__(self):
@@ -54,12 +57,17 @@ class FileBuffer():
 def FillFileBuffer(fname, filebuffer):
     f=open(fname, 'r')
     for line in f:
-	if "include" in line and not line[0]==';':
-	    name=(line.split()[1]).strip('\"')
-	    FillFileBuffer(name, filebuffer)
-	else:
+        if "include" in line and not line[0]==';':
+            name=(line.split()[1]).strip('\"')
+            try: 
+                FillFileBuffer(name, filebuffer)
+            except IOError:
+                #need to use relative path
+                name = os.path.join(os.path.dirname(fname), name)
+                FillFileBuffer(name, filebuffer)
+        else:
             l=line.rstrip('\n')
-	    if l:
+            if l:
                 filebuffer.appendline(l)
             
     f.close
@@ -174,7 +182,7 @@ class HarmonicNCosDihedralInteractionType(InteractionType):
 class RyckaertBellemansDihedralInteractionType(InteractionType):
     def createEspressoInteraction(self, system, fpl):
         print('RyckaertBellemans: {}'.format(self.parameters))
-        pot = espressopp.interaction.DihedralRB(**{k: v for k, v in self.parameters.iteritems()})
+        pot = espressopp.interaction.DihedralRB(**self.parameters)
         return espressopp.interaction.FixedQuadrupleListDihedralRB(system, fpl, pot)
 
 class HarmonicDihedralInteractionType(InteractionType):

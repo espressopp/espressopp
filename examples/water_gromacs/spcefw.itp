@@ -1,3 +1,4 @@
+; based on a file distributed with gromacs
 [ moleculetype ]
 ; molname       nrexcl
 SOL             2

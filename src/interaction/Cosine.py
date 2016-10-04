@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -27,7 +27,7 @@ r"""
 Calculates the Cosine Interaction
 
 .. math::
-	U = K  (1 - cos(\theta - \theta_0))
+	U = K  (1 + cos(\theta - \theta_0))
 
 
 
