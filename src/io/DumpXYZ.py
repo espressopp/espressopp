@@ -28,7 +28,7 @@ r"""
 
 * `dump()`
   write configuration to trajectory XYZ file. By default filename is "out.xyz",
-  coordinates are folded.
+  coordinates are folded. DumpXYZ works also for Multiple communicators.
 
   Properties
 
@@ -138,3 +138,4 @@ if pmi.isController :
       pmicall = [ 'dump' ],
       pmiproperty = ['filename', 'unfolded', 'length_factor', 'length_unit', 'store_pids', 'store_velocities', 'append']
     )
+
