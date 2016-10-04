@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -32,7 +32,7 @@ def createCubic(N, rho, perfect=True, RNG=None):
     import random
   
   cubes = []
-  for i in range(100):
+  for i in xrange(100):
     cubes.append(i**3)
   if(cubes.count(N) != 1):
     print '\nWARNING: num_particles is not a perfect cube. Initial'
@@ -59,9 +59,9 @@ def createCubic(N, rho, perfect=True, RNG=None):
   x = []
   y = []
   z = []
-  for i in range(a):
-    for j in range(a):
-      for k in range(a):
+  for i in xrange(a):
+    for j in xrange(a):
+      for k in xrange(a):
         if(ct < N):
           x.append(0.5 * lattice_spacing + i * lattice_spacing + rnd(magn))
           y.append(0.5 * lattice_spacing + j * lattice_spacing + rnd(magn))
@@ -100,9 +100,9 @@ def createDiamond(N, rho, perfect=True, RNG=None):
   a1 = 0.5 * a * Real3D(0,1,1)
   a2 = 0.5 * a * Real3D(1,0,1)
   a3 = 0.5 * a * Real3D(1,1,0)
-  for i in range(num_per_edge):
-    for j in range(num_per_edge):
-      for k in range(num_per_edge):
+  for i in xrange(num_per_edge):
+    for j in xrange(num_per_edge):
+      for k in xrange(num_per_edge):
         Rijk = R0 + i*a11 + j*a22 + k*a33
         pos.append(Rijk)
         pos.append(Rijk+a1)

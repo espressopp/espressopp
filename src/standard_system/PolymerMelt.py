@@ -101,10 +101,10 @@ def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.
   if xyzrfilename: 
     props    = ['id', 'type', 'mass', 'pos', 'v', 'radius']
     bondlist = espressopp.FixedPairList(system.storage)
-    for i in range(num_chains):
+    for i in xrange(num_chains):
       chain = []
       bonds = []
-      for k in range(monomers_per_chain):
+      for k in xrange(monomers_per_chain):
         idx  =  i * monomers_per_chain + k
         part = [ pidf[idx], typef[idx], mass,
                  espressopp.Real3D(xposf[idx],yposf[idx],zposf[idx]),
@@ -119,10 +119,10 @@ def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.
   elif xyzfilename: 
     props    = ['id', 'type', 'mass', 'pos', 'v']
     bondlist = espressopp.FixedPairList(system.storage)
-    for i in range(num_chains):
+    for i in xrange(num_chains):
       chain = []
       bonds = []
-      for k in range(monomers_per_chain):
+      for k in xrange(monomers_per_chain):
         idx  =  i * monomers_per_chain + k
         part = [ pidf[idx], typef[idx], mass,
                  espressopp.Real3D(xposf[idx],yposf[idx],zposf[idx]),
@@ -140,10 +140,10 @@ def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.
     pid      = 1
     type     = 0
     chain    = []
-    for i in range(num_chains):
+    for i in xrange(num_chains):
       startpos = system.bc.getRandomPos()
       positions, bonds = espressopp.tools.topology.polymerRW(pid, startpos, monomers_per_chain, bondlen)
-      for k in range(monomers_per_chain):  
+      for k in xrange(monomers_per_chain):  
         part = [pid + k, type, mass, positions[k], vel_zero]
         chain.append(part)
       pid += monomers_per_chain
