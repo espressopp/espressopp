@@ -113,7 +113,7 @@ First, we define the appropriate interaction type, in H-AdResS this is ``VerletL
 Note that the here used interaction, ``VerletListHadressLennardJones``, couples only Lennard-Jones-type potentials with tabulated ones. However, there exist more such interaction templates for other potentials and potential combinations.
 
 AdResS Integrator Extension
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Finally, we have to set up the AdResS integrator extension:
 
 .. code-block:: python
