@@ -491,7 +491,7 @@ for k in range(nOutput):
   EQQ14 = qq14_interactions.computeEnergy()
   T = temperature.compute()
   Etotal = Eb+EAng+EDih+EImp+EQQ+EQQ14+ELj+ELj14
-  print (fmt%(i*dt,Eb, EAng, EDih, EImp, ELj, ELj14, EQQ, EQQ14, Etotal, T*temperatureConvFactor*dofTemperatureCorrFactor)),"output"
+  print (fmt%(i*dt,Eb, EAng, EDih, EImp, ELj, ELj14, EQQ, EQQ14, Etotal, T*temperatureConvFactor*dofTemperatureCorrFactor))
   sys.stdout.flush()
   integrator.run(nStepsPerOutput)
   particle = system.storage.getParticle(1)
