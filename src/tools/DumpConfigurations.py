@@ -116,7 +116,7 @@ def readxyz(filename):
   xvel = []
   yvel = []
   zvel = []
-  for i in range(num_particles):
+  for i in xrange(num_particles):
     line = file.readline().split()
     if len(line) == 7 or len(line)==4:
       line.insert(1,'0')
@@ -155,7 +155,7 @@ def readxyzr(filename):
   yvel = []
   zvel = []
   radius = []
-  for i in range(num_particles):
+  for i in xrange(num_particles):
     line = file.readline().split()
     if len(line) == 7:
       line.insert(1,'0')
@@ -245,7 +245,7 @@ def fastreadxyz(filename):
   xpos = []
   ypos = []
   zpos = []
-  for i in range(num_particles):
+  for i in xrange(num_particles):
     line = file.readline().split()
     if len(line) == 7 or len(line)==4:
       line.insert(1,'0')
