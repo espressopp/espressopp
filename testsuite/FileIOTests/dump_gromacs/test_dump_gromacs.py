@@ -63,7 +63,7 @@ def remove_all_gro_files():
         os.remove(file)
 
 
-class TestDumpXYZ(unittest.TestCase):
+class TestDumpGRO(unittest.TestCase):
     def setUp(self):
         system, integrator = espressopp.standard_system.LennardJones(0,(20,20,20))
         prewrite_expected_files(expected_files)
