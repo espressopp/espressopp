@@ -26,7 +26,7 @@
 #ifndef _REALND_HPP
 #define _REALND_HPP
 
-#include "types.hpp"
+#include "include/types.hpp"
 #include <sstream>
 
 namespace espressopp {

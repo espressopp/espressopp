@@ -1,0 +1,6 @@
+#find_package (Boost COMPONENTS system filesystem unit_test_framework REQUIRED)
+#include_directories(${Boost_INCLUDE_DIRS})
+add_definitions (-DBOOST_TEST_DYN_LINK)
+add_executable(RealNDTest RealNDTest.cpp)
+add_test(RealNDTest ${CMAKE_CURRENT_BINARY_DIR}/RealNDTest)
+set_tests_properties(RealNDTest PROPERTIES ENVIRONMENT "${TEST_ENV}")
