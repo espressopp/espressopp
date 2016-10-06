@@ -19,9 +19,8 @@
 */
 
 #define BOOST_TEST_MODULE RealNDTest
-#include <boost/test/included/unit_test.hpp>
-#include <vector>
 #include "RealND.hpp"
+#include <boost/test/included/unit_test.hpp>
 
 using namespace espressopp;  // NOLINT
 

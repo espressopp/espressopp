@@ -26,8 +26,14 @@
 #ifndef _REALND_HPP
 #define _REALND_HPP
 
-#include "include/types.hpp"
+#include <vector>
 #include <sstream>
+#include "boost/predef.h"
+#if BOOST_COMP_GNUC
+    #include "types.hpp"
+#else
+    #include "include/types.hpp"
+#endif
 
 namespace espressopp {
 
