@@ -3,5 +3,6 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../src/include)
 add_definitions (-DBOOST_TEST_DYN_LINK)
 add_executable(RealNDTest RealNDTest.cpp)
+target_link_libraries(RealNDTest ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
 add_test(RealNDTest ${CMAKE_CURRENT_BINARY_DIR}/RealNDTest)
 set_tests_properties(RealNDTest PROPERTIES ENVIRONMENT "${TEST_ENV}")
