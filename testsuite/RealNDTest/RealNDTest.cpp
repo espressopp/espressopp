@@ -20,7 +20,6 @@
 
 #define BOOST_TEST_MODULE RealNDTest
 
-#include "ut.hpp"
 #include "RealND.hpp"
 #include <boost/test/included/unit_test.hpp>
 
