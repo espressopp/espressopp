@@ -50,10 +50,10 @@ namespace espressopp {
          filename = "vz_of_x."; filename.append(convert.str()); filename.append(".dat");
          
          /* define lattice sites to measure velocity profile. We use a simple profile Vz(x)
-          * at y=0 and z=0 (indexes _j and _k are set to zero) */
-         int _j = 0; int _k = 0;
+          * at y=0 and z=0 (indexes _j and _k are set to offset) */
 
          int _offset = latticeboltzmann->getHaloSkin();
+         int _j = _offset, _k = _offset;
 
          // creating a profile based on the current populations
          FILE * velProfFile = fopen(filename.c_str(),"a");
