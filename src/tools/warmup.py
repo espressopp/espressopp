@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -53,7 +53,7 @@ def warmup(system, integrator, number=80):
   force_capping = espressopp.integrator.CapForce(system, 0.0)
   integrator.addExtension(force_capping)
 
-  for k in range(11,number):
+  for k in xrange(11,number):
     force_capping.setAbsCapForce(1000000.0/number*k)
     pot.sigma = final_sigma/number*k
     pot.epsilon = final_epsilon/number*k
@@ -66,7 +66,7 @@ def warmup(system, integrator, number=80):
   pot.epsilon = final_epsilon
   force_capping.disconnect()
   
-  for k in range(11):
+  for k in xrange(11):
     integrator.run(70)
     espressopp.tools.analyse.info(system, integrator)
 

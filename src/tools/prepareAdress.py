@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -42,7 +42,7 @@ import espressopp
 def AdressSetCG(apm, pidCG, allParticlesAT):
     cmp = [0,0,0]
     pos = (allParticlesAT[pidCG*apm])[1]
-    for i in range(3):
+    for i in xrange(3):
 	cmp[i] += pos[i]
     return cmp
 
