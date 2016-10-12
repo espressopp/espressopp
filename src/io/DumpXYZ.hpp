@@ -26,13 +26,17 @@
 #ifndef _IO_DUMPXYZ_HPP
 #define _IO_DUMPXYZ_HPP
 
+#include "mpi.hpp"
+#include "types.hpp"
+#include "System.hpp"
 #include "integrator/MDIntegrator.hpp"
 #include "io/FileBackup.hpp"
-
+#include <boost/serialization/map.hpp>
 #include "esutil/Error.hpp"
-
-#include <string>
 #include "ParticleAccess.hpp"
+#include "storage/Storage.hpp"
+#include "iterator/CellListIterator.hpp"
+#include <string>
 
 namespace espressopp {
   namespace io{
@@ -58,7 +62,34 @@ namespace espressopp {
                         store_pids(_store_pids),
                         store_velocities(_store_velocities),
                         append(_append){
-        setLengthUnit(_length_unit);
+          setLengthUnit(_length_unit);
+
+          //get local particle ID map
+          std::map<long, short> myParticleIDToTypeMap;
+          CellList realCells = system->storage->getRealCells();
+          for (iterator::CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+              long id = cit->id();
+              short type = cit->type();
+              myParticleIDToTypeMap[id] = type;
+          }
+          if (myParticleIDToTypeMap.size() ==0 )
+              throw std::runtime_error("Dumper: No particles found in the system - make sure particles are added first before Dumper is initialized");
+
+          //gather all particle ID maps
+          std::vector< std::map<long, short> > allParticleIDMaps;
+          boost::mpi::all_gather(
+                  *getSystem()->comm,
+                  myParticleIDToTypeMap,
+                  allParticleIDMaps);
+
+          //merge all particle ID maps
+          for (std::vector< std::map<long, short> >::iterator it=allParticleIDMaps.begin(); it!=allParticleIDMaps.end(); ++it)
+          {
+              particleIDToType.insert(it->begin(), it->end());
+          }
+          //std::cout << "particleIDToType.size(): " << particleIDToType.size() << std::endl;
+
+
         if (system->comm->rank() == 0  && !append)
           FileBackup backup(file_name);
       }
@@ -109,6 +140,9 @@ namespace espressopp {
 
       std::string file_name;
 
+      //an array or an map where key: particle id and value: particle type
+      //we assume, that the type of a particle does not change over time
+      std::map<long, short> particleIDToType;
       bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
       bool append; //append to existing trajectory file or create a new one
       bool store_pids;
