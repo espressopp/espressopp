@@ -1,6 +1,3 @@
-#import sys
-#import time
-import os
 import espressopp
 import mpi4py.MPI as MPI
 from espressopp import Int3D
@@ -93,8 +90,8 @@ class TestLBMDCoupling(unittest.TestCase):
         global runSteps
         lb.profStep = int(.5 * runSteps)
         lboutputScreen = espressopp.analysis.LBOutputScreen(system,lb)
-        OUT3=espressopp.integrator.ExtAnalyze(lboutputScreen,runSteps)
-        integrator.addExtension(OUT3)
+        ext_lboutputScreen=espressopp.integrator.ExtAnalyze(lboutputScreen,runSteps)
+        integrator.addExtension(ext_lboutputScreen)
         
         # lb parameters: viscosities, temperature, time contrast b/w MD and LB
         lb.visc_b = 3.

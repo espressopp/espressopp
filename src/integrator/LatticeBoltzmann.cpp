@@ -563,11 +563,11 @@ namespace espressopp {
                   }
                }
             }
-            
-            calcDenMom();
-            
-            copyDenMomToHalo();
          }
+         
+         calcDenMom();
+         
+         copyDenMomToHalo();
       }
       
 /*******************************************************************************************/
