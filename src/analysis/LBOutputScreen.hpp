@@ -37,6 +37,9 @@ namespace espressopp {
          void writeOutput();
          void findLBMom(int _mode);
          
+         void setMDMom(Real3D _mdMom);
+         Real3D getMDMom();
+         
          void setLBMom(Real3D _lbMom);
          Real3D getLBMom();
          
@@ -54,7 +57,7 @@ namespace espressopp {
       private:
          int oldStepNum;
          real lbTimerOld, lbTimerNew;
-         Real3D lbMom;
+         Real3D lbMom, mdMom;
          esutil::WallTimer timeLBtoMD;  //!< used for timing
       };
    }

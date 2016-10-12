@@ -1,5 +1,3 @@
-#import sys
-#import time
 import os
 import espressopp
 import mpi4py.MPI as MPI
@@ -17,15 +15,14 @@ initVel = 0.
 class TestPureLB(unittest.TestCase):
     def setUp(self):
         # set up system
-        global Ni
-        global temperature
+        global Ni, temperature
         system, integrator = espressopp.standard_system.LennardJones(0, box=(Ni, Ni, Ni), temperature=temperature)
         nodeGrid = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
 
         # set up LB fluid
         lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid)
         integrator.addExtension(lb)
-        lb.lbTemp = 1.0
+        lb.lbTemp = temperature
 
         # set initial populations
         global initDen, initVel
@@ -44,7 +41,6 @@ class TestPureLB(unittest.TestCase):
         # variables to hold average density and mass flux
         av_den = 0.
         av_j = Real3D(0.)
-        list = []
 
         # lattice variables. halo is hard coded
         halo = 1

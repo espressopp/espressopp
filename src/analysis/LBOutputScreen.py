@@ -73,5 +73,5 @@ if pmi.isController :
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.LBOutputScreenLocal',
-            pmicall = ["writeOutput"]
+            pmicall = ["writeOutput", "getLBMom", "getMDMom"]
             )

@@ -72,7 +72,8 @@ namespace espressopp {
                                _myCMVel, _totCMVel, std::plus<Real3D>(), 0);
             findLBMom(0);
          }
-         
+    
+         // output MD momentum and statistics of the run //
          if (system.comm->rank() == 0) {
             Int3D _Ni = latticeboltzmann->getNi();
             long int latSize = _Ni[0] * _Ni[1] * _Ni[2];
@@ -81,6 +82,7 @@ namespace espressopp {
             long int madeLBSteps = (long int)((_step-getOldStepNum()) * _invNSteps);
             
             // output MD momentum //
+            setMDMom(_totCMVel); // need this for testsuite
             printf("MD mom at (+1/2dt): %17.12f %17.12f %17.12f \n",
                    _totCMVel[0], _totCMVel[1], _totCMVel[2]);
             
@@ -126,7 +128,7 @@ namespace espressopp {
             }
          }
          _myMom *= (latticeboltzmann->convTimeMDtoLB() / latticeboltzmann->getA());
-         
+      
          System& system = getSystemRef();
 
          if (_mode == 0) {
@@ -137,12 +139,12 @@ namespace espressopp {
             // collect momenta and share the result between CPUs
             boost::mpi::all_reduce(*system.comm,
                                    _myMom, result, std::plus<Real3D>());
-            
             setLBMom(result);
          }
          
          // output LB momentum //
          if (system.comm->rank() == 0) {
+            setLBMom(result); // need this for testsuite
             printf ("after step %d:\n", latticeboltzmann->getStepNum());
             printf ("LB mom in LJ units: %17.12f %17.12f %17.12f \n",
                     result[0], result[1], result[2]);
@@ -151,6 +153,9 @@ namespace espressopp {
       
       void LBOutputScreen::setLBMom (Real3D _lbMom) { lbMom = _lbMom; }
       Real3D LBOutputScreen::getLBMom () {return lbMom;}
+      
+      void LBOutputScreen::setMDMom (Real3D _mdMom) { mdMom = _mdMom; }
+      Real3D LBOutputScreen::getMDMom () {return mdMom;}
       
       void LBOutputScreen::setLBTimerOld (real _lbTimerOld) {
          lbTimerOld = _lbTimerOld;}
@@ -172,6 +177,8 @@ namespace espressopp {
           shared_ptr< integrator::LatticeBoltzmann > >())
          
          .def("writeOutput", &LBOutputScreen::writeOutput)
+         .def("getLBMom", &LBOutputScreen::getLBMom)
+         .def("getMDMom", &LBOutputScreen::getMDMom)
          ;
       }
    }
