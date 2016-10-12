@@ -73,14 +73,14 @@ namespace espressopp {
                     myfile << cei.currentId() << " ";
                 }
 
-                myfile << cei.currentProperties()[0] <<
-                       " " << fixed << setprecision(10) << length_factor * cei.currentProperties()[1] << " "
-                       << length_factor * cei.currentProperties()[2] <<
-                       " " << length_factor * cei.currentProperties()[3];
+                myfile << particleIDToType.find(cei.currentId())->second <<
+                       " " << fixed << setprecision(10) << length_factor * cei.currentProperties()[0] << " "
+                       << length_factor * cei.currentProperties()[1] <<
+                       " " << length_factor * cei.currentProperties()[2];
 
                 if (store_velocities) {
-                  myfile << " " << length_factor * cei.currentProperties()[4] << " " << length_factor * cei.currentProperties()[5] <<
-                  " " << length_factor * cei.currentProperties()[6];
+                  myfile << " " << length_factor * cei.currentProperties()[3] << " " << length_factor * cei.currentProperties()[4] <<
+                  " " << length_factor * cei.currentProperties()[5];
                 }
                 myfile << endl;
                 myfile.unsetf(ios_base::fixed);
