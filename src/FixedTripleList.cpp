@@ -282,6 +282,13 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "regenerated local fixed triple list from global list");
   }
 
+  void FixedTripleList::remove(void) {
+      this->clear();
+      globalTriples.clear();
+      sigBeforeSend.disconnect();
+      sigAfterRecv.disconnect();
+      sigOnParticleChanged.disconnect();
+  }
   /****************************************************
   ** REGISTRATION WITH PYTHON
   ****************************************************/
@@ -299,6 +306,7 @@ namespace espressopp {
       ("FixedTripleList", init< shared_ptr< storage::Storage > >())
       .def("add", pyAdd)
       .def("size", &FixedTripleList::size)
+      .def("remove",  &FixedTripleList::remove)
       .def("getTriples",  &FixedTripleList::getTriples)
      ;
   }

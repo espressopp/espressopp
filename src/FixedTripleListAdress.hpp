@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -58,7 +58,7 @@ namespace espressopp {
 		void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);
 		void beforeSendATParticles(std::vector<longint>& atpl, class OutBuffer& buf);
 		void onParticlesChanged();
-
+                void remove();
 		static void registerPython();
 
 	  protected:

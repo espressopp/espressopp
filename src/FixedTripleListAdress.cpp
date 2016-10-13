@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -228,6 +228,16 @@ FixedTripleListAdress::~FixedTripleListAdress() {
     LOG4ESPP_INFO(theLogger, "regenerated local fixed pair list from global list");
   }
 
+  void FixedTripleListAdress::remove(void) {
+      this->clear();
+      globalTriples.clear();
+      sigBeforeSend.disconnect();
+      sigAfterRecv.disconnect();
+      sigBeforeSendAT.disconnect();
+      sigAfterRecvAT.disconnect();
+      sigOnParticleChanged.disconnect();
+  }
+
   /****************************************************
   ** REGISTRATION WITH PYTHON
   ****************************************************/
@@ -244,6 +254,7 @@ FixedTripleListAdress::~FixedTripleListAdress() {
               init <shared_ptr<storage::Storage>,
                      shared_ptr<FixedTupleListAdress> >())
       .def("add", pyAdd)
+      .def("remove",  &FixedTripleList::remove)
       ;
   }
 

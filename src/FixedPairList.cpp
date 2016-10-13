@@ -257,6 +257,14 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "regenerated local fixed pair list from global list");
   }
 
+  void FixedPairList::remove(void) {
+      this->clear();
+      globalPairs.clear();
+      sigBeforeSend.disconnect();
+      sigAfterRecv.disconnect();
+      sigOnParticlesChanged.disconnect();
+  }
+
   /****************************************************
   ** REGISTRATION WITH PYTHON
   ****************************************************/
@@ -274,6 +282,7 @@ namespace espressopp {
       .def("add", pyAdd)
       .def("size", &FixedPairList::size)
       .def("getBonds",  &FixedPairList::getBonds)
+      .def("remove",  &FixedPairList::remove)
       .def("resetLongtimeMaxBondSqr", &FixedPairList::resetLongtimeMaxBondSqr)
       .def("getLongtimeMaxBondSqr", &FixedPairList::getLongtimeMaxBondSqr)
       ;

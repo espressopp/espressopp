@@ -53,6 +53,12 @@ r"""
 .. function:: espressopp.FixedTripleList.size()
 
 		:rtype: 
+
+.. function:: espressopp.FixedTripleList.remove()
+    remove the FixedPairList and disconnect
+
+
+
 """
 from espressopp import pmi
 import _espressopp
@@ -88,6 +94,12 @@ class FixedTripleListLocal(_espressopp.FixedTripleList):
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 
+    def remove(self):
+        if pmi.workerIsActive():
+            self.cxxclass.remove(self)
+            return
+
+
     '''
     def addTriples(self, triplelist):
         """
@@ -114,6 +126,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedTripleListLocal',
             localcall = [ "add" ],
-            pmicall = [ "addTriples" ],
+            pmicall = [ "addTriples","remove" ],
             pmiinvoke = ["getTriples", "size"]
         )

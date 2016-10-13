@@ -66,8 +66,9 @@ namespace espressopp {
 	    	return globalTriples.size();
 	    }
 
-		static void registerPython();
-	
+         void remove();
+                static void registerPython();
+
 
 	  private:
 		static LOG4ESPP_DECL_LOGGER(theLogger);

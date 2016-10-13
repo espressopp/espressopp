@@ -67,6 +67,7 @@ namespace espressopp {
 
 	    python::list getBonds();
 	    GlobalPairs* getGlobalPairs() {return &globalPairs;};
+            void remove();
 
 	    /** Get the number of bonds in the GlobalPairs list */
 	    int size() {
