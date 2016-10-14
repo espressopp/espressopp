@@ -1,7 +1,7 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012-2016
       Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
+  Copyright (C) 2008-2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
   
   This file is part of ESPResSo++.
@@ -25,7 +25,6 @@
 
 namespace espressopp {
   namespace integrator {
-//    LOG4ESPP_LOGGER(LBInitPopWave::theLogger, "LBInitPopWave");
     LBInitPopWave::LBInitPopWave(shared_ptr<System> system,
 																 shared_ptr< LatticeBoltzmann > latticeboltzmann)
     : LBInit(system, latticeboltzmann) {

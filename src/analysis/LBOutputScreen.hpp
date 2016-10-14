@@ -1,6 +1,8 @@
 /*
- Copyright (C) 2012-2016 Max Planck Institute for Polymer Research
- Copyright (C) 2008-2011 Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+ Copyright (C) 2012-2016 
+     Max Planck Institute for Polymer Research
+ Copyright (C) 2008-2011 
+     Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
  
  This file is part of ESPResSo++.
  
@@ -30,9 +32,6 @@ namespace espressopp {
       public:
          LBOutputScreen(shared_ptr<System> _system,
                         shared_ptr< integrator::LatticeBoltzmann > _latticeboltzmann);
-         
-         /** Destructor for output. */
-         //        ~LBOutputScreen ();
          
          void writeOutput();
          void findLBMom(int _mode);
