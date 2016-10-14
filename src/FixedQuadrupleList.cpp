@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -277,7 +277,13 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "regenerated local fixed quadruple list from global list");
   }
 
-
+  void FixedQuadrupleList::remove(void) {
+      this->clear();
+      globalQuadruples.clear();
+      sigBeforeSend.disconnect();
+      sigAfterRecv.disconnect();
+      sigOnParticleChanged.disconnect();
+  }
   /****************************************************
   ** REGISTRATION WITH PYTHON
   ****************************************************/
@@ -295,6 +301,7 @@ namespace espressopp {
       ("FixedQuadrupleList", init< shared_ptr< storage::Storage > >())
       .def("add", pyAdd)
       .def("size", &FixedQuadrupleList::size)
+      .def("remove",  &FixedQuadrupleList::remove)
       .def("getQuadruples",  &FixedQuadrupleList::getQuadruples)
      ;
   }
