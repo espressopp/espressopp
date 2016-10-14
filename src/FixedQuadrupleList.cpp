@@ -282,7 +282,6 @@ namespace espressopp {
       globalQuadruples.clear();
       sigBeforeSend.disconnect();
       sigAfterRecv.disconnect();
-      sigOnParticleChanged.disconnect();
   }
   /****************************************************
   ** REGISTRATION WITH PYTHON
