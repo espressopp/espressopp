@@ -108,7 +108,6 @@ class FixedPairListLocal(_espressopp.FixedPairList):
     def remove(self):
         if pmi.workerIsActive():
           self.cxxclass.remove(self)
-          return
 
     def resetLongtimeMaxBond(self):
 

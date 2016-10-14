@@ -257,7 +257,7 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "regenerated local fixed pair list from global list");
   }
 
-  void FixedPairList::remove(void) {
+  void FixedPairList::remove() {
       this->clear();
       globalPairs.clear();
       sigBeforeSend.disconnect();

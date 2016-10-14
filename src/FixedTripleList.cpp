@@ -282,7 +282,7 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "regenerated local fixed triple list from global list");
   }
 
-  void FixedTripleList::remove(void) {
+  void FixedTripleList::remove() {
       this->clear();
       globalTriples.clear();
       sigBeforeSend.disconnect();

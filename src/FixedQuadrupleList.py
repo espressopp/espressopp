@@ -98,7 +98,6 @@ class FixedQuadrupleListLocal(_espressopp.FixedQuadrupleList):
     def remove(self):
         if pmi.workerIsActive():
             self.cxxclass.remove(self)
-            return
 
     def getQuadruples(self):
 

@@ -277,7 +277,7 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "regenerated local fixed quadruple list from global list");
   }
 
-  void FixedQuadrupleList::remove(void) {
+  void FixedQuadrupleList::remove() {
       this->clear();
       globalQuadruples.clear();
       sigBeforeSend.disconnect();
