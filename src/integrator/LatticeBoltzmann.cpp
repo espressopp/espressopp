@@ -1067,7 +1067,6 @@ namespace espressopp {
             for ( int _j = 0; _j < _myNi[1]; _j++ ) {
                for ( int _k = 0; _k < _myNi[2]; _k++ ) {
                   Real3D _couplForceLoc = (*lbfor)[_i][_j][_k].getCouplForceLoc();
-                  // QUITE LONG, HA??
                   if ( _couplForceLoc.sqr() < ROUND_ERROR_PREC ) {
                   // see definition of ROUND ERROR in src/include/esconfig.hpp
                   } else {
@@ -1222,6 +1221,22 @@ namespace espressopp {
          setNi( _Ni );
          setMyLeft( _myLeft );
          setMyNi( _numSites );
+      }
+
+/*******************************************************************************************/
+
+      /* FIND GLOBAL INDICES OF THE FIRST REAL LB SITE IN CURRENT CPU */
+      Int3D LatticeBoltzmann::findGlobIdx () {
+         Int3D _globIdx;
+         Int3D _Ni = getNi();
+         Int3D _myPos = getMyPos();
+         Int3D _nodeGrid = getNodeGrid();
+         
+         for (int _dim = 0; _dim < 3; _dim++) {
+            _globIdx[_dim] = floor(_myPos[_dim] * _Ni[_dim] / _nodeGrid[_dim]);
+         }
+         
+         return _globIdx;
       }
       
 /*******************************************************************************************/

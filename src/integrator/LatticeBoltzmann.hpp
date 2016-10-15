@@ -231,6 +231,7 @@ namespace espressopp {
          /* MPI FUNCTIONS */
          void findMyNeighbours ();
          void assignMyLattice ();
+         Int3D findGlobIdx ();      // find global index of first lb site of cpu
          void commHalo ();                     // communicate populations in halo
          void copyForcesFromHalo ();      // copy coupling forces from halo regions to the real lattice sites
          void copyDenMomToHalo ();         // copy den and j from real lattice sites to halo
