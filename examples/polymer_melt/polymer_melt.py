@@ -3,7 +3,8 @@
 
 ###########################################################################
 #                                                                         #
-#  ESPResSo++ Benchmark Python script for a Lennard Jones System          #
+#  ESPResSo++ Python script for a Polymer Melt System including           #
+#  runtime details
 #                                                                         #
 ###########################################################################
 

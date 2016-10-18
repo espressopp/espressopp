@@ -1,23 +1,25 @@
 /*
+  Copyright (C) 2016
+      Max Planck Institute for Polymer Research & JGU Mainz
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "python.hpp"
@@ -40,7 +42,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(ConfigurationsExt::logger, "ConfigurationsExt");
 
-    void ConfigurationsExt::setCapacity(int max) 
+    void ConfigurationsExt::setCapacity(int max)
     {
       if (max < 0) {
          LOG4ESPP_ERROR(logger, "number for maximal configurations must be positive");
@@ -57,13 +59,13 @@ namespace espressopp {
 
          int diff = nconfigs - maxConfigs;
 
-         LOG4ESPP_INFO(logger, "delete " << diff << 
+         LOG4ESPP_INFO(logger, "delete " << diff <<
               " configurations due to restricted capacity");
 
          configurationsExt.erase(configurationsExt.begin(),
                               configurationsExt.begin() + diff);
       }
-      
+
       unfolded = true; // by default it writes unfolded coordinates
     }
 
@@ -77,7 +79,7 @@ namespace espressopp {
       return configurationsExt.size();
     }
 
-   
+
     ConfigurationExtList ConfigurationsExt::all()
     {
       return configurationsExt;
@@ -120,7 +122,7 @@ namespace espressopp {
     void ConfigurationsExt::gather() {
 
       System& system = getSystemRef();
-  
+
       // determine number of local particles and total particles
 
       int myN = system.storage->getNRealParticles();
@@ -141,7 +143,7 @@ namespace espressopp {
 
       CellList realCells = system.storage->getRealCells();
 
-      int i = 0; 
+      int i = 0;
 
       if( unfolded ){
         for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
@@ -203,8 +205,8 @@ namespace espressopp {
            int nother;
 
            if (iproc) {
-   
-              int nIds, nCoords, nVelocs;   // number of received values
+
+              int nIds, nCoords, nVelocs; // number of received values
               //int tmp;
 
               boost::mpi::request req;
@@ -221,11 +223,11 @@ namespace espressopp {
               system.comm->send(iproc, DEFAULT_TAG, 0);
               stat = req.wait();
               nCoords = *stat.count<real>();
-  
+
               // make sure to have 3 coordinate values for each id
 
               if (nCoords != 3 * nIds) {
-                LOG4ESPP_ERROR(logger, "serious error collecting data, got " << 
+                LOG4ESPP_ERROR(logger, "serious error collecting data, got " <<
                               nIds << " ids, but " << nCoords << " coordinates");
               }
 
@@ -238,17 +240,16 @@ namespace espressopp {
               // make sure to have 3 velocities values for each id
 
               if (nVelocs != 3 * nIds) {
-                LOG4ESPP_ERROR(logger, "serious error collecting data, got " << 
+                LOG4ESPP_ERROR(logger, "serious error collecting data, got " <<
                               nIds << " ids, but " << nVelocs << " velocities");
               }
-
 
               nother = nIds;
 
            } else {
              nother = myN;
            }
-   
+
 
            LOG4ESPP_INFO(logger, "add " << nother << " coordinates of proc " << iproc);
 
@@ -257,16 +258,17 @@ namespace espressopp {
              int index = ids[i];
 
              LOG4ESPP_INFO(logger, "set coordianates of particle with id = " << index <<
-                                   ": " << coordinates[3*i] << " " <<  coordinates[3*i+1] << " " << coordinates[3*i+2] << 
+                                   ": " << coordinates[3*i] << " " <<  coordinates[3*i+1] << " " << coordinates[3*i+2] <<
                                    "and velocities: " <<  velocities[3*i] << " " <<  velocities[3*i+1] << " " << velocities[3*i+2]);
 
+             RealND _vec(6);  // p[0].p[1].p[2].v[0].v[1].v[2]
 
-             RealND _vec(6);
              for (int k=0; k<3; k++)
                _vec.setItem(k, coordinates[3*i + k]);
 
              for (int k=0; k<3; k++)
                _vec.setItem(k+3, velocities[3*i + k]);
+
              config->set(index, _vec);
            }
         }
@@ -277,20 +279,23 @@ namespace espressopp {
 
       } else {
 
-       LOG4ESPP_INFO(logger, "proc " << system.comm->rank() << " sends data " 
+       LOG4ESPP_INFO(logger, "proc " << system.comm->rank() << " sends data "
                       << " of " << myN << " particles");
 
        // not master process, send data to master process
 
        int tmp;
 
+       boost::mpi::request requests[2];
        boost::mpi::status stat;
 
        // wait for a signal (empty message) before sending
 
-       system.comm->irecv<int>(0, DEFAULT_TAG, tmp);
+       requests[0] = system.comm->irecv<int>(0, DEFAULT_TAG, tmp);
        system.comm->send<int>(0, DEFAULT_TAG, ids, myN);
-       system.comm->irecv<int>(0, DEFAULT_TAG, tmp);
+       stat = requests[0].wait();
+       requests[1] = system.comm->irecv<int>(0, DEFAULT_TAG, tmp);
+       stat = requests[1].wait();
        system.comm->send<real>(0, DEFAULT_TAG, coordinates, 3*myN);
        system.comm->send<real>(0, DEFAULT_TAG, velocities, 3*myN);
       }
@@ -317,9 +322,9 @@ namespace espressopp {
       class_<ConfigurationsExt>
         ("analysis_ConfigurationsExt", init< shared_ptr< System > >())
       .add_property("size", &ConfigurationsExt::getSize)
-      .add_property("capacity", &ConfigurationsExt::getCapacity, 
+      .add_property("capacity", &ConfigurationsExt::getCapacity,
                                 &ConfigurationsExt::setCapacity)
-      .add_property("unfolded", &ConfigurationsExt::getUnfolded, 
+      .add_property("unfolded", &ConfigurationsExt::getUnfolded,
                                 &ConfigurationsExt::setUnfolded)
       .def("gather", &ConfigurationsExt::gather)
       .def("__getitem__", &ConfigurationsExt::get)
