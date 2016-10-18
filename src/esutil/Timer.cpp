@@ -22,11 +22,12 @@
 
 #include "Timer.hpp"
 
+namespace espressopp {
+namespace esutil {
+
 #ifdef CMAKE_HEADERS
 
 #include <sys/resource.h>
-
-using namespace espressopp::esutil;
 
 float UserTimer::getCurrentTime() const {
   struct rusage rus;
@@ -42,3 +43,6 @@ float UserTimer::getCurrentTime() const { return 0; }
 #endif
 
 float WallTimer::getCurrentTime() const { return timer.elapsed(); }
+
+}  // end namespace esutil
+}  // end namespace espressopp
