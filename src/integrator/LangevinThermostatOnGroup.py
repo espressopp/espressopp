@@ -30,7 +30,19 @@ Thermalize particles in the ParticleGroup only.
         :type system: espressopp.System
         :param particle_group: The particle group.
         :type particle_group: espressopp.ParticleGroup
+
+Example
+###########
+
+>>> pg = espressopp.ParticleGroup(system.storage)
+>>> for pid in range(10):
+>>>     pg.add(pid)
+>>> thermostat = espressopp.integrator.LangevinThermostatOnGroup(system, pg)
+>>> thermostat.temperature = 1.0
+>>> thermostat.gamma = 1.0
+>>> integrator.addExtension(thermostat)
 """
+
 from espressopp.esutil import cxxinit
 from espressopp import pmi
 
