@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -41,6 +41,7 @@ namespace espressopp {
       virtual ~Interaction() {};
       virtual void addForces() = 0;
       virtual real computeEnergy() = 0;
+      virtual real computeEnergyDeriv() = 0;
       virtual real computeEnergyAA() = 0;
       virtual real computeEnergyCG() = 0;
       virtual real computeVirial() = 0;

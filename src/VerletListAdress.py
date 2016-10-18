@@ -2,21 +2,21 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -25,7 +25,7 @@ r"""
 **************************************
 
 The VerletListAdress is the Verlet List to be used for AdResS or H-AdResS
-simulations. When creating the VerletListAdress one has to provide the system 
+simulations. When creating the VerletListAdress one has to provide the system
 and specify both cutoff for the CG interaction and adrcutoff for the atomistic
 interaction. Often, it is important to set the atomistic adrcutoff much bigger
 than the actual interaction's cutoff would be, since also the atomistic part of
@@ -35,9 +35,9 @@ to also set the atomistic cutoff on the same value as the coarse-grained one.
 
 Furthermore, the sizes of the explicit and hybrid region have to be
 provided (dEx and dHy in the example below) and the center of the atomistic
-region has to be set (adrCenter). In the current implementation this results in
-a resolution change along the x-direction of the box. A spherical symmetry can
-be obtained by only minor code changes.
+region has to be set (adrCenter). Additionally, it can be chosen between a spherical and a slab-like geometry (sphereAdr).
+
+The AdResS region can also be defined based on one or more particles. For a single particle, in this case a spherical region moves along with the particle. For many such region defining particles, the high-resolution/hybrid region corresponds to the overlap of the different spherical regions based on the individual particles (for details see Kreis et al., JCTC doi: 10.1021/acs.jctc.6b00440). Note that more region defining particles mean a higher computational overhead as these particles need to be communicated among all processors (also see explanations in AdResS.py). Also note that region defining particles should be normal/CG particles, not atomistic/AdResS ones.
 
 Bascially the VerListAdress provides 4 lists:
 ---------------------------------------------
@@ -61,56 +61,60 @@ Example - creating the VerletListAdress for a spherical adress region centered o
 
 >>> vl      = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, adrCenter=[Lx/2, Ly/2, Lz/2], sphereAdr=True)
 
-Example - creating the VerletListAdress for a spherical adress region centered on a particle and moving with the particle
+Example - creating the VerletListAdress for a spherical adress region centered on one particle and moving with the particle
 
 >>> vl      = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, pids=[adrCenterPID], sphereAdr=True)
 
+Example - creating the VerletListAdress for a adress region based on the overlapping spherical regions by several particles
+
+>>> vl      = espressopp.VerletListAdress(system, cutoff=rc, adrcut=rc, dEx=ex_size, dHy=hy_size, pids=[adrCenterPID1,adrCenterPID2,adrCenterPID3, ... ], sphereAdr=True)
+
 .. function:: espressopp.VerletListAdress(system, cutoff, adrcut, dEx, dHy, adrCenter, pids, exclusionlist, sphereAdr)
 
-		:param system: 
-		:param cutoff: 
-		:param adrcut: 
-		:param dEx: 
-		:param dHy: 
+		:param system:
+		:param cutoff:
+		:param adrcut:
+		:param dEx:
+		:param dHy:
 		:param adrCenter: (default: [])
 		:param pids: (default: [])
 		:param exclusionlist: (default: [])
 		:param sphereAdr: (default: False)
-		:type system: 
-		:type cutoff: 
-		:type adrcut: 
-		:type dEx: 
-		:type dHy: 
-		:type adrCenter: 
-		:type pids: 
-		:type exclusionlist: 
-		:type sphereAdr: 
+		:type system:
+		:type cutoff:
+		:type adrcut:
+		:type dEx:
+		:type dHy:
+		:type adrCenter:
+		:type pids:
+		:type exclusionlist:
+		:type sphereAdr:
 
 .. function:: espressopp.VerletListAdress.addAdrParticles(pids, rebuild)
 
-		:param pids: 
+		:param pids:
 		:param rebuild: (default: True)
-		:type pids: 
-		:type rebuild: 
-		:rtype: 
+		:type pids:
+		:type rebuild:
+		:rtype:
 
 .. function:: espressopp.VerletListAdress.exclude(exclusionlist)
 
-		:param exclusionlist: 
-		:type exclusionlist: 
-		:rtype: 
+		:param exclusionlist:
+		:type exclusionlist:
+		:rtype:
 
 .. function:: espressopp.VerletListAdress.rebuild()
 
-		:rtype: 
+		:rtype:
 
 .. function:: espressopp.VerletListAdress.totalSize()
 
-		:rtype: 
+		:rtype:
 """
 
 from espressopp import pmi
-import _espressopp 
+import _espressopp
 import espressopp
 from espressopp.esutil import cxxinit
 
@@ -137,17 +141,17 @@ class VerletListAdressLocal(_espressopp.VerletListAdress):
                 self.cxxclass.setAdrCenter(self, adrCenter[0], adrCenter[1], adrCenter[2])
             # set adress region type (slab or spherical)
             self.cxxclass.setAdrRegionType(self,sphereAdr)
-            
+
             # rebuild list now
             self.cxxclass.rebuild(self)
-                
-            
+
+
     def totalSize(self):
 
         if pmi.workerIsActive():
             return self.cxxclass.totalSize(self)
 
-        
+
     def exclude(self, exclusionlist):
         """
         Each processor takes the broadcasted exclusion list

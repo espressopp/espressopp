@@ -92,6 +92,8 @@ namespace espressopp {
       real _computeEnergy(const Particle &p1, const Particle &p2, const Real3D& dist) const;
       real _computeEnergySqr(real distSqr) const;
 
+      real _computeEnergyDeriv(const Particle &p1, const Particle &p2) const;
+
       bool _computeForce(Real3D& force, 
 			 const Particle &p1, const Particle &p2) const;
       bool _computeForce(Real3D& force, 
@@ -275,7 +277,17 @@ namespace espressopp {
         return e;
       }
     }
-    
+
+    //computation of derivative wrt TI lambda
+    template < class Derived >
+    inline real
+    PotentialTemplate< Derived >::
+    _computeEnergyDeriv(const Particle& p1, const Particle& p2) const {
+      std::cout<<"Calculation of energy derivative wrt lambda not implemented for all potentials!"<<std::endl;
+      return 0.0;
+    }
+
+
     // Force computation
     template < class Derived > 
     inline Real3D 

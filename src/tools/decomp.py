@@ -60,9 +60,9 @@ def nodeGrid(n):
 	d1 = 1
 	d2 = 1
 	d3 = 1
-	for i in range(1,n+1):
-		for j in range(i,n+1):
-			for k in range(j,n+1):
+	for i in xrange(1,n+1):
+		for j in xrange(i,n+1):
+			for k in xrange(j,n+1):
 				if (i*j*k == n) and (i*i + j*j + k*k < ijkmax):
 					d1 = k
 					d2 = j

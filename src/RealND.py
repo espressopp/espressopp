@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -88,7 +88,7 @@ class __RealND(RealND) :
     # string conversion
     def __str__(self) :
       arr = []
-      for i in range(self.dimension):
+      for i in xrange(self.dimension):
         arr.append(self[i])
       return str(arr)
 

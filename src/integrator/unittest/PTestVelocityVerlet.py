@@ -70,7 +70,7 @@ class TestVerletList(espressopp.unittest.TestCase) :
        nodeGrid = (1, 1, comm.size)
        cellGrid = [1, 1, 1]
 
-       for i in range(3):
+       for i in xrange(3):
           cellGrid[i] = calcNumberCells(SIZE, nodeGrid[i], cutoff)
 
        print 'NodeGrid = %s'%(nodeGrid,)
@@ -82,9 +82,9 @@ class TestVerletList(espressopp.unittest.TestCase) :
 
        id = 0
 
-       for i in range(N):
-         for j in range(N):
-           for k in range(N):
+       for i in xrange(N):
+         for j in xrange(N):
+           for k in xrange(N):
  
              m = (i + 2*j + 3*k) % 11
              r = 0.45 + m * 0.01
@@ -139,7 +139,7 @@ class TestVerletList(espressopp.unittest.TestCase) :
 
        # logging.getLogger("MDIntegrator").setLevel(logging.DEBUG)
 
-       for i in range(20):
+       for i in xrange(20):
           integrator.run(nsteps)
           temperature = temp.compute()
           kineticEnergy = 0.5 * temperature * (3 * N * N * N)

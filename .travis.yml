@@ -43,7 +43,7 @@ before_install:
  - mkdir -p "$HOME/bin"
  - ln -s /usr/bin/ccache "$HOME/bin/clang++"
  - ln -s /usr/bin/ccache "$HOME/bin/clang"
- - if [[ ${EXTERNAL} = ON ]]; then pip install --user mpi4py==1.3.1; fi 
+ - if [[ ${EXTERNAL} = ON ]]; then pip install --user mpi4py; fi 
  - if [[ ${COVERAGE}  ]]; then pip install --user codecov; fi
 
 env: #maybe add mpich later
@@ -61,7 +61,7 @@ env: #maybe add mpich later
 matrix:
   exclude:
     - compiler: clang
-      env: EXTERNAL=ON COVERAGE=ON #clang has no coverage support 
+      env: EXTERNAL=ON COVERAGE=ON #clang has no coverage support
     - compiler: clang
       env: GVER=4.7 EXTERNAL=ON
     - compiler: clang
@@ -72,8 +72,8 @@ matrix:
       env: GVER=5   EXTERNAL=ON
 
 script:
-  - mkdir build && cd build && 
-    PATH="$HOME/bin:/usr/lib/ccache:$PATH" cmake -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL ${COVERAGE:+-DUSE_GCOV=ON} .. && 
+  - mkdir build && cd build &&
+    PATH="$HOME/bin:/usr/lib/ccache:$PATH" cmake -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL ${COVERAGE:+-DUSE_GCOV=ON} .. &&
     make -j2 all ${BUILD_UG:+ug doc ug-pdf} &&
     make test ARGS='-V' &&
     make install DESTDIR="${HOME}"
