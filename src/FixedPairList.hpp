@@ -64,7 +64,7 @@ namespace espressopp {
 		virtual void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);
 		void afterRecvParticles(ParticleList& pl, class InBuffer& buf);
 		virtual void onParticlesChanged();
-                void remove();
+		void remove();
 	    python::list getBonds();
 	    GlobalPairs* getGlobalPairs() {return &globalPairs;};
 
