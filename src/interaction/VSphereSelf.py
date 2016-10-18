@@ -28,6 +28,7 @@ This class provides methods to compute forces and energies of
 the VSphereSelf potential.
 
 .. math::
+
         U  =   e_1\left(\frac{4}{3}\pi \sigma_2\right)^{\frac{3}{2}}
                   + \frac{a_1 {N_b}^3}{{\sigma_2}^3}
                   + \frac{2a_2}{N_b} \sigma_2

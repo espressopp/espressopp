@@ -16,6 +16,7 @@ interaction
    espressopp.interaction.CoulombRSpace.rst
    espressopp.interaction.CoulombTruncated.rst
    espressopp.interaction.CoulombTruncatedUniqueCharge.rst
+   espressopp.interaction.DihedralHarmonic.rst
    espressopp.interaction.DihedralHarmonicCos.rst
    espressopp.interaction.DihedralHarmonicNCos.rst
    espressopp.interaction.DihedralHarmonicUniqueCos.rst
@@ -30,11 +31,15 @@ interaction
    espressopp.interaction.Interaction.rst
    espressopp.interaction.LJcos.rst
    espressopp.interaction.LennardJones.rst
+   espressopp.interaction.LennardJones93.rst
    espressopp.interaction.LennardJonesAutoBonds.rst
    espressopp.interaction.LennardJonesCapped.rst
    espressopp.interaction.LennardJonesEnergyCapped.rst
    espressopp.interaction.LennardJonesExpand.rst
+   espressopp.interaction.LennardJonesGeneric.rst
    espressopp.interaction.LennardJonesGromacs.rst
+   espressopp.interaction.LennardJonesSoftcoreTI.rst
+   espressopp.interaction.MirrorLennardJones.rst
    espressopp.interaction.Morse.rst
    espressopp.interaction.OPLS.rst
    espressopp.interaction.Potential.rst
@@ -42,6 +47,8 @@ interaction
    espressopp.interaction.PotentialVSpherePair.rst
    espressopp.interaction.Quartic.rst
    espressopp.interaction.ReactionFieldGeneralized.rst
+   espressopp.interaction.ReactionFieldGeneralizedTI.rst
+   espressopp.interaction.SingleParticlePotential.rst
    espressopp.interaction.SoftCosine.rst
    espressopp.interaction.StillingerWeberPairTerm.rst
    espressopp.interaction.StillingerWeberPairTermCapped.rst
@@ -54,4 +61,3 @@ interaction
    espressopp.interaction.VSpherePair.rst
    espressopp.interaction.VSphereSelf.rst
    espressopp.interaction.Zero.rst
-   espressopp.interaction.LennardJones93.rst
