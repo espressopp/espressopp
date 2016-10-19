@@ -14,7 +14,6 @@ User Interface
    espressopp.integrator.LangevinBarostat.rst
    espressopp.interaction.CoulombRSpace.rst
    espressopp.interaction.CoulombKSpaceEwald.rst
-   espressopp.tools.decomp.rst
 
 
    espressopp.rst
@@ -29,5 +28,6 @@ User Interface
    espressopp.rst
    standard_system.rst
    storage.rst
+   tools.rst
 
    logging.rst

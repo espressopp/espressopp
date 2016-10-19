@@ -16,17 +16,18 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
-
-"""
-*******************
-**espressopp.Rattle**
-*******************
+r"""
+************************************
+**Rattle** - rigid bonds to hydrogen
+************************************
 
 RATTLE algorithm for satisfying bond constraints and making the corresponding velocity corrections. 
 
 Refs: 
-Andersen, H. C. ``Rattle: A ``velocity'' version of the Shake algorithm for molecular dynamics calculations'', J. Comp. Physics, 52, 24-34 (1983)
-Allen & Tildesley, ``Computer Simulation of Liquids'', OUP, 1987
+
+Andersen, H. C. Rattle: A velocity version of the Shake algorithm for molecular dynamics calculations, J. Comp. Physics, 52, 24-34 (1983)
+
+Allen & Tildesley, Computer Simulation of Liquids, OUP, 1987
 
 RATTLE is implemented as an integrator extension, and takes as input a list of lists detailing, for each bond to be constrained: the indices of the two particles involved, the constraint distance, and the particle masses. 
 
@@ -37,27 +38,28 @@ Note: At the moment, the RATTLE implementation only works if all atoms in an iso
 Note: The constraints are not taken into account in other parts of the code, such as temperature or pressure calculation.
 
 Python example script for one methanol molecule where atoms are indexed in the order C H1 H2 H3 OH HO:
->>># list for each constrained bond which lists: heavy atom index, light atom index, bond length, heavy atom mass, light atom mass
->>>constrainedBondsList = [[1, 2, 0.109, 12.011, 1.008], [1, 3, 0.109, 12.011, 1.008], [1, 4, 0.109, 12.011, 1.008], [5, 6, 0.096, 15.9994, 1.008]]
->>>rattle = espressopp.integrator.Rattle(system, maxit = 1000, tol = 1e-6, rptol = 1e-6)
->>>rattle.addConstrainedBonds(constrainedBondsList)
->>>integrator.addExtension(rattle)
+
+>>> # list for each constrained bond which lists: heavy atom index, light atom index, bond length, heavy atom mass, light atom mass
+>>> constrainedBondsList = [[1, 2, 0.109, 12.011, 1.008], [1, 3, 0.109, 12.011, 1.008], [1, 4, 0.109, 12.011, 1.008], [5, 6, 0.096, 15.9994, 1.008]]
+>>> rattle = espressopp.integrator.Rattle(system, maxit = 1000, tol = 1e-6, rptol = 1e-6)
+>>> rattle.addConstrainedBonds(constrainedBondsList)
+>>> integrator.addExtension(rattle)
 
 This list of lists of constrained bonds can be conveniently built using the espressopppp tool `findConstrainedBonds`.
 
->>># Automatically identify hydrogen-containing bonds among the particles whose indices are in the list pidlist
->>># pidlist - list of indices of particles in which to search for hydrogens (list of int)
->>># masses - list of masses of all particles (list of real)
->>># massCutoff - atoms with mass < massCutoff are identified as hydrogens (real)
->>># bondtypes - dictionary (e.g. obtained using espressopppp.gromacs.read()), key: bondtype (int), value: list of tuples of the indices of the two particles in each bond of that bondtype (list of 2-tuples of integers)
->>># bondtypeparams - dictionary (e.g. obtained using espressopppp.gromacs.read()), key: bondtype (int), value: espressopppp interaction potential instance
->>>hydrogenIDs, constrainedBondsDict, constrainedBondsList = espressopp.tools.findConstrainedBonds(pidlist, bondtypes, bondtypeparams, masses, massCutoff = 1.1)
->>># hydrogenIDs - list of indices of hydrogen atoms
->>># constrainedBondsDict - dictionary mapping from a heavy atom to all the light atoms it is bonded to, key: heavy atom index (int), value: list of light atom indices (list of int)
->>># constrainedBondsList - list of lists, constrained bonds for use with Rattle.addConstrainedBonds()
->>>print "# found", len(hydrogenIDs)," hydrogens in the solute"
->>>print "# found", len(constrainedBondsDict)," heavy atoms involved in bonds to hydrogen"
->>>print "# will constrain", len(constrainedBondsList)," bonds using RATTLE"
+>>> # Automatically identify hydrogen-containing bonds among the particles whose indices are in the list pidlist
+>>> # pidlist - list of indices of particles in which to search for hydrogens (list of int)
+>>> # masses - list of masses of all particles (list of real)
+>>> # massCutoff - atoms with mass < massCutoff are identified as hydrogens (real)
+>>> # bondtypes - dictionary (e.g. obtained using espressopppp.gromacs.read()), key: bondtype (int), value: list of tuples of the indices of the two particles in each bond of that bondtype (list of 2-tuples of integers)
+>>> # bondtypeparams - dictionary (e.g. obtained using espressopppp.gromacs.read()), key: bondtype (int), value: espressopppp interaction potential instance
+>>> hydrogenIDs, constrainedBondsDict, constrainedBondsList = espressopp.tools.findConstrainedBonds(pidlist, bondtypes, bondtypeparams, masses, massCutoff = 1.1)
+>>> # hydrogenIDs - list of indices of hydrogen atoms
+>>> # constrainedBondsDict - dictionary mapping from a heavy atom to all the light atoms it is bonded to, key: heavy atom index (int), value: list of light atom indices (list of int)
+>>> # constrainedBondsList - list of lists, constrained bonds for use with Rattle.addConstrainedBonds()
+>>> print "# found", len(hydrogenIDs)," hydrogens in the solute"
+>>> print "# found", len(constrainedBondsDict)," heavy atoms involved in bonds to hydrogen"
+>>> print "# will constrain", len(constrainedBondsList)," bonds using RATTLE"
 
 .. function:: espressopppp.integrator.Rattle(system, maxit = 1000, tol = 1e-6, rptol = 1e-6)
 
@@ -71,6 +73,7 @@ This list of lists of constrained bonds can be conveniently built using the espr
                 :type rptol: real
   
 .. function:: espressopppp.integrator.Rattle.addConstrainedBonds(bondDetailsLists)
+
                 :param bondDetailsLists: list of lists, each list contains pid of heavy atom, pid of light atom, constraint distance, mass of heavy atom, mass of light atom
                 :type bondDetailsLists: list of [int, int, real, real, real]
 """
