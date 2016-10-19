@@ -27,7 +27,7 @@ This class provides methods to compute forces and energies of
 the VSpherePair potential.
 
 .. math::
-.. math::
+
          V(r_{ij}, \sigma_{ij}) = \frac{\varepsilon}{\beta} \left( \frac{2 \pi}{3} \right)
                               \sigma_{ij}^{- \frac{3}{2}} e^{- \frac{3}{2} \frac{r_{ij}^2}{\sigma_{ij}}} ,
                               r_{ij} = \left| \vec{r_i} - \vec{r_j} \right| ,

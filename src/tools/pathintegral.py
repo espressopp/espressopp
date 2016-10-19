@@ -18,15 +18,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import copy
-import math
-import espressopp
-from espressopp import Real3D, Int3D
-
 """
-***************************************************
-**pathintegral** - method to autmatically run the system including nuclear quantum effects using the Feynman path-integral
-***************************************************
+******************************************
+**pathintegral** - nuclear quantum effects
+******************************************
+
+- method to automatically run the system including nuclear quantum effects using the Feynman path-integral
 
 !!WARNING: THIS IS STILL AN EXPERIMENTAL FEATURE!!
 
@@ -59,6 +56,11 @@ The method needs the following parameters:
 	disable Virtual Verlet List (slow but safe). If false, the neighbour search is based on the VirtualParticles extension, which contain 
 	the rings. This speeds up neighbour search significantly.
 """
+
+import copy
+import math
+import espressopp
+from espressopp import Real3D, Int3D
 
 def createPathintegralSystem(allParticles,
 props,

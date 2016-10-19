@@ -27,6 +27,7 @@ This class provides methods to compute forces and energies of
 the Quartic potential.
 
 .. math::
+
 	U=\frac{K}{4} \left(d^2 - r_0^2 \right)^2
 
 

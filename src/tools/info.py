@@ -18,7 +18,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
-
+"""
+******************************************
+**info** - get info on particles and bonds
+******************************************
+"""
 import espressopp
 
 def getAllParticles(system, *properties):
