@@ -21,9 +21,11 @@
 
 # -*- coding: utf-8 -*-
 
-import espressopp
-
 """
+**************************************************
+**io_extended** - read/write configurational files
+**************************************************
+
   This Python module allows one to read and write configurational files.
   One can choose folded or unfolded coordinates and write down velocities or not.
   It is similar to lammps read and write, but it writes down only:
@@ -47,6 +49,8 @@ import espressopp
                (pid1,pid2,pid3) for angles
                (pid1,pid2,pid3,pid4) for dihedrals
 """   
+
+import espressopp
 
 def write(fileName, system, folded=True, writeVelocities=False):
     

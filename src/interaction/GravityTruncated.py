@@ -27,6 +27,7 @@ r"""
 This is an implementation of a truncated (cutoff) Gravity Potential
 
 .. math::
+
 	U = P \cdot \frac{m_1 \cdot m_2}{ \lvert p_1 - p_2\rvert}
 
 where :math:`m_i` is the mass of the `i` th particle, :math:`p_i` its position and `P` a prefactor.

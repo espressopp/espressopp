@@ -39,6 +39,7 @@
 #include "LangevinThermostat1D.hpp"
 #include "LangevinThermostatHybrid.hpp"
 #include "GeneralizedLangevinThermostat.hpp"
+#include "LangevinThermostatOnGroup.hpp"
 #include "DPDThermostat.hpp"
 #include "LangevinBarostat.hpp"
 #include "FixPositions.hpp"
@@ -55,6 +56,7 @@
 #include "CapForce.hpp"
 #include "ExtAnalyze.hpp"
 #include "Settle.hpp"
+#include "Rattle.hpp"
 #include "VelocityVerletOnRadius.hpp"
 #include "ExtVirtualParticles.hpp"
 #include "AssociationReaction.hpp"
@@ -84,6 +86,7 @@ namespace espressopp {
       LangevinThermostat1D::registerPython();
       LangevinThermostatHybrid::registerPython();
       GeneralizedLangevinThermostat::registerPython();
+      LangevinThermostatOnGroup::registerPython();
       DPDThermostat::registerPython();
       FixPositions::registerPython();
       LatticeBoltzmann::registerPython();
@@ -97,6 +100,7 @@ namespace espressopp {
       CapForce::registerPython();
       ExtAnalyze::registerPython();
       Settle::registerPython();
+      Rattle::registerPython();
       VelocityVerletOnRadius::registerPython();
       AssociationReaction::registerPython();
       MinimizeEnergy::registerPython();

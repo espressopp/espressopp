@@ -21,9 +21,9 @@
 
 """
 
-********************
-**prepareAdress.py** 
-********************
+*********************************************
+**prepareAdress** - setup AdResS simulation
+*********************************************
 
 Auxiliary python functions for preparation of an Adress Simulation based on a configuration from an all-atomistic simulation.
 

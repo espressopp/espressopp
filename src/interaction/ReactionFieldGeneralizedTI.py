@@ -19,19 +19,21 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***************************************************
+r"""
+*****************************************************
 **espressopp.interaction.ReactionFieldGeneralizedTI**
-***************************************************
+*****************************************************
 
 This module is for performing simulations (e.g. as part of Thermodynamic Integration) where some interactions are a linear function of a parameter :math:`\lambda`.
 
 .. math::
+
   U(\lambda) = (1-\lambda)U_C^A
 
 where :math:`U_C^A` is the standard Reaction Field interaction. This allows one to perform TI where the charges in TI state A (:math:`\lambda=0`) are the particle charges contained in the particle property ``charge`` and the charges in TI state B (:math:`\lambda=1`) are zero. 
 
 The user specifies a list of particles, pidlist. For all pairs of particles with particletypes interacting via this potential, the RF interaction between two particles i and j is calculated as follows:
+
 if (i not in pidlist) and (j not in pidlist):
   :math:`U_{RF}` (full RF interaction)
 if (i in pidlist) and (j in pidlist):
@@ -53,6 +55,7 @@ The :math:`\lambda` (``lambdaTI``) parameter used here should not be confused wi
 See also the Thermodynamic Integration tutorial.
 
 Example python script:
+
 >>> #value of lambda
 >>> lambdaTI = 0.3
 >>> #construct RF potential with parameters prefactor,kappa,epsilon1,epsilon2,cutoff as in standard RF interaction
@@ -69,6 +72,7 @@ Example python script:
 >>> system.addInteraction(qq_adres_interaction)
 
 During the MD run, one can then calculate the derivative of the RF energy wrt lambda
+
 >>> #calculate dU/dlambda
 >>> dUdl = qq_adres_interaction.computeEnergyDeriv()
 

@@ -27,6 +27,7 @@ r"""
 Calculates the angular unique cosine squared interaction.
 
 .. math::
+
 	U =  K (cos(\theta) - cos(\theta_{0}))^2
 
 

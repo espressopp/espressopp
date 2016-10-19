@@ -41,6 +41,7 @@ from espressopp.integrator.LangevinThermostat import *
 from espressopp.integrator.LangevinThermostatHybrid import *
 from espressopp.integrator.LangevinThermostat1D import *
 from espressopp.integrator.GeneralizedLangevinThermostat import *
+from espressopp.integrator.LangevinThermostatOnGroup import *
 from espressopp.integrator.DPDThermostat import *
 from espressopp.integrator.LangevinBarostat import *
 from espressopp.integrator.FixPositions import *
@@ -55,6 +56,7 @@ from espressopp.integrator.ExtForce import *
 from espressopp.integrator.CapForce import *
 from espressopp.integrator.ExtAnalyze import *
 from espressopp.integrator.Settle import *
+from espressopp.integrator.Rattle import *
 from espressopp.integrator.VelocityVerletOnRadius import *
 from espressopp.integrator.AssociationReaction import *
 from espressopp.integrator.EmptyExtension import *
