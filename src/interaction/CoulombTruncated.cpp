@@ -53,6 +53,8 @@ namespace espressopp {
         ("interaction_VerletListCoulombTruncated", init< shared_ptr<VerletList> >())
         .def("setPotential", &VerletListCoulombTruncated::setPotential)
         .def("getPotential", &VerletListCoulombTruncated::getPotentialPtr)
+        .def("getVerletList", &VerletListCoulombTruncated::getVerletList)
+        .def("setVerletList", &VerletListCoulombTruncated::setVerletList)
         ;
 
       class_< FixedPairListTypesCoulombTruncated, bases< Interaction > >

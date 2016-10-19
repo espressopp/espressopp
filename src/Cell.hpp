@@ -26,6 +26,7 @@
 #include <vector>
 #include "Particle.hpp"
 #include <esutil/ESPPIterator.hpp>
+#include "python.hpp"
 
 namespace espressopp {
   /** A cell is a structure that manages a list of particles and a
@@ -67,7 +68,14 @@ namespace espressopp {
 
   struct CellList 
     : public esutil::ESPPContainer < std::vector< Cell* > > 
-  {};
+  {
+	  static void registerPython() {
+	    using namespace espressopp::python;
+
+	  class_< CellList > ("CellList", init<>());
+	  }
+
+  };
 
   struct NeighborCellList 
     : public esutil::ESPPContainer< std::vector< NeighborCellInfo > > 

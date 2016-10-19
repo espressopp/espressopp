@@ -78,6 +78,7 @@ namespace espressopp {
     createCellGrid(_nodeGrid, _cellGrid);
     initCellInteractions();
     prepareGhostCommunication();
+    onCellListsChanged();
     LOG4ESPP_DEBUG(logger, "done");
   }
 
@@ -283,7 +284,9 @@ namespace espressopp {
     }
     
     exchangeGhosts();
+    onCellListsChanged();
     onParticlesChanged();
+
   }
 
   void DomainDecomposition::initCellInteractions() {

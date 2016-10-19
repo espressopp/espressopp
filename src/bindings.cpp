@@ -59,6 +59,8 @@
 #include <interaction/bindings.hpp>
 #include <analysis/bindings.hpp>
 #include <io/bindings.hpp>
+#include <Cell.hpp>
+#include <VirtualVerletList.hpp>
 
 void espressopp::registerPython() {
   espressopp::Particle::registerPython();
@@ -86,6 +88,8 @@ void espressopp::registerPython() {
   espressopp::Int3D::registerPython();
   espressopp::Version::registerPython();
   espressopp::ParticleAccess::registerPython();
+  espressopp::CellList::registerPython();
+  espressopp::VirtualVerletList::registerPython();
 
   espressopp::esutil::registerPython();
   espressopp::bc::registerPython();

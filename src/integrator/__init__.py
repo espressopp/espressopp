@@ -33,6 +33,7 @@ from espressopp.integrator.OnTheFlyFEC import *
 
 from espressopp.integrator.Extension import *
 from espressopp.integrator.Adress import *
+from espressopp.integrator.ExtVirtualParticles import *
 from espressopp.integrator.BerendsenBarostat import *
 from espressopp.integrator.BerendsenBarostatAnisotropic import *
 from espressopp.integrator.BerendsenThermostat import *

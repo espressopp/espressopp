@@ -240,6 +240,8 @@ namespace espressopp {
       real maxSqDist = 0.0; // maximal square distance a particle moves
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         real sqDist = 0.0;
+        if (cit->mass() < ROUND_ERROR_PREC) continue;
+
         LOG4ESPP_INFO(theLogger, "updating first half step of velocities and full step of positions")
         LOG4ESPP_DEBUG(theLogger, "Particle " << cit->id() << 
                 ", pos = " << cit->position() <<
@@ -292,7 +294,9 @@ namespace espressopp {
       // loop over all particles of the local cells
       real half_dt = 0.5 * dt; 
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
+    	if (cit->mass() < ROUND_ERROR_PREC) continue;
         real dtfm = half_dt / cit->mass();
+
         /* Propagate velocities: v(t+0.5*dt) = v(t) + 0.5*dt * f(t) */
         cit->velocity() += dtfm * cit->force();
       }
@@ -333,6 +337,8 @@ namespace espressopp {
         VT_TRACER("commF");
         storage.updateGhosts();
       }
+      aftUpdGhosts(); //signal
+
       timeComm1 += timeIntegrate.getElapsedTime() - time;
       time = timeIntegrate.getElapsedTime();
       calcForces();

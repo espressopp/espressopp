@@ -73,6 +73,7 @@ namespace espressopp {
         .def("getVerletList", &VerletListLennardJones::getVerletList)
         .def("setPotential", &VerletListLennardJones::setPotential)
         .def("getPotential", &VerletListLennardJones::getPotentialPtr)
+        .def("setVerletList", &VerletListLennardJones::setVerletList)
       ;
 
       class_< VerletListAdressLennardJones, bases< Interaction > >

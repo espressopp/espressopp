@@ -53,6 +53,7 @@ from espressopp.FixedTupleList import *
 from espressopp.FixedTupleListAdress import *
 from espressopp.MultiSystem import *
 from espressopp.ParallelTempering import *
+from espressopp.VirtualVerletList import *
 from espressopp.Version import *
 from espressopp.PLogger import *
 

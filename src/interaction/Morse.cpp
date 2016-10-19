@@ -62,6 +62,8 @@ namespace espressopp {
         ("interaction_VerletListMorse", init< shared_ptr<VerletList> >())
         .def("setPotential", &VerletListMorse::setPotential)
         .def("getPotential", &VerletListMorse::getPotentialPtr)
+        .def("getVerletList", &VerletListMorse::getVerletList)
+        .def("setVerletList", &VerletListMorse::setVerletList)
       ;
 
       class_< VerletListAdressMorse, bases< Interaction > >

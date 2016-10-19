@@ -60,12 +60,12 @@ from espressopp.esutil import cxxinit
 class VerletListLocal(_espressopp.VerletList):
 
 
-    def __init__(self, system, cutoff, exclusionlist=[]):
-
+    def __init__(self, system, cutoff, exclusionlist=[], rebuild=True):
+        'Local construction of a verlet list'
         if pmi.workerIsActive():
             if (exclusionlist == []):
                 # rebuild list in constructor
-                cxxinit(self, _espressopp.VerletList, system, cutoff, True)
+                cxxinit(self, _espressopp.VerletList, system, cutoff, rebuild)
             else:
                 # do not rebuild list in constructor
                 cxxinit(self, _espressopp.VerletList, system, cutoff, False)

@@ -216,6 +216,12 @@ class VerletListTabulatedLocal(InteractionLocal, interaction_VerletListTabulated
     def getPotential(self, type1, type2):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             return self.cxxclass.getPotential(self, type1, type2)
+	def getVerletList(self):
+		if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+		  return self.cxxclass.getVerletList(self)
+	def setVerletList(self, vl):
+		if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+		  return self.cxxclass.setVerletList(self, vl)
 
 class CellListTabulatedLocal(InteractionLocal, interaction_CellListTabulated):
 
@@ -287,7 +293,7 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.interaction.VerletListTabulatedLocal',
-            pmicall = ['setPotential','getPotential']
+            pmicall = ['setPotential','getPotential', 'clonePotential', 'getVerletList', 'setVerletList']
             )
         
     class CellListTabulated(Interaction):

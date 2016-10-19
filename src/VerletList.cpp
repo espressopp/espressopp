@@ -89,7 +89,6 @@ namespace espressopp {
     
     vlPairs.clear();
 
-    // add particles to adress zone
     CellList cl = getSystem()->storage->getRealCells();
     LOG4ESPP_DEBUG(theLogger, "local cell list size = " << cl.size());
     for (CellListAllPairsIterator it(cl); it.isValid(); ++it) {

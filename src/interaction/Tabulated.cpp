@@ -81,6 +81,8 @@ namespace espressopp {
         ("interaction_VerletListTabulated", init <shared_ptr<VerletList> >())
             .def("setPotential", &VerletListTabulated::setPotential)
             .def("getPotential", &VerletListTabulated::getPotentialPtr)
+            .def("getVerletList", &VerletListTabulated::getVerletList)
+            .def("setVerletList", &VerletListTabulated::setVerletList)
         ;
 
       class_ <VerletListAdressTabulated, bases <Interaction> >

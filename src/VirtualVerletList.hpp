@@ -1,28 +1,6 @@
-/*
-  Copyright (C) 2012,2013
-      Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
-      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
-  This file is part of ESPResSo++.
-  
-  ESPResSo++ is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-  
-  ESPResSo++ is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
-*/
-
 // ESPP_CLASS
-#ifndef _VERLETLIST_HPP
-#define _VERLETLIST_HPP
+#ifndef _VirtualVerletList_HPP
+#define _VirtualVerletList_HPP
 
 #include "log4espp.hpp"
 #include "types.hpp"
@@ -31,7 +9,10 @@
 #include "SystemAccess.hpp"
 #include "boost/signals2.hpp"
 #include "boost/unordered_set.hpp"
-#include "VirtualVerletList.hpp"
+#include "Cell.hpp"
+#include "VerletList.hpp"
+#include "esutil/Array2D.hpp"
+#include "FixedTupleList.hpp"
 
 namespace espressopp {
 
@@ -41,7 +22,7 @@ namespace espressopp {
 
 */
 
-  class VerletList : public SystemAccess {
+  class VirtualVerletList : public SystemAccess {
 
   public:
 
@@ -53,9 +34,9 @@ namespace espressopp {
 
     */
 
-    VerletList(shared_ptr< System >, real cut, bool rebuildVL);
+    VirtualVerletList(shared_ptr< System >, real cut, shared_ptr<FixedTupleList> ftpl, bool rebuildVL);
 
-    ~VerletList();
+    ~VirtualVerletList();
 
     PairList& getPairs() { return vlPairs; }
 
@@ -87,10 +68,15 @@ namespace espressopp {
     /** Register this class so it can be used from Python. */
     static void registerPython();
 
-    /**need to access protected functions from VirtualVerletList */
-    friend class VirtualVerletList;
+    void addTypeToVLMap(int typeI, int typeJ, shared_ptr<VerletList> vl){
+    	vlArray.at(typeI, typeJ)= vl;
+    }
 
-    void clearPairs(){vlPairs.clear();}
+    void setCellList(shared_ptr<CellList> _cellList){
+    	std::cout<<"cell list set " << _cellList->size() << std::endl;
+    	cellList=_cellList;
+    };
+
 
   protected:
 
@@ -104,6 +90,15 @@ namespace espressopp {
     
     int builds;
     boost::signals2::connection connectionResort;
+
+    shared_ptr<CellList> cellList;
+
+    typedef std::map<int, shared_ptr<VerletList> > TypeToVLMap;
+    TypeToVLMap typemap;
+
+    esutil::Array2D<shared_ptr<VerletList>, esutil::enlarge> vlArray;
+
+    shared_ptr <FixedTupleList> ftpl;
 
     static LOG4ESPP_DECL_LOGGER(theLogger);
   };

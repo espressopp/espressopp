@@ -553,6 +553,7 @@ namespace espressopp {
     }
 
     void Storage::decompose() {
+      beforeDecompose();
       invalidateGhosts();
       decomposeRealParticles();
       exchangeGhosts();

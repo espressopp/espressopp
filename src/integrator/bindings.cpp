@@ -58,6 +58,7 @@
 #include "Settle.hpp"
 #include "Rattle.hpp"
 #include "VelocityVerletOnRadius.hpp"
+#include "ExtVirtualParticles.hpp"
 #include "AssociationReaction.hpp"
 #include "MinimizeEnergy.hpp"
 
@@ -71,6 +72,7 @@ namespace espressopp {
       VelocityVerletOnGroup::registerPython();
       Extension::registerPython();
       Adress::registerPython();
+      ExtVirtualParticles::registerPython();
       BerendsenBarostat::registerPython();
       BerendsenBarostatAnisotropic::registerPython();
       BerendsenThermostat::registerPython();
