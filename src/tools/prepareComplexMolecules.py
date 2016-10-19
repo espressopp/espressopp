@@ -17,37 +17,53 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
+r"""
 
-******************************
-**prepareComplexMolecules.py** 
-******************************
+*********************************************
+**prepareComplexMolecules** - set up proteins
+*********************************************
 
-#various helper functions for setting up systems containing complex molecules such as proteins
+various helper functions for setting up systems containing complex molecules such as proteins
 
+.. function:: espressopp.tools.findConstrainedBonds(atomPids, bondtypes, bondtypeparams, masses, massCutoff = 1.1)
+
+  Finds all heavyatom-hydrogen bonds in a given list of particle IDs, and outputs a list describing the bonds, in a format suitable for use with the RATTLE algorithm for constrained bonds
+  
+  :param atomPids: list of pids of atoms between which to search for bonds
+  :type atomPids: list of int
+  :param bondtypes: dictionary mapping from tuple of pids to bondtypeid, e.g. as returned by tools.convert.gromacs.read()
+  :type bondtypes: dict, key: (int,int), value: int
+  :param bondtypeparams: dictionary mapping from bondtypeid to class storing parameters of that bond type, e.g. as returned by tools.convert.gromacs.read()
+  :type bondtypeparams: dict, key: int, value: espressopp bond type
+  :param masses: list of masses, e.g. as returned by tools.convert.gromacs.read()
+  :type masses: list of float
+  :param massCutoff: for identifying light atoms (hydrogens), default 1.1 mass units, can also be increased e.g. for use with deuterated systems
+  :type massCutoff: float
+  :returns:
+    | hydrogenIDs - list of pids (integer) of light atoms (hydrogens)
+    | constrainedBondsDict - dict, keys: pid (integer) of heavy atom, values: list of pids of light atoms that are bonded to it
+    | constrainedBondsList - list of lists, one entry for each constrained bond with format: [pid of heavy atom, pid of light atom, bond distance, mass of heavy atom ,mass of light atom]
+  
+  Can then be used with RATTLE, e.g.
+  
+  >>> rattle = espresso.integrator.Rattle(system, maxit = 1000, tol = 1e-6, rptol = 1e-6)
+  >>> rattle.addConstrainedBonds(constrainedBondsList)
+  >>> integrator.addExtension(rattle)
+
+
+.. function:: espressopp.tools.getInternalNonbondedInteractions(atExclusions,pidlist)
+
+  Gets the non-bonded pairs within a list of particle indices, excluding those which are in a supplied list of exclusions. Useful for example for getting the internal atomistic non-bonded interactions in a coarse-grained particle and adding them as a fixedpairlist
+  
+  :param atExclusions: list of excluded pairs
+  :type atExclusions: list of 2-tuples of int
+  :param pidlist: list of pids among which to create pairs
+  :type pidlist: list of int
+  :return: list of pairs which are not in atExclusions
+  :rtype: list of 2-tuples of int
 """
 
 def findConstrainedBonds(atomPids, bondtypes, bondtypeparams, masses, massCutoff = 1.1):
-  """
-  Finds all heavyatom-hydrogen bonds in a given list of particle IDs, and outputs a list describing the bonds, in a format suitable for use with the RATTLE algorithm for constrained bonds
-  
-  Input parameters:
-    atomPids - list of pids (integer) of atoms between which to search for bonds
-    bondtypes - dict, key: pid (integer), pid (integer), value: bondtypeid (integer), e.g. as returned by tools.convert.gromacs.read()
-    bondtypeparams - dict, key: bondtypeid (integer), value: class storing parameters of that bond type, e.g. as returned by tools.convert.gromacs.read()
-    masses - list of masses (float), e.g. as returned by tools.convert.gromacs.read()
-    massCutoff - float, for identifying light atoms (hydrogens), default 1.1 mass units, can also be increased e.g. for use with deuterated systems
-  
-  Returns:
-    hydrogenIDs - list of pids (integer) of light atoms (hydrogens)
-    constrainedBondsDict - dict, keys: pid (integer) of heavy atom, values: list of pids of light atoms that are bonded to it
-    constrainedBondsList - list of lists, one entry for each constrained bond with format: [pid of heavy atom, pid of light atom, bond distance, mass of heavy atom ,mass of light atom]
-  
-    Can then be used with RATTLE, e.g.
-    >>> rattle = espresso.integrator.Rattle(system, maxit = 1000, tol = 1e-6, rptol = 1e-6)
-    >>> rattle.addConstrainedBonds(constrainedBondsList)
-    >>> integrator.addExtension(rattle)
-  """
 
   hydrogenIDs = []
   constrainedBondsDict = {} 
@@ -82,7 +98,6 @@ def findConstrainedBonds(atomPids, bondtypes, bondtypeparams, masses, massCutoff
   return hydrogenIDs, constrainedBondsDict, constrainedBondsList
 
 def getInternalNonbondedInteractions(atExclusions,pidlist):
-  """gets the non-bonded pairs within a list of particle indices, excluding those which are in a list of exclusions. Useful for example for getting the internal atomistic non-bonded interactions in a coarse-grained particles and adding them as a fixedpairlist"""
   nonBondPairs = []
   for pid1 in pidlist:
     for pid2 in pidlist:

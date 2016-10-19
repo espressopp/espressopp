@@ -29,11 +29,13 @@ the Stillinger Weber Triple Term potential.
 if :math:`d_{12} >= r_{c_1}` or :math:`d_{32} >= r_{c_2}`
 
 .. math::
+
 	U = 0.0
 
 else
 
 .. math::
+
 	U = \varepsilon \lambda  e^{\frac{\sigma \gamma_1}{|r_{12}| - \sigma r_{c_1}}}
 	 + \frac{\sigma \gamma_2}{|r_{32}| - \sigma r_{c_2}}
 	   \left(\frac{r_{12}  r_{32}}{|r_{12}|\cdot |r_{32}|} 

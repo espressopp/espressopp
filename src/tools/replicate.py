@@ -18,6 +18,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
+"""
+**************************************
+**replicate** - replicate polymer melt
+**************************************
+"""
 
 def replicate(bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1):
   """

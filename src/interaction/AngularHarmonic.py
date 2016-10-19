@@ -27,6 +27,7 @@ r"""
 Calculates the Angular Harmonic interaction
 
 .. math::
+
 	U = K (\theta - \theta_0)^2
 
 

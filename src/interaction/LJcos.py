@@ -25,11 +25,13 @@ r"""
 if :math:`r^2 \leq border_{pot}`, then:
 
 .. math::
+
 	U = 4(\frac{1}{r^{12}} - \frac{1}{r^6}) + 1 - \phi
 
 else:
 	
 .. math::     
+
 	U = \frac{1}{2}\phi (cos(\alpha r^2+\beta) - 1)
 
 

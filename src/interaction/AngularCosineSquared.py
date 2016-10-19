@@ -27,6 +27,7 @@ r"""
 Calculates the Angular Cosine Squared interaction
 
 .. math::
+
 	U =  K (cos(\theta) - cos(\theta_{0}))^2
 
 
