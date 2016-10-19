@@ -15,6 +15,7 @@ integrator
    espressopp.integrator.Extension.rst
    espressopp.integrator.FixPositions.rst
    espressopp.integrator.FreeEnergyCompensation.rst
+   espressopp.integrator.GeneralizedLangevinThermostat.rst
    espressopp.integrator.Isokinetic.rst
    espressopp.integrator.LatticeBoltzmann.rst
    espressopp.integrator.LBInit.rst
@@ -25,7 +26,11 @@ integrator
    espressopp.integrator.LangevinBarostat.rst
    espressopp.integrator.LangevinThermostat.rst
    espressopp.integrator.LangevinThermostat1D.rst
+   espressopp.integrator.LangevinThermostatHybrid.rst
+   espressopp.integrator.LiquidGasLB.rst
    espressopp.integrator.MDIntegrator.rst
+   espressopp.integrator.OnTheFlyFEC.rst
+   espressopp.integrator.Rattle.rst
    espressopp.integrator.Settle.rst
    espressopp.integrator.StochasticVelocityRescaling.rst
    espressopp.integrator.TDforce.rst

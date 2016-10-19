@@ -29,12 +29,13 @@ This class provides methods to compute forces and energies of
 the Mirror Lennard-Jones potential.
 
 .. math::
+
 	V(r) = V_{LJ}(r_m - |r-r_m|)
 
-	where :math:`V_{LJ}` is the 6-12 purely repulsive Lennard-Jones
-	potential. This potential is introduced in R.L.C. Akkermans, S. Toxvaerd
-	and & W. J. Briels. Molecular dynamics of polymer growth. The Journal of
-	Chemical Physics, 1998, 109, 2929-2940.
+where :math:`V_{LJ}` is the 6-12 purely repulsive Lennard-Jones
+potential. This potential is introduced in R.L.C. Akkermans, S. Toxvaerd
+and & W. J. Briels. Molecular dynamics of polymer growth. The Journal of
+Chemical Physics, 1998, 109, 2929-2940.
 
 
 

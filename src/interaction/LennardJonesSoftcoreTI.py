@@ -19,16 +19,17 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***********************************************
+r"""
+*************************************************
 **espressopp.interaction.LennardJonesSoftcoreTI**
-***********************************************
+*************************************************
 
 This module is for performing simulations (e.g. as part of Thermodynamic Integration) where some Lennard-Jones interactions are a function of a parameter :math:`\lambda`, used to construct a pathway between states A and B.
 
 For those interactions which are a function of :math:`\lambda`, the potential is softcore Lennard Jones with the following form:
 
 .. math::
+
   U_S(r_{ij},\lambda) = (1-\lambda)U_H^A(r_A) + \lambda U_H^B(r_B)
 
   r_A=(\alpha\sigma^6_A\lambda^p+r_{ij}^6)^{1/6}
@@ -38,9 +39,11 @@ For those interactions which are a function of :math:`\lambda`, the potential is
 where :math:`\epsilon_A`, :math:`\epsilon_B`, :math:`\sigma_A` and :math:`\sigma_B` are the parameters of states A and B, and :math:`\alpha` and :math:`p` are adjustable parameters of the softcore potential. The potentials :math:`U_H^A(r_A)` and :math:`U_H^B(r_B)` are the normal Lennard-Jones 12-6 hardcore potentials:
 
 .. math::
+
   U_H^A(r_A) = 4.0\epsilon_A(\frac{\sigma_A}{r_A}^{12} - \frac{\sigma_A}{r_A}^6)
 
 The user specifies a list of particles, pidlist. For all pairs of particles with particletypes interacting via this potential, the LJ interaction between two particles i and j is calculated as follows:
+
 if (i not in pidlist) and (j not in pidlist):
   :math:`U_{H}^A` (full state A hardcore LJ interaction)
 if (i in pidlist) and (j in pidlist):
@@ -64,6 +67,7 @@ The :math:`\lambda` (``lambdaTI``) parameter used here should not be confused wi
 See also the Thermodynamic Integration tutorial.
 
 Example python script:
+
 >>> #value of lambda
 >>> lambdaTI = 0.3
 >>> #softcore parameters
@@ -82,6 +86,7 @@ Example python script:
 >>> system.addInteraction(lj_adres_interaction)
 
 During the MD run, one can then calculate the derivative of the RF energy wrt lambda
+
 >>> #calculate dU/dlambda
 >>> dUdl = lj_adres_interaction.computeEnergyDeriv()
 
