@@ -5,8 +5,9 @@ from espressopp import Real3D
 
 import unittest
 import os
+import shutil
 
-runSteps = 500
+runSteps = 1000
 temperature = 1.0
 Npart = 80
 Ni = 5
@@ -114,7 +115,7 @@ class makeConf(unittest.TestCase):
         global runSteps
         lb.profStep = int(.5 * runSteps)
         lboutputScreen = espressopp.analysis.LBOutputScreen(system,lb)
-        ext_lboutputScreen=espressopp.integrator.ExtAnalyze(lboutputScreen,runSteps)
+        ext_lboutputScreen=espressopp.integrator.ExtAnalyze(lboutputScreen,lb.profStep)
         integrator.addExtension(ext_lboutputScreen)
         
         # lb parameters: viscosities, temperature, time contrast b/w MD and LB
@@ -124,8 +125,16 @@ class makeConf(unittest.TestCase):
         lb.nSteps = 5
 
         # set self
+        self.system = system
+        self.lb = lb
         self.integrator = integrator
         self.lboutput = lboutputScreen
+
+    def tearDown(self):
+        if (self.integrator.step == 0):
+            print "continue to restarting test:"
+        else:
+            shutil.rmtree('./dump/')
 
 class TestLBMDCoupling(makeConf):
     def test_lbmdcoupling(self):
@@ -133,18 +142,54 @@ class TestLBMDCoupling(makeConf):
 
         global runSteps
 
-        for checks in range(2):
-            self.integrator.run(runSteps)
+        self.integrator.run(runSteps)
 
-            # output formatting
-            print "-" * 73
-            tot_mom = self.lboutput.getLBMom() + self.lboutput.getMDMom()
-            print "total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n"
+        self.lb.saveLBConf()     # saves current state of the LB fluid
+        s = str(self.integrator.step)
+        restartmdoutput = 'dump/restart' + s + '.xyz'
+        espressopp.tools.fastwritexyz(restartmdoutput, self.system)
+        self.restartmdoutput = restartmdoutput
+    
+        self.integrator.step = 0
+        # output formatting
+        print "-" * 73
+        tot_mom = self.lboutput.getLBMom() + self.lboutput.getMDMom()
+        print "total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n"
 
-            # momentum checks
-            self.assertAlmostEqual(tot_mom[0], 0., places=10)
-            self.assertAlmostEqual(tot_mom[1], 0., places=10)
-            self.assertAlmostEqual(tot_mom[2], 0., places=10)
+        # momentum checks
+        self.assertAlmostEqual(tot_mom[0], 0., places=10)
+        self.assertAlmostEqual(tot_mom[1], 0., places=10)
+        self.assertAlmostEqual(tot_mom[2], 0., places=10)
+
+    def test_restartlbmd(self):
+        print "Checking total momentum of restarted LB-MD system:"
+
+        global runSteps
+        self.integrator.step = runSteps
+
+        self.system.storage.removeAllParticles()
+        mdfile = 'dump/restart' + str(self.integrator.step) + '.xyz'
+
+        pid, ptype, x, y, z, vx, vy, vz, Lx, Ly, Lz = espressopp.tools.readxyz(mdfile)
+        props = ['id', 'type', 'mass', 'pos', 'v']
+        new_particles = []
+        for pid in range(Npart):
+            part = [pid + 1, 0, 1.0, Real3D(x[pid], y[pid], z[pid]), Real3D(vx[pid], vy[pid], vz[pid])]
+            new_particles.append(part)
+        self.system.storage.addParticles(new_particles, *props)
+        self.system.storage.decompose()
+
+        self.integrator.run(runSteps)
+
+        # output formatting
+        print "-" * 73
+        tot_mom = self.lboutput.getLBMom() + self.lboutput.getMDMom()
+        print "total LB-MD mom:  ", ("{:>18.1e}"*3).format(*tot_mom), "\n"
+
+        # momentum checks
+        self.assertAlmostEqual(tot_mom[0], 0., places=10)
+        self.assertAlmostEqual(tot_mom[1], 0., places=10)
+        self.assertAlmostEqual(tot_mom[2], 0., places=10)
 
 if __name__ == '__main__':
     unittest.main()
