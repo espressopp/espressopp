@@ -4,28 +4,42 @@ from espressopp import Int3D
 from espressopp import Real3D
 
 import unittest
+import os
 
 runSteps = 500
 temperature = 1.0
-num_particles = 400
-Ni = 10
+Npart = 80
+Ni = 5
 initDen = 1.
 initVel = 0.
+mdoutput = 'eq_LJ_fluid.xyz'
 
-class TestLBMDCoupling(unittest.TestCase):
+class makeConf(unittest.TestCase):
     def setUp(self):
-        # set up system
+        # globals
         global Ni, temperature
 
-        box  = (Ni, Ni, Ni)
+        # constants
         rc   = pow(2, 1./6.)
         skin = 0.3
         epsilon = 1.
-        sigma  = 0.
 
         # system set up
         system         = espressopp.System()
         system.rng     = espressopp.esutil.RNG()
+
+        global Npart
+        if ( os.path.isfile(mdoutput) ):
+            pid, ptype, x, y, z, vx, vy, vz, Lx, Ly, Lz = espressopp.tools.readxyz(mdoutput)
+            Npart = len(pid)
+            sigma  = 1.
+            timestep = 0.005
+            box  = (Lx, Ly, Lz)
+        else:
+            sigma  = 0.
+            timestep = 0.001
+            box  = (Ni, Ni, Ni)
+
         system.bc      = espressopp.bc.OrthorhombicBC(system.rng, box)
         system.skin    = skin
         nodeGrid       = espressopp.tools.decomp.nodeGrid(espressopp.MPI.COMM_WORLD.size)
@@ -40,7 +54,7 @@ class TestLBMDCoupling(unittest.TestCase):
         
         # integrator
         integrator     = espressopp.integrator.VelocityVerlet(system)
-        integrator.dt = 0.001
+        integrator.dt  = timestep
 
         # thermostat
         thermostat     = espressopp.integrator.LangevinThermostat(system)
@@ -48,29 +62,39 @@ class TestLBMDCoupling(unittest.TestCase):
         thermostat.temperature = temperature
         integrator.addExtension(thermostat)
 
-        # make dense system
-        global num_particles
-        particle_list = []
-        mass = 1.
-        for k in range(num_particles):
-            pid  = k + 1
-            pos  = system.bc.getRandomPos()
-            v    = Real3D(0,0,0)
-            type = 0
-            part = [pid, pos, type, v, mass]
-            particle_list.append(part)
-        system.storage.addParticles(particle_list, 'id', 'pos', 'type', 'v', 'mass')
-        system.storage.decompose()
+        if ( os.path.isfile(mdoutput) ):
+            props = ['id', 'type', 'mass', 'pos', 'v']
+            new_particles = []
+            for pid in range(Npart):
+                part = [pid + 1, 0, 1.0, Real3D(x[pid], y[pid], z[pid]), Real3D(vx[pid], vy[pid], vz[pid])]
+                new_particles.append(part)
+            system.storage.addParticles(new_particles, *props)
+            system.storage.decompose()
+        else:
+            # make dense system
+            particle_list = []
+            mass = 1.
+            for k in range(Npart):
+                pid  = k + 1
+                pos  = system.bc.getRandomPos()
+                v    = Real3D(0.)
+                ptype = 0
+                part = [pid, ptype, mass, pos, v]
+                particle_list.append(part)
+            system.storage.addParticles(particle_list, 'id', 'type', 'mass', 'pos', 'v')
+            system.storage.decompose()
 
-        print "Warm up. Sigma will be increased from 0. to 1."
-        new_sigma = sigma
-        for k in range(100):
-            integrator.run(100)
-            new_sigma += 0.01
-            if (new_sigma > 0.8):
-                integrator.dt = 0.005
-            potLJ = espressopp.interaction.LennardJones(epsilon, new_sigma, rc)
-            interaction.setPotential(type1=0, type2=0, potential=potLJ)
+            print "Warm up. Sigma will be increased from 0. to 1."
+            new_sigma = sigma
+            for k in range(50):
+                integrator.run(100)
+                new_sigma += 0.02
+                if (new_sigma > 0.8):
+                    integrator.dt = 0.005
+                potLJ = espressopp.interaction.LennardJones(epsilon, new_sigma, rc)
+                interaction.setPotential(type1=0, type2=0, potential=potLJ)
+
+            espressopp.tools.fastwritexyz(mdoutput, system)
 
         # LB will control thermostatting now
         thermostat.disconnect()        
@@ -100,10 +124,10 @@ class TestLBMDCoupling(unittest.TestCase):
         lb.nSteps = 5
 
         # set self
-        self.lb = lb
-        self.lboutput = lboutputScreen
         self.integrator = integrator
+        self.lboutput = lboutputScreen
 
+class TestLBMDCoupling(makeConf):
     def test_lbmdcoupling(self):
         print "Checking total momentum of LB-MD system:"
 
