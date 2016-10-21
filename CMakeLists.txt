@@ -18,8 +18,6 @@ enable_testing()
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 
-include(CheckCXXCompilerFlag)
-
 ########################################################################
 # User input options                                                   #
 ########################################################################
