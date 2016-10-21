@@ -5,9 +5,9 @@ from espressopp import Real3D
 
 import unittest
 
-runSteps = 1000
+runSteps = 500
 temperature = 1.0
-Ni = 6
+Ni = 5
 initDen = 1.
 initVel = 0.
 
@@ -32,9 +32,13 @@ class TestExtForceLB(unittest.TestCase):
         lbforce = espressopp.integrator.LBInitConstForce(system,lb)
         lbforce.setForce(Real3D(0.,0.,0.00001))
 
+        # set external sin-like force
+        lbforceSin = espressopp.integrator.LBInitPeriodicForce(system,lb)
+
         self.lb = lb
         self.integrator = integrator
         self.lbforce = lbforce
+        self.lbforceSin = lbforceSin
 
     def run_average(self, _vz):
         # variables to hold average density and mass flux
@@ -65,17 +69,33 @@ class TestExtForceLB(unittest.TestCase):
         self.assertAlmostEqual(av_j[1], initVel, places=2)
         self.assertAlmostEqual(av_j[2], _vz, places=2)
 
-    def test_extforce(self):
+    def test_constextforce(self):
         global runSteps
 
-        vz_check = 0.01
+        vz_check = 0.005
         self.integrator.run(runSteps)
         self.run_average(vz_check)
 
         # add external constant (gravity-like) force to the existing one
         self.lbforce.addForce(Real3D(0.,0.,0.00002))
 
-        vz_check = 0.04
+        vz_check = 0.02
+        self.integrator.run(runSteps)
+        self.run_average(vz_check)
+
+    def test_sinextforce(self):
+        global runSteps
+        self.lbforce.addForce(Real3D(0.))
+
+        self.lbforceSin.setForce(Real3D(0.,0.,0.00001))
+
+        vz_check = 0.   # average vz always gives 0 with sin-line force fz(x)
+        self.integrator.run(runSteps)
+        self.run_average(vz_check)
+
+        # add external constant (gravity-like) force to the existing one
+        self.lbforceSin.addForce(Real3D(0.,0.,0.00002))
+
         self.integrator.run(runSteps)
         self.run_average(vz_check)
 

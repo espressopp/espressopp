@@ -5,11 +5,12 @@ from espressopp import Real3D
 
 import unittest
 
-runSteps = 1000
+runSteps = 500
 temperature = 1.0
 Ni = 5
 initDen = 1.
 initVel = 0.
+initVelSin = 0.1
 
 class TestPureLB(unittest.TestCase):
     def setUp(self):
@@ -21,21 +22,40 @@ class TestPureLB(unittest.TestCase):
         # set up LB fluid
         lb = espressopp.integrator.LatticeBoltzmann(system, nodeGrid)
         integrator.addExtension(lb)
-        lb.lbTemp = temperature
 
-        # set initial populations
-        global initDen, initVel
-        initPop = espressopp.integrator.LBInitPopUniform(system,lb)
-        initPop.createDenVel(initDen, Real3D(initVel))
-
+        self.system = system
         self.lb = lb
         self.integrator = integrator
 
     def test_purelb(self):
+        print "Checking athermal LB fluid"
         global runSteps
 
+        # set initial populations
+        global initDen, initVel
+        initPop = espressopp.integrator.LBInitPopUniform(self.system,self.lb)
+        initPop.createDenVel(initDen, Real3D(initVel))
+
         self.integrator.run(runSteps)
-        
+
+        self.check_averages(initVel)
+
+    def test_thermallb(self):
+        print "Checking stochastic LB fluid with sin-wave initialization"
+        global runSteps
+
+        # set initial populations
+        global initDen, initVel, initVelSin
+        initPop = espressopp.integrator.LBInitPopWave(self.system,self.lb)
+        initPop.createDenVel(initDen, Real3D(initVel, initVel, initVelSin))
+
+        # set temperature 
+        self.lb.lbTemp = temperature
+        self.integrator.run(runSteps)
+
+        self.check_averages(initVel) # sin-like wave is killed by temperature
+
+    def check_averages(self, _v):
         # variables to hold average density and mass flux
         av_den = 0.
         av_j = Real3D(0.)
@@ -60,9 +80,9 @@ class TestPureLB(unittest.TestCase):
             print av_den, av_j
 
             self.assertAlmostEqual(av_den, initDen, places=2)
-            self.assertAlmostEqual(av_j[0], initVel, places=2)
-            self.assertAlmostEqual(av_j[1], initVel, places=2)
-            self.assertAlmostEqual(av_j[2], initVel, places=2)
+            self.assertAlmostEqual(av_j[0], _v, places=2)
+            self.assertAlmostEqual(av_j[1], _v, places=2)
+            self.assertAlmostEqual(av_j[2], _v, places=2)
 
             av_den = 0.
             av_j = Real3D(0.)

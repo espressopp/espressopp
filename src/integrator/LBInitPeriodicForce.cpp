@@ -121,10 +121,10 @@ namespace espressopp {
 				if (_printId == 0)
               cout << "cancelled. It is now zero.\n" ;
 				else if (_printId == 1)
-              cout << "set." << endl << "It is a harmonic force with amplitude:"
+              cout << "set." << endl << "It is a harmonic force with amplitude: "
               << setprecision(5) << _force << endl;
 				else
-              cout << "added." << endl << "It is a harmonic force with amplitude:"
+              cout << "added." << endl << "It is a harmonic force with amplitude: "
               << setprecision(5) << _force << endl;
 
             cout << "-------------------------------------" << endl;
