@@ -20,9 +20,9 @@
 
 
 r"""
-**************************************
-**AdResS** - Object
-**************************************
+********************************************
+**AdResS** - adaptive resolution simulations
+********************************************
 
 The AdResS object is an extension to the integrator. It makes sure that the
 integrator also processes the atomistic particles and not only the CG particles.
@@ -30,7 +30,6 @@ Hence, this object is of course only used when performing AdResS or H-AdResS
 simulations.
 
 In detail the AdResS extension makes sure:
----------------------------------------------
 
 * that also the forces on the atomistic particles are initialized and set to
   by Adress::initForces

@@ -28,6 +28,7 @@ the OPLS dihedral potential. To create a new dihedral potential.
 
 
 .. math::
+
 	U = \sum^4_{j=1} K_j  (1 + cos(j \phi))
 
 

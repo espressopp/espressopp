@@ -25,6 +25,7 @@ r"""
 **********************************************************
 
 .. math::
+
 	V(r) = 4 \varepsilon \left[ \left( \frac{\sigma}{r} \right)^{12} -
 	\left( \frac{\sigma}{r} \right)^{6} \right]
 
