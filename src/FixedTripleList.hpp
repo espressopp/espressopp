@@ -65,11 +65,11 @@ namespace espressopp {
 	    int size() {
 	    	return globalTriples.size();
 	    }
+		
+		void remove();
+		static void registerPython();
 
-         void remove();
-                static void registerPython();
-
-
+		
 	  private:
 		static LOG4ESPP_DECL_LOGGER(theLogger);
 

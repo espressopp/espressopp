@@ -57,9 +57,9 @@ namespace espressopp {
 		void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);
 		void beforeSendATParticles(std::vector<longint>& atpl, class OutBuffer& buf);
 		void onParticlesChanged();
-                void remove();
+		void remove();
 		python::list getBonds();
-                static void registerPython();
+		static void registerPython();
 
 	  protected:
 		// fixedtuple list connects to this and triggers beforeSendATParticles()

@@ -58,7 +58,7 @@ namespace espressopp {
 		void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);
 		void beforeSendATParticles(std::vector<longint>& atpl, class OutBuffer& buf);
 		void onParticlesChanged();
-                void remove();
+		void remove();
 		static void registerPython();
 
 	  protected:
