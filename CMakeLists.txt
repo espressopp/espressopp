@@ -250,5 +250,5 @@ if ( SPHINX_EXECUTABLE )
 
    message ( STATUS "Generate LaTeX manual via ${SPHINX_EXECUTABLE}: make ug-pdf")
 else ( SPHINX_EXECUTABLE )
-    message ( WARNING "Not building user documentation because Doxygen not found.")
+    message ( WARNING "Not building user documentation because Sphinx not found.")
 endif ( SPHINX_EXECUTABLE )
