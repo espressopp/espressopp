@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013,2015
+#  Copyright (C) 2012,2013,2015,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -36,7 +36,6 @@ Example - creating the FixedPairListAdress and adding bonds:
 >>> fpl = espressopp.FixedPairListAdress(system.storage, ftpl)
 >>> fpl.addBonds(bonds)
 
-
 .. function:: espressopp.FixedPairListAdress(storage, fixedtupleList)
 
 		:param storage: 
@@ -57,6 +56,9 @@ Example - creating the FixedPairListAdress and adding bonds:
 		:param bondlist: 
 		:type bondlist: 
 		:rtype: 
+
+.. function:: espressopp.FixedPairListAdress.remove()
+        remove the FixedPairListAdress and disconnect
 
 .. function:: espressopp.FixedPairListAdress.getBonds()
 
@@ -86,6 +88,11 @@ class FixedPairListAdressLocal(_espressopp.FixedPairListAdress):
           bonds=self.cxxclass.getBonds(self)
           return bonds
 
+    def remove(self):
+        if pmi.workerIsActive():
+          self.cxxclass.remove(self)
+          return
+
     def addBonds(self, bondlist):
         """
         Each processor takes the broadcasted bondlist and
@@ -104,6 +111,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedPairListAdressLocal',
             localcall = [ "add" ],
-            pmicall = [ "addBonds" ],
+            pmicall = [ "addBonds","remove" ],
 			pmiinvoke = ['getBonds']
             )
