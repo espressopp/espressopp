@@ -68,11 +68,11 @@ source_suffix = '.rst'
 #source_encoding = 'utf-8'
 
 # The master toctree document.
-#master_doc = 'index'
+master_doc = 'index'
 
 # General information about the project.
-project = u'ESPResSo++'
-copyright = u'2013-{}, Max Planck Institute for Polymer Research'.format(
+project = 'ESPResSo++'
+copyright = '2013-{}, Max Planck Institute for Polymer Research'.format(
     datetime.date.today().year)
 
 # The version info for the project you're documenting, acts as replacement for
@@ -197,7 +197,7 @@ html_sidebars = {
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'ESPResSodoc'
+htmlhelp_basename = 'ESPResSo++_doc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
