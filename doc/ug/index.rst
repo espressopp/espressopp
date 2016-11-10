@@ -39,4 +39,4 @@ are different software packages.
     DOI: 10.1016/j.cpc.2012.12.004
     Online access: http://dx.doi.org/10.1016/j.cpc.2012.12.004
 
-`Recent publications where ESPResSo++ was used <https://scholar.google.com/scholar?cites=16263384330356203698&as_sdt=2005&sciodt=0,5&hl=pl>`_
+`Recent publications where ESPResSo++ was used <https://scholar.google.com/scholar?cites=16263384330356203698&as_sdt=2005&sciodt=0,5&hl=en>`_
