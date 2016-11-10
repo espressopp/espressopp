@@ -4,7 +4,6 @@ espressopp
 .. toctree::
    :maxdepth: 2
    
-   espressopp.pmi.rst
    espressopp.Exceptions.rst
    espressopp.FixedPairDistList.rst
    espressopp.FixedPairList.rst
@@ -23,10 +22,13 @@ espressopp
    espressopp.Particle.rst
    espressopp.ParticleAccess.rst
    espressopp.ParticleGroup.rst
+   espressopp.pmi.rst
    espressopp.Real3D.rst
    espressopp.RealND.rst
    espressopp.Tensor.rst
+   espressopp.System.rst
    espressopp.VerletList.rst
    espressopp.VerletListAdress.rst
    espressopp.VerletListTriple.rst
+   espressopp.Version.rst
 
