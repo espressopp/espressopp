@@ -19,64 +19,42 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-***********************************************************************************************
-**LBInit** - abstract class for LatticeBoltzmann initialization and external force management
-***********************************************************************************************
-
+R"""
 This abstract class provides the interface to (re-)initialize populations and handle external forces.
 
-.. function:: createDenVel(rho0,u0)
+.. py:class:: espressopp.integrator.LBInit
+
+    .. py:method:: createDenVel(rho0,u0)
   
-  to set initial density and velocity of the LB-fluid.
+        to set initial density and velocity of the LB-fluid.
   
-  :param rho0: density
-  :param u0: velocity
+        :param real rho0: density
+        :param Real3D u0: velocity
   
-  At the moment we support the following options for LB-fluid initialization:
+    The following options for LB-fluid initialization are supported:
   
-  - :class:`espressopp.integrator.LBInitPopUniform` for uniformly distributed density and velocity, i.e. on every lattice site the density is rho0 and velocity is u0;
-  - :class:`espressopp.integrator.LBInitPopWave` for uniform density at every lattice site, but harmonic velocity :math:`v_z (x)` with the period of lattice sites in *x*-direction;
+    * :class:`espressopp.integrator.LBInitPopUniform` A typical choice. It initializes uniformly distributed density and velocity: On every lattice site the density is ``rho0`` and velocity is ``u0``
     
-.. function:: setForce(value)
+    * :class:`espressopp.integrator.LBInitPopWave` for uniform density at every lattice site, but harmonic velocity :math:`v_z (x)` with the period of lattice sites in *x*-direction
+    
+    .. py:method:: setForce(value)
 
-  to set an external force onto LB-fluid.
+        to set an external force onto LB-fluid.
 
-  :param value: value of the force
-  :type value: Real3D
+        :param Real3D value: value of the force
 
-.. function:: addForce(value)
+    .. py:method:: addForce(force)
 
-  to add a new external force to the existing one.
+        to add a new external force to the existing one.
 
-  :param value: value of the force
-  :type value: Real3D
+        :param Real3D force: value of the force
 
-Two main external force types are implemented:
+    Two main external force types are implemented:
 
-- :class:`espressopp.integrator.LBInitConstForce` to manage constant (gravity-like) force acting on every lattice site and
-- :class:`espressopp.integrator.LBInitPeriodicForce` to manage harmonic (position-dependent) force
+    * :class:`espressopp.integrator.LBInitConstForce` to manage constant (gravity-like) forces acting on every lattice site and
+    
+    * :class:`espressopp.integrator.LBInitPeriodicForce` to manage periodic (sin-like) forces
 
-
-
-.. function:: espressopp.integrator.LBInit.addForce(force)
-
-		:param force: 
-		:type force: 
-		:rtype: 
-
-.. function:: espressopp.integrator.LBInit.createDenVel(rho0, u0)
-
-		:param rho0: 
-		:param u0: 
-		:type rho0: 
-		:type u0: 
-		:rtype: 
-
-.. function:: espressopp.integrator.LBInit.setForce(force)
-
-		:param force: 
-		:type force: 
 """
 
 from espressopp.esutil import cxxinit

@@ -20,36 +20,35 @@
 
 
 r"""
-*****************************************************************
-**LBInitPeriodicForce** - handles external periodic forces
-*****************************************************************
+    
+This class allows to set or add external periodic forces 
+(*lattice units*) to the LB-fluid. At first, one has to create a force object and then 
+set or add this force to the system.
 
-This class sets or adds an external periodic forces to the LB-fluid. At first, one has to create an instance. Only after it one may set or add this force to the system. 
+.. note::
 
-  .. note::
+    Please note, that a periodic (sin-like) force acts in *z*-direction as a function 
+    of *x*. The *z*-component of the force provides therefore the amplitude of the
+    sin-modulation. The *x*- and *y*-components of the specified force interpreted as
+    body forces in corresponding directions.
+    
+Example to set external sin-like force.
 
-    Please note, that you have to specify the amplitude of the force. Its particular values at every lattice site will be calculated automatically.
+>>> ampFz = 0.0001
+>>> Fx = Fy = 0.
+>>> extForceToSet = Real3D( Fx, Fy, ampFz )
+>>> lbforceSin = espressopp.integrator.LBInitConstForce(system,lb)
+>>> lbforceSin.setForce( extForceToSet )
 
-  Example to set an external force:
+Example to add external sin-like force. 
 
-  >>> lbforce1 = espressopp.integrator.LBInitPeriodicForce(system,lb)
-  >>> lbforce1.setForce(Real3D(0.,0.,0.0005))
-  >>> # a vector sets the external body force amplitude
-
-  Example to add an external force with the amplitude :math:`(0.0001, 0., 0.)`:
-
-  >>> lbforce2 = espressopp.integrator.LBInitPeriodicForce(system,lb)
-  >>> lbforce2.addForce(Real3D(0.0001,0.,0.))
-  >>> # a vector adds the external body force with a Real3D amplitude
+>>> ampFz = 0.0005
+>>> Fx = Fy = 0.
+>>> extForceToAdd = Real3D( Fx, Fy, ampFz )
+>>> lbforceSin = espressopp.integrator.LBInitConstForce(system,lb)
+>>> lbforceSin.addForce( extForceToAdd )
 
 
-
-.. function:: espressopp.integrator.LBInitPeriodicForce(system, latticeboltzmann)
-
-		:param system: 
-		:param latticeboltzmann: 
-		:type system: 
-		:type latticeboltzmann: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

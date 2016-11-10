@@ -2107,8 +2107,7 @@ namespace espressopp {
          using namespace espressopp::python;
          class_<LatticeBoltzmann, shared_ptr<LatticeBoltzmann>, bases<Extension> >
          
-         ("integrator_LatticeBoltzmann", init<	shared_ptr< System >,
-          Int3D, real, real, int, int >())
+         ("integrator_LatticeBoltzmann", init<	shared_ptr< System >, Int3D, real, real, int, int >())
          .add_property("nodeGrid", &LatticeBoltzmann::getNodeGrid, &LatticeBoltzmann::setNodeGrid)
          .add_property("a", &LatticeBoltzmann::getA, &LatticeBoltzmann::setA)
          .add_property("tau", &LatticeBoltzmann::getTau, &LatticeBoltzmann::setTau)
@@ -2128,7 +2127,6 @@ namespace espressopp {
          .def("getLBMom", &LatticeBoltzmann::getLBMom)
          .def("setLBMom", &LatticeBoltzmann::setLBMom)
          .def("saveLBConf", &LatticeBoltzmann::saveLBConf)
-         .def("readLBConf", &LatticeBoltzmann::readLBConf)
          .def("keepLBDump", &LatticeBoltzmann::keepLBDump)
          .def("connect", &LatticeBoltzmann::connect)
          .def("disconnect", &LatticeBoltzmann::disconnect)

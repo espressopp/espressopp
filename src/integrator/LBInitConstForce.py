@@ -20,30 +20,23 @@
 
 
 r"""
-***********************************************************************
-**LBInitConstForce** - handles constant (gravity-like) external force
-***********************************************************************
 
-This class sets or adds a constant (gravity-like) external force to the LB-fluid. At first, one has to create an instance. Only after it one may set or add this force to the system.
+This class allows to set or add constant (gravity-like) external forces 
+(*lattice units*) to the LB-fluid. At first, one has to create a force object and then 
+set or add this force to the system.
 
-	Example to set the extenal force to :math:`(0., 0., 0.0005)`:
-	
-	>>> lbforce1 = espressopp.integrator.LBInitConstForce(system,lb)
-	>>> lbforce1.setForce(Real3D(0.,0.,0.0005))
-	>>> # a vector sets the external body force directly in lb-units
+Example to set extenal force:
 
-	Example to add an extenal force of :math:`(0.0001, 0., 0.)` to the existing forces:
+>>> extForceToSet = Real3D(0., 0., 0.0005)
+>>> lbforce = espressopp.integrator.LBInitConstForce(system,lb)
+>>> lbforce.setForce( extForceToSet )
 
-	>>> lbforce2 = espressopp.integrator.LBInitConstForce(system,lb)
-	>>> lbforce2.addForce(Real3D(0.0001,0.,0.))
-	>>> # a vector sets the external body force directly in lb-units
+Example to add extenal force to the existing forces:
 
-.. function:: espressopp.integrator.LBInitConstForce(system, latticeboltzmann)
+>>> extForceToAdd = Real3D(0.0001, 0., 0.)
+>>> lbforce = espressopp.integrator.LBInitConstForce(system,lb)
+>>> lbforce.addForce( extForceToAdd )
 
-		:param system: 
-		:param latticeboltzmann: 
-		:type system: 
-		:type latticeboltzmann: 
 """
 
 from espressopp.esutil import cxxinit

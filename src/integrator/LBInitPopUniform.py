@@ -19,26 +19,21 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-**************************************************************************************
-**LBInitPopUniform** - creates initial populations with uniform density and velocity
-**************************************************************************************
+R"""
 
-This class creates LB-fluid with uniform density rho0 and velocity u0. You have only to specify the corresponding parameters.
+This class creates LB-fluid with uniform density ``rho0`` and velocity ``u0`` (*lattice
+units*).
 
-	Example:
-	
-	>>> initPop = espressopp.integrator.LBInitPopUniform(system,lb)
-	>>> initPop.createDenVel(1.0, Real3D(0.,0.,0.0))
-	>>> # first number is the density, second number is a vector of velocity
-	
+Example:
 
-.. function:: espressopp.integrator.LBInitPopUniform(system, latticeboltzmann)
+>>> # set initial density and velocity
+>>> initDen = 1.
+>>> initVel = Real3D( 0. )
+>>>
+>>> # create initPop object and initialize populations
+>>> initPop = espressopp.integrator.LBInitPopUniform(system,lb)
+>>> initPop.createDenVel( initDen, initVel )
 
-		:param system: 
-		:param latticeboltzmann: 
-		:type system: 
-		:type latticeboltzmann: 
 """
 
 from espressopp.esutil import cxxinit

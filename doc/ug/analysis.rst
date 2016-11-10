@@ -14,9 +14,6 @@ analysis
    espressopp.analysis.Energy.rst
    espressopp.analysis.IntraChainDistSq.rst
    espressopp.analysis.LBOutput.rst
-   espressopp.analysis.LBOutputScreen.rst
-   espressopp.analysis.LBOutputVzInTime.rst
-   espressopp.analysis.LBOutputVzOfX.rst
    espressopp.analysis.MaxPID.rst
    espressopp.analysis.MeanSquareDispl.rst
    espressopp.analysis.NPart.rst

@@ -19,15 +19,10 @@ integrator
    espressopp.integrator.Isokinetic.rst
    espressopp.integrator.LatticeBoltzmann.rst
    espressopp.integrator.LBInit.rst
-   espressopp.integrator.LBInitConstForce.rst
-   espressopp.integrator.LBInitPeriodicForce.rst
-   espressopp.integrator.LBInitPopUniform.rst
-   espressopp.integrator.LBInitPopWave.rst
    espressopp.integrator.LangevinBarostat.rst
    espressopp.integrator.LangevinThermostat.rst
    espressopp.integrator.LangevinThermostat1D.rst
    espressopp.integrator.LangevinThermostatHybrid.rst
-   espressopp.integrator.LiquidGasLB.rst
    espressopp.integrator.MDIntegrator.rst
    espressopp.integrator.OnTheFlyFEC.rst
    espressopp.integrator.Rattle.rst
