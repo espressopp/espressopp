@@ -46,10 +46,9 @@ sys.path.append(os.path.abspath('sphinxext'))
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 
-extensions = ['sphinx.ext.pngmath',
-              'matplotlib.sphinxext.only_directives',
-              'matplotlib.sphinxext.plot_directive',
+extensions = ['sphinx.ext.mathjax',
               'sphinx.ext.autodoc',
+              'sphinx.ext.napoleon',
               'sphinx.ext.doctest',
               'sphinx.ext.autosummary',
               'ipython_console_highlighting',
