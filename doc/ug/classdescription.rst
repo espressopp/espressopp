@@ -1,7 +1,7 @@
 User Interface
 ==============
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    analysis.rst
    bc.rst
