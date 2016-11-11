@@ -29,8 +29,8 @@ analysis
    espressopp.analysis.PressureTensor.rst
    espressopp.analysis.PressureTensorLayer.rst
    espressopp.analysis.PressureTensorMultiLayer.rst
-   espressopp.analysis.RDFatomistic.rst
    espressopp.analysis.RadialDistrF.rst
+   espressopp.analysis.RDFatomistic.rst
    espressopp.analysis.StaticStructF.rst
    espressopp.analysis.SystemMonitor.rst
    espressopp.analysis.Temperature.rst
