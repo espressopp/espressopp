@@ -2,41 +2,40 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
-*****************************************
-**PressureTensorMultiLayer** - Analysis
-*****************************************
+********************************************
+espressopp.analysis.PressureTensorMultiLayer
+********************************************
 
 This class computes the pressure tensor of the system in `n` layers.
 Layers are perpendicular to Z direction and are equidistant(distance is Lz/n).
 It can be used as standalone class in python as well as
 in combination with the integrator extension ExtAnalyze.
 
-Standalone Usage:
------------------
+Example of standalone Usage:
 
 >>> pt = espressopp.analysis.PressureTensorMultiLayer(system, n, dh)
 >>> for i in xrange(n):
 >>>     print "pressure tensor in layer %d: %s" % ( i, pt.compute())
 
-or 
+or
 
 >>> pt = espressopp.analysis.PressureTensorMultiLayer(system, n, dh)
 >>> for k in xrange(100):
@@ -45,8 +44,7 @@ or
 >>> for i in xrange(n):
 >>>     print "average pressure tensor in layer %d: %s" % ( i, pt.compute())
 
-Usage in integrator with ExtAnalyze:
-------------------------------------
+Example of usage in integrator with ExtAnalyze:
 
 >>> pt           = espressopp.analysis.PressureTensorMultiLayer(system, n, dh)
 >>> extension_pt = espressopp.integrator.ExtAnalyze(pt , interval=100)
@@ -75,12 +73,12 @@ The following methods are supported:
 
 .. function:: espressopp.analysis.PressureTensorMultiLayer(system, n, dh)
 
-		:param system: 
-		:param n: 
-		:param dh: 
-		:type system: 
-		:type n: 
-		:type dh: 
+		:param system:
+		:param n:
+		:param dh:
+		:type system:
+		:type n:
+		:type dh:
 """
 
 from espressopp.esutil import cxxinit

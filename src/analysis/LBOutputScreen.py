@@ -16,7 +16,7 @@
 #  GNU General Public License for more details.
 #  
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -69,7 +69,7 @@ class LBOutputScreenLocal(LBOutputLocal, analysis_LBOutput_Screen):
     def __init__(self, system, latticeboltzmann):
 	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_LBOutput_Screen, system, latticeboltzmann)
-
+            
 if pmi.isController :
     class LBOutputScreen(LBOutput):
         __metaclass__ = pmi.Proxy

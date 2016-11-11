@@ -17,9 +17,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-***************************************
-**espressopp.analysis.PotentialEnergy**
-***************************************
+***********************************
+espressopp.analysis.PotentialEnergy
+***********************************
 
 The object that computes potential energy of different interactions.
 
