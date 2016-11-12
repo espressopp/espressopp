@@ -37,6 +37,7 @@ before_install:
  - if [[ ${BUILD_UG} ]]; then
      git clone https://github.com/espressopp/espressopp.github.io.git doc/ug/_build/html;
      pip install --user sphinx;
+     pip install --user sphinx_rtd_theme;
      mkdir -p doc/ug/_build/latex;
      wget -O doc/ug/_build/latex/newfloat.sty https://raw.githubusercontent.com/onlinecity/gatewayapi-docs/master/docs/newfloat.sty;
    fi
