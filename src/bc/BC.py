@@ -20,25 +20,14 @@
 
 
 r"""
-**************************************
-**BC** - Boundary Condition Object
-**************************************
 
 This is the abstract base class for all boundary condition objects.
 It cannot be used directly. All derived classes implement at least
 the following methods:
 
-* `getMinimumImageVector(pos1, pos2)`
-* `getFoldedPosition(pos, imageBox)`
-* `getUnfoldedPosition(pos, imageBox)`
-* `getRandomPos()`
+.. py:class:: espressopp.bc.BC
 
-`pos`, `pos1` and `pos2` are particle coordinates ( type: (`float`, `float`, `float`) ).
-`imageBox` ( type: (`int`, `int`, `int`) ) specifies the   
-
-
-
-.. function:: espressopp.bc.BC.getFoldedPosition(pos, imageBox)
+	.. py:method:: espressopp.bc.BC.getFoldedPosition(pos, imageBox)
 
 		:param pos: 
 		:param imageBox: (default: None)
@@ -46,7 +35,7 @@ the following methods:
 		:type imageBox: 
 		:rtype: 
 
-.. function:: espressopp.bc.BC.getMinimumImageVector(pos1, pos2)
+	.. py:method:: espressopp.bc.BC.getMinimumImageVector(pos1, pos2)
 
 		:param pos1: 
 		:param pos2: 
@@ -54,17 +43,21 @@ the following methods:
 		:type pos2: 
 		:rtype: 
 
-.. function:: espressopp.bc.BC.getRandomPos()
+	.. py:method:: espressopp.bc.BC.getRandomPos()
 
 		:rtype: 
 
-.. function:: espressopp.bc.BC.getUnfoldedPosition(pos, imageBox)
+	.. py:method:: espressopp.bc.BC.getUnfoldedPosition(pos, imageBox)
 
 		:param pos: 
 		:param imageBox: 
 		:type pos: 
 		:type imageBox: 
 		:rtype: 
+
+	`pos`, `pos1` and `pos2` are particle coordinates ( type: (`float`, `float`, `float`) ).
+`imageBox` ( type: (`int`, `int`, `int`) ) specifies the   
+
 """
 
 
