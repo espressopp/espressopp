@@ -72,6 +72,12 @@ class TestPythonTools(unittest.TestCase):
     def test_read_simple_system(self):
 
         filename = 'test.top'
+        ff = open(filename,'w')
+        ff.write('#mass,charge,index,name,ptype\n')
+        ff.write('1.0 -1.0 4 name1 type1\n')
+        ff.write('5.0 -0.7 8 name2 type2\n')
+        ff.close()
+
         nparticles = 2
         mass,charge,index,name,ptype = espressopp.tools.readSimpleSystem(filename,nparticles,header=1)
 
