@@ -50,8 +50,7 @@ r"""
   :param header: number of header lines to skip at start of file
   :type header: int
 
-  Returns: index,atomname,resname,resid,x,y,z,alpha,beta,segid,element
-  Lists of type int,str,str,int,float,float,float,float,float,str,str
+  Returns: index,atomname,resname,resid,x,y,z,alpha,beta,segid,element (lists of type int,str,str,int,float,float,float,float,float,str,str)
 
 """
 import espressopp
