@@ -22,9 +22,9 @@
 
 
 r"""
-*********************************************
-**DumpXYZ** - IO Object
-*********************************************
+*********************
+espressopp.io.DumpXYZ
+*********************
 
 * `dump()`
   write configuration to trajectory XYZ file. By default filename is "out.xyz",
@@ -138,4 +138,3 @@ if pmi.isController :
       pmicall = [ 'dump' ],
       pmiproperty = ['filename', 'unfolded', 'length_factor', 'length_unit', 'store_pids', 'store_velocities', 'append']
     )
-

@@ -20,9 +20,9 @@
 
 
 r"""
-*********************************************
-**DumpGRO** - IO Object
-*********************************************
+*********************
+espressopp.io.DumpGRO
+*********************
 
 * `dump()`
   write configuration to trajectory GRO file. By default filename is "out.gro", 
