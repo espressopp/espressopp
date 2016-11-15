@@ -20,9 +20,9 @@
 
 
 r"""
-*******************************************************
-**BerendsenThermostat** - Berendsen thermostat Object
-*******************************************************
+*****************************************
+espressopp.integrator.BerendsenThermostat
+*****************************************
 
 This is the Berendsen thermostat implementation according to the original paper [Berendsen84]_.
 If Berendsen thermostat is defined (as a property of integrator) then at the each run the system size

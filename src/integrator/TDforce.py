@@ -20,9 +20,9 @@
 
 
 r"""
-*********************************
-**espressopp.integrator.TDforce**
-*********************************
+*****************************
+espressopp.integrator.TDforce
+*****************************
 
 Thermodynamic force.
 

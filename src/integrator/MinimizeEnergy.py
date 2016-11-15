@@ -20,9 +20,9 @@
 
 
 r"""
-****************************************
-**espressopp.integrator.MinimizeEnergy**
-****************************************
+************************************
+espressopp.integrator.MinimizeEnergy
+************************************
 
 This is a very simple approach to perform energy minimization of the system. The module uses
 a `steepest descent method <https://en.wikipedia.org/wiki/Gradient_descent>`_. The position of particles is updated following the equation:
@@ -48,20 +48,17 @@ In both cases, the routine runs until the maximum force is bigger than :math:`f_
 **Please note**
 This module does not support any integrator extensions.
 
-Example1
-==========
+Example
 
 >>> em = espressopp.integrator.MinimizeEnergy(system, gamma=0.001, ftol=0.01, max_displacement=0.0001)
 >>> em.run(10000)
 
-Example2
-==========
+Example
 
 >>> em = espressopp.integrator.MinimizeEnergy(system, gamma=0.01, ftol=0.01, max_displacement=0.01, variable_step_flag=True)
 >>> em.run(10000)
 
-API
-=======
+**API**
 
 .. function:: espressopp.integrator.MinimizeEnergy(system, gamma, ftol, max_displacement, variable_step_flag)
 

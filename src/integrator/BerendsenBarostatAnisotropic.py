@@ -20,9 +20,9 @@
 
 
 r"""
-**************************************************************
-**BerendsenBarostatAnisotropic** - Berendsen barostat Object
-**************************************************************
+**************************************************
+espressopp.integrator.BerendsenBarostatAnisotropic
+**************************************************
 
 #TODO fix these comments 
 This is the Berendsen barostat implementation according to the original paper [Berendsen84]_.

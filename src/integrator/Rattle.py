@@ -17,9 +17,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 r"""
-************************************
-**Rattle** - rigid bonds to hydrogen
-************************************
+******************************
+espressopp.integrator.Rattle
+******************************
 
 RATTLE algorithm for satisfying bond constraints and making the corresponding velocity corrections. 
 
@@ -104,5 +104,3 @@ if pmi.isController:
             cls = 'espressopp.integrator.RattleLocal',
             pmicall = [ "addConstrainedBonds" ]
             )
-
-

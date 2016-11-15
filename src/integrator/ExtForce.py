@@ -20,9 +20,9 @@
 
 
 r"""
-**********************************
-**espressopp.integrator.ExtForce**
-**********************************
+******************************
+espressopp.integrator.ExtForce
+******************************
 
 
 .. function:: espressopp.integrator.ExtForce(system, extForce, particleGroup)

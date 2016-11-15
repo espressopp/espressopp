@@ -20,9 +20,9 @@
 
 
 r"""
-************************************************
-**espressopp.integrator.FreeEnergyCompensation**
-************************************************
+********************************************
+espressopp.integrator.FreeEnergyCompensation
+********************************************
 
 Free Energy Compensation used in Hamiltonian Adaptive Resolution Simulations (H-AdResS). This works for spherical or slab adaptive resolution geometries. However, it only works for fixed, non-moving atomistic region (otherwise, H-AdResS is not properly defined).
 

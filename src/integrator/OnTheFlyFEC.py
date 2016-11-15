@@ -20,9 +20,9 @@
 
 
 r"""
-*************************************
-**espressopp.integrator.OnTheFlyFEC**
-*************************************
+*********************************
+espressopp.integrator.OnTheFlyFEC
+*********************************
 
 
 .. function:: espressopp.integrator.OnTheFlyFEC(system, center)
