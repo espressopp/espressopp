@@ -20,9 +20,9 @@
 
 
 r"""
-*************************
-**espressopp.Exceptions**
-*************************
+*********************
+espressopp.Exceptions
+*********************
 
 
 .. function:: espressopp.Error(msg)

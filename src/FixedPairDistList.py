@@ -20,9 +20,9 @@
 
 
 r"""
-********************************
-**espressopp.FixedPairDistList**
-********************************
+****************************
+espressopp.FixedPairDistList
+****************************
 
 
 .. function:: espressopp.FixedPairDistList(storage)

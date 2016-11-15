@@ -20,9 +20,10 @@
 
 
 r"""
-********************************
-**espressopp.ParallelTempering**
-********************************
+****************************
+espressopp.ParallelTempering
+****************************
+
 .. function:: espressopp.ParallelTempering(NumberOfSystems, RNG)
 		:param NumberOfSystems: (default: 4)
 		:param RNG: (default: None)

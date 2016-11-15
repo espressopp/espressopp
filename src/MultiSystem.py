@@ -19,9 +19,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 r"""
-**************************
-**espressopp.MultiSystem**
-**************************
+**********************
+espressopp.MultiSystem
+**********************
+
 .. function:: espressopp.MultiSystem()
 .. function:: espressopp.MultiSystem.beginSystemDefinition()
 		:rtype: 

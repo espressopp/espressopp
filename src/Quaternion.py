@@ -20,9 +20,9 @@
 
 
 """
-***************************
-**espressopp.Quaternion**
-***************************
+*********************
+espressopp.Quaternion
+*********************
 
 This class provides quaternions with the associate methods. 
 Quaternions can be used as an efficient representation for the orientation 
@@ -41,8 +41,7 @@ les angular motion, i.e. the rigid body dynamics.
 
 
 
-Usage:
-------
+**Usage:**
 
 The following methods from C++-level are available at the python-level:
 

@@ -22,9 +22,9 @@
 
 
 r"""
-**************************************
-**System** - Object
-**************************************
+*****************
+espressopp.System
+*****************
 
 The main purpose of this class is to store pointers to some
 important other classes and thus make them available to C++.
@@ -34,8 +34,7 @@ If you need to run more than one system at the same time you
 can combine several systems with the help of the Multisystem
 class.
 
-In detail the System class holds pointers to:
----------------------------------------------
+**In detail the System class holds pointers to:**
 
 * the `storage` (e.g. DomainDecomposition)
 * the boundary conditions `bc` for the system (e.g. OrthorhombicBC)
@@ -225,4 +224,3 @@ if pmi.isController:
             'getInteraction', 'getNumberOfInteractions','scaleVolume', 'setTrace',
             'getAllInteractions', 'getInteractionByName']
     )
-
