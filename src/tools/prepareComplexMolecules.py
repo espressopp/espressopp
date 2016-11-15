@@ -19,9 +19,9 @@
 
 r"""
 
-*********************************************
-**prepareComplexMolecules** - set up proteins
-*********************************************
+*****************************************
+prepareComplexMolecules - set up proteins
+*****************************************
 
 various helper functions for setting up systems containing complex molecules such as proteins
 

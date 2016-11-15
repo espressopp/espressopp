@@ -19,9 +19,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-******************************************
-**pathintegral** - nuclear quantum effects
-******************************************
+**************************************
+pathintegral - nuclear quantum effects
+**************************************
 
 - method to automatically run the system including nuclear quantum effects using the Feynman path-integral
 

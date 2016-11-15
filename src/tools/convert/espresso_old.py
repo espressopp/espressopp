@@ -23,9 +23,14 @@
 import math
 
 
-"""This Python module allows one to use ESPResSo data files as the
-   input to an ESPResSo++ simulation.
-   """
+"""
+
+**espressomd** parser
+
+This Python module allows one to use ESPResSo data files as the
+input to an ESPResSo++ simulation.
+
+"""
 
 def read(file):
     """ Read ESPResSo data files.

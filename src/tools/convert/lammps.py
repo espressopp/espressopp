@@ -23,8 +23,13 @@
 
 import espressopp
 
-"""This Python module allows one to use a LAMMPS data file as the
-   input to an ESPResSo++ simulation."""
+"""
+**lammps** parser
+
+This Python module allows one to use a LAMMPS data file as the
+input to an ESPResSo++ simulation.
+
+"""
 
 def read(fin):
 

@@ -20,23 +20,22 @@
 
 
 '''
-*****************************************
+
 **units** - convert to Real Units
-*****************************************
 
-  Espresso++ returns temperature, energy, pressure, box length etc. in dimensionless units. Usually user should take care about real length, energy, mass and charge units.  This python class is a helper in order to simplify the conversion which is based on basic units.  However, user always should use it carefully for complicated systems.
+Espresso++ returns temperature, energy, pressure, box length etc. in dimensionless units. Usually user should take care about real length, energy, mass and charge units.  This python class is a helper in order to simplify the conversion which is based on basic units.  However, user always should use it carefully for complicated systems.
 
-  Currently it is implemented for SI units. Make sure that you are using
-  length in [nm]
-  energy in [kJ/mol]
-  mass in   [amu]
-  q in      [e]
+Currently it is implemented for SI units. Make sure that you are using
+length in [nm]
+energy in [kJ/mol]
+mass in   [amu]
+q in      [e]
 
-  and it will return you
-  pressure in     [bar]
-  temperature in  [K]
-  time in         [ps]
-  density in      [kg/m^3]
+and it will return you
+pressure in     [bar]
+temperature in  [K]
+time in         [ps]
+density in      [kg/m^3]
   
 Example:
 

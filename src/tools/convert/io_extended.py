@@ -22,32 +22,30 @@
 # -*- coding: utf-8 -*-
 
 """
-**************************************************
 **io_extended** - read/write configurational files
-**************************************************
 
-  This Python module allows one to read and write configurational files.
-  One can choose folded or unfolded coordinates and write down velocities or not.
-  It is similar to lammps read and write, but it writes down only:
-  1) number of particles + types
-  2) number of bonds (number of pairs) + types
-  3) number of angles (number of triples) + types
-  4) number of dihedrals (number of quadruples) + types
-  5) system size (Lx,Ly,Lz)
-  6) p_id, p_type, p_positions
-  7) velocities (if true)
-  8) bonds (if exist)
-  9) angles (if exist)
-  10)dihedrals (if exist)
-  
-  read returns:
-  Lx, Ly, Lz, p_ids, p_types, poss, vels, bonds, angles, dihedrals
-  if something does not exist then it will return the empty list
-  bonds, angles, dihedrals - will return list [type, (x,x,x,x)],
-  where type is the type of bond, angle or dihedral
-  (x,x,x,x) is (pid1,pid2) for bonds,
-               (pid1,pid2,pid3) for angles
-               (pid1,pid2,pid3,pid4) for dihedrals
+This Python module allows one to read and write configurational files.
+One can choose folded or unfolded coordinates and write down velocities or not.
+It is similar to lammps read and write, but it writes down only:
+1) number of particles + types
+2) number of bonds (number of pairs) + types
+3) number of angles (number of triples) + types
+4) number of dihedrals (number of quadruples) + types
+5) system size (Lx,Ly,Lz)
+6) p_id, p_type, p_positions
+7) velocities (if true)
+8) bonds (if exist)
+9) angles (if exist)
+10)dihedrals (if exist)
+
+read returns:
+Lx, Ly, Lz, p_ids, p_types, poss, vels, bonds, angles, dihedrals
+if something does not exist then it will return the empty list
+bonds, angles, dihedrals - will return list [type, (x,x,x,x)],
+where type is the type of bond, angle or dihedral
+(x,x,x,x) is (pid1,pid2) for bonds,
+           (pid1,pid2,pid3) for angles
+           (pid1,pid2,pid3,pid4) for dihedrals
 """   
 
 import espressopp

@@ -19,28 +19,26 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-"""
-***************************************
-**warmup** - method to warm up a system
-***************************************
-
-This method does a warm up for a system with a density of 0.85.
-
-The method needs the following parameters:
-
-* system, integrator
-    ESPResSo system which schoul be warmed up and the correspondig integrator e.g.:
-    >>>system, integrator = espressopp.standard_system.LennardJones(100,(10,10,10))
-*number
-    number of steps of the warm up
-  =80
-    for a system with a desnsity of 0.85, if it explodes try a higher number
-"""
 import espressopp
 from espressopp import Real3D
 
-def warmup(system, integrator, number=80):
+def warmup(system, integrator, number = 80):
+  """
+  Warm up for a system with a density of 0.85.
 
+  The method needs the following parameters:
+
+  * system, integrator
+    ESPResSo system which schoul be warmed up and the correspondig integrator e.g.:
+    
+    >>> system, integrator = espressopp.standard_system.LennardJones(100,(10,10,10))
+    
+  * number
+    number of steps of the warm up 
+    
+    for a system with a density of 0.85, if it explodes try a higher number
+    
+  """
   print "starting warmup"
 
   org_dt = integrator.dt
