@@ -20,9 +20,9 @@
 
 
 r"""
-*****************************************
-**FENE interaction**
-*****************************************
+***************************
+espressopp.interaction.FENE
+***************************
 
 Implementation of the Finitely Extensible Non-linear Elastic potential:
 

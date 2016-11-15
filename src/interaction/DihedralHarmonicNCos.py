@@ -22,9 +22,9 @@
 
 
 r"""
-*********************************************************
-**espressopp.interaction.DihedralHarmonicNCos**
-*********************************************************
+*******************************************
+espressopp.interaction.DihedralHarmonicNCos
+*******************************************
 
 The dihedral harmonic potential
 

@@ -19,9 +19,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 r"""
-*******************************************
-**espressopp.interaction.CoulombTruncated**
-*******************************************
+***************************************
+espressopp.interaction.CoulombTruncated
+***************************************
 
 .. math::
 
@@ -142,6 +142,3 @@ if pmi.isController:
             cls =  'espressopp.interaction.FixedPairListTypesCoulombTruncatedLocal',
             pmicall = ['setPotential']
             )
-
-
-

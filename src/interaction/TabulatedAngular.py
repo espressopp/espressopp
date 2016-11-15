@@ -22,9 +22,9 @@
 
 
 r"""
-*****************************************************
-**espressopp.interaction.TabulatedAngular**
-*****************************************************
+***************************************
+espressopp.interaction.TabulatedAngular
+***************************************
 
 .. function:: espressopp.interaction.TabulatedAngular(itype, filename)
 
