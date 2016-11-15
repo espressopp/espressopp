@@ -20,9 +20,9 @@
 
 
 r"""
-*******************************************
-**espressopp.standard_system.LennardJones**
-*******************************************
+***************************************
+espressopp.standard_system.LennardJones
+***************************************
 
 
 .. function:: espressopp.standard_system.LennardJones(num_particles, box, rc, skin, dt, epsilon, sigma, shift, temperature, xyzfilename, xyzrfilename)

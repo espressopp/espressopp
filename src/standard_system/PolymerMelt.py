@@ -20,9 +20,9 @@
 
 
 r"""
-******************************************
-**espressopp.standard_system.PolymerMelt**
-******************************************
+**************************************
+espressopp.standard_system.PolymerMelt
+**************************************
 
 
 .. function:: espressopp.standard_system.PolymerMelt(num_chains, monomers_per_chain, box, bondlen, rc, skin, dt, epsilon, sigma, shift, temperature, xyzfilename, xyzrfilename)
@@ -172,4 +172,3 @@ def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.
       self._L             = pow(self._num_particles / self._density, 1.0/3.0)
       self._box           = (L, L, L)
       self._system        = espress.System()
-
