@@ -56,7 +56,7 @@ the following methods:
 		:rtype: 
 
 	`pos`, `pos1` and `pos2` are particle coordinates ( type: (`float`, `float`, `float`) ).
-`imageBox` ( type: (`int`, `int`, `int`) ) specifies the   
+	`imageBox` ( type: (`int`, `int`, `int`) ) specifies the   
 
 """
 
