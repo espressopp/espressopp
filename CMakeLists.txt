@@ -18,14 +18,6 @@ enable_testing()
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 
-include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag("-std=c++98" COMPILER_SUPPORTS_CXX98)
-if(COMPILER_SUPPORTS_CXX98)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98")
-else(COMPILER_SUPPORTS_CXX98)
-    message(FATAL_ERROR "Compiler flag -std=c++98 not supported")
-endif(COMPILER_SUPPORTS_CXX98)
-
 ########################################################################
 # User input options                                                   #
 ########################################################################
@@ -49,6 +41,13 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CXX_FLAGS)
       "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
       FORCE)
 endif()
+
+check_cxx_compiler_flag("-std=c++98" COMPILER_SUPPORTS_CXX98)
+if(COMPILER_SUPPORTS_CXX98)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98")
+else(COMPILER_SUPPORTS_CXX98)
+    message(FATAL_ERROR "Compiler flag -std=c++98 not supported")
+endif(COMPILER_SUPPORTS_CXX98)
 
 ########################################################################
 #VampirTrace settings
@@ -251,5 +250,5 @@ if ( SPHINX_EXECUTABLE )
 
    message ( STATUS "Generate LaTeX manual via ${SPHINX_EXECUTABLE}: make ug-pdf")
 else ( SPHINX_EXECUTABLE )
-    message ( WARNING "Not building user documentation because Doxygen not found.")
+    message ( WARNING "Not building user documentation because Sphinx not found.")
 endif ( SPHINX_EXECUTABLE )
