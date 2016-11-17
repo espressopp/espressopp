@@ -25,39 +25,60 @@ espressopp.ParallelTempering
 ****************************
 
 .. function:: espressopp.ParallelTempering(NumberOfSystems, RNG)
+
 		:param NumberOfSystems: (default: 4)
 		:param RNG: (default: None)
 		:type NumberOfSystems: int
 		:type RNG: 
+		
 .. function:: espressopp.ParallelTempering.endDefiningSystem(n)
+
 		:param n: 
 		:type n: 
 		:rtype: 
+		
 .. function:: espressopp.ParallelTempering.exchange()
+
 		:rtype: 
+		
 .. function:: espressopp.ParallelTempering.getNumberOfCPUsPerSystem()
+
 		:rtype: 
+		
 .. function:: espressopp.ParallelTempering.getNumberOfSystems()
+
 		:rtype: 
+		
 .. function:: espressopp.ParallelTempering.run(nsteps)
+
 		:param nsteps: 
 		:type nsteps: 
 		:rtype: 
+		
 .. function:: espressopp.ParallelTempering.setAnalysisE(analysisE)
+
 		:param analysisE: 
 		:type analysisE: 
+		
 .. function:: espressopp.ParallelTempering.setAnalysisNPart(analysisNPart)
+
 		:param analysisNPart: 
 		:type analysisNPart: 
+		
 .. function:: espressopp.ParallelTempering.setAnalysisT(analysisT)
+
 		:param analysisT: 
 		:type analysisT: 
+		
 .. function:: espressopp.ParallelTempering.setIntegrator(integrator, thermostat)
+
 		:param integrator: 
 		:param thermostat: 
 		:type integrator: 
 		:type thermostat: 
+		
 .. function:: espressopp.ParallelTempering.startDefiningSystem(n)
+
 		:param n: 
 		:type n: 
 		:rtype: 

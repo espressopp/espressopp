@@ -63,14 +63,10 @@ This list of lists of constrained bonds can be conveniently built using the espr
 
 .. function:: espressopppp.integrator.Rattle(system, maxit = 1000, tol = 1e-6, rptol = 1e-6)
 
-                :param system: espressopppp system
-                :param maxit: (default: 1000) maximum number of iterations
-                :param tol: (default: 1e-6) tolerance for deciding if constraint distance and current distance are similar enough
-                :param rptol: (default: 1e-6) tolerance for deciding if the angle between the bond vector at end of previous timestep and current vector has become too large
-                :type system: System
-                :type maxit: int
-                :type tol: real
-                :type rptol: real
+                :param espressopp.System system: espressopp system
+                :param int maxit: maximum number of iterations
+                :param real tol: tolerance for deciding if constraint distance and current distance are similar enough
+                :param real rptol: tolerance for deciding if the angle between the bond vector at end of previous timestep and current vector has become too large
   
 .. function:: espressopppp.integrator.Rattle.addConstrainedBonds(bondDetailsLists)
 

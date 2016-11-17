@@ -85,6 +85,7 @@ Example (not complete):
 		:type name: str
 
 .. function:: espressopp.System.getAllInteractions()
+
 		:rtype: The dictionary with name as a key and Interaction object.
 
 .. function:: espressopp.System.scaleVolume(\*args)
