@@ -18,18 +18,17 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
-
-# -*- coding: utf-8 -*-
-
-import espressopp
-
 """
-**lammps** parser
+**************************
+lammps - read lammps files
+**************************
 
 This Python module allows one to use a LAMMPS data file as the
 input to an ESPResSo++ simulation.
 
 """
+
+import espressopp
 
 def read(fin):
 

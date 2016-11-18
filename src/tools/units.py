@@ -20,8 +20,9 @@
 
 
 '''
-
-**units** - convert to Real Units
+*****************************
+units - convert to real units
+*****************************
 
 Espresso++ returns temperature, energy, pressure, box length etc. in dimensionless units. Usually user should take care about real length, energy, mass and charge units.  This python class is a helper in order to simplify the conversion which is based on basic units.  However, user always should use it carefully for complicated systems.
 

@@ -22,7 +22,9 @@
 # -*- coding: utf-8 -*-
 
 """
-**io_extended** - read/write configurational files
+**********************************************
+io_extended - read/write configurational files
+**********************************************
 
 This Python module allows one to read and write configurational files.
 One can choose folded or unfolded coordinates and write down velocities or not.

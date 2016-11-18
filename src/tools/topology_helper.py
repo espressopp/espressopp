@@ -24,7 +24,9 @@
 # Some helper classes usefull when parsing the gromacs topology
 
 """
-**topology_helper**
+***************
+topology_helper
+***************
 """
 
 import espressopp

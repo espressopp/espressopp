@@ -22,8 +22,9 @@
 # -*- coding: utf-8 -*-
 
 """
-
-**gromacs** - parser for Gromacs files
+**********************************
+gromacs - parser for Gromacs files
+**********************************
 
 This Python module allows one to use GROMACS data files as the
 input to an ESPResSo++ simulation, set interactions for given
