@@ -61,6 +61,33 @@ various helper functions for setting up systems containing complex molecules suc
   :type pidlist: list of int
   :return: list of pairs which are not in atExclusions
   :rtype: list of 2-tuples of int
+
+.. function:: espressopp.tools.readSimpleSystem(filename,nparticles,header)
+
+  Read in a column-formatted file containing information about the 
+  particles in a simple system, for example a coarsegrained protein.
+
+  This function expects the input file to have between 2 and 5 columns.
+  The number of columns in the file is automatically detected.
+  The function reads each column into a list and returns the lists.
+  Column types are interpreted as follows:
+  2 columns: float, float
+  3 columns: float, float, int
+  4 columns: float, float, int, str
+  5 columns: float, float, int, str, str
+
+  For example in the case of a coarsegrained protein model, these could be:
+  mass, charge, corresponding atomistic index, beadname, beadtype
+
+  :param filename: name of file to open and read
+  :type filename: string
+  :param nparticles: number of particles in file
+  :type nparticles: int
+  :param header: number of lines to skip at start of file (default 0)
+  :type header: int
+
+  Returns: between 2 and 5 lists
+ 
 """
 
 def findConstrainedBonds(atomPids, bondtypes, bondtypeparams, masses, massCutoff = 1.1):
@@ -108,3 +135,34 @@ def getInternalNonbondedInteractions(atExclusions,pidlist):
       if (pid2,pid1) in nonBondPairs: continue #to avoid this we'd have to assume pids in pidlist were ordered and continuous
       nonBondPairs.append((pid1,pid2))
   return nonBondPairs
+
+def readSimpleSystem(filename,nparticles,header=0):
+  f = open(filename,'r')
+  mass=[]
+  charge=[]
+  index=[]
+  name=[]
+  ptype=[]
+  for i in range(header):
+    f.readline()
+  for i in range(nparticles):
+    line = f.readline()
+    line = line.split()
+    mass.append(float(line[0]))
+    charge.append(float(line[1]))
+    if len(line)>2:
+      index.append(int(line[2]))
+    if len(line)>3:
+      name.append(line[3])
+    if len(line)==5:
+      ptype.append(line[4])
+  f.close()
+  if len(line)==2:
+    return mass,charge
+  elif len(line)==3:
+    return mass,charge,index
+  elif len(line)==4:
+    return mass,charge,index,name
+  elif len(line)==5:
+    return mass,charge,index,name,ptype
+
