@@ -45,27 +45,28 @@ e.g. replace:
 
 .. code-block:: none
 
- ; Include topology for ions
- #include "amber03.ff/ions.itp"
+    ; Include topology for ions
+    #include "amber03.ff/ions.itp"
 
 by:
 
 .. code-block:: none
 
- ; Include topology for ions
- [ moleculetype ]
- ; molname       nrexcl
- CL              1
+    ; Include topology for ions
+    [ moleculetype ]
+    ; molname       nrexcl
+    CL              1
  
- [ atoms ]
- ; id    at type         res nr  residu name     at name  cg nr  charge
- 1       Cl              1       CL              CL       1      -1.00000
+    [ atoms ]
+    ; id    at type         res nr  residu name     at name  cg nr  charge
+    1       Cl              1       CL              CL       1      -1.00000
 
 
 **Tip 2. impropers**
 
 impropers in the topol.top file (function type 4) need to be labelled '[ impropers ]', not '[ dihedrals ]' as in standard gromacs format"
 
+Also, the dihedrals should be listed before the impropers (this is usuall the case by default in gromacs-format files).
 
 **Tip 3.**
 
@@ -73,24 +74,24 @@ For rigid SPC/E water using Settle, spce.itp file should look like this:
 
 .. code-block:: none
 
- [ moleculetype ]
- ; molname       nrexcl
- SOL             2
+    [ moleculetype ]
+    ; molname       nrexcl
+    SOL             2
  
- [ atoms ]
- ; id  at type     res nr  res name  at name  cg nr  charge    mass
-   1   OW_spc      1       SOL       OW       1      -0.8476   15.99940
-   2   HW_spc      1       SOL       HW1      1       0.4238    1.00800
-   3   HW_spc      1       SOL       HW2      1       0.4238    1.00800
+    [ atoms ]
+    ; id  at type     res nr  res name  at name  cg nr  charge    mass
+      1   OW_spc      1       SOL       OW       1      -0.8476   15.99940
+      2   HW_spc      1       SOL       HW1      1       0.4238    1.00800
+      3   HW_spc      1       SOL       HW2      1       0.4238    1.00800
  
- [ bonds ]
- ; i     j       funct   length  force.c.
- 1       2       1       0.1     345000  0.1     345000
- 1       3       1       0.1     345000  0.1     345000
+    [ bonds ]
+    ; i     j       funct   length  force.c.
+    1       2       1       0.1     345000  0.1     345000
+    1       3       1       0.1     345000  0.1     345000
  
- [ angles ]
- ; i     j       k       funct   angle   force.c.
- 2       1       3       1       109.47  383     109.47  383
+    [ angles ]
+    ; i     j       k       funct   angle   force.c.
+    2       1       3       1       109.47  383     109.47  383
 
 _____________________________________________________________________________
 
@@ -126,17 +127,17 @@ i.e. Okay for an itp file like spce.itp above, where the bonds and angles parame
 
 .. code-block:: none
 
- [ bonds ]
- ; i     j       funct   length  force.c.
- 1       2       1       0.1     345000  0.1     345000
+    [ bonds ]
+    ; i     j       funct   length  force.c.
+    1       2       1       0.1     345000  0.1     345000
 
 Not okay for an itp file containing lines like:
 
 .. code-block:: none
 
- [ bonds ]
- ; i     j       funct   length  force.c.
- 1       2       1
+    [ bonds ]
+    ; i     j       funct   length  force.c.
+    1       2       1
  
 """
    
