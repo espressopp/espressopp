@@ -20,6 +20,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+*****************************************
+DumpConfigurations - read/write xyz files
+*****************************************
+"""
+
 import espressopp
 
 def writexyz(filename, system, velocities = True, unfolded = False, append = False):

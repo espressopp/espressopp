@@ -7,6 +7,7 @@ converting files
 
    espressopp.tools.convert.espresso_old
    espressopp.tools.convert.gromacs
+   espressopp.tools.convert.io_extended
    espressopp.tools.convert.lammps
    espressopp.tools.convert.topology_helper
    espressopp.tools.convert.units
@@ -22,7 +23,12 @@ espressopp.tools.convert.gromacs
 """"""""""""""""""""""""""""""""
 .. automodule:: espressopp.tools.convert.gromacs
    :members:
-
+   
+espressopp.tools.convert.io_extended
+""""""""""""""""""""""""""""""""""""
+.. automodule:: espressopp.tools.convert.io_extended
+   :members:
+      
 espressopp.tools.convert.lammps
 """""""""""""""""""""""""""""""
 .. automodule:: espressopp.tools.convert.lammps

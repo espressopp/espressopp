@@ -44,8 +44,11 @@ if something does not exist then it will return the empty list
 bonds, angles, dihedrals - will return list [type, (x,x,x,x)],
 where type is the type of bond, angle or dihedral
 (x,x,x,x) is (pid1,pid2) for bonds,
-           (pid1,pid2,pid3) for angles
-           (pid1,pid2,pid3,pid4) for dihedrals
+
+(pid1,pid2,pid3) for angles
+
+(pid1,pid2,pid3,pid4) for dihedrals
+
 """   
 
 import espressopp

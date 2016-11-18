@@ -21,7 +21,7 @@
 
 """
 ***********************************
-decomp - Auxiliary python functions
+decomp - auxiliary python functions
 ***********************************
 
 
