@@ -19,6 +19,7 @@ addons:
       - openmpi-bin
       - libboost1.55-all-dev
       - python-matplotlib
+      - python-numpy
       - texlive-latex-base
       - texlive-latex-recommended
       - texlive-latex-extra
