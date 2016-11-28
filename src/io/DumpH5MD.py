@@ -1,8 +1,8 @@
+# Copyright (c) 2015,2016
+#     Jakub Krajniak (jkrajniak at gmail.com)
+#
 # Copyright (c) 2015
 #     Pierre de Buyl
-#
-# Copyright (c) 2015-2016
-#     Jakub Krajniak (jkrajniak at gmail.com)
 #
 #  This file is part of ESPResSo++.
 #
@@ -103,12 +103,10 @@ from espressopp.esutil import cxxinit
 from espressopp import pmi
 from _espressopp import io_DumpH5MD
 from mpi4py import MPI
+import h5py
 import numpy as np
-try:
-    import h5py
-    import pyh5md
-except ImportError:
-    print 'missing pyh5md'
+import pyh5md
+import os
 
 import time as py_time
 
@@ -123,13 +121,14 @@ class DumpH5MDLocal(io_DumpH5MD):
                  store_charge=False,
                  store_lambda=False,
                  store_res_id=False,
+                 store_mass=True,
                  static_box=True,
                  is_adress=False,
                  author='xxx',
                  email='xxx',
-                 chunk_size=128,
-                 do_sort=True,
-                 integrator=None):
+                 chunk_size=256,
+                 is_single_prec=False,
+                 do_sort=True):
         """
         Args:
             system: The system object.
@@ -143,14 +142,15 @@ class DumpH5MDLocal(io_DumpH5MD):
             store_charge: If set to True then charge will be stored. (default: False)
             store_lambda: If set to True then lambda (AdResS) will be stored. (default: False)
             store_res_id: If set to True then store res_id. (default: False)
+            store_mass: If set to True then store mass. (default: True)
             static_box: If set to True then box is static (like in NVT ensemble) (default: True)
             is_adress: If set to True then AdResS particles will be save instead of
                 coarse-grained.
             author: The name of author of the file. (default: xxx)
             email: The e-mail to author of that file. (default: xxx)
             chunk_size: The size of data chunk. (default: 128)
+            is_single_prec: Use single precision instead of double.
             do_sort: If set to True then HDF5 will be sorted on close.
-            integrator: The integrator, if None then the value from system object is taken.
         """
         if not pmi.workerIsActive():
             return
@@ -166,74 +166,83 @@ class DumpH5MDLocal(io_DumpH5MD):
         self.store_charge = store_charge
         self.store_lambda = store_lambda
         self.store_res_id = store_res_id
+        self.store_mass = store_mass
         self.static_box = static_box
         self.chunk_size = chunk_size
         self.do_sort = do_sort
+        self.single_prec = is_single_prec
 
         self.system = system
-        if integrator is not None:
-            self.integrator = integrator
-        else:
-            self.integrator = system.integrator
 
-        if self.integrator is None:
-            raise RuntimeError('Integrator is not set properly.')
+        if pmi.isController:
+            if os.path.exists(filename):
+                basename = os.path.basename(filename)
+                dirname = os.path.dirname(filename)
+                new_filename = '{}/{}_{}'.format(dirname, int(py_time.time()), os.path.basename(filename))
+                os.rename(filename, new_filename)
+                print('File {} exists, moved to {}'.format(filename, new_filename))
 
-        self.file = pyh5md.H5MD_File(filename, 'w', driver='mpio', comm=MPI.COMM_WORLD,
-                                     creator='espressopp',
-                                     creator_version=espressopp.VersionLocal().info(),
-                                     author=author, email=email
-                                     )
+        self.file = pyh5md.File(
+            filename, 'w',
+            creator='espressopp',
+            creator_version=espressopp.VersionLocal().info(),
+            author=author,
+            author_email=email,
+            driver='mpio',
+            comm=MPI.COMM_WORLD)
 
         self._system_data()
 
+        self.float_type = np.float32 if is_single_prec else np.float64
+        self.int_type = np.int32 if is_single_prec else np.int
+
         part = self.file.particles_group(self.group_name)
+        self.particle_group = part
+
         if self.static_box:
-            self.box = part.box(dimension=3,
-                                boundary=['periodic', 'periodic', 'periodic'],
-                                time=False,
-                                edges=np.array(
-                                    [ed_i for ed_i in self.system.bc.boxL],
-                                    dtype=np.float64
-                                ))
+            self.box = part.create_box(
+                dimension=3,
+                boundary=['periodic', 'periodic', 'periodic'],
+                store='fixed',
+                data=np.array([ed_i for ed_i in self.system.bc.boxL], dtype=self.float_type))
         else:
             self.box = part.box(
                 dimension=3,
                 boundary=['periodic', 'periodic', 'periodic'],
-                time=True,
-                edges=np.zeros(3, dtype=np.float64))
-        self.id_e = part.trajectory(
-            'id', (self.chunk_size,), np.int, chunks=(1, self.chunk_size), fillvalue=-1)
-        self.mass = part.trajectory(
-            'mass', (self.chunk_size,), np.float64, chunks=(1, self.chunk_size), fillvalue=-1)
+                store='time', time=True,
+                data=np.zeros(3, dtype=self.float_type))
+
+        self.id_e = pyh5md.element(part, 'id', store='time', time=True, shape=(self.chunk_size,), maxshape=(None, ),
+                                   dtype=self.int_type, fillvalue=-1)
+        if store_mass:
+            self.mass = pyh5md.element(part, 'mass', store='time', time=True, maxshape=(None, ),
+                                       shape=(self.chunk_size,), dtype=self.float_type, fillvalue=-1)
         if self.store_position:
-            self.position = part.trajectory(
-                'position', (self.chunk_size, 3), np.float64, chunks=(1, self.chunk_size, 3))
-            self.image = part.trajectory(
-                'image', (self.chunk_size, 3), np.float64, chunks=(1, self.chunk_size, 3))
+            self.position = pyh5md.element(part, 'position', store='time', time=True, maxshape=(None, 3),
+                                           shape=(self.chunk_size, 3), dtype=self.float_type)
+            self.image = pyh5md.element(part, 'image', store='time', time=True, maxshape=(None, 3),
+                                        shape=(self.chunk_size, 3), dtype=self.float_type)
         if self.store_species:
-            self.species = part.trajectory(
-                'species', (self.chunk_size,), np.int, chunks=(1, self.chunk_size), fillvalue=-1)
+            self.species = pyh5md.element(part, 'species', store='time', time=True, maxshape=(None, ),
+                                          shape=(self.chunk_size,), dtype=self.int_type, fillvalue=-1)
         if self.store_state:
-            self.state = part.trajectory(
-                'state', (self.chunk_size,), np.int, chunks=(1, self.chunk_size), fillvalue=-1)
+            self.state = pyh5md.element(part, 'state', store='time', time=True, maxshape=(None, ),
+                                        shape=(self.chunk_size,), dtype=self.int_type,  fillvalue=-1)
         if self.store_velocity:
-            self.velocity = part.trajectory(
-                'velocity', (self.chunk_size, 3), np.float64, chunks=(1, self.chunk_size, 3))
+            self.velocity = pyh5md.element(part, 'velocity', store='time', time=True, maxshape=(None, 3),
+                                           shape=(self.chunk_size, 3), dtype=self.float_type)
         if self.store_force:
-            self.force = part.trajectory(
-                'force', (self.chunk_size, 3), np.float64, chunks=(1, self.chunk_size, 3))
+            self.force = pyh5md.element(part, 'force', store='time', time=True, maxshape=(None, 3),
+                                        shape=(self.chunk_size, 3), dtype=self.float_type)
         if self.store_charge:
-            self.charge = part.trajectory(
-                'charge', (self.chunk_size,), np.float64, chunks=(1, self.chunk_size), fillvalue=-1)
+            self.charge = pyh5md.element(part, 'charge', store='time', time=True, maxshape=(None, ),
+                                         shape=(self.chunk_size,), dtype=self.float_type, fillvalue=-1)
         if self.store_lambda:
-            self.lambda_adr = part.trajectory(
-                'lambda_adr', (self.chunk_size,), np.float64,
-                chunks=(1, self.chunk_size), fillvalue=-1)
+            self.lambda_adr = pyh5md.element(part, 'lambda_adr', store='time', time=True, maxshape=(None, ),
+                                             shape=(self.chunk_size,), dtype=self.float_type,  fillvalue=-1)
         if self.store_res_id:
-            self.res_id = part.trajectory(
-                'res_id', (self.chunk_size, ), np.int,
-                chunks=(1, self.chunk_size), fillvalue=-1)
+            self.res_id = pyh5md.element(part, 'res_id', store='time', time=True, maxshape=(None, ),
+                                         shape=(self.chunk_size, ), dtype=self.int_type,  fillvalue=-1)
         self._system_data()
 
         self.commTimer = 0.0
@@ -241,6 +250,8 @@ class DumpH5MDLocal(io_DumpH5MD):
         self.writeTimer = 0.0
         self.flushTimer = 0.0
         self.closeTimer = 0.0
+        self.resizeCounter = 0
+
 
     def _system_data(self):
         """Stores specific information about simulation."""
@@ -260,39 +271,45 @@ class DumpH5MDLocal(io_DumpH5MD):
                     'updateTimer': self.updateTimer,
                     'writeTimer': self.writeTimer,
                     'flushTimer': self.flushTimer,
-                    'closeTimer': self.closeTimer
+                    'closeTimer': self.closeTimer,
+                    'resizeCounter': self.resizeCounter
                    }
 
     def set_parameters(self, paramters):
         if pmi.workerIsActive():
-            if 'parameters' not in self.file.f:
-                self.file.f.create_group('parameters')
-            g_params = self.file.f['parameters']
+            if 'parameters' not in self.file:
+                self.file.create_group('parameters')
+            g_params = self.file['parameters']
             for k, v in paramters.iteritems():
                 g_params.attrs[k] = v
 
     def get_file(self):
         if pmi.workerIsActive():
-            return self.file.f
+            return self.file
 
     def update(self):
         if pmi.workerIsActive():
             self.cxxclass.update(self)
 
     def clear_buffers(self):
-        self.cxxclass.clear_buffers(self)
+        if pmi.workerIsActive():
+            self.cxxclass.clear_buffers(self)
 
     def getPosition(self):
-        return self.cxxclass.getPosition(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getPosition(self)
 
     def getImage(self):
-        return self.cxxclass.getImage(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getImage(self)
 
     def getVelocity(self):
-        return self.cxxclass.getVelocity(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getVelocity(self)
 
     def getForce(self):
-        return self.cxxclass.getForce(self)
+        if pmi.workerIsActive():
+            return self.cxxclass.getForce(self)
 
     def getId(self):
         if pmi.workerIsActive():
@@ -322,12 +339,12 @@ class DumpH5MDLocal(io_DumpH5MD):
         if pmi.workerIsActive():
             return self.cxxclass.getResId(self)
 
-    def dump(self):
+    def dump(self, step=0, time=0):
         if not pmi.workerIsActive():
             return
 
         # Take it directly from integrator;
-        integrator = self.integrator
+        integrator = self.system.integrator
         step = integrator.step
         time = step*integrator.dt
 
@@ -345,87 +362,104 @@ class DumpH5MDLocal(io_DumpH5MD):
         idx_1 = idx_0+NLocal
         self.commTimer += (py_time.time() - time0)
 
+        isResized = False
+
         time0 = py_time.time()
         # Store ids. Always!
         id_ar = np.asarray(self.getId())
         if total_size > self.id_e.value.shape[1]:
+            isResized = True
             self.id_e.value.resize(total_size, axis=1)
-        self.id_e.append(id_ar, step, time, region=(idx_0, idx_1))
+        self.id_e.append(id_ar, step, time, region=(idx_0, idx_1), collective=True)
+
+        # Store box values at every time step
+        if not self.static_box:
+            self.box.edges.append(
+                np.array([edge_i for edge_i in self.system.bc.boxL], dtype=self.float_type),
+                step,
+                time, collective=True)
 
         if self.store_position:
-            pos = np.asarray(self.getPosition())
+            pos = np.asarray(self.getPosition(), dtype=self.float_type)
             if total_size > self.position.value.shape[1]:
+                isResized = True
                 self.position.value.resize(total_size, axis=1)
-            self.position.append(pos, step, time, region=(idx_0, idx_1))
-            if not self.static_box:
-                self.box.edges.append(
-                    np.array([edge_i for edge_i in self.system.bc.boxL], dtype=np.float64),
-                    step,
-                    time)
+            self.position.append(pos, step, time, region=(idx_0, idx_1), collective=True)
             # Store image.
-            image = np.asarray(self.getImage())
+            image = np.asarray(self.getImage(), dtype=self.int_type)
             if total_size > self.image.value.shape[1]:
                 self.image.value.resize(total_size, axis=1)
-            self.image.append(image, step, time, region=(idx_0, idx_1))
+            self.image.append(image, step, time, region=(idx_0, idx_1), collective=True)
 
         # Store velocity.
         if self.store_velocity:
-            vel = np.asarray(self.getVelocity())
+            vel = np.asarray(self.getVelocity(), dtype=self.float_type)
             if total_size > self.velocity.value.shape[1]:
+                isResized = True
                 self.velocity.value.resize(total_size, axis=1)
-            self.velocity.append(vel, step, time, region=(idx_0, idx_1))
+            self.velocity.append(vel, step, time, region=(idx_0, idx_1), collective=True)
 
         if self.store_force:
-            force = np.asarray(self.getForce())
+            force = np.asarray(self.getForce(), dtype=self.float_type)
             if total_size > self.force.value.shape[1]:
+                isResized = True
                 self.force.value.resize(total_size, axis=1)
-            self.force.append(force, step, time, region=(idx_0, idx_1))
+            self.force.append(force, step, time, region=(idx_0, idx_1), collective=True)
 
         if self.store_charge:
-            charge = np.asarray(self.getCharge())
+            charge = np.asarray(self.getCharge(), dtype=self.float_type)
             if total_size > self.charge.value.shape[1]:
+                isResized = True
                 self.charge.value.resize(total_size, axis=1)
-            self.charge.append(charge, step, time, region=(idx_0, idx_1))
+            self.charge.append(charge, step, time, region=(idx_0, idx_1), collective=True)
 
         # Store mass.
-        mass = np.asarray(self.getMass())
-        if total_size > self.mass.value.shape[1]:
-            self.mass.value.resize(total_size, axis=1)
-        self.mass.append(mass, step, time, region=(idx_0, idx_1))
+        if self.store_mass:
+            mass = np.asarray(self.getMass(), dtype=self.float_type)
+            if total_size > self.mass.value.shape[1]:
+                isResized = True
+                self.mass.value.resize(total_size, axis=1)
+            self.mass.append(mass, step, time, region=(idx_0, idx_1), collective=True)
 
         # Store species.
         if self.store_species:
             species = np.asarray(self.getSpecies())
             if total_size > self.species.value.shape[1]:
+                isResized = True
                 self.species.value.resize(total_size, axis=1)
-            self.species.append(species, step, time, region=(idx_0, idx_1))
+            self.species.append(species, step, time, region=(idx_0, idx_1), collective=True)
 
         # Store state.
         if self.store_state:
             state = np.asarray(self.getState())
             if total_size > self.state.value.shape[1]:
+                isResized = True
                 self.state.value.resize(total_size, axis=1)
-            self.state.append(state, step, time, region=(idx_0, idx_1))
+            self.state.append(state, step, time, region=(idx_0, idx_1), collective=True)
 
         # Store lambda_adr
         if self.store_lambda:
             lambda_adr = np.asarray(self.getLambda())
             if total_size > self.lambda_adr.value.shape[1]:
+                isResized = True
                 self.lambda_adr.value.resize(total_size, axis=1)
-            self.lambda_adr.append(lambda_adr, step, time, region=(idx_0, idx_1))
+            self.lambda_adr.append(lambda_adr, step, time, region=(idx_0, idx_1), collective=True)
 
         # Store res_id
         if self.store_res_id:
             res_id = np.asarray(self.getResId())
             if total_size > self.res_id.value.shape[1]:
+                isResized = True
                 self.res_id.value.resize(total_size, axis=1)
-            self.res_id.append(res_id, step, time, region=(idx_0, idx_1))
+            self.res_id.append(res_id, step, time, region=(idx_0, idx_1), collective=True)
         self.writeTimer += (py_time.time() - time0)
+        if isResized:
+            self.resizeCounter += 1
 
     def close(self):
         if pmi.workerIsActive():
             time0 = py_time.time()
-            self.file.f.close()
+            self.file.close()
             self.closeTimer += (py_time.time() - time0)
 
     def flush(self):
@@ -447,8 +481,7 @@ if pmi.isController:
                 idd = [
                     x[1] for x in sorted(
                         [(p_id, col_id) for col_id, p_id in enumerate(ids[t])],
-                        key=lambda y: (True, y[0]) if y[0] == -1 else (False, y[0])
-                        )
+                        key=lambda y: (True, y[0]) if y[0] == -1 else (False, y[0]))
                     ]
                 for k in h5['/particles/{}/'.format(ag)].keys():
                     if 'value' in h5['/particles/{}/{}'.format(ag, k)].keys():
@@ -464,7 +497,7 @@ if pmi.isController:
                      'dump', 'clear_buffers', 'flush', 'get_file', 'set_parameters'],
             pmiinvoke=['getTimers'],
             pmiproperty=['store_position', 'store_species', 'store_state', 'store_velocity',
-                         'store_charge', 'store_res_id', 'store_lambda'])
+                         'store_charge', 'store_res_id', 'store_lambda', 'store_mass'])
 
         def close(self):
             pmi.call(self.pmiobject, "close")

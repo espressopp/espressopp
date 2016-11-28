@@ -20,7 +20,6 @@
 
 #include "python.hpp"
 #include "DumpTopology.hpp"
-#include <vector>
 
 
 namespace espressopp {
@@ -30,15 +29,22 @@ void DumpTopology::observeTuple(shared_ptr<FixedPairList> fpl) {
   fpls_.push_back(fpl);
 }
 
+void DumpTopology::observeTriple(shared_ptr<FixedTripleList> ftl) {
+  ftls_.push_back(ftl);
+}
+
+void DumpTopology::observeQuadruple(shared_ptr<FixedQuadrupleList> fql) {
+  fqls_.push_back(fql);
+}
+
 void DumpTopology::saveDataToBuffer() {
   // Format: <step1><pair_idx_0><size><pid1><pid2><pid3><pid4><pair_idx_1><size><pid...><step2>..
   int idx = 0;
-  for (std::vector<shared_ptr<FixedPairList> >::iterator it = fpls_.begin();
-       it != fpls_.end(); ++it) {
+  for (std::vector<shared_ptr<FixedPairList> >::iterator it = fpls_.begin(); it != fpls_.end(); ++it) {
     fpl_buffer_.push_front(integrator_->getStep());
     std::vector<longint> pairs = (*it)->getPairList();
     fpl_buffer_.push_front(idx);
-    fpl_buffer_.push_front(pairs.size()/2);
+    fpl_buffer_.push_front(pairs.size() / 2);
     for (std::vector<longint>::iterator itt = pairs.begin(); itt != pairs.end();) {
       fpl_buffer_.push_front(*(itt++));
       fpl_buffer_.push_front(*(itt++));

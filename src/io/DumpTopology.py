@@ -108,9 +108,10 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
             self.h5md_file = h5md_file
             self.tuple_index = 0
             self.tuple_data = {}
-            if 'connectivity' not in self.h5md_file.file.f:
-                self.h5md_file.file.f.create_group('connectivity')
-            self.chunk_size = 128
+            if 'connectivity' not in self.h5md_file.file:
+                self.h5md_file.file.create_group('connectivity')
+            self.connectivity = self.h5md_file.file['connectivity']
+            self.chunk_size = h5md_file.chunk_size
             self.dt = integrator.dt
 
     def dump(self):
@@ -121,11 +122,13 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
     def observe_tuple(self, fpl, name, particle_group='atoms'):
         if pmi.workerIsActive():
             self.cxxclass.observe_tuple(self, fpl)
-            g = pyh5md.TimeData(
-                self.h5md_file.file.f['/connectivity'],
+            g = pyh5md.element(
+                self.connectivity,
                 name,
+                store='time',
+                maxshape=(None, 2),
                 shape=(self.chunk_size, 2),
-                dtype=np.int,
+                dtype=self.h5md_file.int_type,
                 fillvalue=-1)
             g.attrs['particle_group'] = particle_group
             self.tuple_data[self.tuple_index] = g
@@ -140,12 +143,13 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
             size_per_cpu = ((NMaxGlobal // self.chunk_size)+1)*self.chunk_size
             total_size = MPI.COMM_WORLD.size*size_per_cpu
             # Prepares Dataset.
-            g = pyh5md.FixedData(
-                self.h5md_file.file.f['/connectivity'],
+            g = pyh5md.element(
+                self.connectivity,
                 name,
-                shape=(total_size, 2),
-                dtype=np.int,
-                fillvalue=-1)
+                store='fixed',
+                dtype=self.h5md_file.int_type,
+                fillvalue=-1,
+                shape=(total_size, 2))
             g.attrs['particle_group'] = particle_group
             # Calculates index per cpu.
             idx_0 = MPI.COMM_WORLD.rank*size_per_cpu
@@ -169,8 +173,10 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
                     b2 = raw_data.pop()
                     data.append((b1, b2))
                 max_size = max(len(data), max_size)
-                step_data[step][fpl_idx] = np.array(data, dtype=np.int)
+                step_data[step][fpl_idx] = np.array(data, dtype=self.h5md_file.int_type)
+
             MPI.COMM_WORLD.Barrier()
+
             NMaxLocal = np.array(max_size, 'i')
             NMaxGlobal = np.array(0, 'i')
             MPI.COMM_WORLD.Allreduce(NMaxLocal, NMaxGlobal, op=MPI.MAX)
@@ -193,7 +199,7 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
                     ds = self.tuple_data[fpl_idx]
                     if total_size > ds.value.shape[1]:
                         ds.value.resize(total_size, axis=1)
-                    ds.append(data, step, step*self.dt, region=(idx_0, idx_1))
+                    ds.append(data, step, step*self.dt, region=(idx_0, idx_1), collective=True)
             self.cxxclass.clear_buffer(self)
 
 if pmi.isController:

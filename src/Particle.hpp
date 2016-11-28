@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2016
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -48,21 +50,7 @@ namespace espressopp {
     real drift;
     real lambdaDeriv;
     int state;
-    int res_id;
-
-    static void registerPython();
-
-    void init() {
-      id = 0;
-      type = 0;
-      mass = 1.0;
-      q = 0.0;
-      lambda = 0.0;
-      lambdaDeriv = 0.0;
-      state = 0;
-      res_id = 0;
-    }
-
+    longint res_id;
   private:
     friend class boost::serialization::access;
     template< class Archive >

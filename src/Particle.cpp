@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2016
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -48,35 +50,5 @@ namespace espressopp {
       .add_property("extVar", &Particle::getExtVar, &Particle::setExtVar)
       .add_property("drift_f", &Particle::getDrift, &Particle::setDrift)
       ;
-  }
-
-  void ParticleProperties::registerPython() {
-    using namespace python;
-    class_<ParticleProperties,
-        boost::shared_ptr<ParticleProperties> >("_ParticleProperties")
-      .add_property(
-          "type",
-          make_getter(&ParticleProperties::type),
-          make_setter(&ParticleProperties::type))
-      .add_property(
-          "mass",
-          make_getter(&ParticleProperties::mass),
-          make_setter(&ParticleProperties::mass))
-      .add_property(
-          "q",
-          make_getter(&ParticleProperties::q),
-          make_setter(&ParticleProperties::q))
-      .add_property(
-          "state",
-          make_getter(&ParticleProperties::state),
-          make_setter(&ParticleProperties::state))
-      .add_property(
-          "res_id",
-          make_getter(&ParticleProperties::res_id),
-          make_setter(&ParticleProperties::res_id))
-      .def(
-          "init",
-          &ParticleProperties::init
-      );
   }
 }

@@ -25,20 +25,21 @@
 #ifndef _IO_DUMPH5MD_HPP
 #define _IO_DUMPH5MD_HPP
 
-#include <Python.h>
-#include <object.h>
 #include "types.hpp"
 #include "SystemAccess.hpp"
 #include "FixedTupleListAdress.hpp"
+#include <Python.h>
+#include <object.h>
 
 namespace espressopp {
 namespace io {
 
-template <class T> void init_pb(Py_buffer *pb, int ndim, int *shape);
+template<class T>
+void init_pb(Py_buffer *pb, int ndim, int *shape);
 void free_pb(Py_buffer *pb);
 
 /** Store particle data in Python buffers */
-class DumpH5MD : public SystemAccess {
+class DumpH5MD: public SystemAccess {
  public:
   DumpH5MD(shared_ptr<System> system, bool is_adress);
   ~DumpH5MD();
@@ -52,31 +53,33 @@ class DumpH5MD : public SystemAccess {
   bool get_store_species() { return store_species; }
   void set_store_state(bool _s) { store_state = _s; }
   bool get_store_state() { return store_state; }
-  void set_store_velocity(bool _s) { store_velocity = _s;}
+  void set_store_velocity(bool _s) { store_velocity = _s; }
   bool get_store_velocity() { return store_velocity; }
   void set_store_force(bool _s) { store_force = _s; }
   bool get_store_force() { return store_force; }
   void set_store_charge(bool _s) { store_charge = _s; }
   bool get_store_charge() { return store_charge; }
-  void set_store_lambda(bool _s) { store_lambda = _s;}
+  void set_store_lambda(bool _s) { store_lambda = _s; }
   bool get_store_lambda() { return store_lambda; }
   void set_store_res_id(bool _s) { store_res_id = _s; }
   bool get_store_res_id() { return store_res_id; }
+  void set_store_mass(bool _s) { store_mass = _s; }
+  bool get_store_mass() { return store_mass; }
 
   void clear_buffers();
 
   void update();
-  PyObject* getPosition();
-  PyObject* getId();
-  PyObject* getImage();
-  PyObject* getSpecies();
-  PyObject* getState();
-  PyObject* getVelocity();
-  PyObject* getForce();
-  PyObject* getMass();
-  PyObject* getCharge();
-  PyObject* getLambda();
-  PyObject* getResId();
+  PyObject *getPosition();
+  PyObject *getId();
+  PyObject *getImage();
+  PyObject *getSpecies();
+  PyObject *getState();
+  PyObject *getVelocity();
+  PyObject *getForce();
+  PyObject *getMass();
+  PyObject *getCharge();
+  PyObject *getLambda();
+  PyObject *getResId();
 
   static void registerPython();
 
