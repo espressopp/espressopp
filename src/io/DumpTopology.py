@@ -199,7 +199,7 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
                     ds = self.tuple_data[fpl_idx]
                     if total_size > ds.value.shape[1]:
                         ds.value.resize(total_size, axis=1)
-                    ds.append(data, step, step*self.dt, region=(idx_0, idx_1), collective=True)
+                    ds.append(data, step, step*self.dt, region=(idx_0, idx_1), collective=False)
             self.cxxclass.clear_buffer(self)
 
 if pmi.isController:
