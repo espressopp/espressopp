@@ -7,9 +7,12 @@ services:
 
 env: #maybe add mpich later
   matrix:
-    - EXTERNAL=ON BUILD_UG=ON
-    - EXTERNAL=ON COVERAGE=ON
-    - EXTERNAL=OFF
+    - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
+    - DISTRO=ubuntu EXTERNAL=ON COVERAGE=ON
+    - DISTRO=ubuntu EXTERNAL=OFF
+    - DISTRO=fedora EXTERNAL=ON BUILD_UG=ON
+    - DISTRO=fedora EXTERNAL=ON COVERAGE=ON
+    - DISTRO=fedora EXTERNAL=OFF
 
 matrix:
   allow_failures: #issue #8, ubuntu gcc is too new for internal boost
@@ -20,6 +23,7 @@ matrix:
 
 script:
  - cp -vr docker ${HOME}
+ - sed -i "1s/ubuntu/${DISTRO}/" ${HOME}/docker/Dockerfile
  - cd ../../
  - mv -v ${TRAVIS_REPO_SLUG} $HOME/docker
  - cp -r $HOME/.ccache ${HOME}/docker/ccache
