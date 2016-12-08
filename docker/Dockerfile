@@ -1,4 +1,21 @@
-from espressopp/buildenv:latest
+from espressopp/buildenv:ubuntu
+
+ARG COVERAGE
+ARG EXTERNAL
+ARG CC
+ARG CXX
+ARG BUILD_UG
+
+#for coverage
+ENV CI true
+ENV TRAVIS true
+ARG TRAVIS_BRANCH
+ARG TRAVIS_JOB_NUMBER
+ARG TRAVIS_PULL_REQUEST 
+ARG TRAVIS_JOB_ID
+ARG TRAVIS_TAG
+ARG TRAVIS_REPO_SLUG
+ARG TRAVIS_COMMIT
 
 RUN rm -rf /home/espressopp/.ccache
 COPY espressopp /home/espressopp/espressopp
@@ -9,11 +26,15 @@ USER espressopp
 
 WORKDIR /home/espressopp/espressopp
 RUN mkdir build
+
 WORKDIR build
-RUN cmake -DCMAKE_INSTALL_PREFIX=/usr ..
-RUN make VERBOSE=1 -j2
+RUN ccache -z
+RUN cmake -DCMAKE_INSTALL_PREFIX=/usr -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL ${COVERAGE:+-DUSE_GCOV=ON} ..
+RUN make VERBOSE=1 -j2 all ${BUILD_UG:+ug doc ug-pdf}
+RUN ccache -s
 RUN make test
 RUN make install DESTDIR=${PWD}
+RUN cd .. && if [ ${COVERAGE} ]; then $HOME/.local/bin/codecov; fi && cd -
 USER root
 RUN make install
 USER espressopp
