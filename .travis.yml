@@ -11,6 +11,13 @@ env: #maybe add mpich later
     - EXTERNAL=ON COVERAGE=ON
     - EXTERNAL=OFF
 
+matrix:
+  allow_failures: #issue #8, ubuntu gcc is too new for internal boost
+    - compiler: gcc
+      env: EXTERNAL=OFF
+    - compiler: clang
+      env: EXTERNAL=OFF
+
 script:
  - cp -vr docker ${HOME}
  - cd ../../
@@ -58,4 +65,4 @@ cache:
 
 compiler:
   - gcc
-
+  - clang
