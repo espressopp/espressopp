@@ -159,7 +159,7 @@ def read(gro_file, top_file="", doRegularExcl=True):
     :type doRegularExcl: bool
     """
 
-    print '# See the source code $ESPRESSOHOME/src/tools/convert/gromacs.py for some tips on using the gromacs parser'
+    print '# See the source code $ESPRESSOHOME/src/tools/gromacs.py for some tips on using the gromacs parser'
 
     # read gro file
     if gro_file != "":

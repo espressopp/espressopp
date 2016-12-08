@@ -5,7 +5,7 @@ import mpi4py.MPI as MPI
 # import the ESPResSo++ python module
 import espressopp
 from espressopp import Real3D
-from espressopp.tools.convert import gromacs
+from espressopp.tools import gromacs
 
 import math
 import os
