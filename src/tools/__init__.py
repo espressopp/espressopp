@@ -19,6 +19,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
+import espressopp.tools.convert
 from espressopp.tools.init_cfg import *
 
 from espressopp.tools.analyse import *
