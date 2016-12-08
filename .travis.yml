@@ -1,4 +1,4 @@
-language: generic
+language: cpp
 
 sudo: required
 
@@ -6,14 +6,24 @@ services:
 - docker
 
 script:
- - docker build  --build-arg TRAVIS=${TRAVIS} --build-arg TRAVIS_BRANCH=${TRAVIS_BRANCH}
-                 --build-arg TRAVIS_COMMIT=${TRAVIS_COMMIT}
-                 --build-arg TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST}
-                 --build-arg TRAVIS_REPO_SLUG=${TRAVIS_REPO_SLUG}
-                 -t espressopp/espressopp:latest -f docker/espressopp docker/
+ - cp -vr docker ${HOME}
+ - cd ../../
+ - mv -v ${TRAVIS_REPO_SLUG} $HOME/docker
+ - cp -r $HOME/.ccache ${HOME}/docker/ccache
+ - docker build -t espressopp/espressopp:latest ${HOME}/docker/ &&
+   rm -rf $HOME/.ccache &&
+   CON=$(docker run -d espressopp/espressopp:latest /bin/bash) &&
+   docker cp ${CON}:/home/espressopp/.ccache ${HOME}/
 
 after_success:
   - if [[ ${DOCKER_USERNAME} && ${DOCKER_PASSWORD} && ${TRAVIS_PULL_REQUEST} == false && ${TRAVIS_BRANCH} == docker ]]; then
         docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
         docker push "espressopp/espressopp:latest";
     fi
+
+cache:
+  - ccache
+
+compiler:
+  - gcc
+
