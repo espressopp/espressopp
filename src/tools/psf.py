@@ -18,6 +18,38 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
+r"""
+
+***********************************
+**PSF** - read and write psf format
+***********************************
+
+PSF file format given at http://www.ks.uiuc.edu/Training/Tutorials/namd/namd-tutorial-win-html/node24.html
+
+.. function:: espressopp.tools.psfwrite(filename, system, maxdist=None, molsize=4, typenames=None)
+
+  Writes !NATOM and !NBOND sections of a psf format file
+
+  :param filename: output file name
+  :type filename: string
+  :param system: espressopp system
+  :type system: espressopp System object
+  :param maxdist: if this is specified, only bonds in which the pair of particles are separated by a distance < maxdist are written to the !NBOND section
+  :type maxdist: float
+  :param molsize: if molsize>0, the molecule count is increased every molsize particles
+  :type molsize: int
+  :param typenames: dictionary used for mapping from espressopp's integer particle types to the particle type strings written in a psf file
+  :type typenames: dict, key=int, value=string
+
+.. function:: espressopp.tools.psfread(filename)
+
+  Reads !NATOM section of a psf format file
+
+  :param filename: input file name
+  :type filename: string
+  Returns: pid,segname,resindex,resname,atomname,atomtype,mass,charge (lists of type int,str,int,str,str,str,float,float)
+
+"""
 
 import espressopp
 from math import sqrt
@@ -147,3 +179,36 @@ def psfwrite(filename, system, maxdist=None, molsize=4, typenames=None):
   ndihedrals = len(dihedrals)
 """
   
+def psfread(filename):
+
+  pid=[]
+  segname=[]
+  resname=[]
+  resindex=[]
+  atomname=[]
+  atomtype=[]
+  mass=[]
+  charge=[]
+
+  file = open(filename,'r')
+  line = file.readline()
+  line = file.readline()
+  line = file.readline()
+  nskip = int(line.split()[0]) #get NREMARKS value
+  for i in range(nskip):
+    line = file.readline()
+  line = file.readline()
+  line = file.readline()
+  natoms = int(line.split()[0]) #get NATOMS value
+  for i in range(natoms):
+    line = file.readline()
+    pid.append(int(line[3:8]))
+    segname.append(line[8:12])
+    resindex.append(int(line[10:15]))
+    resname.append(line[19:23])
+    atomname.append(line[24:28])
+    atomtype.append(line[29:33])
+    charge.append(float(line[34:44]))
+    mass.append(float(line[45:59]))
+  file.close()
+  return pid,segname,resindex,resname,atomname,atomtype,mass,charge

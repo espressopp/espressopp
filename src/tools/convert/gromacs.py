@@ -66,6 +66,8 @@
    Tip 2. impropers
 
    impropers in the topol.top file (function type 4) need to be labelled '[ impropers ]', not '[ dihedrals ]' as in standard gromacs format"
+
+   Also, the dihedrals should be listed before the impropers (this is usuall the case by default in gromacs-format files).
    
    ----------------------------------------------------------------- 
    Tip 3. 
