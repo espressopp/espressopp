@@ -15,3 +15,5 @@ tools
    espressopp.tools.gromacs.rst
    espressopp.tools.units.rst
    espressopp.tools.io_extended.rst
+   espressopp.tools.pdb.rst
+   espressopp.tools.psf.rst
