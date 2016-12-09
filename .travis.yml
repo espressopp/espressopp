@@ -17,9 +17,9 @@ env: #maybe add mpich later
 matrix:
   allow_failures: #issue #8, ubuntu gcc is too new for internal boost
     - compiler: gcc
-      env: EXTERNAL=OFF
-    - compiler: clang
-      env: EXTERNAL=OFF
+      env: DISTRO=ubuntu EXTERNAL=OFF
+    - compiler: gcc
+      env: DISTRO=fedora EXTERNAL=OFF
 
 script:
  - cp -vr docker ${HOME}
