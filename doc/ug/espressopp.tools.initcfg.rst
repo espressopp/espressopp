@@ -5,22 +5,17 @@ initializing particles
 
 .. autosummary::
 
-   espressopp.tools.init_cfg.lattice
-   espressopp.tools.init_cfg.velocities
+   espressopp.tools.lattice
    espressopp.tools.replicate
    espressopp.tools.topology
+   espressopp.tools.velocities
    espressopp.tools.warmup
 
 .. rubric:: Details
 
-espressopp.tools.init_cfg.lattice
-"""""""""""""""""""""""""""""""""
-.. automodule:: espressopp.tools.init_cfg.lattice
-   :members:
-
-espressopp.tools.init_cfg.velocities
-""""""""""""""""""""""""""""""""""""
-.. automodule:: espressopp.tools.init_cfg.velocities
+espressopp.tools.lattice
+""""""""""""""""""""""""
+.. automodule:: espressopp.tools.lattice
    :members:
 
 espressopp.tools.replicate
@@ -31,6 +26,11 @@ espressopp.tools.replicate
 espressopp.tools.topology
 """""""""""""""""""""""""
 .. automodule:: espressopp.tools.topology
+   :members:
+
+espressopp.tools.velocities
+"""""""""""""""""""""""""""
+.. automodule:: espressopp.tools.velocities
    :members:
 
 espressopp.tools.warmup
