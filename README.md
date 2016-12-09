@@ -15,12 +15,14 @@ QUICKINSTALL:
 
 ```
 # cd espressopp
-# cmake .
-# make
+# cmake -DEXTERNAL_BOOST=OFF -DEXTERNAL_MPI4PY=OFF .
+# make -j 4
 # source ESPRC
 ```
 
-go to the examples directory and have a look at the python scripts.
+(we used 4 CPUs for parallel building. You can adjust this number to your architechture.)
+
+After building go to the `examples` directory and have a look at the python scripts.
 
 ISSUES:
 =======
