@@ -10,7 +10,7 @@ env: #maybe add mpich later
     - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
     - DISTRO=ubuntu EXTERNAL=ON COVERAGE=ON
     - DISTRO=ubuntu EXTERNAL=OFF
-    - DISTRO=fedora EXTERNAL=ON BUILD_UG=ON
+    - DISTRO=fedora EXTERNAL=ON
     - DISTRO=fedora EXTERNAL=ON COVERAGE=ON
     - DISTRO=fedora EXTERNAL=OFF
 
