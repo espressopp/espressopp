@@ -5,21 +5,31 @@ sudo: required
 services:
 - docker
 
-env: #maybe add mpich later
+env:
   matrix:
     - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
     - DISTRO=ubuntu EXTERNAL=ON COVERAGE=ON
     - DISTRO=ubuntu EXTERNAL=OFF
+    - DISTRO=ubuntu_mpich EXTERNAL=ON BUILD_UG=ON
+    - DISTRO=ubuntu_mpich EXTERNAL=ON COVERAGE=ON
+    - DISTRO=ubuntu_mpich EXTERNAL=OFF
     - DISTRO=fedora EXTERNAL=ON
     - DISTRO=fedora EXTERNAL=ON COVERAGE=ON
     - DISTRO=fedora EXTERNAL=OFF
+    - DISTRO=fedora_mpich EXTERNAL=ON
+    - DISTRO=fedora_mpich EXTERNAL=ON COVERAGE=ON
+    - DISTRO=fedora_mpich EXTERNAL=OFF
 
 matrix:
   allow_failures: #issue #8, ubuntu gcc is too new for internal boost
     - compiler: gcc
       env: DISTRO=ubuntu EXTERNAL=OFF
     - compiler: gcc
+      env: DISTRO=ubuntu_mpich EXTERNAL=OFF
+    - compiler: gcc
       env: DISTRO=fedora EXTERNAL=OFF
+    - compiler: gcc
+      env: DISTRO=fedora_mpich EXTERNAL=OFF
 
 script:
  - cp -vr docker ${HOME}
