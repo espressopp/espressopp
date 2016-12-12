@@ -117,6 +117,9 @@ find_library(PYTHON_LIBRARIES
              NAMES python${PYTHON_VERSION}
              PATHS ${PYTHON_LIBDIR}  )
 
+if(NOT PYTHON_LIBRARIES)
+  message(FATAL_ERROR "Python libraries not found!")
+endif(NOT PYTHON_LIBRARIES)
 message(STATUS "PYTHON_LIBRARIES = ${PYTHON_LIBRARIES}")
 
 mark_as_advanced(PYTHON_INCLUDE_PATH PYTHON_LIBRARIES)
