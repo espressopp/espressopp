@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013,2015
+#  Copyright (C) 2012,2013,2015,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -40,6 +40,9 @@ r"""
 		:type pid2: 
 		:rtype: 
 
+.. function:: espressopp.FixedTripleListAdress.remove()
+        remove the FixedTripleListAdress and disconnect
+
 .. function:: espressopp.FixedTripleListAdress.addTriples(triplelist)
 
 		:param triplelist: 
@@ -55,14 +58,17 @@ class FixedTripleListAdressLocal(_espressopp.FixedTripleListAdress):
 
 
     def __init__(self, storage, fixedtupleList):
-
         if pmi.workerIsActive():
             cxxinit(self, _espressopp.FixedTripleListAdress, storage, fixedtupleList)
 
     def add(self, pid1, pid2):
-
         if pmi.workerIsActive():
             return self.cxxclass.add(self, pid1, pid2, pid3)
+
+    def remove(self):
+        if pmi.workerIsActive():
+            self.cxxclass.remove(self)
+            return
 
     def addTriples(self, triplelist):
         """

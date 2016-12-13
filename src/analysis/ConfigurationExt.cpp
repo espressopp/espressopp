@@ -140,7 +140,7 @@ namespace espressopp {
         boost::python::throw_error_already_set();
       }
 
-     RealND props = (*it).second;
+      RealND props = (*it).second;
       it++;
       return props;
     }

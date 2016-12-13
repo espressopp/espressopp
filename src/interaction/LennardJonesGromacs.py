@@ -28,11 +28,13 @@ r"""
 if :math:`d^2 > r_1^2`
 
 .. math::        
+
 	U = 4 \varepsilon (\frac{sigma^{12}}{d^{12}} - \frac{sigma^6}{d^6}) + (d-r_1)^3 (ljsw3 + ljsw4 (d-r_1) + ljsw5)      	
 
 else
 
 .. math::
+
 	U = 4 \varepsilon (\frac{\sigma^{12}}{d^{12}} - \frac{\sigma^6}{d^6})
 
 

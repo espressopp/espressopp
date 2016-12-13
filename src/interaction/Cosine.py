@@ -27,6 +27,7 @@ r"""
 Calculates the Cosine Interaction
 
 .. math::
+
 	U = K  (1 + cos(\theta - \theta_0))
 
 

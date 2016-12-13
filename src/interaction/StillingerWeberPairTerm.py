@@ -27,6 +27,7 @@ This class provides methods to compute forces and energies of
 2 body term of Stillinger-Weber potential.
 
 .. math::
+
 	U = \varepsilon A  \left[ {\frac{d}{\sigma}}^{-p} (B  - 1 )\right] exp\left(\frac{1}{\frac{d}{\sigma} - r_c}\right)
 
 where :math:`r_c` is the cutoff-radius.

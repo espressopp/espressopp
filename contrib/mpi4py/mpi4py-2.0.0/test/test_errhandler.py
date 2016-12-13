@@ -1,0 +1,77 @@
+from mpi4py import MPI
+import mpiunittest as unittest
+
+class TestErrhandler(unittest.TestCase):
+
+    def testPredefined(self):
+        self.assertFalse(MPI.ERRHANDLER_NULL)
+        self.assertTrue(MPI.ERRORS_ARE_FATAL)
+        self.assertTrue(MPI.ERRORS_RETURN)
+
+    def testCommGetSetErrhandler(self):
+        for COMM in [MPI.COMM_SELF, MPI.COMM_WORLD]:
+            for ERRHANDLER in [MPI.ERRORS_ARE_FATAL, MPI.ERRORS_RETURN,
+                               MPI.ERRORS_ARE_FATAL, MPI.ERRORS_RETURN, ]:
+                errhdl_1 = COMM.Get_errhandler()
+                self.assertNotEqual(errhdl_1, MPI.ERRHANDLER_NULL)
+                COMM.Set_errhandler(ERRHANDLER)
+                errhdl_2 = COMM.Get_errhandler()
+                self.assertEqual(errhdl_2, ERRHANDLER)
+                errhdl_2.Free()
+                self.assertEqual(errhdl_2, MPI.ERRHANDLER_NULL)
+                COMM.Set_errhandler(errhdl_1)
+                errhdl_1.Free()
+                self.assertEqual(errhdl_1, MPI.ERRHANDLER_NULL)
+
+    def testGetErrhandler(self):
+        errhdls = []
+        for i in range(100):
+            e = MPI.COMM_WORLD.Get_errhandler()
+            errhdls.append(e)
+        for e in errhdls:
+            e.Free()
+        for e in errhdls:
+            self.assertEqual(e, MPI.ERRHANDLER_NULL)
+
+    def testCommCallErrhandler(self):
+        errhdl = MPI.COMM_SELF.Get_errhandler()
+        comm = MPI.COMM_SELF.Dup()
+        comm.Set_errhandler(MPI.ERRORS_RETURN)
+        comm.Call_errhandler(MPI.ERR_OTHER)
+        comm.Free()
+
+    def testWinCallErrhandler(self):
+        try:
+            win = MPI.Win.Create(MPI.BOTTOM, 1, MPI.INFO_NULL, MPI.COMM_SELF)
+        except NotImplementedError:
+            return
+        win.Set_errhandler(MPI.ERRORS_RETURN)
+        win.Call_errhandler(MPI.ERR_OTHER)
+        win.Free()
+
+    def testFileCallErrhandler(self):
+        import os, tempfile
+        rank = MPI.COMM_WORLD.Get_rank()
+        fd, filename = tempfile.mkstemp(prefix='mpi4py-', suffix="-%d"%rank)
+        os.close(fd)
+        amode = MPI.MODE_WRONLY | MPI.MODE_CREATE | MPI.MODE_DELETE_ON_CLOSE
+        try:
+            file = MPI.File.Open(MPI.COMM_SELF, filename, amode, MPI.INFO_NULL)
+        except NotImplementedError:
+            return
+        file.Set_errhandler(MPI.ERRORS_RETURN)
+        #file.Call_errhandler(MPI.ERR_OTHER)
+        file.Call_errhandler(MPI.SUCCESS)
+        file.Close()
+
+name, version = MPI.get_vendor()
+if MPI.Get_version() < (2, 0):
+    del TestErrhandler.testCommCallErrhandler
+    del TestErrhandler.testWinCallErrhandler
+    del TestErrhandler.testFileCallErrhandler
+elif name == 'Microsoft MPI':
+	del TestErrhandler.testFileCallErrhandler
+
+
+if __name__ == '__main__':
+    unittest.main()

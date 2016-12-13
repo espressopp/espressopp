@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -223,6 +223,17 @@ namespace espressopp {
 	return bonds;
   }
 
+  void FixedPairListAdress::remove(void) {
+      this->clear();
+      globalPairs.clear();
+      sigBeforeSend.disconnect();
+      sigAfterRecv.disconnect();
+      sigBeforeSendAT.disconnect();
+      sigAfterRecvAT.disconnect();
+      sigOnParticlesChanged.disconnect();
+  }
+
+
   /****************************************************
   ** REGISTRATION WITH PYTHON
   ****************************************************/
@@ -239,6 +250,7 @@ namespace espressopp {
               init <shared_ptr<storage::Storage>,
                      shared_ptr<FixedTupleListAdress> >())
       .def("add", pyAdd)
+      .def("remove",  &FixedPairListAdress::remove)
       .def("getBonds",  &FixedPairListAdress::getBonds)
       ;
   }

@@ -1,0 +1,30 @@
+; ********************************************************************
+; * The original ffamber ports were written by Eric J. Sorin,        *
+; * CSU Long Beach, Dept. of Chem & Biochem, and have now been       *
+; * integrated with the standard gromacs distribution.               *
+; * (Please don't blame Eric for errors we might have introduced.)   *
+; * For the implementation/validation, please read/cite:             * 
+; * Sorin & Pande (2005). Biophys. J. 88(4), 2472-2493.              *
+; * For related material and updates, please consult                 *
+; * http://chemistry.csulb.edu/ffamber/                              *
+; ********************************************************************
+
+[ moleculetype ]
+; molname	nrexcl
+SOL		2
+
+[ atoms ]
+; id  at type     res nr  res name  at name  cg nr  charge    mass
+  1   OW_spc      1       SOL       OW       1      -0.8476   15.99940
+  2   HW_spc      1       SOL       HW1      1       0.4238    1.00800
+  3   HW_spc      1       SOL       HW2      1       0.4238    1.00800
+
+[ bonds ]
+; i     j       funct   length  force.c.
+1       2       1       0.1     345000  0.1     345000
+1       3       1       0.1     345000  0.1     345000
+
+[ angles ]
+; i     j       k       funct   angle   force.c.
+2       1       3       1       109.47  383     109.47  383
+

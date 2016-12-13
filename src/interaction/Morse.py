@@ -27,6 +27,7 @@ This class provides methods to compute forces and energies of
 the Morse potential.
 
 .. math::
+
 	U = \varepsilon  \left(e^{-2 \alpha (r - r_{min})} - 2 e^{-\alpha (r - r_{min})}\right)
 
 

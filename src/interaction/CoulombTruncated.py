@@ -24,6 +24,7 @@ r"""
 *******************************************
 
 .. math::
+
 	U = k\frac{q_iq_j}{d_{ij}}
 
 where :math:`k` is the user-supplied prefactor, :math:`q_i` is the charge of particle `i`, and :math:`d_{ij}` is interparticle distance
