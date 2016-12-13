@@ -51,8 +51,7 @@ extensions = ['sphinx.ext.mathjax',
               'sphinx.ext.autodoc',
               'sphinx.ext.doctest',
               'sphinx.ext.autosummary',
-              'ipython_console_highlighting',
-              'sphinxtogithub'
+              'ipython_console_highlighting'
              ]
 
 # Not yet: numpydoc
