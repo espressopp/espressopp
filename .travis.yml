@@ -37,32 +37,39 @@ script:
  - cd ../../
  - mv -v ${TRAVIS_REPO_SLUG} $HOME/docker
  - cp -r $HOME/.ccache ${HOME}/docker/ccache
+ - if [[ ${TRAVIS_BRANCH} = master ]]; then DOCKER_TAG=latest; else DOCKER_TAG="${TRAVIS_BRANCH}"; fi
  - docker build --build-arg COVERAGE=${COVERAGE} --build-arg EXTERNAL=${EXTERNAL}
                 --build-arg CC=${CC} --build-arg CXX=${CXX} --build-arg BUILD_UG=${BUILD_UG}
                 --build-arg TRAVIS_BRANCH=${TRAVIS_BRANCH} --build-arg TRAVIS_JOB_NUMBER=${TRAVIS_JOB_NUMBER}
                 --build-arg TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST} --build-arg TRAVIS_JOB_ID=${TRAVIS_JOB_ID}
                 --build-arg TRAVIS_TAG=${TRAVIS_TAG} --build-arg TRAVIS_REPO_SLUG=${TRAVIS_REPO_SLUG}
                 --build-arg TRAVIS_COMMIT=${TRAVIS_COMMIT}
-                -t espressopp/espressopp:latest ${HOME}/docker/ &&
+                -t espressopp/espressopp:${DOCKER_TAG} ${HOME}/docker/ &&
    rm -rf $HOME/.ccache &&
-   CON=$(docker run -d espressopp/espressopp:latest /bin/bash) &&
+   CON=$(docker run -d espressopp/espressopp:${DOCKER_TAG} /bin/bash) &&
    docker cp ${CON}:/home/espressopp/.ccache ${HOME}/
 
 after_success:
-  - if [[ ${DOCKER_USERNAME} && ${DOCKER_PASSWORD} && ${TRAVIS_PULL_REQUEST} == false && ${TRAVIS_BRANCH} == master && ${TRAVIS_JOB_NUMBER} = *.1 ]]; then
+  - shopt -s extglob && [[ ${TRAVIS_BRANCH} = @(master|v1.*) ]] && DEPLOY=yes
+  - if [[ ${DOCKER_USERNAME} && ${DOCKER_PASSWORD} && ${TRAVIS_PULL_REQUEST} == false && ${DEPLOY} && ${TRAVIS_JOB_NUMBER} = *.1 ]]; then
         docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-        docker push "espressopp/espressopp:latest";
+        docker push "espressopp/espressopp:${DOCKER_TAG}";
     fi
   - if [[ ${BUILD_UG} = ON && ${TRAVIS_JOB_NUMBER} = *.1 ]]; then
       git clone --depth 1 https://github.com/espressopp/espressopp.github.io.git html;
-      CON=$(docker run -d espressopp/espressopp:latest) && docker cp ${CON}:/home/espressopp/espressopp/build/doc . ;
+      CON=$(docker run -d espressopp/espressopp:${DOCKER_TAG}) && docker cp ${CON}:/home/espressopp/espressopp/build/doc . ;
       mkdir -p html/doxygen;
-      mv doc/dg/html/* html/doxygen;
-      mv doc/ug/_build/latex/ESPResSo++.pdf html;
-      mv doc/ug/_build/html/* html;
+      if [[ ${TRAVIS_BRANCH} = v1.* ]]; then 
+        mkdir -p html/${TRAVIS_BRANCH};
+        mv doc/ug/_build/html/* html/${TRAVIS_BRANCH};
+      else
+         mv doc/dg/html/* html/doxygen;
+         mv doc/ug/_build/latex/ESPResSo++.pdf html;
+         mv doc/ug/_build/html/* html;
+      fi;
       rm -rvf doc;
       cd html;
-      if [[ ${TRAVIS_BRANCH} = master && ${encrypted_194b3d1e9306_key} && ${encrypted_194b3d1e9306_iv} && ${TRAVIS_PULL_REQUEST} == false ]]; then
+      if [[ ${DEPLOY} && ${encrypted_194b3d1e9306_key} && ${encrypted_194b3d1e9306_iv} && ${TRAVIS_PULL_REQUEST} == false ]]; then
         git config --global user.name "Automatic Deployment (Travis CI)";
         git config --global user.email "espp-devel@listserv.mpip-mainz.mpg.de";
         git add --all && git commit -m "Documentation Update";
