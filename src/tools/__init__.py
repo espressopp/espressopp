@@ -36,3 +36,4 @@ from espressopp.tools.prepareAdress import *
 from espressopp.tools.warmup import *
 from espressopp.tools.povwrite import *
 from espressopp.tools.pathintegral import *
+from espressopp.tools.prepareComplexMolecules import *

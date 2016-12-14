@@ -138,7 +138,6 @@ namespace espressopp {
       real* coordinates = new real [3 * maxN];  // buffer for gather
       real* velocities  = new real [3 * maxN];  // buffer for gather
       int*  ids         = new int [maxN];  // buffer for gather
-      int*  types         = new int [maxN];  // buffer for gather
 
       // fill the buffer with my values
 
@@ -164,8 +163,6 @@ namespace espressopp {
           velocities[3*i+1] = vel[1];
           velocities[3*i+2] = vel[2];
 
-          types[i] = cit->type();
-
           i++;
         }
       }
@@ -184,8 +181,6 @@ namespace espressopp {
           velocities[3*i]   = vel[0];
           velocities[3*i+1] = vel[1];
           velocities[3*i+2] = vel[2];
-
-          types[i] = cit->type();
 
           i++;
         }
@@ -211,7 +206,7 @@ namespace espressopp {
 
            if (iproc) {
 
-              int nIds, nCoords, nVelocs, nTypes;   // number of received values
+              int nIds, nCoords, nVelocs; // number of received values
               //int tmp;
 
               boost::mpi::request req;
@@ -249,18 +244,6 @@ namespace espressopp {
                               nIds << " ids, but " << nVelocs << " velocities");
               }
 
-              req = system.comm->irecv<int>(iproc, DEFAULT_TAG, types, maxN);
-              system.comm->send(iproc, DEFAULT_TAG, 0);
-              stat = req.wait();
-              nTypes = *stat.count<int>();
-
-              // make sure to have 1 type values for each id
-
-              if (nTypes != nIds) {
-                LOG4ESPP_ERROR(logger, "serious error collecting data, got " <<
-                              nIds << " ids, but " << nTypes << " types");
-              }
-
               nother = nIds;
 
            } else {
@@ -276,18 +259,15 @@ namespace espressopp {
 
              LOG4ESPP_INFO(logger, "set coordianates of particle with id = " << index <<
                                    ": " << coordinates[3*i] << " " <<  coordinates[3*i+1] << " " << coordinates[3*i+2] <<
-                                   "and velocities: " <<  velocities[3*i] << " " <<  velocities[3*i+1] << " " << velocities[3*i+2] <<
-                                   "and types: " <<  types[i]);
+                                   "and velocities: " <<  velocities[3*i] << " " <<  velocities[3*i+1] << " " << velocities[3*i+2]);
 
-             RealND _vec(7);  // .type.p[0].p[1].p[2].v[0].v[1].v[2]
-
-             _vec.setItem(0, types[i]);
+             RealND _vec(6);  // p[0].p[1].p[2].v[0].v[1].v[2]
 
              for (int k=0; k<3; k++)
-               _vec.setItem(k+1, coordinates[3*i + k]);
+               _vec.setItem(k, coordinates[3*i + k]);
 
              for (int k=0; k<3; k++)
-               _vec.setItem(k+4, velocities[3*i + k]);
+               _vec.setItem(k+3, velocities[3*i + k]);
 
              config->set(index, _vec);
            }
@@ -318,7 +298,6 @@ namespace espressopp {
        stat = requests[1].wait();
        system.comm->send<real>(0, DEFAULT_TAG, coordinates, 3*myN);
        system.comm->send<real>(0, DEFAULT_TAG, velocities, 3*myN);
-       system.comm->send<int>(0, DEFAULT_TAG, types, myN);
       }
 
       // ToDo: remove first configuration if capacity is exhausted
@@ -327,7 +306,6 @@ namespace espressopp {
 
       delete [] coordinates;
       delete [] velocities;
-      delete [] types;
       delete [] ids;
     }
 

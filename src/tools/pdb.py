@@ -18,7 +18,41 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
+r"""
 
+***********************************
+**PDB** - read and write pdb format
+***********************************
+
+.. function:: espressopp.tools.pdbwrite(filename, system, molsize=4, append=False, typenames=None)
+
+  Writes a file in PDB format
+
+  :param filename: output file name
+  :type filename: string
+  :param system: espressopp system
+  :type system: espressopp System object
+  :param molsize: if molsize>0, the molecule count is increased every molsize particles (default 4)
+  :type molsize: int
+  :param append: if True, append to filename, other over-write filename (default False)
+  :type append: bool
+  :param typenames: dictionary used for mapping from espressopp's integer particle types to the particle type strings written in a pdb file
+  :type typenames: dict, key=int, value=string
+
+.. function:: espressopp.tools.pdbread(filename,natoms,header)
+
+  Reads one frame of a pdb format file
+
+  :param filename: input file name
+  :type filename: string
+  :param natoms: number of atoms in pdf file
+  :type natoms: int
+  :param header: number of header lines to skip at start of file
+  :type header: int
+
+  Returns: index,atomname,resname,resid,x,y,z,alpha,beta,segid,element (lists of type int,str,str,int,float,float,float,float,float,str,str)
+
+"""
 import espressopp
 from math import sqrt
 from espressopp import Real3D
@@ -155,3 +189,48 @@ def pqrwrite(filename, system, molsize=4, append=False):
   file.write('END\n')
   file.close()
 
+def pdbread(filename,natoms,header):
+
+  index=[]
+  atomname=[]
+  resname=[]
+  chainid=[]
+  resid=[]
+  x=[]
+  y=[]
+  z=[]
+  alpha=[]
+  beta=[]
+  segid=[]
+  element=[]
+
+  file = open(filename,'r')
+  for i in range(header):
+    line = file.readline()
+  for i in range(natoms):
+    line = file.readline()
+    findex=int(line[7:11])
+    fname=line[12:16]
+    fresname=line[17:20]
+    fresid=int(line[22:26])
+    fx=float(line[30:38])
+    fy=float(line[38:46])
+    fz=float(line[46:54])
+    falpha=float(line[55:60])
+    fbeta=float(line[60:66])
+    fsegid=line[72:76]
+    felement=line[76:78]
+
+    index.append(findex)
+    atomname.append(fname)
+    resname.append(fresname)
+    resid.append(fresid)
+    x.append(fx)
+    y.append(fy)
+    z.append(fz)
+    alpha.append(falpha)
+    beta.append(fbeta)
+    segid.append(fsegid)
+    element.append(felement)
+
+  return index,atomname,resname,resid,x,y,z,alpha,beta,segid,element

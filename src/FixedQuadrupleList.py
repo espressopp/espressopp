@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013,2015
+#  Copyright (C) 2012,2013,2015,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -48,6 +48,10 @@ r"""
 		:type quadruplelist: 
 		:rtype: 
 
+.. function:: espressopp.FixedQuadrupleList.remove()
+        remove the FixedPairList and disconnect
+
+
 .. function:: espressopp.FixedQuadrupleList.getQuadruples()
 
 		:rtype: 
@@ -91,6 +95,10 @@ class FixedQuadrupleListLocal(_espressopp.FixedQuadrupleList):
                 pid1, pid2, pid3, pid4 = quadruple
                 self.cxxclass.add(self, pid1, pid2, pid3, pid4)
 
+    def remove(self):
+        if pmi.workerIsActive():
+            self.cxxclass.remove(self)
+
     def getQuadruples(self):
 
         if pmi.workerIsActive():
@@ -103,6 +111,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedQuadrupleListLocal',
             localcall = [ "add" ],
-            pmicall = [ "addQuadruples" ],
+            pmicall = [ "addQuadruples","remove" ],
             pmiinvoke = ["getQuadruples", "size"]
             )

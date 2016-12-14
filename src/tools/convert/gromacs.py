@@ -20,13 +20,13 @@
 
 
 # -*- coding: utf-8 -*-
-import math
-import espressopp
-from topology_helper import *
-from operator import itemgetter # for sorting a dict
 
+"""
+**************************************
+**gromacs** - parser for Gromacs files
+**************************************
 
-"""This Python module allows one to use GROMACS data files as the
+   This Python module allows one to use GROMACS data files as the
    input to an ESPResSo++ simulation, set interactions for given
    particle types and convert GROMACS potential tables into
    ESPResSo++ tables.
@@ -35,92 +35,130 @@ from operator import itemgetter # for sorting a dict
    Some tips for using the gromacs parser:
 
    Tip 1. 
+   
    topol.top includes solvent via #include statements
+
    If the included .itp file ONLY contains the solvent molecule you're using (e.g. spc/e water using spce.itp) then this is okay.
+
    But if the .itp file contains info about many molecules (e.g. you want to use one ion from ions.itp), then gromacs.py will just take the first one listed. You must edit your topol.top file to explicitly include the solvent molecule you're using.
    
    e.g. replace:
-  
-   ; Include topology for ions
-   #include "amber03.ff/ions.itp"
+
+   .. code-block:: none
+
+     ; Include topology for ions
+     #include "amber03.ff/ions.itp"
    
    by:
    
-   ; Include topology for ions
-   [ moleculetype ]
-   ; molname       nrexcl
-   CL              1
-   
-   [ atoms ]
-   ; id    at type         res nr  residu name     at name  cg nr  charge
-   1       Cl              1       CL              CL       1      -1.00000
+   .. code-block:: none
+
+     ; Include topology for ions
+     [ moleculetype ]
+     ; molname       nrexcl
+     CL              1
+     
+     [ atoms ]
+     ; id    at type         res nr  residu name     at name  cg nr  charge
+     1       Cl              1       CL              CL       1      -1.00000
    
    ----------------------------------------------------------------- 
    Tip 2. impropers
+
    impropers in the topol.top file (function type 4) need to be labelled '[ impropers ]', not '[ dihedrals ]' as in standard gromacs format"
+
+   Also, the dihedrals should be listed before the impropers (this is usuall the case by default in gromacs-format files).
    
    ----------------------------------------------------------------- 
    Tip 3. 
+
    For rigid SPC/E water using Settle, spce.itp file should look like this:
-   _____________________________________________________________________________
    
-   [ moleculetype ]
-   ; molname       nrexcl
-   SOL             2
-   
-   [ atoms ]
-   ; id  at type     res nr  res name  at name  cg nr  charge    mass
-     1   OW_spc      1       SOL       OW       1      -0.8476   15.99940
-     2   HW_spc      1       SOL       HW1      1       0.4238    1.00800
-     3   HW_spc      1       SOL       HW2      1       0.4238    1.00800
-   
-   [ bonds ]
-   ; i     j       funct   length  force.c.
-   1       2       1       0.1     345000  0.1     345000
-   1       3       1       0.1     345000  0.1     345000
-   
-   [ angles ]
-   ; i     j       k       funct   angle   force.c.
-   2       1       3       1       109.47  383     109.47  383
+   .. code-block:: none
+
+     [ moleculetype ]
+     ; molname       nrexcl
+     SOL             2
+     
+     [ atoms ]
+     ; id  at type     res nr  res name  at name  cg nr  charge    mass
+       1   OW_spc      1       SOL       OW       1      -0.8476   15.99940
+       2   HW_spc      1       SOL       HW1      1       0.4238    1.00800
+       3   HW_spc      1       SOL       HW2      1       0.4238    1.00800
+     
+     [ bonds ]
+     ; i     j       funct   length  force.c.
+     1       2       1       0.1     345000  0.1     345000
+     1       3       1       0.1     345000  0.1     345000
+     
+     [ angles ]
+     ; i     j       k       funct   angle   force.c.
+     2       1       3       1       109.47  383     109.47  383
    
    _____________________________________________________________________________
    
    The bonds section is used to generate exclusions, but bond and angle parameters are not relevant if the Settle extension is used. The geometry is that specified in the python script when adding the Settle extension
    
    Include modified spce file in topol.top, e.g. replace
+
    #include "amber03.ff/spce.itp"
+
    by
+
    #include "amber03.ff/spce-for-espressopp.itp"
    
    ----------------------------------------------------------------- 
    Tip 4. 
+
    Use absolute paths for any include files which are not in the standard gromacs topology directory ($GMXLIB)
+
    e.g. replace
+
    #include "mynewresidue.itp"
+
    by
+
    #include "path/to/mynewres/file/mynewresidue.itp"
    
    ----------------------------------------------------------------- 
    Tip 5. 
+
    The parser won't work if the particles ids in the include files conflict with the particle ids in the topol.top file itself, and the bonded interaction parameters in the itp file need to be looked up via particle type in the standard gromacs topology directory ($GMXLIB)
+
    i.e. Okay for an itp file like spce.itp above, where the bonds and angles parameters are given in the itp file, as in:
-   [ bonds ]
-   ; i     j       funct   length  force.c.
-   1       2       1       0.1     345000  0.1     345000
+
+   .. code-block:: none
+
+     [ bonds ]
+     ; i     j       funct   length  force.c.
+     1       2       1       0.1     345000  0.1     345000
+
    Not okay for an itp file containing lines like:
-   [ bonds ]
-   ; i     j       funct   length  force.c.
-   1       2       1
+
+   .. code-block:: none
+
+     [ bonds ]
+     ; i     j       funct   length  force.c.
+     1       2       1
+
    ----------------------------------------------------------------- 
    """
    
+import math
+import espressopp
+from topology_helper import *
+from operator import itemgetter # for sorting a dict
+
 def read(gro_file, top_file="", doRegularExcl=True):
     """ Read GROMACS data files.
 
-    Keyword arguments:
-    gro_file -- contains coordinates of all particles, the number of particles, velocities and box size.
-    top_file -- contains topology information. Included topology files (.itp) are also read
-    doRegularExcl -- if True, exclusions are generated automatically based on the nregxcl parameter (see gromacs manual)
+    Arguments:
+    :param gro_file: -- contains coordinates of all particles, the number of particles, velocities and box size.
+    :type gro_file: string
+    :param top_file: -- contains topology information. Included topology files (.itp) are also read
+    :type gro_file: string
+    :param doRegularExcl: -- if True, exclusions are generated automatically based on the nregxcl parameter (see gromacs manual)
+    :type doRegularExcl: bool
     """
 
     print '# See the source code $ESPRESSOHOME/src/tools/convert/gromacs.py for some tips on using the gromacs parser'

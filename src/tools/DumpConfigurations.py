@@ -20,6 +20,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+*********************************************
+**DumpConfigurations** - read/write xyz files
+*********************************************
+"""
 
 import espressopp
 
@@ -211,9 +216,9 @@ def fastwritexyz(filename, system, velocities = True, unfolded = True, append = 
   file.write(st)
 
   for pid in configuration:
-        xpos   = configuration[pid][1]*scale
-        ypos   = configuration[pid][2]*scale
-        zpos   = configuration[pid][3]*scale
+        xpos   = configuration[pid][0]*scale
+        ypos   = configuration[pid][1]*scale
+        zpos   = configuration[pid][2]*scale
         if velocities:
           xvel   = velocity[pid][0]*scale
           yvel   = velocity[pid][1]*scale
@@ -226,10 +231,7 @@ def fastwritexyz(filename, system, velocities = True, unfolded = True, append = 
 
   file.close()
 # Franziska's modified readxyz to fastreadxyz without velocities
-# Federico: can read also standard XYZ, e.g. written by fastwritexyz_standard()
-# standard XYZ doesn't have pid as the first column!
-# default behavior left with pids, since this was coded first!
-def fastreadxyz(filename, have_pid = True):
+def fastreadxyz(filename):
   file = open(filename)
   line = file.readline()
   num_particles = int(line.split()[0])
@@ -242,8 +244,8 @@ def fastreadxyz(filename, have_pid = True):
     Lx = float(line[0])
     Ly = float(line[4])
     Lz = float(line[8])
-  if have_pid is True:
-    pid  = []
+
+  pid  = []
   type = []
   xpos = []
   ypos = []
@@ -252,21 +254,13 @@ def fastreadxyz(filename, have_pid = True):
     line = file.readline().split()
     if len(line) == 7 or len(line)==4:
       line.insert(1,'0')
-    if have_pid is True:
-      pid.append(int(line[0]))
-      type.append(int(line[1]))
-      xpos.append(float(line[2]))
-      ypos.append(float(line[3]))
-      zpos.append(float(line[4]))
-    else:
-      type.append(int(line[0]))
-      xpos.append(float(line[1]))
-      ypos.append(float(line[2]))
-      zpos.append(float(line[3]))
-  if have_pid:
-    return pid, type, xpos, ypos, zpos, Lx, Ly, Lz
-  else:
-    return type, xpos, ypos, zpos, Lx, Ly, Lz
+    pid.append(int(line[0]))
+    type.append(int(line[1]))
+    xpos.append(float(line[2]))
+    ypos.append(float(line[3]))
+    zpos.append(float(line[4]))
+
+  return pid, type, xpos, ypos, zpos, Lx, Ly, Lz
   file.close()
 
 '''
@@ -306,12 +300,11 @@ def fastwritexyz_standard(filename, system, unfolded = False, append = False):
   file.write(st)
 
   for pid in conf[0]:
-    type    = conf[0][pid][0]
-    xpos   = conf[0][pid][1]
-    ypos   = conf[0][pid][2]
-    zpos   = conf[0][pid][3]
+    xpos   = conf[0][pid][0]
+    ypos   = conf[0][pid][1]
+    zpos   = conf[0][pid][2]
 
-    st = "%d %15.10f %15.10f %15.10f\n"%(type, xpos, ypos, zpos)
+    st = "%d %15.10f %15.10f %15.10f\n"%(0, xpos, ypos, zpos)
     file.write(st)
     pid   += 1
 

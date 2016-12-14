@@ -20,37 +20,39 @@
 
 
 """
-************************************************
+**************************************************
 **espressopp.integrator.LangevinThermostatHybrid**
-************************************************
+**************************************************
 
 As LangevinThermostat, but for use in AdResS systems, to allow the application of different thermostat friction constants (:math:`\gamma`) to different AdResS regions. Uses three values of :math:`\gamma`, one for the atomistic region, one for the hybrid region, and one for the coarse-grained region.
 
-  # create FixedTupleList object
+  >>> # create FixedTupleList object
   >>> ftpl = espressopp.FixedTupleListAdress(system.storage)
   >>> ftpl.addTuples(tuples)
   >>> system.storage.setFixedTuplesAdress(ftpl)
-
+  >>>
   >>> system.storage.decompose()
-
-  # create Langevin thermostat
+  >>>
+  >>> # create Langevin thermostat
   >>> thermostat             = espressopp.integrator.LangevinThermostatHybrid(system,ftpl)
-
-  # set Langevin friction constants
+  >>>
+  >>> # set Langevin friction constants
   >>> thermostat.gamma       = 0.0 # units = 1/timeunit
   >>> print "# gamma for atomistic region for langevin thermostat = ",thermostat.gamma
   >>> thermostat.gammahy     = 10.0 # units = 1/timeunit
   >>> print "# gamma for hybrid region for langevin thermostat = ",thermostat.gammahy
   >>> thermostat.gammacg     = 10.0 # units = 1/timeunit
   >>> print "# gamma for coarse-grained region for langevin thermostat = ",thermostat.gammacg
-
-  # set temperature of thermostat
+  >>>
+  >>> # set temperature of thermostat
   >>> thermostat.temperature = kBT
-  # kBT is a float with the value of temperature in reduced units, i.e. temperature * Boltzmann's constant in appropriate units
+  >>> # kBT is a float with the value of temperature in reduced units, i.e. temperature * Boltzmann's constant in appropriate units
 
-  # no need to include the line
+No need to include the line
+
   >>> thermostat.adress = True
-  # as is necessary in the case of the basic LangevinThermostat, because LangevinThermostatHybrid is always only used in AdResS systems
+
+as is necessary in the case of the basic LangevinThermostat, because LangevinThermostatHybrid is always only used in AdResS systems
 
 """
 from espressopp.esutil import cxxinit
@@ -60,7 +62,6 @@ from espressopp.integrator.Extension import *
 from _espressopp import integrator_LangevinThermostatHybrid
 
 class LangevinThermostatHybridLocal(ExtensionLocal, integrator_LangevinThermostatHybrid):
-    'The (local) Velocity Verlet Integrator.'
     def __init__(self, system, fixedtuplelist):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, integrator_LangevinThermostatHybrid, system,fixedtuplelist)
