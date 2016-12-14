@@ -10,6 +10,16 @@ development is independent and they are different software packages. ESPResSo++
 is free, open-source software published under the GNU General Public License
 (GPL).
 
+QUICKSTART:
+===========
+
+Using [docker](https://www.docker.com):
+```
+# docker pull espressopp/espressopp
+# docker run -it espressopp/espressopp /bin/bash
+```
+
+
 QUICKINSTALL:
 =============
 
