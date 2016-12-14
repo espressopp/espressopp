@@ -49,7 +49,7 @@ script:
    docker cp ${CON}:/home/espressopp/.ccache ${HOME}/
 
 after_success:
-  - if [[ ${DOCKER_USERNAME} && ${DOCKER_PASSWORD} && ${TRAVIS_PULL_REQUEST} == false && ${TRAVIS_BRANCH} == docker && ${TRAVIS_JOB_NUMBER} = *.1 ]]; then
+  - if [[ ${DOCKER_USERNAME} && ${DOCKER_PASSWORD} && ${TRAVIS_PULL_REQUEST} == false && ${TRAVIS_BRANCH} == master && ${TRAVIS_JOB_NUMBER} = *.1 ]]; then
         docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
         docker push "espressopp/espressopp:latest";
     fi
