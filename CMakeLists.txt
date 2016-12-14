@@ -117,6 +117,9 @@ find_library(PYTHON_LIBRARIES
              NAMES python${PYTHON_VERSION}
              PATHS ${PYTHON_LIBDIR}  )
 
+if(NOT PYTHON_LIBRARIES)
+  message(FATAL_ERROR "Python libraries not found!")
+endif(NOT PYTHON_LIBRARIES)
 message(STATUS "PYTHON_LIBRARIES = ${PYTHON_LIBRARIES}")
 
 mark_as_advanced(PYTHON_INCLUDE_PATH PYTHON_LIBRARIES)
@@ -250,5 +253,5 @@ if ( SPHINX_EXECUTABLE )
 
    message ( STATUS "Generate LaTeX manual via ${SPHINX_EXECUTABLE}: make ug-pdf")
 else ( SPHINX_EXECUTABLE )
-    message ( WARNING "Not building user documentation because Doxygen not found.")
+    message ( WARNING "Not building user documentation because Sphinx not found.")
 endif ( SPHINX_EXECUTABLE )
