@@ -16,7 +16,7 @@ QUICKINSTALL:
 ```
 # cd espressopp
 # cmake -DEXTERNAL_BOOST=OFF -DEXTERNAL_MPI4PY=OFF .
-# make -j -l$(nproc)
+# make -j -l$(nproc-2)
 # source ESPRC
 ```
 
