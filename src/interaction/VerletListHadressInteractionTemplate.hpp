@@ -416,6 +416,7 @@ namespace espressopp {
     VerletListHadressInteractionTemplate < _PotentialAT, _PotentialCG >::
     computeEnergyDeriv() {
       std::cout << "Warning! At the moment computeEnergyDeriv() in VerletListHadressInteractionTemplate does not work." << std::endl;
+      return 0.0;
     }
 
     template < typename _PotentialAT, typename _PotentialCG >
