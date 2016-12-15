@@ -172,12 +172,16 @@ template<typename _Potential>
 inline real
 FixedTripleListTypesInteractionTemplate<_Potential>::
 computeEnergyAA() {
+  std::cout << "Warning! At the moment computeEnergyAA() in FixedTripleListTypesInteractionTemplate does not work." << std::endl;
+  return 0.0;
 }
 
 template<typename _Potential>
 inline real
 FixedTripleListTypesInteractionTemplate<_Potential>::
 computeEnergyCG() {
+  std::cout << "Warning! At the moment computeEnergyCG() in FixedTripleListTypesInteractionTemplate does not work." << std::endl;
+  return 0.0;
 }
 
 template<typename _Potential>
