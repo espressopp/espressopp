@@ -28,7 +28,7 @@
 
 #define MAJORVERSION 1
 #define MINORVERSION 9
-#define PATCHLEVEL   3
+#define PATCHLEVEL   4
 #include "gitversion.hpp"
 
 namespace espressopp {
