@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013,2015 (H)
+  Copyright (C) 2012,2013,2015 (H),2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
