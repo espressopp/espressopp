@@ -92,7 +92,10 @@ namespace espressopp {
          @return The energy value.
        */
       real _computeEnergyRaw(real _phi) const {
-        real energy = 0.5 * K * (_phi - phi0) * (_phi - phi0);
+        real diff = _phi - phi0;
+        if (diff>M_PI) diff -= 2.0*M_PI;
+        if (diff<(-1.0*M_PI)) diff += 2.0*M_PI;
+        real energy = 0.5 * K * diff * diff;
         return energy;
       }
 
@@ -134,12 +137,21 @@ namespace espressopp {
           _phi = M_PI-1e-10;
         }
 
+        //get sign of phi
+        //positive if (rij x rjk) x (rjk x rkn) is in the same direction as rjk, negative otherwise (see DLPOLY manual)
+        Real3D rcross = rijjk.cross(rjkkn); //(rij x rjk) x (rjk x rkn)
+        real signcheck = rcross * r32;
+        if (signcheck < 0.0) _phi *= -1.0;
+
         /// The part of the formula. 1/sin(phi) * d/dphi U(phi)
         /// where the \f$U(\phi) = 0.5 K (\phi_{ijkn} - \phi_0)^2]\f$
         ///
         /// The derivative of \f$U(phi)\f$ is \f$K*(\phi_0 - \phi)\f$
         ///
-        real coef1 = (1.0/sin(_phi)) * (K * (_phi - phi0));
+        real diff = _phi - phi0;
+        if (diff>M_PI) diff -= 2.0*M_PI;
+        if (diff<(-1.0*M_PI)) diff += 2.0*M_PI;
+        real coef1 = (1.0/sin(_phi)) * (K * diff);
 
         real A1 = inv_rijjk * inv_rjkkn;
         real A2 = inv_rijjk * inv_rijjk;
@@ -187,13 +199,19 @@ namespace espressopp {
        *
        * @return The value of the force
        */
+
+      //TODO note: this function has not been tested and may need debugging
       real _computeForceRaw(real phi) const {
+        std::cout<<"Warning! The function _computeForceRaw(real phi) in DihedralHarmonic has not been tested and may need debugging"<<std::endl;
 	real sin_phi = sin(phi);
         if (fabs(sin_phi) < 1e-9) {
           if (sin_phi>0.0) sin_phi = 1e-9;
 	  else sin_phi = -1e-9;  	
 	}
-	real coef1 = (1.0/sin(phi)) * K * (phi - phi0);
+        real diff = phi - phi0;
+        if (diff>M_PI) diff -= 2.0*M_PI;
+        if (diff<(-1.0*M_PI)) diff += 2.0*M_PI;
+	real coef1 = (1.0/sin_phi) * K * diff; 
         return -1.0 * coef1;
       }
 
