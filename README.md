@@ -13,7 +13,7 @@ is free, open-source software published under the GNU General Public License
 QUICKSTART:
 ===========
 
-To get a copy of the developer version (most recent version) of ESPResSo++, you can use git or docker.
+To get a copy of the developer version (most recent version) of ESPResSo++, you can use git or docker. Using docker will give you a binary release (nothing to compile, but performance may not be optimal). If you use git clone or download a tarball, you will have to compile ESPResSo+ yourself, which might lead to better performance.
 
 Using [docker](https://www.docker.com):
 ```
@@ -34,7 +34,7 @@ QUICKINSTALL:
 ```
 # cd espressopp
 # cmake -DEXTERNAL_BOOST=OFF -DEXTERNAL_MPI4PY=OFF .
-# make [for multicore CPUs make -j#(cores+1)]
+# make -j2
 # source ESPRC
 ```
 
