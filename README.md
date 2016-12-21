@@ -13,12 +13,20 @@ is free, open-source software published under the GNU General Public License
 QUICKSTART:
 ===========
 
+To get a copy of the developer version (most recent version) of ESPResSo++, you can use git or docker.
+
 Using [docker](https://www.docker.com):
 ```
 # docker pull espressopp/espressopp
 # docker run -it espressopp/espressopp /bin/bash
 ```
 
+Using git:
+```
+# git clone https://github.com/espressopp/espressopp.git
+```
+
+Alternatively, you can download a tarball or zip file of [previous release versions](https://github.com/espressopp/espressopp/releases) of ESPResSo++.
 
 QUICKINSTALL:
 =============
@@ -31,6 +39,21 @@ QUICKINSTALL:
 ```
 
 After building go to the `examples` directory and have a look at the python scripts.
+
+DOCUMENTATION:
+==============
+
+Documentation for the developer version of ESPResSo++ is at:
+
+http://espressopp.github.io
+
+Documentation for release versions from v1.9.4.1 onward is at:
+
+http://espressopp.github.io/vXXX
+
+where XXX is the version number, e.g.: 
+
+http://espressopp.github.io/v1.9.4.1
 
 ISSUES:
 =======
