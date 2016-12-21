@@ -57,15 +57,16 @@ after_success:
     fi
   - if [[ ${BUILD_UG} = ON && ${TRAVIS_JOB_NUMBER} = *.1 ]]; then
       git clone --depth 1 https://github.com/espressopp/espressopp.github.io.git html;
-      CON=$(docker run -d espressopp/espressopp:${DOCKER_TAG}) && docker cp ${CON}:/home/espressopp/espressopp/build/doc . ;
-      mkdir -p html/doxygen;
-      if [[ ${TRAVIS_BRANCH} = v1.* ]]; then 
+      CON=$(docker run -d espressopp/espressopp:${DOCKER_TAG}) && docker cp ${CON}:/home/espressopp/espressopp/doc . ;
+      if [[ ${TRAVIS_BRANCH} = v1.* ]]; then
+        rm -rf html/${TRAVIS_BRANCH};
         mkdir -p html/${TRAVIS_BRANCH};
         mv doc/ug/_build/html/* html/${TRAVIS_BRANCH};
       else
-         mv doc/dg/html/* html/doxygen;
-         mv doc/ug/_build/latex/ESPResSo++.pdf html;
-         mv doc/ug/_build/html/* html;
+         rm -rf html/[^v][^1]*
+         mv doc/dg/html html/doxygen;
+         mv doc/ug/_build/latex/ESPResSo++.pdf html/;
+         mv doc/ug/_build/html/* html/;
       fi;
       rm -rvf doc;
       cd html;
@@ -73,7 +74,7 @@ after_success:
         git config --global user.name "Automatic Deployment (Travis CI)";
         git config --global user.email "espp-devel@listserv.mpip-mainz.mpg.de";
         git add --all && git commit -m "Documentation Update";
-        openssl aes-256-cbc -K $encrypted_194b3d1e9306_key -iv $encrypted_194b3d1e9306_iv -in ../../deploy.enc -out ~/.ssh/id_rsa -d;
+        openssl aes-256-cbc -K $encrypted_194b3d1e9306_key -iv $encrypted_194b3d1e9306_iv -in $HOME/docker/espressopp/doc/ug/deploy.enc -out ~/.ssh/id_rsa -d;
         chmod 600 ~/.ssh/id_rsa;
         git push git@github.com:espressopp/espressopp.github.io.git master;
       else

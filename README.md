@@ -26,7 +26,7 @@ QUICKINSTALL:
 ```
 # cd espressopp
 # cmake -DEXTERNAL_BOOST=OFF -DEXTERNAL_MPI4PY=OFF .
-# make -j -l$(nproc)
+# make [for multicore CPUs make -j#(cores+1)]
 # source ESPRC
 ```
 
