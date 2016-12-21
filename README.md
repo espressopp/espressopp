@@ -10,17 +10,27 @@ development is independent and they are different software packages. ESPResSo++
 is free, open-source software published under the GNU General Public License
 (GPL).
 
+QUICKSTART:
+===========
+
+Using [docker](https://www.docker.com):
+```
+# docker pull espressopp/espressopp
+# docker run -it espressopp/espressopp /bin/bash
+```
+
+
 QUICKINSTALL:
 =============
 
 ```
 # cd espressopp
-# cmake .
-# make
+# cmake -DEXTERNAL_BOOST=OFF -DEXTERNAL_MPI4PY=OFF .
+# make [for multicore CPUs make -j#(cores+1)]
 # source ESPRC
 ```
 
-go to the examples directory and have a look at the python scripts.
+After building go to the `examples` directory and have a look at the python scripts.
 
 ISSUES:
 =======
