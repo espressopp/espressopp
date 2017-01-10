@@ -3,21 +3,21 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008-2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+
   This file is part of ESPResSo++.
-  
+
   ESPResSo++ is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-  
+
   ESPResSo++ is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
-  
+
   You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "python.hpp"
@@ -30,7 +30,7 @@ namespace espressopp {
                                          shared_ptr< LatticeBoltzmann > latticeboltzmann)
       : LBInit(system, latticeboltzmann) {
       }
-      
+
       void LBInitPopUniform::createDenVel (real _rho0, Real3D _u0) {
          if (mpiWorld->rank()==0) {
             printf("Creating an initial configuration with uniform density %f and \nvelocity %f, %f, %f\n",
@@ -39,15 +39,15 @@ namespace espressopp {
          } else {
             // do nothing
          }
-         
+
          real invCs2 = 1. / latticeboltzmann->getCs2();
-         
+
          real invCs4 = invCs2*invCs2;
          real scalp, value;
          int _offset = latticeboltzmann->getHaloSkin();
          Int3D _Ni = latticeboltzmann->getMyNi();
          int _numVels = latticeboltzmann->getNumVels();	// number of velocities in the model
-         
+
          // set initial velocity of the populations from Maxwell's distribution
          for (int i = 0; i < _Ni.getItem(0); i++) {
             real trace = _u0 * _u0 * invCs2;
@@ -68,14 +68,14 @@ namespace espressopp {
             }
          }
       }
-      
+
       /* do nothing with external forces */
       void LBInitPopUniform::setForce (Real3D _force) {}
       void LBInitPopUniform::addForce (Real3D _force) {}
-      
+
       void LBInitPopUniform::registerPython() {
          using namespace espressopp::python;
-         
+
          class_<LBInitPopUniform, bases< LBInit > >
          ("integrator_LBInit_PopUniform",		init< shared_ptr< System >,
           shared_ptr< LatticeBoltzmann > >())
