@@ -22,7 +22,7 @@ try:
     ESPP_VERSION = '{}.{}.{}'.format(
         ver.major, ver.minor, ver.patchlevel)
 except ImportError:
-    ESPP_VERSION = '1.9.3'
+    ESPP_VERSION = 'X.X.X'
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -30,19 +30,10 @@ except ImportError:
 
 # -- General configuration -----------------------------------------------------
 
-# Add any Sphinx extension module names here, as strings. They can be extensions
-# coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-# extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 
-#               'sphinx.ext.intersphinx', 'sphinx.ext.coverage', 
-#               'sphinx.ext.pngmath', 'sphinx.ext.autosummary', 'matplotlib.sphinxext.mathmpl',
-# 'matplotlib.sphinxext.only_directives', 'matplotlib.sphinxext.plot_directive']
-
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
-#sys.path.append('../..')
 sys.path.append(os.path.abspath('sphinxext'))
-#sys.path.append(os.path.abspath('/System/Library/Frameworks/Python.framework/Versions/2.7/Extras/lib/python/matplotlib/sphinxext'))
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
@@ -125,7 +116,6 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
 #html_theme = 'basic'
-#html_theme = 'alabaster'
 # Find sphinx_rtd_theme package
 html_theme = 'sphinx_rtd_theme'
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
@@ -147,7 +137,7 @@ html_title = '{} v{}'.format(project, version)
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-#html_logo = 'Logo.png'
+html_logo = '_static/logo_theory_group_200x48.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -170,7 +160,7 @@ html_favicon = "_static/favicon.ico"
 #html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-html_sidebars = { 
+html_sidebars = {
     '**': ['globaltoc.html', 'custom_links_sidebar.html', 'searchbox.html'], }
 
 # Additional templates that should be rendered to pages, maps page names to
