@@ -20,9 +20,9 @@
 
 
 r"""
-***********************************************
-**espressopp.interaction.FENECapped**
-***********************************************
+*********************************
+espressopp.interaction.FENECapped
+*********************************
 
 .. math::
 
@@ -137,4 +137,3 @@ if pmi.isController:
             cls =  'espressopp.interaction.FixedPairListFENECappedLocal',
             pmicall = ['setPotential','getPotential','setFixedPairList', 'getFixedPairList']
             )
-

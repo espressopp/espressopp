@@ -20,9 +20,9 @@
 
 
 r"""
-*************************************
-**espressopp.standard_system.KGMelt**
-*************************************
+*********************************
+espressopp.standard_system.KGMelt
+*********************************
 
 
 .. function:: espressopp.standard_system.KGMelt(num_chains, chain_len)

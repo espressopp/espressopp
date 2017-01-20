@@ -20,9 +20,9 @@
 
 
 r"""
-*****************************************************
-**espressopp.storage.DomainDecompositionNonBlocking**
-*****************************************************
+*************************************************
+espressopp.storage.DomainDecompositionNonBlocking
+*************************************************
 
 
 .. function:: espressopp.storage.DomainDecompositionNonBlocking(system, nodeGrid, cellGrid)

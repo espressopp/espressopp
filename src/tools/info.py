@@ -18,15 +18,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
-"""
-******************************************
-**info** - get info on particles and bonds
-******************************************
-"""
 import espressopp
 
 def getAllParticles(system, *properties):
-  'returns a list of all particle properties of all particles of the system (currently no atomistic AdResS particles are included)'
+  """
+  returns a list of all particle properties of all particles of the system (currently no atomistic AdResS particles are included)
+  """
   allParticles = []
   maxParticleID = int(espressopp.analysis.MaxPID(system).compute())
   pid   = 0
@@ -52,7 +49,9 @@ def getAllParticles(system, *properties):
  
   
 def getAllBonds(system):
-  'return all bonds of the system (currently only FixedPairLists are supported)'
+  """
+  return all bonds of the system (currently only FixedPairLists are supported)
+  """
   bonds = []
   nInteractions = system.getNumberOfInteractions()
   for i in xrange(nInteractions):

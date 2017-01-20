@@ -20,9 +20,9 @@
 
 
 r"""
-*************************
-**espressopp.VerletList**
-*************************
+*********************
+espressopp.VerletList
+*********************
 
 
 .. function:: espressopp.VerletList(system, cutoff, exclusionlist)

@@ -20,9 +20,9 @@
 
 
 r"""
-**************************************
-**Storage** - Storage Object
-**************************************
+**************************
+espressopp.storage.Storage
+**************************
 
 This is the base class for all storage objects.
 All derived classes implement at least the following methods:

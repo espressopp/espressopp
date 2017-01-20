@@ -25,7 +25,7 @@ temperature = 1.0
 ######################################################################
 print espressopp.Version().info()
 print 'Setting up simulation ...'
-bonds, angles, x, y, z, Lx, Ly, Lz = espressopp.tools.convert.lammps.read('polymer_melt.lammps')
+bonds, angles, x, y, z, Lx, Ly, Lz = espressopp.tools.lammps.read('polymer_melt.lammps')
 bonds, angles, x, y, z, Lx, Ly, Lz = espressopp.tools.replicate(bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1)
 num_particles = len(x)
 density = num_particles / (Lx * Ly * Lz)

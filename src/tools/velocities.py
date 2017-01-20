@@ -20,9 +20,11 @@
 
 
 def gaussian(T, N, zero_momentum=True, seed=7654321):
-
-  """This Python module generates initial particle velocities
-  with temperature T according to a Maxwell-Boltzmann distribution."""
+  """  
+  This Python module generates initial particle velocities
+  with temperature T according to a Maxwell-Boltzmann distribution.
+  """
+  
   # TODO: account for mass
 
   import random

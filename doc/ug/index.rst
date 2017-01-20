@@ -4,8 +4,22 @@
    contain the root `toctree` directive.
 
 ESPResSo++
-========================
+==========
 
+Welcome to the user documentation of ESPResSo++
+
+.. toctree::
+   :maxdepth: 2
+   :titlesonly:
+
+   overview.rst
+   instalation.rst
+   tutorial.rst
+   classdescription.rst
+   FAQ <faq>
+   getting_help.rst
+   team.rst
+   bib.rst
 .. |espp| replace:: ESPResSo++
 
 **Welcome to the homepage of the ESPResSo++ project**
@@ -25,4 +39,4 @@ are different software packages.
     DOI: 10.1016/j.cpc.2012.12.004
     Online access: http://dx.doi.org/10.1016/j.cpc.2012.12.004
 
-`Recent publications where ESPResSo++ was used <https://scholar.google.com/scholar?cites=16263384330356203698&as_sdt=2005&sciodt=0,5&hl=pl>`_
+`Recent publications where ESPResSo++ was used <https://scholar.google.com/scholar?cites=16263384330356203698&as_sdt=2005&sciodt=0,5&hl=en>`_

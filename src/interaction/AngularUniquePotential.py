@@ -20,9 +20,9 @@
 
 
 r"""
-***********************************************************
-**espressopp.interaction.AngularUniquePotential**
-***********************************************************
+*********************************************
+espressopp.interaction.AngularUniquePotential
+*********************************************
 
 This is an abstract class, only needed to be inherited from.
 

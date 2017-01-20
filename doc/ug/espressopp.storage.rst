@@ -1,1 +1,0 @@
-.. automodule:: espressopp.storage.Storage

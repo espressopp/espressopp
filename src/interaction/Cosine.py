@@ -20,20 +20,15 @@
 
 
 r"""
-*******************************************
-**espressopp.interaction.Cosine**
-*******************************************
+*****************************
+espressopp.interaction.Cosine
+*****************************
 
 Calculates the Cosine Interaction
 
 .. math::
 
 	U = K  (1 + cos(\theta - \theta_0))
-
-
-
-
-
 
 .. function:: espressopp.interaction.Cosine(K, theta0)
 

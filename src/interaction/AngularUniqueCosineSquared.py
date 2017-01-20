@@ -20,9 +20,9 @@
 
 
 r"""
-***************************************************************
-**espressopp.interaction.AngularUniqueCosineSquared**
-***************************************************************
+*************************************************
+espressopp.interaction.AngularUniqueCosineSquared
+*************************************************
 
 Calculates the angular unique cosine squared interaction.
 

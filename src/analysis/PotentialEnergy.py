@@ -17,9 +17,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-***************************************
-**espressopp.analysis.PotentialEnergy**
-***************************************
+***********************************
+espressopp.analysis.PotentialEnergy
+***********************************
 
 The object that computes potential energy of different interactions.
 
@@ -44,7 +44,6 @@ from _espressopp import analysis_PotentialEnergy
 
 
 class PotentialEnergyLocal(ObservableLocal, analysis_PotentialEnergy):
-    """The (local) compute of potential energy."""
     def __init__(self, system, interaction, compute_method=None):
         if pmi.workerIsActive():
             if compute_method is None:

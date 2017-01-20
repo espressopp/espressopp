@@ -20,9 +20,9 @@
 
 
 r"""
-************************************************
-**espressopp.interaction.VSphereSelf**
-************************************************
+**********************************
+espressopp.interaction.VSphereSelf
+**********************************
 
 This class provides methods to compute forces and energies of
 the VSphereSelf potential.

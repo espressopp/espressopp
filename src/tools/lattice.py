@@ -21,13 +21,13 @@
 
 # -*- coding: iso-8859-1 -*-
 
-"""This Python module initializes particles on the sites
-   of a simple cubic lattice. By setting perfect=False
-   the particle positions will be given random displacements
-   with a magnitude of one-tenth the lattice spacing."""
-
 def createCubic(N, rho, perfect=True, RNG=None):
-
+  """
+  Initializes particles on the sites of a simple cubic lattice. 
+  By setting ``perfect=False`` 
+  the particle positions will be given random displacements
+  with a magnitude of one-tenth the lattice spacing.
+  """
   if RNG == None:
     import random
   
@@ -72,6 +72,10 @@ def createCubic(N, rho, perfect=True, RNG=None):
 
 # TODO implement checking for a wrong number of particles, lightly nonideal lattice etc.
 def createDiamond(N, rho, perfect=True, RNG=None):
+  """
+  Initializes particles on the sites of a diamond lattice. 
+  """
+  
   from espressopp import Real3D
   
   #L = (N / 8.0 / rho)**(1.0/3.0)

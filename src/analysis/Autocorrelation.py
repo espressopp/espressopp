@@ -2,47 +2,46 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
-***************************************
-**espressopp.analysis.Autocorrelation**
-***************************************
-
+***********************************
+espressopp.analysis.Autocorrelation
+***********************************
 
 .. function:: espressopp.analysis.Autocorrelation(system)
 
-		:param system: 
-		:type system: 
+		:param system:
+		:type system:
 
 .. function:: espressopp.analysis.Autocorrelation.clear()
 
-		:rtype: 
+		:rtype:
 
 .. function:: espressopp.analysis.Autocorrelation.compute()
 
-		:rtype: 
+		:rtype:
 
 .. function:: espressopp.analysis.Autocorrelation.gather(value)
 
-		:param value: 
-		:type value: 
-		:rtype: 
+		:param value:
+		:type value:
+		:rtype:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -58,10 +57,10 @@ class AutocorrelationLocal(analysis_Autocorrelation):
       return self.cxxclass.gather(self, value)
     def clear(self):
       return self.cxxclass.clear(self)
-      
+
     def compute(self):
       return self.cxxclass.compute(self)
-    
+
 if pmi.isController:
   class Autocorrelation(object):
 

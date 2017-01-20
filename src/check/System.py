@@ -20,9 +20,9 @@
 
 
 """
-***************************
-**espressopp.check.System**
-***************************
+***********************
+espressopp.check.System
+***********************
 
 """
 def System(system, what='all'):

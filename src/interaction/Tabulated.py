@@ -22,9 +22,9 @@
 
 
 r"""
-**********************************************
-**espressopp.interaction.Tabulated**
-**********************************************
+********************************
+espressopp.interaction.Tabulated
+********************************
 
 
 .. function:: espressopp.interaction.Tabulated(itype, filename, cutoff)

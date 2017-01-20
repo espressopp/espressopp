@@ -20,9 +20,9 @@
 
 
 r"""
-*****************************************************
-**espressopp.interaction.ReactionFieldGeneralizedTI**
-*****************************************************
+*************************************************
+espressopp.interaction.ReactionFieldGeneralizedTI
+*************************************************
 
 This module is for performing simulations (e.g. as part of Thermodynamic Integration) where some interactions are a linear function of a parameter :math:`\lambda`.
 

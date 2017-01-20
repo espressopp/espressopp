@@ -20,9 +20,10 @@
 
 
 r"""
-************************************************************
-**espressopp.interaction.StillingerWeberPairTerm**
-************************************************************
+**********************************************
+espressopp.interaction.StillingerWeberPairTerm
+**********************************************
+
 This class provides methods to compute forces and energies of
 2 body term of Stillinger-Weber potential.
 

@@ -20,9 +20,9 @@
 
 
 r"""
-********************************************
-**espressopp.integrator.LangevinThermostat**
-********************************************
+****************************************
+espressopp.integrator.LangevinThermostat
+****************************************
 
 Langevin Thermostat
 

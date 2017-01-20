@@ -20,9 +20,9 @@
 
 
 """
-**************************************************
-**espressopp.integrator.LangevinThermostatHybrid**
-**************************************************
+**********************************************
+espressopp.integrator.LangevinThermostatHybrid
+**********************************************
 
 As LangevinThermostat, but for use in AdResS systems, to allow the application of different thermostat friction constants (:math:`\gamma`) to different AdResS regions. Uses three values of :math:`\gamma`, one for the atomistic region, one for the hybrid region, and one for the coarse-grained region.
 

@@ -22,9 +22,6 @@
 
 
 r"""
-*********************
-**SlabBC** - Object
-*********************
 
 Like all boundary condition objects, this class implements all the methods of
 the base class **BC** , which are described in detail in the documentation of
@@ -39,15 +36,14 @@ Example:
 >>> boxsize = (Lx, Ly, Lz)
 >>> bc = espressopp.bc.SlabBC(rng, boxsize)
 
-
-.. function:: espressopp.bc.SlabBC(rng, boxL)
+.. py:method:: espressopp.bc.SlabBC(rng, boxL)
 
 		:param rng: 
 		:param boxL: (default: 1.0)
 		:type rng: 
 		:type boxL: real
 
-.. function:: espressopp.bc.SlabBC.setBoxL(boxL)
+.. py:method:: espressopp.bc.SlabBC.setBoxL(boxL)
 
 		:param boxL: 
 		:type boxL: 

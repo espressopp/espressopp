@@ -20,9 +20,10 @@
 
 
 r"""
-************************************************
-**espressopp.interaction.VSpherePair**
-************************************************
+**********************************
+espressopp.interaction.VSpherePair
+**********************************
+
 This class provides methods to compute forces and energies of
 the VSpherePair potential.
 
@@ -126,4 +127,3 @@ if pmi.isController:
             cls =  'espressopp.interaction.VerletListVSpherePairLocal',
             pmicall = ['setPotential', 'getPotential', 'getVerletList']
             )
-
