@@ -76,6 +76,7 @@ def PolymerMelt(num_chains, monomers_per_chain, box=(0,0,0), bondlen=0.97, rc=1.
   else:
     if box[0]<=0 or box[1]<=0 or box[2]<=0:
       print "WARNING: no valid box size specified, box size set to (100,100,100) !"
+      box = (100,100,100)
 
   system         = espressopp.System()
   system.rng     = espressopp.esutil.RNG()
