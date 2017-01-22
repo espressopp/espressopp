@@ -20,11 +20,11 @@
 
 
 r"""
-**********************************************************************
-**ParticleAccess** - abstract base class for analysis/measurement/io
-**********************************************************************
+*************************
+espressopp.ParticleAccess
+*************************
 
-
+Abstract base class for analysis/measurement/io
 
 .. function:: espressopp.ParticleAccess.perform_action()
 

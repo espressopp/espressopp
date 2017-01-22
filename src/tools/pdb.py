@@ -20,9 +20,9 @@
 
 r"""
 
-***********************************
-**PDB** - read and write pdb format
-***********************************
+*******************************
+PDB - read and write pdb format
+*******************************
 
 .. function:: espressopp.tools.pdbwrite(filename, system, molsize=4, append=False, typenames=None)
 

@@ -20,18 +20,13 @@
 
 
 r"""
-********************************************************
-**espressopp.interaction.DihedralHarmonicCos**
-********************************************************
+******************************************
+espressopp.interaction.DihedralHarmonicCos
+******************************************
 
 .. math::
 
 	U = K (cos(\phi) - cos(\phi_0))^2
-
-
-
-
-
 
 .. function:: espressopp.interaction.DihedralHarmonicCos(K, phi0)
 

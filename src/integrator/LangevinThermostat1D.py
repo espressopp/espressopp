@@ -20,9 +20,9 @@
 
 
 r"""
-**********************************************
-**espressopp.integrator.LangevinThermostat1D**
-**********************************************
+******************************************
+espressopp.integrator.LangevinThermostat1D
+******************************************
 
 
 .. function:: espressopp.integrator.LangevinThermostat1D(system)

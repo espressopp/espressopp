@@ -20,20 +20,11 @@
 
 
 r"""
-******************************************************
-**espressopp.interaction.DihedralPotential**
-******************************************************
+****************************************
+espressopp.interaction.DihedralPotential
+****************************************
+
 This is an abstract class, only needed to be inherited from.
-
-
-
-
-
-
-
-
-
-
 
 .. function:: espressopp.interaction.DihedralPotential.computeEnergy(\*args)
 

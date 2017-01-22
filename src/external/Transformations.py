@@ -1,4 +1,9 @@
-"""Homogeneous Transformation Matrices and Quaternions.
+"""
+***********************************
+espressopp.external.Transformations
+***********************************
+
+Homogeneous Transformation Matrices and Quaternions.
 
 A library for calculating 4x4 matrices for translating, rotating, reflecting,
 scaling, shearing, projecting, orthogonalizing, and superimposing arrays of
@@ -12,16 +17,14 @@ functions to decompose transformation matrices.
 
 :Version: 2011.01.25
 
-Requirements
-------------
+**Requirements**
 
 * `Python 2.6 or 3.1 <http://www.python.org>`__
 * `Numpy 1.5 <http://numpy.scipy.org>`__
 * `transformations.c 2010.04.10 <http://www.lfd.uci.edu/~gohlke/>`__
   (optional implementation of some functions in C)
 
-Notes
------
+**Notes**
 
 The API is not stable yet and is expected to change between revisions.
 
@@ -64,8 +67,7 @@ be specified using a 4 character string or encoded 4-tuple:
   - repetition : first and last axis are same (1) or different (0).
   - frame : rotations are applied to static (0) or rotating (1) frame.
 
-References
-----------
+**References**
 
 (1)  Matrices and transformations. Ronald Goldman.
      In "Graphics Gems I", pp 472-475. Morgan Kaufmann, 1990.
@@ -97,7 +99,6 @@ References
      Itzhack Y Bar-Itzhack, J Guid Contr Dynam. 2000. 23(6): 1085-1087.
 
 Examples
---------
 
 >>> alpha, beta, gamma = 0.123, -1.234, 2.345
 >>> origin, xaxis, yaxis, zaxis = (0, 0, 0), (1, 0, 0), (0, 1, 0), (0, 0, 1)

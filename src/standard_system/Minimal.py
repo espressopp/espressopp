@@ -20,9 +20,9 @@
 
 
 r"""
-**************************************
-**espressopp.standard_system.Minimal**
-**************************************
+**********************************
+espressopp.standard_system.Minimal
+**********************************
 
 
 .. function:: espressopp.standard_system.Minimal(num_particles, box, rc, skin, dt, temperature)

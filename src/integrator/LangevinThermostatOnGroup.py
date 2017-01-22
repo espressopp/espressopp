@@ -18,9 +18,9 @@
 
 
 r"""
-***************************************************
-**espressopp.integrator.LangevinThermostatOnGroup**
-***************************************************
+***********************************************
+espressopp.integrator.LangevinThermostatOnGroup
+***********************************************
 
 Thermalize particles in the ParticleGroup only.
 

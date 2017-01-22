@@ -20,9 +20,9 @@
 
 
 r"""
-***************************************
-**espressopp.integrator.DPDThermostat**
-***************************************
+***********************************
+espressopp.integrator.DPDThermostat
+***********************************
 
 
 .. function:: espressopp.integrator.DPDThermostat(system, vl)

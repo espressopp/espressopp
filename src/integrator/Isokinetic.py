@@ -20,9 +20,9 @@
 
 
 r"""
-************************************
-**espressopp.integrator.Isokinetic**
-************************************
+********************************
+espressopp.integrator.Isokinetic
+********************************
 
 
 .. function:: espressopp.integrator.Isokinetic(system)

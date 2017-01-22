@@ -20,9 +20,9 @@
 
 
 r"""
-******************************************
-**espressopp.storage.DomainDecomposition**
-******************************************
+**************************************
+espressopp.storage.DomainDecomposition
+**************************************
 
 
 .. function:: espressopp.storage.DomainDecomposition(system, nodeGrid, cellGrid)

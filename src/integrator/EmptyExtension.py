@@ -20,9 +20,9 @@
 
 
 r"""
-****************************************
-**espressopp.integrator.EmptyExtension**
-****************************************
+************************************
+espressopp.integrator.EmptyExtension
+************************************
 
 
 .. function:: espressopp.integrator.EmptyExtension(system)

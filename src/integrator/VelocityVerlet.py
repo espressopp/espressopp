@@ -20,9 +20,9 @@
 
 
 r"""
-****************************************
-**espressopp.integrator.VelocityVerlet**
-****************************************
+************************************
+espressopp.integrator.VelocityVerlet
+************************************
 
 
 .. function:: espressopp.integrator.VelocityVerlet(system)

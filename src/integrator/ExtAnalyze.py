@@ -20,16 +20,15 @@
 
 
 r"""
-***************************************
-**ExtAnalyze** - Integrator Extension
-***************************************
+********************************
+espressopp.integrator.ExtAnalyze
+********************************
 
 This class can be used to execute nearly all analysis objects
 within the main integration loop which allows to automatically
 accumulate time averages (with standard deviation error bars). 
   
 Example Usage:
------------------
 
 >>> pt           = espressopp.analysis.PressureTensor(system)
 >>> extension_pt = espressopp.integrator.ExtAnalyze(pt , interval=100)

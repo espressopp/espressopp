@@ -20,9 +20,9 @@
 
 
 r"""
-********************
-**espressopp.Int3D**
-********************
+****************
+espressopp.Int3D
+****************
 
 
 .. function:: espressopp.__Int3D(\*args)

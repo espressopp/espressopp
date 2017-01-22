@@ -20,9 +20,9 @@
 
 
 r"""
-*********************************
-**espressopp.FixedQuadrupleList**
-*********************************
+*****************************
+espressopp.FixedQuadrupleList
+*****************************
 
 
 .. function:: espressopp.FixedQuadrupleList(storage)

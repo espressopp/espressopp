@@ -19,9 +19,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 r"""
-**************************************
-**PLogger** - Object
-**************************************
+******************
+espressopp.PLogger
+******************
 
 This module defines the parallel logger PLogger.
 It can be used to switch on logging on all CPUs.
@@ -54,4 +54,3 @@ import espressopp
 def set(thelogger,level):
   hw = espressopp.pmi.create('logging.getLogger',thelogger)
   espressopp.pmi.call(hw,'setLevel',level)
-

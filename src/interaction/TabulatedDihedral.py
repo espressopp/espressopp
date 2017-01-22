@@ -22,9 +22,9 @@
 
 
 r"""
-******************************************************
-**espressopp.interaction.TabulatedDihedral**
-******************************************************
+****************************************
+espressopp.interaction.TabulatedDihedral
+****************************************
 
 .. function:: espressopp.interaction.TabulatedDihedral(itype, filename)
 

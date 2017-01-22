@@ -19,9 +19,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 """
-************************************
-**tabulated** - write tabulated file
-************************************
+********************************
+tabulated - write tabulated file
+********************************
 """
 
 import espressopp

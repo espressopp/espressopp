@@ -20,9 +20,6 @@
 
 
 r"""
-**************************************
-**OrthorhombicBC** - Object
-**************************************
 
 Like all boundary condition objects, this class implements
 all the methods of the base class **BC** , which are described in detail
@@ -37,14 +34,14 @@ Example:
 >>> bc = espressopp.bc.OrthorhombicBC(rng, boxsize) 
 
 
-.. function:: espressopp.bc.OrthorhombicBC(rng, boxL)
+.. py:method:: espressopp.bc.OrthorhombicBC(rng, boxL)
 
 		:param rng: 
 		:param boxL: (default: 1.0)
 		:type rng: 
 		:type boxL: real
 
-.. function:: espressopp.bc.OrthorhombicBC.setBoxL(boxL)
+.. py:method:: espressopp.bc.OrthorhombicBC.setBoxL(boxL)
 
 		:param boxL: 
 		:type boxL: 

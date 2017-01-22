@@ -24,7 +24,7 @@ import espressopp
 import mpi4py.MPI as MPI
 import logging
 from espressopp import Real3D, Int3D
-from espressopp.tools.convert import espresso_old
+from espressopp.tools import espresso_old
 from espressopp.tools import decomp
 from espressopp.tools import timers
 

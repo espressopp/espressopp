@@ -79,15 +79,13 @@ def drain_socket(sock):
 def connect(system, molsize=10, pqrfile=False, vmd_path='vmd'):
   """Connects to the VMD.
 
-  Args:
-    system: The system object.
-    molsize: The optional size of the molecule.
-    pqrfile: If set to True then the pqr vmd.pqr file will be used otherwise (default)
+    :param espressopp.system system: The system object.
+    :param int molsize: The optional size of the molecule.
+    :param bool pqrfile: If set to True then the pqr vmd.pqr file will be used otherwise (default)
       the vmd.pdb file will be used.
-    vmd_path: The path to the executable of vmd, by default it is set to 'vmd'.
+    :param str vmd_path: The path to the executable of vmd, by default it is set to 'vmd'.
 
-  Returns:
-    The socket to the VMD.
+    :returns: Socket to the VMD.
 
   """
   espressopp.tools.psfwrite("vmd.psf", system, molsize=molsize, maxdist=system.bc.boxL[0]/2)

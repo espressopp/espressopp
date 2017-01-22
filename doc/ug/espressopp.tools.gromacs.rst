@@ -1,2 +1,2 @@
-.. automodule:: espressopp.tools.convert.gromacs
+.. automodule:: espressopp.tools.gromacs
    :members:

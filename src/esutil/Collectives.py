@@ -20,12 +20,20 @@
 
 
 r"""
-*********************************
-**espressopp.esutil.collectives**
-*********************************
+*****************************
+espressopp.esutil.Collectives
+*****************************
 
+locate the node with here=True (e.g. indicating that data of a
+distributed storage is on the local node). This is a collective
+SPMD function.
 
-.. function:: espressopp.esutil.locateItem(here)
+here is a boolean value, which should be True on at most one
+node. Returns on the controller the number of the node with
+here=True, or an KeyError exception if no node had the item,
+i.e. had here=True.
+
+.. py:method:: espressopp.esutil.locateItem(here)
 
 		:param here: 
 		:type here: 
@@ -36,15 +44,6 @@ from espressopp import pmi
 ResultNone = _espressopp.esutil_Collectives_ResultNone
 
 def locateItem(here):
-    """locate the node with here=True (e.g. indicating that data of a
-    distributed storage is on the local node). This is a collective
-    SPMD function.
-
-    here is a boolean value, which should be True on at most one
-    node. Returns on the controller the number of the node with
-    here=True, or an KeyError exception if no node had the item,
-    i.e. had here=True.
-    """
     res = _espressopp.esutil_Collectives_locateItem(here, pmi.CONTROLLER)
     if pmi.isController:
         if res == ResultNone:

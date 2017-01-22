@@ -18,7 +18,7 @@ import math
 import logging
 import os
 from espressopp import Real3D, Int3D
-from espressopp.tools.convert import gromacs
+from espressopp.tools import gromacs
 
 
 # Input values for system

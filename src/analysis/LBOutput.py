@@ -14,7 +14,7 @@
 #  GNU General Public License for more details.
 #  
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
@@ -42,7 +42,7 @@ class LBOutputLocal(AnalysisBaseLocal, analysis_LBOutput):
     def writeOutput(self):
         if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             self.cxxclass.writeOutput(self)
-        
+            
 if pmi.isController :
     class LBOutput(AnalysisBase):
         __metaclass__ = pmi.Proxy

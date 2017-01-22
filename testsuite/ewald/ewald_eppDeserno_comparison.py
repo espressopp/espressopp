@@ -48,7 +48,7 @@ import mpi4py.MPI as MPI
 import espressopp
 
 from espressopp import Real3D
-from espressopp.tools.convert import espresso_old
+from espressopp.tools import espresso_old
 
 # reading the particle coordinates, charges and box size from old espressopp data file
 # file 'ini_struct_deserno.dat' contains the data we need

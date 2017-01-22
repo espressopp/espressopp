@@ -20,9 +20,9 @@
 
 
 r"""
-**************************************
-**VerletListAdress** - Object
-**************************************
+***************************
+espressopp.VerletListAdress
+***************************
 
 The VerletListAdress is the Verlet List to be used for AdResS or H-AdResS
 simulations. When creating the VerletListAdress one has to provide the system
@@ -39,8 +39,7 @@ region has to be set (adrCenter). Additionally, it can be chosen between a spher
 
 The AdResS region can also be defined based on one or more particles. For a single particle, in this case a spherical region moves along with the particle. For many such region defining particles, the high-resolution/hybrid region corresponds to the overlap of the different spherical regions based on the individual particles (for details see Kreis et al., JCTC doi: 10.1021/acs.jctc.6b00440). Note that more region defining particles mean a higher computational overhead as these particles need to be communicated among all processors (also see explanations in AdResS.py). Also note that region defining particles should be normal/CG particles, not atomistic/AdResS ones.
 
-Bascially the VerListAdress provides 4 lists:
----------------------------------------------
+**Bascially the VerListAdress provides 4 lists:**
 
 * adrZone: A list which holds all particles in the atomistic and hybrid region
 * cgZone: A list which holds all particles in the coarse-grained region

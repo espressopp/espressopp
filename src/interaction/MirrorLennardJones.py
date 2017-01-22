@@ -22,9 +22,10 @@
 
 
 r"""
-*******************************************************
-**espressopp.interaction.MirrorLennardJones**
-*******************************************************
+*****************************************
+espressopp.interaction.MirrorLennardJones
+*****************************************
+
 This class provides methods to compute forces and energies of
 the Mirror Lennard-Jones potential.
 
