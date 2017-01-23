@@ -1,7 +1,5 @@
-#  Copyright (C) 2012,2013
-#      Max Planck Institute for Polymer Research
-#  Copyright (C) 2008,2009,2010,2011
-#      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+# Copyright (C) 2012-2016 Max Planck Institute for Polymer Research
+# Copyright (C) 2008-2011 Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 #  
 #  This file is part of ESPResSo++.
 #  
@@ -259,7 +257,7 @@ if pmi.isController:
         'The Lennard-Jones potential.'
         pmiproxydefs = dict(
             cls = 'espressopp.interaction.LJcosLocal',
-            pmiproperty = ['phi']
+            pmiproperty = ['phi','sigma']
         )
 
     class VerletListLJcos(Interaction):
