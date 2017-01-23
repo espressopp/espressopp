@@ -20,9 +20,9 @@
 
 
 r"""
-******************************
-**espressopp.FixedTripleList**
-******************************
+**************************
+espressopp.FixedTripleList
+**************************
 
 
 .. function:: espressopp.FixedTripleList(storage)

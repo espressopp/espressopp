@@ -20,9 +20,9 @@
 
 
 r"""
-*********************
-**espressopp.Real3D**
-*********************
+*****************
+espressopp.Real3D
+*****************
 
 
 .. function:: espressopp.__Real3D(\*args)

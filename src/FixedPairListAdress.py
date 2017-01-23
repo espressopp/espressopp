@@ -20,9 +20,9 @@
 
 
 r"""
-**************************************
-**FixedPairListAdress** - Object
-**************************************
+******************************
+espressopp.FixedPairListAdress
+******************************
 
 The FixedPairListAdress is the Fixed Pair List to be used for AdResS or H-AdResS
 simulations. When creating the FixedPairListAdress one has to provide the storage

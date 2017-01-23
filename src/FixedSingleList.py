@@ -20,9 +20,9 @@
 
 
 r"""
-******************************
-**espressopp.FixedSingleList**
-******************************
+**************************
+espressopp.FixedSingleList
+**************************
 
 
 .. function:: espressopp.FixedSingleList(storage)

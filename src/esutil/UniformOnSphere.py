@@ -20,9 +20,9 @@
 
 
 r"""
-*************************************
-**espressopp.esutil.UniformOnSphere**
-*************************************
+*********************************
+espressopp.esutil.UniformOnSphere
+*********************************
 
 
 """
@@ -42,4 +42,3 @@ if pmi.isController:
             cls = 'espressopp.esutil.UniformOnSphereLocal',
             localcall = [ '__call__' ],
             )
-

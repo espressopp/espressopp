@@ -20,9 +20,9 @@
 
 
 r"""
-*************************************************
-**espressopp.interaction.LennardJonesSoftcoreTI**
-*************************************************
+*********************************************
+espressopp.interaction.LennardJonesSoftcoreTI
+*********************************************
 
 This module is for performing simulations (e.g. as part of Thermodynamic Integration) where some Lennard-Jones interactions are a function of a parameter :math:`\lambda`, used to construct a pathway between states A and B.
 

@@ -22,9 +22,9 @@
 
 
 r"""
-************************************************************
-**espressopp.interaction.SingleParticlePotential**
-************************************************************
+**********************************************
+espressopp.interaction.SingleParticlePotential
+**********************************************
 
 This class is used to define single-particle interactions, typically used for
 external forces on the system.

@@ -20,9 +20,9 @@
 
 
 r"""
-**********************************************************
-**espressopp.interaction.AngularUniqueHarmonic**
-**********************************************************
+********************************************
+espressopp.interaction.AngularUniqueHarmonic
+********************************************
 
 Calculates the Angular Unique Harmonic interaction
 

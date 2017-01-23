@@ -20,9 +20,10 @@
 
 
 r"""
-*************************************
-**espressopp.interaction.SoftCosine**
-*************************************
+*********************************
+espressopp.interaction.SoftCosine
+*********************************
+
 This class provides methods to compute forces and energies ofthe SoftCosine potential.
 
 .. math::

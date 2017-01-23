@@ -18,7 +18,7 @@ import logging
 import copy
 import math
 from espressopp import Real3D, Int3D
-from espressopp.tools.convert import gromacs
+from espressopp.tools import gromacs
 from espressopp.tools import decomp
 from espressopp.tools import timers
 from espressopp.tools import pathintegral

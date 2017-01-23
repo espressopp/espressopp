@@ -20,9 +20,10 @@
 
 
 r"""
-********************************************
-**espressopp.interaction.Quartic**
-********************************************
+******************************
+espressopp.interaction.Quartic
+******************************
+
 This class provides methods to compute forces and energies of
 the Quartic potential.
 

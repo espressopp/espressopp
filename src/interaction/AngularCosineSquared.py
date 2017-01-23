@@ -20,24 +20,15 @@
 
 
 r"""
-***************************************************************************
-**espressopp.interaction.AngularCosineSquared**
-***************************************************************************
+*******************************************
+espressopp.interaction.AngularCosineSquared
+*******************************************
 
 Calculates the Angular Cosine Squared interaction
 
 .. math::
 
 	U =  K (cos(\theta) - cos(\theta_{0}))^2
-
-
-
-
-
-
-
-
-
 
 .. function:: espressopp.interaction.AngularCosineSquared(K, theta0)
 

@@ -20,9 +20,10 @@
 
 
 r"""
-********************************************************
-**espressopp.interaction.LennardJonesGeneric**
-********************************************************
+******************************************
+espressopp.interaction.LennardJonesGeneric
+******************************************
+
 This class provides methods to compute forces and energies of
 a generic Lennard Jones potential with arbitrary integers a and b.
 

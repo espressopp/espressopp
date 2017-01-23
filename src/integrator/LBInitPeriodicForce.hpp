@@ -1,7 +1,7 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012-2016
       Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
+  Copyright (C) 2008-2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
   
   This file is part of ESPResSo++.
@@ -32,9 +32,6 @@ namespace espressopp {
       LBInitPeriodicForce(shared_ptr<System> _system,
                           shared_ptr< LatticeBoltzmann > _latticeboltzmann);
 
-        /** Destructor for output. */
-/*        ~LBInitPeriodicForce ();
-*/
         void createDenVel (real _rho0, Real3D _u0);
 
         void setForce (Real3D _force);

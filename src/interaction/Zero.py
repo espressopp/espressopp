@@ -20,9 +20,10 @@
 
 
 r"""
-***************************************
-**espressopp.interaction.Zero**
-***************************************
+***************************
+espressopp.interaction.Zero
+***************************
+
 This class provides methods for a zero potential
 no interactions between particles, mainly used for debugging and testing
 

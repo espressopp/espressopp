@@ -39,9 +39,9 @@ import espressopp
 import mpi4py.MPI as MPI
 import logging
 from espressopp import Real3D, Int3D
-from espressopp.tools.convert import lammps
+from espressopp.tools import lammps
 from espressopp.tools import decomp
-from espressopp.tools.init_cfg import lattice
+from espressopp.tools import lattice
 from espressopp.tools import timers
 
 # logging.getLogger("Storage").setLevel(logging.INFO)

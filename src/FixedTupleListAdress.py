@@ -20,9 +20,9 @@
 
 
 r"""
-**************************************
-**FixedTupleListAdress** - Object
-**************************************
+*******************************
+espressopp.FixedTupleListAdress
+*******************************
 
 The FixedTupleListAdress is important for AdResS and H-AdResS simulations. It is the
 connection between the atomistic and coarse-grained particles. It defines which
