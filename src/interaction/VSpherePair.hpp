@@ -108,8 +108,8 @@ namespace espressopp {
     	real eh      = exp(mth*distSqr/sigmaij);
     	real fs      = ff1*pow(1.0L*sigmaij, 1.0L*mfh) * eh * (1 - 0.5*distSqr/sigmaij);
     	force        = ff1*pow(1.0L*sigmaij, 1.0L*mfh) * eh * dist;
-    	fsi          = fs * sigmai;
-    	fsj          = fs * sigmaj;
+    	//fsi          = fs * sigmai;
+    	//fsj          = fs * sigmaj;
     	return true;
       }
     };
