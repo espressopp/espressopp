@@ -79,6 +79,8 @@ namespace espressopp {
 
     void copyShifted(ParticlePosition& dst, const Real3D& shift) const {
       dst.p = p + shift;
+      dst.radius = radius;
+      dst.extVar = extVar;
     }
   private:
     friend class boost::serialization::access;
