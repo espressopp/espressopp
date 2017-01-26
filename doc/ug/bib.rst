@@ -1,5 +1,5 @@
-References
-==========
+Citations
+=========
 
 .. [frenkel02b]
 
