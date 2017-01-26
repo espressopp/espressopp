@@ -18,7 +18,6 @@ Welcome to the user documentation of ESPResSo++
    FAQ <faq>
    getting_help.rst
    team.rst
-   bib.rst
 
 .. |espp| replace:: ESPResSo++
 
