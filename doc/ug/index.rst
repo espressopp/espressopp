@@ -32,4 +32,4 @@ Welcome to the user documentation of ESPResSo++
 
 `Recent publications where ESPResSo++ was cited <https://scholar.google.com/scholar?cites=16263384330356203698&as_sdt=2005&sciodt=0,5&hl=en>`_
 
-.. image:: _static/MPIP_Logo.png
+.. image:: _static/mpi-p_logo.png
