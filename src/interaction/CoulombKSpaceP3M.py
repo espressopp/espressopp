@@ -20,10 +20,11 @@
 
 
 r"""
-*******************************************************************************************
-**CoulombKSpaceP3M** - Coulomb potential and interaction Objects (`K` space part)
-*******************************************************************************************
+***************************************
+espressopp.interaction.CoulombKSpaceP3M
+***************************************
 
+Coulomb potential and interaction Objects (`K` space part)
 
 This is the `K` space part of potential of Coulomb long range interaction according to the P3M
 summation technique. Good explanation of P3M summation could be found here [Allen89]_,

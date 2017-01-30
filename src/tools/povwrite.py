@@ -18,6 +18,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
+"""
+*****************************
+povwrite - write povray files
+*****************************
+"""
 
 import espressopp
 from espressopp import Real3D
@@ -246,5 +251,3 @@ def povwrite(system, integrator, filename, append=False, box=True):
     radius = r[pid]/2/g*f
     file.write("VMD_sphere(<%f,%f,%f>,%f,rgbt<%f,%f,%f>)\n"%(x,y,z,radius, red, green, blue)) 
     pid += 1
-
-

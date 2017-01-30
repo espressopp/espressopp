@@ -18,11 +18,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
-
 import sys
 import espressopp
 
 def info(system, integrator, per_atom=False):
+  """
+  reports on the simulation progress
+  """
   NPart  = espressopp.analysis.NPart(system).compute()
   T      = espressopp.analysis.Temperature(system).compute()
   P      = espressopp.analysis.Pressure(system).compute()
@@ -62,6 +64,9 @@ def info(system, integrator, per_atom=False):
   sys.stdout.write(tot)
 
 def final_info(system, integrator, vl, start_time, end_time):
+  """
+  final report on the simulation statistics
+  """
   NPart  = espressopp.analysis.NPart(system).compute()
   espressopp.tools.timers.show(integrator.getTimers(), precision=3)
   sys.stdout.write('Total # of neighbors = %d\n' % vl.totalSize())
@@ -69,4 +74,3 @@ def final_info(system, integrator, vl, start_time, end_time):
   sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
   sys.stdout.write('Integration steps = %d\n' % integrator.step)
   sys.stdout.write('CPUs = %i CPU time per CPU = %.5f\n' % (espressopp.MPI.COMM_WORLD.size, end_time - start_time))
-

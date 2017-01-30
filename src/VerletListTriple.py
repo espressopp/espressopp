@@ -20,9 +20,9 @@
 
 
 r"""
-*******************************
-**espressopp.VerletListTriple**
-*******************************
+***************************
+espressopp.VerletListTriple
+***************************
 
 
 .. function:: espressopp.VerletListTriple(system, cutoff, exclusionlist)

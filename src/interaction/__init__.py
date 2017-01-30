@@ -57,14 +57,15 @@ from espressopp.interaction.MirrorLennardJones import *
 
 from espressopp.interaction.HarmonicUnique import *
 
+from espressopp.interaction.AngularCosineSquared import *
+from espressopp.interaction.AngularHarmonic import *
 from espressopp.interaction.AngularPotential import *
+from espressopp.interaction.AngularUniqueCosineSquared import *
+from espressopp.interaction.AngularUniqueHarmonic import *
 from espressopp.interaction.AngularUniquePotential import *
 from espressopp.interaction.Cosine import *
+
 from espressopp.interaction.TabulatedAngular import *
-from espressopp.interaction.AngularHarmonic import *
-from espressopp.interaction.AngularUniqueHarmonic import *
-from espressopp.interaction.AngularCosineSquared import *
-from espressopp.interaction.AngularUniqueCosineSquared import *
 
 from espressopp.interaction.DihedralPotential import *
 from espressopp.interaction.DihedralUniquePotential import *

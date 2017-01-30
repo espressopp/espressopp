@@ -20,9 +20,10 @@
 
 
 r"""
-****************************************************
-**espressopp.interaction.TersoffPairTerm**
-****************************************************
+**************************************
+espressopp.interaction.TersoffPairTerm
+**************************************
+
 This class provides methods to compute forces and energies of
 2 body term of Tersoff potential.
 

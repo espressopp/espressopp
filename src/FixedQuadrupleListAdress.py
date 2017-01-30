@@ -22,9 +22,9 @@
 
 
 r"""
-***************************************
-**espressopp.FixedQuadrupleListAdress**
-***************************************
+***********************************
+espressopp.FixedQuadrupleListAdress
+***********************************
 
 
 .. function:: espressopp.FixedQuadrupleListAdress(storage, fixedtupleList)

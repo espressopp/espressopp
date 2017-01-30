@@ -22,9 +22,9 @@
 
 
 r"""
-******************************************************
-**espressopp.interaction.TabulatedDihedral**
-******************************************************
+****************************************
+espressopp.interaction.TabulatedDihedral
+****************************************
 
 Calculates energies and forces for a dihedral tabulated potential.
 In the tabulated potential file, angles should be in radians, and

@@ -20,9 +20,10 @@
 
 
 r"""
-******************************************
-**espressopp.interaction.Morse**
-******************************************
+****************************
+espressopp.interaction.Morse
+****************************
+
 This class provides methods to compute forces and energies of
 the Morse potential.
 

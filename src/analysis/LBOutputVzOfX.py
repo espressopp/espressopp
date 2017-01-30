@@ -1,6 +1,6 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012-2016
 #      Max Planck Institute for Polymer Research
-#  Copyright (C) 2008,2009,2010,2011
+#  Copyright (C) 2008-2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 #  
 #  This file is part of ESPResSo++.
@@ -20,43 +20,27 @@
 
 
 r"""
-***********************************************************************
-**LBOutputVzOfX** - controls output of the velocity component profile
-***********************************************************************
-Child class derived from the abstract class :class:`espressopp.analysis.LBOutput`. 
-It computes and outputs simulation progress (finished step) and controls flux 
+    
+Computes and outputs simulation progress (finished step) and controls flux
 conservation when using MD to LB coupling.
 
-.. function:: espressopp.analysis.LBOutputVzOfX(system,latticeboltzmann)
+.. py:class:: espressopp.analysis.LBOutputVzOfX(system,lb)
 
-	:param system: system object defined earlier in the python-script
-	:param latticeboltzmann: lattice boltzmann object defined earlier in the python-script
-	
-.. Note::
- 
-	this class should be called from external analysis class :class:`espressopp.integrator.ExtAnalyze`
-	with specified periodicity of invokation and after this added to the integrator. See an example for details.
-	
-Example to call the profiler:
+    :param shared_ptr system: system object defined earlier in the python-script
+    :param lb_object lb: lattice boltzmann object defined earlier in the python-script
 
->>> # initialise profiler (for example with the name outputVzOfX) with system and
->>> # lattice boltzmann objects as parameters:
+Example:
+
+>>> # initialise output of the Vz as a function of x-coordinate
 >>> outputVzOfX = espressopp.analysis.LBOutputVzOfX(system,lb)
 >>>
->>> # initialise external analysis object (for example extAnalysisNum3) with
->>> # previously created profiler and periodicity of invocation in steps:
->>> extAnalysisNum3=espressopp.integrator.ExtAnalyze(outputVzOfX,100)
+>>> # initialise external analysis object with previously created output object
+>>> # and periodicity of invocation (steps):
+>>> extAnalysis = espressopp.integrator.ExtAnalyze(outputVzOfX,100)
 >>>
 >>> # add the external analysis object as an extension to the integrator
->>> integrator.addExtension(extAnalysisNum3)
+>>> integrator.addExtension( extAnalysis )
 
-
-.. function:: espressopp.analysis.LBOutputVzOfX(system, latticeboltzmann)
-
-		:param system: 
-		:param latticeboltzmann: 
-		:type system: 
-		:type latticeboltzmann: 
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi

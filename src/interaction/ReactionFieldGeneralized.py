@@ -20,9 +20,10 @@
 
 
 r"""
-*************************************************************
-**espressopp.interaction.ReactionFieldGeneralized**
-*************************************************************
+***********************************************
+espressopp.interaction.ReactionFieldGeneralized
+***********************************************
+
 This class provides methods to compute forces and energies of
 the generalized reaction field.
 

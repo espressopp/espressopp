@@ -2,39 +2,38 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
-**************************************
-**PressureTensor** - Analysis
-**************************************
+**********************************
+espressopp.analysis.PressureTensor
+**********************************
 
 This class computes the pressure tensor of the system.
 It can be used as standalone class in python as well as
 in combination with the integrator extension ExtAnalyze.
 
-Standalone Usage:
------------------
+Example of standalone Usage:
 
 >>> pt = espressopp.analysis.PressureTensor(system)
 >>> print "pressure tensor of current configuration = ", pt.compute()
 
-or 
+or
 
 >>> pt = espressopp.analysis.PressureTensor(system)
 >>> for k in xrange(100):
@@ -42,8 +41,7 @@ or
 >>>     pt.performMeasurement()
 >>> print "average pressure tensor = ", pt.getAverageValue()
 
-Usage in integrator with ExtAnalyze:
-------------------------------------
+Example of usage in integrator with ExtAnalyze:
 
 >>> pt           = espressopp.analysis.PressureTensor(system)
 >>> extension_pt = espressopp.integrator.ExtAnalyze(pt , interval=100)
@@ -71,8 +69,8 @@ The following methods are supported:
 
 .. function:: espressopp.analysis.PressureTensor(system)
 
-		:param system: 
-		:type system: 
+		:param system:
+		:type system:
 """
 
 from espressopp.esutil import cxxinit

@@ -20,16 +20,15 @@
 
 
 r"""
-**************************************
-**CapForce** - Integrator Extension
-**************************************
+******************************
+espressopp.integrator.CapForce
+******************************
 
 This class can be used to forcecap all particles or a group of particles.
 Force capping means that the force vector of a particle is rescaled
 so that the length of the force vector is <= capforce  
 
 Example Usage:
------------------
 
 >>> capforce     = espressopp.integrator.CapForce(system, 1000.0)
 >>> integrator.addExtension(capForce)
@@ -39,9 +38,6 @@ CapForce can also be used to forcecap only a group of particles:
 >>> particle_group = [45, 67, 89, 103]
 >>> capforce       = espressopp.integrator.CapForce(system, 1000.0, particle_group)
 >>> integrator.addExtension(capForce)
-
-
-
 
 .. function:: espressopp.integrator.CapForce(system, capForce, particleGroup)
 

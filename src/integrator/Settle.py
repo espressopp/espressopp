@@ -20,9 +20,9 @@
 
 
 r"""
-**********************************
-**espressopp.integrator.Settle**
-**********************************
+****************************
+espressopp.integrator.Settle
+****************************
 
 
 .. function:: espressopp.integrator.Settle(system, fixedtuplelist, mO, mH, distHH, distOH)

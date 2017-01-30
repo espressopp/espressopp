@@ -1,3 +1,9 @@
+r"""
+*****************************************
+espressopp.integrator.AssociationReaction
+*****************************************
+"""
+
 from espressopp.esutil import cxxinit
 from espressopp import pmi
 

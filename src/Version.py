@@ -20,9 +20,9 @@
 
 
 r"""
-**************************************
-**Version** - Object
-**************************************
+******************
+espressopp.Version
+******************
 
 Return version information of espressopp module 
 
@@ -73,4 +73,3 @@ if pmi.isController:
             pmiproperty = ['major', 'minor', 'gitrevision', 'boostversion', 'patchlevel', 'date', 'time', 'name'],
             pmicall = ['info']
             )
-

@@ -20,9 +20,9 @@
 
 
 r"""
-***********************************
-**espressopp.esutil.NormalVariate**
-***********************************
+*******************************
+espressopp.esutil.NormalVariate
+*******************************
 
 
 .. function:: espressopp.esutil.NormalVariate(mean, sigma)
@@ -49,4 +49,3 @@ if pmi.isController:
             cls = 'espressopp.esutil.NormalVariateLocal',
             localcall = [ '__call__' ],
             )
-

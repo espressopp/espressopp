@@ -20,9 +20,9 @@
 
 r"""
 
-***********************************
-**PSF** - read and write psf format
-***********************************
+*******************************
+PSF - read and write psf format
+*******************************
 
 PSF file format given at http://www.ks.uiuc.edu/Training/Tutorials/namd/namd-tutorial-win-html/node24.html
 
@@ -47,7 +47,7 @@ PSF file format given at http://www.ks.uiuc.edu/Training/Tutorials/namd/namd-tut
 
   :param filename: input file name
   :type filename: string
-  Returns: pid,segname,resindex,resname,atomname,atomtype,mass,charge (lists of type int,str,int,str,str,str,float,float)
+  :returns: pid,segname,resindex,resname,atomname,atomtype,mass,charge (lists of type int,str,int,str,str,str,float,float)
 
 """
 
