@@ -46,7 +46,7 @@ various helper functions for setting up systems containing complex molecules suc
   
   Can then be used with RATTLE, e.g.
   
-  >>> rattle = espresso.integrator.Rattle(system, maxit = 1000, tol = 1e-6, rptol = 1e-6)
+  >>> rattle = espressopp.integrator.Rattle(system, maxit = 1000, tol = 1e-6, rptol = 1e-6)
   >>> rattle.addConstrainedBonds(constrainedBondsList)
   >>> integrator.addExtension(rattle)
 
@@ -111,6 +111,9 @@ various helper functions for setting up systems containing complex molecules suc
   >>> restraintR0 = {'aA':0.31,'baA':120.0,'aAB':90.0,'aABC':100.0,'cbaA':-170.0,'baAB':-105.0} #nm, degrees
 
 """
+
+import espressopp
+import math
 
 def findConstrainedBonds(atomPids, bondtypes, bondtypeparams, masses, massCutoff = 1.1):
 
@@ -192,39 +195,39 @@ def applyBoreschRestraints(system,restraintAtoms,restraintK,restraintR0):
 
   restraintinteraction = {}
 
-  restraintBond = espresso.FixedPairList(system.storage)
+  restraintBond = espressopp.FixedPairList(system.storage)
   restraintBond.addBonds([(restraintAtoms['a'],restraintAtoms['A'])])
-  potint=espresso.interaction.FixedPairListHarmonic(system, restraintBond, potential=espresso.interaction.Harmonic(K=0.5*restraintK['aA'],r0=restraintR0['aA'], cutoff = 5.0, shift = 0.0))
+  potint=espressopp.interaction.FixedPairListHarmonic(system, restraintBond, potential=espressopp.interaction.Harmonic(K=0.5*restraintK['aA'],r0=restraintR0['aA'], cutoff = 5.0, shift = 0.0))
   system.addInteraction(potint)
   restraintinteraction.update({0:potint})
   
-  restraintAngle = espresso.FixedTripleList(system.storage)
+  restraintAngle = espressopp.FixedTripleList(system.storage)
   restraintAngle.addTriples([(restraintAtoms['a'],restraintAtoms['A'],restraintAtoms['B'])])
-  potint=espresso.interaction.FixedTripleListAngularHarmonic(system, restraintAngle, potential=espresso.interaction.AngularHarmonic(K=0.5*restraintK['aAB'],theta0=restraintR0['aAB']*math.pi/180.0))
+  potint=espressopp.interaction.FixedTripleListAngularHarmonic(system, restraintAngle, potential=espressopp.interaction.AngularHarmonic(K=0.5*restraintK['aAB'],theta0=restraintR0['aAB']*math.pi/180.0))
   system.addInteraction(potint)
   restraintinteraction.update({1:potint})
   
-  restraintAngle = espresso.FixedTripleList(system.storage)
+  restraintAngle = espressopp.FixedTripleList(system.storage)
   restraintAngle.addTriples([(restraintAtoms['b'],restraintAtoms['a'],restraintAtoms['A'])])
-  potint=espresso.interaction.FixedTripleListAngularHarmonic(system, restraintAngle, potential=espresso.interaction.AngularHarmonic(K=0.5*restraintK['baA'],theta0=restraintR0['baA']*math.pi/180.0))
+  potint=espressopp.interaction.FixedTripleListAngularHarmonic(system, restraintAngle, potential=espressopp.interaction.AngularHarmonic(K=0.5*restraintK['baA'],theta0=restraintR0['baA']*math.pi/180.0))
   system.addInteraction(potint)
   restraintinteraction.update({2:potint})
   
-  restraintDih = espresso.FixedQuadrupleList(system.storage)
+  restraintDih = espressopp.FixedQuadrupleList(system.storage)
   restraintDih.addQuadruples([(restraintAtoms['c'],restraintAtoms['b'],restraintAtoms['a'],restraintAtoms['A'])])
-  potint=espresso.interaction.FixedQuadrupleListDihedralHarmonic(system, restraintDih, potential=espresso.interaction.DihedralHarmonic(K=restraintK['cbaA'],phi0=restraintR0['cbaA']*math.pi/180.0))
+  potint=espressopp.interaction.FixedQuadrupleListDihedralHarmonic(system, restraintDih, potential=espressopp.interaction.DihedralHarmonic(K=restraintK['cbaA'],phi0=restraintR0['cbaA']*math.pi/180.0))
   system.addInteraction(potint)
   restraintinteraction.update({3:potint})
   
-  restraintDih = espresso.FixedQuadrupleList(system.storage)
+  restraintDih = espressopp.FixedQuadrupleList(system.storage)
   restraintDih.addQuadruples([(restraintAtoms['b'],restraintAtoms['a'],restraintAtoms['A'],restraintAtoms['B'])])
-  potint=espresso.interaction.FixedQuadrupleListDihedralHarmonic(system, restraintDih, potential=espresso.interaction.DihedralHarmonic(K=restraintK['baAB'],phi0=restraintR0['baAB']*math.pi/180.0))
+  potint=espressopp.interaction.FixedQuadrupleListDihedralHarmonic(system, restraintDih, potential=espressopp.interaction.DihedralHarmonic(K=restraintK['baAB'],phi0=restraintR0['baAB']*math.pi/180.0))
   system.addInteraction(potint)
   restraintinteraction.update({4:potint})
   
-  restraintDih = espresso.FixedQuadrupleList(system.storage)
+  restraintDih = espressopp.FixedQuadrupleList(system.storage)
   restraintDih.addQuadruples([(restraintAtoms['a'],restraintAtoms['A'],restraintAtoms['B'],restraintAtoms['C'])])
-  potint=espresso.interaction.FixedQuadrupleListDihedralHarmonic(system, restraintDih, potential=espresso.interaction.DihedralHarmonic(K=restraintK['aABC'],phi0=restraintR0['aABC']*math.pi/180.0))
+  potint=espressopp.interaction.FixedQuadrupleListDihedralHarmonic(system, restraintDih, potential=espressopp.interaction.DihedralHarmonic(K=restraintK['aABC'],phi0=restraintR0['aABC']*math.pi/180.0))
   system.addInteraction(potint)
   restraintinteraction.update({5:potint})
 
