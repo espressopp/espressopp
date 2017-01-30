@@ -26,6 +26,14 @@ r"""
 **espressopp.interaction.TabulatedDihedral**
 ******************************************************
 
+Calculates energies and forces for a dihedral tabulated potential.
+In the tabulated potential file, angles should be in radians, and
+the file should cover the range -pi radians to +pi radians (-180 to
++180 degrees).
+
+Note that this class has only been tested for symmetric tabulated
+potentials.
+
 .. function:: espressopp.interaction.TabulatedDihedral(itype, filename)
 
         :param itype: The interpolation type: 1 - linear, 2 - akima spline, 3 - cubic spline
