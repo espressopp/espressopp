@@ -19,6 +19,10 @@ Welcome to the user documentation of ESPResSo++
    getting_help.rst
    team.rst
 
+   doxygen 
+
+   pdf
+
 .. |espp| replace:: ESPResSo++
 
 **Please cite this, if you used ESPResSo++ in your research**
