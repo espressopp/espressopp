@@ -51,11 +51,11 @@ class TestPythonTools(unittest.TestCase):
 
     def test_self_excl_energy(self):
 
-        exclusions = []
+        exclusions = [(1,2),(1,3),(4,5),(4,6)]
         energy = espressopp.tools.energy.getSelfExclEnergyReactionField(self.system,exclusions,prefactor=1.0,epsilon1=1,epsilon2=80,rc=3.0,pidlist=[3,4,5,6])
-        self.assertAlmostEqual(energy,-0.1962732919254,places=5)
+        self.assertAlmostEqual(energy,-0.1231021394065,places=5)
         energy = espressopp.tools.energy.getSelfExclEnergyReactionField(self.system,exclusions,prefactor=1.0,epsilon1=1,epsilon2=80,rc=3.0,nParticles=6)
-        self.assertAlmostEqual(energy,-0.2608695652173,places=5)
+        self.assertAlmostEqual(energy,-0.1436881757534,places=5)
 
 
 if __name__ == '__main__':
