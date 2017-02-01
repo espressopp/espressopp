@@ -1,2 +1,2 @@
-.. automodule:: espressopp.tools.convert.units
+.. automodule:: espressopp.tools.units
    :members:

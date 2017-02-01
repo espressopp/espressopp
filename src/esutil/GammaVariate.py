@@ -20,9 +20,9 @@
 
 
 r"""
-**********************************
-**espressopp.esutil.GammaVariate**
-**********************************
+******************************
+espressopp.esutil.GammaVariate
+******************************
 
 
 .. function:: espressopp.esutil.GammaVariate(alpha, beta)
@@ -49,4 +49,3 @@ if pmi.isController:
             cls = 'espressopp.esutil.GammaVariateLocal',
             localcall = [ '__call__' ],
             )
-

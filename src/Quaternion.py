@@ -20,9 +20,9 @@
 
 
 """
-***************************
-**espressopp.Quaternion**
-***************************
+*********************
+espressopp.Quaternion
+*********************
 
 This class provides quaternions with the associate methods. 
 Quaternions can be used as an efficient representation for the orientation 
@@ -39,10 +39,7 @@ in the simulation code, they will be used at the C++-level in order to per-
 form the integration of the Euler equations of motion regarding the partic-
 les angular motion, i.e. the rigid body dynamics.
 
-
-
-Usage:
-------
+**Usage:**
 
 The following methods from C++-level are available at the python-level:
 
@@ -71,13 +68,9 @@ The multiplication operator is overloaded in order to perform quaternion
 multiplication, see examples below. Furthermore, it is possible to multi-
 ply a quaternion with a scalar, in order to rescale it.
 
+**Examples:**
 
-Examples:
----------
-
-
-Initialize:
------------
+**Initialize:**
 
 >>> espressopp.Quaternion()
 Quaternion(0.0, Real3D(0.0, 0.0, 0.0)) 
@@ -93,8 +86,7 @@ Quaternion(0.0, Real3D(1.0, 2.0, 3.0))
 Quaternion(1.0, Real3D(0.0, 0.0, 0.0))
 
 
-Get:
-----
+**Get:**
 
 >>> q = espressopp.Quaternion(0.0, 1.0, 2.0, 3.0)
 >>> q.getReal()
@@ -105,8 +97,7 @@ Real3D(1.0, 2.0, 3.0)
 1.0
 
 
-Set:
-----
+**Set:**
 
 >>> q = espressopp.Quaternion(0.0, 0.0, 0.0, 0.0)
 >>> q.setReal(1.0)
@@ -118,8 +109,7 @@ Quaternion(1.0, Real3D(1.0, 2.0, 3.0))
 Quaternion(1.0, Real3D(0.0, 2.0, 3.0))
 
 
-Transpose and normalize:
-------------------------
+**Transpose and normalize:**
 
 >>> q = Quaternion(0.0, 1.0, 2.0, 3.0) 
 >>> q.transpose()
@@ -129,8 +119,7 @@ Quaternion(0.0, Real3D(-1.0, -2.0, -3.0))
 Quaternion(0.0, Real3D(0.2672612419124244, 0.5345224838248488, 0.8017837257372732))
 
 
-Inner product and absolute value:
----------------------------------
+**Inner product and absolute value:**
 
 >>> q = Quaternion(0.0, 1.0, 2.0, 3.0) 
 >>> q.sqr()
@@ -139,19 +128,13 @@ Inner product and absolute value:
 3.7416573867739413
 
 
-Quaternion multiplication (compare, e.g., wikipedia):
------------------------------------------------------
+**Quaternion multiplication (compare, e.g., wikipedia):**
 
 >>> p = Quaternion(0.0, 1.0, 2.0, 3.0)
 >>> q = Quaternion(0.0, 1.0, 2.0, 3.0)
 Quaternion(-14.0, Real3D(0.0, 0.0, 0.0))
 
 """
-
-
-
-
-
 
 from _espressopp import Quaternion
 from _espressopp import Real3D

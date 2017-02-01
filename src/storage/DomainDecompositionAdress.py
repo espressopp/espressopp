@@ -20,9 +20,9 @@
 
 
 r"""
-****************************************
-**DomainDecompositionAdress** - Object
-****************************************
+********************************************
+espressopp.storage.DomainDecompositionAdress
+********************************************
 
 The DomainDecompositionAdress is the Domain Decomposition for AdResS and H-
 AdResS simulations. It makes sure that tuples (i.e. a coarse-grained particle

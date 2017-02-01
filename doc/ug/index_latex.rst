@@ -38,4 +38,3 @@ are different software packages.
    FAQ <faq>
    getting_help.rst
    team.rst
-   bib.rst

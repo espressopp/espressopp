@@ -18,21 +18,16 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
-"""
-**************************************
-**replicate** - replicate polymer melt
-**************************************
-"""
 
-def replicate(bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1):
+def replicate (bonds, angles, x, y, z, Lx, Ly, Lz, xdim=1, ydim=1, zdim=1):
   """
+  Replicates configuration in each dimension. 
+  
+  This may be used to increase the size of an equilibrated melt by a factor of 8 or more.
+
   Presently this routine works only for semiflexible polymers. A general
   class should be written to deal with files containing coordinates
   and topology data.
-
-  This method takes the current configuration and replicates
-  it by some number of boxes in each dimension. This may be used to
-  increase the size of an equilibrated melt by a factor of 8 or more.
 
   xdim = ydim = zdim = 1 returns the original system not replicated.
   xdim = ydim = zdim = 2 returns the original system replicated to 8x.

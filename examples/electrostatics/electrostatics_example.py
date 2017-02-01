@@ -33,7 +33,7 @@ rho = 0.03              # number density of particles, number of particles devid
 
 # creating a cubic NaCl crystal
 #print 'Creating a simple cubic structure...'
-x, y, z, Lx, Ly, Lz = espressopp.tools.init_cfg.lattice.createCubic(num_particles, rho, False)
+x, y, z, Lx, Ly, Lz = espressopp.tools.lattice.createCubic(num_particles, rho, False)
 
 # creating the system box
 box = (Lx, Ly, Lz)

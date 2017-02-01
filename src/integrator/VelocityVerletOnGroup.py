@@ -20,9 +20,9 @@
 
 
 r"""
-***********************************************
-**espressopp.integrator.VelocityVerletOnGroup**
-***********************************************
+*******************************************
+espressopp.integrator.VelocityVerletOnGroup
+*******************************************
 
 
 .. function:: espressopp.integrator.VelocityVerletOnGroup(system, group)

@@ -19,9 +19,9 @@
 
 r"""
 
-*********************************************
-**prepareComplexMolecules** - set up proteins
-*********************************************
+*****************************************
+prepareComplexMolecules - set up proteins
+*****************************************
 
 various helper functions for setting up systems containing complex molecules such as proteins
 
@@ -31,11 +31,11 @@ various helper functions for setting up systems containing complex molecules suc
   
   :param atomPids: list of pids of atoms between which to search for bonds
   :type atomPids: list of int
-  :param bondtypes: dictionary mapping from tuple of pids to bondtypeid, e.g. as returned by tools.convert.gromacs.read()
+  :param bondtypes: dictionary mapping from tuple of pids to bondtypeid, e.g. as returned by tools.gromacs.read()
   :type bondtypes: dict, key: (int,int), value: int
-  :param bondtypeparams: dictionary mapping from bondtypeid to class storing parameters of that bond type, e.g. as returned by tools.convert.gromacs.read()
+  :param bondtypeparams: dictionary mapping from bondtypeid to class storing parameters of that bond type, e.g. as returned by tools.gromacs.read()
   :type bondtypeparams: dict, key: int, value: espressopp bond type
-  :param masses: list of masses, e.g. as returned by tools.convert.gromacs.read()
+  :param masses: list of masses, e.g. as returned by tools.gromacs.read()
   :type masses: list of float
   :param massCutoff: for identifying light atoms (hydrogens), default 1.1 mass units, can also be increased e.g. for use with deuterated systems
   :type massCutoff: float

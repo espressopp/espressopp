@@ -5,4 +5,3 @@ bc
    :maxdepth: 2
    
    espressopp.bc.BC.rst
-   espressopp.bc.OrthorhombicBC.rst

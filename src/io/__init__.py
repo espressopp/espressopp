@@ -22,6 +22,6 @@
 from espressopp.esutil import pmiimport
 pmiimport('espressopp.io')
 
-from espressopp.io.DumpXYZ import *
 from espressopp.io.DumpGRO import *
 from espressopp.io.DumpGROAdress import *
+from espressopp.io.DumpXYZ import *

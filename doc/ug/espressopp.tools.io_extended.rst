@@ -1,2 +1,2 @@
-.. automodule:: espressopp.tools.convert.io_extended
+.. automodule:: espressopp.tools.io_extended
    :members:

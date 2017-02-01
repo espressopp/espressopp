@@ -3,27 +3,27 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#
 #  This file is part of ESPResSo++.
-#  
+#
 #  ESPResSo++ is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
 #  (at your option) any later version.
-#  
+#
 #  ESPResSo++ is distributed in the hope that it will be useful,
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  
+#
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 r"""
-*************************************
-**espressopp.analysis.TotalVelocity**
-*************************************
+*********************************
+espressopp.analysis.TotalVelocity
+*********************************
 
 
 .. function:: espressopp.analysis.TotalVelocity(system)
@@ -41,20 +41,16 @@ r"""
 
         Subtract the total velocity of the system from every particle.
 
-Examples
----------
 
-Reset the velocity
-++++++++++++++++++++
+Example of resetting velocity
 
 >>> total_velocity = espressopp.analysis.TotalVelocity(system)
 >>> total_velocity.reset()
 
-Extension to integrator
-++++++++++++++++++++++++++++++++++++++++++++
+Example of attaching to integrator
 
-This extension can also be attached to integrator and run `reset()` every `n-th` steps.
-
+>>> # This extension can be attached to integrator
+>>> # and run `reset()` every `n-th` steps.
 >>> total_velocity = espressopp.analysis.TotalVelocity(system)
 >>> ext_remove_com = espressopp.analysis.ExtAnalyze(total_velocity, 10)
 >>> integrator.addExtension(ext_remove_com)

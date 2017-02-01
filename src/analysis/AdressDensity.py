@@ -18,9 +18,9 @@
 
 
 r"""
-********************************
-**espressopp.analysis.AdressDensity**
-********************************
+*********************************
+espressopp.analysis.AdressDensity
+*********************************
 
 Class to compute radial density profiles in adaptive resolution simulations based on distance to closest AdResS center. Works also for multiple overlapping AdResS regions.
 

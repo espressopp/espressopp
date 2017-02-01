@@ -20,9 +20,10 @@
 
 
 r"""
-******************************************************
-**espressopp.interaction.TersoffTripleTerm**
-******************************************************
+****************************************
+espressopp.interaction.TersoffTripleTerm
+****************************************
+
 This class provides methods to compute forces and energies of
 the Tersoff Triple Term potential.
 

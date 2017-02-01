@@ -20,9 +20,9 @@
 
 
 r"""
-************************************
-**espressopp.analysis.RDFatomistic**
-************************************
+********************************
+espressopp.analysis.RDFatomistic
+********************************
 
 Class to compute radial distribution functions in adaptive resolution simulations in subregions of the box.
 

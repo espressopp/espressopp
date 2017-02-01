@@ -20,10 +20,12 @@
 
 
 r"""
-*********************************************************************************************
-**CoulombKSpaceEwald** - Coulomb potential and interaction Objects (`K` space part)
-*********************************************************************************************
+*****************************************
+espressopp.interaction.CoulombKSpaceEwald
+*****************************************
 
+Coulomb potential and interaction Objects (`K` space part)
+ 
 .. math::
 
 	\frac{1}{2\pi V} 

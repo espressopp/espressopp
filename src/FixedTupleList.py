@@ -20,9 +20,9 @@
 
 
 r"""
-*****************************
-**espressopp.FixedTupleList**
-*****************************
+*************************
+espressopp.FixedTupleList
+*************************
 
 
 .. function:: espressopp.FixedTupleList(storage)

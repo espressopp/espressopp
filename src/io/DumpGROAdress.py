@@ -20,9 +20,9 @@
 
 
 r"""
-*********************************************
-**DumpGROAdress** - IO Object
-*********************************************
+***************************
+espressopp.io.DumpGROAdress
+***************************
 
 dumps coordinates of atomistic particles instead of coarse-grained particles in Adress simulation
 

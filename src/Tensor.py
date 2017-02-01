@@ -20,9 +20,9 @@
 
 
 r"""
-*********************
-**espressopp.Tensor**
-*********************
+*****************
+espressopp.Tensor
+*****************
 """
 from _espressopp import Tensor
 from espressopp import esutil

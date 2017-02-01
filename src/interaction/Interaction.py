@@ -20,9 +20,10 @@
 
 
 r"""
-************************************************
-**espressopp.interaction.Interaction**
-************************************************
+**********************************
+espressopp.interaction.Interaction
+**********************************
+
 This is an abstract class, only needed to be inherited from.
 
 

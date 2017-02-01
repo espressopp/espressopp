@@ -20,9 +20,9 @@
 
 
 r"""
-************************************************
-**espressopp.integrator.VelocityVerletOnRadius**
-************************************************
+********************************************
+espressopp.integrator.VelocityVerletOnRadius
+********************************************
 
 
 .. function:: espressopp.integrator.VelocityVerletOnRadius(system, dampingmass)

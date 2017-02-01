@@ -20,9 +20,12 @@
 
 
 r"""
-****************************************************************************************
-**CoulombRSpace** - Coulomb potential and interaction Objects (`R` space part)
-****************************************************************************************
+************************************
+espressopp.interaction.CoulombRSpace
+************************************
+
+Coulomb potential and interaction Objects (`R` space part)
+
 .. math::
 	\sum^{N}_{i=1}
 	\sum_{j>i \atop r_{ij}<k_{max}}

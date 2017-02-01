@@ -21,9 +21,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 r"""
-*************************************************
-**espressopp.interaction.HarmonicTrap**
-*************************************************
+***********************************
+espressopp.interaction.HarmonicTrap
+***********************************
 
 .. math::
 

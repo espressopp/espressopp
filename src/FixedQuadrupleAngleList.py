@@ -20,9 +20,9 @@
 
 
 r"""
-**************************************
-**espressopp.FixedQuadrupleAngleList**
-**************************************
+**********************************
+espressopp.FixedQuadrupleAngleList
+**********************************
 
 
 .. function:: espressopp.FixedQuadrupleAngleList(storage)
