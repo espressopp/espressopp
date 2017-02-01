@@ -35,7 +35,7 @@ def dot(u,v):
 
 def calc_dihedral(self,quadrupleslist):
     #quadrupleslist contains [i,j,k,n]
-    #returns torsional angle according to IUPAC convention
+    #returns torsional angle according to IUPAC convention (same convention as used in espressopp, dlpoly, gromacs, vmd, etc.)
 
     positions = []
     for pid in quadrupleslist:
@@ -124,6 +124,10 @@ class TestDihedralHarmonic(unittest.TestCase):
         self.assertAlmostEqual(interactions[0].computeEnergy(),0.747885,places=5)
         self.assertAlmostEqual(interactions[1].computeEnergy(),0.099570,places=5)
         self.assertAlmostEqual(interactions[2].computeEnergy(),0.099570,places=5)
+
+        self.assertAlmostEqual(calc_dihedral(self,quadrupleslist[0]),1.397549,places=5)
+        self.assertAlmostEqual(calc_dihedral(self,quadrupleslist[1]),2.869874,places=5)
+        self.assertAlmostEqual(calc_dihedral(self,quadrupleslist[2]),-2.869874,places=5)
 
 
 if __name__ == '__main__':
