@@ -13,7 +13,6 @@
 
 import sys, os
 import datetime
-import sphinx_rtd_theme
 
 # Gets version directly from the code
 try:
@@ -48,7 +47,7 @@ extensions = ['sphinx.ext.mathjax',
 # Not yet: numpydoc
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+#templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -118,7 +117,7 @@ pygments_style = 'sphinx'
 #html_theme = 'basic'
 # Find sphinx_rtd_theme package
 html_theme = 'sphinx_rtd_theme'
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_theme_path = ["_themes", ]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
