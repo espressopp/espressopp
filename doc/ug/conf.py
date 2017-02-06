@@ -15,13 +15,17 @@ import sys, os
 import datetime
 
 # Gets version directly from the code
-try:
-    import espressopp
-    ver = espressopp.Version()
-    ESPP_VERSION = '{}.{}.{}'.format(
-        ver.major, ver.minor, ver.patchlevel)
-except ImportError:
-    ESPP_VERSION = 'X.X.X'
+on_espp_server = os.environ.get('HOME')=='home/espressopp'
+if on_espp_server:
+    try:
+        import espressopp
+        ver = espressopp.Version()
+        ESPP_VERSION = 'Release {}.{}.{}'.format(
+            ver.major, ver.minor, ver.patchlevel)
+    except ImportError:
+        ESPP_VERSION = 'Release X.X.X'
+else:
+    ESPP_VERSION = 'latest'
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
