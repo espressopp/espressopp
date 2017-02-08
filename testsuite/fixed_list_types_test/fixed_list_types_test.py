@@ -159,7 +159,7 @@ class TestFixedQuadrupleListTypesTabulated(ESPPTestCase):
         # Create table.
         tab1 = open('table_d1.pot', 'w')
         tab1.writelines([
-            '{} {} 1.0\n'.format(x / 180.0 * math.pi, float(i)) for i, x in enumerate([0, 45.0, 90.0, 135.0])
+            '{} {} 1.0\n'.format(x / 180.0 * math.pi, abs(i)) for i, x in zip([3,2,1,0,1,2,3],[-135.0, -90.0, -45.0, 0, 45.0, 90.0, 135.0])
         ])
         tab1.close()
 

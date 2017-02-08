@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -241,6 +241,11 @@ namespace espressopp {
         else if (cos_phi < -1.0) cos_phi = -1.0;
         
         real phi = acos(cos_phi);
+        //get sign of phi
+        //positive if (rij x rjk) x (rjk x rkn) is in the same direction as rjk, negative otherwise (see DLPOLY manual)
+        Real3D rcross = rijjk.cross(rjkkn); //(rij x rjk) x (rjk x rkn)
+        real signcheck = rcross * r32;
+        if (signcheck < 0.0) phi *= -1.0;
         
         return _computeEnergy(phi);
       
