@@ -160,8 +160,7 @@ html_favicon = "_static/favicon_blue.ico"
 #html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-html_sidebars = {
-    '**': ['globaltoc.html', 'custom_links_sidebar.html', 'searchbox.html'], }
+#html_sidebars = { '**': ['globaltoc.html', 'custom_links_sidebar.html', 'searchbox.html'] }
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -203,7 +202,7 @@ latex_paper_size = 'a4'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index_latex', 'ESPResSo++.tex', u'ESPResSo++ Documentation',
-   u'Torsten Stuehn', 'manual'),
+   u'Developer team', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
