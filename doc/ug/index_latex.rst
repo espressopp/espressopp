@@ -34,3 +34,4 @@ are different software packages.
    instalation.rst
    tutorial.rst
    classdescription.rst
+   credits.rst

@@ -19,6 +19,8 @@ Welcome to the user documentation of ESPResSo++
 
    pdf
 
+   credits.rst
+
 .. |espp| replace:: ESPResSo++
 
 **Please cite this, if you used ESPResSo++ in your research**
