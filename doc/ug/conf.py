@@ -13,16 +13,19 @@
 
 import sys, os
 import datetime
-import sphinx_rtd_theme
 
 # Gets version directly from the code
-try:
-    import espressopp
-    ver = espressopp.Version()
-    ESPP_VERSION = '{}.{}.{}'.format(
-        ver.major, ver.minor, ver.patchlevel)
-except ImportError:
-    ESPP_VERSION = 'X.X.X'
+on_espp_server = os.environ.get('HOME')=='home/espressopp'
+if on_espp_server:
+    try:
+        import espressopp
+        ver = espressopp.Version()
+        ESPP_VERSION = 'Release {}.{}.{}'.format(
+            ver.major, ver.minor, ver.patchlevel)
+    except ImportError:
+        ESPP_VERSION = 'Release X.X.X'
+else:
+    ESPP_VERSION = 'latest'
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -48,7 +51,7 @@ extensions = ['sphinx.ext.mathjax',
 # Not yet: numpydoc
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+#templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -118,7 +121,7 @@ pygments_style = 'sphinx'
 #html_theme = 'basic'
 # Find sphinx_rtd_theme package
 html_theme = 'sphinx_rtd_theme'
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_theme_path = ["_themes", ]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -137,7 +140,7 @@ html_title = '{} v{}'.format(project, version)
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = '_static/logo_theory_group_200x48.png'
+html_logo = '_static/logo_theory_group.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32

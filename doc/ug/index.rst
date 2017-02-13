@@ -11,17 +11,15 @@ Welcome to the user documentation of ESPResSo++
    :maxdepth: 2
    :titlesonly:
 
-   overview.rst
    instalation.rst
    tutorial.rst
    classdescription.rst
-   FAQ <faq>
-   getting_help.rst
-   team.rst
 
    doxygen 
 
    pdf
+
+   credits.rst
 
 .. |espp| replace:: ESPResSo++
 
