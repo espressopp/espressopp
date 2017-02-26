@@ -47,6 +47,7 @@ namespace espressopp {
     real lambda;
     real drift;
     real lambdaDeriv;
+    int isFixed;
     int state;
   private:
     friend class boost::serialization::access;
@@ -60,6 +61,7 @@ namespace espressopp {
       ar & lambda;
       ar & drift;
       ar & lambdaDeriv;
+      ar & isFixed;
       ar & state;
     }
   };
@@ -197,6 +199,7 @@ namespace espressopp {
       p.lambda       = 0.0;
       p.drift        = 0.0;      
       p.lambdaDeriv  = 0.0;
+      p.isFixed      = -1; //default to adaptive resolution
       r.extVar       = 0.0;      
       p.state        = 0;
     }
@@ -286,6 +289,12 @@ namespace espressopp {
     const bool& ghost() const { return l.ghost; }
     bool getGhostStatus() const { return l.ghost; }
     void setGhostStatus(const bool& gs) { l.ghost = gs; }
+   
+    //used for specifying whether a particle is adaptive resolution (-1), fixed atomistic (1) or fixed coarse-grained (0) 
+    int& isFixed() { return p.isFixed; }
+    const int& isFixed() const { return p.isFixed; }
+    int getFixedStatus() const { return p.isFixed; }
+    void setFixedStatus(const int& gs) { p.isFixed = gs; }
     
     // weight/lambda (used in H-Adress)
     real& lambda() { return p.lambda; }

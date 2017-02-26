@@ -245,6 +245,7 @@ class StorageLocal(object):
             index_adrAT       = -1 # adress AT particle if 1
             index_lambda_adr  = -1
             index_lambda_adrd = -1
+            index_isFixed     = -1 # fixed particle in adres simulation if 0 or 1 (where 0 or 1 is the fixed value of lambda)
             index_state       = -1
             
             last_pos = toReal3DFromVector([-99,-99,-99])
@@ -270,6 +271,7 @@ class StorageLocal(object):
                     elif val.lower() == "adrat": index_adrAT = nindex
                     elif val.lower() == "lambda_adr": index_lambda_adr = nindex
                     elif val.lower() == "lambda_adrd": index_lambda_adrd = nindex
+                    elif val.lower() == "isfixed": index_isFixed = nindex
                     elif val.lower() == "state": index_state = nindex
                     else: raise SyntaxError("unknown particle property: %s"%val)
                     nindex += 1
@@ -312,7 +314,7 @@ class StorageLocal(object):
                     
                 if storedParticle != None:
                     self.logger.debug("Processor %d stores particle id = %d"%(pmi.rank, id))
-                    self.logger.debug("particle property indexes: id=%i pos=%i type=%i mass=%i v=%i f=%i q=%i radius=%i lambda_adr=%i lambda_adrd=%i state=%i"%(index_id,index_pos,index_type,index_mass,index_v,index_f,index_q,index_radius,index_lambda_adr,index_lambda_adrd,index_state))
+                    self.logger.debug("particle property indexes: id=%i pos=%i type=%i mass=%i v=%i f=%i q=%i radius=%i lambda_adr=%i lambda_adrd=%i isFixed=%i state=%i"%(index_id,index_pos,index_type,index_mass,index_v,index_f,index_q,index_radius,index_lambda_adr,index_lambda_adrd,index_isFixed,index_state))
 
                     # only the owner processor writes other properties
 
@@ -346,6 +348,9 @@ class StorageLocal(object):
                     if index_lambda_adrd >= 0:
                         storedParticle.lambda_adrd = particle[index_lambda_adrd]
 
+                    if index_isFixed >= 0:
+                        storedParticle.isFixed = particle[index_isFixed]
+ 
                     if index_state >= 0:
                         storedParticle.state = particle[index_state]
  
@@ -372,6 +377,7 @@ class StorageLocal(object):
                   elif property.lower() == "vradius" : particle.vradius = value
                   elif property.lower() == "lambda_adr" : particle.lambda_adr = value
                   elif property.lower() == "lambda_adrd" : particle.lambda_adrd = value
+                  elif property.lower() == "isfixed" : particle.isFixed = value
                   elif property.lower() == "state" : particle.state = value
                   else: raise SyntaxError( 'unknown particle property: %s' % property) # UnknownParticleProperty exception is not implemented
               #except ParticleDoesNotExistHere:

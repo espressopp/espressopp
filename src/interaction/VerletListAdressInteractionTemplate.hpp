@@ -512,9 +512,12 @@ namespace espressopp {
       for (std::set<Particle*>::iterator it=cgZone.begin();
           it != cgZone.end(); ++it) {
 
-      Particle &vp = **it;
-      vp.lambda() = 0.0;
-      //weights.insert(std::make_pair(&vp, 0.0));
+          Particle &vp = **it;
+          if (vp.isFixed()==1) { //fixed atomistic though located in CG region
+            vp.lambda() = 1.0;
+          } else { //fixed coarse-grained or adaptive coarse-grained
+            vp.lambda() = 0.0;
+          }
       }
 
       std::set<Particle*> adrZone = verletList->getAdrZone();
@@ -556,50 +559,56 @@ namespace espressopp {
               vp.position() = cmp;
               vp.velocity() = cmv;
 
-              // calculate distance to nearest adress particle or center
-              std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
-              Real3D pa = **it2; // position of adress particle
-              Real3D d1;
-              verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
-              // set min1sq before loop
-              real min1sq;
-              if (verletList->getAdrRegionType()) { // spherical adress region
-                min1sq = d1.sqr();
-              } else { //slab-type adress region
-                min1sq = d1[0]*d1[0];
-              }
-              ++it2;
-              for (; it2 != verletList->getAdrPositions().end(); ++it2) {
-                   pa = **it2;
-                   verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
-                   real distsq1;
-                   if (verletList->getAdrRegionType()) { // spherical adress region
-                     distsq1 = d1.sqr();
-                   } else { //slab-type adress region
-                     distsq1 = d1[0]*d1[0];
-                   }
-                   if (distsq1 < min1sq) min1sq = distsq1;
-              }
+              if (vp.isFixed()<0) { //adaptive resolution particle
+                  // calculate distance to nearest adress particle or center
+                  std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
+                  Real3D pa = **it2; // position of adress particle
+                  Real3D d1;
+                  verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
+                  // set min1sq before loop
+                  real min1sq;
+                  if (verletList->getAdrRegionType()) { // spherical adress region
+                    min1sq = d1.sqr();
+                  } else { //slab-type adress region
+                    min1sq = d1[0]*d1[0];
+                  }
+                  ++it2;
+                  for (; it2 != verletList->getAdrPositions().end(); ++it2) {
+                       pa = **it2;
+                       verletList->getSystem()->bc->getMinimumImageVector(d1, vp.position(), pa);
+                       real distsq1;
+                       if (verletList->getAdrRegionType()) { // spherical adress region
+                         distsq1 = d1.sqr();
+                       } else { //slab-type adress region
+                         distsq1 = d1[0]*d1[0];
+                       }
+                       if (distsq1 < min1sq) min1sq = distsq1;
+                  }
 
-              //std::cout << vp.id() << " min: " << min1 << "\n";
-              //std::cout << vp.id() << " dex: " << dex << "\n";
-              //std::cout << vp.id() << " dex+dhy: " << dexdhy << "\n";
+                  //std::cout << vp.id() << " min: " << min1 << "\n";
+                  //std::cout << vp.id() << " dex: " << dex << "\n";
+                  //std::cout << vp.id() << " dex+dhy: " << dexdhy << "\n";
 
-              // calculate weight and write it in the map
-              real w;
-              if (dex2 > min1sq) w = 1;
-              else if (dexdhy2 < min1sq) w = 0;
-              else {
-                   w = cos(pidhy2 * (sqrt(min1sq) - dex));
-                   w *= w;
-                   // real argument = sqrt(min1sq) - dex;
-                   // w = 1.0-(30.0/(pow(dhy, 5.0)))*(1.0/5.0*pow(argument, 5.0)-dhy/2.0*pow(argument, 4.0)+1.0/3.0*pow(argument, 3.0)*dhy*dhy);
+                  // calculate weight and write it in the map
+                  real w;
+                  if (dex2 > min1sq) w = 1;
+                  else if (dexdhy2 < min1sq) w = 0;
+                  else {
+                       w = cos(pidhy2 * (sqrt(min1sq) - dex));
+                       w *= w;
+                       // real argument = sqrt(min1sq) - dex;
+                       // w = 1.0-(30.0/(pow(dhy, 5.0)))*(1.0/5.0*pow(argument, 5.0)-dhy/2.0*pow(argument, 4.0)+1.0/3.0*pow(argument, 3.0)*dhy*dhy);
+                  }
+                  vp.lambda() = w;
+                  //weights.insert(std::make_pair(&vp, w));
+
+                  //if (w1 == 1 || w2 == 1) std::cout << p1.id() << " ";
+                  //std::cout << vp.id() << " weight: " << w << "\n";
               }
-              vp.lambda() = w;
-              //weights.insert(std::make_pair(&vp, w));
-
-              //if (w1 == 1 || w2 == 1) std::cout << p1.id() << " ";
-              //std::cout << vp.id() << " weight: " << w << "\n";
+              else //fixed resolution particle
+              {
+                  vp.lambda()=vp.isFixed();
+              }
           }
           else { // this should not happen
               std::cout << " VP particle " << vp.id() << "-" << vp.ghost() << " not found in tuples ";

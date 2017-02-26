@@ -144,6 +144,11 @@ class ParticleLocal(object):
     def isGhost(self): return self.__getTmp().isGhost
     @isGhost.setter
     def isGhost(self, val): self.__getTmp().isGhost = val
+    
+    @property
+    def isFixed(self): return self.__getTmp().isFixed
+    @isFixed.setter
+    def isFixed(self, val): self.__getTmp().isFixed = val
 
     @property
     def lambda_adr(self): return self.__getTmp().lambda_adr
