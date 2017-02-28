@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2017
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -24,10 +24,34 @@ r"""
 espressopp.analysis.Temperature
 *******************************
 
+Calculate the temperature of the system (in :math:`k_B T` units).
+
 .. function:: espressopp.analysis.Temperature(system)
 
-		:param system:
-		:type system:
+    :arg shared_ptr system: system object
+    :returns: temperature
+    :rtype: real
+
+    Temperature of the system of :math:`N` particles is calculated as:
+
+    .. math::
+
+        T = \frac{1}{N_f} \sum^N_{i=1} m_i v_i^2,
+
+    where :math:`m_i` and :math:`v_i` are the mass and velocity of a
+    particle :math:`i`.
+
+    :math:`N_f = 3N` is the number of the system's degrees of freedom.
+
+    **Example:**
+
+    >>> # declare an object, e.g., T:
+    >>> T   = espressopp.analysis.Temperature(system)
+    >>>
+    >>> # later in your script compute temperature and print it:
+    >>> print T.compute()
+
+
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
@@ -38,7 +62,7 @@ from _espressopp import analysis_Temperature
 class TemperatureLocal(AnalysisBaseLocal, analysis_Temperature):
 
     def __init__(self, system):
-	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
+        if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
             cxxinit(self, analysis_Temperature, system)
 
 if pmi.isController :
