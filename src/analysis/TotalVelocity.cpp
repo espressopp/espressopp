@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2014 Pierre de Buyl
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2017
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -49,17 +49,14 @@ namespace espressopp {
       CellList realCells = system.storage->getRealCells();
 
       // Compute the local velocity
-
       myMass=0.;
       myV=0.;
+      
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-
-        // replaced position with velocity
         Real3D& velocity = cit->velocity();
-	real mass = cit->getMass();
-	myMass += mass;
-	myV += mass*velocity;
-
+        real mass = cit->getMass();
+        myMass += mass;
+        myV += mass*velocity;
       }
 
       real v_data[4], total_v[4];
@@ -83,7 +80,7 @@ namespace espressopp {
       compute();
       CellList realCells = system.storage->getRealCells();
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-	cit->velocity() -= v;
+        cit->velocity() -= v;
       }
 
     }
