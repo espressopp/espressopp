@@ -52,7 +52,8 @@ namespace espressopp {
 
       void perform_action() { reset(); }
 
-      Real3D getV() const { return v; }
+      /** get current velocity */
+      Real3D getV() const;
 
       static void registerPython();
 

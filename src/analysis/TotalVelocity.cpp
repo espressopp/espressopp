@@ -85,6 +85,8 @@ namespace espressopp {
 
     }
 
+    Real3D TotalVelocity::getV() const { return v; }
+    
     // Python wrapping
 
     void TotalVelocity::registerPython() {
