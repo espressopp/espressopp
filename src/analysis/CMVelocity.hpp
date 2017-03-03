@@ -32,17 +32,17 @@
 namespace espressopp {
   namespace analysis {
 
-    /** Class to compute the total velocity of a system. TotalVelocity provides
+    /** Class to compute the total velocity of a system. CMVelocity provides
 	a facility to reset the total velocity of the system.
     */
 
-    class TotalVelocity : public AnalysisBaseTemplate <Real3D> {
+    class CMVelocity : public AnalysisBaseTemplate <Real3D> {
 
     public:
 
-      TotalVelocity(shared_ptr<System> system) : AnalysisBaseTemplate <Real3D> (system) {}
+      CMVelocity(shared_ptr<System> system) : AnalysisBaseTemplate <Real3D> (system) {}
 
-      ~TotalVelocity() {}
+      ~CMVelocity() {}
 
       /** Reset the total velocity of the system*/
       void reset();

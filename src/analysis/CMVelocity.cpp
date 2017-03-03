@@ -22,7 +22,7 @@
 */
 
 #include "python.hpp"
-#include "TotalVelocity.hpp"
+#include "CMVelocity.hpp"
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "mpi.h"
@@ -34,9 +34,9 @@ namespace espressopp {
 
     using namespace iterator;
 
-    LOG4ESPP_LOGGER(TotalVelocity::logger, "TotalVelocity");
+    LOG4ESPP_LOGGER(CMVelocity::logger, "CMVelocity");
 
-    Real3D TotalVelocity::computeRaw() {
+    Real3D CMVelocity::computeRaw() {
 
       System& system = getSystemRef();
   
@@ -72,7 +72,7 @@ namespace espressopp {
       return v;
     }
 
-    void TotalVelocity::reset() {
+    void CMVelocity::reset() {
       System& system = getSystemRef();
 
       computeRaw();
@@ -83,17 +83,17 @@ namespace espressopp {
 
     }
 
-    Real3D TotalVelocity::getV() const { return v; }
+    Real3D CMVelocity::getV() const { return v; }
     
     // Python wrapping
 
-    void TotalVelocity::registerPython() {
+    void CMVelocity::registerPython() {
 
       using namespace espressopp::python;
 
-      class_<TotalVelocity, bases<AnalysisBase> >
-        ("analysis_TotalVelocity", init<shared_ptr<System> >())
-      .add_property("v", &TotalVelocity::getV)
+      class_<CMVelocity, bases<AnalysisBase> >
+        ("analysis_CMVelocity", init<shared_ptr<System> >())
+      .add_property("v", &CMVelocity::getV)
       ;
     }
   }

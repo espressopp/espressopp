@@ -22,36 +22,36 @@
 
 r"""
 *********************************
-espressopp.analysis.TotalVelocity
+espressopp.analysis.CMVelocity
 *********************************
 
 
-.. function:: espressopp.analysis.TotalVelocity(system)
+.. function:: espressopp.analysis.CMVelocity(system)
 
 		:param system: The system object.
 		:type system: espressopp.System
 
-.. function:: espressopp.analysis.TotalVelocity.compute()
+.. function:: espressopp.analysis.CMVelocity.compute()
 
         Compute the total velocity of the system.
 
 		:rtype: float
 
-.. function:: espressopp.analysis.TotalVelocity.reset()
+.. function:: espressopp.analysis.CMVelocity.reset()
 
         Subtract the total velocity of the system from every particle.
 
 
 Example of resetting velocity
 
->>> total_velocity = espressopp.analysis.TotalVelocity(system)
+>>> total_velocity = espressopp.analysis.CMVelocity(system)
 >>> total_velocity.reset()
 
 Example of attaching to integrator
 
 >>> # This extension can be attached to integrator
 >>> # and run `reset()` every `n-th` steps.
->>> total_velocity = espressopp.analysis.TotalVelocity(system)
+>>> total_velocity = espressopp.analysis.CMVelocity(system)
 >>> ext_remove_com = espressopp.analysis.ExtAnalyze(total_velocity, 10)
 >>> integrator.addExtension(ext_remove_com)
 
@@ -60,18 +60,18 @@ from espressopp.esutil import cxxinit
 from espressopp import pmi
 
 from espressopp.analysis.AnalysisBase import *
-from _espressopp import analysis_TotalVelocity
+from _espressopp import analysis_CMVelocity
 
-class TotalVelocityLocal(AnalysisBaseLocal, analysis_TotalVelocity):
+class CMVelocityLocal(AnalysisBaseLocal, analysis_CMVelocity):
 
     def __init__(self, system):
 	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-          cxxinit(self, analysis_TotalVelocity, system)
+          cxxinit(self, analysis_CMVelocity, system)
 
 if pmi.isController :
-    class TotalVelocity(AnalysisBase):
+    class CMVelocity(AnalysisBase):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espressopp.analysis.TotalVelocityLocal',
+            cls =  'espressopp.analysis.CMVelocityLocal',
             pmiproperty = ["v"]
             )
