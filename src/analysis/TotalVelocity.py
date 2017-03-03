@@ -67,16 +67,11 @@ class TotalVelocityLocal(AnalysisBaseLocal, analysis_TotalVelocity):
     def __init__(self, system):
 	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
           cxxinit(self, analysis_TotalVelocity, system)
-    def compute(self):
-        return self.cxxclass.compute(self)
-    def reset(self):
-        return self.cxxclass.reset(self)
 
 if pmi.isController :
     class TotalVelocity(AnalysisBase):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.TotalVelocityLocal',
-            pmicall = [ "compute", "reset" ],
             pmiproperty = ["v"]
             )
