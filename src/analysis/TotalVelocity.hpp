@@ -27,7 +27,7 @@
 
 #include "types.hpp"
 #include "Real3D.hpp"
-#include "ParticleAccess.hpp"
+#include "AnalysisBase.hpp"
 
 namespace espressopp {
   namespace analysis {
@@ -36,16 +36,13 @@ namespace espressopp {
 	a facility to reset the total velocity of the system.
     */
 
-    class TotalVelocity : public ParticleAccess {
+    class TotalVelocity : public AnalysisBaseTemplate <Real3D> {
 
     public:
 
-      TotalVelocity(shared_ptr<System> system) : ParticleAccess (system) {}
+      TotalVelocity(shared_ptr<System> system) : AnalysisBaseTemplate <Real3D> (system) {}
 
       ~TotalVelocity() {}
-
-      /** Compute the total velocity of the system*/
-      Real3D computeRaw();
 
       /** Reset the total velocity of the system*/
       void reset();
@@ -57,6 +54,25 @@ namespace espressopp {
 
       static void registerPython();
 
+      /** virtual functions from AnalysisBase class */
+      Real3D computeRaw(); // compute the total velocity of the system
+
+      python::list compute() {
+        python::list ret;
+        Real3D res = computeRaw();
+        ret.append(res);
+        return ret;
+      }
+      
+      python::list getAverageValue() {
+        python::list ret;
+        return ret;
+      }
+      
+      void resetAverage() {return;}
+
+      void updateAverage(Real3D res) {return;}
+      
     protected:
 
       static LOG4ESPP_DECL_LOGGER(logger);

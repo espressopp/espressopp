@@ -59,10 +59,10 @@ Example of attaching to integrator
 from espressopp.esutil import cxxinit
 from espressopp import pmi
 
-from espressopp.analysis.Observable import *
+from espressopp.analysis.AnalysisBase import *
 from _espressopp import analysis_TotalVelocity
 
-class TotalVelocityLocal(ObservableLocal, analysis_TotalVelocity):
+class TotalVelocityLocal(AnalysisBaseLocal, analysis_TotalVelocity):
 
     def __init__(self, system):
 	if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -73,7 +73,7 @@ class TotalVelocityLocal(ObservableLocal, analysis_TotalVelocity):
         return self.cxxclass.reset(self)
 
 if pmi.isController :
-    class TotalVelocity(Observable):
+    class TotalVelocity(AnalysisBase):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.analysis.TotalVelocityLocal',

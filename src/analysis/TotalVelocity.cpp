@@ -91,7 +91,7 @@ namespace espressopp {
 
       using namespace espressopp::python;
 
-      class_<TotalVelocity, bases<ParticleAccess> >
+      class_<TotalVelocity, bases<AnalysisBase> >
         ("analysis_TotalVelocity", init<shared_ptr<System> >())
       .add_property("v", &TotalVelocity::getV)
       .def("compute", &TotalVelocity::computeRaw)
