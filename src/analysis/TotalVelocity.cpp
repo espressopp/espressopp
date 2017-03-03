@@ -36,7 +36,7 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(TotalVelocity::logger, "TotalVelocity");
 
-    void TotalVelocity::compute() {
+    Real3D TotalVelocity::computeRaw() {
 
       System& system = getSystemRef();
   
@@ -69,12 +69,13 @@ namespace espressopp {
       v[1] = total_v[2]/total_v[0];
       v[2] = total_v[3]/total_v[0];
 
+      return v;
     }
 
     void TotalVelocity::reset() {
       System& system = getSystemRef();
 
-      compute();
+      computeRaw();
       CellList realCells = system.storage->getRealCells();
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         cit->velocity() -= v;
@@ -93,7 +94,7 @@ namespace espressopp {
       class_<TotalVelocity, bases<ParticleAccess> >
         ("analysis_TotalVelocity", init<shared_ptr<System> >())
       .add_property("v", &TotalVelocity::getV)
-      .def("compute", &TotalVelocity::compute)
+      .def("compute", &TotalVelocity::computeRaw)
       .def("reset", &TotalVelocity::reset)
       ;
     }

@@ -45,7 +45,7 @@ namespace espressopp {
       ~TotalVelocity() {}
 
       /** Compute the total velocity of the system*/
-      void compute();
+      Real3D computeRaw();
 
       /** Reset the total velocity of the system*/
       void reset();
