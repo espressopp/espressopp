@@ -22,15 +22,12 @@
 */
 
 #include "python.hpp"
-#include <boost/python.hpp>
 #include "TotalVelocity.hpp"
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "mpi.h"
 
 using namespace espressopp;
-
-#define DEFAULT_TAG 71
 
 namespace espressopp {
   namespace analysis {
