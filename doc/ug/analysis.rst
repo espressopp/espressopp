@@ -9,6 +9,7 @@ analysis
    espressopp.analysis.AnalysisBase.rst
    espressopp.analysis.Autocorrelation.rst
    espressopp.analysis.CenterOfMass.rst
+   espressopp.analysis.CMVelocity.rst
    espressopp.analysis.ConfigsParticleDecomp.rst
    espressopp.analysis.Configurations.rst
    espressopp.analysis.ConfigurationsExt.rst
@@ -34,7 +35,6 @@ analysis
    espressopp.analysis.SystemMonitor.rst
    espressopp.analysis.Temperature.rst
    espressopp.analysis.Test.rst
-   espressopp.analysis.TotalVelocity.rst
    espressopp.analysis.Velocities.rst
    espressopp.analysis.VelocityAutocorrelation.rst
    espressopp.analysis.Viscosity.rst
