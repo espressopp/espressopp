@@ -25,35 +25,46 @@ r"""
 espressopp.analysis.CMVelocity
 *********************************
 
+Compute and reset (set to zero) the center-of-mass (CM) velocity of the system. 
 
-.. function:: espressopp.analysis.CMVelocity(system)
+.. class:: espressopp.analysis.CMVelocity(system)
 
-		:param system: The system object.
-		:type system: espressopp.System
+    :param system: system object
+    :type system: espressopp.System
+    
+    .. note:: 
+            
+        :class:`CMVelocity <espressopp.analysis.CMVelocity>` can be attached to 
+        the *integrator*. In this case the :meth:`reset` method is called, so 
+        you will reset the CM-velocity every `n-th` steps.
 
-.. function:: espressopp.analysis.CMVelocity.compute()
+    **Methods**
 
-        Compute the total velocity of the system.
+    .. function:: espressopp.analysis.CMVelocity.compute()
 
-		:rtype: float
+        Compute the CM-velocity of the system
+        
+        :rtype: Real3D
 
-.. function:: espressopp.analysis.CMVelocity.reset()
+    .. function:: espressopp.analysis.CMVelocity.reset()
 
-        Subtract the total velocity of the system from every particle.
+        Reset (set to zero) the CM-velocity of the system. Done by computing the
+        CM-velocity of the system and subtracting it then from every particle.
+        
+        :rtype: void
 
+    Example of resetting velocity
 
-Example of resetting velocity
+    >>> total_velocity = espressopp.analysis.CMVelocity(system)
+    >>> total_velocity.reset()
 
->>> total_velocity = espressopp.analysis.CMVelocity(system)
->>> total_velocity.reset()
+    Example of attaching to integrator
 
-Example of attaching to integrator
-
->>> # This extension can be attached to integrator
->>> # and run `reset()` every `n-th` steps.
->>> total_velocity = espressopp.analysis.CMVelocity(system)
->>> ext_remove_com = espressopp.analysis.ExtAnalyze(total_velocity, 10)
->>> integrator.addExtension(ext_remove_com)
+    >>> # This extension can be attached to integrator
+    >>> # and run `reset()` every `n-th` steps.
+    >>> total_velocity = espressopp.analysis.CMVelocity(system)
+    >>> ext_remove_com = espressopp.integrator.ExtAnalyze(total_velocity, 10)
+    >>> integrator.addExtension(ext_remove_com)
 
 """
 from espressopp.esutil import cxxinit
