@@ -80,6 +80,10 @@ namespace espressopp {
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
         cit->velocity() -= v;
       }
+      
+      // set private variable to zero (new CM-velocity).
+      // one could use computeRaw() again, but it is slower
+      v = Real3D(0.);
 
     }
 
