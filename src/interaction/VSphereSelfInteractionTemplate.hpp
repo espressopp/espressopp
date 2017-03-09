@@ -34,7 +34,6 @@
 #include "bc/BC.hpp"
 #include "SystemAccess.hpp"
 #include "storage/Storage.hpp"
-#include "Interaction.hpp"
 #include "types.hpp"
 
 namespace espressopp {
