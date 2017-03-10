@@ -1,3 +1,4 @@
+add_subdirectory(cm_velocity)
 add_subdirectory(ewald)
 add_subdirectory(pickle_potential)
 add_subdirectory(pi_water)

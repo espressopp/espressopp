@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2014 Pierre de Buyl
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2017
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -27,35 +27,52 @@
 
 #include "types.hpp"
 #include "Real3D.hpp"
-#include "ParticleAccess.hpp"
+#include "AnalysisBase.hpp"
 
 namespace espressopp {
   namespace analysis {
 
-    /** Class to compute the total velocity of a system. TotalVelocity provides
+    /** Class to compute the total velocity of a system. CMVelocity provides
 	a facility to reset the total velocity of the system.
     */
 
-    class TotalVelocity : public ParticleAccess {
+    class CMVelocity : public AnalysisBaseTemplate <Real3D> {
 
     public:
 
-      TotalVelocity(shared_ptr<System> system) : ParticleAccess (system) {}
+      CMVelocity(shared_ptr<System> system) : AnalysisBaseTemplate <Real3D> (system) {}
 
-      ~TotalVelocity() {}
-
-      /** Compute the total velocity of the system*/
-      void compute();
+      ~CMVelocity() {}
 
       /** Reset the total velocity of the system*/
       void reset();
 
       void perform_action() { reset(); }
 
-      Real3D getV() const { return v; }
+      /** get current velocity */
+      Real3D getV() const;
 
       static void registerPython();
 
+      /** virtual functions from AnalysisBase class */
+      Real3D computeRaw(); // compute the total velocity of the system
+
+      python::list compute() {
+        python::list ret;
+        Real3D res = computeRaw();
+        ret.append(res);
+        return ret;
+      }
+      
+      python::list getAverageValue() {
+        python::list ret;
+        return ret;
+      }
+      
+      void resetAverage() {return;}
+
+      void updateAverage(Real3D res) {return;}
+      
     protected:
 
       static LOG4ESPP_DECL_LOGGER(logger);

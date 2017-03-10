@@ -38,7 +38,7 @@
 #include "NPart.hpp"
 #include "MaxPID.hpp"
 #include "AllParticlePos.hpp"
-#include "TotalVelocity.hpp"
+#include "CMVelocity.hpp"
 
 #include "ConfigsParticleDecomp.hpp"
 #include "VelocityAutocorrelation.hpp"
@@ -92,7 +92,7 @@ namespace espressopp {
       IntraChainDistSq::registerPython();
       NeighborFluctuation::registerPython();
       OrderParameter::registerPython();
-      TotalVelocity::registerPython();
+      CMVelocity::registerPython();
 
       ConfigsParticleDecomp::registerPython();
       VelocityAutocorrelation::registerPython();

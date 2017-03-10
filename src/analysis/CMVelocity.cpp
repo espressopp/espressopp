@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2014 Pierre de Buyl
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2017
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -22,24 +22,21 @@
 */
 
 #include "python.hpp"
-#include <boost/python.hpp>
-#include "TotalVelocity.hpp"
+#include "CMVelocity.hpp"
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
 #include "mpi.h"
 
 using namespace espressopp;
 
-#define DEFAULT_TAG 71
-
 namespace espressopp {
   namespace analysis {
 
     using namespace iterator;
 
-    LOG4ESPP_LOGGER(TotalVelocity::logger, "TotalVelocity");
+    LOG4ESPP_LOGGER(CMVelocity::logger, "CMVelocity");
 
-    void TotalVelocity::compute() {
+    Real3D CMVelocity::computeRaw() {
 
       System& system = getSystemRef();
   
@@ -49,17 +46,14 @@ namespace espressopp {
       CellList realCells = system.storage->getRealCells();
 
       // Compute the local velocity
-
       myMass=0.;
       myV=0.;
+      
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-
-        // replaced position with velocity
         Real3D& velocity = cit->velocity();
-	real mass = cit->getMass();
-	myMass += mass;
-	myV += mass*velocity;
-
+        real mass = cit->getMass();
+        myMass += mass;
+        myV += mass*velocity;
       }
 
       real v_data[4], total_v[4];
@@ -75,30 +69,35 @@ namespace espressopp {
       v[1] = total_v[2]/total_v[0];
       v[2] = total_v[3]/total_v[0];
 
+      return v;
     }
 
-    void TotalVelocity::reset() {
+    void CMVelocity::reset() {
       System& system = getSystemRef();
 
-      compute();
+      computeRaw();
       CellList realCells = system.storage->getRealCells();
       for(CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-	cit->velocity() -= v;
+        cit->velocity() -= v;
       }
+      
+      // set private variable to zero (new CM-velocity).
+      // one could use computeRaw() again, but it is slower
+      v = Real3D(0.);
 
     }
 
+    Real3D CMVelocity::getV() const { return v; }
+    
     // Python wrapping
 
-    void TotalVelocity::registerPython() {
+    void CMVelocity::registerPython() {
 
       using namespace espressopp::python;
 
-      class_<TotalVelocity, bases<ParticleAccess> >
-        ("analysis_TotalVelocity", init<shared_ptr<System> >())
-      .add_property("v", &TotalVelocity::getV)
-      .def("compute", &TotalVelocity::compute)
-      .def("reset", &TotalVelocity::reset)
+      class_<CMVelocity, bases<AnalysisBase> >
+        ("analysis_CMVelocity", init<shared_ptr<System> >())
+      .add_property("v", &CMVelocity::getV)
       ;
     }
   }
