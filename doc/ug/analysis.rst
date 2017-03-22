@@ -2,7 +2,7 @@ analysis
 ========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    
    espressopp.analysis.AdressDensity.rst
    espressopp.analysis.AllParticlePos.rst
