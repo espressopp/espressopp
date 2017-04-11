@@ -1,6 +1,6 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012-2016
 #      Max Planck Institute for Polymer Research
-#  Copyright (C) 2008,2009,2010,2011
+#  Copyright (C) 2008-2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 #  
 #  This file is part of ESPResSo++.
@@ -19,33 +19,34 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-r"""
-********************************************************************************************
-**LBInitPopWave** - creates initial populations with uniform density and harmonic velocity
-********************************************************************************************
+R"""
 
-This class creates LB-fluid with uniform density and harmonic velocity:
-:math:`v_x = 0`, 
+This class creates LB-fluid with uniform density and harmonic velocity (*lattice units*):
+
+:math:`v_x = 0`,
 :math:`v_y = 0`,
-:math:`v_z(i) = A * sin (2 * \pi * i / N_x)`,
+:math:`v_z(i) = A \cdot sin (2 \pi \cdot i \,/ N_x)`,
+where :math:`A` is the amplitude of the velocity wave, 
+:math:`N_x` is the number of lattice nodes in :math:`x`-direction and 
+:math:`i` is the index of the node the velocity is calculated for.
 
-where :math:`A` is the amplitude of the velocity wave, :math:`N_x` is the number of lattice nodes in :math:`x`-direction and :math:`i` is the node index that the velocity is calculated for.
+This may be used to test the system: total moment is zero and the liquid tends to 
+equilibrium, i.e. relaxes to a uniform zero velocity.
+    
+Example:
 
-This may be used to test the system: total moment is zero and the liquid tends to equilibrium, i.e. relaxes to a uniform zero velocity.
-  
-	Example:
-	
-	>>> initPop = espressopp.integrator.LBInitPopWave(system,lb)
-	>>> initPop.createDenVel(1.0, Real3D(0.,0.,0.0005))
-	>>> # the Real3D vector in this case includes amplitudes of the velocities
-	
+>>> # set initial density
+>>> initDen = 1.
+>>>
+>>> # set initial velocity
+>>> Vx = Vy = 0.
+>>> ampVz = 0.0005
+>>> initVel = Real3D( Vx, Vy, ampVz )
+>>>
+>>> # create initPop object and initialize populations
+>>> initPop = espressopp.integrator.LBInitPopWave(system,lb)
+>>> initPop.createDenVel( initDen, initVel )
 
-.. function:: espressopp.integrator.LBInitPopWave(system, latticeboltzmann)
-
-		:param system: 
-		:param latticeboltzmann: 
-		:type system: 
-		:type latticeboltzmann: 
 """
 
 from espressopp.esutil import cxxinit

@@ -63,7 +63,7 @@ after_success:
         mkdir -p html/${TRAVIS_BRANCH};
         mv doc/ug/_build/html/* html/${TRAVIS_BRANCH};
       else
-         rm -rf html/[^v][^1]*
+         rm -rf html/[^v][^1]*;
          mv doc/dg/html html/doxygen;
          mv doc/ug/_build/latex/ESPResSo++.pdf html/;
          mv doc/ug/_build/html/* html/;

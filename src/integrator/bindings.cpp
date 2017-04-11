@@ -50,8 +50,6 @@
 #include "LBInitPeriodicForce.hpp"
 #include "LBInitPopUniform.hpp"
 #include "LBInitPopWave.hpp"
-#include "LiquidGasLB.hpp"
-#include "LGLatticeSite.hpp"
 #include "ExtForce.hpp"
 #include "CapForce.hpp"
 #include "ExtAnalyze.hpp"
@@ -93,7 +91,6 @@ namespace espressopp {
       LBInitPeriodicForce::registerPython();
       LBInitPopUniform::registerPython();
       LBInitPopWave::registerPython();
-			LiquidGasLB::registerPython();
       ExtForce::registerPython();
       CapForce::registerPython();
       ExtAnalyze::registerPython();

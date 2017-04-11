@@ -26,11 +26,6 @@ integrator
    espressopp.integrator.LangevinThermostatOnGroup.rst
    espressopp.integrator.LatticeBoltzmann.rst
    espressopp.integrator.LBInit.rst
-   espressopp.integrator.LBInitConstForce.rst
-   espressopp.integrator.LBInitPeriodicForce.rst
-   espressopp.integrator.LBInitPopUniform.rst
-   espressopp.integrator.LBInitPopWave.rst
-   espressopp.integrator.LiquidGasLB.rst
    espressopp.integrator.MDIntegrator.rst
    espressopp.integrator.MinimizeEnergy.rst
    espressopp.integrator.OnTheFlyFEC.rst

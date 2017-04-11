@@ -20,9 +20,6 @@
 
 
 r"""
-******************************
-espressopp.analysis.Observable
-******************************
 
 .. function:: espressopp.analysis.Observable.compute()
 

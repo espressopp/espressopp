@@ -1,1 +1,0 @@
-.. automodule:: espressopp.analysis.TotalVelocity

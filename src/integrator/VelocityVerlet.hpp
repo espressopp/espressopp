@@ -152,7 +152,7 @@ namespace espressopp {
         real timeRun;
         real timeLost;
         real timeForce;
-        real timeForceComp[100];
+        real timeForceComp[10000];
         real timeComm1;
         real timeComm2;
         real timeInt1;

@@ -20,9 +20,6 @@
 
 
 r"""
-********************************
-espressopp.analysis.AnalysisBase
-********************************
 
 This abstract base class provides the interface and some basic
 functionality for classes that do analysis or observable measurements
@@ -59,6 +56,7 @@ It provides the following methods:
 		Resets average and standard deviation
 
 		:rtype:
+                    
 """
 
 from espressopp import pmi
