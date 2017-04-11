@@ -28,7 +28,7 @@ Calculate the temperature of the system (in :math:`k_B T` units).
 
 .. function:: espressopp.analysis.Temperature(system)
 
-    :arg shared_ptr system: system object
+    :param shared_ptr system: system object
     :returns: temperature
     :rtype: real
 
