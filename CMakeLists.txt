@@ -42,12 +42,12 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CXX_FLAGS)
       FORCE)
 endif()
 
-check_cxx_compiler_flag("-std=c++98" COMPILER_SUPPORTS_CXX98)
-if(COMPILER_SUPPORTS_CXX98)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98")
-else(COMPILER_SUPPORTS_CXX98)
-    message(FATAL_ERROR "Compiler flag -std=c++98 not supported")
-endif(COMPILER_SUPPORTS_CXX98)
+#check_cxx_compiler_flag("-std=c++98" COMPILER_SUPPORTS_CXX98)
+#if(COMPILER_SUPPORTS_CXX98)
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98")
+#else(COMPILER_SUPPORTS_CXX98)
+#    message(FATAL_ERROR "Compiler flag -std=c++98 not supported")
+#endif(COMPILER_SUPPORTS_CXX98)
 
 ########################################################################
 #VampirTrace settings

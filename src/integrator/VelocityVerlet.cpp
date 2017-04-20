@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -177,16 +179,17 @@ namespace espressopp {
     static object wrapGetTimers(class VelocityVerlet* obj) {
       real tms[10];
       obj->loadTimers(tms);
-      return make_tuple(tms[0],
-                        tms[1],
-                        tms[2],
-                        tms[3],
-                        tms[4],
-                        tms[5],
-                        tms[6],
-                        tms[7],
-                        tms[8],
-                        tms[9]);
+      return boost::python::make_tuple(
+          tms[0],
+          tms[1],
+          tms[2],
+          tms[3],
+          tms[4],
+          tms[5],
+          tms[6],
+          tms[7],
+          tms[8],
+          tms[9]);
     }
 
     void VelocityVerlet::loadTimers(real t[10]) {
