@@ -19,10 +19,10 @@
 // include this to prevent linker errors when the
 // same modules are marked export and import.
 #define BOOST_SERIALIZATION_SOURCE
-
-#include <boost/archive/archive_exception.hpp>
+#include <boost/serialization/config.hpp>
 #include <boost/serialization/throw_exception.hpp>
 
+#include <boost/archive/archive_exception.hpp>
 #include <boost/archive/detail/basic_serializer.hpp>
 #include <boost/archive/detail/basic_serializer_map.hpp>
 
@@ -40,7 +40,7 @@ basic_serializer_map::type_info_pointer_compare::operator()(
     return *lhs < *rhs;
 }
 
-BOOST_ARCHIVE_DECL(bool) 
+BOOST_ARCHIVE_DECL bool
 basic_serializer_map::insert(const basic_serializer * bs){
     // attempt to insert serializer into it's map
     // the following is commented out - rather than being just
@@ -72,7 +72,7 @@ basic_serializer_map::insert(const basic_serializer * bs){
     return true;
 }
 
-BOOST_ARCHIVE_DECL(void) 
+BOOST_ARCHIVE_DECL void 
 basic_serializer_map::erase(const basic_serializer * bs){
     map_type::iterator it = m_map.begin();
     map_type::iterator it_end = m_map.end();
@@ -92,7 +92,7 @@ basic_serializer_map::erase(const basic_serializer * bs){
     //if(*it == bs)
     //    m_map.erase(it);
 }
-BOOST_ARCHIVE_DECL(const basic_serializer *)
+BOOST_ARCHIVE_DECL const basic_serializer *
 basic_serializer_map::find(
     const boost::serialization::extended_type_info & eti
 ) const {

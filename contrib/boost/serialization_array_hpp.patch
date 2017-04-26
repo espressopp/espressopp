@@ -1,0 +1,13 @@
+--- boost/serialization/array.hpp	2017-04-25 15:31:44.975396000 +0200
++++ boost/serialization/array.hpp	2017-04-25 15:36:05.318237000 +0200
+@@ -44,8 +44,8 @@
+     // note: I would like to make the copy constructor private but this breaks
+     // make_array.  So I try to make make_array a friend - but that doesn't
+     // build.  Need a C++ guru to explain this!
+-    template<class S>
+-    friend const boost::serialization::array_wrapper<T> make_array( T* t, S s);
++    //template<class S>
++    //friend const boost::serialization::array_wrapper<T> make_array( T* t, S s);
+ 
+     array_wrapper(const array_wrapper & rhs) :
+         m_t(rhs.m_t),

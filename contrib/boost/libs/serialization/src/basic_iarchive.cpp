@@ -24,17 +24,18 @@ namespace std{
 #endif
 
 #include <boost/integer_traits.hpp>
-#include <boost/serialization/state_saver.hpp>
-#include <boost/serialization/throw_exception.hpp>
-#include <boost/serialization/tracking.hpp>
 
 #define BOOST_ARCHIVE_SOURCE
 // include this to prevent linker errors when the
 // same modules are marked export and import.
 #define BOOST_SERIALIZATION_SOURCE
+#include <boost/serialization/config.hpp>
+
+#include <boost/serialization/state_saver.hpp>
+#include <boost/serialization/throw_exception.hpp>
+#include <boost/serialization/tracking.hpp>
 
 #include <boost/archive/archive_exception.hpp>
-
 #include <boost/archive/detail/decl.hpp>
 #include <boost/archive/basic_archive.hpp>
 #include <boost/archive/detail/basic_iserializer.hpp>
@@ -183,7 +184,6 @@ class basic_iarchive_impl {
         m_archive_library_version(BOOST_ARCHIVE_VERSION()),
         m_flags(flags)
     {}
-    ~basic_iarchive_impl(){}
     void set_library_version(library_version_type archive_library_version){
         m_archive_library_version = archive_library_version;
     }
@@ -228,7 +228,6 @@ class basic_iarchive_impl {
         const basic_pointer_iserializer * (*finder)(
             const boost::serialization::extended_type_info & type
         )
-
     );
 };
 
@@ -252,8 +251,8 @@ basic_iarchive_impl::reset_object_address(
     //    but the code may work anyway.  Naturally, a bad practice on the part
     //    of the programmer but we can't detect it - as above.  So maybe we
     //    can save a few more people from themselves as above.
-    object_id_type i;
-    for(i = m_moveable_objects.recent; i < m_moveable_objects.end; ++i){
+    object_id_type i = m_moveable_objects.recent;
+    for(; i < m_moveable_objects.end; ++i){
         if(old_address == object_id_vector[i].address)
             break;
     }
@@ -520,28 +519,26 @@ namespace boost {
 namespace archive {
 namespace detail {
 
-BOOST_ARCHIVE_DECL(void)
+BOOST_ARCHIVE_DECL void
 basic_iarchive::next_object_pointer(void *t){
     pimpl->next_object_pointer(t);
 }
 
-BOOST_ARCHIVE_DECL(BOOST_PP_EMPTY())
+BOOST_ARCHIVE_DECL
 basic_iarchive::basic_iarchive(unsigned int flags) : 
     pimpl(new basic_iarchive_impl(flags))
 {}
 
-BOOST_ARCHIVE_DECL(BOOST_PP_EMPTY())
+BOOST_ARCHIVE_DECL
 basic_iarchive::~basic_iarchive()
-{
-    delete pimpl;
-}
+{}
 
-BOOST_ARCHIVE_DECL(void)
+BOOST_ARCHIVE_DECL void
 basic_iarchive::set_library_version(library_version_type archive_library_version){
     pimpl->set_library_version(archive_library_version);
 }
 
-BOOST_ARCHIVE_DECL(void)
+BOOST_ARCHIVE_DECL void
 basic_iarchive::reset_object_address(
     const void * new_address, 
     const void * old_address
@@ -549,7 +546,7 @@ basic_iarchive::reset_object_address(
     pimpl->reset_object_address(new_address, old_address);
 }
 
-BOOST_ARCHIVE_DECL(void)
+BOOST_ARCHIVE_DECL void
 basic_iarchive::load_object(
     void *t, 
     const basic_iserializer & bis
@@ -558,7 +555,7 @@ basic_iarchive::load_object(
 }
 
 // load a pointer object
-BOOST_ARCHIVE_DECL(const basic_pointer_iserializer *)
+BOOST_ARCHIVE_DECL const basic_pointer_iserializer *
 basic_iarchive::load_pointer(
     void * &t, 
     const basic_pointer_iserializer * bpis_ptr,
@@ -570,23 +567,23 @@ basic_iarchive::load_pointer(
     return pimpl->load_pointer(*this, t, bpis_ptr, finder);
 }
 
-BOOST_ARCHIVE_DECL(void)
+BOOST_ARCHIVE_DECL void
 basic_iarchive::register_basic_serializer(const basic_iserializer & bis){
     pimpl->register_type(bis);
 }
 
-BOOST_ARCHIVE_DECL(void)
+BOOST_ARCHIVE_DECL void
 basic_iarchive::delete_created_pointers()
 {
     pimpl->delete_created_pointers();
 }
 
-BOOST_ARCHIVE_DECL(boost::archive::library_version_type) 
+BOOST_ARCHIVE_DECL boost::archive::library_version_type
 basic_iarchive::get_library_version() const{
     return pimpl->m_archive_library_version;
 }
 
-BOOST_ARCHIVE_DECL(unsigned int) 
+BOOST_ARCHIVE_DECL unsigned int
 basic_iarchive::get_flags() const{
     return pimpl->m_flags;
 }

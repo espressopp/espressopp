@@ -14,16 +14,18 @@
 
 
 #include <exception>
-#include <boost/assert.hpp>
 #include <string>
 
+#include <boost/assert.hpp>
+
 #define BOOST_ARCHIVE_SOURCE
+#include <boost/serialization/config.hpp>
 #include <boost/archive/xml_archive_exception.hpp>
 
 namespace boost {
 namespace archive {
 
-BOOST_ARCHIVE_DECL(BOOST_PP_EMPTY())
+BOOST_ARCHIVE_DECL
 xml_archive_exception::xml_archive_exception(
         exception_code c, 
         const char * e1,
@@ -35,13 +37,15 @@ xml_archive_exception::xml_archive_exception(
         case xml_archive_parsing_error:
             archive_exception::append(0, "unrecognized XML syntax");
             break;
-        case xml_archive_tag_mismatch:
-            archive_exception::append(0, "XML start/end tag mismatch");
+        case xml_archive_tag_mismatch:{
+            unsigned int l;
+            l = archive_exception::append(0, "XML start/end tag mismatch");
             if(NULL != e1){
-                archive_exception::append(0, " - ");
-                archive_exception::append(0, e1);
+                l = archive_exception::append(l, " - ");
+                archive_exception::append(l, e1);
             }    
             break;
+        }
         case xml_archive_tag_name_error:
             archive_exception::append(0, "Invalid XML tag name");
             break;
@@ -51,6 +55,14 @@ xml_archive_exception::xml_archive_exception(
             break;
         }
     }
+    
+BOOST_ARCHIVE_DECL
+xml_archive_exception::xml_archive_exception(xml_archive_exception const & oth) :
+ 	archive_exception(oth)
+	{
+	}
+	
+BOOST_ARCHIVE_DECL xml_archive_exception::~xml_archive_exception() BOOST_NOEXCEPT_OR_NOTHROW {}
 
 } // archive
 } // boost
