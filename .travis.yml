@@ -20,17 +20,6 @@ env:
     - DISTRO=fedora_mpich EXTERNAL=ON COVERAGE=ON
     - DISTRO=fedora_mpich EXTERNAL=OFF
 
-matrix:
-  allow_failures: #issue #8, ubuntu gcc is too new for internal boost
-    - compiler: gcc
-      env: DISTRO=ubuntu EXTERNAL=OFF
-    - compiler: gcc
-      env: DISTRO=ubuntu_mpich EXTERNAL=OFF
-    - compiler: gcc
-      env: DISTRO=fedora EXTERNAL=OFF
-    - compiler: gcc
-      env: DISTRO=fedora_mpich EXTERNAL=OFF
-
 script:
  - cp -vr docker ${HOME}
  - sed -i "1s/ubuntu/${DISTRO}/" ${HOME}/docker/Dockerfile
