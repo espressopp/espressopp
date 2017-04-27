@@ -25,7 +25,7 @@ file(GLOB_RECURSE NOT_BOOST_SOURCES
 list(REMOVE_ITEM BOOST_SOURCES ${NOT_BOOST_SOURCES})
 
 # Apply patch for Intel Compiler; http://stackoverflow.com/a/41188485
-if (CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+if (NOT EXTERNAL_BOOST AND CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     message(STATUS "Applying patch on internal Boost because of Intel compiler")
     execute_process(COMMAND patch
         ${CMAKE_CURRENT_LIST_DIR}/boost/serialization/array.hpp
