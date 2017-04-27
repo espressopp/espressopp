@@ -133,8 +133,12 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 # this conflicts with mpi4py-1.3 (is used to check for MPI version there)
 # add_definitions( -DHAVE_CONFIG_H )
 
+# Minimum required Boost version is set to 1.58 (only because of travis)
+# but the version in contrib is 1.61;
+
 if (EXTERNAL_BOOST)
-  find_package(Boost 1.61.0 REQUIRED COMPONENTS mpi python serialization system filesystem)
+  set(NEEDED_Boost_VERSION 1.58.0)
+  find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS mpi python serialization system filesystem)
   if(NOT Boost_FOUND)
     message(FATAL_ERROR "Boost (required at least version ${NEEDED_Boost_VERSION}) not found, make sure you have installed boost and it's dev packages. To hint cmake to your Boost installation, use the option -DBOOST_ROOT=/path/to/boost. As last resort you can use our internal replacement with -DEXTERNAL_BOOST=OFF")
   endif(NOT Boost_FOUND)
