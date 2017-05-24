@@ -55,6 +55,8 @@
 #include "AdressDensity.hpp"
 #include "Test.hpp"
 #include "ParticleRadiusDistribution.hpp"
+#include "CenterOfMassOfSubchains.hpp"
+#include "GyrationRadiusOfSubchains.hpp"
 
 #include "IntraChainDistSq.hpp"
 #include "NeighborFluctuation.hpp"
@@ -107,6 +109,8 @@ namespace espressopp {
       AdressDensity::registerPython();
       Test::registerPython();
       ParticleRadiusDistribution::registerPython();
+      CenterOfMassOfSubchains::registerPython();
+      GyrationRadiusOfSubchains::registerPython();
 
       Autocorrelation::registerPython();
       Viscosity::registerPython();
