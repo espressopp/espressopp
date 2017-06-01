@@ -104,7 +104,6 @@ namespace espressopp {
     	  radius[0] = cit->radius();
           if(potential->_computeForce(force, radius)) {
             cit->fradius() = force[0]; //+= force[0];
-            std::cout << "pid=" << cit->id() << " fradius=" << cit->fradius() << " force[0]=" << force[0] << std::endl;
           }
       }
     }
