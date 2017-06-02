@@ -29,16 +29,13 @@ the VSpherePair potential.
 
 .. math::
 
-         V(r_{ij}, \sigma_{ij}) = \frac{\varepsilon}{\beta} \left( \frac{2 \pi}{3} \right)
-                              \sigma_{ij}^{- \frac{3}{2}} e^{- \frac{3}{2} \frac{r_{ij}^2}{\sigma_{ij}}} ,
+         V(r_{ij}, \sigma_{ij}) = \frac{\varepsilon}{\beta}
+                              \left( \frac{2 \pi}{3} \sigma_{ij}\right)^{- \frac{3}{2}}
+                              e^{- \frac{3}{2} \frac{r_{ij}^2}{\sigma_{ij}}} ,
                               r_{ij} = \left| \vec{r_i} - \vec{r_j} \right| ,
                               \sigma_{ij} = \sigma_i^2 + \sigma_j^2
 
-
-
-
-
-
+Reference: Flactuating soft-sphere approach to coars-graining of polymer melts, Soft matter, 2010, 6, 2282
 
 .. function:: espressopp.interaction.VSpherePair(epsilon, cutoff, shift)
 
