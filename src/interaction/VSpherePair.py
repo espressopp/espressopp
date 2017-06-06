@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2017
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -29,7 +29,7 @@ the VSpherePair potential.
 
 .. math::
 
-         V(r_{ij}, \sigma_{ij}) = \frac{\varepsilon}{\beta}
+         V(r_{ij}, \sigma_{ij}) = \varepsilon
                               \left( \frac{2 \pi}{3} \sigma_{ij}\right)^{- \frac{3}{2}}
                               e^{- \frac{3}{2} \frac{r_{ij}^2}{\sigma_{ij}}} ,
                               r_{ij} = \left| \vec{r_i} - \vec{r_j} \right| ,
