@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2017
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -41,6 +41,7 @@ namespace espressopp {
       .add_property("vradius", &Particle::getVRadius, &Particle::setVRadius)
       .add_property("imageBox", &Particle::getImageBox, &Particle::setImageBox)
       .add_property("isGhost", &Particle::getGhostStatus, &Particle::setGhostStatus)
+      .add_property("isFixed", &Particle::getFixedStatus, &Particle::setFixedStatus)
       .add_property("lambda_adr", &Particle::getLambda, &Particle::setLambda)
       .add_property("lambda_adrd", &Particle::getLambdaDeriv, &Particle::setLambdaDeriv)
       .add_property("state", &Particle::getState, &Particle::setState)

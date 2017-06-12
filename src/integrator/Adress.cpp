@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013,2014,2015,2016
+  Copyright (C) 2012,2013,2014,2015,2016,2017
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -147,6 +147,7 @@ namespace espressopp {
                   vp.velocity() = cmv;
 
                   if (KTI == false) {
+                    if (vp.isFixed()<0) {
                       // calculate distance to nearest adress particle or center
                       std::vector<Real3D*>::iterator it2 = verletList->getAdrPositions().begin();
                       Real3D pa = **it2; // position of adress particle
@@ -180,7 +181,12 @@ namespace espressopp {
 
                       real wDeriv = weightderivative(min1sq);
                       vp.lambdaDeriv() = wDeriv;
-
+                    }
+                    else //fixed resolution particle
+                    {
+                      vp.lambda() = vp.isFixed();
+                      vp.lambdaDeriv() = 0.0;
+                    }
                   }
 
               }
@@ -297,7 +303,8 @@ namespace espressopp {
           for(CellListIterator cit(localCells); !cit.isDone(); ++cit) {
 
 
-                Particle &vp = *cit;
+              Particle &vp = *cit;
+              if (vp.isFixed()<0) {  // adres particle
 
                 FixedTupleListAdress::iterator it3;
                 it3 = fixedtupleList->find(&vp);
@@ -353,6 +360,12 @@ namespace espressopp {
                     exit(1);
                     return;
                 }
+             }
+             else //fixed resolution particle
+             {
+                 vp.lambda()=vp.isFixed();
+                 vp.lambdaDeriv() = 0.0;
+             }
 
           }
 
