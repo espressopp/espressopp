@@ -53,9 +53,9 @@ espressopp.FixedPairList
 
 		:rtype: 
 
-.. function:: espressopp.FixedPairList.clean_and_remove()
+.. function:: espressopp.FixedPairList.clearAndRemove()
 
-    'remove the FixedPairList and disconnect'
+    remove the FixedPairList and disconnect
 
 .. function:: espressopp.FixedPairList.remove(pid1, pid2)
 

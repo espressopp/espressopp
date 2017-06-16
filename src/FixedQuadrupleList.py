@@ -50,8 +50,19 @@ espressopp.FixedQuadrupleList
 		:type quadruplelist: 
 		:rtype: 
 
-.. function:: espressopp.FixedQuadrupleList.remove()
+.. function:: espressopp.FixedQuadrupleList.clearAndRemove()
+
         remove the FixedPairList and disconnect
+
+.. function:: espressopp.FixedQuadrupleList.remove(pid1, pid2, pid3, pid4)
+
+   remove quadruplet from fixed quadruple list
+
+      :param pid1: particle id
+      :param pid2: particle id
+      :param pid3: particle id
+      :param pid4: particle id
+      :rtype: bool
 
 
 .. function:: espressopp.FixedQuadrupleList.getQuadruples()

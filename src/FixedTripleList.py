@@ -56,8 +56,18 @@ espressopp.FixedTripleList
 
 		:rtype: 
 
-.. function:: espressopp.FixedTripleList.remove(pid1, pid2, pid3)
+.. function:: espressopp.FixedTripleList.clearAndRemove()
+
     remove the FixedPairList and disconnect
+
+.. function:: espressopp.FixedTripleList.remove(pid1, pid2, pid3)
+
+    remove the triplet from FixedTripleList
+
+    :param pid1: particle id
+    :param pid2: particle id
+    :param pid3: particle id
+    :rtype: bool
 
 """
 from espressopp import pmi
