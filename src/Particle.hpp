@@ -3,6 +3,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   
   This file is part of ESPResSo++.
   
@@ -48,6 +50,7 @@ namespace espressopp {
     real drift;
     real lambdaDeriv;
     int state;
+    int res_id;
   private:
     friend class boost::serialization::access;
     template< class Archive >
@@ -61,6 +64,7 @@ namespace espressopp {
       ar & drift;
       ar & lambdaDeriv;
       ar & state;
+      ar & res_id;
     }
   };
 
@@ -201,6 +205,7 @@ namespace espressopp {
       p.lambdaDeriv  = 0.0;
       r.extVar       = 0.0;      
       p.state        = 0;
+      p.res_id       = 0;
     }
 
     // getter and setter used for export in Python
@@ -313,6 +318,12 @@ namespace espressopp {
     int getState() const { return p.state; }
     void setState(const int& _state) { p.state = _state; }
 
+    // res_id (eg. define the id of the polymer chain)
+    int& res_id() { return p.res_id; }
+    const int& res_id() const { return p.res_id; }
+    int getResId() const { return p.res_id; }
+    void setResId(const int& _res_id) { p.res_id = _res_id; }
+
     static void registerPython();
   
     void copyAsGhost(const Particle& src, int extradata, const Real3D& shift) {
@@ -328,6 +339,15 @@ namespace espressopp {
         l = src.l;
       }
       ghost() = 1;
+    }
+
+    friend std::ostream& operator<<(std::ostream &output, const Particle &p) {
+      output << "P.id=" << p.id() << " type=" << p.type()
+             << " pos=" << p.position() << " v=" << p.velocity()
+             << " f=" << p.force() << " ghost=" << p.ghost()
+             << " lmb=" << p.lambda() << " state=" << p.state()
+             << " resid=" << p.res_id();
+      return output;
     }
 
   private:

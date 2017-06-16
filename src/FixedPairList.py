@@ -2,6 +2,8 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+#  Copyright (C) 2017
+#      Jakub Krajniak (jkrajniak at gmail.com)
 #  
 #  This file is part of ESPResSo++.
 #  
@@ -26,30 +28,44 @@ espressopp.FixedPairList
 
 .. function:: espressopp.FixedPairList(storage)
 
-		:param storage: 
-		:type storage: 
+		:param storage:
+		:type storage: espressopp.storage.Storage
 
 .. function:: espressopp.FixedPairList.add(pid1, pid2)
 
-		:param pid1: 
-		:param pid2: 
-		:type pid1: 
-		:type pid2: 
-		:rtype: 
+    Adds new bond.
+
+		:param pid1: particle id
+		:param pid2: particle id
+		:type pid1: int
+		:type pid2: int
+		:rtype: bool
 
 .. function:: espressopp.FixedPairList.addBonds(bondlist)
 
-		:param bondlist: 
-		:type bondlist: 
+   Adds bonds from the list.
+
+		:param bondlist: List of pairs
+		:type bondlist: list
 		:rtype: 
 
 .. function:: espressopp.FixedPairList.getBonds()
 
 		:rtype: 
 
-.. function:: espressopp.FixedPairList.remove()
+.. function:: espressopp.FixedPairList.clean_and_remove()
 
     'remove the FixedPairList and disconnect'
+
+.. function:: espressopp.FixedPairList.remove(pid1, pid2)
+
+   Remove pair from the list.
+
+    :param pid1: Particle ID
+    :param pid2: Particle ID
+    :type pid1: int
+    :type pid2: int
+    :rtype: bool
 
 .. function:: espressopp.FixedPairList.getLongtimeMaxBond()
 
@@ -62,6 +78,10 @@ espressopp.FixedPairList
 .. function:: espressopp.FixedPairList.size()
 
 		:rtype: 
+
+.. function:: espressopp.FixedPairList.totalSize()
+
+        :rtype:
 """
 from espressopp import pmi
 import _espressopp 
@@ -77,6 +97,16 @@ class FixedPairListLocal(_espressopp.FixedPairList):
         if pmi.workerIsActive():
             cxxinit(self, _espressopp.FixedPairList, storage)
 
+        self._interaction = None
+
+    @property
+    def interaction(self):
+        return self._interaction
+
+    @interaction.setter
+    def interaction(self, _interaction):
+        self._interaction = _interaction
+
     def add(self, pid1, pid2):
 
         if pmi.workerIsActive():
@@ -86,6 +116,10 @@ class FixedPairListLocal(_espressopp.FixedPairList):
 
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
+
+    def totalSize(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.totalSize(self)
 
     def addBonds(self, bondlist):
         """
@@ -105,9 +139,13 @@ class FixedPairListLocal(_espressopp.FixedPairList):
           bonds=self.cxxclass.getBonds(self)
           return bonds
 
-    def remove(self):
+    def getAllBonds(self):
         if pmi.workerIsActive():
-          self.cxxclass.remove(self)
+            return self.cxxclass.getAllBonds(self)
+
+    def clearAndRemove(self):
+        if pmi.workerIsActive():
+          self.cxxclass.clearAndRemove(self)
 
     def resetLongtimeMaxBond(self):
 
@@ -119,14 +157,18 @@ class FixedPairListLocal(_espressopp.FixedPairList):
         if pmi.workerIsActive(): 
             mxsqr = self.cxxclass.getLongtimeMaxBondSqr(self)
             return sqrt(mxsqr)
+
+    def remove(self, pid1, pid2, no_signal=False):
+        if pmi.workerIsActive():
+            return self.cxxclass.remove(self, pid1, pid2, no_signal)
             
 if pmi.isController:
     class FixedPairList(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espressopp.FixedPairListLocal',
-            #localcall = [ 'add' ],
-            pmicall = [ 'add', 'addBonds','remove', 'resetLongtimeMaxBond' ],
+            pmiproperty = ('interaction', ),
+            pmicall = [ 'add', 'addBonds', 'clearAndRemove', 'resetLongtimeMaxBond', "totalSize", "remove", 'getAllBonds' ],
             pmiinvoke = ['getBonds', 'size', 'getLongtimeMaxBondLocal']
         )
         

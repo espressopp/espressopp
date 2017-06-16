@@ -2,7 +2,9 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  
+#  Copyright (C) 2017
+#      Jakub Krajniak (jkrajniak at gmail.com)
+#
 #  This file is part of ESPResSo++.
 #  
 #  ESPResSo++ is free software: you can redistribute it and/or modify
@@ -95,15 +97,23 @@ class FixedQuadrupleListLocal(_espressopp.FixedQuadrupleList):
                 pid1, pid2, pid3, pid4 = quadruple
                 self.cxxclass.add(self, pid1, pid2, pid3, pid4)
 
-    def remove(self):
+    def remove(self, pid1, pid2, pid3, pid4, no_signal=False):
         if pmi.workerIsActive():
-            self.cxxclass.remove(self)
+            self.cxxclass.remove(self, pid1, pid2, pid3, pid4, no_signal)
+
+    def clearAndRemove(self):
+        if pmi.workerIsActive():
+            self.cxxclass.clearAndRemove()
 
     def getQuadruples(self):
 
         if pmi.workerIsActive():
           quadruple = self.cxxclass.getQuadruples(self)
-          return quadruple 
+          return quadruple
+
+    def getAllQuadruples(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getAllQuadruples(self)
 
 if pmi.isController:
     class FixedQuadrupleList(object):
@@ -111,6 +121,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedQuadrupleListLocal',
             localcall = [ "add" ],
-            pmicall = [ "addQuadruples","remove" ],
+            pmicall = [ "addQuadruples", "totalSize", "getAllQuadruples", "clearAndRemove", "remove"],
             pmiinvoke = ["getQuadruples", "size"]
             )

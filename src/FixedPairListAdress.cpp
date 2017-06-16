@@ -245,7 +245,7 @@ namespace espressopp {
     bool (FixedPairListAdress::*pyAdd)(longint pid1, longint pid2)
       = &FixedPairListAdress::add;
 
-    class_<FixedPairListAdress, shared_ptr<FixedPairListAdress> >
+    class_<FixedPairListAdress, shared_ptr<FixedPairListAdress>, boost::noncopyable >
       ("FixedPairListAdress",
               init <shared_ptr<storage::Storage>,
                      shared_ptr<FixedTupleListAdress> >())

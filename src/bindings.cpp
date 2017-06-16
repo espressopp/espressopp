@@ -64,6 +64,7 @@ void espressopp::registerPython() {
   espressopp::Particle::registerPython();
   espressopp::ParticleGroup::registerPython();
   espressopp::System::registerPython();
+  espressopp::DynamicExcludeList::registerPython();
   espressopp::VerletList::registerPython();
   espressopp::VerletListAdress::registerPython();
   espressopp::VerletListTriple::registerPython();

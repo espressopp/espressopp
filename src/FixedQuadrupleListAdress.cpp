@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2014
+  Copyright (c) 2014,2017
       Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
@@ -56,6 +56,63 @@ FixedQuadrupleListAdress::~FixedQuadrupleListAdress() {
   LOG4ESPP_INFO(theLogger, "~FixedQuadrupleListAdress");
   sigBeforeSendAT.disconnect();
   sigAfterRecvAT.disconnect();
+}
+
+bool FixedQuadrupleListAdress::iadd(longint pid1, longint pid2, longint pid3, longint pid4) {
+  // here we assume pid1 < pid2 < pid3 < pid4
+  bool returnVal = true;
+  System& system = storage->getSystemRef();
+
+  // ADD THE LOCAL QUADRUPLET
+  Particle *p1 = storage->lookupAdrATParticle(pid1);
+  Particle *p2 = storage->lookupAdrATParticle(pid2);
+  Particle *p3 = storage->lookupAdrATParticle(pid3);
+  Particle *p4 = storage->lookupAdrATParticle(pid4);
+  if (!p1){
+    // Particle does not exist here, return false
+    returnVal = false;
+  } else {
+    std::stringstream msg;
+    if (!p2) {
+      msg << "Quadruple particle p2 " << pid2 << " does not exists here and cannot be added.";
+      throw std::runtime_error(msg.str());
+    }
+    if (!p3) {
+      msg << "Quadruple particle p3 " << pid3 << " does not exists here and cannot be added.";
+      throw std::runtime_error(msg.str());
+    }
+    if (!p4) {
+      msg << "Quadruple particle p4 " << pid4 << " does not exists here and cannot be added.";
+      throw std::runtime_error(msg.str());
+    }
+  }
+
+  if(returnVal){
+    // add the quadruple locally
+    this->add(p1, p2, p3, p4);
+
+    // ADD THE GLOBAL QUADRUPLET
+    // see whether the particle already has quadruples
+    std::pair<GlobalQuadruples::const_iterator,
+              GlobalQuadruples::const_iterator> equalRange
+        = globalQuadruples.equal_range(pid1);
+    if (equalRange.first == globalQuadruples.end()) {
+      // if it hasn't, insert the new quadruple
+      globalQuadruples.insert(std::make_pair(pid1,
+                                             Triple<longint, longint, longint>(pid2, pid3, pid4)));
+    } else {
+      // otherwise test whether the quadruple already exists
+      for (GlobalQuadruples::const_iterator it = equalRange.first; it != equalRange.second; ++it)
+        if (it->second == Triple<longint, longint, longint>(pid2, pid3, pid4))
+          // TODO: Quadruple already exists, generate error!
+          ;
+      // if not, insert the new quadruple
+      globalQuadruples.insert(equalRange.first,
+                              std::make_pair(pid1, Triple<longint, longint, longint>(pid2, pid3, pid4)));
+    }
+  }
+  LOG4ESPP_INFO(theLogger, "Added fixed quadruple to local quadruple list.");
+  return returnVal;
 }
 
 bool FixedQuadrupleListAdress::add(longint pid1, longint pid2, longint pid3, longint pid4) {
@@ -219,7 +276,7 @@ void FixedQuadrupleListAdress::registerPython() {
   bool (FixedQuadrupleListAdress::*pyAdd)(longint pid1, longint pid2,
          longint pid3, longint pid4) = &FixedQuadrupleListAdress::add;
 
-  class_< FixedQuadrupleListAdress, shared_ptr< FixedQuadrupleListAdress > >
+  class_< FixedQuadrupleListAdress, shared_ptr< FixedQuadrupleListAdress >, boost::noncopyable >
     ("FixedQuadrupleListAdress",
         init<shared_ptr< storage::Storage>, shared_ptr<FixedTupleListAdress> >())
     .def("add", pyAdd)

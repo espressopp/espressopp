@@ -3,6 +3,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   
   This file is part of ESPResSo++.
   
@@ -32,7 +34,6 @@
 #include "esutil/ESPPIterator.hpp"
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
-//#include "FixedListComm.hpp"
 
 namespace espressopp {
   class FixedQuadrupleList : public QuadrupleList {
@@ -45,6 +46,7 @@ namespace espressopp {
     using QuadrupleList::add;
 
   public:
+    FixedQuadrupleList() { }
     FixedQuadrupleList(shared_ptr< storage::Storage > _storage);
     ~FixedQuadrupleList();
 
@@ -55,22 +57,48 @@ namespace espressopp {
 	
 	\return whether the quadruple was inserted on this processor.
     */
-    bool add(longint pid1, longint pid2, longint pid3, longint pid4);
-    void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
-    void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
-    virtual void onParticlesChanged();
+    virtual bool add(longint pid1, longint pid2, longint pid3, longint pid4);
+    /// Non-blocking add method.
+    virtual bool iadd(longint pid1, longint pid2, longint pid3, longint pid4);
 
-    python::list getQuadruples();
+    virtual bool remove(longint pid1, longint pid2, longint pid3, longint pid4, bool no_signal);
+    virtual void clearAndRemove() {
+      this->clear();
+      globalQuadruples.clear();
+      sigBeforeSend.disconnect();
+      sigAfterRecv.disconnect();
+    }
+    /**
+     * Remove quadruplets that are build around bond pid1-pid2
+     * @param pid1 particle id
+     * @param pid2 particle id
+     * @return true if the quadruplets were removed
+     */
+    virtual bool removeByBond(longint pid1, longint pid2);
+
+    virtual void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
+    virtual void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
+    virtual void onParticlesChanged();
+    virtual void updateParticlesStorage();
+
+    virtual std::vector<longint> getQuadrupleList();
+    virtual python::list getQuadruples();
 
     /** Get the number of quadruples in the GlobalQuadruples list */
-    int size() {
+    virtual int size() {
     	return globalQuadruples.size();
     }
-    void remove();
+
+    virtual int totalSize();
+
+    boost::signals2::signal<void (longint, longint, longint, longint)> onTupleAdded;
+    boost::signals2::signal<void (longint, longint, longint, longint)> onTupleRemoved;
+
     static void registerPython();
 
   private:
     static LOG4ESPP_DECL_LOGGER(theLogger);
+    python::list getAllQuadruples();
   };
 }
 

@@ -228,6 +228,8 @@ find_program(SPHINX_EXECUTABLE
   DOC "Sphinx documentation generation tool (http://www.sphinx-doc.org/)"
 )
 
+message(${SPHINX_EXECUTABLE})
+
 if ( SPHINX_EXECUTABLE )
 
    set ( SPHINX_BUILD_ROOT "${CMAKE_SOURCE_DIR}/doc/ug" )

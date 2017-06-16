@@ -3,6 +3,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2017
+      Jakub Krajniak
   
   This file is part of ESPResSo++.
   
@@ -21,29 +23,14 @@
 */
 
 #include "python.hpp"
-#include <sstream>
 #include "FixedPairList.hpp"
-//#include <utility>
-//#include <algorithm>
-#include <boost/bind.hpp>
 #include "storage/Storage.hpp"
-#include "Buffer.hpp"
 
 #include "esutil/Error.hpp"
 
 using namespace std;
 
 namespace espressopp {
-
-  /*
-  FixedPairList::FixedPairList(shared_ptr< storage::Storage > _storage)
-  : FixedListComm (_storage){}
-
-  FixedPairList::~FixedPairList() {
-    //std::cout << "~fixedpairlist" << std::endl;
-    //FixedListComm::~FixedListComm();
-  }*/
-
 
   LOG4ESPP_LOGGER(FixedPairList::theLogger, "FixedPairList");
 
@@ -69,16 +56,6 @@ namespace espressopp {
     sigOnParticlesChanged.disconnect();
   }
 
-
-  /*
-  bool FixedPairList::add(longint pid1, longint pid2) {
-    std::vector<longint> tmp;
-    tmp.push_back(pid2);
-    tmp.push_back(pid1); // this is used as key
-
-    return FixedListComm::add(tmp);
-  }*/
-
   real FixedPairList::getLongtimeMaxBondSqr() {
 	  return longtimeMaxBondSqr;
   }
@@ -98,7 +75,8 @@ namespace espressopp {
       std::swap(pid1, pid2);
 
     System& system = storage->getSystemRef();
-    
+    esutil::Error err(system.comm);
+
     // ADD THE LOCAL PAIR
     Particle *p1 = storage->lookupRealParticle(pid1);
     Particle *p2 = storage->lookupLocalParticle(pid2);
@@ -109,37 +87,147 @@ namespace espressopp {
     }
     else{
       if (!p2) {
-	LOG4ESPP_DEBUG(theLogger, "Particle p2 " << pid2 << " not found");
+        std::stringstream msg;
+        msg << "bond particle p2 " << pid2 << " does not exists here and cannot be added";
+        err.setException(msg.str());
       }
     }
-    
-    if(returnVal){
-      // add the pair locally
-      this->add(p1, p2);
+
+    err.checkException();
+
+    if (returnVal) {
       // ADD THE GLOBAL PAIR
       // see whether the particle already has pairs
-      std::pair<GlobalPairs::const_iterator,
-        GlobalPairs::const_iterator> equalRange
-        = globalPairs.equal_range(pid1);
-      if (equalRange.first == globalPairs.end()) {
-        // if it hasn't, insert the new pair
-        globalPairs.insert(std::make_pair(pid1, pid2));
-      }
-      else {
+      bool found = false;
+      std::pair<GlobalPairs::const_iterator, GlobalPairs::const_iterator> equalRange =
+          globalPairs.equal_range(pid1);
+      if (equalRange.first != globalPairs.end()) {
         // otherwise test whether the pair already exists
-        for (GlobalPairs::const_iterator it = equalRange.first; it != equalRange.second; ++it) {
-  	    if (it->second == pid2) {
-  	      // TODO: Pair already exists, generate error!
-  	      ;
-  	    }
+        for (GlobalPairs::const_iterator it = equalRange.first; it != equalRange.second && !found; ++it) {
+          if (it->second == pid2)
+            found = true;
         }
-        // if not, insert the new pair
-        globalPairs.insert(equalRange.first, std::make_pair(pid1, pid2));
       }
-      LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
+      returnVal = !found;
+      if (!found) {
+        // add the pair locally
+        this->add(p1, p2);
+        // Update list of integers.
+        globalPairs.insert(equalRange.first, std::make_pair(pid1, pid2));
+        // Throw signal onTupleAdded.
+        onTupleAdded(pid1, pid2);
+        LOG4ESPP_INFO(theLogger, "added fixed pair " << pid1 << "-" << pid2 << " to global pair list");
+      }
     }
-    LOG4ESPP_DEBUG(theLogger, "Leaving add with returnVal " << returnVal);
     return returnVal;
+  }
+
+  bool FixedPairList::iadd(longint pid1, longint pid2) {
+    bool returnVal = true;
+    if (pid1 > pid2)
+      std::swap(pid1, pid2);
+
+    System& system = storage->getSystemRef();
+
+    // ADD THE LOCAL PAIR
+    Particle *p1 = storage->lookupRealParticle(pid1);
+    Particle *p2 = storage->lookupLocalParticle(pid2);
+
+    if (!p1) {
+      // Particle does not exist here, return false
+      returnVal = false;
+    } else if (!p2) {
+        returnVal = false;
+    }
+
+    if (returnVal) {
+      // ADD THE GLOBAL PAIR
+      // see whether the particle already has pairs
+      bool found = false;
+      std::pair<GlobalPairs::const_iterator, GlobalPairs::const_iterator> equalRange =
+          globalPairs.equal_range(pid1);
+      if (equalRange.first != globalPairs.end()) {
+        // otherwise test whether the pair already exists
+        for (GlobalPairs::const_iterator it = equalRange.first; it != equalRange.second && !found; ++it) {
+          if (it->second == pid2)
+            found = true;
+        }
+      }
+      returnVal = !found;
+      if (!found) {
+        // add the pair locally
+        this->add(p1, p2);
+        // Update list of integers.
+        globalPairs.insert(equalRange.first, std::make_pair(pid1, pid2));
+        // Throw signal onTupleAdded.
+        onTupleAdded(pid1, pid2);
+        LOG4ESPP_INFO(theLogger, "added fixed pair " << pid1 << "-" << pid2 << " to global pair list");
+      }
+    }
+    return returnVal;
+  }
+
+  bool FixedPairList::remove(longint pid1, longint pid2, bool no_signal) {
+    LOG4ESPP_DEBUG(theLogger, "FPL remove " << pid1 << "-" << pid2);
+    bool returnValue = false;
+    std::pair<GlobalPairs::iterator, GlobalPairs::iterator> equalRange, equalRange_rev;
+    equalRange = globalPairs.equal_range(pid1);
+    if (equalRange.first != globalPairs.end()) {
+      for (GlobalPairs::iterator it = equalRange.first; it != equalRange.second;) {
+        if (it->second == pid2) {
+          LOG4ESPP_DEBUG(theLogger, "FPL, found " << it->first << " - " << it->second);
+          if (!no_signal)
+            onTupleRemoved(pid1, pid2);
+          it = globalPairs.erase(it);
+          returnValue = true;
+        } else {
+          it++;
+        }
+      }
+    }
+    if (!returnValue) {
+      equalRange_rev = globalPairs.equal_range(pid2);
+      if (equalRange_rev.first != globalPairs.end()) {
+        for (GlobalPairs::iterator it = equalRange_rev.first; it != equalRange_rev.second;) {
+          if (it->second == pid1) {
+            LOG4ESPP_DEBUG(theLogger, "FPL, found " << it->first << " - " << it->second);
+            if (!no_signal)
+              onTupleRemoved(pid1, pid2);
+            it = globalPairs.erase(it);
+            returnValue = true;
+          } else {
+            it++;
+          }
+        }
+      }
+    }
+    return returnValue;
+  }
+
+  bool FixedPairList::removeByPid1(longint pid1, bool noSignal, bool removeAll, longint removeCounter) {
+    bool returnValue = false;
+    std::pair<GlobalPairs::iterator, GlobalPairs::iterator> equalRange = globalPairs.equal_range(pid1);
+    if (equalRange.first == globalPairs.end())
+      return returnValue;
+
+    if (removeAll) {
+      for(GlobalPairs::iterator it = equalRange.first; it != equalRange.second;) {
+        if (!noSignal)
+          onTupleRemoved(it->first, it->second);
+        it = globalPairs.erase(it);
+        returnValue = true;
+      }
+    } else {
+      longint num_removed = 0;
+      for(GlobalPairs::iterator it = equalRange.first; it != equalRange.second && num_removed < removeCounter;) {
+        if (!noSignal)
+          onTupleRemoved(it->first, it->second);
+        it = globalPairs.erase(it);
+        returnValue = true;
+        num_removed++;
+      }
+    }
+    return returnValue;
   }
 
   python::list FixedPairList::getBonds()
@@ -152,6 +240,43 @@ namespace espressopp {
     }
 
 	return bonds;
+  }
+
+  std::vector<longint> FixedPairList::getPairList() {
+    std::vector<longint> ret;
+    for (GlobalPairs::const_iterator it = globalPairs.begin(); it != globalPairs.end(); it++) {
+      ret.push_back(it->first);
+      ret.push_back(it->second);
+    }
+    return ret;
+  }
+
+  python::list FixedPairList::getAllBonds() {
+    std::vector<longint> local_bonds;
+    std::vector<std::vector<longint> > global_bonds;
+    python::list bonds;
+
+    for (GlobalPairs::const_iterator it = globalPairs.begin(); it != globalPairs.end(); it++) {
+      local_bonds.push_back(it->first);
+      local_bonds.push_back(it->second);
+    }
+    System& system = storage->getSystemRef();
+    if (system.comm->rank() == 0) {
+      mpi::gather(*system.comm, local_bonds, global_bonds, 0);
+      python::tuple bond;
+
+      for (std::vector<std::vector<longint> >::iterator it = global_bonds.begin();
+           it != global_bonds.end(); ++it) {
+        for (std::vector<longint>::iterator iit = it->begin(); iit != it->end();) {
+          longint pid1 = *(iit++);
+          longint pid2 = *(iit++);
+          bonds.append(python::make_tuple(pid1, pid2));
+        }
+      }
+    } else {
+      mpi::gather(*system.comm, local_bonds, global_bonds, 0);
+    }
+    return bonds;
   }
 
   void FixedPairList::beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
@@ -237,7 +362,8 @@ namespace espressopp {
 	    p1 = storage->lookupRealParticle(it->first);
         if (p1 == NULL) {
           std::stringstream msg;
-          msg << "onParticlesChanged error. Fixed Pair List particle p1 " << it->first << " does not exists here";
+          msg << "onParticlesChanged error. Fixed Pair List particle p1 " << it->first << " does not exists here.";
+          msg << " pair: " << it->first << "-" << it->second;
           err.setException( msg.str() );
           //std::runtime_error(err.str());
         }
@@ -246,7 +372,9 @@ namespace espressopp {
       p2 = storage->lookupLocalParticle(it->second);
       if (p2 == NULL) {
           std::stringstream msg;
-          msg << "onParticlesChanged error. Fixed Pair List particle p2 " << it->second << " does not exists here";
+          msg << "onParticlesChanged error. Fixed Pair List particle p2 " << it->second << " does not exists here.";
+          msg << " p1: " << *p1;
+          msg << " pair: " << it->first << "-" << it->second;
           //std::runtime_error(err.str());
           err.setException( msg.str() );
       }
@@ -257,7 +385,49 @@ namespace espressopp {
     LOG4ESPP_INFO(theLogger, "regenerated local fixed pair list from global list");
   }
 
-  void FixedPairList::remove() {
+  void FixedPairList::updateParticlesStorage() {
+    LOG4ESPP_INFO(theLogger, "rebuild local bond list from global\n");
+
+    System& system = storage->getSystemRef();
+
+    this->clear();
+    longint lastpid1 = -1;
+    Particle *p1;
+    Particle *p2;
+    for (GlobalPairs::const_iterator it = globalPairs.begin(); it != globalPairs.end(); ++it) {
+      if (it->first != lastpid1) {
+        p1 = storage->lookupRealParticle(it->first);
+        if (p1 == NULL) {
+          std::stringstream msg;
+          msg << "updateParticlesStorage error. Fixed Pair List particle p1 " << it->first << " does not exists here.";
+          msg << " p1: " << *p1;
+          msg << " pair: " << it->first << "-" << it->second;
+          throw std::runtime_error(msg.str());
+        }
+        lastpid1 = it->first;
+      }
+      p2 = storage->lookupLocalParticle(it->second);
+      if (p2 == NULL) {
+        std::stringstream msg;
+        msg << "updateParticlesStorage error. Fixed Pair List particle p2 " << it->second << " does not exists here.";
+        msg << " p1: " << *p1;
+        msg << " pair: " << it->first << "-" << it->second;
+        throw std::runtime_error(msg.str());
+      }
+      this->add(p1, p2);
+    }
+    LOG4ESPP_INFO(theLogger, "regenerated local fixed pair list from global list");
+  }
+
+  int FixedPairList::totalSize() {
+    int local_size = globalPairs.size();
+    int global_size;
+    System& system = storage->getSystemRef();
+    mpi::all_reduce(*system.comm, local_size, global_size, std::plus<int>());
+    return global_size;
+  }
+
+  void FixedPairList::clearAndRemove() {
       this->clear();
       globalPairs.clear();
       sigBeforeSend.disconnect();
@@ -277,12 +447,15 @@ namespace espressopp {
       = &FixedPairList::add;
     //bool (FixedPairList::*pyAdd)(pvec pids) = &FixedPairList::add;
 
-    class_<FixedPairList, shared_ptr<FixedPairList> >
+    class_<FixedPairList, shared_ptr<FixedPairList>, boost::noncopyable >
       ("FixedPairList", init <shared_ptr<storage::Storage> >())
       .def("add", pyAdd)
+      .def("remove", &FixedPairList::remove)
       .def("size", &FixedPairList::size)
+      .def("totalSize", &FixedPairList::totalSize)
       .def("getBonds",  &FixedPairList::getBonds)
-      .def("remove",  &FixedPairList::remove)
+      .def("getAllBonds", &FixedPairList::getAllBonds)
+      .def("clearAndRemove",  &FixedPairList::clearAndRemove)
       .def("resetLongtimeMaxBondSqr", &FixedPairList::resetLongtimeMaxBondSqr)
       .def("getLongtimeMaxBondSqr", &FixedPairList::getLongtimeMaxBondSqr)
       ;

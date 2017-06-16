@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)s
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -29,10 +31,58 @@
 #include "python.hpp"
 #include "Particle.hpp"
 #include "SystemAccess.hpp"
+#include "integrator/MDIntegrator.hpp"
 #include "boost/signals2.hpp"
 #include "boost/unordered_set.hpp"
+#include "FixedPairList.hpp"
+#include "FixedTripleList.hpp"
+#include "FixedQuadrupleList.hpp"
+#include "esutil/Timer.hpp"
 
 namespace espressopp {
+typedef boost::unordered_set<std::pair<longint, longint> > ExcludeList;
+
+class DynamicExcludeList {
+ public:
+  DynamicExcludeList(shared_ptr<integrator::MDIntegrator> integrator);
+  ~DynamicExcludeList();
+  void exclude(longint pid1, longint pid2);
+  void unexclude(longint pid1, longint pid2);
+  void connect();
+  void disconnect();
+  shared_ptr<ExcludeList> getExList() { return exList; };
+  python::list getList();
+  int getSize() const { return exList->size(); }
+
+  void observe_tuple(shared_ptr<FixedPairList> fpl);
+  void observe_triple(shared_ptr<FixedTripleList> ftl);
+  void observe_quadruple(shared_ptr<FixedQuadrupleList> fql);
+
+  boost::signals2::signal<void ()> onListUpdated;
+  boost::signals2::signal<void (longint, longint)> onPairExclude;
+  boost::signals2::signal<void (longint, longint)> onPairUnexclude;
+  
+  static void registerPython();
+
+ private:
+  shared_ptr<integrator::MDIntegrator> integrator_;
+  shared_ptr<System> system_;
+  shared_ptr<ExcludeList> exList;
+  // Helper lists.
+  std::vector<longint> exList_add;
+  std::vector<longint> exList_remove;
+
+  bool is_dirty_;
+
+  /**
+   * Synchronize exclude list among all CPUs.
+   */
+  void updateList();
+
+  boost::signals2::connection befIntP, runInit;
+  static LOG4ESPP_DECL_LOGGER(theLogger);
+
+};
 
 /** Class that builds and stores verlet lists.
 
@@ -53,6 +103,7 @@ namespace espressopp {
     */
 
     VerletList(shared_ptr< System >, real cut, bool rebuildVL);
+    VerletList(shared_ptr< System >, real cut, shared_ptr<DynamicExcludeList> dynamicExList, bool rebuildVL);
 
     ~VerletList();
 
@@ -61,6 +112,8 @@ namespace espressopp {
     python::tuple getPair(int i);
     
     real getVerletCutoff(); // returns cutoff + skin
+
+    void setVerletCutoff(real _cut); // set cutoff
 
     void connect();
 
@@ -77,6 +130,11 @@ namespace espressopp {
     /** Add pairs to exclusion list */
     bool exclude(longint pid1, longint pid2);
 
+    /** Remove pairs from exclusion list. */
+    bool unexclude(longint pid1, longint pid2);
+
+    longint excludeListSize() const;
+
     /** Get the number of times the Verlet list has been rebuilt */
     int getBuilds() const { return builds; }
 
@@ -86,11 +144,16 @@ namespace espressopp {
     /** Register this class so it can be used from Python. */
     static void registerPython();
 
+    boost::signals2::signal<void (longint, longint)> onPairExclude;
+    boost::signals2::signal<void (longint, longint)> onPairUnexclude;
+
   protected:
 
     void checkPair(Particle &pt1, Particle &pt2);
     PairList vlPairs;
-    boost::unordered_set<std::pair<longint, longint> > exList; // exclusion list
+    shared_ptr<ExcludeList> exList; // exclusion list
+    shared_ptr<DynamicExcludeList> dynamicExcludeList;
+    bool isDynamicExList;
     
     real cutsq;
     real cut;
@@ -98,6 +161,21 @@ namespace espressopp {
     
     int builds;
     boost::signals2::connection connectionResort;
+
+    /** timers */
+    esutil::WallTimer wallTimer;
+    real timeRebuild_;
+    python::list getTimers() {
+      python::list ret;
+      ret.append(python::make_tuple("timeRebuild", timeRebuild_));
+      return ret;
+    }
+
+    void resetTimers() {
+      timeRebuild_ = 0.0;
+      wallTimer.reset();
+    }
+
 
     static LOG4ESPP_DECL_LOGGER(theLogger);
   };

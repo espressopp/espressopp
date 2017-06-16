@@ -3,6 +3,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   
   This file is part of ESPResSo++.
   
@@ -62,6 +64,70 @@ FixedTripleListAdress::~FixedTripleListAdress() {
   sigAfterRecvAT.disconnect();
 }
 
+
+// override parent function (use lookupAdrATParticle) - non-blocking
+bool FixedTripleListAdress::iadd(longint pid1, longint pid2, longint pid3) {
+  bool returnVal = true;
+  System& system = storage->getSystemRef();
+  esutil::Error err(system.comm);
+
+  //if (pid1 > pid2)
+  //std::swap(pid1, pid2);
+
+  // ADD THE LOCAL TRIPLES
+  Particle *p1 = storage->lookupAdrATParticle(pid1);
+  Particle *p2 = storage->lookupAdrATParticle(pid2);
+  Particle *p3 = storage->lookupAdrATParticle(pid3);
+
+  // middle particle is the reference particle and must exist here
+  if (!p2){
+    // particle does not exists here (some other CPU must have it)
+    returnVal = false;
+  }
+  else{
+    std::stringstream msg;
+    if (!p1) {
+      msg << "atomistic triple particle p1 " << pid1 << " does not exists here and cannot be added";
+      msg << " triplet: " << pid1 << "-" << pid2 << "-" << pid3;
+      throw std::runtime_error(msg.str());
+    }
+
+    if (!p3) {
+      std::stringstream msg;
+      msg << "atomistic triple particle p3 " << pid3 << " does not exists here and cannot be added";
+      msg << " triplet: " << pid1 << "-" << pid2 << "-" << pid3;
+      throw std::runtime_error(msg.str());
+    }
+  }
+
+  if(returnVal){
+    // add the triple locally
+    this->add(p1, p2, p3);
+
+    // ADD THE GLOBAL TRIPLET
+    // see whether the particle already has triples
+    std::pair<GlobalTriples::const_iterator,
+              GlobalTriples::const_iterator> equalRange
+        = globalTriples.equal_range(pid2);
+    if (equalRange.first == globalTriples.end()) {
+      // if it hasn't, insert the new triple
+      globalTriples.insert(std::make_pair(pid2,
+                                          std::pair<longint, longint>(pid1, pid3)));
+    }
+    else {
+      // otherwise test whether the triple already exists
+      for (GlobalTriples::const_iterator it = equalRange.first;
+           it != equalRange.second; ++it)
+        if (it->second == std::pair<longint, longint>(pid1, pid3))
+          // TODO: Triple already exists, generate error!
+          ;
+      // if not, insert the new triple
+      globalTriples.insert(equalRange.first, std::make_pair(pid2, std::pair<longint, longint>(pid1, pid3)));
+    }
+    LOG4ESPP_INFO(theLogger, "added fixed pair to global pair list");
+  }
+  return returnVal;
+}
 
   // override parent function (use lookupAdrATParticle)
   bool FixedTripleListAdress::add(longint pid1, longint pid2, longint pid3) {
@@ -249,7 +315,7 @@ FixedTripleListAdress::~FixedTripleListAdress() {
     bool (FixedTripleListAdress::*pyAdd)(longint pid1, longint pid2, longint pid3)
       = &FixedTripleListAdress::add;
 
-    class_<FixedTripleListAdress, shared_ptr<FixedTripleListAdress> >
+    class_<FixedTripleListAdress, shared_ptr<FixedTripleListAdress>, boost::noncopyable >
       ("FixedTripleListAdress",
               init <shared_ptr<storage::Storage>,
                      shared_ptr<FixedTupleListAdress> >())

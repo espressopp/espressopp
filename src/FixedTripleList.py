@@ -2,6 +2,8 @@
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+#  Copyright (C) 2017
+#      Jakub Krajniak (jkrajniak at gmail.com)
 #  
 #  This file is part of ESPResSo++.
 #  
@@ -54,10 +56,8 @@ espressopp.FixedTripleList
 
 		:rtype: 
 
-.. function:: espressopp.FixedTripleList.remove()
+.. function:: espressopp.FixedTripleList.remove(pid1, pid2, pid3)
     remove the FixedPairList and disconnect
-
-
 
 """
 from espressopp import pmi
@@ -94,29 +94,22 @@ class FixedTripleListLocal(_espressopp.FixedTripleList):
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 
-    def remove(self):
+    def remove(self, pid1, pid2, pid3, no_signal=False):
         if pmi.workerIsActive():
-            self.cxxclass.remove(self)
+            self.cxxclass.remove(self, pid1, pid2, pid3, no_signal)
 
-    '''
-    def addTriples(self, triplelist):
-        """
-        Each processor takes the broadcasted triplelist and
-        adds those triples whose first particle is owned by
-        this processor.
-        """
-        
+    def clearAndRemove(self):
         if pmi.workerIsActive():
-            for triple in triplelist:
-                pid1, pid2, pid3 = triple
-                self.cxxclass.add(self, pid1, pid2, pid3)
-    '''
+            self.cxxclass.clearAndRemove(self)
 
     def getTriples(self):
-
         if pmi.workerIsActive():
           triples = self.cxxclass.getTriples(self)
-          return triples 
+          return triples
+
+    def getAllTriples(self):
+        if pmi.workerIsActive():
+            return self.cxxclass.getAllTriples(self)
 
 if pmi.isController:
     class FixedTripleList(object):
@@ -124,6 +117,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedTripleListLocal',
             localcall = [ "add" ],
-            pmicall = [ "addTriples","remove" ],
+            pmicall = [ "addTriples", "totalSize", "getAllTriples", "clearAndRemove", "remove"],
             pmiinvoke = ["getTriples", "size"]
         )

@@ -3,6 +3,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   
   This file is part of ESPResSo++.
   
@@ -55,6 +57,7 @@ namespace espressopp {
 		\return whether the particle was inserted on this processor.
 		*/
 		bool add(longint pid1, longint pid2, longint pid3);
+	  bool iadd(longint pid1, longint pid2, longint pid3);
 		void beforeSendParticles(ParticleList& pl, class OutBuffer& buf);
 		void beforeSendATParticles(std::vector<longint>& atpl, class OutBuffer& buf);
 		void onParticlesChanged();

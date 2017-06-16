@@ -3,6 +3,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   
   This file is part of ESPResSo++.
   
@@ -45,6 +47,7 @@ namespace espressopp {
       //FixedListComm<FixedTripleList, 3> _comm;
 
 	  public:
+	    FixedTripleList() { }
 		FixedTripleList(shared_ptr<storage::Storage> _storage);
 		virtual ~FixedTripleList();
 		//bool add(pvec pids) { _comm.add(pids); }
@@ -55,25 +58,40 @@ namespace espressopp {
 		\return whether the triple was inserted on this processor.
 		*/
 		virtual bool add(longint pid1, longint pid2, longint pid3);
+	    // Non blocking version of 'add' method.
+	    virtual bool iadd(longint pid1, longint pid2, longint pid3);
+
+        /**
+         * Removes a triplet from the list.
+         * @param pid1 particle id
+         * @param pid2 particle id
+         * @param pid3 particle id
+         * @param no_signal if true, onTupleRemoved signal will not be thrown
+         * @return true if the triplet is removed
+         */
+		virtual bool remove(longint pid1, longint pid2, longint pid3, bool no_signal);
+		virtual void clearAndRemove();
+		virtual bool removeByBond(longint pid1, longint pid2);
+
 		virtual void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
-		void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
+		virtual void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
 		virtual void onParticlesChanged();
+		virtual void updateParticlesStorage();
 
-		python::list getTriples();
-
+		virtual std::vector<longint> getTripleList();
+		virtual python::list getTriples();
+		virtual python::list getAllTriples();
 	    /** Get the number of triples in the GlobalTriples list */
-	    int size() {
-	    	return globalTriples.size();
-	    }
-		
-		void remove();
+	    virtual int size() { return globalTriples.size(); }
+	    virtual int totalSize();
+
+	    boost::signals2::signal<void (longint, longint, longint)> onTupleAdded;
+	    boost::signals2::signal<void (longint, longint, longint)> onTupleRemoved;
+
 		static void registerPython();
 
-		
 	  private:
 		static LOG4ESPP_DECL_LOGGER(theLogger);
-
-
   };
 }
 

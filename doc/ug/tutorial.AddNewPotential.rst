@@ -1,5 +1,5 @@
-AddNewPotential
-===============
+Define new potential
+====================
 
 .. |espp| replace:: ESPResSo++
 

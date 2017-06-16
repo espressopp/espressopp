@@ -51,6 +51,7 @@ class FixedQuadrupleListAdress : public FixedQuadrupleList {
 	  \return whether the quadruple was inserted on this processor.
   */
   bool add(longint pid1, longint pid2, longint pid3, longint pid4);
+  bool iadd(longint pid1, longint pid2, longint pid3, longint pid4);
   void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
   void beforeSendATParticles(std::vector<longint>& atpl, class OutBuffer& buf);
   void onParticlesChanged();

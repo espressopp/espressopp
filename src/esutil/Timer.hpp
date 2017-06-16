@@ -39,13 +39,25 @@ namespace espressopp {
     class Timer {
     protected:
       float currentTime;
+      float time0;
       virtual float getCurrentTime() const = 0;
     public:
       virtual ~Timer() {}
       /// reset the starting time
-      void reset() { currentTime = getCurrentTime(); }
+      void reset() {
+        currentTime = getCurrentTime();
+        time0 = 0.0;
+      }
       /// get the time that elapsed since the last reset
       float getElapsedTime() const { return getCurrentTime() - currentTime; }
+      void startMeasure() {
+        time0 = getElapsedTime();
+      }
+      float stopMeasure() {
+        float result = getElapsedTime() - time0;
+        time0 = 0.0;
+        return result;
+      }
     };
 
     /// when printing give the current elapsed time
