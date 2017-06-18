@@ -114,7 +114,7 @@ class FixedQuadrupleListLocal(_espressopp.FixedQuadrupleList):
 
     def clearAndRemove(self):
         if pmi.workerIsActive():
-            self.cxxclass.clearAndRemove()
+            self.cxxclass.clearAndRemove(self)
 
     def getQuadruples(self):
 
@@ -132,6 +132,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedQuadrupleListLocal',
             localcall = [ "add" ],
-            pmicall = [ "addQuadruples", "totalSize", "getAllQuadruples", "clearAndRemove", "remove"],
+            pmicall = [ "addQuadruples", "totalSize", "getAllQuadruples", "clearAndRemove", "remove", "removeByBond"],
             pmiinvoke = ["getQuadruples", "size"]
             )

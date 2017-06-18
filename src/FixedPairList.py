@@ -161,14 +161,14 @@ class FixedPairListLocal(_espressopp.FixedPairList):
     def remove(self, pid1, pid2, no_signal=False):
         if pmi.workerIsActive():
             return self.cxxclass.remove(self, pid1, pid2, no_signal)
-            
+
 if pmi.isController:
     class FixedPairList(object):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls = 'espressopp.FixedPairListLocal',
             pmiproperty = ('interaction', ),
-            pmicall = [ 'add', 'addBonds', 'clearAndRemove', 'resetLongtimeMaxBond', "totalSize", "remove", 'getAllBonds' ],
+            pmicall = ['add', 'addBonds', 'clearAndRemove', 'resetLongtimeMaxBond', "totalSize", "remove", 'getAllBonds', 'removeByPid1'],
             pmiinvoke = ['getBonds', 'size', 'getLongtimeMaxBondLocal']
         )
         

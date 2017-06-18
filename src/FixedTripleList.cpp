@@ -242,6 +242,7 @@ namespace espressopp {
       if ((a1 == pid1 && a2 == pid2) || (a2 == pid1 && a3 == pid2) ||
           (a1 == pid2 && a2 == pid1) || (a2 == pid2 && a3 == pid1)) {
         it = globalTriples.erase(it);
+        onTupleRemoved(a1, a2, a3);
         return_val = true;
       } else {
         ++it;
@@ -492,6 +493,7 @@ namespace espressopp {
       .def("getTriples",  &FixedTripleList::getTriples)
       .def("getAllTriples", &FixedTripleList::getAllTriples)
       .def("remove", &FixedTripleList::remove)
+      .def("removeByBond", &FixedTripleList::removeByBond)
       .def("clearAndRemove", &FixedTripleList::clearAndRemove)
      ;
   }

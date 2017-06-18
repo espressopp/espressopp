@@ -451,6 +451,7 @@ namespace espressopp {
       ("FixedPairList", init <shared_ptr<storage::Storage> >())
       .def("add", pyAdd)
       .def("remove", &FixedPairList::remove)
+      .def("removeByPid1", &FixedPairList::removeByPid1)
       .def("size", &FixedPairList::size)
       .def("totalSize", &FixedPairList::totalSize)
       .def("getBonds",  &FixedPairList::getBonds)

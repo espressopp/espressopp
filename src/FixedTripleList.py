@@ -127,6 +127,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedTripleListLocal',
             localcall = [ "add" ],
-            pmicall = [ "addTriples", "totalSize", "getAllTriples", "clearAndRemove", "remove"],
+            pmicall = [ "addTriples", "totalSize", "getAllTriples", "clearAndRemove", "remove", "removeByBond"],
             pmiinvoke = ["getTriples", "size"]
         )
