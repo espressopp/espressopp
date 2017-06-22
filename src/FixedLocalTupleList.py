@@ -68,6 +68,11 @@ class FixedLocalTupleListLocal(_espressopp.FixedLocalTupleList):
         if pmi.workerIsActive():
             return self.cxxclass.addTuple(self, tuplelist)"""
 
+    def getTuples(self):
+
+        if pmi.workerIsActive():
+            tuples=self.cxxclass.getTuples(self)
+            return tuples
 
     def size(self):
 
@@ -82,6 +87,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedLocalTupleListLocal',
             #localcall = [ "add" ],
-            pmicall = [ "addTuple", "getTuples" ],
-            pmiinvoke = ["size"]
+            pmicall = [ "addTuple"],
+            pmiinvoke = ["size", "getTuples"]
         )
