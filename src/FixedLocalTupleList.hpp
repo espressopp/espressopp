@@ -31,40 +31,36 @@
 #include <boost/signals2.hpp>
 
 namespace espressopp {
-  class FixedLocalTupleList : public TupleList {
-      protected:
-		boost::signals2::connection con1, con2, con3;
-		shared_ptr<storage::Storage> storage;
-                typedef std::vector<longint> tuple;
-		typedef std::multimap <longint,tuple > GlobalTuples;
-		GlobalTuples globalTuples;
-		using TupleList::add;
-
-      //FixedListComm<FixedLocalTupleList, 3> _comm;
-
-	  public:
-		FixedLocalTupleList(shared_ptr<storage::Storage> _storage);
-		virtual ~FixedLocalTupleList();
-		virtual bool addTuple(boost::python::list& tuple);
-		virtual void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
-		void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
-		virtual void onParticlesChanged();
-
-		python::list getTuples();
-
-	    /** Get the number of triples in the GlobalTriples list */
-	    int size() {
-	    	return globalTuples.size();
-	    }
-
-		static void registerPython();
+    class FixedLocalTupleList : public TupleList {
+    protected:
+	boost::signals2::connection con1, con2, con3;
+	shared_ptr<storage::Storage> storage;
+	typedef std::vector<longint> tuple;
+	typedef std::multimap <longint,tuple > GlobalTuples;
+	GlobalTuples globalTuples;
+	using TupleList::add;
 	
+    public:
+	FixedLocalTupleList(shared_ptr<storage::Storage> _storage);
+	virtual ~FixedLocalTupleList();
+	virtual bool addTuple(boost::python::list& tuple);
+	virtual void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
+	void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
+	virtual void onParticlesChanged();
+	
+	python::list getTuples();
 
-	  private:
-		static LOG4ESPP_DECL_LOGGER(theLogger);
-                int Tuple_Length;
-                bool first_add;
-  };
+	/** Get the number of triples in the GlobalTriples list */
+	int size() {
+	    return globalTuples.size();
+	}
+	
+	static void registerPython();
+	
+	
+    private:
+	static LOG4ESPP_DECL_LOGGER(theLogger);
+    };
 }
 
 #endif

@@ -22,9 +22,6 @@
 #include <sstream>
 #include "FixedLocalTupleList.hpp"
 
-//#include <vector>
-//#include <utility>
-//#include <algorithm>
 #include <boost/bind.hpp>
 #include "storage/Storage.hpp"
 #include "Buffer.hpp"
@@ -33,33 +30,31 @@
 
 
 namespace espressopp {
-
-  LOG4ESPP_LOGGER(FixedLocalTupleList::theLogger, "FixedLocalTupleList");
-
-  FixedLocalTupleList::FixedLocalTupleList(shared_ptr< storage::Storage > _storage)
-    : storage(_storage), globalTuples()
-  {
-    LOG4ESPP_INFO(theLogger, "construct FixedLocalTupleList");
-
-    first_add = true;
-
-    con1 = storage->beforeSendParticles.connect
-      (boost::bind(&FixedLocalTupleList::beforeSendParticles, this, _1, _2));
-    con2 = storage->afterRecvParticles.connect
-      (boost::bind(&FixedLocalTupleList::afterRecvParticles, this, _1, _2));
-    con3 = storage->onParticlesChanged.connect
-      (boost::bind(&FixedLocalTupleList::onParticlesChanged, this));
-  }
-
-  FixedLocalTupleList::~FixedLocalTupleList() {
-
-    LOG4ESPP_INFO(theLogger, "~FixedLocalTupleList");
-
-    con1.disconnect();
-    con2.disconnect();
-    con3.disconnect();
+    
+    LOG4ESPP_LOGGER(FixedLocalTupleList::theLogger, "FixedLocalTupleList");
+    
+    FixedLocalTupleList::FixedLocalTupleList(shared_ptr< storage::Storage > _storage)
+	: storage(_storage), globalTuples()
+    {
+	LOG4ESPP_INFO(theLogger, "construct FixedLocalTupleList");
+	
+	con1 = storage->beforeSendParticles.connect
+	    (boost::bind(&FixedLocalTupleList::beforeSendParticles, this, _1, _2));
+	con2 = storage->afterRecvParticles.connect
+	    (boost::bind(&FixedLocalTupleList::afterRecvParticles, this, _1, _2));
+	con3 = storage->onParticlesChanged.connect
+	    (boost::bind(&FixedLocalTupleList::onParticlesChanged, this));
     }
 
+    FixedLocalTupleList::~FixedLocalTupleList() {
+	
+	LOG4ESPP_INFO(theLogger, "~FixedLocalTupleList");
+	
+	con1.disconnect();
+	con2.disconnect();
+	con3.disconnect();
+    }
+    
     bool FixedLocalTupleList::
     addTuple(boost::python::list& tuple) {
         bool returnVal = true;
@@ -72,16 +67,18 @@ namespace espressopp {
         std::vector<longint> pids; //used to extract from tuple;
         std::vector<longint> pidstmp; // temporary vector
         
-	if (first_add) {
-	    Tuple_Length = boost::python::len(tuple);
-	    first_add = false;
-	} else if (Tuple_Length != boost::python::len(tuple)) {
+	/*
+	if (firstAdd) {
+	    tupleLength = boost::python::len(tuple);
+	    firstAdd = false;
+	} else if (tupleLength != boost::python::len(tuple)) {
 	    std::stringstream msg;
 	    msg << "ERROR: tuple length is not constant\n";
 	    err.setException(msg.str());
 	    returnVal = false;
 	}
-
+	*/
+	
         for (int i = 0; i < boost::python::len(tuple); ++i) {
             pids.push_back(boost::python::extract<int>(tuple[i]));
         }
@@ -106,17 +103,17 @@ namespace espressopp {
             }
         }
         err.checkException();
-
+	
         if (returnVal) {
             this->add(vp, tmp); // add to TupleList
             globalTuples.insert(make_pair(pidK, pidstmp));
+	    LOG4ESPP_INFO(theLogger, "added fixed tuple to global tuples");
         }
-        LOG4ESPP_INFO(theLogger, "added fixed tuple to global tuples");
-
+	
         tmp.clear();
         pids.clear();
         pidstmp.clear();
-
+	
 
         return returnVal;
     }
@@ -133,18 +130,18 @@ namespace espressopp {
             }
             alltuples.append(tuple);
         }
-
+	
         return alltuples;
     }
-
-  void FixedLocalTupleList::
+    
+    void FixedLocalTupleList::
     beforeSendParticles(ParticleList& pl, OutBuffer& buf) {
         std::vector<longint> toSend;
         // loop over the particle list
         for (ParticleList::Iterator pit(pl); pit.isValid(); ++pit) {
             longint pidK = pit->id();
             LOG4ESPP_DEBUG(theLogger, "send particle with pid " << pidK << ", find tuples");
-
+	    
             // find particle that involves this particle id
             GlobalTuples::const_iterator it = globalTuples.find(pidK);
             if (it != globalTuples.end()) {
@@ -178,9 +175,7 @@ namespace espressopp {
         GlobalTuples::iterator it = globalTuples.begin();
 
 	buf.read(received);
-	//for (int i = 0; i < received.size(); i++) {
-	//    std::cout << "received[" << i << "] = " << received[i] << std::endl;
-	//}
+
 	int size = received.size();
 
 	i = 0;
@@ -201,8 +196,8 @@ namespace espressopp {
     }
 
 
-  void FixedLocalTupleList::onParticlesChanged() {
-         // TODO errors should be thrown in a nice way
+    void FixedLocalTupleList::onParticlesChanged() {
+	// TODO errors should be thrown in a nice way
         LOG4ESPP_INFO(theLogger, "rebuild local particle list from global tuples\n");
         System& system = storage->getSystemRef();
         esutil::Error err(system.comm);
@@ -210,9 +205,9 @@ namespace espressopp {
         this->clear();
         Particle* vp, * at;
         std::vector<Particle*> tmp;
-
+	
         GlobalTuples::const_iterator it = globalTuples.begin();
-
+	
         for (;it != globalTuples.end(); ++it) {
 	    if (globalTuples.count(it->first) > 1) {
 		std::stringstream msg;
@@ -225,14 +220,14 @@ namespace espressopp {
                 msg << " particle in tuple " << it->first << " does not exists here";
                 err.setException( msg.str() );
             }
-
+	    
             // iterate through vector in map
             for (tuple::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
                 at = storage->lookupLocalParticle(*it2);
                 if (at == NULL) {
-                	std::stringstream msg;
-                        msg << " particle in tuple " << *it2 << " does not exists here";
-                        err.setException( msg.str() );
+		    std::stringstream msg;
+		    msg << " particle in tuple " << *it2 << " does not exists here";
+		    err.setException( msg.str() );
                 }
                 tmp.push_back(at);
             }
@@ -240,26 +235,21 @@ namespace espressopp {
             tmp.clear();
         }
         LOG4ESPP_INFO(theLogger, "regenerated local fixed list from global tuples");
-  }
-
-  /****************************************************
-  ** REGISTRATION WITH PYTHON
-  ****************************************************/
-
-  void FixedLocalTupleList::registerPython() {
-
-    using namespace espressopp::python;
-
-    //bool (FixedLocalTupleList::*pyAdd)(tuple pids)
-     // = &FixedLocalTupleList::addTuple;
-    //bool (FixedLocalTupleList::*pyAdd)(pvec pids)
-    //      = &FixedLocalTupleList::add;
-
-    class_< FixedLocalTupleList, shared_ptr< FixedLocalTupleList > >
-      ("FixedLocalTupleList", init< shared_ptr< storage::Storage > >())
-      .def("addTuple", &FixedLocalTupleList::addTuple)
-     .def("getTuples", &FixedLocalTupleList::getTuples)
-      .def("size", &FixedLocalTupleList::size)
-     ;
-  }
+    }
+    
+    /****************************************************
+     ** REGISTRATION WITH PYTHON
+     ****************************************************/
+    
+    void FixedLocalTupleList::registerPython() {
+	
+	using namespace espressopp::python;
+	
+	class_< FixedLocalTupleList, shared_ptr< FixedLocalTupleList > >
+	    ("FixedLocalTupleList", init< shared_ptr< storage::Storage > >())
+	    .def("addTuple", &FixedLocalTupleList::addTuple)
+	    .def("getTuples", &FixedLocalTupleList::getTuples)
+	    .def("size", &FixedLocalTupleList::size)
+	    ;
+    }
 }

@@ -23,13 +23,9 @@ r"""
 *****************************
 This class can contain many tuple which store a arbitrary positive number, which should be more than 2, of local (real + ghost) particle id.
 
-For using this class, there are 3 conditions.
+For using this class, there is 1 conditions:
 
-1. The length of all tuple must be same.
-2. Particles in one tuple must be in a same or neighbor cell list.
-3. Particle id should not be stored redundantly.
-
-These conditions are available only for the identical object.
+Particles in one tuple must be in a same or neighbor cell list.
 
 .. function:: espressopp.FixedLocalTupleList(storage)
 
@@ -62,11 +58,6 @@ class FixedLocalTupleListLocal(_espressopp.FixedLocalTupleList):
 
         if pmi.workerIsActive():
             cxxinit(self, _espressopp.FixedLocalTupleList, storage)
-
-    """def addTuples(self, tuplelist):
-        'add tuple to fixed tuple list'
-        if pmi.workerIsActive():
-            return self.cxxclass.addTuple(self, tuplelist)"""
 
     def getTuples(self):
 

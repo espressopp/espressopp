@@ -67,6 +67,19 @@ class TestFixedLocalTupleList(unittest.TestCase) :
                     system.storage.addParticle(pid, Real3D(x, y, z))
 
                     pid = pid + 1
+
+        for i in xrange(N):
+            for j in xrange(N):
+                for k in xrange(N):
+                    
+                    r = 0.25
+                    x = (i + r) / N * SIZE
+                    y = (j + r) / N * SIZE
+                    z = (k + r) / N * SIZE
+   
+                    system.storage.addParticle(pid, Real3D(x, y, z))
+
+                    pid = pid + 1
                     
         system.storage.decompose()
 
@@ -87,16 +100,27 @@ class TestFixedLocalTupleList(unittest.TestCase) :
             tuplelist.addTuple(tuple)
             stored.append(tuple)
 
-        self.assertEqual(sum(tuplelist.size(), 0), N*N*N/num_constrain)
+        num_constrain = N*N/2
+        for i in range(N*N*N/num_constrain, 2*N*N*N/num_constrain):
+            tuple = []
+            for j in range(num_constrain):
+                tuple.append(num_constrain*i + j)
+            tuplelist.addTuple(tuple)
+            stored.append(tuple)
+
+        self.assertEqual(sum(tuplelist.size(), 0), 1.5*N*N*N/num_constrain)
 
         # check the contained particles id
 
         g_tuplelist = tuplelist.getTuples()
         s_id = 0
-        for i in range(espressopp.MPI.COMM_WORLD.size):
-            for j in range(len(g_tuplelist[i])):
-                self.assertEqual(g_tuplelist[i][j], stored[s_id])
-                s_id += 1
+        for i in range(3*N*N*N/num_constrain/2):
+            for j in range(espressopp.MPI.COMM_WORLD.size):
+                #print i, j, stored[s_id] in g_tuplelist[j]
+                if stored[s_id] in g_tuplelist[j]:
+                    break
+            self.assertEqual(stored[s_id] in g_tuplelist[j], True)
+            s_id += 1
 
 if __name__ == "__main__":
     unittest.main()
