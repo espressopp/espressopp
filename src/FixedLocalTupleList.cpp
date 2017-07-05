@@ -67,18 +67,6 @@ namespace espressopp {
         std::vector<longint> pids; //used to extract from tuple;
         std::vector<longint> pidstmp; // temporary vector
         
-	/*
-	if (firstAdd) {
-	    tupleLength = boost::python::len(tuple);
-	    firstAdd = false;
-	} else if (tupleLength != boost::python::len(tuple)) {
-	    std::stringstream msg;
-	    msg << "ERROR: tuple length is not constant\n";
-	    err.setException(msg.str());
-	    returnVal = false;
-	}
-	*/
-	
         for (int i = 0; i < boost::python::len(tuple); ++i) {
             pids.push_back(boost::python::extract<int>(tuple[i]));
         }
@@ -159,8 +147,7 @@ namespace espressopp {
                 }
                 // delete this pid from the global list
                 globalTuples.erase(pidK);
-		//std::cout << "Erase pid " << pidK << std::endl;
-
+		LOG4ESPP_DEBUG(theLogger, "Erase pid " << pidK);
             }
         }
 	buf.write(toSend);
@@ -190,7 +177,7 @@ namespace espressopp {
 		}
 		it = globalTuples.insert(it, std::make_pair(pidK, pids));
 		pids.clear();
-		//std::cout << "Insert pid " << pidK << std::endl;
+		LOG4ESPP_DEBUG(theLogger, "Insert pid " << pidK);
 	    }
 	}
     }
