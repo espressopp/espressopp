@@ -1,3 +1,4 @@
 add_subdirectory(dump_xyz)
 add_subdirectory(dump_gromacs)
 add_subdirectory(dump_gromacs_adress)
+add_subdirectory(dump_xtc)
