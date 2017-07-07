@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 
 project(espressopp)
 
@@ -17,6 +17,11 @@ enable_testing()
 
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
+
+# Check for C++11 standard
+set(CMAKE_CXX_STANDARD 11) # C++11...
+set(CMAKE_CXX_STANDARD_REQUIRED ON) #...is required...
+set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
 
 ########################################################################
 # User input options                                                   #
@@ -41,13 +46,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CXX_FLAGS)
       "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
       FORCE)
 endif()
-
-check_cxx_compiler_flag("-std=c++98" COMPILER_SUPPORTS_CXX98)
-if(COMPILER_SUPPORTS_CXX98)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++98")
-else(COMPILER_SUPPORTS_CXX98)
-    message(FATAL_ERROR "Compiler flag -std=c++98 not supported")
-endif(COMPILER_SUPPORTS_CXX98)
 
 ########################################################################
 #VampirTrace settings
@@ -135,12 +133,12 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 # this conflicts with mpi4py-1.3 (is used to check for MPI version there)
 # add_definitions( -DHAVE_CONFIG_H )
 
+# Minimum required Boost version is set to 1.58 (only because of travis)
+# but the version in contrib is 1.61;
+
 if (EXTERNAL_BOOST)
-  set(NEEDED Boost_VERSION 1.55.0)
-  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "5")
-    set(NEEDED_Boost_VERSION 1.58.0) #issue #8
-  endif()
-  find_package(Boost ${NEEDED_Boost_VERSION} COMPONENTS mpi python serialization system filesystem)
+  set(NEEDED_Boost_VERSION 1.58.0)
+  find_package(Boost ${NEEDED_Boost_VERSION} REQUIRED COMPONENTS mpi python serialization system filesystem)
   if(NOT Boost_FOUND)
     message(FATAL_ERROR "Boost (required at least version ${NEEDED_Boost_VERSION}) not found, make sure you have installed boost and it's dev packages. To hint cmake to your Boost installation, use the option -DBOOST_ROOT=/path/to/boost. As last resort you can use our internal replacement with -DEXTERNAL_BOOST=OFF")
   endif(NOT Boost_FOUND)

@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -232,16 +234,16 @@ namespace espressopp {
 	  update pointers to the particles in the call via
 	  lookupLocalParticle() and lookupRealParticle().
        */
-      boost::signals2::signal0 <void> onParticlesChanged;
-      boost::signals2::signal2 <void, ParticleList&, class OutBuffer&> 
+      boost::signals2::signal<void ()> onParticlesChanged;
+      boost::signals2::signal<void (ParticleList&, class OutBuffer&)>
         beforeSendParticles;
-      boost::signals2::signal2 <void, ParticleList&, class InBuffer&> 
+      boost::signals2::signal<void (ParticleList&, class InBuffer&)>
         afterRecvParticles;
 
 
       // for AdResS
       // this is exactly the same as onParticlesChanged, but only used to rebuild tuples
-      boost::signals2::signal0 <void> onTuplesChanged;
+      boost::signals2::signal<void ()> onTuplesChanged;
 
 
       // for AdResS

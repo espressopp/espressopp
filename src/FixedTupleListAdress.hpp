@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -57,9 +59,9 @@ namespace espressopp {
 
             // This signals the AT particles to rebuild AT fixed pair, triple, quadruple bonds
             // Fixed{Pair|Triple}ListAdress connects to it
-            boost::signals2::signal2 <void, std::vector<longint>&, class OutBuffer&>
+            boost::signals2::signal<void (std::vector<longint>&, class OutBuffer&)>
                 beforeSendATParticles;
-            boost::signals2::signal2 <void, ParticleList&, class InBuffer&>
+            boost::signals2::signal<void (ParticleList&, class InBuffer&)>
                 afterRecvATParticles;
 
             static void registerPython();

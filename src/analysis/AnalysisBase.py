@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013,2017
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -20,9 +20,6 @@
 
 
 r"""
-********************************
-espressopp.analysis.AnalysisBase
-********************************
 
 This abstract base class provides the interface and some basic
 functionality for classes that do analysis or observable measurements
@@ -59,6 +56,7 @@ It provides the following methods:
 		Resets average and standard deviation
 
 		:rtype:
+                    
 """
 
 from espressopp import pmi

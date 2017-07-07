@@ -44,8 +44,8 @@ namespace espressopp {
       class data {
         public:
         Real3D pos;
-        int type;
-        int molecule;
+        size_t type;
+        size_t molecule;
         real resolution;
         friend class boost::serialization::access;
         template<class Archive> void serialize(Archive & ar, const unsigned int version) {
