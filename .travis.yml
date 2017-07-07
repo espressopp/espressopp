@@ -82,9 +82,6 @@ after_success:
       fi;
     fi
 
-after_failure:
-  - cat Testing/Temporary/LastTest.log
-
 cache:
   - ccache
 
