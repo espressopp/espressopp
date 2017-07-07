@@ -32,7 +32,7 @@ RUN ccache -z
 RUN cmake -DCMAKE_INSTALL_PREFIX=/usr -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL ${COVERAGE:+-DUSE_GCOV=ON} ..
 RUN make VERBOSE=1 -j2 all ${BUILD_UG:+ug doc ug-pdf}
 RUN ccache -s
-RUN make CTEST_OUTPUT_ON_FAILURE=1 test
+RUN make test
 RUN make install DESTDIR=${PWD}
 RUN cd .. && if [ ${COVERAGE} ]; then \
   if [ ${CC} = clang ]; then \

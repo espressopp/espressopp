@@ -1,8 +1,10 @@
 /*
-  Copyright (C) 2012,2013
-  Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
-  Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2017
+      Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de) 
+  Copyright (C) 2012-2016
+      Max Planck Institute for Polymer Research
+  Copyright (C) 2008-2011
+      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
   
   This file is part of ESPResSo++.
   
@@ -21,10 +23,24 @@
 */
 
 
-//This is an excerpt of the GROMACS 4.6.7 libxdrf.c file
-//GROMACS 4.6.7 is licensed under the GNU LESSER GENERAL PUBLIC LICENSE Version 2.1
+/*This is an excerpt of the GROMACS 4.6.7 libxdrf.c file
+ *
+ * GROMACS 4.6.7 Copyright Notice: 
+ * Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+ * Copyright (c) 2001-2004, The GROMACS development team,
+ * check out http://www.gromacs.org for more information.
+ * Copyright (c) 2012,2013, by the GROMACS development team, led by
+ * David van der Spoel, Berk Hess, Erik Lindahl, and including many
+ * others, as listed in the AUTHORS file in the top-level source
+ * directory and at http://www.gromacs.org.
+ *
+ * GROMACS is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation; either version 2.1
+ * of the License, or (at your option) any later version.
+ */
 
-//Modifications added by Gregor Deichmann (deichmann@cpc.tu-darmstadt.de) on 26th Oct 2015:
+//Modifications added by Gregor Deichmann (deichmann@cpc.tu-darmstadt.de) in 26th Oct 2015:
 //-Changed all occurences of gmx_bool to int 
 //-declared xdr3dfcoord static
 

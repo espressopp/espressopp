@@ -1,7 +1,9 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2017
+      Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de) 
+  Copyright (C) 2012-2016
       Max Planck Institute for Polymer Research
-  Copyright (C) 2008,2009,2010,2011
+  Copyright (C) 2008-2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
   
   This file is part of ESPResSo++.
@@ -39,9 +41,9 @@
 #include <string>
 
 extern "C" {
-//TODO on certain platforms these will not be available. Provide substitution
-      #include <rpc/rpc.h>
-      #include <rpc/xdr.h>
+//TODO on certain platforms (e.g. Windows) these may not be available.
+  #include <rpc/rpc.h>
+  #include <rpc/xdr.h>
 }
     
 #define XTC_MAGIC 1995
@@ -100,7 +102,6 @@ namespace espressopp {
           FileBackup backup(file_name); //backup trajectory if it already exists
         }
 
-        //TODO We get a segmentation fault if the integrator is not well initialized. Should check for that
       }
       ~DumpXTC() {std::cout << "DumpXTC destructor" << std::endl;} // never called, right?
 
