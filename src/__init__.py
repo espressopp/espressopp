@@ -51,6 +51,7 @@ from espressopp.FixedQuadrupleListAdress import *
 from espressopp.FixedQuadrupleAngleList import *
 from espressopp.FixedTupleList import *
 from espressopp.FixedTupleListAdress import *
+from espressopp.FixedLocalTupleList import *
 from espressopp.MultiSystem import *
 from espressopp.ParallelTempering import *
 from espressopp.Version import *

@@ -5,6 +5,7 @@ espressopp
    :maxdepth: 2
    
    espressopp.Exceptions.rst
+   espressopp.FixedLocalTupleList.rst
    espressopp.FixedPairDistList.rst
    espressopp.FixedPairList.rst
    espressopp.FixedPairListAdress.rst
