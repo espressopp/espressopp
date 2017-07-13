@@ -1,11 +1,7 @@
 /*
   Copyright (C) 2017
       Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de) 
-  Copyright (C) 2012-2016
-      Max Planck Institute for Polymer Research
-  Copyright (C) 2008-2011
-      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  
+ 
   This file is part of ESPResSo++.
   
   ESPResSo++ is free software: you can redistribute it and/or modify
@@ -60,7 +56,6 @@ namespace espressopp {
               std::string _file_name,
               bool _unfolded,
               real _length_factor,
-              std::string _length_unit, 
               bool _append):
                         ParticleAccess(system),
                         xdrmode(XDR_ENCODE),
@@ -72,31 +67,7 @@ namespace espressopp {
                         append(_append),
                         fp(NULL),
                         xdr(new XDR){
-        setLengthUnit(_length_unit);
-        
-        std::map<long, short> myParticleIDToTypeMap;
-        CellList realCells = system->storage->getRealCells();
-        for (iterator::CellListIterator cit(realCells); !cit.isDone(); ++cit) {
-          long id = cit->id();
-          short type = cit->type();
-          myParticleIDToTypeMap[id] = type;
-        }
-        if (myParticleIDToTypeMap.size() ==0 )
-          throw std::runtime_error("Dumper: No particles found in the system - make sure particles are added first before Dumper is initialized");
-
-        //gather all particle ID maps
-        std::vector< std::map<long, short> > allParticleIDMaps;
-        boost::mpi::all_gather(
-            *getSystem()->comm,
-            myParticleIDToTypeMap, 
-            allParticleIDMaps);
-            
-        //merge all particle ID maps
-        for (std::vector< std::map<long, short> >::iterator it=allParticleIDMaps.begin(); it!=allParticleIDMaps.end(); ++it)
-        {
-          particleIDToType.insert(it->begin(), it->end());
-        }
-
+  
 
         if( system->comm->rank()==0 && !append){
           FileBackup backup(file_name); //backup trajectory if it already exists
@@ -118,21 +89,6 @@ namespace espressopp {
       bool getAppend(){return append;}
       void setAppend(bool v){append = v;}
 
-      std::string getLengthUnit(){return length_unit;}
-      void setLengthUnit(std::string v){
-        esutil::Error err( getSystem()->comm );
-        if( v != "LJ" && v != "nm" && v != "A" ){
-          std::stringstream msg;
-          msg<<"Wrong unit length: "<< v << "  It should be string: LJ, nm or A" <<"\n";
-          err.setException( msg.str() );
-          err.checkException();
-        }
-        
-        length_unit = v;
-      }
-      real getLengthFactor(){return length_factor;}
-      void setLengthFactor(real v){length_factor = v;}
-      
       static void registerPython();
     
     protected:
@@ -152,14 +108,9 @@ namespace espressopp {
       
       std::string file_name;
 
-      //an array or an map where key: particle id and value: particle type
-      //we assume, that the type of a particle does not change over time
-      std::map<long, short> particleIDToType;
-      
       bool unfolded;  // one can choose folded or unfolded coordinates, by default it is folded
       bool append; //append to existing trajectory file or create a new one
-      real length_factor;  // for example 
-      std::string length_unit; // length unit: {could be LJ, nm, A} it is just for user info
+      real length_factor;   
 
       bool open(const char *mode);
       void close();

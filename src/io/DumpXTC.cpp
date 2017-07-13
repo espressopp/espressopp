@@ -1,10 +1,6 @@
 /*
   Copyright (C) 2017
       Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de) 
-  Copyright (C) 2012-2016
-      Max Planck Institute for Polymer Research
-  Copyright (C) 2008-2011
-      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
   
   This file is part of ESPResSo++.
   
@@ -76,43 +72,42 @@ namespace espressopp {
     }
 
     bool DumpXTC::write(int natoms,  
-                              int step,
-                              float time,
-                              Real3D *box,
-                              float *x,
-                              float prec){
+                        int step,
+                        float time,
+                        Real3D *box,
+                        float *x,
+                        float prec){
 
         bool bOk = true;
 
-        int num=XTC_MAGIC,ival; //gromacs magic number (should be 1995)
-        float fval;
-        int i,j;
+        int num=XTC_MAGIC; //gromacs magic number (should be 1995)
+        int ival;
 
         if( xdr_int(xdr,&num) == 0){
             bOk = false;
-            return 1;
+            return bOk;
         }
 
         ival=natoms;
         if( xdr_int(xdr,&ival) == 0){
             bOk = false;
-            return 1;
+            return bOk;
         }
 
         ival=step;
         if( xdr_int(xdr,&ival) == 0){
             bOk = false;
-            return 1;
+            return bOk;
         };
 
-        fval=time;
+        float fval=time;
         if( xdr_float(xdr,&fval) == 0){
             bOk = false;
-            return 1;
+            return bOk;
         };
 
-        for(i=0;i<dim;i++){
-            for(j=0;j<dim;j++){
+        for(int i=0;i<dim;i++){
+            for(int j=0;j<dim;j++){
                 fval = box[i][j];
 
                 if( xdr_float(xdr,&fval) == 0){
@@ -126,7 +121,7 @@ namespace espressopp {
         }
 
         if(!bOk){
-            return 1;
+            return bOk;
         }
 
         const int x_size = natoms*dim;
@@ -155,8 +150,6 @@ namespace espressopp {
         if(this->open("a")){ 
         
           ConfigurationExtIterator cei = conf_real-> getIterator();
-          //RealND::iterator ii;
-          //short ind;
           Real3D *box = new Real3D [dim];
           float *coord = new float [dim*num_of_particles];
           RealND props;
@@ -209,18 +202,13 @@ namespace espressopp {
                            std::string, 
                            bool,
                            real,
-                           std::string,
                            bool>())
         .add_property("filename", &DumpXTC::getFilename, 
                                   &DumpXTC::setFilename)
         .add_property("unfolded", &DumpXTC::getUnfolded, 
                                   &DumpXTC::setUnfolded)
-        .add_property("append", &DumpXTC::getAppend, 
+        .add_property("append",   &DumpXTC::getAppend, 
                                   &DumpXTC::setAppend)
-        .add_property("length_factor", &DumpXTC::getLengthFactor, 
-                                       &DumpXTC::setLengthFactor)
-        .add_property("length_unit", &DumpXTC::getLengthUnit, 
-                                     &DumpXTC::setLengthUnit)
         .def("dump", &DumpXTC::dump)
       ;
     }

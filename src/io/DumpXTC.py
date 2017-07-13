@@ -1,9 +1,5 @@
 #  Copyright (C) 2017
 #      Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de) 
-#  Copyright (C) 2012-2016
-#      Max Planck Institute for Polymer Research
-#  Copyright (C) 2008-2011
-#      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
 #
 #  This file is part of ESPResSo++.
 #
@@ -45,9 +41,6 @@ r"""
   If length dimension in current system is nm, and unit is 0.23 nm, for example, then
   length_factor should be 0.23
 
-* `length_unit`
-  It is length unit. Can be LJ, nm or A. By default - LJ
-
 usage:
 
 writing down trajectory
@@ -55,40 +48,38 @@ writing down trajectory
 >>> dump_conf_xtc = espressopp.io.DumpXTC(system, integrator, filename='trajectory.xtc')
 >>> for i in range (200):
 >>>   integrator.run(10)
->>>   dump_conf_gro.dump()
+>>>   dump_conf_xtc.dump()
 
 writing down trajectory using ExtAnalyze extension
 
->>> dump_conf_xtc = espressopp.io.DumpXTC(system, integrator, filename='trajectory.gro')
->>> ext_analyze = espressopp.integrator.ExtAnalyze(dump_conf_gro, 10)
+>>> dump_conf_xtc = espressopp.io.DumpXTC(system, integrator, filename='trajectory.xtc')
+>>> ext_analyze = espressopp.integrator.ExtAnalyze(dump_conf_xtc, 10)
 >>> integrator.addExtension(ext_analyze)
 >>> integrator.run(2000)
 
-Both exapmles will give the same result: 200 configurations in trajectory .gro file.
+Both exapmles will give the same result: 200 configurations in trajectory .xtc file.
 
 setting up length scale
 
 For example, the Lennard-Jones model for liquid argon with :math:`\sigma=0.34 [nm]`
 
->>> dump_conf_xtc = espressopp.io.DumpXTC(system, integrator, filename='trj.xtc', unfolded=False, length_factor=0.34, length_unit='nm', append=True)
+>>> dump_conf_xtc = espressopp.io.DumpXTC(system, integrator, filename='trj.xtc', unfolded=False, length_factor=0.34, append=True)
 
-will produce trj.gro with in nanometers
+will produce trj.xtc with coordinates in nm
 
-.. function:: espressopp.io.DumpXTC(system, integrator, filename, unfolded, length_factor, length_unit, append)
+.. function:: espressopp.io.DumpXTC(system, integrator, filename, unfolded, length_factor, append)
 
 		:param system:
 		:param integrator:
-		:param filename: (default: 'out.gro')
+		:param filename: (default: 'out.xtc')
 		:param unfolded: (default: False)
 		:param length_factor: (default: 1.0)
-		:param length_unit: (default: 'LJ')
 		:param append: (default: True)
 		:type system:
 		:type integrator:
 		:type filename:
 		:type unfolded:
 		:type length_factor: real
-		:type length_unit:
 		:type append:
 
 .. function:: espressopp.io.DumpXTC.dump()
@@ -104,8 +95,8 @@ from _espressopp import io_DumpXTC
 
 class DumpXTCLocal(ParticleAccessLocal, io_DumpXTC):
 
-  def __init__(self, system, integrator, filename='out.xtc', unfolded=False, length_factor=1.0, length_unit='LJ', append=True):
-    cxxinit(self, io_DumpXTC, system, integrator, filename, unfolded, length_factor, length_unit, append)
+  def __init__(self, system, integrator, filename='out.xtc', unfolded=False, length_factor=1.0, append=True):
+    cxxinit(self, io_DumpXTC, system, integrator, filename, unfolded, length_factor, append)
 
   def dump(self):
     if not pmi._PMIComm or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -118,5 +109,5 @@ if pmi.isController :
     pmiproxydefs = dict(
       cls =  'espressopp.io.DumpXTCLocal',
       pmicall = [ 'dump' ],
-      pmiproperty = ['filename', 'unfolded', 'length_factor', 'length_unit', 'append']
+      pmiproperty = ['filename', 'unfolded', 'length_factor', 'append']
     )
