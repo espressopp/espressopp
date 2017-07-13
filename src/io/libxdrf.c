@@ -1,10 +1,6 @@
 /*
   Copyright (C) 2017
       Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de) 
-  Copyright (C) 2012-2016
-      Max Planck Institute for Polymer Research
-  Copyright (C) 2008-2011
-      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
   
   This file is part of ESPResSo++.
   
@@ -42,7 +38,6 @@
 
 //Modifications added by Gregor Deichmann (deichmann@cpc.tu-darmstadt.de) in 26th Oct 2015:
 //-Changed all occurences of gmx_bool to int 
-//-declared xdr3dfcoord static
 
 
 /* This is just for clarity - it can never be anything but 4! */
