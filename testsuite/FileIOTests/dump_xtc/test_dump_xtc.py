@@ -54,12 +54,12 @@ class TestDumpXTC(unittest.TestCase):
         self.system.storage.addParticles(particle_list, 'id', 'pos')
 
         file_xtc_9atoms = "test_without_compression.xtc"
-        dump_xtc = espressopp.io.DumpXTC(self.system, self.integrator, filename=file_xtc_9atoms, unfolded = False, length_factor = 1.0, length_unit = 'LJ', append = False)
+        dump_xtc = espressopp.io.DumpXTC(self.system, self.integrator, filename=file_xtc_9atoms, unfolded = False, length_factor = 1.0, append = False)
         dump_xtc.dump()
 
         self.system.storage.addParticles( [( 10 , espressopp.Real3D( 14.4037 , 2.03629 , 9.6589) )] , 'id','pos')
         file_xtc_10atoms = "test_with_compression.xtc"
-        dump_xtc = espressopp.io.DumpXTC(self.system, self.integrator, filename=file_xtc_10atoms, unfolded = False, length_factor = 1.0, length_unit = 'LJ', append = False)
+        dump_xtc = espressopp.io.DumpXTC(self.system, self.integrator, filename=file_xtc_10atoms, unfolded = False, length_factor = 1.0, append = False)
         dump_xtc.dump()
 
         self.assertTrue(filecmp.cmp(file_xtc_9atoms, expected_files[0], shallow = False), "!!! Error! Files are not equal!! They should be equal!")

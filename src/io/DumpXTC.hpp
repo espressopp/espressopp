@@ -36,13 +36,7 @@
 
 #include <string>
 
-extern "C" {
-//TODO on certain platforms (e.g. Windows) these may not be available.
-  #include <rpc/rpc.h>
-  #include <rpc/xdr.h>
-}
-    
-#define XTC_MAGIC 1995
+#include "gromacs/fileio/xtcio.h"
 
 namespace espressopp {
   namespace io{
@@ -58,16 +52,13 @@ namespace espressopp {
               real _length_factor,
               bool _append):
                         ParticleAccess(system),
-                        xdrmode(XDR_ENCODE),
                         xtcprec(1000),
                         integrator(_integrator),
                         file_name( _file_name ),
                         unfolded(_unfolded),
                         length_factor(_length_factor),
                         append(_append),
-                        fp(NULL),
-                        xdr(new XDR){
-  
+                        fio(NULL){
 
         if( system->comm->rank()==0 && !append){
           FileBackup backup(file_name); //backup trajectory if it already exists
@@ -97,10 +88,8 @@ namespace espressopp {
 
     private:
       
-      FILE *fp;
-      XDR *xdr;
+      t_fileio *fio;
       static const int dim=3;
-      xdr_op xdrmode;
       real xtcprec;
 
       // integrator we need to know an integration step
@@ -114,8 +103,7 @@ namespace espressopp {
 
       bool open(const char *mode);
       void close();
-      bool write(int natoms,int step,float time,Real3D *box,float *x,float prec);
-
+      void write(int natoms,int step,float time,Real3D *box,Real3D *x,float prec);
 
     };
   }

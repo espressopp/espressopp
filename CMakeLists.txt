@@ -77,6 +77,13 @@ find_package(FFTW3 REQUIRED)
 include_directories(${FFTW3_INCLUDES})
 
 ########################################################################
+#Process GROMACS settings
+########################################################################
+
+find_package(GROMACS REQUIRED)
+include_directories(${GROMACS_INCLUDES})
+
+########################################################################
 #Process Python settings
 ########################################################################
 
