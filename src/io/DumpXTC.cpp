@@ -28,9 +28,7 @@
 #include "analysis/ConfigurationExt.hpp"
 #include "analysis/ConfigurationsExt.hpp"
 
-extern "C"{
-#include "libxdrf.c" //c-routines for xdr io and compression
-}
+#include <boost/filesystem.hpp>
 
 using namespace espressopp;
 using namespace espressopp::analysis;
@@ -41,96 +39,53 @@ namespace espressopp {
     
     bool DumpXTC::open(const char *mode){
       
-      fp = fopen(file_name.c_str(),mode);
-      
-      if(!fp){
-        return false;
+      if(mode[0] == 'a' && !boost::filesystem::exists(file_name)){
+          fio = open_xtc(file_name.c_str(),"w"); //Opening with mode "a" on a non-existing file leads to error
       }
-      
-      xdrstdio_create(xdr,fp,xdrmode);
-      
+      else{
+          fio = open_xtc(file_name.c_str(),mode); 
+      }
+            
       return true;
     }
 
     void DumpXTC::close(){
-      
-      if(!fp){
-        return;
-      }
-      
-      if(xdr){
-        xdr_destroy(xdr);
-      }
-      
-      if(fp){
-        fclose(fp);
-        fp=NULL;
-      }   
+
+      close_xtc(fio);
       
       return;
-
     }
 
-    bool DumpXTC::write(int natoms,  
+    void DumpXTC::write(int natoms,  
                         int step,
                         float time,
                         Real3D *box,
-                        float *x,
+                        Real3D *x,
                         float prec){
 
-        bool bOk = true;
+        matrix gmx_box;
 
-        int num=XTC_MAGIC; //gromacs magic number (should be 1995)
-        int ival;
-
-        if( xdr_int(xdr,&num) == 0){
-            bOk = false;
-            return bOk;
-        }
-
-        ival=natoms;
-        if( xdr_int(xdr,&ival) == 0){
-            bOk = false;
-            return bOk;
-        }
-
-        ival=step;
-        if( xdr_int(xdr,&ival) == 0){
-            bOk = false;
-            return bOk;
-        };
-
-        float fval=time;
-        if( xdr_float(xdr,&fval) == 0){
-            bOk = false;
-            return bOk;
-        };
-
-        for(int i=0;i<dim;i++){
-            for(int j=0;j<dim;j++){
-                fval = box[i][j];
-
-                if( xdr_float(xdr,&fval) == 0){
-                    bOk = false;
-                    break;
-                }
-            }
-            if(!bOk){
-                break;
+        for(int i=0;i<3;i++){
+            for(int j=0;j<3;j++){
+                gmx_box[i][j] = box[i][j];
             }
         }
 
-        if(!bOk){
-            return bOk;
-        }
+        rvec *gmx_x = new rvec[natoms];
 
-        const int x_size = natoms*dim;
+        for(int i=0;i<natoms;i++){
+            gmx_x[i][0] = x[i][0];
+            gmx_x[i][1] = x[i][1];
+            gmx_x[i][2] = x[i][2];
+        }
         
-        if( xdr3dfcoord(xdr, x, &natoms, &prec) == 0 ){
-            bOk=false;
-        }
+        write_xtc(fio,
+                natoms, step, time,
+                gmx_box,gmx_x,prec);
 
-        return bOk;
+        delete [] gmx_x;
+
+        return;
     }
 
 
@@ -151,7 +106,7 @@ namespace espressopp {
         
           ConfigurationExtIterator cei = conf_real-> getIterator();
           Real3D *box = new Real3D [dim];
-          float *coord = new float [dim*num_of_particles];
+          Real3D *coord = new Real3D [num_of_particles];
           RealND props;
           props.setDimension( cei.currentProperties().getDimension() );
 
@@ -169,9 +124,9 @@ namespace espressopp {
           for(int i=0;i<num_of_particles;i++){
             
             props=cei.nextProperties();
-            coord[i*dim] = props[0]*length_factor; //We only write coordinates to .xtc 
-            coord[i*dim+1] = props[1]*length_factor;
-            coord[i*dim+2] = props[2]*length_factor;
+            coord[i][0] = props[0]*length_factor; //We only write coordinates to .xtc 
+            coord[i][1] = props[1]*length_factor;
+            coord[i][2] = props[2]*length_factor;
 
           }
 
@@ -189,6 +144,8 @@ namespace espressopp {
 
       
       }
+      
+      return;
     }
       
     // Python wrapping
