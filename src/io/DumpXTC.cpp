@@ -38,60 +38,31 @@ namespace espressopp {
   namespace io {
     
     bool DumpXTC::open(const char *mode){
-      
+
+#ifdef HAS_GROMACS
       if(mode[0] == 'a' && !boost::filesystem::exists(file_name)){
-          fio = open_xtc(file_name.c_str(),"w"); //Opening with mode "a" on a non-existing file leads to error
+        fio = open_xtc(file_name.c_str(),"w"); //Opening with mode "a" on a non-existing file leads to error
       }
       else{
-          fio = open_xtc(file_name.c_str(),mode); 
+        fio = open_xtc(file_name.c_str(),mode); 
       }
-            
+#endif
+
       return true;
     }
 
     void DumpXTC::close(){
 
+#ifdef HAS_GROMACS
       close_xtc(fio);
+#endif
       
       return;
     }
-
-    void DumpXTC::write(int natoms,  
-                        int step,
-                        float time,
-                        Real3D *box,
-                        Real3D *x,
-                        float prec){
-
-        matrix gmx_box;
-
-        for(int i=0;i<3;i++){
-            for(int j=0;j<3;j++){
-                gmx_box[i][j] = box[i][j];
-            }
-        }
-
-        rvec *gmx_x = new rvec[natoms];
-
-        for(int i=0;i<natoms;i++){
-            gmx_x[i][0] = x[i][0];
-            gmx_x[i][1] = x[i][1];
-            gmx_x[i][2] = x[i][2];
-        }
-        
-        write_xtc(fio,
-                natoms, step, time,
-                gmx_box,gmx_x,prec);
-
-        delete [] gmx_x;
-
-        return;
-    }
-
-
       
     void DumpXTC::dump(){
 
+#ifdef HAS_GROMACS
       shared_ptr<System> system = getSystem();
       ConfigurationsExt conf( system );
       conf.setUnfolded(unfolded);
@@ -105,8 +76,9 @@ namespace espressopp {
         if(this->open("a")){ 
         
           ConfigurationExtIterator cei = conf_real-> getIterator();
-          Real3D *box = new Real3D [dim];
-          Real3D *coord = new Real3D [num_of_particles];
+          //Real3D *box = new Real3D [dim];
+          matrix box;
+          rvec *coord = new rvec [num_of_particles];
           RealND props;
           props.setDimension( cei.currentProperties().getDimension() );
 
@@ -133,9 +105,8 @@ namespace espressopp {
           int step = integrator->getStep();
           float time = integrator->getTimeStep()*step;
 
-          this->write(num_of_particles,step,time,box,coord,xtcprec);
+          write_xtc(fio, num_of_particles, step, time, box, coord, xtcprec);
 
-          delete [] box;
           delete [] coord;
           
           this->close();
@@ -144,7 +115,8 @@ namespace espressopp {
 
       
       }
-      
+#endif
+
       return;
     }
       

@@ -35,8 +35,11 @@
 #include "esutil/Error.hpp"
 
 #include <string>
+#include <iostream>
 
+#ifdef HAS_GROMACS
 #include "gromacs/fileio/xtcio.h"
+#endif
 
 namespace espressopp {
   namespace io{
@@ -52,17 +55,23 @@ namespace espressopp {
               real _length_factor,
               bool _append):
                         ParticleAccess(system),
+#ifdef HAS_GROMACS
+                        fio(NULL),
+#endif
                         xtcprec(1000),
                         integrator(_integrator),
                         file_name( _file_name ),
                         unfolded(_unfolded),
                         length_factor(_length_factor),
-                        append(_append),
-                        fio(NULL){
+                        append(_append){
 
         if( system->comm->rank()==0 && !append){
           FileBackup backup(file_name); //backup trajectory if it already exists
         }
+
+#ifndef HAS_GROMACS
+        std::cerr << "WARNING: espresso++ has been built without gromacs library. The XTC dumper will not produce any output!" << std::endl;
+#endif
 
       }
       ~DumpXTC() {std::cout << "DumpXTC destructor" << std::endl;} // never called, right?
@@ -82,13 +91,11 @@ namespace espressopp {
 
       static void registerPython();
     
-    protected:
-
-      //static LOG4ESPP_DECL_LOGGER(logger);
-
     private:
       
+#ifdef HAS_GROMACS
       t_fileio *fio;
+#endif
       static const int dim=3;
       real xtcprec;
 
