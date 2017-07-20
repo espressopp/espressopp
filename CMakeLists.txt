@@ -82,7 +82,7 @@ include_directories(${FFTW3_INCLUDES})
 ########################################################################
 
 if(WITH_XTC)
-  find_package(GROMACS CONFIG REQUIRED)
+  find_package(GROMACS REQUIRED)
   include_directories(${GROMACS_INCLUDE_DIRS})
   add_definitions( -DHAS_GROMACS )
 endif()
