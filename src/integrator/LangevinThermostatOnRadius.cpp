@@ -43,6 +43,7 @@ namespace espressopp {
 	    temperature = 0.0;
 	    
 	    dampingmass = _dampingmass;
+	    massf = sqrt(dampingmass);
 	    
 	    exclusions.clear();
 	    
@@ -113,7 +114,7 @@ namespace espressopp {
 	    
 	    for(CellListIterator cit(cells); !cit.isDone(); ++cit) {
 		
-		if(exclusions.count((*cit).id()) == 0) {
+		if(exclusions.count(cit->id()) == 0) {
 		    frictionThermo(*cit);
 		}
 		
@@ -121,7 +122,6 @@ namespace espressopp {
 	}
 	
 	void LangevinThermostatOnRadius::frictionThermo(Particle& p) {
-	    real massf = sqrt(dampingmass);
 	    
 	    // get a random value for a radius
 	    

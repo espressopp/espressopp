@@ -49,7 +49,6 @@ class TestCaseLangevinThermostatOnRadius(unittest.TestCase):
         langevin = espressopp.integrator.LangevinThermostatOnRadius(self.system, dampingmass=radius_mass)
         langevin.gamma = 1.0
         langevin.temperature = 10.0
-        langevin.adress = False
         langevin.addExclusions([1])
         integrator.addExtension(langevin)
 

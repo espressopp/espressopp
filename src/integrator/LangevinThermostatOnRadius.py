@@ -33,8 +33,6 @@ Example:
 >>> # set friction coefficient gamma
 >>> langevin.temperature = temp
 >>> # set temperature
->>> langevin.adress = True
->>> # set adress (default is False)
 >>> integrator.addExtension(langevin)
 >>> # add extensions to a previously defined integrator
 
@@ -47,7 +45,7 @@ Example:
 
 .. function:: espressopp.integrator.LangevinThermostatOnRadius.addExclusions(pidlist)
 
-                :param pidlist: list of particle ids to be excluded from thermostating. In adaptive (AdResS) simulations, add ids of atomistic particles to be excluded (thermostats acts in this case on atomistic level). For normal simulations, add normal or coarse-grained particle ids.
+                :param pidlist: list of particle ids to be excluded from thermostating.
                 :type pidlist: list of ints
 """
 from espressopp.esutil import cxxinit

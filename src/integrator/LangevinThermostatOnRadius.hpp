@@ -78,7 +78,7 @@ namespace espressopp {
 	private:
 	    
 	    boost::signals2::connection _initialize, _heatUp, _coolDown,
-		_thermalize, _thermalizeAdr;
+		_thermalize;
 	    
 	    void frictionThermo(class Particle&);
 	    
@@ -92,6 +92,7 @@ namespace espressopp {
 	    real temperature;  //!< desired user temperature
 	    
 	    real dampingmass; //!< radial damping mass
+	    real massf; //!< square root of radial damping mass
 	    
 	    real pref1;  //!< prefactor, reduces complexity of thermalize
 	    real pref2;  //!< prefactor, reduces complexity of thermalize
