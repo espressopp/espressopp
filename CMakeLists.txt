@@ -82,14 +82,10 @@ include_directories(${FFTW3_INCLUDES})
 ########################################################################
 
 if(WITH_XTC)
-find_package(GROMACS CONFIG)
-include_directories(${GROMACS_INCLUDE_DIRS})
-  if(GROMACS_FOUND)
-    add_definitions( -DHAS_GROMACS )
-  else(GROMACS_FOUND)
-    set(WITH_XTC OFF)
-  endif(GROMACS_FOUND)
-endif(WITH_XTC)
+  find_package(GROMACS CONFIG REQUIRED)
+  include_directories(${GROMACS_INCLUDE_DIRS})
+  add_definitions( -DHAS_GROMACS )
+endif()
 
 ########################################################################
 #Process Python settings
