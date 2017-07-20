@@ -1,6 +1,6 @@
 add_subdirectory(dump_xyz)
 add_subdirectory(dump_gromacs)
 add_subdirectory(dump_gromacs_adress)
-if(ENABLE_GROMACS)
+if(WITH_XTC)
   add_subdirectory(dump_xtc)
 endif()

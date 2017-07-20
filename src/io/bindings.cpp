@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2017
+        Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de)        
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -24,8 +26,11 @@
 #include "DumpXYZ.hpp"
 #include "DumpGRO.hpp"
 #include "DumpGROAdress.hpp"
-#include "DumpXTC.hpp"
 #include "FileBackup.hpp"
+
+#ifdef HAS_GROMACS
+#include "DumpXTC.hpp"
+#endif
 
 namespace espressopp {
   namespace io{
@@ -33,7 +38,9 @@ namespace espressopp {
       DumpXYZ::registerPython();
       DumpGRO::registerPython();
       DumpGROAdress::registerPython();
+#ifdef HAS_GROMACS
       DumpXTC::registerPython();
+#endif
     }
   }
 }

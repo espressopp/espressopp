@@ -39,30 +39,25 @@ namespace espressopp {
     
     bool DumpXTC::open(const char *mode){
 
-#ifdef HAS_GROMACS
       if(mode[0] == 'a' && !boost::filesystem::exists(file_name)){
         fio = open_xtc(file_name.c_str(),"w"); //Opening with mode "a" on a non-existing file leads to error
       }
       else{
         fio = open_xtc(file_name.c_str(),mode); 
       }
-#endif
 
       return true;
     }
 
     void DumpXTC::close(){
 
-#ifdef HAS_GROMACS
       close_xtc(fio);
-#endif
       
       return;
     }
       
     void DumpXTC::dump(){
 
-#ifdef HAS_GROMACS
       shared_ptr<System> system = getSystem();
       ConfigurationsExt conf( system );
       conf.setUnfolded(unfolded);
@@ -115,7 +110,6 @@ namespace espressopp {
 
       
       }
-#endif
 
       return;
     }
