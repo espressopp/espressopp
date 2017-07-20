@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2017
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -40,6 +40,7 @@
 #include "LangevinThermostatHybrid.hpp"
 #include "GeneralizedLangevinThermostat.hpp"
 #include "LangevinThermostatOnGroup.hpp"
+#include "LangevinThermostatOnRadius.hpp"
 #include "DPDThermostat.hpp"
 #include "LangevinBarostat.hpp"
 #include "FixPositions.hpp"
@@ -83,6 +84,7 @@ namespace espressopp {
       LangevinThermostatHybrid::registerPython();
       GeneralizedLangevinThermostat::registerPython();
       LangevinThermostatOnGroup::registerPython();
+      LangevinThermostatOnRadius::registerPython();
       DPDThermostat::registerPython();
       FixPositions::registerPython();
       LatticeBoltzmann::registerPython();
