@@ -10,7 +10,13 @@ file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
   bc/unittest/*.cpp
   integrator/unittest/*.cpp
 )
+
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
+
+if(NOT WITH_XTC)
+  file(GLOB_RECURSE DUMP_XTC_SOURCE io/DumpXTC.cpp)
+  list(REMOVE_ITEM ESPRESSO_SOURCES ${DUMP_XTC_SOURCE})
+endif()
 
 add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_MODULE_PATH}/gitversion.cmake)
 
@@ -43,6 +49,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_library(_espressopp ${ESPRESSO_SOURCES})
 target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
+if(WITH_XTC)
+  target_link_libraries(_espressopp ${GROMACS_LIBRARIES})
+endif()
 #python libs have not prefix (default would be 'lib')
 set_target_properties(_espressopp PROPERTIES PREFIX "" SUFFIX ".so" LIBRARY_OUTPUT_DIRECTORY ..)
 install(TARGETS _espressopp LIBRARY DESTINATION ${PYTHON_INSTDIR} ARCHIVE DESTINATION ${PYTHON_INSTDIR})

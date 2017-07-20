@@ -27,6 +27,7 @@ set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
 # User input options                                                   #
 ########################################################################
 option(EXTERNAL_BOOST "Use external boost" ON)
+option(WITH_XTC "Build with DumpXTC class (requires libgromacs)" OFF)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 if(NOT BUILD_SHARED_LIBS)
   message(WARNING "Building static libraries might lead to problems with python modules - you are on your own!")
@@ -75,6 +76,16 @@ include_directories(${MPI_INCLUDE_PATH})
 
 find_package(FFTW3 REQUIRED)
 include_directories(${FFTW3_INCLUDES})
+
+########################################################################
+#Process GROMACS settings
+########################################################################
+
+if(WITH_XTC)
+  find_package(GROMACS REQUIRED)
+  include_directories(${GROMACS_INCLUDE_DIRS})
+  add_definitions( -DHAS_GROMACS )
+endif()
 
 ########################################################################
 #Process Python settings
