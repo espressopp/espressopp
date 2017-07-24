@@ -148,11 +148,13 @@ namespace espressopp {
         real omega = 1-dist/current_cutoff;
         real omega2 = omega*omega;
 
-        real veldiff = (p1.velocity() - p2.velocity()) * r / dist;
+        r /= dist;
+
+        real veldiff = (p1.velocity() - p2.velocity()) * r;
         real friction = pref1 * omega2 * veldiff;
         real noise = pref2 * omega * ((*rng)() - 0.5);
 
-        Real3D f = (noise - friction) * r / dist;
+        Real3D f = (noise - friction) * r;
         p1.force() += f;
         p2.force() -= f;
       }
@@ -169,10 +171,11 @@ namespace espressopp {
         real omega = 1-dist/current_cutoff;
         real omega2 = omega*omega;
 
-		Real3D noisevec((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);
+        r /= dist;
+		
+        Real3D noisevec((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);
         Real3D veldiff = p1.velocity() - p2.velocity();
 
-        r /= dist;
         Real3D f_damp,f_rand;
         
         //Calculate matrix product of projector and veldiff vector:
@@ -188,8 +191,6 @@ namespace espressopp {
         
         f_damp *= pref3 * omega2;
         f_rand *= pref4 * omega;
-
-		Real3D f = f_rand - f_damp;
 
 		p1.force() += f_rand - f_damp;
 		p2.force() -= f_rand - f_damp;
