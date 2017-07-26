@@ -92,4 +92,3 @@ from espressopp.interaction.HarmonicTrap import *
 from espressopp.interaction.LennardJones93Wall import *
 
 from espressopp.interaction.ConstrainCOM import *
-from espressopp.interaction.ConstrainRG import *
