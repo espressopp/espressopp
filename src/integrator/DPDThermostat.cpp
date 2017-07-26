@@ -180,14 +180,14 @@ namespace espressopp {
         
         //Calculate matrix product of projector and veldiff vector:
         //P dv = (I - r r_T) dv 
-        f_damp[0] = (1.0 - r[0]*r[0])*veldiff[0] + r[0]*r[1]*veldiff[1] + r[0]*r[2]*veldiff[2];
-        f_damp[1] = (1.0 - r[1]*r[1])*veldiff[1] + r[1]*r[0]*veldiff[0] + r[1]*r[2]*veldiff[2];
-        f_damp[2] = (1.0 - r[2]*r[2])*veldiff[2] + r[2]*r[0]*veldiff[0] + r[2]*r[1]*veldiff[1];
+        f_damp[0] = (1.0 - r[0]*r[0])*veldiff[0] - r[0]*r[1]*veldiff[1] - r[0]*r[2]*veldiff[2];
+        f_damp[1] = (1.0 - r[1]*r[1])*veldiff[1] - r[1]*r[0]*veldiff[0] - r[1]*r[2]*veldiff[2];
+        f_damp[2] = (1.0 - r[2]*r[2])*veldiff[2] - r[2]*r[0]*veldiff[0] - r[2]*r[1]*veldiff[1];
        
         //Same with random vector
-        f_rand[0] = (1.0 - r[0]*r[0])*noisevec[0] + r[0]*r[1]*noisevec[1] + r[0]*r[2]*noisevec[2];
-        f_rand[1] = (1.0 - r[1]*r[1])*noisevec[1] + r[1]*r[0]*noisevec[0] + r[1]*r[2]*noisevec[2];
-        f_rand[2] = (1.0 - r[2]*r[2])*noisevec[2] + r[2]*r[0]*noisevec[0] + r[2]*r[1]*noisevec[1];
+        f_rand[0] = (1.0 - r[0]*r[0])*noisevec[0] - r[0]*r[1]*noisevec[1] - r[0]*r[2]*noisevec[2];
+        f_rand[1] = (1.0 - r[1]*r[1])*noisevec[1] - r[1]*r[0]*noisevec[0] - r[1]*r[2]*noisevec[2];
+        f_rand[2] = (1.0 - r[2]*r[2])*noisevec[2] - r[2]*r[0]*noisevec[0] - r[2]*r[1]*noisevec[1];
         
         f_damp *= pref3 * omega2;
         f_rand *= pref4 * omega;
