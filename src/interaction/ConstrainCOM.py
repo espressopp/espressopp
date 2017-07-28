@@ -27,7 +27,6 @@ Subchains are defined as a tuple list.
 .. math:: U = k_{com} \left(\vec{r}_{com} - \vec{R}_{com}\right)^2,
 
 where :math:`\vec{r}_{com}` stands for the center of mass of subchain and :math:`\vec{R}_{com}` stands for the desired center of mass of subchain.
-This class assume that the mass of all particles is 1.
 
 This class set 2 conditions on a tuple list defining subchains.
 

@@ -48,6 +48,8 @@ namespace espressopp {
 	    long unsigned int num_of_part; // total number of particles
 	    long unsigned int num_of_subchain; // total number of subchains
 	    boost::unordered_map<long unsigned int, Real3D> com_origin;
+	    boost::unordered_map<long unsigned int, Real3D> com_temporal;
+	    boost::unordered_map<long unsigned int, real> total_mass;
 	    
 	    int N_Constrain; // number of particles constraining the interaction
 	    int nParticles;  // number of particles in this node
@@ -110,13 +112,13 @@ namespace espressopp {
 		Real3D* totCOM = new Real3D[num_of_subchain];
 		Real3D* COM = new Real3D[num_of_subchain];
 		
-		boost::unordered_map<long unsigned int, Real3D> MAP_COM = computeCOM();
+		computeCOM();
 
 		for(long unsigned int i = 0; i < num_of_subchain; i++) {
 		    totCOM[i] = 0.;
 		    
-		    if (MAP_COM.count(i)) {
-			COM[i] = MAP_COM[i];
+		    if (com_temporal.count(i)) {
+			COM[i] = com_temporal[i];
 		    } else {
 			COM[i] = 0.;
 		    }
@@ -177,16 +179,19 @@ namespace espressopp {
 	    virtual int bondType() { return Nonbonded; }
 	    
 	protected:
-	    boost::unordered_map<long unsigned int, Real3D> computeCOM() {
+	    void computeCOM() {
 
-		boost::unordered_map<long unsigned int, Real3D> com;
+		com_temporal.clear();
+		total_mass.clear();
 
 		const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
 		for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
 		    Particle *p = it->first;
 		    Real3D pos_i = p->position();
-		    Real3D tmp_com = pos_i;
+		    real mass = p->mass();
+		    Real3D tmp_com = mass*pos_i;
+		    real tmp_mass = mass;
 		    std::vector<Particle*> pList = it->second;
 
 		    for (long unsigned int j = 0; j < N_Constrain - 1; j++) {
@@ -195,13 +200,14 @@ namespace espressopp {
 			Real3D dist;
 			bc.getMinimumImageVectorBox(dist, pos_j, pos_i);
 			pos_j = pos_i + dist;
-			tmp_com += pos_j;
+			mass = p->mass();
+			tmp_com += mass*pos_j;
+			tmp_mass += mass;
 			pos_i = pos_j;
 		    }
-		    com[(p->id() - 1)/N_Constrain] = tmp_com/N_Constrain;
+		    com_temporal[(p->id() - 1)/N_Constrain] = tmp_com/tmp_mass;
+		    total_mass[(p->id() - 1)/N_Constrain] = tmp_mass;
 		}
-		
-		return com;
 	    }
 
 	    int ntypes;
@@ -218,8 +224,7 @@ namespace espressopp {
 
 	    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
-	    boost::unordered_map<long unsigned int, Real3D> com;
-	    com = computeCOM();
+	    computeCOM();
 
 	    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
 		Particle *p = it->first;
@@ -228,13 +233,13 @@ namespace espressopp {
 		long unsigned int pid = p->id() - 1;
 		bc.getMinimumImageVectorBox(diff,
 					    com_origin[pid/N_Constrain],
-					    com[pid/N_Constrain]);
-		force = potential->_computeForce(diff, N_Constrain);
-		p->force() += force;
+					    com_temporal[pid/N_Constrain]);
+		force = potential->_computeForce(diff, total_mass[pid/N_Constrain]);
+		p->force() += p->mass()*force;
 		
 		for (int i = 0; i < N_Constrain - 1; i++) {
 		    p = pList[i];
-		    p->force() += force;
+		    p->force() += p->mass()*force;
 		}
 	    }
 	}
@@ -248,8 +253,7 @@ namespace espressopp {
 	    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
 	    real e = 0.0;
-	    boost::unordered_map<long unsigned int, Real3D> com;
-	    com = computeCOM();
+	    computeCOM();
 	    
 	    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
 		Particle *p = it->first;
@@ -257,7 +261,7 @@ namespace espressopp {
 		long unsigned int pid = p->id() - 1;
 		bc.getMinimumImageVectorBox(diff,
 					    com_origin[pid/N_Constrain],
-					    com[pid/N_Constrain]);
+					    com_temporal[pid/N_Constrain]);
 		
 		e += potential->_computeEnergy(diff);
 	    }
@@ -304,8 +308,7 @@ namespace espressopp {
 	    real w = 0.0;
 	    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
-	    boost::unordered_map<long unsigned int, Real3D> com;
-	    com = computeCOM();
+	    computeCOM();
 	    
 	    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
 		Particle *p = it->first;
@@ -314,21 +317,21 @@ namespace espressopp {
 		long unsigned int pid = p->id() - 1;
 		bc.getMinimumImageVectorBox(diff,
 					    com_origin[pid/N_Constrain],
-					    com[pid/N_Constrain]);
+					    com_temporal[pid/N_Constrain]);
 		bc.getMinimumImageVectorBox(dist,
 					    p->position(),
 					    com_origin[pid/N_Constrain]);
-		force = potential->_computeForce(diff, N_Constrain);
+		force = potential->_computeForce(diff, total_mass[pid/N_Constrain]);
 		
 		// TODO: formulas are not correct yet?
-		w += dist * force;
+		w += dist * p->mass() * force;
 		
 		for (int i = 0; i < N_Constrain - 1; i++) {
 		    p = pList[i];
 		    bc.getMinimumImageVectorBox(dist,
 						p->position(),
 						com_origin[pid/N_Constrain]);
-		    w += dist * force;
+		    w += dist * p->mass() * force;
 		}
 	    }
 
@@ -344,8 +347,7 @@ namespace espressopp {
 	    Tensor wlocal(0.0);
 	    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
-	    boost::unordered_map<long unsigned int, Real3D> com;
-	    com = computeCOM();
+	    computeCOM();
 	    
 	    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
 		Particle *p = it->first;
@@ -354,21 +356,21 @@ namespace espressopp {
 		long unsigned int pid = p->id() - 1;
 		bc.getMinimumImageVectorBox(diff,
 					    com_origin[pid/N_Constrain],
-					    com[pid/N_Constrain]);
+					    com_temporal[pid/N_Constrain]);
 		bc.getMinimumImageVectorBox(dist,
 					    p->position(),
 					    com_origin[pid/N_Constrain]);
-		force = potential->_computeForce(diff, N_Constrain);
+		force = potential->_computeForce(diff, total_mass[pid/N_Constrain]);
 
 		// TODO: formulas are not correct yet?
-		wlocal += Tensor(dist, force);
+		wlocal += Tensor(dist, p->mass()*force);
 		
 		for (int i = 0; i < N_Constrain - 1; i++) {
 		    p = pList[i];
 		    bc.getMinimumImageVectorBox(dist,
 						p->position(),
 						com_origin[pid/N_Constrain]);
-		    wlocal += Tensor(dist, force);
+		    wlocal += Tensor(dist, p->mass()*force);
 		}
 	    }
 	    

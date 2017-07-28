@@ -31,9 +31,9 @@ class TestCaseConstrainCOM(unittest.TestCase):
         # add some particles (normal, coarse-grained particles only)
         particle_list = [
             (1, 1, 0, espressopp.Real3D(3.0, 5.0, 5.0), 1.0, 0, 1.),
-            (2, 1, 0, espressopp.Real3D(4.0, 5.0, 5.0), 1.0, 0, 1.),
-            (3, 1, 0, espressopp.Real3D(5.0, 5.0, 5.0), 1.0, 0, 1.),
-            (4, 1, 0, espressopp.Real3D(6.0, 5.0, 5.0), 1.0, 0, 1.),
+            (2, 1, 0, espressopp.Real3D(4.0, 5.0, 5.0), 2.0, 0, 1.),
+            (3, 1, 0, espressopp.Real3D(5.0, 5.0, 5.0), 3.0, 0, 1.),
+            (4, 1, 0, espressopp.Real3D(6.0, 5.0, 5.0), 2.0, 0, 1.),
             (5, 1, 0, espressopp.Real3D(7.0, 5.0, 5.0), 1.0, 0, 1.),
         ]
         self.system.storage.addParticles(particle_list, 'id', 'type', 'q', 'pos', 'mass','adrat', 'radius')
@@ -73,22 +73,27 @@ class TestCaseConstrainCOM(unittest.TestCase):
         particle = self.system.storage.getParticle(1)
         dmy_p = []
         dmy_ele = []
+        mass = []
         for i in xrange(3):
             dmy_ele.append(particle.pos[i])
         dmy_p.append(dmy_ele)
+        mass.append(particle.mass)
         for i in xrange(2, 6):
             particle = self.system.storage.getParticle(i)
+            mass.append(particle.mass)
             diff = []
             for j in xrange(3):
                 x_i = particle.pos[j] - dmy_p[i - 2][j]
                 x_i = x_i - round(x_i/self.L)*self.L
                 diff.append(x_i + dmy_p[i - 2][j])
             dmy_p.append(diff)
+        total_mass = 0.
         for i in xrange(5):
+            total_mass += mass[i]
             for j in xrange(3):
-                before[j] += dmy_p[i][j]
+                before[j] += mass[i]*dmy_p[i][j]
         for i in xrange(3):
-            before[i] /= 5.
+            before[i] /= total_mass
         print "before", before
 
         # run twenty thousand steps
@@ -100,22 +105,27 @@ class TestCaseConstrainCOM(unittest.TestCase):
         particle = self.system.storage.getParticle(1)
         dmy_p = []
         dmy_ele = []
+        mass = []
         for i in xrange(3):
             dmy_ele.append(particle.pos[i])
         dmy_p.append(dmy_ele)
+        mass.append(particle.mass)
         for i in xrange(2, 6):
             particle = self.system.storage.getParticle(i)
+            mass.append(particle.mass)
             diff = []
             for j in xrange(3):
                 x_i = particle.pos[j] - dmy_p[i - 2][j]
                 x_i = x_i - round(x_i/self.L)*self.L
                 diff.append(x_i + dmy_p[i - 2][j])
             dmy_p.append(diff)
+        total_mass = 0.
         for i in xrange(5):
+            total_mass += mass[i]
             for j in xrange(3):
-                after[j] += dmy_p[i][j]
+                after[j] += mass[i]*dmy_p[i][j]
         for i in xrange(3):
-            after[i] /= 5.
+            after[i] /= total_mass
         print "after", after
 
         # run checks
