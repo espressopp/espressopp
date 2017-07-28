@@ -47,7 +47,7 @@ namespace espressopp {
 	private:
 	    long unsigned int num_of_part; // total number of particles
 	    long unsigned int num_of_subchain; // total number of subchains
-	    std::map<long unsigned int, Real3D> com_origin;
+	    boost::unordered_map<long unsigned int, Real3D> com_origin;
 	    
 	    int N_Constrain; // number of particles constraining the interaction
 	    int nParticles;  // number of particles in this node
@@ -104,34 +104,22 @@ namespace espressopp {
 		    pidK++;
 		}
 
-		Real3D* totCOM;
-		totCOM = new Real3D[num_of_subchain];
-		Real3D* COM;
-		COM = new Real3D[num_of_subchain];
+		delete [] pid_list;
+		pid_list = NULL;
+
+		Real3D* totCOM = new Real3D[num_of_subchain];
+		Real3D* COM = new Real3D[num_of_subchain];
 		
-		Real3D Li = system.bc->getBoxL();
-		
+		boost::unordered_map<long unsigned int, Real3D> MAP_COM = computeCOM();
+
 		for(long unsigned int i = 0; i < num_of_subchain; i++) {
-		    COM[i] = 0.;
 		    totCOM[i] = 0.;
-		}
-
-		for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
-		    Particle *p = it->first;
-		    Real3D pos_i = p->position();
-		    Real3D tmp_com = pos_i;
-		    std::vector<Particle*> pList = it->second;
-
-		    for (long unsigned int j = 1; j < N_Constrain; j++) {
-			p = pList[j - 1];
-			Real3D pos_j = p->position();
-			Real3D dist;
-			system.bc->getMinimumImageVectorBox(dist, pos_j, pos_i);
-			pos_j = pos_i + dist;
-			tmp_com += pos_j;
-			pos_i = pos_j;
+		    
+		    if (MAP_COM.count(i)) {
+			COM[i] = MAP_COM[i];
+		    } else {
+			COM[i] = 0.;
 		    }
-		    COM[(p->id() - 1)/N_Constrain] = tmp_com/N_Constrain;
 		}
 
 		boost::mpi::all_reduce(*system.comm, COM, num_of_subchain, totCOM, std::plus<Real3D>() );
@@ -189,9 +177,9 @@ namespace espressopp {
 	    virtual int bondType() { return Nonbonded; }
 	    
 	protected:
-	    std::map<long unsigned int, Real3D> computeCOM() {
+	    boost::unordered_map<long unsigned int, Real3D> computeCOM() {
 
-		std::map<long unsigned int, Real3D> com;
+		boost::unordered_map<long unsigned int, Real3D> com;
 
 		const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
@@ -201,8 +189,8 @@ namespace espressopp {
 		    Real3D tmp_com = pos_i;
 		    std::vector<Particle*> pList = it->second;
 
-		    for (long unsigned int j = 1; j < N_Constrain; j++) {
-			p = pList[j - 1];
+		    for (long unsigned int j = 0; j < N_Constrain - 1; j++) {
+			p = pList[j];
 			Real3D pos_j = p->position();
 			Real3D dist;
 			bc.getMinimumImageVectorBox(dist, pos_j, pos_i);
@@ -230,7 +218,7 @@ namespace espressopp {
 
 	    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
-	    std::map<long unsigned int, Real3D> com;
+	    boost::unordered_map<long unsigned int, Real3D> com;
 	    com = computeCOM();
 
 	    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
@@ -260,7 +248,7 @@ namespace espressopp {
 	    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
 	    real e = 0.0;
-	    std::map<long unsigned int, Real3D> com;
+	    boost::unordered_map<long unsigned int, Real3D> com;
 	    com = computeCOM();
 	    
 	    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
@@ -271,7 +259,7 @@ namespace espressopp {
 					    com_origin[pid/N_Constrain],
 					    com[pid/N_Constrain]);
 		
-		e += N_Constrain*potential->_computeEnergy(diff);
+		e += potential->_computeEnergy(diff);
 	    }
 
 	    real esum;
@@ -316,7 +304,7 @@ namespace espressopp {
 	    real w = 0.0;
 	    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
-	    std::map<long unsigned int, Real3D> com;
+	    boost::unordered_map<long unsigned int, Real3D> com;
 	    com = computeCOM();
 	    
 	    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
@@ -356,7 +344,7 @@ namespace espressopp {
 	    Tensor wlocal(0.0);
 	    const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
-	    std::map<long unsigned int, Real3D> com;
+	    boost::unordered_map<long unsigned int, Real3D> com;
 	    com = computeCOM();
 	    
 	    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {

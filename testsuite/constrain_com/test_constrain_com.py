@@ -119,9 +119,9 @@ class TestCaseConstrainCOM(unittest.TestCase):
         print "after", after
 
         # run checks
-        self.assertTrue(fabs((before[0] - after[0])/before[0]) < 0.01)
-        self.assertTrue(fabs((before[1] - after[1])/before[1]) < 0.01)
-        self.assertTrue(fabs((before[2] - after[2])/before[2]) < 0.01)
+        self.assertTrue(fabs(before[0] - after[0]) < 0.04)
+        self.assertTrue(fabs(before[1] - after[1]) < 0.04)
+        self.assertTrue(fabs(before[2] - after[2]) < 0.04)
 
 
 if __name__ == '__main__':

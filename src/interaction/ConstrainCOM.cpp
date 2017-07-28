@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2016
+  Copyright (C) 2017
       Max Planck Institute for Polymer Research
   
   This file is part of ESPResSo++.

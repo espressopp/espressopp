@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2016
+  Copyright (C) 2017
   Max Planck Institute for Polymer Research
   
   This file is part of ESPResSo++.
@@ -80,12 +80,14 @@ namespace espressopp {
 	    real _computeEnergySqrRaw(real distSqr) const {
 		stringstream msg;
 		msg << "There is no sense to call this function for COM";
+		LOG4ESPP_INFO(theLogger, msg);
 		return 0.0;
 	    }
 	    
 	    bool _computeForceRaw(Real3D& force, const Real3D& dist, real distSqr) const {
 		stringstream msg;
 		msg << "There is no sense to call this function for constrain of COM";
+		LOG4ESPP_INFO(theLogger, msg);
 		return false;
 	    }
 	};

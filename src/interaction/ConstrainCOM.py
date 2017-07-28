@@ -1,4 +1,4 @@
-#  Copyright (C) 2016
+#  Copyright (C) 2017
 #      Max Planck Institute for Polymer Research
 #  
 #  This file is part of ESPResSo++.
@@ -24,15 +24,17 @@ r"""
 This class is for calculating forces of constraining center of mass of subchains.
 Subchains are defined as a tuple list.
 
-.. math:: U = k_{com} \left(r - R_{com}\right)^2,
+.. math:: U = k_{com} \left(\vec{r}_{com} - \vec{R}_{com}\right)^2,
 
-where :math:`R_{com}` stands for the desired center of mass of subchain.
+where :math:`\vec{r}_{com}` stands for the center of mass of subchain and :math:`\vec{R}_{com}` stands for the desired center of mass of subchain.
+This class assume that the mass of all particles is 1.
 
-This class set 3 conditions on a tuple list defining subchains.
+This class set 2 conditions on a tuple list defining subchains.
 
 1. The length of all tuple must be same.
-2. Particles in one tuple must be in a same or neighbor cell list.
-3. The ratio of (Particle ID / The length of a tuple) must not be redundantly.
+2. int(key particle id / The length of a tuple) must not be redundantly, where key particle id is the smallest particle id in a tuple.
+
+Reference: Equilibration of high molecular weight polymer melts: A hierarchical strategy, Macro Lett., 2014, 3, 198
 
 .. function:: espressopp.interaction.ConstrainCOM(k_com)
 
