@@ -25,6 +25,7 @@ import espressopp.tools.init_cfg
 from espressopp.tools.analyse import *
 from espressopp.tools.decomp import *
 from espressopp.tools.DumpConfigurations import *
+from espressopp.tools.energy import *
 from espressopp.tools.espresso_old import *
 from espressopp.tools.gromacs import *
 from espressopp.tools.info import *
