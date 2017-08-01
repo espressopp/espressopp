@@ -90,3 +90,5 @@ from espressopp.interaction.CoulombKSpaceP3M import *
 from espressopp.interaction.SingleParticlePotential import *
 from espressopp.interaction.HarmonicTrap import *
 from espressopp.interaction.LennardJones93Wall import *
+
+from espressopp.interaction.ConstrainCOM import *
