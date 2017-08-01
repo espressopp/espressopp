@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #unittests for python tools in $ESPRESSOPPHOME/tools
+#this file uses a system containing only two particles, for testing input/output tools with minimum computational time
 
 import sys
 import time
