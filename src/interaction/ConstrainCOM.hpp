@@ -71,7 +71,7 @@ namespace espressopp {
 	    }
 	    
 	    Real3D _computeForce(Real3D diff,
-				 long unsigned int Total_mass) {
+				 real Total_mass) {
 		
 		return 2.*k_com*diff/Total_mass;
 		
