@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2017(H)
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -30,6 +30,7 @@
 #include "SystemAccess.hpp"
 #include "boost/signals2.hpp"
 #include "boost/unordered_set.hpp"
+#include "Real3D.hpp"
 
 namespace espressopp {
 
@@ -56,14 +57,11 @@ namespace espressopp {
     ~VerletListAdress();
 
     PairList& getPairs() { return vlPairs; }
-
-    // AdResS stuff
     PairList& getAdrPairs() { return adrPairs; }
     std::set<longint>& getAdrList() { return adrList; }
     std::set<Particle*>& getAdrZone() { return adrZone; }
     std::set<Particle*>& getCGZone() { return cgZone; }
     std::vector<Real3D*>& getAdrPositions() { return adrPositions; }
-    //std::set<Particle*>& getAdrZone() { return adrZone; }
     real getHy() { return dHy; }
     real getEx() { return dEx; }
     /** Add an atomistic particle (used for AdResS) to atList */
@@ -71,6 +69,7 @@ namespace espressopp {
     // set the center of AdResS zone
     void setAdrCenter(real x, real y, real z);
     bool getAdrCenterSet() { return adrCenterSet; } // tells if adrCenter is set
+    Real3D getAdrCenter();
     // set whether adress zone is spherical (true) or slab (false)
     void setAdrRegionType(bool _sphereAdr);
     bool getAdrRegionType();
@@ -98,7 +97,6 @@ namespace espressopp {
 
   private:
 
-    // AdResS stuff
     std::set<longint> adrList;   // pids of particles defining center of adress zone, if set
     std::set<Particle*> adrZone; // particles that are in the AdResS zone
     std::set<Particle*> cgZone; // particles not in adress zone (same as in vlPairs)
