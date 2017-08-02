@@ -83,6 +83,7 @@
 #include "Potential.hpp"
 #include "PotentialVSpherePair.hpp"
 #include "SingleParticlePotential.hpp"
+#include "ConstrainCOM.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -149,6 +150,8 @@ namespace espressopp {
       TersoffTripleTerm::registerPython();
       
       CoulombKSpaceP3M::registerPython();
+
+      ConstrainCOM::registerPython();
     }
   }
 }
