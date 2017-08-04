@@ -84,6 +84,7 @@
 #include "PotentialVSpherePair.hpp"
 #include "SingleParticlePotential.hpp"
 #include "ConstrainCOM.hpp"
+#include "ConstrainRG.hpp"
 
 namespace espressopp {
   namespace interaction {
@@ -152,6 +153,7 @@ namespace espressopp {
       CoulombKSpaceP3M::registerPython();
 
       ConstrainCOM::registerPython();
+      ConstrainRG::registerPython();
     }
   }
 }
