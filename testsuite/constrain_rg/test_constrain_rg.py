@@ -131,7 +131,7 @@ class TestCaseConstrainRG(unittest.TestCase):
         print "after  Rg =", after_rg
 
         # run checks
-        self.assertTrue(fabs((before_rg - after_rg)/before_rg) < 0.01)
+        self.assertTrue(fabs((before_rg - after_rg)/before_rg) < 0.03)
 
 if __name__ == '__main__':
     unittest.main()

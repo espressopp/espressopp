@@ -61,20 +61,25 @@ namespace espressopp {
 	    }
 	    real getK_rg() const { return k_rg; }
 /////////////////////////////////////////////////////////////////////////////////////////
-	    
-	    real _computeEnergy(real diff) {
+
+	    // This potential term is based on the reference:
+            // Equilibration of high molecular weight polymer melts: A hierarchical strategy,
+	    // Macro Lett., 2014, 3, 198
+	    real _computeEnergy(real diff_rg) {
 		
-		real energy = diff*diff;
+		real energy = diff_rg*diff_rg;
 
 		return k_rg*energy;
 	    }
 	    
+	    // This force term is based on the reference:
+            // Equilibration of high molecular weight polymer melts: A hierarchical strategy,
+	    // Macro Lett., 2014, 3, 198
 	    Real3D _computeForce(Real3D diff,
-				 real rg_id,
 				 real diff_rg,
 				 long unsigned int N_Constrain) {
 		
-		return 8.*k_rg*diff*diff_rg*sqrt(rg_id)/N_Constrain;
+		return 4.*k_rg*diff*diff_rg/N_Constrain;
 	    }
 	    
 	    real _computeEnergySqrRaw(real distSqr) const {

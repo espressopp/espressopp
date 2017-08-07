@@ -125,11 +125,8 @@ namespace espressopp {
 
 		boost::mpi::all_reduce(*system.comm, RG, num_of_subchain, totRG, std::plus<real>() );
 		
-		if (system.comm->rank() == 0) {
-		    for(long unsigned int i = 0; i < num_of_subchain; i++) {
-			rg_origin[i] = totRG[i];
-		    }
-		    
+		for(long unsigned int i = 0; i < num_of_subchain; i++) {
+		    rg_origin[i] = totRG[i];
 		}
 
 		delete [] RG;
@@ -274,7 +271,7 @@ namespace espressopp {
 
 		real diff_rg = rg_origin[id] - rg_sq[id];
 		
-		p->force() += potential->_computeForce(diff, rg_sq[id], diff_rg, N_Constrain);
+		p->force() += p->mass()*potential->_computeForce(diff, diff_rg, N_Constrain);
 
 		for (long unsigned int i = 0; i < N_Constrain - 1; i++) {
 		    Particle* pt = pList[i];
@@ -282,7 +279,7 @@ namespace espressopp {
 						pt->position(),
 						center[id]);
 		    pt->force() +=
-			potential->_computeForce(diff, rg_sq[id], diff_rg, N_Constrain);
+			p->mass()*potential->_computeForce(diff, diff_rg, N_Constrain);
 		}
 
 	    }
@@ -370,14 +367,14 @@ namespace espressopp {
 
 		real diff_rg = rg_origin[id] - rg_sq[id];
 		
-		w += diff * potential->_computeForce(diff, rg_sq[id], diff_rg, N_Constrain);
+		w += diff*p->mass()*potential->_computeForce(diff, diff_rg, N_Constrain);
 
 		for (long unsigned int i = 0; i < N_Constrain - 1; i++) {
 		    Particle* pt = pList[i];
 		    bc.getMinimumImageVectorBox(diff,
 						pt->position(),
 						center[id]);
-		    w += diff * potential->_computeForce(diff, rg_sq[id], diff_rg, N_Constrain);
+		    w += diff*p->mass()*potential->_computeForce(diff, diff_rg, N_Constrain);
 		}
 
 	    }
@@ -412,14 +409,14 @@ namespace espressopp {
 
 		real diff_rg = rg_origin[id] - rg_sq[id];
 		
-		wlocal += Tensor(diff, potential->_computeForce(diff, rg_sq[id], diff_rg, N_Constrain));
+		wlocal += Tensor(diff, p->mass()*potential->_computeForce(diff, diff_rg, N_Constrain));
 
 		for (long unsigned int i = 0; i < N_Constrain - 1; i++) {
 		    Particle* pt = pList[i];
 		    bc.getMinimumImageVectorBox(diff,
 						pt->position(),
 						center[id]);
-		    wlocal += Tensor(diff, potential->_computeForce(diff, rg_sq[id], diff_rg, N_Constrain));
+		    wlocal += Tensor(diff, p->mass()*potential->_computeForce(diff, diff_rg, N_Constrain));
 		}
 
 	    }

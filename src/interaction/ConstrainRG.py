@@ -24,7 +24,7 @@ r"""
 This class is for calculating forces of constraining radii of gyration of subchains.
 Subchains are defined as a tuple list.
 
-.. math:: U = k_{rg} \left(R_{g} - R_{g}^{ideal}\right)^2
+.. math:: U = k_{rg} \left(R_{g}^2 - {R_{g}^{ideal}}^2\right)^2
 
 where :math:`R_{g}^{ideal}` stands for the desired radius of gyration of subchain.
 
