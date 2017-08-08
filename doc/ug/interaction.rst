@@ -17,6 +17,7 @@ interaction
    espressopp.interaction.CoulombTruncated.rst
    espressopp.interaction.CoulombTruncatedUniqueCharge.rst
    espressopp.interaction.ConstrainCOM.rst
+   espressopp.interaction.ConstrainRG.rst
    espressopp.interaction.DihedralHarmonic.rst
    espressopp.interaction.DihedralHarmonicCos.rst
    espressopp.interaction.DihedralHarmonicNCos.rst
