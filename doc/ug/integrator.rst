@@ -24,6 +24,7 @@ integrator
    espressopp.integrator.LangevinThermostat1D.rst
    espressopp.integrator.LangevinThermostatHybrid.rst
    espressopp.integrator.LangevinThermostatOnGroup.rst
+   espressopp.integrator.LangevinThermostatOnRadius.rst
    espressopp.integrator.LatticeBoltzmann.rst
    espressopp.integrator.LBInit.rst
    espressopp.integrator.MDIntegrator.rst

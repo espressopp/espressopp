@@ -46,7 +46,7 @@ various helper functions for setting up systems containing complex molecules suc
   
   Can then be used with RATTLE, e.g.
   
-  >>> rattle = espresso.integrator.Rattle(system, maxit = 1000, tol = 1e-6, rptol = 1e-6)
+  >>> rattle = espressopp.integrator.Rattle(system, maxit = 1000, tol = 1e-6, rptol = 1e-6)
   >>> rattle.addConstrainedBonds(constrainedBondsList)
   >>> integrator.addExtension(rattle)
 
@@ -88,7 +88,32 @@ various helper functions for setting up systems containing complex molecules suc
 
   Returns: between 2 and 5 lists
  
+.. function:: espressopp.tools.applyBoreschRestraints(system,restraintAtoms,restraintK,restraintR0)
+
+  Applies restraints between ligand and protein as defined in Boresch et al, JPCB 2003, 107, 9535-9551
+  The restraints (one bond, two angles and three dihedrals) are applied between three ligand atoms A,B,C and three protein atoms a,b,c.
+
+  In espressopp, the potential for harmonic bond and angles is k(x-x0)^2, but the harmonic dihedral potential is 0.5*k(x-x0)^2. This is taken care of in this function, i.e. the user should supply the force constants exactly as given in Boresch et al.
+
+  :param system: espressopp system
+  :type system: System object
+  :param restraintAtoms: dictionary identifying the six atoms involved in the restraints, key = atom label (one of 'A','B','C','a','b','c'), value = atom index
+  :type restraintAtoms: python dictionary
+  :param restraintK: dictionary of force constants, key = restraint label ('aA' for the bond, 'baA' and 'aAB' for the angles, 'aABC', 'cbaA' and 'baAB' for the dihedrals), value = force constant (units as for the simulation forcefield, angle and dihedral constants should be in rad^-2)
+  :type restraintK: python dictionary
+  :param restraintR0: dictionary of equilibrium values (distance or angle), key = restraint label, value = distance (in distance units) or angle (in degrees)
+  :type restraintR0: python dictionary
+
+  Examples of the three dictionaries:
+
+  >>> restraintAtoms = {'A':1981,'B':1966,'C':1993,'a':1588,'b':1581,'c':1567}
+  >>> restraintK = {'aA':4184,'baA':41.84,'aAB':41.84,'aABC':41.84,'cbaA':41.84,'baAB':41.84} #kJ mol-1 nm-2,kJ mol-1 rad-2, all 10 kcal as in JPCB 2003
+  >>> restraintR0 = {'aA':0.31,'baA':120.0,'aAB':90.0,'aABC':100.0,'cbaA':-170.0,'baAB':-105.0} #nm, degrees
+
 """
+
+import espressopp
+import math
 
 def findConstrainedBonds(atomPids, bondtypes, bondtypeparams, masses, massCutoff = 1.1):
 
@@ -165,4 +190,46 @@ def readSimpleSystem(filename,nparticles,header=0):
     return mass,charge,index,name
   elif len(line)==5:
     return mass,charge,index,name,ptype
+
+def applyBoreschRestraints(system,restraintAtoms,restraintK,restraintR0):
+
+  restraintinteraction = {}
+
+  restraintBond = espressopp.FixedPairList(system.storage)
+  restraintBond.addBonds([(restraintAtoms['a'],restraintAtoms['A'])])
+  potint=espressopp.interaction.FixedPairListHarmonic(system, restraintBond, potential=espressopp.interaction.Harmonic(K=0.5*restraintK['aA'],r0=restraintR0['aA'], cutoff = 5.0, shift = 0.0))
+  system.addInteraction(potint)
+  restraintinteraction.update({0:potint})
+  
+  restraintAngle = espressopp.FixedTripleList(system.storage)
+  restraintAngle.addTriples([(restraintAtoms['a'],restraintAtoms['A'],restraintAtoms['B'])])
+  potint=espressopp.interaction.FixedTripleListAngularHarmonic(system, restraintAngle, potential=espressopp.interaction.AngularHarmonic(K=0.5*restraintK['aAB'],theta0=restraintR0['aAB']*math.pi/180.0))
+  system.addInteraction(potint)
+  restraintinteraction.update({1:potint})
+  
+  restraintAngle = espressopp.FixedTripleList(system.storage)
+  restraintAngle.addTriples([(restraintAtoms['b'],restraintAtoms['a'],restraintAtoms['A'])])
+  potint=espressopp.interaction.FixedTripleListAngularHarmonic(system, restraintAngle, potential=espressopp.interaction.AngularHarmonic(K=0.5*restraintK['baA'],theta0=restraintR0['baA']*math.pi/180.0))
+  system.addInteraction(potint)
+  restraintinteraction.update({2:potint})
+  
+  restraintDih = espressopp.FixedQuadrupleList(system.storage)
+  restraintDih.addQuadruples([(restraintAtoms['c'],restraintAtoms['b'],restraintAtoms['a'],restraintAtoms['A'])])
+  potint=espressopp.interaction.FixedQuadrupleListDihedralHarmonic(system, restraintDih, potential=espressopp.interaction.DihedralHarmonic(K=restraintK['cbaA'],phi0=restraintR0['cbaA']*math.pi/180.0))
+  system.addInteraction(potint)
+  restraintinteraction.update({3:potint})
+  
+  restraintDih = espressopp.FixedQuadrupleList(system.storage)
+  restraintDih.addQuadruples([(restraintAtoms['b'],restraintAtoms['a'],restraintAtoms['A'],restraintAtoms['B'])])
+  potint=espressopp.interaction.FixedQuadrupleListDihedralHarmonic(system, restraintDih, potential=espressopp.interaction.DihedralHarmonic(K=restraintK['baAB'],phi0=restraintR0['baAB']*math.pi/180.0))
+  system.addInteraction(potint)
+  restraintinteraction.update({4:potint})
+  
+  restraintDih = espressopp.FixedQuadrupleList(system.storage)
+  restraintDih.addQuadruples([(restraintAtoms['a'],restraintAtoms['A'],restraintAtoms['B'],restraintAtoms['C'])])
+  potint=espressopp.interaction.FixedQuadrupleListDihedralHarmonic(system, restraintDih, potential=espressopp.interaction.DihedralHarmonic(K=restraintK['aABC'],phi0=restraintR0['aABC']*math.pi/180.0))
+  system.addInteraction(potint)
+  restraintinteraction.update({5:potint})
+
+  return restraintinteraction
 

@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 2012,2013,2014,2015,2016
+  Copyright (C) 2012,2013,2014,2015,2016,2017(H)
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -51,8 +51,6 @@ namespace espressopp {
       cutverlet = cut + skin;
       cutsq = cutverlet * cutverlet;
       builds = 0;
-
-      // AdResS stuff
       dEx = _dEx;
       dHy = _dHy;
       adrCenterSet = false;
@@ -205,6 +203,8 @@ namespace espressopp {
         adrCenterSet = true;
         adrPositions.push_back(&adrCenter);
     }
+
+    Real3D VerletListAdress::getAdrCenter(){return adrCenter;}
 
     void VerletListAdress::setAdrRegionType(bool _sphereAdr){
         sphereAdr = _sphereAdr;
