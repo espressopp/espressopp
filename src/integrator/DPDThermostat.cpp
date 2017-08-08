@@ -152,7 +152,8 @@ namespace espressopp {
 
         real veldiff = (p1.velocity() - p2.velocity()) * r;
         real friction = pref1 * omega2 * veldiff;
-        real noise = pref2 * omega * ((*rng)() - 0.5);
+        real r0 = ((*rng)() - 0.5);
+        real noise = pref2 * omega * r0;//(*rng)() - 0.5);
 
         Real3D f = (noise - friction) * r;
         p1.force() += f;
@@ -173,7 +174,11 @@ namespace espressopp {
 
         r /= dist;
 		
-        Real3D noisevec((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);
+        Real3D noisevec(0.0);
+        noisevec[0] = (*rng)() - 0.5;
+        noisevec[1] = (*rng)() - 0.5;
+        noisevec[2] = (*rng)() - 0.5;
+        
         Real3D veldiff = p1.velocity() - p2.velocity();
 
         Real3D f_damp,f_rand;

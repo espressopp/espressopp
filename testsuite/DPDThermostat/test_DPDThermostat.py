@@ -97,9 +97,7 @@ class TestDPDThermostat(unittest.TestCase):
         r2 = self.system.rng()-.5
         r3 = self.system.rng()-.5
 
-        #the order of evaluation is left to right in python but probably right to left in the c++ implementation
-        #therefore we switch here to get equal results
-        randvec = espressopp.Real3D(r3,r2,r1)
+        randvec = espressopp.Real3D(r1,r2,r3)
 
         tf_noise[0] =   (1.0 - dist_unitv[0]*dist_unitv[0])*randvec[0] \
                       - dist_unitv[0]*dist_unitv[1]*randvec[1]         \
