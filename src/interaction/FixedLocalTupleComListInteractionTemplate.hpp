@@ -69,21 +69,46 @@ namespace espressopp {
 		long unsigned int localN = system.storage -> getNRealParticles();
 		boost::mpi::all_reduce(*system.comm, localN, num_of_part, std::plus<int>());
 
-		FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList);
-		std::vector<Particle*> pList = it->second;
+		N_Constrain = 0;
 
-		N_Constrain = pList.size() + 1;
-
-		// Check the length of individula particle list in FixedLocalTuple
-		for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
-		    std::vector<Particle*> pList = it->second;
+		if (!fixedtupleList->empty()) {
 		    
-		    if (pList.size() + 1 != N_Constrain) {
-			std::stringstream msg;
-			msg << "ERROR: Tuple Length is not constant\n";
-			err.setException(msg.str());
+		    FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList);
+		    std::vector<Particle*> pList = it->second;
+
+		    N_Constrain = pList.size() + 1;
+		    
+		    // Check the length of individula particle list in FixedLocalTuple
+		    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
+			std::vector<Particle*> pList = it->second;
+			
+			if (pList.size() + 1 != N_Constrain) {
+			    std::stringstream msg;
+			    msg << "ERROR: Tuple Length is not constant\n";
+			    err.setException(msg.str());
+			}
 		    }
 		}
+
+		std::vector<int> nList;
+		boost::mpi::all_gather(*system.comm, N_Constrain, nList);
+		int check_N = 0;
+		for (int i = 0; i < nList.size(); i++) {
+		    if (nList[i] != 0) {
+			check_N = nList[i];
+			break;
+		    }
+		}
+		for (int i = 0; i < nList.size(); i++) {
+		    if (nList[i] != 0) {
+			if (nList[i] != check_N) {
+			    std::stringstream msg;
+			    msg << "ERROR: Tuple Length is not constant\n";
+			    err.setException(msg.str());
+			}
+		    }
+		}
+		N_Constrain = check_N;
 		
 		num_of_subchain = num_of_part/N_Constrain;
 
@@ -92,18 +117,20 @@ namespace espressopp {
 		pid_list = new int[num_of_subchain];
 
 		// Check the particle id in FixedLocalTuple
-		for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
-		    Particle *p = it->first;
-		    pid_list[pidK] = p->id();
-		    
-		    for(long unsigned int i = 0; i < pidK; i++) {
-			if (pid_list[i]/N_Constrain == pid_list[pidK]/N_Constrain) {
-			    std::stringstream msg;
-			    msg << "ERROR: Particle ID is redundant\n";
-			    err.setException(msg.str());
+		if (!fixedtupleList->empty()) {
+		    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
+			Particle *p = it->first;
+			pid_list[pidK] = p->id();
+			
+			for(long unsigned int i = 0; i < pidK; i++) {
+			    if (pid_list[i]/N_Constrain == pid_list[pidK]/N_Constrain) {
+				std::stringstream msg;
+				msg << "ERROR: Particle ID is redundant\n";
+				err.setException(msg.str());
+			    }
 			}
+			pidK++;
 		    }
-		    pidK++;
 		}
 
 		delete [] pid_list;
@@ -186,27 +213,29 @@ namespace espressopp {
 
 		const bc::BC& bc = *getSystemRef().bc;  // boundary conditions
 
-		for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
-		    Particle *p = it->first;
-		    Real3D pos_i = p->position();
-		    real mass = p->mass();
-		    Real3D tmp_com = mass*pos_i;
-		    real tmp_mass = mass;
-		    std::vector<Particle*> pList = it->second;
-
-		    for (long unsigned int j = 0; j < N_Constrain - 1; j++) {
-			p = pList[j];
-			Real3D pos_j = p->position();
-			Real3D dist;
-			bc.getMinimumImageVectorBox(dist, pos_j, pos_i);
-			pos_j = pos_i + dist;
-			mass = p->mass();
-			tmp_com += mass*pos_j;
-			tmp_mass += mass;
-			pos_i = pos_j;
+		if (!fixedtupleList->empty()) {
+		    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
+			Particle *p = it->first;
+			Real3D pos_i = p->position();
+			real mass = p->mass();
+			Real3D tmp_com = mass*pos_i;
+			real tmp_mass = mass;
+			std::vector<Particle*> pList = it->second;
+			
+			for (long unsigned int j = 0; j < N_Constrain - 1; j++) {
+			    p = pList[j];
+			    Real3D pos_j = p->position();
+			    Real3D dist;
+			    bc.getMinimumImageVectorBox(dist, pos_j, pos_i);
+			    pos_j = pos_i + dist;
+			    mass = p->mass();
+			    tmp_com += mass*pos_j;
+			    tmp_mass += mass;
+			    pos_i = pos_j;
+			}
+			com_temporal[(p->id() - 1)/N_Constrain] = tmp_com/tmp_mass;
+			total_mass[(p->id() - 1)/N_Constrain] = tmp_mass;
 		    }
-		    com_temporal[(p->id() - 1)/N_Constrain] = tmp_com/tmp_mass;
-		    total_mass[(p->id() - 1)/N_Constrain] = tmp_mass;
 		}
 	    }
 
@@ -226,20 +255,22 @@ namespace espressopp {
 
 	    computeCOM();
 
-	    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
-		Particle *p = it->first;
-		std::vector<Particle*> pList = it->second;
-		Real3D diff, force;
-		long unsigned int pid = p->id() - 1;
-		bc.getMinimumImageVectorBox(diff,
-					    com_origin[pid/N_Constrain],
-					    com_temporal[pid/N_Constrain]);
-		force = potential->_computeForce(diff, total_mass[pid/N_Constrain]);
-		p->force() += p->mass()*force;
-		
-		for (int i = 0; i < N_Constrain - 1; i++) {
-		    p = pList[i];
+	    if (!fixedtupleList->empty()) {
+		for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
+		    Particle *p = it->first;
+		    std::vector<Particle*> pList = it->second;
+		    Real3D diff, force;
+		    long unsigned int pid = p->id() - 1;
+		    bc.getMinimumImageVectorBox(diff,
+						com_origin[pid/N_Constrain],
+						com_temporal[pid/N_Constrain]);
+		    force = potential->_computeForce(diff, total_mass[pid/N_Constrain]);
 		    p->force() += p->mass()*force;
+		    
+		    for (int i = 0; i < N_Constrain - 1; i++) {
+			p = pList[i];
+			p->force() += p->mass()*force;
+		    }
 		}
 	    }
 	}
@@ -255,15 +286,17 @@ namespace espressopp {
 	    real e = 0.0;
 	    computeCOM();
 	    
-	    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
-		Particle *p = it->first;
-		Real3D diff;
-		long unsigned int pid = p->id() - 1;
-		bc.getMinimumImageVectorBox(diff,
-					    com_origin[pid/N_Constrain],
-					    com_temporal[pid/N_Constrain]);
-		
-		e += potential->_computeEnergy(diff);
+	    if (!fixedtupleList->empty()) {
+		for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
+		    Particle *p = it->first;
+		    Real3D diff;
+		    long unsigned int pid = p->id() - 1;
+		    bc.getMinimumImageVectorBox(diff,
+						com_origin[pid/N_Constrain],
+						com_temporal[pid/N_Constrain]);
+		    
+		    e += potential->_computeEnergy(diff);
+		}
 	    }
 
 	    real esum;
@@ -310,28 +343,30 @@ namespace espressopp {
 
 	    computeCOM();
 	    
-	    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
-		Particle *p = it->first;
-		std::vector<Particle*> pList = it->second;
-		Real3D diff, dist, force;
-		long unsigned int pid = p->id() - 1;
-		bc.getMinimumImageVectorBox(diff,
-					    com_origin[pid/N_Constrain],
-					    com_temporal[pid/N_Constrain]);
-		bc.getMinimumImageVectorBox(dist,
-					    p->position(),
-					    com_origin[pid/N_Constrain]);
-		force = potential->_computeForce(diff, total_mass[pid/N_Constrain]);
-		
-		// TODO: formulas are not correct yet?
-		w += dist * p->mass() * force;
-		
-		for (int i = 0; i < N_Constrain - 1; i++) {
-		    p = pList[i];
+	    if (!fixedtupleList->empty()) {
+		for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
+		    Particle *p = it->first;
+		    std::vector<Particle*> pList = it->second;
+		    Real3D diff, dist, force;
+		    long unsigned int pid = p->id() - 1;
+		    bc.getMinimumImageVectorBox(diff,
+						com_origin[pid/N_Constrain],
+						com_temporal[pid/N_Constrain]);
 		    bc.getMinimumImageVectorBox(dist,
 						p->position(),
 						com_origin[pid/N_Constrain]);
+		    force = potential->_computeForce(diff, total_mass[pid/N_Constrain]);
+		    
+		    // TODO: formulas are not correct yet?
 		    w += dist * p->mass() * force;
+		    
+		    for (int i = 0; i < N_Constrain - 1; i++) {
+			p = pList[i];
+			bc.getMinimumImageVectorBox(dist,
+						    p->position(),
+						    com_origin[pid/N_Constrain]);
+			w += dist * p->mass() * force;
+		    }
 		}
 	    }
 
@@ -349,28 +384,30 @@ namespace espressopp {
 
 	    computeCOM();
 	    
-	    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
-		Particle *p = it->first;
-		std::vector<Particle*> pList = it->second;
-		Real3D diff, dist, force;
-		long unsigned int pid = p->id() - 1;
-		bc.getMinimumImageVectorBox(diff,
-					    com_origin[pid/N_Constrain],
-					    com_temporal[pid/N_Constrain]);
-		bc.getMinimumImageVectorBox(dist,
-					    p->position(),
-					    com_origin[pid/N_Constrain]);
-		force = potential->_computeForce(diff, total_mass[pid/N_Constrain]);
-
-		// TODO: formulas are not correct yet?
-		wlocal += Tensor(dist, p->mass()*force);
-		
-		for (int i = 0; i < N_Constrain - 1; i++) {
-		    p = pList[i];
+	    if (!fixedtupleList->empty()) {
+		for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
+		    Particle *p = it->first;
+		    std::vector<Particle*> pList = it->second;
+		    Real3D diff, dist, force;
+		    long unsigned int pid = p->id() - 1;
+		    bc.getMinimumImageVectorBox(diff,
+						com_origin[pid/N_Constrain],
+						com_temporal[pid/N_Constrain]);
 		    bc.getMinimumImageVectorBox(dist,
 						p->position(),
 						com_origin[pid/N_Constrain]);
+		    force = potential->_computeForce(diff, total_mass[pid/N_Constrain]);
+		    
+		    // TODO: formulas are not correct yet?
 		    wlocal += Tensor(dist, p->mass()*force);
+		    
+		    for (int i = 0; i < N_Constrain - 1; i++) {
+			p = pList[i];
+			bc.getMinimumImageVectorBox(dist,
+						    p->position(),
+						    com_origin[pid/N_Constrain]);
+			wlocal += Tensor(dist, p->mass()*force);
+		    }
 		}
 	    }
 	    
