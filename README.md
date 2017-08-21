@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ESPResSo++
 ==========
 
@@ -66,3 +67,7 @@ Report bugs on the [github issues site](https://github.com/espressopp/espressopp
 [![codecov.io](https://codecov.io/github/espressopp/espressopp/coverage.svg?branch=master)](https://codecov.io/github/espressopp/espressopp?branch=master)
 [![Analysis Status](https://scan.coverity.com/projects/8143/badge.svg?flat=1)](https://scan.coverity.com/projects/espressopp-espressopp)
 
+=======
+# xTalGrowth
+asdfasdf
+>>>>>>> upstream/master
