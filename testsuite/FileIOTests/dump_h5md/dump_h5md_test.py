@@ -26,14 +26,14 @@ class TestH5MD(ut.TestCase):
             (4, espressopp.Real3D(4,5,6), 4)]
 
         self.system.storage.addParticles(self.particles, 'id', 'pos', 'type')
+        self.system.integrator = self.integrator
 
         self.dump_h5md = espressopp.io.DumpH5MD(
             self.system,
             self.h5md_file,
             store_species=True,
             store_velocity=True,
-            store_state=True,
-            integrator=self.integrator)
+            store_state=True)
 
     def tearDown(self):
         remove_file(self.h5md_file)

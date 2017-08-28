@@ -3,6 +3,8 @@
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   
   This file is part of ESPResSo++.
   
@@ -32,7 +34,6 @@
 #include "esutil/ESPPIterator.hpp"
 #include <boost/unordered_map.hpp>
 #include <boost/signals2.hpp>
-//#include "FixedListComm.hpp"
 
 namespace espressopp {
   class FixedQuadrupleList : public QuadrupleList {
@@ -59,7 +60,7 @@ namespace espressopp {
     void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
     void afterRecvParticles(ParticleList& pl, class InBuffer &buf);
     virtual void onParticlesChanged();
-
+    virtual std::vector<longint> getQuadrupleList();
     python::list getQuadruples();
 
     /** Get the number of quadruples in the GlobalQuadruples list */

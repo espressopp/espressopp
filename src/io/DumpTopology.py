@@ -107,7 +107,11 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
             cxxinit(self, io_DumpTopology, system, integrator)
             self.h5md_file = h5md_file
             self.tuple_index = 0
+            self.triple_index = 0
+            self.quadruple_index = 0
             self.tuple_data = {}
+            self.triple_data = {}
+            self.quadruple_data = {}
             if 'connectivity' not in self.h5md_file.file:
                 self.h5md_file.file.create_group('connectivity')
             self.connectivity = self.h5md_file.file['connectivity']
@@ -134,6 +138,30 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
             self.tuple_data[self.tuple_index] = g
             self.tuple_index += 1
 
+    def observe_triple(self, ftl, name, particle_group='atoms'):
+        if pmi.workerIsActive():
+            self.cxxclass.observe_triple(self, ftl)
+            g = pyh5md.element(self.connectivity, name, store='time', maxshape=(None, 3), shape=(self.chunk_size, 3),
+                               dtype=self.h5md_file.int_type, fillvalue=-1)
+            g.attrs['particle_group'] = particle_group
+            self.triple_data[self.triple_index] = g
+            self.triple_index += 1
+
+    def observe_quadruple(self, fql, name, particle_group='atoms'):
+        if pmi.workerIsActive():
+            self.cxxclass.observe_quadruple(self, fql)
+            g = pyh5md.element(
+                self.connectivity,
+                name,
+                store='time',
+                maxshape=(None, 4),
+                shape=(self.chunk_size, 4),
+                dtype=self.h5md_file.int_type,
+                fillvalue=-1)
+            g.attrs['particle_group'] = particle_group
+            self.quadruple_data[self.quadruple_index] = g
+            self.quadruple_index += 1
+
     def add_static_tuple(self, fpl, name, particle_group='atoms'):
         if pmi.workerIsActive():
             bonds = fpl.getBonds()
@@ -157,49 +185,116 @@ class DumpTopologyLocal(ParticleAccessLocal, io_DumpTopology):
             # Writes data.
             g[idx_0:idx_1] = bonds
 
+    def add_static_triple(self, ftl, name, particle_group='atoms'):
+        if pmi.workerIsActive():
+            triplets = ftl.getTriples()
+            NMaxLocal = np.array(len(triplets), 'i')
+            NMaxGlobal = np.array(0, 'i')
+            MPI.COMM_WORLD.Allreduce(NMaxLocal, NMaxGlobal, op=MPI.MAX)
+            size_per_cpu = ((NMaxGlobal // self.chunk_size)+1)*self.chunk_size
+            total_size = MPI.COMM_WORLD.size*size_per_cpu
+            g = pyh5md.element(
+                self.connectivity,
+                name,
+                store='fixed',
+                dtype=self.h5md_file.int_type,
+                fillvalue=-1,
+                shape=(total_size, 3))
+            g.attrs['particle_group'] = particle_group
+            idx_0 = MPI.COMM_WORLD.rank*size_per_cpu
+            idx_1 = idx_0 + NMaxLocal
+            g[idx_0:idx_1] = triplets
+
+    def add_static_quadruple(self, fql, name, particle_group='atoms'):
+        if pmi.workerIsActive():
+            quadruplets = fql.getQuadruples()
+            NMaxLocal = np.array(len(quadruplets), 'i')
+            NMaxGlobal = np.array(0, 'i')
+            MPI.COMM_WORLD.Allreduce(NMaxLocal, NMaxGlobal, op=MPI.MAX)
+            size_per_cpu = ((NMaxGlobal // self.chunk_size)+1)*self.chunk_size
+            total_size = MPI.COMM_WORLD.size*size_per_cpu
+            g = pyh5md.element(
+                self.connectivity,
+                name,
+                store='fixed',
+                dtype=self.h5md_file.int_type,
+                fillvalue=-1,
+                shape=(total_size, 4))
+            g.attrs['particle_group'] = particle_group
+            idx_0 = MPI.COMM_WORLD.rank*size_per_cpu
+            idx_1 = idx_0 + NMaxLocal
+            g[idx_0:idx_1] = quadruplets
+
     def update(self):
         """Load data from the buffer and store in the HDF5 file."""
         if pmi.workerIsActive():
             raw_data = self.cxxclass.get_data(self)
-            step_data = collections.defaultdict(dict)
-            max_size = 0
+            step_data = {}
+            max_sizes = [0, 0, 0] # {2: 0, 3: 0, 4: 0}
             while raw_data != []:
                 step = raw_data.pop()
                 fpl_idx = raw_data.pop()
+                fpl_type = raw_data.pop()
                 fpl_size = raw_data.pop()
                 data = []
                 for _ in range(fpl_size):
-                    b1 = raw_data.pop()
-                    b2 = raw_data.pop()
-                    data.append((b1, b2))
-                max_size = max(len(data), max_size)
-                step_data[step][fpl_idx] = np.array(data, dtype=self.h5md_file.int_type)
+                    if fpl_type == 2:
+                        b1 = raw_data.pop()
+                        b2 = raw_data.pop()
+                        data.append((b1, b2))
+                    elif fpl_type == 3:
+                        b1 = raw_data.pop()
+                        b2 = raw_data.pop()
+                        b3 = raw_data.pop()
+                        data.append((b1, b2, b3))
+                    elif fpl_type == 4:
+                        b1 = raw_data.pop()
+                        b2 = raw_data.pop()
+                        b3 = raw_data.pop()
+                        b4 = raw_data.pop()
+                        data.append((b1, b2, b3, b4))
+                    else:
+                        raise RuntimeError('Wrong fpl_type: {}'.format(fpl_type))
+                max_sizes[fpl_type-2] = max(len(data), max_sizes[fpl_type-2])
+                if step not in step_data:
+                    step_data[step] = {}
+                if fpl_type not in step_data[step]:
+                    step_data[step][fpl_type] = {}
+                step_data[step][fpl_type][fpl_idx] = np.array(data, dtype=self.h5md_file.int_type)
 
             MPI.COMM_WORLD.Barrier()
 
-            NMaxLocal = np.array(max_size, 'i')
-            NMaxGlobal = np.array(0, 'i')
+            NMaxLocal = np.array(max_sizes, 'i')
+            NMaxGlobal = np.zeros(3, 'i')
             MPI.COMM_WORLD.Allreduce(NMaxLocal, NMaxGlobal, op=MPI.MAX)
             cpu_size = ((NMaxGlobal // self.chunk_size)+1)*self.chunk_size
             total_size = MPI.COMM_WORLD.size*cpu_size
             idx_0 = MPI.COMM_WORLD.rank*cpu_size
             idx_1 = idx_0 + NMaxLocal
             for step in sorted(step_data):
-                for fpl_idx in step_data[step]:
-                    data = step_data[step][fpl_idx]
-                    if data.shape[0] < NMaxLocal:
-                        old_shape = data.shape
-                        if len(data):
-                            linear_data = data.reshape((old_shape[0]*old_shape[1],))
+                for fpl_type in step_data[step]:
+                    for fpl_idx in step_data[step][fpl_type]:
+                        data = step_data[step][fpl_type][fpl_idx]
+                        if data.shape[0] < NMaxLocal[fpl_type-2]:
+                            old_shape = data.shape
+                            if len(data):
+                                linear_data = data.reshape((old_shape[0]*old_shape[1],))
+                            else:
+                                linear_data = data
+                            data = np.pad(linear_data, (0, fpl_type*NMaxLocal[fpl_type-2]-linear_data.shape[0]),
+                                          'constant', constant_values=-1)
+                            data = data.reshape((NMaxLocal[fpl_type-2], fpl_type))
+                        if fpl_type == 2:
+                            ds = self.tuple_data[fpl_idx]
+                        elif fpl_type == 3:
+                            ds = self.triple_data[fpl_idx]
+                        elif fpl_type == 4:
+                            ds = self.quadruple_data[fpl_idx]
                         else:
-                            linear_data = data
-                        data = np.pad(linear_data, (0, 2*NMaxLocal-linear_data.shape[0]),
-                                      'constant', constant_values=-1)
-                        data = data.reshape((NMaxLocal, 2))
-                    ds = self.tuple_data[fpl_idx]
-                    if total_size > ds.value.shape[1]:
-                        ds.value.resize(total_size, axis=1)
-                    ds.append(data, step, step*self.dt, region=(idx_0, idx_1), collective=False)
+                            raise RuntimeError('Wrong fpl_type: {}'.format(fpl_type))
+                        if total_size[fpl_type-2] > ds.value.shape[1]:
+                            ds.value.resize(total_size[fpl_type-2], axis=1)
+                        ds.append(data, step, step*self.dt, region=(idx_0[fpl_type-2], idx_1[fpl_type-2]))
             self.cxxclass.clear_buffer(self)
 
 if pmi.isController:
@@ -207,7 +302,8 @@ if pmi.isController:
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls='espressopp.io.DumpTopologyLocal',
-            pmicall=['dump', 'clear_buffer', 'observe_tuple', 'update', 'add_static_tuple'],
+            pmicall=['dump', 'clear_buffer', 'observe_tuple', 'observe_triple', 'observe_quadruple', 'update',
+                     'add_static_tuple', 'add_static_triple', 'add_static_quadruple'],
             pmiproperty=[],
             pmiinvoke=['get_data']
         )
