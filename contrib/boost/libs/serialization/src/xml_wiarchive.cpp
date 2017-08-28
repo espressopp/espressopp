@@ -8,26 +8,17 @@
 
 //  See http://www.boost.org for updates, documentation, and revision history.
 
+#if (defined _MSC_VER) && (_MSC_VER == 1200)
+#  pragma warning (disable : 4786) // too long name, harmless warning
+#endif
+
 #include <boost/config.hpp>
 #ifdef BOOST_NO_STD_WSTREAMBUF
 #error "wide char i/o not supported on this platform"
 #else
 
-#include <boost/detail/workaround.hpp>
-
-#if (defined _MSC_VER) && (_MSC_VER == 1200)
-#  pragma warning (disable : 4786) // too long name, harmless warning
-#endif
-
 #define BOOST_WARCHIVE_SOURCE
-
-// the following works around an issue between spirit 1.61 and borland.
-// it turns out the the certain spirit stuff must be defined before
-// certain parts of mpl.  including this here makes sure that happens
-#if BOOST_WORKAROUND(__BORLANDC__, <= 0x560 )
-#include <boost/archive/impl/basic_xml_grammar.hpp>
-#endif
-
+#include <boost/serialization/config.hpp>
 #include <boost/archive/xml_wiarchive.hpp>
 #include <boost/archive/detail/archive_serializer_map.hpp>
 

@@ -19,34 +19,53 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 r"""
-**************************
-**espressopp.MultiSystem**
-**************************
+**********************
+espressopp.MultiSystem
+**********************
+
 .. function:: espressopp.MultiSystem()
 .. function:: espressopp.MultiSystem.beginSystemDefinition()
+
 		:rtype: 
+		
 .. function:: espressopp.MultiSystem.runAnalysisNPart()
+
 		:rtype: 
+		
 .. function:: espressopp.MultiSystem.runAnalysisPotential()
+
 		:rtype: 
+		
 .. function:: espressopp.MultiSystem.runAnalysisTemperature()
+
 		:rtype: 
+		
 .. function:: espressopp.MultiSystem.runIntegrator(niter)
+
 		:param niter: 
 		:type niter: 
 		:rtype: 
+		
 .. function:: espressopp.MultiSystem.setAnalysisNPart(npart)
+
 		:param npart: 
 		:type npart: 
+		
 .. function:: espressopp.MultiSystem.setAnalysisPotential(potential)
+
 		:param potential: 
 		:type potential: 
+		
 .. function:: espressopp.MultiSystem.setAnalysisTemperature(temperature)
+
 		:param temperature: 
 		:type temperature: 
+		
 .. function:: espressopp.MultiSystem.setIntegrator(integrator)
+
 		:param integrator: 
 		:type integrator: 
+		
 """
 
 from espressopp.esutil import cxxinit

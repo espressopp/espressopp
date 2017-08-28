@@ -24,6 +24,19 @@ file(GLOB_RECURSE NOT_BOOST_SOURCES
 
 list(REMOVE_ITEM BOOST_SOURCES ${NOT_BOOST_SOURCES})
 
+# Apply patch for Intel Compiler; http://stackoverflow.com/a/41188485
+if (NOT EXTERNAL_BOOST AND CMAKE_CXX_COMPILER_ID MATCHES "Intel")
+    message(STATUS "Applying patch on internal Boost because of Intel compiler")
+    execute_process(COMMAND patch
+        ${CMAKE_CURRENT_LIST_DIR}/boost/serialization/array.hpp
+        ${CMAKE_CURRENT_LIST_DIR}/serialization_array_hpp.patch
+        RESULT_VARIABLE boost_patch OUTPUT_VARIABLE boost_patch_stdout)
+    #message(${boost_patch_stdout})
+    if ("${boost_patch}" EQUAL "1" AND NOT "${boost_patch_stdout}" MATCHES "Skipping patch")
+        message(FATAL_ERROR ${boost_patch_stdout})
+    endif()
+endif()
+
 add_library(espressopp_boost STATIC ${BOOST_SOURCES})
 target_link_libraries(espressopp_boost ${PYTHON_LIBRARIES} ${VAMPIRTRACE_LIBRARIES} ${MPI_LIBRARIES} ${RT_LIBRARIES})
 if( CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64" )

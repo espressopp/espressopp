@@ -20,22 +20,19 @@
 
 
 r"""
-********************************************
-**espressopp.standard_system.Default**
-********************************************
+**********************************
+espressopp.standard_system.Default
+**********************************
 
 
-.. function:: espressopp.standard_system.Default(box, rc, skin, dt, temperature)
+.. py:method:: espressopp.standard_system.Default(box, rc = 1.12246, skin = 0.3, dt = 0.005, temperature = None)
 
 		:param box: 
-		:param rc: (default: 1.12246)
-		:param skin: (default: 0.3)
-		:param dt: (default: 0.005)
-		:param temperature: (default: None)
-		:type box: 
-		:type rc: real
-		:type skin: real
-		:type dt: real
+		:param real rc:
+		:param real skin:
+		:param real dt:
+		:param temperature:
+		:type box:
 		:type temperature: 
 		 
 		Return default system and integrator, no interactions, no particles are set

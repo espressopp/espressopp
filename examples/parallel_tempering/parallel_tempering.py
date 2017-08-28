@@ -1,7 +1,7 @@
 import espressopp
 from espressopp import Int3D, Real3D
 from espressopp.tools import decomp
-from espressopp.tools.init_cfg import lattice
+from espressopp.tools import lattice
 import random
 import sys
 

@@ -13,7 +13,7 @@ import espresso
 import mpi4py.MPI as MPI
 import logging
 from espresso import Real3D, Int3D
-from espresso.tools.convert import lammps, gromacs
+from espresso.tools import lammps, gromacs
 from espresso.tools import decomp, timers, replicate
 
 # simulation parameters (nvt = False is nve)

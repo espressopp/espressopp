@@ -20,9 +20,9 @@
 
 
 r"""
-********************************************************
-**LangevinBarostat** - Langevin-Hoover barostat Object
-********************************************************
+**************************************
+espressopp.integrator.LangevinBarostat
+**************************************
 
 This is the barostat implementation to perform Langevin dynamics in a Hoover style extended system
 according to the paper [Quigley04]_. It includes corrections of Hoover approach which were introduced

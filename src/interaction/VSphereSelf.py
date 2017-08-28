@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013, 2017
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -20,22 +20,20 @@
 
 
 r"""
-************************************************
-**espressopp.interaction.VSphereSelf**
-************************************************
+**********************************
+espressopp.interaction.VSphereSelf
+**********************************
 
 This class provides methods to compute forces and energies of
 the VSphereSelf potential.
 
 .. math::
 
-        U  =   e_1\left(\frac{4}{3}\pi \sigma_2\right)^{\frac{3}{2}}
-                  + \frac{a_1 {N_b}^3}{{\sigma_2}^3}
-                  + \frac{2a_2}{N_b} \sigma_2
+        U  =   e_1\left(\frac{4}{3}\pi \sigma^2\right)^{\frac{3}{2}}
+                  + \frac{a_1 {N_b}^3}{\sigma^6}
+                  + \frac{a_2}{N_b} \sigma^2
 
-
-
-
+Reference: Flactuating soft-sphere approach to coars-graining of polymer melts, Soft matter, 2010, 6, 2282
 
 .. function:: espressopp.interaction.VSphereSelf(e1, a1, a2, Nb, cutoff, shift)
 

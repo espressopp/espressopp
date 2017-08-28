@@ -20,9 +20,10 @@
 
 
 r"""
-**************************************************************
-**espressopp.interaction.StillingerWeberTripleTerm**
-**************************************************************
+************************************************
+espressopp.interaction.StillingerWeberTripleTerm
+************************************************
+
 This class provides methods to compute forces and energies of
 the Stillinger Weber Triple Term potential.
 

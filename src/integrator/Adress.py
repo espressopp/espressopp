@@ -20,9 +20,9 @@
 
 
 r"""
-********************************************
-**AdResS** - adaptive resolution simulations
-********************************************
+****************************
+espressopp.integrator.Adress
+****************************
 
 The AdResS object is an extension to the integrator. It makes sure that the
 integrator also processes the atomistic particles and not only the CG particles.
@@ -38,24 +38,20 @@ In detail the AdResS extension makes sure:
 
 Example - how to turn on the AdResS integrator extension:
 
->>> adress      = espressopp.integrator.Adress(system, verletlist, fixedtuplelist)
+>>> adress = espressopp.integrator.Adress(system, verletlist, fixedtuplelist)
 >>> integrator.addExtension(adress)
 
 If KTI is set to True, then the resolution parameters are not updated. This can be used for example for Kirkwood thermodynamic integration, during which one manually sets the whole system on different resolution parameters. KTI = True then prevents overwriting these manually set values.
 Furthermore, when having moving AdResS regions based on particles, regionupdates specifies the update frequency of the AdResS region in number of steps (or, to be more precise, calls of communicateAdrPositions()). Note that there is a tradeoff: The more frequently the AdResS region is updated, the more gradually and accurately the AdResS region changes and adapts it shape. This could allow for a smaller overall AdResS region and possibly a smoother simulation. However, when having many AdResS region defining particles, these frequent updates can become computationally significant and cost additional simulation time. The optimum is highly system and application dependent.
 
-.. function:: espressopp.integrator.Adress(_system, _verletlist, _fixedtuplelist, KTI, regionupdates)
+.. py:class:: espressopp.integrator.Adress(_system, _verletlist, _fixedtuplelist, KTI = False, regionupdates = 1)
 
-                :param _system: system object
-                :param _verletlist: verletlist object
-                :param _fixedtuplelist: fixedtuplelist object
-                :param KTI: (default: False) update resolution parameter? (Yes: set False, No: set True)
-                :param regionupdates: (default: 1) after how many steps does the AdResS region needs to be updated?
-                :type _system: shared_ptr<System>
-                :type _verletlist: shared_ptr<VerletListAdress>
-                :type _fixedtuplelist: shared_ptr<FixedTupleListAdress>
-                :type KTI: bool
-                :type regionupdates: int
+    :param shared_ptr<System> _system: system object
+    :param shared_ptr<VerletListAdress> _verletlist: verletlist object
+    :param shared_ptr<FixedTupleListAdress> _fixedtuplelist: fixedtuplelist object
+    :param bool KTI: update resolution parameter? (Yes: set False, No: set True)
+    :param int regionupdates: after how many steps does the AdResS region needs to be updated?
+
 """
 
 from espressopp.esutil import cxxinit

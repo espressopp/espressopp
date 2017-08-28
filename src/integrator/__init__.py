@@ -1,4 +1,4 @@
-#  Copyright (C) 2012,2013
+#  Copyright (C) 2012,2013, 2017
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
@@ -41,6 +41,7 @@ from espressopp.integrator.LangevinThermostatHybrid import *
 from espressopp.integrator.LangevinThermostat1D import *
 from espressopp.integrator.GeneralizedLangevinThermostat import *
 from espressopp.integrator.LangevinThermostatOnGroup import *
+from espressopp.integrator.LangevinThermostatOnRadius import *
 from espressopp.integrator.DPDThermostat import *
 from espressopp.integrator.LangevinBarostat import *
 from espressopp.integrator.FixPositions import *
@@ -50,7 +51,6 @@ from espressopp.integrator.LBInitConstForce import *
 from espressopp.integrator.LBInitPeriodicForce import *
 from espressopp.integrator.LBInitPopUniform import *
 from espressopp.integrator.LBInitPopWave import *
-from espressopp.integrator.LiquidGasLB import *
 from espressopp.integrator.ExtForce import *
 from espressopp.integrator.CapForce import *
 from espressopp.integrator.ExtAnalyze import *

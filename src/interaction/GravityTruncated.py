@@ -20,9 +20,9 @@
 
 
 r"""
-******************************
-**GravityTruncated**
-******************************
+***************************************
+espressopp.interaction.GravityTruncated
+***************************************
 
 This is an implementation of a truncated (cutoff) Gravity Potential
 

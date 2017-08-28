@@ -13,17 +13,20 @@ There are two different AdResS approaches: The force-based scheme, in which forc
 
 .. math::
   \mathbf{F}_{\alpha|\beta} = \lambda(\mathbf{R}_\alpha)\lambda(\mathbf{R}_\beta)\mathbf{F}_{\alpha|\beta}^{\text{AT}} + \left(1-\lambda(\mathbf{R}_\alpha)\lambda(\mathbf{R}_\beta)\right)\mathbf{F}_{\alpha|\beta}^{\text{CG}},
+
 where :math:`\mathbf{F}_{\alpha|\beta}^{\text{AT}}` is an AT force field based on the individual atoms belonging to the molecules :math:`\alpha` and :math:`\beta` and :math:`\lambda` is a position dependent resolution function smoothly changing from 1 in the AT region to 0 in the CG region via the hybrid buffer region. It is evaluated based on the molecules' center of mass positions :math:`\mathbf{R_\alpha}`. Note that there can of course also be bonded interactions, but these are typically not interpolated, as they are computationally usually much cheaper to evaluate than the non-bonded forces. For the sake of clarity, we omit them here.
 
 In H-AdResS (see Potestio et al., Phys. Rev. Lett. 110, 108301 (2013)), interpolation is performed directly on potential energies in the Hamiltonian as
 
 .. math::
   H  = \sum_\alpha \sum_{i\in\alpha} \frac{\mathbf{p}_{\alpha i}^2}{2m_{\alpha i}}+\sum_{\alpha} \left\{\lambda({\mathbf{R}_\alpha}) V^{\text{AT}}_\alpha + \left(1 - \lambda({\mathbf{R}_\alpha})\right) V^{\text{CG}}_\alpha \right\},
+
 where the first term corresponds to the kinetic energy and we again omitted intramolecular interactions. The forces obtained from this Hamiltonian are
 
 .. math::
   \textbf{F}_{\alpha i} = & \sum_{\beta\neq\alpha}\sum_{j\in\beta}\left\{ \frac{\lambda_\alpha+\lambda_\beta}{2}\textbf{F}_{\alpha i|\beta j}^{\text{AT}} + \left(1-\frac{\lambda_\alpha+\lambda_\beta}{2}\right)\textbf{F}_{\alpha i|\beta}^{\text{CG}}  \right\} \\
   & - [V^{\text{AT}}_\alpha - V^{\text{CG}}_\alpha] \,\nabla_{\alpha i}\lambda_\alpha.
+
 The last term, the so-called drift force, comes from applying the position gradient on the position-dependent resolution function :math:`\lambda`. It acts only in the hybrid region and unphysically pushes molecules from one region to the other. Therefore, it needs to be corrected. On the other hand, force-based AdResS, contrary to H-AdResS, does not allow a Hamiltonian formulation at all.
 
 Usually, the force fields used in the different regions of the adaptive simulation setup have significantly different pressures given the same temperature and particle density. This pressure gradient leads, in addition to the drift force in H-AdResS, to particles being pushed across the hybrid region. Eventually, the system would evolve to an equilibrium state with a inhomogeneous density profile across the simulation box. Therefore, correction forces needs to be applied in the hybrid region to counter these effects. In H-AdResS one can use a so-called free energy correction (FEC), which on average cancels the drift force in the hybrid region (see Potestio et al., Phys. Rev. Lett. 110, 108301 (2013)). The FEC corresponds to the free energy difference between the subsystems and can, for instance, be derived from Kirkwood thermodynamic integration. An alternative approach which is typically used to cancel the pressure gradient in force-based AdResS is the so-called thermodynamic force (see Fritsch et al., Phys. Rev. Lett. 108, 170602 (2012)). It is derived by constructing the correction directly from the distorted density profile which is obtained without any correction and then refined iteratively.
@@ -46,7 +49,7 @@ When setting up the storage we have to use an appropriate domain decomposition t
   system.storage = espressopp.storage.DomainDecompositionAdress(system, nodeGrid, cellGrid)
 
 Atomistic and Coarse-Grained particles
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 When adding particles to the storage, we have to define them as atomistic or coarse-grained. This has been implemented as the particle property "adrat". If it is 0, the particle is coarse-grained. If it is 1, it is an atomistic particle.
 
 .. code-block:: python

@@ -1,4 +1,8 @@
 /*
+  Copyright (C) 2017
+        Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de)        
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -28,6 +32,10 @@
 #include "DumpTopology.hpp"
 #include "FileBackup.hpp"
 
+#ifdef HAS_GROMACS
+#include "DumpXTC.hpp"
+#endif
+
 namespace espressopp {
   namespace io{
     void registerPython() {
@@ -36,6 +44,9 @@ namespace espressopp {
       DumpGROAdress::registerPython();
       DumpH5MD::registerPython();
       DumpTopology::registerPython();
+#ifdef HAS_GROMACS
+      DumpXTC::registerPython();
+#endif
     }
   }
 }

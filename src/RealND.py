@@ -20,9 +20,9 @@
 
 
 r"""
-*********************************************
-**RealND** - 
-*********************************************
+*****************
+espressopp.RealND
+*****************
 
 This is the object which represents N-dimensional vector. It is an extended Real3D,
 basicly, it hase the same functionallity but in N-dimetions.

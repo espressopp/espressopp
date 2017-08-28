@@ -19,5 +19,5 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
 
-import lattice
-import velocities
+from espressopp.tools import lattice
+from espressopp.tools import velocities

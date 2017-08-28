@@ -127,9 +127,7 @@ namespace espressopp {
         if(potential._computeForce(force, fsi, fsj, p1, p2)) {
           p1.force() += force;
           p2.force() -= force;
-          p1.fradius() = fsi;
-          p2.fradius() = fsj;
-          std::cout << "(" << p1.id() << ", " << p2.id() << ") force=" << force << " fradius: (" << p1.fradius() << ", " << p2.fradius() << ")" << std::endl;
+
           LOG4ESPP_TRACE(theLogger, "id1=" << p1.id() << " id2=" << p2.id() << " force=" << force);
         }
       }

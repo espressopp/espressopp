@@ -15,7 +15,7 @@ import math
 import logging
 import os
 from espressopp import Real3D, Int3D
-from espressopp.tools.convert import lammps, gromacs
+from espressopp.tools import lammps, gromacs
 from espressopp.tools import decomp
 from espressopp.tools import timers
 

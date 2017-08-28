@@ -24,9 +24,9 @@
 
 
 r"""
-***********************
-**espressopp.Particle**
-***********************
+*******************
+espressopp.Particle
+*******************
 
 
 .. function:: espressopp.Particle(pid, storage)

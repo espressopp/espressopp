@@ -21,9 +21,9 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 r"""
-*******************************************************
-**espressopp.interaction.LennardJones93Wall**
-*******************************************************
+*****************************************
+espressopp.interaction.LennardJones93Wall
+*****************************************
 
 This class defines a Lennard-Jones 9-3 SingleParticlePotential in the direction x.
 

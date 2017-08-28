@@ -20,9 +20,9 @@
 
 
 r"""
-****************************
-**espressopp.ParticleGroup**
-****************************
+************************
+espressopp.ParticleGroup
+************************
 
 
 .. function:: espressopp.ParticleGroup(storage)
@@ -85,4 +85,3 @@ if pmi.isController:
             cls = 'espressopp.ParticleGroupLocal',
             pmicall = [ "add", "show", "has", "size" ]
             )
-

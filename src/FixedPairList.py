@@ -22,9 +22,9 @@
 
 
 r"""
-****************************
-**espressopp.FixedPairList**
-****************************
+************************
+espressopp.FixedPairList
+************************
 
 
 .. function:: espressopp.FixedPairList(storage)

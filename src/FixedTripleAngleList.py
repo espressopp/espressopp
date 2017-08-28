@@ -20,9 +20,9 @@
 
 
 r"""
-***********************************
-**espressopp.FixedTripleAngleList**
-***********************************
+*******************************
+espressopp.FixedTripleAngleList
+*******************************
 
 
 .. function:: espressopp.FixedTripleAngleList(storage)

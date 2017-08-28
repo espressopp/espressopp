@@ -20,20 +20,11 @@
 
 
 r"""
-*************************************************************
-**espressopp.interaction.AngularPotential**
-*************************************************************
+***************************************
+espressopp.interaction.AngularPotential
+***************************************
+
 This is an abstract class, only needed to be inherited from.
-
-
-
-
-
-
-
-
-
-
 
 .. function:: espressopp.interaction.AngularPotential.computeEnergy(\*args)
 

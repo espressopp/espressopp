@@ -18,9 +18,9 @@
 
 
 r"""
-***********************************************
-**espressopp.interaction.DihedralRB**
-***********************************************
+*********************************
+espressopp.interaction.DihedralRB
+*********************************
 
 The proper dihedral with Ryckaert-Bellemans form.
 

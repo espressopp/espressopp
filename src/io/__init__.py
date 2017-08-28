@@ -1,3 +1,7 @@
+#  Copyright (C) 2017
+#      Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de)
+#  Copyright (C) 2017
+#      Jakub Krajniak (jkrajniak at gmail.com)
 #  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
@@ -22,12 +26,17 @@
 from espressopp.esutil import pmiimport
 pmiimport('espressopp.io')
 
-from espressopp.io.DumpXYZ import *
 from espressopp.io.DumpGRO import *
 from espressopp.io.DumpGROAdress import *
+from espressopp.io.DumpXYZ import *
+
+try:
+    from espressopp.io.DumpXTC import *
+except ImportError:
+    pass
+
 try:
     from espressopp.io.DumpH5MD import *
     from espressopp.io.DumpTopology import *
 except ImportError as ex:
-    import warnings
-    warnings.warn('H5MD format not supported ({})'.format(ex))
+    pass

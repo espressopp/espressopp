@@ -1,10 +1,10 @@
 /*
-  Copyright (C) 2016
-      Jakub Krajniak (jkrajniak at gmail.com)
-  Copyright (C) 2012,2013
+  Copyright (C) 2012,2013,2017
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   
   This file is part of ESPResSo++.
   
@@ -83,6 +83,8 @@ namespace espressopp {
 
     void copyShifted(ParticlePosition& dst, const Real3D& shift) const {
       dst.p = p + shift;
+      dst.radius = radius;
+      dst.extVar = extVar;
     }
   private:
     friend class boost::serialization::access;

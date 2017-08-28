@@ -20,9 +20,9 @@
 
 
 r"""
-**************************************
-**espressopp.integrator.FixPositions**
-**************************************
+**********************************
+espressopp.integrator.FixPositions
+**********************************
 
 
 .. function:: espressopp.integrator.FixPositions(system, particleGroup, fixMask)

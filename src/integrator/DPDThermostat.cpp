@@ -1,4 +1,7 @@
 /*
+  
+  Copyright (C) 2017
+      Gregor Deichmann (TU Darmstadt)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -125,25 +128,32 @@ namespace espressopp {
         for (PairList::Iterator it(verletList->getPairs()); it.isValid(); ++it) {
             Particle &p1 = *it->first;
             Particle &p2 = *it->second;
-
-            frictionThermoDPD(p1, p2);
+      
+            if(gamma > 0.0)
+              frictionThermoDPD(p1, p2);
+            if(tgamma > 0.0)
+              frictionThermoTDPD(p1, p2);
         }
     }
 
 
     void DPDThermostat::frictionThermoDPD(Particle& p1, Particle& p2) {
+      //Implements the standard DPD thermostat 
       Real3D r = p1.position() - p2.position();
       real dist2 = r.sqr();
-      if(dist2 < current_cutoff_sqr && gamma > 0.0){
-        real dist = sqrt(dist2);
       
+      if(dist2 < current_cutoff_sqr){
+        
+        real dist = sqrt(dist2);
         real omega = 1-dist/current_cutoff;
         real omega2 = omega*omega;
 
-        // standard DPD part
+        r /= dist;
+
         real veldiff = (p1.velocity() - p2.velocity()) * r;
         real friction = pref1 * omega2 * veldiff;
-        real noise = pref2 * omega * ((*rng)() - 0.5);
+        real r0 = ((*rng)() - 0.5);
+        real noise = pref2 * omega * r0;//(*rng)() - 0.5);
 
         Real3D f = (noise - friction) * r;
         p1.force() += f;
@@ -152,44 +162,44 @@ namespace espressopp {
     }
 
     void DPDThermostat::frictionThermoTDPD(Particle& p1, Particle& p2) {
+      //Implements a transverse DPD thermostat with the canonical functional form of omega
+      Real3D r = p1.position() - p2.position();
+	  real dist2 = r.sqr();
+      
+      if(dist2 < current_cutoff_sqr){
+        
+        real dist = sqrt(dist2);
+        real omega = 1-dist/current_cutoff;
+        real omega2 = omega*omega;
 
-		Real3D dist3D = p1.position() - p2.position();
-		real distsq = dist3D.sqr();
-		real omega2 = 1.0 / distsq;
-		real omega = sqrt(omega2);
+        r /= dist;
+		
+        Real3D noisevec(0.0);
+        noisevec[0] = (*rng)() - 0.5;
+        noisevec[1] = (*rng)() - 0.5;
+        noisevec[2] = (*rng)() - 0.5;
+        
+        Real3D veldiff = p1.velocity() - p2.velocity();
 
-		// transverse DPD part
-		if (tgamma > 0.0) {
-		  real distinv = omega;
+        Real3D f_damp,f_rand;
+        
+        //Calculate matrix product of projector and veldiff vector:
+        //P dv = (I - r r_T) dv 
+        f_damp[0] = (1.0 - r[0]*r[0])*veldiff[0] - r[0]*r[1]*veldiff[1] - r[0]*r[2]*veldiff[2];
+        f_damp[1] = (1.0 - r[1]*r[1])*veldiff[1] - r[1]*r[0]*veldiff[0] - r[1]*r[2]*veldiff[2];
+        f_damp[2] = (1.0 - r[2]*r[2])*veldiff[2] - r[2]*r[0]*veldiff[0] - r[2]*r[1]*veldiff[1];
+       
+        //Same with random vector
+        f_rand[0] = (1.0 - r[0]*r[0])*noisevec[0] - r[0]*r[1]*noisevec[1] - r[0]*r[2]*noisevec[2];
+        f_rand[1] = (1.0 - r[1]*r[1])*noisevec[1] - r[1]*r[0]*noisevec[0] - r[1]*r[2]*noisevec[2];
+        f_rand[2] = (1.0 - r[2]*r[2])*noisevec[2] - r[2]*r[0]*noisevec[0] - r[2]*r[1]*noisevec[1];
+        
+        f_damp *= pref3 * omega2;
+        f_rand *= pref4 * omega;
 
-		  Real3D noisevec((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);
-
-		  // damping, random force
-		  Real3D f_damp(0.0, 0.0, 0.0), f_rand(0.0, 0.0, 0.0);
-
-		  // proj matrix
-		  Real3D *matrix = new Real3D[3];
-		  matrix[0] = Real3D(distsq, 0.0, 0.0);
-		  matrix[1] = Real3D(0.0, distsq, 0.0);
-		  matrix[2] = Real3D(0.0, 0.0, distsq);
-
-		  for (int i = 0; i < 3; i++) {
-			  for (int j = 0; j < 3; j++) {
-				  matrix[i][j] -= dist3D[i] * dist3D[j];
-				  f_damp[i] += matrix[i][j] * (p1.velocity()[j] - p2.velocity()[j]);
-				  f_rand[i] += matrix[i][j] * noisevec[j];
-			  }
-			  f_damp[i] *= pref3 * omega2;
-			  f_rand[i] *= pref4 * omega * distinv;
-		  }
-
-		  delete [] matrix;
-
-		  Real3D f = f_rand - f_damp;
-
-		  p1.force() += f;
-		  p2.force() -= f;
-		}
+		p1.force() += f_rand - f_damp;
+		p2.force() -= f_rand - f_damp;
+      }	
 	}
 
     void DPDThermostat::initialize() {
@@ -206,9 +216,9 @@ namespace espressopp {
               ", temperature = " << temperature);
 
       pref1 = gamma;
-      pref2 = sqrt(24.0 * temperature * gamma/timestep);
+      pref2 = sqrt(24.0 * temperature * gamma / timestep);
       pref3 = tgamma;
-      pref4 = sqrt(24.0 * temperature * tgamma);
+      pref4 = sqrt(24.0 * temperature * tgamma / timestep);
     }
 
     /** very nasty: if we recalculate force when leaving/reentering the integrator,

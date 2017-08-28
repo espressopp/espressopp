@@ -15,7 +15,7 @@
 
 import sys
 import random
-from espressopp.tools.init_cfg import lattice, velocities
+from espressopp.tools import lattice, velocities
 
 
 # cubic lattice with user-defined values of N and rho

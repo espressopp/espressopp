@@ -20,9 +20,10 @@
 
 
 r"""
-*****************************************
-**espressopp.interaction.OPLS**
-*****************************************
+***************************
+espressopp.interaction.OPLS
+***************************
+
 This class provides methods to compute forces and energies of
 the OPLS dihedral potential. To create a new dihedral potential.
 

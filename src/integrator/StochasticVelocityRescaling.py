@@ -20,9 +20,9 @@
 
 
 r"""
-*****************************************************
-**espressopp.integrator.StochasticVelocityRescaling**
-*****************************************************
+*************************************************
+espressopp.integrator.StochasticVelocityRescaling
+*************************************************
 
 
 .. function:: espressopp.integrator.StochasticVelocityRescaling(system)

@@ -25,6 +25,10 @@ from espressopp import Real3D
 from espressopp.Exceptions import Error
 
 def polymerRW(pid, startpos, numberOfMonomers, bondlength, return_angles=False, return_dihedrals=False, mindist=None, rng=None):
+	"""
+	Initializes polymers through random walk 
+	"""
+	
 	x         = startpos[0]
 	y         = startpos[1]
 	z         = startpos[2]

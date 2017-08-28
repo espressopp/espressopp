@@ -1,0 +1,1 @@
+.. automodule:: espressopp.analysis.CMVelocity
