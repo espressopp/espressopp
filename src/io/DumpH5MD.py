@@ -158,7 +158,7 @@ class DumpH5MDLocal(io_DumpH5MD):
             return
         cxxinit(self, io_DumpH5MD, system, is_adress)
 
-        self.filename = filename
+        self.h5md_filename = filename
         self.group_name = group_name
         self.store_position = store_position
         self.store_species = store_species
@@ -185,7 +185,7 @@ class DumpH5MDLocal(io_DumpH5MD):
                 os.rename(filename, new_filename)
                 print('File {} exists, moved to {}'.format(filename, new_filename))
 
-        self.file = pyh5md.File(
+        self.h5md_file = pyh5md.File(
             filename, 'w',
             creator='espressopp',
             creator_version=espressopp.VersionLocal().info(),
@@ -199,7 +199,7 @@ class DumpH5MDLocal(io_DumpH5MD):
         self.float_type = np.float32 if is_single_prec else np.float64
         self.int_type = np.int32 if is_single_prec else np.int
 
-        part = self.file.particles_group(self.group_name)
+        part = self.h5md_file.particles_group(self.group_name)
         self.particle_group = part
 
         if self.static_box:
@@ -209,11 +209,14 @@ class DumpH5MDLocal(io_DumpH5MD):
                 store='fixed',
                 data=np.array([ed_i for ed_i in self.system.bc.boxL], dtype=self.float_type))
         else:
-            self.box = part.box(
+            self.box = part.create_box(
                 dimension=3,
                 boundary=['periodic', 'periodic', 'periodic'],
-                store='time', time=True,
-                data=np.zeros(3, dtype=self.float_type))
+                store='time',
+                shape=(3, ),
+                dtype=self.float_type,
+                fillvalue=0,
+                time=True)
 
         self.id_e = pyh5md.element(part, 'id', store='time', time=True, shape=(self.chunk_size,), maxshape=(None, ),
                                    dtype=self.int_type, fillvalue=-1)
@@ -280,15 +283,15 @@ class DumpH5MDLocal(io_DumpH5MD):
 
     def set_parameters(self, paramters):
         if pmi.workerIsActive():
-            if 'parameters' not in self.file:
-                self.file.create_group('parameters')
-            g_params = self.file['parameters']
+            if 'parameters' not in self.h5md_file:
+                self.h5md_file.create_group('parameters')
+            g_params = self.h5md_file['parameters']
             for k, v in paramters.iteritems():
                 g_params.attrs[k] = v
 
     def get_file(self):
         if pmi.workerIsActive():
-            return self.file
+            return self.h5md_file
 
     def update(self):
         if pmi.workerIsActive():
@@ -470,13 +473,13 @@ class DumpH5MDLocal(io_DumpH5MD):
     def close(self):
         if pmi.workerIsActive():
             time0 = py_time.time()
-            self.file.close()
+            self.h5md_file.close()
             self.closeTimer += (py_time.time() - time0)
 
     def flush(self):
         if pmi.workerIsActive():
             time0 = py_time.time()
-            self.file.flush()
+            self.h5md_file.flush()
             self.flushTimer += (py_time.time() - time0)
 
 
@@ -514,7 +517,7 @@ if pmi.isController:
             pmi.call(self.pmiobject, "close")
             # Sort file if flag is set to true.
             if self.pmiobject.do_sort:
-                h5 = h5py.File(self.pmiobject.filename, 'r+')
+                h5 = h5py.File(self.pmiobject.h5md_filename, 'r+')
                 print('Sorting file, please wait...')
                 sort_file(h5)
                 print('File sorted')
