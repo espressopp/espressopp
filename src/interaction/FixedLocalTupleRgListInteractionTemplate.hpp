@@ -66,21 +66,46 @@ namespace espressopp {
 		long unsigned int localN = system.storage -> getNRealParticles();
 		boost::mpi::all_reduce(*system.comm, localN, num_of_part, std::plus<int>());
 
-		FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList);
-		std::vector<Particle*> pList = it->second;
+		N_Constrain = 0;
 
-		N_Constrain = pList.size() + 1;
-
-		// Check the length of individula particle list in FixedLocalTuple
-		for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
-		    std::vector<Particle*> pList = it->second;
+		if (!fixedtupleList->empty()) {
 		    
-		    if (pList.size() + 1 != N_Constrain) {
-			std::stringstream msg;
-			msg << "ERROR: Tuple Length is not constant\n";
-			err.setException(msg.str());
+		    FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList);
+		    std::vector<Particle*> pList = it->second;
+
+		    N_Constrain = pList.size() + 1;
+
+		    // Check the length of individula particle list in FixedLocalTuple
+		    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
+			std::vector<Particle*> pList = it->second;
+			
+			if (pList.size() + 1 != N_Constrain) {
+			    std::stringstream msg;
+			    msg << "ERROR: Tuple Length is not constant\n";
+			    err.setException(msg.str());
+			}
 		    }
 		}
+
+		std::vector<int> nList;
+		boost::mpi::all_gather(*system.comm, N_Constrain, nList);
+		int check_N = 0;
+		for (int i = 0; i < nList.size(); i++) {
+		    if (nList[i] != 0) {
+			check_N = nList[i];
+			break;
+		    }
+		}
+		for (int i = 0; i < nList.size(); i++) {
+		    if (nList[i] != 0) {
+			if (nList[i] != check_N) {
+			    std::stringstream msg;
+			    msg << "ERROR: Tuple Length is not constant\n";
+			    err.setException(msg.str());
+			}
+		    }
+		}
+		N_Constrain = check_N;
 		
 		num_of_subchain = num_of_part/N_Constrain;
 
@@ -192,7 +217,7 @@ namespace espressopp {
 		    Real3D pos_i = p->position();
 		    Real3D tmp_center = pos_i;
 		    std::vector<Particle*> pList = it->second;
-
+		    
 		    for (long unsigned int j = 1; j < N_Constrain; j++) {
 			p = pList[j - 1];
 			Real3D pos_j = p->position();
@@ -220,7 +245,7 @@ namespace espressopp {
 		    Real3D pos_i = p->position();
 		    std::vector<Particle*> pList = it->second;
 		    long unsigned int id = (p->id() - 1)/N_Constrain;
-
+		    
 		    Real3D dist;
 		    bc.getMinimumImageVectorBox(dist, pos_i, center[id]);
 		    real tmp_rg = dist.sqr();
@@ -235,7 +260,7 @@ namespace espressopp {
 		    }
 		    rg[id] = tmp_rg/N_Constrain;
 		}
-
+		    
 		return rg;
 	    }
 
@@ -264,15 +289,15 @@ namespace espressopp {
 		std::vector<Particle*> pList = it->second;
 		Real3D diff;
 		long unsigned int id = (p->id() - 1)/N_Constrain;
-
+		
 		bc.getMinimumImageVectorBox(diff,
 					    p->position(),
 					    center[id]);
-
+		
 		real diff_rg = rg_origin[id] - rg_sq[id];
 		
 		p->force() += p->mass()*potential->_computeForce(diff, diff_rg, N_Constrain);
-
+		
 		for (long unsigned int i = 0; i < N_Constrain - 1; i++) {
 		    Particle* pt = pList[i];
 		    bc.getMinimumImageVectorBox(diff,
@@ -281,7 +306,7 @@ namespace espressopp {
 		    pt->force() +=
 			p->mass()*potential->_computeForce(diff, diff_rg, N_Constrain);
 		}
-
+		
 	    }
 	}
 	
@@ -300,13 +325,13 @@ namespace espressopp {
 	    
 	    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
 		Particle *p = it->first;
-
+		
 		long unsigned int id = (p->id() - 1)/N_Constrain;
 		real diff = rg_origin[id] - rg[id];
 		
 		e += N_Constrain*potential->_computeEnergy(diff);
 	    }
-
+	    
 	    real esum;
 	    boost::mpi::all_reduce(*mpiWorld, e, esum, std::plus<real>());
 	    return esum;
@@ -360,15 +385,15 @@ namespace espressopp {
 		std::vector<Particle*> pList = it->second;
 		Real3D diff;
 		long unsigned int id = (p->id() - 1)/N_Constrain;
-
+		
 		bc.getMinimumImageVectorBox(diff,
 					    p->position(),
 					    center[id]);
-
+		
 		real diff_rg = rg_origin[id] - rg_sq[id];
 		
 		w += diff*p->mass()*potential->_computeForce(diff, diff_rg, N_Constrain);
-
+		
 		for (long unsigned int i = 0; i < N_Constrain - 1; i++) {
 		    Particle* pt = pList[i];
 		    bc.getMinimumImageVectorBox(diff,
@@ -376,7 +401,7 @@ namespace espressopp {
 						center[id]);
 		    w += diff*p->mass()*potential->_computeForce(diff, diff_rg, N_Constrain);
 		}
-
+		
 	    }
 
 	    real wsum;
@@ -402,15 +427,15 @@ namespace espressopp {
 		std::vector<Particle*> pList = it->second;
 		Real3D diff;
 		long unsigned int id = (p->id() - 1)/N_Constrain;
-
+		
 		bc.getMinimumImageVectorBox(diff,
 					    p->position(),
 					    center[id]);
-
+		
 		real diff_rg = rg_origin[id] - rg_sq[id];
 		
 		wlocal += Tensor(diff, p->mass()*potential->_computeForce(diff, diff_rg, N_Constrain));
-
+		
 		for (long unsigned int i = 0; i < N_Constrain - 1; i++) {
 		    Particle* pt = pList[i];
 		    bc.getMinimumImageVectorBox(diff,
@@ -418,7 +443,7 @@ namespace espressopp {
 						center[id]);
 		    wlocal += Tensor(diff, p->mass()*potential->_computeForce(diff, diff_rg, N_Constrain));
 		}
-
+		
 	    }
 	    
 	    // reduce over all CPUs

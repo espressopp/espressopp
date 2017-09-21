@@ -69,21 +69,46 @@ namespace espressopp {
 		long unsigned int localN = system.storage -> getNRealParticles();
 		boost::mpi::all_reduce(*system.comm, localN, num_of_part, std::plus<int>());
 
-		FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList);
-		std::vector<Particle*> pList = it->second;
+		N_Constrain = 0;
 
-		N_Constrain = pList.size() + 1;
-
-		// Check the length of individula particle list in FixedLocalTuple
-		for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
-		    std::vector<Particle*> pList = it->second;
+		if (!fixedtupleList->empty()) {
 		    
-		    if (pList.size() + 1 != N_Constrain) {
-			std::stringstream msg;
-			msg << "ERROR: Tuple Length is not constant\n";
-			err.setException(msg.str());
+		    FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList);
+		    std::vector<Particle*> pList = it->second;
+
+		    N_Constrain = pList.size() + 1;
+		    
+		    // Check the length of individula particle list in FixedLocalTuple
+		    for (FixedLocalTupleList::TupleList::Iterator it(*fixedtupleList); it.isValid(); ++it) {
+			std::vector<Particle*> pList = it->second;
+			
+			if (pList.size() + 1 != N_Constrain) {
+			    std::stringstream msg;
+			    msg << "ERROR: Tuple Length is not constant\n";
+			    err.setException(msg.str());
+			}
 		    }
 		}
+
+		std::vector<int> nList;
+		boost::mpi::all_gather(*system.comm, N_Constrain, nList);
+		int check_N = 0;
+		for (int i = 0; i < nList.size(); i++) {
+		    if (nList[i] != 0) {
+			check_N = nList[i];
+			break;
+		    }
+		}
+		for (int i = 0; i < nList.size(); i++) {
+		    if (nList[i] != 0) {
+			if (nList[i] != check_N) {
+			    std::stringstream msg;
+			    msg << "ERROR: Tuple Length is not constant\n";
+			    err.setException(msg.str());
+			}
+		    }
+		}
+		N_Constrain = check_N;
 		
 		num_of_subchain = num_of_part/N_Constrain;
 
@@ -193,7 +218,7 @@ namespace espressopp {
 		    Real3D tmp_com = mass*pos_i;
 		    real tmp_mass = mass;
 		    std::vector<Particle*> pList = it->second;
-
+		    
 		    for (long unsigned int j = 0; j < N_Constrain - 1; j++) {
 			p = pList[j];
 			Real3D pos_j = p->position();
@@ -361,7 +386,7 @@ namespace espressopp {
 					    p->position(),
 					    com_origin[pid/N_Constrain]);
 		force = potential->_computeForce(diff, total_mass[pid/N_Constrain]);
-
+		
 		// TODO: formulas are not correct yet?
 		wlocal += Tensor(dist, p->mass()*force);
 		
