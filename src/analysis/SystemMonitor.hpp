@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2015
+  Copyright (c) 2015-2017
       Jakub Krajniak (jkrajniak at gmail.com)
 
   This file is part of ESPResSo++.
@@ -35,13 +35,46 @@
 #include "NPart.hpp"
 #include "storage/Storage.hpp"
 #include "iterator/CellListIterator.hpp"
+#include <boost/mpi/timer.hpp>
 
 namespace espressopp {
 namespace analysis {
 
-
-class SystemMonitorOutputCSV {
+/**
+ * Base class for SystemMonitor output formats.
+ */
+class SystemMonitorOutput {
   friend class SystemMonitor;
+  public:
+    virtual void write() = 0;
+    void setSystem(shared_ptr<System> system) {
+      system_ = system;
+    }
+
+    void setKeys(shared_ptr<std::vector<std::string> > keys) {
+      keys_ = keys;
+    }
+
+    void setValues(shared_ptr<std::vector<real> > val) {
+      values_ = val;
+    }
+
+    static void registerPython();
+
+  protected:
+    shared_ptr<std::vector<std::string> > keys_;
+    shared_ptr<std::vector<real> > values_;
+    shared_ptr<System> system_;
+    static LOG4ESPP_DECL_LOGGER(theLogger);
+};
+
+/**
+ * Output of SystemMonitor writen to CSV file.
+ *
+ * @param file_name The output file name.
+ * @param delimiter The separator of fields.
+ */
+class SystemMonitorOutputCSV : public SystemMonitorOutput {
  public:
   SystemMonitorOutputCSV(std::string file_name, std::string delimiter) :
       file_name_(file_name), delimiter_(delimiter) {
@@ -49,19 +82,18 @@ class SystemMonitorOutputCSV {
   }
   void write();
 
-  void setSystem(shared_ptr<System> system) {
-    system_ = system;
-  }
-
   static void registerPython();
 
  private:
-  shared_ptr<std::vector<std::string> > keys_;
-  shared_ptr<std::vector<real> > values_;
   std::string file_name_;
-  shared_ptr<System> system_;
   std::string delimiter_;
   bool header_written_;
+};
+
+class SystemMonitorOutputDummy : public SystemMonitorOutput {
+ public:
+  void write() { }
+  static void registerPython();
 };
 
 
@@ -70,7 +102,7 @@ class SystemMonitor : public ParticleAccess {
   typedef std::vector<std::pair<std::string, shared_ptr<Observable> > > ObservableList;
   SystemMonitor(shared_ptr< System > system,
                 shared_ptr<integrator::MDIntegrator> integrator,
-                shared_ptr<SystemMonitorOutputCSV> output):
+                shared_ptr<SystemMonitorOutput> output):
         ParticleAccess(system),
         system_(system),
         integrator_(integrator),
@@ -78,9 +110,9 @@ class SystemMonitor : public ParticleAccess {
     header_ = make_shared<std::vector<std::string> >();
     values_ = make_shared<std::vector<real> >();
 
-    output_->system_ = system;
-    output_->keys_ = header_;
-    output_->values_ = values_;
+    output_->setKeys(header_);
+    output_->setValues(values_);
+    output_->setSystem(system);
 
     header_shown_ = false;
     if (system->comm->rank() == 0) {
@@ -89,10 +121,11 @@ class SystemMonitor : public ParticleAccess {
       visible_observables_.push_back(1);
       visible_observables_.push_back(1);
     }
+    elapsed_time_ = true;
   }
 
-  ~SystemMonitor() {
-  }
+  ~SystemMonitor() { }
+
   void perform_action();
   void info();
 
@@ -104,16 +137,21 @@ class SystemMonitor : public ParticleAccess {
   void addObservable(std::string name, shared_ptr<Observable> obs, bool is_visible);
 
   int current_step_;
-  bool header_written_;
   bool header_shown_;
+  bool elapsed_time_;
+  boost::mpi::timer timer_;
+
   shared_ptr<std::vector<real> > values_;
   shared_ptr<std::vector<std::string> > header_;
   std::vector<int> visible_observables_;
   shared_ptr<System> system_;
   shared_ptr<integrator::MDIntegrator> integrator_;
 
-  shared_ptr<SystemMonitorOutputCSV> output_;
+  shared_ptr<SystemMonitorOutput> output_;
   ObservableList observables_;
+
+  real total_energy_;
+  real potential_energy_;
 };
 
 }  // end namespace analysis

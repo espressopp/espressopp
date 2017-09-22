@@ -1,4 +1,6 @@
 /*
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
@@ -35,7 +37,16 @@ namespace espressopp {
     public:
       /** Observable can be int, real, scalar or vector */
       enum result_types {old_format=-1, none=0, real_scalar=1, int_scalar=2, real_vector=3, int_vector=4};
-      Observable(shared_ptr< System > system) : SystemAccess(system) {result_type=old_format; };
+      enum ObservableTypes {
+        POTENTIAL_ENERGY,
+        KINETIC_ENERGY,
+        OTHER
+        };
+
+      Observable(shared_ptr< System > system) : SystemAccess(system) {
+        result_type = old_format;
+        observable_type = OTHER;
+      };
       virtual ~Observable() {};
 
     public:
@@ -46,7 +57,7 @@ namespace espressopp {
       /** returns observable of type int, used for Python and on C++ level*/
       virtual int compute_int() const { return 0; };
       /** computes vector of real values (e.g. pressure tensor, ...), used on C++ level only */
-      virtual void compute_real_vector(){ return; };
+      virtual std::vector<real> compute_real_vector(){ return std::vector<real>(); };
       /** computes vector of integer values, used on C++ level only */
       virtual void compute_int_vector(){ return; };
 
@@ -60,13 +71,17 @@ namespace espressopp {
       // trying to convert result_types to python
       //result_types getResultType() { return result_type; };
       int getResultType() { return result_type; };
+      longint getResultVectorSize() { return result_vector_size; }
+      ObservableTypes getObservableType() { return observable_type; }
 
       static void registerPython();
 
      protected:
       result_types result_type;
+      ObservableTypes observable_type;
       std::vector< real > result_real_vector;
       std::vector< int > result_int_vector;
+      longint result_vector_size;
 
       static LOG4ESPP_DECL_LOGGER(logger);
 
