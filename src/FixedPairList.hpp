@@ -69,7 +69,7 @@ namespace espressopp {
 	     * @param pid2 particle id
 	     * @return whether the particle was inserted on this processor.
 	     */
-		virtual bool iadd(longint pid1, longint pid2);
+		virtual bool addNonblocking(longint pid1, longint pid2);
 	  	/**
 	  	 * Remove the given particle pair from the list on this processor
 	  	 * @param pid1 particle id
@@ -77,7 +77,7 @@ namespace espressopp {
 	  	 * @param no_signal if true, do not throw signal onTupleRemoved
 	  	 * @return whether the pair is removed
 	  	 */
-	    virtual bool remove(longint pid1, longint pid2, bool no_signal = false);
+	    virtual bool removePair(longint pid1, longint pid2, bool no_signal = false);
 	  	/**
 	  	 * Remove pairs where the first element is pid1.
 	  	 *
@@ -96,7 +96,7 @@ namespace espressopp {
 	  	/**
 	  	 * Clean fixed pair list data structures and disconnect signals.
 	  	 */
-    	void clearAndRemove();
+    	void remove();
 	  	/**
 	  	 * Update the local pointers based on pair list
 	  	 */

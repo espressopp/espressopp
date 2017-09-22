@@ -122,7 +122,7 @@ namespace espressopp {
     return returnVal;
   }
 
-  bool FixedPairList::iadd(longint pid1, longint pid2) {
+  bool FixedPairList::addNonblock(longint pid1, longint pid2) {
     bool returnVal = true;
     if (pid1 > pid2)
       std::swap(pid1, pid2);
@@ -167,7 +167,7 @@ namespace espressopp {
     return returnVal;
   }
 
-  bool FixedPairList::remove(longint pid1, longint pid2, bool no_signal) {
+  bool FixedPairList::removePair(longint pid1, longint pid2, bool no_signal) {
     LOG4ESPP_DEBUG(theLogger, "FPL remove " << pid1 << "-" << pid2);
     bool returnValue = false;
     std::pair<GlobalPairs::iterator, GlobalPairs::iterator> equalRange, equalRange_rev;
@@ -427,7 +427,7 @@ namespace espressopp {
     return global_size;
   }
 
-  void FixedPairList::clearAndRemove() {
+  void FixedPairList::remove() {
       this->clear();
       globalPairs.clear();
       sigBeforeSend.disconnect();
@@ -450,13 +450,13 @@ namespace espressopp {
     class_<FixedPairList, shared_ptr<FixedPairList>, boost::noncopyable >
       ("FixedPairList", init <shared_ptr<storage::Storage> >())
       .def("add", pyAdd)
-      .def("remove", &FixedPairList::remove)
+      .def("removePair", &FixedPairList::removePair)
       .def("removeByPid1", &FixedPairList::removeByPid1)
       .def("size", &FixedPairList::size)
       .def("totalSize", &FixedPairList::totalSize)
       .def("getBonds",  &FixedPairList::getBonds)
       .def("getAllBonds", &FixedPairList::getAllBonds)
-      .def("clearAndRemove",  &FixedPairList::clearAndRemove)
+      .def("remove",  &FixedPairList::remove)
       .def("resetLongtimeMaxBondSqr", &FixedPairList::resetLongtimeMaxBondSqr)
       .def("getLongtimeMaxBondSqr", &FixedPairList::getLongtimeMaxBondSqr)
       ;
