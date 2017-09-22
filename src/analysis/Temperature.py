@@ -54,6 +54,14 @@ Calculate the temperature of the system (in :math:`k_B T` units).
     >>> print T.compute()
 
 
+.. function::espressopp.analysis.Temperature.add_type(type_id)
+
+      :param type_id: The particle type id to observe
+
+.. function::espressopp.analysis.Temperature.remove_type(type_id)
+
+      :param type_id: Remove particle type id.
+
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
