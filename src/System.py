@@ -1,4 +1,4 @@
-#  Copyright (C) 2015
+#  Copyright (C) 2015,2017
 #      Jakub Krajniak (jkrajniak at gmail.com)
 #  Copyright (C) 2012,2013
 #      Max Planck Institute for Polymer Research
