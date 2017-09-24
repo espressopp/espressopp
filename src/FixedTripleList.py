@@ -56,11 +56,11 @@ espressopp.FixedTripleList
 
 		:rtype: 
 
-.. function:: espressopp.FixedTripleList.clearAndRemove()
+.. function:: espressopp.FixedTripleList.remove()
 
     remove the FixedPairList and disconnect
 
-.. function:: espressopp.FixedTripleList.remove(pid1, pid2, pid3)
+.. function:: espressopp.FixedTripleList.removeTriplet(pid1, pid2, pid3)
 
     remove the triplet from FixedTripleList
 
@@ -104,11 +104,11 @@ class FixedTripleListLocal(_espressopp.FixedTripleList):
         if pmi.workerIsActive():
             return self.cxxclass.size(self)
 
-    def remove(self, pid1, pid2, pid3, no_signal=False):
+    def removeTriplet(self, pid1, pid2, pid3, no_signal=False):
         if pmi.workerIsActive():
-            self.cxxclass.remove(self, pid1, pid2, pid3, no_signal)
+            self.cxxclass.removeTriplet(self, pid1, pid2, pid3, no_signal)
 
-    def clearAndRemove(self):
+    def remove(self):
         if pmi.workerIsActive():
             self.cxxclass.clearAndRemove(self)
 
@@ -127,6 +127,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedTripleListLocal',
             localcall = [ "add" ],
-            pmicall = [ "addTriples", "totalSize", "getAllTriples", "clearAndRemove", "remove", "removeByBond"],
+            pmicall = [ "addTriples", "totalSize", "getAllTriples", "remove", "removeTriplet", "removeByBond"],
             pmiinvoke = ["getTriples", "size"]
         )

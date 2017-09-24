@@ -1,9 +1,9 @@
+#  Copyright (C) 2017
+#      Jakub Krajniak (jkrajniak at gmail.com)
 #  Copyright (C) 2012,2013,2015,2016
 #      Max Planck Institute for Polymer Research
 #  Copyright (C) 2008,2009,2010,2011
 #      Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-#  Copyright (C) 2017
-#      Jakub Krajniak (jkrajniak at gmail.com)
 #
 #  This file is part of ESPResSo++.
 #  
@@ -50,11 +50,11 @@ espressopp.FixedQuadrupleList
 		:type quadruplelist: 
 		:rtype: 
 
-.. function:: espressopp.FixedQuadrupleList.clearAndRemove()
+.. function:: espressopp.FixedQuadrupleList.remove()
 
         remove the FixedPairList and disconnect
 
-.. function:: espressopp.FixedQuadrupleList.remove(pid1, pid2, pid3, pid4)
+.. function:: espressopp.FixedQuadrupleList.removeQuadruplet(pid1, pid2, pid3, pid4)
 
    remove quadruplet from fixed quadruple list
 
@@ -108,13 +108,13 @@ class FixedQuadrupleListLocal(_espressopp.FixedQuadrupleList):
                 pid1, pid2, pid3, pid4 = quadruple
                 self.cxxclass.add(self, pid1, pid2, pid3, pid4)
 
-    def remove(self, pid1, pid2, pid3, pid4, no_signal=False):
+    def removeQuadruplet(self, pid1, pid2, pid3, pid4, no_signal=False):
         if pmi.workerIsActive():
-            self.cxxclass.remove(self, pid1, pid2, pid3, pid4, no_signal)
+            self.cxxclass.removeQuadruplet(self, pid1, pid2, pid3, pid4, no_signal)
 
-    def clearAndRemove(self):
+    def remove(self):
         if pmi.workerIsActive():
-            self.cxxclass.clearAndRemove(self)
+            self.cxxclass.remove(self)
 
     def getQuadruples(self):
 
@@ -132,6 +132,6 @@ if pmi.isController:
         pmiproxydefs = dict(
             cls = 'espressopp.FixedQuadrupleListLocal',
             localcall = [ "add" ],
-            pmicall = [ "addQuadruples", "totalSize", "getAllQuadruples", "clearAndRemove", "remove", "removeByBond"],
+            pmicall = [ "addQuadruples", "totalSize", "getAllQuadruples", "remove", "removeQuadruplet", "removeByBond"],
             pmiinvoke = ["getQuadruples", "size"]
             )

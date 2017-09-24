@@ -1,10 +1,10 @@
 /*
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  Copyright (C) 2017
-      Jakub Krajniak (jkrajniak at gmail.com)
   
   This file is part of ESPResSo++.
   
@@ -65,17 +65,8 @@ namespace espressopp {
     sigOnParticleChanged.disconnect();
   }
 
-  /*
-  bool FixedTripleList::add(longint pid1, longint pid2, longint pid3) {
-      std::vector<longint> tmp;
-      tmp.push_back(pid1);
-      tmp.push_back(pid3);
-      tmp.push_back(pid2); // this is used as key
 
-      return FixedListComm::add(tmp);
-  }*/
-
-  bool FixedTripleList::iadd(longint pid1, longint pid2, longint pid3) {
+  bool FixedTripleList::addNonblock(longint pid1, longint pid2, longint pid3) {
     bool returnVal = true;
     System& system = storage->getSystemRef();
 
@@ -207,7 +198,7 @@ namespace espressopp {
     return returnVal;
   }
 
-  bool FixedTripleList::remove(longint pid1, longint pid2, longint pid3, bool no_signal) {
+  bool FixedTripleList::removeTriplet(longint pid1, longint pid2, longint pid3, bool no_signal) {
     bool returnVal = false;
     // Remove entries.
     std::pair<GlobalTriples::iterator, GlobalTriples::iterator> equalRange =
@@ -464,7 +455,7 @@ namespace espressopp {
     return global_size;
   }
 
-  void FixedTripleList::clearAndRemove() {
+  void FixedTripleList::remove() {
     this->clear();
     globalTriples.clear();
     sigBeforeSend.disconnect();
@@ -492,9 +483,9 @@ namespace espressopp {
       .def("totalSize", &FixedTripleList::totalSize)
       .def("getTriples",  &FixedTripleList::getTriples)
       .def("getAllTriples", &FixedTripleList::getAllTriples)
-      .def("remove", &FixedTripleList::remove)
+      .def("removeTriplet", &FixedTripleList::removeTriplet)
       .def("removeByBond", &FixedTripleList::removeByBond)
-      .def("clearAndRemove", &FixedTripleList::clearAndRemove)
+      .def("remove", &FixedTripleList::remove)
      ;
   }
 }

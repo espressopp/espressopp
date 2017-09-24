@@ -59,10 +59,10 @@ namespace espressopp {
     */
     virtual bool add(longint pid1, longint pid2, longint pid3, longint pid4);
     /// Non-blocking add method.
-    virtual bool iadd(longint pid1, longint pid2, longint pid3, longint pid4);
+    virtual bool addNonblock(longint pid1, longint pid2, longint pid3, longint pid4);
 
-    virtual bool remove(longint pid1, longint pid2, longint pid3, longint pid4, bool no_signal);
-    virtual void clearAndRemove() {
+    virtual bool removeQuadruplet(longint pid1, longint pid2, longint pid3, longint pid4, bool no_signal);
+    virtual void remove() {
       this->clear();
       globalQuadruples.clear();
       sigBeforeSend.disconnect();
@@ -91,7 +91,9 @@ namespace espressopp {
 
     virtual int totalSize();
 
+    // signal is called whenever new quadruplet is added.
     boost::signals2::signal<void (longint, longint, longint, longint)> onTupleAdded;
+    // signal is called whenever the quadruplet is removed.
     boost::signals2::signal<void (longint, longint, longint, longint)> onTupleRemoved;
 
     static void registerPython();

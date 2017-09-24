@@ -1,10 +1,10 @@
 /*
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  Copyright (C) 2017
-      Jakub Krajniak (jkrajniak at gmail.com)
   
   This file is part of ESPResSo++.
   
@@ -57,7 +57,7 @@ namespace espressopp {
     sigOnParticlesChanged.disconnect();
   }
 
-  bool FixedQuadrupleList::iadd(longint pid1, longint pid2, longint pid3, longint pid4) {
+  bool FixedQuadrupleList::addNonblock(longint pid1, longint pid2, longint pid3, longint pid4) {
     bool returnVal = true;
     System& system = storage->getSystemRef();
 
@@ -199,7 +199,7 @@ namespace espressopp {
     return returnVal;
   }
 
-  bool FixedQuadrupleList::remove(longint pid1, longint pid2, longint pid3, longint pid4, bool no_signal) {
+  bool FixedQuadrupleList::removeQuadruplet(longint pid1, longint pid2, longint pid3, longint pid4, bool no_signal) {
     bool returnVal = false;
     std::pair<GlobalQuadruples::iterator, GlobalQuadruples::iterator> equalRange, equalRange_rev;
     equalRange = globalQuadruples.equal_range(pid1);
@@ -510,8 +510,8 @@ namespace espressopp {
       .def("totalSize", &FixedQuadrupleList::totalSize)
       .def("getQuadruples",  &FixedQuadrupleList::getQuadruples)
       .def("getAllQuadruples", &FixedQuadrupleList::getAllQuadruples)
-      .def("clearAndRemove", &FixedQuadrupleList::clearAndRemove)
-      .def("remove", &FixedQuadrupleList::remove)
+      .def("remove", &FixedQuadrupleList::clearAndRemove)
+      .def("removeQuadruplet", &FixedQuadrupleList::removeQuadruplet)
       .def("removeByBond", &FixedQuadrupleList::removeByBond)
      ;
   }

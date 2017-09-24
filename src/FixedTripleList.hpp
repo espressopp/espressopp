@@ -1,10 +1,10 @@
 /*
+  Copyright (C) 2017
+      Jakub Krajniak (jkrajniak at gmail.com)
   Copyright (C) 2012,2013,2016
       Max Planck Institute for Polymer Research
   Copyright (C) 2008,2009,2010,2011
       Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
-  Copyright (C) 2017
-      Jakub Krajniak (jkrajniak at gmail.com)
   
   This file is part of ESPResSo++.
   
@@ -59,7 +59,7 @@ namespace espressopp {
 		*/
 		virtual bool add(longint pid1, longint pid2, longint pid3);
 	    // Non blocking version of 'add' method.
-	    virtual bool iadd(longint pid1, longint pid2, longint pid3);
+	    virtual bool addNonblock(longint pid1, longint pid2, longint pid3);
 
         /**
          * Removes a triplet from the list.
@@ -69,8 +69,8 @@ namespace espressopp {
          * @param no_signal if true, onTupleRemoved signal will not be thrown
          * @return true if the triplet is removed
          */
-		virtual bool remove(longint pid1, longint pid2, longint pid3, bool no_signal);
-		virtual void clearAndRemove();
+		virtual bool removeTriplet(longint pid1, longint pid2, longint pid3, bool no_signal);
+		virtual void remove();
 		virtual bool removeByBond(longint pid1, longint pid2);
 
 		virtual void beforeSendParticles(ParticleList& pl, class OutBuffer &buf);
@@ -85,7 +85,9 @@ namespace espressopp {
 	    virtual int size() { return globalTriples.size(); }
 	    virtual int totalSize();
 
+      // signal is called whenever new triplet is added.
 	    boost::signals2::signal<void (longint, longint, longint)> onTupleAdded;
+      // signal is called whenever the triplet is removed.
 	    boost::signals2::signal<void (longint, longint, longint)> onTupleRemoved;
 
 		static void registerPython();
