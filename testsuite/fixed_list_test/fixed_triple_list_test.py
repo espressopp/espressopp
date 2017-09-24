@@ -36,7 +36,7 @@ class TestFixedTripleList(espp_test_case.ESPPTestCase):
         ftl = espressopp.FixedTripleList(self.system.storage)
         ftl.add(1, 2, 3)
         self.assertItemsEqual(ftl.getAllTriples(), [(1, 2, 3)])
-        ftl.remove(1, 2, 3)
+        ftl.removeTriplet(1, 2, 3)
         self.assertItemsEqual(ftl.getAllTriples(), [])
 
     def test_remove_angle_by_pid1(self):
@@ -48,11 +48,11 @@ class TestFixedTripleList(espp_test_case.ESPPTestCase):
         self.assertItemsEqual(ftl.getAllTriples(), [])
         ftl.addTriples([(1, 2, 3), (1, 3, 4)])
 
-    def test_clear_and_remove(self):
+    def test_remove(self):
         """Test for clearAndRemove, this does not test if the signal is disconnected."""
         ftl = espressopp.FixedTripleList(self.system.storage)
         ftl.addTriples([(1, 2, 3), (1, 3, 4), (2, 4, 1)])
-        ftl.clearAndRemove()
+        ftl.remove()
         self.assertItemsEqual(ftl.getAllTriples(), [])
         # TODO: test if signals are disconnected
 

@@ -1,2 +1,6 @@
 add_test(fixed_pair_list_test ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/fixed_pair_list_test.py)
+add_test(fixed_triple_list_test ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/fixed_triple_list_test.py)
+add_test(fixed_quadruple_list_test ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/fixed_quadruple_list_test.py)
 set_tests_properties(fixed_pair_list_test PROPERTIES ENVIRONMENT "${TEST_ENV}")
+set_tests_properties(fixed_triple_list_test PROPERTIES ENVIRONMENT "${TEST_ENV}")
+set_tests_properties(fixed_quadruple_list_test PROPERTIES ENVIRONMENT "${TEST_ENV}")

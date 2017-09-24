@@ -35,23 +35,26 @@ class TestFixedQuadrupleList(espp_test_case.ESPPTestCase):
     def test_remove_dihedral(self):
         fql = espressopp.FixedQuadrupleList(self.system.storage)
         fql.add(1, 2, 3, 4)
-        self.assertItemsEqual(fql.getAllQuadruples(), [(1, 2, 3, 4)])
-        fql.remove(1, 2, 3, 4)
-        self.assertItemsEqual(fql.getAllQuadruples(), [])
+        fql.add(7, 2, 3, 4)
+        self.assertItemsEqual(fql.getAllQuadruples(), [(1, 2, 3, 4), (7, 2, 3, 4)])
+        fql.removeQuadruplet(1, 2, 3, 4)
+        self.assertItemsEqual(fql.getAllQuadruples(), [(7, 2, 3, 4)])
 
     def test_remove_dihedral_by_pid1(self):
         fql = espressopp.FixedQuadrupleList(self.system.storage)
         fql.add(1, 2, 3, 4)
-        self.assertItemsEqual(fql.getAllQuadruples(), [(1, 2, 3, 4)])
+        fql.add(7, 2, 3, 4)
+        fql.add(5, 6, 1, 2)
+        self.assertItemsEqual(fql.getAllQuadruples(), [(1, 2, 3, 4), (7, 2, 3, 4), (5, 6, 1, 2)])
         # Remove all
         fql.removeByBond(1, 2)
-        self.assertItemsEqual(fql.getAllQuadruples(), [])
+        self.assertItemsEqual(fql.getAllQuadruples(), [(7, 2, 3, 4)])
 
-    def test_clear_and_remove(self):
-        """Test for clearAndRemove, this does not test if the signal is disconnected."""
+    def test_remove(self):
+        """Test for remove, this does not test if the signal is disconnected."""
         fql = espressopp.FixedQuadrupleList(self.system.storage)
         fql.addQuadruples([(1, 2, 3, 4), (1, 3, 4, 2), (2, 4, 1, 3)])
-        fql.clearAndRemove()
+        fql.remove()
         self.assertItemsEqual(fql.getAllQuadruples(), [])
         # TODO: test if signals are disconnected
 

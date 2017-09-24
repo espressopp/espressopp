@@ -36,7 +36,7 @@ class TestFixedPairList(espp_test_case.ESPPTestCase):
         fpl = espressopp.FixedPairList(self.system.storage)
         fpl.add(1, 2)
         self.assertItemsEqual(fpl.getAllBonds(), [(1, 2)])
-        fpl.remove(1, 2)
+        fpl.removePair(1, 2)
         self.assertItemsEqual(fpl.getAllBonds(), [])
 
     def test_remove_bond_by_pid1(self):
@@ -51,11 +51,11 @@ class TestFixedPairList(espp_test_case.ESPPTestCase):
         fpl.removeByPid1(1, True, False, 1)
         self.assertItemsEqual(fpl.getAllBonds(), [(1, 3)])
 
-    def test_clear_and_remove(self):
-        """Test for clearAndRemove, this does not test if the signal is disconnected."""
+    def test_remove(self):
+        """Test for remove this does not test if the signal is disconnected."""
         fpl = espressopp.FixedPairList(self.system.storage)
         fpl.addBonds([(1, 2), (1, 3), (2, 4)])
-        fpl.clearAndRemove()
+        fpl.remove()
         self.assertItemsEqual(fpl.getAllBonds(), [])
         # TODO: test if signals are disconnected
 
