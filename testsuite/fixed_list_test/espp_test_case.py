@@ -32,10 +32,13 @@ class ESPPTestCase(ut.TestCase):
         self.part_prop = ('id', 'type', 'pos')
 
         particle_list = [
-            (1, 1, espressopp.Real3D(2.0, 2.0, 2.0)),
-            (2, 1, espressopp.Real3D(3.0, 2.0, 2.0)),
-            (3, 2, espressopp.Real3D(2.0, 3.0, 2.0)),
-            (4, 2, espressopp.Real3D(3.0, 3.0, 2.0))
+            (1, 1, espressopp.Real3D(2.0, 8.0, 1.0)),
+            (2, 1, espressopp.Real3D(3.0, 2.0, 3.0)),
+            (3, 2, espressopp.Real3D(2.0, 3.0, 6.0)),
+            (4, 2, espressopp.Real3D(3.0, 3.0, 8.0))
+            (5, 2, espressopp.Real3D(3.0, 3.0, 5.0))
+            (6, 2, espressopp.Real3D(3.0, 3.0, 1.0))
+            (7, 2, espressopp.Real3D(3.0, 3.0, 2.0))
         ]
         self.system.storage.addParticles(particle_list, *self.part_prop)
         self.system.storage.decompose()
