@@ -69,7 +69,7 @@ namespace espressopp {
 	     * @param pid2 particle id
 	     * @return whether the particle was inserted on this processor.
 	     */
-		virtual bool addNonblocking(longint pid1, longint pid2);
+		virtual bool addNonblock(longint pid1, longint pid2);
 	  	/**
 	  	 * Remove the given particle pair from the list on this processor
 	  	 * @param pid1 particle id

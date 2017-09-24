@@ -510,7 +510,7 @@ namespace espressopp {
       .def("totalSize", &FixedQuadrupleList::totalSize)
       .def("getQuadruples",  &FixedQuadrupleList::getQuadruples)
       .def("getAllQuadruples", &FixedQuadrupleList::getAllQuadruples)
-      .def("remove", &FixedQuadrupleList::clearAndRemove)
+      .def("remove", &FixedQuadrupleList::remove)
       .def("removeQuadruplet", &FixedQuadrupleList::removeQuadruplet)
       .def("removeByBond", &FixedQuadrupleList::removeByBond)
      ;

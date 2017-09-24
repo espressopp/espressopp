@@ -467,7 +467,7 @@ namespace espressopp {
 	  pB->setState(pB->getState()+deltaB);
 	}
 	// Add a bond
-	fpl->iadd(A, B);
+	fpl->addNonblock(A, B);
       }
 
       LOG4ESPP_INFO(theLogger, "Leaving applyAR");

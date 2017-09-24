@@ -110,7 +110,7 @@ class FixedTripleListLocal(_espressopp.FixedTripleList):
 
     def remove(self):
         if pmi.workerIsActive():
-            self.cxxclass.clearAndRemove(self)
+            self.cxxclass.remove(self)
 
     def getTriples(self):
         if pmi.workerIsActive():

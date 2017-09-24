@@ -53,7 +53,7 @@ espressopp.FixedPairList
 
 		:rtype: 
 
-.. function:: espressopp.FixedPairList.clearAndRemove()
+.. function:: espressopp.FixedPairList.remove()
 
     remove the FixedPairList and disconnect
 
@@ -145,7 +145,7 @@ class FixedPairListLocal(_espressopp.FixedPairList):
 
     def remove(self):
         if pmi.workerIsActive():
-          self.cxxclass.clearAndRemove(self)
+          self.cxxclass.remove(self)
 
     def resetLongtimeMaxBond(self):
 

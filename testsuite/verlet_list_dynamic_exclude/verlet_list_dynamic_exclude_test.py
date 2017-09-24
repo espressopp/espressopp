@@ -73,7 +73,7 @@ class TestVerletListDynamicExclude(ESPPTestCase):
             dynamic_excl.get_list()[0],
             [(1, 2), (2, 1), (3, 4), (4, 3)])
         # Remove bond 1-2
-        fpl.remove(1, 2)
+        fpl.removePair(1, 2)
         self.integrator.run(0)
         self.assertItemsEqual((dynamic_excl.get_list()[0]), [(3, 4), (4, 3)])
         pairs = vl.getAllPairs()
@@ -92,7 +92,7 @@ class TestVerletListDynamicExclude(ESPPTestCase):
         self.assertNotIn((1, 2), pairs[0])
         self.assertNotIn((3, 4), pairs[0])
         # Remove bond 1-2
-        ftl.remove(1, 3, 2)
+        ftl.removeTriplet(1, 3, 2)
         self.integrator.run(0)
         self.assertItemsEqual((dynamic_excl.get_list()[0]), [(3, 4), (4, 3)])
         pairs = vl.getAllPairs()
@@ -115,7 +115,7 @@ class TestVerletListDynamicExclude(ESPPTestCase):
         self.assertNotIn((3, 4), pairs[0])
         self.assertNotIn((3, 2), pairs[0])
         # Remove bond 1-2
-        fql.remove(1, 3, 4, 2)
+        fql.removeQuadruplet(1, 3, 4, 2)
         self.integrator.run(0)
         self.assertItemsEqual((dynamic_excl.get_list()[0]), [(3, 4), (4, 3)])
         pairs = vl.getAllPairs()
