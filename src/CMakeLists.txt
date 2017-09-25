@@ -62,5 +62,6 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${PYTHON_INSTDIR}/esp
     PATTERN "CMakeFiles" EXCLUDE)
 
 if (WITH_GITVERSION)
+    add_definitions(-DWITH_GITVERSION)
     add_dependencies(_espressopp gitversion)
 endif()
