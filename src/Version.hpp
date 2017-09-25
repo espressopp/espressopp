@@ -29,7 +29,11 @@
 #define MAJORVERSION 1
 #define MINORVERSION 9
 #define PATCHLEVEL   4
+#ifdef WITH_GITVERSION
 #include "gitversion.hpp"
+#else
+static const std::string gitversion = "unknown";
+#endif
 
 namespace espressopp {
 

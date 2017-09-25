@@ -28,6 +28,7 @@ set(CMAKE_CXX_EXTENSIONS OFF) #...without compiler extensions like gnu++11
 ########################################################################
 option(EXTERNAL_BOOST "Use external boost" ON)
 option(WITH_XTC "Build with DumpXTC class (requires libgromacs)" OFF)
+option(WITH_GITVERSION "Include gitversion into the ESPP Version (OFF - speed-up the compilation)" ON)
 option(BUILD_SHARED_LIBS "Build shared libs" ON)
 if(NOT BUILD_SHARED_LIBS)
   message(WARNING "Building static libraries might lead to problems with python modules - you are on your own!")
@@ -264,3 +265,10 @@ if ( SPHINX_EXECUTABLE )
 else ( SPHINX_EXECUTABLE )
     message ( WARNING "Not building user documentation because Sphinx not found.")
 endif ( SPHINX_EXECUTABLE )
+
+find_program(CCACHE_FOUND ccache)
+if(CCACHE_FOUND)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+    message(STATUS "Using ccache")
+endif(CCACHE_FOUND)
