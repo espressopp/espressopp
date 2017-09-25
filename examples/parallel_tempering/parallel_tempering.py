@@ -1,3 +1,27 @@
+#  Copyright (C) 2017(H)
+#      Max Planck Institute for Polymer Research
+#
+#  This file is part of ESPResSo++.
+#
+#  ESPResSo++ is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  ESPResSo++ is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+###########################################################################			
+#                                                                         #
+#  ESPResSo++ Python script for a Multisystem simulation                  #
+#                                                                         #
+###########################################################################
+
 import espressopp
 from espressopp import Int3D, Real3D
 from espressopp.tools import decomp
@@ -7,7 +31,7 @@ import sys
 
 print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 print "+ Due to a recent change in the design of ESPResSo++ the Parallel Tempering     +"
-print "+ Class is not available in the current version. This Class will be back soon.  +"
+print "+ Class is available in the current version.                                    +"
 print "+ Multisystem simulations are still possible but have to be setup manually.     +"
 print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 

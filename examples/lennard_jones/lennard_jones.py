@@ -1,6 +1,30 @@
+#  Copyright (C) 2017(H)
+#      Max Planck Institute for Polymer Research
+#
+#  This file is part of ESPResSo++.
+#
+#  ESPResSo++ is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  ESPResSo++ is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+###########################################################################
+#                                                                         #
+#  This is an example for an MD simulation of a simple Lennard-Jones      #
+#  fluid with ESPResSo++. 						  #	
+#                                                                         #
+###########################################################################
+
 """
-This is an example for an MD simulation of a simple Lennard-Jones fluid
-with ESPResSo++. We will start with particles at random positions within
+We will start with particles at random positions within
 the simulation box interacting via a shifted Lennard-Jones type potential
 with an interaction cutoff at 2.5.
 Newtons equations of motion are integrated with a Velocity-Verlet integrator.
@@ -30,8 +54,6 @@ The simulation consists of the following steps:
   8. running the equilibration loop
   9. writing configuration to a file
 """
-
-# import the ESPResSo++ python module
 import espressopp
 
 ########################################################################
@@ -192,7 +214,7 @@ system.addInteraction(interaction)
 print "starting warm-up ..."
 # print some status information (time, measured temperature, pressure,
 # pressure tensor (xy only), kinetic energy, potential energy, total energy, boxsize)
-espressopp.tools.info(system, integrator)
+espressopp.tools.analyse.info(system, integrator)
 for step in range(warmup_nloops):
   # perform warmup_isteps integraton steps
   integrator.run(warmup_isteps)
@@ -201,7 +223,7 @@ for step in range(warmup_nloops):
   # update the type0-type0 interaction to use the new values of LJpot
   interaction.setPotential(type1=0, type2=0, potential=LJpot)
   # print status info
-  espressopp.tools.info(system, integrator)  
+  espressopp.tools.analyse.info(system, integrator)  
 print "warmup finished"
 # remove the force capping interaction from the system
 system.removeInteraction(0) 
@@ -242,12 +264,12 @@ integrator.step = 0
 
 print "starting equilibration ..."
 # print inital status information
-espressopp.tools.info(system, integrator)
+espressopp.tools.analyse.info(system, integrator)
 for step in range(equil_nloops):
   # perform equilibration_isteps integration steps
   integrator.run(equil_isteps)
   # print status information
-  espressopp.tools.info(system, integrator)
+  espressopp.tools.analyse.info(system, integrator)
 print "equilibration finished"
 
 ########################################################################

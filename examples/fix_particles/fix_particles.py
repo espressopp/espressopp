@@ -1,3 +1,27 @@
+#  Copyright (C) 2017(H)
+#      Max Planck Institute for Polymer Research
+#
+#  This file is part of ESPResSo++.
+#
+#  ESPResSo++ is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  ESPResSo++ is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+##############################################################################################
+#                                                                                            #
+#  ESPResSo++ Python script for fixing positions of particles within a L-J standard system   #
+#                                                                          		     # 
+##############################################################################################
+
 import espressopp
 
 # create default Lennard Jones (WCA) system with 0 particles and cubic box (L=10)

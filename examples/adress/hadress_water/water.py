@@ -1,6 +1,4 @@
-#!/usr/bin/env python2
-
-#  Copyright (C) 2016
+#  Copyright (C) 2016, 2017(H)
 #      Max Planck Institute for Polymer Research
 #
 #  This file is part of ESPResSo++.
@@ -18,12 +16,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-############################################
-#                                                                            #
-#  ESPResSo++ Python script for H-Adress Water  #
-#  simulation  based on Gromacs topology               #
-#                                                                            #
-############################################
+###########################################################################
+#  ESPResSo++ Python script for H-AdResS Water                            #
+#  simulation  based on Gromacs topology                                  #
+###########################################################################
 
 import math
 import sys
@@ -261,8 +257,3 @@ end_time = time.clock()
 sys.stdout.write('Neighbor list builds = %d\n' % vl.builds)
 sys.stdout.write('Integration steps = %d\n' % integrator.step)
 sys.stdout.write('CPU time = %.1f\n' % (end_time - start_time))
-
-
-
-
-

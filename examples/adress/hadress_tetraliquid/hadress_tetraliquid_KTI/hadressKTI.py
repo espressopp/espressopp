@@ -1,6 +1,4 @@
-#!/usr/bin/env python2
-
-#  Copyright (C) 2016
+#  Copyright (C) 2017
 #      Max Planck Institute for Polymer Research
 #
 #  This file is part of ESPResSo++.
@@ -18,7 +16,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# relevant imports
+#########################################################################################
+#                                                                                       #
+#  ESPResSo++ Python script for an H-AdResS tetrahedral liquid simulation including KTI #
+#                                                                                       #
+#  KTI stands for Kirkwood Thermodynamic Integration                                    #
+#########################################################################################
+
 import sys
 import time
 import espressopp
