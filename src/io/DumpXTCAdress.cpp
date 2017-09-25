@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2017
-      Gregor Deichmann (TU Darmstadt, deichmann(at)cpc.tu-darmstadt.de)
+      Jakub Krajniak (jkrajniak at gmail.com)
 
   This file is part of ESPResSo++.
 
