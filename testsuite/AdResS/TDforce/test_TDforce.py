@@ -283,6 +283,24 @@ class TestTDforce(unittest.TestCase):
         self.assertEqual(before[3], after[3])
         self.assertEqual(before[4], after[4])
 
+    def test_force_value(self):
+        # set up TD force
+        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
+                                dEx=1.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=False)
+        thdforce = espressopp.integrator.TDforce(self.system,vl)
+        thdforce.addForce(itype=3,filename="table_tf.tab",type=1)
+        self.assertAlmostEqual(thdforce.getForce(1, 0.9), 1.52920, places=5)
+
+    def test_switch_table(self):
+        # set up TD force
+        vl = espressopp.VerletListAdress(self.system, cutoff=1.5, adrcut=1.5,
+                                dEx=1.0, dHy=1.0, adrCenter=[5.0, 5.0, 5.0], sphereAdr=False)
+        thdforce = espressopp.integrator.TDforce(self.system,vl)
+        thdforce.addForce(itype=3,filename="table_tf.tab",type=1)
+        self.assertAlmostEqual(thdforce.getForce(1, 0.9), 1.52920, places=5)
+        thdforce.addForce(itype=3,filename="table_tf2.tab",type=1)
+        self.assertAlmostEqual(thdforce.getForce(1, 0.9), 9.89, places=3)  # New table new value
+
 
 if __name__ == '__main__':
     unittest.main()
