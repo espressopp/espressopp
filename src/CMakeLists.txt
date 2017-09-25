@@ -18,7 +18,9 @@ if(NOT WITH_XTC)
   list(REMOVE_ITEM ESPRESSO_SOURCES ${DUMP_XTC_SOURCE})
 endif()
 
-add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_MODULE_PATH}/gitversion.cmake)
+if (WITH_GITVERSION)
+    add_custom_target(gitversion COMMAND ${CMAKE_COMMAND} -DTOP_SOURCE_DIR="${CMAKE_SOURCE_DIR}" -P ${CMAKE_MODULE_PATH}/gitversion.cmake)
+endif()
 
 list(REMOVE_ITEM ESPRESSO_SOURCES ${NOT_ESPRESSO_SOURCES})
 
@@ -59,4 +61,6 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/ DESTINATION ${PYTHON_INSTDIR}/esp
 	FILES_MATCHING PATTERN "*.py"
     PATTERN "CMakeFiles" EXCLUDE)
 
-add_dependencies(_espressopp gitversion)
+if (WITH_GITVERSION)
+    add_dependencies(_espressopp gitversion)
+endif()
