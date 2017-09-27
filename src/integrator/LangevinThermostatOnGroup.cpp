@@ -18,14 +18,14 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "python.hpp"
 #include "LangevinThermostatOnGroup.hpp"
+#include "python.hpp"
 
-#include "types.hpp"
 #include "System.hpp"
-#include "storage/Storage.hpp"
-#include "iterator/CellListIterator.hpp"
 #include "esutil/RNG.hpp"
+#include "iterator/CellListIterator.hpp"
+#include "storage/Storage.hpp"
+#include "types.hpp"
 
 namespace espressopp {
 namespace integrator {
@@ -34,7 +34,7 @@ using namespace espressopp::iterator;
 
 LangevinThermostatOnGroup::LangevinThermostatOnGroup(
     shared_ptr<System> system, shared_ptr<ParticleGroup> _pg)
-        : Extension(system), particle_group(_pg) {
+    : Extension(system), particle_group(_pg) {
   type = Extension::Thermostat;
 
   gamma = 0.0;
@@ -49,25 +49,17 @@ LangevinThermostatOnGroup::LangevinThermostatOnGroup(
   LOG4ESPP_INFO(theLogger, "Langevin constructed");
 }
 
-void LangevinThermostatOnGroup::setGamma(real _gamma) {
-  gamma = _gamma;
-}
+void LangevinThermostatOnGroup::setGamma(real _gamma) { gamma = _gamma; }
 
-real LangevinThermostatOnGroup::getGamma() {
-  return gamma;
-}
+real LangevinThermostatOnGroup::getGamma() { return gamma; }
 
 void LangevinThermostatOnGroup::setTemperature(real _temperature) {
   temperature = _temperature;
 }
 
-real LangevinThermostatOnGroup::getTemperature() {
-  return temperature;
-}
+real LangevinThermostatOnGroup::getTemperature() { return temperature; }
 
-LangevinThermostatOnGroup::~LangevinThermostatOnGroup() {
-  disconnect();
-}
+LangevinThermostatOnGroup::~LangevinThermostatOnGroup() { disconnect(); }
 
 void LangevinThermostatOnGroup::disconnect() {
   _initialize.disconnect();
@@ -91,13 +83,13 @@ void LangevinThermostatOnGroup::connect() {
       boost::bind(&LangevinThermostatOnGroup::thermalize, this));
 }
 
-
 void LangevinThermostatOnGroup::thermalize() {
   LOG4ESPP_DEBUG(theLogger, "thermalize");
 
   System &system = getSystemRef();
 
-  for (ParticleGroup::iterator it = particle_group->begin(); it != particle_group->end(); it++) {
+  for (ParticleGroup::iterator it = particle_group->begin();
+       it != particle_group->end(); it++) {
     frictionThermo(**it);
   }
 }
@@ -109,8 +101,7 @@ void LangevinThermostatOnGroup::frictionThermo(Particle &p) {
 
   Real3D ranval((*rng)() - 0.5, (*rng)() - 0.5, (*rng)() - 0.5);
 
-  p.force() += pref1 * p.velocity() * p.mass() +
-      pref2 * ranval * massf;
+  p.force() += pref1 * p.velocity() * p.mass() + pref2 * ranval * massf;
 
   LOG4ESPP_TRACE(theLogger, "new force of p = " << p.force());
 }
@@ -121,9 +112,10 @@ void LangevinThermostatOnGroup::initialize() {  // calculate the prefactors
   pref1 = -gamma;
   pref2 = sqrt(24.0 * temperature * gamma / timestep);
 
-  LOG4ESPP_INFO(theLogger, "init, timestep = " << timestep <<
-      ", gamma = " << gamma <<
-      ", temperature = " << temperature << " pref2=" << pref2);
+  LOG4ESPP_INFO(theLogger,
+                "init, timestep = " << timestep << ", gamma = " << gamma
+                                    << ", temperature = " << temperature
+                                    << " pref2=" << pref2);
 }
 
 /** very nasty: if we recalculate force when leaving/reentering the integrator,
@@ -154,16 +146,15 @@ void LangevinThermostatOnGroup::coolDown() {
 void LangevinThermostatOnGroup::registerPython() {
   using namespace espressopp::python;
 
-  class_<LangevinThermostatOnGroup, shared_ptr<LangevinThermostatOnGroup>, bases<Extension> >
-      ("integrator_LangevinThermostatOnGroup",
-           init<shared_ptr<System>, shared_ptr<ParticleGroup> >())
+  class_<LangevinThermostatOnGroup, shared_ptr<LangevinThermostatOnGroup>,
+         bases<Extension> >(
+      "integrator_LangevinThermostatOnGroup",
+      init<shared_ptr<System>, shared_ptr<ParticleGroup> >())
       .def("connect", &LangevinThermostatOnGroup::connect)
       .def("disconnect", &LangevinThermostatOnGroup::disconnect)
-      .add_property("gamma",
-                    &LangevinThermostatOnGroup::getGamma,
+      .add_property("gamma", &LangevinThermostatOnGroup::getGamma,
                     &LangevinThermostatOnGroup::setGamma)
-      .add_property("temperature",
-                    &LangevinThermostatOnGroup::getTemperature,
+      .add_property("temperature", &LangevinThermostatOnGroup::getTemperature,
                     &LangevinThermostatOnGroup::setTemperature);
 }
 

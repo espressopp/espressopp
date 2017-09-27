@@ -18,12 +18,12 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "python.hpp"
+#include "SystemMonitor.hpp"
 #include <string>
 #include <utility>
 #include <vector>
-#include "SystemMonitor.hpp"
 #include "integrator/MDIntegrator.hpp"
+#include "python.hpp"
 
 namespace espressopp {
 namespace analysis {
@@ -41,7 +41,8 @@ void SystemMonitor::perform_action() {
 }
 
 void SystemMonitor::computeObservables() {
-  for (ObservableList::iterator it = observables_.begin(); it != observables_.end(); ++it) {
+  for (ObservableList::iterator it = observables_.begin();
+       it != observables_.end(); ++it) {
     values_->push_back(it->second->compute_real());
   }
 }
@@ -50,11 +51,11 @@ void SystemMonitor::info() {
   if (system_->comm->rank() == 0) {
     int idx = 0;
     if (!header_shown_) {
-      for (std::vector<std::string>::iterator it = header_->begin(); it != header_->end(); ++it) {
+      for (std::vector<std::string>::iterator it = header_->begin();
+           it != header_->end(); ++it) {
         if (visible_observables_[idx] == 1) {
           std::cout << *it;
-          if (it != header_->end()-1)
-              std::cout << "\t";
+          if (it != header_->end() - 1) std::cout << "\t";
         }
         idx++;
       }
@@ -63,11 +64,11 @@ void SystemMonitor::info() {
     }
     // Print data
     idx = 0;
-    for (std::vector<real>::iterator it = values_->begin(); it != values_->end(); ++it) {
+    for (std::vector<real>::iterator it = values_->begin();
+         it != values_->end(); ++it) {
       if (visible_observables_[idx] == 1) {
         std::cout << *it;
-        if (it != values_->end()-1)
-          std::cout << "\t";
+        if (it != values_->end() - 1) std::cout << "\t";
       }
       idx++;
     }
@@ -76,7 +77,7 @@ void SystemMonitor::info() {
 }
 
 void SystemMonitor::addObservable(std::string name, shared_ptr<Observable> obs,
-    bool is_visible) {
+                                  bool is_visible) {
   observables_.push_back(std::make_pair(name, obs));
   header_->push_back(name);
   if (is_visible)
@@ -87,12 +88,10 @@ void SystemMonitor::addObservable(std::string name, shared_ptr<Observable> obs,
 
 void SystemMonitor::registerPython() {
   using namespace espressopp::python;  // NOLINT
-  class_<SystemMonitor, bases< ParticleAccess > >
-      ("analysis_SystemMonitor", init<
-          shared_ptr<System>,
-          shared_ptr<integrator::MDIntegrator>,
-          shared_ptr<SystemMonitorOutputCSV>
-          >())
+  class_<SystemMonitor, bases<ParticleAccess> >(
+      "analysis_SystemMonitor",
+      init<shared_ptr<System>, shared_ptr<integrator::MDIntegrator>,
+           shared_ptr<SystemMonitorOutputCSV> >())
       .def("add_observable", &SystemMonitor::addObservable)
       .def("info", &SystemMonitor::info)
       .def("dump", &SystemMonitor::perform_action);
@@ -102,11 +101,10 @@ void SystemMonitor::registerPython() {
 
 void SystemMonitorOutputCSV::registerPython() {
   using namespace espressopp::python;  // NOLINT
-  class_<SystemMonitorOutputCSV>
-    ("analysis_SystemMonitorOutputCSV", init<
-        std::string,  // file_name
-        std::string  // deflimiter
-        >());
+  class_<SystemMonitorOutputCSV>("analysis_SystemMonitorOutputCSV",
+                                 init<std::string,  // file_name
+                                      std::string   // deflimiter
+                                      >());
 }
 
 void SystemMonitorOutputCSV::write() {
@@ -115,22 +113,24 @@ void SystemMonitorOutputCSV::write() {
     std::stringstream ss;
     if (!header_written_) {  // First run, write header;
       output_file.open(file_name_.c_str(), std::fstream::out);
-      for (std::vector<std::string>::iterator it = keys_->begin(); it != keys_->end(); ++it) {
+      for (std::vector<std::string>::iterator it = keys_->begin();
+           it != keys_->end(); ++it) {
         ss << *it;
-        if (it != keys_->end()-1)
-            ss << delimiter_;
+        if (it != keys_->end() - 1) ss << delimiter_;
       }
-      ss << std::endl;;
+      ss << std::endl;
+      ;
       header_written_ = true;
     } else {
-      output_file.open(file_name_.c_str(), std::ofstream::out | std::ofstream::app);
+      output_file.open(file_name_.c_str(),
+                       std::ofstream::out | std::ofstream::app);
     }
 
     // Write values;
-    for (std::vector<real>::iterator it = values_->begin(); it != values_->end(); ++it) {
+    for (std::vector<real>::iterator it = values_->begin();
+         it != values_->end(); ++it) {
       ss << *it;
-      if (it != values_->end()-1)
-        ss << delimiter_;
+      if (it != values_->end() - 1) ss << delimiter_;
     }
     ss << std::endl;
 

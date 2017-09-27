@@ -18,11 +18,11 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "python.hpp"
 #include "PotentialEnergy.hpp"
 #include "interaction/Interaction.hpp"
+#include "python.hpp"
 
-using namespace espressopp;  //NOLINT
+using namespace espressopp;  // NOLINT
 
 namespace espressopp {
 namespace analysis {
@@ -36,14 +36,14 @@ real PotentialEnergy::compute_real() const {
     return interaction_->computeEnergyCG();
 }
 
-
 void PotentialEnergy::registerPython() {
-  using namespace espressopp::python;  //NOLINT
-  class_<PotentialEnergy, bases<Observable> >
-    ("analysis_PotentialEnergy",
-        init< shared_ptr<System>, shared_ptr<interaction::Interaction> >())
-    .def(init<shared_ptr<System>, shared_ptr<interaction::Interaction>, bool>())
-    .add_property("value", &PotentialEnergy::compute_real);
+  using namespace espressopp::python;  // NOLINT
+  class_<PotentialEnergy, bases<Observable> >(
+      "analysis_PotentialEnergy",
+      init<shared_ptr<System>, shared_ptr<interaction::Interaction> >())
+      .def(init<shared_ptr<System>, shared_ptr<interaction::Interaction>,
+                bool>())
+      .add_property("value", &PotentialEnergy::compute_real);
 }
 }  // end namespace analysis
 }  // end namespace espressopp

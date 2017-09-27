@@ -22,34 +22,33 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "python.hpp"
 #include "HarmonicTrap.hpp"
 #include "Real3D.hpp"
+#include "python.hpp"
 
 namespace espressopp {
-  namespace interaction {
+namespace interaction {
 
-    typedef class SingleParticleInteractionTemplate <HarmonicTrap>
+typedef class SingleParticleInteractionTemplate<HarmonicTrap>
     SingleParticleHarmonicTrap;
 
-    //////////////////////////////////////////////////
-    // REGISTRATION WITH PYTHON
-    //////////////////////////////////////////////////
-    void
-    HarmonicTrap::registerPython() {
-      using namespace espressopp::python;
+//////////////////////////////////////////////////
+// REGISTRATION WITH PYTHON
+//////////////////////////////////////////////////
+void HarmonicTrap::registerPython() {
+  using namespace espressopp::python;
 
-      class_< HarmonicTrap, bases< SingleParticlePotential > >
-        ("interaction_HarmonicTrap", init<>())
-        .add_property("k", &HarmonicTrap::getK, &HarmonicTrap::setK)
-        .add_property("center", &HarmonicTrap::getCenter, &HarmonicTrap::setCenter)
-        ;
+  class_<HarmonicTrap, bases<SingleParticlePotential> >(
+      "interaction_HarmonicTrap", init<>())
+      .add_property("k", &HarmonicTrap::getK, &HarmonicTrap::setK)
+      .add_property("center", &HarmonicTrap::getCenter,
+                    &HarmonicTrap::setCenter);
 
-      class_< SingleParticleHarmonicTrap, bases< Interaction > >
-        ("interaction_SingleParticleHarmonicTrap", init< shared_ptr<System>, shared_ptr<HarmonicTrap> >())
-        .def("setPotential", &SingleParticleHarmonicTrap::setPotential)
-        .def("getPotential", &SingleParticleHarmonicTrap::getPotential)
-      ;
-    }
-  }
+  class_<SingleParticleHarmonicTrap, bases<Interaction> >(
+      "interaction_SingleParticleHarmonicTrap",
+      init<shared_ptr<System>, shared_ptr<HarmonicTrap> >())
+      .def("setPotential", &SingleParticleHarmonicTrap::setPotential)
+      .def("getPotential", &SingleParticleHarmonicTrap::getPotential);
+}
+}
 }

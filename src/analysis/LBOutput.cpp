@@ -1,6 +1,7 @@
 /*
  Copyright (C) 2012-2016 Max Planck Institute for Polymer Research
- Copyright (C) 2008-2011 Max-Planck-Institute for Polymer Research & Fraunhofer SCAI
+ Copyright (C) 2008-2011 Max-Planck-Institute for Polymer Research & Fraunhofer
+ SCAI
 
  This file is part of ESPResSo++.
 
@@ -21,17 +22,17 @@
 #include "LBOutput.hpp"
 
 namespace espressopp {
-   namespace analysis {
-      //    LOG4ESPP_LOGGER(LBOutput::theLogger, "LBOutput");
-      /* Abstract class. No need to define anything here, except of python registration */
-      void LBOutput::registerPython() {
-         using namespace espressopp::python;
+namespace analysis {
+//    LOG4ESPP_LOGGER(LBOutput::theLogger, "LBOutput");
+/* Abstract class. No need to define anything here, except of python
+ * registration */
+void LBOutput::registerPython() {
+  using namespace espressopp::python;
 
-         class_<LBOutput, bases< AnalysisBase >, boost::noncopyable >
-         ("analysis_LBOutput", no_init)
+  class_<LBOutput, bases<AnalysisBase>, boost::noncopyable>("analysis_LBOutput",
+                                                            no_init)
 
-         .def("writeOutput", pure_virtual(&LBOutput::writeOutput))
-         ;
-      }
-   }
+      .def("writeOutput", pure_virtual(&LBOutput::writeOutput));
+}
+}
 }
