@@ -196,7 +196,8 @@ void LBSite::thermalFluct(real *m) {
 
   for (int l = 4; l < _numVelsLoc; l++) {
     m[l] += rootRhoLoc * getPhiLoc(l) * ((*LatticePar::rng)() - 0.5);
-    //				m[l] += rootRhoLoc*getPhiLoc(l)*((LatticePar::rng)->normal());
+    //				m[l] +=
+    // rootRhoLoc*getPhiLoc(l)*((LatticePar::rng)->normal());
     ////Gaussian
   }
 }

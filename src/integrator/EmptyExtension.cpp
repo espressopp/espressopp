@@ -45,7 +45,7 @@ void EmptyExtension::disconnect() {
 void EmptyExtension::connect() {
   // connection to initialisation
   //_aftInitF  = integrator->aftInitF.connect(
-  //boost::bind(&EmptyExtension::applyForceToAll, this));
+  // boost::bind(&EmptyExtension::applyForceToAll, this));
 }
 
 void EmptyExtension::emptyFunction() {}

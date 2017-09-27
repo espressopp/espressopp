@@ -324,7 +324,7 @@ real LatticeBoltzmann::getLBMom(Int3D _Ni, int _l) {
 real LatticeBoltzmann::convMassMDtoLB() { return 1.; }
 
 //#note: need a foolproof in case there is no access to the integrator (and
-//getTimeStep) yet
+// getTimeStep) yet
 real LatticeBoltzmann::convTimeMDtoLB() {
   return 1. / (integrator->getTimeStep() * getTau());
 }
@@ -546,7 +546,7 @@ void LatticeBoltzmann::makeLBStep() {
 
 /* REAL MD-PARTICLES DECOMPOSITION IF THEY MOVED TO THE GHOST REGION */
 ///* it is needed as we couple LB to MD at half-timestep and, most importantly,
-///because real particles can still
+/// because real particles can still
 /// leave the real regions and reside in ghost layer. Tricky. */
 void LatticeBoltzmann::makeDecompose() {
   int _offset = getHaloSkin();

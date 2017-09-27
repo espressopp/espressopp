@@ -760,7 +760,7 @@ void Storage::registerPython() {
            return_value_policy<reference_existing_object>())
       .def("setFixedTuplesAdress", &Storage::setFixedTuplesAdress)
       //.def("addParticle", &Storage::addParticle, return_value_policy<
-      //reference_existing_object >())
+      // reference_existing_object >())
       .def("lookupLocalParticle", &Storage::lookupLocalParticle,
            return_value_policy<reference_existing_object>())
       .def("lookupRealParticle", &Storage::lookupRealParticle,
