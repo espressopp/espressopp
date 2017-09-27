@@ -1,4 +1,5 @@
-#  Copyright (C) 2017(H)
+#!/usr/bin/env python2
+#  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
 #  This file is part of ESPResSo++.
@@ -30,8 +31,6 @@ import random
 import sys
 
 print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-print "+ Due to a recent change in the design of ESPResSo++ the Parallel Tempering     +"
-print "+ Class is available in the current version.                                    +"
 print "+ Multisystem simulations are still possible but have to be setup manually.     +"
 print "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
