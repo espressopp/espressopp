@@ -22,6 +22,8 @@
 #ifndef _ANALYSIS_LBOUTPUT_HPP
 #define _ANALYSIS_LBOUTPUT_HPP
 
+#include "python.hpp"
+
 #include "integrator/LatticeBoltzmann.hpp"
 #include "AnalysisBase.hpp"
 #include "iterator/CellListIterator.hpp"

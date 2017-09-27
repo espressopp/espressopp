@@ -24,6 +24,8 @@
 #ifndef _INTERACTION_REACTIONFIELDGENERALIZEDTI_HPP
 #define _INTERACTION_REACTIONFIELDGENERALIZEDTI_HPP
 
+#include "python.hpp"
+
 #include "Potential.hpp"
 #include <algorithm>
 #include <set>

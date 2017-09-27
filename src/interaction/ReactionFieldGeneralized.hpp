@@ -24,6 +24,8 @@
 #ifndef _INTERACTION_REACTIONFIELDGENERALIZED_HPP
 #define _INTERACTION_REACTIONFIELDGENERALIZED_HPP
 
+#include "python.hpp"
+
 #include "Potential.hpp"
 //#include "FixedPairListInteractionTemplate.hpp"
 

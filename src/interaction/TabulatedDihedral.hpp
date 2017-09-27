@@ -26,6 +26,8 @@
 #ifndef _INTERACTION_TABULATEDDIHEDRAL_HPP
 #define _INTERACTION_TABULATEDDIHEDRAL_HPP
 
+#include "python.hpp"
+
 #include "DihedralPotential.hpp"
 #include "Interpolation.hpp"
 

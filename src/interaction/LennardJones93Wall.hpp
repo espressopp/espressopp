@@ -26,6 +26,8 @@
 #ifndef _INTERACTION_LENNARDJONES93WALL_HPP
 #define _INTERACTION_LENNARDJONES93WALL_HPP
 
+#include "python.hpp"
+
 #include "SingleParticlePotential.hpp"
 #include "SingleParticleInteractionTemplate.hpp"
 #include "Real3D.hpp"

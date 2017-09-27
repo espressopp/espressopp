@@ -24,6 +24,8 @@
 #ifndef _ANALYSIS_PRESSURE_TENSOR_MULTI_LAYER_HPP
 #define _ANALYSIS_PRESSURE_TENSOR_MULTI_LAYER_HPP
 
+#include "python.hpp"
+
 #include "types.hpp"
 #include "AnalysisBase.hpp"
 #include "Tensor.hpp"

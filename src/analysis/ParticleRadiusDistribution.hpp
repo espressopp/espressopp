@@ -24,6 +24,8 @@
 #ifndef _ANALYSIS_PARTICLERADIUSDISTRIBUTION_HPP
 #define _ANALYSIS_PARTICLERADIUSDISTRIBUTION_HPP
 
+#include "python.hpp"
+
 #include "types.hpp"
 #include "AnalysisBase.hpp"
 #include "storage/Storage.hpp"

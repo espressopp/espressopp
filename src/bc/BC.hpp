@@ -26,6 +26,8 @@
 #ifndef _BC_BC_HPP
 #define _BC_BC_HPP
 
+#include "python.hpp"
+
 #include <boost/python/tuple.hpp>
 #include <boost/signals2.hpp>
 #include "types.hpp"

@@ -24,6 +24,8 @@
 #ifndef _INTERACTION_POTENTIALVSPHEREPAIR_HPP
 #define _INTERACTION_POTENTIALVSPHEREPAIR_HPP
 
+#include "python.hpp"
+
 #include "types.hpp"
 #include "Real3D.hpp"
 #include "Particle.hpp"

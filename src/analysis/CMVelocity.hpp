@@ -25,6 +25,8 @@
 #ifndef _ANALYSIS_TOTAL_VELOCITY_HPP
 #define _ANALYSIS_TOTAL_VELOCITY_HPP
 
+#include "python.hpp"
+
 #include "types.hpp"
 #include "Real3D.hpp"
 #include "AnalysisBase.hpp"

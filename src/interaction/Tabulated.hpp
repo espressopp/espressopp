@@ -24,6 +24,8 @@
 #ifndef _INTERACTION_TABULATED_HPP
 #define _INTERACTION_TABULATED_HPP
 
+#include "python.hpp"
+
 //#include <stdexcept>
 #include "Potential.hpp"
 #include "Interpolation.hpp"

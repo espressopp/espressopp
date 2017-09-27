@@ -24,6 +24,8 @@
 #ifndef _FIXEDTUPLELIST_HPP
 #define _FIXEDTUPLELIST_HPP
 
+#include "python.hpp"
+
 #include "log4espp.hpp"
 #include "types.hpp"
 

@@ -26,6 +26,8 @@
 #ifndef _INTERACTION_TABULATEDANGULAR_HPP
 #define _INTERACTION_TABULATEDANGULAR_HPP
 
+#include "python.hpp"
+
 #include "AngularPotential.hpp"
 #include "Interpolation.hpp"
 

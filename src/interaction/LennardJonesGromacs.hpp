@@ -24,6 +24,8 @@
 #ifndef _INTERACTION_LENNARDJONESGROMACS_HPP
 #define _INTERACTION_LENNARDJONESGROMACS_HPP
 
+#include "python.hpp"
+
 #include "FixedPairListInteractionTemplate.hpp"
 #include "Potential.hpp"
 

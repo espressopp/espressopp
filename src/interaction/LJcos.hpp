@@ -22,10 +22,14 @@
 #ifndef _INTERACTION_LJCOS_HPP
 #define _INTERACTION_LJCOS_HPP
 
+#include "python.hpp"
+
 #include "Potential.hpp"
 
 #ifndef M_PIl
 #define M_PIl 3.1415926535897932384626433832795029L
+
+#include "python.hpp"
 #endif
 
 namespace espressopp {

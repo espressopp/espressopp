@@ -24,6 +24,8 @@
 #ifndef _INTERACTION_LENNARDJONESEXPAND_HPP
 #define _INTERACTION_LENNARDJONESEXPAND_HPP
 
+#include "python.hpp"
+
 #include "FixedPairListInteractionTemplate.hpp"
 #include "Potential.hpp"
 

@@ -25,6 +25,7 @@
 #define _INTERACTION_CELLLISTALLPAIRSINTERACTIONTEMPLATE_HPP
 
 #include "types.hpp"
+#include "bc/BC.hpp"
 #include "Tensor.hpp"
 #include "Interaction.hpp"
 #include "storage/Storage.hpp"

@@ -24,6 +24,8 @@
 #ifndef _FIXEDQUADRUPLEANGLELIST_HPP
 #define _FIXEDQUADRUPLEANGLELIST_HPP
 
+#include "python.hpp"
+
 #include "log4espp.hpp"
 #include "types.hpp"
 #include "Triple.hpp"

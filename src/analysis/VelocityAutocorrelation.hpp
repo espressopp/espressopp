@@ -24,6 +24,8 @@
 #ifndef _ANALYSIS_VELOCITYAUTOCORRELATION_HPP
 #define _ANALYSIS_VELOCITYAUTOCORRELATION_HPP
 
+#include "python.hpp"
+
 #include "ConfigsParticleDecomp.hpp"
 
 namespace espressopp {

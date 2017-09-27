@@ -24,6 +24,8 @@
 #ifndef _INTERACTION_MORSE_HPP
 #define _INTERACTION_MORSE_HPP
 
+#include "python.hpp"
+
 #include "FixedPairListInteractionTemplate.hpp"
 #include "Potential.hpp"
 

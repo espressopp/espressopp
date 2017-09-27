@@ -24,6 +24,8 @@
 #ifndef _ANALYSIS_TEST_HPP
 #define _ANALYSIS_TEST_HPP
 
+#include "python.hpp"
+
 #include "types.hpp"
 #include "AnalysisBase.hpp"
 

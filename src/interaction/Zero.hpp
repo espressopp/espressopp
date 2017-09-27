@@ -24,6 +24,8 @@
 #ifndef _INTERACTION_ZERO_HPP
 #define _INTERACTION_ZERO_HPP
 
+#include "python.hpp"
+
 #include "Potential.hpp"
 
 namespace espressopp {

@@ -24,6 +24,8 @@
 #ifndef _FIXEDTRIPLEANGLELIST_HPP
 #define _FIXEDTRIPLEANGLELIST_HPP
 
+#include "python.hpp"
+
 #include "log4espp.hpp"
 #include "types.hpp"
 

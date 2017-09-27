@@ -24,6 +24,8 @@
 #ifndef _FIXEDQUADRUPLELIST_HPP
 #define _FIXEDQUADRUPLELIST_HPP
 
+#include "python.hpp"
+
 #include "log4espp.hpp"
 #include "types.hpp"
 #include "Triple.hpp"

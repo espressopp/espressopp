@@ -24,6 +24,8 @@
 #ifndef _INTERACTION_SOFTCOSINE_HPP
 #define _INTERACTION_SOFTCOSINE_HPP
 
+#include "python.hpp"
+
 #include "Potential.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 

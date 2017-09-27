@@ -24,6 +24,8 @@
 #ifndef _FIXEDPAIRLISTADRESS_HPP
 #define _FIXEDPAIRLISTADRESS_HPP
 
+#include "python.hpp"
+
 #include "log4espp.hpp"
 
 //#include "Particle.hpp"

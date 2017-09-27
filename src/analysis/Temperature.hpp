@@ -24,6 +24,8 @@
 #ifndef _ANALYSIS_TEMPERATURE_HPP
 #define _ANALYSIS_TEMPERATURE_HPP
 
+#include "python.hpp"
+
 #include "types.hpp"
 #include "AnalysisBase.hpp"
 //#include "storage/DomainDecomposition.hpp"

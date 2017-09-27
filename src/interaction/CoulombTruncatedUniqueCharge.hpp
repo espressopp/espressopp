@@ -24,6 +24,8 @@
 #ifndef _INTERACTION_COULOMBTRUNCATEDUNIQUECHARGE_HPP
 #define _INTERACTION_COULOMBTRUNCATEDUNIQUECHARGE_HPP
 
+#include "python.hpp"
+
 #include "Potential.hpp"
 #include "FixedPairListInteractionTemplate.hpp"
 

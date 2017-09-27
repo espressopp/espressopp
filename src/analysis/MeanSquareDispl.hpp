@@ -24,6 +24,8 @@
 #ifndef _ANALYSIS_MEANSQUAREDISPL_HPP
 #define _ANALYSIS_MEANSQUAREDISPL_HPP
 
+#include "python.hpp"
+
 #include "ConfigsParticleDecomp.hpp"
 
 namespace espressopp {
