@@ -1,7 +1,29 @@
+#!/usr/bin/env python2
+#  Copyright (C) 2016-2017(H)
+#      Max Planck Institute for Polymer Research
+#
+#  This file is part of ESPResSo++.
+#
+#  ESPResSo++ is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  ESPResSo++ is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#############################################################################
+#                                                                           #
+#  ESPResSo++ Python script for the calculation of long range interactions  #
+#  (Coulomb interaction) using the Ewald summation and the P3M methods.     #
+#                                                                           #
+#############################################################################
 '''
-#  This script is an example of calculation of long range interactions
-#  (Coulomb interaction) using the Ewald summation and the P3M methods.
-#  
 #  Initially, the simple cubic structure is generated in order to represent the
 #  NaCl crystal. Then the energy and forces are calculated and compared using both
 #  the Ewald summation and the P3M. At the end the Madelung constant of NaCl crystal
@@ -21,7 +43,6 @@
     P              = 7             (charge assignment order)
 '''
 
-# The script itself
 import mpi4py.MPI as MPI
 import espressopp
 from espressopp import Real3D
