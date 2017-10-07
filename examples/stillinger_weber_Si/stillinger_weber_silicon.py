@@ -1,11 +1,27 @@
-#!/usr/bin/env python                                                               
-# -*- coding: iso-8859-1 -*-                                                        
+#!/usr/bin/env python2
+#  Copyright (C) 2015-2017(H)
+#      Max Planck Institute for Polymer Research
+#
+#  This file is part of ESPResSo++.
+#
+#  ESPResSo++ is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  ESPResSo++ is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#################################
-#                               #
-#  ESPResSo++ Python script     #
-#                               #
-#################################
+###################################################################################			
+#                                                                                 #
+#  ESPResSo++ Python script for a simulation using the Stillinger-Weber potential #
+#                                                                                 #
+###################################################################################
 
 '''
   This is an example of using Stillinger-Weber nonbonded 
@@ -179,7 +195,7 @@ in_time = time.time()
 espressopp.tools.analyse.info(system, integrator)
 for i in range (10):
   integrator.run(1000)
-  espressopp.tools.info(system, integrator)
+  espressopp.tools.analyse.info(system, integrator)
 
 ##############################################
 # calculate the radial distribution function #
@@ -208,7 +224,7 @@ for i in range (nprints):
       else:
         rdf_array_total[i] += rdf_array[i]
     
-  espressopp.tools.info(system, integrator)
+  espressopp.tools.analyse.info(system, integrator)
 
 fin_time = time.time()
 print '\ngeneral running time: ', (fin_time-in_time)

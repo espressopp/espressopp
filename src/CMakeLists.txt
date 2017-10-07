@@ -65,8 +65,8 @@ find_program(CLANG_FORMAT "clang-format")
 if (CLANG_FORMAT)
     add_custom_target(
             format
-            COMMAND clang-format
-            -style=Google
+            COMMAND ${CLANG_FORMAT}
+            -style=file
             -i
             ${ESPRESSO_SOURCES}
     )
