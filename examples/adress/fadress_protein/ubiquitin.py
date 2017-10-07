@@ -1,6 +1,5 @@
 #!/usr/bin/env python2
-
-#  Copyright (C) 2016
+#  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #  
 #  This file is part of ESPResSo++.
@@ -18,9 +17,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 
-import mpi4py.MPI as MPI
+#########################################################################################
+#                                                                                       #
+#  ESPResSo++ Python script for a F-AdResS Ubiquitin (protein) solvated in water        #
+#                                                                                       #
+#########################################################################################
 
-# import the ESPResSo++ python module
+import mpi4py.MPI as MPI
 import espressopp
 from espressopp import Real3D
 from espressopp.tools import gromacs
