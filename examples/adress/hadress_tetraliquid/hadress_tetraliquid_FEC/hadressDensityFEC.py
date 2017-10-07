@@ -1,6 +1,5 @@
-#!/usr/bin/env python2
-
-#  Copyright (C) 2016
+#!/usr/bin/env python2 
+#  Copyright (C) 2016-2017(H)
 #      Max Planck Institute for Polymer Research
 #
 #  This file is part of ESPResSo++.
@@ -18,7 +17,14 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# relevant imports
+#########################################################################################
+#                                                                                       #
+#  ESPResSo++ Python script for an H-AdResS tetrahedral liquid simulation FEC density   #
+#                                                                                       #
+#  FEC stands for Free Energy Correction                                                #
+#########################################################################################
+
+
 import sys
 import time
 import espressopp
