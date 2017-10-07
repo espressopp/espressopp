@@ -66,7 +66,7 @@ if (CLANG_FORMAT)
     add_custom_target(
             format
             COMMAND ${CLANG_FORMAT}
-            -style=Google
+            -style=file
             -i
             ${ESPRESSO_SOURCES}
     )
