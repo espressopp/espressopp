@@ -47,6 +47,7 @@ jobs:
     include:
         - stage: codestyle
           env: DISTRO=ubuntu CODESTYLE=ON
+          compiler: gcc
         - script:
           - cp -vr docker ${HOME}
           - cd ../../
