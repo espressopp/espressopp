@@ -15,6 +15,9 @@ ARG TRAVIS_COMMIT
 ARG TRAVIS_COMMIT_RANGE
 ARG TRAVIS_REPO_SLUG
 
+COPY espressopp /home/espressopp/espressopp
+USER root
+RUN chown -R espressopp:espressopp /home/espressopp/espressopp
 USER espressopp
 
 WORKDIR /home/espressopp/espressopp
