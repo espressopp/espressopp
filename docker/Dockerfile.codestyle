@@ -1,0 +1,26 @@
+from espressopp/buildenv:ubuntu
+
+ARG COVERAGE
+ARG EXTERNAL
+ARG CC
+ARG CXX
+ARG BUILD_UG
+
+#for coverage
+ENV CI true
+ENV TRAVIS true
+ARG CODESTYLE
+ARG TRAVIS_PULL_REQUEST
+ARG TRAVIS_COMMIT
+ARG TRAVIS_COMMIT_RANGE
+ARG TRAVIS_REPO_SLUG
+
+RUN rm -rf /home/espressopp/.ccache
+COPY espressopp /home/espressopp/espressopp
+COPY ccache/ /home/espressopp/.ccache
+USER root
+RUN chown -R espressopp:espressopp /home/espressopp/espressopp /home/espressopp/.ccache
+USER espressopp
+
+WORKDIR /home/espressopp/espressopp
+RUN maintainer/check_codestyle.sh ${CODESTYLE} ${TRAVIS_PULL_REQUEST} ${TRAVIS_COMMIT} ${TRAVIS_COMMIT_RANGE} ${TRAVIS_REPO_SLUG}
