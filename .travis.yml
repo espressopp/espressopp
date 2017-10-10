@@ -47,7 +47,7 @@ script:
                 --build-arg CODESTYLE=${CODESTYLE} --build-arg TRAVIS_COMMIT_RANGE=${TRAVIS_COMMIT_RANGE}
                 --build-arg TRAVIS_COMMIT=${TRAVIS_COMMIT}
                 -t espressopp/espressopp:${DOCKER_TAG} -f ${HOME}/docker/${DOCKER_FILE} ${HOME}/docker/ &&
-   rm -rf $HOME/.ccache &&
+   [[ ${CODESTYLE} != ON ]] && rm -rf $HOME/.ccache &&
    CON=$(docker run -d espressopp/espressopp:${DOCKER_TAG} /bin/bash) &&
    docker cp ${CON}:/home/espressopp/.ccache ${HOME}/
 
