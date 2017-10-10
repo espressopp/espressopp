@@ -11,11 +11,13 @@ ENV CI true
 ENV TRAVIS true
 ARG TRAVIS_BRANCH
 ARG TRAVIS_JOB_NUMBER
-ARG TRAVIS_PULL_REQUEST 
+ARG TRAVIS_PULL_REQUEST
 ARG TRAVIS_JOB_ID
 ARG TRAVIS_TAG
 ARG TRAVIS_REPO_SLUG
 ARG TRAVIS_COMMIT
+ARG TRAVIS_COMMIT_RANGE
+ARG CODESTYLE
 
 RUN rm -rf /home/espressopp/.ccache
 COPY espressopp /home/espressopp/espressopp
@@ -25,6 +27,8 @@ RUN chown -R espressopp:espressopp /home/espressopp/espressopp /home/espressopp/
 USER espressopp
 
 WORKDIR /home/espressopp/espressopp
+RUN maintainer/check_codestyle.sh ${CODESTYLE} ${TRAVIS_PULL_REQUEST} ${TRAVIS_COMMIT} ${TRAVIS_COMMIT_RANGE} ${TRAVIS_REPO_SLUG}
+RUN if [ "CODESTYLE" = "ON" ]; then exit 0; fi
 RUN mkdir build
 
 WORKDIR build

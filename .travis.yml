@@ -5,6 +5,10 @@ sudo: required
 services:
 - docker
 
+stages:
+  - codestyle
+  - test
+
 env:
   matrix:
     - DISTRO=ubuntu EXTERNAL=ON BUILD_UG=ON
@@ -20,6 +24,11 @@ env:
     - DISTRO=fedora_mpich EXTERNAL=ON COVERAGE=ON
     - DISTRO=fedora_mpich EXTERNAL=OFF
 
+jobs:
+    include:
+        - stage: codestyle
+          env: DISTRO=ubuntu CODESTYLE=ON
+
 script:
  - cp -vr docker ${HOME}
  - sed -i "1s/ubuntu/${DISTRO}/" ${HOME}/docker/Dockerfile
@@ -33,6 +42,7 @@ script:
                 --build-arg TRAVIS_PULL_REQUEST=${TRAVIS_PULL_REQUEST} --build-arg TRAVIS_JOB_ID=${TRAVIS_JOB_ID}
                 --build-arg TRAVIS_TAG=${TRAVIS_TAG} --build-arg TRAVIS_REPO_SLUG=${TRAVIS_REPO_SLUG}
                 --build-arg TRAVIS_COMMIT=${TRAVIS_COMMIT}
+                --build-arg CODESTYLE=${CODESTYLE} --build-arg TRAVIS_COMMIT_RANGE=${TRAVIS_COMMIT_RANGE}
                 -t espressopp/espressopp:${DOCKER_TAG} ${HOME}/docker/ &&
    rm -rf $HOME/.ccache &&
    CON=$(docker run -d espressopp/espressopp:${DOCKER_TAG} /bin/bash) &&
