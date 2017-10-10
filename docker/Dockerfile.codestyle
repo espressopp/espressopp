@@ -15,11 +15,6 @@ ARG TRAVIS_COMMIT
 ARG TRAVIS_COMMIT_RANGE
 ARG TRAVIS_REPO_SLUG
 
-RUN rm -rf /home/espressopp/.ccache
-COPY espressopp /home/espressopp/espressopp
-COPY ccache/ /home/espressopp/.ccache
-USER root
-RUN chown -R espressopp:espressopp /home/espressopp/espressopp /home/espressopp/.ccache
 USER espressopp
 
 WORKDIR /home/espressopp/espressopp
