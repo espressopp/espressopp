@@ -15,7 +15,9 @@ ARG TRAVIS_PULL_REQUEST
 ARG TRAVIS_JOB_ID
 ARG TRAVIS_TAG
 ARG TRAVIS_REPO_SLUG
+ARG CODESTYLE
 
+RUN [[ ${CODESTYLE} = "ON" ]] && exit 1
 RUN rm -rf /home/espressopp/.ccache
 COPY espressopp /home/espressopp/espressopp
 COPY ccache/ /home/espressopp/.ccache
