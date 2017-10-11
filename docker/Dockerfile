@@ -19,7 +19,6 @@ ARG CODESTYLE
 ARG TRAVIS_COMMIT
 ARG TRAVIS_COMMIT_RANGE
 
-RUN [[ ${CODESTYLE} = "ON" ]] && exit 1
 RUN rm -rf /home/espressopp/.ccache
 COPY espressopp /home/espressopp/espressopp
 COPY ccache/ /home/espressopp/.ccache
@@ -28,6 +27,7 @@ RUN chown -R espressopp:espressopp /home/espressopp/espressopp /home/espressopp/
 USER espressopp
 
 WORKDIR /home/espressopp/espressopp
+RUN maintainer/check_codestyle.sh ${CODESTYLE} ${TRAVIS_PULL_REQUEST} ${TRAVIS_COMMIT} ${TRAVIS_COMMIT_RANGE} ${TRAVIS_REPO_SLUG}
 RUN mkdir build
 
 WORKDIR build

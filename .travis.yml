@@ -24,8 +24,6 @@ env:
     - DISTRO=fedora_mpich EXTERNAL=ON COVERAGE=ON
     - DISTRO=fedora_mpich EXTERNAL=OFF
 
-
-
 jobs:
     include:
         - stage: codestyle
@@ -38,7 +36,6 @@ script:
  - mv -v ${TRAVIS_REPO_SLUG} $HOME/docker
  - cp -r $HOME/.ccache ${HOME}/docker/ccache
  - if [[ ${TRAVIS_BRANCH} = master ]]; then DOCKER_TAG=latest; else DOCKER_TAG="${TRAVIS_BRANCH}"; fi
- - if [[ ${CODESTYLE} = ON ]]; then DOCKER_FILE=Dockerfile.codestyle; else DOCKER_FILE=Dockerfile; fi
  - docker build --build-arg COVERAGE=${COVERAGE} --build-arg EXTERNAL=${EXTERNAL}
                 --build-arg CC=${CC} --build-arg CXX=${CXX} --build-arg BUILD_UG=${BUILD_UG}
                 --build-arg TRAVIS_BRANCH=${TRAVIS_BRANCH} --build-arg TRAVIS_JOB_NUMBER=${TRAVIS_JOB_NUMBER}
@@ -46,8 +43,8 @@ script:
                 --build-arg TRAVIS_TAG=${TRAVIS_TAG} --build-arg TRAVIS_REPO_SLUG=${TRAVIS_REPO_SLUG}
                 --build-arg CODESTYLE=${CODESTYLE} --build-arg TRAVIS_COMMIT_RANGE=${TRAVIS_COMMIT_RANGE}
                 --build-arg TRAVIS_COMMIT=${TRAVIS_COMMIT}
-                -t espressopp/espressopp:${DOCKER_TAG} -f ${HOME}/docker/${DOCKER_FILE} ${HOME}/docker/ &&
-   [[ ${CODESTYLE} != ON ]] && rm -rf $HOME/.ccache &&
+                -t espressopp/espressopp:${DOCKER_TAG} ${HOME}/docker/ &&
+   rm -rf $HOME/.ccache &&
    CON=$(docker run -d espressopp/espressopp:${DOCKER_TAG} /bin/bash) &&
    docker cp ${CON}:/home/espressopp/.ccache ${HOME}/
 

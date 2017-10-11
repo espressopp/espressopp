@@ -21,11 +21,11 @@ function clangformat() {
 #function pep8format() {
 #}
 
-if [ "X$CODESTYLE" = "XON" ]; then
-    if [ "X$TRAVIS_PULL_REQUEST" != "Xfalse" ]; then
+if [ $CODESTYLE = ON ]; then
+    if [ $TRAVIS_PULL_REQUEST != false ]; then
         # Gets list of files from pull request.
         FILES="`curl -s "https://api.github.com/repos/${TRAVIS_REPO_SLUG}/pulls/${TRAVIS_PULL_REQUEST}/files" | grep '"filename":' | grep '"filename":' | sed -e 's/.*"filename": "\(.*\)",/\1/g' | xargs`"
-    elif [ "X$TRAVIS_COMMIT_RANGE" != "X" ]; then
+    elif [ $TRAVIS_COMMIT_RANGE ]; then
         FILES="`git diff --name-only ${TRAVIS_COMMIT_RANGE} | xargs`"
     else
         # Gets list from single commit.
