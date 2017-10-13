@@ -1,12 +1,9 @@
 #!/bin/bash
 
-echo "check_codestyle.sh CODESTYLE=$1 TRAVIS_PULL_REQUEST=$2 TRAVIS_COMMIT=$3 TRAVIS_COMMIT_RANGE=$4 TRAVIS_REPO_SLUG=$5"
+echo "check_codestyle.sh CODESTYLE=$1 TRAVIS_BRANCH=$2"
 
 CODESTYLE=$1
-TRAVIS_PULL_REQUEST=$2
-TRAVIS_COMMIT=$3
-TRAVIS_COMMIT_RANGE=$4
-[[ $5 ]] && TRAVIS_REPO_SLUG=$5 || TRAVIS_REPO_SLUG="espressopp/espressopp"
+TRAVIS_BRANCH=$2
 
 INCORRECT_FILES=""
 
@@ -22,15 +19,7 @@ function clangformat() {
 #}
 
 if [ $CODESTYLE = ON ]; then
-    if [ $TRAVIS_PULL_REQUEST != false ]; then
-        # Gets list of files from pull request.
-        FILES="`curl -s "https://api.github.com/repos/${TRAVIS_REPO_SLUG}/pulls/${TRAVIS_PULL_REQUEST}/files" | grep '"filename":' | grep '"filename":' | sed -e 's/.*"filename": "\(.*\)",/\1/g' | xargs`"
-    elif [ $TRAVIS_COMMIT_RANGE ]; then
-        FILES="`git diff --name-only ${TRAVIS_COMMIT_RANGE} | xargs`"
-    else
-        # Gets list from single commit.
-        FILES="`git show --no-notes --oneline --name-only ${TRAVIS_COMMIT} | tail -n +2 | xargs`"
-    fi
+    FILES="`git diff --name-only --diff-filter=AM $TRAVIS_BRANCH...HEAD`"
     echo "FILES: ${FILES}"
     clangformat "${FILES}"
     echo "INCORRECT_FILES: ${INCORRECT_FILES}"
