@@ -49,7 +49,7 @@ RUN if [ "${CODESTYLE}" = ON ]; then \
         fi; \
       fi; \
   fi
-WORKDIR /home/espressopp/espressopp
+WORKDIR /home/espressopp/espressopp/build
 USER root
 RUN [ "${CODESTYLE}" = ON ] && exit 0 || make install
 USER espressopp
