@@ -29,7 +29,7 @@ USER espressopp
 WORKDIR /home/espressopp/espressopp
 RUN maintainer/check_codestyle.sh ${CODESTYLE} ${TRAVIS_BRANCH} ${TRAVIS_PULL_REQUEST} ${TRAVIS_COMMIT} ${TRAVIS_COMMIT_RANGE}
 
-RUN if [ ${CODESTYLE} = ON ]; then \
+RUN if [ X${CODESTYLE} = XON ]; then \
       exit 0; \
   else \
       mkdir build && \
@@ -41,7 +41,7 @@ RUN if [ ${CODESTYLE} = ON ]; then \
       make test && \
       make install DESTDIR=${PWD} && \
       cd .. && \
-      if [ ${COVERAGE} = ON ]; then \
+      if [ ${COVERAGE} ]; then \
         if [ ${CC} = clang ]; then \
           $HOME/.local/bin/codecov --gcov-exec "llvm-cov gcov"; \
         else \
