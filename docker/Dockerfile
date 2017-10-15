@@ -29,7 +29,7 @@ USER espressopp
 WORKDIR /home/espressopp/espressopp
 RUN maintainer/check_codestyle.sh ${CODESTYLE} ${TRAVIS_BRANCH} ${TRAVIS_PULL_REQUEST} ${TRAVIS_COMMIT} ${TRAVIS_COMMIT_RANGE}
 
-RUN if [ X${CODESTYLE} = XON ]; then \
+RUN if [ "${CODESTYLE}" = ON ]; then \
       exit 0; \
   else \
       mkdir build && \
@@ -50,6 +50,6 @@ RUN if [ X${CODESTYLE} = XON ]; then \
       fi; \
   fi && cd -
 USER root
-RUN [ ${CODESTYLE} = ON ] && exit 0 || make install
+RUN [ "${CODESTYLE}" = ON ] && exit 0 || make install
 USER espressopp
 WORKDIR ../examples
