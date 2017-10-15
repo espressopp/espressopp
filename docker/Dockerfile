@@ -40,7 +40,8 @@ RUN if [ ${CODESTYLE} = ON ]; then \
       ccache -s && \
       make test && \
       make install DESTDIR=${PWD} && \
-      cd .. && if [ ${COVERAGE} ]; then \
+      cd .. && \
+      if [ ${COVERAGE} = ON ]; then \
         if [ ${CC} = clang ]; then \
           $HOME/.local/bin/codecov --gcov-exec "llvm-cov gcov"; \
         else \
