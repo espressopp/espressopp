@@ -15,14 +15,11 @@ function clangformat() {
     done
 }
 
-#function pep8format() {
-#}
-
-if [ $CODESTYLE = ON ]; then
-    FILES="`git diff --name-only --diff-filter=AM $TRAVIS_BRANCH...HEAD`"
+if [[ $CODESTYLE = ON ]]; then
+    FILES="$(git diff --name-only --diff-filter=AM $TRAVIS_BRANCH...HEAD)"
     echo "FILES: ${FILES}"
     clangformat "${FILES}"
     echo "INCORRECT_FILES: ${INCORRECT_FILES}"
-    [ "$INCORRECT_FILES" ] && exit 1 || exit 0
+    [[ $INCORRECT_FILES ]] && exit 1 || exit 0
 fi
 exit 0
