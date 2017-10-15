@@ -16,6 +16,7 @@ ARG TRAVIS_JOB_ID
 ARG TRAVIS_TAG
 ARG TRAVIS_REPO_SLUG
 ARG TRAVIS_COMMIT
+ARG TRAVIS_COMMIT_RANGE
 ARG CODESTYLE
 
 RUN rm -rf /home/espressopp/.ccache
@@ -26,24 +27,28 @@ RUN chown -R espressopp:espressopp /home/espressopp/espressopp /home/espressopp/
 USER espressopp
 
 WORKDIR /home/espressopp/espressopp
-RUN maintainer/check_codestyle.sh ${CODESTYLE} ${TRAVIS_BRANCH}
-RUN mkdir build
+RUN maintainer/check_codestyle.sh ${CODESTYLE} ${TRAVIS_BRANCH} ${TRAVIS_PULL_REQUEST} ${TRAVIS_COMMIT} ${TRAVIS_COMMIT_RANGE}
 
-WORKDIR build
-RUN ccache -z
-RUN cmake -DCMAKE_INSTALL_PREFIX=/usr -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL -DWITH_XTC=ON ${COVERAGE:+-DUSE_GCOV=ON} ..
-RUN make VERBOSE=1 -j2 all ${BUILD_UG:+ug doc ug-pdf}
-RUN ccache -s
-RUN make test
-RUN make install DESTDIR=${PWD}
-RUN cd .. && if [ ${COVERAGE} ]; then \
-  if [ ${CC} = clang ]; then \
-    $HOME/.local/bin/codecov --gcov-exec "llvm-cov gcov"; \
+RUN if [ ${CODESTYLE} = ON ]; then \
+      exit 0; \
   else \
-    $HOME/.local/bin/codecov; \
-  fi; \
-fi && cd -
+      mkdir build && \
+      cd build && \
+      ccache -z && \
+      cmake -DCMAKE_INSTALL_PREFIX=/usr -DEXTERNAL_BOOST=$EXTERNAL -DEXTERNAL_MPI4PY=$EXTERNAL -DWITH_XTC=ON ${COVERAGE:+-DUSE_GCOV=ON} .. && \
+      make VERBOSE=1 -j2 all ${BUILD_UG:+ug doc ug-pdf} && \
+      ccache -s && \
+      make test && \
+      make install DESTDIR=${PWD} && \
+      cd .. && if [ ${COVERAGE} ]; then \
+        if [ ${CC} = clang ]; then \
+          $HOME/.local/bin/codecov --gcov-exec "llvm-cov gcov"; \
+        else \
+          $HOME/.local/bin/codecov; \
+        fi; \
+      fi; \
+  fi && cd -
 USER root
-RUN make install
+RUN [ ${CODESTYLE} = ON ] && exit 0 || make install
 USER espressopp
 WORKDIR ../examples
