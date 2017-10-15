@@ -48,7 +48,8 @@ RUN if [ X${CODESTYLE} = XON ]; then \
           $HOME/.local/bin/codecov; \
         fi; \
       fi; \
-  fi && cd -
+  fi
+WORKDIR /home/espressopp/espressopp
 USER root
 RUN [ ${CODESTYLE} = ON ] && exit 0 || make install
 USER espressopp
