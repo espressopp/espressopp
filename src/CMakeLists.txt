@@ -1,3 +1,4 @@
+include(${CMAKE_SOURCE_DIR}/Plumed.cmake)
 file(GLOB_RECURSE ESPRESSO_SOURCES *.cpp)
 file(GLOB_RECURSE NOT_ESPRESSO_SOURCES
   esutil/GenLogger.cpp
@@ -48,6 +49,7 @@ endif (WITH_RC_FILES)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_library(_espressopp ${ESPRESSO_SOURCES})
+target_link_libraries(_espressopp ${PLUMED_LOAD})
 target_link_libraries(_espressopp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MPI_LIBRARIES} ${FFTW3_LIBRARIES} ${VAMPIRTRACE_LIBRARIES})
 if(WITH_XTC)
   target_link_libraries(_espressopp ${GROMACS_LIBRARIES})
