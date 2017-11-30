@@ -34,8 +34,16 @@ QUICKINSTALL:
 
 ```
 # cd espressopp
-# cmake -DEXTERNAL_BOOST=OFF -DEXTERNAL_MPI4PY=OFF .
-# make -j2
+
+```
+To build espressopp with PLUMED, create soft links Plumed.h, Plumed.cmake and Plumed.inc to
+Plumed.h, Plumed.cmake.runtime and Plumed.inc.runtime correspondingly under your installation.
+
+```
+# mkdir build
+# cd build
+# cmake .. -DEXTERNAL_BOOST=OFF -DEXTERNAL_MPI4PY=OFF
+# make -j4
 # source ESPRC
 ```
 
@@ -52,7 +60,7 @@ Documentation for release versions from v1.9.4.1 onward is at:
 
 http://espressopp.github.io/vXXX
 
-where XXX is the version number, e.g.: 
+where XXX is the version number, e.g.:
 
 http://espressopp.github.io/v1.9.4.1
 
