@@ -39,8 +39,8 @@ namespace espressopp {
     class ExtPlumed : public Extension {
 
       public:
-      ExtPlumed(shared_ptr < System > _system, std::string filename, std::string plumedlog, std::string units);
-        void applyForceToAll();
+      ExtPlumed(shared_ptr < System >, std::string, std::string, std::string);
+      void applyForceToAll();
         real getBias();
         virtual ~ExtPlumed() {};
         /** Register this class so it can be used from Python. */
@@ -51,25 +51,23 @@ namespace espressopp {
         PLMD::Plumed*p;
         std::string plumedfile;
         std::string units;
-        std::string logfile;
+      std::string plumedlog;
       // real peTotal;
         real dt;
 
-      longint nprocs;
-      longint nlocal; // total number of atoms (real & ghost) on the processor
-        longint natoms; // total number of atoms
-      size_t *gatindex;
-      real *masses;
-      real *forces;
-      real *pos;
-      real *charges;
 
-      boost::signals2::connection _aftCalcF;
-      // boost::signals2::connection _aftIntV;
-      void connect();
+        longint nlocal; // total number of atoms (real & ghost) on the processor
+        longint natoms; // total number of atoms
+        size_t *gatindex;
+        real *masses;
+        real *forces;
+        real *pos;
+        real *charges;
+
+        boost::signals2::connection _aftCalcF;
+        void connect();
         void disconnect();
-      // void computePe();
-      /** Logger */
+        /** Logger */
         static LOG4ESPP_DECL_LOGGER(theLogger);
         const bool charged;
         real bias;

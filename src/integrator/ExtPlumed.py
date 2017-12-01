@@ -41,14 +41,14 @@ from _espressopp import integrator_ExtPlumed
 
 class ExtPlumed(ExtensionLocal, integrator_ExtPlumed):
 
-    def __init__(self, system, filename, logfile, units):
+    def __init__(self, system, plumedfile, plumedlog="log.plumed", units="Natural"):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
-            cxxinit(self, integrator_ExtPlumed, system, filename, plumedlog, units)
+            cxxinit(self, integrator_ExtPlumed, system, plumedfile, plumedlog, units)
 
 if pmi.isController :
     class ExtPlumed(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
             cls =  'espressopp.integrator.ExtPlumed',
-	    pmiproperty = [ 'filename', 'plumedlog', 'units' ],
+	    pmiproperty = [ 'plumedfile', 'plumedlog', 'units' ],
             )

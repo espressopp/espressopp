@@ -30,7 +30,7 @@
 #include "iterator/CellListIterator.hpp"
 #include "bc/BC.hpp"
 #include "ExtPlumed.hpp"
-// #include "mpi.h"
+#include "mpi.h"
 /*
 Todo: units. Not just natural units.
 Todo: particle groups. ExtPlumed::applyForceToGroup()
@@ -44,11 +44,11 @@ namespace espressopp {
 
     LOG4ESPP_LOGGER(ExtPlumed::theLogger, "ExtPlumed");
 
-    ExtPlumed::ExtPlumed(shared_ptr<System> _system, string filename, string plumedlog, string units)
+    ExtPlumed::ExtPlumed(shared_ptr<System> _system, string _plumedfile, string _plumedlog, string _units)
       : Extension(_system),
-	plumedfile(filename),
-        logfile(plumedlog),
-        units(units),
+        plumedfile(_plumedfile),
+        plumedlog(_plumedlog),
+        units(_units),
         // pe(nullptr),
         nlocal(0),
         natoms(0),
@@ -68,7 +68,7 @@ namespace espressopp {
       if (units == "Natural") p->cmd("setNaturalUnits");
 
       p->cmd("setPlumedDat",plumedfile.c_str());
-      p->cmd("setLogFile",logfile.c_str());
+      p->cmd("setLogFile",plumedlog.c_str());
       p->cmd("setMDEngine","ESPRESSO++");
 
       longint nReal = system.storage->getNRealParticles();
@@ -77,19 +77,13 @@ namespace espressopp {
       p->cmd("setNatoms",&natoms);  // check type
       dt = integrator->getTimeStep();
       p->cmd("setTimestep",&dt); // check type
-      p->cmd("init");
-
-      // auto IL = system.getInteraction(0);
-      // pe = new analysis::PotentialEnergy(system, system.getInteraction(0));
-      nprocs = system.comm->size();
-      // peTotal = pe->compute_real() / nprocs; // pe is defined as per proc in plumed.
-      // p->cmd("setEnergy", &peTotal);
       p->cmd("setAtomsNlocal",&nlocal);
+      p->cmd("init");
     }
 
-        real ExtPlumed::getBias(){
-          return bias;
-        }
+    real ExtPlumed::getBias(){
+      return bias;
+    }
 
     void ExtPlumed::disconnect(){
       _aftCalcF.disconnect();
@@ -189,17 +183,6 @@ namespace espressopp {
         ++k;
       }
     }
-
-    // void ExtPlumed::computePe() {
-    //   peTotal = pe->compute_real() / nprocs;
-    //   return;
-    // }
-
-    // ExtPlumed::~ExtPlumed() {
-    //   if(pe != nullptr) {
-    //       delete pe;
-    //   }
-    // }
 
     /****************************************************
      ** REGISTRATION WITH PYTHON
