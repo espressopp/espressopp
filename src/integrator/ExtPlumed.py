@@ -25,21 +25,16 @@ espressopp.integrator.ExtPlumed
 ******************************
 
 
-.. function:: espressopp.integrator.ExtPlumed(system, extForce, particleGroup)
+.. function:: espressopp.integrator.ExtPlumed(system, plumedfile, plumelog, units)
 
 		:param system:
-		:param extForce:
-		:param particleGroup: (default: None)
-		:type system:
-		:type extForce:
-		:type particleGroup:
 """
 from espressopp.esutil import cxxinit
 from espressopp import pmi
 from espressopp.integrator.Extension import *
 from _espressopp import integrator_ExtPlumed
 
-class ExtPlumed(ExtensionLocal, integrator_ExtPlumed):
+class ExtPlumedLocal(ExtensionLocal, integrator_ExtPlumed):
 
     def __init__(self, system, plumedfile, plumedlog="log.plumed", units="Natural"):
         if not (pmi._PMIComm and pmi._PMIComm.isActive()) or pmi._MPIcomm.rank in pmi._PMIComm.getMPIcpugroup():
@@ -49,6 +44,6 @@ if pmi.isController :
     class ExtPlumed(Extension):
         __metaclass__ = pmi.Proxy
         pmiproxydefs = dict(
-            cls =  'espressopp.integrator.ExtPlumed',
+            cls =  'espressopp.integrator.ExtPlumedLocal',
 	    pmiproperty = [ 'plumedfile', 'plumedlog', 'units' ],
             )
