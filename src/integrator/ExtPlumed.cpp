@@ -85,15 +85,23 @@ namespace espressopp {
       return bias;
     }
 
-    void ExtPlumed::disconnect(){
+    void ExtPlumed::disconnect() {
       _aftCalcF.disconnect();
+      _runInit.disconnect();
       // _aftIntV.disconnect();
     }
 
-    void ExtPlumed::connect(){
+    void ExtPlumed::connect() {
       // connection to initialisation
       _aftCalcF  = integrator->aftCalcF.connect( boost::bind(&ExtPlumed::applyForceToAll, this));
+      _runInit = integrator->runInit.connect( boost::bind(&ExtPlumed::getTimeStep, this));
       // _aftIntV = integrator->aftIntV.connect( boost::bind(&ExtPlumed::computePe, this));
+    }
+
+    void ExtPlumed::getTimeStep() {
+
+      dt = integrator->getTimeStep();
+      p->cmd("setTimestep",&dt); // check type
     }
 
     void ExtPlumed::applyForceToAll() {

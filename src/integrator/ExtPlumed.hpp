@@ -65,8 +65,10 @@ namespace espressopp {
         real *charges;
 
         boost::signals2::connection _aftCalcF;
+        boost::signals2::connection _runInit;
         void connect();
         void disconnect();
+	void getTimeStep();
         /** Logger */
         static LOG4ESPP_DECL_LOGGER(theLogger);
         const bool charged;
